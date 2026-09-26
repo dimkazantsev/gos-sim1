@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GOS//SIM — моделирование государственного управления</title>
+  <meta name="description" content="Интерактивная учебная симуляция государственного управления" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="authView" class="auth-shell">
+      <div class="auth-grid-bg"></div>
+      <div class="auth-card glass">
+        <div class="brand-row">
+          <div class="brand-mark">G//S</div>
+          <div>
+            <div class="eyebrow">Учебная политико-управленческая симуляция</div>
+            <h1>GOS//SIM</h1>
+          </div>
+        </div>
+        <p class="lead">Войдите в игровое государство. Все действия, решения и результаты сохраняются в журнале сессии.</p>
+        <div class="segmented" role="tablist">
+          <button class="seg active" data-auth-mode="student">Студент</button>
+          <button class="seg" data-auth-mode="teacher">Преподаватель</button>
+        </div>
+        <form id="loginForm" class="stack">
+          <label>ФИО
+            <input id="fioInput" autocomplete="name" placeholder="Иванов Иван Иванович" required />
+          </label>
+          <label>Код игры
+            <input id="gameCodeInput" value="GPU-2026" placeholder="GPU-2026" required />
+          </label>
+          <label id="groupField">Учебная группа
+            <input id="groupInput" placeholder="Например: ПЛ-231" />
+          </label>
+          <label id="teacherCodeField" class="hidden">Код преподавателя
+            <input id="teacherCodeInput" type="password" placeholder="PREPOD2026" />
+          </label>
+          <button class="primary big" type="submit">Войти в симуляцию</button>
+        </form>
+        <div class="auth-note">Демо-режим хранит прогресс в браузере. Production-версия из архива рассчитана на PostgreSQL/Supabase.</div>
+      </div>
+    </section>
+
+    <section id="gameView" class="hidden app-shell">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="mobileMenuBtn" class="icon-btn mobile-only" aria-label="Меню">☰</button>
+          <div class="brand-mini"><span>G//S</span><small>GOS//SIM</small></div>
+          <div class="session-pill"><span class="pulse"></span><span id="sessionStatus">Раунд 1 · активен</span></div>
+        </div>
+        <div class="topbar-center">
+          <div class="turn-box">
+            <span class="muted">До конца хода</span>
+            <strong id="turnTimer">12:00</strong>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button id="soundToggle" class="icon-btn" title="Звук">◉</button>
+          <button id="profileBtn" class="profile-chip"><span id="profileInitials">ИИ</span><span id="profileName">Иван Иванов</span></button>
+        </div>
+      </header>
+
+      <aside id="sidebar" class="sidebar">
+        <nav>
+          <button class="nav-item active" data-view="overview"><span>⌂</span>Обзор государства</button>
+          <button class="nav-item" data-view="actions"><span>⚖</span>Мои действия <b id="pendingBadge">2</b></button>
+          <button class="nav-item" data-view="institutions"><span>▦</span>Органы власти</button>
+          <button class="nav-item" data-view="documents"><span>▤</span>Документы</button>
+          <button class="nav-item" data-view="analytics"><span>◫</span>Аналитика</button>
+          <button class="nav-item" data-view="journal"><span>↺</span>Журнал игры</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="role-card">
+            <div class="muted small">Ваша роль</div>
+            <strong id="roleName">Министр внутренней политики</strong>
+            <span id="roleLevel">Исполнительная власть</span>
+          </div>
+          <button id="teacherPanelBtn" class="teacher-btn hidden">Панель преподавателя</button>
+          <button id="logoutBtn" class="ghost full">Выйти</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section id="overviewPanel" class="view-panel">
+          <div class="hero-grid">
+            <div>
+              <div class="eyebrow">Национальный ситуационный центр</div>
+              <h2>Республика <span class="accent">Альтаир</span></h2>
+              <p class="subtle">Обстановка обновляется преподавателем и игровым движком. Решения участников влияют на показатели государства.</p>
+            </div>
+            <div class="hero-actions">
+              <button class="primary" data-quick-action="proposal">+ Инициировать решение</button>
+              <button class="secondary" id="openChatBtn">Открыть общий чат</button>
+            </div>
+          </div>
+
+          <div id="stateMetrics" class="metrics-grid"></div>
+
+          <div class="content-grid two-thirds">
+            <section class="card events-card">
+              <div class="card-head">
+                <div>
+                  <span class="eyebrow">Лента государства</span>
+                  <h3>События и решения</h3>
+                </div>
+                <button class="ghost compact" id="filterEventsBtn">Фильтр</button>
+              </div>
+              <div id="eventsFeed" class="events-feed"></div>
+            </section>
+
+            <section class="card brief-card">
+              <div class="card-head"><div><span class="eyebrow">Ваш бриф</span><h3>Что нужно сделать</h3></div><span class="status warning">до конца хода</span></div>
+              <div id="missionList" class="mission-list"></div>
+              <div class="divider"></div>
+              <div class="mini-chart-wrap">
+                <div class="mini-chart-title"><span>Риск политического кризиса</span><strong id="riskValue">38%</strong></div>
+                <div id="riskChart" class="risk-chart"></div>
+              </div>
+            </section>
+          </div>
+
+          <section class="card situation-map">
+            <div class="card-head">
+              <div><span class="eyebrow">Ситуационная модель</span><h3>Карта напряжения</h3></div>
+              <div class="legend"><span><i class="dot ok"></i>стабильно</span><span><i class="dot warn"></i>напряжение</span><span><i class="dot danger"></i>кризис</span></div>
+            </div>
+            <div class="map-grid" id="regionMap"></div>
+          </section>
+        </section>
+
+        <section id="actionsPanel" class="view-panel hidden">
+          <div class="page-head"><div><span class="eyebrow">Ход игрока</span><h2>Мои действия</h2></div><button class="primary" data-quick-action="proposal">+ Новое действие</button></div>
+          <div class="content-grid thirds">
+            <div class="card action-builder">
+              <h3>Конструктор решения</h3>
+              <label>Тип действия<select id="actionType"><option>Проект управленческого решения</option><option>Публичное заявление</option><option>Запрос ресурса</option><option>Межведомственное поручение</option><option>Поправка / контрпредложение</option></select></label>
+              <label>Краткое название<input id="actionTitle" placeholder="Например: стабилизация цен на топливо" /></label>
+              <label>Обоснование<textarea id="actionBody" rows="7" placeholder="Проблема → предлагаемое решение → ожидаемый эффект → риски"></textarea></label>
+              <div class="inline-two"><label>Бюджет<input id="actionBudget" type="number" min="0" value="25" /></label><label>Срочность<select id="actionUrgency"><option>Обычная</option><option>Высокая</option><option>Критическая</option></select></label></div>
+              <button id="submitActionBtn" class="primary full">Отправить преподавателю</button>
+            </div>
+            <div class="card" style="grid-column: span 2">
+              <div class="card-head"><div><span class="eyebrow">История</span><h3>Отправленные действия</h3></div><span class="status">все раунды</span></div>
+              <div id="actionsTable" class="data-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="institutionsPanel" class="view-panel hidden">
+          <div class="page-head"><div><span class="eyebrow">Игровые акторы</span><h2>Органы власти и группы влияния</h2></div></div>
+          <div id="institutionsGrid" class="institution-grid"></div>
+        </section>
+
+        <section id="documentsPanel" class="view-panel hidden">
+          <div class="page-head"><div><span class="eyebrow">Нормативный контур</span><h2>Документы</h2></div><button class="secondary">+ Черновик документа</button></div>
+          <div id="documentsList" class="document-grid"></div>
+        </section>
+
+        <section id="analyticsPanel" class="view-panel hidden">
+          <div class="page-head"><div><span class="eyebrow">Игровая аналитика</span><h2>Показатели и последствия</h2></div></div>
+          <div class="analytics-grid">
+            <div class="card"><span class="eyebrow">Вклад игрока</span><div class="big-number" id="playerScore">72</div><div class="subtle">балла за текущую сессию</div><div id="scoreBars" class="score-bars"></div></div>
+            <div class="card"><span class="eyebrow">Государство</span><h3>Динамика стабильности</h3><div id="stabilityChart" class="spark-chart"></div></div>
+            <div class="card"><span class="eyebrow">Команда</span><h3>Активность участников</h3><div id="activityLeaderboard" class="leaderboard"></div></div>
+          </div>
+        </section>
+
+        <section id="journalPanel" class="view-panel hidden">
+          <div class="page-head"><div><span class="eyebrow">Аудит</span><h2>Журнал игры</h2></div><button id="exportLogBtn" class="secondary">Экспорт JSON</button></div>
+          <div class="card"><div id="journalList" class="timeline"></div></div>
+        </section>
+      </main>
+
+      <aside id="chatDock" class="chat-dock hidden">
+        <div class="chat-head"><div><span class="eyebrow">Канал</span><strong># общий-штаб</strong></div><button id="closeChatBtn" class="icon-btn">×</button></div>
+        <div class="channel-tabs"><button class="active">Общий</button><button>Моя команда</button><button>Секретный</button></div>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="recorder-state hidden" id="recorderState"><span class="record-dot"></span><span id="recordLabel">Запись аудио…</span><span id="recordTime">00:00</span></div>
+        <div class="chat-compose">
+          <textarea id="chatInput" rows="2" placeholder="Сообщение…"></textarea>
+          <div class="compose-row">
+            <button id="audioBtn" class="icon-btn" title="Аудиосообщение">🎙</button>
+            <button id="videoBtn" class="icon-btn" title="Видеосообщение">◉</button>
+            <label class="icon-btn upload-label" title="Файл">＋<input id="fileInput" type="file" hidden /></label>
+            <button id="sendChatBtn" class="primary compact">Отправить</button>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <div id="modalRoot" class="modal-root hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>

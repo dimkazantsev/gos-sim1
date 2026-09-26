@@ -1,0 +1,23 @@
+{
+  "game": {
+    "title": "Моделирование ПАУ/ГПУ",
+    "code": "GPU-2026",
+    "roundDurationSeconds": 720,
+    "maxPlayers": 40
+  },
+  "metrics": [
+    {"key":"legitimacy","label":"Легитимность","value":67,"min":0,"max":100,"public":true},
+    {"key":"economy","label":"Экономика","value":54,"min":0,"max":100,"public":true},
+    {"key":"budget","label":"Бюджет","value":742,"unit":"млн","public":true},
+    {"key":"social_tension","label":"Социальное напряжение","value":41,"min":0,"max":100,"public":true},
+    {"key":"security","label":"Безопасность","value":73,"min":0,"max":100,"public":true}
+  ],
+  "roles": [
+    {"key":"government","title":"Правительство","team":"executive"},
+    {"key":"parliament","title":"Парламент","team":"legislative"},
+    {"key":"presidency","title":"Администрация главы государства","team":"executive"},
+    {"key":"court","title":"Судебная власть","team":"judicial"},
+    {"key":"media","title":"СМИ","team":"public"},
+    {"key":"interests","title":"Группы интересов","team":"public"}
+  ]
+}
