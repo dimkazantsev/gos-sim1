@@ -1,0 +1,15 @@
+export type Member={game_id:string;user_id:string;full_name:string;group_name:string|null;kind:'student'|'teacher'|'observer';role_title:string|null;team:string|null;score:number};
+export type Game={id:string;title:string;status:string;current_round:number;turn_open:boolean;turn_ends_at:string|null;settings:Record<string,unknown>};
+export type Metric={id:string;game_id:string;metric_key:string;label:string;value:number;previous_value:number|null;unit:string|null};
+export type EventItem={id:string;game_id:string;category:string;severity:string;title:string;body:string;round_no:number;published_at:string};
+export type ActionItem={id:string;game_id:string;author_id:string;action_type:string;title:string;body:string;budget:number;status:string;submitted_at:string;teacher_feedback:string|null};
+export type Channel={id:string;game_id:string;name:string;kind:string};
+export type Message={id:string;game_id:string;channel_id:string;author_id:string;kind:'text'|'audio'|'video'|'file'|'system';text:string|null;storage_path:string|null;mime_type:string|null;created_at:string;url?:string|null};
+export type Stage={id:string;game_id:string;stage_no:number;title:string;mode:string;summary:string;status:'locked'|'open'|'completed';deadline:string|null;opened_at:string|null;completed_at:string|null};
+export type Party={id:string;game_id:string;name:string;ideology:string|null;support:number;mandates:number;regions:number;budget:number;leader_user_id:string|null;color:string};
+export type Vote={id:string;game_id:string;stage_no:number;title:string;body:string|null;voting_mode:'member'|'faction'|'mandate';status:'open'|'closed';opened_at:string;closed_at:string|null};
+export type Ballot={vote_id:string;voter_id:string;choice:'yes'|'no'|'abstain';weight:number};
+export type Evaluation={id:string;game_id:string;stage_no:number;user_id:string;evaluator_id:string;score:number;note:string|null};
+export type Crisis={id:string;game_id:string;stage_no:number;crisis_type:string;intensity:'low'|'medium'|'high'|'ultra';description:string;created_at:string};
+export type GameDocument={id:string;game_id:string;title:string;doc_type:string|null;body:string|null;created_by:string|null;created_at:string};
+export type View='dashboard'|'stages'|'parties'|'votes'|'documents'|'actions'|'teacher';
