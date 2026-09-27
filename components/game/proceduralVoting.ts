@@ -43,6 +43,29 @@ export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
   };
  }
 
+ if(doc.workflow_key==='budget'){
+  if(['reading1','reading2','reading3'].includes(doc.status_code)){
+   const label=doc.status_code==='reading1'?'I чтение бюджета':doc.status_code==='reading2'?'II чтение бюджета':'III чтение бюджета';
+   return {
+    title:label+': '+doc.title,
+    body:doc.status_code==='reading1'
+      ?'Государственная Дума принимает или отклоняет основные характеристики федерального бюджета.'
+      :doc.status_code==='reading2'
+        ?'Государственная Дума рассматривает поправки ко второму чтению проекта федерального бюджета.'
+        :'Государственная Дума голосует за федеральный бюджет в целом.',
+    mode:'mandate',institutionKey:'gd',procedureKey:'budget_'+doc.status_code,
+    quorumKind:'fraction',quorumValue:2/3,
+    majorityKind:'eligible_majority',majorityValue:0.5,
+    allowAbstain:true,tieBreakerChair:false,
+    passTransition:'advance',
+    failTransition:doc.status_code==='reading1'?'none':'reject',
+    badge:label.toUpperCase(),
+    rule:'Большинство от общего числа депутатов Государственной Думы'
+   };
+  }
+  return null;
+ }
+
  if(doc.workflow_key==='bill'){
   if(['reading1','reading2','reading3'].includes(doc.status_code)){
    const label=doc.status_code==='reading1'?'I чтение':doc.status_code==='reading2'?'II чтение':'III чтение';
