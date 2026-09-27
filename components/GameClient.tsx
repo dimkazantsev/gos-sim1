@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {Activity,BookOpenText,ChevronLeft,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote,Wifi} from 'lucide-react';
+import {BookOpenText,ChevronLeft,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote,Wifi} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
