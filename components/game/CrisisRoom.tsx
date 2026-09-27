@@ -5,6 +5,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 
 type InfoRequest={id:string;crisis_id:string;game_id:string;requester_id:string;question:string;answer:string|null;status:'pending'|'answered';created_at:string;answered_at:string|null};
 type CrisisResponse={id:string;crisis_id:string;game_id:string;user_id:string;role_title:string|null;action_plan:string;legal_basis:string|null;resources:string|null;public_message:string|null;teacher_note:string|null;status:'submitted'|'reviewed';created_at:string;updated_at:string};
+type RoleConsequence={game_id:string;user_id:string;crisis_id:string|null;status:'active'|'suspended'|'arrested'|'detained'|'deceased'|'incapacitated';reason:string|null;until_at:string|null;set_at:string};
 
 const intensityLabel:Record<string,string>={low:'Низкая',medium:'Средняя',high:'Высокая',ultra:'Ультра'};
 const intensityClass=(x:string)=>x==='ultra'?'ultra':x==='high'?'high':x==='medium'?'medium':'low';
@@ -14,6 +15,7 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
  const active=useMemo(()=>crises.filter(c=>c.status==='active').sort((a,b)=>new Date(b.created_at).getTime()-new Date(a.created_at).getTime())[0],[crises]);
  const [requests,setRequests]=useState<InfoRequest[]>([]);
  const [responses,setResponses]=useState<CrisisResponse[]>([]);
+ const [consequences,setConsequences]=useState<RoleConsequence[]>([]);
  const [question,setQuestion]=useState('');
  const [answerDraft,setAnswerDraft]=useState<Record<string,string>>({});
  const [plan,setPlan]=useState('');
@@ -22,16 +24,22 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
  const [message,setMessage]=useState('');
  const [reviewDraft,setReviewDraft]=useState<Record<string,string>>({});
  const [resolution,setResolution]=useState('');
+ const [consequenceUser,setConsequenceUser]=useState('');
+ const [consequenceStatus,setConsequenceStatus]=useState<RoleConsequence['status']>('suspended');
+ const [consequenceReason,setConsequenceReason]=useState('');
+ const [consequenceUntil,setConsequenceUntil]=useState('');
  const [busy,setBusy]=useState(false);
  const [now,setNow]=useState(Date.now());
 
  async function load(){
   if(!game||!active)return;
-  const [q,r]=await Promise.all([
+  const [q,r,cs]=await Promise.all([
    supabase.from('crisis_information_requests').select('*').eq('game_id',game.id).eq('crisis_id',active.id).order('created_at',{ascending:true}),
-   supabase.from('crisis_responses').select('*').eq('game_id',game.id).eq('crisis_id',active.id).order('created_at',{ascending:true})
+   supabase.from('crisis_responses').select('*').eq('game_id',game.id).eq('crisis_id',active.id).order('created_at',{ascending:true}),
+   supabase.from('game_role_consequences').select('*').eq('game_id',game.id).order('set_at',{ascending:false})
   ]);
   if(!q.error)setRequests((q.data||[]) as InfoRequest[]);
+  if(!cs.error)setConsequences((cs.data||[]) as RoleConsequence[]);
   if(!r.error){
    const rows=(r.data||[]) as CrisisResponse[];
    setResponses(rows);
@@ -46,6 +54,7 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
   const ch=supabase.channel('crisis-room:'+active.id)
    .on('postgres_changes',{event:'*',schema:'public',table:'crisis_information_requests',filter:'game_id=eq.'+game.id},()=>void load())
    .on('postgres_changes',{event:'*',schema:'public',table:'crisis_responses',filter:'game_id=eq.'+game.id},()=>void load())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_role_consequences',filter:'game_id=eq.'+game.id},()=>void load())
    .subscribe();
   return()=>{void supabase.removeChannel(ch)}
  },[game?.id,active?.id]);
@@ -88,6 +97,15 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
   setBusy(true);const r=await supabase.rpc('resolve_crisis',{p_crisis_id:active.id,p_resolution_note:resolution.trim()||null});
   if(r.error)setError(r.error.message);setBusy(false);
  }
+ async function applyRoleConsequence(){
+  if(!consequenceUser)return;setBusy(true);
+  const r=await supabase.rpc('set_crisis_role_consequence',{
+   p_crisis_id:active.id,p_user_id:consequenceUser,p_status:consequenceStatus,
+   p_reason:consequenceReason.trim()||null,p_until_at:consequenceUntil?new Date(consequenceUntil).toISOString():null
+  });
+  if(r.error)setError(r.error.message);else{setConsequenceReason('');setConsequenceUntil('');await load()}
+  setBusy(false);
+ }
 
  return <section className={'crisisCommand '+intensityClass(active.intensity)}>
   <header className="crisisCommandHead">
@@ -108,6 +126,13 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
     :<div className="crisisResponseForm"><label>1 · Управленческое решение<textarea rows={5} value={plan} onChange={e=>setPlan(e.target.value)} placeholder="Что именно вы делаете сейчас, кто исполняет и в какой последовательности?"/></label><label>2 · Полномочия и правовое основание<textarea rows={3} value={legal} onChange={e=>setLegal(e.target.value)} placeholder="На каком полномочии, норме или компетенции основано решение?"/></label><label>3 · Ресурсы и ограничения<textarea rows={3} value={resources} onChange={e=>setResources(e.target.value)} placeholder="Люди, бюджет, информация, время, инфраструктура, риски…"/></label><label>4 · Публичная коммуникация<textarea rows={3} value={message} onChange={e=>setMessage(e.target.value)} placeholder="Что ваш орган сообщает гражданам и другим институтам?"/></label><button className="primary" disabled={busy||plan.trim().length<20} onClick={()=>void submit()}>{myResponse?'Обновить решение':'Отправить решение'}</button>{myResponse?.teacher_note&&<div className="crisisTeacherFeedback"><b>Комментарий преподавателя</b><p>{myResponse.teacher_note}</p></div>}</div>}
    </article>
   </div>
+
+  {teacher&&<section className="crisisRoleConsequences">
+   <div className="crisisSectionHead"><div><small>ИНСТИТУЦИОНАЛЬНЫЕ ПОСЛЕДСТВИЯ</small><h3>Статус государственных ролей</h3></div><span>{consequences.filter(x=>x.status!=='active'&&(!x.until_at||new Date(x.until_at)>new Date())).length} ограничено</span></div>
+   <p className="crisisRoleIntro">Последствие не стирает должность из профиля. Оно временно или постоянно отключает полномочия роли для институциональных действий и голосований; преподаватель может восстановить полномочия.</p>
+   <div className="crisisRoleGrid">{members.filter(m=>m.kind==='student'&&m.role_title).map(m=>{const x=consequences.find(c=>c.user_id===m.user_id);const effective=x&&x.status!=='active'&&(!x.until_at||new Date(x.until_at)>new Date());return <article key={m.user_id} className={effective?x.status:'active'}><div><b>{m.full_name}</b><small>{m.role_title}</small>{x?.reason&&effective&&<p>{x.reason}</p>}</div><span>{!effective?'Полномочия активны':x.status==='suspended'?'Отстранён(а)':x.status==='arrested'?'Арестован(а)':x.status==='detained'?'Заключён(а)':x.status==='deceased'?'Роль погибла':'Недееспособен(на)'}</span>{x?.until_at&&effective&&<time>до {new Date(x.until_at).toLocaleString('ru-RU')}</time>}</article>})}</div>
+   <div className="crisisRoleComposer"><select value={consequenceUser} onChange={e=>setConsequenceUser(e.target.value)}><option value="">Участник с государственной ролью…</option>{members.filter(m=>m.kind==='student'&&m.role_title).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name} · {m.role_title}</option>)}</select><select value={consequenceStatus} onChange={e=>setConsequenceStatus(e.target.value as RoleConsequence['status'])}><option value="suspended">Временно отстранить</option><option value="arrested">Арестовать роль</option><option value="detained">Заключить / задержать</option><option value="incapacitated">Временно недееспособна</option><option value="deceased">Роль погибла</option><option value="active">Восстановить полномочия</option></select><input value={consequenceReason} onChange={e=>setConsequenceReason(e.target.value)} placeholder="Основание / последствие кризиса"/><label>До<input type="datetime-local" disabled={consequenceStatus==='deceased'||consequenceStatus==='active'} value={consequenceUntil} onChange={e=>setConsequenceUntil(e.target.value)}/></label><button className="primary" disabled={busy||!consequenceUser} onClick={()=>void applyRoleConsequence()}>Зафиксировать статус</button></div>
+  </section>}
 
   {teacher&&<footer className="crisisResolution"><div><small>ЗАВЕРШЕНИЕ СЦЕНАРИЯ</small><p>Фиксируйте результат только после разбора решений: что сработало, какие полномочия были использованы корректно и какие последствия возникли.</p></div><textarea rows={3} value={resolution} onChange={e=>setResolution(e.target.value)} placeholder="Итог кризиса и ключевые последствия"/><button className="primary" disabled={busy} onClick={()=>void resolve()}>Завершить кризис</button></footer>}
  </section>;
