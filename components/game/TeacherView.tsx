@@ -5,7 +5,7 @@ import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
 
 const VIEW_NAMES:Record<string,string>={
- dashboard:'Политические процессы',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'Материалы',actions:'Решения',teacher:'Управление',chat:'Связь'
+ dashboard:'Политические процессы',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'НПА',actions:'Решения',grades:'Оценки',profile:'Профиль',teacher:'Управление',chat:'Связь'
 };
 
 function timerText(seconds:number){
