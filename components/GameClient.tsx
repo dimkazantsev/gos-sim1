@@ -79,7 +79,7 @@ export default function GameClient({gameId}:{gameId:string}){
    {view==='documents'&&<DocumentsView g={g} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>} 
    {view==='actions'&&<PoliticalWallView g={g} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>} 
    {view==='profile'&&<ProfileView g={g}/>} 
-   {view==='teacher'&&teacher&&<TeacherView g={g}/>}  
+   {view==='teacher'&&teacher&&<TeacherView g={g} onOpenProcesses={()=>setView('dashboard')}/>}  
    {!chatOpen&&<button className="floatingChat" onClick={()=>{setChatOpen(true);void logActivity('navigation','Открыл связь','chat')}}>⌁ <span>Связь</span></button>}
   </main>
 
