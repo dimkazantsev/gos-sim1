@@ -3,7 +3,7 @@ import {FormEvent,useEffect,useMemo,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
 import type {ActionItem,Activity,Ballot,Channel,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,ImpactLedger,ImpactRule,Member,Message,Metric,MetricHistory,Party,PartyAgreement,PartyDocument,PartyInvitation,PartyMandateAllocation,PartySupportHistory,PoliticalDecision,PoliticalPost,PoliticalPostFormalLink,PoliticalPostMedia,Presence,Stage,Vote} from './types';
-import {CRISES,INTENSITY_LABEL} from './constants';
+import {CRISES} from './constants';
 
 export function useRepublicGame(gameId:string){
  const router=useRouter();
