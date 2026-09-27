@@ -388,6 +388,16 @@ export function useRepublicGame(gameId:string){
   if(r.error){setError(r.error.message);return false}
   await loadPartyRepresentation();return true;
  }
+ async function submitPartyRegistration(partyId:string){
+  const r=await supabase.rpc('submit_party_registration',{p_party_id:partyId});
+  if(r.error){setError(r.error.message);return false}
+  await refresh();return true;
+ }
+ async function reviewPartyRegistration(partyId:string,status:'registered'|'revision'|'rejected',note?:string){
+  const r=await supabase.rpc('review_party_registration',{p_party_id:partyId,p_status:status,p_note:note||null});
+  if(r.error){setError(r.error.message);return false}
+  await refresh();return true;
+ }
  async function applyPartyGhostLoss(partyId:string,loss:number){
   const r=await supabase.rpc('apply_party_ghost_loss',{p_party_id:partyId,p_loss:loss});
   if(r.error){setError(r.error.message);return false}
@@ -626,5 +636,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,toggleRecording};
+  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,toggleRecording};
 }
