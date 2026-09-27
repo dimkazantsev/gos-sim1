@@ -115,6 +115,25 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
   </section>
 
   <details className="teacherDetails">
+   <summary><div><b>Журнал партийных приглашений</b><span>Вся история формирования фракций: приглашено, принято, отклонено, отменено</span></div><i>+</i></summary>
+   <div className="teacherDetailsBody">
+    <div className="teacherInviteLog">
+     {partyInvitations.length===0?<div className="emptyState">Приглашений пока не было.</div>:partyInvitations.map(inv=>{
+      const p=parties.find(x=>x.id===inv.party_id);
+      const student=members.find(m=>m.user_id===inv.invited_user_id);
+      const sender=members.find(m=>m.user_id===inv.invited_by);
+      return <div key={inv.id}>
+       <span className={'inviteStatus '+inv.status}>{inv.status==='accepted'?'✓':inv.status==='declined'?'×':inv.status==='cancelled'?'—':'○'}</span>
+       <div><b>{student?.full_name||'Студент'}</b><small>{p?.name||'Партия'} · пригласил {sender?.full_name||'участник'}</small></div>
+       <em>{inv.status==='pending'?'Ожидает':inv.status==='accepted'?'Принято':inv.status==='declined'?'Отклонено':'Отменено'}</em>
+       <time>{new Date(inv.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}{inv.responded_at?' → '+new Date(inv.responded_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}</time>
+      </div>
+     })}
+    </div>
+   </div>
+  </details>
+
+  <details className="teacherDetails">
    <summary><div><b>Быстрые сценарии и события</b><span>Таймер, кризис, ghost voting, публикация события</span></div><i>+</i></summary>
    <div className="teacherDetailsBody">
     <div className="directorButtons compact">
