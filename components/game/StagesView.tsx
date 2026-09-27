@@ -14,6 +14,7 @@ import InstitutionStaffingLab from './InstitutionStaffingLab';
 import StateProgramLab from './StateProgramLab';
 import BudgetLab from './BudgetLab';
 import MunicipalProjectLab from './MunicipalProjectLab';
+import SystemDebriefLab from './SystemDebriefLab';
 import LegislativeSessionLab from './LegislativeSessionLab';
 import GovernmentProgramSessionLab from './GovernmentProgramSessionLab';
 
@@ -165,6 +166,8 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
      {selected.stage_no===13&&<BudgetLab g={g}/>} 
 
      {selected.stage_no===14&&<MunicipalProjectLab g={g}/>} 
+
+     {selected.stage_no===16&&<SystemDebriefLab g={g}/>} 
 
      {teacher&&<section className="stageTeacherActions">
       <div><small>УПРАВЛЕНИЕ ЭТАПОМ</small><b>Действия преподавателя</b></div>
