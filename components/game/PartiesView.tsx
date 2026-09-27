@@ -14,7 +14,7 @@ const DOCS:{kind:PartyDocument['doc_kind'];title:string;rule:string}[]=[
 ];
 
 export default function PartiesView({g}:{g:ReturnTypeRepublic}){
- const {parties,members,profiles,partyDocuments,partyInvitations,partyMandates,partyAgreements,votes,currentStage,me,teacher,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,savePartyIdentity,uploadPartyDocument,reviewPartyDocument}=g;
+ const {parties,members,profiles,partyDocuments,partyInvitations,partyMandates,partyAgreements,votes,currentStage,me,teacher,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,savePartyIdentity,uploadPartyDocument,reviewPartyDocument}=g;
  const [name,setName]=useState(''),[ideology,setIdeology]=useState('');
  const [selectedId,setSelectedId]=useState('');
  const [desc,setDesc]=useState('');
@@ -31,6 +31,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const [agreementVote,setAgreementVote]=useState('');
  const [myPromise,setMyPromise]=useState<''|'yes'|'no'>('');
  const [theirPromise,setTheirPromise]=useState<''|'yes'|'no'>('');
+ const [registrationNote,setRegistrationNote]=useState('');
  const [busy,setBusy]=useState(false);
 
  const ranked=useMemo(()=>[...parties].sort((a,b)=>Number(b.support)-Number(a.support)||b.regions-a.regions||b.mandates-a.mandates),[parties]);
@@ -39,6 +40,8 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const partyMembers=selected?members.filter(m=>m.kind==='student'&&m.team===selected.name):[];
  const leader=selected?members.find(m=>m.user_id===selected.leader_user_id):undefined;
  const docs=selected?partyDocuments.filter(d=>d.party_id===selected.id):[];
+ const registrationComplete=DOCS.every(req=>docs.some(d=>d.doc_kind===req.kind));
+ const registrationAccepted=DOCS.every(req=>docs.some(d=>d.doc_kind===req.kind&&d.status==='accepted'));
  const canEditIdentity=!!selected&&(teacher||selected.leader_user_id===me?.user_id);
  const isLeader=!!selected&&selected.leader_user_id===me?.user_id;
  const freeStudents=members.filter(m=>m.kind==='student'&&!m.team);
@@ -188,6 +191,11 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
   </section>}
 
   {selected&&<section className="partyDocumentsSection">
+   <div className="partyRegistrationStatus">
+    <div><small>ГОСУДАРСТВЕННАЯ РЕГИСТРАЦИЯ · ИГРОВОЙ МИНЮСТ</small><h3>{selected.registration_status==='registered'?'Партия зарегистрирована':selected.registration_status==='submitted'?'Пакет рассматривается':selected.registration_status==='revision'?'Возвращено на доработку':selected.registration_status==='rejected'?'В регистрации отказано':'Пакет формируется'}</h3>{selected.registration_note&&<p>{selected.registration_note}</p>}<span>{docs.length}/{DOCS.length} документов · {docs.filter(d=>d.status==='accepted').length}/{DOCS.length} принято</span></div>
+    {isLeader&&selected.registration_status!=='registered'&&selected.registration_status!=='submitted'&&<button className="primary" disabled={busy||!registrationComplete} onClick={async()=>{setBusy(true);await submitPartyRegistration(selected.id);setBusy(false)}}>Подать пакет в Минюст →</button>}
+    {teacher&&selected.registration_status==='submitted'&&<div className="partyRegistrationDecision"><textarea rows={2} value={registrationNote} onChange={e=>setRegistrationNote(e.target.value)} placeholder="Комментарий Минюста / основания решения"/><button disabled={busy} onClick={async()=>{setBusy(true);await reviewPartyRegistration(selected.id,'revision',registrationNote);setBusy(false)}}>↺ Доработка</button><button disabled={busy} onClick={async()=>{setBusy(true);await reviewPartyRegistration(selected.id,'rejected',registrationNote);setBusy(false)}}>Отказать</button><button className="primary" disabled={busy||!registrationAccepted} onClick={async()=>{setBusy(true);await reviewPartyRegistration(selected.id,'registered',registrationNote);setBusy(false)}}>✓ Зарегистрировать</button></div>}
+   </div>
    <div className="partySectionTitle"><div><small>УЧРЕДИТЕЛЬНЫЙ ПАКЕТ</small><h2>Документы партии</h2></div><span>{docs.length} загружено</span></div>
    <div className="requiredDocs">
     {DOCS.map(req=>{const d=docs.find(x=>x.doc_kind===req.kind);return <article className={d?'requiredDoc complete':'requiredDoc'} key={req.kind}><div className="docState">{d?'✓':'○'}</div><div><b>{req.title}</b><span>{req.rule}</span>{d&&<a href={d.url||'#'} target="_blank" rel="noreferrer">{d.file_name}</a>}</div>{d&&<em className={`docReview ${d.status}`}>{d.status==='accepted'?'Принято':d.status==='revision'?'На доработку':'Загружено'}</em>}</article>})}
