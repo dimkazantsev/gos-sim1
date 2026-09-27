@@ -3,12 +3,12 @@ import {useEffect,useState} from 'react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {View} from './game/types';
 import {initials} from './game/constants';
-import DashboardView from './game/DashboardView';
+import PoliticalWallView from './game/PoliticalWallView';
+import StateMetricsDock from './game/StateMetricsDock';
 import StagesView from './game/StagesView';
 import PartiesView from './game/PartiesView';
 import VotesView from './game/VotesView';
 import DocumentsView from './game/DocumentsView';
-import ActionsView from './game/ActionsView';
 import TeacherView from './game/TeacherView';
 import ProfileView from './game/ProfileView';
 import ChatPanel from './game/ChatPanel';
@@ -31,7 +31,7 @@ export default function GameClient({gameId}:{gameId:string}){
 
  useEffect(()=>{
   if(!me)return;
-  const labels:Record<View,string>={dashboard:'Сейчас',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Решение',profile:'Мой профиль',teacher:'Управление'};
+  const labels:Record<View,string>={dashboard:'Политические процессы',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Архив решений',profile:'Мой профиль',teacher:'Управление'};
   void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
   const id=setInterval(()=>void touchPresence(view),30000);
   return()=>clearInterval(id);
@@ -40,8 +40,8 @@ export default function GameClient({gameId}:{gameId:string}){
  if(loading||!game||!me)return <main className="loginPage"><div className="loaderCard"><div className="spinner"/><div><b>GOS//SIM</b><p className="muted">{error||'Подключение к игре…'}</p></div></div></main>;
 
  const nav:[View,string,string][] = teacher
-  ? [['teacher','✦','Управление'],['dashboard','◎','Общий ход'],['parties','◈','Партии'],['votes','✓','Голосования'],['actions','▣','Решения'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Профиль']]
-  : [['dashboard','◎','Сейчас'],['parties','◈','Партия'],['votes','✓','Голосование'],['actions','▣','Решение'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Мой профиль']];
+  ? [['teacher','✦','Управление'],['dashboard','◎','Политические процессы'],['parties','◈','Партии'],['votes','✓','Голосования'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Профиль']]
+  : [['dashboard','◎','Политические процессы'],['parties','◈','Партия'],['votes','✓','Голосование'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Мой профиль']];
 
  const openScreen=()=>window.open('/game/'+gameId+'/screen','gos-sim-public');
 
@@ -70,14 +70,16 @@ export default function GameClient({gameId}:{gameId:string}){
    </div>
   </nav>
 
+  <StateMetricsDock g={g}/>
+
   <main className={`simMain ${chatOpen?'chatOpen':''}`}>
    {error&&<div className="errorBox closable" onClick={()=>setError('')}>{error}</div>}
-   {view==='dashboard'&&<DashboardView g={g} onNavigate={v=>setView(v)}/>}
+   {view==='dashboard'&&<PoliticalWallView g={g} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}}/>}
    {view==='stages'&&<StagesView g={g} onOpenVotes={()=>setView('votes')}/>} 
    {view==='parties'&&<PartiesView g={g}/>}
    {view==='votes'&&<VotesView g={g} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onOpenStages={()=>setView('stages')}/>} 
    {view==='documents'&&<DocumentsView g={g} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>} 
-   {view==='actions'&&<ActionsView g={g}/>}
+   {view==='actions'&&<PoliticalWallView g={g} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}}/>}
    {view==='profile'&&<ProfileView g={g}/>} 
    {view==='teacher'&&teacher&&<TeacherView g={g} onOpenScreen={openScreen}/>} 
    {!chatOpen&&<button className="floatingChat" onClick={()=>{setChatOpen(true);void logActivity('navigation','Открыл связь','chat')}}>⌁ <span>Связь</span></button>}
