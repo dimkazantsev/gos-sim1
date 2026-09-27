@@ -2,6 +2,7 @@
 import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {VSN_LABEL} from './constants';
+import ImpactRulesPanel from './ImpactRulesPanel';
 
 const VIEW_NAMES:Record<string,string>={
  dashboard:'Главный экран',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'Материалы',actions:'Решения',teacher:'Управление',chat:'Связь'
@@ -12,7 +13,7 @@ function timerText(seconds:number){
  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpenScreen:()=>void}){
+export default function TeacherView({g}:{g:ReturnTypeRepublic}){
  const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,setEvaluation,updateMember,updateMetric}=g;
  const [eventTitle,setEventTitle]=useState(''),[eventBody,setEventBody]=useState('');
  if(!game)return null;
@@ -59,8 +60,8 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
     <span>{game.turn_open?'Ⅱ':'▶'}</span>
     <div><b>{game.turn_open?'Поставить на паузу':'Открыть ход'}</b><small>{game.turn_open?'Временно остановить действия студентов':'Разрешить студентам выполнять задания'}</small></div>
    </button>
-   <button className="teacherAction" onClick={onOpenScreen}>
-    <span>▣</span><div><b>Общий экран</b><small>Открыть экран для проектора и аудитории</small></div>
+   <button className="teacherAction" onClick={()=>{const el=document.querySelector('.wallPage');if(el)el.scrollIntoView({behavior:'smooth'});}}>
+    <span>◎</span><div><b>Политические процессы</b><small>Общее публичное пространство игры теперь находится в ленте</small></div>
    </button>
    <button className="teacherAction" onClick={confirmNext}>
     <span>→</span><div><b>Следующий этап</b><small>Завершить текущий и перейти дальше</small></div>
@@ -125,6 +126,8 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
     })}
    </div>
   </section>
+
+  <ImpactRulesPanel g={g}/>
 
   <section className="surface teacherRepresentation">
    <div className="surfaceHead"><div><small>ПРЕДСТАВИТЕЛЬСТВО В ГД</small><h2>Фракции, студенты и мандаты</h2></div><span>{parties.reduce((a,p)=>a+Number(p.mandates||0),0)}/450</span></div>
