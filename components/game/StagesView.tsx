@@ -8,6 +8,7 @@ import {GAME_PHASES,STAGE_SYSTEM,gamePhaseForStage} from './stageSystem';
 import DeadlineControl from './DeadlineControl';
 import PresidentialElectionLab from './PresidentialElectionLab';
 import DumaLeadershipElection from './DumaLeadershipElection';
+import GovernmentFormationLab from './GovernmentFormationLab';
 
 export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
@@ -141,6 +142,8 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
      {selected.stage_no===4&&<DumaLeadershipElection g={g}/>} 
 
      {(selected.stage_no===6||selected.stage_no===7)&&<PresidentialElectionLab g={g}/>} 
+
+     {selected.stage_no===8&&<GovernmentFormationLab g={g}/>} 
 
      {teacher&&<section className="stageTeacherActions">
       <div><small>УПРАВЛЕНИЕ ЭТАПОМ</small><b>Действия преподавателя</b></div>
