@@ -2,7 +2,7 @@
 import {useEffect,useState} from 'react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {View} from './game/types';
-import {gameStatus,initials} from './game/constants';
+import {initials} from './game/constants';
 import DashboardView from './game/DashboardView';
 import StagesView from './game/StagesView';
 import PartiesView from './game/PartiesView';
@@ -20,40 +20,53 @@ function fmtTimer(seconds:number){
 export default function GameClient({gameId}:{gameId:string}){
  const g=useRepublicGame(gameId);
  const [view,setView]=useState<View>('dashboard');
- const viewLabels:Record<View,string>={dashboard:'Главный экран',stages:'Этапы игры',parties:'Партии и фракции',votes:'Голосования',documents:'Документы',actions:'Мои решения',teacher:'Пульт преподавателя'};
- const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,averageVsn,touchPresence,logActivity}=g;
+ const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
 
  useEffect(()=>{
   if(!me)return;
-  void touchPresence(view,'Открыл раздел «'+viewLabels[view]+'»');
+  if(teacher&&view==='dashboard')setView('teacher');
+ },[teacher,me?.user_id]);
+
+ useEffect(()=>{
+  if(!me)return;
+  const labels:Record<View,string>={dashboard:'Сейчас',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'Материалы',actions:'Решение',teacher:'Управление'};
+  void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
   const id=setInterval(()=>void touchPresence(view),30000);
   return()=>clearInterval(id);
  },[view,me?.user_id]);
 
- if(loading||!game||!me)return <main className="loginPage"><div className="loaderCard"><div className="spinner"/><div><b>GOS//SIM</b><p className="muted">{error||'Подключение к «Республике Политология»…'}</p></div></div></main>;
+ if(loading||!game||!me)return <main className="loginPage"><div className="loaderCard"><div className="spinner"/><div><b>GOS//SIM</b><p className="muted">{error||'Подключение к игре…'}</p></div></div></main>;
 
- const nav:[View,string,string][]=[
-  ['dashboard','◎','Главный экран'],
-  ['stages','◫','Этапы игры'],
-  ['parties','◈','Партии и фракции'],
-  ['votes','✓','Голосования'],
-  ['documents','▤','Документы'],
-  ['actions','▣','Мои решения']
- ];
+ const nav:[View,string,string][] = teacher
+  ? [['teacher','✦','Управление'],['dashboard','◎','Общий ход'],['parties','◈','Партии'],['votes','✓','Голосования'],['actions','▣','Решения'],['documents','▤','Материалы'],['stages','◫','Этапы']]
+  : [['dashboard','◎','Сейчас'],['parties','◈','Партия'],['votes','✓','Голосование'],['actions','▣','Решение'],['documents','▤','Материалы'],['stages','◫','Этапы']];
+
+ const openScreen=()=>window.open('/game/'+gameId+'/screen','gos-sim-public');
 
  return <div className="simShell">
   <header className="simTop">
    <div className="simBrand"><div className="simLogo">GS</div><div><b>GOS//SIM</b><span>Республика Политология</span></div></div>
-   <div className="simTopCenter"><strong>{game.title}</strong><div className="topIndicators"><span className={`livePill ${game.turn_open?'on':'off'}`}>● {game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span><span className={`connectionPill ${g.realtimeState}`} title="Состояние синхронизации">{g.realtimeState==='connected'?'● ONLINE':g.realtimeState==='connecting'?'○ SYNC':'! OFFLINE'}</span><span className="stagePill">Этап {currentStage?.stage_no||game.current_round}/16</span>{game.turn_open&&game.turn_ends_at&&<span className="timerPill">{fmtTimer(secondsLeft)}</span>}</div></div>
-   <div className="simUser">{teacher&&<button className="publicScreenTop" onClick={()=>window.open('/game/'+gameId+'/screen','gos-sim-public')}>Общий экран ↗</button>}<div className="simAvatar">{initials(me.full_name)}</div><div><b>{me.full_name}</b><span>{me.role_title||(teacher?'Руководитель симуляции':'Участник')}</span></div><button onClick={logout}>Выйти</button></div>
+   <div className="simTopCenter">
+    <strong>{currentStage?.stage_no||game.current_round}. {currentStage?.title||game.title}</strong>
+    <div className="topIndicators">
+     <span className={`livePill ${game.turn_open?'on':'off'}`}>● {game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span>
+     {game.turn_open&&game.turn_ends_at&&<span className="timerPill">{fmtTimer(secondsLeft)}</span>}
+     <span className={`connectionPill ${g.realtimeState}`}>{g.realtimeState==='connected'?'● ONLINE':g.realtimeState==='connecting'?'○ SYNC':'! OFFLINE'}</span>
+    </div>
+   </div>
+   <div className="simUser">
+    {teacher&&<button className="topScreenButton" onClick={openScreen}>▣ Общий экран</button>}
+    <div className="simAvatar">{initials(me.full_name)}</div>
+    <div className="simUserText"><b>{me.full_name}</b><span>{me.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
+    <button className="logoutButton" onClick={logout}>Выйти</button>
+   </div>
   </header>
 
-  <aside className="simNav">
-   <nav>{nav.map(([k,ic,label])=><button key={k} className={view===k?'active':''} onClick={()=>setView(k)} aria-current={view===k?'page':undefined}><i>{ic}</i><span>{label}</span></button>)}{teacher&&<button className={view==='teacher'?'active':''} onClick={()=>setView('teacher')}><i>✦</i><span>Пульт преподавателя</span></button>}</nav>
-   {teacher&&<button className="publicScreenNav" onClick={()=>window.open('/game/'+gameId+'/screen','gos-sim-public')}><i>▣</i><span><b>Общий экран</b><small>Для проектора и аудитории</small></span></button>}
-   <div className="stageMini"><small>ТЕКУЩИЙ ЭТАП</small><b>{currentStage?.stage_no}. {currentStage?.title}</b><span>{currentStage?.mode}</span><div className="progressLine"><i style={{width:`${((currentStage?.stage_no||1)/16)*100}%`}}/></div></div>
-   <div className="roleMini"><small>МОЯ РОЛЬ</small><b>{me.role_title||me.kind}</b><span>{me.team||me.group_name||'Без фракции'}</span><em>ВСН: {averageVsn?averageVsn.toFixed(1):'—'} · {gameStatus(game.status)}</em></div>
-  </aside>
+  <nav className="focusNav" aria-label="Разделы игры">
+   <div className="focusNavInner">
+    {nav.map(([k,ic,label])=><button key={k} className={view===k?'active':''} onClick={()=>setView(k)} aria-current={view===k?'page':undefined}><i>{ic}</i><span>{label}</span></button>)}
+   </div>
+  </nav>
 
   <main className={`simMain ${chatOpen?'chatOpen':''}`}>
    {error&&<div className="errorBox closable" onClick={()=>setError('')}>{error}</div>}
@@ -63,10 +76,10 @@ export default function GameClient({gameId}:{gameId:string}){
    {view==='votes'&&<VotesView g={g}/>}
    {view==='documents'&&<DocumentsView g={g}/>}
    {view==='actions'&&<ActionsView g={g}/>}
-   {view==='teacher'&&teacher&&<TeacherView g={g} onOpenScreen={()=>window.open('/game/'+gameId+'/screen','gos-sim-public')}/>}
-   {!chatOpen&&<button className="floatingChat" onClick={()=>{setChatOpen(true);void logActivity('navigation','Открыл панель связи','chat')}}>⌁ <span>Открыть связь</span></button>}
+   {view==='teacher'&&teacher&&<TeacherView g={g} onOpenScreen={openScreen}/>}
+   {!chatOpen&&<button className="floatingChat" onClick={()=>{setChatOpen(true);void logActivity('navigation','Открыл связь','chat')}}>⌁ <span>Связь</span></button>}
   </main>
 
   {chatOpen&&<ChatPanel g={g}/>}
- </div>
+ </div>;
 }
