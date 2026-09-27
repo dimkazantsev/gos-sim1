@@ -5,7 +5,7 @@ import type {Stage} from './types';
 import {formatDeadline,stageIcon} from './constants';
 import {STAGE_DETAILS} from './stageDetails';
 
-export default function StagesView({g}:{g:ReturnTypeRepublic}){
+export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
  const [selected,setSelected]=useState<Stage|null>(null);
  const detail=selected?STAGE_DETAILS[selected.stage_no]:null;
@@ -103,6 +103,11 @@ export default function StagesView({g}:{g:ReturnTypeRepublic}){
        <p>Если нужна формулировка без сокращений, примеры, специальные условия или процедурные детали — откройте соответствующий раздел полного документа правил.</p>
       </div>
       <a href={detail.rulesUrl} target="_blank" rel="noreferrer">Открыть полные правила <span>↗</span></a>
+     </section>}
+
+     {votes.some(v=>v.stage_no===selected.stage_no&&v.status==='open')&&<section className="stageVotingLink">
+      <div><small>СВЯЗАННОЕ ГОЛОСОВАНИЕ</small><b>По этому этапу сейчас идёт процедурное голосование</b><p>Откройте центр голосований, чтобы увидеть кворум, связанные НПА и результат процедуры.</p></div>
+      <button className="primary" onClick={onOpenVotes}>Перейти к голосованию →</button>
      </section>}
 
      {teacher&&<section className="stageTeacherActions">
