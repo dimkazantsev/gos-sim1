@@ -22,7 +22,8 @@ export default function DocumentsView({g}:{g:ReturnTypeRepublic}){
  const history=selected?formalHistory.filter(h=>h.document_id===selected.id).slice().reverse():[];
  const author=selected?members.find(m=>m.user_id===selected.author_id):undefined;
  const subject=selected?FORMAL_SUBJECTS.find(s=>s.key===selected.subject_key):undefined;
- const signatureHolder=selected?(members.find(m=>subject?.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||author):undefined;
+ const personalSigner=selected&&['gd_deputy','sf_member','region','ks','vs'].includes(selected.subject_key);
+ const signatureHolder=selected?(personalSigner?author:(members.find(m=>subject?.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||author)):undefined;
  const signature=selected?formalSignature(selected.subject_key,signatureHolder?.full_name||author?.full_name||'________________'):null;
 
  function canManage(doc:FormalDocument){
@@ -51,12 +52,13 @@ export default function DocumentsView({g}:{g:ReturnTypeRepublic}){
    const fd=new FormData();fd.append('file',next);
    const res=await fetch('/api/extract-document',{method:'POST',body:fd});const data=await res.json();
    if(!res.ok){setRecognized(data.error||'Не удалось распознать текст. Файл всё равно можно прикрепить.');return}
-   if(data.text){
-    setBody(data.text);const baseTitle=title||next.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');if(!title)setTitle(baseTitle);
-    const found=inferFormal(data.text,baseTitle,me?.role_title);
-    if(teacher||availableSubjects.some(s=>s.key===found.subject.key))setSubjectKey(found.subject.key);else if(availableSubjects[0])setSubjectKey(availableSubjects[0].key);
-    setDocType(found.type.key);setRecognized('✓ Текст извлечён'+(data.pages?' · '+data.pages+' стр.':'')+' · '+found.type.label+' · '+found.subject.short);
-   }
+   const baseTitle=title||next.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');if(!title)setTitle(baseTitle);
+   const extracted=typeof data.text==='string'?data.text:'';
+   if(extracted)setBody(extracted);
+   const found=inferFormal(extracted,baseTitle,me?.role_title);
+   if(teacher||availableSubjects.some(s=>s.key===found.subject.key))setSubjectKey(found.subject.key);else if(availableSubjects[0])setSubjectKey(availableSubjects[0].key);
+   setDocType(found.type.key);
+   setRecognized(extracted?('✓ Текст извлечён'+(data.pages?' · '+data.pages+' стр.':'')+' · '+found.type.label+' · '+found.subject.short):('✓ Файл прикреплён · предварительно: '+found.type.label+' · '+found.subject.short+'. Вставьте текст ниже для точного распознавания.'));
   }catch(e){setRecognized(e instanceof Error?e.message:'Ошибка распознавания')}finally{setExtracting(false)}
  }
 
@@ -64,7 +66,8 @@ export default function DocumentsView({g}:{g:ReturnTypeRepublic}){
 
  async function create(){
   const s=FORMAL_SUBJECTS.find(x=>x.key===subjectKey),t=FORMAL_TYPES.find(x=>x.key===docType);if(!s||!t||title.trim().length<3)return;
-  const holder=members.find(m=>s.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||me;const signatureMeta=formalSignature(s.key,holder?.full_name||me?.full_name||'');
+  const personalSigner=['gd_deputy','sf_member','region','ks','vs'].includes(s.key);
+  const holder=personalSigner?me:(members.find(m=>s.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||me);const signatureMeta=formalSignature(s.key,holder?.full_name||me?.full_name||'');
   setBusy(true);
   const id=await createFormalDocument({stageNo:currentStage?.stage_no||12,title:title.trim(),docType:t.key,subjectKey:s.key,subjectLabel:s.label,bodyText:body,workflowKey:t.workflow,metadata:{signature_title:signatureMeta.title,signature_name:signatureMeta.name,institution:s.label,recognized:recognized||null,created_in_editor:!file}},file||undefined);
   setBusy(false);if(id){setSelectedId(id);setMode('registry');setTitle('');setBody('');setFile(null);setRecognized('')}
