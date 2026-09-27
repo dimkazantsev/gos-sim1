@@ -16,6 +16,12 @@ function spark(points:number[],w=220,h=64){
 }
 function delta(m:Metric){return Number(m.value)-Number(m.previous_value??m.value)}
 function groupLabel(k:string){return k==='society'?'Общество':k==='elites'?'Элиты':k==='international'?'Международное':k==='economy'?'Экономика':'Государство'}
+function changeTone(m:Metric,d:number){
+ if(d===0)return 'flat';
+ if(m.metric_key==='social_tension')return d>0?'bad':'good';
+ if(m.metric_key==='budget')return 'neutral';
+ return d>0?'good':'bad';
+}
 function metricIcon(k:string){
  if(k==='public_trust')return '◉';
  if(k==='economy')return '⌁';
@@ -75,7 +81,7 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
   return <button key={m.id} className={'statePulseMetric '+m.group_key} onClick={()=>setSelected(m.id)}>
    <span className="statePulseIcon">{metricIcon(m.metric_key)}</span>
    <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.label}</b><span>{last?.note||m.description||'Игровой показатель'}</span></div>
-   <div className="statePulseValue"><strong>{Number(m.value).toLocaleString('ru-RU')}{m.unit||''}</strong><em className={d>0?'up':d<0?'down':'flat'}>{d>0?'▲ +':d<0?'▼ ':'• '}{Math.abs(d).toFixed(Math.abs(d)%1?1:0)}</em></div>
+   <div className="statePulseValue"><strong>{Number(m.value).toLocaleString('ru-RU')}{m.unit||''}</strong><em className={changeTone(m,d)}>{d>0?'▲ +':d<0?'▼ ':'• '}{Math.abs(d).toFixed(Math.abs(d)%1?1:0)}</em></div>
    <div className="statePulseTrend">
     {mini.length>1&&<svg viewBox="0 0 120 32" aria-hidden="true"><path d={spark(mini,120,32)} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"/></svg>}
     {pct!=null&&<i><span style={{width:pct+'%'}}/></i>}
@@ -96,7 +102,7 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
   {chosen&&<div className="metricModalBackdrop" onClick={()=>setSelected('')}>
    <section className="metricModal redesigned" onClick={e=>e.stopPropagation()}>
     <header><div className="metricModalTitle"><span>{metricIcon(chosen.metric_key)}</span><div><small>{groupLabel(chosen.group_key).toUpperCase()}</small><h2>{chosen.label}</h2><p>{chosen.description||'Игровой показатель состояния государства.'}</p></div></div><button onClick={()=>setSelected('')}>×</button></header>
-    <div className="metricHeroValue"><strong>{Number(chosen.value).toLocaleString('ru-RU')}{chosen.unit||''}</strong><span className={delta(chosen)>=0?'up':'down'}>{delta(chosen)>=0?'▲ +':'▼ '}{Math.abs(delta(chosen)).toFixed(1)} с прошлого изменения</span></div>
+    <div className="metricHeroValue"><strong>{Number(chosen.value).toLocaleString('ru-RU')}{chosen.unit||''}</strong><span className={changeTone(chosen,delta(chosen))}>{delta(chosen)>=0?'▲ +':'▼ '}{Math.abs(delta(chosen)).toFixed(1)} с прошлого изменения</span></div>
     {hist.at(-1)&&<div className="metricLastCause"><small>ПОСЛЕДНЯЯ ПРИЧИНА</small><b>{hist.at(-1)?.note||hist.at(-1)?.source_type}</b><span>{new Date(hist.at(-1)!.recorded_at).toLocaleString('ru-RU')}</span></div>}
     <div className="metricBucketTabs"><button className={bucket==='changes'?'active':''} onClick={()=>setBucket('changes')}>Все изменения</button><button className={bucket==='day'?'active':''} onClick={()=>setBucket('day')}>По дням</button><button className={bucket==='week'?'active':''} onClick={()=>setBucket('week')}>По неделям</button></div>
     <div className="metricChart">
