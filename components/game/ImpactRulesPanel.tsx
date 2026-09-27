@@ -39,7 +39,7 @@ function effectsText(g:ReturnTypeRepublic,effects:Record<string,unknown>){
   const metric=g.metrics.find(x=>x.metric_key===k);
   return (Number(v)>0?'+':'')+v+' '+(metric?.label||k);
  });
- if(Number(effects.actor_party_support||0)!==0)out.push((Number(effects.actor_party_support)>0?'+':'')+effects.actor_party_support+' поддержка партии');
+ const partyDelta=Number(effects.actor_party_support||0);if(partyDelta!==0)out.push((partyDelta>0?'+':'')+partyDelta+' поддержка партии');
  return out;
 }
 
