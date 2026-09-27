@@ -12,6 +12,7 @@ import DumaLeadershipElection from './DumaLeadershipElection';
 import GhostPolicyLab from './GhostPolicyLab';
 import ElectoralArchitectureLab from './ElectoralArchitectureLab';
 import GovernmentFormationLab from './GovernmentFormationLab';
+import GovernmentStructurePanel from './GovernmentStructurePanel';
 import InstitutionStaffingLab from './InstitutionStaffingLab';
 import StateProgramLab from './StateProgramLab';
 import BudgetLab from './BudgetLab';
@@ -161,7 +162,7 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
 
      {(selected.stage_no===6||selected.stage_no===7)&&<PresidentialElectionLab g={g}/>} 
 
-     {selected.stage_no===8&&<GovernmentFormationLab g={g}/>} 
+     {selected.stage_no===8&&<><GovernmentStructurePanel g={g}/><GovernmentFormationLab g={g}/></>} 
 
      {selected.stage_no===9&&<InstitutionStaffingLab g={g}/>} 
 
