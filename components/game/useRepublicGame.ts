@@ -195,17 +195,83 @@ export function useRepublicGame(gameId:string){
  }
  async function updateMember(userId:string,patch:Partial<Pick<Member,'role_title'|'score'>>){const r=await supabase.from('game_members').update(patch).eq('game_id',gameId).eq('user_id',userId);if(r.error)setError(r.error.message);else await refresh()}
 
- async function createVote(data:{title:string;body:string;mode:'member'|'faction'|'mandate'}){
-  if(!teacher||!me||!data.title.trim())return false;const r=await supabase.from('game_votes').insert({game_id:gameId,stage_no:currentStage?.stage_no||1,title:data.title.trim(),body:data.body.trim()||null,voting_mode:data.mode,created_by:me.user_id});
+ async function createVote(data:{
+  title:string;body:string;mode:'member'|'faction'|'mandate';
+  institutionKey?:string;procedureKey?:string;quorumKind?:'none'|'fraction';quorumValue?:number;
+  majorityKind?:'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction';majorityValue?:number;
+  allowAbstain?:boolean;tieBreakerChair?:boolean;formalDocumentId?:string|null;
+  passTransition?:string;failTransition?:string;
+ }){
+  if(!me||!data.title.trim())return false;
+  const r=await supabase.rpc('create_procedural_vote',{
+   p_game_id:gameId,
+   p_title:data.title.trim(),
+   p_body:data.body.trim()||null,
+   p_voting_mode:data.mode,
+   p_institution_key:data.institutionKey||'all',
+   p_procedure_key:data.procedureKey||'generic',
+   p_quorum_kind:data.quorumKind||'fraction',
+   p_quorum_value:data.quorumValue??0.6666667,
+   p_majority_kind:data.majorityKind||'yes_no_simple',
+   p_majority_value:data.majorityValue??0.5,
+   p_allow_abstain:data.allowAbstain??true,
+   p_tie_breaker_chair:data.tieBreakerChair??false,
+   p_formal_document_id:data.formalDocumentId||null,
+   p_pass_transition:data.passTransition||'none',
+   p_fail_transition:data.failTransition||'none'
+  });
   if(r.error){setError(r.error.message);return false}await refresh();return true;
  }
  function partyForUser(uid:string){const m=members.find(x=>x.user_id===uid);return parties.find(p=>p.name===m?.team)}
- function canVote(v:Vote){if(!me)return false;if(v.voting_mode==='member')return me.kind!=='observer';const p=partyForUser(me.user_id);return !!p&&p.leader_user_id===me.user_id}
- function ballotWeight(v:Vote){if(v.voting_mode==='member')return 1;const p=partyForUser(me?.user_id||'');if(!p)return 0;return v.voting_mode==='mandate'?Math.max(1,p.mandates):1}
- function quorum(v:Vote){const eligible=v.voting_mode==='member'?members.filter(m=>m.kind==='student').length:parties.filter(p=>p.leader_user_id).length;const cast=ballots.filter(b=>b.vote_id===v.id).length;return {eligible,cast,needed:Math.ceil(eligible*2/3),met:eligible>0&&cast>=Math.ceil(eligible*2/3)}}
- function tally(v:Vote){const x=ballots.filter(b=>b.vote_id===v.id);const yes=x.filter(b=>b.choice==='yes').reduce((a,b)=>a+Number(b.weight),0),no=x.filter(b=>b.choice==='no').reduce((a,b)=>a+Number(b.weight),0);return {yes,no,total:yes+no}}
- async function castVote(v:Vote,choice:'yes'|'no'){if(!me||!canVote(v))return;const r=await supabase.from('game_ballots').upsert({vote_id:v.id,voter_id:me.user_id,choice,weight:ballotWeight(v)},{onConflict:'vote_id,voter_id'});if(r.error)setError(r.error.message);else await refresh()}
- async function closeVote(id:string){const r=await supabase.from('game_votes').update({status:'closed',closed_at:new Date().toISOString()}).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
+ function memberMatchesInstitution(uid:string,institution:string){
+  const m=members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;
+  const role=(m.role_title||'').toLowerCase();
+  if(institution==='all'||institution==='factions')return m.kind==='student';
+  if(institution==='gd')return role.includes('депутат')||(role.includes('государственн')&&role.includes('дум'));
+  if(institution==='government')return role.includes('правительств')||role.includes('министр');
+  if(institution==='sf')return role.includes('совет федерац')||role.includes('сенатор');
+  if(institution==='committee')return role.includes('комитет')||role.includes('депутат');
+  if(institution==='municipality')return role.includes('муницип')||role.includes('администрац')||role.includes('глава города');
+  return false;
+ }
+ function canVote(v:Vote){
+  if(!me)return false;
+  if(v.voting_mode==='member')return memberMatchesInstitution(me.user_id,v.institution_key||'all');
+  const p=partyForUser(me.user_id);return !!p&&p.leader_user_id===me.user_id;
+ }
+ function ballotWeight(v:Vote){
+  if(v.voting_mode==='member')return canVote(v)?1:0;
+  const p=partyForUser(me?.user_id||'');if(!p)return 0;return v.voting_mode==='mandate'?Math.max(1,p.mandates):1;
+ }
+ function eligibleWeight(v:Vote){
+  if(v.voting_mode==='faction')return parties.filter(p=>p.leader_user_id).length;
+  if(v.voting_mode==='mandate')return parties.filter(p=>p.leader_user_id).reduce((a,p)=>a+Math.max(1,Number(p.mandates)||0),0);
+  return members.filter(m=>memberMatchesInstitution(m.user_id,v.institution_key||'all')).length;
+ }
+ function quorum(v:Vote){
+  const eligible=eligibleWeight(v);
+  const x=ballots.filter(b=>b.vote_id===v.id);
+  const cast=v.voting_mode==='member'?x.length:x.reduce((a,b)=>a+Number(b.weight),0);
+  const needed=v.quorum_kind==='none'?0:Math.ceil(eligible*Number(v.quorum_value||0));
+  return {eligible,cast,needed,met:v.quorum_kind==='none'||(eligible>0&&cast>=needed)};
+ }
+ function tally(v:Vote){
+  const x=ballots.filter(b=>b.vote_id===v.id);
+  const yes=x.filter(b=>b.choice==='yes').reduce((a,b)=>a+Number(b.weight),0);
+  const no=x.filter(b=>b.choice==='no').reduce((a,b)=>a+Number(b.weight),0);
+  const abstain=x.filter(b=>b.choice==='abstain').reduce((a,b)=>a+Number(b.weight),0);
+  return {yes,no,abstain,total:yes+no+abstain};
+ }
+ async function castVote(v:Vote,choice:'yes'|'no'|'abstain'){
+  if(!me||!canVote(v))return;
+  const r=await supabase.rpc('cast_procedural_vote',{p_vote_id:v.id,p_choice:choice});
+  if(r.error)setError(r.error.message);else await refresh();
+ }
+ async function closeVote(id:string,note?:string){
+  const r=await supabase.rpc('close_procedural_vote',{p_vote_id:id,p_note:note||null});
+  if(r.error){setError(r.error.message);return null}
+  await refresh();return r.data;
+ }
 
  async function setEvaluation(userId:string,score:number,note?:string){
   if(!teacher||!me||!currentStage)return;const old=evaluations.find(e=>e.user_id===userId&&e.stage_no===currentStage.stage_no);
