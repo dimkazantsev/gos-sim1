@@ -3,7 +3,9 @@ import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 
-type Scenario={id:string;game_id:string;title:string;budget_year:number;source_note:string|null;gdp:number;oil_price:number|null;cutoff_price:number|null;key_rate:number|null;fx_change_pct:number|null;fx_intervention:number|null;revenue:number;expenditure:number;debt_start:number;financing:number;balance:number;deficit_pct_gdp:number|null;debt_end:number;debt_pct_gdp:number|null;deficit_limit_pct:number|null;debt_limit_pct:number|null;status:'draft'|'final';created_by:string;updated_at:string};
+type Scenario={id:string;game_id:string;title:string;budget_year:number;source_note:string|null;gdp:number;oil_price:number|null;cutoff_price:number|null;key_rate:number|null;fx_change_pct:number|null;fx_intervention:number|null;revenue:number;expenditure:number;debt_start:number;financing:number;balance:number;deficit_pct_gdp:number|null;debt_end:number;debt_pct_gdp:number|null;deficit_limit_pct:number|null;debt_limit_pct:number|null;status:'draft'|'final';formal_document_id:string|null;created_by:string;updated_at:string};
+type ProgramAllocation={id:string;scenario_id:string;program_id:string;amount:number;note:string|null;created_at:string;updated_at:string};
+type AdoptedProgram={id:string;title:string;responsible_ministry:string;total_budget:number;status:string};
 type Stream={id:string;scenario_id:string;workstream:'central_bank'|'macro'|'revenue'|'expenditure'|'financing_debt';summary:string;submitted_by:string;updated_at:string};
 
 const streams=[
@@ -15,9 +17,11 @@ const streams=[
 ] as const;
 
 export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
- const {game,me,teacher,members,setError}=g;
+ const {game,me,teacher,members,formalDocuments,setError}=g;
  const [scenarios,setScenarios]=useState<Scenario[]>([]);
  const [work,setWork]=useState<Stream[]>([]);
+ const [allocations,setAllocations]=useState<ProgramAllocation[]>([]);
+ const [adoptedPrograms,setAdoptedPrograms]=useState<AdoptedProgram[]>([]);
  const [selectedId,setSelectedId]=useState('');
  const [title,setTitle]=useState('Базовый сценарий федерального бюджета');
  const [year,setYear]=useState(new Date().getFullYear()+1);
@@ -35,18 +39,25 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
  const [deficitLimit,setDeficitLimit]=useState('');
  const [debtLimit,setDebtLimit]=useState('');
  const [streamDraft,setStreamDraft]=useState<Record<string,string>>({});
+ const [allocationProgram,setAllocationProgram]=useState('');
+ const [allocationAmount,setAllocationAmount]=useState('');
+ const [allocationNote,setAllocationNote]=useState('');
  const [busy,setBusy]=useState(false);
  const role=(me?.role_title||'').toLowerCase();
  const canFinalize=teacher||(role.includes('председател')&&role.includes('правительств'))||(role.includes('министр')&&role.includes('финанс'));
 
  async function load(){
   if(!game)return;
-  const [s,w]=await Promise.all([
+  const [s,w,a,p]=await Promise.all([
    supabase.from('budget_scenarios').select('*').eq('game_id',game.id).order('created_at',{ascending:true}),
-   supabase.from('budget_workstreams').select('*').eq('game_id',game.id)
+   supabase.from('budget_workstreams').select('*').eq('game_id',game.id),
+   supabase.from('budget_program_allocations').select('*').eq('game_id',game.id),
+   supabase.from('state_programs').select('id,title,responsible_ministry,total_budget,status').eq('game_id',game.id).eq('status','adopted').order('title')
   ]);
   if(!s.error){const rows=(s.data||[]) as Scenario[];setScenarios(rows);if(!selectedId&&rows[0])setSelectedId(rows[0].id)}
   if(!w.error){const rows=(w.data||[]) as Stream[];setWork(rows);setStreamDraft(v=>({...v,...Object.fromEntries(rows.map(x=>[x.scenario_id+'-'+x.workstream,x.summary]))}))}
+  if(!a.error)setAllocations((a.data||[]) as ProgramAllocation[]);
+  if(!p.error)setAdoptedPrograms((p.data||[]) as AdoptedProgram[]);
  }
  useEffect(()=>{void load()},[game?.id]);
  useEffect(()=>{
@@ -54,6 +65,8 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
   const ch=supabase.channel('budget-lab:'+game.id)
    .on('postgres_changes',{event:'*',schema:'public',table:'budget_scenarios',filter:'game_id=eq.'+game.id},()=>void load())
    .on('postgres_changes',{event:'*',schema:'public',table:'budget_workstreams',filter:'game_id=eq.'+game.id},()=>void load())
+   .on('postgres_changes',{event:'*',schema:'public',table:'budget_program_allocations',filter:'game_id=eq.'+game.id},()=>void load())
+   .on('postgres_changes',{event:'*',schema:'public',table:'state_programs',filter:'game_id=eq.'+game.id},()=>void load())
    .subscribe();
   return()=>{void supabase.removeChannel(ch)}
  },[game?.id]);
@@ -73,6 +86,10 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
  const previewDebt=Math.max(0,n(debt)+Math.max(0,-previewBalance)-n(financing));
  const previewDebtPct=n(gdp)>0?previewDebt/n(gdp)*100:null;
  const myWork=selected?work.filter(x=>x.scenario_id===selected.id):[];
+ const myAllocations=selected?allocations.filter(x=>x.scenario_id===selected.id):[];
+ const allocatedTotal=myAllocations.reduce((sum,x)=>sum+Number(x.amount||0),0);
+ const allocationCoverage=n(expenditure)>0?allocatedTotal/n(expenditure)*100:0;
+ const budgetDocument=selected?.formal_document_id?formalDocuments.find(d=>d.id===selected.formal_document_id):undefined;
  const name=(id:string)=>members.find(m=>m.user_id===id)?.full_name||'Участник';
  const limitFlag=(value:number|null,limit:string)=>value!=null&&limit.trim()!==''&&value>Number(limit);
 
@@ -91,6 +108,13 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
   if(r.error)setError(r.error.message);else await load();setBusy(false);
  }
  async function finalize(){if(!selected)return;setBusy(true);const r=await supabase.rpc('finalize_budget_scenario',{p_scenario_id:selected.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function setAllocation(){
+  if(!selected||!allocationProgram||Number(allocationAmount)<0)return;
+  setBusy(true);const r=await supabase.rpc('set_budget_program_allocation',{p_scenario_id:selected.id,p_program_id:allocationProgram,p_amount:Number(allocationAmount)||0,p_note:allocationNote.trim()||null});
+  if(r.error)setError(r.error.message);else{setAllocationProgram('');setAllocationAmount('');setAllocationNote('');await load()}setBusy(false);
+ }
+ async function deleteAllocation(id:string){setBusy(true);const r=await supabase.rpc('delete_budget_program_allocation',{p_allocation_id:id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function createBudgetDocument(){if(!selected)return;setBusy(true);const r=await supabase.rpc('create_budget_document_from_scenario',{p_scenario_id:selected.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
 
  return <section className="budgetLab">
   <header className="budgetLabHead"><div><small>МАКРОЭКОНОМИКА И ПУБЛИЧНЫЕ ФИНАНСЫ · ЭТАП 13</small><h2>Бюджетная лаборатория</h2><p>Пять аналитических потоков собираются в один проверяемый сценарий. Система автоматически считает баланс, дефицит к ВВП и долг, но не подменяет преподавателя: параметры бюджетного правила и сценарные ограничения вводятся с источником.</p></div><div className="budgetEquation"><b>Баланс</b><span>доходы − расходы</span><b>Дефицит, % ВВП</b><span>max(0, −баланс) / ВВП × 100</span><b>Долг</b><span>начальный долг + дефицит − финансирование</span></div></header>
@@ -125,11 +149,17 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
    <article className={limitFlag(previewDebtPct,debtLimit)?'bad':''}><small>ДОЛГ / ВВП</small><strong>{previewDebtPct==null?'—':previewDebtPct.toFixed(2)+'%'}</strong>{debtLimit&&<span>лимит {debtLimit}%</span>}</article>
   </div>
 
+  {selected&&<section className="budgetPrograms">
+   <div className="budgetProgramsHead"><div><small>ПРОГРАММНЫЕ РАСХОДЫ</small><h3>Принятые ГП → федеральный бюджет</h3><p>Здесь бюджетный сценарий получает содержательную структуру: принятые Правительством государственные программы превращаются в конкретные расходные обязательства.</p></div><div><strong>{allocatedTotal.toLocaleString('ru-RU')}</strong><span>{allocationCoverage.toFixed(1)}% расходов распределено по ГП</span></div></div>
+   <div className="budgetAllocationList">{myAllocations.length===0?<div className="emptyState">Принятые государственные программы пока не связаны с этим бюджетом.</div>:myAllocations.map(a=>{const p=adoptedPrograms.find(x=>x.id===a.program_id);return <article key={a.id}><div><b>{p?.title||'Государственная программа'}</b><small>{p?.responsible_ministry||'Ответственный исполнитель'}</small>{a.note&&<p>{a.note}</p>}</div><strong>{Number(a.amount).toLocaleString('ru-RU')}</strong>{selected.status==='draft'&&canFinalize&&<button onClick={()=>void deleteAllocation(a.id)}>×</button>}</article>})}</div>
+   {selected.status==='draft'&&canFinalize&&adoptedPrograms.length>0&&<div className="budgetAllocationForm"><select value={allocationProgram} onChange={e=>{setAllocationProgram(e.target.value);const p=adoptedPrograms.find(x=>x.id===e.target.value);if(p)setAllocationAmount(String(p.total_budget||0))}}><option value="">Выберите принятую ГП…</option>{adoptedPrograms.filter(p=>!myAllocations.some(a=>a.program_id===p.id)).map(p=><option key={p.id} value={p.id}>{p.title} · {p.responsible_ministry}</option>)}</select><input type="number" min="0" value={allocationAmount} onChange={e=>setAllocationAmount(e.target.value)} placeholder="Сумма финансирования"/><input value={allocationNote} onChange={e=>setAllocationNote(e.target.value)} placeholder="Комментарий / приоритет / корректировка"/><button disabled={busy||!allocationProgram} onClick={()=>void setAllocation()}>Добавить финансирование</button></div>}
+  </section>}
+
   {selected&&<div className="budgetStreams">{streams.map(([key,label,hint])=>{
    const existing=myWork.find(x=>x.workstream===key);const dkey=selected.id+'-'+key;
    return <article className={existing?'done':''} key={key}><header><span>{existing?'✓':'○'}</span><div><b>{label}</b><small>{hint}</small></div></header><textarea rows={4} disabled={selected.status==='final'} value={streamDraft[dkey]??existing?.summary??''} onChange={e=>setStreamDraft(v=>({...v,[dkey]:e.target.value}))} placeholder="Ключевые расчёты, предпосылки и выводы вашей группы…"/><footer>{existing?<span>{name(existing.submitted_by)} · {new Date(existing.updated_at).toLocaleString('ru-RU')}</span>:<span>Не представлено</span>}{selected.status==='draft'&&<button disabled={busy||(streamDraft[dkey]||'').trim().length<10} onClick={()=>void submitStream(key)}>Сдать блок</button>}</footer></article>
   })}</div>}
 
-  {selected&&<footer className="budgetFinalize"><div><small>ГОТОВНОСТЬ СЦЕНАРИЯ</small><h3>{myWork.length}/5 аналитических блоков</h3><p>{selected.status==='final'?'Сценарий зафиксирован. Используйте его показатели как исходные данные для проекта федерального бюджета в реестре НПА.':'После фиксации сценарий становится общей количественной базой для последующей бюджетной процедуры.'}</p></div>{canFinalize&&selected.status==='draft'&&<button className="primary" disabled={busy||myWork.length<5} onClick={()=>void finalize()}>Зафиксировать сценарий</button>}</footer>}
+  {selected&&<footer className="budgetFinalize"><div><small>ГОТОВНОСТЬ СЦЕНАРИЯ</small><h3>{myWork.length}/5 аналитических блоков</h3><p>{selected.status==='final'?(budgetDocument?'Проект федерального бюджета уже создан в реестре НПА: '+budgetDocument.registry_no+'.':'Сценарий зафиксирован. Следующий шаг — сформировать из него проект федерального бюджета в реестре НПА.'):'После фиксации сценарий становится общей количественной базой для последующей бюджетной процедуры.'}</p></div><div>{canFinalize&&selected.status==='draft'&&<button className="primary" disabled={busy||myWork.length<5} onClick={()=>void finalize()}>Зафиксировать сценарий</button>}{canFinalize&&selected.status==='final'&&!selected.formal_document_id&&<button className="primary" disabled={busy} onClick={()=>void createBudgetDocument()}>Создать проект бюджета →</button>}{budgetDocument&&<span className="budgetDocBadge">{budgetDocument.registry_no} · {budgetDocument.status_label}</span>}</div></footer>}
  </section>;
 }
