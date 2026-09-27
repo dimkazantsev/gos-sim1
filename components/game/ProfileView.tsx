@@ -2,6 +2,7 @@
 import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import MediaUploadButton from './MediaUploadButton';
+import GradesView from './GradesView';
 
 export default function ProfileView({g}:{g:ReturnTypeRepublic}){
  const {me,profiles,parties,partyInvitations,partyMandates,averageVsn,actions,saveProfile}=g;
@@ -33,6 +34,8 @@ export default function ProfileView({g}:{g:ReturnTypeRepublic}){
     <div className="profileChips"><span>{me.group_name||'Группа не указана'}</span><span>ВСН {averageVsn?averageVsn.toFixed(1):'—'}</span><span>{actions.filter(a=>a.author_id===me.user_id).length} решений</span>{allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}</div>
    </div>
   </section>
+
+  <GradesView g={g} compact/>
 
   <section className="profileGrid">
    <article className="surface profileEditor">
