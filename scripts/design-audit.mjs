@@ -27,7 +27,8 @@ const checks=[
  ['operational state metrics are responsive', files.views.includes('.statePulseGrid')&&files.responsive.includes('.statePulseGrid')],
  ['stage modal has narrow-screen fallback', files.responsive.includes('.stageDetailPanel')&&files.responsive.includes('max-height:100dvh')],
  ['dense grades table remains scrollable', files.views.includes('.gradesMatrix')&&files.views.includes('overflow:auto')],
- ['icon-only controls have labels', files.client.includes('aria-label="Выйти"')&&files.client.includes('aria-label="Открыть связь"')]
+ ['icon-only controls have labels', files.client.includes('aria-label="Выйти"')&&files.client.includes("aria-label={chatOpen?'Закрыть связь':'Открыть связь'}")],
+ ['mobile navigation sheet is a modal dialog', files.client.includes('role="dialog"')&&files.client.includes('aria-modal="true"')]
 ];
 
 let failed=0;
