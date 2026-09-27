@@ -1,4 +1,6 @@
 import {NextResponse} from 'next/server';
+import mammoth from 'mammoth';
+import {extractText,getDocumentProxy} from 'unpdf';
 
 export const runtime='nodejs';
 
@@ -18,15 +20,13 @@ export async function POST(request:Request){
     if(type==='text/plain'||name.endsWith('.txt')){
       text=new TextDecoder('utf-8').decode(ab);
     }else if(type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'||name.endsWith('.docx')){
-      const mammoth=await import('mammoth');
       const result=await mammoth.extractRawText({buffer:Buffer.from(ab)});
       text=result.value||'';
     }else if(type==='application/pdf'||name.endsWith('.pdf')){
-      const {getDocumentProxy,extractText}=await import('unpdf');
       const pdf=await getDocumentProxy(new Uint8Array(ab));
-      pages=pdf.numPages;
-      if(pages>60)return NextResponse.json({error:'PDF содержит больше 60 страниц. Сократите документ или вставьте текст вручную.'},{status:422});
+      if(pdf.numPages>60)return NextResponse.json({error:'PDF содержит больше 60 страниц. Сократите документ или вставьте текст вручную.'},{status:422});
       const result=await extractText(pdf,{mergePages:true});
+      pages=result.totalPages;
       text=typeof result.text==='string'?result.text:result.text.join('\n');
     }else{
       return NextResponse.json({error:'Автоматическое распознавание поддерживает PDF, DOCX и TXT. Файл можно загрузить и дополнительно вставить текст вручную.'},{status:415});
