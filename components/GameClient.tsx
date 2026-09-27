@@ -120,6 +120,8 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   removePartyMember:blocked as typeof g.removePartyMember,
   proposePartyAgreement:blocked as typeof g.proposePartyAgreement,
   respondPartyAgreement:blocked as typeof g.respondPartyAgreement,
+  submitPartyRegistration:blocked as typeof g.submitPartyRegistration,
+  reviewPartyRegistration:blocked as typeof g.reviewPartyRegistration,
   applyPartyGhostLoss:blocked as typeof g.applyPartyGhostLoss,
   drawGhostVoting:blockedNull as typeof g.drawGhostVoting,
   clearPartyGhostLoss:blocked as typeof g.clearPartyGhostLoss,
