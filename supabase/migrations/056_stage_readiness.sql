@@ -117,7 +117,8 @@ begin
   select count(*) into c from public.game_members where game_id=p_game and kind='student';
   select count(*) into c3 from (select user_id from public.game_reflections where game_id=p_game and status in ('submitted','reviewed') group by user_id having count(distinct phase_key)>=6) q;
   m:=jsonb_build_object('students',c,'students_completed_reflection',c3);
-  if c>0 and c3<c then b:=b||jsonb_build_array('Не все студенты сдали рефлексию по шести фазам игры'); end if;
+  if c=0 then b:=b||jsonb_build_array('В игре нет студентов, для которых можно провести итоговую рефлексию');
+  elsif c3<c then b:=b||jsonb_build_array('Не все студенты сдали рефлексию по шести фазам игры'); end if;
   if exists(select 1 from public.game_reflections where game_id=p_game and status='submitted') then w:=w||jsonb_build_array('Есть сданные рефлексии, которые преподаватель ещё не разобрал'); end if;
  end if;
  return jsonb_build_object('stage_no',p_stage,'ready',jsonb_array_length(b)=0,'blockers',b,'warnings',w,'metrics',m);
