@@ -27,6 +27,16 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
  }).sort((a,b)=>Number(b.online)-Number(a.online)||new Date(b.p?.last_seen_at||0).getTime()-new Date(a.p?.last_seen_at||0).getTime()),[members,presence,studentActivities]);
 
  async function publish(){if(await publishEvent(eventTitle,eventBody)){setEventTitle('');setEventBody('')}}
+ function confirmNext(){if(window.confirm('Завершить текущий этап и открыть следующий?'))void nextStage()}
+ function confirmCrisis(){if(window.confirm('Разыграть случайный кризис для всей аудитории?'))void triggerCrisis()}
+ function confirmGhost(){if(window.confirm('Запустить ghost voting и случайно уменьшить состав одной фракции?'))void ghostVoting()}
+ function exportSession(){
+  const rows=[['Время','Участник','Тип','Действие','Раздел']];
+  for(const a of [...activities].reverse())rows.push([new Date(a.created_at).toLocaleString('ru-RU'),names[a.actor_id]||a.actor_id,a.event_type,a.label,a.view_key||'']);
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='gos-sim-activity-'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(url);
+ }
 
  return <>
   <section className="teacherHero">
@@ -51,7 +61,7 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
    <article>
     <span className="stepNo">3</span>
     <div><small>СЛЕДУЮЩИЙ ШАГ</small><b>Перейти дальше</b><p>Закрыть текущий этап и открыть следующий</p></div>
-    <button className="primary" onClick={nextStage}>Следующий этап →</button>
+    <button className="primary" onClick={confirmNext}>Следующий этап →</button>
    </article>
   </section>
 
@@ -87,15 +97,15 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
      <button onClick={()=>setTurnMinutes(10)}><span>10:00</span><b>Короткий ход</b><small>Открыть студентам 10 минут</small></button>
      <button onClick={()=>setTurnMinutes(20)}><span>20:00</span><b>Рабочий ход</b><small>Открыть студентам 20 минут</small></button>
      <button onClick={()=>setTurnMinutes(30)}><span>30:00</span><b>Большой раунд</b><small>Открыть студентам 30 минут</small></button>
-     <button className="dangerQuick" onClick={triggerCrisis}><span>⚠</span><b>Разыграть кризис</b><small>Случайный тип и интенсивность</small></button>
-     <button onClick={ghostVoting}><span>⚡</span><b>Ghost voting</b><small>Потеря 25–50 депутатов</small></button>
-     <button onClick={onOpenScreen}><span>▣</span><b>Общий экран</b><small>Вывести игру на проектор</small></button>
+     <button className="dangerQuick" onClick={confirmCrisis}><span>⚠</span><b>Разыграть кризис</b><small>Случайный тип и интенсивность</small></button>
+     <button onClick={confirmGhost}><span>⚡</span><b>Ghost voting</b><small>Потеря 25–50 депутатов</small></button>
+     <button onClick={onOpenScreen}><span>▣</span><b>Общий экран</b><small>Вывести игру на проектор</small></button><button onClick={exportSession}><span>⇩</span><b>Экспорт журнала</b><small>Скачать активность студентов CSV</small></button>
     </div>
    </article>
 
    <article className="surface">
     <div className="surfaceHead"><div><small>СОБЫТИЕ ДЛЯ ВСЕХ</small><h2>Опубликовать в общий экран</h2></div></div>
-    <div className="eventComposer"><input value={eventTitle} onChange={e=>setEventTitle(e.target.value)} placeholder="Заголовок события"/><textarea rows={5} value={eventBody} onChange={e=>setEventBody(e.target.value)} placeholder="Что произошло и что должны учитывать участники"/><button className="primary" onClick={publish}>Опубликовать событие</button></div>
+    <div className="eventComposer"><input value={eventTitle} onChange={e=>setEventTitle(e.target.value)} aria-label="Заголовок события" placeholder="Заголовок события"/><textarea rows={5} value={eventBody} onChange={e=>setEventBody(e.target.value)} aria-label="Описание события" placeholder="Что произошло и что должны учитывать участники"/><button className="primary" onClick={publish}>Опубликовать событие</button></div>
    </article>
   </section>
 
