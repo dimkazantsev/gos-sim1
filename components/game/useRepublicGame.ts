@@ -507,9 +507,7 @@ export function useRepublicGame(gameId:string){
  async function ghostVoting(){
   if(!teacher||!me||!parties.length){setError('Сначала создайте партии.');return}
   const eligible=parties.filter(p=>p.mandates>0);if(!eligible.length){setError('Сначала распределите мандаты между партиями.');return}
-  const p=eligible[Math.floor(Math.random()*eligible.length)];
-  const loss=25+Math.floor(Math.random()*26);
-  return await applyPartyGhostLoss(p.id,loss);
+  return await drawGhostVoting();
  }
 
  async function createDocument(data:{title:string;type:string;body:string}){if(!teacher||!me||!data.title.trim())return false;const r=await supabase.from('game_documents').insert({game_id:gameId,title:data.title.trim(),doc_type:data.type.trim()||'Документ',body:data.body.trim()||null,created_by:me.user_id});if(r.error){setError(r.error.message);return false}await refresh();return true}
