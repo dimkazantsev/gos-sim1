@@ -73,7 +73,7 @@ export default function GameClient({gameId}:{gameId:string}){
   <main className={`simMain ${chatOpen?'chatOpen':''}`}>
    {error&&<div className="errorBox closable" onClick={()=>setError('')}>{error}</div>}
    {view==='dashboard'&&<DashboardView g={g} onNavigate={v=>setView(v)}/>}
-   {view==='stages'&&<StagesView g={g}/>}
+   {view==='stages'&&<StagesView g={g} onOpenVotes={()=>setView('votes')}/>} 
    {view==='parties'&&<PartiesView g={g}/>}
    {view==='votes'&&<VotesView g={g} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onOpenStages={()=>setView('stages')}/>} 
    {view==='documents'&&<DocumentsView g={g} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>} 
