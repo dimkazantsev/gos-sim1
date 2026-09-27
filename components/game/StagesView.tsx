@@ -9,6 +9,7 @@ import DeadlineControl from './DeadlineControl';
 import PresidentialElectionLab from './PresidentialElectionLab';
 import DumaLeadershipElection from './DumaLeadershipElection';
 import GovernmentFormationLab from './GovernmentFormationLab';
+import InstitutionStaffingLab from './InstitutionStaffingLab';
 import StateProgramLab from './StateProgramLab';
 import BudgetLab from './BudgetLab';
 import MunicipalProjectLab from './MunicipalProjectLab';
@@ -149,6 +150,8 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
      {(selected.stage_no===6||selected.stage_no===7)&&<PresidentialElectionLab g={g}/>} 
 
      {selected.stage_no===8&&<GovernmentFormationLab g={g}/>} 
+
+     {selected.stage_no===9&&<InstitutionStaffingLab g={g}/>} 
 
      {(selected.stage_no===10||selected.stage_no===11)&&<StateProgramLab g={g}/>} 
 
