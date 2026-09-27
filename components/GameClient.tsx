@@ -6,6 +6,7 @@ import type {ReturnTypeRepublic} from './game/viewTypes';
 import {initials} from './game/constants';
 import PoliticalWallView from './game/PoliticalWallView';
 import StateMetricsDock from './game/StateMetricsDock';
+import CrisisRoom from './game/CrisisRoom';
 import StagesView from './game/StagesView';
 import PartiesView from './game/PartiesView';
 import VotesView from './game/VotesView';
@@ -233,6 +234,8 @@ export default function GameClient({gameId}:{gameId:string}){
   </nav>
 
   <StateMetricsDock g={vg}/>
+
+  {!previewMode&&<div className="crisisShell"><CrisisRoom g={g}/></div>}
 
   <main className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
    {error&&<div className="errorBox closable" onClick={()=>setError('')}>{error}</div>}
