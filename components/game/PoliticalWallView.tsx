@@ -1,7 +1,7 @@
 'use client';
 import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
-import type {PoliticalPost} from './types';
+import type {PoliticalPost,View} from './types';
 
 const PROCESS_TYPES=[
  ['statement','Заявление'],['initiative','Инициатива'],['decision','Проект решения'],['event','Событие'],
@@ -32,7 +32,7 @@ function PostImpactEditor({g,post}:{g:ReturnTypeRepublic;post:PoliticalPost}){
  </details>
 }
 
-export default function PoliticalWallView({g,onOpenVotes,onOpenDocument}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument:(id:string)=>void}){
+export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNavigate}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument:(id:string)=>void;onNavigate:(view:View)=>void}){
  const {game,me,teacher,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,formalDocuments,votes,profiles,names,availableActors,createPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,createVoteFromPost,createFormalDocument}=g;
  const [tab,setTab]=useState<'feed'|'registry'>('feed');
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('participant');
@@ -116,7 +116,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument}:{g:Retu
      <div className="wallPostBody"><small>{PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||p.process_type}</small><h2>{p.title}</h2><p>{p.body}</p></div>
      {!!p.tags?.length&&<div className="wallTags">{p.tags.map(t=><button key={t} onClick={()=>setSearch('#'+t)}>#{t}</button>)}</div>}
      {media.length>0&&<div className={'wallMedia '+(media.length>1?'multi':'')}>{media.map(m=>m.media_kind==='image'?<img key={m.id} src={m.url||''} alt={m.file_name}/>:m.media_kind==='video'?<video key={m.id} src={m.url||''} controls/>:m.media_kind==='audio'?<audio key={m.id} src={m.url||''} controls/>:<a key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer">▤ {m.file_name}</a>)}</div>}
-     {(p.external_url||p.internal_view)&&<div className="wallLinks">{p.external_url&&<a href={p.external_url} target="_blank" rel="noreferrer">↗ Внешняя ссылка</a>}{p.internal_view&&<span>↳ Внутри GOS//SIM: {p.internal_view}</span>}</div>}
+     {(p.external_url||p.internal_view)&&<div className="wallLinks">{p.external_url&&<a href={p.external_url} target="_blank" rel="noreferrer">↗ Внешняя ссылка</a>}{p.internal_view&&<button onClick={()=>onNavigate(p.internal_view as View)}>↳ Внутри GOS//SIM: {p.internal_view}</button>}</div>}
      {links.length>0&&<div className="wallNpaLinks">{links.map((d:any)=><button key={d.id} onClick={()=>onOpenDocument(d.id)}><small>НПА</small><b>{d.registry_no}</b><span>{d.title}</span></button>)}</div>}
      {vote&&<button className={'wallVoteLink '+vote.status} onClick={onOpenVotes}><span>✓</span><div><small>{vote.status==='open'?'ИДЁТ ГОЛОСОВАНИЕ':'ГОЛОСОВАНИЕ ЗАВЕРШЕНО'}</small><b>{vote.title}</b></div><strong>{vote.status==='closed'?vote.result_label:'Открыть →'}</strong></button>}
      <div className="wallPostActions">
