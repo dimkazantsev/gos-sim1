@@ -84,6 +84,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  },[game?.id]);
 
  if(!game||!me)return null;
+ const activeGame=game;
  const adoptedP=pRules.find(x=>x.status==='adopted');
  const adoptedR=rRules.find(x=>x.status==='adopted'||x.status==='allocated');
  const activeP=pRules.filter(x=>!['superseded'].includes(x.status));
@@ -101,12 +102,12 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  },[parties,support,system,method,propShare]);
 
  async function proposeP(){
-  setBusy(true);const r=await supabase.rpc('propose_parliamentary_election_rule',{p_game_id:game.id,p_system_type:system,p_allocation_method:system==='majoritarian'?null:method,p_majoritarian_method:system==='proportional'?null:majority,p_proportional_share:system==='mixed'?propShare:null,p_rationale:rationale.trim()||null});
+  setBusy(true);const r=await supabase.rpc('propose_parliamentary_election_rule',{p_game_id:activeGame.id,p_system_type:system,p_allocation_method:system==='majoritarian'?null:method,p_majoritarian_method:system==='proportional'?null:majority,p_proportional_share:system==='mixed'?propShare:null,p_rationale:rationale.trim()||null});
   if(r.error)setError(r.error.message);else{setRationale('');await load()}setBusy(false);
  }
  async function voteP(id:string){setBusy(true);const r=await supabase.rpc('open_parliamentary_rule_vote',{p_rule_id:id});if(r.error)setError(r.error.message);else{await load();onOpenVotes()}setBusy(false)}
  async function proposeR(){
-  setBusy(true);const r=await supabase.rpc('propose_regional_election_rule',{p_game_id:game.id,p_method:regionalMethod,p_rationale:regionalRationale.trim()||null});
+  setBusy(true);const r=await supabase.rpc('propose_regional_election_rule',{p_game_id:activeGame.id,p_method:regionalMethod,p_rationale:regionalRationale.trim()||null});
   if(r.error)setError(r.error.message);else{setRegionalRationale('');await load()}setBusy(false);
  }
  async function voteR(id:string){setBusy(true);const r=await supabase.rpc('open_regional_rule_vote',{p_rule_id:id});if(r.error)setError(r.error.message);else{await load();onOpenVotes()}setBusy(false)}
