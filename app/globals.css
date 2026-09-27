@@ -516,3 +516,57 @@ button,input,textarea,select{font-size:14px}
 @media(prefers-reduced-motion:reduce){
   .simMain>*,.landingShell,.stageCard.open .stageNo,.livePill.on{animation:none!important}
 }
+
+
+/* Institutional phase rail */
+.stagePhaseRail{
+  display:grid;grid-template-columns:minmax(240px,.72fr) minmax(0,2.28fr);gap:12px;
+  margin:0 0 14px;padding:12px;border:1px solid #dce4ef;border-radius:22px;background:#fff;
+  box-shadow:0 8px 28px rgba(13,31,58,.05)
+}
+.stagePhaseIntro{
+  display:flex;flex-direction:column;justify-content:center;min-height:92px;padding:15px 17px;
+  border-radius:16px;background:linear-gradient(145deg,#0a1830,#102b54);color:#fff
+}
+.stagePhaseIntro small{font-size:10px;font-weight:900;letter-spacing:.11em;color:#82f0df}
+.stagePhaseIntro b{margin-top:5px;font-size:17px;line-height:1.25;letter-spacing:-.025em}
+.stagePhaseIntro span{margin-top:6px;font-size:10.5px;color:rgba(255,255,255,.63)}
+.stagePhaseTrack{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
+.stagePhaseTrack button{
+  position:relative;display:grid;align-content:center;min-width:0;min-height:92px;padding:11px;
+  border:1px solid #e0e7f0;border-radius:15px;background:#f9fafc;text-align:left;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease
+}
+.stagePhaseTrack button::before{
+  content:"";position:absolute;left:9px;right:9px;top:8px;height:3px;border-radius:999px;
+  background:var(--phase-accent,#315efb);opacity:.38
+}
+.stagePhaseTrack button:hover{transform:translateY(-2px);background:#fff;border-color:#cbd7e6;box-shadow:0 8px 22px rgba(13,31,58,.07)}
+.stagePhaseTrack button.active{background:#f2f6ff;border-color:#9eb9ff;box-shadow:inset 0 0 0 1px rgba(49,94,251,.08)}
+.stagePhaseTrack button.active::before{opacity:1}
+.stagePhaseTrack i{margin-top:5px;color:#8696ab;font-size:9px;font-style:normal;font-weight:900;letter-spacing:.06em}
+.stagePhaseTrack b{margin-top:3px;color:#1c3557;font-size:11.5px;line-height:1.25;overflow-wrap:anywhere}
+.stagePhaseTrack span{margin-top:6px;color:#71849f;font-size:9.5px;font-weight:800}
+.stageSystemLens{
+  display:grid;grid-template-columns:.82fr 1.2fr 1.2fr;gap:10px;
+  margin:0 0 13px;padding:10px;border-radius:18px;background:#0b1c34;color:#fff
+}
+.stageSystemLens>div{min-width:0;padding:14px;border:1px solid rgba(255,255,255,.10);border-radius:13px;background:rgba(255,255,255,.045)}
+.stageSystemLens small{display:block;color:#75e5d4;font-size:9.5px;font-weight:900;letter-spacing:.1em}
+.stageSystemLens b{display:block;margin-top:6px;font-size:13px;line-height:1.35}
+.stageSystemLens span{display:inline-flex;margin-top:8px;padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.1);color:#dbe7f7;font-size:9px;font-weight:800}
+.stageSystemLens p{margin:6px 0 0;color:#d8e2f0;font-size:12.5px;line-height:1.55}
+@media(max-width:1000px){
+  .stagePhaseRail{grid-template-columns:1fr}
+  .stagePhaseTrack{grid-template-columns:repeat(3,1fr)}
+  .stageSystemLens{grid-template-columns:1fr 1fr}
+  .stageSystemLens>div:first-child{grid-column:1/-1}
+}
+@media(max-width:700px){
+  .stagePhaseRail{padding:9px;border-radius:18px}
+  .stagePhaseIntro{min-height:78px}
+  .stagePhaseTrack{display:flex;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:2px}
+  .stagePhaseTrack button{min-width:145px;min-height:84px;scroll-snap-align:start}
+  .stageSystemLens{grid-template-columns:1fr;padding:8px}
+  .stageSystemLens>div:first-child{grid-column:auto}
+}
