@@ -3,9 +3,11 @@ import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 export default function ProfileView({g}:{g:ReturnTypeRepublic}){
- const {me,profiles,parties,averageVsn,actions,saveProfile}=g;
+ const {me,profiles,parties,partyInvitations,partyMandates,averageVsn,actions,saveProfile}=g;
  const mine=profiles.find(x=>x.user_id===me?.user_id);
  const party=parties.find(p=>p.name===me?.team);
+ const allocation=party?partyMandates.find(x=>x.party_id===party.id&&x.user_id===me?.user_id):undefined;
+ const pendingInvites=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  const [bio,setBio]=useState(mine?.bio||'');
  const [file,setFile]=useState<File|null>(null);
  const [saving,setSaving]=useState(false);
@@ -27,7 +29,7 @@ export default function ProfileView({g}:{g:ReturnTypeRepublic}){
     <small>ЛИЧНЫЙ КАБИНЕТ</small>
     <h1>{me.full_name}</h1>
     <p>{me.role_title||'Участник деловой игры'}{party?' · '+party.name:''}</p>
-    <div className="profileChips"><span>{me.group_name||'Группа не указана'}</span><span>ВСН {averageVsn?averageVsn.toFixed(1):'—'}</span><span>{actions.filter(a=>a.author_id===me.user_id).length} решений</span></div>
+    <div className="profileChips"><span>{me.group_name||'Группа не указана'}</span><span>ВСН {averageVsn?averageVsn.toFixed(1):'—'}</span><span>{actions.filter(a=>a.author_id===me.user_id).length} решений</span>{allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}</div>
    </div>
   </section>
 
@@ -41,6 +43,16 @@ export default function ProfileView({g}:{g:ReturnTypeRepublic}){
    </article>
 
    <aside className="surface profileSummary">
+    <div className="surfaceHead"><div><small>МОЁ ПРЕДСТАВИТЕЛЬСТВО</small><h2>Фракция и мандаты</h2></div></div>
+    {party&&allocation?<div className="profileMandateCard">
+      <div className="profilePartyLine"><span className="profilePartyDot" style={{background:party.color}}/><div><small>ПАРТИЯ / ФРАКЦИЯ</small><b>{party.name}</b></div></div>
+      <div className="profileMandateStats"><div><strong>{allocation.base_mandates}</strong><span>мандатов представляю</span></div><div className={allocation.ghost_loss?'affected':''}><strong>{allocation.effective_mandates}</strong><span>голосов сейчас</span></div><div><strong>{allocation.ghost_loss}</strong><span>потеря GV</span></div></div>
+      <p>Ваш голос в мандатном голосовании имеет вес <b>{allocation.effective_mandates}</b>. При изменении состава партии мандаты перераспределяются автоматически между всеми её студентами.</p>
+      {party.ghost_active&&<div className="profileGhostNote">⚡ Ghost voting действует только на ближайшее заседание ГД: ваша временная потеря — {allocation.ghost_loss}.</div>}
+     </div>:pendingInvites.length?<div className="profileInviteNote"><b>У вас {pendingInvites.length} приглашение(я) в партию.</b><span>Откройте раздел «Партии», чтобы принять или отклонить.</span></div>:<div className="emptyState">Вы пока не состоите в партии. Вступление возможно после приглашения руководителя и вашего согласия.</div>}
+
+    <div className="profilePositionDivider"/>
+
     <div className="surfaceHead"><div><small>МОЯ ПОЗИЦИЯ</small><h2>В игре</h2></div></div>
     <dl><div><dt>Партия</dt><dd>{me.team||'Не назначена'}</dd></div><div><dt>Роль</dt><dd>{me.role_title||'Не назначена'}</dd></div><div><dt>ВСН</dt><dd>{averageVsn?averageVsn.toFixed(1):'—'}</dd></div><div><dt>Решения</dt><dd>{actions.filter(a=>a.author_id===me.user_id).length}</dd></div></dl>
     {mine?.bio&&<div className="profileBioPreview"><small>Описание</small><p>{mine.bio}</p></div>}
