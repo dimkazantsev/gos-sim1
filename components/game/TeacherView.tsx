@@ -121,7 +121,7 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
      const vsn=ev.length?ev.reduce((a,e)=>a+Number(e.score),0)/ev.length:0;
      return <div key={m.user_id} className="teacherPlayerStatsRow">
       <div><b>{m.full_name}</b><small>{m.team||m.group_name||'Без партии'} · {m.role_title||'роль не назначена'}</small></div>
-      <strong>{posts.length}</strong><strong>{decisions.length}</strong><strong>{docs.length}</strong><strong>{bs.length}</strong><strong>{act.length}</strong><strong>{vsn?vsn.toFixed(1):'—'}</strong>
+      <strong>{posts.length}</strong><strong>{decisions.length}</strong><strong>{docs.length}</strong><strong>{bs.length}</strong><strong>{act.length}</strong><strong>{ev.length?vsn.toFixed(1):'—'}</strong>
      </div>
     })}
    </div>
