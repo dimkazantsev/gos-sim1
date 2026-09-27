@@ -93,6 +93,16 @@ export default function StagesView({g}:{g:ReturnTypeRepublic}){
       <p>Описание адаптировано для интерфейса из полного сценария игры; содержание этапа сохранено, а длинные процедурные положения структурированы для удобного чтения.</p>
      </section>
 
+     {detail.rulesUrl&&<section className="stageRulesCallout">
+      <div className="stageRulesCalloutIcon">?</div>
+      <div>
+       <small>УТОЧНИТЬ ПО ПРАВИЛАМ</small>
+       <h3>{detail.rulesSection||('Этап '+selected.stage_no)}</h3>
+       <p>Если нужна формулировка без сокращений, примеры, специальные условия или процедурные детали — откройте соответствующий раздел полного документа правил.</p>
+      </div>
+      <a href={detail.rulesUrl} target="_blank" rel="noreferrer">Открыть полные правила <span>↗</span></a>
+     </section>}
+
      {teacher&&<section className="stageTeacherActions">
       <div><small>УПРАВЛЕНИЕ ЭТАПОМ</small><b>Действия преподавателя</b></div>
       <div>
