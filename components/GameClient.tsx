@@ -232,7 +232,7 @@ export default function GameClient({gameId}:{gameId:string}){
    </div>
   </aside>
 
-  <div className="simWorkspace">
+  <div className={'simWorkspace '+(chatOpen?'chatOpen':'')}>
    <header className="simTop">
     <div className="mobileBrand"><div className="simLogo"><ShieldCheck aria-hidden="true"/><span>GS</span></div><b>GOS//SIM</b></div>
     <div className="simTopCenter">
