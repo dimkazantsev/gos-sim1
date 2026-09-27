@@ -43,7 +43,6 @@ export default function GameClient({gameId}:{gameId:string}){
   ? [['teacher','✦','Управление'],['dashboard','◎','Политические процессы'],['parties','◈','Партии'],['votes','✓','Голосования'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Профиль']]
   : [['dashboard','◎','Политические процессы'],['parties','◈','Партия'],['votes','✓','Голосование'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Мой профиль']];
 
- const openScreen=()=>window.open('/game/'+gameId+'/screen','gos-sim-public');
 
  return <div className="simShell">
   <header className="simTop">
@@ -57,7 +56,6 @@ export default function GameClient({gameId}:{gameId:string}){
     </div>
    </div>
    <div className="simUser">
-    {teacher&&<button className="topScreenButton" onClick={openScreen}>▣ Общий экран</button>}
     <div className="simAvatar">{initials(me.full_name)}</div>
     <div className="simUserText"><b>{me.full_name}</b><span>{me.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
     <button className="logoutButton" onClick={logout}>Выйти</button>
@@ -81,7 +79,7 @@ export default function GameClient({gameId}:{gameId:string}){
    {view==='documents'&&<DocumentsView g={g} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>} 
    {view==='actions'&&<PoliticalWallView g={g} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>} 
    {view==='profile'&&<ProfileView g={g}/>} 
-   {view==='teacher'&&teacher&&<TeacherView g={g} onOpenScreen={openScreen}/>} 
+   {view==='teacher'&&teacher&&<TeacherView g={g}/>}  
    {!chatOpen&&<button className="floatingChat" onClick={()=>{setChatOpen(true);void logActivity('navigation','Открыл связь','chat')}}>⌁ <span>Связь</span></button>}
   </main>
 
