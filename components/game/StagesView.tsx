@@ -6,7 +6,7 @@ import {formatDeadline,stageIcon} from './constants';
 import {STAGE_DETAILS} from './stageDetails';
 
 export default function StagesView({g}:{g:ReturnTypeRepublic}){
- const {stages,teacher,nextStage,openStage,setStageDeadline}=g;
+ const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
  const [selected,setSelected]=useState<Stage|null>(null);
  const detail=selected?STAGE_DETAILS[selected.stage_no]:null;
 
@@ -34,6 +34,7 @@ export default function StagesView({g}:{g:ReturnTypeRepublic}){
      <div className="stageMeta">
       <span className={`statusTag ${s.status}`}>{s.status==='open'?'Сейчас':s.status==='completed'?'Завершён':'Закрыт'}</span>
       {s.deadline&&<span className="deadlineTag">до {formatDeadline(s.deadline)}</span>}
+      {votes.some(v=>v.stage_no===s.stage_no&&v.status==='open')&&<span className="stageVoteTag">● Есть голосование</span>}
       <span className="stageOpenHint">Подробнее →</span>
      </div>
     </div>
@@ -50,6 +51,7 @@ export default function StagesView({g}:{g:ReturnTypeRepublic}){
       <div className="stageDetailStatus">
        <span className={`statusTag ${selected.status}`}>{selected.status==='open'?'Текущий этап':selected.status==='completed'?'Завершён':'Закрыт'}</span>
        {selected.deadline&&<span className="deadlineTag">Дедлайн: {formatDeadline(selected.deadline)}</span>}
+       {votes.filter(v=>v.stage_no===selected.stage_no).length>0&&<span className="stageVoteTag">{votes.filter(v=>v.stage_no===selected.stage_no&&v.status==='open').length?('● Открыто '+votes.filter(v=>v.stage_no===selected.stage_no&&v.status==='open').length):('Голосований: '+votes.filter(v=>v.stage_no===selected.stage_no).length)}</span>}
       </div>
      </div>
      <button className="stageClose" onClick={()=>setSelected(null)} aria-label="Закрыть описание">×</button>
