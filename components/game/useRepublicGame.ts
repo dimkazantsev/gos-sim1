@@ -71,7 +71,7 @@ export function useRepublicGame(gameId:string){
   if(show)setLoading(true);
   const u=(await supabase.auth.getUser()).data.user;
   if(!u){router.replace('/');return}
-  const [g,m,mt,ev,ac,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,fd,fh,pp,px,pl,pc,mh,psh,ir,il]=await Promise.all([
+  const [g,m,mt,ev,ac,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,fd,fh,pp,px,pl,pc,mh,psh]=await Promise.all([
    supabase.from('games').select('*').eq('id',gameId).single(),
    supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',u.id).single(),
    supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label'),
@@ -99,9 +99,7 @@ export function useRepublicGame(gameId:string){
    supabase.from('political_post_formal_links').select('*').eq('game_id',gameId),
    supabase.from('political_decisions').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
    supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
-   supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
-   supabase.from('impact_rules').select('*').eq('game_id',gameId).order('priority'),
-   supabase.from('impact_ledger').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(500)
+   supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000)
   ]);
   if(g.error||m.error){setError(g.error?.message||m.error?.message||'Нет доступа к игре');setLoading(false);return}
   setGame(g.data as Game);setMe(m.data as Member);setMetrics((mt.data||[]) as Metric[]);setEvents((ev.data||[]) as EventItem[]);setActions((ac.data||[]) as ActionItem[]);
@@ -117,8 +115,9 @@ export function useRepublicGame(gameId:string){
   const formalRows=await Promise.all(((fd.data||[]) as FormalDocument[]).map(async x=>x.source_file_path?{...x,file_url:(await supabase.storage.from('game-assets').createSignedUrl(x.source_file_path,3600)).data?.signedUrl||null}:x));
   setFormalDocuments(formalRows);setFormalHistory((fh.data||[]) as FormalHistory[]);
   const mediaRows=await Promise.all(((px.data||[]) as PoliticalPostMedia[]).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
-  setPoliticalPosts((pp.data||[]) as PoliticalPost[]);setPoliticalMedia(mediaRows);setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);setPoliticalDecisions((pc.data||[]) as PoliticalDecision[]);setMetricHistory((mh.data||[]) as MetricHistory[]);setPartySupportHistory((psh.data||[]) as PartySupportHistory[]);setImpactRules((ir.data||[]) as ImpactRule[]);setImpactLedger((il.data||[]) as ImpactLedger[]);
+  setPoliticalPosts((pp.data||[]) as PoliticalPost[]);setPoliticalMedia(mediaRows);setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);setPoliticalDecisions((pc.data||[]) as PoliticalDecision[]);setMetricHistory((mh.data||[]) as MetricHistory[]);setPartySupportHistory((psh.data||[]) as PartySupportHistory[]);
   if(!channelRef.current&&ch.data?.[0])setChannelId(ch.data[0].id);
+  await loadImpactEngine();
   if(show)setLoading(false);
  }
 
