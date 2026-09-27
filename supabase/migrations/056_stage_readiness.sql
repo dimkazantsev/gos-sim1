@@ -51,7 +51,11 @@ begin
   if c2>0 then w:=w||jsonb_build_array('Есть кандидатуры, которые ещё находятся на проверке или доработке'); end if;
  elsif p_stage=7 then
   select status into s from public.presidential_election_settings where game_id=p_game;
-  m:=jsonb_build_object('election_status',coalesce(s,'not_configured'));
+  select count(*) into c from public.presidential_system_proposals where game_id=p_game and status='adopted';
+  select count(*) into c2 from public.formal_documents where game_id=p_game and stage_no=7 and doc_type='sf_resolution' and metadata->>'purpose'='presidential_election_appointment';
+  m:=jsonb_build_object('election_status',coalesce(s,'not_configured'),'duma_system_decision',c,'sf_appointment_resolution',c2);
+  if c=0 then b:=b||jsonb_build_array('Государственная Дума не приняла тип мажоритарной системы выборов Президента'); end if;
+  if c2=0 then b:=b||jsonb_build_array('Не создано постановление Совета Федерации о назначении выборов Президента'); end if;
   if s is null then b:=b||jsonb_build_array('Модель президентских выборов не настроена');
   elsif s='manual_required' then b:=b||jsonb_build_array('Президентские выборы требуют ручного разрешения преподавателем');
   elsif s<>'finished' then b:=b||jsonb_build_array('Президентские выборы ещё не завершены'); end if;
