@@ -8,7 +8,7 @@ function pct(n:number,d:number){return d>0?Math.round(n/d*100):0}
 function time(v:string){return new Date(v).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
 
 export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeRepublic;onOpenDocument:(id:string)=>void;onOpenStages:()=>void}){
- const {votes,ballots,me,teacher,formalDocuments,stages,createVote,canVote,castVote,closeVote,tally,quorum}=g;
+ const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,createVote,canVote,castVote,closeVote,tally,quorum}=g;
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[mode,setMode]=useState<'member'|'faction'|'mandate'>('faction');
  const [institution,setInstitution]=useState('all'),[quorumValue,setQuorumValue]=useState(0.5),[majorityKind,setMajorityKind]=useState<'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction'>('present_majority'),[majorityValue,setMajorityValue]=useState(0.5);
  const [tab,setTab]=useState<'open'|'closed'|'all'>('open'),[busy,setBusy]=useState('');
@@ -91,6 +91,20 @@ export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeR
     </div>
 
     <div className="quorumMeter"><div><span>Участие: {q.cast} из {q.eligible}</span><b className={q.met?'ok':'wait'}>{q.met?'КВОРУМ ЕСТЬ':'НУЖНО '+Math.max(0,q.needed-q.cast)}</b></div><i><em style={{width:Math.min(100,pct(q.cast,q.eligible))+'%'}}/></i></div>
+    {v.voting_mode==='mandate'&&<details className="deputyRegistration" open={v.status==='open'}>
+     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{partyMandates.reduce((a,x)=>a+x.effective_mandates,0)} / {parties.reduce((a,p)=>a+Number(p.mandates||0),0)} присутствует</span></summary>
+     <div className="deputyRegistrationBody">
+      {parties.filter(p=>p.mandates>0).map(p=>{
+       const rows=partyMandates.filter(x=>x.party_id===p.id);
+       const base=rows.reduce((a,x)=>a+x.base_mandates,0);
+       const effective=rows.reduce((a,x)=>a+x.effective_mandates,0);
+       return <article key={p.id}>
+        <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{base} мандатов · {effective} зарегистрировано{p.ghost_active?' · GV −'+p.ghost_loss_current:''}</small></div></header>
+        <div>{rows.map(a=>{const m=members.find(x=>x.user_id===a.user_id);return <div className="deputyStudentRow" key={a.user_id}><b>{m?.full_name||'Участник'}</b><span>{a.base_mandates} манд.</span>{a.ghost_loss?<em>−{a.ghost_loss} GV</em>:<em>—</em>}<strong>{a.effective_mandates} голосов</strong></div>})}</div>
+       </article>
+      })}
+     </div>
+    </details>}
 
     <div className="voteResultBoard">
      <div className="voteNumber yes"><strong>{t.yes}</strong><span>ЗА</span><small>{pct(t.yes,denominator)}%</small></div>
@@ -106,6 +120,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeR
       <button disabled={!canVote(v)} className={my?.choice==='no'?'selected no':''} onClick={()=>castVote(v,'no')}>× Против</button>
      </div>
      {!canVote(v)&&<small className="voteNotEligible">Вашей игровой роли не предоставлено право голоса в этой процедуре.</small>}
+     {v.voting_mode==='mandate'&&canVote(v)&&<small className="myMandateWeight">Ваш вес в этом голосовании: <b>{partyMandates.find(x=>x.user_id===me?.user_id)?.effective_mandates||0}</b> депутатских голосов.</small>}
      {canClose(v)&&<button className="primary closeProceduralVote" disabled={busy===v.id} onClick={async()=>{if(!confirm('Закрыть голосование и зафиксировать результат?'))return;setBusy(v.id);await closeVote(v.id);setBusy('')}}>{busy===v.id?'Подсчитываю…':'Закрыть и применить результат →'}</button>}
     </div>:<div className={'finalVoteDecision '+(v.result_code||'')}>
      <div><small>ИТОГОВОЕ РЕШЕНИЕ</small><strong>{v.result_label||'Голосование завершено'}</strong>{v.decision_note&&<p>{v.decision_note}</p>}</div>
