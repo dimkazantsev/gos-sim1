@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {BookOpenText,ChevronLeft,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote,Wifi} from 'lucide-react';
+import {BookOpenText,ChevronLeft,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote as VoteIcon,Wifi} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
@@ -197,7 +197,7 @@ export default function GameClient({gameId}:{gameId:string}){
    : [['dashboard','Процессы'],['parties','Партия'],['votes','Голосование'],['documents','НПА'],['stages','Этапы'],['grades','Оценки'],['profile','Профиль']];
 
  const navIcon=(key:View)=>{
-  const P=key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='parties'?Landmark:key==='votes'?Vote:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:UserRound;
+  const P=key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='parties'?Landmark:key==='votes'?VoteIcon:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:UserRound;
   return <P aria-hidden="true" strokeWidth={1.9}/>;
  };
  const mobilePrimary:View[]=teacher&&!previewMode?['teacher','dashboard','stages','votes']:['dashboard','stages','parties','votes'];
