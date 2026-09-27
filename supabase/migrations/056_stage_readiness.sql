@@ -108,19 +108,41 @@ begin
   if c2>0 then b:=b||jsonb_build_array('Не по всем государственным программам принято итоговое решение Правительства'); end if;
   if n<c3 then b:=b||jsonb_build_array('Не все принятые государственные программы оформлены постановлениями Правительства'); end if;
  elsif p_stage=12 then
-  select count(*) into c from public.formal_documents where game_id=p_game and stage_no=12 and workflow_key in ('bill','gd_resolution');
+  select count(*) into c from public.formal_documents where game_id=p_game and stage_no=12 and workflow_key='bill';
   select count(*) into c2 from public.duma_sessions where game_id=p_game and stage_no=12 and status='closed';
-  m:=jsonb_build_object('legislative_documents',c,'closed_duma_sessions',c2);
-  if c=0 then b:=b||jsonb_build_array('В реестре НПА нет законопроекта или постановления, созданного на этапе 12'); end if;
+  select count(*) into c3 from public.formal_documents where game_id=p_game and stage_no=12 and workflow_key='bill' and status_code in ('published','rejected');
+  m:=jsonb_build_object(
+   'bills',c,'closed_duma_sessions',c2,'terminal_bills',c3,
+   'published_bills',(select count(*) from public.formal_documents where game_id=p_game and stage_no=12 and workflow_key='bill' and status_code='published')
+  );
+  if c=0 then b:=b||jsonb_build_array('В реестре НПА нет законопроекта, созданного на этапе 12'); end if;
   if c2=0 then b:=b||jsonb_build_array('Не завершено ни одного заседания Государственной Думы с законодательной повесткой'); end if;
+  if c3=0 then b:=b||jsonb_build_array('Ни один законопроект этапа 12 не доведён до итогового решения по формальной процедуре'); end if;
   if exists(select 1 from public.duma_sessions where game_id=p_game and stage_no=12 and status='open') then w:=w||jsonb_build_array('Сейчас открыто заседание ГД; завершите или осознанно перенесите остаток повестки'); end if;
+  if exists(
+   select 1 from public.formal_documents d
+   where d.game_id=p_game and d.stage_no=12 and d.workflow_key='bill'
+     and d.status_code not in ('published','rejected')
+  ) then w:=w||jsonb_build_array('Есть законопроекты, которые ещё проходят процедуру'); end if;
  elsif p_stage=13 then
   select count(*) into c from public.budget_scenarios where game_id=p_game and stage_no=13 and status='final';
   select count(*) into c2 from public.budget_scenarios where game_id=p_game and stage_no=13 and status='final' and formal_document_id is not null;
-  m:=jsonb_build_object('final_scenarios',c,'budget_bills',c2);
+  select count(*) into c3
+  from public.budget_scenarios s join public.formal_documents d on d.id=s.formal_document_id
+  where s.game_id=p_game and s.stage_no=13 and s.status='final' and d.status_code='published';
+  m:=jsonb_build_object(
+   'final_scenarios',c,'budget_bills',c2,'published_budget_laws',c3,
+   'preliminary_reviews_accepted',(select count(*) from public.budget_preliminary_reviews br join public.formal_documents d on d.id=br.document_id where br.game_id=p_game and d.stage_no=13 and br.decision='accept')
+  );
   if c=0 then b:=b||jsonb_build_array('Не зафиксирован итоговый бюджетный сценарий'); end if;
   if c2=0 then b:=b||jsonb_build_array('Из финального сценария не создан проект федерального бюджета в реестре НПА'); end if;
-  if exists(select 1 from public.budget_scenarios s join public.formal_documents d on d.id=s.formal_document_id where s.game_id=p_game and s.stage_no=13 and s.status='final' and d.status_code not in ('published','signed','adopted')) then w:=w||jsonb_build_array('Проект федерального бюджета ещё проходит формальную законодательную процедуру'); end if;
+  if c2>0 and not exists(
+    select 1 from public.budget_scenarios s join public.formal_documents d on d.id=s.formal_document_id
+    where s.game_id=p_game and s.stage_no=13 and s.status='final'
+      and (d.status_code in ('reading1','amendments','reading2','reading3','sf','president','published','budget_conciliation')
+        or exists(select 1 from public.budget_preliminary_reviews br where br.document_id=d.id and br.decision='accept'))
+  ) then b:=b||jsonb_build_array('Проект федерального бюджета не прошёл предварительную проверку Комитета по бюджету и Совета ГД'); end if;
+  if c2>0 and c3=0 then b:=b||jsonb_build_array('Федеральный бюджет не завершил I–III чтения, рассмотрение Советом Федерации и президентскую стадию'); end if;
  elsif p_stage=14 then
   select count(*) into c from public.municipal_mayor_elections where game_id=p_game and status='finished';
   select count(*) into c2 from public.municipal_districts where game_id=p_game;
