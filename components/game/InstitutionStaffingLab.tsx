@@ -2,6 +2,7 @@
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import CommitteeChairElectionPanel from './CommitteeChairElectionPanel';
 
 type Unit={id:string;game_id:string;unit_kind:'committee'|'ministry';unit_key:string;title:string;description:string|null;capacity_min:number|null;capacity_max:number|null;mandate_capacity:number|null;head_user_id:string|null};
 type Assignment={id:string;game_id:string;unit_id:string;unit_kind:'committee'|'ministry';user_id:string;party_id:string|null;assignment_role:'member'|'deputy'|'head';created_at:string};
@@ -80,12 +81,14 @@ export default function InstitutionStaffingLab({g}:{g:ReturnTypeRepublic}){
     return <article className="institutionUnit committeeUnit" key={u.id}>
      <header><div><small>КОМИТЕТ</small><h4>{u.title}</h4><p>{u.description}</p></div><span>{aa.length} студентов</span></header>
      <div className="committeeQuota">{rows.map(r=><div key={r.party_id}><i style={{background:r.color}}/><b>{r.party_name}</b><strong>{r.quota}</strong><span>{r.students} студент(а)</span></div>)}</div>
-     <div className="unitHead"><small>ПРЕДСЕДАТЕЛЬ</small><b>{memberName(u.head_user_id)}</b>{teacher&&<div><select value={headPick[u.id]||''} onChange={e=>setHeadPick(v=>({...v,[u.id]:e.target.value}))}><option value="">Зафиксировать избранного…</option>{students.filter(s=>aa.some(a=>a.user_id===s.user_id)).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}</option>)}</select><button disabled={busy||!headPick[u.id]} onClick={()=>void setHead(u.id)}>Назначить после голосования</button></div>}</div>
+     <div className="unitHead"><small>ПРЕДСЕДАТЕЛЬ</small><b>{memberName(u.head_user_id)}</b><span className="unitHeadElectionHint">Избирается всей Государственной Думой ниже</span></div>
      <div className="unitMembers">{aa.length===0?<div className="emptyState">Состав не сформирован.</div>:aa.map(a=>{const row=rows.find(r=>r.party_id===a.party_id);const partyStudents=Math.max(1,row?.students||1);const weight=(row?.quota||0)/partyStudents;return <div key={a.id}><span>{memberName(a.user_id)}</span><small>{partyName(a.party_id)}</small><b>≈ {weight.toFixed(1)} мандата</b>{canManageCommittee&&(!ledParty||a.party_id===ledParty.id||teacher)&&<button onClick={()=>void remove(a.id)}>×</button>}</div>})}</div>
      {canManageCommittee&&<div className="unitAssign"><select value={pick[u.id]||''} onChange={e=>setPick(v=>({...v,[u.id]:e.target.value}))}><option value="">Добавить депутата…</option>{committeeCandidates.filter(s=>!assignmentFor(s.user_id,'committee')).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}{s.team?' · '+s.team:''}</option>)}</select><button disabled={busy||!pick[u.id]} onClick={()=>void assign(u.id)}>Добавить</button></div>}
     </article>
    })}</div>
   </section>
+
+  <CommitteeChairElectionPanel g={g}/>
 
   <section className="staffingSection ministrySection">
    <div className="staffingSectionHead"><div><small>ПРАВИТЕЛЬСТВО</small><h3>5 министерств · беспартийный кадровый принцип</h3><p>Министры набирают заместителей и участников своих ведомств. Партийная принадлежность здесь не используется как критерий распределения; система показывает дисбаланс численности между ведомствами.</p></div><span className={maxCount-minCount>1?'warn':''}>разброс {minCount}–{maxCount}</span></div>
