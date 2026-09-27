@@ -5,7 +5,7 @@ import {VSN_LABEL} from './constants';
 import ImpactRulesPanel from './ImpactRulesPanel';
 
 const VIEW_NAMES:Record<string,string>={
- dashboard:'Главный экран',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'Материалы',actions:'Решения',teacher:'Управление',chat:'Связь'
+ dashboard:'Политические процессы',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'Материалы',actions:'Решения',teacher:'Управление',chat:'Связь'
 };
 
 function timerText(seconds:number){
