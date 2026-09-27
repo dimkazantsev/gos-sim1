@@ -14,7 +14,7 @@ const DOCS:{kind:PartyDocument['doc_kind'];title:string;rule:string}[]=[
 ];
 
 export default function PartiesView({g}:{g:ReturnTypeRepublic}){
- const {parties,members,profiles,partyDocuments,partyInvitations,partyMandates,me,teacher,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,savePartyIdentity,uploadPartyDocument,reviewPartyDocument}=g;
+ const {parties,members,profiles,partyDocuments,partyInvitations,partyMandates,partyAgreements,votes,currentStage,me,teacher,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,savePartyIdentity,uploadPartyDocument,reviewPartyDocument}=g;
  const [name,setName]=useState(''),[ideology,setIdeology]=useState('');
  const [selectedId,setSelectedId]=useState('');
  const [desc,setDesc]=useState('');
@@ -25,6 +25,12 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const [inviteUser,setInviteUser]=useState('');
  const [ghostLoss,setGhostLoss]=useState(25);
  const [ghostDraw,setGhostDraw]=useState<{total_loss:number;result:{party_id:string;party_name:string;loss:number}[]}|null>(null);
+ const [agreementParty,setAgreementParty]=useState('');
+ const [agreementTitle,setAgreementTitle]=useState('');
+ const [agreementTerms,setAgreementTerms]=useState('');
+ const [agreementVote,setAgreementVote]=useState('');
+ const [myPromise,setMyPromise]=useState<''|'yes'|'no'>('');
+ const [theirPromise,setTheirPromise]=useState<''|'yes'|'no'>('');
  const [busy,setBusy]=useState(false);
 
  const ranked=useMemo(()=>[...parties].sort((a,b)=>Number(b.support)-Number(a.support)||b.regions-a.regions||b.mandates-a.mandates),[parties]);
@@ -40,6 +46,12 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const pendingForSelected=selected?partyInvitations.filter(i=>i.party_id===selected.id&&i.status==='pending'):[];
  const myPending=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  const chamberMandates=parties.reduce((a,p)=>a+Number(p.mandates||0),0);
+ const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
+ const agreementPhase=(currentStage?.stage_no||1)<4;
+ const factionVotes=votes.filter(v=>v.stage_no<4&&v.voting_mode==='faction'&&v.status==='open');
+ const incomingAgreements=ledParty?partyAgreements.filter(a=>a.counterparty_party_id===ledParty.id&&a.status==='proposed'):[];
+ const agreementPartyName=(id:string)=>parties.find(p=>p.id===id)?.name||'Фракция';
+ const agreementVoteTitle=(id:string|null)=>id?votes.find(v=>v.id===id)?.title||'Связанное голосование':'Общее обязательство';
 
  async function create(){if(await createParty(name,ideology)){setName('');setIdeology('')}}
  async function saveIdentity(){
@@ -74,6 +86,35 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
     <small>Ручную корректировку отдельной фракции можно сделать в её карточке ниже.</small>
    </div>}
   </section>
+
+  {agreementPhase&&<section className="agreementExchange">
+   <div className="agreementExchangeHead">
+    <div><small>ПЕРЕГОВОРЫ · ОБЯЗАТЕЛЬСТВА</small><h2>Межфракционные соглашения</h2><p>До формирования парламента принятое соглашение становится обязательством. Если оно привязано к фракционному голосованию, сервер не позволит стороне проголосовать вопреки принятому обещанию.</p></div>
+    <div className="agreementRule"><b>Правило игры</b><span>Договорённости обязательны до этапа формирования парламента; после этого решения подчиняются институциональным и правовым процедурам.</span></div>
+   </div>
+
+   {incomingAgreements.length>0&&<div className="agreementInbox"><small>ТРЕБУЕТСЯ ВАШЕ РЕШЕНИЕ</small>{incomingAgreements.map(a=><article key={a.id}><div><b>{a.title}</b><span>{agreementPartyName(a.proposer_party_id)} → {agreementPartyName(a.counterparty_party_id)}</span><p>{a.terms}</p></div><div><button className="primary" onClick={()=>void respondPartyAgreement(a.id,true)}>Принять обязательство</button><button className="secondary" onClick={()=>void respondPartyAgreement(a.id,false)}>Отклонить</button></div></article>)}</div>}
+
+   {ledParty&&<details className="agreementComposer">
+    <summary><div><b>Предложить сделку другой фракции</b><span>Можно сделать соглашение общим или привязать к конкретному открытому голосованию</span></div><i>+</i></summary>
+    <div className="agreementComposerBody">
+     <label>Контрагент<select value={agreementParty} onChange={e=>setAgreementParty(e.target.value)}><option value="">Выберите фракцию…</option>{parties.filter(p=>p.id!==ledParty.id).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+     <label>Название сделки<input value={agreementTitle} onChange={e=>setAgreementTitle(e.target.value)} placeholder="Например: поддержка модели ИС в обмен на региональную договорённость"/></label>
+     <label className="agreementTerms">Условия<textarea rows={4} value={agreementTerms} onChange={e=>setAgreementTerms(e.target.value)} placeholder="Что именно обещает каждая сторона, в какой момент и ради какого обмена?"/></label>
+     <label>Связанное голосование<select value={agreementVote} onChange={e=>setAgreementVote(e.target.value)}><option value="">Без привязки</option>{factionVotes.map(v=><option key={v.id} value={v.id}>{v.stage_no}. {v.title}</option>)}</select></label>
+     {agreementVote&&<><label>Наша обещанная позиция<select value={myPromise} onChange={e=>setMyPromise(e.target.value as ''|'yes'|'no')}><option value="">Не фиксировать</option><option value="yes">За</option><option value="no">Против</option></select></label><label>Позиция партнёра<select value={theirPromise} onChange={e=>setTheirPromise(e.target.value as ''|'yes'|'no')}><option value="">Не фиксировать</option><option value="yes">За</option><option value="no">Против</option></select></label></>}
+     <button className="primary" disabled={busy||!agreementParty||agreementTitle.trim().length<3||agreementTerms.trim().length<10} onClick={async()=>{setBusy(true);const ok=await proposePartyAgreement({counterpartyPartyId:agreementParty,title:agreementTitle.trim(),terms:agreementTerms.trim(),targetVoteId:agreementVote||null,proposerChoice:myPromise||null,counterpartyChoice:theirPromise||null});setBusy(false);if(ok){setAgreementTitle('');setAgreementTerms('');setAgreementVote('');setMyPromise('');setTheirPromise('')}}}>Отправить соглашение →</button>
+    </div>
+   </details>}
+
+   <div className="agreementLedger">
+    {partyAgreements.length===0?<div className="emptyState">Соглашений пока нет. Здесь появится проверяемая история коалиционных обменов.</div>:partyAgreements.map(a=><article key={a.id} className={'agreementCard '+a.status}>
+     <header><span>{a.status==='accepted'?'●':a.status==='fulfilled'?'✓':a.status==='rejected'?'×':'○'}</span><div><b>{a.title}</b><small>{agreementPartyName(a.proposer_party_id)} ⇄ {agreementPartyName(a.counterparty_party_id)}</small></div><em>{a.status==='proposed'?'Ожидает ответа':a.status==='accepted'?'Обязательно':a.status==='fulfilled'?'Исполнено':a.status==='rejected'?'Отклонено':'Завершено'}</em></header>
+     <p>{a.terms}</p>
+     <footer><span>{agreementVoteTitle(a.target_vote_id)}</span>{a.proposer_choice&&<span>{agreementPartyName(a.proposer_party_id)}: {a.proposer_choice==='yes'?'ЗА':'ПРОТИВ'}</span>}{a.counterparty_choice&&<span>{agreementPartyName(a.counterparty_party_id)}: {a.counterparty_choice==='yes'?'ЗА':'ПРОТИВ'}</span>}</footer>
+    </article>)}
+   </div>
+  </section>}
 
   {myPending.length>0&&<section className="partyInviteInbox">
    <div><small>ВАС ПРИГЛАСИЛИ</small><h2>Приглашения в партии</h2><p>Вступление произойдёт только после вашего подтверждения. После принятия система автоматически перераспределит депутатские мандаты между всеми студентами фракции.</p></div>
