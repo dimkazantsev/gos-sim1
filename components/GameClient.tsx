@@ -21,6 +21,7 @@ function fmtTimer(seconds:number){
 export default function GameClient({gameId}:{gameId:string}){
  const g=useRepublicGame(gameId);
  const [view,setView]=useState<View>('dashboard');
+ const [focusFormalId,setFocusFormalId]=useState('');
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
 
  useEffect(()=>{
@@ -40,7 +41,7 @@ export default function GameClient({gameId}:{gameId:string}){
 
  const nav:[View,string,string][] = teacher
   ? [['teacher','✦','Управление'],['dashboard','◎','Общий ход'],['parties','◈','Партии'],['votes','✓','Голосования'],['actions','▣','Решения'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Профиль']]
-  : [['dashboard','◎','Сейчас'],['parties','◈','Партия'],['votes','✓','Голосование'],['actions','▣','Решение'],['documents','▤','Материалы'],['stages','◫','Этапы'],['profile','●','Мой профиль']];
+  : [['dashboard','◎','Сейчас'],['parties','◈','Партия'],['votes','✓','Голосование'],['actions','▣','Решение'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Мой профиль']];
 
  const openScreen=()=>window.open('/game/'+gameId+'/screen','gos-sim-public');
 
@@ -74,8 +75,8 @@ export default function GameClient({gameId}:{gameId:string}){
    {view==='dashboard'&&<DashboardView g={g} onNavigate={v=>setView(v)}/>}
    {view==='stages'&&<StagesView g={g}/>}
    {view==='parties'&&<PartiesView g={g}/>}
-   {view==='votes'&&<VotesView g={g}/>}
-   {view==='documents'&&<DocumentsView g={g}/>}
+   {view==='votes'&&<VotesView g={g} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onOpenStages={()=>setView('stages')}/>} 
+   {view==='documents'&&<DocumentsView g={g} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>} 
    {view==='actions'&&<ActionsView g={g}/>}
    {view==='profile'&&<ProfileView g={g}/>} 
    {view==='teacher'&&teacher&&<TeacherView g={g} onOpenScreen={openScreen}/>} 
