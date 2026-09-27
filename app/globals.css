@@ -1061,3 +1061,5 @@ button,input,textarea,select{font-size:14px}
 .stageReadinessOverrideForm label{display:grid;gap:4px;color:#766b55;font-size:9px;font-weight:900}.stageReadinessOverrideForm textarea{width:100%;border:1px solid #dfd7c4;border-radius:9px;background:#fff;padding:8px 9px;color:#5f5748;font-size:10px;line-height:1.42;resize:vertical}.stageReadinessOverrideForm button{min-height:39px;max-width:230px}
 .stageReadinessClearOverride{margin-top:8px}
 @media(max-width:650px){.stageReadinessOverrideForm{grid-template-columns:1fr}.stageReadinessOverrideForm button{max-width:none;width:100%}}
+
+.stageReadinessOverrideNotice details{margin-top:7px;padding-top:6px;border-top:1px solid #e4def5}.stageReadinessOverrideNotice summary{cursor:pointer;color:#675990;font-size:8.8px;font-weight:900}.stageReadinessOverrideNotice ul{display:grid;gap:3px;margin:6px 0 0;padding-left:17px}.stageReadinessOverrideNotice li{color:#817995;font-size:8.8px;line-height:1.35}
