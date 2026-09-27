@@ -34,19 +34,20 @@ export default function GovernmentStructurePanel({g}:{g:ReturnTypeRepublic}){
  },[game?.id]);
 
  if(!game||!me)return null;
+ const activeGame=game;
  const canEdit=teacher||isPM;
  const canReview=teacher||isPresident;
  const editable=!row||row.status==='draft'||row.status==='revision';
 
  async function save(submit:boolean){
   setBusy(true);const r=await supabase.rpc('save_government_structure',{
-   p_game_id:game.id,p_social_title:titles.social,p_economic_title:titles.economic,p_defence_title:titles.defence,
+   p_game_id:activeGame.id,p_social_title:titles.social,p_economic_title:titles.economic,p_defence_title:titles.defence,
    p_foreign_title:titles.foreign,p_internal_title:titles.internal,p_submit:submit
   });
   if(r.error)setError(r.error.message);else await load();setBusy(false);
  }
  async function review(action:'approve'|'revision'){
-  setBusy(true);const r=await supabase.rpc('review_government_structure',{p_game_id:game.id,p_action:action,p_note:note.trim()||null});
+  setBusy(true);const r=await supabase.rpc('review_government_structure',{p_game_id:activeGame.id,p_action:action,p_note:note.trim()||null});
   if(r.error)setError(r.error.message);else{setNote('');await load()}setBusy(false);
  }
 
