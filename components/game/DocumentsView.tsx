@@ -14,6 +14,7 @@ type BillProfile={document_id:string;requires_financial_justification:boolean;re
 type BillFile={id:string;document_id:string;file_kind:string;title:string;storage_path:string;file_name:string;status:'submitted'|'accepted'|'revision';note:string|null;url?:string|null};
 type BillConclusion={document_id:string;rapporteur_user_id:string|null;legal_compliance:string;internal_logic:string;affected_acts_completeness:string;recommendation:'draft'|'proceed'|'return'|'reject';finalized:boolean};
 type BillReadiness={submission_ready:boolean;committee_ready:boolean;issues:string[];review_issues:string[];required_files:string[];committee_key:string|null;committee_recommendation:string|null;committee_finalized:boolean};
+type BudgetPreliminaryReview={document_id:string;documents_compliant:boolean;sent_to_all_committees:boolean;accounts_chamber_reviewed:boolean;committee_conclusion:string;decision:'draft'|'accept'|'return';note:string|null;updated_at:string};
 const billFileLabels:Record<string,string>={explanatory_note:'Пояснительная записка',affected_acts:'Перечень затрагиваемых актов',financial_economic:'Финансово-экономическое обоснование',government_opinion:'Заключение Правительства РФ',collegial_decision:'Решение коллегиального субъекта о внесении',other_review:'Отзыв иного субъекта законодательной инициативы'};
 
 export default function DocumentsView({g,focusId,onOpenVotes}:{g:ReturnTypeRepublic;focusId?:string;onOpenVotes:()=>void}){
@@ -25,12 +26,14 @@ export default function DocumentsView({g,focusId,onOpenVotes}:{g:ReturnTypeRepub
  const [billFinancial,setBillFinancial]=useState(false),[billGovernmentOpinion,setBillGovernmentOpinion]=useState(false),[billCommittee,setBillCommittee]=useState(''),[billRepresentative,setBillRepresentative]=useState(''),[billNote,setBillNote]=useState('');
  const [billFileKind,setBillFileKind]=useState('explanatory_note'),[billFile,setBillFile]=useState<File|null>(null),[billReviewNote,setBillReviewNote]=useState<Record<string,string>>({});
  const [committeeRapporteur,setCommitteeRapporteur]=useState(''),[committeeLegal,setCommitteeLegal]=useState(''),[committeeLogic,setCommitteeLogic]=useState(''),[committeeActs,setCommitteeActs]=useState(''),[committeeRecommendation,setCommitteeRecommendation]=useState<'draft'|'proceed'|'return'|'reject'>('draft');
+ const [budgetReview,setBudgetReview]=useState<BudgetPreliminaryReview|null>(null),[budgetDocsOk,setBudgetDocsOk]=useState(false),[budgetDistributed,setBudgetDistributed]=useState(false),[budgetAccounts,setBudgetAccounts]=useState(false),[budgetConclusion,setBudgetConclusion]=useState(''),[budgetDecision,setBudgetDecision]=useState<'draft'|'accept'|'return'>('draft'),[budgetReviewNote,setBudgetReviewNote]=useState('');
+ const [localRefresh,setLocalRefresh]=useState(0);
 
  const role=(me?.role_title||'').toLowerCase();
  const availableSubjects=useMemo(()=>teacher?FORMAL_SUBJECTS:FORMAL_SUBJECTS.filter(s=>s.roleHints.some(h=>role.includes(h))),[teacher,role]);
  const selected=useMemo(()=>formalDocuments.find(d=>d.id===selectedId)||formalDocuments[0],[formalDocuments,selectedId]);
  const [committeeUnits,setCommitteeUnits]=useState<{unit_key:string;title:string;head_user_id:string|null}[]>([]);
- useEffect(()=>{if(!me)return;void supabase.from('institution_units').select('unit_key,title,head_user_id').eq('unit_kind','committee').then(r=>{if(!r.error)setCommitteeUnits((r.data||[]) as any)})},[me?.user_id]);
+ useEffect(()=>{if(!me||!g.game)return;void supabase.from('institution_units').select('unit_key,title,head_user_id').eq('game_id',g.game.id).eq('unit_kind','committee').then(r=>{if(!r.error)setCommitteeUnits((r.data||[]) as any)})},[me?.user_id,g.game?.id]);
  useEffect(()=>{if(focusId&&formalDocuments.some(d=>d.id===focusId))setSelectedId(focusId)},[focusId,formalDocuments]);
  useEffect(()=>{
   if(!selected||selected.workflow_key!=='bill'){setBillProfile(null);setBillFiles([]);setBillConclusion(null);setBillReadiness(null);return}
@@ -52,7 +55,16 @@ export default function DocumentsView({g,focusId,onOpenVotes}:{g:ReturnTypeRepub
    setCommitteeRapporteur(bc?.rapporteur_user_id||'');setCommitteeLegal(bc?.legal_compliance||'');setCommitteeLogic(bc?.internal_logic||'');setCommitteeActs(bc?.affected_acts_completeness||'');setCommitteeRecommendation(bc?.recommendation||'draft');
    if(!r.error)setBillReadiness(r.data as BillReadiness);
   })();
- },[selected?.id,selected?.updated_at]);
+ },[selected?.id,selected?.updated_at,localRefresh]);
+ useEffect(()=>{
+  if(!selected||selected.workflow_key!=='budget'){setBudgetReview(null);return}
+  void supabase.from('budget_preliminary_reviews').select('*').eq('document_id',selected.id).maybeSingle().then(r=>{
+   if(r.error)return;
+   const x=(r.data||null) as BudgetPreliminaryReview|null;setBudgetReview(x);
+   setBudgetDocsOk(!!x?.documents_compliant);setBudgetDistributed(!!x?.sent_to_all_committees);setBudgetAccounts(!!x?.accounts_chamber_reviewed);
+   setBudgetConclusion(x?.committee_conclusion||'');setBudgetDecision(x?.decision||'draft');setBudgetReviewNote(x?.note||'');
+  });
+ },[selected?.id,selected?.updated_at,localRefresh]);
  const filtered=useMemo(()=>formalDocuments.filter(d=>{const q=query.trim().toLowerCase();return(!q||[d.registry_no,d.title,d.subject_label,typeLabel(d.doc_type),d.status_label].join(' ').toLowerCase().includes(q))&&(!filterSubject||d.subject_key===filterSubject)&&(!filterStatus||d.status_code===filterStatus)}),[formalDocuments,query,filterSubject,filterStatus]);
  const history=selected?formalHistory.filter(h=>h.document_id===selected.id).slice().reverse():[];
  const author=selected?members.find(m=>m.user_id===selected.author_id):undefined;
@@ -125,7 +137,7 @@ export default function DocumentsView({g,focusId,onOpenVotes}:{g:ReturnTypeRepub
  async function saveBillProfile(){
   if(!selected)return;setBusy(true);
   const r=await supabase.rpc('save_bill_submission_profile',{p_document_id:selected.id,p_requires_financial_justification:billFinancial,p_requires_government_opinion:billGovernmentOpinion,p_committee_key:billCommittee||null,p_representative_user_id:billRepresentative||null,p_note:billNote.trim()||null});
-  if(r.error)g.setError(r.error.message);else selected.updated_at=new Date().toISOString();setBusy(false);
+  if(r.error)g.setError(r.error.message);else setLocalRefresh(x=>x+1);setBusy(false);
  }
  async function uploadBillFile(){
   if(!selected||!billFile)return;
@@ -133,15 +145,24 @@ export default function DocumentsView({g,focusId,onOpenVotes}:{g:ReturnTypeRepub
   setBusy(true);const up=await supabase.storage.from('game-assets').upload(storagePath,billFile,{contentType:billFile.type||'application/octet-stream'});
   if(up.error){g.setError(up.error.message);setBusy(false);return}
   const r=await supabase.rpc('add_bill_package_file',{p_document_id:selected.id,p_file_kind:billFileKind,p_title:billFileLabels[billFileKind]||billFile.name,p_storage_path:storagePath,p_file_name:billFile.name,p_mime_type:billFile.type||null,p_file_size:billFile.size});
-  if(r.error)g.setError(r.error.message);else{setBillFile(null);selected.updated_at=new Date().toISOString()}setBusy(false);
+  if(r.error)g.setError(r.error.message);else{setBillFile(null);setLocalRefresh(x=>x+1)}setBusy(false);
  }
  async function reviewBillFile(id:string,status:'accepted'|'revision'){
   setBusy(true);const r=await supabase.rpc('review_bill_package_file',{p_file_id:id,p_status:status,p_note:(billReviewNote[id]||'').trim()||null});
-  if(r.error)g.setError(r.error.message);else if(selected)selected.updated_at=new Date().toISOString();setBusy(false);
+  if(r.error)g.setError(r.error.message);else if(selected)setLocalRefresh(x=>x+1);setBusy(false);
  }
  async function saveCommitteeConclusion(finalize:boolean){
   if(!selected)return;setBusy(true);const r=await supabase.rpc('save_bill_committee_conclusion',{p_document_id:selected.id,p_rapporteur_user_id:committeeRapporteur||null,p_legal_compliance:committeeLegal,p_internal_logic:committeeLogic,p_affected_acts_completeness:committeeActs,p_recommendation:committeeRecommendation,p_finalize:finalize});
-  if(r.error)g.setError(r.error.message);else selected.updated_at=new Date().toISOString();setBusy(false);
+  if(r.error)g.setError(r.error.message);else setLocalRefresh(x=>x+1);setBusy(false);
+ }
+ async function saveBudgetPreliminary(){
+  if(!selected)return;setBusy(true);
+  const r=await supabase.rpc('save_budget_preliminary_review',{
+   p_document_id:selected.id,p_documents_compliant:budgetDocsOk,p_sent_to_all_committees:budgetDistributed,
+   p_accounts_chamber_reviewed:budgetAccounts,p_committee_conclusion:budgetConclusion,p_decision:budgetDecision,p_note:budgetReviewNote.trim()||null
+  });
+  if(r.error)g.setError(r.error.message);else setLocalRefresh(x=>x+1);
+  setBusy(false);
  }
 
  return <div className="formalPage">
@@ -175,6 +196,13 @@ export default function DocumentsView({g,focusId,onOpenVotes}:{g:ReturnTypeRepub
        {selected.author_id===me?.user_id&&selected.current_owner_key==='author'&&<div className="billPackageUpload"><select value={billFileKind} onChange={e=>setBillFileKind(e.target.value)}>{Object.entries(billFileLabels).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select><label>Файл<input type="file" accept=".pdf,.doc,.docx,.txt" onChange={e=>setBillFile(e.target.files?.[0]||null)}/></label><button disabled={busy||!billFile} onClick={()=>void uploadBillFile()}>Загрузить</button></div>}
        {(selected.status_code==='committee'||billConclusion)&&<div className="billCommitteeConclusion"><small>ЗАКЛЮЧЕНИЕ ПРОФИЛЬНОГО КОМИТЕТА</small><label>Докладчик<select value={committeeRapporteur} onChange={e=>setCommitteeRapporteur(e.target.value)}><option value="">Не выбран</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label><label>Соответствие Конституции, ФКЗ и ФЗ<textarea rows={3} value={committeeLegal} onChange={e=>setCommitteeLegal(e.target.value)}/></label><label>Внутренняя логика и противоречия<textarea rows={3} value={committeeLogic} onChange={e=>setCommitteeLogic(e.target.value)}/></label><label>Полнота перечня изменяемых актов<textarea rows={3} value={committeeActs} onChange={e=>setCommitteeActs(e.target.value)}/></label><label>Рекомендация<select value={committeeRecommendation} onChange={e=>setCommitteeRecommendation(e.target.value as any)}><option value="draft">Черновик</option><option value="proceed">Передать в Совет ГД</option><option value="return">Вернуть субъекту инициативы</option><option value="reject">Рекомендовать отклонить</option></select></label>{canManage(selected)&&<div><button className="secondary" disabled={busy} onClick={()=>void saveCommitteeConclusion(false)}>Сохранить</button><button className="primary" disabled={busy||committeeRecommendation==='draft'} onClick={()=>void saveCommitteeConclusion(true)}>Зафиксировать заключение</button></div>}</div>}
        {billReadiness&&(!billReadiness.submission_ready||!billReadiness.committee_ready)&&<div className="billDossierIssues">{[...billReadiness.issues,...billReadiness.review_issues].map(x=><p key={x}>• {x}</p>)}</div>}
+      </article>}
+      {selected.workflow_key==='budget'&&['budget_registered','budget_committee','budget_council','revision'].includes(selected.status_code)&&<article className="surface budgetPreliminary"><div className="surfaceHead"><div><small>СТ. 192 БК РФ · ЭТАП 13</small><h2>Предварительная проверка бюджета</h2></div><span className={budgetReview?.decision==='accept'?'ok':budgetReview?.decision==='return'?'bad':'warn'}>{budgetReview?.decision==='accept'?'Принят к рассмотрению':budgetReview?.decision==='return'?'Возврат':'Проверка'}</span></div>
+       <p className="budgetPreliminaryIntro">До I чтения Комитет по бюджету проверяет комплектность проекта. После принятия к рассмотрению проект и материалы направляются комитетам ГД и Счётной палате.</p>
+       <div className="budgetPreliminaryChecks"><label><input type="checkbox" checked={budgetDocsOk} onChange={e=>setBudgetDocsOk(e.target.checked)}/> Документы и материалы соответствуют требованиям</label><label><input type="checkbox" checked={budgetDistributed} onChange={e=>setBudgetDistributed(e.target.checked)}/> Проект направлен во все комитеты ГД</label><label><input type="checkbox" checked={budgetAccounts} onChange={e=>setBudgetAccounts(e.target.checked)}/> Получено/смоделировано заключение Счётной палаты</label></div>
+       <label className="budgetPreliminaryText">Заключение Комитета по бюджету<textarea rows={4} value={budgetConclusion} onChange={e=>setBudgetConclusion(e.target.value)} placeholder="Оцените соответствие комплекта требованиям, полноту материалов и готовность проекта к рассмотрению Государственной Думой."/></label>
+       <label className="budgetPreliminaryText">Примечание<textarea rows={2} value={budgetReviewNote} onChange={e=>setBudgetReviewNote(e.target.value)} placeholder="Замечания, условия возврата или организационные сведения"/></label>
+       <div className="budgetPreliminaryDecision"><select value={budgetDecision} onChange={e=>setBudgetDecision(e.target.value as 'draft'|'accept'|'return')}><option value="draft">Черновик решения</option><option value="accept">Принять к рассмотрению</option><option value="return">Вернуть Правительству</option></select><button className="primary" disabled={busy} onClick={()=>void saveBudgetPreliminary()}>Зафиксировать проверку</button></div>
       </article>}
       <article className="surface formalActions"><div className="surfaceHead"><div><small>ПРОЦЕДУРА</small><h2>Доступное действие</h2></div></div>
        <p>Сейчас документ находится у: <b>{ownerLabel(selected.current_owner_key)}</b>.</p>
