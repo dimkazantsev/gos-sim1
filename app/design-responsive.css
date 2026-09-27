@@ -1,0 +1,106 @@
+/* GOS//SIM Design System 3.0 — responsive, touch and accessibility QA */
+@media(max-width:1380px){
+ :root{--gs-sidebar-w:220px;--gs-chat-w:360px}
+ .statePulseGrid,.statePulseSecondary{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .stageTimeline{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:1120px){
+ :root{--gs-sidebar-w:204px}
+ .simTop{padding:0 18px!important}.simContentFlow{padding-inline:18px}
+ .topIndicators .connectionPill{display:none!important}
+ .viewAsSwitcher{min-width:160px!important}
+ .stageTimeline{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .teacherPrimaryActions{grid-template-columns:1fr 1fr!important}
+ .gradesRules{grid-template-columns:1fr 1fr!important}
+ .formalWorkspace{grid-template-columns:280px minmax(0,1fr)!important}
+}
+@media(max-width:900px){
+ :root{--gs-top-h:66px}
+ .simShell{display:block!important;padding-bottom:72px!important}
+ .simSidebar{display:none!important}
+ .simWorkspace{width:100%!important}
+ .simTop{height:var(--gs-top-h)!important;padding:0 12px!important;gap:10px!important}
+ .mobileBrand{display:flex!important;align-items:center;gap:8px;min-width:0}.mobileBrand .simLogo{width:36px!important;height:36px!important;border-radius:11px!important}.mobileBrand .simLogo svg{width:16px;height:16px}.mobileBrand b{font-size:12px;letter-spacing:-.02em}
+ .simTopCenter{justify-content:flex-end!important}.topStageCopy{display:none}
+ .topIndicators{margin-left:auto!important}.topIndicators .livePill,.topIndicators .connectionPill{display:none!important}.timerPill{display:flex!important}
+ .viewAsSwitcher{min-width:142px!important}
+ .topChatButton{width:40px!important;padding:0!important;justify-content:center!important}.topChatButton span{display:none}
+ .simContentFlow{padding:12px 12px 28px!important}
+ .simMain{padding-top:12px!important}
+ .statePulseGrid,.statePulseSecondary{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .statePulseMetric{min-height:74px!important;padding:9px!important;grid-template-columns:26px minmax(0,1fr) auto!important}.statePulseIcon{width:26px!important;height:26px!important}.statePulseValue strong{font-size:16px!important}.statePulseTrend svg{display:none!important}
+ .mobileDock{
+  position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:75;
+  height:60px;display:grid!important;grid-template-columns:repeat(6,1fr);gap:2px;padding:5px;
+  border:1px solid rgba(228,231,236,.92);border-radius:17px;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(18px) saturate(150%);box-shadow:0 12px 40px rgba(16,24,40,.16)
+ }
+ .mobileDock button{min-width:0;border:0;border-radius:11px;background:transparent;color:var(--gs-faint);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:7px;font-weight:650}.mobileDock button svg{width:17px;height:17px}.mobileDock button.active{background:var(--gs-accent-soft);color:var(--gs-accent)}
+ .simChat{top:var(--gs-top-h)!important;width:min(420px,100vw)!important}
+ .studentPreviewBanner{top:var(--gs-top-h)!important;padding:8px 12px!important}
+ .studentPreviewBanner p{font-size:9px!important}
+ .wallHero,.formalHero,.votesHero,.gradesHero,.teacherFocus,.profileHero,.studentStageHero,.pageHeader{padding:22px!important}
+ .wallHero h1,.formalHero h1,.votesHero h1,.gradesHero h1,.teacherFocus h1,.profileHero h1,.studentStageHero h1,.pageHeader h1{font-size:34px!important}
+ .formalWorkspace{grid-template-columns:1fr!important}.formalRegistry{max-height:330px!important}
+ .crisisCommandGrid,.teacherMainGrid,.teacherActionsGrid,.teacherLowerGrid,.studentBelow,.actionColumns,.dashGrid{grid-template-columns:1fr!important}
+ .landingShell{grid-template-columns:1fr!important}.landingIntro{padding:12px 4px!important}.loginCard{max-width:720px;width:100%;justify-self:center}
+}
+@media(max-width:650px){
+ :root{--gs-top-h:60px}
+ html,body{font-size:14px}
+ .simTop{height:60px!important}
+ .mobileBrand .simLogo{width:33px!important;height:33px!important}.mobileBrand .simLogo>span{display:none}.mobileBrand b{font-size:11px}
+ .timerPill{min-height:28px!important;padding:0 8px!important;font-size:10px!important}
+ .viewAsSwitcher{display:none!important}
+ .topChatButton{min-height:36px!important;width:36px!important}
+ .simContentFlow{padding:9px 9px 24px!important}
+ .statePulseTop{margin-bottom:6px!important}.statePulseTop>div small{font-size:7.5px!important}
+ .statePulseGrid,.statePulseSecondary{
+  display:flex!important;overflow-x:auto!important;gap:6px!important;padding-bottom:2px!important;
+  scroll-snap-type:x proximity;scrollbar-width:none
+ }
+ .statePulseGrid::-webkit-scrollbar,.statePulseSecondary::-webkit-scrollbar{display:none}
+ .statePulseMetric{flex:0 0 145px!important;scroll-snap-align:start;min-height:68px!important}
+ .statePulseCopy b{font-size:8.5px!important}.statePulseValue strong{font-size:15px!important}.statePulseTrend{display:none!important}
+ .wallHero,.formalHero,.votesHero,.gradesHero,.teacherFocus,.profileHero,.studentStageHero,.pageHeader{padding:18px!important;border-radius:17px!important}
+ .wallHero h1,.formalHero h1,.votesHero h1,.gradesHero h1,.teacherFocus h1,.profileHero h1,.studentStageHero h1,.pageHeader h1{font-size:29px!important;letter-spacing:-.045em!important}
+ .wallHero p,.formalHero p,.votesHero p,.gradesHero p,.teacherFocus p,.profileHero p,.studentStageHero p,.pageHeader p{font-size:12px!important}
+ .wallHeroStats,.formalStats,.votesOverview,.teacherPulse,.heroData{grid-template-columns:1fr 1fr!important}
+ .wallHeroStats>div,.formalStats>article,.formalStats>div,.votesOverview article,.teacherPulse .pulseCard,.heroData div{padding:11px!important}
+ .wallHeroStats strong,.formalStats strong,.votesOverview strong,.pulseCard strong,.heroData b{font-size:21px!important}
+ .wallStageTask,.nextTaskCard{grid-template-columns:42px 1fr!important;padding:13px!important}.wallStageTask>.primary,.nextTaskCard>.primary{grid-column:1/-1!important;width:100%!important}
+ .wallComposer{padding:14px!important}.wallComposerGrid,.wallAttachGrid,.wallSearch{grid-template-columns:1fr!important}.wallComposerActions{align-items:stretch!important;flex-direction:column!important}.wallComposerActions .primary{width:100%!important}
+ .wallPost header,.wallPostBody,.wallPostActions{padding-inline:13px!important}.wallPostBody h2{font-size:15px!important}.wallPostBody p{font-size:12px!important}
+ .wallTabs,.formalTabs,.voteTabs,.metricBucketTabs{width:100%!important;overflow-x:auto!important}.wallTabs button,.formalTabs button,.voteTabs button,.metricBucketTabs button{flex:1 0 auto!important}
+ .stageTimeline{grid-template-columns:1fr!important}.stageCard{min-height:0!important}.stageDetailPanel{width:100%!important;max-height:100dvh!important;border-radius:0!important}.stageDetailHeader{padding:15px!important}.stageDetailScroll{padding:14px!important}.stageDetailGrid{grid-template-columns:1fr!important}
+ .teacherPrimaryActions,.gradesRules{grid-template-columns:1fr!important}
+ .teacherFocus{grid-template-columns:1fr!important}.teacherFocusState{text-align:left!important}
+ .formalDocGrid{grid-template-columns:1fr!important}.formalPaper{padding:17px!important}.formalSidebar{order:-1!important}
+ .formalHeroActions{width:100%!important;display:grid!important;grid-template-columns:1fr!important}.formalHeroActions a,.formalHeroActions button{text-align:center!important}
+ .votesOverview{grid-template-columns:1fr 1fr!important}.proceduralVoteCard header{align-items:flex-start!important;flex-direction:column!important}.voteRuleStrip{grid-template-columns:1fr!important}
+ .partyGrid,.partyPeople,.requiredDocs,.lawCards{grid-template-columns:1fr!important}.partyIdentityCard{padding:16px!important}.partyIdentityText h1{font-size:25px!important}
+ .gradesMatrixHead,.gradesMatrixRow{min-width:920px!important;grid-template-columns:minmax(200px,1fr) repeat(16,42px)!important}
+ .crisisRoleGrid,.crisisRoleComposer{grid-template-columns:1fr!important}
+ .profileHero{grid-template-columns:1fr!important}.profileHero>*{justify-self:start!important}
+ .studentPreviewBanner{position:relative!important;top:auto!important;align-items:flex-start!important;flex-direction:column!important}.studentPreviewBanner>button{width:100%!important}
+ .simChat{top:auto!important;bottom:0!important;height:min(78dvh,720px)!important;border-radius:20px 20px 0 0!important;border:1px solid var(--gs-border)!important;box-shadow:0 -20px 60px rgba(16,24,40,.2)!important}
+ .mobileDock{left:7px;right:7px;bottom:max(7px,env(safe-area-inset-bottom));height:58px;border-radius:15px}
+ .loginPage{padding:12px!important;place-items:start!important}
+ .landingIntro h2{font-size:36px!important;margin-top:22px!important}.landingText{font-size:13px!important}.featureGrid,.infoStrip,.loginTips{grid-template-columns:1fr!important}.featureGrid{margin:18px 0!important}.loginCard{padding:18px!important;border-radius:18px!important}
+}
+@media(max-width:390px){
+ .mobileDock{grid-template-columns:repeat(5,1fr)}.mobileDock button:nth-child(5){display:none}
+ .mobileBrand b{display:none}
+ .wallHeroStats,.formalStats,.votesOverview,.heroData{grid-template-columns:1fr!important}
+ .landingIntro h2{font-size:32px!important}
+}
+
+/* keyboard/touch guarantees */
+@media(pointer:coarse){
+ button,a,summary,select,input[type=checkbox],input[type=radio]{min-height:44px}
+ .mobileDock button{min-height:48px}
+}
+@media(prefers-contrast:more){
+ :root{--gs-border:#c7ccd4;--gs-muted:#475467;--gs-faint:#667085}
+ .surface,.voteCard,.partyCard,.documentCard,.wallPost,.stageCard,.formalRegistry,.formalDetail{border-width:2px!important}
+}
