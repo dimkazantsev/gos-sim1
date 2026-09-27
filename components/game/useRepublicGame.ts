@@ -11,7 +11,7 @@ export function useRepublicGame(gameId:string){
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]);
  const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]);
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[chatOpen,setChatOpen]=useState(true),[secondsLeft,setSecondsLeft]=useState(0);
- const [recording,setRecording]=useState<'audio'|'video'|null>(null);
+ const [recording,setRecording]=useState<'audio'|'video'|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]);
 
  const teacher=me?.kind==='teacher';
@@ -40,7 +40,7 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_channels',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
    .on('postgres_changes',{event:'*',schema:'public',table:'channel_members'},()=>void loadAll(false))
    .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'game_id=eq.'+gameId},()=>{if(channelRef.current)void loadMessages(channelRef.current)})
-   .subscribe();
+   .subscribe(status=>{setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'?'disconnected':'connecting')});
   liveRef.current=live;
   return()=>{if(liveRef.current)void supabase.removeChannel(liveRef.current)};
  },[gameId]);
@@ -108,9 +108,9 @@ export function useRepublicGame(gameId:string){
  async function setTurnMinutes(minutes:number){if(!game)return;const r=await supabase.from('games').update({turn_open:true,status:'running',turn_ends_at:new Date(Date.now()+minutes*60*1000).toISOString()}).eq('id',gameId);if(r.error)setError(r.error.message);else await refresh()}
 
  async function openStage(stageNo:number){
-  if(!teacher)return;const now=new Date().toISOString();
-  for(const s of stages){const status=s.stage_no<stageNo?'completed':s.stage_no===stageNo?'open':'locked';await supabase.from('game_stages').update({status,opened_at:status==='open'?(s.opened_at||now):s.opened_at,completed_at:status==='completed'?(s.completed_at||now):null}).eq('id',s.id)}
-  const r=await supabase.from('games').update({current_round:stageNo,status:'running',turn_open:true,turn_ends_at:new Date(Date.now()+12*60*1000).toISOString()}).eq('id',gameId);if(r.error)setError(r.error.message);else await refresh();
+  if(!teacher)return;
+  const r=await supabase.rpc('set_game_stage',{p_game_id:gameId,p_stage_no:stageNo,p_minutes:12});
+  if(r.error)setError(r.error.message);else await refresh();
  }
  async function nextStage(){await openStage(Math.min(16,(currentStage?.stage_no||1)+1))}
  async function setStageDeadline(stageId:string,value:string){const r=await supabase.from('game_stages').update({deadline:value?new Date(value).toISOString():null}).eq('id',stageId);if(r.error)setError(r.error.message);else await refresh()}
@@ -118,7 +118,7 @@ export function useRepublicGame(gameId:string){
  async function submitAction(e:FormEvent,data:{type:string;title:string;body:string;budget:number}){
   e.preventDefault();if(!me||!game)return false;
   const r=await supabase.from('player_actions').insert({game_id:gameId,round_no:currentStage?.stage_no||game.current_round,author_id:me.user_id,action_type:data.type,title:data.title,body:data.body,budget:data.budget,status:'submitted'});
-  if(r.error){setError(r.error.message);return false}await logActivity('decision_submit','Отправил управленческое решение','actions',{title:data.title,type:data.type,budget:data.budget});await refresh();return true;
+  if(r.error){setError(r.error.message);return false}await refresh();return true;
  }
  async function judgeAction(id:string,status:'accepted'|'rejected'){const r=await supabase.from('player_actions').update({status,reviewed_by:me?.user_id,reviewed_at:new Date().toISOString()}).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
 
@@ -147,7 +147,7 @@ export function useRepublicGame(gameId:string){
  function ballotWeight(v:Vote){if(v.voting_mode==='member')return 1;const p=partyForUser(me?.user_id||'');if(!p)return 0;return v.voting_mode==='mandate'?Math.max(1,p.mandates):1}
  function quorum(v:Vote){const eligible=v.voting_mode==='member'?members.filter(m=>m.kind==='student').length:parties.filter(p=>p.leader_user_id).length;const cast=ballots.filter(b=>b.vote_id===v.id).length;return {eligible,cast,needed:Math.ceil(eligible*2/3),met:eligible>0&&cast>=Math.ceil(eligible*2/3)}}
  function tally(v:Vote){const x=ballots.filter(b=>b.vote_id===v.id);const yes=x.filter(b=>b.choice==='yes').reduce((a,b)=>a+Number(b.weight),0),no=x.filter(b=>b.choice==='no').reduce((a,b)=>a+Number(b.weight),0);return {yes,no,total:yes+no}}
- async function castVote(v:Vote,choice:'yes'|'no'){if(!me||!canVote(v))return;const r=await supabase.from('game_ballots').upsert({vote_id:v.id,voter_id:me.user_id,choice,weight:ballotWeight(v)},{onConflict:'vote_id,voter_id'});if(r.error)setError(r.error.message);else{await logActivity('vote','Проголосовал '+(choice==='yes'?'ЗА':'ПРОТИВ'),'votes',{vote_id:v.id,vote_title:v.title,choice});await refresh()}}
+ async function castVote(v:Vote,choice:'yes'|'no'){if(!me||!canVote(v))return;const r=await supabase.from('game_ballots').upsert({vote_id:v.id,voter_id:me.user_id,choice,weight:ballotWeight(v)},{onConflict:'vote_id,voter_id'});if(r.error)setError(r.error.message);else await refresh()}
  async function closeVote(id:string){const r=await supabase.from('game_votes').update({status:'closed',closed_at:new Date().toISOString()}).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
 
  async function setEvaluation(userId:string,score:number,note?:string){
@@ -176,7 +176,7 @@ export function useRepublicGame(gameId:string){
 
  async function updateMetric(id:string,value:number){if(!teacher)return;const m=metrics.find(x=>x.id===id);const r=await supabase.from('state_metrics').update({previous_value:m?.value??null,value,updated_at:new Date().toISOString()}).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
 
- async function sendText(text:string){if(!me||!channelId||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}await logActivity('chat','Отправил сообщение','chat',{channel_id:channelId});await loadMessages(channelId);return true}
+ async function sendText(text:string){if(!me||!channelId||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}await loadMessages(channelId);return true}
  async function toggleRecording(kind:'audio'|'video'){
   if(recorder.current?.state==='recording'){recorder.current.stop();return}
   if(!me||!channelId)return;
@@ -188,6 +188,6 @@ export function useRepublicGame(gameId:string){
   }catch(e){setError(e instanceof Error?e.message:'Нет доступа к микрофону/камере')}
  }
 
- return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,teacher,names,currentStage,myEvaluations,averageVsn,
+ return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
   logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,createParty,updateParty,assignParty,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,sendText,toggleRecording};
 }
