@@ -3,6 +3,7 @@ import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
+import StageReadinessPanel from './StageReadinessPanel';
 
 const VIEW_NAMES:Record<string,string>={
  dashboard:'Политические процессы',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'НПА',actions:'Решения',grades:'Оценки',profile:'Профиль',teacher:'Управление',chat:'Связь'
@@ -31,7 +32,7 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
  const onlineCount=studentRows.filter(x=>x.online).length;
 
  async function publish(){if(await publishEvent(eventTitle,eventBody)){setEventTitle('');setEventBody('')}}
- function confirmNext(){if(window.confirm('Завершить текущий этап и открыть следующий?'))void nextStage()}
+ function confirmNext(){if(window.confirm('Перейти к следующему этапу? Проверьте индикатор процедурной готовности выше: переход остаётся ручным и может быть выполнен даже при незавершённых процедурах.'))void nextStage()}
  function confirmCrisis(){if(window.confirm('Разыграть случайный кризис для всей аудитории?'))void triggerCrisis()}
  function confirmGhost(){if(window.confirm('Запустить ghost voting?'))void ghostVoting()}
  function exportSession(){
@@ -54,6 +55,8 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
     <b>{game.turn_open&&game.turn_ends_at?timerText(secondsLeft):'—'}</b>
    </div>
   </section>
+
+  {currentStage&&<StageReadinessPanel g={g} stageNo={currentStage.stage_no} compact/>}
 
   <section className="teacherPrimaryActions">
    <button className={game.turn_open?'teacherAction dangerLite':'teacherAction primaryAction'} onClick={()=>setTurn(!game.turn_open)}>
