@@ -10,6 +10,8 @@ type Assessment={
  teacher_note:string|null;finalized_at:string|null
 };
 type Evidence=Record<string,unknown[]|unknown>;
+type Run={id:number;assessment_id:string;run_type:string;auto_score:number;criterion_law:boolean;criterion_strategy:boolean;criterion_debrief:boolean;created_at:string};
+type Debrief={id:string;game_id:string;stage_no:number;user_id:string;body:string;updated_at:string};
 
 const STAGES=Array.from({length:16},(_,i)=>i+1);
 const shownScore=(a?:Assessment)=>a?(a.status==='final'?(a.final_score??a.auto_score):a.auto_score):null;
@@ -19,6 +21,8 @@ const when=(v?:string|null)=>v?new Date(v).toLocaleString('ru-RU',{day:'2-digit'
 export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compact?:boolean}){
  const {game,me,members,stages,teacher}=g;
  const [rows,setRows]=useState<Assessment[]>([]);
+ const [runs,setRuns]=useState<Run[]>([]);
+ const [debriefRows,setDebriefRows]=useState<Debrief[]>([]);
  const [selected,setSelected]=useState<{userId:string;stageNo:number}|null>(null);
  const [evidence,setEvidence]=useState<Evidence|null>(null);
  const [loadingEvidence,setLoadingEvidence]=useState(false);
@@ -34,12 +38,17 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
   if(!game)return;
   const r=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).order('stage_no');
   if(!r.error)setRows((r.data||[]) as Assessment[]);
+  if(me?.kind==='student'){
+   const d=await supabase.from('stage_debriefs').select('*').eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no');
+   if(!d.error)setDebriefRows((d.data||[]) as Debrief[]);
+  }
  }
  useEffect(()=>{void load();void supabase.auth.getUser().then(x=>setAuthId(x.data.user?.id||''))},[game?.id,me?.user_id]);
  useEffect(()=>{
   if(!game)return;
   const ch=supabase.channel('grades-view:'+game.id)
    .on('postgres_changes',{event:'*',schema:'public',table:'stage_assessments',filter:'game_id=eq.'+game.id},()=>void load())
+   .on('postgres_changes',{event:'*',schema:'public',table:'stage_debriefs',filter:'game_id=eq.'+game.id},()=>void load())
    .subscribe();
   return()=>{void supabase.removeChannel(ch)}
  },[game?.id]);
@@ -50,6 +59,7 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
  const targetDebrief=targetDebriefStage?stages.find(s=>s.stage_no===targetDebriefStage):undefined;
  const targetAssessment=targetDebriefStage?rows.find(r=>r.user_id===me?.user_id&&r.stage_no===targetDebriefStage):undefined;
  const canWriteDebrief=!!me&&me.kind==='student'&&authId===me.user_id&&!!targetDebrief&&targetAssessment?.status!=='final';
+ useEffect(()=>{if(me?.kind!=='student'||targetDebriefStage==null)return;setDebrief(debriefRows.find(d=>d.stage_no===targetDebriefStage)?.body||'')},[targetDebriefStage,debriefRows.length,me?.user_id]);
  const myRows=rows.filter(r=>r.user_id===me?.user_id);
  const myAverage=useMemo(()=>{
   const vals=myRows.map(shownScore).filter((x):x is number=>x!==null);
@@ -61,11 +71,14 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
   setSelected({userId,stageNo});
   setEditScore(shownScore(a)??0);
   setNote(a?.teacher_note||'');
-  setEvidence(null);
+  setEvidence(null);setRuns([]);
   if(!game||(!teacher&&userId!==me?.user_id))return;
   setLoadingEvidence(true);
-  const r=await supabase.rpc('get_stage_assessment_evidence',{p_game_id:game.id,p_user_id:userId,p_stage_no:stageNo});
-  if(!r.error)setEvidence((r.data||{}) as Evidence);
+  const requests:any[]=[supabase.rpc('get_stage_assessment_evidence',{p_game_id:game.id,p_user_id:userId,p_stage_no:stageNo})];
+  if(a)requests.push(supabase.from('stage_assessment_runs').select('id,assessment_id,run_type,auto_score,criterion_law,criterion_strategy,criterion_debrief,created_at').eq('assessment_id',a.id).order('created_at',{ascending:false}).limit(50));
+  const rr=await Promise.all(requests);
+  if(!rr[0].error)setEvidence((rr[0].data||{}) as Evidence);
+  if(rr[1]&&!rr[1].error)setRuns((rr[1].data||[]) as Run[]);
   setLoadingEvidence(false);
  }
  const assessment=selected?rows.find(x=>x.user_id===selected.userId&&x.stage_no===selected.stageNo):undefined;
@@ -103,7 +116,7 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
   if(!game||!targetDebrief||debrief.trim().length<40)return;
   setBusy(true);
   const r=await supabase.rpc('submit_stage_debrief',{p_game_id:game.id,p_stage_no:targetDebrief.stage_no,p_body:debrief.trim()});
-  if(r.error)g.setError(r.error.message);else{setDebrief('');await load()}
+  if(r.error)g.setError(r.error.message);else await load()
   setBusy(false);
  }
 
@@ -113,7 +126,7 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
    <div className="surfaceHead"><div><small>ЖУРНАЛ ВСН</small><h2>Динамика по 16 этапам</h2></div><strong>{myAverage?myAverage.toFixed(2):'—'}</strong></div>
    <div className="vsnMiniTrend">{STAGES.map(n=>{const a=myRows.find(x=>x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(me.user_id,n)} aria-label={'Этап '+n+', оценка '+(v??'нет')}><small>{n}</small><b>{v??'—'}</b></button>})}</div>
    <p className="vsnCompactHint">Нажмите на этап, чтобы увидеть критерии и обоснование оценки.</p>
-   {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} loading={loadingEvidence} teacher={false} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>setSelected(null)} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
+   {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={false} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>setSelected(null)} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
   </section>;
  }
 
@@ -142,17 +155,17 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
   </section>
 
   {!!me&&me.kind==='student'&&authId===me.user_id&&eligibleDebriefStages.length>0&&<section className="surface gradesDebrief">
-   <div><small>ИТОГОВЫЙ РАЗБОР · КРИТЕРИЙ 3</small><select value={targetDebriefStage??''} onChange={e=>{setDebriefStage(Number(e.target.value));setDebrief('')}}>{eligibleDebriefStages.map(s=><option key={s.id} value={s.stage_no}>{s.stage_no}. {s.title}</option>)}</select><p>Опишите причины, интересы участников, правила и институты, результат и политические последствия. До утверждения итоговой оценки разбор можно обновлять.</p></div>
+   <div><small>ИТОГОВЫЙ РАЗБОР · КРИТЕРИЙ 3</small><select value={targetDebriefStage??''} onChange={e=>setDebriefStage(Number(e.target.value))}>{eligibleDebriefStages.map(s=><option key={s.id} value={s.stage_no}>{s.stage_no}. {s.title}</option>)}</select><p>Опишите причины, интересы участников, правила и институты, результат и политические последствия. До утверждения итоговой оценки разбор можно обновлять.</p></div>
    <textarea rows={6} value={debrief} disabled={!canWriteDebrief} onChange={e=>setDebrief(e.target.value)} placeholder={targetAssessment?.status==='final'?'Оценка уже утверждена преподавателем':'Содержательный анализ выбранного этапа…'}/>
    <div><span>{targetAssessment?.status==='final'?'Итоговая оценка зафиксирована':debrief.trim().length+' знаков'}</span><button className="primary" disabled={!canWriteDebrief||busy||debrief.trim().length<40} onClick={()=>void submitDebrief()}>Сдать / обновить разбор</button></div>
   </section>}
 
-  {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} loading={loadingEvidence} teacher={teacher} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>setSelected(null)} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
+  {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={teacher} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>setSelected(null)} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
  </div>;
 }
 
 function AssessmentModal(p:any){
- const {g,assessment:a,selected,student,evidence,loading,teacher,editScore,setEditScore,note,setNote,busy,close,ensureDraft,recalc,finalize,reopen}=p;
+ const {g,assessment:a,selected,student,evidence,runs,loading,teacher,editScore,setEditScore,note,setNote,busy,close,ensureDraft,recalc,finalize,reopen}=p;
  const v=shownScore(a);
  const canSeeEvidence=teacher||selected.userId===g.me?.user_id;
  return <div className="gradeModalBack" onMouseDown={e=>{if(e.target===e.currentTarget)close()}}><article className="gradeModal">
@@ -164,6 +177,7 @@ function AssessmentModal(p:any){
    {a.teacher_note&&<section className="gradeTeacherNote"><small>КОММЕНТАРИЙ ПРЕПОДАВАТЕЛЯ</small><p>{a.teacher_note}</p></section>}
    {teacher&&<section className="gradeApproval"><label>Итоговый балл<select value={editScore} onChange={e=>setEditScore(Number(e.target.value))}>{[0,1,2,3].map(n=><option value={n} key={n}>{n} · {level(n)}</option>)}</select></label><label>Комментарий<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Почему вы подтверждаете или меняете автооценку"/></label><div>{a.status==='final'?<button onClick={()=>void reopen()} disabled={busy}>Переоткрыть оценку</button>:<><button onClick={()=>void recalc()} disabled={busy}>Пересчитать сейчас</button><button className="primary" onClick={()=>void finalize()} disabled={busy}>Утвердить как итоговую</button></>}</div></section>}
   </>}
+  {a&&runs?.length>0&&<details className="gradeRunHistory"><summary>История автоматических пересчётов <span>{runs.length}</span></summary><div>{runs.map((r:Run)=><article key={r.id}><time>{when(r.created_at)}</time><b>{r.auto_score}/3 · {level(r.auto_score)}</b><span>{r.run_type}</span><em>{r.criterion_law?'Право ✓':'Право ○'} · {r.criterion_strategy?'Стратегия ✓':'Стратегия ○'} · {r.criterion_debrief?'Анализ ✓':'Анализ ○'}</em></article>)}</div></details>}
   {canSeeEvidence&&<section className="gradeEvidence"><div className="gradeEvidenceHead"><div><small>ДОКАЗАТЕЛЬСТВА</small><h3>Все зафиксированные действия на этапе</h3></div></div>{loading?<div className="emptyState">Собираю данные…</div>:evidence?<Evidence evidence={evidence}/>:<div className="emptyState">Доказательства ещё не загружены.</div>}</section>}
   {!canSeeEvidence&&<div className="gradePrivacy">Подробные тексты и действия доступны только самому студенту и преподавателю.</div>}
  </article></div>;
