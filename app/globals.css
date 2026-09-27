@@ -623,3 +623,36 @@ button,input,textarea,select{font-size:14px}
 .ghostWarControls>small{font-size:9.5px;line-height:1.45;color:#8493a7}
 @media(max-width:1050px){.ghostWarRoom{grid-template-columns:1fr 1fr}.ghostWarControls{grid-column:1/-1;grid-template-columns:1fr auto auto}.ghostWarControls>small{grid-column:1/-1}}
 @media(max-width:700px){.ghostWarRoom{grid-template-columns:1fr;padding:10px;border-radius:19px}.ghostWarControls{grid-column:auto;grid-template-columns:1fr}.ghostWarControls>small{grid-column:auto}}
+
+
+/* Coalition bargaining exchange */
+.agreementExchange{
+  margin:0 0 18px;padding:18px;border:1px solid #dce4ef;border-radius:23px;background:#fff;
+  box-shadow:0 10px 30px rgba(13,31,58,.055)
+}
+.agreementExchangeHead{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.65fr);gap:14px;align-items:stretch}
+.agreementExchangeHead small,.agreementInbox>small{font-size:10px;font-weight:900;letter-spacing:.1em;color:#6e7f99}
+.agreementExchangeHead h2{margin:5px 0 7px;color:#102744;font-size:26px;letter-spacing:-.035em}
+.agreementExchangeHead p{max-width:850px;margin:0;color:#667991;font-size:12.5px;line-height:1.6}
+.agreementRule{display:grid;align-content:center;padding:15px;border-radius:15px;background:#f2efff;border:1px solid #d8cffb}
+.agreementRule b{color:#5a47ae;font-size:12px}.agreementRule span{margin-top:5px;color:#6d628e;font-size:11px;line-height:1.5}
+.agreementInbox{display:grid;gap:7px;margin-top:13px;padding:12px;border-radius:16px;background:#fff8e8;border:1px solid #ead7a5}
+.agreementInbox article{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px;border-radius:12px;background:#fff}
+.agreementInbox article>div:first-child{min-width:0}.agreementInbox b{display:block;color:#2d4665;font-size:13px}.agreementInbox span{display:block;margin-top:2px;color:#8d7890;font-size:10px}
+.agreementInbox p{margin:5px 0 0;color:#667991;font-size:11.5px;line-height:1.5}.agreementInbox article>div:last-child{display:flex;gap:6px;flex:none}
+.agreementComposer{margin-top:12px;border:1px solid #dfe6ef;border-radius:15px;overflow:hidden;background:#fafbfd}
+.agreementComposer>summary{display:flex;justify-content:space-between;align-items:center;min-height:62px;padding:13px 15px;cursor:pointer}
+.agreementComposer>summary b{display:block;color:#27405f;font-size:13px}.agreementComposer>summary span{display:block;margin-top:3px;color:#78899f;font-size:10.5px}.agreementComposer>summary i{font-style:normal;font-size:20px;color:#315efb}
+.agreementComposerBody{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:14px;border-top:1px solid #e1e8f0;background:#fff}
+.agreementComposerBody label{display:grid;gap:5px;color:#617590;font-size:10.5px;font-weight:900}
+.agreementComposerBody input,.agreementComposerBody select,.agreementComposerBody textarea{width:100%;min-height:44px;border:1px solid #dbe4ef;border-radius:11px;background:#fff;padding:10px 11px;color:#233b5b;font-size:12px}
+.agreementComposerBody textarea{line-height:1.5;resize:vertical}.agreementTerms{grid-column:1/-1}.agreementComposerBody>.primary{align-self:end;min-height:44px}
+.agreementLedger{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
+.agreementCard{padding:13px;border:1px solid #e0e7ef;border-radius:15px;background:#fbfcfe}
+.agreementCard.accepted{border-color:#aebfff;background:#f4f6ff}.agreementCard.fulfilled{border-color:#b9dfcd;background:#eff9f4}.agreementCard.rejected{opacity:.68}
+.agreementCard header{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center}.agreementCard header>span{width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:#edf2f8;color:#5b7190;font-size:10px}
+.agreementCard header b{display:block;color:#293f5d;font-size:12.5px}.agreementCard header small{display:block;margin-top:2px;color:#8190a5;font-size:9.5px}.agreementCard em{padding:5px 7px;border-radius:999px;background:#eef2f7;color:#6e7f94;font-size:9px;font-style:normal;font-weight:900}
+.agreementCard.accepted em{background:#e0e6ff;color:#455bb8}.agreementCard.fulfilled em{background:#d8f1e3;color:#23714f}
+.agreementCard>p{margin:10px 0;color:#5e718a;font-size:11.5px;line-height:1.55}.agreementCard footer{display:flex;gap:5px;flex-wrap:wrap}.agreementCard footer span{padding:5px 7px;border-radius:8px;background:#edf2f7;color:#687b94;font-size:9.5px;font-weight:800}
+@media(max-width:900px){.agreementExchangeHead{grid-template-columns:1fr}.agreementComposerBody{grid-template-columns:1fr 1fr}.agreementTerms{grid-column:1/-1}.agreementLedger{grid-template-columns:1fr}}
+@media(max-width:650px){.agreementExchange{padding:13px;border-radius:19px}.agreementComposerBody{grid-template-columns:1fr}.agreementTerms{grid-column:auto}.agreementInbox article{align-items:flex-start;flex-direction:column}.agreementInbox article>div:last-child{width:100%}.agreementInbox article>div:last-child button{flex:1}.agreementLedger{grid-template-columns:1fr}}
