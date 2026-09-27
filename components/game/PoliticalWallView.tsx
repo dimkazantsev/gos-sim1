@@ -3,6 +3,7 @@ import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {PoliticalPost,View} from './types';
 import MediaUploadButton from './MediaUploadButton';
+import {STAGE_ACTIONS} from './stageActions';
 
 const PROCESS_TYPES=[
  ['statement','Заявление'],['initiative','Инициатива'],['decision','Проект решения'],['event','Событие'],
@@ -34,7 +35,7 @@ function PostImpactEditor({g,post}:{g:ReturnTypeRepublic;post:PoliticalPost}){
 }
 
 export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNavigate}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument:(id:string)=>void;onNavigate:(view:View)=>void}){
- const {game,me,teacher,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,formalDocuments,votes,profiles,names,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,createVoteFromPost,createFormalDocument}=g;
+ const {game,me,teacher,currentStage,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,formalDocuments,votes,profiles,names,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,createVoteFromPost,createFormalDocument}=g;
  const [tab,setTab]=useState<'feed'|'registry'>('feed');
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('participant');
  const actors=availableActors();
@@ -75,12 +76,20 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   if(id){setNpaFor('');onOpenDocument(id)}
  }
  if(!game||!me)return null;
+ const stageNo=currentStage?.stage_no||game.current_round||1;
+ const stageAction=STAGE_ACTIONS[stageNo]||STAGE_ACTIONS[1];
 
  return <div className="wallPage">
   <section className="wallHero">
    <div><small>ОФИЦИАЛЬНАЯ ЛЕНТА ИГРЫ</small><h1>Политические процессы</h1><p>Публикации органов власти, партий, должностных лиц, СМИ и участников. Пост может стать решением, НПА или предметом голосования.</p></div>
    <div className="wallHeroStats"><div><strong>{politicalPosts.length}</strong><span>публикаций</span></div><div><strong>{politicalDecisions.length}</strong><span>решений</span></div><div><strong>{votes.filter(v=>v.status==='open').length}</strong><span>голосований</span></div></div>
   </section>
+
+  {!teacher&&<section className="wallStageTask">
+   <div className="wallStageTaskNo">{String(stageNo).padStart(2,'0')}</div>
+   <div className="wallStageTaskCopy"><small>ВАША ЗАДАЧА СЕЙЧАС</small><h2>{stageAction.title}</h2><p>{stageAction.body}</p></div>
+   <button className="primary" onClick={()=>onNavigate(stageAction.target)}>{stageAction.button} →</button>
+  </section>}
 
   <section className="wallComposer surface">
    <div className="wallComposerIdentity">
