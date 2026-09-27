@@ -1,5 +1,5 @@
 'use client';
-import {useMemo,useState} from 'react';
+import {useMemo,useState,type CSSProperties} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {PartyDocument} from './types';
 import MediaUploadButton from './MediaUploadButton';
@@ -14,7 +14,7 @@ const DOCS:{kind:PartyDocument['doc_kind'];title:string;rule:string}[]=[
 ];
 
 export default function PartiesView({g}:{g:ReturnTypeRepublic}){
- const {parties,members,profiles,partyDocuments,partyInvitations,partyMandates,me,teacher,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,applyPartyGhostLoss,clearPartyGhostLoss,savePartyIdentity,uploadPartyDocument,reviewPartyDocument}=g;
+ const {parties,members,profiles,partyDocuments,partyInvitations,partyMandates,me,teacher,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,savePartyIdentity,uploadPartyDocument,reviewPartyDocument}=g;
  const [name,setName]=useState(''),[ideology,setIdeology]=useState('');
  const [selectedId,setSelectedId]=useState('');
  const [desc,setDesc]=useState('');
@@ -24,6 +24,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const [docTitle,setDocTitle]=useState('');
  const [inviteUser,setInviteUser]=useState('');
  const [ghostLoss,setGhostLoss]=useState(25);
+ const [ghostDraw,setGhostDraw]=useState<{total_loss:number;result:{party_id:string;party_name:string;loss:number}[]}|null>(null);
  const [busy,setBusy]=useState(false);
 
  const ranked=useMemo(()=>[...parties].sort((a,b)=>Number(b.support)-Number(a.support)||b.regions-a.regions||b.mandates-a.mandates),[parties]);
@@ -59,6 +60,20 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
 
  return <div className="partyPage">
   <section className="pageHeader partyPageHeader"><div><small>ПАРТИЙНАЯ СИСТЕМА · ПРЕДСТАВИТЕЛЬСТВО</small><h1>Партии и фракции</h1><p>Состав партии, приглашения, руководство, 450 депутатских мандатов и персональный вес каждого студента связаны в одной системе.</p></div></section>
+
+  <section className="ghostWarRoom">
+   <div className="ghostWarCopy"><small>СТОХАСТИЧЕСКИЙ РИСК · ЭТАП 5+</small><h2>Ghost voting</h2><p>Перед заседанием ГД система временно выводит из голосования 25–50 депутатов и распределяет потерю между случайно выбранными фракциями. Это меняет реальную коалиционную математику ближайшего заседания.</p></div>
+   <div className="ghostWarState">
+    {parties.some(p=>p.ghost_active)?<div className="ghostActiveParties">{parties.filter(p=>p.ghost_active).map(p=><span key={p.id} style={{'--party-color':p.color} as CSSProperties}><i/>{p.name}<b>−{p.ghost_loss_current}</b></span>)}</div>:<div className="ghostQuiet"><b>Состав полный</b><span>Временных потерь мандатов нет</span></div>}
+    {ghostDraw&&<div className="ghostLastDraw"><small>ПОСЛЕДНЯЯ ЖЕРЕБЬЁВКА · −{ghostDraw.total_loss}</small>{ghostDraw.result.map(x=><span key={x.party_id}>{x.party_name}<b>−{x.loss}</b></span>)}</div>}
+   </div>
+   {teacher&&<div className="ghostWarControls">
+    <label>Общий объём отсутствующих<input type="number" min="25" max="50" value={ghostLoss} onChange={e=>setGhostLoss(Math.max(25,Math.min(50,Number(e.target.value)||25)))}/></label>
+    <button className="primary" disabled={busy||parties.every(p=>p.mandates<=0)} onClick={async()=>{setBusy(true);const x=await drawGhostVoting(ghostLoss);if(x)setGhostDraw(x);setBusy(false)}}>⚡ Провести жеребьёвку</button>
+    {parties.some(p=>p.ghost_active)&&<button className="secondary" disabled={busy} onClick={async()=>{setBusy(true);await clearPartyGhostLoss();setGhostDraw(null);setBusy(false)}}>↺ Завершить заседание</button>}
+    <small>Ручную корректировку отдельной фракции можно сделать в её карточке ниже.</small>
+   </div>}
+  </section>
 
   {myPending.length>0&&<section className="partyInviteInbox">
    <div><small>ВАС ПРИГЛАСИЛИ</small><h2>Приглашения в партии</h2><p>Вступление произойдёт только после вашего подтверждения. После принятия система автоматически перераспределит депутатские мандаты между всеми студентами фракции.</p></div>
@@ -119,8 +134,8 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
     {teacher&&<div className="partyTeacherControl">
      <label>Руководитель партии<select value={selected.leader_user_id||''} onChange={e=>{if(e.target.value)void setPartyLeader(selected.id,e.target.value)}}><option value="">Назначить руководителя…</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}{m.team?' · '+m.team:''}</option>)}</select></label>
      <label>Мандаты партии<input key={selected.id+'-'+selected.mandates} type="number" min="0" max="450" defaultValue={selected.mandates} onBlur={e=>void setPartyMandates(selected.id,Math.max(0,Math.min(450,Number(e.target.value)||0)))}/></label>
-     <label>Ghost voting<input type="number" min="25" max="50" value={ghostLoss} onChange={e=>setGhostLoss(Math.max(25,Math.min(50,Number(e.target.value)||25)))}/></label>
-     <button className="secondary" disabled={selected.mandates<=0} onClick={()=>void applyPartyGhostLoss(selected.id,ghostLoss)}>⚡ Применить GV</button>
+     <label>Ручная потеря GV<input type="number" min="25" max="50" value={ghostLoss} onChange={e=>setGhostLoss(Math.max(25,Math.min(50,Number(e.target.value)||25)))}/></label>
+     <button className="secondary" disabled={selected.mandates<=0} onClick={()=>void applyPartyGhostLoss(selected.id,ghostLoss)}>Применить вручную</button>
     </div>}
 
     {(isLeader||teacher)&&<div className="partyInviteManager">
