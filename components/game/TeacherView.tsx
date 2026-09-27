@@ -1,8 +1,8 @@
 'use client';
 import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
-import {VSN_LABEL} from './constants';
 import ImpactRulesPanel from './ImpactRulesPanel';
+import GradesView from './GradesView';
 
 const VIEW_NAMES:Record<string,string>={
  dashboard:'Политические процессы',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'Материалы',actions:'Решения',teacher:'Управление',chat:'Связь'
@@ -14,7 +14,7 @@ function timerText(seconds:number){
 }
 
 export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void}){
- const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,setEvaluation,updateMember,updateMetric}=g;
+ const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
  const [eventTitle,setEventTitle]=useState(''),[eventBody,setEventBody]=useState('');
  if(!game)return null;
 
@@ -127,6 +127,8 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
    </div>
   </section>
 
+  <GradesView g={g} teacherMode/>
+
   <ImpactRulesPanel g={g}/>
 
   <section className="surface teacherRepresentation">
@@ -179,10 +181,10 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
   </details>
 
   <details className="teacherDetails">
-   <summary><div><b>Оценки, роли и показатели</b><span>ВСН, игровые роли и KPI государства</span></div><i>+</i></summary>
+   <summary><div><b>Роли и показатели</b><span>Игровые роли и KPI государства; журнал ВСН расположен выше</span></div><i>+</i></summary>
    <div className="teacherDetailsBody split">
     <div><h3>Показатели государства</h3><div className="metricEditor">{metrics.map(m=><label key={m.id}><span>{m.label}</span><input key={m.id+String(m.value)} type="number" defaultValue={m.value} onBlur={e=>updateMetric(m.id,+e.target.value)}/><em>{m.unit||''}</em></label>)}</div></div>
-    <div><h3>ВСН и роли</h3><div className="evaluationRows">{members.filter(m=>m.kind!=='teacher').map(m=>{const ev=evaluations.find(x=>x.user_id===m.user_id&&x.stage_no===(currentStage?.stage_no||1));return <div key={m.user_id}><div className="studentIdentity"><b>{m.full_name}</b><input key={m.user_id+(m.role_title||'')} defaultValue={m.role_title||''} onBlur={e=>updateMember(m.user_id,{role_title:e.target.value})} placeholder="Игровая роль"/></div><div className="vsnButtons">{[0,1,2,3].map(s=><button key={s} className={ev?.score===s?'active':''} onClick={()=>setEvaluation(m.user_id,s)}><b>{VSN_LABEL[s]}</b><small>{s}</small></button>)}</div></div>})}</div></div>
+    <div><h3>Игровые роли</h3><div className="evaluationRows">{members.filter(m=>m.kind!=='teacher').map(m=><div key={m.user_id}><div className="studentIdentity"><b>{m.full_name}</b><input key={m.user_id+(m.role_title||'')} defaultValue={m.role_title||''} onBlur={e=>updateMember(m.user_id,{role_title:e.target.value})} placeholder="Игровая роль"/></div></div>)}</div></div>
    </div>
   </details>
  </div>;
