@@ -13,7 +13,7 @@ function timerText(seconds:number){
 }
 
 export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpenScreen:()=>void}){
- const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,setEvaluation,updateMember,updateMetric}=g;
+ const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,setEvaluation,updateMember,updateMetric}=g;
  const [eventTitle,setEventTitle]=useState(''),[eventBody,setEventBody]=useState('');
  if(!game)return null;
 
@@ -96,6 +96,34 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
      </div>)}
     </div>
    </article>
+  </section>
+
+  <section className="teacherAnalytics surface">
+   <div className="surfaceHead"><div><small>АНАЛИТИКА ИГРЫ</small><h2>Общая статистика и вклад участников</h2></div><span>{members.filter(m=>m.kind==='student').length} студентов</span></div>
+   <div className="teacherAnalyticsCards">
+    <div><small>ПУБЛИКАЦИИ</small><strong>{politicalPosts.length}</strong><span>политических процессов</span></div>
+    <div><small>РЕШЕНИЯ</small><strong>{politicalDecisions.length}</strong><span>принято и зарегистрировано</span></div>
+    <div><small>НПА</small><strong>{formalDocuments.length}</strong><span>в реестре</span></div>
+    <div><small>ГОЛОСОВАНИЯ</small><strong>{votes.length}</strong><span>{votes.filter(v=>v.status==='open').length} открыто</span></div>
+    <div><small>ИЗМЕНЕНИЯ KPI</small><strong>{metricHistory.filter(h=>h.source_type!=='baseline').length}</strong><span>зафиксированных изменений</span></div>
+   </div>
+   <div className="teacherPlayerStats">
+    <div className="teacherPlayerStatsHead"><span>Участник</span><span>Посты</span><span>Решения</span><span>НПА</span><span>Голоса</span><span>Активность</span><span>ВСН</span></div>
+    {members.filter(m=>m.kind==='student').map(m=>{
+     const posts=politicalPosts.filter(p=>p.author_id===m.user_id);
+     const postIds=new Set(posts.map(p=>p.id));
+     const decisions=politicalDecisions.filter(d=>postIds.has(d.post_id));
+     const docs=formalDocuments.filter(d=>d.author_id===m.user_id);
+     const bs=ballots.filter(b=>b.voter_id===m.user_id);
+     const act=activities.filter(a=>a.actor_id===m.user_id);
+     const ev=evaluations.filter(e=>e.user_id===m.user_id);
+     const vsn=ev.length?ev.reduce((a,e)=>a+Number(e.score),0)/ev.length:0;
+     return <div key={m.user_id} className="teacherPlayerStatsRow">
+      <div><b>{m.full_name}</b><small>{m.team||m.group_name||'Без партии'} · {m.role_title||'роль не назначена'}</small></div>
+      <strong>{posts.length}</strong><strong>{decisions.length}</strong><strong>{docs.length}</strong><strong>{bs.length}</strong><strong>{act.length}</strong><strong>{vsn?vsn.toFixed(1):'—'}</strong>
+     </div>
+    })}
+   </div>
   </section>
 
   <section className="surface teacherRepresentation">
