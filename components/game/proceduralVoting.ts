@@ -16,6 +16,8 @@ export type VotePreset={
  failTransition:'none'|'advance'|'reject'|'return_author'|'return_previous';
  badge:string;
  rule:string;
+ legalMode:'game'|'law'|'reduction';
+ legalBasis:string;
 };
 
 function billThreshold(doc:FormalDocument){
@@ -35,7 +37,7 @@ export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
    title:'Преодоление вето Президента: '+doc.title,
    body:'Государственная Дума решает, одобрить ли федеральный закон в ранее принятой редакции после отклонения Президентом Российской Федерации.',
    mode:'mandate',institutionKey:'gd',procedureKey:'presidential_veto_override',
-   quorumKind:'fraction',quorumValue:2/3,
+   quorumKind:'fraction',quorumValue:0.5,
    majorityKind:'eligible_fraction',majorityValue:2/3,
    allowAbstain:true,tieBreakerChair:false,
    passTransition:'advance',failTransition:'reject',
@@ -98,7 +100,8 @@ export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
    allowAbstain:true,tieBreakerChair:true,
    passTransition:'advance',failTransition:'reject',
    badge:'ЗАСЕДАНИЕ ПРАВИТЕЛЬСТВА',
-   rule:'Кворум — не менее половины состава; решение — большинством присутствующих; при равенстве решает председательствующий'
+   rule:'Кворум — не менее половины состава; решение — большинством присутствующих; при равенстве решает председательствующий',
+   legalMode:'law',legalBasis:'Пп. 34 и 37 Регламента Правительства РФ: заседание правомочно при присутствии не менее половины членов; при голосовании решение принимается большинством присутствующих, при равенстве решает председательствующий.'
   };
  }
 
