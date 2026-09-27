@@ -59,11 +59,12 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
  const targetDebrief=targetDebriefStage?stages.find(s=>s.stage_no===targetDebriefStage):undefined;
  const targetAssessment=targetDebriefStage?rows.find(r=>r.user_id===me?.user_id&&r.stage_no===targetDebriefStage):undefined;
  const canWriteDebrief=!!me&&me.kind==='student'&&authId===me.user_id&&!!targetDebrief&&targetAssessment?.status!=='final';
- useEffect(()=>{if(me?.kind!=='student'||targetDebriefStage==null)return;setDebrief(debriefRows.find(d=>d.stage_no===targetDebriefStage)?.body||'')},[targetDebriefStage,debriefRows.length,me?.user_id]);
+ const savedDebrief=targetDebriefStage==null?undefined:debriefRows.find(d=>d.stage_no===targetDebriefStage);
+ useEffect(()=>{if(me?.kind!=='student'||targetDebriefStage==null)return;setDebrief(savedDebrief?.body||'')},[targetDebriefStage,savedDebrief?.body,me?.user_id]);
  const myRows=rows.filter(r=>r.user_id===me?.user_id);
  const myAverage=useMemo(()=>{
   const vals=myRows.map(shownScore).filter((x):x is number=>x!==null);
-  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
  },[myRows]);
 
  async function open(userId:string,stageNo:number){
@@ -84,18 +85,27 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
  const assessment=selected?rows.find(x=>x.user_id===selected.userId&&x.stage_no===selected.stageNo):undefined;
  const selectedStudent=selected?members.find(m=>m.user_id===selected.userId):undefined;
 
+ async function syncTeacherDraft(assessmentId:string){
+  const fresh=await supabase.from('stage_assessments').select('*').eq('id',assessmentId).single();
+  if(!fresh.error&&fresh.data){
+   const a=fresh.data as Assessment;
+   setEditScore(shownScore(a)??0);
+   setNote(a.teacher_note||'');
+  }
+  await load();
+ }
  async function ensureDraft(){
   if(!game||!selected||!teacher)return;
   setBusy(true);
   const r=await supabase.rpc('recalculate_student_stage',{p_game_id:game.id,p_user_id:selected.userId,p_stage_no:selected.stageNo});
-  if(r.error)g.setError(r.error.message);else await load();
+  if(r.error)g.setError(r.error.message);else if(r.data)await syncTeacherDraft(String(r.data));else await load();
   setBusy(false);
  }
  async function recalc(){
   if(!assessment)return;
   setBusy(true);
   const r=await supabase.rpc('recalculate_stage_assessment',{p_assessment_id:assessment.id});
-  if(r.error)g.setError(r.error.message);else await load();
+  if(r.error)g.setError(r.error.message);else await syncTeacherDraft(assessment.id);
   setBusy(false);
  }
  async function finalize(){
@@ -123,7 +133,7 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
  if(!game||!me)return null;
  if(compact){
   return <section className="surface vsnCompact">
-   <div className="surfaceHead"><div><small>ЖУРНАЛ ВСН</small><h2>Динамика по 16 этапам</h2></div><strong>{myAverage?myAverage.toFixed(2):'—'}</strong></div>
+   <div className="surfaceHead"><div><small>ЖУРНАЛ ВСН</small><h2>Динамика по 16 этапам</h2></div><strong>{myAverage!==null?myAverage.toFixed(2):'—'}</strong></div>
    <div className="vsnMiniTrend">{STAGES.map(n=>{const a=myRows.find(x=>x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(me.user_id,n)} aria-label={'Этап '+n+', оценка '+(v??'нет')}><small>{n}</small><b>{v??'—'}</b></button>})}</div>
    <p className="vsnCompactHint">Нажмите на этап, чтобы увидеть критерии и обоснование оценки.</p>
    {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={false} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>setSelected(null)} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
