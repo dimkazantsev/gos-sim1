@@ -76,3 +76,5 @@
 @media(max-width:1100px){.statePulseGrid{grid-template-columns:repeat(3,1fr)}.statePulseSecondary{grid-template-columns:repeat(3,1fr)}.impactRuleEffects{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:780px){.statePulseDock{top:116px;padding:6px 10px}.statePulseTop b{display:none}.statePulseGrid{display:flex;overflow-x:auto;scrollbar-width:none}.statePulseGrid::-webkit-scrollbar{display:none}.statePulseMetric{min-width:184px}.statePulseSecondary{grid-template-columns:1fr 1fr}.impactEngineIntro{grid-template-columns:1fr}.impactRulesGrid{grid-template-columns:1fr}.impactLedger>article{grid-template-columns:28px 1fr}.impactLedgerEffects,.impactLedger>article>button,.impactLedger>article>strong{grid-column:2}.impactRuleEffects{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.statePulseSecondary{grid-template-columns:1fr}.impactRuleEffects{grid-template-columns:1fr}.mediaPreviewItem{width:80px}.wallAttachGrid .mediaPicker{grid-column:1/-1}}
+
+.good{color:#17805a!important}.bad{color:#a54155!important}.neutral{color:#4d72a0!important}
