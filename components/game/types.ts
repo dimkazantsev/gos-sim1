@@ -12,4 +12,6 @@ export type Ballot={vote_id:string;voter_id:string;choice:'yes'|'no'|'abstain';w
 export type Evaluation={id:string;game_id:string;stage_no:number;user_id:string;evaluator_id:string;score:number;note:string|null};
 export type Crisis={id:string;game_id:string;stage_no:number;crisis_type:string;intensity:'low'|'medium'|'high'|'ultra';description:string;created_at:string};
 export type GameDocument={id:string;game_id:string;title:string;doc_type:string|null;body:string|null;created_by:string|null;created_at:string};
+export type Activity={id:number;game_id:string;actor_id:string;event_type:string;label:string;view_key:string|null;payload:Record<string,unknown>;created_at:string};
+export type Presence={game_id:string;user_id:string;current_view:string;last_seen_at:string};
 export type View='dashboard'|'stages'|'parties'|'votes'|'documents'|'actions'|'teacher';
