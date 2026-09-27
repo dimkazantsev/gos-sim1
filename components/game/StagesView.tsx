@@ -11,6 +11,7 @@ import DumaLeadershipElection from './DumaLeadershipElection';
 import GovernmentFormationLab from './GovernmentFormationLab';
 import StateProgramLab from './StateProgramLab';
 import BudgetLab from './BudgetLab';
+import MunicipalProjectLab from './MunicipalProjectLab';
 
 export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
@@ -150,6 +151,8 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
      {(selected.stage_no===10||selected.stage_no===11)&&<StateProgramLab g={g}/>} 
 
      {selected.stage_no===13&&<BudgetLab g={g}/>} 
+
+     {selected.stage_no===14&&<MunicipalProjectLab g={g}/>} 
 
      {teacher&&<section className="stageTeacherActions">
       <div><small>УПРАВЛЕНИЕ ЭТАПОМ</small><b>Действия преподавателя</b></div>
