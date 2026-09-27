@@ -26,6 +26,7 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
  const [note,setNote]=useState('');
  const [busy,setBusy]=useState(false);
  const [debrief,setDebrief]=useState('');
+ const [debriefStage,setDebriefStage]=useState<number|null>(null);
  const [authId,setAuthId]=useState('');
  const students=members.filter(m=>m.kind==='student');
 
@@ -44,7 +45,11 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
  },[game?.id]);
 
  const currentStage=stages.find(s=>s.status==='open');
- const canWriteDebrief=!!me&&me.kind==='student'&&authId===me.user_id&&!!currentStage;
+ const eligibleDebriefStages=stages.filter(s=>s.status==='open'||s.status==='completed');
+ const targetDebriefStage=debriefStage??currentStage?.stage_no??eligibleDebriefStages.at(-1)?.stage_no??null;
+ const targetDebrief=targetDebriefStage?stages.find(s=>s.stage_no===targetDebriefStage):undefined;
+ const targetAssessment=targetDebriefStage?rows.find(r=>r.user_id===me?.user_id&&r.stage_no===targetDebriefStage):undefined;
+ const canWriteDebrief=!!me&&me.kind==='student'&&authId===me.user_id&&!!targetDebrief&&targetAssessment?.status!=='final';
  const myRows=rows.filter(r=>r.user_id===me?.user_id);
  const myAverage=useMemo(()=>{
   const vals=myRows.map(shownScore).filter((x):x is number=>x!==null);
@@ -95,9 +100,9 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
   setBusy(false);
  }
  async function submitDebrief(){
-  if(!game||!currentStage||debrief.trim().length<40)return;
+  if(!game||!targetDebrief||debrief.trim().length<40)return;
   setBusy(true);
-  const r=await supabase.rpc('submit_stage_debrief',{p_game_id:game.id,p_stage_no:currentStage.stage_no,p_body:debrief.trim()});
+  const r=await supabase.rpc('submit_stage_debrief',{p_game_id:game.id,p_stage_no:targetDebrief.stage_no,p_body:debrief.trim()});
   if(r.error)g.setError(r.error.message);else{setDebrief('');await load()}
   setBusy(false);
  }
@@ -136,10 +141,10 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
    </div>
   </section>
 
-  {canWriteDebrief&&<section className="surface gradesDebrief">
-   <div><small>ИТОГОВЫЙ РАЗБОР · КРИТЕРИЙ 3</small><h2>{currentStage!.stage_no}. {currentStage!.title}</h2><p>Опишите, что произошло, почему участники действовали именно так, какие интересы преследовали, какие нормы и институты повлияли на результат и какие последствия возникли.</p></div>
-   <textarea rows={6} value={debrief} onChange={e=>setDebrief(e.target.value)} placeholder="Содержательный анализ текущего этапа…"/>
-   <div><span>{debrief.trim().length} знаков</span><button className="primary" disabled={busy||debrief.trim().length<40} onClick={()=>void submitDebrief()}>Сдать разбор этапа</button></div>
+  {!!me&&me.kind==='student'&&authId===me.user_id&&eligibleDebriefStages.length>0&&<section className="surface gradesDebrief">
+   <div><small>ИТОГОВЫЙ РАЗБОР · КРИТЕРИЙ 3</small><select value={targetDebriefStage??''} onChange={e=>{setDebriefStage(Number(e.target.value));setDebrief('')}}>{eligibleDebriefStages.map(s=><option key={s.id} value={s.stage_no}>{s.stage_no}. {s.title}</option>)}</select><p>Опишите причины, интересы участников, правила и институты, результат и политические последствия. До утверждения итоговой оценки разбор можно обновлять.</p></div>
+   <textarea rows={6} value={debrief} disabled={!canWriteDebrief} onChange={e=>setDebrief(e.target.value)} placeholder={targetAssessment?.status==='final'?'Оценка уже утверждена преподавателем':'Содержательный анализ выбранного этапа…'}/>
+   <div><span>{targetAssessment?.status==='final'?'Итоговая оценка зафиксирована':debrief.trim().length+' знаков'}</span><button className="primary" disabled={!canWriteDebrief||busy||debrief.trim().length<40} onClick={()=>void submitDebrief()}>Сдать / обновить разбор</button></div>
   </section>}
 
   {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} loading={loadingEvidence} teacher={teacher} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>setSelected(null)} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
@@ -165,6 +170,6 @@ function AssessmentModal(p:any){
 }
 
 function Evidence({evidence}:{evidence:Evidence}){
- const defs:[string,string,string][]=[['Чат','chat','text'],['Политические процессы','political_posts','body'],['Голосования','ballots','choice'],['НПА','formal_documents','body_text'],['Действия с НПА','formal_actions','note'],['Решения и действия','actions','body'],['Партийные действия','party_actions','status'],['Итоговый разбор','debrief','body'],['Активность','activity','label']];
- return <div className="gradeEvidenceGroups">{defs.map(([title,key,textKey])=>{const arr=(evidence[key]||[]) as any[];if(!arr.length)return null;return <details key={key} open={key==='debrief'||key==='formal_documents'}><summary>{title}<span>{arr.length}</span></summary><div>{arr.map((x,i)=><article key={x.id||i}><small>{when(x.created_at||x.submitted_at||x.updated_at)}</small><b>{x.title||x.channel||x.action||x.action_type||x.event_type||title}</b><p>{String(x[textKey]||x.text||x.label||'').slice(0,3000)}</p>{x.weight!=null&&<em>Вес голоса: {x.weight}</em>}</article>)}</div></details>})}</div>;
+ const defs:[string,string,string][]=[['Чат и медиа','chat','text'],['Политические процессы','political_posts','body'],['Голосования','ballots','choice'],['НПА','formal_documents','body_text'],['Действия с НПА','formal_actions','note'],['Решения и действия','actions','body'],['Игровые документы','game_documents','body'],['Партийные документы','party_documents','note'],['Партийные действия','party_actions','status'],['Итоговый разбор','debrief','body'],['Активность','activity','label']];
+ return <div className="gradeEvidenceGroups">{defs.map(([title,key,textKey])=>{const arr=(evidence[key]||[]) as any[];if(!arr.length)return null;return <details key={key} open={key==='debrief'||key==='formal_documents'}><summary>{title}<span>{arr.length}</span></summary><div>{arr.map((x,i)=><article key={x.id||i}><small>{when(x.created_at||x.submitted_at||x.updated_at)}</small><b>{x.title||x.channel||x.action||x.action_type||x.event_type||title}</b><p>{String(x[textKey]||x.text||x.label||x.file_name||x.kind||'').slice(0,3000)}</p>{x.weight!=null&&<em>Вес голоса: {x.weight}</em>}</article>)}</div></details>})}</div>;
 }
