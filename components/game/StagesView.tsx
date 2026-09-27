@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useState,type CSSProperties} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage} from './types';
 import {formatDeadline,stageIcon} from './constants';
@@ -26,7 +26,7 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
     const completed=stages.filter(s=>s.stage_no>=p.range[0]&&s.stage_no<=p.range[1]&&s.status==='completed').length;
     const total=p.range[1]-p.range[0]+1;
     const active=!!current&&current.stage_no>=p.range[0]&&current.stage_no<=p.range[1];
-    return <button key={p.id} className={active?'active':''} onClick={()=>{const s=stages.find(x=>x.stage_no===p.range[0]);if(s)setSelected(s)}} style={{'--phase-accent':p.accent} as React.CSSProperties}>
+    return <button key={p.id} className={active?'active':''} onClick={()=>{const s=stages.find(x=>x.stage_no===p.range[0]);if(s)setSelected(s)}} style={{'--phase-accent':p.accent} as CSSProperties}>
      <i>{String(p.range[0]).padStart(2,'0')}{p.range[1]!==p.range[0]?'–'+String(p.range[1]).padStart(2,'0'):''}</i>
      <b>{p.short}</b><span>{completed}/{total}</span>
     </button>
