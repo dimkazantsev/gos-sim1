@@ -2,14 +2,14 @@
 import {FormEvent,useEffect,useMemo,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
-import type {ActionItem,Ballot,Channel,Crisis,Evaluation,EventItem,Game,GameDocument,Member,Message,Metric,Party,Stage,Vote} from './types';
+import type {ActionItem,Activity,Ballot,Channel,Crisis,Evaluation,EventItem,Game,GameDocument,Member,Message,Metric,Party,Presence,Stage,Vote} from './types';
 import {CRISES,INTENSITY_LABEL} from './constants';
 
 export function useRepublicGame(gameId:string){
  const router=useRouter();
  const [game,setGame]=useState<Game|null>(null),[me,setMe]=useState<Member|null>(null),[metrics,setMetrics]=useState<Metric[]>([]),[events,setEvents]=useState<EventItem[]>([]),[actions,setActions]=useState<ActionItem[]>([]),[members,setMembers]=useState<Member[]>([]);
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]);
- const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]);
+ const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]);
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[chatOpen,setChatOpen]=useState(true),[secondsLeft,setSecondsLeft]=useState(0);
  const [recording,setRecording]=useState<'audio'|'video'|null>(null);
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]);
@@ -35,6 +35,8 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'*',schema:'public',table:'game_events',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
    .on('postgres_changes',{event:'*',schema:'public',table:'player_actions',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
    .on('postgres_changes',{event:'*',schema:'public',table:'game_documents',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_activity',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_presence',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_channels',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
    .on('postgres_changes',{event:'*',schema:'public',table:'channel_members'},()=>void loadAll(false))
    .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'game_id=eq.'+gameId},()=>{if(channelRef.current)void loadMessages(channelRef.current)})
@@ -57,7 +59,7 @@ export function useRepublicGame(gameId:string){
   if(show)setLoading(true);
   const u=(await supabase.auth.getUser()).data.user;
   if(!u){router.replace('/');return}
-  const [g,m,mt,ev,ac,mb,ch,st,pa,vo,ba,ge,cr,dc]=await Promise.all([
+  const [g,m,mt,ev,ac,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr]=await Promise.all([
    supabase.from('games').select('*').eq('id',gameId).single(),
    supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',u.id).single(),
    supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label'),
@@ -71,13 +73,15 @@ export function useRepublicGame(gameId:string){
    supabase.from('game_ballots').select('*'),
    supabase.from('game_evaluations').select('*').eq('game_id',gameId).order('stage_no'),
    supabase.from('game_crises').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   supabase.from('game_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
+   supabase.from('game_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('game_activity').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
+   supabase.from('game_presence').select('*').eq('game_id',gameId).order('last_seen_at',{ascending:false})
   ]);
   if(g.error||m.error){setError(g.error?.message||m.error?.message||'Нет доступа к игре');setLoading(false);return}
   setGame(g.data as Game);setMe(m.data as Member);setMetrics((mt.data||[]) as Metric[]);setEvents((ev.data||[]) as EventItem[]);setActions((ac.data||[]) as ActionItem[]);
   setMembers((mb.data||[]) as Member[]);setChannels((ch.data||[]) as Channel[]);setStages((st.data||[]) as Stage[]);setParties((pa.data||[]) as Party[]);setVotes((vo.data||[]) as Vote[]);
   const voteIds=new Set(((vo.data||[]) as Vote[]).map(v=>v.id));setBallots(((ba.data||[]) as Ballot[]).filter(b=>voteIds.has(b.vote_id)));
-  setEvaluations((ge.data||[]) as Evaluation[]);setCrises((cr.data||[]) as Crisis[]);setDocuments((dc.data||[]) as GameDocument[]);
+  setEvaluations((ge.data||[]) as Evaluation[]);setCrises((cr.data||[]) as Crisis[]);setDocuments((dc.data||[]) as GameDocument[]);setActivities((al.data||[]) as Activity[]);setPresence((pr.data||[]) as Presence[]);
   if(!channelRef.current&&ch.data?.[0])setChannelId(ch.data[0].id);
   if(show)setLoading(false);
  }
@@ -88,6 +92,16 @@ export function useRepublicGame(gameId:string){
   setMessages(rows);
  }
  async function refresh(){await loadAll(false);if(channelRef.current)await loadMessages(channelRef.current)}
+
+ async function logActivity(eventType:string,label:string,viewKey?:string,payload:Record<string,unknown>={}){
+  const u=(await supabase.auth.getUser()).data.user;if(!u)return;
+  await supabase.from('game_activity').insert({game_id:gameId,actor_id:u.id,event_type:eventType,label,view_key:viewKey||null,payload});
+ }
+ async function touchPresence(viewKey:string,label?:string){
+  const u=(await supabase.auth.getUser()).data.user;if(!u)return;
+  await supabase.from('game_presence').upsert({game_id:gameId,user_id:u.id,current_view:viewKey,last_seen_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
+  if(label)await logActivity('navigation',label,viewKey);
+ }
 
  async function logout(){await supabase.auth.signOut();router.replace('/')}
  async function setTurn(open:boolean){const r=await supabase.from('games').update({turn_open:open,status:open?'running':'paused',turn_ends_at:open?new Date(Date.now()+12*60*1000).toISOString():null}).eq('id',gameId);if(r.error)setError(r.error.message);else await refresh()}
@@ -104,7 +118,7 @@ export function useRepublicGame(gameId:string){
  async function submitAction(e:FormEvent,data:{type:string;title:string;body:string;budget:number}){
   e.preventDefault();if(!me||!game)return false;
   const r=await supabase.from('player_actions').insert({game_id:gameId,round_no:currentStage?.stage_no||game.current_round,author_id:me.user_id,action_type:data.type,title:data.title,body:data.body,budget:data.budget,status:'submitted'});
-  if(r.error){setError(r.error.message);return false}await refresh();return true;
+  if(r.error){setError(r.error.message);return false}await logActivity('decision_submit','Отправил управленческое решение','actions',{title:data.title,type:data.type,budget:data.budget});await refresh();return true;
  }
  async function judgeAction(id:string,status:'accepted'|'rejected'){const r=await supabase.from('player_actions').update({status,reviewed_by:me?.user_id,reviewed_at:new Date().toISOString()}).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
 
@@ -133,7 +147,7 @@ export function useRepublicGame(gameId:string){
  function ballotWeight(v:Vote){if(v.voting_mode==='member')return 1;const p=partyForUser(me?.user_id||'');if(!p)return 0;return v.voting_mode==='mandate'?Math.max(1,p.mandates):1}
  function quorum(v:Vote){const eligible=v.voting_mode==='member'?members.filter(m=>m.kind==='student').length:parties.filter(p=>p.leader_user_id).length;const cast=ballots.filter(b=>b.vote_id===v.id).length;return {eligible,cast,needed:Math.ceil(eligible*2/3),met:eligible>0&&cast>=Math.ceil(eligible*2/3)}}
  function tally(v:Vote){const x=ballots.filter(b=>b.vote_id===v.id);const yes=x.filter(b=>b.choice==='yes').reduce((a,b)=>a+Number(b.weight),0),no=x.filter(b=>b.choice==='no').reduce((a,b)=>a+Number(b.weight),0);return {yes,no,total:yes+no}}
- async function castVote(v:Vote,choice:'yes'|'no'){if(!me||!canVote(v))return;const r=await supabase.from('game_ballots').upsert({vote_id:v.id,voter_id:me.user_id,choice,weight:ballotWeight(v)},{onConflict:'vote_id,voter_id'});if(r.error)setError(r.error.message);else await refresh()}
+ async function castVote(v:Vote,choice:'yes'|'no'){if(!me||!canVote(v))return;const r=await supabase.from('game_ballots').upsert({vote_id:v.id,voter_id:me.user_id,choice,weight:ballotWeight(v)},{onConflict:'vote_id,voter_id'});if(r.error)setError(r.error.message);else{await logActivity('vote','Проголосовал '+(choice==='yes'?'ЗА':'ПРОТИВ'),'votes',{vote_id:v.id,vote_title:v.title,choice});await refresh()}}
  async function closeVote(id:string){const r=await supabase.from('game_votes').update({status:'closed',closed_at:new Date().toISOString()}).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
 
  async function setEvaluation(userId:string,score:number,note?:string){
@@ -162,7 +176,7 @@ export function useRepublicGame(gameId:string){
 
  async function updateMetric(id:string,value:number){if(!teacher)return;const m=metrics.find(x=>x.id===id);const r=await supabase.from('state_metrics').update({previous_value:m?.value??null,value,updated_at:new Date().toISOString()}).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
 
- async function sendText(text:string){if(!me||!channelId||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}await loadMessages(channelId);return true}
+ async function sendText(text:string){if(!me||!channelId||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}await logActivity('chat','Отправил сообщение','chat',{channel_id:channelId});await loadMessages(channelId);return true}
  async function toggleRecording(kind:'audio'|'video'){
   if(recorder.current?.state==='recording'){recorder.current.stop();return}
   if(!me||!channelId)return;
@@ -174,6 +188,6 @@ export function useRepublicGame(gameId:string){
   }catch(e){setError(e instanceof Error?e.message:'Нет доступа к микрофону/камере')}
  }
 
- return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,stages,parties,votes,ballots,evaluations,crises,documents,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,teacher,names,currentStage,myEvaluations,averageVsn,
-  logout,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,createParty,updateParty,assignParty,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,sendText,toggleRecording};
+ return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,teacher,names,currentStage,myEvaluations,averageVsn,
+  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,createParty,updateParty,assignParty,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,sendText,toggleRecording};
 }
