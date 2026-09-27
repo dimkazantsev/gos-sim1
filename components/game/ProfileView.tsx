@@ -1,6 +1,7 @@
 'use client';
 import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
+import MediaUploadButton from './MediaUploadButton';
 
 export default function ProfileView({g}:{g:ReturnTypeRepublic}){
  const {me,profiles,parties,partyInvitations,partyMandates,averageVsn,actions,saveProfile}=g;
@@ -23,7 +24,7 @@ export default function ProfileView({g}:{g:ReturnTypeRepublic}){
   <section className="profileHero">
    <div className="profilePhoto">
     {mine?.avatar_url?<img src={mine.avatar_url} alt="Фото профиля"/>:<span>{initials}</span>}
-    <label className="photoEdit">Изменить фото<input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>setFile(e.target.files?.[0]||null)}/></label>
+    <div className="photoEdit"><MediaUploadButton files={file?[file]:[]} onChange={x=>setFile(x[0]||null)} accept="image/jpeg,image/png,image/webp,image/gif" multiple={false} label="Фото" hint="Загрузить изображение" variant="avatar"/></div>
    </div>
    <div className="profileIntro">
     <small>ЛИЧНЫЙ КАБИНЕТ</small>
@@ -38,7 +39,7 @@ export default function ProfileView({g}:{g:ReturnTypeRepublic}){
     <div className="surfaceHead"><div><small>О СЕБЕ В ИГРЕ</small><h2>Игровая визитка</h2></div></div>
     <p className="profileHint">Напишите коротко, какую роль вы играете, какие компетенции или интересы хотите подчеркнуть. Не добавляйте лишние персональные данные.</p>
     <textarea rows={8} maxLength={1000} value={bio} onChange={e=>setBio(e.target.value)} placeholder="Например: отвечаю за правовой анализ, переговоры и подготовку законопроектов…"/>
-    {file&&<div className="selectedFile">Новое фото: <b>{file.name}</b></div>}
+ }
     <div className="profileSaveRow"><button className="primary" disabled={saving} onClick={save}>{saving?'Сохраняю…':'Сохранить профиль'}</button>{saved&&<span>✓ Сохранено</span>}</div>
    </article>
 
