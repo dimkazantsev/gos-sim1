@@ -76,6 +76,10 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
  const blockedVoid=async()=>{
   g.setError('Это безопасный режим просмотра студента. Действия от его имени заблокированы.');
  };
+ const blockedMaybe=async()=>{
+  g.setError('Это безопасный режим просмотра студента. Действия от его имени заблокированы.');
+  return undefined;
+ };
 
  return {
   ...g,
@@ -105,10 +109,10 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   updateImpactRule:blocked as typeof g.updateImpactRule,
   revertImpactEntry:blocked as typeof g.revertImpactEntry,
   createParty:blocked as typeof g.createParty,
-  updateParty:blocked as typeof g.updateParty,
+  updateParty:blockedVoid as typeof g.updateParty,
   setPartyLeader:blocked as typeof g.setPartyLeader,
   setPartyMandates:blocked as typeof g.setPartyMandates,
-  inviteToParty:blockedNull as typeof g.inviteToParty,
+  inviteToParty:blocked as typeof g.inviteToParty,
   respondPartyInvitation:blocked as typeof g.respondPartyInvitation,
   cancelPartyInvitation:blocked as typeof g.cancelPartyInvitation,
   removePartyMember:blocked as typeof g.removePartyMember,
@@ -121,7 +125,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   setEvaluation:blockedVoid as typeof g.setEvaluation,
   publishEvent:blocked as typeof g.publishEvent,
   triggerCrisis:blockedVoid,
-  ghostVoting:blockedNull as typeof g.ghostVoting,
+  ghostVoting:blockedMaybe as typeof g.ghostVoting,
   createDocument:blocked as typeof g.createDocument,
   updateMetric:blockedVoid as typeof g.updateMetric,
   saveProfile:blocked as typeof g.saveProfile,
