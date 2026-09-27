@@ -100,9 +100,13 @@ begin
  elsif p_stage=11 then
   select count(*) into c from public.government_sessions where game_id=p_game and stage_no=11 and status='closed';
   select count(*) into c2 from public.state_programs where game_id=p_game and status not in ('adopted','rejected');
-  m:=jsonb_build_object('closed_sessions',c,'unresolved_programs',c2);
+  select count(*) into c3 from public.state_programs where game_id=p_game and status='adopted';
+  select count(*) into n from public.formal_documents where game_id=p_game and stage_no=11 and doc_type='government_resolution'
+    and status_code='published' and metadata ? 'state_program_id';
+  m:=jsonb_build_object('closed_sessions',c,'unresolved_programs',c2,'adopted_programs',c3,'government_resolutions',n);
   if c=0 then b:=b||jsonb_build_array('Не закрыто ни одного заседания Правительства по государственным программам'); end if;
   if c2>0 then b:=b||jsonb_build_array('Не по всем государственным программам принято итоговое решение Правительства'); end if;
+  if n<c3 then b:=b||jsonb_build_array('Не все принятые государственные программы оформлены постановлениями Правительства'); end if;
  elsif p_stage=12 then
   select count(*) into c from public.formal_documents where game_id=p_game and stage_no=12 and workflow_key in ('bill','gd_resolution');
   select count(*) into c2 from public.duma_sessions where game_id=p_game and stage_no=12 and status='closed';
@@ -118,11 +122,25 @@ begin
   if c2=0 then b:=b||jsonb_build_array('Из финального сценария не создан проект федерального бюджета в реестре НПА'); end if;
   if exists(select 1 from public.budget_scenarios s join public.formal_documents d on d.id=s.formal_document_id where s.game_id=p_game and s.stage_no=13 and s.status='final' and d.status_code not in ('published','signed','adopted')) then w:=w||jsonb_build_array('Проект федерального бюджета ещё проходит формальную законодательную процедуру'); end if;
  elsif p_stage=14 then
-  select count(*) into c from public.municipal_projects where game_id=p_game and stage_no=14;
-  select count(*) into c2 from public.municipal_projects where game_id=p_game and stage_no=14 and status in ('submitted','vote_open','adopted','rejected');
-  m:=jsonb_build_object('projects',c,'submitted_or_decided',c2);
-  if c=0 then b:=b||jsonb_build_array('Не создан ни один муниципальный полевой проект'); end if;
-  if c>0 and c2=0 then b:=b||jsonb_build_array('Ни один муниципальный проект не передан на защиту или принятие решения'); end if;
+  select count(*) into c from public.municipal_mayor_elections where game_id=p_game and status='finished';
+  select count(*) into c2 from public.municipal_districts where game_id=p_game;
+  select count(*) into c3 from public.municipal_districts where game_id=p_game and head_user_id is not null;
+  select count(distinct district_key) into n from public.municipal_projects
+   where game_id=p_game and stage_no=14 and status in ('submitted','vote_open','adopted','rejected') and district_key is not null;
+  m:=jsonb_build_object(
+   'mayor_election_finished',c,'districts',c2,'district_heads',c3,'districts_with_project',n,
+   'assigned_students',(select count(*) from public.municipal_district_members where game_id=p_game)
+  );
+  if c=0 then b:=b||jsonb_build_array('Не завершены тайные выборы главы города Барнаула'); end if;
+  if c2<5 then b:=b||jsonb_build_array('Не сформированы все пять районных администраций Барнаула'); end if;
+  if c3<5 then b:=b||jsonb_build_array('Назначены не все пять глав районных администраций'); end if;
+  if n<5 then b:=b||jsonb_build_array('Не каждый район подготовил и передал на рассмотрение собственный муниципальный проект'); end if;
+  if exists(
+   select 1 from public.game_members gm
+   where gm.game_id=p_game and gm.kind='student'
+     and gm.user_id is distinct from (select winner_user_id from public.municipal_mayor_elections where game_id=p_game and status='finished' order by closed_at desc limit 1)
+     and not exists(select 1 from public.municipal_district_members dm where dm.game_id=p_game and dm.user_id=gm.user_id)
+  ) then w:=w||jsonb_build_array('Есть студенты, не распределённые по районным администрациям'); end if;
   if exists(select 1 from public.municipal_projects where game_id=p_game and stage_no=14 and status in ('fieldwork','draft')) then w:=w||jsonb_build_array('Есть муниципальные проекты, оставшиеся на полевом или черновом этапе'); end if;
  elsif p_stage=15 then
   select count(*) into c from public.game_crises where game_id=p_game and stage_no=15;
