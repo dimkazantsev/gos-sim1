@@ -48,7 +48,7 @@ export default function SystemDebriefLab({g}:{g:ReturnTypeRepublic}){
  const myRows=rows.filter(x=>x.user_id===me.user_id);
  const phaseRow=(key:string)=>myRows.find(x=>x.phase_key===key);
  const d=(key:string)=>drafts[key]||{decision:'',causal:'',effectiveness:'',improvement:''};
- const setD=(key:string,field:keyof Draft,value:string)=>setDrafts(v=>({...v,[key]:{decision:'',causal:'',effectiveness:'',improvement:'',...(v[key]||{}),[field]:value}}));
+ const setD=(key:string,field:keyof Draft,value:string)=>setDrafts(v=>({...v,[key]:{...(v[key]||{decision:'',causal:'',effectiveness:'',improvement:''}),[field]:value}}));
  const completedStages=stages.filter(s=>s.status==='completed').length;
  const changedMetrics=metricHistory.filter(x=>x.source_type!=='baseline').length;
  const acceptedAgreements=partyAgreements.filter(x=>['accepted','fulfilled'].includes(x.status)).length;
