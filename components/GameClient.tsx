@@ -26,11 +26,6 @@ export default function GameClient({gameId}:{gameId:string}){
 
  useEffect(()=>{
   if(!me)return;
-  if(teacher&&view==='dashboard')setView('teacher');
- },[teacher,me?.user_id]);
-
- useEffect(()=>{
-  if(!me)return;
   const labels:Record<View,string>={dashboard:'Политические процессы',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Архив решений',profile:'Мой профиль',teacher:'Управление'};
   void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
   const id=setInterval(()=>void touchPresence(view),30000);
