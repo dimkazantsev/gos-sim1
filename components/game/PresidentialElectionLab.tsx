@@ -53,25 +53,27 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  },[game?.id]);
 
  if(!game||!me)return null;
+ const activeGame=game;
+ const activeMe=me;
  const score=(id:string,round:1|2)=>scores.find(x=>x.candidate_id===id&&x.round_no===round);
  const draft=(id:string,round:1|2)=>drafts[id+'-'+round]||emptyDraft();
  const setDraft=(id:string,round:1|2,key:keyof Draft,value:string)=>setDrafts(v=>({...v,[id+'-'+round]:{...emptyDraft(),...(v[id+'-'+round]||{}),[key]:value}}));
  const numberOrNull=(x:string)=>x.trim()===''?null:Number(x);
  const partyUsers=(partyId:string)=>{const p=parties.find(x=>x.id===partyId);return p?members.filter(m=>m.kind==='student'&&m.team===p.name):[]};
 
- async function configure(){setBusy(true);const r=await supabase.rpc('configure_presidential_election',{p_game_id:game.id,p_system_type:system,p_threshold_pct:threshold,p_poll_enabled:pollEnabled});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function configure(){setBusy(true);const r=await supabase.rpc('configure_presidential_election',{p_game_id:activeGame.id,p_system_type:system,p_threshold_pct:threshold,p_poll_enabled:pollEnabled});if(r.error)setError(r.error.message);else await load();setBusy(false)}
  async function nominate(){
   let type:'party'|'self'|'fictional'=teacher?(candidateParty?'party':candidateUser?'self':'fictional'):(ledParty?'party':'self');
   let partyId:string|null=teacher?(candidateParty||null):(ledParty?.id||null);
-  let userId:string|null=teacher?(candidateUser||null):(ledParty?(candidateUser||me.user_id):me.user_id);
+  let userId:string|null=teacher?(candidateUser||null):(ledParty?(candidateUser||activeMe.user_id):activeMe.user_id);
   const found=members.find(m=>m.user_id===userId);
-  const name=(candidateName.trim()||found?.full_name||me.full_name).trim();
-  setBusy(true);const r=await supabase.rpc('save_presidential_candidate',{p_game_id:game.id,p_candidate_id:null,p_user_id:userId,p_party_id:partyId,p_display_name:name,p_nomination_type:type,p_program_summary:program.trim()||null});
+  const name=(candidateName.trim()||found?.full_name||activeMe.full_name).trim();
+  setBusy(true);const r=await supabase.rpc('save_presidential_candidate',{p_game_id:activeGame.id,p_candidate_id:null,p_user_id:userId,p_party_id:partyId,p_display_name:name,p_nomination_type:type,p_program_summary:program.trim()||null});
   if(r.error)setError(r.error.message);else{setCandidateName('');setCandidateUser('');setProgram('');await load()}setBusy(false)
  }
  async function reviewCandidate(id:string){const x=review[id];if(!x)return;setBusy(true);const r=await supabase.rpc('review_presidential_candidate',{p_candidate_id:id,p_status:x.status,p_legal_errors:Number(x.errors)||0,p_rating_penalty:Number(x.penalty)||0});if(r.error)setError(r.error.message);else await load();setBusy(false)}
  async function saveScore(id:string,round:1|2){const x=draft(id,round);setBusy(true);const r=await supabase.rpc('set_presidential_scorecard',{p_candidate_id:id,p_round_no:round,p_teacher_program_pct:round===1?numberOrNull(x.program):null,p_teacher_campaign_pct:round===1?numberOrNull(x.campaign):null,p_game_rating_pct:round===1?numberOrNull(x.rating):null,p_poll_pct:round===1&&pollEnabled?numberOrNull(x.poll):null,p_teacher_runoff_pct:round===2?numberOrNull(x.runoff):null});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function finish(round:1|2){setBusy(true);const r=await supabase.rpc('finalize_presidential_round',{p_game_id:game.id,p_round_no:round});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function finish(round:1|2){setBusy(true);const r=await supabase.rpc('finalize_presidential_round',{p_game_id:activeGame.id,p_round_no:round});if(r.error)setError(r.error.message);else await load();setBusy(false)}
 
  return <section className="electionLab">
   <header className="electionLabHead"><div><small>ЭЛЕКТОРАЛЬНАЯ ЛАБОРАТОРИЯ · ЭТАПЫ 6–7</small><h2>Выборы Президента</h2><p>Все компоненты результата сохраняются отдельно: программа, агитация, игровой рейтинг, соцопрос и регистрационные штрафы.</p></div><div className="electionFormula"><b>1 тур</b><span>(программа + агитация + рейтинг{pollEnabled?' + опрос':''}) / {pollEnabled?'4':'3'} − штраф</span><b>2 тур</b><span>(результат 1 тура + новое голосование ППС) / 2</span></div></header>
