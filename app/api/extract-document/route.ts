@@ -1,6 +1,4 @@
 import {NextResponse} from 'next/server';
-import mammoth from 'mammoth';
-import {extractText,getDocumentProxy} from 'unpdf';
 
 export const runtime='nodejs';
 
@@ -13,28 +11,18 @@ export async function POST(request:Request){
 
     const name=file.name.toLowerCase();
     const type=file.type;
-    const ab=await file.arrayBuffer();
-    let text='';
-    let pages:number|undefined;
-
     if(type==='text/plain'||name.endsWith('.txt')){
-      text=new TextDecoder('utf-8').decode(ab);
-    }else if(type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'||name.endsWith('.docx')){
-      const result=await mammoth.extractRawText({buffer:Buffer.from(ab)});
-      text=result.value||'';
-    }else if(type==='application/pdf'||name.endsWith('.pdf')){
-      const pdf=await getDocumentProxy(new Uint8Array(ab));
-      if(pdf.numPages>60)return NextResponse.json({error:'PDF содержит больше 60 страниц. Сократите документ или вставьте текст вручную.'},{status:422});
-      const result=await extractText(pdf,{mergePages:true});
-      pages=result.totalPages;
-      text=typeof result.text==='string'?result.text:result.text.join('\n');
-    }else{
-      return NextResponse.json({error:'Автоматическое распознавание поддерживает PDF, DOCX и TXT. Файл можно загрузить и дополнительно вставить текст вручную.'},{status:415});
+      const text=(await file.text()).replace(/\u0000/g,'').replace(/\r\n/g,'\n').trim();
+      return NextResponse.json({text:text.slice(0,120000),truncated:text.length>120000});
     }
 
-    text=text.replace(/\u0000/g,'').replace(/\r\n/g,'\n').trim();
-    return NextResponse.json({text:text.slice(0,120000),pages,truncated:text.length>120000});
+    return NextResponse.json({
+      text:'',
+      fileName:file.name,
+      needsManualText:true,
+      message:'Файл прикреплён. Для PDF/DOCX текст можно вставить в редактор; тип документа будет распознан по названию и введённому тексту.'
+    });
   }catch(error){
-    return NextResponse.json({error:error instanceof Error?error.message:'Не удалось распознать документ'},{status:500});
+    return NextResponse.json({error:error instanceof Error?error.message:'Не удалось обработать документ'},{status:500});
   }
 }
