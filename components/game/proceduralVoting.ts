@@ -47,6 +47,21 @@ export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
  }
 
  if(doc.workflow_key==='budget'){
+  if(doc.status_code==='sf'){
+   return {
+    title:'Совет Федерации · федеральный бюджет: '+doc.title,
+    body:'Совет Федерации рассматривает принятый Государственной Думой федеральный закон о федеральном бюджете.',
+    mode:'member',institutionKey:'sf',procedureKey:'budget_sf',
+    quorumKind:'fraction',quorumValue:0.5,
+    majorityKind:'present_majority',majorityValue:0.5,
+    allowAbstain:true,tieBreakerChair:false,
+    passTransition:'advance',failTransition:'reject',
+    badge:'СОВЕТ ФЕДЕРАЦИИ · БЮДЖЕТ',
+    rule:'Решение Совета Федерации по федеральному бюджету',
+    legalMode:'law',
+    legalBasis:'Федеральный закон о федеральном бюджете после принятия Государственной Думой подлежит обязательному рассмотрению Советом Федерации (ст. 106 Конституции РФ).'
+   };
+  }
   if(['reading1','reading2','reading3'].includes(doc.status_code)){
    const label=doc.status_code==='reading1'?'I чтение бюджета':doc.status_code==='reading2'?'II чтение бюджета':'III чтение бюджета';
    return {
