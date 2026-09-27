@@ -656,3 +656,41 @@ button,input,textarea,select{font-size:14px}
 .agreementCard>p{margin:10px 0;color:#5e718a;font-size:11.5px;line-height:1.55}.agreementCard footer{display:flex;gap:5px;flex-wrap:wrap}.agreementCard footer span{padding:5px 7px;border-radius:8px;background:#edf2f7;color:#687b94;font-size:9.5px;font-weight:800}
 @media(max-width:900px){.agreementExchangeHead{grid-template-columns:1fr}.agreementComposerBody{grid-template-columns:1fr 1fr}.agreementTerms{grid-column:1/-1}.agreementLedger{grid-template-columns:1fr}}
 @media(max-width:650px){.agreementExchange{padding:13px;border-radius:19px}.agreementComposerBody{grid-template-columns:1fr}.agreementTerms{grid-column:auto}.agreementInbox article{align-items:flex-start;flex-direction:column}.agreementInbox article>div:last-child{width:100%}.agreementInbox article>div:last-child button{flex:1}.agreementLedger{grid-template-columns:1fr}}
+
+
+/* Crisis command room */
+.crisisShell{width:min(1440px,calc(100% - 40px));margin:16px auto 0}
+.crisisCommand{
+  overflow:hidden;border:1px solid #dfc9ce;border-radius:23px;background:#fff;
+  box-shadow:0 16px 48px rgba(62,20,31,.10)
+}
+.crisisCommand.medium{--crisis:#c77a12}.crisisCommand.high{--crisis:#d85647}.crisisCommand.ultra{--crisis:#c53455}.crisisCommand.low{--crisis:#b28a24}
+.crisisCommandHead{
+  display:flex;justify-content:space-between;gap:18px;align-items:center;padding:18px 20px;
+  background:linear-gradient(120deg,#25131b,#371824);color:#fff;border-bottom:1px solid rgba(255,255,255,.08)
+}
+.crisisSignal{display:flex;gap:13px;min-width:0}
+.crisisSignal>span{
+  width:48px;height:48px;flex:none;display:grid;place-items:center;border-radius:15px;
+  background:var(--crisis);color:#fff;font-size:22px;font-weight:950;
+  box-shadow:0 0 0 7px color-mix(in srgb,var(--crisis) 18%,transparent)
+}
+.crisisSignal small,.crisisClock small,.crisisSectionHead small,.crisisResponseList section small,.crisisResolution small{
+  font-size:9.5px;font-weight:900;letter-spacing:.095em
+}
+.crisisSignal small{color:#ffabb9}.crisisSignal h2{margin:4px 0 5px;font-size:22px;letter-spacing:-.035em}.crisisSignal p{max-width:880px;margin:0;color:#e2cad0;font-size:12px;line-height:1.5}
+.crisisClock{min-width:170px;padding:10px 12px;border-radius:13px;background:rgba(255,255,255,.07);text-align:right}
+.crisisClock small{color:#bca8ae}.crisisClock strong{display:block;margin-top:2px;font-variant-numeric:tabular-nums;font-size:25px;letter-spacing:.02em}.crisisClock strong.late{color:#ff8ba0}.crisisClock span{display:block;margin-top:1px;color:#c6b4b9;font-size:9.5px}
+.crisisCommandGrid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.3fr);gap:0}
+.crisisIntel,.crisisResponsePanel{padding:17px 18px;min-width:0}.crisisIntel{border-right:1px solid #e5e8ed;background:#fafbfc}
+.crisisSectionHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:11px}.crisisSectionHead small{color:#8a7890}.crisisSectionHead h3{margin:3px 0 0;color:#273d5a;font-size:17px}.crisisSectionHead>span{padding:5px 8px;border-radius:999px;background:#edf2f7;color:#6a7e98;font-size:9px;font-weight:900}
+.crisisIntelList,.crisisResponseList{display:grid;gap:7px;max-height:430px;overflow:auto}
+.crisisIntelRow{padding:11px;border-radius:12px;border:1px solid #e0e6ee;background:#fff}.crisisIntelRow b{font-size:11.5px;color:#324a68}.crisisIntelRow p{margin:4px 0 0;color:#5d7189;font-size:11.5px;line-height:1.5}
+.crisisIntelRow blockquote{margin:8px 0 0;padding:9px 10px;border-left:3px solid #315efb;border-radius:0 9px 9px 0;background:#edf3ff;color:#405d83;font-size:11.5px;line-height:1.5}
+.crisisAnswer{display:flex;gap:5px;margin-top:8px}.crisisAnswer input,.crisisAsk input{flex:1;min-width:0;min-height:40px;border:1px solid #dbe4ee;border-radius:10px;padding:0 10px;font-size:11.5px}.crisisAnswer button,.crisisAsk button,.crisisReview button{min-height:40px;border:1px solid #d7e0ea;border-radius:10px;background:#fff;color:#425d7e;font-size:10.5px;font-weight:900;padding:0 11px}
+.crisisAsk{display:flex;gap:6px;margin-top:9px}.crisisEmpty{padding:22px;border:1px dashed #d4dce7;border-radius:12px;color:#7d8da1;font-size:11px;text-align:center}
+.crisisResponseForm{display:grid;grid-template-columns:1fr 1fr;gap:9px}.crisisResponseForm label{display:grid;gap:5px;color:#627691;font-size:10px;font-weight:900}.crisisResponseForm label:first-child{grid-column:1/-1}.crisisResponseForm textarea,.crisisReview textarea,.crisisResolution textarea{width:100%;border:1px solid #dbe4ee;border-radius:11px;padding:10px 11px;color:#263f5e;font-size:11.5px;line-height:1.5;resize:vertical}.crisisResponseForm>.primary{grid-column:1/-1}.crisisTeacherFeedback{grid-column:1/-1;padding:11px;border-radius:12px;background:#eef7f2;border:1px solid #cce4d7}.crisisTeacherFeedback b{font-size:11px;color:#2a6d4e}.crisisTeacherFeedback p{margin:4px 0 0;color:#557565;font-size:11.5px;line-height:1.5}
+.crisisResponseList>article{padding:12px;border:1px solid #dfe6ef;border-radius:13px;background:#fbfcfe}.crisisResponseList>article>header{display:flex;justify-content:space-between;gap:8px}.crisisResponseList header b{display:block;color:#2d4565;font-size:12px}.crisisResponseList header span{display:block;margin-top:2px;color:#8492a6;font-size:9.5px}.crisisResponseList header em{padding:4px 7px;border-radius:999px;background:#edf2f7;color:#6d7f96;font-size:9px;font-style:normal;font-weight:900}.crisisResponseList section{margin-top:8px}.crisisResponseList section small{color:#8190a3}.crisisResponseList section p{margin:3px 0 0;color:#566b85;font-size:11.5px;line-height:1.5;white-space:pre-wrap}.crisisReview{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:9px}
+.crisisResolution{display:grid;grid-template-columns:1fr minmax(340px,.8fr) auto;gap:10px;align-items:end;padding:14px 18px;border-top:1px solid #e4e9ef;background:#f7f9fb}.crisisResolution small{color:#786575}.crisisResolution p{margin:4px 0 0;color:#697b91;font-size:10.5px;line-height:1.45}
+@media(max-width:900px){.crisisCommandGrid{grid-template-columns:1fr}.crisisIntel{border-right:0;border-bottom:1px solid #e5e8ed}.crisisResolution{grid-template-columns:1fr}.crisisResponseForm{grid-template-columns:1fr}.crisisResponseForm label:first-child,.crisisResponseForm>.primary,.crisisTeacherFeedback{grid-column:auto}}
+@media(max-width:700px){.crisisShell{width:calc(100% - 20px);margin-top:10px}.crisisCommand{border-radius:19px}.crisisCommandHead{align-items:flex-start;flex-direction:column;padding:15px}.crisisClock{width:100%;text-align:left}.crisisIntel,.crisisResponsePanel{padding:14px}.crisisAnswer,.crisisAsk,.crisisReview{grid-template-columns:1fr;display:grid}}
