@@ -13,6 +13,7 @@ export type StageReadiness={
  overridden?:boolean;
  override_reason?:string|null;
  override_at?:string|null;
+ original_blockers?:string[];
 };
 
 export default function StageReadinessPanel({g,stageNo,compact=false}:{g:ReturnTypeRepublic;stageNo:number;compact?:boolean}){
@@ -65,7 +66,7 @@ export default function StageReadinessPanel({g,stageNo,compact=false}:{g:ReturnT
   {!!state&&state.blockers.length>0&&<div className="stageReadinessGroup blockers"><b>Обязательно завершить</b><ul>{state.blockers.map(x=><li key={x}>{x}</li>)}</ul></div>}
   {!!state&&state.warnings.length>0&&<div className="stageReadinessGroup warnings"><b>Проверьте перед переходом</b><ul>{state.warnings.map(x=><li key={x}>{x}</li>)}</ul></div>}
   {state?.ready&&!state.warnings?.length&&<div className="stageReadinessOk">Ключевые процедуры этого этапа зафиксированы в системе.</div>}
-  {state?.overridden&&<div className="stageReadinessOverrideNotice"><b>Историческое прохождение подтверждено</b><p>{state.override_reason}</p>{state.override_at&&<small>{new Date(state.override_at).toLocaleString('ru-RU')}</small>}</div>}
+  {state?.overridden&&<div className="stageReadinessOverrideNotice"><b>Историческое прохождение подтверждено</b><p>{state.override_reason}</p>{state.original_blockers&&state.original_blockers.length>0&&<details><summary>Какие структурированные записи отсутствуют</summary><ul>{state.original_blockers.map(x=><li key={x}>{x}</li>)}</ul></details>}{state.override_at&&<small>{new Date(state.override_at).toLocaleString('ru-RU')}</small>}</div>}
   {teacher&&!state?.overridden&&state&&!state.ready&&<div className="stageReadinessOverrideForm"><label>Этап был пройден до появления структурированной механики<textarea rows={2} value={overrideReason} onChange={e=>setOverrideReason(e.target.value)} placeholder="Кратко укажите, где и как был зафиксирован результат старого этапа"/></label><button className="secondary" disabled={loading||overrideReason.trim().length<10} onClick={()=>void setOverride()}>Подтвердить историческое прохождение</button></div>}
   {teacher&&state?.overridden&&<button className="secondary stageReadinessClearOverride" disabled={loading} onClick={()=>void clearOverride()}>Отменить историческое подтверждение</button>}
   <button className="secondary stageReadinessRefresh" onClick={()=>void load()} disabled={loading}>↻ Перепроверить</button>
