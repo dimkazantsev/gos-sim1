@@ -9,6 +9,7 @@ import DeadlineControl from './DeadlineControl';
 import PresidentialElectionLab from './PresidentialElectionLab';
 import DumaLeadershipElection from './DumaLeadershipElection';
 import GovernmentFormationLab from './GovernmentFormationLab';
+import StateProgramLab from './StateProgramLab';
 
 export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
@@ -144,6 +145,8 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
      {(selected.stage_no===6||selected.stage_no===7)&&<PresidentialElectionLab g={g}/>} 
 
      {selected.stage_no===8&&<GovernmentFormationLab g={g}/>} 
+
+     {(selected.stage_no===10||selected.stage_no===11)&&<StateProgramLab g={g}/>} 
 
      {teacher&&<section className="stageTeacherActions">
       <div><small>УПРАВЛЕНИЕ ЭТАПОМ</small><b>Действия преподавателя</b></div>
