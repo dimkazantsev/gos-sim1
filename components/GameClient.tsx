@@ -30,7 +30,7 @@ export default function GameClient({gameId}:{gameId:string}){
 
  useEffect(()=>{
   if(!me)return;
-  const labels:Record<View,string>={dashboard:'Сейчас',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'Материалы',actions:'Решение',profile:'Мой профиль',teacher:'Управление'};
+  const labels:Record<View,string>={dashboard:'Сейчас',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Решение',profile:'Мой профиль',teacher:'Управление'};
   void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
   const id=setInterval(()=>void touchPresence(view),30000);
   return()=>clearInterval(id);
@@ -39,7 +39,7 @@ export default function GameClient({gameId}:{gameId:string}){
  if(loading||!game||!me)return <main className="loginPage"><div className="loaderCard"><div className="spinner"/><div><b>GOS//SIM</b><p className="muted">{error||'Подключение к игре…'}</p></div></div></main>;
 
  const nav:[View,string,string][] = teacher
-  ? [['teacher','✦','Управление'],['dashboard','◎','Общий ход'],['parties','◈','Партии'],['votes','✓','Голосования'],['actions','▣','Решения'],['documents','▤','Материалы'],['stages','◫','Этапы'],['profile','●','Профиль']]
+  ? [['teacher','✦','Управление'],['dashboard','◎','Общий ход'],['parties','◈','Партии'],['votes','✓','Голосования'],['actions','▣','Решения'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Профиль']]
   : [['dashboard','◎','Сейчас'],['parties','◈','Партия'],['votes','✓','Голосование'],['actions','▣','Решение'],['documents','▤','Материалы'],['stages','◫','Этапы'],['profile','●','Мой профиль']];
 
  const openScreen=()=>window.open('/game/'+gameId+'/screen','gos-sim-public');
