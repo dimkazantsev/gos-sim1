@@ -1044,3 +1044,11 @@ button,input,textarea,select{font-size:14px}
 .gameReadinessNo{width:35px;height:35px;display:grid;place-items:center;border-radius:9px;background:#edf2f7;color:#47617d;font-size:9px;font-weight:950}.gameReadinessGrid article>div:nth-child(2)>small{display:block;color:#8794a6;font-size:7.4px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gameReadinessGrid article>div:nth-child(2)>b{display:block;margin-top:2px;color:#334e6c;font-size:9.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gameReadinessGrid article>div:nth-child(2)>p{margin:3px 0 0;color:#7c8c9f;font-size:7.9px;line-height:1.35}.gameReadinessGrid article>span{width:24px;height:24px;display:grid;place-items:center;border-radius:7px;background:#edf2f7;color:#6d7f94;font-size:10px;font-weight:950}.gameReadinessGrid article.ready>span{background:#dff3e8;color:#277151}.gameReadinessGrid article.warning>span{background:#ffedbd;color:#916817}.gameReadinessGrid article.blocked>span{background:#f8dfe4;color:#a43b50}
 @media(max-width:1050px){.gameReadinessGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.gameReadinessMatrix>header{flex-direction:column}.gameReadinessCounters{justify-content:flex-start}.gameReadinessGrid{grid-template-columns:1fr}}
+
+
+/* Active student task on the political wall */
+.wallStageTask{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:12px;align-items:center;margin:12px 0;padding:13px 14px;border:1px solid #d8e2ef;border-radius:16px;background:linear-gradient(135deg,#f8fbff,#f5f7ff)}
+.wallStageTaskNo{width:58px;height:58px;display:grid;place-items:center;border-radius:15px;background:#142a47;color:#8ce8d9;font-size:16px;font-weight:950;letter-spacing:.04em}
+.wallStageTaskCopy small{font-size:8.8px;font-weight:900;letter-spacing:.09em;color:#74869c}.wallStageTaskCopy h2{margin:3px 0 4px;color:#294563;font-size:15px}.wallStageTaskCopy p{max-width:850px;margin:0;color:#6d8098;font-size:10.5px;line-height:1.46}
+.wallStageTask>button{min-height:42px;padding:0 13px;white-space:nowrap}
+@media(max-width:720px){.wallStageTask{grid-template-columns:48px 1fr}.wallStageTaskNo{width:48px;height:48px}.wallStageTask>button{grid-column:1/-1;width:100%}}
