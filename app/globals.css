@@ -61,3 +61,458 @@ button,a{-webkit-tap-highlight-color:transparent}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
 
 .routeState{min-height:100vh;display:flex;align-items:center;justify-content:center;gap:14px;padding:24px;background:var(--bg);color:var(--navy)}.routeState>div:last-child{max-width:480px}.routeState b{font-size:18px}.routeState p{margin:5px 0 12px;color:var(--muted);font-size:12px;line-height:1.55}.routeStateIcon{width:44px;height:44px;border-radius:13px;background:var(--danger-soft);color:var(--danger);display:grid;place-items:center;font-size:20px;font-weight:900;border:1px solid #efcdd5}
+
+
+/* === GOS//SIM COMMAND SYSTEM 2026 === */
+:root{
+  --bg:#f4f6fa;
+  --surface:#ffffff;
+  --surface-2:#f8fafc;
+  --surface-3:#eef3f8;
+  --navy:#0a1830;
+  --navy-2:#102b54;
+  --text:#10213c;
+  --body:#354a67;
+  --muted:#6b7e99;
+  --soft:#8b9ab0;
+  --line:#dce4ef;
+  --line-strong:#c7d3e2;
+  --blue:#315efb;
+  --blue-2:#5b7cff;
+  --blue-soft:#edf2ff;
+  --purple:#7458ff;
+  --coral:#e24f69;
+  --green:#0f9466;
+  --green-soft:#e8f8f1;
+  --warn:#a86600;
+  --warn-soft:#fff5db;
+  --danger:#c13e59;
+  --danger-soft:#fff0f3;
+  --shadow:0 10px 32px rgba(13,31,58,.07);
+  --shadow-lg:0 28px 90px rgba(7,24,48,.16);
+  --radius:20px;
+  --radius-sm:13px;
+  --touch:46px;
+  --command:#071426;
+  --command-2:#0b203d;
+  --command-line:rgba(255,255,255,.11);
+  --cyan:#4fe0d0;
+}
+html,body{font-size:15px}
+body{
+  background:
+    radial-gradient(circle at 0 0,rgba(49,94,251,.06),transparent 28rem),
+    linear-gradient(180deg,#f7f9fc 0,#f3f6fa 42rem,#f4f6fa 100%);
+  color:var(--text);
+}
+button,input,textarea,select{font-size:14px}
+.primary,.secondary{min-height:46px;border-radius:13px;padding-inline:17px;font-size:13px;letter-spacing:-.005em}
+.primary{background:linear-gradient(135deg,#315efb,#486fff);border-color:#315efb;box-shadow:0 10px 24px rgba(49,94,251,.20)}
+.primary:hover:not(:disabled){background:linear-gradient(135deg,#244fe7,#3d64ee);box-shadow:0 13px 30px rgba(49,94,251,.25)}
+.secondary{box-shadow:0 2px 7px rgba(13,31,58,.03)}
+.emptyState{padding:28px!important;border-radius:16px!important;font-size:13px!important;color:var(--muted)!important;background:linear-gradient(145deg,#fafbfd,#f5f8fb)!important;border:1px dashed #ced9e7!important}
+.errorBox{font-size:13px}
+
+/* Command header */
+.simShell{background:transparent}
+.simTop{
+  height:78px;
+  grid-template-columns:minmax(220px,310px) minmax(300px,1fr) auto;
+  padding:0 max(20px,calc((100vw - 1440px)/2));
+  gap:20px;
+  background:
+    radial-gradient(circle at 32% -100%,rgba(79,224,208,.18),transparent 35%),
+    linear-gradient(110deg,var(--command),var(--command-2));
+  border-bottom:1px solid var(--command-line);
+  box-shadow:0 12px 32px rgba(4,15,31,.22);
+}
+.simLogo{
+  width:46px;height:46px;border-radius:15px;
+  background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.07));
+  border-color:rgba(255,255,255,.18);
+  box-shadow:inset 0 1px rgba(255,255,255,.18),0 10px 30px rgba(0,0,0,.12);
+  font-size:13px;letter-spacing:.04em
+}
+.simBrand{gap:12px}
+.simBrand b{font-size:16px;letter-spacing:.02em}
+.simBrand span{font-size:11px;letter-spacing:.03em}
+.simTopCenter>strong{font-size:14px;letter-spacing:-.01em}
+.topIndicators{margin-top:7px;gap:7px}
+.livePill,.timerPill,.connectionPill{
+  min-height:27px;padding:0 10px;font-size:10px;letter-spacing:.045em;
+  backdrop-filter:blur(10px)
+}
+.timerPill{background:rgba(255,255,255,.13);color:#fff}
+.simAvatar{width:40px;height:40px;border-radius:13px;font-size:11px}
+.simUserText b{font-size:12px;max-width:205px}
+.simUserText span{font-size:10px}
+.simUser>button{min-height:39px;padding:0 13px;border-radius:11px;font-size:11px}
+
+/* Navigation behaves like a command bar, not browser tabs */
+.focusNav{top:78px;background:rgba(247,249,252,.90);backdrop-filter:blur(18px) saturate(145%);border-bottom-color:#dce4ee}
+.focusNavInner{width:min(1440px,calc(100% - 40px));padding:10px 0;gap:5px}
+.focusNav button{
+  min-height:45px;padding:0 15px;border-radius:13px;
+  color:#63758f;font-size:12px;letter-spacing:-.01em;
+  transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease
+}
+.focusNav button i{
+  width:22px;height:22px;display:grid;place-items:center;border-radius:8px;
+  background:#eef3ff;color:#315efb;font-size:12px
+}
+.focusNav button:hover{transform:translateY(-1px);background:#fff;border-color:#d5dfea}
+.focusNav button.active{
+  background:#0d203b;color:#fff;border-color:#0d203b;
+  box-shadow:0 8px 18px rgba(10,30,58,.14)
+}
+.focusNav button.active i{background:rgba(255,255,255,.12);color:#7af0dd}
+.simMain{width:min(1440px,calc(100% - 40px));padding:26px 0 56px;min-height:calc(100vh - 145px)}
+
+/* Global product hierarchy */
+.pageHeader,.gradesHero,.votesHero,.formalHero,.teacherFocus,.profileHero,.wallHero,.dashHero{
+  position:relative;overflow:hidden;
+  border:1px solid #dce4ef!important;
+  background:
+    radial-gradient(circle at 95% 0,rgba(49,94,251,.10),transparent 31%),
+    linear-gradient(135deg,#fff,#f7f9fd)!important;
+  border-radius:26px!important;
+  box-shadow:0 18px 48px rgba(12,31,60,.07)!important
+}
+.pageHeader::before,.gradesHero::before,.votesHero::before,.formalHero::before,.teacherFocus::before,.profileHero::before,.wallHero::before,.dashHero::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,#315efb,#4fe0d0)
+}
+.pageHeader{padding:25px 27px;margin-bottom:18px}
+.pageHeader small,.surfaceHead small,.gradesHero small,.votesHero small,.formalHero small,.teacherFocus small,.profileIntro small,.wallHero small,.dashHero small,
+.gradeModal small,.gradesDebrief small{
+  font-size:11px!important;line-height:1.2;letter-spacing:.105em!important;font-weight:900
+}
+.pageHeader h1,.gradesHero h1,.votesHero h1,.formalHero h1,.profileIntro h1,.wallHero h1,.dashHero h1{
+  font-size:clamp(30px,3.2vw,48px)!important;line-height:1.03!important;letter-spacing:-.045em!important
+}
+.pageHeader p,.gradesHero p,.votesHero p,.formalHero p,.wallHero p,.dashHero p{font-size:14px!important;line-height:1.65!important}
+.surface,.voteCard,.partyCard,.documentCard{
+  border-color:#dfe6ef!important;border-radius:20px!important;
+  box-shadow:0 8px 28px rgba(13,31,58,.055)!important
+}
+.surface{padding:20px}
+.surfaceHead{margin-bottom:16px}
+.surfaceHead h2{font-size:20px!important;letter-spacing:-.025em}
+.surfaceHead>b,.surfaceHead>span{height:35px;min-width:35px;font-size:11px}
+.surface input,.surface textarea,.surface select,.actionForm input,.actionForm textarea,.actionForm select,.voteBuilder input,.voteBuilder textarea,.voteBuilder select{
+  min-height:44px;border-radius:12px;padding:11px 12px;font-size:13px
+}
+.surface textarea,.actionForm textarea,.voteBuilder textarea{line-height:1.55}
+:where(.surface,.voteCard,.partyCard,.documentCard,.proceduralVoteCard,.stageCard,.streamItem){
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease
+}
+
+/* Stage architecture */
+.stageTimeline{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stageCard{
+  grid-template-columns:52px 1fr;gap:13px;min-height:178px;padding:17px;
+  border-radius:19px;background:linear-gradient(145deg,#fff,#fbfcfe);
+  border-color:#dfe6ef
+}
+.stageCard:hover{transform:translateY(-3px);box-shadow:0 15px 36px rgba(13,31,58,.09)}
+.stageCard.open{
+  border-color:#95b6ff;background:linear-gradient(145deg,#f8faff,#eef4ff);
+  box-shadow:0 15px 38px rgba(49,94,251,.13)
+}
+.stageNo{min-height:60px;height:60px;border-radius:15px}
+.stageNo i{font-size:18px}.stageNo span{font-size:11px}
+.stageCard small{font-size:10px!important;letter-spacing:.08em;font-weight:850}
+.stageCard h3{font-size:16px;margin:5px 0 7px;line-height:1.22}
+.stageCard p{font-size:12.5px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.stageMeta{gap:6px;margin-top:12px}
+.statusTag,.deadlineTag,.resourceTag,.authorTag,.stageVoteTag,.stageOpenHint{
+  min-height:27px!important;display:inline-flex!important;align-items:center!important;
+  padding:0 9px!important;border-radius:999px!important;font-size:10px!important;font-weight:800
+}
+.stageOpenHint{margin-left:auto;color:#315efb;background:#eef3ff}
+.stageModalBackdrop{backdrop-filter:blur(8px);background:rgba(5,18,36,.58)!important}
+.stageDetailPanel{width:min(1080px,96vw)!important;max-height:94vh!important;border-radius:26px!important;box-shadow:0 40px 120px rgba(3,16,34,.35)!important}
+.stageDetailHeader{padding:22px 24px!important}
+.stageDetailBadge{width:58px!important;height:58px!important;border-radius:17px!important;font-size:18px!important}
+.stageDetailHeader h2{font-size:24px!important;letter-spacing:-.03em!important}
+.stageDetailHeader small{font-size:11px!important}
+.stageClose{width:42px!important;height:42px!important;border-radius:13px!important;font-size:22px!important}
+.stageDetailScroll{padding:22px 24px 28px!important}
+.stageLead{padding:18px 20px!important;border-radius:17px!important}
+.stageLead p{font-size:16px!important;line-height:1.62!important}
+.stageDetailGrid{gap:12px!important}
+.stageDetailBlock,.stageNotes,.stageSources,.stageRuleSource,.stageRulesCallout,.stageVotingLink,.stageTeacherActions{
+  border-radius:17px!important;padding:18px!important
+}
+.stageDetailBlock>small,.stageNotes>small,.stageSources>small,.stageRuleSource small,.stageRulesCallout small,.stageVotingLink small,.stageTeacherActions small{
+  font-size:10.5px!important
+}
+.stageSteps li p,.stageOutputList li,.stageProcedure p,.stageNotes p,.stageRuleSource p,.stageRulesCallout p,.stageVotingLink p{font-size:13px!important;line-height:1.55!important}
+.stageSources a{min-height:44px!important;font-size:12px!important}
+
+/* Party war room */
+.partyRanking,.partyCabinet,.partyDocumentsSection,.lawLibrary{margin-top:18px}
+.partySectionTitle h2{font-size:24px!important;letter-spacing:-.035em!important}
+.partySectionTitle small{font-size:11px!important}
+.partyRankingList{gap:8px}
+.partyRankingList>button,.partyRankingList>article{min-height:70px!important;border-radius:15px!important}
+.partyIdentityCard{border-radius:23px!important;padding:22px!important}
+.partyBigLogo{width:72px!important;height:72px!important;border-radius:20px!important}
+.partyIdentityText h1{font-size:30px!important;letter-spacing:-.04em!important}
+.partyIdentityText p{font-size:13px!important;line-height:1.6!important}
+.partyHeadlineStats strong{font-size:25px!important}
+.partyHeadlineStats span{font-size:10px!important}
+.partyPeople,.requiredDocs,.lawCards{gap:10px!important}
+.requiredDoc,.lawCards>a{border-radius:15px!important}
+.requiredDoc b,.lawCards b{font-size:13px!important}
+.requiredDoc span,.lawCards p{font-size:11.5px!important;line-height:1.55!important}
+.partyTeacherControl label,.partyInviteManager p,.partyUpload,.partyReview{font-size:12px!important}
+
+/* Voting chamber */
+.votesHero{padding:28px 30px!important}
+.votesHeroState strong{font-size:38px!important}
+.votesHeroState span,.votesHeroState button{font-size:11px!important}
+.votesOverview{gap:10px!important}
+.votesOverview article{
+  min-height:112px;padding:17px 18px!important;border-radius:18px!important;
+  border:1px solid #dfe6ef!important;background:#fff!important;box-shadow:0 8px 24px rgba(13,31,58,.05)
+}
+.votesOverview small{font-size:10px!important}.votesOverview strong{font-size:30px!important}.votesOverview span{font-size:11px!important}
+.voteTabs{padding:5px!important;border-radius:14px!important}
+.voteTabs button{min-height:42px!important;font-size:12px!important;border-radius:10px!important}
+.proceduralVoteList{gap:14px!important}
+.proceduralVoteCard{
+  border-radius:23px!important;border:1px solid #dce4ee!important;background:#fff!important;
+  box-shadow:0 12px 34px rgba(13,31,58,.06)!important;overflow:hidden
+}
+.proceduralVoteCard header{padding:19px 20px!important}
+.voteInstitution span{width:38px!important;height:38px!important;border-radius:12px!important}
+.voteInstitution small{font-size:10px!important}.voteInstitution b{font-size:17px!important}
+.voteState{font-size:10px!important;min-height:30px!important;padding:0 10px!important}
+.voteBody{font-size:13px!important;line-height:1.62!important}
+.voteRuleStrip{gap:8px!important}
+.voteRuleStrip>div{padding:12px!important;border-radius:13px!important}
+.voteRuleStrip small{font-size:9.5px!important}.voteRuleStrip b{font-size:12px!important;line-height:1.35}
+.quorumMeter span,.quorumMeter b{font-size:11px!important}
+.voteNumber strong{font-size:30px!important}.voteNumber span{font-size:10px!important}.voteNumber small{font-size:10px!important}
+.voteChoiceButtons button{min-height:46px!important;padding:0 17px!important;border-radius:12px!important;font-size:13px!important}
+.voteNotEligible,.myMandateWeight{font-size:11.5px!important}
+.finalVoteDecision strong{font-size:19px!important}
+.finalVoteDecision span{font-size:11px!important}
+
+/* Formal registry */
+.formalHero{padding:28px 30px!important}
+.formalStats{gap:10px!important}
+.formalStats>div{border-radius:16px!important;padding:15px!important}
+.formalStats strong{font-size:26px!important}
+.formalTabs button{min-height:43px!important;font-size:12px!important}
+.formalWorkspace{gap:14px!important}
+.formalRegistry{border-radius:20px!important}
+.formalRegistryHead{padding:16px!important}
+.formalRegistryNo{font-size:10px!important}
+.formalRegistryList button{padding:14px!important}
+.formalRegistryList b{font-size:13px!important;line-height:1.35}
+.formalRegistryList small,.formalRegistryList span{font-size:10px!important}
+.formalDetail{border-radius:20px!important}
+.formalDocHeader h2{font-size:23px!important}
+.formalDocHeader small,.formalPaperInstitution small,.formalPaperMeta,.formalPassport dt,.formalHistoryRow time{font-size:10px!important}
+.formalPaper{padding:25px!important;border-radius:15px!important}
+.formalPaper h1,.formalPaper h2{letter-spacing:-.025em!important}
+.formalPaperBody{font-size:14px!important;line-height:1.7!important}
+.formalActions button,.formalSecondaryActions button{min-height:44px!important;font-size:12px!important;border-radius:12px!important}
+.formalHistoryRow{font-size:12px!important}
+
+/* Political process feed */
+.wallHero{padding:28px 30px!important}
+.wallHeroStats>div{border-radius:15px!important}
+.wallHeroStats strong{font-size:28px!important}
+.wallComposer{border-radius:21px!important;padding:19px!important}
+.wallComposerIdentity b{font-size:14px!important}.wallComposerIdentity span{font-size:11px!important}
+.wallComposerGrid input,.wallComposerGrid textarea,.wallComposerGrid select{font-size:13px!important}
+.wallTabs button{min-height:42px!important;font-size:12px!important}
+.wallSearch{min-height:44px!important;font-size:13px!important}
+.wallFeed{gap:12px!important}
+.wallPost{border-radius:20px!important}
+.wallPostWho b{font-size:13px!important}.wallPostWho small{font-size:10px!important}
+.wallPostBody h2{font-size:18px!important;line-height:1.32!important}.wallPostBody p{font-size:13px!important;line-height:1.65!important}
+.wallTags span,.wallLinks a,.wallNpaLinks button{font-size:10.5px!important}
+.wallPostActions button{min-height:40px!important;font-size:11px!important}
+.decisionRegistryNo{font-size:11px!important}
+
+/* Teacher control room */
+.teacherSimple{display:grid;gap:16px}
+.teacherFocus{padding:28px 30px!important}
+.teacherFocusCopy h1{font-size:clamp(31px,3.4vw,49px)!important;letter-spacing:-.045em!important}
+.teacherFocusCopy p{font-size:14px!important;line-height:1.62!important}
+.teacherFocusState b{font-size:34px!important}
+.bigState{font-size:10px!important;min-height:29px!important;padding:0 11px!important}
+.teacherPrimaryActions{gap:10px!important}
+.teacherAction{min-height:94px!important;border-radius:18px!important;padding:16px!important}
+.teacherAction>span{width:43px!important;height:43px!important;border-radius:13px!important;font-size:18px!important}
+.teacherAction b{font-size:14px!important}.teacherAction small{font-size:11px!important;line-height:1.4!important}
+.teacherPulse{gap:10px!important}
+.pulseCard{padding:18px!important;border-radius:18px!important}
+.pulseCard small{font-size:10px!important}.pulseCard strong{font-size:32px!important}.pulseCard span{font-size:11px!important}
+.studentLiveRow.simple{padding:12px!important;border-radius:13px!important}
+.studentLiveIdentity b,.studentNow b,.studentLast b{font-size:12px!important}
+.studentLiveIdentity small,.studentNow label,.studentLast label,.studentLast small{font-size:10px!important}
+.activityRow{padding:10px!important}.activityRow time{font-size:10px!important}.activityRow b{font-size:12px!important}.activityRow p{font-size:11.5px!important}
+.teacherAnalyticsCards>div{border-radius:15px!important;padding:15px!important}
+.teacherAnalyticsCards small{font-size:9.5px!important}.teacherAnalyticsCards strong{font-size:27px!important}.teacherAnalyticsCards span{font-size:10.5px!important}
+.teacherPlayerStatsHead,.teacherPlayerStatsRow{font-size:11px!important}
+.teacherPlayerStatsRow b{font-size:12px!important}.teacherPlayerStatsRow small{font-size:10px!important}
+.teacherDetails{border-radius:17px!important}
+.teacherDetails>summary{min-height:64px!important;padding:14px 17px!important}
+.teacherDetails>summary b{font-size:13px!important}.teacherDetails>summary span{font-size:11px!important}
+.teacherDetailsBody{padding:17px!important}
+.directorButtons button{min-height:56px!important;border-radius:13px!important}
+.directorButtons button b{font-size:11px!important}
+
+/* VSN journal */
+.gradesHero{padding:28px 30px!important}
+.gradesRules{gap:9px!important;padding:12px!important}
+.gradesRules>div{padding:15px!important;border-radius:15px!important}
+.gradesRules b{font-size:22px!important}.gradesRules span{font-size:11px!important}.gradesRules p{font-size:11.5px!important;line-height:1.55!important}
+.gradesMatrixHead,.gradesMatrixRow{grid-template-columns:minmax(240px,1fr) repeat(16,48px)!important;gap:5px!important;min-width:1080px!important}
+.gradesMatrixHead{font-size:10px!important}
+.gradesMatrixRow>div b{font-size:12px!important}.gradesMatrixRow>div small{font-size:9.5px!important}
+.gradesMatrixRow>button{height:45px!important;border-radius:10px!important}
+.gradesMatrixRow>button b{font-size:13px!important}.gradesMatrixRow>button small{font-size:8px!important}
+.vsnMiniTrend button{height:52px!important;min-width:46px!important}
+.vsnMiniTrend button small{font-size:9px!important}.vsnMiniTrend button b{font-size:14px!important}
+.vsnCompactHint{font-size:11px!important}
+.gradesDebrief p{font-size:12px!important}.gradesDebrief>div:last-child span{font-size:10px!important}
+.gradeModal{border-radius:25px!important}
+.gradeModal>header{padding:20px 22px!important}.gradeModal>header h2{font-size:23px!important}.gradeModal>header p{font-size:11px!important}
+.gradeCriteria span{font-size:11px!important;padding:11px!important}
+.gradeRationale p,.gradeTeacherNote p{font-size:12.5px!important}
+.gradeRationale footer span{font-size:9.5px!important}
+.gradeApproval label{font-size:11px!important}
+.gradeApproval>div button{min-height:42px!important;font-size:11px!important}
+.gradeEvidenceGroups summary{font-size:11.5px!important}
+.gradeEvidenceGroups article small{font-size:9px!important}.gradeEvidenceGroups article b{font-size:11px!important}.gradeEvidenceGroups article p{font-size:11.5px!important}
+.gradePrivacy{font-size:11px!important}
+.gradeRunHistory>summary{font-size:11px!important}.gradeRunHistory time,.gradeRunHistory em{font-size:9px!important}.gradeRunHistory b{font-size:11px!important}
+
+/* Profile */
+.profileHero{padding:28px 30px!important}
+.profilePhoto{width:112px!important;height:112px!important;border-radius:26px!important}
+.profileIntro p{font-size:14px!important}
+.profileChips span{font-size:10.5px!important;min-height:29px!important}
+.profileHint,.profileSummary p{font-size:12px!important;line-height:1.55!important}
+.profileSummary dt{font-size:10px!important}.profileSummary dd{font-size:12px!important}
+.profileMandateStats strong{font-size:25px!important}.profileMandateStats span{font-size:10px!important}
+
+/* Metrics dock becomes a true heads-up display */
+.statePulseDock{
+  top:143px!important;width:min(1440px,calc(100% - 40px))!important;
+  margin:0 auto 18px!important;border-radius:19px!important;
+  border:1px solid #dce4ef!important;box-shadow:0 12px 32px rgba(13,31,58,.07)!important
+}
+.statePulseTop{padding:11px 14px!important}
+.statePulseCopy b{font-size:12px!important}.statePulseCopy span{font-size:10px!important}
+.statePulseValue{font-size:18px!important}.statePulseTrend{font-size:10px!important}
+.statePulseGrid{gap:7px!important}
+.metricModal.redesigned{border-radius:25px!important}
+.metricModalTitle h2{font-size:23px!important}
+.metricHeroValue strong{font-size:42px!important}
+.metricHeroValue span,.metricLastCause,.metricBucketTabs button,.metricHistoryList,.metricCompare{font-size:11px!important}
+
+/* Chat as a proper collaboration rail */
+.simChat{
+  top:78px;width:min(430px,100%);border-left:1px solid #d6e0ec;
+  box-shadow:-22px 0 60px rgba(6,22,43,.14)
+}
+.chatTop{padding:17px 18px}.chatTop small{font-size:10px}.chatTop b{font-size:14px}
+.simChat>select{min-height:44px;font-size:12px}
+.chatMessages{padding:14px;gap:10px;background:#f5f7fa}
+.chatMsg{grid-template-columns:36px 1fr;gap:9px}
+.chatMsg>span{width:36px;height:36px;border-radius:11px;font-size:9px}
+.chatMsg>div{padding:11px 12px;border-radius:13px}
+.chatMsg b{font-size:11.5px}.chatMsg time{font-size:9px}.chatMsg p{font-size:12.5px;line-height:1.55}
+.chatCompose{padding:12px}.chatCompose textarea{min-height:78px;font-size:13px}
+.floatingChat{right:22px;bottom:22px;min-height:50px;border-radius:15px;padding:0 18px;box-shadow:0 14px 36px rgba(13,31,58,.14)}
+
+/* Landing */
+.loginPage{background:
+  radial-gradient(circle at 13% 8%,rgba(49,94,251,.13),transparent 31rem),
+  radial-gradient(circle at 84% 22%,rgba(79,224,208,.11),transparent 25rem),
+  #f3f6fa
+}
+.gridGlow{background-size:52px 52px;opacity:.7}
+.landingShell{width:min(1440px,100%);grid-template-columns:minmax(0,1.2fr) minmax(410px,.7fr);gap:36px;align-items:center}
+.landingIntro{padding:38px 20px 24px 4px}
+.introBadge{min-height:32px;padding:0 12px;font-size:10px}
+.logo{width:58px;height:58px;border-radius:18px;background:linear-gradient(145deg,#315efb,#583fff);box-shadow:0 15px 36px rgba(49,94,251,.25)}
+.logoRow small{font-size:11px}.logoRow h1{font-size:34px}
+.landingIntro h2{font-size:clamp(45px,5.1vw,76px);max-width:900px}
+.landingText{font-size:16px;max-width:800px}
+.featureGrid{gap:12px;margin:28px 0}
+.featureGrid article{padding:17px;border-radius:17px}
+.featureGrid article>span{width:44px;height:44px;border-radius:14px}
+.featureGrid b{font-size:13.5px}.featureGrid p{font-size:12px}
+.infoStrip div{padding:14px;border-radius:14px}
+.infoStrip label,.loginTips label{font-size:10px}.infoStrip strong{font-size:12.5px}
+.loginCard{padding:29px;border-radius:25px;box-shadow:0 30px 90px rgba(7,24,48,.14)}
+.formTitle{font-size:28px}
+.loginCard label{font-size:12px}.loginCard input{min-height:48px;font-size:14px;border-radius:12px}
+.seg{padding:4px;border-radius:13px}.seg button{min-height:42px;font-size:12px;border-radius:10px}
+.loginTips ul,.loginTips p{font-size:11.5px}
+
+/* Product motion: only state and entry, never decorative noise */
+@keyframes commandIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.simMain>*,.landingShell{animation:commandIn .32s cubic-bezier(.2,.8,.2,1) both}
+.stageCard.open .stageNo,.livePill.on{animation:stateBreath 2.8s ease-in-out infinite}
+@keyframes stateBreath{0%,100%{box-shadow:0 0 0 0 rgba(49,94,251,0)}50%{box-shadow:0 0 0 6px rgba(49,94,251,.08)}}
+
+/* Tablet */
+@media(max-width:1180px){
+  .stageTimeline{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .simMain,.focusNavInner,.statePulseDock{width:min(100% - 28px,1120px)!important}
+  .teacherSimpleGrid,.dashGrid{grid-template-columns:1fr!important}
+  .partyGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+/* Mobile */
+@media(max-width:700px){
+  html,body{font-size:15px}
+  .simTop{min-height:66px;height:auto;padding:10px 12px;grid-template-columns:1fr auto}
+  .simBrand b{font-size:14px}.simBrand span{display:none}.simLogo{width:40px;height:40px;border-radius:13px}
+  .focusNav{top:66px}
+  .focusNavInner{width:100%!important;padding:8px 10px;gap:5px}
+  .focusNav button{min-height:44px;padding:0 13px;font-size:11.5px}
+  .focusNav button i{display:grid;width:20px;height:20px}
+  .simMain{width:100%!important;padding:14px 10px 38px}
+  .statePulseDock{top:125px!important;width:calc(100% - 20px)!important;border-radius:16px!important}
+  .pageHeader,.gradesHero,.votesHero,.formalHero,.teacherFocus,.profileHero,.wallHero,.dashHero{border-radius:20px!important;padding:21px 18px!important}
+  .pageHeader h1,.gradesHero h1,.votesHero h1,.formalHero h1,.profileIntro h1,.wallHero h1,.dashHero h1{font-size:30px!important}
+  .pageHeader p,.gradesHero p,.votesHero p,.formalHero p,.wallHero p,.dashHero p,.teacherFocusCopy p{font-size:13px!important}
+  .stageTimeline{grid-template-columns:1fr;gap:9px}
+  .stageCard{min-height:auto;padding:15px}
+  .stageCard p{-webkit-line-clamp:4}
+  .stageOpenHint{margin-left:0}
+  .stageDetailPanel{width:100vw!important;max-height:100dvh!important;height:100dvh!important;border-radius:0!important}
+  .stageDetailHeader{padding:16px!important}.stageDetailScroll{padding:16px!important}
+  .stageDetailGrid{grid-template-columns:1fr!important}
+  .partyGrid,.votesOverview,.formalStats,.teacherPulse,.teacherAnalyticsCards,.profileGrid{grid-template-columns:1fr!important}
+  .partyIdentityTop,.partyHeadlineStats,.teacherPrimaryActions{grid-template-columns:1fr!important}
+  .formalWorkspace{grid-template-columns:1fr!important}
+  .formalRegistry{max-height:none!important}
+  .gradesRules{grid-template-columns:1fr!important}
+  .gradesDebrief{grid-template-columns:1fr!important}
+  .voteRuleStrip{grid-template-columns:1fr!important}
+  .voteResultBoard{grid-template-columns:1fr 1fr!important}
+  .voteVisual{grid-column:1/-1!important;order:-1}
+  .teacherAction{min-height:82px!important}
+  .teacherPlayerStats{overflow-x:auto}
+  .teacherPlayerStatsHead,.teacherPlayerStatsRow{min-width:760px}
+  .simChat{top:auto;height:min(80dvh,720px);border-radius:22px 22px 0 0}
+  .floatingChat{right:12px;bottom:12px}
+  .landingShell{grid-template-columns:1fr;gap:12px}
+  .landingIntro h2{font-size:36px}
+  .landingText{font-size:14px}
+  .featureGrid,.infoStrip,.loginTips{grid-template-columns:1fr}
+  .loginCard{padding:20px;border-radius:20px}
+}
+@media(prefers-reduced-motion:reduce){
+  .simMain>*,.landingShell,.stageCard.open .stageNo,.livePill.on{animation:none!important}
+}
