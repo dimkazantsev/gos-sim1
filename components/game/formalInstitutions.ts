@@ -7,7 +7,8 @@ export const FORMAL_SUBJECTS:FormalSubject[]=[
  {key:'president',label:'Президент Российской Федерации',short:'Президент РФ',roleHints:['президент'],signatureTitle:'Президент Российской Федерации',workflow:'president_act',defaultType:'president_decree'},
  {key:'gd_deputy',label:'Депутат Государственной Думы',short:'Депутат ГД',roleHints:['депутат'],signatureTitle:'Депутат Государственной Думы',workflow:'bill',defaultType:'fz_bill'},
  {key:'gd',label:'Государственная Дума Федерального Собрания РФ',short:'Государственная Дума',roleHints:['государственн','дум'],signatureTitle:'Председатель Государственной Думы',workflow:'gd_resolution',defaultType:'gd_resolution'},
- {key:'sf',label:'Совет Федерации Федерального Собрания РФ',short:'Совет Федерации',roleHints:['совет федерац','сенатор'],signatureTitle:'Председатель Совета Федерации',workflow:'sf_resolution',defaultType:'sf_resolution'},
+ {key:'sf',label:'Совет Федерации Федерального Собрания РФ',short:'Совет Федерации',roleHints:['совет федерац'],signatureTitle:'Председатель Совета Федерации',workflow:'sf_resolution',defaultType:'sf_resolution'},
+ {key:'sf_member',label:'Сенатор Российской Федерации',short:'Сенатор РФ',roleHints:['сенатор'],signatureTitle:'Сенатор Российской Федерации',workflow:'bill',defaultType:'fz_bill'},
  {key:'government',label:'Правительство Российской Федерации',short:'Правительство РФ',roleHints:['правительств','председатель правительств'],signatureTitle:'Председатель Правительства Российской Федерации',workflow:'government_act',defaultType:'government_resolution'},
  {key:'region',label:'Законодательный орган субъекта РФ',short:'Субъект РФ',roleHints:['регион','субъект','законодательн'],signatureTitle:'Председатель законодательного органа субъекта РФ',workflow:'bill',defaultType:'fz_bill'},
  {key:'ks',label:'Конституционный Суд Российской Федерации',short:'КС РФ',roleHints:['конституционн','суд'],signatureTitle:'Председатель Конституционного Суда Российской Федерации',workflow:'bill',defaultType:'fz_bill'},
@@ -50,7 +51,8 @@ export function inferFormal(text:string,title:string,roleTitle?:string|null){
  const role=(roleTitle||'').toLowerCase();
  if(/президент/.test(hay)||/президент/.test(role))subject='president';
  else if(/правительств/.test(hay)||/правительств/.test(role)||/председател.*правительств/.test(role))subject='government';
- else if(/совет.*федерац|сенатор/.test(hay)||/совет.*федерац|сенатор/.test(role))subject='sf';
+ else if(/сенатор/.test(role))subject='sf_member';
+ else if(/совет.*федерац/.test(hay)||/совет.*федерац/.test(role))subject='sf';
  else if(/конституционн.*суд/.test(hay)||/конституционн.*суд/.test(role))subject='ks';
  else if(/верховн.*суд/.test(hay)||/верховн.*суд/.test(role))subject='vs';
  else if(/министерств|министр/.test(hay)||/министерств|министр/.test(role))subject='ministry';
