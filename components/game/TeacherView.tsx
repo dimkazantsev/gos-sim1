@@ -13,7 +13,7 @@ function timerText(seconds:number){
  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-export default function TeacherView({g}:{g:ReturnTypeRepublic}){
+export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void}){
  const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,setEvaluation,updateMember,updateMetric}=g;
  const [eventTitle,setEventTitle]=useState(''),[eventBody,setEventBody]=useState('');
  if(!game)return null;
@@ -60,8 +60,8 @@ export default function TeacherView({g}:{g:ReturnTypeRepublic}){
     <span>{game.turn_open?'Ⅱ':'▶'}</span>
     <div><b>{game.turn_open?'Поставить на паузу':'Открыть ход'}</b><small>{game.turn_open?'Временно остановить действия студентов':'Разрешить студентам выполнять задания'}</small></div>
    </button>
-   <button className="teacherAction" onClick={()=>{const el=document.querySelector('.wallPage');if(el)el.scrollIntoView({behavior:'smooth'});}}>
-    <span>◎</span><div><b>Политические процессы</b><small>Общее публичное пространство игры теперь находится в ленте</small></div>
+   <button className="teacherAction" onClick={onOpenProcesses}>
+    <span>◎</span><div><b>Политические процессы</b><small>Открыть общее публичное пространство игры</small></div>
    </button>
    <button className="teacherAction" onClick={confirmNext}>
     <span>→</span><div><b>Следующий этап</b><small>Завершить текущий и перейти дальше</small></div>
