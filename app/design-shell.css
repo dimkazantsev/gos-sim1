@@ -95,7 +95,8 @@
 .viewAsSwitcher.active{border-color:#c9c9ff!important;background:#f5f5ff!important}
 .topChatButton{min-height:40px;padding:0 12px;border:1px solid var(--gs-border);border-radius:11px;background:#fff;color:var(--gs-ink-2);display:flex;align-items:center;gap:7px;font-size:10px;font-weight:650;box-shadow:var(--gs-shadow-xs)}.topChatButton svg{width:15px;height:15px}.topChatButton:hover,.topChatButton.active{border-color:#c8c8ff;background:#f6f6ff;color:#4849dc}
 
-.simContentFlow{min-width:0;padding:18px 24px 80px}
+.simContentFlow{min-width:0;padding:18px 24px 80px;transition:padding-right .2s ease}
+.simWorkspace.chatOpen .simContentFlow{padding-right:calc(var(--gs-chat-w) + 24px)}
 .simMain{width:min(var(--gs-content-max),100%)!important;min-height:auto!important;margin:0 auto!important;padding:18px 0 0!important}
 .statePulseDock,.crisisShell{width:min(var(--gs-content-max),100%)!important;margin-left:auto!important;margin-right:auto!important}
 .simChat{
