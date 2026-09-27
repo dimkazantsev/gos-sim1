@@ -13,7 +13,7 @@ function timerText(seconds:number){
 }
 
 export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpenScreen:()=>void}){
- const {game,currentStage,members,metrics,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,setEvaluation,updateMember,updateMetric}=g;
+ const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,setEvaluation,updateMember,updateMetric}=g;
  const [eventTitle,setEventTitle]=useState(''),[eventBody,setEventBody]=useState('');
  if(!game)return null;
 
@@ -96,6 +96,22 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
      </div>)}
     </div>
    </article>
+  </section>
+
+  <section className="surface teacherRepresentation">
+   <div className="surfaceHead"><div><small>ПРЕДСТАВИТЕЛЬСТВО В ГД</small><h2>Фракции, студенты и мандаты</h2></div><span>{parties.reduce((a,p)=>a+Number(p.mandates||0),0)}/450</span></div>
+   <div className="teacherPartyMatrix">
+    {parties.length===0?<div className="emptyState">Партии ещё не созданы.</div>:parties.map(p=>{
+      const pm=members.filter(m=>m.kind==='student'&&m.team===p.name);
+      const leader=members.find(m=>m.user_id===p.leader_user_id);
+      const pending=partyInvitations.filter(i=>i.party_id===p.id&&i.status==='pending').length;
+      return <article key={p.id}>
+       <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{leader?'Руководитель: '+leader.full_name:'Руководитель не назначен'}</small></div><strong>{p.mandates}</strong></header>
+       <div className="teacherPartyStats"><span>{pm.length} студентов</span><span>{p.ghost_active?('GV −'+p.ghost_loss_current):'GV нет'}</span><span>{pending} приглашений</span><span>{Math.max(0,p.mandates-p.ghost_loss_current)} голосов сейчас</span></div>
+       <div className="teacherMandateRows">{pm.map(m=>{const a=partyMandates.find(x=>x.party_id===p.id&&x.user_id===m.user_id);return <div key={m.user_id}><b>{m.full_name}</b><span>{a?.base_mandates||0} манд.</span><em>{a?.ghost_loss?('−'+a.ghost_loss+' GV'):'—'}</em><strong>{a?.effective_mandates||0} голосов</strong></div>})}</div>
+      </article>
+    })}
+   </div>
   </section>
 
   <details className="teacherDetails">
