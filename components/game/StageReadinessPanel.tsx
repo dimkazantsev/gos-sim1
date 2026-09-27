@@ -44,8 +44,8 @@ export default function StageReadinessPanel({g,stageNo,compact=false}:{g:ReturnT
 
  return <section className={'stageReadinessPanel '+status}>
   <header><div><small>ПРОЦЕДУРНАЯ ГОТОВНОСТЬ</small><h3>{title}</h3><p>{card?.institution||'Игровой институт'} · этап {stageNo}</p></div><strong>{status==='ready'?'✓':status==='warning'?'!':status==='loading'?'…':'×'}</strong></header>
-  {state?.blockers?.length>0&&<div className="stageReadinessGroup blockers"><b>Обязательно завершить</b><ul>{state.blockers.map(x=><li key={x}>{x}</li>)}</ul></div>}
-  {state?.warnings?.length>0&&<div className="stageReadinessGroup warnings"><b>Проверьте перед переходом</b><ul>{state.warnings.map(x=><li key={x}>{x}</li>)}</ul></div>}
+  {!!state&&state.blockers.length>0&&<div className="stageReadinessGroup blockers"><b>Обязательно завершить</b><ul>{state.blockers.map(x=><li key={x}>{x}</li>)}</ul></div>}
+  {!!state&&state.warnings.length>0&&<div className="stageReadinessGroup warnings"><b>Проверьте перед переходом</b><ul>{state.warnings.map(x=><li key={x}>{x}</li>)}</ul></div>}
   {state?.ready&&!state.warnings?.length&&<div className="stageReadinessOk">Ключевые процедуры этого этапа зафиксированы в системе.</div>}
   <button className="secondary stageReadinessRefresh" onClick={()=>void load()} disabled={loading}>↻ Перепроверить</button>
  </section>;
