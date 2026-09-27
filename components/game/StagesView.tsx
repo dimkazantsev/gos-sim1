@@ -18,6 +18,8 @@ import MunicipalProjectLab from './MunicipalProjectLab';
 import SystemDebriefLab from './SystemDebriefLab';
 import LegislativeSessionLab from './LegislativeSessionLab';
 import GovernmentProgramSessionLab from './GovernmentProgramSessionLab';
+import CrisisRoom from './CrisisRoom';
+import StageReadinessPanel from './StageReadinessPanel';
 
 export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
@@ -170,7 +172,11 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
 
      {selected.stage_no===14&&<MunicipalProjectLab g={g}/>} 
 
+     {selected.stage_no===15&&<CrisisRoom g={g}/>} 
+
      {selected.stage_no===16&&<SystemDebriefLab g={g}/>} 
+
+     <StageReadinessPanel g={g} stageNo={selected.stage_no}/>
 
      {teacher&&<section className="stageTeacherActions">
       <div><small>УПРАВЛЕНИЕ ЭТАПОМ</small><b>Действия преподавателя</b></div>
