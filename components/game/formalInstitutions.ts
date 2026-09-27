@@ -20,6 +20,7 @@ export const FORMAL_SUBJECTS:FormalSubject[]=[
 export const FORMAL_TYPES:FormalDocType[]=[
  {key:'fz_bill',label:'Проект федерального закона',workflow:'bill',prefix:'Проект ФЗ'},
  {key:'fkz_bill',label:'Проект федерального конституционного закона',workflow:'bill',prefix:'Проект ФКЗ'},
+ {key:'federal_budget',label:'Проект федерального закона о федеральном бюджете',workflow:'budget',prefix:'Федеральный бюджет'},
  {key:'president_decree',label:'Указ Президента РФ',workflow:'president_act',prefix:'Указ'},
  {key:'president_order',label:'Распоряжение Президента РФ',workflow:'president_act',prefix:'Распоряжение'},
  {key:'government_resolution',label:'Постановление Правительства РФ',workflow:'government_act',prefix:'Постановление'},
@@ -36,7 +37,8 @@ export function inferFormal(text:string,title:string,roleTitle?:string|null){
  const hay=(title+'\n'+text).toLowerCase();
  let type='other';
  let subject='gd_deputy';
- if(/федеральн(ый|ого) конституционн(ый|ого) закон|фкз/.test(hay))type='fkz_bill';
+ if(/федеральн(ый|ого) бюджет|закон.*о федеральном бюджете|проект.*федерального бюджета/.test(hay))type='federal_budget';
+ else if(/федеральн(ый|ого) конституционн(ый|ого) закон|фкз/.test(hay))type='fkz_bill';
  else if(/федеральн(ый|ого) закон|законопроект/.test(hay))type='fz_bill';
  else if(/указ.*президент|президент.*указ/.test(hay))type='president_decree';
  else if(/распоряжение.*президент/.test(hay))type='president_order';
@@ -75,7 +77,7 @@ export function ownerLabel(key:string){
  return {
   author:'Автор / субъект инициативы',gd_staff:'Аппарат / Председатель ГД',committee:'Профильный комитет',
   gd_council:'Совет Государственной Думы',gd:'Государственная Дума',sf:'Совет Федерации',
-  president:'Президент РФ',government:'Правительство РФ',ministry:'Министерство',municipality:'Муниципальный орган',
+  president:'Президент РФ',government:'Правительство РФ',ministry:'Министерство',municipality:'Муниципальный орган',conciliation:'Согласительная комиссия',
   teacher:'Преподаватель',system:'Завершено'
  }[key]||key;
 }
