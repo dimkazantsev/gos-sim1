@@ -2,6 +2,7 @@
 import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {PoliticalPost,View} from './types';
+import MediaUploadButton from './MediaUploadButton';
 
 const PROCESS_TYPES=[
  ['statement','Заявление'],['initiative','Инициатива'],['decision','Проект решения'],['event','Событие'],
@@ -95,10 +96,10 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     <label># Теги<input value={tagText} onChange={e=>setTagText(e.target.value)} placeholder="президентрф гдрф экономика"/></label>
     <label>Внешняя ссылка<input value={externalUrl} onChange={e=>setExternalUrl(e.target.value)} placeholder="https://…"/></label>
     <label>Внутренняя ссылка<select value={internalView} onChange={e=>setInternalView(e.target.value)}><option value="">Нет</option><option value="votes">Голосования</option><option value="documents">НПА</option><option value="parties">Партии</option><option value="stages">Этапы</option></select></label>
-    <label>Медиа<input type="file" multiple accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.txt" onChange={e=>setFiles(Array.from(e.target.files||[]))}/></label>
+    <MediaUploadButton files={files} onChange={setFiles} label="Добавить медиа" hint="Фото, видео, аудио или файл"/>
    </div>
    <details className="wallFormalAttach"><summary>▤ Прикрепить НПА <span>{formalIds.length||''}</span></summary><div>{formalDocuments.length===0?<p>НПА ещё нет.</p>:formalDocuments.map(d=><label key={d.id}><input type="checkbox" checked={formalIds.includes(d.id)} onChange={e=>setFormalIds(x=>e.target.checked?[...x,d.id]:x.filter(id=>id!==d.id))}/><span><b>{d.registry_no}</b>{d.title}</span></label>)}</div></details>
-   {files.length>0&&<div className="wallSelectedFiles">{files.map(f=><span key={f.name}>{f.name}</span>)}</div>}
+}
    <div className="wallComposerActions"><span>Публикация станет частью официального журнала игры.</span><button className="primary" disabled={busy||!title.trim()||!body.trim()} onClick={publish}>{busy?'Публикую…':'Опубликовать'}</button></div>
   </section>
 
