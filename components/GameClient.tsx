@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {BookOpenText,ChevronLeft,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote,Wifi} from 'lucide-react';
+import {BookOpenText,ChevronLeft,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote,Wifi} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
@@ -157,6 +157,7 @@ export default function GameClient({gameId}:{gameId:string}){
  const [view,setView]=useState<View>('dashboard');
  const [focusFormalId,setFocusFormalId]=useState('');
  const [viewAs,setViewAs]=useState('');
+ const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
 
  const genericStudent:Member|undefined=teacher&&game?{
@@ -199,6 +200,8 @@ export default function GameClient({gameId}:{gameId:string}){
   const P=key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='parties'?Landmark:key==='votes'?Vote:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:UserRound;
   return <P aria-hidden="true" strokeWidth={1.9}/>;
  };
+ const mobilePrimary:View[]=teacher&&!previewMode?['teacher','dashboard','stages','votes']:['dashboard','stages','parties','votes'];
+ const mobileSecondary=nav.filter(([k])=>!mobilePrimary.includes(k));
 
  return <div className={'simShell '+(previewMode?'studentPreviewShell':'')}>
   <aside className="simSidebar">
@@ -281,9 +284,15 @@ export default function GameClient({gameId}:{gameId:string}){
    {chatOpen&&<ChatPanel g={vg}/>}
   </div>
 
+  {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
+   <section className="mobileMoreSheet" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
+    <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><button onClick={()=>setMobileMenuOpen(false)}>×</button></header>
+    <div>{mobileSecondary.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>{setView(k);setMobileMenuOpen(false)}}>{navIcon(k)}<span>{label}</span></button>)}</div>
+   </section>
+  </div>}
   <nav className="mobileDock" aria-label="Мобильная навигация">
-   {nav.slice(0,5).map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>setView(k)}>{navIcon(k)}<span>{label}</span></button>)}
-   <button className={view==='profile'?'active':''} onClick={()=>setView('profile')}><UserRound/><span>Ещё</span></button>
+   {mobilePrimary.map(k=>{const item=nav.find(([x])=>x===k);if(!item)return null;return <button key={k} className={view===k?'active':''} onClick={()=>{setView(k);setMobileMenuOpen(false)}}>{navIcon(k)}<span>{item[1]}</span></button>})}
+   <button className={mobileSecondary.some(([k])=>k===view)?'active':''} onClick={()=>setMobileMenuOpen(true)}><Menu/><span>Ещё</span></button>
   </nav>
  </div>;
 }
