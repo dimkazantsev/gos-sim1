@@ -13,7 +13,7 @@ const DOCS:{kind:PartyDocument['doc_kind'];title:string;rule:string}[]=[
 ];
 
 export default function PartiesView({g}:{g:ReturnTypeRepublic}){
- const {parties,members,profiles,partyDocuments,partyInvitations,partyMandates,me,teacher,createParty,updateParty,setPartyLeader,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,applyPartyGhostLoss,clearPartyGhostLoss,savePartyIdentity,uploadPartyDocument,reviewPartyDocument}=g;
+ const {parties,members,profiles,partyDocuments,partyInvitations,partyMandates,me,teacher,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,applyPartyGhostLoss,clearPartyGhostLoss,savePartyIdentity,uploadPartyDocument,reviewPartyDocument}=g;
  const [name,setName]=useState(''),[ideology,setIdeology]=useState('');
  const [selectedId,setSelectedId]=useState('');
  const [desc,setDesc]=useState('');
@@ -117,7 +117,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
 
     {teacher&&<div className="partyTeacherControl">
      <label>Руководитель партии<select value={selected.leader_user_id||''} onChange={e=>{if(e.target.value)void setPartyLeader(selected.id,e.target.value)}}><option value="">Назначить руководителя…</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}{m.team?' · '+m.team:''}</option>)}</select></label>
-     <label>Мандаты партии<input type="number" min="0" max="450" value={selected.mandates} onChange={e=>void updateParty(selected.id,{mandates:Math.max(0,Math.min(450,Number(e.target.value)||0))})}/></label>
+     <label>Мандаты партии<input key={selected.id+'-'+selected.mandates} type="number" min="0" max="450" defaultValue={selected.mandates} onBlur={e=>void setPartyMandates(selected.id,Math.max(0,Math.min(450,Number(e.target.value)||0)))}/></label>
      <label>Ghost voting<input type="number" min="25" max="50" value={ghostLoss} onChange={e=>setGhostLoss(Math.max(25,Math.min(50,Number(e.target.value)||25)))}/></label>
      <button className="secondary" disabled={selected.mandates<=0} onClick={()=>void applyPartyGhostLoss(selected.id,ghostLoss)}>⚡ Применить GV</button>
     </div>}
