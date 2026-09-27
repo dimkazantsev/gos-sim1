@@ -285,7 +285,7 @@ export default function GameClient({gameId}:{gameId:string}){
   </div>
 
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
-   <section className="mobileMoreSheet" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
+   <section className="mobileMoreSheet" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
     <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><button onClick={()=>setMobileMenuOpen(false)}>×</button></header>
     <div>{mobileSecondary.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>{setView(k);setMobileMenuOpen(false)}}>{navIcon(k)}<span>{label}</span></button>)}</div>
    </section>
