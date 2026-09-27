@@ -1052,3 +1052,12 @@ button,input,textarea,select{font-size:14px}
 .wallStageTaskCopy small{font-size:8.8px;font-weight:900;letter-spacing:.09em;color:#74869c}.wallStageTaskCopy h2{margin:3px 0 4px;color:#294563;font-size:15px}.wallStageTaskCopy p{max-width:850px;margin:0;color:#6d8098;font-size:10.5px;line-height:1.46}
 .wallStageTask>button{min-height:42px;padding:0 13px;white-space:nowrap}
 @media(max-width:720px){.wallStageTask{grid-template-columns:48px 1fr}.wallStageTaskNo{width:48px;height:48px}.wallStageTask>button{grid-column:1/-1;width:100%}}
+
+
+/* Auditable legacy-completion controls */
+.stageReadinessOverrideNotice{margin-top:9px;padding:9px 10px;border:1px solid #d9d3f1;border-radius:10px;background:#f7f5ff}
+.stageReadinessOverrideNotice b{display:block;color:#594a91;font-size:9.8px}.stageReadinessOverrideNotice p{margin:4px 0 0;color:#6e6689;font-size:10px;line-height:1.42}.stageReadinessOverrideNotice small{display:block;margin-top:4px;color:#9189a7;font-size:8.3px}
+.stageReadinessOverrideForm{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-top:9px;padding:9px 10px;border:1px dashed #d8c9a5;border-radius:10px;background:#fffaf0}
+.stageReadinessOverrideForm label{display:grid;gap:4px;color:#766b55;font-size:9px;font-weight:900}.stageReadinessOverrideForm textarea{width:100%;border:1px solid #dfd7c4;border-radius:9px;background:#fff;padding:8px 9px;color:#5f5748;font-size:10px;line-height:1.42;resize:vertical}.stageReadinessOverrideForm button{min-height:39px;max-width:230px}
+.stageReadinessClearOverride{margin-top:8px}
+@media(max-width:650px){.stageReadinessOverrideForm{grid-template-columns:1fr}.stageReadinessOverrideForm button{max-width:none;width:100%}}
