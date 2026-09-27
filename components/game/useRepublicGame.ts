@@ -2,14 +2,14 @@
 import {FormEvent,useEffect,useMemo,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
-import type {ActionItem,Activity,Ballot,Channel,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,Member,Message,Metric,Party,PartyDocument,Presence,Stage,Vote} from './types';
+import type {ActionItem,Activity,Ballot,Channel,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,Member,Message,Metric,Party,PartyDocument,PartyInvitation,PartyMandateAllocation,Presence,Stage,Vote} from './types';
 import {CRISES,INTENSITY_LABEL} from './constants';
 
 export function useRepublicGame(gameId:string){
  const router=useRouter();
  const [game,setGame]=useState<Game|null>(null),[me,setMe]=useState<Member|null>(null),[metrics,setMetrics]=useState<Metric[]>([]),[events,setEvents]=useState<EventItem[]>([]),[actions,setActions]=useState<ActionItem[]>([]),[members,setMembers]=useState<Member[]>([]);
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]);
- const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profiles,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]);
+ const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profiles,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[partyInvitations,setPartyInvitations]=useState<PartyInvitation[]>([]),[partyMandates,setPartyMandates]=useState<PartyMandateAllocation[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]);
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[chatOpen,setChatOpen]=useState(true),[secondsLeft,setSecondsLeft]=useState(0);
  const [recording,setRecording]=useState<'audio'|'video'|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]);
@@ -39,6 +39,8 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'*',schema:'public',table:'game_presence',filter:'game_id=eq.'+gameId},()=>void loadClassroomTelemetry())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_profiles',filter:'game_id=eq.'+gameId},()=>void loadPartyAssets())
    .on('postgres_changes',{event:'*',schema:'public',table:'party_documents',filter:'game_id=eq.'+gameId},()=>void loadPartyAssets())
+   .on('postgres_changes',{event:'*',schema:'public',table:'party_invitations',filter:'game_id=eq.'+gameId},()=>void loadPartyRepresentation())
+   .on('postgres_changes',{event:'*',schema:'public',table:'party_member_mandates',filter:'game_id=eq.'+gameId},()=>void loadPartyRepresentation())
    .on('postgres_changes',{event:'*',schema:'public',table:'formal_documents',filter:'game_id=eq.'+gameId},()=>void loadFormalRegistry())
    .on('postgres_changes',{event:'*',schema:'public',table:'formal_document_history',filter:'game_id=eq.'+gameId},()=>void loadFormalRegistry())
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_channels',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
@@ -63,7 +65,7 @@ export function useRepublicGame(gameId:string){
   if(show)setLoading(true);
   const u=(await supabase.auth.getUser()).data.user;
   if(!u){router.replace('/');return}
-  const [g,m,mt,ev,ac,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,fd,fh]=await Promise.all([
+  const [g,m,mt,ev,ac,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,fd,fh]=await Promise.all([
    supabase.from('games').select('*').eq('id',gameId).single(),
    supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',u.id).single(),
    supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label'),
@@ -82,6 +84,8 @@ export function useRepublicGame(gameId:string){
    supabase.from('game_presence').select('*').eq('game_id',gameId).order('last_seen_at',{ascending:false}),
    supabase.from('game_profiles').select('*').eq('game_id',gameId),
    supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('party_invitations').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('party_member_mandates').select('*').eq('game_id',gameId),
    supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}),
    supabase.from('formal_document_history').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
   ]);
@@ -95,7 +99,7 @@ export function useRepublicGame(gameId:string){
   const profileRows=await Promise.all(rawProfiles.map(async x=>x.avatar_path?{...x,avatar_url:(await supabase.storage.from('game-assets').createSignedUrl(x.avatar_path,3600)).data?.signedUrl||null}:x));
   const partyRows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
   const docRows=await Promise.all(rawPartyDocs.map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
-  setProfiles(profileRows);setParties(partyRows);setPartyDocuments(docRows);
+  setProfiles(profileRows);setParties(partyRows);setPartyDocuments(docRows);setPartyInvitations((pi.data||[]) as PartyInvitation[]);setPartyMandates((pm.data||[]) as PartyMandateAllocation[]);
   const formalRows=await Promise.all(((fd.data||[]) as FormalDocument[]).map(async x=>x.source_file_path?{...x,file_url:(await supabase.storage.from('game-assets').createSignedUrl(x.source_file_path,3600)).data?.signedUrl||null}:x));
   setFormalDocuments(formalRows);setFormalHistory((fh.data||[]) as FormalHistory[]);
   if(!channelRef.current&&ch.data?.[0])setChannelId(ch.data[0].id);
@@ -128,6 +132,22 @@ export function useRepublicGame(gameId:string){
   if(!pd.error){
    const rows=await Promise.all(((pd.data||[]) as PartyDocument[]).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
    setPartyDocuments(rows);
+  }
+ }
+
+ async function loadPartyRepresentation(){
+  const [pi,pm,pa,mb]=await Promise.all([
+   supabase.from('party_invitations').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('party_member_mandates').select('*').eq('game_id',gameId),
+   supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}),
+   supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name')
+  ]);
+  if(!pi.error)setPartyInvitations((pi.data||[]) as PartyInvitation[]);
+  if(!pm.error)setPartyMandates((pm.data||[]) as PartyMandateAllocation[]);
+  if(!mb.error)setMembers((mb.data||[]) as Member[]);
+  if(!pa.error){
+   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
+   setParties(rows);
   }
  }
 
@@ -187,11 +207,40 @@ export function useRepublicGame(gameId:string){
   await refresh();return true;
  }
  async function updateParty(id:string,patch:Partial<Party>){const r=await supabase.from('game_parties').update(patch).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
- async function assignParty(userId:string,team:string){
-  const r=await supabase.from('game_members').update({team:team||null}).eq('game_id',gameId).eq('user_id',userId);if(r.error){setError(r.error.message);return}
-  const teamChannels=channels.filter(c=>c.kind==='team');if(teamChannels.length)await supabase.from('channel_members').delete().eq('user_id',userId).in('channel_id',teamChannels.map(c=>c.id));
-  if(team){const c=teamChannels.find(x=>x.name==='Фракция · '+team);if(c)await supabase.from('channel_members').upsert({channel_id:c.id,user_id:userId})}
-  await refresh();
+ async function setPartyLeader(partyId:string,userId:string){
+  const r=await supabase.rpc('set_party_leader',{p_party_id:partyId,p_user_id:userId});
+  if(r.error){setError(r.error.message);return false}
+  await loadPartyRepresentation();return true;
+ }
+ async function inviteToParty(partyId:string,userId:string){
+  const r=await supabase.rpc('invite_to_party',{p_party_id:partyId,p_user_id:userId});
+  if(r.error){setError(r.error.message);return false}
+  await loadPartyRepresentation();return true;
+ }
+ async function respondPartyInvitation(invitationId:string,accept:boolean){
+  const r=await supabase.rpc('respond_party_invitation',{p_invitation_id:invitationId,p_accept:accept});
+  if(r.error){setError(r.error.message);return false}
+  await loadPartyRepresentation();return true;
+ }
+ async function cancelPartyInvitation(invitationId:string){
+  const r=await supabase.rpc('cancel_party_invitation',{p_invitation_id:invitationId});
+  if(r.error){setError(r.error.message);return false}
+  await loadPartyRepresentation();return true;
+ }
+ async function removePartyMember(partyId:string,userId:string){
+  const r=await supabase.rpc('remove_party_member',{p_party_id:partyId,p_user_id:userId});
+  if(r.error){setError(r.error.message);return false}
+  await loadPartyRepresentation();return true;
+ }
+ async function applyPartyGhostLoss(partyId:string,loss:number){
+  const r=await supabase.rpc('apply_party_ghost_loss',{p_party_id:partyId,p_loss:loss});
+  if(r.error){setError(r.error.message);return false}
+  await refresh();return true;
+ }
+ async function clearPartyGhostLoss(partyId?:string){
+  const r=await supabase.rpc('clear_party_ghost_loss',{p_game_id:gameId,p_party_id:partyId||null});
+  if(r.error){setError(r.error.message);return false}
+  await refresh();return true;
  }
  async function updateMember(userId:string,patch:Partial<Pick<Member,'role_title'|'score'>>){const r=await supabase.from('game_members').update(patch).eq('game_id',gameId).eq('user_id',userId);if(r.error)setError(r.error.message);else await refresh()}
 
@@ -237,15 +286,19 @@ export function useRepublicGame(gameId:string){
  function canVote(v:Vote){
   if(!me)return false;
   if(v.voting_mode==='member')return memberMatchesInstitution(me.user_id,v.institution_key||'all');
-  const p=partyForUser(me.user_id);return !!p&&p.leader_user_id===me.user_id;
+  const p=partyForUser(me.user_id);if(!p)return false;
+  if(v.voting_mode==='faction')return p.leader_user_id===me.user_id;
+  return (partyMandates.find(x=>x.user_id===me.user_id&&x.party_id===p.id)?.effective_mandates||0)>0;
  }
  function ballotWeight(v:Vote){
   if(v.voting_mode==='member')return canVote(v)?1:0;
-  const p=partyForUser(me?.user_id||'');if(!p)return 0;return v.voting_mode==='mandate'?Math.max(1,p.mandates):1;
+  const p=partyForUser(me?.user_id||'');if(!p)return 0;
+  if(v.voting_mode==='faction')return p.leader_user_id===me?.user_id?1:0;
+  return partyMandates.find(x=>x.user_id===me?.user_id&&x.party_id===p.id)?.effective_mandates||0;
  }
  function eligibleWeight(v:Vote){
   if(v.voting_mode==='faction')return parties.filter(p=>p.leader_user_id).length;
-  if(v.voting_mode==='mandate')return parties.filter(p=>p.leader_user_id).reduce((a,p)=>a+Math.max(1,Number(p.mandates)||0),0);
+  if(v.voting_mode==='mandate')return parties.reduce((a,p)=>a+Math.max(0,Number(p.mandates)||0),0);
   return members.filter(m=>memberMatchesInstitution(m.user_id,v.institution_key||'all')).length;
  }
  function quorum(v:Vote){
@@ -289,10 +342,11 @@ export function useRepublicGame(gameId:string){
   if(cr.error||ev.error)setError(cr.error?.message||ev.error?.message||'Ошибка кризиса');else await refresh();
  }
  async function ghostVoting(){
-  if(!teacher||!me||!parties.length){setError('Сначала создайте партии.');return}const loss=25+Math.floor(Math.random()*26);const p=parties[Math.floor(Math.random()*parties.length)];const description='Ghost voting: фракция «'+p.name+'» случайно теряет '+loss+' депутатов на ближайшем заседании ГД.';
-  const cr=await supabase.from('game_crises').insert({game_id:gameId,stage_no:5,crisis_type:'Ghost voting',intensity:'medium',description,created_by:me.user_id});
-  const ev=await supabase.from('game_events').insert({game_id:gameId,round_no:5,category:'Ghost voting',severity:'warning',title:'Результат ghost voting',body:description,created_by:me.user_id});
-  if(cr.error||ev.error)setError(cr.error?.message||ev.error?.message||'Ошибка ghost voting');else await refresh();
+  if(!teacher||!me||!parties.length){setError('Сначала создайте партии.');return}
+  const eligible=parties.filter(p=>p.mandates>0);if(!eligible.length){setError('Сначала распределите мандаты между партиями.');return}
+  const p=eligible[Math.floor(Math.random()*eligible.length)];
+  const loss=25+Math.floor(Math.random()*26);
+  return await applyPartyGhostLoss(p.id,loss);
  }
 
  async function createDocument(data:{title:string;type:string;body:string}){if(!teacher||!me||!data.title.trim())return false;const r=await supabase.from('game_documents').insert({game_id:gameId,title:data.title.trim(),doc_type:data.type.trim()||'Документ',body:data.body.trim()||null,created_by:me.user_id});if(r.error){setError(r.error.message);return false}await refresh();return true}
@@ -398,6 +452,6 @@ export function useRepublicGame(gameId:string){
   }catch(e){setError(e instanceof Error?e.message:'Нет доступа к микрофону/камере')}
  }
 
- return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,partyDocuments,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,createParty,updateParty,assignParty,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,toggleRecording};
+ return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,partyDocuments,partyInvitations,partyMandates,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
+  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,createParty,updateParty,setPartyLeader,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,applyPartyGhostLoss,clearPartyGhostLoss,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,toggleRecording};
 }
