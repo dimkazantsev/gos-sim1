@@ -5,11 +5,12 @@ import MediaUploadButton from './MediaUploadButton';
 import GradesView from './GradesView';
 
 export default function ProfileView({g}:{g:ReturnTypeRepublic}){
- const {me,profiles,parties,partyInvitations,partyMandates,averageVsn,actions,saveProfile}=g;
+ const {me,profiles,parties,partyInvitations,partyMandates,averageVsn,myEvaluations,actions,saveProfile}=g;
  const mine=profiles.find(x=>x.user_id===me?.user_id);
  const party=parties.find(p=>p.name===me?.team);
  const allocation=party?partyMandates.find(x=>x.party_id===party.id&&x.user_id===me?.user_id):undefined;
  const pendingInvites=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
+ const hasVsn=myEvaluations.length>0;
  const [bio,setBio]=useState(mine?.bio||'');
  const [file,setFile]=useState<File|null>(null);
  const [saving,setSaving]=useState(false);
@@ -31,7 +32,7 @@ export default function ProfileView({g}:{g:ReturnTypeRepublic}){
     <small>ЛИЧНЫЙ КАБИНЕТ</small>
     <h1>{me.full_name}</h1>
     <p>{me.role_title||'Участник деловой игры'}{party?' · '+party.name:''}</p>
-    <div className="profileChips"><span>{me.group_name||'Группа не указана'}</span><span>ВСН {averageVsn?averageVsn.toFixed(1):'—'}</span><span>{actions.filter(a=>a.author_id===me.user_id).length} решений</span>{allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}</div>
+    <div className="profileChips"><span>{me.group_name||'Группа не указана'}</span><span>ВСН {hasVsn?averageVsn.toFixed(1):'—'}</span><span>{actions.filter(a=>a.author_id===me.user_id).length} решений</span>{allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}</div>
    </div>
   </section>
 
@@ -58,7 +59,7 @@ export default function ProfileView({g}:{g:ReturnTypeRepublic}){
     <div className="profilePositionDivider"/>
 
     <div className="surfaceHead"><div><small>МОЯ ПОЗИЦИЯ</small><h2>В игре</h2></div></div>
-    <dl><div><dt>Партия</dt><dd>{me.team||'Не назначена'}</dd></div><div><dt>Роль</dt><dd>{me.role_title||'Не назначена'}</dd></div><div><dt>ВСН</dt><dd>{averageVsn?averageVsn.toFixed(1):'—'}</dd></div><div><dt>Решения</dt><dd>{actions.filter(a=>a.author_id===me.user_id).length}</dd></div></dl>
+    <dl><div><dt>Партия</dt><dd>{me.team||'Не назначена'}</dd></div><div><dt>Роль</dt><dd>{me.role_title||'Не назначена'}</dd></div><div><dt>ВСН</dt><dd>{hasVsn?averageVsn.toFixed(1):'—'}</dd></div><div><dt>Решения</dt><dd>{actions.filter(a=>a.author_id===me.user_id).length}</dd></div></dl>
     {mine?.bio&&<div className="profileBioPreview"><small>Описание</small><p>{mine.bio}</p></div>}
    </aside>
   </section>
