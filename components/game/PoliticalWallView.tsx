@@ -99,7 +99,6 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     <MediaUploadButton files={files} onChange={setFiles} label="Добавить медиа" hint="Фото, видео, аудио или файл"/>
    </div>
    <details className="wallFormalAttach"><summary>▤ Прикрепить НПА <span>{formalIds.length||''}</span></summary><div>{formalDocuments.length===0?<p>НПА ещё нет.</p>:formalDocuments.map(d=><label key={d.id}><input type="checkbox" checked={formalIds.includes(d.id)} onChange={e=>setFormalIds(x=>e.target.checked?[...x,d.id]:x.filter(id=>id!==d.id))}/><span><b>{d.registry_no}</b>{d.title}</span></label>)}</div></details>
-}
    <div className="wallComposerActions"><span>Публикация станет частью официального журнала игры.</span><button className="primary" disabled={busy||!title.trim()||!body.trim()} onClick={publish}>{busy?'Публикую…':'Опубликовать'}</button></div>
   </section>
 
