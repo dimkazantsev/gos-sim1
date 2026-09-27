@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
+import {Activity,BookOpenText,ChevronLeft,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote,Wifi} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
@@ -188,71 +189,101 @@ export default function GameClient({gameId}:{gameId:string}){
 
  if(loading||!game||!me||!shownMe)return <main className="loginPage"><div className="loaderCard"><div className="spinner"/><div><b>GOS//SIM</b><p className="muted">{error||'Подключение к игре…'}</p></div></div></main>;
 
- const nav:[View,string,string][] = previewMode
-  ? [['dashboard','◎','Политические процессы'],['parties','◈','Партия'],['votes','✓','Голосование'],['documents','▤','НПА'],['stages','◫','Этапы'],['grades','★','Оценки'],['profile','●','Мой профиль']]
+ const nav:[View,string][] = previewMode
+  ? [['dashboard','Процессы'],['parties','Партия'],['votes','Голосование'],['documents','НПА'],['stages','Этапы'],['grades','Оценки'],['profile','Профиль']]
   : teacher
-   ? [['teacher','✦','Управление'],['dashboard','◎','Политические процессы'],['parties','◈','Партии'],['votes','✓','Голосования'],['documents','▤','НПА'],['stages','◫','Этапы'],['grades','★','Оценки'],['profile','●','Профиль']]
-   : [['dashboard','◎','Политические процессы'],['parties','◈','Партия'],['votes','✓','Голосование'],['documents','▤','НПА'],['stages','◫','Этапы'],['grades','★','Оценки'],['profile','●','Мой профиль']];
+   ? [['teacher','Управление'],['dashboard','Процессы'],['parties','Партии'],['votes','Голосования'],['documents','НПА'],['stages','Этапы'],['grades','Оценки'],['profile','Профиль']]
+   : [['dashboard','Процессы'],['parties','Партия'],['votes','Голосование'],['documents','НПА'],['stages','Этапы'],['grades','Оценки'],['profile','Профиль']];
+
+ const navIcon=(key:View)=>{
+  const P=key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='parties'?Landmark:key==='votes'?Vote:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:UserRound;
+  return <P aria-hidden="true" strokeWidth={1.9}/>;
+ };
 
  return <div className={'simShell '+(previewMode?'studentPreviewShell':'')}>
-  <header className="simTop">
-   <div className="simBrand"><div className="simLogo">GS</div><div><b>GOS//SIM</b><span>Республика Политология</span></div></div>
-   <div className="simTopCenter">
-    <strong>{currentStage?.stage_no||game.current_round}. {currentStage?.title||game.title}</strong>
-    <div className="topIndicators">
-     <span className={`livePill ${game.turn_open?'on':'off'}`}>● {game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span>
-     {game.turn_open&&game.turn_ends_at&&<span className="timerPill">{fmtTimer(secondsLeft)}</span>}
-     <span className={`connectionPill ${g.realtimeState}`}>{g.realtimeState==='connected'?'● ONLINE':g.realtimeState==='connecting'?'○ SYNC':'! OFFLINE'}</span>
+  <aside className="simSidebar">
+   <div className="sidebarBrand">
+    <div className="simLogo"><ShieldCheck aria-hidden="true"/><span>GS</span></div>
+    <div><b>GOS//SIM</b><span>Республика Политология</span></div>
+   </div>
+
+   <section className="sidebarStage">
+    <div className="sidebarStageNumber">{String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</div>
+    <div><small>ТЕКУЩИЙ ЭТАП</small><b>{currentStage?.title||game.title}</b></div>
+    <span className={game.turn_open?'open':'paused'}>{game.turn_open?'Ход открыт':'Пауза'}</span>
+   </section>
+
+   <nav className="focusNav" aria-label="Разделы игры">
+    <div className="focusNavInner">
+     {nav.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>setView(k)} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{label}</span></button>)}
+    </div>
+   </nav>
+
+   <div className="sidebarFooter">
+    <div className="sidebarRealtime"><Wifi aria-hidden="true"/><span>{g.realtimeState==='connected'?'Синхронизация активна':g.realtimeState==='connecting'?'Подключение…':'Нет соединения'}</span><i className={g.realtimeState}/></div>
+    <div className="sidebarUser">
+     <div className="simAvatar">{initials(shownMe.full_name)}</div>
+     <div className="simUserText"><b>{shownMe.full_name}</b><span>{previewMode?'Просмотр · '+(shownMe.role_title||'Участник'):shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
+     {previewMode?<button aria-label="Вернуться к преподавателю" className="sidebarIconButton" onClick={()=>setViewAs('')}><ChevronLeft/></button>:<button aria-label="Выйти" className="sidebarIconButton" onClick={logout}><LogOut/></button>}
     </div>
    </div>
+  </aside>
 
-   {teacher&&<label className={'viewAsSwitcher '+(previewMode?'active':'')}>
-    <span>РЕЖИМ ПРОСМОТРА</span>
-    <select value={viewAs} onChange={e=>setViewAs(e.target.value)}>
-     <option value="">Преподаватель</option>
-     <option value={GENERIC_STUDENT}>Студент · типовой вид</option>
-     {g.members.some(m=>m.kind==='student')&&<optgroup label="Конкретный студент">
-      {g.members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}{m.role_title?' · '+m.role_title:''}</option>)}
-     </optgroup>}
-    </select>
-   </label>}
+  <div className="simWorkspace">
+   <header className="simTop">
+    <div className="mobileBrand"><div className="simLogo"><ShieldCheck aria-hidden="true"/><span>GS</span></div><b>GOS//SIM</b></div>
+    <div className="simTopCenter">
+     <div className="topStageCopy"><small>ЭТАП {String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</small><strong>{currentStage?.title||game.title}</strong></div>
+     <div className="topIndicators">
+      <span className={`livePill ${game.turn_open?'on':'off'}`}><Radio aria-hidden="true"/>{game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span>
+      {game.turn_open&&game.turn_ends_at&&<span className="timerPill">{fmtTimer(secondsLeft)}</span>}
+      <span className={`connectionPill ${g.realtimeState}`}><Wifi aria-hidden="true"/>{g.realtimeState==='connected'?'ONLINE':g.realtimeState==='connecting'?'SYNC':'OFFLINE'}</span>
+     </div>
+    </div>
 
-   <div className="simUser">
-    <div className="simAvatar">{initials(shownMe.full_name)}</div>
-    <div className="simUserText"><b>{shownMe.full_name}</b><span>{previewMode?'Просмотр · '+(shownMe.role_title||'Участник'):shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
-    {previewMode?<button className="logoutButton previewReturn" onClick={()=>setViewAs('')}>Вернуться</button>:<button className="logoutButton" onClick={logout}>Выйти</button>}
+    {teacher&&<label className={'viewAsSwitcher '+(previewMode?'active':'')}>
+     <span>РЕЖИМ ПРОСМОТРА</span>
+     <select value={viewAs} onChange={e=>setViewAs(e.target.value)}>
+      <option value="">Преподаватель</option>
+      <option value={GENERIC_STUDENT}>Студент · типовой вид</option>
+      {g.members.some(m=>m.kind==='student')&&<optgroup label="Конкретный студент">
+       {g.members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}{m.role_title?' · '+m.role_title:''}</option>)}
+      </optgroup>}
+     </select>
+    </label>}
+
+    <button className={`topChatButton ${chatOpen?'active':''}`} onClick={()=>setChatOpen(!chatOpen)} aria-label={chatOpen?'Закрыть связь':'Открыть связь'}><MessageCircle aria-hidden="true"/><span>Связь</span></button>
+   </header>
+
+   {previewMode&&<div className="studentPreviewBanner">
+    <div><Eye aria-hidden="true"/><p><b>Режим студента:</b> {shownMe.full_name}{shownMe.team?' · '+shownMe.team:''}{shownMe.role_title?' · '+shownMe.role_title:''}. <strong>Действия от его имени заблокированы.</strong></p></div>
+    <button onClick={()=>setViewAs('')}>Вернуться к преподавателю</button>
+   </div>}
+
+   <div className="simContentFlow">
+    <StateMetricsDock g={vg}/>
+    {!previewMode&&<div className="crisisShell"><CrisisRoom g={g}/></div>}
+
+    <main className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
+     {error&&<div className="errorBox closable" onClick={()=>setError('')}>{error}</div>}
+     {view==='dashboard'&&<PoliticalWallView g={vg} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>}
+     {view==='stages'&&<StagesView g={vg} onOpenVotes={()=>setView('votes')}/>}
+     {view==='parties'&&<PartiesView g={vg}/>}
+     {view==='votes'&&<VotesView g={vg} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onOpenStages={()=>setView('stages')}/>}
+     {view==='documents'&&<DocumentsView g={vg} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>}
+     {view==='grades'&&<GradesView g={vg}/>}
+     {view==='actions'&&<PoliticalWallView g={vg} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>}
+     {view==='profile'&&<ProfileView g={vg}/>}
+     {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>setView('dashboard')}/>}
+    </main>
    </div>
-  </header>
 
-  {previewMode&&<div className="studentPreviewBanner">
-   <div><span>👁</span><p><b>Ты смотришь игру глазами студента:</b> {shownMe.full_name}{shownMe.team?' · '+shownMe.team:''}{shownMe.role_title?' · '+shownMe.role_title:''}. <strong>Действия от его имени заблокированы.</strong></p></div>
-   <button onClick={()=>setViewAs('')}>Вернуться к роли преподавателя</button>
-  </div>}
+   {chatOpen&&<ChatPanel g={vg}/>}
+  </div>
 
-  <nav className="focusNav" aria-label="Разделы игры">
-   <div className="focusNavInner">
-    {nav.map(([k,ic,label])=><button key={k} className={view===k?'active':''} onClick={()=>setView(k)} aria-current={view===k?'page':undefined}><i>{ic}</i><span>{label}</span></button>)}
-   </div>
+  <nav className="mobileDock" aria-label="Мобильная навигация">
+   {nav.slice(0,5).map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>setView(k)}>{navIcon(k)}<span>{label}</span></button>)}
+   <button className={view==='profile'?'active':''} onClick={()=>setView('profile')}><UserRound/><span>Ещё</span></button>
   </nav>
-
-  <StateMetricsDock g={vg}/>
-
-  {!previewMode&&<div className="crisisShell"><CrisisRoom g={g}/></div>}
-
-  <main className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
-   {error&&<div className="errorBox closable" onClick={()=>setError('')}>{error}</div>}
-   {view==='dashboard'&&<PoliticalWallView g={vg} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>}
-   {view==='stages'&&<StagesView g={vg} onOpenVotes={()=>setView('votes')}/>}
-   {view==='parties'&&<PartiesView g={vg}/>}
-   {view==='votes'&&<VotesView g={vg} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onOpenStages={()=>setView('stages')}/>}
-   {view==='documents'&&<DocumentsView g={vg} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>} 
-   {view==='grades'&&<GradesView g={vg}/>} 
-   {view==='actions'&&<PoliticalWallView g={vg} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>}
-   {view==='profile'&&<ProfileView g={vg}/>}
-   {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>setView('dashboard')}/>}
-   {!chatOpen&&<button className="floatingChat" onClick={()=>{setChatOpen(true);if(!previewMode)void logActivity('navigation','Открыл связь','chat')}}>⌁ <span>Связь</span></button>}
-  </main>
-
-  {chatOpen&&<ChatPanel g={vg}/>}
  </div>;
 }
