@@ -74,12 +74,12 @@ export default function GameClient({gameId}:{gameId:string}){
 
   <main className={`simMain ${chatOpen?'chatOpen':''}`}>
    {error&&<div className="errorBox closable" onClick={()=>setError('')}>{error}</div>}
-   {view==='dashboard'&&<PoliticalWallView g={g} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}}/>}
+   {view==='dashboard'&&<PoliticalWallView g={g} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>} 
    {view==='stages'&&<StagesView g={g} onOpenVotes={()=>setView('votes')}/>} 
    {view==='parties'&&<PartiesView g={g}/>}
    {view==='votes'&&<VotesView g={g} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onOpenStages={()=>setView('stages')}/>} 
    {view==='documents'&&<DocumentsView g={g} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>} 
-   {view==='actions'&&<PoliticalWallView g={g} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}}/>}
+   {view==='actions'&&<PoliticalWallView g={g} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>} 
    {view==='profile'&&<ProfileView g={g}/>} 
    {view==='teacher'&&teacher&&<TeacherView g={g} onOpenScreen={openScreen}/>} 
    {!chatOpen&&<button className="floatingChat" onClick={()=>{setChatOpen(true);void logActivity('navigation','Открыл связь','chat')}}>⌁ <span>Связь</span></button>}
