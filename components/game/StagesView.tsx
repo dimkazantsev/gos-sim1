@@ -6,6 +6,7 @@ import {formatDeadline,stageIcon} from './constants';
 import {STAGE_DETAILS} from './stageDetails';
 import {GAME_PHASES,STAGE_SYSTEM,gamePhaseForStage} from './stageSystem';
 import DeadlineControl from './DeadlineControl';
+import PresidentialElectionLab from './PresidentialElectionLab';
 
 export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
@@ -135,6 +136,8 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
      </section>}
 
      <DeadlineControl g={g} stageNo={selected.stage_no}/>
+
+     {(selected.stage_no===6||selected.stage_no===7)&&<PresidentialElectionLab g={g}/>} 
 
      {teacher&&<section className="stageTeacherActions">
       <div><small>УПРАВЛЕНИЕ ЭТАПОМ</small><b>Действия преподавателя</b></div>
