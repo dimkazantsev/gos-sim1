@@ -255,13 +255,12 @@ export function useRepublicGame(gameId:string){
  }
  async function createPoliticalPost(data:{processType:string;actorKey:string;actorLabel:string;title:string;body:string;tags:string[];externalUrl?:string;internalView?:string;internalRefId?:string;formalIds?:string[]},files:File[]=[]){
   if(!me||!data.title.trim()||!data.body.trim())return null;
-  const r=await supabase.from('political_posts').insert({
-   game_id:gameId,author_id:me.user_id,process_type:data.processType,actor_key:data.actorKey,actor_label:data.actorLabel,
-   title:data.title.trim(),body:data.body.trim(),tags:data.tags,external_url:data.externalUrl?.trim()||null,
-   internal_view:data.internalView||null,internal_ref_id:data.internalRefId||null
-  }).select('id').single();
+  const r=await supabase.rpc('create_political_post',{
+   p_game_id:gameId,p_process_type:data.processType,p_actor_key:data.actorKey,p_title:data.title.trim(),p_body:data.body.trim(),
+   p_tags:data.tags,p_external_url:data.externalUrl?.trim()||null,p_internal_view:data.internalView||null,p_internal_ref_id:data.internalRefId||null
+  });
   if(r.error){setError(r.error.message);return null}
-  const postId=r.data.id as string;
+  const postId=r.data as string;
   if(data.formalIds?.length){
    const links=data.formalIds.map(id=>({game_id:gameId,post_id:postId,formal_document_id:id,created_by:me.user_id}));
    const lr=await supabase.from('political_post_formal_links').insert(links);if(lr.error)setError(lr.error.message);
