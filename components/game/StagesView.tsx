@@ -4,16 +4,33 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage} from './types';
 import {formatDeadline,stageIcon} from './constants';
 import {STAGE_DETAILS} from './stageDetails';
+import {GAME_PHASES,STAGE_SYSTEM,gamePhaseForStage} from './stageSystem';
 
 export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
  const [selected,setSelected]=useState<Stage|null>(null);
  const detail=selected?STAGE_DETAILS[selected.stage_no]:null;
+ const current=stages.find(s=>s.status==='open')||stages.find(s=>s.status!=='completed')||stages.at(-1);
+ const currentPhase=current?gamePhaseForStage(current.stage_no):GAME_PHASES[0];
+ const selectedSystem=selected?STAGE_SYSTEM[selected.stage_no]:null;
 
  return <>
   <section className="pageHeader">
    <div><small>АРХИТЕКТУРА ИГРЫ</small><h1>16 этапов «Республики Политология»</h1><p>Нажмите на любой этап — откроются полные правила, задачи, результаты и процедура.</p></div>
    {teacher&&<button className="primary" onClick={nextStage}>Открыть следующий этап</button>}
+  </section>
+
+  <section className="stagePhaseRail" aria-label="Фазы государственного строительства">
+   <div className="stagePhaseIntro"><small>КАРТА ГОСУДАРСТВА</small><b>{currentPhase.title}</b><span>Текущая фаза · этап {current?.stage_no||1} из 16</span></div>
+   <div className="stagePhaseTrack">{GAME_PHASES.map(p=>{
+    const completed=stages.filter(s=>s.stage_no>=p.range[0]&&s.stage_no<=p.range[1]&&s.status==='completed').length;
+    const total=p.range[1]-p.range[0]+1;
+    const active=!!current&&current.stage_no>=p.range[0]&&current.stage_no<=p.range[1];
+    return <button key={p.id} className={active?'active':''} onClick={()=>{const s=stages.find(x=>x.stage_no===p.range[0]);if(s)setSelected(s)}} style={{'--phase-accent':p.accent} as React.CSSProperties}>
+     <i>{String(p.range[0]).padStart(2,'0')}{p.range[1]!==p.range[0]?'–'+String(p.range[1]).padStart(2,'0'):''}</i>
+     <b>{p.short}</b><span>{completed}/{total}</span>
+    </button>
+   })}</div>
   </section>
 
   <div className="stageTimeline">
@@ -62,6 +79,12 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
       <small>СМЫСЛ ЭТАПА</small>
       <p>{detail.goal}</p>
      </section>
+
+     {selectedSystem&&<section className="stageSystemLens">
+      <div><small>ИНСТИТУЦИОНАЛЬНЫЙ РЕЖИМ</small><b>{selectedSystem.institution}</b><span>{selectedSystem.legalMode}</span></div>
+      <div><small>СТРАТЕГИЧЕСКИЙ ВОПРОС</small><p>{selectedSystem.strategicQuestion}</p></div>
+      <div><small>МЕХАНИКА ЭТАПА</small><p>{selectedSystem.gameMechanic}</p></div>
+     </section>}
 
      <div className="stageDetailGrid">
       <section className="stageDetailBlock stageSteps">
