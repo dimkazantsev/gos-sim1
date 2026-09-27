@@ -564,6 +564,16 @@ export function useRepublicGame(gameId:string){
  }
 
  async function sendText(text:string){if(!me||!channelId||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}await loadMessages(channelId);return true}
+ async function sendChatFile(file:File){
+  if(!me||!channelId)return false;
+  const ext=(file.name.split('.').pop()||'bin').toLowerCase();
+  const path=gameId+'/'+channelId+'/'+me.user_id+'/'+crypto.randomUUID()+'.'+ext;
+  const up=await supabase.storage.from('game-media').upload(path,file,{contentType:file.type||'application/octet-stream'});
+  if(up.error){setError(up.error.message);return false}
+  const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind:'file',text:file.name,storage_path:path,mime_type:file.type||null});
+  if(r.error){setError(r.error.message);return false}
+  await loadMessages(channelId);return true;
+ }
  async function toggleRecording(kind:'audio'|'video'){
   if(recorder.current?.state==='recording'){recorder.current.stop();return}
   if(!me||!channelId)return;
@@ -576,5 +586,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,partyDocuments,partyInvitations,partyMandates,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,applyPartyGhostLoss,clearPartyGhostLoss,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,toggleRecording};
+  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,applyPartyGhostLoss,clearPartyGhostLoss,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,toggleRecording};
 }
