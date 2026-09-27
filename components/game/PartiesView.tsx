@@ -2,6 +2,7 @@
 import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {PartyDocument} from './types';
+import MediaUploadButton from './MediaUploadButton';
 
 const DOCS:{kind:PartyDocument['doc_kind'];title:string;rule:string}[]=[
  {kind:'application',title:'Заявление о регистрации',rule:'Пункт а ст. 16 95-ФЗ'},
@@ -96,7 +97,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
     </div>
     <div className="partyHeadlineStats"><div><strong>{selected.support}%</strong><span>электоральная поддержка</span></div><div><strong>{selected.regions}</strong><span>контролируемых регионов</span></div><div><strong>{selected.mandates}</strong><span>мест в ГД</span></div><div><strong>{selected.ghost_active?Math.max(0,selected.mandates-selected.ghost_loss_current):selected.mandates}</strong><span>голосов на заседании</span></div><div><strong>{partyMembers.length}</strong><span>студентов</span></div></div>
     {selected.ghost_active&&<div className="partyGhostBanner"><span>⚡</span><div><small>GHOST VOTING · БЛИЖАЙШЕЕ ЗАСЕДАНИЕ</small><b>Фракция временно теряет {selected.ghost_loss_current} депутатов</b><p>Номинально {selected.mandates}, на текущем заседании доступно {Math.max(0,selected.mandates-selected.ghost_loss_current)} голосов.</p></div>{teacher&&<button onClick={()=>void clearPartyGhostLoss(selected.id)}>Завершить GV</button>}</div>}
-    {canEditIdentity&&<details className="inlineEditor"><summary>Редактировать визитку партии</summary><div><textarea rows={4} value={desc||selected.description||''} onChange={e=>setDesc(e.target.value)} placeholder="Описание партии"/><label className="filePicker">Загрузить логотип<input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>setLogo(e.target.files?.[0]||null)}/></label>{logo&&<small>{logo.name}</small>}<button className="primary" disabled={busy} onClick={saveIdentity}>{busy?'Сохраняю…':'Сохранить'}</button></div></details>}
+    {canEditIdentity&&<details className="inlineEditor"><summary>Редактировать визитку партии</summary><div><textarea rows={4} value={desc||selected.description||''} onChange={e=>setDesc(e.target.value)} placeholder="Описание партии"/><MediaUploadButton files={logo?[logo]:[]} onChange={x=>setLogo(x[0]||null)} accept="image/jpeg,image/png,image/webp,image/gif" multiple={false} label="Логотип партии" hint="Загрузить изображение" variant="logo"/><button className="primary" disabled={busy} onClick={saveIdentity}>{busy?'Сохраняю…':'Сохранить'}</button></div></details>}
    </article>
 
    <article className="surface partyPeople">
