@@ -127,7 +127,7 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
    </div>
   </section>
 
-  <GradesView g={g} teacherMode/>
+  <GradesView g={g}/>
 
   <ImpactRulesPanel g={g}/>
 
