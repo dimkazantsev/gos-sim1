@@ -5,6 +5,7 @@ import type {Stage} from './types';
 import {formatDeadline,stageIcon} from './constants';
 import {STAGE_DETAILS} from './stageDetails';
 import {GAME_PHASES,STAGE_SYSTEM,gamePhaseForStage} from './stageSystem';
+import DeadlineControl from './DeadlineControl';
 
 export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
@@ -132,6 +133,8 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
       <div><small>СВЯЗАННОЕ ГОЛОСОВАНИЕ</small><b>По этому этапу сейчас идёт процедурное голосование</b><p>Откройте центр голосований, чтобы увидеть кворум, связанные НПА и результат процедуры.</p></div>
       <button className="primary" onClick={onOpenVotes}>Перейти к голосованию →</button>
      </section>}
+
+     <DeadlineControl g={g} stageNo={selected.stage_no}/>
 
      {teacher&&<section className="stageTeacherActions">
       <div><small>УПРАВЛЕНИЕ ЭТАПОМ</small><b>Действия преподавателя</b></div>
