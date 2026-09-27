@@ -17,12 +17,14 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
  const [eventTitle,setEventTitle]=useState(''),[eventBody,setEventBody]=useState('');
  if(!game)return null;
 
+ const studentIds=useMemo(()=>new Set(members.filter(m=>m.kind!=='teacher').map(m=>m.user_id)),[members]);
+ const studentActivities=useMemo(()=>activities.filter(a=>studentIds.has(a.actor_id)),[activities,studentIds]);
  const studentRows=useMemo(()=>members.filter(m=>m.kind!=='teacher').map(m=>{
   const p=presence.find(x=>x.user_id===m.user_id);
-  const last=activities.find(x=>x.actor_id===m.user_id);
+  const last=studentActivities.find(x=>x.actor_id===m.user_id);
   const online=!!p&&(Date.now()-new Date(p.last_seen_at).getTime()<90000);
   return {m,p,last,online};
- }).sort((a,b)=>Number(b.online)-Number(a.online)||new Date(b.p?.last_seen_at||0).getTime()-new Date(a.p?.last_seen_at||0).getTime()),[members,presence,activities]);
+ }).sort((a,b)=>Number(b.online)-Number(a.online)||new Date(b.p?.last_seen_at||0).getTime()-new Date(a.p?.last_seen_at||0).getTime()),[members,presence,studentActivities]);
 
  async function publish(){if(await publishEvent(eventTitle,eventBody)){setEventTitle('');setEventBody('')}}
 
@@ -67,9 +69,9 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
    </article>
 
    <article className="surface activityPanel">
-    <div className="surfaceHead"><div><small>ЖИВАЯ ЛЕНТА</small><h2>Что нажимают и делают</h2></div><span>{activities.length}</span></div>
+    <div className="surfaceHead"><div><small>ЖИВАЯ ЛЕНТА</small><h2>Что нажимают и делают</h2></div><span>{studentActivities.length}</span></div>
     <div className="activityFeed">
-     {activities.length===0?<div className="emptyState">Активность появится после действий студентов.</div>:activities.slice(0,80).map(a=><div className="activityRow" key={a.id}>
+     {studentActivities.length===0?<div className="emptyState">Активность появится после действий студентов.</div>:studentActivities.slice(0,80).map(a=><div className="activityRow" key={a.id}>
       <time>{new Date(a.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</time>
       <span className="activityAvatar">{(names[a.actor_id]||'?').split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</span>
       <div><b>{names[a.actor_id]||'Участник'}</b><p>{a.label}</p>{a.view_key&&<small>{VIEW_NAMES[a.view_key]||a.view_key}</small>}</div>
