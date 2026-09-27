@@ -2,14 +2,14 @@
 import {FormEvent,useEffect,useMemo,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
-import type {ActionItem,Activity,Ballot,Channel,Crisis,Evaluation,EventItem,Game,GameDocument,Member,Message,Metric,Party,Presence,Stage,Vote} from './types';
+import type {ActionItem,Activity,Ballot,Channel,Crisis,Evaluation,EventItem,Game,GameDocument,GameProfile,Member,Message,Metric,Party,PartyDocument,Presence,Stage,Vote} from './types';
 import {CRISES,INTENSITY_LABEL} from './constants';
 
 export function useRepublicGame(gameId:string){
  const router=useRouter();
  const [game,setGame]=useState<Game|null>(null),[me,setMe]=useState<Member|null>(null),[metrics,setMetrics]=useState<Metric[]>([]),[events,setEvents]=useState<EventItem[]>([]),[actions,setActions]=useState<ActionItem[]>([]),[members,setMembers]=useState<Member[]>([]);
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]);
- const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]);
+ const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profiles,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]);
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[chatOpen,setChatOpen]=useState(true),[secondsLeft,setSecondsLeft]=useState(0);
  const [recording,setRecording]=useState<'audio'|'video'|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]);
@@ -37,6 +37,8 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'*',schema:'public',table:'game_documents',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
    .on('postgres_changes',{event:'*',schema:'public',table:'game_activity',filter:'game_id=eq.'+gameId},()=>void loadClassroomTelemetry())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_presence',filter:'game_id=eq.'+gameId},()=>void loadClassroomTelemetry())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_profiles',filter:'game_id=eq.'+gameId},()=>void loadPartyAssets())
+   .on('postgres_changes',{event:'*',schema:'public',table:'party_documents',filter:'game_id=eq.'+gameId},()=>void loadPartyAssets())
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_channels',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
    .on('postgres_changes',{event:'*',schema:'public',table:'channel_members'},()=>void loadAll(false))
    .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'game_id=eq.'+gameId},()=>{if(channelRef.current)void loadMessages(channelRef.current)})
@@ -59,7 +61,7 @@ export function useRepublicGame(gameId:string){
   if(show)setLoading(true);
   const u=(await supabase.auth.getUser()).data.user;
   if(!u){router.replace('/');return}
-  const [g,m,mt,ev,ac,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr]=await Promise.all([
+  const [g,m,mt,ev,ac,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd]=await Promise.all([
    supabase.from('games').select('*').eq('id',gameId).single(),
    supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',u.id).single(),
    supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label'),
@@ -75,13 +77,21 @@ export function useRepublicGame(gameId:string){
    supabase.from('game_crises').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
    supabase.from('game_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
    supabase.from('game_activity').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
-   supabase.from('game_presence').select('*').eq('game_id',gameId).order('last_seen_at',{ascending:false})
+   supabase.from('game_presence').select('*').eq('game_id',gameId).order('last_seen_at',{ascending:false}),
+   supabase.from('game_profiles').select('*').eq('game_id',gameId),
+   supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
   ]);
   if(g.error||m.error){setError(g.error?.message||m.error?.message||'Нет доступа к игре');setLoading(false);return}
   setGame(g.data as Game);setMe(m.data as Member);setMetrics((mt.data||[]) as Metric[]);setEvents((ev.data||[]) as EventItem[]);setActions((ac.data||[]) as ActionItem[]);
-  setMembers((mb.data||[]) as Member[]);setChannels((ch.data||[]) as Channel[]);setStages((st.data||[]) as Stage[]);setParties((pa.data||[]) as Party[]);setVotes((vo.data||[]) as Vote[]);
+  setMembers((mb.data||[]) as Member[]);setChannels((ch.data||[]) as Channel[]);setStages((st.data||[]) as Stage[]);setVotes((vo.data||[]) as Vote[]);
   const voteIds=new Set(((vo.data||[]) as Vote[]).map(v=>v.id));setBallots(((ba.data||[]) as Ballot[]).filter(b=>voteIds.has(b.vote_id)));
   setEvaluations((ge.data||[]) as Evaluation[]);setCrises((cr.data||[]) as Crisis[]);setDocuments((dc.data||[]) as GameDocument[]);setActivities((al.data||[]) as Activity[]);setPresence((pr.data||[]) as Presence[]);
+  const rawProfiles=(pf.data||[]) as GameProfile[];
+  const rawPartyDocs=(pd.data||[]) as PartyDocument[];
+  const profileRows=await Promise.all(rawProfiles.map(async x=>x.avatar_path?{...x,avatar_url:(await supabase.storage.from('game-assets').createSignedUrl(x.avatar_path,3600)).data?.signedUrl||null}:x));
+  const partyRows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
+  const docRows=await Promise.all(rawPartyDocs.map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
+  setProfiles(profileRows);setParties(partyRows);setPartyDocuments(docRows);
   if(!channelRef.current&&ch.data?.[0])setChannelId(ch.data[0].id);
   if(show)setLoading(false);
  }
@@ -93,6 +103,26 @@ export function useRepublicGame(gameId:string){
   ]);
   if(!al.error)setActivities((al.data||[]) as Activity[]);
   if(!pr.error)setPresence((pr.data||[]) as Presence[]);
+ }
+
+ async function loadPartyAssets(){
+  const [pa,pf,pd]=await Promise.all([
+   supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}),
+   supabase.from('game_profiles').select('*').eq('game_id',gameId),
+   supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
+  ]);
+  if(!pa.error){
+   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
+   setParties(rows);
+  }
+  if(!pf.error){
+   const rows=await Promise.all(((pf.data||[]) as GameProfile[]).map(async x=>x.avatar_path?{...x,avatar_url:(await supabase.storage.from('game-assets').createSignedUrl(x.avatar_path,3600)).data?.signedUrl||null}:x));
+   setProfiles(rows);
+  }
+  if(!pd.error){
+   const rows=await Promise.all(((pd.data||[]) as PartyDocument[]).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
+   setPartyDocuments(rows);
+  }
  }
 
  async function loadMessages(cid:string){
@@ -185,6 +215,49 @@ export function useRepublicGame(gameId:string){
 
  async function updateMetric(id:string,value:number){if(!teacher)return;const m=metrics.find(x=>x.id===id);const r=await supabase.from('state_metrics').update({previous_value:m?.value??null,value,updated_at:new Date().toISOString()}).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
 
+ async function saveProfile(bio:string,file?:File){
+  if(!me)return false;
+  let avatarPath=profiles.find(x=>x.user_id===me.user_id)?.avatar_path||null;
+  if(file){
+    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+    const path=gameId+'/profiles/'+me.user_id+'/avatar-'+Date.now()+'.'+ext;
+    const up=await supabase.storage.from('game-assets').upload(path,file,{upsert:true,contentType:file.type});
+    if(up.error){setError(up.error.message);return false}
+    avatarPath=path;
+  }
+  const r=await supabase.from('game_profiles').upsert({game_id:gameId,user_id:me.user_id,bio:bio.trim()||null,avatar_path:avatarPath,updated_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
+  if(r.error){setError(r.error.message);return false}
+  await loadPartyAssets();return true;
+ }
+ async function savePartyIdentity(partyId:string,description:string,file?:File){
+  let logoPath=parties.find(x=>x.id===partyId)?.logo_path||null;
+  if(file){
+    const ext=(file.name.split('.').pop()||'png').toLowerCase();
+    const path=gameId+'/parties/'+partyId+'/logo-'+Date.now()+'.'+ext;
+    const up=await supabase.storage.from('game-assets').upload(path,file,{upsert:true,contentType:file.type});
+    if(up.error){setError(up.error.message);return false}
+    logoPath=path;
+  }
+  const r=await supabase.rpc('update_my_party_identity',{p_party_id:partyId,p_description:description.trim()||null,p_logo_path:logoPath});
+  if(r.error){setError(r.error.message);return false}
+  await loadPartyAssets();return true;
+ }
+ async function uploadPartyDocument(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File){
+  if(!me)return false;
+  const ext=(file.name.split('.').pop()||'bin').toLowerCase();
+  const path=gameId+'/parties/'+partyId+'/docs/'+crypto.randomUUID()+'.'+ext;
+  const up=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type});
+  if(up.error){setError(up.error.message);return false}
+  const r=await supabase.from('party_documents').insert({game_id:gameId,party_id:partyId,doc_kind:kind,title:title.trim()||file.name,storage_path:path,file_name:file.name,mime_type:file.type||null,file_size:file.size,uploaded_by:me.user_id,status:'submitted'});
+  if(r.error){setError(r.error.message);return false}
+  await loadPartyAssets();return true;
+ }
+ async function reviewPartyDocument(id:string,status:'accepted'|'revision',note?:string){
+  if(!teacher)return;
+  const r=await supabase.from('party_documents').update({status,note:note?.trim()||null}).eq('id',id);
+  if(r.error)setError(r.error.message);else await loadPartyAssets();
+ }
+
  async function sendText(text:string){if(!me||!channelId||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}await loadMessages(channelId);return true}
  async function toggleRecording(kind:'audio'|'video'){
   if(recorder.current?.state==='recording'){recorder.current.stop();return}
@@ -197,6 +270,6 @@ export function useRepublicGame(gameId:string){
   }catch(e){setError(e instanceof Error?e.message:'Нет доступа к микрофону/камере')}
  }
 
- return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,createParty,updateParty,assignParty,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,sendText,toggleRecording};
+ return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,partyDocuments,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
+  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,createParty,updateParty,assignParty,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,sendText,toggleRecording};
 }
