@@ -4,6 +4,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
 import StageReadinessPanel from './StageReadinessPanel';
+import GameReadinessMatrix from './GameReadinessMatrix';
 
 const VIEW_NAMES:Record<string,string>={
  dashboard:'Политические процессы',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'НПА',actions:'Решения',grades:'Оценки',profile:'Профиль',teacher:'Управление',chat:'Связь'
@@ -76,6 +77,8 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
    <article className="pulseCard"><small>ЖДУТ РЕШЕНИЯ</small><strong>{pending.length}</strong><span>{pending.length?'нужно рассмотреть':'очередь пуста'}</span></article>
    <article className="pulseCard"><small>АКТИВНОСТЬ</small><strong>{studentActivities.length}</strong><span>действий за сессию</span></article>
   </section>
+
+  <GameReadinessMatrix g={g}/>
 
   <section className="teacherSimpleGrid">
    <article className="surface">
