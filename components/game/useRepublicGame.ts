@@ -444,7 +444,8 @@ export function useRepublicGame(gameId:string){
   const eligible=eligibleWeight(v);
   const x=ballots.filter(b=>b.vote_id===v.id);
   const cast=v.voting_mode==='member'?x.length:x.reduce((a,b)=>a+Number(b.weight),0);
-  const needed=v.quorum_kind==='none'?0:Math.ceil(eligible*Number(v.quorum_value||0));
+  const quorumValue=Number(v.quorum_value||0);
+  const needed=v.quorum_kind==='none'?0:v.institution_key==='gd'&&quorumValue===0.5?Math.floor(eligible/2)+1:Math.ceil(eligible*quorumValue);
   return {eligible,cast,needed,met:v.quorum_kind==='none'||(eligible>0&&cast>=needed)};
  }
  function tally(v:Vote){
