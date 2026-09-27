@@ -3,6 +3,7 @@ import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 
+type Structure={social_title:string;economic_title:string;defence_title:string;foreign_title:string;internal_title:string;status:'draft'|'submitted'|'approved'|'revision'};
 type Nomination={
  id:string;game_id:string;office_key:string;office_title:string;
  office_kind:'prime_minister'|'deputy_pm'|'duma_minister'|'security_minister'|'central_bank_chair';
@@ -25,7 +26,9 @@ const statusLabel:Record<Nomination['status'],string>={
 export default function GovernmentFormationLab({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,votes,setError}=g;
  const [rows,setRows]=useState<Nomination[]>([]);
+ const [structure,setStructure]=useState<Structure|null>(null);
  const [kind,setKind]=useState<Nomination['office_kind']>('prime_minister');
+ const [portfolio,setPortfolio]=useState<'social'|'economic'|'defence'|'foreign'|'internal'>('social');
  const [officeTitle,setOfficeTitle]=useState('Председатель Правительства Российской Федерации');
  const [candidate,setCandidate]=useState('');
  const [candidateName,setCandidateName]=useState('');
@@ -38,14 +41,19 @@ export default function GovernmentFormationLab({g}:{g:ReturnTypeRepublic}){
 
  async function load(){
   if(!game)return;
-  const r=await supabase.from('government_nominations').select('*').eq('game_id',game.id).eq('stage_no',8).order('created_at',{ascending:true});
+  const [r,s]=await Promise.all([
+   supabase.from('government_nominations').select('*').eq('game_id',game.id).eq('stage_no',8).order('created_at',{ascending:true}),
+   supabase.from('government_structures').select('*').eq('game_id',game.id).maybeSingle()
+  ]);
   if(!r.error)setRows((r.data||[]) as Nomination[]);
+  if(!s.error)setStructure((s.data||null) as Structure|null);
  }
  useEffect(()=>{void load()},[game?.id]);
  useEffect(()=>{
   if(!game)return;
   const ch=supabase.channel('government-formation:'+game.id)
    .on('postgres_changes',{event:'*',schema:'public',table:'government_nominations',filter:'game_id=eq.'+game.id},()=>void load())
+   .on('postgres_changes',{event:'*',schema:'public',table:'government_structures',filter:'game_id=eq.'+game.id},()=>void load())
    .subscribe();
   return()=>{void supabase.removeChannel(ch)}
  },[game?.id]);
@@ -56,13 +64,24 @@ export default function GovernmentFormationLab({g}:{g:ReturnTypeRepublic}){
  const rejections=(officeKey:string)=>rows.filter(r=>r.office_key===officeKey&&r.status==='rejected').length;
  const voteInfo=(id:string|null)=>id?votes.find(v=>v.id===id):undefined;
 
+ function portfolioTitle(key:'social'|'economic'|'defence'|'foreign'|'internal'){
+  return structure?.[key+'_title' as keyof Structure] as string||
+   ({social:'Министерство по социальной политике',economic:'Министерство по экономической политике',defence:'Министерство по обороне и внутренней безопасности',foreign:'Министерство по внешней политике',internal:'Министерство по внутренней политике и государству'} as const)[key];
+ }
+ function choosePortfolio(key:'social'|'economic'|'defence'|'foreign'|'internal'){
+  setPortfolio(key);
+  const title=portfolioTitle(key);
+  setOfficeTitle(kind==='deputy_pm'?'Заместитель Председателя Правительства РФ — '+title:title);
+ }
  function chooseKind(x:Nomination['office_kind']){
   setKind(x);
+  const nextPortfolio=x==='security_minister'?'defence':x==='deputy_pm'||x==='duma_minister'?'social':portfolio;
+  if(x==='security_minister'||x==='deputy_pm'||x==='duma_minister')setPortfolio(nextPortfolio);
   setOfficeTitle(
    x==='prime_minister'?'Председатель Правительства Российской Федерации':
    x==='central_bank_chair'?'Председатель Центрального банка Российской Федерации':
-   x==='deputy_pm'?'Заместитель Председателя Правительства Российской Федерации':
-   x==='security_minister'?'Федеральный министр блока ст. 83 «д.1»':
+   x==='deputy_pm'?'Заместитель Председателя Правительства РФ — '+portfolioTitle(nextPortfolio):
+   x==='security_minister'||x==='duma_minister'?portfolioTitle(nextPortfolio):
    'Федеральный министр'
   );
  }
@@ -70,7 +89,7 @@ export default function GovernmentFormationLab({g}:{g:ReturnTypeRepublic}){
  async function submit(){
   const name=(candidateName.trim()||candidateMember?.full_name||'').trim();
   if(name.length<3||officeTitle.trim().length<3)return;
-  const base=kind==='prime_minister'?'prime_minister':kind==='central_bank_chair'?'central_bank_chair':kind+'_'+officeTitle.trim().toLowerCase().replace(/[^а-яa-z0-9]+/gi,'_').slice(0,36);
+  const base=kind==='prime_minister'?'prime_minister':kind==='central_bank_chair'?'central_bank_chair':'ministry_'+portfolio;
   setBusy(true);
   const r=await supabase.rpc('submit_government_nomination',{
    p_game_id:activeGame.id,p_office_key:base,p_office_title:officeTitle.trim(),
@@ -99,6 +118,7 @@ export default function GovernmentFormationLab({g}:{g:ReturnTypeRepublic}){
      <option value="security_minister">Министр блока ст. 83 «д.1»</option>
      <option value="central_bank_chair">Председатель Банка России · игровая процедура</option>
     </select></label>
+    {(kind==='deputy_pm'||kind==='duma_minister'||kind==='security_minister')&&<label>Портфель<select value={portfolio} onChange={e=>choosePortfolio(e.target.value as 'social'|'economic'|'defence'|'foreign'|'internal')}>{(kind==='security_minister'?(['defence','internal'] as const):(['social','economic','foreign'] as const)).map(k=><option key={k} value={k}>{portfolioTitle(k)}</option>)}</select></label>}
     <label>Должность<input value={officeTitle} onChange={e=>setOfficeTitle(e.target.value)}/></label>
     <label>Участник<select value={candidate} onChange={e=>setCandidate(e.target.value)}><option value="">Сценарная кандидатура / имя вручную</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name} · {m.role_title||'участник'}</option>)}</select></label>
     <label>Имя кандидатуры<input value={candidateName} onChange={e=>setCandidateName(e.target.value)} placeholder={candidateMember?.full_name||'Ф.И.О. кандидата'}/></label>
@@ -108,9 +128,9 @@ export default function GovernmentFormationLab({g}:{g:ReturnTypeRepublic}){
 
   <div className="governmentFlow">
    {rows.length===0?<div className="emptyState">Кандидатуры ещё не внесены.</div>:rows.map(n=>{
-    const v=voteInfo(n.vote_id),rejects=rejections(n.office_key),canAppoint=teacher||isPresident;
+    const v=voteInfo(n.vote_id),rejects=rejections(n.office_key),canAppoint=(teacher||isPresident)&&n.office_kind!=='central_bank_chair';
     return <article className={'governmentNomination '+n.status} key={n.id}>
-     <header><div><small>{routeLabel[n.route]}</small><h3>{n.office_title}</h3><p>{n.candidate_name}</p></div><span>{statusLabel[n.status]}</span></header>
+     <header><div><small>{n.office_kind==='central_bank_chair'?'Президент → Государственная Дума (назначение палатой)':routeLabel[n.route]}</small><h3>{n.office_title}</h3><p>{n.candidate_name}</p></div><span>{statusLabel[n.status]}</span></header>
      <div className="governmentAudit">
       <span>Попытка <b>{n.attempt_no}/3</b></span>
       {n.route!=='president_after_sf'&&<span>Отклонений по должности <b>{rejects}</b></span>}
@@ -118,7 +138,8 @@ export default function GovernmentFormationLab({g}:{g:ReturnTypeRepublic}){
      </div>
 
      <div className="governmentProcedure">
-      {n.route==='president_to_duma'&&<><b>1</b><span>Президент внёс кандидатуру</span><b>2</b><span>ГД утверждает большинством от общего числа депутатов</span><b>3</b><span>Президент назначает утверждённого кандидата</span></>}
+      {n.route==='president_to_duma'&&n.office_kind==='central_bank_chair'&&<><b>1</b><span>Президент внёс кандидатуру</span><b>2</b><span>ГД рассматривает кандидатуру</span><b>3</b><span>Положительное голосование ГД является назначением</span></>}
+      {n.route==='president_to_duma'&&n.office_kind!=='central_bank_chair'&&<><b>1</b><span>Президент внёс кандидатуру</span><b>2</b><span>ГД утверждает большинством от общего числа депутатов</span><b>3</b><span>Президент назначает утверждённого кандидата</span></>}
       {n.route==='pm_to_duma'&&<><b>1</b><span>Председатель Правительства внёс кандидатуру</span><b>2</b><span>ГД утверждает большинством от общего числа депутатов</span><b>3</b><span>Президент назначает утверждённого кандидата</span></>}
       {n.route==='president_after_sf'&&<><b>1</b><span>Определена кандидатура специального министра</span><b>2</b><span>Проводятся консультации с Советом Федерации</span><b>3</b><span>Президент принимает решение о назначении</span></>}
      </div>
