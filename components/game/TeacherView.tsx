@@ -4,7 +4,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import {VSN_LABEL} from './constants';
 
 const VIEW_NAMES:Record<string,string>={
- dashboard:'Главный экран',stages:'Этапы игры',parties:'Партии и фракции',votes:'Голосования',documents:'Документы',actions:'Мои решения',teacher:'Пульт преподавателя',chat:'Связь'
+ dashboard:'Главный экран',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'Материалы',actions:'Решения',teacher:'Управление',chat:'Связь'
 };
 
 function timerText(seconds:number){
@@ -26,10 +26,13 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
   return {m,p,last,online};
  }).sort((a,b)=>Number(b.online)-Number(a.online)||new Date(b.p?.last_seen_at||0).getTime()-new Date(a.p?.last_seen_at||0).getTime()),[members,presence,studentActivities]);
 
+ const pending=actions.filter(a=>a.status==='submitted');
+ const onlineCount=studentRows.filter(x=>x.online).length;
+
  async function publish(){if(await publishEvent(eventTitle,eventBody)){setEventTitle('');setEventBody('')}}
  function confirmNext(){if(window.confirm('Завершить текущий этап и открыть следующий?'))void nextStage()}
  function confirmCrisis(){if(window.confirm('Разыграть случайный кризис для всей аудитории?'))void triggerCrisis()}
- function confirmGhost(){if(window.confirm('Запустить ghost voting и случайно уменьшить состав одной фракции?'))void ghostVoting()}
+ function confirmGhost(){if(window.confirm('Запустить ghost voting?'))void ghostVoting()}
  function exportSession(){
   const rows=[['Время','Участник','Тип','Действие','Раздел']];
   for(const a of [...activities].reverse())rows.push([new Date(a.created_at).toLocaleString('ru-RU'),names[a.actor_id]||a.actor_id,a.event_type,a.label,a.view_key||'']);
@@ -38,82 +41,82 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='gos-sim-activity-'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(url);
  }
 
- return <>
-  <section className="teacherHero">
-   <div>
-    <small>ПУЛЬТ ПРЕПОДАВАТЕЛЯ</small>
-    <h1>Управление занятием</h1>
-    <p>Здесь видно, что происходит прямо сейчас, что делают студенты и какие действия можно запустить следующим шагом.</p>
+ return <div className="teacherSimple">
+  <section className="teacherFocus">
+   <div className="teacherFocusCopy">
+    <small>СЕЙЧАС</small>
+    <h1>{currentStage?.stage_no}. {currentStage?.title}</h1>
+    <p>{currentStage?.summary||'Управляйте текущим этапом, наблюдайте за действиями студентов и переводите игру дальше только когда аудитория готова.'}</p>
    </div>
-   <button className="screenLaunch" onClick={onOpenScreen}><span>▣</span><b>Открыть общий экран</b><small>Для проектора — без служебных кнопок</small></button>
+   <div className="teacherFocusState">
+    <span className={game.turn_open?'bigState on':'bigState off'}>{game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span>
+    <b>{game.turn_open&&game.turn_ends_at?timerText(secondsLeft):'—'}</b>
+   </div>
   </section>
 
-  <section className="controlStrip">
-   <article>
-    <span className="stepNo">1</span>
-    <div><small>ТЕКУЩИЙ ЭТАП</small><b>{currentStage?.stage_no}. {currentStage?.title}</b><p>{currentStage?.mode}</p></div>
-   </article>
-   <article>
-    <span className="stepNo">2</span>
-    <div><small>ХОД ИГРЫ</small><b className={game.turn_open?'stateOpen':'statePause'}>{game.turn_open?'Открыт':'Пауза'}</b><p>{game.turn_open&&game.turn_ends_at?'Осталось '+timerText(secondsLeft):'Студенты не могут отправлять решения'}</p></div>
-    <button className={game.turn_open?'secondary':'primary'} onClick={()=>setTurn(!game.turn_open)}>{game.turn_open?'Пауза':'Открыть ход'}</button>
-   </article>
-   <article>
-    <span className="stepNo">3</span>
-    <div><small>СЛЕДУЮЩИЙ ШАГ</small><b>Перейти дальше</b><p>Закрыть текущий этап и открыть следующий</p></div>
-    <button className="primary" onClick={confirmNext}>Следующий этап →</button>
-   </article>
+  <section className="teacherPrimaryActions">
+   <button className={game.turn_open?'teacherAction dangerLite':'teacherAction primaryAction'} onClick={()=>setTurn(!game.turn_open)}>
+    <span>{game.turn_open?'Ⅱ':'▶'}</span>
+    <div><b>{game.turn_open?'Поставить на паузу':'Открыть ход'}</b><small>{game.turn_open?'Временно остановить действия студентов':'Разрешить студентам выполнять задания'}</small></div>
+   </button>
+   <button className="teacherAction" onClick={onOpenScreen}>
+    <span>▣</span><div><b>Общий экран</b><small>Открыть экран для проектора и аудитории</small></div>
+   </button>
+   <button className="teacherAction" onClick={confirmNext}>
+    <span>→</span><div><b>Следующий этап</b><small>Завершить текущий и перейти дальше</small></div>
+   </button>
   </section>
 
-  <section className="teacherMainGrid">
-   <article className="surface liveStudents">
-    <div className="surfaceHead"><div><small>СЕЙЧАС В ИГРЕ</small><h2>Студенты</h2></div><span>{studentRows.filter(x=>x.online).length} онлайн</span></div>
+  <section className="teacherPulse">
+   <article className="pulseCard"><small>В ИГРЕ СЕЙЧАС</small><strong>{onlineCount}</strong><span>из {studentRows.length} студентов онлайн</span></article>
+   <article className="pulseCard"><small>ЖДУТ РЕШЕНИЯ</small><strong>{pending.length}</strong><span>{pending.length?'нужно рассмотреть':'очередь пуста'}</span></article>
+   <article className="pulseCard"><small>АКТИВНОСТЬ</small><strong>{studentActivities.length}</strong><span>действий за сессию</span></article>
+  </section>
+
+  <section className="teacherSimpleGrid">
+   <article className="surface">
+    <div className="surfaceHead"><div><small>СТУДЕНТЫ</small><h2>Кто что делает</h2></div><span>{onlineCount} онлайн</span></div>
     <div className="studentLiveList">
-     {studentRows.length===0?<div className="emptyState">Студенты ещё не подключились.</div>:studentRows.map(({m,p,last,online})=><div className="studentLiveRow" key={m.user_id}>
+     {studentRows.length===0?<div className="emptyState">Студенты ещё не подключились.</div>:studentRows.map(({m,p,last,online})=><div className="studentLiveRow simple" key={m.user_id}>
       <span className={online?'onlineDot':'offlineDot'}/>
       <div className="studentLiveIdentity"><b>{m.full_name}</b><small>{m.team||m.group_name||'Без команды'} · {m.role_title||'роль не назначена'}</small></div>
       <div className="studentNow"><label>Сейчас</label><b>{p?VIEW_NAMES[p.current_view]||p.current_view:'Нет данных'}</b></div>
-      <div className="studentLast"><label>Последнее действие</label><b>{last?.label||'—'}</b><small>{last?new Date(last.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):''}</small></div>
+      <div className="studentLast"><label>Последнее действие</label><b>{last?.label||'—'}</b><small>{last?new Date(last.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}):''}</small></div>
      </div>)}
-    </div>
-   </article>
-
-   <article className="surface activityPanel">
-    <div className="surfaceHead"><div><small>ЖИВАЯ ЛЕНТА</small><h2>Что нажимают и делают</h2></div><span>{studentActivities.length}</span></div>
-    <div className="activityFeed">
-     {studentActivities.length===0?<div className="emptyState">Активность появится после действий студентов.</div>:studentActivities.slice(0,80).map(a=><div className="activityRow" key={a.id}>
-      <time>{new Date(a.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</time>
-      <span className="activityAvatar">{(names[a.actor_id]||'?').split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</span>
-      <div><b>{names[a.actor_id]||'Участник'}</b><p>{a.label}</p>{a.view_key&&<small>{VIEW_NAMES[a.view_key]||a.view_key}</small>}</div>
-     </div>)}
-    </div>
-   </article>
-  </section>
-
-  <section className="teacherActionsGrid">
-   <article className="surface actionGuide">
-    <div className="surfaceHead"><div><small>БЫСТРОЕ УПРАВЛЕНИЕ</small><h2>Что запустить сейчас</h2></div></div>
-    <div className="directorButtons">
-     <button onClick={()=>setTurnMinutes(10)}><span>10:00</span><b>Короткий ход</b><small>Открыть студентам 10 минут</small></button>
-     <button onClick={()=>setTurnMinutes(20)}><span>20:00</span><b>Рабочий ход</b><small>Открыть студентам 20 минут</small></button>
-     <button onClick={()=>setTurnMinutes(30)}><span>30:00</span><b>Большой раунд</b><small>Открыть студентам 30 минут</small></button>
-     <button className="dangerQuick" onClick={confirmCrisis}><span>⚠</span><b>Разыграть кризис</b><small>Случайный тип и интенсивность</small></button>
-     <button onClick={confirmGhost}><span>⚡</span><b>Ghost voting</b><small>Потеря 25–50 депутатов</small></button>
-     <button onClick={onOpenScreen}><span>▣</span><b>Общий экран</b><small>Вывести игру на проектор</small></button><button onClick={exportSession}><span>⇩</span><b>Экспорт журнала</b><small>Скачать активность студентов CSV</small></button>
     </div>
    </article>
 
    <article className="surface">
-    <div className="surfaceHead"><div><small>СОБЫТИЕ ДЛЯ ВСЕХ</small><h2>Опубликовать в общий экран</h2></div></div>
-    <div className="eventComposer"><input value={eventTitle} onChange={e=>setEventTitle(e.target.value)} aria-label="Заголовок события" placeholder="Заголовок события"/><textarea rows={5} value={eventBody} onChange={e=>setEventBody(e.target.value)} aria-label="Описание события" placeholder="Что произошло и что должны учитывать участники"/><button className="primary" onClick={publish}>Опубликовать событие</button></div>
+    <div className="surfaceHead"><div><small>ЛЕНТА</small><h2>Последние действия</h2></div></div>
+    <div className="activityFeed simple">
+     {studentActivities.length===0?<div className="emptyState">Здесь появятся действия студентов.</div>:studentActivities.slice(0,25).map(a=><div className="activityRow" key={a.id}>
+      <time>{new Date(a.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</time>
+      <span className="activityAvatar">{(names[a.actor_id]||'?').split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</span>
+      <div><b>{names[a.actor_id]||'Участник'}</b><p>{a.label}</p></div>
+     </div>)}
+    </div>
    </article>
   </section>
 
-  <section className="teacherLowerGrid">
-   <article className="surface"><div className="surfaceHead"><div><small>ПОКАЗАТЕЛИ ГОСУДАРСТВА</small><h2>Изменить KPI</h2></div></div><div className="metricEditor">{metrics.map(m=><label key={m.id}><span>{m.label}</span><input key={m.id+String(m.value)} type="number" defaultValue={m.value} onBlur={e=>updateMetric(m.id,+e.target.value)}/><em>{m.unit||''}</em></label>)}</div></article>
-   <article className="surface"><div className="surfaceHead"><div><small>ОЖИДАЮТ РЕШЕНИЯ</small><h2>Очередь преподавателя</h2></div><span>{actions.filter(a=>a.status==='submitted').length}</span></div><div className="queueSummary">{actions.filter(a=>a.status==='submitted').slice(0,6).map(a=><div key={a.id}><b>{names[a.author_id]||'Участник'}</b><span>{a.title}</span></div>)}{actions.filter(a=>a.status==='submitted').length===0&&<div className="emptyState">Нет решений на рассмотрении.</div>}</div></article>
-  </section>
+  <details className="teacherDetails">
+   <summary><div><b>Быстрые сценарии и события</b><span>Таймер, кризис, ghost voting, публикация события</span></div><i>+</i></summary>
+   <div className="teacherDetailsBody">
+    <div className="directorButtons compact">
+     {[10,20,30,60].map(n=><button key={n} onClick={()=>setTurnMinutes(n)}><span>{n}:00</span><b>Ход на {n} минут</b></button>)}
+     <button className="dangerQuick" onClick={confirmCrisis}><span>⚠</span><b>Разыграть кризис</b></button>
+     <button onClick={confirmGhost}><span>⚡</span><b>Ghost voting</b></button>
+     <button onClick={exportSession}><span>⇩</span><b>Экспорт журнала</b></button>
+    </div>
+    <div className="eventComposer"><input value={eventTitle} onChange={e=>setEventTitle(e.target.value)} placeholder="Заголовок события"/><textarea rows={4} value={eventBody} onChange={e=>setEventBody(e.target.value)} placeholder="Что произошло?"/><button className="primary" onClick={publish}>Опубликовать всем</button></div>
+   </div>
+  </details>
 
-  <section className="surface"><div className="surfaceHead"><div><small>ВСН · ЭТАП {currentStage?.stage_no}</small><h2>Индивидуальная оценка вклада</h2></div><span>0 · Н · С · В</span></div><div className="evaluationRows">{members.filter(m=>m.kind!=='teacher').map(m=>{const ev=evaluations.find(x=>x.user_id===m.user_id&&x.stage_no===(currentStage?.stage_no||1));return <div key={m.user_id}><div className="studentIdentity"><b>{m.full_name}</b><span>{m.team||m.group_name||'Без команды'}</span><input key={m.user_id+(m.role_title||'')} defaultValue={m.role_title||''} onBlur={e=>updateMember(m.user_id,{role_title:e.target.value})} placeholder="Игровая роль"/></div><div className="vsnButtons">{[0,1,2,3].map(s=><button key={s} className={ev?.score===s?'active':''} onClick={()=>setEvaluation(m.user_id,s)}><b>{VSN_LABEL[s]}</b><small>{s}</small></button>)}</div></div>})}</div></section>
- </>;
+  <details className="teacherDetails">
+   <summary><div><b>Оценки, роли и показатели</b><span>ВСН, игровые роли и KPI государства</span></div><i>+</i></summary>
+   <div className="teacherDetailsBody split">
+    <div><h3>Показатели государства</h3><div className="metricEditor">{metrics.map(m=><label key={m.id}><span>{m.label}</span><input key={m.id+String(m.value)} type="number" defaultValue={m.value} onBlur={e=>updateMetric(m.id,+e.target.value)}/><em>{m.unit||''}</em></label>)}</div></div>
+    <div><h3>ВСН и роли</h3><div className="evaluationRows">{members.filter(m=>m.kind!=='teacher').map(m=>{const ev=evaluations.find(x=>x.user_id===m.user_id&&x.stage_no===(currentStage?.stage_no||1));return <div key={m.user_id}><div className="studentIdentity"><b>{m.full_name}</b><input key={m.user_id+(m.role_title||'')} defaultValue={m.role_title||''} onBlur={e=>updateMember(m.user_id,{role_title:e.target.value})} placeholder="Игровая роль"/></div><div className="vsnButtons">{[0,1,2,3].map(s=><button key={s} className={ev?.score===s?'active':''} onClick={()=>setEvaluation(m.user_id,s)}><b>{VSN_LABEL[s]}</b><small>{s}</small></button>)}</div></div>})}</div></div>
+   </div>
+  </details>
+ </div>;
 }
