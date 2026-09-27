@@ -61,10 +61,24 @@ begin
   elsif s<>'finished' then b:=b||jsonb_build_array('Президентские выборы ещё не завершены'); end if;
  elsif p_stage=8 then
   select count(*) into c from public.government_nominations where game_id=p_game and stage_no=8 and office_kind='prime_minister' and status='appointed';
-  select count(*) into c2 from public.government_nominations where game_id=p_game and stage_no=8 and status not in ('appointed','withdrawn','rejected');
-  m:=jsonb_build_object('prime_minister_appointed',c,'open_nominations',c2);
+  select count(*) into c2 from public.government_structures where game_id=p_game and status='approved';
+  select count(*) into c3 from public.government_nominations where game_id=p_game and stage_no=8 and office_kind='central_bank_chair' and status='appointed';
+  select count(*) into n from public.government_nominations where game_id=p_game and stage_no=8 and office_key like 'ministry_%' and status='appointed';
+  m:=jsonb_build_object(
+   'prime_minister_appointed',c,'structure_approved',c2,'central_bank_chair_appointed',c3,'ministers_appointed',n,
+   'special_ministers',(select count(*) from public.government_nominations where game_id=p_game and stage_no=8 and office_kind='security_minister' and status='appointed'),
+   'deputy_pm',(select count(*) from public.government_nominations where game_id=p_game and stage_no=8 and office_kind='deputy_pm' and status='appointed')
+  );
   if c=0 then b:=b||jsonb_build_array('Председатель Правительства ещё не назначен'); end if;
-  if c2>0 then w:=w||jsonb_build_array('Есть незавершённые кадровые процедуры Правительства'); end if;
+  if c2=0 then b:=b||jsonb_build_array('Президент не одобрил структуру из пяти министерств'); end if;
+  if c3=0 then b:=b||jsonb_build_array('Не завершено назначение Председателя Банка России решением Государственной Думы'); end if;
+  if n<5 then b:=b||jsonb_build_array('Назначены руководители не всех пяти игровых министерств'); end if;
+  if (select count(*) from public.government_nominations where game_id=p_game and stage_no=8 and office_kind='security_minister' and status='appointed')<2
+  then b:=b||jsonb_build_array('Не назначены оба специальных министра после консультаций с Советом Федерации'); end if;
+  if (select count(*) from public.government_nominations where game_id=p_game and stage_no=8 and office_kind='deputy_pm' and status='appointed')<1
+  then b:=b||jsonb_build_array('Не назначен заместитель Председателя Правительства'); end if;
+  if exists(select 1 from public.government_nominations where game_id=p_game and stage_no=8 and status not in ('appointed','withdrawn','rejected'))
+  then w:=w||jsonb_build_array('Есть незавершённые кадровые процедуры Правительства'); end if;
  elsif p_stage=9 then
   select count(*) into c from public.institution_units where game_id=p_game and unit_kind='committee';
   select count(*) into c2 from public.institution_units where game_id=p_game and unit_kind='ministry';
