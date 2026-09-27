@@ -13,7 +13,7 @@ function timerText(seconds:number){
 }
 
 export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpenScreen:()=>void}){
- const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,setEvaluation,updateMember,updateMetric}=g;
+ const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,setEvaluation,updateMember,updateMetric}=g;
  const [eventTitle,setEventTitle]=useState(''),[eventBody,setEventBody]=useState('');
  if(!game)return null;
 
@@ -121,6 +121,7 @@ export default function TeacherView({g,onOpenScreen}:{g:ReturnTypeRepublic;onOpe
      {[10,20,30,60].map(n=><button key={n} onClick={()=>setTurnMinutes(n)}><span>{n}:00</span><b>Ход на {n} минут</b></button>)}
      <button className="dangerQuick" onClick={confirmCrisis}><span>⚠</span><b>Разыграть кризис</b></button>
      <button onClick={confirmGhost}><span>⚡</span><b>Ghost voting</b></button>
+     {parties.some(p=>p.ghost_active)&&<button onClick={()=>{if(confirm('Завершить ближайшее заседание ГД и восстановить полный состав всех фракций?'))void clearPartyGhostLoss()}}><span>↺</span><b>Завершить заседание ГД · снять GV</b></button>}
      <button onClick={exportSession}><span>⇩</span><b>Экспорт журнала</b></button>
     </div>
     <div className="eventComposer"><input value={eventTitle} onChange={e=>setEventTitle(e.target.value)} placeholder="Заголовок события"/><textarea rows={4} value={eventBody} onChange={e=>setEventBody(e.target.value)} placeholder="Что произошло?"/><button className="primary" onClick={publish}>Опубликовать всем</button></div>
