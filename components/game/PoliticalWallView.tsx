@@ -34,7 +34,7 @@ function PostImpactEditor({g,post}:{g:ReturnTypeRepublic;post:PoliticalPost}){
 }
 
 export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNavigate}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument:(id:string)=>void;onNavigate:(view:View)=>void}){
- const {game,me,teacher,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,formalDocuments,votes,profiles,names,availableActors,createPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,createVoteFromPost,createFormalDocument}=g;
+ const {game,me,teacher,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,formalDocuments,votes,profiles,names,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,createVoteFromPost,createFormalDocument}=g;
  const [tab,setTab]=useState<'feed'|'registry'>('feed');
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('participant');
  const actors=availableActors();
@@ -123,6 +123,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
      <div className="wallPostActions">
       {!vote&&p.status==='published'&&<button onClick={()=>void startVote(p.id)}>✓ Инициировать голосование</button>}
       <button onClick={()=>setNpaFor(npaFor===p.id?'':p.id)}>▤ Создать НПА</button>
+      {(teacher||p.author_id===me.user_id)&&<MediaUploadButton files={[]} onChange={x=>{if(x.length)void addMediaToPoliticalPost(p.id,x)}} label="Добавить медиа" hint="Дозагрузить в пост"/>}
       {teacher&&p.status==='published'&&<button className="acceptPost" onClick={()=>void acceptPoliticalPost(p.id)}>✓ Принять как решение</button>}
       {teacher&&p.status==='published'&&<button className="rejectPost" onClick={()=>void rejectPoliticalPost(p.id)}>× Отклонить</button>}
      </div>
