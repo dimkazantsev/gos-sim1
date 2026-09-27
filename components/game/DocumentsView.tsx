@@ -48,16 +48,41 @@ export default function DocumentsView({g}:{g:ReturnTypeRepublic}){
  async function extractFile(next:File){
   setFile(next);setExtracting(true);setRecognized('');
   try{
-   const fd=new FormData();fd.append('file',next);
-   const res=await fetch('/api/extract-document',{method:'POST',body:fd});const data=await res.json();
-   if(!res.ok){setRecognized(data.error||'Не удалось распознать текст. Файл всё равно можно прикрепить.');return}
-   if(data.text){
-    setBody(data.text);const baseTitle=title||next.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');if(!title)setTitle(baseTitle);
-    const found=inferFormal(data.text,baseTitle,me?.role_title);
-    if(teacher||availableSubjects.some(s=>s.key===found.subject.key))setSubjectKey(found.subject.key);else if(availableSubjects[0])setSubjectKey(availableSubjects[0].key);
-    setDocType(found.type.key);setRecognized('✓ Текст извлечён'+(data.pages?' · '+data.pages+' стр.':'')+' · '+found.type.label+' · '+found.subject.short);
+   const name=next.name.toLowerCase();
+   let extracted='';
+   let pages:number|undefined;
+   if(next.type==='text/plain'||name.endsWith('.txt')){
+    extracted=await next.text();
+   }else if(next.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'||name.endsWith('.docx')){
+    const mammoth=await import('mammoth');
+    const result=await mammoth.extractRawText({arrayBuffer:await next.arrayBuffer()});
+    extracted=result.value||'';
+   }else if(next.type==='application/pdf'||name.endsWith('.pdf')){
+    const {getDocumentProxy,extractText}=await import('unpdf');
+    const pdf=await getDocumentProxy(new Uint8Array(await next.arrayBuffer()));
+    if(pdf.numPages>60)throw new Error('PDF содержит больше 60 страниц. Сократите документ или вставьте текст вручную.');
+    const result=await extractText(pdf,{mergePages:true});
+    pages=result.totalPages;
+    extracted=typeof result.text==='string'?result.text:result.text.join('\n');
+   }else{
+    const fd=new FormData();fd.append('file',next);
+    await fetch('/api/extract-document',{method:'POST',body:fd});
    }
-  }catch(e){setRecognized(e instanceof Error?e.message:'Ошибка распознавания')}finally{setExtracting(false)}
+   extracted=extracted.replace(/\u0000/g,'').replace(/\r\n/g,'\n').trim();
+   const baseTitle=title||next.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');
+   if(!title)setTitle(baseTitle);
+   if(extracted)setBody(extracted.slice(0,120000));
+   const found=inferFormal(extracted,baseTitle,me?.role_title);
+   if(teacher||availableSubjects.some(s=>s.key===found.subject.key))setSubjectKey(found.subject.key);else if(availableSubjects[0])setSubjectKey(availableSubjects[0].key);
+   setDocType(found.type.key);
+   setRecognized((extracted?'✓ Текст извлечён':'✓ Файл прикреплён')+(pages?' · '+pages+' стр.':'')+' · '+found.type.label+' · '+found.subject.short+(extracted.length>120000?' · текст сокращён до 120 000 знаков':''));
+  }catch(e){
+   const baseTitle=title||next.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');if(!title)setTitle(baseTitle);
+   const found=inferFormal('',baseTitle,me?.role_title);
+   if(teacher||availableSubjects.some(s=>s.key===found.subject.key))setSubjectKey(found.subject.key);else if(availableSubjects[0])setSubjectKey(availableSubjects[0].key);
+   setDocType(found.type.key);
+   setRecognized((e instanceof Error?e.message:'Не удалось извлечь текст')+' Файл останется прикреплённым; текст можно вставить вручную.');
+  }finally{setExtracting(false)}
  }
 
  function chooseSubject(key:string){setSubjectKey(key);const s=FORMAL_SUBJECTS.find(x=>x.key===key);if(s){const current=FORMAL_TYPES.find(x=>x.key===docType);if(!current||current.workflow==='generic'||current.key==='other')setDocType(s.defaultType)}}
