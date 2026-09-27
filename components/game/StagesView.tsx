@@ -7,6 +7,7 @@ import {STAGE_DETAILS} from './stageDetails';
 import {GAME_PHASES,STAGE_SYSTEM,gamePhaseForStage} from './stageSystem';
 import DeadlineControl from './DeadlineControl';
 import PresidentialElectionLab from './PresidentialElectionLab';
+import PresidentialSystemDecisionPanel from './PresidentialSystemDecisionPanel';
 import DumaLeadershipElection from './DumaLeadershipElection';
 import GhostPolicyLab from './GhostPolicyLab';
 import ElectoralArchitectureLab from './ElectoralArchitectureLab';
@@ -155,6 +156,8 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
      {selected.stage_no===4&&<DumaLeadershipElection g={g}/>} 
 
      {selected.stage_no===5&&<GhostPolicyLab g={g} onOpenVotes={onOpenVotes}/>} 
+
+     {selected.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes}/>} 
 
      {(selected.stage_no===6||selected.stage_no===7)&&<PresidentialElectionLab g={g}/>} 
 
