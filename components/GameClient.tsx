@@ -10,6 +10,7 @@ import StagesView from './game/StagesView';
 import PartiesView from './game/PartiesView';
 import VotesView from './game/VotesView';
 import DocumentsView from './game/DocumentsView';
+import GradesView from './game/GradesView';
 import TeacherView from './game/TeacherView';
 import ProfileView from './game/ProfileView';
 import ChatPanel from './game/ChatPanel';
@@ -166,7 +167,7 @@ export default function GameClient({gameId}:{gameId:string}){
 
  useEffect(()=>{
   if(!me||previewMode)return;
-  const labels:Record<View,string>={dashboard:'Политические процессы',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Архив решений',profile:'Мой профиль',teacher:'Управление'};
+  const labels:Record<View,string>={dashboard:'Политические процессы',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Архив решений',grades:'Оценки',profile:'Мой профиль',teacher:'Управление'};
   void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
   const id=setInterval(()=>void touchPresence(view),30000);
   return()=>clearInterval(id);
@@ -182,10 +183,10 @@ export default function GameClient({gameId}:{gameId:string}){
  if(loading||!game||!me||!shownMe)return <main className="loginPage"><div className="loaderCard"><div className="spinner"/><div><b>GOS//SIM</b><p className="muted">{error||'Подключение к игре…'}</p></div></div></main>;
 
  const nav:[View,string,string][] = previewMode
-  ? [['dashboard','◎','Политические процессы'],['parties','◈','Партия'],['votes','✓','Голосование'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Мой профиль']]
+  ? [['dashboard','◎','Политические процессы'],['parties','◈','Партия'],['votes','✓','Голосование'],['documents','▤','НПА'],['stages','◫','Этапы'],['grades','★','Оценки'],['profile','●','Мой профиль']]
   : teacher
-   ? [['teacher','✦','Управление'],['dashboard','◎','Политические процессы'],['parties','◈','Партии'],['votes','✓','Голосования'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Профиль']]
-   : [['dashboard','◎','Политические процессы'],['parties','◈','Партия'],['votes','✓','Голосование'],['documents','▤','НПА'],['stages','◫','Этапы'],['profile','●','Мой профиль']];
+   ? [['teacher','✦','Управление'],['dashboard','◎','Политические процессы'],['parties','◈','Партии'],['votes','✓','Голосования'],['documents','▤','НПА'],['stages','◫','Этапы'],['grades','★','Оценки'],['profile','●','Профиль']]
+   : [['dashboard','◎','Политические процессы'],['parties','◈','Партия'],['votes','✓','Голосование'],['documents','▤','НПА'],['stages','◫','Этапы'],['grades','★','Оценки'],['profile','●','Мой профиль']];
 
  return <div className={'simShell '+(previewMode?'studentPreviewShell':'')}>
   <header className="simTop">
@@ -236,7 +237,8 @@ export default function GameClient({gameId}:{gameId:string}){
    {view==='stages'&&<StagesView g={vg} onOpenVotes={()=>setView('votes')}/>}
    {view==='parties'&&<PartiesView g={vg}/>}
    {view==='votes'&&<VotesView g={vg} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onOpenStages={()=>setView('stages')}/>}
-   {view==='documents'&&<DocumentsView g={vg} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>}
+   {view==='documents'&&<DocumentsView g={vg} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>} 
+   {view==='grades'&&<GradesView g={vg}/>} 
    {view==='actions'&&<PoliticalWallView g={vg} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>}
    {view==='profile'&&<ProfileView g={vg}/>}
    {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>setView('dashboard')}/>}
