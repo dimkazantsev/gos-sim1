@@ -169,3 +169,16 @@
 .vsnCompactHint{margin:7px 0 0;color:#8391a3;font-size:7.5px}
 @media(max-width:1050px){.gradesRules{grid-template-columns:1fr 1fr}.gradesDebrief{grid-template-columns:1fr}.gradesDebrief>div:last-child{display:flex;justify-content:space-between;align-items:center}.vsnMiniTrend{display:flex;overflow-x:auto}.vsnMiniTrend button{min-width:44px}}
 @media(max-width:700px){.gradesHero{align-items:flex-start;flex-direction:column}.gradesRules{grid-template-columns:1fr}.gradeCriteria{grid-template-columns:1fr}.gradeApproval{grid-template-columns:1fr}.gradeApproval>div{grid-column:auto;flex-direction:column}.gradeApproval>div button{width:100%}.gradeModalBack{padding:6px}.gradeModal{max-height:96vh}.gradesDebrief>div:last-child{display:grid}.gradesDebrief>div:last-child span{text-align:left}}
+
+.gradesDebrief select{width:100%;margin:4px 0 6px;border:1px solid #dce5ef;border-radius:9px;background:#fff;padding:8px;color:#47617f;font-size:8px;font-weight:800}
+.gradeRunHistory{margin:10px 20px;border:1px solid #e2e9f1;border-radius:11px;background:#fafcff;overflow:hidden}
+.gradeRunHistory>summary{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;color:#526b88;font-size:8px;font-weight:900;cursor:pointer}
+.gradeRunHistory>summary span{display:grid;place-items:center;min-width:20px;height:20px;border-radius:999px;background:#eaf1fa;color:#4f7098}
+.gradeRunHistory>div{display:grid;max-height:250px;overflow:auto;border-top:1px solid #e7edf4}
+.gradeRunHistory article{display:grid;grid-template-columns:115px 130px 90px 1fr;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid #edf1f5}
+.gradeRunHistory article:last-child{border-bottom:0}
+.gradeRunHistory time{color:#8795a6;font-size:6.8px}
+.gradeRunHistory b{color:#3f5a7a;font-size:8px}
+.gradeRunHistory article>span{padding:3px 5px;border-radius:6px;background:#eef3f9;color:#66809c;font-size:6.6px;text-align:center}
+.gradeRunHistory em{color:#72849a;font-size:6.8px;font-style:normal}
+@media(max-width:650px){.gradeRunHistory article{grid-template-columns:90px 1fr}.gradeRunHistory article>span,.gradeRunHistory em{grid-column:2}}
