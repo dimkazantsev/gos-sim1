@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run build"
+    "check": "npm run typecheck && npm run design:check && npm run build",
+    "design:check": "node scripts/design-audit.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",
