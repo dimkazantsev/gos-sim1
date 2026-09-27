@@ -10,7 +10,7 @@ const intensityLabel:Record<string,string>={low:'Низкая',medium:'Сред�
 const intensityClass=(x:string)=>x==='ultra'?'ultra':x==='high'?'high':x==='medium'?'medium':'low';
 
 export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
- const {game,me,teacher,crises,members,setError}=g;
+ const {game,me,teacher,crises,members,currentStage,triggerCrisis,setError}=g;
  const active=useMemo(()=>crises.filter(c=>c.status==='active').sort((a,b)=>new Date(b.created_at).getTime()-new Date(a.created_at).getTime())[0],[crises]);
  const [requests,setRequests]=useState<InfoRequest[]>([]);
  const [responses,setResponses]=useState<CrisisResponse[]>([]);
@@ -51,7 +51,14 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
  },[game?.id,active?.id]);
  useEffect(()=>{const id=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(id)},[]);
 
- if(!game||!me||!active)return null;
+ if(!game||!me)return null;
+ if(!active){
+  if(!teacher||currentStage?.stage_no!==15)return null;
+  return <section className="crisisCommand crisisLauncher">
+   <header className="crisisCommandHead"><div className="crisisSignal"><span>!</span><div><small>ЭТАП 15 · КРИЗИСНОЕ УПРАВЛЕНИЕ</small><h2>Сценарий ещё не запущен</h2><p>Система случайно выберет тип кризиса и интенсивность, после чего участники получат ограниченное окно для запроса данных и управленческой реакции.</p></div></div><div className="crisisClock"><small>СОСТОЯНИЕ</small><strong>ГОТОВ</strong><span>ожидается запуск преподавателем</span></div></header>
+   <div className="crisisLaunchBody"><div><b>Что произойдёт после запуска</b><p>Создастся кризис этапа 15, включится 20-минутное окно первичной реакции, появятся запросы сведений, планы действий, правовые основания, ресурсы и публичная коммуникация.</p></div><button className="primary" disabled={busy} onClick={async()=>{setBusy(true);await triggerCrisis();setBusy(false)}}>⚠ Запустить случайный кризис</button></div>
+  </section>;
+ }
  const deadline=active.response_deadline?new Date(active.response_deadline).getTime():null;
  const left=deadline?Math.max(0,Math.floor((deadline-now)/1000)):null;
  const late=deadline!==null&&left===0;
