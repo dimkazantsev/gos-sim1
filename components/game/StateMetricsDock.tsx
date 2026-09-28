@@ -44,10 +44,10 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
  const dialogRef=useDialog(!!selected,()=>setSelected(''));
  const [compare,setCompare]=useState<string[]>([]);
  const [bucket,setBucket]=useState<'changes'|'day'|'week'>('changes');
- const [more,setMore]=useState(false);
  const allowed=useMemo(()=>[...metrics].filter(m=>teacher||m.is_public).sort((a,b)=>a.sort_order-b.sort_order),[metrics,teacher]);
  const primary=PRIMARY.map(k=>allowed.find(m=>m.metric_key===k)).filter(Boolean) as Metric[];
  const secondary=allowed.filter(m=>!PRIMARY.includes(m.metric_key));
+ const visibleMetrics=[...primary,...secondary];
  const chosen=allowed.find(m=>m.id===selected);
 
  function rowsFor(metricKey:string){return metricHistory.filter(h=>h.metric_key===metricKey)}
@@ -83,7 +83,7 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
   return <button key={m.id} className={'statePulseMetric '+m.group_key} onClick={()=>setSelected(m.id)}>
    <span className="statePulseIcon">{metricIcon(m.metric_key)}</span>
    <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.label}</b><span>{last?.note||m.description||'Игровой показатель'}</span></div>
-   <div className="statePulseValue"><strong>{Number(m.value).toLocaleString('ru-RU')}{m.unit||''}</strong><em className={changeTone(m,d)}>{d>0?'▲ +':d<0?'▼ ':'• '}{Math.abs(d).toFixed(Math.abs(d)%1?1:0)}</em></div>
+   <div className="statePulseValue"><strong>{Number(m.value).toLocaleString('ru-RU')}{m.unit||''}</strong><em className={changeTone(m,d)}>{d===0?'—':`${d>0?'▲ +':'▼ '}${Math.abs(d).toFixed(Math.abs(d)%1?1:0)}`}</em></div>
    <div className="statePulseTrend">
     {mini.length>1&&<svg viewBox="0 0 120 32" aria-hidden="true"><path d={spark(mini,120,32)} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"/></svg>}
     {pct!=null&&<i><span style={{width:pct+'%'}}/></i>}
@@ -95,10 +95,9 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
   <section className="statePulseDock" aria-label="Состояние государства">
    <div className="statePulseTop">
     <div><small>ИГРОВЫЕ ПОКАЗАТЕЛИ</small><b>Последствия решений видны сразу</b></div>
-    {secondary.length>0&&<button className={more?'active':''} aria-expanded={more} onClick={()=>setMore(v=>!v)}>{more?'Скрыть':'Ещё показатели'} <span>{secondary.length}</span></button>}
+}
    </div>
-   {allowed.length?<div className="statePulseGrid">{primary.map(card)}</div>:<div className="emptyState">Показатели появятся после настройки игры преподавателем.</div>}
-   {more&&<div className="statePulseSecondary">{secondary.map(card)}</div>}
+   {visibleMetrics.length?<div className="statePulseGrid">{visibleMetrics.map(card)}</div>:<div className="emptyState">Показатели появятся после настройки игры преподавателем.</div>}
   </section>
 
   {chosen&&<div className="metricModalBackdrop" onClick={()=>setSelected('')}>
