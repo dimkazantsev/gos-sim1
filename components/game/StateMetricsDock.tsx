@@ -1,9 +1,11 @@
 'use client';
 import {useMemo,useState} from 'react';
+import {Check} from 'lucide-react';
 import {Activity,BadgeCheck,Globe2,Handshake,HeartHandshake,MessageSquare,Scale,ShieldCheck,TrendingUp,UsersRound,Wallet} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Metric} from './types';
+import {drawMetricChart,METRIC_COLORS,pointsForMetric} from './metricChart';
 
 const PRIMARY=['public_trust','economy','budget','social_stability','lawfulness','international_standing'];
 
@@ -40,7 +42,7 @@ function metricIcon(k:string){
 }
 
 export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
- const {metrics,metricHistory,teacher,politicalPosts,names}=g;
+ const {game,metrics,metricHistory,teacher,politicalPosts,names}=g;
  const [selected,setSelected]=useState('');
  const dialogRef=useDialog(!!selected,()=>setSelected(''));
  const [compare,setCompare]=useState<string[]>([]);
@@ -52,28 +54,22 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
  const chosen=allowed.find(m=>m.id===selected);
 
  function rowsFor(metricKey:string){return metricHistory.filter(h=>h.metric_key===metricKey)}
- function grouped(metricKey:string){
-  const rows=rowsFor(metricKey);
-  if(bucket==='changes')return rows;
-  const map=new Map<string,typeof rows[number]>();
-  for(const h of rows){
-   const d=new Date(h.recorded_at);
-   let key='';
-   if(bucket==='day')key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-   else{
-    const t=new Date(d.getFullYear(),d.getMonth(),d.getDate());
-    const day=(t.getDay()+6)%7;t.setDate(t.getDate()-day);
-    key=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
-   }
-   map.set(key,h);
-  }
-  return [...map.values()];
- }
- const hist=chosen?rowsFor(chosen.metric_key):[];
- const groupedHist=chosen?grouped(chosen.metric_key):[];
- const values=groupedHist.map(h=>Number(h.value));
- const path=spark(values,620,180);
- const compareMetrics=metrics.filter(m=>compare.includes(m.id));
+ const hist=chosen?rowsFor(chosen.metric_key).sort((a,b)=>Date.parse(a.recorded_at)-Date.parse(b.recorded_at)):[];
+ const comparisonOptions=visibleMetrics.filter(m=>m.id!==chosen?.id);
+ const activeMetrics=chosen?[chosen,...comparisonOptions.filter(m=>compare.includes(m.id))]:[];
+ const snapshotAt=useMemo(()=>Date.now(),[selected]);
+ const series=activeMetrics.map((metric,index)=>({
+  metric,
+  color:METRIC_COLORS[index%METRIC_COLORS.length],
+  points:pointsForMetric(metric,metricHistory,bucket,game?.created_at,snapshotAt)
+ }));
+ const geometry=drawMetricChart(series);
+ const chosenPoints=series[0]?.points||[];
+ const singlePoint=geometry.lines.length===1&&chosenPoints.length===1;
+ const formatValue=(v:number,unit:string|null)=>v.toLocaleString('ru-RU',{maximumFractionDigits:2})+(unit||'');
+ const formatTime=(timestamp:number)=>new Date(timestamp).toLocaleString('ru-RU',{
+  day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'
+ });
 
  function card(m:Metric){
   const d=delta(m);
@@ -81,7 +77,7 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
   const mini=rows.slice(-12).map(h=>Number(h.value));
   const last=rows.at(-1);
   const pct=m.max_value!=null&&m.min_value!=null?Math.max(0,Math.min(100,(Number(m.value)-Number(m.min_value))/Math.max(1,Number(m.max_value)-Number(m.min_value))*100)):null;
-  return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} onClick={()=>setSelected(m.id)}>
+  return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} onClick={()=>{setCompare([]);setBucket('changes');setSelected(m.id)}}>
    <span className="statePulseIcon" aria-hidden="true">{metricIcon(m.metric_key)}</span>
    <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.label}</b><span>{last?.note||m.description||'Игровой показатель'}</span></div>
    <div className="statePulseValue"><strong>{Number(m.value).toLocaleString('ru-RU')}{m.unit||''}</strong><em className={changeTone(m,d)}>{d===0?'—':`${d>0?'▲ +':'▼ '}${Math.abs(d).toFixed(Math.abs(d)%1?1:0)}`}</em></div>
@@ -103,8 +99,40 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
     <div className="metricHeroValue"><strong>{Number(chosen.value).toLocaleString('ru-RU')}{chosen.unit||''}</strong><span className={changeTone(chosen,delta(chosen))}>{delta(chosen)>=0?'▲ +':'▼ '}{Math.abs(delta(chosen)).toFixed(1)} с прошлого изменения</span></div>
     {hist.at(-1)&&<div className="metricLastCause"><small>ПОСЛЕДНЯЯ ПРИЧИНА</small><b>{hist.at(-1)?.note||hist.at(-1)?.source_type}</b><span>{new Date(hist.at(-1)!.recorded_at).toLocaleString('ru-RU')}</span></div>}
     <div className="metricBucketTabs"><button className={bucket==='changes'?'active':''} onClick={()=>setBucket('changes')}>Все изменения</button><button className={bucket==='day'?'active':''} onClick={()=>setBucket('day')}>По дням</button><button className={bucket==='week'?'active':''} onClick={()=>setBucket('week')}>По неделям</button></div>
-    <div className="metricChart">
-     {values.length>1?<svg viewBox="0 0 620 180" role="img" aria-label={'Динамика '+chosen.label}><path d={path} fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/></svg>:<div className="emptyState">Для графика нужно хотя бы два изменения.</div>}
+    <div className="metricChart redesignedChart">
+     <div className="metricChartCaption"><b>{geometry.comparing?'Динамика показателей':'История показателя'}</b><span>{bucket==='changes'?'По игровым событиям':bucket==='day'?'По дням':'По неделям'}</span></div>
+     <svg viewBox={`0 0 ${geometry.width} ${geometry.height}`} role="img" aria-label={'Временной график: '+activeMetrics.map(m=>m.label).join(', ')}>
+      {geometry.yTicks.map((tick,i)=><g key={i}>
+       <line className="metricGridLine" x1={geometry.left} x2={geometry.width-geometry.right} y1={tick.y} y2={tick.y}/>
+       <text className="metricAxisText" x={geometry.left-8} y={tick.y+4} textAnchor="end">{geometry.comparing?tick.value+'%':tick.value.toLocaleString('ru-RU',{maximumFractionDigits:1})}</text>
+      </g>)}
+      {geometry.xTicks.map((tick,i)=><g key={i}>
+       <line className="metricDateLine" x1={tick.x} x2={tick.x} y1={geometry.top} y2={geometry.height-geometry.bottom}/>
+       <text className="metricAxisText" x={tick.x} y={geometry.height-12} textAnchor={i===0&&geometry.xTicks.length>1?'start':i===geometry.xTicks.length-1&&geometry.xTicks.length>1?'end':'middle'}>{new Date(tick.at).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'})}</text>
+      </g>)}
+      {geometry.lines.map(line=><g key={line.metric.id} style={{color:line.color}}>
+       {line.pointsOnChart.length>1&&<path d={line.path} className="metricSeriesPath" stroke="currentColor"/>}
+       {line.pointsOnChart.length===1&&<line x1={geometry.left} x2={geometry.width-geometry.right} y1={line.pointsOnChart[0].y} y2={line.pointsOnChart[0].y} className="metricSingleGuide" stroke="currentColor"/>}
+       {line.pointsOnChart.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r={4.5} className="metricChartPoint" fill="currentColor" stroke="#fff" strokeWidth="2"><title>{line.metric.label}: {formatValue(p.value,line.metric.unit)}. {formatTime(p.at)}. {p.note}</title></circle>)}
+      </g>)}
+     </svg>
+     <div className="metricChartLegend" aria-label="Показатели на графике">
+      {series.map(s=><span key={s.metric.id}><i style={{background:s.color}}/>{s.metric.label}</span>)}
+     </div>
+     {singlePoint&&<p className="metricChartNotice">{chosenPoints[0].kind==='snapshot'?'Показано текущее значение. Записи об изменениях пока отсутствуют.':'Показана исходная точка. Линия динамики появится после первого изменения.'}</p>}
+     {geometry.comparing&&<p className="metricChartNotice">Сравнение: каждая линия приведена к своей шкале 0–100%. Для бюджета используется диапазон зафиксированных значений. Точные значения доступны при наведении на точки.</p>}
+    </div>
+    <div className="metricSeriesControls">
+     <div className="metricSeriesControlsHead"><b>Добавить показатели на график</b><span>Включайте и выключайте параметры. Начальная метрика всегда видна.</span></div>
+     <div className="metricSeriesToggleRow">
+      {comparisonOptions.map((m,i)=>{
+       const active=compare.includes(m.id);
+       const color=METRIC_COLORS[(1+comparisonOptions.filter(x=>compare.includes(x.id)).findIndex(x=>x.id===m.id))%METRIC_COLORS.length];
+       return <button key={m.id} type="button" className={'metricSeriesToggle '+(active?'active':'')} aria-pressed={active} onClick={()=>setCompare(list=>list.includes(m.id)?list.filter(id=>id!==m.id):[...list,m.id])}>
+        <i style={{background:active?color:'#bbc6dc'}}/><span>{m.label}</span>{active&&<Check size={14} aria-hidden="true"/>}
+       </button>;
+      })}
+     </div>
     </div>
     <div className="metricHistoryList">
      <div className="metricHistoryHead"><b>Почему менялся показатель</b><span>{hist.length} записей</span></div>
@@ -114,11 +142,7 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
       <strong className={Number(h.delta)>=0?'up':'down'}>{Number(h.delta)>0?'+':''}{Number(h.delta||0).toFixed(1)}</strong>
      </article>})}
     </div>
-    {teacher&&<details className="metricCompare">
-     <summary>Сравнить с другими показателями</summary>
-     <div className="metricComparePicker">{metrics.filter(m=>m.id!==chosen.id).map(m=><label key={m.id}><input type="checkbox" checked={compare.includes(m.id)} onChange={e=>setCompare(x=>e.target.checked?[...x,m.id]:x.filter(id=>id!==m.id))}/>{m.label}</label>)}</div>
-     {compareMetrics.length>0&&<div className="metricCompareRows">{[chosen,...compareMetrics].map(m=>{const hh=grouped(m.metric_key).map(h=>Number(h.value));return <div key={m.id}><b>{m.label}</b><span>{Number(m.value).toLocaleString('ru-RU')}{m.unit||''}</span><svg viewBox="0 0 220 64"><path d={spark(hh)} fill="none" stroke="currentColor" strokeWidth="3"/></svg></div>})}</div>}
-    </details>}
+
    </section>
   </div>}
  </>;
