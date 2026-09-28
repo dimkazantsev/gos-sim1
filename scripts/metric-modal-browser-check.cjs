@@ -35,6 +35,18 @@ async function main(){
     await page.locator('#screen').selectOption(screen);
     const frame=page.frameLocator('#preview');
     const dialog=frame.locator('.metricModal.redesigned');
+    const closeButton=frame.getByRole('button',{name:'Закрыть показатель'});
+    assert.equal(await closeButton.count(),1,'Metric dialog has exactly one labelled close button');
+    const closeBox=await closeButton.boundingBox();
+    assert(closeBox&&closeBox.width>=43&&closeBox.height>=43,'Metric close button has a 44px touch target');
+    const cross=closeButton.locator('svg');
+    assert.equal(await cross.count(),1,'Metric close control uses vector X icon');
+    const crossBox=await cross.boundingBox();
+    assert(crossBox&&Math.abs(crossBox.x+crossBox.width/2-closeBox.x-closeBox.width/2)<=1.5,
+      'Metric close icon is optically centred horizontally');
+    assert(crossBox&&Math.abs(crossBox.y+crossBox.height/2-closeBox.y-closeBox.height/2)<=1.5,
+      'Metric close icon is optically centred vertically');
+
     const content=frame.locator('.metricModalBody');
     const plot=frame.locator('.metricPlotViewport');
     const filters=frame.locator('.metricSeriesControls');
@@ -92,6 +104,11 @@ async function main(){
     console.log('PASS '+screen+' '+width+'px: no overlaps, clipping or missing options');
    }
   }
+  // The chat panel uses the same close geometry as all modal headers.
+  await page.locator('#screen').selectOption('chat');
+  const chatClose=page.frameLocator('#preview').getByRole('button',{name:'Закрыть чат'});
+  assert.equal(await chatClose.count(),1,'Chat uses the shared close control');
+  assert(await chatClose.locator('svg').isVisible(),'Chat close icon remains visible');
   assert.equal(errors.length,0,'Browser runtime exceptions:\n'+errors.join('\n'));
   console.log('PASS no page exceptions; 12 layouts checked, screenshots saved to '+shotDir);
  }finally{await browser.close();}

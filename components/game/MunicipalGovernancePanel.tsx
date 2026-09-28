@@ -1,4 +1,5 @@
 'use client';
+import {IconAction} from '../ui/IconAction';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -127,7 +128,7 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
     return <article key={d.id} className={d.head_user_id?'staffed':''}>
      <header><div><small>РАЙОН</small><h4>{d.title}</h4></div><span>{team.length} чел.</span></header>
      <div className="districtHead"><small>ГЛАВА АДМИНИСТРАЦИИ</small><b>{name(d.head_user_id)}</b>{(teacher||isMayor)&&<div><select value={headPick[d.id]||''} onChange={e=>setHeadPick(v=>({...v,[d.id]:e.target.value}))}><option value="">Назначить главу…</option>{availableStudents.filter(s=>!districts.some(x=>x.head_user_id===s.user_id)||d.head_user_id===s.user_id).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}</option>)}</select><button disabled={busy||!headPick[d.id]} onClick={()=>void appointHead(d.id)}>Назначить</button></div>}</div>
-     <div className="districtMembers">{team.map(x=><div key={x.id}><b>{name(x.user_id)}</b><span>{x.assignment_role==='head'?'глава':'муниципальный служащий'}</span>{canManage&&x.assignment_role==='member'&&<button onClick={()=>void removeMember(x.id)}>×</button>}</div>)}</div>
+     <div className="districtMembers">{team.map(x=><div key={x.id}><b>{name(x.user_id)}</b><span>{x.assignment_role==='head'?'глава':'муниципальный служащий'}</span>{canManage&&x.assignment_role==='member'&&<IconAction variant="remove" onClick={()=>void removeMember(x.id)} label={'Исключить муниципального служащего '+name(x.user_id)}/>}</div>)}</div>
      {canManage&&d.head_user_id&&<div className="districtAdd"><select value={memberPick[d.id]||''} onChange={e=>setMemberPick(v=>({...v,[d.id]:e.target.value}))}><option value="">Добавить в команду…</option>{availableStudents.filter(s=>!assignedIds.has(s.user_id)).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}</option>)}</select><button disabled={busy||!memberPick[d.id]} onClick={()=>void addMember(d.id)}>Добавить</button></div>}
     </article>
    })}</div>

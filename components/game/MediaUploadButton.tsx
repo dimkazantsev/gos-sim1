@@ -1,4 +1,5 @@
 'use client';
+import {IconAction} from '../ui/IconAction';
 import {useEffect,useMemo,useRef} from 'react';
 
 type Props={
@@ -38,7 +39,7 @@ export default function MediaUploadButton({files,onChange,accept='image/*,audio/
      p.file.type.startsWith('audio/')?<div className="mediaTypeIcon">♫</div>:
      <div className="mediaTypeIcon">▤</div>}
     <span>{p.file.name}</span>
-    <button type="button" onClick={()=>remove(i)} aria-label="Удалить файл">×</button>
+    <IconAction variant="remove" onClick={()=>remove(i)} label={'Удалить файл '+p.file.name}/>
    </div>)}
   </div>}
  </div>;

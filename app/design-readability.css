@@ -800,3 +800,166 @@
 /* Longer GOS//SIMS monogram retains correct proportions on small screens. */
 @media(max-width:900px){.mobileBrand .brandMark{font-size:12px}}
 @media(max-width:390px){.mobileBrand .brandMark{font-size:12px}}
+
+/* Shared close/remove controls — one geometry and one hit target across GOS//SIMS.
+   Scoped after legacy styles so visual alignment is identical on every modal. */
+.gsIconAction{
+  appearance:none;
+  display:inline-grid;
+  place-items:center;
+  align-self:center;
+  justify-self:end;
+  flex:0 0 44px;
+  box-sizing:border-box;
+  width:44px;
+  min-width:44px;
+  max-width:44px;
+  height:44px;
+  min-height:44px;
+  max-height:44px;
+  margin:0;
+  padding:0;
+  border:1px solid #d6e1f4;
+  border-radius:12px;
+  background:#fff;
+  color:#334968;
+  box-shadow:none;
+  cursor:pointer;
+  font-size:initial;
+  line-height:1;
+  transition:background-color .16s ease,border-color .16s ease,color .16s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.gsIconAction>svg{
+  display:block;
+  width:20px;
+  height:20px;
+  min-width:20px;
+  max-width:20px;
+  min-height:20px;
+  max-height:20px;
+  flex:none;
+  stroke:currentColor;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  fill:none;
+  transform:none;
+  pointer-events:none;
+}
+.gsIconAction:hover:not(:disabled){
+  background:#eef3ff;
+  border-color:#b0c5eb;
+  color:#204d99;
+}
+.gsIconAction:active:not(:disabled){background:#dfeaff}
+.gsIconAction:focus-visible{
+  outline:3px solid #6e97e6;
+  outline-offset:3px;
+}
+.gsIconAction:disabled{opacity:.4;cursor:not-allowed}
+/* Destructive inline buttons are visually quiet and cannot be mistaken for
+   dismissing an entire dialog. Preserve 40px targets for touch use. */
+.gsIconAction--remove{
+  flex:0 0 40px;
+  width:40px;
+  min-width:40px;
+  max-width:40px;
+  height:40px;
+  min-height:40px;
+  max-height:40px;
+  border-radius:10px;
+  color:#816274;
+  background:#fff;
+  border-color:#e9dce4;
+}
+.gsIconAction--remove>svg{width:18px;height:18px;min-width:18px;max-width:18px;min-height:18px;max-height:18px}
+.gsIconAction--remove:hover:not(:disabled){
+  background:#fff2f5;
+  border-color:#e5b8c4;
+  color:#a03d57;
+}
+.metricModal.redesigned>header>.gsIconAction,
+.gradeModal>header>.gsIconAction,
+.stageDetailHeader>.gsIconAction,
+.chatTop>.gsIconAction,
+.mobileMoreSheet>header>.gsIconAction,
+.errorBox.closable>.gsIconAction{
+  display:inline-grid;
+  place-items:center;
+  flex:0 0 44px;
+  width:44px;
+  min-width:44px;
+  max-width:44px;
+  height:44px;
+  min-height:44px;
+  max-height:44px;
+  margin:0;
+  padding:0;
+  border:1px solid #d6e1f4;
+  border-radius:12px;
+  background:#fff;
+  color:#334968;
+  font-size:initial;
+  line-height:1;
+}
+:is(.metricModal.redesigned>header,.gradeModal>header,.stageDetailHeader,.chatTop,.mobileMoreSheet>header,.errorBox.closable)>.gsIconAction:hover:not(:disabled){
+  background:#eef3ff;
+  border-color:#b0c5eb;
+  color:#204d99;
+}
+:is(.metricModal.redesigned>header,.gradeModal>header,.stageDetailHeader,.chatTop,.mobileMoreSheet>header,.errorBox.closable)>.gsIconAction:focus-visible{
+  outline:3px solid #6e97e6;
+  outline-offset:3px;
+}
+:is(.metricModal.redesigned>header,.gradeModal>header,.stageDetailHeader,.chatTop,.mobileMoreSheet>header)>.gsIconAction{
+  align-self:center;
+  justify-self:end;
+  position:relative;
+  z-index:1;
+}
+:is(.metricModal.redesigned>header,.gradeModal>header,.stageDetailHeader,.mobileMoreSheet>header)>:first-child{
+  min-width:0;
+}
+.metricModal.redesigned>header>.gsIconAction>svg,
+.gradeModal>header>.gsIconAction>svg,
+.stageDetailHeader>.gsIconAction>svg,
+.chatTop>.gsIconAction>svg,
+.mobileMoreSheet>header>.gsIconAction>svg,
+.errorBox.closable>.gsIconAction>svg{
+  display:block;
+  width:20px;
+  height:20px;
+  min-width:20px;
+  max-width:20px;
+  min-height:20px;
+  max-height:20px;
+  stroke-width:2;
+  pointer-events:none;
+}
+:is(.mediaPreviewItem,.candidateProgramPoints,.supportGroupList,.programBudgetYears,.programGoals,.programComponent,.unitMembers,.districtMembers) .gsIconAction--remove{
+  display:inline-grid;
+  place-items:center;
+  width:40px;
+  min-width:40px;
+  max-width:40px;
+  height:40px;
+  min-height:40px;
+  max-height:40px;
+  padding:0;
+  line-height:1;
+}
+@media(max-width:650px){
+ .metricModal.redesigned>header>.gsIconAction,
+ .gradeModal>header>.gsIconAction,
+ .stageDetailHeader>.gsIconAction,
+ .mobileMoreSheet>header>.gsIconAction{
+   width:44px;
+   min-width:44px;
+   height:44px;
+   min-height:44px;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .gsIconAction{transition:none}
+}

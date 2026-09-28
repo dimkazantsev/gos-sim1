@@ -1,4 +1,5 @@
 'use client';
+import {IconAction} from '../ui/IconAction';
 import {useEffect,useState,type CSSProperties} from 'react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -92,7 +93,7 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
        {votes.filter(v=>v.stage_no===selected.stage_no).length>0&&<span className="stageVoteTag">{votes.filter(v=>v.stage_no===selected.stage_no&&v.status==='open').length?('● Открыто '+votes.filter(v=>v.stage_no===selected.stage_no&&v.status==='open').length):('Голосований: '+votes.filter(v=>v.stage_no===selected.stage_no).length)}</span>}
       </div>
      </div>
-     <button className="stageClose" onClick={()=>setSelected(null)} aria-label="Закрыть описание">×</button>
+     <IconAction className="stageClose" onClick={()=>setSelected(null)} label="Закрыть описание"/>
     </header>
 
     <div className="stageDetailScroll">

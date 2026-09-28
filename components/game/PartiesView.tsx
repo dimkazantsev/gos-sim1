@@ -1,4 +1,5 @@
 'use client';
+import {IconAction} from '../ui/IconAction';
 import {useMemo,useState,type CSSProperties} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {PartyDocument} from './types';
@@ -169,7 +170,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
        <div className="mandatePersonName"><b>{m.full_name}</b><span>{m.user_id===selected.leader_user_id?'Руководитель фракции':m.role_title||'Член фракции'}</span></div>
        <div className="mandateBlock"><strong>{a?.base_mandates||0}</strong><span>мандатов</span></div>
        <div className={a?.ghost_loss?'mandateEffective affected':'mandateEffective'}><strong>{a?.effective_mandates||0}</strong><span>голосов сейчас</span>{!!a?.ghost_loss&&<em>−{a.ghost_loss} GV</em>}</div>
-       {teacher&&<button className="removePartyMember" onClick={()=>{if(confirm('Удалить студента из партии? Мандаты автоматически перераспределятся.'))void removePartyMember(selected.id,m.user_id)}}>×</button>}
+       {teacher&&<IconAction variant="remove" className="removePartyMember" onClick={()=>{if(confirm('Удалить студента из партии? Мандаты автоматически перераспределятся.'))void removePartyMember(selected.id,m.user_id)}} label={'Удалить участника '+m.full_name}/>}
       </article>})}
     </div>
 

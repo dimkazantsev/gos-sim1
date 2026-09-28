@@ -30,6 +30,39 @@ check('Legacy rules are isolated from the new design',read('app/globals.css').in
 check('Reduced motion',css['design-tokens'].includes('prefers-reduced-motion:reduce'));
 check('Visible keyboard focus',css['design-tokens'].includes(':focus-visible'));
 const readable=css['design-readability'];
+const uiClose=read('components/ui/IconAction.tsx');
+check('Unified accessible X action exposes close and remove variants',
+ uiClose.includes("variant?:'close'|'remove'")&&
+ uiClose.includes('aria-label={label}')&&
+ uiClose.includes('type="button"')&&
+ uiClose.includes('<X aria-hidden="true"'));
+const closeFiles=[
+ 'components/GameClient.tsx',
+ 'components/game/StateMetricsDock.tsx',
+ 'components/game/StagesView.tsx',
+ 'components/game/GradesView.tsx',
+ 'components/game/ChatPanel.tsx',
+ 'components/game/MediaUploadButton.tsx',
+ 'components/game/PartiesView.tsx',
+ 'components/game/PresidentialElectionLab.tsx',
+ 'components/game/StateProgramLab.tsx',
+ 'components/game/InstitutionStaffingLab.tsx',
+ 'components/game/MunicipalGovernancePanel.tsx'
+];
+for(const source of closeFiles){
+ check(source+': unified X icons, no font glyph buttons',
+  read(source).includes('<IconAction')&&
+  !/>\\s*[×✕✖]\\s*<\\/button>/.test(read(source)));
+}
+check('Close buttons have 44px targets with mobile and focus states',
+ readable.includes('.gsIconAction{')&&readable.includes('width:44px;')&&
+ readable.includes('.gsIconAction:focus-visible')&&
+ readable.includes('@media(prefers-reduced-motion:reduce)'));
+check('Inline remove buttons are distinct and touch accessible',
+ readable.includes('.gsIconAction--remove{')&&
+ readable.includes('width:40px;')&&
+ read('components/game/PartiesView.tsx').includes('variant="remove"'));
+
 
 const brandingFiles=[
  'app/page.tsx','app/layout.tsx','app/loading.tsx','components/GameClient.tsx',
