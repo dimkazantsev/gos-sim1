@@ -1,5 +1,5 @@
 export type Member={game_id:string;user_id:string;full_name:string;group_name:string|null;kind:'student'|'teacher'|'observer';role_title:string|null;team:string|null;score:number;joined_at:string;party_joined_at:string|null};
-export type Game={id:string;title:string;status:string;current_round:number;turn_open:boolean;turn_ends_at:string|null;settings:Record<string,unknown>};
+export type Game={id:string;title:string;status:string;current_round:number;turn_open:boolean;turn_ends_at:string|null;settings:Record<string,unknown>;created_at?:string;};
 export type Metric={id:string;game_id:string;metric_key:string;label:string;value:number;previous_value:number|null;unit:string|null;is_public:boolean;group_key:string;description:string|null;min_value:number|null;max_value:number|null;sort_order:number};
 export type MetricHistory={id:number;game_id:string;metric_id:string|null;metric_key:string;value:number;previous_value:number|null;delta:number|null;source_type:string;source_id:string|null;actor_id:string|null;note:string|null;recorded_at:string};
 export type EventItem={id:string;game_id:string;category:string;severity:string;title:string;body:string;round_no:number;published_at:string};
