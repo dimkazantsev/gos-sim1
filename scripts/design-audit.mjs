@@ -64,6 +64,28 @@ check('Dashboard icons use softly tinted group palettes',
  readable.includes('metric-public_trust .statePulseIcon')&&
  readable.includes('width:18px;'));
 
+check('Metrics modal isolates scrollable content from the fixed header',
+ dock.includes('className="metricModalBody"')&&
+ readable.includes('.metricModal.redesigned>.metricModalBody')&&
+ readable.includes('overflow-y:auto;')&&
+ readable.includes('height:min(850px,calc(100dvh - 32px))'));
+check('Chart, filters and history are ordered in distinct blocks',
+ dock.indexOf('className="metricPlotViewport"')<dock.indexOf('className="metricSeriesControls"')&&
+ dock.indexOf('className="metricSeriesControls"')<dock.indexOf('className="metricHistoryList"')&&
+ readable.includes('.metricModal.redesigned .metricPlotViewport')&&
+ readable.includes('min-height:250px'));
+check('Responsive chart measures real SVG width and keeps plot dimensions stable',
+ dock.includes("node.querySelector('svg')")&&
+ dock.includes('ResizeObserver')&&
+ dock.includes('preserveAspectRatio="xMidYMid meet"')&&
+ readable.includes('.metricModal.redesigned .metricPlotViewport>svg'));
+check('Series selection supports keyboard and stable colors',
+ dock.includes('setFocusedPoint({id:line.metric.id,at:p.at})')&&
+ dock.includes('aria-pressed={active}')&&
+ dock.includes('comparisonOptions.findIndex(option=>option.id===metric.id)'));
+check('Offline design preview includes an opened metric chart and current CSS',
+ read('scripts/design-preview.cjs').includes("['metric-modal','График показателя'")&&
+ read('scripts/design-preview.cjs').includes("'design-readability'"));
 check('Dashboard renders all permitted metrics without a collapsed section',
  dock.includes('visibleMetrics.map(card)')&&!dock.includes('setMore('));
 check('Dashboard compact grid has six columns and responsive container breakpoints',
