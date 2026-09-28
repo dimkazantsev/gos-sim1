@@ -1,6 +1,6 @@
 /* Identity and entry */
 .wordmark{display:inline-flex;align-items:center;gap:14px;color:var(--gs-ink);text-decoration:none;font-size:24px;letter-spacing:-.065em;font-weight:850}.wordmark b{font-weight:850}.wordmark b>span,.sidebarBrand b>span{color:var(--gs-accent)}
-.brandMark{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:46px;height:46px;border-radius:13px;background:var(--gs-accent);color:#fff;font-size:17px;font-weight:800;letter-spacing:-.07em}.brandMark>span{color:var(--gs-pink);padding:0 2px}
+.brandMark{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:46px;height:46px;border-radius:13px;background:var(--gs-accent);color:#fff;font-size:15px;font-weight:800;letter-spacing:-.09em}.brandMark>span{color:var(--gs-pink);padding:0 1px}
 .entryPage{min-height:100dvh;background:#f7f8fd;padding:0 clamp(24px,5.2vw,88px);overflow:hidden}
 .entryHeader{max-width:1440px;margin:auto;padding:28px 0;display:flex;align-items:center;justify-content:space-between;gap:24px;border-bottom:1px solid var(--gs-border)}
 .entryEdition{font-size:13px;color:var(--gs-muted);display:flex;gap:28px;align-items:center}.entryEdition i{font:500 13px var(--gs-font-mono);font-style:normal;border-left:1px solid var(--gs-border);padding-left:28px}

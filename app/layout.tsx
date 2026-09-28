@@ -9,9 +9,9 @@ import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
 
 export const metadata:Metadata={
- title:'GOS//SIM — Республика Политология · симулятор',
+ title:'GOS//SIMS — Республика Политология · симулятор',
  description:'Учебная многопользовательская платформа: политические процессы, НПА, голосования, партии, аналитика и автоматический журнал ВСН по 16 этапам',
- applicationName:'GOS//SIM'
+ applicationName:'GOS//SIMS'
 };
 
 export default function RootLayout({children}:{children:React.ReactNode}){

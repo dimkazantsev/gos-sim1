@@ -51,7 +51,7 @@ export default function Home(){
   return <main className="loginPage">
     <div className="gridGlow"/>
     <form className="loginCard" onSubmit={submit}>
-      <div className="logoRow"><div className="logo">G//S</div><div><small>POLITICAL & PUBLIC ADMINISTRATION LAB</small><h1>GOS//SIM</h1></div></div>
+      <div className="logoRow"><div className="logo">G//SS</div><div><small>POLITICAL & PUBLIC ADMINISTRATION LAB</small><h1>GOS//SIMS</h1></div></div>
       <p className="muted">Вход в игровую сессию. ФИО сохраняется в профиле участника и протоколе игры.</p>
       <div className="seg"><button type="button" className={mode==='student'?'active':''} onClick={()=>{setMode('student');setCreateMode(false)}}>Студент</button><button type="button" className={mode==='teacher'?'active':''} onClick={()=>setMode('teacher')}>Преподаватель</button></div>{mode==='teacher'&&<div className="seg"><button type="button" className={!createMode?'active':''} onClick={()=>setCreateMode(false)}>Войти</button><button type="button" className={createMode?'active':''} onClick={()=>setCreateMode(true)}>Создать игру</button></div>}
       <label>ФИО<input value={fio} onChange={e=>setFio(e.target.value)} required /></label>

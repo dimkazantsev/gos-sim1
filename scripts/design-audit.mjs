@@ -31,6 +31,27 @@ check('Reduced motion',css['design-tokens'].includes('prefers-reduced-motion:red
 check('Visible keyboard focus',css['design-tokens'].includes(':focus-visible'));
 const readable=css['design-readability'];
 
+const brandingFiles=[
+ 'app/page.tsx','app/layout.tsx','app/loading.tsx','components/GameClient.tsx',
+ 'components/PublicScreen.tsx','components/game/DocumentsView.tsx',
+ 'components/game/PoliticalWallView.tsx','production-app/app/page.tsx',
+ 'production-app/app/layout.tsx','production-app/components/GameClient.tsx',
+ 'demo/index.html','README.md','docs/ARCHITECTURE.md','docs/DESIGN.md',
+ 'docs/DEPLOYMENT.md','docs/DESIGN-AUDIT.md'
+];
+const oldFullBrand=new RegExp('GOS'+'\\/\\/SIM(?!S)');
+const oldRichBrand=new RegExp('GOS'+'<span>\\/\\/<\\/span>SIM(?!S)');
+const oldCompactBrand=new RegExp('g'+'<span>\\/\\/<\\/span>s(?!s)');
+for(const name of brandingFiles){
+ const source=read(name);
+ check(name+': consistent GOS//SIMS branding',
+  !oldFullBrand.test(source)&&!oldRichBrand.test(source)&&!oldCompactBrand.test(source));
+}
+check('Main and mobile masthead show the new full brand',
+ read('components/GameClient.tsx').includes('GOS<span>//</span>SIMS')&&
+ read('components/GameClient.tsx').includes('<b>GOS//SIMS</b>'));
+
+
 const dock=read('components/game/StateMetricsDock.tsx');
 check('State metric icons use unified Lucide vector icons rather than text glyphs',
  dock.includes("from 'lucide-react'")&&

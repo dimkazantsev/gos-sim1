@@ -16,7 +16,7 @@ export default function PublicScreen({gameId}:{gameId:string}){
  const activeCrisis=crises.find(c=>c.status==='active');
  return <main className="publicScreen">
   <header className="publicTop">
-   <div className="publicBrand"><span>GS</span><div><b>GOS//SIM</b><small>ОБЩИЙ ЭКРАН АУДИТОРИИ</small></div></div>
+   <div className="publicBrand"><span>G//SS</span><div><b>GOS//SIMS</b><small>ОБЩИЙ ЭКРАН АУДИТОРИИ</small></div></div>
    <div className="publicGame"><b>{game.title}</b><span>Этап {currentStage?.stage_no||game.current_round} из 16</span></div>
    <div className="publicClock"><span className={game.turn_open?'publicLive on':'publicLive'}>● {game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span><b>{game.turn_open&&game.turn_ends_at?fmt(secondsLeft):'—'}</b><button onClick={async()=>{try{await document.documentElement.requestFullscreen?.()}catch{g.setError('Полноэкранный режим недоступен в этом браузере.')}}}>На весь экран</button></div>
   </header>

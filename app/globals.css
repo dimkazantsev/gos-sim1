@@ -66,7 +66,7 @@ button,a{-webkit-tap-highlight-color:transparent}
 .routeState{min-height:100vh;display:flex;align-items:center;justify-content:center;gap:14px;padding:24px;background:var(--bg);color:var(--navy)}.routeState>div:last-child{max-width:480px}.routeState b{font-size:18px}.routeState p{margin:5px 0 12px;color:var(--muted);font-size:13px;line-height:1.55}.routeStateIcon{width:44px;height:44px;border-radius:13px;background:var(--danger-soft);color:var(--danger);display:grid;place-items:center;font-size:20px;font-weight:900;border:1px solid #efcdd5}
 
 
-/* === GOS//SIM COMMAND SYSTEM 2026 === */
+/* === GOS//SIMS COMMAND SYSTEM 2026 === */
 :root{
   --bg:#f4f6fa;
   --surface:#ffffff;

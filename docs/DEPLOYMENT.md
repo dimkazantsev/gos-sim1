@@ -2,7 +2,7 @@
 
 ## 1. Supabase
 
-GOS//SIM использует Supabase Auth, PostgreSQL, Realtime и Storage.
+GOS//SIMS использует Supabase Auth, PostgreSQL, Realtime и Storage.
 
 1. Создайте отдельный Supabase project.
 2. Примените `supabase/schema.sql`.

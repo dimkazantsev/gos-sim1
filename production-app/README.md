@@ -1,4 +1,4 @@
-# GOS//SIM production client
+# GOS//SIMS production client
 
 ## Setup
 
