@@ -82,292 +82,171 @@
   }
 }
 
-/* Compact game toolbar. One source of truth after base and responsive styles.
-   Status and chat share a scale; the role selector is wider to fit its content.
-   Controls stay at least 44px tall for keyboard and touch use. */
+/* Unified compact toolbar. Native select was replaced with a contained preview menu. */
 .simTop{
-  gap:10px;
-  padding-inline:clamp(14px,2vw,28px);
+  min-height:66px;
+  height:auto;
+  gap:9px;
+  padding:9px clamp(12px,1.7vw,26px);
+  overflow:visible;
 }
-.topScreenHistory{
-  display:flex;
-  align-items:center;
-  gap:5px;
-  flex:0 0 auto;
-}
+.topScreenHistory{display:flex;align-items:center;flex:none;gap:4px}
 .topScreenHistory .screenHistoryButton{
-  display:grid;
-  place-items:center;
-  flex:0 0 44px;
-  width:44px;
-  min-width:44px;
-  height:44px;
-  min-height:44px;
-  padding:0;
-  border:1px solid var(--gs-border);
-  border-radius:10px;
-  background:#fff;
-  color:var(--gs-ink);
-  box-shadow:none;
+  display:grid;place-items:center;
+  flex:0 0 42px;width:42px;min-width:42px;height:42px;min-height:42px;
+  padding:0;border:1px solid var(--gs-border);border-radius:11px;
+  background:#fff;color:var(--gs-ink);box-shadow:none;
 }
 .topScreenHistory .screenHistoryButton:hover:not(:disabled){
-  background:var(--gs-accent-soft);
-  border-color:#b9c8fa;
-  color:var(--gs-accent);
+  background:var(--gs-accent-soft);border-color:#b9c8fa;color:var(--gs-accent);
 }
-.topScreenHistory .screenHistoryButton:disabled{
-  opacity:.4;
-  cursor:not-allowed;
-}
+.topScreenHistory .screenHistoryButton:disabled{opacity:.4;cursor:not-allowed}
 .simTop :is(.screenHistoryButton,.topChatButton,.livePill,.connectionPill)>svg{
-  display:block;
-  flex:0 0 18px;
-  width:18px;
-  height:18px;
-  stroke-width:1.9;
-  vertical-align:middle;
+  display:block;flex:0 0 18px;width:18px;height:18px;stroke-width:1.9;
 }
-.simTopCenter{
-  flex:1 1 auto;
-  min-width:0;
-  gap:10px;
+.simTopCenter{flex:1 1 auto;min-width:0;gap:10px}
+.simTop .topIndicators{display:flex;align-items:center;flex:0 0 auto;gap:7px}
+.simTop .livePill,.simTop .topChatButton{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:108px;min-width:108px;max-width:108px;
+  height:44px;min-height:44px;flex:0 0 108px;
+  padding:0 10px;margin:0;gap:8px;
+  border-radius:11px;font-size:13px;line-height:1.3;
 }
-.simTop .topIndicators{
-  display:flex;
-  flex:0 0 auto;
-  align-items:center;
-  gap:7px;
-  min-width:0;
-}
-.simTop .livePill{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  flex:0 0 116px;
-  width:116px;
-  min-width:116px;
-  max-width:116px;
-  height:44px;
-  min-height:44px;
-  padding:0 10px;
-  margin:0;
-  border-radius:11px;
-  font-size:13px;
-  line-height:1.3;
-  font-weight:750;
-}
+.simTop .livePill>svg{display:block}
+.simTop .topChatButton>span{display:inline;white-space:nowrap}
 .simTop .connectionPill{
-  display:none;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  min-height:36px;
-  padding:6px 9px;
-  border-radius:10px;
-  font-size:12px;
-  line-height:1.3;
+  display:none;align-items:center;gap:6px;min-height:34px;
+  padding:5px 9px;border-radius:9px;font-size:12px;
 }
 .simTop .connectionPill.disconnected{display:inline-flex}
 .simTop .timerPill{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  height:36px;
-  min-height:36px;
-  padding:6px 9px;
-  border-radius:10px;
-  font-size:12px;
+  display:inline-flex;align-items:center;justify-content:center;
+  height:34px;min-height:34px;padding:5px 9px;border-radius:9px;font-size:12px;
 }
+/* View-as button and popup are isolated from global select/button sizing. */
 .simTop .viewAsSwitcher{
-  position:relative;
-  display:grid;
-  align-content:center;
-  flex:0 0 184px;
-  gap:1px;
-  width:184px;
-  min-width:184px;
-  max-width:184px;
-  height:48px;
-  min-height:48px;
-  padding:5px 32px 5px 12px;
-  margin:0;
-  border-radius:11px;
+  position:relative;display:block;flex:0 0 188px;
+  width:188px;min-width:188px;max-width:188px;
+  height:46px;min-height:46px;
+  margin:0;padding:0;border:0;border-radius:11px;background:transparent;
 }
-.simTop .viewAsSwitcher>span{
-  display:block;
-  margin:0;
-  font-size:12px;
-  line-height:1.2;
-  letter-spacing:.015em;
-  white-space:nowrap;
+.simTop .viewAsTrigger{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;height:46px;min-height:46px;
+  padding:6px 10px 6px 12px;margin:0;gap:7px;
+  border:1px solid var(--gs-border);border-radius:11px;
+  background:#fff;color:var(--gs-ink);text-align:left;box-shadow:none;
 }
-.simTop .viewAsSwitcher select{
-  display:block;
-  width:100%;
-  min-width:0;
-  max-width:100%;
-  height:20px;
-  min-height:20px;
-  margin:0;
-  padding:0;
-  border:0;
-  border-radius:2px;
-  appearance:none;
-  -webkit-appearance:none;
-  background:transparent;
-  font-size:13px;
-  font-weight:750;
-  line-height:1.3;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  cursor:pointer;
+.simTop .viewAsTrigger:hover{background:#f8faff;border-color:#b9c8fa}
+.simTop .viewAsSwitcher.active .viewAsTrigger{
+  background:var(--gs-pink-soft);border-color:#daaac5;
 }
-.simTop .viewAsSwitcher .viewAsChevron{
-  position:absolute;
-  right:10px;
-  top:50%;
-  transform:translateY(-50%);
-  width:16px;
-  height:16px;
-  color:var(--gs-muted);
-  stroke-width:1.9;
-  pointer-events:none;
+.simTop .viewAsTriggerText{
+  display:flex;flex:1 1 auto;flex-direction:column;justify-content:center;
+  min-width:0;gap:1px;line-height:1.2;
 }
-.simTop .topChatButton{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  flex:0 0 116px;
-  gap:8px;
-  width:116px;
-  min-width:116px;
-  max-width:116px;
-  height:44px;
-  min-height:44px;
-  padding:0 10px;
-  margin:0;
-  border-radius:11px;
-  font-size:13px;
+.simTop .viewAsLabel{
+  display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--gs-muted);font-size:11px;font-weight:800;letter-spacing:.035em;
   line-height:1.3;
 }
-.simTop .topChatButton>span{
-  display:inline;
-  line-height:1.3;
-  white-space:nowrap;
+.simTop .viewAsValue{
+  display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--gs-ink);font-size:13px;font-weight:750;line-height:1.35;
+}
+.simTop .viewAsChevron{
+  display:block;position:static;transform:none;flex:0 0 16px;
+  width:16px;height:16px;color:var(--gs-muted);stroke-width:1.9;
+  transition:transform .18s ease;pointer-events:none;
+}
+.simTop .viewAsTrigger[aria-expanded="true"] .viewAsChevron{transform:rotate(180deg)}
+.simTop .viewAsMenu{
+  position:absolute;top:calc(100% + 7px);right:0;z-index:1000;
+  display:grid;gap:3px;
+  width:max(100%,230px);max-width:min(320px,calc(100vw - 24px));
+  max-height:min(340px,65dvh);overflow-y:auto;overscroll-behavior:contain;
+  padding:6px;border:1px solid var(--gs-border);border-radius:13px;
+  background:white;box-shadow:0 16px 40px #17244720;
+}
+.simTop .viewAsMenu button{
+  display:block;width:100%;min-width:0;min-height:42px;
+  padding:10px 11px;margin:0;border:1px solid transparent;border-radius:8px;
+  background:transparent;color:var(--gs-ink);font-size:13px;
+  font-weight:650;line-height:1.45;text-align:left;
+  overflow-wrap:break-word;white-space:normal;
+}
+.simTop .viewAsMenu button small{
+  display:block;color:var(--gs-muted);font-size:12px;font-weight:500;
+}
+.simTop .viewAsMenu button:hover,.simTop .viewAsMenu button:focus-visible{
+  border-color:#dbe5ff;background:#f3f6ff;
+}
+.simTop .viewAsMenu button.selected{
+  border-color:#ccd9ff;background:var(--gs-accent-soft);color:var(--gs-accent);
+}
+.simTop .viewAsMenuDivider{
+  padding:10px 10px 4px;color:var(--gs-muted);font-size:11px;
+  font-weight:800;letter-spacing:.04em;border-top:1px solid var(--gs-border);
 }
 @media(max-width:1200px){
   .simTop .topStageCopy{display:none}
   .simTopCenter{justify-content:flex-end}
 }
 @media(max-width:1060px){
-  .simTop{gap:8px}
-  .simTop .topChatButton{flex-basis:44px;width:44px;min-width:44px;max-width:44px;padding:0}
+  .simTop .topChatButton{
+    width:44px;min-width:44px;max-width:44px;flex-basis:44px;padding:0;
+  }
   .simTop .topChatButton>span{display:none}
-  .simTop .livePill>svg{display:block}
 }
 @media(max-width:900px){
-  .simTop{
-    height:auto;
-    min-height:64px;
-    padding:10px 16px;
-    gap:8px;
-    align-items:center;
-    flex-wrap:wrap;
-  }
-  .mobileBrand{display:flex;align-items:center}
-  .topScreenHistory{order:1;margin-left:0}
+  .simTop{min-height:62px;gap:8px;padding:8px 14px;flex-wrap:wrap}
+  .mobileBrand{display:flex;align-items:center;order:0}
+  .topScreenHistory{order:1;margin:0}
   .simTopCenter{order:2;flex:1 1 auto;margin:0}
-  .simTop .viewAsSwitcher{order:3;flex:0 0 184px;max-width:184px;margin:0}
+  .simTop .viewAsSwitcher{order:3;margin:0}
   .simTop .topChatButton{order:4}
 }
 @media(max-width:760px){
-  /* A consistent two-row layout, including the smallest common phones. */
   .simTop{
-    display:grid;
-    grid-template-columns:116px minmax(0,1fr) auto auto;
-    column-gap:8px;
-    row-gap:7px;
-    padding:10px 12px;
-    align-items:center;
+    display:grid;grid-template-columns:108px minmax(0,1fr) auto auto;
+    column-gap:7px;row-gap:7px;align-items:center;padding:8px 10px;
   }
   .simTop .mobileBrand{
-    grid-column:1/3;
-    grid-row:1;
-    display:flex;
-    min-width:0;
-    margin:0;
-    gap:8px;
+    grid-column:1/3;grid-row:1;display:flex;min-width:0;margin:0;gap:7px;
   }
-  .simTop .mobileBrand b{font-size:16px}
-  .topScreenHistory{
-    grid-column:3;
-    grid-row:1;
-    justify-self:end;
-    gap:4px;
-    margin:0;
+  .simTop .mobileBrand b{font-size:15px}
+  .topScreenHistory{grid-column:3;grid-row:1;justify-self:end;gap:3px}
+  .topScreenHistory .screenHistoryButton{
+    flex-basis:44px;width:44px;min-width:44px;height:44px;min-height:44px;
   }
   .simTop .topChatButton{
-    grid-column:4;
-    grid-row:1;
-    width:44px;
-    min-width:44px;
-    max-width:44px;
-    height:44px;
-    min-height:44px;
-    padding:0;
+    grid-column:4;grid-row:1;
+    width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;
   }
   .simTopCenter{
-    grid-column:1;
-    grid-row:2;
-    width:116px;
-    min-width:0;
-    margin:0;
+    grid-column:1;grid-row:2;width:108px;min-width:0;margin:0;
   }
-  .simTop .topIndicators{
-    display:flex;
-    width:100%;
-    flex-wrap:wrap;
-    gap:5px;
-  }
+  .simTop .topIndicators{display:flex;width:100%;flex-wrap:wrap;gap:5px}
   .simTop .livePill{
-    flex:0 0 116px;
-    width:116px;
-    min-width:116px;
-    max-width:116px;
-    height:44px;
-    min-height:44px;
+    flex:0 0 108px;width:108px;min-width:108px;max-width:108px;
+    height:44px;min-height:44px;
   }
   .simTop .viewAsSwitcher{
-    grid-column:2/5;
-    grid-row:2;
-    justify-self:start;
-    width:min(100%,240px);
-    min-width:0;
-    max-width:240px;
-    height:48px;
-    min-height:48px;
-    margin:0;
-    padding:5px 30px 5px 11px;
+    grid-column:2/5;grid-row:2;justify-self:start;
+    width:min(100%,216px);min-width:0;max-width:216px;
+    height:46px;min-height:46px;
   }
-  .simTop:not(:has(.viewAsSwitcher)) .simTopCenter{
-    grid-column:1/5;
-    width:100%;
-  }
+  .simTop:not(:has(.viewAsSwitcher)) .simTopCenter{grid-column:1/5;width:100%}
 }
 @media(max-width:390px){
-  .simTop{gap:7px;padding:9px 10px}
-  .mobileBrand{gap:7px}
-  .mobileBrand .brandMark{width:32px;height:32px}
-  .mobileBrand b{font-size:15px}
-  .topScreenHistory{gap:3px}
+  .simTop{column-gap:5px;padding:8px}
+  .simTop .mobileBrand b{font-size:14px}
+  .simTop .mobileBrand .brandMark{width:30px;height:30px}
+  .simTop .viewAsMenu{max-width:calc(100vw - 16px)}
+}
+@media(pointer:coarse) and (min-width:761px){
   .topScreenHistory .screenHistoryButton{
-    flex-basis:44px;
-    width:44px;
-    min-width:44px;
-    height:44px;
-    min-height:44px;
+    flex-basis:44px;width:44px;min-width:44px;height:44px;min-height:44px;
   }
-  .simTop .viewAsSwitcher>span{font-size:12px;letter-spacing:0}
 }
