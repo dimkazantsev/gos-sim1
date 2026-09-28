@@ -322,16 +322,16 @@ export default function GameClient({gameId}:{gameId:string}){
     </div>
 
     {teacher&&<div className={'viewAsSwitcher '+(previewMode?'active':'')} ref={viewAsRef}>
-     <button type="button" className="viewAsTrigger" aria-haspopup="menu" aria-expanded={viewAsOpen} aria-controls={viewAsOpen?'game-view-as-menu':undefined} aria-label={'Режим просмотра: '+(!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент · типовой вид':previewStudent?.full_name||'Студент')} onClick={()=>setViewAsOpen(open=>!open)}>
+     <button type="button" className="viewAsTrigger" aria-haspopup="menu" aria-expanded={viewAsOpen} aria-controls={viewAsOpen?'game-view-as-menu':undefined} aria-label={'Режим просмотра: '+(!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент':previewStudent?.full_name||'Студент')} onClick={()=>setViewAsOpen(open=>!open)}>
       <span className="viewAsTriggerText">
        <span className="viewAsLabel">РЕЖИМ ПРОСМОТРА</span>
-       <strong className="viewAsValue">{!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент · типовой вид':previewStudent?.full_name||'Студент'}</strong>
+       <strong className="viewAsValue">{!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент':previewStudent?.full_name||'Студент'}</strong>
       </span>
       <ChevronDown className="viewAsChevron" aria-hidden="true"/>
      </button>
      {viewAsOpen&&<div className="viewAsMenu" id="game-view-as-menu" role="menu" aria-label="Выбрать режим просмотра" onKeyDown={onPreviewMenuKeyDown}>
       <button type="button" role="menuitemradio" aria-checked={!viewAs} className={!viewAs?'selected':''} onClick={()=>selectViewAs('')}>Преподаватель</button>
-      <button type="button" role="menuitemradio" aria-checked={viewAs===GENERIC_STUDENT} className={viewAs===GENERIC_STUDENT?'selected':''} onClick={()=>selectViewAs(GENERIC_STUDENT)}>Студент · типовой вид</button>
+      <button type="button" role="menuitemradio" aria-checked={viewAs===GENERIC_STUDENT} className={viewAs===GENERIC_STUDENT?'selected':''} onClick={()=>selectViewAs(GENERIC_STUDENT)}>Студент</button>
       {g.members.some(m=>m.kind==='student')&&<div role="separator" className="viewAsMenuDivider">Конкретный студент</div>}
       {g.members.filter(m=>m.kind==='student').map(m=><button type="button" key={m.user_id} role="menuitemradio" aria-checked={viewAs===m.user_id} className={viewAs===m.user_id?'selected':''} title={m.full_name+(m.role_title?' · '+m.role_title:'')} onClick={()=>selectViewAs(m.user_id)}>{m.full_name}{m.role_title&&<small>{m.role_title}</small>}</button>)}
      </div>}
