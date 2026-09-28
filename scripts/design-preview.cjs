@@ -42,6 +42,7 @@ const pages=[['entry','Вход',login],['dashboard','Обзор',base]];
 fixture.chatOpen=true;pages.push(['chat','Чат и обзор',renderToStaticMarkup(h(GameClient,{gameId:'design-preview'}))]);fixture.chatOpen=false;
 const ChatPanel=require('../components/game/ChatPanel').default;
 pages.push(['chat-panel','Командный чат',renderToStaticMarkup(h('main',{className:'previewChatPage'},h(ChatPanel,{g,draft:'',onDraftChange:noop})))]);
+pages.push(['chat-channels','Список каналов',renderToStaticMarkup(h('main',{className:'previewChatPage'},h(ChatPanel,{g,draft:'',onDraftChange:noop,previewChannelOpen:true})))]);
 const originalMessages=fixture.messages;
 fixture.messages=[];
 pages.push(['chat-empty','Пустой чат',renderToStaticMarkup(h('main',{className:'previewChatPage'},h(ChatPanel,{g,draft:'',onDraftChange:noop})))]);
