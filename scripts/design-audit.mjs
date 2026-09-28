@@ -166,10 +166,16 @@ const stageActions=read('components/game/stageActions.ts');
 check('Every one of the 16 stages has a next action',Array.from({length:16},(_,i)=>i+1).every(n=>new RegExp(`\\b${n}:\\{title:`).test(stageActions)));
 const chat=read('components/game/ChatPanel.tsx');
 const chatCss=read('app/design-readability.css');
-check('Chat uses a single channel switcher integrated into its header',
- chat.includes('className="chatChannelField"')&&
- !chat.includes('<select aria-label="Канал общения"')&&
- chat.includes('aria-label="Выбрать канал общения"'));
+check('Chat uses one accessible styled channel switcher in the header',
+ chat.includes('<ChatChannelDropdown')&&
+ read('components/game/ChatChannelDropdown.tsx').includes('role="menuitemradio"')&&
+ read('components/game/ChatChannelDropdown.tsx').includes('aria-expanded={open}')&&
+ !chat.includes('<select aria-label="Канал общения"'));
+check('Chat supports real backend pinning and icon-only send',
+ chat.includes('chatPinnedWrap')&&chat.includes('setChatPin(m.id,!pinned)')&&
+ chat.includes('chatPinAction')&&
+ chat.includes('className="chatSendButton iconOnly"')&&
+ !chat.includes('<span>Отправить</span>'));
 check('Chat supports keyboard search, attachment filtering and scroll to latest',
  chat.includes('className="chatSearchBar"')&&
  chat.includes("'chatFilesFilter '")&&
