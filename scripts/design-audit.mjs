@@ -30,6 +30,20 @@ check('Reduced motion',css['design-tokens'].includes('prefers-reduced-motion:red
 check('Visible keyboard focus',css['design-tokens'].includes(':focus-visible'));
 const readable=css['design-readability'];
 
+const dock=read('components/game/StateMetricsDock.tsx');
+check('Dashboard renders all permitted metrics without a collapsed section',
+ dock.includes('visibleMetrics.map(card)')&&!dock.includes('setMore('));
+check('Dashboard compact grid has six columns and responsive container breakpoints',
+ readable.includes('.overviewMetrics .statePulseGrid')&&
+ readable.includes('grid-template-columns:repeat(6,minmax(0,1fr))')&&
+ readable.includes('@container (max-width:1050px)')&&
+ readable.includes('@container (max-width:690px)')&&
+ readable.includes('@container (max-width:460px)'));
+check('Dashboard cards remain readable with 28px icons and compact dimensions',
+ readable.includes('min-height:108px')&&readable.includes('width:28px')&&
+ readable.includes('.overviewMetrics .statePulseValue strong'));
+
+
 check('Compact header status and chat match at 108px',
  readable.includes('flex:0 0 108px')&&readable.includes('width:108px'));
 check('Preview selector remains contained at 188px',
