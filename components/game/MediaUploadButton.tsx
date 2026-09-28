@@ -30,7 +30,7 @@ export default function MediaUploadButton({files,onChange,accept='image/*,audio/
   <button type="button" className="mediaPickerButton" onClick={()=>input.current?.click()} aria-label={label}>
    <MediaIcon/><span><b>{label}</b><small>{hint}</small></span>
   </button>
-  <input ref={input} hidden type="file" accept={accept} multiple={multiple} onChange={e=>pick(e.target.files)}/>
+  <input aria-label={label} ref={input} hidden type="file" accept={accept} multiple={multiple} onChange={e=>pick(e.target.files)}/>
   {files.length>0&&<div className="mediaPickerPreview">
    {previews.map((p,i)=><div className="mediaPreviewItem" key={p.file.name+'-'+p.file.size+'-'+i}>
     {p.file.type.startsWith('image/')?<img src={p.url} alt="Предпросмотр"/>:

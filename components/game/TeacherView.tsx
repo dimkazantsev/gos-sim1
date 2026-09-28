@@ -7,7 +7,7 @@ import StageReadinessPanel from './StageReadinessPanel';
 import GameReadinessMatrix from './GameReadinessMatrix';
 
 const VIEW_NAMES:Record<string,string>={
- dashboard:'Политические процессы',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'НПА',actions:'Решения',grades:'Оценки',profile:'Профиль',teacher:'Управление',chat:'Связь'
+ dashboard:'Обзор игры',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'НПА',actions:'Политические процессы',grades:'Оценки',profile:'Профиль',teacher:'Управление',chat:'Связь'
 };
 
 function timerText(seconds:number){
@@ -182,7 +182,7 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
      {parties.some(p=>p.ghost_active)&&<button onClick={()=>{if(confirm('Завершить ближайшее заседание ГД и восстановить полный состав всех фракций?'))void clearPartyGhostLoss()}}><span>↺</span><b>Завершить заседание ГД · снять GV</b></button>}
      <button onClick={exportSession}><span>⇩</span><b>Экспорт журнала</b></button>
     </div>
-    <div className="eventComposer"><input value={eventTitle} onChange={e=>setEventTitle(e.target.value)} placeholder="Заголовок события"/><textarea rows={4} value={eventBody} onChange={e=>setEventBody(e.target.value)} placeholder="Что произошло?"/><button className="primary" onClick={publish}>Опубликовать всем</button></div>
+    <div className="eventComposer"><input aria-label="Заголовок события" value={eventTitle} onChange={e=>setEventTitle(e.target.value)} placeholder="Заголовок события"/><textarea aria-label="Описание события" rows={4} value={eventBody} onChange={e=>setEventBody(e.target.value)} placeholder="Что произошло?"/><button className="primary" onClick={publish}>Опубликовать всем</button></div>
    </div>
   </details>
 
@@ -190,7 +190,7 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
    <summary><div><b>Роли и показатели</b><span>Игровые роли и KPI государства; журнал ВСН расположен выше</span></div><i>+</i></summary>
    <div className="teacherDetailsBody split">
     <div><h3>Показатели государства</h3><div className="metricEditor">{metrics.map(m=><label key={m.id}><span>{m.label}</span><input key={m.id+String(m.value)} type="number" defaultValue={m.value} onBlur={e=>updateMetric(m.id,+e.target.value)}/><em>{m.unit||''}</em></label>)}</div></div>
-    <div><h3>Игровые роли</h3><div className="evaluationRows">{members.filter(m=>m.kind!=='teacher').map(m=><div key={m.user_id}><div className="studentIdentity"><b>{m.full_name}</b><input key={m.user_id+(m.role_title||'')} defaultValue={m.role_title||''} onBlur={e=>updateMember(m.user_id,{role_title:e.target.value})} placeholder="Игровая роль"/></div></div>)}</div></div>
+    <div><h3>Игровые роли</h3><div className="evaluationRows">{members.filter(m=>m.kind!=='teacher').map(m=><div key={m.user_id}><div className="studentIdentity"><b>{m.full_name}</b><input key={m.user_id+(m.role_title||'')} defaultValue={m.role_title||''} onBlur={e=>updateMember(m.user_id,{role_title:e.target.value})} aria-label="Игровая роль участника" placeholder="Игровая роль"/></div></div>)}</div></div>
    </div>
   </details>
  </div>;

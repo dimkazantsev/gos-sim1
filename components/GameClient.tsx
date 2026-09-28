@@ -5,8 +5,9 @@ import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
 import {initials} from './game/constants';
+import DashboardView from './game/DashboardView';
+import {useDialog} from './ui/useDialog';
 import PoliticalWallView from './game/PoliticalWallView';
-import StateMetricsDock from './game/StateMetricsDock';
 import CrisisRoom from './game/CrisisRoom';
 import StagesView from './game/StagesView';
 import PartiesView from './game/PartiesView';
@@ -158,6 +159,10 @@ export default function GameClient({gameId}:{gameId:string}){
  const [focusFormalId,setFocusFormalId]=useState('');
  const [viewAs,setViewAs]=useState('');
  const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
+ const [focusStage,setFocusStage]=useState(0);
+ const [crisisExpanded,setCrisisExpanded]=useState(false);
+ const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
+ function navigate(next:View){setFocusStage(0);setView(next);setMobileMenuOpen(false);requestAnimationFrame(()=>document.getElementById('game-main')?.focus());}
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
 
  const genericStudent:Member|undefined=teacher&&game?{
@@ -175,7 +180,7 @@ export default function GameClient({gameId}:{gameId:string}){
 
  useEffect(()=>{
   if(!me||previewMode)return;
-  const labels:Record<View,string>={dashboard:'Политические процессы',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Архив решений',grades:'Оценки',profile:'Мой профиль',teacher:'Управление'};
+  const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политические процессы',grades:'Оценки',profile:'Мой профиль',teacher:'Управление'};
   void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
   const id=setInterval(()=>void touchPresence(view),30000);
   return()=>clearInterval(id);
@@ -188,26 +193,23 @@ export default function GameClient({gameId}:{gameId:string}){
   if(visible.length&&!visible.some(c=>c.id===g.channelId))g.setChannelId(visible[0].id);
  },[previewStudent?.user_id]);
 
- if(loading||!game||!me||!shownMe)return <main className="loginPage"><div className="loaderCard"><div className="spinner"/><div><b>GOS//SIM</b><p className="muted">{error||'Подключение к игре…'}</p></div></div></main>;
+ if(loading||!game||!me||!shownMe)return <main className="connectionPage"><section className="connectionCard" aria-live="polite"><span className="wordmark">GOS//SIM</span>{!error&&<div className="spinner"/>}<h1>{error?'Не удалось открыть игру':'Подключаемся к республике'}</h1><p>{error||'Загружаем этапы, команды и последние решения.'}</p>{error&&<div><button className="primary" onClick={()=>window.location.reload()}>Попробовать снова</button><a className="secondary" href="/">Вернуться ко входу</a></div>}</section></main>;
 
- const nav:[View,string][] = previewMode
-  ? [['dashboard','Процессы'],['parties','Партия'],['votes','Голосование'],['documents','НПА'],['stages','Этапы'],['grades','Оценки'],['profile','Профиль']]
-  : teacher
-   ? [['teacher','Управление'],['dashboard','Процессы'],['parties','Партии'],['votes','Голосования'],['documents','НПА'],['stages','Этапы'],['grades','Оценки'],['profile','Профиль']]
-   : [['dashboard','Процессы'],['parties','Партия'],['votes','Голосование'],['documents','НПА'],['stages','Этапы'],['grades','Оценки'],['profile','Профиль']];
+ const nav:[View,string][]=[['dashboard','Обзор игры'],['stages','Этапы и задачи'],['actions','Политические процессы'],['parties',teacher&&!previewMode?'Партии':'Моя партия'],['votes','Голосования'],['documents','Реестр НПА'],['grades','Оценки и разбор'],...(teacher&&!previewMode?[['teacher','Управление'] as [View,string]]:[]),['profile','Мой профиль']];
 
  const navIcon=(key:View)=>{
-  const P=key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='parties'?Landmark:key==='votes'?VoteIcon:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:UserRound;
+  const P=key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='actions'?Radio:key==='parties'?Landmark:key==='votes'?VoteIcon:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:UserRound;
   return <P aria-hidden="true" strokeWidth={1.9}/>;
  };
  const mobilePrimary:View[]=teacher&&!previewMode?['teacher','dashboard','stages','votes']:['dashboard','stages','parties','votes'];
  const mobileSecondary=nav.filter(([k])=>!mobilePrimary.includes(k));
 
  return <div className={'simShell '+(previewMode?'studentPreviewShell':'')}>
+  <a className="skipLink" href="#game-main">Перейти к содержимому</a>
   <aside className="simSidebar">
    <div className="sidebarBrand">
-    <div className="simLogo"><ShieldCheck aria-hidden="true"/><span>GS</span></div>
-    <div><b>GOS//SIM</b><span>Республика Политология</span></div>
+    <div className="brandMark" aria-hidden="true">g<span>//</span>s</div>
+    <div><b>GOS<span>//</span>SIM</b><small>Республика Политология</small></div>
    </div>
 
    <section className="sidebarStage">
@@ -218,7 +220,7 @@ export default function GameClient({gameId}:{gameId:string}){
 
    <nav className="focusNav" aria-label="Разделы игры">
     <div className="focusNavInner">
-     {nav.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>setView(k)} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{label}</span></button>)}
+     {nav.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>navigate(k)} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{label}</span>{k==='votes'&&g.votes.some(v=>v.status==='open')&&<i className="navBadge">{g.votes.filter(v=>v.status==='open').length}</i>}</button>)}
     </div>
    </nav>
 
@@ -234,13 +236,13 @@ export default function GameClient({gameId}:{gameId:string}){
 
   <div className={'simWorkspace '+(chatOpen?'chatOpen':'')}>
    <header className="simTop">
-    <div className="mobileBrand"><div className="simLogo"><ShieldCheck aria-hidden="true"/><span>GS</span></div><b>GOS//SIM</b></div>
+    <div className="mobileBrand"><div className="brandMark" aria-hidden="true">g<span>//</span>s</div><b>GOS//SIM</b></div>
     <div className="simTopCenter">
-     <div className="topStageCopy"><small>ЭТАП {String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</small><strong>{currentStage?.title||game.title}</strong></div>
+     <div className="topStageCopy"><small>ЭТАП {String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</small><strong>{nav.find(([key])=>key===view)?.[1]||game.title}</strong></div>
      <div className="topIndicators">
-      <span className={`livePill ${game.turn_open?'on':'off'}`}><Radio aria-hidden="true"/>{game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span>
-      {game.turn_open&&game.turn_ends_at&&<span className="timerPill">{fmtTimer(secondsLeft)}</span>}
-      <span className={`connectionPill ${g.realtimeState}`}><Wifi aria-hidden="true"/>{g.realtimeState==='connected'?'ONLINE':g.realtimeState==='connecting'?'SYNC':'OFFLINE'}</span>
+      <span className={`livePill ${game.turn_open?'on':'off'}`}><Radio aria-hidden="true"/>{game.turn_open?'Ход открыт':'Пауза'}</span>
+      {game.turn_open&&game.turn_ends_at&&<span className="timerPill" aria-label="Время до конца хода">{fmtTimer(secondsLeft)}</span>}
+      <span className={`connectionPill ${g.realtimeState}`}><Wifi aria-hidden="true"/>{g.realtimeState==='connected'?'В сети':g.realtimeState==='connecting'?'Подключение':'Нет связи'}</span>
      </div>
     </div>
 
@@ -264,20 +266,19 @@ export default function GameClient({gameId}:{gameId:string}){
    </div>}
 
    <div className="simContentFlow">
-    <StateMetricsDock g={vg}/>
-    {!previewMode&&<div className="crisisShell"><CrisisRoom g={g}/></div>}
+    {!previewMode&&g.crises.some(c=>c.status==='active')&&<section className="crisisNotice"><div><b>В республике активен кризис</b><span>{g.crises.find(c=>c.status==='active')?.crisis_type}</span></div><button className="secondary" aria-expanded={crisisExpanded} onClick={()=>setCrisisExpanded(!crisisExpanded)}>{crisisExpanded?'Свернуть штаб':'Открыть кризисный штаб'}</button>{crisisExpanded&&<div className="crisisNoticeBody"><CrisisRoom g={g}/></div>}</section>}
 
-    <main className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
-     {error&&<div className="errorBox closable" onClick={()=>setError('')}>{error}</div>}
-     {view==='dashboard'&&<PoliticalWallView g={vg} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>}
-     {view==='stages'&&<StagesView g={vg} onOpenVotes={()=>setView('votes')}/>}
+    <main id="game-main" tabIndex={-1} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
+     {error&&<div className="errorBox closable" role="alert"><span>{error}</span><button onClick={()=>setError('')} aria-label="Закрыть сообщение об ошибке">×</button></div>}
+     {view==='dashboard'&&<DashboardView g={vg} onNavigate={v=>{navigate(v);if(v==='stages')setFocusStage(currentStage?.stage_no||game.current_round)}}/>}
+     {view==='stages'&&<StagesView g={vg} readOnly={previewMode} focusStageNo={focusStage} onOpenVotes={()=>setView('votes')}/>}
      {view==='parties'&&<PartiesView g={vg}/>}
      {view==='votes'&&<VotesView g={vg} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onOpenStages={()=>setView('stages')}/>}
-     {view==='documents'&&<DocumentsView g={vg} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>}
+     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>}
      {view==='grades'&&<GradesView g={vg}/>}
      {view==='actions'&&<PoliticalWallView g={vg} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>}
      {view==='profile'&&<ProfileView g={vg}/>}
-     {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>setView('dashboard')}/>}
+     {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>navigate('actions')}/>}
     </main>
    </div>
 
@@ -285,14 +286,15 @@ export default function GameClient({gameId}:{gameId:string}){
   </div>
 
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
-   <section className="mobileMoreSheet" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
-    <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><button onClick={()=>setMobileMenuOpen(false)}>×</button></header>
-    <div>{mobileSecondary.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>{setView(k);setMobileMenuOpen(false)}}>{navIcon(k)}<span>{label}</span></button>)}</div>
+   <section ref={mobileDialogRef} tabIndex={-1} className="mobileMoreSheet" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
+    <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><button onClick={()=>setMobileMenuOpen(false)} aria-label="Закрыть меню">×</button></header>
+    <div>{mobileSecondary.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>navigate(k)}>{navIcon(k)}<span>{label}</span></button>)}</div>
+    <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
   <nav className="mobileDock" aria-label="Мобильная навигация">
-   {mobilePrimary.map(k=>{const item=nav.find(([x])=>x===k);if(!item)return null;return <button key={k} className={view===k?'active':''} onClick={()=>{setView(k);setMobileMenuOpen(false)}}>{navIcon(k)}<span>{item[1]}</span></button>})}
-   <button className={mobileSecondary.some(([k])=>k===view)?'active':''} onClick={()=>setMobileMenuOpen(true)}><Menu/><span>Ещё</span></button>
+   {mobilePrimary.map(k=>{const item=nav.find(([x])=>x===k);if(!item)return null;return <button key={k} className={view===k?'active':''} onClick={()=>navigate(k)} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{item[1]}</span></button>})}
+   <button className={mobileSecondary.some(([k])=>k===view)?'active':''} onClick={()=>setMobileMenuOpen(true)} aria-expanded={mobileMenuOpen} aria-haspopup="dialog"><Menu/><span>Ещё</span></button>
   </nav>
  </div>;
 }

@@ -1,5 +1,7 @@
 'use client';
 import {FormEvent,useMemo,useState} from 'react';
+import {ArrowUpRight,ArrowRight,Eye,EyeOff,GraduationCap,Landmark,LockKeyhole,LoaderCircle} from 'lucide-react';
+import CivicArtwork from '@/components/ui/CivicArtwork';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
 
@@ -16,7 +18,8 @@ export default function Home(){
  const router=useRouter();
  const [mode,setMode]=useState<'student'|'teacher'>('student'),[createMode,setCreateMode]=useState(false);
  const [gameTitle,setGameTitle]=useState('Республика Политология'),[studentCode,setStudentCode]=useState(''),[fio,setFio]=useState(''),[group,setGroup]=useState(''),[gameCode,setGameCode]=useState(''),[invite,setInvite]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
- const heading=useMemo(()=>mode==='teacher'&&createMode?'Создание новой игровой сессии':mode==='teacher'?'Вход преподавателя':'Вход участника',[mode,createMode]);
+ const [showCode,setShowCode]=useState(false);
+ const heading=useMemo(()=>mode==='teacher'&&createMode?'Новое государство':mode==='teacher'?'Начнём занятие':'Ваш ход. Входите.',[mode,createMode]);
 
  async function submit(e:FormEvent){
   e.preventDefault();setBusy(true);setError('');
@@ -36,23 +39,37 @@ export default function Home(){
   }catch(e){setError(readableError(e))}finally{setBusy(false)}
  }
 
- return <main className="loginPage"><div className="gridGlow"/><section className="landingShell">
-  <div className="landingIntro"><div className="introBadge">учебная многопользовательская симуляция</div><div className="logoRow"><div className="logo">G//S</div><div><small>POLITICAL & PUBLIC ADMINISTRATION LAB</small><h1>GOS//SIM</h1></div></div><h2>«Республика Политология» — цифровая среда моделирования ПАУ/ГПУ</h2><p className="landingText">От создания партий и выборов до Правительства, законотворчества, федерального бюджета, местного самоуправления и кризисного управления.</p>
-   <div className="featureGrid"><article><span>◫</span><div><b>16 игровых этапов</b><p>Вся логика курса перенесена в последовательный интерактивный сценарий.</p></div></article><article><span>✓</span><div><b>Процедуры и голосования</b><p>Кворум 2/3, фракционные решения, мандаты и ghost voting.</p></div></article><article><span>✦</span><div><b>Режиссёрская преподавателя</b><p>Время, кризисы, события, ВСН, роли, партии и показатели государства.</p></div></article><article><span>⌁</span><div><b>Командная коммуникация</b><p>Общий штаб и закрытые фракционные каналы с аудио и видео.</p></div></article></div>
-   <div className="infoStrip"><div><label>Курс</label><strong>ГПУ / ПАУ</strong></div><div><label>Формат</label><strong>Командная симуляция</strong></div><div><label>Оценивание</label><strong>ВСН · 0–3</strong></div></div>
+ return <main className="entryPage">
+  <a className="skipLink" href="#entry-form">Перейти ко входу</a>
+  <header className="entryHeader"><a className="wordmark" href="/" aria-label="GOS SIM — главная"><span className="brandMark" aria-hidden="true">g<span>//</span>s</span><b>GOS<span>//</span>SIM</b></a><span className="entryEdition">Лаборатория государственного управления <i>2026</i></span></header>
+  <div className="entryGrid">
+   <section className="entryStory" aria-labelledby="entry-title">
+    <div className="entryEyebrow"><span/>Учебная игра · ГМУ</div>
+    <h1 id="entry-title">Государство<br/>начинается<br/><em>с вашего решения.</em></h1>
+    <p className="entryLead">Создавайте партии. Принимайте законы. Договаривайтесь о будущем. Пройдите путь от первого политического союза до управления целой республикой.</p>
+    <div className="entryVisual"><CivicArtwork/><div className="entryVisualCaption"><span>РЕСПУБЛИКА ПОЛИТОЛОГИЯ</span><ArrowUpRight aria-hidden="true"/></div></div>
+    <div className="entryFacts"><div><b>16</b><span>этапов игры</span></div><div><Landmark aria-hidden="true"/><span>Реальные институты.<br/>Учебные решения.</span></div><div><GraduationCap aria-hidden="true"/><span>Практика государственного<br/>и муниципального управления</span></div></div>
+   </section>
+   <section className="entryAccess" aria-labelledby="entry-heading">
+    <form id="entry-form" className="entryForm" onSubmit={submit} aria-busy={busy}>
+     <div className="entryFormIntro"><span className="overline">ПРИСОЕДИНИТЬСЯ К ИГРЕ</span><h2 id="entry-heading">{heading}</h2><p>{mode==='teacher'&&createMode?'Задайте название и коды доступа для вашей группы.':'Введите данные, которые вы получили от преподавателя.'}</p></div>
+     <fieldset disabled={busy}>
+      <legend className="srOnly">Роль и данные для входа</legend>
+      <div className="entryRoles" aria-label="Ваша роль"><button type="button" aria-pressed={mode==='student'} className={mode==='student'?'active':''} onClick={()=>{setMode('student');setCreateMode(false);setError('')}}><GraduationCap aria-hidden="true"/>Участник</button><button type="button" aria-pressed={mode==='teacher'} className={mode==='teacher'?'active':''} onClick={()=>{setMode('teacher');setError('')}}><Landmark aria-hidden="true"/>Преподаватель</button></div>
+      {mode==='teacher'&&<div className="entryMode"><button type="button" aria-pressed={!createMode} className={!createMode?'active':''} onClick={()=>{setCreateMode(false);setError('')}}>Войти в игру</button><button type="button" aria-pressed={createMode} className={createMode?'active':''} onClick={()=>{setCreateMode(true);setError('')}}>Создать игру</button></div>}
+      <label className="entryField">Ваше ФИО<input name="fullName" autoComplete="name" value={fio} onChange={e=>setFio(e.target.value)} placeholder="Иванов Иван Иванович" minLength={2} required/></label>
+      {mode==='teacher'&&createMode&&<label className="entryField">Название игры<input name="gameTitle" value={gameTitle} onChange={e=>setGameTitle(e.target.value)} required/></label>}
+      <div className={'entryFieldRow '+(mode==='teacher'?'single':'')}><label className="entryField">Код игры<input name="gameCode" autoComplete="off" autoCapitalize="none" spellCheck={false} value={gameCode} onChange={e=>setGameCode(e.target.value)} placeholder="GPU-2026" minLength={2} required/></label>{mode==='student'&&<label className="entryField">Группа <small>необязательно</small><input name="group" value={group} onChange={e=>setGroup(e.target.value)} placeholder="Например, 1241"/></label>}</div>
+      <label className="entryField">{mode==='teacher'?'Код преподавателя':'Код участника'}<span className="entrySecret"><input name="inviteCode" autoComplete={createMode?'new-password':'current-password'} type={showCode?'text':'password'} minLength={4} value={invite} onChange={e=>setInvite(e.target.value)} required aria-describedby="code-hint"/><button type="button" onClick={()=>setShowCode(!showCode)} aria-label={showCode?'Скрыть код':'Показать код'} aria-pressed={showCode}>{showCode?<EyeOff/>:<Eye/>}</button></span><small id="code-hint">{mode==='teacher'&&createMode?'Придумайте код из 4 или более символов.':'Отдельный код доступа, полученный от преподавателя.'}</small></label>
+      {mode==='teacher'&&createMode&&<label className="entryField">Код для студентов<input name="studentCode" type="password" autoComplete="new-password" minLength={4} value={studentCode} onChange={e=>setStudentCode(e.target.value)} required/><small>Не должен совпадать с кодом преподавателя.</small></label>}
+      {error&&<div className="errorBox" role="alert">{error}</div>}
+      <button className="primary entrySubmit" disabled={busy}>{busy?<><LoaderCircle className="spin" aria-hidden="true"/>Подключаемся…</>:<>{mode==='teacher'&&createMode?'Создать игру':'Войти в игру'}<ArrowRight aria-hidden="true"/></>}</button>
+     </fieldset>
+     <div className="entryPrivacy"><LockKeyhole aria-hidden="true"/><p>ФИО будет видно участникам и преподавателю. Ваши действия сохраняются в протоколе игры.</p></div>
+    </form>
+    <div className="entryAccessNote"><span>01 — 16</span><p>Здесь каждое решение<br/>меняет ход игры.</p><ArrowUpRight aria-hidden="true"/></div>
+   </section>
   </div>
-  <form className="loginCard" onSubmit={submit}><div><small className="muted">РЕЖИМ ДОСТУПА</small><h3 className="formTitle">{heading}</h3><p className="muted">ФИО сохраняется в профиле и игровом протоколе сессии.</p></div>
-   <div className="seg"><button type="button" className={mode==='student'?'active':''} onClick={()=>{setMode('student');setCreateMode(false);setError('')}}>Студент</button><button type="button" className={mode==='teacher'?'active':''} onClick={()=>{setMode('teacher');setError('')}}>Преподаватель</button></div>
-   {mode==='teacher'&&<div className="seg"><button type="button" className={!createMode?'active':''} onClick={()=>setCreateMode(false)}>Войти</button><button type="button" className={createMode?'active':''} onClick={()=>setCreateMode(true)}>Создать игру</button></div>}
-   <label>ФИО<input value={fio} onChange={e=>setFio(e.target.value)} placeholder="Иванов Иван Иванович" required/></label>
-   {mode==='teacher'&&createMode&&<label>Название игры<input value={gameTitle} onChange={e=>setGameTitle(e.target.value)} required/></label>}
-   <label>Код игры<input value={gameCode} onChange={e=>setGameCode(e.target.value)} placeholder="GPU-2026" required/></label>
-   {mode==='student'&&<label>Учебная группа<input value={group} onChange={e=>setGroup(e.target.value)} placeholder="Например: 1241"/></label>}
-   <label>{mode==='teacher'?'Код преподавателя':'Код участника'}<input type="password" minLength={4} value={invite} onChange={e=>setInvite(e.target.value)} required/><small className="muted">Минимум 4 символа.</small></label>
-   {mode==='teacher'&&createMode&&<label>Код для студентов<input type="password" minLength={4} value={studentCode} onChange={e=>setStudentCode(e.target.value)} required/><small className="muted">Не должен совпадать с кодом преподавателя.</small></label>}
-   {error&&<div className="errorBox">{error}</div>}
-   <button className="primary" disabled={busy}>{busy?'Подключение…':mode==='teacher'&&createMode?'Создать игровую сессию':'Войти в государство'}</button>
-   <div className="loginTips"><div><label>Внутри платформы</label><ul><li>16 этапов курса;</li><li>партии, фракции и роли;</li><li>голосования и решения;</li><li>ВСН и кризисные сценарии.</li></ul></div><div><label>Учебный режим</label><p>Платформа предназначена для проведения деловой игры в рамках учебного курса и фиксирует действия участников внутри сессии.</p></div></div>
-  </form>
- </section></main>
+  <footer className="entryFooter"><span>GOS//SIM · Республика Политология</span><span>Деловая игра по ПАУ / ГПУ</span><span>Учебная модель государственных институтов</span></footer>
+ </main>;
 }

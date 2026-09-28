@@ -1,5 +1,6 @@
 'use client';
 import {useMemo,useState} from 'react';
+import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Metric} from './types';
 
@@ -40,13 +41,14 @@ function metricIcon(k:string){
 export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
  const {metrics,metricHistory,teacher,politicalPosts,names}=g;
  const [selected,setSelected]=useState('');
+ const dialogRef=useDialog(!!selected,()=>setSelected(''));
  const [compare,setCompare]=useState<string[]>([]);
  const [bucket,setBucket]=useState<'changes'|'day'|'week'>('changes');
  const [more,setMore]=useState(false);
  const allowed=useMemo(()=>[...metrics].filter(m=>teacher||m.is_public).sort((a,b)=>a.sort_order-b.sort_order),[metrics,teacher]);
  const primary=PRIMARY.map(k=>allowed.find(m=>m.metric_key===k)).filter(Boolean) as Metric[];
  const secondary=allowed.filter(m=>!PRIMARY.includes(m.metric_key));
- const chosen=metrics.find(m=>m.id===selected);
+ const chosen=allowed.find(m=>m.id===selected);
 
  function rowsFor(metricKey:string){return metricHistory.filter(h=>h.metric_key===metricKey)}
  function grouped(metricKey:string){
@@ -92,16 +94,16 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
  return <>
   <section className="statePulseDock" aria-label="Состояние государства">
    <div className="statePulseTop">
-    <div><small>СОСТОЯНИЕ ГОСУДАРСТВА · LIVE</small><b>Последствия решений видны сразу</b></div>
-    {secondary.length>0&&<button className={more?'active':''} onClick={()=>setMore(v=>!v)}>{more?'Скрыть':'Ещё показатели'} <span>{secondary.length}</span></button>}
+    <div><small>ИГРОВЫЕ ПОКАЗАТЕЛИ</small><b>Последствия решений видны сразу</b></div>
+    {secondary.length>0&&<button className={more?'active':''} aria-expanded={more} onClick={()=>setMore(v=>!v)}>{more?'Скрыть':'Ещё показатели'} <span>{secondary.length}</span></button>}
    </div>
-   <div className="statePulseGrid">{primary.map(card)}</div>
+   {allowed.length?<div className="statePulseGrid">{primary.map(card)}</div>:<div className="emptyState">Показатели появятся после настройки игры преподавателем.</div>}
    {more&&<div className="statePulseSecondary">{secondary.map(card)}</div>}
   </section>
 
   {chosen&&<div className="metricModalBackdrop" onClick={()=>setSelected('')}>
-   <section className="metricModal redesigned" onClick={e=>e.stopPropagation()}>
-    <header><div className="metricModalTitle"><span>{metricIcon(chosen.metric_key)}</span><div><small>{groupLabel(chosen.group_key).toUpperCase()}</small><h2>{chosen.label}</h2><p>{chosen.description||'Игровой показатель состояния государства.'}</p></div></div><button onClick={()=>setSelected('')}>×</button></header>
+   <section ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="metric-title" className="metricModal redesigned" onClick={e=>e.stopPropagation()}>
+    <header><div className="metricModalTitle"><span>{metricIcon(chosen.metric_key)}</span><div><small>{groupLabel(chosen.group_key).toUpperCase()}</small><h2 id="metric-title">{chosen.label}</h2><p>{chosen.description||'Игровой показатель состояния государства.'}</p></div></div><button onClick={()=>setSelected('')} aria-label="Закрыть показатель">×</button></header>
     <div className="metricHeroValue"><strong>{Number(chosen.value).toLocaleString('ru-RU')}{chosen.unit||''}</strong><span className={changeTone(chosen,delta(chosen))}>{delta(chosen)>=0?'▲ +':'▼ '}{Math.abs(delta(chosen)).toFixed(1)} с прошлого изменения</span></div>
     {hist.at(-1)&&<div className="metricLastCause"><small>ПОСЛЕДНЯЯ ПРИЧИНА</small><b>{hist.at(-1)?.note||hist.at(-1)?.source_type}</b><span>{new Date(hist.at(-1)!.recorded_at).toLocaleString('ru-RU')}</span></div>}
     <div className="metricBucketTabs"><button className={bucket==='changes'?'active':''} onClick={()=>setBucket('changes')}>Все изменения</button><button className={bucket==='day'?'active':''} onClick={()=>setBucket('day')}>По дням</button><button className={bucket==='week'?'active':''} onClick={()=>setBucket('week')}>По неделям</button></div>

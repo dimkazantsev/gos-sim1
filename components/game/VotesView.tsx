@@ -49,8 +49,8 @@ export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeR
    <summary><div><b>Открыть отдельное голосование</b><span>Для вопросов, не привязанных к конкретному НПА</span></div><i>+</i></summary>
    <div className="teacherDetailsBody">
     <div className="voteBuilder modern">
-     <input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Вопрос голосования"/>
-     <textarea value={body} onChange={e=>setBody(e.target.value)} placeholder="Проект решения / пояснение"/>
+     <input aria-label="Вопрос голосования" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Вопрос голосования"/>
+     <textarea aria-label="Проект решения" value={body} onChange={e=>setBody(e.target.value)} placeholder="Проект решения / пояснение"/>
      <div className="voteBuilderGrid">
       <label>Кто голосует<select value={institution} onChange={e=>setInstitution(e.target.value)}><option value="all">Все участники</option><option value="gd">Государственная Дума</option><option value="government">Правительство РФ</option><option value="sf">Совет Федерации</option><option value="committee">Профильный комитет</option><option value="municipality">Муниципальный орган</option></select></label>
       <label>Способ подсчёта<select value={mode} onChange={e=>setMode(e.target.value as typeof mode)}><option value="member">Один участник — один голос</option><option value="faction">Одна фракция — один голос</option><option value="mandate">Вес = число мандатов</option></select></label>

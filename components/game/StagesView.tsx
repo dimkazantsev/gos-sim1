@@ -1,5 +1,6 @@
 'use client';
-import {useState,type CSSProperties} from 'react';
+import {useEffect,useState,type CSSProperties} from 'react';
+import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage} from './types';
 import {formatDeadline,stageIcon} from './constants';
@@ -24,9 +25,11 @@ import GovernmentProgramSessionLab from './GovernmentProgramSessionLab';
 import CrisisRoom from './CrisisRoom';
 import StageReadinessPanel from './StageReadinessPanel';
 
-export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
+export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;focusStageNo?:number;readOnly?:boolean}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
  const [selected,setSelected]=useState<Stage|null>(null);
+ const dialogRef=useDialog(!!selected,()=>setSelected(null));
+ useEffect(()=>{if(focusStageNo)setSelected(stages.find(s=>s.stage_no===focusStageNo)||null)},[focusStageNo]);
  const detail=selected?STAGE_DETAILS[selected.stage_no]:null;
  const current=stages.find(s=>s.status==='open')||stages.find(s=>s.status!=='completed')||stages.at(-1);
  const currentPhase=current?gamePhaseForStage(current.stage_no):GAME_PHASES[0];
@@ -34,7 +37,7 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
 
  return <>
   <section className="pageHeader">
-   <div><small>АРХИТЕКТУРА ИГРЫ</small><h1>16 этапов «Республики Политология»</h1><p>Нажмите на любой этап — откроются полные правила, задачи, результаты и процедура.</p></div>
+   <div><small>КАРТА ИГРЫ · 16 ЭТАПОВ</small><h1>Путь вашей республики</h1><p>Нажмите на любой этап — откроются полные правила, задачи, результаты и процедура.</p></div>
    {teacher&&<button className="primary" onClick={nextStage}>Открыть следующий этап</button>}
   </section>
 
@@ -77,7 +80,7 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
   </div>
 
   {selected&&detail&&<div className="stageModalBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}>
-   <section className="stageDetailPanel" role="dialog" aria-modal="true" aria-labelledby="stage-detail-title">
+   <section ref={dialogRef} tabIndex={-1} className="stageDetailPanel" role="dialog" aria-modal="true" aria-labelledby="stage-detail-title">
     <header className="stageDetailHeader">
      <div className="stageDetailBadge">{String(selected.stage_no).padStart(2,'0')}</div>
      <div>
@@ -151,6 +154,7 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
       <button className="primary" onClick={onOpenVotes}>Перейти к голосованию →</button>
      </section>}
 
+     <fieldset className="labControls" disabled={readOnly}><legend className="srOnly">Рабочие действия этапа</legend>{readOnly&&<p className="readOnlyNote">Просмотр интерфейса участника. Рабочие действия доступны в его собственной сессии.</p>}
      <DeadlineControl g={g} stageNo={selected.stage_no}/>
 
      {(selected.stage_no===2||selected.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={selected.stage_no as 2|3} onOpenVotes={onOpenVotes}/>} 
@@ -182,6 +186,7 @@ export default function StagesView({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenV
      {selected.stage_no===16&&<SystemDebriefLab g={g}/>} 
 
      <StageReadinessPanel g={g} stageNo={selected.stage_no}/>
+     </fieldset>
 
      {teacher&&<section className="stageTeacherActions">
       <div><small>УПРАВЛЕНИЕ ЭТАПОМ</small><b>Действия преподавателя</b></div>

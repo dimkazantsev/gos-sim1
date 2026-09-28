@@ -1,5 +1,6 @@
 'use client';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
+import {useDialog} from '../ui/useDialog';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 
@@ -24,6 +25,7 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
  const [runs,setRuns]=useState<Run[]>([]);
  const [debriefRows,setDebriefRows]=useState<Debrief[]>([]);
  const [selected,setSelected]=useState<{userId:string;stageNo:number}|null>(null);
+ const evidenceRequest=useRef(0);
  const [evidence,setEvidence]=useState<Evidence|null>(null);
  const [loadingEvidence,setLoadingEvidence]=useState(false);
  const [editScore,setEditScore]=useState(0);
@@ -68,6 +70,7 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
  },[myRows]);
 
  async function open(userId:string,stageNo:number){
+  const request=++evidenceRequest.current;
   const a=rows.find(x=>x.user_id===userId&&x.stage_no===stageNo);
   setSelected({userId,stageNo});
   setEditScore(shownScore(a)??0);
@@ -78,6 +81,7 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
   const requests:any[]=[supabase.rpc('get_stage_assessment_evidence',{p_game_id:game.id,p_user_id:userId,p_stage_no:stageNo})];
   if(a)requests.push(supabase.from('stage_assessment_runs').select('id,assessment_id,run_type,auto_score,criterion_law,criterion_strategy,criterion_debrief,created_at').eq('assessment_id',a.id).order('created_at',{ascending:false}).limit(50));
   const rr=await Promise.all(requests);
+  if(request!==evidenceRequest.current)return;
   if(!rr[0].error)setEvidence((rr[0].data||{}) as Evidence);
   if(rr[1]&&!rr[1].error)setRuns((rr[1].data||[]) as Run[]);
   setLoadingEvidence(false);
@@ -136,7 +140,7 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
    <div className="surfaceHead"><div><small>ЖУРНАЛ ВСН</small><h2>Динамика по 16 этапам</h2></div><strong>{myAverage!==null?myAverage.toFixed(2):'—'}</strong></div>
    <div className="vsnMiniTrend">{STAGES.map(n=>{const a=myRows.find(x=>x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(me.user_id,n)} aria-label={'Этап '+n+', оценка '+(v??'нет')}><small>{n}</small><b>{v??'—'}</b></button>})}</div>
    <p className="vsnCompactHint">Нажмите на этап, чтобы увидеть критерии и обоснование оценки.</p>
-   {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={false} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>setSelected(null)} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
+   {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={false} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>{evidenceRequest.current++;setSelected(null)}} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
   </section>;
  }
 
@@ -170,16 +174,17 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
    <div><span>{targetAssessment?.status==='final'?'Итоговая оценка зафиксирована':debrief.trim().length+' знаков'}</span><button className="primary" disabled={!canWriteDebrief||busy||debrief.trim().length<40} onClick={()=>void submitDebrief()}>Сдать / обновить разбор</button></div>
   </section>}
 
-  {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={teacher} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>setSelected(null)} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
+  {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={teacher} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>{evidenceRequest.current++;setSelected(null)}} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
  </div>;
 }
 
 function AssessmentModal(p:any){
  const {g,assessment:a,selected,student,evidence,runs,loading,teacher,editScore,setEditScore,note,setNote,busy,close,ensureDraft,recalc,finalize,reopen}=p;
+ const dialogRef=useDialog(true,close);
  const v=shownScore(a);
  const canSeeEvidence=teacher||selected.userId===g.me?.user_id;
- return <div className="gradeModalBack" onMouseDown={e=>{if(e.target===e.currentTarget)close()}}><article className="gradeModal">
-  <header><div><small>ЭТАП {selected.stageNo}</small><h2>{student?.full_name||g.me?.full_name}</h2><p>{g.stages.find((s:any)=>s.stage_no===selected.stageNo)?.title}</p></div><button onClick={close} aria-label="Закрыть">×</button></header>
+ return <div className="gradeModalBack" onMouseDown={e=>{if(e.target===e.currentTarget)close()}}><article ref={dialogRef} tabIndex={-1} className="gradeModal" role="dialog" aria-modal="true" aria-labelledby="assessment-title">
+  <header><div><small>ЭТАП {selected.stageNo}</small><h2 id="assessment-title">{student?.full_name||g.me?.full_name}</h2><p>{g.stages.find((s:any)=>s.stage_no===selected.stageNo)?.title}</p></div><button onClick={close} aria-label="Закрыть">×</button></header>
   {!a?<div className="emptyState gradeEmpty">Черновик ещё не создан.{teacher&&<><br/><button className="primary" disabled={busy} onClick={()=>void ensureDraft()}>Рассчитать сейчас</button></>}</div>:<>
    <div className={'gradeScoreHero '+a.status}><strong>{v}</strong><div><b>{level(v??0)}</b><span>{a.status==='final'?'Итоговая оценка преподавателя':'Автоматический черновик'}</span></div></div>
    <div className="gradeCriteria"><span className={a.criterion_law?'ok':'miss'}><b>{a.criterion_law?'✓':'○'}</b> Право и правила</span><span className={a.criterion_strategy?'ok':'miss'}><b>{a.criterion_strategy?'✓':'○'}</b> Стратегия и интересы</span><span className={a.criterion_debrief?'ok':'miss'}><b>{a.criterion_debrief?'✓':'○'}</b> Анализ этапа</span></div>
