@@ -40,7 +40,7 @@ function ChatAttachment({message:m}:{message:Message}){
 }
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean}){
- const {channels,channelId,setChannelId,messages,chatPins,pinnedMessages,setChatPin,chatLoading,names,recording,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
+ const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,chatLoading,names,recording,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
  const [sending,setSending]=useState(false);
  const [uploading,setUploading]=useState(false);
  const [overlay,setOverlay]=useState(false);
@@ -64,6 +64,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const pendingSend=useRef(false);
  const panel=useDialog(overlay,()=>setChatOpen(false));
  const channel=channels.find(c=>c.id===channelId);
+ const chatPins=useMemo(()=>allPins.filter(p=>p.channel_id===channelId),[allPins,channelId]);
+ const pinnedMessages=useMemo(()=>allPinnedMessages.filter(m=>m.channel_id===channelId),[allPinnedMessages,channelId]);
  const channelMessages=useMemo(()=>messages.filter(m=>m.channel_id===channelId),[messages,channelId]);
  const filtered=useMemo(()=>channelMessages.filter(m=>matchChatMessage(m,search,names[m.author_id]||'Система',onlyFiles)),[channelMessages,search,names,onlyFiles]);
  const entries=useMemo(()=>buildChatEntries(filtered,me?.user_id||''),[filtered,me?.user_id]);
