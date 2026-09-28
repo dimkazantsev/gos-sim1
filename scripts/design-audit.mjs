@@ -31,6 +31,17 @@ check('Visible keyboard focus',css['design-tokens'].includes(':focus-visible'));
 const readable=css['design-readability'];
 
 const dock=read('components/game/StateMetricsDock.tsx');
+check('State metric icons use unified Lucide vector icons rather than text glyphs',
+ dock.includes("from 'lucide-react'")&&
+ dock.includes("k==='economy'?TrendingUp")&&
+ dock.includes("strokeWidth={1.75}")&&
+ !dock.includes("return '⌁'"));
+check('Dashboard icons use softly tinted group palettes',
+ readable.includes('State metric icon system:')&&
+ readable.includes('metric-economy .statePulseIcon')&&
+ readable.includes('metric-public_trust .statePulseIcon')&&
+ readable.includes('width:18px;'));
+
 check('Dashboard renders all permitted metrics without a collapsed section',
  dock.includes('visibleMetrics.map(card)')&&!dock.includes('setMore('));
 check('Dashboard compact grid has six columns and responsive container breakpoints',
