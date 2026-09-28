@@ -1,8 +1,9 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
-import {ArrowDown,ChevronDown,FileText,Image as ImageIcon,Mic,Paperclip,Plus,Search,Send,Video, X} from 'lucide-react';
+import {ArrowDown,FileText,Mic,Paperclip,Pin,PinOff,Plus,Search,Send,Video,X} from 'lucide-react';
 import {IconAction} from '../ui/IconAction';
+import ChatChannelDropdown from './ChatChannelDropdown';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Message} from './types';
@@ -39,11 +40,13 @@ function ChatAttachment({message:m}:{message:Message}){
 }
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void}){
- const {channels,channelId,setChannelId,messages,chatLoading,names,recording,setChatOpen,sendText,sendChatFile,toggleRecording,me}=g;
+ const {channels,channelId,setChannelId,messages,chatPins,pinnedMessages,setChatPin,chatLoading,names,recording,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
  const [sending,setSending]=useState(false);
  const [uploading,setUploading]=useState(false);
  const [overlay,setOverlay]=useState(false);
  const [searchOpen,setSearchOpen]=useState(false);
+ const [pinsOpen,setPinsOpen]=useState(false);
+ const [pinBusy,setPinBusy]=useState<string|null>(null);
  const [search,setSearch]=useState('');
  const [onlyFiles,setOnlyFiles]=useState(false);
  const [attachOpen,setAttachOpen]=useState(false);
@@ -76,7 +79,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
  useEffect(()=>{
   if(channelId!==lastChannel.current){
    lastChannel.current=channelId;follow.current=true;
-   setSearch('');setOnlyFiles(false);setSearchOpen(false);setAttachOpen(false);
+   setSearch('');setOnlyFiles(false);setSearchOpen(false);setAttachOpen(false);setPinsOpen(false);
    setLocalError('');setJumpVisible(false);
   }
  },[channelId]);
@@ -129,6 +132,23 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
   catch{setLocalError('Файл не отправлен. Повторите попытку.')}
   finally{setUploading(false);if(uploadInput.current)uploadInput.current.value=''}
  }
+ async function togglePin(m:Message){
+  if(pinBusy)return;
+  const pinned=chatPins.some(p=>p.message_id===m.id);
+  setPinBusy(m.id);setLocalError('');
+  try{if(!await setChatPin(m.id,!pinned))setLocalError('Не удалось изменить закрепление. Проверьте права или лимит канала.')}
+  catch{setLocalError('Не удалось изменить закрепление. Попробуйте ещё раз.')}
+  finally{setPinBusy(null)}
+ }
+ function showPinnedMessage(m:Message){
+  setPinsOpen(false);
+  resetSearch();
+  requestAnimationFrame(()=>{
+   const node=list.current?.querySelector<HTMLElement>('[data-message-id="'+CSS.escape(m.id)+'"]');
+   if(node)node.scrollIntoView({block:'center',behavior:'smooth'});
+   else{setPinsOpen(true);setLocalError('Сообщение находится вне загруженной истории. Материал доступен в закреплениях.')}
+  });
+ }
  function resetSearch(){setSearch('');setOnlyFiles(false);setSearchOpen(false);follow.current=true;requestAnimationFrame(scrollToLatest)}
  return <aside id="game-chat" ref={panel} tabIndex={-1} className="simChat gsChatV2" role={overlay?'dialog':undefined} aria-modal={overlay?true:undefined} aria-label="Командный чат" onKeyDown={e=>{if(e.key==='Escape'){
   if(attachOpen){e.stopPropagation();setAttachOpen(false);attachmentButton.current?.focus()}
@@ -137,18 +157,28 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
  }}}>
   <header className="chatTop">
    <div className="chatHeadIcon" aria-hidden="true"><MessageIcon/></div>
-   <div className="chatHeadText">
-    <label htmlFor="chat-channel" className="chatEyebrow">КОМАНДНЫЙ ЧАТ</label>
-    <div className="chatChannelField">
-     <select id="chat-channel" aria-label="Выбрать канал общения" value={channelId} onChange={e=>setChannelId(e.target.value)} disabled={!channels.length}>
-      {channels.length?channels.map(c=><option key={c.id} value={c.id}>{c.name}</option>):<option value="">Нет каналов</option>}
-     </select>
-     <ChevronDown aria-hidden="true" size={16}/>
-    </div>
-   </div>
+   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId}/>
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
    <IconAction onClick={()=>setChatOpen(false)} label="Закрыть чат"/>
   </header>
+  {chatPins.length>0&&<div className="chatPinnedWrap">
+   <button type="button" className="chatPinnedToggle" aria-expanded={pinsOpen} aria-controls="chat-pinned-list" onClick={()=>setPinsOpen(v=>!v)}>
+    <Pin size={16} aria-hidden="true"/><span>Закреплено</span><b>{chatPins.length}</b><span className="chatPinnedPreview">{pinnedMessages[0]?.text||'Материалы канала'}</span>
+   </button>
+   {pinsOpen&&<div id="chat-pinned-list" className="chatPinnedList" aria-label="Закреплённые материалы">
+    {chatPins.map(pin=>{
+     const item=pinnedMessages.find(m=>m.id===pin.message_id);
+     const removable=pin.pinned_by===me?.user_id||teacher;
+     return <div className="chatPinnedItem" key={pin.id}>
+      {item?<><div className="chatPinnedItemHead">
+       <button type="button" className="chatPinnedJump" onClick={()=>showPinnedMessage(item)} title="Перейти к сообщению"><Pin size={14} aria-hidden="true"/>{item.text|| (item.kind==='audio'?'Аудиосообщение':item.kind==='video'?'Видеосообщение':'Файл')}</button>
+       {removable&&<button type="button" className="chatUnpin" disabled={pinBusy===item.id} aria-label="Открепить сообщение" onClick={()=>void togglePin(item)}><PinOff size={15} aria-hidden="true"/></button>}
+      </div>{isChatAttachment(item)&&<div className="chatPinnedMedia"><ChatAttachment message={item}/></div>}</>:
+      <span className="chatMissingFile">Материал недоступен</span>}
+     </div>;
+    })}
+   </div>}
+  </div>}
   {searchOpen&&<div className="chatSearchBar">
    <div className="chatSearchField"><Search size={18} aria-hidden="true"/><input ref={searchInput} value={search} onChange={e=>setSearch(e.target.value)} aria-label="Поиск по сообщениям этого канала" placeholder="Сообщения и документы…" type="search"/></div>
    <button type="button" className={'chatFilesFilter '+(onlyFiles?'active':'')} aria-pressed={onlyFiles} onClick={()=>setOnlyFiles(x=>!x)}><Paperclip size={15} aria-hidden="true"/> Файлы</button>
@@ -162,7 +192,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
      const showText=!!m.text&&(m.kind==='text'||m.kind==='system');
      return <div className="chatEntry" key={m.id} data-chat-date={day}>
       {startsDay&&<div className="chatDateSeparator"><span>{dayLabel}</span></div>}
-      <article className={'chatMsg '+(own?'mine':'theirs')+(startsGroup?' groupStart':' grouped')} aria-label={name+', '+formatChatTime(m.created_at)}>
+      <article className={'chatMsg '+(own?'mine':'theirs')+(startsGroup?' groupStart':' grouped')} data-message-id={m.id} aria-label={name+', '+formatChatTime(m.created_at)}>
        {!own&&<span className={'chatAvatar '+(!startsGroup?'placeholder':'')} aria-hidden="true">{startsGroup?initials(name):''}</span>}
        <div className="chatMessageColumn">
         {startsGroup&&<div className="chatAuthor"><b>{own?'Вы':name}</b><time dateTime={m.created_at}>{formatChatTime(m.created_at)}</time></div>}
@@ -173,6 +203,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
          {!startsGroup&&<time className="chatInlineTime" dateTime={m.created_at}>{formatChatTime(m.created_at)}</time>}
         </div>
        </div>
+       <button type="button" className={'chatPinAction '+(chatPins.some(p=>p.message_id===m.id)?'isPinned':'')} disabled={!!pinBusy||(chatPins.length>=12&&!chatPins.some(p=>p.message_id===m.id))} aria-label={chatPins.some(p=>p.message_id===m.id)?'Открепить сообщение':'Закрепить сообщение'} aria-pressed={chatPins.some(p=>p.message_id===m.id)} title={chatPins.some(p=>p.message_id===m.id)?'Открепить':'Закрепить'} onClick={()=>void togglePin(m)}><Pin size={15} aria-hidden="true"/></button>
       </article>
      </div>;
     })}
@@ -193,7 +224,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
      <input ref={uploadInput} type="file" hidden accept={FILE_ACCEPT} aria-label="Выбрать файл для чата" onChange={e=>{const file=e.target.files?.[0];if(file)void upload(file)}}/>
     </div>
     <span className="chatComposerHint">{uploading?'Загрузка файла…':sending?'Отправка…':'Enter — отправить · Shift + Enter — новая строка'}</span>
-    <button type="button" className="chatSendButton" disabled={sending||uploading||chatLoading||!text.trim()||!channelId} onClick={()=>void send()} aria-label="Отправить сообщение"><Send aria-hidden="true" size={17}/><span>Отправить</span></button>
+    <button type="button" className="chatSendButton iconOnly" disabled={sending||uploading||chatLoading||!text.trim()||!channelId} onClick={()=>void send()} aria-label="Отправить сообщение" title="Отправить"><Send aria-hidden="true" size={20}/></button>
    </div>
   </div>
  </aside>;
