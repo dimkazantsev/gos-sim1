@@ -1,5 +1,5 @@
 'use client';
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {Check} from 'lucide-react';
 import {Activity,BadgeCheck,Globe2,Handshake,HeartHandshake,MessageSquare,Scale,ShieldCheck,TrendingUp,UsersRound,Wallet} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
@@ -47,11 +47,24 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
  const dialogRef=useDialog(!!selected,()=>setSelected(''));
  const [compare,setCompare]=useState<string[]>([]);
  const [bucket,setBucket]=useState<'changes'|'day'|'week'>('changes');
+ const plotRef=useRef<HTMLDivElement>(null);
+ const [plotWidth,setPlotWidth]=useState(700);
+ const [focusedPoint,setFocusedPoint]=useState<{id:string;at:number}|null>(null);
  const allowed=useMemo(()=>[...metrics].filter(m=>teacher||m.is_public).sort((a,b)=>a.sort_order-b.sort_order),[metrics,teacher]);
  const primary=PRIMARY.map(k=>allowed.find(m=>m.metric_key===k)).filter(Boolean) as Metric[];
  const secondary=allowed.filter(m=>!PRIMARY.includes(m.metric_key));
  const visibleMetrics=[...primary,...secondary];
  const chosen=allowed.find(m=>m.id===selected);
+ useEffect(()=>{
+  if(!chosen||!plotRef.current)return;
+  const node=plotRef.current;
+  const update=()=>{const measured=Math.round(node.getBoundingClientRect().width);if(measured>0)setPlotWidth(old=>Math.abs(old-measured)>1?measured:old)};
+  update();
+  const observer=typeof ResizeObserver!=='undefined'?new ResizeObserver(update):null;
+  observer?.observe(node);
+  window.addEventListener('resize',update);
+  return()=>{observer?.disconnect();window.removeEventListener('resize',update)};
+ },[chosen?.id]);
 
  function rowsFor(metricKey:string){return metricHistory.filter(h=>h.metric_key===metricKey)}
  const hist=chosen?rowsFor(chosen.metric_key).sort((a,b)=>Date.parse(a.recorded_at)-Date.parse(b.recorded_at)):[];
@@ -63,9 +76,11 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
   color:METRIC_COLORS[index%METRIC_COLORS.length],
   points:pointsForMetric(metric,metricHistory,bucket,game?.created_at,snapshotAt)
  }));
- const geometry=drawMetricChart(series);
+ const geometry=drawMetricChart(series,series.length>1,Math.max(240,plotWidth),plotWidth<460?222:250);
  const chosenPoints=series[0]?.points||[];
  const singlePoint=geometry.lines.length===1&&chosenPoints.length===1;
+ const activePoint=series.flatMap(s=>s.points.map(point=>({...point,metric:s.metric,color:s.color}))).find(p=>focusedPoint?.id===p.metric.id&&focusedPoint.at===p.at)
+  ||(series[0]&&chosenPoints.length?{...chosenPoints[chosenPoints.length-1],metric:series[0].metric,color:series[0].color}:null);
  const formatValue=(v:number,unit:string|null)=>v.toLocaleString('ru-RU',{maximumFractionDigits:2})+(unit||'');
  const formatTime=(timestamp:number)=>new Date(timestamp).toLocaleString('ru-RU',{
   day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'
@@ -77,7 +92,7 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
   const mini=rows.slice(-12).map(h=>Number(h.value));
   const last=rows.at(-1);
   const pct=m.max_value!=null&&m.min_value!=null?Math.max(0,Math.min(100,(Number(m.value)-Number(m.min_value))/Math.max(1,Number(m.max_value)-Number(m.min_value))*100)):null;
-  return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} onClick={()=>{setCompare([]);setBucket('changes');setSelected(m.id)}}>
+  return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} onClick={()=>{setCompare([]);setBucket('changes');setFocusedPoint(null);setSelected(m.id)}}>
    <span className="statePulseIcon" aria-hidden="true">{metricIcon(m.metric_key)}</span>
    <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.label}</b><span>{last?.note||m.description||'Игровой показатель'}</span></div>
    <div className="statePulseValue"><strong>{Number(m.value).toLocaleString('ru-RU')}{m.unit||''}</strong><em className={changeTone(m,d)}>{d===0?'—':`${d>0?'▲ +':'▼ '}${Math.abs(d).toFixed(Math.abs(d)%1?1:0)}`}</em></div>
@@ -96,12 +111,14 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
   {chosen&&<div className="metricModalBackdrop" onClick={()=>setSelected('')}>
    <section ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="metric-title" className="metricModal redesigned" onClick={e=>e.stopPropagation()}>
     <header><div className="metricModalTitle"><span>{metricIcon(chosen.metric_key)}</span><div><small>{groupLabel(chosen.group_key).toUpperCase()}</small><h2 id="metric-title">{chosen.label}</h2><p>{chosen.description||'Игровой показатель состояния государства.'}</p></div></div><button onClick={()=>setSelected('')} aria-label="Закрыть показатель">×</button></header>
+    <div className="metricModalBody">
     <div className="metricHeroValue"><strong>{Number(chosen.value).toLocaleString('ru-RU')}{chosen.unit||''}</strong><span className={changeTone(chosen,delta(chosen))}>{delta(chosen)>=0?'▲ +':'▼ '}{Math.abs(delta(chosen)).toFixed(1)} с прошлого изменения</span></div>
     {hist.at(-1)&&<div className="metricLastCause"><small>ПОСЛЕДНЯЯ ПРИЧИНА</small><b>{hist.at(-1)?.note||hist.at(-1)?.source_type}</b><span>{new Date(hist.at(-1)!.recorded_at).toLocaleString('ru-RU')}</span></div>}
-    <div className="metricBucketTabs"><button className={bucket==='changes'?'active':''} onClick={()=>setBucket('changes')}>Все изменения</button><button className={bucket==='day'?'active':''} onClick={()=>setBucket('day')}>По дням</button><button className={bucket==='week'?'active':''} onClick={()=>setBucket('week')}>По неделям</button></div>
-    <div className="metricChart redesignedChart">
+    <div className="metricBucketTabs"><button className={bucket==='changes'?'active':''} aria-pressed={bucket==='changes'} onClick={()=>{setFocusedPoint(null);setBucket('changes')}}>Все изменения</button><button className={bucket==='day'?'active':''} aria-pressed={bucket==='day'} onClick={()=>{setFocusedPoint(null);setBucket('day')}}>По дням</button><button className={bucket==='week'?'active':''} aria-pressed={bucket==='week'} onClick={()=>{setFocusedPoint(null);setBucket('week')}}>По неделям</button></div>
+    <section className="metricChart redesignedChart" aria-label="График динамики показателей">
      <div className="metricChartCaption"><b>{geometry.comparing?'Динамика показателей':'История показателя'}</b><span>{bucket==='changes'?'По игровым событиям':bucket==='day'?'По дням':'По неделям'}</span></div>
-     <svg viewBox={`0 0 ${geometry.width} ${geometry.height}`} role="img" aria-label={'Временной график: '+activeMetrics.map(m=>m.label).join(', ')}>
+     <div className="metricPlotViewport" ref={plotRef}>
+     <svg viewBox={`0 0 ${geometry.width} ${geometry.height}`} role="group" aria-label={'Временной график: '+activeMetrics.map(m=>m.label).join(', ')} preserveAspectRatio="none">
       {geometry.yTicks.map((tick,i)=><g key={i}>
        <line className="metricGridLine" x1={geometry.left} x2={geometry.width-geometry.right} y1={tick.y} y2={tick.y}/>
        <text className="metricAxisText" x={geometry.left-8} y={tick.y+4} textAnchor="end">{geometry.comparing?tick.value+'%':tick.value.toLocaleString('ru-RU',{maximumFractionDigits:1})}</text>
@@ -113,36 +130,40 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
       {geometry.lines.map(line=><g key={line.metric.id} style={{color:line.color}}>
        {line.pointsOnChart.length>1&&<path d={line.path} className="metricSeriesPath" stroke="currentColor"/>}
        {line.pointsOnChart.length===1&&<line x1={geometry.left} x2={geometry.width-geometry.right} y1={line.pointsOnChart[0].y} y2={line.pointsOnChart[0].y} className="metricSingleGuide" stroke="currentColor"/>}
-       {line.pointsOnChart.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r={4.5} className="metricChartPoint" fill="currentColor" stroke="#fff" strokeWidth="2"><title>{line.metric.label}: {formatValue(p.value,line.metric.unit)}. {formatTime(p.at)}. {p.note}</title></circle>)}
+       {line.pointsOnChart.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r={focusedPoint?.id===line.metric.id&&focusedPoint.at===p.at?6:4.5} className="metricChartPoint" fill="currentColor" stroke="#fff" strokeWidth="2" tabIndex={0} role="button" aria-label={`${line.metric.label}: ${formatValue(p.value,line.metric.unit)}, ${formatTime(p.at)}. ${p.note}`} onClick={()=>setFocusedPoint({id:line.metric.id,at:p.at})} onFocus={()=>setFocusedPoint({id:line.metric.id,at:p.at})} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setFocusedPoint({id:line.metric.id,at:p.at})}}}><title>{line.metric.label}: {formatValue(p.value,line.metric.unit)}. {formatTime(p.at)}. {p.note}</title></circle>)}
       </g>)}
      </svg>
+     </div>
+     {activePoint&&<div className="metricPointDetail" aria-live="polite">
+      <span className="metricPointDot" style={{background:activePoint.color}} aria-hidden="true"/>
+      <span className="metricPointText"><b>{activePoint.metric.label} · {formatValue(activePoint.value,activePoint.metric.unit)}</b><small>{formatTime(activePoint.at)} · {activePoint.note}</small></span>
+     </div>}
      <div className="metricChartLegend" aria-label="Показатели на графике">
       {series.map(s=><span key={s.metric.id}><i style={{background:s.color}}/>{s.metric.label}</span>)}
      </div>
      {singlePoint&&<p className="metricChartNotice">{chosenPoints[0].kind==='snapshot'?'Показано текущее значение. Записи об изменениях пока отсутствуют.':'Показана исходная точка. Линия динамики появится после первого изменения.'}</p>}
      {geometry.comparing&&<p className="metricChartNotice">Сравнение: каждая линия приведена к своей шкале 0–100%. Для бюджета используется диапазон зафиксированных значений. Точные значения доступны при наведении на точки.</p>}
-    </div>
-    <div className="metricSeriesControls">
+     <div className="metricSeriesControls">
      <div className="metricSeriesControlsHead"><b>Добавить показатели на график</b><span>Включайте и выключайте параметры. Начальная метрика всегда видна.</span></div>
      <div className="metricSeriesToggleRow">
-      {comparisonOptions.map((m,i)=>{
+      {comparisonOptions.map(m=>{
        const active=compare.includes(m.id);
        const color=METRIC_COLORS[(1+comparisonOptions.filter(x=>compare.includes(x.id)).findIndex(x=>x.id===m.id))%METRIC_COLORS.length];
-       return <button key={m.id} type="button" className={'metricSeriesToggle '+(active?'active':'')} aria-pressed={active} onClick={()=>setCompare(list=>list.includes(m.id)?list.filter(id=>id!==m.id):[...list,m.id])}>
+       return <button key={m.id} type="button" className={'metricSeriesToggle '+(active?'active':'')} aria-pressed={active} onClick={()=>{setFocusedPoint(null);setCompare(list=>list.includes(m.id)?list.filter(id=>id!==m.id):[...list,m.id])}}>
         <i style={{background:active?color:'#bbc6dc'}}/><span>{m.label}</span>{active&&<Check size={14} aria-hidden="true"/>}
        </button>;
       })}
      </div>
-    </div>
+    </section>
     <div className="metricHistoryList">
-     <div className="metricHistoryHead"><b>Почему менялся показатель</b><span>{hist.length} записей</span></div>
+     <div className="metricHistoryHead"><b>Журнал показателя</b><span>{hist.length} записей</span></div>
      {[...hist].reverse().slice(0,30).map(h=>{const p=h.source_id?politicalPosts.find(x=>x.id===h.source_id):undefined;return <article key={h.id}>
       <time>{new Date(h.recorded_at).toLocaleString('ru-RU')}</time>
       <div><b>{Number(h.previous_value??h.value).toLocaleString('ru-RU')} → {Number(h.value).toLocaleString('ru-RU')} {chosen.unit||''}</b><p>{h.note||p?.title||h.source_type}</p>{h.actor_id&&<small>{names[h.actor_id]||'Участник'}</small>}</div>
       <strong className={Number(h.delta)>=0?'up':'down'}>{Number(h.delta)>0?'+':''}{Number(h.delta||0).toFixed(1)}</strong>
      </article>})}
     </div>
-
+    </div>
    </section>
   </div>}
  </>;
