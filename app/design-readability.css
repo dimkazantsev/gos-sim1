@@ -1022,3 +1022,549 @@
  .simWorkspace .simTop .mobileBrand b{font-size:13px}
  .simWorkspace .simTop .topScreenHistory{gap:2px}
 }
+
+
+/* GOS//SIMS team chat: isolated second-generation layout.
+   Header and composer never scroll; only the message viewport scrolls. */
+.simChat.gsChatV2{
+ position:fixed;
+ z-index:110;
+ top:calc(var(--gs-top-h) + 10px);
+ bottom:16px;
+ right:16px;
+ display:flex;
+ flex-direction:column;
+ width:min(420px,calc(100vw - 32px));
+ min-width:0;
+ min-height:0;
+ height:auto;
+ padding:0;
+ overflow:hidden;
+ border:1px solid #d9e3f5;
+ border-radius:20px;
+ background:#fff;
+ box-shadow:0 24px 70px #17244720;
+}
+.gsChatV2 *{box-sizing:border-box}
+.gsChatV2 .chatTop{
+ display:flex;
+ flex:0 0 auto;
+ align-items:center;
+ min-width:0;
+ min-height:74px;
+ gap:10px;
+ padding:12px 14px;
+ border-bottom:1px solid #e5ebf6;
+ background:#fff;
+}
+.gsChatV2 .chatHeadIcon{
+ display:grid;
+ place-items:center;
+ flex:0 0 40px;
+ width:40px;
+ height:40px;
+ border-radius:12px;
+ color:#4262ae;
+ background:#edf3ff;
+}
+.gsChatV2 .chatHeadText{flex:1 1 auto;min-width:0;display:grid;gap:3px}
+.gsChatV2 .chatEyebrow{
+ color:#657591;
+ font-size:12px;
+ line-height:1.2;
+ letter-spacing:.075em;
+ font-weight:800;
+}
+.gsChatV2 .chatChannelField{position:relative;display:flex;align-items:center;min-width:0}
+.gsChatV2 .chatChannelField select{
+ display:block;
+ width:100%;
+ min-width:0;
+ max-width:100%;
+ height:29px;
+ min-height:29px;
+ margin:0;
+ padding:0 25px 0 0;
+ border:0;
+ border-radius:0;
+ background:transparent;
+ color:#172447;
+ font-size:16px;
+ line-height:1.35;
+ font-weight:800;
+ appearance:none;
+ -webkit-appearance:none;
+ white-space:nowrap;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ cursor:pointer;
+}
+.gsChatV2 .chatChannelField select:focus-visible{
+ border-radius:4px;
+ outline:2px solid #7c9fe5;
+ outline-offset:2px;
+}
+.gsChatV2 .chatChannelField svg{
+ position:absolute;
+ top:50%;
+ right:1px;
+ transform:translateY(-50%);
+ pointer-events:none;
+ color:#5a7095;
+}
+.gsChatV2 .chatIconButton{
+ display:inline-grid;
+ place-items:center;
+ flex:0 0 42px;
+ width:42px;
+ min-width:42px;
+ height:42px;
+ min-height:42px;
+ padding:0;
+ margin:0;
+ border:1px solid #dce4f2;
+ border-radius:11px;
+ background:#fff;
+ color:#4b5c7b;
+}
+.gsChatV2 .chatIconButton svg{width:19px;height:19px;stroke-width:1.9}
+.gsChatV2 .chatIconButton:hover:not(:disabled),.gsChatV2 .chatIconButton.active{
+ color:#2c55b2;
+ background:#f0f4ff;
+ border-color:#b8c8f2;
+}
+.gsChatV2 .chatTop>.gsIconAction{
+ display:inline-grid;
+ place-items:center;
+ flex:0 0 42px;
+ width:42px;
+ min-width:42px;
+ max-width:42px;
+ height:42px;
+ min-height:42px;
+ max-height:42px;
+ margin:0;
+ border-radius:11px;
+}
+.gsChatV2 .chatSearchBar{
+ display:flex;
+ flex:0 0 auto;
+ flex-wrap:wrap;
+ align-items:center;
+ gap:7px;
+ padding:10px 14px;
+ border-bottom:1px solid #e6ebf5;
+ background:#f9fbff;
+}
+.gsChatV2 .chatSearchField{
+ display:flex;
+ flex:1 1 170px;
+ min-width:0;
+ align-items:center;
+ gap:8px;
+ height:39px;
+ padding:0 10px;
+ border:1px solid #d8e3f7;
+ border-radius:10px;
+ background:#fff;
+ color:#6a7a96;
+}
+.gsChatV2 .chatSearchField svg{flex:0 0 17px}
+.gsChatV2 .chatSearchField input{
+ width:100%;
+ min-width:0;
+ height:36px;
+ padding:0;
+ border:0;
+ outline:0;
+ background:transparent;
+ color:#172447;
+ font-size:13px;
+}
+.gsChatV2 .chatFilesFilter{
+ display:flex;
+ align-items:center;
+ flex:0 0 auto;
+ gap:5px;
+ min-height:39px;
+ padding:8px 10px;
+ border:1px solid #d8e3f7;
+ border-radius:10px;
+ background:#fff;
+ color:#526681;
+ font-size:12px;
+ font-weight:750;
+}
+.gsChatV2 .chatFilesFilter.active{background:#eaf1ff;border-color:#b6c9fa;color:#3059bc}
+.gsChatV2 .chatSearchCount{width:100%;font-size:12px;line-height:1.3;color:#75839c}
+.gsChatV2 .chatMessages{
+ display:flex;
+ flex:1 1 auto;
+ flex-direction:column;
+ align-items:stretch;
+ align-content:initial;
+ gap:0;
+ min-width:0;
+ min-height:0;
+ width:100%;
+ padding:12px 14px 18px;
+ margin:0;
+ overflow-y:auto;
+ overflow-x:hidden;
+ overscroll-behavior:contain;
+ background:#f6f8fd;
+ scrollbar-color:#c7d3ea transparent;
+}
+.gsChatV2 .chatEntry{width:100%;min-width:0;flex:0 0 auto}
+.gsChatV2 .chatDateSeparator{
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ margin:12px 0 14px;
+}
+.gsChatV2 .chatDateSeparator span{
+ padding:5px 10px;
+ border:1px solid #e3e9f5;
+ border-radius:30px;
+ background:#fff;
+ color:#687892;
+ font-size:12px;
+ font-weight:700;
+ line-height:1.2;
+}
+.gsChatV2 .chatMsg{
+ display:flex;
+ align-items:flex-start;
+ width:100%;
+ min-width:0;
+ gap:8px;
+ margin:0;
+ padding:0;
+}
+.gsChatV2 .chatMsg.groupStart{margin-top:10px}
+.gsChatV2 .chatDateSeparator+.chatMsg.groupStart{margin-top:0}
+.gsChatV2 .chatMsg.mine{justify-content:flex-end}
+.gsChatV2 .chatMsg.theirs{justify-content:flex-start}
+.gsChatV2 .chatMsg .chatAvatar{
+ flex:0 0 32px;
+ display:grid;
+ place-items:center;
+ width:32px;
+ height:32px;
+ padding:0;
+ margin:2px 0 0;
+ border-radius:50%;
+ background:#e7eeff;
+ color:#385fbc;
+ font-size:12px;
+ font-weight:800;
+}
+.gsChatV2 .chatMsg .chatAvatar.placeholder{background:transparent}
+.gsChatV2 .chatMessageColumn{
+ display:flex;
+ flex:0 1 auto;
+ flex-direction:column;
+ align-items:flex-start;
+ gap:4px;
+ min-width:0;
+ max-width:calc(100% - 40px);
+ margin:0;
+ padding:0;
+ border:0;
+ border-radius:0;
+ background:transparent;
+}
+.gsChatV2 .chatMsg.mine .chatMessageColumn{align-items:flex-end;max-width:85%}
+.gsChatV2 .chatAuthor{
+ display:flex;
+ flex-wrap:wrap;
+ align-items:baseline;
+ gap:4px 8px;
+ max-width:100%;
+ padding:0 3px;
+ background:transparent;
+ border:0;
+}
+.gsChatV2 .chatAuthor b{
+ color:#344665;
+ font-size:12px;
+ font-weight:800;
+ overflow-wrap:anywhere;
+}
+.gsChatV2 .chatAuthor time{color:#8190a8;font-size:12px}
+.gsChatV2 .chatBubble{
+ display:flex;
+ flex-direction:column;
+ align-items:flex-start;
+ width:max-content;
+ max-width:100%;
+ min-width:0;
+ padding:9px 11px;
+ margin:0;
+ border:1px solid #e0e7f5;
+ border-radius:13px 13px 13px 4px;
+ background:#fff;
+ box-shadow:0 2px 7px #20396906;
+ overflow-wrap:anywhere;
+}
+.gsChatV2 .chatMsg.mine .chatBubble{
+ border-color:#d4e0fb;
+ border-radius:13px 13px 4px 13px;
+ background:#eaf1ff;
+}
+.gsChatV2 .chatBubble p{
+ margin:0;
+ color:#253650;
+ font-size:13px;
+ line-height:1.58;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+.gsChatV2 .chatInlineTime{
+ align-self:flex-end;
+ margin-top:3px;
+ color:#8592a7;
+ font-size:12px;
+}
+.gsChatV2 .chatBubble audio,.gsChatV2 .chatBubble video{
+ display:block;
+ width:100%;
+ max-width:280px;
+ max-height:220px;
+ border-radius:8px;
+}
+.gsChatV2 .chatPhoto{display:block;max-width:100%}
+.gsChatV2 .chatPhoto img{
+ display:block;
+ width:auto;
+ max-width:100%;
+ max-height:245px;
+ height:auto;
+ object-fit:contain;
+ border-radius:8px;
+}
+.gsChatV2 .chatDocument{
+ display:flex;
+ align-items:center;
+ gap:9px;
+ width:min(270px,100%);
+ max-width:100%;
+ min-height:58px;
+ padding:6px 8px;
+ border:1px solid #e3eafa;
+ border-radius:10px;
+ background:#f9fbff;
+ color:#385a9d;
+ text-decoration:none;
+}
+.gsChatV2 .chatDocument:hover{background:#edf4ff;border-color:#c0d2f3}
+.gsChatV2 .chatDocumentIcon{
+ display:grid;
+ place-items:center;
+ flex:0 0 38px;
+ width:38px;
+ height:38px;
+ border-radius:9px;
+ background:#e8efff;
+}
+.gsChatV2 .chatDocumentIcon svg{width:19px;height:19px}
+.gsChatV2 .chatDocumentName{display:grid;gap:2px;flex:1 1 auto;min-width:0}
+.gsChatV2 .chatDocumentName b{
+ color:#31559d;
+ font-size:12px;
+ line-height:1.35;
+ overflow-wrap:anywhere;
+}
+.gsChatV2 .chatDocumentName small{color:#72839f;font-size:12px}
+.gsChatV2 .chatDocumentArrow{font-size:17px;flex:none}
+.gsChatV2 .chatMissingFile{color:#a64c5b;font-size:12px}
+.gsChatV2 .chatEmpty{
+ display:grid;
+ align-content:center;
+ justify-items:center;
+ gap:9px;
+ min-height:180px;
+ flex:1;
+ padding:28px 12px;
+ text-align:center;
+}
+.gsChatV2 .chatEmptyIcon{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:#eaf0ff;color:#5974b8}
+.gsChatV2 .chatEmpty b{font-size:14px}
+.gsChatV2 .chatEmpty p{max-width:260px;margin:0;font-size:12px;line-height:1.5;color:#71809b}
+.gsChatV2 .chatJumpLatest{
+ align-self:center;
+ flex:0 0 auto;
+ display:flex;
+ align-items:center;
+ gap:6px;
+ margin:0 auto -6px;
+ position:relative;
+ z-index:1;
+ min-height:36px;
+ padding:7px 12px;
+ border:1px solid #cedbf4;
+ border-radius:30px;
+ background:#fff;
+ color:#3158b1;
+ box-shadow:0 3px 12px #15295013;
+ font-size:12px;
+ font-weight:750;
+}
+.gsChatV2 .chatRecording,.gsChatV2 .chatLocalError{
+ display:flex;
+ flex:0 0 auto;
+ align-items:center;
+ flex-wrap:wrap;
+ gap:8px;
+ padding:9px 14px;
+ font-size:12px;
+ line-height:1.45;
+}
+.gsChatV2 .chatRecording{background:#fff1f5;color:#98435b}
+.gsChatV2 .chatRecordingDot{width:8px;height:8px;border-radius:50%;background:#ce4c64}
+.gsChatV2 .chatRecording button{margin-left:auto;padding:6px 8px;border:1px solid #e2bac7;border-radius:8px;background:#fff;font-size:12px;color:#933c53}
+.gsChatV2 .chatLocalError{justify-content:space-between;background:#fff1f5;color:#9e3950}
+.gsChatV2 .chatLocalError button{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:inherit}
+.gsChatV2 .chatCompose{
+ display:flex;
+ flex:0 0 auto;
+ flex-direction:column;
+ gap:9px;
+ min-width:0;
+ margin:0;
+ padding:12px 14px 14px;
+ border-top:1px solid #e2e9f6;
+ background:#fff;
+}
+.gsChatV2 .chatCompose textarea{
+ display:block;
+ box-sizing:border-box;
+ width:100%;
+ min-height:44px;
+ max-height:136px;
+ height:44px;
+ margin:0;
+ padding:11px 13px;
+ border:1px solid #d6e2f6;
+ border-radius:11px;
+ outline:0;
+ background:#fbfcff;
+ color:#1b2b4a;
+ font-size:14px;
+ line-height:1.5;
+ resize:none;
+ overflow-y:auto;
+}
+.gsChatV2 .chatCompose textarea:focus{
+ background:#fff;
+ border-color:#91aceb;
+ box-shadow:0 0 0 3px #e8efff;
+}
+.gsChatV2 .chatComposeActions{
+ display:flex;
+ align-items:center;
+ gap:8px;
+ min-width:0;
+ margin:0;
+ padding:0;
+}
+.gsChatV2 .chatAttachWrap{position:relative;flex:0 0 auto}
+.gsChatV2 .chatComposeActions .chatIconButton{width:40px;height:40px;min-width:40px;min-height:40px}
+.gsChatV2 .chatAttachMenu{
+ position:absolute;
+ left:0;
+ bottom:calc(100% + 9px);
+ z-index:10;
+ display:grid;
+ gap:4px;
+ width:min(260px,calc(100vw - 38px));
+ padding:6px;
+ border:1px solid #dae4f5;
+ border-radius:12px;
+ background:#fff;
+ box-shadow:0 12px 35px #17244725;
+}
+.gsChatV2 .chatAttachMenu button{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ width:100%;
+ min-height:44px;
+ padding:9px 11px;
+ border:0;
+ border-radius:8px;
+ background:transparent;
+ color:#354869;
+ font-size:13px;
+ font-weight:700;
+ text-align:left;
+}
+.gsChatV2 .chatAttachMenu button:hover,.gsChatV2 .chatAttachMenu button:focus-visible{background:#edf3ff;color:#294f9c}
+.gsChatV2 .chatComposerHint{
+ flex:1 1 auto;
+ min-width:0;
+ color:#71809a;
+ font-size:12px;
+ line-height:1.3;
+}
+.gsChatV2 .chatSendButton{
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ flex:0 0 auto;
+ gap:8px;
+ min-width:44px;
+ min-height:40px;
+ margin:0 0 0 auto;
+ padding:9px 12px;
+ border:0;
+ border-radius:10px;
+ background:#315fe3;
+ color:#fff;
+ font-size:12px;
+ font-weight:800;
+ line-height:1.3;
+}
+.gsChatV2 .chatSendButton:disabled{opacity:.46;cursor:not-allowed}
+.gsChatV2 .chatSendButton:not(:disabled):hover{background:#254fc7}
+.gsChatV2 :is(.chatIconButton,.chatFilesFilter,.chatSendButton,.chatAttachMenu button,.chatJumpLatest,.chatRecording button):focus-visible{
+ outline:3px solid #8da9e8;
+ outline-offset:2px;
+}
+@media(max-width:1099px){
+ .simChat.gsChatV2{
+  position:fixed;
+  z-index:180;
+  inset:0;
+  width:100vw;
+  max-width:100vw;
+  height:100dvh;
+  max-height:100dvh;
+  min-height:0;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  animation:none;
+ }
+ .gsChatV2 .chatTop{padding:10px 16px;min-height:66px}
+ .gsChatV2 .chatMessages{padding:11px 15px 16px}
+ .gsChatV2 .chatCompose{
+  padding:10px 14px calc(11px + env(safe-area-inset-bottom));
+ }
+ .gsChatV2 .chatCompose textarea{font-size:16px}
+}
+@media(max-width:430px){
+ .gsChatV2 .chatTop{gap:7px;padding:9px 12px}
+ .gsChatV2 .chatHeadIcon{width:36px;height:36px;flex-basis:36px}
+ .gsChatV2 .chatIconButton,.gsChatV2 .chatTop>.gsIconAction{
+  flex-basis:44px;width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;max-height:44px;
+ }
+ .gsChatV2 .chatMessages{padding:8px 11px 15px}
+ .gsChatV2 .chatCompose{padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+ .gsChatV2 .chatComposerHint{font-size:12px}
+ .gsChatV2 .chatSendButton{padding:9px}
+ .gsChatV2 .chatSendButton span{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .simChat.gsChatV2{animation:none}
+}
