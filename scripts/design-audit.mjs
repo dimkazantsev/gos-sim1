@@ -30,6 +30,19 @@ check('Legacy rules are isolated from the new design',read('app/globals.css').in
 check('Reduced motion',css['design-tokens'].includes('prefers-reduced-motion:reduce'));
 check('Visible keyboard focus',css['design-tokens'].includes(':focus-visible'));
 const readable=css['design-readability'];
+check('Chart comparison header interpolates count without a literal dollar sign',
+ read('components/game/StateMetricsDock.tsx').includes('до {MAX_CHART_SERIES-1} дополнительных показателей')&&
+ !read('components/game/StateMetricsDock.tsx').includes('до ${MAX_CHART_SERIES}'));
+check('Top action is consistently named Chat',
+ read('components/GameClient.tsx').includes('<ChatToggleButton')&&
+ read('components/game/ChatToggleButton.tsx').includes('<span>Чат</span>')&&
+ !read('components/game/ChatToggleButton.tsx').includes('Связь'));
+check('Header and page content use common responsive right alignment',
+ readable.includes('calc((100% - var(--gs-content-max))/2)')&&
+ readable.includes('--gs-layout-gutter:36px')&&
+ readable.includes('--gs-layout-gutter:24px')&&
+ readable.includes('--gs-layout-gutter:16px'));
+
 const uiClose=read('components/ui/IconAction.tsx');
 check('Unified accessible X action exposes close and remove variants',
  uiClose.includes("variant?:'close'|'remove'")&&
