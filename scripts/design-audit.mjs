@@ -29,6 +29,17 @@ check('Legacy rules are isolated from the new design',read('app/globals.css').in
 check('Reduced motion',css['design-tokens'].includes('prefers-reduced-motion:reduce'));
 check('Visible keyboard focus',css['design-tokens'].includes(':focus-visible'));
 const readable=css['design-readability'];
+
+check('Compact toolbar has balanced 116px status/chat and 184px picker',
+ readable.includes('flex:0 0 116px')&&
+ readable.includes('flex:0 0 184px')&&
+ !readable.includes('--toolbar-control-width:192px'));
+check('Compact toolbar preserves touch-sized controls',
+ readable.includes('height:44px;')&&readable.includes('height:48px;'));
+check('Phone toolbar uses a dedicated two-row grid',
+ readable.includes('grid-template-columns:116px minmax(0,1fr) auto auto;')&&
+ readable.includes('grid-column:2/5;')&&readable.includes('grid-row:2;'));
+
 check('Every common page header receives a separated accent', ['pageHeader','gradesHero','votesHero','formalHero','teacherFocus','profileHero','wallHero','dashHero'].every(name=>{const root=postcss.parse(readable);return root.nodes.some(node=>node.type==='rule'&&node.selectors?.includes('.'+name+'::before')&&node.nodes.some(d=>d.prop==='background'&&d.value.includes('linear-gradient')));}));
 check('Accent and text have separate insets on phones',readable.includes('padding:20px 18px 22px 42px')&&readable.includes('left:16px')&&readable.includes('padding:18px 14px 20px 36px')&&readable.includes('left:13px'));
 check('Phone layout and touch targets',css['design-responsive'].includes('@media(max-width:390px)')&&css['design-responsive'].includes('@media(pointer:coarse)'));
