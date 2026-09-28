@@ -60,7 +60,7 @@ async function main(){
     'Toolbar overflows horizontally at '+width+'px: '+JSON.stringify(bounds));
    await page.locator('#preview').screenshot({path:path.join(shotDir,'top-chat-'+width+'.png')});
    console.log('PASS top Chat button alignment, label and no horizontal overflow at '+width+'px');
-   for(const chatScreen of ['chat-panel','chat-empty']){
+   for(const chatScreen of ['chat-panel','chat-empty','chat-channels','chat-pins']){
     await page.locator('#screen').selectOption(chatScreen);
     const frame=page.frameLocator('#preview');
     const root=frame.locator('.simChat.gsChatV2');
@@ -86,13 +86,23 @@ async function main(){
     assert(dims.root.bottom>=dims.composer.bottom-gap,'Composer escapes chat container at '+width+'px');
     assert(dims.textarea.left>=dims.root.x-gap&&dims.textarea.right<=dims.root.right+gap,'Chat input overflows panel at '+width+'px');
     assert(dims.overflow<=gap,'Chat page horizontally overflows at '+width+'px');
-    assert.equal(await frame.locator('.chatChannelField select').count(),1,'Exactly one channel selector');
-    assert.equal(await frame.locator('.simChat>select').count(),0,'No redundant channel dropdown');
+    assert.equal(await frame.locator('.chatChannelTrigger').count(),1,'Exactly one styled channel selector');
+    assert.equal(await frame.locator('.simChat select').count(),0,'No native channel dropdown');
+    assert.equal(await frame.locator('.chatSendButton.iconOnly svg').count(),1,'Icon-only send button');
+    assert((await frame.locator('.chatSendButton.iconOnly').boundingBox())?.width<=45,'Send button stays compact');
+    if(chatScreen==='chat-channels'){
+     assert.equal(await frame.locator('.chatChannelMenu [role="menuitemradio"]').count(),2,'Styled channel menu lists both channels');
+     assert.equal(await frame.locator('.chatChannelMenu [aria-checked="true"]').count(),1,'Selected channel is marked');
+    }
+    if(chatScreen==='chat-pins'){
+     assert.equal(await frame.locator('.chatPinnedItem').count(),3,'File, audio and video remain pinned');
+     assert.equal(await frame.locator('.chatPinnedMedia').count(),3,'All pinned media has preview containers');
+    }
     const close=frame.locator('.chatTop').getByRole('button',{name:'Закрыть чат'});
     assert.equal(await close.count(),1);
     const closeRect=await close.boundingBox();
     assert(closeRect&&closeRect.width>=40&&closeRect.height>=40,'Accessible chat close target');
-    if(chatScreen==='chat-panel'){
+    if(chatScreen!=='chat-empty'){
      assert(await frame.locator('.chatMsg.mine').count()>=2,'Own messages on right');
      assert(await frame.locator('.chatMsg.theirs').count()>=2,'Other authors on left');
      assert(await frame.locator('.chatDateSeparator').count()>=2,'Message days separated');
