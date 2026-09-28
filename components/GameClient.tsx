@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {BookOpenText,ChevronLeft,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote as VoteIcon,Wifi} from 'lucide-react';
+import {BookOpenText,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote as VoteIcon,Wifi} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
@@ -19,6 +19,13 @@ import ProfileView from './game/ProfileView';
 import ChatPanel from './game/ChatPanel';
 
 const GENERIC_STUDENT='__generic_student_preview__';
+type ScreenLocation={view:View;stageNo:number;documentId:string};
+function adjacentScreen(entries:ScreenLocation[],index:number,direction:-1|1,skipTeacher:boolean){
+ for(let next=index+direction;next>=0&&next<entries.length;next+=direction){
+  if(!skipTeacher||entries[next].view!=='teacher')return next;
+ }
+ return -1;
+}
 
 function fmtTimer(seconds:number){
  const m=Math.floor(seconds/60),s=seconds%60;
@@ -155,15 +162,33 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
 
 export default function GameClient({gameId}:{gameId:string}){
  const g=useRepublicGame(gameId);
- const [view,setView]=useState<View>('dashboard');
- const [focusFormalId,setFocusFormalId]=useState('');
+ const [screenHistory,setScreenHistory]=useState<{entries:ScreenLocation[];index:number}>({
+  entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
+ });
+ const currentScreen=screenHistory.entries[screenHistory.index];
+ const view=currentScreen.view;
+ const focusFormalId=currentScreen.documentId;
+ const focusStage=currentScreen.stageNo;
  const [viewAs,setViewAs]=useState('');
  const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
- const [focusStage,setFocusStage]=useState(0);
  const [crisisExpanded,setCrisisExpanded]=useState(false);
  const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
- function navigate(next:View){setFocusStage(0);setView(next);setMobileMenuOpen(false);if(window.matchMedia('(max-width:1099px)').matches)g.setChatOpen(false);requestAnimationFrame(()=>document.getElementById('game-main')?.focus());}
+ function finishScreenNavigation(){
+  setMobileMenuOpen(false);
+  if(window.matchMedia('(max-width:1099px)').matches)g.setChatOpen(false);
+  requestAnimationFrame(()=>document.getElementById('game-main')?.focus());
+ }
+ function navigate(next:View,target?:{stageNo?:number;documentId?:string}){
+  const destination:ScreenLocation={view:next,stageNo:target?.stageNo??0,documentId:target?.documentId??''};
+  setScreenHistory(previous=>{
+   const current=previous.entries[previous.index];
+   if(current.view===destination.view&&current.stageNo===destination.stageNo&&current.documentId===destination.documentId)return previous;
+   const entries=[...previous.entries.slice(0,previous.index+1),destination];
+   return {entries,index:entries.length-1};
+  });
+  finishScreenNavigation();
+ }
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
 
  const genericStudent:Member|undefined=teacher&&game?{
@@ -176,6 +201,13 @@ export default function GameClient({gameId}:{gameId:string}){
     : g.members.find(m=>m.user_id===viewAs&&m.kind==='student')
   : undefined;
  const previewMode=!!previewStudent;
+ const backIndex=adjacentScreen(screenHistory.entries,screenHistory.index,-1,previewMode);
+ const forwardIndex=adjacentScreen(screenHistory.entries,screenHistory.index,1,previewMode);
+ function moveHistory(index:number){
+  if(index<0)return;
+  setScreenHistory(previous=>({...previous,index}));
+  finishScreenNavigation();
+ }
  const vg=previewStudent?buildStudentPreview(g,previewStudent):g;
  const shownMe=vg.me||me;
  const chatDraftKey=(shownMe?.user_id||'')+':'+g.channelId;
@@ -190,7 +222,7 @@ export default function GameClient({gameId}:{gameId:string}){
 
  useEffect(()=>{
   if(!previewMode)return;
-  if(view==='teacher')setView('dashboard');
+  if(view==='teacher')navigate('dashboard');
   const visible=vg.channels;
   if(visible.length&&!visible.some(c=>c.id===g.channelId))g.setChannelId(visible[0].id);
  },[previewStudent?.user_id]);
@@ -239,6 +271,10 @@ export default function GameClient({gameId}:{gameId:string}){
   <div className={'simWorkspace '+(chatOpen?'chatOpen':'')}>
    <header className="simTop">
     <div className="mobileBrand"><div className="brandMark" aria-hidden="true">g<span>//</span>s</div><b>GOS//SIM</b></div>
+    <nav className="topScreenHistory" aria-label="История разделов">
+     <button type="button" className="screenHistoryButton" onClick={()=>moveHistory(backIndex)} disabled={backIndex<0} aria-label="Вернуться к предыдущему экрану" title="Назад"><ChevronLeft aria-hidden="true"/></button>
+     <button type="button" className="screenHistoryButton" onClick={()=>moveHistory(forwardIndex)} disabled={forwardIndex<0} aria-label="Перейти к следующему экрану" title="Вперёд"><ChevronRight aria-hidden="true"/></button>
+    </nav>
     <div className="simTopCenter">
      <div className="topStageCopy"><small>ЭТАП {String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</small><strong>{nav.find(([key])=>key===view)?.[1]||game.title}</strong></div>
      <div className="topIndicators">
@@ -257,6 +293,7 @@ export default function GameClient({gameId}:{gameId:string}){
        {g.members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}{m.role_title?' · '+m.role_title:''}</option>)}
       </optgroup>}
      </select>
+     <ChevronDown className="viewAsChevron" aria-hidden="true"/>
     </label>}
 
     <button className={`topChatButton ${chatOpen?'active':''}`} onClick={()=>setChatOpen(!chatOpen)} aria-label={chatOpen?'Закрыть связь':'Открыть связь'} aria-expanded={chatOpen} aria-controls="game-chat"><MessageCircle aria-hidden="true"/><span>Связь</span></button>
@@ -272,13 +309,13 @@ export default function GameClient({gameId}:{gameId:string}){
 
     <main id="game-main" tabIndex={-1} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
      {error&&<div className="errorBox closable" role="alert"><span>{error}</span><button onClick={()=>setError('')} aria-label="Закрыть сообщение об ошибке">×</button></div>}
-     {view==='dashboard'&&<DashboardView g={vg} onNavigate={v=>{navigate(v);if(v==='stages')setFocusStage(currentStage?.stage_no||game.current_round)}}/>}
+     {view==='dashboard'&&<DashboardView g={vg} onNavigate={v=>navigate(v,v==='stages'?{stageNo:currentStage?.stage_no||game.current_round}:undefined)}/>}
      {view==='stages'&&<StagesView g={vg} readOnly={previewMode} focusStageNo={focusStage} onOpenVotes={()=>navigate('votes')}/>}
      {view==='parties'&&<PartiesView g={vg}/>}
-     {view==='votes'&&<VotesView g={vg} onOpenDocument={id=>{setFocusFormalId(id);navigate('documents')}} onOpenStages={()=>navigate('stages')}/>}
+     {view==='votes'&&<VotesView g={vg} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
      {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode} focusId={focusFormalId} onOpenVotes={()=>navigate('votes')}/>}
      {view==='grades'&&<GradesView g={vg}/>}
-     {view==='actions'&&<PoliticalWallView g={vg} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>{setFocusFormalId(id);navigate('documents')}} onNavigate={navigate}/>}
+     {view==='actions'&&<PoliticalWallView g={vg} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
      {view==='profile'&&<ProfileView g={vg}/>}
      {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>navigate('actions')}/>}
     </main>
