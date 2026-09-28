@@ -39,7 +39,7 @@ function ChatAttachment({message:m}:{message:Message}){
 }
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void}){
- const {channels,channelId,setChannelId,messages,names,recording,setChatOpen,sendText,sendChatFile,toggleRecording,me}=g;
+ const {channels,channelId,setChannelId,messages,chatLoading,names,recording,setChatOpen,sendText,sendChatFile,toggleRecording,me}=g;
  const [sending,setSending]=useState(false);
  const [uploading,setUploading]=useState(false);
  const [overlay,setOverlay]=useState(false);
@@ -108,7 +108,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
  },[overlay]);
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
-  if(pendingSend.current||!text.trim()||!channelId)return;
+  if(pendingSend.current||uploading||chatLoading||!text.trim()||!channelId)return;
   const sentText=text,fromChannel=channelId;
   pendingSend.current=true;setSending(true);setLocalError('');
   try{
@@ -155,7 +155,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
    <span className="chatSearchCount" aria-live="polite">{filtered.length} из {channelMessages.length}</span>
   </div>}
   <div className="chatMessages" ref={list} role="log" aria-label="Сообщения" aria-live={hasFilter?'off':'polite'} aria-relevant="additions" onScroll={()=>{const el=list.current;if(!el)return;const nearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<85;follow.current=nearBottom;setJumpVisible(!nearBottom&&!hasFilter&&channelMessages.length>0)}}>
-   {!entries.length?<div className="chatEmpty"><span className="chatEmptyIcon"><Search aria-hidden="true"/></span><b>{hasFilter?'Ничего не найдено':'Пока нет сообщений'}</b><p>{hasFilter?'Измените запрос или отключите фильтр.':'Начните обсуждение: сообщения увидят участники этого канала.'}</p></div>:
+   {chatLoading?<div className="chatEmpty" role="status"><span className="chatLoadingSpinner" aria-hidden="true"/><b>Загружаем сообщения…</b></div>:!entries.length?<div className="chatEmpty"><span className="chatEmptyIcon"><Search aria-hidden="true"/></span><b>{hasFilter?'Ничего не найдено':'Пока нет сообщений'}</b><p>{hasFilter?'Измените запрос или отключите фильтр.':'Начните обсуждение: сообщения увидят участники этого канала.'}</p></div>:
     entries.map(({message:m,startsDay,startsGroup,own,day,dayLabel})=>{
      const name=names[m.author_id]||'Система';
      const attachment=isChatAttachment(m);
@@ -181,10 +181,10 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
   {recording&&<div className="chatRecording" role="status"><span className="chatRecordingDot"/>Записывается {recording==='audio'?'аудио':'видео'}<button type="button" onClick={()=>void toggleRecording(recording)}>Завершить и отправить</button></div>}
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
   <div className="chatCompose">
-   <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)} placeholder={channelId?'Написать сообщение…':'Выберите канал'} disabled={!channelId} readOnly={sending} aria-busy={sending} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
+   <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)} placeholder={channelId?'Написать сообщение…':'Выберите канал'} disabled={!channelId||chatLoading} readOnly={sending} aria-busy={sending} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
    <div className="chatComposeActions">
     <div className="chatAttachWrap" ref={attachWrap}>
-     <button type="button" ref={attachmentButton} className={'chatIconButton chatAttachButton '+(attachOpen?'active':'')} aria-label="Прикрепить или записать" aria-haspopup="menu" aria-expanded={attachOpen} disabled={!channelId||uploading} onClick={()=>setAttachOpen(v=>!v)}><Plus aria-hidden="true"/></button>
+     <button type="button" ref={attachmentButton} className={'chatIconButton chatAttachButton '+(attachOpen?'active':'')} aria-label="Прикрепить или записать" aria-haspopup="menu" aria-expanded={attachOpen} disabled={!channelId||uploading||chatLoading} onClick={()=>setAttachOpen(v=>!v)}><Plus aria-hidden="true"/></button>
      {attachOpen&&<div className="chatAttachMenu" role="menu" aria-label="Добавить в чат">
       <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);uploadInput.current?.click()}}><Paperclip aria-hidden="true" size={18}/>Файл или изображение</button>
       <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);void toggleRecording('audio')}}><Mic aria-hidden="true" size={18}/>Аудиосообщение</button>
@@ -193,7 +193,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
      <input ref={uploadInput} type="file" hidden accept={FILE_ACCEPT} aria-label="Выбрать файл для чата" onChange={e=>{const file=e.target.files?.[0];if(file)void upload(file)}}/>
     </div>
     <span className="chatComposerHint">{uploading?'Загрузка файла…':sending?'Отправка…':'Enter — отправить · Shift + Enter — новая строка'}</span>
-    <button type="button" className="chatSendButton" disabled={sending||uploading||!text.trim()||!channelId} onClick={()=>void send()} aria-label="Отправить сообщение"><Send aria-hidden="true" size={17}/><span>Отправить</span></button>
+    <button type="button" className="chatSendButton" disabled={sending||uploading||chatLoading||!text.trim()||!channelId} onClick={()=>void send()} aria-label="Отправить сообщение"><Send aria-hidden="true" size={17}/><span>Отправить</span></button>
    </div>
   </div>
  </aside>;
