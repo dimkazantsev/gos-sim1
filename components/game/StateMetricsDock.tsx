@@ -1,5 +1,6 @@
 'use client';
 import {useMemo,useState} from 'react';
+import {Activity,BadgeCheck,Globe2,Handshake,HeartHandshake,MessageSquare,Scale,ShieldCheck,TrendingUp,UsersRound,Wallet} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Metric} from './types';
@@ -24,18 +25,18 @@ function changeTone(m:Metric,d:number){
  return d>0?'good':'bad';
 }
 function metricIcon(k:string){
- if(k==='public_trust')return '◉';
- if(k==='economy')return '⌁';
- if(k==='budget')return '₽';
- if(k==='social_stability')return '≈';
- if(k==='lawfulness')return '§';
- if(k==='international_standing')return '◎';
- if(k==='elite_support')return '◆';
- if(k==='security')return '◇';
- if(k==='social_tension')return '!';
- if(k==='media_climate')return '◌';
- if(k==='legitimacy')return '◈';
- return '•';
+ const Icon=k==='public_trust'?Handshake:
+  k==='economy'?TrendingUp:
+  k==='budget'?Wallet:
+  k==='social_stability'?HeartHandshake:
+  k==='lawfulness'?Scale:
+  k==='international_standing'?Globe2:
+  k==='elite_support'?UsersRound:
+  k==='security'?ShieldCheck:
+  k==='social_tension'?Activity:
+  k==='media_climate'?MessageSquare:
+  k==='legitimacy'?BadgeCheck:Activity;
+ return <Icon aria-hidden="true" size={18} strokeWidth={1.75}/>;
 }
 
 export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
@@ -80,8 +81,8 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
   const mini=rows.slice(-12).map(h=>Number(h.value));
   const last=rows.at(-1);
   const pct=m.max_value!=null&&m.min_value!=null?Math.max(0,Math.min(100,(Number(m.value)-Number(m.min_value))/Math.max(1,Number(m.max_value)-Number(m.min_value))*100)):null;
-  return <button key={m.id} className={'statePulseMetric '+m.group_key} onClick={()=>setSelected(m.id)}>
-   <span className="statePulseIcon">{metricIcon(m.metric_key)}</span>
+  return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} onClick={()=>setSelected(m.id)}>
+   <span className="statePulseIcon" aria-hidden="true">{metricIcon(m.metric_key)}</span>
    <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.label}</b><span>{last?.note||m.description||'Игровой показатель'}</span></div>
    <div className="statePulseValue"><strong>{Number(m.value).toLocaleString('ru-RU')}{m.unit||''}</strong><em className={changeTone(m,d)}>{d===0?'—':`${d>0?'▲ +':'▼ '}${Math.abs(d).toFixed(Math.abs(d)%1?1:0)}`}</em></div>
    <div className="statePulseTrend">
