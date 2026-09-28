@@ -963,3 +963,62 @@
 @media(prefers-reduced-motion:reduce){
  .gsIconAction{transition:none}
 }
+
+
+/* Top bar and workspace share one responsive right edge. The inner
+   max-width mirrors .simMain, rather than sizing header and content separately. */
+.simWorkspace{
+ --gs-layout-gutter:36px;
+}
+.simWorkspace .simTop{
+ box-sizing:border-box;
+ width:100%;
+ padding-inline:max(var(--gs-layout-gutter),calc((100% - var(--gs-content-max))/2));
+}
+.simWorkspace .simTop .topChatButton{
+ flex-shrink:0;
+ margin-right:0;
+ margin-left:0;
+ justify-self:end;
+}
+.simWorkspace .simTop .topChatButton>span{
+ white-space:nowrap;
+}
+@media(max-width:1280px){
+ .simWorkspace{--gs-layout-gutter:24px}
+}
+@media(max-width:900px){
+ .simWorkspace{--gs-layout-gutter:24px}
+ .simWorkspace .simTop{padding-inline:var(--gs-layout-gutter)}
+}
+@media(max-width:760px){
+ .simWorkspace{--gs-layout-gutter:16px}
+ .simWorkspace .simTop{
+  grid-template-columns:minmax(0,1fr) auto auto;
+  column-gap:7px;
+  padding-inline:var(--gs-layout-gutter);
+ }
+ .simWorkspace .simTop .mobileBrand{grid-column:1;grid-row:1}
+ .simWorkspace .simTop .topScreenHistory{grid-column:2;grid-row:1}
+ .simWorkspace .simTop .topChatButton{grid-column:3;grid-row:1;margin:0}
+ .simWorkspace .simTop .simTopCenter{grid-column:1;grid-row:2;width:108px}
+ .simWorkspace .simTop .viewAsSwitcher{
+  grid-column:2/4;
+  grid-row:2;
+  width:min(100%,216px);
+  max-width:216px;
+ }
+ .simWorkspace .simTop:not(:has(.viewAsSwitcher)) .simTopCenter{
+  grid-column:1/4;
+  width:100%;
+ }
+}
+@media(max-width:390px){
+ .simWorkspace{--gs-layout-gutter:16px}
+ .simWorkspace .simTop{
+  padding-inline:var(--gs-layout-gutter);
+  column-gap:6px;
+ }
+ .simWorkspace .simTop .mobileBrand b{font-size:13px}
+ .simWorkspace .simTop .topScreenHistory{gap:2px}
+}
