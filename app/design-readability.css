@@ -1568,3 +1568,11 @@
 @media(prefers-reduced-motion:reduce){
  .simChat.gsChatV2{animation:none}
 }
+
+.gsChatV2 .chatSearchMatch{
+ padding:0 1px;
+ border-radius:3px;
+ background:#fff0aa;
+ color:#5c4a11;
+ font-weight:750;
+}
