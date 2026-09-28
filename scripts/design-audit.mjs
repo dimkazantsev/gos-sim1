@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import postcss from 'postcss';
+import {execFileSync} from 'node:child_process';
 
 const read=p=>fs.readFileSync(p,'utf8');
 const styles=['design-tokens','design-shell','design-views','design-responsive','design-readability'];
@@ -72,4 +73,5 @@ check('Accent and text have separate insets on phones',readable.includes('paddin
 check('Phone layout and touch targets',css['design-responsive'].includes('@media(max-width:390px)')&&css['design-responsive'].includes('@media(pointer:coarse)'));
 const stageActions=read('components/game/stageActions.ts');
 check('Every one of the 16 stages has a next action',Array.from({length:16},(_,i)=>i+1).every(n=>new RegExp(`\\b${n}:\\{title:`).test(stageActions)));
+execFileSync(process.execPath,['scripts/metric-chart-check.cjs'],{stdio:'inherit'});
 console.log(`\n${count} source and contrast checks passed. This does not certify browser layout, keyboard interaction, or a live classroom session.`);
