@@ -33,10 +33,25 @@ const pages=[['entry','Вход',login],['dashboard','Обзор',base]];
 fixture.chatOpen=true;pages.push(['chat','Чат и обзор',renderToStaticMarkup(h(GameClient,{gameId:'design-preview'}))]);fixture.chatOpen=false;
 const originalMe=fixture.me;fixture.me=fixture.members[1];fixture.teacher=false;pages.push(['student','Обзор участника',renderToStaticMarkup(h(GameClient,{gameId:'design-preview'}))]);fixture.game.turn_open=false;pages.push(['paused','Игра на паузе',renderToStaticMarkup(h(GameClient,{gameId:'design-preview'}))]);fixture.game.turn_open=true;fixture.me=originalMe;fixture.teacher=true;
 const PublicScreen=require('../components/PublicScreen').default;pages.push(['audience','Экран аудитории',renderToStaticMarkup(h(PublicScreen,{gameId:'design-preview'}))]);
+// Render the real metric modal with historical and comparable metrics so layout
+// can be inspected at 360/390/768px and desktop without live credentials.
+fixture.game.created_at=now;
+fixture.metricHistory=fixture.metrics.slice(0,3).flatMap((metric,index)=>{
+ const base=Number(metric.value)-(index===0?8:index===1?7:6);
+ return [
+  {id:index*3+1,game_id:'design-preview',metric_id:metric.id,metric_key:metric.metric_key,value:base,previous_value:null,delta:0,source_type:'baseline',source_id:null,actor_id:null,note:'Начальная точка показателя',recorded_at:'2026-09-27T12:00:00Z'},
+  {id:index*3+2,game_id:'design-preview',metric_id:metric.id,metric_key:metric.metric_key,value:base+3,previous_value:base,delta:3,source_type:'decision',source_id:null,actor_id:null,note:'Завершение первого игрового этапа',recorded_at:'2026-09-28T10:00:00Z'},
+  {id:index*3+3,game_id:'design-preview',metric_id:metric.id,metric_key:metric.metric_key,value:Number(metric.value),previous_value:base+3,delta:Number(metric.value)-base-3,source_type:'decision',source_id:null,actor_id:null,note:'Принято решение по итогам заседания',recorded_at:'2026-09-29T11:00:00Z'}
+ ];
+});
+const StateMetricsDock=require('../components/game/StateMetricsDock').default;
+pages.push(['metric-modal','График показателя',renderToStaticMarkup(h('main',{className:'previewMetricPage'},h(StateMetricsDock,{
+ g,initialSelectedMetricId:fixture.metrics[0].id,initialCompareIds:[fixture.metrics[1].id,fixture.metrics[2].id]
+})))]);
 const defs=[['stages','Этапы','StagesView'],['parties','Партии','PartiesView'],['votes','Голосования','VotesView'],['documents','Реестр НПА','DocumentsView'],['actions','Процессы','PoliticalWallView'],['grades','Оценки','GradesView'],['teacher','Управление','TeacherView'],['profile','Профиль','ProfileView']];
 for(const [id,label,file] of defs){const Component=require('../components/game/'+file).default;const content=renderToStaticMarkup(h(Component,{g,onNavigate:noop,onOpenVotes:noop,onOpenStages:noop,onOpenDocument:noop,onOpenProcesses:noop}));pages.push([id,label,base.replace(/(<main id="game-main"[^>]*>)[\s\S]*?(<\/main>)/,(_,start,end)=>start+content+end)]);}
 let css=fs.readFileSync(path.join(root,'app/globals.css'),'utf8');css=css.replace(/@import '\.\/([^']+)' layer\(legacy\);/g,(_,file)=>'@layer legacy {\n'+fs.readFileSync(path.join(root,'app',file),'utf8')+'\n}');
-for(const file of ['design-tokens','design-shell','design-views','design-responsive'])css+='\n'+fs.readFileSync(path.join(root,'app',file+'.css'),'utf8');
+for(const file of ['design-tokens','design-shell','design-views','design-responsive','design-readability'])css+='\n'+fs.readFileSync(path.join(root,'app',file+'.css'),'utf8');
 for(const subset of ['latin','cyrillic']){const file=path.join(root,'node_modules/@fontsource-variable/manrope/files',`manrope-${subset}-wght-normal.woff2`);css+=`\n@font-face{font-family:'Manrope Variable';font-style:normal;font-weight:200 800;font-display:swap;src:url(data:font/woff2;base64,${fs.readFileSync(file).toString('base64')}) format('woff2');unicode-range:${subset==='cyrillic'?'U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116':'U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215'};}`;}
 css+='\n.previewNotice{position:fixed;z-index:2000;bottom:100px;left:50%;transform:translateX(-50%);max-width:calc(100% - 32px);background:#172447;color:white;border-radius:12px;padding:16px 20px;font:14px/1.5 sans-serif;box-shadow:0 12px 36px #17244733}.previewNotice[hidden]{display:none}';
 function doc(markup){return '<!doctype html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+css+'</style></head><body>'+markup+'<div class="previewNotice" hidden role="status"></div><script>document.addEventListener("submit",e=>e.preventDefault());document.addEventListener("click",e=>{const b=e.target.closest("button,a");if(!b)return;e.preventDefault();const nav=b.closest(".focusNav,.mobileDock");if(nav){parent.postMessage({type:"navigate",text:b.innerText},"*");return}const n=document.querySelector(".previewNotice");n.textContent="Это макет с вымышленными данными. Рабочие действия доступны в самой игре.";n.hidden=false;clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>n.hidden=true,3000)});<\/script></body></html>';}
