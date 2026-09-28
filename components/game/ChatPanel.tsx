@@ -39,13 +39,13 @@ function ChatAttachment({message:m}:{message:Message}){
  </a>;
 }
 
-export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void}){
+export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean}){
  const {channels,channelId,setChannelId,messages,chatPins,pinnedMessages,setChatPin,chatLoading,names,recording,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
  const [sending,setSending]=useState(false);
  const [uploading,setUploading]=useState(false);
  const [overlay,setOverlay]=useState(false);
  const [searchOpen,setSearchOpen]=useState(false);
- const [pinsOpen,setPinsOpen]=useState(false);
+ const [pinsOpen,setPinsOpen]=useState(previewPinsOpen);
  const [pinBusy,setPinBusy]=useState<string|null>(null);
  const [search,setSearch]=useState('');
  const [onlyFiles,setOnlyFiles]=useState(false);
@@ -135,6 +135,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
  async function togglePin(m:Message){
   if(pinBusy)return;
   const pinned=chatPins.some(p=>p.message_id===m.id);
+  const existing=chatPins.find(p=>p.message_id===m.id);
+  if(pinned&&existing?.pinned_by!==me?.user_id&&!teacher)return;
   setPinBusy(m.id);setLocalError('');
   try{if(!await setChatPin(m.id,!pinned))setLocalError('Не удалось изменить закрепление. Проверьте права или лимит канала.')}
   catch{setLocalError('Не удалось изменить закрепление. Попробуйте ещё раз.')}
@@ -157,7 +159,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
  }}}>
   <header className="chatTop">
    <div className="chatHeadIcon" aria-hidden="true"><MessageIcon/></div>
-   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId}/>
+   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} initialOpen={previewChannelOpen}/>
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
    <IconAction onClick={()=>setChatOpen(false)} label="Закрыть чат"/>
   </header>
@@ -203,7 +205,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
          {!startsGroup&&<time className="chatInlineTime" dateTime={m.created_at}>{formatChatTime(m.created_at)}</time>}
         </div>
        </div>
-       <button type="button" className={'chatPinAction '+(chatPins.some(p=>p.message_id===m.id)?'isPinned':'')} disabled={!!pinBusy||(chatPins.length>=12&&!chatPins.some(p=>p.message_id===m.id))} aria-label={chatPins.some(p=>p.message_id===m.id)?'Открепить сообщение':'Закрепить сообщение'} aria-pressed={chatPins.some(p=>p.message_id===m.id)} title={chatPins.some(p=>p.message_id===m.id)?'Открепить':'Закрепить'} onClick={()=>void togglePin(m)}><Pin size={15} aria-hidden="true"/></button>
+       <button type="button" className={'chatPinAction '+(chatPins.some(p=>p.message_id===m.id)?'isPinned':'')} disabled={!!pinBusy||(chatPins.length>=12&&!chatPins.some(p=>p.message_id===m.id))||(chatPins.some(p=>p.message_id===m.id&&p.pinned_by!==me?.user_id)&&!teacher)} aria-label={chatPins.some(p=>p.message_id===m.id)?'Открепить сообщение':'Закрепить сообщение'} aria-pressed={chatPins.some(p=>p.message_id===m.id)} title={chatPins.some(p=>p.message_id===m.id)?'Открепить':'Закрепить'} onClick={()=>void togglePin(m)}><Pin size={15} aria-hidden="true"/></button>
       </article>
      </div>;
     })}
