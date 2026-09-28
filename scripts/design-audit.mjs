@@ -29,7 +29,7 @@ check('Legacy rules are isolated from the new design',read('app/globals.css').in
 check('Reduced motion',css['design-tokens'].includes('prefers-reduced-motion:reduce'));
 check('Visible keyboard focus',css['design-tokens'].includes(':focus-visible'));
 const readable=css['design-readability'];
-check('Every common page header receives a separated accent', ['pageHeader','gradesHero','votesHero','formalHero','teacherFocus','profileHero','wallHero','dashHero'].every(name=>readable.includes('.'+name+'::before')&&readable.includes('.'+name+',')));
+check('Every common page header receives a separated accent', ['pageHeader','gradesHero','votesHero','formalHero','teacherFocus','profileHero','wallHero','dashHero'].every(name=>{const root=postcss.parse(readable);return root.nodes.some(node=>node.type==='rule'&&node.selectors?.includes('.'+name+'::before')&&node.nodes.some(d=>d.prop==='background'&&d.value.includes('linear-gradient')));}));
 check('Accent and text have separate insets on phones',readable.includes('padding:20px 18px 22px 42px')&&readable.includes('left:16px')&&readable.includes('padding:18px 14px 20px 36px')&&readable.includes('left:13px'));
 check('Phone layout and touch targets',css['design-responsive'].includes('@media(max-width:390px)')&&css['design-responsive'].includes('@media(pointer:coarse)'));
 const stageActions=read('components/game/stageActions.ts');
