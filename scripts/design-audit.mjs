@@ -172,7 +172,7 @@ check('Chat uses a single channel switcher integrated into its header',
  chat.includes('aria-label="Выбрать канал общения"'));
 check('Chat supports keyboard search, attachment filtering and scroll to latest',
  chat.includes('className="chatSearchBar"')&&
- chat.includes('className="chatFilesFilter')&&
+ chat.includes("'chatFilesFilter '")&&
  chat.includes('className="chatJumpLatest"')&&
  chat.includes('chatUtils'));
 check('Chat uses distinct personal messages, day separators and one file card',
