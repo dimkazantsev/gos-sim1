@@ -1,7 +1,8 @@
 'use client';
 import {IconAction} from './ui/IconAction';
+import ChatToggleButton from './game/ChatToggleButton';
 import {useEffect,useRef,useState} from 'react';
-import {BookOpenText,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote as VoteIcon,Wifi} from 'lucide-react';
+import {BookOpenText,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,Menu,Radio,Settings2,ShieldCheck,UserRound,Vote as VoteIcon,Wifi} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
@@ -338,7 +339,7 @@ export default function GameClient({gameId}:{gameId:string}){
      </div>}
     </div>}
 
-    <button className={`topChatButton ${chatOpen?'active':''}`} onClick={()=>setChatOpen(!chatOpen)} aria-label={chatOpen?'Закрыть связь':'Открыть связь'} aria-expanded={chatOpen} aria-controls="game-chat"><MessageCircle aria-hidden="true"/><span>Связь</span></button>
+    <ChatToggleButton chatOpen={chatOpen} onToggle={()=>setChatOpen(!chatOpen)}/>
    </header>
 
    {previewMode&&<div className="studentPreviewBanner">
