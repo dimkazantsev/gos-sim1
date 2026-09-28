@@ -12,8 +12,9 @@
  --bg:var(--gs-bg);--surface:#fff;--surface-2:var(--gs-surface-soft);--surface-3:var(--gs-accent-soft);--navy:var(--gs-ink);--navy-2:#233c78;--text:var(--gs-ink);--body:var(--gs-ink-2);--muted:var(--gs-muted);--soft:var(--gs-faint);--line:var(--gs-border);--line-strong:var(--gs-border-strong);--blue:var(--gs-accent);--blue-2:var(--gs-accent);--pink:var(--gs-pink);
 }
 *{box-sizing:border-box}
-html{background:var(--gs-bg);color-scheme:light;scroll-padding-top:100px}
+html{scrollbar-gutter:stable;background:var(--gs-bg);color-scheme:light;scroll-padding-top:100px}
 body{margin:0;min-height:100dvh;background:var(--gs-bg);color:var(--gs-ink);font:500 16px/1.55 var(--gs-font-sans);-webkit-font-smoothing:antialiased}
+button,a,input,select,textarea{touch-action:manipulation;-webkit-tap-highlight-color:#2453e61f}
 button,input,select,textarea{font-family:inherit;font-size:14px;line-height:1.5}
 button{min-height:44px;cursor:pointer;border:1px solid var(--gs-border);border-radius:10px;padding:10px 16px;color:var(--gs-ink-2);background:white;font-weight:650;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease}
 button:hover:not(:disabled){border-color:var(--gs-border-strong);background:var(--gs-surface-soft)}
@@ -59,3 +60,6 @@ svg.lucide{width:20px;height:20px;flex-shrink:0;stroke-width:1.8}
 @keyframes spin{to{transform:rotate(360deg)}}.spin{animation:spin 1s linear infinite}
 @keyframes arrive{from{opacity:.4;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+
+h1,h2,h3,p,.wallPostBody,.formalPaperBody,.eventTimeline,.mandateLegend,.chatTop b,.chatMsg b{overflow-wrap:anywhere}
+.mobileMoreSheet,.metricModal,.stageDetailPanel{overscroll-behavior:contain}

@@ -161,8 +161,9 @@ export default function GameClient({gameId}:{gameId:string}){
  const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
  const [focusStage,setFocusStage]=useState(0);
  const [crisisExpanded,setCrisisExpanded]=useState(false);
+ const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
- function navigate(next:View){setFocusStage(0);setView(next);setMobileMenuOpen(false);requestAnimationFrame(()=>document.getElementById('game-main')?.focus());}
+ function navigate(next:View){setFocusStage(0);setView(next);setMobileMenuOpen(false);if(window.matchMedia('(max-width:1099px)').matches)g.setChatOpen(false);requestAnimationFrame(()=>document.getElementById('game-main')?.focus());}
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
 
  const genericStudent:Member|undefined=teacher&&game?{
@@ -177,6 +178,7 @@ export default function GameClient({gameId}:{gameId:string}){
  const previewMode=!!previewStudent;
  const vg=previewStudent?buildStudentPreview(g,previewStudent):g;
  const shownMe=vg.me||me;
+ const chatDraftKey=(shownMe?.user_id||'')+':'+g.channelId;
 
  useEffect(()=>{
   if(!me||previewMode)return;
@@ -257,7 +259,7 @@ export default function GameClient({gameId}:{gameId:string}){
      </select>
     </label>}
 
-    <button className={`topChatButton ${chatOpen?'active':''}`} onClick={()=>setChatOpen(!chatOpen)} aria-label={chatOpen?'Закрыть связь':'Открыть связь'}><MessageCircle aria-hidden="true"/><span>Связь</span></button>
+    <button className={`topChatButton ${chatOpen?'active':''}`} onClick={()=>setChatOpen(!chatOpen)} aria-label={chatOpen?'Закрыть связь':'Открыть связь'} aria-expanded={chatOpen} aria-controls="game-chat"><MessageCircle aria-hidden="true"/><span>Связь</span></button>
    </header>
 
    {previewMode&&<div className="studentPreviewBanner">
@@ -271,18 +273,18 @@ export default function GameClient({gameId}:{gameId:string}){
     <main id="game-main" tabIndex={-1} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
      {error&&<div className="errorBox closable" role="alert"><span>{error}</span><button onClick={()=>setError('')} aria-label="Закрыть сообщение об ошибке">×</button></div>}
      {view==='dashboard'&&<DashboardView g={vg} onNavigate={v=>{navigate(v);if(v==='stages')setFocusStage(currentStage?.stage_no||game.current_round)}}/>}
-     {view==='stages'&&<StagesView g={vg} readOnly={previewMode} focusStageNo={focusStage} onOpenVotes={()=>setView('votes')}/>}
+     {view==='stages'&&<StagesView g={vg} readOnly={previewMode} focusStageNo={focusStage} onOpenVotes={()=>navigate('votes')}/>}
      {view==='parties'&&<PartiesView g={vg}/>}
-     {view==='votes'&&<VotesView g={vg} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onOpenStages={()=>setView('stages')}/>}
-     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode} focusId={focusFormalId} onOpenVotes={()=>setView('votes')}/>}
+     {view==='votes'&&<VotesView g={vg} onOpenDocument={id=>{setFocusFormalId(id);navigate('documents')}} onOpenStages={()=>navigate('stages')}/>}
+     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode} focusId={focusFormalId} onOpenVotes={()=>navigate('votes')}/>}
      {view==='grades'&&<GradesView g={vg}/>}
-     {view==='actions'&&<PoliticalWallView g={vg} onOpenVotes={()=>setView('votes')} onOpenDocument={id=>{setFocusFormalId(id);setView('documents')}} onNavigate={v=>setView(v)}/>}
+     {view==='actions'&&<PoliticalWallView g={vg} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>{setFocusFormalId(id);navigate('documents')}} onNavigate={navigate}/>}
      {view==='profile'&&<ProfileView g={vg}/>}
      {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>navigate('actions')}/>}
     </main>
    </div>
 
-   {chatOpen&&<ChatPanel g={vg}/>}
+   {chatOpen&&<ChatPanel g={vg} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))}/>}
   </div>
 
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
