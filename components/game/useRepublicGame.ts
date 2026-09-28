@@ -58,7 +58,7 @@ export function useRepublicGame(gameId:string){
   return()=>{if(liveRef.current)void supabase.removeChannel(liveRef.current)};
  },[gameId]);
 
- useEffect(()=>{channelRef.current=channelId;if(channelId)void loadMessages(channelId)},[channelId]);
+ useEffect(()=>{channelRef.current=channelId;setMessages([]);if(channelId)void loadMessages(channelId)},[channelId]);
 
  useEffect(()=>{
   const tick=()=>{
@@ -220,7 +220,8 @@ export function useRepublicGame(gameId:string){
 
  async function loadMessages(cid:string){
   const r=await supabase.from('chat_messages').select('*').eq('channel_id',cid).order('created_at',{ascending:false}).limit(150);
-  const rows=await Promise.all(((r.data||[]) as Message[]).map(async m=>{if(!m.storage_path)return m;const x=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);return {...m,url:x.data?.signedUrl||null}}));
+  if(r.error){setError(r.error.message);return}
+   const rows=await Promise.all(((r.data||[]) as Message[]).map(async m=>{if(!m.storage_path)return m;const x=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);return {...m,url:x.data?.signedUrl||null}}));
   if(channelRef.current===cid)setMessages(rows.reverse());
  }
  async function refresh(){await loadAll(false);if(channelRef.current)await loadMessages(channelRef.current)}
