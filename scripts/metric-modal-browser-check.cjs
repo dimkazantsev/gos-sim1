@@ -35,7 +35,9 @@ async function main(){
    const dashboard=page.frameLocator('#preview');
    const chat=dashboard.getByRole('button',{name:'Открыть чат'});
    assert.equal(await chat.count(),1,'Top bar must use Chat, not Connection');
-   assert.equal((await chat.innerText()).trim(),'Чат','Top bar visible label is Chat');
+   assert.equal((await chat.locator('span').innerText()).trim(),'Чат','Top bar label is Chat');
+   if(width>=1100)assert(await chat.locator('span').isVisible(),'Desktop top bar must show the Chat label');
+   else assert.equal(await chat.getAttribute('aria-label'),'Открыть чат','Icon-only mobile Chat remains accessible');
    const bounds=await dashboard.locator('.simWorkspace').evaluate(workspace=>{
     const bar=workspace.querySelector('.simTop');
     const chat=workspace.querySelector('.topChatButton');
