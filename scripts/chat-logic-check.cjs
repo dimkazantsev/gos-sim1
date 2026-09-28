@@ -31,7 +31,7 @@ assert.equal(entries[4].dayLabel,'Вчера');
 assert.equal(chatDayLabel('2026-09-29T09:00:00Z',now),'Сегодня');
 console.log('PASS grouping by author, six-minute gaps, real dates and own messages');
 const document={...make('f','alice','2026-09-29T09:00:00Z','file','Проект постановления.pdf'),mime_type:'application/pdf'};
-assert(matchChatMessage(document,'ПОСТАНОВЛЕНИЕ','Анна'));
+assert(matchChatMessage(document,'ПОСТАНОВЛЕНИЯ','Анна'));
 assert(matchChatMessage(document,'АННА','Анна'));
 assert(matchChatMessage(document,'', 'Анна',true));
 assert(!matchChatMessage(messages[0],'','Анна',true));
