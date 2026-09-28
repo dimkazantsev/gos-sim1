@@ -174,3 +174,87 @@
  .topScreenHistory .screenHistoryButton{width:40px;min-width:40px;height:44px}
  .simTop .topChatButton{width:42px;min-width:42px}
 }
+
+/* Header controls: true equal-width desktop rhythm instead of auto-sized chips.
+   The selector is intentionally after all base and responsive declarations. */
+.simTop{--toolbar-control-width:192px}
+.simTop :is(.livePill,.viewAsSwitcher,.topChatButton){
+ box-sizing:border-box;
+ width:var(--toolbar-control-width);
+ min-width:var(--toolbar-control-width);
+ max-width:var(--toolbar-control-width);
+ height:58px;min-height:58px;
+ flex:0 0 var(--toolbar-control-width);
+ margin:0;
+ border-radius:13px;
+}
+.simTop .topIndicators{flex:0 0 auto;align-items:center}
+.simTop .livePill{
+ display:inline-flex;justify-content:center;align-items:center;
+ gap:10px;padding:0 14px;font-size:14px;line-height:1.3;
+}
+.simTop .livePill>svg{display:block;width:20px;height:20px;flex:0 0 20px}
+.simTop .topChatButton{
+ display:inline-flex;align-items:center;justify-content:center;
+ gap:10px;padding:0 14px;font-size:14px;line-height:1.3;
+}
+.simTop .topChatButton>span{display:inline;white-space:nowrap}
+.simTop .viewAsSwitcher{
+ display:grid;align-content:center;gap:2px;
+ padding:7px 34px 7px 15px;
+}
+.simTop .viewAsSwitcher>span{
+ display:block;font-size:12px;line-height:1.35;
+ letter-spacing:.02em;white-space:nowrap;
+}
+.simTop .viewAsSwitcher select{width:100%;min-height:24px;font-size:14px;line-height:1.3}
+.simTop .viewAsChevron{right:12px}
+@media(max-width:1200px){
+ /* Keep the three controls balanced; the section label is already in navigation. */
+ .simTop .topStageCopy{display:none}
+ .simTopCenter{justify-content:flex-end}
+}
+@media(max-width:900px){
+ .simTop{align-items:center}
+ .simTopCenter{order:2;flex:0 0 var(--toolbar-control-width);margin-left:0}
+ .simTop .viewAsSwitcher{
+  order:3;flex:0 0 var(--toolbar-control-width);
+  width:var(--toolbar-control-width);
+  min-width:var(--toolbar-control-width);
+  max-width:var(--toolbar-control-width);
+  margin:0;
+ }
+ .simTop .topChatButton{
+  order:4;flex:0 0 var(--toolbar-control-width);
+  width:var(--toolbar-control-width);
+  min-width:var(--toolbar-control-width);
+  max-width:var(--toolbar-control-width);
+ }
+}
+@media(max-width:650px){
+ /* On narrow phones: two equally sized status/chat controls; selector full-width. */
+ .simTop{gap:10px;align-items:center}
+ .mobileBrand{order:0;margin-right:auto}
+ .topScreenHistory{order:1}
+ .simTopCenter{order:2;flex:1 1 calc(50% - 5px);width:auto;min-width:0}
+ .simTop .topIndicators{width:100%;display:flex;flex-wrap:wrap;gap:6px}
+ .simTop .livePill{
+  flex:1 1 100%;width:100%;min-width:0;max-width:none;
+  height:56px;min-height:56px;
+ }
+ .simTop .topChatButton{
+  order:3;flex:1 1 calc(50% - 5px);
+  width:auto;min-width:0;max-width:none;
+  height:56px;min-height:56px;
+ }
+ .simTop .viewAsSwitcher{
+  order:4;flex:1 1 100%;width:100%;
+  min-width:0;max-width:none;height:58px;min-height:58px;
+  padding:8px 38px 8px 15px;
+ }
+ .simTop .viewAsSwitcher>span{white-space:nowrap}
+ .simTop .timerPill,.simTop .connectionPill.disconnected{
+  width:auto;min-width:0;height:auto;min-height:32px;
+  padding:5px 9px;font-size:12px;
+ }
+}
