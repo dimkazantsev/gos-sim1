@@ -149,7 +149,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
      {geometry.comparing&&<p className="metricChartNotice">Линии приведены к собственным шкалам. Точные значения показаны при выборе точки.</p>}
      <div className="metricSeriesControls">
       <div className="metricSeriesControlsHead">
-       <div><b>Показатели для сравнения</b><span>Выберите до ${MAX_CHART_SERIES} линий вместе с основной.</span></div>
+       <div><b>Показатели для сравнения</b><span>Выберите до {MAX_CHART_SERIES-1} дополнительных показателей.</span></div>
        {compare.length>0&&<button type="button" className="metricClearCompare" onClick={()=>{setCompare([]);setFocusedPoint(null)}}>Сбросить сравнение</button>}
       </div>
       <div className="metricSeriesToggleRow" aria-label="Выбор показателей для сравнения">
