@@ -8,7 +8,7 @@ import {CRISES} from './constants';
 export function useRepublicGame(gameId:string){
  const router=useRouter();
  const [game,setGame]=useState<Game|null>(null),[me,setMe]=useState<Member|null>(null),[metrics,setMetrics]=useState<Metric[]>([]),[events,setEvents]=useState<EventItem[]>([]),[actions,setActions]=useState<ActionItem[]>([]),[members,setMembers]=useState<Member[]>([]);
- const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]),[chatPins,setChatPins]=useState<ChatPin[]>([]),[chatLoading,setChatLoading]=useState(false);
+ const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]),[chatPins,setChatPins]=useState<ChatPin[]>([]),[pinnedMessages,setPinnedMessages]=useState<Message[]>([]),[chatLoading,setChatLoading]=useState(false);
  const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profiles,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[partyInvitations,setPartyInvitations]=useState<PartyInvitation[]>([]),[partyMandates,setPartyMandateRows]=useState<PartyMandateAllocation[]>([]),[partyAgreements,setPartyAgreements]=useState<PartyAgreement[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]),[politicalPosts,setPoliticalPosts]=useState<PoliticalPost[]>([]),[politicalMedia,setPoliticalMedia]=useState<PoliticalPostMedia[]>([]),[postFormalLinks,setPostFormalLinks]=useState<PoliticalPostFormalLink[]>([]),[politicalDecisions,setPoliticalDecisions]=useState<PoliticalDecision[]>([]),[metricHistory,setMetricHistory]=useState<MetricHistory[]>([]),[partySupportHistory,setPartySupportHistory]=useState<PartySupportHistory[]>([]),[impactRules,setImpactRules]=useState<ImpactRule[]>([]),[impactLedger,setImpactLedger]=useState<ImpactLedger[]>([]);
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[chatOpen,setChatOpen]=useState(false),[secondsLeft,setSecondsLeft]=useState(0);
  const [recording,setRecording]=useState<'audio'|'video'|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
@@ -59,7 +59,7 @@ export function useRepublicGame(gameId:string){
   return()=>{if(liveRef.current)void supabase.removeChannel(liveRef.current)};
  },[gameId]);
 
- useEffect(()=>{channelRef.current=channelId;setMessages([]);setChatPins([]);if(channelId){void loadMessages(channelId,true);void loadChatPins(channelId)}else setChatLoading(false)},[channelId]);
+ useEffect(()=>{channelRef.current=channelId;setMessages([]);setChatPins([]);setPinnedMessages([]);if(channelId){void loadMessages(channelId,true);void loadChatPins(channelId)}else setChatLoading(false)},[channelId]);
 
  useEffect(()=>{
   const tick=()=>{
@@ -231,7 +231,17 @@ export function useRepublicGame(gameId:string){
  async function loadChatPins(cid:string){
   const r=await supabase.from('chat_pins').select('id,game_id,channel_id,message_id,pinned_by,pinned_at').eq('channel_id',cid).order('pinned_at',{ascending:false}).limit(12);
   if(r.error){setError(r.error.message);return}
-  if(channelRef.current===cid)setChatPins((r.data||[]) as ChatPin[]);
+  const pins=(r.data||[]) as ChatPin[];
+  const ids=pins.map(p=>p.message_id);
+  if(!ids.length){if(channelRef.current===cid){setChatPins([]);setPinnedMessages([])}return}
+  const linked=await supabase.from('chat_messages').select('*').in('id',ids).eq('channel_id',cid);
+  if(linked.error){setError(linked.error.message);return}
+  const media=await Promise.all(((linked.data||[]) as Message[]).map(async m=>{
+   if(!m.storage_path)return m;
+   const url=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);
+   return {...m,url:url.data?.signedUrl||null};
+  }));
+  if(channelRef.current===cid){setChatPins(pins);setPinnedMessages(media)}
  }
  async function setChatPin(messageId:string,pin:boolean){
   if(!me||!channelId)return false;
@@ -656,6 +666,6 @@ export function useRepublicGame(gameId:string){
   }catch(e){setError(e instanceof Error?e.message:'Нет доступа к микрофону/камере')}
  }
 
- return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,chatPins,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
+ return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
   logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,toggleRecording};
 }
