@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {BookOpenText,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote as VoteIcon,Wifi} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
@@ -170,10 +170,47 @@ export default function GameClient({gameId}:{gameId:string}){
  const focusFormalId=currentScreen.documentId;
  const focusStage=currentScreen.stageNo;
  const [viewAs,setViewAs]=useState('');
+ const [viewAsOpen,setViewAsOpen]=useState(false);
+ const viewAsRef=useRef<HTMLDivElement>(null);
  const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
  const [crisisExpanded,setCrisisExpanded]=useState(false);
  const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
+ useEffect(()=>{
+  if(!viewAsOpen)return;
+  function onPointerDown(event:PointerEvent){
+   if(!viewAsRef.current?.contains(event.target as Node))setViewAsOpen(false);
+  }
+  function onEscape(event:KeyboardEvent){
+   if(event.key!=='Escape')return;
+   event.preventDefault();
+   setViewAsOpen(false);
+   viewAsRef.current?.querySelector<HTMLButtonElement>('.viewAsTrigger')?.focus();
+  }
+  document.addEventListener('pointerdown',onPointerDown);
+  document.addEventListener('keydown',onEscape);
+  const frame=requestAnimationFrame(()=>viewAsRef.current?.querySelector<HTMLButtonElement>('.viewAsMenu [aria-checked="true"]')?.focus());
+  return()=>{
+   cancelAnimationFrame(frame);
+   document.removeEventListener('pointerdown',onPointerDown);
+   document.removeEventListener('keydown',onEscape);
+  };
+ },[viewAsOpen]);
+ function selectViewAs(next:string){
+  setViewAs(next);
+  setViewAsOpen(false);
+  requestAnimationFrame(()=>viewAsRef.current?.querySelector<HTMLButtonElement>('.viewAsTrigger')?.focus());
+ }
+ function onPreviewMenuKeyDown(event:React.KeyboardEvent<HTMLDivElement>){
+  if(event.key!=='ArrowDown'&&event.key!=='ArrowUp'&&event.key!=='Home'&&event.key!=='End')return;
+  const options=Array.from(viewAsRef.current?.querySelectorAll<HTMLButtonElement>('.viewAsMenu [role="menuitemradio"]')||[]);
+  if(!options.length)return;
+  event.preventDefault();
+  const current=options.indexOf(document.activeElement as HTMLButtonElement);
+  const index=event.key==='Home'?0:event.key==='End'?options.length-1:
+   event.key==='ArrowDown'?(current+1)%options.length:(current+options.length-1)%options.length;
+  options[index]?.focus();
+ }
  function finishScreenNavigation(){
   setMobileMenuOpen(false);
   if(window.matchMedia('(max-width:1099px)').matches)g.setChatOpen(false);
@@ -284,17 +321,21 @@ export default function GameClient({gameId}:{gameId:string}){
      </div>
     </div>
 
-    {teacher&&<label className={'viewAsSwitcher '+(previewMode?'active':'')}>
-     <span>РЕЖИМ ПРОСМОТРА</span>
-     <select value={viewAs} onChange={e=>setViewAs(e.target.value)}>
-      <option value="">Преподаватель</option>
-      <option value={GENERIC_STUDENT}>Студент · типовой вид</option>
-      {g.members.some(m=>m.kind==='student')&&<optgroup label="Конкретный студент">
-       {g.members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}{m.role_title?' · '+m.role_title:''}</option>)}
-      </optgroup>}
-     </select>
-     <ChevronDown className="viewAsChevron" aria-hidden="true"/>
-    </label>}
+    {teacher&&<div className={'viewAsSwitcher '+(previewMode?'active':'')} ref={viewAsRef}>
+     <button type="button" className="viewAsTrigger" aria-haspopup="menu" aria-expanded={viewAsOpen} aria-controls={viewAsOpen?'game-view-as-menu':undefined} aria-label={'Режим просмотра: '+(!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент · типовой вид':previewStudent?.full_name||'Студент')} onClick={()=>setViewAsOpen(open=>!open)}>
+      <span className="viewAsTriggerText">
+       <span className="viewAsLabel">РЕЖИМ ПРОСМОТРА</span>
+       <strong className="viewAsValue">{!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент · типовой вид':previewStudent?.full_name||'Студент'}</strong>
+      </span>
+      <ChevronDown className="viewAsChevron" aria-hidden="true"/>
+     </button>
+     {viewAsOpen&&<div className="viewAsMenu" id="game-view-as-menu" role="menu" aria-label="Выбрать режим просмотра" onKeyDown={onPreviewMenuKeyDown}>
+      <button type="button" role="menuitemradio" aria-checked={!viewAs} className={!viewAs?'selected':''} onClick={()=>selectViewAs('')}>Преподаватель</button>
+      <button type="button" role="menuitemradio" aria-checked={viewAs===GENERIC_STUDENT} className={viewAs===GENERIC_STUDENT?'selected':''} onClick={()=>selectViewAs(GENERIC_STUDENT)}>Студент · типовой вид</button>
+      {g.members.some(m=>m.kind==='student')&&<div role="separator" className="viewAsMenuDivider">Конкретный студент</div>}
+      {g.members.filter(m=>m.kind==='student').map(m=><button type="button" key={m.user_id} role="menuitemradio" aria-checked={viewAs===m.user_id} className={viewAs===m.user_id?'selected':''} title={m.full_name+(m.role_title?' · '+m.role_title:'')} onClick={()=>selectViewAs(m.user_id)}>{m.full_name}{m.role_title&&<small>{m.role_title}</small>}</button>)}
+     </div>}
+    </div>}
 
     <button className={`topChatButton ${chatOpen?'active':''}`} onClick={()=>setChatOpen(!chatOpen)} aria-label={chatOpen?'Закрыть связь':'Открыть связь'} aria-expanded={chatOpen} aria-controls="game-chat"><MessageCircle aria-hidden="true"/><span>Связь</span></button>
    </header>
