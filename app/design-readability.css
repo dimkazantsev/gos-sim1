@@ -452,3 +452,64 @@
   background:#f0f3fa;
   color:#64799e;
 }
+
+
+/* Event-sourced metrics modal: prevent stretched empty charts and display
+   switchable comparison series immediately below the chart. */
+.metricModal.redesigned{overflow-y:auto;overflow-x:hidden}
+.metricModal.redesigned .metricHeroValue{padding:16px 24px 10px}
+.metricModal.redesigned .metricHeroValue strong{font-size:clamp(28px,4vw,40px)}
+.metricModal.redesigned .metricLastCause{margin:8px 24px 16px;padding:12px 16px}
+.metricModal.redesigned .metricBucketTabs{flex-shrink:0;margin:0 24px}
+.metricModal.redesigned .metricChart{
+  display:grid;gap:12px;min-height:0;
+  margin:16px 24px 0;padding:16px 16px 12px;
+  border:1px solid var(--gs-border);border-radius:18px;
+  background:linear-gradient(180deg,#fbfcff,#fff);color:var(--gs-ink);
+}
+.metricChartCaption{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.metricChartCaption b{font-size:14px}
+.metricChartCaption span{font-size:12px;color:var(--gs-muted)}
+.metricModal.redesigned .metricChart svg{display:block;width:100%;height:auto;overflow:visible}
+.metricGridLine{stroke:#e5ebf6;stroke-width:1;vector-effect:non-scaling-stroke}
+.metricDateLine{stroke:#f0f3fa;stroke-width:1;stroke-dasharray:3 4;vector-effect:non-scaling-stroke}
+.metricAxisText{fill:#71809b;font-size:12px;font-family:var(--gs-font-sans)}
+.metricSeriesPath{fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.metricSingleGuide{stroke-width:1.5;stroke-dasharray:5 5;opacity:.45;vector-effect:non-scaling-stroke}
+.metricChartPoint{vector-effect:non-scaling-stroke}
+.metricChartLegend{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.metricChartLegend span{display:inline-flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--gs-ink-2)}
+.metricChartLegend i,.metricSeriesToggle i{display:inline-block;flex-shrink:0;width:9px;height:9px;border-radius:50%}
+.metricChartNotice{margin:0;color:var(--gs-muted);font-size:12px;line-height:1.6}
+.metricSeriesControls{display:grid;gap:12px;margin:16px 24px 22px}
+.metricSeriesControlsHead{display:grid;gap:4px}
+.metricSeriesControlsHead b{font-size:14px;color:var(--gs-ink)}
+.metricSeriesControlsHead span{font-size:12px;color:var(--gs-muted);line-height:1.5}
+.metricSeriesToggleRow{display:flex;align-items:stretch;flex-wrap:wrap;gap:8px}
+.metricModal.redesigned .metricSeriesToggle{
+  display:inline-flex;align-items:center;justify-content:flex-start;
+  min-height:40px;height:auto;min-width:0;max-width:100%;
+  gap:8px;padding:8px 11px;border:1px solid var(--gs-border);
+  border-radius:11px;background:#fff;color:var(--gs-ink-2);
+  font-size:12px;font-weight:700;line-height:1.4;text-align:left;white-space:normal;
+}
+.metricSeriesToggle span{min-width:0}
+.metricSeriesToggle svg{flex:0 0 14px}
+.metricModal.redesigned .metricSeriesToggle.active{
+  border-color:#b9c9ed;background:#eef3ff;color:#284c99;
+}
+.metricModal.redesigned .metricSeriesToggle:hover{border-color:#a5b9ee;background:#f7f9ff}
+.metricModal.redesigned .metricHistoryList{margin:0 24px 24px}
+@media(max-width:650px){
+  .metricModalBackdrop{padding:8px}
+  .metricModal.redesigned{width:100%;max-height:calc(100dvh - 16px);border-radius:16px}
+  .metricModal.redesigned>header{padding:16px}
+  .metricModal.redesigned .metricHeroValue{padding:12px 16px}
+  .metricModal.redesigned .metricLastCause{margin:8px 16px 12px}
+  .metricModal.redesigned .metricBucketTabs{margin:0 16px;width:calc(100% - 32px)}
+  .metricModal.redesigned .metricBucketTabs button{padding-inline:10px;flex:1 1 auto;font-size:12px}
+  .metricModal.redesigned .metricChart{margin:12px 16px 0;padding:10px}
+  .metricModal.redesigned .metricSeriesControls{margin:14px 16px 18px}
+  .metricModal.redesigned .metricHistoryList{margin:0 16px 16px}
+  .metricModal.redesigned .metricSeriesToggle{min-height:44px}
+}
