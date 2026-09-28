@@ -93,10 +93,6 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
 
  return <>
   <section className="statePulseDock" aria-label="Состояние государства">
-   <div className="statePulseTop">
-    <div><small>ИГРОВЫЕ ПОКАЗАТЕЛИ</small><b>Последствия решений видны сразу</b></div>
-}
-   </div>
    {visibleMetrics.length?<div className="statePulseGrid">{visibleMetrics.map(card)}</div>:<div className="emptyState">Показатели появятся после настройки игры преподавателем.</div>}
   </section>
 
