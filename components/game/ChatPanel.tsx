@@ -10,7 +10,7 @@ import type {Message} from './types';
 import {initials} from './constants';
 import {buildChatEntries,formatChatTime,isChatAttachment,matchChatMessage} from './chatUtils';
 
-const FILE_ACCEPT='image/*,.pdf,.doc,.docx,.txt,.xlsx,.ppt,.pptx';
+const FILE_ACCEPT='image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.xlsx,.ppt,.pptx';
 const MAX_FILE_SIZE=25*1024*1024;
 function highlightChatText(value:string,search:string):ReactNode{
  const query=search.trim();if(!query)return value;
@@ -27,8 +27,8 @@ function highlightChatText(value:string,search:string):ReactNode{
 function formatBytes(size:number){return size<1024*1024?Math.max(1,Math.round(size/1024))+' КБ':(size/1024/1024).toFixed(1)+' МБ';}
 function ChatAttachment({message:m}:{message:Message}){
  if(!m.url)return <span className="chatMissingFile">Вложение недоступно</span>;
- if(m.kind==='audio')return <audio controls preload="none" src={m.url} aria-label="Аудиосообщение"/>;
- if(m.kind==='video')return <video controls preload="metadata" playsInline src={m.url} aria-label="Видеосообщение"/>;
+ if(m.kind==='audio'||m.mime_type?.startsWith('audio/'))return <audio controls preload="none" src={m.url} aria-label="Аудиосообщение"/>;
+ if(m.kind==='video'||m.mime_type?.startsWith('video/'))return <video controls preload="metadata" playsInline src={m.url} aria-label="Видеосообщение"/>;
  if(m.mime_type?.startsWith('image/')){
   return <a className="chatPhoto" href={m.url} target="_blank" rel="noopener noreferrer" aria-label="Открыть изображение в новой вкладке"><img src={m.url} alt={m.text||'Изображение из чата'} loading="lazy"/></a>;
  }
@@ -221,7 +221,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     <div className="chatAttachWrap" ref={attachWrap}>
      <button type="button" ref={attachmentButton} className={'chatIconButton chatAttachButton '+(attachOpen?'active':'')} aria-label="Прикрепить или записать" aria-haspopup="menu" aria-expanded={attachOpen} disabled={!channelId||uploading||chatLoading} onClick={()=>setAttachOpen(v=>!v)}><Plus aria-hidden="true"/></button>
      {attachOpen&&<div className="chatAttachMenu" role="menu" aria-label="Добавить в чат">
-      <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);uploadInput.current?.click()}}><Paperclip aria-hidden="true" size={18}/>Файл или изображение</button>
+      <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);uploadInput.current?.click()}}><Paperclip aria-hidden="true" size={18}/>Файл, фото, аудио или видео</button>
       <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);void toggleRecording('audio')}}><Mic aria-hidden="true" size={18}/>Аудиосообщение</button>
       <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);void toggleRecording('video')}}><Video aria-hidden="true" size={18}/>Видеосообщение</button>
      </div>}
