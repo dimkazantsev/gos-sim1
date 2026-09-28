@@ -516,4 +516,4 @@
 
 /* Longer GOS//SIMS monogram retains correct proportions on small screens. */
 @media(max-width:900px){.mobileBrand .brandMark{font-size:12px}}
-@media(max-width:390px){.mobileBrand .brandMark{font-size:11px}}
+@media(max-width:390px){.mobileBrand .brandMark{font-size:12px}}
