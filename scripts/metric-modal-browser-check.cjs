@@ -106,7 +106,7 @@ async function main(){
      assert(await frame.locator('.chatMsg.mine').count()>=2,'Own messages on right');
      assert(await frame.locator('.chatMsg.theirs').count()>=2,'Other authors on left');
      assert(await frame.locator('.chatDateSeparator').count()>=2,'Message days separated');
-     assert.equal(await frame.locator('.chatDocument').count(),1,'File shown once as a card');
+     assert.equal(await frame.locator('.chatMessages .chatDocument').count(),1,'File shown once in conversation; pinned copy is separate');
      assert.equal(await frame.locator('.chatBubble a.chatDocument+p').count(),0,'No duplicated filename after document');
     }else assert.equal(await frame.locator('.chatEmpty').count(),1,'Correct empty state');
     if(width<=768)assert(Math.abs(dims.root.width-dims.viewport)<=2,'Mobile/tablet chat should fill viewport');
