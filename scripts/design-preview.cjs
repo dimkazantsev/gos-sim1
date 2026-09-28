@@ -28,7 +28,11 @@ fixture.messages=[
  {id:'c6',game_id:'design-preview',channel_id:'public-demo',author_id:'teacher-demo',kind:'text',text:'Предлагаю рассмотреть оба варианта и вынести решение на голосование.',storage_path:null,mime_type:null,created_at:'2026-09-28T11:44:00Z'},
  {id:'c7',game_id:'design-preview',channel_id:'public-demo',author_id:'student-0',kind:'text',text:'Согласна. Добавлю аргументы в проект.',storage_path:null,mime_type:null,created_at:'2026-09-28T11:46:00Z'}
 ];
-fixture.chatPins=[{id:'pin-file',game_id:'design-preview',channel_id:'public-demo',message_id:'c5',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:00:00Z'}];
+fixture.messages.push(
+ {id:'c8',game_id:'design-preview',channel_id:'public-demo',author_id:'teacher-demo',kind:'audio',text:null,storage_path:'preview/mock.webm',mime_type:'audio/webm',created_at:'2026-09-28T12:00:00Z'},
+ {id:'c9',game_id:'design-preview',channel_id:'public-demo',author_id:'student-0',kind:'video',text:null,storage_path:'preview/video.webm',mime_type:'video/webm',created_at:'2026-09-28T12:03:00Z'}
+);
+fixture.chatPins=[{id:'pin-audio',game_id:'design-preview',channel_id:'public-demo',message_id:'c8',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:01:00Z'},{id:'pin-video',game_id:'design-preview',channel_id:'public-demo',message_id:'c9',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:02:00Z'},{id:'pin-file',game_id:'design-preview',channel_id:'public-demo',message_id:'c5',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:00:00Z'}];
 fixture.pinnedMessages=fixture.messages.filter(m=>fixture.chatPins.some(pin=>pin.message_id===m.id));
 fixture.votes=[{id:'vote-demo',stage_no:4,title:'Об утверждении повестки заседания',body:'Предлагается утвердить порядок рассмотрения вопросов первого заседания Государственной Думы.',voting_mode:'mandate',status:'open',opened_at:now,closed_at:null,institution_key:'gd',procedure_key:'gd_resolution',quorum_kind:'fraction',quorum_value:.5,majority_kind:'eligible_majority',majority_value:.5,allow_abstain:true,result_code:null}];
 fixture.availableActors=()=>[{key:'participant',label:'Участник'},{key:'gd',label:'Государственная Дума'}];fixture.canVote=()=>false;fixture.tally=()=>({yes:245,no:70,abstain:30});fixture.quorum=()=>({cast:345,eligible:450,needed:226,met:true});
