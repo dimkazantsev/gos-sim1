@@ -60,6 +60,49 @@ async function main(){
     'Toolbar overflows horizontally at '+width+'px: '+JSON.stringify(bounds));
    await page.locator('#preview').screenshot({path:path.join(shotDir,'top-chat-'+width+'.png')});
    console.log('PASS top Chat button alignment, label and no horizontal overflow at '+width+'px');
+   for(const chatScreen of ['chat-panel','chat-empty']){
+    await page.locator('#screen').selectOption(chatScreen);
+    const frame=page.frameLocator('#preview');
+    const root=frame.locator('.simChat.gsChatV2');
+    await root.waitFor();
+    const dims=await root.evaluate(el=>{
+     const box=el.getBoundingClientRect();
+     const h=el.querySelector('.chatTop').getBoundingClientRect();
+     const list=el.querySelector('.chatMessages').getBoundingClientRect();
+     const compose=el.querySelector('.chatCompose').getBoundingClientRect();
+     const textarea=el.querySelector('textarea').getBoundingClientRect();
+     const doc=el.ownerDocument.documentElement;
+     return {root:{x:box.x,right:box.right,top:box.top,bottom:box.bottom,width:box.width,height:box.height},
+      header:{top:h.top,bottom:h.bottom},messages:{top:list.top,bottom:list.bottom,height:list.height},
+      composer:{top:compose.top,bottom:compose.bottom},
+      textarea:{left:textarea.left,right:textarea.right,width:textarea.width},
+      overflow:doc.scrollWidth-doc.clientWidth,viewport:doc.clientWidth};
+    });
+    const gap=3;
+    assert(dims.root.width<=dims.viewport+gap,'Chat panel wider than viewport at '+width+'px');
+    assert(dims.header.bottom<=dims.messages.top+gap,'Chat header overlaps message list at '+width+'px');
+    assert(dims.messages.bottom<=dims.composer.top+gap,'Chat messages overlap composer at '+width+'px');
+    assert(dims.messages.height>=100,'Chat message viewport collapsed at '+width+'px');
+    assert(dims.root.bottom>=dims.composer.bottom-gap,'Composer escapes chat container at '+width+'px');
+    assert(dims.textarea.left>=dims.root.x-gap&&dims.textarea.right<=dims.root.right+gap,'Chat input overflows panel at '+width+'px');
+    assert(dims.overflow<=gap,'Chat page horizontally overflows at '+width+'px');
+    assert.equal(await frame.locator('.chatChannelField select').count(),1,'Exactly one channel selector');
+    assert.equal(await frame.locator('.simChat>select').count(),0,'No redundant channel dropdown');
+    const close=frame.locator('.chatTop').getByRole('button',{name:'Закрыть чат'});
+    assert.equal(await close.count(),1);
+    const closeRect=await close.boundingBox();
+    assert(closeRect&&closeRect.width>=40&&closeRect.height>=40,'Accessible chat close target');
+    if(chatScreen==='chat-panel'){
+     assert(await frame.locator('.chatMsg.mine').count()>=2,'Own messages on right');
+     assert(await frame.locator('.chatMsg.theirs').count()>=2,'Other authors on left');
+     assert(await frame.locator('.chatDateSeparator').count()>=2,'Message days separated');
+     assert.equal(await frame.locator('.chatDocument').count(),1,'File shown once as a card');
+     assert.equal(await frame.locator('.chatBubble a.chatDocument+p').count(),0,'No duplicated filename after document');
+    }else assert.equal(await frame.locator('.chatEmpty').count(),1,'Correct empty state');
+    if(width<=768)assert(Math.abs(dims.root.width-dims.viewport)<=2,'Mobile/tablet chat should fill viewport');
+    await page.locator('#preview').screenshot({path:path.join(shotDir,chatScreen+'-'+width+'.png')});
+    console.log('PASS '+chatScreen+' '+width+'px: structured conversation, correct positioning and no overflow');
+   }
    for(const screen of ['metric-modal','metric-modal-full','metric-modal-empty']){
     await page.locator('#screen').selectOption(screen);
     const frame=page.frameLocator('#preview');
