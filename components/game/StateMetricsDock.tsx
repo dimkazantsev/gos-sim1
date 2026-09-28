@@ -154,6 +154,7 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
        </button>;
       })}
      </div>
+     </div>
     </section>
     <div className="metricHistoryList">
      <div className="metricHistoryHead"><b>Журнал показателя</b><span>{hist.length} записей</span></div>
