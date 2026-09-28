@@ -250,3 +250,157 @@
     flex-basis:44px;width:44px;min-width:44px;height:44px;min-height:44px;
   }
 }
+
+
+/* Dashboard metrics: show every accessible metric above the fold.
+   Container queries adapt the grid when the chat panel narrows the workspace. */
+.overviewMetrics{
+  min-width:0;
+  container-type:inline-size;
+}
+.overviewMetrics>.sectionTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px 16px;
+  margin:0 0 12px;
+}
+.overviewMetrics>.sectionTop>div{
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:6px 13px;
+  min-width:0;
+}
+.overviewMetrics>.sectionTop .overline{
+  font-size:11px;
+  line-height:1.3;
+}
+.overviewMetrics>.sectionTop h2{
+  margin:0;
+  font-size:clamp(18px,1.7vw,22px);
+  line-height:1.25;
+}
+.overviewMetrics .sectionHint{
+  flex:0 1 340px;
+  max-width:340px;
+  text-align:right;
+  font-size:12px;
+  line-height:1.4;
+}
+.overviewMetrics .statePulseDock{
+  position:static;
+  display:block;
+  width:100%;
+  min-width:0;
+  padding:0;
+  margin:0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+.overviewMetrics .statePulseTop{display:none}
+.overviewMetrics .statePulseGrid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:10px;
+  width:100%;
+  min-width:0;
+  margin:0;
+}
+.overviewMetrics .statePulseMetric{
+  display:grid;
+  grid-template-columns:28px minmax(0,1fr);
+  grid-template-rows:minmax(32px,auto) auto;
+  align-items:start;
+  align-content:space-between;
+  column-gap:8px;
+  row-gap:9px;
+  min-width:0;
+  min-height:108px;
+  height:auto;
+  padding:13px;
+  border:1px solid var(--gs-border);
+  border-radius:14px;
+  background:#fff;
+  text-align:left;
+  box-shadow:none;
+  transition:border-color .18s,background .18s;
+}
+.overviewMetrics .statePulseMetric:hover:not(:disabled){
+  transform:none;
+  border-color:#9cb2f4;
+  background:#f9faff;
+  box-shadow:none;
+}
+.overviewMetrics .statePulseIcon{
+  display:grid;
+  place-items:center;
+  grid-column:1;
+  grid-row:1;
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  font-size:17px;
+}
+.overviewMetrics .statePulseCopy{
+  grid-column:2;
+  grid-row:1;
+  align-self:center;
+  min-width:0;
+}
+.overviewMetrics .statePulseCopy b{
+  display:block;
+  color:var(--gs-muted);
+  font-size:12px;
+  font-weight:750;
+  line-height:1.35;
+  white-space:normal;
+  overflow-wrap:break-word;
+}
+.overviewMetrics .statePulseValue{
+  grid-column:1/3;
+  grid-row:2;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:2px 7px;
+  min-width:0;
+  text-align:left;
+}
+.overviewMetrics .statePulseValue strong{
+  font-size:clamp(21px,1.85vw,28px);
+  line-height:1.15;
+  font-weight:750;
+  letter-spacing:-.045em;
+  overflow-wrap:anywhere;
+}
+.overviewMetrics .statePulseValue em{
+  font-size:11px;
+  font-weight:700;
+  line-height:1.25;
+}
+.overviewMetrics .statePulseValue em.flat{color:var(--gs-faint)}
+.overviewMetrics .statePulseTrend{display:none}
+.overviewMetrics .statePulseSecondary{display:contents}
+@container (max-width:1050px){
+  .overviewMetrics .statePulseGrid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@container (max-width:690px){
+  .overviewMetrics .statePulseGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .overviewMetrics .statePulseMetric{min-height:104px;padding:11px}
+}
+@container (max-width:460px){
+  .overviewMetrics>.sectionTop{flex-wrap:wrap;align-items:flex-start}
+  .overviewMetrics .sectionHint{
+    display:block;
+    max-width:none;
+    flex-basis:100%;
+    text-align:left;
+    font-size:12px;
+  }
+  .overviewMetrics .statePulseGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .overviewMetrics .statePulseMetric{min-height:98px;padding:10px;column-gap:7px;row-gap:7px}
+  .overviewMetrics .statePulseValue strong{font-size:22px}
+}
