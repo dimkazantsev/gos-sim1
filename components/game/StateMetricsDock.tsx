@@ -41,11 +41,11 @@ function metricIcon(k:string){
  return <Icon aria-hidden="true" size={18} strokeWidth={1.75}/>;
 }
 
-export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
+export default function StateMetricsDock({g,initialSelectedMetricId='',initialCompareIds=[]}:{g:ReturnTypeRepublic;initialSelectedMetricId?:string;initialCompareIds?:string[]}){
  const {game,metrics,metricHistory,teacher,politicalPosts,names}=g;
- const [selected,setSelected]=useState('');
+ const [selected,setSelected]=useState(initialSelectedMetricId);
  const dialogRef=useDialog(!!selected,()=>setSelected(''));
- const [compare,setCompare]=useState<string[]>([]);
+ const [compare,setCompare]=useState<string[]>(initialCompareIds);
  const [bucket,setBucket]=useState<'changes'|'day'|'week'>('changes');
  const plotRef=useRef<HTMLDivElement>(null);
  const [plotWidth,setPlotWidth]=useState(700);
