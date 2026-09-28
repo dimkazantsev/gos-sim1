@@ -52,7 +52,9 @@ const closeFiles=[
 for(const source of closeFiles){
  check(source+': unified X icons, no font glyph buttons',
   read(source).includes('<IconAction')&&
-  !/>\\s*[×✕✖]\\s*<\\/button>/.test(read(source)));
+  !read(source).includes('>×</button>')&&
+  !read(source).includes('>✕</button>')&&
+  !read(source).includes('>✖</button>'));
 }
 check('Close buttons have 44px targets with mobile and focus states',
  readable.includes('.gsIconAction{')&&readable.includes('width:44px;')&&
