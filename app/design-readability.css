@@ -404,3 +404,51 @@
   .overviewMetrics .statePulseMetric{min-height:98px;padding:10px;column-gap:7px;row-gap:7px}
   .overviewMetrics .statePulseValue strong{font-size:22px}
 }
+
+
+/* State metric icon system: consistent 18px line icons, soft tinted backgrounds. */
+.overviewMetrics .statePulseIcon{
+  width:30px;
+  height:30px;
+  border-radius:10px;
+  background:#edf3ff;
+  color:#4567bb;
+  font-size:initial;
+}
+.overviewMetrics .statePulseIcon svg{
+  display:block;
+  width:18px;
+  height:18px;
+  stroke-width:1.75;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.overviewMetrics .statePulseMetric.metric-public_trust .statePulseIcon,
+.overviewMetrics .statePulseMetric.metric-social_stability .statePulseIcon{
+  background:#e9f5f3;
+  color:#397f79;
+}
+.overviewMetrics .statePulseMetric.metric-economy .statePulseIcon,
+.overviewMetrics .statePulseMetric.metric-budget .statePulseIcon{
+  background:#edf2fc;
+  color:#5075b8;
+}
+.overviewMetrics .statePulseMetric.metric-lawfulness .statePulseIcon,
+.overviewMetrics .statePulseMetric.metric-legitimacy .statePulseIcon{
+  background:#f0effb;
+  color:#7065ac;
+}
+.overviewMetrics .statePulseMetric.metric-international_standing .statePulseIcon,
+.overviewMetrics .statePulseMetric.metric-media_climate .statePulseIcon{
+  background:#edf4fb;
+  color:#567eaa;
+}
+.overviewMetrics .statePulseMetric.metric-social_tension .statePulseIcon{
+  background:#fff1ec;
+  color:#b97860;
+}
+.overviewMetrics .statePulseMetric.metric-elite_support .statePulseIcon,
+.overviewMetrics .statePulseMetric.metric-security .statePulseIcon{
+  background:#f0f3fa;
+  color:#64799e;
+}
