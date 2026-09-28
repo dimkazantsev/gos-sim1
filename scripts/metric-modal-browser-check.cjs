@@ -135,7 +135,7 @@ async function main(){
   }
   // The chat panel uses the same close geometry as all modal headers.
   await page.locator('#screen').selectOption('chat');
-  const chatClose=page.frameLocator('#preview').getByRole('button',{name:'Закрыть чат'});
+  const chatClose=page.frameLocator('#preview').locator('.chatTop').getByRole('button',{name:'Закрыть чат'});
   assert.equal(await chatClose.count(),1,'Chat uses the shared close control');
   assert(await chatClose.locator('svg').isVisible(),'Chat close icon remains visible');
   assert.equal(errors.length,0,'Browser runtime exceptions:\n'+errors.join('\n'));
