@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
+import type {ReactNode} from 'react';
 import {ArrowDown,ChevronDown,FileText,Image as ImageIcon,Mic,Paperclip,Plus,Search,Send,Video, X} from 'lucide-react';
 import {IconAction} from '../ui/IconAction';
 import {useDialog} from '../ui/useDialog';
@@ -10,6 +11,18 @@ import {buildChatEntries,formatChatTime,isChatAttachment,matchChatMessage} from 
 
 const FILE_ACCEPT='image/*,.pdf,.doc,.docx,.txt,.xlsx,.ppt,.pptx';
 const MAX_FILE_SIZE=25*1024*1024;
+function highlightChatText(value:string,search:string):ReactNode{
+ const query=search.trim();if(!query)return value;
+ const haystack=value.toLocaleLowerCase('ru-RU'),needle=query.toLocaleLowerCase('ru-RU');
+ const chunks:ReactNode[]=[];let cursor=0,position=haystack.indexOf(needle);
+ while(position!==-1){
+  if(position>cursor)chunks.push(value.slice(cursor,position));
+  chunks.push(<mark key={position} className="chatSearchMatch">{value.slice(position,position+needle.length)}</mark>);
+  cursor=position+needle.length;position=haystack.indexOf(needle,cursor);
+ }
+ if(cursor<value.length)chunks.push(value.slice(cursor));
+ return chunks.length?chunks:value;
+}
 function formatBytes(size:number){return size<1024*1024?Math.max(1,Math.round(size/1024))+' КБ':(size/1024/1024).toFixed(1)+' МБ';}
 function ChatAttachment({message:m}:{message:Message}){
  if(!m.url)return <span className="chatMissingFile">Вложение недоступно</span>;
@@ -41,13 +54,15 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
  const searchInput=useRef<HTMLInputElement>(null);
  const attachmentButton=useRef<HTMLButtonElement>(null);
  const uploadInput=useRef<HTMLInputElement>(null);
+ const attachWrap=useRef<HTMLDivElement>(null);
  const previousFocus=useRef<HTMLElement|null>(null);
  const follow=useRef(true);
  const lastChannel=useRef(channelId);
  const pendingSend=useRef(false);
  const panel=useDialog(overlay,()=>setChatOpen(false));
  const channel=channels.find(c=>c.id===channelId);
- const filtered=useMemo(()=>messages.filter(m=>matchChatMessage(m,search,names[m.author_id]||'Система',onlyFiles)),[messages,search,names,onlyFiles]);
+ const channelMessages=useMemo(()=>messages.filter(m=>m.channel_id===channelId),[messages,channelId]);
+ const filtered=useMemo(()=>channelMessages.filter(m=>matchChatMessage(m,search,names[m.author_id]||'Система',onlyFiles)),[channelMessages,search,names,onlyFiles]);
  const entries=useMemo(()=>buildChatEntries(filtered,me?.user_id||''),[filtered,me?.user_id]);
  const hasFilter=!!search.trim()||onlyFiles;
  useEffect(()=>{
@@ -77,6 +92,20 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
   node.style.height=Math.min(136,Math.max(44,node.scrollHeight))+'px';
  },[text]);
  useEffect(()=>{if(searchOpen)searchInput.current?.focus()},[searchOpen]);
+ useEffect(()=>{
+  if(!attachOpen)return;
+  const click=(event:PointerEvent)=>{if(attachWrap.current&&!attachWrap.current.contains(event.target as Node))setAttachOpen(false)};
+  document.addEventListener('pointerdown',click);
+  return()=>document.removeEventListener('pointerdown',click);
+ },[attachOpen]);
+ useEffect(()=>{
+  if(!overlay)return;
+  const viewport=window.visualViewport,node=panel.current;
+  if(!viewport||!node)return;
+  const align=()=>{node.style.height=viewport.height+'px';node.style.top=viewport.offsetTop+'px'};
+  align();viewport.addEventListener('resize',align);viewport.addEventListener('scroll',align);
+  return()=>{viewport.removeEventListener('resize',align);viewport.removeEventListener('scroll',align);node.style.removeProperty('height');node.style.removeProperty('top')};
+ },[overlay]);
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
   if(pendingSend.current||!text.trim()||!channelId)return;
@@ -123,9 +152,9 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
   {searchOpen&&<div className="chatSearchBar">
    <div className="chatSearchField"><Search size={18} aria-hidden="true"/><input ref={searchInput} value={search} onChange={e=>setSearch(e.target.value)} aria-label="Поиск по сообщениям этого канала" placeholder="Сообщения и документы…" type="search"/></div>
    <button type="button" className={'chatFilesFilter '+(onlyFiles?'active':'')} aria-pressed={onlyFiles} onClick={()=>setOnlyFiles(x=>!x)}><Paperclip size={15} aria-hidden="true"/> Файлы</button>
-   <span className="chatSearchCount" aria-live="polite">{filtered.length} из {messages.length}</span>
+   <span className="chatSearchCount" aria-live="polite">{filtered.length} из {channelMessages.length}</span>
   </div>}
-  <div className="chatMessages" ref={list} role="log" aria-label="Сообщения" aria-live={hasFilter?'off':'polite'} aria-relevant="additions" onScroll={()=>{const el=list.current;if(!el)return;const nearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<85;follow.current=nearBottom;setJumpVisible(!nearBottom&&!hasFilter&&messages.length>0)}}>
+  <div className="chatMessages" ref={list} role="log" aria-label="Сообщения" aria-live={hasFilter?'off':'polite'} aria-relevant="additions" onScroll={()=>{const el=list.current;if(!el)return;const nearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<85;follow.current=nearBottom;setJumpVisible(!nearBottom&&!hasFilter&&channelMessages.length>0)}}>
    {!entries.length?<div className="chatEmpty"><span className="chatEmptyIcon"><Search aria-hidden="true"/></span><b>{hasFilter?'Ничего не найдено':'Пока нет сообщений'}</b><p>{hasFilter?'Измените запрос или отключите фильтр.':'Начните обсуждение: сообщения увидят участники этого канала.'}</p></div>:
     entries.map(({message:m,startsDay,startsGroup,own,day,dayLabel})=>{
      const name=names[m.author_id]||'Система';
@@ -138,7 +167,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
        <div className="chatMessageColumn">
         {startsGroup&&<div className="chatAuthor"><b>{own?'Вы':name}</b><time dateTime={m.created_at}>{formatChatTime(m.created_at)}</time></div>}
         <div className="chatBubble">
-         {showText&&<p>{m.text}</p>}
+         {showText&&<p>{highlightChatText(m.text||'',search)}</p>}
          {attachment&&<ChatAttachment message={m}/>}
          {m.kind==='system'&&!showText&&<p>Системное сообщение</p>}
          {!startsGroup&&<time className="chatInlineTime" dateTime={m.created_at}>{formatChatTime(m.created_at)}</time>}
@@ -154,7 +183,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText}:{g:Return
   <div className="chatCompose">
    <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)} placeholder={channelId?'Написать сообщение…':'Выберите канал'} disabled={!channelId} readOnly={sending} aria-busy={sending} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
    <div className="chatComposeActions">
-    <div className="chatAttachWrap">
+    <div className="chatAttachWrap" ref={attachWrap}>
      <button type="button" ref={attachmentButton} className={'chatIconButton chatAttachButton '+(attachOpen?'active':'')} aria-label="Прикрепить или записать" aria-haspopup="menu" aria-expanded={attachOpen} disabled={!channelId||uploading} onClick={()=>setAttachOpen(v=>!v)}><Plus aria-hidden="true"/></button>
      {attachOpen&&<div className="chatAttachMenu" role="menu" aria-label="Добавить в чат">
       <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);uploadInput.current?.click()}}><Paperclip aria-hidden="true" size={18}/>Файл или изображение</button>
