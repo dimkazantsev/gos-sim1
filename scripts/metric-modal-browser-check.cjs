@@ -31,6 +31,33 @@ async function main(){
    }else{
     await page.locator('[data-width="'+width+'px"]').click();
    }
+   await page.locator('#screen').selectOption('dashboard');
+   const dashboard=page.frameLocator('#preview');
+   const chat=dashboard.getByRole('button',{name:'Открыть чат'});
+   assert.equal(await chat.count(),1,'Top bar must use Chat, not Connection');
+   assert.equal((await chat.innerText()).trim(),'Чат','Top bar visible label is Chat');
+   const bounds=await dashboard.locator('.simWorkspace').evaluate(workspace=>{
+    const bar=workspace.querySelector('.simTop');
+    const chat=workspace.querySelector('.topChatButton');
+    const main=workspace.querySelector('.simMain');
+    const card=workspace.querySelector('.overviewHeading .quietButton');
+    const w=workspace.getBoundingClientRect();
+    const b=bar?.getBoundingClientRect();
+    const c=chat?.getBoundingClientRect();
+    const m=main?.getBoundingClientRect();
+    const q=card?.getBoundingClientRect();
+    return {workspaceRight:w.right,barRight:b?.right,chatRight:c?.right,
+     mainRight:m?.right,cardRight:q?.right,barScrollWidth:bar?.scrollWidth,
+     barClientWidth:bar?.clientWidth};
+   });
+   assert(bounds.chatRight!==undefined&&bounds.mainRight!==undefined,
+    'Dashboard has toolbar and main content');
+   assert(Math.abs(bounds.chatRight-bounds.mainRight)<=3,
+    'Chat right edge must align with main content at '+width+'px: '+JSON.stringify(bounds));
+   assert(bounds.barScrollWidth<=bounds.barClientWidth+3,
+    'Toolbar overflows horizontally at '+width+'px: '+JSON.stringify(bounds));
+   await page.locator('#preview').screenshot({path:path.join(shotDir,'top-chat-'+width+'.png')});
+   console.log('PASS top Chat button alignment, label and no horizontal overflow at '+width+'px');
    for(const screen of ['metric-modal','metric-modal-full','metric-modal-empty']){
     await page.locator('#screen').selectOption(screen);
     const frame=page.frameLocator('#preview');
