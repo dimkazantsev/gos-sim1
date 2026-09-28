@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import postcss from 'postcss';
 
 const read=p=>fs.readFileSync(p,'utf8');
-const styles=['design-tokens','design-shell','design-views','design-responsive'];
+const styles=['design-tokens','design-shell','design-views','design-responsive','design-readability'];
 const css=Object.fromEntries(styles.map(name=>[name,read(`app/${name}.css`)]));
 let count=0;
 function check(label,test){assert.ok(test,label);console.log(`PASS ${label}`);count++;}
@@ -28,6 +28,9 @@ check('Self-hosted Cyrillic font is available',font.includes('cyrillic')&&font.i
 check('Legacy rules are isolated from the new design',read('app/globals.css').includes('@layer legacy {'));
 check('Reduced motion',css['design-tokens'].includes('prefers-reduced-motion:reduce'));
 check('Visible keyboard focus',css['design-tokens'].includes(':focus-visible'));
+const readable=css['design-readability'];
+check('Every common page header receives a separated accent', ['pageHeader','gradesHero','votesHero','formalHero','teacherFocus','profileHero','wallHero','dashHero'].every(name=>readable.includes('.'+name+'::before')&&readable.includes('.'+name+',')));
+check('Accent and text have separate insets on phones',readable.includes('padding:20px 18px 22px 42px')&&readable.includes('left:16px')&&readable.includes('padding:18px 14px 20px 36px')&&readable.includes('left:13px'));
 check('Phone layout and touch targets',css['design-responsive'].includes('@media(max-width:390px)')&&css['design-responsive'].includes('@media(pointer:coarse)'));
 const stageActions=read('components/game/stageActions.ts');
 check('Every one of the 16 stages has a next action',Array.from({length:16},(_,i)=>i+1).every(n=>new RegExp(`\\b${n}:\\{title:`).test(stageActions)));
