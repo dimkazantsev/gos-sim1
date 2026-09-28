@@ -1576,3 +1576,17 @@
  color:#5c4a11;
  font-weight:750;
 }
+
+
+.gsChatV2 .chatLoadingSpinner{
+ display:block;
+ width:27px;height:27px;
+ border:3px solid #dce7fc;
+ border-top-color:#4269cb;
+ border-radius:50%;
+ animation:chatLoadingSpin .8s linear infinite;
+}
+@keyframes chatLoadingSpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){
+ .gsChatV2 .chatLoadingSpinner{animation:none;border-top-color:#4269cb}
+}
