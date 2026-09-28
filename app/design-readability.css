@@ -1,0 +1,83 @@
+/* Shared reading surface: decorative accents must never occupy text space.
+   Kept last in the stylesheet order so legacy + page-level layouts cannot
+   reset the content inset at narrower breakpoints. */
+.pageHeader,.gradesHero,.votesHero,.formalHero,.teacherFocus,.profileHero,.wallHero,.dashHero{
+  --hero-inset-block:clamp(22px,2.2vw,32px);
+  position:relative;
+  isolation:isolate;
+  min-width:0;
+  padding:var(--hero-inset-block) clamp(20px,2.6vw,36px) var(--hero-inset-block) clamp(52px,4.4vw,66px);
+  border:1px solid var(--gs-border);
+  border-radius:22px;
+  background:linear-gradient(120deg,#fff 0%,#f7f9ff 100%);
+  box-shadow:none;
+  gap:clamp(14px,2vw,24px);
+}
+.pageHeader::before,.gradesHero::before,.votesHero::before,.formalHero::before,
+.teacherFocus::before,.profileHero::before,.wallHero::before,.dashHero::before{
+  content:"";
+  position:absolute;
+  left:clamp(20px,2vw,28px);
+  top:var(--hero-inset-block);
+  bottom:var(--hero-inset-block);
+  width:4px;
+  height:auto;
+  border-radius:4px;
+  background:linear-gradient(180deg,#315efb,#4fe0d0);
+  pointer-events:none;
+}
+.pageHeader>div:first-child{min-width:0;flex:1 1 420px}
+.pageHeader h1,.gradesHero h1,.votesHero h1,.formalHero h1,
+.teacherFocus h1,.profileHero h1,.wallHero h1,.dashHero h1{
+  max-width:100%;
+  overflow-wrap:break-word;
+  line-height:1.16;
+}
+.pageHeader small,.gradesHero small,.votesHero small,.formalHero small,
+.teacherFocus small,.profileHero small,.wallHero small,.dashHero small{
+  line-height:1.55;
+}
+@media(max-width:720px){
+  .pageHeader,.gradesHero,.votesHero,.formalHero,.teacherFocus,.profileHero,.wallHero,.dashHero{
+    --hero-inset-block:20px;
+    padding:20px 18px 22px 42px;
+    border-radius:18px;
+    gap:16px;
+  }
+  .pageHeader::before,.gradesHero::before,.votesHero::before,.formalHero::before,
+  .teacherFocus::before,.profileHero::before,.wallHero::before,.dashHero::before{
+    left:16px;
+    width:3px;
+  }
+  .pageHeader h1,.gradesHero h1,.votesHero h1,.formalHero h1,
+  .teacherFocus h1,.profileHero h1,.wallHero h1,.dashHero h1{
+    font-size:clamp(26px,6.4vw,32px);
+    line-height:1.2;
+    letter-spacing:-.035em;
+  }
+  .pageHeader p,.gradesHero p,.votesHero p,.formalHero p,
+  .teacherFocus p,.profileHero p,.wallHero p,.dashHero p{
+    font-size:14px;
+    line-height:1.7;
+    overflow-wrap:break-word;
+  }
+  .pageHeader>.primary{width:100%;margin-top:4px;white-space:normal}
+}
+@media(max-width:390px){
+  .pageHeader,.gradesHero,.votesHero,.formalHero,.teacherFocus,.profileHero,.wallHero,.dashHero{
+    padding:18px 14px 20px 36px;
+    border-radius:16px;
+  }
+  .pageHeader::before,.gradesHero::before,.votesHero::before,.formalHero::before,
+  .teacherFocus::before,.profileHero::before,.wallHero::before,.dashHero::before{
+    left:13px;
+    top:18px;
+    bottom:20px;
+  }
+  .pageHeader small,.gradesHero small,.votesHero small,.formalHero small,
+  .teacherFocus small,.profileHero small,.wallHero small,.dashHero small{
+    font-size:12px;
+    letter-spacing:.05em;
+    overflow-wrap:break-word;
+  }
+}
