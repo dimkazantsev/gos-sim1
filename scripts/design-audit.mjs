@@ -30,15 +30,17 @@ check('Reduced motion',css['design-tokens'].includes('prefers-reduced-motion:red
 check('Visible keyboard focus',css['design-tokens'].includes(':focus-visible'));
 const readable=css['design-readability'];
 
-check('Compact toolbar has balanced 116px status/chat and 184px picker',
- readable.includes('flex:0 0 116px')&&
- readable.includes('flex:0 0 184px')&&
- !readable.includes('--toolbar-control-width:192px'));
-check('Compact toolbar preserves touch-sized controls',
- readable.includes('height:44px;')&&readable.includes('height:48px;'));
-check('Phone toolbar uses a dedicated two-row grid',
- readable.includes('grid-template-columns:116px minmax(0,1fr) auto auto;')&&
- readable.includes('grid-column:2/5;')&&readable.includes('grid-row:2;'));
+check('Compact header status and chat match at 108px',
+ readable.includes('flex:0 0 108px')&&readable.includes('width:108px'));
+check('Preview selector remains contained at 188px',
+ readable.includes('flex:0 0 188px')&&readable.includes('width:188px'));
+check('Accessible preview menu supports compact screens',
+ readable.includes('.viewAsMenu button:focus-visible')&&
+ readable.includes('max-width:calc(100vw - 16px)')&&
+ readable.includes('grid-column:2/5;'));
+check('View-as menu uses accessible roles and Escape handling',
+ read('components/GameClient.tsx').includes('role="menuitemradio"')&&
+ read('components/GameClient.tsx').includes("event.key!=='Escape'"));
 
 check('Every common page header receives a separated accent', ['pageHeader','gradesHero','votesHero','formalHero','teacherFocus','profileHero','wallHero','dashHero'].every(name=>{const root=postcss.parse(readable);return root.nodes.some(node=>node.type==='rule'&&node.selectors?.includes('.'+name+'::before')&&node.nodes.some(d=>d.prop==='background'&&d.value.includes('linear-gradient')));}));
 check('Accent and text have separate insets on phones',readable.includes('padding:20px 18px 22px 42px')&&readable.includes('left:16px')&&readable.includes('padding:18px 14px 20px 36px')&&readable.includes('left:13px'));
