@@ -164,5 +164,29 @@ check('Accent and text have separate insets on phones',readable.includes('paddin
 check('Phone layout and touch targets',css['design-responsive'].includes('@media(max-width:390px)')&&css['design-responsive'].includes('@media(pointer:coarse)'));
 const stageActions=read('components/game/stageActions.ts');
 check('Every one of the 16 stages has a next action',Array.from({length:16},(_,i)=>i+1).every(n=>new RegExp(`\\b${n}:\\{title:`).test(stageActions)));
+const chat=read('components/game/ChatPanel.tsx');
+const chatCss=read('app/design-readability.css');
+check('Chat uses a single channel switcher integrated into its header',
+ chat.includes('className="chatChannelField"')&&
+ !chat.includes('<select aria-label="Канал общения"')&&
+ chat.includes('aria-label="Выбрать канал общения"'));
+check('Chat supports keyboard search, attachment filtering and scroll to latest',
+ chat.includes('className="chatSearchBar"')&&
+ chat.includes('className="chatFilesFilter')&&
+ chat.includes('className="chatJumpLatest"')&&
+ chat.includes('chatUtils'));
+check('Chat uses distinct personal messages, day separators and one file card',
+ chat.includes("own?'mine':'theirs'")&&
+ chat.includes('className="chatDateSeparator"')&&
+ chat.includes('className="chatDocument"'));
+check('Chat has a fixed composer and full-screen tablet/mobile layout',
+ chatCss.includes('.simChat.gsChatV2{')&&
+ chatCss.includes('.gsChatV2 .chatCompose{')&&
+ chatCss.includes('@media(max-width:1099px)')&&
+ chatCss.includes('height:100dvh;'));
+check('Chat has an offline full and empty preview',
+ read('scripts/design-preview.cjs').includes("['chat-panel','Командный чат'")&&
+ read('scripts/design-preview.cjs').includes("['chat-empty','Пустой чат'"));
 execFileSync(process.execPath,['scripts/metric-chart-check.cjs'],{stdio:'inherit'});
+execFileSync(process.execPath,['scripts/chat-logic-check.cjs'],{stdio:'inherit'});
 console.log(`\n${count} source and contrast checks passed. This does not certify browser layout, keyboard interaction, or a live classroom session.`);
