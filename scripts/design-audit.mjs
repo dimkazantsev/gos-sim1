@@ -176,6 +176,21 @@ check('Chat supports real backend pinning and icon-only send',
  chat.includes('chatPinAction')&&
  chat.includes('className="chatSendButton iconOnly"')&&
  !chat.includes('<span>Отправить</span>'));
+check('Pinned media is secured, persistent and available outside recent history',
+ read('supabase/migrations/068_chat_pins.sql').includes('enable row level security')&&
+ read('supabase/migrations/068_chat_pins.sql').includes('private.can_access_channel')&&
+ read('supabase/migrations/068_chat_pins.sql').includes('set_chat_pin')&&
+ read('components/game/useRepublicGame.ts').includes('pinnedMessages')&&
+ read('components/game/useRepublicGame.ts').includes("table:'chat_pins'")&&
+ chat.includes('chatPinnedWrap')&&chat.includes('chatPinnedMedia'));
+check('Audio and video files can be uploaded and played in chat',
+ chat.includes('audio/*,video/*')&&
+ chat.includes("m.mime_type?.startsWith('audio/')")&&
+ chat.includes("m.mime_type?.startsWith('video/')"));
+check('Styled channel menu has proper keyboard and focus management',
+ read('components/game/ChatChannelDropdown.tsx').includes("event.key==='Escape'")&&
+ read('components/game/ChatChannelDropdown.tsx').includes('ArrowDown')&&
+ read('components/game/ChatChannelDropdown.tsx').includes('aria-checked={value===c.id}'));
 check('Chat supports keyboard search, attachment filtering and scroll to latest',
  chat.includes('className="chatSearchBar"')&&
  chat.includes("'chatFilesFilter '")&&
