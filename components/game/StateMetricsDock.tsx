@@ -58,7 +58,7 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
  useEffect(()=>{
   if(!chosen||!plotRef.current)return;
   const node=plotRef.current;
-  const update=()=>{const measured=Math.round(node.getBoundingClientRect().width);if(measured>0)setPlotWidth(old=>Math.abs(old-measured)>1?measured:old)};
+  const update=()=>{const measured=Math.round((node.querySelector('svg')||node).getBoundingClientRect().width);if(measured>0)setPlotWidth(old=>Math.abs(old-measured)>1?measured:old)};
   update();
   const observer=typeof ResizeObserver!=='undefined'?new ResizeObserver(update):null;
   observer?.observe(node);
@@ -71,9 +71,9 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
  const comparisonOptions=visibleMetrics.filter(m=>m.id!==chosen?.id);
  const activeMetrics=chosen?[chosen,...comparisonOptions.filter(m=>compare.includes(m.id))]:[];
  const snapshotAt=useMemo(()=>Date.now(),[selected]);
- const series=activeMetrics.map((metric,index)=>({
+ const series=activeMetrics.map(metric=>({
   metric,
-  color:METRIC_COLORS[index%METRIC_COLORS.length],
+  color:metric.id===chosen?.id?METRIC_COLORS[0]:METRIC_COLORS[(1+comparisonOptions.findIndex(option=>option.id===metric.id))%METRIC_COLORS.length],
   points:pointsForMetric(metric,metricHistory,bucket,game?.created_at,snapshotAt)
  }));
  const geometry=drawMetricChart(series,series.length>1,Math.max(240,plotWidth),plotWidth<460?222:250);
@@ -85,6 +85,9 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
  const formatTime=(timestamp:number)=>new Date(timestamp).toLocaleString('ru-RU',{
   day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'
  });
+ const visibleTicks=plotWidth<440&&geometry.xTicks.length>2?[geometry.xTicks[0],geometry.xTicks[geometry.xTicks.length-1]]:geometry.xTicks;
+ const daySpan=geometry.xTicks.length>1&&geometry.xTicks.at(-1)!.at-geometry.xTicks[0].at<86400000*2;
+ const axisDate=(at:number)=>new Date(at).toLocaleString('ru-RU',daySpan?{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}:{day:'2-digit',month:'2-digit'});
 
  function card(m:Metric){
   const d=delta(m);
@@ -118,14 +121,14 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
     <section className="metricChart redesignedChart" aria-label="График динамики показателей">
      <div className="metricChartCaption"><b>{geometry.comparing?'Динамика показателей':'История показателя'}</b><span>{bucket==='changes'?'По игровым событиям':bucket==='day'?'По дням':'По неделям'}</span></div>
      <div className="metricPlotViewport" ref={plotRef}>
-     <svg viewBox={`0 0 ${geometry.width} ${geometry.height}`} role="group" aria-label={'Временной график: '+activeMetrics.map(m=>m.label).join(', ')} preserveAspectRatio="none">
+     <svg viewBox={`0 0 ${geometry.width} ${geometry.height}`} role="group" aria-label={'Временной график: '+activeMetrics.map(m=>m.label).join(', ')} preserveAspectRatio="xMidYMid meet">
       {geometry.yTicks.map((tick,i)=><g key={i}>
        <line className="metricGridLine" x1={geometry.left} x2={geometry.width-geometry.right} y1={tick.y} y2={tick.y}/>
        <text className="metricAxisText" x={geometry.left-8} y={tick.y+4} textAnchor="end">{geometry.comparing?tick.value+'%':tick.value.toLocaleString('ru-RU',{maximumFractionDigits:1})}</text>
       </g>)}
-      {geometry.xTicks.map((tick,i)=><g key={i}>
+      {visibleTicks.map((tick,i)=><g key={i}>
        <line className="metricDateLine" x1={tick.x} x2={tick.x} y1={geometry.top} y2={geometry.height-geometry.bottom}/>
-       <text className="metricAxisText" x={tick.x} y={geometry.height-12} textAnchor={i===0&&geometry.xTicks.length>1?'start':i===geometry.xTicks.length-1&&geometry.xTicks.length>1?'end':'middle'}>{new Date(tick.at).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'})}</text>
+       <text className="metricAxisText" x={tick.x} y={geometry.height-12} textAnchor={i===0&&visibleTicks.length>1?'start':i===visibleTicks.length-1&&visibleTicks.length>1?'end':'middle'}>{axisDate(tick.at)}</text>
       </g>)}
       {geometry.lines.map(line=><g key={line.metric.id} style={{color:line.color}}>
        {line.pointsOnChart.length>1&&<path d={line.path} className="metricSeriesPath" stroke="currentColor"/>}
@@ -148,7 +151,7 @@ export default function StateMetricsDock({g}:{g:ReturnTypeRepublic}){
      <div className="metricSeriesToggleRow">
       {comparisonOptions.map(m=>{
        const active=compare.includes(m.id);
-       const color=METRIC_COLORS[(1+comparisonOptions.filter(x=>compare.includes(x.id)).findIndex(x=>x.id===m.id))%METRIC_COLORS.length];
+       const color=METRIC_COLORS[(1+comparisonOptions.findIndex(x=>x.id===m.id))%METRIC_COLORS.length];
        return <button key={m.id} type="button" className={'metricSeriesToggle '+(active?'active':'')} aria-pressed={active} onClick={()=>{setFocusedPoint(null);setCompare(list=>list.includes(m.id)?list.filter(id=>id!==m.id):[...list,m.id])}}>
         <i style={{background:active?color:'#bbc6dc'}}/><span>{m.label}</span>{active&&<Check size={14} aria-hidden="true"/>}
        </button>;
