@@ -8,7 +8,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 const VIEW_NAMES:Record<string,string>={
  dashboard:'Обзор игры',stages:'Этапы',parties:'Партии',votes:'Голосования',
  documents:'НПА',actions:'Политические процессы',grades:'Оценки',
- profile:'Профиль',teacher:'Управление'
+ profile:'Профиль',teacher:'Управление',events:'События и решения',chat:'Командный чат'
 };
 type Sort='recent'|'oldest'|'name'|'surname'|'online';
 type Scope='all'|'mine';
