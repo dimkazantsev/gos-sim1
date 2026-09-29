@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {ArrowDownToLine,Pause,Play} from 'lucide-react';
+import {normalizeVoiceWaveform} from './voiceWaveform';
 
 /** Stable decorative waveform. The slider above it represents real playback
  * position; bars are not falsely presented as measured audio amplitudes. */
@@ -17,8 +18,8 @@ export function voiceProgress(elapsed:number,duration:number):number{
 }
 
 export default function ChatVoicePlayer({
- src,messageId,durationHint=0,fileName='Аудиосообщение',
-}:{src:string;messageId:string;durationHint?:number|null;fileName?:string}){
+ src,messageId,durationHint=0,waveform,fileName='Аудиосообщение',
+}:{src:string;messageId:string;durationHint?:number|null;waveform?:number[]|null;fileName?:string}){
  const audio=useRef<HTMLAudioElement>(null);
  const [playing,setPlaying]=useState(false);
  const [elapsed,setElapsed]=useState(0);
@@ -28,7 +29,7 @@ export default function ChatVoicePlayer({
  const [buffering,setBuffering]=useState(false);
  const duration=mediaDuration>0?mediaDuration:(durationHint&&durationHint>0?durationHint:0);
  const progress=voiceProgress(elapsed,duration);
- const bars=useMemo(()=>WAVE,[]);
+ const bars=useMemo(()=>normalizeVoiceWaveform(waveform)||WAVE,[waveform]);
  useEffect(()=>{
   setPlaying(false);setElapsed(0);setMediaDuration(0);setFailed(false);setBuffering(false);
   const node=audio.current;
@@ -70,6 +71,7 @@ export default function ChatVoicePlayer({
    onWaiting={()=>setBuffering(true)}
    onCanPlay={()=>setBuffering(false)}
    onTimeUpdate={e=>{setElapsed(e.currentTarget.currentTime);syncDuration()}}
+   onRateChange={e=>setSpeed(e.currentTarget.playbackRate)}
    onEnded={e=>{setPlaying(false);setBuffering(false);if(!duration)setMediaDuration(e.currentTarget.currentTime);setElapsed(0)}}
    onError={()=>{setFailed(true);setPlaying(false);setBuffering(false)}}/>
   <button type="button" className="chatVoicePlay"
