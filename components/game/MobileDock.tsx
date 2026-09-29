@@ -16,8 +16,7 @@ export function moveDockItem<T>(items:T[],from:T,to:T):T[]{
  if(source<0||target<0||source===target)return items;
  const next=[...items];
  const [item]=next.splice(source,1);
- const insertion=source<target?target-1:target;
- next.splice(Math.max(0,insertion),0,item);
+ next.splice(target,0,item);
  return next;
 }
 
