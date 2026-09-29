@@ -10,7 +10,7 @@ fs.mkdirSync(screens,{recursive:true});
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser','/opt/google/chrome/chrome'].find(p=>p&&fs.existsSync(p));
 if(!chrome)throw Error('Chrome is required for real mobile interactions');
 const pageSource=String.raw`'use client';
-import {useState} from 'react';
+import {useState,useEffect} from 'react';
 import {LayoutDashboard,Settings2,Landmark,Vote,BookOpenText,FileText,GraduationCap,Radio,UserRound} from 'lucide-react';
 import MobileDock from '../../components/game/MobileDock';
 import ImpactRulesPanel from '../../components/game/ImpactRulesPanel';
@@ -28,6 +28,7 @@ const impactRules=[{id:'r1',rule_key:'decision',label:'Принятие реше
 export default function UiTest(){
  const [editing,setEditing]=useState(false),[menu,setMenu]=useState(false),[active,setActive]=useState<View>('teacher');
  const [rules,setRules]=useState(impactRules);
+ useEffect(()=>{document.body.dataset.uiReady='yes';return()=>{delete document.body.dataset.uiReady}},[]);
  const g={metrics,impactRules:rules,impactLedger:[],names:{},
    updateImpactRule:async(id:string,enabled:boolean,auto_apply:boolean,effects:unknown,description:string)=>{
     setRules(prev=>prev.map(rule=>rule.id===id?{...rule,enabled,auto_apply,effects:effects as typeof rule.effects,description,updated_at:new Date().toISOString()}:rule));
@@ -91,11 +92,14 @@ async function main(){
  browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
  const desktop=await browser.newPage({viewport:{width:390,height:850}});
  await desktop.goto(address);
+ await desktop.waitForFunction(()=>document.body.dataset.uiReady==='yes');
  await desktop.locator('.mobileDockItem').first().waitFor();
  for(const width of [320,360,390,430,768])await checkUnits(desktop,width);
  await desktop.setViewportSize({width:390,height:850});
  await desktop.getByRole('button',{name:'Все разделы'}).click();
  const modal=desktop.getByRole('dialog',{name:'Все разделы'});
+ await modal.waitFor({state:'visible'});
+ await modal.locator('.mobileAllGrid button').first().waitFor();
  assert.equal(await modal.locator('.mobileAllGrid button').count(),9,'All nine real routes are in a single menu');
  const menuBounds=await modal.evaluate(el=>{const a=el.getBoundingClientRect();return {top:a.top,bottom:a.bottom,height:innerHeight}});
  assert(menuBounds.top>=-2&&menuBounds.bottom<=menuBounds.height+2);
@@ -116,15 +120,18 @@ async function main(){
  assert.deepEqual(keys.slice(0,3),['dashboard','stages','teacher'],'Mouse drag did not reorder: '+keys.join(','));
  await desktop.getByRole('button',{name:'Готово'}).click();
  await desktop.reload();
+ await desktop.waitForFunction(()=>document.body.dataset.uiReady==='yes');
  assert.deepEqual((await order(desktop)).slice(0,3),['dashboard','stages','teacher'],'Reorder did not survive reload');
  console.log('PASS mouse long press, drag and durable saved order');
  // Use a fresh touch browser profile, with native touch events rather than mouse emulation.
  const touchContext=await browser.newContext({viewport:{width:390,height:850},isMobile:true,hasTouch:true,deviceScaleFactor:1});
  const touch=await touchContext.newPage();
  await touch.goto(address);
+ await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
  await touch.locator('.mobileDockItem').first().waitFor();
  await touch.evaluate(()=>localStorage.removeItem('dock-interaction-ci'));
  await touch.reload();
+ await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
  const touchFrom=await touch.locator('[data-dock-item="teacher"]').boundingBox();
  const touchTo=await touch.locator('[data-dock-item="stages"]').boundingBox();
  const cdp=await touchContext.newCDPSession(touch);
@@ -141,6 +148,7 @@ async function main(){
  assert.deepEqual((await order(touch)).slice(0,3),['dashboard','stages','teacher'],'Native touch drag did not reorder');
  await touch.getByRole('button',{name:'Готово'}).click();
  await touch.reload();
+ await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
  assert.deepEqual((await order(touch)).slice(0,3),['dashboard','stages','teacher'],'Touch drag order not saved');
  console.log('PASS native touch hold + drag and persistence');
  await touch.screenshot({path:path.join(screens,'real-dragged-mobile.png')});
