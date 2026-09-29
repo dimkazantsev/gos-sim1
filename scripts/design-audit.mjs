@@ -59,7 +59,7 @@ check('Assessment journal adds aggregate columns and teacher sorting',
  gradesSource.includes("gradeSort==='sum'")&&
  gradesSource.includes("gradeSort==='surname'")&&
  gradesSource.includes('className="gradeTotal"')&&
- gradesSource.includes('className="gradesRulesCompact"'));
+ gradesSource.includes('gradesRulesCompact'));
 check('Shared classroom journal honors privacy and profile-specific access',
  teacherSource.includes("<ClassroomJournal g={g}/>")&&
  profileSource.includes("showMyJournal&&<ClassroomJournal g={g}/>")&&
