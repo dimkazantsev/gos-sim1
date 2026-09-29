@@ -365,7 +365,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {view==='grades'&&<GradesView g={vg}/>}
      {view==='actions'&&<PoliticalWallView g={vg} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
      {view==='profile'&&<ProfileView g={vg}/>}
-     {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>navigate('actions')}/>}
+     {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>navigate('actions')} onOpenStages={stageNo=>navigate('stages',{stageNo})}/>}
     </main>
    </div>
 
