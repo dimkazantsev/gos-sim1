@@ -18,7 +18,7 @@ if(!chrome)throw new Error('Chrome/Chromium missing. Set CHROME_BIN for browser 
 if(!fs.existsSync(preview))throw new Error('Run npm run design:preview first.');
 
 async function main(){
- const browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
+ const browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage','--use-fake-ui-for-media-stream','--use-fake-device-for-media-stream']});
  const errors=[];
  try{
   const page=await browser.newPage({viewport:{width:1560,height:960},deviceScaleFactor:1});
@@ -213,13 +213,46 @@ async function main(){
     console.log('PASS '+screen+' '+width+'px: no overlaps, clipping or missing options');
    }
   }
+  // Browser-level verification that actual MediaRecorder emits playable-size
+  // audio/video blobs from microphone/camera, independent of authentication.
+  const mediaPage=await browser.newPage();
+  await mediaPage.goto('file://'+preview,{waitUntil:'load'});
+  const recorded=await mediaPage.evaluate(async()=>{
+   async function make(kind){
+    const stream=await navigator.mediaDevices.getUserMedia(kind==='audio'?{audio:true}:{audio:true,video:true});
+    try{
+     const candidates=kind==='audio'?['audio/webm;codecs=opus','audio/mp4','audio/webm']:['video/webm;codecs=vp8,opus','video/mp4','video/webm'];
+     const mime=candidates.find(t=>MediaRecorder.isTypeSupported(t));
+     const recorder=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);
+     const chunks=[];
+     const finished=new Promise((resolve,reject)=>{
+      recorder.addEventListener('dataavailable',e=>{if(e.data.size)chunks.push(e.data)});
+      recorder.addEventListener('error',e=>reject(new Error('Recorder emitted error: '+e.type)));
+      recorder.addEventListener('stop',()=>resolve(new Blob(chunks,{type:recorder.mimeType})));
+     });
+     recorder.start(80);
+     await new Promise(resolve=>setTimeout(resolve,550));
+     recorder.stop();
+     const blob=await finished;
+     return {kind,mime:recorder.mimeType,size:blob.size,trackCount:stream.getTracks().length};
+    }finally{stream.getTracks().forEach(track=>track.stop())}
+   }
+   return [await make('audio'),await make('video')];
+  });
+  for(const result of recorded){
+   assert(result.size>0,result.kind+' must record a nonempty media blob');
+   assert(result.mime.startsWith(result.kind+'/'),result.kind+' must use a real matching MIME type: '+result.mime);
+   assert(result.trackCount>=1,result.kind+' must capture at least one actual fake-device track');
+   console.log('PASS real Chromium '+result.kind+' MediaRecorder: '+result.mime+', '+result.size+' bytes');
+  }
+  await mediaPage.close();
   // The chat panel uses the same close geometry as all modal headers.
   await page.locator('#screen').selectOption('chat');
   const chatClose=page.frameLocator('#preview').locator('.chatTop').getByRole('button',{name:'Закрыть чат'});
   assert.equal(await chatClose.count(),1,'Chat uses the shared close control');
   assert(await chatClose.locator('svg').isVisible(),'Chat close icon remains visible');
   assert.equal(errors.length,0,'Browser runtime exceptions:\n'+errors.join('\n'));
-  console.log('PASS no page exceptions; 12 layouts checked, screenshots saved to '+shotDir);
+  console.log('PASS no page exceptions; desktop/mobile layouts and native media capture checked, screenshots saved to '+shotDir);
  }finally{await browser.close();}
 }
 main().catch(error=>{console.error(error);process.exitCode=1});
