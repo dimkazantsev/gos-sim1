@@ -1,0 +1,86 @@
+/* Final UX pass: fixed responsive geometry and round media notes. */
+.teacherPartyChat{display:grid;place-items:center;flex:none;width:42px;height:42px;border:1px solid #bdd4f6;border-radius:11px;background:#eef4ff;color:#3159a9;cursor:pointer}
+.teacherPartyChat:hover:not(:disabled){background:#dfebff;border-color:#92b7eb}
+.teacherPartyChat:disabled{opacity:.45;cursor:not-allowed}
+.ghostScenarioExplanation{margin:0;font-size:12px;line-height:1.55;color:#6a83a5;overflow-wrap:anywhere}
+.ghostScenarioSummary{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ghostScenarioSummary span{display:inline-flex;gap:5px;align-items:center;min-height:36px;padding:7px 12px;border:1px solid #d7e4f6;border-radius:9px;background:#f7faff;color:#5b769a;font-size:12px}
+.ghostScenarioSummary b{color:#305ba9;font-size:15px;font-variant-numeric:tabular-nums}
+.ghostBulk .styledSelect{min-width:0}
+.gradesPage .gradesToolbar{align-items:end;gap:12px;min-width:0}
+.gradesPage .gradesToolbar>.gradesPending{align-self:end;display:flex;align-items:center;gap:8px;padding:0 8px;height:43px;line-height:1.3}
+.gradesPage .gradesToolbar>.gradesSortDir{display:grid;place-items:center;align-self:end;flex:0 0 43px;width:43px;height:43px;min-height:43px;padding:0;line-height:1}
+.journalToolbar>.styledSelect,.participantsToolbar>.styledSelect{flex:1 1 145px;min-width:0;max-width:100%}
+.journalToolbar>.styledSelect>button,.participantsToolbar>.styledSelect>button{width:100%;height:43px}
+.participantsToolbar>button:not(.styledSelectTrigger){align-self:end;min-width:138px;flex:0 0 138px;width:138px;max-width:138px;height:43px}
+.firstPendingDecision{display:grid;gap:13px;min-width:0;margin:0 0 18px;padding:20px;border:1px solid #adcbf6;border-radius:16px;background:#f0f5ff}
+.firstPendingDecision header{display:flex;align-items:center;justify-content:space-between}
+.firstPendingDecision header small{font-size:11px;font-weight:800;color:#617ea6;letter-spacing:.07em}
+.firstPendingDecision h2{margin:5px 0;font-size:20px;line-height:1.3;color:#243e62}
+.firstPendingDecision header span{color:#7589a3;font-size:12px}
+.firstPendingDecision p{margin:0;color:#496889;font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.firstPendingActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.firstPendingActions button,.teacherOverviewDecision button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:9px 14px;border:1px solid #b9cffa;border-radius:9px;background:#e7f0ff;color:#2b58a8;font-size:12px;font-weight:800;cursor:pointer}
+.firstPendingActions button:last-child,.teacherOverviewDecision button{background:#315fd0;color:white;border-color:#315fd0}
+.teacherOverviewDecision{display:flex;justify-content:space-between;align-items:center;gap:17px;flex-wrap:wrap;padding:19px 21px;border:1px solid #d5e3f6;border-radius:15px;background:#f9fbff;min-width:0}
+.teacherOverviewDecision>div{min-width:0}
+.teacherOverviewDecision small{font-size:11px;letter-spacing:.08em;font-weight:840;color:#6783a5}
+.teacherOverviewDecision h3{margin:6px 0;font-size:17px;color:#294666;overflow-wrap:anywhere}
+.teacherOverviewDecision p{margin:0;font-size:12px;color:#7c91ad}
+.teacherOverviewDecision button{flex:none;max-width:100%}
+.institutionRegistrationPanel{display:grid;gap:17px;min-width:0;padding:22px;border:1px solid #d5e2f3;border-radius:17px;background:#fff}
+.institutionRegistrationPanel>header{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.institutionRegistrationPanel>header>div{min-width:0}
+.institutionRegistrationPanel header small{display:block;color:#758ca6;font-size:10px;font-weight:850;letter-spacing:.09em}
+.institutionRegistrationPanel header h2{margin:5px 0;color:#2c476c;font-size:21px;line-height:1.3}
+.institutionRegistrationPanel header p{max-width:720px;margin:0;color:#69829f;font-size:12px;line-height:1.65}
+.institutionRegistrationPanel>header>svg{flex:none;color:#456eb4}
+.institutionRegistrationGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;min-width:0}
+.institutionRegistrationGrid>article{display:flex;flex-direction:column;align-items:stretch;gap:10px;min-width:0;padding:16px;border:1px solid #dae6f4;border-radius:13px;background:#fbfdff}
+.institutionRegistrationGrid h3{margin:0;color:#29496d;font-size:15px;line-height:1.35;overflow-wrap:anywhere}
+.institutionRegistrationGrid article>p{margin:0;color:#7d90a9;font-size:11px;line-height:1.55}
+.institutionRegistrationStats{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.institutionRegistrationStats span{display:inline-flex;align-items:center;gap:5px;padding:7px;border-radius:8px;background:#edf4ff;color:#3d64a5;font-size:11px;font-weight:750}
+.institutionRegistrationPeople{display:flex;flex-wrap:wrap;gap:6px;min-height:30px}
+.institutionRegistrationPeople>span{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#3c795f}
+.institutionRegistrationGrid article>button{width:100%;min-height:43px;margin-top:auto;padding:8px 11px;border:1px solid #bfd3f4;border-radius:9px;background:#edf4ff;color:#2d5fac;font-size:12px;font-weight:790;cursor:pointer}
+.institutionRegistrationGrid article>button:disabled{opacity:.54;cursor:not-allowed}
+.institutionRegistrationNotice{margin:0;padding:11px;border:1px solid #b9dbc8;border-radius:9px;background:#effaf3;color:#247b51;font-size:12px}
+.chatVideoNote{position:relative;display:grid;place-items:center;flex:none;isolation:isolate;width:min(240px,65vw);height:min(240px,65vw);max-width:100%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#152b46;box-shadow:0 6px 20px #1e365d26}
+.chatVideoNote>video{position:absolute;inset:0;width:100%;height:100%;max-width:100%;object-fit:cover;border-radius:50%;cursor:pointer}
+.chatVideoNote .chatVideoPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;display:grid;place-items:center;width:48px;height:48px;min-width:48px;min-height:48px;border:1px solid #ffffffa6;border-radius:50%;background:#0d1c336b;color:#fff;cursor:pointer;backdrop-filter:blur(6px)}
+.chatVideoNote .chatVideoDuration{position:absolute;bottom:15px;left:50%;transform:translateX(-50%);z-index:2;min-width:52px;padding:5px 8px;border-radius:999px;background:#0b2036ac;color:white;font-size:11px;font-variant-numeric:tabular-nums;text-align:center;pointer-events:none}
+.chatVideoNote .chatVideoFullscreen{position:absolute;right:20px;top:20px;z-index:2;display:grid;place-items:center;width:29px;height:29px;min-width:29px;min-height:29px;border:0;border-radius:50%;background:#0b2036ac;color:#fff;cursor:pointer}
+.chatVideoNote.isPreview{width:220px;height:220px}
+.chatCaptureCamera{width:200px!important;height:200px!important;max-width:min(200px,60vw)!important;max-height:min(200px,60vw)!important;aspect-ratio:1;border-radius:50%;object-fit:cover;align-self:center;margin:5px auto}
+.chatCapturePanel{min-width:0}
+.chatCaptureReview .chatVideoNote{align-self:center;margin:8px auto}
+.chatEntry .chatBubble:has(.chatVideoNote){padding:5px;background:transparent;border:0;box-shadow:none}
+.chatEntry .chatBubble .chatVideoNote{max-width:min(240px,calc(var(--gs-chat-w,370px) - 90px))}
+.simChat.gsChatV2{min-width:0}
+.simChat.gsChatV2 .chatMessages{min-height:0;overflow-x:hidden;overscroll-behavior:contain}
+.simChat.gsChatV2 .chatEntry,.simChat.gsChatV2 .chatMsg,.simChat.gsChatV2 .chatMessageColumn{min-width:0;max-width:100%}
+@media(min-width:1100px){
+ .simWorkspace.chatOpen .simContentFlow{box-sizing:border-box;width:calc(100% - var(--gs-chat-w,375px) - 24px);padding:24px 20px 64px!important}
+ .simWorkspace.chatOpen .simMain{box-sizing:border-box;width:100%;max-width:100%;min-width:0}
+ .simWorkspace.chatOpen .simChat.gsChatV2{position:fixed;top:calc(var(--gs-top-h,76px) + 12px);right:12px;bottom:12px;width:var(--gs-chat-w,375px);height:auto;max-height:none}
+ .simMain.chatOpen .teacherCommand .teacherStageSplit{grid-template-columns:minmax(0,1fr)}
+ .simMain.chatOpen .teacherCommand .teacherStageList{grid-template-columns:repeat(2,minmax(0,1fr));max-height:265px}
+ .simMain.chatOpen :is(.institutionRegistrationGrid,.ghostBulk){grid-template-columns:minmax(0,1fr)}
+ .simMain.chatOpen .participantsToolbar>.styledSelect,.simMain.chatOpen .journalToolbar>.styledSelect{flex:1 1 180px}
+}
+@media(max-width:1099px){
+ .simWorkspace.chatOpen .simContentFlow{visibility:hidden;pointer-events:none}
+ .simWorkspace.chatOpen .simChat.gsChatV2{z-index:88;box-sizing:border-box;position:fixed;top:var(--gs-top-h,56px)!important;bottom:var(--gs-mobile-dock-height,76px)!important;left:0!important;right:0!important;width:100%!important;height:auto!important;max-height:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+ .simWorkspace.chatOpen .simTop{z-index:89}
+}
+@media(max-width:900px){.institutionRegistrationGrid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:650px){
+ .institutionRegistrationPanel{padding:16px}
+ .chatVideoNote{width:min(220px,62vw);height:min(220px,62vw)}
+ .teacherOverviewDecision>button{width:100%}
+ .journalToolbar>.styledSelect,.participantsToolbar>.styledSelect{flex:1 1 calc(50% - 9px)}
+ .participantsToolbar>button:not(.styledSelectTrigger){flex:1 1 calc(50% - 9px);max-width:100%;width:auto;min-width:0}
+ .ghostBulk{grid-template-columns:minmax(0,1fr)}
+}
+@media(prefers-reduced-motion:reduce){.chatVideoNote *{animation:none!important;transition:none!important}}
