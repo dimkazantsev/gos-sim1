@@ -39,8 +39,13 @@ voiceWav.writeUInt16LE(2,32);voiceWav.writeUInt16LE(16,34);
 voiceWav.write('data',36);voiceWav.writeUInt32LE(voiceSamples*2,40);
 for(let i=0;i<voiceSamples;i++)voiceWav.writeInt16LE(Math.round(Math.sin(i/8000*2*Math.PI*440)*1800),44+i*2);
 const voicePreviewUrl='data:audio/wav;base64,'+voiceWav.toString('base64');
+const voiceWave=Array.from({length:36},(_,i)=>{
+ let rms=0;const start=Math.floor(i*voiceSamples/36),end=Math.floor((i+1)*voiceSamples/36);
+ for(let n=start;n<end;n++){const sample=voiceWav.readInt16LE(44+n*2)/32768;rms+=sample*sample}
+ return Math.round(Math.max(18,Math.min(100,18+82*Math.sqrt(rms/Math.max(end-start,1))/.04)));
+});
 fixture.messages.push(
- {id:'c8',game_id:'design-preview',channel_id:'public-demo',author_id:'teacher-demo',kind:'audio',text:'voice-preview.wav',storage_path:'preview/mock.wav',mime_type:'audio/wav',url:voicePreviewUrl,created_at:'2026-09-28T12:00:00Z'},
+ {id:'c8',game_id:'design-preview',channel_id:'public-demo',author_id:'teacher-demo',kind:'audio',text:'voice-preview.wav',storage_path:'preview/mock.wav',mime_type:'audio/wav',url:voicePreviewUrl,voice_meta:{duration:1,waveform:voiceWave},created_at:'2026-09-28T12:00:00Z'},
  {id:'c9',game_id:'design-preview',channel_id:'public-demo',author_id:'student-0',kind:'video',text:null,storage_path:'preview/video.webm',mime_type:'video/webm',created_at:'2026-09-28T12:03:00Z'}
 );
 fixture.chatPins=[{id:'pin-audio',game_id:'design-preview',channel_id:'public-demo',message_id:'c8',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:01:00Z'},{id:'pin-video',game_id:'design-preview',channel_id:'public-demo',message_id:'c9',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:02:00Z'},{id:'pin-file',game_id:'design-preview',channel_id:'public-demo',message_id:'c5',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:00:00Z'}];
@@ -65,7 +70,7 @@ const savedRecording={recording:fixture.recording,recordingPreview:fixture.recor
 fixture.recording='audio';fixture.recordingStartedAt=Date.now()-32000;
 pages.push(['chat-recording','Запись аудио',renderToStaticMarkup(h('main',{className:'previewChatPage'},h(ChatPanel,{g,draft:'',onDraftChange:noop})))]);
 fixture.recording=null;fixture.recordingStartedAt=null;
-fixture.recordingPreview={kind:'audio',blob:new Blob(['mock audio'],{type:'audio/webm'}),url:'data:audio/webm;base64,GkXfo',mime:'audio/webm',fileName:'audio-preview.webm',channelId:'public-demo',duration:32};
+fixture.recordingPreview={kind:'audio',blob:new Blob([voiceWav],{type:'audio/wav'}),url:voicePreviewUrl,mime:'audio/wav',fileName:'audio-preview.wav',channelId:'public-demo',duration:1,waveform:voiceWave};
 pages.push(['chat-audio-preview','Предпросмотр аудио',renderToStaticMarkup(h('main',{className:'previewChatPage'},h(ChatPanel,{g,draft:'',onDraftChange:noop})))]);
 fixture.recordingPreview={kind:'video',blob:new Blob(['mock video'],{type:'video/webm'}),url:'data:video/webm;base64,GkXfo',mime:'video/webm',fileName:'video-preview.webm',channelId:'public-demo',duration:18};
 pages.push(['chat-video-preview','Предпросмотр видео',renderToStaticMarkup(h('main',{className:'previewChatPage'},h(ChatPanel,{g,draft:'',onDraftChange:noop})))]);
