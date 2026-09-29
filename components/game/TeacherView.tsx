@@ -25,10 +25,10 @@ const WORKSPACES=[
  {key:'tools',title:'Инструменты',icon:Wrench}
 ] as const;
 
-export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void}){
+export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview'}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace}){
  const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
  const [eventTitle,setEventTitle]=useState(''),[eventBody,setEventBody]=useState('');
- const [workspace,setWorkspace]=useState<Workspace>('overview');
+ const [workspace,setWorkspace]=useState<Workspace>(initialWorkspace);
 
  const studentIds=useMemo(()=>new Set(members.filter(m=>m.kind!=='teacher').map(m=>m.user_id)),[members]);
  const studentActivities=useMemo(()=>activities.filter(a=>studentIds.has(a.actor_id)),[activities,studentIds]);
