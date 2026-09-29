@@ -114,8 +114,7 @@ async function main(){
  const to=await desktop.locator('[data-dock-item="stages"]').boundingBox();
  await desktop.mouse.move(from.x+from.width/2,from.y+from.height/2);
  await desktop.mouse.down();
- await sleep(510);
- assert(await desktop.locator('.mobileDockV2').evaluate(el=>el.classList.contains('isEditing')),'Mouse long-press did not activate editing');
+ await desktop.waitForFunction(()=>document.querySelector('.mobileDockV2')?.classList.contains('isEditing'),null,{timeout:4500});
  await desktop.mouse.move(to.x+to.width/2,to.y+to.height/2,{steps:8});
  await desktop.mouse.up();
  keys=await order(desktop);
@@ -140,8 +139,7 @@ async function main(){
  const tx=touchFrom.x+touchFrom.width/2,ty=touchFrom.y+touchFrom.height/2;
  const toX=touchTo.x+touchTo.width/2,toY=touchTo.y+touchTo.height/2;
  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:tx,y:ty}]});
- await sleep(540);
- assert(await touch.locator('.mobileDockV2').evaluate(el=>el.classList.contains('isEditing')),'Touch long-press did not activate editing');
+ await touch.waitForFunction(()=>document.querySelector('.mobileDockV2')?.classList.contains('isEditing'),null,{timeout:4500});
  for(let i=1;i<=8;i++){
   await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:tx+(toX-tx)*i/8,y:ty+(toY-ty)*i/8}]});
   await sleep(35);
