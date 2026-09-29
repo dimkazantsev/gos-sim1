@@ -28,7 +28,10 @@ function highlightChatText(value:string,search:string):ReactNode{
 }
 function formatBytes(size:number){return size<1024*1024?Math.max(1,Math.round(size/1024))+' КБ':(size/1024/1024).toFixed(1)+' МБ';}
 function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messageId:string,path:string)=>Promise<string|null>}){
- if(!m.url)return <span className="chatMissingFile">Вложение недоступно</span>;
+ if(!m.url)return <div className="chatAttachmentUnavailable">
+  <span>Не удалось открыть вложение</span>
+  {m.storage_path&&onRefresh&&<button type="button" onClick={()=>void onRefresh(m.id,m.storage_path!)}>Обновить ссылку</button>}
+ </div>;
  if(m.kind==='audio'||m.mime_type?.startsWith('audio/'))return <ChatVoicePlayer src={m.url} messageId={m.id} durationHint={m.voice_meta?.duration} waveform={m.voice_meta?.waveform} fileName={m.text||'Голосовое сообщение'} onRefresh={m.storage_path&&onRefresh?()=>onRefresh(m.id,m.storage_path!):undefined} />;
  if(m.kind==='video'||m.mime_type?.startsWith('video/'))return <video controls preload="metadata" playsInline src={m.url} aria-label="Видеосообщение"/>;
  if(m.mime_type?.startsWith('image/')){
