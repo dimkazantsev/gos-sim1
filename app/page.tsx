@@ -19,6 +19,8 @@ export default function Home(){
  const [mode,setMode]=useState<'student'|'teacher'>('student'),[createMode,setCreateMode]=useState(false);
  const [gameTitle,setGameTitle]=useState('Республика Политология'),[studentCode,setStudentCode]=useState(''),[fio,setFio]=useState(''),[group,setGroup]=useState(''),[gameCode,setGameCode]=useState(''),[invite,setInvite]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const [showCode,setShowCode]=useState(false);
+ const [personalLogin,setPersonalLogin]=useState(false);
+ const [loginEmail,setLoginEmail]=useState(''),[loginPassword,setLoginPassword]=useState(''),[loginGameCode,setLoginGameCode]=useState(''),[recoverySent,setRecoverySent]=useState(false);
  const heading=useMemo(()=>mode==='teacher'&&createMode?'Новое государство':mode==='teacher'?'Начнём занятие':'Ваш ход. Входите.',[mode,createMode]);
 
  async function submit(e:FormEvent){
@@ -39,6 +41,23 @@ export default function Home(){
   }catch(e){setError(readableError(e))}finally{setBusy(false)}
  }
 
+ async function login(e:FormEvent){
+  e.preventDefault();setBusy(true);setError('');
+  try{
+   const auth=await supabase.auth.signInWithPassword({email:loginEmail.trim().toLowerCase(),password:loginPassword});
+   if(auth.error)throw auth.error;
+   const r=await supabase.rpc('resume_member_game',{p_game_code:loginGameCode.trim()});
+   if(r.error)throw r.error;
+   router.push('/game/'+r.data);
+  }catch(e){setError(readableError(e))}finally{setBusy(false)}
+ }
+ async function recover(){
+  if(!loginEmail.includes('@')){setError('Укажите почту, к которой привязана ваша учётная запись.');return}
+  setBusy(true);setError('');setRecoverySent(false);
+  const r=await supabase.auth.resetPasswordForEmail(loginEmail.trim().toLowerCase(),{redirectTo:window.location.origin+'/auth/update-password'});
+  if(r.error)setError(readableError(r.error));else setRecoverySent(true);
+  setBusy(false);
+ }
  return <main className="entryPage">
   <a className="skipLink" href="#entry-form">Перейти ко входу</a>
   <header className="entryHeader"><a className="wordmark" href="/" aria-label="GOS//SIMS — главная"><span className="brandMark" aria-hidden="true">g<span>//</span>ss</span><b>GOS<span>//</span>SIMS</b></a><span className="entryEdition">Лаборатория государственного управления <i>2026</i></span></header>
@@ -51,8 +70,8 @@ export default function Home(){
     <div className="entryFacts"><div><b>16</b><span>этапов игры</span></div><div><Landmark aria-hidden="true"/><span>Реальные институты.<br/>Учебные решения.</span></div><div><GraduationCap aria-hidden="true"/><span>Практика государственного<br/>и муниципального управления</span></div></div>
    </section>
    <section className="entryAccess" aria-labelledby="entry-heading">
-    <form id="entry-form" className="entryForm" onSubmit={submit} aria-busy={busy}>
-     <div className="entryFormIntro"><span className="overline">{mode==='teacher'&&createMode?'СОЗДАТЬ УЧЕБНУЮ ИГРУ':'ПРИСОЕДИНИТЬСЯ К ИГРЕ'}</span><h2 id="entry-heading">{heading}</h2><p>{mode==='teacher'?(createMode?'Задайте название и коды доступа для вашей группы.':'Откройте занятие с помощью кода игры и кода преподавателя.'):'Введите данные, которые вы получили от преподавателя.'}</p></div>
+    {!personalLogin&&<form id="entry-form" className="entryForm" onSubmit={submit} aria-busy={busy}>
+     <div className="entryFormIntro"><span className="overline">{mode==='teacher'&&createMode?'СОЗДАТЬ УЧЕБНУЮ ИГРУ':'ПРИСОЕДИНИТЬСЯ К ИГРЕ'}</span><h2 id="entry-heading">{heading}</h2><p>{mode==='teacher'?(createMode?'Задайте название и коды доступа для вашей группы.':'Откройте занятие с помощью кода игры и кода преподавателя.'):'Введите данные, которые вы получили от преподавателя.'}</p></div><button type="button" className="entryPersonalSwitch" onClick={()=>{setPersonalLogin(true);setError('')}}><LockKeyhole size={16}/> Войти с личным паролем</button>
      <fieldset disabled={busy}>
       <legend className="srOnly">Роль и данные для входа</legend>
       <div className="entryRoles" aria-label="Ваша роль"><button type="button" aria-pressed={mode==='student'} className={mode==='student'?'active':''} onClick={()=>{setMode('student');setCreateMode(false);setError('')}}><GraduationCap aria-hidden="true"/>Участник</button><button type="button" aria-pressed={mode==='teacher'} className={mode==='teacher'?'active':''} onClick={()=>{setMode('teacher');setError('')}}><Landmark aria-hidden="true"/>Преподаватель</button></div>
@@ -66,7 +85,21 @@ export default function Home(){
       <button className="primary entrySubmit" disabled={busy}>{busy?<><LoaderCircle className="spin" aria-hidden="true"/>Подключаемся…</>:<>{mode==='teacher'&&createMode?'Создать игру':'Войти в игру'}<ArrowRight aria-hidden="true"/></>}</button>
      </fieldset>
      <div className="entryPrivacy"><LockKeyhole aria-hidden="true"/><p>ФИО будет видно участникам и преподавателю. Ваши действия сохраняются в протоколе игры.</p></div>
-    </form>
+    </form>}
+    {personalLogin&&<form id="entry-form" className="entryForm" onSubmit={login} aria-busy={busy}>
+     <div className="entryFormIntro"><span className="overline">ЛИЧНАЯ УЧЁТНАЯ ЗАПИСЬ</span><h2>Вход по паролю</h2><p>Используйте подтверждённую почту и пароль, указанные в игровом профиле. Ваши мандаты и действия сохранятся.</p></div>
+     <button type="button" className="entryPersonalSwitch" onClick={()=>{setPersonalLogin(false);setError('')}}><LockKeyhole size={16}/> Вернуться ко входу по коду</button>
+     <fieldset disabled={busy}>
+      <legend className="srOnly">Данные личной учётной записи</legend>
+      <label className="entryField">Код игры<input required value={loginGameCode} onChange={e=>setLoginGameCode(e.target.value)} placeholder="Код вашей игры" autoCapitalize="characters"/></label>
+      <label className="entryField">Электронная почта<input required type="email" autoComplete="username" value={loginEmail} onChange={e=>setLoginEmail(e.target.value)} placeholder="Ваш адрес почты"/></label>
+      <label className="entryField">Личный пароль<input required type="password" autoComplete="current-password" value={loginPassword} onChange={e=>setLoginPassword(e.target.value)} placeholder="Ваш личный пароль"/></label>
+      {error&&<div className="errorBox" role="alert">{error}</div>}
+      {recoverySent&&<div className="entryRecoveryNotice" role="status">Если этот адрес привязан к игре, письмо со ссылкой для смены пароля будет отправлено.</div>}
+      <button type="submit" className="primary entrySubmit" disabled={busy}>{busy?'Проверка…':'Войти в мою игру'}<ArrowRight size={18}/></button>
+      <button type="button" className="entryForgot" disabled={busy} onClick={()=>void recover()}>Забыли пароль? Отправить ссылку для восстановления</button>
+     </fieldset>
+    </form>}
     <div className="entryAccessNote"><span>01 — 16</span><p>Здесь каждое решение<br/>меняет ход игры.</p><ArrowUpRight aria-hidden="true"/></div>
    </section>
   </div>
