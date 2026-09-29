@@ -4,8 +4,15 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const Module=require('node:module');
 const ts=require('typescript');
+const helperPath='components/game/voiceWaveform.ts';
+const helper=new Module(helperPath,module);helper.filename=helperPath;helper.paths=module.paths;
+helper._compile(ts.transpileModule(fs.readFileSync(helperPath,'utf8'),{
+ compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
+}).outputText,helperPath);
 const path='components/game/ChatVoicePlayer.tsx';
 const mod=new Module(path,module);mod.filename=path;mod.paths=module.paths;
+const baseRequire=mod.require.bind(mod);
+mod.require=id=>id==='./voiceWaveform'?helper.exports:baseRequire(id);
 mod._compile(ts.transpileModule(fs.readFileSync(path,'utf8'),{
  compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,
  jsx:ts.JsxEmit.ReactJSX}
