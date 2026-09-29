@@ -4,6 +4,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {useDialog} from '../ui/useDialog';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import StyledSelect from '../ui/StyledSelect';
 
 type Assessment={
  id:string;game_id:string;stage_no:number;user_id:string;auto_score:number;final_score:number|null;
@@ -192,12 +193,10 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
    <div className="surfaceHead"><div><small>ГРУППА × ЭТАПЫ</small><h2>Оценки всех участников</h2></div><span>{sortedStudents.length} из {students.length}</span></div>
    <div className="gradesToolbar">
     <label><span>Поиск</span><input type="search" value={gradeSearch} onChange={e=>setGradeSearch(e.target.value)} placeholder="Фамилия, имя, роль" aria-label="Поиск студентов"/></label>
-    <label><span>Партия или группа</span><select value={gradeTeam} onChange={e=>setGradeTeam(e.target.value)}><option value="">Все</option>{teams.map(t=><option key={t} value={t}>{t}</option>)}</select></label>
-    <label><span>Сортировка</span><select value={gradeSort} onChange={e=>setGradeSort(e.target.value as typeof gradeSort)}>
-     <option value="surname">По фамилии</option><option value="name">По имени</option>
-     <option value="sum">По сумме баллов</option><option value="average">По среднему баллу</option>
-     <option value="final">По утверждённым</option><option value="graded">По количеству оценок</option>
-    </select></label>
+    <StyledSelect label="Партия или группа" value={gradeTeam} onChange={setGradeTeam} options={[{value:'',label:'Все'},...teams.map(t=>({value:t,label:t}))]}/>
+    <StyledSelect label="Сортировка" value={gradeSort} onChange={v=>setGradeSort(v as typeof gradeSort)} options={[
+     {value:'surname',label:'По фамилии'},{value:'name',label:'По имени'},{value:'sum',label:'По сумме баллов'},
+     {value:'average',label:'По среднему баллу'},{value:'final',label:'По утверждённым'},{value:'graded',label:'По количеству оценок'}]}/>
     <button type="button" className="gradesSortDir" onClick={()=>setGradeAsc(!gradeAsc)} aria-label={gradeAsc?'Сортировать по убыванию':'Сортировать по возрастанию'}>{gradeAsc?'↑':'↓'}</button>
     <label className="gradesPending"><input type="checkbox" checked={gradeOnlyPending} onChange={e=>setGradeOnlyPending(e.target.checked)}/> Есть неутверждённые</label>
    </div>
