@@ -165,6 +165,9 @@ async function main(){
  if(browser)await browser.close();
  if(server){server.kill('SIGTERM');await sleep(1500)}
  fs.rmSync(route,{recursive:true,force:true});
+ // Next dev generates route validators. The temporary route must leave no stale
+ // validator behind or a later production build fails after the route is removed.
+ fs.rmSync(path.join(root,'.next','dev','types'),{recursive:true,force:true});
 }
 }
 main().catch(error=>{console.error(error);process.exitCode=1});
