@@ -1,0 +1,271 @@
+/* Teacher control centre: scoped compact desktop workspace, loaded after legacy sheets. */
+.teacherCommand{
+ --tc-ink:#1b3150;--tc-muted:#667b96;--tc-line:#e0e8f2;--tc-blue:#315ee8;
+ display:grid;gap:16px;min-width:0;align-content:start
+}
+.teacherCommand .teacherFocus{
+ display:grid;grid-template-columns:minmax(0,1fr) 148px;align-items:center;gap:20px;
+ padding:22px 25px 22px 42px;margin:0;min-width:0;
+ border:1px solid #dce6f3;border-radius:19px;background:#fff;
+ box-shadow:0 6px 22px rgba(18,43,82,.035)
+}
+.teacherCommand .teacherFocusCopy{min-width:0}
+.teacherCommand .teacherFocusCopy>small{display:block;margin:0 0 5px;color:#58759b;font-size:11px;font-weight:850;letter-spacing:.11em}
+.teacherCommand .teacherFocusCopy h1{
+ margin:0 0 12px;font-size:clamp(24px,2.3vw,34px);line-height:1.12;font-weight:820;letter-spacing:-.04em
+}
+.teacherCommand .teacherFocusCopy p{display:grid;gap:4px;margin:0;max-width:820px;font-size:13px;line-height:1.5;color:var(--tc-muted)}
+.teacherCommand .teacherFocusCopy p strong{color:#2b4b77;font-weight:780;font-size:14px}
+.teacherCommand .teacherFocusCopy p span{overflow-wrap:anywhere}
+.teacherCommand .teacherFocusState{
+ display:grid;justify-items:center;gap:8px;min-width:0;min-height:96px;
+ align-content:center;padding:12px;border:1px solid #e1e9f3;border-radius:13px;background:#f7faff
+}
+.teacherCommand .teacherFocusState .bigState{margin:0}
+.teacherCommand .teacherFocusState>b{margin:0;font-size:27px;line-height:1;font-weight:800;font-variant-numeric:tabular-nums}
+.teacherCommand .teacherPrimaryActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0}
+.teacherCommand .teacherAction{
+ display:flex;align-items:center;gap:12px;min-height:73px;margin:0;padding:12px 15px;
+ border:1px solid #dce6f2;border-radius:13px;background:#fff;
+ box-shadow:0 3px 12px rgba(17,39,73,.025);text-align:left;min-width:0
+}
+.teacherCommand .teacherAction:hover{border-color:#acc6f0;background:#f9fbff}
+.teacherCommand .teacherAction.primaryAction{border-color:#c8d8f9;background:#eff5ff}
+.teacherCommand .teacherAction.dangerLite{border-color:#f1d7d5;background:#fff8f7}
+.teacherCommand .teacherAction>span{
+ display:grid;place-items:center;flex:none;width:39px;height:39px;
+ border:1px solid #dce7f9;border-radius:11px;background:#eff4fd;color:#3866ba
+}
+.teacherCommand .teacherAction.dangerLite>span{background:#fff0ef;color:#b35758;border-color:#f4d6d6}
+.teacherCommand .teacherAction>div{min-width:0}
+.teacherCommand .teacherAction b{display:block;margin:0;color:#264361;font-size:13px;line-height:1.35;font-weight:820}
+.teacherCommand .teacherAction small{display:block;margin-top:3px;color:#70849b;font-size:11px;line-height:1.35}
+.teacherCommand .teacherPulse{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0}
+.teacherCommand .teacherPulse .pulseCard{
+ display:grid;align-content:center;gap:3px;min-height:91px;padding:14px 17px;
+ border:1px solid #e0e7f0;border-radius:13px;background:#fff
+}
+.teacherCommand .teacherPulse .pulseCard small{font-size:10px;letter-spacing:.085em}
+.teacherCommand .teacherPulse .pulseCard strong{font-size:25px;line-height:1.17}
+.teacherCommand .teacherPulse .pulseCard span{font-size:11px;line-height:1.35}
+/* Stage manager: four-column dense matrix, status and reset aligned as an explicit action. */
+.teacherCommand .teacherStageManager{
+ display:grid;gap:15px;min-width:0;padding:20px 22px 22px;
+ border:1px solid #dce6f1;border-radius:19px;background:#fff;
+ box-shadow:0 5px 20px rgba(18,43,82,.03)
+}
+.teacherCommand .teacherStageManagerHead{
+ display:flex;align-items:center;justify-content:space-between;gap:22px;min-width:0
+}
+.teacherCommand .teacherStageManagerHeading{min-width:0}
+.teacherCommand .teacherEyebrow{display:block;color:#6881a0;font-size:10px;letter-spacing:.11em;font-weight:850;line-height:1.4}
+.teacherCommand .teacherStageManagerHeading h2{
+ margin:4px 0 4px;color:#183353;font-size:20px;letter-spacing:-.025em;line-height:1.25;font-weight:830
+}
+.teacherCommand .teacherStageManagerHeading p{margin:0;max-width:640px;color:#69809a;font-size:12px;line-height:1.45}
+.teacherCommand .teacherStageManagerTools{display:flex;align-items:center;gap:12px;flex:none}
+.teacherCommand .teacherStageManagerTotals{display:grid;gap:3px;justify-items:end;color:#687d97;font-size:11px;line-height:1.35}
+.teacherCommand .teacherStageManagerTotals>span{display:flex;align-items:center;gap:5px}
+.teacherCommand .teacherStageManagerTotals strong{color:#2a5dba;font-size:16px;font-variant-numeric:tabular-nums}
+.teacherCommand .teacherResetAll{
+ display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:39px;
+ padding:0 13px;border:1px solid #e9cdd0;border-radius:10px;background:#fff7f7;
+ color:#a04751;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer
+}
+.teacherCommand .teacherResetAll:hover:not(:disabled){background:#ffeded;border-color:#dcadb4}
+.teacherCommand .teacherResetAll svg{display:block;flex:none}
+.teacherCommand .teacherStageManagerToolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.teacherCommand .teacherStageFilter{display:flex;flex-wrap:wrap;align-items:center;gap:5px;min-width:0}
+.teacherCommand .teacherStageFilter button{
+ display:inline-flex;justify-content:center;align-items:center;gap:7px;min-height:36px;
+ padding:0 10px;border:1px solid transparent;border-radius:9px;background:transparent;
+ color:#71849d;font-size:12px;font-weight:780;white-space:nowrap;cursor:pointer
+}
+.teacherCommand .teacherStageFilter button:hover{background:#f4f7fb;color:#3764a6}
+.teacherCommand .teacherStageFilter button.isActive{background:#edf3ff;border-color:#d2e0fa;color:#295bbc}
+.teacherCommand .teacherStageFilter button span{
+ display:grid;place-items:center;min-width:20px;height:20px;padding:0 4px;
+ border-radius:6px;background:#edf1f7;color:#647a97;font-size:10px;font-variant-numeric:tabular-nums
+}
+.teacherCommand .teacherStageFilter button.isActive span{background:#dce8fd;color:#285bbd}
+.teacherCommand .teacherStageSearch{
+ display:flex;align-items:center;gap:7px;flex:0 1 205px;min-width:170px;
+ height:37px;margin:0;padding:0 10px;border:1px solid #dae4ee;border-radius:9px;background:#fff;color:#748ba5
+}
+.teacherCommand .teacherStageSearch svg{flex:none}
+.teacherCommand .teacherStageSearch input{
+ flex:1;min-width:0;width:100%;height:100%;border:0;outline:none;background:transparent;
+ color:#314d6c;font-size:12px;font-weight:600
+}
+.teacherCommand .teacherStageGrid{
+ display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;align-items:stretch
+}
+.teacherCommand .teacherStageCard{
+ display:flex;align-items:stretch;min-width:0;min-height:88px;
+ border:1px solid #e0e8f0;border-radius:12px;background:#fcfdff;overflow:hidden;
+ transition:border-color .16s,box-shadow .16s
+}
+.teacherCommand .teacherStageCard:hover{border-color:#b5c9eb;box-shadow:0 6px 14px rgba(20,43,75,.055)}
+.teacherCommand .teacherStageCard.is-open{border-color:#a8bff3;background:#f7faff;box-shadow:inset 0 2px #4777df}
+.teacherCommand .teacherStageOpen{
+ display:flex;align-items:center;gap:10px;flex:1;min-width:0;min-height:87px;
+ padding:12px 4px 12px 11px;border:0;background:transparent;text-align:left;cursor:pointer
+}
+.teacherCommand .teacherStageNumber{
+ display:grid;place-items:center;flex:none;width:31px;height:34px;
+ border-radius:9px;background:#ecf1f8;color:#4e698c;font-size:12px;font-weight:850;font-variant-numeric:tabular-nums
+}
+.teacherCommand .teacherStageCard.is-completed .teacherStageNumber{background:#e6f5ee;color:#268360}
+.teacherCommand .teacherStageCard.is-open .teacherStageNumber{background:#e5eeff;color:#315dc8}
+.teacherCommand .teacherStageCopy{display:grid;align-content:center;justify-items:start;gap:7px;min-width:0}
+.teacherCommand .teacherStageName{
+ display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ color:#27415f;font-size:12px;font-weight:800;line-height:1.34;overflow-wrap:anywhere
+}
+.teacherCommand .teacherStageStatus{
+ display:inline-flex;align-items:center;gap:5px;color:#8190a4;font-size:10px;font-weight:790;line-height:1
+}
+.teacherCommand .teacherStageStatus.is-completed{color:#1a815f}
+.teacherCommand .teacherStageStatus.is-open{color:#315dc6}
+.teacherCommand .teacherStageStatus svg{display:block;flex:none}
+.teacherCommand .teacherStageGo{display:block;flex:none;margin-left:auto;color:#96a7bd}
+.teacherCommand .teacherStageReset{
+ display:grid;place-items:center;flex:none;align-self:center;width:32px;height:36px;
+ margin:0 8px 0 0;padding:0;border:1px solid #e2e8f0;border-radius:9px;
+ background:#fff;color:#8999ad;cursor:pointer
+}
+.teacherCommand .teacherStageReset:hover:not(:disabled){border-color:#e6b7bd;background:#fff0f0;color:#a64d58}
+.teacherCommand .teacherStageReset svg{display:block;flex:none}
+.teacherCommand .teacherStageEmpty{
+ display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;min-height:110px;
+ padding:18px;border:1px dashed #d9e4f1;border-radius:12px;background:#fbfcff;color:#7286a0;font-size:12px
+}
+.teacherCommand .teacherStageEmpty button{
+ min-height:36px;padding:0 12px;border:1px solid #cadbf9;border-radius:9px;background:#eef4ff;
+ color:#305ec1;font-size:12px;font-weight:800;cursor:pointer
+}
+.teacherCommand .teacherStageNotice{
+ display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid #cde6d8;border-radius:9px;
+ background:#f0faf4;color:#1e7954;font-size:12px;font-weight:750
+}
+.teacherCommand .teacherStageNotice>svg{flex:none}
+.teacherCommand .teacherStageNotice button{display:grid;place-items:center;width:28px;height:28px;margin-left:auto;border:0;background:transparent;color:inherit;cursor:pointer}
+.teacherCommand .teacherStageManager button:focus-visible,
+.teacherCommand .teacherWorkspaceNav button:focus-visible{outline:3px solid #5d86e9;outline-offset:2px}
+.teacherCommand .teacherStageManager button:disabled{opacity:.5;cursor:not-allowed}
+/* One navigation line replaces permanent stacked analytical panels. */
+.teacherCommand .teacherWorkspace{
+ display:grid;gap:0;min-width:0;border:1px solid #dce6f1;border-radius:18px;background:#fff;overflow:hidden
+}
+.teacherCommand .teacherWorkspaceNav{
+ display:flex;align-items:center;gap:3px;min-width:0;padding:9px 12px;
+ border-bottom:1px solid #e8edf5;background:#f8fafd;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin
+}
+.teacherCommand .teacherWorkspaceNav button{
+ display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;gap:8px;
+ min-height:42px;padding:0 13px;border:1px solid transparent;border-radius:10px;
+ background:transparent;color:#637d9b;font-size:12px;font-weight:780;white-space:nowrap;cursor:pointer
+}
+.teacherCommand .teacherWorkspaceNav button.active{
+ border-color:#cbdafa;background:#edf3ff;color:#2b5bbb;box-shadow:0 2px 7px #315eef0a
+}
+.teacherCommand .teacherWorkspaceNav button:hover:not(.active){background:#fff}
+.teacherCommand .teacherWorkspaceNav em{
+ display:grid;place-items:center;min-width:20px;height:20px;padding:0 5px;
+ border-radius:6px;background:#ffe9d7;color:#a85b29;font-style:normal;font-size:10px
+}
+.teacherCommand .teacherWorkspacePanel{
+ display:grid;gap:15px;min-width:0;padding:19px;outline-offset:-3px
+}
+.teacherCommand .teacherWorkspacePanel>.teacherSimpleGrid{margin:0}
+.teacherCommand .teacherWorkspacePanel>.gameReadinessMatrix{margin:0}
+.teacherCommand .teacherWorkspacePanel>.surface,.teacherCommand .teacherWorkspacePanel .teacherDetails{min-width:0}
+.teacherCommand .teacherWorkspacePanel .teacherAnalytics{padding:17px 18px}
+.teacherCommand .teacherWorkspacePanel .teacherSimpleGrid{gap:14px}
+.teacherCommand .teacherWorkspacePanel .teacherDetails{margin:0}
+/* The destructive confirmation uses a separate focus-trapped alert dialog. */
+.teacherResetBackdrop{
+ position:fixed;inset:0;z-index:300;display:grid;place-items:center;
+ padding:18px;background:#12233db8;backdrop-filter:blur(5px)
+}
+.teacherResetDialog{
+ width:min(478px,100%);max-height:calc(100dvh - 36px);overflow-y:auto;
+ padding:26px;border:1px solid #e0e5ed;border-radius:21px;background:#fff;
+ box-shadow:0 30px 95px #13243a4d;color:#1e3552
+}
+.teacherResetDialogTop{display:flex;justify-content:space-between;align-items:start;gap:10px;margin:0 0 13px}
+.teacherResetWarningIcon{
+ display:grid;place-items:center;width:47px;height:47px;border:1px solid #f0d6c5;
+ border-radius:13px;background:#fff4ea;color:#a9763d
+}
+.teacherResetClose{
+ display:grid;place-items:center;width:38px;height:38px;padding:0;border:1px solid #e4e9f0;
+ border-radius:10px;background:#fff;color:#7889a0;cursor:pointer
+}
+.teacherResetDialog h2{margin:0 0 10px;font-size:23px;line-height:1.25;font-weight:830;letter-spacing:-.03em}
+.teacherResetDialog>p{margin:0;color:#5f718a;font-size:14px;line-height:1.6}
+.teacherResetPreserve{
+ display:flex;align-items:flex-start;gap:10px;margin:17px 0;padding:12px;
+ border:1px solid #dce6f4;border-radius:11px;background:#f6f9fe;
+ color:#56718f;font-size:12px;line-height:1.55;font-weight:670
+}
+.teacherResetPreserve svg{flex:none;color:#47896c;margin-top:1px}
+.teacherResetWord{display:grid;gap:8px;margin:17px 0;color:#475e79;font-size:13px;line-height:1.5;font-weight:700}
+.teacherResetWord strong{color:#a64b56}
+.teacherResetWord input{
+ width:100%;min-height:43px;padding:0 12px;border:1px solid #d6e0eb;border-radius:10px;
+ background:#fff;color:#2c425f;font-size:14px
+}
+.teacherResetError{margin:10px 0;color:#a3444a;font-size:12px;font-weight:720}
+.teacherResetDialogActions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:20px}
+.teacherResetDialogActions button{
+ display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:42px;
+ padding:0 15px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer
+}
+.teacherResetCancel{border:1px solid #dce3ee;background:#fff;color:#526b88}
+.teacherResetConfirm{border:1px solid #a94551;background:#ad4955;color:#fff}
+.teacherResetConfirm:hover:not(:disabled){background:#963a47}
+.teacherResetDialogActions button:disabled,.teacherResetClose:disabled{opacity:.48;cursor:not-allowed}
+.teacherResetDialog :is(button,input):focus-visible{outline:3px solid #6f94e7;outline-offset:2px}
+@media(max-width:1380px){
+ .teacherCommand .teacherStageGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .teacherCommand .teacherStageManagerHead{align-items:flex-start}
+}
+@media(max-width:1050px){
+ .teacherCommand .teacherStageGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .teacherCommand .teacherStageManagerHead{flex-wrap:wrap}
+ .teacherCommand .teacherStageManagerTools{width:100%;justify-content:space-between}
+ .teacherCommand .teacherStageManagerTotals{justify-items:start}
+ .teacherCommand .teacherStageManagerToolbar{flex-wrap:wrap}
+ .teacherCommand .teacherStageSearch{flex:1 1 210px}
+}
+@media(max-width:720px){
+ .teacherCommand{gap:12px}
+ .teacherCommand .teacherFocus{grid-template-columns:minmax(0,1fr);gap:12px;padding:19px 16px 19px 35px}
+ .teacherCommand .teacherFocusState{display:flex;justify-content:space-between;align-items:center;min-height:60px;padding:10px 12px}
+ .teacherCommand .teacherFocusState>b{font-size:23px}
+ .teacherCommand .teacherPrimaryActions{grid-template-columns:minmax(0,1fr)}
+ .teacherCommand .teacherAction{min-height:65px;padding:10px 12px}
+ .teacherCommand .teacherAction small{font-size:11px}
+ .teacherCommand .teacherPulse{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .teacherCommand .teacherPulse .pulseCard:nth-child(3){grid-column:1/-1}
+ .teacherCommand .teacherStageManager{padding:17px 13px}
+ .teacherCommand .teacherStageManagerTools{align-items:center;flex-wrap:wrap}
+ .teacherCommand .teacherStageFilter{flex-wrap:nowrap;max-width:100%;overflow-x:auto;scrollbar-width:thin}
+ .teacherCommand .teacherStageGrid{grid-template-columns:minmax(0,1fr)}
+ .teacherCommand .teacherStageCard{min-height:74px}
+ .teacherCommand .teacherStageOpen{min-height:72px}
+ .teacherCommand .teacherWorkspaceNav{padding:8px}
+ .teacherCommand .teacherWorkspaceNav button{min-height:43px;padding:0 10px}
+ .teacherCommand .teacherWorkspacePanel{padding:12px}
+ .teacherResetDialog{padding:21px;border-radius:16px}
+}
+@media(max-width:380px){
+ .teacherCommand .teacherStageManagerTools{align-items:stretch}
+ .teacherCommand .teacherResetAll{width:100%}
+ .teacherCommand .teacherStageSearch{min-width:0;flex-basis:100%}
+ .teacherCommand .teacherStageManagerTotals{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+ .teacherCommand :is(.teacherStageCard,.teacherAction,.teacherResetAll){transition:none}
+}
