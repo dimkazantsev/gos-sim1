@@ -41,7 +41,7 @@ function ChatAttachment({message:m}:{message:Message}){
 }
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean}){
- const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,chatLoading,names,recording,recordingPreview,recordingSaving,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
+ const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,chatLoading,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
  const [sending,setSending]=useState(false);
  const [uploading,setUploading]=useState(false);
  const [recordElapsed,setRecordElapsed]=useState(0);
@@ -144,7 +144,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   if(!channelId||uploading||recordingSaving)return;
   if(file.size>MAX_FILE_SIZE){setLocalError('Файл превышает 25 МБ. Выберите файл меньшего размера.');return}
   setLocalError('');setUploading(true);setAttachOpen(false);
-  try{const ok=await sendChatFile(file);if(!ok)setLocalError('Не удалось прикрепить файл. Попробуйте снова.');else requestAnimationFrame(scrollToLatest)}
+  try{const ok=await sendChatFile(file);if(!ok)setLocalError('Вложение не отправлено. Подробности ниже.');else requestAnimationFrame(scrollToLatest)}
   catch{setLocalError('Файл не отправлен. Повторите попытку.')}
   finally{setUploading(false);if(uploadInput.current)uploadInput.current.value=''}
  }
@@ -253,10 +253,11 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     <button type="button" className="chatCaptureCancel" onClick={discardRecording} disabled={recordingSaving}><Trash2 size={16} aria-hidden="true"/>Удалить</button>
     <a className="chatCaptureDownload" href={recordingPreview.url} download={recordingPreview.fileName} aria-label="Сохранить запись на устройство"><Download size={17} aria-hidden="true"/></a>
     <button type="button" className="chatCaptureSend" disabled={recordingSaving||recordingPreview.blob.size>MAX_FILE_SIZE} onClick={()=>void sendRecordingPreview()}>
-     <Send size={16} aria-hidden="true"/>{recordingSaving?'Сохраняется…':'Отправить'}
+     <Send size={16} aria-hidden="true"/>{recordingSaving?(chatMediaPhase==='uploading'?'Загрузка…':'Публикация…'):'Отправить в чат'}
     </button>
    </div>
   </section>}
+  {chatMediaError&&<div className="chatLocalError chatMediaError" role="alert"><span>{chatMediaError}</span></div>}
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
   <div className="chatCompose">
    <div className="chatInputRow">
@@ -294,7 +295,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      <Video aria-hidden="true" size={19}/>
     </button>
     <span className="chatComposerHint" aria-live="polite">
-     {uploading?'Загружается вложение…':recordingSaving?'Сохраняется запись…':recording?'Идёт запись…':'Enter — отправить'}
+     {uploading?'Загружается вложение…':recordingSaving?(chatMediaPhase==='uploading'?'Загружается запись…':'Публикуется сообщение…'):recording?'Идёт запись…':'Enter — отправить'}
     </span>
    </div>
   </div>
