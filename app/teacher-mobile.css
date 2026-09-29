@@ -1,0 +1,275 @@
+/* GOS//SIMS: teacher workspace + genuinely scrollable mobile dock.
+   Loaded after design-readability so responsive rules have a single owner. */
+
+/* Prevent children with long names, labels and auto-sized grids from widening the page. */
+.teacherSimple,
+.teacherSimple :is(.surface,.teacherFocusCopy,.teacherDetails,.teacherDetailsBody,.teacherAction>div,
+.studentLiveIdentity,.studentNow,.studentLast,.activityRow>div,.gameReadinessMatrix,
+.gameReadinessGrid article>div,.impactEngine,.impactRuleCard,.teacherPartyMatrix>article,
+.teacherPartyMatrix header>div,.teacherAnalytics,.teacherPlayerStats,.teacherDetails summary>div){
+ min-width:0;
+ max-width:100%;
+}
+.teacherSimple :is(.studentLiveIdentity,.studentLast,.studentNow,.activityRow>div,
+.teacherDetails summary>div,.teacherPartyMatrix header>div){
+ overflow-wrap:anywhere;
+}
+.teacherSimple :is(input,textarea,select){max-width:100%}
+.teacherSimple .teacherPlayerStatsRow>strong[data-label]::before,
+.teacherSimple .teacherMandateRows :is(span,em,strong)[data-label]::before{display:none}
+.teacherSimple .teacherScrollHint{display:none}
+
+/* A horizontal list instead of a fixed five-column dock: every route remains reachable
+   by swipe, keyboard focus, and the existing "Ещё" sheet. */
+@media (max-width:900px){
+ .mobileDock{
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:stretch;
+  justify-content:flex-start;
+  gap:7px;
+  width:100%;
+  max-width:100vw;
+  overflow-x:auto;
+  overflow-y:hidden;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-x;
+  scroll-snap-type:x proximity;
+  scroll-padding-inline:12px;
+  scrollbar-width:none;
+  padding:9px max(12px,env(safe-area-inset-right,0px))
+   calc(9px + env(safe-area-inset-bottom,0px))
+   max(12px,env(safe-area-inset-left,0px));
+  background:#fff;
+ }
+ .mobileDock::-webkit-scrollbar{display:none}
+ .mobileDock>button{
+  box-sizing:border-box;
+  display:flex;
+  flex:0 0 102px;
+  width:102px;
+  max-width:102px;
+  min-width:102px;
+  min-height:61px;
+  padding:8px 5px;
+  gap:4px;
+  scroll-snap-align:start;
+  overflow:hidden;
+ }
+ .mobileDock>button svg{width:21px;height:21px;flex:none}
+ .mobileDock>button span{
+  display:block;
+  width:100%;
+  max-width:100%;
+  font-size:11px;
+  line-height:1.26;
+  text-align:center;
+  white-space:normal;
+  overflow-wrap:break-word;
+  word-break:normal;
+ }
+ .mobileDock>button:focus-visible{
+  outline:3px solid #6586dc;
+  outline-offset:-3px;
+ }
+ .simContentFlow,
+ .simWorkspace.chatOpen .simContentFlow{
+  padding-bottom:calc(118px + env(safe-area-inset-bottom,0px));
+ }
+ .studentPreviewMain::before{
+  bottom:calc(94px + env(safe-area-inset-bottom,0px));
+ }
+}
+
+/* Intermediate widths: keep analytics, monitor and long control titles out of each other's space. */
+@media (max-width:1180px){
+ .teacherSimple .teacherSimpleGrid{grid-template-columns:minmax(0,1fr)}
+ .teacherSimple .teacherDetailsBody.split{grid-template-columns:minmax(0,1fr)}
+ .teacherSimple .teacherPartyMatrix{grid-template-columns:minmax(0,1fr)}
+ .teacherSimple .studentLiveRow.simple{
+  grid-template-columns:12px minmax(0,1.2fr) minmax(0,.65fr) minmax(0,1fr);
+ }
+ .teacherSimple .teacherPrimaryActions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .teacherSimple .teacherAnalyticsCards{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .teacherSimple .gameReadinessGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:820px){
+ .teacherSimple .teacherFocus{grid-template-columns:minmax(0,1fr);gap:16px}
+ .teacherSimple .teacherFocusState{
+  display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-start;
+  gap:12px;min-width:0;text-align:left;
+ }
+ .teacherSimple .teacherFocusState>b{margin:0;font-size:25px}
+ .teacherSimple .teacherSimpleGrid{grid-template-columns:minmax(0,1fr)}
+ .teacherSimple .studentLiveRow.simple{
+  grid-template-columns:12px minmax(0,1fr) minmax(0,110px);
+  gap:9px;
+ }
+ .teacherSimple .studentLiveRow.simple .studentLast{grid-column:2/-1}
+ .teacherSimple .teacherDetailsBody.split{grid-template-columns:minmax(0,1fr)}
+ .teacherSimple .gameReadinessGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .teacherSimple .impactRulesGrid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:650px){
+ .teacherSimple{gap:16px;min-width:0}
+ .teacherSimple .teacherFocus{padding:20px 17px 20px 39px;gap:14px}
+ .teacherSimple .teacherFocus h1{
+  font-size:clamp(24px,6.5vw,30px);
+  line-height:1.22;
+  overflow-wrap:anywhere;
+ }
+ .teacherSimple .teacherPrimaryActions{grid-template-columns:minmax(0,1fr);gap:10px}
+ .teacherSimple .teacherAction{
+  grid-template-columns:43px minmax(0,1fr);
+  width:100%;min-height:82px;
+  padding:13px 14px;gap:12px;border-radius:15px;
+ }
+ .teacherSimple .teacherAction>div{min-width:0}
+ .teacherSimple .teacherAction b{font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+ .teacherSimple .teacherAction small{font-size:12px;line-height:1.45}
+ .teacherSimple .teacherPulse{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .teacherSimple .teacherPulse .pulseCard{padding:15px 13px;min-width:0}
+ .teacherSimple .teacherPulse .pulseCard:nth-child(3){grid-column:1/-1}
+ .teacherSimple .surface{min-width:0;padding:17px 14px}
+ .teacherSimple .surfaceHead{gap:10px;flex-wrap:wrap;align-items:flex-start}
+ .teacherSimple .surfaceHead>div{min-width:0}
+ .teacherSimple .surfaceHead h2{font-size:clamp(18px,5vw,22px);overflow-wrap:anywhere}
+ .teacherSimple .studentLiveList{max-height:none;overflow:visible}
+ .teacherSimple .studentLiveRow.simple{
+  grid-template-columns:10px minmax(0,1fr);
+  align-items:start;
+  gap:8px 11px;
+  padding:14px 12px;
+ }
+ .teacherSimple .studentLiveRow.simple :is(.studentNow,.studentLast){
+  grid-column:2;
+  min-width:0;
+ }
+ .teacherSimple .studentLiveIdentity b{font-size:14px;line-height:1.4}
+ .teacherSimple .studentLiveIdentity small{font-size:12px;line-height:1.5}
+ .teacherSimple .studentNow label,
+ .teacherSimple .studentLast label{font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+ .teacherSimple .studentNow b,.teacherSimple .studentLast b{font-size:13px;line-height:1.4}
+ .teacherSimple .activityFeed{max-height:440px}
+ .teacherSimple .activityRow{
+  grid-template-columns:47px 30px minmax(0,1fr);
+  align-items:start;gap:7px;padding:12px 2px;
+ }
+ .teacherSimple .activityRow time{font-size:11px}
+ .teacherSimple .activityAvatar{width:30px;height:30px}
+ .teacherSimple .activityRow p{overflow-wrap:anywhere;white-space:normal}
+ .teacherSimple .teacherAnalyticsCards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .teacherSimple .teacherAnalyticsCards>div{min-width:0;padding:13px}
+ .teacherSimple .teacherAnalyticsCards span{overflow-wrap:anywhere}
+ /* Turn the desktop six-column report into labeled, readable student cards. */
+ .teacherSimple .teacherPlayerStats{overflow:visible;margin-top:15px}
+ .teacherSimple .teacherPlayerStatsHead{display:none}
+ .teacherSimple .teacherPlayerStatsRow{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;min-width:0;
+  margin-bottom:10px;padding:13px;
+  border:1px solid var(--gs-border);
+  border-radius:14px;background:#fbfcff;
+ }
+ .teacherSimple .teacherPlayerStatsRow>div:first-child{grid-column:1/-1;min-width:0}
+ .teacherSimple .teacherPlayerStatsRow>div:first-child b{
+  font-size:14px;white-space:normal;overflow-wrap:anywhere
+ }
+ .teacherSimple .teacherPlayerStatsRow>div:first-child small{
+  white-space:normal;overflow-wrap:anywhere;line-height:1.45
+ }
+ .teacherSimple .teacherPlayerStatsRow>strong[data-label]{
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+  gap:5px;min-width:0;text-align:left;
+  padding:10px 9px;background:#fff;
+  border:1px solid #e5ebf3;border-radius:10px;
+  font-size:17px;
+ }
+ .teacherSimple .teacherPlayerStatsRow>strong[data-label]::before{
+  content:attr(data-label);display:block;
+  color:#60728e;font-size:11px;font-weight:650;
+  line-height:1.2;overflow-wrap:anywhere;
+ }
+ .teacherSimple .teacherScrollHint{display:none}
+ .teacherSimple .teacherPartyMatrix>article{padding:13px}
+ .teacherSimple .teacherPartyMatrix header{grid-template-columns:34px minmax(0,1fr) auto}
+ .teacherSimple .teacherPartyMatrix header b{overflow-wrap:anywhere}
+ .teacherSimple .teacherMandateRows>div{
+  grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding:10px 0;
+ }
+ .teacherSimple .teacherMandateRows>div>b{
+  grid-column:1/-1;overflow-wrap:anywhere;font-size:13px;
+ }
+ .teacherSimple .teacherMandateRows :is(span,em,strong)[data-label]{
+  display:grid;gap:4px;align-content:start;
+  text-align:left;padding:8px 6px;border-radius:8px;
+  background:#fff;border:1px solid #e8edf4;min-width:0;overflow-wrap:anywhere;
+  font-style:normal;
+ }
+ .teacherSimple .teacherMandateRows :is(span,em,strong)[data-label]::before{
+  content:attr(data-label);display:block;
+  color:#647792;font-size:10px;font-weight:700;line-height:1.35;
+ }
+ .teacherSimple .teacherInviteLog>div{
+  grid-template-columns:28px minmax(0,1fr);
+  gap:6px 9px;align-items:start;padding:11px;
+ }
+ .teacherSimple .teacherInviteLog :is(em,time){
+  grid-column:2;text-align:left;overflow-wrap:anywhere;
+ }
+ .teacherSimple .teacherDetails>summary{
+  align-items:center;gap:10px;min-height:66px;padding:14px;
+ }
+ .teacherSimple .teacherDetails summary>div{flex:1;min-width:0}
+ .teacherSimple .teacherDetails summary i{flex:0 0 30px}
+ .teacherSimple .teacherDetails>summary :is(b,span){line-height:1.4;overflow-wrap:anywhere}
+ .teacherSimple .teacherDetailsBody{padding:14px}
+ .teacherSimple .directorButtons.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .teacherSimple .directorButtons.compact button{
+  min-width:0;min-height:64px;padding:12px;overflow-wrap:anywhere;
+ }
+ .teacherSimple .eventComposer :is(input,textarea,button){width:100%;min-height:44px}
+ .teacherSimple .metricEditor label{
+  grid-template-columns:minmax(0,1fr) 84px auto;
+  gap:8px;min-width:0;
+ }
+ .teacherSimple .metricEditor label span{min-width:0;overflow-wrap:anywhere}
+ .teacherSimple .evaluationRows .studentIdentity{min-width:0}
+ .teacherSimple .evaluationRows input{width:100%;max-width:100%;min-height:44px}
+ .teacherSimple .gameReadinessMatrix{padding:14px 12px}
+ .teacherSimple .gameReadinessMatrix>header{flex-direction:column;gap:12px}
+ .teacherSimple .gameReadinessCounters{justify-content:flex-start;gap:6px}
+ .teacherSimple .gameReadinessGrid{grid-template-columns:minmax(0,1fr);gap:9px}
+ .teacherSimple .gameReadinessGrid article{
+  grid-template-columns:35px minmax(0,1fr) 24px;gap:8px;padding:12px;
+ }
+ .teacherSimple .gameReadinessGrid article>div:nth-child(2)>:is(small,b){
+  white-space:normal;overflow:visible;overflow-wrap:anywhere;
+ }
+ .teacherSimple .impactEngineFlow{flex-wrap:wrap;max-width:100%}
+ .teacherSimple .impactRuleCard>header{flex-wrap:wrap}
+ .teacherSimple .impactRuleEffects label{
+  grid-template-columns:minmax(0,1fr) minmax(64px,85px) auto;
+  min-width:0;gap:7px;
+ }
+ .teacherSimple .impactRuleEffects label span{min-width:0;overflow-wrap:anywhere}
+ .teacherSimple .impactLedger article{min-width:0;overflow-wrap:anywhere}
+ .teacherSimple .impactRuleCard footer{flex-wrap:wrap;gap:10px}
+ .teacherSimple .impactRuleCard footer button{min-height:44px}
+}
+@media (max-width:390px){
+ .mobileDock>button{flex-basis:96px;width:96px;max-width:96px;min-width:96px}
+ .teacherSimple .teacherPlayerStatsRow{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .teacherSimple .teacherPulse{grid-template-columns:minmax(0,1fr)}
+ .teacherSimple .teacherPulse .pulseCard:nth-child(3){grid-column:auto}
+ .teacherSimple .directorButtons.compact{grid-template-columns:minmax(0,1fr)}
+ .teacherSimple .metricEditor label{
+  grid-template-columns:minmax(0,1fr) minmax(74px,88px);
+ }
+ .teacherSimple .metricEditor em{grid-column:2;text-align:right}
+ .teacherSimple .teacherFocus{padding-left:36px}
+}
+@media (prefers-reduced-motion:reduce){
+ .mobileDock{scroll-behavior:auto}
+}
