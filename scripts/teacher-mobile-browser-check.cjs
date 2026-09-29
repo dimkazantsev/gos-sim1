@@ -36,9 +36,9 @@ async function main(){
     });
     const chatGeometry=await frame.locator('.gsChatV2').evaluate(el=>{
      const a=el.getBoundingClientRect(),b=document.querySelector('.mobileDockV2').getBoundingClientRect();
-     return {chat:{top:a.top,bottom:a.bottom},dock:{top:b.top,bottom:b.bottom}};
+     return {chat:{top:a.top,bottom:a.bottom},dock:{top:b.top,bottom:b.bottom},headerBottom:document.querySelector('.simTop').getBoundingClientRect().bottom};
     });
-    assert(chatGeometry.chat.top>=-2&&chatGeometry.chat.top<12,'Chat must start at viewport top: '+JSON.stringify(chatGeometry));
+    assert(chatGeometry.chat.top>=chatGeometry.headerBottom-2&&chatGeometry.chat.top<=chatGeometry.headerBottom+30,'Chat must remain below the header without overlapping it: '+JSON.stringify(chatGeometry));
     assert(chatGeometry.chat.bottom<=chatGeometry.dock.top+3&&chatGeometry.chat.bottom>=chatGeometry.dock.top-8,'Chat must end above dock: '+JSON.stringify(chatGeometry));
    }
    await page.locator('#screen').selectOption('teacher-stages');
