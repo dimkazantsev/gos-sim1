@@ -2344,3 +2344,185 @@
  .simChat.gsChatV2 .chatEntry + .chatEntry{margin-top:8px}
  .simChat.gsChatV2 .chatBubble{padding:10px 12px}
 }
+
+
+/* Telegram-inspired compact voice messages.
+   Explicit widths avoid native controls collapsing into vertical ellipsis. */
+.simChat.gsChatV2 .chatBubble:has(.chatVoicePlayer){
+  box-sizing:border-box;
+  width:min(270px,100%);
+  min-width:0;
+  max-width:100%;
+  padding:8px 10px;
+}
+.simChat.gsChatV2 .chatMessageColumn:has(.chatVoicePlayer){
+  flex:1 1 245px;
+  width:min(270px,100%);
+  min-width:0;
+  max-width:min(270px,calc(100% - 42px));
+}
+.simChat.gsChatV2 .chatMsg.mine .chatMessageColumn:has(.chatVoicePlayer){
+  flex:0 1 245px;
+  max-width:min(270px,calc(100% - 38px));
+}
+.simChat.gsChatV2 .chatMsg.theirs .chatMessageColumn:has(.chatVoicePlayer){
+  max-width:min(270px,calc(100% - 65px));
+}
+.simChat.gsChatV2 .chatPinnedMedia:has(.chatVoicePlayer){
+  display:block;
+  width:100%;
+}
+.gsChatV2 .chatVoicePlayer{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:9px;
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  min-height:52px;
+  padding:0;
+  background:transparent;
+  color:#355aab;
+}
+.gsChatV2 .chatVoicePlay{
+  display:grid;
+  place-items:center;
+  flex:0 0 38px;
+  width:38px;
+  min-width:38px;
+  height:38px;
+  min-height:38px;
+  margin:0;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:#416bde;
+  color:#fff;
+  cursor:pointer;
+}
+.gsChatV2 .chatVoicePlay svg{
+  display:block;
+  width:18px;
+  height:18px;
+  stroke-width:2;
+}
+.gsChatV2 .chatVoiceTrack{
+  position:relative;
+  display:grid;
+  align-content:center;
+  flex:1 1 auto;
+  gap:4px;
+  min-width:0;
+  margin:0;
+}
+.gsChatV2 .chatVoiceWave{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:2px;
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  height:23px;
+  overflow:hidden;
+  pointer-events:none;
+}
+.gsChatV2 .chatVoiceWave>span{
+  display:block;
+  flex:1 1 2px;
+  min-width:1px;
+  max-width:3px;
+  border-radius:4px;
+  background:#aec3ef;
+}
+.gsChatV2 .chatVoiceWave>span.played{background:#496bc4}
+.gsChatV2 .chatVoiceSeek{
+  position:absolute;
+  z-index:1;
+  top:0;
+  left:0;
+  display:block;
+  width:100%;
+  height:23px;
+  margin:0;
+  padding:0;
+  opacity:0;
+  cursor:pointer;
+}
+.gsChatV2 .chatVoiceSeek:disabled{cursor:default}
+.gsChatV2 .chatVoiceSeek:focus-visible{
+  opacity:.25;
+  outline:2px solid #375ec5;
+  outline-offset:2px;
+}
+.gsChatV2 .chatVoiceMeta{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+  min-height:17px;
+  line-height:1.2;
+  color:#6a7b9e;
+}
+.gsChatV2 .chatVoiceMeta time{
+  flex:0 0 auto;
+  font-size:12px;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.gsChatV2 .chatVoiceBuffering,.gsChatV2 .chatVoiceError{
+  flex:1 1 auto;
+  min-width:0;
+  font-size:12px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.gsChatV2 .chatVoiceError{color:#ac4157}
+.gsChatV2 .chatVoiceDownload{
+  display:grid;
+  place-items:center;
+  flex:0 0 20px;
+  width:20px;
+  height:20px;
+  margin:0 0 0 auto;
+  border-radius:6px;
+  color:#607cae;
+}
+.gsChatV2 .chatVoiceSpeed{
+  display:grid;
+  place-items:center;
+  flex:0 0 35px;
+  width:35px;
+  min-width:35px;
+  height:29px;
+  margin:0;
+  padding:0;
+  border:1px solid #d6e1f9;
+  border-radius:10px;
+  background:#f6f9ff;
+  color:#4964a5;
+  font-size:11px;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+  cursor:pointer;
+}
+.gsChatV2 .chatVoicePlay:hover{background:#2e55b9}
+.gsChatV2 .chatVoiceSpeed:hover{background:#e5edff}
+.gsChatV2 :is(.chatVoicePlay,.chatVoiceSpeed,.chatVoiceDownload):focus-visible{
+  outline:3px solid #8aabeb;
+  outline-offset:2px;
+}
+.gsChatV2 .chatPinnedMedia .chatVoicePlayer{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+@media(max-width:430px){
+  .simChat.gsChatV2 .chatBubble:has(.chatVoicePlayer){padding:8px}
+  .gsChatV2 .chatVoicePlayer{gap:6px}
+  .gsChatV2 .chatVoicePlay{flex-basis:36px;width:36px;min-width:36px;height:36px;min-height:36px}
+  .gsChatV2 .chatVoiceSpeed{flex-basis:32px;width:32px;min-width:32px}
+  .gsChatV2 .chatVoiceWave{gap:1px}
+}
