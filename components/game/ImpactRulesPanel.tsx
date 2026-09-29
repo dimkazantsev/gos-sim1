@@ -236,3 +236,4 @@ export default function ImpactRulesPanel({g}:{g:ReturnTypeRepublic}){
    {filteredHistory.length>50&&<p className="impactListCount">Показаны последние 50 из {filteredHistory.length} записей.</p>}
   </div>
  </section>;
+}
