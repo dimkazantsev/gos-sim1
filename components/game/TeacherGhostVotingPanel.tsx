@@ -21,8 +21,20 @@ export default function TeacherGhostVotingPanel({g}:{g:ReturnTypeRepublic}){
  function distribute(){
   const n=Number(uniform);
   if(!Number.isInteger(n)||n<0||n>50){setNotice('Укажите целое число от 0 до 50.');return}
-  setLosses(prev=>({...prev,...Object.fromEntries(target.map(p=>[p.id,n]))}));
-  setNotice('');
+  if(scope==='all'){
+   const next=Object.fromEntries(parties.map(p=>[p.id,0])) as Record<string,number>;
+   for(let i=0;i<n;i++){
+    const available=parties.filter(p=>next[p.id]<50);
+    const seed=new Uint32Array(1);crypto.getRandomValues(seed);
+    const party=available[seed[0]%available.length];if(!party)break;
+    next[party.id]++;
+   }
+   setLosses(prev=>({...prev,...next}));
+   setNotice('Общая сумма '+n+' случайно распределена между '+parties.length+' партиями. Сохраните распределение.');
+  }else{
+   setLosses(prev=>({...prev,...Object.fromEntries(target.map(p=>[p.id,n]))}));
+   setNotice('Для выбранной партии установлена потеря '+n+'. Сохраните распределение.');
+  }
  }
  async function save(){
   if(!teacher||busy)return;
@@ -42,13 +54,13 @@ export default function TeacherGhostVotingPanel({g}:{g:ReturnTypeRepublic}){
  }
  if(!teacher)return null;
  return <section className="teacherGhostPanel" aria-label="Настройка Ghost Voting">
-  <header><div><small>НАСТРОЙКА СЦЕНАРИЯ</small><h2>Ghost Voting · распределение потерь</h2><p>Настройте отдельно каждую фракцию или назначьте одинаковое число всем. Ограничение — не более 50 мандатов и не более размера фракции.</p></div><ShieldAlert size={24} aria-hidden="true"/></header>
+  <header><div><small>НАСТРОЙКА СЦЕНАРИЯ</small><h2>Ghost Voting · распределение потерь</h2><p>Настройте отдельно каждую фракцию или назначьте одинаковое число всем. Сумма для всех партий распределяется случайно; для одной партии назначается выбранное значение. Не более 50 для каждой.</p></div><ShieldAlert size={24} aria-hidden="true"/></header>
   <div className="ghostBulk">
    <StyledSelect label="Применить к" value={scope} onChange={v=>setScope(v as typeof scope)}
     options={[{value:'selected',label:'Одной партии'},{value:'all',label:'Всем партиям'}]}/>
    {scope==='selected'&&<StyledSelect label="Партия" value={chosen} onChange={setChosen}
      options={parties.map(p=>({value:p.id,label:p.name}))}/>}
-   <label>Плановая потеря мандатов<input type="number" min="0" max="50" step="1" value={uniform} onChange={e=>setUniform(e.target.value)}/></label>
+   <label>{scope==='all'?'Общая сумма потерь':'Потеря выбранной партии'}<input type="number" min="0" max="50" step="1" value={uniform} onChange={e=>setUniform(e.target.value)}/></label>
    <button type="button" onClick={distribute} disabled={!target.length}>Распределить</button>
   </div>
   <p className="ghostScenarioExplanation">Распределить — заполнить значения ниже, «Сохранить распределение» — записать их в игру. Если партия пока имеет 0 мандатов, потери сохранятся как план и начнут действовать после распределения мандатов. Текущие и последующие депутатские голосования учитывают уменьшенный вес.</p>
