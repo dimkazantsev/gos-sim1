@@ -14,7 +14,8 @@
     "design:check": "node scripts/design-audit.mjs",
     "design:preview": "node scripts/design-preview.cjs",
     "design:browser": "node scripts/metric-modal-browser-check.cjs",
-    "design:mobile": "node scripts/teacher-mobile-browser-check.cjs"
+    "design:mobile": "node scripts/teacher-mobile-browser-check.cjs",
+    "design:impact": "node scripts/impact-browser-check.cjs"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",
