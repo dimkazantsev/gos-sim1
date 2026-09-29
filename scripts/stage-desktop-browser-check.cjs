@@ -54,6 +54,10 @@ async function main(){
      })
     };
    });
+   const resets=await frame.locator('.stageAtlasResetStage').count();
+   const bulk=await frame.locator('.stageAtlasResetAll').count();
+   assert.equal(resets,16,'Teacher must have exactly one reset icon per stage');
+   assert.equal(bulk,1,'Teacher must have a single all-stages reset control');
    assert.equal(result.cards.length,16,'Exactly sixteen cards should render');
    assert(result.scrollWidth<=result.viewport+2,
     'Stage layout overflows iframe viewport at '+width+'px: '+JSON.stringify(result));
