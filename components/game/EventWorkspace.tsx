@@ -24,7 +24,7 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
  async function reload(){
   if(!game||!me)return;
   const [a,b,c]=await Promise.all([
-   supabase.from('event_cases').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).limit(200),
+   supabase.from('event_cases').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).limit(600),
    supabase.from('event_assignments').select('*').eq('game_id',game.id),
    supabase.from('event_decisions').select('*').eq('game_id',game.id)
   ]);
