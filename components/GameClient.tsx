@@ -19,6 +19,7 @@ import GradesView from './game/GradesView';
 import TeacherView from './game/TeacherView';
 import ProfileView from './game/ProfileView';
 import ChatPanel from './game/ChatPanel';
+import MobileDock from './game/MobileDock';
 
 const GENERIC_STUDENT='__generic_student_preview__';
 type ScreenLocation={view:View;stageNo:number;documentId:string};
@@ -175,7 +176,7 @@ export default function GameClient({gameId}:{gameId:string}){
  const [viewAsOpen,setViewAsOpen]=useState(false);
  const viewAsRef=useRef<HTMLDivElement>(null);
  const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
- const mobileDockRef=useRef<HTMLElement>(null);
+ const [mobileDockEditing,setMobileDockEditing]=useState(false);
  const [crisisExpanded,setCrisisExpanded]=useState(false);
  const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
@@ -266,17 +267,7 @@ export default function GameClient({gameId}:{gameId:string}){
   const visible=vg.channels;
   if(visible.length&&!visible.some(c=>c.id===g.channelId))g.setChannelId(visible[0].id);
  },[previewStudent?.user_id]);
- useEffect(()=>{
-  const dock=mobileDockRef.current;
-  if(!dock||!window.matchMedia('(max-width:900px)').matches)return;
-  const active=dock.querySelector<HTMLButtonElement>('button[aria-current="page"]');
-  if(!active)return;
-  const left=active.offsetLeft-dock.offsetLeft;
-  const right=left+active.offsetWidth;
-  if(left<dock.scrollLeft||right>dock.scrollLeft+dock.clientWidth){
-   dock.scrollTo({left:Math.max(0,left-(dock.clientWidth-active.offsetWidth)/2),behavior:'smooth'});
-  }
- },[view]);
+
 
  if(loading||!game||!me||!shownMe)return <main className="connectionPage"><section className="connectionCard" aria-live="polite"><span className="wordmark">GOS//SIMS</span>{!error&&<div className="spinner"/>}<h1>{error?'Не удалось открыть игру':'Подключаемся к республике'}</h1><p>{error||'Загружаем этапы, команды и последние решения.'}</p>{error&&<div><button className="primary" onClick={()=>window.location.reload()}>Попробовать снова</button><a className="secondary" href="/">Вернуться ко входу</a></div>}</section></main>;
 
@@ -288,6 +279,7 @@ export default function GameClient({gameId}:{gameId:string}){
  };
  const mobilePrimary:View[]=teacher&&!previewMode?['teacher','dashboard','stages','votes']:['dashboard','stages','parties','votes'];
  const mobileSecondary=nav.filter(([k])=>!mobilePrimary.includes(k));
+ const dockItems=[...mobilePrimary,...mobileSecondary.map(([k])=>k)].map(key=>({key,label:nav.find(([k])=>k===key)![1],icon:navIcon(key)}));
 
  return <div className={'simShell '+(previewMode?'studentPreviewShell':'')}>
   <a className="skipLink" href="#game-main">Перейти к содержимому</a>
@@ -382,14 +374,9 @@ export default function GameClient({gameId}:{gameId:string}){
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
    <section ref={mobileDialogRef} tabIndex={-1} className="mobileMoreSheet" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
     <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><IconAction onClick={()=>setMobileMenuOpen(false)} label="Закрыть меню"/></header>
-    <div>{mobileSecondary.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>navigate(k)}>{navIcon(k)}<span>{label}</span></button>)}</div>
+    <div className="mobileAllGrid">{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} onClick={()=>navigate(k)}>{navIcon(k)}<span>{label}</span></button>)}</div>
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
-  <nav ref={mobileDockRef} className="mobileDock" aria-label="Мобильная навигация: листайте горизонтально">
-   {mobilePrimary.map(k=>{const item=nav.find(([x])=>x===k);if(!item)return null;return <button key={k} className={view===k?'active':''} onClick={()=>navigate(k)} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{item[1]}</span></button>})}
-   {mobileSecondary.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>navigate(k)} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{label}</span></button>)}
-   <button onClick={()=>setMobileMenuOpen(true)} aria-expanded={mobileMenuOpen} aria-haspopup="dialog"><Menu/><span>Все разделы</span></button>
-  </nav>
- </div>;
+  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>navigate(k)} onAll={()=>setMobileMenuOpen(true)}/></div>;
 }
