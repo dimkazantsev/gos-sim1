@@ -2,7 +2,7 @@
  * A recording is never discarded when either Storage or message insertion fails.
  * Retrying after a successful upload reuses the same object and message UUID. */
 export type MediaKind='file'|'audio'|'video';
-export type MediaUploadPhase='idle'|'uploading'|'saving';
+export type MediaUploadPhase='idle'|'analyzing'|'uploading'|'saving';
 export type PendingMediaUpload={path:string;messageId:string};
 export type MediaRecord={
  id:string;game_id:string;channel_id:string;author_id:string;
