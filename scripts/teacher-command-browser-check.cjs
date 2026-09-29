@@ -99,6 +99,47 @@ async function check(){
   await page.locator('#screen').selectOption('profile');
   assert.equal(await frame.locator('.profileJournalAccess button').count(),1,
    'Profile needs a private journal toggle');
+  // Regression for all newly added public-profile, signature and events controls.
+  assert.equal(await frame.locator('.profileCameraButton').count(),1,'Profile photo requires a round camera control');
+  assert.equal(await frame.locator('.profileComicButton').count(),1,'Profile needs a working comic trigger');
+  assert.equal(await frame.locator('.profileSignature').count(),1,'Profile must expose the signature uploader');
+  assert.equal(await frame.locator('.profileSecurity').count(),1,'Profile must expose the password panel');
+  for(const [screen,selector] of [['profile','.profilePage'],['teacher-event','.eventWorkspace'],['chat-video-preview','.chatVideoNote']]){
+   await page.locator('#screen').selectOption(screen);
+   await frame.locator(selector).first().waitFor();
+   for(const width of [1440,1024,768,390,360,320]){
+    await page.locator('#preview').evaluate((el,w)=>{el.style.width=w+'px'},width);
+    await frame.locator(selector).first().evaluate(el=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    const geometry=await frame.locator(selector).first().evaluate(el=>{
+     const rect=el.getBoundingClientRect();return {
+      viewport:document.documentElement.clientWidth,
+      scroll:document.documentElement.scrollWidth,
+      left:rect.left,right:rect.right,
+      height:rect.height
+     };
+    });
+    assert(geometry.scroll<=geometry.viewport+3,screen+' global overflow at '+width+'px: '+JSON.stringify(geometry));
+    assert(geometry.left>=-3&&geometry.right<=geometry.viewport+3,screen+' escapes page at '+width+'px: '+JSON.stringify(geometry));
+    if(screen==='chat-video-preview'){
+     const video=await frame.locator('.chatVideoNote').first().evaluate(el=>{
+      const r=el.getBoundingClientRect(),b=el.querySelector('.chatVideoPlay').getBoundingClientRect();
+      return {width:r.width,height:r.height,centerX:r.x+r.width/2,centerY:r.y+r.height/2,
+       playX:b.x+b.width/2,playY:b.y+b.height/2};
+     });
+     assert(video.width<=103&&video.height<=103,'Round video should not exceed 100px: '+JSON.stringify(video));
+     assert(Math.abs(video.centerX-video.playX)<=2&&Math.abs(video.centerY-video.playY)<=2,'Video play must be centered: '+JSON.stringify(video));
+    }
+    if(screen==='teacher-event'){
+     assert.equal(await frame.locator('.eventDecisionOverview article').count(),5,'Events overview must expose assigned/solved/yes/no/trust KPIs');
+     assert.equal(await frame.locator('.autoEventPanel .autoEventButtons button').count(),3,'Event autopilot must have start, pause and check controls');
+     assert.equal(await frame.locator('.autoEventSettings .styledSelect').count(),5,'Event autopilot needs all five adjustable parameters');
+    }
+    if(width===390&&screen!=='chat-video-preview')await frame.locator(selector).first().screenshot({
+     path:path.join(screenshots,'new-'+screen+'-390.png'),animations:'disabled'
+    });
+    console.log('PASS '+screen+' '+width+'px: layout, controls'+(screen==='chat-video-preview'?', circular video and centered play':''));
+   }
+  }
  }finally{await browser.close()}
 }
 check().catch(error=>{console.error(error);process.exitCode=1});
