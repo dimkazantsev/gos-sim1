@@ -15,6 +15,7 @@ import './teacher-extended.css';
 import './teacher-master-detail.css';
 import './teacher-final-interactions.css';
 import './2026-cinema-events.css';
+import './2026-profile-comic.css';
 import type {Metadata} from 'next';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
