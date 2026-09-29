@@ -1,25 +1,23 @@
 'use client';
 import {useMemo,useState} from 'react';
-import {Activity,ArrowRight,BarChart3,GraduationCap,Network,Pause,Play,Radio,UsersRound,Wrench} from 'lucide-react';
+import {Activity,ArrowRight,BarChart3,BookOpenText,GraduationCap,Network,Pause,Play,Radio,UsersRound,Wrench} from 'lucide-react';
+import ClassroomJournal from './ClassroomJournal';
+import ParticipantsAnalytics from './ParticipantsAnalytics';
 import TeacherStageManager from './TeacherStageManager';
 import type {ReturnTypeRepublic} from './viewTypes';
 import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
-import StageReadinessPanel from './StageReadinessPanel';
-import GameReadinessMatrix from './GameReadinessMatrix';
-
-const VIEW_NAMES:Record<string,string>={
- dashboard:'Обзор игры',stages:'Этапы',parties:'Партии',votes:'Голосования',documents:'НПА',actions:'Политические процессы',grades:'Оценки',profile:'Профиль',teacher:'Управление',chat:'Связь'
-};
 
 function timerText(seconds:number){
  const m=Math.floor(seconds/60),s=seconds%60;
  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-type Workspace='overview'|'analytics'|'grades'|'impact'|'parties'|'tools';
+type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools';
 const WORKSPACES=[
  {key:'overview',title:'Обзор',icon:Activity},
+ {key:'stages',title:'Этапы',icon:BookOpenText},
+ {key:'journal',title:'Журнал',icon:UsersRound},
  {key:'analytics',title:'Аналитика',icon:BarChart3},
  {key:'grades',title:'Оценки',icon:GraduationCap},
  {key:'impact',title:'Модель последствий',icon:Network},
@@ -34,16 +32,11 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTy
 
  const studentIds=useMemo(()=>new Set(members.filter(m=>m.kind!=='teacher').map(m=>m.user_id)),[members]);
  const studentActivities=useMemo(()=>activities.filter(a=>studentIds.has(a.actor_id)),[activities,studentIds]);
- const studentRows=useMemo(()=>members.filter(m=>m.kind!=='teacher').map(m=>{
-  const p=presence.find(x=>x.user_id===m.user_id);
-  const last=studentActivities.find(x=>x.actor_id===m.user_id);
-  const online=!!p&&(Date.now()-new Date(p.last_seen_at).getTime()<90000);
-  return {m,p,last,online};
- }).sort((a,b)=>Number(b.online)-Number(a.online)||new Date(b.p?.last_seen_at||0).getTime()-new Date(a.p?.last_seen_at||0).getTime()),[members,presence,studentActivities]);
+
 
  if(!game)return null;
  const pending=actions.filter(a=>a.status==='submitted');
- const onlineCount=studentRows.filter(x=>x.online).length;
+ const onlineCount=members.filter(m=>m.kind==='student'&&presence.some(p=>p.user_id===m.user_id&&Date.now()-new Date(p.last_seen_at).getTime()<90000)).length;
 
  async function publish(){if(await publishEvent(eventTitle,eventBody)){setEventTitle('');setEventBody('')}}
  function confirmNext(){if(window.confirm('Перейти к следующему этапу? Проверьте индикатор процедурной готовности выше: переход остаётся ручным и может быть выполнен даже при незавершённых процедурах.'))void nextStage()}
@@ -58,7 +51,30 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTy
  }
 
  return <div className="teacherSimple teacherCommand">
-  <section className="teacherCommandBar" aria-label="Быстрое управление игрой">
+  <section className="teacherWorkspace" aria-label="Рабочие разделы управления">
+   <div className="teacherWorkspaceNav" role="tablist" aria-label="Рабочие разделы преподавателя">
+    {WORKSPACES.map(item=>{
+     const Icon=item.icon;
+     return <button key={item.key} type="button" role="tab" id={'teacher-tab-'+item.key}
+      aria-controls="teacher-workspace-panel" aria-selected={workspace===item.key} tabIndex={workspace===item.key?0:-1}
+      className={workspace===item.key?'active':''} onClick={()=>setWorkspace(item.key)}
+      onKeyDown={event=>{
+       if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+       event.preventDefault();
+       const index=WORKSPACES.findIndex(entry=>entry.key===item.key);
+       const nextIndex=event.key==='Home'?0:event.key==='End'?WORKSPACES.length-1:
+        (index+(event.key==='ArrowRight'?1:-1)+WORKSPACES.length)%WORKSPACES.length;
+       const next=WORKSPACES[nextIndex];setWorkspace(next.key);
+       document.getElementById('teacher-tab-'+next.key)?.focus();
+      }}>
+      <Icon size={18} strokeWidth={1.9} aria-hidden="true"/><span>{item.title}</span>
+      {item.key==='overview'&&pending.length>0&&<em>{pending.length}</em>}
+     </button>
+    })}
+   </div>
+   <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
+    {workspace==='overview'&&<>
+       <section className="teacherCommandBar" aria-label="Быстрое управление игрой">
    <div className="teacherCommandStage">
     <span className="teacherEyebrow">ПУЛЬТ ПРЕПОДАВАТЕЛЯ</span>
     <div className="teacherCommandStageLine">
@@ -87,65 +103,16 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTy
    </div>
   </section>
 
-  <TeacherStageManager g={g} onOpenStage={onOpenStages}/>
 
-  <section className="teacherPulse">
-   <article className="pulseCard"><small>В ИГРЕ СЕЙЧАС</small><strong>{onlineCount}</strong><span>из {studentRows.length} студентов онлайн</span></article>
-   <article className="pulseCard"><small>ЖДУТ РЕШЕНИЯ</small><strong>{pending.length}</strong><span>{pending.length?'нужно рассмотреть':'очередь пуста'}</span></article>
-   <article className="pulseCard"><small>АКТИВНОСТЬ</small><strong>{studentActivities.length}</strong><span>действий за сессию</span></article>
-  </section>
+     <div className="teacherOverviewQuick">
+      <button type="button" onClick={()=>setWorkspace('stages')}>Управление этапами <ArrowRight size={16} aria-hidden="true"/></button>
+      <button type="button" onClick={()=>setWorkspace('journal')}>Журнал аудитории <ArrowRight size={16} aria-hidden="true"/></button>
+     </div>
 
-  <section className="teacherWorkspace" aria-label="Рабочие разделы управления">
-   <div className="teacherWorkspaceNav" role="tablist" aria-label="Рабочие разделы преподавателя">
-    {WORKSPACES.map(item=>{
-     const Icon=item.icon;
-     return <button key={item.key} type="button" role="tab" id={'teacher-tab-'+item.key}
-      aria-controls="teacher-workspace-panel" aria-selected={workspace===item.key} tabIndex={workspace===item.key?0:-1}
-      className={workspace===item.key?'active':''} onClick={()=>setWorkspace(item.key)}
-      onKeyDown={event=>{
-       if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
-       event.preventDefault();
-       const index=WORKSPACES.findIndex(entry=>entry.key===item.key);
-       const nextIndex=event.key==='Home'?0:event.key==='End'?WORKSPACES.length-1:
-        (index+(event.key==='ArrowRight'?1:-1)+WORKSPACES.length)%WORKSPACES.length;
-       const next=WORKSPACES[nextIndex];setWorkspace(next.key);
-       document.getElementById('teacher-tab-'+next.key)?.focus();
-      }}>
-      <Icon size={18} strokeWidth={1.9} aria-hidden="true"/><span>{item.title}</span>
-      {item.key==='overview'&&pending.length>0&&<em>{pending.length}</em>}
-     </button>
-    })}
-   </div>
-   <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
-    {workspace==='overview'&&<>
-     {currentStage&&<StageReadinessPanel g={g} stageNo={currentStage.stage_no} compact/>}
-     <GameReadinessMatrix g={g}/>
-
-  <section className="teacherSimpleGrid">
-   <article className="surface">
-    <div className="surfaceHead"><div><small>СТУДЕНТЫ</small><h2>Кто что делает</h2></div><span>{onlineCount} онлайн</span></div>
-    <div className="studentLiveList">
-     {studentRows.length===0?<div className="emptyState">Студенты ещё не подключились.</div>:studentRows.map(({m,p,last,online})=><div className="studentLiveRow simple" key={m.user_id}>
-      <span className={online?'onlineDot':'offlineDot'}/>
-      <div className="studentLiveIdentity"><b>{m.full_name}</b><small>{m.team||m.group_name||'Без команды'} · {m.role_title||'роль не назначена'}</small></div>
-      <div className="studentNow"><label>Сейчас</label><b>{p?VIEW_NAMES[p.current_view]||p.current_view:'Нет данных'}</b></div>
-      <div className="studentLast"><label>Последнее действие</label><b>{last?.label||'—'}</b><small>{last?new Date(last.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}):''}</small></div>
-     </div>)}
-    </div>
-   </article>
-
-   <article className="surface">
-    <div className="surfaceHead"><div><small>ЛЕНТА</small><h2>Последние действия</h2></div></div>
-    <div className="activityFeed simple">
-     {studentActivities.length===0?<div className="emptyState">Здесь появятся действия студентов.</div>:studentActivities.slice(0,25).map(a=><div className="activityRow" key={a.id}>
-      <time>{new Date(a.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</time>
-      <span className="activityAvatar">{(names[a.actor_id]||'?').split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</span>
-      <div><b>{names[a.actor_id]||'Участник'}</b><p>{a.label}</p></div>
-     </div>)}
-    </div>
-   </article>
-  </section>
     </>}
+
+    {workspace==='stages'&&<TeacherStageManager g={g} onOpenStage={onOpenStages}/>}
+    {workspace==='journal'&&<ClassroomJournal g={g}/>}
 
     {workspace==='analytics'&&<section className="teacherAnalytics surface">
    <div className="surfaceHead"><div><small>АНАЛИТИКА ИГРЫ</small><h2>Общая статистика и вклад участников</h2></div><span>{members.filter(m=>m.kind==='student').length} студентов</span></div>
@@ -156,23 +123,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTy
     <div><small>ГОЛОСОВАНИЯ</small><strong>{votes.length}</strong><span>{votes.filter(v=>v.status==='open').length} открыто</span></div>
     <div><small>ИЗМЕНЕНИЯ KPI</small><strong>{metricHistory.filter(h=>h.source_type!=='baseline').length}</strong><span>зафиксированных изменений</span></div>
    </div>
-   <div className="teacherPlayerStats" role="region" aria-label="Статистика участников">
-    <div className="teacherPlayerStatsHead"><span>Участник</span><span>Посты</span><span>Решения</span><span>НПА</span><span>Голоса</span><span>Активность</span><span>ВСН</span></div>
-    {members.filter(m=>m.kind==='student').map(m=>{
-     const posts=politicalPosts.filter(p=>p.author_id===m.user_id);
-     const postIds=new Set(posts.map(p=>p.id));
-     const decisions=politicalDecisions.filter(d=>postIds.has(d.post_id));
-     const docs=formalDocuments.filter(d=>d.author_id===m.user_id);
-     const bs=ballots.filter(b=>b.voter_id===m.user_id);
-     const act=activities.filter(a=>a.actor_id===m.user_id);
-     const ev=evaluations.filter(e=>e.user_id===m.user_id);
-     const vsn=ev.length?ev.reduce((a,e)=>a+Number(e.score),0)/ev.length:0;
-     return <div key={m.user_id} className="teacherPlayerStatsRow">
-      <div><b>{m.full_name}</b><small>{m.team||m.group_name||'Без партии'} · {m.role_title||'роль не назначена'}</small></div>
-      <strong data-label="Посты">{posts.length}</strong><strong data-label="Решения">{decisions.length}</strong><strong data-label="НПА">{docs.length}</strong><strong data-label="Голоса">{bs.length}</strong><strong data-label="Активность">{act.length}</strong><strong data-label="ВСН">{ev.length?vsn.toFixed(1):'—'}</strong>
-     </div>
-    })}
-   </div>
+   <ParticipantsAnalytics g={g}/>
   </section>}
 
     {workspace==='grades'&&<GradesView g={g}/>}
