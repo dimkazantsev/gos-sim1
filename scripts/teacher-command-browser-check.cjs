@@ -115,7 +115,12 @@ async function check(){
       viewport:document.documentElement.clientWidth,
       scroll:document.documentElement.scrollWidth,
       left:rect.left,right:rect.right,
-      height:rect.height
+      height:rect.height,
+      offenders:Array.from(document.querySelectorAll('*')).filter(node=>{
+       const r=node.getBoundingClientRect(),style=getComputedStyle(node);
+       return style.position!=='fixed'&&r.width>1&&(r.right>document.documentElement.clientWidth+2||r.left<-2);
+      }).slice(0,12).map(node=>({tag:node.tagName,cls:String(node.className||'').slice(0,90),text:node.textContent?.trim().slice(0,38),
+       x:Math.round(node.getBoundingClientRect().x),right:Math.round(node.getBoundingClientRect().right)}))
      };
     });
     assert(geometry.scroll<=geometry.viewport+3,screen+' global overflow at '+width+'px: '+JSON.stringify(geometry));
