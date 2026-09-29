@@ -21,7 +21,7 @@ for(const [name,source] of Object.entries(css)){
  const unknown=[];root.walkDecls(d=>{for(const match of d.value.matchAll(/var\((--gs-[\w-]+)/g))if(!(match[1] in tokens))unknown.push(match[1])});
  check(`${name}: all design tokens resolve`,unknown.length===0);
 }
-for(const name of ['globals','landing','sim-shell','sim-panels','public-screen','stage-map','teacher-command','teacher-operations','teacher-ui-polish','teacher-extended']){const root=postcss.parse(read(`app/${name}.css`),{from:`app/${name}.css`});check(`${name}: inherited CSS parsed`,root.nodes.length>0);}
+for(const name of ['globals','landing','sim-shell','sim-panels','public-screen','stage-map','teacher-command','teacher-operations','teacher-ui-polish','teacher-extended','teacher-master-detail','teacher-final-interactions']){const root=postcss.parse(read(`app/${name}.css`),{from:`app/${name}.css`});check(`${name}: inherited CSS parsed`,root.nodes.length>0);}
 const teacherSource=read('components/game/TeacherView.tsx');
 const stageManager=read('components/game/TeacherStageManager.tsx');
 const teacherCss=read('app/teacher-command.css');
@@ -34,7 +34,7 @@ const layoutSource=read('app/layout.tsx');
 const previewSourceTeacher=read('scripts/design-preview.cjs');
 check('Operations stylesheet loaded after teacher command styles in production and preview',
  layoutSource.indexOf("import './teacher-operations.css';")>layoutSource.indexOf("import './teacher-command.css';")&&
- previewSourceTeacher.includes("'teacher-command','teacher-operations'"));
+ previewSourceTeacher.includes("'teacher-master-detail','teacher-final-interactions'"));
 check('Nine upper navigation workspaces include Event, stages, journal, analytics and grades',
  teacherSource.includes('const WORKSPACES=[')&&
  ["overview","stages","journal","analytics","grades","impact","parties","tools","event"].every(k=>teacherSource.includes("key:'"+k+"'"))&&
@@ -43,8 +43,8 @@ check('Nine upper navigation workspaces include Event, stages, journal, analytic
 check('Teacher stage matrix integrates readiness and safe reset actions',
  teacherSource.includes('<TeacherStageManager')&&
  stageManager.includes("supabase.rpc('get_game_readiness'")&&
- stageManager.includes('className="teacherStageExpand"')&&
- stageManager.includes('className="teacherStageReset"')&&
+ stageManager.includes('className="teacherStageListItem ')&&
+ stageManager.includes('className="teacherStageInspectorReset"')&&
  stageManager.includes('className="teacherResetAll"')&&
  stageManager.includes("confirmation.trim()==='СБРОСИТЬ'")&&
  stageManager.includes('role="alertdialog"'));
@@ -72,7 +72,7 @@ check('Teacher stage details remain linked to the source game routes',
 check('Static preview renders stage, analytics, grade and journal teacher workspaces',
  ['teacher-stages','teacher-journal','teacher-analytics','teacher-grades','teacher-event','teacher-parties','teacher-tools'].every(v=>previewSourceTeacher.includes("'"+v+"'")));
 check('New director mechanics and scoped editor styles exist',
- teacherSource.includes("<TeacherPartyDossiers g={g}/>")&&
+ teacherSource.includes("<TeacherPartyDossiers g={g} onOpenChat={onOpenChat}/>")&&
  teacherSource.includes("<TeacherGhostVotingPanel g={g}/>")&&
  teacherSource.includes("workspace==='event'&&<EventWorkspace")&&
  read('components/game/TeacherStageManager.tsx').includes("<StagePolicyEditor")&&
