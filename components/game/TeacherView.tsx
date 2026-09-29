@@ -70,8 +70,6 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTy
    </div>
   </section>
 
-  {currentStage&&<StageReadinessPanel g={g} stageNo={currentStage.stage_no} compact/>}
-
   <section className="teacherPrimaryActions">
    <button className={game.turn_open?'teacherAction dangerLite':'teacherAction primaryAction'} onClick={()=>setTurn(!game.turn_open)}>
     <span>{game.turn_open?<Pause size={20} strokeWidth={2} aria-hidden="true"/>:<Play size={20} strokeWidth={2} aria-hidden="true"/>}</span>
@@ -85,13 +83,13 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTy
    </button>
   </section>
 
+  <TeacherStageManager g={g} onOpenStage={onOpenStages}/>
+
   <section className="teacherPulse">
    <article className="pulseCard"><small>В ИГРЕ СЕЙЧАС</small><strong>{onlineCount}</strong><span>из {studentRows.length} студентов онлайн</span></article>
    <article className="pulseCard"><small>ЖДУТ РЕШЕНИЯ</small><strong>{pending.length}</strong><span>{pending.length?'нужно рассмотреть':'очередь пуста'}</span></article>
    <article className="pulseCard"><small>АКТИВНОСТЬ</small><strong>{studentActivities.length}</strong><span>действий за сессию</span></article>
   </section>
-
-  <TeacherStageManager g={g} onOpenStage={onOpenStages}/>
 
   <section className="teacherWorkspace" aria-label="Рабочие разделы управления">
    <div className="teacherWorkspaceNav" role="tablist" aria-label="Рабочие разделы преподавателя">
@@ -116,6 +114,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTy
    </div>
    <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
     {workspace==='overview'&&<>
+     {currentStage&&<StageReadinessPanel g={g} stageNo={currentStage.stage_no} compact/>}
      <GameReadinessMatrix g={g}/>
 
   <section className="teacherSimpleGrid">
