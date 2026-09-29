@@ -29,7 +29,7 @@ const WORKSPACES=[
  {key:'event',title:'Event',icon:BookOpenText}
 ] as const;
 
-export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview'}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace}){
+export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void}){
  const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
  const [eventTitle,setEventTitle]=useState(''),[eventBody,setEventBody]=useState('');
  const [workspace,setWorkspace]=useState<Workspace>(initialWorkspace);
@@ -40,6 +40,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
 
  if(!game)return null;
  const pending=actions.filter(a=>a.status==='submitted');
+ const firstPending=[...pending].sort((a,b)=>new Date(a.submitted_at).getTime()-new Date(b.submitted_at).getTime())[0];
  const onlineCount=members.filter(m=>m.kind==='student'&&presence.some(p=>p.user_id===m.user_id&&Date.now()-new Date(p.last_seen_at).getTime()<90000)).length;
 
  async function publish(){if(await publishEvent(eventTitle,eventBody)){setEventTitle('');setEventBody('')}}
@@ -112,13 +113,11 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
       <article><small>АКТИВНОСТЬ</small><strong>{studentActivities.length}</strong><span>событий в загруженной ленте</span></article>
       <article><small>ГОТОВНОСТЬ</small><strong>{g.stages.filter(s=>s.status==='completed').length}/{g.stages.length}</strong><span>этапов завершено</span></article>
      </div>
-     <div className="teacherOverviewQuick">
-      <button type="button" onClick={()=>setWorkspace('stages')}>Управление этапами <ArrowRight size={16} aria-hidden="true"/></button>
-      <button type="button" onClick={()=>setWorkspace('journal')}>Журнал аудитории <ArrowRight size={16} aria-hidden="true"/></button>
-      <button type="button" onClick={()=>setWorkspace('grades')}>Журнал оценок <ArrowRight size={16} aria-hidden="true"/></button>
-      <button type="button" onClick={()=>setWorkspace('analytics')}>Аналитика участников <ArrowRight size={16} aria-hidden="true"/></button>
+     <div className="teacherOverviewDecision">
+      <div><small>ПЕРВОЕ РЕШЕНИЕ В ОЧЕРЕДИ</small><h3>{firstPending?.title||'Очередь пуста'}</h3>
+       <p>{firstPending?'Ожидает рассмотрения с '+new Date(firstPending.submitted_at).toLocaleString('ru-RU'):'Новых решений для преподавателя нет.'}</p></div>
+      <button type="button" onClick={onOpenProcesses} disabled={!firstPending}>Перейти к первому решению <ArrowRight size={18}/></button>
      </div>
-
     </>}
 
     {workspace==='stages'&&<TeacherStageManager g={g} onOpenStage={onOpenStages}/>}
@@ -139,7 +138,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     {workspace==='grades'&&<GradesView g={g}/>}
     {workspace==='impact'&&<ImpactRulesPanel g={g}/>}
 
-    {workspace==='parties'&&<TeacherPartyDossiers g={g}/>}
+    {workspace==='parties'&&<TeacherPartyDossiers g={g} onOpenChat={onOpenChat}/>}
 
     {workspace==='tools'&&<>
     <details className="teacherDetails" open>
