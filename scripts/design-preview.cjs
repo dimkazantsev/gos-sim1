@@ -142,7 +142,7 @@ for(const [id,label,file] of defs){const Component=require('../components/game/'
 const TeacherViewPreview=require('../components/game/TeacherView').default;
 for(const [id,label,initialWorkspace] of [['teacher-stages','Управление · этапы','stages'],['teacher-journal','Управление · журнал','journal'],['teacher-analytics','Управление · аналитика','analytics'],['teacher-grades','Управление · оценки','grades']]){
  const content=renderToStaticMarkup(h(TeacherViewPreview,{g,onOpenStages:noop,onOpenProcesses:noop,initialWorkspace}));
- pages.push([id,label,base.replace(/(<main id="game-main"[^>]*>)[\\s\\S]*?(<\\/main>)/,(_,start,end)=>start+content+end)]);
+ pages.push([id,label,base.replace(/(<main id="game-main"[^>]*>)[\s\S]*?(<\/main>)/,(_,start,end)=>start+content+end)]);
 }
 let css=fs.readFileSync(path.join(root,'app/globals.css'),'utf8');css=css.replace(/@import '\.\/([^']+)' layer\(legacy\);/g,(_,file)=>'@layer legacy {\n'+fs.readFileSync(path.join(root,'app',file),'utf8')+'\n}');
 for(const file of ['design-tokens','design-shell','design-views','design-responsive','design-readability','teacher-mobile','impact-workbench','mobile-nav-polish','stage-map','teacher-command','teacher-operations'])css+='\n'+fs.readFileSync(path.join(root,'app',file+'.css'),'utf8');
