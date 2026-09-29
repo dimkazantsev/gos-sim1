@@ -11,9 +11,7 @@ export function voiceWaveformFromSamples(channels:Float32Array[],count=VOICE_BAR
   const stride=Math.max(1,Math.floor((end-start)/300));
   let square=0,n=0;
   for(let s=start;s<end;s+=stride){
-   let amplitude=0;
-   for(const channel of channels)amplitude+=(channel[s]||0)/channels.length;
-   square+=amplitude*amplitude;n++;
+   for(const channel of channels){const amplitude=channel[s]||0;square+=amplitude*amplitude;n++}
   }
   return Math.sqrt(square/Math.max(n,1));
  });
