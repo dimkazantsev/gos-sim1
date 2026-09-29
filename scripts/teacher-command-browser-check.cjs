@@ -68,7 +68,10 @@ async function check(){
   for(const [screen,selector] of [
    ['teacher-journal','.classroomJournal'],
    ['teacher-analytics','.participantsAnalytics'],
-   ['teacher-grades','.gradesToolbar']
+   ['teacher-grades','.gradesToolbar'],
+   ['teacher-event','.eventWorkspace'],
+   ['teacher-parties','.teacherPartyDossiers'],
+   ['teacher-tools','.teacherGhostPanel']
   ]){
    await page.locator('#screen').selectOption(screen);
    await frame.locator(selector).first().waitFor();
@@ -84,6 +87,16 @@ async function check(){
    if(screen==='teacher-grades'){
     assert((await frame.locator('.gradesToolbar select').count())>=2,'Grade sorting/filter controls missing');
     assert.equal(await frame.locator('.gradeTotalHead').count(),2,'Grade totals missing');
+   }
+   if(screen==='teacher-event'){
+    assert.equal(await frame.locator('.eventCatalogTargets>div').count(),4,'Event case budget must contain four targets');
+    assert.equal(await frame.locator('.eventEditorGrid select').count(),4,'Event must have category, seriousness, role and audience controls');
+   }
+   if(screen==='teacher-parties'){
+    assert.equal(await frame.locator('.teacherPartyDossierHead').count(),1,'Expanded party dossier heading missing');
+   }
+   if(screen==='teacher-tools'){
+    assert.equal(await frame.locator('.ghostBulk select').count(),2,'Ghost Voting must provide scope and party selection');
    }
    for(const width of [1440,390]){
     await page.locator('#preview').evaluate((el,w)=>{el.style.width=w+'px'},width);
