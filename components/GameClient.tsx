@@ -2,7 +2,7 @@
 import {IconAction} from './ui/IconAction';
 import ChatToggleButton from './game/ChatToggleButton';
 import {useEffect,useRef,useState} from 'react';
-import {BookOpenText,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote as VoteIcon,Wifi} from 'lucide-react';
+import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote as VoteIcon,Wifi} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
@@ -19,6 +19,8 @@ import GradesView from './game/GradesView';
 import TeacherView from './game/TeacherView';
 import ProfileView from './game/ProfileView';
 import ChatPanel from './game/ChatPanel';
+import EventWorkspace from './game/EventWorkspace';
+import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
 
 const GENERIC_STUDENT='__generic_student_preview__';
@@ -138,6 +140,9 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   applyPartyGhostLoss:blocked as typeof g.applyPartyGhostLoss,
   drawGhostVoting:blockedNull as typeof g.drawGhostVoting,
   clearPartyGhostLoss:blocked as typeof g.clearPartyGhostLoss,
+  applyGhostVotingBatch:blocked as typeof g.applyGhostVotingBatch,
+  deleteParty:blocked as typeof g.deleteParty,
+  configureStageDeadline:blocked as typeof g.configureStageDeadline,
   updateMember:blockedVoid as typeof g.updateMember,
   createVote:blocked as typeof g.createVote,
   castVote:blockedVoid as typeof g.castVote,
@@ -181,6 +186,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [crisisExpanded,setCrisisExpanded]=useState(false);
  const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
+ const [pendingEvents,setPendingEvents]=useState(0);
  useEffect(()=>{
   if(!viewAsOpen)return;
   function onPointerDown(event:PointerEvent){
@@ -233,6 +239,20 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  }
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
 
+ useEffect(()=>{
+  if(!game||!me||previewMode)return;
+  let live=true;
+  async function count(){
+   const r=await supabase.from('event_assignments').select('id',{count:'exact',head:true})
+    .eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending');
+   if(live&&!r.error)setPendingEvents(r.count||0);
+  }
+  void count();
+  const channel=supabase.channel('event-count:'+game.id+':'+me.user_id)
+   .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>void count()).subscribe();
+  return()=>{live=false;void supabase.removeChannel(channel)};
+ },[game?.id,me?.user_id,previewMode,view]);
+
  const genericStudent:Member|undefined=teacher&&game?{
   game_id:game.id,user_id:GENERIC_STUDENT,full_name:'Студент · предпросмотр',group_name:null,
   kind:'student',role_title:'Участник',team:null,score:0,joined_at:new Date(0).toISOString(),party_joined_at:null
@@ -256,7 +276,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
  useEffect(()=>{
   if(!me||previewMode)return;
-  const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политические процессы',grades:'Оценки',profile:'Мой профиль',teacher:'Управление'};
+  const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политические процессы',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Event · ситуации'};
   void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
   const id=setInterval(()=>void touchPresence(view),30000);
   return()=>clearInterval(id);
@@ -272,10 +292,10 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
  if(loading||!game||!me||!shownMe)return <main className="connectionPage"><section className="connectionCard" aria-live="polite"><span className="wordmark">GOS//SIMS</span>{!error&&<div className="spinner"/>}<h1>{error?'Не удалось открыть игру':'Подключаемся к республике'}</h1><p>{error||'Загружаем этапы, команды и последние решения.'}</p>{error&&<div><button className="primary" onClick={()=>window.location.reload()}>Попробовать снова</button><a className="secondary" href="/">Вернуться ко входу</a></div>}</section></main>;
 
- const nav:[View,string][]=[['dashboard','Обзор игры'],['stages','Этапы и задачи'],['actions','Политические процессы'],['parties',teacher&&!previewMode?'Партии':'Моя партия'],['votes','Голосования'],['documents','Реестр НПА'],['grades','Оценки и разбор'],...(teacher&&!previewMode?[['teacher','Управление'] as [View,string]]:[]),['profile','Мой профиль']];
+ const nav:[View,string][]=[['dashboard','Обзор игры'],['stages','Этапы и задачи'],['actions','Политические процессы'],['parties',teacher&&!previewMode?'Партии':'Моя партия'],['votes','Голосования'],['documents','Реестр НПА'],['grades','Оценки и разбор'],['events','Event · ситуации'],...(teacher&&!previewMode?[['teacher','Управление'] as [View,string]]:[]),['profile','Мой профиль']];
 
  const navIcon=(key:View)=>{
-  const P=key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='actions'?Radio:key==='parties'?Landmark:key==='votes'?VoteIcon:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:UserRound;
+  const P=key==='events'?CalendarDays:key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='actions'?Radio:key==='parties'?Landmark:key==='votes'?VoteIcon:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:UserRound;
   return <P aria-hidden="true" strokeWidth={1.9}/>;
  };
  const mobilePrimary:View[]=teacher&&!previewMode?['teacher','dashboard','stages','votes']:['dashboard','stages','parties','votes'];
@@ -298,7 +318,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
    <nav className="focusNav" aria-label="Разделы игры">
     <div className="focusNavInner">
-     {nav.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>navigate(k)} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{label}</span>{k==='votes'&&g.votes.some(v=>v.status==='open')&&<i className="navBadge">{g.votes.filter(v=>v.status==='open').length}</i>}</button>)}
+     {nav.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>navigate(k)} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{label}</span>{k==='events'&&pendingEvents>0&&<i className="navBadge">{pendingEvents}</i>}{k==='votes'&&g.votes.some(v=>v.status==='open')&&<i className="navBadge">{g.votes.filter(v=>v.status==='open').length}</i>}</button>)}
     </div>
    </nav>
 
@@ -365,6 +385,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {view==='grades'&&<GradesView g={vg}/>}
      {view==='actions'&&<PoliticalWallView g={vg} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
      {view==='profile'&&<ProfileView g={vg}/>}
+     {view==='events'&&<EventWorkspace g={vg} readOnly={previewMode}/>}
      {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>navigate('actions')} onOpenStages={stageNo=>navigate('stages',{stageNo})}/>}
     </main>
    </div>
