@@ -4,6 +4,9 @@ import {Activity,ArrowRight,BarChart3,BookOpenText,GraduationCap,Network,Pause,P
 import ClassroomJournal from './ClassroomJournal';
 import ParticipantsAnalytics from './ParticipantsAnalytics';
 import TeacherStageManager from './TeacherStageManager';
+import TeacherPartyDossiers from './TeacherPartyDossiers';
+import TeacherGhostVotingPanel from './TeacherGhostVotingPanel';
+import EventWorkspace from './EventWorkspace';
 import type {ReturnTypeRepublic} from './viewTypes';
 import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
@@ -13,7 +16,7 @@ function timerText(seconds:number){
  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools';
+type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools'|'event';
 const WORKSPACES=[
  {key:'overview',title:'Обзор',icon:Activity},
  {key:'stages',title:'Этапы',icon:BookOpenText},
@@ -22,7 +25,8 @@ const WORKSPACES=[
  {key:'grades',title:'Оценки',icon:GraduationCap},
  {key:'impact',title:'Модель последствий',icon:Network},
  {key:'parties',title:'Фракции',icon:UsersRound},
- {key:'tools',title:'Инструменты',icon:Wrench}
+ {key:'tools',title:'Инструменты',icon:Wrench},
+ {key:'event',title:'Event',icon:BookOpenText}
 ] as const;
 
 export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview'}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace}){
@@ -135,42 +139,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     {workspace==='grades'&&<GradesView g={g}/>}
     {workspace==='impact'&&<ImpactRulesPanel g={g}/>}
 
-    {workspace==='parties'&&<>
-    <section className="surface teacherRepresentation">
-   <div className="surfaceHead"><div><small>ПРЕДСТАВИТЕЛЬСТВО В ГД</small><h2>Фракции, студенты и мандаты</h2></div><span>{parties.reduce((a,p)=>a+Number(p.mandates||0),0)}/450</span></div>
-   <div className="teacherPartyMatrix">
-    {parties.length===0?<div className="emptyState">Партии ещё не созданы.</div>:parties.map(p=>{
-      const pm=members.filter(m=>m.kind==='student'&&m.team===p.name);
-      const leader=members.find(m=>m.user_id===p.leader_user_id);
-      const pending=partyInvitations.filter(i=>i.party_id===p.id&&i.status==='pending').length;
-      return <article key={p.id}>
-       <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{leader?'Руководитель: '+leader.full_name:'Руководитель не назначен'}</small></div><strong>{p.mandates}</strong></header>
-       <div className="teacherPartyStats"><span>{pm.length} студентов</span><span>{p.ghost_active?('GV −'+p.ghost_loss_current):'GV нет'}</span><span>{pending} приглашений</span><span>{Math.max(0,p.mandates-p.ghost_loss_current)} голосов сейчас</span></div>
-       <div className="teacherMandateRows">{pm.map(m=>{const a=partyMandates.find(x=>x.party_id===p.id&&x.user_id===m.user_id);return <div key={m.user_id}><b>{m.full_name}</b><span data-label="Мандаты">{a?.base_mandates||0} манд.</span><em data-label="Потери GV">{a?.ghost_loss?('−'+a.ghost_loss+' GV'):'—'}</em><strong data-label="Доступно">{a?.effective_mandates||0} голосов</strong></div>})}</div>
-      </article>
-    })}
-   </div>
-  </section>
-
-  <details className="teacherDetails">
-   <summary><div><b>Журнал партийных приглашений</b><span>Вся история формирования фракций: приглашено, принято, отклонено, отменено</span></div><i>+</i></summary>
-   <div className="teacherDetailsBody">
-    <div className="teacherInviteLog">
-     {partyInvitations.length===0?<div className="emptyState">Приглашений пока не было.</div>:partyInvitations.map(inv=>{
-      const p=parties.find(x=>x.id===inv.party_id);
-      const student=members.find(m=>m.user_id===inv.invited_user_id);
-      const sender=members.find(m=>m.user_id===inv.invited_by);
-      return <div key={inv.id}>
-       <span className={'inviteStatus '+inv.status}>{inv.status==='accepted'?'✓':inv.status==='declined'?'×':inv.status==='cancelled'?'—':'○'}</span>
-       <div><b>{student?.full_name||'Студент'}</b><small>{p?.name||'Партия'} · пригласил {sender?.full_name||'участник'}</small></div>
-       <em>{inv.status==='pending'?'Ожидает':inv.status==='accepted'?'Принято':inv.status==='declined'?'Отклонено':'Отменено'}</em>
-       <time>{new Date(inv.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}{inv.responded_at?' → '+new Date(inv.responded_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}</time>
-      </div>
-     })}
-    </div>
-   </div>
-  </details>
-    </>}
+    {workspace==='parties'&&<TeacherPartyDossiers g={g}/>}
 
     {workspace==='tools'&&<>
     <details className="teacherDetails" open>
@@ -179,10 +148,11 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     <div className="directorButtons compact">
      {[10,20,30,60].map(n=><button key={n} onClick={()=>setTurnMinutes(n)}><span>{n}:00</span><b>Ход на {n} минут</b></button>)}
      <button className="dangerQuick" onClick={confirmCrisis}><span>⚠</span><b>Разыграть кризис</b></button>
-     <button onClick={confirmGhost}><span>⚡</span><b>Ghost voting</b></button>
+     <button onClick={confirmGhost}><span>⚡</span><b>Случайное Ghost Voting</b></button>
      {parties.some(p=>p.ghost_active)&&<button onClick={()=>{if(confirm('Завершить ближайшее заседание ГД и восстановить полный состав всех фракций?'))void clearPartyGhostLoss()}}><span>↺</span><b>Завершить заседание ГД · снять GV</b></button>}
      <button onClick={exportSession}><span>⇩</span><b>Экспорт журнала</b></button>
     </div>
+    <TeacherGhostVotingPanel g={g}/>
     <div className="eventComposer"><input aria-label="Заголовок события" value={eventTitle} onChange={e=>setEventTitle(e.target.value)} placeholder="Заголовок события"/><textarea aria-label="Описание события" rows={4} value={eventBody} onChange={e=>setEventBody(e.target.value)} placeholder="Что произошло?"/><button className="primary" onClick={publish}>Опубликовать всем</button></div>
    </div>
   </details>
@@ -195,6 +165,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    </div>
   </details>
     </>}
+    {workspace==='event'&&<EventWorkspace g={g}/>}
    </div>
   </section>
  </div>;
