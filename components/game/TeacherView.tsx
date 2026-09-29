@@ -114,7 +114,7 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
     <div><small>ГОЛОСОВАНИЯ</small><strong>{votes.length}</strong><span>{votes.filter(v=>v.status==='open').length} открыто</span></div>
     <div><small>ИЗМЕНЕНИЯ KPI</small><strong>{metricHistory.filter(h=>h.source_type!=='baseline').length}</strong><span>зафиксированных изменений</span></div>
    </div>
-   <div className="teacherPlayerStats">
+   <div className="teacherPlayerStats" role="region" aria-label="Статистика участников">
     <div className="teacherPlayerStatsHead"><span>Участник</span><span>Посты</span><span>Решения</span><span>НПА</span><span>Голоса</span><span>Активность</span><span>ВСН</span></div>
     {members.filter(m=>m.kind==='student').map(m=>{
      const posts=politicalPosts.filter(p=>p.author_id===m.user_id);
@@ -127,7 +127,7 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
      const vsn=ev.length?ev.reduce((a,e)=>a+Number(e.score),0)/ev.length:0;
      return <div key={m.user_id} className="teacherPlayerStatsRow">
       <div><b>{m.full_name}</b><small>{m.team||m.group_name||'Без партии'} · {m.role_title||'роль не назначена'}</small></div>
-      <strong>{posts.length}</strong><strong>{decisions.length}</strong><strong>{docs.length}</strong><strong>{bs.length}</strong><strong>{act.length}</strong><strong>{ev.length?vsn.toFixed(1):'—'}</strong>
+      <strong data-label="Посты">{posts.length}</strong><strong data-label="Решения">{decisions.length}</strong><strong data-label="НПА">{docs.length}</strong><strong data-label="Голоса">{bs.length}</strong><strong data-label="Активность">{act.length}</strong><strong data-label="ВСН">{ev.length?vsn.toFixed(1):'—'}</strong>
      </div>
     })}
    </div>
@@ -147,7 +147,7 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
       return <article key={p.id}>
        <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{leader?'Руководитель: '+leader.full_name:'Руководитель не назначен'}</small></div><strong>{p.mandates}</strong></header>
        <div className="teacherPartyStats"><span>{pm.length} студентов</span><span>{p.ghost_active?('GV −'+p.ghost_loss_current):'GV нет'}</span><span>{pending} приглашений</span><span>{Math.max(0,p.mandates-p.ghost_loss_current)} голосов сейчас</span></div>
-       <div className="teacherMandateRows">{pm.map(m=>{const a=partyMandates.find(x=>x.party_id===p.id&&x.user_id===m.user_id);return <div key={m.user_id}><b>{m.full_name}</b><span>{a?.base_mandates||0} манд.</span><em>{a?.ghost_loss?('−'+a.ghost_loss+' GV'):'—'}</em><strong>{a?.effective_mandates||0} голосов</strong></div>})}</div>
+       <div className="teacherMandateRows">{pm.map(m=>{const a=partyMandates.find(x=>x.party_id===p.id&&x.user_id===m.user_id);return <div key={m.user_id}><b>{m.full_name}</b><span data-label="Мандаты">{a?.base_mandates||0} манд.</span><em data-label="Потери GV">{a?.ghost_loss?('−'+a.ghost_loss+' GV'):'—'}</em><strong data-label="Доступно">{a?.effective_mandates||0} голосов</strong></div>})}</div>
       </article>
     })}
    </div>
