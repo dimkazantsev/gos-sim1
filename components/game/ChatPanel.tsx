@@ -1,7 +1,8 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
-import {ArrowDown,FileText,Mic,Paperclip,Pin,PinOff,Plus,Search,Send,Video,X} from 'lucide-react';
+import {ArrowDown,Download,FileText,Mic,Paperclip,Pin,PinOff,Plus,Search,Send,Square,Trash2,Video,X} from 'lucide-react';
+import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
 import {useDialog} from '../ui/useDialog';
@@ -11,7 +12,7 @@ import {initials} from './constants';
 import {buildChatEntries,formatChatTime,isChatAttachment,matchChatMessage} from './chatUtils';
 
 const FILE_ACCEPT='image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.xlsx,.ppt,.pptx';
-const MAX_FILE_SIZE=25*1024*1024;
+const MAX_FILE_SIZE=CHAT_MAX_FILE_BYTES;
 function highlightChatText(value:string,search:string):ReactNode{
  const query=search.trim();if(!query)return value;
  const haystack=value.toLocaleLowerCase('ru-RU'),needle=query.toLocaleLowerCase('ru-RU');
@@ -40,9 +41,10 @@ function ChatAttachment({message:m}:{message:Message}){
 }
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean}){
- const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,chatLoading,names,recording,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
+ const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,chatLoading,names,recording,recordingPreview,recordingSaving,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
  const [sending,setSending]=useState(false);
  const [uploading,setUploading]=useState(false);
+ const [recordElapsed,setRecordElapsed]=useState(0);
  const [overlay,setOverlay]=useState(false);
  const [searchOpen,setSearchOpen]=useState(false);
  const [pinsOpen,setPinsOpen]=useState(previewPinsOpen);
@@ -54,6 +56,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [localError,setLocalError]=useState('');
  const list=useRef<HTMLDivElement>(null);
  const composer=useRef<HTMLTextAreaElement>(null);
+ const liveCamera=useRef<HTMLVideoElement>(null);
  const searchInput=useRef<HTMLInputElement>(null);
  const attachmentButton=useRef<HTMLButtonElement>(null);
  const uploadInput=useRef<HTMLInputElement>(null);
@@ -98,6 +101,17 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  },[text]);
  useEffect(()=>{if(searchOpen)searchInput.current?.focus()},[searchOpen]);
  useEffect(()=>{
+  if(!recordingStartedAt){setRecordElapsed(0);return}
+  const update=()=>setRecordElapsed(Math.floor((Date.now()-recordingStartedAt)/1000));
+  update();const timer=window.setInterval(update,1000);return()=>window.clearInterval(timer);
+ },[recordingStartedAt]);
+ useEffect(()=>{
+  const video=liveCamera.current;
+  if(!video||recording!=='video'||!recordingStream)return;
+  video.srcObject=recordingStream;void video.play().catch(()=>{});
+  return()=>{video.pause();video.srcObject=null};
+ },[recording,recordingStream]);
+ useEffect(()=>{
   if(!attachOpen)return;
   const click=(event:PointerEvent)=>{if(attachWrap.current&&!attachWrap.current.contains(event.target as Node))setAttachOpen(false)};
   document.addEventListener('pointerdown',click);
@@ -127,7 +141,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   finally{pendingSend.current=false;setSending(false);if(!overlay)composer.current?.focus()}
  }
  async function upload(file:File){
-  if(!channelId||uploading)return;
+  if(!channelId||uploading||recordingSaving)return;
   if(file.size>MAX_FILE_SIZE){setLocalError('Файл превышает 25 МБ. Выберите файл меньшего размера.');return}
   setLocalError('');setUploading(true);setAttachOpen(false);
   try{const ok=await sendChatFile(file);if(!ok)setLocalError('Не удалось прикрепить файл. Попробуйте снова.');else requestAnimationFrame(scrollToLatest)}
@@ -213,22 +227,75 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     })}
   </div>
   {jumpVisible&&<button type="button" className="chatJumpLatest" onClick={scrollToLatest}><ArrowDown aria-hidden="true" size={16}/> К последним сообщениям</button>}
-  {recording&&<div className="chatRecording" role="status"><span className="chatRecordingDot"/>Записывается {recording==='audio'?'аудио':'видео'}<button type="button" onClick={()=>void toggleRecording(recording)}>Завершить и отправить</button></div>}
+  {recording&&<section className="chatCapturePanel" aria-label={recording==='audio'?'Запись аудио':'Запись видео'}>
+   <div className="chatCaptureStatus">
+    <span className="chatCaptureLive" aria-hidden="true"/><b>{recording==='audio'?'Записывается аудио':'Записывается видео'}</b>
+    <time aria-label="Длительность записи">{formatRecordingDuration(recordElapsed)}</time>
+   </div>
+   {recording==='video'&&<video ref={liveCamera} autoPlay muted playsInline className="chatCaptureCamera" aria-label="Предпросмотр камеры"/>}
+   <div className="chatCaptureActions">
+    <button type="button" className="chatCaptureCancel" onClick={discardRecording}><Trash2 size={16} aria-hidden="true"/>Отменить</button>
+    <button type="button" className="chatCaptureStop" onClick={()=>void toggleRecording(recording)}><Square size={14} fill="currentColor" aria-hidden="true"/>Завершить</button>
+   </div>
+  </section>}
+  {recordingPreview&&<section className="chatCapturePanel chatCaptureReview" aria-label="Предпросмотр записи">
+   <div className="chatCaptureStatus">
+    {recordingPreview.kind==='audio'?<Mic size={17} aria-hidden="true"/>:<Video size={17} aria-hidden="true"/>}
+    <b>{recordingPreview.kind==='audio'?'Аудиосообщение':'Видеосообщение'}</b>
+    <time>{formatRecordingDuration(recordingPreview.duration)}</time>
+   </div>
+   {recordingPreview.kind==='audio'
+    ?<audio controls preload="metadata" src={recordingPreview.url} aria-label="Прослушать запись"/>
+    :<video controls preload="metadata" playsInline src={recordingPreview.url} aria-label="Просмотреть запись"/>}
+   {recordingPreview.channelId!==channelId&&<p className="chatCaptureNote">Запись будет отправлена в исходный канал.</p>}
+   {recordingPreview.blob.size>MAX_FILE_SIZE&&<p className="chatCaptureNote">Превышен лимит 25 МБ. Сохраните запись на устройство или повторите.</p>}
+   <div className="chatCaptureActions">
+    <button type="button" className="chatCaptureCancel" onClick={discardRecording} disabled={recordingSaving}><Trash2 size={16} aria-hidden="true"/>Удалить</button>
+    <a className="chatCaptureDownload" href={recordingPreview.url} download={recordingPreview.fileName} aria-label="Сохранить запись на устройство"><Download size={17} aria-hidden="true"/></a>
+    <button type="button" className="chatCaptureSend" disabled={recordingSaving||recordingPreview.blob.size>MAX_FILE_SIZE} onClick={()=>void sendRecordingPreview()}>
+     <Send size={16} aria-hidden="true"/>{recordingSaving?'Сохраняется…':'Отправить'}
+    </button>
+   </div>
+  </section>}
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
   <div className="chatCompose">
-   <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)} placeholder={channelId?'Написать сообщение…':'Выберите канал'} disabled={!channelId||chatLoading} readOnly={sending} aria-busy={sending} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
+   <div className="chatInputRow">
+    <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)}
+     placeholder={channelId?'Написать сообщение…':'Выберите канал'}
+     disabled={!channelId||chatLoading} readOnly={sending} aria-busy={sending}
+     onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
+    <button type="button" className="chatSendButton iconOnly" disabled={sending||uploading||chatLoading||!text.trim()||!channelId}
+     onClick={()=>void send()} aria-label="Отправить сообщение" title="Отправить"><Send aria-hidden="true" size={20}/></button>
+   </div>
    <div className="chatComposeActions">
     <div className="chatAttachWrap" ref={attachWrap}>
-     <button type="button" ref={attachmentButton} className={'chatIconButton chatAttachButton '+(attachOpen?'active':'')} aria-label="Прикрепить или записать" aria-haspopup="menu" aria-expanded={attachOpen} disabled={!channelId||uploading||chatLoading} onClick={()=>setAttachOpen(v=>!v)}><Plus aria-hidden="true"/></button>
+     <button type="button" ref={attachmentButton} className={'chatIconButton chatAttachButton '+(attachOpen?'active':'')}
+      aria-label="Прикрепить файл" aria-haspopup="menu" aria-expanded={attachOpen}
+      disabled={!channelId||uploading||chatLoading||!!recording||!!recordingPreview||recordingSaving}
+      onClick={()=>setAttachOpen(v=>!v)}><Plus aria-hidden="true"/></button>
      {attachOpen&&<div className="chatAttachMenu" role="menu" aria-label="Добавить в чат">
-      <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);uploadInput.current?.click()}}><Paperclip aria-hidden="true" size={18}/>Файл, фото, аудио или видео</button>
-      <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);void toggleRecording('audio')}}><Mic aria-hidden="true" size={18}/>Аудиосообщение</button>
-      <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);void toggleRecording('video')}}><Video aria-hidden="true" size={18}/>Видеосообщение</button>
+      <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);uploadInput.current?.click()}}>
+       <Paperclip aria-hidden="true" size={18}/>Файл, фото, аудио или видео
+      </button>
      </div>}
-     <input ref={uploadInput} type="file" hidden accept={FILE_ACCEPT} aria-label="Выбрать файл для чата" onChange={e=>{const file=e.target.files?.[0];if(file)void upload(file)}}/>
+     <input ref={uploadInput} type="file" hidden accept={FILE_ACCEPT} aria-label="Выбрать файл для чата"
+      onChange={e=>{const file=e.target.files?.[0];if(file)void upload(file)}}/>
     </div>
-    <span className="chatComposerHint">{uploading?'Загрузка файла…':sending?'Отправка…':'Enter — отправить · Shift + Enter — новая строка'}</span>
-    <button type="button" className="chatSendButton iconOnly" disabled={sending||uploading||chatLoading||!text.trim()||!channelId} onClick={()=>void send()} aria-label="Отправить сообщение" title="Отправить"><Send aria-hidden="true" size={20}/></button>
+    <button type="button" className={'chatIconButton chatMediaShortcut '+(recording==='audio'?'isRecording':'')}
+     disabled={!channelId||uploading||chatLoading||recordingSaving||!!recordingPreview||recording==='video'}
+     aria-label={recording==='audio'?'Завершить запись аудио':'Записать аудиосообщение'}
+     title={recording==='audio'?'Завершить запись':'Записать аудио'} onClick={()=>void toggleRecording('audio')}>
+     <Mic aria-hidden="true" size={19}/>
+    </button>
+    <button type="button" className={'chatIconButton chatMediaShortcut '+(recording==='video'?'isRecording':'')}
+     disabled={!channelId||uploading||chatLoading||recordingSaving||!!recordingPreview||recording==='audio'}
+     aria-label={recording==='video'?'Завершить запись видео':'Записать видеосообщение'}
+     title={recording==='video'?'Завершить запись':'Записать видео'} onClick={()=>void toggleRecording('video')}>
+     <Video aria-hidden="true" size={19}/>
+    </button>
+    <span className="chatComposerHint" aria-live="polite">
+     {uploading?'Загружается вложение…':recordingSaving?'Сохраняется запись…':recording?'Идёт запись…':'Enter — отправить'}
+    </span>
    </div>
   </div>
  </aside>;
