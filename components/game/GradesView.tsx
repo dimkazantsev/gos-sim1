@@ -70,14 +70,33 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
 
  async function load(){
   if(!game)return;
-  const r=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).order('stage_no');
-  if(!r.error)setRows((r.data||[]) as Assessment[]);
-  if(me?.kind==='student'){
+  if(teacher){
+   const r=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).order('stage_no');
+   if(!r.error)setRows((r.data||[]) as Assessment[]);
+  }else{
+   // Everyone sees numerical scores; details belong only to the actual account owner.
+   const publicResult=await supabase.rpc('get_public_stage_scores',{p_game_id:game.id});
+   const safeRows:Assessment[]=((publicResult.data||[]) as Pick<Assessment,'user_id'|'stage_no'|'auto_score'|'final_score'|'status'>[])
+    .map(a=>({...a,id:'public-'+a.user_id+'-'+a.stage_no,game_id:game.id,
+      criterion_law:false,criterion_strategy:false,criterion_debrief:false,
+      public_rationale:'',last_run_type:'',last_auto_at:null,revision_count:0,
+      teacher_note:null,finalized_at:null}));
+   if(authId===me?.user_id){
+    const own=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no');
+    if(!own.error){
+     const map=new Map(safeRows.map(a=>[a.user_id+':'+a.stage_no,a]));
+     for(const a of (own.data||[]) as Assessment[])map.set(a.user_id+':'+a.stage_no,a);
+     setRows([...map.values()]);
+    }else setRows(safeRows);
+   }else setRows(safeRows);
+  }
+  if(me?.kind==='student'&&authId===me.user_id){
    const d=await supabase.from('stage_debriefs').select('*').eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no');
    if(!d.error)setDebriefRows((d.data||[]) as Debrief[]);
   }
  }
- useEffect(()=>{void load();void supabase.auth.getUser().then(x=>setAuthId(x.data.user?.id||''))},[game?.id,me?.user_id]);
+ useEffect(()=>{void supabase.auth.getUser().then(x=>setAuthId(x.data.user?.id||''))},[game?.id,me?.user_id]);
+ useEffect(()=>{void load()},[game?.id,me?.user_id,authId,teacher]);
  useEffect(()=>{
   if(!game)return;
   const ch=supabase.channel('grades-view:'+game.id)
@@ -108,7 +127,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
   setEditScore(shownScore(a)??0);
   setNote(a?.teacher_note||'');
   setEvidence(null);setRuns([]);
-  if(!game||(!teacher&&userId!==me?.user_id))return;
+  if(!game||(!teacher&&(userId!==me?.user_id||authId!==me.user_id)))return;
   setLoadingEvidence(true);
   const requests:any[]=[supabase.rpc('get_stage_assessment_evidence',{p_game_id:game.id,p_user_id:userId,p_stage_no:stageNo})];
   if(a)requests.push(supabase.from('stage_assessment_runs').select('id,assessment_id,run_type,auto_score,criterion_law,criterion_strategy,criterion_debrief,created_at').eq('assessment_id',a.id).order('created_at',{ascending:false}).limit(50));
@@ -225,14 +244,16 @@ function AssessmentModal(p:any){
  const {g,assessment:a,selected,student,evidence,runs,loading,teacher,editScore,setEditScore,note,setNote,busy,close,ensureDraft,recalc,finalize,reopen}=p;
  const dialogRef=useDialog(true,close);
  const v=shownScore(a);
- const canSeeEvidence=teacher||selected.userId===g.me?.user_id;
+ const canSeeEvidence=teacher||(selected.userId===g.me?.user_id&&assessment?.id?.startsWith('public-')===false);
  return <div className="gradeModalBack" onMouseDown={e=>{if(e.target===e.currentTarget)close()}}><article ref={dialogRef} tabIndex={-1} className="gradeModal" role="dialog" aria-modal="true" aria-labelledby="assessment-title">
   <header><div><small>ЭТАП {selected.stageNo}</small><h2 id="assessment-title">{student?.full_name||g.me?.full_name}</h2><p>{g.stages.find((s:any)=>s.stage_no===selected.stageNo)?.title}</p></div><IconAction onClick={close} label="Закрыть оценку"/></header>
   {!a?<div className="emptyState gradeEmpty">Черновик ещё не создан.{teacher&&<><br/><button className="primary" disabled={busy} onClick={()=>void ensureDraft()}>Рассчитать сейчас</button></>}</div>:<>
    <div className={'gradeScoreHero '+a.status}><strong>{v}</strong><div><b>{level(v??0)}</b><span>{a.status==='final'?'Итоговая оценка преподавателя':'Автоматический черновик'}</span></div></div>
+{canSeeEvidence&&<>
    <div className="gradeCriteria"><span className={a.criterion_law?'ok':'miss'}><b>{a.criterion_law?'✓':'○'}</b> Право и правила</span><span className={a.criterion_strategy?'ok':'miss'}><b>{a.criterion_strategy?'✓':'○'}</b> Стратегия и интересы</span><span className={a.criterion_debrief?'ok':'miss'}><b>{a.criterion_debrief?'✓':'○'}</b> Анализ этапа</span></div>
    <section className="gradeRationale"><small>ИНТЕРПРЕТАЦИЯ ДЕЙСТВИЙ</small><p>{a.public_rationale}</p><footer><span>Пересчёт: {when(a.last_auto_at)}</span><span>{a.last_run_type}</span><span>версия {a.revision_count}</span></footer></section>
    {a.teacher_note&&<section className="gradeTeacherNote"><small>КОММЕНТАРИЙ ПРЕПОДАВАТЕЛЯ</small><p>{a.teacher_note}</p></section>}
+</>}
    {teacher&&<section className="gradeApproval"><StyledSelect label="Итоговый балл" value={String(editScore)} onChange={v=>setEditScore(Number(v))} options={[0,1,2,3].map(n=>({value:String(n),label:n+' · '+level(n)}))}/><label>Комментарий<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Почему вы подтверждаете или меняете автооценку"/></label><div>{a.status==='final'?<button onClick={()=>void reopen()} disabled={busy}>Переоткрыть оценку</button>:<><button onClick={()=>void recalc()} disabled={busy}>Пересчитать сейчас</button><button className="primary" onClick={()=>void finalize()} disabled={busy}>Утвердить как итоговую</button></>}</div></section>}
   </>}
   {a&&runs?.length>0&&<details className="gradeRunHistory"><summary>История автоматических пересчётов <span>{runs.length}</span></summary><div>{runs.map((r:Run)=><article key={r.id}><time>{when(r.created_at)}</time><b>{r.auto_score}/3 · {level(r.auto_score)}</b><span>{r.run_type}</span><em>{r.criterion_law?'Право ✓':'Право ○'} · {r.criterion_strategy?'Стратегия ✓':'Стратегия ○'} · {r.criterion_debrief?'Анализ ✓':'Анализ ○'}</em></article>)}</div></details>}
