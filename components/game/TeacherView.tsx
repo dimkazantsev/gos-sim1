@@ -1,5 +1,7 @@
 'use client';
 import {useMemo,useState} from 'react';
+import {Activity,ArrowRight,BarChart3,BookOpenText,GraduationCap,Network,Pause,Play,Radio,UsersRound,Wrench} from 'lucide-react';
+import TeacherStageManager from './TeacherStageManager';
 import type {ReturnTypeRepublic} from './viewTypes';
 import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
@@ -15,10 +17,20 @@ function timerText(seconds:number){
  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void}){
+type Workspace='overview'|'analytics'|'grades'|'impact'|'parties'|'tools';
+const WORKSPACES=[
+ {key:'overview',title:'Обзор',icon:Activity},
+ {key:'analytics',title:'Аналитика',icon:BarChart3},
+ {key:'grades',title:'Оценки',icon:GraduationCap},
+ {key:'impact',title:'Модель последствий',icon:Network},
+ {key:'parties',title:'Фракции',icon:UsersRound},
+ {key:'tools',title:'Инструменты',icon:Wrench}
+] as const;
+
+export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void}){
  const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
  const [eventTitle,setEventTitle]=useState(''),[eventBody,setEventBody]=useState('');
- if(!game)return null;
+ const [workspace,setWorkspace]=useState<Workspace>('overview');
 
  const studentIds=useMemo(()=>new Set(members.filter(m=>m.kind!=='teacher').map(m=>m.user_id)),[members]);
  const studentActivities=useMemo(()=>activities.filter(a=>studentIds.has(a.actor_id)),[activities,studentIds]);
@@ -29,6 +41,7 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
   return {m,p,last,online};
  }).sort((a,b)=>Number(b.online)-Number(a.online)||new Date(b.p?.last_seen_at||0).getTime()-new Date(a.p?.last_seen_at||0).getTime()),[members,presence,studentActivities]);
 
+ if(!game)return null;
  const pending=actions.filter(a=>a.status==='submitted');
  const onlineCount=studentRows.filter(x=>x.online).length;
 
@@ -44,12 +57,12 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='gos-sims-activity-'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(url);
  }
 
- return <div className="teacherSimple">
+ return <div className="teacherSimple teacherCommand">
   <section className="teacherFocus">
    <div className="teacherFocusCopy">
-    <small>СЕЙЧАС</small>
-    <h1>{currentStage?.stage_no}. {currentStage?.title}</h1>
-    <p>{currentStage?.summary||'Управляйте текущим этапом, наблюдайте за действиями студентов и переводите игру дальше только когда аудитория готова.'}</p>
+    <small>ПУЛЬТ ПРЕПОДАВАТЕЛЯ</small>
+    <h1>Управление игрой</h1>
+    <p><strong>Этап {currentStage?.stage_no||game.current_round}: {currentStage?.title||'Подготовка игры'}</strong><span>{currentStage?.summary||'Наблюдение за игрой, этапами и действиями участников.'}</span></p>
    </div>
    <div className="teacherFocusState">
     <span className={game.turn_open?'bigState on':'bigState off'}>{game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span>
@@ -61,14 +74,14 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
 
   <section className="teacherPrimaryActions">
    <button className={game.turn_open?'teacherAction dangerLite':'teacherAction primaryAction'} onClick={()=>setTurn(!game.turn_open)}>
-    <span>{game.turn_open?'Ⅱ':'▶'}</span>
+    <span>{game.turn_open?<Pause size={20} strokeWidth={2} aria-hidden="true"/>:<Play size={20} strokeWidth={2} aria-hidden="true"/>}</span>
     <div><b>{game.turn_open?'Поставить на паузу':'Открыть ход'}</b><small>{game.turn_open?'Временно остановить действия студентов':'Разрешить студентам выполнять задания'}</small></div>
    </button>
    <button className="teacherAction" onClick={onOpenProcesses}>
-    <span>◎</span><div><b>Политические процессы</b><small>Открыть общее публичное пространство игры</small></div>
+    <span><Radio size={20} strokeWidth={2} aria-hidden="true"/></span><div><b>Политические процессы</b><small>Публикации и решения участников</small></div>
    </button>
    <button className="teacherAction" onClick={confirmNext}>
-    <span>→</span><div><b>Следующий этап</b><small>Завершить текущий и перейти дальше</small></div>
+    <span><ArrowRight size={20} strokeWidth={2} aria-hidden="true"/></span><div><b>Следующий этап</b><small>Завершить текущий этап</small></div>
    </button>
   </section>
 
@@ -78,7 +91,32 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
    <article className="pulseCard"><small>АКТИВНОСТЬ</small><strong>{studentActivities.length}</strong><span>действий за сессию</span></article>
   </section>
 
-  <GameReadinessMatrix g={g}/>
+  <TeacherStageManager g={g} onOpenStage={onOpenStages}/>
+
+  <section className="teacherWorkspace" aria-label="Рабочие разделы управления">
+   <div className="teacherWorkspaceNav" role="tablist" aria-label="Рабочие разделы преподавателя">
+    {WORKSPACES.map(item=>{
+     const Icon=item.icon;
+     return <button key={item.key} type="button" role="tab" id={'teacher-tab-'+item.key}
+      aria-controls="teacher-workspace-panel" aria-selected={workspace===item.key} tabIndex={workspace===item.key?0:-1}
+      className={workspace===item.key?'active':''} onClick={()=>setWorkspace(item.key)}
+      onKeyDown={event=>{
+       if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+       event.preventDefault();
+       const index=WORKSPACES.findIndex(entry=>entry.key===item.key);
+       const nextIndex=event.key==='Home'?0:event.key==='End'?WORKSPACES.length-1:
+        (index+(event.key==='ArrowRight'?1:-1)+WORKSPACES.length)%WORKSPACES.length;
+       const next=WORKSPACES[nextIndex];setWorkspace(next.key);
+       document.getElementById('teacher-tab-'+next.key)?.focus();
+      }}>
+      <Icon size={18} strokeWidth={1.9} aria-hidden="true"/><span>{item.title}</span>
+      {item.key==='overview'&&pending.length>0&&<em>{pending.length}</em>}
+     </button>
+    })}
+   </div>
+   <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
+    {workspace==='overview'&&<>
+     <GameReadinessMatrix g={g}/>
 
   <section className="teacherSimpleGrid">
    <article className="surface">
@@ -104,8 +142,9 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
     </div>
    </article>
   </section>
+    </>}
 
-  <section className="teacherAnalytics surface">
+    {workspace==='analytics'&&<section className="teacherAnalytics surface">
    <div className="surfaceHead"><div><small>АНАЛИТИКА ИГРЫ</small><h2>Общая статистика и вклад участников</h2></div><span>{members.filter(m=>m.kind==='student').length} студентов</span></div>
    <div className="teacherAnalyticsCards">
     <div><small>ПУБЛИКАЦИИ</small><strong>{politicalPosts.length}</strong><span>политических процессов</span></div>
@@ -131,13 +170,13 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
      </div>
     })}
    </div>
-  </section>
+  </section>}
 
-  <GradesView g={g}/>
+    {workspace==='grades'&&<GradesView g={g}/>}
+    {workspace==='impact'&&<ImpactRulesPanel g={g}/>}
 
-  <ImpactRulesPanel g={g}/>
-
-  <section className="surface teacherRepresentation">
+    {workspace==='parties'&&<>
+    <section className="surface teacherRepresentation">
    <div className="surfaceHead"><div><small>ПРЕДСТАВИТЕЛЬСТВО В ГД</small><h2>Фракции, студенты и мандаты</h2></div><span>{parties.reduce((a,p)=>a+Number(p.mandates||0),0)}/450</span></div>
    <div className="teacherPartyMatrix">
     {parties.length===0?<div className="emptyState">Партии ещё не созданы.</div>:parties.map(p=>{
@@ -171,8 +210,10 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
     </div>
    </div>
   </details>
+    </>}
 
-  <details className="teacherDetails">
+    {workspace==='tools'&&<>
+    <details className="teacherDetails" open>
    <summary><div><b>Быстрые сценарии и события</b><span>Таймер, кризис, ghost voting, публикация события</span></div><i>+</i></summary>
    <div className="teacherDetailsBody">
     <div className="directorButtons compact">
@@ -193,5 +234,8 @@ export default function TeacherView({g,onOpenProcesses}:{g:ReturnTypeRepublic;on
     <div><h3>Игровые роли</h3><div className="evaluationRows">{members.filter(m=>m.kind!=='teacher').map(m=><div key={m.user_id}><div className="studentIdentity"><b>{m.full_name}</b><input key={m.user_id+(m.role_title||'')} defaultValue={m.role_title||''} onBlur={e=>updateMember(m.user_id,{role_title:e.target.value})} aria-label="Игровая роль участника" placeholder="Игровая роль"/></div></div>)}</div></div>
    </div>
   </details>
+    </>}
+   </div>
+  </section>
  </div>;
 }
