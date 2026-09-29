@@ -253,8 +253,15 @@ async function main(){
      if(width===390&&chatScreen==='chat-panel'){
       const playback=await player.locator('audio').evaluate(async el=>{
        await el.play();
-       await new Promise(resolve=>setTimeout(resolve,300));
-       const data={duration:el.duration,elapsed:el.currentTime,playing:!el.paused};
+       // On loaded CI runners media playback can start after the first 300 ms.
+       // Observe a real media time advance instead of assuming a fixed startup delay.
+       let progressed=false;
+       const deadline=performance.now()+1600;
+       while(performance.now()<deadline){
+        if(el.currentTime>0.02){progressed=true;break}
+        await new Promise(resolve=>setTimeout(resolve,40));
+       }
+       const data={duration:el.duration,elapsed:el.currentTime,playing:progressed};
        el.pause();
        return data;
       });
