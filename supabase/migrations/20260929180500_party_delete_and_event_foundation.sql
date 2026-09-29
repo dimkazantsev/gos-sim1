@@ -19,7 +19,7 @@ begin
  from public.political_posts where game_id=p.game_id and actor_key='party' and actor_label=p.name;
  -- Preserve teacher audit records and independent state acts that are not unambiguously party property.
  update public.game_members set team=null,party_joined_at=null where game_id=p.game_id and team=p.name;
- update public.chat_channels set name='Архив фракции · '||p.name,kind='public'
+ update public.chat_channels set name='Архив фракции · '||p.name
   where game_id=p.game_id and name='Фракция · '||p.name;
  delete from public.political_posts where id=any(posts);
  delete from public.game_parties where id=p.id;
