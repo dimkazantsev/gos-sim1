@@ -1,6 +1,8 @@
 'use client';
-import {useState} from 'react';
-import {ArrowUpRight,CheckCircle2,ChevronRight,CircleDot,LockKeyhole,RotateCcw,Search,ShieldAlert,X} from 'lucide-react';
+import {useEffect,useState} from 'react';
+import {supabase} from '@/lib/supabase';
+import type {StageReadiness} from './StageReadinessPanel';
+import {CheckCircle2,ChevronRight,CircleDot,LockKeyhole,RefreshCw,RotateCcw,Search,ShieldAlert,X} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 
@@ -17,7 +19,10 @@ const FILTERS:{value:StageFilter;label:string}[]=[
 export default function TeacherStageManager({g,onOpenStage}:{
  g:ReturnTypeRepublic;onOpenStage:(stageNo:number)=>void
 }){
- const {stages,teacher,resetStageProgress}=g;
+ const {stages,teacher,resetStageProgress,game}=g;
+ const [readiness,setReadiness]=useState<StageReadiness[]>([]);
+ const [readinessLoading,setReadinessLoading]=useState(false);
+ const [expanded,setExpanded]=useState<number|null>(null);
  const [filter,setFilter]=useState<StageFilter>('all');
  const [search,setSearch]=useState('');
  const [resetTarget,setResetTarget]=useState<ResetTarget>(null);
@@ -25,6 +30,21 @@ export default function TeacherStageManager({g,onOpenStage}:{
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState('');
  const [notice,setNotice]=useState('');
+ async function refreshReadiness(){
+  if(!game)return;
+  setReadinessLoading(true);
+  const r=await supabase.rpc('get_game_readiness',{p_game_id:game.id});
+  if(!r.error&&Array.isArray(r.data))setReadiness(r.data as StageReadiness[]);
+  setReadinessLoading(false);
+ }
+ useEffect(()=>{void refreshReadiness()},[game?.id]);
+ useEffect(()=>{
+  if(!game)return;
+  const c=supabase.channel('teacher-stage-readiness:'+game.id)
+   .on('postgres_changes',{event:'*',schema:'public',table:'stage_readiness_overrides',filter:'game_id=eq.'+game.id},()=>void refreshReadiness())
+   .subscribe();
+  return()=>{void supabase.removeChannel(c)};
+ },[game?.id]);
  const closeDialog=()=>{if(busy)return;setResetTarget(null);setConfirmation('');setError('')};
  const dialogRef=useDialog(resetTarget!==null,closeDialog);
  const completed=stages.filter(s=>s.status==='completed').length;
@@ -48,6 +68,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
    if(!ok){setError('Не удалось сбросить этапы. Проверьте сообщение об ошибке в верхней части приложения.');return}
    setNotice(all?'Все этапы сброшены. Ход остановлен.':'Этап '+resetTarget+' сброшен.');
    if(all){setFilter('all');setSearch('')}
+   void refreshReadiness();
    setResetTarget(null);setConfirmation('');
   }catch(err){
    setError(err instanceof Error?err.message:'Не удалось сбросить этапы.');
@@ -60,13 +81,14 @@ export default function TeacherStageManager({g,onOpenStage}:{
    <div className="teacherStageManagerHeading">
     <span className="teacherEyebrow">РЕЖИССЁР ИГРЫ</span>
     <h2 id="teacher-stage-manager-title">Управление этапами</h2>
-    <p>Открывайте задания и сбрасывайте статус нужного этапа, не покидая панель преподавателя.</p>
+    <p>Статус прохождения и фактическая процедурная готовность каждого этапа отображаются вместе.</p>
    </div>
    <div className="teacherStageManagerTools">
     <div className="teacherStageManagerTotals" aria-label="Прогресс этапов">
      <span><strong>{completed}</strong> / {stages.length} завершено</span>
      <span><CircleDot size={14} aria-hidden="true"/>{active} текущих</span>
     </div>
+    <button type="button" className="teacherReadinessRefresh" onClick={()=>void refreshReadiness()} disabled={readinessLoading} aria-label="Перепроверить готовность всех этапов"><RefreshCw size={16} aria-hidden="true"/> {readinessLoading?'Проверка…':'Проверить готовность'}</button>
     <button type="button" className="teacherResetAll" onClick={()=>askReset('all')} disabled={busy}>
      <RotateCcw size={16} strokeWidth={2} aria-hidden="true"/> Сбросить все этапы
     </button>
@@ -90,6 +112,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
 
   {shown.length>0?<div className="teacherStageGrid">
    {shown.map(stage=>{
+    const ready=readiness.find(r=>r.stage_no===stage.stage_no);
     const StatusIcon=stage.status==='completed'?CheckCircle2:stage.status==='open'?CircleDot:LockKeyhole;
     return <article className={'teacherStageCard is-'+stage.status} key={stage.id}>
      <button type="button" className="teacherStageOpen" onClick={()=>onOpenStage(stage.stage_no)}
@@ -99,13 +122,24 @@ export default function TeacherStageManager({g,onOpenStage}:{
        <span className="teacherStageName" title={stage.title}>{stage.title}</span>
        <span className={'teacherStageStatus is-'+stage.status}><StatusIcon size={13} aria-hidden="true"/>
         {stage.status==='open'?'Идёт':stage.status==='completed'?'Завершён':'Закрыт'}</span>
+       <span className={'teacherReadinessStatus '+(ready?.ready?(ready.warnings.length?'warning':'ready'):'blocked')} title={ready?.blockers?.[0]||ready?.warnings?.[0]||'Структурированная готовность'}>
+        {ready?ready.ready?(ready.warnings.length?'Готово с замечаниями':'Процедуры готовы'):'Есть препятствия':'Проверка…'}</span>
       </span>
       <ChevronRight className="teacherStageGo" size={16} aria-hidden="true"/>
      </button>
+     <button type="button" className="teacherStageExpand" title="Проверка готовности" aria-label={'Показать готовность этапа '+stage.stage_no} aria-expanded={expanded===stage.stage_no} onClick={()=>setExpanded(expanded===stage.stage_no?null:stage.stage_no)}><ChevronRight size={16} aria-hidden="true"/></button>
      <button type="button" className="teacherStageReset" onClick={()=>askReset(stage.stage_no)}
       title={'Сбросить этап '+stage.stage_no} aria-label={'Сбросить этап '+stage.stage_no+': '+stage.title} disabled={busy}>
       <RotateCcw size={16} strokeWidth={1.9} aria-hidden="true"/>
      </button>
+     {expanded===stage.stage_no&&<div className="teacherStageReadinessDetail"><b>Процедурная готовность</b>
+      {ready?<><p>{ready.ready?'Основные требования выполнены.':'Этап требует выполнения процедур.'}</p>
+       {ready.blockers.map((item,i)=><p key={'b'+i} className="blocked">{item}</p>)}
+       {ready.warnings.map((item,i)=><p key={'w'+i} className="warning">{item}</p>)}
+       {ready.overridden&&<p>Историческое прохождение подтверждено преподавателем.</p>}
+      </>:<p>Результат проверки пока не получен.</p>}
+      <button type="button" onClick={()=>onOpenStage(stage.stage_no)}>Открыть процедуры и инструменты этапа</button>
+     </div>}
     </article>
    })}
   </div>:<div className="teacherStageEmpty">
