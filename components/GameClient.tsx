@@ -239,6 +239,16 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  }
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
 
+ const genericStudent:Member|undefined=teacher&&game?{
+  game_id:game.id,user_id:GENERIC_STUDENT,full_name:'Студент · предпросмотр',group_name:null,
+  kind:'student',role_title:'Участник',team:null,score:0,joined_at:new Date(0).toISOString(),party_joined_at:null
+ }:undefined;
+ const previewStudent=teacher&&viewAs
+  ? viewAs===GENERIC_STUDENT
+    ? genericStudent
+    : g.members.find(m=>m.user_id===viewAs&&m.kind==='student')
+  : undefined;
+ const previewMode=!!previewStudent;
  useEffect(()=>{
   if(!game||!me||previewMode)return;
   let live=true;
@@ -253,16 +263,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   return()=>{live=false;void supabase.removeChannel(channel)};
  },[game?.id,me?.user_id,previewMode,view]);
 
- const genericStudent:Member|undefined=teacher&&game?{
-  game_id:game.id,user_id:GENERIC_STUDENT,full_name:'Студент · предпросмотр',group_name:null,
-  kind:'student',role_title:'Участник',team:null,score:0,joined_at:new Date(0).toISOString(),party_joined_at:null
- }:undefined;
- const previewStudent=teacher&&viewAs
-  ? viewAs===GENERIC_STUDENT
-    ? genericStudent
-    : g.members.find(m=>m.user_id===viewAs&&m.kind==='student')
-  : undefined;
- const previewMode=!!previewStudent;
+
  const backIndex=adjacentScreen(screenHistory.entries,screenHistory.index,-1,previewMode);
  const forwardIndex=adjacentScreen(screenHistory.entries,screenHistory.index,1,previewMode);
  function moveHistory(index:number){
