@@ -56,6 +56,28 @@ fixture.messages.push(
 fixture.chatPins=[{id:'pin-audio',game_id:'design-preview',channel_id:'public-demo',message_id:'c8',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:01:00Z'},{id:'pin-video',game_id:'design-preview',channel_id:'public-demo',message_id:'c9',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:02:00Z'},{id:'pin-file',game_id:'design-preview',channel_id:'public-demo',message_id:'c5',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:00:00Z'}];
 fixture.pinnedMessages=fixture.messages.filter(m=>fixture.chatPins.some(pin=>pin.message_id===m.id));
 fixture.votes=[{id:'vote-demo',stage_no:4,title:'Об утверждении повестки заседания',body:'Предлагается утвердить порядок рассмотрения вопросов первого заседания Государственной Думы.',voting_mode:'mandate',status:'open',opened_at:now,closed_at:null,institution_key:'gd',procedure_key:'gd_resolution',quorum_kind:'fraction',quorum_value:.5,majority_kind:'eligible_majority',majority_value:.5,allow_abstain:true,result_code:null}];
+fixture.impactRules=[
+ {id:'rule-1',game_id:'design-preview',rule_key:'accepted_post',label:'Публикация принятого решения',event_type:'political_post_accepted',
+  description:'Публичное решение изменяет доверие и общественную поддержку.',conditions:{status:'accepted'},
+  effects:{metrics:{public_trust:2,social_stability:1,legitimacy:1},actor_party_support:1},
+  enabled:true,auto_apply:true,priority:10,created_at:now,updated_at:now},
+ {id:'rule-2',game_id:'design-preview',rule_key:'budget_passed',label:'Утверждение федерального бюджета',event_type:'budget_approved',
+  description:'Рассмотрение и утверждение бюджетного закона.',conditions:{institution:'gd'},
+  effects:{metrics:{economy:3,budget:-2,public_trust:1},actor_party_support:0},
+  enabled:true,auto_apply:false,priority:20,created_at:now,updated_at:now},
+ {id:'rule-3',game_id:'design-preview',rule_key:'crisis',label:'Кризисная ситуация',event_type:'crisis_started',
+  description:'Резкое изменение социальной и экономической обстановки.',conditions:{},
+  effects:{metrics:{social_stability:-4,public_trust:-2},actor_party_support:0},
+  enabled:false,auto_apply:false,priority:30,created_at:now,updated_at:now}
+];
+fixture.impactLedger=[
+ {id:1,game_id:'design-preview',rule_id:'rule-1',rule_key:'accepted_post',source_type:'political_post',source_id:'post-demo',
+  actor_id:'student-0',effects:{metrics:{public_trust:2,social_stability:1,legitimacy:1},actor_party_support:1},
+  note:'Принято публичное решение',status:'applied',created_at:now,reverted_at:null},
+ {id:2,game_id:'design-preview',rule_id:'rule-3',rule_key:'crisis',source_type:'crisis',source_id:'crisis-demo',
+  actor_id:null,effects:{metrics:{social_stability:-4,public_trust:-2}},
+  note:'Кризис урегулирован',status:'reverted',created_at:'2026-09-27T11:00:00Z',reverted_at:now}
+];
 fixture.availableActors=()=>[{key:'participant',label:'Участник'},{key:'gd',label:'Государственная Дума'}];fixture.canVote=()=>false;fixture.tally=()=>({yes:245,no:70,abstain:30});fixture.quorum=()=>({cast:345,eligible:450,needed:226,met:true});
 const g=new Proxy(fixture,{get:(target,key)=>key in target?target[key]:noop});
 // Replace only this process's hook export. The application source remains unchanged.
@@ -110,6 +132,8 @@ pages.push(['metric-modal-empty','График без истории',renderToSt
  g,initialSelectedMetricId:fixture.metrics[0].id
 })))]);
 fixture.metricHistory=savedMetricHistory;
+const ImpactRulesPanel=require('../components/game/ImpactRulesPanel').default;
+pages.push(['impact','Модель последствий',renderToStaticMarkup(h('main',{className:'teacherSimple previewImpactPage'},h(ImpactRulesPanel,{g})))]);
 const defs=[['stages','Этапы','StagesView'],['parties','Партии','PartiesView'],['votes','Голосования','VotesView'],['documents','Реестр НПА','DocumentsView'],['actions','Процессы','PoliticalWallView'],['grades','Оценки','GradesView'],['teacher','Управление','TeacherView'],['profile','Профиль','ProfileView']];
 for(const [id,label,file] of defs){const Component=require('../components/game/'+file).default;const content=renderToStaticMarkup(h(Component,{g,onNavigate:noop,onOpenVotes:noop,onOpenStages:noop,onOpenDocument:noop,onOpenProcesses:noop}));pages.push([id,label,base.replace(/(<main id="game-main"[^>]*>)[\s\S]*?(<\/main>)/,(_,start,end)=>start+content+end)]);}
 let css=fs.readFileSync(path.join(root,'app/globals.css'),'utf8');css=css.replace(/@import '\.\/([^']+)' layer\(legacy\);/g,(_,file)=>'@layer legacy {\n'+fs.readFileSync(path.join(root,'app',file),'utf8')+'\n}');
