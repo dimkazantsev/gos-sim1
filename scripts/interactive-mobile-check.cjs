@@ -94,6 +94,8 @@ async function main(){
  desktop.on('pageerror',err=>console.error('BROWSER PAGE ERROR:',String(err)));
  desktop.on('console',msg=>{if(msg.type()==='error')console.error('BROWSER CONSOLE ERROR:',msg.text())});
  await desktop.goto(address);
+ // Next.js development overlay sits above the fixed dock; disable only in CI's browser page.
+ await desktop.addStyleTag({content:'nextjs-portal{display:none!important;pointer-events:none!important}'});
  await desktop.waitForFunction(()=>document.body.dataset.uiReady==='yes',null,{timeout:30000});
  await desktop.locator('.mobileDockItem').first().waitFor();
  for(const width of [320,360,390,430,768])await checkUnits(desktop,width);
@@ -131,6 +133,7 @@ async function main(){
  const touchContext=await browser.newContext({viewport:{width:390,height:850},isMobile:true,hasTouch:true,deviceScaleFactor:1});
  const touch=await touchContext.newPage();
  await touch.goto(address);
+ await touch.addStyleTag({content:'nextjs-portal{display:none!important;pointer-events:none!important}'});
  await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes',null,{timeout:12000});
  await touch.locator('.mobileDockItem').first().waitFor();
  await touch.evaluate(()=>localStorage.removeItem('dock-interaction-ci'));
