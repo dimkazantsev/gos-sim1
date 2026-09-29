@@ -300,7 +300,7 @@ check('Recording does not immediately upload on stop and supports local audio/vi
  read('components/game/useRepublicGame.ts').includes('pendingChatUploads.current.set(blob,result.pending)')&&
  read('components/game/useRepublicGame.ts').includes('rec.start(1000)')&&
  chat.includes('className="chatCapturePanel chatCaptureReview"')&&
- chat.includes('chatCaptureVoicePreview')&&chat.includes('Просмотреть запись')&&
+ chat.includes('chatCaptureVoicePreview')&&chat.includes('ChatVideoNote')&&
  chat.includes('recordingStream'));
 check('Chat composer aligns icon send, attachment, visible mic and video controls',
  chat.includes('className="chatInputRow"')&&
