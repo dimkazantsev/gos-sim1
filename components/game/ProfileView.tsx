@@ -8,6 +8,7 @@ import ClassroomJournal from './ClassroomJournal';
 import SignatureUpload from './SignatureUpload';
 import ProfileSecurityPanel from './ProfileSecurityPanel';
 import RepublicComic from './RepublicComic';
+import SessionManager from './SessionManager';
 import StyledSelect from '../ui/StyledSelect';
 import {cropPortrait} from './avatarCrop';
 
@@ -153,6 +154,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
     {targetProfile?.bio&&<div className="profileBioPreview"><small>Описание</small><p>{targetProfile.bio}</p></div>}
    </aside>
   </section>
+  {own&&teacher&&<SessionManager g={g}/>}
   <RepublicComic open={comicOpen} onClose={()=>setComicOpen(false)}/>
  </div>;
 }
