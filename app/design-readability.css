@@ -2372,6 +2372,14 @@
   display:block;
   width:100%;
 }
+.simChat.gsChatV2 .chatVoicePlayer>audio,
+.simChat.gsChatV2 .chatPinnedMedia .chatVoicePlayer>audio{
+  display:none;
+  position:absolute;
+  width:0;
+  height:0;
+  overflow:hidden;
+}
 .gsChatV2 .chatVoicePlayer{
   display:flex;
   flex-direction:row;
