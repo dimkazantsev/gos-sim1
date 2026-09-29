@@ -301,7 +301,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    </div>
    {recordingPreview.kind==='audio'
     ?<div className="chatCaptureVoicePreview"><ChatVoicePlayer src={recordingPreview.url} messageId="draft-voice" durationHint={recordingPreview.duration} waveform={recordingPreview.waveform} fileName={recordingPreview.fileName}/></div>
-    :<video controls preload="metadata" playsInline src={recordingPreview.url} aria-label="Просмотреть запись"/>}
+    :<ChatVideoNote src={recordingPreview.url} preview/>}
    {recordingPreview.channelId!==channelId&&<p className="chatCaptureNote">Запись будет отправлена в исходный канал.</p>}
    {recordingPreview.blob.size>MAX_FILE_SIZE&&<p className="chatCaptureNote">Превышен лимит 25 МБ. Сохраните запись на устройство или повторите.</p>}
    <div className="chatCaptureActions">
