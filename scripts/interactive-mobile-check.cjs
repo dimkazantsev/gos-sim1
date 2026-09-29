@@ -107,6 +107,8 @@ async function main(){
  assert(menuBounds.top>=-2&&menuBounds.bottom<=menuBounds.height+2);
  await desktop.screenshot({path:path.join(screens,'real-all-sections.png')});
  await modal.getByRole('button',{name:'Закрыть'}).click();
+ await modal.waitFor({state:'hidden'});
+ await desktop.evaluate(()=>{window.__dockEvents=[];document.addEventListener('pointerdown',e=>{if(e.target.closest('.mobileDock'))window.__dockEvents.push({type:'down',node:e.target.closest('button')?.dataset?.dockItem})},true);document.addEventListener('pointercancel',e=>window.__dockEvents.push({type:'cancel'}),true);});
  let keys=await order(desktop);
  assert.equal(keys[0],'teacher');
  // Mouse long press must activate the mode; pointer capture must not block drop targeting.
@@ -114,7 +116,7 @@ async function main(){
  const to=await desktop.locator('[data-dock-item="stages"]').boundingBox();
  await desktop.mouse.move(from.x+from.width/2,from.y+from.height/2);
  await desktop.mouse.down();
- await desktop.waitForFunction(()=>document.querySelector('.mobileDockV2')?.classList.contains('isEditing'),null,{timeout:4500});
+ try{await desktop.waitForFunction(()=>document.querySelector('.mobileDockV2')?.classList.contains('isEditing'),null,{timeout:4500});}catch(err){console.error('POINTER DIAGNOSTIC',await desktop.evaluate(()=>({events:window.__dockEvents,at:document.elementFromPoint(innerWidth/2,innerHeight-30)?.outerHTML.slice(0,300),nav:document.querySelector('.mobileDock')?.className})));throw err}
  await desktop.mouse.move(to.x+to.width/2,to.y+to.height/2,{steps:8});
  await desktop.mouse.up();
  keys=await order(desktop);
