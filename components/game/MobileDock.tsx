@@ -244,7 +244,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
     </div>}
     {editing?
      <button type="button" className="mobileDockDone" onClick={()=>{clearGesture();setEditing(false)}}><Check aria-hidden="true"/><span>Готово</span></button>:
-     <button type="button" className="mobileDockAll" aria-haspopup="dialog" onClick={onAll}><LayoutGrid aria-hidden="true"/><span>Все разделы</span></button>
+     <button type="button" className="mobileDockAll" aria-haspopup="dialog" onClick={onAll}><LayoutGrid aria-hidden="true"/><span>Все разделы</span></button>}
    </div>
    <span className="mobileDockAnnouncement" role="status" aria-live="polite">{announcement}</span>
   </nav>
