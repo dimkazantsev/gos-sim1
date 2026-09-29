@@ -11,6 +11,7 @@ import RepublicComic from './RepublicComic';
 import StyledSelect from '../ui/StyledSelect';
 
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
+type PublicStats={accepted_actions:number;posts:number;votes_cast:number;documents_created:number;activity_entries:number;events_decided:number};
 export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,readOnly=false}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;readOnly?:boolean}){
  const {me,game,members,profiles,parties,partyInvitations,partyMandates,averageVsn,myEvaluations,actions,politicalPosts,ballots,formalDocuments,activities,saveProfile,teacher}=g;
  const target=members.find(m=>m.user_id===(targetUserId||me?.user_id))||me;
@@ -22,7 +23,8 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
  const [bio,setBio]=useState(targetProfile?.bio||'');
  const [file,setFile]=useState<File|null>(null),[photoPreview,setPhotoPreview]=useState('');
  const [saving,setSaving]=useState(false),[saved,setSaved]=useState(false),[showMyJournal,setShowMyJournal]=useState(false),[comicOpen,setComicOpen]=useState(false);
- const [publicScores,setPublicScores]=useState<PublicAssessment[]>([]),[search,setSearch]=useState('');
+ const [publicScores,setPublicScores]=useState<PublicAssessment[]>([]);
+ const [publicStats,setPublicStats]=useState<PublicStats|null>(null);
  const photoInput=useRef<HTMLInputElement>(null);
  const initials=useMemo(()=>target?.full_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()||'Я',[target?.full_name]);
  useEffect(()=>{setBio(targetProfile?.bio||'')},[target?.user_id,targetProfile?.bio]);
@@ -34,6 +36,13 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
    .then(r=>{if(valid)setPublicScores(((r.data||[]) as (PublicAssessment & {user_id:string})[]).filter(a=>a.user_id===target.user_id))});
   return()=>{valid=false};
  },[game?.id,target?.user_id]);
+ useEffect(()=>{
+  if(!game||!target)return;
+  let active=true;setPublicStats(null);
+  void supabase.rpc('get_member_public_stats',{p_game_id:game.id,p_user_id:target.user_id})
+   .then(r=>{if(active&&!r.error&&r.data?.[0])setPublicStats(r.data[0] as PublicStats)});
+  return()=>{active=false};
+ },[game?.id,target?.user_id]);
  if(!me||!target)return null;
  const counted=publicScores.map(s=>s.status==='final'?(s.final_score??s.auto_score):s.auto_score);
  const avg=counted.length?counted.reduce((a,b)=>a+b,0)/counted.length:null;
@@ -41,7 +50,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
  const numberOfPosts=politicalPosts.filter(p=>p.author_id===target.user_id).length;
  const numberOfVotes=ballots.filter(b=>b.voter_id===target.user_id).length;
  const numberOfDocuments=formalDocuments.filter(d=>d.author_id===target.user_id).length;
- const loggedActivity=activities.filter(a=>a.actor_id===target.user_id).length;
+ const loggedActivity=publicStats?.activity_entries??null;
  async function save(){
   if(!own||saving)return;
   setSaving(true);setSaved(false);
@@ -89,9 +98,9 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
   {!own&&<>
    <section className="profilePublicStats">
     {[
-     ['Принятые решения',numberOfActions],['Публикации',numberOfPosts],['Голосования',numberOfVotes],
-     ['Созданные НПА',numberOfDocuments],['Действия в журнале',loggedActivity]
-    ].map(([label,value])=><article key={label}><strong>{value}</strong><span>{label}</span></article>)}
+     ['Принятые решения',publicStats?.accepted_actions],['Публикации',publicStats?.posts],['Голосования',publicStats?.votes_cast],
+     ['Созданные НПА',publicStats?.documents_created],['Действия в журнале',publicStats?.activity_entries],['Ответы на события',publicStats?.events_decided]
+    ].map(([label,value])=><article key={label}><strong>{value??'—'}</strong><span>{label}</span></article>)}
    </section>
    <section className="profilePublicBiography surface"><h2>Игровая визитка</h2><p>{targetProfile?.bio||'Игрок пока не добавил описание.'}</p></section>
    {target.kind==='student'&&<section className="surface profilePublicScores"><header><h2>Публичные баллы по этапам</h2><strong>{avg===null?'—':avg.toFixed(2)}</strong></header>
