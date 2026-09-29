@@ -1,406 +1,317 @@
-/* Stages desktop polish.
-   Loaded AFTER the generic view and responsive sheets to give the stage map
-   one unambiguous layout owner without changing mobile navigation. */
-@media (min-width:901px) {
-  .stagesPage {--stage-gap:16px;--stage-blue:#315efb;min-width:0}
-  .stagesPage .pageHeader {align-items:center;gap:24px}
-  .stagesPage .stageNextButton {
-    display:inline-flex;align-items:center;justify-content:center;gap:10px;
-    min-height:46px;padding:12px 18px;flex-shrink:0;white-space:nowrap;
-  }
-  .stagesPage .stageNextButton svg {width:17px;height:17px;flex:none}
-
-  /* Six phase buttons share the same three baselines and equal tracks. */
-  .stagesPage .stagePhaseRail {
-    display:grid;grid-template-columns:minmax(215px,.75fr) minmax(0,2.25fr);
-    gap:16px;align-items:stretch;padding:16px;margin:22px 0 18px;
-  }
-  .stagesPage .stagePhaseIntro {
-    margin:0;min-width:0;min-height:112px;padding:18px;
-    justify-content:center;align-items:flex-start;
-  }
-  .stagesPage .stagePhaseTrack {
-    display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;align-items:stretch;
-  }
-  .stagesPage .stagePhaseTrack button {
-    display:grid;grid-template-rows:20px minmax(34px,1fr) 25px;
-    justify-items:center;align-items:center;align-content:stretch;
-    min-height:112px;min-width:0;padding:17px 8px 9px;
-    text-align:center;gap:3px;overflow-wrap:normal;
-  }
-  .stagesPage .stagePhaseTrack button::before {left:10px;right:10px;top:8px}
-  .stagesPage .stagePhaseTrack button i {
-    margin:0;align-self:center;font-size:12px;line-height:20px;font-style:normal;
-  }
-  .stagesPage .stagePhaseTrack button b {
-    display:grid;place-items:center;margin:0;min-height:34px;max-width:100%;
-    font-size:12px;line-height:1.3;font-weight:800;text-wrap:balance;overflow-wrap:anywhere;
-  }
-  .stagesPage .stagePhaseProgress {
-    display:inline-flex;align-items:center;justify-content:center;gap:5px;
-    min-height:25px;margin:0;padding:3px 7px;border-radius:8px;
-    background:#eef3fa;color:#526884;font-size:12px;line-height:1;
-  }
-  .stagesPage .stagePhaseProgress svg {width:14px;height:14px;flex:none}
-
-  /* Cards are flex columns: only the body grows; the entire action strip is
-     a single bottom-aligned row. No absolute controls or phantom grid tracks. */
-  .stagesPage .stageTimeline {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));
-    align-items:stretch;
-    gap:16px;
-    min-width:0;
-  }
-  .stagesPage .stageCard {
-    container-name:stage-card;
-    container-type:inline-size;
-    position:relative;
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
-    gap:0;
-    min-width:0;
-    min-height:266px;
-    padding:0;
-    overflow:hidden;
-    border:1px solid #dce5ef;
-    border-radius:18px;
-    background:#fff;
-    box-shadow:0 5px 18px rgba(19,39,70,.045);
-    transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
-  }
-  .stagesPage .stageCard.open {
-    border-color:#a9bfeb;
-    background:linear-gradient(165deg,#fff 52%,#f8faff);
-    box-shadow:0 6px 22px rgba(49,94,251,.08);
-  }
-  .stagesPage .stageCard.completed{background:#fff}
-  .stagesPage .stageCard:hover {
-    transform:translateY(-2px);
-    border-color:#9db9e0;
-    box-shadow:0 12px 29px rgba(19,39,70,.09);
-  }
-  .stagesPage .stageCardPrimary {
-    display:flex;
-    flex:1 1 auto;
-    flex-direction:column;
-    align-items:stretch;
-    justify-content:flex-start;
-    gap:0;
-    min-width:0;
-    min-height:0;
-    width:100%;
-    margin:0;
-    padding:20px 20px 18px;
-    border:0;
-    border-radius:0;
-    background:transparent;
-    color:inherit;
-    text-align:left;
-    cursor:pointer;
-    font-size:14px;
-    font-weight:450;
-    line-height:1.45;
-  }
-  .stagesPage .stageCardTop {
-    display:grid;
-    grid-template-columns:52px minmax(0,1fr);
-    align-items:start;
-    gap:14px;
-    width:100%;
-    min-width:0;
-    margin:0;
-  }
-  .stagesPage .stageCard .stageNo {
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    flex:none;
-    gap:2px;
-    width:52px;
-    min-width:52px;
-    height:57px;
-    min-height:57px;
-    margin:0;
-    padding:0;
-    border-radius:14px;
-    background:#eef3f7;
-    color:#4d6683;
-    box-shadow:none;
-  }
-  .stagesPage .stageCard .stageNo svg {display:block;flex:none;width:22px;height:22px;margin:0}
-  .stagesPage .stageCard .stageNo span {
-    display:block;
-    margin:0;
-    color:inherit;
-    text-align:center;
-    font-size:12px;
-    font-weight:800;
-    line-height:1;
-    letter-spacing:.045em;
-  }
-  .stagesPage .stageCard.open .stageNo {background:#e7eeff;color:#285fc5}
-  .stagesPage .stageCard.completed .stageNo {background:#e8f5ee;color:#22744f}
-  .stagesPage .stageCardBody {
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
-    gap:0;
-    width:100%;
-    min-width:0;
-    margin:0;
-    padding:0;
-  }
-  .stagesPage .stageCardMode {
-    display:block;
-    min-width:0;
-    margin:1px 0 6px;
-    color:#71829a;
-    font-size:11px;
-    font-weight:800;
-    line-height:1.4;
-    letter-spacing:.055em;
-    text-transform:uppercase;
-    overflow-wrap:anywhere;
-  }
-  .stagesPage .stageCardTitle {
-    display:block;
-    min-width:0;
-    margin:0;
-    color:#183454;
-    font-size:17px;
-    font-weight:770;
-    line-height:1.32;
-    letter-spacing:-.02em;
-    overflow-wrap:anywhere;
-    text-wrap:pretty;
-  }
-  .stagesPage .stageCardSummary {
-    display:-webkit-box;
-    min-width:0;
-    margin:9px 0 0;
-    color:#5e718b;
-    font-size:13px;
-    font-weight:430;
-    line-height:1.52;
-    letter-spacing:0;
-    overflow:hidden;
-    overflow-wrap:anywhere;
-    -webkit-box-orient:vertical;
-    -webkit-line-clamp:4;
-  }
-  .stagesPage .stageCardDue {
-    display:inline-flex;
-    align-self:flex-start;
-    align-items:center;
-    gap:7px;
-    margin:13px 0 0 66px;
-    padding:5px 9px;
-    min-height:29px;
-    max-width:calc(100% - 66px);
-    border:1px solid #e1e8f0;
-    border-radius:8px;
-    background:#fff;
-    color:#60738d;
-    font-size:12px;
-    font-weight:730;
-    font-variant-numeric:tabular-nums;
-    line-height:1.25;
-  }
-  .stagesPage .stageCardDue svg{display:block;flex:none}
-  .stagesPage .stageCardFooter {
-    display:flex;
-    flex:0 0 auto;
-    align-items:center;
-    justify-content:flex-start;
-    flex-wrap:nowrap;
-    gap:8px;
-    min-width:0;
-    min-height:66px;
-    width:100%;
-    margin:0;
-    padding:12px 18px;
-    border-top:1px solid #e7edf5;
-    background:#f9fbfe;
-  }
-  .stagesPage .stageStatusPill {
-    display:inline-flex;
-    flex:0 0 auto;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    min-width:0;
-    min-height:38px;
-    margin:0;
-    padding:0 10px;
-    border:1px solid #dee5ed;
-    border-radius:9px;
-    background:#f1f4f7;
-    color:#63748a;
-    font-size:12px;
-    font-weight:800;
-    line-height:1;
-    white-space:nowrap;
-  }
-  .stagesPage .stageStatusPill svg,
-  .stagesPage .stageVoteQuick svg,
-  .stagesPage .stageCardOpen svg{
-    display:block;
-    width:16px;
-    height:16px;
-    flex:none;
-    margin:0;
-  }
-  .stagesPage .stageStatusPill--open {background:#e9f0ff;border-color:#cddfff;color:#285bb5}
-  .stagesPage .stageStatusPill--completed {background:#e9f6ef;border-color:#cde7d8;color:#1d754f}
-  .stagesPage .stageStatusPill--locked {background:#f1f4f8;border-color:#dfe6ee;color:#687a91}
-  .stagesPage .stageVoteQuick {
-    position:static;
-    display:inline-flex;
-    flex:0 0 auto;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    min-width:38px;
-    min-height:38px;
-    width:auto;
-    height:38px;
-    margin:0;
-    padding:0 10px;
-    border:1px solid #efd1a1;
-    border-radius:9px;
-    background:#fff4e1;
-    color:#895b1e;
-    font-size:12px;
-    font-weight:750;
-    line-height:1;
-    white-space:nowrap;
-    cursor:pointer;
-  }
-  .stagesPage .stageVoteQuick>span {
-    position:static;
-    display:block;
-    width:auto;
-    height:auto;
-    overflow:visible;
-    clip:auto;
-    clip-path:none;
-    white-space:nowrap;
-  }
-  .stagesPage .stageVoteQuick:hover{background:#ffe9c3;border-color:#dcb77a}
-  .stagesPage .stageCardOpen {
-    display:inline-flex;
-    flex:0 0 auto;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    width:auto;
-    min-width:120px;
-    min-height:40px;
-    margin:0 0 0 auto;
-    padding:0 12px;
-    border:1px solid #ccdafa;
-    border-radius:9px;
-    background:#ecf2ff;
-    color:#2a58b5;
-    font-size:12px;
-    font-weight:800;
-    line-height:1;
-    white-space:nowrap;
-    cursor:pointer;
-    transition:background .16s ease,border-color .16s ease;
-  }
-  .stagesPage .stageCardOpen span{display:block;width:auto;margin:0;text-align:left}
-  .stagesPage .stageCardOpen:hover,
-  .stagesPage .stageCardPrimary:hover~.stageCardFooter .stageCardOpen {
-    background:#dce8ff;
-    border-color:#afc7f2;
-  }
-  .stagesPage .stageCardPrimary:focus-visible,
-  .stagesPage .stageVoteQuick:focus-visible,
-  .stagesPage .stageCardOpen:focus-visible,
-  .stagesPage .stagePhaseTrack button:focus-visible,
-  .stagesPage .stageNextButton:focus-visible {
-    position:relative;
-    z-index:1;
-    outline:3px solid #3468cc;
-    outline-offset:-4px;
-  }
-  @container stage-card (max-width:470px) {
-    .stageVoteQuick {width:38px;padding:0}
-    .stageVoteQuick>span{display:none}
-  }
-  @container stage-card (max-width:345px) {
-    .stageCardFooter{gap:5px;padding:10px}
-    .stageStatusPill{padding:0 7px}
-    .stageCardOpen{min-width:100px;padding:0 8px;gap:5px}
-  }
-
-  /* Modal heading has three strict columns, avoiding close-icon drift. */
-  .stagesPage .stageDetailHeader {
-    display:grid;grid-template-columns:58px minmax(0,1fr) 44px;
-    align-items:center;column-gap:16px;padding:22px 26px;
-  }
-  .stagesPage .stageDetailHeader>div:nth-child(2) {min-width:0}
-  .stagesPage .stageDetailBadge {
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:3px;width:58px;height:58px;min-height:58px;padding:0;
-  }
-  .stagesPage .stageDetailBadge svg {display:block;width:23px;height:23px;flex:none}
-  .stagesPage .stageDetailBadge span {display:block;font-size:12px;line-height:13px}
-  .stagesPage .stageDetailHeader h2 {
-    margin:4px 0 10px;line-height:1.25;overflow-wrap:anywhere;
-  }
-  .stagesPage .stageDetailStatus {
-    display:flex;align-items:center;justify-content:flex-start;
-    gap:7px;flex-wrap:wrap;min-width:0;
-  }
-  .stagesPage .stageDetailHeader .gsIconAction {
-    display:grid;place-items:center;justify-self:end;align-self:center;
-    width:44px;height:44px;min-width:44px;min-height:44px;padding:0;margin:0;
-  }
-  .stagesPage .stageDetailHeader .gsIconAction svg {display:block;margin:0}
-  .stagesPage .stageModalVoteAction {
-    display:inline-flex;align-items:center;justify-content:center;
-    gap:10px;min-height:44px;white-space:normal;text-align:center;
-  }
-  .stagesPage .stageModalVoteAction svg {width:17px;height:17px;flex:none}
-  .stagesPage .stageRulesCalloutIcon {display:grid;place-items:center}
+/* Stages atlas — independent, last-loaded component stylesheet.
+   All selectors are scoped to .stagesAtlas; older stageCard rules cannot leak in. */
+.stagesAtlas{
+ --atlas-text:#192d4a;--atlas-muted:#677b96;--atlas-line:#dfe7f0;
+ --atlas-accent:#315eef;--atlas-soft:#f0f5ff;--atlas-green:#167a59;
+ display:grid;gap:20px;min-width:0;color:var(--atlas-text)
 }
-@media (min-width:901px) and (max-width:1320px){
-  .stagesPage .stagePhaseRail{grid-template-columns:minmax(0,1fr)}
-  .stagesPage .stagePhaseTrack{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .stagesPage .stagePhaseIntro{min-height:84px}
-  .stagesPage .stagePhaseTrack button{min-height:96px}
+.stagesAtlas :is(button,input){font-family:inherit}
+.stagesAtlas :is(button,input):focus-visible{outline:3px solid #6a8df7;outline-offset:3px}
+.stagesAtlas :is(.stageAtlasHero,.stageAtlasPhases,.stageAtlasDirectory){
+ min-width:0;border:1px solid #dfe6f1;border-radius:22px;background:#fff;
+ box-shadow:0 5px 22px rgba(21,42,76,.035)
 }
-@media (max-width:900px){
-  /* Keep the new footer structure usable on tablets and mobiles. */
-  .stagesPage .stageTimeline{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
-  .stagesPage .stageCard{display:flex;flex-direction:column;align-items:stretch;min-width:0;padding:0;gap:0;overflow:hidden}
-  .stagesPage .stageCardPrimary{display:flex;flex:1 1 auto;flex-direction:column;min-width:0;width:100%;padding:16px;border:0;background:transparent;text-align:left}
-  .stagesPage .stageCardTop{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;align-items:start;min-width:0;width:100%}
-  .stagesPage .stageCard .stageNo{width:48px;height:54px;min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-  .stagesPage .stageCard .stageNo svg{display:block;flex:none}
-  .stagesPage .stageCard .stageNo span{display:block;margin:0;font-size:12px;line-height:1}
-  .stagesPage .stageCardBody{display:flex;flex-direction:column;gap:0;min-width:0}
-  .stagesPage .stageCardMode{display:block;margin:0 0 6px;color:#70819a;font-size:11px;font-weight:800;line-height:1.3}
-  .stagesPage .stageCardTitle{display:block;margin:0;font-size:16px;font-weight:750;line-height:1.34;color:#1d3655}
-  .stagesPage .stageCardSummary{display:-webkit-box;margin:8px 0 0;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:4;color:#63758e;font-size:13px;font-weight:450;line-height:1.5}
-  .stagesPage .stageCardDue{display:inline-flex;align-items:center;align-self:flex-start;gap:6px;margin:12px 0 0 60px;font-size:12px}
-  .stagesPage .stageCardFooter{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:auto;padding:12px 15px;min-height:60px;border-top:1px solid #e7edf5;background:#f9fbfe}
-  .stagesPage .stageStatusPill{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 9px;font-size:12px;white-space:nowrap}
-  .stagesPage .stageVoteQuick{position:static;display:inline-flex;align-items:center;justify-content:center;gap:5px;width:auto;height:36px;min-height:36px;margin:0;padding:0 9px;border:1px solid #efd1a1;border-radius:9px;background:#fff4e1;color:#895b1e;font-size:12px}
-  .stagesPage .stageVoteQuick>span{position:static;display:block;width:auto;height:auto;clip:auto;clip-path:none;overflow:visible}
-  .stagesPage .stageVoteQuick svg,.stagesPage .stageStatusPill svg,.stagesPage .stageCardOpen svg{display:block;flex:none;width:16px;height:16px}
-  .stagesPage .stageCardOpen{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;margin:0 0 0 auto;padding:0 10px;border:1px solid #ccdafa;border-radius:9px;background:#ecf2ff;color:#2a58b5;font-size:12px;font-weight:800;white-space:nowrap}
-  .stagesPage .stageCardOpen span{width:auto}
+.stagesAtlas .stageAtlasHero{
+ display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,.6fr);
+ align-items:center;gap:30px;padding:28px 32px;
+ background:radial-gradient(circle at 95% 0%,rgba(79,125,251,.075),transparent 48%),#fff
 }
-@media (max-width:370px){
-  .stagesPage .stageVoteQuick>span{display:none}
+.stagesAtlas .stageAtlasOverline,.stagesAtlas .stageAtlasEyebrow{
+ display:inline-flex;align-items:center;gap:8px;color:#577294;font-size:11px;font-weight:850;
+ letter-spacing:.11em;line-height:1.4
+}
+.stagesAtlas .stageAtlasOverline svg{color:var(--atlas-accent)}
+.stagesAtlas .stageAtlasHeading h1{
+ margin:10px 0;font-size:clamp(27px,2.6vw,37px);line-height:1.12;
+ color:#172d4d;letter-spacing:-.04em;font-weight:820
+}
+.stagesAtlas .stageAtlasHeading p{
+ max-width:630px;margin:0;color:#60748d;font-size:14px;line-height:1.65
+}
+.stagesAtlas .stageAtlasHeroAside{display:grid;gap:12px;min-width:0}
+.stagesAtlas .stageAtlasProgressBox{
+ display:grid;gap:11px;padding:17px 19px;border:1px solid #dce6f8;border-radius:15px;background:#f7faff
+}
+.stagesAtlas .stageAtlasProgressTop,.stagesAtlas .stageAtlasProgressBottom{
+ display:flex;justify-content:space-between;align-items:center;gap:12px;
+ color:#657a96;font-size:12px;font-weight:700
+}
+.stagesAtlas .stageAtlasProgressTop strong{
+ color:#173d81;font-size:22px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.035em
+}
+.stagesAtlas .stageAtlasProgressTop strong span{color:#8396b1;font-size:13px;font-weight:750}
+.stagesAtlas .stageAtlasProgressTrack{
+ height:7px;border-radius:100px;background:#e3ebf8;overflow:hidden
+}
+.stagesAtlas .stageAtlasProgressTrack>span{
+ display:block;height:100%;min-width:0;border-radius:inherit;
+ background:linear-gradient(90deg,#3264ef,#5dc3bd);transition:width .2s ease
+}
+.stagesAtlas .stageAtlasProgressBottom{font-size:11px}
+.stagesAtlas .stageAtlasNext{
+ display:inline-flex;align-items:center;justify-content:center;gap:10px;
+ min-height:43px;padding:10px 16px;border-radius:11px;font-size:13px;font-weight:780
+}
+.stagesAtlas .stageAtlasNext svg{flex:none}
+.stagesAtlas .stageAtlasPhases{padding:22px 24px}
+.stagesAtlas .stageAtlasSectionHead,.stagesAtlas .stageAtlasDirectoryHead{
+ display:flex;justify-content:space-between;align-items:center;gap:16px;min-width:0;margin-bottom:17px
+}
+.stagesAtlas .stageAtlasSectionHead h2,.stagesAtlas .stageAtlasDirectoryHead h2{
+ margin:4px 0 0;color:#193353;font-size:19px;line-height:1.3;font-weight:820;letter-spacing:-.025em
+}
+.stagesAtlas .stageAtlasClear{
+ display:inline-flex;align-items:center;gap:7px;flex:none;padding:7px 9px;
+ border:0;border-radius:8px;background:#f0f5fb;color:#47658a;font-size:12px;font-weight:750
+}
+.stagesAtlas .stageAtlasPhaseList{
+ display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;min-width:0
+}
+.stagesAtlas .stageAtlasPhase{
+ --phase-accent:#315efb;
+ position:relative;display:flex;flex-direction:column;align-items:stretch;gap:9px;
+ min-width:0;min-height:128px;padding:14px 13px 12px;overflow:hidden;text-align:left;
+ border:1px solid #e0e7f0;border-radius:13px;background:#fbfcfe;
+ transition:border-color .16s,background .16s,box-shadow .16s
+}
+.stagesAtlas .stageAtlasPhase:hover{border-color:#adc3e8;background:#fff}
+.stagesAtlas .stageAtlasPhase.isCurrent{background:#f6f9ff;border-color:#bed0fa}
+.stagesAtlas .stageAtlasPhase.isSelected{
+ background:#edf3ff;border-color:#8faef4;box-shadow:inset 0 0 0 1px #abc0fc
+}
+.stagesAtlas .stageAtlasPhaseRange{
+ display:block;color:#6682a6;font-size:11px;font-weight:820;letter-spacing:.065em
+}
+.stagesAtlas .stageAtlasPhaseTitle{
+ display:flex;align-items:center;flex:1;min-height:36px;max-width:100%;
+ color:#253e60;font-size:12px;font-weight:820;line-height:1.3;overflow-wrap:anywhere
+}
+.stagesAtlas .stageAtlasPhaseBottom{
+ display:flex;justify-content:space-between;align-items:center;gap:7px;min-width:0;
+ color:#7185a0;font-size:11px;line-height:1.2;font-weight:730;white-space:nowrap
+}
+.stagesAtlas .stageAtlasPhaseBottom svg{flex:none;color:var(--phase-accent)}
+.stagesAtlas .stageAtlasPhaseMeter{
+ display:block;width:100%;height:3px;margin-top:1px;border-radius:10px;background:#e8ecf3;overflow:hidden
+}
+.stagesAtlas .stageAtlasPhaseMeter>span{
+ display:block;height:100%;border-radius:inherit;background:var(--phase-accent)
+}
+.stagesAtlas .stageAtlasDirectory{padding:23px 24px 25px}
+.stagesAtlas .stageAtlasVisibleCount{
+ display:inline-flex;align-items:center;justify-content:center;flex:none;
+ min-height:30px;padding:0 10px;border:1px solid #e1e8f1;border-radius:9px;
+ background:#f5f8fc;color:#627893;font-size:12px;font-weight:770;font-variant-numeric:tabular-nums
+}
+.stagesAtlas .stageAtlasToolbar{
+ display:flex;align-items:center;justify-content:space-between;gap:16px;min-width:0;
+ margin:0 0 20px;padding-bottom:18px;border-bottom:1px solid #e9eef5
+}
+.stagesAtlas .stageAtlasFilters{display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-width:0}
+.stagesAtlas .stageAtlasFilter{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;
+ min-height:38px;padding:0 12px;border:1px solid transparent;border-radius:10px;
+ background:transparent;color:#667992;font-size:12px;font-weight:760;white-space:nowrap;
+ transition:background .16s,border-color .16s,color .16s
+}
+.stagesAtlas .stageAtlasFilter:hover{background:#f4f7fc;color:#274e93}
+.stagesAtlas .stageAtlasFilter.isActive{background:#ebf2ff;border-color:#c9dafc;color:#245bc4}
+.stagesAtlas .stageAtlasFilter>span{
+ display:grid;place-items:center;min-width:21px;min-height:21px;padding:0 5px;
+ border-radius:6px;background:#ecf0f6;color:#627a96;font-size:11px;font-variant-numeric:tabular-nums
+}
+.stagesAtlas .stageAtlasFilter.isActive>span{background:#dce8ff;color:#285bbd}
+.stagesAtlas .stageAtlasSearch{
+ display:flex;align-items:center;gap:8px;flex:0 1 250px;min-width:190px;
+ height:41px;margin:0;padding:0 12px;border:1px solid #dce5f1;border-radius:11px;
+ background:#fff;color:#7990aa;transition:border-color .16s
+}
+.stagesAtlas .stageAtlasSearch:focus-within{border-color:#819feb}
+.stagesAtlas .stageAtlasSearch svg{flex:none}
+.stagesAtlas .stageAtlasSearch input{
+ flex:1;min-width:0;width:100%;height:100%;padding:0;border:0;outline:none;
+ background:transparent;color:#26405f;font-size:13px;font-weight:550
+}
+.stagesAtlas .stageAtlasSearch input:focus-visible{outline:none}
+.stagesAtlas .stageAtlasSearch input::placeholder{color:#8797ab}
+.stagesAtlas .stageAtlasGrid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;align-items:stretch;min-width:0
+}
+.stagesAtlas .stageAtlasCard{
+ container-type:inline-size;container-name:atlas-card;
+ display:flex;flex-direction:column;align-items:stretch;min-width:0;min-height:201px;
+ padding:0;overflow:hidden;border:1px solid #e0e7f0;border-radius:16px;
+ background:#fff;box-shadow:0 3px 12px rgba(22,43,76,.028);
+ transition:transform .16s,border-color .16s,box-shadow .16s
+}
+.stagesAtlas .stageAtlasCard:hover{
+ transform:translateY(-2px);border-color:#aec3e6;box-shadow:0 12px 24px rgba(22,43,76,.07)
+}
+.stagesAtlas .stageAtlasCard.is-open{border-color:#aac1ef;box-shadow:inset 0 3px #4c77e9}
+.stagesAtlas .stageAtlasCardMain{
+ display:grid;grid-template-columns:50px minmax(0,1fr);gap:14px;min-width:0;
+ flex:1;align-items:start;padding:20px 20px 18px
+}
+.stagesAtlas .stageAtlasCardGlyph{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+ width:50px;height:54px;min-height:54px;border:1px solid #d8ece2;border-radius:13px;
+ background:#eaf5ef;color:#227451
+}
+.stagesAtlas .stageAtlasCardGlyph svg{display:block;flex:none}
+.stagesAtlas .stageAtlasCardGlyph span{display:block;font-size:12px;line-height:1;font-weight:850;letter-spacing:.055em}
+.stagesAtlas .stageAtlasCard.is-open .stageAtlasCardGlyph{
+ border-color:#d5e2ff;background:#edf3ff;color:#3768d4
+}
+.stagesAtlas .stageAtlasCard.is-locked .stageAtlasCardGlyph{
+ border-color:#e2e8f0;background:#f2f5f9;color:#68809c
+}
+.stagesAtlas .stageAtlasCardContent{min-width:0}
+.stagesAtlas .stageAtlasCardTopline{
+ display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;
+ min-width:0;margin:0 0 7px
+}
+.stagesAtlas .stageAtlasCardMode{
+ display:inline-block;min-width:0;color:#7b8da4;font-size:11px;line-height:1.3;
+ font-weight:850;letter-spacing:.08em;text-transform:uppercase;overflow-wrap:anywhere
+}
+.stagesAtlas .stageAtlasCardStatus{
+ display:inline-flex;align-items:center;gap:5px;min-height:25px;padding:4px 8px;
+ border:1px solid #d3eadf;border-radius:8px;background:#eef9f3;
+ color:#237552;font-size:11px;font-weight:800;line-height:1.1;white-space:nowrap
+}
+.stagesAtlas .stageAtlasCardStatus svg{flex:none}
+.stagesAtlas .stageAtlasCardStatus.is-open{
+ border-color:#ccdcfb;background:#ecf2ff;color:#2a5ec4
+}
+.stagesAtlas .stageAtlasCardStatus.is-locked{
+ border-color:#e1e7ef;background:#f5f7fa;color:#6e8198
+}
+.stagesAtlas .stageAtlasCardContent h3{
+ margin:0;color:#1a3454;font-size:16px;font-weight:820;line-height:1.34;
+ letter-spacing:-.023em;overflow-wrap:anywhere;text-wrap:pretty
+}
+.stagesAtlas .stageAtlasCardContent p{
+ display:-webkit-box;margin:8px 0 0;color:#657891;font-size:13px;font-weight:450;
+ line-height:1.52;overflow:hidden;overflow-wrap:anywhere;
+ -webkit-box-orient:vertical;-webkit-line-clamp:3
+}
+.stagesAtlas .stageAtlasCardFooter{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ min-width:0;min-height:56px;margin-top:auto;padding:9px 17px 9px 20px;
+ border-top:1px solid #edf0f5;background:#fcfdff
+}
+.stagesAtlas .stageAtlasCardDeadline{
+ display:flex;align-items:center;gap:7px;min-width:0;color:#8899ac;
+ font-size:11px;font-weight:730;line-height:1.25;font-variant-numeric:tabular-nums
+}
+.stagesAtlas .stageAtlasCardDeadline svg{flex:none}
+.stagesAtlas .stageAtlasVoteIndicator{display:inline-flex;align-items:center;gap:6px;color:#9d722b}
+.stagesAtlas .stageAtlasVoteIndicator>span{
+ display:block;flex:none;width:6px;height:6px;border-radius:50%;background:#d68c27
+}
+.stagesAtlas .stageAtlasCardActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
+.stagesAtlas .stageAtlasVoteAction,.stagesAtlas .stageAtlasDetailAction{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;
+ min-height:36px;margin:0;padding:0 12px;border:1px solid #dce6f0;border-radius:9px;
+ background:#fff;color:#365b88;font-size:12px;font-weight:800;line-height:1;
+ white-space:nowrap;cursor:pointer;transition:background .16s,border-color .16s
+}
+.stagesAtlas .stageAtlasVoteAction{
+ border-color:#f0d6ae;background:#fff7eb;color:#895b26
+}
+.stagesAtlas .stageAtlasVoteAction:hover{border-color:#e7bd7a;background:#ffedd0}
+.stagesAtlas .stageAtlasDetailAction{
+ border-color:#d6e2fb;background:#edf3ff;color:#285bbb
+}
+.stagesAtlas .stageAtlasDetailAction:hover{border-color:#b6cdfb;background:#deeaff}
+.stagesAtlas .stageAtlasVoteAction svg,.stagesAtlas .stageAtlasDetailAction svg{display:block;flex:none}
+.stagesAtlas .stageAtlasEmpty{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+ min-height:240px;border:1px dashed #d4dfed;border-radius:15px;background:#fbfcff;
+ color:#7185a0;text-align:center;padding:30px
+}
+.stagesAtlas .stageAtlasEmpty strong{color:#284360;font-size:17px}
+.stagesAtlas .stageAtlasEmpty p{margin:0;font-size:13px}
+.stagesAtlas .stageAtlasEmpty button{
+ min-height:37px;margin-top:6px;padding:0 13px;border:1px solid #c9dafa;
+ border-radius:9px;background:#edf3ff;color:#285cbe;font-size:12px;font-weight:800
+}
+/* Keep modal open/close and internal workflow independent of the page redesign. */
+.stagesAtlas .stageDetailHeader{
+ display:grid;grid-template-columns:58px minmax(0,1fr) 44px;gap:16px;align-items:center;padding:22px 26px
+}
+.stagesAtlas .stageDetailHeader>div:nth-child(2){min-width:0}
+.stagesAtlas .stageDetailBadge{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+ width:58px;height:58px;min-height:58px
+}
+.stagesAtlas .stageDetailBadge svg{display:block;width:23px;height:23px;flex:none}
+.stagesAtlas .stageDetailBadge span{display:block;font-size:12px;line-height:13px;font-weight:850}
+.stagesAtlas .stageDetailStatus{display:flex;align-items:center;justify-content:flex-start;gap:7px;flex-wrap:wrap}
+.stagesAtlas .stageDetailHeader .gsIconAction{
+ display:grid;place-items:center;justify-self:end;align-self:center;
+ width:44px;height:44px;min-width:44px;min-height:44px;padding:0;margin:0
+}
+.stagesAtlas .stageDetailHeader .gsIconAction svg{display:block;margin:0}
+.stagesAtlas .stageModalVoteAction{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;flex-wrap:wrap}
+.stagesAtlas .stageRulesCalloutIcon{display:grid;place-items:center}
+@container atlas-card (max-width:480px){
+ .stagesAtlas .stageAtlasCardMain{gap:11px;padding:17px 15px 14px}
+ .stagesAtlas .stageAtlasCardFooter{gap:6px;padding:8px 12px 8px 15px}
+ .stagesAtlas .stageAtlasCardTopline{gap:7px}
+ .stagesAtlas .stageAtlasCardStatus{font-size:10px;padding:4px 6px}
+ .stagesAtlas .stageAtlasCardActions{gap:5px}
+ .stagesAtlas .stageAtlasCardDeadline{font-size:10px}
+ .stagesAtlas .stageAtlasVoteAction,.stagesAtlas .stageAtlasDetailAction{padding:0 10px}
+}
+@container atlas-card (max-width:375px){
+ .stagesAtlas .stageAtlasCardStatus{min-height:24px}
+ .stagesAtlas .stageAtlasCardDeadline{display:none}
+ .stagesAtlas .stageAtlasCardFooter{justify-content:flex-end}
+}
+@media (max-width:1470px){
+ .stagesAtlas .stageAtlasPhaseList{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .stagesAtlas .stageAtlasPhase{min-height:96px}
+}
+@media (max-width:1150px){
+ .stagesAtlas .stageAtlasHero{grid-template-columns:minmax(0,1fr);gap:20px}
+ .stagesAtlas .stageAtlasHeroAside{grid-template-columns:1fr auto;align-items:stretch}
+ .stagesAtlas .stageAtlasNext{max-width:260px}
+ .stagesAtlas .stageAtlasToolbar{flex-wrap:wrap}
+ .stagesAtlas .stageAtlasSearch{flex:1 1 250px}
+ .stagesAtlas .stageAtlasGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:800px){
+ .stagesAtlas{gap:12px}
+ .stagesAtlas .stageAtlasHero,.stagesAtlas .stageAtlasPhases,.stagesAtlas .stageAtlasDirectory{
+  border-radius:17px;padding:19px 16px
+ }
+ .stagesAtlas .stageAtlasHeroAside{grid-template-columns:1fr}
+ .stagesAtlas .stageAtlasNext{max-width:none}
+ .stagesAtlas .stageAtlasPhaseList{
+  display:flex;overflow-x:auto;scroll-snap-type:x proximity;overscroll-behavior-inline:contain;
+  gap:8px;padding-bottom:6px
+ }
+ .stagesAtlas .stageAtlasPhase{flex:0 0 155px;min-height:111px;scroll-snap-align:start}
+ .stagesAtlas .stageAtlasToolbar{gap:12px}
+ .stagesAtlas .stageAtlasFilters{overflow-x:auto;max-width:100%;flex-wrap:nowrap;padding-bottom:5px}
+ .stagesAtlas .stageAtlasSearch{flex:1 1 100%;min-width:0}
+ .stagesAtlas .stageAtlasGrid{grid-template-columns:minmax(0,1fr)}
+ .stagesAtlas .stageAtlasCard{min-height:0}
+ .stagesAtlas .stageDetailHeader{grid-template-columns:48px minmax(0,1fr) 44px;padding:15px}
+ .stagesAtlas .stageDetailBadge{width:48px;height:48px;min-height:48px}
+}
+@media (max-width:460px){
+ .stagesAtlas .stageAtlasCardMain{gap:11px;padding:16px 14px}
+ .stagesAtlas .stageAtlasCardGlyph{width:45px;height:50px}
+ .stagesAtlas .stageAtlasCardMain{grid-template-columns:45px minmax(0,1fr)}
+ .stagesAtlas .stageAtlasCardTopline{align-items:flex-start}
+ .stagesAtlas .stageAtlasCardStatus{font-size:10px}
+ .stagesAtlas .stageAtlasCardFooter{padding:9px 12px}
+ .stagesAtlas .stageAtlasCardDeadline{display:none}
+ .stagesAtlas .stageAtlasCardActions{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){
-  .stagesPage .stageCard,.stagesPage .stageCardOpen,.stagesPage .stageVoteQuick{transition:none}
-  .stagesPage .stageCard:hover{transform:none}
+ .stagesAtlas :is(.stageAtlasPhase,.stageAtlasCard,.stageAtlasVoteAction,.stageAtlasDetailAction,.stageAtlasFilter){transition:none}
+ .stagesAtlas .stageAtlasCard:hover{transform:none}
 }
