@@ -30,6 +30,10 @@ async function main(){
     assert(header.connection!=='none','Sync indicator must be present and stable');
     for(const part of header.parts)assert(part.left>=-2&&part.right<=header.width+2,'Header overflows at '+width+': '+JSON.stringify(header));
     await page.locator('#screen').selectOption('chat');
+    // The sheet deliberately slides up; assert final position after the animation.
+    await frame.locator('.gsChatV2').evaluate(async el=>{
+     await Promise.all(el.getAnimations().map(animation=>animation.finished.catch(()=>{})));
+    });
     const chatGeometry=await frame.locator('.gsChatV2').evaluate(el=>{
      const a=el.getBoundingClientRect(),b=document.querySelector('.mobileDockV2').getBoundingClientRect();
      return {chat:{top:a.top,bottom:a.bottom},dock:{top:b.top,bottom:b.bottom}};
