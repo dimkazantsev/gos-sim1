@@ -11,10 +11,10 @@ import RepublicComic from './RepublicComic';
 import StyledSelect from '../ui/StyledSelect';
 
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
-export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void}){
+export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,readOnly=false}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;readOnly?:boolean}){
  const {me,game,members,profiles,parties,partyInvitations,partyMandates,averageVsn,myEvaluations,actions,politicalPosts,ballots,formalDocuments,activities,saveProfile,teacher}=g;
  const target=members.find(m=>m.user_id===(targetUserId||me?.user_id))||me;
- const own=target?.user_id===me?.user_id;
+ const own=!readOnly&&target?.user_id===me?.user_id;
  const targetProfile=profiles.find(x=>x.user_id===target?.user_id);
  const party=parties.find(p=>p.name===target?.team);
  const allocation=party?partyMandates.find(x=>x.party_id===party.id&&x.user_id===target?.user_id):undefined;
