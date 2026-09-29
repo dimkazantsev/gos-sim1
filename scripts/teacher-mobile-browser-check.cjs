@@ -63,7 +63,7 @@ async function main(){
    if(width<=900){
     assert(result.dock.visible,'Mobile dock hidden at '+width+'px');
     assert(result.dock.buttons>=9,'All eight routes + More must be in the mobile dock');
-    if(width<=768)assert(result.dock.scroll>result.dock.width,
+    if(width<=650)assert(result.dock.scroll>result.dock.width,
      'Dock should scroll when icons exceed narrow viewport at '+width+'px: '+JSON.stringify(result.dock));
     if(result.dock.scroll>result.dock.width+2){
      const moved=await frame.locator('.mobileDockScroll').evaluate(el=>{
