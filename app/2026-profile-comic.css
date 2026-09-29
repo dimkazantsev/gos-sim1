@@ -223,3 +223,28 @@
 .profileSessionConfirm input{width:17px;height:17px;flex:none;accent-color:#b24754}
 .profileSessionProgress,.profileSessionNotice{padding:10px 12px;border:1px solid #bcd2f1;border-radius:9px;background:#f0f6ff;color:#355f9b;font-size:12px;line-height:1.5}
 @media(max-width:600px){.profileSessionManager{padding:13px}.profileSessionActions{width:100%}.profileSessionActions>button{flex:1 1 125px}}
+
+
+/* First-visit onboarding remains readable without covering the circular photo. */
+.profileOnboardingHint{padding:12px 14px;background:#f0f6ff;border:1px solid #c5d8f5;border-radius:11px;color:#315f9f}
+.profileOnboardingHint strong{font-size:13px}
+.profileOnboardingHint p{font-size:12px!important;margin:6px 0 0!important;line-height:1.65}
+.profileFullNameField{display:grid;gap:7px;color:#3d608c;font-size:12px;font-weight:800}
+.profileFullNameField input{width:100%;min-width:0;box-sizing:border-box;min-height:44px;padding:10px 12px;border:1px solid #c5d8f1;border-radius:9px;font-size:13px;background:#fff;color:#28486d}
+.onboardingBar{position:fixed;inset:auto 18px 20px;z-index:155;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;padding:14px 19px;border:1px solid #b4cdf5;border-radius:15px;background:#f5f9ff;box-shadow:0 9px 50px #1a3d7340;max-width:min(930px,calc(100vw - 36px));margin:auto}
+.onboardingBar>div{display:grid;gap:5px;min-width:0;flex:1 1 260px}
+.onboardingBar strong{font-size:14px;color:#264f90}
+.onboardingBar span,.onboardingBar small{font-size:11px;color:#617d9d;line-height:1.45}
+.onboardingBar button{min-height:43px;min-width:176px;padding:9px 15px;border:1px solid #2c59cf;border-radius:10px;background:#2b5be3;color:white;font-size:12px;font-weight:800}
+.onboardingBar button:disabled{opacity:.5}
+.chatGuestNote{padding:14px 16px;background:#f5f8fe;border-top:1px solid #dbe4f4;color:#6885ab;font-size:12px}
+.profileGuestInvites{display:grid;gap:10px;padding:13px 15px;border:1px solid #d5e2f5;border-radius:12px;background:#f8fbff}
+.profileGuestInvites h3{margin:0;color:#30558a;font-size:15px}
+.profileGuestInvites p{margin:0;font-size:11px;line-height:1.6;color:#7087a5}
+.profileGuestInvites>div{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.profileGuestInvites input{flex:1 1 200px;min-height:43px;min-width:0;max-width:400px;padding:9px 12px;border:1px solid #cbd8ef;border-radius:9px}
+.profileGuestInvites button{display:flex;align-items:center;justify-content:center;flex:0 1 auto;min-height:43px;padding:8px 13px;border:1px solid #c5d3ee;border-radius:9px;background:#fff;color:#2d60ab;font-size:12px;font-weight:800}
+.profileGuestInvites button:disabled{opacity:.46}
+.profileGuestInvites code{padding:3px 7px;background:#e6effd;border-radius:5px}
+.observerShell :is(.wallComposer,.wallStageTask,.chatCompose,.profileEditor,.partyUpload){display:none!important}
+@media(max-width:700px){.onboardingBar{inset:auto 8px calc(75px + env(safe-area-inset-bottom));max-width:calc(100vw - 16px);padding:12px;gap:9px}.onboardingBar>div{flex:1 1 100%}.onboardingBar button{width:100%}.profileGuestInvites>div>button{flex:1 1 100%}}
