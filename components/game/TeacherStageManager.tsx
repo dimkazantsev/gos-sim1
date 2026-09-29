@@ -6,6 +6,7 @@ import {CheckCircle2,ChevronRight,CircleDot,LockKeyhole,RefreshCw,RotateCcw,Sear
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StagePolicyEditor from './StagePolicyEditor';
+import StyledSelect from '../ui/StyledSelect';
 
 type StageFilter='all'|'open'|'completed'|'locked';
 type ResetTarget=number|'all'|null;
@@ -24,6 +25,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
  const [readiness,setReadiness]=useState<StageReadiness[]>([]);
  const [readinessLoading,setReadinessLoading]=useState(false);
  const [expanded,setExpanded]=useState<number|null>(null);
+ const [stageSort,setStageSort]=useState<'number'|'reverse'|'status'>('number');
  const [filter,setFilter]=useState<StageFilter>('all');
  const [search,setSearch]=useState('');
  const [resetTarget,setResetTarget]=useState<ResetTarget>(null);
@@ -53,7 +55,10 @@ export default function TeacherStageManager({g,onOpenStage}:{
  const searchTerm=search.trim().toLocaleLowerCase('ru-RU');
  const shown=stages.filter(s=>(filter==='all'||s.status===filter)&&(
   !searchTerm||[String(s.stage_no),String(s.stage_no).padStart(2,'0'),s.title].some(t=>t.toLocaleLowerCase('ru-RU').includes(searchTerm))
- )).sort((a,b)=>a.stage_no-b.stage_no);
+ )).sort((a,b)=>stageSort==='reverse'?b.stage_no-a.stage_no:stageSort==='status'?(a.status==='open'?-1:a.status==='locked'?1:0)-(b.status==='open'?-1:b.status==='locked'?1:0)||a.stage_no-b.stage_no:a.stage_no-b.stage_no);
+ const selectedStage=stages.find(x=>x.stage_no===(expanded??currentStageNumber()));
+ function currentStageNumber(){return stages.find(x=>x.status==='open')?.stage_no||game?.current_round||1}
+ const selectedReady=readiness.find(x=>x.stage_no===selectedStage?.stage_no);
  const targetStage=typeof resetTarget==='number'?stages.find(s=>s.stage_no===resetTarget):null;
  const all=resetTarget==='all';
  const canReset=resetTarget!==null&&!busy&&(!all||confirmation.trim()==='СБРОСИТЬ');
@@ -98,62 +103,51 @@ export default function TeacherStageManager({g,onOpenStage}:{
 
   <div className="teacherStageManagerToolbar">
    <div className="teacherStageFilter" role="group" aria-label="Отбор этапов">
-    {FILTERS.map(item=><button type="button" key={item.value} className={filter===item.value?'isActive':''}
-     aria-pressed={filter===item.value} onClick={()=>setFilter(item.value)}>
-     {item.label}<span>{item.value==='all'?stages.length:stages.filter(s=>s.status===item.value).length}</span>
-    </button>)}
+    {FILTERS.map(item=><button type="button" key={item.value} className={filter===item.value?'isActive':''} aria-pressed={filter===item.value}
+     onClick={()=>setFilter(item.value)}>{item.label}<span>{item.value==='all'?stages.length:stages.filter(s=>s.status===item.value).length}</span></button>)}
    </div>
-   <label className="teacherStageSearch"><Search size={16} aria-hidden="true"/>
-    <input type="search" placeholder="Найти этап" aria-label="Найти этап" value={search} onChange={e=>setSearch(e.target.value)}/>
-   </label>
+   <label className="teacherStageSearch"><Search size={16} aria-hidden="true"/><input type="search" placeholder="Найти этап" aria-label="Найти этап" value={search} onChange={e=>setSearch(e.target.value)}/></label>
+   <StyledSelect label="Порядок этапов" value={stageSort} onChange={x=>setStageSort(x as typeof stageSort)}
+    options={[{value:'number',label:'По номеру ↑'},{value:'reverse',label:'По номеру ↓'},{value:'status',label:'Текущие сначала'}]}/>
+   <button type="button" className="teacherStageCurrentShortcut" onClick={()=>{setExpanded(currentStageNumber());setFilter('all');setSearch('')}}>Текущий этап</button>
   </div>
-
   {notice&&<div className="teacherStageNotice" role="status"><CheckCircle2 size={16} aria-hidden="true"/>{notice}
-   <button type="button" aria-label="Скрыть уведомление" onClick={()=>setNotice('')}><X size={15} aria-hidden="true"/></button></div>}
-
-  {shown.length>0?<div className="teacherStageGrid">
-   {shown.map(stage=>{
-    const ready=readiness.find(r=>r.stage_no===stage.stage_no);
-    const StatusIcon=stage.status==='completed'?CheckCircle2:stage.status==='open'?CircleDot:LockKeyhole;
-    return <article className={'teacherStageCard is-'+stage.status} key={stage.id}>
-     <button type="button" className="teacherStageOpen" onClick={()=>onOpenStage(stage.stage_no)}
-      aria-label={'Открыть подробности этапа '+stage.stage_no+': '+stage.title}>
-      <span className="teacherStageNumber" aria-hidden="true">{String(stage.stage_no).padStart(2,'0')}</span>
-      <span className="teacherStageCopy">
-       <span className="teacherStageName" title={stage.title}>{stage.title}</span>
-       <span className={'teacherStageStatus is-'+stage.status}><StatusIcon size={13} aria-hidden="true"/>
-        {stage.status==='open'?'Идёт':stage.status==='completed'?'Завершён':'Закрыт'}</span>
-       <span className={'teacherReadinessStatus '+(ready?.ready?(ready.warnings.length?'warning':'ready'):'blocked')} title={ready?.blockers?.[0]||ready?.warnings?.[0]||'Структурированная готовность'}>
-        {ready?ready.ready?(ready.warnings.length?'Готово с замечаниями':'Процедуры готовы'):'Есть препятствия':'Проверка…'}</span>
-      </span>
-      <ChevronRight className="teacherStageGo" size={16} aria-hidden="true"/>
-     </button>
-     <button type="button" className="teacherStageExpand" title="Проверка готовности" aria-label={'Показать готовность этапа '+stage.stage_no} aria-expanded={expanded===stage.stage_no} onClick={()=>setExpanded(expanded===stage.stage_no?null:stage.stage_no)}><ChevronRight size={16} aria-hidden="true"/></button>
-     <button type="button" className="teacherStageReset" onClick={()=>askReset(stage.stage_no)}
-      title={'Сбросить этап '+stage.stage_no} aria-label={'Сбросить этап '+stage.stage_no+': '+stage.title} disabled={busy}>
-      <RotateCcw size={16} strokeWidth={1.9} aria-hidden="true"/>
-     </button>
-     {expanded===stage.stage_no&&<div className="teacherStageReadinessDetail"><b>Процедурная готовность</b>
-      {ready?<><p>{ready.ready?'Основные требования выполнены.':'Этап требует выполнения процедур.'}</p>
-       {ready.blockers.map((item,i)=><p key={'b'+i} className="blocked">{item}</p>)}
-       {ready.warnings.map((item,i)=><p key={'w'+i} className="warning">{item}</p>)}
-       {ready.overridden&&<p>Историческое прохождение подтверждено преподавателем.</p>}
-      </>:<p>Результат проверки пока не получен.</p>}
-      <StagePolicyEditor g={g} stageNo={stage.stage_no}/>
-      <div className="teacherStageExpandedActions">
-       {stage.status!=='open'&&<button type="button" className="teacherStageLaunch" onClick={()=>{
-        if(window.confirm('Сделать этап '+stage.stage_no+' текущим? Предыдущие этапы получат статус «Завершён», последующие будут закрыты.'))void g.openStage(stage.stage_no);
-       }}>Сделать текущим</button>}
-       <button type="button" onClick={()=>onOpenStage(stage.stage_no)}>Процедуры и инструменты этапа</button>
-      </div>
-     </div>}
-    </article>
-   })}
-  </div>:<div className="teacherStageEmpty">
-   <Search size={20} aria-hidden="true"/><span>Этапов по этому запросу нет.</span>
-   <button type="button" onClick={()=>{setFilter('all');setSearch('')}}>Сбросить фильтры</button>
-  </div>}
-
+   <button type="button" aria-label="Скрыть уведомление" onClick={()=>setNotice('')}><X size={15}/></button></div>}
+  <div className="teacherStageSplit">
+   <nav className="teacherStageList" aria-label="Выбор этапа">
+    {shown.length===0?<div className="teacherStageEmpty">Этапов по фильтру нет.</div>:shown.map(stage=>{
+     const ready=readiness.find(r=>r.stage_no===stage.stage_no);
+     const StatusIcon=stage.status==='completed'?CheckCircle2:stage.status==='open'?CircleDot:LockKeyhole;
+     return <button type="button" key={stage.id} className={'teacherStageListItem '+(selectedStage?.stage_no===stage.stage_no?'selected ':'')+'is-'+stage.status}
+       aria-current={selectedStage?.stage_no===stage.stage_no?'step':undefined}
+       onClick={()=>setExpanded(stage.stage_no)}>
+       <span className="teacherStageNumber">{String(stage.stage_no).padStart(2,'0')}</span>
+       <span className="teacherStageListCopy"><strong>{stage.title}</strong><small><StatusIcon size={13}/>{stage.status==='open'?'Текущий':stage.status==='completed'?'Завершён':'Закрыт'}{ready?.ready?' · Готов':ready?' · Есть препятствия':''}</small></span>
+       <ChevronRight size={17} aria-hidden="true"/>
+     </button>;
+    })}
+   </nav>
+   <div className="teacherStageInspector">
+    {selectedStage?<><header className="teacherStageInspectorHead"><div className="teacherStageInspectorIdentity">
+      <span className="teacherStageNumber">{String(selectedStage.stage_no).padStart(2,'0')}</span>
+      <div><small>ЭТАП · {selectedStage.status==='open'?'ТЕКУЩИЙ':selectedStage.status==='completed'?'ЗАВЕРШЁН':'ЗАКРЫТ'}</small><h3>{selectedStage.title}</h3></div>
+     </div>
+     <button type="button" className="teacherStageInspectorReset" onClick={()=>askReset(selectedStage.stage_no)} title="Сбросить этот этап" aria-label={'Сбросить этап '+selectedStage.stage_no} disabled={busy}><RotateCcw size={17}/></button></header>
+     {selectedStage.summary&&<p className="teacherStageInspectorSummary">{selectedStage.summary}</p>}
+     <section className="teacherStageInspectorSection"><h4>Процедурная готовность</h4>
+      {selectedReady?<><p>{selectedReady.ready?'Основные требования выполнены.':'Необходимо выполнить процедуры.'}</p>
+       {selectedReady.blockers.map((v,i)=><p className="blocked" key={'b'+i}>{v}</p>)}
+       {selectedReady.warnings.map((v,i)=><p className="warning" key={'w'+i}>{v}</p>)}
+      </>:<p>Идёт проверка готовности.</p>}
+     </section>
+     <StagePolicyEditor key={selectedStage.id} g={g} stageNo={selectedStage.stage_no}/>
+     <div className="teacherStageInspectorActions">
+      {selectedStage.status!=='open'&&<button type="button" onClick={()=>{if(window.confirm('Сделать этап '+selectedStage.stage_no+' текущим?'))void g.openStage(selectedStage.stage_no)}}>Сделать текущим</button>}
+      <button type="button" className="primary" onClick={()=>onOpenStage(selectedStage.stage_no)}>Открыть процедуры этапа <ChevronRight size={16}/></button>
+     </div>
+    </>:<p>Выберите этап из списка.</p>}
+   </div>
+  </div>
   {resetTarget!==null&&<div className="teacherResetBackdrop" onMouseDown={event=>{if(event.target===event.currentTarget)closeDialog()}}>
    <section className="teacherResetDialog" ref={dialogRef} role="alertdialog" tabIndex={-1} aria-modal="true"
     aria-labelledby="teacher-reset-title" aria-describedby="teacher-reset-description">
