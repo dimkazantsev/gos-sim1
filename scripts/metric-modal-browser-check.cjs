@@ -286,7 +286,9 @@ async function main(){
      assert.equal(await frame.locator('.chatMessages .chatDocument').count(),1,'File shown once in conversation; pinned copy is separate');
      assert.equal(await frame.locator('.chatBubble a.chatDocument+p').count(),0,'No duplicated filename after document');
     }else assert.equal(await frame.locator('.chatEmpty').count(),1,'Correct empty state');
-    if(width<=768)assert(Math.abs(dims.root.width-dims.viewport)<=2,'Mobile/tablet chat should fill viewport: '+JSON.stringify(dims));
+    // An iframe's vertical scrollbar consumes 10px on Chromium; a fixed 100% panel
+    // correctly fills the *usable scrollport*, not the full outer viewport.
+    if(width<=768)assert(Math.abs(dims.root.width-(dims.viewport+dims.overflow))<=2,'Mobile/tablet chat should fill available viewport: '+JSON.stringify(dims));
     await page.locator('#preview').screenshot({path:path.join(shotDir,chatScreen+'-'+width+'.png')});
     console.log('PASS '+chatScreen+' '+width+'px: structured conversation, correct positioning and no overflow');
    }
