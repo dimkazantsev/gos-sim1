@@ -130,15 +130,19 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
    if(event.clientX<r.left+42)scroller.scrollLeft-=20;
    if(event.clientX>r.right-42)scroller.scrollLeft+=20;
   }
-  const under=document.elementFromPoint(event.clientX,event.clientY);
-  const target=under?.closest<HTMLButtonElement>('.mobileDockItem[data-dock-item]');
-  const key=target?.dataset.dockItem as View|undefined;
-  if(key&&key!==g.key&&available.includes(key))reorder(g.key,key);
  }
  function onPointerEnd(event:ReactPointerEvent<HTMLButtonElement>){
   const g=gestureRef.current;
   if(!g||g.id!==event.pointerId)return;
   const wasDrag=g.mode==='drag',wasScroll=g.mode==='scroll';
+  // Apply exactly one reorder on release. Reordering during every pointermove
+  // shifts the target beneath the finger and sends the icon across the whole dock.
+  if(wasDrag){
+   const under=document.elementFromPoint(event.clientX,event.clientY);
+   const target=under?.closest<HTMLButtonElement>('.mobileDockItem[data-dock-item]');
+   const key=target?.dataset.dockItem as View|undefined;
+   if(key&&key!==g.key&&available.includes(key))reorder(g.key,key);
+  }
   cancelGesture();
   if(wasDrag||wasScroll)suppressClickUntil.current=Date.now()+420;
   try{if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId)}catch{}
