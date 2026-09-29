@@ -18,6 +18,7 @@ import DocumentsView from './game/DocumentsView';
 import GradesView from './game/GradesView';
 import TeacherView from './game/TeacherView';
 import ProfileView from './game/ProfileView';
+import RepublicComic from './game/RepublicComic';
 import ChatPanel from './game/ChatPanel';
 import EventWorkspace from './game/EventWorkspace';
 import {supabase} from '@/lib/supabase';
@@ -189,6 +190,10 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
  const [pendingEvents,setPendingEvents]=useState(0);
  const [selectedProfileId,setSelectedProfileId]=useState('');
+ const [introOpen,setIntroOpen]=useState(false);
+ const [introStarted,setIntroStarted]=useState('');
+ const [completingProfile,setCompletingProfile]=useState(false);
+ const [onboardingNotice,setOnboardingNotice]=useState('');
  useEffect(()=>{
   if(!viewAsOpen)return;
   function onPointerDown(event:PointerEvent){
@@ -230,6 +235,12 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   requestAnimationFrame(()=>document.getElementById('game-main')?.focus());
  }
  function navigate(next:View,target?:{stageNo?:number;documentId?:string}){
+  const owner=g.me;
+  const p=g.profiles.find(row=>row.user_id===owner?.user_id);
+  if(owner&&owner.kind!=='observer'&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'){
+   setOnboardingNotice('Сначала завершите оформление личного профиля.');
+   next='profile';
+  }
   const destination:ScreenLocation={view:next,stageNo:target?.stageNo??0,documentId:target?.documentId??''};
   setScreenHistory(previous=>{
    const current=previous.entries[previous.index];
@@ -252,6 +263,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     : g.members.find(m=>m.user_id===viewAs&&m.kind==='student')
   : undefined;
  const previewMode=!!previewStudent;
+ const observer=me?.kind==='observer';
+ const myProfile=g.profiles.find(p=>p.user_id===me?.user_id);
+ const onboardingRequired=!!me&&!observer&&!myProfile?.onboarding_completed_at;
  useEffect(()=>{
   if(!game||!me||previewMode)return;
   let live=true;
@@ -267,16 +281,40 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  },[game?.id,me?.user_id,previewMode,view]);
 
 
- const backIndex=adjacentScreen(screenHistory.entries,screenHistory.index,-1,previewMode);
- const forwardIndex=adjacentScreen(screenHistory.entries,screenHistory.index,1,previewMode);
+ const backIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,-1,previewMode);
+ const forwardIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,1,previewMode);
  function moveHistory(index:number){
-  if(index<0)return;
+  if(index<0||onboardingRequired)return;
   setScreenHistory(previous=>({...previous,index}));
   finishScreenNavigation();
  }
- const vg=previewStudent?buildStudentPreview(g,previewStudent):g;
+ const vg=previewStudent?buildStudentPreview(g,previewStudent):observer&&me?{...buildStudentPreview(g,me),logout:g.logout} as ReturnTypeRepublic:g;
  const shownMe=vg.me||me;
  const chatDraftKey=(shownMe?.user_id||'')+':'+g.channelId;
+ useEffect(()=>{
+  if(!game||!me||me.kind==='observer'||myProfile?.intro_seen_at)return;
+  if(introStarted!==me.user_id){setIntroStarted(me.user_id);setIntroOpen(true)}
+ },[game?.id,me?.user_id,myProfile?.intro_seen_at,introStarted]);
+ useEffect(()=>{
+  if(!game||!me||me.kind==='observer'||introOpen||!myProfile?.intro_seen_at||myProfile.onboarding_completed_at)return;
+  if(view!=='profile')navigate('profile');
+ },[game?.id,me?.user_id,myProfile?.intro_seen_at,myProfile?.onboarding_completed_at,introOpen,view]);
+ async function completeOnboarding(){
+  if(!game||!me||completingProfile)return;
+  setCompletingProfile(true);setOnboardingNotice('');
+  const r=await supabase.rpc('complete_my_game_profile',{p_game:game.id});
+  if(r.error){setOnboardingNotice('Проверьте обязательные поля: '+r.error.message)}
+  else{setOnboardingNotice('Профиль заполнен. Добро пожаловать в игру!');await g.refresh();navigate('dashboard')}
+  setCompletingProfile(false);
+ }
+ async function finishIntro(){
+  setIntroOpen(false);
+  if(!game)return;
+  const r=await supabase.rpc('mark_my_intro_seen',{p_game:game.id});
+  if(r.error)setOnboardingNotice('Не удалось зафиксировать прохождение пролога: '+r.error.message);
+  await g.refresh();navigate('profile');
+ }
+ 
 
  useEffect(()=>{
   if(!me||previewMode)return;
@@ -307,7 +345,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const dockShortLabels:Record<View,string>={dashboard:'Обзор',stages:'Этапы',actions:'Процессы',parties:'Партии',votes:'Голоса',documents:'НПА',grades:'Оценки',events:'События',teacher:'Пульт',profile:'Профиль'};
  const dockItems=[...mobilePrimary,...mobileSecondary.map(([k])=>k)].map(key=>({key,label:nav.find(([k])=>k===key)![1],shortLabel:dockShortLabels[key],icon:key==='events'&&pendingEvents>0?<span className="eventDockIcon">{navIcon(key)}<i className="eventDockBadge">{pendingEvents}</i></span>:navIcon(key)}));
 
- return <div className={'simShell '+(previewMode?'studentPreviewShell':'')}>
+ return <div className={'simShell '+(previewMode?'studentPreviewShell':'')+(observer?' observerShell':'')}>
   <a className="skipLink" href="#game-main">Перейти к содержимому</a>
   <aside className="simSidebar">
    <div className="sidebarBrand">
@@ -383,20 +421,20 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <main id="game-main" tabIndex={-1} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
      {error&&<div className="errorBox closable" role="alert"><span>{error}</span><IconAction onClick={()=>setError('')} label="Закрыть сообщение об ошибке"/></div>}
      {view==='dashboard'&&<DashboardView g={vg} onNavigate={v=>navigate(v,v==='stages'?{stageNo:currentStage?.stage_no||game.current_round}:undefined)}/>}
-     {view==='stages'&&<StagesView g={vg} readOnly={previewMode} focusStageNo={focusStage} onOpenVotes={()=>navigate('votes')}/>}
+     {view==='stages'&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onOpenVotes={()=>navigate('votes')}/>}
      {view==='parties'&&<PartiesView g={vg}/>}
      {view==='votes'&&<VotesView g={vg} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
-     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode} focusId={focusFormalId} onOpenVotes={()=>navigate('votes')}/>}
+     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} onOpenVotes={()=>navigate('votes')}/>}
      {view==='grades'&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
-     {view==='actions'&&<PoliticalWallView g={vg} focusPending={true} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
-     {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}}/>}
-     {view==='events'&&<EventWorkspace g={vg} readOnly={previewMode}/>}
+     {view==='actions'&&<PoliticalWallView g={vg} readOnly={previewMode||observer} focusPending={true} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
+     {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}}/>}
+     {view==='events'&&<EventWorkspace g={vg} readOnly={previewMode||observer}/>}
      {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>navigate('actions')} onOpenStages={stageNo=>navigate('stages',{stageNo})}
        onOpenChat={channelId=>{g.setChannelId(channelId);g.setChatOpen(true)}}/>}
     </main>
    </div>
 
-   {chatOpen&&<ChatPanel g={vg} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
+   {chatOpen&&<ChatPanel g={vg} readOnly={observer} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
   </div>
 
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
@@ -406,5 +444,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
+  {onboardingRequired&&myProfile?.intro_seen_at&&!introOpen&&!previewMode&&<div className="onboardingBar" role="status"><div><strong>Первое знакомство с Республикой</strong><span>Обязательные поля: ФИО, пол, подпись, описание и подтверждённая почта с паролем.</span>{onboardingNotice&&<small>{onboardingNotice}</small>}</div><button type="button" disabled={completingProfile} onClick={()=>{setSelectedProfileId('');navigate('profile');void completeOnboarding()}}>{completingProfile?'Проверяем…':'Закончить настройку'}</button></div>}
+  <RepublicComic intro open={introOpen} onClose={()=>void finishIntro()}/>
   <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }
