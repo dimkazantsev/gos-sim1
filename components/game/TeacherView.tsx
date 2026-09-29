@@ -58,29 +58,33 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTy
  }
 
  return <div className="teacherSimple teacherCommand">
-  <section className="teacherFocus">
-   <div className="teacherFocusCopy">
-    <small>ПУЛЬТ ПРЕПОДАВАТЕЛЯ</small>
-    <h1>Управление игрой</h1>
-    <p><strong>Этап {currentStage?.stage_no||game.current_round}: {currentStage?.title||'Подготовка игры'}</strong><span>{currentStage?.summary||'Наблюдение за игрой, этапами и действиями участников.'}</span></p>
+  <section className="teacherCommandBar" aria-label="Быстрое управление игрой">
+   <div className="teacherCommandStage">
+    <span className="teacherEyebrow">ПУЛЬТ ПРЕПОДАВАТЕЛЯ</span>
+    <div className="teacherCommandStageLine">
+     <span className="teacherCommandStageNo">{String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</span>
+     <div>
+      <small>ТЕКУЩИЙ ЭТАП</small>
+      <h1>{currentStage?.title||'Подготовка игры'}</h1>
+     </div>
+    </div>
    </div>
-   <div className="teacherFocusState">
-    <span className={game.turn_open?'bigState on':'bigState off'}>{game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span>
-    <b>{game.turn_open&&game.turn_ends_at?timerText(secondsLeft):'—'}</b>
+   <div className="teacherCommandClock">
+    <span className={game.turn_open?'teacherTurnBadge isOpen':'teacherTurnBadge isPaused'}>{game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span>
+    <strong>{game.turn_open&&game.turn_ends_at?timerText(secondsLeft):'—'}</strong>
    </div>
-  </section>
-
-  <section className="teacherPrimaryActions">
-   <button className={game.turn_open?'teacherAction dangerLite':'teacherAction primaryAction'} onClick={()=>setTurn(!game.turn_open)}>
-    <span>{game.turn_open?<Pause size={20} strokeWidth={2} aria-hidden="true"/>:<Play size={20} strokeWidth={2} aria-hidden="true"/>}</span>
-    <div><b>{game.turn_open?'Поставить на паузу':'Открыть ход'}</b><small>{game.turn_open?'Временно остановить действия студентов':'Разрешить студентам выполнять задания'}</small></div>
-   </button>
-   <button className="teacherAction" onClick={onOpenProcesses}>
-    <span><Radio size={20} strokeWidth={2} aria-hidden="true"/></span><div><b>Политические процессы</b><small>Публикации и решения участников</small></div>
-   </button>
-   <button className="teacherAction" onClick={confirmNext}>
-    <span><ArrowRight size={20} strokeWidth={2} aria-hidden="true"/></span><div><b>Следующий этап</b><small>Завершить текущий этап</small></div>
-   </button>
+   <div className="teacherQuickActions">
+    <button type="button" className={game.turn_open?'teacherQuick danger':'teacherQuick primary'} onClick={()=>setTurn(!game.turn_open)}>
+     <span>{game.turn_open?<Pause size={18} strokeWidth={2} aria-hidden="true"/>:<Play size={18} strokeWidth={2} aria-hidden="true"/>}</span>
+     <b>{game.turn_open?'Пауза':'Открыть ход'}</b>
+    </button>
+    <button type="button" className="teacherQuick" onClick={onOpenProcesses}>
+     <span><Radio size={18} strokeWidth={2} aria-hidden="true"/></span><b>Процессы</b>
+    </button>
+    <button type="button" className="teacherQuick" onClick={confirmNext}>
+     <span><ArrowRight size={18} strokeWidth={2} aria-hidden="true"/></span><b>Следующий этап</b>
+    </button>
+   </div>
   </section>
 
   <TeacherStageManager g={g} onOpenStage={onOpenStages}/>
