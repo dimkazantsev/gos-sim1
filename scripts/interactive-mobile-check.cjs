@@ -207,7 +207,7 @@ async function main(){
  assert.equal(await touch.locator('[data-dock-item="'+pinPoint.key+'"]').count(),0,'Pinned item must leave scroll strip');
  await touch.reload();
  await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
- await touch.waitForFunction(()=>document.querySelector('.mobileDockPinnedItem')?.textContent?.includes('Обзор игры'),null,{timeout:4500});
+ await touch.waitForFunction(label=>document.querySelector('.mobileDockPinnedItem')?.textContent?.includes(label),pinPoint.label,{timeout:4500});
  console.log('PASS extra-long touch pins icon next to All sections; pin survives reload');
  const pinButton=await touch.locator('.mobileDockPinnedItem').first().boundingBox();
  const ux=pinButton.x+pinButton.width/2,uy=pinButton.y+pinButton.height/2;
@@ -215,7 +215,7 @@ async function main(){
  await touch.waitForFunction(()=>document.querySelectorAll('.mobileDockPinnedItem').length===0,null,{timeout:4500});
  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
  assert.deepEqual(await touch.evaluate(()=>JSON.parse(localStorage.getItem('dock-interaction-ci:pinned')||'[]')),[]);
- assert.equal(await touch.locator('[data-dock-item="dashboard"]').count(),1,'Unpinned icon must return to scroll strip');
+ assert.equal(await touch.locator('[data-dock-item="'+pinPoint.key+'"]').count(),1,'Unpinned icon must return to scroll strip');
  console.log('PASS extra-long hold unpins icon and restores scroll order');
  await touch.screenshot({path:path.join(screens,'real-dragged-mobile.png')});
  await touchContext.close();
