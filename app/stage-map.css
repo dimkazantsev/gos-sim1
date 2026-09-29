@@ -315,3 +315,87 @@
  .stagesAtlas :is(.stageAtlasPhase,.stageAtlasCard,.stageAtlasVoteAction,.stageAtlasDetailAction,.stageAtlasFilter){transition:none}
  .stagesAtlas .stageAtlasCard:hover{transform:none}
 }
+
+/* Teacher-only stage reset controls and safety dialog. */
+.stagesAtlas .stageAtlasTeacherActions{display:flex;flex-direction:column;gap:9px}
+.stagesAtlas .stageAtlasResetAll{
+ display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:40px;
+ width:100%;padding:0 13px;border:1px solid #e9d4d5;border-radius:10px;
+ background:#fff8f8;color:#995055;font-size:12px;font-weight:790;cursor:pointer;
+ transition:background .16s,border-color .16s
+}
+.stagesAtlas .stageAtlasResetAll:hover:not(:disabled){background:#fff0f0;border-color:#dbaab0}
+.stagesAtlas .stageAtlasResetAll svg{display:block;flex:none}
+.stagesAtlas .stageAtlasResetStage{
+ display:grid;place-items:center;flex:0 0 36px;min-width:36px;min-height:36px;
+ width:36px;height:36px;margin:0;padding:0;border:1px solid #e3e9f1;border-radius:9px;
+ background:#fff;color:#8493a8;cursor:pointer;transition:background .16s,color .16s,border-color .16s
+}
+.stagesAtlas .stageAtlasResetStage:hover:not(:disabled){
+ background:#fff2f2;color:#a54e56;border-color:#e6bbc0
+}
+.stagesAtlas .stageAtlasResetStage svg{display:block;flex:none}
+.stagesAtlas :is(.stageAtlasResetAll,.stageAtlasResetStage):disabled{opacity:.5;cursor:wait}
+.stagesAtlas .stageAtlasResetNotice{
+ display:flex;align-items:center;gap:10px;padding:12px 15px;
+ border:1px solid #cde5d7;border-radius:12px;background:#f0faf4;
+ color:#267451;font-size:13px;font-weight:760;line-height:1.45
+}
+.stagesAtlas .stageAtlasResetNotice>svg{display:block;flex:none}
+.stagesAtlas .stageAtlasResetNotice button{
+ display:grid;place-items:center;flex:none;width:30px;height:30px;margin-left:auto;
+ border:0;border-radius:8px;background:transparent;color:inherit;cursor:pointer
+}
+.stagesAtlas .stageAtlasResetNotice button:hover{background:#dff2e7}
+.stageResetBackdrop{
+ position:fixed;inset:0;z-index:230;display:grid;place-items:center;
+ padding:20px;background:rgba(13,30,54,.64);backdrop-filter:blur(6px);overflow-y:auto
+}
+.stageResetDialog{
+ width:min(480px,100%);max-height:calc(100dvh - 40px);overflow-y:auto;
+ padding:29px;border:1px solid #e5eaf1;border-radius:22px;background:#fff;
+ box-shadow:0 26px 85px rgba(9,25,46,.23);color:#1d3450
+}
+.stageResetDialogIcon{
+ display:grid;place-items:center;width:49px;height:49px;margin-bottom:15px;
+ border:1px solid #f0d9c9;border-radius:14px;background:#fff4e9;color:#b77728
+}
+.stageResetDialog h2{margin:0 0 11px;font-size:23px;font-weight:820;line-height:1.25;letter-spacing:-.03em}
+.stageResetDialog>p{margin:0;color:#576c86;font-size:14px;line-height:1.65}
+.stageResetKeep{
+ display:flex;align-items:flex-start;gap:10px;padding:13px;margin-top:17px;
+ border:1px solid #dce8f8;border-radius:11px;background:#f5f8fe;
+ color:#526b8a;font-size:12px;font-weight:670;line-height:1.55
+}
+.stageResetKeep svg{display:block;flex:none;color:#426aa7;margin-top:1px}
+.stageResetConfirmLabel{
+ display:grid;gap:8px;margin-top:20px;color:#3e526c;font-size:13px;font-weight:700
+}
+.stageResetConfirmLabel strong{color:#983a48;letter-spacing:.045em}
+.stageResetConfirmLabel input{
+ width:100%;min-height:45px;padding:0 13px;border:1px solid #d5dee9;border-radius:10px;
+ background:#fff;color:#273b55;font-size:15px;outline:none
+}
+.stageResetConfirmLabel input:focus{border-color:#759ce8;box-shadow:0 0 0 3px #769aec26}
+.stageResetDialogActions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+.stageResetDialogActions button{
+ min-height:43px;padding:0 16px;border-radius:10px;font-size:13px;font-weight:820;cursor:pointer
+}
+.stageResetCancel{border:1px solid #d9e2ec;background:#fff;color:#486079}
+.stageResetCancel:hover:not(:disabled){background:#f4f7fa}
+.stageResetConfirm{border:1px solid #b3424f;background:#b3424f;color:#fff}
+.stageResetConfirm:hover:not(:disabled){border-color:#9f3341;background:#9f3341}
+.stageResetDialogActions button:disabled{opacity:.45;cursor:not-allowed}
+.stageResetDialog :is(button,input):focus-visible{outline:3px solid #789ff1;outline-offset:2px}
+@container atlas-card (max-width:470px){
+ .stagesAtlas .stageAtlasCardActions{gap:5px}
+ .stagesAtlas .stageAtlasDetailAction{padding:0 9px}
+ .stagesAtlas .stageAtlasResetStage{flex-basis:34px;width:34px;min-width:34px;height:36px}
+}
+@media (max-width:800px){
+ .stagesAtlas .stageAtlasTeacherActions{width:100%}
+ .stageResetDialog{padding:22px;border-radius:18px}
+}
+@media (prefers-reduced-motion:reduce){
+ .stagesAtlas :is(.stageAtlasResetAll,.stageAtlasResetStage){transition:none}
+}
