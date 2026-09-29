@@ -212,7 +212,7 @@ execFileSync(process.execPath,['scripts/metric-chart-check.cjs'],{stdio:'inherit
 check('Recording does not immediately upload on stop and supports local audio/video review',
  read('components/game/useRepublicGame.ts').includes('setRecordingPreview(preview)')&&
  read('components/game/useRepublicGame.ts').includes('sendRecordingPreview()')&&
- read('components/game/useRepublicGame.ts').includes('pendingChatUploads.current.set(blob,path)')&&
+ read('components/game/useRepublicGame.ts').includes('pendingChatUploads.current.set(blob,result.pending)')&&
  read('components/game/useRepublicGame.ts').includes('rec.start(1000)')&&
  chat.includes('className="chatCapturePanel chatCaptureReview"')&&
  chat.includes('Прослушать запись')&&chat.includes('Просмотреть запись')&&
