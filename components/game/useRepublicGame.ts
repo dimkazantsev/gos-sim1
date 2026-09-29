@@ -699,7 +699,7 @@ export function useRepublicGame(gameId:string){
  }
  async function toggleRecording(kind:ChatMediaKind){
   if(recorder.current?.state==='recording'){recorder.current.stop();return}
-  if(mediaOperationRef.current||previewRef.current||!me||!channelId)return;
+  if(recorder.current||mediaOperationRef.current||previewRef.current||!me||!channelId)return;
   if(typeof navigator==='undefined'||!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder==='undefined'){
    setError('Этот браузер не поддерживает запись аудио и видео.');return;
   }
