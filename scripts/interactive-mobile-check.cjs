@@ -184,7 +184,10 @@ async function main(){
  assert.deepEqual((await order(touch)).slice(0,3),['dashboard','stages','teacher'],'Touch drag order not saved');
  console.log('PASS native touch hold + drag and persistence');
  // Holding stationary beyond the drag delay should pin; the same long hold unpins.
- await touch.locator('.mobileDockScroll').evaluate(el=>el.scrollLeft=0);
+ // Let the persisted active-item smooth scroll finish before choosing a touch point.
+ await sleep(450);
+ await touch.locator('.mobileDockScroll').evaluate(el=>{el.style.scrollBehavior='auto';el.scrollLeft=0});
+ await touch.waitForFunction(()=>{const b=document.querySelector('[data-dock-item="dashboard"]')?.getBoundingClientRect();if(!b)return false;return document.elementFromPoint(b.left+b.width/2,b.top+b.height/2)?.closest('[data-dock-item]')?.dataset.dockItem==='dashboard'},null,{timeout:2500});
  const pinFrom=await touch.locator('[data-dock-item="dashboard"]').boundingBox();
  const px=pinFrom.x+pinFrom.width/2,py=pinFrom.y+pinFrom.height/2;
  await touch.evaluate(()=>{window.__pinEvents=[];for(const name of ['pointerdown','pointermove','pointerup','pointercancel','contextmenu'])document.addEventListener(name,e=>{window.__pinEvents.push({name,target:e.target.closest?.('[data-dock-item]')?.dataset.dockItem||'',x:e.clientX,y:e.clientY})},true)});
