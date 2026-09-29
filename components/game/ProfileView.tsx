@@ -30,8 +30,8 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
  useEffect(()=>{
   if(!game||!target)return;
   let valid=true;
-  void supabase.from('stage_assessments').select('stage_no,auto_score,final_score,status').eq('game_id',game.id).eq('user_id',target.user_id)
-   .then(r=>{if(valid)setPublicScores((r.data||[]) as PublicAssessment[])});
+  void supabase.rpc('get_public_stage_scores',{p_game_id:game.id})
+   .then(r=>{if(valid)setPublicScores((r.data||[]).filter(a=>a.user_id===target.user_id) as PublicAssessment[])});
   return()=>{valid=false};
  },[game?.id,target?.user_id]);
  if(!me||!target)return null;
