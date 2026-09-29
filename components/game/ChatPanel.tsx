@@ -27,9 +27,9 @@ function highlightChatText(value:string,search:string):ReactNode{
  return chunks.length?chunks:value;
 }
 function formatBytes(size:number){return size<1024*1024?Math.max(1,Math.round(size/1024))+' КБ':(size/1024/1024).toFixed(1)+' МБ';}
-function ChatAttachment({message:m}:{message:Message}){
+function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messageId:string,path:string)=>Promise<string|null>}){
  if(!m.url)return <span className="chatMissingFile">Вложение недоступно</span>;
- if(m.kind==='audio'||m.mime_type?.startsWith('audio/'))return <ChatVoicePlayer src={m.url} messageId={m.id} durationHint={m.voice_meta?.duration} waveform={m.voice_meta?.waveform} fileName={m.text||'Голосовое сообщение'} />;
+ if(m.kind==='audio'||m.mime_type?.startsWith('audio/'))return <ChatVoicePlayer src={m.url} messageId={m.id} durationHint={m.voice_meta?.duration} waveform={m.voice_meta?.waveform} fileName={m.text||'Голосовое сообщение'} onRefresh={m.storage_path&&onRefresh?()=>onRefresh(m.id,m.storage_path!):undefined} />;
  if(m.kind==='video'||m.mime_type?.startsWith('video/'))return <video controls preload="metadata" playsInline src={m.url} aria-label="Видеосообщение"/>;
  if(m.mime_type?.startsWith('image/')){
   return <a className="chatPhoto" href={m.url} target="_blank" rel="noopener noreferrer" aria-label="Открыть изображение в новой вкладке"><img src={m.url} alt={m.text||'Изображение из чата'} loading="lazy"/></a>;
@@ -42,7 +42,7 @@ function ChatAttachment({message:m}:{message:Message}){
 }
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean}){
- const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,chatLoading,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
+ const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
  const [sending,setSending]=useState(false);
  const [uploading,setUploading]=useState(false);
  const [recordElapsed,setRecordElapsed]=useState(0);
@@ -192,7 +192,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
       {item?<><div className="chatPinnedItemHead">
        <button type="button" className="chatPinnedJump" onClick={()=>showPinnedMessage(item)} title="Перейти к сообщению"><Pin size={14} aria-hidden="true"/>{item.text|| (item.kind==='audio'?'Аудиосообщение':item.kind==='video'?'Видеосообщение':'Файл')}</button>
        {removable&&<button type="button" className="chatUnpin" disabled={pinBusy===item.id} aria-label="Открепить сообщение" onClick={()=>void togglePin(item)}><PinOff size={15} aria-hidden="true"/></button>}
-      </div>{isChatAttachment(item)&&<div className="chatPinnedMedia"><ChatAttachment message={item}/></div>}</>:
+      </div>{isChatAttachment(item)&&<div className="chatPinnedMedia"><ChatAttachment message={item} onRefresh={refreshChatMediaUrl}/></div>}</>:
       <span className="chatMissingFile">Материал недоступен</span>}
      </div>;
     })}
@@ -217,7 +217,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
         {startsGroup&&<div className="chatAuthor"><b>{own?'Вы':name}</b><time dateTime={m.created_at}>{formatChatTime(m.created_at)}</time></div>}
         <div className="chatBubble">
          {showText&&<p>{highlightChatText(m.text||'',search)}</p>}
-         {attachment&&<ChatAttachment message={m}/>}
+         {attachment&&<ChatAttachment message={m} onRefresh={refreshChatMediaUrl}/>}
          {m.kind==='system'&&!showText&&<p>Системное сообщение</p>}
          {!startsGroup&&<time className="chatInlineTime" dateTime={m.created_at}>{formatChatTime(m.created_at)}</time>}
         </div>
