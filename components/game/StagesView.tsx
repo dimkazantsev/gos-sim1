@@ -44,10 +44,10 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
  const selectedOpenVoteCount=selected?votes.filter(v=>v.stage_no===selected.stage_no&&v.status==='open').length:0;
  const selectedVoteCount=selected?votes.filter(v=>v.stage_no===selected.stage_no).length:0;
 
- return <>
+ return <div className="stagesPage">
   <section className="pageHeader">
    <div><small>КАРТА ИГРЫ · 16 ЭТАПОВ</small><h1>Путь вашей республики</h1><p>Нажмите на любой этап — откроются полные правила, задачи, результаты и процедура.</p></div>
-   {teacher&&<button className="primary" onClick={nextStage}>Открыть следующий этап</button>}
+   {teacher&&<button type="button" className="primary stageNextButton" onClick={nextStage}>Открыть следующий этап <ArrowRight size={17} aria-hidden="true"/></button>}
   </section>
 
   <section className="stagePhaseRail" aria-label="Фазы государственного строительства">
@@ -58,7 +58,7 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
     const active=!!current&&current.stage_no>=p.range[0]&&current.stage_no<=p.range[1];
     return <button key={p.id} className={active?'active':''} onClick={()=>{const s=stages.find(x=>x.stage_no===p.range[0]);if(s)setSelected(s)}} style={{'--phase-accent':p.accent} as CSSProperties}>
      <i>{String(p.range[0]).padStart(2,'0')}{p.range[1]!==p.range[0]?'–'+String(p.range[1]).padStart(2,'0'):''}</i>
-     <b>{p.short}</b><span>{completed}/{total}</span>
+     <b>{p.short}</b><span className="stagePhaseProgress">{completed===total?<CheckCircle2 size={14} aria-hidden="true"/>:<CircleDot size={14} aria-hidden="true"/>}{completed}/{total}</span>
     </button>
    })}</div>
   </section>
@@ -83,11 +83,12 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
        <div className="stageMeta">
         <span className={'stageStatusPill stageStatusPill--'+s.status}><StatusIcon size={15} strokeWidth={2.15} aria-hidden="true"/>{s.status==='open'?'Текущий':s.status==='completed'?'Завершён':'Закрыт'}</span>
         {s.deadline&&<span className="stageDeadlinePill"><CalendarClock size={15} aria-hidden="true"/>До {formatDeadline(s.deadline)}</span>}
+        {hasOpenVote&&<span className="stageVotePill stageVotePill--inline"><Vote size={15} aria-hidden="true"/>Есть голосование</span>}
        </div>
-       <span className="stageCardOpen">Подробнее <ArrowRight size={16} strokeWidth={2} aria-hidden="true"/></span>
+       <span className="stageCardOpen"><BookOpenText size={17} strokeWidth={1.9} aria-hidden="true"/><span>Подробнее</span><ArrowRight size={17} strokeWidth={2} aria-hidden="true"/></span>
       </div>
      </button>
-     {hasOpenVote&&<button type="button" className="stageVoteQuick" onClick={onOpenVotes} aria-label={'Перейти к голосованиям этапа '+s.stage_no}>
+     {hasOpenVote&&<button type="button" className="stageVoteQuick" title="Перейти к голосованиям" onClick={onOpenVotes} aria-label={'Перейти к голосованиям этапа '+s.stage_no}>
       <Vote size={17} strokeWidth={1.9} aria-hidden="true"/><span>Идёт голосование</span><ArrowUpRight size={16} aria-hidden="true"/>
      </button>}
     </article>
@@ -214,5 +215,5 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
     </div>
    </section>
   </div>}
- </>;
+ </div>;
 }
