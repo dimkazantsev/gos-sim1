@@ -98,6 +98,7 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
      <div className="eventCaseTop"><span>{c.category}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>
      <h4>{c.title}</h4><p>{c.situation}</p>
      <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили</span>
+      <span className="eventCaseTally">За: {responded.filter(d=>d.choice==='accept').length} · Против: {responded.filter(d=>d.choice==='reject').length}{responded.length===assigned.length&&assigned.length>0?' · Голосование завершено':''}</span>
       {my?.status==='pending'&&!teacher?<div className="eventDecisionButtons"><button disabled={!!busyId||readOnly} onClick={()=>void answer(my,'reject')}>Отклонить</button><button disabled={!!busyId||readOnly} onClick={()=>void answer(my,'accept')}>Принять</button></div>:my&&!teacher?<span><VoteIcon size={14}/>Ответ учтён: {my.status==='accepted'?'Принято':'Отклонено'}</span>:null}
      </div>
     </article>;
