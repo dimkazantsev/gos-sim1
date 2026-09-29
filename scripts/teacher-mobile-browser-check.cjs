@@ -86,7 +86,7 @@ async function main(){
      return {viewport:html.clientWidth,scroll:html.scrollWidth,sheet:{left:panel.left,right:panel.right,top:panel.top,bottom:panel.bottom},
       sections:items.length,overflow:items.filter(r=>r.left<panel.left-3||r.right>panel.right+3)};
     });
-    assert.equal(all.sections,10,'Nine teacher routes and chat must be visible in the same menu');
+    assert.equal(all.sections,11,'Ten teacher routes and chat must be visible in the same menu');
     assert(all.scroll<=all.viewport+3,'All sections menu widens page at '+width+'px');
     assert.equal(all.overflow.length,0,'All-sections items escape modal bounds at '+width+'px');
     assert(all.sheet.top>=-2&&all.sheet.bottom<=940+2,'All-sections menu escapes viewport at '+width+'px');
