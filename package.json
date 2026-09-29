@@ -18,7 +18,8 @@
     "design:impact": "node scripts/impact-browser-check.cjs",
     "design:dock": "node scripts/dock-order-check.cjs",
     "design:interactive": "node scripts/interactive-mobile-check.cjs",
-    "design:stages": "node scripts/stage-desktop-browser-check.cjs"
+    "design:stages": "node scripts/stage-desktop-browser-check.cjs",
+    "design:teacher": "node scripts/teacher-command-browser-check.cjs"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",
