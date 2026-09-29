@@ -69,28 +69,32 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
     const StageIcon=STAGE_ICONS[s.stage_no-1]||BookOpenText;
     const StatusIcon=s.status==='completed'?CheckCircle2:s.status==='open'?CircleDot:LockKeyhole;
     const hasOpenVote=votes.some(v=>v.stage_no===s.stage_no&&v.status==='open');
+    const openDetails=()=>setSelected(s);
     return <article className={'stageCard '+s.status} key={s.id}>
-     <button type="button" className="stageCardPrimary" onClick={()=>setSelected(s)} aria-label={'Подробнее об этапе '+s.stage_no+': '+s.title}>
+     <button type="button" className="stageCardPrimary" onClick={openDetails} aria-label={'Открыть описание этапа '+s.stage_no+': '+s.title}>
       <div className="stageCardTop">
-       <div className="stageNo" aria-hidden="true"><StageIcon size={23} strokeWidth={1.9}/><span>{String(s.stage_no).padStart(2,'0')}</span></div>
-       <div className="stageCardBody">
-        <small>{s.mode}</small>
-        <h3>{s.title}</h3>
-        <p>{s.summary}</p>
-       </div>
-      </div>
-      <div className="stageCardFooter">
-       <div className="stageMeta">
-        <span className={'stageStatusPill stageStatusPill--'+s.status}><StatusIcon size={15} strokeWidth={2.15} aria-hidden="true"/>{s.status==='open'?'Текущий':s.status==='completed'?'Завершён':'Закрыт'}</span>
-        {s.deadline&&<span className="stageDeadlinePill"><CalendarClock size={15} aria-hidden="true"/>До {formatDeadline(s.deadline)}</span>}
-        {hasOpenVote&&<span className="stageVotePill stageVotePill--inline"><Vote size={15} aria-hidden="true"/>Есть голосование</span>}
-       </div>
-       <span className="stageCardOpen"><BookOpenText size={17} strokeWidth={1.9} aria-hidden="true"/><span>Подробнее</span><ArrowRight size={17} strokeWidth={2} aria-hidden="true"/></span>
+       <span className="stageNo" aria-hidden="true"><StageIcon size={22} strokeWidth={1.85}/><span>{String(s.stage_no).padStart(2,'0')}</span></span>
+       <span className="stageCardBody">
+        <span className="stageCardMode">{s.mode}</span>
+        <span className="stageCardTitle">{s.title}</span>
+        <span className="stageCardSummary">{s.summary}</span>
+       </span>
       </div>
      </button>
-     {hasOpenVote&&<button type="button" className="stageVoteQuick" title="Перейти к голосованиям" onClick={onOpenVotes} aria-label={'Перейти к голосованиям этапа '+s.stage_no}>
-      <Vote size={17} strokeWidth={1.9} aria-hidden="true"/><span>Идёт голосование</span><ArrowUpRight size={16} aria-hidden="true"/>
-     </button>}
+     <div className="stageCardFooter">
+      <div className="stageCardFooterExtras">
+       {s.deadline&&<span className="stageDeadlinePill"><CalendarClock size={15} aria-hidden="true"/><span>До {formatDeadline(s.deadline)}</span></span>}
+       {hasOpenVote&&<button type="button" className="stageVoteQuick" onClick={onOpenVotes} aria-label={'Перейти к голосованиям этапа '+s.stage_no}>
+        <Vote size={16} strokeWidth={1.9} aria-hidden="true"/><span>Голосование</span><ArrowUpRight size={15} aria-hidden="true"/>
+       </button>}
+      </div>
+      <div className="stageCardFooterRow">
+       <span className={'stageStatusPill stageStatusPill--'+s.status}><StatusIcon size={16} strokeWidth={2.1} aria-hidden="true"/><span>{s.status==='open'?'Текущий':s.status==='completed'?'Завершён':'Закрыт'}</span></span>
+       <button type="button" className="stageCardOpen" onClick={openDetails} aria-label={'Подробнее об этапе '+s.stage_no}>
+        <span>Подробнее</span><ArrowRight size={17} strokeWidth={2} aria-hidden="true"/>
+       </button>
+      </div>
+     </div>
     </article>
    })}
   </div>
