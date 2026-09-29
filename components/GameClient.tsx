@@ -163,7 +163,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
  } as ReturnTypeRepublic;
 }
 
-export default function GameClient({gameId}:{gameId:string}){
+export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:string;initialMobileMenuOpen?:boolean}){
  const g=useRepublicGame(gameId);
  const [screenHistory,setScreenHistory]=useState<{entries:ScreenLocation[];index:number}>({
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
@@ -175,7 +175,7 @@ export default function GameClient({gameId}:{gameId:string}){
  const [viewAs,setViewAs]=useState('');
  const [viewAsOpen,setViewAsOpen]=useState(false);
  const viewAsRef=useRef<HTMLDivElement>(null);
- const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
+ const [mobileMenuOpen,setMobileMenuOpen]=useState(initialMobileMenuOpen);
  const [mobileDockEditing,setMobileDockEditing]=useState(false);
  const [crisisExpanded,setCrisisExpanded]=useState(false);
  const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
