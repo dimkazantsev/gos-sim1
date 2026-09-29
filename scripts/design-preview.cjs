@@ -88,6 +88,7 @@ const {AppRouterContext}=require('next/dist/shared/lib/app-router-context.shared
 const Home=require('../app/page').default;
 const login=renderToStaticMarkup(h(AppRouterContext.Provider,{value:{push:noop,replace:noop,prefetch:noop,back:noop,forward:noop,refresh:noop}},h(Home)));
 const pages=[['entry','Вход',login],['dashboard','Обзор',base]];
+pages.push(['mobile-all','Все разделы (мобильное меню)',renderToStaticMarkup(h(GameClient,{gameId:'design-preview',initialMobileMenuOpen:true}))]);
 fixture.chatOpen=true;pages.push(['chat','Чат и обзор',renderToStaticMarkup(h(GameClient,{gameId:'design-preview'}))]);fixture.chatOpen=false;
 const ChatPanel=require('../components/game/ChatPanel').default;
 pages.push(['chat-panel','Командный чат',renderToStaticMarkup(h('main',{className:'previewChatPage'},h(ChatPanel,{g,draft:'',onDraftChange:noop})))]);
