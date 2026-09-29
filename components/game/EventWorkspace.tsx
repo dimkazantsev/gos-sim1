@@ -76,6 +76,8 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
   if(r.error)setNotice(r.error.message);else await reload();
   setBusyId(null);
  }
+ const assignedCaseIds=new Set(assignments.map(a=>a.case_id));
+ const visibleCases=teacher?cases.filter(c=>assignedCaseIds.has(c.id)):cases.filter(c=>mine.some(a=>a.case_id===c.id));
  const seenAssignments=teacher?assignments:mine;
  const caseIds=new Set(seenAssignments.map(a=>a.case_id));
  const relevantDecisions=teacher?decisions:decisions.filter(d=>caseIds.has(d.case_id)&&d.actor_id===me?.user_id);
@@ -86,7 +88,7 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
  const trust=g.metrics.find(m=>m.metric_key==='public_trust');
  if(!game||!me)return null;
  return <section className="eventWorkspace" aria-label="Event — ситуационные решения">
-  <header><div><small>EVENT · ИГРОВЫЕ СИТУАЦИИ</small><h2>События и решения</h2><p>Индивидуальные задания, совместные решения 2–3 участников и общее голосование. Банк учебных ситуаций, автоматическое назначение, статистика ответов и влияние обработанных задач на доверие граждан.</p></div><span><CalendarDays size={17} aria-hidden="true"/>{teacher?cases.length+' событий':pending.length+' ожидают решения'}</span></header>
+  <header><div><small>EVENT · ИГРОВЫЕ СИТУАЦИИ</small><h2>События и решения</h2><p>Индивидуальные задания, совместные решения 2–3 участников и общее голосование. Банк учебных ситуаций, автоматическое назначение, статистика ответов и влияние обработанных задач на доверие граждан.</p></div><span><CalendarDays size={17} aria-hidden="true"/>{teacher?visibleCases.length+' назначенных ситуаций':pending.length+' ожидают решения'}</span></header>
   <div className="eventDecisionOverview" aria-label="Статистика решений по игровым событиям">
    <article><small>Назначено заданий</small><strong>{seenAssignments.length}</strong><span>{teacher?'Всем участникам':'Вам'}</span></article>
    <article><small>Решено</small><strong>{completedCount}<em> / {seenAssignments.length}</em></strong><span>{ratio(completedCount,seenAssignments.length)}% заданий</span></article>
@@ -117,8 +119,8 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
    <footer><span>{audience==='all'?'Получатели: вся аудитория':'Выбрано: '+selected.length}</span><button type="button" onClick={()=>void create()} disabled={!canSend||saving||readOnly}>{saving?'Отправка…':'Назначить событие'}</button></footer>
   </div>}
   <div className="eventList"><h3>{teacher?'Назначенные ситуации':'Мои события'}</h3>
-   {(teacher?cases:cases.filter(c=>mine.some(a=>a.case_id===c.id))).length===0?<div className="journalEmpty">Назначенных ситуаций пока нет.</div>:
-   (teacher?cases:cases.filter(c=>mine.some(a=>a.case_id===c.id))).map(c=>{
+   {visibleCases.length===0?<div className="journalEmpty">Назначенных ситуаций пока нет.</div>:
+   visibleCases.map(c=>{
     const assigned=assignments.filter(a=>a.case_id===c.id),responded=decisions.filter(d=>d.case_id===c.id);
     const my=assigned.find(a=>a.recipient_id===me.user_id);
     const yes=responded.filter(d=>d.choice==='accept').length,no=responded.filter(d=>d.choice==='reject').length;
