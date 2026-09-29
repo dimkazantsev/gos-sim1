@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/backup-project.yml'
+      - 'docs/DEPLOY_AUTH_AND_EVENTS.md'
   workflow_dispatch:
 
 permissions:
