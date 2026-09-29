@@ -1,0 +1,126 @@
+/* Consequence model: consistent hierarchy, adaptive controls and ledger. */
+.impactWorkbench{--impact-line:#e2e8f2;display:grid;gap:0;min-width:0;padding:0!important;overflow:hidden;border:1px solid var(--impact-line);border-radius:20px;background:#fff}
+.impactWorkbench *{box-sizing:border-box}
+.impactWorkbenchHeader{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:25px 26px;border-bottom:1px solid var(--impact-line);background:linear-gradient(125deg,#fff,#f6f8fe)}
+.impactWorkbenchHeader>div:first-child{flex:1;min-width:0}
+.impactWorkbenchHeader small{font-size:11px;letter-spacing:.095em;font-weight:850;color:#647da2}
+.impactWorkbenchHeader h2{font-size:clamp(20px,2.2vw,28px);line-height:1.25;margin:5px 0 8px;letter-spacing:-.035em;overflow-wrap:anywhere;color:#1a2a4d}
+.impactWorkbenchHeader p{margin:0;font-size:13px;line-height:1.6;color:#6b7c96}
+.impactWorkbenchStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;flex:0 1 385px;min-width:0}
+.impactWorkbenchStats>span{display:grid;align-content:center;min-height:78px;gap:4px;padding:12px;border:1px solid #dfe6f2;background:#fff;border-radius:12px;min-width:0}
+.impactWorkbenchStats b{font-size:24px;font-variant-numeric:tabular-nums;line-height:1;color:#213d76}
+.impactWorkbenchStats small{font-size:11px;letter-spacing:0;line-height:1.35;color:#677c9a;font-weight:650}
+.impactProcess{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:9px;padding:15px 20px;border-bottom:1px solid var(--impact-line);background:#fbfcff}
+.impactProcess>span{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid #e1e7f2;border-radius:10px;background:#fff;color:#425c7f;font-size:12px;font-weight:800}
+.impactProcess svg{width:16px;height:16px;flex:none;color:#4b71bd}.impactProcess>i{font-style:normal;color:#8aa0c0;font-weight:850}
+.impactWorkbenchTabs{display:flex;gap:8px;padding:15px 22px 0;border-bottom:1px solid var(--impact-line)}
+.impactWorkbenchTabs button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:0;min-height:46px;padding:10px 15px;margin-bottom:-1px;border:1px solid transparent;border-bottom:2px solid transparent;border-radius:10px 10px 0 0;background:transparent;color:#60738f;font-size:13px;font-weight:800;cursor:pointer}
+.impactWorkbenchTabs button.active{background:#f5f8ff;border-color:#e2e9f7;border-bottom-color:#4269c8;color:#2e56aa}
+.impactWorkbenchTabs svg{width:16px;height:16px;flex:none}
+.impactWorkbenchTabs span{min-width:22px;padding:3px 6px;border-radius:6px;background:#e9edf6;font-size:11px;font-variant-numeric:tabular-nums}
+.impactTabContent{display:grid;gap:14px;padding:21px 22px 24px;min-width:0}
+.impactTabContent[hidden],.impactRuleItem[hidden],.impactRuleEditor[hidden]{display:none!important}
+.impactWorkbenchFilters{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.impactSearch{display:flex;align-items:center;gap:9px;flex:1 1 280px;max-width:460px;min-width:0;min-height:44px;padding:0 12px;border:1px solid #dbe4f1;border-radius:11px;background:#fff}
+.impactSearch:focus-within{border-color:#6d94df;box-shadow:0 0 0 3px #dee9ff}
+.impactSearch svg{width:17px;height:17px;flex:none;color:#758baa}
+.impactSearch input{flex:1;min-width:0;width:100%;border:0!important;box-shadow:none!important;outline:none!important;padding:0!important;background:transparent!important;font-size:14px;color:#253e62}
+.impactFilterChoices{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.impactFilterChoices button{min-height:39px;padding:8px 11px;border:1px solid #e0e7f1;border-radius:9px;background:#fff;color:#5e7695;font-size:12px;font-weight:800;cursor:pointer}
+.impactFilterChoices button.selected{background:#eaf1ff;border-color:#b7c9ed;color:#365eaf}
+.impactListCount{margin:0;font-size:12px;line-height:1.6;color:#77869e}
+.impactWorkbench .impactRulesGrid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin:0;min-width:0}
+.impactWorkbench .impactRuleItem{min-width:0}
+.impactWorkbench .impactRuleCard{display:block;min-width:0;padding:0;margin:0;border:1px solid #e1e8f1;border-radius:14px;background:#fff;overflow:hidden;opacity:1}
+.impactWorkbench .impactRuleCard.disabled{background:#f9fafc}
+.impactRuleCard.expanded{border-color:#b9ccee!important;box-shadow:0 6px 24px #234c9510}
+.impactRuleSummary{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:17px 18px 10px}
+.impactRuleTitleBlock{min-width:0;flex:1}
+.impactWorkbench .impactRuleEvent{display:block;font-size:10px;letter-spacing:.095em;text-transform:uppercase;color:#7b8ca5;font-weight:850}
+.impactWorkbench .impactRuleTitleBlock h3{font-size:16px;line-height:1.35;letter-spacing:-.015em;color:#273b60;margin:5px 0 10px;overflow-wrap:anywhere}
+.impactRuleMeta{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:11px;color:#788aa3}
+.impactRuleMeta>span{line-height:1.4}
+.impactStatus{border-radius:6px;padding:4px 7px;font-weight:800}
+.impactStatus.automatic{background:#eaf6ef;color:#26724d}
+.impactStatus.manual{background:#fff5e3;color:#93621f}
+.impactStatus.off{background:#edf0f5;color:#667891}
+.impactUnsaved{color:#9b6a22!important;font-weight:800}.impactSaved{color:#287b57!important;font-weight:800}
+.impactExpandButton{display:flex;align-items:center;justify-content:center;gap:7px;min-width:115px;min-height:42px;flex:none;padding:9px 12px;border:1px solid #d8e3f1;border-radius:10px;background:#f6f9ff;color:#365da7;font-weight:850;font-size:12px;cursor:pointer}
+.impactExpandButton svg{height:16px;width:16px;flex:none}
+.impactExpandButton:hover{background:#eaf1ff}
+.impactPreview{display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:0 18px 17px;min-height:30px}
+.impactDelta{display:inline-flex;align-items:baseline;flex-wrap:wrap;gap:5px;min-width:0;padding:7px 9px;border:1px solid #e3eaf3;border-radius:8px;background:#f7f9fd;color:#586e8d;font-size:11px;line-height:1.45;overflow-wrap:anywhere}
+.impactDelta b{color:#294b82;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.impactMoreEffects,.impactNoEffects{font-size:12px;color:#73839d}
+.impactRuleEditor{padding:0 18px 18px;min-width:0}
+.impactRuleEditor form{display:grid;gap:17px;min-width:0;margin:0}
+.impactRuleControls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;border-top:1px solid #e9edf4;padding-top:16px}
+.impactToggle{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 14px;border:1px solid #e0e7f1;border-radius:11px;background:#f8faff;min-width:0;cursor:pointer}
+.impactToggle>span{display:grid;gap:4px;min-width:0}
+.impactToggle b{font-size:12px;line-height:1.4;color:#354e73}
+.impactToggle small{font-size:11px;line-height:1.4;color:#7588a0}
+.impactToggle input{appearance:none;-webkit-appearance:none;position:relative;display:block;flex:0 0 40px!important;width:40px!important;max-width:40px;height:23px;min-height:23px!important;margin:0;border:0!important;border-radius:15px;background:#c8d1df;cursor:pointer;box-shadow:inset 0 0 0 1px #b7c3d4}
+.impactToggle input::before{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;box-shadow:0 1px 4px #13234224;transition:transform .17s ease}
+.impactToggle input:checked{background:#4771c5;box-shadow:none}
+.impactToggle input:checked::before{transform:translateX(17px)}
+.impactToggle input:disabled{opacity:.5;cursor:not-allowed}
+.impactDescription{display:grid;gap:7px}
+.impactDescription>span{font-size:12px;font-weight:850;color:#39557a}
+.impactDescription textarea{display:block;width:100%;max-width:100%;min-height:76px;resize:vertical;padding:12px 13px;border:1px solid #dce5f0;border-radius:10px;background:#fff;color:#344762;font-size:14px;line-height:1.6}
+.impactEffectsHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.impactEffectsHead>div{min-width:0}
+.impactEffectsHead b{font-size:14px;color:#2d4369}
+.impactEffectsHead p{margin:4px 0 0;font-size:12px;line-height:1.5;color:#75849b}
+.impactEffectsHead>span{flex:none;white-space:nowrap;border-radius:8px;background:#edf3ff;padding:7px 9px;color:#3e62a9;font-size:11px;font-weight:800}
+.impactWorkbench .impactRuleEffects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0;min-width:0}
+.impactWorkbench .impactRuleEffects label{display:grid;grid-template-columns:minmax(0,1fr) 126px;align-items:center;gap:10px;min-width:0;padding:9px 11px;border:1px solid #e5ebf4;border-radius:10px;background:#fcfdff}
+.impactWorkbench .impactRuleEffects label>span{font-size:12px;line-height:1.45;color:#526a88;overflow-wrap:anywhere}
+.impactNumeric{display:flex;align-items:center;min-width:0;min-height:39px;padding:0 8px;border:1px solid #dce5f0;border-radius:8px;background:#fff}
+.impactNumeric:focus-within{border-color:#7397dc;box-shadow:0 0 0 3px #e4edff}
+.impactNumeric input{display:block;min-width:0;width:100%;height:37px;min-height:37px;padding:0 3px;border:0!important;box-shadow:none!important;outline:none!important;background:transparent!important;font:700 14px inherit;font-size:14px;color:#284a7f;font-variant-numeric:tabular-nums}
+.impactNumeric em{flex:none;font-size:11px;color:#8395ae;font-style:normal;padding-left:3px}
+.impactNumeric input[aria-invalid="true"]{color:#aa354e}
+.impactNumeric:has(input[aria-invalid="true"]){border-color:#cc7082}
+.impactWorkbench .partySupportEffect{background:#f5f8ff!important;border-color:#dbe6f7!important}
+.impactConditions{min-width:0;border:1px solid #e3e9f3;border-radius:10px;background:#fafbfe}
+.impactConditions summary{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 12px;cursor:pointer;font-size:12px;font-weight:800;color:#506b90;list-style:none}
+.impactConditions summary::-webkit-details-marker{display:none}
+.impactConditions summary svg{width:16px;height:16px}
+.impactConditions[open] summary svg{transform:rotate(180deg)}
+.impactConditions pre{overflow:auto;max-width:100%;margin:0;padding:12px;border-top:1px solid #e7edf5;font-size:12px;line-height:1.5;color:#526887}
+.impactConditionsEmpty{margin:0;font-size:11px;color:#8190a4}
+.impactWorkbench .impactRuleFooter{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:0;padding:15px 0 0;border-top:1px solid #e9edf4}
+.impactRuleFooter>span{font-size:12px;white-space:normal!important;max-width:none!important}
+.impactRuleFooter>div{display:flex;flex-wrap:wrap;gap:8px}
+.impactRuleFooter button{display:inline-flex;justify-content:center;align-items:center;gap:7px;min-height:43px!important;padding:10px 14px!important;border-radius:9px!important;font-size:12px!important;cursor:pointer}
+.impactRuleFooter button svg{width:15px;height:15px}
+.impactReset{background:#fff;border:1px solid #dbe5f1;color:#597195;font-weight:800}
+.impactRuleFooter button:disabled{opacity:.48;cursor:not-allowed}
+.impactEmpty{padding:34px 16px;border:1px dashed #ccd8e8;border-radius:12px;color:#7184a0;text-align:center;font-size:13px;line-height:1.6}
+.impactLedgerHeader{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.impactLedgerHeader p{margin:0;color:#70839d;font-size:12px;line-height:1.55}
+.impactWorkbench .impactLedger{display:grid;gap:9px;min-width:0}
+.impactWorkbench .impactHistoryRow{display:grid;gap:14px;min-width:0;padding:16px;border:1px solid #e1e8f2;border-radius:12px;background:#fff;opacity:1}
+.impactHistoryRow.reverted{background:#f8fafc}
+.impactHistoryTop{display:grid;grid-template-columns:35px minmax(0,1fr) auto;gap:11px;align-items:start}
+.impactHistoryIcon{display:grid;place-items:center;width:35px;height:35px;border-radius:10px;background:#edf4ff;color:#4a72b5}
+.impactHistoryIcon.reverted{background:#edf0f5;color:#8794a6}
+.impactHistoryIcon svg{width:18px;height:18px}
+.impactHistoryIdentity{min-width:0;overflow-wrap:anywhere}
+.impactHistoryIdentity small{display:block;color:#8291a5;font-size:11px;line-height:1.45}
+.impactHistoryIdentity b{display:block;color:#2c476e;font-size:14px;line-height:1.4;margin:3px 0}
+.impactHistoryIdentity p{margin:4px 0;color:#6e7f96;font-size:12px;line-height:1.55}
+.impactHistoryIdentity>span{display:block;margin-top:5px;color:#788ba3;font-size:11px}
+.impactHistoryStatus{display:inline-block;white-space:nowrap;border-radius:7px;padding:6px 8px;background:#eaf5f0;color:#267454;font-size:11px;font-weight:850}
+.impactHistoryStatus.reverted{background:#edf0f4;color:#697b94}
+.impactHistoryBottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding-left:46px}
+.impactWorkbench .impactLedgerEffects{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0;flex:1}
+.impactWorkbench .impactLedgerEffects .impactDelta{font-weight:400}
+.impactUndo{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:9px 12px;border:1px solid #ebcbd4;border-radius:9px;background:#fff8fa;color:#99465a;font-size:12px;font-weight:800;cursor:pointer}
+.impactUndo svg{width:14px;height:14px}.impactUndo:disabled{opacity:.5}
+.impactWorkbench button:focus-visible,.impactWorkbench input:focus-visible,.impactWorkbench textarea:focus-visible,.impactWorkbench summary:focus-visible{outline:3px solid #7aa0ee;outline-offset:2px}
+@media(max-width:1180px){.impactWorkbenchHeader{flex-wrap:wrap}.impactWorkbenchStats{flex:1 1 100%}.impactProcess{justify-content:flex-start}}
+@media(max-width:760px){.impactWorkbenchHeader{padding:20px 18px}.impactTabContent{padding:17px 15px 20px}.impactWorkbenchTabs{padding:12px 14px 0}.impactWorkbenchFilters{align-items:stretch}.impactSearch{max-width:none;flex:1 1 100%}.impactWorkbench .impactRuleEffects{grid-template-columns:minmax(0,1fr)}.impactProcess{padding:12px 15px;gap:6px}.impactProcess>span{padding:8px 9px}.impactProcess i{font-size:11px}}
+@media(max-width:550px){.impactWorkbench{border-radius:15px}.impactWorkbenchHeader{gap:16px;padding:18px 14px}.impactWorkbenchStats{gap:6px}.impactWorkbenchStats>span{padding:10px 8px;min-height:68px}.impactWorkbenchStats b{font-size:22px}.impactWorkbenchStats small{font-size:10px}.impactProcess{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:12px 10px}.impactProcess>span{display:grid;justify-items:center;gap:4px;padding:9px 3px;font-size:10px;text-align:center;line-height:1.2;white-space:normal}.impactProcess i{display:none}.impactProcess svg{height:18px;width:18px}.impactWorkbenchTabs{padding:10px 10px 0;gap:4px}.impactWorkbenchTabs button{flex:1;padding:9px 6px;gap:5px;font-size:11px;white-space:normal}.impactWorkbenchTabs svg{width:14px;height:14px}.impactTabContent{padding:15px 11px}.impactFilterChoices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:5px}.impactFilterChoices button{font-size:11px;min-width:0;padding:8px 3px}.impactRuleSummary{align-items:flex-start;padding:13px 12px 9px;gap:8px}.impactWorkbench .impactRuleTitleBlock h3{font-size:14px}.impactExpandButton{min-width:0;flex:0 0 auto;padding:9px 8px;gap:4px;font-size:11px}.impactExpandButton svg{width:13px;height:13px}.impactPreview{padding:0 12px 12px}.impactRuleEditor{padding:0 12px 13px}.impactRuleControls{grid-template-columns:minmax(0,1fr)}.impactToggle{padding:11px}.impactWorkbench .impactRuleEffects label{grid-template-columns:minmax(0,1fr) 110px;padding:8px;gap:6px}.impactEffectsHead{align-items:flex-start;flex-wrap:wrap}.impactEffectsHead>span{white-space:nowrap}.impactRuleFooter>div{width:100%;display:grid;grid-template-columns:1fr 1fr}.impactRuleFooter>div button{width:100%}.impactHistoryTop{grid-template-columns:29px minmax(0,1fr);gap:9px}.impactHistoryIcon{width:29px;height:29px}.impactHistoryStatus{grid-column:2;justify-self:start}.impactHistoryBottom{padding-left:0}.impactUndo{width:100%}}
+@media(max-width:350px){.impactWorkbench .impactRuleEffects label{grid-template-columns:minmax(0,1fr);gap:6px}.impactNumeric{max-width:100%}.impactRuleSummary{flex-wrap:wrap}.impactExpandButton{margin-left:auto}}
+@media(prefers-reduced-motion:reduce){.impactToggle input::before{transition:none}}
