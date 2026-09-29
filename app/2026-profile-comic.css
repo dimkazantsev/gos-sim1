@@ -1,0 +1,157 @@
+/* Public identities, in-app document signing and cinematic Republic prologue. */
+.profilePage{display:grid;gap:20px;min-width:0}
+.profilePage .profileHero{display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding:22px 24px;border:1px solid #dce6f7;border-radius:20px;background:#fbfdff;min-width:0}
+.profilePage .profilePhoto{position:relative;flex:none;display:grid;place-items:center;width:132px;height:132px;min-width:132px;min-height:132px;overflow:visible;border-radius:35px;background:#eaf2ff;color:#3265d1;font-size:37px;font-weight:850;isolation:isolate}
+.profilePage .profilePhoto>img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.profileCameraButton{position:absolute;right:-7px;bottom:-7px;z-index:2;display:grid;place-items:center;width:42px;height:42px;min-height:42px;padding:0!important;border:3px solid #fff!important;border-radius:50%!important;background:#345ddd!important;color:#fff!important;box-shadow:0 4px 14px #183a7740;cursor:pointer}
+.profileCameraButton svg{display:block;width:19px;height:19px}
+.profilePage .profileIntro{flex:1 1 320px;min-width:0}
+.profilePage .profileIntro h1{overflow-wrap:anywhere;font-size:clamp(24px,3.1vw,39px);letter-spacing:-.025em}
+.profileHeroControls{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:15px}
+.profileHeroControls>button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 14px;border:1px solid #cbdcf9;border-radius:10px;background:#f3f7ff;color:#3159aa;font-size:12px;font-weight:790;cursor:pointer}
+.profileHeroControls>button.primary{background:#2c5ee2;color:white;border-color:#2c5ee2}
+.profileComicButton{background:#1e3463!important;border-color:#1e3463!important;color:#fff!important}
+.profilePublicStrip,.profileJournalAccess{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:16px 18px;border:1px solid #d9e5f6;border-radius:15px;background:#fff;min-width:0}
+.profilePublicStrip>div:first-child,.profileJournalAccess>div:first-child{display:flex;align-items:center;gap:10px;min-width:0}
+.profilePublicStrip>div:first-child>svg{flex:none;color:#5079c9}
+.profilePublicStrip>div:first-child>div,.profileJournalAccess>div:first-child>div{display:grid;gap:4px;min-width:0}
+.profilePublicStrip b,.profileJournalAccess b{color:#2b4c7c;font-size:13px}
+.profilePublicStrip span,.profileJournalAccess span{color:#7388a5;font-size:12px;line-height:1.5}
+.profilePublicStrip .styledSelect{flex:0 1 390px;min-width:185px}
+.profilePublicStrip .styledSelectTrigger{min-height:45px}
+.profilePublicStats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.profilePublicStats article{display:grid;gap:7px;align-content:center;padding:17px 13px;border:1px solid #dce6f5;border-radius:13px;background:#fff;min-width:0}
+.profilePublicStats strong{font-size:28px;color:#2d5dc2;font-variant-numeric:tabular-nums}
+.profilePublicStats span{font-size:11px;color:#6885a2;overflow-wrap:anywhere}
+.profilePublicBiography{display:grid;gap:9px}
+.profilePublicBiography h2,.profilePublicScores h2{margin:0;font-size:17px;color:#294b79}
+.profilePublicBiography p{margin:0;color:#557293;line-height:1.7;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+.profilePublicScores{display:grid;gap:13px}
+.profilePublicScores header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.profilePublicScores header strong{font-size:20px;color:#275cc2}
+.profileScoreCells{display:grid;grid-template-columns:repeat(16,minmax(38px,1fr));gap:6px;min-width:0;overflow-x:auto;padding:4px 1px}
+.profileScoreCells>div{display:grid;justify-items:center;gap:6px;min-width:38px;padding:9px 4px;border:1px solid #d7e4f5;border-radius:8px;background:#f9fbff}
+.profileScoreCells>div.final{background:#eafaef;border-color:#bce2cb}
+.profileScoreCells>div.draft{background:#f1f5ff;border-color:#bed2fe}
+.profileScoreCells small{font-size:10px;color:#7890ad}
+.profileScoreCells b{font-size:17px;color:#2d528e}
+.profilePublicScores>p{margin:0;font-size:12px;color:#768ca9;line-height:1.5}
+.gradesProfileLink{background:none;border:0;padding:0;text-align:left;font-size:inherit;font-weight:850;line-height:1.4;color:#315dc0;cursor:pointer;text-decoration:underline;text-decoration-color:#d9e5fa;text-underline-offset:3px;overflow-wrap:anywhere}
+.chatAuthorProfile{border:0!important;padding:0!important;min-width:0!important;min-height:0!important;height:auto!important;display:inline!important;background:transparent!important;color:#345bac!important;font-size:12px;font-weight:850;text-align:left;cursor:pointer}
+.profilePage .profileGrid{min-width:0}
+.profilePage .profileEditor{display:grid;align-content:start;gap:15px;min-width:0}
+.profilePage .profileEditor>textarea{height:auto;min-height:94px!important;max-height:170px!important;resize:vertical;padding:13px 14px;line-height:1.55;font-size:13px}
+.profilePage .profileEditor .profileHint{margin:0;font-size:12px;line-height:1.65;color:#6f85a2}
+.profilePage .profileEditor .profileSaveRow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.profilePage .profileEditor .profileSaveRow button{min-height:43px;min-width:180px}
+.profilePage .profileEditor .profileSaveRow span{font-size:11px;color:#6988a8}
+.profileSignature,.profileSecurity{display:grid;gap:13px;min-width:0;padding:16px;border:1px solid #dce6f5;border-radius:14px;background:#f9fbff}
+.profileSignature header,.profileSecurity header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.profileSignature header small,.profileSecurity header small{display:block;font-size:10px;font-weight:850;letter-spacing:.07em;color:#788eab}
+.profileSignature header h2,.profileSecurity header h2{margin:5px 0 0;color:#294e85;font-size:17px}
+.profileSignature header>svg,.profileSecurity header>svg{flex:none;color:#5278bc}
+.profileSignature p,.profileSecurity>p{margin:0;color:#63809e;font-size:12px;line-height:1.65}
+.profileSignaturePreview{display:grid;place-items:center;min-height:85px;padding:14px;border:1px dashed #b9cbed;border-radius:11px;background:linear-gradient(45deg,#fff 25%,#f0f3fb 25%,#f0f3fb 50%,#fff 50%,#fff 75%,#f0f3fb 75%);background-size:18px 18px}
+.profileSignaturePreview img{max-width:100%;max-height:105px;object-fit:contain;filter:contrast(1.07)}
+.profileSignaturePreview>span{font-size:11px;color:#71869e}
+.profileSignatureActions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.profileSignatureActions button,.profileSecurityGrid>button,.profilePasswordFields button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;min-width:150px;padding:9px 11px;border:1px solid #c5d8f7;border-radius:9px;background:white;color:#2c5cb2;font-size:12px;font-weight:790;cursor:pointer}
+.profileSignatureActions button.primary,.profilePasswordFields button.primary{background:#325ee2;color:white;border-color:#325ee2}
+.profileSignatureActions button:disabled,.profileSecurityGrid button:disabled{opacity:.55;cursor:not-allowed}
+.profileSignatureNotice,.profileSecurityNotice{margin:0;padding:10px 12px;border-radius:8px;background:#edf4ff;color:#36619d;font-size:12px}
+.profileSignatureFine{display:flex;gap:8px;align-items:flex-start;color:#7390aa;font-size:11px!important}
+.profileSignatureFine svg{flex:none}
+.profileSecurityGrid{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:9px;align-items:end;min-width:0}
+.profileSecurityGrid label,.profilePasswordFields label{display:grid;gap:6px;min-width:0;color:#587391;font-size:11px;font-weight:790}
+.profileSecurityGrid input,.profilePasswordFields input{min-width:0;width:100%;box-sizing:border-box;height:43px;border:1px solid #d2e1f5;border-radius:10px;background:white;padding:0 10px;color:#254766;font-size:13px}
+.profilePasswordFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:end}
+.profilePasswordFields button{grid-column:1/-1;justify-self:start}
+.profileSecurityVerified{display:flex;align-items:center;gap:8px;color:#217b57!important}
+.profileSecurityRecovery{padding:12px;border:1px solid #dae7f5;border-radius:10px;background:#fff}
+.profileSecurityRecovery summary{display:flex;align-items:center;gap:9px;color:#365b99;font-size:12px;font-weight:830;cursor:pointer}
+.profileSecurityRecovery>p{color:#6b839b;font-size:11px;line-height:1.6}
+.profileSecurityRecovery>div{display:grid;gap:7px;max-height:280px;overflow:auto}
+.profileSecurityRecovery article{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px;border:1px solid #e1eaf6;border-radius:9px}
+.profileSecurityRecovery article>div{display:grid;gap:4px;min-width:0}
+.profileSecurityRecovery article b{color:#315079;font-size:12px;overflow-wrap:anywhere}
+.profileSecurityRecovery article small{color:#7290ac;font-size:11px;overflow-wrap:anywhere}
+.profileSecurityRecovery article button{flex:none;min-height:36px;padding:7px 10px;border:1px solid #b8d1f0;border-radius:8px;background:#f1f6ff;color:#305ca2;cursor:pointer;font-size:11px}
+.profileSecurityRecovery article button:disabled{opacity:.48;cursor:not-allowed}
+.formalPaper .formalSignature{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.formalPaper .formalSignatureImage{display:grid;justify-items:center;gap:4px;max-width:190px;margin:0;padding:4px}
+.formalPaper .formalSignatureImage img{display:block;max-width:100%;max-height:75px;object-fit:contain;filter:contrast(1.06)}
+.formalPaper .formalSignatureImage figcaption{font-size:9px;color:#8190a3;line-height:1.3;text-align:center}
+.formalPaper .formalSignature small{display:block;margin-top:6px;color:#7086a1;font-size:10px}
+.entryPersonalSwitch,.entryForgot{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:8px 13px;border:1px solid #cadbf3;border-radius:9px;background:#f4f8ff;color:#345d9c;font-size:12px;font-weight:790;cursor:pointer}
+.entryPersonalSwitch{justify-self:start;align-self:start;margin-bottom:10px}
+.entryForgot{margin-top:10px;width:100%;white-space:normal;text-align:center}
+.entryRecoveryNotice{padding:12px;border:1px solid #b9dcca;border-radius:9px;background:#f1fbf5;color:#266f49;font-size:12px;line-height:1.55}
+.passwordRecoveryPage{display:grid;place-items:center;min-height:100dvh;padding:22px;background:#f1f5ff}
+.passwordRecoveryCard{display:grid;gap:18px;max-width:520px;width:100%;padding:35px;border:1px solid #d6e4f8;border-radius:20px;background:#fff;color:#28466e;box-shadow:0 12px 52px #11274514}
+.passwordRecoveryCard h1{margin:0;font-size:25px}
+.passwordRecoveryCard>p{margin:0;font-size:13px;line-height:1.6}
+.passwordRecoveryCard form{display:grid;gap:13px}
+.passwordRecoveryCard label{display:grid;gap:6px;font-size:12px}
+.passwordRecoveryCard input{width:100%;min-height:45px;padding:10px;border:1px solid #c8d8ef;border-radius:9px}
+.passwordRecoveryCard button{min-height:45px}
+.passwordRecoveryCard a{font-size:12px;color:#315dc4}
+.passwordRecoverySuccess{display:flex;align-items:center;gap:8px;color:#237f58}
+/* Animated editorial art for the fictional Republic prologue. */
+.comicBackdrop{position:fixed;inset:0;z-index:300;display:grid;place-items:center;overflow:auto;padding:14px;background:#091225dc;backdrop-filter:blur(12px)}
+.comicDialog{display:flex;flex-direction:column;gap:0;width:min(1120px,100%);max-height:min(94dvh,880px);min-width:0;overflow:hidden;border:1px solid #566792;border-radius:22px;background:#0c1733;color:#fff;box-shadow:0 35px 110px #020a1c94}
+.comicDialog>header{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:65px;flex:none;padding:13px 22px;border-bottom:1px solid #c4d4ff26}
+.comicDialog>header b{font-size:12px;letter-spacing:.13em;color:#a8c9fd}
+.comicDialog>header>div{display:flex;gap:7px;flex:none}
+.comicDialog>header button,.comicControls button{display:grid;place-items:center;width:39px;height:39px;min-width:39px;min-height:39px;padding:0;border:1px solid #bed8ff3a;border-radius:11px;background:#ffffff13;color:#eaf2ff;cursor:pointer}
+.comicDialog>header button:hover,.comicControls button:hover{background:#ffffff32}
+.comicFrame{position:relative;flex:1 1 auto;min-height:390px;max-height:600px;overflow:hidden;isolation:isolate;background:#182d52;animation:comicReveal .6s ease both}
+.comicArtwork{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(1.16);animation:comicCamera 6.6s ease-in-out both}
+.comicClouds{animation:comicCloud 13s linear infinite alternate}
+.comicStorm{animation:comicStorm 1.4s linear infinite alternate}
+.comicRebirth{animation:comicFloat 4s ease-in-out infinite alternate}
+.comicOverlay{position:absolute;left:0;right:0;bottom:0;z-index:2;display:grid;justify-items:start;gap:12px;max-width:100%;padding:clamp(20px,4vw,48px);background:linear-gradient(0deg,#0c1325fa,#101c3bdc 65%,#111b3400);box-sizing:border-box}
+.comicOverlay .comicKicker{display:inline-block;padding:7px 10px;border:1px solid #93e6f774;border-radius:8px;background:#8deef71c;color:#9beff6;font-size:11px;font-weight:900;letter-spacing:.13em}
+.comicOverlay h2{max-width:700px;margin:0;font-size:clamp(29px,5vw,65px);line-height:1.08;font-weight:900;letter-spacing:-.055em;text-wrap:balance;animation:comicTitle .65s .1s ease both}
+.comicOverlay p{max-width:710px;margin:0;color:#dfecff;font-size:clamp(13px,1.6vw,18px);line-height:1.62;text-wrap:pretty;animation:comicTitle .7s .28s ease both}
+.comicOverlay strong{display:inline-flex;align-items:center;min-height:32px;padding:7px 12px;border-radius:7px;background:#f7d17a;color:#17284a;font-size:11px;font-weight:900;letter-spacing:.07em}
+.comicDialog>footer{display:flex;align-items:center;justify-content:space-between;gap:14px;flex:none;padding:13px 22px;min-height:77px}
+.comicFooterLabel{display:grid;gap:3px;min-width:0}
+.comicFooterLabel small{font-size:12px;color:#c5d9ff;line-height:1.4}
+.comicFooterLabel span{font-size:10px;color:#88a6d1;font-variant-numeric:tabular-nums}
+.comicControls{display:flex;align-items:center;gap:5px;flex:none}
+.comicControls button.comicDot{width:30px;height:30px;min-width:30px;min-height:30px;border-radius:8px;font-size:11px;font-weight:900}
+.comicControls button.comicDot.active{background:#7ef0d8;color:#132c4f}
+@keyframes comicReveal{from{opacity:.2;transform:scale(1.02)}to{opacity:1;transform:scale(1)}}
+@keyframes comicCamera{from{transform:scale(1.07)}to{transform:scale(1)}}
+@keyframes comicCloud{from{transform:translateX(-35px)}to{transform:translateX(35px)}}
+@keyframes comicStorm{from{transform:translate(13px,-25px);opacity:.25}to{transform:translate(-12px,20px);opacity:.8}}
+@keyframes comicFloat{from{transform:translateY(5px)}to{transform:translateY(-13px)}}
+@keyframes comicTitle{from{opacity:0;transform:translateY(17px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1050px){.profilePublicStats{grid-template-columns:repeat(3,minmax(0,1fr))}.profileSecurityGrid{grid-template-columns:minmax(0,1fr) 1fr}.profileSecurityGrid label{grid-column:1/-1}.comicFrame{min-height:350px}}
+@media(max-width:700px){
+ .profilePage .profileHero{padding:16px;gap:16px}
+ .profilePage .profilePhoto{width:94px;height:94px;min-width:94px;min-height:94px;font-size:27px;border-radius:24px}
+ .profilePage .profileIntro{flex:1 1 205px}
+ .profilePage .profileIntro h1{font-size:23px;line-height:1.25}
+ .profilePublicStrip .styledSelect{flex:1 1 100%}
+ .profilePublicStats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .profileSecurityGrid,.profilePasswordFields{grid-template-columns:minmax(0,1fr)}
+ .profileSecurityGrid label{grid-column:auto}
+ .profilePasswordFields button{grid-column:auto;width:100%}
+ .profileSecurityRecovery article{align-items:start;flex-wrap:wrap}
+ .profileSecurityRecovery article button{flex:1 1 100%}
+ .comicBackdrop{padding:0}
+ .comicDialog{height:100dvh;max-height:100dvh;border:0;border-radius:0}
+ .comicDialog>header{padding:12px 14px;min-height:59px}
+ .comicDialog>header b{font-size:10px;letter-spacing:.08em}
+ .comicFrame{flex:1 1 auto;min-height:0;max-height:none}
+ .comicOverlay{padding:22px 18px 30px;gap:10px}
+ .comicOverlay h2{font-size:clamp(30px,8vw,51px)}
+ .comicOverlay p{font-size:14px;line-height:1.55}
+ .comicDialog>footer{padding:10px 12px;gap:12px;flex-wrap:wrap}
+ .comicFooterLabel{flex:1 1 100%}
+ .comicControls{width:100%;justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){
+ .comicArtwork,.comicClouds,.comicStorm,.comicRebirth,.comicFrame,.comicOverlay h2,.comicOverlay p{animation:none!important}
+}
