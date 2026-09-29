@@ -4,7 +4,7 @@ import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
 import type {ActionItem,Activity,Ballot,Channel,ChatPin,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,ImpactLedger,ImpactRule,Member,Message,Metric,MetricHistory,Party,PartyAgreement,PartyDocument,PartyInvitation,PartyMandateAllocation,PartySupportHistory,PoliticalDecision,PoliticalPost,PoliticalPostFormalLink,PoliticalPostMedia,Presence,Stage,Vote} from './types';
 import {CRISES} from './constants';
-import {CHAT_MAX_FILE_BYTES,preferredRecordingMime,recordingFileName,uploadedChatKind} from './recordingMedia';
+import {CHAT_MAX_FILE_BYTES,preferredRecordingMime,recordingFileName,uploadedChatKind,inferChatMime} from './recordingMedia';
 import type {ChatMediaKind} from './recordingMedia';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number};
 
@@ -685,7 +685,8 @@ export function useRepublicGame(gameId:string){
  async function sendChatFile(file:File){
   const target=channelId;
   if(!me||!target)return false;
-  return storeChatAttachment(file,file.name,file.type||'application/octet-stream',uploadedChatKind(file.type),target);
+  const mime=inferChatMime(file);
+  return storeChatAttachment(file,file.name,mime,uploadedChatKind(mime),target);
  }
  function discardRecording(){
   if(mediaOperationRef.current)return;
