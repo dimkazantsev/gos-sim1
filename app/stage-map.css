@@ -43,130 +43,300 @@
   }
   .stagesPage .stagePhaseProgress svg {width:14px;height:14px;flex:none}
 
-  /* Every card has identical header, metadata and action baselines. */
+  /* Cards are flex columns: only the body grows; the entire action strip is
+     a single bottom-aligned row. No absolute controls or phantom grid tracks. */
   .stagesPage .stageTimeline {
-    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:var(--stage-gap);align-items:stretch;min-width:0;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));
+    align-items:stretch;
+    gap:16px;
+    min-width:0;
   }
   .stagesPage .stageCard {
-    position:relative;display:flex;flex-direction:column;align-items:stretch;
-    min-width:0;min-height:324px;padding:0;gap:0;overflow:hidden;
-    border:1px solid #dce5ef;border-radius:19px;background:#fff;
-    box-shadow:0 6px 24px rgba(19,39,70,.045);
-    transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
-  }
-  .stagesPage .stageCard:hover {
-    transform:translateY(-2px);border-color:#b6caf0;
-    box-shadow:0 15px 30px rgba(19,39,70,.08);
+    container-name:stage-card;
+    container-type:inline-size;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:0;
+    min-width:0;
+    min-height:266px;
+    padding:0;
+    overflow:hidden;
+    border:1px solid #dce5ef;
+    border-radius:18px;
+    background:#fff;
+    box-shadow:0 5px 18px rgba(19,39,70,.045);
+    transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
   }
   .stagesPage .stageCard.open {
-    background:linear-gradient(155deg,#fff 50%,#f5f8ff);
-    border:1px solid #a9bfee;box-shadow:inset 0 3px #547bde,0 7px 25px rgba(49,94,251,.07);
+    border-color:#a9bfeb;
+    background:linear-gradient(165deg,#fff 52%,#f8faff);
+    box-shadow:0 6px 22px rgba(49,94,251,.08);
   }
-  .stagesPage .stageCard.completed {background:#fff}
+  .stagesPage .stageCard.completed{background:#fff}
+  .stagesPage .stageCard:hover {
+    transform:translateY(-2px);
+    border-color:#9db9e0;
+    box-shadow:0 12px 29px rgba(19,39,70,.09);
+  }
   .stagesPage .stageCardPrimary {
-    display:flex;flex-direction:column;align-items:stretch;flex:1 1 auto;gap:0;
-    min-width:0;width:100%;min-height:0;padding:20px;border:0;border-radius:0;
-    background:transparent;color:inherit;text-align:left;cursor:pointer;
+    display:flex;
+    flex:1 1 auto;
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:flex-start;
+    gap:0;
+    min-width:0;
+    min-height:0;
+    width:100%;
+    margin:0;
+    padding:20px 20px 18px;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:inherit;
+    text-align:left;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:450;
+    line-height:1.45;
+  }
+  .stagesPage .stageCardTop {
+    display:grid;
+    grid-template-columns:52px minmax(0,1fr);
+    align-items:start;
+    gap:14px;
+    width:100%;
+    min-width:0;
+    margin:0;
+  }
+  .stagesPage .stageCard .stageNo {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    flex:none;
+    gap:2px;
+    width:52px;
+    min-width:52px;
+    height:57px;
+    min-height:57px;
+    margin:0;
+    padding:0;
+    border-radius:14px;
+    background:#eef3f7;
+    color:#4d6683;
+    box-shadow:none;
+  }
+  .stagesPage .stageCard .stageNo svg {display:block;flex:none;width:22px;height:22px;margin:0}
+  .stagesPage .stageCard .stageNo span {
+    display:block;
+    margin:0;
+    color:inherit;
+    text-align:center;
+    font-size:12px;
+    font-weight:800;
+    line-height:1;
+    letter-spacing:.045em;
+  }
+  .stagesPage .stageCard.open .stageNo {background:#e7eeff;color:#285fc5}
+  .stagesPage .stageCard.completed .stageNo {background:#e8f5ee;color:#22744f}
+  .stagesPage .stageCardBody {
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:0;
+    width:100%;
+    min-width:0;
+    margin:0;
+    padding:0;
+  }
+  .stagesPage .stageCardMode {
+    display:block;
+    min-width:0;
+    margin:1px 0 6px;
+    color:#71829a;
+    font-size:11px;
+    font-weight:800;
+    line-height:1.4;
+    letter-spacing:.055em;
+    text-transform:uppercase;
+    overflow-wrap:anywhere;
+  }
+  .stagesPage .stageCardTitle {
+    display:block;
+    min-width:0;
+    margin:0;
+    color:#183454;
+    font-size:17px;
+    font-weight:770;
+    line-height:1.32;
+    letter-spacing:-.02em;
+    overflow-wrap:anywhere;
+    text-wrap:pretty;
+  }
+  .stagesPage .stageCardSummary {
+    display:-webkit-box;
+    min-width:0;
+    margin:9px 0 0;
+    color:#5e718b;
+    font-size:13px;
+    font-weight:430;
+    line-height:1.52;
+    letter-spacing:0;
+    overflow:hidden;
+    overflow-wrap:anywhere;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:4;
+  }
+  .stagesPage .stageCardDue {
+    display:inline-flex;
+    align-self:flex-start;
+    align-items:center;
+    gap:7px;
+    margin:13px 0 0 66px;
+    padding:5px 9px;
+    min-height:29px;
+    max-width:calc(100% - 66px);
+    border:1px solid #e1e8f0;
+    border-radius:8px;
+    background:#fff;
+    color:#60738d;
+    font-size:12px;
+    font-weight:730;
+    font-variant-numeric:tabular-nums;
+    line-height:1.25;
+  }
+  .stagesPage .stageCardDue svg{display:block;flex:none}
+  .stagesPage .stageCardFooter {
+    display:flex;
+    flex:0 0 auto;
+    align-items:center;
+    justify-content:flex-start;
+    flex-wrap:nowrap;
+    gap:8px;
+    min-width:0;
+    min-height:66px;
+    width:100%;
+    margin:0;
+    padding:12px 18px;
+    border-top:1px solid #e7edf5;
+    background:#f9fbfe;
+  }
+  .stagesPage .stageStatusPill {
+    display:inline-flex;
+    flex:0 0 auto;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    min-width:0;
+    min-height:38px;
+    margin:0;
+    padding:0 10px;
+    border:1px solid #dee5ed;
+    border-radius:9px;
+    background:#f1f4f7;
+    color:#63748a;
+    font-size:12px;
+    font-weight:800;
+    line-height:1;
+    white-space:nowrap;
+  }
+  .stagesPage .stageStatusPill svg,
+  .stagesPage .stageVoteQuick svg,
+  .stagesPage .stageCardOpen svg{
+    display:block;
+    width:16px;
+    height:16px;
+    flex:none;
+    margin:0;
+  }
+  .stagesPage .stageStatusPill--open {background:#e9f0ff;border-color:#cddfff;color:#285bb5}
+  .stagesPage .stageStatusPill--completed {background:#e9f6ef;border-color:#cde7d8;color:#1d754f}
+  .stagesPage .stageStatusPill--locked {background:#f1f4f8;border-color:#dfe6ee;color:#687a91}
+  .stagesPage .stageVoteQuick {
+    position:static;
+    display:inline-flex;
+    flex:0 0 auto;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    min-width:38px;
+    min-height:38px;
+    width:auto;
+    height:38px;
+    margin:0;
+    padding:0 10px;
+    border:1px solid #efd1a1;
+    border-radius:9px;
+    background:#fff4e1;
+    color:#895b1e;
+    font-size:12px;
+    font-weight:750;
+    line-height:1;
+    white-space:nowrap;
+    cursor:pointer;
+  }
+  .stagesPage .stageVoteQuick>span {
+    position:static;
+    display:block;
+    width:auto;
+    height:auto;
+    overflow:visible;
+    clip:auto;
+    clip-path:none;
+    white-space:nowrap;
+  }
+  .stagesPage .stageVoteQuick:hover{background:#ffe9c3;border-color:#dcb77a}
+  .stagesPage .stageCardOpen {
+    display:inline-flex;
+    flex:0 0 auto;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    width:auto;
+    min-width:120px;
+    min-height:40px;
+    margin:0 0 0 auto;
+    padding:0 12px;
+    border:1px solid #ccdafa;
+    border-radius:9px;
+    background:#ecf2ff;
+    color:#2a58b5;
+    font-size:12px;
+    font-weight:800;
+    line-height:1;
+    white-space:nowrap;
+    cursor:pointer;
+    transition:background .16s ease,border-color .16s ease;
+  }
+  .stagesPage .stageCardOpen span{display:block;width:auto;margin:0;text-align:left}
+  .stagesPage .stageCardOpen:hover,
+  .stagesPage .stageCardPrimary:hover~.stageCardFooter .stageCardOpen {
+    background:#dce8ff;
+    border-color:#afc7f2;
   }
   .stagesPage .stageCardPrimary:focus-visible,
   .stagesPage .stageVoteQuick:focus-visible,
+  .stagesPage .stageCardOpen:focus-visible,
   .stagesPage .stagePhaseTrack button:focus-visible,
   .stagesPage .stageNextButton:focus-visible {
-    outline:3px solid #456fca;outline-offset:-4px;z-index:1;
+    position:relative;
+    z-index:1;
+    outline:3px solid #3468cc;
+    outline-offset:-4px;
   }
-  .stagesPage .stageCardTop {
-    display:grid;grid-template-columns:54px minmax(0,1fr);
-    align-items:start;gap:14px;width:100%;min-width:0;
+  @container stage-card (max-width:470px) {
+    .stageVoteQuick {width:38px;padding:0}
+    .stageVoteQuick>span{display:none}
   }
-  .stagesPage .stageCard .stageNo {
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    width:54px;min-width:54px;height:59px;min-height:59px;gap:5px;
-    border-radius:14px;background:#eef2f9;color:#49617f;box-shadow:none;
+  @container stage-card (max-width:345px) {
+    .stageCardFooter{gap:5px;padding:10px}
+    .stageStatusPill{padding:0 7px}
+    .stageCardOpen{min-width:100px;padding:0 8px;gap:5px}
   }
-  .stagesPage .stageCard .stageNo svg {
-    width:23px;height:23px;flex:none;display:block;margin:0;
-  }
-  .stagesPage .stageCard .stageNo span {
-    display:block;margin:0;font-size:12px;line-height:12px;font-weight:850;
-    letter-spacing:.045em;color:inherit;text-align:center;
-  }
-  .stagesPage .stageCard.open .stageNo {background:#e6edff;color:#285fc5}
-  .stagesPage .stageCard.completed .stageNo {background:#e8f5ee;color:#22744f}
-  .stagesPage .stageCardBody {display:flex;flex-direction:column;min-width:0}
-  .stagesPage .stageCardBody small {
-    display:block;margin:0 0 6px;min-height:15px;
-    font-size:12px;line-height:15px;letter-spacing:.04em;font-weight:750;
-    color:#71829a;overflow-wrap:anywhere;
-  }
-  .stagesPage .stageCardBody h3 {
-    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
-    overflow:hidden;min-height:63px;max-height:69px;margin:0 0 9px;
-    font-size:16px;line-height:1.34;font-weight:760;letter-spacing:-.018em;
-    color:#1d3350;overflow-wrap:anywhere;
-  }
-  .stagesPage .stageCardBody p {
-    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
-    overflow:hidden;min-height:60px;max-height:63px;margin:0;
-    font-size:13px;line-height:1.53;color:#5c708b;overflow-wrap:anywhere;
-  }
-  .stagesPage .stageCardFooter {
-    display:flex;flex-direction:column;gap:11px;width:100%;
-    margin-top:auto;padding:15px 0 0;min-width:0;
-  }
-  .stagesPage .stageCard .stageMeta {
-    display:grid;grid-template-columns:minmax(0,1fr) auto;
-    grid-template-rows:31px 27px;gap:7px;align-items:center;align-content:start;
-    width:100%;min-height:65px;margin:0;
-  }
-  .stagesPage :is(.stageStatusPill,.stageDeadlinePill,.stageVotePill) {
-    display:inline-flex;align-items:center;justify-content:center;gap:6px;
-    min-width:0;max-width:100%;min-height:31px;padding:5px 9px;
-    border-radius:9px;font-size:12px;line-height:18px;font-weight:800;
-    white-space:nowrap;
-  }
-  .stagesPage :is(.stageStatusPill,.stageDeadlinePill,.stageVotePill) svg {
-    width:15px;height:15px;flex:none;display:block;
-  }
-  .stagesPage .stageCard .stageStatusPill {grid-column:1;grid-row:1;justify-self:start}
-  .stagesPage .stageCard .stageDeadlinePill {
-    grid-column:2;grid-row:1;justify-self:end;
-    padding-left:7px;padding-right:7px;font-variant-numeric:tabular-nums;
-    background:#fff;border-color:#dce4ef;color:#596e89;
-  }
-  .stagesPage .stageCard .stageVotePill--inline {
-    grid-column:1/-1;grid-row:2;justify-self:start;
-    min-height:27px;padding:3px 9px;
-    background:#fff2df;border-color:#f0d3a3;color:#955d16;
-  }
-  .stagesPage .stageCardOpen {
-    display:grid;grid-template-columns:18px minmax(0,1fr) 18px;
-    align-items:center;justify-items:center;gap:8px;
-    width:calc(100% - 55px);min-width:0;min-height:44px;
-    padding:10px 12px;margin:0;border:1px solid #cad9f0;
-    border-radius:11px;background:#eef4ff;color:#285ec3;
-    font-size:13px;line-height:20px;font-weight:820;
-    transition:background .16s,border-color .16s;
-  }
-  .stagesPage .stageCardOpen span {width:100%;text-align:center}
-  .stagesPage .stageCardOpen svg {width:17px;height:17px;display:block;flex:none;margin:0}
-  .stagesPage .stageCardPrimary:hover .stageCardOpen {
-    background:#e2ecff;border-color:#aec3eb;
-  }
-  .stagesPage .stageVoteQuick {
-    position:absolute;right:20px;bottom:20px;z-index:1;
-    display:grid;place-items:center;width:44px;min-width:44px;height:44px;min-height:44px;
-    margin:0;padding:0;gap:0;
-    border:1px solid #edc98e;border-radius:11px;background:#fff2db;
-    color:#8e5813;cursor:pointer;transition:background .16s,border-color .16s;
-  }
-  .stagesPage .stageVoteQuick>svg:first-child {width:19px;height:19px;display:block;margin:0}
-  .stagesPage .stageVoteQuick>svg:last-child {display:none}
-  .stagesPage .stageVoteQuick>span {
-    position:absolute;width:1px;height:1px;overflow:hidden;
-    clip:rect(0,0,0,0);white-space:nowrap;clip-path:inset(50%);
-  }
-  .stagesPage .stageVoteQuick:hover {background:#ffe7bc;border-color:#dbad64}
 
   /* Modal heading has three strict columns, avoiding close-icon drift. */
   .stagesPage .stageDetailHeader {
@@ -199,23 +369,38 @@
   .stagesPage .stageModalVoteAction svg {width:17px;height:17px;flex:none}
   .stagesPage .stageRulesCalloutIcon {display:grid;place-items:center}
 }
-@media (min-width:901px) and (max-width:1320px) {
-  .stagesPage .stagePhaseRail {grid-template-columns:minmax(0,1fr)}
-  .stagesPage .stagePhaseTrack {grid-template-columns:repeat(3,minmax(0,1fr))}
-  .stagesPage .stagePhaseIntro {min-height:84px}
-  .stagesPage .stagePhaseTrack button {min-height:96px}
+@media (min-width:901px) and (max-width:1320px){
+  .stagesPage .stagePhaseRail{grid-template-columns:minmax(0,1fr)}
+  .stagesPage .stagePhaseTrack{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .stagesPage .stagePhaseIntro{min-height:84px}
+  .stagesPage .stagePhaseTrack button{min-height:96px}
 }
-@media (min-width:1360px) {
-  .stagesPage .stageTimeline {grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:900px){
+  /* Keep the new footer structure usable on tablets and mobiles. */
+  .stagesPage .stageTimeline{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+  .stagesPage .stageCard{display:flex;flex-direction:column;align-items:stretch;min-width:0;padding:0;gap:0;overflow:hidden}
+  .stagesPage .stageCardPrimary{display:flex;flex:1 1 auto;flex-direction:column;min-width:0;width:100%;padding:16px;border:0;background:transparent;text-align:left}
+  .stagesPage .stageCardTop{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;align-items:start;min-width:0;width:100%}
+  .stagesPage .stageCard .stageNo{width:48px;height:54px;min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .stagesPage .stageCard .stageNo svg{display:block;flex:none}
+  .stagesPage .stageCard .stageNo span{display:block;margin:0;font-size:12px;line-height:1}
+  .stagesPage .stageCardBody{display:flex;flex-direction:column;gap:0;min-width:0}
+  .stagesPage .stageCardMode{display:block;margin:0 0 6px;color:#70819a;font-size:11px;font-weight:800;line-height:1.3}
+  .stagesPage .stageCardTitle{display:block;margin:0;font-size:16px;font-weight:750;line-height:1.34;color:#1d3655}
+  .stagesPage .stageCardSummary{display:-webkit-box;margin:8px 0 0;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:4;color:#63758e;font-size:13px;font-weight:450;line-height:1.5}
+  .stagesPage .stageCardDue{display:inline-flex;align-items:center;align-self:flex-start;gap:6px;margin:12px 0 0 60px;font-size:12px}
+  .stagesPage .stageCardFooter{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:auto;padding:12px 15px;min-height:60px;border-top:1px solid #e7edf5;background:#f9fbfe}
+  .stagesPage .stageStatusPill{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 9px;font-size:12px;white-space:nowrap}
+  .stagesPage .stageVoteQuick{position:static;display:inline-flex;align-items:center;justify-content:center;gap:5px;width:auto;height:36px;min-height:36px;margin:0;padding:0 9px;border:1px solid #efd1a1;border-radius:9px;background:#fff4e1;color:#895b1e;font-size:12px}
+  .stagesPage .stageVoteQuick>span{position:static;display:block;width:auto;height:auto;clip:auto;clip-path:none;overflow:visible}
+  .stagesPage .stageVoteQuick svg,.stagesPage .stageStatusPill svg,.stagesPage .stageCardOpen svg{display:block;flex:none;width:16px;height:16px}
+  .stagesPage .stageCardOpen{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;margin:0 0 0 auto;padding:0 10px;border:1px solid #ccdafa;border-radius:9px;background:#ecf2ff;color:#2a58b5;font-size:12px;font-weight:800;white-space:nowrap}
+  .stagesPage .stageCardOpen span{width:auto}
 }
-@media (min-width:1850px) {
-  .stagesPage .stageTimeline {grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:370px){
+  .stagesPage .stageVoteQuick>span{display:none}
 }
-@media (min-width:901px) and (max-width:1599px) {
-  .simMain.chatOpen .stagesPage .stageTimeline {grid-template-columns:minmax(0,1fr)}
-}
-@media (prefers-reduced-motion:reduce) {
-  .stagesPage .stageCard,.stagesPage .stageCardOpen,
-  .stagesPage .stageVoteQuick {transition:none}
-  .stagesPage .stageCard:hover {transform:none}
+@media (prefers-reduced-motion:reduce){
+  .stagesPage .stageCard,.stagesPage .stageCardOpen,.stagesPage .stageVoteQuick{transition:none}
+  .stagesPage .stageCard:hover{transform:none}
 }
