@@ -31,6 +31,24 @@ async function main(){
    assert(result.scroll<=result.viewport+3,'Consequence page overflows at '+width+': '+JSON.stringify(result));
    assert.equal(result.offenders.length,0,'Consequences layout has escaped children at '+width+': '+JSON.stringify(result.offenders));
    await page.locator('#preview').screenshot({path:path.join(screenshots,'impact-'+width+'.png')});
+   for(const variant of ['impact-expanded','impact-ledger']){
+    await page.locator('#screen').selectOption(variant);
+    const test=await page.frameLocator('#preview').locator('html').evaluate(html=>{
+     const root=html.querySelector('.impactWorkbench'),b=root.getBoundingClientRect();
+     const visible=(selector)=>[...root.querySelectorAll(selector)].filter(el=>getComputedStyle(el).display!=='none'&&!el.closest('[hidden]'));
+     const nodes=variantUnused(root); // placeholder replaced below
+     return {viewport:html.clientWidth,scroll:html.scrollWidth,root:{left:b.left,right:b.right},
+      visibleInputs:visible('.impactRuleEditor input').length,history:visible('.impactHistoryRow').length,
+      offending:nodes.map(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,element:el.tagName}}).filter(x=>x.left<b.left-3||x.right>b.right+3)};
+     function variantUnused(root){return [...root.querySelectorAll('.impactRuleEditor:not([hidden]) .impactRuleControls,.impactRuleEditor:not([hidden]) .impactRuleEffects label,.impactRuleEditor:not([hidden]) .impactNumeric,.impactHistoryRow,.impactHistoryBottom,.impactUndo')].filter(el=>!el.closest('[hidden]'))}
+    });
+    assert(test.scroll<=test.viewport+3,variant+' overflows document at '+width+'px: '+JSON.stringify(test));
+    assert(!test.offending.length,variant+' children escape at '+width+'px: '+JSON.stringify(test.offending));
+    if(variant==='impact-expanded')assert(test.visibleInputs>=12,'Expanded rule editor lost inputs at '+width+'px');
+    if(variant==='impact-ledger')assert.equal(test.history,2,'History must contain applied and reverted records');
+    await page.locator('#preview').screenshot({path:path.join(screenshots,variant+'-'+width+'.png')});
+    console.log('PASS '+variant+' '+width+'px');
+   }
    console.log('PASS consequences '+width+'px: no horizontal overflow, three readable rules');
   }
  }finally{await browser.close()}
