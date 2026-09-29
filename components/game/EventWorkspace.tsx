@@ -14,6 +14,7 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
  const [title,setTitle]=useState('');
  const [situation,setSituation]=useState('');
  const [category,setCategory]=useState('Государственное управление');
+ const [roleFilter,setRoleFilter]=useState('');
  const [seriousness,setSeriousness]=useState<'serious'|'light'>('serious');
  const [audience,setAudience]=useState<'single'|'group'|'all'>('single');
  const [selected,setSelected]=useState<string[]>([]);
@@ -42,6 +43,8 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
   return()=>{void supabase.removeChannel(channel)};
  },[game?.id,me?.user_id]);
  const students=members.filter(m=>m.kind==='student');
+ const roles=[...new Set(students.map(m=>m.role_title?.trim()).filter((r):r is string=>!!r))].sort((a,b)=>a.localeCompare(b,'ru'));
+ const recipients=roleFilter&&audience!=='all'?students.filter(m=>m.role_title===roleFilter):students;
  const mine=assignments.filter(a=>a.recipient_id===me?.user_id);
  const pending=mine.filter(a=>a.status==='pending');
  const eligible=audience==='all'?students.map(m=>m.user_id):selected;
@@ -53,7 +56,7 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
   const key='manual-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
   const r=await supabase.from('event_cases').insert({
    game_id:game.id,case_key:key,title:title.trim(),situation:situation.trim(),category,
-   seriousness,audience,status:'ready',created_by:me.user_id
+   seriousness,audience,allowed_roles:roleFilter?[roleFilter]:[],status:'ready',created_by:me.user_id
   }).select('id').single();
   if(r.error||!r.data){setNotice(r.error?.message||'Не удалось создать событие.');setSaving(false);return}
   const a=await supabase.from('event_assignments').insert(eligible.map(recipient_id=>({
@@ -79,10 +82,11 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
     <label>Название<input value={title} maxLength={180} onChange={e=>setTitle(e.target.value)} placeholder="Краткий заголовок ситуации"/></label>
     <label>Сфера<select value={category} onChange={e=>setCategory(e.target.value)}>{['Государственное управление','Экономика','Международные отношения','Образование','Здравоохранение','Экология','Муниципальное управление','Культура и протокол','Социальная политика'].map(s=><option key={s}>{s}</option>)}</select></label>
     <label>Тип<select value={seriousness} onChange={e=>setSeriousness(e.target.value as 'serious'|'light')}><option value="serious">Серьёзное</option><option value="light">Повседневное / необычное</option></select></label>
+    <label>Роль получателя<select value={roleFilter} onChange={e=>{setRoleFilter(e.target.value);setSelected([])}}><option value="">Любая должность</option>{roles.map(role=><option key={role} value={role}>{role}</option>)}</select></label>
     <label>Формат<select value={audience} onChange={e=>{setAudience(e.target.value as 'single'|'group'|'all');setSelected([])}}><option value="single">Одному участнику</option><option value="group">Совместно, 2–3 человека</option><option value="all">Всем студентам</option></select></label>
     <label className="eventWide">Описание ситуации<textarea rows={4} value={situation} maxLength={5000} onChange={e=>setSituation(e.target.value)} placeholder="Какое решение нужно принять или отклонить?"/></label>
    </div>
-   {audience!=='all'&&<div className="eventRecipients"><strong>Получатели · {selected.length}/{audience==='single'?1:3}</strong><div>{students.map(m=><label key={m.user_id}><input type="checkbox" checked={selected.includes(m.user_id)} disabled={!selected.includes(m.user_id)&&selected.length>=(audience==='single'?1:3)} onChange={e=>setSelected(old=>e.target.checked?[...old,m.user_id]:old.filter(x=>x!==m.user_id))}/>{m.full_name}<small>{m.role_title||'Студент'}</small></label>)}</div></div>}
+   {audience!=='all'&&<div className="eventRecipients"><strong>Получатели · {selected.length}/{audience==='single'?1:3}</strong><div>{recipients.map(m=><label key={m.user_id}><input type="checkbox" checked={selected.includes(m.user_id)} disabled={!selected.includes(m.user_id)&&selected.length>=(audience==='single'?1:3)} onChange={e=>setSelected(old=>e.target.checked?[...old,m.user_id]:old.filter(x=>x!==m.user_id))}/>{m.full_name}<small>{m.role_title||'Студент'}</small></label>)}</div></div>}
    <footer><span>{audience==='all'?'Получатели: вся аудитория':'Выбрано: '+selected.length}</span><button type="button" onClick={()=>void create()} disabled={!canSend||saving||readOnly}>{saving?'Отправка…':'Назначить событие'}</button></footer>
   </div>}
   <div className="eventList"><h3>{teacher?'Назначенные ситуации':'Мои события'}</h3>
