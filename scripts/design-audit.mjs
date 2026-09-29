@@ -227,6 +227,15 @@ check('Chat composer aligns icon send, attachment, visible mic and video control
 execFileSync(process.execPath,['scripts/chat-logic-check.cjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['scripts/recording-media-check.cjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['scripts/chat-media-transport-check.cjs'],{stdio:'inherit'});
+execFileSync(process.execPath,['scripts/chat-voice-player-check.cjs'],{stdio:'inherit'});
+check('Voice notes use same accessible compact player in chat and pins',
+ chat.includes('import ChatVoicePlayer from')&&
+ chat.includes('<ChatVoicePlayer src={m.url}')&&
+ !chat.includes('<audio controls preload="none" src={m.url}')&&
+ read('components/game/ChatVoicePlayer.tsx').includes("data-chat-voice-player")&&
+ read('components/game/ChatVoicePlayer.tsx').includes('pauseOtherVoices()')&&
+ chatCss.includes('.gsChatV2 .chatVoicePlayer{'));
+
 check('Media transfer failure is visible in the chat and local preview survives',
  read('components/game/useRepublicGame.ts').includes('setChatMediaError(result.error)')&&
  read('components/game/useRepublicGame.ts').includes('pendingChatUploads.current.set(blob,result.pending)')&&
