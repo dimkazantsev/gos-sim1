@@ -1,0 +1,156 @@
+/* Teacher UI geometry refinement: one spacing system, chat containment, stable toolbars. */
+.teacherCommand,.gradesPage,.classroomJournal,.participantsAnalytics{--panel-gap:16px;min-width:0}
+.teacherCommand .teacherWorkspace{display:grid;gap:var(--panel-gap);min-width:0;overflow:visible}
+.teacherCommand .teacherWorkspaceNav{margin:0;max-width:100%;min-width:0;column-gap:8px;padding:10px 12px}
+.teacherCommand .teacherWorkspacePanel{min-width:0;display:grid;align-content:start;gap:var(--panel-gap)}
+.teacherCommand .teacherWorkspacePanel>*{min-width:0;margin:0}
+.teacherCommand .teacherWorkspacePanel>.teacherAnalytics{display:grid;gap:18px}
+.teacherCommand .teacherOverviewQuick{gap:10px;padding:0}
+.teacherCommand .teacherOverviewQuick button{min-height:44px}
+.teacherCommand .teacherCommandBar{align-items:center;gap:16px;min-width:0}
+.teacherCommand .teacherQuickActions{gap:9px}
+.teacherCommand .teacherQuick{min-height:44px}
+.teacherCommand .teacherStageManager{display:grid;gap:17px}
+.teacherCommand .teacherStageManagerToolbar{gap:14px}
+.teacherCommand .teacherStageGrid{gap:12px}
+.teacherCommand .teacherStageCard{min-width:0}
+.teacherCommand .teacherStageOpen{gap:12px;min-width:0}
+.teacherCommand .teacherStageCopy{gap:5px}
+.teacherCommand .teacherStageName{max-width:100%;line-height:1.4}
+.teacherCommand .teacherStageExpand,.teacherCommand .teacherStageReset{display:grid;place-items:center;padding:0;aspect-ratio:1}
+.teacherCommand .teacherStageExpand svg,.teacherCommand .teacherStageReset svg{display:block;flex:none;margin:0}
+.teacherCommand .teacherStageReadinessDetail{margin-top:0}
+.teacherCommand .teacherStageManagerTools{flex-wrap:wrap;gap:10px}
+.teacherCommand .teacherWorkspaceNav button{scroll-snap-align:start}
+.teacherCommand .teacherRepresentation,.teacherCommand .teacherPartyMatrix{min-width:0}
+.teacherCommand .teacherPartyMatrix{gap:14px}
+.teacherCommand .teacherPartyMatrix>article{min-width:0;overflow:hidden}
+.teacherCommand .teacherPartyMatrix>article header{min-width:0;gap:10px}
+.teacherCommand .teacherPartyMatrix>article header>div{min-width:0;overflow-wrap:anywhere}
+.teacherCommand .teacherMandateRows{min-width:0;overflow-x:auto}
+
+/* A fixed chat pane must never overlap a responsive teacher card or toolbar.
+   On small screens the chat becomes the sole visible content area, above the dock. */
+.simWorkspace,.simContentFlow,.simMain,.teacherCommand{min-width:0}
+@media (min-width:1100px){
+ .simWorkspace.chatOpen .simContentFlow{padding-right:calc(var(--gs-chat-w,375px) + 34px);padding-left:clamp(16px,2vw,30px)}
+ .simMain.chatOpen{min-width:0;max-width:100%;width:100%}
+ .simMain.chatOpen .teacherCommand .teacherWorkspaceNav{position:sticky;top:var(--gs-top-h,84px)}
+ .simMain.chatOpen .teacherCommand .teacherCommandBar{grid-template-columns:minmax(0,1fr);gap:12px}
+ .simMain.chatOpen .teacherCommand .teacherCommandClock{
+   border:0;padding:0;justify-items:start;display:flex;gap:12px;align-items:center
+ }
+ .simMain.chatOpen .teacherCommand .teacherQuickActions{grid-column:1;flex-wrap:wrap;justify-content:flex-start}
+ .simMain.chatOpen .teacherCommand .teacherStageGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .simMain.chatOpen .teacherCommand .teacherStageManagerHead{flex-wrap:wrap}
+ .simMain.chatOpen .teacherCommand .teacherStageManagerTools{width:100%;flex-wrap:wrap;justify-content:space-between}
+ .simMain.chatOpen :is(.teacherStageManagerToolbar,.journalToolbar,.participantsToolbar,.gradesToolbar){flex-wrap:wrap;min-width:0}
+ .simMain.chatOpen .journalHeader,.simMain.chatOpen .participantsHeader{flex-wrap:wrap}
+ .simMain.chatOpen .teacherPartyMatrix{grid-template-columns:minmax(0,1fr)}
+ .simMain.chatOpen .teacherCommand .teacherOverviewStats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (min-width:1100px) and (max-width:1530px){
+ .simMain.chatOpen .teacherCommand .teacherStageGrid{grid-template-columns:minmax(0,1fr)}
+ .simMain.chatOpen .teacherCommand .teacherStageManagerHead{display:grid}
+ .simMain.chatOpen .teacherCommand .teacherStageManagerTools{display:grid;grid-template-columns:1fr;justify-items:stretch}
+ .simMain.chatOpen .teacherCommand .teacherStageManagerTotals{justify-items:start}
+}
+@media (max-width:1099px){
+ .simWorkspace.chatOpen .simContentFlow{visibility:hidden;pointer-events:none}
+ .simWorkspace.chatOpen .simChat.gsChatV2{
+   position:fixed;left:0;right:0;top:var(--gs-top-h,74px);
+   bottom:calc(78px + env(safe-area-inset-bottom));width:100%;max-width:100%;
+   height:auto;max-height:none;min-height:0;z-index:88;margin:0;
+   border-radius:0;background:#fff;box-shadow:none;overflow:hidden
+ }
+ .simWorkspace.chatOpen .simTop{position:sticky;top:0;z-index:89}
+ .simWorkspace.chatOpen .simChat.gsChatV2 .chatMessages{min-height:0}
+ .teacherCommand .teacherWorkspaceNav{top:var(--gs-top-h,74px)}
+}
+@media (max-width:650px){
+ .simWorkspace.chatOpen .simChat.gsChatV2{
+   top:var(--gs-top-h,64px);bottom:calc(80px + env(safe-area-inset-bottom));height:auto;
+   max-height:none;border-radius:0
+ }
+ .teacherCommand .teacherWorkspacePanel{gap:12px}
+ .teacherCommand .teacherStageGrid{gap:10px}
+ .teacherCommand .teacherStageManager{padding:14px;gap:14px}
+ .teacherCommand .teacherStageManagerHead{display:grid;gap:12px}
+ .teacherCommand .teacherStageManagerTools{display:grid;grid-template-columns:1fr 1fr;width:100%}
+ .teacherCommand .teacherStageManagerTotals{grid-column:1/-1;justify-items:start}
+ .teacherCommand .teacherResetAll,.teacherCommand .teacherReadinessRefresh{white-space:normal;line-height:1.35;text-align:center}
+}
+
+/* Native selects have identical heights and their popup never changes toolbar dimensions. */
+.journalToolbar,.participantsToolbar,.gradesToolbar{align-items:end;gap:11px 12px;min-width:0}
+.journalToolbar>label,.participantsToolbar>label,.gradesToolbar>label{min-width:0}
+.journalToolbar :is(select,input[type=search]),.participantsToolbar :is(select,input[type=search]),
+.gradesToolbar :is(select,input[type=search]){
+ display:block;box-sizing:border-box;height:42px;width:100%;
+ min-height:42px;max-width:100%;min-width:0;
+ padding:0 35px 0 12px;border:1px solid #dbe5f3;border-radius:10px;
+ background-color:#fff;color:#314e71;font-size:13px;font-weight:670;line-height:1.2
+}
+.journalToolbar select,.participantsToolbar select,.gradesToolbar select{
+ appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235d7899' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+ background-repeat:no-repeat;background-position:right 12px center;background-size:16px
+}
+.journalToolbar label.journalSearch,.participantsToolbar label.participantsSearch{
+ box-sizing:border-box;min-height:42px;height:42px;padding:0 12px;min-width:160px;
+ display:flex;align-items:center;gap:9px;border:1px solid #dbe5f3;border-radius:10px
+}
+.journalSearch input[type=search],.participantsSearch input[type=search]{
+ height:100%;min-height:0;padding:0!important;border:0!important;background:transparent
+}
+.journalToolbar label.journalCheck,.participantsToolbar label.participantsCheck{align-self:end;min-height:42px;white-space:nowrap}
+.journalToolbar label:not(.journalSearch):not(.journalCheck),
+.participantsToolbar label:not(.participantsSearch):not(.participantsCheck),
+.gradesToolbar label:not(.gradesPending){display:grid;align-content:end;gap:7px}
+.journalFeed{border:1px solid #e5edf7;border-radius:12px;padding:0 13px;min-height:160px;max-height:min(60vh,700px)}
+.journalEvent{grid-template-columns:112px 10px minmax(0,1fr);gap:14px;min-height:66px;align-items:start}
+.journalEvent:focus-within{background:#f7faff}
+.journalPresence{gap:10px;padding:5px 0 13px}
+.journalPresence button{flex-basis:214px;border-radius:12px}
+.classroomJournal,.participantsAnalytics{gap:17px;padding:21px 23px;border-radius:16px}
+.journalHeader,.participantsHeader{gap:15px}
+.journalHeader h2,.participantsHeader h2{font-size:clamp(19px,2vw,24px);line-height:1.25}
+.participantsToolbar>button{display:grid;place-items:center;flex:0 0 152px;width:152px;min-width:152px;height:42px;padding:0 12px;font-size:12px}
+.participantsTableScroll{margin-top:0}
+.gradesPage{gap:15px;min-width:0}
+.gradesPage .gradesHero{
+ display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:20px;
+ position:relative;padding:25px 28px 25px 51px;min-width:0;isolation:isolate
+}
+.gradesPage .gradesHero::before{left:24px;top:27px;bottom:27px;width:4px;height:auto;transform:none;border-radius:5px}
+.gradesPage .gradesHero>div:first-child{min-width:0}
+.gradesPage .gradesHero h1{margin:7px 0 8px;line-height:1.2}
+.gradesPage .gradesHero p{margin:0;max-width:680px;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.gradesPage .gradesHeroLegend{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;min-width:0}
+.gradesPage .gradesToolbar{gap:11px}
+.gradesPage .gradesToolbar>label:not(.gradesPending){flex:1 1 190px}
+.gradesPage .gradesToolbar .gradesSortDir{
+ display:grid;place-items:center;flex:0 0 42px;
+ box-sizing:border-box;width:42px;min-width:42px;max-width:42px;height:42px;min-height:42px;
+ padding:0;margin:0;line-height:1;border-radius:10px;font-size:18px;vertical-align:middle
+}
+.gradesPage .gradesToolbar .gradesSortDir svg{display:block;margin:0}
+@media(max-width:900px){
+ .classroomJournal,.participantsAnalytics{padding:16px}
+ .gradesPage .gradesHero{grid-template-columns:1fr;padding:22px 20px 22px 43px;gap:13px}
+ .gradesPage .gradesHero::before{left:20px;top:23px;bottom:23px}
+ .gradesPage .gradesHeroLegend{justify-content:flex-start}
+ .participantsToolbar>button{flex-basis:140px;width:140px;min-width:140px}
+}
+@media(max-width:520px){
+ .journalEvent{grid-template-columns:77px 8px minmax(0,1fr);gap:9px}
+ .journalHeader,.participantsHeader{display:grid}
+ .journalCounters{justify-content:start}
+ .journalToolbar,.participantsToolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .journalToolbar label.journalSearch,.participantsToolbar label.participantsSearch{grid-column:1/-1}
+ .journalToolbar label.journalCheck,.participantsToolbar label.participantsCheck{min-width:0;white-space:normal}
+ .participantsToolbar>button{width:100%;min-width:0;flex-basis:auto}
+ .gradesPage .gradesToolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+ .gradesPage .gradesToolbar>label:first-child{grid-column:1/-1}
+ .gradesPage .gradesToolbar .gradesSortDir{grid-column:1;width:42px}
+}
+@media(prefers-reduced-motion:reduce){.teacherCommand *{scroll-behavior:auto}}
