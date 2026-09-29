@@ -155,3 +155,11 @@
 @media(prefers-reduced-motion:reduce){
  .comicArtwork,.comicClouds,.comicStorm,.comicRebirth,.comicFrame,.comicOverlay h2,.comicOverlay p{animation:none!important}
 }
+
+/* The selected player's long name must never enlarge a 320px viewport. */
+.profilePublicStrip .styledSelect{box-sizing:border-box;min-width:0!important;max-width:100%;width:100%;flex:1 1 100%}
+.profilePublicStrip .styledSelectLabel,.profilePublicStrip .styledSelectTrigger{box-sizing:border-box;display:flex;align-items:center;min-width:0;width:100%;max-width:100%;overflow:hidden}
+.profilePublicStrip .styledSelectTrigger{justify-content:space-between;gap:8px}
+.profilePublicStrip .styledSelectValue{display:block;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profilePublicStrip .styledSelectTrigger>svg{flex:none}
+@media(max-width:380px){.profilePublicStrip{padding:12px;gap:10px}.profilePublicStrip>div:first-child{min-width:0;max-width:100%}.profilePublicStrip>div:first-child>div{min-width:0}}
