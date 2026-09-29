@@ -1,11 +1,11 @@
 'use client';
 import {useState} from 'react';
-import {FileText,Trash2,UsersRound,Landmark,ShieldAlert,X,ExternalLink} from 'lucide-react';
+import {FileText,Trash2,UsersRound,Landmark,ShieldAlert,X,ExternalLink,MessageCircle} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 const docLabels:Record<string,string>={application:'Заявление',charter:'Устав',program:'Программа',fee:'Пошлина',symbol:'Символика',congress_minutes:'Учредительный съезд',other:'Дополнительный документ'};
-export default function TeacherPartyDossiers({g}:{g:ReturnTypeRepublic}){
- const {parties,members,partyDocuments,partyMandates,partyInvitations,politicalPosts,teacher,deleteParty}=g;
+export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepublic;onOpenChat?:(channelId:string)=>void}){
+ const {parties,members,partyDocuments,partyMandates,partyInvitations,politicalPosts,channels,teacher,deleteParty}=g;
  const [selected,setSelected]=useState<string|null>(null);
  const [confirm,setConfirm]=useState('');
  const [busy,setBusy]=useState(false);
@@ -32,7 +32,10 @@ export default function TeacherPartyDossiers({g}:{g:ReturnTypeRepublic}){
    const posts=politicalPosts.filter(x=>x.actor_key==='party'&&x.actor_label===p.name);
    const invites=partyInvitations.filter(i=>i.party_id===p.id&&i.status==='pending');
    return <article key={p.id} className="teacherPartyDossier">
-    <header><span className="teacherPartyMark" style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><h3>{p.name}</h3><p>{p.ideology||'Идеология не указана'} · {p.registration_status==='registered'?'Зарегистрирована':p.registration_status==='submitted'?'На регистрации':'Регистрация: '+p.registration_status}</p></div><button type="button" title="Удалить партию и связанные материалы" aria-label={'Удалить партию '+p.name} className="teacherPartyDelete" onClick={()=>{setSelected(p.id);setConfirm('');setNotice('')}}><Trash2 size={17} aria-hidden="true"/></button></header>
+    <header><span className="teacherPartyMark" style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><h3>{p.name}</h3><p>{p.ideology||'Идеология не указана'} · {p.registration_status==='registered'?'Зарегистрирована':p.registration_status==='submitted'?'На регистрации':'Регистрация: '+p.registration_status}</p></div><button type="button" title="Открыть партийный чат" aria-label={'Перейти в чат партии '+p.name}
+ className="teacherPartyChat" disabled={!channels.some(c=>c.name==='Фракция · '+p.name)}
+ onClick={()=>{const c=channels.find(x=>x.name==='Фракция · '+p.name);if(c)onOpenChat?.(c.id)}}>
+ <MessageCircle size={18} aria-hidden="true"/></button></header>
     {p.description&&<p className="teacherPartyDescription">{p.description}</p>}
     <div className="teacherPartyKpis">
      <span><strong>{p.mandates}</strong> мандатов</span><span><strong>{p.support}</strong> поддержка</span>
