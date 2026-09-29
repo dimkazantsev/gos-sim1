@@ -1,0 +1,50 @@
+/* Stage editor: master/detail prevents every stage card from expanding in-place. */
+.teacherCommand .teacherStageManager{overflow:visible}
+.teacherCommand .teacherStageManagerToolbar{display:flex;flex-wrap:wrap;align-items:end;gap:12px}
+.teacherCommand .teacherStageManagerToolbar>.styledSelect{flex:0 1 190px;min-width:145px}
+.teacherStageCurrentShortcut{min-height:43px;padding:0 13px;border:1px solid #cbdafa;border-radius:10px;background:#f1f6ff;color:#2c58ae;font-size:12px;font-weight:800;cursor:pointer}
+.teacherStageSplit{display:grid;grid-template-columns:minmax(235px,.7fr) minmax(0,1.3fr);gap:16px;align-items:start;min-width:0}
+.teacherStageList{display:grid;align-content:start;gap:7px;min-width:0;max-height:72dvh;overflow-y:auto;padding:5px}
+.teacherStageListItem{display:grid;grid-template-columns:45px minmax(0,1fr) 18px;align-items:center;gap:10px;width:100%;min-width:0;text-align:left;min-height:69px;padding:10px;border:1px solid #dde7f4;border-radius:11px;background:white;color:#35577e;cursor:pointer;transition:background .15s,border-color .15s}
+.teacherStageListItem:hover{border-color:#b7c9ef;background:#f8faff}
+.teacherStageListItem.selected{border-color:#8badee;background:#edf4ff;box-shadow:inset 3px 0 #426fe0}
+.teacherStageListItem .teacherStageNumber{flex:none}
+.teacherStageListCopy{min-width:0;display:grid;gap:5px}
+.teacherStageListCopy strong{font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+.teacherStageListCopy small{display:flex;gap:5px;align-items:center;font-size:11px;color:#748ba7;line-height:1.4}
+.teacherStageInspector{display:grid;align-content:start;gap:17px;min-width:0;padding:22px;border:1px solid #dce6f4;border-radius:15px;background:#fff}
+.teacherStageInspectorHead,.teacherStageInspectorIdentity{display:flex;gap:13px;align-items:center;min-width:0}
+.teacherStageInspectorHead{justify-content:space-between}
+.teacherStageInspectorIdentity>div{min-width:0}
+.teacherStageInspectorIdentity small{font-size:10px;letter-spacing:.09em;color:#778baa;font-weight:800}
+.teacherStageInspectorIdentity h3{margin:4px 0 0;font-size:clamp(17px,2vw,23px);line-height:1.3;color:#223e63;overflow-wrap:anywhere}
+.teacherStageInspectorReset{display:grid;place-items:center;flex:none;width:42px;height:42px;border:1px solid #dfcdd1;border-radius:10px;background:#fff7f7;color:#a14c5d;cursor:pointer}
+.teacherStageInspectorSummary{margin:0;font-size:13px;line-height:1.65;color:#6a809e}
+.teacherStageInspectorSection{display:grid;gap:7px;padding:14px 16px;border:1px solid #e1eaf5;border-radius:11px;background:#f9fbff}
+.teacherStageInspectorSection h4{margin:0;color:#284f86;font-size:13px}
+.teacherStageInspectorSection p{margin:0;color:#69809a;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.teacherStageInspectorSection p.blocked{color:#aa4e54}
+.teacherStageInspectorSection p.warning{color:#9e721d}
+.teacherStageInspector>.stagePolicyEditor{margin:0;min-width:0}
+.teacherStageInspectorActions{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.teacherStageInspectorActions button{display:inline-flex;gap:6px;align-items:center;justify-content:center;min-height:42px;padding:0 13px;border:1px solid #bbcff3;border-radius:9px;background:#edf4ff;color:#2f59a6;font-size:12px;font-weight:800;cursor:pointer}
+.teacherStageInspectorActions button.primary{background:#2e61d3;color:#fff;border-color:#2e61d3}
+.styledSelect{position:relative;display:grid;align-content:end;gap:7px;min-width:0;isolation:isolate}
+.styledSelect.wide{width:100%}
+.styledSelectLabel{display:block;font-size:11px;font-weight:780;line-height:1.3;color:#6b809e}
+.styledSelectTrigger{display:flex;align-items:center;justify-content:space-between;gap:9px;width:100%;height:43px;min-height:43px;padding:0 12px;border:1px solid #ccdafa;border-radius:11px;background:white;color:#284b7b;text-align:left;font-size:12px;font-weight:760;cursor:pointer;box-sizing:border-box}
+.styledSelectTrigger .styledSelectValue{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.styledSelectTrigger svg{flex:none;transition:transform .15s}
+.styledSelectTrigger.isOpen svg{transform:rotate(180deg)}
+.styledSelectTrigger:focus-visible{outline:3px solid #5e8aff;outline-offset:2px}
+.styledSelectMenu{z-index:9999;display:grid;align-content:start;overflow:auto;padding:5px;border:1px solid #c8d6eb;border-radius:12px;background:#fff;box-shadow:0 16px 38px #233e6a2b}
+.styledSelectMenu>button{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;width:100%;min-height:40px;padding:8px 11px;border:0;border-radius:8px;background:transparent;color:#385374;font-size:12px;font-weight:670;cursor:pointer}
+.styledSelectMenu>button.selected,.styledSelectMenu>button.focused{background:#edf4ff;color:#2859b1}
+.styledSelectMenu>button:disabled{opacity:.45;cursor:not-allowed}
+.styledSelectMenu>button svg{flex:none}
+.gradesPage .gradesToolbar>.styledSelect{flex:1 1 175px}
+.gradesPage .gradesToolbar>.gradesPending{display:flex;gap:9px;align-items:center;justify-content:flex-start;flex:0 0 auto;min-height:43px;margin:0;white-space:normal}
+.gradesPage .gradesToolbar>.gradesPending input{flex:none;width:17px;height:17px;margin:0;accent-color:#386be4}
+@media(min-width:1100px){.simMain.chatOpen .teacherStageSplit{grid-template-columns:minmax(210px,.8fr) minmax(0,1.2fr)}}
+@media(max-width:1120px){.teacherStageSplit{grid-template-columns:minmax(0,1fr)}.teacherStageList{max-height:310px;overflow:auto;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.teacherStageList{grid-template-columns:1fr;max-height:280px}.teacherStageInspector{padding:14px;gap:13px}.teacherStageInspectorActions button{flex:1 1 155px}.teacherStageManagerToolbar>.styledSelect{flex:1 1 160px}.gradesPage .gradesToolbar>.styledSelect{grid-column:auto;min-width:0}.gradesPage .gradesToolbar>.gradesPending{grid-column:1/-1}}
