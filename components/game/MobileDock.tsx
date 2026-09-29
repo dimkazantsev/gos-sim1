@@ -133,7 +133,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
    togglePin(key);clearGesture();setEditing(false);
   },PIN_HOLD_MS);
  }
- function onPointerMove(event:ReactPointerEvent<HTMLButtonElement>){
+ function onPointerMove(event:ReactPointerEvent<HTMLButtonElement|HTMLDivElement>){
   const g=gestureRef.current;
   if(!g||g.id!==event.pointerId)return;
   const now=performance.now(),dx=event.clientX-g.lastX;
@@ -163,7 +163,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
    if(event.clientX>r.right-30)scroller.scrollLeft+=11;
   }
  }
- function onPointerEnd(event:ReactPointerEvent<HTMLButtonElement>){
+ function onPointerEnd(event:ReactPointerEvent<HTMLButtonElement|HTMLDivElement>){
   const g=gestureRef.current;
   if(!g||g.id!==event.pointerId)return;
   const wasDrag=g.mode==='drag',wasScroll=g.mode==='scroll';
@@ -181,7 +181,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
   if(wasDrag||wasScroll)suppressClickUntil.current=Date.now()+450;
   try{if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId)}catch{}
  }
- function onPointerCancel(event:ReactPointerEvent<HTMLButtonElement>){
+ function onPointerCancel(event:ReactPointerEvent<HTMLButtonElement|HTMLDivElement>){
   if(gestureRef.current?.id===event.pointerId){clearGesture();suppressClickUntil.current=Date.now()+450}
  }
  function onPinnedDown(event:ReactPointerEvent<HTMLButtonElement>,key:View){
