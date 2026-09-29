@@ -631,7 +631,10 @@ export function useRepublicGame(gameId:string){
     if(up.error){setError(up.error.message);return false}
     avatarPath=path;
   }
-  const r=await supabase.from('game_profiles').upsert({game_id:gameId,user_id:me.user_id,bio:bio.trim()||null,avatar_path:avatarPath,...(gender?{gender}:{}),updated_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
+  const prior=profiles.find(p=>p.user_id===me.user_id);
+  const changes={bio:bio.trim()||null,avatar_path:avatarPath,...(gender?{gender}:{}),updated_at:new Date().toISOString()};
+  const r=prior?await supabase.from('game_profiles').update(changes).eq('game_id',gameId).eq('user_id',me.user_id):
+   await supabase.from('game_profiles').insert({game_id:gameId,user_id:me.user_id,...changes});
   if(r.error){setError(r.error.message);return false}
   await loadPartyAssets();return true;
  }
@@ -641,9 +644,9 @@ export function useRepublicGame(gameId:string){
   const up=await supabase.storage.from('game-assets').upload(path,file,{contentType:'image/png',upsert:false});
   if(up.error){setError(up.error.message);return false}
   const row=profiles.find(p=>p.user_id===me.user_id);
-  const r=await supabase.from('game_profiles').upsert({game_id:gameId,user_id:me.user_id,
-   bio:row?.bio||null,avatar_path:row?.avatar_path||null,signature_path:path,updated_at:new Date().toISOString()},
-   {onConflict:'game_id,user_id'});
+  const r=row?await supabase.from('game_profiles').update({signature_path:path,updated_at:new Date().toISOString()})
+     .eq('game_id',gameId).eq('user_id',me.user_id):
+    await supabase.from('game_profiles').insert({game_id:gameId,user_id:me.user_id,signature_path:path,updated_at:new Date().toISOString()});
   if(r.error){setError(r.error.message);return false}
   await loadPartyAssets();return true;
  }
