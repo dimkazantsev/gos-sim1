@@ -99,7 +99,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   hold.released=true;
   if(mediaHoldTimer.current)clearTimeout(mediaHoldTimer.current);
   mediaHoldTimer.current=null;mediaHold.current=null;
-  if(hold.started){heldClickUntil.current=Date.now()+1200;void toggleRecording(hold.kind)}
+  if(hold.started){heldClickUntil.current=Date.now()+1200;if(recording===hold.kind)void toggleRecording(hold.kind)}
  }
  function cancelHold(){
   const hold=mediaHold.current;if(mediaHoldTimer.current)clearTimeout(mediaHoldTimer.current);
