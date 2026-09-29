@@ -41,10 +41,10 @@ async function main(){
     assert(chatGeometry.chat.top>=-2&&chatGeometry.chat.top<12,'Chat must start at viewport top: '+JSON.stringify(chatGeometry));
     assert(chatGeometry.chat.bottom<=chatGeometry.dock.top+3&&chatGeometry.chat.bottom>=chatGeometry.dock.top-8,'Chat must end above dock: '+JSON.stringify(chatGeometry));
    }
-   await page.locator('#screen').selectOption('teacher');
-   await frame.locator('.teacherSimple .teacherFocus').waitFor();
+   await page.locator('#screen').selectOption('teacher-stages');
+   await frame.locator('.teacherCommand .teacherStageManager').waitFor();
    const result=await frame.locator('html').evaluate(html=>{
-    const root=html.querySelector('.teacherSimple');
+    const root=html.querySelector('.teacherCommand');
     const dock=html.querySelector('.mobileDockScroll');
     const bounds=(selector)=>Array.from(root.querySelectorAll(selector)).map(el=>{
      const r=el.getBoundingClientRect();
@@ -52,7 +52,7 @@ async function main(){
     });
     return {viewport:html.clientWidth,scroll:html.scrollWidth,
      sections:bounds(':scope > section,:scope > details'),
-     cards:bounds('.teacherAction,.pulseCard,.studentLiveRow,.teacherAnalyticsCards>div,.teacherPlayerStatsRow,.teacherPartyMatrix>article,.gameReadinessGrid article'),
+     cards:bounds('.teacherStageCard,.teacherStageReset,.teacherStageExpand,.teacherCommandBar,.teacherQuick'),
      dock:{visible:getComputedStyle(dock).display!=='none',width:dock.clientWidth,scroll:dock.scrollWidth,buttons:dock.querySelectorAll('button').length}};
    });
    assert(result.scroll<=result.viewport+3,'Teacher view overflows at '+width+'px: '+JSON.stringify(result));
