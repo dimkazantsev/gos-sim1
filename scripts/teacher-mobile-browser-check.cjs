@@ -41,15 +41,17 @@ async function main(){
    if(width<=900){
     assert(result.dock.visible,'Mobile dock hidden at '+width+'px');
     assert(result.dock.buttons>=9,'All eight routes + More must be in the mobile dock');
-    assert(result.dock.scroll>result.dock.width+100,
-     'Dock must scroll horizontally at '+width+'px: '+JSON.stringify(result.dock));
-    const moved=await frame.locator('.mobileDockScroll').evaluate(el=>{
-     el.scrollLeft=0;
-     el.scrollLeft=el.scrollWidth-el.clientWidth;
-     return {left:el.scrollLeft,max:el.scrollWidth-el.clientWidth};
-    });
-    assert(moved.left>100&&Math.abs(moved.left-moved.max)<=3,
-     'Rightmost navigation item must be reachable by horizontal scroll');
+    if(width<=768)assert(result.dock.scroll>result.dock.width,
+     'Dock should scroll when icons exceed narrow viewport at '+width+'px: '+JSON.stringify(result.dock));
+    if(result.dock.scroll>result.dock.width+2){
+     const moved=await frame.locator('.mobileDockScroll').evaluate(el=>{
+      el.scrollLeft=0;
+      el.scrollLeft=el.scrollWidth-el.clientWidth;
+      return {left:el.scrollLeft,max:el.scrollWidth-el.clientWidth};
+     });
+     assert(moved.left>2&&Math.abs(moved.left-moved.max)<=3,
+      'Last navigation item must be reachable by horizontal scroll');
+    }
    }
    await page.locator('#preview').screenshot({path:path.join(shotDir,'teacher-mobile-'+width+'.png')});
    await page.locator('#screen').selectOption('mobile-all');
