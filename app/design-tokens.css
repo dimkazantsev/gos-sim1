@@ -7,7 +7,7 @@
  --gs-green:#16734f;--gs-green-soft:#e8f5ee;--gs-amber:#885511;--gs-amber-soft:#fff3df;--gs-red:#b62c45;--gs-red-soft:#fff0f2;--gs-blue:#2453e6;--gs-purple:#6d4ac5;
  --gs-shadow-xs:0 2px 4px #17244704;--gs-shadow-sm:0 8px 24px #17244706;--gs-shadow-md:0 12px 36px #1724470c;--gs-shadow-lg:0 24px 80px #17244726;
  --gs-radius-xs:8px;--gs-radius-sm:12px;--gs-radius-md:18px;--gs-radius-lg:24px;--gs-radius-xl:30px;
- --gs-sidebar-w:264px;--gs-chat-w:400px;--gs-top-h:84px;--gs-content-max:1440px;--gs-layout-gutter:36px;--gs-touch:44px;
+ --gs-sidebar-w:264px;--gs-chat-w:400px;--gs-top-h:84px;--gs-content-max:1440px;--gs-layout-gutter:36px;--gs-top-control-h:48px;--gs-top-gap:9px;--gs-top-status-w:152px;--gs-top-clock-w:84px;--gs-top-role-w:236px;--gs-top-chat-w:110px;--gs-touch:44px;
  --gs-font-sans:'Manrope Variable','Segoe UI',Arial,sans-serif;--gs-font-mono:var(--font-geist-mono),'SFMono-Regular',Consolas,monospace;
  --bg:var(--gs-bg);--surface:#fff;--surface-2:var(--gs-surface-soft);--surface-3:var(--gs-accent-soft);--navy:var(--gs-ink);--navy-2:#233c78;--text:var(--gs-ink);--body:var(--gs-ink-2);--muted:var(--gs-muted);--soft:var(--gs-faint);--line:var(--gs-border);--line-strong:var(--gs-border-strong);--blue:var(--gs-accent);--blue-2:var(--gs-accent);--pink:var(--gs-pink);
 }
