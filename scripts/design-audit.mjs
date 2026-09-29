@@ -43,7 +43,7 @@ check('Nine upper navigation workspaces include Event, stages, journal, analytic
 check('Teacher stage matrix integrates readiness and safe reset actions',
  teacherSource.includes('<TeacherStageManager')&&
  stageManager.includes("supabase.rpc('get_game_readiness'")&&
- stageManager.includes('className="teacherStageListItem ')&&
+ stageManager.includes("'teacherStageListItem '+")&&
  stageManager.includes('className="teacherStageInspectorReset"')&&
  stageManager.includes('className="teacherResetAll"')&&
  stageManager.includes("confirmation.trim()==='СБРОСИТЬ'")&&
