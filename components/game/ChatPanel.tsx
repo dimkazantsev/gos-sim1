@@ -45,7 +45,7 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
  </a>;
 }
 
-export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void}){
+export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember,readOnly=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void;readOnly?:boolean}){
  const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
  const [sending,setSending]=useState(false);
  const [uploading,setUploading]=useState(false);
@@ -314,7 +314,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   </section>}
   {chatMediaError&&<div className="chatLocalError chatMediaError" role="alert"><span>{chatMediaError}</span></div>}
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
-  <div className="chatCompose">
+  {!readOnly?<div className="chatCompose">
    <div className="chatInputRow">
     <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)}
      placeholder={channelId?'Написать сообщение…':'Выберите канал'}
@@ -359,7 +359,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      {uploading?'Загружается вложение…':recordingSaving?(chatMediaPhase==='analyzing'?'Анализируется запись…':chatMediaPhase==='uploading'?'Загружается запись…':'Публикуется сообщение…'):recording?'Идёт запись…' :'Удерживайте микрофон или камеру — отпустите для отправки; видео до 30 с'}
     </span>
    </div>
-  </div>
+  </div>:<div className="chatGuestNote">Гостевой режим: просмотр переписки без отправки сообщений.</div>}
  </aside>;
 }
 function MessageIcon(){return <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-8 8 8.2 8.2 0 0 1-3.5-.8L4 20l1.3-4.4A8 8 0 1 1 20 11.5Z"/></svg>}
