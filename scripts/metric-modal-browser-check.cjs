@@ -209,6 +209,31 @@ async function main(){
      assert.equal(await frame.locator('.chatChannelMenu [role="menuitemradio"]').count(),2,'Styled channel menu lists both channels');
      assert.equal(await frame.locator('.chatChannelMenu [aria-checked="true"]').count(),1,'Selected channel is marked');
     }
+    if(chatScreen==='chat-panel'||chatScreen==='chat-pins'){
+     const player=frame.locator('.chatMessages .chatVoicePlayer').first();
+     assert.equal(await player.count(),1,'Voice message uses compact horizontal player');
+     assert.equal(await frame.locator('.chatMessages audio[controls]').count(),0,'Native vertical audio widget is never shown');
+     assert.equal(await player.locator('.chatVoiceWave>span').count(),36,'Waveform contains 36 decorative bars');
+     const voice=await player.evaluate(el=>{
+      const box=el.getBoundingClientRect();
+      const play=el.querySelector('.chatVoicePlay').getBoundingClientRect();
+      const track=el.querySelector('.chatVoiceTrack').getBoundingClientRect();
+      const speed=el.querySelector('.chatVoiceSpeed').getBoundingClientRect();
+      const bubble=el.closest('.chatBubble').getBoundingClientRect();
+      const hidden=el.querySelector('audio');
+      return {width:box.width,height:box.height,playLeft:play.left,playRight:play.right,
+       trackLeft:track.left,trackRight:track.right,speedLeft:speed.left,speedRight:speed.right,
+       bubbleRight:bubble.right,bubbleLeft:bubble.left,hidden:getComputedStyle(hidden).display};
+     });
+     assert(voice.width>=145&&voice.height<=85,'Voice note remains a compact landscape row: '+JSON.stringify(voice));
+     assert(voice.playRight<=voice.trackLeft+3&&voice.trackRight<=voice.speedLeft+3,
+       'Voice controls remain horizontally ordered: '+JSON.stringify(voice));
+     assert(voice.speedRight<=voice.bubbleRight+3&&voice.playLeft>=voice.bubbleLeft-3,
+       'Voice player fits bubble without clipping: '+JSON.stringify(voice));
+     assert.equal(voice.hidden,'none','Audio engine remains visually hidden');
+     if(chatScreen==='chat-pins')assert.equal(await frame.locator('.chatPinnedMedia .chatVoicePlayer').count(),1,
+       'Pinned voice uses same horizontal layout as conversation voice');
+    }
     if(chatScreen==='chat-pins'){
      assert.equal(await frame.locator('.chatPinnedItem').count(),3,'File, audio and video remain pinned');
      assert.equal(await frame.locator('.chatPinnedMedia').count(),3,'All pinned media has preview containers');
