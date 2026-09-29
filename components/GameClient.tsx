@@ -154,6 +154,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   createDocument:blocked as typeof g.createDocument,
   updateMetric:blockedVoid as typeof g.updateMetric,
   saveProfile:blocked as typeof g.saveProfile,
+  saveSignature:blocked as typeof g.saveSignature,
   savePartyIdentity:blocked as typeof g.savePartyIdentity,
   uploadPartyDocument:blocked as typeof g.uploadPartyDocument,
   reviewPartyDocument:blockedVoid as typeof g.reviewPartyDocument,
@@ -187,6 +188,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
  const [pendingEvents,setPendingEvents]=useState(0);
+ const [selectedProfileId,setSelectedProfileId]=useState('');
  useEffect(()=>{
   if(!viewAsOpen)return;
   function onPointerDown(event:PointerEvent){
@@ -237,6 +239,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   });
   finishScreenNavigation();
  }
+ function navigateProfile(id:string){setSelectedProfileId(id);navigate('profile')}
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
 
  const genericStudent:Member|undefined=teacher&&game?{
@@ -319,7 +322,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
    <nav className="focusNav" aria-label="Разделы игры">
     <div className="focusNavInner">
-     {nav.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>navigate(k)} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{label}</span>{k==='events'&&pendingEvents>0&&<i className="navBadge">{pendingEvents}</i>}{k==='votes'&&g.votes.some(v=>v.status==='open')&&<i className="navBadge">{g.votes.filter(v=>v.status==='open').length}</i>}</button>)}
+     {nav.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{label}</span>{k==='events'&&pendingEvents>0&&<i className="navBadge">{pendingEvents}</i>}{k==='votes'&&g.votes.some(v=>v.status==='open')&&<i className="navBadge">{g.votes.filter(v=>v.status==='open').length}</i>}</button>)}
     </div>
    </nav>
 
@@ -383,16 +386,16 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {view==='parties'&&<PartiesView g={vg}/>}
      {view==='votes'&&<VotesView g={vg} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
      {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode} focusId={focusFormalId} onOpenVotes={()=>navigate('votes')}/>}
-     {view==='grades'&&<GradesView g={vg}/>}
+     {view==='grades'&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
      {view==='actions'&&<PoliticalWallView g={vg} focusPending={true} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
-     {view==='profile'&&<ProfileView g={vg}/>}
+     {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}}/>}
      {view==='events'&&<EventWorkspace g={vg} readOnly={previewMode}/>}
      {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onOpenProcesses={()=>navigate('actions')} onOpenStages={stageNo=>navigate('stages',{stageNo})}
        onOpenChat={channelId=>{g.setChannelId(channelId);g.setChatOpen(true)}}/>}
     </main>
    </div>
 
-   {chatOpen&&<ChatPanel g={vg} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))}/>}
+   {chatOpen&&<ChatPanel g={vg} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
   </div>
 
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
@@ -402,5 +405,5 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
-  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>navigate(k)} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
+  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }
