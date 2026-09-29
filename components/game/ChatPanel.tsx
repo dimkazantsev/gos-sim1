@@ -6,6 +6,7 @@ import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
 import ChatVoicePlayer from './ChatVoicePlayer';
+import ChatVideoNote from './ChatVideoNote';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Message} from './types';
@@ -33,7 +34,7 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
   {m.storage_path&&onRefresh&&<button type="button" onClick={()=>void onRefresh(m.id,m.storage_path!)}>Обновить ссылку</button>}
  </div>;
  if(m.kind==='audio'||m.mime_type?.startsWith('audio/'))return <ChatVoicePlayer src={m.url} messageId={m.id} durationHint={m.voice_meta?.duration} waveform={m.voice_meta?.waveform} fileName={m.text||'Голосовое сообщение'} onRefresh={m.storage_path&&onRefresh?()=>onRefresh(m.id,m.storage_path!):undefined} />;
- if(m.kind==='video'||m.mime_type?.startsWith('video/'))return <video controls preload="metadata" playsInline src={m.url} aria-label="Видеосообщение"/>;
+ if(m.kind==='video'||m.mime_type?.startsWith('video/'))return <ChatVideoNote src={m.url}/>;
  if(m.mime_type?.startsWith('image/')){
   return <a className="chatPhoto" href={m.url} target="_blank" rel="noopener noreferrer" aria-label="Открыть изображение в новой вкладке"><img src={m.url} alt={m.text||'Изображение из чата'} loading="lazy"/></a>;
  }
@@ -61,6 +62,10 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const list=useRef<HTMLDivElement>(null);
  const composer=useRef<HTMLTextAreaElement>(null);
  const liveCamera=useRef<HTMLVideoElement>(null);
+ const mediaHoldTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const mediaHold=useRef<{kind:'audio'|'video';started:boolean;released:boolean}|null>(null);
+ const heldClickUntil=useRef(0);
+ const autoSendHold=useRef(false);
  const searchInput=useRef<HTMLInputElement>(null);
  const attachmentButton=useRef<HTMLButtonElement>(null);
  const uploadInput=useRef<HTMLInputElement>(null);
@@ -77,6 +82,37 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const filtered=useMemo(()=>channelMessages.filter(m=>matchChatMessage(m,search,names[m.author_id]||'Система',onlyFiles)),[channelMessages,search,names,onlyFiles]);
  const entries=useMemo(()=>buildChatEntries(filtered,me?.user_id||''),[filtered,me?.user_id]);
  const hasFilter=!!search.trim()||onlyFiles;
+ function beginHold(kind:'audio'|'video'){
+  if(mediaHoldTimer.current)clearTimeout(mediaHoldTimer.current);
+  const hold={kind,started:false,released:false};
+  mediaHold.current=hold;
+  mediaHoldTimer.current=setTimeout(()=>{
+   if(mediaHold.current!==hold||hold.released)return;
+   hold.started=true;autoSendHold.current=true;heldClickUntil.current=Date.now()+1500;
+   void toggleRecording(kind).then(()=>{
+    if(hold.released)void toggleRecording(kind);
+   });
+  },320);
+ }
+ function releaseHold(){
+  const hold=mediaHold.current;if(!hold)return;
+  hold.released=true;
+  if(mediaHoldTimer.current)clearTimeout(mediaHoldTimer.current);
+  mediaHoldTimer.current=null;mediaHold.current=null;
+  if(hold.started){heldClickUntil.current=Date.now()+1200;void toggleRecording(hold.kind)}
+ }
+ function cancelHold(){
+  const hold=mediaHold.current;if(mediaHoldTimer.current)clearTimeout(mediaHoldTimer.current);
+  mediaHoldTimer.current=null;mediaHold.current=null;
+  if(hold?.started){autoSendHold.current=false;discardRecording()}
+ }
+ useEffect(()=>{
+  if(!recordingPreview||!autoSendHold.current)return;
+  autoSendHold.current=false;
+  void sendRecordingPreview();
+ },[recordingPreview?.url]);
+ useEffect(()=>()=>{if(mediaHoldTimer.current)clearTimeout(mediaHoldTimer.current)},[]);
+
  useEffect(()=>{
   const media=window.matchMedia('(max-width:1099px)');
   const update=()=>setOverlay(media.matches&&!window.matchMedia('(max-width:900px)').matches);
@@ -304,17 +340,23 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     <button type="button" className={'chatIconButton chatMediaShortcut '+(recording==='audio'?'isRecording':'')}
      disabled={!channelId||uploading||chatLoading||recordingSaving||!!recordingPreview||recording==='video'}
      aria-label={recording==='audio'?'Завершить запись аудио':'Записать аудиосообщение'}
-     title={recording==='audio'?'Завершить запись':'Записать аудио'} onClick={()=>void toggleRecording('audio')}>
+     title={recording==='audio'?'Завершить запись':'Короткое нажатие — запись, удержание — записать и отправить'}
+     onPointerDown={e=>{if(e.pointerType!=='mouse'||e.button===0)beginHold('audio')}}
+     onPointerUp={releaseHold} onPointerCancel={cancelHold} onPointerLeave={e=>{if(e.pointerType==='mouse')releaseHold()}}
+     onClick={()=>{if(Date.now()<heldClickUntil.current)return;void toggleRecording('audio')}}>
      <Mic aria-hidden="true" size={19}/>
     </button>
     <button type="button" className={'chatIconButton chatMediaShortcut '+(recording==='video'?'isRecording':'')}
      disabled={!channelId||uploading||chatLoading||recordingSaving||!!recordingPreview||recording==='audio'}
      aria-label={recording==='video'?'Завершить запись видео':'Записать видеосообщение'}
-     title={recording==='video'?'Завершить запись':'Записать видео'} onClick={()=>void toggleRecording('video')}>
+     title={recording==='video'?'Завершить запись':'Короткое нажатие — запись, удержание — записать и отправить'}
+     onPointerDown={e=>{if(e.pointerType!=='mouse'||e.button===0)beginHold('video')}}
+     onPointerUp={releaseHold} onPointerCancel={cancelHold} onPointerLeave={e=>{if(e.pointerType==='mouse')releaseHold()}}
+     onClick={()=>{if(Date.now()<heldClickUntil.current)return;void toggleRecording('video')}}>
      <Video aria-hidden="true" size={19}/>
     </button>
     <span className="chatComposerHint" aria-live="polite">
-     {uploading?'Загружается вложение…':recordingSaving?(chatMediaPhase==='analyzing'?'Анализируется запись…':chatMediaPhase==='uploading'?'Загружается запись…':'Публикуется сообщение…'):recording?'Идёт запись…':'Enter — отправить'}
+     {uploading?'Загружается вложение…':recordingSaving?(chatMediaPhase==='analyzing'?'Анализируется запись…':chatMediaPhase==='uploading'?'Загружается запись…':'Публикуется сообщение…'):recording?'Идёт запись…' :'Удерживайте микрофон или камеру — отпустите для отправки; видео до 30 с'}
     </span>
    </div>
   </div>
