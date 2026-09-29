@@ -1,0 +1,38 @@
+name: Full project backup
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  archive-project:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create complete source code archive
+        shell: bash
+        run: |
+          mkdir -p backup
+          git archive --format=zip --prefix=GOS-SIMS/ HEAD -o "backup/GOS-SIMS-source-${GITHUB_SHA:0:8}.zip"
+          git bundle create "backup/GOS-SIMS-history-${GITHUB_SHA:0:8}.bundle" --all
+          sha256sum backup/* > backup/CHECKSUMS-SHA256.txt
+          cat > backup/README.txt <<'TXT'
+          GOS//SIMS: full export of source code and git history.
+          The ZIP includes application code, Supabase migrations, public static assets, and docs.
+          The bundle preserves repository history and can be restored via git clone.
+          Supabase live database, auth user records, uploaded storage assets,
+          Vercel environment variables, API secrets and private user data
+          are NOT contained in this archive; use separate authorized backups.
+          TXT
+      - name: Attach project source and history backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: GOS-SIMS-full-project-backup
+          path: backup/
+          retention-days: 90
+          if-no-files-found: error
