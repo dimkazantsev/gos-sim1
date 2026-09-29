@@ -129,11 +129,15 @@ async function main(){
    }
    await page.locator('#screen').selectOption('dashboard');
    const dashboard=page.frameLocator('#preview');
-   const chat=dashboard.locator(width<=900?'.mobileDockChat':'.topChatButton');
-   assert.equal(await chat.count(),1,'Chat must exist in the appropriate navigation bar');
-   assert.equal((await chat.locator('span').innerText()).trim(),'Чат','Top bar label is Chat');
-   if(width>=1100)assert(await chat.locator('span').isVisible(),'Desktop top bar must show the Chat label');
-   else assert.equal(await chat.getAttribute('aria-label'),'Открыть чат','Icon-only mobile Chat remains accessible');
+   const chat=dashboard.locator('.topChatButton');
+   if(width>900){
+    assert.equal(await chat.count(),1,'Desktop toolbar must contain Chat');
+    assert.equal((await chat.locator('span').innerText()).trim(),'Чат','Desktop top bar label is Chat');
+    assert(await chat.locator('span').isVisible(),'Desktop top bar must show the Chat label');
+   }else{
+    assert.equal(await dashboard.locator('.mobileDockChat').count(),0,'Chat must not be fixed at the right edge of the mobile dock');
+    assert.equal(await dashboard.locator('.mobileDockAll').count(),1,'All sections remains the only permanent right-side launcher');
+   }
    const bounds=await dashboard.locator('.simWorkspace').evaluate(workspace=>{
     const bar=workspace.querySelector('.simTop');
     const chat=workspace.querySelector('.topChatButton');

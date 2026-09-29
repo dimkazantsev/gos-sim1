@@ -377,3 +377,47 @@
   bottom:var(--gs-mobile-dock-height);
  }
 }
+
+/* Geometry pass: all mobile dock icons share one optical baseline.
+   Only All sections is permanently fixed at the right edge; user-pinned routes stay just to its left. */
+@media(max-width:900px){
+ .mobileDock.mobileDockV2{align-items:center}
+ .mobileDockV2 .mobileDockScroll{align-items:center}
+ .mobileDockV2 .mobileDockItem,
+ .mobileDockV2 .mobileDockPinnedItem,
+ .mobileDockV2 .mobileDockFixed>button{
+  display:grid;grid-template-rows:18px 22px;align-content:center;justify-items:center;
+  row-gap:2px;height:50px;min-height:50px;max-height:50px;padding:4px 2px;
+ }
+ .mobileDockV2 .mobileDockIcon{
+  width:18px;height:18px;min-height:18px;display:grid;place-items:center;
+  align-self:center;justify-self:center;
+ }
+ .mobileDockV2 .mobileDockIcon>svg,
+ .mobileDockV2 .mobileDockFixed>button>svg{
+  width:16px;height:16px;display:block;align-self:center;justify-self:center;
+ }
+ .mobileDockV2 .mobileDockLabel,
+ .mobileDockV2 .mobileDockFixed>button>span{
+  height:22px;min-height:22px;max-height:22px;display:flex;
+  align-items:flex-start;justify-content:center;line-height:1.1;text-align:center;
+ }
+ .mobileDockV2 .mobileDockFixed{
+  display:flex;align-items:center;flex:0 0 auto;width:auto;max-width:none;padding-left:5px;
+ }
+ .mobileDockV2 .mobileDockFixed>button.mobileDockAll{
+  flex:0 0 58px;width:58px;min-width:58px;max-width:58px;
+ }
+ .mobileDockV2 .mobileDockPinned{align-items:center}
+ .mobileDockV2 .mobileDockChat{display:none!important}
+ .simWorkspace .simTop .viewAsSwitcher,
+ .simWorkspace .simTop .viewAsTrigger{
+  position:relative;box-sizing:border-box;width:36px;min-width:36px;max-width:36px;
+  height:36px;min-height:36px;max-height:36px;
+ }
+ .simWorkspace .simTop .viewAsMobileIcon{
+  position:absolute!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
+  width:18px!important;height:18px!important;margin:0!important;
+  transform:translate(-50%,-50%)!important;display:block!important;pointer-events:none;
+ }
+}

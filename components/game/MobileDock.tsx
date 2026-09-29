@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Check,LayoutGrid,MessageCircle,Pin} from 'lucide-react';
+import {Check,LayoutGrid,Pin} from 'lucide-react';
 import type {ReactNode,PointerEvent as ReactPointerEvent,KeyboardEvent as ReactKeyboardEvent} from 'react';
 import type {View} from './types';
 
@@ -34,7 +34,7 @@ type Gesture={
  pinTimer:ReturnType<typeof setTimeout>|null;
 };
 
-export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll,onChat,chatOpen=false}:{
+export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll}:{
  items:MobileDockItem[];
  activeView:View;
  storageKey:string;
@@ -42,8 +42,6 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  setEditing:(value:boolean)=>void;
  onNavigate:(view:View)=>void;
  onAll:()=>void;
- onChat?:()=>void;
- chatOpen?:boolean;
 }){
  const scrollRef=useRef<HTMLDivElement>(null);
  const gestureRef=useRef<Gesture|null>(null);
@@ -246,8 +244,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
     </div>}
     {editing?
      <button type="button" className="mobileDockDone" onClick={()=>{clearGesture();setEditing(false)}}><Check aria-hidden="true"/><span>Готово</span></button>:
-     <>{onChat&&<button type="button" className={'mobileDockChat '+(chatOpen?'active':'')} aria-controls="game-chat" aria-expanded={chatOpen} aria-label={chatOpen?'Закрыть чат':'Открыть чат'} onClick={onChat}><MessageCircle aria-hidden="true"/><span>Чат</span></button>}
-     <button type="button" className="mobileDockAll" aria-haspopup="dialog" onClick={onAll}><LayoutGrid aria-hidden="true"/><span>Все разделы</span></button></>}
+     <button type="button" className="mobileDockAll" aria-haspopup="dialog" onClick={onAll}><LayoutGrid aria-hidden="true"/><span>Все разделы</span></button>
    </div>
    <span className="mobileDockAnnouncement" role="status" aria-live="polite">{announcement}</span>
   </nav>
