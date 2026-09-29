@@ -304,7 +304,7 @@ export function useRepublicGame(gameId:string){
   const r=await supabase.rpc('set_game_stage',{p_game_id:gameId,p_stage_no:stageNo,p_minutes:12});
   if(r.error)setError(r.error.message);else await refresh();
  }
- async function nextStage(){await openStage(Math.min(16,(currentStage?.stage_no||1)+1))}
+ async function nextStage(){const active=stages.find(s=>s.status==='open');const next=active?Math.min(16,active.stage_no+1):(stages.find(s=>s.status!=='completed')?.stage_no||1);await openStage(next)}
  async function resetStageProgress(stageNo:number|null):Promise<boolean>{
   if(!teacher||!me){setError('Сброс этапов доступен только преподавателю.');return false}
   if(stageNo!==null&&(!Number.isInteger(stageNo)||stageNo<1||stageNo>16)){setError('Неверный номер этапа.');return false}
