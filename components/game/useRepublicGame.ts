@@ -20,7 +20,7 @@ export function useRepublicGame(gameId:string){
  const [chatMediaError,setChatMediaError]=useState(''),[chatMediaPhase,setChatMediaPhase]=useState<MediaUploadPhase>('idle');
  const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]);
- const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,PendingMediaUpload>());
+ const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,PendingMediaUpload>()),voiceAnalysisRef=useRef<Promise<{waveform:number[];duration:number}|null>|null>(null);
 
  const teacher=me?.kind==='teacher';
  const names=useMemo(()=>Object.fromEntries(members.map(x=>[x.user_id,x.full_name])),[members]);
@@ -721,7 +721,7 @@ export function useRepublicGame(gameId:string){
   if(recorder.current?.state==='recording')recorder.current.stop();
   else recordingStream.current?.getTracks().forEach(track=>track.stop());
   const previous=previewRef.current;
-  previewRef.current=null;setRecordingPreview(null);setRecording(null);setRecordingStartedAt(null);
+  previewRef.current=null;voiceAnalysisRef.current=null;setRecordingPreview(null);setRecording(null);setRecordingStartedAt(null);
   if(previous)URL.revokeObjectURL(previous.url);
  }
  async function toggleRecording(kind:ChatMediaKind){
@@ -751,7 +751,7 @@ export function useRepublicGame(gameId:string){
     }
    };
    rec.onerror=()=>setError('Ошибка записи. Попробуйте ещё раз или прикрепите готовый файл.');
-   rec.onstop=async()=>{
+   rec.onstop=()=>{
     const current=captureRef.current;
     const parts=chunks.current;chunks.current=[];
     stream?.getTracks().forEach(track=>track.stop());
@@ -764,13 +764,17 @@ export function useRepublicGame(gameId:string){
     if(!blob.size){setError('Запись получилась пустой. Проверьте микрофон или камеру.');return}
     const url=URL.createObjectURL(blob);
     const fallbackDuration=Math.max(1,Math.round((Date.now()-current.started)/1000));
-    const analysis=current.kind==='audio'?await analyseVoiceBlob(blob):null;
-    const preview={blob,url,mime:actualMime,kind:current.kind,channelId:current.channelId,
+    const preview:RecordingPreview={blob,url,mime:actualMime,kind:current.kind,channelId:current.channelId,
      fileName:recordingFileName(current.kind,actualMime,new Date(current.started)),
-     duration:analysis?.duration||fallbackDuration,
-     ...(analysis?.waveform?{waveform:analysis.waveform}:{})};
+     duration:fallbackDuration};
     if(previewRef.current)URL.revokeObjectURL(previewRef.current.url);
     previewRef.current=preview;setRecordingPreview(preview);
+    voiceAnalysisRef.current=current.kind==='audio'?analyseVoiceBlob(blob):null;
+    if(voiceAnalysisRef.current)void voiceAnalysisRef.current.then(analysis=>{
+     if(!analysis||previewRef.current?.url!==url)return;
+     const updated:RecordingPreview={...previewRef.current,duration:analysis.duration,waveform:analysis.waveform};
+     previewRef.current=updated;setRecordingPreview(updated);
+    }).catch(()=>{});
     if(blob.size>CHAT_MAX_FILE_BYTES)setError('Запись превышает 25 МБ. Сохраните её на устройство или запишите заново.');
    };
    rec.start(1000);
@@ -787,9 +791,15 @@ export function useRepublicGame(gameId:string){
   if(preview.blob.size>CHAT_MAX_FILE_BYTES){setError('Запись больше 25 МБ — сохраните её на устройство или сделайте короче.');return false}
   mediaOperationRef.current=true;setRecordingSaving(true);setChatMediaError('');
   try{
-   const ok=await storeChatAttachment(preview.blob,preview.fileName,preview.mime,preview.kind,preview.channelId,preview.kind==='audio'?{duration:preview.duration,...(preview.waveform?{waveform:preview.waveform}:{})}:undefined);
-   if(ok&&previewRef.current===preview){
-    previewRef.current=null;setRecordingPreview(null);URL.revokeObjectURL(preview.url);
+   if(preview.kind==='audio'&&voiceAnalysisRef.current){
+    setChatMediaPhase('analyzing');
+    await voiceAnalysisRef.current;
+   }
+   const ready=previewRef.current?.url===preview.url?previewRef.current:preview;
+   const ok=await storeChatAttachment(ready.blob,ready.fileName,ready.mime,ready.kind,ready.channelId,
+    ready.kind==='audio'?{duration:ready.duration,...(ready.waveform?{waveform:ready.waveform}:{})}:undefined);
+   if(ok&&previewRef.current?.url===preview.url){
+    previewRef.current=null;voiceAnalysisRef.current=null;setRecordingPreview(null);URL.revokeObjectURL(preview.url);
    }
    return ok;
   }catch(e){setChatMediaError(e instanceof Error?e.message:'Не удалось отправить запись. Она доступна для повторной отправки.');return false}
