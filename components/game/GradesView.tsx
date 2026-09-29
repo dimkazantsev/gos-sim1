@@ -81,7 +81,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
       criterion_law:false,criterion_strategy:false,criterion_debrief:false,
       public_rationale:'',last_run_type:'',last_auto_at:null,revision_count:0,
       teacher_note:null,finalized_at:null}));
-   if(authId===me?.user_id){
+   if(me&&authId===me.user_id){
     const own=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no');
     if(!own.error){
      const map=new Map(safeRows.map(a=>[a.user_id+':'+a.stage_no,a]));
@@ -244,7 +244,7 @@ function AssessmentModal(p:any){
  const {g,assessment:a,selected,student,evidence,runs,loading,teacher,editScore,setEditScore,note,setNote,busy,close,ensureDraft,recalc,finalize,reopen}=p;
  const dialogRef=useDialog(true,close);
  const v=shownScore(a);
- const canSeeEvidence=teacher||(selected.userId===g.me?.user_id&&assessment?.id?.startsWith('public-')===false);
+ const canSeeEvidence=teacher||(selected.userId===g.me?.user_id&&a?.id?.startsWith('public-')===false);
  return <div className="gradeModalBack" onMouseDown={e=>{if(e.target===e.currentTarget)close()}}><article ref={dialogRef} tabIndex={-1} className="gradeModal" role="dialog" aria-modal="true" aria-labelledby="assessment-title">
   <header><div><small>ЭТАП {selected.stageNo}</small><h2 id="assessment-title">{student?.full_name||g.me?.full_name}</h2><p>{g.stages.find((s:any)=>s.stage_no===selected.stageNo)?.title}</p></div><IconAction onClick={close} label="Закрыть оценку"/></header>
   {!a?<div className="emptyState gradeEmpty">Черновик ещё не создан.{teacher&&<><br/><button className="primary" disabled={busy} onClick={()=>void ensureDraft()}>Рассчитать сейчас</button></>}</div>:<>
