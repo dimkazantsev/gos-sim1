@@ -37,13 +37,18 @@ voiceWav.writeUInt16LE(1,20);voiceWav.writeUInt16LE(1,22);
 voiceWav.writeUInt32LE(8000,24);voiceWav.writeUInt32LE(16000,28);
 voiceWav.writeUInt16LE(2,32);voiceWav.writeUInt16LE(16,34);
 voiceWav.write('data',36);voiceWav.writeUInt32LE(voiceSamples*2,40);
-for(let i=0;i<voiceSamples;i++)voiceWav.writeInt16LE(Math.round(Math.sin(i/8000*2*Math.PI*440)*1800),44+i*2);
+for(let i=0;i<voiceSamples;i++){
+ const envelope=.2+.8*(.5+.5*Math.sin(i/8000*2*Math.PI*3));
+ voiceWav.writeInt16LE(Math.round(Math.sin(i/8000*2*Math.PI*440)*1800*envelope),44+i*2);
+}
 const voicePreviewUrl='data:audio/wav;base64,'+voiceWav.toString('base64');
-const voiceWave=Array.from({length:36},(_,i)=>{
- let rms=0;const start=Math.floor(i*voiceSamples/36),end=Math.floor((i+1)*voiceSamples/36);
- for(let n=start;n<end;n++){const sample=voiceWav.readInt16LE(44+n*2)/32768;rms+=sample*sample}
- return Math.round(Math.max(18,Math.min(100,18+82*Math.sqrt(rms/Math.max(end-start,1))/.04)));
+const voiceRms=Array.from({length:36},(_,i)=>{
+ let sum=0;const start=Math.floor(i*voiceSamples/36),end=Math.floor((i+1)*voiceSamples/36);
+ for(let n=start;n<end;n++){const sample=voiceWav.readInt16LE(44+n*2)/32768;sum+=sample*sample}
+ return Math.sqrt(sum/Math.max(end-start,1));
 });
+const peak=Math.max(...voiceRms,1e-6);
+const voiceWave=voiceRms.map(v=>Math.round(Math.max(18,Math.min(100,18+82*(v/peak)**.65))));
 fixture.messages.push(
  {id:'c8',game_id:'design-preview',channel_id:'public-demo',author_id:'teacher-demo',kind:'audio',text:'voice-preview.wav',storage_path:'preview/mock.wav',mime_type:'audio/wav',url:voicePreviewUrl,voice_meta:{duration:1,waveform:voiceWave},created_at:'2026-09-28T12:00:00Z'},
  {id:'c9',game_id:'design-preview',channel_id:'public-demo',author_id:'student-0',kind:'video',text:null,storage_path:'preview/video.webm',mime_type:'video/webm',created_at:'2026-09-28T12:03:00Z'}
