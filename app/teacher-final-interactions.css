@@ -86,3 +86,16 @@
 @media(prefers-reduced-motion:reduce){.chatVideoNote *{animation:none!important;transition:none!important}}
 
 @media(max-width:900px){.simWorkspace.chatOpen .simChat.gsChatV2{top:56px!important}}
+
+/* Shared selector containers stay within the same grid track as the native fields they replace. */
+.partyInviteComposer>.styledSelect,.partyUpload>.styledSelect,.wallComposerIdentity .styledSelect,
+.wallComposerGrid>.styledSelect,.wallAttachGrid>.styledSelect,.wallSearch>.styledSelect,
+.quickNpa>.styledSelect,.voteBuilderGrid>.styledSelect,.eventEditorGrid>.styledSelect,
+.partyAgreementForm .styledSelect,.partyCabinet .styledSelect{min-width:0;max-width:100%}
+.wallSearch>.styledSelect{flex:1 1 170px}
+.wallComposerGrid>.styledSelect{width:100%}
+.partyInviteComposer>.styledSelect{flex:1 1 210px}
+.partyUpload>.styledSelect{width:100%}
+.quickNpa>.styledSelect{flex:1 1 170px}
+.wallComposerIdentity .styledSelectLabel{font-size:10px}
+@media(max-width:800px){.wallSearch>.styledSelect{flex:1 1 100%}}
