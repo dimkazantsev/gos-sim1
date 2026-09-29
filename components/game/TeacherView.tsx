@@ -1,6 +1,6 @@
 'use client';
 import {useMemo,useState} from 'react';
-import {Activity,ArrowRight,BarChart3,BookOpenText,GraduationCap,Network,Pause,Play,Radio,UsersRound,Wrench} from 'lucide-react';
+import {Activity,ArrowRight,BarChart3,GraduationCap,Network,Pause,Play,Radio,UsersRound,Wrench} from 'lucide-react';
 import TeacherStageManager from './TeacherStageManager';
 import type {ReturnTypeRepublic} from './viewTypes';
 import ImpactRulesPanel from './ImpactRulesPanel';
