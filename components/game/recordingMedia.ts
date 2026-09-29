@@ -30,3 +30,17 @@ export function formatRecordingDuration(seconds:number):string{
  const safe=Math.max(0,Math.floor(seconds));
  return String(Math.floor(safe/60)).padStart(2,'0')+':'+String(safe%60).padStart(2,'0');
 }
+
+/** Some Android file pickers omit File.type; use a conservative media
+ * extension fallback so uploaded sound and video get native players. */
+export function inferChatMime(file:{name:string;type:string}):string{
+ if(file.type.trim())return file.type;
+ const ext=file.name.toLowerCase().split('.').pop();
+ const known:Record<string,string>={
+  mp4:'video/mp4',m4v:'video/mp4',mov:'video/quicktime',webm:'video/webm',
+  mp3:'audio/mpeg',m4a:'audio/mp4',ogg:'audio/ogg',oga:'audio/ogg',wav:'audio/wav',
+  pdf:'application/pdf',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',
+  gif:'image/gif',webp:'image/webp'
+ };
+ return known[ext||'']||'application/octet-stream';
+}
