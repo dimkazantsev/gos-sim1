@@ -52,6 +52,20 @@ async function main(){
      'Rightmost navigation item must be reachable by horizontal scroll');
    }
    await page.locator('#preview').screenshot({path:path.join(shotDir,'teacher-mobile-'+width+'.png')});
+   await page.locator('#screen').selectOption('mobile-all');
+   const all=await page.frameLocator('#preview').locator('html').evaluate(html=>{
+    const sheet=html.querySelector('.mobileMoreSheet'),grid=sheet.querySelector('.mobileAllGrid');
+    const panel=sheet.getBoundingClientRect(),items=[...grid.querySelectorAll('button')].map(el=>{
+     const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};
+    });
+    return {viewport:html.clientWidth,scroll:html.scrollWidth,sheet:{left:panel.left,right:panel.right,top:panel.top,bottom:panel.bottom},
+     sections:items.length,overflow:items.filter(r=>r.left<panel.left-3||r.right>panel.right+3)};
+   });
+   assert.equal(all.sections,9,'All nine teacher routes must be visible in the same menu');
+   assert(all.scroll<=all.viewport+3,'All sections menu widens page at '+width+'px');
+   assert.equal(all.overflow.length,0,'All-sections items escape modal bounds at '+width+'px');
+   assert(all.sheet.top>=-2&&all.sheet.bottom<=940+2,'All-sections menu escapes viewport at '+width+'px');
+   await page.locator('#preview').screenshot({path:path.join(shotDir,'all-sections-'+width+'.png')});
    console.log('PASS teacher '+width+'px: no global overflow; dock scroll '+result.dock.scroll+'/'+result.dock.width);
   }
  }finally{await browser.close()}
