@@ -1,5 +1,6 @@
 'use client';
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
+import {supabase} from '@/lib/supabase';
 import {Activity,ArrowDownWideNarrow,Download,Search,UsersRound} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 
@@ -11,7 +12,29 @@ const VIEW_NAMES:Record<string,string>={
 type Sort='recent'|'oldest'|'name'|'surname'|'online';
 type Scope='all'|'mine';
 export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
- const {me,members,activities,presence,teacher}=g;
+ const {me,game,members,activities,presence,teacher}=g;
+ const [older,setOlder]=useState<typeof activities>([]);
+ const [olderBusy,setOlderBusy]=useState(false);
+ const [olderExhausted,setOlderExhausted]=useState(false);
+ const [olderError,setOlderError]=useState('');
+ useEffect(()=>{setOlder([]);setOlderExhausted(false);setOlderError('')},[game?.id,me?.user_id]);
+ const loaded=useMemo(()=>[...new Map([...activities,...older].map(a=>[a.id,a])).values()],[activities,older]);
+ async function loadOlder(){
+  if(!game||olderBusy||olderExhausted)return;
+  const earliest=loaded.reduce<string|null>((min,a)=>!min||a.created_at<min?a.created_at:min,null);
+  if(!earliest){setOlderExhausted(true);return}
+  setOlderBusy(true);setOlderError('');
+  const r=await supabase.from('game_activity').select('*').eq('game_id',game.id)
+   .lt('created_at',earliest).order('created_at',{ascending:false}).limit(250);
+  if(r.error)setOlderError(r.error.message);
+  else{
+   const page=(r.data||[]) as typeof activities;
+   setOlder(previous=>[...new Map([...previous,...page].map(a=>[a.id,a])).values()]);
+   if(page.length<250)setOlderExhausted(true);
+  }
+  setOlderBusy(false);
+ }
+
  const [search,setSearch]=useState('');
  const [memberFilter,setMemberFilter]=useState('');
  const [viewFilter,setViewFilter]=useState('');
@@ -22,7 +45,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const studentMembers=members.filter(m=>m.kind==='student');
  const lastMap=new Map(studentMembers.map(m=>[m.user_id,presence.find(p=>p.user_id===m.user_id)]));
  const isOnline=(id:string)=>{const p=lastMap.get(id);return !!p&&Date.now()-new Date(p.last_seen_at).getTime()<90000};
- const allowed=useMemo(()=>activities.filter(a=>teacher||a.actor_id===me?.user_id),[activities,teacher,me?.user_id]);
+ const allowed=useMemo(()=>loaded.filter(a=>teacher||a.actor_id===me?.user_id),[loaded,teacher,me?.user_id]);
  const visible=useMemo(()=>{
   const q=search.trim().toLocaleLowerCase('ru');
   const xs=allowed.filter(a=>{
@@ -81,7 +104,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
    </button>})}
   </div>}
   <div className="journalFeed" role="region" aria-label="Записи журнала" tabIndex={0}>
-   {visible.length===0?<div className="journalEmpty">По выбранным фильтрам записей нет.</div>:visible.slice(0,showAll?250:50).map(a=>{
+   {visible.length===0?<div className="journalEmpty">По выбранным фильтрам записей нет.</div>:visible.slice(0,showAll?visible.length:50).map(a=>{
     const m=members.find(x=>x.user_id===a.actor_id);
     return <article key={a.id} className="journalEvent">
      <time dateTime={a.created_at}>{new Date(a.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</time>
@@ -91,7 +114,9 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
     </article>;
    })}
   </div>
-  {visible.length>50&&<button type="button" className="journalMore" onClick={()=>setShowAll(!showAll)}>{showAll?'Показать первые 50':'Показать ещё ('+Math.min(visible.length,250)+' из '+visible.length+')'}</button>}
-  <p className="journalNote">{teacher?'Отображаются последние 250 загруженных событий; для полной истории нужен отдельный экспорт сервера.':'Вам доступны только собственные события. Действия других студентов и преподавателя скрыты.'}</p>
+  {visible.length>50&&<button type="button" className="journalMore" onClick={()=>setShowAll(!showAll)}>{showAll?'Показать первые 50':'Показать ещё ('+visible.length+' из '+visible.length+')'}</button>}
+  {loaded.length>=250&&!olderExhausted&&<button type="button" className="journalMore" onClick={()=>void loadOlder()} disabled={olderBusy}>{olderBusy?'Загрузка…':'Загрузить предыдущие 250 событий'}</button>}
+  {olderError&&<p className="journalError" role="alert">{olderError}</p>}
+  <p className="journalNote">{teacher?'Загружено '+loaded.length+' событий. Фильтры и экспорт действуют на загруженную историю.':'Вам доступны только собственные события. Действия других студентов и преподавателя скрыты.'}</p>
  </section>;
 }
