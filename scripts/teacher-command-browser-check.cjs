@@ -65,6 +65,43 @@ async function check(){
    }
    console.log('PASS '+width+'px: 16 independent reset icons, bulk reset, eight workspaces, no overflow');
   }
+  for(const [screen,selector] of [
+   ['teacher-journal','.classroomJournal'],
+   ['teacher-analytics','.participantsAnalytics'],
+   ['teacher-grades','.gradesToolbar']
+  ]){
+   await page.locator('#screen').selectOption(screen);
+   await frame.locator(selector).first().waitFor();
+   assert.equal(await frame.locator('.teacherWorkspaceNav [role=tab]').count(),8,'Eight workspaces required');
+   if(screen==='teacher-journal'){
+    assert((await frame.locator('.journalToolbar select').count())>=2,'Participant and section journal filters missing');
+    assert.equal(await frame.locator('.journalCounters button').count(),1,'Journal CSV export missing');
+   }
+   if(screen==='teacher-analytics'){
+    assert.equal(await frame.locator('.participantsTable').count(),1,'Participant table missing');
+    assert((await frame.locator('.participantsTable thead th').count())>=9,'Participant metrics missing');
+   }
+   if(screen==='teacher-grades'){
+    assert((await frame.locator('.gradesToolbar select').count())>=2,'Grade sorting/filter controls missing');
+    assert.equal(await frame.locator('.gradeTotalHead').count(),2,'Grade totals missing');
+   }
+   for(const width of [1440,390]){
+    await page.locator('#preview').evaluate((el,w)=>{el.style.width=w+'px'},width);
+    await frame.locator(selector).first().evaluate(el=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    const ok=await frame.locator(selector).first().evaluate(el=>({
+     width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
+     right:el.getBoundingClientRect().right
+    }));
+    assert(ok.scroll<=ok.width+3,screen+' overflows at '+width+'px: '+JSON.stringify(ok));
+    if(width===1440)await frame.locator(selector).first().screenshot({
+     path:path.join(screenshots,screen+'.png'),animations:'disabled'
+    });
+   }
+   console.log('PASS '+screen+': responsive static controls');
+  }
+  await page.locator('#screen').selectOption('profile');
+  assert.equal(await frame.locator('.profileJournalAccess button').count(),1,
+   'Profile needs a private journal toggle');
  }finally{await browser.close()}
 }
 check().catch(error=>{console.error(error);process.exitCode=1});
