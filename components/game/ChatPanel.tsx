@@ -5,6 +5,7 @@ import {ArrowDown,Download,FileText,Mic,Paperclip,Pin,PinOff,Plus,Search,Send,Sq
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
+import ChatVoicePlayer from './ChatVoicePlayer';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Message} from './types';
@@ -28,7 +29,7 @@ function highlightChatText(value:string,search:string):ReactNode{
 function formatBytes(size:number){return size<1024*1024?Math.max(1,Math.round(size/1024))+' КБ':(size/1024/1024).toFixed(1)+' МБ';}
 function ChatAttachment({message:m}:{message:Message}){
  if(!m.url)return <span className="chatMissingFile">Вложение недоступно</span>;
- if(m.kind==='audio'||m.mime_type?.startsWith('audio/'))return <audio controls preload="none" src={m.url} aria-label="Аудиосообщение"/>;
+ if(m.kind==='audio'||m.mime_type?.startsWith('audio/'))return <ChatVoicePlayer src={m.url} messageId={m.id} fileName={m.text||'Голосовое сообщение'} />;
  if(m.kind==='video'||m.mime_type?.startsWith('video/'))return <video controls preload="metadata" playsInline src={m.url} aria-label="Видеосообщение"/>;
  if(m.mime_type?.startsWith('image/')){
   return <a className="chatPhoto" href={m.url} target="_blank" rel="noopener noreferrer" aria-label="Открыть изображение в новой вкладке"><img src={m.url} alt={m.text||'Изображение из чата'} loading="lazy"/></a>;
