@@ -2,6 +2,7 @@
 import {useEffect,useMemo,useState} from 'react';
 import {Download,Search} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import StyledSelect from '../ui/StyledSelect';
 import type {ReturnTypeRepublic} from './viewTypes';
 type Assessment={user_id:string;stage_no:number;auto_score:number;final_score:number|null;status:'draft'|'final'};
 type Sort='surname'|'name'|'score'|'average'|'approved'|'activity'|'posts'|'votes';
@@ -81,9 +82,13 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
   </div>
   <div className="participantsToolbar">
    <label className="participantsSearch"><Search size={17} aria-hidden="true"/><input type="search" placeholder="Поиск по студентам" value={search} onChange={e=>setSearch(e.target.value)} aria-label="Поиск по студентам"/></label>
-   <label>Партия<select value={team} onChange={e=>setTeam(e.target.value)}><option value="">Все</option>{teams.map(t=><option key={t} value={t}>{t}</option>)}</select></label>
-   <label>Этап<select value={stage} onChange={e=>setStage(Number(e.target.value))}><option value={0}>Все 16</option>{Array.from({length:16},(_,i)=><option value={i+1} key={i+1}>{i+1}</option>)}</select></label>
-   <label>Сортировать<select value={sort} onChange={e=>setSort(e.target.value as Sort)}><option value="score">Сумма баллов</option><option value="average">Средний балл</option><option value="surname">Фамилия</option><option value="name">Имя</option><option value="approved">Утверждено</option><option value="activity">Активность</option><option value="posts">Посты</option><option value="votes">Голоса</option></select></label>
+   <StyledSelect label="Партия" value={team} onChange={setTeam} options={[{value:'',label:'Все'},...teams.map(t=>({value:t,label:t}))]}/>
+   <StyledSelect label="Этап" value={String(stage)} onChange={v=>setStage(Number(v))}
+    options={[{value:'0',label:'Все 16'},...Array.from({length:16},(_,i)=>({value:String(i+1),label:String(i+1)}))]}/>
+   <StyledSelect label="Сортировать" value={sort} onChange={v=>setSort(v as Sort)}
+    options={[{value:'score',label:'Сумма баллов'},{value:'average',label:'Средний балл'},{value:'surname',label:'Фамилия'},
+     {value:'name',label:'Имя'},{value:'approved',label:'Утверждено'},{value:'activity',label:'Активность'},
+     {value:'posts',label:'Посты'},{value:'votes',label:'Голоса'}]}/>
    <button type="button" onClick={()=>setAsc(!asc)} aria-label={asc?'По убыванию':'По возрастанию'}>{asc?'↑ Возрастание':'↓ Убывание'}</button>
    <label className="participantsCheck"><input type="checkbox" checked={onlyAssessed} onChange={e=>setOnlyAssessed(e.target.checked)}/> Только оценённые</label>
   </div>
