@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),{spawn}=require('node:child_process');
 const {chromium}=require('playwright-core');
 const root=path.resolve(__dirname,'..');
-const route=path.join(root,'app','__ui_check__');
+const route=path.join(root,'app','ui-interaction-test-route');
 const screens=path.join(root,'.design-review','screenshots');
 fs.mkdirSync(screens,{recursive:true});
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser','/opt/google/chrome/chrome'].find(p=>p&&fs.existsSync(p));
@@ -48,12 +48,12 @@ export default function UiTest(){
 }
 `;
 let server,browser;
-const address='http://127.0.0.1:3998/__ui_check__';
+const address='http://127.0.0.1:3998/ui-interaction-test-route';
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 async function ready(){
- for(let n=0;n<90;n++){
+ for(let n=0;n<45;n++){
   if(server.exitCode!==null)throw Error('Next dev server exited prematurely: '+server.exitCode);
-  try{const r=await fetch(address);if(r.ok)return}catch{}
+  try{const r=await fetch(address,{signal:AbortSignal.timeout(5000)});if(r.ok)return}catch{}
   await sleep(1000);
  }
  throw Error('Next dev page did not become available');
@@ -86,9 +86,9 @@ async function main(){
  const lines=[];
  server.stdout.on('data',chunk=>{lines.push(String(chunk));if(lines.length>50)lines.shift()});
  server.stderr.on('data',chunk=>{lines.push(String(chunk));if(lines.length>50)lines.shift()});
+ try{
  await ready();
  browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
- try{
  const desktop=await browser.newPage({viewport:{width:390,height:850}});
  await desktop.goto(address);
  await desktop.locator('.mobileDockItem').first().waitFor();
@@ -147,6 +147,7 @@ async function main(){
  await touchContext.close();
 }finally{
  if(browser)await browser.close();
+ if(server?.exitCode!==null)console.log('Next dev server output:',lines.join('').slice(-5000));
  if(server){server.kill('SIGTERM');await sleep(1500)}
  fs.rmSync(route,{recursive:true,force:true});
 }
