@@ -314,6 +314,13 @@ export function useRepublicGame(gameId:string){
   return true;
  }
 
+ async function configureStageDeadline(stageNo:number,deadline:string|null,inclusive:boolean,penalty:number,description:string){
+  if(!teacher){setError('Настройки этапов доступны только преподавателю.');return false}
+  const r=await supabase.rpc('configure_stage_deadline',{p_game_id:gameId,p_stage_no:stageNo,p_deadline:deadline,
+   p_inclusive:inclusive,p_penalty_points:penalty,p_penalty_description:description});
+  if(r.error){setError(r.error.message);return false}
+  await refresh();return true;
+ }
  async function setStageDeadline(stageId:string,value:string){const r=await supabase.from('game_stages').update({deadline:value?new Date(value).toISOString():null}).eq('id',stageId);if(r.error)setError(r.error.message);else await refresh()}
 
  async function submitAction(e:FormEvent,data:{type:string;title:string;body:string;budget:number}){
@@ -477,6 +484,24 @@ export function useRepublicGame(gameId:string){
   if(r.error){setError(r.error.message);return null}
   await refresh();
   return r.data as {round_id:string;total_loss:number;result:{party_id:string;party_name:string;loss:number}[]};
+ }
+ async function applyGhostVotingBatch(losses:{party_id:string;loss:number}[]){
+  if(!teacher){setError('Ghost Voting доступен только преподавателю.');return false}
+  const r=await supabase.rpc('apply_ghost_voting_batch',{p_game_id:gameId,p_losses:losses});
+  if(r.error){setError(r.error.message);return false}
+  await refresh();return true;
+ }
+ async function deleteParty(partyId:string){
+  if(!teacher){setError('Удаление партий доступно только преподавателю.');return false}
+  const r=await supabase.rpc('delete_party_with_assets',{p_party_id:partyId});
+  if(r.error){setError(r.error.message);return false}
+  const result=r.data as {assets?:{bucket:string;path:string}[]};
+  const paths=(result?.assets||[]).filter(a=>a.bucket==='game-assets').map(a=>a.path);
+  if(paths.length){
+   const removed=await supabase.storage.from('game-assets').remove(paths);
+   if(removed.error)setError('Партия удалена из базы, но часть файлов осталась в хранилище: '+removed.error.message);
+  }
+  await refresh();return true;
  }
  async function clearPartyGhostLoss(partyId?:string){
   const r=await supabase.rpc('clear_party_ghost_loss',{p_game_id:gameId,p_party_id:partyId||null});
@@ -816,5 +841,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
+  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }
