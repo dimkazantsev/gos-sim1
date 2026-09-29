@@ -3,6 +3,7 @@ import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {PoliticalPost,View} from './types';
 import MediaUploadButton from './MediaUploadButton';
+import StyledSelect from '../ui/StyledSelect';
 import {STAGE_ACTIONS} from './stageActions';
 
 const PROCESS_TYPES=[
@@ -100,17 +101,17 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   <section className="wallComposer surface">
    <div className="wallComposerIdentity">
     <div className="wallAvatar">{me.full_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</div>
-    <div><small>ПУБЛИКАЦИЯ ОТ ИМЕНИ</small><select aria-label="Автор публикации" value={actorKey} onChange={e=>setActorKey(e.target.value)}>{actors.map((a:{key:string;label:string})=><option key={a.key} value={a.key}>{a.label}</option>)}</select></div>
+    <div><small>ПУБЛИКАЦИЯ ОТ ИМЕНИ</small><StyledSelect label="Автор публикации" value={actorKey} onChange={setActorKey} options={actors.map((a:{key:string;label:string})=>({value:a.key,label:a.label}))}/></div>
    </div>
    <div className="wallComposerGrid">
-    <select aria-label="Тип процесса" value={processType} onChange={e=>setProcessType(e.target.value)}>{PROCESS_TYPES.map(x=><option key={x[0]} value={x[0]}>{x[1]}</option>)}</select>
+    <StyledSelect label="Тип процесса" value={processType} onChange={setProcessType} options={PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))}/>
     <input aria-label="Заголовок публикации" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Заголовок политического процесса"/>
    </div>
    <textarea aria-label="Текст публикации" rows={5} value={body} onChange={e=>setBody(e.target.value)} placeholder="Что произошло, что предлагается, кто действует и к каким последствиям это должно привести?"/>
    <div className="wallAttachGrid">
     <label># Теги<input value={tagText} onChange={e=>setTagText(e.target.value)} placeholder="президентрф гдрф экономика"/></label>
     <label>Внешняя ссылка<input value={externalUrl} onChange={e=>setExternalUrl(e.target.value)} placeholder="https://…"/></label>
-    <label>Внутренняя ссылка<select value={internalView} onChange={e=>setInternalView(e.target.value)}><option value="">Нет</option><option value="votes">Голосования</option><option value="documents">НПА</option><option value="parties">Партии</option><option value="stages">Этапы</option></select></label>
+    <StyledSelect label="Внутренняя ссылка" value={internalView} onChange={setInternalView} options={[{value:'',label:'Нет'},{value:'votes',label:'Голосования'},{value:'documents',label:'НПА'},{value:'parties',label:'Партии'},{value:'stages',label:'Этапы'}]}/>
     <MediaUploadButton files={files} onChange={setFiles} label="Добавить медиа" hint="Фото, видео, аудио или файл"/>
    </div>
    <details className="wallFormalAttach"><summary>▤ Прикрепить НПА <span>{formalIds.length||''}</span></summary><div>{formalDocuments.length===0?<p>НПА ещё нет.</p>:formalDocuments.map(d=><label key={d.id}><input type="checkbox" checked={formalIds.includes(d.id)} onChange={e=>setFormalIds(x=>e.target.checked?[...x,d.id]:x.filter(id=>id!==d.id))}/><span><b>{d.registry_no}</b>{d.title}</span></label>)}</div></details>
@@ -120,7 +121,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   <div className="wallTabs"><button className={tab==='feed'?'active':''} onClick={()=>setTab('feed')}>Лента</button><button className={tab==='registry'?'active':''} onClick={()=>setTab('registry')}>Реестр принятых решений <span>{politicalDecisions.length}</span></button></div>
 
   {tab==='feed'&&<>
-   <section className="wallSearch"><input aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="⌕ Поиск по публикациям, тексту и тегам"/><select aria-label="Фильтр по субъекту" value={filterActor} onChange={e=>setFilterActor(e.target.value)}><option value="">Все субъекты</option>{Array.from(new Map(politicalPosts.map(p=>[p.actor_key,p.actor_label])).entries()).map(([k,l])=><option key={k} value={k}>{l}</option>)}</select><select aria-label="Фильтр по процессу" value={filterType} onChange={e=>setFilterType(e.target.value)}><option value="">Все процессы</option>{PROCESS_TYPES.map(x=><option key={x[0]} value={x[0]}>{x[1]}</option>)}</select></section>
+   <section className="wallSearch"><input aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="⌕ Поиск по публикациям, тексту и тегам"/><StyledSelect label="Субъект" value={filterActor} onChange={setFilterActor} options={[{value:'',label:'Все субъекты'},...Array.from(new Map(politicalPosts.map(p=>[p.actor_key,p.actor_label])).entries()).map(([k,l])=>({value:k,label:l}))]}/><StyledSelect label="Процесс" value={filterType} onChange={setFilterType} options={[{value:'',label:'Все процессы'},...PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))]}/></section>
    <section className="wallFeed">{filtered.length===0?<div className="emptyState">Подходящих публикаций нет.</div>:filtered.map(p=>{
     const pf=profiles.find(x=>x.user_id===p.author_id);
     const media=politicalMedia.filter(x=>x.post_id===p.id);
@@ -141,7 +142,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
       {teacher&&p.status==='published'&&<button className="acceptPost" onClick={()=>void acceptPoliticalPost(p.id)}>✓ Принять как решение</button>}
       {teacher&&p.status==='published'&&<button className="rejectPost" onClick={()=>void rejectPoliticalPost(p.id)}>× Отклонить</button>}
      </div>
-     {npaFor===p.id&&<div className="quickNpa"><select aria-label="Вид создаваемого НПА" value={npaType} onChange={e=>setNpaType(e.target.value)}><option value="fz_bill">Проект ФЗ</option><option value="fkz_bill">Проект ФКЗ</option><option value="federal_budget">Федеральный бюджет</option><option value="president_decree">Указ Президента</option><option value="government_resolution">Постановление Правительства</option><option value="gd_resolution">Постановление ГД</option><option value="sf_resolution">Постановление СФ</option><option value="municipal_act">Муниципальный акт</option></select><button className="primary" disabled={busy} onClick={()=>void quickNpa(p)}>Создать проект из публикации →</button></div>}
+     {npaFor===p.id&&<div className="quickNpa"><StyledSelect label="Вид НПА" value={npaType} onChange={setNpaType} options={[{value:'fz_bill',label:'Проект ФЗ'},{value:'fkz_bill',label:'Проект ФКЗ'},{value:'federal_budget',label:'Федеральный бюджет'},{value:'president_decree',label:'Указ Президента'},{value:'government_resolution',label:'Постановление Правительства'},{value:'gd_resolution',label:'Постановление ГД'},{value:'sf_resolution',label:'Постановление СФ'},{value:'municipal_act',label:'Муниципальный акт'}]}/><button className="primary" disabled={busy} onClick={()=>void quickNpa(p)}>Создать проект из публикации →</button></div>}
      {teacher&&<PostImpactEditor g={g} post={p}/>}
     </article>
    })}</section>
