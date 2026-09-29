@@ -68,8 +68,8 @@ async function checkUnits(page,width){
  }));
  assert(measurements.length>=3);
  for(const m of measurements){
-  assert(m.input.right<=m.unit.left+2,'Input collides with its unit at '+width+': '+JSON.stringify(m));
-  assert(m.unit.right<=m.bounds[1]+2,'Unit escapes field at '+width+': '+JSON.stringify(m));
+  assert(m.input[1]<=m.unit[0]+2,'Input collides with its unit at '+width+': '+JSON.stringify(m));
+  assert(m.unit[1]<=m.bounds[1]+2,'Unit escapes field at '+width+': '+JSON.stringify(m));
   assert(m.bounds[0]>=m.label.left-2&&m.bounds[1]<=m.label.right+2,'Field escapes label at '+width+': '+JSON.stringify(m));
  }
  const doc=await page.locator('html').evaluate(el=>({width:el.clientWidth,scroll:el.scrollWidth}));
