@@ -28,14 +28,20 @@ const previewSource=read('scripts/design-preview.cjs');
 check('Last-loaded stage stylesheet is included in offline browser preview',
  previewSource.includes("'mobile-nav-polish','stage-map'")&&
  read('app/layout.tsx').includes("import './stage-map.css'"));
-check('Stage card has one aligned status/vote/details action row',
- stagesView.includes('className="stageCardFooter"')&&
- stagesView.includes('className="stageVoteQuick"')&&
- stagesView.includes('className="stageCardOpen"')&&
- !stagesView.includes('stageVotePill--inline'));
-check('Stage desktop styling has no absolute voting button or offset detail width',
- stageSheet.includes('.stagesPage .stageCardFooter')&&
- stageSheet.includes('position:static;')&&
+check('Atlas has search, status filters and selectable game phases',
+ stagesView.includes('className="stageAtlasSearch"')&&
+ stagesView.includes('className="stageAtlasFilters"')&&
+ stagesView.includes('className="stageAtlasPhaseList"')&&
+ stagesView.includes("setPhaseFilter(isSelected?null:p.id)"));
+check('New stage cards render a unique status, detail button and optional vote button',
+ stagesView.includes('className="stageAtlasCardFooter"')&&
+ stagesView.includes('className="stageAtlasVoteAction"')&&
+ stagesView.includes('className="stageAtlasDetailAction"')&&
+ stagesView.includes("className={'stageAtlasCardStatus is-'+s.status}")&&
+ !stagesView.includes('className="stageTimeline"'));
+check('Atlas owns last-loaded card styles without old fixed-width buttons',
+ stageSheet.includes('.stagesAtlas .stageAtlasGrid')&&
+ stageSheet.includes('.stagesAtlas .stageAtlasCardFooter')&&
  !stageSheet.includes('width:calc(100% - 55px)'));
 const layout=read('app/layout.tsx');
 check('Single ordered entry point for all design sheets',styles.every((name,i)=>layout.indexOf(name+'.css')>=0&&(i===0||layout.indexOf(name+'.css')>layout.indexOf(styles[i-1]+'.css'))));
