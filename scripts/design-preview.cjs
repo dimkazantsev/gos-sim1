@@ -63,7 +63,7 @@ const originalMessages=fixture.messages;
 fixture.messages=[];
 pages.push(['chat-empty','Пустой чат',renderToStaticMarkup(h('main',{className:'previewChatPage'},h(ChatPanel,{g,draft:'',onDraftChange:noop})))]);
 fixture.messages=originalMessages;
-const originalMe=fixture.me;fixture.me=fixture.members[1];fixture.teacher=false;pages.push(['student','Обзор участника',renderToStaticMarkup(h(GameClient,{gameId:'design-preview'}))]);fixture.game.turn_open=false;pages.push(['paused','Игра на паузе',renderToStaticMarkup(h(GameClient,{gameId:'design-preview'}))]);fixture.game.turn_open=true;fixture.me=originalMe;fixture.teacher=true;
+const originalMe=fixture.me;fixture.me=fixture.members[1];fixture.teacher=false;pages.push(['student','Обзор участника',renderToStaticMarkup(h(GameClient,{gameId:'design-preview'}))]);fixture.game.turn_open=false;pages.push(['paused','Игра на паузе',renderToStaticMarkup(h(GameClient,{gameId:'design-preview'}))]);fixture.game.turn_open=true;fixture.me=originalMe;fixture.teacher=true;fixture.realtimeState='disconnected';pages.push(['offline','Связь потеряна',renderToStaticMarkup(h(GameClient,{gameId:'design-preview'}))]);fixture.realtimeState='connected';
 const PublicScreen=require('../components/PublicScreen').default;pages.push(['audience','Экран аудитории',renderToStaticMarkup(h(PublicScreen,{gameId:'design-preview'}))]);
 // Render the real metric modal with historical and comparable metrics so layout
 // can be inspected at 360/390/768px and desktop without live credentials.
