@@ -5,12 +5,18 @@ on:
     branches: [main]
     paths:
       - 'components/game/StagesView.tsx'
+      - 'components/game/TeacherView.tsx'
+      - 'components/game/TeacherStageManager.tsx'
+      - 'components/GameClient.tsx'
       - 'app/stage-map.css'
+      - 'app/teacher-command.css'
+      - 'app/layout.tsx'
       - 'app/globals.css'
       - 'app/design-*.css'
       - 'scripts/design-preview.cjs'
       - 'scripts/design-audit.mjs'
       - 'scripts/stage-desktop-browser-check.cjs'
+      - 'scripts/teacher-command-browser-check.cjs'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/stage-desktop.yml'
@@ -50,10 +56,16 @@ jobs:
         run: npm run design:stages
         env:
           CHROME_BIN: /usr/bin/google-chrome
+      - name: Teacher command centre geometry and accessible reset controls
+        run: npm run design:teacher
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - name: Upload stage screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: stage-card-screenshots
-          path: .design-review/screenshots/stages-*.png
+          path: |
+            .design-review/screenshots/stages-*.png
+            .design-review/screenshots/teacher-stages-*.png
           if-no-files-found: ignore
