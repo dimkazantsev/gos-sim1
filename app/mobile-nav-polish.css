@@ -141,4 +141,24 @@
 @media(max-width:350px){
  .impactWorkbench .impactRuleEffects label{grid-template-columns:minmax(0,1fr) minmax(0,106px)}
 }
+/* iOS-style edit feedback without forcing motion for accessibility. */
+@keyframes mobileDockJiggle{
+ 0%{transform:rotate(-1.8deg) translateY(-1px)}
+ 100%{transform:rotate(1.8deg) translateY(0)}
+}
+@media(max-width:900px){
+ .mobileDockV2.isEditing .mobileDockItem:not(.isDragged) .mobileDockIcon{
+  animation:mobileDockJiggle .22s ease-in-out infinite alternate;
+  transform-origin:50% 70%;
+ }
+ .mobileDockV2.isEditing .mobileDockItem:nth-child(2n):not(.isDragged) .mobileDockIcon{
+  animation-direction:alternate-reverse;
+  animation-delay:-.11s;
+ }
+ .mobileDockV2.isEditing .mobileDockItem.isDragged .mobileDockIcon{animation:none}
+ .mobileDockGhost{transition:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .mobileDockV2.isEditing .mobileDockItem .mobileDockIcon{animation:none!important}
+}
 @media print{.mobileDockGhost{display:none}}
