@@ -257,7 +257,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     <button type="button" className="chatCaptureCancel" onClick={discardRecording} disabled={recordingSaving}><Trash2 size={16} aria-hidden="true"/>Удалить</button>
     <a className="chatCaptureDownload" href={recordingPreview.url} download={recordingPreview.fileName} aria-label="Сохранить запись на устройство"><Download size={17} aria-hidden="true"/></a>
     <button type="button" className="chatCaptureSend" disabled={recordingSaving||recordingPreview.blob.size>MAX_FILE_SIZE} onClick={()=>void sendRecordingPreview()}>
-     <Send size={16} aria-hidden="true"/>{recordingSaving?(chatMediaPhase==='uploading'?'Загрузка…':'Публикация…'):'Отправить в чат'}
+     <Send size={16} aria-hidden="true"/>{recordingSaving?(chatMediaPhase==='analyzing'?'Подготовка…':chatMediaPhase==='uploading'?'Загрузка…':'Публикация…'):'Отправить в чат'}
     </button>
    </div>
   </section>}
@@ -299,7 +299,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      <Video aria-hidden="true" size={19}/>
     </button>
     <span className="chatComposerHint" aria-live="polite">
-     {uploading?'Загружается вложение…':recordingSaving?(chatMediaPhase==='uploading'?'Загружается запись…':'Публикуется сообщение…'):recording?'Идёт запись…':'Enter — отправить'}
+     {uploading?'Загружается вложение…':recordingSaving?(chatMediaPhase==='analyzing'?'Анализируется запись…':chatMediaPhase==='uploading'?'Загружается запись…':'Публикуется сообщение…'):recording?'Идёт запись…':'Enter — отправить'}
     </span>
    </div>
   </div>
