@@ -179,3 +179,30 @@
 .simMain.chatOpen .eventComicCaption strong{font-size:clamp(13px,2vw,19px)}
 @media(max-width:1080px){.eventStory{grid-template-columns:minmax(0,1fr)}.eventFeedFilters{grid-template-columns:repeat(2,minmax(0,1fr))}.eventComicCaption strong{font-size:clamp(14px,2vw,19px)}}
 @media(max-width:520px){.eventFeedFilters{grid-template-columns:minmax(0,1fr)}.eventStory{padding:10px!important;gap:12px}.eventStoryContent>h4{font-size:16px}.eventOptionButtons{grid-template-columns:minmax(0,1fr)}.eventComicCaption{padding:30px 11px 10px}.eventComicCaption strong{font-size:13px}}
+
+
+/* Model-of-Consequences teacher metrics editor, no layout jumps when chat opens. */
+.metricDirectorStudio{display:grid;gap:13px;min-width:0;padding:17px;border:1px solid #ccdcf5;border-radius:14px;background:linear-gradient(130deg,#f4f8ff,#fff)}
+.metricDirectorStudio>header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.metricDirectorStudio>header>div{min-width:0}
+.metricDirectorStudio>header small{color:#5878ac;font-size:10px;letter-spacing:.08em;font-weight:850}
+.metricDirectorStudio>header h3{margin:5px 0;font-size:18px;color:#274d81}
+.metricDirectorStudio>header p{margin:0;font-size:11px;line-height:1.65;color:#7991a9}
+.metricDirectorStudio>header>svg{flex:none;color:#5b80b9}
+.metricDirectorGrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(110px,.6fr) minmax(0,.75fr);gap:10px;align-items:end}
+.metricDirectorGrid .styledSelect{min-width:0;max-width:100%;width:100%}
+.metricDirectorGrid>label,.metricDirectorReason{display:grid;gap:6px;min-width:0;font-size:11px;font-weight:790;color:#587294}
+.metricDirectorGrid input,.metricDirectorReason input,.metricDirectorReason textarea{min-width:0;width:100%;min-height:44px;box-sizing:border-box;padding:10px 12px;border:1px solid #c8d9f2;border-radius:9px;background:white;font-size:12px;color:#2e527d}
+.metricDirectorReason textarea{min-height:80px;resize:vertical;line-height:1.6}
+.metricDirectorValue{display:grid;align-content:center;gap:6px;min-width:0;min-height:44px;padding:8px 11px;border:1px solid #d1dff1;border-radius:9px;background:#fff}
+.metricDirectorValue small{color:#7490b0;font-size:10px}
+.metricDirectorValue strong{color:#2b5eaf;font-size:17px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.metricDirectorCheck{display:flex;align-items:center;gap:9px;line-height:1.6;font-size:11px;font-weight:750;color:#426792}
+.metricDirectorCheck input{flex:none;width:16px;height:16px;accent-color:#325bd7}
+.metricDirectorCheck svg{flex:none}
+.metricDirectorStudio>.primary{display:flex;align-items:center;justify-content:center;gap:9px;justify-self:start;min-height:44px;min-width:205px;padding:10px 16px;border-radius:9px}
+.metricDirectorNotice{display:flex;align-items:start;gap:8px;line-height:1.5;color:#3d669d;font-size:12px}
+.simMain.chatOpen .metricDirectorGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.simMain.chatOpen .metricDirectorGrid>.styledSelect{grid-column:1/-1}
+@media(max-width:750px){.metricDirectorGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.metricDirectorGrid>.styledSelect{grid-column:1/-1}}
+@media(max-width:480px){.metricDirectorGrid,.simMain.chatOpen .metricDirectorGrid{grid-template-columns:minmax(0,1fr)}.metricDirectorGrid>.styledSelect,.simMain.chatOpen .metricDirectorGrid>.styledSelect{grid-column:auto}.metricDirectorStudio{padding:12px}.metricDirectorStudio>.primary{width:100%}}
