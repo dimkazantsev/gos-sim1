@@ -1,6 +1,6 @@
 'use client';
 import {IconAction} from '../ui/IconAction';
-import {ArrowRight,ArrowUpRight,BookOpenText,Building2,CalendarClock,ChartNoAxesCombined,CheckCircle2,ChevronRight,CircleDot,ClipboardCheck,ClipboardList,Landmark,Layers3,LockKeyhole,Map,MapPin,Network,Search,Scale,ShieldAlert,SlidersHorizontal,Target,UserRoundX,UsersRound,Vote,Wallet,X} from 'lucide-react';
+import {ArrowRight,ArrowUpRight,BookOpenText,Building2,CalendarClock,ChartNoAxesCombined,CheckCircle2,ChevronRight,CircleDot,ClipboardCheck,ClipboardList,Landmark,Layers3,LockKeyhole,Map,MapPin,Network,Search,Scale,ShieldAlert,SlidersHorizontal,Target,RotateCcw,TriangleAlert,UserRoundX,UsersRound,Vote,Wallet,X} from 'lucide-react';
 import {useEffect,useState,type CSSProperties} from 'react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -34,6 +34,12 @@ type StageFilter='all'|'open'|'voting'|'completed'|'locked';
 export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;focusStageNo?:number;readOnly?:boolean}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
  const [selected,setSelected]=useState<Stage|null>(null);
+ const [resetTarget,setResetTarget]=useState<number|'all'|null>(null);
+ const [resetConfirmation,setResetConfirmation]=useState('');
+ const [resetBusy,setResetBusy]=useState(false);
+ const [resetNotice,setResetNotice]=useState('');
+ const resetDialogRef=useDialog(resetTarget!==null,()=>{if(!resetBusy){setResetTarget(null);setResetConfirmation('')}});
+
  const [stageFilter,setStageFilter]=useState<StageFilter>('all');
  const [phaseFilter,setPhaseFilter]=useState<string|null>(null);
  const [stageSearch,setStageSearch]=useState('');
@@ -53,6 +59,31 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
  const votingStageNos=new Set(votes.filter(v=>v.status==='open').map(v=>v.stage_no));
  const votingCount=stages.filter(s=>votingStageNos.has(s.stage_no)).length;
  const completionPercent=stages.length?Math.round(completedCount/stages.length*100):0;
+ const resetStage=resetTarget==='all'?null:resetTarget;
+ const resetStageRecord=typeof resetTarget==='number'?stages.find(s=>s.stage_no===resetTarget):null;
+ const resetIsAll=resetTarget==='all';
+ const canConfirmReset=resetTarget!==null&&!resetBusy&&(!resetIsAll||resetConfirmation.trim()==='СБРОСИТЬ');
+ function requestReset(target:number|'all'){
+  if(!teacher||readOnly)return;
+  setResetNotice('');
+  setResetConfirmation('');
+  setResetTarget(target);
+ }
+ async function confirmReset(){
+  if(!canConfirmReset||!teacher||readOnly)return;
+  setResetBusy(true);
+  try{
+   const ok=await g.resetStageProgress(resetStage);
+   if(ok){
+    setResetNotice(resetIsAll?'Статусы и сроки всех этапов сброшены. Игровой таймер остановлен.':('Этап '+resetStage+' сброшен.'));
+    setResetTarget(null);
+    setResetConfirmation('');
+    if(resetIsAll){setStageFilter('all');setPhaseFilter(null);setStageSearch('')}
+    if(selected&&resetStage!==null&&selected.stage_no===resetStage)setSelected(null);
+   }
+  }finally{setResetBusy(false)}
+ }
+
  const stageFilters:{id:StageFilter;label:string;count:number}[]=[
   {id:'all',label:'Все этапы',count:stages.length},
   {id:'open',label:'Текущие',count:openCount},
@@ -82,10 +113,14 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
      </div>
      <div className="stageAtlasProgressBottom"><span>{completionPercent}% выполнено</span><span>{openCount?openCount+' сейчас активно':'Активных этапов нет'}</span></div>
     </div>
-    {teacher&&<button type="button" className="primary stageAtlasNext" onClick={nextStage} disabled={completedCount===stages.length}>Открыть следующий этап <ArrowRight size={17} aria-hidden="true"/></button>}
+    {teacher&&!readOnly&&<div className="stageAtlasTeacherActions">
+     <button type="button" className="stageAtlasResetAll" onClick={()=>requestReset('all')} disabled={resetBusy}><RotateCcw size={16} strokeWidth={2} aria-hidden="true"/> Сбросить все этапы</button>
+     <button type="button" className="primary stageAtlasNext" onClick={nextStage} disabled={completedCount===stages.length}>Открыть следующий этап <ArrowRight size={17} aria-hidden="true"/></button>
+    </div>}
    </div>
   </section>
 
+  {resetNotice&&<div className="stageAtlasResetNotice" role="status"><CheckCircle2 size={17} aria-hidden="true"/>{resetNotice}<button type="button" onClick={()=>setResetNotice('')} aria-label="Скрыть сообщение"><X size={15} aria-hidden="true"/></button></div>}
   <section className="stageAtlasPhases" aria-label="Фазы государственного строительства">
    <div className="stageAtlasSectionHead">
     <div><span className="stageAtlasEyebrow">МАРШРУТ</span><h2>Шесть фаз игры</h2></div>
@@ -146,6 +181,7 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
        <div className="stageAtlasCardActions">
         {hasOpenVote&&<button type="button" className="stageAtlasVoteAction" onClick={onOpenVotes} aria-label={'Открыть голосования этапа '+s.stage_no}><Vote size={16} aria-hidden="true"/>Голосование</button>}
         <button type="button" className="stageAtlasDetailAction" onClick={openDetails} aria-label={'Подробнее об этапе '+s.stage_no+': '+s.title}>Подробнее <ArrowUpRight size={16} strokeWidth={2} aria-hidden="true"/></button>
+        {teacher&&!readOnly&&<button type="button" className="stageAtlasResetStage" title={'Сбросить этап '+s.stage_no} aria-label={'Сбросить этап '+s.stage_no+': '+s.title} onClick={()=>requestReset(s.stage_no)} disabled={resetBusy}><RotateCcw size={17} strokeWidth={1.9} aria-hidden="true"/></button>}
        </div>
       </div>
      </article>;
@@ -158,6 +194,24 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
    </div>}
   </section>
 
+
+  {resetTarget!==null&&teacher&&!readOnly&&<div className="stageResetBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!resetBusy)setResetTarget(null)}}>
+   <section className="stageResetDialog" ref={resetDialogRef} role="alertdialog" aria-modal="true" aria-labelledby="stage-reset-title" aria-describedby="stage-reset-description" tabIndex={-1}>
+    <div className="stageResetDialogIcon"><TriangleAlert size={25} strokeWidth={1.9} aria-hidden="true"/></div>
+    <h2 id="stage-reset-title">{resetIsAll?'Сбросить все этапы?':'Сбросить этап '+resetTarget+'?'}</h2>
+    <p id="stage-reset-description">{resetIsAll
+     ?'Все 16 этапов вернутся в закрытое состояние. Текущий этап будет сброшен, а игровой таймер остановится.'
+     :'Статус, дата открытия, дата завершения и дедлайн этапа «'+(resetStageRecord?.title||'')+'» будут очищены. Если это текущий этап, игровой таймер остановится.'}</p>
+    <div className="stageResetKeep"><BookOpenText size={17} aria-hidden="true"/><span>Документы, результаты голосований, действия студентов и оценки сохранятся. Сброс касается только статусов и сроков этапов.</span></div>
+    {resetIsAll&&<label className="stageResetConfirmLabel">Для подтверждения введите <strong>СБРОСИТЬ</strong>
+     <input type="text" value={resetConfirmation} onChange={e=>setResetConfirmation(e.target.value)} autoComplete="off" spellCheck={false} placeholder="СБРОСИТЬ" disabled={resetBusy}/>
+    </label>}
+    <div className="stageResetDialogActions">
+     <button type="button" className="stageResetCancel" disabled={resetBusy} onClick={()=>{setResetTarget(null);setResetConfirmation('')}}>Отмена</button>
+     <button type="button" className="stageResetConfirm" disabled={!canConfirmReset} onClick={()=>void confirmReset()}>{resetBusy?'Выполняется…':resetIsAll?'Сбросить все этапы':'Сбросить этап'}</button>
+    </div>
+   </section>
+  </div>}
   {selected&&detail&&<div className="stageModalBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}>
    <section ref={dialogRef} tabIndex={-1} className="stageDetailPanel" role="dialog" aria-modal="true" aria-labelledby="stage-detail-title">
     <header className="stageDetailHeader">
