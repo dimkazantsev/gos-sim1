@@ -4,6 +4,7 @@ import {useMemo,useState,type CSSProperties} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {PartyDocument} from './types';
 import MediaUploadButton from './MediaUploadButton';
+import StyledSelect from '../ui/StyledSelect';
 
 const DOCS:{kind:PartyDocument['doc_kind'];title:string;rule:string}[]=[
  {kind:'application',title:'Заявление о регистрации',rule:'Пункт а ст. 16 95-ФЗ'},
@@ -102,11 +103,11 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
    {ledParty&&<details className="agreementComposer">
     <summary><div><b>Предложить сделку другой фракции</b><span>Можно сделать соглашение общим или привязать к конкретному открытому голосованию</span></div><i>+</i></summary>
     <div className="agreementComposerBody">
-     <label>Контрагент<select value={agreementParty} onChange={e=>setAgreementParty(e.target.value)}><option value="">Выберите фракцию…</option>{parties.filter(p=>p.id!==ledParty.id).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+     <StyledSelect label="Контрагент" value={agreementParty} onChange={setAgreementParty} options={[{value:'',label:'Выберите фракцию…'},...parties.filter(p=>p.id!==ledParty.id).map(p=>({value:p.id,label:p.name}))]}/>
      <label>Название сделки<input value={agreementTitle} onChange={e=>setAgreementTitle(e.target.value)} placeholder="Например: поддержка модели ИС в обмен на региональную договорённость"/></label>
      <label className="agreementTerms">Условия<textarea rows={4} value={agreementTerms} onChange={e=>setAgreementTerms(e.target.value)} placeholder="Что именно обещает каждая сторона, в какой момент и ради какого обмена?"/></label>
-     <label>Связанное голосование<select value={agreementVote} onChange={e=>setAgreementVote(e.target.value)}><option value="">Без привязки</option>{factionVotes.map(v=><option key={v.id} value={v.id}>{v.stage_no}. {v.title}</option>)}</select></label>
-     {agreementVote&&<><label>Наша обещанная позиция<select value={myPromise} onChange={e=>setMyPromise(e.target.value as ''|'yes'|'no')}><option value="">Не фиксировать</option><option value="yes">За</option><option value="no">Против</option></select></label><label>Позиция партнёра<select value={theirPromise} onChange={e=>setTheirPromise(e.target.value as ''|'yes'|'no')}><option value="">Не фиксировать</option><option value="yes">За</option><option value="no">Против</option></select></label></>}
+     <StyledSelect label="Связанное голосование" value={agreementVote} onChange={setAgreementVote} options={[{value:'',label:'Без привязки'},...factionVotes.map(v=>({value:v.id,label:v.stage_no+'. '+v.title}))]}/>
+     {agreementVote&&<><StyledSelect label="Наша обещанная позиция" value={myPromise} onChange={v=>setMyPromise(v as ''|'yes'|'no')} options={[{value:'',label:'Не фиксировать'},{value:'yes',label:'За'},{value:'no',label:'Против'}]}/><StyledSelect label="Позиция партнёра" value={theirPromise} onChange={v=>setTheirPromise(v as ''|'yes'|'no')} options={[{value:'',label:'Не фиксировать'},{value:'yes',label:'За'},{value:'no',label:'Против'}]}/></>}
      <button className="primary" disabled={busy||!agreementParty||agreementTitle.trim().length<3||agreementTerms.trim().length<10} onClick={async()=>{setBusy(true);const ok=await proposePartyAgreement({counterpartyPartyId:agreementParty,title:agreementTitle.trim(),terms:agreementTerms.trim(),targetVoteId:agreementVote||null,proposerChoice:myPromise||null,counterpartyChoice:theirPromise||null});setBusy(false);if(ok){setAgreementTitle('');setAgreementTerms('');setAgreementVote('');setMyPromise('');setTheirPromise('')}}}>Отправить соглашение →</button>
     </div>
    </details>}
@@ -177,7 +178,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
     <div className="mandateMath"><b>{selected.mandates} мандатов ÷ {Math.max(1,partyMembers.length)} студентов</b><span>Система распределяет целые блоки максимально поровну; разница между участниками не превышает одного мандата.</span></div>
 
     {teacher&&<div className="partyTeacherControl">
-     <label>Руководитель партии<select value={selected.leader_user_id||''} onChange={e=>{if(e.target.value)void setPartyLeader(selected.id,e.target.value)}}><option value="">Назначить руководителя…</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}{m.team?' · '+m.team:''}</option>)}</select></label>
+     <StyledSelect label="Руководитель партии" value={selected.leader_user_id||''} onChange={v=>{if(v)void setPartyLeader(selected.id,v)}} options={[{value:'',label:'Назначить руководителя…'},...members.filter(m=>m.kind==='student').map(m=>({value:m.user_id,label:m.full_name+(m.team?' · '+m.team:'')}))]}/>
      <label>Мандаты партии<input key={selected.id+'-'+selected.mandates} type="number" min="0" max="450" defaultValue={selected.mandates} onBlur={e=>void setPartyMandates(selected.id,Math.max(0,Math.min(450,Number(e.target.value)||0)))}/></label>
      <label>Ручная потеря GV<input type="number" min="25" max="50" value={ghostLoss} onChange={e=>setGhostLoss(Math.max(25,Math.min(50,Number(e.target.value)||25)))}/></label>
      <button className="secondary" disabled={selected.mandates<=0} onClick={()=>void applyPartyGhostLoss(selected.id,ghostLoss)}>Применить вручную</button>
@@ -185,7 +186,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
 
     {(isLeader||teacher)&&<div className="partyInviteManager">
      <div><small>НАБОР В ПАРТИЮ</small><h3>Пригласить студента</h3><p>Доступны только студенты, которые ещё не состоят ни в одной партии.</p></div>
-     <div className="partyInviteComposer"><select aria-label="Студент для приглашения" value={inviteUser} onChange={e=>setInviteUser(e.target.value)}><option value="">Выберите студента…</option>{freeStudents.map(s=><option key={s.user_id} value={s.user_id}>{s.full_name} · {s.group_name||'без группы'}</option>)}</select><button className="primary" disabled={!inviteUser||busy} onClick={invite}>Отправить приглашение</button></div>
+     <div className="partyInviteComposer"><StyledSelect label="Студент для приглашения" value={inviteUser} onChange={setInviteUser} options={[{value:'',label:'Выберите студента…'},...freeStudents.map(s=>({value:s.user_id,label:s.full_name+' · '+(s.group_name||'без группы')}))]}/><button className="primary" disabled={!inviteUser||busy} onClick={invite}>Отправить приглашение</button></div>
      {pendingForSelected.length>0&&<div className="pendingInvites">{pendingForSelected.map(inv=>{const s=members.find(m=>m.user_id===inv.invited_user_id);return <div key={inv.id}><span>○</span><b>{s?.full_name||'Студент'}</b><small>Ожидается ответ</small><button onClick={()=>void cancelPartyInvitation(inv.id)}>Отменить</button></div>})}</div>}
     </div>}
    </article>
@@ -201,7 +202,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
    <div className="requiredDocs">
     {DOCS.map(req=>{const d=docs.find(x=>x.doc_kind===req.kind);return <article className={d?'requiredDoc complete':'requiredDoc'} key={req.kind}><div className="docState">{d?'✓':'○'}</div><div><b>{req.title}</b><span>{req.rule}</span>{d&&<a href={d.url||'#'} target="_blank" rel="noreferrer">{d.file_name}</a>}</div>{d&&<em className={`docReview ${d.status}`}>{d.status==='accepted'?'Принято':d.status==='revision'?'На доработку':'Загружено'}</em>}</article>})}
    </div>
-   {canEditIdentity&&<div className="partyUpload surface"><div><small>ЗАГРУЗИТЬ ДОКУМЕНТ</small><h3>Добавить в партийное дело</h3></div><select aria-label="Тип партийного документа" value={docKind} onChange={e=>setDocKind(e.target.value as PartyDocument['doc_kind'])}>{DOCS.map(x=><option key={x.kind} value={x.kind}>{x.title}</option>)}</select><input aria-label="Название партийного документа" value={docTitle} onChange={e=>setDocTitle(e.target.value)} placeholder="Название документа"/><label className="filePicker">Выбрать файл<input type="file" accept=".pdf,.doc,.docx,.txt,image/jpeg,image/png,image/webp" onChange={e=>setDocFile(e.target.files?.[0]||null)}/></label><button className="primary" disabled={!docFile||busy} onClick={uploadDoc}>{busy?'Загрузка…':'Загрузить'}</button></div>}
+   {canEditIdentity&&<div className="partyUpload surface"><div><small>ЗАГРУЗИТЬ ДОКУМЕНТ</small><h3>Добавить в партийное дело</h3></div><StyledSelect label="Тип партийного документа" value={docKind} onChange={v=>setDocKind(v as PartyDocument['doc_kind'])} options={DOCS.map(x=>({value:x.kind,label:x.title}))}/><input aria-label="Название партийного документа" value={docTitle} onChange={e=>setDocTitle(e.target.value)} placeholder="Название документа"/><label className="filePicker">Выбрать файл<input type="file" accept=".pdf,.doc,.docx,.txt,image/jpeg,image/png,image/webp" onChange={e=>setDocFile(e.target.files?.[0]||null)}/></label><button className="primary" disabled={!docFile||busy} onClick={uploadDoc}>{busy?'Загрузка…':'Загрузить'}</button></div>}
    {teacher&&docs.length>0&&<div className="surface partyReview"><div className="surfaceHead"><div><small>МИНЮСТ РФ · ИГРОВАЯ РОЛЬ</small><h2>Рассмотрение документов</h2></div></div>{docs.map(d=><div className="reviewRow" key={d.id}><div><b>{d.title}</b><span>{d.file_name}</span></div><a href={d.url||'#'} target="_blank" rel="noreferrer">Открыть</a><button onClick={()=>reviewPartyDocument(d.id,'accepted')}>✓ Принять</button><button onClick={()=>reviewPartyDocument(d.id,'revision')}>↺ На доработку</button></div>)}</div>}
   </section>}
 
