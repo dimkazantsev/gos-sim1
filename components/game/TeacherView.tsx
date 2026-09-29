@@ -31,7 +31,7 @@ const WORKSPACES=[
 
 export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void}){
  const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
- const [eventTitle,setEventTitle]=useState(''),[eventBody,setEventBody]=useState('');
+
  const [workspace,setWorkspace]=useState<Workspace>(initialWorkspace);
 
  const studentIds=useMemo(()=>new Set(members.filter(m=>m.kind!=='teacher').map(m=>m.user_id)),[members]);
@@ -43,7 +43,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
  const firstPending=[...pending].sort((a,b)=>new Date(a.submitted_at).getTime()-new Date(b.submitted_at).getTime())[0];
  const onlineCount=members.filter(m=>m.kind==='student'&&presence.some(p=>p.user_id===m.user_id&&Date.now()-new Date(p.last_seen_at).getTime()<90000)).length;
 
- async function publish(){if(await publishEvent(eventTitle,eventBody)){setEventTitle('');setEventBody('')}}
+
  function confirmNext(){if(window.confirm('Перейти к следующему этапу? Проверьте индикатор процедурной готовности выше: переход остаётся ручным и может быть выполнен даже при незавершённых процедурах.'))void nextStage()}
  function confirmCrisis(){if(window.confirm('Разыграть случайный кризис для всей аудитории?'))void triggerCrisis()}
  function confirmGhost(){if(window.confirm('Запустить ghost voting?'))void ghostVoting()}
@@ -142,7 +142,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
 
     {workspace==='tools'&&<>
     <details className="teacherDetails" open>
-   <summary><div><b>Быстрые сценарии и события</b><span>Таймер, кризис, ghost voting, публикация события</span></div><i>+</i></summary>
+   <summary><div><b>Быстрые инструменты</b><span>Таймер, кризис и Ghost Voting; публикации доступны в политических процессах</span></div><i>+</i></summary>
    <div className="teacherDetailsBody">
     <div className="directorButtons compact">
      {[10,20,30,60].map(n=><button key={n} onClick={()=>setTurnMinutes(n)}><span><Clock3 size={21} strokeWidth={1.8}/></span><b>Ход на {n} минут</b></button>)}
@@ -152,14 +152,14 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
      <button onClick={exportSession}><span><Download size={22} strokeWidth={1.8}/></span><b>Экспорт журнала</b></button>
     </div>
     <TeacherGhostVotingPanel g={g}/>
-    <div className="eventComposer"><input aria-label="Заголовок события" value={eventTitle} onChange={e=>setEventTitle(e.target.value)} placeholder="Заголовок события"/><textarea aria-label="Описание события" rows={4} value={eventBody} onChange={e=>setEventBody(e.target.value)} placeholder="Что произошло?"/><button className="primary" onClick={publish}>Опубликовать всем</button></div>
+
    </div>
   </details>
 
   <details className="teacherDetails">
-   <summary><div><b>Роли и показатели</b><span>Игровые роли и KPI государства; журнал ВСН расположен выше</span></div><i>+</i></summary>
+   <summary><div><b>Игровые роли</b><span>Назначение должностей участникам; ручная корректировка рейтингов находится в модели последствий</span></div><i>+</i></summary>
    <div className="teacherDetailsBody split">
-    <div><h3>Показатели государства</h3><div className="metricEditor">{metrics.map(m=><label key={m.id}><span>{m.label}</span><input key={m.id+String(m.value)} type="number" defaultValue={m.value} onBlur={e=>updateMetric(m.id,+e.target.value)}/><em>{m.unit||''}</em></label>)}</div></div>
+    
     <div><h3>Игровые роли</h3><div className="evaluationRows">{members.filter(m=>m.kind!=='teacher').map(m=><div key={m.user_id}><div className="studentIdentity"><b>{m.full_name}</b><input key={m.user_id+(m.role_title||'')} defaultValue={m.role_title||''} onBlur={e=>updateMember(m.user_id,{role_title:e.target.value})} aria-label="Игровая роль участника" placeholder="Игровая роль"/></div></div>)}</div></div>
    </div>
   </details>
