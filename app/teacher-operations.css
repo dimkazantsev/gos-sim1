@@ -220,3 +220,8 @@
  .teacherCommand .teacherOverviewStats article{min-height:95px;padding:12px}
  .teacherCommand .teacherOverviewStats strong{font-size:23px}
 }
+
+.teacherCommand .teacherStageExpandedActions{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:10px}
+.teacherCommand .teacherStageReadinessDetail .teacherStageExpandedActions button{margin:0;flex:1 1 125px}
+.teacherCommand .teacherStageReadinessDetail .teacherStageExpandedActions .teacherStageLaunch{border-color:#bddbbf;background:#eff9f1;color:#267750}
+.journalError{margin:0;color:#a64953;font-size:12px;font-weight:700}
