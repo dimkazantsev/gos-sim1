@@ -1150,80 +1150,123 @@ button,input,textarea,select{font-size:14px}
 @media(max-width:650px){.crisisRoleGrid,.crisisRoleComposer{grid-template-columns:1fr}.crisisRoleComposer>button{grid-column:auto}}
 
 
-/* Desktop stage map: readable iconography and a single clear action hierarchy. */
-.stageTimeline{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:stretch}
-.stageCard{
- display:flex;flex-direction:column;min-width:0;min-height:244px;padding:0;overflow:hidden;
- border:1px solid #dce5f0;border-radius:20px;background:#fff;box-shadow:0 7px 24px rgba(14,37,69,.045)
+/* Stage map: a shared baseline for status, voting and the detail action.
+   Scoped to this page so the rest of the application keeps its own card rules. */
+.stagesPage .stageTimeline{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch
 }
-.stageCard:hover{transform:translateY(-2px);border-color:#bfd0e6;box-shadow:0 15px 34px rgba(14,37,69,.085)}
-.stageCard.open{border-color:#a5c0f2;background:linear-gradient(145deg,#fff,#f5f8ff);box-shadow:0 12px 34px rgba(49,94,251,.10)}
-.stageCard.completed{background:#fff}
-.stageCardPrimary{
- display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;width:100%;padding:18px;
- border:0;border-radius:inherit;background:transparent;color:inherit;text-align:left;cursor:pointer
+.stagesPage .stageCard{
+ display:flex;flex-direction:column;min-width:0;min-height:290px;gap:0;
+ padding:0;overflow:hidden;border:1px solid #d9e3ef;border-radius:20px;
+ background:#fff;box-shadow:0 6px 22px rgba(15,38,73,.045);
+ transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease
 }
-.stageCardPrimary:focus-visible,.stageVoteQuick:focus-visible,.stagePhaseTrack button:focus-visible,.stageModalVoteAction:focus-visible{
- outline:3px solid #4c76e6;outline-offset:-3px
+.stagesPage .stageCard:hover{transform:translateY(-2px);border-color:#b9cce5;box-shadow:0 15px 35px rgba(15,38,73,.09)}
+.stagesPage .stageCard.open{border-color:#98b9ed;background:linear-gradient(145deg,#fff,#f7faff);box-shadow:0 11px 30px rgba(49,94,251,.09)}
+.stagesPage .stageCard.completed{background:#fff}
+.stagesPage .stageCardPrimary{
+ display:block;flex:1 0 auto;min-width:0;width:100%;padding:20px 20px 0;
+ border:0;border-radius:0;background:transparent;color:inherit;text-align:left;cursor:pointer
 }
-.stageCardTop{display:grid;grid-template-columns:54px minmax(0,1fr);gap:13px;align-items:start;width:100%;min-width:0}
-.stageCard .stageNo{
- display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
- width:54px;height:59px;min-height:59px;border-radius:15px;background:#edf2fa;color:#405b7e
+.stagesPage .stageCardPrimary:focus-visible,
+.stagesPage .stageCardOpen:focus-visible,
+.stagesPage .stageVoteQuick:focus-visible,
+.stagesPage .stagePhaseTrack button:focus-visible,
+.stagesPage .stageModalVoteAction:focus-visible{
+ position:relative;z-index:1;outline:3px solid #3566cc;outline-offset:-4px
 }
-.stageCard .stageNo svg{flex:none}.stageCard .stageNo span{font-size:12px;line-height:1;font-weight:850;color:inherit;margin:0;letter-spacing:.07em}
-.stageCard.open .stageNo{background:#e4edff;color:#285fd5}
-.stageCard.completed .stageNo{background:#e8f5ed;color:#22744f}
-.stageCardBody{min-width:0;width:100%}
-.stageCardBody small{display:block;margin:1px 0 6px;font-size:11px;line-height:1.25;letter-spacing:.075em;color:#70849e;font-weight:850;text-transform:uppercase}
-.stageCardBody h3{margin:0 0 8px;font-size:16px;line-height:1.34;letter-spacing:-.02em;color:#192f4f;overflow-wrap:anywhere}
-.stageCardBody p{margin:0;color:#61748d;font-size:13px;line-height:1.58;-webkit-line-clamp:3}
-.stageCardFooter{display:flex;flex-direction:column;align-items:stretch;gap:13px;width:100%;margin-top:auto;padding-top:17px}
-.stageCard .stageMeta{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0}
-.stageStatusPill,.stageDeadlinePill,.stageVotePill{
- display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:29px;max-width:100%;
- padding:5px 10px;border:1px solid #dfe6ef;border-radius:9px;background:#f1f4f8;
- color:#5e7089;font-size:12px;font-weight:800;line-height:1.2;white-space:normal
+.stagesPage .stageCardTop{
+ display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;align-items:start;
+ min-width:0;width:100%
 }
-.stageStatusPill svg,.stageDeadlinePill svg,.stageVotePill svg{flex:none}
-.stageStatusPill--open{background:#eaf0ff;border-color:#d6e2ff;color:#2b5db8}
-.stageStatusPill--completed{background:#e9f6ef;border-color:#cee8d9;color:#22744f}
-.stageStatusPill--locked{background:#f1f4f8;border-color:#e3e8ef;color:#6d7d92}
-.stageDeadlinePill{background:#fff;border-color:#e1e8f0;color:#60738d;font-variant-numeric:tabular-nums}
-.stageVotePill.isOpen{background:#fff2df;border-color:#f0d6aa;color:#96601c}
-.stageCardOpen{
- display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:39px;
- padding:0 12px;border:1px solid #d7e3f7;border-radius:11px;background:#eef4ff;
- color:#2a5dc5;font-size:13px;font-weight:850;transition:background .16s,border-color .16s
+.stagesPage .stageCard .stageNo{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+ width:52px;height:58px;min-height:58px;border-radius:14px;background:#eef3fa;color:#49627f
 }
-.stageCardPrimary:hover .stageCardOpen{background:#dfeaff;border-color:#b5caf3}
-.stageCardOpen svg{flex:none;transition:transform .16s}
-.stageCardPrimary:hover .stageCardOpen svg{transform:translateX(3px)}
-.stageVoteQuick{
- display:flex;align-items:center;justify-content:space-between;gap:9px;width:100%;min-height:47px;
- padding:11px 18px;border:0;border-top:1px solid #eddfc5;background:#fff8ec;
- color:#915916;font-size:12px;font-weight:850;text-align:left;cursor:pointer
+.stagesPage .stageCard .stageNo svg{display:block;width:22px;height:22px;flex:none}
+.stagesPage .stageCard .stageNo span{
+ display:block;margin:0;font-size:12px;font-weight:850;line-height:1;letter-spacing:.045em;color:inherit
 }
-.stageVoteQuick>svg{flex:none}.stageVoteQuick>span{flex:1}.stageVoteQuick:hover{background:#fff0d4}
-.stageDetailHeader{grid-template-columns:58px minmax(0,1fr) auto;align-items:start}
-.stageDetailHeader>div:nth-child(2){min-width:0}
-.stageDetailBadge{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
-.stageDetailBadge span{font-size:12px;line-height:1;letter-spacing:.06em;font-weight:850}
-.stageDetailStatus{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-.stageRulesCalloutIcon{display:grid;place-items:center}
-.stageModalVoteAction{display:inline-flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;min-height:44px}
-@media(min-width:1450px){.stageTimeline{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(min-width:701px) and (max-width:1179px){.stageTimeline{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stagesPage .stageCard.open .stageNo{background:#e4edff;color:#285ec8}
+.stagesPage .stageCard.completed .stageNo{background:#e8f5ed;color:#22744f}
+.stagesPage .stageCardBody{display:flex;flex-direction:column;min-width:0;width:100%}
+.stagesPage .stageCardMode{
+ display:block;margin:1px 0 8px;color:#71829a;font-size:12px;font-weight:800;
+ letter-spacing:.065em;line-height:1.28;text-transform:uppercase;overflow-wrap:anywhere
+}
+.stagesPage .stageCardTitle{
+ display:block;color:#193655;font-size:17px;font-weight:850;line-height:1.34;
+ letter-spacing:-.025em;overflow-wrap:anywhere
+}
+.stagesPage .stageCardSummary{
+ display:-webkit-box;margin:10px 0 0;color:#5f738c;font-size:13px;
+ font-weight:450;line-height:1.56;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:3
+}
+.stagesPage .stageCardFooter{
+ display:flex;flex-direction:column;gap:10px;width:100%;margin-top:auto;padding:16px 20px 18px
+}
+.stagesPage .stageCardFooterExtras{
+ display:flex;gap:7px;align-items:center;flex-wrap:wrap;align-content:center;min-height:36px
+}
+.stagesPage .stageCardFooterRow{
+ display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;min-height:40px
+}
+.stagesPage .stageStatusPill,
+.stagesPage .stageDeadlinePill,
+.stagesPage .stageVotePill{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:34px;
+ max-width:100%;padding:0 11px;border:1px solid #dfe6ef;border-radius:10px;
+ background:#f2f5f8;color:#5f7088;font-size:13px;font-weight:800;line-height:1.15;white-space:nowrap
+}
+.stagesPage .stageStatusPill svg,
+.stagesPage .stageDeadlinePill svg,
+.stagesPage .stageVotePill svg{display:block;flex:none}
+.stagesPage .stageStatusPill--open{background:#e9f0ff;border-color:#d3e1ff;color:#2b5db8}
+.stagesPage .stageStatusPill--completed{background:#ebf6ef;border-color:#cee9d8;color:#1f7651}
+.stagesPage .stageStatusPill--locked{background:#f1f4f8;border-color:#e1e8ef;color:#69798e}
+.stagesPage .stageDeadlinePill{background:#fff;border-color:#e1e8f0;color:#60738d;font-variant-numeric:tabular-nums}
+.stagesPage .stageVotePill.isOpen{background:#fff3e2;border-color:#efdab9;color:#895b20}
+.stagesPage .stageVoteQuick{
+ display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;
+ width:auto;margin:0;padding:0 10px;border:1px solid #eecf9d;border-radius:10px;
+ background:#fff5e6;color:#87591b;font-size:12px;font-weight:850;white-space:nowrap;cursor:pointer;
+ transition:background .16s,border-color .16s
+}
+.stagesPage .stageVoteQuick:hover{background:#ffecca;border-color:#dcb477}
+.stagesPage .stageVoteQuick svg{display:block;flex:none}
+.stagesPage .stageCardOpen{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;
+ width:auto;margin:0;padding:0 12px;border:1px solid #d7e3f7;border-radius:10px;
+ background:#eef4ff;color:#285bb6;font-size:13px;font-weight:850;line-height:1;white-space:nowrap;
+ cursor:pointer;transition:background .16s,border-color .16s
+}
+.stagesPage .stageCardOpen svg{display:block;flex:none;transition:transform .16s}
+.stagesPage .stageCardOpen:hover,.stagesPage .stageCardPrimary:hover~.stageCardFooter .stageCardOpen{
+ background:#dfeaff;border-color:#b5caf3
+}
+.stagesPage .stageCardOpen:hover svg{transform:translateX(3px)}
+.stagesPage .stageDetailHeader{grid-template-columns:58px minmax(0,1fr) auto;align-items:start}
+.stagesPage .stageDetailHeader>div:nth-child(2){min-width:0}
+.stagesPage .stageDetailBadge{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.stagesPage .stageDetailBadge span{font-size:12px;line-height:1;font-weight:850;letter-spacing:.045em}
+.stagesPage .stageDetailStatus{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.stagesPage .stageRulesCalloutIcon{display:grid;place-items:center}
+.stagesPage .stageModalVoteAction{display:inline-flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;min-height:44px}
+@media(min-width:1600px){.stagesPage .stageTimeline{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:701px) and (max-width:1179px){.stagesPage .stageTimeline{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){
- .stageTimeline{grid-template-columns:1fr;gap:10px}
- .stageCard{min-height:0;border-radius:17px}
- .stageCardPrimary{padding:15px}
- .stageCardTop{grid-template-columns:48px minmax(0,1fr);gap:11px}
- .stageCard .stageNo{width:48px;height:54px;min-height:54px;border-radius:13px}
- .stageCardFooter{gap:10px;padding-top:13px}
- .stageVoteQuick{padding:11px 15px}
- .stageDetailHeader{grid-template-columns:48px minmax(0,1fr) auto}
+ .stagesPage .stageTimeline{grid-template-columns:1fr;gap:10px}
+ .stagesPage .stageCard{min-height:0;border-radius:17px}
+ .stagesPage .stageCardPrimary{padding:15px 15px 0}
+ .stagesPage .stageCardTop{grid-template-columns:48px minmax(0,1fr);gap:11px}
+ .stagesPage .stageCard .stageNo{width:48px;height:54px;min-height:54px;border-radius:13px}
+ .stagesPage .stageCardFooter{padding:14px 15px 15px}
+ .stagesPage .stageDetailHeader{grid-template-columns:48px minmax(0,1fr) auto}
 }
-@media(prefers-reduced-motion:reduce){.stageCardOpen svg{transition:none}.stageCardPrimary:hover .stageCardOpen svg{transform:none}}
+@media(prefers-reduced-motion:reduce){
+ .stagesPage .stageCard,.stagesPage .stageCardOpen svg{transition:none}
+ .stagesPage .stageCard:hover{transform:none}
+ .stagesPage .stageCardOpen:hover svg{transform:none}
+}
 
 }
