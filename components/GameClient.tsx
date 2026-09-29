@@ -111,6 +111,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   setTurnMinutes:blockedVoid,
   openStage:blockedVoid,
   nextStage:blockedVoid,
+  resetStageProgress:blocked as typeof g.resetStageProgress,
   setStageDeadline:blockedVoid,
   submitAction:blocked as typeof g.submitAction,
   judgeAction:blockedVoid,
