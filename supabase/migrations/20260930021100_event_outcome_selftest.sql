@@ -1,6 +1,6 @@
 create or replace function private.test_curated_event_outcomes()
 returns jsonb language plpgsql security definer set search_path=public,private,pg_temp as $$
-declare teacher_user uuid;student_user uuid;g uuid;c uuid;a uuid;d jsonb;value_now numeric;report_count int;result jsonb;
+declare teacher_user uuid;student_user uuid;g uuid;c uuid;a uuid;d jsonb;value_now numeric;value_before numeric;report_count int;result jsonb;
 begin
  select user_id into teacher_user from public.game_members where kind='teacher' limit 1;
  select user_id into student_user from public.game_members where kind='teacher' and user_id<>teacher_user limit 1;
@@ -16,10 +16,11 @@ begin
   if c is null then raise exception 'Missing curated case';end if;
   insert into public.event_assignments(game_id,case_id,recipient_id,created_by)
    values(g,c,student_user,teacher_user) returning id into a;
+  select value into value_before from public.state_metrics where game_id=g and metric_key='public_trust';
   perform set_config('request.jwt.claim.sub',student_user::text,true);
   perform public.submit_event_decision(a,'option_1','Проверка положительного сценария');
   select value into value_now from public.state_metrics where game_id=g and metric_key='public_trust';
-  if value_now<>62 then raise exception 'Wrong event trust after option_1: %',value_now;end if;
+  if value_now<>value_before+2 then raise exception 'Wrong event trust after option_1: %',value_now;end if;
   if (select count(*) from public.event_case_outcomes where case_id=c and winner='option_1' and trust_delta=2)<>1 then raise exception 'Missing event outcome';end if;
   select count(*) into report_count from public.political_posts where game_id=g and internal_ref_id=c::text and actor_key='media';
   if report_count<>1 then raise exception 'Expected one media report, got %',report_count;end if;
