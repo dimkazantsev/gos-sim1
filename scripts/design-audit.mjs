@@ -21,29 +21,56 @@ for(const [name,source] of Object.entries(css)){
  const unknown=[];root.walkDecls(d=>{for(const match of d.value.matchAll(/var\((--gs-[\w-]+)/g))if(!(match[1] in tokens))unknown.push(match[1])});
  check(`${name}: all design tokens resolve`,unknown.length===0);
 }
-for(const name of ['globals','landing','sim-shell','sim-panels','public-screen','stage-map']){const root=postcss.parse(read(`app/${name}.css`),{from:`app/${name}.css`});check(`${name}: inherited CSS parsed`,root.nodes.length>0);}
+for(const name of ['globals','landing','sim-shell','sim-panels','public-screen','stage-map','teacher-command','teacher-operations']){const root=postcss.parse(read(`app/${name}.css`),{from:`app/${name}.css`});check(`${name}: inherited CSS parsed`,root.nodes.length>0);}
 const teacherSource=read('components/game/TeacherView.tsx');
 const stageManager=read('components/game/TeacherStageManager.tsx');
 const teacherCss=read('app/teacher-command.css');
-check('Teacher command CSS is the last loaded stylesheet in production and preview',
- read('app/layout.tsx').includes("import './teacher-command.css';")&&
- read('scripts/design-preview.cjs').includes("'stage-map','teacher-command'"));
-check('Teacher dashboard exposes 16 individual stage reset icons and guarded bulk reset',
+const operationsCss=read('app/teacher-operations.css');
+const activityJournal=read('components/game/ClassroomJournal.tsx');
+const analyticsSource=read('components/game/ParticipantsAnalytics.tsx');
+const gradesSource=read('components/game/GradesView.tsx');
+const profileSource=read('components/game/ProfileView.tsx');
+const layoutSource=read('app/layout.tsx');
+const previewSourceTeacher=read('scripts/design-preview.cjs');
+check('Operations stylesheet loaded after teacher command styles in production and preview',
+ layoutSource.indexOf("import './teacher-operations.css';")>layoutSource.indexOf("import './teacher-command.css';")&&
+ previewSourceTeacher.includes("'teacher-command','teacher-operations'"));
+check('Eight upper navigation workspaces include stages, journal, analytics and grades',
+ teacherSource.includes('const WORKSPACES=[')&&
+ ["overview","stages","journal","analytics","grades","impact","parties","tools"].every(k=>teacherSource.includes("key:'"+k+"'"))&&
+ teacherSource.includes('className="teacherWorkspaceNav"')&&
+ teacherSource.includes("event.key==='ArrowRight'"));
+check('Teacher stage matrix integrates readiness and safe reset actions',
  teacherSource.includes('<TeacherStageManager')&&
- stageManager.includes("className=\\\"teacherStageReset\\\"")&&
- stageManager.includes("className=\\\"teacherResetAll\\\"")&&
+ stageManager.includes("supabase.rpc('get_game_readiness'")&&
+ stageManager.includes('className="teacherStageExpand"')&&
+ stageManager.includes('className="teacherStageReset"')&&
+ stageManager.includes('className="teacherResetAll"')&&
  stageManager.includes("confirmation.trim()==='СБРОСИТЬ'")&&
  stageManager.includes('role="alertdialog"'));
-check('Teacher dashboard has six focused workspaces and direct stage navigation',
- teacherSource.includes('const WORKSPACES=[')&&
- teacherSource.includes("key:'analytics'")&&
- teacherSource.includes("key:'impact'")&&
- teacherSource.includes('onOpenStage={onOpenStages}')&&
- read('components/GameClient.tsx').includes("onOpenStages={stageNo=>navigate('stages',{stageNo})}"));
-check('Teacher command selectors and keyboard access are present',
+check('Participant dashboard uses authoritative stage assessments and sortable measures',
+ teacherSource.includes('<ParticipantsAnalytics')&&
+ analyticsSource.includes("from('stage_assessments')")&&
+ analyticsSource.includes("sort==='surname'")&&
+ analyticsSource.includes("sort==='average'")&&
+ analyticsSource.includes('className="participantsTable"'));
+check('Assessment journal adds aggregate columns and teacher sorting',
+ gradesSource.includes('className="gradesToolbar"')&&
+ gradesSource.includes("gradeSort==='sum'")&&
+ gradesSource.includes("gradeSort==='surname'")&&
+ gradesSource.includes('className="gradeTotal"')&&
+ gradesSource.includes('className="gradesRulesCompact"'));
+check('Shared classroom journal honors privacy and profile-specific access',
+ teacherSource.includes("<ClassroomJournal g={g}/>")&&
+ profileSource.includes("showMyJournal&&<ClassroomJournal g={g}/>")&&
+ activityJournal.includes('teacher||a.actor_id===me?.user_id')&&
+ read('supabase/migrations/20260929152000_student_activity_journal.sql').includes("game_activity_student_own_read"));
+check('Teacher stage details remain linked to the source game routes',
+ read('components/GameClient.tsx').includes("onOpenStages={stageNo=>navigate('stages',{stageNo})}")&&
  teacherCss.includes('.teacherCommand .teacherStageGrid')&&
- teacherCss.includes('.teacherResetDialog')&&
- teacherSource.includes("event.key==='ArrowRight'"));
+ operationsCss.includes('.teacherCommand .teacherReadinessStatus'));
+check('Static preview renders stage, analytics, grade and journal teacher workspaces',
+ ['teacher-stages','teacher-journal','teacher-analytics','teacher-grades'].every(v=>previewSourceTeacher.includes("'"+v+"'")));
 const stagesView=read('components/game/StagesView.tsx');
 const stageSheet=read('app/stage-map.css');
 const previewSource=read('scripts/design-preview.cjs');
