@@ -91,8 +91,10 @@ async function main(){
  await ready();
  browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
  const desktop=await browser.newPage({viewport:{width:390,height:850}});
+ desktop.on('pageerror',err=>console.error('BROWSER PAGE ERROR:',String(err)));
+ desktop.on('console',msg=>{if(msg.type()==='error')console.error('BROWSER CONSOLE ERROR:',msg.text())});
  await desktop.goto(address);
- await desktop.waitForFunction(()=>document.body.dataset.uiReady==='yes');
+ await desktop.waitForFunction(()=>document.body.dataset.uiReady==='yes',null,{timeout:12000});
  await desktop.locator('.mobileDockItem').first().waitFor();
  for(const width of [320,360,390,430,768])await checkUnits(desktop,width);
  await desktop.setViewportSize({width:390,height:850});
@@ -127,7 +129,7 @@ async function main(){
  const touchContext=await browser.newContext({viewport:{width:390,height:850},isMobile:true,hasTouch:true,deviceScaleFactor:1});
  const touch=await touchContext.newPage();
  await touch.goto(address);
- await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
+ await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes',null,{timeout:12000});
  await touch.locator('.mobileDockItem').first().waitFor();
  await touch.evaluate(()=>localStorage.removeItem('dock-interaction-ci'));
  await touch.reload();
@@ -154,8 +156,8 @@ async function main(){
  await touch.screenshot({path:path.join(screens,'real-dragged-mobile.png')});
  await touchContext.close();
 }finally{
+ console.log('Next dev server output:',lines.join('').slice(-6000));
  if(browser)await browser.close();
- if(server?.exitCode!==null)console.log('Next dev server output:',lines.join('').slice(-5000));
  if(server){server.kill('SIGTERM');await sleep(1500)}
  fs.rmSync(route,{recursive:true,force:true});
 }
