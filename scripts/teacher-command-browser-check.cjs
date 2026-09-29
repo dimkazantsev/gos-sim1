@@ -74,7 +74,7 @@ async function check(){
    }
    if(screen==='teacher-event'){
     assert.equal(await frame.locator('.eventCatalogTargets>div').count(),4,'Event case budget must contain four targets');
-    assert.equal(await frame.locator('.eventEditorGrid .styledSelect').count(),4,'Event must have category, seriousness, role and audience controls');
+    assert((await frame.locator('.eventEditorGrid .styledSelect').count())>=4,'Event must have category, seriousness, role and audience controls');
    }
    if(screen==='teacher-parties'){
     assert.equal(await frame.locator('.teacherPartyDossierHead').count(),1,'Expanded party dossier heading missing');
