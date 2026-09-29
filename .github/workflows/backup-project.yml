@@ -1,6 +1,10 @@
 name: Full project backup
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/backup-project.yml'
   workflow_dispatch:
 
 permissions:
