@@ -2,6 +2,7 @@
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {Activity,ArrowDownWideNarrow,Download,Search,UsersRound} from 'lucide-react';
+import StyledSelect from '../ui/StyledSelect';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 const VIEW_NAMES:Record<string,string>={
@@ -89,12 +90,13 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   </header>
   <div className="journalToolbar">
    <label className="journalSearch"><Search size={17} aria-hidden="true"/><input type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Поиск по журналу" aria-label="Поиск по журналу"/></label>
-   {teacher&&<label>Участник<select value={memberFilter} onChange={e=>setMemberFilter(e.target.value)}><option value="">Все участники</option>{studentMembers.map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>}
-   <label>Раздел<select value={viewFilter} onChange={e=>setViewFilter(e.target.value)}><option value="">Все разделы</option>{uniqueViews.map(v=><option key={v} value={v}>{VIEW_NAMES[v]||v}</option>)}</select></label>
-   <label><ArrowDownWideNarrow size={15} aria-hidden="true"/>Сортировка<select value={sort} onChange={e=>setSort(e.target.value as Sort)}>
-    <option value="recent">Новые сначала</option><option value="oldest">Старые сначала</option>
-    {teacher&&<><option value="surname">По фамилии</option><option value="name">По имени</option><option value="online">Онлайн сначала</option></>}
-   </select></label>
+   {teacher&&<StyledSelect label="Участник" value={memberFilter} onChange={setMemberFilter}
+    options={[{value:'',label:'Все участники'},...studentMembers.map(m=>({value:m.user_id,label:m.full_name}))]}/>}
+   <StyledSelect label="Раздел" value={viewFilter} onChange={setViewFilter}
+    options={[{value:'',label:'Все разделы'},...uniqueViews.map(v=>({value:v,label:VIEW_NAMES[v]||v}))]}/>
+   <StyledSelect label="Сортировка" value={sort} onChange={v=>setSort(v as Sort)}
+    options={[{value:'recent',label:'Новые сначала'},{value:'oldest',label:'Старые сначала'},...(teacher?[
+     {value:'surname',label:'По фамилии'},{value:'name',label:'По имени'},{value:'online',label:'Онлайн сначала'}]:[])]}/>
    {teacher&&<label className="journalCheck"><input type="checkbox" checked={onlyOnline} onChange={e=>setOnlyOnline(e.target.checked)}/> Только онлайн</label>}
    {teacher&&<label className="journalCheck"><input type="checkbox" checked={scope==='mine'} onChange={e=>setScope(e.target.checked?'mine':'all')}/> Мои действия</label>}
   </div>
