@@ -23,6 +23,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
  const allocation=party?partyMandates.find(x=>x.party_id===party.id&&x.user_id===target?.user_id):undefined;
  const pendingInvites=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  const [bio,setBio]=useState(targetProfile?.bio||'');
+ const [fullName,setFullName]=useState(target?.full_name||'');
  const [gender,setGender]=useState<'male'|'female'|'unspecified'>(targetProfile?.gender||'unspecified');
  const [photoBusy,setPhotoBusy]=useState(false);
  const [photoPreview,setPhotoPreview]=useState('');
@@ -31,7 +32,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
  const [publicStats,setPublicStats]=useState<PublicStats|null>(null);
  const photoInput=useRef<HTMLInputElement>(null);
  const initials=useMemo(()=>target?.full_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()||'Я',[target?.full_name]);
- useEffect(()=>{setBio(targetProfile?.bio||'');setGender(targetProfile?.gender||'unspecified')},[target?.user_id,targetProfile?.bio,targetProfile?.gender]);
+ useEffect(()=>{setFullName(target?.full_name||'');setBio(targetProfile?.bio||'');setGender(targetProfile?.gender||'unspecified')},[target?.user_id,targetProfile?.bio,targetProfile?.gender]);
 
  useEffect(()=>{
   if(!game||!target)return;
@@ -58,6 +59,10 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
  async function save(){
   if(!own||saving)return;
   setSaving(true);setSaved(false);
+  if(game&&me&&fullName.trim()!==me.full_name.trim()){
+   const identity=await supabase.rpc('update_my_game_identity',{p_game:game.id,p_full_name:fullName.trim(),p_gender:gender});
+   if(identity.error){g.setError(identity.error.message);setSaving(false);return}
+  }
   const ok=await saveProfile(bio,undefined,gender);
   setSaving(false);if(ok){setSaved(true)}
  }
@@ -133,7 +138,8 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
 
   <section className="profileGrid">
    {own&&<article className="surface profileEditor">
-    <div className="surfaceHead"><div><small>О СЕБЕ В ИГРЕ</small><h2>Игровая визитка</h2></div></div>
+    <div className="surfaceHead"><div><small>О СЕБЕ В ИГРЕ</small><h2>Игровая визитка</h2></div></div>{!targetProfile?.onboarding_completed_at&&<div className="profileOnboardingHint"><strong>Обязательная настройка профиля</strong><p>Для начала игры укажите ФИО, выберите пол, напишите краткое описание и загрузите подпись. Далее подтвердите электронную почту и установите пароль. После этого нажмите «Закончить настройку» в нижней панели.</p></div>}
+    <label className="profileFullNameField">Фамилия, имя и отчество<input autoComplete="name" value={fullName} onChange={e=>setFullName(e.target.value)} minLength={5} placeholder="Иванов Иван Иванович"/></label>
     <p className="profileHint">Опишите свою игровую должность, интересы и компетенции. Этот текст смогут прочитать другие участники.</p>
     <StyledSelect label="Пол для оформления аватара" value={gender} onChange={v=>setGender(v as typeof gender)} options={[{value:"unspecified",label:"Не указывать"},{value:"male",label:"Мужской"},{value:"female",label:"Женский"}]}/>
     <textarea aria-label="О себе в игре" rows={3} maxLength={350} value={bio} onChange={e=>{setBio(e.target.value);setSaved(false)}}
