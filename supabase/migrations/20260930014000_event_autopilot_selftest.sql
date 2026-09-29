@@ -28,7 +28,8 @@ begin
   insert into public.game_members(game_id,user_id,full_name,kind,role_title)
   values(new_game,owner_user,'Regression Student','student','Министр образования');
   insert into public.state_metrics(game_id,metric_key,label,value,unit,is_public)
-  values(new_game,'public_trust','Доверие граждан',60,'%',true);
+  values(new_game,'public_trust','Доверие граждан',60,'%',true)
+  on conflict(game_id,metric_key) do update set value=60;
   seeded:=private.seed_event_bank(new_game);
   if seeded<>12 then raise exception 'Expected 12 cases, received %',seeded;end if;
   insert into public.event_auto_settings(game_id,enabled,interval_hours,activity_weight,max_daily,trust_per_20,backlog_penalty)
