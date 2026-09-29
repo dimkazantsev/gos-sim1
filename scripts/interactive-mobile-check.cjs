@@ -136,13 +136,33 @@ async function main(){
  await touch.addStyleTag({content:'nextjs-portal{display:none!important;pointer-events:none!important}'});
  await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes',null,{timeout:12000});
  await touch.locator('.mobileDockItem').first().waitFor();
- await touch.evaluate(()=>localStorage.removeItem('dock-interaction-ci'));
+ await touch.evaluate(()=>{localStorage.removeItem('dock-interaction-ci');localStorage.removeItem('dock-interaction-ci:pinned')});
  await touch.reload();
  await touch.addStyleTag({content:'nextjs-portal{display:none!important;pointer-events:none!important}'});
  await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
+ // Real finger swipes must move the scroll container BOTH ways without activating editing.
+ const cdp=await touchContext.newCDPSession(touch);
+ const swipeArea=await touch.locator('.mobileDockScroll').boundingBox();
+ const sy=swipeArea.y+swipeArea.height/2;
+ const right=swipeArea.x+swipeArea.width-25,left=swipeArea.x+27;
+ await touch.locator('.mobileDockScroll').evaluate(el=>el.scrollLeft=0);
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:right,y:sy}]});
+ for(let i=1;i<=9;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:right+(left-right)*i/9,y:sy}]});await sleep(18)}
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ await sleep(380);
+ const forward=await touch.locator('.mobileDockScroll').evaluate(el=>({left:el.scrollLeft,max:el.scrollWidth-el.clientWidth}));
+ assert(forward.max>160&&forward.left>45,'Leftward finger swipe should scroll to the right: '+JSON.stringify(forward));
+ const backRight=swipeArea.x+Math.min(swipeArea.width-20,190),backLeft=swipeArea.x+32;
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:backLeft,y:sy}]});
+ for(let i=1;i<=9;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:backLeft+(backRight-backLeft)*i/9,y:sy}]});await sleep(18)}
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ await sleep(380);
+ const backward=await touch.locator('.mobileDockScroll').evaluate(el=>el.scrollLeft);
+ assert(backward<forward.left-35,'Rightward finger swipe should scroll back left: '+JSON.stringify({forward,backward}));
+ await touch.locator('.mobileDockScroll').evaluate(el=>el.scrollLeft=0);
+ console.log('PASS real native touch swipes left and right; remaining dock items are scrollable');
  const touchFrom=await touch.locator('[data-dock-item="teacher"]').boundingBox();
  const touchTo=await touch.locator('[data-dock-item="stages"]').boundingBox();
- const cdp=await touchContext.newCDPSession(touch);
  const tx=touchFrom.x+touchFrom.width/2,ty=touchFrom.y+touchFrom.height/2;
  const toX=touchTo.x+touchTo.width/2,toY=touchTo.y+touchTo.height/2;
  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:tx,y:ty}]});
@@ -163,6 +183,27 @@ async function main(){
  await touch.waitForFunction(()=>[...document.querySelectorAll('.mobileDockItem')].slice(0,3).map(x=>x.dataset.dockItem).join(',')==='dashboard,stages,teacher',null,{timeout:4000});
  assert.deepEqual((await order(touch)).slice(0,3),['dashboard','stages','teacher'],'Touch drag order not saved');
  console.log('PASS native touch hold + drag and persistence');
+ // Holding stationary beyond the drag delay should pin; the same long hold unpins.
+ await touch.locator('.mobileDockScroll').evaluate(el=>el.scrollLeft=0);
+ const pinFrom=await touch.locator('[data-dock-item="dashboard"]').boundingBox();
+ const px=pinFrom.x+pinFrom.width/2,py=pinFrom.y+pinFrom.height/2;
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:px,y:py}]});
+ await touch.waitForFunction(()=>document.querySelector('.mobileDockPinnedItem')?.textContent?.includes('Обзор игры'),null,{timeout:4500});
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ assert.deepEqual(await touch.evaluate(()=>JSON.parse(localStorage.getItem('dock-interaction-ci:pinned')||'[]')),['dashboard']);
+ assert.equal(await touch.locator('[data-dock-item="dashboard"]').count(),0,'Pinned item must leave scroll strip');
+ await touch.reload();
+ await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
+ await touch.waitForFunction(()=>document.querySelector('.mobileDockPinnedItem')?.textContent?.includes('Обзор игры'),null,{timeout:4500});
+ console.log('PASS extra-long touch pins icon next to All sections; pin survives reload');
+ const pinButton=await touch.locator('.mobileDockPinnedItem').first().boundingBox();
+ const ux=pinButton.x+pinButton.width/2,uy=pinButton.y+pinButton.height/2;
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:ux,y:uy}]});
+ await touch.waitForFunction(()=>document.querySelectorAll('.mobileDockPinnedItem').length===0,null,{timeout:4500});
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ assert.deepEqual(await touch.evaluate(()=>JSON.parse(localStorage.getItem('dock-interaction-ci:pinned')||'[]')),[]);
+ assert.equal(await touch.locator('[data-dock-item="dashboard"]').count(),1,'Unpinned icon must return to scroll strip');
+ console.log('PASS extra-long hold unpins icon and restores scroll order');
  await touch.screenshot({path:path.join(screens,'real-dragged-mobile.png')});
  await touchContext.close();
 }finally{
