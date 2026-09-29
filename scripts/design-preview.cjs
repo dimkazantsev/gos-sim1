@@ -134,6 +134,8 @@ pages.push(['metric-modal-empty','График без истории',renderToSt
 fixture.metricHistory=savedMetricHistory;
 const ImpactRulesPanel=require('../components/game/ImpactRulesPanel').default;
 pages.push(['impact','Модель последствий',renderToStaticMarkup(h('main',{className:'teacherSimple previewImpactPage'},h(ImpactRulesPanel,{g})))]);
+pages.push(['impact-expanded','Настройка модели последствий',renderToStaticMarkup(h('main',{className:'teacherSimple previewImpactPage'},h(ImpactRulesPanel,{g,initialExpandedRuleId:'rule-1'})))]);
+pages.push(['impact-ledger','Журнал модели последствий',renderToStaticMarkup(h('main',{className:'teacherSimple previewImpactPage'},h(ImpactRulesPanel,{g,initialTab:'ledger'})))]);
 const defs=[['stages','Этапы','StagesView'],['parties','Партии','PartiesView'],['votes','Голосования','VotesView'],['documents','Реестр НПА','DocumentsView'],['actions','Процессы','PoliticalWallView'],['grades','Оценки','GradesView'],['teacher','Управление','TeacherView'],['profile','Профиль','ProfileView']];
 for(const [id,label,file] of defs){const Component=require('../components/game/'+file).default;const content=renderToStaticMarkup(h(Component,{g,onNavigate:noop,onOpenVotes:noop,onOpenStages:noop,onOpenDocument:noop,onOpenProcesses:noop}));pages.push([id,label,base.replace(/(<main id="game-main"[^>]*>)[\s\S]*?(<\/main>)/,(_,start,end)=>start+content+end)]);}
 let css=fs.readFileSync(path.join(root,'app/globals.css'),'utf8');css=css.replace(/@import '\.\/([^']+)' layer\(legacy\);/g,(_,file)=>'@layer legacy {\n'+fs.readFileSync(path.join(root,'app',file),'utf8')+'\n}');
