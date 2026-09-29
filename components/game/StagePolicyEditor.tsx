@@ -3,6 +3,7 @@ import {useEffect,useState} from 'react';
 import {CalendarClock,Save} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import StyledSelect from '../ui/StyledSelect';
 
 function localDate(iso:string|null|undefined){
  if(!iso)return '';
@@ -57,12 +58,12 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
   <p>Укажите точный момент окончания. Правило хранится отдельно от оценок; установление штрафа само по себе не изменяет утверждённые оценки.</p>
   <div className="stagePolicyQuick">
    <label>Через<input type="number" min="1" max="365" value={hours} onChange={e=>setHours(e.target.value)}/></label>
-   <label>Единица<select value={unit} onChange={e=>setUnit(e.target.value as 'hours'|'days')}><option value="hours">часов</option><option value="days">дней</option></select></label>
+   <StyledSelect label="Единица" value={unit} onChange={v=>setUnit(v as 'hours'|'days')} options={[{value:'hours',label:'часов'},{value:'days',label:'дней'}]}/>
    <button type="button" onClick={fillRelative}>Рассчитать дату</button>
   </div>
   <div className="stagePolicyFields">
    <label>Дедлайн — до, включительно<input type="datetime-local" value={deadline} onChange={e=>setDeadline(e.target.value)}/></label>
-   <label>Формулировка<select value={inclusive?'inclusive':'exclusive'} onChange={e=>setInclusive(e.target.value==='inclusive')}><option value="inclusive">До, включительно</option><option value="exclusive">Строго до указанного времени</option></select></label>
+   <StyledSelect label="Формулировка" value={inclusive?'inclusive':'exclusive'} onChange={v=>setInclusive(v==='inclusive')} options={[{value:'inclusive',label:'До, включительно'},{value:'exclusive',label:'Строго до указанного времени'}]}/>
    <label>Штраф, баллов<input type="number" step="0.5" min="0" max="3" value={penalty} onChange={e=>setPenalty(e.target.value)}/></label>
    <label className="stagePolicyDescription">Основание штрафа<input type="text" maxLength={240} value={description} onChange={e=>setDescription(e.target.value)}/></label>
   </div>
