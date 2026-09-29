@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Check,Grip,LayoutGrid} from 'lucide-react';
+import {Check,LayoutGrid} from 'lucide-react';
 import type {ReactNode,PointerEvent as ReactPointerEvent,KeyboardEvent as ReactKeyboardEvent} from 'react';
 import type {View} from './types';
 
@@ -15,7 +15,7 @@ export function normalizeDockOrder(saved:unknown,available:View[]):View[]{
 export function moveDockItem<T>(items:T[],from:T,to:T):T[]{
  const source=items.indexOf(from),target=items.indexOf(to);
  if(source<0||target<0||source===target)return items;
- const next=[...items];next.splice(source,1);next.splice(target,0,next[source]);
+ const next=[...items];const [item]=next.splice(source,1);next.splice(target,0,item);
  // Insertion must use the original item (the removed index may precede the target).
  return next;
 }
@@ -75,7 +75,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  },[]);
  function reorder(from:View,to:View){
   const next=moveDockItem(normalizeDockOrder(order,available),from,to);
-  if(next===order)return;
+  if(next.every((key,i)=>key===order[i]))return;
   setOrder(next);
   try{localStorage.setItem(storageKey,JSON.stringify(next))}catch{/* Private mode: reorder for this session. */}
  }
