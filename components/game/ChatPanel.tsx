@@ -29,7 +29,7 @@ function highlightChatText(value:string,search:string):ReactNode{
 function formatBytes(size:number){return size<1024*1024?Math.max(1,Math.round(size/1024))+' КБ':(size/1024/1024).toFixed(1)+' МБ';}
 function ChatAttachment({message:m}:{message:Message}){
  if(!m.url)return <span className="chatMissingFile">Вложение недоступно</span>;
- if(m.kind==='audio'||m.mime_type?.startsWith('audio/'))return <ChatVoicePlayer src={m.url} messageId={m.id} fileName={m.text||'Голосовое сообщение'} />;
+ if(m.kind==='audio'||m.mime_type?.startsWith('audio/'))return <ChatVoicePlayer src={m.url} messageId={m.id} durationHint={m.voice_meta?.duration} waveform={m.voice_meta?.waveform} fileName={m.text||'Голосовое сообщение'} />;
  if(m.kind==='video'||m.mime_type?.startsWith('video/'))return <video controls preload="metadata" playsInline src={m.url} aria-label="Видеосообщение"/>;
  if(m.mime_type?.startsWith('image/')){
   return <a className="chatPhoto" href={m.url} target="_blank" rel="noopener noreferrer" aria-label="Открыть изображение в новой вкладке"><img src={m.url} alt={m.text||'Изображение из чата'} loading="lazy"/></a>;
@@ -246,7 +246,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     <time>{formatRecordingDuration(recordingPreview.duration)}</time>
    </div>
    {recordingPreview.kind==='audio'
-    ?<audio controls preload="metadata" src={recordingPreview.url} aria-label="Прослушать запись"/>
+    ?<div className="chatCaptureVoicePreview"><ChatVoicePlayer src={recordingPreview.url} messageId="draft-voice" durationHint={recordingPreview.duration} waveform={recordingPreview.waveform} fileName={recordingPreview.fileName}/></div>
     :<video controls preload="metadata" playsInline src={recordingPreview.url} aria-label="Просмотреть запись"/>}
    {recordingPreview.channelId!==channelId&&<p className="chatCaptureNote">Запись будет отправлена в исходный канал.</p>}
    {recordingPreview.blob.size>MAX_FILE_SIZE&&<p className="chatCaptureNote">Превышен лимит 25 МБ. Сохраните запись на устройство или повторите.</p>}
