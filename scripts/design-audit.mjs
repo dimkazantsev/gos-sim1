@@ -21,7 +21,22 @@ for(const [name,source] of Object.entries(css)){
  const unknown=[];root.walkDecls(d=>{for(const match of d.value.matchAll(/var\((--gs-[\w-]+)/g))if(!(match[1] in tokens))unknown.push(match[1])});
  check(`${name}: all design tokens resolve`,unknown.length===0);
 }
-for(const name of ['globals','landing','sim-shell','sim-panels','public-screen']){const root=postcss.parse(read(`app/${name}.css`),{from:`app/${name}.css`});check(`${name}: inherited CSS parsed`,root.nodes.length>0);}
+for(const name of ['globals','landing','sim-shell','sim-panels','public-screen','stage-map']){const root=postcss.parse(read(`app/${name}.css`),{from:`app/${name}.css`});check(`${name}: inherited CSS parsed`,root.nodes.length>0);}
+const stagesView=read('components/game/StagesView.tsx');
+const stageSheet=read('app/stage-map.css');
+const previewSource=read('scripts/design-preview.cjs');
+check('Last-loaded stage stylesheet is included in offline browser preview',
+ previewSource.includes("'mobile-nav-polish','stage-map'")&&
+ read('app/layout.tsx').includes("import './stage-map.css'"));
+check('Stage card has one aligned status/vote/details action row',
+ stagesView.includes('className="stageCardFooter"')&&
+ stagesView.includes('className="stageVoteQuick"')&&
+ stagesView.includes('className="stageCardOpen"')&&
+ !stagesView.includes('stageVotePill--inline'));
+check('Stage desktop styling has no absolute voting button or offset detail width',
+ stageSheet.includes('.stagesPage .stageCardFooter')&&
+ stageSheet.includes('position:static;')&&
+ !stageSheet.includes('width:calc(100% - 55px)'));
 const layout=read('app/layout.tsx');
 check('Single ordered entry point for all design sheets',styles.every((name,i)=>layout.indexOf(name+'.css')>=0&&(i===0||layout.indexOf(name+'.css')>layout.indexOf(styles[i-1]+'.css'))));
 const font=read('node_modules/@fontsource-variable/manrope/index.css');
