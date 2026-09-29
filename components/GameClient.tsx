@@ -301,7 +301,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  };
  const mobilePrimary:View[]=teacher&&!previewMode?['teacher','dashboard','stages','votes']:['dashboard','stages','parties','votes'];
  const mobileSecondary=nav.filter(([k])=>!mobilePrimary.includes(k));
- const dockItems=[...mobilePrimary,...mobileSecondary.map(([k])=>k)].map(key=>({key,label:nav.find(([k])=>k===key)![1],icon:navIcon(key)}));
+ const dockItems=[...mobilePrimary,...mobileSecondary.map(([k])=>k)].map(key=>({key,label:nav.find(([k])=>k===key)![1],icon:key==='events'&&pendingEvents>0?<span className="eventDockIcon">{navIcon(key)}<i className="eventDockBadge">{pendingEvents}</i></span>:navIcon(key)}));
 
  return <div className={'simShell '+(previewMode?'studentPreviewShell':'')}>
   <a className="skipLink" href="#game-main">Перейти к содержимому</a>
