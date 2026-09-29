@@ -76,6 +76,12 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
  if(!game||!me)return null;
  return <section className="eventWorkspace" aria-label="Event — ситуационные решения">
   <header><div><small>EVENT · ИГРОВЫЕ СИТУАЦИИ</small><h2>События и решения</h2><p>Индивидуальные задания, совместные решения 2–3 участников и общее голосование. Библиотека из 500 кейсов и модель эффектов будут подключены после проверки содержания.</p></div><span><CalendarDays size={17} aria-hidden="true"/>{teacher?cases.length+' событий':pending.length+' ожидают решения'}</span></header>
+  {teacher&&<div className="eventCatalogTargets" aria-label="План будущей библиотеки ситуаций">
+   <div><strong>{cases.length}<span>/500</span></strong><small>Уникальных кейсов в текущей игре</small></div>
+   <div><strong>{cases.filter(c=>c.seriousness==='serious').length}<span>/300</span></strong><small>Серьёзные · 60%</small></div>
+   <div><strong>{cases.filter(c=>c.seriousness==='light').length}<span>/200</span></strong><small>Повседневные · 40%</small></div>
+   <div><strong>{cases.filter(c=>c.audience==='all').length}<span>/25</span></strong><small>Для всей аудитории · 5%</small></div>
+  </div>}
   {teacher&&<div className="eventComposerPanel">
    <h3>Направить новое событие</h3>
    <div className="eventEditorGrid">
