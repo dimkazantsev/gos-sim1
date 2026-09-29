@@ -2296,3 +2296,51 @@
 @media(prefers-reduced-motion:reduce){
  .simWorkspace .simTop .viewAsChevron{transition:none}
 }
+
+
+/* Chat rhythm: breathing room between consecutive messages without wasting
+   vertical space. The distinction between same author and a new group is clear. */
+.simChat.gsChatV2 .chatEntry + .chatEntry{
+ margin-top:8px;
+}
+.simChat.gsChatV2 .chatMsg.groupStart{
+ margin-top:9px;
+}
+.simChat.gsChatV2 .chatEntry:first-child .chatMsg.groupStart,
+.simChat.gsChatV2 .chatDateSeparator + .chatMsg.groupStart{
+ margin-top:0;
+}
+.simChat.gsChatV2 .chatDateSeparator{
+ margin:15px 0 13px;
+}
+.simChat.gsChatV2 .chatBubble{
+ padding:11px 13px;
+ border-radius:15px 15px 15px 6px;
+}
+.simChat.gsChatV2 .chatMsg.mine .chatBubble{
+ border-radius:15px 15px 6px 15px;
+}
+.simChat.gsChatV2 .chatBubble p{
+ font-size:13px;
+ line-height:1.57;
+}
+.simChat.gsChatV2 .chatAuthor{
+ margin-bottom:3px;
+}
+.simChat.gsChatV2 .chatInlineTime{
+ margin-top:5px;
+}
+.simChat.gsChatV2 .chatPinAction{
+ align-self:center;
+}
+.simChat.gsChatV2 .chatMediaError{
+ border-top:1px solid #f1ccd6;
+ font-size:12px;
+ line-height:1.5;
+ padding:10px 14px;
+ overflow-wrap:anywhere;
+}
+@media(max-width:430px){
+ .simChat.gsChatV2 .chatEntry + .chatEntry{margin-top:8px}
+ .simChat.gsChatV2 .chatBubble{padding:10px 12px}
+}
