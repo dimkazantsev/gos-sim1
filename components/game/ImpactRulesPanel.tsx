@@ -169,13 +169,13 @@ function LedgerRow({g,entry,rule}:{g:ReturnTypeRepublic;entry:ImpactLedger;rule?
  </article>;
 }
 
-export default function ImpactRulesPanel({g}:{g:ReturnTypeRepublic}){
+export default function ImpactRulesPanel({g,initialTab='rules',initialExpandedRuleId=null}:{g:ReturnTypeRepublic;initialTab?:'rules'|'ledger';initialExpandedRuleId?:string|null}){
  const {impactRules,impactLedger}=g;
- const [tab,setTab]=useState<'rules'|'ledger'>('rules');
+ const [tab,setTab]=useState<'rules'|'ledger'>(initialTab);
  const [query,setQuery]=useState('');
  const [ruleFilter,setRuleFilter]=useState<RuleFilter>('all');
  const [ledgerFilter,setLedgerFilter]=useState<LedgerFilter>('all');
- const [expandedId,setExpandedId]=useState<string|null>(null);
+ const [expandedId,setExpandedId]=useState<string|null>(initialExpandedRuleId);
  const enabled=impactRules.filter(r=>r.enabled).length;
  const automatic=impactRules.filter(r=>r.enabled&&r.auto_apply).length;
  const filtered=impactRules.filter(r=>{
