@@ -31,4 +31,4 @@ export type PoliticalDecision={id:string;game_id:string;registry_no:string;post_
 export type PartySupportHistory={id:number;game_id:string;party_id:string;value:number;previous_value:number|null;delta:number|null;source_type:string;source_id:string|null;recorded_at:string};
 export type ImpactRule={id:string;game_id:string;rule_key:string;label:string;event_type:string;description:string|null;conditions:Record<string,unknown>;effects:{metrics?:Record<string,number>;actor_party_support?:number};enabled:boolean;auto_apply:boolean;priority:number;created_at:string;updated_at:string};
 export type ImpactLedger={id:number;game_id:string;rule_id:string|null;rule_key:string;source_type:string;source_id:string;actor_id:string|null;effects:{metrics?:Record<string,number>;actor_party_support?:number};note:string|null;status:'applied'|'reverted'|'adjusted';created_at:string;reverted_at:string|null};
-export type View='dashboard'|'stages'|'parties'|'votes'|'documents'|'actions'|'grades'|'profile'|'teacher';
+export type View='dashboard'|'stages'|'parties'|'votes'|'documents'|'actions'|'grades'|'profile'|'teacher'|'events';
