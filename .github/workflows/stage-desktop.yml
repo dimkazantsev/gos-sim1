@@ -1,0 +1,59 @@
+name: Stage desktop design regression
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'components/game/StagesView.tsx'
+      - 'app/stage-map.css'
+      - 'app/globals.css'
+      - 'app/design-*.css'
+      - 'scripts/design-preview.cjs'
+      - 'scripts/design-audit.mjs'
+      - 'scripts/stage-desktop-browser-check.cjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/stage-desktop.yml'
+  pull_request:
+    paths:
+      - 'components/game/StagesView.tsx'
+      - 'app/stage-map.css'
+      - 'app/globals.css'
+      - 'app/design-*.css'
+      - 'scripts/design-preview.cjs'
+      - 'scripts/design-audit.mjs'
+      - 'scripts/stage-desktop-browser-check.cjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/stage-desktop.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage-design:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: TypeScript
+        run: npm run typecheck
+      - name: Generate real component preview including stage-map.css
+        run: npm run design:preview
+      - name: Desktop geometry and accessibility regression
+        run: npm run design:stages
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+      - name: Upload stage screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage-card-screenshots
+          path: .design-review/screenshots/stages-*.png
+          if-no-files-found: ignore
