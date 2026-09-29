@@ -35,7 +35,37 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
  const [debrief,setDebrief]=useState('');
  const [debriefStage,setDebriefStage]=useState<number|null>(null);
  const [authId,setAuthId]=useState('');
+ const [gradeSearch,setGradeSearch]=useState('');
+ const [gradeTeam,setGradeTeam]=useState('');
+ const [gradeSort,setGradeSort]=useState<'surname'|'name'|'sum'|'average'|'final'|'graded'>('surname');
+ const [gradeAsc,setGradeAsc]=useState(true);
+ const [gradeOnlyPending,setGradeOnlyPending]=useState(false);
  const students=members.filter(m=>m.kind==='student');
+ const gradeByStudent=useMemo(()=>{
+  const map=new Map<string,{sum:number;average:number|null;final:number;graded:number}>();
+  for(const student of students){
+   const selected=rows.filter(a=>a.user_id===student.user_id),sum=selected.reduce((v,a)=>v+(shownScore(a)??0),0);
+   map.set(student.user_id,{sum,average:selected.length?sum/selected.length:null,final:selected.filter(a=>a.status==='final').length,graded:selected.length});
+  }
+  return map;
+ },[rows,members]);
+ const teams=[...new Set(students.map(s=>s.team||s.group_name||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
+ const sortedStudents=students.filter(s=>{
+  const stats=gradeByStudent.get(s.user_id);
+  return (!gradeTeam||(s.team||s.group_name||'')===gradeTeam)&&
+   (!gradeOnlyPending||!!stats&&stats.final<stats.graded)&&
+   (!gradeSearch||[s.full_name,s.team||'',s.group_name||'',s.role_title||''].some(v=>v.toLocaleLowerCase('ru').includes(gradeSearch.trim().toLocaleLowerCase('ru'))));
+ }).sort((a,b)=>{
+  const av=gradeByStudent.get(a.user_id),bv=gradeByStudent.get(b.user_id);
+  const part=(s:string,i:number)=>s.trim().split(/\s+/)[i]||'';
+  const cmp=gradeSort==='surname'?part(a.full_name,0).localeCompare(part(b.full_name,0),'ru'):
+   gradeSort==='name'?part(a.full_name,1).localeCompare(part(b.full_name,1),'ru'):
+   gradeSort==='sum'?(av?.sum||0)-(bv?.sum||0):
+   gradeSort==='average'?(av?.average??-1)-(bv?.average??-1):
+   gradeSort==='final'?(av?.final||0)-(bv?.final||0):(av?.graded||0)-(bv?.graded||0);
+  return (gradeAsc?cmp:-cmp)||a.full_name.localeCompare(b.full_name,'ru');
+ });
+
 
  async function load(){
   if(!game)return;
@@ -151,19 +181,32 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
    <div className="gradesHeroLegend"><span className="draft">Черновик</span><span className="final">Итоговая</span><span className="empty">Нет оценки</span></div>
   </section>
 
-  <section className="surface gradesRules">
+  <details className="surface gradesRules gradesRulesCompact"><summary>Критерии выставления баллов <span>0–3 балла · показать объяснение</span></summary><div className="gradesRuleItems">
    <div><b>1 балл</b><span>Право и правила</span><p>Знание норм, полномочий, процедур и корректное применение их в игровой ситуации.</p></div>
    <div><b>+1 балл</b><span>Стратегия и интересы</span><p>Осмысленные решения с учётом целей своей стороны, ресурсов, выгод, рисков и последствий.</p></div>
    <div><b>+1 балл</b><span>Анализ этапа</span><p>Причины, интересы, институты, результат и политические последствия произошедшего.</p></div>
    <div><b>0 баллов</b><span>Нет участия</span><p>На этапе не зафиксировано содержательных действий студента.</p></div>
-  </section>
+  </div></details>
 
   <section className="surface gradesMatrixWrap">
-   <div className="surfaceHead"><div><small>ГРУППА × ЭТАПЫ</small><h2>Оценки всех участников</h2></div><span>{students.length} студентов</span></div>
+   <div className="surfaceHead"><div><small>ГРУППА × ЭТАПЫ</small><h2>Оценки всех участников</h2></div><span>{sortedStudents.length} из {students.length}</span></div>
+   <div className="gradesToolbar">
+    <label><span>Поиск</span><input type="search" value={gradeSearch} onChange={e=>setGradeSearch(e.target.value)} placeholder="Фамилия, имя, роль" aria-label="Поиск студентов"/></label>
+    <label><span>Партия или группа</span><select value={gradeTeam} onChange={e=>setGradeTeam(e.target.value)}><option value="">Все</option>{teams.map(t=><option key={t} value={t}>{t}</option>)}</select></label>
+    <label><span>Сортировка</span><select value={gradeSort} onChange={e=>setGradeSort(e.target.value as typeof gradeSort)}>
+     <option value="surname">По фамилии</option><option value="name">По имени</option>
+     <option value="sum">По сумме баллов</option><option value="average">По среднему баллу</option>
+     <option value="final">По утверждённым</option><option value="graded">По количеству оценок</option>
+    </select></label>
+    <button type="button" className="gradesSortDir" onClick={()=>setGradeAsc(!gradeAsc)} aria-label={gradeAsc?'Сортировать по убыванию':'Сортировать по возрастанию'}>{gradeAsc?'↑':'↓'}</button>
+    <label className="gradesPending"><input type="checkbox" checked={gradeOnlyPending} onChange={e=>setGradeOnlyPending(e.target.checked)}/> Есть неутверждённые</label>
+   </div>
    <div className="gradesMatrix" role="table" aria-label="Матрица оценок по этапам">
-    <div className="gradesMatrixHead" role="row"><b>Студент</b>{STAGES.map(n=><span key={n} title={stages.find(s=>s.stage_no===n)?.title||''}>{n}</span>)}</div>
-    {students.length===0?<div className="emptyState">Студенты ещё не подключились.</div>:students.map(s=><div className="gradesMatrixRow" role="row" key={s.user_id}>
+    <div className="gradesMatrixHead" role="row"><b>Студент</b><span className="gradeTotalHead">Σ</span><span className="gradeTotalHead">Ср.</span>{STAGES.map(n=><span key={n} title={stages.find(s=>s.stage_no===n)?.title||''}>{n}</span>)}</div>
+    {sortedStudents.length===0?<div className="emptyState">Нет студентов по выбранным фильтрам.</div>:sortedStudents.map(s=><div className="gradesMatrixRow" role="row" key={s.user_id}>
      <div><b>{s.full_name}</b><small>{s.team||'Без партии'} · {s.role_title||'роль не назначена'}</small></div>
+     <span className="gradeTotal">{gradeByStudent.get(s.user_id)?.graded?gradeByStudent.get(s.user_id)?.sum:'—'}</span>
+     <span className="gradeTotal">{gradeByStudent.get(s.user_id)?.average?.toFixed(2)??'—'}</span>
      {STAGES.map(n=>{const a=rows.find(x=>x.user_id===s.user_id&&x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(s.user_id,n)} aria-label={s.full_name+', этап '+n+', '+(v??'нет оценки')}><b>{v??'—'}</b><small>{a?.status==='final'?'итог':a?'авто':''}</small></button>})}
     </div>)}
    </div>
