@@ -220,6 +220,16 @@ async function main(){
     if(chatScreen!=='chat-empty'){
      assert(await frame.locator('.chatMsg.mine').count()>=2,'Own messages on right');
      assert(await frame.locator('.chatMsg.theirs').count()>=2,'Other authors on left');
+     const rhythm=await frame.locator('.chatMsg').evaluateAll(items=>{
+      const pairs=[];
+      for(let i=1;i<items.length;i++){
+       const a=items[i-1].getBoundingClientRect(),b=items[i].getBoundingClientRect();
+       pairs.push(b.top-a.bottom);
+      }
+      return pairs;
+     });
+     assert(rhythm.every(gap=>gap>=6),'Chat message bubbles must have breathable vertical spacing at '+width+'px: '+rhythm.join(','));
+
      assert(await frame.locator('.chatDateSeparator').count()>=2,'Message days separated');
      assert.equal(await frame.locator('.chatMessages .chatDocument').count(),1,'File shown once in conversation; pinned copy is separate');
      assert.equal(await frame.locator('.chatBubble a.chatDocument+p').count(),0,'No duplicated filename after document');
