@@ -214,7 +214,7 @@ async function main(){
      assert.equal(await frame.locator('.chatCaptureSend').count(),1,'Audio review can be submitted');
     }
     if(chatScreen==='chat-video-preview'){
-     assert.equal(await frame.locator('.chatCaptureReview video[controls]').count(),1,'Video is reviewable before upload');
+     assert.equal(await frame.locator('.chatCaptureReview .chatVideoNote video').count(),1,'Round video is reviewable before upload');
      assert.equal(await frame.locator('.chatCaptureSend').count(),1,'Video review can be submitted');
     }
 
