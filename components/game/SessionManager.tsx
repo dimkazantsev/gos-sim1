@@ -16,6 +16,8 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
  const [progress,setProgress]=useState('');
+ const [guestCode,setGuestCode]=useState('');
+ const [guestCreated,setGuestCreated]=useState('');
  const candidate=sessions.find(s=>s.id===selected);
  async function refresh(){
   if(!teacher||!me)return;
@@ -43,6 +45,14 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
    setNotice('Архив сформирован и передан браузеру. Проверьте, что файл действительно сохранился перед удалением.');
   }catch(e){setNotice('Ошибка экспорта: '+(e instanceof Error?e.message:'Неизвестная ошибка'))}
   finally{setBusy(false);setProgress('')}
+ }
+ async function inviteGuest(){
+  if(!game||busy||guestCode.trim().length<6)return;
+  setBusy(true);setNotice('');
+  const r=await supabase.rpc('create_observer_invite',{p_game_id:game.id,p_code:guestCode.trim()});
+  if(r.error)setNotice('Не удалось создать гостевой код: '+r.error.message);
+  else{setGuestCreated(guestCode.trim());setGuestCode('');setNotice('Гостевой код создан. Сохраните его сейчас — позже он не отображается.')}
+  setBusy(false);
  }
  async function deleteOne(){
   const s=candidate;if(!s||!teacher||busy||!confirmed||typed!==s.game_code)return;
@@ -72,6 +82,11 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
  if(!teacher||!me)return null;
  return <section className="profileSessionManager" aria-label="Экспорт и удаление сеансов">
   <header><div><small>АРХИВ И БЕЗОПАСНОСТЬ</small><h2>Мои игровые сеансы</h2><p>Скачайте данные или полный архив с файлами. Удаление выполняется только по подтверждённому коду сеанса.</p></div><Archive size={22}/></header>
+  <div className="profileGuestInvites"><h3>Гостевой просмотр текущей игры</h3><p>Гость сможет читать открытые разделы и журнал, но не сможет голосовать, загружать документы, менять показатели или отправлять сообщения.</p>
+   <div><input type="text" autoComplete="off" minLength={6} value={guestCode} onChange={e=>setGuestCode(e.target.value)} placeholder="Новый код гостя · не менее 6 символов"/>
+     <button type="button" disabled={busy||guestCode.trim().length<6} onClick={()=>void inviteGuest()}>Создать гостевой код</button></div>
+   {guestCreated&&<p role="status">Созданный код: <code>{guestCreated}</code> · Передайте гостю для входа с главной страницы.</p>}
+  </div>
   <div className="profileSessionRows">{sessions.filter(s=>s.owner_id===me.user_id||admin).map(s=><article key={s.id} className={selected===s.id?'selected':''}>
    <div><b>{s.title}</b><span>Код: {s.game_code} · {s.status==='archived'?'В архиве':s.status==='running'?'Игра запущена':'Подготовка'}</span></div>
    <div className="profileSessionActions">
