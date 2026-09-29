@@ -9,6 +9,7 @@ import SignatureUpload from './SignatureUpload';
 import ProfileSecurityPanel from './ProfileSecurityPanel';
 import RepublicComic from './RepublicComic';
 import StyledSelect from '../ui/StyledSelect';
+import {cropPortrait} from './avatarCrop';
 
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
 type PublicStats={accepted_actions:number;posts:number;votes_cast:number;documents_created:number;activity_entries:number;events_decided:number};
@@ -21,14 +22,16 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
  const allocation=party?partyMandates.find(x=>x.party_id===party.id&&x.user_id===target?.user_id):undefined;
  const pendingInvites=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  const [bio,setBio]=useState(targetProfile?.bio||'');
- const [file,setFile]=useState<File|null>(null),[photoPreview,setPhotoPreview]=useState('');
+ const [gender,setGender]=useState<'male'|'female'|'unspecified'>(targetProfile?.gender||'unspecified');
+ const [photoBusy,setPhotoBusy]=useState(false);
+ const [photoPreview,setPhotoPreview]=useState('');
  const [saving,setSaving]=useState(false),[saved,setSaved]=useState(false),[showMyJournal,setShowMyJournal]=useState(false),[comicOpen,setComicOpen]=useState(false);
  const [publicScores,setPublicScores]=useState<PublicAssessment[]>([]);
  const [publicStats,setPublicStats]=useState<PublicStats|null>(null);
  const photoInput=useRef<HTMLInputElement>(null);
  const initials=useMemo(()=>target?.full_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()||'Я',[target?.full_name]);
- useEffect(()=>{setBio(targetProfile?.bio||'')},[target?.user_id,targetProfile?.bio]);
- useEffect(()=>{if(!file){setPhotoPreview('');return}const u=URL.createObjectURL(file);setPhotoPreview(u);return()=>URL.revokeObjectURL(u)},[file]);
+ useEffect(()=>{setBio(targetProfile?.bio||'');setGender(targetProfile?.gender||'unspecified')},[target?.user_id,targetProfile?.bio,targetProfile?.gender]);
+
  useEffect(()=>{
   if(!game||!target)return;
   let valid=true;
@@ -54,23 +57,34 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
  async function save(){
   if(!own||saving)return;
   setSaving(true);setSaved(false);
-  const ok=await saveProfile(bio,file||undefined);
-  setSaving(false);if(ok){setSaved(true);setFile(null)}
+  const ok=await saveProfile(bio,undefined,gender);
+  setSaving(false);if(ok){setSaved(true)}
  }
- function changeFile(next:File|undefined){
-  if(!next)return;
-  if(!['image/jpeg','image/png','image/webp','image/gif'].includes(next.type)||next.size>5*1024*1024){
-   g.setError('Фото должно быть в формате JPEG, PNG, WebP или GIF размером до 5 МБ.');return;
+ async function changeFile(next:File|undefined){
+  if(!next||!own||photoBusy)return;
+  if(!['image/jpeg','image/png','image/webp'].includes(next.type)||next.size>5*1024*1024){
+   g.setError('Фото должно быть в формате JPEG, PNG или WebP размером до 5 МБ.');return;
   }
-  setFile(next);setSaved(false);
+  setPhotoBusy(true);setSaved(false);
+  try{
+   const cropped=await cropPortrait(next);
+   const url=URL.createObjectURL(cropped);
+   setPhotoPreview(url);
+   const ok=await saveProfile(bio,cropped,gender);
+   setSaved(ok);
+   if(!ok)g.setError('Не удалось сохранить фотографию. Попробуйте ещё раз.');
+   URL.revokeObjectURL(url);
+   if(ok)setPhotoPreview('');
+  }catch(err){g.setError(err instanceof Error?err.message:'Не удалось обработать фотографию.')}
+  finally{setPhotoBusy(false)}
  }
  return <div className="profilePage">
   <section className="profileHero">
    <div className="profilePhoto">
-    {photoPreview||targetProfile?.avatar_url?<img src={photoPreview||targetProfile?.avatar_url||''} alt={'Фото: '+target.full_name}/>:<span>{initials}</span>}
-    {own&&<><input ref={photoInput} type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif" aria-label="Загрузить фотографию профиля"
-     onChange={e=>{changeFile(e.target.files?.[0]);e.target.value=''}}/>
-     <button type="button" className="profileCameraButton" title="Изменить фотографию" aria-label="Изменить фотографию профиля" onClick={()=>photoInput.current?.click()}><Camera size={20} aria-hidden="true"/></button></>}
+    {photoPreview||targetProfile?.avatar_url?<img src={photoPreview||targetProfile?.avatar_url||''} alt={'Фото: '+target.full_name}/>:<span className={'profileFallbackAvatar '+(targetProfile?.gender||'unspecified')} aria-label={'Аватар: '+(targetProfile?.gender==='female'?'Женский':targetProfile?.gender==='male'?'Мужской':'Нейтральный')}><UserRound size={61} strokeWidth={1.25} aria-hidden="true"/></span>}
+    {own&&<><input ref={photoInput} type="file" hidden accept="image/jpeg,image/png,image/webp" aria-label="Загрузить фотографию профиля"
+     onChange={e=>{void changeFile(e.target.files?.[0]);e.target.value=''}}/>
+     <button type="button" className="profileCameraButton" title="Изменить фотографию" aria-label="Изменить фотографию профиля" onClick={()=>photoInput.current?.click()}><Camera size={20} aria-hidden="true"/></button>{photoBusy&&<span className="profilePhotoSaving" role="status">Сохранение…</span>}</>}
    </div>
    <div className="profileIntro">
     <small>{own?'ЛИЧНЫЙ КАБИНЕТ':'ПУБЛИЧНЫЙ ПРОФИЛЬ ИГРОКА'}</small>
@@ -84,7 +98,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
     <div className="profileHeroControls">
      <button type="button" className="profileComicButton" onClick={()=>setComicOpen(true)}><BookOpen size={17}/> Комикс о Республике</button>
      {!own&&<button type="button" onClick={onOwnProfile}><UserRound size={17}/> Мой профиль</button>}
-     {own&&file&&<button type="button" disabled={saving} className="primary" onClick={()=>void save()}>{saving?'Загрузка…':'Сохранить фотографию'}</button>}
+
     </div>
    </div>
   </section>
@@ -120,6 +134,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
    {own&&<article className="surface profileEditor">
     <div className="surfaceHead"><div><small>О СЕБЕ В ИГРЕ</small><h2>Игровая визитка</h2></div></div>
     <p className="profileHint">Опишите свою игровую должность, интересы и компетенции. Этот текст смогут прочитать другие участники.</p>
+    <StyledSelect label="Пол для оформления аватара" value={gender} onChange={v=>setGender(v as typeof gender)} options={[{value:"unspecified",label:"Не указывать"},{value:"male",label:"Мужской"},{value:"female",label:"Женский"}]}/>
     <textarea aria-label="О себе в игре" rows={3} maxLength={350} value={bio} onChange={e=>{setBio(e.target.value);setSaved(false)}}
       placeholder="Например: Отвечаю за переговоры и подготовку законопроектов…"/>
     <div className="profileSaveRow"><button className="primary" disabled={saving} onClick={()=>void save()}>{saving?'Сохранение…':'Сохранить визитку'}</button><span>{bio.length}/350</span>{saved&&<span>✓ Сохранено</span>}</div>
