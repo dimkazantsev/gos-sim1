@@ -153,7 +153,9 @@ async function main(){
  }
  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
  assert.deepEqual((await order(touch)).slice(0,3),['dashboard','stages','teacher'],'Native touch drag did not reorder');
+ console.log('TOUCH SAVED IMMEDIATELY',await touch.evaluate(()=>localStorage.getItem('dock-interaction-ci')));
  await touch.getByRole('button',{name:'Готово'}).click();
+ console.log('TOUCH SAVED AFTER DONE',await touch.evaluate(()=>localStorage.getItem('dock-interaction-ci')));
  await touch.reload();
  await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
  assert.deepEqual((await order(touch)).slice(0,3),['dashboard','stages','teacher'],'Touch drag order not saved');
