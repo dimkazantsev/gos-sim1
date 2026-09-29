@@ -29,6 +29,12 @@ async function run(){
  assert.equal(success.calls.inserts[0].kind,'audio');
  assert.equal(success.calls.inserts[0].storage_path,success.calls.uploads[0].path);
  console.log('PASS audio blob uploads with bare Storage MIME and publishes original codec metadata');
+ const wave=input({voiceMeta:{duration:3.2,waveform:Array(36).fill(45)}});
+ const waveSent=await sendChatMedia(wave.args);
+ assert(waveSent.ok);
+ assert.equal(wave.calls.inserts[0].voice_meta.duration,3.2);
+ assert.equal(wave.calls.inserts[0].voice_meta.waveform.length,36);
+ console.log('PASS real voice duration and 36 RMS peaks persist in audio message records');
  const retry=input();let insertCount=0;
  retry.transport.insert=async row=>{retry.calls.inserts.push(row);insertCount++;return{error:insertCount===1?{message:'temporary database error'}:null}};
  const first=await sendChatMedia(retry.args);
