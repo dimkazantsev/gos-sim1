@@ -122,3 +122,14 @@
 @media(max-width:620px){.autoEventPanel{padding:12px}.autoEventHeading{align-items:start;flex-wrap:wrap}.autoEventSettings{grid-template-columns:minmax(0,1fr)}.autoEventButtons button{flex:1 1 calc(50% - 6px)}.autoEventBankList{grid-template-columns:minmax(0,1fr)}.autoEventCaseAssign button{flex:1 1 100%}}
 .eventCaseTally{display:flex!important;flex-wrap:wrap;gap:6px}
 .eventCaseFooter{align-items:center}
+
+.eventDecisionOverview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;min-width:0}
+.eventDecisionOverview article{display:grid;align-content:center;gap:7px;min-width:0;min-height:105px;padding:13px 12px;border:1px solid #d9e6f7;border-radius:12px;background:#fbfdff}
+.eventDecisionOverview article small{font-size:11px;color:#6e87a6;font-weight:770;line-height:1.35}
+.eventDecisionOverview article strong{color:#2757a9;font-size:clamp(22px,2vw,30px);line-height:1.15;font-variant-numeric:tabular-nums}
+.eventDecisionOverview article strong em{color:#8ca1b8;font-size:14px;font-style:normal}
+.eventDecisionOverview article span{color:#778aa2;font-size:11px;line-height:1.4}
+.eventDecisionOverview article:last-child{background:#edf4ff;border-color:#bdd2f3}
+@media(max-width:1000px){.eventDecisionOverview{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.eventDecisionOverview{grid-template-columns:repeat(2,minmax(0,1fr))}.eventDecisionOverview article{min-height:88px}}
+@media(min-width:1100px){.simMain.chatOpen .eventDecisionOverview{grid-template-columns:repeat(2,minmax(0,1fr))}}
