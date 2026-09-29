@@ -1953,3 +1953,346 @@
  .simChat.gsChatV2 .chatComposeActions .chatComposerHint{font-size:12px}
  .gsChatV2 .chatCapturePanel{padding:10px}
 }
+
+
+/* GOS//SIMS unified toolbar v3.
+   Every control (history, turn, timer, connection, role and chat) uses one
+   48px height. Layout wraps into explicit rows BEFORE labels are clipped. */
+.simWorkspace{
+ --gs-top-control-h:48px;
+ --gs-top-gap:9px;
+ --gs-top-status-w:152px;
+ --gs-top-clock-w:84px;
+ --gs-top-role-w:236px;
+ --gs-top-chat-w:110px;
+}
+.simWorkspace .simTop{
+ display:flex;
+ flex-flow:row nowrap;
+ align-items:center;
+ gap:var(--gs-top-gap);
+ min-height:68px;
+ height:auto;
+ padding-block:10px;
+ overflow:visible;
+}
+.simWorkspace .topScreenHistory{
+ display:flex;
+ flex:0 0 auto;
+ align-items:center;
+ gap:5px;
+ margin:0;
+ order:initial;
+}
+.simWorkspace .topScreenHistory .screenHistoryButton{
+ display:grid;
+ place-items:center;
+ flex:0 0 var(--gs-top-control-h);
+ box-sizing:border-box;
+ width:var(--gs-top-control-h);
+ min-width:var(--gs-top-control-h);
+ max-width:var(--gs-top-control-h);
+ height:var(--gs-top-control-h);
+ min-height:var(--gs-top-control-h);
+ max-height:var(--gs-top-control-h);
+ padding:0;
+ margin:0;
+ border-radius:12px;
+}
+.simWorkspace .topScreenHistory .screenHistoryButton>svg{
+ display:block;
+ width:19px;
+ height:19px;
+ flex:none;
+}
+.simWorkspace .simTopCenter{
+ flex:1 1 auto;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ min-width:0;
+ min-height:var(--gs-top-control-h);
+ margin:0;
+ padding:0;
+ gap:12px;
+}
+.simWorkspace .simTop .topIndicators{
+ display:flex;
+ flex:0 0 auto;
+ width:auto;
+ min-width:0;
+ align-items:center;
+ gap:8px;
+ flex-wrap:nowrap;
+ margin:0;
+}
+.simWorkspace .simTop .livePill,
+.simWorkspace .simTop .timerPill,
+.simWorkspace .simTop .connectionPill{
+ box-sizing:border-box;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:8px;
+ height:var(--gs-top-control-h);
+ min-height:var(--gs-top-control-h);
+ max-height:var(--gs-top-control-h);
+ margin:0;
+ padding:0 13px;
+ border-radius:12px;
+ font-size:13px;
+ font-weight:750;
+ line-height:1.25;
+ white-space:nowrap;
+ overflow:visible;
+ text-overflow:clip;
+}
+.simWorkspace .simTop .livePill{
+ flex:0 0 var(--gs-top-status-w);
+ width:var(--gs-top-status-w);
+ min-width:var(--gs-top-status-w);
+ max-width:var(--gs-top-status-w);
+ justify-content:center;
+}
+.simWorkspace .simTop .livePill>svg{
+ display:block;
+ flex:0 0 19px;
+ width:19px;
+ height:19px;
+}
+.simWorkspace .simTop .timerPill{
+ flex:0 0 var(--gs-top-clock-w);
+ width:var(--gs-top-clock-w);
+ min-width:var(--gs-top-clock-w);
+ max-width:var(--gs-top-clock-w);
+ padding-inline:8px;
+ font:750 14px/1.2 var(--gs-font-mono);
+ font-variant-numeric:tabular-nums;
+ color:var(--gs-ink);
+}
+.simWorkspace .simTop .connectionPill{display:none}
+.simWorkspace .simTop .connectionPill.disconnected{
+ display:inline-flex;
+ flex:0 0 auto;
+ min-width:118px;
+}
+.simWorkspace .simTop .viewAsSwitcher{
+ position:relative;
+ display:block;
+ flex:0 0 var(--gs-top-role-w);
+ box-sizing:border-box;
+ width:var(--gs-top-role-w);
+ min-width:var(--gs-top-role-w);
+ max-width:var(--gs-top-role-w);
+ height:var(--gs-top-control-h);
+ min-height:var(--gs-top-control-h);
+ max-height:var(--gs-top-control-h);
+ margin:0;
+ padding:0;
+ border:0;
+ border-radius:12px;
+ background:transparent;
+}
+.simWorkspace .simTop .viewAsTrigger{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ width:100%;
+ min-width:0;
+ height:100%;
+ min-height:var(--gs-top-control-h);
+ max-height:var(--gs-top-control-h);
+ gap:8px;
+ padding:5px 12px 5px 14px;
+ margin:0;
+ border-radius:12px;
+}
+.simWorkspace .simTop .viewAsTriggerText{
+ min-width:0;
+ flex:1 1 auto;
+ gap:2px;
+}
+.simWorkspace .simTop .viewAsLabel{
+ font-size:12px;
+ letter-spacing:.025em;
+ line-height:1.25;
+ white-space:nowrap;
+ overflow:visible;
+ text-overflow:clip;
+}
+.simWorkspace .simTop .viewAsValue{
+ font-size:14px;
+ line-height:1.3;
+ overflow:hidden;
+ white-space:nowrap;
+ text-overflow:ellipsis;
+}
+.simWorkspace .simTop .viewAsChevron{
+ flex:0 0 17px;
+ width:17px;
+ height:17px;
+}
+.simWorkspace .simTop .topChatButton{
+ display:inline-flex;
+ flex:0 0 var(--gs-top-chat-w);
+ box-sizing:border-box;
+ align-items:center;
+ justify-content:center;
+ width:var(--gs-top-chat-w);
+ min-width:var(--gs-top-chat-w);
+ max-width:var(--gs-top-chat-w);
+ height:var(--gs-top-control-h);
+ min-height:var(--gs-top-control-h);
+ max-height:var(--gs-top-control-h);
+ gap:8px;
+ padding:0 12px;
+ margin:0;
+ border-radius:12px;
+ font-size:14px;
+ font-weight:750;
+ line-height:1.25;
+}
+.simWorkspace .simTop .topChatButton>span{display:inline;white-space:nowrap}
+.simWorkspace .simTop .topChatButton>svg{
+ display:block;
+ flex:0 0 19px;
+ width:19px;
+ height:19px;
+}
+.simWorkspace .simTop :is(.screenHistoryButton,.viewAsTrigger,.topChatButton):focus-visible{
+ outline:3px solid #7195e8;
+ outline-offset:2px;
+}
+@media(max-width:1240px){
+ .simWorkspace .simTop .topStageCopy{display:none}
+ .simWorkspace .simTopCenter{justify-content:flex-end}
+}
+@media(max-width:1060px) and (min-width:901px){
+ .simWorkspace .simTop{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-rows:var(--gs-top-control-h) var(--gs-top-control-h);
+  column-gap:9px;
+  row-gap:8px;
+  align-items:center;
+ }
+ .simWorkspace .simTop .mobileBrand{display:none}
+ .simWorkspace .simTop .topScreenHistory{grid-column:1;grid-row:1;justify-self:start}
+ .simWorkspace .simTop .viewAsSwitcher{
+  grid-column:2;grid-row:1;justify-self:end;order:initial;
+ }
+ .simWorkspace .simTop .topChatButton{
+  grid-column:3;grid-row:1;justify-self:end;order:initial;
+ }
+ .simWorkspace .simTop .simTopCenter{
+  grid-column:1/4;grid-row:2;
+  width:100%;justify-content:flex-end;order:initial;
+ }
+ .simWorkspace .simTop:not(:has(.viewAsSwitcher)) .simTopCenter{grid-column:1/4}
+}
+@media(max-width:900px){
+ .simWorkspace .simTop{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  grid-template-rows:auto auto;
+  align-items:center;
+  row-gap:8px;
+  column-gap:9px;
+  padding-block:9px;
+ }
+ .simWorkspace .simTop .mobileBrand{
+  display:flex;
+  grid-column:1;grid-row:1;order:initial;
+  min-width:0;
+  margin:0;
+ }
+ .simWorkspace .simTop .mobileBrand b{white-space:nowrap}
+ .simWorkspace .simTop .topScreenHistory{
+  grid-column:2;grid-row:1;justify-self:end;order:initial;
+ }
+ .simWorkspace .simTop .topChatButton{
+  grid-column:3;grid-row:1;justify-self:end;order:initial;
+ }
+ .simWorkspace .simTop .simTopCenter{
+  grid-column:1/3;grid-row:2;
+  width:100%;min-width:0;
+  justify-content:flex-start;
+  order:initial;
+ }
+ .simWorkspace .simTop .viewAsSwitcher{
+  grid-column:3;grid-row:2;justify-self:end;order:initial;
+ }
+ .simWorkspace .simTop:not(:has(.viewAsSwitcher)) .simTopCenter{
+  grid-column:1/4;grid-row:2;
+ }
+ .simWorkspace .simTop .topStageCopy{display:none}
+}
+@media(max-width:760px){
+ .simWorkspace .simTop{
+  grid-template-columns:minmax(0,1fr) auto auto;
+  column-gap:8px;
+ }
+ .simWorkspace .simTop .simTopCenter{
+  grid-column:1/3;grid-row:2;
+  width:100%;
+ }
+ .simWorkspace .simTop .viewAsSwitcher{
+  grid-column:3;grid-row:2;
+ }
+ .simWorkspace .simTop .topChatButton{
+  width:var(--gs-top-control-h);
+  min-width:var(--gs-top-control-h);
+  max-width:var(--gs-top-control-h);
+  flex-basis:var(--gs-top-control-h);
+  padding:0;
+ }
+ .simWorkspace .simTop .topChatButton>span{display:none}
+ .simWorkspace .simTop .topIndicators{flex-wrap:wrap}
+}
+@media(max-width:620px){
+ .simWorkspace .simTop{
+  grid-template-rows:var(--gs-top-control-h) auto auto;
+  row-gap:7px;
+ }
+ .simWorkspace .simTop .simTopCenter{
+  grid-column:1/4;grid-row:2;
+  width:100%;
+  justify-content:flex-start;
+ }
+ .simWorkspace .simTop .viewAsSwitcher{
+  grid-column:1/4;grid-row:3;
+  justify-self:stretch;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+ }
+ .simWorkspace .simTop:not(:has(.viewAsSwitcher)) .simTopCenter{
+  grid-column:1/4;grid-row:2;
+ }
+ .simWorkspace .simTop .topIndicators{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-start;
+  width:100%;
+ }
+ .simWorkspace .simTop .viewAsMenu{
+  width:100%;
+  max-width:100%;
+ }
+}
+@media(max-width:390px){
+ .simWorkspace{
+  --gs-top-status-w:142px;
+  --gs-top-clock-w:78px;
+  --gs-top-gap:7px;
+ }
+ .simWorkspace .simTop{column-gap:6px;padding-inline:12px}
+ .simWorkspace .simTop .mobileBrand{gap:6px}
+ .simWorkspace .simTop .mobileBrand b{font-size:13px}
+ .simWorkspace .simTop .topScreenHistory{gap:3px}
+ .simWorkspace .simTop .livePill{gap:6px;padding-inline:9px}
+ .simWorkspace .simTop .timerPill{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+ .simWorkspace .simTop .viewAsChevron{transition:none}
+}
