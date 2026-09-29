@@ -7,8 +7,9 @@ import {CRISES} from './constants';
 import {CHAT_MAX_FILE_BYTES,preferredRecordingMime,recordingFileName,uploadedChatKind,inferChatMime} from './recordingMedia';
 import type {ChatMediaKind} from './recordingMedia';
 import {sendChatMedia} from './chatMediaTransport';
+import {analyseVoiceBlob} from './voiceWaveform';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
-export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number};
+export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
 
 export function useRepublicGame(gameId:string){
  const router=useRouter();
@@ -662,11 +663,11 @@ export function useRepublicGame(gameId:string){
  }
 
  async function sendText(text:string){if(!me||!channelId||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}await loadMessages(channelId);return true}
- async function storeChatAttachment(blob:Blob,fileName:string,mime:string,kind:'file'|ChatMediaKind,targetChannel:string){
+ async function storeChatAttachment(blob:Blob,fileName:string,mime:string,kind:'file'|ChatMediaKind,targetChannel:string,voiceMeta?:{duration?:number;waveform?:number[]}){
   if(!me||!targetChannel){setChatMediaError('Канал недоступен. Повторно откройте чат.');return false}
   setChatMediaError('');
   const result=await sendChatMedia({
-   blob,fileName,mime,kind,gameId,channelId:targetChannel,userId:me.user_id,
+   blob,fileName,mime,kind,voiceMeta,gameId,channelId:targetChannel,userId:me.user_id,
    pending:pendingChatUploads.current.get(blob),generateId:()=>crypto.randomUUID(),
    onPhase:setChatMediaPhase,
    transport:{
@@ -739,7 +740,7 @@ export function useRepublicGame(gameId:string){
     }
    };
    rec.onerror=()=>setError('Ошибка записи. Попробуйте ещё раз или прикрепите готовый файл.');
-   rec.onstop=()=>{
+   rec.onstop=async()=>{
     const current=captureRef.current;
     const parts=chunks.current;chunks.current=[];
     stream?.getTracks().forEach(track=>track.stop());
@@ -751,9 +752,12 @@ export function useRepublicGame(gameId:string){
     const blob=new Blob(parts,{type:actualMime});
     if(!blob.size){setError('Запись получилась пустой. Проверьте микрофон или камеру.');return}
     const url=URL.createObjectURL(blob);
+    const fallbackDuration=Math.max(1,Math.round((Date.now()-current.started)/1000));
+    const analysis=current.kind==='audio'?await analyseVoiceBlob(blob):null;
     const preview={blob,url,mime:actualMime,kind:current.kind,channelId:current.channelId,
      fileName:recordingFileName(current.kind,actualMime,new Date(current.started)),
-     duration:Math.max(1,Math.round((Date.now()-current.started)/1000))};
+     duration:analysis?.duration||fallbackDuration,
+     ...(analysis?.waveform?{waveform:analysis.waveform}:{})};
     if(previewRef.current)URL.revokeObjectURL(previewRef.current.url);
     previewRef.current=preview;setRecordingPreview(preview);
     if(blob.size>CHAT_MAX_FILE_BYTES)setError('Запись превышает 25 МБ. Сохраните её на устройство или запишите заново.');
@@ -772,7 +776,7 @@ export function useRepublicGame(gameId:string){
   if(preview.blob.size>CHAT_MAX_FILE_BYTES){setError('Запись больше 25 МБ — сохраните её на устройство или сделайте короче.');return false}
   mediaOperationRef.current=true;setRecordingSaving(true);setChatMediaError('');
   try{
-   const ok=await storeChatAttachment(preview.blob,preview.fileName,preview.mime,preview.kind,preview.channelId);
+   const ok=await storeChatAttachment(preview.blob,preview.fileName,preview.mime,preview.kind,preview.channelId,preview.kind==='audio'?{duration:preview.duration,...(preview.waveform?{waveform:preview.waveform}:{})}:undefined);
    if(ok&&previewRef.current===preview){
     previewRef.current=null;setRecordingPreview(null);URL.revokeObjectURL(preview.url);
    }
