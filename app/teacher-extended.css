@@ -95,3 +95,9 @@
 @media(min-width:1100px){.simMain.chatOpen .teacherPartyDossierGrid{grid-template-columns:minmax(0,1fr)}.simMain.chatOpen .eventRecipients>div{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:1180px){.teacherPartyDossierGrid{grid-template-columns:minmax(0,1fr)}.ghostBulk{grid-template-columns:repeat(2,minmax(0,1fr))}.ghostBulk button{align-self:end}}
 @media(max-width:700px){.teacherPartyDossiers,.teacherGhostPanel,.eventWorkspace{padding:14px;gap:14px}.teacherPartyDossierHead,.teacherGhostPanel>header,.eventWorkspace>header{flex-wrap:wrap}.ghostBulk,.stagePolicyQuick,.stagePolicyFields,.eventEditorGrid{grid-template-columns:minmax(0,1fr)}.stagePolicyDescription,.eventWide{grid-column:auto}.eventRecipients>div{grid-template-columns:minmax(0,1fr)}.ghostPartyRow{grid-template-columns:36px minmax(0,1fr) 75px}.ghostPartyMark{width:36px;height:36px}.ghostPartyRow>strong{grid-column:2/-1;text-align:left}.teacherPartyKpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.eventDockIcon{position:relative;display:inline-grid;place-items:center;width:24px;height:24px}
+.eventDockIcon>svg{display:block;width:21px;height:21px}
+.eventDockBadge{position:absolute;right:-9px;top:-7px;display:grid;place-items:center;min-width:16px;height:16px;padding:0 3px;border-radius:8px;border:1px solid #fff;background:#e65c6a;color:#fff;font-size:9px;font-style:normal;font-weight:850;line-height:1;font-variant-numeric:tabular-nums}
+.eventCaseTally{margin-left:auto;color:#365f9d!important;font-variant-numeric:tabular-nums}
+@media(max-width:600px){.eventCaseTally{flex-basis:100%;margin-left:0}}
