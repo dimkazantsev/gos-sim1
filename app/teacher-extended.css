@@ -1,0 +1,97 @@
+/* Cohesive teacher control additions: stage policies, party dossiers, GV, and Event. */
+.teacherCommand .teacherWorkspacePanel>*{min-width:0}
+.teacherCommand .teacherWorkspaceNav{gap:8px;padding:11px 13px}
+.teacherCommand .teacherStageManager{row-gap:18px}
+.teacherCommand .teacherStageReadinessDetail{padding:16px}
+.stagePolicyEditor{display:grid;gap:12px;margin:15px 0;padding:16px;border:1px solid #d8e5f4;border-radius:13px;background:#fff}
+.stagePolicyEditor h4{display:flex;align-items:center;gap:8px;margin:0;font-size:14px;color:#284568}
+.stagePolicyEditor>p{margin:0;color:#70829a;font-size:12px;line-height:1.5}
+.stagePolicyQuick,.stagePolicyFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;min-width:0}
+.stagePolicyQuick{grid-template-columns:minmax(0,110px) minmax(0,145px) auto;align-items:end}
+.stagePolicyEditor label,.ghostBulk label,.eventEditorGrid label{display:grid;gap:6px;min-width:0;font-size:12px;font-weight:750;color:#536b8a}
+.stagePolicyEditor :is(input,select),.teacherGhostPanel :is(input,select),.eventWorkspace :is(input,select,textarea){
+ box-sizing:border-box;display:block;width:100%;min-width:0;min-height:42px;padding:10px 12px;
+ border:1px solid #d4e0f0;border-radius:9px;background:#fff;color:#284563;font:inherit;font-size:13px;
+}
+.stagePolicyEditor :is(input,select,button):focus-visible,.teacherGhostPanel :is(button,input,select):focus-visible,
+.eventWorkspace :is(button,input,select,textarea):focus-visible{outline:3px solid #719af1;outline-offset:2px}
+.stagePolicyQuick button,.stagePolicyFooter button,.ghostBulk button,.teacherGhostPanel footer button,.eventComposerPanel footer button{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:9px 13px;
+ border:1px solid #cbdaf7;border-radius:9px;background:#eef4ff;color:#2c5ab1;
+ font-weight:800;font-size:12px;cursor:pointer
+}
+.stagePolicyDescription{grid-column:1/-1}
+.stagePolicyFooter{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.stagePolicyFooter button:first-child{background:#fff;color:#69809e;border-color:#dde5ef}
+.stagePolicyFooter button:last-child,.teacherGhostPanel footer button:last-child,.eventComposerPanel footer button{background:#315feb;color:#fff;border-color:#315feb}
+.stagePolicyMessage,.ghostNotice,.eventNotice{margin:0;padding:11px;border:1px solid #dce7f2;border-radius:9px;color:#41658e;background:#f5f9ff;font-size:12px;line-height:1.45}
+.teacherPartyDossiers,.teacherGhostPanel,.eventWorkspace{display:grid;gap:18px;padding:21px;border:1px solid #dde6f1;border-radius:17px;background:#fff;min-width:0}
+.teacherPartyDossierHead,.teacherGhostPanel>header,.eventWorkspace>header{display:flex;align-items:start;justify-content:space-between;gap:18px}
+.teacherPartyDossierHead>div,.teacherGhostPanel>header>div,.eventWorkspace>header>div{min-width:0}
+.teacherPartyDossierHead small,.teacherGhostPanel header small,.eventWorkspace header small{font-size:11px;font-weight:850;letter-spacing:.1em;color:#7387a2}
+.teacherPartyDossierHead h2,.teacherGhostPanel header h2,.eventWorkspace header h2{margin:5px 0;font-size:21px;line-height:1.25;letter-spacing:-.025em;color:#1b3657}
+.teacherPartyDossierHead p,.teacherGhostPanel header p,.eventWorkspace header p{margin:0;color:#75869c;font-size:12px;line-height:1.55}
+.teacherPartyDossierHead>span,.eventWorkspace>header>span{display:flex;gap:7px;align-items:center;flex:none;padding:10px 12px;border:1px solid #dce7f5;border-radius:10px;color:#577397;background:#f8fbff;font-size:12px;font-weight:760}
+.teacherPartyDossierGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.teacherPartyDossier{display:grid;gap:15px;min-width:0;padding:16px;border:1px solid #dce6f2;border-radius:14px;background:#fbfdff}
+.teacherPartyDossier>header{display:flex;align-items:center;gap:11px;min-width:0}
+.teacherPartyMark,.ghostPartyMark{display:grid;place-items:center;flex:none;width:43px;height:43px;border-radius:11px;color:#fff;font-size:12px;font-weight:900}
+.teacherPartyDossier>header>div{min-width:0;flex:1}
+.teacherPartyDossier h3{margin:0;color:#223b5c;font-size:16px;overflow-wrap:anywhere}
+.teacherPartyDossier header p{margin:4px 0 0;color:#788da6;font-size:11px;overflow-wrap:anywhere}
+.teacherPartyDelete{display:grid;place-items:center;flex:none;width:38px;height:38px;border:1px solid #edd6d8;border-radius:9px;background:#fff6f6;color:#a2545c;cursor:pointer}
+.teacherPartyDescription{margin:0;color:#526c89;font-size:12px;line-height:1.55}
+.teacherPartyKpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.teacherPartyKpis span{display:grid;gap:5px;padding:9px;border:1px solid #e4ebf5;border-radius:9px;background:#fff;color:#6e829c;font-size:11px}
+.teacherPartyKpis strong{color:#254d9b;font-size:18px;font-weight:830}
+.teacherPartySection{display:grid;gap:9px;padding-top:13px;border-top:1px solid #e5ecf5;min-width:0}
+.teacherPartySection h4{display:flex;align-items:center;gap:7px;margin:0;color:#405d81;font-size:12px}
+.teacherPartySection p{margin:0;color:#607893;font-size:12px;line-height:1.5}
+.teacherPartySection ul{display:grid;gap:0;list-style:none;padding:0;margin:0}
+.teacherPartySection li{display:flex;align-items:center;justify-content:space-between;gap:9px;min-width:0;padding:9px 0;border-bottom:1px solid #e9eef5;font-size:12px;color:#405b7a}
+.teacherPartySection li>span{min-width:0;overflow-wrap:anywhere}
+.teacherPartySection li small{display:block;margin-top:4px;color:#8595a9;overflow-wrap:anywhere}
+.teacherPartySection li>b{flex:none;color:#2b5eb6}
+.teacherPartySection li a{display:grid;place-items:center;flex:none;min-width:34px;min-height:34px;border:1px solid #dae5f5;border-radius:8px;color:#315fb5}
+.teacherPartyMuted{display:flex;align-items:center;gap:7px;color:#8192a5}
+.teacherPartyDossier>footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-top:12px;border-top:1px solid #e8edf6;color:#8697aa;font-size:11px}
+.teacherPartyDossier>footer button{display:inline-flex;align-items:center;gap:6px;min-height:37px;padding:0 11px;border:1px solid #ecd2d5;border-radius:9px;background:#fff6f6;color:#9c4e58;font-size:11px;font-weight:800;cursor:pointer}
+.teacherPartyNotice{padding:12px;border:1px solid #c6e4d3;border-radius:10px;background:#f0faf4;color:#247654;font-size:12px}
+.teacherGhostPanel>header>svg{color:#a87b33;flex:none}
+.ghostBulk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:end;gap:10px;padding:14px;border:1px solid #e1e9f3;border-radius:12px;background:#f7faff}
+.ghostPartyList{display:grid;gap:8px}
+.ghostPartyRow{display:grid;grid-template-columns:43px minmax(0,1fr) 85px 105px;gap:11px;align-items:center;padding:11px;border:1px solid #e2eaf4;border-radius:11px;background:#fff;min-width:0}
+.ghostPartyName{min-width:0}
+.ghostPartyName b,.ghostPartyName small{display:block;overflow-wrap:anywhere}
+.ghostPartyName b{color:#254463;font-size:13px}
+.ghostPartyName small{margin-top:5px;color:#788da3;font-size:11px}
+.ghostPartyInput{display:grid;gap:4px;font-size:11px;font-weight:750;color:#6e819c}
+.ghostPartyRow>strong{text-align:right;color:#2b60bb;font-size:12px}
+.teacherGhostPanel footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.eventComposerPanel{display:grid;gap:16px;padding:17px;border:1px solid #dce7f6;border-radius:14px;background:#f9fbff}
+.eventComposerPanel h3,.eventList h3{margin:0;color:#264363;font-size:16px}
+.eventEditorGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.eventEditorGrid textarea{resize:vertical;min-height:110px;line-height:1.5}
+.eventWide{grid-column:1/-1}
+.eventRecipients{display:grid;gap:10px}
+.eventRecipients>strong{color:#45658b;font-size:12px}
+.eventRecipients>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.eventRecipients label{display:grid;grid-template-columns:18px minmax(0,1fr);gap:5px 8px;align-items:center;padding:10px;border:1px solid #dee7f2;border-radius:10px;background:#fff;color:#456384;font-size:12px;overflow-wrap:anywhere}
+.eventRecipients input{width:17px;height:17px;min-height:17px;padding:0;accent-color:#315feb}
+.eventRecipients label small{grid-column:2;color:#8a9aaf;font-size:10px}
+.eventComposerPanel footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#7084a0;font-size:12px}
+.eventList{display:grid;gap:12px;min-width:0}
+.eventCaseCard{display:grid;gap:12px;padding:16px;border:1px solid #dfe9f4;border-radius:12px;background:#fff}
+.eventCaseTop{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:#64809c;font-size:11px}
+.eventCaseTop span{padding:5px 8px;border-radius:7px;background:#eef3fa}
+.eventCaseCard h4{margin:0;color:#294664;font-size:15px}
+.eventCaseCard>p{margin:0;color:#617893;font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.eventCaseFooter{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid #e8eef7;padding-top:12px}
+.eventCaseFooter>span{display:inline-flex;gap:6px;align-items:center;color:#6984a0;font-size:11px;font-weight:750}
+.eventDecisionButtons{display:flex;gap:8px;margin-left:auto}
+.eventDecisionButtons button{min-height:39px;padding:0 14px;border:1px solid #e6c5cb;border-radius:9px;background:#fff5f5;color:#a14550;font-weight:800;font-size:12px;cursor:pointer}
+.eventDecisionButtons button:last-child{border-color:#b9d7c5;background:#eff9f2;color:#21764f}
+.eventWorkspace button:disabled,.teacherGhostPanel button:disabled{opacity:.52;cursor:not-allowed}
+@media(min-width:1100px){.simMain.chatOpen .teacherPartyDossierGrid{grid-template-columns:minmax(0,1fr)}.simMain.chatOpen .eventRecipients>div{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1180px){.teacherPartyDossierGrid{grid-template-columns:minmax(0,1fr)}.ghostBulk{grid-template-columns:repeat(2,minmax(0,1fr))}.ghostBulk button{align-self:end}}
+@media(max-width:700px){.teacherPartyDossiers,.teacherGhostPanel,.eventWorkspace{padding:14px;gap:14px}.teacherPartyDossierHead,.teacherGhostPanel>header,.eventWorkspace>header{flex-wrap:wrap}.ghostBulk,.stagePolicyQuick,.stagePolicyFields,.eventEditorGrid{grid-template-columns:minmax(0,1fr)}.stagePolicyDescription,.eventWide{grid-column:auto}.eventRecipients>div{grid-template-columns:minmax(0,1fr)}.ghostPartyRow{grid-template-columns:36px minmax(0,1fr) 75px}.ghostPartyMark{width:36px;height:36px}.ghostPartyRow>strong{grid-column:2/-1;text-align:left}.teacherPartyKpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
