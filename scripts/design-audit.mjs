@@ -243,6 +243,12 @@ check('Voice notes use same accessible compact player in chat and pins',
  read('components/game/ChatVoicePlayer.tsx').includes('pauseOtherVoices()')&&
  chatCss.includes('.gsChatV2 .chatVoicePlayer{'));
 
+check('Voice media securely renews expired signed URLs and keeps original message identity',
+ read('components/game/useRepublicGame.ts').includes('async function refreshChatMediaUrl(')&&
+ read('components/game/useRepublicGame.ts').includes("createSignedUrl(storagePath,3600)")&&
+ read('components/game/ChatVoicePlayer.tsx').includes('refreshAttempts.current++')&&
+ read('components/game/ChatPanel.tsx').includes('onRefresh={refreshChatMediaUrl}')&&
+ read('components/game/ChatPanel.tsx').includes('chatAttachmentUnavailable'));
 check('Media transfer failure is visible in the chat and local preview survives',
  read('components/game/useRepublicGame.ts').includes('setChatMediaError(result.error)')&&
  read('components/game/useRepublicGame.ts').includes('pendingChatUploads.current.set(blob,result.pending)')&&
