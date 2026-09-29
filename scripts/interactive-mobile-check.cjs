@@ -127,6 +127,7 @@ async function main(){
  await desktop.screenshot({path:path.join(screens,'real-all-sections.png')});
  await modal.getByRole('button',{name:'Закрыть'}).click();
  await modal.waitFor({state:'hidden'});
+ await desktop.locator('.mobileDockScroll').evaluate(el=>{el.style.scrollBehavior='auto';el.scrollLeft=0});
  await desktop.evaluate(()=>{window.__dockEvents=[];document.addEventListener('pointerdown',e=>{window.__dockEvents.push({type:'down',node:e.target.closest('button')?.dataset?.dockItem||'',html:e.target.outerHTML.slice(0,250),x:e.clientX,y:e.clientY})},true);document.addEventListener('pointercancel',e=>window.__dockEvents.push({type:'cancel'}),true);});
  let keys=await order(desktop);
  assert.equal(keys[0],'teacher');

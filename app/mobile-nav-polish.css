@@ -409,7 +409,7 @@
   flex:0 0 58px;width:58px;min-width:58px;max-width:58px;
  }
  .mobileDockV2 .mobileDockPinned{align-items:center}
- .mobileDockV2 .mobileDockChat{display:none!important}
+ .mobileDockV2 .mobileDockFixed>.mobileDockChat{display:none!important}
  .simWorkspace .simTop .viewAsSwitcher,
  .simWorkspace .simTop .viewAsTrigger{
   position:relative;box-sizing:border-box;width:36px;min-width:36px;max-width:36px;
@@ -420,4 +420,21 @@
   width:18px!important;height:18px!important;margin:0!important;
   transform:translate(-50%,-50%)!important;display:block!important;pointer-events:none;
  }
+}
+
+/* Chat participates in horizontal section scrolling, never the fixed action cluster. */
+@media(max-width:900px){
+ .mobileDockV2 .mobileDockFixed .mobileDockChat{display:none!important}
+ .mobileDockV2 .mobileDockScroll>.mobileDockChat{
+  display:grid!important;flex:0 0 56px;width:56px;min-width:56px;max-width:56px;
+  grid-template-rows:18px 22px;align-content:center;justify-items:center;
+  row-gap:2px;height:50px;min-height:50px;max-height:50px;padding:4px 2px;
+  border:1px solid transparent;border-radius:10px;background:transparent;color:#647792;
+  touch-action:pan-x;scroll-snap-align:none;
+ }
+ .mobileDockV2 .mobileDockScroll>.mobileDockChat.active{background:#eef3ff;border-color:#dbe6ff;color:#315dba}
+ .mobileDockV2 .mobileDockScroll>.mobileDockChat .mobileDockIcon{
+  width:18px;height:18px;min-height:18px;display:grid;place-items:center
+ }
+ .mobileDockV2 .mobileDockScroll>.mobileDockChat .mobileDockIcon svg{display:block;width:16px;height:16px}
 }

@@ -378,5 +378,5 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
-  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>navigate(k)} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
+  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>navigate(k)} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }

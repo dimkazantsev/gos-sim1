@@ -135,7 +135,8 @@ async function main(){
     assert.equal((await chat.locator('span').innerText()).trim(),'Чат','Desktop top bar label is Chat');
     assert(await chat.locator('span').isVisible(),'Desktop top bar must show the Chat label');
    }else{
-    assert.equal(await dashboard.locator('.mobileDockChat').count(),0,'Chat must not be fixed at the right edge of the mobile dock');
+    assert.equal(await dashboard.locator('.mobileDockFixed .mobileDockChat').count(),0,'Chat must not be fixed at the right edge of the mobile dock');
+     assert.equal(await dashboard.locator('.mobileDockScroll .mobileDockChat').count(),1,'Chat must scroll together with the ordinary sections');
     assert.equal(await dashboard.locator('.mobileDockAll').count(),1,'All sections remains the only permanent right-side launcher');
    }
    const bounds=await dashboard.locator('.simWorkspace').evaluate(workspace=>{

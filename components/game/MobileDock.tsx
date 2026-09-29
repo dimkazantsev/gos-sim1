@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Check,LayoutGrid,Pin} from 'lucide-react';
+import {Check,LayoutGrid,MessageCircle,Pin} from 'lucide-react';
 import type {ReactNode,PointerEvent as ReactPointerEvent,KeyboardEvent as ReactKeyboardEvent} from 'react';
 import type {View} from './types';
 
@@ -34,7 +34,7 @@ type Gesture={
  pinTimer:ReturnType<typeof setTimeout>|null;
 };
 
-export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll}:{
+export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll,onChat,chatOpen=false}:{
  items:MobileDockItem[];
  activeView:View;
  storageKey:string;
@@ -42,6 +42,8 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  setEditing:(value:boolean)=>void;
  onNavigate:(view:View)=>void;
  onAll:()=>void;
+ onChat?:()=>void;
+ chatOpen?:boolean;
 }){
  const scrollRef=useRef<HTMLDivElement>(null);
  const gestureRef=useRef<Gesture|null>(null);
@@ -227,6 +229,9 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
      <span className="mobileDockIcon">{item.icon}</span>
      <span className="mobileDockLabel">{item.label}</span>
     </button>)}
+    {onChat&&<button type="button" className={'mobileDockChat mobileDockItem '+(chatOpen?'active':'')}
+     aria-controls="game-chat" aria-expanded={chatOpen} aria-label={chatOpen?'Закрыть чат':'Открыть чат'}
+     onClick={onChat}><span className="mobileDockIcon"><MessageCircle aria-hidden="true"/></span><span className="mobileDockLabel">Чат</span></button>}
    </div>
    <div className="mobileDockFixed">
     {pinnedItems.length>0&&<div className="mobileDockPinned" aria-label="Закреплённые разделы">
