@@ -30,25 +30,25 @@ async function main(){
   await page.goto('file://'+preview,{waitUntil:'load'});
   const frame=page.frameLocator('#preview');
   await page.locator('#screen').selectOption('stages');
-  await frame.locator('.stagesPage .stageCard').first().waitFor();
+  await frame.locator('.stagesAtlas .stageAtlasCard').first().waitFor();
   const widths=[1600,1440,1280,1160,1024,960,900,768,430,390,360];
   for(const width of widths){
    await page.locator('#preview').evaluate((el,w)=>{el.style.width=w+'px'},width);
-   await frame.locator('.stageCard').first().evaluate(el=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   await frame.locator('.stageAtlasCard').first().evaluate(el=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    const result=await frame.locator('.stagesPage').evaluate(root=>{
     const box=el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height,centerY:r.y+r.height/2}};
-    const cards=[...root.querySelectorAll('.stageTimeline>.stageCard')];
-    const timeline=box(root.querySelector('.stageTimeline'));
+    const cards=[...root.querySelectorAll('.stageAtlasGrid>.stageAtlasCard')];
+    const timeline=box(root.querySelector('.stageAtlasGrid'));
     return {
      viewport:document.documentElement.clientWidth,
      scrollWidth:document.documentElement.scrollWidth,
      timeline,
      cards:cards.map(el=>{
-      const status=el.querySelector('.stageStatusPill'),details=el.querySelector('.stageCardOpen');
-      const vote=el.querySelector('.stageVoteQuick');
+      const status=el.querySelector('.stageAtlasCardStatus'),details=el.querySelector('.stageAtlasDetailAction');
+      const vote=el.querySelector('.stageAtlasVoteAction');
       return {card:box(el),status:box(status),details:box(details),vote:vote?box(vote):null,
-       footer:box(el.querySelector('.stageCardFooter')),
-       header:box(el.querySelector('.stageCardPrimary')),
+       footer:box(el.querySelector('.stageAtlasCardFooter')),
+       header:box(el.querySelector('.stageAtlasCardPrimary')),
        detailsLabel:details.getAttribute('aria-label'),
        voteLabel:vote?.getAttribute('aria-label')||null};
      })
@@ -62,20 +62,18 @@ async function main(){
      'Card '+(index+1)+' exceeds the stage grid at '+width+'px');
     assert(card.footer.y>=card.header.bottom-3,
      'Footer overlaps stage content on card '+(index+1)+' at '+width+'px');
-    assert(Math.abs(card.status.centerY-card.details.centerY)<=3,
-     'Status and details button are not vertically aligned on card '+(index+1)+' at '+width+'px');
-    assert(card.status.right+2<=card.details.x,
-     'Status and details button overlap on card '+(index+1)+' at '+width+'px');
-    assert(card.status.x>=card.footer.x-2&&card.details.right<=card.footer.right+2,
-     'Actions extend beyond footer on card '+(index+1)+' at '+width+'px');
+    assert(card.status.y>=card.card.y-2&&card.status.bottom<=card.footer.y+2,
+     'Status pill should stay in header on card '+(index+1)+' at '+width+'px');
+    assert(card.details.x>=card.footer.x-2&&card.details.right<=card.footer.right+2,
+     'Details button extends beyond footer on card '+(index+1)+' at '+width+'px');
     assert(card.detailsLabel?.includes('Подробнее об этапе'),
      'Missing accessible details label on card '+(index+1));
     if(card.vote){
-     assert(Math.abs(card.vote.centerY-card.status.centerY)<=3,
+     assert(Math.abs(card.vote.centerY-card.details.centerY)<=3,
       'Voting button is not centered alongside status on card '+(index+1)+' at '+width+'px');
-     assert(card.status.right+2<=card.vote.x&&card.vote.right+2<=card.details.x,
+     assert(card.vote.right+2<=card.details.x,
       'Voting button overlaps other controls on card '+(index+1)+' at '+width+'px');
-     assert(card.voteLabel?.includes('голосованиям'),
+     assert(card.voteLabel?.includes('голосования'),
       'Voting action lacks an accessible label');
     }
    }
@@ -89,11 +87,11 @@ async function main(){
     assert(Math.max(...bottoms)-Math.min(...bottoms)<=3,
      'Card bottoms in the same grid row are not aligned at '+width+'px');
    if([1440,1024,390].includes(width)){
-    await frame.locator('.stageTimeline').screenshot({
+    await frame.locator('.stageAtlasGrid').screenshot({
      path:path.join(shotDir,'stages-'+width+'.png'),animations:'disabled'
     });
    }
-   console.log('PASS '+width+'px: 16 cards, no clipping, aligned footers'+
+   console.log('PASS '+width+'px: 16 cards, no clipping, aligned buttons'+
     ', vote button and accessibility checks');
   }
  }finally{await browser.close()}
