@@ -45,7 +45,7 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
  </a>;
 }
 
-export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean}){
+export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void}){
  const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
  const [sending,setSending]=useState(false);
  const [uploading,setUploading]=useState(false);
@@ -268,7 +268,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
       <article className={'chatMsg '+(own?'mine':'theirs')+(startsGroup?' groupStart':' grouped')} data-message-id={m.id} aria-label={name+', '+formatChatTime(m.created_at)}>
        {!own&&<span className={'chatAvatar '+(!startsGroup?'placeholder':'')} aria-hidden="true">{startsGroup?initials(name):''}</span>}
        <div className="chatMessageColumn">
-        {startsGroup&&<div className="chatAuthor"><b>{own?'Вы':name}</b><time dateTime={m.created_at}>{formatChatTime(m.created_at)}</time></div>}
+        {startsGroup&&<div className="chatAuthor">{onOpenMember&&g.members.some(member=>member.user_id===m.author_id)?<button type="button" className="chatAuthorProfile" onClick={()=>onOpenMember(m.author_id)}>{own?'Вы':name}</button>:<b>{own?'Вы':name}</b>}<time dateTime={m.created_at}>{formatChatTime(m.created_at)}</time></div>}
         <div className="chatBubble">
          {showText&&<p>{highlightChatText(m.text||'',search)}</p>}
          {attachment&&<ChatAttachment message={m} onRefresh={refreshChatMediaUrl}/>}
