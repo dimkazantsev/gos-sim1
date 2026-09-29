@@ -226,4 +226,14 @@ check('Chat composer aligns icon send, attachment, visible mic and video control
  read('scripts/design-preview.cjs').includes("['chat-video-preview'"));
 execFileSync(process.execPath,['scripts/chat-logic-check.cjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['scripts/recording-media-check.cjs'],{stdio:'inherit'});
+execFileSync(process.execPath,['scripts/chat-media-transport-check.cjs'],{stdio:'inherit'});
+check('Media transfer failure is visible in the chat and local preview survives',
+ read('components/game/useRepublicGame.ts').includes('setChatMediaError(result.error)')&&
+ read('components/game/useRepublicGame.ts').includes('pendingChatUploads.current.set(blob,result.pending)')&&
+ read('components/game/ChatPanel.tsx').includes('chatMediaError')&&
+ read('components/game/ChatPanel.tsx').includes('Публикация…'));
+check('Chat entries have intentional breathing room',
+ chatCss.includes('.simChat.gsChatV2 .chatEntry + .chatEntry')&&
+ chatCss.includes('.simChat.gsChatV2 .chatBubble{'));
+
 console.log(`\n${count} source and contrast checks passed. This does not certify browser layout, keyboard interaction, or a live classroom session.`);
