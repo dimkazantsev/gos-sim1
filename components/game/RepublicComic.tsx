@@ -29,6 +29,14 @@ function Artwork({scene}:{scene:number}){
   {scene===0&&<g className="comicStorm" fill="none" stroke="#d2deff" strokeWidth="2" opacity=".55">
     {Array.from({length:19},(_,i)=><path key={i} d={'m'+(i*53-70)+' '+(i%3*59+8)+' -40 95'}/>)}
    <path stroke="#fff3b0" strokeWidth="10" d="m520 35-40 92 32-6-42 88"/></g>}
+  {scene===0&&<g className="comicEmergency">
+    <path d="M0 405q155-48 260-16t295-13t360 14" stroke="#607fa4" strokeWidth="33" fill="none"/>
+    <path d="M80 411h155v-58H80l23-45h89l36 45h25v58Z" fill="#e2e5d9" stroke="#213453" strokeWidth="8"/>
+    <path d="M146 323v30m-16-15h32" stroke="#ff6874" strokeWidth="12"/>
+    <circle cx="114" cy="410" r="18" fill="#141e31"/><circle cx="213" cy="410" r="18" fill="#141e31"/>
+    <path d="m354 354 33-65 63 48 54-33 32 64" stroke="#f7c2a7" strokeWidth="13" fill="none"/>
+    <g strokeWidth="11" fill="none" strokeLinecap="round"><path d="M545 398q30-46 57 0" stroke="#a9ffdc"/><path d="M560 362v-40" stroke="#a9ffdc"/></g>
+   </g>}
   {scene===1&&<g className="comicVault">
     <rect x="302" y="226" width="274" height="244" rx="20" fill="#263354" stroke="#f7c87b" strokeWidth="8"/>
     <circle cx="440" cy="343" r="88" fill="#1c2548" stroke="#9faec8" strokeWidth="12"/>
@@ -53,39 +61,58 @@ function Artwork({scene}:{scene:number}){
   <path d="M0 509V474Q100 468 200 479T400 472T600 481T900 461V509Z" fill="#111d35"/>
  </svg>;
 }
-export default function RepublicComic({open,onClose}:{open:boolean;onClose:()=>void}){
+export default function RepublicComic({open,onClose,intro=false}:{open:boolean;onClose:()=>void;intro?:boolean}){
  const [scene,setScene]=useState(0),[playing,setPlaying]=useState(true),[audio,setAudio]=useState(false);
  const audioRef=useRef<AudioContext|null>(null);
- const dialog=useDialog(open,onClose);
- function sound(index:number){
-  if(!audio||typeof window==='undefined')return;
-  const ctx=audioRef.current||(audioRef.current=new AudioContext());
-  if(ctx.state==='suspended')void ctx.resume();
-  const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';
-  osc.frequency.setValueAtTime([145,174,205,294][index]||205,ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(440,ctx.currentTime+.22);
-  gain.gain.setValueAtTime(.0001,ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(.065,ctx.currentTime+.03);
-  gain.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.45);
-  osc.connect(gain);gain.connect(ctx.destination);osc.start();osc.stop(ctx.currentTime+.48);
+ const sourceRef=useRef<AudioBufferSourceNode|null>(null);
+ const close=()=>{if(!intro||scene===SCENES.length-1)onClose()};
+ const dialog=useDialog(open,close);
+ function startSound(){
+  try{
+   const ctx=audioRef.current||(audioRef.current=new AudioContext({sampleRate:22050}));
+   void ctx.resume();
+   if(sourceRef.current)return;
+   // A 36-second atmospheric score. Fade-out and fade-in meet at silence to prevent clicks.
+   const length=ctx.sampleRate*36,buffer=ctx.createBuffer(1,length,ctx.sampleRate),samples=buffer.getChannelData(0);
+   const notes=[65.41,73.42,82.41,98,87.31,82.41,73.42,65.41,61.74];
+   for(let i=0;i<length;i++){
+    const t=i/ctx.sampleRate,n=notes[Math.floor(t/4)%notes.length];
+    const fade=Math.min(1,t/1.4,(36-t)/1.4);
+    const beat=Math.exp(-((t%2)*4))*.15*Math.sin(2*Math.PI*44*t);
+    const drone=.16*Math.sin(2*Math.PI*n*t)+.10*Math.sin(2*Math.PI*(n/2)*t)+.035*Math.sin(2*Math.PI*1.7*t)*Math.sin(2*Math.PI*(n*1.5)*t);
+    samples[i]=Math.max(-.35,Math.min(.35,(drone+beat)*Math.max(0,fade)));
+   }
+   const node=ctx.createBufferSource(),gain=ctx.createGain();node.buffer=buffer;node.loop=true;node.loopStart=0;node.loopEnd=36;
+   gain.gain.setValueAtTime(.0001,ctx.currentTime);gain.gain.linearRampToValueAtTime(.4,ctx.currentTime+.7);
+   node.connect(gain);gain.connect(ctx.destination);node.start();sourceRef.current=node;
+  }catch{/* Sound can require explicit permission; the comic remains readable. */}
  }
- function go(index:number){const n=(index+SCENES.length)%SCENES.length;setScene(n);sound(n)}
- useEffect(()=>{if(!open||!playing)return;const t=window.setInterval(()=>setScene(s=>(s+1)%SCENES.length),6500);return()=>clearInterval(t)},[open,playing]);
- useEffect(()=>{if(open)setScene(0)},[open]);
- useEffect(()=>()=>{void audioRef.current?.close()},[]);
- if(!open)return null;
+ function stopSound(){try{sourceRef.current?.stop()}catch{}sourceRef.current?.disconnect();sourceRef.current=null}
+ function toggleAudio(){if(audio){stopSound();setAudio(false)}else{startSound();setAudio(true)}}
+ function go(index:number){const n=Math.max(0,Math.min(SCENES.length-1,index));setScene(n)}
+ useEffect(()=>{
+  if(!open||!playing)return;
+  const timer=window.setTimeout(()=>{
+   if(scene===SCENES.length-1){if(intro)onClose();else setScene(0)}
+   else setScene(scene+1);
+  },8200);
+  return()=>window.clearTimeout(timer);
+ },[open,playing,scene,intro,onClose]);
+ useEffect(()=>{if(open){setScene(0);setPlaying(true)}else stopSound()},[open]);
+ useEffect(()=>()=>{stopSound();void audioRef.current?.close()},[]);
+  if(!open)return null;
  const item=SCENES[scene];
- return <div className="comicBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)onClose()}}>
+ return <div className="comicBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!intro)close()}}>
   <section ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Комикс о Республике" className="comicDialog">
-   <header><b>GOS//SIMS · КОМИКС О РЕСПУБЛИКЕ</b><div><button aria-label={audio?'Выключить звук':'Включить звук'} onClick={()=>setAudio(!audio)}>{audio?<Volume2 size={19}/>:<VolumeX size={19}/>}</button>
+   <header><b>GOS//SIMS · КОМИКС О РЕСПУБЛИКЕ</b><div><button aria-label={audio?'Выключить звук':'Включить звук'} onClick={toggleAudio}>{audio?<Volume2 size={19}/>:<VolumeX size={19}/>}</button>
      <button aria-label={playing?'Остановить автоматическое воспроизведение':'Продолжить показ'} onClick={()=>setPlaying(!playing)}>{playing?<Pause size={19}/>:<Play size={19}/>}</button>
-     <button aria-label="Закрыть комикс" onClick={onClose}><X size={20}/></button></div></header>
+     <button aria-label={intro?'Завершить пролог после просмотра':'Закрыть комикс'} disabled={intro&&scene!==SCENES.length-1} onClick={close}><X size={20}/></button></div></header>
    <div className="comicFrame" key={scene}><Artwork scene={scene}/><div className="comicOverlay">
     <span className="comicKicker">{item.kicker}</span><h2>{item.title}</h2><p>{item.body}</p><strong>{item.stamp}</strong>
    </div></div>
-   <footer><div className="comicFooterLabel"><small>{item.caption}</small><span>{String(scene+1).padStart(2,'0')} / {String(SCENES.length).padStart(2,'0')}</span></div>
+   <footer><div className="comicFooterLabel"><small>{item.caption}{intro?' · После пролога откроется обязательная настройка профиля.':''}</small><span>{String(scene+1).padStart(2,'0')} / {String(SCENES.length).padStart(2,'0')}</span></div>
     <div className="comicControls"><button onClick={()=>go(scene-1)} aria-label="Предыдущая сцена"><ArrowLeft size={18}/></button>
     {SCENES.map((x,i)=><button key={i} className={'comicDot '+(scene===i?'active':'')} aria-current={scene===i?'step':undefined} aria-label={'Сцена '+(i+1)+': '+x.title} onClick={()=>go(i)}>{String(i+1).padStart(2,'0')}</button>)}
-    <button onClick={()=>scene===SCENES.length-1?onClose():go(scene+1)} aria-label={scene===SCENES.length-1?'Завершить просмотр':'Следующая сцена'}><ArrowRight size={18}/></button></div></footer>
+    <button onClick={()=>scene===SCENES.length-1?close():go(scene+1)} aria-label={scene===SCENES.length-1?'Завершить просмотр':'Следующая сцена'}><ArrowRight size={18}/></button></div></footer>
   </section></div>;
 }
