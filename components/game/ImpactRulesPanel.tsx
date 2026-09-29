@@ -3,6 +3,7 @@
 import {useEffect,useId,useMemo,useState} from 'react';
 import {Activity,ArrowDownRight,ChevronDown,ChevronUp,History,RotateCcw,Search,SlidersHorizontal} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
+import TeacherMetricStudio from './TeacherMetricStudio';
 import type {ImpactLedger,ImpactRule} from './types';
 
 type RuleFilter='all'|'automatic'|'off';
@@ -194,6 +195,7 @@ export default function ImpactRulesPanel({g,initialTab='rules',initialExpandedRu
     <span><b>{automatic}</b><small>работают автоматически</small></span>
    </div>
   </header>
+  <TeacherMetricStudio g={g}/>
   <div className="impactProcess" aria-label="Как работает модель">
    <span><Activity aria-hidden="true"/> Событие</span><i>→</i>
    <span><SlidersHorizontal aria-hidden="true"/> Правило</span><i>→</i>
