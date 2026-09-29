@@ -23,11 +23,11 @@ jobs:
       - run: npm run typecheck
       - run: npm run design:check
       - run: npm run design:preview
+      - run: npm run design:interactive
       - run: npm run design:browser
       - run: npm run design:dock
       - run: npm run design:mobile
       - run: npm run design:impact
-      - run: npm run design:interactive
       - uses: actions/upload-artifact@v4
         if: always()
         with:
