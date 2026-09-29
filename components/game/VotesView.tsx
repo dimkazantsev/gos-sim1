@@ -2,6 +2,8 @@
 import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Vote} from './types';
+import StyledSelect from '../ui/StyledSelect';
+import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 import {institutionLabel,majorityLabel} from './proceduralVoting';
 
 function pct(n:number,d:number){return d>0?Math.round(n/d*100):0}
@@ -17,7 +19,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeR
  const openCount=votes.filter(v=>v.status==='open').length;
 
  async function create(){
-  const ok=await createVote({title,body,mode,institutionKey:institution,procedureKey:'manual',quorumKind:'fraction',quorumValue,majorityKind,majorityValue,allowAbstain:true,tieBreakerChair:institution==='government'});
+  const ok=await createVote({title,body,mode,institutionKey:institution,procedureKey:['gd','government','municipality'].includes(institution)?'registered_session':'manual',quorumKind:'fraction',quorumValue,majorityKind,majorityValue,allowAbstain:true,tieBreakerChair:institution==='government'});
   if(ok){setTitle('');setBody('')}
  }
 
@@ -38,6 +40,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeR
    <div className="votesHeroState"><strong>{openCount}</strong><span>открытых голосований</span><button onClick={onOpenStages}>Этапы игры →</button></div>
   </section>
 
+  <InstitutionRegistrationPanel g={g}/>
   <section className="votesOverview">
    <article><small>ВСЕГО</small><strong>{votes.length}</strong><span>процедур</span></article>
    <article><small>ПРИНЯТО</small><strong>{votes.filter(v=>v.result_code==='passed').length}</strong><span>решений</span></article>
@@ -52,12 +55,20 @@ export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeR
      <input aria-label="Вопрос голосования" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Вопрос голосования"/>
      <textarea aria-label="Проект решения" value={body} onChange={e=>setBody(e.target.value)} placeholder="Проект решения / пояснение"/>
      <div className="voteBuilderGrid">
-      <label>Кто голосует<select value={institution} onChange={e=>setInstitution(e.target.value)}><option value="all">Все участники</option><option value="gd">Государственная Дума</option><option value="government">Правительство РФ</option><option value="sf">Совет Федерации</option><option value="committee">Профильный комитет</option><option value="municipality">Муниципальный орган</option></select></label>
-      <label>Способ подсчёта<select value={mode} onChange={e=>setMode(e.target.value as typeof mode)}><option value="member">Один участник — один голос</option><option value="faction">Одна фракция — один голос</option><option value="mandate">Вес = число мандатов</option></select></label>
-      <label>Кворум<select value={quorumValue} onChange={e=>setQuorumValue(Number(e.target.value))}><option value={0.5}>Не менее 1/2</option><option value={2/3}>Не менее 2/3</option><option value={0.75}>Не менее 3/4</option></select></label>
-      <label>Порог решения<select value={majorityKind} onChange={e=>setMajorityKind(e.target.value as typeof majorityKind)}><option value="present_majority">Большинство присутствующих</option><option value="eligible_majority">Большинство от общего состава</option><option value="eligible_fraction">Доля от общего состава</option><option value="yes_no_simple">Больше «за», чем «против»</option></select></label>
+      <StyledSelect label="Кто голосует" value={institution} onChange={setInstitution} options={[
+       {value:'all',label:'Все участники'},{value:'gd',label:'Государственная Дума'},
+       {value:'government',label:'Правительство РФ'},{value:'sf',label:'Совет Федерации'},
+       {value:'committee',label:'Профильный комитет'},{value:'municipality',label:'Муниципальный орган'}]}/>
+      <StyledSelect label="Способ подсчёта" value={mode} onChange={v=>setMode(v as typeof mode)} options={[
+       {value:'member',label:'Один участник — один голос'},{value:'faction',label:'Одна фракция — один голос'},{value:'mandate',label:'Вес = число мандатов'}]}/>
+      <StyledSelect label="Кворум" value={String(quorumValue)} onChange={v=>setQuorumValue(Number(v))}
+       options={[{value:'0.5',label:'Не менее 1/2'},{value:String(2/3),label:'Не менее 2/3'},{value:'0.75',label:'Не менее 3/4'}]}/>
+      <StyledSelect label="Порог решения" value={majorityKind} onChange={v=>setMajorityKind(v as typeof majorityKind)}
+       options={[{value:'present_majority',label:'Большинство присутствующих'},{value:'eligible_majority',label:'Большинство от общего состава'},
+       {value:'eligible_fraction',label:'Доля от общего состава'},{value:'yes_no_simple',label:'Больше «за», чем «против»'}]}/>
      </div>
-     {majorityKind==='eligible_fraction'&&<label className="voteFraction">Необходимая доля<select value={majorityValue} onChange={e=>setMajorityValue(Number(e.target.value))}><option value={2/3}>2/3</option><option value={0.75}>3/4</option></select></label>}
+     {majorityKind==='eligible_fraction'&&<StyledSelect label="Необходимая доля" value={String(majorityValue)}
+       onChange={v=>setMajorityValue(Number(v))} options={[{value:String(2/3),label:'2/3'},{value:'0.75',label:'3/4'}]}/>}
      <button className="primary" onClick={create}>Открыть голосование</button>
     </div>
    </div>
