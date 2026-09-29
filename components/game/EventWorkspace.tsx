@@ -3,6 +3,7 @@ import {useEffect,useState} from 'react';
 import {CalendarDays,CheckCircle2,UsersRound,Vote as VoteIcon} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import StyledSelect from '../ui/StyledSelect';
 type CaseRow={id:string;game_id:string;case_key:string;title:string;situation:string;category:string;seriousness:'serious'|'light';audience:'single'|'group'|'all';allowed_roles:string[];status:string;source_url:string|null};
 type Assignment={id:string;case_id:string;game_id:string;recipient_id:string;status:string};
 type Decision={id:string;case_id:string;actor_id:string;choice:string};
@@ -86,10 +87,10 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
    <h3>Направить новое событие</h3>
    <div className="eventEditorGrid">
     <label>Название<input value={title} maxLength={180} onChange={e=>setTitle(e.target.value)} placeholder="Краткий заголовок ситуации"/></label>
-    <label>Сфера<select value={category} onChange={e=>setCategory(e.target.value)}>{['Государственное управление','Экономика','Международные отношения','Образование','Здравоохранение','Экология','Муниципальное управление','Культура и протокол','Социальная политика'].map(s=><option key={s}>{s}</option>)}</select></label>
-    <label>Тип<select value={seriousness} onChange={e=>setSeriousness(e.target.value as 'serious'|'light')}><option value="serious">Серьёзное</option><option value="light">Повседневное / необычное</option></select></label>
-    <label>Роль получателя<select value={roleFilter} onChange={e=>{setRoleFilter(e.target.value);setSelected([])}}><option value="">Любая должность</option>{roles.map(role=><option key={role} value={role}>{role}</option>)}</select></label>
-    <label>Формат<select value={audience} onChange={e=>{setAudience(e.target.value as 'single'|'group'|'all');setSelected([])}}><option value="single">Одному участнику</option><option value="group">Совместно, 2–3 человека</option><option value="all">Всем студентам</option></select></label>
+    <StyledSelect label="Сфера" value={category} onChange={setCategory} options={['Государственное управление','Экономика','Международные отношения','Образование','Здравоохранение','Экология','Муниципальное управление','Культура и протокол','Социальная политика'].map(v=>({value:v,label:v}))}/>
+    <StyledSelect label="Тип" value={seriousness} onChange={v=>setSeriousness(v as 'serious'|'light')} options={[{value:'serious',label:'Серьёзное'},{value:'light',label:'Повседневное / необычное'}]}/>
+    <StyledSelect label="Роль получателя" value={roleFilter} onChange={v=>{setRoleFilter(v);setSelected([])}} options={[{value:'',label:'Любая должность'},...roles.map(v=>({value:v,label:v}))]}/>
+    <StyledSelect label="Формат" value={audience} onChange={v=>{setAudience(v as 'single'|'group'|'all');setSelected([])}} options={[{value:'single',label:'Одному участнику'},{value:'group',label:'Совместно, 2–3 человека'},{value:'all',label:'Всем студентам'}]}/>
     <label className="eventWide">Описание ситуации<textarea rows={4} value={situation} maxLength={5000} onChange={e=>setSituation(e.target.value)} placeholder="Какое решение нужно принять или отклонить?"/></label>
    </div>
    {audience!=='all'&&<div className="eventRecipients"><strong>Получатели · {selected.length}/{audience==='single'?1:3}</strong><div>{recipients.map(m=><label key={m.user_id}><input type="checkbox" checked={selected.includes(m.user_id)} disabled={!selected.includes(m.user_id)&&selected.length>=(audience==='single'?1:3)} onChange={e=>setSelected(old=>e.target.checked?[...old,m.user_id]:old.filter(x=>x!==m.user_id))}/>{m.full_name}<small>{m.role_title||'Студент'}</small></label>)}</div></div>}
