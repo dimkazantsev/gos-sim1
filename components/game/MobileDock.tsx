@@ -5,7 +5,7 @@ import {Check,LayoutGrid,MessageCircle,Pin} from 'lucide-react';
 import type {ReactNode,PointerEvent as ReactPointerEvent,KeyboardEvent as ReactKeyboardEvent} from 'react';
 import type {View} from './types';
 
-export type MobileDockItem={key:View;label:string;icon:ReactNode};
+export type MobileDockItem={key:View;label:string;shortLabel?:string;icon:ReactNode};
 
 export function normalizeDockOrder(saved:unknown,available:View[]):View[]{
  const valid=Array.isArray(saved)?saved.filter((key):key is View=>typeof key==='string'&&available.includes(key as View)):[];
@@ -227,7 +227,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
      onDragStart={e=>e.preventDefault()} onKeyDown={e=>keyMove(e,item.key)}
      onClick={e=>click(e,item.key)}>
      <span className="mobileDockIcon">{item.icon}</span>
-     <span className="mobileDockLabel">{item.label}</span>
+     <span className="mobileDockLabel">{item.shortLabel||item.label}</span>
     </button>)}
     {onChat&&<button type="button" className={'mobileDockChat mobileDockItem '+(chatOpen?'active':'')}
      aria-controls="game-chat" aria-expanded={chatOpen} aria-label={chatOpen?'Закрыть чат':'Открыть чат'}
@@ -244,7 +244,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
       onKeyDown={e=>{if(e.key.toLowerCase()==='p'){e.preventDefault();togglePin(item.key)}}}
       onClick={e=>click(e,item.key)}>
       <span className="mobileDockIcon">{item.icon}<Pin className="mobileDockPinBadge" aria-hidden="true"/></span>
-      <span className="mobileDockLabel">{item.label}</span>
+      <span className="mobileDockLabel">{item.shortLabel||item.label}</span>
      </button>)}
     </div>}
     {editing?
