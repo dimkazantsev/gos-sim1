@@ -6,7 +6,7 @@ export type MediaUploadPhase='idle'|'uploading'|'saving';
 export type PendingMediaUpload={path:string;messageId:string};
 export type MediaRecord={
  id:string;game_id:string;channel_id:string;author_id:string;
- kind:MediaKind;text:string;storage_path:string;mime_type:string|null;
+ kind:MediaKind;text:string;storage_path:string;mime_type:string|null;voice_meta?:{duration?:number;waveform?:number[]}|null;
 };
 type RequestResult={error:null|{message:string;code?:string}};
 export type MediaTransport={
@@ -15,7 +15,7 @@ export type MediaTransport={
  exists:(messageId:string)=>Promise<boolean>;
 };
 export type MediaSendInput={
- blob:Blob;fileName:string;mime:string;kind:MediaKind;
+ blob:Blob;fileName:string;mime:string;kind:MediaKind;voiceMeta?:{duration?:number;waveform?:number[]}|null;
  gameId:string;channelId:string;userId:string;
  pending?:PendingMediaUpload;generateId:()=>string;
  onPhase?:(phase:MediaUploadPhase)=>void;
@@ -47,7 +47,7 @@ export async function sendChatMedia(input:MediaSendInput):Promise<MediaSendResul
  input.onPhase?.('saving');
  const record:MediaRecord={
   id:pending.messageId,game_id:gameId,channel_id:channelId,author_id:userId,
-  kind,text:fileName,storage_path:pending.path,mime_type:mime||null
+  kind,text:fileName,storage_path:pending.path,mime_type:mime||null,...(kind==='audio'&&input.voiceMeta?{voice_meta:input.voiceMeta}:{})
  };
  try{
   const result=await transport.insert(record);
