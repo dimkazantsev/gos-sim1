@@ -66,7 +66,7 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
   await load();await onChanged();setBusy(false);
  }
  async function assign(){
-  if(!game||!chosen||!recipient||busy||assigned.some(x=>x.case_id===chosen&&x.recipient_id===recipient))return;
+  if(!game||!chosen||!recipient||busy||!eligible.some(m=>m.user_id===recipient)||assigned.some(x=>x.case_id===chosen&&x.recipient_id===recipient))return;
   setBusy(true);setNotice('');
   const r=await supabase.from('event_assignments').insert({game_id:game.id,case_id:chosen,recipient_id:recipient,created_by:g.me?.user_id});
   setNotice(r.error?'Ошибка: '+r.error.message:'Ситуация назначена участнику.');
@@ -105,10 +105,10 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
    </button>
    {openBank&&<div className="autoEventBankBody">
     <div className="autoEventBankSearch"><input aria-label="Найти ситуацию" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Найти ситуацию по названию, сфере или тексту…"/><button type="button" disabled={busy} onClick={()=>void seed()}><RefreshCw size={16}/> Пополнить банк</button></div>
-    <div className="autoEventBankLayout"><div className="autoEventBankList" role="list">{visible.map(c=><button type="button" role="listitem" key={c.id} className={chosen===c.id?'selected':''} onClick={()=>setChosen(c.id)}><b>{c.title}</b><small>{c.category} · {c.seriousness==='light'?'Повседневное':'Серьёзное'}</small></button>)}</div>
+    <div className="autoEventBankLayout"><div className="autoEventBankList" role="list">{visible.map(c=><button type="button" role="listitem" key={c.id} className={chosen===c.id?'selected':''} onClick={()=>{setChosen(c.id);setRecipient('')}}><b>{c.title}</b><small>{c.category} · {c.seriousness==='light'?'Повседневное':'Серьёзное'}</small></button>)}</div>
      <article className="autoEventCaseDetails">{selected?<><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}</small><h4>{selected.title}</h4><p>{selected.situation}</p><em>{selected.source_note||'Авторский учебный кейс'}</em>
        <div className="autoEventCaseAssign"><StyledSelect label="Назначить участнику" value={recipient} onChange={setRecipient} options={[{value:'',label:'Выберите участника'},...eligible.map(m=>({value:m.user_id,label:m.full_name,disabled:assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id)}))]}/>
-       <button type="button" disabled={busy||!recipient||assigned.some(a=>a.case_id===chosen&&a.recipient_id===recipient)} onClick={()=>void assign()}><Send size={16}/> Назначить</button></div>
+       <button type="button" disabled={busy||!recipient||!eligible.some(m=>m.user_id===recipient)||assigned.some(a=>a.case_id===chosen&&a.recipient_id===recipient)} onClick={()=>void assign()}><Send size={16}/> Назначить</button></div>
       </>:<p>Выберите ситуацию слева.</p>}</article></div>
    </div>}
   </div>
