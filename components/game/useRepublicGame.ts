@@ -16,7 +16,7 @@ export function useRepublicGame(gameId:string){
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[chatOpen,setChatOpen]=useState(false),[secondsLeft,setSecondsLeft]=useState(0);
  const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]);
- const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false);
+ const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,string>());
 
  const teacher=me?.kind==='teacher';
  const names=useMemo(()=>Object.fromEntries(members.map(x=>[x.user_id,x.full_name])),[members]);
@@ -663,18 +663,23 @@ export function useRepublicGame(gameId:string){
   if(!me||!targetChannel)return false;
   if(blob.size<1||blob.size>CHAT_MAX_FILE_BYTES){setError('Размер вложения должен быть от 1 байта до 25 МБ.');return false}
   const ext=(fileName.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'')||'bin';
-  const path=gameId+'/'+targetChannel+'/'+me.user_id+'/'+crypto.randomUUID()+'.'+ext;
-  const up=await supabase.storage.from('game-media').upload(path,blob,{contentType:mime||'application/octet-stream',upsert:false});
-  if(up.error){setError('Загрузка вложения: '+up.error.message);return false}
+  let path=pendingChatUploads.current.get(blob);
+  if(!path){
+   path=gameId+'/'+targetChannel+'/'+me.user_id+'/'+crypto.randomUUID()+'.'+ext;
+   const up=await supabase.storage.from('game-media').upload(path,blob,{contentType:mime||'application/octet-stream',upsert:false});
+   if(up.error){setError('Загрузка вложения: '+up.error.message);return false}
+   pendingChatUploads.current.set(blob,path);
+  }
   const row=await supabase.from('chat_messages').insert({
    game_id:gameId,channel_id:targetChannel,author_id:me.user_id,
    kind,text:fileName,storage_path:path,mime_type:mime||null
   });
   if(row.error){
-   setError('Файл загружен, но сообщение не сохранено: '+row.error.message+'. Запись оставлена для повторной отправки.');
+   setError('Файл загружен, но сообщение не сохранено: '+row.error.message+'. Повторная отправка не загрузит копию файла.');
    return false;
   }
-  if(channelRef.current===targetChannel)await loadMessages(targetChannel);
+  pendingChatUploads.current.delete(blob);
+  if(channelRef.current===targetChannel)void loadMessages(targetChannel).catch(()=>setError('Вложение сохранено. Не удалось обновить список сообщений — повторно откройте канал.'));
   return true;
  }
  async function sendChatFile(file:File){
