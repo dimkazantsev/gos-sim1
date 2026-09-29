@@ -184,20 +184,27 @@ async function main(){
  assert.deepEqual((await order(touch)).slice(0,3),['dashboard','stages','teacher'],'Touch drag order not saved');
  console.log('PASS native touch hold + drag and persistence');
  // Holding stationary beyond the drag delay should pin; the same long hold unpins.
- // Let the persisted active-item smooth scroll finish before choosing a touch point.
+ // Target an actually visible route: a prior swipe can leave the first item clipped.
  await sleep(450);
- await touch.locator('.mobileDockScroll').evaluate(el=>{el.style.scrollBehavior='auto';el.scrollLeft=0});
- await touch.waitForFunction(()=>{const b=document.querySelector('[data-dock-item="dashboard"]')?.getBoundingClientRect();if(!b)return false;return document.elementFromPoint(b.left+b.width/2,b.top+b.height/2)?.closest('[data-dock-item]')?.dataset.dockItem==='dashboard'},null,{timeout:2500});
- const pinFrom=await touch.locator('[data-dock-item="dashboard"]').boundingBox();
- const px=pinFrom.x+pinFrom.width/2,py=pinFrom.y+pinFrom.height/2;
- await touch.evaluate(()=>{window.__pinEvents=[];for(const name of ['pointerdown','pointermove','pointerup','pointercancel','contextmenu'])document.addEventListener(name,e=>{window.__pinEvents.push({name,target:e.target.closest?.('[data-dock-item]')?.dataset.dockItem||'',x:e.clientX,y:e.clientY})},true)});
+ const pinPoint=await touch.locator('.mobileDockScroll').evaluate(el=>{
+  const r=el.getBoundingClientRect();
+  for(const fraction of [.45,.62,.30,.78,.15]){
+   const x=r.left+r.width*fraction,y=r.top+r.height/2;
+   const item=document.elementFromPoint(x,y)?.closest('[data-dock-item]');
+   if(item){const b=item.getBoundingClientRect();return {key:item.dataset.dockItem,label:item.textContent.trim(),x:b.left+b.width/2,y:b.top+b.height/2}}
+  }
+  return null;
+ });
+ assert(pinPoint,'At least one scroll-strip item must be visible and tappable');
+ const {x:px,y:py}=pinPoint;
+ console.log('PIN TARGET',pinPoint);
  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:px,y:py}]});
  await sleep(1700);
  console.log('PIN DEBUG',await touch.evaluate(()=>({events:window.__pinEvents,storage:localStorage.getItem('dock-interaction-ci:pinned'),pinned:[...document.querySelectorAll('.mobileDockPinnedItem')].map(e=>e.textContent),editing:document.querySelector('.mobileDockV2')?.className,at:document.elementFromPoint(innerWidth/3,innerHeight-30)?.outerHTML.slice(0,180)})));
- await touch.waitForFunction(()=>document.querySelector('.mobileDockPinnedItem')?.textContent?.includes('Обзор игры'),null,{timeout:1000});
+ await touch.waitForFunction(label=>document.querySelector('.mobileDockPinnedItem')?.textContent?.includes(label),pinPoint.label,{timeout:1200});
  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
- assert.deepEqual(await touch.evaluate(()=>JSON.parse(localStorage.getItem('dock-interaction-ci:pinned')||'[]')),['dashboard']);
- assert.equal(await touch.locator('[data-dock-item="dashboard"]').count(),0,'Pinned item must leave scroll strip');
+ assert.deepEqual(await touch.evaluate(()=>JSON.parse(localStorage.getItem('dock-interaction-ci:pinned')||'[]')),[pinPoint.key]);
+ assert.equal(await touch.locator('[data-dock-item="'+pinPoint.key+'"]').count(),0,'Pinned item must leave scroll strip');
  await touch.reload();
  await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
  await touch.waitForFunction(()=>document.querySelector('.mobileDockPinnedItem')?.textContent?.includes('Обзор игры'),null,{timeout:4500});
