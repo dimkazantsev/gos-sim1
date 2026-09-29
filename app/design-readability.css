@@ -2286,7 +2286,7 @@
   --gs-top-clock-w:78px;
   --gs-top-gap:7px;
  }
- .simWorkspace .simTop{column-gap:6px;padding-inline:12px}
+ .simWorkspace .simTop{column-gap:6px;padding-inline:var(--gs-layout-gutter)}
  .simWorkspace .simTop .mobileBrand{gap:6px}
  .simWorkspace .simTop .mobileBrand b{font-size:13px}
  .simWorkspace .simTop .topScreenHistory{gap:3px}
