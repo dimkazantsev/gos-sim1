@@ -2,7 +2,7 @@
 .teacherCommand{gap:0;align-content:start}
 .teacherCommand .teacherWorkspace{overflow:visible;border:0;background:transparent;gap:0;box-shadow:none}
 .teacherCommand .teacherWorkspaceNav{
- position:sticky;top:70px;z-index:18;
+ position:sticky;top:var(--gs-top-h,84px);z-index:18;
  display:flex;align-items:center;gap:7px;width:100%;
  padding:9px 12px;margin:0 0 13px;border:1px solid #dce5f3;border-radius:14px;
  background:rgba(250,252,255,.98);box-shadow:0 5px 18px #1533550b;
@@ -179,7 +179,7 @@
 .gradeTotal{display:grid;place-items:center;height:36px;border-radius:7px;background:#eff4ff;color:#315db6;font-size:12px;font-weight:820;font-variant-numeric:tabular-nums}
 .gradeTotalHead{font-weight:900;color:#42699d}
 @media(max-width:1050px){
- .teacherCommand .teacherWorkspaceNav{top:0}
+ .teacherCommand .teacherWorkspaceNav{top:56px}
  .gradesRulesCompact .gradesRuleItems{grid-template-columns:repeat(2,minmax(0,1fr))}
  .participantsTableScroll{max-width:100%}
 }
@@ -215,7 +215,7 @@
 .teacherCommand .teacherOverviewStats span{color:#758aa1;font-size:11px;line-height:1.4}
 @media(max-width:1100px){.teacherCommand .teacherOverviewStats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){
- .teacherCommand .teacherWorkspaceNav{top:0}
+ .teacherCommand .teacherWorkspaceNav{top:56px}
  .teacherCommand .teacherOverviewStats{gap:8px}
  .teacherCommand .teacherOverviewStats article{min-height:95px;padding:12px}
  .teacherCommand .teacherOverviewStats strong{font-size:23px}
