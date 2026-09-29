@@ -18,9 +18,10 @@ export function voiceProgress(elapsed:number,duration:number):number{
 }
 
 export default function ChatVoicePlayer({
- src,messageId,durationHint=0,waveform,fileName='Аудиосообщение',
-}:{src:string;messageId:string;durationHint?:number|null;waveform?:number[]|null;fileName?:string}){
+ src,messageId,durationHint=0,waveform,fileName='Аудиосообщение',onRefresh,
+}:{src:string;messageId:string;durationHint?:number|null;waveform?:number[]|null;fileName?:string;onRefresh?:()=>Promise<string|null>}){
  const audio=useRef<HTMLAudioElement>(null);
+ const refreshAttempts=useRef(0);
  const [playing,setPlaying]=useState(false);
  const [elapsed,setElapsed]=useState(0);
  const [mediaDuration,setMediaDuration]=useState(0);
@@ -58,6 +59,13 @@ export default function ChatVoicePlayer({
   const time=Math.max(0,Math.min(duration,next));
   try{node.currentTime=time;setElapsed(time)}catch{/* Metadata unavailable: retain current position. */}
  }
+ async function recoverPlayback(){
+  if(!onRefresh||refreshAttempts.current>=1){setFailed(true);setBuffering(false);return}
+  refreshAttempts.current++;
+  setBuffering(true);
+  try{const next=await onRefresh();if(!next||next===src){setFailed(true);setBuffering(false)}}
+  catch{setFailed(true);setBuffering(false)}
+ }
  function cycleSpeed(){
   const next=SPEEDS[(SPEEDS.indexOf(speed as typeof SPEEDS[number])+1)%SPEEDS.length];
   if(audio.current)audio.current.playbackRate=next;
@@ -73,7 +81,7 @@ export default function ChatVoicePlayer({
    onTimeUpdate={e=>{setElapsed(e.currentTarget.currentTime);syncDuration()}}
    onRateChange={e=>setSpeed(e.currentTarget.playbackRate)}
    onEnded={e=>{setPlaying(false);setBuffering(false);if(!duration)setMediaDuration(e.currentTarget.currentTime);setElapsed(0)}}
-   onError={()=>{setFailed(true);setPlaying(false);setBuffering(false)}}/>
+   onError={()=>{setPlaying(false);void recoverPlayback()}}/>
   <button type="button" className="chatVoicePlay"
    aria-label={playing?'Пауза голосового сообщения':'Воспроизвести голосовое сообщение'}
    title={playing?'Пауза':'Воспроизвести'} onClick={()=>void toggle()}>
