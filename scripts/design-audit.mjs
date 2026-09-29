@@ -215,7 +215,7 @@ check('Recording does not immediately upload on stop and supports local audio/vi
  read('components/game/useRepublicGame.ts').includes('pendingChatUploads.current.set(blob,result.pending)')&&
  read('components/game/useRepublicGame.ts').includes('rec.start(1000)')&&
  chat.includes('className="chatCapturePanel chatCaptureReview"')&&
- chat.includes('Прослушать запись')&&chat.includes('Просмотреть запись')&&
+ chat.includes('chatCaptureVoicePreview')&&chat.includes('Просмотреть запись')&&
  chat.includes('recordingStream'));
 check('Chat composer aligns icon send, attachment, visible mic and video controls',
  chat.includes('className="chatInputRow"')&&
@@ -228,6 +228,12 @@ execFileSync(process.execPath,['scripts/chat-logic-check.cjs'],{stdio:'inherit'}
 execFileSync(process.execPath,['scripts/recording-media-check.cjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['scripts/chat-media-transport-check.cjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['scripts/chat-voice-player-check.cjs'],{stdio:'inherit'});
+check('Voice recordings preserve actual decoded waveform and metadata through Storage publication',
+ read('components/game/useRepublicGame.ts').includes('analyseVoiceBlob(blob)')&&
+ read('components/game/chatMediaTransport.ts').includes('voice_meta:input.voiceMeta')&&
+ read('components/game/ChatPanel.tsx').includes('waveform={m.voice_meta?.waveform}')&&
+ read('supabase/migrations/070_voice_metadata.sql').includes('voice_meta jsonb'));
+
 check('Voice notes use same accessible compact player in chat and pins',
  chat.includes('import ChatVoicePlayer from')&&
  chat.includes('<ChatVoicePlayer src={m.url}')&&
