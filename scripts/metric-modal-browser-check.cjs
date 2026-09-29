@@ -18,7 +18,7 @@ if(!chrome)throw new Error('Chrome/Chromium missing. Set CHROME_BIN for browser 
 if(!fs.existsSync(preview))throw new Error('Run npm run design:preview first.');
 
 async function main(){
- const browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage','--use-fake-ui-for-media-stream','--use-fake-device-for-media-stream']});
+ const browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage','--use-fake-ui-for-media-stream','--use-fake-device-for-media-stream','--autoplay-policy=no-user-gesture-required']});
  const errors=[];
  try{
   const page=await browser.newPage({viewport:{width:1560,height:960},deviceScaleFactor:1});
@@ -231,6 +231,19 @@ async function main(){
      assert(voice.speedRight<=voice.bubbleRight+3&&voice.playLeft>=voice.bubbleLeft-3,
        'Voice player fits bubble without clipping: '+JSON.stringify(voice));
      assert.equal(voice.hidden,'none','Audio engine remains visually hidden');
+     if(width===390&&chatScreen==='chat-panel'){
+      const playback=await player.locator('audio').evaluate(async el=>{
+       await el.play();
+       await new Promise(resolve=>setTimeout(resolve,300));
+       const data={duration:el.duration,elapsed:el.currentTime,playing:!el.paused};
+       el.pause();
+       return data;
+      });
+      assert(playback.duration>0&&playback.elapsed>0&&playback.playing,
+       'Real waveform fixture must decode and play in Chromium: '+JSON.stringify(playback));
+      console.log('PASS real WAV voice note playback: '+JSON.stringify(playback));
+     }
+
      if(chatScreen==='chat-pins')assert.equal(await frame.locator('.chatPinnedMedia .chatVoicePlayer').count(),1,
        'Pinned voice uses same horizontal layout as conversation voice');
     }
