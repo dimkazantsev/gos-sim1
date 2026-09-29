@@ -19,6 +19,24 @@ async function main(){
   const frame=page.frameLocator('#preview');
   for(const width of [1180,900,820,768,650,430,390,360,320]){
    await page.locator('#preview').evaluate((el,w)=>{el.style.width=w+'px'},width);
+   if(width<=900){
+    await page.locator('#screen').selectOption('dashboard');
+    const header=await frame.locator('.simTop').evaluate(el=>{
+     const r=el.getBoundingClientRect();
+     const parts=[...el.querySelectorAll('.mobileBrand,.topScreenHistory,.simTopCenter,.viewAsSwitcher')].filter(x=>getComputedStyle(x).display!=='none').map(x=>{const a=x.getBoundingClientRect();return {name:x.className,left:a.left,right:a.right,top:a.top,bottom:a.bottom}});
+     return {height:r.height,width:document.documentElement.clientWidth,parts,connection:getComputedStyle(el.querySelector('.connectionPill')).display};
+    });
+    assert(header.height<=60,'Mobile header must fit one row at '+width+'px: '+JSON.stringify(header));
+    assert(header.connection!=='none','Sync indicator must be present and stable');
+    for(const part of header.parts)assert(part.left>=-2&&part.right<=header.width+2,'Header overflows at '+width+': '+JSON.stringify(header));
+    await page.locator('#screen').selectOption('chat');
+    const chatGeometry=await frame.locator('.gsChatV2').evaluate(el=>{
+     const a=el.getBoundingClientRect(),b=document.querySelector('.mobileDockV2').getBoundingClientRect();
+     return {chat:{top:a.top,bottom:a.bottom},dock:{top:b.top,bottom:b.bottom}};
+    });
+    assert(chatGeometry.chat.top>=-2&&chatGeometry.chat.top<12,'Chat must start at viewport top: '+JSON.stringify(chatGeometry));
+    assert(chatGeometry.chat.bottom<=chatGeometry.dock.top+3&&chatGeometry.chat.bottom>=chatGeometry.dock.top-8,'Chat must end above dock: '+JSON.stringify(chatGeometry));
+   }
    await page.locator('#screen').selectOption('teacher');
    await frame.locator('.teacherSimple .teacherFocus').waitFor();
    const result=await frame.locator('html').evaluate(html=>{
@@ -64,7 +82,7 @@ async function main(){
      return {viewport:html.clientWidth,scroll:html.scrollWidth,sheet:{left:panel.left,right:panel.right,top:panel.top,bottom:panel.bottom},
       sections:items.length,overflow:items.filter(r=>r.left<panel.left-3||r.right>panel.right+3)};
     });
-    assert.equal(all.sections,9,'All nine teacher routes must be visible in the same menu');
+    assert.equal(all.sections,10,'Nine teacher routes and chat must be visible in the same menu');
     assert(all.scroll<=all.viewport+3,'All sections menu widens page at '+width+'px');
     assert.equal(all.overflow.length,0,'All-sections items escape modal bounds at '+width+'px');
     assert(all.sheet.top>=-2&&all.sheet.bottom<=940+2,'All-sections menu escapes viewport at '+width+'px');

@@ -168,3 +168,93 @@
  .mobileDockV2 .mobileDockItem{touch-action:none!important;-webkit-user-select:none;user-select:none;}
  .mobileDockV2 .mobileDockScroll{touch-action:pan-y;}
 }
+
+/* Compact one-row mobile header, with stable sync footprint. */
+@media(max-width:900px){
+ :root{--gs-mobile-dock-height:calc(76px + env(safe-area-inset-bottom,0px))}
+ .simWorkspace .simTop{
+  display:flex;flex-flow:row nowrap;align-items:center;justify-content:space-between;
+  box-sizing:border-box;width:100%;height:56px;min-height:56px;max-height:56px;
+  padding:7px 12px;gap:5px;overflow:visible;
+ }
+ .simWorkspace .simTop .mobileBrand{display:flex;flex:0 1 auto;order:0;min-width:0;margin:0 auto 0 0;gap:7px}
+ .simWorkspace .simTop .mobileBrand .brandMark{flex:0 0 32px;width:32px;min-width:32px;height:32px;border-radius:9px;font-size:12px}
+ .simWorkspace .simTop .mobileBrand b{min-width:0;max-width:104px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px}
+ .simWorkspace .simTop .topStageCopy{display:none}
+ .simWorkspace .simTop .simTopCenter{
+  display:flex;flex:0 0 auto;order:1;justify-content:flex-end;align-items:center;
+  width:auto;min-width:0;min-height:0;height:40px;padding:0;margin:0;gap:0;
+ }
+ .simWorkspace .simTop .topIndicators{display:flex;flex-wrap:nowrap;align-items:center;gap:4px;width:auto;min-width:0;margin:0}
+ .simWorkspace .simTop .livePill{
+  display:grid;place-items:center;flex:0 0 34px;width:34px;min-width:34px;max-width:34px;
+  height:36px;min-height:36px;max-height:36px;padding:0;border-radius:10px;
+ }
+ .simWorkspace .simTop .livePill svg{display:block;flex:none;width:17px;height:17px}
+ .simWorkspace .simTop .livePillText{display:none}
+ .simWorkspace .simTop .timerPill{
+  display:grid;place-items:center;flex:0 0 58px;width:58px;min-width:58px;max-width:58px;
+  height:36px;min-height:36px;max-height:36px;padding:0 3px;border-radius:10px;
+  font-size:12px;font-variant-numeric:tabular-nums;
+ }
+ .simWorkspace .simTop .connectionPill,
+ .simWorkspace .simTop .connectionPill.disconnected{
+  display:grid;place-items:center;flex:0 0 34px;width:34px;min-width:34px;max-width:34px;
+  height:36px;min-height:36px;max-height:36px;padding:0;border-radius:10px;
+ }
+ .simWorkspace .simTop .connectionPill svg{display:block;width:17px;height:17px;flex:none}
+ .simWorkspace .simTop .connectionPill .connectionLabel{display:none}
+ .simWorkspace .simTop .connectionPill.connected{color:var(--gs-green);border-color:#c6e0d3;background:var(--gs-green-soft)}
+ .simWorkspace .simTop .connectionPill.connecting{color:var(--gs-amber);border-color:#ebd6b3;background:var(--gs-amber-soft)}
+ .simWorkspace .simTop .topScreenHistory{
+  display:flex;align-items:center;flex:0 0 auto;order:2;grid-column:auto;grid-row:auto;margin:0;gap:2px;
+ }
+ .simWorkspace .topScreenHistory .screenHistoryButton{
+  flex:0 0 36px;width:36px;min-width:36px;max-width:36px;
+  height:36px;min-height:36px;max-height:36px;padding:0;border-radius:10px;
+ }
+ .simWorkspace .topScreenHistory .screenHistoryButton svg{width:17px;height:17px}
+ .simWorkspace .simTop .viewAsSwitcher{
+  display:block;position:relative;flex:0 0 36px;order:3;grid-column:auto;grid-row:auto;
+  width:36px;min-width:36px;max-width:36px;height:36px;min-height:36px;max-height:36px;
+  margin:0;padding:0;border:0;background:transparent;
+ }
+ .simWorkspace .simTop .viewAsTrigger{
+  display:grid;place-items:center;width:36px;min-width:36px;max-width:36px;
+  height:36px;min-height:36px;max-height:36px;padding:0;border:1px solid #dbe4f1;
+  border-radius:10px;background:#fff;
+ }
+ .simWorkspace .simTop .viewAsMobileIcon{display:block;width:18px;height:18px}
+ .simWorkspace .simTop .viewAsSwitcher.active .viewAsTrigger{background:#fff1f8;color:#9c3e75;border-color:#ebbed5}
+ .simWorkspace .simTop .viewAsTriggerText,.simWorkspace .simTop .viewAsChevron{display:none}
+ .simWorkspace .simTop .viewAsMenu{
+  position:absolute;top:calc(100% + 10px);right:0;
+  width:260px;min-width:230px;max-width:calc(100vw - 24px);
+  max-height:min(400px,calc(100dvh - 130px));overflow-y:auto;
+ }
+ .simWorkspace .simTop .topChatButton{display:none}
+ .mobileDockV2 .mobileDockFixed{
+  flex:0 0 156px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:4px;min-width:0;padding-left:6px;
+ }
+ .mobileDockV2 .mobileDockFixed>button{min-width:0;min-height:61px;padding:5px 2px;font-size:10px}
+ .mobileDockV2 .mobileDockFixed>button.mobileDockChat.active{border-color:#abc1f0;background:#eaf1ff;color:#2859b5}
+ .mobileDockV2 .mobileDockFixed>button.mobileDockDone{grid-column:1/-1}
+ .mobileDockV2 .mobileDockFixed:has(>button:only-child){flex-basis:82px;grid-template-columns:minmax(0,1fr)}
+ .simChat.gsChatV2{
+  position:fixed;z-index:85;inset:0 0 var(--gs-mobile-dock-height) 0;
+  width:100%;max-width:100%;height:calc(100dvh - var(--gs-mobile-dock-height));
+  max-height:none;min-height:0;margin:0;border:0;border-radius:20px 20px 0 0;
+  box-shadow:0 -14px 52px #132a4c30;animation:mobileChatReveal .23s cubic-bezier(.2,.75,.3,1) both;
+ }
+ .simChat.gsChatV2 .chatCompose{padding-bottom:10px}
+}
+@media(max-width:470px){.simWorkspace .simTop:has(.viewAsSwitcher) .mobileBrand b{display:none}}
+@media(max-width:350px){
+ .simWorkspace .simTop .mobileBrand b{display:none}
+ .simWorkspace .simTop{padding-inline:8px;gap:3px}
+ .simWorkspace .simTop .topIndicators{gap:2px}
+ .simWorkspace .simTop .mobileBrand{gap:3px}
+}
+@keyframes mobileChatReveal{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.simChat.gsChatV2{animation:none!important}}

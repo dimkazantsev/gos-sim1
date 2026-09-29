@@ -79,7 +79,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const hasFilter=!!search.trim()||onlyFiles;
  useEffect(()=>{
   const media=window.matchMedia('(max-width:1099px)');
-  const update=()=>setOverlay(media.matches);
+  const update=()=>setOverlay(media.matches&&!window.matchMedia('(max-width:900px)').matches);
   update();
   media.addEventListener('change',update);
   previousFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
@@ -122,13 +122,28 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   return()=>document.removeEventListener('pointerdown',click);
  },[attachOpen]);
  useEffect(()=>{
-  if(!overlay)return;
   const viewport=window.visualViewport,node=panel.current;
   if(!viewport||!node)return;
-  const align=()=>{node.style.height=viewport.height+'px';node.style.top=viewport.offsetTop+'px'};
-  align();viewport.addEventListener('resize',align);viewport.addEventListener('scroll',align);
-  return()=>{viewport.removeEventListener('resize',align);viewport.removeEventListener('scroll',align);node.style.removeProperty('height');node.style.removeProperty('top')};
- },[overlay]);
+  const mobile=window.matchMedia('(max-width:900px)');
+  const tablet=window.matchMedia('(min-width:901px) and (max-width:1099px)');
+  const align=()=>{
+   if(!mobile.matches&&!tablet.matches){
+    node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');return;
+   }
+   const dockHeight=mobile.matches?(document.querySelector<HTMLElement>('.mobileDockV2')?.getBoundingClientRect().height||76):0;
+   node.style.height=Math.max(0,viewport.height-dockHeight)+'px';
+   node.style.top=viewport.offsetTop+'px';
+   if(mobile.matches)node.style.bottom='auto';else node.style.removeProperty('bottom');
+  };
+  align();
+  viewport.addEventListener('resize',align);viewport.addEventListener('scroll',align);
+  mobile.addEventListener('change',align);tablet.addEventListener('change',align);
+  return()=>{
+   viewport.removeEventListener('resize',align);viewport.removeEventListener('scroll',align);
+   mobile.removeEventListener('change',align);tablet.removeEventListener('change',align);
+   node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');
+  };
+ },[]);
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
   if(pendingSend.current||uploading||chatLoading||!text.trim()||!channelId)return;
@@ -172,7 +187,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   });
  }
  function resetSearch(){setSearch('');setOnlyFiles(false);setSearchOpen(false);follow.current=true;requestAnimationFrame(scrollToLatest)}
- return <aside id="game-chat" ref={panel} tabIndex={-1} className="simChat gsChatV2" role={overlay?'dialog':undefined} aria-modal={overlay?true:undefined} aria-label="Командный чат" onKeyDown={e=>{if(e.key==='Escape'){
+ return <aside id="game-chat" ref={panel} tabIndex={-1} className="simChat gsChatV2" role={overlay?'dialog':'region'} aria-modal={overlay?true:undefined} aria-label="Командный чат" onKeyDown={e=>{if(e.key==='Escape'){
   if(attachOpen){e.stopPropagation();setAttachOpen(false);attachmentButton.current?.focus()}
   else if(searchOpen){e.stopPropagation();resetSearch()}
   else{e.stopPropagation();setChatOpen(false)}
