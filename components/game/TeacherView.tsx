@@ -72,9 +72,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTy
      </button>
     })}
    </div>
-   <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
-    {workspace==='overview'&&<>
-       <section className="teacherCommandBar" aria-label="Быстрое управление игрой">
+   <section className="teacherCommandBar" aria-label="Быстрое управление игрой">
    <div className="teacherCommandStage">
     <span className="teacherEyebrow">ПУЛЬТ ПРЕПОДАВАТЕЛЯ</span>
     <div className="teacherCommandStageLine">
@@ -102,6 +100,9 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages}:{g:ReturnTy
     </button>
    </div>
   </section>
+   <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
+    {workspace==='overview'&&<>
+
 
 
      <div className="teacherOverviewQuick">
