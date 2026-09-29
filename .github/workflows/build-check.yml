@@ -24,6 +24,7 @@ jobs:
       - run: npm run design:check
       - run: npm run design:preview
       - run: npm run design:browser
+      - run: npm run design:dock
       - run: npm run design:mobile
       - run: npm run design:impact
       - uses: actions/upload-artifact@v4
