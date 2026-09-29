@@ -9,6 +9,7 @@ const score=(a:Assessment)=>a.status==='final'?(a.final_score??a.auto_score):a.a
 export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
  const {game,members,activities,politicalPosts,politicalDecisions,formalDocuments,ballots,teacher}=g;
  const [assessments,setAssessments]=useState<Assessment[]>([]);
+ const [activityTotals,setActivityTotals]=useState<Record<string,number>|null>(null);
  const [sort,setSort]=useState<Sort>('score');
  const [asc,setAsc]=useState(false);
  const [search,setSearch]=useState('');
@@ -20,9 +21,15 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
   if(!game||!teacher)return;
   let alive=true;
   const load=async()=>{
-   const r=await supabase.from('stage_assessments').select('user_id,stage_no,auto_score,final_score,status').eq('game_id',game.id);
+   const [r,t]=await Promise.all([
+    supabase.from('stage_assessments').select('user_id,stage_no,auto_score,final_score,status').eq('game_id',game.id),
+    supabase.rpc('teacher_game_activity_counts',{p_game_id:game.id})
+   ]);
    if(!alive)return;
-   if(r.error)setError(r.error.message);else{setAssessments((r.data||[]) as Assessment[]);setError('')}
+   if(r.error)setError(r.error.message);else setAssessments((r.data||[]) as Assessment[]);
+   if(t.error){setActivityTotals(null);setError(t.error.message)}
+   else setActivityTotals(Object.fromEntries(((t.data||[]) as {user_id:string;activity_count:number|string}[]).map(item=>[item.user_id,Number(item.activity_count)])));
+   if(!r.error&&!t.error)setError('')
   };
   void load();
   const channel=supabase.channel('analytics-assessments:'+game.id)
@@ -40,8 +47,8 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
    posts:posts.length,decisions:politicalDecisions.filter(d=>ids.has(d.post_id)).length,
    documents:formalDocuments.filter(d=>d.author_id===m.user_id).length,
    votes:ballots.filter(b=>b.voter_id===m.user_id).length,
-   activity:activities.filter(a=>a.actor_id===m.user_id).length};
- }),[members,assessments,stage,politicalPosts,politicalDecisions,formalDocuments,ballots,activities]);
+   activity:activityTotals===null?activities.filter(a=>a.actor_id===m.user_id).length:activityTotals[m.user_id]||0};
+ }),[members,assessments,stage,politicalPosts,politicalDecisions,formalDocuments,ballots,activities,activityTotals]);
  const filtered=rows.filter(r=>(!team||(r.m.team||r.m.group_name||'')===team)&&(!onlyAssessed||r.assessed>0)&&
   (!search||[r.m.full_name,r.m.team||'',r.m.group_name||'',r.m.role_title||''].some(s=>s.toLocaleLowerCase('ru').includes(search.toLocaleLowerCase('ru'))))).sort((a,b)=>{
    const part=(n:string,index:number)=>n.trim().split(/\s+/)[index]||'';
@@ -88,6 +95,6 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
    </table>
    {!filtered.length&&<div className="journalEmpty">Нет участников по выбранным условиям.</div>}
   </div>
-  <p className="journalNote">Источник баллов: stage_assessments. Показатели активности — последние 250 загруженных событий; это не абсолютный итог за всю игру.</p>
+  <p className="journalNote">Источник баллов: stage_assessments. {activityTotals===null?'Активность: последние 250 загруженных событий до получения полного итога.':'Активность: все зафиксированные события игры, подсчитанные сервером.'}</p>
  </section>;
 }
