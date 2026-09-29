@@ -5,7 +5,7 @@ import {supabase} from '@/lib/supabase';
 import StyledSelect from '../ui/StyledSelect';
 import type {ReturnTypeRepublic} from './viewTypes';
 type Settings={enabled:boolean;interval_hours:number;activity_weight:number;max_daily:number;trust_per_20:number;backlog_penalty:number;last_run_at:string|null};
-type BankCase={id:string;case_key:string;title:string;situation:string;category:string;seriousness:string;allowed_roles:string[];status:string;source_note:string|null};
+type BankCase={id:string;case_key:string;title:string;situation:string;category:string;seriousness:string;allowed_roles:string[];audience:'single'|'all'|'group';status:string;source_note:string|null};
 const DEFAULT:Settings={enabled:false,interval_hours:12,activity_weight:1,max_daily:2,trust_per_20:2,backlog_penalty:1,last_run_at:null};
 export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;onChanged:()=>Promise<void>}){
  const {game,members,teacher}=g;
@@ -21,13 +21,13 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
  const students=members.filter(m=>m.kind==='student');
  const visible=useMemo(()=>bank.filter(c=>[c.title,c.category,c.situation].join(' ').toLowerCase().includes(search.toLowerCase())),[bank,search]);
  const selected=bank.find(c=>c.id===chosen);
- const eligible=students.filter(m=>!selected?.allowed_roles?.length||selected.allowed_roles.some(role=>(m.role_title||'').toLowerCase().includes(role.toLowerCase())));
+ const eligible=selected?.audience==='all'?students:students.filter(m=>!selected?.allowed_roles?.length||selected.allowed_roles.some(role=>(m.role_title||'').toLowerCase().includes(role.toLowerCase())));
  const effectiveInterval=settings.activity_weight===0?settings.interval_hours:Math.max(4,settings.interval_hours/(1+settings.activity_weight*2));
  async function load(){
   if(!game)return;
   const [a,b,c]=await Promise.all([
    supabase.from('event_auto_settings').select('*').eq('game_id',game.id).maybeSingle(),
-   supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,status,source_note').eq('game_id',game.id).like('case_key','bank-%').order('category').order('title'),
+   supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,audience,status,source_note').eq('game_id',game.id).like('case_key','bank-%').order('category').order('title'),
    supabase.from('event_assignments').select('case_id,recipient_id').eq('game_id',game.id)
   ]);
   if(!a.error&&a.data)setSettings(a.data as Settings);
@@ -72,6 +72,18 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
   setNotice(r.error?'Ошибка: '+r.error.message:'Ситуация назначена участнику.');
   await load();await onChanged();setBusy(false);
  }
+ async function assignAll(){
+  if(!game||!chosen||!teacher||busy||selected?.audience!=='all')return;
+  const pending=students.filter(m=>!assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id));
+  if(!pending.length){setNotice('Ситуация уже направлена всем участникам.');return}
+  if(!window.confirm('Назначить ситуацию «'+selected.title+'» всем '+pending.length+' участникам?'))return;
+  setBusy(true);setNotice('');
+  const r=await supabase.from('event_assignments').insert(pending.map(m=>({
+   game_id:game.id,case_id:chosen,recipient_id:m.user_id,created_by:g.me?.user_id
+  })));
+  setNotice(r.error?'Ошибка: '+r.error.message:'Ситуация успешно назначена '+pending.length+' участникам.');
+  await load();await onChanged();setBusy(false);
+ }
  if(!teacher||!game)return null;
  return <section className="autoEventPanel" aria-label="Автоматические события и банк ситуаций">
   <header className="autoEventHeading"><div><small>РЕЖИССЁР · АВТОМАТИЧЕСКИЕ СОБЫТИЯ</small><h3>Автоматический сценарий</h3>
@@ -105,10 +117,14 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
    </button>
    {openBank&&<div className="autoEventBankBody">
     <div className="autoEventBankSearch"><input aria-label="Найти ситуацию" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Найти ситуацию по названию, сфере или тексту…"/><button type="button" disabled={busy} onClick={()=>void seed()}><RefreshCw size={16}/> Пополнить банк</button></div>
-    <div className="autoEventBankLayout"><div className="autoEventBankList" role="list">{visible.map(c=><button type="button" role="listitem" key={c.id} className={chosen===c.id?'selected':''} onClick={()=>{setChosen(c.id);setRecipient('')}}><b>{c.title}</b><small>{c.category} · {c.seriousness==='light'?'Повседневное':'Серьёзное'}</small></button>)}</div>
-     <article className="autoEventCaseDetails">{selected?<><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}</small><h4>{selected.title}</h4><p>{selected.situation}</p><em>{selected.source_note||'Авторский учебный кейс'}</em>
-       <div className="autoEventCaseAssign"><StyledSelect label="Назначить участнику" value={recipient} onChange={setRecipient} options={[{value:'',label:'Выберите участника'},...eligible.map(m=>({value:m.user_id,label:m.full_name,disabled:assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id)}))]}/>
-       <button type="button" disabled={busy||!recipient||!eligible.some(m=>m.user_id===recipient)||assigned.some(a=>a.case_id===chosen&&a.recipient_id===recipient)} onClick={()=>void assign()}><Send size={16}/> Назначить</button></div>
+    <div className="autoEventBankLayout"><div className="autoEventBankList" role="list">{visible.map(c=><button type="button" role="listitem" key={c.id} className={chosen===c.id?'selected':''} onClick={()=>{setChosen(c.id);setRecipient('')}}><b>{c.title}</b><small>{c.category} · {c.seriousness==='light'?'Повседневное':'Серьёзное'}{c.audience==='all'?' · Вся аудитория':''}</small></button>)}</div>
+     <article className="autoEventCaseDetails">{selected?<><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}{selected.audience==='all'?' · Вся аудитория':''}</small><h4>{selected.title}</h4><p>{selected.situation}</p><em>{selected.source_note||'Авторский учебный кейс'}</em>
+       {selected.audience==='all'?<div className="autoEventCaseAssign">
+        <p>Ситуация для всей аудитории. При назначении каждый участник получает личное задание, а результаты объединяются в статистике.</p>
+        <button type="button" disabled={busy||!students.length||students.every(m=>assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id))}
+          onClick={()=>void assignAll()}><Send size={16}/> Назначить всей аудитории</button></div>
+       :<div className="autoEventCaseAssign"><StyledSelect label="Назначить участнику" value={recipient} onChange={setRecipient} options={[{value:'',label:'Выберите участника'},...eligible.map(m=>({value:m.user_id,label:m.full_name,disabled:assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id)}))]}/>
+       <button type="button" disabled={busy||!recipient||!eligible.some(m=>m.user_id===recipient)||assigned.some(a=>a.case_id===chosen&&a.recipient_id===recipient)} onClick={()=>void assign()}><Send size={16}/> Назначить</button></div>}
       </>:<p>Выберите ситуацию слева.</p>}</article></div>
    </div>}
   </div>
