@@ -23,7 +23,7 @@ async function main(){
    await frame.locator('.teacherSimple .teacherFocus').waitFor();
    const result=await frame.locator('html').evaluate(html=>{
     const root=html.querySelector('.teacherSimple');
-    const dock=html.querySelector('.mobileDock');
+    const dock=html.querySelector('.mobileDockScroll');
     const bounds=(selector)=>Array.from(root.querySelectorAll(selector)).map(el=>{
      const r=el.getBoundingClientRect();
      return {selector,className:String(el.className||''),x:r.x,right:r.right,width:r.width,top:r.top,bottom:r.bottom};
@@ -43,7 +43,7 @@ async function main(){
     assert(result.dock.buttons>=9,'All eight routes + More must be in the mobile dock');
     assert(result.dock.scroll>result.dock.width+100,
      'Dock must scroll horizontally at '+width+'px: '+JSON.stringify(result.dock));
-    const moved=await frame.locator('.mobileDock').evaluate(el=>{
+    const moved=await frame.locator('.mobileDockScroll').evaluate(el=>{
      el.scrollLeft=0;
      el.scrollLeft=el.scrollWidth-el.clientWidth;
      return {left:el.scrollLeft,max:el.scrollWidth-el.clientWidth};
