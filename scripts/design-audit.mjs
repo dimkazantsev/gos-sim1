@@ -228,6 +228,7 @@ execFileSync(process.execPath,['scripts/chat-logic-check.cjs'],{stdio:'inherit'}
 execFileSync(process.execPath,['scripts/recording-media-check.cjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['scripts/chat-media-transport-check.cjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['scripts/chat-voice-player-check.cjs'],{stdio:'inherit'});
+execFileSync(process.execPath,['scripts/voice-waveform-check.cjs'],{stdio:'inherit'});
 check('Voice recordings preserve actual decoded waveform and metadata through Storage publication',
  read('components/game/useRepublicGame.ts').includes('analyseVoiceBlob(blob)')&&
  read('components/game/chatMediaTransport.ts').includes('voice_meta:input.voiceMeta')&&
