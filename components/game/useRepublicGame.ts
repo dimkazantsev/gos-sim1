@@ -20,6 +20,7 @@ export function useRepublicGame(gameId:string){
  const [chatMediaError,setChatMediaError]=useState(''),[chatMediaPhase,setChatMediaPhase]=useState<MediaUploadPhase>('idle');
  const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]);
+ const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,PendingMediaUpload>()),voiceAnalysisRef=useRef<Promise<{waveform:number[];duration:number}|null>|null>(null);
 
  const teacher=me?.kind==='teacher';
@@ -750,6 +751,7 @@ export function useRepublicGame(gameId:string){
   return storeChatAttachment(file,file.name,mime,uploadedChatKind(mime),target);
  }
  function discardRecording(){
+  if(videoLimitTimer.current){clearTimeout(videoLimitTimer.current);videoLimitTimer.current=null}
   if(mediaOperationRef.current)return;
   if(captureRef.current)captureRef.current.discard=true;
   if(recorder.current?.state==='recording')recorder.current.stop();
@@ -786,6 +788,7 @@ export function useRepublicGame(gameId:string){
    };
    rec.onerror=()=>setError('Ошибка записи. Попробуйте ещё раз или прикрепите готовый файл.');
    rec.onstop=()=>{
+    if(videoLimitTimer.current){clearTimeout(videoLimitTimer.current);videoLimitTimer.current=null}
     const current=captureRef.current;
     const parts=chunks.current;chunks.current=[];
     stream?.getTracks().forEach(track=>track.stop());
@@ -812,8 +815,10 @@ export function useRepublicGame(gameId:string){
     if(blob.size>CHAT_MAX_FILE_BYTES)setError('Запись превышает 25 МБ. Сохраните её на устройство или запишите заново.');
    };
    rec.start(1000);
+   if(kind==='video')videoLimitTimer.current=setTimeout(()=>{if(rec.state==='recording')rec.stop()},30000);
   }catch(e){
    stream?.getTracks().forEach(track=>track.stop());
+   if(videoLimitTimer.current){clearTimeout(videoLimitTimer.current);videoLimitTimer.current=null}
    recordingStream.current=null;recorder.current=null;captureRef.current=null;
    setRecording(null);setRecordingStartedAt(null);
    setError(e instanceof Error?e.message:'Не удалось получить доступ к микрофону или камере.');
