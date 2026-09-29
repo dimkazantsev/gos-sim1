@@ -12,6 +12,7 @@ import './teacher-command.css';
 import './teacher-operations.css';
 import './teacher-ui-polish.css';
 import './teacher-extended.css';
+import './teacher-master-detail.css';
 import type {Metadata} from 'next';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
