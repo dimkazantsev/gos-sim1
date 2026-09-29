@@ -124,15 +124,15 @@ export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeR
 
     <div className="quorumMeter"><div><span>Участие: {q.cast} из {q.eligible}</span><b className={q.met?'ok':'wait'}>{q.met?'КВОРУМ ЕСТЬ':'НУЖНО '+Math.max(0,q.needed-q.cast)}</b></div><i><em style={{width:Math.min(100,pct(q.cast,q.eligible))+'%'}}/></i></div>
     {v.voting_mode==='mandate'&&<details className="deputyRegistration" open={v.status==='open'}>
-     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{partyMandates.reduce((a,x)=>a+x.effective_mandates,0)} / {parties.reduce((a,p)=>a+Number(p.mandates||0),0)} присутствует</span></summary>
+     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{partyMandates.filter(a=>v.procedure_key!=='registered_session'||checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)).reduce((a,x)=>a+x.effective_mandates,0)} / {parties.reduce((a,p)=>a+Number(p.mandates||0),0)} участвует · GV −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
      <div className="deputyRegistrationBody">
       {parties.filter(p=>p.mandates>0).map(p=>{
        const rows=partyMandates.filter(x=>x.party_id===p.id);
        const base=rows.reduce((a,x)=>a+x.base_mandates,0);
        const effective=rows.reduce((a,x)=>a+x.effective_mandates,0);
        return <article key={p.id}>
-        <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{base} мандатов · {effective} зарегистрировано{p.ghost_active?' · GV −'+p.ghost_loss_current:''}</small></div></header>
-        <div>{rows.map(a=>{const m=members.find(x=>x.user_id===a.user_id);return <div className="deputyStudentRow" key={a.user_id}><b>{m?.full_name||'Участник'}</b><span>{a.base_mandates} манд.</span>{a.ghost_loss?<em>−{a.ghost_loss} GV</em>:<em>—</em>}<strong>{a.effective_mandates} голосов</strong></div>})}</div>
+        <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{base} мандатов · {effective} доступно{p.ghost_active?' · GV −'+p.ghost_loss_current:''}</small></div></header>
+        <div>{rows.map(a=>{const m=members.find(x=>x.user_id===a.user_id);return <div className="deputyStudentRow" key={a.user_id}><b>{m?.full_name||'Участник'}</b><span>{a.base_mandates} манд.</span>{a.ghost_loss?<em>−{a.ghost_loss} GV</em>:<em>—</em>}<strong>{a.effective_mandates} голосов {v.procedure_key==='registered_session'?(checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)?'· На заседании':'· Не зарегистрирован'):''}</strong></div>})}</div>
        </article>
       })}
      </div>
