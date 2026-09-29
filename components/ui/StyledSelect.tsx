@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useId,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
 import {Check,ChevronDown} from 'lucide-react';
 
@@ -14,7 +14,7 @@ export default function StyledSelect({label,value,options,onChange,disabled=fals
  const ref=useRef<HTMLDivElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
  const popup=useRef<HTMLDivElement>(null);
- const id=useRef('select-'+Math.random().toString(36).slice(2)).current;
+ const id=useId();
  const selected=options.find(o=>o.value===value);
  function position(){
   const r=trigger.current?.getBoundingClientRect();
