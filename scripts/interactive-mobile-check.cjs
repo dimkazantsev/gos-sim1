@@ -100,6 +100,23 @@ async function main(){
  await desktop.locator('.mobileDockItem').first().waitFor();
  for(const width of [320,360,390,430,768])await checkUnits(desktop,width);
  await desktop.setViewportSize({width:390,height:850});
+ const dockGeom=await desktop.locator('.mobileDockV2').evaluate(el=>{
+  const scroll=el.querySelector('.mobileDockScroll'),item=el.querySelector('.mobileDockItem'),icon=el.querySelector('.mobileDockIcon svg');
+  return {dock:el.getBoundingClientRect().height,item:item.getBoundingClientRect().width,icon:icon.getBoundingClientRect().width,scroll:scroll.scrollWidth,client:scroll.clientWidth};
+ });
+ assert(dockGeom.dock<=70,'Compact dock became too tall: '+JSON.stringify(dockGeom));
+ assert(dockGeom.item<=58&&dockGeom.icon<=17,'Dock icons/items are not compact: '+JSON.stringify(dockGeom));
+ const swipeResult=await desktop.locator('.mobileDockScroll').evaluate(async el=>{
+  el.scrollLeft=0;
+  const item=el.querySelector('.mobileDockItem'),r=item.getBoundingClientRect();
+  const id=71,x=r.left+r.width/2,y=r.top+r.height/2;
+  item.dispatchEvent(new PointerEvent('pointerdown',{pointerId:id,pointerType:'touch',isPrimary:true,clientX:x,clientY:y,bubbles:true}));
+  item.dispatchEvent(new PointerEvent('pointermove',{pointerId:id,pointerType:'touch',isPrimary:true,clientX:x-70,clientY:y,bubbles:true,cancelable:true}));
+  item.dispatchEvent(new PointerEvent('pointerup',{pointerId:id,pointerType:'touch',isPrimary:true,clientX:x-70,clientY:y,bubbles:true}));
+  await new Promise(r=>setTimeout(r,80));
+  return {left:el.scrollLeft,max:el.scrollWidth-el.clientWidth};
+ });
+ if(swipeResult.max>4)assert(swipeResult.left>0,'Pointer swipe must move the dock: '+JSON.stringify(swipeResult));
  await desktop.getByRole('button',{name:'Все разделы'}).click();
  const modal=desktop.getByRole('dialog',{name:'Все разделы'});
  await modal.waitFor({state:'visible'});

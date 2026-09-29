@@ -262,32 +262,32 @@
 /* Dock v3: compact icons, predictable horizontal swipe and pinned shortcuts.
    Keep touch targets comfortable while decreasing icon, label and bar height. */
 @media(max-width:900px){
- :root{--gs-mobile-dock-height:calc(65px + env(safe-area-inset-bottom,0px))}
+ :root{--gs-mobile-dock-height:calc(59px + env(safe-area-inset-bottom,0px))}
  .mobileDock.mobileDockV2{
-  padding:6px max(6px,env(safe-area-inset-right,0px))
-    calc(6px + env(safe-area-inset-bottom,0px))
-    max(6px,env(safe-area-inset-left,0px));
+  padding:4px max(5px,env(safe-area-inset-right,0px))
+    calc(4px + env(safe-area-inset-bottom,0px))
+    max(5px,env(safe-area-inset-left,0px));
  }
  .mobileDockV2 .mobileDockScroll{
   flex:1 1 0;min-width:48px;max-width:none;
   gap:3px;padding:0 4px 0 0;
   overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:none!important;scroll-behavior:auto;
-  touch-action:pan-y;overscroll-behavior-x:contain;
+  touch-action:none;overscroll-behavior-x:contain;
  }
  .mobileDockV2 .mobileDockItem{
-  flex:0 0 62px;width:62px;min-width:62px;max-width:62px;
-  min-height:52px;max-height:56px;gap:3px;padding:4px 3px;
+  flex:0 0 56px;width:56px;min-width:56px;max-width:56px;
+  min-height:48px;max-height:51px;gap:2px;padding:3px 2px;
   scroll-snap-align:none;touch-action:none!important;
  }
  .mobileDockV2 .mobileDockIcon{
   position:relative;display:grid;place-items:center;
-  flex:0 0 19px;width:20px;height:19px;min-height:19px;
+  flex:0 0 17px;width:18px;height:17px;min-height:17px;
  }
- .mobileDockV2 .mobileDockIcon>svg{width:18px;height:18px;stroke-width:1.85}
+ .mobileDockV2 .mobileDockIcon>svg{width:16px;height:16px;stroke-width:1.85}
  .mobileDockV2 .mobileDockLabel{
-  min-height:22px;max-height:24px;
-  font-size:9px;line-height:1.14;font-weight:740;letter-spacing:0;
+  min-height:20px;max-height:22px;
+  font-size:8.5px;line-height:1.12;font-weight:740;letter-spacing:0;
  }
  .mobileDockV2 .mobileDockFixed,
  .mobileDockV2 .mobileDockFixed:has(>button:only-child){
@@ -297,16 +297,16 @@
  }
  .mobileDockV2 .mobileDockFixed>button,
  .mobileDockV2 .mobileDockPinnedItem{
-  flex:0 0 55px;box-sizing:border-box;
+  flex:0 0 49px;box-sizing:border-box;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;width:55px;min-width:55px;max-width:55px;
-  min-height:52px;max-height:56px;margin:0;padding:4px 2px;
+  gap:2px;width:49px;min-width:49px;max-width:49px;
+  min-height:48px;max-height:51px;margin:0;padding:3px 2px;
   border:1px solid #d9e4f7;border-radius:10px;background:#eef4ff;
-  color:#305db0;font-size:9px;font-weight:790;line-height:1.14;text-align:center;
+  color:#305db0;font-size:8.5px;font-weight:790;line-height:1.12;text-align:center;
  }
- .mobileDockV2 .mobileDockFixed>button.mobileDockAll{flex-basis:65px;width:65px;min-width:65px;max-width:65px}
- .mobileDockV2 .mobileDockFixed>button.mobileDockDone{flex-basis:65px;width:65px;min-width:65px;max-width:65px}
- .mobileDockV2 .mobileDockFixed>button svg{width:18px;height:18px;flex:none}
+ .mobileDockV2 .mobileDockFixed>button.mobileDockAll{flex-basis:58px;width:58px;min-width:58px;max-width:58px}
+ .mobileDockV2 .mobileDockFixed>button.mobileDockDone{flex-basis:58px;width:58px;min-width:58px;max-width:58px}
+ .mobileDockV2 .mobileDockFixed>button svg{width:16px;height:16px;flex:none}
  .mobileDockV2 .mobileDockFixed>button span{width:100%;min-width:0;max-width:100%;overflow-wrap:anywhere}
  .mobileDockV2 .mobileDockPinned{
   flex:0 1 auto;display:flex;align-items:stretch;gap:3px;
@@ -316,7 +316,7 @@
  }
  .mobileDockV2 .mobileDockPinned::-webkit-scrollbar{display:none}
  .mobileDockV2 .mobileDockPinnedItem{
-  flex-basis:51px;width:51px;min-width:51px;max-width:51px;
+  flex-basis:47px;width:47px;min-width:47px;max-width:47px;
   background:#f5f2ff;border-color:#ded8ff;color:#6351a5;
   touch-action:pan-x;cursor:pointer;
  }
@@ -345,16 +345,17 @@
   height:36px;min-height:36px;max-height:36px;padding:0;margin:0;
  }
  .simWorkspace .simTop .viewAsMobileIcon{
-  display:block;justify-self:center;align-self:center;
-  width:19px;height:19px;min-width:19px;min-height:19px;
-  margin:0;transform:none;
+  position:absolute;inset:0;margin:auto;display:block;
+  width:18px;height:18px;min-width:18px;min-height:18px;
+  transform:none;pointer-events:none;
  }
+ .simWorkspace .simTop .viewAsTrigger{position:relative;line-height:0}
  .simWorkspace .simTop .viewAsMenu{justify-self:auto;align-self:auto}
 }
 @media(max-width:350px){
- .mobileDockV2 .mobileDockItem{flex-basis:57px;width:57px;min-width:57px;max-width:57px}
- .mobileDockV2 .mobileDockFixed>button{flex-basis:50px;width:50px;min-width:50px;max-width:50px}
- .mobileDockV2 .mobileDockFixed>button.mobileDockAll{flex-basis:58px;width:58px;min-width:58px;max-width:58px}
+ .mobileDockV2 .mobileDockItem{flex-basis:52px;width:52px;min-width:52px;max-width:52px}
+ .mobileDockV2 .mobileDockFixed>button{flex-basis:46px;width:46px;min-width:46px;max-width:46px}
+ .mobileDockV2 .mobileDockFixed>button.mobileDockAll{flex-basis:54px;width:54px;min-width:54px;max-width:54px}
  .mobileDockV2 .mobileDockPinned{max-width:min(87px,26vw)}
 }
 

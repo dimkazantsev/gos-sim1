@@ -25,7 +25,7 @@ export function normalizePinnedDock(saved:unknown,available:View[]):View[]{
 
 const DRAG_HOLD_MS=360;
 const PIN_HOLD_MS=1450;
-const SWIPE_THRESHOLD=9;
+const SWIPE_THRESHOLD=6;
 type Gesture={
  id:number;key:View;
  startX:number;startY:number;lastX:number;lastY:number;lastTime:number;velocity:number;
@@ -216,14 +216,13 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  }
  return <>
   <nav className={'mobileDock mobileDockV2 '+(editing?'isEditing':'')} aria-label={editing?'Изменение порядка мобильной панели':'Мобильная навигация'}>
-   <div ref={scrollRef} className="mobileDockScroll" aria-label="Прокручиваемые разделы">
+   <div ref={scrollRef} className="mobileDockScroll" aria-label="Прокручиваемые разделы" onPointerMove={onPointerMove} onPointerUp={onPointerEnd} onPointerCancel={onPointerCancel}>
     {ordered.map(item=><button key={item.key} data-dock-item={item.key} type="button"
      aria-current={activeView===item.key?'page':undefined}
      aria-label={editing?item.label+'. Перетащите для изменения порядка или удерживайте ещё для закрепления.':item.label+'. Длительное удержание — перемещение, очень длительное — закрепление.'}
      title={item.label}
      className={'mobileDockItem '+(activeView===item.key?'active ':'')+(dragging===item.key?'isDragged':'')}
-     onPointerDown={e=>onPointerDown(e,item.key)} onPointerMove={onPointerMove}
-     onPointerUp={onPointerEnd} onPointerCancel={onPointerCancel}
+     onPointerDown={e=>onPointerDown(e,item.key)}
      onContextMenu={e=>{if(editing||gestureRef.current?.key===item.key)e.preventDefault()}}
      onDragStart={e=>e.preventDefault()} onKeyDown={e=>keyMove(e,item.key)}
      onClick={e=>click(e,item.key)}>
