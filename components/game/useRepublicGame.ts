@@ -4,6 +4,9 @@ import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
 import type {ActionItem,Activity,Ballot,Channel,ChatPin,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,ImpactLedger,ImpactRule,Member,Message,Metric,MetricHistory,Party,PartyAgreement,PartyDocument,PartyInvitation,PartyMandateAllocation,PartySupportHistory,PoliticalDecision,PoliticalPost,PoliticalPostFormalLink,PoliticalPostMedia,Presence,Stage,Vote} from './types';
 import {CRISES} from './constants';
+import {CHAT_MAX_FILE_BYTES,preferredRecordingMime,recordingFileName,uploadedChatKind} from './recordingMedia';
+import type {ChatMediaKind} from './recordingMedia';
+export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number};
 
 export function useRepublicGame(gameId:string){
  const router=useRouter();
@@ -11,8 +14,9 @@ export function useRepublicGame(gameId:string){
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]),[chatPins,setChatPins]=useState<ChatPin[]>([]),[pinnedMessages,setPinnedMessages]=useState<Message[]>([]),[chatLoading,setChatLoading]=useState(false);
  const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profiles,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[partyInvitations,setPartyInvitations]=useState<PartyInvitation[]>([]),[partyMandates,setPartyMandateRows]=useState<PartyMandateAllocation[]>([]),[partyAgreements,setPartyAgreements]=useState<PartyAgreement[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]),[politicalPosts,setPoliticalPosts]=useState<PoliticalPost[]>([]),[politicalMedia,setPoliticalMedia]=useState<PoliticalPostMedia[]>([]),[postFormalLinks,setPostFormalLinks]=useState<PoliticalPostFormalLink[]>([]),[politicalDecisions,setPoliticalDecisions]=useState<PoliticalDecision[]>([]),[metricHistory,setMetricHistory]=useState<MetricHistory[]>([]),[partySupportHistory,setPartySupportHistory]=useState<PartySupportHistory[]>([]),[impactRules,setImpactRules]=useState<ImpactRule[]>([]),[impactLedger,setImpactLedger]=useState<ImpactLedger[]>([]);
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[chatOpen,setChatOpen]=useState(false),[secondsLeft,setSecondsLeft]=useState(0);
- const [recording,setRecording]=useState<'audio'|'video'|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
+ const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]);
+ const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false);
 
  const teacher=me?.kind==='teacher';
  const names=useMemo(()=>Object.fromEntries(members.map(x=>[x.user_id,x.full_name])),[members]);
@@ -58,6 +62,16 @@ export function useRepublicGame(gameId:string){
   liveRef.current=live;
   return()=>{if(liveRef.current)void supabase.removeChannel(liveRef.current)};
  },[gameId]);
+
+ useEffect(()=>()=>{
+  const rec=recorder.current;
+  if(rec&&rec.state!=='inactive'){
+   if(captureRef.current)captureRef.current.discard=true;
+   rec.stop();
+  }
+  recordingStream.current?.getTracks().forEach(track=>track.stop());
+  if(previewRef.current)URL.revokeObjectURL(previewRef.current.url);
+ },[]);
 
  useEffect(()=>{channelRef.current=channelId;setMessages([]);setChatPins([]);setPinnedMessages([]);if(channelId){void loadMessages(channelId,true);void loadChatPins(channelId)}else setChatLoading(false)},[channelId]);
 
@@ -645,27 +659,107 @@ export function useRepublicGame(gameId:string){
  }
 
  async function sendText(text:string){if(!me||!channelId||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}await loadMessages(channelId);return true}
- async function sendChatFile(file:File){
-  if(!me||!channelId)return false;
-  const ext=(file.name.split('.').pop()||'bin').toLowerCase();
-  const path=gameId+'/'+channelId+'/'+me.user_id+'/'+crypto.randomUUID()+'.'+ext;
-  const up=await supabase.storage.from('game-media').upload(path,file,{contentType:file.type||'application/octet-stream'});
-  if(up.error){setError(up.error.message);return false}
-  const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind:'file',text:file.name,storage_path:path,mime_type:file.type||null});
-  if(r.error){setError(r.error.message);return false}
-  await loadMessages(channelId);return true;
+ async function storeChatAttachment(blob:Blob,fileName:string,mime:string,kind:'file'|ChatMediaKind,targetChannel:string){
+  if(!me||!targetChannel)return false;
+  if(blob.size<1||blob.size>CHAT_MAX_FILE_BYTES){setError('Размер вложения должен быть от 1 байта до 25 МБ.');return false}
+  const ext=(fileName.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'')||'bin';
+  const path=gameId+'/'+targetChannel+'/'+me.user_id+'/'+crypto.randomUUID()+'.'+ext;
+  const up=await supabase.storage.from('game-media').upload(path,blob,{contentType:mime||'application/octet-stream',upsert:false});
+  if(up.error){setError('Загрузка вложения: '+up.error.message);return false}
+  const row=await supabase.from('chat_messages').insert({
+   game_id:gameId,channel_id:targetChannel,author_id:me.user_id,
+   kind,text:fileName,storage_path:path,mime_type:mime||null
+  });
+  if(row.error){
+   setError('Файл загружен, но сообщение не сохранено: '+row.error.message+'. Запись оставлена для повторной отправки.');
+   return false;
+  }
+  if(channelRef.current===targetChannel)await loadMessages(targetChannel);
+  return true;
  }
- async function toggleRecording(kind:'audio'|'video'){
+ async function sendChatFile(file:File){
+  const target=channelId;
+  if(!me||!target)return false;
+  return storeChatAttachment(file,file.name,file.type||'application/octet-stream',uploadedChatKind(file.type),target);
+ }
+ function discardRecording(){
+  if(mediaOperationRef.current)return;
+  if(captureRef.current)captureRef.current.discard=true;
+  if(recorder.current?.state==='recording')recorder.current.stop();
+  else recordingStream.current?.getTracks().forEach(track=>track.stop());
+  const previous=previewRef.current;
+  previewRef.current=null;setRecordingPreview(null);setRecording(null);setRecordingStartedAt(null);
+  if(previous)URL.revokeObjectURL(previous.url);
+ }
+ async function toggleRecording(kind:ChatMediaKind){
   if(recorder.current?.state==='recording'){recorder.current.stop();return}
-  if(!me||!channelId)return;
+  if(mediaOperationRef.current||previewRef.current||!me||!channelId)return;
+  if(typeof navigator==='undefined'||!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder==='undefined'){
+   setError('Этот браузер не поддерживает запись аудио и видео.');return;
+  }
+  const target=channelId;
+  mediaOperationRef.current=true;
+  let stream:MediaStream|null=null;
   try{
-   const stream=await navigator.mediaDevices.getUserMedia(kind==='audio'?{audio:true}:{audio:true,video:{facingMode:'user'}});chunks.current=[];const rec=new MediaRecorder(stream);recorder.current=rec;setRecording(kind);
-   rec.ondataavailable=e=>e.data.size&&chunks.current.push(e.data);
-   rec.onstop=async()=>{const mime=rec.mimeType||'video/webm',blob=new Blob(chunks.current,{type:mime}),path=gameId+'/'+channelId+'/'+me.user_id+'/'+crypto.randomUUID()+'.webm';const up=await supabase.storage.from('game-media').upload(path,blob,{contentType:mime});if(up.error)setError(up.error.message);else await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind,storage_path:path,mime_type:mime});stream.getTracks().forEach(t=>t.stop());recorder.current=null;setRecording(null);await loadMessages(channelId)};
-   rec.start();
-  }catch(e){setError(e instanceof Error?e.message:'Нет доступа к микрофону/камере')}
+   stream=await navigator.mediaDevices.getUserMedia(kind==='audio'?{audio:true}:{audio:true,video:{facingMode:'user'}});
+   if(channelRef.current!==target){stream.getTracks().forEach(track=>track.stop());return}
+   const mime=preferredRecordingMime(kind,t=>MediaRecorder.isTypeSupported(t));
+   const rec=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);
+   const started=Date.now();
+   recordingStream.current=stream;recorder.current=rec;chunks.current=[];
+   captureRef.current={kind,channelId:target,started,discard:false};
+   setRecording(kind);setRecordingStartedAt(started);
+   rec.ondataavailable=e=>{
+    if(!e.data.size)return;
+    chunks.current.push(e.data);
+    if(chunks.current.reduce((sum,chunk)=>sum+chunk.size,0)>CHAT_MAX_FILE_BYTES&&rec.state==='recording'){
+     setError('Лимит записи — 25 МБ. Завершите запись или запишите более короткий фрагмент.');
+     rec.stop();
+    }
+   };
+   rec.onerror=()=>setError('Ошибка записи. Попробуйте ещё раз или прикрепите готовый файл.');
+   rec.onstop=()=>{
+    const current=captureRef.current;
+    const parts=chunks.current;chunks.current=[];
+    stream?.getTracks().forEach(track=>track.stop());
+    if(recordingStream.current===stream)recordingStream.current=null;
+    if(recorder.current===rec)recorder.current=null;
+    captureRef.current=null;setRecording(null);setRecordingStartedAt(null);
+    if(!current||current.discard)return;
+    const actualMime=rec.mimeType||parts[0]?.type||(kind==='audio'?'audio/webm':'video/webm');
+    const blob=new Blob(parts,{type:actualMime});
+    if(!blob.size){setError('Запись получилась пустой. Проверьте микрофон или камеру.');return}
+    const url=URL.createObjectURL(blob);
+    const preview={blob,url,mime:actualMime,kind:current.kind,channelId:current.channelId,
+     fileName:recordingFileName(current.kind,actualMime,new Date(current.started)),
+     duration:Math.max(1,Math.round((Date.now()-current.started)/1000))};
+    if(previewRef.current)URL.revokeObjectURL(previewRef.current.url);
+    previewRef.current=preview;setRecordingPreview(preview);
+    if(blob.size>CHAT_MAX_FILE_BYTES)setError('Запись превышает 25 МБ. Сохраните её на устройство или запишите заново.');
+   };
+   rec.start(1000);
+  }catch(e){
+   stream?.getTracks().forEach(track=>track.stop());
+   recordingStream.current=null;recorder.current=null;captureRef.current=null;
+   setRecording(null);setRecordingStartedAt(null);
+   setError(e instanceof Error?e.message:'Не удалось получить доступ к микрофону или камере.');
+  }finally{mediaOperationRef.current=false}
+ }
+ async function sendRecordingPreview(){
+  const preview=previewRef.current;
+  if(!preview||mediaOperationRef.current||!me)return false;
+  if(preview.blob.size>CHAT_MAX_FILE_BYTES){setError('Запись больше 25 МБ — сохраните её на устройство или сделайте короче.');return false}
+  mediaOperationRef.current=true;setRecordingSaving(true);
+  try{
+   const ok=await storeChatAttachment(preview.blob,preview.fileName,preview.mime,preview.kind,preview.channelId);
+   if(ok&&previewRef.current===preview){
+    previewRef.current=null;setRecordingPreview(null);URL.revokeObjectURL(preview.url);
+   }
+   return ok;
+  }catch(e){setError(e instanceof Error?e.message:'Не удалось отправить запись. Она доступна для повторной отправки.');return false}
+  finally{mediaOperationRef.current=false;setRecordingSaving(false)}
  }
 
- return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,toggleRecording};
+ return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,recordingStartedAt,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
+  logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,toggleRecording,discardRecording,sendRecordingPreview};
 }
