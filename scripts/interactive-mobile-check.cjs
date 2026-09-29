@@ -127,6 +127,8 @@ async function main(){
  await desktop.getByRole('button',{name:'Готово'}).click();
  await desktop.reload();
  await desktop.waitForFunction(()=>document.body.dataset.uiReady==='yes');
+ // Hydration marks the page ready before the dock's persisted-order effect has committed.
+ await desktop.waitForFunction(()=>[...document.querySelectorAll('.mobileDockItem')].slice(0,3).map(x=>x.dataset.dockItem).join(',')==='dashboard,stages,teacher',null,{timeout:4500});
  assert.deepEqual((await order(desktop)).slice(0,3),['dashboard','stages','teacher'],'Reorder did not survive reload');
  console.log('PASS mouse long press, drag and durable saved order');
  // Use a fresh touch browser profile, with native touch events rather than mouse emulation.
