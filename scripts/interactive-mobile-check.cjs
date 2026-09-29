@@ -88,6 +88,7 @@ async function main(){
  server.stderr.on('data',chunk=>{lines.push(String(chunk));if(lines.length>50)lines.shift()});
  await ready();
  browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
+ try{
  const desktop=await browser.newPage({viewport:{width:390,height:850}});
  await desktop.goto(address);
  await desktop.locator('.mobileDockItem').first().waitFor();
