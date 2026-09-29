@@ -3,6 +3,8 @@ import {useMemo,useState} from 'react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import MediaUploadButton from './MediaUploadButton';
 import GradesView from './GradesView';
+import ClassroomJournal from './ClassroomJournal';
+import {Activity,ChevronDown} from 'lucide-react';
 
 export default function ProfileView({g}:{g:ReturnTypeRepublic}){
  const {me,profiles,parties,partyInvitations,partyMandates,averageVsn,myEvaluations,actions,saveProfile}=g;
@@ -15,6 +17,7 @@ export default function ProfileView({g}:{g:ReturnTypeRepublic}){
  const [file,setFile]=useState<File|null>(null);
  const [saving,setSaving]=useState(false);
  const [saved,setSaved]=useState(false);
+ const [showMyJournal,setShowMyJournal]=useState(false);
  const initials=useMemo(()=>me?.full_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()||'Я',[me?.full_name]);
  if(!me)return null;
  async function save(){
@@ -37,6 +40,11 @@ export default function ProfileView({g}:{g:ReturnTypeRepublic}){
   </section>
 
   <GradesView g={g} compact/>
+  <section className="profileJournalAccess">
+   <div><Activity size={19} aria-hidden="true"/><div><b>Мой журнал действий</b><span>История ваших действий и переходов по разделам игры.</span></div></div>
+   <button type="button" aria-expanded={showMyJournal} onClick={()=>setShowMyJournal(!showMyJournal)}> {showMyJournal?'Скрыть журнал':'Открыть журнал'} <ChevronDown size={17} aria-hidden="true"/></button>
+  </section>
+  {showMyJournal&&<ClassroomJournal g={g}/>}
 
   <section className="profileGrid">
    <article className="surface profileEditor">
