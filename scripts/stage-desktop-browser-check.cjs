@@ -48,7 +48,7 @@ async function main(){
       const vote=el.querySelector('.stageAtlasVoteAction');
       return {card:box(el),status:box(status),details:box(details),vote:vote?box(vote):null,
        footer:box(el.querySelector('.stageAtlasCardFooter')),
-       header:box(el.querySelector('.stageAtlasCardPrimary')),
+       header:box(el.querySelector('.stageAtlasCardMain')),
        detailsLabel:details.getAttribute('aria-label'),
        voteLabel:vote?.getAttribute('aria-label')||null};
      })
@@ -70,7 +70,7 @@ async function main(){
      'Missing accessible details label on card '+(index+1));
     if(card.vote){
      assert(Math.abs(card.vote.centerY-card.details.centerY)<=3,
-      'Voting button is not centered alongside status on card '+(index+1)+' at '+width+'px');
+      'Voting button is not centered alongside the details action on card '+(index+1)+' at '+width+'px');
      assert(card.vote.right+2<=card.details.x,
       'Voting button overlaps other controls on card '+(index+1)+' at '+width+'px');
      assert(card.voteLabel?.includes('голосования'),
