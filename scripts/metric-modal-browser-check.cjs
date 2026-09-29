@@ -215,6 +215,9 @@ async function main(){
      assert.equal(await player.count(),1,'Voice message uses compact horizontal player');
      assert.equal(await frame.locator('.chatMessages audio[controls]').count(),0,'Native vertical audio widget is never shown');
      assert.equal(await player.locator('.chatVoiceWave>span').count(),36,'Voice waveform has 36 bars');
+     const heights=await player.locator('.chatVoiceWave>span').evaluateAll(items=>items.map(el=>el.style.height));
+     assert(new Set(heights).size>5,'Stored sample waveform must reflect genuine amplitude variation, not a flat placeholder');
+
      assert.equal(await player.locator('audio').count(),1,'Voice note has a single hidden playback engine');
      const voice=await player.evaluate(el=>{
       const box=el.getBoundingClientRect();
