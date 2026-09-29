@@ -5,6 +5,7 @@ import './design-views.css';
 import './design-responsive.css';
 import './design-readability.css';
 import './teacher-mobile.css';
+import './impact-workbench.css';
 import type {Metadata} from 'next';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
