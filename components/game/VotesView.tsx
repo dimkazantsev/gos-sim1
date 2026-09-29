@@ -1,5 +1,6 @@
 'use client';
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
+import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Vote} from './types';
 import StyledSelect from '../ui/StyledSelect';
@@ -14,6 +15,26 @@ export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeR
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[mode,setMode]=useState<'member'|'faction'|'mandate'>('faction');
  const [institution,setInstitution]=useState('all'),[quorumValue,setQuorumValue]=useState(0.5),[majorityKind,setMajorityKind]=useState<'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction'>('present_majority'),[majorityValue,setMajorityValue]=useState(0.5);
  const [tab,setTab]=useState<'open'|'closed'|'all'>('open'),[busy,setBusy]=useState('');
+ const [checkedIn,setCheckedIn]=useState<{user_id:string;institution_key:string;stage_no:number}[]>([]);
+ useEffect(()=>{
+  if(!g.game)return;
+  let live=true;
+  async function reload(){
+   const game=g.game;if(!game)return;
+   const r=await supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no').eq('game_id',game.id);
+   if(live&&!r.error)setCheckedIn(r.data||[]);
+  }
+  void reload();
+  const channel=supabase.channel('vote-checkin:'+g.game.id)
+   .on('postgres_changes',{schema:'public',table:'institution_session_registrations',event:'*',filter:'game_id=eq.'+g.game.id},()=>void reload()).subscribe();
+  return()=>{live=false;void supabase.removeChannel(channel)};
+ },[g.game?.id]);
+ function isRegisteredForVote(v:Vote){
+  return v.procedure_key!=='registered_session'||!['gd','government','municipality'].includes(v.institution_key)||
+   checkedIn.some(row=>row.user_id===me?.user_id&&row.institution_key===v.institution_key&&row.stage_no===v.stage_no);
+ }
+ function canCast(v:Vote){return canVote(v)&&isRegisteredForVote(v)}
+
 
  const visible=useMemo(()=>votes.filter(v=>tab==='all'||v.status===tab),[votes,tab]);
  const openCount=votes.filter(v=>v.status==='open').length;
@@ -126,11 +147,12 @@ export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeR
 
     {v.status==='open'?<div className="proceduralVoteActions">
      <div className="voteChoiceButtons">
-      <button disabled={!canVote(v)} className={my?.choice==='yes'?'selected yes':''} onClick={()=>castVote(v,'yes')}>✓ За</button>
+      <button disabled={!canCast(v)} className={my?.choice==='yes'?'selected yes':''} onClick={()=>castVote(v,'yes')}>✓ За</button>
       {v.allow_abstain&&<button disabled={!canVote(v)} className={my?.choice==='abstain'?'selected abstain':''} onClick={()=>castVote(v,'abstain')}>○ Воздержаться</button>}
       <button disabled={!canVote(v)} className={my?.choice==='no'?'selected no':''} onClick={()=>castVote(v,'no')}>× Против</button>
      </div>
      {!canVote(v)&&<small className="voteNotEligible">Вашей игровой роли не предоставлено право голоса в этой процедуре.</small>}
+     {canVote(v)&&!isRegisteredForVote(v)&&<small className="voteNotEligible">Сначала отметьте присутствие в панели регистрации выше, затем голосуйте.</small>}
      {v.voting_mode==='mandate'&&canVote(v)&&<small className="myMandateWeight">Ваш вес в этом голосовании: <b>{partyMandates.find(x=>x.user_id===me?.user_id)?.effective_mandates||0}</b> депутатских голосов.</small>}
      {canClose(v)&&<button className="primary closeProceduralVote" disabled={busy===v.id} onClick={async()=>{if(!confirm('Закрыть голосование и зафиксировать результат?'))return;setBusy(v.id);await closeVote(v.id);setBusy('')}}>{busy===v.id?'Подсчитываю…':'Закрыть и применить результат →'}</button>}
     </div>:<div className={'finalVoteDecision '+(v.result_code||'')}>
