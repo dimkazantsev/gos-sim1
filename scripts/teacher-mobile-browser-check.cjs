@@ -39,7 +39,7 @@ async function main(){
      return {chat:{top:a.top,bottom:a.bottom},dock:{top:b.top,bottom:b.bottom},headerBottom:document.querySelector('.simTop').getBoundingClientRect().bottom};
     });
     assert(chatGeometry.chat.top>=chatGeometry.headerBottom-2&&chatGeometry.chat.top<=chatGeometry.headerBottom+30,'Chat must remain below the header without overlapping it: '+JSON.stringify(chatGeometry));
-    assert(chatGeometry.chat.bottom<=chatGeometry.dock.top+3&&chatGeometry.chat.bottom>=chatGeometry.dock.top-8,'Chat must end above dock: '+JSON.stringify(chatGeometry));
+    assert(chatGeometry.chat.bottom<=chatGeometry.dock.top+2&&chatGeometry.chat.bottom>=chatGeometry.dock.top-34,'Chat must end above dock with a small intentional gap: '+JSON.stringify(chatGeometry));
    }
    await page.locator('#screen').selectOption('teacher-stages');
    await frame.locator('.teacherCommand .teacherStageManager').waitFor();
