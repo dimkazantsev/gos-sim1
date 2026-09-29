@@ -4,7 +4,8 @@ import {CalendarDays,CheckCircle2,UsersRound,Vote as VoteIcon} from 'lucide-reac
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
-type CaseRow={id:string;game_id:string;case_key:string;title:string;situation:string;category:string;seriousness:'serious'|'light';audience:'single'|'group'|'all';allowed_roles:string[];status:string;source_url:string|null};
+import EventAutopilotPanel from './EventAutopilotPanel';
+type CaseRow={id:string;game_id:string;case_key:string;title:string;situation:string;category:string;seriousness:'serious'|'light';audience:'single'|'group'|'all';allowed_roles:string[];status:string;source_url:string|null;decision_options?:string[]};
 type Assignment={id:string;case_id:string;game_id:string;recipient_id:string;status:string};
 type Decision={id:string;case_id:string;actor_id:string;choice:string};
 export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;readOnly?:boolean}){
@@ -16,6 +17,7 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
  const [situation,setSituation]=useState('');
  const [category,setCategory]=useState('Государственное управление');
  const [roleFilter,setRoleFilter]=useState('');
+ const [decisionLabels,setDecisionLabels]=useState<'accept'|'yes'>('accept');
  const [seriousness,setSeriousness]=useState<'serious'|'light'>('serious');
  const [audience,setAudience]=useState<'single'|'group'|'all'>('single');
  const [selected,setSelected]=useState<string[]>([]);
@@ -57,7 +59,7 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
   const key='manual-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
   const r=await supabase.from('event_cases').insert({
    game_id:game.id,case_key:key,title:title.trim(),situation:situation.trim(),category,
-   seriousness,audience,allowed_roles:roleFilter?[roleFilter]:[],status:'ready',created_by:me.user_id
+   seriousness,audience,allowed_roles:roleFilter?[roleFilter]:[],decision_options:decisionLabels==='yes'?['Да','Нет']:['Принять','Отклонить'],status:'ready',created_by:me.user_id
   }).select('id').single();
   if(r.error||!r.data){setNotice(r.error?.message||'Не удалось создать событие.');setSaving(false);return}
   const a=await supabase.from('event_assignments').insert(eligible.map(recipient_id=>({
@@ -76,7 +78,8 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
  }
  if(!game||!me)return null;
  return <section className="eventWorkspace" aria-label="Event — ситуационные решения">
-  <header><div><small>EVENT · ИГРОВЫЕ СИТУАЦИИ</small><h2>События и решения</h2><p>Индивидуальные задания, совместные решения 2–3 участников и общее голосование. Библиотека из 500 кейсов и модель эффектов будут подключены после проверки содержания.</p></div><span><CalendarDays size={17} aria-hidden="true"/>{teacher?cases.length+' событий':pending.length+' ожидают решения'}</span></header>
+  <header><div><small>EVENT · ИГРОВЫЕ СИТУАЦИИ</small><h2>События и решения</h2><p>Индивидуальные задания, совместные решения 2–3 участников и общее голосование. Банк учебных ситуаций, автоматическое назначение, статистика ответов и влияние обработанных задач на доверие граждан.</p></div><span><CalendarDays size={17} aria-hidden="true"/>{teacher?cases.length+' событий':pending.length+' ожидают решения'}</span></header>
+  {teacher&&<EventAutopilotPanel g={g} onChanged={reload}/>}
   {teacher&&<div className="eventCatalogTargets" aria-label="План будущей библиотеки ситуаций">
    <div><strong>{cases.length}<span>/500</span></strong><small>Уникальных кейсов в текущей игре</small></div>
    <div><strong>{cases.filter(c=>c.seriousness==='serious').length}<span>/300</span></strong><small>Серьёзные · 60%</small></div>
@@ -91,6 +94,8 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
     <StyledSelect label="Тип" value={seriousness} onChange={v=>setSeriousness(v as 'serious'|'light')} options={[{value:'serious',label:'Серьёзное'},{value:'light',label:'Повседневное / необычное'}]}/>
     <StyledSelect label="Роль получателя" value={roleFilter} onChange={v=>{setRoleFilter(v);setSelected([])}} options={[{value:'',label:'Любая должность'},...roles.map(v=>({value:v,label:v}))]}/>
     <StyledSelect label="Формат" value={audience} onChange={v=>{setAudience(v as 'single'|'group'|'all');setSelected([])}} options={[{value:'single',label:'Одному участнику'},{value:'group',label:'Совместно, 2–3 человека'},{value:'all',label:'Всем студентам'}]}/>
+    <StyledSelect label="Варианты ответа" value={decisionLabels} onChange={v=>setDecisionLabels(v as typeof decisionLabels)}
+      options={[{value:'accept',label:'Принять / Отклонить'},{value:'yes',label:'Да / Нет'}]}/>
     <label className="eventWide">Описание ситуации<textarea rows={4} value={situation} maxLength={5000} onChange={e=>setSituation(e.target.value)} placeholder="Какое решение нужно принять или отклонить?"/></label>
    </div>
    {audience!=='all'&&<div className="eventRecipients"><strong>Получатели · {selected.length}/{audience==='single'?1:3}</strong><div>{recipients.map(m=><label key={m.user_id}><input type="checkbox" checked={selected.includes(m.user_id)} disabled={!selected.includes(m.user_id)&&selected.length>=(audience==='single'?1:3)} onChange={e=>setSelected(old=>e.target.checked?[...old,m.user_id]:old.filter(x=>x!==m.user_id))}/>{m.full_name}<small>{m.role_title||'Студент'}</small></label>)}</div></div>}
@@ -101,12 +106,15 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
    (teacher?cases:cases.filter(c=>mine.some(a=>a.case_id===c.id))).map(c=>{
     const assigned=assignments.filter(a=>a.case_id===c.id),responded=decisions.filter(d=>d.case_id===c.id);
     const my=assigned.find(a=>a.recipient_id===me.user_id);
+    const yes=responded.filter(d=>d.choice==='accept').length,no=responded.filter(d=>d.choice==='reject').length;
+    const percent=(n:number,d:number)=>d?Math.round(100*n/d):0;
+    const labels=c.decision_options?.length===2?c.decision_options:['Принять','Отклонить'];
     return <article key={c.id} className="eventCaseCard">
      <div className="eventCaseTop"><span>{c.category}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>
      <h4>{c.title}</h4><p>{c.situation}</p>
      <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили</span>
-      <span className="eventCaseTally">За: {responded.filter(d=>d.choice==='accept').length} · Против: {responded.filter(d=>d.choice==='reject').length}{responded.length===assigned.length&&assigned.length>0?' · Голосование завершено':''}</span>
-      {my?.status==='pending'&&!teacher?<div className="eventDecisionButtons"><button disabled={!!busyId||readOnly} onClick={()=>void answer(my,'reject')}>Отклонить</button><button disabled={!!busyId||readOnly} onClick={()=>void answer(my,'accept')}>Принять</button></div>:my&&!teacher?<span><VoteIcon size={14}/>Ответ учтён: {my.status==='accepted'?'Принято':'Отклонено'}</span>:null}
+      <span className="eventCaseTally">Да: {yes} ({percent(yes,responded.length)}%) · Нет: {no} ({percent(no,responded.length)}%) · Решено: {percent(responded.length,assigned.length)}%</span>
+      {my?.status==='pending'&&!teacher?<div className="eventDecisionButtons"><button disabled={!!busyId||readOnly} onClick={()=>void answer(my,'reject')}>{labels[1]}</button><button disabled={!!busyId||readOnly} onClick={()=>void answer(my,'accept')}>{labels[0]}</button></div>:my&&!teacher?<span><VoteIcon size={14}/>Ответ учтён: {my.status==='accepted'?labels[0]:labels[1]}</span>:null}
      </div>
     </article>;
    })}</div>
