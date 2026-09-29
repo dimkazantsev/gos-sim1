@@ -34,6 +34,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false}:{g:Retur
   :key==='government'?(myRole.includes('министр')||myRole.includes('правительств'))
   :(myRole.includes('муницип')||myRole.includes('администрац')||myRole.includes('глава города'));
  async function register(key:string){
+  if(!game||!me)return;
   setBusy(key);setNotice('');
   const r=await supabase.rpc('register_institution_session',{p_game_id:game.id,p_institution:key});
   if(r.error)setError(r.error.message);
