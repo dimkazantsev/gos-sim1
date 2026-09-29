@@ -33,6 +33,13 @@ check('Atlas has search, status filters and selectable game phases',
  stagesView.includes('className="stageAtlasFilters"')&&
  stagesView.includes('className="stageAtlasPhaseList"')&&
  stagesView.includes("setPhaseFilter(isSelected?null:p.id)"));
+check('Reset controls are teacher-only, guarded, and backed by the RPC',
+ stagesView.includes('teacher&&!readOnly&&<button type="button" className="stageAtlasResetStage"')&&
+ stagesView.includes('className="stageAtlasResetAll"')&&
+ stagesView.includes("setResetTarget(target)")&&
+ stagesView.includes("resetConfirmation.trim()==='СБРОСИТЬ'")&&
+ stagesView.includes('role="alertdialog"')&&
+ read('components/game/useRepublicGame.ts').includes("supabase.rpc('reset_game_stage_progress'"));
 check('New stage cards render a unique status, detail button and optional vote button',
  stagesView.includes('className="stageAtlasCardFooter"')&&
  stagesView.includes('className="stageAtlasVoteAction"')&&
