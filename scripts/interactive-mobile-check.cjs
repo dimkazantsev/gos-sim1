@@ -9,7 +9,7 @@ const screens=path.join(root,'.design-review','screenshots');
 fs.mkdirSync(screens,{recursive:true});
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser','/opt/google/chrome/chrome'].find(p=>p&&fs.existsSync(p));
 if(!chrome)throw Error('Chrome is required for real mobile interactions');
-const pageSource=String.raw\`'use client';
+const pageSource=String.raw`'use client';
 import {useState} from 'react';
 import {LayoutDashboard,Settings2,Landmark,Vote,BookOpenText,FileText,GraduationCap,Radio,UserRound} from 'lucide-react';
 import MobileDock from '../../components/game/MobileDock';
@@ -46,7 +46,7 @@ export default function UiTest(){
    onNavigate={setActive} onAll={()=>setMenu(true)}/>
  </div>;
 }
-\`;
+`;
 let server,browser;
 const address='http://127.0.0.1:3998/__ui_check__';
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
