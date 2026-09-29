@@ -196,7 +196,8 @@ async function main(){
     assert(composeLayout.micBottom<=composeLayout.composerBottom+3&&composeLayout.videoBottom<=composeLayout.composerBottom+3,'Media shortcuts stay inside the footer');
     if(chatScreen==='chat-recording')assert.equal(await frame.locator('.chatCaptureStop').count(),1,'Recording has a stop control');
     if(chatScreen==='chat-audio-preview'){
-     assert.equal(await frame.locator('.chatCaptureReview audio[controls]').count(),1,'Audio is reviewable before upload');
+     assert.equal(await frame.locator('.chatCaptureReview .chatVoicePlayer').count(),1,'Audio draft uses same horizontal waveform player as posted notes');
+     assert.equal(await frame.locator('.chatCaptureReview .chatVoiceWave>span').count(),36,'Audio draft displays measured waveform');
      assert.equal(await frame.locator('.chatCaptureSend').count(),1,'Audio review can be submitted');
     }
     if(chatScreen==='chat-video-preview'){
@@ -213,7 +214,8 @@ async function main(){
      const player=frame.locator('.chatMessages .chatVoicePlayer').first();
      assert.equal(await player.count(),1,'Voice message uses compact horizontal player');
      assert.equal(await frame.locator('.chatMessages audio[controls]').count(),0,'Native vertical audio widget is never shown');
-     assert.equal(await player.locator('.chatVoiceWave>span').count(),36,'Waveform contains 36 decorative bars');
+     assert.equal(await player.locator('.chatVoiceWave>span').count(),36,'Voice waveform has 36 bars');
+     assert.equal(await player.locator('audio').count(),1,'Voice note has a single hidden playback engine');
      const voice=await player.evaluate(el=>{
       const box=el.getBoundingClientRect();
       const play=el.querySelector('.chatVoicePlay').getBoundingClientRect();
@@ -231,6 +233,7 @@ async function main(){
      assert(voice.speedRight<=voice.bubbleRight+3&&voice.playLeft>=voice.bubbleLeft-3,
        'Voice player fits bubble without clipping: '+JSON.stringify(voice));
      assert.equal(voice.hidden,'none','Audio engine remains visually hidden');
+     assert.equal(await player.locator('.chatVoiceMeta time').innerText(),'0:00 / 0:01','Stored duration renders before playback begins');
      if(width===390&&chatScreen==='chat-panel'){
       const playback=await player.locator('audio').evaluate(async el=>{
        await el.play();
