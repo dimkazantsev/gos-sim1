@@ -60,7 +60,7 @@ async function main(){
     'Toolbar overflows horizontally at '+width+'px: '+JSON.stringify(bounds));
    await page.locator('#preview').screenshot({path:path.join(shotDir,'top-chat-'+width+'.png')});
    console.log('PASS top Chat button alignment, label and no horizontal overflow at '+width+'px');
-   for(const chatScreen of ['chat-panel','chat-empty','chat-channels','chat-pins']){
+   for(const chatScreen of ['chat-panel','chat-empty','chat-channels','chat-pins','chat-recording','chat-audio-preview','chat-video-preview']){
     await page.locator('#screen').selectOption(chatScreen);
     const frame=page.frameLocator('#preview');
     const root=frame.locator('.simChat.gsChatV2');
@@ -89,6 +89,33 @@ async function main(){
     assert.equal(await frame.locator('.chatChannelTrigger').count(),1,'Exactly one styled channel selector');
     assert.equal(await frame.locator('.simChat select').count(),0,'No native channel dropdown');
     assert.equal(await frame.locator('.chatSendButton.iconOnly svg').count(),1,'Icon-only send button');
+    assert.equal(await frame.locator('.chatMediaShortcut').count(),2,'Audio and video recording are directly accessible');
+    const composeLayout=await frame.locator('.chatCompose').evaluate(el=>{
+     const row=el.querySelector('.chatInputRow').getBoundingClientRect();
+     const textarea=el.querySelector('textarea').getBoundingClientRect();
+     const send=el.querySelector('.chatSendButton.iconOnly').getBoundingClientRect();
+     const mic=el.querySelector('.chatMediaShortcut').getBoundingClientRect();
+     const video=el.querySelectorAll('.chatMediaShortcut')[1].getBoundingClientRect();
+     const composer=el.getBoundingClientRect();
+     return {rowTop:row.top,rowBottom:row.bottom,inputRight:textarea.right,sendLeft:send.left,
+      sendRight:send.right,sendBottom:send.bottom,composerRight:composer.right,
+      micBottom:mic.bottom,videoBottom:video.bottom,composerBottom:composer.bottom,
+      sendWidth:send.width};
+    });
+    assert(composeLayout.inputRight<=composeLayout.sendLeft+3,'Send must not overlap the editable field');
+    assert(composeLayout.sendRight<=composeLayout.composerRight+3,'Send must stay within the composer');
+    assert(composeLayout.sendWidth>=40&&composeLayout.sendWidth<=45,'Send must be an accessible compact icon');
+    assert(composeLayout.micBottom<=composeLayout.composerBottom+3&&composeLayout.videoBottom<=composeLayout.composerBottom+3,'Media shortcuts stay inside the footer');
+    if(chatScreen==='chat-recording')assert.equal(await frame.locator('.chatCaptureStop').count(),1,'Recording has a stop control');
+    if(chatScreen==='chat-audio-preview'){
+     assert.equal(await frame.locator('.chatCaptureReview audio[controls]').count(),1,'Audio is reviewable before upload');
+     assert.equal(await frame.locator('.chatCaptureSend').count(),1,'Audio review can be submitted');
+    }
+    if(chatScreen==='chat-video-preview'){
+     assert.equal(await frame.locator('.chatCaptureReview video[controls]').count(),1,'Video is reviewable before upload');
+     assert.equal(await frame.locator('.chatCaptureSend').count(),1,'Video review can be submitted');
+    }
+
     assert((await frame.locator('.chatSendButton.iconOnly').boundingBox())?.width<=45,'Send button stays compact');
     if(chatScreen==='chat-channels'){
      assert.equal(await frame.locator('.chatChannelMenu [role="menuitemradio"]').count(),2,'Styled channel menu lists both channels');
