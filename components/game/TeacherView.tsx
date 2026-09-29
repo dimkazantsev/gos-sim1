@@ -1,6 +1,6 @@
 'use client';
 import {useMemo,useState} from 'react';
-import {Activity,ArrowRight,BarChart3,BookOpenText,GraduationCap,Network,Pause,Play,Radio,UsersRound,Wrench} from 'lucide-react';
+import {Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
 import ClassroomJournal from './ClassroomJournal';
 import ParticipantsAnalytics from './ParticipantsAnalytics';
 import TeacherStageManager from './TeacherStageManager';
@@ -145,11 +145,11 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    <summary><div><b>Быстрые сценарии и события</b><span>Таймер, кризис, ghost voting, публикация события</span></div><i>+</i></summary>
    <div className="teacherDetailsBody">
     <div className="directorButtons compact">
-     {[10,20,30,60].map(n=><button key={n} onClick={()=>setTurnMinutes(n)}><span>{n}:00</span><b>Ход на {n} минут</b></button>)}
-     <button className="dangerQuick" onClick={confirmCrisis}><span>⚠</span><b>Разыграть кризис</b></button>
-     <button onClick={confirmGhost}><span>⚡</span><b>Случайное Ghost Voting</b></button>
-     {parties.some(p=>p.ghost_active)&&<button onClick={()=>{if(confirm('Завершить ближайшее заседание ГД и восстановить полный состав всех фракций?'))void clearPartyGhostLoss()}}><span>↺</span><b>Завершить заседание ГД · снять GV</b></button>}
-     <button onClick={exportSession}><span>⇩</span><b>Экспорт журнала</b></button>
+     {[10,20,30,60].map(n=><button key={n} onClick={()=>setTurnMinutes(n)}><span><Clock3 size={21} strokeWidth={1.8}/></span><b>Ход на {n} минут</b></button>)}
+     <button className="dangerQuick" onClick={confirmCrisis}><span><AlertTriangle size={22} strokeWidth={1.8}/></span><b>Разыграть кризис</b></button>
+     <button onClick={confirmGhost}><span><Zap size={22} strokeWidth={1.8}/></span><b>Случайное Ghost Voting</b></button>
+     {parties.some(p=>p.ghost_active)&&<button onClick={()=>{if(confirm('Завершить ближайшее заседание ГД и восстановить полный состав всех фракций?'))void clearPartyGhostLoss()}}><span><RotateCcw size={22} strokeWidth={1.8}/></span><b>Завершить заседание ГД · снять GV</b></button>}
+     <button onClick={exportSession}><span><Download size={22} strokeWidth={1.8}/></span><b>Экспорт журнала</b></button>
     </div>
     <TeacherGhostVotingPanel g={g}/>
     <div className="eventComposer"><input aria-label="Заголовок события" value={eventTitle} onChange={e=>setEventTitle(e.target.value)} placeholder="Заголовок события"/><textarea aria-label="Описание события" rows={4} value={eventBody} onChange={e=>setEventBody(e.target.value)} placeholder="Что произошло?"/><button className="primary" onClick={publish}>Опубликовать всем</button></div>
