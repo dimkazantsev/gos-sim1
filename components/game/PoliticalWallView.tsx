@@ -34,8 +34,8 @@ function PostImpactEditor({g,post}:{g:ReturnTypeRepublic;post:PoliticalPost}){
  </details>
 }
 
-export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNavigate}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument:(id:string)=>void;onNavigate:(view:View)=>void}){
- const {game,me,teacher,currentStage,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,formalDocuments,votes,profiles,names,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,createVoteFromPost,createFormalDocument}=g;
+export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNavigate,focusPending=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument:(id:string)=>void;onNavigate:(view:View)=>void;focusPending?:boolean}){
+ const {actions,judgeAction,game,me,teacher,currentStage,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,formalDocuments,votes,profiles,names,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,createVoteFromPost,createFormalDocument}=g;
  const [tab,setTab]=useState<'feed'|'registry'>('feed');
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('participant');
  const actors=availableActors();
@@ -78,8 +78,14 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  if(!game||!me)return null;
  const stageNo=currentStage?.stage_no||game.current_round||1;
  const stageAction=STAGE_ACTIONS[stageNo]||STAGE_ACTIONS[1];
+ const firstPending=[...actions.filter(a=>a.status==='submitted')].sort((a,b)=>new Date(a.submitted_at).getTime()-new Date(b.submitted_at).getTime())[0];
 
  return <div className="wallPage">
+  {teacher&&firstPending&&<section id="first-pending-decision" className={'firstPendingDecision '+(focusPending?'isFocused':'')}>
+   <header><div><small>ПЕРВОЕ РЕШЕНИЕ В ОЧЕРЕДИ</small><h2>{firstPending.title}</h2><span>{new Date(firstPending.submitted_at).toLocaleString('ru-RU')}</span></div></header>
+   <p>{firstPending.body}</p><div className="firstPendingActions"><button type="button" onClick={()=>void judgeAction(firstPending.id,'rejected')}>Отклонить</button>
+   <button type="button" onClick={()=>void judgeAction(firstPending.id,'accepted')}>Принять решение</button></div>
+  </section>}
   <section className="wallHero">
    <div><small>ОФИЦИАЛЬНАЯ ЛЕНТА ИГРЫ</small><h1>Политические процессы</h1><p>Публикации органов власти, партий, должностных лиц, СМИ и участников. Пост может стать решением, НПА или предметом голосования.</p></div>
    <div className="wallHeroStats"><div><strong>{politicalPosts.length}</strong><span>публикаций</span></div><div><strong>{politicalDecisions.length}</strong><span>решений</span></div><div><strong>{votes.filter(v=>v.status==='open').length}</strong><span>голосований</span></div></div>
