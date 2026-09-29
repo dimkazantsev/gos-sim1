@@ -621,7 +621,7 @@ export function useRepublicGame(gameId:string){
  async function createDocument(data:{title:string;type:string;body:string}){if(!teacher||!me||!data.title.trim())return false;const r=await supabase.from('game_documents').insert({game_id:gameId,title:data.title.trim(),doc_type:data.type.trim()||'Документ',body:data.body.trim()||null,created_by:me.user_id});if(r.error){setError(r.error.message);return false}await refresh();return true}
 
 
- async function saveProfile(bio:string,file?:File){
+ async function saveProfile(bio:string,file?:File,gender?:'male'|'female'|'unspecified'){
   if(!me)return false;
   let avatarPath=profiles.find(x=>x.user_id===me.user_id)?.avatar_path||null;
   if(file){
@@ -631,7 +631,7 @@ export function useRepublicGame(gameId:string){
     if(up.error){setError(up.error.message);return false}
     avatarPath=path;
   }
-  const r=await supabase.from('game_profiles').upsert({game_id:gameId,user_id:me.user_id,bio:bio.trim()||null,avatar_path:avatarPath,updated_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
+  const r=await supabase.from('game_profiles').upsert({game_id:gameId,user_id:me.user_id,bio:bio.trim()||null,avatar_path:avatarPath,...(gender?{gender}:{}),updated_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
   if(r.error){setError(r.error.message);return false}
   await loadPartyAssets();return true;
  }
