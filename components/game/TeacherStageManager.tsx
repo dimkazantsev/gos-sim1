@@ -5,6 +5,7 @@ import type {StageReadiness} from './StageReadinessPanel';
 import {CheckCircle2,ChevronRight,CircleDot,LockKeyhole,RefreshCw,RotateCcw,Search,ShieldAlert,X} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
+import StagePolicyEditor from './StagePolicyEditor';
 
 type StageFilter='all'|'open'|'completed'|'locked';
 type ResetTarget=number|'all'|null;
@@ -138,6 +139,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
        {ready.warnings.map((item,i)=><p key={'w'+i} className="warning">{item}</p>)}
        {ready.overridden&&<p>Историческое прохождение подтверждено преподавателем.</p>}
       </>:<p>Результат проверки пока не получен.</p>}
+      <StagePolicyEditor g={g} stageNo={stage.stage_no}/>
       <div className="teacherStageExpandedActions">
        {stage.status!=='open'&&<button type="button" className="teacherStageLaunch" onClick={()=>{
         if(window.confirm('Сделать этап '+stage.stage_no+' текущим? Предыдущие этапы получат статус «Завершён», последующие будут закрыты.'))void g.openStage(stage.stage_no);
