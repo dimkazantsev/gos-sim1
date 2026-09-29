@@ -207,6 +207,8 @@ async function main(){
  assert.equal(await touch.locator('[data-dock-item="'+pinPoint.key+'"]').count(),0,'Pinned item must leave scroll strip');
  await touch.reload();
  await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
+ await sleep(650);
+ console.log('PIN RELOAD DEBUG',await touch.evaluate(()=>({storage:localStorage.getItem('dock-interaction-ci:pinned'),order:localStorage.getItem('dock-interaction-ci'),pinned:[...document.querySelectorAll('.mobileDockPinnedItem')].map(e=>e.textContent),unPinned:[...document.querySelectorAll('[data-dock-item]')].map(e=>e.dataset.dockItem),dock:document.querySelector('.mobileDockV2')?.outerHTML.slice(0,1200)})));
  await touch.waitForFunction(label=>document.querySelector('.mobileDockPinnedItem')?.textContent?.includes(label),pinPoint.label,{timeout:4500});
  console.log('PASS extra-long touch pins icon next to All sections; pin survives reload');
  const pinButton=await touch.locator('.mobileDockPinnedItem').first().boundingBox();
