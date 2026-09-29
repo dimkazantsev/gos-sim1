@@ -52,13 +52,13 @@ async function main(){
    assert.equal(layout.statusText,'Ход открыт','The full turn status must be shown');
    assert(layout.timer&&layout.clockText,'Turn countdown must remain visible');
    assert.equal(layout.roleLabel,'РЕЖИМ ПРОСМОТРА','The view mode heading must remain complete');
-   const controls=[layout.history,layout.status,layout.timer,layout.role,layout.chat].filter(Boolean);
+   const controls=[layout.history,layout.status,layout.timer,layout.role,...(width>900?[layout.chat]:[])].filter(Boolean);
    for(const control of controls){
-    assert(Math.abs(control.h-48)<=1,'Top control height must be 48px at '+width+'px: '+JSON.stringify(layout));
+    assert(Math.abs(control.h-(width<=900?36:48))<=1,'Top control height must match responsive layout at '+width+'px: '+JSON.stringify(layout));
     assert(control.x>=layout.header.x-2&&control.right<=layout.header.right+2,
      'Top control escapes horizontal toolbar bounds at '+width+'px: '+JSON.stringify(layout));
    }
-   assert.equal(layout.role.labelOverflow,0,'View-as heading must never truncate');
+   if(width>900)assert.equal(layout.role.labelOverflow,0,'View-as heading must never truncate');
    assert.equal(layout.header.scroll<=layout.header.client+2,true,
     'Toolbar must not overflow at '+width+'px: '+JSON.stringify(layout));
    for(let i=0;i<controls.length;i++)for(let j=i+1;j<controls.length;j++){
@@ -86,7 +86,7 @@ async function main(){
       countdown:get('.timerPill'),connection:get('.connectionPill.disconnected'),
       role:get('.viewAsTrigger'),chat:get('.topChatButton')};
     });
-    assert(layout.status&&layout.chat,'Status and chat must exist in '+screen);
+    assert(layout.status&&(width<=900||layout.chat),'Status and desktop chat must exist in '+screen);
     if(screen==='paused'){
      assert.equal(layout.status.text,'Пауза');
      assert(!layout.countdown,'Timer must not occupy space during pause');
@@ -99,7 +99,7 @@ async function main(){
     assert(layout.scroll<=layout.width+2,'Top bar scrolls horizontally in '+screen+' at '+width+'px');
     const controls=[layout.previous,layout.status,layout.countdown,layout.connection,layout.role,layout.chat].filter(Boolean);
     for(const item of controls){
-     assert(Math.abs(item.height-48)<=1,'Potential top control height is inconsistent in '+screen+' at '+width+'px: '+JSON.stringify(layout));
+     assert(Math.abs(item.height-(width<=900?36:48))<=1,'Potential top control height is inconsistent in '+screen+' at '+width+'px: '+JSON.stringify(layout));
      assert(item.x>=layout.bounds.x-2&&item.right<=layout.bounds.right+2,
       'Control exceeds toolbar in '+screen+' at '+width+'px: '+JSON.stringify(layout));
     }
@@ -121,8 +121,8 @@ async function main(){
    }
    await page.locator('#screen').selectOption('dashboard');
    const dashboard=page.frameLocator('#preview');
-   const chat=dashboard.getByRole('button',{name:'Открыть чат'});
-   assert.equal(await chat.count(),1,'Top bar must use Chat, not Connection');
+   const chat=dashboard.locator(width<=900?'.mobileDockChat':'.topChatButton');
+   assert.equal(await chat.count(),1,'Chat must exist in the appropriate navigation bar');
    assert.equal((await chat.locator('span').innerText()).trim(),'Чат','Top bar label is Chat');
    if(width>=1100)assert(await chat.locator('span').isVisible(),'Desktop top bar must show the Chat label');
    else assert.equal(await chat.getAttribute('aria-label'),'Открыть чат','Icon-only mobile Chat remains accessible');
@@ -142,7 +142,7 @@ async function main(){
    });
    assert(bounds.chatRight!==undefined&&bounds.mainRight!==undefined,
     'Dashboard has toolbar and main content');
-   assert(Math.abs(bounds.chatRight-bounds.mainRight)<=3,
+   if(width>900)assert(Math.abs(bounds.chatRight-bounds.mainRight)<=3,
     'Chat right edge must align with main content at '+width+'px: '+JSON.stringify(bounds));
    assert(bounds.barScrollWidth<=bounds.barClientWidth+3,
     'Toolbar overflows horizontally at '+width+'px: '+JSON.stringify(bounds));
