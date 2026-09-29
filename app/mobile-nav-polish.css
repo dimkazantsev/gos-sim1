@@ -162,3 +162,9 @@
  .mobileDockV2.isEditing .mobileDockItem .mobileDockIcon{animation:none!important}
 }
 @media print{.mobileDockGhost{display:none}}
+
+/* The item handles touch gestures itself: native browser panning would cancel long-press drag. */
+@media(max-width:900px){
+ .mobileDockV2 .mobileDockItem{touch-action:none!important;-webkit-user-select:none;user-select:none;}
+ .mobileDockV2 .mobileDockScroll{touch-action:pan-y;}
+}
