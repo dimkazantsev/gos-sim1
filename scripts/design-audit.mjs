@@ -22,6 +22,28 @@ for(const [name,source] of Object.entries(css)){
  check(`${name}: all design tokens resolve`,unknown.length===0);
 }
 for(const name of ['globals','landing','sim-shell','sim-panels','public-screen','stage-map']){const root=postcss.parse(read(`app/${name}.css`),{from:`app/${name}.css`});check(`${name}: inherited CSS parsed`,root.nodes.length>0);}
+const teacherSource=read('components/game/TeacherView.tsx');
+const stageManager=read('components/game/TeacherStageManager.tsx');
+const teacherCss=read('app/teacher-command.css');
+check('Teacher command CSS is the last loaded stylesheet in production and preview',
+ read('app/layout.tsx').includes("import './teacher-command.css';")&&
+ read('scripts/design-preview.cjs').includes("'stage-map','teacher-command'"));
+check('Teacher dashboard exposes 16 individual stage reset icons and guarded bulk reset',
+ teacherSource.includes('<TeacherStageManager')&&
+ stageManager.includes("className=\\\"teacherStageReset\\\"")&&
+ stageManager.includes("className=\\\"teacherResetAll\\\"")&&
+ stageManager.includes("confirmation.trim()==='СБРОСИТЬ'")&&
+ stageManager.includes('role="alertdialog"'));
+check('Teacher dashboard has six focused workspaces and direct stage navigation',
+ teacherSource.includes('const WORKSPACES=[')&&
+ teacherSource.includes("key:'analytics'")&&
+ teacherSource.includes("key:'impact'")&&
+ teacherSource.includes('onOpenStage={onOpenStages}')&&
+ read('components/GameClient.tsx').includes("onOpenStages={stageNo=>navigate('stages',{stageNo})}"));
+check('Teacher command selectors and keyboard access are present',
+ teacherCss.includes('.teacherCommand .teacherStageGrid')&&
+ teacherCss.includes('.teacherResetDialog')&&
+ teacherSource.includes("event.key==='ArrowRight'"));
 const stagesView=read('components/game/StagesView.tsx');
 const stageSheet=read('app/stage-map.css');
 const previewSource=read('scripts/design-preview.cjs');
