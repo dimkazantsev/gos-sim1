@@ -96,6 +96,14 @@ async function main(){
      assert(layout.connection&&layout.connection.text.includes('Нет связи'),
       'Disconnected state is visible with a full status label');
     }
+    if(layout.scroll>layout.width+2){
+     const details=await page.frameLocator('#preview').locator('.simTop').evaluate(el=>({
+      scrollWidth:el.scrollWidth,clientWidth:el.clientWidth,
+      children:[...el.children].map(n=>({className:String(n.className),rect:n.getBoundingClientRect().toJSON(),scroll:n.scrollWidth,client:n.clientWidth,display:getComputedStyle(n).display})),
+      padding:getComputedStyle(el).padding
+     }));
+     console.error('MOBILE HEADER OVERFLOW',JSON.stringify(details));
+    }
     assert(layout.scroll<=layout.width+2,'Top bar scrolls horizontally in '+screen+' at '+width+'px');
     const controls=[layout.previous,layout.status,layout.countdown,layout.connection,layout.role,layout.chat].filter(Boolean);
     for(const item of controls){
