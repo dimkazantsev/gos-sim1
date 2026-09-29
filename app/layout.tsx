@@ -11,7 +11,8 @@ import {GeistMono} from 'geist/font/mono';
 export const metadata:Metadata={
  title:'GOS//SIMS — Республика Политология · симулятор',
  description:'Учебная многопользовательская платформа: политические процессы, НПА, голосования, партии, аналитика и автоматический журнал ВСН по 16 этапам',
- applicationName:'GOS//SIMS'
+ applicationName:'GOS//SIMS',
+ other:{'gos-sims-release':process.env.VERCEL_GIT_COMMIT_SHA?.slice(0,8)||'local'}
 };
 
 export default function RootLayout({children}:{children:React.ReactNode}){
