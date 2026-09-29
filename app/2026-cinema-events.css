@@ -1,0 +1,124 @@
+/* GOS//SIMS: Cohesive responsive controls, Telegram-proportioned video notes and event studio. */
+:where(.simMain,.simChat,.teacherCommand,.eventWorkspace,.profilePage) button{
+ box-sizing:border-box;
+}
+:where(.simMain,.simChat,.teacherCommand,.eventWorkspace,.profilePage) button>svg{
+ flex:0 0 auto;vertical-align:middle;
+}
+:where(.simMain,.simChat,.teacherCommand,.eventWorkspace,.profilePage) button:focus-visible{
+ outline:3px solid #6597ef;outline-offset:2px;
+}
+.directorButtons.compact>button{display:flex;align-items:center;gap:14px;min-height:72px;text-align:left}
+.directorButtons.compact>button>span{display:grid;place-items:center;flex:none;width:30px;height:30px;font-variant-numeric:tabular-nums}
+.directorButtons.compact>button>span svg{display:block;margin:0;transform:none}
+.directorButtons.compact>button>b{flex:1;min-width:0;line-height:1.35}
+.chatVideoNote,.chatVideoNote.isPreview,.chatEntry .chatBubble .chatVideoNote{
+ width:100px!important;height:100px!important;
+ max-width:100px!important;max-height:100px!important;
+ min-width:100px;min-height:100px;aspect-ratio:1!important;border-radius:50%!important;
+}
+.chatVideoNote>video{width:100%!important;height:100%!important;max-width:none!important;border-radius:50%!important;object-fit:cover}
+.chatVideoNote .chatVideoPlay{
+ box-sizing:border-box;top:50%!important;left:50%!important;
+ right:auto!important;bottom:auto!important;
+ transform:translate(-50%,-50%)!important;
+ width:35px!important;height:35px!important;min-width:35px!important;min-height:35px!important;
+ display:grid!important;place-items:center!important;padding:0!important;
+ border-radius:50%!important;line-height:0!important;
+}
+.chatVideoNote .chatVideoPlay svg{display:block;width:19px;height:19px;margin:0;flex:none}
+.chatVideoNote .chatVideoDuration{bottom:3px!important;font-size:9px!important;min-width:0!important;padding:2px 5px!important;line-height:1.2}
+.chatVideoNote .chatVideoFullscreen{top:7px!important;right:11px!important;width:24px!important;height:24px!important;min-width:24px!important;min-height:24px!important}
+.chatVideoNote .chatVideoFullscreen svg{width:13px;height:13px}
+.chatCaptureCamera{width:140px!important;height:140px!important;max-width:140px!important;max-height:140px!important}
+.chatEntry .chatBubble:has(.chatVideoNote){display:flex;align-items:center;justify-content:center;max-width:120px}
+.chatEntry .chatBubble:has(.chatVideoNote)+.chatInlineTime{align-self:center}
+.simChat.gsChatV2 .chatMsg{min-width:0;max-width:100%}
+.simChat.gsChatV2 .chatMessageColumn{min-width:0;overflow:visible}
+.simChat.gsChatV2 .chatBubble{max-width:min(100%,var(--gs-chat-w,380px));overflow-wrap:anywhere}
+.simChat.gsChatV2 .chatCompose{flex:none;min-width:0;padding:11px 13px max(11px,env(safe-area-inset-bottom,0px))}
+.simChat.gsChatV2 .chatComposeActions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.simChat.gsChatV2 .chatMediaShortcut,.simChat.gsChatV2 .chatIconButton{display:grid;place-items:center;flex:none;width:42px;height:42px;min-width:42px;min-height:42px;padding:0}
+.simChat.gsChatV2 .chatMediaShortcut svg{margin:0}
+.simChat.gsChatV2 .chatComposerHint{flex:1 1 155px;line-height:1.35;font-size:11px;white-space:normal;overflow-wrap:anywhere}
+@media(min-width:1100px){
+ .simWorkspace.chatOpen{--gs-chat-w:clamp(306px,25vw,350px)}
+ .simWorkspace.chatOpen .simContentFlow{box-sizing:border-box;max-width:none;width:calc(100% - var(--gs-chat-w) - 23px);min-width:0;padding:20px 16px 64px!important}
+ .simWorkspace.chatOpen .simMain{box-sizing:border-box;max-width:100%;min-width:0;width:100%}
+ .simWorkspace.chatOpen .simChat.gsChatV2{width:var(--gs-chat-w);right:10px}
+ .simMain.chatOpen :is(.teacherOverviewStats,.teacherAnalyticsCards,.eventCatalogTargets,.institutionRegistrationGrid,.ghostBulk,.profileGrid,.formalRecognitionGrid){grid-template-columns:repeat(2,minmax(0,1fr))}
+ .simMain.chatOpen :is(.teacherStageSplit,.formalWorkspace,.partyCabinetGrid,.wallComposerGrid){grid-template-columns:minmax(0,1fr)}
+ .simMain.chatOpen .teacherStageList{grid-template-columns:minmax(0,1fr);max-height:260px}
+ .simMain.chatOpen :is(.teacherQuick,.teacherCommandBar,.teacherStageInspectorActions,.ghostScenarioSummary){flex-wrap:wrap}
+ .simMain.chatOpen :is(.teacherCommand,.eventWorkspace,.profilePage,.formalPage){min-width:0;max-width:100%}
+ .simMain.chatOpen .teacherWorkspaceNav{max-width:100%;overflow-x:auto}
+}
+@media(max-width:1099px){
+ .simWorkspace.chatOpen .simChat.gsChatV2{display:flex!important;z-index:92!important;left:0!important;right:0!important;width:100vw!important;max-width:100vw!important;
+  top:var(--gs-top-h,56px)!important;bottom:var(--gs-mobile-dock-height,76px)!important;
+  height:calc(100dvh - var(--gs-top-h,56px) - var(--gs-mobile-dock-height,76px))!important;
+  max-height:none!important;border-radius:0!important;border:0!important}
+ .simWorkspace.chatOpen .simContentFlow{pointer-events:none;visibility:hidden}
+ .simWorkspace.chatOpen .simChat.gsChatV2 .chatMessages{flex:1 1 0;min-height:0;max-height:none;overflow-y:auto}
+ .simWorkspace.chatOpen .simChat.gsChatV2 .chatTop{min-height:59px;flex:none;gap:7px;padding:9px 12px}
+ .simWorkspace.chatOpen .simChat.gsChatV2 .chatCompose{padding-bottom:10px}
+}
+@media(max-width:900px){
+ .simWorkspace.chatOpen .simChat.gsChatV2{top:56px!important;
+  height:calc(100dvh - 56px - var(--gs-mobile-dock-height,76px))!important}
+}
+@media(max-width:390px){
+ .simChat.gsChatV2 .chatComposerHint{flex:1 1 120px;font-size:10px}
+ .simChat.gsChatV2 .chatMediaShortcut{width:39px;min-width:39px}
+}
+.autoEventPanel{display:grid;gap:16px;min-width:0;padding:17px;border:1px solid #cbdcf8;border-radius:15px;background:linear-gradient(160deg,#f4f8ff,#ffffff 65%);box-shadow:0 6px 23px #203b6608}
+.autoEventHeading,.autoEventButtons,.autoEventBankToggle,.autoEventBankSearch{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.autoEventHeading>div{min-width:0}
+.autoEventHeading small{color:#5f7aa3;font-size:10px;font-weight:850;letter-spacing:.09em}
+.autoEventHeading h3{font-size:20px;line-height:1.3;margin:4px 0;color:#213f6a}
+.autoEventHeading p{margin:0;font-size:12px;line-height:1.55;color:#69829f}
+.autoEventState{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:8px 10px;border:1px solid #dee5f3;border-radius:999px;font-size:11px;font-weight:800;background:#f3f5fa;color:#71829f}
+.autoEventState.enabled{border-color:#bce5cf;color:#288058;background:#f1fcf4}
+.autoEventButtons{justify-content:flex-start;flex-wrap:wrap}
+.autoEventButtons button,.autoEventSave,.autoEventBankSearch button,.autoEventCaseAssign button{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;
+ box-sizing:border-box;min-height:42px;min-width:140px;padding:9px 13px;border:1px solid #cbdcf6;border-radius:10px;
+ background:#f3f7ff;color:#345c9f;font-size:12px;font-weight:800;cursor:pointer;
+}
+.autoEventButtons button:first-child,.autoEventSave{background:#2457d6;color:white;border-color:#2457d6}
+.autoEventButtons button:disabled,.autoEventSave:disabled,.autoEventBankSearch button:disabled{opacity:.48;cursor:not-allowed}
+.autoEventSettings{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;align-items:end;min-width:0}
+.autoEventSettings .styledSelect{min-width:0}
+.autoEventFormula{display:flex;align-items:flex-start;gap:11px;padding:12px 14px;background:#eaf1ff;border:1px solid #cfddf7;border-radius:10px;color:#40638e}
+.autoEventFormula svg{flex:none;margin-top:3px}
+.autoEventFormula p{font-size:12px;line-height:1.6;margin:0}
+.autoEventSave{justify-self:end;min-width:175px}
+.autoEventBank{border:1px solid #dce6f6;border-radius:12px;background:#fff;overflow:hidden}
+.autoEventBankToggle{width:100%;border:0;padding:15px 17px;background:#f7faff;color:#2b4d7a;text-align:left;cursor:pointer}
+.autoEventBankToggle>svg:first-child{flex:none;color:#426cc0}
+.autoEventBankToggle>span{flex:1;min-width:0;display:grid;gap:4px}
+.autoEventBankToggle b{font-size:14px}
+.autoEventBankToggle small{color:#7087a7;font-size:11px}
+.autoEventBankToggle[aria-expanded=true]>svg:last-child{transform:rotate(180deg)}
+.autoEventBankBody{display:grid;gap:13px;padding:14px;border-top:1px solid #e1eafa}
+.autoEventBankSearch{flex-wrap:wrap}
+.autoEventBankSearch input{flex:1 1 220px;min-width:0;min-height:42px;padding:8px 11px;border:1px solid #d6e3f6;border-radius:9px;background:white}
+.autoEventBankLayout{display:grid;grid-template-columns:minmax(190px,.7fr) minmax(0,1.3fr);gap:12px;align-items:start;min-width:0}
+.autoEventBankList{display:grid;align-content:start;gap:6px;max-height:360px;min-width:0;overflow:auto}
+.autoEventBankList button{display:grid;gap:5px;min-width:0;padding:11px;border:1px solid #e1e9f6;border-radius:10px;background:white;color:#31547e;text-align:left;cursor:pointer}
+.autoEventBankList button.selected{border-color:#94b4f3;background:#eff5ff}
+.autoEventBankList button b{font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+.autoEventBankList button small{font-size:10px;color:#8497b0}
+.autoEventCaseDetails{display:grid;align-content:start;gap:13px;min-width:0;padding:15px;border:1px solid #dce6f6;border-radius:11px}
+.autoEventCaseDetails>small{font-size:11px;color:#6681a3}
+.autoEventCaseDetails h4{margin:0;color:#294971;font-size:17px}
+.autoEventCaseDetails p{margin:0;color:#5b7694;font-size:12px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+.autoEventCaseDetails em{font-size:11px;color:#889ab0}
+.autoEventCaseAssign{display:flex;align-items:end;gap:9px;flex-wrap:wrap}
+.autoEventCaseAssign>.styledSelect{flex:1 1 185px}
+.autoEventCaseAssign button{min-width:124px}
+.autoEventNotice{margin:0;padding:10px;border:1px solid #bcd5fa;border-radius:8px;background:#eaf2ff;color:#375e93;font-size:12px;line-height:1.5}
+@media(max-width:950px){.autoEventSettings{grid-template-columns:repeat(2,minmax(0,1fr))}.autoEventBankLayout{grid-template-columns:minmax(0,1fr)}.autoEventBankList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-height:250px}}
+@media(max-width:620px){.autoEventPanel{padding:12px}.autoEventHeading{align-items:start;flex-wrap:wrap}.autoEventSettings{grid-template-columns:minmax(0,1fr)}.autoEventButtons button{flex:1 1 calc(50% - 6px)}.autoEventBankList{grid-template-columns:minmax(0,1fr)}.autoEventCaseAssign button{flex:1 1 100%}}
+.eventCaseTally{display:flex!important;flex-wrap:wrap;gap:6px}
+.eventCaseFooter{align-items:center}
