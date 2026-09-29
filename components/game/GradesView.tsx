@@ -21,7 +21,7 @@ const shownScore=(a?:Assessment)=>a?(a.status==='final'?(a.final_score??a.auto_s
 const level=(n:number)=>n===3?'Высокий':n===2?'Средний':n===1?'Низкий':'Нет участия';
 const when=(v?:string|null)=>v?new Date(v).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
 
-export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compact?:boolean}){
+export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnTypeRepublic;compact?:boolean;onOpenProfile?:(id:string)=>void}){
  const {game,me,members,stages,teacher}=g;
  const [rows,setRows]=useState<Assessment[]>([]);
  const [runs,setRuns]=useState<Run[]>([]);
@@ -203,7 +203,7 @@ export default function GradesView({g,compact=false}:{g:ReturnTypeRepublic;compa
    <div className="gradesMatrix" role="table" aria-label="Матрица оценок по этапам">
     <div className="gradesMatrixHead" role="row"><b>Студент</b><span className="gradeTotalHead">Σ</span><span className="gradeTotalHead">Ср.</span>{STAGES.map(n=><span key={n} title={stages.find(s=>s.stage_no===n)?.title||''}>{n}</span>)}</div>
     {sortedStudents.length===0?<div className="emptyState">Нет студентов по выбранным фильтрам.</div>:sortedStudents.map(s=><div className="gradesMatrixRow" role="row" key={s.user_id}>
-     <div><b>{s.full_name}</b><small>{s.team||'Без партии'} · {s.role_title||'роль не назначена'}</small></div>
+     <div>{onOpenProfile?<button type="button" className="gradesProfileLink" onClick={()=>onOpenProfile(s.user_id)}>{s.full_name}</button>:<b>{s.full_name}</b>}<small>{s.team||'Без партии'} · {s.role_title||'Роль не назначена'}</small></div>
      <span className="gradeTotal">{gradeByStudent.get(s.user_id)?.graded?gradeByStudent.get(s.user_id)?.sum:'—'}</span>
      <span className="gradeTotal">{gradeByStudent.get(s.user_id)?.average?.toFixed(2)??'—'}</span>
      {STAGES.map(n=>{const a=rows.find(x=>x.user_id===s.user_id&&x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(s.user_id,n)} aria-label={s.full_name+', этап '+n+', '+(v??'нет оценки')}><b>{v??'—'}</b><small>{a?.status==='final'?'итог':a?'авто':''}</small></button>})}
