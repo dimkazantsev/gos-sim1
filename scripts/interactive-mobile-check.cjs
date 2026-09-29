@@ -187,8 +187,11 @@ async function main(){
  await touch.locator('.mobileDockScroll').evaluate(el=>el.scrollLeft=0);
  const pinFrom=await touch.locator('[data-dock-item="dashboard"]').boundingBox();
  const px=pinFrom.x+pinFrom.width/2,py=pinFrom.y+pinFrom.height/2;
+ await touch.evaluate(()=>{window.__pinEvents=[];for(const name of ['pointerdown','pointermove','pointerup','pointercancel','contextmenu'])document.addEventListener(name,e=>{window.__pinEvents.push({name,target:e.target.closest?.('[data-dock-item]')?.dataset.dockItem||'',x:e.clientX,y:e.clientY})},true)});
  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:px,y:py}]});
- await touch.waitForFunction(()=>document.querySelector('.mobileDockPinnedItem')?.textContent?.includes('Обзор игры'),null,{timeout:4500});
+ await sleep(1700);
+ console.log('PIN DEBUG',await touch.evaluate(()=>({events:window.__pinEvents,storage:localStorage.getItem('dock-interaction-ci:pinned'),pinned:[...document.querySelectorAll('.mobileDockPinnedItem')].map(e=>e.textContent),editing:document.querySelector('.mobileDockV2')?.className,at:document.elementFromPoint(innerWidth/3,innerHeight-30)?.outerHTML.slice(0,180)})));
+ await touch.waitForFunction(()=>document.querySelector('.mobileDockPinnedItem')?.textContent?.includes('Обзор игры'),null,{timeout:1000});
  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
  assert.deepEqual(await touch.evaluate(()=>JSON.parse(localStorage.getItem('dock-interaction-ci:pinned')||'[]')),['dashboard']);
  assert.equal(await touch.locator('[data-dock-item="dashboard"]').count(),0,'Pinned item must leave scroll strip');
