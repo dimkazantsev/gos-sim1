@@ -209,5 +209,21 @@ check('Chat has an offline full and empty preview',
  read('scripts/design-preview.cjs').includes("['chat-panel','Командный чат'")&&
  read('scripts/design-preview.cjs').includes("['chat-empty','Пустой чат'"));
 execFileSync(process.execPath,['scripts/metric-chart-check.cjs'],{stdio:'inherit'});
+check('Recording does not immediately upload on stop and supports local audio/video review',
+ read('components/game/useRepublicGame.ts').includes('setRecordingPreview(preview)')&&
+ read('components/game/useRepublicGame.ts').includes('sendRecordingPreview()')&&
+ read('components/game/useRepublicGame.ts').includes('pendingChatUploads.current.set(blob,path)')&&
+ read('components/game/useRepublicGame.ts').includes('rec.start(1000)')&&
+ chat.includes('className="chatCapturePanel chatCaptureReview"')&&
+ chat.includes('Прослушать запись')&&chat.includes('Просмотреть запись')&&
+ chat.includes('recordingStream'));
+check('Chat composer aligns icon send, attachment, visible mic and video controls',
+ chat.includes('className="chatInputRow"')&&
+ chat.includes('chatMediaShortcut')&&
+ chatCss.includes('.gsChatV2 .chatInputRow{')&&
+ chatCss.includes('.gsChatV2 .chatCapturePanel{')&&
+ read('scripts/design-preview.cjs').includes("['chat-audio-preview'")&&
+ read('scripts/design-preview.cjs').includes("['chat-video-preview'"));
 execFileSync(process.execPath,['scripts/chat-logic-check.cjs'],{stdio:'inherit'});
+execFileSync(process.execPath,['scripts/recording-media-check.cjs'],{stdio:'inherit'});
 console.log(`\n${count} source and contrast checks passed. This does not certify browser layout, keyboard interaction, or a live classroom session.`);
