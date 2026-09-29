@@ -367,3 +367,12 @@
   align-items:center;justify-content:flex-end;
  }
 }
+
+/* Legacy teacher-specific cap must not shorten the dock-anchored chat on phones. */
+@media(max-width:900px){
+ .simWorkspace:has(.viewAsSwitcher) .simChat.gsChatV2{
+  max-height:none;
+  height:calc(100dvh - var(--gs-mobile-dock-height));
+  bottom:var(--gs-mobile-dock-height);
+ }
+}
