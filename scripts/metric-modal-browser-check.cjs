@@ -24,6 +24,52 @@ async function main(){
   const page=await browser.newPage({viewport:{width:1560,height:960},deviceScaleFactor:1});
   page.on('pageerror',error=>errors.push(String(error)));
   await page.goto('file://'+preview,{waitUntil:'load'});
+  // Toolbar regression at every layout switch, including the narrowest phones.
+  for(const width of [1440,1240,1060,1024,900,768,620,430,390,360,320]){
+   await page.locator('#preview').evaluate((el,w)=>{el.style.width=w+'px'},width);
+   await page.locator('#screen').selectOption('dashboard');
+   const frame=page.frameLocator('#preview');
+   const layout=await frame.locator('.simTop').evaluate(el=>{
+    const box=el.getBoundingClientRect();
+    const pick=(selector)=>{
+     const node=el.querySelector(selector);
+     if(!node)return null;
+     const bounds=node.getBoundingClientRect();
+     const label=node.querySelector('.viewAsLabel');
+     return {x:bounds.x,right:bounds.right,top:bounds.top,bottom:bounds.bottom,
+      h:bounds.height,w:bounds.width,scroll:node.scrollWidth,client:node.clientWidth,
+      labelOverflow:label?label.scrollWidth-label.clientWidth:0,visible:getComputedStyle(node).display!=='none'};
+    };
+    const status=el.querySelector('.livePill');
+    const clock=el.querySelector('.timerPill');
+    const role=el.querySelector('.viewAsTrigger');
+    return {header:{x:box.x,right:box.right,scroll:el.scrollWidth,client:el.clientWidth},
+     history:pick('.screenHistoryButton'),status:pick('.livePill'),timer:pick('.timerPill'),
+     role:pick('.viewAsTrigger'),chat:pick('.topChatButton'),
+     statusText:status?.textContent?.trim(),clockText:clock?.textContent?.trim(),
+     roleLabel:role?.querySelector('.viewAsLabel')?.textContent?.trim()};
+   });
+   assert.equal(layout.statusText,'Ход открыт','The full turn status must be shown');
+   assert(layout.timer&&layout.clockText,'Turn countdown must remain visible');
+   assert.equal(layout.roleLabel,'РЕЖИМ ПРОСМОТРА','The view mode heading must remain complete');
+   const controls=[layout.history,layout.status,layout.timer,layout.role,layout.chat].filter(Boolean);
+   for(const control of controls){
+    assert(Math.abs(control.h-48)<=1,'Top control height must be 48px at '+width+'px: '+JSON.stringify(layout));
+    assert(control.x>=layout.header.x-2&&control.right<=layout.header.right+2,
+     'Top control escapes horizontal toolbar bounds at '+width+'px: '+JSON.stringify(layout));
+   }
+   assert.equal(layout.role.labelOverflow,0,'View-as heading must never truncate');
+   assert.equal(layout.header.scroll<=layout.header.client+2,true,
+    'Toolbar must not overflow at '+width+'px: '+JSON.stringify(layout));
+   for(let i=0;i<controls.length;i++)for(let j=i+1;j<controls.length;j++){
+    const a=controls[i],b=controls[j];
+    const crossX=a.x<b.right-2&&b.x<a.right-2;
+    const crossY=a.top<b.bottom-2&&b.top<a.bottom-2;
+    assert(!(crossX&&crossY),'Top controls collide at '+width+'px: '+JSON.stringify(layout));
+   }
+   await page.locator('#preview').screenshot({path:path.join(shotDir,'toolbar-'+width+'.png')});
+   console.log('PASS toolbar '+width+'px: equal 48px heights, full turn label, countdown and no overlap');
+  }
   for(const width of [1440,768,390,360]){
    await page.locator('[data-width]').filter({hasText:'По ширине окна'}).count();
    if(width===1440){
