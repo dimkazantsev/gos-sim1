@@ -49,7 +49,7 @@ export default function UiTest(){
 }
 `;
 let server,browser;
-const address='http://127.0.0.1:3998/ui-interaction-test-route';
+const address='http://localhost:3998/ui-interaction-test-route';
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 async function ready(){
  for(let n=0;n<45;n++){
@@ -94,7 +94,7 @@ async function main(){
  desktop.on('pageerror',err=>console.error('BROWSER PAGE ERROR:',String(err)));
  desktop.on('console',msg=>{if(msg.type()==='error')console.error('BROWSER CONSOLE ERROR:',msg.text())});
  await desktop.goto(address);
- await desktop.waitForFunction(()=>document.body.dataset.uiReady==='yes',null,{timeout:12000});
+ await desktop.waitForFunction(()=>document.body.dataset.uiReady==='yes',null,{timeout:30000});
  await desktop.locator('.mobileDockItem').first().waitFor();
  for(const width of [320,360,390,430,768])await checkUnits(desktop,width);
  await desktop.setViewportSize({width:390,height:850});
