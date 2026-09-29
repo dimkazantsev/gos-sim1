@@ -25,45 +25,29 @@ async function check(){
    await page.locator('#preview').evaluate((el,n)=>{el.style.width=n+'px'},width);
    await frame.locator('.teacherStageManager').evaluate(el=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    const data=await frame.locator('.teacherCommand').evaluate(root=>{
-    const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,y:r.y+r.height/2}};
-    const grid=root.querySelector('.teacherStageGrid');
-    const board=root.querySelector('.teacherStageManager');
-    const cards=[...grid.querySelectorAll('.teacherStageCard')];
-    return {
-     width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
-     page:rect(root),grid:rect(grid),board:rect(board),
-     cardRects:cards.map(card=>({
-      card:rect(card),open:rect(card.querySelector('.teacherStageOpen')),
-      reset:rect(card.querySelector('.teacherStageReset')),
-      resetLabel:card.querySelector('.teacherStageReset').getAttribute('aria-label')
-     })),
-     allReset:rect(root.querySelector('.teacherResetAll')),
-     allResetCount:root.querySelectorAll('.teacherResetAll').length,
-     workspaceCount:root.querySelectorAll('.teacherWorkspaceNav [role=tab]').length,
-     sections:[...root.children].filter(el=>getComputedStyle(el).display!=='none').map(rect)
-    };
+    const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
+    const list=root.querySelector('.teacherStageList');
+    const inspector=root.querySelector('.teacherStageInspector');
+    const entries=[...list.querySelectorAll('.teacherStageListItem')];
+    return {width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
+     list:rect(list),inspector:rect(inspector),rows:entries.map(rect),
+     reset:root.querySelectorAll('.teacherStageInspectorReset').length,
+     allReset:root.querySelectorAll('.teacherResetAll').length,
+     workspaceCount:root.querySelectorAll('.teacherWorkspaceNav [role=tab]').length};
    });
-   assert.equal(data.cardRects.length,16,'Exactly 16 stage cards required at '+width+'px');
-   assert.equal(data.allResetCount,1,'Exactly one all-stage reset control required');
-   assert.equal(data.workspaceCount,9,'All nine teacher workspaces must be present');
-   assert(data.scroll<=data.width+3,'Horizontal document overflow at '+width+'px: '+JSON.stringify(data));
-   for(let i=0;i<data.cardRects.length;i++){
-    const card=data.cardRects[i];
-    assert(card.card.left>=data.grid.left-2&&card.card.right<=data.grid.right+2,
-     'Stage '+(i+1)+' outside grid at '+width+'px');
-    assert(card.reset.left>=card.card.left-2&&card.reset.right<=card.card.right+2,
-     'Reset icon outside card '+(i+1)+' at '+width+'px');
-    assert(card.open.right<=card.reset.left+2,'Reset icon overlaps main stage action '+(i+1)+' at '+width+'px');
-    assert(Math.abs(card.open.y-card.reset.y)<=26,'Reset not aligned with stage '+(i+1)+' at '+width+'px');
-    assert(card.reset.width>=30&&card.reset.height>=34,'Reset icon too small on stage '+(i+1));
-    assert(card.resetLabel.includes('Сбросить этап '+(i+1)),'Reset icon missing accessible label');
-   }
+   assert.equal(data.rows.length,16,'Stage list must contain all 16 stages at '+width+'px');
+   assert.equal(data.reset,1,'Exactly one contextual stage reset button');
+   assert.equal(data.allReset,1,'Exactly one global stage reset');
+   assert.equal(data.workspaceCount,9,'Nine teacher workspaces');
+   assert(data.scroll<=data.width+3,'Stage management overflows at '+width+'px: '+JSON.stringify(data));
+   for(const row of data.rows)assert(row.left>=data.list.left-2&&row.right<=data.list.right+2,'Stage row leaves list at '+width+'px');
+   assert(data.inspector.left>=-2&&data.inspector.right<=data.width+3,'Stage details leave viewport at '+width+'px');
    if([1440,900,390].includes(width)){
     await frame.locator('.teacherStageManager').screenshot({
      path:path.join(screenshots,'teacher-stages-'+width+'.png'),animations:'disabled'
     });
    }
-   console.log('PASS '+width+'px: 16 independent reset icons, bulk reset, nine workspaces, no overflow');
+   console.log('PASS '+width+'px: 16 stable list rows, contextual reset, nine workspaces, no overflow');
   }
   for(const [screen,selector] of [
    ['teacher-journal','.classroomJournal'],
@@ -77,7 +61,7 @@ async function check(){
    await frame.locator(selector).first().waitFor();
    assert.equal(await frame.locator('.teacherWorkspaceNav [role=tab]').count(),9,'Nine workspaces required');
    if(screen==='teacher-journal'){
-    assert((await frame.locator('.journalToolbar select').count())>=2,'Participant and section journal filters missing');
+    assert((await frame.locator('.journalToolbar .styledSelect').count())>=2,'Participant and section journal filters missing');
     assert.equal(await frame.locator('.journalCounters button').count(),1,'Journal CSV export missing');
    }
    if(screen==='teacher-analytics'){
@@ -85,18 +69,18 @@ async function check(){
     assert((await frame.locator('.participantsTable thead th').count())>=9,'Participant metrics missing');
    }
    if(screen==='teacher-grades'){
-    assert((await frame.locator('.gradesToolbar select').count())>=2,'Grade sorting/filter controls missing');
+    assert((await frame.locator('.gradesToolbar .styledSelect').count())>=2,'Grade sorting/filter controls missing');
     assert.equal(await frame.locator('.gradeTotalHead').count(),2,'Grade totals missing');
    }
    if(screen==='teacher-event'){
     assert.equal(await frame.locator('.eventCatalogTargets>div').count(),4,'Event case budget must contain four targets');
-    assert.equal(await frame.locator('.eventEditorGrid select').count(),4,'Event must have category, seriousness, role and audience controls');
+    assert.equal(await frame.locator('.eventEditorGrid .styledSelect').count(),4,'Event must have category, seriousness, role and audience controls');
    }
    if(screen==='teacher-parties'){
     assert.equal(await frame.locator('.teacherPartyDossierHead').count(),1,'Expanded party dossier heading missing');
    }
    if(screen==='teacher-tools'){
-    assert.equal(await frame.locator('.ghostBulk select').count(),2,'Ghost Voting must provide scope and party selection');
+    assert.equal(await frame.locator('.ghostBulk .styledSelect').count(),2,'Ghost Voting must provide scope and party selection');
    }
    for(const width of [1440,390]){
     await page.locator('#preview').evaluate((el,w)=>{el.style.width=w+'px'},width);
