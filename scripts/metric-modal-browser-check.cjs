@@ -70,6 +70,48 @@ async function main(){
    await page.locator('#preview').screenshot({path:path.join(shotDir,'toolbar-'+width+'.png')});
    console.log('PASS toolbar '+width+'px: equal 48px heights, full turn label, countdown and no overlap');
   }
+  for(const width of [1440,768,390,320]){
+   await page.locator('#preview').evaluate((node,w)=>{node.style.width=w+'px'},width);
+   for(const screen of ['paused','student','offline']){
+    await page.locator('#screen').selectOption(screen);
+    const layout=await page.frameLocator('#preview').locator('.simTop').evaluate(header=>{
+     const get=selector=>{
+      const el=header.querySelector(selector);
+      if(!el||getComputedStyle(el).display==='none')return null;
+      const r=el.getBoundingClientRect();
+      return {x:r.x,right:r.right,top:r.top,bottom:r.bottom,height:r.height,text:el.textContent?.trim()};
+     };
+     return {bounds:header.getBoundingClientRect().toJSON(),width:header.clientWidth,scroll:header.scrollWidth,
+      previous:get('.screenHistoryButton'),status:get('.livePill'),
+      countdown:get('.timerPill'),connection:get('.connectionPill.disconnected'),
+      role:get('.viewAsTrigger'),chat:get('.topChatButton')};
+    });
+    assert(layout.status&&layout.chat,'Status and chat must exist in '+screen);
+    if(screen==='paused'){
+     assert.equal(layout.status.text,'Пауза');
+     assert(!layout.countdown,'Timer must not occupy space during pause');
+    }else if(screen==='student'){
+     assert(!layout.role,'Students must not see teacher preview controls');
+    }else if(screen==='offline'){
+     assert(layout.connection&&layout.connection.text.includes('Нет связи'),
+      'Disconnected state is visible with a full status label');
+    }
+    assert(layout.scroll<=layout.width+2,'Top bar scrolls horizontally in '+screen+' at '+width+'px');
+    const controls=[layout.previous,layout.status,layout.countdown,layout.connection,layout.role,layout.chat].filter(Boolean);
+    for(const item of controls){
+     assert(Math.abs(item.height-48)<=1,'Potential top control height is inconsistent in '+screen+' at '+width+'px: '+JSON.stringify(layout));
+     assert(item.x>=layout.bounds.x-2&&item.right<=layout.bounds.right+2,
+      'Control exceeds toolbar in '+screen+' at '+width+'px: '+JSON.stringify(layout));
+    }
+    for(let i=0;i<controls.length;i++)for(let j=i+1;j<controls.length;j++){
+     const a=controls[i],b=controls[j];
+     assert(!(a.x<b.right-2&&b.x<a.right-2&&a.top<b.bottom-2&&b.top<a.bottom-2),
+      'Controls overlap in '+screen+' at '+width+'px: '+JSON.stringify(layout));
+    }
+    await page.locator('#preview').screenshot({path:path.join(shotDir,'toolbar-'+screen+'-'+width+'.png')});
+    console.log('PASS '+screen+' toolbar at '+width+'px: consistent heights and no overlapping controls');
+   }
+  }
   for(const width of [1440,768,390,360]){
    await page.locator('[data-width]').filter({hasText:'По ширине окна'}).count();
    if(width===1440){
