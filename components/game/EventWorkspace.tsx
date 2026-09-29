@@ -76,9 +76,24 @@ export default function EventWorkspace({g,readOnly=false}:{g:ReturnTypeRepublic;
   if(r.error)setNotice(r.error.message);else await reload();
   setBusyId(null);
  }
+ const seenAssignments=teacher?assignments:mine;
+ const caseIds=new Set(seenAssignments.map(a=>a.case_id));
+ const relevantDecisions=teacher?decisions:decisions.filter(d=>caseIds.has(d.case_id)&&d.actor_id===me?.user_id);
+ const completedCount=seenAssignments.filter(a=>a.status!=='pending').length;
+ const yesCount=relevantDecisions.filter(d=>d.choice==='accept').length;
+ const noCount=relevantDecisions.filter(d=>d.choice==='reject').length;
+ const ratio=(n:number,d:number)=>d?Math.round(100*n/d):0;
+ const trust=g.metrics.find(m=>m.metric_key==='public_trust');
  if(!game||!me)return null;
  return <section className="eventWorkspace" aria-label="Event — ситуационные решения">
   <header><div><small>EVENT · ИГРОВЫЕ СИТУАЦИИ</small><h2>События и решения</h2><p>Индивидуальные задания, совместные решения 2–3 участников и общее голосование. Банк учебных ситуаций, автоматическое назначение, статистика ответов и влияние обработанных задач на доверие граждан.</p></div><span><CalendarDays size={17} aria-hidden="true"/>{teacher?cases.length+' событий':pending.length+' ожидают решения'}</span></header>
+  <div className="eventDecisionOverview" aria-label="Статистика решений по игровым событиям">
+   <article><small>Назначено заданий</small><strong>{seenAssignments.length}</strong><span>{teacher?'Всем участникам':'Вам'}</span></article>
+   <article><small>Решено</small><strong>{completedCount}<em> / {seenAssignments.length}</em></strong><span>{ratio(completedCount,seenAssignments.length)}% заданий</span></article>
+   <article><small>Да</small><strong>{yesCount}</strong><span>{ratio(yesCount,relevantDecisions.length)}% от ответов</span></article>
+   <article><small>Нет</small><strong>{noCount}</strong><span>{ratio(noCount,relevantDecisions.length)}% от ответов</span></article>
+   <article><small>Доверие граждан</small><strong>{trust?Number(trust.value).toFixed(1):'—'}<em> {trust?.unit||''}</em></strong><span>Текущий игровой показатель</span></article>
+  </div>
   {teacher&&<EventAutopilotPanel g={g} onChanged={reload}/>}
   {teacher&&<div className="eventCatalogTargets" aria-label="План будущей библиотеки ситуаций">
    <div><strong>{cases.length}<span>/500</span></strong><small>Уникальных кейсов в текущей игре</small></div>
