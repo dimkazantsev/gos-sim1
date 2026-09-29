@@ -1,10 +1,11 @@
 'use client';
 import {IconAction} from '../ui/IconAction';
+import {ArrowRight,ArrowUpRight,BookOpenText,Building2,CalendarClock,ChartNoAxesCombined,CheckCircle2,CircleDot,ClipboardCheck,ClipboardList,Landmark,LockKeyhole,Map,MapPin,Network,Scale,ShieldAlert,SlidersHorizontal,Target,UserRoundX,UsersRound,Vote,Wallet} from 'lucide-react';
 import {useEffect,useState,type CSSProperties} from 'react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage} from './types';
-import {formatDeadline,stageIcon} from './constants';
+import {formatDeadline} from './constants';
 import {STAGE_DETAILS} from './stageDetails';
 import {GAME_PHASES,STAGE_SYSTEM,gamePhaseForStage} from './stageSystem';
 import DeadlineControl from './DeadlineControl';
@@ -26,6 +27,9 @@ import GovernmentProgramSessionLab from './GovernmentProgramSessionLab';
 import CrisisRoom from './CrisisRoom';
 import StageReadinessPanel from './StageReadinessPanel';
 
+// A consistent icon language for the sixteen institutions and decisions.
+const STAGE_ICONS=[UsersRound,SlidersHorizontal,Map,Landmark,UserRoundX,ClipboardCheck,Vote,Building2,Network,Target,ClipboardList,Scale,Wallet,MapPin,ShieldAlert,ChartNoAxesCombined] as const;
+
 export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;focusStageNo?:number;readOnly?:boolean}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
  const [selected,setSelected]=useState<Stage|null>(null);
@@ -35,6 +39,10 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
  const current=stages.find(s=>s.status==='open')||stages.find(s=>s.status!=='completed')||stages.at(-1);
  const currentPhase=current?gamePhaseForStage(current.stage_no):GAME_PHASES[0];
  const selectedSystem=selected?STAGE_SYSTEM[selected.stage_no]:null;
+ const SelectedStageIcon=STAGE_ICONS[(selected?.stage_no||1)-1]||BookOpenText;
+ const SelectedStatusIcon=selected?.status==='completed'?CheckCircle2:selected?.status==='open'?CircleDot:LockKeyhole;
+ const selectedOpenVoteCount=selected?votes.filter(v=>v.stage_no===selected.stage_no&&v.status==='open').length:0;
+ const selectedVoteCount=selected?votes.filter(v=>v.stage_no===selected.stage_no).length:0;
 
  return <>
   <section className="pageHeader">
@@ -55,42 +63,49 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
    })}</div>
   </section>
 
+
   <div className="stageTimeline">
-   {stages.map(s=><article
-    className={`stageCard stageClickable ${s.status}`}
-    key={s.id}
-    role="button"
-    tabIndex={0}
-    onClick={()=>setSelected(s)}
-    onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setSelected(s)}}}
-    aria-label={'Открыть полное описание этапа '+s.stage_no+': '+s.title}
-   >
-    <div className="stageNo"><i>{stageIcon(s.stage_no)}</i><span>{String(s.stage_no).padStart(2,'0')}</span></div>
-    <div className="stageCardBody">
-     <small>{s.mode}</small>
-     <h3>{s.title}</h3>
-     <p>{s.summary}</p>
-     <div className="stageMeta">
-      <span className={`statusTag ${s.status}`}>{s.status==='open'?'Сейчас':s.status==='completed'?'Завершён':'Закрыт'}</span>
-      {s.deadline&&<span className="deadlineTag">до {formatDeadline(s.deadline)}</span>}
-      {votes.some(v=>v.stage_no===s.stage_no&&v.status==='open')&&<span className="stageVoteTag">● Есть голосование</span>}
-      <span className="stageOpenHint">Подробнее →</span>
-     </div>
-    </div>
-   </article>)}
+   {stages.map(s=>{
+    const StageIcon=STAGE_ICONS[s.stage_no-1]||BookOpenText;
+    const StatusIcon=s.status==='completed'?CheckCircle2:s.status==='open'?CircleDot:LockKeyhole;
+    const hasOpenVote=votes.some(v=>v.stage_no===s.stage_no&&v.status==='open');
+    return <article className={'stageCard '+s.status} key={s.id}>
+     <button type="button" className="stageCardPrimary" onClick={()=>setSelected(s)} aria-label={'Подробнее об этапе '+s.stage_no+': '+s.title}>
+      <div className="stageCardTop">
+       <div className="stageNo" aria-hidden="true"><StageIcon size={23} strokeWidth={1.9}/><span>{String(s.stage_no).padStart(2,'0')}</span></div>
+       <div className="stageCardBody">
+        <small>{s.mode}</small>
+        <h3>{s.title}</h3>
+        <p>{s.summary}</p>
+       </div>
+      </div>
+      <div className="stageCardFooter">
+       <div className="stageMeta">
+        <span className={'stageStatusPill stageStatusPill--'+s.status}><StatusIcon size={15} strokeWidth={2.15} aria-hidden="true"/>{s.status==='open'?'Текущий':s.status==='completed'?'Завершён':'Закрыт'}</span>
+        {s.deadline&&<span className="stageDeadlinePill"><CalendarClock size={15} aria-hidden="true"/>До {formatDeadline(s.deadline)}</span>}
+       </div>
+       <span className="stageCardOpen">Подробнее <ArrowRight size={16} strokeWidth={2} aria-hidden="true"/></span>
+      </div>
+     </button>
+     {hasOpenVote&&<button type="button" className="stageVoteQuick" onClick={onOpenVotes} aria-label={'Перейти к голосованиям этапа '+s.stage_no}>
+      <Vote size={17} strokeWidth={1.9} aria-hidden="true"/><span>Идёт голосование</span><ArrowUpRight size={16} aria-hidden="true"/>
+     </button>}
+    </article>
+   })}
   </div>
 
   {selected&&detail&&<div className="stageModalBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}>
    <section ref={dialogRef} tabIndex={-1} className="stageDetailPanel" role="dialog" aria-modal="true" aria-labelledby="stage-detail-title">
     <header className="stageDetailHeader">
-     <div className="stageDetailBadge">{String(selected.stage_no).padStart(2,'0')}</div>
+     <div className="stageDetailBadge" aria-hidden="true"><SelectedStageIcon size={23} strokeWidth={1.9}/><span>{String(selected.stage_no).padStart(2,'0')}</span></div>
      <div>
       <small>{selected.mode}</small>
       <h2 id="stage-detail-title">{selected.title}</h2>
       <div className="stageDetailStatus">
-       <span className={`statusTag ${selected.status}`}>{selected.status==='open'?'Текущий этап':selected.status==='completed'?'Завершён':'Закрыт'}</span>
-       {selected.deadline&&<span className="deadlineTag">Дедлайн: {formatDeadline(selected.deadline)}</span>}
-       {votes.filter(v=>v.stage_no===selected.stage_no).length>0&&<span className="stageVoteTag">{votes.filter(v=>v.stage_no===selected.stage_no&&v.status==='open').length?('● Открыто '+votes.filter(v=>v.stage_no===selected.stage_no&&v.status==='open').length):('Голосований: '+votes.filter(v=>v.stage_no===selected.stage_no).length)}</span>}
+       <span className={'stageStatusPill stageStatusPill--'+selected.status}><SelectedStatusIcon size={15} aria-hidden="true"/>{selected.status==='open'?'Текущий этап':selected.status==='completed'?'Завершён':'Закрыт'}</span>
+       {selected.deadline&&<span className="stageDeadlinePill"><CalendarClock size={15} aria-hidden="true"/>Дедлайн: {formatDeadline(selected.deadline)}</span>}
+       {selectedVoteCount>0&&<span className={'stageVotePill'+(selectedOpenVoteCount?' isOpen':'')}><Vote size={15} aria-hidden="true"/>{selectedOpenVoteCount?'Открыто голосований: '+selectedOpenVoteCount:'Голосований: '+selectedVoteCount}</span>}
+
       </div>
      </div>
      <IconAction className="stageClose" onClick={()=>setSelected(null)} label="Закрыть описание"/>
@@ -141,7 +156,7 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
      </section>
 
      {detail.rulesUrl&&<section className="stageRulesCallout">
-      <div className="stageRulesCalloutIcon">?</div>
+      <div className="stageRulesCalloutIcon"><BookOpenText size={23} strokeWidth={1.9} aria-hidden="true"/></div>
       <div>
        <small>УТОЧНИТЬ ПО ПРАВИЛАМ</small>
        <h3>{detail.rulesSection||('Этап '+selected.stage_no)}</h3>
@@ -152,7 +167,7 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
 
      {votes.some(v=>v.stage_no===selected.stage_no&&v.status==='open')&&<section className="stageVotingLink">
       <div><small>СВЯЗАННОЕ ГОЛОСОВАНИЕ</small><b>По этому этапу сейчас идёт процедурное голосование</b><p>Откройте центр голосований, чтобы увидеть кворум, связанные НПА и результат процедуры.</p></div>
-      <button className="primary" onClick={onOpenVotes}>Перейти к голосованию →</button>
+      <button className="primary stageModalVoteAction" onClick={onOpenVotes}><Vote size={18} aria-hidden="true"/>Перейти к голосованию <ArrowRight size={17} aria-hidden="true"/></button>
      </section>}
 
      <fieldset className="labControls" disabled={readOnly}><legend className="srOnly">Рабочие действия этапа</legend>{readOnly&&<p className="readOnlyNote">Просмотр интерфейса участника. Рабочие действия доступны в его собственной сессии.</p>}
