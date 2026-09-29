@@ -84,3 +84,5 @@
  .ghostBulk{grid-template-columns:minmax(0,1fr)}
 }
 @media(prefers-reduced-motion:reduce){.chatVideoNote *{animation:none!important;transition:none!important}}
+
+@media(max-width:900px){.simWorkspace.chatOpen .simChat.gsChatV2{top:56px!important}}
