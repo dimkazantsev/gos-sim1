@@ -138,6 +138,7 @@ async function main(){
  await touch.locator('.mobileDockItem').first().waitFor();
  await touch.evaluate(()=>localStorage.removeItem('dock-interaction-ci'));
  await touch.reload();
+ await touch.addStyleTag({content:'nextjs-portal{display:none!important;pointer-events:none!important}'});
  await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
  const touchFrom=await touch.locator('[data-dock-item="teacher"]').boundingBox();
  const touchTo=await touch.locator('[data-dock-item="stages"]').boundingBox();
