@@ -18,7 +18,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const [olderExhausted,setOlderExhausted]=useState(false);
  const [olderError,setOlderError]=useState('');
  useEffect(()=>{setOlder([]);setOlderExhausted(false);setOlderError('')},[game?.id,me?.user_id]);
- const loaded=useMemo(()=>[...new Map([...activities,...older].map(a=>[a.id,a])).values()],[activities,older]);
+ const loaded=useMemo(()=>[...new Map<number,(typeof activities)[number]>([...activities,...older].map(a=>[a.id,a] as const)).values()],[activities,older]);
  async function loadOlder(){
   if(!game||olderBusy||olderExhausted)return;
   const earliest=loaded.reduce<string|null>((min,a)=>!min||a.created_at<min?a.created_at:min,null);
@@ -29,7 +29,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   if(r.error)setOlderError(r.error.message);
   else{
    const page=(r.data||[]) as typeof activities;
-   setOlder(previous=>[...new Map([...previous,...page].map(a=>[a.id,a])).values()]);
+   setOlder(previous=>[...new Map<number,(typeof activities)[number]>([...previous,...page].map(a=>[a.id,a] as const)).values()]);
    if(page.length<250)setOlderExhausted(true);
   }
   setOlderBusy(false);
