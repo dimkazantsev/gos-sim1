@@ -31,7 +31,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
   if(!game||!target)return;
   let valid=true;
   void supabase.rpc('get_public_stage_scores',{p_game_id:game.id})
-   .then(r=>{if(valid)setPublicScores((r.data||[]).filter(a=>a.user_id===target.user_id) as PublicAssessment[])});
+   .then(r=>{if(valid)setPublicScores(((r.data||[]) as (PublicAssessment & {user_id:string})[]).filter(a=>a.user_id===target.user_id))});
   return()=>{valid=false};
  },[game?.id,target?.user_id]);
  if(!me||!target)return null;
