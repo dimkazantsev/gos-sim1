@@ -102,12 +102,17 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
   </section>
    <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
     {workspace==='overview'&&<>
-
-
-
+     <div className="teacherOverviewStats">
+      <article><small>В ИГРЕ СЕЙЧАС</small><strong>{onlineCount}</strong><span>из {members.filter(m=>m.kind==='student').length} студентов онлайн</span></article>
+      <article><small>ЖДУТ РЕШЕНИЯ</small><strong>{pending.length}</strong><span>{pending.length?'необходимо рассмотреть':'очередь пуста'}</span></article>
+      <article><small>АКТИВНОСТЬ</small><strong>{studentActivities.length}</strong><span>событий в загруженной ленте</span></article>
+      <article><small>ГОТОВНОСТЬ</small><strong>{g.stages.filter(s=>s.status==='completed').length}/{g.stages.length}</strong><span>этапов завершено</span></article>
+     </div>
      <div className="teacherOverviewQuick">
       <button type="button" onClick={()=>setWorkspace('stages')}>Управление этапами <ArrowRight size={16} aria-hidden="true"/></button>
       <button type="button" onClick={()=>setWorkspace('journal')}>Журнал аудитории <ArrowRight size={16} aria-hidden="true"/></button>
+      <button type="button" onClick={()=>setWorkspace('grades')}>Журнал оценок <ArrowRight size={16} aria-hidden="true"/></button>
+      <button type="button" onClick={()=>setWorkspace('analytics')}>Аналитика участников <ArrowRight size={16} aria-hidden="true"/></button>
      </div>
 
     </>}
