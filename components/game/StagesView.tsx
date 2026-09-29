@@ -1,6 +1,6 @@
 'use client';
 import {IconAction} from '../ui/IconAction';
-import {ArrowRight,BookOpenText,Building2,CalendarClock,ChartNoAxesCombined,CheckCircle2,CircleDot,ClipboardCheck,ClipboardList,Landmark,LockKeyhole,Map,MapPin,Network,Scale,ShieldAlert,SlidersHorizontal,Target,UserRoundX,UsersRound,Vote,Wallet} from 'lucide-react';
+import {ArrowRight,ArrowUpRight,BookOpenText,Building2,CalendarClock,ChartNoAxesCombined,CheckCircle2,ChevronRight,CircleDot,ClipboardCheck,ClipboardList,Landmark,Layers3,LockKeyhole,Map,MapPin,Network,Search,Scale,ShieldAlert,SlidersHorizontal,Target,UserRoundX,UsersRound,Vote,Wallet,X} from 'lucide-react';
 import {useEffect,useState,type CSSProperties} from 'react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -29,10 +29,14 @@ import StageReadinessPanel from './StageReadinessPanel';
 
 // A consistent icon language for the sixteen institutions and decisions.
 const STAGE_ICONS=[UsersRound,SlidersHorizontal,Map,Landmark,UserRoundX,ClipboardCheck,Vote,Building2,Network,Target,ClipboardList,Scale,Wallet,MapPin,ShieldAlert,ChartNoAxesCombined] as const;
+type StageFilter='all'|'open'|'voting'|'completed'|'locked';
 
 export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;focusStageNo?:number;readOnly?:boolean}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
  const [selected,setSelected]=useState<Stage|null>(null);
+ const [stageFilter,setStageFilter]=useState<StageFilter>('all');
+ const [phaseFilter,setPhaseFilter]=useState<string|null>(null);
+ const [stageSearch,setStageSearch]=useState('');
  const dialogRef=useDialog(!!selected,()=>setSelected(null));
  useEffect(()=>{if(focusStageNo)setSelected(stages.find(s=>s.stage_no===focusStageNo)||null)},[focusStageNo]);
  const detail=selected?STAGE_DETAILS[selected.stage_no]:null;
@@ -44,56 +48,115 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
  const selectedOpenVoteCount=selected?votes.filter(v=>v.stage_no===selected.stage_no&&v.status==='open').length:0;
  const selectedVoteCount=selected?votes.filter(v=>v.stage_no===selected.stage_no).length:0;
 
- return <div className="stagesPage">
-  <section className="pageHeader">
-   <div><small>КАРТА ИГРЫ · 16 ЭТАПОВ</small><h1>Путь вашей республики</h1><p>Нажмите на любой этап — откроются полные правила, задачи, результаты и процедура.</p></div>
-   {teacher&&<button type="button" className="primary stageNextButton" onClick={nextStage}>Открыть следующий этап <ArrowRight size={17} aria-hidden="true"/></button>}
-  </section>
-
-  <section className="stagePhaseRail" aria-label="Фазы государственного строительства">
-   <div className="stagePhaseIntro"><small>КАРТА ГОСУДАРСТВА</small><b>{currentPhase.title}</b><span>Текущая фаза · этап {current?.stage_no||1} из 16</span></div>
-   <div className="stagePhaseTrack">{GAME_PHASES.map(p=>{
-    const completed=stages.filter(s=>s.stage_no>=p.range[0]&&s.stage_no<=p.range[1]&&s.status==='completed').length;
-    const total=p.range[1]-p.range[0]+1;
-    const active=!!current&&current.stage_no>=p.range[0]&&current.stage_no<=p.range[1];
-    return <button key={p.id} className={active?'active':''} onClick={()=>{const s=stages.find(x=>x.stage_no===p.range[0]);if(s)setSelected(s)}} style={{'--phase-accent':p.accent} as CSSProperties}>
-     <i>{String(p.range[0]).padStart(2,'0')}{p.range[1]!==p.range[0]?'–'+String(p.range[1]).padStart(2,'0'):''}</i>
-     <b>{p.short}</b><span className="stagePhaseProgress">{completed===total?<CheckCircle2 size={14} aria-hidden="true"/>:<CircleDot size={14} aria-hidden="true"/>}{completed}/{total}</span>
-    </button>
-   })}</div>
-  </section>
-
-
-  <div className="stageTimeline">
-   {stages.map(s=>{
-    const StageIcon=STAGE_ICONS[s.stage_no-1]||BookOpenText;
-    const StatusIcon=s.status==='completed'?CheckCircle2:s.status==='open'?CircleDot:LockKeyhole;
-    const hasOpenVote=votes.some(v=>v.stage_no===s.stage_no&&v.status==='open');
-    const openDetails=()=>setSelected(s);
-    return <article className={'stageCard '+s.status} key={s.id}>
-     <button type="button" className="stageCardPrimary" onClick={openDetails} aria-label={'Описание этапа '+s.stage_no+': '+s.title}>
-      <span className="stageCardTop">
-       <span className="stageNo" aria-hidden="true"><StageIcon size={22} strokeWidth={1.85}/><span>{String(s.stage_no).padStart(2,'0')}</span></span>
-       <span className="stageCardBody">
-        <span className="stageCardMode">{s.mode}</span>
-        <span className="stageCardTitle">{s.title}</span>
-        <span className="stageCardSummary">{s.summary}</span>
-       </span>
-      </span>
-      {s.deadline&&<span className="stageCardDue"><CalendarClock size={15} aria-hidden="true"/>До {formatDeadline(s.deadline)}</span>}
-     </button>
-     <div className="stageCardFooter">
-      <span className={'stageStatusPill stageStatusPill--'+s.status}><StatusIcon size={16} strokeWidth={2.1} aria-hidden="true"/><span>{s.status==='open'?'Текущий':s.status==='completed'?'Завершён':'Закрыт'}</span></span>
-      {hasOpenVote&&<button type="button" className="stageVoteQuick" title="Открыть голосование" onClick={onOpenVotes} aria-label={'Перейти к голосованиям этапа '+s.stage_no}>
-       <Vote size={17} strokeWidth={1.9} aria-hidden="true"/><span>Голосование</span>
-      </button>}
-      <button type="button" className="stageCardOpen" onClick={openDetails} aria-label={'Подробнее об этапе '+s.stage_no}>
-       <span>Подробнее</span><ArrowRight size={17} strokeWidth={2} aria-hidden="true"/>
-      </button>
+ const completedCount=stages.filter(s=>s.status==='completed').length;
+ const openCount=stages.filter(s=>s.status==='open').length;
+ const votingStageNos=new Set(votes.filter(v=>v.status==='open').map(v=>v.stage_no));
+ const votingCount=stages.filter(s=>votingStageNos.has(s.stage_no)).length;
+ const completionPercent=stages.length?Math.round(completedCount/stages.length*100):0;
+ const stageFilters:{id:StageFilter;label:string;count:number}[]=[
+  {id:'all',label:'Все этапы',count:stages.length},
+  {id:'open',label:'Текущие',count:openCount},
+  {id:'voting',label:'Голосования',count:votingCount},
+  {id:'completed',label:'Завершённые',count:completedCount},
+  {id:'locked',label:'Закрытые',count:stages.filter(s=>s.status==='locked').length}
+ ];
+ const selectedPhase=phaseFilter?GAME_PHASES.find(p=>p.id===phaseFilter):null;
+ const normalizedSearch=stageSearch.trim().toLocaleLowerCase('ru-RU');
+ const visibleStages=stages.filter(s=>
+  (!selectedPhase||(s.stage_no>=selectedPhase.range[0]&&s.stage_no<=selectedPhase.range[1]))&&
+  (stageFilter==='all'||(stageFilter==='voting'?votingStageNos.has(s.stage_no):s.status===stageFilter))&&
+  (!normalizedSearch||[String(s.stage_no),String(s.stage_no).padStart(2,'0'),s.title,s.summary,s.mode].some(part=>part.toLocaleLowerCase('ru-RU').includes(normalizedSearch)))
+ );
+ return <div className="stagesPage stagesAtlas">
+  <section className="stageAtlasHero" aria-labelledby="stage-atlas-title">
+   <div className="stageAtlasHeading">
+    <span className="stageAtlasOverline"><Layers3 size={16} strokeWidth={2} aria-hidden="true"/> КАРТА ИГРЫ · {stages.length} ЭТАПОВ</span>
+    <h1 id="stage-atlas-title">Этапы и задачи</h1>
+    <p>Путь от создания партий до управления государством. Выберите этап, чтобы изучить его правила и выполнить задачи.</p>
+   </div>
+   <div className="stageAtlasHeroAside">
+    <div className="stageAtlasProgressBox">
+     <div className="stageAtlasProgressTop"><span>Прогресс республики</span><strong>{completedCount} <span>/ {stages.length}</span></strong></div>
+     <div className="stageAtlasProgressTrack" role="progressbar" aria-label="Пройдено этапов" aria-valuemin={0} aria-valuemax={stages.length} aria-valuenow={completedCount}>
+      <span style={{width:completionPercent+'%'}}/>
      </div>
-    </article>
-   })}
-  </div>
+     <div className="stageAtlasProgressBottom"><span>{completionPercent}% выполнено</span><span>{openCount?openCount+' сейчас активно':'Активных этапов нет'}</span></div>
+    </div>
+    {teacher&&<button type="button" className="primary stageAtlasNext" onClick={nextStage} disabled={completedCount===stages.length}>Открыть следующий этап <ArrowRight size={17} aria-hidden="true"/></button>}
+   </div>
+  </section>
+
+  <section className="stageAtlasPhases" aria-label="Фазы государственного строительства">
+   <div className="stageAtlasSectionHead">
+    <div><span className="stageAtlasEyebrow">МАРШРУТ</span><h2>Шесть фаз игры</h2></div>
+    {phaseFilter&&<button type="button" className="stageAtlasClear" onClick={()=>setPhaseFilter(null)}>Показать все фазы <X size={15} aria-hidden="true"/></button>}
+   </div>
+   <div className="stageAtlasPhaseList">
+    {GAME_PHASES.map(p=>{
+     const done=stages.filter(s=>s.stage_no>=p.range[0]&&s.stage_no<=p.range[1]&&s.status==='completed').length;
+     const total=p.range[1]-p.range[0]+1;
+     const isCurrent=!!current&&current.stage_no>=p.range[0]&&current.stage_no<=p.range[1];
+     const isSelected=phaseFilter===p.id;
+     return <button type="button" key={p.id} className={'stageAtlasPhase'+(isCurrent?' isCurrent':'')+(isSelected?' isSelected':'')} aria-pressed={isSelected} title={p.title} onClick={()=>setPhaseFilter(isSelected?null:p.id)} style={{'--phase-accent':p.accent} as CSSProperties}>
+      <span className="stageAtlasPhaseRange">{String(p.range[0]).padStart(2,'0')}{p.range[1]!==p.range[0]?' — '+String(p.range[1]).padStart(2,'0'):''}</span>
+      <span className="stageAtlasPhaseTitle">{p.short}</span>
+      <span className="stageAtlasPhaseBottom"><span>{done}/{total} пройдено</span>{done===total?<CheckCircle2 size={15} aria-hidden="true"/>:isCurrent?<CircleDot size={15} aria-hidden="true"/>:<ChevronRight size={15} aria-hidden="true"/>}</span>
+      <span className="stageAtlasPhaseMeter" aria-hidden="true"><span style={{width:Math.round(done/total*100)+'%'}}/></span>
+     </button>;
+    })}
+   </div>
+  </section>
+
+  <section className="stageAtlasDirectory" aria-label="Каталог этапов">
+   <div className="stageAtlasDirectoryHead">
+    <div><span className="stageAtlasEyebrow">РАБОЧАЯ КАРТА</span><h2>{selectedPhase?selectedPhase.title:'Все этапы'}</h2></div>
+    <span className="stageAtlasVisibleCount">{visibleStages.length} из {stages.length}</span>
+   </div>
+   <div className="stageAtlasToolbar">
+    <div className="stageAtlasFilters" role="group" aria-label="Фильтр этапов">
+     {stageFilters.map(filter=><button type="button" key={filter.id} className={'stageAtlasFilter'+(stageFilter===filter.id?' isActive':'')} aria-pressed={stageFilter===filter.id} onClick={()=>setStageFilter(filter.id)}>
+      {filter.label}<span>{filter.count}</span>
+     </button>)}
+    </div>
+    <label className="stageAtlasSearch">
+     <Search size={18} strokeWidth={2} aria-hidden="true"/>
+     <input type="search" placeholder="Поиск по этапам" aria-label="Поиск по этапам" value={stageSearch} onChange={e=>setStageSearch(e.target.value)}/>
+    </label>
+   </div>
+   {visibleStages.length>0?<div className="stageAtlasGrid">
+    {visibleStages.map(s=>{
+     const StageIcon=STAGE_ICONS[s.stage_no-1]||BookOpenText;
+     const StatusIcon=s.status==='completed'?CheckCircle2:s.status==='open'?CircleDot:LockKeyhole;
+     const hasOpenVote=votingStageNos.has(s.stage_no);
+     const openDetails=()=>setSelected(s);
+     return <article className={'stageAtlasCard is-'+s.status} key={s.id}>
+      <div className="stageAtlasCardMain">
+       <div className="stageAtlasCardGlyph" aria-hidden="true"><StageIcon size={22} strokeWidth={1.8}/><span>{String(s.stage_no).padStart(2,'0')}</span></div>
+       <div className="stageAtlasCardContent">
+        <div className="stageAtlasCardTopline">
+         <span className="stageAtlasCardMode">{s.mode}</span>
+         <span className={'stageAtlasCardStatus is-'+s.status}><StatusIcon size={15} strokeWidth={2.1} aria-hidden="true"/>{s.status==='open'?'Текущий этап':s.status==='completed'?'Завершён':'Закрыт'}</span>
+        </div>
+        <h3>{s.title}</h3>
+        <p>{s.summary}</p>
+       </div>
+      </div>
+      <div className="stageAtlasCardFooter">
+       <div className="stageAtlasCardDeadline">{s.deadline?<><CalendarClock size={15} aria-hidden="true"/>До {formatDeadline(s.deadline)}</>:hasOpenVote?<span className="stageAtlasVoteIndicator"><span/>Требует внимания</span>:<span className="stageAtlasCardStageName">Этап {String(s.stage_no).padStart(2,'0')}</span>}</div>
+       <div className="stageAtlasCardActions">
+        {hasOpenVote&&<button type="button" className="stageAtlasVoteAction" onClick={onOpenVotes} aria-label={'Открыть голосования этапа '+s.stage_no}><Vote size={16} aria-hidden="true"/>Голосование</button>}
+        <button type="button" className="stageAtlasDetailAction" onClick={openDetails} aria-label={'Подробнее об этапе '+s.stage_no+': '+s.title}>Подробнее <ArrowUpRight size={16} strokeWidth={2} aria-hidden="true"/></button>
+       </div>
+      </div>
+     </article>;
+    })}
+   </div>:<div className="stageAtlasEmpty" role="status">
+    <Search size={24} aria-hidden="true"/>
+    <strong>Этапы не найдены</strong>
+    <p>Измените поисковый запрос или сбросьте фильтры.</p>
+    <button type="button" onClick={()=>{setStageSearch('');setStageFilter('all');setPhaseFilter(null)}}>Сбросить фильтры</button>
+   </div>}
+  </section>
 
   {selected&&detail&&<div className="stageModalBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}>
    <section ref={dialogRef} tabIndex={-1} className="stageDetailPanel" role="dialog" aria-modal="true" aria-labelledby="stage-detail-title">
