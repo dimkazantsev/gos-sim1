@@ -19,7 +19,7 @@ async function check(){
   const page=await browser.newPage({viewport:{width:1650,height:900},deviceScaleFactor:1});
   await page.goto('file://'+preview,{waitUntil:'load'});
   const frame=page.frameLocator('#preview');
-  await page.locator('#screen').selectOption('teacher');
+  await page.locator('#screen').selectOption('teacher-stages');
   await frame.locator('.teacherStageManager').waitFor();
   for(const width of [1600,1440,1280,1100,900,768,430,390,360,320]){
    await page.locator('#preview').evaluate((el,n)=>{el.style.width=n+'px'},width);
@@ -45,7 +45,7 @@ async function check(){
    });
    assert.equal(data.cardRects.length,16,'Exactly 16 stage cards required at '+width+'px');
    assert.equal(data.allResetCount,1,'Exactly one all-stage reset control required');
-   assert.equal(data.workspaceCount,6,'All six teacher workspaces must be present');
+   assert.equal(data.workspaceCount,8,'All eight teacher workspaces must be present');
    assert(data.scroll<=data.width+3,'Horizontal document overflow at '+width+'px: '+JSON.stringify(data));
    for(let i=0;i<data.cardRects.length;i++){
     const card=data.cardRects[i];
@@ -63,7 +63,7 @@ async function check(){
      path:path.join(screenshots,'teacher-stages-'+width+'.png'),animations:'disabled'
     });
    }
-   console.log('PASS '+width+'px: 16 independent reset icons, bulk reset, six workspaces, no overflow');
+   console.log('PASS '+width+'px: 16 independent reset icons, bulk reset, eight workspaces, no overflow');
   }
  }finally{await browser.close()}
 }
