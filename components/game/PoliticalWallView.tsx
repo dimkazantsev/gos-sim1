@@ -36,7 +36,7 @@ function PostImpactEditor({g,post}:{g:ReturnTypeRepublic;post:PoliticalPost}){
  </details>
 }
 
-export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNavigate,focusPending=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument:(id:string)=>void;onNavigate:(view:View)=>void;focusPending?:boolean}){
+export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNavigate,focusPending=false,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument:(id:string)=>void;onNavigate:(view:View)=>void;focusPending?:boolean;readOnly?:boolean}){
  const {actions,judgeAction,game,me,teacher,currentStage,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,formalDocuments,votes,profiles,names,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,createVoteFromPost,createFormalDocument}=g;
  const [tab,setTab]=useState<'feed'|'registry'>('feed');
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('participant');
@@ -93,13 +93,13 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
    <div className="wallHeroStats"><div><strong>{politicalPosts.length}</strong><span>публикаций</span></div><div><strong>{politicalDecisions.length}</strong><span>решений</span></div><div><strong>{votes.filter(v=>v.status==='open').length}</strong><span>голосований</span></div></div>
   </section>
 
-  {!teacher&&<section className="wallStageTask">
+  {!teacher&&!readOnly&&<section className="wallStageTask">
    <div className="wallStageTaskNo">{String(stageNo).padStart(2,'0')}</div>
    <div className="wallStageTaskCopy"><small>ВАША ЗАДАЧА СЕЙЧАС</small><h2>{stageAction.title}</h2><p>{stageAction.body}</p></div>
    <button className="primary" onClick={()=>onNavigate(stageAction.target)}>{stageAction.button} →</button>
   </section>}
 
-  <section className="wallComposer surface">
+  {!readOnly&&<section className="wallComposer surface">
    <div className="wallComposerIdentity">
     <div className="wallAvatar">{me.full_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</div>
     <div><small>ПУБЛИКАЦИЯ ОТ ИМЕНИ</small><StyledSelect label="Автор публикации" value={actorKey} onChange={setActorKey} options={actors.map((a:{key:string;label:string})=>({value:a.key,label:a.label}))}/></div>
@@ -117,7 +117,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
    </div>
    <details className="wallFormalAttach"><summary>▤ Прикрепить НПА <span>{formalIds.length||''}</span></summary><div>{formalDocuments.length===0?<p>НПА ещё нет.</p>:formalDocuments.map(d=><label key={d.id}><input type="checkbox" checked={formalIds.includes(d.id)} onChange={e=>setFormalIds(x=>e.target.checked?[...x,d.id]:x.filter(id=>id!==d.id))}/><span><b>{d.registry_no}</b>{d.title}</span></label>)}</div></details>
    <div className="wallComposerActions"><span>Публикация станет частью официального журнала игры.</span><button className="primary" disabled={busy||!title.trim()||!body.trim()} onClick={publish}>{busy?'Публикую…':'Опубликовать'}</button></div>
-  </section>
+  </section>}
 
   <div className="wallTabs"><button className={tab==='feed'?'active':''} onClick={()=>setTab('feed')}>Лента</button><button className={tab==='registry'?'active':''} onClick={()=>setTab('registry')}>Реестр принятых решений <span>{politicalDecisions.length}</span></button></div>
 
