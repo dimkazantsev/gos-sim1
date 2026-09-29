@@ -158,6 +158,9 @@ async function main(){
  console.log('TOUCH SAVED AFTER DONE',await touch.evaluate(()=>localStorage.getItem('dock-interaction-ci')));
  await touch.reload();
  await touch.waitForFunction(()=>document.body.dataset.uiReady==='yes');
+ console.log('TOUCH STORAGE AFTER RELOAD',await touch.evaluate(()=>localStorage.getItem('dock-interaction-ci')));
+ // The parent page becomes ready before all client effects necessarily commit.
+ await touch.waitForFunction(()=>[...document.querySelectorAll('.mobileDockItem')].slice(0,3).map(x=>x.dataset.dockItem).join(',')==='dashboard,stages,teacher',null,{timeout:4000});
  assert.deepEqual((await order(touch)).slice(0,3),['dashboard','stages','teacher'],'Touch drag order not saved');
  console.log('PASS native touch hold + drag and persistence');
  await touch.screenshot({path:path.join(screens,'real-dragged-mobile.png')});
