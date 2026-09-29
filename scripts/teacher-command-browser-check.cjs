@@ -45,7 +45,7 @@ async function check(){
    });
    assert.equal(data.cardRects.length,16,'Exactly 16 stage cards required at '+width+'px');
    assert.equal(data.allResetCount,1,'Exactly one all-stage reset control required');
-   assert.equal(data.workspaceCount,8,'All eight teacher workspaces must be present');
+   assert.equal(data.workspaceCount,9,'All nine teacher workspaces must be present');
    assert(data.scroll<=data.width+3,'Horizontal document overflow at '+width+'px: '+JSON.stringify(data));
    for(let i=0;i<data.cardRects.length;i++){
     const card=data.cardRects[i];
@@ -63,7 +63,7 @@ async function check(){
      path:path.join(screenshots,'teacher-stages-'+width+'.png'),animations:'disabled'
     });
    }
-   console.log('PASS '+width+'px: 16 independent reset icons, bulk reset, eight workspaces, no overflow');
+   console.log('PASS '+width+'px: 16 independent reset icons, bulk reset, nine workspaces, no overflow');
   }
   for(const [screen,selector] of [
    ['teacher-journal','.classroomJournal'],
@@ -72,7 +72,7 @@ async function check(){
   ]){
    await page.locator('#screen').selectOption(screen);
    await frame.locator(selector).first().waitFor();
-   assert.equal(await frame.locator('.teacherWorkspaceNav [role=tab]').count(),8,'Eight workspaces required');
+   assert.equal(await frame.locator('.teacherWorkspaceNav [role=tab]').count(),9,'Nine workspaces required');
    if(screen==='teacher-journal'){
     assert((await frame.locator('.journalToolbar select').count())>=2,'Participant and section journal filters missing');
     assert.equal(await frame.locator('.journalCounters button').count(),1,'Journal CSV export missing');
