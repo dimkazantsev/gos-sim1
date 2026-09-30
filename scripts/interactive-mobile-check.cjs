@@ -17,7 +17,6 @@ import ImpactRulesPanel from '../../components/game/ImpactRulesPanel';
 import EventCaseTile from '../../components/game/EventCaseTile';
 import EventCaseModal from '../../components/game/EventCaseModal';
 import EventComic from '../../components/game/EventComic';
-import TeacherMetricStudio from '../../components/game/TeacherMetricStudio';
 import authoredCases from '../../content/events-v2.json';
 import type {View} from '../../components/game/types';
 import type {ReturnTypeRepublic} from '../../components/game/viewTypes';
@@ -43,7 +42,6 @@ export default function UiTest(){
  return <div style={{width:'100%',maxWidth:'100vw',padding:'12px 12px 120px'}}>
   <section className="interfaceCaseTest"><div className="eventTileGrid">{caseTiles.map(c=><EventCaseTile key={c.id} item={c} meta={c.category} onClick={()=>setOpened(c.id)}/>)}</div></section>
   {activeCase&&<EventCaseModal title={activeCase.title} onClose={()=>setOpened('')}><EventComic title={activeCase.title} caseKey={activeCase.case_key} category={activeCase.category} scene={activeCase.comic_scene}/><p>{activeCase.situation}</p><div className="eventOptionButtons"><button>Первый вариант</button><button>Второй вариант</button></div></EventCaseModal>}
-  <TeacherMetricStudio g={g}/>
   <main className="teacherSimple"><ImpactRulesPanel g={g} initialExpandedRuleId="r1"/></main>
   {menu&&<div className="mobileMoreBackdrop" onClick={()=>setMenu(false)}>
    <section className="mobileMoreSheet" role="dialog" aria-label="Все разделы" onClick={e=>e.stopPropagation()}>
