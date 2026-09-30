@@ -4,15 +4,22 @@ import {CalendarDays,CheckCircle2,UsersRound} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
+import EventCollaboration,{type EventInvitation} from './EventCollaboration';
+import {eventButtonSound} from './eventButtonSound';
 import EventAutopilotPanel from './EventAutopilotPanel';
 import EventComic from './EventComic';
 import type {EventComicScene} from './types';
 type CaseRow={id:string;game_id:string;case_key:string;title:string;situation:string;category:string;seriousness:'serious'|'light';audience:'single'|'group'|'all';allowed_roles:string[];status:string;source_url:string|null;decision_options?:string[];effect_plan?:{options?:{key:string;trust:number;description?:string}[]};comic_scene?:EventComicScene};
 type Assignment={id:string;case_id:string;game_id:string;recipient_id:string;status:string;created_at:string};
-type Decision={id:string;case_id:string;actor_id:string;choice:string};
+type Decision={id:string;case_id:string;actor_id:string;choice:string;role_snapshot?:string};
+type Authority={decision_id:string;case_id:string;actor_id:string;authority_ok:boolean;lawful:boolean;strategy_point:boolean;role_snapshot:string;legal_basis:string};
 type Outcome={case_id:string;winner:string;trust_delta:number;votes_count:number;assignments_count:number;media_post_id:string|null;requested_trust_delta?:number;resolution_kind?:string};
 export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnTypeRepublic;readOnly?:boolean;mode?:'feed'|'manage'}){
  const {game,me,members,teacher}=g;
+ const [invitations,setInvitations]=useState<EventInvitation[]>([]);
+ const [authority,setAuthority]=useState<Authority[]>([]);
+ const [expanded,setExpanded]=useState('');
+ const [legalFilter,setLegalFilter]=useState('all');
  const [cases,setCases]=useState<CaseRow[]>([]);
  const [assignments,setAssignments]=useState<Assignment[]>([]);
  const [decisions,setDecisions]=useState<Decision[]>([]);
@@ -34,14 +41,17 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const [busyId,setBusyId]=useState<string|null>(null);
  async function reload(){
   if(!game||!me)return;
-  const [a,b,c,d]=await Promise.all([
+  const [a,b,c,d,e,f]=await Promise.all([
    supabase.from('event_cases').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).limit(1000),
    supabase.from('event_assignments').select('*').eq('game_id',game.id),
    supabase.from('event_decisions').select('*').eq('game_id',game.id),
-   supabase.from('event_case_outcomes').select('*').eq('game_id',game.id)
+   supabase.from('event_case_outcomes').select('*').eq('game_id',game.id),
+   supabase.from('event_collaboration_invites').select('*').eq('game_id',game.id),
+   supabase.from('event_authority_evidence').select('*').eq('game_id',game.id)
   ]);
-  const error=[a,b,c,d].find(r=>r.error)?.error;
+  const error=[a,b,c,d,e,f].find(r=>r.error)?.error;
   if(error){setNotice(error.message);return}
+  setInvitations((e.data||[]) as EventInvitation[]);setAuthority((f.data||[]) as Authority[]);
   setCases((a.data||[]) as CaseRow[]);
   if(!b.error)setAssignments((b.data||[]) as Assignment[]);
   if(!c.error)setDecisions((c.data||[]) as Decision[]);
@@ -50,13 +60,14 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  useEffect(()=>{
   if(!game?.id||!me?.user_id)return;
   void reload();
+  const poll=setInterval(()=>void reload(),5000);
   const channel=supabase.channel('event-workspace:'+game.id+':'+me.user_id)
    .on('postgres_changes',{event:'*',schema:'public',table:'event_cases',filter:'game_id=eq.'+game.id},()=>void reload())
    .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>void reload())
    .on('postgres_changes',{event:'*',schema:'public',table:'event_decisions',filter:'game_id=eq.'+game.id},()=>void reload())
    .on('postgres_changes',{event:'*',schema:'public',table:'event_case_outcomes',filter:'game_id=eq.'+game.id},()=>void reload())
    .subscribe();
-  return()=>{void supabase.removeChannel(channel)};
+  return()=>{clearInterval(poll);void supabase.removeChannel(channel)};
  },[game?.id,me?.user_id]);
  const students=members.filter(m=>m.kind==='student');
  const roles=[...new Set(students.map(m=>m.role_title?.trim()).filter((r):r is string=>!!r))].sort((a,b)=>a.localeCompare(b,'ru'));
@@ -79,7 +90,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  }
  async function answer(assignment:Assignment,choice:string){
   if(busyId||readOnly||me?.kind!=='student')return;
-  setBusyId(assignment.id);setNotice('');
+  eventButtonSound();setBusyId(assignment.id);setNotice('');
   const r=await supabase.rpc('submit_event_decision',{p_assignment_id:assignment.id,p_choice:choice,p_rationale:null});
   if(r.error)setNotice(r.error.message);else await Promise.all([reload(),g.refresh()]);
   setBusyId(null);
@@ -91,10 +102,11 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  }
  const filteredCases=cases.filter(c=>{
   const casesAssignments=assignments.filter(a=>a.case_id===c.id);
-  if(!assignedCaseIds.has(c.id))return false;
-  if(!teacher&&me?.kind!=='observer'&&!casesAssignments.some(a=>a.recipient_id===me?.user_id))return false;
+  if(!assignedCaseIds.has(c.id)&&!(mode==='manage'&&teacher&&c.status==='ready'))return false;
+  if(!teacher&&me?.kind!=='observer'&&!casesAssignments.some(a=>a.recipient_id===me?.user_id)&&!invitations.some(i=>i.case_id===c.id&&i.recipient_id===me?.user_id&&i.status==='pending'))return false;
   if(feedPerson&&!casesAssignments.some(a=>a.recipient_id===feedPerson))return false;
   if(feedRole&&!casesAssignments.some(a=>members.find(m=>m.user_id===a.recipient_id)?.role_title===feedRole))return false;
+  if(legalFilter!=='all'&&!authority.some(a=>a.case_id===c.id&&(!feedPerson||a.actor_id===feedPerson)&&(legalFilter==='valid'?(a.authority_ok&&a.lawful):(!a.authority_ok||!a.lawful))))return false;
   const outcome=outcomes.find(o=>o.case_id===c.id);
   if(feedState==='resolved'&&!outcome)return false;
   if(feedState==='pending'&&outcome)return false;
@@ -148,22 +160,23 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     <StyledSelect label="Формат" value={audience} onChange={v=>{setAudience(v as 'single'|'group'|'all');setSelected([])}} options={[{value:'single',label:'Одному участнику'},{value:'group',label:'Совместно, 2–3 человека'},{value:'all',label:'Всем студентам'}]}/>
     <label className="eventWide">Описание ситуации<textarea rows={4} value={situation} maxLength={5000} onChange={e=>setSituation(e.target.value)} placeholder="Какое решение нужно принять или отклонить?"/></label>
    </div>
-   <div className="eventChoiceEditor"><h4>Варианты И Последствия · От 2 До 6</h4>{options.map((o,i)=><article key={i}>
+   <div className="eventChoiceEditor"><h4>Варианты и последствия · От 2 до 6</h4>{options.map((o,i)=><article key={i}>
     <label>Вариант {i+1}<input value={o.label} maxLength={500} onChange={e=>setOptions(old=>old.map((v,j)=>j===i?{...v,label:e.target.value}:v))} placeholder="Содержательное решение"/></label>
-    <label>Доверие, П.п.<input type="number" min={-100} max={100} step="0.5" value={o.trust} onChange={e=>setOptions(old=>old.map((v,j)=>j===i?{...v,trust:e.target.valueAsNumber}:v))}/></label>
-    <button type="button" disabled={options.length<=2} onClick={()=>setOptions(old=>old.filter((_,j)=>j!==i))}>Удалить Вариант</button>
-    <label className="eventChoiceDescription">Элементарные Последствия<textarea rows={2} value={o.description} maxLength={2000} onChange={e=>setOptions(old=>old.map((v,j)=>j===i?{...v,description:e.target.value}:v))} placeholder="Что изменится после этого решения?"/></label>
-   </article>)}<button type="button" disabled={options.length>=6} onClick={()=>setOptions(old=>[...old,{label:'',trust:0,description:''}])}>Добавить Вариант</button></div>
+    <label>Доверие, п.п.<input type="number" min={-100} max={100} step="0.5" value={o.trust} onChange={e=>setOptions(old=>old.map((v,j)=>j===i?{...v,trust:e.target.valueAsNumber}:v))}/></label>
+    <button type="button" disabled={options.length<=2} onClick={()=>setOptions(old=>old.filter((_,j)=>j!==i))}>Удалить вариант</button>
+    <label className="eventChoiceDescription">Последствия решения<textarea rows={2} value={o.description} maxLength={2000} onChange={e=>setOptions(old=>old.map((v,j)=>j===i?{...v,description:e.target.value}:v))} placeholder="Что изменится после этого решения?"/></label>
+   </article>)}<button type="button" disabled={options.length>=6} onClick={()=>setOptions(old=>[...old,{label:'',trust:0,description:''}])}>Добавить вариант</button></div>
    {audience!=='all'&&<div className="eventRecipients"><strong>Получатели · {selected.length}/{audience==='single'?1:3}</strong><div>{recipients.map(m=><label key={m.user_id}><input type="checkbox" checked={selected.includes(m.user_id)} disabled={!selected.includes(m.user_id)&&selected.length>=(audience==='single'?1:3)} onChange={e=>setSelected(old=>e.target.checked?[...old,m.user_id]:old.filter(x=>x!==m.user_id))}/>{m.full_name}<small>{m.role_title||'Студент'}</small></label>)}</div></div>}
    <footer><span>{audience==='all'?'Получатели: вся аудитория':'Выбрано: '+selected.length}</span><button type="button" onClick={()=>void create()} disabled={!canSend||saving||readOnly}>{saving?'Отправка…':'Назначить событие'}</button></footer>
   </div>}
-  {mode==='feed'&&<div className="eventList"><header className="eventFeedHeader"><div><small>ЛЕНТА НАЗНАЧЕННЫХ СИТУАЦИЙ</small><h3>{teacher||me.kind==='observer'?'Решения участников':'Мои события'}</h3></div><span>{visibleCases.length} событий</span></header>
+  {<div className="eventList"><header className="eventFeedHeader"><div><small>ЛЕНТА НАЗНАЧЕННЫХ СИТУАЦИЙ</small><h3>{teacher||me.kind==='observer'?'Решения участников':'Мои события'}</h3></div><span>{visibleCases.length} событий</span></header>
    {<div className="eventFeedFilters">
     <StyledSelect label="Участник" value={feedPerson} onChange={setFeedPerson} options={[{value:'',label:'Все участники'},...students.map(m=>({value:m.user_id,label:m.full_name}))]}/>
     <StyledSelect label="Должность" value={feedRole} onChange={setFeedRole} options={[{value:'',label:'Все должности'},...roles.map(r=>({value:r,label:r}))]}/>
     <StyledSelect label="Состояние" value={feedState} onChange={setFeedState} options={[{value:'all',label:'Все события'},{value:'resolved',label:'Результат получен'},{value:'pending',label:'Ожидают решения'}]}/>
     <StyledSelect label="Сортировка" value={feedSort} onChange={setFeedSort} options={[{value:'recent',label:'Сначала новые назначения'},{value:'oldest',label:'Сначала старые назначения'},{value:'name',label:'По названию · А–Я'}]}/>
    </div>}
+   {teacher&&<StyledSelect label="Правовая оценка" value={legalFilter} onChange={setLegalFilter} options={[{value:'all',label:'Все решения'},{value:'valid',label:'В пределах полномочий'},{value:'invalid',label:'Нарушения полномочий или права'}]}/>}
    {visibleCases.length===0?<div className="journalEmpty">Назначенных ситуаций пока нет.</div>:
    visibleCases.map(c=>{
     const assigned=assignments.filter(a=>a.case_id===c.id),responded=decisions.filter(d=>d.case_id===c.id);
@@ -175,31 +188,40 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     const winnerIndex=outcome?.winner==='accept'?0:outcome?.winner==='reject'?1:Number(outcome?.winner.replace('option_',''))-1;
     const chosenEffect=outcome&&winnerIndex>=0?c.effect_plan?.options?.[winnerIndex]:null;
     const kind=outcome?.resolution_kind||(outcome?(Number(chosenEffect?.trust)>0?'beneficial':Number(chosenEffect?.trust)<0?'harmful':'neutral'):'pending');
-    return <article key={c.id} className={'eventCaseCard eventStory '+(kind==='beneficial'?'eventStoryResolved ':kind==='harmful'?'eventStoryRejected ':outcome?'eventStoryNeutral ':'')}>
+    const expandedCase=mode==='feed'||expanded===c.id;
+    const invites=invitations.filter(i=>i.case_id===c.id);
+    const pendingInvites=invites.some(i=>i.status==='pending');
+    return <div className="eventCaseBundle" key={c.id}><article className={'eventCaseCard eventStory '+(kind==='beneficial'?'eventStoryResolved ':kind==='harmful'?'eventStoryRejected ':outcome?'eventStoryNeutral ':'')}>
      <div className="eventStoryVisual"><EventComic title={c.title} category={c.category} caseKey={c.case_key} scene={c.comic_scene} compact/></div>
      <div className="eventStoryContent">
-      <div className="eventCaseTop"><span>{c.category}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>
-      <h4>{c.title}</h4><p>{c.situation.replace(/\\n/g,'\n')}</p>
+      <div className="eventCaseTop"><span>{c.category}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {invites.some(i=>i.status==='accepted')?'Совместно':c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>
+      <h4>{teacher&&mode==='manage'?<button className="eventExpandButton" aria-expanded={expandedCase} onClick={()=>setExpanded(expanded===c.id?'':c.id)}>{c.title}<span>{expandedCase?'Свернуть':'Карточка и статистика'}</span></button>:c.title}</h4>{expandedCase&&<><p>{c.situation.replace(/\\n/g,'\n')}</p>
       <div className="eventStoryRecipients">{assigned.map(a=><span key={a.id}>{members.find(m=>m.user_id===a.recipient_id)?.full_name||'Участник'} · {members.find(m=>m.user_id===a.recipient_id)?.role_title||'Без должности'}</span>)}</div>
       <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили · {pct(responded.length,assigned.length)}%</span>
       </div>
-      <div className="eventVoteResults" aria-label="Результаты По Вариантам">{labels.map((label,i)=>{
+      <div className="eventVoteResults" aria-label="Результаты по вариантам">{labels.map((label,i)=>{
        const count=responded.filter(d=>d.choice==='option_'+(i+1)||(i===0&&d.choice==='accept')||(i===1&&d.choice==='reject')).length;
        return <div className="eventVoteResult" key={i}><div><span>{i+1}. {label}</span><b>{count} · {pct(count,responded.length)}%</b></div><div className="eventVoteBar" aria-hidden="true"><span style={{width:pct(count,responded.length)+'%'}}/></div></div>;
       })}</div>
-      {my?.status==='pending'&&me.kind==='student'&&!outcome&&<div className="eventOptionButtons" role="group" aria-label={'Решение по событию '+c.title}>
-       {labels.map((label,i)=><button type="button" key={i} disabled={!!busyId||readOnly}
-        onClick={()=>void answer(my,'option_'+(i+1))}><b>{String(i+1).padStart(2,'0')}</b>{label}</button>)}
-      </div>}
+
       {mineAnswer&&!teacher&&<div className="eventOutcomeNote">Ваш голос: {labels[mineAnswer.choice==='accept'?0:mineAnswer.choice==='reject'?1:Math.max(0,Number(mineAnswer.choice.replace('option_',''))-1)]||'Учтён'}</div>}
-      {outcome&&<div className="eventOutcomeNote final"><strong>Итог голосования: {outcome.winner==='tie'?'Равное число голосов — общее решение не принято':labels[winnerIndex]}</strong>
+      {outcome&&<div className="eventOutcomeNote final"><strong>Итог голосования: {outcome.winner==='tie'?'Большинство участников не поддержало единый вариант — решение не принято':labels[winnerIndex]}</strong>
        {chosenEffect?.description&&<p>{chosenEffect.description}</p>}
        <span>Фактическое изменение доверия: {outcome.trust_delta>0?'+':''}{outcome.trust_delta} п.п. · Голосов: {outcome.votes_count}/{outcome.assignments_count}</span>
-       {outcome.requested_trust_delta!==undefined&&outcome.requested_trust_delta!==outcome.trust_delta&&<span>Расчётный эффект: {outcome.requested_trust_delta>0?'+':''}{outcome.requested_trust_delta} П.п. · Достигнута граница показателя.</span>}
+       {outcome.requested_trust_delta!==undefined&&outcome.requested_trust_delta!==outcome.trust_delta&&<span>Расчётный эффект: {outcome.requested_trust_delta>0?'+':''}{outcome.requested_trust_delta} п.п. · Достигнута граница показателя.</span>}
       </div>}
       {teacher&&responded.length>0&&!outcome&&<button type="button" disabled={!!busyId||readOnly} className="eventFinalize" onClick={()=>void finalize(c.id)}>Подвести итог по полученным голосам</button>}
+      {teacher&&authority.some(a=>a.case_id===c.id)&&<div className="eventAuthorityTable"><h4>Полномочия и баллы</h4>{authority.filter(a=>a.case_id===c.id).map(a=><article key={a.decision_id}><b>{g.names[a.actor_id]||'Участник'}</b><span>{a.role_snapshot||'Без должности'}</span><strong>{a.authority_ok&&a.lawful?'Правовой критерий: 1 балл':'Правовой критерий: 0 баллов'}</strong><small>{a.legal_basis}</small>{a.strategy_point&&<span>Защита интересов своей роли: учитывается в стратегии</span>}</article>)}</div>}
+      </>}
      </div>
-    </article>;
+    </article>
+    {expandedCase&&<EventCollaboration g={g} caseId={c.id} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={reload} readOnly={readOnly}/>}
+    {expandedCase&&teacher&&mode==='manage'&&<div className="eventOptionButtons" aria-label="Варианты решения">{labels.map((label,i)=><button type="button" key={i} disabled><b>{String(i+1).padStart(2,'0')}</b>{label}</button>)}</div>}
+    {expandedCase&&my?.status==='pending'&&me.kind==='student'&&!outcome&&<div className="eventOptionButtons" role="group" aria-label={'Решение по событию '+c.title}>
+      {labels.map((label,i)=><button type="button" key={i} disabled={!!busyId||readOnly||pendingInvites} onClick={()=>void answer(my,'option_'+(i+1))}><b>{String(i+1).padStart(2,'0')}</b>{label}</button>)}
+      {pendingInvites&&<p>Ожидаем ответа на приглашения.</p>}
+    </div>}
+    </div>;
    })}</div>}
   {notice&&<p className="eventNotice" role="status">{notice}</p>}
  </section>;

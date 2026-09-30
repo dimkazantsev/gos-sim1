@@ -13,6 +13,7 @@ import StyledSelect from '../ui/StyledSelect';
 import {cropPortrait,decodePortrait,preparePortraitDetector} from './avatarCrop';
 import ProfileAvatar from './ProfileAvatar';
 import ProfileDocumentLinks from './ProfileDocumentLinks';
+import ProfileOffices from './ProfileOffices';
 
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
 type PublicStats={accepted_actions:number;posts:number;votes_cast:number;documents_created:number;activity_entries:number;events_decided:number};
@@ -123,6 +124,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
    </div>
   </section>
 
+  <ProfileOffices g={g} userId={target.user_id}/>
   {own&&teacher&&<section className="profileRoleSwitcher">
    <div><small>Права администратора сохраняются</small><h2>Игровая должность преподавателя</h2><p>По умолчанию вы нейтральный преподаватель. При желании можете занять любую игровую должность. Это не меняет полномочия преподавателя.</p></div>
    <StyledSelect label="Действовать в игре как" value={me.role_title||'Преподаватель'}

@@ -1,0 +1,3 @@
+'use client';
+let context:AudioContext|undefined;
+export function eventButtonSound(){try{context??=new AudioContext();void context.resume();const oscillator=context.createOscillator(),gain=context.createGain();oscillator.connect(gain);gain.connect(context.destination);const t=context.currentTime;oscillator.type='sine';oscillator.frequency.setValueAtTime(620,t);oscillator.frequency.exponentialRampToValueAtTime(980,t+.055);gain.gain.setValueAtTime(.035,t);gain.gain.exponentialRampToValueAtTime(.001,t+.12);oscillator.start(t);oscillator.stop(t+.13)}catch{/* Voting remains available without audio. */}}

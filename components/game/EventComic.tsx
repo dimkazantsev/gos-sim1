@@ -1,16 +1,28 @@
 'use client';
-import {useId} from 'react';
+import {useId,type CSSProperties} from 'react';
 import ComicSoundButton from './ComicSoundButton';
 import type {EventComicScene} from './types';
-type Props={title:string;category:string;caseKey:string;compact?:boolean;scene?:EventComicScene|null};
+type Props={title:string;category:string;caseKey:string;compact?:boolean;silent?:boolean;scene?:EventComicScene|null};
 function hash(s:string){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-export default function EventComic({title,category,caseKey,compact=false,scene}:Props){
+export default function EventComic({title,category,caseKey,compact=false,silent=false,scene}:Props){
  const id=useId().replace(/:/g,'');
+ const number=Number((scene?.scene_id||caseKey).match(/(?:scene-|v2-)(\d+)$/)?.[1]||0);
+ if(number>=1&&number<=50){
+  const extra=number>=42&&number<=46;
+  const index=number<=41?number-1:number-6;
+  const row=Math.floor(index/5),column=extra?number-42:index%5;
+  const lower=row===8&&!extra;
+  const ratio=extra?1536/5/108.5:1536/5/(lower?157:108.5);
+  const top=extra?187:lower?867/157*100:row*100;
+  const style={'--atlas-column':column,'--atlas-top':top+'%','--atlas-ratio':ratio} as CSSProperties;
+  return <div className="eventComicPlayer"><figure className={'eventComic eventAtlasIllustration '+(compact?'isCompact':'')} style={style} role="img" aria-label={scene?.alt||'Иллюстрация к ситуации «'+title+'»'}><img src={'/event-comics/atlas-'+(extra?'extra':'main')+'.webp'} alt="" loading="lazy" decoding="async"/><figcaption className="eventAtlasLabel">{category}</figcaption></figure>{!silent&&<ComicSoundButton/>}</div>;
+ }
+
  if(scene?.scene_id&&/^scene-\d{2,4}$/.test(scene.scene_id))return <div className="eventComicPlayer">
   <figure className={'eventComic '+(compact?'isCompact':'')} role="img" aria-label={scene.alt||'Комикс к событию «'+title+'»'}>
    <img src={'/event-comics/'+scene.scene_id+'.svg'} alt="" loading="lazy" decoding="async"/>
    <figcaption className="eventComicCaption"><span>GOS//SIMS · {category}</span><strong>{title}</strong><small>Авторская анимированная сцена</small></figcaption>
-  </figure><ComicSoundButton/>
+  </figure>{!silent&&<ComicSoundButton/>}
  </div>;
  const seed=hash(caseKey||title),kind=(()=>{const t=(title+' '+category).toLowerCase();
  if(/больниц|клиник|врач|скор|лекарств|инсулин|медицин/.test(t))return 'hospital';

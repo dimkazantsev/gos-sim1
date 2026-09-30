@@ -282,14 +282,13 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(!game||!me||previewMode)return;
   let live=true;
   async function count(){
-   const r=await supabase.from('event_assignments').select('id',{count:'exact',head:true})
-    .eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending');
-   if(live&&!r.error)setPendingEvents(r.count||0);
+   const [r,i]=await Promise.all([supabase.from('event_assignments').select('id',{count:'exact',head:true}).eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending'),supabase.from('event_collaboration_invites').select('id',{count:'exact',head:true}).eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending')]);
+   if(live&&!r.error&&!i.error)setPendingEvents((r.count||0)+(i.count||0));
   }
-  void count();
+  void count();const poll=setInterval(()=>void count(),5000);
   const channel=supabase.channel('event-count:'+game.id+':'+me.user_id)
    .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>void count()).subscribe();
-  return()=>{live=false;void supabase.removeChannel(channel)};
+  return()=>{live=false;clearInterval(poll);void supabase.removeChannel(channel)};
  },[game?.id,me?.user_id,previewMode,view]);
 
 
@@ -338,7 +337,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
  if(loading||!game||!me||!shownMe)return <main className="connectionPage"><section className="connectionCard" aria-live="polite"><span className="wordmark">GOS//SIMS</span>{!error&&<div className="spinner"/>}<h1>{error?'Не удалось открыть игру':'Подключаемся к республике'}</h1><p>{error||'Загружаем этапы, команды и последние решения.'}</p>{error&&<div><button className="primary" onClick={()=>window.location.reload()}>Попробовать снова</button><a className="secondary" href="/">Вернуться ко входу</a></div>}</section></main>;
 
- const nav:[View,string][]=[['dashboard','Обзор игры'],['stages','Этапы и задачи'],['actions','Политические процессы'],['parties',teacher&&!previewMode?'Партии':'Моя партия'],['votes','Голосования'],['documents','Реестр НПА'],['grades','Оценки и разбор'],['events','Event · ситуации'],...(teacher&&!previewMode?[['teacher','Управление'] as [View,string]]:[]),['profile','Мой профиль']];
+ const nav:[View,string][]=[['dashboard','Обзор игры'],['stages','Этапы и задачи'],['actions','Политические процессы'],['parties',teacher&&!previewMode?'Партии':'Моя партия'],['votes','Голосования'],['documents','Реестр НПА'],['grades','Оценки и разбор'],['events','События и ситуации'],...(teacher&&!previewMode?[['teacher','Управление'] as [View,string]]:[]),['profile','Мой профиль']];
 
  const navIcon=(key:View)=>{
   const P=key==='events'?CalendarDays:key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='actions'?Radio:key==='parties'?Landmark:key==='votes'?VoteIcon:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:UserRound;

@@ -1,0 +1,43 @@
+name: Public game on GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - run: node scripts/prepare-github-pages.mjs
+      - run: npm ci && npm run build
+        working-directory: .pages-build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLIC_KEY || secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .pages-build/out
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish game
+        id: deployment
+        uses: actions/deploy-pages@v4
