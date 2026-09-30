@@ -1,9 +1,17 @@
 'use client';
 import {useId} from 'react';
-type Props={title:string;category:string;caseKey:string;compact?:boolean};
+import ComicSoundButton from './ComicSoundButton';
+import type {EventComicScene} from './types';
+type Props={title:string;category:string;caseKey:string;compact?:boolean;scene?:EventComicScene|null};
 function hash(s:string){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-export default function EventComic({title,category,caseKey,compact=false}:Props){
+export default function EventComic({title,category,caseKey,compact=false,scene}:Props){
  const id=useId().replace(/:/g,'');
+ if(scene?.scene_id&&/^scene-\d{2,4}$/.test(scene.scene_id))return <div className="eventComicPlayer">
+  <figure className={'eventComic '+(compact?'isCompact':'')} role="img" aria-label={scene.alt||'Комикс к событию «'+title+'»'}>
+   <img src={'/event-comics/'+scene.scene_id+'.svg'} alt="" loading="lazy" decoding="async"/>
+   <figcaption className="eventComicCaption"><span>GOS//SIMS · {category}</span><strong>{title}</strong><small>Авторская анимированная сцена</small></figcaption>
+  </figure><ComicSoundButton/>
+ </div>;
  const seed=hash(caseKey||title),kind=(()=>{const t=(title+' '+category).toLowerCase();
  if(/больниц|клиник|врач|скор|лекарств|инсулин|медицин/.test(t))return 'hospital';
  if(/школ|экзамен|университет|студент|образован|учени|язык/.test(t))return 'school';
@@ -25,7 +33,7 @@ export default function EventComic({title,category,caseKey,compact=false}:Props)
  ][seed%5];
  const [night,mid,warm,light]=colors;
  const shift=seed%58,personColor=['#8cf2d2','#ffb7b2','#aabfff','#ffe1a2'][seed%4];
- return <div className={'eventComic '+(compact?'isCompact':'')} role="img" aria-label={'Комикс-иллюстрация к событию «'+title+'»'}>
+ return <div className="eventComicPlayer"><div className={'eventComic '+(compact?'isCompact':'')} role="img" aria-label={'Комикс-иллюстрация к событию «'+title+'»'}>
  <svg viewBox="0 0 680 350" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
  <defs><linearGradient id={'sky'+id} x2="0.85" y2="1"><stop stopColor={night}/><stop offset=".62" stopColor={mid}/><stop offset="1" stopColor={warm}/></linearGradient>
  <linearGradient id={'floor'+id} x2="0" y2="1"><stop stopColor="#213450"/><stop offset="1" stopColor="#102139"/></linearGradient></defs>
@@ -82,5 +90,5 @@ export default function EventComic({title,category,caseKey,compact=false}:Props)
  <path d="M0 1H680V350H0Z" fill="none" stroke="#fff" strokeOpacity=".23" strokeWidth="11"/>
  </svg>
  <div className="eventComicCaption"><span>GOS//SIMS · {category}</span><strong>{title}</strong><small>Авторская иллюстрация учебного сценария</small></div>
- </div>;
+ </div><ComicSoundButton/></div>;
 }

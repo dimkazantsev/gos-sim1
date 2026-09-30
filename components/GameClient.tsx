@@ -55,7 +55,7 @@ function actorsForStudent(m:Member){
 function memberMatchesInstitution(m:Member|undefined,institution:string){
  if(!m||m.kind==='observer')return false;
  const role=(m.role_title||'').toLowerCase();
- if(institution==='all'||institution==='factions')return m.kind==='student';
+ if(institution==='all'||institution==='factions')return m.kind==='student'||(m.kind==='teacher'&&!['','руководитель симуляции','преподаватель','администратор'].includes(role.trim()));
  if(institution==='gd')return role.includes('депутат')||(role.includes('государственн')&&role.includes('дум'));
  if(institution==='government')return role.includes('правительств')||role.includes('министр');
  if(institution==='sf')return role.includes('совет федерац')||role.includes('сенатор');
@@ -144,7 +144,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   applyGhostVotingBatch:blocked as typeof g.applyGhostVotingBatch,
   deleteParty:blocked as typeof g.deleteParty,
   configureStageDeadline:blocked as typeof g.configureStageDeadline,
-  updateMember:blockedVoid as typeof g.updateMember,
+  updateMember:blocked as typeof g.updateMember,
   createVote:blocked as typeof g.createVote,
   castVote:blockedVoid as typeof g.castVote,
   closeVote:blockedNull as typeof g.closeVote,
@@ -234,10 +234,10 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(window.matchMedia('(max-width:1099px)').matches)g.setChatOpen(false);
   requestAnimationFrame(()=>document.getElementById('game-main')?.focus());
  }
- function navigate(next:View,target?:{stageNo?:number;documentId?:string}){
+ function navigate(next:View,target?:{stageNo?:number;documentId?:string},profileVerified=false){
   const owner=g.me;
   const p=g.profiles.find(row=>row.user_id===owner?.user_id);
-  if(owner&&owner.kind!=='observer'&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'){
+  if(!profileVerified&&owner&&owner.kind!=='observer'&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'){
    setOnboardingNotice('Сначала завершите оформление личного профиля.');
    next='profile';
   }
@@ -304,7 +304,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   setCompletingProfile(true);setOnboardingNotice('');
   const r=await supabase.rpc('complete_my_game_profile',{p_game:game.id});
   if(r.error){setOnboardingNotice('Проверьте обязательные поля: '+r.error.message)}
-  else{setOnboardingNotice('Профиль заполнен. Добро пожаловать в игру!');await g.refresh();navigate('dashboard')}
+  else{setOnboardingNotice('Профиль заполнен. Добро пожаловать в игру!');await g.refresh();navigate('dashboard',undefined,true)}
   setCompletingProfile(false);
  }
  async function finishIntro(){
@@ -317,7 +317,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  
 
  useEffect(()=>{
-  if(!me||previewMode)return;
+  if(!me||previewMode||me.kind==='observer')return;
   const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политические процессы',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Event · ситуации'};
   void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
   const id=setInterval(()=>void touchPresence(view),30000);

@@ -5,6 +5,8 @@ import type {PoliticalPost,View} from './types';
 import MediaUploadButton from './MediaUploadButton';
 import StyledSelect from '../ui/StyledSelect';
 import EventComic from './EventComic';
+import ProfileAvatar from './ProfileAvatar';
+import {Newspaper} from 'lucide-react';
 import {STAGE_ACTIONS} from './stageActions';
 
 const PROCESS_TYPES=[
@@ -129,8 +131,8 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     const links=postFormalLinks.filter(x=>x.post_id===p.id).map(x=>formalDocuments.find(d=>d.id===x.formal_document_id)).filter(Boolean);
     const vote=votes.find(v=>v.source_post_id===p.id);
     return <article className={'wallPost '+p.status} key={p.id}>
-     <header><div className="wallPostAvatar">{pf?.avatar_url?<img src={pf.avatar_url} alt=""/>:<span>{p.actor_label.slice(0,2).toUpperCase()}</span>}</div><div className="wallPostWho"><b>{p.actor_label}</b><small>{names[p.author_id]||'Участник'} · {new Date(p.created_at).toLocaleString('ru-RU')}</small></div><span className={'postStatus '+p.status}>{p.status==='accepted'?'✓ ПРИНЯТО':p.status==='rejected'?'× ОТКЛОНЕНО':'ОПУБЛИКОВАНО'}</span></header>
-     <div className="wallPostBody"><small>{PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||p.process_type}</small><h2>{p.title}</h2>{p.actor_key==='media'&&p.comic_scene?.title&&<div className="wallPostComic"><EventComic title={p.comic_scene.title} category={p.comic_scene.category||'События Республики'} caseKey={p.internal_ref_id||p.id}/></div>}<p>{p.body}</p></div>
+     <header><div className="wallPostAvatar">{p.actor_key==='media'?<Newspaper size={23} aria-label="СМИ"/>:<ProfileAvatar src={pf?.avatar_url} name={names[p.author_id]||p.actor_label} gender={pf?.gender}/>}</div><div className="wallPostWho"><b>{p.actor_label}</b><small>{p.actor_key==='media'?'Редакция СМИ':names[p.author_id]||'Участник'} · {new Date(p.created_at).toLocaleString('ru-RU')}</small></div><span className={'postStatus '+p.status}>{p.status==='accepted'?'✓ ПРИНЯТО':p.status==='rejected'?'× ОТКЛОНЕНО':'ОПУБЛИКОВАНО'}</span></header>
+     <div className="wallPostBody"><small>{PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||p.process_type}</small><h2>{p.title}</h2>{p.actor_key==='media'&&p.comic_scene?.title&&<div className="wallPostComic"><EventComic title={p.comic_scene.title} category={p.comic_scene.category||'События Республики'} caseKey={p.comic_scene.case_key||p.internal_ref_id||p.id} scene={p.comic_scene}/></div>}<p>{p.body}</p></div>
      {!!p.tags?.length&&<div className="wallTags">{p.tags.map(t=><button key={t} onClick={()=>setSearch('#'+t)}>#{t}</button>)}</div>}
      {media.length>0&&<div className={'wallMedia '+(media.length>1?'multi':'')}>{media.map(m=>m.media_kind==='image'?<img key={m.id} src={m.url||''} alt={m.file_name}/>:m.media_kind==='video'?<video key={m.id} src={m.url||''} controls/>:m.media_kind==='audio'?<audio key={m.id} src={m.url||''} controls/>:<a key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer">▤ {m.file_name}</a>)}</div>}
      {(p.external_url||p.internal_view)&&<div className="wallLinks">{p.external_url&&<a href={p.external_url} target="_blank" rel="noreferrer">↗ Внешняя ссылка</a>}{p.internal_view&&<button onClick={()=>onNavigate(p.internal_view as View)}>↳ Внутри GOS//SIMS: {p.internal_view}</button>}</div>}

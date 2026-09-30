@@ -92,6 +92,8 @@ export function useRepublicGame(gameId:string){
   if(show)setLoading(true);
   const u=(await supabase.auth.getUser()).data.user;
   if(!u){router.replace('/');return}
+  const access=await supabase.rpc('ensure_my_game_access',{p_game:gameId});
+  if(access.error){setError(access.error.message);setLoading(false);return}
   const [g,m,mt,ev,ac,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,pc,mh,psh]=await Promise.all([
    supabase.from('games').select('*').eq('id',gameId).single(),
    supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',u.id).single(),
@@ -509,7 +511,12 @@ export function useRepublicGame(gameId:string){
   if(r.error){setError(r.error.message);return false}
   await refresh();return true;
  }
- async function updateMember(userId:string,patch:Partial<Pick<Member,'role_title'|'score'>>){const r=await supabase.from('game_members').update(patch).eq('game_id',gameId).eq('user_id',userId);if(r.error)setError(r.error.message);else await refresh()}
+ async function updateMember(userId:string,patch:Partial<Pick<Member,'role_title'|'score'>>){
+  if(!teacher)return false;
+  const r=await supabase.from('game_members').update(patch).eq('game_id',gameId).eq('user_id',userId).select('user_id,role_title').single();
+  if(r.error||!r.data){setError(r.error?.message||'Не удалось подтвердить изменение должности.');return false}
+  await refresh();return true;
+ }
 
  async function createVote(data:{
   title:string;body:string;mode:'member'|'faction'|'mandate';
@@ -542,7 +549,7 @@ export function useRepublicGame(gameId:string){
  function memberMatchesInstitution(uid:string,institution:string){
   const m=members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;
   const role=(m.role_title||'').toLowerCase();
-  if(institution==='all'||institution==='factions')return m.kind==='student';
+  if(institution==='all'||institution==='factions')return m.kind==='student'||(m.kind==='teacher'&&!['','руководитель симуляции','преподаватель','администратор'].includes(role.trim()));
   if(institution==='gd')return role.includes('депутат')||(role.includes('государственн')&&role.includes('дум'));
   if(institution==='government')return role.includes('правительств')||role.includes('министр');
   if(institution==='sf')return role.includes('совет федерац')||role.includes('сенатор');
@@ -622,32 +629,37 @@ export function useRepublicGame(gameId:string){
 
 
  async function saveProfile(bio:string,file?:File,gender?:'male'|'female'|'unspecified'){
-  if(!me)return false;
-  let avatarPath=profiles.find(x=>x.user_id===me.user_id)?.avatar_path||null;
+  if(!me||me.kind==='observer')return false;
+  const prior=profiles.find(p=>p.user_id===me.user_id);
+  const oldPath=prior?.avatar_path||null;
+  let avatarPath=oldPath;
   if(file){
-    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
-    const path=gameId+'/profiles/'+me.user_id+'/avatar-'+Date.now()+'.'+ext;
-    const up=await supabase.storage.from('game-assets').upload(path,file,{upsert:true,contentType:file.type});
+    const path=gameId+'/profiles/'+me.user_id+'/avatar-'+crypto.randomUUID()+'.webp';
+    const up=await supabase.storage.from('game-assets').upload(path,file,{upsert:false,contentType:file.type});
     if(up.error){setError(up.error.message);return false}
     avatarPath=path;
   }
-  const prior=profiles.find(p=>p.user_id===me.user_id);
   const changes={bio:bio.trim()||null,avatar_path:avatarPath,...(gender?{gender}:{}),updated_at:new Date().toISOString()};
-  const r=prior?await supabase.from('game_profiles').update(changes).eq('game_id',gameId).eq('user_id',me.user_id):
-   await supabase.from('game_profiles').insert({game_id:gameId,user_id:me.user_id,...changes});
-  if(r.error){setError(r.error.message);return false}
+  const r=prior?await supabase.from('game_profiles').update(changes).eq('game_id',gameId).eq('user_id',me.user_id).select('user_id,avatar_path').single():
+   await supabase.from('game_profiles').insert({game_id:gameId,user_id:me.user_id,...changes}).select('user_id,avatar_path').single();
+  if(r.error||!r.data){
+   if(file&&avatarPath)await supabase.storage.from('game-assets').remove([avatarPath]);
+   setError(r.error?.message||'Не удалось подтвердить сохранение профиля.');return false;
+  }
+  if(file&&oldPath&&oldPath!==avatarPath)await supabase.storage.from('game-assets').remove([oldPath]);
   await loadPartyAssets();return true;
  }
+
  async function saveSignature(file:File){
-  if(!me||file.type!=='image/png'||file.size>2*1024*1024){setError('Загрузите PNG-подпись размером до 2 МБ.');return false}
+  if(!me||me.kind==='observer'||file.type!=='image/png'||file.size>2*1024*1024){setError('Загрузите PNG-подпись размером до 2 МБ.');return false}
   const path=gameId+'/profiles/'+me.user_id+'/signature-'+Date.now()+'.png';
   const up=await supabase.storage.from('game-assets').upload(path,file,{contentType:'image/png',upsert:false});
   if(up.error){setError(up.error.message);return false}
   const row=profiles.find(p=>p.user_id===me.user_id);
   const r=row?await supabase.from('game_profiles').update({signature_path:path,updated_at:new Date().toISOString()})
-     .eq('game_id',gameId).eq('user_id',me.user_id):
-    await supabase.from('game_profiles').insert({game_id:gameId,user_id:me.user_id,signature_path:path,updated_at:new Date().toISOString()});
-  if(r.error){setError(r.error.message);return false}
+     .eq('game_id',gameId).eq('user_id',me.user_id).select('user_id,signature_path').single():
+    await supabase.from('game_profiles').insert({game_id:gameId,user_id:me.user_id,signature_path:path,updated_at:new Date().toISOString()}).select('user_id,signature_path').single();
+  if(r.error||!r.data){setError(r.error?.message||'Не удалось подтвердить сохранение подписи.');return false}
   await loadPartyAssets();return true;
  }
  async function savePartyIdentity(partyId:string,description:string,file?:File){

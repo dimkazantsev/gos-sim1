@@ -4,6 +4,7 @@ import {Archive,Download,ShieldAlert,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {downloadFullGameArchive,enumerateGameAssets,purgeGameAssets,saveGameBlob} from './gameArchive';
+import {preparePortableSession,type SessionArchive} from './portableSession';
 type Session={id:string;title:string;game_code:string;owner_id:string;status:string;created_at:string};
 export default function SessionManager({g}:{g:ReturnTypeRepublic}){
  const {me,teacher,game}=g;
@@ -29,19 +30,22 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
   if(!a.error)setSessions((a.data||[]) as Session[]);
  }
  useEffect(()=>{void refresh()},[me?.user_id,game?.id,teacher]);
- async function exportOne(s:Session,full:boolean){
+ async function exportOne(s:Session,format:'json'|'zip'|'html'){
   if(busy)return;setBusy(true);setNotice('');setProgress('Подготавливаем архив…');
   try{
    const suffix=s.game_code.replace(/[^a-zA-Zа-яА-Я0-9-]/g,'_');
-   if(full){
+   if(format==='zip'){
     const blob=await downloadFullGameArchive(s.id,(done,total)=>setProgress('Файлов включено: '+done+' из '+total));
     saveGameBlob(blob,'GOS-SIMS-'+suffix+'-full.zip');
    }else{
     const r=await supabase.rpc('export_game_data',{p_game:s.id});
     if(r.error)throw r.error;
-    saveGameBlob(new Blob([JSON.stringify(r.data,null,2)],{type:'application/json'}),'GOS-SIMS-'+suffix+'.json');
+    if(format==='html'){
+     const portable=await preparePortableSession(r.data as SessionArchive);
+     saveGameBlob(new Blob([portable.html],{type:'text/html'}),'GOS-SIMS-'+suffix+'.html');
+    }else saveGameBlob(new Blob([JSON.stringify(r.data,null,2)],{type:'application/json'}),'GOS-SIMS-'+suffix+'.json');
    }
-   setBackedUp(old=>old.includes(s.id)?old:[...old,s.id]);
+   if(format==='zip')setBackedUp(old=>old.includes(s.id)?old:[...old,s.id]);
    setNotice('Архив сформирован и передан браузеру. Проверьте, что файл действительно сохранился перед удалением.');
   }catch(e){setNotice('Ошибка экспорта: '+(e instanceof Error?e.message:'Неизвестная ошибка'))}
   finally{setBusy(false);setProgress('')}
@@ -81,7 +85,7 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
  }
  if(!teacher||!me)return null;
  return <section className="profileSessionManager" aria-label="Экспорт и удаление сеансов">
-  <header><div><small>АРХИВ И БЕЗОПАСНОСТЬ</small><h2>Мои игровые сеансы</h2><p>Скачайте данные или полный архив с файлами. Удаление выполняется только по подтверждённому коду сеанса.</p></div><Archive size={22}/></header>
+  <header><div><small>АРХИВ И БЕЗОПАСНОСТЬ</small><h2>Мои игровые сеансы</h2><p>JSON сохраняет данные; HTML открывается в одном браузере; ZIP включает файлы и сервер для локальной сети. Перед удалением сохраните полный ZIP.</p></div><Archive size={22}/></header>
   <div className="profileGuestInvites"><h3>Гостевой просмотр текущей игры</h3><p>Гость сможет читать открытые разделы и журнал, но не сможет голосовать, загружать документы, менять показатели или отправлять сообщения.</p>
    <div><input type="text" autoComplete="off" minLength={6} value={guestCode} onChange={e=>setGuestCode(e.target.value)} placeholder="Новый код гостя · не менее 6 символов"/>
      <button type="button" disabled={busy||guestCode.trim().length<6} onClick={()=>void inviteGuest()}>Создать гостевой код</button></div>
@@ -90,8 +94,9 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
   <div className="profileSessionRows">{sessions.filter(s=>s.owner_id===me.user_id||admin).map(s=><article key={s.id} className={selected===s.id?'selected':''}>
    <div><b>{s.title}</b><span>Код: {s.game_code} · {s.status==='archived'?'В архиве':s.status==='running'?'Игра запущена':'Подготовка'}</span></div>
    <div className="profileSessionActions">
-    <button type="button" disabled={busy} onClick={()=>void exportOne(s,false)}><Download size={17}/> JSON</button>
-    <button type="button" disabled={busy} onClick={()=>void exportOne(s,true)}><Archive size={17}/> ZIP + Файлы</button>
+    <button type="button" disabled={busy} onClick={()=>void exportOne(s,'json')}><Download size={17}/> JSON</button>
+    <button type="button" disabled={busy} onClick={()=>void exportOne(s,'html')}><Download size={17}/> HTML</button>
+    <button type="button" disabled={busy} onClick={()=>void exportOne(s,'zip')}><Archive size={17}/> ZIP · Локальная Игра</button>
     <button type="button" className="danger" disabled={busy} onClick={()=>{setSelected(selected===s.id?'':s.id);setTyped('');setConfirmed(false);setNotice('')}}><Trash2 size={17}/> Удалить</button>
    </div>
   </article>)}</div>

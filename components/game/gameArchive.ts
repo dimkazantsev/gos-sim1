@@ -1,4 +1,5 @@
 import {supabase} from '@/lib/supabase';
+import {preparePortableSession,type SessionArchive} from './portableSession';
 type ArchiveFile={path:string;data:Uint8Array};
 function crc32(bytes:Uint8Array){let c=0xffffffff;for(const b of bytes){c^=b;for(let j=0;j<8;j++)c=c&1?(c>>>1)^0xedb88320:c>>>1}return (c^0xffffffff)>>>0}
 function uint16(v:number){return [v&255,(v>>>8)&255]}
@@ -41,13 +42,14 @@ export async function enumerateGameAssets(gameId:string,bucket:'game-assets'|'ga
 export async function downloadFullGameArchive(gameId:string,onProgress?:(done:number,total:number)=>void):Promise<Blob>{
  const data=await supabase.rpc('export_game_data',{p_game:gameId});
  if(data.error||!data.data)throw Error('Не удалось экспортировать сеанс: '+(data.error?.message||'Нет данных'));
+ const portable=await preparePortableSession(data.data as SessionArchive);
+ const encode=(text:string)=>new TextEncoder().encode(text);
  const entries:ArchiveFile[]=[
-  {path:'game.json',data:new TextEncoder().encode(JSON.stringify(data.data,null,2))},
-  {path:'RESTORE-README.txt',data:new TextEncoder().encode(
-   'GOS//SIMS: полный игровой архив. game.json содержит данные сеанса. Файлы находятся в папке media. '+
-   'Для развёртывания в другой среде установите приложение и его SQL-миграции из отдельного архива исходного кода, '+
-   'создайте новых пользователей, восстановите записи с отображением старых user_id и загрузите файлы в соответствующие бакеты Supabase. '+
-   'Пароли Supabase Auth и коды доступа не экспортируются. Этот ZIP нельзя запустить как самостоятельный автономный сервер.\n')}
+  {path:'game.json',data:encode(JSON.stringify(portable.data,null,2))},
+  {path:'index.html',data:encode(portable.html)},
+  {path:'server.mjs',data:encode(portable.server)},
+  {path:'engine.mjs',data:encode(portable.engine)},
+  {path:'RESTORE-README.txt',data:encode(portable.readme)}
  ];
  const paths=await Promise.all((['game-assets','game-media'] as const).map(async bucket=>({bucket,paths:await enumerateGameAssets(gameId,bucket)})));
  const total=paths.reduce((n,x)=>n+x.paths.length,0);let done=0;

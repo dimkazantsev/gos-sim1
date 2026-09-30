@@ -5,6 +5,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import type {PartyDocument} from './types';
 import MediaUploadButton from './MediaUploadButton';
 import StyledSelect from '../ui/StyledSelect';
+import ProfileAvatar from './ProfileAvatar';
 
 const DOCS:{kind:PartyDocument['doc_kind'];title:string;rule:string}[]=[
  {kind:'application',title:'Заявление о регистрации',rule:'Пункт а ст. 16 95-ФЗ'},
@@ -163,11 +164,11 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
 
    <article className="surface partyPeople">
     <div className="surfaceHead"><div><small>КОМАНДА И ПРЕДСТАВИТЕЛЬСТВО</small><h2>Кто сколько депутатов представляет</h2></div><span>{partyMembers.length} студентов</span></div>
-    {leader&&<div className="leaderCard">{profiles.find(p=>p.user_id===leader.user_id)?.avatar_url?<img src={profiles.find(p=>p.user_id===leader.user_id)?.avatar_url||''} alt=""/>:<div className="personFallback">{leader.full_name.slice(0,1)}</div>}<div><small>РУКОВОДИТЕЛЬ ПАРТИИ / ФРАКЦИИ</small><h3>{leader.full_name}</h3><p>{profiles.find(p=>p.user_id===leader.user_id)?.bio||leader.role_title||'Руководитель партийной команды'}</p></div></div>}
+    {leader&&<div className="leaderCard"><div className="leaderIdentityPhoto"><ProfileAvatar src={profiles.find(p=>p.user_id===leader.user_id)?.avatar_url} name={leader.full_name} gender={profiles.find(p=>p.user_id===leader.user_id)?.gender}/></div><div><small>РУКОВОДИТЕЛЬ ПАРТИИ / ФРАКЦИИ</small><h3>{leader.full_name}</h3><p>{profiles.find(p=>p.user_id===leader.user_id)?.bio||leader.role_title||'Руководитель партийной команды'}</p></div></div>}
 
     <div className="mandateDistribution">
      {partyMembers.length===0?<div className="emptyState">В партии пока нет студентов.</div>:partyMembers.map(m=>{const pf=profiles.find(p=>p.user_id===m.user_id);const a=selectedAllocations.find(x=>x.user_id===m.user_id);return <article className={m.user_id===selected.leader_user_id?'mandatePerson leader':'mandatePerson'} key={m.user_id}>
-       <div className="mandatePersonPhoto">{pf?.avatar_url?<img src={pf.avatar_url} alt=""/>:<span>{m.full_name.slice(0,1)}</span>}</div>
+       <div className="mandatePersonPhoto"><ProfileAvatar src={pf?.avatar_url} name={m.full_name} gender={pf?.gender}/></div>
        <div className="mandatePersonName"><b>{m.full_name}</b><span>{m.user_id===selected.leader_user_id?'Руководитель фракции':m.role_title||'Член фракции'}</span></div>
        <div className="mandateBlock"><strong>{a?.base_mandates||0}</strong><span>мандатов</span></div>
        <div className={a?.ghost_loss?'mandateEffective affected':'mandateEffective'}><strong>{a?.effective_mandates||0}</strong><span>голосов сейчас</span>{!!a?.ghost_loss&&<em>−{a.ghost_loss} GV</em>}</div>

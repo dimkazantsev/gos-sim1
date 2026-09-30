@@ -1,7 +1,8 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,Pause,Play,Volume2,VolumeX,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,Pause,Play,X} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
+import ComicSoundButton from './ComicSoundButton';
 const SCENES=[
  {kicker:'ПРОЛОГ · ДЕНЬ НОЛЬ',title:'Республика После Бури',body:'Вы пришли к власти не в идеальном государстве. Заводы простаивают, мосты требуют ремонта, бюджет трещит по швам, а граждане больше не верят красивым обещаниям.',stamp:'ДОВЕРИЕ: КРИТИЧЕСКОЕ',caption:'Начало не будет лёгким.'},
  {kicker:'ГЛАВА 01 · ПЕРВЫЙ СИГНАЛ',title:'Казна Почти Пуста',body:'У вас есть кабинеты, законы, партии и огромное количество вопросов. Деньги заканчиваются быстрее совещаний. Каждая программа забирает ресурсы у другой.',stamp:'РЕСУРСЫ: ОГРАНИЧЕНЫ',caption:'Цена любого решения реальна — хотя республика и вымышленная.'},
@@ -51,8 +52,11 @@ function Artwork({scene}:{scene:number}){
    <path d="M340 239h225v87H340Z" fill="#fce6bc" stroke="#342c56" strokeWidth="7" transform="rotate(-7 450 275)"/>
    <text x="361" y="286" fontSize="28" fontWeight="900" fill="#172b53" transform="rotate(-7 450 275)">ГДЕ РЕШЕНИЯ?</text></g>}
   {scene===3&&<g className="comicRebirth">
-   <path d="M270 509 420 225 505 509" fill="#223f6f" stroke="#93ffd5" strokeWidth="10"/>
-   <path d="M304 508 420 285 465 508" fill="#70c9d6" opacity=".85"/>
+   <path d="M130 389H768V430H130Z" fill="#83d4d9" stroke="#173252" strokeWidth="9"/>
+   <path d="M195 430V510M704 430V510M245 388Q450 144 655 388" fill="none" stroke="#fbe3a4" strokeWidth="17"/>
+   <path d="M274 340V388M357 269V388M452 247V388M546 274V388M628 345V388" stroke="#f8e8bf" strokeWidth="7"/>
+   <g transform="translate(403 342)"><circle cx="0" cy="0" r="17" fill="#f5c097"/><path d="M-21 43V26Q0 7 23 26V43" fill="#fa947c"/><path d="M-13 43V47M16 43V47" stroke="#142a47" strokeWidth="9"/></g>
+   <g transform="translate(540 342)"><circle cx="0" cy="0" r="17" fill="#d69f7d"/><path d="M-21 43V26Q0 7 23 26V43" fill="#7fe3c3"/></g>
    <path d="m420 226 0-105" stroke="#fcf6dc" strokeWidth="12"/>
    <path d="M426 118Q520 91 587 148Q513 196 426 175Z" fill="#51e7c9"/>
    <path d="M-10 474Q290 365 559 450T930 418" fill="none" stroke="#f4e79d" strokeWidth="12" strokeLinecap="round"/>
@@ -62,49 +66,25 @@ function Artwork({scene}:{scene:number}){
  </svg>;
 }
 export default function RepublicComic({open,onClose,intro=false}:{open:boolean;onClose:()=>void;intro?:boolean}){
- const [scene,setScene]=useState(0),[playing,setPlaying]=useState(true),[audio,setAudio]=useState(false);
- const audioRef=useRef<AudioContext|null>(null);
- const sourceRef=useRef<AudioBufferSourceNode|null>(null);
- const close=()=>{if(!intro||scene===SCENES.length-1)onClose()};
+ const [scene,setScene]=useState(0),[playing,setPlaying]=useState(true);
+ const closeRef=useRef(onClose);closeRef.current=onClose;
+ const close=()=>{if(!intro||scene===SCENES.length-1)closeRef.current()};
  const dialog=useDialog(open,close);
- function startSound(){
-  try{
-   const ctx=audioRef.current||(audioRef.current=new AudioContext({sampleRate:22050}));
-   void ctx.resume();
-   if(sourceRef.current)return;
-   // A 36-second atmospheric score. Fade-out and fade-in meet at silence to prevent clicks.
-   const length=ctx.sampleRate*36,buffer=ctx.createBuffer(1,length,ctx.sampleRate),samples=buffer.getChannelData(0);
-   const notes=[65.41,73.42,82.41,98,87.31,82.41,73.42,65.41,61.74];
-   for(let i=0;i<length;i++){
-    const t=i/ctx.sampleRate,n=notes[Math.floor(t/4)%notes.length];
-    const fade=Math.min(1,t/1.4,(36-t)/1.4);
-    const beat=Math.exp(-((t%2)*4))*.15*Math.sin(2*Math.PI*44*t);
-    const drone=.16*Math.sin(2*Math.PI*n*t)+.10*Math.sin(2*Math.PI*(n/2)*t)+.035*Math.sin(2*Math.PI*1.7*t)*Math.sin(2*Math.PI*(n*1.5)*t);
-    samples[i]=Math.max(-.35,Math.min(.35,(drone+beat)*Math.max(0,fade)));
-   }
-   const node=ctx.createBufferSource(),gain=ctx.createGain();node.buffer=buffer;node.loop=true;node.loopStart=0;node.loopEnd=36;
-   gain.gain.setValueAtTime(.0001,ctx.currentTime);gain.gain.linearRampToValueAtTime(.4,ctx.currentTime+.7);
-   node.connect(gain);gain.connect(ctx.destination);node.start();sourceRef.current=node;
-  }catch{/* Sound can require explicit permission; the comic remains readable. */}
- }
- function stopSound(){try{sourceRef.current?.stop()}catch{}sourceRef.current?.disconnect();sourceRef.current=null}
- function toggleAudio(){if(audio){stopSound();setAudio(false)}else{startSound();setAudio(true)}}
  function go(index:number){const n=Math.max(0,Math.min(SCENES.length-1,index));setScene(n)}
  useEffect(()=>{
   if(!open||!playing)return;
   const timer=window.setTimeout(()=>{
-   if(scene===SCENES.length-1){if(intro)onClose();else setScene(0)}
+   if(scene===SCENES.length-1){if(intro)closeRef.current();else setScene(0)}
    else setScene(scene+1);
   },8200);
   return()=>window.clearTimeout(timer);
- },[open,playing,scene,intro,onClose]);
- useEffect(()=>{if(open){setScene(0);setPlaying(true)}else stopSound()},[open]);
- useEffect(()=>()=>{stopSound();void audioRef.current?.close()},[]);
+ },[open,playing,scene,intro]);
+ useEffect(()=>{if(open){setScene(0);setPlaying(true)}},[open]);
   if(!open)return null;
  const item=SCENES[scene];
  return <div className="comicBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!intro)close()}}>
   <section ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Комикс о Республике" className="comicDialog">
-   <header><b>GOS//SIMS · КОМИКС О РЕСПУБЛИКЕ</b><div><button aria-label={audio?'Выключить звук':'Включить звук'} onClick={toggleAudio}>{audio?<Volume2 size={19}/>:<VolumeX size={19}/>}</button>
+   <header><b>GOS//SIMS · КОМИКС О РЕСПУБЛИКЕ</b><div><ComicSoundButton playing={playing}/>
      <button aria-label={playing?'Остановить автоматическое воспроизведение':'Продолжить показ'} onClick={()=>setPlaying(!playing)}>{playing?<Pause size={19}/>:<Play size={19}/>}</button>
      <button aria-label={intro?'Завершить пролог после просмотра':'Закрыть комикс'} disabled={intro&&scene!==SCENES.length-1} onClick={close}><X size={20}/></button></div></header>
    <div className="comicFrame" key={scene}><Artwork scene={scene}/><div className="comicOverlay">

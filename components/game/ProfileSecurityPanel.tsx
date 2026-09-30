@@ -52,7 +52,7 @@ export default function ProfileSecurityPanel({g}:{g:ReturnTypeRepublic}){
   setBusy(true);setNotice('');
   const r=await supabase.auth.updateUser({password});
   if(r.error)setNotice('Не удалось установить пароль: '+r.error.message);
-  else{setPassword('');setConfirm('');setNotice('Личный пароль сохранён в Supabase Auth. Используйте почту и пароль при следующем входе.');await check()}
+  else{setPassword('');setConfirm('');await load();setNotice('Личный пароль сохранён. Используйте почту и пароль при следующем входе.')}
   setBusy(false);
  }
  async function reset(targetEmail:string){

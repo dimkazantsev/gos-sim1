@@ -5,7 +5,7 @@ import StyledSelect from '../ui/StyledSelect';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 export default function TeacherMetricStudio({g}:{g:ReturnTypeRepublic}){
- const {game,metrics,teacher,me}=g;
+ const {game,metrics,teacher}=g;
  const [selected,setSelected]=useState('');
  const metric=metrics.find(m=>m.id===selected)||metrics[0];
  const [value,setValue]=useState('');
@@ -21,17 +21,10 @@ export default function TeacherMetricStudio({g}:{g:ReturnTypeRepublic}){
   if((metric.min_value!==null&&parsed<metric.min_value)||(metric.max_value!==null&&parsed>metric.max_value)){setNotice('Значение вне разрешённого диапазона показателя.');return}
   if(!reason.trim()){setNotice('Добавьте короткое обоснование, чтобы изменение сохранилось в журнале.');return}
   setBusy(true);setNotice('');
-  const delta=parsed-metric.value;
   try{
-   const r=await supabase.rpc('set_state_metric',{p_metric_id:metric.id,p_value:parsed,p_note:reason.trim()});
+   const r=await supabase.rpc('set_state_metric_and_post',{p_metric_id:metric.id,p_value:parsed,p_note:reason.trim(),
+    p_publish:broadcast,p_title:title.trim()||null});
    if(r.error)throw r.error;
-   if(broadcast){
-    const post=await g.createPoliticalPost({processType:'statement',actorKey:'teacher',actorLabel:'Руководитель симуляции',
-     title:title.trim()||'Изменение показателя: '+metric.label,
-     body:reason.trim()+'\n\nВ учебной модели показатель «'+metric.label+'» '+(delta===0?'не изменился':delta>0?'увеличился на '+delta:'уменьшился на '+Math.abs(delta))+(metric.unit||'')+'.',
-     tags:['Показатели','Республика',metric.label]});
-    if(!post){setNotice('Изменение рейтинга сохранено, но публикация не отправилась. Проверьте журнал и повторите публикацию вручную.');return}
-   }
    await g.refresh();setNotice('Значение обновлено в базе и журнале.'+(broadcast?' Публикация появилась в Политических процессах.':''));setValue('');setReason('');setTitle('');
   }catch(e){setNotice(e instanceof Error?e.message:'Не удалось изменить показатель.')}
   finally{setBusy(false)}
@@ -39,6 +32,7 @@ export default function TeacherMetricStudio({g}:{g:ReturnTypeRepublic}){
  if(!teacher||!game)return null;
  return <section className="metricDirectorStudio">
   <header><div><small>РЕЖИССЁР · РЕЙТИНГИ РЕСПУБЛИКИ</small><h3>Ручная корректировка показателей</h3><p>Выберите показатель, установите значение и укажите основание. При необходимости опубликуйте связанное политическое событие.</p></div><SlidersHorizontal size={22}/></header>
+  <div className="metricDirectorCards" aria-label="Выбрать показатель для корректировки">{metrics.map(m=><button type="button" key={m.id} className={metric?.id===m.id?'selected':''} aria-pressed={metric?.id===m.id} onClick={()=>{setSelected(m.id);setValue(String(m.value));setNotice('')}}><span>{m.label}</span><strong>{m.value} {m.unit}</strong></button>)}</div>
   <div className="metricDirectorGrid">
    <StyledSelect label="Показатель" value={metric?.id||''} onChange={id=>{setSelected(id);setValue('');setReason('')}} options={metrics.map(m=>({value:m.id,label:m.label}))}/>
    <div className="metricDirectorValue"><small>Текущее значение</small><strong>{metric?metric.value+' '+(metric.unit||''):'—'}</strong></div>

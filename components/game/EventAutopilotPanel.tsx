@@ -15,6 +15,7 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
  const [notice,setNotice]=useState('');
  const [chosen,setChosen]=useState('');
  const [recipient,setRecipient]=useState('');
+ const [groupRecipients,setGroupRecipients]=useState<string[]>([]);
  const [openBank,setOpenBank]=useState(false);
  const [search,setSearch]=useState('');
  const [assigned,setAssigned]=useState<{case_id:string;recipient_id:string}[]>([]);
@@ -25,14 +26,15 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
  const effectiveInterval=settings.activity_weight===0?settings.interval_hours:Math.max(4,settings.interval_hours/(1+settings.activity_weight*2));
  async function load(){
   if(!game)return;
-  const [a,b,c]=await Promise.all([
+  const [a,b,c0,d]=await Promise.all([
    supabase.from('event_auto_settings').select('*').eq('game_id',game.id).maybeSingle(),
-   supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,audience,status,source_note').eq('game_id',game.id).like('case_key','bank-%').order('category').order('title'),
-   supabase.from('event_assignments').select('case_id,recipient_id').eq('game_id',game.id)
+   supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,audience,status,source_note').eq('game_id',game.id).like('case_key','bank-%').eq('status','ready').order('category').order('title'),
+   supabase.from('event_assignments').select('case_id,recipient_id').eq('game_id',game.id),
+   supabase.from('event_case_outcomes').select('case_id').eq('game_id',game.id)
   ]);
   if(!a.error&&a.data)setSettings(a.data as Settings);
-  if(!b.error)setBank((b.data||[]) as BankCase[]);
-  if(!c.error)setAssigned(c.data||[]);
+  if(!b.error&&!d.error){const closed=new Set((d.data||[]).map(o=>o.case_id));setBank(((b.data||[]) as BankCase[]).filter(c=>!closed.has(c.id)&&!(c.audience==='single'&&(c0.data||[]).some(a=>a.case_id===c.id))))}
+  if(!c0.error)setAssigned(c0.data||[]);
  }
  useEffect(()=>{void load()},[game?.id]);
  useEffect(()=>{if(bank.length&&!bank.some(c=>c.id===chosen))setChosen(bank[0].id)},[bank,chosen]);
@@ -66,10 +68,11 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
   await load();await onChanged();setBusy(false);
  }
  async function assign(){
-  if(!game||!chosen||!recipient||busy||!eligible.some(m=>m.user_id===recipient)||assigned.some(x=>x.case_id===chosen&&x.recipient_id===recipient))return;
+  const ids=selected?.audience==='group'?groupRecipients:[recipient];
+  if(!game||!chosen||busy||!teacher||ids.some(id=>!eligible.some(m=>m.user_id===id))||(selected?.audience==='group'?ids.length<2||ids.length>3:!recipient))return;
   setBusy(true);setNotice('');
-  const r=await supabase.from('event_assignments').insert({game_id:game.id,case_id:chosen,recipient_id:recipient,created_by:g.me?.user_id});
-  setNotice(r.error?'Ошибка: '+r.error.message:'Ситуация назначена участнику.');
+  const r=await supabase.rpc('assign_event_case',{p_case_id:chosen,p_recipients:ids});
+  setNotice(r.error?'Ошибка: '+r.error.message:'Назначено новых заданий: '+r.data+'.');
   await load();await onChanged();setBusy(false);
  }
  async function assignAll(){
@@ -78,10 +81,8 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
   if(!pending.length){setNotice('Ситуация уже направлена всем участникам.');return}
   if(!window.confirm('Назначить ситуацию «'+selected.title+'» всем '+pending.length+' участникам?'))return;
   setBusy(true);setNotice('');
-  const r=await supabase.from('event_assignments').insert(pending.map(m=>({
-   game_id:game.id,case_id:chosen,recipient_id:m.user_id,created_by:g.me?.user_id
-  })));
-  setNotice(r.error?'Ошибка: '+r.error.message:'Ситуация успешно назначена '+pending.length+' участникам.');
+  const r=await supabase.rpc('assign_event_case',{p_case_id:chosen,p_recipients:students.map(m=>m.user_id)});
+  setNotice(r.error?'Ошибка: '+r.error.message:'Назначено новых заданий: '+r.data+'.');
   await load();await onChanged();setBusy(false);
  }
  if(!teacher||!game)return null;
@@ -102,13 +103,13 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
     options={[{value:'0',label:'Отключён'},{value:'0.5',label:'Умеренный'},{value:'1',label:'Стандартный'},{value:'2',label:'Усиленный'}]}/>
    <StyledSelect label="Лимит за 24 часа" value={String(settings.max_daily)} onChange={x=>setSettings(s=>({...s,max_daily:Number(x)}))}
     options={[1,2,3].map(n=>({value:String(n),label:n+' '+(n===1?'событие':'события')}))}/>
-   <StyledSelect label="За 20 решений, п.п." value={String(settings.trust_per_20)} onChange={x=>setSettings(s=>({...s,trust_per_20:Number(x)}))}
+   <StyledSelect label="За 20 Полезных Итогов, П.п." value={String(settings.trust_per_20)} onChange={x=>setSettings(s=>({...s,trust_per_20:Number(x)}))}
     options={[0,1,2,3,4].map(n=>({value:String(n),label:'+'+n+' п.п.'}))}/>
    <StyledSelect label="За 3 просроченные, п.п." value={String(settings.backlog_penalty)} onChange={x=>setSettings(s=>({...s,backlog_penalty:Number(x)}))}
     options={[0,0.5,1,1.5,2].map(n=>({value:String(n),label:'−'+n+' п.п.'}))}/>
   </div>
   <div className="autoEventFormula">
-   <Activity size={18} aria-hidden="true"/><p>Интервал = Макс(4 ч.; базовый интервал / (1 + вес активности × Мин(2; часы отсутствия / 48))). Диапазон: от {Math.round(effectiveInterval*10)/10} до {settings.interval_hours} ч. Не более {settings.max_daily} событий за 24 часа и не более трёх нерешённых одновременно. Участникам, давно не заходившим в игру, чаще предлагаются необычные ситуации. За каждые 20 обработанных заданий — +{settings.trust_per_20} п.п. доверия; за каждые три задания старше 48 часов — −{settings.backlog_penalty} п.п. в сутки, но не более −3 п.п. в день.</p>
+   <Activity size={18} aria-hidden="true"/><p>Интервал = Макс(4 ч.; базовый интервал / (1 + вес активности × Мин(2; часы отсутствия / 48))). Диапазон: от {Math.round(effectiveInterval*10)/10} до {settings.interval_hours} ч. Не более {settings.max_daily} событий за 24 часа и не более трёх нерешённых одновременно. Участникам, давно не заходившим в игру, чаще предлагаются необычные ситуации. За каждые 20 общих решений в интересах общества — +{settings.trust_per_20} п.п. доверия; за каждые три задания старше 48 часов — −{settings.backlog_penalty} п.п. в сутки, но не более −3 п.п. в день.</p>
   </div>
   <button type="button" className="autoEventSave" disabled={busy} onClick={()=>void save(settings)}><Check size={17}/> {busy?'Сохранение…':'Сохранить настройки'}</button>
   <div className="autoEventBank">
@@ -116,13 +117,14 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
     <BookOpenText size={19}/><span><b>Банк игровых ситуаций</b><small>{bank.length} авторских учебных кейсов</small></span><ChevronDown size={19}/>
    </button>
    {openBank&&<div className="autoEventBankBody">
-    <div className="autoEventBankSearch"><input aria-label="Найти ситуацию" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Найти ситуацию по названию, сфере или тексту…"/><button type="button" disabled={busy} onClick={()=>void seed()}><RefreshCw size={16}/> Пополнить банк</button></div>
-    <div className="autoEventBankLayout"><div className="autoEventBankList" role="list">{visible.map(c=><button type="button" role="listitem" key={c.id} className={chosen===c.id?'selected':''} onClick={()=>{setChosen(c.id);setRecipient('')}}><b>{c.title}</b><small>{c.category} · {c.seriousness==='light'?'Повседневное':'Серьёзное'}{c.audience==='all'?' · Вся аудитория':''}</small></button>)}</div>
+    <div className="autoEventBankSearch"><input aria-label="Найти ситуацию" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Найти ситуацию по названию, сфере или тексту…"/><button type="button" disabled={busy} onClick={()=>void seed()}><RefreshCw size={16}/> Сверить Банк</button></div>
+    <div className="autoEventBankLayout"><div className="autoEventBankList" role="list">{visible.map(c=><button type="button" role="listitem" key={c.id} className={chosen===c.id?'selected':''} onClick={()=>{setChosen(c.id);setRecipient('');setGroupRecipients([])}}><b>{c.title}</b><small>{c.category} · {c.seriousness==='light'?'Повседневное':'Серьёзное'}{c.audience==='all'?' · Вся аудитория':''}</small></button>)}</div>
      <article className="autoEventCaseDetails">{selected?<><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}{selected.audience==='all'?' · Вся аудитория':''}</small><h4>{selected.title}</h4><p>{selected.situation}</p><em>{selected.source_note||'Авторский учебный кейс'}</em>
        {selected.audience==='all'?<div className="autoEventCaseAssign">
         <p>Ситуация для всей аудитории. При назначении каждый участник получает личное задание, а результаты объединяются в статистике.</p>
         <button type="button" disabled={busy||!students.length||students.every(m=>assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id))}
           onClick={()=>void assignAll()}><Send size={16}/> Назначить всей аудитории</button></div>
+       :selected.audience==='group'?<div className="autoEventCaseAssign"><p>Выберите 2–3 Участников Для Совместного Голосования.</p><div className="eventGroupRecipients">{eligible.map(m=><label key={m.user_id}><input type="checkbox" checked={groupRecipients.includes(m.user_id)} disabled={!groupRecipients.includes(m.user_id)&&groupRecipients.length>=3} onChange={e=>setGroupRecipients(old=>e.target.checked?[...old,m.user_id]:old.filter(id=>id!==m.user_id))}/>{m.full_name}</label>)}</div><button type="button" disabled={busy||groupRecipients.length<2} onClick={()=>void assign()}><Send size={16}/> Назначить Группе</button></div>
        :<div className="autoEventCaseAssign"><StyledSelect label="Назначить участнику" value={recipient} onChange={setRecipient} options={[{value:'',label:'Выберите участника'},...eligible.map(m=>({value:m.user_id,label:m.full_name,disabled:assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id)}))]}/>
        <button type="button" disabled={busy||!recipient||!eligible.some(m=>m.user_id===recipient)||assigned.some(a=>a.case_id===chosen&&a.recipient_id===recipient)} onClick={()=>void assign()}><Send size={16}/> Назначить</button></div>}
       </>:<p>Выберите ситуацию слева.</p>}</article></div>
