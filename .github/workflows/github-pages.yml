@@ -18,14 +18,13 @@ jobs:
           node-version: 22
           cache: npm
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - run: node scripts/prepare-github-pages.mjs
       - run: npm ci && npm run build
         working-directory: .pages-build
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLIC_KEY || secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      - run: node scripts/github-pages-check.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .pages-build/out

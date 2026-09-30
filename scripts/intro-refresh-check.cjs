@@ -60,7 +60,7 @@ async function main(){
  await check('Intro waits for a confirmed profile response',async()=>{
   const g=gameState();g.profilesLoaded=false;const h=harness(g);await h.flush();assert.equal(h.comic().props.open,false);g.profilesLoaded=true;await h.flush();assert.equal(h.comic().props.open,true);h.dispose();
  });
- await check('Finished intro survives offline refresh and stays scoped to user and game',async()=>{
+ await check('Finished intro survives offline refresh and follows the user across games',async()=>{
   const storage=new Map();const g=gameState();let calls=0;const offline=harness(g,storage,async()=>{calls++;return{error:{message:'Network unavailable'}}});await offline.flush();assert.equal(offline.comic().props.open,true);await offline.comic().props.onClose();await offline.flush();assert.equal(offline.comic().props.open,false);assert.ok(calls>0);offline.dispose();
   const second=harness(gameState(),storage,async()=>({error:{message:'Network unavailable'}}));await second.flush();assert.equal(second.comic().props.open,false);second.dispose();
   const otherGame=harness(gameState('user-a','other-game'),storage);await otherGame.flush();assert.equal(otherGame.comic().props.open,false);otherGame.dispose();

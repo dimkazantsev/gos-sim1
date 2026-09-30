@@ -7,4 +7,5 @@ node_modules/
 npm-debug.log*
 
 .design-review/
+.pages-build/
 *.tsbuildinfo
