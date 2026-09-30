@@ -19,6 +19,7 @@ import GradesView from './game/GradesView';
 import TeacherView from './game/TeacherView';
 import ProfileView from './game/ProfileView';
 import RepublicComic from './game/RepublicComic';
+import {useIntroProgress} from './game/introProgress';
 import ChatPanel from './game/ChatPanel';
 import EventWorkspace from './game/EventWorkspace';
 import {supabase} from '@/lib/supabase';
@@ -190,8 +191,6 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
  const [pendingEvents,setPendingEvents]=useState(0);
  const [selectedProfileId,setSelectedProfileId]=useState('');
- const [introOpen,setIntroOpen]=useState(false);
- const [introStarted,setIntroStarted]=useState('');
  const [completingProfile,setCompletingProfile]=useState(false);
  const [onboardingNotice,setOnboardingNotice]=useState('');
  useEffect(()=>{
@@ -265,6 +264,16 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const previewMode=!!previewStudent;
  const observer=me?.kind==='observer';
  const myProfile=g.profiles.find(p=>p.user_id===me?.user_id);
+ const {open:introOpen,seen:introSeen,finish:closeIntro,syncError:introSyncError}=useIntroProgress({
+  gameId:game?.id||'',userId:me?.user_id||'',ready:!loading&&g.profilesLoaded&&game?.id===gameId,
+  observer:!!observer,serverSeen:!!(myProfile?.intro_seen_at||myProfile?.onboarding_completed_at),
+  persist:async()=>{
+   if(!game)throw new Error('Игра ещё загружается');
+   const r=await supabase.rpc('mark_my_intro_seen',{p_game:game.id});
+   if(r.error)throw r.error;
+   await g.refresh();
+  }
+ });
  const onboardingRequired=!!me&&!observer&&!myProfile?.onboarding_completed_at;
  useEffect(()=>{
   if(!game||!me||previewMode)return;
@@ -292,13 +301,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const shownMe=vg.me||me;
  const chatDraftKey=(shownMe?.user_id||'')+':'+g.channelId;
  useEffect(()=>{
-  if(!game||!me||me.kind==='observer'||myProfile?.intro_seen_at)return;
-  if(introStarted!==me.user_id){setIntroStarted(me.user_id);setIntroOpen(true)}
- },[game?.id,me?.user_id,myProfile?.intro_seen_at,introStarted]);
- useEffect(()=>{
-  if(!game||!me||me.kind==='observer'||introOpen||!myProfile?.intro_seen_at||myProfile.onboarding_completed_at)return;
+  if(!game||!me||me.kind==='observer'||introOpen||!introSeen||myProfile?.onboarding_completed_at)return;
   if(view!=='profile')navigate('profile');
- },[game?.id,me?.user_id,myProfile?.intro_seen_at,myProfile?.onboarding_completed_at,introOpen,view]);
+ },[game?.id,me?.user_id,introSeen,myProfile?.onboarding_completed_at,introOpen,view]);
  async function completeOnboarding(){
   if(!game||!me||completingProfile)return;
   setCompletingProfile(true);setOnboardingNotice('');
@@ -307,12 +312,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   else{setOnboardingNotice('Профиль заполнен. Добро пожаловать в игру!');await g.refresh();navigate('dashboard',undefined,true)}
   setCompletingProfile(false);
  }
- async function finishIntro(){
-  setIntroOpen(false);
-  if(!game)return;
-  const r=await supabase.rpc('mark_my_intro_seen',{p_game:game.id});
-  if(r.error)setOnboardingNotice('Не удалось зафиксировать прохождение пролога: '+r.error.message);
-  await g.refresh();navigate('profile');
+ function finishIntro(){
+  closeIntro();navigate('profile');
  }
  
 
@@ -444,7 +445,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
-  {onboardingRequired&&myProfile?.intro_seen_at&&!introOpen&&!previewMode&&<div className="onboardingBar" role="status"><div><strong>Первое знакомство с Республикой</strong><span>Обязательные поля: ФИО, пол, подпись, описание и подтверждённая почта с паролем.</span>{onboardingNotice&&<small>{onboardingNotice}</small>}</div><button type="button" disabled={completingProfile} onClick={()=>{setSelectedProfileId('');navigate('profile');void completeOnboarding()}}>{completingProfile?'Проверяем…':'Закончить настройку'}</button></div>}
+  {onboardingRequired&&introSeen&&!introOpen&&!previewMode&&<div className="onboardingBar" role="status"><div><strong>Первое знакомство с Республикой</strong><span>Обязательные поля: ФИО, пол, подпись, описание и подтверждённая почта с паролем.</span>{(onboardingNotice||introSyncError)&&<small>{onboardingNotice||introSyncError}</small>}</div><button type="button" disabled={completingProfile} onClick={()=>{setSelectedProfileId('');navigate('profile');void completeOnboarding()}}>{completingProfile?'Проверяем…':'Закончить настройку'}</button></div>}
   <RepublicComic intro open={introOpen} onClose={()=>void finishIntro()}/>
   <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }
