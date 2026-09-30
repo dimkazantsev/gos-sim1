@@ -13,8 +13,8 @@ export default function EventComic({title,category,caseKey,compact=false,silent=
   const row=Math.floor(index/5),column=extra?number-42:index%5;
   const lower=row===8&&!extra;
   const ratio=extra?1536/5/108.5:1536/5/(lower?157:108.5);
-  const top=extra?187:lower?867/157*100:row*100;
-  const style={'--atlas-column':column,'--atlas-top':top+'%','--atlas-ratio':ratio} as CSSProperties;
+  const shift=extra?39.65:(lower?867:row*108.5)/1024*100;
+  const style={'--atlas-column':column,'--atlas-shift':-shift+'%','--atlas-ratio':ratio} as CSSProperties;
   return <div className="eventComicPlayer"><figure className={'eventComic eventAtlasIllustration '+(compact?'isCompact':'')} style={style} role="img" aria-label={scene?.alt||'Иллюстрация к ситуации «'+title+'»'}><img src={'/event-comics/atlas-'+(extra?'extra':'main')+'.webp'} alt="" loading="lazy" decoding="async"/><figcaption className="eventAtlasLabel">{category}</figcaption></figure>{!silent&&<ComicSoundButton/>}</div>;
  }
 
