@@ -23,6 +23,7 @@ jobs:
       - run: npm run typecheck
       - run: node scripts/intro-refresh-check.cjs
       - run: npm run design:check
+      - run: node scripts/event-card-browser-check.cjs
       - run: npm run design:preview
       - run: npm run design:interactive
       - run: npm run design:browser

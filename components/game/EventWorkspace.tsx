@@ -178,7 +178,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    </div>}
    {teacher&&<StyledSelect label="Правовая оценка" value={legalFilter} onChange={setLegalFilter} options={[{value:'all',label:'Все решения'},{value:'valid',label:'В пределах полномочий'},{value:'invalid',label:'Нарушения полномочий или права'}]}/>}
    {visibleCases.length===0?<div className="journalEmpty">Назначенных ситуаций пока нет.</div>:
-   visibleCases.map(c=>{
+   <div className="eventCardsRail" aria-label="Карточки ситуаций" tabIndex={0}>{visibleCases.map(c=>{
     const assigned=assignments.filter(a=>a.case_id===c.id),responded=decisions.filter(d=>d.case_id===c.id);
     const my=assigned.find(a=>a.recipient_id===me.user_id);
     const outcome=outcomes.find(o=>o.case_id===c.id);
@@ -222,7 +222,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
       {pendingInvites&&<p>Ожидаем ответа на приглашения.</p>}
     </div>}
     </div>;
-   })}</div>}
+   })}</div>}</div>}
   {notice&&<p className="eventNotice" role="status">{notice}</p>}
  </section>;
 }

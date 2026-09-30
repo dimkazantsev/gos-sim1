@@ -1,21 +1,18 @@
 'use client';
-import {useId,type CSSProperties} from 'react';
+import {useId} from 'react';
+import {eventSceneFrame} from './eventSceneFrame';
 import ComicSoundButton from './ComicSoundButton';
 import type {EventComicScene} from './types';
 type Props={title:string;category:string;caseKey:string;compact?:boolean;silent?:boolean;scene?:EventComicScene|null};
 function hash(s:string){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 export default function EventComic({title,category,caseKey,compact=false,silent=false,scene}:Props){
  const id=useId().replace(/:/g,'');
- const number=Number((scene?.scene_id||caseKey).match(/(?:scene-|v2-)(\d+)$/)?.[1]||0);
- if(number>=1&&number<=50){
-  const extra=number>=42&&number<=46;
-  const index=number<=41?number-1:number-6;
-  const row=Math.floor(index/5),column=extra?number-42:index%5;
-  const lower=row===8&&!extra;
-  const ratio=extra?1536/5/108.5:1536/5/(lower?157:108.5);
-  const shift=extra?39.65:(lower?867:row*108.5)/1024*100;
-  const style={'--atlas-column':column,'--atlas-shift':-shift+'%','--atlas-ratio':ratio} as CSSProperties;
-  return <div className="eventComicPlayer"><figure className={'eventComic eventAtlasIllustration '+(compact?'isCompact':'')} style={style} role="img" aria-label={scene?.alt||'Иллюстрация к ситуации «'+title+'»'}><img src={'/event-comics/atlas-'+(extra?'extra':'main')+'.webp'} alt="" loading="lazy" decoding="async"/><figcaption className="eventAtlasLabel">{category}</figcaption></figure>{!silent&&<ComicSoundButton/>}</div>;
+ const frame=eventSceneFrame(caseKey,scene?.scene_id);
+ if(frame){
+  return <div className="eventComicPlayer"><figure className={'eventComic eventPanelIllustration '+(compact?'isCompact':'')} role="img" aria-label={scene?.alt||'Иллюстрация к ситуации «'+title+'»'}>
+   <svg viewBox={[frame.x,frame.y,frame.width,frame.height].join(' ')} preserveAspectRatio="xMidYMid meet" data-scene={frame.number} aria-hidden="true">
+    <image href={'/event-comics/atlas-'+frame.atlas+'.webp'} width={frame.atlas==='main'?1536:2172} height={frame.atlas==='main'?1024:724}/>
+   </svg><figcaption className="eventAtlasLabel">{category}</figcaption></figure>{!silent&&<ComicSoundButton/>}</div>;
  }
 
  if(scene?.scene_id&&/^scene-\d{2,4}$/.test(scene.scene_id))return <div className="eventComicPlayer">

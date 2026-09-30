@@ -1,6 +1,6 @@
 'use client';
-import {useEffect,useMemo,useState} from 'react';
-import {Activity,BookOpenText,CalendarClock,Check,ChevronDown,PauseCircle,PlayCircle,RefreshCw,Send,Settings2,ShieldCheck} from 'lucide-react';
+import {useEffect,useMemo,useRef,useState} from 'react';
+import {Activity,BookOpenText,CalendarClock,Check,ChevronDown,ChevronLeft,ChevronRight,PauseCircle,PlayCircle,RefreshCw,Send,Settings2,ShieldCheck} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import EventComic from './EventComic';
 import type {EventComicScene} from './types';
@@ -18,6 +18,7 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
  const [chosen,setChosen]=useState('');
  const [recipient,setRecipient]=useState('');
  const [groupRecipients,setGroupRecipients]=useState<string[]>([]);
+ const bankRail=useRef<HTMLDivElement>(null);
  const [openBank,setOpenBank]=useState(false);
  const [search,setSearch]=useState('');
  const [assigned,setAssigned]=useState<{case_id:string;recipient_id:string}[]>([]);
@@ -120,8 +121,8 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
    </button>
    {openBank&&<div className="autoEventBankBody">
     <div className="autoEventBankSearch"><input aria-label="Найти ситуацию" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Найти ситуацию по названию, сфере или тексту…"/><button type="button" disabled={busy} onClick={()=>void seed()}><RefreshCw size={16}/> Сверить банк</button></div>
-    <div className="autoEventBankLayout"><div className="autoEventBankList" role="list">{visible.map(c=><button type="button" role="listitem" key={c.id} className={chosen===c.id?'selected':''} onClick={()=>{setChosen(c.id);setRecipient('');setGroupRecipients([])}}><EventComic title={c.title} category={c.category} caseKey={c.case_key} scene={c.comic_scene} compact silent/><b>{c.title}</b><small>{c.category} · {c.seriousness==='light'?'Повседневное':'Серьёзное'}{c.audience==='all'?' · Вся аудитория':''}</small></button>)}</div>
-     <article className="autoEventCaseDetails">{selected?<><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}{selected.audience==='all'?' · Вся аудитория':''}</small><h4>{selected.title}</h4><p>{selected.situation}</p><em>{selected.source_note||'Авторский учебный кейс'}</em>
+    <p className="eventRailHint">Выберите карточку. Ленту можно прокручивать влево и вправо.</p><div className="autoEventBankLayout"><nav className="eventRailControls" aria-label="Листать карточки"><span>Выберите ситуацию в ленте</span><button type="button" aria-label="Предыдущие карточки" onClick={()=>bankRail.current?.scrollBy({left:-bankRail.current.clientWidth*.8,behavior:'smooth'})}><ChevronLeft size={20}/></button><button type="button" aria-label="Следующие карточки" onClick={()=>bankRail.current?.scrollBy({left:bankRail.current.clientWidth*.8,behavior:'smooth'})}><ChevronRight size={20}/></button></nav><div className="autoEventBankList" role="group" aria-label="Выбор ситуации" tabIndex={0} ref={bankRail}>{visible.map(c=><button type="button" key={c.id} className={chosen===c.id?'selected':''} aria-label={'Открыть ситуацию «'+c.title+'»'} aria-pressed={chosen===c.id} onClick={()=>{setChosen(c.id);setRecipient('');setGroupRecipients([])}}><EventComic title={c.title} category={c.category} caseKey={c.case_key} scene={c.comic_scene} compact silent/><b>{c.title}</b><p className="eventBankSummary">{c.situation}</p><small>{c.category} · {c.seriousness==='light'?'Повседневное':'Серьёзное'}{c.audience==='all'?' · Вся аудитория':''}</small></button>)}</div>
+     <article className="autoEventCaseDetails">{selected?<><EventComic title={selected.title} category={selected.category} caseKey={selected.case_key} scene={selected.comic_scene}/><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}{selected.audience==='all'?' · Вся аудитория':''}</small><h4>{selected.title}</h4><p>{selected.situation}</p><em>{selected.source_note||'Авторский учебный кейс'}</em>
        {selected.audience==='all'?<div className="autoEventCaseAssign">
         <p>Ситуация для всей аудитории. При назначении каждый участник получает личное задание, а результаты объединяются в статистике.</p>
         <button type="button" disabled={busy||!students.length||students.every(m=>assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id))}
@@ -129,7 +130,7 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
        :selected.audience==='group'?<div className="autoEventCaseAssign"><p>Выберите 2–3 участников для совместного голосования.</p><div className="eventGroupRecipients">{eligible.map(m=><label key={m.user_id}><input type="checkbox" checked={groupRecipients.includes(m.user_id)} disabled={!groupRecipients.includes(m.user_id)&&groupRecipients.length>=3} onChange={e=>setGroupRecipients(old=>e.target.checked?[...old,m.user_id]:old.filter(id=>id!==m.user_id))}/>{m.full_name}</label>)}</div><button type="button" disabled={busy||groupRecipients.length<2} onClick={()=>void assign()}><Send size={16}/> Назначить группе</button></div>
        :<div className="autoEventCaseAssign"><StyledSelect label="Назначить участнику" value={recipient} onChange={setRecipient} options={[{value:'',label:'Выберите участника'},...eligible.map(m=>({value:m.user_id,label:m.full_name,disabled:assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id)}))]}/>
        <button type="button" disabled={busy||!recipient||!eligible.some(m=>m.user_id===recipient)||assigned.some(a=>a.case_id===chosen&&a.recipient_id===recipient)} onClick={()=>void assign()}><Send size={16}/> Назначить</button></div>}
-      </>:<p>Выберите ситуацию слева.</p>}</article></div>
+      </>:<p>Выберите карточку в ленте ниже.</p>}</article></div>
    </div>}
   </div>
   {notice&&<p className="autoEventNotice" role="status">{notice}</p>}

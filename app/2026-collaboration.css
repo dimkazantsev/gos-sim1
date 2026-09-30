@@ -11,3 +11,24 @@
 .eventAuthorityTable{display:grid;gap:10px}.eventAuthorityTable>article{display:grid;gap:6px;padding:14px;border:1px solid #cbdcf5;border-radius:12px;background:#f5f8ff;font-size:13px}.eventAuthorityTable small{line-height:1.5;color:#617b9c}.eventCaseBundle>.eventOptionButtons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.eventCaseBundle>.eventOptionButtons button{padding:14px;min-height:60px;display:flex;align-items:center;gap:12px;border:1px solid #8eadde;background:#fff;color:#294f84;border-radius:12px;text-align:left;line-height:1.5;font-size:14px}.eventOptionButtons button b{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:8px;background:#e4edff}.eventOptionButtons button:hover{background:#f1f6ff}.eventOptionButtons button:disabled{opacity:.5}.eventOptionButtons p{grid-column:1/-1}
 @media(max-width:650px){.profileOffices,.eventCollaboration{padding:14px}.officeCards>article{flex-wrap:wrap}.officeActions{width:100%;grid-template-columns:1fr 1fr}.eventInviteControls,.eventTextDiscussion form{grid-template-columns:1fr}.eventCaseBundle>.eventOptionButtons{grid-template-columns:1fr}.eventAtlasIllustration{max-height:300px}.autoEventBankList{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.eventCaseBundle>.eventStory{transition:none}.eventCaseBundle>.eventStory:hover{transform:none}}
+/* Each SVG viewport owns a single scene; legacy img positioning cannot change it. */
+.eventComicPlayer .eventPanelIllustration{position:relative!important;aspect-ratio:auto!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;border-radius:0!important;background:#fff}
+.eventComicPlayer .eventPanelIllustration>svg{position:static!important;display:block!important;width:100%!important;height:220px!important;inset:auto!important;transform:none!important;animation:none!important;max-width:100%}
+.eventPanelIllustration .eventAtlasLabel{left:10px;bottom:10px;font-size:11px}
+.autoEventBankLayout{display:flex!important;flex-direction:column;gap:18px;min-width:0}
+.autoEventCaseDetails{order:-1;width:100%;min-width:0;box-sizing:border-box}
+.autoEventCaseDetails>.eventComicPlayer{margin:-14px -14px 18px;width:calc(100% + 28px);border-radius:12px 12px 0 0;overflow:hidden}
+.autoEventBankList{display:flex!important;grid-template-columns:none!important;gap:14px;width:100%;max-height:none!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x proximity;overscroll-behavior-x:contain;padding:6px 2px 14px;align-items:stretch;box-sizing:border-box}
+.autoEventBankList>button{flex:0 0 clamp(260px,30vw,350px);scroll-snap-align:start;display:flex!important;flex-direction:column;align-items:stretch;gap:10px;min-width:0;box-sizing:border-box;border:1px solid #d8e4f5;white-space:normal}
+.autoEventBankList>button.selected{outline:2px solid #6089cc;outline-offset:-2px}
+.autoEventBankList .eventPanelIllustration>svg{height:170px!important}
+.eventBankSummary{margin:0;padding:0 12px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden;font-size:13px;line-height:1.6;color:#456182;text-transform:none}
+.autoEventBankList>button>small{margin-top:auto}
+.eventCardsRail{display:flex;align-items:flex-start;gap:18px;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;overscroll-behavior-x:contain;padding:6px 2px 18px;box-sizing:border-box}
+.eventCardsRail>.eventCaseBundle{flex:0 0 min(440px,calc(100% - 16px));scroll-snap-align:start;max-width:100%;min-width:0}
+.eventCardsRail .eventStoryContent{padding:18px!important;overflow-wrap:anywhere}
+.eventCardsRail .eventStoryVisual{min-height:0!important}
+.autoEventBankList:focus-visible,.eventCardsRail:focus-visible{outline:2px solid #426dc1;outline-offset:2px}
+@media(max-width:650px){.autoEventBankList>button{flex-basis:min(300px,calc(100% - 20px))}.eventCardsRail>.eventCaseBundle{flex-basis:calc(100% - 16px)}.eventComicPlayer .eventPanelIllustration>svg{height:180px!important}.autoEventBankList .eventPanelIllustration>svg{height:150px!important}.autoEventCaseDetails>.eventComicPlayer{margin-left:0;margin-right:0;width:100%}}
+
+.eventRailControls{display:flex;align-items:center;gap:8px;width:100%;color:#456182;font-size:13px}.eventRailControls>span{margin-right:auto}.eventRailControls button{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid #b9cdec;border-radius:10px;background:#f4f8ff;color:#315987;cursor:pointer}
