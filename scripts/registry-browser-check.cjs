@@ -16,6 +16,10 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    });
    assert(geometry.scroll<=geometry.viewport+2,'Registry overflow at '+width+': '+JSON.stringify(geometry));
    assert.equal(geometry.offenders.length,0,'Registry children stay inside at '+width+': '+JSON.stringify(geometry.offenders));
+   const rows=await frame.locator('.formalRegistryRow').evaluateAll(rows=>rows.map(el=>{const r=el.getBoundingClientRect();return {height:r.height,bottom:r.bottom,top:r.top,children:[...el.children].map(c=>({top:c.getBoundingClientRect().top,bottom:c.getBoundingClientRect().bottom}))}}));
+   assert(rows.length>=6,'Test a populated document list');
+   for(const row of rows)assert(row.children.every(c=>c.top>=row.top-2&&c.bottom<=row.bottom+2),'Document content must fit its row at '+width+'px: '+JSON.stringify(row));
+   for(let i=1;i<rows.length;i++)assert(rows[i].top>=rows[i-1].bottom-1,'Document rows may not overlap');
    assert(geometry.actions.bottom<=geometry.paper.top,'Primary procedure is placed before the document body');
    assert.equal(await frame.locator('.formalVoteLink.active').count(),1,'Linked open vote is visible');
    assert.equal(await frame.getByRole('button',{name:'Перейти к голосованию →'}).count(),1);
