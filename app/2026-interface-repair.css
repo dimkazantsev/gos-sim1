@@ -152,6 +152,7 @@
  .mobileDockV2 .mobileDockIcon,.mobileDockV2 .mobileDockScroll>.mobileDockChat .mobileDockIcon {width:24px;height:24px;min-height:24px}
  .mobileDockV2 .mobileDockIcon>svg,.mobileDockV2 .mobileDockFixed>button>svg,.mobileDockV2 .mobileDockScroll>.mobileDockChat .mobileDockIcon svg {width:22px;height:22px;stroke-width:1.9}
  .mobileDock.mobileDockV2 {min-height:72px;height:auto}
+ .simWorkspace .simChat {bottom:calc(72px + env(safe-area-inset-bottom,0px))!important;height:auto!important;max-height:calc(100dvh - 56px - 72px - env(safe-area-inset-bottom,0px))!important}
  .metricDirectorStudio .metricDirectorGrid {grid-template-columns:repeat(2,minmax(0,1fr))}
  .metricDirectorStudio .metricDirectorGrid>.styledSelect {grid-column:1/-1}
 }

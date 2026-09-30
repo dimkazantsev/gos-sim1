@@ -124,7 +124,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
    </div>
   </section>
 
-  <ProfileOffices g={g} userId={target.user_id}/>
+  <ProfileOffices g={g} userId={target.user_id} readOnly={readOnly}/>
   {own&&teacher&&<section className="profileRoleSwitcher">
    <div><small>Права администратора сохраняются</small><h2>Игровая должность преподавателя</h2><p>По умолчанию вы нейтральный преподаватель. При желании можете занять любую игровую должность. Это не меняет полномочия преподавателя.</p></div>
    <StyledSelect label="Действовать в игре как" value={me.role_title||'Преподаватель'}
