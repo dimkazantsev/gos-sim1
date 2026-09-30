@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Vote} from './types';
@@ -10,11 +10,14 @@ import {institutionLabel,majorityLabel} from './proceduralVoting';
 function pct(n:number,d:number){return d>0?Math.round(n/d*100):0}
 function time(v:string){return new Date(v).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
 
-export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeRepublic;onOpenDocument:(id:string)=>void;onOpenStages:()=>void}){
+export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:ReturnTypeRepublic;onOpenDocument:(id:string)=>void;onOpenStages:()=>void;focusId?:string}){
  const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,createVote,canVote,castVote,closeVote,tally,quorum}=g;
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[mode,setMode]=useState<'member'|'faction'|'mandate'>('faction');
  const [institution,setInstitution]=useState('all'),[quorumValue,setQuorumValue]=useState(0.5),[majorityKind,setMajorityKind]=useState<'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction'>('present_majority'),[majorityValue,setMajorityValue]=useState(0.5);
  const [tab,setTab]=useState<'open'|'closed'|'all'>('open'),[busy,setBusy]=useState('');
+ const focused=useRef('');
+ useEffect(()=>{if(focusId)setTab('all')},[focusId]);
+ useEffect(()=>{if(!focusId||focused.current===focusId)return;const node=document.getElementById('vote-'+focusId);if(node){focused.current=focusId;node.scrollIntoView({block:'start',behavior:'smooth'});node.focus({preventScroll:true})}},[focusId,tab,votes]);
  const [checkedIn,setCheckedIn]=useState<{user_id:string;institution_key:string;stage_no:number}[]>([]);
  useEffect(()=>{
   if(!g.game)return;
@@ -103,7 +106,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages}:{g:ReturnTypeR
    const stage=stages.find(s=>s.stage_no===v.stage_no);
    const denominator=Math.max(1,t.yes+t.no+t.abstain);
    const rule=majorityLabel(v.majority_kind,Number(v.majority_value));
-   return <article className={'proceduralVoteCard '+v.status} key={v.id}>
+   return <article id={'vote-'+v.id} tabIndex={-1} className={'proceduralVoteCard '+v.status+(focusId===v.id?' isFocused':'')} key={v.id}>
     <header>
      <div className="voteInstitution"><span>✓</span><div><small>{institutionLabel(v.institution_key)}</small><b>{v.title}</b></div></div>
      <div className={'voteState '+(v.status==='open'?'live':v.result_code||'closed')}>{v.status==='open'?'● ГОЛОСОВАНИЕ ИДЁТ':v.result_label||'ЗАВЕРШЕНО'}</div>

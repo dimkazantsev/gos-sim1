@@ -1,0 +1,191 @@
+/* Case artwork is clipped in its own SVG. The outer frame only sets presentation size. */
+.eventComicPlayer .eventPanelIllustration {overflow:hidden!important;min-width:0;border-radius:10px;background:#fff}
+.eventComicPlayer .eventPanelIllustration>svg {overflow:hidden!important;object-fit:contain}
+.eventBankHint {margin:10px 0 14px;color:#617189;font-size:13px;line-height:1.5}
+.autoEventBankBody {container-type:inline-size}
+.eventBankWorkspace {display:grid;grid-template-columns:minmax(0,1.35fr) minmax(290px,1fr);align-items:start;gap:20px;min-width:0}
+.eventBankTiles {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-height:690px;overflow-y:auto;overflow-x:hidden;align-content:start;padding:3px 8px 8px 3px;min-width:0;scrollbar-gutter:stable}
+.eventTileGrid {display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:18px;align-items:start;min-width:0;margin-top:18px}
+.eventCaseTile {display:flex;flex-direction:column;align-items:stretch;min-width:0;width:100%;height:100%;padding:0;border:1px solid #d8e2f0;border-radius:14px;overflow:hidden;background:#fff;text-align:left;color:#263b5c;cursor:pointer;box-shadow:0 3px 10px #253d6610;transition:transform .15s,border-color .15s,box-shadow .15s}
+.eventCaseTile:hover {transform:translateY(-2px);border-color:#93ace0;box-shadow:0 6px 18px #253d6619}
+.eventCaseTile.selected {border:2px solid #527bd0;background:#f3f7ff}
+.eventCaseTile:focus-visible {outline:3px solid #7ba5f1;outline-offset:3px}
+.eventTileArtwork {display:grid;place-items:center;min-width:0;height:140px;overflow:hidden;padding:8px;background:#fff7df;border-bottom:1px solid #e8e4d8}
+.eventTileArtwork .eventComicPlayer {width:100%;min-width:0}
+.eventTileArtwork .eventPanelIllustration {margin:0!important;border:0!important;box-shadow:none!important;border-radius:4px;aspect-ratio:auto!important}
+.eventTileArtwork .eventPanelIllustration>svg {width:100%!important;height:122px!important;max-width:100%;display:block!important}
+.eventTileArtwork .eventAtlasLabel {display:none}
+.eventTileText {display:flex;flex-direction:column;gap:10px;padding:14px;flex:1;min-width:0}
+.eventTileText>b {display:block;font-size:14px;line-height:1.45;white-space:normal;overflow-wrap:break-word}
+.eventTileText>p {display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:0;font-size:12px;line-height:1.55;color:#697a91}
+.eventTileText>small {display:block;margin-top:auto;font-size:11px;line-height:1.45;color:#6d7e97;white-space:normal}
+.eventGridEmpty {grid-column:1/-1;color:#687b94;padding:20px}
+.eventBankDetail {display:grid;gap:14px;align-content:start;min-width:0;padding:20px;border:1px solid #dbe4f2;border-radius:14px;background:#f8fbff}
+.eventBankDetail>h4 {margin:0;font-size:21px;line-height:1.3;color:#263e65;overflow-wrap:break-word}
+.eventBankDetail>p {margin:0;white-space:pre-line;font-size:14px;line-height:1.75;color:#405673}
+.eventBankDetail>small,.eventBankDetail>em {font-size:12px;line-height:1.55;color:#6e7f96}
+.eventBankDetail .autoEventCaseAssign {display:grid;gap:12px;margin:6px 0 0;padding:16px 0 0;border-top:1px solid #dbe4f2}
+.eventBankDetail .autoEventCaseAssign>button {justify-content:center;min-height:46px;width:100%;white-space:normal}
+.eventBankDetail .eventGroupRecipients {display:grid;gap:10px;max-height:220px;overflow:auto}
+.eventBankDetail .eventGroupRecipients label {display:flex;align-items:center;gap:10px;line-height:1.5;min-height:42px}
+.eventCaseBackdrop {position:fixed;inset:0;z-index:650;display:grid;place-items:center;padding:24px;background:#10244399;backdrop-filter:blur(4px)}
+.eventCaseModal {display:flex;flex-direction:column;width:min(960px,100%);max-height:90dvh;min-width:0;border:1px solid #d6e1f0;border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 24px 80px #10244355}
+.eventModalHeader {display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:18px 22px;border-bottom:1px solid #dce5f0;background:#f7faff}
+.eventModalHeader>div {min-width:0}
+.eventModalHeader small {font-size:12px;color:#7284a0}
+.eventModalHeader h3 {margin:5px 0 0;font-size:23px;line-height:1.3;color:#263e65}
+.eventModalClose {display:grid;place-items:center;width:44px;min-width:44px;height:44px;padding:0;border:1px solid #d6e0ee;border-radius:10px;background:#fff;color:#536987;cursor:pointer}
+.eventModalBody {padding:22px;overflow:auto;overscroll-behavior:contain;min-width:0}
+.eventCaseModal .eventCaseBundle {min-width:0;width:100%;max-width:none}
+.eventCaseModal .eventStoryVisual {min-width:0;max-width:600px;width:100%;justify-self:center}
+.eventCaseModal .eventStoryContent {padding:20px;min-width:0}
+.eventCaseModal .eventStoryContent>p {font-size:15px;line-height:1.8}
+.eventCaseModal .eventAuthorityTable>article {display:grid;gap:7px;grid-template-columns:minmax(0,1fr);padding:14px;min-width:0}
+.eventCaseModal .eventOptionButtons {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.eventCaseModal .eventOptionButtons>button {min-height:54px;white-space:normal;line-height:1.5;text-align:left;min-width:0}
+.eventCaseModal .eventOptionButtons>p {grid-column:1/-1}
+.simSidebar .focusNavInner>button {cursor:pointer;gap:10px;padding-left:10px}
+.simSidebar .focusNavInner>button>.sidebarDragHandle {display:grid;place-items:center;flex:0 0 22px;width:22px;min-width:22px;height:32px;align-self:center;margin-right:2px;color:#8393ac;cursor:grab;border-radius:6px}
+.simSidebar .focusNavInner>button>.sidebarDragHandle:hover {background:#e9eff7;color:#456594}
+.simSidebar .focusNavInner>button>.sidebarDragHandle:active {cursor:grabbing}
+.simSidebar .focusNavInner>button>.sidebarDragHandle:focus-visible {outline:2px solid #8eade4;outline-offset:2px}
+.simSidebar .sidebarRouteLabel {min-width:0;flex:1;white-space:normal;line-height:1.4}
+.metricDirectorStudio .metricDirectorGrid {display:grid;grid-template-columns:minmax(0,1.4fr) repeat(2,minmax(0,1fr));gap:16px;align-items:end}
+.metricDirectorStudio .metricValueField {display:grid;gap:7px;min-width:0;margin:0;color:#60748f;font-size:12px;font-weight:700}
+.metricDirectorStudio .metricValueControl {display:flex;align-items:center;gap:10px;height:48px;min-width:0;padding:0 13px;border:1px solid #cfdcf0;border-radius:10px;background:#fff}
+.metricDirectorStudio .metricValueControl.isCurrent {background:#f4f7fc}
+.metricDirectorStudio .metricValueControl:focus-within {outline:2px solid #8fafe8;outline-offset:1px}
+.metricDirectorStudio .metricValueControl>input {display:block;flex:1;width:0;min-width:0;height:44px;min-height:0;margin:0;padding:0;border:0!important;box-shadow:none!important;outline:none!important;background:transparent!important;font-family:inherit;font-size:20px;font-weight:700;line-height:1.2;color:#304967;text-align:left}
+.metricDirectorStudio .metricValueControl>input::placeholder {font-size:13px;font-weight:500}
+.metricDirectorStudio .metricValueControl>span {flex:none;max-width:35%;font-size:12px;font-weight:600;color:#7586a0}
+.teacherSimple .impactWorkbench .impactHistoryRow {display:flex;flex-direction:column;gap:14px;min-width:0;width:100%;box-sizing:border-box}
+.teacherSimple .impactWorkbench .impactHistoryRow>.impactHistoryTop {display:grid!important;grid-template-columns:35px minmax(0,1fr) auto!important;gap:12px;align-items:start;width:100%;min-width:0}
+.teacherSimple .impactHistoryTop>.impactHistoryIdentity {display:block!important;min-width:0;width:auto;flex:none;overflow-wrap:break-word}
+.teacherSimple .impactHistoryIdentity>small {display:flex;flex-wrap:wrap;gap:5px;white-space:normal;line-height:1.6;min-width:0;width:auto}
+.teacherSimple .impactHistoryIdentity time {white-space:nowrap}
+.teacherSimple .impactHistoryIdentity>p {white-space:normal;overflow-wrap:break-word;line-height:1.65}
+.teacherSimple .impactHistoryRow>.impactHistoryBottom {display:flex!important;flex-wrap:wrap;grid-template-columns:none!important;align-items:center;justify-content:space-between;gap:12px;padding-left:47px;min-width:0}
+.teacherSimple .impactLedgerEffects {display:flex;flex-wrap:wrap;gap:8px;min-width:0;flex:1 1 220px}
+.teacherSimple .impactDelta {white-space:normal;line-height:1.45}
+/* Registry: list, selected document, and a single clearly placed procedure panel. */
+.formalPage .formalWorkspace {grid-template-columns:minmax(240px,300px) minmax(0,1fr);gap:20px;min-width:0}
+.formalPage .formalRegistry {position:static;max-height:800px;min-width:0;padding:16px;gap:12px}
+.formalPage .formalRegistryHead {padding:0 0 12px;margin:0;gap:12px;min-width:0}
+.formalPage .formalRegistryHead>div {min-width:0}
+.formalPage .formalRegistryHead h2 {font-size:18px;line-height:1.4}
+.formalPage .formalRegistryHead>button {width:44px;min-width:44px;height:44px}
+.formalPage .formalFilters {grid-template-columns:minmax(0,1fr);gap:10px;margin:0}
+.formalPage .formalSearch {flex-shrink:0;min-height:44px}
+.formalPage .formalRegistryList {gap:10px;min-width:0}
+.formalPage .formalRegistryRow {padding:14px;border:1px solid #dce5f1;border-radius:10px;gap:8px;min-width:0;white-space:normal}
+.formalPage .formalRegistryRow>b {font-size:14px;line-height:1.5;overflow-wrap:break-word}
+.formalPage .formalRegistryRow>div:last-child {flex-wrap:wrap;gap:8px;align-items:flex-start}
+.formalPage .formalStatus {display:inline-block;max-width:100%;white-space:normal;line-height:1.4;font-size:11px;border-radius:7px}
+.formalPage .formalDetail {display:grid;gap:16px;min-width:0}
+.formalPage .formalDocHeader {grid-template-columns:minmax(0,1fr);gap:16px;padding:22px;border-radius:0;box-shadow:none;min-width:0}
+.formalPage .formalDocHeader h2 {font-size:24px;line-height:1.35;overflow-wrap:break-word}
+.formalPage .formalStatusLarge {min-width:0;width:100%;box-sizing:border-box}
+.formalPage .formalProgress {min-width:0;margin:0;border-radius:0;overflow:hidden;padding:20px}
+.formalPage .formalSteps {display:flex;flex-wrap:wrap;gap:10px;min-width:0;margin-top:16px}
+.formalPage .formalStep {display:grid;grid-template-columns:30px minmax(0,1fr);grid-template-rows:auto auto;column-gap:8px;row-gap:3px;flex:1 1 150px;min-width:0;padding:9px;border:1px solid #e2e9f3;border-radius:9px;align-items:start}
+.formalPage .formalStep>span {grid-row:1/3;width:28px;height:28px;display:grid;place-items:center;margin:0}
+.formalPage .formalStep>b,.formalPage .formalStep>small {text-align:left;white-space:normal;line-height:1.4;overflow-wrap:break-word}
+.formalPage .formalStep>b {font-size:12px}
+.formalPage .formalStep>small {font-size:11px}
+.formalPage .formalDocGrid {display:grid;grid-template-columns:minmax(0,1fr);gap:18px;min-width:0;padding:20px}
+.formalPage .formalPaper {min-width:0;padding:24px;border-radius:12px}
+.formalPage .formalPaperBody {font-size:14px;line-height:1.85;overflow-wrap:break-word}
+.formalPage .formalSidebar {display:grid;grid-template-columns:minmax(0,1fr);min-width:0;gap:18px}
+.formalPage .formalSidebar>.surface {display:block;min-width:0;box-sizing:border-box;padding:20px}
+.formalPage .formalActions {margin:0 20px;padding:20px;border:1px solid #bfd2ef;border-radius:12px;background:#f6f9ff;min-width:0}
+.formalPage .formalActions .surfaceHead {display:flex;gap:12px;align-items:flex-start;min-width:0;margin-bottom:12px}
+.formalPage .formalActions h2 {font-size:19px;line-height:1.4;margin:0}
+.formalPage .formalActions p {font-size:13px;line-height:1.65}
+.formalPage .formalActions :is(.formalVoteLink,.formalBranchPanel,.presidentialDecision) {display:grid;gap:10px;min-width:0}
+.formalPage .formalActions :is(button,a.primary) {min-height:44px;white-space:normal;line-height:1.5;max-width:100%;padding:11px 14px}
+.formalPage .formalActions :is(.formalBranchPanel,.presidentialDecision)>div,.formalPage .formalSecondaryActions {display:flex;flex-wrap:wrap;gap:10px}
+.formalPage .formalProcedureHint {display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0 0}
+.formalProcedureHint span,.formalVoteBadge {display:inline-flex;padding:6px 9px;border:1px solid #d4e1f4;border-radius:7px;background:#eff5ff;color:#47658e;font-size:11px;line-height:1.4}
+.formalPage .formalPassport dl>div {display:grid;grid-template-columns:minmax(0,1fr);gap:5px;padding:10px 0;min-width:0}
+.formalPage .formalPassport dd {margin:0;white-space:normal;overflow-wrap:break-word}
+.formalPage .billProfileForm,.formalPage .billPackageUpload {display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:0}
+.formalPage .billPackageList>div {display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;min-width:0;padding:12px 0}
+.formalPage .billPackageList>div>div:last-child:not(:nth-child(2)) {grid-column:2;display:flex;flex-wrap:wrap;gap:8px;min-width:0}
+.formalPage .billPackageList a {overflow-wrap:anywhere;line-height:1.5}
+.formalPage .billPackageList input {width:100%;min-width:0}
+.formalPage .formalCreate {grid-template-columns:minmax(220px,.7fr) minmax(0,1.3fr)}
+.formalPage .formalCreateFooter {flex-wrap:wrap;gap:14px}
+.formalResultCount {color:#7889a1;font-size:12px}
+.formalPage .formalLinkedVotes {display:grid;gap:10px;margin-bottom:16px}
+.formalPage .formalLinkedVotes>button {display:grid;gap:7px;min-width:0;min-height:44px;padding:12px;border:1px solid #d4e0f1;border-radius:9px;background:#f6f9ff;text-align:left;white-space:normal;line-height:1.5}
+.formalLinkedVotes b {font-size:12px;color:#35537d}
+.formalLinkedVotes span {font-size:11px;color:#6f819c}
+.proceduralVoteCard.isFocused {outline:3px solid #94b3e8;outline-offset:3px;scroll-margin-top:90px}
+.profileOffices .officeRoleExplanation {margin:0;font-size:13px;line-height:1.7;color:#677b96}
+.profileOffices .officeStudentPicker,.profileOffices .officeCurrentRole {display:grid;gap:8px;margin-top:16px;min-width:0}
+.profileOffices :is(select,input,textarea) {min-width:0;width:100%;box-sizing:border-box;min-height:44px;border:1px solid #cfdced;border-radius:9px;padding:10px 12px;background:#fff;font:inherit;color:#324a6d}
+.profileOffices .officeCurrentRole {padding:14px;background:#f1f6ff;border:1px solid #d8e5fa;border-radius:10px}
+.profileOffices .officeCards {display:grid;gap:10px;margin-top:14px}
+.profileOffices .officeCards>article {display:flex;flex-wrap:wrap;align-items:center;gap:12px;min-width:0;padding:12px}
+.profileOffices .officeCards>article>div:not(.officeActions) {flex:1 1 180px;min-width:0}
+.profileOffices .officeCards h3 {margin:0;font-size:14px;line-height:1.45}
+.profileOffices .officeCards p {margin:4px 0;font-size:12px}
+.profileOffices .officeAssignmentForm {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:16px;margin-top:14px}
+.profileOffices .officeAssignmentForm>label {display:grid;gap:8px;min-width:0}
+.profileOffices .officeAssignmentForm>button {min-height:44px;align-self:end;padding:10px 16px}
+.profileOffices .officeAssignmentForm>small {grid-column:1/-1;font-size:12px;line-height:1.6}
+.profileOffices .officeActions {display:flex;flex-wrap:wrap;gap:8px}
+.profileOffices .officeActions>button {min-height:40px;padding:8px 10px;white-space:normal}
+@container (max-width:760px) {
+ .eventBankWorkspace {grid-template-columns:minmax(0,1fr)}
+ .eventBankTiles {max-height:440px}
+ .eventBankDetail {order:1}
+}
+@media(max-width:1100px) {
+ .formalPage .formalWorkspace {grid-template-columns:minmax(0,1fr)}
+ .formalPage .formalRegistry {max-height:none}
+ .formalPage .formalRegistryList {grid-template-columns:repeat(2,minmax(0,1fr));max-height:330px}
+ .formalPage .formalFilters {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:900px) {
+ .mobileDockV2 :is(.mobileDockItem,.mobileDockPinnedItem,.mobileDockFixed>button,.mobileDockScroll>.mobileDockChat) {grid-template-rows:24px 22px;row-gap:3px;height:56px;min-height:56px;max-height:56px;min-width:60px;cursor:pointer}
+ .mobileDockV2 .mobileDockIcon,.mobileDockV2 .mobileDockScroll>.mobileDockChat .mobileDockIcon {width:24px;height:24px;min-height:24px}
+ .mobileDockV2 .mobileDockIcon>svg,.mobileDockV2 .mobileDockFixed>button>svg,.mobileDockV2 .mobileDockScroll>.mobileDockChat .mobileDockIcon svg {width:22px;height:22px;stroke-width:1.9}
+ .mobileDock.mobileDockV2 {min-height:72px;height:auto}
+ .metricDirectorStudio .metricDirectorGrid {grid-template-columns:repeat(2,minmax(0,1fr))}
+ .metricDirectorStudio .metricDirectorGrid>.styledSelect {grid-column:1/-1}
+}
+@media(max-width:550px) {
+ .eventBankWorkspace {grid-template-columns:minmax(0,1fr)}
+ .eventBankTiles {gap:10px;grid-template-columns:repeat(2,minmax(0,1fr));max-height:450px;padding-right:4px}
+ .eventTileArtwork {height:110px;padding:5px}
+ .eventTileArtwork .eventPanelIllustration>svg {height:98px!important}
+ .eventTileText {padding:11px;gap:8px}
+ .eventTileText>b {font-size:12px}
+ .eventTileText>small {font-size:10px}
+ .eventTileText>p {display:none}
+ .eventBankDetail {padding:16px}
+ .eventCaseBackdrop {padding:10px}
+ .eventCaseModal {max-height:94dvh;border-radius:14px}
+ .eventModalHeader {padding:14px;gap:10px}
+ .eventModalHeader h3 {font-size:19px}
+ .eventModalBody {padding:12px}
+ .eventCaseModal .eventStoryContent {padding:14px}
+ .eventCaseModal .eventOptionButtons {grid-template-columns:minmax(0,1fr)}
+ .teacherSimple .impactWorkbench .impactHistoryRow>.impactHistoryTop {grid-template-columns:30px minmax(0,1fr)!important;gap:10px}
+ .teacherSimple .impactHistoryTop>.impactHistoryStatus {grid-column:2;justify-self:start}
+ .teacherSimple .impactHistoryRow>.impactHistoryBottom {padding-left:0}
+ .metricDirectorStudio .metricDirectorGrid {gap:10px}
+ .metricDirectorStudio .metricValueControl {padding:0 9px;gap:6px}
+ .metricDirectorStudio .metricValueControl>input {font-size:18px}
+ .formalPage .formalRegistryList {grid-template-columns:minmax(0,1fr)}
+ .formalPage .formalHero,.formalPage .formalCreate {grid-template-columns:minmax(0,1fr)}
+ .formalPage .formalDocGrid,.formalPage .formalDocHeader,.formalPage .formalPaper {padding:16px}
+ .formalPage .formalActions {margin:0 16px;padding:16px}
+ .formalPage .formalActions button {width:100%}
+ .formalPage .formalRecognitionGrid {grid-template-columns:minmax(0,1fr)}
+ .formalPage .formalStep {flex-basis:130px}
+ .formalPage .formalDocHeader h2 {font-size:21px}
+ .profileOffices .officeAssignmentForm {grid-template-columns:minmax(0,1fr)}
+}
+@media(prefers-reduced-motion:reduce) {.eventCaseTile {transition:none}.eventCaseTile:hover {transform:none}}

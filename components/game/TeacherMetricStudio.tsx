@@ -31,12 +31,12 @@ export default function TeacherMetricStudio({g}:{g:ReturnTypeRepublic}){
  }
  if(!teacher||!game)return null;
  return <section className="metricDirectorStudio">
-  <header><div><small>РЕЖИССЁР · РЕЙТИНГИ РЕСПУБЛИКИ</small><h3>Ручная корректировка показателей</h3><p>Выберите показатель, установите значение и укажите основание. При необходимости опубликуйте связанное политическое событие.</p></div><SlidersHorizontal size={22}/></header>
+  <header><div><small>Преподаватель · Показатели республики</small><h3>Ручная корректировка показателей</h3><p>Выберите показатель, установите значение и укажите основание. При необходимости опубликуйте связанное политическое событие.</p></div><SlidersHorizontal size={22}/></header>
   <div className="metricDirectorCards" aria-label="Выбрать показатель для корректировки">{metrics.map(m=><button type="button" key={m.id} className={metric?.id===m.id?'selected':''} aria-pressed={metric?.id===m.id} onClick={()=>{setSelected(m.id);setValue(String(m.value));setNotice('')}}><span>{m.label}</span><strong>{m.value} {m.unit}</strong></button>)}</div>
   <div className="metricDirectorGrid">
    <StyledSelect label="Показатель" value={metric?.id||''} onChange={id=>{setSelected(id);setValue('');setReason('')}} options={metrics.map(m=>({value:m.id,label:m.label}))}/>
-   <div className="metricDirectorValue"><small>Текущее значение</small><strong>{metric?metric.value+' '+(metric.unit||''):'—'}</strong></div>
-   <label>Новое значение<span className="metricValueInput"><input type="number" value={value} onChange={e=>setValue(e.target.value)} min={metric?.min_value??undefined} max={metric?.max_value??undefined} placeholder="Введите число"/><span>{metric?.unit}</span></span></label>
+   <label className="metricValueField">Текущее значение<span className="metricValueControl isCurrent"><input aria-label="Текущее значение" readOnly value={metric?.value??'—'}/><span>{metric?.unit}</span></span></label>
+   <label className="metricValueField">Новое значение<span className="metricValueControl"><input aria-label="Новое значение" type="number" step="any" value={value} onChange={e=>setValue(e.target.value)} min={metric?.min_value??undefined} max={metric?.max_value??undefined} placeholder="Введите число"/><span>{metric?.unit}</span></span></label>
   </div>
   <label className="metricDirectorReason">Обоснование<textarea rows={2} value={reason} onChange={e=>setReason(e.target.value)} placeholder="Что произошло и почему изменился показатель?"/></label>
   <label className="metricDirectorCheck"><input type="checkbox" checked={broadcast} onChange={e=>setBroadcast(e.target.checked)}/><Newspaper size={17}/> Опубликовать политическое событие одновременно с корректировкой</label>

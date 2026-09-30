@@ -2,7 +2,7 @@
 import {IconAction} from './ui/IconAction';
 import ChatToggleButton from './game/ChatToggleButton';
 import {useEffect,useRef,useState} from 'react';
-import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote as VoteIcon,Wifi} from 'lucide-react';
+import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote as VoteIcon,Wifi} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
@@ -26,7 +26,7 @@ import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
 
 const GENERIC_STUDENT='__generic_student_preview__';
-type ScreenLocation={view:View;stageNo:number;documentId:string};
+type ScreenLocation={view:View;stageNo:number;documentId:string;voteId?:string};
 function adjacentScreen(entries:ScreenLocation[],index:number,direction:-1|1,skipTeacher:boolean){
  for(let next=index+direction;next>=0&&next<entries.length;next+=direction){
   if(!skipTeacher||entries[next].view!=='teacher')return next;
@@ -236,17 +236,17 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(window.matchMedia('(max-width:1099px)').matches)g.setChatOpen(false);
   requestAnimationFrame(()=>document.getElementById('game-main')?.focus());
  }
- function navigate(next:View,target?:{stageNo?:number;documentId?:string},profileVerified=false){
+ function navigate(next:View,target?:{stageNo?:number;documentId?:string;voteId?:string},profileVerified=false){
   const owner=g.me;
   const p=g.profiles.find(row=>row.user_id===owner?.user_id);
   if(!profileVerified&&owner&&owner.kind!=='observer'&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'){
    setOnboardingNotice('Сначала завершите оформление личного профиля.');
    next='profile';
   }
-  const destination:ScreenLocation={view:next,stageNo:target?.stageNo??0,documentId:target?.documentId??''};
+  const destination:ScreenLocation={view:next,stageNo:target?.stageNo??0,documentId:target?.documentId??'',voteId:target?.voteId??''};
   setScreenHistory(previous=>{
    const current=previous.entries[previous.index];
-   if(current.view===destination.view&&current.stageNo===destination.stageNo&&current.documentId===destination.documentId)return previous;
+   if(current.view===destination.view&&current.stageNo===destination.stageNo&&current.documentId===destination.documentId&&current.voteId===destination.voteId)return previous;
    const entries=[...previous.entries.slice(0,previous.index+1),destination];
    return {entries,index:entries.length-1};
   });
@@ -348,6 +348,13 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const dockShortLabels:Record<View,string>={dashboard:'Обзор',stages:'Этапы',actions:'Процессы',parties:'Партии',votes:'Голоса',documents:'НПА',grades:'Оценки',events:'События',teacher:'Пульт',profile:'Профиль'};
  const dockItems=[...mobilePrimary,...mobileSecondary.map(([k])=>k)].map(key=>({key,label:nav.find(([k])=>k===key)![1],shortLabel:dockShortLabels[key],icon:key==='events'&&pendingEvents>0?<span className="eventDockIcon">{navIcon(key)}<i className="eventDockBadge">{pendingEvents}</i></span>:navIcon(key)}));
 
+ function sidebarKeys(){return [...sidebarOrder,...nav.map(x=>x[0]).filter(x=>!sidebarOrder.includes(x))].filter(x=>nav.some(n=>n[0]===x))}
+ function reorderSidebar(from:string,to:string){
+  const order=sidebarKeys(),fromIndex=order.indexOf(from),toIndex=order.indexOf(to);
+  if(fromIndex<0||toIndex<0||from===to)return;
+  order.splice(fromIndex,1);order.splice(toIndex,0,from);setSidebarOrder(order);
+  try{window.localStorage.setItem('gos-sims-sidebar:'+gameId,JSON.stringify(order))}catch{}
+ }
  return <div className={'simShell '+(previewMode?'studentPreviewShell':'')+(observer?' observerShell':'')}>
   <a className="skipLink" href="#game-main">Перейти к содержимому</a>
   <aside className="simSidebar">
@@ -364,7 +371,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
    <nav className="focusNav" aria-label="Разделы игры">
     <div className="focusNavInner">
-     {[...nav].sort((a,b)=>{const rank=(key:string)=>sidebarOrder.includes(key)?sidebarOrder.indexOf(key):sidebarOrder.length+nav.findIndex(x=>x[0]===key);return rank(a[0])-rank(b[0])}).map(([k,label])=><button key={k} draggable onDragStart={e=>{sidebarDrag.current=k;e.dataTransfer.setData('text/plain',k)}} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();const from=sidebarDrag.current;if(!from||from===k)return;const order=[...sidebarOrder,...nav.map(x=>x[0]).filter(x=>!sidebarOrder.includes(x))].filter(x=>nav.some(n=>n[0]===x));order.splice(order.indexOf(from),1);order.splice(order.indexOf(k),0,from);setSidebarOrder(order);try{window.localStorage.setItem('gos-sims-sidebar:'+gameId,JSON.stringify(order))}catch{}}} className={view===k?'active':''} onClick={()=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{label}</span>{k==='events'&&pendingEvents>0&&<i className="navBadge">{pendingEvents}</i>}{k==='votes'&&g.votes.some(v=>v.status==='open')&&<i className="navBadge">{g.votes.filter(v=>v.status==='open').length}</i>}</button>)}
+     {[...nav].sort((a,b)=>{const rank=(key:string)=>sidebarOrder.includes(key)?sidebarOrder.indexOf(key):sidebarOrder.length+nav.findIndex(x=>x[0]===key);return rank(a[0])-rank(b[0])}).map(([k,label])=><button key={k} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();const from=sidebarDrag.current;if(from)reorderSidebar(from,k);sidebarDrag.current=''}} className={view===k?'active':''} onClick={()=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} aria-current={view===k?'page':undefined}>
+      <span className="sidebarDragHandle" draggable tabIndex={0} role="button" aria-label={'Переместить раздел «'+label+'». Стрелки вверх и вниз меняют порядок.'} title="Перетащите для изменения порядка" onClick={e=>e.stopPropagation()} onDragStart={e=>{sidebarDrag.current=k;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',k)}} onDragEnd={()=>{sidebarDrag.current=''}} onKeyDown={e=>{if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;e.preventDefault();e.stopPropagation();const order=sidebarKeys(),i=order.indexOf(k),to=i+(e.key==='ArrowUp'?-1:1);if(to>=0&&to<order.length)reorderSidebar(k,order[to])}}><GripVertical size={15} aria-hidden="true"/></span>
+      {navIcon(k)}<span className="sidebarRouteLabel">{label}</span>{k==='events'&&pendingEvents>0&&<i className="navBadge">{pendingEvents}</i>}{k==='votes'&&g.votes.some(v=>v.status==='open')&&<i className="navBadge">{g.votes.filter(v=>v.status==='open').length}</i>}</button>)}
     </div>
    </nav>
 
@@ -426,8 +435,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {view==='dashboard'&&<DashboardView g={vg} onNavigate={v=>navigate(v,v==='stages'?{stageNo:currentStage?.stage_no||game.current_round}:undefined)}/>}
      {view==='stages'&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onOpenVotes={()=>navigate('votes')}/>}
      {view==='parties'&&<PartiesView g={vg}/>}
-     {view==='votes'&&<VotesView g={vg} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
-     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} onOpenVotes={()=>navigate('votes')}/>}
+     {view==='votes'&&<VotesView g={vg} focusId={currentScreen.voteId} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
+     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
      {view==='grades'&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
      {view==='actions'&&<PoliticalWallView g={vg} readOnly={previewMode||observer} focusPending={true} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
      {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}}/>}

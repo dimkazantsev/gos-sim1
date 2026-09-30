@@ -10,8 +10,9 @@ export default function EventComic({title,category,caseKey,compact=false,silent=
  const frame=eventSceneFrame(caseKey,scene?.scene_id);
  if(frame){
   return <div className="eventComicPlayer"><figure className={'eventComic eventPanelIllustration '+(compact?'isCompact':'')} role="img" aria-label={scene?.alt||'Иллюстрация к ситуации «'+title+'»'}>
-   <svg viewBox={[frame.x,frame.y,frame.width,frame.height].join(' ')} preserveAspectRatio="xMidYMid meet" data-scene={frame.number} aria-hidden="true">
-    <image href={'/event-comics/atlas-'+frame.atlas+'.webp'} width={frame.atlas==='main'?1536:2172} height={frame.atlas==='main'?1024:724}/>
+   <svg viewBox={'0 0 '+frame.width+' '+frame.height} preserveAspectRatio="xMidYMid meet" data-scene={frame.number} aria-hidden="true" style={{overflow:'hidden'}}>
+    <defs><clipPath id={'caseScene'+frame.number+'_'+id}><rect width={frame.width} height={frame.height}/></clipPath></defs>
+    <g clipPath={'url(#caseScene'+frame.number+'_'+id+')'}><image x={-frame.x} y={-frame.y} href={'/event-comics/atlas-'+frame.atlas+'.webp'} width={frame.atlas==='main'?1536:2172} height={frame.atlas==='main'?1024:724}/></g>
    </svg><figcaption className="eventAtlasLabel">{category}</figcaption></figure>{!silent&&<ComicSoundButton/>}</div>;
  }
 

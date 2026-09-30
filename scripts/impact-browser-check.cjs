@@ -45,7 +45,12 @@ async function main(){
     assert(test.scroll<=test.viewport+3,variant+' overflows document at '+width+'px: '+JSON.stringify(test));
     assert(!test.offending.length,variant+' children escape at '+width+'px: '+JSON.stringify(test.offending));
     if(variant==='impact-expanded')assert(test.visibleInputs>=12,'Expanded rule editor lost inputs at '+width+'px');
-    if(variant==='impact-ledger')assert.equal(test.history,2,'History must contain applied and reverted records');
+    if(variant==='impact-ledger'){
+     assert.equal(test.history,2,'History must contain applied and reverted records');
+     const identities=await page.frameLocator('#preview').locator('.impactHistoryIdentity').evaluateAll(els=>els.map(el=>({width:el.getBoundingClientRect().width,date:el.querySelector('time').getBoundingClientRect().toJSON(),row:el.closest('.impactHistoryTop').getBoundingClientRect().toJSON()})));
+     assert(identities.every(x=>x.width>=140),'Ledger text has readable width at '+width+': '+JSON.stringify(identities));
+     assert(identities.every(x=>x.date.height<25),'Dates must not break into vertical letters');
+    }
     await page.locator('#preview').screenshot({path:path.join(screenshots,variant+'-'+width+'.png')});
     console.log('PASS '+variant+' '+width+'px');
    }

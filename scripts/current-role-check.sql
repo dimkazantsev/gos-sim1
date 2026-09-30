@@ -1,0 +1,34 @@
+-- Current role, teacher assignment and immutable event history; all fixtures roll back.
+begin;
+update public.game_members set kind='student',role_title='Депутат Государственной Думы' where game_id='541b6fde-16d5-4225-8f67-1fc2c7c15523' and user_id='89de1d45-8973-4f38-980d-26042af9e53e';
+update public.game_members set kind='student',role_title='Редактор СМИ' where game_id='541b6fde-16d5-4225-8f67-1fc2c7c15523' and user_id='a4795eef-fbf3-4584-bc0b-f7bfee68b783';
+select set_config('request.jwt.claim.sub','9fdf732c-1a84-4435-979d-e0272c2b81db',true);
+set local role authenticated;
+do $$ declare g uuid:='541b6fde-16d5-4225-8f67-1fc2c7c15523';u uuid:='89de1d45-8973-4f38-980d-26042af9e53e';minister uuid;foreign_role uuid;c uuid;a uuid;blocked boolean:=false;begin
+ minister:=public.appoint_game_office(g,u,'Министр здравоохранения','Учебная ротация преподавателя для малой группы',true);
+ if (select role_title from public.game_members where game_id=g and user_id=u)<>'Депутат Государственной Думы' then raise exception 'FAIL appointment changed the current role';end if;
+ if (select count(*) from public.game_office_assignments where game_id=g and user_id=u and status='active')<>2 then raise exception 'FAIL portfolio not preserved';end if;
+ foreign_role:=public.appoint_game_office(g,'a4795eef-fbf3-4584-bc0b-f7bfee68b783','Министр культуры','Учебная проверка назначения другому студенту',true);
+ c:=public.create_assigned_event(g,'Проверка текущей роли','Временный кейс для проверки роли, сохранённой на момент принятия решения.','Здравоохранение','serious','single','[{"label":"Проверить качество лекарств","trust":2,"description":"Безопасная партия направлена пациентам"},{"label":"Выдать непроверенные лекарства","trust":-2,"description":"Создан риск безопасности пациентов"}]',array[u],array['министр здравоохранения']);
+ perform set_config('request.jwt.claim.sub',u::text,true);
+ perform public.select_game_office(minister);
+ if (select role_title from public.game_members where game_id=g and user_id=u)<>'Министр здравоохранения' then raise exception 'FAIL student cannot switch current role';end if;
+ begin perform public.select_game_office(foreign_role);exception when others then blocked:=true;end;
+ if not blocked then raise exception 'FAIL another student role selectable';end if;
+ select id into a from public.event_assignments where case_id=c and recipient_id=u;
+ perform public.submit_event_decision(a,'option_1',null);
+ perform public.select_game_office((select id from public.game_office_assignments where game_id=g and user_id=u and status='active' and role_title='Депутат Государственной Думы'));
+ if (select role_snapshot from public.event_decisions where case_id=c and actor_id=u)<>'Министр здравоохранения' then raise exception 'FAIL role snapshot changed with current role';end if;
+ blocked:=false;
+ begin perform public.appoint_game_office(g,u,'Президент Российской Федерации','Несанкционированное назначение студентом',true);exception when others then blocked:=true;end;
+ if not blocked then raise exception 'FAIL self appointment permitted';end if;
+ perform set_config('request.jwt.claim.sub','9fdf732c-1a84-4435-979d-e0272c2b81db',true);
+ perform public.review_game_office(minister,false);
+ blocked:=false;
+ perform set_config('request.jwt.claim.sub',u::text,true);
+ begin perform public.select_game_office(minister);exception when others then blocked:=true;end;
+ if not blocked then raise exception 'FAIL revoked role selectable';end if;
+end;$$;
+reset role;
+select jsonb_build_object('teacher_assignment','PASS','one_current_role','PASS','student_switch','PASS','foreign_role_guard','PASS','immutable_event_snapshot','PASS','revocation_guard','PASS') as checks;
+rollback;
