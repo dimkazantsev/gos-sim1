@@ -21,7 +21,7 @@ for(const [name,source] of Object.entries(css)){
  const unknown=[];root.walkDecls(d=>{for(const match of d.value.matchAll(/var\((--gs-[\w-]+)/g))if(!(match[1] in tokens))unknown.push(match[1])});
  check(`${name}: all design tokens resolve`,unknown.length===0);
 }
-for(const name of ['globals','landing','sim-shell','sim-panels','public-screen','stage-map','teacher-command','teacher-operations','teacher-ui-polish','teacher-extended','teacher-master-detail','teacher-final-interactions']){const root=postcss.parse(read(`app/${name}.css`),{from:`app/${name}.css`});check(`${name}: inherited CSS parsed`,root.nodes.length>0);}
+for(const name of ['globals','landing','sim-shell','sim-panels','public-screen','stage-map','teacher-command','teacher-operations','teacher-ui-polish','teacher-extended','teacher-master-detail','teacher-final-interactions','2026-interface-repair']){const root=postcss.parse(read(`app/${name}.css`),{from:`app/${name}.css`});check(`${name}: inherited CSS parsed`,root.nodes.length>0);}
 const teacherSource=read('components/game/TeacherView.tsx');
 const stageManager=read('components/game/TeacherStageManager.tsx');
 const teacherCss=read('app/teacher-command.css');
@@ -32,9 +32,10 @@ const gradesSource=read('components/game/GradesView.tsx');
 const profileSource=read('components/game/ProfileView.tsx');
 const layoutSource=read('app/layout.tsx');
 const previewSourceTeacher=read('scripts/design-preview.cjs');
+const previewUsesLayout=previewSourceTeacher.includes("readFileSync(path.join(root,'app/layout.tsx')")&&previewSourceTeacher.includes('matchAll(/import');
 check('Operations stylesheet loaded after teacher command styles in production and preview',
  layoutSource.indexOf("import './teacher-operations.css';")>layoutSource.indexOf("import './teacher-command.css';")&&
- previewSourceTeacher.includes("'teacher-master-detail','teacher-final-interactions'"));
+ layoutSource.indexOf("import './teacher-final-interactions.css';")>layoutSource.indexOf("import './teacher-master-detail.css';")&&previewUsesLayout);
 check('Nine upper navigation workspaces include Event, stages, journal, analytics and grades',
  teacherSource.includes('const WORKSPACES=[')&&
  ["overview","stages","journal","analytics","grades","impact","parties","tools","event"].every(k=>teacherSource.includes("key:'"+k+"'"))&&
@@ -83,7 +84,7 @@ const stagesView=read('components/game/StagesView.tsx');
 const stageSheet=read('app/stage-map.css');
 const previewSource=read('scripts/design-preview.cjs');
 check('Last-loaded stage stylesheet is included in offline browser preview',
- previewSource.includes("'mobile-nav-polish','stage-map'")&&
+ previewUsesLayout&&layoutSource.indexOf("import './stage-map.css';")>layoutSource.indexOf("import './mobile-nav-polish.css';")&&
  read('app/layout.tsx').includes("import './stage-map.css'"));
 check('Atlas has search, status filters and selectable game phases',
  stagesView.includes('className="stageAtlasSearch"')&&
@@ -218,7 +219,7 @@ check('Series selection supports keyboard and stable colors',
  dock.includes('comparisonOptions.findIndex(option=>option.id===metric.id)'));
 check('Offline design preview includes an opened metric chart and current CSS',
  read('scripts/design-preview.cjs').includes("['metric-modal','График показателя'")&&
- read('scripts/design-preview.cjs').includes("'design-readability'"));
+ previewUsesLayout&&layoutSource.includes("import './design-readability.css';"));
 check('Dashboard renders all permitted metrics without a collapsed section',
  dock.includes('visibleMetrics.map(card)')&&!dock.includes('setMore('));
 check('Dashboard compact grid has six columns and responsive container breakpoints',
