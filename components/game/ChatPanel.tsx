@@ -5,6 +5,7 @@ import {ArrowDown,Download,FileText,Mic,Paperclip,Pin,PinOff,Plus,Search,Send,Sq
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
+import DirectMessagePicker from './DirectMessagePicker';
 import ChatVoicePlayer from './ChatVoicePlayer';
 import ChatVideoNote from './ChatVideoNote';
 import {useDialog} from '../ui/useDialog';
@@ -231,6 +232,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   <header className="chatTop">
    <div className="chatHeadIcon" aria-hidden="true"><MessageIcon/></div>
    <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} initialOpen={previewChannelOpen}/>
+   {!readOnly&&<DirectMessagePicker g={g}/>}
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
    <IconAction onClick={()=>setChatOpen(false)} label="Закрыть чат"/>
   </header>

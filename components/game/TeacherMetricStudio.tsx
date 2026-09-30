@@ -36,7 +36,7 @@ export default function TeacherMetricStudio({g}:{g:ReturnTypeRepublic}){
   <div className="metricDirectorGrid">
    <StyledSelect label="Показатель" value={metric?.id||''} onChange={id=>{setSelected(id);setValue('');setReason('')}} options={metrics.map(m=>({value:m.id,label:m.label}))}/>
    <div className="metricDirectorValue"><small>Текущее значение</small><strong>{metric?metric.value+' '+(metric.unit||''):'—'}</strong></div>
-   <label>Новое значение<input type="number" value={value} onChange={e=>setValue(e.target.value)} min={metric?.min_value??undefined} max={metric?.max_value??undefined} placeholder="Введите число"/></label>
+   <label>Новое значение<span className="metricValueInput"><input type="number" value={value} onChange={e=>setValue(e.target.value)} min={metric?.min_value??undefined} max={metric?.max_value??undefined} placeholder="Введите число"/><span>{metric?.unit}</span></span></label>
   </div>
   <label className="metricDirectorReason">Обоснование<textarea rows={2} value={reason} onChange={e=>setReason(e.target.value)} placeholder="Что произошло и почему изменился показатель?"/></label>
   <label className="metricDirectorCheck"><input type="checkbox" checked={broadcast} onChange={e=>setBroadcast(e.target.checked)}/><Newspaper size={17}/> Опубликовать политическое событие одновременно с корректировкой</label>

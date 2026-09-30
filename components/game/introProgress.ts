@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 
-const PREFIX='gos-sims:intro-seen:v1:';
+const PREFIX='gos-sims:intro-seen:v2:';
 function readSeen(scope:string){
  try{return window.localStorage.getItem(PREFIX+scope)==='1'}catch{return false}
 }
@@ -13,7 +13,7 @@ function rememberSeen(scope:string){
 export function useIntroProgress({gameId,userId,ready,observer,serverSeen,persist}:{
  gameId:string;userId:string;ready:boolean;observer:boolean;serverSeen:boolean;persist:()=>Promise<void>;
 }){
- const scope=gameId&&userId?gameId+':'+userId:'';
+ const scope=gameId&&userId?userId:'';
  const [open,setOpen]=useState(false),[seenScope,setSeenScope]=useState(''),[syncError,setSyncError]=useState('');
  const started=useRef(''),persistRef=useRef(persist);
  persistRef.current=persist;
@@ -22,10 +22,10 @@ export function useIntroProgress({gameId,userId,ready,observer,serverSeen,persis
  useEffect(()=>{
   if(!scope||observer){setOpen(false);return}
   if(!ready)return;
-  if(serverSeen||readSeen(scope)){
-   rememberSeen(scope);setSeenScope(scope);setOpen(false);return;
+  if(serverSeen||readSeen(scope)||(()=>{try{return window.localStorage.getItem('gos-sims:intro-seen:v1:'+gameId+':'+userId)==='1'}catch{return false}})()){
+   rememberSeen(scope);setSeenScope(scope);if(started.current!==scope)setOpen(false);return;
   }
-  if(started.current!==scope){started.current=scope;setOpen(true)}
+  if(started.current!==scope){started.current=scope;rememberSeen(scope);setSeenScope(scope);setOpen(true)}
  },[scope,ready,observer,serverSeen]);
 
  useEffect(()=>{

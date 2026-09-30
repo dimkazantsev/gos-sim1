@@ -18,6 +18,7 @@ export function useRepublicGame(gameId:string){
  const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profiles,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[partyInvitations,setPartyInvitations]=useState<PartyInvitation[]>([]),[partyMandates,setPartyMandateRows]=useState<PartyMandateAllocation[]>([]),[partyAgreements,setPartyAgreements]=useState<PartyAgreement[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]),[politicalPosts,setPoliticalPosts]=useState<PoliticalPost[]>([]),[politicalMedia,setPoliticalMedia]=useState<PoliticalPostMedia[]>([]),[postFormalLinks,setPostFormalLinks]=useState<PoliticalPostFormalLink[]>([]),[politicalDecisions,setPoliticalDecisions]=useState<PoliticalDecision[]>([]),[metricHistory,setMetricHistory]=useState<MetricHistory[]>([]),[partySupportHistory,setPartySupportHistory]=useState<PartySupportHistory[]>([]),[impactRules,setImpactRules]=useState<ImpactRule[]>([]),[impactLedger,setImpactLedger]=useState<ImpactLedger[]>([]);
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[chatOpen,setChatOpen]=useState(false),[secondsLeft,setSecondsLeft]=useState(0);
  const [profileGameId,setProfileGameId]=useState('');
+ const [introAccountSeen,setIntroAccountSeen]=useState(false);
  const [chatMediaError,setChatMediaError]=useState(''),[chatMediaPhase,setChatMediaPhase]=useState<MediaUploadPhase>('idle');
  const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]);
@@ -138,7 +139,9 @@ export function useRepublicGame(gameId:string){
    const old=previous.find(p=>p.user_id===row.user_id);
    return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url:null,signature_url:old?.signature_path===row.signature_path?old?.signature_url:null};
   }));
-  setProfileGameId(gameId);
+  const intro=await supabase.rpc('has_seen_my_intro');
+  if(intro.error){setError('Не удалось проверить первый вход. '+intro.error.message);setLoading(false);return}
+  setIntroAccountSeen(!!intro.data);setProfileGameId(gameId);
   const rawPartyDocs=(pd.data||[]) as PartyDocument[];
   const profileRows=await Promise.all(rawProfiles.map(async x=>({...x,avatar_url:x.avatar_path?(await supabase.storage.from('game-assets').createSignedUrl(x.avatar_path,3600)).data?.signedUrl||null:null,signature_url:x.signature_path?(await supabase.storage.from('game-assets').createSignedUrl(x.signature_path,3600)).data?.signedUrl||null:null})));
   const partyRows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
@@ -353,7 +356,7 @@ export function useRepublicGame(gameId:string){
   if(teacher||role.includes('министр'))x.push({key:'ministry',label:me.role_title||'Федеральный орган исполнительной власти'});
   if(teacher||role.includes('муницип')||role.includes('глава города'))x.push({key:'municipality',label:'Орган местного самоуправления'});
   if(teacher||role.includes('сми')||role.includes('журналист'))x.push({key:'media',label:'Средства массовой информации'});
-  if(teacher)x.push({key:'teacher',label:'Руководитель симуляции'});
+  if(teacher)x.push({key:'teacher',label:'Преподаватель'});
   return x;
  }
  async function createPoliticalPost(data:{processType:string;actorKey:string;actorLabel:string;title:string;body:string;tags:string[];externalUrl?:string;internalView?:string;internalRefId?:string;formalIds?:string[]},files:File[]=[]){
@@ -880,6 +883,6 @@ export function useRepublicGame(gameId:string){
   finally{mediaOperationRef.current=false;setRecordingSaving(false)}
  }
 
- return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
+ return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
   refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }

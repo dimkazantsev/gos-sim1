@@ -186,6 +186,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const viewAsRef=useRef<HTMLDivElement>(null);
  const [mobileMenuOpen,setMobileMenuOpen]=useState(initialMobileMenuOpen);
  const [mobileDockEditing,setMobileDockEditing]=useState(false);
+ const [sidebarOrder,setSidebarOrder]=useState<string[]>([]);
+ const sidebarDrag=useRef('');
+ useEffect(()=>{try{setSidebarOrder(JSON.parse(window.localStorage.getItem('gos-sims-sidebar:'+gameId)||'[]'))}catch{setSidebarOrder([])}},[gameId]);
  const [crisisExpanded,setCrisisExpanded]=useState(false);
  const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
@@ -266,7 +269,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const myProfile=g.profiles.find(p=>p.user_id===me?.user_id);
  const {open:introOpen,seen:introSeen,finish:closeIntro,syncError:introSyncError}=useIntroProgress({
   gameId:game?.id||'',userId:me?.user_id||'',ready:!loading&&g.profilesLoaded&&game?.id===gameId,
-  observer:!!observer,serverSeen:!!(myProfile?.intro_seen_at||myProfile?.onboarding_completed_at),
+  observer:!!observer,serverSeen:!!(g.introAccountSeen||myProfile?.intro_seen_at||myProfile?.onboarding_completed_at),
   persist:async()=>{
    if(!game)throw new Error('Игра ещё загружается');
    const r=await supabase.rpc('mark_my_intro_seen',{p_game:game.id});
@@ -362,7 +365,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
    <nav className="focusNav" aria-label="Разделы игры">
     <div className="focusNavInner">
-     {nav.map(([k,label])=><button key={k} className={view===k?'active':''} onClick={()=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{label}</span>{k==='events'&&pendingEvents>0&&<i className="navBadge">{pendingEvents}</i>}{k==='votes'&&g.votes.some(v=>v.status==='open')&&<i className="navBadge">{g.votes.filter(v=>v.status==='open').length}</i>}</button>)}
+     {[...nav].sort((a,b)=>{const rank=(key:string)=>sidebarOrder.includes(key)?sidebarOrder.indexOf(key):sidebarOrder.length+nav.findIndex(x=>x[0]===key);return rank(a[0])-rank(b[0])}).map(([k,label])=><button key={k} draggable onDragStart={e=>{sidebarDrag.current=k;e.dataTransfer.setData('text/plain',k)}} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();const from=sidebarDrag.current;if(!from||from===k)return;const order=[...sidebarOrder,...nav.map(x=>x[0]).filter(x=>!sidebarOrder.includes(x))].filter(x=>nav.some(n=>n[0]===x));order.splice(order.indexOf(from),1);order.splice(order.indexOf(k),0,from);setSidebarOrder(order);try{window.localStorage.setItem('gos-sims-sidebar:'+gameId,JSON.stringify(order))}catch{}}} className={view===k?'active':''} onClick={()=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} aria-current={view===k?'page':undefined}>{navIcon(k)}<span>{label}</span>{k==='events'&&pendingEvents>0&&<i className="navBadge">{pendingEvents}</i>}{k==='votes'&&g.votes.some(v=>v.status==='open')&&<i className="navBadge">{g.votes.filter(v=>v.status==='open').length}</i>}</button>)}
     </div>
    </nav>
 

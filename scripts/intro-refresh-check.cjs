@@ -63,7 +63,8 @@ async function main(){
  await check('Finished intro survives offline refresh and stays scoped to user and game',async()=>{
   const storage=new Map();const g=gameState();let calls=0;const offline=harness(g,storage,async()=>{calls++;return{error:{message:'Network unavailable'}}});await offline.flush();assert.equal(offline.comic().props.open,true);await offline.comic().props.onClose();await offline.flush();assert.equal(offline.comic().props.open,false);assert.ok(calls>0);offline.dispose();
   const second=harness(gameState(),storage,async()=>({error:{message:'Network unavailable'}}));await second.flush();assert.equal(second.comic().props.open,false);second.dispose();
-  for(const other of [gameState('other-user'),gameState('user-a','other-game')]){const fresh=harness(other,storage);await fresh.flush();assert.equal(fresh.comic().props.open,true);fresh.dispose();}
+  const otherGame=harness(gameState('user-a','other-game'),storage);await otherGame.flush();assert.equal(otherGame.comic().props.open,false);otherGame.dispose();
+  for(const other of [gameState('other-user')]){const fresh=harness(other,storage);await fresh.flush();assert.equal(fresh.comic().props.open,true);fresh.dispose();}
  });
  await check('Guest never receives the automatic intro',async()=>{const g=gameState();g.me.kind='observer';const h=harness(g);await h.flush();assert.equal(h.comic().props.open,false);h.dispose();});
  if(failures.length)process.exitCode=1;
