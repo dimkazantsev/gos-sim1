@@ -24,13 +24,13 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
  const students=members.filter(m=>m.kind==='student');
  const visible=useMemo(()=>bank.filter(c=>[c.title,c.category,c.situation].join(' ').toLowerCase().includes(search.toLowerCase())),[bank,search]);
  const selected=bank.find(c=>c.id===chosen);
- const eligible=selected?.audience==='all'?students:students.filter(m=>!selected?.allowed_roles?.length||selected.allowed_roles.some(role=>(m.role_title||'').toLowerCase().includes(role.toLowerCase())));
+ const eligible=students;
  const effectiveInterval=settings.activity_weight===0?settings.interval_hours:Math.max(4,settings.interval_hours/(1+settings.activity_weight*2));
  async function load(){
   if(!game)return;
   const [a,b,c0,d]=await Promise.all([
    supabase.from('event_auto_settings').select('*').eq('game_id',game.id).maybeSingle(),
-   supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,audience,status,source_note').eq('game_id',game.id).like('case_key','bank-%').eq('status','ready').order('category').order('title'),
+   supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,audience,status,source_note,comic_scene').eq('game_id',game.id).like('case_key','bank-%').eq('status','ready').order('category').order('title'),
    supabase.from('event_assignments').select('case_id,recipient_id').eq('game_id',game.id),
    supabase.from('event_case_outcomes').select('case_id').eq('game_id',game.id)
   ]);
@@ -89,7 +89,7 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
  }
  if(!teacher||!game)return null;
  return <section className="autoEventPanel" aria-label="Автоматические события и банк ситуаций">
-  <header className="autoEventHeading"><div><small>РЕЖИССЁР · АВТОМАТИЧЕСКИЕ СОБЫТИЯ</small><h3>Автоматический сценарий</h3>
+  <header className="autoEventHeading"><div><small>Автоматические события</small><h3>Автоматический сценарий</h3>
    <p>События подбираются по игровой должности и активности. Решения и изменение доверия записываются в общую базу.</p></div>
    <span className={'autoEventState '+(settings.enabled?'enabled':'paused')}>{settings.enabled?<PlayCircle size={16}/>:<PauseCircle size={16}/>} {settings.enabled?'Работает':'Пауза'}</span>
   </header>
@@ -105,7 +105,7 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
     options={[{value:'0',label:'Отключён'},{value:'0.5',label:'Умеренный'},{value:'1',label:'Стандартный'},{value:'2',label:'Усиленный'}]}/>
    <StyledSelect label="Лимит за 24 часа" value={String(settings.max_daily)} onChange={x=>setSettings(s=>({...s,max_daily:Number(x)}))}
     options={[1,2,3].map(n=>({value:String(n),label:n+' '+(n===1?'событие':'события')}))}/>
-   <StyledSelect label="За 20 Полезных Итогов, П.п." value={String(settings.trust_per_20)} onChange={x=>setSettings(s=>({...s,trust_per_20:Number(x)}))}
+   <StyledSelect label="За 20 полезных итогов, п.п." value={String(settings.trust_per_20)} onChange={x=>setSettings(s=>({...s,trust_per_20:Number(x)}))}
     options={[0,1,2,3,4].map(n=>({value:String(n),label:'+'+n+' п.п.'}))}/>
    <StyledSelect label="За 3 просроченные, п.п." value={String(settings.backlog_penalty)} onChange={x=>setSettings(s=>({...s,backlog_penalty:Number(x)}))}
     options={[0,0.5,1,1.5,2].map(n=>({value:String(n),label:'−'+n+' п.п.'}))}/>
