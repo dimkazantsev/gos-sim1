@@ -1,5 +1,5 @@
 """Acquire primary source data; no fabricated regional observations."""
-import requests,json,math,hashlib,re
+import requests,json,math,hashlib,re,certifi
 from pathlib import Path
 from shapely.geometry import shape
 import fitz
@@ -18,9 +18,21 @@ Path("data").mkdir(exist_ok=True)
 Path("data/region-map.json").write_text(json.dumps({"sources":ledger,"features":features},ensure_ascii=False,separators=(",",":")))
 print("MAP_NAMES",json.dumps([f["name"] for f in features],ensure_ascii=False))
 pages=[]
+ca_bundle=certifi.where()
+try:
+ root=requests.get("https://gu-st.ru/content/Other/doc/russian_trusted_root_ca.cer",timeout=30);root.raise_for_status()
+ cert=bytes(root.content)
+ if b"BEGIN CERTIFICATE" not in cert:
+  from cryptography import x509
+  from cryptography.hazmat.primitives.serialization import Encoding
+  cert=x509.load_der_x509_certificate(cert).public_bytes(Encoding.PEM)
+ Path("/tmp/regional-ca.pem").write_bytes(Path(certifi.where()).read_bytes()+b"\n"+cert)
+ ca_bundle="/tmp/regional-ca.pem"
+ print("SOURCE_CA_SHA256",hashlib.sha256(root.content).hexdigest())
+except Exception as exc:print("SOURCE_CA_UNAVAILABLE",str(exc))
 for url in ["https://rosstat.gov.ru/storage/mediabank/Region_Pokaz_2025.pdf","https://www.rosstat.gov.ru/storage/mediabank/Region_Pokaz_2025.pdf","https://ssl.rosstat.gov.ru/storage/mediabank/Region_Pokaz_2025.pdf"]:
  try:
-  r=requests.get(url,timeout=90);r.raise_for_status();pdf=fitz.open(stream=r.content,filetype="pdf")
+  r=requests.get(url,timeout=90,verify=ca_bundle);r.raise_for_status();pdf=fitz.open(stream=r.content,filetype="pdf")
   ledger.append({"kind":"statistics","url":url,"sha256":hashlib.sha256(r.content).hexdigest(),"publication_year":2025})
   for i in range(min(260,len(pdf))):
    t=pdf[i].get_text()
@@ -29,6 +41,6 @@ for url in ["https://rosstat.gov.ru/storage/mediabank/Region_Pokaz_2025.pdf","ht
   print("ROSSTAT_PAGES",len(pdf),"EXTRACTS",len(pages))
   for p in pages[:5]:print("SOURCE_EXCERPT",p["pdf_page"],p["text"][:700])
   break
- except Exception as exc:print("SOURCE_UNAVAILABLE",url,type(exc).__name__)
+ except Exception as exc:print("SOURCE_UNAVAILABLE",url,str(exc))
 Path("data/regional-source-extract.json").write_text(json.dumps({"sources":ledger,"pages":pages},ensure_ascii=False))
 Path("docs/REGIONAL_DATA_SOURCES.md").write_text("# Источники региональных данных\n\n"+json.dumps(ledger,ensure_ascii=False,indent=2)+"\n\nГраницы — справочный набор 2017 года, не карта фактического контроля. Спорные территории обозначаются отдельно. Статистические наблюдения извлекаются с указанием года и единицы; отсутствующие значения остаются пустыми. Игровые коэффициенты не являются статистикой.\n")
