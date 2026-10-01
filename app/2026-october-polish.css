@@ -1,0 +1,16 @@
+/* Shared geometry for the three metric controls. */
+.metricDirectorStudio .metricDirectorGrid > .styledSelect,
+.metricDirectorStudio .metricDirectorGrid > .metricValueField {
+ display:grid;grid-template-rows:20px 56px;gap:8px;align-content:start;min-width:0;margin:0;
+}
+.metricDirectorStudio .metricDirectorGrid .styledSelectLabel {
+ font-size:13px;line-height:20px;margin:0;font-weight:700;color:#60748f;
+}
+.metricDirectorStudio .metricDirectorGrid .styledSelectTrigger,
+.metricDirectorStudio .metricDirectorGrid .metricValueControl {
+ box-sizing:border-box;height:56px;min-height:56px;margin:0;padding:0 16px;border-radius:10px;
+}
+.metricDirectorStudio .metricDirectorGrid .metricValueControl > input {
+ box-sizing:border-box;height:54px;min-height:0;padding:0;font-size:20px;
+}
+.metricDirectorStudio .metricDirectorGrid > .metricValueField {font-size:13px;line-height:20px}
