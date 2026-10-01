@@ -25,7 +25,7 @@ type BillReadiness={submission_ready:boolean;committee_ready:boolean;issues:stri
 type BudgetPreliminaryReview={document_id:string;documents_compliant:boolean;sent_to_all_committees:boolean;accounts_chamber_reviewed:boolean;committee_conclusion:string;decision:'draft'|'accept'|'return';note:string|null;updated_at:string};
 const billFileLabels:Record<string,string>={explanatory_note:'Пояснительная записка',affected_acts:'Перечень затрагиваемых актов',financial_economic:'Финансово-экономическое обоснование',government_opinion:'Заключение Правительства РФ',collegial_decision:'Решение коллегиального субъекта о внесении',other_review:'Отзыв иного субъекта законодательной инициативы'};
 
-export default function DocumentsView({g,focusId,onOpenVotes,onSelectDocument,readOnly=false,initialDetailTab='text'}:{g:ReturnTypeRepublic;initialDetailTab?:'text'|'procedure';focusId?:string;onOpenVotes:(voteId?:string)=>void;onSelectDocument?:(id?:string)=>void;readOnly?:boolean}){
+export default function DocumentsView({g,focusId,createTemplate,createStageNo,onOpenVotes,onSelectDocument,readOnly=false,initialDetailTab='text'}:{g:ReturnTypeRepublic;initialDetailTab?:'text'|'procedure';focusId?:string;createTemplate?:string;createStageNo?:number;onOpenVotes:(voteId?:string)=>void;onSelectDocument?:(id?:string)=>void;readOnly?:boolean}){
  const {formalDocuments,formalHistory,votes,members,me,teacher,currentStage,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,createVote}=g;
  const [mode,setMode]=useSavedGameState<'registry'|'create'>(g.game?.id,g.me?.user_id,'documents-mode','registry',savedChoice('registry','create')),[selectedId,setSelectedId]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-selected','',savedString),[query,setQuery]=useState(''),[filterSubject,setFilterSubject]=useState(''),[filterStatus,setFilterStatus]=useState(''),[sortOrder,setSortOrder]=useState('updated');
  const [detailOpen,setDetailOpen]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-detail',!!focusId,savedBoolean),[detailTab,setDetailTab]=useSavedGameState<'text'|'procedure'>(g.game?.id,g.me?.user_id,'documents-tab',initialDetailTab,savedChoice('text','procedure'));
@@ -98,6 +98,7 @@ export default function DocumentsView({g,focusId,onOpenVotes,onSelectDocument,re
   });
  },[selected?.id,selected?.updated_at,localRefresh]);
 
+ useEffect(()=>{if(!createTemplate||readOnly)return;const t=DOCUMENT_TEMPLATES.find(x=>x.key===createTemplate);if(!t)return;setTemplateKey(t.key);setTitle(t.title);setBody(t.body);setDocType(t.docType);setSubjectKey(t.subject);setFile(null);setRecognized('Образец для этапа '+(createStageNo||currentStage?.stage_no||1)+'. Проверьте субъект и заполните поля в квадратных скобках.');setDetailOpen(false);setMode('create')},[createTemplate,createStageNo,readOnly]);
  const history=selected?formalHistory.filter(h=>h.document_id===selected.id).slice().reverse():[];
  const author=selected?members.find(m=>m.user_id===selected.author_id):undefined;
  const subject=selected?FORMAL_SUBJECTS.find(s=>s.key===selected.subject_key):undefined;
@@ -130,7 +131,7 @@ export default function DocumentsView({g,focusId,onOpenVotes,onSelectDocument,re
   setFile(next);setExtracting(true);setRecognized('');
   try{
    const fd=new FormData();fd.append('file',next);
-   const res=await fetch('/api/extract-document',{method:'POST',body:fd});const data=await res.json();
+   const res=await fetch((process.env.NEXT_PUBLIC_GAME_API_ORIGIN||'')+'/api/extract-document',{method:'POST',body:fd});const data=await res.json();
    if(!res.ok){setRecognized(data.error||'Не удалось распознать текст. Файл всё равно можно прикрепить.');return}
    const baseTitle=title||next.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');if(!title)setTitle(baseTitle);
    const extracted=typeof data.text==='string'?data.text:'';
@@ -149,7 +150,7 @@ export default function DocumentsView({g,focusId,onOpenVotes,onSelectDocument,re
   const personalSigner=['gd_deputy','sf_member','region','ks','vs'].includes(s.key);
   const holder=personalSigner?me:(members.find(m=>s.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||me);const signatureMeta=formalSignature(s.key,holder?.full_name||me?.full_name||'');
   setBusy(true);
-  const id=await createFormalDocument({stageNo:currentStage?.stage_no||12,title:title.trim(),docType:t.key,subjectKey:s.key,subjectLabel:s.label,bodyText:body,workflowKey:t.workflow,metadata:{institution:s.label,issuer_name:issuer.trim()||s.label,place:place.trim()||'Москва',template_key:templateKey,recognized:recognized||null,created_in_editor:!file}},file||undefined);
+  const id=await createFormalDocument({stageNo:createStageNo||currentStage?.stage_no||12,title:title.trim(),docType:t.key,subjectKey:s.key,subjectLabel:s.label,bodyText:body,workflowKey:t.workflow,metadata:{institution:s.label,issuer_name:issuer.trim()||s.label,place:place.trim()||'Москва',template_key:templateKey,recognized:recognized||null,created_in_editor:!file}},file||undefined);
   setBusy(false);if(id){setSelectedId(id);onSelectDocument?.(id);setDetailOpen(true);setMode('registry');setTitle('');setBody('');setFile(null);setRecognized('')}
  }
 
