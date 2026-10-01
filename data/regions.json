@@ -6,14 +6,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 51080.616,
+      "tax_receipts_federal": 17733.581,
+      "tax_receipts_consolidated": 33347.035,
+      "tax_receipts_local": 7858.946,
+      "usn_receipts": 3693.555
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "02",
@@ -22,14 +22,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 630592.568,
+      "tax_receipts_federal": 274399.173,
+      "tax_receipts_consolidated": 356193.395,
+      "tax_receipts_local": 65390.689,
+      "usn_receipts": 21332.589
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "03",
@@ -38,14 +38,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 69204.415,
+      "tax_receipts_federal": 9700.557,
+      "tax_receipts_consolidated": 59503.858,
+      "tax_receipts_local": 14469.183,
+      "usn_receipts": 4685.121
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "04",
@@ -54,14 +54,14 @@
     "disputed": false,
     "profile": "tourism",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 16722.858,
+      "tax_receipts_federal": 1740.641,
+      "tax_receipts_consolidated": 14982.217,
+      "tax_receipts_local": 5184.784,
+      "usn_receipts": 1504.848
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "05",
@@ -70,14 +70,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 93127.059,
+      "tax_receipts_federal": 26375.973,
+      "tax_receipts_consolidated": 66751.086,
+      "tax_receipts_local": 20219.763,
+      "usn_receipts": 3126.12
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "06",
@@ -86,14 +86,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 10001.108,
+      "tax_receipts_federal": 3000.554,
+      "tax_receipts_consolidated": 7000.554,
+      "tax_receipts_local": 1705.032,
+      "usn_receipts": 474.924
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "07",
@@ -102,14 +102,14 @@
     "disputed": false,
     "profile": "tourism",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 38084.784,
+      "tax_receipts_federal": 10769.334,
+      "tax_receipts_consolidated": 27315.45,
+      "tax_receipts_local": 6290.822,
+      "usn_receipts": 2428.072
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "08",
@@ -118,14 +118,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 47035.723,
+      "tax_receipts_federal": 24841.645,
+      "tax_receipts_consolidated": 22194.078,
+      "tax_receipts_local": 8557.689,
+      "usn_receipts": 8702.863
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "09",
@@ -134,14 +134,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 21113.746,
+      "tax_receipts_federal": 6235.934,
+      "tax_receipts_consolidated": 14877.812,
+      "tax_receipts_local": 4124.063,
+      "usn_receipts": 2061.332
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "10",
@@ -150,14 +150,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 78615.066,
+      "tax_receipts_federal": 29748.33,
+      "tax_receipts_consolidated": 48866.736,
+      "tax_receipts_local": 10601.107,
+      "usn_receipts": 4298.003
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "11",
@@ -166,14 +166,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 259470.866,
+      "tax_receipts_federal": 155412.737,
+      "tax_receipts_consolidated": 104058.129,
+      "tax_receipts_local": 17462.923,
+      "usn_receipts": 3439.679
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "12",
@@ -182,14 +182,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 63746.764,
+      "tax_receipts_federal": 26745.085,
+      "tax_receipts_consolidated": 37001.679,
+      "tax_receipts_local": 8469.254,
+      "usn_receipts": 3970.063
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "13",
@@ -198,14 +198,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 96725.793,
+      "tax_receipts_federal": 32486.565,
+      "tax_receipts_consolidated": 64239.228,
+      "tax_receipts_local": 10926.184,
+      "usn_receipts": 6463.882
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "14",
@@ -214,14 +214,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 365492.414,
+      "tax_receipts_federal": 129119.296,
+      "tax_receipts_consolidated": 236373.118,
+      "tax_receipts_local": 41419.007,
+      "usn_receipts": 7880.137
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "15",
@@ -230,14 +230,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 39720.365,
+      "tax_receipts_federal": 11205.817,
+      "tax_receipts_consolidated": 28514.548,
+      "tax_receipts_local": 8464.861,
+      "usn_receipts": 2709.159
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "16",
@@ -246,14 +246,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 1750911.15,
+      "tax_receipts_federal": 1152072.339,
+      "tax_receipts_consolidated": 598838.811,
+      "tax_receipts_local": 96002.767,
+      "usn_receipts": 32323.375
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "17",
@@ -262,14 +262,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 18587.694,
+      "tax_receipts_federal": 3244.72,
+      "tax_receipts_consolidated": 15342.974,
+      "tax_receipts_local": 3792.698,
+      "usn_receipts": 754.441
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "18",
@@ -278,14 +278,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 476172.336,
+      "tax_receipts_federal": 341690.598,
+      "tax_receipts_consolidated": 134481.738,
+      "tax_receipts_local": 23500.049,
+      "usn_receipts": 15620.612
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "19",
@@ -294,14 +294,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 40360.968,
+      "tax_receipts_federal": 1777.18,
+      "tax_receipts_consolidated": 38583.788,
+      "tax_receipts_local": 7455.657,
+      "usn_receipts": 2574.722
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "20",
@@ -310,14 +310,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 57916.251,
+      "tax_receipts_federal": 20881.923,
+      "tax_receipts_consolidated": 37034.328,
+      "tax_receipts_local": 12976.267,
+      "usn_receipts": 3701.47
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "21",
@@ -326,14 +326,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 163573.817,
+      "tax_receipts_federal": 80355.49,
+      "tax_receipts_consolidated": 83218.327,
+      "tax_receipts_local": 14599.29,
+      "usn_receipts": 8217.627
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "22",
@@ -342,14 +342,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 216579.165,
+      "tax_receipts_federal": 81759.606,
+      "tax_receipts_consolidated": 134819.559,
+      "tax_receipts_local": 33541.905,
+      "usn_receipts": 13920.309
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "23",
@@ -358,14 +358,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 774264.021,
+      "tax_receipts_federal": 241409.763,
+      "tax_receipts_consolidated": 532854.258,
+      "tax_receipts_local": 136117.02,
+      "usn_receipts": 68238.765
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "24",
@@ -374,14 +374,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 852481.661,
+      "tax_receipts_federal": 393473.543,
+      "tax_receipts_consolidated": 459008.118,
+      "tax_receipts_local": 84708.602,
+      "usn_receipts": 21482.492
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "25",
@@ -390,14 +390,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 359608.918,
+      "tax_receipts_federal": 135589.627,
+      "tax_receipts_consolidated": 224019.291,
+      "tax_receipts_local": 44160.993,
+      "usn_receipts": 21307.909
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "26",
@@ -406,14 +406,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 234557.538,
+      "tax_receipts_federal": 89334.796,
+      "tax_receipts_consolidated": 145222.742,
+      "tax_receipts_local": 39612.975,
+      "usn_receipts": 18007.95
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "27",
@@ -422,14 +422,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 305309.515,
+      "tax_receipts_federal": 83240.328,
+      "tax_receipts_consolidated": 222069.187,
+      "tax_receipts_local": 35103.972,
+      "usn_receipts": 13801.204
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "28",
@@ -438,14 +438,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 150248.643,
+      "tax_receipts_federal": 28044.386,
+      "tax_receipts_consolidated": 122204.257,
+      "tax_receipts_local": 21223.808,
+      "usn_receipts": 6704.517
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "29",
@@ -454,14 +454,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 130921.826,
+      "tax_receipts_federal": 31727.442,
+      "tax_receipts_consolidated": 99194.384,
+      "tax_receipts_local": 22504.085,
+      "usn_receipts": 7119.407
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "30",
@@ -470,14 +470,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 237296.643,
+      "tax_receipts_federal": 174922.541,
+      "tax_receipts_consolidated": 62374.102,
+      "tax_receipts_local": 12643.268,
+      "usn_receipts": 5202.899
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "31",
@@ -486,14 +486,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 276122.233,
+      "tax_receipts_federal": 129999.237,
+      "tax_receipts_consolidated": 146122.996,
+      "tax_receipts_local": 35477.507,
+      "usn_receipts": 8753.532
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "32",
@@ -502,14 +502,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 140502.304,
+      "tax_receipts_federal": 71465.972,
+      "tax_receipts_consolidated": 69036.332,
+      "tax_receipts_local": 13984.505,
+      "usn_receipts": 7232.014
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "33",
@@ -518,14 +518,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 203200.489,
+      "tax_receipts_federal": 93631.681,
+      "tax_receipts_consolidated": 109568.808,
+      "tax_receipts_local": 28239.103,
+      "usn_receipts": 10233.385
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "34",
@@ -534,14 +534,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 375895.495,
+      "tax_receipts_federal": 206955.987,
+      "tax_receipts_consolidated": 168939.508,
+      "tax_receipts_local": 27392.711,
+      "usn_receipts": 12421.707
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "35",
@@ -550,14 +550,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 147546.401,
+      "tax_receipts_federal": 35943.262,
+      "tax_receipts_consolidated": 111603.139,
+      "tax_receipts_local": 21489.777,
+      "usn_receipts": 7896.475
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "36",
@@ -566,14 +566,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 314026.671,
+      "tax_receipts_federal": 126226.607,
+      "tax_receipts_consolidated": 187800.064,
+      "tax_receipts_local": 36959.12,
+      "usn_receipts": 17792.705
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "37",
@@ -582,14 +582,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 95646.606,
+      "tax_receipts_federal": 39672.26,
+      "tax_receipts_consolidated": 55974.346,
+      "tax_receipts_local": 12061.042,
+      "usn_receipts": 9263.682
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "38",
@@ -598,14 +598,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 743951.929,
+      "tax_receipts_federal": 462327.922,
+      "tax_receipts_consolidated": 281624.007,
+      "tax_receipts_local": 54252.633,
+      "usn_receipts": 16704.565
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "39",
@@ -614,14 +614,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 257344.163,
+      "tax_receipts_federal": 145232.592,
+      "tax_receipts_consolidated": 112111.571,
+      "tax_receipts_local": 28641.021,
+      "usn_receipts": 17186.365
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "40",
@@ -630,14 +630,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 293961.783,
+      "tax_receipts_federal": 181003.236,
+      "tax_receipts_consolidated": 112958.547,
+      "tax_receipts_local": 26903.404,
+      "usn_receipts": 8175.394
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "41",
@@ -646,14 +646,14 @@
     "disputed": false,
     "profile": "northern",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 85648.777,
+      "tax_receipts_federal": 14228.479,
+      "tax_receipts_consolidated": 71420.298,
+      "tax_receipts_local": 21323.173,
+      "usn_receipts": 4015.642
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "42",
@@ -662,14 +662,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 219436.077,
+      "tax_receipts_federal": 27942.102,
+      "tax_receipts_consolidated": 191493.975,
+      "tax_receipts_local": 46782.165,
+      "usn_receipts": 12090.182
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "43",
@@ -678,14 +678,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 129156.805,
+      "tax_receipts_federal": 52407.566,
+      "tax_receipts_consolidated": 76749.239,
+      "tax_receipts_local": 18507.18,
+      "usn_receipts": 8344.621
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "44",
@@ -694,14 +694,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 90837.025,
+      "tax_receipts_federal": 45988.522,
+      "tax_receipts_consolidated": 44848.503,
+      "tax_receipts_local": 10651.353,
+      "usn_receipts": 5384.257
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "45",
@@ -710,14 +710,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 104375.348,
+      "tax_receipts_federal": 51020.162,
+      "tax_receipts_consolidated": 53355.186,
+      "tax_receipts_local": 10271.667,
+      "usn_receipts": 4644.797
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "46",
@@ -726,14 +726,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 128483.219,
+      "tax_receipts_federal": 46601.797,
+      "tax_receipts_consolidated": 81881.422,
+      "tax_receipts_local": 19013.181,
+      "usn_receipts": 6332.046
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "47",
@@ -742,14 +742,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 665114.161,
+      "tax_receipts_federal": 348332.486,
+      "tax_receipts_consolidated": 316781.675,
+      "tax_receipts_local": 66980.651,
+      "usn_receipts": 17462.852
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "48",
@@ -758,14 +758,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 119292.766,
+      "tax_receipts_federal": 30428.692,
+      "tax_receipts_consolidated": 88864.074,
+      "tax_receipts_local": 21954.603,
+      "usn_receipts": 6405.936
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "49",
@@ -774,14 +774,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 90238.518,
+      "tax_receipts_federal": 2443.731,
+      "tax_receipts_consolidated": 87794.787,
+      "tax_receipts_local": 8182.21,
+      "usn_receipts": 2139.638
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "50",
@@ -790,14 +790,14 @@
     "disputed": false,
     "profile": "metropolis",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 2713340.377,
+      "tax_receipts_federal": 1348859.869,
+      "tax_receipts_consolidated": 1364480.508,
+      "tax_receipts_local": 320202.822,
+      "usn_receipts": 117484.733
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "51",
@@ -806,14 +806,14 @@
     "disputed": false,
     "profile": "northern",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 70930.371,
+      "tax_receipts_federal": -40515.973,
+      "tax_receipts_consolidated": 111446.344,
+      "tax_receipts_local": 23300.311,
+      "usn_receipts": 5510.123
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "52",
@@ -822,14 +822,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 838569.888,
+      "tax_receipts_federal": 431191.999,
+      "tax_receipts_consolidated": 407377.889,
+      "tax_receipts_local": 69865.106,
+      "usn_receipts": 25816.586
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "53",
@@ -838,14 +838,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 71755.414,
+      "tax_receipts_federal": 25023.433,
+      "tax_receipts_consolidated": 46731.981,
+      "tax_receipts_local": 11681.178,
+      "usn_receipts": 3355.076
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "54",
@@ -854,14 +854,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 512705.463,
+      "tax_receipts_federal": 200393.35,
+      "tax_receipts_consolidated": 312312.113,
+      "tax_receipts_local": 66410.031,
+      "usn_receipts": 32648.343
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "55",
@@ -870,14 +870,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 426231.599,
+      "tax_receipts_federal": 174720.971,
+      "tax_receipts_consolidated": 251510.628,
+      "tax_receipts_local": 29671.067,
+      "usn_receipts": 11893.599
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "56",
@@ -886,14 +886,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 714330.389,
+      "tax_receipts_federal": 587306.78,
+      "tax_receipts_consolidated": 127023.609,
+      "tax_receipts_local": 33133.244,
+      "usn_receipts": 8197.399
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "57",
@@ -902,14 +902,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 62842.736,
+      "tax_receipts_federal": 23091.059,
+      "tax_receipts_consolidated": 39751.677,
+      "tax_receipts_local": 9440.892,
+      "usn_receipts": 3973.366
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "58",
@@ -918,14 +918,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 147813.254,
+      "tax_receipts_federal": 66034.104,
+      "tax_receipts_consolidated": 81779.15,
+      "tax_receipts_local": 16090.802,
+      "usn_receipts": 9555.086
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "59",
@@ -934,14 +934,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 1279428.314,
+      "tax_receipts_federal": 994563.036,
+      "tax_receipts_consolidated": 284865.278,
+      "tax_receipts_local": 48074.637,
+      "usn_receipts": 17305.45
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "60",
@@ -950,14 +950,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 51776.956,
+      "tax_receipts_federal": 16750.929,
+      "tax_receipts_consolidated": 35026.027,
+      "tax_receipts_local": 8007.757,
+      "usn_receipts": 3580.096
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "61",
@@ -966,14 +966,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 513011.173,
+      "tax_receipts_federal": 202513.443,
+      "tax_receipts_consolidated": 310497.73,
+      "tax_receipts_local": 70665.34,
+      "usn_receipts": 35175.464
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "62",
@@ -982,14 +982,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 250452.354,
+      "tax_receipts_federal": 111528.417,
+      "tax_receipts_consolidated": 138923.937,
+      "tax_receipts_local": 20920.203,
+      "usn_receipts": 8268.997
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "63",
@@ -998,14 +998,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 1303050.616,
+      "tax_receipts_federal": 950830.443,
+      "tax_receipts_consolidated": 352220.173,
+      "tax_receipts_local": 59847.168,
+      "usn_receipts": 23722.117
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "64",
@@ -1014,14 +1014,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 280219.07,
+      "tax_receipts_federal": 120558.372,
+      "tax_receipts_consolidated": 159660.698,
+      "tax_receipts_local": 32598.883,
+      "usn_receipts": 12382.907
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "65",
@@ -1030,14 +1030,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 325596.46,
+      "tax_receipts_federal": 158472.012,
+      "tax_receipts_consolidated": 167124.448,
+      "tax_receipts_local": 31933.486,
+      "usn_receipts": 7814.338
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "66",
@@ -1046,14 +1046,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 931667.034,
+      "tax_receipts_federal": 439092.779,
+      "tax_receipts_consolidated": 492574.255,
+      "tax_receipts_local": 105264.147,
+      "usn_receipts": 40282.014
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "67",
@@ -1062,14 +1062,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 151489.141,
+      "tax_receipts_federal": 75491.641,
+      "tax_receipts_consolidated": 75997.5,
+      "tax_receipts_local": 15076.818,
+      "usn_receipts": 6375.384
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "68",
@@ -1078,14 +1078,14 @@
     "disputed": false,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 89766.446,
+      "tax_receipts_federal": 33072.891,
+      "tax_receipts_consolidated": 56693.555,
+      "tax_receipts_local": 13491.442,
+      "usn_receipts": 4722.709
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "69",
@@ -1094,14 +1094,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 172971.642,
+      "tax_receipts_federal": 70698.907,
+      "tax_receipts_consolidated": 102272.735,
+      "tax_receipts_local": 21993.328,
+      "usn_receipts": 9356.779
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "70",
@@ -1110,14 +1110,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 355635.744,
+      "tax_receipts_federal": 269876.227,
+      "tax_receipts_consolidated": 85759.517,
+      "tax_receipts_local": 19363.769,
+      "usn_receipts": 7424.259
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "71",
@@ -1126,14 +1126,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 363438.406,
+      "tax_receipts_federal": 203037.411,
+      "tax_receipts_consolidated": 160400.995,
+      "tax_receipts_local": 34141.102,
+      "usn_receipts": 10394.129
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "72",
@@ -1142,14 +1142,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 497027.365,
+      "tax_receipts_federal": 334205.089,
+      "tax_receipts_consolidated": 162822.276,
+      "tax_receipts_local": 35934.751,
+      "usn_receipts": 13679.992
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "73",
@@ -1158,14 +1158,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 174510.537,
+      "tax_receipts_federal": 78030.779,
+      "tax_receipts_consolidated": 96479.758,
+      "tax_receipts_local": 16222.956,
+      "usn_receipts": 6706.192
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "74",
@@ -1174,14 +1174,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 582482.82,
+      "tax_receipts_federal": 293711.062,
+      "tax_receipts_consolidated": 288771.758,
+      "tax_receipts_local": 71279.852,
+      "usn_receipts": 22709.565
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "75",
@@ -1190,14 +1190,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 114964.6,
+      "tax_receipts_federal": 1664.447,
+      "tax_receipts_consolidated": 113300.153,
+      "tax_receipts_local": 25008.58,
+      "usn_receipts": 5452.643
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "76",
@@ -1206,14 +1206,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 342228.097,
+      "tax_receipts_federal": 166799.989,
+      "tax_receipts_consolidated": 175428.108,
+      "tax_receipts_local": 20561.627,
+      "usn_receipts": 10237.83
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "77",
@@ -1222,14 +1222,14 @@
     "disputed": false,
     "profile": "metropolis",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 10710290.666,
+      "tax_receipts_federal": 5926791.791,
+      "tax_receipts_consolidated": 4783498.875,
+      "tax_receipts_local": 4072.498,
+      "usn_receipts": 307493.835
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "78",
@@ -1238,14 +1238,14 @@
     "disputed": false,
     "profile": "metropolis",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 2687518.162,
+      "tax_receipts_federal": 1460141.914,
+      "tax_receipts_consolidated": 1227376.248,
+      "tax_receipts_local": 1783.144,
+      "usn_receipts": 102390.237
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "79",
@@ -1254,14 +1254,14 @@
     "disputed": false,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 21479.579,
+      "tax_receipts_federal": 7296.997,
+      "tax_receipts_consolidated": 14182.582,
+      "tax_receipts_local": 2575.271,
+      "usn_receipts": 726.259
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "83",
@@ -1270,14 +1270,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 115294.915,
+      "tax_receipts_federal": 90022.085,
+      "tax_receipts_consolidated": 25272.83,
+      "tax_receipts_local": 2342.345,
+      "usn_receipts": 431.157
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "86",
@@ -1286,14 +1286,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 3946469.099,
+      "tax_receipts_federal": 3443207.614,
+      "tax_receipts_consolidated": 503261.485,
+      "tax_receipts_local": 93178.109,
+      "usn_receipts": 11077.371
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "87",
@@ -1302,14 +1302,14 @@
     "disputed": false,
     "profile": "northern",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 25272.766,
+      "tax_receipts_federal": -17034.278,
+      "tax_receipts_consolidated": 42307.044,
+      "tax_receipts_local": 4431.317,
+      "usn_receipts": 214.16
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "89",
@@ -1318,14 +1318,14 @@
     "disputed": false,
     "profile": "resources",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 2835850.727,
+      "tax_receipts_federal": 2490170.995,
+      "tax_receipts_consolidated": 345679.732,
+      "tax_receipts_local": 39664.927,
+      "usn_receipts": 4369.056
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "91",
@@ -1334,14 +1334,14 @@
     "disputed": true,
     "profile": "tourism",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 191154.314,
+      "tax_receipts_federal": 74106.985,
+      "tax_receipts_consolidated": 117047.329,
+      "tax_receipts_local": 24455.497,
+      "usn_receipts": 12332.074
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "92",
@@ -1350,14 +1350,14 @@
     "disputed": true,
     "profile": "tourism",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": 50708.597,
+      "tax_receipts_federal": 18066.016,
+      "tax_receipts_consolidated": 32642.581,
+      "tax_receipts_local": 87.862,
+      "usn_receipts": 3622.437
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "93",
@@ -1366,14 +1366,14 @@
     "disputed": true,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": null,
+      "tax_receipts_federal": null,
+      "tax_receipts_consolidated": null,
+      "tax_receipts_local": null,
+      "usn_receipts": null
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "94",
@@ -1382,14 +1382,14 @@
     "disputed": true,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": null,
+      "tax_receipts_federal": null,
+      "tax_receipts_consolidated": null,
+      "tax_receipts_local": null,
+      "usn_receipts": null
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "95",
@@ -1398,14 +1398,14 @@
     "disputed": true,
     "profile": "agriculture",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": null,
+      "tax_receipts_federal": null,
+      "tax_receipts_consolidated": null,
+      "tax_receipts_local": null,
+      "usn_receipts": null
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   },
   {
     "code": "96",
@@ -1414,13 +1414,13 @@
     "disputed": true,
     "profile": "industrial",
     "observations": {
-      "population": null,
-      "enterprises": null,
-      "gross_regional_product": null,
-      "regional_revenue": null,
-      "regional_expenditure": null
+      "tax_receipts_total": null,
+      "tax_receipts_federal": null,
+      "tax_receipts_consolidated": null,
+      "tax_receipts_local": null,
+      "usn_receipts": null
     },
-    "statistics_source": "https://rosstat.gov.ru/folder/210/document/13204",
-    "statistics_year": 2024
+    "statistics_source": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+    "statistics_year": 2025
   }
 ]

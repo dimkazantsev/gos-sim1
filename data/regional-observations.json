@@ -1,0 +1,1353 @@
+{
+  "source": {
+    "kind": "tax_receipts",
+    "url": "https://www.nalog.gov.ru/html/sites/www.new.nalog.ru/files/related_activities/statistics_and_analytics/forms/1nm/1nm010126reg.zip",
+    "sha256": "883bce76652627f3f7b8b7067770803f6ca6dae05ca1050ca0247e00e46445df"
+  },
+  "year": 2025,
+  "unit": "млн рублей",
+  "sheet": "1000",
+  "columns": [
+    "1000",
+    "1000.2",
+    "1000.3",
+    "1000.4"
+  ],
+  "regions": [
+    {
+      "code": "01",
+      "name": "Республика Адыгея",
+      "observations": {
+        "tax_receipts_total": 51080.616,
+        "tax_receipts_federal": 17733.581,
+        "tax_receipts_consolidated": 33347.035,
+        "tax_receipts_local": 7858.946,
+        "usn_receipts": 3693.555
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Адыгея"
+    },
+    {
+      "code": "02",
+      "name": "Республика Башкортостан",
+      "observations": {
+        "tax_receipts_total": 630592.568,
+        "tax_receipts_federal": 274399.173,
+        "tax_receipts_consolidated": 356193.395,
+        "tax_receipts_local": 65390.689,
+        "usn_receipts": 21332.589
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Башкортостан"
+    },
+    {
+      "code": "03",
+      "name": "Республика Бурятия",
+      "observations": {
+        "tax_receipts_total": 69204.415,
+        "tax_receipts_federal": 9700.557,
+        "tax_receipts_consolidated": 59503.858,
+        "tax_receipts_local": 14469.183,
+        "usn_receipts": 4685.121
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Бурятия"
+    },
+    {
+      "code": "04",
+      "name": "Республика Алтай",
+      "observations": {
+        "tax_receipts_total": 16722.858,
+        "tax_receipts_federal": 1740.641,
+        "tax_receipts_consolidated": 14982.217,
+        "tax_receipts_local": 5184.784,
+        "usn_receipts": 1504.848
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Алтай"
+    },
+    {
+      "code": "05",
+      "name": "Республика Дагестан",
+      "observations": {
+        "tax_receipts_total": 93127.059,
+        "tax_receipts_federal": 26375.973,
+        "tax_receipts_consolidated": 66751.086,
+        "tax_receipts_local": 20219.763,
+        "usn_receipts": 3126.12
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Дагестан"
+    },
+    {
+      "code": "06",
+      "name": "Республика Ингушетия",
+      "observations": {
+        "tax_receipts_total": 10001.108,
+        "tax_receipts_federal": 3000.554,
+        "tax_receipts_consolidated": 7000.554,
+        "tax_receipts_local": 1705.032,
+        "usn_receipts": 474.924
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Ингушетия"
+    },
+    {
+      "code": "07",
+      "name": "Кабардино-Балкарская Республика",
+      "observations": {
+        "tax_receipts_total": 38084.784,
+        "tax_receipts_federal": 10769.334,
+        "tax_receipts_consolidated": 27315.45,
+        "tax_receipts_local": 6290.822,
+        "usn_receipts": 2428.072
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Кабардино-Балкарская Республика"
+    },
+    {
+      "code": "08",
+      "name": "Республика Калмыкия",
+      "observations": {
+        "tax_receipts_total": 47035.723,
+        "tax_receipts_federal": 24841.645,
+        "tax_receipts_consolidated": 22194.078,
+        "tax_receipts_local": 8557.689,
+        "usn_receipts": 8702.863
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Калмыкия"
+    },
+    {
+      "code": "09",
+      "name": "Карачаево-Черкесская Республика",
+      "observations": {
+        "tax_receipts_total": 21113.746,
+        "tax_receipts_federal": 6235.934,
+        "tax_receipts_consolidated": 14877.812,
+        "tax_receipts_local": 4124.063,
+        "usn_receipts": 2061.332
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Карачаево-Черкесская Республика"
+    },
+    {
+      "code": "10",
+      "name": "Республика Карелия",
+      "observations": {
+        "tax_receipts_total": 78615.066,
+        "tax_receipts_federal": 29748.33,
+        "tax_receipts_consolidated": 48866.736,
+        "tax_receipts_local": 10601.107,
+        "usn_receipts": 4298.003
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Карелия"
+    },
+    {
+      "code": "11",
+      "name": "Республика Коми",
+      "observations": {
+        "tax_receipts_total": 259470.866,
+        "tax_receipts_federal": 155412.737,
+        "tax_receipts_consolidated": 104058.129,
+        "tax_receipts_local": 17462.923,
+        "usn_receipts": 3439.679
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Коми"
+    },
+    {
+      "code": "12",
+      "name": "Республика Марий Эл",
+      "observations": {
+        "tax_receipts_total": 63746.764,
+        "tax_receipts_federal": 26745.085,
+        "tax_receipts_consolidated": 37001.679,
+        "tax_receipts_local": 8469.254,
+        "usn_receipts": 3970.063
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Марий-Эл"
+    },
+    {
+      "code": "13",
+      "name": "Республика Мордовия",
+      "observations": {
+        "tax_receipts_total": 96725.793,
+        "tax_receipts_federal": 32486.565,
+        "tax_receipts_consolidated": 64239.228,
+        "tax_receipts_local": 10926.184,
+        "usn_receipts": 6463.882
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Мордовия"
+    },
+    {
+      "code": "14",
+      "name": "Республика Саха (Якутия)",
+      "observations": {
+        "tax_receipts_total": 365492.414,
+        "tax_receipts_federal": 129119.296,
+        "tax_receipts_consolidated": 236373.118,
+        "tax_receipts_local": 41419.007,
+        "usn_receipts": 7880.137
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Саха (Якутия)"
+    },
+    {
+      "code": "15",
+      "name": "Республика Северная Осетия — Алания",
+      "observations": {
+        "tax_receipts_total": 39720.365,
+        "tax_receipts_federal": 11205.817,
+        "tax_receipts_consolidated": 28514.548,
+        "tax_receipts_local": 8464.861,
+        "usn_receipts": 2709.159
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Северная Осетия - Алания"
+    },
+    {
+      "code": "16",
+      "name": "Республика Татарстан",
+      "observations": {
+        "tax_receipts_total": 1750911.15,
+        "tax_receipts_federal": 1152072.339,
+        "tax_receipts_consolidated": 598838.811,
+        "tax_receipts_local": 96002.767,
+        "usn_receipts": 32323.375
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Татарстан"
+    },
+    {
+      "code": "17",
+      "name": "Республика Тыва",
+      "observations": {
+        "tax_receipts_total": 18587.694,
+        "tax_receipts_federal": 3244.72,
+        "tax_receipts_consolidated": 15342.974,
+        "tax_receipts_local": 3792.698,
+        "usn_receipts": 754.441
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Тыва"
+    },
+    {
+      "code": "18",
+      "name": "Удмуртская Республика",
+      "observations": {
+        "tax_receipts_total": 476172.336,
+        "tax_receipts_federal": 341690.598,
+        "tax_receipts_consolidated": 134481.738,
+        "tax_receipts_local": 23500.049,
+        "usn_receipts": 15620.612
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Удмуртская Республика"
+    },
+    {
+      "code": "19",
+      "name": "Республика Хакасия",
+      "observations": {
+        "tax_receipts_total": 40360.968,
+        "tax_receipts_federal": 1777.18,
+        "tax_receipts_consolidated": 38583.788,
+        "tax_receipts_local": 7455.657,
+        "usn_receipts": 2574.722
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Хакасия"
+    },
+    {
+      "code": "20",
+      "name": "Чеченская Республика",
+      "observations": {
+        "tax_receipts_total": 57916.251,
+        "tax_receipts_federal": 20881.923,
+        "tax_receipts_consolidated": 37034.328,
+        "tax_receipts_local": 12976.267,
+        "usn_receipts": 3701.47
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Чеченская Республика"
+    },
+    {
+      "code": "21",
+      "name": "Чувашская Республика",
+      "observations": {
+        "tax_receipts_total": 163573.817,
+        "tax_receipts_federal": 80355.49,
+        "tax_receipts_consolidated": 83218.327,
+        "tax_receipts_local": 14599.29,
+        "usn_receipts": 8217.627
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Чувашская Республика"
+    },
+    {
+      "code": "22",
+      "name": "Алтайский край",
+      "observations": {
+        "tax_receipts_total": 216579.165,
+        "tax_receipts_federal": 81759.606,
+        "tax_receipts_consolidated": 134819.559,
+        "tax_receipts_local": 33541.905,
+        "usn_receipts": 13920.309
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Алтайский край"
+    },
+    {
+      "code": "23",
+      "name": "Краснодарский край",
+      "observations": {
+        "tax_receipts_total": 774264.021,
+        "tax_receipts_federal": 241409.763,
+        "tax_receipts_consolidated": 532854.258,
+        "tax_receipts_local": 136117.02,
+        "usn_receipts": 68238.765
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Краснодарский край"
+    },
+    {
+      "code": "24",
+      "name": "Красноярский край",
+      "observations": {
+        "tax_receipts_total": 852481.661,
+        "tax_receipts_federal": 393473.543,
+        "tax_receipts_consolidated": 459008.118,
+        "tax_receipts_local": 84708.602,
+        "usn_receipts": 21482.492
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Красноярский край"
+    },
+    {
+      "code": "25",
+      "name": "Приморский край",
+      "observations": {
+        "tax_receipts_total": 359608.918,
+        "tax_receipts_federal": 135589.627,
+        "tax_receipts_consolidated": 224019.291,
+        "tax_receipts_local": 44160.993,
+        "usn_receipts": 21307.909
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Приморский край"
+    },
+    {
+      "code": "26",
+      "name": "Ставропольский край",
+      "observations": {
+        "tax_receipts_total": 234557.538,
+        "tax_receipts_federal": 89334.796,
+        "tax_receipts_consolidated": 145222.742,
+        "tax_receipts_local": 39612.975,
+        "usn_receipts": 18007.95
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Ставропольский край"
+    },
+    {
+      "code": "27",
+      "name": "Хабаровский край",
+      "observations": {
+        "tax_receipts_total": 305309.515,
+        "tax_receipts_federal": 83240.328,
+        "tax_receipts_consolidated": 222069.187,
+        "tax_receipts_local": 35103.972,
+        "usn_receipts": 13801.204
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Хабаровский край"
+    },
+    {
+      "code": "28",
+      "name": "Амурская область",
+      "observations": {
+        "tax_receipts_total": 150248.643,
+        "tax_receipts_federal": 28044.386,
+        "tax_receipts_consolidated": 122204.257,
+        "tax_receipts_local": 21223.808,
+        "usn_receipts": 6704.517
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Амурская область"
+    },
+    {
+      "code": "29",
+      "name": "Архангельская область",
+      "observations": {
+        "tax_receipts_total": 130921.826,
+        "tax_receipts_federal": 31727.442,
+        "tax_receipts_consolidated": 99194.384,
+        "tax_receipts_local": 22504.085,
+        "usn_receipts": 7119.407
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Архангельская область"
+    },
+    {
+      "code": "30",
+      "name": "Астраханская область",
+      "observations": {
+        "tax_receipts_total": 237296.643,
+        "tax_receipts_federal": 174922.541,
+        "tax_receipts_consolidated": 62374.102,
+        "tax_receipts_local": 12643.268,
+        "usn_receipts": 5202.899
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Астраханская область"
+    },
+    {
+      "code": "31",
+      "name": "Белгородская область",
+      "observations": {
+        "tax_receipts_total": 276122.233,
+        "tax_receipts_federal": 129999.237,
+        "tax_receipts_consolidated": 146122.996,
+        "tax_receipts_local": 35477.507,
+        "usn_receipts": 8753.532
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Белгородская область"
+    },
+    {
+      "code": "32",
+      "name": "Брянская область",
+      "observations": {
+        "tax_receipts_total": 140502.304,
+        "tax_receipts_federal": 71465.972,
+        "tax_receipts_consolidated": 69036.332,
+        "tax_receipts_local": 13984.505,
+        "usn_receipts": 7232.014
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Брянская область"
+    },
+    {
+      "code": "33",
+      "name": "Владимирская область",
+      "observations": {
+        "tax_receipts_total": 203200.489,
+        "tax_receipts_federal": 93631.681,
+        "tax_receipts_consolidated": 109568.808,
+        "tax_receipts_local": 28239.103,
+        "usn_receipts": 10233.385
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Владимирская область"
+    },
+    {
+      "code": "34",
+      "name": "Волгоградская область",
+      "observations": {
+        "tax_receipts_total": 375895.495,
+        "tax_receipts_federal": 206955.987,
+        "tax_receipts_consolidated": 168939.508,
+        "tax_receipts_local": 27392.711,
+        "usn_receipts": 12421.707
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Волгоградская область"
+    },
+    {
+      "code": "35",
+      "name": "Вологодская область",
+      "observations": {
+        "tax_receipts_total": 147546.401,
+        "tax_receipts_federal": 35943.262,
+        "tax_receipts_consolidated": 111603.139,
+        "tax_receipts_local": 21489.777,
+        "usn_receipts": 7896.475
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Вологодская область"
+    },
+    {
+      "code": "36",
+      "name": "Воронежская область",
+      "observations": {
+        "tax_receipts_total": 314026.671,
+        "tax_receipts_federal": 126226.607,
+        "tax_receipts_consolidated": 187800.064,
+        "tax_receipts_local": 36959.12,
+        "usn_receipts": 17792.705
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Воронежская область"
+    },
+    {
+      "code": "37",
+      "name": "Ивановская область",
+      "observations": {
+        "tax_receipts_total": 95646.606,
+        "tax_receipts_federal": 39672.26,
+        "tax_receipts_consolidated": 55974.346,
+        "tax_receipts_local": 12061.042,
+        "usn_receipts": 9263.682
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Ивановская область"
+    },
+    {
+      "code": "38",
+      "name": "Иркутская область",
+      "observations": {
+        "tax_receipts_total": 743951.929,
+        "tax_receipts_federal": 462327.922,
+        "tax_receipts_consolidated": 281624.007,
+        "tax_receipts_local": 54252.633,
+        "usn_receipts": 16704.565
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Иркутская область"
+    },
+    {
+      "code": "39",
+      "name": "Калининградская область",
+      "observations": {
+        "tax_receipts_total": 257344.163,
+        "tax_receipts_federal": 145232.592,
+        "tax_receipts_consolidated": 112111.571,
+        "tax_receipts_local": 28641.021,
+        "usn_receipts": 17186.365
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Калининградская область"
+    },
+    {
+      "code": "40",
+      "name": "Калужская область",
+      "observations": {
+        "tax_receipts_total": 293961.783,
+        "tax_receipts_federal": 181003.236,
+        "tax_receipts_consolidated": 112958.547,
+        "tax_receipts_local": 26903.404,
+        "usn_receipts": 8175.394
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Калужская область"
+    },
+    {
+      "code": "41",
+      "name": "Камчатский край",
+      "observations": {
+        "tax_receipts_total": 85648.777,
+        "tax_receipts_federal": 14228.479,
+        "tax_receipts_consolidated": 71420.298,
+        "tax_receipts_local": 21323.173,
+        "usn_receipts": 4015.642
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Камчатский край"
+    },
+    {
+      "code": "42",
+      "name": "Кемеровская область — Кузбасс",
+      "observations": {
+        "tax_receipts_total": 219436.077,
+        "tax_receipts_federal": 27942.102,
+        "tax_receipts_consolidated": 191493.975,
+        "tax_receipts_local": 46782.165,
+        "usn_receipts": 12090.182
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Кемеровская область - Кузбасс"
+    },
+    {
+      "code": "43",
+      "name": "Кировская область",
+      "observations": {
+        "tax_receipts_total": 129156.805,
+        "tax_receipts_federal": 52407.566,
+        "tax_receipts_consolidated": 76749.239,
+        "tax_receipts_local": 18507.18,
+        "usn_receipts": 8344.621
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Кировская область"
+    },
+    {
+      "code": "44",
+      "name": "Костромская область",
+      "observations": {
+        "tax_receipts_total": 90837.025,
+        "tax_receipts_federal": 45988.522,
+        "tax_receipts_consolidated": 44848.503,
+        "tax_receipts_local": 10651.353,
+        "usn_receipts": 5384.257
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Костромская область"
+    },
+    {
+      "code": "45",
+      "name": "Курганская область",
+      "observations": {
+        "tax_receipts_total": 104375.348,
+        "tax_receipts_federal": 51020.162,
+        "tax_receipts_consolidated": 53355.186,
+        "tax_receipts_local": 10271.667,
+        "usn_receipts": 4644.797
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Курганская область"
+    },
+    {
+      "code": "46",
+      "name": "Курская область",
+      "observations": {
+        "tax_receipts_total": 128483.219,
+        "tax_receipts_federal": 46601.797,
+        "tax_receipts_consolidated": 81881.422,
+        "tax_receipts_local": 19013.181,
+        "usn_receipts": 6332.046
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Курская область"
+    },
+    {
+      "code": "47",
+      "name": "Ленинградская область",
+      "observations": {
+        "tax_receipts_total": 665114.161,
+        "tax_receipts_federal": 348332.486,
+        "tax_receipts_consolidated": 316781.675,
+        "tax_receipts_local": 66980.651,
+        "usn_receipts": 17462.852
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Ленинградская область"
+    },
+    {
+      "code": "48",
+      "name": "Липецкая область",
+      "observations": {
+        "tax_receipts_total": 119292.766,
+        "tax_receipts_federal": 30428.692,
+        "tax_receipts_consolidated": 88864.074,
+        "tax_receipts_local": 21954.603,
+        "usn_receipts": 6405.936
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Липецкая область"
+    },
+    {
+      "code": "49",
+      "name": "Магаданская область",
+      "observations": {
+        "tax_receipts_total": 90238.518,
+        "tax_receipts_federal": 2443.731,
+        "tax_receipts_consolidated": 87794.787,
+        "tax_receipts_local": 8182.21,
+        "usn_receipts": 2139.638
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Магаданская область"
+    },
+    {
+      "code": "50",
+      "name": "Московская область",
+      "observations": {
+        "tax_receipts_total": 2713340.377,
+        "tax_receipts_federal": 1348859.869,
+        "tax_receipts_consolidated": 1364480.508,
+        "tax_receipts_local": 320202.822,
+        "usn_receipts": 117484.733
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Московская область"
+    },
+    {
+      "code": "51",
+      "name": "Мурманская область",
+      "observations": {
+        "tax_receipts_total": 70930.371,
+        "tax_receipts_federal": -40515.973,
+        "tax_receipts_consolidated": 111446.344,
+        "tax_receipts_local": 23300.311,
+        "usn_receipts": 5510.123
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Мурманская область"
+    },
+    {
+      "code": "52",
+      "name": "Нижегородская область",
+      "observations": {
+        "tax_receipts_total": 838569.888,
+        "tax_receipts_federal": 431191.999,
+        "tax_receipts_consolidated": 407377.889,
+        "tax_receipts_local": 69865.106,
+        "usn_receipts": 25816.586
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Нижегородская область"
+    },
+    {
+      "code": "53",
+      "name": "Новгородская область",
+      "observations": {
+        "tax_receipts_total": 71755.414,
+        "tax_receipts_federal": 25023.433,
+        "tax_receipts_consolidated": 46731.981,
+        "tax_receipts_local": 11681.178,
+        "usn_receipts": 3355.076
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Новгородская область"
+    },
+    {
+      "code": "54",
+      "name": "Новосибирская область",
+      "observations": {
+        "tax_receipts_total": 512705.463,
+        "tax_receipts_federal": 200393.35,
+        "tax_receipts_consolidated": 312312.113,
+        "tax_receipts_local": 66410.031,
+        "usn_receipts": 32648.343
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Новосибирская область"
+    },
+    {
+      "code": "55",
+      "name": "Омская область",
+      "observations": {
+        "tax_receipts_total": 426231.599,
+        "tax_receipts_federal": 174720.971,
+        "tax_receipts_consolidated": 251510.628,
+        "tax_receipts_local": 29671.067,
+        "usn_receipts": 11893.599
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Омская область"
+    },
+    {
+      "code": "56",
+      "name": "Оренбургская область",
+      "observations": {
+        "tax_receipts_total": 714330.389,
+        "tax_receipts_federal": 587306.78,
+        "tax_receipts_consolidated": 127023.609,
+        "tax_receipts_local": 33133.244,
+        "usn_receipts": 8197.399
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Оренбургская область"
+    },
+    {
+      "code": "57",
+      "name": "Орловская область",
+      "observations": {
+        "tax_receipts_total": 62842.736,
+        "tax_receipts_federal": 23091.059,
+        "tax_receipts_consolidated": 39751.677,
+        "tax_receipts_local": 9440.892,
+        "usn_receipts": 3973.366
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Орловская область"
+    },
+    {
+      "code": "58",
+      "name": "Пензенская область",
+      "observations": {
+        "tax_receipts_total": 147813.254,
+        "tax_receipts_federal": 66034.104,
+        "tax_receipts_consolidated": 81779.15,
+        "tax_receipts_local": 16090.802,
+        "usn_receipts": 9555.086
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Пензенская область"
+    },
+    {
+      "code": "59",
+      "name": "Пермский край",
+      "observations": {
+        "tax_receipts_total": 1279428.314,
+        "tax_receipts_federal": 994563.036,
+        "tax_receipts_consolidated": 284865.278,
+        "tax_receipts_local": 48074.637,
+        "usn_receipts": 17305.45
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Пермский край"
+    },
+    {
+      "code": "60",
+      "name": "Псковская область",
+      "observations": {
+        "tax_receipts_total": 51776.956,
+        "tax_receipts_federal": 16750.929,
+        "tax_receipts_consolidated": 35026.027,
+        "tax_receipts_local": 8007.757,
+        "usn_receipts": 3580.096
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Псковская область"
+    },
+    {
+      "code": "61",
+      "name": "Ростовская область",
+      "observations": {
+        "tax_receipts_total": 513011.173,
+        "tax_receipts_federal": 202513.443,
+        "tax_receipts_consolidated": 310497.73,
+        "tax_receipts_local": 70665.34,
+        "usn_receipts": 35175.464
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Ростовская область"
+    },
+    {
+      "code": "62",
+      "name": "Рязанская область",
+      "observations": {
+        "tax_receipts_total": 250452.354,
+        "tax_receipts_federal": 111528.417,
+        "tax_receipts_consolidated": 138923.937,
+        "tax_receipts_local": 20920.203,
+        "usn_receipts": 8268.997
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Рязанская область"
+    },
+    {
+      "code": "63",
+      "name": "Самарская область",
+      "observations": {
+        "tax_receipts_total": 1303050.616,
+        "tax_receipts_federal": 950830.443,
+        "tax_receipts_consolidated": 352220.173,
+        "tax_receipts_local": 59847.168,
+        "usn_receipts": 23722.117
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Самарская область"
+    },
+    {
+      "code": "64",
+      "name": "Саратовская область",
+      "observations": {
+        "tax_receipts_total": 280219.07,
+        "tax_receipts_federal": 120558.372,
+        "tax_receipts_consolidated": 159660.698,
+        "tax_receipts_local": 32598.883,
+        "usn_receipts": 12382.907
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Саратовская область"
+    },
+    {
+      "code": "65",
+      "name": "Сахалинская область",
+      "observations": {
+        "tax_receipts_total": 325596.46,
+        "tax_receipts_federal": 158472.012,
+        "tax_receipts_consolidated": 167124.448,
+        "tax_receipts_local": 31933.486,
+        "usn_receipts": 7814.338
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Сахалинская область"
+    },
+    {
+      "code": "66",
+      "name": "Свердловская область",
+      "observations": {
+        "tax_receipts_total": 931667.034,
+        "tax_receipts_federal": 439092.779,
+        "tax_receipts_consolidated": 492574.255,
+        "tax_receipts_local": 105264.147,
+        "usn_receipts": 40282.014
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Свердловская область"
+    },
+    {
+      "code": "67",
+      "name": "Смоленская область",
+      "observations": {
+        "tax_receipts_total": 151489.141,
+        "tax_receipts_federal": 75491.641,
+        "tax_receipts_consolidated": 75997.5,
+        "tax_receipts_local": 15076.818,
+        "usn_receipts": 6375.384
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Смоленская область"
+    },
+    {
+      "code": "68",
+      "name": "Тамбовская область",
+      "observations": {
+        "tax_receipts_total": 89766.446,
+        "tax_receipts_federal": 33072.891,
+        "tax_receipts_consolidated": 56693.555,
+        "tax_receipts_local": 13491.442,
+        "usn_receipts": 4722.709
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Тамбовская область"
+    },
+    {
+      "code": "69",
+      "name": "Тверская область",
+      "observations": {
+        "tax_receipts_total": 172971.642,
+        "tax_receipts_federal": 70698.907,
+        "tax_receipts_consolidated": 102272.735,
+        "tax_receipts_local": 21993.328,
+        "usn_receipts": 9356.779
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Тверская область"
+    },
+    {
+      "code": "70",
+      "name": "Томская область",
+      "observations": {
+        "tax_receipts_total": 355635.744,
+        "tax_receipts_federal": 269876.227,
+        "tax_receipts_consolidated": 85759.517,
+        "tax_receipts_local": 19363.769,
+        "usn_receipts": 7424.259
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Томская область"
+    },
+    {
+      "code": "71",
+      "name": "Тульская область",
+      "observations": {
+        "tax_receipts_total": 363438.406,
+        "tax_receipts_federal": 203037.411,
+        "tax_receipts_consolidated": 160400.995,
+        "tax_receipts_local": 34141.102,
+        "usn_receipts": 10394.129
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Тульская область"
+    },
+    {
+      "code": "72",
+      "name": "Тюменская область",
+      "observations": {
+        "tax_receipts_total": 497027.365,
+        "tax_receipts_federal": 334205.089,
+        "tax_receipts_consolidated": 162822.276,
+        "tax_receipts_local": 35934.751,
+        "usn_receipts": 13679.992
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Тюменская область"
+    },
+    {
+      "code": "73",
+      "name": "Ульяновская область",
+      "observations": {
+        "tax_receipts_total": 174510.537,
+        "tax_receipts_federal": 78030.779,
+        "tax_receipts_consolidated": 96479.758,
+        "tax_receipts_local": 16222.956,
+        "usn_receipts": 6706.192
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Ульяновская область"
+    },
+    {
+      "code": "74",
+      "name": "Челябинская область",
+      "observations": {
+        "tax_receipts_total": 582482.82,
+        "tax_receipts_federal": 293711.062,
+        "tax_receipts_consolidated": 288771.758,
+        "tax_receipts_local": 71279.852,
+        "usn_receipts": 22709.565
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Челябинская область"
+    },
+    {
+      "code": "75",
+      "name": "Забайкальский край",
+      "observations": {
+        "tax_receipts_total": 114964.6,
+        "tax_receipts_federal": 1664.447,
+        "tax_receipts_consolidated": 113300.153,
+        "tax_receipts_local": 25008.58,
+        "usn_receipts": 5452.643
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Забайкальский край"
+    },
+    {
+      "code": "76",
+      "name": "Ярославская область",
+      "observations": {
+        "tax_receipts_total": 342228.097,
+        "tax_receipts_federal": 166799.989,
+        "tax_receipts_consolidated": 175428.108,
+        "tax_receipts_local": 20561.627,
+        "usn_receipts": 10237.83
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Ярославская область"
+    },
+    {
+      "code": "77",
+      "name": "Москва",
+      "observations": {
+        "tax_receipts_total": 10710290.666,
+        "tax_receipts_federal": 5926791.791,
+        "tax_receipts_consolidated": 4783498.875,
+        "tax_receipts_local": 4072.498,
+        "usn_receipts": 307493.835
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "г. Москва"
+    },
+    {
+      "code": "78",
+      "name": "Санкт-Петербург",
+      "observations": {
+        "tax_receipts_total": 2687518.162,
+        "tax_receipts_federal": 1460141.914,
+        "tax_receipts_consolidated": 1227376.248,
+        "tax_receipts_local": 1783.144,
+        "usn_receipts": 102390.237
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "г. Санкт-Петербург"
+    },
+    {
+      "code": "79",
+      "name": "Еврейская автономная область",
+      "observations": {
+        "tax_receipts_total": 21479.579,
+        "tax_receipts_federal": 7296.997,
+        "tax_receipts_consolidated": 14182.582,
+        "tax_receipts_local": 2575.271,
+        "usn_receipts": 726.259
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Еврейская автономная область"
+    },
+    {
+      "code": "83",
+      "name": "Ненецкий автономный округ",
+      "observations": {
+        "tax_receipts_total": 115294.915,
+        "tax_receipts_federal": 90022.085,
+        "tax_receipts_consolidated": 25272.83,
+        "tax_receipts_local": 2342.345,
+        "usn_receipts": 431.157
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Ненецкий автономный округ"
+    },
+    {
+      "code": "86",
+      "name": "Ханты-Мансийский автономный округ — Югра",
+      "observations": {
+        "tax_receipts_total": 3946469.099,
+        "tax_receipts_federal": 3443207.614,
+        "tax_receipts_consolidated": 503261.485,
+        "tax_receipts_local": 93178.109,
+        "usn_receipts": 11077.371
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Ханты-Мансийский автономный округ - Югра"
+    },
+    {
+      "code": "87",
+      "name": "Чукотский автономный округ",
+      "observations": {
+        "tax_receipts_total": 25272.766,
+        "tax_receipts_federal": -17034.278,
+        "tax_receipts_consolidated": 42307.044,
+        "tax_receipts_local": 4431.317,
+        "usn_receipts": 214.16
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Чукотский автономный округ"
+    },
+    {
+      "code": "89",
+      "name": "Ямало-Ненецкий автономный округ",
+      "observations": {
+        "tax_receipts_total": 2835850.727,
+        "tax_receipts_federal": 2490170.995,
+        "tax_receipts_consolidated": 345679.732,
+        "tax_receipts_local": 39664.927,
+        "usn_receipts": 4369.056
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Ямало-Ненецкий автономный округ"
+    },
+    {
+      "code": "91",
+      "name": "Республика Крым",
+      "observations": {
+        "tax_receipts_total": 191154.314,
+        "tax_receipts_federal": 74106.985,
+        "tax_receipts_consolidated": 117047.329,
+        "tax_receipts_local": 24455.497,
+        "usn_receipts": 12332.074
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "Республика Крым"
+    },
+    {
+      "code": "92",
+      "name": "Севастополь",
+      "observations": {
+        "tax_receipts_total": 50708.597,
+        "tax_receipts_federal": 18066.016,
+        "tax_receipts_consolidated": 32642.581,
+        "tax_receipts_local": 87.862,
+        "usn_receipts": 3622.437
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": "г. Севастополь"
+    },
+    {
+      "code": "93",
+      "name": "Донецкая Народная Республика",
+      "observations": {
+        "tax_receipts_total": null,
+        "tax_receipts_federal": null,
+        "tax_receipts_consolidated": null,
+        "tax_receipts_local": null,
+        "usn_receipts": null
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": null
+    },
+    {
+      "code": "94",
+      "name": "Луганская Народная Республика",
+      "observations": {
+        "tax_receipts_total": null,
+        "tax_receipts_federal": null,
+        "tax_receipts_consolidated": null,
+        "tax_receipts_local": null,
+        "usn_receipts": null
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": null
+    },
+    {
+      "code": "95",
+      "name": "Херсонская область",
+      "observations": {
+        "tax_receipts_total": null,
+        "tax_receipts_federal": null,
+        "tax_receipts_consolidated": null,
+        "tax_receipts_local": null,
+        "usn_receipts": null
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": null
+    },
+    {
+      "code": "96",
+      "name": "Запорожская область",
+      "observations": {
+        "tax_receipts_total": null,
+        "tax_receipts_federal": null,
+        "tax_receipts_consolidated": null,
+        "tax_receipts_local": null,
+        "usn_receipts": null
+      },
+      "source_url": "https://www.nalog.gov.ru/rn77/related_activities/statistics_and_analytics/forms/16031004/",
+      "source_year": 2025,
+      "unit": "млн рублей",
+      "source_row": null
+    }
+  ]
+}
