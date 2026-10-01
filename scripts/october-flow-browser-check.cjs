@@ -67,6 +67,10 @@ async function ready(){
    assert((await page.locator('.formalTextEditor').inputValue()).length>30,'Editable template opens');
    await page.locator('.formalTextEditor').fill('Текст документа для проверки редактора.');
    await page.getByRole('navigation',{name:'Проверяемый раздел'}).getByRole('button',{name:'Политический процесс',exact:true}).click();
+   await page.locator('.wallPostAvatar img[alt="GOS//SIMS"]').evaluate(img=>img.decode());
+   await page.locator('#process-rating-demo .ratingNewsVisual').scrollIntoViewIfNeeded();
+   assert.equal(await page.locator('#process-rating-demo .ratingVisualValues').textContent(),'Было 65 %Стало 68 %','News shows recorded before/after values');
+   await page.screenshot({path:path.join(screens,'process-live-news-'+width+'.png')});
    const composer=page.locator('.wallComposer');assert.equal(await composer.locator('.processComposerBody').isVisible(),false,'Composer starts folded');
    await composer.locator('summary').first().click();
    assert(await composer.locator('.wallAvatar img[alt="GOS//SIMS"]').isVisible(),'Teacher uses game logo');

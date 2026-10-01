@@ -35,6 +35,7 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    assert.equal(await frame.locator('.wallPost').count(),3,'Populated process feed');
    assert.equal(await frame.locator('.impactEditor').count(),0,'Post records actual changes without a metric checklist');
    assert.equal(await frame.locator('.wallPostAvatar img[alt="GOS//SIMS"]').count(),1,'Teacher has neutral game logo');
+   assert(await frame.locator('.wallPostAvatar img[alt="GOS//SIMS"]').evaluate(img=>img.complete?img.naturalWidth>0:new Promise(resolve=>{img.onload=()=>resolve(img.naturalWidth>0);img.onerror=()=>resolve(false)})),'Neutral logo loads in preview');
    assert.equal(await frame.locator('.processRecordedChanges').count(),2,'Actual linked changes and media reporting');
    const measured=await frame.locator('.processPortal').evaluate(el=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,offenders:[...el.querySelectorAll('button,input,a,.processSourceVisual')].filter(x=>x.getClientRects().length).map(x=>({class:x.className,left:x.getBoundingClientRect().left,right:x.getBoundingClientRect().right})).filter(r=>r.left<-2||r.right>document.documentElement.clientWidth+2)}));
    assert(measured.scroll<=measured.width+2,'Process overflow '+width+': '+JSON.stringify(measured));assert.equal(measured.offenders.length,0,'Process bounds '+width+': '+JSON.stringify(measured));

@@ -152,7 +152,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     const publicFiles=g.partyDocuments.filter(d=>p.context?.party_document_ids?.includes(d.id)&&d.url);
     const label=p.actor_key==='teacher'?'GOS//SIMS':p.actor_label,kind=PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
     const auto=!!p.source_key||p.context?.automatic===true;
-    const own=p.author_id===me.user_id,editable=!readOnly&&(teacher||own);
+    const own=p.author_id===me.user_id,editable=!readOnly&&(teacher||own&&!auto);
     const canRequestVote=!readOnly&&(teacher||own&&!auto);
     return <article className={'wallPost '+p.status} key={p.id} id={'process-'+p.id}>
      <header><div className="wallPostAvatar"><PublisherAvatar actorKey={p.actor_key} label={label} partyLogo={party?.logo_url} avatar={pf?.avatar_url} gender={pf?.gender} name={names[p.author_id]}/></div><div className="wallPostWho"><b>{label}</b><small>{auto?'Автоматическая публикация':p.actor_key==='participant'?names[p.author_id]||'Участник':'Официальное сообщение'} · <time dateTime={p.created_at}>{new Date(p.created_at).toLocaleString('ru-RU')}</time></small></div><span className={'postStatus '+p.status}>{p.status==='accepted'?'Принято':p.status==='rejected'?'Отклонено':'Опубликовано'}</span></header>

@@ -1,6 +1,7 @@
 export function institutionEmblem(subject:string,issuer=''){
  if(subject==='minjust'||/юстиц/i.test(issuer))return '/emblems/minjust-user.jpg';
  if(subject==='interior'||/внутренн|мвд/i.test(issuer))return '/emblems/interior-user.png';
+ if(subject==='central_bank'||/центральн.*банк|банк россии/i.test(issuer))return '/emblems/central-bank.svg';
  if(subject==='municipality'||subject==='region')return null;
  if(subject==='gd'||subject==='gd_deputy')return '/emblems/gd.png';
  if(subject==='sf'||subject==='sf_member')return '/emblems/sf.png';
