@@ -6,6 +6,7 @@ import {CheckCircle2,ChevronRight,CircleDot,LockKeyhole,RefreshCw,RotateCcw,Sear
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StagePolicyEditor from './StagePolicyEditor';
+import DeadlineControl from './DeadlineControl';
 import StyledSelect from '../ui/StyledSelect';
 
 type StageFilter='all'|'open'|'completed'|'locked';
@@ -141,6 +142,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
       </>:<p>Идёт проверка готовности.</p>}
      </section>
      <StagePolicyEditor key={selectedStage.id} g={g} stageNo={selectedStage.stage_no}/>
+     <DeadlineControl g={g} stageNo={selectedStage.stage_no}/>
      <div className="teacherStageInspectorActions">
       {selectedStage.status!=='open'&&<button type="button" onClick={()=>{if(window.confirm('Сделать этап '+selectedStage.stage_no+' текущим?'))void g.openStage(selectedStage.stage_no)}}>Сделать текущим</button>}
       <button type="button" className="primary" onClick={()=>onOpenStage(selectedStage.stage_no)}>Открыть процедуры этапа <ChevronRight size={16}/></button>

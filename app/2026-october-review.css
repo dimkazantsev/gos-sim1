@@ -74,3 +74,11 @@
 
 .chatAddressList{display:grid;gap:5px;padding:10px;border:1px solid #d8e4f4;border-radius:12px;background:#fff;max-height:240px;overflow:auto;margin-bottom:10px}.chatAddressList>small{font-size:12px;color:#667e9c;padding:5px}.chatAddressList>button{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;width:100%;text-align:left;padding:9px 12px;border:0;border-radius:8px;background:#f4f8ff}.chatAddressList>button>b{font-size:13px}.chatAddressList>button>span{font-size:12px;color:#426ba7;overflow-wrap:anywhere}
 .eventModalHeader>.eventModalActions{display:flex;align-items:center;gap:8px;flex:none;margin:0}.eventModalActions>.comicSoundButton.iconOnly,.eventModalActions>.eventModalClose{display:grid;place-items:center;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;margin:0;border:1px solid #d7e3f2;border-radius:11px;background:#fff}.eventModalActions>button>svg{display:block;margin:0;position:static;transform:none;width:21px;height:21px}.eventModalActions .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.scoreFormula{margin-block:16px;border-left:4px solid var(--accent,#ca3f8f)}
+.scoreFormula summary{padding:18px;font-weight:700;cursor:pointer;display:flex;gap:12px;flex-wrap:wrap}
+.scoreFormula summary span{font-size:13px;color:var(--muted,#56677d)}
+.scoreFormulaBody{padding:0 18px 18px}.scoreFormulaBody li{margin-block:12px;line-height:1.6}.scoreEquations{background:#f3f6fb;padding:14px;border-radius:12px}
+.scoreWeights{overflow:auto;margin-block:16px}.scoreWeights table{border-collapse:collapse;min-width:420px;width:100%}.scoreWeights th,.scoreWeights td{padding:12px;border-bottom:1px solid #dce4ed;text-align:left}.scoreWeights td{text-align:center;font-variant-numeric:tabular-nums}
+.formalHero{border-left:4px solid #c3438c}.formalRegistryRowActions{display:flex;gap:8px;padding:0 14px 14px;flex-wrap:wrap}.formalRegistryRowActions button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 12px}
+@media(max-width:600px){.scoreFormula summary,.scoreFormulaBody{padding-inline:12px}.teacherStageInspector .deadlineApplyGrid{grid-template-columns:minmax(0,1fr)}}

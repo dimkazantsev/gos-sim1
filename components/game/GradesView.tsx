@@ -5,6 +5,7 @@ import {useDialog} from '../ui/useDialog';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
+import ScoreFormula from './ScoreFormula';
 
 type Assessment={
  id:string;game_id:string;stage_no:number;user_id:string;auto_score:number;final_score:number|null;
@@ -208,6 +209,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
    <div><b>0 баллов</b><span>Нет участия</span><p>На этапе не зафиксировано содержательных действий студента.</p></div>
   </div></details>
 
+  {teacher&&<ScoreFormula/>}
   <section className="surface gradesMatrixWrap">
    <div className="surfaceHead"><div><small>ГРУППА × ЭТАПЫ</small><h2>Оценки всех участников</h2></div><span>{sortedStudents.length} из {students.length}</span></div>
    <div className="gradesToolbar">
