@@ -7,7 +7,7 @@ type Props={title:string;category:string;caseKey:string;compact?:boolean;silent?
 function hash(s:string){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 export default function EventComic({title,category,caseKey,compact=false,silent=false,scene}:Props){
  const id=useId().replace(/:/g,'');
- const sceneId=scene?.scene_id||eventSceneFrame(caseKey)?.number&&('scene-'+String(eventSceneFrame(caseKey)!.number).padStart(2,'0'));
+ const sceneId=scene?.scene_id||(eventSceneFrame(caseKey)?.number&&('scene-'+String(eventSceneFrame(caseKey)!.number).padStart(2,'0')));
  if(sceneId&&/^scene-\d{2,4}$/.test(String(sceneId)))return <div className="eventComicPlayer">
  <figure className={'eventComic eventPanelIllustration '+(compact?'isCompact':'')} style={{'--scene-native-width':'1920px','--scene-ratio':'16/9'} as CSSProperties} role="img" aria-label={scene?.alt||'Иллюстрация ситуации «'+title+'»'}>
  <svg width="1920" height="1080" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-hidden="true">

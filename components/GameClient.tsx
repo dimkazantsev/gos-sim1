@@ -204,7 +204,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
  const [pendingEvents,setPendingEvents]=useState(0);
  const sectionUpdates=useSectionUpdates(gameId,g.me?.user_id,view,!!viewAs);
- const sectionBadge=(key:string)=>Math.min(999,Math.max(sectionUpdates[key]||0,key==='events'?pendingEvents:0));
+ const sectionBadge=(key:string)=>Math.min(999,Math.max(sectionUpdates?.[key]||0,key==='events'?pendingEvents:0));
  const [selectedProfileId,setSelectedProfileId]=useSavedGameState(gameId,g.me?.user_id,'profile-selected','',savedString);
  const [completingProfile,setCompletingProfile]=useState(false);
  const [onboardingNotice,setOnboardingNotice]=useState('');
