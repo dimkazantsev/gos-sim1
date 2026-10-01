@@ -177,6 +177,7 @@ async function ready(){
    await page.screenshot({path:path.join(screens,'process-live-news-review-'+width+'.png')});
    await queue.getByRole('button',{name:'Опубликовать в СМИ',exact:true}).click();await page.locator('#process-published-media-ui-post').waitFor();
    assert.equal(toolCalls.filter(x=>x.rpc==='review_media_news').at(-1).p_approve,true);
+   await page.getByRole('searchbox',{name:'Поиск публикаций',exact:true}).fill('');
    page.once('dialog',dialog=>dialog.accept());await page.locator('#process-justice-demo').getByRole('button',{name:'Удалить публикацию',exact:true}).click();
    await page.waitForFunction(()=>!document.querySelector('#process-justice-demo'));
    assert.equal(toolCalls.filter(x=>x.rpc==='delete_process_post').at(-1).p_post_id,'justice-demo','Teacher can remove an automatic publication');
