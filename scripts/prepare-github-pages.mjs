@@ -16,7 +16,7 @@ function transform(name,from,to){
  writeFileSync(file,source.replaceAll(from,to));
 }
 rmSync(target,{recursive:true,force:true});mkdirSync(target,{recursive:true});
-for(const name of ['app','components','lib','public','data','package.json','package-lock.json','tsconfig.json','next-env.d.ts'])cpSync(resolve(root,name),resolve(target,name),{recursive:true});
+for(const name of ['app','components','lib','public','data','package.json','package-lock.json','tsconfig.json','next-env.d.ts','public-client-config.json'])cpSync(resolve(root,name),resolve(target,name),{recursive:true});
 rmSync(resolve(target,'app/game'),{recursive:true,force:true});rmSync(resolve(target,'app/api'),{recursive:true,force:true});
 transform('lib/supabase.ts',"'build-placeholder-key'",JSON.stringify(publicKey));
 writeFileSync(resolve(target,'next.config.ts'),`export default {output:'export',basePath:${JSON.stringify(base)},assetPrefix:${JSON.stringify(base)},trailingSlash:true,images:{unoptimized:true},experimental:{useTypeScriptCli:false}};\n`);

@@ -2,7 +2,7 @@
 import {IconAction} from './ui/IconAction';
 import ChatToggleButton from './game/ChatToggleButton';
 import {useEffect,useRef,useState} from 'react';
-import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Vote as VoteIcon,Wifi} from 'lucide-react';
+import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon,Wifi} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
@@ -360,7 +360,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const nav:[View,string][]=[['dashboard','Обзор игры'],['stages','Этапы и задачи'],['actions','Политический процесс'],['parties',teacher&&!previewMode?'Партии':'Моя партия'],['votes','Голосования'],['documents','Реестр НПА'],['budget','Бюджет'],['grades','Оценки и разбор'],['events','События и ситуации'],...(teacher&&!previewMode?[['teacher','Управление'] as [View,string]]:[]),['profile','Мой профиль']];
 
  const navIcon=(key:View)=>{
-  const P=key==='events'?CalendarDays:key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='actions'?Radio:key==='parties'?Landmark:key==='votes'?VoteIcon:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:UserRound;
+  const P=key==='events'?CalendarDays:key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='actions'?Radio:key==='parties'?Landmark:key==='votes'?VoteIcon:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:key==='budget'?Wallet:UserRound;
   return <P aria-hidden="true" strokeWidth={1.9}/>;
  };
  const mobilePrimary:View[]=teacher&&!previewMode?['teacher','dashboard','stages','votes']:['dashboard','stages','parties','votes'];

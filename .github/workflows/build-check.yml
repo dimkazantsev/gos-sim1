@@ -28,6 +28,7 @@ jobs:
       - run: npm run design:preview
       - run: node scripts/registry-browser-check.cjs
       - run: node scripts/october-flow-browser-check.cjs
+      - run: node scripts/october-budget-awards-browser-check.cjs
       - run: npm run design:interactive
       - run: npm run design:browser
       - run: npm run design:dock
