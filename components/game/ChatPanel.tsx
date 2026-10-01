@@ -89,7 +89,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const hasFilter=!!search.trim()||onlyFiles;
  const handles=chatHandles(g.members).filter(x=>x.member.user_id!==me?.user_id);
  const address=text.match(/^@([а-яёa-z0-9_-]*)/i);
- const suggestions=address?handles.filter(x=>x.handle.startsWith(address[1].toLowerCase())||x.surname.toLowerCase().startsWith(address[1].toLowerCase())).slice(0,8):[];
+ const suggestions=address?handles.filter(x=>x.handle.startsWith(address[1].toLowerCase())||x.aliases.some(a=>a.startsWith(address[1].toLowerCase()))).slice(0,8):[];
  async function addressPerson(userId:string,sendNow=false){
   if(!g.game||sending)return;setSending(true);setLocalError('');
   try{const r=await supabase.rpc('open_direct_conversation',{p_game:g.game.id,p_recipient:userId});
@@ -199,9 +199,9 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
   if(pendingSend.current||sending||uploading||chatLoading||!text.trim()||!channelId)return;
-  if(address){const exact=handles.filter(x=>x.handle===address[1].toLowerCase()||x.surname.toLowerCase()===address[1].toLowerCase());
+  if(address){const exact=handles.filter(x=>x.handle===address[1].toLowerCase()||x.aliases.includes(address[1].toLowerCase()));
    if(exact.length!==1){setLocalError('Выберите адресата из списка под полем сообщения.');return}
-   await addressPerson(exact[0].member.user_id,true);return;
+   pendingSend.current=true;try{await addressPerson(exact[0].member.user_id,true)}finally{pendingSend.current=false}return;
   }
   const sentText=text,fromChannel=channelId;
   pendingSend.current=true;setSending(true);setLocalError('');

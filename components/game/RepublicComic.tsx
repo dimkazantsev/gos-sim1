@@ -91,7 +91,7 @@ export default function RepublicComic({open,onClose,intro=false,gameId}:{open:bo
  const item=items[Math.min(scene,items.length-1)];
  return createPortal(<div className="comicBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!intro)close()}}>
   <section ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Комикс о Республике" className="comicDialog">
-   <header><b>GOS//SIMS · КОМИКС О РЕСПУБЛИКЕ</b><div><ComicSoundButton playing={playing}/>
+   <header><b>GOS//SIMS · КОМИКС О РЕСПУБЛИКЕ</b><div><ComicSoundButton playing={playing} iconOnly/>
      <button aria-label={playing?'Остановить автоматическое воспроизведение':'Продолжить показ'} onClick={()=>setPlaying(!playing)}>{playing?<Pause size={19}/>:<Play size={19}/>}</button>
      <button aria-label={intro?'Завершить пролог после просмотра':'Закрыть комикс'} disabled={intro&&scene!==items.length-1} onClick={close}><X size={20}/></button></div></header>
    {!intro&&<div className='comicArchive'><button type='button' aria-expanded={archiveOpen} onClick={()=>{setArchiveOpen(!archiveOpen);setPlaying(false)}}>Архив глав · {items.length}</button>{archiveOpen&&<nav aria-label='Главы республики'>{items.map((x,i)=><button key={i} type='button' aria-current={scene===i?'step':undefined} onClick={()=>{go(i);setArchiveOpen(false);setPlaying(false)}}>{i<4?'Пролог '+(i+1):x.kicker} · {x.title}</button>)}{!chapters.length&&<p>Итоговая глава и анонс появятся после завершения этапа.</p>}{archiveError&&<p role='status'>{archiveError}</p>}</nav>}</div>}

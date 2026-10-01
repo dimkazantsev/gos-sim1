@@ -20,15 +20,12 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  const total=useMemo(()=>fiscalTotal(regions,rates),[regions,rates]);
  const tax=catalog.taxes.find(t=>t.key===taxKey)!;
  async function load(){
-  if(!g.game)return;const r=await supabase.rpc('get_fiscal_budget',{p_game_id:g.game.id});
+  if(!g.game)return;const [r,c]=await Promise.all([supabase.rpc('get_fiscal_budget',{p_game_id:g.game.id}),supabase.rpc('list_regional_cases',{p_game_id:g.game.id})]);
+  if(!c.error)setCases((c.data||[]) as Case[]);
   if(r.error){g.setError(r.error.message);return}
   if(r.data&&typeof r.data==='object'){setRegions(r.data.regions||[]);setRates(r.data.rates||[]);setProposals(r.data.proposals||[]);setLedger(r.data.ledger||[]);setCanPropose(!!r.data.can_propose);}setReady(true);
  }
  useEffect(()=>{void load();if(!g.game)return;const id=setInterval(()=>void load(),20000);return()=>clearInterval(id)},[g.game?.id,g.me?.user_id]);
- useEffect(()=>{
-  if(!g.game)return;let live=true;void supabase.rpc('list_regional_cases',{p_game_id:g.game.id}).then(r=>{if(live&&!r.error)setCases((r.data||[]) as Case[])});
-  return()=>{live=false};
- },[g.game?.id]);
  useEffect(()=>{if(!region)return;setParameters(Object.fromEntries(['enterprises','employees_per_firm','monthly_wage','profit_per_firm','consumption_per_firm','expenditure','transfer_in','debt','compliance'].map(k=>[k,String(region[k as keyof FiscalRegion])])));},[region?.region_code,region?.enterprises,region?.expenditure,region?.monthly_wage]);
  useEffect(()=>{const scope=tax.level==='federal'?'00':selected;setRate(String(rates.find(r=>r.tax_key===taxKey&&r.region_code===scope)?.rate??tax.default_rate??''));},[taxKey,selected,rates]);
  async function propose(){
