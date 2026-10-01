@@ -1,0 +1,24 @@
+name: Independent achievement medals
+on:
+  push:
+    branches: ['codex/civic-*']
+    paths: ['scripts/build-achievements.py','content/achievements.tsv','.github/workflows/achievement-assets.yml']
+permissions:
+  contents: write
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python scripts/build-achievements.py
+      - name: Preserve medal assets and server definitions
+        run: |
+          git config user.name "Codex achievement content"
+          git config user.email "codex-achievements@users.noreply.github.com"
+          git add public/medals/ supabase/changes/20261002_achievement_catalog.sql docs/ACHIEVEMENT_METHOD.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "content: 100 individual medals and guarded achievement catalog"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
