@@ -1,0 +1,22 @@
+# Источники региональных данных
+
+[
+  {
+    "kind": "geometry",
+    "country": "RUS",
+    "url": "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/RUS/ADM1/geoBoundaries-RUS-ADM1_simplified.geojson",
+    "sha256": "47179a0b1f30097226bc057921e674d83a9ac9e2a44023e687351355cdb7fc1b",
+    "year": 2017,
+    "license": "ODbL 1.0; OpenStreetMap / geoBoundaries"
+  },
+  {
+    "kind": "geometry",
+    "country": "UKR",
+    "url": "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/UKR/ADM1/geoBoundaries-UKR-ADM1_simplified.geojson",
+    "sha256": "4a5947e7497574d51f93255dfa7e03dce0c7acf6ecee52d25773a5205854a399",
+    "year": 2017,
+    "license": "ODbL 1.0; OpenStreetMap / geoBoundaries"
+  }
+]
+
+Границы — справочный набор 2017 года, не карта фактического контроля. Спорные территории обозначаются отдельно. Статистические наблюдения извлекаются с указанием года и единицы; отсутствующие значения остаются пустыми. Игровые коэффициенты не являются статистикой.
