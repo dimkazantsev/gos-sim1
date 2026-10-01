@@ -154,8 +154,8 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    <div><strong>{readyCases.filter(c=>c.seriousness==='light').length}</strong><small>Повседневные ситуации</small></div>
    <div><strong>{readyCases.filter(c=>c.case_key.startsWith('bank-curated-v2-')).length}<span>/50</span></strong><small>Новая авторская итерация</small></div>
   </div>}
-  {mode==='manage'&&teacher&&<div className="eventComposerPanel">
-   <h3>Направить новое событие</h3>
+  {mode==='manage'&&teacher&&<details className="eventComposerPanel civicDisclosure">
+   <summary>Направить событие…</summary><div className="civicDisclosureBody">
    <div className="eventEditorGrid">
     <label>Название<input value={title} maxLength={180} onChange={e=>setTitle(e.target.value)} placeholder="Краткий заголовок ситуации"/></label>
     <StyledSelect label="Сфера" value={category} onChange={setCategory} options={['Государственное управление','Экономика','Международные отношения','Образование','Здравоохранение','Экология','Муниципальное управление','Культура и протокол','Социальная политика'].map(v=>({value:v,label:v}))}/>
@@ -172,7 +172,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    </article>)}<button type="button" disabled={options.length>=6} onClick={()=>setOptions(old=>[...old,{label:'',trust:0,description:''}])}>Добавить вариант</button></div>
    {audience!=='all'&&<div className="eventRecipients"><strong>Получатели · {selected.length}/{audience==='single'?1:3}</strong><div>{recipients.map(m=><label key={m.user_id}><input type="checkbox" checked={selected.includes(m.user_id)} disabled={!selected.includes(m.user_id)&&selected.length>=(audience==='single'?1:3)} onChange={e=>setSelected(old=>e.target.checked?[...old,m.user_id]:old.filter(x=>x!==m.user_id))}/>{m.full_name}<small>{m.role_title||'Студент'}</small></label>)}</div></div>}
    <footer><span>{audience==='all'?'Получатели: вся аудитория':'Выбрано: '+selected.length}</span><button type="button" onClick={()=>void create()} disabled={!canSend||saving||readOnly}>{saving?'Отправка…':'Назначить событие'}</button></footer>
-  </div>}
+  </div></details>}
   {<div className="eventList"><header className="eventFeedHeader"><div><small>ЛЕНТА НАЗНАЧЕННЫХ СИТУАЦИЙ</small><h3>{teacher||me.kind==='observer'?'Решения участников':'Мои события'}</h3></div><span>{visibleCases.length} событий</span></header>
    {<div className="eventFeedFilters">
     <StyledSelect label="Участник" value={feedPerson} onChange={setFeedPerson} options={[{value:'',label:'Все участники'},...students.map(m=>({value:m.user_id,label:m.full_name}))]}/>
