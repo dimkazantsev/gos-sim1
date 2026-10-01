@@ -190,6 +190,6 @@ async function ready(){
    console.log('PASS Real registry revision/delivery/signing controls, document/post reactions/comments/views, inline editor with retained draft, student office proposal, teacher media approval/deletion, picker, tags, links, attachment, metric RPC and body number at '+width+'px');
    await context.close();
   }
- }catch(e){if(activePage&&!activePage.isClosed())await activePage.screenshot({path:path.join(screens,'october-flow-failure.png')}).catch(()=>{});console.error(logs);throw e}
+ }catch(e){if(activePage&&!activePage.isClosed()){await activePage.screenshot({path:path.join(screens,'october-flow-failure.png')}).catch(()=>{});console.error(await activePage.evaluate(()=>({scrollY:window.scrollY,expanded:[...document.querySelectorAll('button[aria-haspopup="listbox"]')].map(b=>({name:b.textContent,expanded:b.getAttribute('aria-expanded'),rect:b.getBoundingClientRect().toJSON()})),menus:document.querySelectorAll('[role="listbox"]').length})).catch(()=>null))}console.error(logs);throw e}
  finally{if(browser)await browser.close();if(server)server.kill('SIGTERM');fs.rmSync(route,{recursive:true,force:true});}
 })().catch(e=>{console.error(e);process.exitCode=1});

@@ -19,6 +19,7 @@ export default function StyledSelect({label,value,options,onChange,disabled=fals
  function position(){
   const r=trigger.current?.getBoundingClientRect();
   if(!r)return;
+  if(r.bottom<=0||r.top>=window.innerHeight){setOpen(false);return;}
   const spaceBelow=window.innerHeight-r.bottom-16,spaceAbove=r.top-16;
   const above=spaceBelow<180&&spaceAbove>spaceBelow;
   const height=Math.min(340,Math.max(128,above?spaceAbove:spaceBelow));
@@ -29,7 +30,7 @@ export default function StyledSelect({label,value,options,onChange,disabled=fals
   if(!open)return;
   const off=(e:PointerEvent)=>{if(!ref.current?.contains(e.target as Node)&&!popup.current?.contains(e.target as Node))setOpen(false)};
   const escape=(e:KeyboardEvent)=>{if(e.key==='Escape'){e.preventDefault();setOpen(false);trigger.current?.focus()}};
-  const scroll=(e:Event)=>{if(!popup.current?.contains(e.target as Node))setOpen(false)};
+  const scroll=(e:Event)=>{if(!popup.current?.contains(e.target as Node))position()};
   document.addEventListener('pointerdown',off);
   document.addEventListener('keydown',escape);
   window.addEventListener('scroll',scroll,true);
