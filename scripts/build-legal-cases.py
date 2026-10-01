@@ -125,3 +125,13 @@ sql="-- 150 original legal cases. Existing completed outcomes are never rewritte
 (ROOT/'supabase/changes/20261002_150_legal_cases.sql').write_text(sql)
 (ROOT/'docs/CASE_CONTENT_AUDIT.md').write_text('# Аудит правовых задач\n\nДобавлено 150 оригинальных задач: 89 региональных и 61 общая. Проверено 200 ключей, заголовков и фактических условий, включая прежние 50. У каждой новой задачи две самостоятельные альтернативы и объяснение с нормой и границами компетенции. Положение верного ответа чередуется.\n\nЭто авторские учебные ситуации, а не пересказ судебных дел и не обещание юридической экспертизы. Темы — бюджетное и налоговое право, конституционные процедуры, административная и гражданская практика, трудовые гарантии, данные, закупки. Смежные темы различаются юридическим фактом и требуемым действием: двойное возмещение оборудования, проверка лизинговых затрат и условия научного результата не являются одной задачей с изменённым регионом.\n\nИллюстрации — 150 независимых векторных файлов с собственной композицией и предметами, 1920×1080; SVG остаётся чётким на телефоне и большом экране. Налоговые, бюджетные и рейтинговые эффекты условны, не прогнозируют реальные регионы.\n')
 print('PASS: 150 new exercises; 89 regional links; 200 unique existing/new records; 150 separate 1920×1080 scenes.')
+
+# Similarity diagnostics complement exact duplicate checks. Review close facts manually.
+import itertools
+stop={'в','на','и','с','по','за','но','что','не','для','как','из','его','от','это','об','без','а','к','до','рф','области','предлагает'}
+tokens=[set(re.findall('[а-яё]+',c['situation'].lower()))-stop for c in all_cases]
+pairs=[]
+for a,b in itertools.combinations(range(200),2):
+    score=len(tokens[a]&tokens[b])/len(tokens[a]|tokens[b])
+    pairs.append((round(score,3),all_cases[a]['case_key'],all_cases[b]['case_key'],all_cases[a]['title'],all_cases[b]['title']))
+(ROOT/'docs/CASE_SIMILARITY_DIAGNOSTICS.json').write_text(json.dumps({'method':'Jaccard of Russian word sets after common-word removal; diagnostic, not proof of legal equivalence','maximum':max(pairs)[0],'closest_pairs':sorted(pairs,reverse=True)[:20]},ensure_ascii=False,indent=2)+'\n')

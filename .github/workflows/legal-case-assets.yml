@@ -17,7 +17,7 @@ jobs:
         run: |
           git config user.name "Codex legal case content"
           git config user.email "codex-legal-cases@users.noreply.github.com"
-          git add content/events-legal-2026.json public/event-comics/scene-*.svg supabase/changes/20261002_150_legal_cases.sql docs/CASE_CONTENT_AUDIT.md
+          git add content/events-legal-2026.json public/event-comics/scene-*.svg supabase/changes/20261002_150_legal_cases.sql docs/CASE_CONTENT_AUDIT.md docs/CASE_SIMILARITY_DIAGNOSTICS.json
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "content: 150 individual legal cases and 1920×1080 scenes"
           git pull --rebase origin "${GITHUB_REF_NAME}"
