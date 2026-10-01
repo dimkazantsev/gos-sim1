@@ -20,7 +20,7 @@ begin
    else delta:=100*(coalesce((l.after_values->>'activity_multiplier')::numeric,1)-coalesce((l.before_values->>'activity_multiplier')::numeric,1));end if;
   elsif key='budget' then
    for r in select * from game_fiscal_regions where game_id=l.game_id and (l.region_code='00' or region_code=l.region_code) loop
-    base:=case p.tax_key when 'vat' then r.enterprises*r.consumption_per_firm*r.activity_multiplier when 'income' then r.enterprises*r.employees_per_firm*r.monthly_wage*12/1000000 when 'profit' then r.enterprises*r.profit_per_firm*r.activity_multiplier when 'corporate_property' then r.enterprises*18 when 'transport' then r.enterprises*240 when 'land' then r.enterprises*3 when 'individual_property' then r.enterprises*r.employees_per_firm*2.5 when 'tourism' then r.enterprises*(case when (select profile from fiscal_region_reference where code=r.region_code)='tourism' then 3 else .2 end) else 0 end;
+    base:=case p.tax_key when 'vat' then r.enterprises*r.consumption_per_firm*r.activity_multiplier when 'income' then r.enterprises*r.employees_per_firm*r.monthly_wage*12/1000000 when 'profit' then r.enterprises*r.profit_per_firm*r.activity_multiplier when 'corporate_property' then r.enterprises*18 when 'transport' then r.enterprises*240 when 'land' then r.enterprises*3 when 'personal_property' then r.enterprises*r.employees_per_firm*2.5 when 'tourism' then r.enterprises*(case when (select profile from fiscal_region_reference where code=r.region_code)='tourism' then 3 else .2 end) else 0 end;
     factor:=case when p.tax_key='transport' then .000001 else .01 end;
     delta:=delta+base*((l.after_values->>'rate')::numeric-(l.before_values->>'rate')::numeric)*factor*r.compliance;
    end loop;
