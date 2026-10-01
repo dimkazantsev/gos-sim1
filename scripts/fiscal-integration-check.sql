@@ -1,0 +1,74 @@
+-- Isolated classroom, authenticated RPC checks, complete rollback, no real IDs in source.
+begin;
+do $$declare g uuid:=gen_random_uuid();admin uuid;a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();begin
+ select owner_id into admin from public.games where game_code='8.414';
+ -- Two temporary identities avoid inheriting platform-admin rights. Both are
+ -- rolled back; real users, logins and classroom roles are never changed.
+ if admin is null then raise exception 'QA requires an existing classroom owner';end if;
+ insert into auth.users(id,aud,role) values(a,'authenticated','authenticated'),(b,'authenticated','authenticated');
+ perform set_config('request.jwt.claim.sub',admin::text,true);
+ insert into public.games(id,title,game_code,owner_id,status,turn_open) values(g,'QA fiscal integration','QA'||substr(replace(g::text,'-',''),1,12),admin,'running',true);
+ insert into public.game_members(game_id,user_id,full_name,kind,role_title,group_name) values(g,admin,'QA преподаватель','teacher','Преподаватель','QA'),(g,a,'QA участник А','student','Депутат Государственной Думы','QA'),(g,b,'QA участник Б','student','Министр финансов','QA');
+ insert into game_stages(game_id,stage_no,title,mode,summary,status) select g,stage_no,title,mode,summary,case when stage_no=1 then 'open' else 'locked' end from game_stages where game_id=(select id from games where game_code='8.414');
+ insert into state_metrics(game_id,metric_key,label,value,unit,is_public,group_key,min_value,max_value,sort_order) select g,metric_key,label,value,unit,is_public,group_key,min_value,max_value,sort_order from state_metrics where game_id=(select id from games where game_code='8.414') on conflict(game_id,metric_key) do nothing;
+ perform set_config('qa.game',g::text,true);perform set_config('qa.teacher',admin::text,true);perform set_config('qa.a',a::text,true);perform set_config('qa.b',b::text,true);
+end$$;
+set local role authenticated;
+do $$declare g uuid:=current_setting('qa.game')::uuid;admin uuid:=current_setting('qa.teacher')::uuid;a uuid:=current_setting('qa.a')::uuid;b uuid:=current_setting('qa.b')::uuid;r jsonb;blocked boolean;office uuid;c uuid;x uuid;y uuid;choice text;before_activity numeric;after_activity numeric;p uuid;begin
+ r:=public.get_fiscal_budget(g);if jsonb_array_length(r->'regions')<>89 then raise exception 'FAIL 89 shared regions';end if;
+ perform public.set_fiscal_parameters(g,'54','{"enterprises":1200,"monthly_wage":55000}');
+ office:=public.appoint_game_office(g,a,'Министр финансов','QA rotation for current budget powers',true);
+ perform set_config('request.jwt.claim.sub',a::text,true);r:=public.get_fiscal_budget(g);
+ if (r->>'can_propose')::boolean then raise exception 'FAIL inactive portfolio office gives budget authority';end if;
+ blocked:=false;begin perform public.propose_fiscal_rate(g,'54','corporate_property',2);exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL nonexecutive changed rate';end if;
+ blocked:=false;begin perform public.set_fiscal_parameters(g,'54','{"enterprises":99999}');exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL student changed economic parameters';end if;
+ perform public.select_game_office(office);r:=public.get_fiscal_budget(g);if not (r->>'can_propose')::boolean then raise exception 'FAIL executive current office';end if;
+ p:=public.propose_fiscal_rate(g,'54','corporate_property',2);
+ if exists(select 1 from game_fiscal_rates where game_id=g and region_code='54' and tax_key='corporate_property' and rate=2) then raise exception 'FAIL proposal applied without NPA';end if;
+ blocked:=false;begin perform public.propose_fiscal_rate(g,'54','tourism',5);exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL illegal 2026 tourism rate';end if;
+ blocked:=false;begin perform public.get_fiscal_budget(gen_random_uuid());exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL foreign-game budget access';end if;
+ perform set_config('request.jwt.claim.sub',admin::text,true);perform public.seed_game_event_bank(g);
+ perform set_config('request.jwt.claim.sub',a::text,true);
+ select (v->>'id')::uuid into c from jsonb_array_elements(public.list_regional_cases(g)) v where v->'comic_scene'->>'region_code'='54';
+ if c is null then raise exception 'FAIL regional case not seeded';end if;
+ perform public.start_regional_case(c);perform public.start_regional_case(c);
+ if (select count(*) from event_assignments where case_id=c and recipient_id=a)<>1 then raise exception 'FAIL repeated case start';end if;
+ r:=public.get_section_updates(g);if coalesce((r->>'events')::int,0)<1 then raise exception 'FAIL event counter';end if;
+ perform set_config('qa.original_budget',(select value::text from state_metrics where game_id=g and metric_key='budget'),true);
+ select activity_multiplier into before_activity from game_fiscal_regions where game_id=g and region_code='54';
+ perform set_config('request.jwt.claim.sub',b::text,true);perform public.start_regional_case(c);
+ select 'option_'||z.n into choice from event_cases e cross join lateral jsonb_array_elements(e.effect_plan->'options') with ordinality z(v,n) where e.id=c and (z.v->>'lawful')::boolean;
+ select id into x from event_assignments where case_id=c and recipient_id=b;perform public.submit_event_decision(x,choice,null);
+ if exists(select 1 from event_case_outcomes where case_id=c) then raise exception 'FAIL resolved before all participants';end if;
+ perform set_config('request.jwt.claim.sub',a::text,true);select id into y from event_assignments where case_id=c and recipient_id=a;perform public.submit_event_decision(y,choice,null);
+ if (select count(*) from event_case_outcomes where case_id=c)<>1 then raise exception 'FAIL collective case outcome';end if;
+ select activity_multiplier into after_activity from game_fiscal_regions where game_id=g and region_code='54';
+ if after_activity<=before_activity then raise exception 'FAIL event not linked to regional budget';end if;
+ r:=public.get_event_decision_feedback(c);if not (r->>'authority_ok')::boolean or not (r->>'lawful')::boolean or length(r->>'legal_basis')<15 then raise exception 'FAIL legal and authority feedback';end if;
+ perform set_config('qa.case',c::text,true);perform set_config('qa.proposal',p::text,true);
+end$$;
+reset role;
+do $$declare g uuid:=current_setting('qa.game')::uuid;c uuid:=current_setting('qa.case')::uuid;admin uuid:=current_setting('qa.teacher')::uuid;l bigint;old_budget numeric;new_budget numeric;history_count int;d uuid;p uuid;changed int;begin
+ select id into l from fiscal_change_ledger where game_id=g and source_type='event' and source_id=c::text;
+ old_budget:=current_setting('qa.original_budget')::numeric;
+ if old_budget is null then raise exception 'FAIL seeded budget index';end if;
+ perform private.apply_fiscal_metrics(l);select value into new_budget from state_metrics where game_id=g and metric_key='budget';
+ if new_budget>=old_budget then raise exception 'FAIL fiscal cost not in budget index';end if;
+ select count(*) into history_count from state_metric_history where game_id=g and source_type='fiscal';perform private.apply_fiscal_metrics(l);
+ if (select count(*) from state_metric_history where game_id=g and source_type='fiscal')<>history_count then raise exception 'FAIL repeated fiscal rating effect';end if;
+ perform set_config('request.jwt.claim.sub',admin::text,true);
+ p:=public.propose_fiscal_rate(g,'54','profit',24);select document_id into d from fiscal_rate_proposals where id=p;
+ if d is null or private.apply_published_fiscal_act(d) then raise exception 'FAIL draft has fiscal force';end if;
+ update formal_documents set status_code='published',status_label='Опубликовано' where id=d;
+ if (select status from fiscal_rate_proposals where id=p)<>'applied' then raise exception 'FAIL published tax trigger';end if;
+ if private.apply_published_fiscal_act(d) or (select rate from game_fiscal_rates where game_id=g and region_code='00' and tax_key='profit')<>24 then raise exception 'FAIL rate apply idempotency';end if;
+ update game_stages set status='completed',completed_at=now() where game_id=g and stage_no=1;
+ select count(*) into changed from fiscal_change_ledger where game_id=g and source_type='period' and source_id='1';if changed<>89 then raise exception 'FAIL rate sensitivity in next period: %',changed;end if;
+ if private.advance_fiscal_period(g,1)<>0 then raise exception 'FAIL period replay';end if;
+ if has_function_privilege('authenticated','private.apply_fiscal_metrics(bigint)','execute') then raise exception 'FAIL client can call protected rating helper';end if;
+end$$;
+set local role anon;
+do $$declare blocked boolean:=false;begin begin perform public.get_fiscal_budget(current_setting('qa.game')::uuid);exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL anonymous budget RPC';end if;end$$;
+reset role;
+select jsonb_build_object('regions_89','PASS','current_executive_role','PASS','economic_parameter_guard','PASS','proposal_requires_act','PASS','tax_limits','PASS','foreign_game_guard','PASS','new_event_counter','PASS','collective_case','PASS','fiscal_case_effect','PASS','legal_feedback','PASS','index_once','PASS','published_act_once','PASS','period_once','PASS','helper_privileges','PASS','anonymous_guard','PASS') as checks;
+rollback;

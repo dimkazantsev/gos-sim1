@@ -31,7 +31,7 @@ export const metadata:Metadata={
  title:'GOS//SIMS — Республика Политология · симулятор',
  description:'Учебная многопользовательская платформа: политические процессы, НПА, голосования, партии, аналитика и автоматический журнал ВСН по 16 этапам',
  applicationName:'GOS//SIMS',
- other:{'gos-sims-release':process.env.VERCEL_GIT_COMMIT_SHA?.slice(0,8)||'local'}
+ other:{'gos-sims-release':(process.env.VERCEL_GIT_COMMIT_SHA||process.env.GITHUB_SHA)?.slice(0,8)||'local'}
 };
 
 export default function RootLayout({children}:{children:React.ReactNode}){

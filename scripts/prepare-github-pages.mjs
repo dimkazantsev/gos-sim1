@@ -16,7 +16,7 @@ function transform(name,from,to){
  writeFileSync(file,source.replaceAll(from,to));
 }
 rmSync(target,{recursive:true,force:true});mkdirSync(target,{recursive:true});
-for(const name of ['app','components','lib','public','package.json','package-lock.json','tsconfig.json','next-env.d.ts'])cpSync(resolve(root,name),resolve(target,name),{recursive:true});
+for(const name of ['app','components','lib','public','data','package.json','package-lock.json','tsconfig.json','next-env.d.ts'])cpSync(resolve(root,name),resolve(target,name),{recursive:true});
 rmSync(resolve(target,'app/game'),{recursive:true,force:true});rmSync(resolve(target,'app/api'),{recursive:true,force:true});
 transform('lib/supabase.ts',"'build-placeholder-key'",JSON.stringify(publicKey));
 writeFileSync(resolve(target,'next.config.ts'),`export default {output:'export',basePath:${JSON.stringify(base)},assetPrefix:${JSON.stringify(base)},trailingSlash:true,images:{unoptimized:true},experimental:{useTypeScriptCli:false}};\n`);
@@ -37,10 +37,7 @@ for(const name of ['EventComic.tsx','ProfileAvatar.tsx','avatarCrop.ts','ComicSo
  for(const prefix of ['/event-comics/','/avatars/','/vendor/','/models/','/audio/','/portable/'])source=source.replaceAll("'"+prefix,"'"+base+prefix).replaceAll('"'+prefix,'"'+base+prefix);
  writeFileSync(file,source);
 }
-// GitHub Pages has no POST endpoint. Keep the existing TXT/manual attachment behavior in the browser.
-transform('components/game/DocumentsView.tsx',
- "const res=await fetch('/api/extract-document',{method:'POST',body:fd});const data=await res.json();",
- "if(next.size>10*1024*1024)throw Error('Файл слишком большой. Максимум 10 МБ.');const text=next.type==='text/plain'||next.name.toLowerCase().endsWith('.txt')?(await next.text()).replace(/\\u0000/g,'').replace(/\\r\\n/g,'\\n').trim():'';const data={text:text.slice(0,120000),truncated:text.length>120000,error:'',pages:0,needsManualText:!text};const res={ok:true};");
+// Document extraction/import uses the same authorised API as the live app.
 for(const name of ['components/GameClient.tsx','components/PublicScreen.tsx'])transform(name,'href="/"','href='+JSON.stringify(base+'/'));
 transform('components/game/SessionManager.tsx',"window.location.assign('/')",'window.location.assign('+JSON.stringify(base+'/')+')');
 for(const name of ['components/StaticLanding.tsx','components/game/ProfileSecurityPanel.tsx'])transform(name,"window.location.origin+'/auth/update-password'",'window.location.origin+'+JSON.stringify(base+'/auth/update-password/'));

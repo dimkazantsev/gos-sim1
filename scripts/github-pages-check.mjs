@@ -19,6 +19,7 @@ for(const name of ['components/StaticLanding.tsx','components/game/ProfileSecuri
 assert.ok(readFileSync(join(built,'components/StaticLanding.tsx'),'utf8').includes(base+'/?game='),'Dynamic game entry must use the static route.');
 const documents=readFileSync(join(built,'components/game/DocumentsView.tsx'),'utf8');
 assert.ok(!documents.includes("fetch('/api/"),'A static host cannot serve document POST requests.');
-assert.ok(documents.includes('10*1024*1024'),'Preserve the document size limit.');
+assert.ok(documents.includes('NEXT_PUBLIC_GAME_API_ORIGIN'),'Use the shared API for PDF/DOCX extraction.');
+assert.ok(existsSync(join(built,'data/region-paths.json')),'Shared region data');
 assert.ok(!readFileSync(join(built,'components/game/portableSession.ts'),'utf8').includes("asset('/portable/"),'Portable assets need the repository prefix.');
 console.log(`PASS ${refs.size} HTML asset links, ${scenes.length} scenes, dynamic game entry, recovery route, document attachments and portable files.`);
