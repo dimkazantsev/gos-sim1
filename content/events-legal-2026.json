@@ -30,6 +30,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.004,
@@ -111,7 +112,7 @@
         {
           "key": "option_2",
           "trust": 1,
-          "description": "Подготовить законную категориальную меру и оценку выпадающих доходов. Основание: НК РФ, статьи 12, 56. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Подготовить законную категориальную меру и оценку выпадающих доходов. Основание: НК РФ, статьи 12, 56. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Сохранение законной поддержки промышленного сектора без произвольной льготы.",
           "news": "Подготовить законную категориальную меру и оценку выпадающих доходов. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -120,7 +121,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": false,
+          "protects_role_interest": true,
+          "role_interest_note": "Сохранение законной поддержки промышленного сектора без произвольной льготы.",
           "legal_basis": "НК РФ, статьи 12, 56 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.005,
@@ -174,6 +176,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статьи 38, 139 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.006,
@@ -264,7 +267,8 @@
             "министр финансов"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, глава 33.1 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.007,
@@ -318,6 +322,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статьи 38, 140 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.008,
@@ -409,6 +414,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статьи 161, 219 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -462,6 +468,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 83; Закон № 115-ФЗ Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.01,
@@ -552,7 +559,8 @@
             "министр финансов"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, статья 394 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.004,
@@ -596,7 +604,7 @@
         {
           "key": "option_1",
           "trust": 1,
-          "description": "Зафиксировать конфликт интересов и исключить участие заинтересованного члена. Основание: Закон № 273-ФЗ, статьи 10–11. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Зафиксировать конфликт интересов и исключить участие заинтересованного члена. Основание: Закон № 273-ФЗ, статьи 10–11. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Защита репутации органа через урегулирование конфликта интересов.",
           "news": "Зафиксировать конфликт интересов и исключить участие заинтересованного члена. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -605,7 +613,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": false,
+          "protects_role_interest": true,
+          "role_interest_note": "Защита репутации органа через урегулирование конфликта интересов.",
           "legal_basis": "Закон № 273-ФЗ, статьи 10–11 Источник: https://pravo.gov.ru/",
           "fiscal_effect": {
             "activity": 0.005,
@@ -697,6 +706,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, нормы неналоговых доходов Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.006,
@@ -750,6 +760,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 81 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.007,
@@ -840,7 +851,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, статья 374 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.008,
@@ -894,6 +906,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статьи 6, 138 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -985,6 +998,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Закон № 44-ФЗ, статья 93 Источник: https://pravo.gov.ru/",
           "fiscal_effect": {
             "activity": 0.01,
@@ -1028,7 +1042,7 @@
         {
           "key": "option_1",
           "trust": 1,
-          "description": "Проверить условия гарантии, финансовое состояние и бюджетные ограничения. Основание: БК РФ, статьи 115–115.2. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Проверить условия гарантии, финансовое состояние и бюджетные ограничения. Основание: БК РФ, статьи 115–115.2. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Защита устойчивости казны и границ долговой ответственности.",
           "news": "Проверить условия гарантии, финансовое состояние и бюджетные ограничения. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -1037,7 +1051,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": false,
+          "protects_role_interest": true,
+          "role_interest_note": "Защита устойчивости казны и границ долговой ответственности.",
           "legal_basis": "БК РФ, статьи 115–115.2 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.004,
@@ -1128,7 +1143,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.005,
@@ -1182,6 +1198,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статьи 106–107 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.006,
@@ -1273,6 +1290,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Закон № 44-ФЗ, специальные закрытые процедуры Источник: https://pravo.gov.ru/",
           "fiscal_effect": {
             "activity": 0.007,
@@ -1326,6 +1344,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, глава 26 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.008,
@@ -1416,7 +1435,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, исполнение бюджета Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -1470,6 +1490,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, статьи 164–165 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.01,
@@ -1561,6 +1582,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78; Закон № 260-ФЗ Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.004,
@@ -1614,6 +1636,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Водный кодекс РФ, статья 6 Источник: https://pravo.gov.ru/",
           "fiscal_effect": {
             "activity": 0.005,
@@ -1704,7 +1727,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, принципы достоверности и сбалансированности Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.006,
@@ -1748,7 +1772,7 @@
         {
           "key": "option_1",
           "trust": 1,
-          "description": "Указать только предусмотренные законом льготы и пределы региональной компетенции. Основание: НК РФ, статьи 12, 56. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Указать только предусмотренные законом льготы и пределы региональной компетенции. Основание: НК РФ, статьи 12, 56. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Поддержка портового инвестора в пределах законных льгот.",
           "news": "Указать только предусмотренные законом льготы и пределы региональной компетенции. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -1757,7 +1781,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": false,
+          "protects_role_interest": true,
+          "role_interest_note": "Поддержка портового инвестора в пределах законных льгот.",
           "legal_basis": "НК РФ, статьи 12, 56 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.007,
@@ -1849,6 +1874,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, глава 33.1 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.008,
@@ -1902,6 +1928,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, казначейское сопровождение Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -1992,7 +2019,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.01,
@@ -2046,6 +2074,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статьи 107–111 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.004,
@@ -2137,6 +2166,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, глава 25.1 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.005,
@@ -2190,6 +2220,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статьи 38, 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.006,
@@ -2280,7 +2311,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.007,
@@ -2334,6 +2366,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78.1 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.008,
@@ -2425,6 +2458,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, исполнение судебных актов Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -2478,6 +2512,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, статья 378.2 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.01,
@@ -2568,7 +2603,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, статья 394 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.004,
@@ -2622,6 +2658,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, главы 9–10 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.005,
@@ -2713,6 +2750,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, глава 25 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.006,
@@ -2766,6 +2804,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Закон № 16-ФЗ; НК РФ Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.007,
@@ -2856,7 +2895,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78; Закон № 135-ФЗ Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.008,
@@ -2910,6 +2950,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -3001,6 +3042,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78; ТК РФ Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.01,
@@ -3054,6 +3096,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, государственные заимствования Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.004,
@@ -3144,7 +3187,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, специальные налоговые режимы Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.005,
@@ -3198,6 +3242,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, целевой характер расходов Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "expenditure": -26,
@@ -3289,6 +3334,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 242 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.007,
@@ -3342,6 +3388,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статья 132; БК РФ Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.008,
@@ -3423,7 +3470,7 @@
         {
           "key": "option_2",
           "trust": 1,
-          "description": "Применить утверждённое определение показателя и проверить выполнение условия. Основание: БК РФ, статья 78. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Применить утверждённое определение показателя и проверить выполнение условия. Основание: БК РФ, статья 78. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Обоснование устойчивого инвестиционного предложения без фиктивной прибыли.",
           "news": "Применить утверждённое определение показателя и проверить выполнение условия. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -3433,6 +3480,7 @@
           ],
           "lawful": true,
           "protects_role_interest": true,
+          "role_interest_note": "Обоснование устойчивого инвестиционного предложения без фиктивной прибыли.",
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -3486,6 +3534,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 37 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.01,
@@ -3577,6 +3626,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ; Закон № 237-ФЗ Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.004,
@@ -3630,6 +3680,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Закон № 44-ФЗ, статья 95 Источник: https://pravo.gov.ru/",
           "fiscal_effect": {
             "activity": 0.005,
@@ -3720,7 +3771,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "expenditure": -33,
@@ -3764,7 +3816,7 @@
         {
           "key": "option_1",
           "trust": 1,
-          "description": "Обеспечить независимость оценки и надлежащее распределение функций. Основание: БК РФ, внутренний финансовый аудит. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Обеспечить независимость оценки и надлежащее распределение функций. Основание: БК РФ, внутренний финансовый аудит. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Сохранение доверия к региональному финансовому контролю.",
           "news": "Обеспечить независимость оценки и надлежащее распределение функций. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -3773,7 +3825,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": false,
+          "protects_role_interest": true,
+          "role_interest_note": "Сохранение доверия к региональному финансовому контролю.",
           "legal_basis": "БК РФ, внутренний финансовый аудит Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.007,
@@ -3865,6 +3918,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.008,
@@ -3918,6 +3972,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Закон № 115-ФЗ; БК РФ Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -4008,7 +4063,8 @@
             "глава"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, глава 26 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.01,
@@ -4052,7 +4108,7 @@
         {
           "key": "option_1",
           "trust": 1,
-          "description": "Применить опубликованные условия и восстановить надлежащую процедуру отбора. Основание: БК РФ, статья 78. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Применить опубликованные условия и восстановить надлежащую процедуру отбора. Основание: БК РФ, статья 78. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Защита репутации конкурсного отбора от аффилированности.",
           "news": "Применить опубликованные условия и восстановить надлежащую процедуру отбора. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -4061,7 +4117,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": false,
+          "protects_role_interest": true,
+          "role_interest_note": "Защита репутации конкурсного отбора от аффилированности.",
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.004,
@@ -4153,6 +4210,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.005,
@@ -4196,7 +4254,7 @@
         {
           "key": "option_1",
           "trust": 1,
-          "description": "Разделить компетенцию уровней и исключить неподтверждённое обещание. Основание: НК РФ, статья 12. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: глава, муницип, министр финансов. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Разделить компетенцию уровней и исключить неподтверждённое обещание. Основание: НК РФ, статья 12. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: глава, муницип, министр финансов. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Отстаивание законных условий инвестиционного соглашения.",
           "news": "Разделить компетенцию уровней и исключить неподтверждённое обещание. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -4205,7 +4263,8 @@
             "министр финансов"
           ],
           "lawful": true,
-          "protects_role_interest": false,
+          "protects_role_interest": true,
+          "role_interest_note": "Отстаивание законных условий инвестиционного соглашения.",
           "legal_basis": "НК РФ, статья 12 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.006,
@@ -4296,7 +4355,8 @@
             "министр финансов"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, межбюджетные трансферты Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.007,
@@ -4350,6 +4410,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Закон № 44-ФЗ; Закон № 135-ФЗ Источник: https://pravo.gov.ru/",
           "fiscal_effect": {
             "activity": 0.008,
@@ -4441,6 +4502,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, отчётность и открытость Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -4494,6 +4556,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, статьи 66–68 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.01,
@@ -4584,7 +4647,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 72 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.004,
@@ -4638,6 +4702,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, глава 26.4 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.005,
@@ -4729,6 +4794,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ; нормы управления публичным имуществом Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.006,
@@ -4782,6 +4848,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ГК РФ, статья 582; Закон № 44-ФЗ Источник: https://pravo.gov.ru/",
           "fiscal_effect": {
             "activity": 0.007,
@@ -4863,7 +4930,7 @@
         {
           "key": "option_2",
           "trust": 1,
-          "description": "Применить процедуру изменения проекта и обеспечить участие инициаторов. Основание: Законодательство об инициативных проектах; БК РФ. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Применить процедуру изменения проекта и обеспечить участие инициаторов. Основание: Законодательство об инициативных проектах; БК РФ. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Укрепление поддержки муниципальной власти через проверяемое участие граждан.",
           "news": "Применить процедуру изменения проекта и обеспечить участие инициаторов. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -4873,6 +4940,7 @@
           ],
           "lawful": true,
           "protects_role_interest": true,
+          "role_interest_note": "Укрепление поддержки муниципальной власти через проверяемое участие граждан.",
           "legal_basis": "Законодательство об инициативных проектах; БК РФ Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.008,
@@ -4926,6 +4994,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, состав государственного долга Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -5017,6 +5086,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статьи 79–80; ГК РФ Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.01,
@@ -5070,6 +5140,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Закон № 44-ФЗ, статья 34 Источник: https://pravo.gov.ru/",
           "fiscal_effect": {
             "activity": 0.004,
@@ -5160,7 +5231,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 6 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.005,
@@ -5214,6 +5286,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.006,
@@ -5305,6 +5378,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 79 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.007,
@@ -5358,6 +5432,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, статья 217 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.008,
@@ -5448,7 +5523,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, статьи 12–15 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -5502,6 +5578,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, глава 33 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.01,
@@ -5593,6 +5670,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Закон № 73-ФЗ; БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.004,
@@ -5646,6 +5724,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 219 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.005,
@@ -5736,7 +5815,8 @@
             "министр финансов"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, нормативы отчислений Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.006,
@@ -5790,6 +5870,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.007,
@@ -5881,6 +5962,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Законодательство о северном завозе; БК РФ Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.008,
@@ -5934,6 +6016,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 78 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.009000000000000001,
@@ -6024,7 +6107,8 @@
             "министр финансов"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, глава 33.1 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.01,
@@ -6078,6 +6162,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, статья 388 Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.004,
@@ -6169,6 +6254,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статья 38 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.005,
@@ -6222,6 +6308,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, специальные переходные положения Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
           "fiscal_effect": {
             "activity": 0.006,
@@ -6312,7 +6399,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статья 132; БК РФ, статья 140 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.007,
@@ -6366,6 +6454,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, статьи 79–80 Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
           "fiscal_effect": {
             "activity": 0.008,
@@ -6415,9 +6504,8 @@
     "seriousness": "serious",
     "audience": "all",
     "allowed_roles": [
-      "министр юстиции",
-      "глава",
-      "руководитель"
+      "судья",
+      "суд"
     ],
     "decision_options": [
       "Применить более высокий штраф к ранее совершённому эпизоду",
@@ -6428,13 +6516,12 @@
         {
           "key": "option_1",
           "trust": -2,
-          "description": "Выбранный способ не устраняет нарушение: Применить более высокий штраф к ранее совершённому эпизоду. Надлежащий шаг: Применить закон, действовавший при совершении нарушения; более строгая ответственность обратной силы не имеет. Основание: КоАП РФ, статья 1.7; Конституция РФ, статья 54. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр юстиции, глава, руководитель. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Выбранный способ не устраняет нарушение: Применить более высокий штраф к ранее совершённому эпизоду. Надлежащий шаг: Применить закон, действовавший при совершении нарушения; более строгая ответственность обратной силы не имеет. Основание: КоАП РФ, статья 1.7; Конституция РФ, статья 54. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: судья, суд. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
           "news": "Выбран спорный способ: Применить более высокий штраф к ранее совершённому эпизоду. Возник риск законности и доверия.",
           "public_interest": "harmful",
           "authorized_roles": [
-            "министр юстиции",
-            "глава",
-            "руководитель"
+            "судья",
+            "суд"
           ],
           "lawful": false,
           "protects_role_interest": false,
@@ -6443,16 +6530,16 @@
         {
           "key": "option_2",
           "trust": 1,
-          "description": "Применить закон, действовавший при совершении нарушения; более строгая ответственность обратной силы не имеет. Основание: КоАП РФ, статья 1.7; Конституция РФ, статья 54. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр юстиции, глава, руководитель. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Применить закон, действовавший при совершении нарушения; более строгая ответственность обратной силы не имеет. Основание: КоАП РФ, статья 1.7; Конституция РФ, статья 54. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: судья, суд. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
           "news": "Применить закон, действовавший при совершении нарушения; более строгая ответственность обратной силы не имеет. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
-            "министр юстиции",
-            "глава",
-            "руководитель"
+            "судья",
+            "суд"
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "КоАП РФ, статья 1.7; Конституция РФ, статья 54. Источник: http://www.kremlin.ru/acts/constitution"
         }
       ]
@@ -6500,6 +6587,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статьи 15 и 57; НК РФ, статья 8. Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
         },
         {
@@ -6573,7 +6661,8 @@
             "председатель государственной думы"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статья 15, часть 3. Источник: http://www.kremlin.ru/acts/constitution"
         }
       ]
@@ -6619,6 +6708,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Регламент Государственной Думы, порядок рассмотрения законопроектов; Конституция РФ, статьи 105–107. Источник: http://www.kremlin.ru/acts/constitution"
         },
         {
@@ -6692,6 +6782,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статья 104, часть 3. Источник: http://www.kremlin.ru/acts/constitution"
         }
       ]
@@ -6737,6 +6828,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статья 107, часть 3. Источник: http://www.kremlin.ru/acts/constitution"
         },
         {
@@ -6806,7 +6898,8 @@
             "президент"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статья 107, часть 3; ФКЗ о Конституционном Суде РФ. Источник: http://www.kremlin.ru/acts/constitution"
         }
       ]
@@ -6854,6 +6947,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статьи 15 и 114; БК РФ, принципы бюджетной системы. Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
         },
         {
@@ -6928,6 +7022,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 95-ФЗ «О политических партиях», требования к уставу и государственной регистрации. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -6973,6 +7068,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статьи 13 и 30; Федеральный закон № 95-ФЗ. Источник: http://www.kremlin.ru/acts/constitution"
         },
         {
@@ -7045,7 +7141,8 @@
             "избирательной комиссии"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 67-ФЗ, правила предвыборной агитации и финансирования. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -7091,6 +7188,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 67-ФЗ, личное голосование и выдача бюллетеней. Источник: https://pravo.gov.ru/"
         },
         {
@@ -7157,7 +7255,7 @@
         {
           "key": "option_2",
           "trust": 1,
-          "description": "Уведомить о конфликте и обеспечить предусмотренное отстранение от участия в принятии решения, а не только от выступления. Основание: Федеральные законы № 273-ФЗ и № 44-ФЗ, конфликт интересов. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Уведомить о конфликте и обеспечить предусмотренное отстранение от участия в принятии решения, а не только от выступления. Основание: Федеральные законы № 273-ФЗ и № 44-ФЗ, конфликт интересов. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Защита репутации закупочной комиссии через отвод при конфликте.",
           "news": "Уведомить о конфликте и обеспечить предусмотренное отстранение от участия в принятии решения, а не только от выступления. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -7166,7 +7264,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": false,
+          "protects_role_interest": true,
+          "role_interest_note": "Защита репутации закупочной комиссии через отвод при конфликте.",
           "legal_basis": "Федеральные законы № 273-ФЗ и № 44-ФЗ, конфликт интересов. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -7214,6 +7313,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 44-ФЗ, принципы закупок и основания закупки у единственного поставщика. Источник: https://pravo.gov.ru/"
         },
         {
@@ -7290,7 +7390,8 @@
             "руководитель"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 44-ФЗ, статья 33. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -7338,6 +7439,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 44-ФЗ, исполнение и приёмка контракта; БК РФ, исполнение расходов. Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
         },
         {
@@ -7405,7 +7507,7 @@
         {
           "key": "option_2",
           "trust": 1,
-          "description": "Разграничить административную жалобу и судебную защиту; не отменять заключённый договор вне компетенции и установленной процедуры. Основание: Федеральный закон № 44-ФЗ, обжалование закупок; ГК РФ, основания недействительности сделок. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Разграничить административную жалобу и судебную защиту; не отменять заключённый договор вне компетенции и установленной процедуры. Основание: Федеральный закон № 44-ФЗ, обжалование закупок; ГК РФ, основания недействительности сделок. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Сохранение права на судебную защиту при пропуске административного срока.",
           "news": "Разграничить административную жалобу и судебную защиту; не отменять заключённый договор вне компетенции и установленной процедуры. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -7414,7 +7516,8 @@
             "губернатор"
           ],
           "lawful": true,
-          "protects_role_interest": false,
+          "protects_role_interest": true,
+          "role_interest_note": "Сохранение права на судебную защиту при пропуске административного срока.",
           "legal_basis": "Федеральный закон № 44-ФЗ, обжалование закупок; ГК РФ, основания недействительности сделок. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -7462,6 +7565,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ГК РФ, статьи 182–183. Источник: https://pravo.gov.ru/"
         },
         {
@@ -7538,7 +7642,8 @@
             "руководитель"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ГК РФ, статья 621; правила распоряжения публичным имуществом. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -7586,6 +7691,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ГК РФ, статьи 330 и 333; условия договора. Источник: https://pravo.gov.ru/"
         },
         {
@@ -7663,6 +7769,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Закон РФ № 2300-1 «О защите прав потребителей», статья 18. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -7710,6 +7817,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Закон РФ № 2300-1, статья 32; ГК РФ, возмездное оказание услуг. Источник: https://pravo.gov.ru/"
         },
         {
@@ -7786,7 +7894,8 @@
             "руководитель"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ТК РФ, статья 81. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -7834,6 +7943,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ТК РФ, статьи 70 и 261. Источник: https://pravo.gov.ru/"
         },
         {
@@ -7911,6 +8021,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ТК РФ, статьи 136, 142 и 236. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -7958,6 +8069,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ТК РФ, статьи 99 и 259. Источник: https://pravo.gov.ru/"
         },
         {
@@ -8034,7 +8146,8 @@
             "глава"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральные законы № 152-ФЗ и № 323-ФЗ, врачебная тайна и специальные категории данных. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -8082,6 +8195,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 152-ФЗ, обязанности оператора и безопасность персональных данных. Источник: https://pravo.gov.ru/"
         },
         {
@@ -8159,6 +8273,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 152-ФЗ, статья 11; законодательство о биометрической идентификации. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -8206,6 +8321,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 59-ФЗ, рассмотрение обращения по существу. Источник: https://pravo.gov.ru/"
         },
         {
@@ -8273,7 +8389,7 @@
         {
           "key": "option_2",
           "trust": 1,
-          "description": "Разграничить открытые сведения и законно ограниченную информацию; предоставить доступ к открытым бюджетным данным. Основание: Федеральный закон № 8-ФЗ; БК РФ, принцип прозрачности. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр юстиции, руководитель, глава. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Разграничить открытые сведения и законно ограниченную информацию; предоставить доступ к открытым бюджетным данным. Основание: Федеральный закон № 8-ФЗ; БК РФ, принцип прозрачности. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр юстиции, руководитель, глава. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Защита доверия к органу власти через законную бюджетную открытость.",
           "news": "Разграничить открытые сведения и законно ограниченную информацию; предоставить доступ к открытым бюджетным данным. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -8283,6 +8399,7 @@
           ],
           "lawful": true,
           "protects_role_interest": true,
+          "role_interest_note": "Защита доверия к органу власти через законную бюджетную открытость.",
           "legal_basis": "Федеральный закон № 8-ФЗ; БК РФ, принцип прозрачности. Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
         }
       ]
@@ -8330,6 +8447,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статья 31; Федеральный закон № 54-ФЗ. Источник: http://www.kremlin.ru/acts/constitution"
         },
         {
@@ -8407,6 +8525,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "КоАП РФ, статьи 1.5 и 24.5. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -8454,6 +8573,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "КоАП РФ, процессуальные права лица и порядок рассмотрения дела. Источник: https://pravo.gov.ru/"
         },
         {
@@ -8527,7 +8647,8 @@
             "налоговой"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статья 57; НК РФ, принципы законодательства о налогах. Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
         }
       ]
@@ -8573,6 +8694,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, единый налоговый счёт и возврат положительного сальдо; последствия отмены взыскания. Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
         },
         {
@@ -8649,6 +8771,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "НК РФ, статьи 3, 56 и глава 31; Конституция РФ, статья 19. Источник: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
         }
       ]
@@ -8696,6 +8819,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статьи 34 и 74; Федеральный закон № 135-ФЗ. Источник: http://www.kremlin.ru/acts/constitution"
         },
         {
@@ -8772,7 +8896,8 @@
             "министр финансов"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Земельный кодекс РФ, порядок предоставления публичных земель. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -8797,9 +8922,8 @@
     "seriousness": "serious",
     "audience": "all",
     "allowed_roles": [
-      "глава",
-      "муницип",
-      "министр финансов"
+      "министр культуры",
+      "глава"
     ],
     "decision_options": [
       "Проверить охранные требования и согласования до работ; приёмка не заменяет предусмотренные разрешительные процедуры.",
@@ -8810,28 +8934,27 @@
         {
           "key": "option_1",
           "trust": 1,
-          "description": "Проверить охранные требования и согласования до работ; приёмка не заменяет предусмотренные разрешительные процедуры. Основание: Федеральный закон № 73-ФЗ; градостроительное законодательство. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: глава, муницип, министр финансов. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Проверить охранные требования и согласования до работ; приёмка не заменяет предусмотренные разрешительные процедуры. Основание: Федеральный закон № 73-ФЗ; градостроительное законодательство. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр культуры, глава. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
           "news": "Проверить охранные требования и согласования до работ; приёмка не заменяет предусмотренные разрешительные процедуры. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
-            "глава",
-            "муницип",
-            "министр финансов"
+            "министр культуры",
+            "глава"
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 73-ФЗ; градостроительное законодательство. Источник: https://pravo.gov.ru/"
         },
         {
           "key": "option_2",
           "trust": -2,
-          "description": "Выбранный способ не устраняет нарушение: Узаконить земляные работы у памятника будущим актом приёмки. Надлежащий шаг: Проверить охранные требования и согласования до работ; приёмка не заменяет предусмотренные разрешительные процедуры. Основание: Федеральный закон № 73-ФЗ; градостроительное законодательство. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: глава, муницип, министр финансов. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Выбранный способ не устраняет нарушение: Узаконить земляные работы у памятника будущим актом приёмки. Надлежащий шаг: Проверить охранные требования и согласования до работ; приёмка не заменяет предусмотренные разрешительные процедуры. Основание: Федеральный закон № 73-ФЗ; градостроительное законодательство. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр культуры, глава. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
           "news": "Выбран спорный способ: Узаконить земляные работы у памятника будущим актом приёмки. Возник риск законности и доверия.",
           "public_interest": "harmful",
           "authorized_roles": [
-            "глава",
-            "муницип",
-            "министр финансов"
+            "министр культуры",
+            "глава"
           ],
           "lawful": false,
           "protects_role_interest": false,
@@ -8897,6 +9020,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 7-ФЗ «Об охране окружающей среды». Источник: https://pravo.gov.ru/"
         }
       ]
@@ -8942,6 +9066,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статья 46; процессуальные требования к обращению в суд. Источник: http://www.kremlin.ru/acts/constitution"
         },
         {
@@ -9017,7 +9142,8 @@
             "руководитель"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статьи 19 и 46; правила соответствующей административной процедуры. Источник: http://www.kremlin.ru/acts/constitution"
         }
       ]
@@ -9042,8 +9168,9 @@
     "seriousness": "serious",
     "audience": "all",
     "allowed_roles": [
-      "судья",
-      "суд"
+      "министр юстиции",
+      "глава",
+      "руководитель"
     ],
     "decision_options": [
       "Соблюсти добровольность и полномочия подписантов; посредник не подменяет волеизъявление сторон.",
@@ -9054,26 +9181,29 @@
         {
           "key": "option_1",
           "trust": 1,
-          "description": "Соблюсти добровольность и полномочия подписантов; посредник не подменяет волеизъявление сторон. Основание: Федеральный закон № 193-ФЗ, добровольность медиации; ГК РФ, представительство. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: судья, суд. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Соблюсти добровольность и полномочия подписантов; посредник не подменяет волеизъявление сторон. Основание: Федеральный закон № 193-ФЗ, добровольность медиации; ГК РФ, представительство. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр юстиции, глава, руководитель. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
           "news": "Соблюсти добровольность и полномочия подписантов; посредник не подменяет волеизъявление сторон. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
-            "судья",
-            "суд"
+            "министр юстиции",
+            "глава",
+            "руководитель"
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 193-ФЗ, добровольность медиации; ГК РФ, представительство. Источник: https://pravo.gov.ru/"
         },
         {
           "key": "option_2",
           "trust": -2,
-          "description": "Выбранный способ не устраняет нарушение: Подписать медиативное соглашение за несогласные стороны. Надлежащий шаг: Соблюсти добровольность и полномочия подписантов; посредник не подменяет волеизъявление сторон. Основание: Федеральный закон № 193-ФЗ, добровольность медиации; ГК РФ, представительство. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: судья, суд. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Выбранный способ не устраняет нарушение: Подписать медиативное соглашение за несогласные стороны. Надлежащий шаг: Соблюсти добровольность и полномочия подписантов; посредник не подменяет волеизъявление сторон. Основание: Федеральный закон № 193-ФЗ, добровольность медиации; ГК РФ, представительство. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр юстиции, глава, руководитель. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
           "news": "Выбран спорный способ: Подписать медиативное соглашение за несогласные стороны. Возник риск законности и доверия.",
           "public_interest": "harmful",
           "authorized_roles": [
-            "судья",
-            "суд"
+            "министр юстиции",
+            "глава",
+            "руководитель"
           ],
           "lawful": false,
           "protects_role_interest": false,
@@ -9136,6 +9266,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Соответствующий процессуальный кодекс, восстановление процессуальных сроков; Конституция РФ, статья 46. Источник: http://www.kremlin.ru/acts/constitution"
         }
       ]
@@ -9181,6 +9312,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 127-ФЗ, оспаривание сделок и предпочтение кредитору. Источник: https://pravo.gov.ru/"
         },
         {
@@ -9253,7 +9385,8 @@
             "суд"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ГК РФ, часть третья, наследование и форма завещания. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -9299,6 +9432,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ГК РФ, статьи 26 и 175. Источник: https://pravo.gov.ru/"
         },
         {
@@ -9375,6 +9509,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Градостроительный кодекс РФ, общественные обсуждения и публичные слушания. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -9422,6 +9557,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "БК РФ, расходные обязательства; применимое законодательство о социальной поддержке. Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
         },
         {
@@ -9498,7 +9634,8 @@
             "министр финансов"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статья 19; ГК РФ, публичный договор и защита права. Источник: http://www.kremlin.ru/acts/constitution"
         }
       ]
@@ -9546,6 +9683,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статьи 23–24; законодательство о персональных данных. Источник: http://www.kremlin.ru/acts/constitution"
         },
         {
@@ -9585,9 +9723,9 @@
     "seriousness": "serious",
     "audience": "all",
     "allowed_roles": [
-      "министр юстиции",
-      "глава",
-      "руководитель"
+      "руководитель партии",
+      "депутат",
+      "министр юстиции"
     ],
     "decision_options": [
       "Считать имя фотографа в подписи полноценной лицензией на фото",
@@ -9598,13 +9736,13 @@
         {
           "key": "option_1",
           "trust": -2,
-          "description": "Выбранный способ не устраняет нарушение: Считать имя фотографа в подписи полноценной лицензией на фото. Надлежащий шаг: Проверить права и условия использования, получить разрешение либо применить законное исключение; подпись автора не заменяет лицензию. Основание: ГК РФ, часть четвёртая, авторские права и допустимое использование. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр юстиции, глава, руководитель. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Выбранный способ не устраняет нарушение: Считать имя фотографа в подписи полноценной лицензией на фото. Надлежащий шаг: Проверить права и условия использования, получить разрешение либо применить законное исключение; подпись автора не заменяет лицензию. Основание: ГК РФ, часть четвёртая, авторские права и допустимое использование. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: руководитель партии, депутат, министр юстиции. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
           "news": "Выбран спорный способ: Считать имя фотографа в подписи полноценной лицензией на фото. Возник риск законности и доверия.",
           "public_interest": "harmful",
           "authorized_roles": [
-            "министр юстиции",
-            "глава",
-            "руководитель"
+            "руководитель партии",
+            "депутат",
+            "министр юстиции"
           ],
           "lawful": false,
           "protects_role_interest": false,
@@ -9613,16 +9751,17 @@
         {
           "key": "option_2",
           "trust": 1,
-          "description": "Проверить права и условия использования, получить разрешение либо применить законное исключение; подпись автора не заменяет лицензию. Основание: ГК РФ, часть четвёртая, авторские права и допустимое использование. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр юстиции, глава, руководитель. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Проверить права и условия использования, получить разрешение либо применить законное исключение; подпись автора не заменяет лицензию. Основание: ГК РФ, часть четвёртая, авторские права и допустимое использование. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: руководитель партии, депутат, министр юстиции. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
           "news": "Проверить права и условия использования, получить разрешение либо применить законное исключение; подпись автора не заменяет лицензию. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
-            "министр юстиции",
-            "глава",
-            "руководитель"
+            "руководитель партии",
+            "депутат",
+            "министр юстиции"
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ГК РФ, часть четвёртая, авторские права и допустимое использование. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -9670,6 +9809,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статьи 34 и 46; закон, регулирующий соответствующее разрешение. Источник: http://www.kremlin.ru/acts/constitution"
         },
         {
@@ -9743,7 +9883,8 @@
             "суд"
           ],
           "lawful": true,
-          "protects_role_interest": true,
+          "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "КоАП РФ, статьи 4.1 и 24.5. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -9789,6 +9930,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статьи 46–47; процессуальное законодательство. Источник: http://www.kremlin.ru/acts/constitution"
         },
         {
@@ -9865,6 +10007,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 210-ФЗ, требования к предоставлению государственных и муниципальных услуг. Источник: https://pravo.gov.ru/"
         }
       ]
@@ -9912,6 +10055,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "ГК РФ, статья 242; законодательство о чрезвычайных ситуациях. Источник: https://pravo.gov.ru/"
         },
         {
@@ -9979,7 +10123,7 @@
         {
           "key": "option_2",
           "trust": 1,
-          "description": "Проверить условия и отчётность, документировать нарушение и применить предусмотренные меры; ведомственный показатель не отменяет контроль. Основание: БК РФ, статья 78; условия предоставления субсидии и бюджетного контроля. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.",
+          "description": "Проверить условия и отчётность, документировать нарушение и применить предусмотренные меры; ведомственный показатель не отменяет контроль. Основание: БК РФ, статья 78; условия предоставления субсидии и бюджетного контроля. Выполнить этот шаг следует в установленной процедуре и в пределах компетенции: министр финансов, правительств, губернатор. При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования. Стратегический критерий: Защита репутации финансового органа через предусмотренный контроль.",
           "news": "Проверить условия и отчётность, документировать нарушение и применить предусмотренные меры; ведомственный показатель не отменяет контроль. В учебной модели устранён конкретный правовой риск.",
           "public_interest": "beneficial",
           "authorized_roles": [
@@ -9989,6 +10133,7 @@
           ],
           "lawful": true,
           "protects_role_interest": true,
+          "role_interest_note": "Защита репутации финансового органа через предусмотренный контроль.",
           "legal_basis": "БК РФ, статья 78; условия предоставления субсидии и бюджетного контроля. Источник: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
         }
       ]
@@ -10036,6 +10181,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Конституция РФ, статья 15; иерархия правовых актов и судебная защита. Источник: http://www.kremlin.ru/acts/constitution"
         },
         {
@@ -10113,6 +10259,7 @@
           ],
           "lawful": true,
           "protects_role_interest": false,
+          "role_interest_note": null,
           "legal_basis": "Федеральный закон № 273-ФЗ; законодательство о государственной службе. Источник: https://pravo.gov.ru/"
         }
       ]
