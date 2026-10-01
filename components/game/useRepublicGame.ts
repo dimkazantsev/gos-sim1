@@ -305,6 +305,7 @@ export function useRepublicGame(gameId:string){
   await supabase.from('game_activity').insert({game_id:gameId,actor_id:u.id,event_type:eventType,label,view_key:viewKey||null,payload});
  }
  async function touchPresence(viewKey:string,label?:string){
+  if(typeof document!=='undefined'&&document.visibilityState==='hidden')return;
   const u=(await supabase.auth.getUser()).data.user;if(!u)return;
   await supabase.from('game_presence').upsert({game_id:gameId,user_id:u.id,current_view:viewKey,last_seen_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
   if(label)await logActivity('navigation',label,viewKey);

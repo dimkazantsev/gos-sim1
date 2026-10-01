@@ -19,13 +19,11 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - run: node scripts/prepare-github-pages.mjs
       - run: npm ci && npm run build
         working-directory: .pages-build
         env:
+          NEXT_PUBLIC_ASSET_BASE_PATH: /gos-sim1
           NEXT_PUBLIC_GAME_API_ORIGIN: https://gos-sim1.vercel.app
           NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLIC_KEY || secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
@@ -40,6 +38,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - name: Publish game
         id: deployment
         uses: actions/deploy-pages@v4
