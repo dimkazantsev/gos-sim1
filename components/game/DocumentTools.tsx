@@ -1,0 +1,41 @@
+'use client';
+import {useEffect,useState} from 'react';
+import {Printer,Send,Signature} from 'lucide-react';
+import {supabase} from '@/lib/supabase';
+import StyledSelect from '../ui/StyledSelect';
+import DisclosureSummary from '../ui/DisclosureSummary';
+import {ownerLabel} from './formalInstitutions';
+import type {FormalDocument,Member} from './types';
+
+export type DocumentAccess={can_edit:boolean;can_manage:boolean;can_sign:boolean;can_copy:boolean;vote_required:boolean;open_vote:boolean;next_owner:string|null;next_action:string|null};
+const destinations=['president','gd','gd_staff','gd_council','committee','sf','government','ministry','municipality','teacher'];
+export function DocumentTools({document:d,access,members,readOnly,onRefresh}:{document:FormalDocument;access:DocumentAccess|null;members:Member[];readOnly:boolean;onRefresh:()=>Promise<void>}){
+ const [destination,setDestination]=useState('person'),[recipient,setRecipient]=useState(''),[note,setNote]=useState(''),[move,setMove]=useState(false),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
+ useEffect(()=>{setMessage('');setError('');setMove(false);setDestination('person');setRecipient('');setNote('')},[d.id]);
+ async function send(){
+  if(busy)return;setBusy(true);setError('');setMessage('');
+  const r=await supabase.rpc('send_formal_document',{p_document_id:d.id,p_destination:destination,p_recipient_id:recipient||null,p_note:note,p_move:move});
+  if(r.error)setError(r.error.message);else{setMessage('Документ направлен. Получателей: '+r.data);await onRefresh()}setBusy(false);
+ }
+ async function sign(){setBusy(true);setError('');const r=await supabase.rpc('sign_formal_document',{p_document_id:d.id,p_note:note||null});if(r.error)setError(r.error.message);else{setMessage('Редакция подписана');await onRefresh()}setBusy(false)}
+ const canMove=!!access?.can_manage&&!access?.vote_required&&!access?.open_vote&&!!access?.next_owner&&!['author','system'].includes(access.next_owner);
+ return <section className="documentTools" aria-label="Инструменты документа">
+  <div className="documentToolsBar"><button type="button" className="secondary" onClick={()=>window.print()}><Printer size={18}/> Печать</button>{!readOnly&&access?.can_sign&&<button type="button" className="primary" disabled={busy} onClick={()=>void sign()}><Signature size={18}/> Подписать редакцию</button>}{access?.open_vote&&<span className="documentToolNotice">Текст зафиксирован до завершения голосования</span>}</div>
+  {!readOnly&&access?.can_copy&&<details className="projectDisclosure documentDelivery"><DisclosureSummary icon={Send} title="Направить документ" description="Адресат, сопроводительный текст и способ передачи"/><div className="civicDisclosureBody documentDeliveryForm">
+   {canMove&&<label className="documentDeliveryMode"><input type="checkbox" checked={move} onChange={e=>{setMove(e.target.checked);setDestination(e.target.checked?access!.next_owner!:'person');setRecipient('')}}/> Передать по процедуре: {ownerLabel(access!.next_owner!)}</label>}
+   <StyledSelect label="Куда направить" value={destination} onChange={v=>{setDestination(v);setRecipient('')}} disabled={move} options={move?[{value:access!.next_owner!,label:ownerLabel(access!.next_owner!)}]:[{value:'person',label:'Лично участнику'},...destinations.map(k=>({value:k,label:ownerLabel(k)}))]}/>
+   <StyledSelect label="Получатель" value={recipient} onChange={setRecipient} options={[{value:'',label:destination==='person'?'Выберите участника':'Все назначенные участники органа'},...members.filter(m=>m.kind!=='observer').map(m=>({value:m.user_id,label:m.full_name+' · '+(m.role_title||'Участник')}))]}/>
+   <label className="documentDeliveryNote">Сопроводительный текст<textarea rows={3} maxLength={2000} value={note} onChange={e=>setNote(e.target.value)} placeholder="Что требуется от адресата"/></label>
+   <p>{move?'Стадия изменится по установленному маршруту. Получатель увидит документ во входящих.':'Копия появится во входящих адресата. Стадия документа сохранится.'}</p>
+   <button type="button" className="primary" disabled={busy||destination==='person'&&!recipient} onClick={()=>void send()}><Send size={18}/> {busy?'Направляется…':move?'Передать по процедуре':'Направить копию'}</button>
+  </div></details>}
+  {error&&<p className="error" role="alert">{error}</p>}{message&&<p className="documentToolSuccess" role="status">{message}</p>}
+ </section>;
+}
+
+export function DocumentInbox({gameId,userId,members,documents,onOpen}:{gameId?:string;userId?:string;members:Member[];documents:FormalDocument[];onOpen:(id:string)=>void}){
+ const [items,setItems]=useState<{id:string;document_id:string;sender_id:string;note:string|null;created_at:string}[]>([]),[error,setError]=useState('');
+ useEffect(()=>{if(!gameId||!userId)return;let active=true;async function load(){const r=await supabase.from('formal_document_deliveries').select('id,document_id,sender_id,note,created_at').eq('game_id',gameId!).eq('recipient_id',userId!).order('created_at',{ascending:false}).limit(30);if(active){if(r.error)setError(r.error.message);else{setItems(r.data||[]);setError('')}}}void load();const timer=setInterval(()=>void load(),20000);return()=>{active=false;clearInterval(timer)}},[gameId,userId,documents]);
+ if(!items.length&&!error)return null;
+ return <details className="projectDisclosure documentInbox"><DisclosureSummary icon={Send} title={'Входящие документы · '+items.length} description="Документы, направленные вам участниками игры"/><div className="civicDisclosureBody">{error&&<p className="error" role="alert">{error}</p>}{items.map(x=><button className="documentInboxRow" key={x.id} onClick={()=>onOpen(x.document_id)}><b>{documents.find(d=>d.id===x.document_id)?.title||'Документ'}</b><small>{members.find(m=>m.user_id===x.sender_id)?.full_name||'Участник'} · {new Date(x.created_at).toLocaleString('ru-RU')}</small>{x.note&&<span>{x.note}</span>}</button>)}</div></details>;
+}
