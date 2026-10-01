@@ -6,6 +6,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import TeacherMetricStudio from './TeacherMetricStudio';
 import type {ImpactLedger,ImpactRule} from './types';
 
+const sourceLabels:Record<string,string>={crisis:'Кризис',formal_history:'Документ',event:'Ситуация',event_answers:'Решение ситуации',political_post:'Публикация',vote:'Голосование',party:'Партия',chat:'Сообщение',manual:'Корректировка преподавателя'};
 type RuleFilter='all'|'automatic'|'off';
 type LedgerFilter='all'|'applied'|'reverted';
 type Draft={enabled:boolean;auto:boolean;description:string;metrics:Record<string,string>;party:string};
@@ -155,9 +156,8 @@ function LedgerRow({g,entry,rule}:{g:ReturnTypeRepublic;entry:ImpactLedger;rule?
  }
  return <article className={'impactHistoryRow '+(reverted?'reverted':'')}>
   <div className="impactHistoryTop">
-   <span className={'impactHistoryIcon '+(reverted?'reverted':'')}><ArrowDownRight aria-hidden="true"/></span>
-   <div className="impactHistoryIdentity"><small><time dateTime={entry.created_at}>{new Date(entry.created_at).toLocaleString('ru-RU')}</time> · {entry.source_type.replaceAll('_',' ')}</small>
-    <b>{rule?.label||entry.rule_key}</b>
+   <div className="impactHistoryIdentity"><small><time dateTime={entry.created_at}>{new Date(entry.created_at).toLocaleString('ru-RU')}</time> · {sourceLabels[entry.source_type]||'Игровое действие'}</small>
+    <div className="impactHistoryHeading"><span className={'impactHistoryIcon '+(reverted?'reverted':'')}><ArrowDownRight aria-hidden="true"/></span><b>{rule?.label||entry.rule_key}</b></div>
     {entry.note&&<p>{entry.note}</p>}
     {name&&<span>{name}</span>}
    </div>

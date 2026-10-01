@@ -14,3 +14,22 @@
  box-sizing:border-box;height:54px;min-height:0;padding:0;font-size:20px;
 }
 .metricDirectorStudio .metricDirectorGrid > .metricValueField {font-size:13px;line-height:20px}
+
+/* The journal uses one layout for every source and outcome. */
+.teacherSimple .impactWorkbench .impactHistoryRow {padding:18px;gap:14px;background:#fff}
+.teacherSimple .impactWorkbench .impactHistoryRow > .impactHistoryTop {grid-template-columns:minmax(0,1fr) auto!important;gap:16px}
+.impactWorkbench .impactHistoryHeading {display:flex;align-items:center;justify-content:flex-start;gap:12px;min-width:0;margin:5px 0}
+.impactWorkbench .impactHistoryHeading > b {margin:0;line-height:1.4;font-size:15px}
+.impactWorkbench .impactHistoryHeading > .impactHistoryIcon {flex:0 0 36px;width:36px;height:36px;display:grid;place-items:center;margin:0;padding:0}
+.teacherSimple .impactHistoryIdentity > small,.teacherSimple .impactHistoryIdentity > p,.teacherSimple .impactHistoryIdentity > span {padding-left:48px}
+.teacherSimple .impactWorkbench .impactHistoryRow > .impactHistoryBottom {display:flex!important;justify-content:flex-start;align-items:center;gap:10px;padding-left:48px}
+.teacherSimple .impactWorkbench .impactHistoryBottom > .impactLedgerEffects {display:flex!important;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:8px;flex:0 1 auto;width:auto;margin:0}
+.teacherSimple .impactWorkbench .impactUndo {display:inline-flex;align-items:center;justify-content:flex-start;gap:8px;width:auto;min-height:42px;margin:0;flex:none}
+.teacherSimple .impactWorkbench .impactUndo > svg {display:block;flex:none;margin:0}
+.teacherSimple .impactWorkbench .impactHistoryRow.reverted {background:#f8fafc}
+@media(max-width:600px){
+ .teacherSimple .impactWorkbench .impactHistoryRow {padding:14px}
+ .teacherSimple .impactWorkbench .impactHistoryRow > .impactHistoryTop {grid-template-columns:minmax(0,1fr)!important;gap:10px}
+ .teacherSimple .impactWorkbench .impactHistoryStatus {grid-column:auto;justify-self:start;margin-left:48px}
+ .teacherSimple .impactWorkbench .impactHistoryRow > .impactHistoryBottom {padding-left:0}
+}
