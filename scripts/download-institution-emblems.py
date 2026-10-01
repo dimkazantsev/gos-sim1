@@ -19,6 +19,11 @@ files = {
     'economy.svg': 'Min-econom-develop-russia-emblem.svg',
     'foreign.svg': 'Emblem of Ministry of Foreign Affairs of Russia.svg',
     'ecology.jpg': 'Russian-ministry-natural-resources-ecology.jpg',
+    'labour.svg': 'Logo of Mintrud (Russia).svg',
+    'energy.jpg': 'Emblem of the Russian Ministry of Energy.jpg',
+    'digital.svg': 'Emblem of the Ministry of Digital Development, Communications and Media.svg',
+    'interior.svg': 'Emblem of the Ministry of Internal Affairs.svg',
+    'emergency.svg': 'Emblem of the Ministry of Emergency Situations.svg',
 }
 out = pathlib.Path('public/emblems')
 out.mkdir(parents=True, exist_ok=True)
@@ -43,9 +48,13 @@ for filename, title in files.items():
     download_url = info.get('thumburl', info['url'])
     if filename.endswith('.svg'):
         filename = filename[:-4]+'.png'
-    req = urllib.request.Request(download_url, headers={'User-Agent':'GosSimsEducationalGame/1.0'})
-    with fetch(req) as res:
-        content = res.read()
+    cached = out/filename
+    if cached.exists():
+        content = cached.read_bytes()
+    else:
+        req = urllib.request.Request(download_url, headers={'User-Agent':'GosSimsEducationalGame/1.0'})
+        with fetch(req) as res:
+            content = res.read()
     if filename.endswith('.png') and not content.startswith(b'\x89PNG\r\n\x1a\n'):
         raise ValueError('Invalid PNG: '+title)
     (out/filename).write_bytes(content)
@@ -55,4 +64,3 @@ for filename, title in files.items():
     print(filename, len(content))
     time.sleep(2)
 (out/'sources.json').write_text(json.dumps(sources,ensure_ascii=False,indent=2))
-

@@ -128,6 +128,7 @@ async function main(){
  await desktop.getByRole('button',{name:'Подать голоса · 210',exact:true}).click();await desktop.waitForFunction(()=>document.querySelector('#ballot-result')?.textContent==='180/20/10');
  await splitInputs.nth(0).fill('200');assert.equal(await desktop.getByRole('button',{name:'Подать голоса · 230',exact:true}).isDisabled(),true,'An over-allocation cannot be submitted');await splitInputs.nth(0).fill('180');
  console.log('PASS Real case choices, percentages, avatars and partial/split mandate ballots');
+ await desktop.setViewportSize({width:390,height:900});await desktop.locator('.civicBallot').scrollIntoViewIfNeeded();await desktop.screenshot({path:path.join(screens,'real-split-ballot-390.png')});
  for(const width of [320,390,1440]){
   await desktop.setViewportSize({width,height:900});
   const values=await desktop.locator('.metricValueControl').evaluateAll(nodes=>nodes.map(el=>el.getBoundingClientRect().toJSON()));

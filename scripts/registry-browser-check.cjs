@@ -39,7 +39,19 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    const geometry=await frame.locator(selector).evaluate(root=>({viewport:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,right:root.getBoundingClientRect().right,offenders:[...root.querySelectorAll('input,button,.styledSelectTrigger,.civicPublicDocs a')].filter(el=>el.getClientRects().length).map(el=>({class:el.className,left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right})).filter(r=>r.left<-2||r.right>document.documentElement.clientWidth+2)}));
    assert(geometry.scroll<=geometry.viewport+2,screen+' overflow at '+width+': '+JSON.stringify(geometry));assert.equal(geometry.offenders.length,0,screen+' controls stay inside at '+width+': '+JSON.stringify(geometry));
    if(screen==='parties'){assert.equal(await frame.locator('.civicPublicDocs a').count(),2,'Public charter and programme; fee is private');assert.equal(await frame.locator('.ghostBulk,.ghostPanel,.partyAgreements').count(),0,'Public parties omit GV and agreements');}
-   await frame.locator(selector).screenshot({path:path.join(screens,screen+'-'+width+'.png')});console.log('PASS '+screen+' '+width+'px: public documents and controls remain in the viewport');
+   await page.locator('#preview').screenshot({path:path.join(screens,screen+'-'+width+'.png')});
+   await frame.locator(screen==='parties'?'.civicPublicDocs':'.civicBallot').last().scrollIntoViewIfNeeded();
+   await page.locator('#preview').screenshot({path:path.join(screens,screen+'-detail-'+width+'.png')});console.log('PASS '+screen+' '+width+'px: public documents and controls remain in the viewport');
+  }
+  await page.locator('#screen').selectOption('teacher-parties');
+  for(const width of [390,1440]){
+   await page.locator('#preview').evaluate((el,w)=>el.style.width=w+'px',width);
+   const frame=page.frameLocator('#preview');await frame.locator('.teacherPartyDossiers').waitFor();
+   await frame.locator('.teacherPartySection').nth(1).scrollIntoViewIfNeeded();
+   await page.locator('#preview').screenshot({path:path.join(screens,'teacher-documents-'+width+'.png')});
+   await frame.locator('.partyMandateEditor').first().evaluate(el=>el.open=true);
+   await frame.locator('.partyMandateEditor').first().scrollIntoViewIfNeeded();
+   await page.locator('#preview').screenshot({path:path.join(screens,'teacher-mandates-'+width+'.png')});
   }
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

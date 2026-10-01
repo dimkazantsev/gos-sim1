@@ -154,5 +154,70 @@
       "AttributionRequired": "false",
       "Copyrighted": "False"
     }
+  },
+  {
+    "file": "labour.png",
+    "title": "Logo of Mintrud (Russia).svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Logo_of_Mintrud_(Russia).svg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Logo_of_Mintrud_%28Russia%29.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "metadata": {
+      "Credit": "<a rel=\"nofollow\" class=\"external free\" href=\"http://www.rosmintrud.ru/\">http://www.rosmintrud.ru/</a>",
+      "Artist": "Министерство труда и социальной защиты Российской Федерации",
+      "LicenseShortName": "Public domain",
+      "AttributionRequired": "false",
+      "Copyrighted": "False"
+    }
+  },
+  {
+    "file": "energy.jpg",
+    "title": "Emblem of the Russian Ministry of Energy.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_the_Russian_Ministry_of_Energy.jpg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/6/68/Emblem_of_the_Russian_Ministry_of_Energy.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "metadata": {
+      "Credit": "<a rel=\"nofollow\" class=\"external free\" href=\"https://www.interfax.ru/russia/421564\">https://www.interfax.ru/russia/421564</a>",
+      "Artist": "Геральдическая комиссия при президенте РФ",
+      "LicenseShortName": "Public domain",
+      "AttributionRequired": "false",
+      "Copyrighted": "False"
+    }
+  },
+  {
+    "file": "digital.png",
+    "title": "Emblem of the Ministry of Digital Development, Communications and Media.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_the_Ministry_of_Digital_Development,_Communications_and_Media.svg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Emblem_of_the_Ministry_of_Digital_Development%2C_Communications_and_Media.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "metadata": {
+      "Credit": "This <a href=\"https://en.wikipedia.org/wiki/vector_image\" class=\"extiw\" title=\"w:vector image\">vector image</a> includes elements that have been taken or adapted from this file:",
+      "Artist": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+      "LicenseShortName": "Public domain",
+      "AttributionRequired": "false",
+      "Copyrighted": "False"
+    }
+  },
+  {
+    "file": "interior.png",
+    "title": "Emblem of the Ministry of Internal Affairs.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_the_Ministry_of_Internal_Affairs.svg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Emblem_of_the_Ministry_of_Internal_Affairs.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "metadata": {
+      "Credit": "<a rel=\"nofollow\" class=\"external text\" href=\"http://abali.ru/gerb-mvd-ministerstva-vnutrennih-del/\">abali.ru</a>",
+      "Artist": "МВД России",
+      "LicenseShortName": "Public domain",
+      "AttributionRequired": "false",
+      "Copyrighted": "False"
+    }
+  },
+  {
+    "file": "emergency.png",
+    "title": "Emblem of the Ministry of Emergency Situations.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Emblem_of_the_Ministry_of_Emergency_Situations.svg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Emblem_of_the_Ministry_of_Emergency_Situations.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "metadata": {
+      "Credit": "<a rel=\"nofollow\" class=\"external text\" href=\"https://mchs.gov.ru/\">mchs.gov.ru</a>",
+      "Artist": "<a href=\"https://en.wikipedia.org/wiki/ru:%D0%9C%D0%A7%D0%A1_%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B8\" class=\"extiw\" title=\"w:ru:МЧС России\">w:ru:МЧС России</a>",
+      "LicenseShortName": "Public domain",
+      "AttributionRequired": "false",
+      "Copyrighted": "False"
+    }
   }
 ]
