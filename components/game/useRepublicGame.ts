@@ -357,7 +357,11 @@ export function useRepublicGame(gameId:string){
   if(teacher||role.includes('министр'))x.push({key:'ministry',label:me.role_title||'Федеральный орган исполнительной власти'});
   if(teacher||role.includes('муницип')||role.includes('глава города'))x.push({key:'municipality',label:'Орган местного самоуправления'});
   if(teacher||role.includes('сми')||role.includes('журналист'))x.push({key:'media',label:'Средства массовой информации'});
-  if(teacher)x.push({key:'teacher',label:'Преподаватель'});
+  if(teacher)x.unshift({key:'teacher',label:'GOS//SIMS · Нейтральная публикация'});
+  if(teacher||role.includes('юстиц'))x.push({key:'minjust',label:'Министерство юстиции Российской Федерации'});
+  if(teacher||role.includes('внутренн'))x.push({key:'interior',label:'Министерство внутренних дел Российской Федерации'});
+  const offices=[['cec','Избирательная комиссия',/избирательн.*комисс|цик/i],['ks','Конституционный Суд Российской Федерации',/конституционн.*суд/i],['vs','Верховный Суд Российской Федерации',/верховн.*суд/i],['central_bank','Банк России',/центральн.*банк|банк.*россии/i],['accounts','Счётная палата Российской Федерации',/сч[её]тн.*палат/i]] as const;
+  for(const [key,label,pattern] of offices)if(teacher||pattern.test(role))x.push({key,label});
   return x;
  }
  async function createPoliticalPost(data:{processType:string;actorKey:string;actorLabel:string;title:string;body:string;tags:string[];externalUrl?:string;internalView?:string;internalRefId?:string;formalIds?:string[]},files:File[]=[]){
@@ -400,6 +404,12 @@ export function useRepublicGame(gameId:string){
   }
   await loadPoliticalWall();return true;
  }
+ async function updatePoliticalPost(postId:string,data:{title:string;body:string;processType:string;tags:string[];externalUrl?:string;internalView?:string;formalIds?:string[]},files:File[]=[]){
+  const r=await supabase.rpc('update_process_post',{p_post_id:postId,p_title:data.title.trim(),p_body:data.body.trim(),p_process_type:data.processType,p_tags:data.tags,p_external_url:data.externalUrl?.trim()||null,p_internal_view:data.internalView||null,p_formal_ids:data.formalIds||[]});
+  if(r.error){setError(r.error.message);return false}
+  if(files.length)return await addMediaToPoliticalPost(postId,files);
+  await loadPoliticalWall();return true;
+ }
  async function acceptPoliticalPost(postId:string,impactPlan?:Record<string,unknown>){
   const r=await supabase.rpc('accept_political_post',{p_post_id:postId,p_impact_plan:impactPlan||null});
   if(r.error){setError(r.error.message);return false}await loadPoliticalWall();return true;
@@ -412,8 +422,8 @@ export function useRepublicGame(gameId:string){
   const r=await supabase.rpc('approve_post_impact',{p_post_id:postId,p_impact_plan:impactPlan});
   if(r.error){setError(r.error.message);return false}await loadPoliticalWall();return true;
  }
- async function createVoteFromPost(postId:string,institutionKey='all',mode:'member'|'faction'|'mandate'='member'){
-  const r=await supabase.rpc('create_vote_from_post',{p_post_id:postId,p_institution_key:institutionKey,p_voting_mode:mode,p_quorum_value:2/3,p_majority_kind:'present_majority',p_majority_value:0.5});
+ async function createVoteFromPost(postId:string,institutionKey='all',mode:'member'|'faction'|'mandate'='member',groupName?:string){
+  const r=await supabase.rpc('open_process_vote',{p_post_id:postId,p_institution_key:institutionKey,p_group_name:groupName||null});
   if(r.error){setError(r.error.message);return null}await refresh();return r.data as string;
  }
  async function updateMetric(id:string,value:number,note?:string){
@@ -889,5 +899,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
+  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }

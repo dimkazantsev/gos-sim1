@@ -12,6 +12,7 @@ import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Message} from './types';
 import {initials} from './constants';
+import {PROCESS_TAGS} from './processTags';
 import {buildChatEntries,formatChatTime,isChatAttachment,matchChatMessage} from './chatUtils';
 
 const FILE_ACCEPT='image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.xlsx,.ppt,.pptx';
@@ -317,6 +318,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   {chatMediaError&&<div className="chatLocalError chatMediaError" role="alert"><span>{chatMediaError}</span></div>}
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
   {!readOnly?<div className="chatCompose">
+   {channels.find(c=>c.id===channelId)?.kind==='public'&&<details className="chatProcessTags"><summary>Сообщение для политического процесса</summary><small>Добавьте игровой тег: сообщение из общего чата автоматически появится в публичной ленте.</small><div>{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
    <div className="chatInputRow">
     <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)}
      placeholder={channelId?'Написать сообщение…':'Выберите канал'}

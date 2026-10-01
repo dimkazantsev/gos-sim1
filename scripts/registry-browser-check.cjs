@@ -29,6 +29,19 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    await frame.locator(screen==='parties'?'.civicPublicDocs':'.civicBallot').last().scrollIntoViewIfNeeded();
    await page.locator('#preview').screenshot({path:path.join(screens,screen+'-detail-'+width+'.png')});console.log('PASS '+screen+' '+width+'px: public documents and controls remain in the viewport');
   }
+  for(const width of [320,390,768,1440]){
+   await page.locator('#preview').evaluate((el,w)=>el.style.width=w+'px',width);await page.locator('#screen').selectOption('actions');
+   const frame=page.frameLocator('#preview');await frame.locator('.processPortal').waitFor();
+   assert.equal(await frame.locator('.wallPost').count(),3,'Populated process feed');
+   assert.equal(await frame.locator('.impactEditor').count(),0,'Post records actual changes without a metric checklist');
+   assert.equal(await frame.locator('.wallPostAvatar img[alt="GOS//SIMS"]').count(),1,'Teacher has neutral game logo');
+   assert.equal(await frame.locator('.processRecordedChanges').count(),2,'Actual linked changes and media reporting');
+   const measured=await frame.locator('.processPortal').evaluate(el=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,offenders:[...el.querySelectorAll('button,input,a,.processSourceVisual')].filter(x=>x.getClientRects().length).map(x=>({class:x.className,left:x.getBoundingClientRect().left,right:x.getBoundingClientRect().right})).filter(r=>r.left<-2||r.right>document.documentElement.clientWidth+2)}));
+   assert(measured.scroll<=measured.width+2,'Process overflow '+width+': '+JSON.stringify(measured));assert.equal(measured.offenders.length,0,'Process bounds '+width+': '+JSON.stringify(measured));
+   await page.locator('#preview').screenshot({path:path.join(screens,'political-process-'+width+'.png')});
+   await frame.locator('.wallComposer').evaluate(el=>el.open=true);await frame.locator('.processAttachmentTools').scrollIntoViewIfNeeded();await page.locator('#preview').screenshot({path:path.join(screens,'political-composer-'+width+'.png')});
+   console.log('PASS Political process, neutral publisher and recorded changes at '+width+'px');
+  }
   await page.locator('#screen').selectOption('teacher-parties');
   for(const width of [390,1440]){
    await page.locator('#preview').evaluate((el,w)=>el.style.width=w+'px',width);
