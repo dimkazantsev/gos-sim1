@@ -99,7 +99,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
      <b>{game.turn_open?'Пауза':'Открыть ход'}</b>
     </button>
     <button type="button" className="teacherQuick" onClick={onOpenProcesses}>
-     <span><Radio size={18} strokeWidth={2} aria-hidden="true"/></span><b>Процессы</b>
+     <span><Radio size={18} strokeWidth={2} aria-hidden="true"/></span><b>Политический процесс</b>
     </button>
     <button type="button" className="teacherQuick" onClick={confirmNext}>
      <span><ArrowRight size={18} strokeWidth={2} aria-hidden="true"/></span><b>Следующий этап</b>

@@ -365,7 +365,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  };
  const mobilePrimary:View[]=teacher&&!previewMode?['teacher','dashboard','stages','votes']:['dashboard','stages','parties','votes'];
  const mobileSecondary=nav.filter(([k])=>!mobilePrimary.includes(k));
- const dockShortLabels:Record<View,string>={dashboard:'Обзор',stages:'Этапы',actions:'Процессы',parties:'Партии',votes:'Голоса',documents:'НПА',grades:'Оценки',events:'События',budget:'Бюджет',teacher:'Пульт',profile:'Профиль'};
+ const dockShortLabels:Record<View,string>={dashboard:'Обзор',stages:'Этапы',actions:'Процесс',parties:'Партии',votes:'Голоса',documents:'НПА',grades:'Оценки',events:'События',budget:'Бюджет',teacher:'Пульт',profile:'Профиль'};
  const dockItems=[...mobilePrimary,...mobileSecondary.map(([k])=>k)].map(key=>({key,label:nav.find(([k])=>k===key)![1],shortLabel:dockShortLabels[key],icon:sectionBadge(key)>0?<span className="eventDockIcon">{navIcon(key)}<i className="eventDockBadge">{sectionBadge(key)}</i></span>:navIcon(key)}));
 
  function sidebarKeys(){return [...sidebarOrder,...nav.map(x=>x[0]).filter(x=>!sidebarOrder.includes(x))].filter(x=>nav.some(n=>n[0]===x))}
