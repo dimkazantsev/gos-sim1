@@ -1,4 +1,5 @@
 'use client';
+import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {FormEvent,useEffect,useMemo,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
@@ -534,10 +535,10 @@ export function useRepublicGame(gameId:string){
   institutionKey?:string;procedureKey?:string;quorumKind?:'none'|'fraction';quorumValue?:number;
   majorityKind?:'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction';majorityValue?:number;
   allowAbstain?:boolean;tieBreakerChair?:boolean;formalDocumentId?:string|null;
-  passTransition?:string;failTransition?:string;
+  passTransition?:string;failTransition?:string;groupName?:string|null;
  }){
   if(!me||!data.title.trim())return false;
-  const r=await supabase.rpc('create_procedural_vote',{
+  const r=await supabase.rpc('create_civic_vote',{
    p_game_id:gameId,
    p_title:data.title.trim(),
    p_body:data.body.trim()||null,
@@ -552,59 +553,63 @@ export function useRepublicGame(gameId:string){
    p_tie_breaker_chair:data.tieBreakerChair??false,
    p_formal_document_id:data.formalDocumentId||null,
    p_pass_transition:data.passTransition||'none',
-   p_fail_transition:data.failTransition||'none'
+   p_fail_transition:data.failTransition||'none',
+   p_group_name:data.groupName||null
   });
   if(r.error){setError(r.error.message);return false}await refresh();return true;
  }
  function partyForUser(uid:string){const m=members.find(x=>x.user_id===uid);return parties.find(p=>p.name===m?.team)}
  function memberMatchesInstitution(uid:string,institution:string){
   const m=members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;
-  const role=(m.role_title||'').toLowerCase();
-  if(institution==='all'||institution==='factions')return m.kind==='student'||(m.kind==='teacher'&&!['','руководитель симуляции','преподаватель','администратор'].includes(role.trim()));
-  if(institution==='gd')return role.includes('депутат')||(role.includes('государственн')&&role.includes('дум'));
-  if(institution==='government')return role.includes('правительств')||role.includes('министр');
-  if(institution==='sf')return role.includes('совет федерац')||role.includes('сенатор');
-  if(institution==='committee')return role.includes('комитет')||role.includes('депутат');
-  if(institution==='municipality')return role.includes('муницип')||role.includes('администрац')||role.includes('глава города');
-  return false;
+  const role=(m.role_title||'').trim();
+  if(institution==='all'||institution==='factions')return m.kind==='student'||(m.kind==='teacher'&&!['','Руководитель симуляции','Преподаватель','Администратор'].includes(role));
+  return VOTING_BODIES.find(b=>b.key===institution)?.role.test(role)||false;
  }
  function canVote(v:Vote){
-  if(!me)return false;
-  if(v.voting_mode==='member')return memberMatchesInstitution(me.user_id,v.institution_key||'all');
+  if(!me||me.kind==='observer'||v.status!=='open')return false;
+  if(v.electorate_snapshot?.weights){return Number(v.electorate_snapshot.weights[me.user_id]||0)>0&&(v.institution_key.startsWith('unit:')||memberMatchesInstitution(me.user_id,v.institution_key))}
+  if(!memberMatchesInstitution(me.user_id,v.institution_key||'all'))return false;
+  if(v.voting_mode==='member')return true;
   const p=partyForUser(me.user_id);if(!p)return false;
   if(v.voting_mode==='faction')return p.leader_user_id===me.user_id;
   return (partyMandates.find(x=>x.user_id===me.user_id&&x.party_id===p.id)?.effective_mandates||0)>0;
  }
  function ballotWeight(v:Vote){
-  if(v.voting_mode==='member')return canVote(v)?1:0;
-  const p=partyForUser(me?.user_id||'');if(!p)return 0;
-  if(v.voting_mode==='faction')return p.leader_user_id===me?.user_id?1:0;
-  return partyMandates.find(x=>x.user_id===me?.user_id&&x.party_id===p.id)?.effective_mandates||0;
+  if(!canVote(v)||!me)return 0;
+  if(v.electorate_snapshot?.weights)return Number(v.electorate_snapshot.weights[me.user_id]||0);
+  if(v.voting_mode==='member'||v.voting_mode==='faction')return 1;
+  return partyMandates.find(x=>x.user_id===me.user_id)?.effective_mandates||0;
  }
  function eligibleWeight(v:Vote){
+  if(v.status==='closed'&&v.result_eligible!=null)return Number(v.result_eligible);
+  if(v.electorate_snapshot)return Number(v.electorate_snapshot.eligible);
+  if(v.institution_key==='gd')return 450;
+  if(['government','municipality'].includes(v.institution_key))return members.filter(m=>m.kind==='student'&&(!v.group_name||m.group_name===v.group_name)).length;
   if(v.voting_mode==='faction')return parties.filter(p=>p.leader_user_id).length;
   if(v.voting_mode==='mandate')return parties.reduce((a,p)=>a+Math.max(0,Number(p.mandates)||0),0);
   return members.filter(m=>memberMatchesInstitution(m.user_id,v.institution_key||'all')).length;
  }
- function quorum(v:Vote){
-  const eligible=eligibleWeight(v);
-  const x=ballots.filter(b=>b.vote_id===v.id);
-  const cast=v.voting_mode==='member'?x.length:x.reduce((a,b)=>a+Number(b.weight),0);
-  const quorumValue=Number(v.quorum_value||0);
-  const needed=v.quorum_kind==='none'?0:v.institution_key==='gd'&&quorumValue===0.5?Math.floor(eligible/2)+1:Math.ceil(eligible*quorumValue);
-  return {eligible,cast,needed,met:v.quorum_kind==='none'||(eligible>0&&cast>=needed)};
+ function quorum(v:Vote,registrations:{user_id:string;institution_key:string;stage_no:number}[]=[]){
+  const eligible=eligibleWeight(v),cast=ballots.filter(b=>b.vote_id===v.id).reduce((n,b)=>n+Number(b.weight),0);
+  const attendance=v.electorate_snapshot?.attendance_required||v.procedure_key==='registered_session';
+  const present=v.status==='closed'&&v.result_present!=null?Number(v.result_present):attendance?registrations.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no).reduce((n,r)=>n+(v.electorate_snapshot?Number(v.electorate_snapshot.weights[r.user_id]||0):v.voting_mode==='mandate'?(partyMandates.find(a=>a.user_id===r.user_id)?.effective_mandates||0):memberMatchesInstitution(r.user_id,v.institution_key)?1:0),0):cast;
+  const needed=v.quorum_kind==='none'?0:bodyQuorum(v.institution_key,eligible,Number(v.quorum_value));
+  return {eligible,cast,present,needed,met:v.quorum_kind==='none'||eligible>0&&present>=needed};
  }
  function tally(v:Vote){
   const x=ballots.filter(b=>b.vote_id===v.id);
-  const yes=x.filter(b=>b.choice==='yes').reduce((a,b)=>a+Number(b.weight),0);
-  const no=x.filter(b=>b.choice==='no').reduce((a,b)=>a+Number(b.weight),0);
-  const abstain=x.filter(b=>b.choice==='abstain').reduce((a,b)=>a+Number(b.weight),0);
-  return {yes,no,abstain,total:yes+no+abstain};
+  const sum=(choice:'yes'|'no'|'abstain')=>x.reduce((a,b)=>a+Number(b[choice==='yes'?'yes_weight':choice==='no'?'no_weight':'abstain_weight']??(b.choice===choice?b.weight:0)),0);
+  const yes=sum('yes'),no=sum('no'),abstain=sum('abstain');return {yes,no,abstain,total:yes+no+abstain};
  }
- async function castVote(v:Vote,choice:'yes'|'no'|'abstain'){
-  if(!me||!canVote(v))return;
-  const r=await supabase.rpc('cast_procedural_vote',{p_vote_id:v.id,p_choice:choice});
-  if(r.error)setError(r.error.message);else await refresh();
+ async function castVoteAllocation(v:Vote,yes:number,no:number,abstain:number){
+  if(!me||!canVote(v))return false;
+  const r=await supabase.rpc('cast_vote_allocation',{p_vote_id:v.id,p_yes:yes,p_no:no,p_abstain:abstain});
+  if(r.error){setError(r.error.message);return false}await refresh();return true;
+ }
+ async function castVote(v:Vote,choice:'yes'|'no'|'abstain',quantity?:number){const n=quantity??ballotWeight(v);return castVoteAllocation(v,choice==='yes'?n:0,choice==='no'?n:0,choice==='abstain'?n:0)}
+ async function setStudentMandates(partyId:string,allocations:Record<string,number>|null){
+  if(!teacher)return false;const r=await supabase.rpc('set_student_mandates',{p_party_id:partyId,p_allocations:allocations});
+  if(r.error){setError(r.error.message);return false}await refresh();return true;
  }
  async function closeVote(id:string,note?:string){
   const r=await supabase.rpc('close_procedural_vote',{p_vote_id:id,p_note:note||null});
@@ -884,5 +889,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,castVote,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
+  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }

@@ -6,15 +6,19 @@ import type {Vote} from './types';
 import StyledSelect from '../ui/StyledSelect';
 import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 import {institutionLabel,majorityLabel} from './proceduralVoting';
+import VoteBallotControls from './VoteBallotControls';
+import {VOTING_BODIES,type VotingUnit} from './votingBodies';
 
 function pct(n:number,d:number){return d>0?Math.round(n/d*100):0}
 function time(v:string){return new Date(v).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
 
 export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:ReturnTypeRepublic;onOpenDocument:(id:string)=>void;onOpenStages:()=>void;focusId?:string}){
  const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,createVote,canVote,castVote,closeVote,tally,quorum}=g;
- const [title,setTitle]=useState(''),[body,setBody]=useState(''),[mode,setMode]=useState<'member'|'faction'|'mandate'>('faction');
+ const [title,setTitle]=useState(''),[body,setBody]=useState(''),[mode,setMode]=useState<'member'|'faction'|'mandate'>('member');
  const [institution,setInstitution]=useState('all'),[quorumValue,setQuorumValue]=useState(0.5),[majorityKind,setMajorityKind]=useState<'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction'>('present_majority'),[majorityValue,setMajorityValue]=useState(0.5);
  const [tab,setTab]=useState<'open'|'closed'|'all'>('open'),[busy,setBusy]=useState('');
+ const [group,setGroup]=useState(''),[query,setQuery]=useState(''),[units,setUnits]=useState<VotingUnit[]>([]);
+ const groups=[...new Set(members.filter(m=>m.kind==='student').map(m=>m.group_name).filter((s):s is string=>!!s))];
  const focused=useRef('');
  useEffect(()=>{if(focusId)setTab('all')},[focusId]);
  useEffect(()=>{if(!focusId||focused.current===focusId)return;const node=document.getElementById('vote-'+focusId);if(node){focused.current=focusId;node.scrollIntoView({block:'start',behavior:'smooth'});node.focus({preventScroll:true})}},[focusId,tab,votes]);
@@ -33,22 +37,22 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
   return()=>{live=false;void supabase.removeChannel(channel)};
  },[g.game?.id]);
  function isRegisteredForVote(v:Vote){
-  return v.procedure_key!=='registered_session'||!['gd','government','municipality'].includes(v.institution_key)||
+  return (!v.electorate_snapshot?.attendance_required&&v.procedure_key!=='registered_session')||
    checkedIn.some(row=>row.user_id===me?.user_id&&row.institution_key===v.institution_key&&row.stage_no===v.stage_no);
  }
  function canCast(v:Vote){return canVote(v)&&isRegisteredForVote(v)}
 
 
- const visible=useMemo(()=>votes.filter(v=>tab==='all'||v.status===tab),[votes,tab]);
+ const visible=useMemo(()=>votes.filter(v=>(tab==='all'||v.status===tab)&&(!query.trim()||[v.title,institutionLabel(v.institution_key),v.group_name,v.electorate_snapshot?.institution_label].join(' ').toLowerCase().includes(query.trim().toLowerCase()))),[votes,tab,query]);
  const openCount=votes.filter(v=>v.status==='open').length;
 
  async function create(){
-  const ok=await createVote({title,body,mode,institutionKey:institution,procedureKey:['gd','government','municipality'].includes(institution)?'registered_session':'manual',quorumKind:'fraction',quorumValue,majorityKind,majorityValue,allowAbstain:true,tieBreakerChair:institution==='government'});
+  const ok=await createVote({title,body,mode,institutionKey:institution,procedureKey:!['all','factions'].includes(institution)?'registered_session':'manual',quorumKind:'fraction',quorumValue,majorityKind,majorityValue,allowAbstain:true,tieBreakerChair:institution==='government',groupName:group||null});
   if(ok){setTitle('');setBody('')}
  }
 
  function canClose(v:Vote){
-  if(teacher)return true;if(!me)return false;
+  if(teacher)return true;if(!me)return false;if(units.some(u=>'unit:'+u.id===v.institution_key&&u.head_user_id===me.user_id))return true;
   const role=(me.role_title||'').toLowerCase();
   if(v.institution_key==='gd')return (role.includes('председател')&&role.includes('дум'))||(role.includes('совет')&&role.includes('дум'));
   if(v.institution_key==='government')return role.includes('председател')&&role.includes('правительств');
@@ -58,13 +62,13 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
   return false;
  }
 
- return <div className="votesPage">
+ return <div className="votesPage civicVotes">
   <section className="votesHero">
    <div><small>ПРОЦЕДУРНЫЙ ЦЕНТР</small><h1>Голосования</h1><p>Здесь принимаются решения, которые реально двигают НПА, государственные программы и иные формальные институты по процедуре.</p></div>
    <div className="votesHeroState"><strong>{openCount}</strong><span>открытых голосований</span><button onClick={onOpenStages}>Этапы игры →</button></div>
   </section>
 
-  <InstitutionRegistrationPanel g={g}/>
+  <InstitutionRegistrationPanel g={g} onUnitsChange={setUnits}/>
   <section className="votesOverview">
    <article><small>ВСЕГО</small><strong>{votes.length}</strong><span>процедур</span></article>
    <article><small>ПРИНЯТО</small><strong>{votes.filter(v=>v.result_code==='passed').length}</strong><span>решений</span></article>
@@ -79,36 +83,34 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
      <input aria-label="Вопрос голосования" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Вопрос голосования"/>
      <textarea aria-label="Проект решения" value={body} onChange={e=>setBody(e.target.value)} placeholder="Проект решения / пояснение"/>
      <div className="voteBuilderGrid">
-      <StyledSelect label="Кто голосует" value={institution} onChange={setInstitution} options={[
-       {value:'all',label:'Все участники'},{value:'gd',label:'Государственная Дума'},
-       {value:'government',label:'Правительство РФ'},{value:'sf',label:'Совет Федерации'},
-       {value:'committee',label:'Профильный комитет'},{value:'municipality',label:'Муниципальный орган'}]}/>
-      <StyledSelect label="Способ подсчёта" value={mode} onChange={v=>setMode(v as typeof mode)} options={[
-       {value:'member',label:'Один участник — один голос'},{value:'faction',label:'Одна фракция — один голос'},{value:'mandate',label:'Вес = число мандатов'}]}/>
+      <StyledSelect label="Кто голосует" value={institution} onChange={key=>{setInstitution(key);setMode(key==='gd'?'mandate':'member');setQuorumValue(VOTING_BODIES.find(b=>b.key===key)?.quorum||.5);setMajorityKind(key==='gd'?'eligible_majority':'present_majority')}} options={[{value:'all',label:'Все участники'},{value:'factions',label:'Фракции'},...VOTING_BODIES.map(b=>({value:b.key,label:b.title})),...units.map(u=>({value:'unit:'+u.id,label:u.title}))]}/>
+      <StyledSelect label="Учебная группа" value={group} onChange={setGroup} options={[{value:'',label:'Все группы'},...groups.map(s=>({value:s,label:s}))]}/>
+      <StyledSelect label="Способ подсчёта" value={mode} onChange={v=>setMode(v as typeof mode)} options={institution==='gd'?[{value:'mandate',label:'По числу депутатских мандатов'}]:['all','factions'].includes(institution)?[{value:'member',label:'Один участник — один голос'},{value:'faction',label:'Одна фракция — один голос'}]:[{value:'member',label:'Один участник — один голос'}]}/>
       <StyledSelect label="Кворум" value={String(quorumValue)} onChange={v=>setQuorumValue(Number(v))}
-       options={[{value:'0.5',label:'Не менее 1/2'},{value:String(2/3),label:'Не менее 2/3'},{value:'0.75',label:'Не менее 3/4'}]}/>
+       options={[...(institution==='ks'?[{value:String(6/11),label:'Учебный кворум КС · 6/11'}]:[]),{value:'0.5',label:'Не менее 1/2'},{value:String(2/3),label:'Не менее 2/3'},{value:'0.75',label:'Не менее 3/4'}]}/>
       <StyledSelect label="Порог решения" value={majorityKind} onChange={v=>setMajorityKind(v as typeof majorityKind)}
        options={[{value:'present_majority',label:'Большинство присутствующих'},{value:'eligible_majority',label:'Большинство от общего состава'},
        {value:'eligible_fraction',label:'Доля от общего состава'},{value:'yes_no_simple',label:'Больше «за», чем «против»'}]}/>
      </div>
      {majorityKind==='eligible_fraction'&&<StyledSelect label="Необходимая доля" value={String(majorityValue)}
        onChange={v=>setMajorityValue(Number(v))} options={[{value:String(2/3),label:'2/3'},{value:'0.75',label:'3/4'}]}/>}
-     <button className="primary" onClick={create}>Открыть голосование</button>
+     <p className="civicVoteBase">{institution==='gd'?'Общий состав: 450 мандатов. GV уменьшает доступные голоса, сохраняя базу расчёта кворума.':['government','municipality'].includes(institution)?'Общий состав: '+members.filter(m=>m.kind==='student'&&(!group||m.group_name===group)).length+' студентов выбранной группы.':'Состав и право голоса фиксируются при открытии процедуры.'}</p><button className="primary" disabled={title.trim().length<3} onClick={create}>Открыть голосование</button>
     </div>
    </div>
   </details>}
 
+  <input className="civicVoteSearch" aria-label="Поиск голосований" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Поиск по вопросу, органу или группе"/>
   <div className="voteTabs"><button className={tab==='open'?'active':''} onClick={()=>setTab('open')}>Открытые <span>{openCount}</span></button><button className={tab==='closed'?'active':''} onClick={()=>setTab('closed')}>Завершённые</button><button className={tab==='all'?'active':''} onClick={()=>setTab('all')}>Все</button></div>
 
   <div className="proceduralVoteList">{visible.length===0?<div className="emptyState">В этой категории голосований пока нет.</div>:visible.map(v=>{
-   const t=tally(v),q=quorum(v),my=ballots.find(b=>b.vote_id===v.id&&b.voter_id===me?.user_id);
+   const t=tally(v),q=quorum(v,checkedIn),my=ballots.find(b=>b.vote_id===v.id&&b.voter_id===me?.user_id);
    const doc=v.formal_document_id?formalDocuments.find(d=>d.id===v.formal_document_id):undefined;
    const stage=stages.find(s=>s.stage_no===v.stage_no);
    const denominator=Math.max(1,t.yes+t.no+t.abstain);
    const rule=majorityLabel(v.majority_kind,Number(v.majority_value));
    return <article id={'vote-'+v.id} tabIndex={-1} className={'proceduralVoteCard '+v.status+(focusId===v.id?' isFocused':'')} key={v.id}>
     <header>
-     <div className="voteInstitution"><span>✓</span><div><small>{institutionLabel(v.institution_key)}</small><b>{v.title}</b></div></div>
+     <div className="voteInstitution"><span>✓</span><div><small>{v.electorate_snapshot?.institution_label||institutionLabel(v.institution_key)}</small><b>{v.title}</b></div></div>
      <div className={'voteState '+(v.status==='open'?'live':v.result_code||'closed')}>{v.status==='open'?'● ГОЛОСОВАНИЕ ИДЁТ':v.result_label||'ЗАВЕРШЕНО'}</div>
     </header>
 
@@ -120,12 +122,12 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
     {v.body&&<p className="voteBody">{v.body}</p>}
 
     <div className="voteRuleStrip">
-     <div><small>КВОРУМ</small><b>{v.quorum_kind==='none'?'Не требуется':Math.round(Number(v.quorum_value)*100)+'% состава'}</b></div>
+     <div><small>КВОРУМ</small><b>{v.quorum_kind==='none'?'Не требуется':q.needed+' из '+q.eligible}</b></div>
      <div><small>РЕШЕНИЕ</small><b>{rule}</b></div>
      <div><small>ФОРМАТ</small><b>{v.voting_mode==='mandate'?'по числу мандатов':v.voting_mode==='faction'?'одна фракция — один голос':'персонально'}</b></div>
     </div>
 
-    <div className="quorumMeter"><div><span>Участие: {q.cast} из {q.eligible}</span><b className={q.met?'ok':'wait'}>{q.met?'КВОРУМ ЕСТЬ':'НУЖНО '+Math.max(0,q.needed-q.cast)}</b></div><i><em style={{width:Math.min(100,pct(q.cast,q.eligible))+'%'}}/></i></div>
+    <div className="quorumMeter"><div><span>Присутствует: {q.present} из {q.eligible} · Подано: {q.cast}</span><b className={q.met?'ok':'wait'}>{q.met?'КВОРУМ ЕСТЬ':'НУЖНО '+Math.max(0,q.needed-q.present)}</b></div><i><em style={{width:Math.min(100,pct(q.present,q.eligible))+'%'}}/></i></div>
     {v.voting_mode==='mandate'&&<details className="deputyRegistration" open={v.status==='open'}>
      <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{partyMandates.filter(a=>v.procedure_key!=='registered_session'||checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)).reduce((a,x)=>a+x.effective_mandates,0)} / {parties.reduce((a,p)=>a+Number(p.mandates||0),0)} участвует · GV −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
      <div className="deputyRegistrationBody">
@@ -149,11 +151,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
     </div>
 
     {v.status==='open'?<div className="proceduralVoteActions">
-     <div className="voteChoiceButtons">
-      <button disabled={!canCast(v)} className={my?.choice==='yes'?'selected yes':''} onClick={()=>castVote(v,'yes')}>✓ За</button>
-      {v.allow_abstain&&<button disabled={!canVote(v)} className={my?.choice==='abstain'?'selected abstain':''} onClick={()=>castVote(v,'abstain')}>○ Воздержаться</button>}
-      <button disabled={!canVote(v)} className={my?.choice==='no'?'selected no':''} onClick={()=>castVote(v,'no')}>× Против</button>
-     </div>
+     <VoteBallotControls vote={v} maxWeight={g.ballotWeight(v)} canCast={canCast(v)} ballot={my} onSubmit={(yes,no,abstain)=>g.castVoteAllocation(v,yes,no,abstain)}/>
      {!canVote(v)&&<small className="voteNotEligible">Вашей игровой роли не предоставлено право голоса в этой процедуре.</small>}
      {canVote(v)&&!isRegisteredForVote(v)&&<small className="voteNotEligible">Сначала отметьте присутствие в панели регистрации выше, затем голосуйте.</small>}
      {v.voting_mode==='mandate'&&canVote(v)&&<small className="myMandateWeight">Ваш вес в этом голосовании: <b>{partyMandates.find(x=>x.user_id===me?.user_id)?.effective_mandates||0}</b> депутатских голосов.</small>}

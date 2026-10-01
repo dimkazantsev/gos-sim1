@@ -1,0 +1,203 @@
+/* Civic screens: white paper, blue procedure controls and intrinsic content heights. */
+.eventTileArtwork,.eventCaseCard.eventStory,.eventStoryVisual {background:#fff!important}
+.eventTileArtwork {border-bottom-color:#e4ebf4}
+.eventCaseModal .eventCaseCard.eventStory {display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+.eventComicPlayer .eventPanelIllustration {width:min(100%,var(--scene-native-width,600px))!important;margin-inline:auto!important;aspect-ratio:var(--scene-ratio,auto)!important;height:auto!important;max-height:none!important;background:#fff!important}
+.eventComicPlayer .eventPanelIllustration>svg {display:block!important;width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:var(--scene-ratio,auto)}
+.eventStoryVisual .eventComicPlayer {display:grid;place-items:center;gap:8px;padding:16px;background:#fff}
+.eventTileArtwork .eventComicPlayer {display:grid;place-items:center;height:100%}
+.eventAnswerPanel {display:grid;gap:12px;margin:20px 0;min-width:0}
+.eventAnswerChoice {display:grid;gap:12px;width:100%;min-width:0;min-height:92px;padding:16px!important;text-align:left!important;border:1px solid #ccdbee!important;border-radius:12px!important;background:#fff!important;color:#294261!important;white-space:normal!important;cursor:pointer;font:inherit;opacity:1!important}
+.eventAnswerChoice:hover:enabled {border-color:#4071cb!important;background:#f5f8ff!important}
+.eventAnswerChoice:focus-visible {outline:3px solid #709be6;outline-offset:3px}
+.eventAnswerChoice[aria-pressed=true] {border:2px solid #386aca!important;background:#f1f6ff!important}
+.eventAnswerChoice:disabled {cursor:default}
+.eventAnswerHeading {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start}
+.eventAnswerHeading b {font-size:14px;line-height:1.6;overflow-wrap:break-word}
+.eventAnswerHeading strong {font-size:19px;line-height:1.3;font-variant-numeric:tabular-nums;color:#3c65a6}
+.eventAnswerProgress {display:block;height:4px;border-radius:4px;background:#e8eef7;overflow:hidden}
+.eventAnswerProgress i {display:block;height:100%;background:#7195d0}
+.eventAnswerPeople {display:flex;justify-content:space-between;align-items:center;gap:12px;color:#75859b;font-size:12px}
+.eventAnswerAvatars {display:flex;flex-wrap:wrap;gap:4px}
+.eventVoter,.eventVoterMore {display:inline-grid;place-items:center;width:30px;height:30px;flex:none;overflow:hidden;border-radius:50%;background:#edf2f9;border:2px solid #fff}
+.eventVoter>.profileFallbackAvatar,.eventVoter>.profileAvatarImage {display:block;width:100%!important;height:100%!important;object-fit:cover}
+.eventVoter svg {display:block;width:100%;height:100%}
+.eventAnswerNotice {font-size:13px;color:#70819a}
+.eventLegalFeedback {display:grid;gap:12px;border:1px solid #cbdbef;border-radius:12px;padding:18px;background:#f6f9ff;margin:16px 0;min-width:0}
+.eventLegalFeedback h4,.eventLegalFeedback p {margin:0;line-height:1.75}
+.eventLegalFeedback article {display:grid;gap:5px;padding-top:12px;border-top:1px solid #dbe5f2;font-size:13px}
+.eventLegalFeedback small {color:#667c9b;line-height:1.6}
+.eventLegalBasis {font-size:12px;color:#5c7495}
+.legalPortal {min-width:0}
+.legalPortal .formalHero {display:grid;grid-template-columns:minmax(0,1fr);gap:20px;padding:28px;background:#fff;border:1px solid #d8e3f1;min-width:0}
+.legalPortal .formalHero h1 {font-size:clamp(22px,2.6vw,34px);max-width:860px;line-height:1.3}
+.legalPortal .formalHeroActions {display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.legalPortal .formalWorkspace {display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start;min-width:0}
+.legalPortal .formalRegistry {display:grid!important;grid-template-columns:minmax(0,1fr);gap:12px;position:static!important;max-height:none!important;min-width:0;overflow:visible;padding:18px}
+.legalPortal .legalRegistryRows {display:grid!important;grid-template-columns:minmax(0,1fr);grid-auto-rows:max-content;align-content:start;gap:12px;max-height:68dvh;overflow:auto;min-height:0;padding:2px 5px 4px 2px;scrollbar-gutter:stable}
+.legalPortal .legalDocumentRow {display:grid!important;grid-template-columns:minmax(0,1fr)!important;flex:none!important;flex-shrink:0!important;height:auto!important;min-height:150px;max-height:none!important;align-content:start;gap:10px;padding:16px!important;overflow:visible;box-sizing:border-box;white-space:normal!important;text-align:left}
+.legalPortal .legalDocumentRow>* {min-width:0;max-width:100%;overflow-wrap:anywhere;line-height:1.5;white-space:normal!important}
+.legalPortal .legalDocumentRow>div:last-child {display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.legalPortal .formalDetail {display:grid;gap:18px;min-width:0;overflow:visible}
+.legalPortal .formalDocHeader {padding:22px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0;background:#fff}
+.legalPortal .formalDocHeader h2 {font-size:23px;line-height:1.4;overflow-wrap:break-word}
+.legalPortal .formalStatusLarge {min-width:0;width:auto;padding:14px}
+.legalPortal .legalRouting {padding:16px 20px!important;overflow:visible}
+.legalRouting summary {font-size:14px;font-weight:700;line-height:1.5;cursor:pointer;min-height:30px}
+.legalPortal .formalActions {margin:0!important;padding:20px!important;border:1px solid #bad0ef;background:#f4f8ff;min-width:0}
+.legalPortal .formalActions button {width:fit-content;max-width:100%;min-height:46px;white-space:normal;line-height:1.5}
+.legalPortal .formalActions button.primary {width:100%;justify-content:center}
+.legalPortal .formalDocGrid {padding:0!important;display:grid;grid-template-columns:minmax(0,1fr);gap:20px;min-width:0}
+.legalPortal .formalSidebar {display:grid;gap:18px;min-width:0}
+.legalPortal .legalDocumentPaper {background:#fff;padding:clamp(18px,3vw,36px);border:1px solid #dbe3ee;border-radius:6px;min-width:0;box-shadow:0 4px 16px #1a365610}
+.legalMasthead {display:grid;justify-items:center;gap:14px;text-align:center;min-width:0}
+.legalEmblem {display:block;object-fit:contain;max-width:100%;width:80px;height:80px}
+.legalPortal .formalPaperInstitution {font-size:14px;line-height:1.7;letter-spacing:.02em;color:#2a3c54}
+.legalPortal .formalPaperType {font-size:17px;line-height:1.5;letter-spacing:.02em;color:#24394e;white-space:normal}
+.legalDraftBadge {font-size:11px;border:1px solid #c8d7e9;border-radius:5px;padding:4px 9px;color:#627b9c}
+.legalPortal .formalPaperMeta {display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:24px;font-size:13px;font-variant-numeric:tabular-nums;color:#5e718a}
+.legalPortal .formalPaper h1 {font-size:21px;line-height:1.55;text-align:center;margin:22px 0}
+.legalPortal .formalPaperBody {max-width:72ch;margin:auto;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.8;color:#28384a}
+.legalPortal .formalPaperBody p {white-space:pre-wrap;overflow-wrap:break-word}
+.legalPortal .formalSignature {display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px;padding-top:28px;margin-top:28px;border-top:1px solid #e1e7ee}
+.legalPortal .formalSignature>div {display:grid;gap:8px;min-width:0;font-size:13px}
+.legalPortal .formalSignatureMark {display:none}
+.legalPortal .formalSignatureImage {margin:0;max-width:180px}
+.legalPortal .formalSignatureImage img {max-width:100%;max-height:100px;object-fit:contain}
+.legalPortal .formalPaper footer {font-size:11px;margin-top:28px;color:#8a96a6}
+.legalPortal .formalCreate {display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+.legalPortal .formalCreateGuide {display:none}
+.legalPortal .formalCreateForm {display:grid;gap:18px;min-width:0;padding:24px;background:#fff;border:1px solid #dbe5f2;border-radius:14px}
+.legalTemplatePicker {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end}
+.legalIssuerFields,.legalPortal .formalRecognitionGrid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.legalPortal :is(label,.legalIssuerFields>label) {min-width:0}
+.legalIssuerFields>label {display:grid;gap:8px;font-size:13px}
+.legalEditorNote {font-size:13px;line-height:1.7;margin:0;color:#68809e}
+.legalPortal .formalTextEditor {min-height:400px;width:100%;box-sizing:border-box;resize:vertical;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.8}
+.legalPortal .formalCreateFooter {display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
+.legalPortal .formalCreateFooter>span {flex:1 1 200px}
+.legalPortal .formalCreateFooter button {min-height:48px;white-space:normal}
+.legalPortal .formalEditBody {width:100%;min-height:420px;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.8}
+.legalPortal .formalLawBase {display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+.legalPortal .formalLawLinks {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.legalEmblemSources {display:inline-block;margin:16px 0;color:#7188a6;font-size:12px;line-height:1.6}
+.civicVotes .voteBuilder.modern {display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding:0;min-width:0}
+.civicVotes .voteBuilderGrid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.civicVotes .voteBuilder.modern>input,.civicVotes .voteBuilder.modern>textarea {width:100%;box-sizing:border-box;min-width:0;grid-column:1/-1}
+.civicVotes .voteBuilder.modern>input {min-height:48px}
+.civicVotes .voteBuilder.modern>textarea {min-height:110px}
+.civicVotes .voteBuilder.modern>button {min-height:48px;grid-column:1/-1}
+.civicVoteBase {font-size:13px;line-height:1.7;color:#617997;margin:0}
+.civicVoteSearch,.civicPartySearch {width:100%;min-height:48px;box-sizing:border-box;margin-bottom:18px;border:1px solid #cfdbec;background:#fff;border-radius:10px;padding:12px;font:inherit;color:#294366}
+.civicRegistration {padding:24px;background:#fff;min-width:0}
+.civicRegistration>header {display:flex;justify-content:space-between;gap:18px;align-items:start;margin-bottom:20px}
+.civicRegistration>header p {line-height:1.7;font-size:13px;color:#6b819e}
+.civicRegistrationSelectors {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.civicAttendance {display:grid;gap:18px;border-top:1px solid #e0e7f1;margin-top:20px;padding-top:20px;min-width:0}
+.civicAttendance h3 {font-size:18px;margin:0 0 10px;line-height:1.4}
+.civicAttendance p {margin:0;font-size:12px;line-height:1.7;color:#6c829e}
+.civicAttendanceNumbers {display:flex;flex-wrap:wrap;gap:20px;font-size:13px;color:#667e9e}
+.civicAttendanceNumbers b {display:block;font-size:22px;font-variant-numeric:tabular-nums;line-height:1.8;color:#29496f}
+.civicAttendees {display:grid;gap:8px;padding:0;margin:0;list-style:none}
+.civicAttendees li {display:flex;justify-content:space-between;gap:12px;font-size:13px;line-height:1.6}
+.civicAttendees b {font-variant-numeric:tabular-nums;flex:none}
+.civicAttendance>button {min-height:46px}
+.civicCustomBody,.partyMandateEditor {margin-top:20px;border-top:1px solid #dce5f1;padding-top:16px}
+.civicCustomBody summary,.partyMandateEditor summary {cursor:pointer;font-size:14px;font-weight:700;line-height:1.6}
+.civicBodyEditor {display:grid;gap:16px;margin-top:16px;min-width:0}
+.civicBodyEditor>label {display:grid;gap:8px}
+.civicBodyEditor fieldset {display:grid;gap:10px;border:1px solid #d8e4f3;border-radius:8px;max-height:260px;overflow:auto;min-width:0}
+.civicCheckbox {display:flex!important;align-items:center;gap:10px!important;font-size:13px;line-height:1.6;min-height:36px}
+.civicCheckbox input[type=checkbox] {flex:none;appearance:auto;width:20px!important;height:20px!important;min-height:20px!important;margin:0!important;accent-color:#466fc0}
+.civicVotes .proceduralVoteCard {padding:24px;min-width:0;overflow:visible}
+.civicVotes .proceduralVoteCard>header {display:flex;flex-wrap:wrap;gap:16px;min-width:0}
+.civicVotes .voteInstitution {min-width:0;flex:1 1 260px}
+.civicVotes .voteInstitution>div {min-width:0}
+.civicVotes .voteInstitution b {overflow-wrap:break-word;white-space:normal;line-height:1.6}
+.civicVotes .voteState {white-space:normal;line-height:1.6}
+.civicVotes .voteRuleStrip {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;padding:18px 0}
+.civicVotes .voteRuleStrip b {line-height:1.6;white-space:normal;font-size:13px}
+.civicVotes .quorumMeter>div {display:flex;flex-wrap:wrap;gap:12px;line-height:1.7;font-size:13px}
+.civicVotes .deputyRegistration summary {display:flex;flex-wrap:wrap;gap:12px}
+.civicVotes .deputyRegistrationBody {min-width:0}
+.civicVotes .deputyStudentRow {display:grid;grid-template-columns:minmax(140px,1.5fr) 90px 65px minmax(130px,1fr);gap:12px;align-items:center;min-width:0;padding:12px 0;font-size:12px}
+.civicVotes .deputyStudentRow b,.civicVotes .deputyStudentRow strong {white-space:normal;line-height:1.6}
+.civicVotes .proceduralVoteActions {display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0}
+.civicBallot {display:grid;gap:14px;padding:18px;background:#f6f9ff;border:1px solid #d6e1f0;border-radius:12px;min-width:0}
+.civicBallot p {font-size:13px;line-height:1.7;margin:0}
+.civicQuantity {display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:12px;align-items:center;font-size:13px}
+.civicSplitInputs {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.civicSplitInputs>label {display:grid;gap:8px;font-size:13px;min-width:0}
+.civicVotes .voteChoiceButtons {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%}
+.civicVotes .voteChoiceButtons button {min-height:50px;padding:12px;white-space:normal;line-height:1.5;min-width:0}
+.civicBallotError {color:#a34651}
+.civicMyBallot {color:#426da9}
+.civicVotes .closeProceduralVote {width:100%;min-height:48px;justify-content:center;white-space:normal}
+.civicParties {display:grid;gap:20px;min-width:0}
+.civicParties h1 {font-size:30px}
+.civicPartyTiles {display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;min-width:0}
+.civicPartyTile {display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:start;padding:18px;border:1px solid #d5e1f0;border-radius:12px;background:#fff;min-width:0;text-align:left;cursor:pointer;color:#315174}
+.civicPartyTile.active {border:2px solid #5c83c5;padding:17px;background:#f5f8ff}
+.civicPartyTile>span:nth-child(2) {display:grid;gap:6px;min-width:0;line-height:1.6}
+.civicPartyTile small {font-size:12px;color:#6c829e}
+.civicPartyTileStats {grid-column:1/-1;font-size:12px;line-height:1.8}
+.civicPartyLogo {display:grid;place-items:center;flex:none;width:48px;height:48px;border-radius:10px;overflow:hidden;color:#fff;font-size:24px;font-weight:800}
+.civicPartyLogo img {width:100%;height:100%;object-fit:contain;background:#fff}
+.civicPartyPublic {display:grid;gap:24px;min-width:0;background:#fff;border:1px solid #d5e1f0;border-radius:14px;padding:28px}
+.civicPartyPublic>header {display:flex;flex-wrap:wrap;gap:16px;align-items:center;min-width:0}
+.civicPartyPublic>header>div {flex:1 1 200px;min-width:0}
+.civicPartyPublic h2 {margin:0;font-size:24px;line-height:1.4;overflow-wrap:break-word}
+.civicPartyPublic>header p {margin:6px 0 0;font-size:13px;color:#7084a0}
+.civicPartyPublic>header>span:last-child {font-size:12px;color:#6983a1}
+.civicPartyDescription {margin:0;line-height:1.8;font-size:14px;max-width:75ch;white-space:pre-wrap}
+.civicPartyFacts {display:flex;flex-wrap:wrap;gap:22px;font-size:12px;color:#6b819e}
+.civicPartyFacts b {font-size:22px;display:block;line-height:1.8;color:#315276}
+.civicPartyLeader {display:flex;gap:12px;align-items:center}
+.civicPartyLeader>div {display:grid;gap:5px}
+.civicPartyLeader small {color:#7b8ca5;font-size:12px}
+.civicPublicDocs {display:grid;gap:12px;min-width:0}
+.civicPublicDocs h3 {font-size:18px;margin:0}
+.civicPublicDocs>a {display:flex;justify-content:space-between;gap:16px;padding:16px;border:1px solid #d5e1ef;border-radius:9px;min-width:0;color:#426aab;text-decoration:none;font-size:13px;line-height:1.6}
+.civicPublicDocs>a>div {display:grid;gap:5px;min-width:0;overflow-wrap:anywhere}
+.civicPublicDocs small {color:#8090a8;font-size:11px}
+.civicPartyRoster summary,.civicPartyEditor summary,.civicPartyPackage summary {font-size:14px;line-height:1.6;min-height:34px;font-weight:700;cursor:pointer}
+.civicPartyRoster ul {padding:0;display:grid;gap:12px;list-style:none;margin-top:16px}
+.civicPartyRoster li {display:flex;gap:12px;align-items:center;min-width:0;font-size:12px;line-height:1.6}
+.civicPartyRoster li>div {display:grid;gap:4px;flex:1;min-width:0}
+.civicPartyRoster small {color:#7388a3}
+.civicPartyEditor,.civicPartyPackage {min-width:0;padding:18px;border:1px solid #d9e3f0;border-radius:10px;background:#f8faff}
+.civicPartyEditor>label {display:grid;gap:8px;margin:14px 0;font-size:13px;min-width:0}
+.civicPartyEditor .styledSelect {margin:14px 0}
+.civicPartyUpload {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px;align-items:end}
+.civicPartyUpload>label {display:grid;gap:8px;font-size:13px;min-width:0}
+.civicPartyUpload button {min-height:46px;white-space:normal}
+.civicPartyFiles {display:grid;gap:12px}
+.civicPartyFiles article {padding:12px 0;border-bottom:1px solid #dae4f1;font-size:13px;min-width:0}
+.civicPartyFiles a {display:grid;gap:6px;line-height:1.6;overflow-wrap:anywhere}
+.civicPartyFiles small {font-size:11px;color:#6e85a3}
+.civicPartyInbox article {display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:14px;background:#fff;border-radius:10px;margin-top:12px}
+.civicPendingInvite {display:flex;justify-content:space-between;gap:14px;align-items:center;padding-top:14px;font-size:13px}
+.partyMandateEditor {display:block;min-width:0}
+.partyMandateEditor>label {display:grid;gap:8px;margin:14px 0;font-size:12px}
+.partyMandateEditor>.styledSelect {margin:16px 0}
+.partyMandateEditor p {font-size:12px;line-height:1.7;color:#7185a1;margin:14px 0}
+.partyMandateRows {display:grid;gap:12px}
+.partyMandateRows>label {display:grid;grid-template-columns:minmax(0,1fr) 85px;gap:12px;align-items:center;font-size:12px;min-width:0}
+.partyMandateRows>label>span {display:grid;gap:5px;line-height:1.6}
+.partyMandateRows small {color:#7387a2;font-size:11px}
+.civicMandateActions {display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.civicDocReview {display:flex;flex-wrap:wrap;gap:8px;grid-column:1/-1;flex-basis:100%;padding-top:8px}
+.teacherPartySection li {flex-wrap:wrap}
+@media(max-width:1120px){.legalPortal .formalWorkspace{grid-template-columns:minmax(0,1fr)}.legalPortal .legalRegistryRows{grid-template-columns:repeat(2,minmax(0,1fr));max-height:480px}.legalPortal .formalFilters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){
+ .legalPortal .formalHero,.legalPortal .formalCreateForm,.civicRegistration,.civicVotes .proceduralVoteCard,.civicPartyPublic{padding:18px}
+ .legalPortal .legalRegistryRows,.legalPortal .formalFilters,.legalIssuerFields,.legalTemplatePicker,.legalPortal .formalRecognitionGrid,.legalPortal .formalLawLinks,.civicRegistrationSelectors,.civicVotes .voteBuilderGrid,.civicPartyUpload{grid-template-columns:minmax(0,1fr)}
+ .legalPortal .formalDocHeader{padding:18px}.legalPortal .formalDocHeader h2{font-size:20px}.legalPortal .legalDocumentRow{min-height:150px}.legalPortal .formalHeroActions{display:grid;grid-template-columns:minmax(0,1fr);width:100%}
+ .legalPortal .formalHeroActions>*{width:100%;box-sizing:border-box;white-space:normal}.legalPortal .formalPaper h1{font-size:18px}
+ .civicVotes .voteRuleStrip{grid-template-columns:minmax(0,1fr);gap:12px}.civicVotes .voteRuleStrip>div{padding-bottom:10px;border-bottom:1px solid #e2e8f2}
+ .civicVotes .deputyStudentRow{grid-template-columns:minmax(0,1fr) auto;gap:8px}.civicVotes .deputyStudentRow b{grid-column:1/-1}.civicVotes .deputyStudentRow strong{grid-column:1/-1}
+ .civicVotes .voteChoiceButtons{grid-template-columns:minmax(0,1fr)}.civicSplitInputs{grid-template-columns:minmax(0,1fr)}.civicSplitInputs>label{grid-template-columns:minmax(0,1fr) 100px;align-items:center}
+ .eventAnswerChoice{padding:13px!important}.eventAnswerHeading{gap:10px}.eventAnswerHeading b{font-size:13px}.eventAnswerHeading strong{font-size:17px}
+ .civicPartyFacts{gap:16px}.civicPartyFacts>span{flex:1 1 40%}.civicPartyRoster li{flex-wrap:wrap}.civicAttendanceNumbers{gap:16px}
+}
+@media(prefers-reduced-motion:reduce){.eventCaseTile,.eventAnswerChoice{transition:none;animation:none}}

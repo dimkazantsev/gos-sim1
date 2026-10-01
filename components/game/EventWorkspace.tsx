@@ -8,6 +8,8 @@ import EventCollaboration,{type EventInvitation} from './EventCollaboration';
 import {eventButtonSound} from './eventButtonSound';
 import EventAutopilotPanel from './EventAutopilotPanel';
 import EventComic from './EventComic';
+import EventChoicePanel from './EventChoicePanel';
+import EventDecisionFeedback from './EventDecisionFeedback';
 import EventCaseTile from './EventCaseTile';
 import EventCaseModal from './EventCaseModal';
 import type {EventComicScene} from './types';
@@ -201,16 +203,13 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     return <EventCaseModal key={c.id} title={c.title} onClose={()=>setExpanded('')}><div className="eventCaseBundle"><article className={'eventCaseCard eventStory '+(kind==='beneficial'?'eventStoryResolved ':kind==='harmful'?'eventStoryRejected ':outcome?'eventStoryNeutral ':'')}>
      <div className="eventStoryVisual"><EventComic title={c.title} category={c.category} caseKey={c.case_key} scene={c.comic_scene} compact/></div>
      <div className="eventStoryContent">
-      <div className="eventCaseTop"><span>{c.category}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {invites.some(i=>i.status==='accepted')?'Совместно':c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>
+      {teacher&&<div className="eventCaseTop"><span>{c.category}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {invites.some(i=>i.status==='accepted')?'Совместно':c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>}
       <h4>{c.title}</h4>{expandedCase&&<><p>{c.situation.replace(/\\n/g,'\n')}</p>
       <div className="eventStoryRecipients">{assigned.map(a=><span key={a.id}>{members.find(m=>m.user_id===a.recipient_id)?.full_name||'Участник'} · {members.find(m=>m.user_id===a.recipient_id)?.role_title||'Без должности'}</span>)}</div>
       <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили · {pct(responded.length,assigned.length)}%</span>
       </div>
-      <div className="eventVoteResults" aria-label="Результаты по вариантам">{labels.map((label,i)=>{
-       const count=responded.filter(d=>d.choice==='option_'+(i+1)||(i===0&&d.choice==='accept')||(i===1&&d.choice==='reject')).length;
-       return <div className="eventVoteResult" key={i}><div><span>{i+1}. {label}</span><b>{count} · {pct(count,responded.length)}%</b></div><div className="eventVoteBar" aria-hidden="true"><span style={{width:pct(count,responded.length)+'%'}}/></div></div>;
-      })}</div>
-
+      <EventChoicePanel labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,choice)}} notice={pendingInvites?'Ожидаем ответа на приглашения.':undefined}/>
+      {mineAnswer&&me.kind==='student'&&<EventDecisionFeedback caseId={c.id}/>}
       {mineAnswer&&!teacher&&<div className="eventOutcomeNote">Ваш голос: {labels[mineAnswer.choice==='accept'?0:mineAnswer.choice==='reject'?1:Math.max(0,Number(mineAnswer.choice.replace('option_',''))-1)]||'Учтён'}</div>}
       {outcome&&<div className="eventOutcomeNote final"><strong>Итог голосования: {outcome.winner==='tie'?'Большинство участников не поддержало единый вариант — решение не принято':labels[winnerIndex]}</strong>
        {chosenEffect?.description&&<p>{chosenEffect.description}</p>}
@@ -223,13 +222,9 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
      </div>
     </article>
     {expandedCase&&<EventCollaboration g={g} caseId={c.id} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={reload} readOnly={readOnly}/>}
-    {expandedCase&&teacher&&<div className="eventOptionButtons" aria-label="Варианты решения">{labels.map((label,i)=><button type="button" key={i} disabled><b>{String(i+1).padStart(2,'0')}</b>{label}</button>)}</div>}
-    {expandedCase&&my?.status==='pending'&&me.kind==='student'&&!outcome&&<div className="eventOptionButtons" role="group" aria-label={'Решение по событию '+c.title}>
-      {labels.map((label,i)=><button type="button" key={i} disabled={!!busyId||readOnly||pendingInvites} onClick={()=>void answer(my,'option_'+(i+1))}><b>{String(i+1).padStart(2,'0')}</b>{label}</button>)}
-      {pendingInvites&&<p>Ожидаем ответа на приглашения.</p>}
-    </div>}
     </div></EventCaseModal>;
    })}
   {notice&&<p className="eventNotice" role="status">{notice}</p>}
  </section>;
 }
+

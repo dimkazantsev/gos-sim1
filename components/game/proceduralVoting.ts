@@ -1,3 +1,4 @@
+import {VOTING_BODIES} from './votingBodies';
 import type {FormalDocument} from './types';
 
 export type VotePreset={
@@ -151,6 +152,7 @@ export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
 }
 
 export function institutionLabel(key:string){
+ const known=VOTING_BODIES.find(b=>b.key===key);if(known)return known.title;
  return {
   all:'Все участники',factions:'Фракции',gd:'Государственная Дума',
   government:'Правительство РФ',sf:'Совет Федерации',committee:'Профильный комитет',

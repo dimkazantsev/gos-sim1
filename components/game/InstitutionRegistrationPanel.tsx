@@ -1,63 +1,31 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {CheckCircle2,Landmark,UsersRound} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
-const INSTITUTIONS=[
- {key:'gd',title:'Государственная Дума',hint:'Депутаты и участники, представляющие думские фракции.'},
- {key:'government',title:'Правительство',hint:'Министры и члены Правительства, назначенные в игре.'},
- {key:'municipality',title:'Муниципальный орган',hint:'Главы муниципалитетов и сотрудники местного самоуправления.'}
-] as const;
-type Entry={game_id:string;stage_no:number;institution_key:string;user_id:string;registered_at:string};
-export default function InstitutionRegistrationPanel({g,readOnly=false}:{g:ReturnTypeRepublic;readOnly?:boolean}){
- const {game,me,members,partyMandates,parties,setError}=g;
- const [rows,setRows]=useState<Entry[]>([]);
- const [busy,setBusy]=useState('');
- const [notice,setNotice]=useState('');
- const stage=game?.current_round||1;
- const uid=me?.user_id;
- const load=async()=>{
-  if(!game)return;
-  const r=await supabase.from('institution_session_registrations').select('*').eq('game_id',game.id).eq('stage_no',stage);
-  if(!r.error)setRows((r.data||[]) as Entry[]);
- };
- useEffect(()=>{
-  if(!game||!uid)return;
-  void load();
-  const channel=supabase.channel('session-checkin:'+game.id)
-   .on('postgres_changes',{schema:'public',table:'institution_session_registrations',event:'*',filter:'game_id=eq.'+game.id},()=>void load()).subscribe();
-  return()=>{void supabase.removeChannel(channel)};
- },[game?.id,stage,uid]);
- if(!game||!me)return null;
- const myRole=(me.role_title||'').toLowerCase();
- const eligible=(key:string)=>key==='gd'?(myRole.includes('депутат')||myRole.includes('государственн')&&myRole.includes('дум'))
-  :key==='government'?(myRole.includes('министр')||myRole.includes('правительств'))
-  :(myRole.includes('муницип')||myRole.includes('администрац')||myRole.includes('глава города'));
- async function register(key:string){
-  if(!game||!me)return;
-  setBusy(key);setNotice('');
-  const r=await supabase.rpc('register_institution_session',{p_game_id:game.id,p_institution:key});
-  if(r.error)setError(r.error.message);
-  else{await load();setNotice('Регистрация на заседание подтверждена.')}
-  setBusy('');
+import StyledSelect from '../ui/StyledSelect';
+import {VOTING_BODIES,bodyQuorum,type VotingUnit} from './votingBodies';
+type Entry={user_id:string;institution_key:string;stage_no:number};
+type Assignment={unit_id:string;user_id:string};
+type Office={user_id:string;role_title:string};
+export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsChange}:{g:ReturnTypeRepublic;readOnly?:boolean;onUnitsChange?:(units:VotingUnit[])=>void}){
+ const [rows,setRows]=useState<Entry[]>([]),[units,setUnits]=useState<VotingUnit[]>([]),[assignments,setAssignments]=useState<Assignment[]>([]),[offices,setOffices]=useState<Office[]>([]);
+ const [body,setBody]=useState('gd'),[group,setGroup]=useState(''),[busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[newTitle,setNewTitle]=useState(''),[users,setUsers]=useState<string[]>([]),[head,setHead]=useState('');
+ const stage=g.game?.current_round||1,students=g.members.filter(m=>m.kind==='student'),groups=[...new Set(students.map(m=>m.group_name).filter((s):s is string=>!!s))];
+ async function load(){if(!g.game)return;const [r,u,a,b,o]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active')]);
+  if(!r.error)setRows(r.data||[]);if(!u.error){setUnits(u.data||[]);onUnitsChange?.(u.data||[])}setAssignments([...(a.data||[]),...(b.data||[])]);if(!o.error)setOffices(o.data||[]);
  }
- return <section className="institutionRegistrationPanel" aria-label="Регистрация на заседания">
-  <header><div><small>ПРИСУТСТВИЕ · ЭТАП {stage}</small><h2>Регистрация на заседания</h2>
-   <p>Студент отмечает присутствие только в органе, которому соответствует его игровая роль. Голоса фракций в Думе учитывают назначенные мандаты и потери Ghost Voting.</p>
-  </div><Landmark size={24} aria-hidden="true"/></header>
-  <div className="institutionRegistrationGrid">{INSTITUTIONS.map(item=>{
-   const membersHere=rows.filter(r=>r.institution_key===item.key);
-   const mine=membersHere.some(r=>r.user_id===uid);
-   const assigned=members.filter(m=>m.kind==='student'&&(item.key==='gd'?/депутат|государственн.*дум/i:item.key==='government'?/министр|правительств/i:/муницип|администрац|глава города/i).test(m.role_title||''));
-   const registeredWeight=item.key==='gd'?membersHere.reduce((n,r)=>n+(partyMandates.find(a=>a.user_id===r.user_id)?.effective_mandates||0),0):membersHere.length;
-   return <article key={item.key}><h3>{item.title}</h3><p>{item.hint}</p>
-    <div className="institutionRegistrationStats"><span><UsersRound size={16}/> {membersHere.length}/{assigned.length} участников</span>
-    {item.key==='gd'&&<span>{registeredWeight}/{parties.reduce((n,p)=>n+Math.max(0,p.mandates-p.ghost_loss_current),0)} доступных мандатов</span>}</div>
-    <div className="institutionRegistrationPeople">{membersHere.map(r=><span key={r.user_id}><CheckCircle2 size={13}/>{members.find(m=>m.user_id===r.user_id)?.full_name||'Участник'}</span>)}</div>
-    <button type="button" disabled={mine||!eligible(item.key)||busy!==''||readOnly}
-     onClick={()=>void register(item.key)}>{mine?'Вы зарегистрированы':busy===item.key?'Регистрация…':eligible(item.key)?'Зарегистрироваться':'Нет полномочий для регистрации'}</button>
-   </article>;
-  })}</div>
-  {notice&&<p className="institutionRegistrationNotice" role="status">{notice}</p>}
+ useEffect(()=>{if(!g.game)return;void load();const channel=supabase.channel('civic-registration:'+g.game.id).on('postgres_changes',{schema:'public',table:'institution_session_registrations',event:'*',filter:'game_id=eq.'+g.game.id},()=>void load()).subscribe();return()=>{void supabase.removeChannel(channel)}},[g.game?.id,stage]);
+ if(!g.game||!g.me)return null;
+ const config=VOTING_BODIES.find(b=>b.key===body),unit=units.find(u=>'unit:'+u.id===body);
+ function eligible(uid:string){const m=g.members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;if(unit)return assignments.some(a=>a.unit_id===unit.id&&a.user_id===uid);return !!config&&(config.role.test(m.role_title||'')||offices.some(o=>o.user_id===uid&&config.role.test(o.role_title)))}
+ const participants=students.filter(m=>(!group||m.group_name===group)&&eligible(m.user_id)),registered=rows.filter(r=>r.institution_key===body&&participants.some(m=>m.user_id===r.user_id)),mine=rows.some(r=>r.institution_key===body&&r.user_id===g.me?.user_id),total=body==='gd'?450:['government','municipality'].includes(body)?students.filter(m=>!group||m.group_name===group).length:participants.length;
+ const present=body==='gd'?registered.reduce((n,r)=>n+(g.partyMandates.find(a=>a.user_id===r.user_id)?.effective_mandates||0),0):registered.length,needed=bodyQuorum(body,total);
+ async function register(){if(!g.game)return;setBusy(true);const r=await supabase.rpc('register_institution_session',{p_game_id:g.game.id,p_institution:body});if(r.error)g.setError(r.error.message);else{await load();setNotice('Вы зарегистрированы на заседание.')}setBusy(false)}
+ async function createBody(){if(!g.game)return;setBusy(true);const r=await supabase.rpc('create_voting_body',{p_game_id:g.game.id,p_title:newTitle.trim(),p_users:users,p_head:head||null});if(r.error)g.setError(r.error.message);else{await load();setBody('unit:'+r.data);setNewTitle('');setUsers([]);setHead('');setNotice('Орган создан. Его можно выбрать при открытии голосования.')}setBusy(false)}
+ return <section className="institutionRegistrationPanel civicRegistration" aria-label="Регистрация на заседания"><header><div><h2>Регистрация на заседание</h2><p>Присутствие и поданные голоса учитываются отдельно. Выберите орган и учебную группу.</p></div><span>Этап {stage}</span></header>
+  <div className="civicRegistrationSelectors"><StyledSelect label="Орган" value={body} onChange={setBody} options={[...VOTING_BODIES.map(b=>({value:b.key,label:b.title})),...units.map(u=>({value:'unit:'+u.id,label:u.title}))]}/><StyledSelect label="Учебная группа" value={group} onChange={setGroup} options={[{value:'',label:'Все группы'},...groups.map(s=>({value:s,label:s}))]}/></div>
+  <div className="civicAttendance"><div><h3>{config?.title||unit?.title}</h3><p>{config?.basis||'Состав зарегистрированного в игре органа. Порог задаётся в голосовании.'}</p></div><div className="civicAttendanceNumbers"><span>Присутствует <b>{present} / {total}</b></span><span>Для кворума <b>{needed}</b></span><span>{present>=needed&&total>0?'Кворум есть':'Ожидаем участников'}</span></div><ul className="civicAttendees">{registered.map(r=><li key={r.user_id}>{g.names[r.user_id]||'Участник'}<b>{body==='gd'?g.partyMandates.find(a=>a.user_id===r.user_id)?.effective_mandates||0:1} голосов</b></li>)}</ul><button type="button" className="primary" disabled={mine||!eligible(g.me.user_id)||busy||readOnly} onClick={()=>void register()}>{mine?'Вы зарегистрированы':eligible(g.me.user_id)?'Зарегистрироваться':'Нет назначения в этот орган'}</button></div>
+  {g.teacher&&<details className="civicCustomBody"><summary>Добавить другой орган или комиссию</summary><div className="civicBodyEditor"><label>Название органа<input value={newTitle} onChange={e=>setNewTitle(e.target.value)}/></label><fieldset><legend>Состав органа · {users.length} участников</legend>{students.map(m=><label className="civicCheckbox" key={m.user_id}><input type="checkbox" checked={users.includes(m.user_id)} onChange={e=>{setUsers(old=>e.target.checked?[...old,m.user_id]:old.filter(id=>id!==m.user_id));if(head===m.user_id&&!e.target.checked)setHead('')}}/>{m.full_name}</label>)}</fieldset><StyledSelect label="Председатель" value={head} onChange={setHead} options={[{value:'',label:'Не назначен'},...students.filter(m=>users.includes(m.user_id)).map(m=>({value:m.user_id,label:m.full_name}))]}/><button type="button" className="primary" disabled={busy||readOnly||newTitle.trim().length<3||!users.length} onClick={()=>void createBody()}>Создать орган</button></div></details>}
+  {notice&&<p role="status">{notice}</p>}
  </section>;
 }

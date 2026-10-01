@@ -78,7 +78,8 @@ fixture.impactLedger=[
   actor_id:null,effects:{metrics:{social_stability:-4,public_trust:-2}},
   note:'Кризис урегулирован',status:'reverted',created_at:'2026-09-27T11:00:00Z',reverted_at:now}
 ];
-fixture.availableActors=()=>[{key:'participant',label:'Участник'},{key:'gd',label:'Государственная Дума'}];fixture.canVote=()=>false;fixture.tally=()=>({yes:245,no:70,abstain:30});fixture.quorum=()=>({cast:345,eligible:450,needed:226,met:true});
+fixture.availableActors=()=>[{key:'participant',label:'Участник'},{key:'gd',label:'Государственная Дума'}];fixture.canVote=()=>false;fixture.ballotWeight=()=>0;
+fixture.tally=()=>({yes:245,no:70,abstain:30});fixture.quorum=()=>({cast:345,present:345,eligible:450,needed:226,met:true});
 const g=new Proxy(fixture,{get:(target,key)=>key in target?target[key]:noop});
 // Replace only this process's hook export. The application source remains unchanged.
 require('../components/game/useRepublicGame').useRepublicGame=()=>g;
@@ -163,3 +164,4 @@ const html=`<!doctype html><html lang="ru"><head><meta charset="UTF-8"><meta nam
 const out=path.join(root,'.design-review');fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'gos-sim-preview.html'),html);
 for(const [id,,markup] of pages)fs.writeFileSync(path.join(out,id+'.html'),markup);
 console.log(`${pages.length} screens rendered from application components; offline preview ${Buffer.byteLength(html)} bytes.`);
+

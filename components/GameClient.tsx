@@ -147,7 +147,9 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   configureStageDeadline:blocked as typeof g.configureStageDeadline,
   updateMember:blocked as typeof g.updateMember,
   createVote:blocked as typeof g.createVote,
-  castVote:blockedVoid as typeof g.castVote,
+  castVote:blocked as typeof g.castVote,
+  castVoteAllocation:blocked as typeof g.castVoteAllocation,
+  setStudentMandates:blocked as typeof g.setStudentMandates,
   closeVote:blockedNull as typeof g.closeVote,
   setEvaluation:blockedVoid as typeof g.setEvaluation,
   publishEvent:blocked as typeof g.publishEvent,
@@ -460,3 +462,4 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   <RepublicComic intro open={introOpen} onClose={()=>void finishIntro()}/>
   <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }
+

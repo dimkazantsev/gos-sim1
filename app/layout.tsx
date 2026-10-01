@@ -18,6 +18,7 @@ import './2026-cinema-events.css';
 import './2026-profile-comic.css';
 import './2026-collaboration.css';
 import './2026-interface-repair.css';
+import './2026-civic-portal.css';
 import type {Metadata} from 'next';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
@@ -32,3 +33,4 @@ export const metadata:Metadata={
 export default function RootLayout({children}:{children:React.ReactNode}){
  return <html lang="ru" className={GeistMono.variable}><body>{children}</body></html>;
 }
+

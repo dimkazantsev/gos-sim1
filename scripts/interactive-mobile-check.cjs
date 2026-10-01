@@ -17,6 +17,8 @@ import ImpactRulesPanel from '../../components/game/ImpactRulesPanel';
 import EventCaseTile from '../../components/game/EventCaseTile';
 import EventCaseModal from '../../components/game/EventCaseModal';
 import EventComic from '../../components/game/EventComic';
+import EventChoicePanel from '../../components/game/EventChoicePanel';
+import VoteBallotControls from '../../components/game/VoteBallotControls';
 import authoredCases from '../../content/events-v2.json';
 import type {View} from '../../components/game/types';
 import type {ReturnTypeRepublic} from '../../components/game/viewTypes';
@@ -31,7 +33,7 @@ const metrics=[{id:'m1',metric_key:'public_trust',label:'Общественно�
 const impactRules=[{id:'r1',rule_key:'decision',label:'Принятие решения',event_type:'decision_approved',description:'Проверка длинных единиц.',conditions:{},effects:{metrics:{public_trust:2,support:1,budget:-1},actor_party_support:3},enabled:true,auto_apply:true,priority:1,created_at:'2026-09-29T00:00:00Z',updated_at:'2026-09-29T00:00:00Z'}];
 export default function UiTest(){
  const [editing,setEditing]=useState(false),[menu,setMenu]=useState(false),[active,setActive]=useState<View>('teacher');
- const [rules,setRules]=useState(impactRules),[opened,setOpened]=useState('');
+ const [rules,setRules]=useState(impactRules),[opened,setOpened]=useState(''),[answer,setAnswer]=useState(''),[allocation,setAllocation]=useState('');
  const caseTiles=authoredCases.slice(0,8).map(c=>({...c,id:c.case_key})),activeCase=caseTiles.find(c=>c.id===opened);
  useEffect(()=>{document.body.dataset.uiReady='yes';return()=>{delete document.body.dataset.uiReady}},[]);
  const g={teacher:true,game:{id:'ui-test'},metrics:metrics.map(m=>({...m,value:68,min_value:0,max_value:100})),impactRules:rules,impactLedger:[],names:{},
@@ -40,8 +42,9 @@ export default function UiTest(){
     return true;
    },revertImpactEntry:async()=>true} as unknown as ReturnTypeRepublic;
  return <div style={{width:'100%',maxWidth:'100vw',padding:'12px 12px 120px'}}>
-  <section className="interfaceCaseTest"><div className="eventTileGrid">{caseTiles.map(c=><EventCaseTile key={c.id} item={c} meta={c.category} onClick={()=>setOpened(c.id)}/>)}</div></section>
-  {activeCase&&<EventCaseModal title={activeCase.title} onClose={()=>setOpened('')}><EventComic title={activeCase.title} caseKey={activeCase.case_key} category={activeCase.category} scene={activeCase.comic_scene}/><p>{activeCase.situation}</p><div className="eventOptionButtons"><button>Первый вариант</button><button>Второй вариант</button></div></EventCaseModal>}
+  <section className="interfaceCaseTest"><div className="eventTileGrid">{caseTiles.map(c=><EventCaseTile key={c.id} item={c} meta={c.category} onClick={()=>{setOpened(c.id);setAnswer('')}}/>)}</div></section>
+  {activeCase&&<EventCaseModal title={activeCase.title} onClose={()=>setOpened('')}><EventComic title={activeCase.title} caseKey={activeCase.case_key} category={activeCase.category} scene={activeCase.comic_scene}/><p>{activeCase.situation}</p><EventChoicePanel labels={activeCase.decision_options} decisions={[{actor_id:'a',choice:'option_1'},{actor_id:'b',choice:'option_2'},...(answer?[{actor_id:'c',choice:answer}]:[])]} members={[{user_id:'a',full_name:'Анна'},{user_id:'b',full_name:'Илья'},{user_id:'c',full_name:'Мария'}] as any} profiles={[]} currentChoice={answer} canAnswer={!answer} onAnswer={setAnswer}/></EventCaseModal>}
+  <section className="civicVotes"><VoteBallotControls vote={{id:'test-vote',voting_mode:'mandate',status:'open',allow_abstain:true} as any} maxWeight={216} canCast={true} onSubmit={async(y,n,a)=>{setAllocation([y,n,a].join('/'));return true}}/><output id="ballot-result">{allocation}</output></section>
   <main className="teacherSimple"><ImpactRulesPanel g={g} initialExpandedRuleId="r1"/></main>
   {menu&&<div className="mobileMoreBackdrop" onClick={()=>setMenu(false)}>
    <section className="mobileMoreSheet" role="dialog" aria-label="Все разделы" onClick={e=>e.stopPropagation()}>
@@ -111,12 +114,20 @@ async function main(){
   const tile=desktop.locator('.eventCaseTile').first();await tile.click();
   const modal=desktop.getByRole('dialog');await modal.waitFor();
   assert.equal(await modal.locator('svg[data-scene]').count(),1,'One case, one illustration');
-  assert.equal(await modal.locator('.eventOptionButtons button').count(),2);
+  assert.equal(await modal.locator('.eventOptionButtons').count(),0,'No duplicate answer controls');
+  const answers=modal.locator('.eventAnswerChoice');assert.equal(await answers.count(),3);await answers.first().click();await desktop.waitForFunction(()=>document.querySelector('.eventAnswerChoice[aria-pressed=true]')?.textContent.includes('67%'));assert.equal(await answers.first().locator('.eventVoter').count(),2);assert.equal(await answers.first().isDisabled(),true,'Submitted answer is locked');
   const modalBounds=await modal.boundingBox();assert(modalBounds.width<=width-15,'Modal fits the viewport');
   await desktop.screenshot({path:path.join(screens,'event-modal-'+width+'.png')});
   await desktop.keyboard.press('Escape');await modal.waitFor({state:'detached'});
   assert.equal(await desktop.locator('.eventCaseTile').first().evaluate(el=>document.activeElement===el),true,'Closing returns focus to its tile');
  }
+ await desktop.getByRole('checkbox',{name:'Указать количество голосов'}).check();
+ await desktop.locator('.civicQuantity input').fill('100');await desktop.getByRole('button',{name:'За · 100',exact:true}).click();await desktop.waitForFunction(()=>document.querySelector('#ballot-result')?.textContent==='100/0/0');
+ await desktop.getByRole('checkbox',{name:'Распределить голоса между вариантами'}).check();
+ const splitInputs=desktop.locator('.civicSplitInputs input');await splitInputs.nth(0).fill('180');await splitInputs.nth(1).fill('20');await splitInputs.nth(2).fill('10');
+ await desktop.getByRole('button',{name:'Подать 210 голосов',exact:true}).click();await desktop.waitForFunction(()=>document.querySelector('#ballot-result')?.textContent==='180/20/10');
+ await splitInputs.nth(0).fill('200');assert.equal(await desktop.getByRole('button',{name:'Подать 230 голосов',exact:true}).isDisabled(),true,'An over-allocation cannot be submitted');await splitInputs.nth(0).fill('180');
+ console.log('PASS Real case choices, percentages, avatars and partial/split mandate ballots');
  for(const width of [320,390,1440]){
   await desktop.setViewportSize({width,height:900});
   const values=await desktop.locator('.metricValueControl').evaluateAll(nodes=>nodes.map(el=>el.getBoundingClientRect().toJSON()));
@@ -278,3 +289,4 @@ async function main(){
 }
 }
 main().catch(error=>{console.error(error);process.exitCode=1});
+

@@ -1,5 +1,5 @@
 'use client';
-import {useId} from 'react';
+import {useId,type CSSProperties} from 'react';
 import {eventSceneFrame} from './eventSceneFrame';
 import ComicSoundButton from './ComicSoundButton';
 import type {EventComicScene} from './types';
@@ -9,17 +9,17 @@ export default function EventComic({title,category,caseKey,compact=false,silent=
  const id=useId().replace(/:/g,'');
  const frame=eventSceneFrame(caseKey,scene?.scene_id);
  if(frame){
-  return <div className="eventComicPlayer"><figure className={'eventComic eventPanelIllustration '+(compact?'isCompact':'')} role="img" aria-label={scene?.alt||'Иллюстрация к ситуации «'+title+'»'}>
+  return <div className="eventComicPlayer"><figure className={'eventComic eventPanelIllustration '+(compact?'isCompact':'')} style={{'--scene-native-width':frame.width+'px','--scene-ratio':frame.width+'/'+frame.height} as CSSProperties} role="img" aria-label={scene?.alt||'Иллюстрация к ситуации «'+title+'»'}>
    <svg viewBox={'0 0 '+frame.width+' '+frame.height} preserveAspectRatio="xMidYMid meet" data-scene={frame.number} aria-hidden="true" style={{overflow:'hidden'}}>
     <defs><clipPath id={'caseScene'+frame.number+'_'+id}><rect width={frame.width} height={frame.height}/></clipPath></defs>
     <g clipPath={'url(#caseScene'+frame.number+'_'+id+')'}><image x={-frame.x} y={-frame.y} href={'/event-comics/atlas-'+frame.atlas+'.webp'} width={frame.atlas==='main'?1536:2172} height={frame.atlas==='main'?1024:724}/></g>
-   </svg><figcaption className="eventAtlasLabel">{category}</figcaption></figure>{!silent&&<ComicSoundButton/>}</div>;
+   </svg></figure>{!silent&&<ComicSoundButton/>}</div>;
  }
 
  if(scene?.scene_id&&/^scene-\d{2,4}$/.test(scene.scene_id))return <div className="eventComicPlayer">
   <figure className={'eventComic '+(compact?'isCompact':'')} role="img" aria-label={scene.alt||'Комикс к событию «'+title+'»'}>
    <img src={'/event-comics/'+scene.scene_id+'.svg'} alt="" loading="lazy" decoding="async"/>
-   <figcaption className="eventComicCaption"><span>GOS//SIMS · {category}</span><strong>{title}</strong><small>Авторская анимированная сцена</small></figcaption>
+   <figcaption className="eventComicCaption"><span>GOS//SIMS</span><strong>{title}</strong><small>Авторская анимированная сцена</small></figcaption>
   </figure>{!silent&&<ComicSoundButton/>}
  </div>;
  const seed=hash(caseKey||title),kind=(()=>{const t=(title+' '+category).toLowerCase();
@@ -99,6 +99,7 @@ export default function EventComic({title,category,caseKey,compact=false,silent=
  </g>
  <path d="M0 1H680V350H0Z" fill="none" stroke="#fff" strokeOpacity=".23" strokeWidth="11"/>
  </svg>
- <div className="eventComicCaption"><span>GOS//SIMS · {category}</span><strong>{title}</strong><small>Авторская иллюстрация учебного сценария</small></div>
+ <div className="eventComicCaption"><span>GOS//SIMS</span><strong>{title}</strong><small>Авторская иллюстрация учебного сценария</small></div>
  </div><ComicSoundButton/></div>;
 }
+

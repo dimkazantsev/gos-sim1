@@ -2,7 +2,7 @@ name: Build Check
 
 on:
   push:
-    branches: [main]
+    branches: [main, "codex/civic-*"]
   workflow_dispatch:
 
 jobs:
@@ -41,3 +41,4 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
       - run: npm run build
+

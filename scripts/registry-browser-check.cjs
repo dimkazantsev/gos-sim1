@@ -12,7 +12,7 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    const geometry=await frame.locator('html').evaluate(html=>{
     const root=html.querySelector('.formalPage'),r=root.getBoundingClientRect(),actions=root.querySelector('.formalActions').getBoundingClientRect(),paper=root.querySelector('.formalPaper').getBoundingClientRect();
     const nodes=[...root.querySelectorAll('.formalRegistryRow,.formalDocHeader,.formalStatusLarge,.formalStep,.formalActions button,.formalPassport,.formalPaper,.formalLinkedVotes button')];
-    return {viewport:html.clientWidth,scroll:html.scrollWidth,root:r.toJSON(),actions:actions.toJSON(),paper:paper.toJSON(),offenders:nodes.map(el=>({name:el.className,left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right})).filter(x=>x.left<r.left-2||x.right>r.right+2)};
+    return {viewport:html.clientWidth,scroll:html.scrollWidth,root:r.toJSON(),actions:actions.toJSON(),paper:paper.toJSON(),offenders:nodes.filter(el=>el.getBoundingClientRect().width>0&&el.getBoundingClientRect().height>0).map(el=>({name:el.className,left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right})).filter(x=>x.left<r.left-2||x.right>r.right+2)};
    });
    assert(geometry.scroll<=geometry.viewport+2,'Registry overflow at '+width+': '+JSON.stringify(geometry));
    assert.equal(geometry.offenders.length,0,'Registry children stay inside at '+width+': '+JSON.stringify(geometry.offenders));
@@ -28,3 +28,4 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
   }
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
+

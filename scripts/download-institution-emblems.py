@@ -32,7 +32,7 @@ def fetch(req):
                 raise
             time.sleep(min(45, 5 * 2 ** attempt))
 params = urllib.parse.urlencode({'action':'query', 'format':'json', 'titles':'|'.join('File:'+t for t in files.values()),
-    'prop':'imageinfo', 'iiprop':'url|extmetadata'})
+    'prop':'imageinfo', 'iiprop':'url|extmetadata', 'iiurlwidth':500})
 req = urllib.request.Request('https://commons.wikimedia.org/w/api.php?'+params,
     headers={'User-Agent':'GosSimsEducationalGame/1.0 (document emblem attribution)'})
 with fetch(req) as res:
@@ -40,11 +40,14 @@ with fetch(req) as res:
 by_title = {p['title']:p['imageinfo'][0] for p in pages.values() if 'imageinfo' in p}
 for filename, title in files.items():
     info = by_title['File:'+title]
-    req = urllib.request.Request(info['url'], headers={'User-Agent':'GosSimsEducationalGame/1.0'})
+    download_url = info.get('thumburl', info['url'])
+    if filename.endswith('.svg'):
+        filename = filename[:-4]+'.png'
+    req = urllib.request.Request(download_url, headers={'User-Agent':'GosSimsEducationalGame/1.0'})
     with fetch(req) as res:
         content = res.read()
-    if filename.endswith('.svg') and b'<svg' not in content[:4096]:
-        raise ValueError('Invalid SVG: '+title)
+    if filename.endswith('.png') and not content.startswith(b'\x89PNG\r\n\x1a\n'):
+        raise ValueError('Invalid PNG: '+title)
     (out/filename).write_bytes(content)
     sources.append({'file':filename, 'title':title, 'source':info['descriptionurl'],
         'original':info['url'], 'metadata':{k:v.get('value') for k,v in info.get('extmetadata',{}).items()
@@ -52,3 +55,4 @@ for filename, title in files.items():
     print(filename, len(content))
     time.sleep(2)
 (out/'sources.json').write_text(json.dumps(sources,ensure_ascii=False,indent=2))
+
