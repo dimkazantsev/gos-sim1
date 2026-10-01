@@ -1,0 +1,240 @@
+{
+  "as_of": "2026-10-01",
+  "taxes": [
+    {
+      "key": "vat",
+      "label": "Налог на добавленную стоимость",
+      "level": "federal",
+      "default_rate": 22,
+      "min_rate": 0,
+      "max_rate": 22,
+      "unit": "%",
+      "chapter": "21",
+      "explanation": "Добавленная стоимость; отдельные операции 10% или 0%. Базовая ставка с 2026 года 22%.",
+      "base_key": "consumption",
+      "source_url": "https://www.nalog.gov.ru/new2026/"
+    },
+    {
+      "key": "excise",
+      "label": "Акцизы",
+      "level": "federal",
+      "default_rate": null,
+      "min_rate": null,
+      "max_rate": null,
+      "unit": "По виду товара",
+      "chapter": "22",
+      "explanation": "Дифференцированные ставки по виду подакцизного товара; не единый процент.",
+      "base_key": null,
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/excise/"
+    },
+    {
+      "key": "income",
+      "label": "Налог на доходы физических лиц",
+      "level": "federal",
+      "default_rate": 13,
+      "min_rate": 13,
+      "max_rate": 22,
+      "unit": "%",
+      "chapter": "23",
+      "explanation": "Для основной налоговой базы шкала 13/15/18/20/22%. В прогнозе показана эффективная ставка, а не замена прогрессивной шкалы.",
+      "base_key": "payroll",
+      "source_url": "https://www.nalog.gov.ru/new2025/"
+    },
+    {
+      "key": "profit",
+      "label": "Налог на прибыль организаций",
+      "level": "federal",
+      "default_rate": 25,
+      "min_rate": 0,
+      "max_rate": 25,
+      "unit": "%",
+      "chapter": "25",
+      "explanation": "Базовая ставка 25%; распределение по бюджетам отдельно от вида налога. Льготы и специальные ставки зависят от норм НК.",
+      "base_key": "profit",
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/profitul/"
+    },
+    {
+      "key": "extraction",
+      "label": "Налог на добычу полезных ископаемых",
+      "level": "federal",
+      "default_rate": null,
+      "min_rate": null,
+      "max_rate": null,
+      "unit": "По виду сырья",
+      "chapter": "26",
+      "explanation": "Специальные ставки и формулы; расчёт зависит от вида сырья, объёма добычи и коэффициентов.",
+      "base_key": null,
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/ndpi/"
+    },
+    {
+      "key": "water",
+      "label": "Водный налог",
+      "level": "federal",
+      "default_rate": null,
+      "min_rate": null,
+      "max_rate": null,
+      "unit": "По бассейну и объёму",
+      "chapter": "25.2",
+      "explanation": "Налог при специальных видах водопользования; ставки по бассейну и назначению.",
+      "base_key": null,
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/water_tax/"
+    },
+    {
+      "key": "wildlife",
+      "label": "Сборы за пользование объектами животного мира и водными биоресурсами",
+      "level": "federal",
+      "default_rate": null,
+      "min_rate": null,
+      "max_rate": null,
+      "unit": "По объекту",
+      "chapter": "25.1",
+      "explanation": "Два вида сборов в одной категории статьи 13 НК РФ; разрешения, вид объекта и объём определяют сумму.",
+      "base_key": null,
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/fees/"
+    },
+    {
+      "key": "duty",
+      "label": "Государственная пошлина",
+      "level": "federal",
+      "default_rate": null,
+      "min_rate": null,
+      "max_rate": null,
+      "unit": "По действию",
+      "chapter": "25.3",
+      "explanation": "Размер зависит от юридически значимого действия. Не относится к единой процентной ставке.",
+      "base_key": null,
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/gosposhlina/"
+    },
+    {
+      "key": "additional_income",
+      "label": "Налог на дополнительный доход от добычи углеводородного сырья",
+      "level": "federal",
+      "default_rate": 50,
+      "min_rate": 50,
+      "max_rate": 50,
+      "unit": "%",
+      "chapter": "25.4",
+      "explanation": "НДД рассчитывается по специальной базе и условиям главы 25.4; учебная база задаётся преподавателем.",
+      "base_key": "oil_income",
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/ndd/"
+    },
+    {
+      "key": "gambling",
+      "label": "Налог на игорный бизнес",
+      "level": "federal",
+      "default_rate": 7,
+      "min_rate": 7,
+      "max_rate": 7,
+      "unit": "%",
+      "chapter": "25.5",
+      "explanation": "С 2026 года федеральный. Букмекеры и тотализаторы: 7%; стол 250 000 руб., автомат 15 000 руб. в месяц. Разные объекты учитываются отдельно.",
+      "base_key": "gambling_income",
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/gambling_tax/"
+    },
+    {
+      "key": "corporate_property",
+      "label": "Налог на имущество организаций",
+      "level": "regional",
+      "default_rate": 2.2,
+      "min_rate": 0,
+      "max_rate": 2.2,
+      "unit": "%",
+      "chapter": "30",
+      "explanation": "В модели — среднегодовая стоимость, ставка до 2,2%; кадастровая база и специальные пределы рассматриваются отдельно.",
+      "base_key": "corporate_assets",
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/imuchorg/"
+    },
+    {
+      "key": "transport",
+      "label": "Транспортный налог",
+      "level": "regional",
+      "default_rate": 3.5,
+      "min_rate": 0,
+      "max_rate": 35,
+      "unit": "руб./л.с.",
+      "chapter": "28",
+      "explanation": "Учебная группа: легковые автомобили мощностью 100–150 л.с. Базовая федеральная ставка 3,5 руб./л.с.; субъект устанавливает ставку в пределах НК.",
+      "base_key": "horsepower",
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/transport/"
+    },
+    {
+      "key": "land",
+      "label": "Земельный налог",
+      "level": "municipal",
+      "default_rate": 1.5,
+      "min_rate": 0,
+      "max_rate": 1.5,
+      "unit": "%",
+      "chapter": "31",
+      "explanation": "В модели — категория земли с пределом 1,5%; для специальных категорий действует предел 0,3%.",
+      "base_key": "land_value",
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/zemelny/"
+    },
+    {
+      "key": "personal_property",
+      "label": "Налог на имущество физических лиц",
+      "level": "municipal",
+      "default_rate": 0.1,
+      "min_rate": 0,
+      "max_rate": 0.3,
+      "unit": "%",
+      "chapter": "32",
+      "explanation": "В модели — обычное жильё. Для других объектов и дорогой недвижимости нормы и пределы отличаются.",
+      "base_key": "housing_value",
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/imuch2016/"
+    },
+    {
+      "key": "trade",
+      "label": "Торговый сбор",
+      "level": "municipal",
+      "default_rate": null,
+      "min_rate": null,
+      "max_rate": null,
+      "unit": "По торговому объекту",
+      "chapter": "33",
+      "explanation": "Вводится актом представительного органа в предусмотренных НК территориях; не автоматически во всех муниципалитетах.",
+      "base_key": null,
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/trade_fee/"
+    },
+    {
+      "key": "tourism",
+      "label": "Туристический налог",
+      "level": "municipal",
+      "default_rate": 2,
+      "min_rate": 0,
+      "max_rate": 2,
+      "unit": "%",
+      "chapter": "33.1",
+      "explanation": "Максимальная ставка в 2026 году 2%; минимальный налог и льготы учитываются по главе 33.1. Модель рассчитывает только облагаемую стоимость размещения.",
+      "base_key": "tourism_income",
+      "source_url": "https://www.nalog.gov.ru/rn77/taxation/taxes/tourist_tax/"
+    }
+  ],
+  "special_regimes": [
+    {
+      "label": "Единый сельскохозяйственный налог",
+      "chapter": "26.1"
+    },
+    {
+      "label": "Упрощённая система налогообложения",
+      "chapter": "26.2"
+    },
+    {
+      "label": "Соглашения о разделе продукции",
+      "chapter": "26.4"
+    },
+    {
+      "label": "Патентная система налогообложения",
+      "chapter": "26.5"
+    },
+    {
+      "label": "Налог на профессиональный доход",
+      "chapter": "Закон № 422-ФЗ"
+    },
+    {
+      "label": "Автоматизированная УСН",
+      "chapter": "Закон № 17-ФЗ"
+    }
+  ],
+  "note": "Специальные режимы показаны отдельно. Страховые взносы, таможенные платежи и неналоговые доходы не включены в перечень налогов по статьям 13–15 НК РФ."
+}
