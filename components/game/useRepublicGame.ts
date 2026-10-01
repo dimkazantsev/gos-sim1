@@ -761,7 +761,7 @@ export function useRepublicGame(gameId:string){
   await loadFormalRegistry();return true;
  }
 
- async function sendText(text:string){if(!me||!channelId||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:channelId,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}await loadMessages(channelId);return true}
+ async function sendText(text:string,targetChannel=channelId){if(!me||!targetChannel||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:targetChannel,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}await loadMessages(targetChannel);return true}
  async function storeChatAttachment(blob:Blob,fileName:string,mime:string,kind:'file'|ChatMediaKind,targetChannel:string,voiceMeta?:{duration?:number;waveform?:number[]}){
   if(!me||!targetChannel){setChatMediaError('Канал недоступен. Повторно откройте чат.');return false}
   setChatMediaError('');
