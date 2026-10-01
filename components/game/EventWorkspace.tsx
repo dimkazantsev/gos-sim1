@@ -202,7 +202,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     const invites=invitations.filter(i=>i.case_id===c.id);
     const pendingInvites=invites.some(i=>i.status==='pending');
     return <EventCaseModal key={c.id} title={c.title} onClose={()=>setExpanded('')}><div className="eventCaseBundle"><article className={'eventCaseCard eventStory '+(kind==='beneficial'?'eventStoryResolved ':kind==='harmful'?'eventStoryRejected ':outcome?'eventStoryNeutral ':'')}>
-     <div className="eventStoryVisual"><EventComic title={c.title} category={c.category} caseKey={c.case_key} scene={c.comic_scene} compact/></div>
+     <div className="eventStoryVisual"><EventComic silent title={c.title} category={c.category} caseKey={c.case_key} scene={c.comic_scene} compact/></div>
      <div className="eventStoryContent">
       {teacher&&<div className="eventCaseTop"><span>{c.category}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {invites.some(i=>i.status==='accepted')?'Совместно':c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>}
       <h4>{c.title}</h4>{expandedCase&&<><p>{c.situation.replace(/\\n/g,'\n')}</p>

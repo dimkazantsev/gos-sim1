@@ -17,7 +17,6 @@ import {VOTING_BODIES} from './votingBodies';
 import {STAGE_ACTIONS} from './stageActions';
 import PostChanges from './PostChanges';
 import RatingNewsVisual from './RatingNewsVisual';
-import {useSavedGameState,savedChoice} from './useSavedGameState';
 import CivicDiscussion from './CivicDiscussion';
 import PostInlineEditor from './PostInlineEditor';
 import NewsProposals from './NewsProposals';
@@ -38,8 +37,7 @@ function PostText({post,onNavigate,onOpenDocument}:{post:PoliticalPost;onNavigat
  return <><RichPostText text={text} onNavigate={onNavigate} onOpenDocument={onOpenDocument}/>{long&&<button className="postReadMore" type="button" aria-expanded={expanded} onClick={()=>setExpanded(v=>!v)}>{expanded?'Свернуть текст':'Читать полностью'}<ChevronDown size={16}/></button>}</>;
 }
 export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNavigate,focusPending=false,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument:(id:string)=>void;onNavigate:(view:View)=>void;focusPending?:boolean;readOnly?:boolean}){
- const {actions,judgeAction,game,me,teacher,currentStage,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,formalDocuments,votes,profiles,names,availableActors}=g;
- const [tab,setTab]=useSavedGameState<'feed'|'registry'>(g.game?.id,g.me?.user_id,'process-tab','feed',savedChoice('feed','registry'));
+ const {game,me,teacher,currentStage,politicalPosts,politicalMedia,postFormalLinks,formalDocuments,votes,profiles,names,availableActors}=g;
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('');
  const [serverActors,setServerActors]=useState<{key:string;label:string}[]|null>(null);
  useEffect(()=>{if(!game?.id||readOnly)return;let active=true;async function loadActors(){const r=await supabase.rpc('get_process_actors',{p_game_id:game!.id});if(active&&!r.error&&Array.isArray(r.data))setServerActors(r.data)}void loadActors();const timer=setInterval(()=>void loadActors(),30000);return()=>{active=false;clearInterval(timer)}},[game?.id,me?.user_id,me?.role_title,readOnly]);
@@ -128,16 +126,14 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  </div>;
  if(!game||!me)return null;
  const stageNo=currentStage?.stage_no||game.current_round||1,stageAction=STAGE_ACTIONS[stageNo]||STAGE_ACTIONS[1];
- const firstPending=[...actions.filter(a=>a.status==='submitted')].sort((a,b)=>Date.parse(a.submitted_at)-Date.parse(b.submitted_at))[0];
  const publisherKey=actor?.key||'participant',publisherLabel=actor?.label||me.full_name;
  const composerParty=g.parties.find(p=>p.name===publisherLabel);
  const mine=profiles.find(p=>p.user_id===me.user_id);
  return <div className="wallPage processPortal">
   <section className="wallHero">
    <div><small>Официальная лента игры</small><h1>Политический процесс</h1><p>События, документы и решения участников. Регистрация, смена этапов и итоги голосований появляются автоматически.</p></div>
-   <div className="wallHeroStats"><div><strong>{politicalPosts.length}</strong><span>Публикаций в ленте</span></div><div><strong>{politicalDecisions.length}</strong><span>Принятых решений</span></div><div><strong>{votes.filter(v=>v.status==='open').length}</strong><span>Открытых голосований</span></div></div>
+   <div className="wallHeroStats"><div><strong>{politicalPosts.length}</strong><span>Публикаций в ленте</span></div><div><strong>{formalDocuments.length}</strong><span>Документов в реестре</span></div><div><strong>{votes.filter(v=>v.status==='open').length}</strong><span>Открытых голосований</span></div></div>
   </section>
-  {teacher&&firstPending&&<details id="first-pending-decision" open={focusPending} className={'firstPendingDecision '+(focusPending?'isFocused':'')}><summary>Решение на рассмотрении: {firstPending.title}</summary><p>{firstPending.body}</p><div className="firstPendingActions"><button type="button" onClick={()=>void judgeAction(firstPending.id,'rejected')}>Отклонить</button><button type="button" onClick={()=>void judgeAction(firstPending.id,'accepted')}>Принять решение</button></div></details>}
   {!teacher&&!readOnly&&<section className="wallStageTask"><div className="wallStageTaskNo">{String(stageNo).padStart(2,'0')}</div><div className="wallStageTaskCopy"><small>Текущий этап</small><h2>{stageAction.title}</h2><p>{stageAction.body}</p></div><button className="primary" onClick={()=>onNavigate(stageAction.target)}>{stageAction.button}</button></section>}
 
   {!readOnly&&<details ref={composer} className="wallComposer surface">
@@ -153,10 +149,9 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     <div className="wallComposerActions"><span>Публикацию увидят участники текущей игры.</span><div>{!teacher&&<button className="secondary" type="button" disabled={busy||!actor||title.trim().length<3||body.trim().length<3} onClick={()=>void submitNews()}><Newspaper size={18}/>Предложить новость в СМИ</button>}<button className="primary" disabled={busy||!actor||title.trim().length<3||body.trim().length<3} onClick={()=>void publish()}>{busy?'Сохраняется…':'Опубликовать'}</button></div></div>
    </div>
   </details>}
-  {!readOnly&&<NewsProposals g={g} refreshKey={proposalRefresh} onOpenDocument={onOpenDocument} onNavigate={onNavigate} onPublished={title=>{setTab('feed');setSearch(title);setNotice('Новость опубликована в СМИ.')}}/>}
+  {!readOnly&&<NewsProposals g={g} refreshKey={proposalRefresh} onOpenDocument={onOpenDocument} onNavigate={onNavigate} onPublished={title=>{setSearch(title);setNotice('Новость опубликована в СМИ.')}}/>}
   {notice&&<p className="processNotice" role="status">{notice}</p>}
-  <div className="wallTabs"><button className={tab==='feed'?'active':''} onClick={()=>setTab('feed')}><Newspaper size={18}/>Лента</button><button className={tab==='registry'?'active':''} onClick={()=>setTab('registry')}><BookOpenText size={18}/>Принятые решения <span>{politicalDecisions.length}</span></button></div>
-  {tab==='feed'&&<>
+  <>
    <section className="wallSearch"><label>Поиск<input type="search" aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Текст, название или тег"/></label><StyledSelect label="Субъект" value={filterActor} onChange={setFilterActor} options={[{value:'',label:'Все субъекты'},...Array.from(new Map(politicalPosts.map(p=>[p.actor_key,p.actor_key==='teacher'?'GOS//SIMS':p.actor_label])).entries()).map(([value,label])=>({value,label}))]}/><StyledSelect label="Вид публикации" value={filterType} onChange={setFilterType} options={[{value:'',label:'Все публикации'},...PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))]}/><StyledSelect label="Этап" value={filterStage} onChange={setFilterStage} options={[{value:'',label:'Все этапы'},...g.stages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></section>
    <section className="wallFeed">{!filtered.length?<div className="emptyState">Подходящих публикаций нет.</div>:filtered.map(p=>{
     const party=g.parties.find(x=>x.id===p.context?.party_id||x.name===p.actor_label),pf=profiles.find(x=>x.user_id===p.author_id);
@@ -190,16 +185,13 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
       {editable&&<MediaUploadButton files={[]} onChange={x=>{if(x.length)void g.addMediaToPoliticalPost(p.id,x)}} label="Добавить вложение" hint=""/>}
       {(teacher||own&&!auto)&&<button className="deletePost" disabled={busy} onClick={()=>void deletePost(p)}><Trash2 size={17}/>Удалить публикацию</button>}
       {teacher&&<button onClick={()=>setMetricPost(p)}><SlidersHorizontal size={17}/>Изменить показатели</button>}
-      {teacher&&!auto&&p.status==='published'&&<button className="acceptPost" disabled={busy} onClick={()=>void g.acceptPoliticalPost(p.id)}>Принять как решение</button>}
-      {teacher&&!auto&&p.status==='published'&&<button className="rejectPost" disabled={busy} onClick={()=>void g.rejectPoliticalPost(p.id)}>Отклонить</button>}
      </div>}
      <CivicDiscussion kind="post" targetId={p.id} g={g} readOnly={readOnly}/>
      {voteFor===p.id&&<section className="processVoteComposer"><h3>Голосование по публикации</h3>{voteSettings}<button className="primary" disabled={busy||isGroupBody&&groups.length>1&&!voteGroup} onClick={()=>void startVote(p.id)}><Vote size={18}/>{busy?'Открывается…':'Открыть голосование'}</button></section>}
      {npaFor===p.id&&<div className="quickNpa"><StyledSelect label="Вид НПА" value={npaType} onChange={setNpaType} options={[{value:'fz_bill',label:'Проект ФЗ'},{value:'fkz_bill',label:'Проект ФКЗ'},{value:'federal_budget',label:'Федеральный бюджет'},{value:'president_decree',label:'Указ Президента'},{value:'government_resolution',label:'Постановление Правительства'},{value:'gd_resolution',label:'Постановление ГД'},{value:'sf_resolution',label:'Постановление СФ'},{value:'municipal_act',label:'Муниципальный акт'}]}/><button className="primary" disabled={busy} onClick={()=>void quickNpa(p)}>Создать проект из публикации</button></div>}
     </article>;
    })}</section>
-  </>}
-  {tab==='registry'&&<section className="decisionRegistry"><div className="decisionRegistryHead"><h2>Принятые решения</h2><span>{politicalDecisions.length}</span></div>{!politicalDecisions.length?<div className="emptyState">Принятых решений пока нет.</div>:politicalDecisions.map(d=>{const p=politicalPosts.find(x=>x.id===d.post_id);return <article key={d.id}><div className="decisionRegistryNo">{d.registry_no}</div><div><small>{d.actor_label} · {d.decision_method==='vote'?'Принято голосованием':'Утверждено преподавателем'}</small><h3>{d.title}</h3></div><time>{new Date(d.created_at).toLocaleString('ru-RU')}</time>{p&&<button onClick={()=>{setTab('feed');setSearch(p.title)}}>Открыть публикацию</button>}</article>})}</section>}
+  </>
   {metricPost&&<div className="eventCaseBackdrop processMetricBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setMetricPost(null)}}><section ref={metricDialog} className="eventCaseModal processMetricDialog" tabIndex={-1} role="dialog" aria-modal="true" aria-label="Показатели публикации"><header className="eventModalHeader"><div><small>Публикация</small><h3>{metricPost.title}</h3></div><button className="eventModalClose" aria-label="Закрыть редактор показателей" onClick={()=>setMetricPost(null)}><X size={20}/></button></header><div className="eventModalBody"><TeacherMetricStudio key={metricPost.id} g={g} postId={metricPost.id}/></div></section></div>}
  </div>;
 }

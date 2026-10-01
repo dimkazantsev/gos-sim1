@@ -36,7 +36,7 @@ async function start(id:string){
  source=context.createBufferSource();source.buffer=score(context);source.loop=true;source.loopStart=0;source.loopEnd=36;
  source.connect(context.destination);source.start();active=id;notify();
 }
-export default function ComicSoundButton({playing=true}:{playing?:boolean}){
+export default function ComicSoundButton({playing=true,iconOnly=false}:{playing?:boolean;iconOnly?:boolean}){
  const id=useId(),[enabled,setEnabled]=useState(false),[failure,setFailure]=useState('');
  useEffect(()=>{const update=(owner:string)=>setEnabled(owner===id);listeners.add(update);return()=>{listeners.delete(update);stop(id)}},[id]);
  useEffect(()=>{if(!playing)stop(id)},[playing,id]);
@@ -44,5 +44,5 @@ export default function ComicSoundButton({playing=true}:{playing?:boolean}){
   setFailure('');if(enabled){stop(id);return}
   try{await start(id)}catch{setFailure('Не удалось включить звук. Нажмите ещё раз.')}
  }
- return <button type="button" className="comicSoundButton" aria-pressed={enabled} aria-label={enabled?'Выключить звук комикса':'Включить звук комикса'} title={failure||'Музыка · Плавный цикл 36 секунд'} onClick={()=>void toggle()}>{enabled?<Volume2 size={18}/>:<VolumeX size={18}/>}<span>{enabled?'Звук включён':'Включить звук'}</span></button>;
+ return <button type="button" className={'comicSoundButton '+(iconOnly?'iconOnly':'')} aria-pressed={enabled} aria-label={enabled?'Выключить звук комикса':'Включить звук комикса'} title={failure||'Музыка · Плавный цикл 36 секунд'} onClick={()=>void toggle()}>{enabled?<Volume2 size={18}/>:<VolumeX size={18}/>}<span className={iconOnly?'sr-only':''}>{enabled?'Звук включён':'Включить звук'}</span></button>;
 }

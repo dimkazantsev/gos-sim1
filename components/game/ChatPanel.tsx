@@ -13,6 +13,9 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import type {Message} from './types';
 import {initials} from './constants';
 import {PROCESS_TAGS} from './processTags';
+import {chatHandles} from './chatHandles';
+import {supabase} from '@/lib/supabase';
+import {userError} from '@/lib/userError';
 import {buildChatEntries,formatChatTime,isChatAttachment,matchChatMessage} from './chatUtils';
 
 const FILE_ACCEPT='image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.xlsx,.ppt,.pptx';
@@ -84,6 +87,16 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const filtered=useMemo(()=>channelMessages.filter(m=>matchChatMessage(m,search,names[m.author_id]||'Система',onlyFiles)),[channelMessages,search,names,onlyFiles]);
  const entries=useMemo(()=>buildChatEntries(filtered,me?.user_id||''),[filtered,me?.user_id]);
  const hasFilter=!!search.trim()||onlyFiles;
+ const handles=chatHandles(g.members).filter(x=>x.member.user_id!==me?.user_id);
+ const address=text.match(/^@([а-яёa-z0-9_-]*)/i);
+ const suggestions=address?handles.filter(x=>x.handle.startsWith(address[1].toLowerCase())||x.surname.toLowerCase().startsWith(address[1].toLowerCase())).slice(0,8):[];
+ async function addressPerson(userId:string){
+  if(!g.game||sending)return;setSending(true);setLocalError('');
+  try{const r=await supabase.rpc('open_direct_conversation',{p_game:g.game.id,p_recipient:userId});
+   if(r.error){setLocalError(userError(r.error));return}
+   await g.refresh();setChannelId(r.data as string);setText(text.replace(/^@[а-яёa-z0-9_-]+\s*/i,''));composer.current?.focus();
+  }catch(e){setLocalError(userError(e))}finally{setSending(false)}
+ }
  function beginHold(kind:'audio'|'video'){
   if(mediaHoldTimer.current)clearTimeout(mediaHoldTimer.current);
   const hold={kind,started:false,released:false};
@@ -185,6 +198,10 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
   if(pendingSend.current||uploading||chatLoading||!text.trim()||!channelId)return;
+  if(address){const exact=handles.filter(x=>x.handle===address[1].toLowerCase()||x.surname.toLowerCase()===address[1].toLowerCase());
+   if(exact.length!==1){setLocalError('Выберите адресата из списка под полем сообщения.');return}
+   await addressPerson(exact[0].member.user_id);return;
+  }
   const sentText=text,fromChannel=channelId;
   pendingSend.current=true;setSending(true);setLocalError('');
   try{
@@ -318,10 +335,11 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   {chatMediaError&&<div className="chatLocalError chatMediaError" role="alert"><span>{chatMediaError}</span></div>}
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
   {!readOnly?<div className="chatCompose">
+   {address&&<div className="chatAddressList" aria-label="Получатель личного сообщения"><small>Личное сообщение · Выберите адресата</small>{suggestions.map(x=><button type="button" key={x.member.user_id} disabled={sending} onClick={()=>void addressPerson(x.member.user_id)}><b>{x.member.full_name}</b><span>@{x.handle}</span></button>)}{!suggestions.length&&<span>Участник не найден.</span>}</div>}
    {channels.find(c=>c.id===channelId)?.kind==='public'&&<details className="chatProcessTags"><summary>Сообщение для политического процесса</summary><small>Добавьте игровой тег: сообщение из общего чата автоматически появится в публичной ленте.</small><div>{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
    <div className="chatInputRow">
     <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)}
-     placeholder={channelId?'Написать сообщение…':'Выберите канал'}
+     placeholder={channelId?'Сообщение или @Фамилия для личной беседы':'Выберите канал'}
      disabled={!channelId||chatLoading} readOnly={sending} aria-busy={sending}
      onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
     <button type="button" className="chatSendButton iconOnly" disabled={sending||uploading||chatLoading||!text.trim()||!channelId}
