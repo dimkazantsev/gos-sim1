@@ -36,7 +36,16 @@ export default function StyledSelect({label,value,options,onChange,disabled=fals
   window.addEventListener('resize',position);
   return()=>{document.removeEventListener('pointerdown',off);document.removeEventListener('keydown',escape);window.removeEventListener('scroll',scroll,true);window.removeEventListener('resize',position)};
  },[open]);
- useEffect(()=>{if(open)popup.current?.querySelector<HTMLElement>('[data-focused=true]')?.scrollIntoView({block:'nearest'})},[cursor,open]);
+ useEffect(()=>{
+  if(!open)return;
+  const menu=popup.current,item=menu?.querySelector<HTMLElement>('[data-focused=true]');
+  if(!menu||!item)return;
+  // Scroll only the list. Scrolling its document ancestor closes the popup
+  // and can cancel a touch selection in a long form.
+  const m=menu.getBoundingClientRect(),r=item.getBoundingClientRect();
+  if(r.top<m.top+menu.clientTop)menu.scrollTop-=m.top+menu.clientTop-r.top;
+  else if(r.bottom>m.top+menu.clientTop+menu.clientHeight)menu.scrollTop+=r.bottom-(m.top+menu.clientTop+menu.clientHeight);
+ },[cursor,open]);
  const enabled=options.map((o,i)=>({...o,index:i})).filter(o=>!o.disabled);
  function keydown(e:React.KeyboardEvent<HTMLButtonElement>){
   if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){

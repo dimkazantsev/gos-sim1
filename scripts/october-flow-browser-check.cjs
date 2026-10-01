@@ -38,7 +38,7 @@ export default function FlowCheck(){
  </main>;
 }
 `;
-let server,browser;
+let server,browser,activePage;
 const address='http://127.0.0.1:3995/october-flow-test-route';
 async function ready(){
  for(let n=0;n<60;n++){
@@ -55,7 +55,7 @@ async function ready(){
   await ready();browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
   for(const width of [320,390,768,1440]){
    const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce',hasTouch:width<600,isMobile:width<600});
-   const page=await context.newPage(),errors=[],metricCalls=[],toolCalls=[],discussions=new Map(),deleted=[],proposals=[];page.on('pageerror',e=>errors.push(e.message));
+   const page=await context.newPage(),errors=[],metricCalls=[],toolCalls=[],discussions=new Map(),deleted=[],proposals=[];activePage=page;page.on('pageerror',e=>errors.push(e.message));
    function discussion(kind,id){const key=kind+':'+id;if(!discussions.has(key))discussions.set(key,{likes:2,dislikes:0,mine:0,views:7,comment_count:0,comments:[],recorded:false});return discussions.get(key)}
    await page.route('https://*.supabase.co/**',async route=>{
     const url=route.request().url(),rpc=url.split('/rpc/')[1]?.split('?')[0],p=rpc?route.request().postDataJSON():null;let response=rpc?null:[];
@@ -190,6 +190,6 @@ async function ready(){
    console.log('PASS Real registry revision/delivery/signing controls, document/post reactions/comments/views, inline editor with retained draft, student office proposal, teacher media approval/deletion, picker, tags, links, attachment, metric RPC and body number at '+width+'px');
    await context.close();
   }
- }catch(e){console.error(logs);throw e}
+ }catch(e){if(activePage&&!activePage.isClosed())await activePage.screenshot({path:path.join(screens,'october-flow-failure.png')}).catch(()=>{});console.error(logs);throw e}
  finally{if(browser)await browser.close();if(server)server.kill('SIGTERM');fs.rmSync(route,{recursive:true,force:true});}
 })().catch(e=>{console.error(e);process.exitCode=1});
