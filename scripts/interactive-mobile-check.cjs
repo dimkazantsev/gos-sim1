@@ -123,8 +123,8 @@ async function main(){
  }
  await desktop.getByRole('checkbox',{name:'Указать количество голосов'}).check();
  await desktop.locator('.civicQuantity input').fill('100');await desktop.getByRole('button',{name:'За · 100',exact:true}).click();await desktop.waitForFunction(()=>document.querySelector('#ballot-result')?.textContent==='100/0/0');
- await desktop.getByRole('checkbox',{name:'Распределить голоса между вариантами'}).check();
- const splitInputs=desktop.locator('.civicSplitInputs input');await splitInputs.nth(0).fill('180');await splitInputs.nth(1).fill('20');await splitInputs.nth(2).fill('10');
+ await desktop.getByRole('checkbox',{name:'Распределить голоса между вариантами'}).check();assert.equal(await desktop.locator('.civicQuantity input').count(),0,'Only fields for the selected ballot mode remain visible');
+ const splitInputs=desktop.locator('.civicSplitInputs input');await splitInputs.nth(0).fill('');assert.equal(await splitInputs.nth(0).inputValue(),'','Empty numeric fields stay empty');assert.equal(await desktop.getByRole('button',{name:/Подать голоса/}).isDisabled(),true,'Incomplete distribution cannot be submitted');await splitInputs.nth(0).fill('180');await splitInputs.nth(1).fill('20');await splitInputs.nth(2).fill('10');
  await desktop.getByRole('button',{name:'Подать голоса · 210',exact:true}).click();await desktop.waitForFunction(()=>document.querySelector('#ballot-result')?.textContent==='180/20/10');
  await splitInputs.nth(0).fill('200');assert.equal(await desktop.getByRole('button',{name:'Подать голоса · 230',exact:true}).isDisabled(),true,'An over-allocation cannot be submitted');await splitInputs.nth(0).fill('180');
  console.log('PASS Real case choices, percentages, avatars and partial/split mandate ballots');
