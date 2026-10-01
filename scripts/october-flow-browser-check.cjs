@@ -92,8 +92,13 @@ async function ready(){
    await composer.getByRole('button',{name:'Опубликовать',exact:true}).click();await page.locator('#process-published-ui-post').waitFor();
    const submitted=JSON.parse(await page.locator('#flow-output').textContent());assert.equal(submitted.actorKey,'teacher');assert.deepEqual(submitted.formalIds,['formal-demo']);assert.deepEqual(submitted.files,['Пояснение.txt']);assert(submitted.tags.includes('ходигры_gpyasu'));assert(submitted.body.includes('[Правовой портал](https://pravo.gov.ru/)'));
    await page.locator('#process-published-ui-post').getByRole('button',{name:'Редактировать',exact:true}).click();
-   await page.getByRole('textbox',{name:'Текст публикации',exact:true}).fill('Отредактированный текст публикации.');
-   await composer.getByRole('button',{name:'Сохранить изменения',exact:true}).click();assert((await page.locator('#process-published-ui-post .postRichText').textContent()).includes('Отредактированный'));
+   const postEditor=page.locator('#process-published-ui-post .processInlineEditor');await postEditor.waitFor();
+   await composer.locator('summary').first().click();
+   await composer.getByRole('textbox',{name:'Заголовок публикации',exact:true}).fill('Новый черновик сохранён');
+   await postEditor.getByRole('textbox',{name:'Редактируемый текст публикации',exact:true}).fill('Отредактированный текст публикации.');
+   await postEditor.getByRole('button',{name:'Сохранить изменения',exact:true}).click();
+   assert.equal(await composer.getByRole('textbox',{name:'Заголовок публикации',exact:true}).inputValue(),'Новый черновик сохранён','Editing preserves creation draft');
+   await composer.locator('summary').first().click();assert((await page.locator('#process-published-ui-post .postRichText').textContent()).includes('Отредактированный'));
    await page.locator('#process-published-ui-post').getByRole('button',{name:'Изменить показатели',exact:true}).click();
    const editor=page.getByRole('dialog',{name:'Показатели публикации'});
    const heights=await editor.locator('.metricDirectorGrid .styledSelectTrigger,.metricValueControl').evaluateAll(nodes=>nodes.map(x=>x.getBoundingClientRect().height));

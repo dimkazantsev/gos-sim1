@@ -1,4 +1,6 @@
 export function institutionEmblem(subject:string,issuer=''){
+ if(subject==='office'||subject.startsWith('office:')){if(/депутат|государственн.*дум/i.test(issuer))subject='gd';else if(/сенатор|совет федерац/i.test(issuer))subject='sf';else if(/министр|министерств/i.test(issuer))subject='ministry';else if(/муницип|глава города/i.test(issuer))subject='municipality';}
+
  if(subject==='minjust'||/юстиц/i.test(issuer))return '/emblems/minjust-user.jpg';
  if(subject==='interior'||/внутренн|мвд/i.test(issuer))return '/emblems/interior-user.png';
  if(subject==='central_bank'||/центральн.*банк|банк россии/i.test(issuer))return '/emblems/central-bank.svg';

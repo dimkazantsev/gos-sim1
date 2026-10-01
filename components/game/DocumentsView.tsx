@@ -11,6 +11,7 @@ import DocumentPaper from './DocumentPaper';
 import {DOCUMENT_TEMPLATES} from './documentTemplates';
 import {useSavedGameState,savedChoice,savedString,savedBoolean} from './useSavedGameState';
 import {DocumentTools,DocumentInbox,type DocumentAccess} from './DocumentTools';
+import CivicDiscussion from './CivicDiscussion';
 
 function typeLabel(key:string){return FORMAL_TYPES.find(x=>x.key===key)?.label||key}
 function shortDate(v:string){return new Date(v).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'})}
@@ -260,6 +261,7 @@ export default function DocumentsView({g,focusId,onOpenVotes,readOnly=false,init
 </aside>
     </section>
       <article className="surface formalHistory"><div className="surfaceHead"><div><small>ИСТОРИЯ</small><h2>Движение документа</h2></div></div><div className="formalLinkedVotes">{votes.filter(v=>v.formal_document_id===selected.id).map(v=><button type="button" key={v.id} onClick={()=>onOpenVotes(v.id)}><b>{v.title}</b><span>{v.status==='open'?'Голосование открыто':v.result_label||'Голосование завершено'}</span></button>)}</div><div>{history.length?history.map(h=><div className="formalHistoryRow" key={h.id}><span/><div><time>{fmtDateTime(h.created_at)}</time><b>{h.action}</b><small>{h.actor_id?members.find(m=>m.user_id===h.actor_id)?.full_name||'Участник':'Система'}{h.note?' · '+h.note:''}</small></div></div>):<div className="emptyState">История пока пуста.</div>}</div></article>
+    <CivicDiscussion kind="document" targetId={selected.id} g={g} readOnly={readOnly}/>
     {revisions.length>0&&<details className="documentRevisionList"><summary>Предыдущие редакции · {revisions.length}</summary>{revisions.map(r=><article key={r.id}><div><b>Редакция {r.revision}</b><time>{fmtDateTime(r.created_at)}</time></div><h3>{r.title}</h3><details><summary>Показать текст редакции</summary><p>{r.body_text||'Текст отсутствует'}</p></details>{canEditSelected&&!editing&&<button type="button" className="secondary" onClick={()=>{setEditTitle(r.title);setEditBody(r.body_text||'');setEditNote('Восстановлен текст редакции '+r.revision);setEditing(true);setDetailTab('text')}}>Использовать текст в новой редакции</button>}</article>)}</details>}
    </>}</article>
   </section>}
