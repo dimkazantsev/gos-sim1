@@ -115,7 +115,7 @@ async function main(){
   const modal=desktop.getByRole('dialog');await modal.waitFor();
   assert.equal(await modal.locator('svg[data-scene]').count(),1,'One case, one illustration');
   assert.equal(await modal.locator('.eventOptionButtons').count(),0,'No duplicate answer controls');
-  const answers=modal.locator('.eventAnswerChoice');assert.equal(await answers.count(),3);await answers.first().click();await desktop.waitForFunction(()=>document.querySelector('.eventAnswerChoice[aria-pressed=true]')?.textContent.includes('67%'));assert.equal(await answers.first().locator('.eventVoter').count(),2);assert.equal(await answers.first().isDisabled(),true,'Submitted answer is locked');
+  const answers=modal.locator('.eventAnswerChoice');assert.equal(await answers.count(),require('../content/events-v2.json')[0].decision_options.length,'All authored options are rendered once');await answers.first().click();await desktop.waitForFunction(()=>document.querySelector('.eventAnswerChoice[aria-pressed=true]')?.textContent.includes('67%'));assert.equal(await answers.first().locator('.eventVoter').count(),2);assert.equal(await answers.first().isDisabled(),true,'Submitted answer is locked');
   const modalBounds=await modal.boundingBox();assert(modalBounds.width<=width-15,'Modal fits the viewport');
   await desktop.screenshot({path:path.join(screens,'event-modal-'+width+'.png')});
   await desktop.keyboard.press('Escape');await modal.waitFor({state:'detached'});
@@ -289,4 +289,3 @@ async function main(){
 }
 }
 main().catch(error=>{console.error(error);process.exitCode=1});
-

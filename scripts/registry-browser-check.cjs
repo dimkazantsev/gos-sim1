@@ -24,8 +24,13 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    assert.equal(await frame.locator('.formalVoteLink.active').count(),1,'Linked open vote is visible');
    assert.equal(await frame.getByRole('button',{name:'Перейти к голосованию →'}).count(),1);
    await page.locator('#preview').screenshot({path:path.join(screens,'registry-'+width+'.png')});
+   await frame.locator('.formalActions').scrollIntoViewIfNeeded();
+   await page.locator('#preview').screenshot({path:path.join(screens,'registry-procedure-'+width+'.png')});
+   await frame.locator('.legalMasthead').scrollIntoViewIfNeeded();
+   const emblem=frame.locator('.legalEmblem');await emblem.evaluate(img=>{if(!img.complete)return new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject})});
+   assert(await emblem.evaluate(img=>img.naturalWidth>0),'The official emblem loads');
+   await page.locator('#preview').screenshot({path:path.join(screens,'registry-document-'+width+'.png')});
    console.log('PASS Populated registry, procedure placement and linked vote at '+width+'px');
   }
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
-
