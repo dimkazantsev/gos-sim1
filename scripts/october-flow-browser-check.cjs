@@ -100,6 +100,7 @@ async function ready(){
    await page.screenshot({path:path.join(screens,'process-live-metric-'+width+'.png')});
    await page.keyboard.press('Escape');assert.equal(await editor.count(),0,'Escape closes metric dialog');
    await page.getByRole('navigation',{name:'Проверяемый раздел'}).getByRole('button',{name:'Регистрация органа',exact:true}).click();
+   await page.locator('.civicRegistration>summary').click();
    const body=page.locator('.civicCustomBody');await body.locator('summary').click();
    await page.getByRole('spinbutton',{name:'Установленный состав органа',exact:true}).fill('12');assert.equal(await page.getByRole('spinbutton',{name:'Установленный состав органа',exact:true}).inputValue(),'12');
    assert.deepEqual(errors,[],'No browser runtime errors');
