@@ -29,12 +29,12 @@ import MobileDock from './game/MobileDock';
 import {useSavedGameState,savedString} from './game/useSavedGameState';
 
 const GENERIC_STUDENT='__generic_student_preview__';
-type ScreenLocation={view:View;stageNo:number;documentId:string;voteId?:string};
+type ScreenLocation={view:View;stageNo:number;documentId:string;voteId?:string;templateKey?:string};
 const SCREEN_VIEWS=['dashboard','stages','parties','votes','documents','grades','actions','profile','events','teacher','budget'];
 function validScreenHistory(value:unknown){
  if(!value||typeof value!=='object')return false;
  const history=value as {entries?:ScreenLocation[];index?:number};
- return Array.isArray(history.entries)&&history.entries.length>0&&history.entries.length<=60&&Number.isInteger(history.index)&&Number(history.index)>=0&&Number(history.index)<history.entries.length&&history.entries.every(e=>e&&SCREEN_VIEWS.includes(e.view)&&Number.isInteger(e.stageNo)&&e.stageNo>=0&&e.stageNo<=16&&typeof e.documentId==='string'&&e.documentId.length<=100&&(!e.voteId||typeof e.voteId==='string'&&e.voteId.length<=100));
+ return Array.isArray(history.entries)&&history.entries.length>0&&history.entries.length<=60&&Number.isInteger(history.index)&&Number(history.index)>=0&&Number(history.index)<history.entries.length&&history.entries.every(e=>e&&SCREEN_VIEWS.includes(e.view)&&Number.isInteger(e.stageNo)&&e.stageNo>=0&&e.stageNo<=16&&typeof e.documentId==='string'&&e.documentId.length<=100&&(!e.voteId||typeof e.voteId==='string'&&e.voteId.length<=100)&&(!e.templateKey||typeof e.templateKey==='string'&&e.templateKey.length<=80));
 }
 function adjacentScreen(entries:ScreenLocation[],index:number,direction:-1|1,skipTeacher:boolean){
  for(let next=index+direction;next>=0&&next<entries.length;next+=direction){
@@ -249,17 +249,17 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(window.matchMedia('(max-width:1099px)').matches)g.setChatOpen(false);
   requestAnimationFrame(()=>document.getElementById('game-main')?.focus());
  }
- function navigate(next:View,target?:{stageNo?:number;documentId?:string;voteId?:string},profileVerified=false){
+ function navigate(next:View,target?:{stageNo?:number;documentId?:string;voteId?:string;templateKey?:string},profileVerified=false){
   const owner=g.me;
   const p=g.profiles.find(row=>row.user_id===owner?.user_id);
   if(!profileVerified&&owner&&owner.kind!=='observer'&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'){
    setOnboardingNotice('Сначала завершите оформление личного профиля.');
    next='profile';
   }
-  const destination:ScreenLocation={view:next,stageNo:target?.stageNo??0,documentId:target?.documentId??'',voteId:target?.voteId??''};
+  const destination:ScreenLocation={view:next,stageNo:target?.stageNo??0,documentId:target?.documentId??'',voteId:target?.voteId??'',templateKey:target?.templateKey??''};
   setScreenHistory(previous=>{
    const current=previous.entries[previous.index];
-   if(current.view===destination.view&&current.stageNo===destination.stageNo&&current.documentId===destination.documentId&&current.voteId===destination.voteId)return previous;
+   if(current.view===destination.view&&current.stageNo===destination.stageNo&&current.documentId===destination.documentId&&current.voteId===destination.voteId&&current.templateKey===destination.templateKey)return previous;
    const entries=[...previous.entries.slice(0,previous.index+1),destination].slice(-60);
    return {entries,index:entries.length-1};
   });
@@ -267,7 +267,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  }
  function navigateProfile(id:string){setSelectedProfileId(id);navigate('profile')}
  function rememberDocument(id?:string){
-  setScreenHistory(previous=>({entries:previous.entries.map((screen,index)=>index===previous.index&&screen.view==='documents'?{...screen,documentId:id||''}:screen),index:previous.index}));
+  setScreenHistory(previous=>({entries:previous.entries.map((screen,index)=>index===previous.index&&screen.view==='documents'?{...screen,documentId:id||'',templateKey:''}:screen),index:previous.index}));
  }
  function clearVoteFocus(){
   setScreenHistory(previous=>({entries:previous.entries.map((screen,index)=>index===previous.index&&screen.view==='votes'?{...screen,voteId:''}:screen),index:previous.index}));
@@ -452,11 +452,11 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <main id="game-main" tabIndex={-1} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
      {error&&<div className="errorBox closable" role="alert"><span>{error}</span><IconAction onClick={()=>setError('')} label="Закрыть сообщение об ошибке"/></div>}
      {view==='dashboard'&&<DashboardView g={vg} onNavigate={v=>navigate(v,v==='stages'?{stageNo:currentStage?.stage_no||game.current_round}:undefined)}/>}
-     {view==='stages'&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onOpenVotes={()=>navigate('votes')}/>}
+     {view==='stages'&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onCreateDocument={(templateKey,stageNo)=>navigate('documents',{templateKey,stageNo})} onNavigate={v=>navigate(v)}/>}
      {view==='parties'&&<PartiesView g={vg}/>}
      {view==='votes'&&<VotesView g={vg} focusId={currentScreen.voteId} onClearFocus={clearVoteFocus} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
      {view==='budget'&&<BudgetView g={vg} readOnly={previewMode||observer} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenEvents={()=>navigate('events')}/>}
-     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} onSelectDocument={rememberDocument} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
+     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} createTemplate={currentScreen.templateKey} createStageNo={focusStage} onSelectDocument={rememberDocument} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
      {view==='grades'&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
      {view==='actions'&&<PoliticalWallView g={vg} readOnly={previewMode||observer} focusPending={true} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
      {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}}/>}
@@ -477,6 +477,6 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    </section>
   </div>}
   {onboardingRequired&&introSeen&&!introOpen&&!previewMode&&<div className="onboardingBar" role="status"><div><strong>Первое знакомство с Республикой</strong><span>Обязательные поля: ФИО, пол, подпись, описание и подтверждённая почта с паролем.</span>{(onboardingNotice||introSyncError)&&<small>{onboardingNotice||introSyncError}</small>}</div><button type="button" disabled={completingProfile} onClick={()=>{setSelectedProfileId('');navigate('profile');void completeOnboarding()}}>{completingProfile?'Проверяем…':'Закончить настройку'}</button></div>}
-  <RepublicComic intro open={introOpen} onClose={()=>void finishIntro()}/>
+  <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>
   <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }

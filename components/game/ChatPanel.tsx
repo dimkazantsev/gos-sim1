@@ -90,11 +90,12 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const handles=chatHandles(g.members).filter(x=>x.member.user_id!==me?.user_id);
  const address=text.match(/^@([а-яёa-z0-9_-]*)/i);
  const suggestions=address?handles.filter(x=>x.handle.startsWith(address[1].toLowerCase())||x.surname.toLowerCase().startsWith(address[1].toLowerCase())).slice(0,8):[];
- async function addressPerson(userId:string){
+ async function addressPerson(userId:string,sendNow=false){
   if(!g.game||sending)return;setSending(true);setLocalError('');
   try{const r=await supabase.rpc('open_direct_conversation',{p_game:g.game.id,p_recipient:userId});
    if(r.error){setLocalError(userError(r.error));return}
-   await g.refresh();setChannelId(r.data as string);setText(text.replace(/^@[а-яёa-z0-9_-]+\s*/i,''));composer.current?.focus();
+   const target=r.data as string,message=text.replace(/^@[а-яёa-z0-9_-]+\s*/i,'');await g.refresh();setChannelId(target);
+   if(sendNow&&message.trim()){const ok=await sendText(message,target);setText(ok?'':message);if(!ok)setLocalError('Не удалось отправить личное сообщение.')}else setText(message);composer.current?.focus();
   }catch(e){setLocalError(userError(e))}finally{setSending(false)}
  }
  function beginHold(kind:'audio'|'video'){
@@ -197,10 +198,10 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  },[]);
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
-  if(pendingSend.current||uploading||chatLoading||!text.trim()||!channelId)return;
+  if(pendingSend.current||sending||uploading||chatLoading||!text.trim()||!channelId)return;
   if(address){const exact=handles.filter(x=>x.handle===address[1].toLowerCase()||x.surname.toLowerCase()===address[1].toLowerCase());
    if(exact.length!==1){setLocalError('Выберите адресата из списка под полем сообщения.');return}
-   await addressPerson(exact[0].member.user_id);return;
+   await addressPerson(exact[0].member.user_id,true);return;
   }
   const sentText=text,fromChannel=channelId;
   pendingSend.current=true;setSending(true);setLocalError('');

@@ -114,7 +114,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
      <span>{target.kind==='teacher'?'Преподаватель':target.kind==='observer'?'Гость':'Участник'}</span>
      {target.kind==='student'&&target.group_name&&<span>Группа: {target.group_name}</span>}
      {target.kind==='student'&&<span>ВСН {avg!==null?avg.toFixed(2):'—'}</span>}
-     <span>Принято решений: {publicStats?.accepted_actions??'—'}</span>{allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}
+     {allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}
     </div>
     <div className="profileHeroControls">
      <button type="button" className="profileComicButton" onClick={()=>setComicOpen(true)}><BookOpen size={17}/> Комикс о Республике</button>
@@ -149,7 +149,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
   {!own&&<>
    <section className="profilePublicStats">
     {[
-     ['Принятые решения',publicStats?.accepted_actions],['Публикации',publicStats?.posts],['Голосования',publicStats?.votes_cast],
+     ['Публикации',publicStats?.posts],['Голосования',publicStats?.votes_cast],
      ['Созданные НПА',publicStats?.documents_created],['Действия в журнале',publicStats?.activity_entries],['Ответы на события',publicStats?.events_decided]
     ].map(([label,value])=><article key={label}><strong>{value??'—'}</strong><span>{label}</span></article>)}
    </section>
@@ -187,12 +187,12 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
      </div>:own&&pendingInvites.length?<div className="profileInviteNote"><b>У вас {pendingInvites.length} приглашение(я) в партию.</b><span>Откройте раздел «Партии», чтобы принять или отклонить.</span></div>:<div className="emptyState">Партия пока не указана.</div>}
     <div className="profilePositionDivider"/>
     <div className="surfaceHead"><div><small>ИГРОВАЯ ПОЗИЦИЯ</small><h2>Роль в Республике</h2></div></div>
-    <dl><div><dt>Партия</dt><dd>{target.team||'Не назначена'}</dd></div><div><dt>Должность</dt><dd>{target.role_title||'Не назначена'}</dd></div>{target.kind==='student'&&<div><dt>ВСН</dt><dd>{avg===null?'—':avg.toFixed(2)}</dd></div>}<div><dt>Принято решений</dt><dd>{publicStats?.accepted_actions??'—'}</dd></div></dl>
+    <dl><div><dt>Партия</dt><dd>{target.team||'Не назначена'}</dd></div><div><dt>Должность</dt><dd>{target.role_title||'Не назначена'}</dd></div>{target.kind==='student'&&<div><dt>ВСН</dt><dd>{avg===null?'—':avg.toFixed(2)}</dd></div>}</dl>
     {targetProfile?.bio&&<div className="profileBioPreview"><small>Описание</small><p>{targetProfile.bio}</p></div>}
    </aside>
   </section>
   {own&&game&&<ProfileDocumentLinks gameId={game.id} userId={me.user_id}/>}
   {own&&teacher&&<SessionManager g={g}/>}
-  <RepublicComic open={comicOpen} onClose={()=>setComicOpen(false)}/>
+  <RepublicComic gameId={game?.id} open={comicOpen} onClose={()=>setComicOpen(false)}/>
  </div>;
 }
