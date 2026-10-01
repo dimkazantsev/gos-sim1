@@ -8,7 +8,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 
 const VIEW_NAMES:Record<string,string>={
  dashboard:'Обзор игры',stages:'Этапы',parties:'Партии',votes:'Голосования',
- documents:'НПА',actions:'Политический процесс',grades:'Оценки',
+ budget:'Бюджет',documents:'НПА',actions:'Политический процесс',grades:'Оценки',
  profile:'Профиль',teacher:'Управление',events:'События и решения',chat:'Командный чат'
 };
 type Sort='recent'|'oldest'|'name'|'surname'|'online';
@@ -31,7 +31,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   setOlderBusy(true);setOlderError('');
   const r=await supabase.from('game_activity').select('*').eq('game_id',game.id)
    .lt('created_at',earliest).gte('created_at',cutoff||'1970-01-01').order('created_at',{ascending:false}).limit(250);
-  if(r.error)setOlderError(r.error.message);
+  if(r.error)setOlderError(userError(r.error));
   else{
    const page=(r.data||[]) as typeof activities;
    setOlder(previous=>[...new Map<number,(typeof activities)[number]>([...previous,...page].map(a=>[a.id,a] as const)).values()]);

@@ -63,6 +63,10 @@ do $$declare g uuid:=current_setting('qa.game')::uuid;c uuid:=current_setting('q
  if (select status from fiscal_rate_proposals where id=p)<>'applied' then raise exception 'FAIL published tax trigger';end if;
  if private.apply_published_fiscal_act(d) or (select rate from game_fiscal_rates where game_id=g and region_code='00' and tax_key='profit')<>24 then raise exception 'FAIL rate apply idempotency';end if;
  update game_stages set status='completed',completed_at=now() where game_id=g and stage_no=1;
+ if (select count(*) from republic_comic_chapters where game_id=g and ((stage_no=1 and kind='completed') or (stage_no=2 and kind='preview')))<>2 then raise exception 'FAIL stage chapter and next preview';end if;
+ if not exists(select 1 from political_posts where game_id=g and actor_key='media' and context ? 'stage_snapshot') then raise exception 'FAIL stage media news';end if;
+ update game_stages set status='completed' where game_id=g and stage_no=1;
+ if (select count(*) from republic_comic_chapters where game_id=g)<>2 then raise exception 'FAIL repeated stage chapter';end if;
  select count(*) into changed from fiscal_change_ledger where game_id=g and source_type='period' and source_id='1';if changed<>89 then raise exception 'FAIL rate sensitivity in next period: %',changed;end if;
  if private.advance_fiscal_period(g,1)<>0 then raise exception 'FAIL period replay';end if;
  if has_function_privilege('authenticated','private.apply_fiscal_metrics(bigint)','execute') then raise exception 'FAIL client can call protected rating helper';end if;
@@ -70,5 +74,5 @@ end$$;
 set local role anon;
 do $$declare blocked boolean:=false;begin begin perform public.get_fiscal_budget(current_setting('qa.game')::uuid);exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL anonymous budget RPC';end if;end$$;
 reset role;
-select jsonb_build_object('regions_89','PASS','current_executive_role','PASS','economic_parameter_guard','PASS','proposal_requires_act','PASS','tax_limits','PASS','foreign_game_guard','PASS','new_event_counter','PASS','collective_case','PASS','fiscal_case_effect','PASS','legal_feedback','PASS','index_once','PASS','published_act_once','PASS','period_once','PASS','helper_privileges','PASS','anonymous_guard','PASS') as checks;
+select jsonb_build_object('regions_89','PASS','current_executive_role','PASS','economic_parameter_guard','PASS','proposal_requires_act','PASS','tax_limits','PASS','foreign_game_guard','PASS','new_event_counter','PASS','collective_case','PASS','fiscal_case_effect','PASS','legal_feedback','PASS','index_once','PASS','published_act_once','PASS','period_once','PASS','completed_chapter','PASS','next_preview','PASS','stage_media_news','PASS','comic_once','PASS','helper_privileges','PASS','anonymous_guard','PASS') as checks;
 rollback;
