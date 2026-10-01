@@ -33,3 +33,12 @@
  .teacherSimple .impactWorkbench .impactHistoryStatus {grid-column:auto;justify-self:start;margin-left:48px}
  .teacherSimple .impactWorkbench .impactHistoryRow > .impactHistoryBottom {padding-left:0}
 }
+/* A single square hit area; the SVG has no text-flow offsets. */
+.teacherPartyDossiers .teacherPartyDossier > header > .teacherPartyChat {
+ display:grid;place-items:center;align-self:center;flex:0 0 48px;
+ box-sizing:border-box;width:48px;min-width:48px;height:48px;min-height:48px;
+ margin:0;padding:0;line-height:1;border-radius:12px;
+}
+.teacherPartyDossiers .teacherPartyDossier > header > .teacherPartyChat > svg {
+ display:block;width:22px;height:22px;margin:0;padding:0;transform:none;position:static;
+}
