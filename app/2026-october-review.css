@@ -82,3 +82,12 @@
 .scoreWeights{overflow:auto;margin-block:16px}.scoreWeights table{border-collapse:collapse;min-width:420px;width:100%}.scoreWeights th,.scoreWeights td{padding:12px;border-bottom:1px solid #dce4ed;text-align:left}.scoreWeights td{text-align:center;font-variant-numeric:tabular-nums}
 .formalHero{border-left:4px solid #c3438c}.formalRegistryRowActions{display:flex;gap:8px;padding:0 14px 14px;flex-wrap:wrap}.formalRegistryRowActions button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 12px}
 @media(max-width:600px){.scoreFormula summary,.scoreFormulaBody{padding-inline:12px}.teacherStageInspector .deadlineApplyGrid{grid-template-columns:minmax(0,1fr)}}
+
+.teacherStageInspector .deadlineControl{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.teacherStageInspector .deadlineControl header{display:flex;flex-wrap:wrap;gap:12px}
+.teacherStageInspector .deadlineControl header>div{min-width:0;max-width:100%}
+.teacherStageInspector .deadlineApply summary>div{min-width:0}
+.teacherStageInspector .deadlineApplyGrid input,.teacherStageInspector .deadlineApplyGrid select,.teacherStageInspector .deadlineApplyGrid textarea{width:100%;min-width:0;box-sizing:border-box}
+.eventCaseModal .eventComicPlayer,.eventCaseModal .eventPanelIllustration{width:100%;max-width:none;margin-inline:0;background:#fff}
+.eventCaseModal .eventPanelIllustration svg{display:block;width:100%;height:auto;aspect-ratio:16/9}
+.eventModalHead .eventModalActions{display:flex;align-items:center;gap:8px}
