@@ -8,7 +8,7 @@
 .impactWorkbench .impactJournalEntry .impactHistoryIdentity>small,.impactWorkbench .impactJournalEntry .impactHistoryIdentity>p,.impactWorkbench .impactJournalEntry .impactHistoryIdentity>span{padding-left:48px;text-align:left}
 .impactWorkbench .impactHistoryRow.impactJournalEntry>.impactHistoryBottom{display:flex!important;align-items:center;justify-content:flex-start!important;flex-wrap:wrap;gap:10px;margin:0;padding:0 0 0 48px;width:100%;text-align:left}
 .impactWorkbench .impactJournalEntry .impactHistoryBottom>.impactLedgerEffects{display:flex!important;align-items:center;justify-content:flex-start!important;flex-wrap:wrap;flex:0 1 auto;gap:8px;width:auto;min-width:0;max-width:100%;margin:0;padding:0;text-align:left}
-.impactWorkbench .impactJournalEntry .impactDelta{justify-content:flex-start;align-items:baseline;min-height:44px;margin:0;font-size:13px;text-align:left}
+.impactWorkbench .impactJournalEntry .impactDelta{display:inline-flex;justify-content:center;align-items:center;min-height:44px;margin:0;font-size:13px;text-align:center}
 .impactWorkbench .impactJournalEntry .impactUndo{display:inline-flex;align-items:center;justify-content:flex-start;gap:8px;flex:none;width:auto;min-height:44px;margin:0}
 .impactWorkbench .impactJournalEntry .impactUndo>svg{display:block;flex:none;margin:0}
 @media(max-width:600px){
@@ -62,3 +62,12 @@
 @media(max-width:600px){.styledSelectMenu>button{min-height:44px;font-size:14px;line-height:1.5}}
 /* Nested comment/editor headers must not inherit the publication masthead. */
 .civicDiscussion .civicCommentAvatar{width:44px;height:44px}.civicDiscussion .civicCommentContent>header{display:grid;grid-template-columns:minmax(0,1fr);align-items:center;gap:2px 8px;min-height:44px;padding:0;margin:0;border:0;background:transparent}.civicDiscussion .civicCommentContent>header:has(button){grid-template-columns:minmax(0,1fr) 44px}.civicDiscussion .civicCommentContent>header>b{grid-column:1;grid-row:1;overflow-wrap:anywhere}.civicDiscussion .civicCommentContent>header>time{grid-column:1;grid-row:2;font-size:12px}.civicDiscussion .civicCommentContent>header>button{grid-column:2;grid-row:1/span 2;align-self:center;width:44px;min-height:44px;margin:0}.processPortal .processInlineEditor>header{padding:0;margin:0;border:0;background:transparent;min-height:0}
+
+/* Ballot settings own their layout and never inherit feed heading geometry. */
+.processPortal .processVoteComposer{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;gap:16px;clear:both}
+.processPortal .processVoteComposer>h3{position:static;display:block;min-width:0;margin:0;padding:0;font-size:16px;line-height:1.5;letter-spacing:0;white-space:normal}
+.processPortal .processVoteSettings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;min-width:0;gap:14px;width:100%;box-sizing:border-box}
+.processPortal .processVoteSettings>*{min-width:0;max-width:100%;position:static}
+.processPortal .processVoteSettings>p{grid-column:1/-1;line-height:1.65;white-space:normal;overflow-wrap:anywhere}
+.processPortal .processVoteComposer>.primary{position:static;min-height:44px;max-width:100%;white-space:normal;justify-content:center}
+@media(max-width:650px){.processPortal .processVoteSettings{grid-template-columns:minmax(0,1fr)}.processPortal .processVoteComposer>.primary{width:100%}}
