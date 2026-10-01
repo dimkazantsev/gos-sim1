@@ -154,7 +154,7 @@ function LedgerRow({g,entry,rule}:{g:ReturnTypeRepublic;entry:ImpactLedger;rule?
   setBusy(true);
   try{await g.revertImpactEntry(entry.id)}finally{setBusy(false)}
  }
- return <article className={'impactHistoryRow '+(reverted?'reverted':'')}>
+ return <article className={'impactHistoryRow impactJournalEntry '+(reverted?'reverted':'')}>
   <div className="impactHistoryTop">
    <div className="impactHistoryIdentity"><small><time dateTime={entry.created_at}>{new Date(entry.created_at).toLocaleString('ru-RU')}</time> · {sourceLabels[entry.source_type]||'Игровое действие'}</small>
     <div className="impactHistoryHeading"><span className={'impactHistoryIcon '+(reverted?'reverted':'')}><ArrowDownRight aria-hidden="true"/></span><b>{rule?.label||entry.rule_key}</b></div>
