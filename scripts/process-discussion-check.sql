@@ -1,7 +1,7 @@
 -- Configure qa.teacher_id, qa.student_a_id and qa.student_b_id for authorized test accounts.
 -- Isolated game, real authenticated RPCs, complete rollback. No student data persists.
 begin;
-do $$ declare g uuid:=gen_random_uuid();p uuid:=gen_random_uuid();admin uuid:=current_setting('qa.teacher_id');a uuid:=current_setting('qa.student_a_id');b uuid:=current_setting('qa.student_b_id');begin
+do $$ declare g uuid:=gen_random_uuid();p uuid:=gen_random_uuid();admin uuid:=current_setting('qa.teacher_id')::uuid;a uuid:=current_setting('qa.student_a_id')::uuid;b uuid:=current_setting('qa.student_b_id')::uuid;begin
  perform set_config('request.jwt.claim.sub',admin::text,true);
  insert into public.games(id,title,game_code,owner_id,status,current_round,turn_open) values(g,'QA civic procedures','QA'||substr(replace(g::text,'-',''),1,10),admin,'running',11,true);
  insert into public.game_members(game_id,user_id,full_name,kind,role_title,group_name) values(g,admin,'Проверка преподавателя','teacher','Преподаватель',null);
@@ -21,6 +21,7 @@ do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;a uuid:=current_set
  p:=public.create_political_post(g,'statement','office:'||office_id::text,'Проверка публикации от должности','Официальное заявление участника');
  if (select actor_label from public.political_posts where id=p)<>'Министр юстиции Российской Федерации' then raise exception 'FAIL active office publication';end if;
  if not exists(select 1 from jsonb_array_elements(public.get_process_actors(g)) x where x->>'key'='office:'||office_id::text) then raise exception 'FAIL active office missing from publisher picker';end if;
+ if not exists(select 1 from jsonb_array_elements(public.get_process_actors(g)) x where x->>'key'='ministry' and x->>'label'='Министр юстиции Российской Федерации') then raise exception 'FAIL additional ministry uses wrong official label';end if;
  perform public.record_civic_view('post',p);perform public.record_civic_view('post',p);
  perform public.react_to_civic_content('post',p,1::smallint);perform public.react_to_civic_content('post',p,(-1)::smallint);
  stats:=public.get_civic_discussion('post',p);
@@ -58,5 +59,19 @@ do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;a uuid:=current_set
 end;$$;
 reset role;
 do $$ begin if not exists(select 1 from public.political_posts where id=current_setting('qa.deleted_post')::uuid and deleted_at is not null and source_key is not null) then raise exception 'FAIL automatic source audit lost';end if;end;$$;
-select jsonb_build_object('assigned_office_publisher','PASS','office_impersonation_guard','PASS','unique_views','PASS','reaction_switching','PASS','comment_guards','PASS','private_news_proposal','PASS','teacher_approval','PASS','approval_idempotency','PASS','direct_insert_guard','PASS','teacher_automatic_deletion','PASS','source_audit_preserved','PASS') as checks;
+insert into public.game_role_consequences(game_id,user_id,status,reason,set_by) values(current_setting('qa.civic_game')::uuid,current_setting('qa.student_a_id')::uuid,'suspended','Изолированная проверка полномочий',current_setting('qa.teacher_id')::uuid);
+set local role authenticated;
+do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;actors jsonb;blocked boolean;begin
+ perform set_config('request.jwt.claim.sub',current_setting('qa.student_a_id'),true);
+ actors:=public.get_process_actors(g);
+ if exists(select 1 from jsonb_array_elements(actors) x where x->>'key'='office' or x->>'key' like 'office:%' or x->>'key' in ('gd','ministry','minjust')) then raise exception 'FAIL suspended official publisher offered';end if;
+ blocked:=false;begin perform public.create_political_post(g,'statement','minjust','Проверка приостановленных полномочий','Официальная публикация');exception when others then blocked:=true;end;
+ if not blocked then raise exception 'FAIL suspended office publication allowed';end if;
+ perform public.create_political_post(g,'statement','participant','Личная публикация участника','Публикация от собственного имени');
+ if jsonb_array_length(public.get_formal_subjects(g))<>0 then raise exception 'FAIL suspended legal subject offered';end if;
+ perform set_config('request.jwt.claim.sub',current_setting('qa.teacher_id'),true);
+ if not exists(select 1 from jsonb_array_elements(public.get_process_actors(g)) x where x->>'key'='teacher') then raise exception 'FAIL teacher publisher unavailable';end if;
+end;$$;
+reset role;
+select jsonb_build_object('assigned_office_publisher','PASS','assigned_ministry_label','PASS','office_impersonation_guard','PASS','unique_views','PASS','reaction_switching','PASS','comment_guards','PASS','private_news_proposal','PASS','teacher_approval','PASS','approval_idempotency','PASS','direct_insert_guard','PASS','teacher_automatic_deletion','PASS','source_audit_preserved','PASS','suspended_official_guard','PASS','personal_publisher_retained','PASS') as checks;
 rollback;

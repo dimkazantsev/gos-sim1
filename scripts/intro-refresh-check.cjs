@@ -74,6 +74,19 @@ async function main(){
   const refreshed=harness(g,storage);await refreshed.flush();assert.equal(refreshed.find('DocumentsView').props.focusId,'qa-document');refreshed.dispose();
   const other=gameState('user-b');other.profiles=[{user_id:'user-b',onboarding_completed_at:'2026-09-30T00:00:00Z'}];const isolated=harness(other,storage);await isolated.flush();assert.equal(isolated.find('DocumentsView'),null);assert(isolated.find('DashboardView'));isolated.dispose();
  });
+ await check('Returning from a document to its registry survives refresh',async()=>{
+  const storage=new Map([['gos-sims:section:game-a:user-a:navigation',JSON.stringify({entries:[{view:'documents',stageNo:0,documentId:'qa-document'}],index:0})]]);
+  const g=gameState();g.profiles=[{user_id:'user-a',onboarding_completed_at:'2026-09-30T00:00:00Z'}];const h=harness(g,storage);await h.flush();
+  h.find('DocumentsView').props.onSelectDocument('qa-other-document');await h.flush();assert.equal(h.find('DocumentsView').props.focusId,'qa-other-document');
+  h.find('DocumentsView').props.onSelectDocument();await h.flush();assert.equal(h.find('DocumentsView').props.focusId,'');h.dispose();
+  const refreshed=harness(g,storage);await refreshed.flush();assert.equal(refreshed.find('DocumentsView').props.focusId,'');refreshed.dispose();
+ });
+ await check('A manually selected vote tab is not overridden by an old target after refresh',async()=>{
+  const storage=new Map([['gos-sims:section:game-a:user-a:navigation',JSON.stringify({entries:[{view:'votes',stageNo:0,documentId:'',voteId:'qa-vote'}],index:0})]]);
+  const g=gameState();g.profiles=[{user_id:'user-a',onboarding_completed_at:'2026-09-30T00:00:00Z'}];const h=harness(g,storage);await h.flush();assert.equal(h.find('VotesView').props.focusId,'qa-vote');
+  h.find('VotesView').props.onClearFocus();await h.flush();assert.equal(h.find('VotesView').props.focusId,'');h.dispose();
+  const refreshed=harness(g,storage);await refreshed.flush();assert.equal(refreshed.find('VotesView').props.focusId,'');refreshed.dispose();
+ });
  await check('Malformed saved navigation returns to a valid screen',async()=>{
   const g=gameState();g.profiles=[{user_id:'user-a',onboarding_completed_at:'2026-09-30T00:00:00Z'}];const storage=new Map([['gos-sims:section:game-a:user-a:navigation','{"entries":[],"index":999}']]);const h=harness(g,storage);await h.flush();assert(h.find('DashboardView'));h.dispose();
  });

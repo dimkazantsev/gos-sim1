@@ -262,6 +262,12 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   finishScreenNavigation();
  }
  function navigateProfile(id:string){setSelectedProfileId(id);navigate('profile')}
+ function rememberDocument(id?:string){
+  setScreenHistory(previous=>({entries:previous.entries.map((screen,index)=>index===previous.index&&screen.view==='documents'?{...screen,documentId:id||''}:screen),index:previous.index}));
+ }
+ function clearVoteFocus(){
+  setScreenHistory(previous=>({entries:previous.entries.map((screen,index)=>index===previous.index&&screen.view==='votes'?{...screen,voteId:''}:screen),index:previous.index}));
+ }
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
 
  const genericStudent:Member|undefined=teacher&&game?{
@@ -444,8 +450,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {view==='dashboard'&&<DashboardView g={vg} onNavigate={v=>navigate(v,v==='stages'?{stageNo:currentStage?.stage_no||game.current_round}:undefined)}/>}
      {view==='stages'&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onOpenVotes={()=>navigate('votes')}/>}
      {view==='parties'&&<PartiesView g={vg}/>}
-     {view==='votes'&&<VotesView g={vg} focusId={currentScreen.voteId} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
-     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
+     {view==='votes'&&<VotesView g={vg} focusId={currentScreen.voteId} onClearFocus={clearVoteFocus} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
+     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} onSelectDocument={rememberDocument} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
      {view==='grades'&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
      {view==='actions'&&<PoliticalWallView g={vg} readOnly={previewMode||observer} focusPending={true} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
      {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}}/>}

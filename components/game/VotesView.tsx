@@ -16,7 +16,7 @@ import DisclosureSummary from '../ui/DisclosureSummary';
 function pct(n:number,d:number){return d>0?Math.round(n/d*100):0}
 function time(v:string){return new Date(v).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
 
-export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:ReturnTypeRepublic;onOpenDocument:(id:string)=>void;onOpenStages:()=>void;focusId?:string}){
+export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClearFocus}:{g:ReturnTypeRepublic;onOpenDocument:(id:string)=>void;onOpenStages:()=>void;focusId?:string;onClearFocus?:()=>void}){
  const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,createVote,canVote,castVote,closeVote,tally,quorum}=g;
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[mode,setMode]=useState<'member'|'faction'|'mandate'>('member');
  const [institution,setInstitution]=useState('all'),[quorumValue,setQuorumValue]=useState(0.5),[majorityKind,setMajorityKind]=useState<'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction'>('present_majority'),[majorityValue,setMajorityValue]=useState(0.5);
@@ -115,7 +115,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
 
 
   <input className="civicVoteSearch" aria-label="Поиск голосований" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Поиск по вопросу, органу или группе"/>
-  <div className="voteTabs"><button className={tab==='open'?'active':''} onClick={()=>setTab('open')}>Открытые <span>{openCount}</span></button><button className={tab==='closed'?'active':''} onClick={()=>setTab('closed')}>Завершённые</button><button className={tab==='all'?'active':''} onClick={()=>setTab('all')}>Все</button></div>
+  <div className="voteTabs"><button className={tab==='open'?'active':''} onClick={()=>{onClearFocus?.();setTab('open')}}>Открытые <span>{openCount}</span></button><button className={tab==='closed'?'active':''} onClick={()=>{onClearFocus?.();setTab('closed')}}>Завершённые</button><button className={tab==='all'?'active':''} onClick={()=>{onClearFocus?.();setTab('all')}}>Все</button></div>
 
   <div className="proceduralVoteList">{visible.length===0?<div className="emptyState">В этой категории голосований пока нет.</div>:visible.map(v=>{
    const t=tally(v),q=quorum(v,checkedIn),my=ballots.find(b=>b.vote_id===v.id&&b.voter_id===me?.user_id);
