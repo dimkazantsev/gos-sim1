@@ -5,7 +5,8 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import type {Vote} from './types';
 import StyledSelect from '../ui/StyledSelect';
 import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
-import {institutionLabel,majorityLabel} from './proceduralVoting';
+import FormalDocumentPicker from './FormalDocumentPicker';
+import {votePresetForDocument,institutionLabel,majorityLabel} from './proceduralVoting';
 import VoteBallotControls from './VoteBallotControls';
 import {VOTING_BODIES,type VotingUnit} from './votingBodies';
 
@@ -19,6 +20,9 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
  const [tab,setTab]=useState<'open'|'closed'|'all'>('open'),[busy,setBusy]=useState('');
  const [group,setGroup]=useState(''),[query,setQuery]=useState(''),[units,setUnits]=useState<VotingUnit[]>([]);
  const groups=[...new Set(members.filter(m=>m.kind==='student').map(m=>m.group_name).filter((s):s is string=>!!s))];
+ const [formalId,setFormalId]=useState('');
+ const selectedNpa=formalDocuments.find(d=>d.id===formalId);
+ const pendingNpas=formalDocuments.filter(d=>votePresetForDocument(d)&&!votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open'));
  const focused=useRef('');
  useEffect(()=>{if(focusId)setTab('all')},[focusId]);
  useEffect(()=>{if(!focusId||focused.current===focusId)return;const node=document.getElementById('vote-'+focusId);if(node){focused.current=focusId;node.scrollIntoView({block:'start',behavior:'smooth'});node.focus({preventScroll:true})}},[focusId,tab,votes]);
@@ -46,9 +50,13 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
  const visible=useMemo(()=>votes.filter(v=>(tab==='all'||v.status===tab)&&(!query.trim()||[v.title,institutionLabel(v.institution_key),v.group_name,v.electorate_snapshot?.institution_label].join(' ').toLowerCase().includes(query.trim().toLowerCase()))),[votes,tab,query]);
  const openCount=votes.filter(v=>v.status==='open').length;
 
+ async function openNpa(id:string){const d=formalDocuments.find(d=>d.id===id),preset=d?votePresetForDocument(d):null;if(!d||!preset)return;setBusy(id);try{await createVote({...preset,formalDocumentId:id,groupName:group||null})}finally{setBusy('')}}
+ function chooseNpa(ids:string[]){setFormalId(ids[0]||'');const d=formalDocuments.find(d=>d.id===ids[0]);if(d){const preset=votePresetForDocument(d);setTitle(preset?.title||d.title);setBody(d.body_text||preset?.body||'');if(preset){setInstitution(preset.institutionKey);setMode(preset.mode);setQuorumValue(preset.quorumValue);setMajorityKind(preset.majorityKind);setMajorityValue(preset.majorityValue)}}}
  async function create(){
-  const ok=await createVote({title,body,mode,institutionKey:institution,procedureKey:!['all','factions'].includes(institution)?'registered_session':'manual',quorumKind:'fraction',quorumValue,majorityKind,majorityValue,allowAbstain:true,tieBreakerChair:institution==='government',groupName:group||null});
-  if(ok){setTitle('');setBody('')}
+  if(selectedNpa){const preset=votePresetForDocument(selectedNpa);if(preset){const ok=await createVote({...preset,title:title||preset.title,body:body||preset.body,formalDocumentId:formalId,groupName:group||null});if(ok){setTitle('');setBody('');setFormalId('')}return}}
+
+  const ok=await createVote({title,body,mode,institutionKey:institution,procedureKey:!['all','factions'].includes(institution)?'registered_session':'manual',quorumKind:'fraction',quorumValue,majorityKind,majorityValue,allowAbstain:true,tieBreakerChair:institution==='government',formalDocumentId:formalId||null,groupName:group||null});
+  if(ok){setTitle('');setBody('');setFormalId('')}
  }
 
  function canClose(v:Vote){
@@ -69,10 +77,11 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
   </section>
 
   {teacher&&<details className="teacherDetails voteManual">
-   <summary><div><b>Открыть отдельное голосование</b><span>Для вопросов, не привязанных к конкретному НПА</span></div><i>+</i></summary>
+   <summary><div><b>Открыть отдельное голосование</b><span>Самостоятельный вопрос или документ из реестра НПА</span></div><i>+</i></summary>
    <div className="teacherDetailsBody">
     <div className="voteBuilder modern">
      <input aria-label="Вопрос голосования" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Вопрос голосования"/>
+     <FormalDocumentPicker documents={formalDocuments} value={formalId?[formalId]:[]} onChange={chooseNpa} multiple={false}/>
      <textarea aria-label="Проект решения" value={body} onChange={e=>setBody(e.target.value)} placeholder="Проект решения / пояснение"/>
      <div className="voteBuilderGrid">
       <StyledSelect label="Кто голосует" value={institution} onChange={key=>{setInstitution(key);setMode(key==='gd'?'mandate':'member');setQuorumValue(VOTING_BODIES.find(b=>b.key===key)?.quorum||.5);setMajorityKind(key==='gd'?'eligible_majority':'present_majority')}} options={[{value:'all',label:'Все участники'},{value:'factions',label:'Фракции'},...VOTING_BODIES.map(b=>({value:b.key,label:b.title})),...units.map(u=>({value:'unit:'+u.id,label:u.title}))]}/>
@@ -91,6 +100,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
    </div>
   </details>}
 
+  <section className="npaVoteQueue"><header><h2>НПА, ожидающие голосования</h2><span>{pendingNpas.length}</span></header><p>Документы появляются здесь автоматически при переходе на стадию голосования. Правила процедуры берутся из документа.</p>{pendingNpas.map(d=>{const preset=votePresetForDocument(d)!;return <article key={d.id}><div><small>{d.registry_no} · {d.status_label}</small><b>{d.title}</b><span>{institutionLabel(preset.institutionKey)}</span></div><button className="secondary" onClick={()=>onOpenDocument(d.id)}>Открыть НПА</button><button className="primary" disabled={busy===d.id} onClick={()=>void openNpa(d.id)}>{busy===d.id?'Открывается…':'Открыть голосование'}</button></article>})}{!pendingNpas.length&&<span>Сейчас нет документов на стадии голосования.</span>}</section>
   <InstitutionRegistrationPanel g={g} onUnitsChange={setUnits}/>
   <section className="votesOverview">
    <article><small>ВСЕГО</small><strong>{votes.length}</strong><span>процедур</span></article>
