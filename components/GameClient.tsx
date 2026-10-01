@@ -22,6 +22,7 @@ import RepublicComic from './game/RepublicComic';
 import {useIntroProgress} from './game/introProgress';
 import ChatPanel from './game/ChatPanel';
 import EventWorkspace from './game/EventWorkspace';
+import {useSectionUpdates} from './game/useSectionUpdates';
 import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
 import {useSavedGameState,savedString} from './game/useSavedGameState';
@@ -202,6 +203,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
  const [pendingEvents,setPendingEvents]=useState(0);
+ const sectionUpdates=useSectionUpdates(gameId,g.me?.user_id,view,!!viewAs);
+ const sectionBadge=(key:string)=>Math.min(999,Math.max(sectionUpdates[key]||0,key==='events'?pendingEvents:0));
  const [selectedProfileId,setSelectedProfileId]=useSavedGameState(gameId,g.me?.user_id,'profile-selected','',savedString);
  const [completingProfile,setCompletingProfile]=useState(false);
  const [onboardingNotice,setOnboardingNotice]=useState('');
@@ -361,7 +364,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const mobilePrimary:View[]=teacher&&!previewMode?['teacher','dashboard','stages','votes']:['dashboard','stages','parties','votes'];
  const mobileSecondary=nav.filter(([k])=>!mobilePrimary.includes(k));
  const dockShortLabels:Record<View,string>={dashboard:'Обзор',stages:'Этапы',actions:'Процессы',parties:'Партии',votes:'Голоса',documents:'НПА',grades:'Оценки',events:'События',teacher:'Пульт',profile:'Профиль'};
- const dockItems=[...mobilePrimary,...mobileSecondary.map(([k])=>k)].map(key=>({key,label:nav.find(([k])=>k===key)![1],shortLabel:dockShortLabels[key],icon:key==='events'&&pendingEvents>0?<span className="eventDockIcon">{navIcon(key)}<i className="eventDockBadge">{pendingEvents}</i></span>:navIcon(key)}));
+ const dockItems=[...mobilePrimary,...mobileSecondary.map(([k])=>k)].map(key=>({key,label:nav.find(([k])=>k===key)![1],shortLabel:dockShortLabels[key],icon:sectionBadge(key)>0?<span className="eventDockIcon">{navIcon(key)}<i className="eventDockBadge">{sectionBadge(key)}</i></span>:navIcon(key)}));
 
  function sidebarKeys(){return [...sidebarOrder,...nav.map(x=>x[0]).filter(x=>!sidebarOrder.includes(x))].filter(x=>nav.some(n=>n[0]===x))}
  function reorderSidebar(from:string,to:string){
@@ -388,7 +391,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <div className="focusNavInner">
      {[...nav].sort((a,b)=>{const rank=(key:string)=>sidebarOrder.includes(key)?sidebarOrder.indexOf(key):sidebarOrder.length+nav.findIndex(x=>x[0]===key);return rank(a[0])-rank(b[0])}).map(([k,label])=><button key={k} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();const from=sidebarDrag.current;if(from)reorderSidebar(from,k);sidebarDrag.current=''}} className={view===k?'active':''} onClick={()=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} aria-current={view===k?'page':undefined}>
       <span className="sidebarDragHandle" draggable tabIndex={0} role="button" aria-label={'Переместить раздел «'+label+'». Стрелки вверх и вниз меняют порядок.'} title="Перетащите для изменения порядка" onClick={e=>e.stopPropagation()} onDragStart={e=>{sidebarDrag.current=k;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',k)}} onDragEnd={()=>{sidebarDrag.current=''}} onKeyDown={e=>{if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;e.preventDefault();e.stopPropagation();const order=sidebarKeys(),i=order.indexOf(k),to=i+(e.key==='ArrowUp'?-1:1);if(to>=0&&to<order.length)reorderSidebar(k,order[to])}}><GripVertical size={15} aria-hidden="true"/></span>
-      {navIcon(k)}<span className="sidebarRouteLabel">{label}</span>{k==='events'&&pendingEvents>0&&<i className="navBadge">{pendingEvents}</i>}{k==='votes'&&g.votes.some(v=>v.status==='open')&&<i className="navBadge">{g.votes.filter(v=>v.status==='open').length}</i>}</button>)}
+      {navIcon(k)}<span className="sidebarRouteLabel">{label}</span>{sectionBadge(k)>0&&<i className="navBadge" aria-label={'Новых: '+sectionBadge(k)}>{sectionBadge(k)}</i>}</button>)}
     </div>
    </nav>
 
