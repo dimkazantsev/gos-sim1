@@ -22,6 +22,7 @@ import RepublicComic from './game/RepublicComic';
 import {useIntroProgress} from './game/introProgress';
 import ChatPanel from './game/ChatPanel';
 import EventWorkspace from './game/EventWorkspace';
+import BudgetView from './game/BudgetView';
 import {useSectionUpdates} from './game/useSectionUpdates';
 import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
@@ -29,7 +30,7 @@ import {useSavedGameState,savedString} from './game/useSavedGameState';
 
 const GENERIC_STUDENT='__generic_student_preview__';
 type ScreenLocation={view:View;stageNo:number;documentId:string;voteId?:string};
-const SCREEN_VIEWS=['dashboard','stages','parties','votes','documents','grades','actions','profile','events','teacher'];
+const SCREEN_VIEWS=['dashboard','stages','parties','votes','documents','grades','actions','profile','events','teacher','budget'];
 function validScreenHistory(value:unknown){
  if(!value||typeof value!=='object')return false;
  const history=value as {entries?:ScreenLocation[];index?:number};
@@ -339,7 +340,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
  useEffect(()=>{
   if(!me||previewMode||me.kind==='observer')return;
-  const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политический процесс',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Event · ситуации'};
+  const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политический процесс',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Event · ситуации',budget:'Бюджет'};
   void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
   const id=setInterval(()=>void touchPresence(view),30000);
   return()=>clearInterval(id);
@@ -355,7 +356,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
  if(loading||!game||!me||!shownMe)return <main className="connectionPage"><section className="connectionCard" aria-live="polite"><span className="wordmark">GOS//SIMS</span>{!error&&<div className="spinner"/>}<h1>{error?'Не удалось открыть игру':'Подключаемся к республике'}</h1><p>{error||'Загружаем этапы, команды и последние решения.'}</p>{error&&<div><button className="primary" onClick={()=>window.location.reload()}>Попробовать снова</button><a className="secondary" href="/">Вернуться ко входу</a></div>}</section></main>;
 
- const nav:[View,string][]=[['dashboard','Обзор игры'],['stages','Этапы и задачи'],['actions','Политический процесс'],['parties',teacher&&!previewMode?'Партии':'Моя партия'],['votes','Голосования'],['documents','Реестр НПА'],['grades','Оценки и разбор'],['events','События и ситуации'],...(teacher&&!previewMode?[['teacher','Управление'] as [View,string]]:[]),['profile','Мой профиль']];
+ const nav:[View,string][]=[['dashboard','Обзор игры'],['stages','Этапы и задачи'],['actions','Политический процесс'],['parties',teacher&&!previewMode?'Партии':'Моя партия'],['votes','Голосования'],['documents','Реестр НПА'],['budget','Бюджет'],['grades','Оценки и разбор'],['events','События и ситуации'],...(teacher&&!previewMode?[['teacher','Управление'] as [View,string]]:[]),['profile','Мой профиль']];
 
  const navIcon=(key:View)=>{
   const P=key==='events'?CalendarDays:key==='teacher'?Settings2:key==='dashboard'?LayoutDashboard:key==='actions'?Radio:key==='parties'?Landmark:key==='votes'?VoteIcon:key==='documents'?FileText:key==='stages'?BookOpenText:key==='grades'?GraduationCap:UserRound;
@@ -363,7 +364,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  };
  const mobilePrimary:View[]=teacher&&!previewMode?['teacher','dashboard','stages','votes']:['dashboard','stages','parties','votes'];
  const mobileSecondary=nav.filter(([k])=>!mobilePrimary.includes(k));
- const dockShortLabels:Record<View,string>={dashboard:'Обзор',stages:'Этапы',actions:'Процессы',parties:'Партии',votes:'Голоса',documents:'НПА',grades:'Оценки',events:'События',teacher:'Пульт',profile:'Профиль'};
+ const dockShortLabels:Record<View,string>={dashboard:'Обзор',stages:'Этапы',actions:'Процессы',parties:'Партии',votes:'Голоса',documents:'НПА',grades:'Оценки',events:'События',budget:'Бюджет',teacher:'Пульт',profile:'Профиль'};
  const dockItems=[...mobilePrimary,...mobileSecondary.map(([k])=>k)].map(key=>({key,label:nav.find(([k])=>k===key)![1],shortLabel:dockShortLabels[key],icon:sectionBadge(key)>0?<span className="eventDockIcon">{navIcon(key)}<i className="eventDockBadge">{sectionBadge(key)}</i></span>:navIcon(key)}));
 
  function sidebarKeys(){return [...sidebarOrder,...nav.map(x=>x[0]).filter(x=>!sidebarOrder.includes(x))].filter(x=>nav.some(n=>n[0]===x))}
@@ -454,6 +455,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {view==='stages'&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onOpenVotes={()=>navigate('votes')}/>}
      {view==='parties'&&<PartiesView g={vg}/>}
      {view==='votes'&&<VotesView g={vg} focusId={currentScreen.voteId} onClearFocus={clearVoteFocus} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
+     {view==='budget'&&<BudgetView g={vg} readOnly={previewMode||observer} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenEvents={()=>navigate('events')}/>}
      {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} onSelectDocument={rememberDocument} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
      {view==='grades'&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
      {view==='actions'&&<PoliticalWallView g={vg} readOnly={previewMode||observer} focusPending={true} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
