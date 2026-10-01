@@ -1,0 +1,31 @@
+name: Workspace code checkpoint
+on:
+  push:
+    branches: ['codex/civic-*']
+permissions:
+  contents: read
+jobs:
+  archive:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: civic-source-checkpoint
+          retention-days: 7
+          path: |
+            app/
+            components/
+            lib/
+            data/
+            content/
+            scripts/
+            docs/
+            supabase/
+            package.json
+            package-lock.json
+            public-client-config.json
+            tsconfig.json
+            next.config.ts
+            next-env.d.ts
+            AGENTS.md
