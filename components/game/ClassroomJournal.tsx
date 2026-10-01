@@ -1,24 +1,28 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
-import {Activity,ArrowDownWideNarrow,Download,Search,UsersRound} from 'lucide-react';
+import {Activity,ArrowDownWideNarrow,Download,Search,Trash2,UsersRound} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 const VIEW_NAMES:Record<string,string>={
  dashboard:'Обзор игры',stages:'Этапы',parties:'Партии',votes:'Голосования',
- documents:'НПА',actions:'Политические процессы',grades:'Оценки',
+ documents:'НПА',actions:'Политический процесс',grades:'Оценки',
  profile:'Профиль',teacher:'Управление',events:'События и решения',chat:'Командный чат'
 };
 type Sort='recent'|'oldest'|'name'|'surname'|'online';
 type Scope='all'|'mine';
 export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const {me,game,members,activities,presence,teacher}=g;
+ const cutoff=typeof game?.settings?.classroom_journal_cleared_at==='string'?game.settings.classroom_journal_cleared_at:'';
+ const [clearing,setClearing]=useState(false);
+ async function clearHistory(){if(!game||!teacher||clearing||!confirm('Очистить видимую историю журнала? Оценки и подтверждённые действия сохранятся.'))return;setClearing(true);setOlderError('');try{const r=await supabase.rpc('clear_classroom_journal',{p_game_id:game.id});if(r.error)setOlderError(userError(r.error));else{setOlder([]);await g.refresh()}}catch(e){setOlderError(userError(e))}finally{setClearing(false)}}
  const [older,setOlder]=useState<typeof activities>([]);
  const [olderBusy,setOlderBusy]=useState(false);
  const [olderExhausted,setOlderExhausted]=useState(false);
  const [olderError,setOlderError]=useState('');
- useEffect(()=>{setOlder([]);setOlderExhausted(false);setOlderError('')},[game?.id,me?.user_id]);
+ useEffect(()=>{setOlder([]);setOlderExhausted(false);setOlderError('')},[game?.id,me?.user_id,cutoff]);
  const loaded=useMemo(()=>[...new Map<number,(typeof activities)[number]>([...activities,...older].map(a=>[a.id,a] as const)).values()],[activities,older]);
  async function loadOlder(){
   if(!game||olderBusy||olderExhausted)return;
@@ -26,7 +30,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   if(!earliest){setOlderExhausted(true);return}
   setOlderBusy(true);setOlderError('');
   const r=await supabase.from('game_activity').select('*').eq('game_id',game.id)
-   .lt('created_at',earliest).order('created_at',{ascending:false}).limit(250);
+   .lt('created_at',earliest).gte('created_at',cutoff||'1970-01-01').order('created_at',{ascending:false}).limit(250);
   if(r.error)setOlderError(r.error.message);
   else{
    const page=(r.data||[]) as typeof activities;
@@ -46,7 +50,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const studentMembers=members.filter(m=>m.kind==='student');
  const lastMap=new Map(studentMembers.map(m=>[m.user_id,presence.find(p=>p.user_id===m.user_id)]));
  const isOnline=(id:string)=>{const p=lastMap.get(id);return !!p&&Date.now()-new Date(p.last_seen_at).getTime()<90000};
- const allowed=useMemo(()=>loaded.filter(a=>teacher||a.actor_id===me?.user_id),[loaded,teacher,me?.user_id]);
+ const allowed=useMemo(()=>loaded.filter(a=>(!cutoff||a.created_at>cutoff)&&(teacher||a.actor_id===me?.user_id)),[loaded,teacher,me?.user_id,cutoff]);
  const visible=useMemo(()=>{
   const q=search.trim().toLocaleLowerCase('ru');
   const xs=allowed.filter(a=>{
@@ -85,6 +89,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
     <p>{teacher?'Участники, текущий раздел и история действий в одном месте.':'Ваши действия и переходы по разделам игры.'}</p></div>
    <div className="journalCounters"><span><UsersRound size={16} aria-hidden="true"/>{teacher?onlineCount+' онлайн':'Личный журнал'}</span>
     <span><Activity size={16} aria-hidden="true"/>{visible.length} записей</span>
+    {teacher&&<button type="button" disabled={clearing} onClick={()=>void clearHistory()} title="Сбросить видимую историю, сохранив данные оценивания"><Trash2 size={16} aria-hidden="true"/>{clearing?'Очистка…':'Очистить историю'}</button>}
     <button type="button" onClick={exportCsv} title="Экспорт показанных строк в CSV"><Download size={16} aria-hidden="true"/> CSV</button>
    </div>
   </header>
