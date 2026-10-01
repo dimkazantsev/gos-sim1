@@ -25,6 +25,7 @@ import SystemDebriefLab from './SystemDebriefLab';
 import LegislativeSessionLab from './LegislativeSessionLab';
 import GovernmentProgramSessionLab from './GovernmentProgramSessionLab';
 import CrisisRoom from './CrisisRoom';
+import StageArtifacts from './StageArtifacts';
 import StageReadinessPanel from './StageReadinessPanel';
 import {useSavedGameState} from './useSavedGameState';
 
@@ -32,7 +33,7 @@ import {useSavedGameState} from './useSavedGameState';
 const STAGE_ICONS=[UsersRound,SlidersHorizontal,Map,Landmark,UserRoundX,ClipboardCheck,Vote,Building2,Network,Target,ClipboardList,Scale,Wallet,MapPin,ShieldAlert,ChartNoAxesCombined] as const;
 type StageFilter='all'|'open'|'voting'|'completed'|'locked';
 
-export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;focusStageNo?:number;readOnly?:boolean}){
+export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:import('./types').View)=>void;focusStageNo?:number;readOnly?:boolean}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
  const [selectedStageNo,setSelectedStageNo]=useSavedGameState(g.game?.id,g.me?.user_id,'stage-selected',0,value=>Number.isInteger(value)&&Number(value)>=0&&Number(value)<=16);
  const selected=stages.find(s=>s.stage_no===selectedStageNo)||null;
@@ -293,6 +294,7 @@ export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}
 
      <fieldset className="labControls" disabled={readOnly}><legend className="srOnly">Рабочие действия этапа</legend>{readOnly&&<p className="readOnlyNote">Просмотр интерфейса участника. Рабочие действия доступны в его собственной сессии.</p>}
      <DeadlineControl g={g} stageNo={selected.stage_no}/>
+     <StageArtifacts g={g} stage={selected} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>
 
      {(selected.stage_no===2||selected.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={selected.stage_no as 2|3} onOpenVotes={onOpenVotes}/>} 
 
