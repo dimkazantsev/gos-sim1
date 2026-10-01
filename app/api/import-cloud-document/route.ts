@@ -4,7 +4,7 @@ import {extractText} from 'unpdf';
 import mammoth from 'mammoth';
 import config from '@/public-client-config.json';
 export const runtime='nodejs';
-function cors(request:Request){const origin=request.headers.get('origin');return origin==='https://dimkazantsev.github.io'?{'Access-Control-Allow-Origin':origin,'Vary':'Origin'}:{}}
+function cors(request:Request):Record<string,string>{const origin=request.headers.get('origin');return origin==='https://dimkazantsev.github.io'?{'Access-Control-Allow-Origin':origin,'Vary':'Origin'}:{}}
 export async function OPTIONS(request:Request){return new Response(null,{status:204,headers:{...cors(request),'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Authorization, Content-Type'}})}
 const allowed=(hostname:string)=>hostname==='docs.google.com'||hostname==='drive.google.com'||hostname==='cloud-api.yandex.net'||hostname.endsWith('.googleusercontent.com')||hostname.endsWith('.yandex.net')||hostname.endsWith('.yandex.ru')||hostname.endsWith('.yandex.com');
 async function boundedFetch(raw:string){
