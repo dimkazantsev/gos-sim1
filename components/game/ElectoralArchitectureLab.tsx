@@ -37,7 +37,7 @@ function quotaAllocate(values:number[],seats:number,method:'hare'|'droop'){
  return out;
 }
 function allocate(values:number[],seats:number,method:PRule['allocation_method']){
- if(!method)return values.map(()=>0);
+ if(!method||seats<=0||values.reduce((n,v)=>n+v,0)<=0)return values.map(()=>0);
  if(method==='hare'||method==='droop')return quotaAllocate(values,seats,method);
  return divisorAllocate(values,seats,method);
 }

@@ -152,7 +152,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
        const effective=rows.reduce((a,x)=>a+x.effective_mandates,0);
        return <article key={p.id}>
         <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{base} мандатов · {effective} доступно{p.ghost_active?' · GV −'+p.ghost_loss_current:''}{p.representation_penalty?' · Потеря мест −'+p.representation_penalty:''}</small></div></header>
-        <div>{rows.map(a=>{const m=members.find(x=>x.user_id===a.user_id);return <div className="deputyStudentRow" key={a.user_id}><b>{m?.full_name||'Участник'}</b><span>{a.base_mandates} манд.</span>{a.ghost_loss?<em>−{a.ghost_loss} GV</em>:<em>—</em>}{!!a.representation_loss&&<em>−{a.representation_loss} мест</em>}<strong>{a.effective_mandates} голосов {v.procedure_key==='registered_session'?(checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)?'· На заседании':'· Не зарегистрирован'):''}</strong></div>})}</div>
+        <div>{rows.map(a=>{const m=members.find(x=>x.user_id===a.user_id);return <div className="deputyStudentRow" key={a.user_id}><b>{m?.full_name||'Участник'}</b><span>{a.base_mandates} манд.</span><em>{[a.ghost_loss?'−'+a.ghost_loss+' GV':'',a.representation_loss?'−'+a.representation_loss+' мест':''].filter(Boolean).join(' · ')||'—'}</em><strong>{a.effective_mandates} голосов {v.procedure_key==='registered_session'?(checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)?'· На заседании':'· Не зарегистрирован'):''}</strong></div>})}</div>
        </article>
       })}
      </div>
