@@ -62,7 +62,7 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  async function record(){
   if(!game||(!partyId&&!userId)||note.trim().length<5)return;
   const requiresMagnitude=kind!=='other';
-  if(requiresMagnitude&&(!magnitude||Number(magnitude)<=0))return;
+  if(requiresMagnitude&&(!magnitude||!Number.isFinite(Number(magnitude))||Number(magnitude)<=0))return;
   setBusy(true);
   const r=await supabase.rpc('record_deadline_consequence',{
    p_game_id:game.id,p_stage_no:stageNo,p_party_id:partyId||null,p_user_id:userId||null,
@@ -88,12 +88,12 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
    <summary><div><b>Зафиксировать нарушение и последствие</b><span>Число задаёт преподаватель только там, где правила игры не дают фиксированной величины.</span></div><i>+</i></summary>
    <div className="deadlineApplyGrid">
     <label>Партия<select value={partyId} onChange={e=>{setPartyId(e.target.value);if(e.target.value)setUserId('')}}><option value="">Не выбрана</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-    <label>Студент<select value={userId} onChange={e=>{setUserId(e.target.value);if(e.target.value)setPartyId('')}}><option value="">Не выбран</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>
-    <label>Тип последствия<select value={kind} onChange={e=>setKind(e.target.value as keyof typeof CONSEQUENCES)}>{Object.entries(CONSEQUENCES).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select></label>
-    {kind!=='other'&&<label>Величина<input type="number" min="0.1" step={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} value={magnitude} onChange={e=>setMagnitude(e.target.value)} placeholder={guide.unit}/></label>}
+    <label>Студент · индивидуальная запись<select value={userId} onChange={e=>{setUserId(e.target.value);if(e.target.value){setPartyId('');setKind('other')}}}><option value="">Не выбран</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>
+    <label>Тип последствия<select value={kind} onChange={e=>{setKind(e.target.value as keyof typeof CONSEQUENCES);if(e.target.value!=='other')setUserId('')}}>{Object.entries(CONSEQUENCES).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select></label>
+    {kind!=='other'&&<label>Величина<input type="number" min={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} max={kind==='representation_loss'?450:kind==='regional_seat_loss'?89:kind==='presidential_rating_loss'?100:undefined} step={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} value={magnitude} onChange={e=>setMagnitude(e.target.value)} placeholder={guide.unit}/></label>}
     <label className="deadlineReason">Основание<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Что именно не выполнено в установленный срок и почему применяется это последствие?"/></label>
     <div className="deadlineGuide"><b>{guide.label}</b><p>{guide.hint}</p></div>
-    <button className="primary" disabled={busy||(!partyId&&!userId)||note.trim().length<5||(kind!=='other'&&Number(magnitude)<=0)} onClick={()=>void record()}>Зафиксировать последствие</button>
+    <button className="primary" disabled={busy||(!partyId&&!userId)||note.trim().length<5||(kind!=='other'&&(!partyId||!Number.isFinite(Number(magnitude))||Number(magnitude)<=0))} onClick={()=>void record()}>Зафиксировать последствие</button>
    </div>
   </details>}
  </section>;

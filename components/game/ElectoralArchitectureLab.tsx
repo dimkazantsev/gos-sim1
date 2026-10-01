@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 
@@ -94,12 +94,12 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const regionRows=adoptedR?allocations.filter(x=>x.rule_id===adoptedR.id):[];
  const totalAgreement=regionRows.reduce((a,x)=>a+Number(x.regions||0),0);
 
- const preview=useMemo(()=>{
+ const preview=(()=>{
   const values=parties.map(p=>Math.max(0,Number(support[p.id])||0));
   const seats=system==='mixed'?Math.round(450*propShare/100):system==='proportional'?450:0;
   const result=seats>0?allocate(values,seats,method):values.map(()=>0);
   return parties.map((p,i)=>({party:p,seats:result[i]}));
- },[parties,support,system,method,propShare]);
+ })();
 
  async function proposeP(){
   setBusy(true);const r=await supabase.rpc('propose_parliamentary_election_rule',{p_game_id:activeGame.id,p_system_type:system,p_allocation_method:system==='majoritarian'?null:method,p_majoritarian_method:system==='proportional'?null:majority,p_proportional_share:system==='mixed'?propShare:null,p_rationale:rationale.trim()||null});
