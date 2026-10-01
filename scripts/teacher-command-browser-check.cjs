@@ -62,7 +62,8 @@ async function check(){
    assert.equal(await frame.locator('.teacherWorkspaceNav [role=tab]').count(),9,'Nine workspaces required');
    if(screen==='teacher-journal'){
     assert((await frame.locator('.journalToolbar .styledSelect').count())>=2,'Participant and section journal filters missing');
-    assert.equal(await frame.locator('.journalCounters button').count(),1,'Journal CSV export missing');
+    assert.equal(await frame.locator('.journalCounters button[title="Экспорт показанных строк в CSV"]').count(),1,'Journal CSV export missing');
+    assert.equal(await frame.getByRole('button',{name:'Очистить историю',exact:true}).count(),1,'Teacher journal clear control missing');
    }
    if(screen==='teacher-analytics'){
     assert.equal(await frame.locator('.participantsTable').count(),1,'Participant table missing');

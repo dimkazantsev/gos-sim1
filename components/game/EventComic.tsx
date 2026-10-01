@@ -100,6 +100,6 @@ export default function EventComic({title,category,caseKey,compact=false,silent=
  <path d="M0 1H680V350H0Z" fill="none" stroke="#fff" strokeOpacity=".23" strokeWidth="11"/>
  </svg>
  <div className="eventComicCaption"><span>GOS//SIMS</span><strong>{title}</strong><small>Авторская иллюстрация учебного сценария</small></div>
- </div><ComicSoundButton/></div>;
+ </div>{!silent&&<ComicSoundButton/>}</div>;
 }
 
