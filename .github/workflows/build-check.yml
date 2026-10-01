@@ -21,6 +21,7 @@ jobs:
           cache-dependency-path: package.json
       - run: npm install
       - run: npm run typecheck
+      - run: node scripts/user-error-check.cjs
       - run: node scripts/intro-refresh-check.cjs
       - run: npm run design:check
       - run: node scripts/interface-contract-check.cjs

@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript');
+const exportsObject={};
+const code=ts.transpileModule(fs.readFileSync('lib/userError.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+new Function('exports',code)(exportsObject);
+const e=exportsObject.userError;
+assert.equal(e({message:'Invalid login credentials'}),'Неверный адрес почты или пароль.');
+assert.equal(e(new Error('Failed to fetch')),'Нет ответа от сервера. Проверьте соединение и повторите попытку.');
+assert.equal(e({message:'Allowed role is Министр финансов'}),'Не удалось выполнить действие. Обновите данные и повторите попытку.');
+assert.equal(e({message:'Candidate dossier is incomplete: Не принят документ: согласие'}),'Пакет кандидата не готов к регистрации. Не принят документ: согласие');
+assert.equal(e({message:'Не принят документ: согласие кандидата'}),'Не принят документ: согласие кандидата');
+assert(!/[a-z]/i.test(e({message:'syntax error at SQLSTATE 42601'})));
+console.log('PASS Russian login/network messages, mixed-language exceptions, candidate dossier context, no SQL traces');
