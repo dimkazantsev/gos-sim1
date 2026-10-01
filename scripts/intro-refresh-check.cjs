@@ -33,8 +33,8 @@ function harness(g,storage=new Map(),rpc=async()=>({error:null})){
   if(request==='@/lib/supabase')return{supabase};
   if(request==='./ui/useDialog')return{useDialog:()=>({current:null})};
   if(request==='./game/constants')return{initials:()=> 'ТУ'};
-  if(request==='./game/introProgress'){
-   if(!loaded.has(request)){const file=path.join(root,'components/game/introProgress.ts');const m={exports:{}};const js=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;vm.runInContext('(function(require,module,exports){'+js+'\n})',context)(requireFor,m,m.exports);loaded.set(request,m.exports);}
+  if(request==='./game/introProgress'||request==='./game/useSavedGameState'){
+   if(!loaded.has(request)){const file=path.join(root,'components',request.slice(2)+'.ts');const m={exports:{}};const js=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;vm.runInContext('(function(require,module,exports){'+js+'\n})',context)(requireFor,m,m.exports);loaded.set(request,m.exports);}
    return loaded.get(request);
   }
   return new Proxy({__esModule:true,default:tag(path.basename(request))},{get:(object,key)=>key in object?object[key]:tag(String(key))});
@@ -44,7 +44,8 @@ function harness(g,storage=new Map(),rpc=async()=>({error:null})){
  function render(){cursor=0;dirty=false;tree=module.exports.default({gameId:g.game?.id||'game-a'});while(pending.length)pending.shift()();return tree;}
  async function flush(){for(let i=0;i<12;i++){render();await Promise.resolve();await Promise.resolve();await Promise.resolve();if(!dirty)break;}return tree;}
  function findComic(node){if(!node||typeof node!=='object')return null;if(node.type?.displayName==='RepublicComic')return node;for(const child of [node.props?.children].flat(Infinity)){const found=findComic(child);if(found)return found;}return null;}
- return {g,storage,flush,comic:()=>findComic(tree),online:()=>listeners.get('online')?.(),dispose(){for(const s of slots)s?.cleanup?.();}};
+ function findComponent(node,name){if(!node||typeof node!=='object')return null;if(node.type?.displayName===name)return node;for(const child of [node.props?.children].flat(Infinity)){const found=findComponent(child,name);if(found)return found}return null}
+ return {g,storage,flush,comic:()=>findComic(tree),find:name=>findComponent(tree,name),online:()=>listeners.get('online')?.(),dispose(){for(const s of slots)s?.cleanup?.();}};
 }
 async function main(){
  const failures=[];
@@ -67,6 +68,15 @@ async function main(){
   for(const other of [gameState('other-user')]){const fresh=harness(other,storage);await fresh.flush();assert.equal(fresh.comic().props.open,true);fresh.dispose();}
  });
  await check('Guest never receives the automatic intro',async()=>{const g=gameState();g.me.kind='observer';const h=harness(g);await h.flush();assert.equal(h.comic().props.open,false);h.dispose();});
+ await check('Refresh restores the selected section and a document target for the same member',async()=>{
+  const storage=new Map([['gos-sims:section:game-a:user-a:navigation',JSON.stringify({entries:[{view:'documents',stageNo:0,documentId:'qa-document'}],index:0})]]);
+  const g=gameState();g.profiles=[{user_id:'user-a',onboarding_completed_at:'2026-09-30T00:00:00Z'}];const h=harness(g,storage);await h.flush();assert.equal(h.find('DocumentsView').props.focusId,'qa-document');h.dispose();
+  const refreshed=harness(g,storage);await refreshed.flush();assert.equal(refreshed.find('DocumentsView').props.focusId,'qa-document');refreshed.dispose();
+  const other=gameState('user-b');other.profiles=[{user_id:'user-b',onboarding_completed_at:'2026-09-30T00:00:00Z'}];const isolated=harness(other,storage);await isolated.flush();assert.equal(isolated.find('DocumentsView'),null);assert(isolated.find('DashboardView'));isolated.dispose();
+ });
+ await check('Malformed saved navigation returns to a valid screen',async()=>{
+  const g=gameState();g.profiles=[{user_id:'user-a',onboarding_completed_at:'2026-09-30T00:00:00Z'}];const storage=new Map([['gos-sims:section:game-a:user-a:navigation','{"entries":[],"index":999}']]);const h=harness(g,storage);await h.flush();assert(h.find('DashboardView'));h.dispose();
+ });
  if(failures.length)process.exitCode=1;
 }
 main().catch(error=>{console.error(error);process.exitCode=1});
