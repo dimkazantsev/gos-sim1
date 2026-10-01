@@ -12,5 +12,5 @@ export const VOTING_BODIES:VotingBody[]=[
  {key:'central_bank',title:'Совет директоров Банка России',role:/центральн.*банк|банк.*россии/i,quorum:.5,basis:'Учебный состав и настраиваемый порог заседания.'},
  {key:'accounts',title:'Коллегия Счётной палаты',role:/сч[её]тн.*палат/i,quorum:2/3,basis:'Учебный состав коллегии; не менее двух третей.'}
 ];
-export type VotingUnit={id:string;title:string;unit_kind:string;head_user_id:string|null;unit_key:string};
+export type VotingUnit={mandate_capacity?:number;id:string;title:string;unit_kind:string;head_user_id:string|null;unit_key:string};
 export function bodyQuorum(key:string,total:number,fraction?:number){const body=VOTING_BODIES.find(b=>b.key===key),value=fraction??body?.quorum??.5;return body?.strictHalf&&Math.abs(value-.5)<.000001?Math.floor(total/2)+1:Math.ceil(total*value-1e-9)}

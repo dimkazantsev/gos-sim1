@@ -68,14 +68,6 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
    <div className="votesHeroState"><strong>{openCount}</strong><span>открытых голосований</span><button onClick={onOpenStages}>Этапы игры →</button></div>
   </section>
 
-  <InstitutionRegistrationPanel g={g} onUnitsChange={setUnits}/>
-  <section className="votesOverview">
-   <article><small>ВСЕГО</small><strong>{votes.length}</strong><span>процедур</span></article>
-   <article><small>ПРИНЯТО</small><strong>{votes.filter(v=>v.result_code==='passed').length}</strong><span>решений</span></article>
-   <article><small>ОТКЛОНЕНО</small><strong>{votes.filter(v=>v.result_code==='rejected').length}</strong><span>решений</span></article>
-   <article><small>БЕЗ КВОРУМА</small><strong>{votes.filter(v=>v.result_code==='no_quorum').length}</strong><span>заседаний</span></article>
-  </section>
-
   {teacher&&<details className="teacherDetails voteManual">
    <summary><div><b>Открыть отдельное голосование</b><span>Для вопросов, не привязанных к конкретному НПА</span></div><i>+</i></summary>
    <div className="teacherDetailsBody">
@@ -98,6 +90,16 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
     </div>
    </div>
   </details>}
+
+  <InstitutionRegistrationPanel g={g} onUnitsChange={setUnits}/>
+  <section className="votesOverview">
+   <article><small>ВСЕГО</small><strong>{votes.length}</strong><span>процедур</span></article>
+   <article><small>ПРИНЯТО</small><strong>{votes.filter(v=>v.result_code==='passed').length}</strong><span>решений</span></article>
+   <article><small>ОТКЛОНЕНО</small><strong>{votes.filter(v=>v.result_code==='rejected').length}</strong><span>решений</span></article>
+   <article><small>БЕЗ КВОРУМА</small><strong>{votes.filter(v=>v.result_code==='no_quorum').length}</strong><span>заседаний</span></article>
+  </section>
+
+
 
   <input className="civicVoteSearch" aria-label="Поиск голосований" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Поиск по вопросу, органу или группе"/>
   <div className="voteTabs"><button className={tab==='open'?'active':''} onClick={()=>setTab('open')}>Открытые <span>{openCount}</span></button><button className={tab==='closed'?'active':''} onClick={()=>setTab('closed')}>Завершённые</button><button className={tab==='all'?'active':''} onClick={()=>setTab('all')}>Все</button></div>
