@@ -125,8 +125,8 @@ async function main(){
  await desktop.locator('.civicQuantity input').fill('100');await desktop.getByRole('button',{name:'За · 100',exact:true}).click();await desktop.waitForFunction(()=>document.querySelector('#ballot-result')?.textContent==='100/0/0');
  await desktop.getByRole('checkbox',{name:'Распределить голоса между вариантами'}).check();
  const splitInputs=desktop.locator('.civicSplitInputs input');await splitInputs.nth(0).fill('180');await splitInputs.nth(1).fill('20');await splitInputs.nth(2).fill('10');
- await desktop.getByRole('button',{name:'Подать 210 голосов',exact:true}).click();await desktop.waitForFunction(()=>document.querySelector('#ballot-result')?.textContent==='180/20/10');
- await splitInputs.nth(0).fill('200');assert.equal(await desktop.getByRole('button',{name:'Подать 230 голосов',exact:true}).isDisabled(),true,'An over-allocation cannot be submitted');await splitInputs.nth(0).fill('180');
+ await desktop.getByRole('button',{name:'Подать голоса · 210',exact:true}).click();await desktop.waitForFunction(()=>document.querySelector('#ballot-result')?.textContent==='180/20/10');
+ await splitInputs.nth(0).fill('200');assert.equal(await desktop.getByRole('button',{name:'Подать голоса · 230',exact:true}).isDisabled(),true,'An over-allocation cannot be submitted');await splitInputs.nth(0).fill('180');
  console.log('PASS Real case choices, percentages, avatars and partial/split mandate ballots');
  for(const width of [320,390,1440]){
   await desktop.setViewportSize({width,height:900});

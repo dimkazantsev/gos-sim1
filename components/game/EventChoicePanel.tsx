@@ -9,7 +9,7 @@ export default function EventChoicePanel({labels,decisions,members,profiles,curr
   return <button type="button" className="eventAnswerChoice" key={i} disabled={!canAnswer} aria-pressed={currentChoice?index(currentChoice)===i:false} onClick={()=>onAnswer('option_'+(i+1))}>
    <span className="eventAnswerHeading"><b>{label}</b><strong>{percent}%</strong></span>
    <span className="eventAnswerProgress" aria-hidden="true"><i style={{width:percent+'%'}}/></span>
-   <span className="eventAnswerPeople"><span className="eventAnswerAvatars">{voters.slice(0,8).map(d=>{const member=members.find(m=>m.user_id===d.actor_id),profile=profiles.find(p=>p.user_id===d.actor_id);return <span className="eventVoter" key={d.actor_id} title={member?.full_name||'Участник'}><ProfileAvatar src={profile?.avatar_url} name={member?.full_name||'Участник'} gender={profile?.gender}/></span>})}{voters.length>8&&<span className="eventVoterMore">+{voters.length-8}</span>}</span><span>{voters.length} голосов</span></span>
+   <span className="eventAnswerPeople"><span className="eventAnswerAvatars">{voters.slice(0,8).map(d=>{const member=members.find(m=>m.user_id===d.actor_id),profile=profiles.find(p=>p.user_id===d.actor_id);return <span className="eventVoter" key={d.actor_id} title={member?.full_name||'Участник'}><ProfileAvatar src={profile?.avatar_url} name={member?.full_name||'Участник'} gender={profile?.gender}/></span>})}{voters.length>8&&<span className="eventVoterMore">+{voters.length-8}</span>}</span><span>Голосов: {voters.length}</span></span>
   </button>;
  })}{notice&&<p className="eventAnswerNotice" role="status">{notice}</p>}</div>;
 }

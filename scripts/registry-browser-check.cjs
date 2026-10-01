@@ -32,5 +32,14 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    await page.locator('#preview').screenshot({path:path.join(screens,'registry-document-'+width+'.png')});
    console.log('PASS Populated registry, procedure placement and linked vote at '+width+'px');
   }
+  for(const [screen,selector] of [['votes','.civicVotes'],['parties','.civicParties']])for(const width of [320,390,768,1440]){
+   await page.locator('#preview').evaluate((el,w)=>el.style.width=w+'px',width);await page.locator('#screen').selectOption(screen);
+   const frame=page.frameLocator('#preview');await frame.locator(selector).waitFor();
+   if(screen==='votes')await frame.locator('.voteManual').evaluate(el=>el.open=true);
+   const geometry=await frame.locator(selector).evaluate(root=>({viewport:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,right:root.getBoundingClientRect().right,offenders:[...root.querySelectorAll('input,button,.styledSelectTrigger,.civicPublicDocs a')].filter(el=>el.getClientRects().length).map(el=>({class:el.className,left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right})).filter(r=>r.left<-2||r.right>document.documentElement.clientWidth+2)}));
+   assert(geometry.scroll<=geometry.viewport+2,screen+' overflow at '+width+': '+JSON.stringify(geometry));assert.equal(geometry.offenders.length,0,screen+' controls stay inside at '+width+': '+JSON.stringify(geometry));
+   if(screen==='parties'){assert.equal(await frame.locator('.civicPublicDocs a').count(),2,'Public charter and programme; fee is private');assert.equal(await frame.locator('.ghostBulk,.ghostPanel,.partyAgreements').count(),0,'Public parties omit GV and agreements');}
+   await frame.locator(selector).screenshot({path:path.join(screens,screen+'-'+width+'.png')});console.log('PASS '+screen+' '+width+'px: public documents and controls remain in the viewport');
+  }
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
