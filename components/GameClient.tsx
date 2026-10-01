@@ -24,9 +24,16 @@ import ChatPanel from './game/ChatPanel';
 import EventWorkspace from './game/EventWorkspace';
 import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
+import {useSavedGameState,savedString} from './game/useSavedGameState';
 
 const GENERIC_STUDENT='__generic_student_preview__';
 type ScreenLocation={view:View;stageNo:number;documentId:string;voteId?:string};
+const SCREEN_VIEWS=['dashboard','stages','parties','votes','documents','grades','actions','profile','events','teacher','crises'];
+function validScreenHistory(value:unknown){
+ if(!value||typeof value!=='object')return false;
+ const history=value as {entries?:ScreenLocation[];index?:number};
+ return Array.isArray(history.entries)&&history.entries.length>0&&history.entries.length<=60&&Number.isInteger(history.index)&&Number(history.index)>=0&&Number(history.index)<history.entries.length&&history.entries.every(e=>e&&SCREEN_VIEWS.includes(e.view)&&Number.isInteger(e.stageNo)&&e.stageNo>=0&&e.stageNo<=16&&typeof e.documentId==='string'&&e.documentId.length<=100&&(!e.voteId||typeof e.voteId==='string'&&e.voteId.length<=100));
+}
 function adjacentScreen(entries:ScreenLocation[],index:number,direction:-1|1,skipTeacher:boolean){
  for(let next=index+direction;next>=0&&next<entries.length;next+=direction){
   if(!skipTeacher||entries[next].view!=='teacher')return next;
@@ -176,9 +183,9 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
 
 export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:string;initialMobileMenuOpen?:boolean}){
  const g=useRepublicGame(gameId);
- const [screenHistory,setScreenHistory]=useState<{entries:ScreenLocation[];index:number}>({
+ const [screenHistory,setScreenHistory]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
- });
+ },validScreenHistory);
  const currentScreen=screenHistory.entries[screenHistory.index];
  const view=currentScreen.view;
  const focusFormalId=currentScreen.documentId;
@@ -195,7 +202,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
  const [pendingEvents,setPendingEvents]=useState(0);
- const [selectedProfileId,setSelectedProfileId]=useState('');
+ const [selectedProfileId,setSelectedProfileId]=useSavedGameState(gameId,g.me?.user_id,'profile-selected','',savedString);
  const [completingProfile,setCompletingProfile]=useState(false);
  const [onboardingNotice,setOnboardingNotice]=useState('');
  useEffect(()=>{
@@ -249,7 +256,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   setScreenHistory(previous=>{
    const current=previous.entries[previous.index];
    if(current.view===destination.view&&current.stageNo===destination.stageNo&&current.documentId===destination.documentId&&current.voteId===destination.voteId)return previous;
-   const entries=[...previous.entries.slice(0,previous.index+1),destination];
+   const entries=[...previous.entries.slice(0,previous.index+1),destination].slice(-60);
    return {entries,index:entries.length-1};
   });
   finishScreenNavigation();
@@ -462,4 +469,3 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   <RepublicComic intro open={introOpen} onClose={()=>void finishIntro()}/>
   <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }
-

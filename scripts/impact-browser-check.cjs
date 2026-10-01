@@ -50,6 +50,8 @@ async function main(){
      const identities=await page.frameLocator('#preview').locator('.impactHistoryIdentity').evaluateAll(els=>els.map(el=>({width:el.getBoundingClientRect().width,date:el.querySelector('time').getBoundingClientRect().toJSON(),row:el.closest('.impactHistoryTop').getBoundingClientRect().toJSON()})));
      assert(identities.every(x=>x.width>=140),'Ledger text has readable width at '+width+': '+JSON.stringify(identities));
      assert(identities.every(x=>x.date.height<25),'Dates must not break into vertical letters');
+     const alignments=await page.frameLocator('#preview').locator('.impactJournalEntry').evaluateAll(rows=>rows.map(row=>({text:row.querySelector('.impactHistoryHeading>b').getBoundingClientRect().left,indicator:row.querySelector('.impactDelta')?.getBoundingClientRect().left})));
+     assert(alignments.every(x=>x.indicator===undefined||Math.abs(x.text-x.indicator)<=1),'Journal indicators share the text left edge at '+width+': '+JSON.stringify(alignments));
     }
     await page.locator('#preview').screenshot({path:path.join(screenshots,variant+'-'+width+'.png')});
     console.log('PASS '+variant+' '+width+'px');

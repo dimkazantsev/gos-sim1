@@ -9,6 +9,7 @@ import {ArrowLeft,BookOpen,FilePlus2,FileText,GitBranch,Plus} from 'lucide-react
 import StyledSelect from '../ui/StyledSelect';
 import DocumentPaper from './DocumentPaper';
 import {DOCUMENT_TEMPLATES} from './documentTemplates';
+import {useSavedGameState,savedChoice,savedString,savedBoolean} from './useSavedGameState';
 
 function typeLabel(key:string){return FORMAL_TYPES.find(x=>x.key===key)?.label||key}
 function shortDate(v:string){return new Date(v).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'})}
@@ -23,8 +24,8 @@ const billFileLabels:Record<string,string>={explanatory_note:'Пояснител
 
 export default function DocumentsView({g,focusId,onOpenVotes,readOnly=false,initialDetailTab='text'}:{g:ReturnTypeRepublic;initialDetailTab?:'text'|'procedure';focusId?:string;onOpenVotes:(voteId?:string)=>void;readOnly?:boolean}){
  const {formalDocuments,formalHistory,votes,members,me,teacher,currentStage,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,createVote}=g;
- const [mode,setMode]=useState<'registry'|'create'>('registry'),[selectedId,setSelectedId]=useState(''),[query,setQuery]=useState(''),[filterSubject,setFilterSubject]=useState(''),[filterStatus,setFilterStatus]=useState(''),[sortOrder,setSortOrder]=useState('updated');
- const [detailOpen,setDetailOpen]=useState(!!focusId),[detailTab,setDetailTab]=useState<'text'|'procedure'>(initialDetailTab);
+ const [mode,setMode]=useSavedGameState<'registry'|'create'>(g.game?.id,g.me?.user_id,'documents-mode','registry',savedChoice('registry','create')),[selectedId,setSelectedId]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-selected','',savedString),[query,setQuery]=useState(''),[filterSubject,setFilterSubject]=useState(''),[filterStatus,setFilterStatus]=useState(''),[sortOrder,setSortOrder]=useState('updated');
+ const [detailOpen,setDetailOpen]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-detail',!!focusId,savedBoolean),[detailTab,setDetailTab]=useSavedGameState<'text'|'procedure'>(g.game?.id,g.me?.user_id,'documents-tab',initialDetailTab,savedChoice('text','procedure'));
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[subjectKey,setSubjectKey]=useState('gd_deputy'),[docType,setDocType]=useState('fz_bill'),[file,setFile]=useState<File|null>(null),[extracting,setExtracting]=useState(false),[recognized,setRecognized]=useState(''),[busy,setBusy]=useState(false);
  const [templateKey,setTemplateKey]=useState('fz_bill'),[issuer,setIssuer]=useState(''),[place,setPlace]=useState('Москва');
  const [editing,setEditing]=useState(false),[editTitle,setEditTitle]=useState(''),[editBody,setEditBody]=useState('');

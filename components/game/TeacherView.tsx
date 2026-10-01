@@ -10,6 +10,7 @@ import EventWorkspace from './EventWorkspace';
 import type {ReturnTypeRepublic} from './viewTypes';
 import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
+import {useSavedGameState,savedChoice} from './useSavedGameState';
 
 function timerText(seconds:number){
  const m=Math.floor(seconds/60),s=seconds%60;
@@ -32,7 +33,7 @@ const WORKSPACES=[
 export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void}){
  const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
 
- const [workspace,setWorkspace]=useState<Workspace>(initialWorkspace);
+ const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
 
  const studentIds=useMemo(()=>new Set(members.filter(m=>m.kind!=='teacher').map(m=>m.user_id)),[members]);
  const studentActivities=useMemo(()=>activities.filter(a=>studentIds.has(a.actor_id)),[activities,studentIds]);

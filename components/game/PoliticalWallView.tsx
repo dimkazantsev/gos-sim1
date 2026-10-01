@@ -16,6 +16,7 @@ import {VOTING_BODIES} from './votingBodies';
 import {STAGE_ACTIONS} from './stageActions';
 import PostChanges from './PostChanges';
 import RatingNewsVisual from './RatingNewsVisual';
+import {useSavedGameState,savedChoice} from './useSavedGameState';
 
 const PROCESS_TYPES=[
  ['statement','Заявление'],['initiative','Инициатива'],['decision','Проект решения'],['event','Событие'],
@@ -34,7 +35,7 @@ function PostText({post,onNavigate,onOpenDocument}:{post:PoliticalPost;onNavigat
 }
 export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNavigate,focusPending=false,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument:(id:string)=>void;onNavigate:(view:View)=>void;focusPending?:boolean;readOnly?:boolean}){
  const {actions,judgeAction,game,me,teacher,currentStage,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,formalDocuments,votes,profiles,names,availableActors}=g;
- const [tab,setTab]=useState<'feed'|'registry'>('feed');
+ const [tab,setTab]=useSavedGameState<'feed'|'registry'>(g.game?.id,g.me?.user_id,'process-tab','feed',savedChoice('feed','registry'));
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('');
  const actors=availableActors();
  const actor=actors.find(x=>x.key===actorKey)||(teacher?actors.find(x=>x.key==='teacher'):null)||actors[0];

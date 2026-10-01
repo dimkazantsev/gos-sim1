@@ -26,6 +26,7 @@ import LegislativeSessionLab from './LegislativeSessionLab';
 import GovernmentProgramSessionLab from './GovernmentProgramSessionLab';
 import CrisisRoom from './CrisisRoom';
 import StageReadinessPanel from './StageReadinessPanel';
+import {useSavedGameState} from './useSavedGameState';
 
 // A consistent icon language for the sixteen institutions and decisions.
 const STAGE_ICONS=[UsersRound,SlidersHorizontal,Map,Landmark,UserRoundX,ClipboardCheck,Vote,Building2,Network,Target,ClipboardList,Scale,Wallet,MapPin,ShieldAlert,ChartNoAxesCombined] as const;
@@ -33,7 +34,9 @@ type StageFilter='all'|'open'|'voting'|'completed'|'locked';
 
 export default function StagesView({g,onOpenVotes,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;focusStageNo?:number;readOnly?:boolean}){
  const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
- const [selected,setSelected]=useState<Stage|null>(null);
+ const [selectedStageNo,setSelectedStageNo]=useSavedGameState(g.game?.id,g.me?.user_id,'stage-selected',0,value=>Number.isInteger(value)&&Number(value)>=0&&Number(value)<=16);
+ const selected=stages.find(s=>s.stage_no===selectedStageNo)||null;
+ function setSelected(stage:Stage|null){setSelectedStageNo(stage?.stage_no||0)}
  const [resetTarget,setResetTarget]=useState<number|'all'|null>(null);
  const [resetConfirmation,setResetConfirmation]=useState('');
  const [resetBusy,setResetBusy]=useState(false);

@@ -5,6 +5,7 @@ import {Activity,ArrowDownRight,ChevronDown,ChevronUp,History,RotateCcw,Search,S
 import type {ReturnTypeRepublic} from './viewTypes';
 import TeacherMetricStudio from './TeacherMetricStudio';
 import type {ImpactLedger,ImpactRule} from './types';
+import {useSavedGameState,savedChoice} from './useSavedGameState';
 
 const sourceLabels:Record<string,string>={crisis:'Кризис',formal_history:'Документ',event:'Ситуация',event_answers:'Решение ситуации',political_post:'Публикация',vote:'Голосование',party:'Партия',chat:'Сообщение',manual:'Корректировка преподавателя'};
 type RuleFilter='all'|'automatic'|'off';
@@ -172,7 +173,7 @@ function LedgerRow({g,entry,rule}:{g:ReturnTypeRepublic;entry:ImpactLedger;rule?
 
 export default function ImpactRulesPanel({g,initialTab='rules',initialExpandedRuleId=null}:{g:ReturnTypeRepublic;initialTab?:'rules'|'ledger';initialExpandedRuleId?:string|null}){
  const {impactRules,impactLedger}=g;
- const [tab,setTab]=useState<'rules'|'ledger'>(initialTab);
+ const [tab,setTab]=useSavedGameState<'rules'|'ledger'>(g.game?.id,g.me?.user_id,'impact-tab',initialTab,savedChoice('rules','ledger'));
  const [query,setQuery]=useState('');
  const [ruleFilter,setRuleFilter]=useState<RuleFilter>('all');
  const [ledgerFilter,setLedgerFilter]=useState<LedgerFilter>('all');

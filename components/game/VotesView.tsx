@@ -9,6 +9,7 @@ import FormalDocumentPicker from './FormalDocumentPicker';
 import {votePresetForDocument,institutionLabel,majorityLabel} from './proceduralVoting';
 import VoteBallotControls from './VoteBallotControls';
 import {VOTING_BODIES,type VotingUnit} from './votingBodies';
+import {useSavedGameState,savedChoice} from './useSavedGameState';
 
 function pct(n:number,d:number){return d>0?Math.round(n/d*100):0}
 function time(v:string){return new Date(v).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
@@ -17,7 +18,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
  const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,createVote,canVote,castVote,closeVote,tally,quorum}=g;
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[mode,setMode]=useState<'member'|'faction'|'mandate'>('member');
  const [institution,setInstitution]=useState('all'),[quorumValue,setQuorumValue]=useState(0.5),[majorityKind,setMajorityKind]=useState<'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction'>('present_majority'),[majorityValue,setMajorityValue]=useState(0.5);
- const [tab,setTab]=useState<'open'|'closed'|'all'>('open'),[busy,setBusy]=useState('');
+ const [tab,setTab]=useSavedGameState<'open'|'closed'|'all'>(g.game?.id,g.me?.user_id,'votes-tab','open',savedChoice('open','closed','all')),[busy,setBusy]=useState('');
  const [group,setGroup]=useState(''),[query,setQuery]=useState(''),[units,setUnits]=useState<VotingUnit[]>([]);
  const groups=[...new Set(members.filter(m=>m.kind==='student').map(m=>m.group_name).filter((s):s is string=>!!s))];
  const [formalId,setFormalId]=useState('');
