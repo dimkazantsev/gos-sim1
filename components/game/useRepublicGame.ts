@@ -485,7 +485,7 @@ export function useRepublicGame(gameId:string){
   await refresh();return true;
  }
  async function reviewPartyRegistration(partyId:string,status:'registered'|'revision'|'rejected',note?:string){
-  const r=await supabase.rpc('review_party_registration',{p_party_id:partyId,p_status:status,p_note:note||null});
+  const r=await supabase.rpc('issue_party_justice_response',{p_party_id:partyId,p_status:status,p_note:note||''});
   if(r.error){setError(r.error.message);return false}
   await refresh();return true;
  }

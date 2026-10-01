@@ -1,5 +1,6 @@
 'use client';
 import {useState} from 'react';
+import PartyJusticeReview from './PartyJusticeReview';
 import PartyMandateEditor from './PartyMandateEditor';
 import {FileText,Trash2,UsersRound,Landmark,ShieldAlert,X,ExternalLink,MessageCircle} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
@@ -9,7 +10,6 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
  const {parties,members,partyDocuments,partyMandates,partyInvitations,politicalPosts,channels,teacher,deleteParty}=g;
  const [selected,setSelected]=useState<string|null>(null);
  const [confirm,setConfirm]=useState('');
- const [reviewNotes,setReviewNotes]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
  const [error,setError]=useState('');
@@ -51,7 +51,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
     <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы ({docs.length})</h4>
      {docs.length?<ul>{docs.map(d=><li key={d.id}><span>{docLabels[d.doc_kind]||d.doc_kind}<small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {d.status==='accepted'?'Принят':d.status==='revision'?'На доработке':'Загружен'}</small></span>{d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title}><ExternalLink size={15}/></a>:<span>—</span>}<div className="civicDocReview"><button type="button" className="secondary" onClick={()=>void g.reviewPartyDocument(d.id,'accepted')}>Принять</button><button type="button" className="secondary" onClick={()=>void g.reviewPartyDocument(d.id,'revision')}>На доработку</button></div></li>)}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
     </div>
-    <div className="civicRegistrationReview"><label>Замечания к регистрации<textarea rows={2} value={reviewNotes[p.id]||''} onChange={e=>setReviewNotes(v=>({...v,[p.id]:e.target.value}))}/></label><div className="civicMandateActions"><button className="primary" onClick={()=>void g.reviewPartyRegistration(p.id,'registered',reviewNotes[p.id])}>Зарегистрировать партию</button><button className="secondary" onClick={()=>void g.reviewPartyRegistration(p.id,'revision',reviewNotes[p.id])}>На доработку</button><button className="secondary" onClick={()=>void g.reviewPartyRegistration(p.id,'rejected',reviewNotes[p.id])}>Отклонить</button></div></div><PartyMandateEditor g={g} party={p}/>
+    <PartyJusticeReview g={g} party={p}/><PartyMandateEditor g={g} party={p}/>
     <footer><span>{posts.length} партийных публикаций · {staff.length} участников</span><button type="button" onClick={()=>{setSelected(p.id);setConfirm('');setNotice('')}}><Trash2 size={15} aria-hidden="true"/> Удалить партию</button></footer>
    </article>;
   })}</div>
