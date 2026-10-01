@@ -1,9 +1,10 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {CalendarDays,CheckCircle2,UsersRound} from 'lucide-react';
+import {CalendarDays,CheckCircle2,Send,UsersRound} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
+import DisclosureSummary from '../ui/DisclosureSummary';
 import EventCollaboration,{type EventInvitation} from './EventCollaboration';
 import {eventButtonSound} from './eventButtonSound';
 import EventAutopilotPanel from './EventAutopilotPanel';
@@ -154,8 +155,8 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    <div><strong>{readyCases.filter(c=>c.seriousness==='light').length}</strong><small>Повседневные ситуации</small></div>
    <div><strong>{readyCases.filter(c=>c.case_key.startsWith('bank-curated-v2-')).length}<span>/50</span></strong><small>Новая авторская итерация</small></div>
   </div>}
-  {mode==='manage'&&teacher&&<details className="eventComposerPanel civicDisclosure">
-   <summary>Направить событие…</summary><div className="civicDisclosureBody">
+  {mode==='manage'&&teacher&&<details className="eventComposerPanel civicDisclosure projectDisclosure">
+   <DisclosureSummary icon={Send} title="Направить событие…" description="Ситуация, варианты решения и участники"/><div className="civicDisclosureBody">
    <div className="eventEditorGrid">
     <label>Название<input value={title} maxLength={180} onChange={e=>setTitle(e.target.value)} placeholder="Краткий заголовок ситуации"/></label>
     <StyledSelect label="Сфера" value={category} onChange={setCategory} options={['Государственное управление','Экономика','Международные отношения','Образование','Здравоохранение','Экология','Муниципальное управление','Культура и протокол','Социальная политика'].map(v=>({value:v,label:v}))}/>
@@ -227,4 +228,3 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   {notice&&<p className="eventNotice" role="status">{notice}</p>}
  </section>;
 }
-

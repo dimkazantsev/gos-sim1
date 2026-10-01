@@ -28,7 +28,7 @@ import {useSavedGameState,savedString} from './game/useSavedGameState';
 
 const GENERIC_STUDENT='__generic_student_preview__';
 type ScreenLocation={view:View;stageNo:number;documentId:string;voteId?:string};
-const SCREEN_VIEWS=['dashboard','stages','parties','votes','documents','grades','actions','profile','events','teacher','crises'];
+const SCREEN_VIEWS=['dashboard','stages','parties','votes','documents','grades','actions','profile','events','teacher'];
 function validScreenHistory(value:unknown){
  if(!value||typeof value!=='object')return false;
  const history=value as {entries?:ScreenLocation[];index?:number};

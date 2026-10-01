@@ -10,6 +10,8 @@ import {votePresetForDocument,institutionLabel,majorityLabel} from './procedural
 import VoteBallotControls from './VoteBallotControls';
 import {VOTING_BODIES,type VotingUnit} from './votingBodies';
 import {useSavedGameState,savedChoice} from './useSavedGameState';
+import {Vote as VoteIcon} from 'lucide-react';
+import DisclosureSummary from '../ui/DisclosureSummary';
 
 function pct(n:number,d:number){return d>0?Math.round(n/d*100):0}
 function time(v:string){return new Date(v).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
@@ -77,8 +79,8 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId}:{g:Ret
    <div className="votesHeroState"><strong>{openCount}</strong><span>открытых голосований</span><button onClick={onOpenStages}>Этапы игры →</button></div>
   </section>
 
-  {teacher&&<details className="teacherDetails voteManual">
-   <summary><div><b>Открыть отдельное голосование</b><span>Самостоятельный вопрос или документ из реестра НПА</span></div><i>+</i></summary>
+  {teacher&&<details className="teacherDetails voteManual projectDisclosure">
+   <DisclosureSummary icon={VoteIcon} title="Открыть отдельное голосование" description="Самостоятельный вопрос или документ из реестра НПА"/>
    <div className="teacherDetailsBody">
     <div className="voteBuilder modern">
      <input aria-label="Вопрос голосования" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Вопрос голосования"/>

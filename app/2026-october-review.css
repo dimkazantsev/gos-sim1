@@ -16,3 +16,20 @@
  .impactWorkbench .impactHistoryRow.impactJournalEntry>.impactHistoryTop{grid-template-columns:minmax(0,1fr)!important;gap:10px}
  .impactWorkbench .impactJournalEntry .impactHistoryStatus{grid-column:auto;justify-self:start;margin-left:48px}
 }
+/* Shared disclosure control for events, ballots and attendance. */
+.projectDisclosure{border:1px solid #d6e1f1!important;border-radius:16px!important;background:#fff!important;min-width:0;overflow:hidden;padding:0!important}
+.projectDisclosure>summary.projectDisclosureSummary{display:flex!important;align-items:center;justify-content:flex-start;gap:14px;min-height:84px;padding:18px 20px!important;margin:0!important;list-style:none!important;cursor:pointer;color:#203556}
+.projectDisclosure>summary.projectDisclosureSummary::-webkit-details-marker{display:none}
+.projectDisclosure .projectDisclosureIcon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:12px;background:#edf2ff;color:#2453e6}
+.projectDisclosure .projectDisclosureIcon>svg{display:block;flex:none;margin:0}
+.projectDisclosure .projectDisclosureText{display:grid;gap:4px;flex:1;min-width:0;text-align:left}
+.projectDisclosure .projectDisclosureText>b{font-size:16px;line-height:22px;color:#203556;margin:0;text-align:left}
+.projectDisclosure .projectDisclosureText>small{font-size:13px;line-height:20px;color:#6b7e98;letter-spacing:0;font-weight:400;margin:0;overflow-wrap:anywhere}
+.projectDisclosure .projectDisclosureArrow{display:block;flex:none;margin:0;color:#365680;transition:transform .15s ease}
+.projectDisclosure[open]>summary.projectDisclosureSummary{border-bottom:1px solid #e1e8f3}
+.projectDisclosure[open]>summary>.projectDisclosureArrow{transform:rotate(180deg)}
+.projectDisclosure>summary:focus-visible{outline:3px solid #7aa0ee;outline-offset:-3px}
+.projectDisclosure:not([open])>:not(summary){display:none!important}
+.projectDisclosure>.civicDisclosureBody,.projectDisclosure>.teacherDetailsBody{padding:20px!important;min-width:0}
+@media(max-width:600px){.projectDisclosure>summary.projectDisclosureSummary{padding:16px!important;gap:12px}.projectDisclosure>.civicDisclosureBody,.projectDisclosure>.teacherDetailsBody{padding:16px!important}}
+@media(prefers-reduced-motion:reduce){.projectDisclosure .projectDisclosureArrow{transition:none}}
