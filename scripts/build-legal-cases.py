@@ -59,11 +59,17 @@ def roles_for(i,title,facts,basis):
         if k in [19,20,21,22,23,24,25]:return ['министр труда','министр юстиции','руководитель']
         if k in [26,27,28,29,30,31,32,33]:return ['министр юстиции','руководитель','глава']
         if k in [34,35]:return ['министр финансов','налоговой']
-        if k in [41,43,44,45,46,47,54,55]:return ['судья','суд']
+        if k in [0,41,44,45,46,47,54,55]:return ['судья','суд']
+        if k==52:return ['руководитель партии','депутат','министр юстиции']
+        if k==39:return ['министр культуры','глава']
+        if k==40:return ['министр природ','министр эколог','глава']
     t=(title+' '+facts).lower()
     if re.search(r'муницип|местн|земел|земл|торговый|турист',t):return ['глава','муницип','министр финансов']
     if re.search(r'эколог|выброс|лесн|ущерб|природ',t):return ['министр природ','министр эколог','глава']
     return ['министр финансов','правительств','губернатор'] if i<89 or re.search(r'бюджет|субсид|налог|закуп',t) else ['министр юстиции','глава','руководитель']
+
+# Strategic credit is assigned only to an explicit legitimate institutional interest.
+ROLE_INTEREST_NOTES={2: 'Сохранение законной поддержки промышленного сектора без произвольной льготы.', 9: 'Защита репутации органа через урегулирование конфликта интересов.', 15: 'Защита устойчивости казны и границ долговой ответственности.', 25: 'Поддержка портового инвестора в пределах законных льгот.', 48: 'Обоснование устойчивого инвестиционного предложения без фиктивной прибыли.', 53: 'Сохранение доверия к региональному финансовому контролю.', 57: 'Защита репутации конкурсного отбора от аффилированности.', 59: 'Отстаивание законных условий инвестиционного соглашения.', 68: 'Укрепление поддержки муниципальной власти через проверяемое участие граждан.', 102: 'Защита репутации закупочной комиссии через отвод при конфликте.', 106: 'Сохранение права на судебную защиту при пропуске административного срока.', 120: 'Защита доверия к органу власти через законную бюджетную открытость.', 148: 'Защита репутации финансового органа через предусмотренный контроль.'}
 
 cases=[];scenes=[]
 for i,((title,facts,basis,correct),wrong) in enumerate(zip(rows,alternatives)):
@@ -79,9 +85,10 @@ for i,((title,facts,basis,correct),wrong) in enumerate(zip(rows,alternatives)):
     fx={'activity':.004+(i%7)*.001,'expenditure':15+i%17} if region else None
     badfx={'activity':-.006-(i%9)*.001,'expenditure':45+i%29} if region else None
     if region and re.search(r'двойн|непострад|неподтвержд|неиспользован',facts):fx={'expenditure':-20-i%19,'activity':.005};badfx={'expenditure':65+i%31,'activity':-.012}
-    effects=[{'key':'option_1','trust':1,'description':lawful_explanation,'news':correct.rstrip('. ')+'. В учебной модели устранён конкретный правовой риск.','public_interest':'beneficial','authorized_roles':roles,'lawful':True,'protects_role_interest':n%4==0,'legal_basis':basis+' Источник: '+source},
+    effects=[{'key':'option_1','trust':1,'description':lawful_explanation,'news':correct.rstrip('. ')+'. В учебной модели устранён конкретный правовой риск.','public_interest':'beneficial','authorized_roles':roles,'lawful':True,'protects_role_interest':n in ROLE_INTEREST_NOTES,'role_interest_note':ROLE_INTEREST_NOTES.get(n),'legal_basis':basis+' Источник: '+source},
              {'key':'option_2','trust':-2,'description':'Выбранный способ не устраняет нарушение: '+wrong.rstrip('. ')+'. Надлежащий шаг: '+lawful_explanation,'news':'Выбран спорный способ: '+wrong.rstrip('. ')+'. Возник риск законности и доверия.','public_interest':'harmful','authorized_roles':roles,'lawful':False,'protects_role_interest':False,'legal_basis':basis+' Источник: '+source}]
     # Alternate lawful/illegal button position; the first button is not always correct.
+    if n in ROLE_INTEREST_NOTES:effects[0]['description']+=' Стратегический критерий: '+ROLE_INTEREST_NOTES[n]
     if fx:effects[0]['fiscal_effect']=fx;effects[1]['fiscal_effect']=badfx
     choices=[correct,wrong]
     if n%2==0:effects.reverse();choices.reverse()
