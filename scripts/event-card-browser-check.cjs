@@ -8,9 +8,12 @@ Module._resolveFilename=function(request,...args){return originalResolve.call(th
 for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,file);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),EventComic=require('../components/game/EventComic').default,EventCaseTile=require('../components/game/EventCaseTile').default;
 const {eventSceneFrame}=require('../components/game/eventSceneFrame');
-const cases=JSON.parse(fs.readFileSync(path.join(root,'content/events-v2.json'),'utf8'));
-assert.equal(cases.length,50);
-assert.equal(new Set(cases.map(c=>JSON.stringify(eventSceneFrame(c.case_key,c.comic_scene.scene_id)))).size,50);
+const old=JSON.parse(fs.readFileSync(path.join(root,'content/events-v2.json'),'utf8'));
+const extra=JSON.parse(fs.readFileSync(path.join(root,'content/events-legal-2026.json'),'utf8'));
+assert.equal(extra.length,150);
+const cases=[...old,...extra];
+assert.equal(cases.length,200);
+assert.equal(new Set(cases.map(c=>JSON.stringify(eventSceneFrame(c.case_key,c.comic_scene.scene_id)))).size,cases.length);
 assert.equal(eventSceneFrame('bank-curated-v2-13','scene-21').number,13,'Case key wins over a stale scene id');
 let css=fs.readFileSync(path.join(root,'app/globals.css'),'utf8').replace(/@import '\.\/([^']+)' layer\(legacy\);/g,(_,file)=>'@layer legacy {'+fs.readFileSync(path.join(root,'app',file),'utf8')+'}');
 for(const match of fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8').matchAll(/import ['"]\.\/([^'"]+\.css)['"]/g)){if(match[1]!=='globals.css')css+='\n'+fs.readFileSync(path.join(root,'app',match[1]),'utf8')}
@@ -35,7 +38,7 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    if(width===1440)assert(geometry.detail.left>=geometry.list.right,'Description is to the right of the bank');
    const clips=await page.locator('svg[data-scene]').evaluateAll(els=>els.map(svg=>({overflow:getComputedStyle(svg).overflow,view:svg.getAttribute('viewBox'),clip:svg.querySelector('g').getAttribute('clip-path'),rect:!!svg.querySelector('clipPath>rect')})));
    assert(clips.every(c=>c.overflow==='hidden'&&c.view.startsWith('0 0 ')&&c.clip&&c.rect),'Every illustration must paint only its own clipped scene');
-   assert.equal(await page.locator('[data-case] svg[data-scene]').count(),50);
+   assert.equal(await page.locator('[data-case] svg[data-scene]').count(),cases.length);
    const hashes=new Set();
    for(const number of [6,10,13,21,41,42,43,44,45,46,47,48,49,50]){
     const svg=page.locator('[data-case="bank-curated-v2-'+String(number).padStart(2,'0')+'"] svg');

@@ -9,7 +9,7 @@ import {fiscalForecast,fiscalTotal,type FiscalRegion,type FiscalRate} from './fi
 import StyledSelect from '../ui/StyledSelect';
 type Proposal={id:string;tax_key:string;region_code:string;new_rate:number;status:string;document_id:string|null;author_id:string};
 type Change={id:number;region_code:string|null;note:string;source_type:string;created_at:string};
-type Case={id:string;title:string;comic_scene:{region_code?:string};status:string};
+type Case={id:string;title:string;comic_scene:{region_code?:string};status:string;assigned?:boolean};
 const money=(n:number|null)=>n===null?'—':new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(n);
 const profileLabel:Record<string,string>={metropolis:'Городская экономика',resources:'Добывающий сектор',agriculture:'Агропромышленный сектор',northern:'Высокая стоимость инфраструктуры',tourism:'Туризм и услуги',industrial:'Промышленность и услуги'};
 export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents}:{g:ReturnTypeRepublic;readOnly?:boolean;onOpenDocument:(id:string)=>void;onOpenEvents:()=>void}){
@@ -26,7 +26,7 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  }
  useEffect(()=>{void load();if(!g.game)return;const id=setInterval(()=>void load(),20000);return()=>clearInterval(id)},[g.game?.id,g.me?.user_id]);
  useEffect(()=>{
-  if(!g.game)return;let live=true;void supabase.from('event_cases').select('id,title,comic_scene,status').eq('game_id',g.game.id).eq('status','ready').then(r=>{if(live&&!r.error)setCases((r.data||[]) as Case[])});
+  if(!g.game)return;let live=true;void supabase.rpc('list_regional_cases',{p_game_id:g.game.id}).then(r=>{if(live&&!r.error)setCases((r.data||[]) as Case[])});
   return()=>{live=false};
  },[g.game?.id]);
  useEffect(()=>{if(!region)return;setParameters(Object.fromEntries(['enterprises','employees_per_firm','monthly_wage','profit_per_firm','consumption_per_firm','expenditure','transfer_in','debt','compliance'].map(k=>[k,String(region[k as keyof FiscalRegion])])));},[region?.region_code,region?.enterprises,region?.expenditure,region?.monthly_wage]);
@@ -44,10 +44,10 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  }
  async function apply(id:string){
   if(readOnly||busy||!g.teacher)return;setBusy(true);const r=await supabase.rpc('apply_fiscal_rate_proposal',{p_proposal:id,p_document:act||null});setBusy(false);
-  if(r.error)g.setError(r.error.message);else{setNotice('Ставка введена на основании опубликованного документа.');await load()}
+  if(r.error)g.setError(r.error.message);else{setNotice('Ставка учебного прогноза изменена по опубликованному документу.');await load()}
  }
  async function practice(c:Case){
-  if(readOnly||busy)return;setBusy(true);const r=await supabase.rpc('start_regional_case',{p_case_id:c.id});setBusy(false);if(r.error)g.setError(r.error.message);else onOpenEvents();
+  if(readOnly||busy)return;if(c.assigned){onOpenEvents();return}setBusy(true);const r=await supabase.rpc('start_regional_case',{p_case_id:c.id});setBusy(false);if(r.error)g.setError(r.error.message);else onOpenEvents();
  }
  const filtered=regions.filter(r=>r.name.toLocaleLowerCase('ru').includes(search.trim().toLocaleLowerCase('ru'))).sort((a,b)=>sort==='name'?a.name.localeCompare(b.name,'ru'):sort==='enterprises'?b.enterprises-a.enterprises:fiscalForecast(b,rates).balance-fiscalForecast(a,rates).balance);
  const preview=region&&Number.isFinite(Number(rate))?fiscalForecast(region,rates,{tax:taxKey,rate:Number(rate)}):null;
@@ -76,8 +76,8 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  </div>
  {region&&forecast&&<aside className="budgetRegionDetail"><header><Landmark size={24}/><div><small>{profileLabel[region.profile]} · учебный профиль</small><h3>{region.name}</h3></div></header>
  <dl>{[['Доходы',forecast.revenue],['Расходы',forecast.expenditure],['Баланс',forecast.balance],['Трансферты',region.transfer_in],['Расчётный долг',forecast.debt],['Рабочие места',forecast.employees]].map(([label,v])=><div key={String(label)}><dt>{label}</dt><dd>{money(Number(v))}{label==='Рабочие места'?'':' млн ₽'}</dd></div>)}</dl>
- <details><summary>Реальная региональная статистика</summary>{Object.entries(region.observations||{}).map(([key,v])=><p key={key}>{({population:'Население',enterprises:'Предприятия',gross_regional_product:'ВРП',regional_revenue:'Доходы бюджета',regional_expenditure:'Расходы бюджета'} as Record<string,string>)[key]||key}: <b>{v===null?'Нет сопоставимого наблюдения':money(v)}</b></p>)}<a href={region.source_url} target="_blank" rel="noreferrer">Росстат · {region.source_year} ↗</a></details>
- <h4>Региональные правовые задачи</h4>{regionCases.length?regionCases.slice(0,8).map(c=><button type="button" className="budgetCaseLink" key={c.id} disabled={readOnly||busy||g.me?.kind==='observer'} onClick={()=>void practice(c)}><FileText size={17}/><span>{c.title}</span><ArrowRight size={17}/></button>):<p>Задачи региона появятся после обновления банка.</p>}
+ <details><summary>Реальная региональная статистика · 2025</summary><p>Налоговые поступления по данным ФНС. Это часть доходов, не весь бюджет региона. Местные суммы уже входят в консолидированные.</p>{Object.entries(region.observations||{}).map(([key,v])=><p key={key}>{({tax_receipts_total:'Поступления ФНС, всего',tax_receipts_federal:'Из них в федеральный бюджет',tax_receipts_consolidated:'В консолидированный бюджет субъекта',tax_receipts_local:'Из него в местные бюджеты',usn_receipts:'Поступления по УСН'} as Record<string,string>)[key]||key}: <b>{v===null?'Нет сопоставимого наблюдения':money(v)+' млн ₽'}</b></p>)}<a href={region.source_url} target="_blank" rel="noreferrer">ФНС, форма 1-НМ · {region.source_year} ↗</a></details>
+ <details className="budgetTaxLines"><summary>Из чего складываются налоговые доходы</summary><div className="budgetTableWrap"><table><thead><tr><th>Налог</th><th>База</th><th>Ставка</th><th>Поступления</th></tr></thead><tbody>{forecast.lines.map(t=><tr key={t.key}><th>{t.label}</th><td>{money(t.base)}</td><td>{t.rate===null?'Специальная формула':money(t.rate)+' '+t.unit}</td><td>{t.amount===null?'Нужна отдельная база':money(t.amount)+' млн ₽'}</td></tr>)}</tbody></table></div><p>Суммарный прогноз включает только строки с заданной базой. Остальные платежи изучаются в справочнике и кейсах.</p></details><h4>Региональные правовые задачи</h4>{regionCases.length?regionCases.slice(0,8).map(c=><button type="button" className="budgetCaseLink" key={c.id} disabled={readOnly||busy||g.me?.kind!=='student'||(!c.assigned&&c.status!=='ready')} onClick={()=>void practice(c)}><FileText size={17}/><span>{c.title}{c.status==='resolved'?' · Решено':c.status==='voting'?' · Голосуют':''}</span><ArrowRight size={17}/></button>):<p>Задачи региона появятся после обновления банка.</p>}
  </aside>}
  </div></section>
  {region&&forecast&&<section className="surface budgetRateLab"><header><div><small>НАЛОГОВАЯ ПОЛИТИКА</small><h2>Ставка и её последствия</h2></div><Coins size={24}/></header>
