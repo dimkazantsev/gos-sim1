@@ -34,7 +34,7 @@ const WORKSPACES=[
 ] as const;
 
 export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void}){
- const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
+ const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,formalDocuments,votes,ballots,evaluations,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
  const navigationRef=useHorizontalWheel(game?.id);
@@ -44,8 +44,6 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
 
 
  if(!game)return null;
- const pending=actions.filter(a=>a.status==='submitted');
- const firstPending=[...pending].sort((a,b)=>new Date(a.submitted_at).getTime()-new Date(b.submitted_at).getTime())[0];
  const onlineCount=members.filter(m=>m.kind==='student'&&presence.some(p=>p.user_id===m.user_id&&Date.now()-new Date(p.last_seen_at).getTime()<90000)).length;
 
 
@@ -78,7 +76,6 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
        document.getElementById('teacher-tab-'+next.key)?.focus();
       }}>
       <Icon size={18} strokeWidth={1.9} aria-hidden="true"/><span>{item.title}</span>
-      {item.key==='overview'&&pending.length>0&&<em>{pending.length}</em>}
      </button>
     })}
    </div>
@@ -114,14 +111,9 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     {workspace==='overview'&&<>
      <div className="teacherOverviewStats">
       <article><small>В ИГРЕ СЕЙЧАС</small><strong>{onlineCount}</strong><span>из {members.filter(m=>m.kind==='student').length} студентов онлайн</span></article>
-      <article><small>ЖДУТ РЕШЕНИЯ</small><strong>{pending.length}</strong><span>{pending.length?'необходимо рассмотреть':'очередь пуста'}</span></article>
+      <article><small>ОТКРЫТЫЕ ГОЛОСОВАНИЯ</small><strong>{votes.filter(v=>v.status==='open').length}</strong><span>{votes.some(v=>v.status==='open')?'процедуры сейчас открыты':'открытых процедур нет'}</span></article>
       <article><small>АКТИВНОСТЬ</small><strong>{studentActivities.length}</strong><span>событий в загруженной ленте</span></article>
       <article><small>ГОТОВНОСТЬ</small><strong>{g.stages.filter(s=>s.status==='completed').length}/{g.stages.length}</strong><span>этапов завершено</span></article>
-     </div>
-     <div className="teacherOverviewDecision">
-      <div><small>ПЕРВОЕ РЕШЕНИЕ В ОЧЕРЕДИ</small><h3>{firstPending?.title||'Очередь пуста'}</h3>
-       <p>{firstPending?'Ожидает рассмотрения с '+new Date(firstPending.submitted_at).toLocaleString('ru-RU'):'Новых решений для преподавателя нет.'}</p></div>
-      <button type="button" onClick={onOpenProcesses} disabled={!firstPending}>Перейти к первому решению <ArrowRight size={18}/></button>
      </div>
     </>}
 
@@ -132,7 +124,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    <div className="surfaceHead"><div><small>АНАЛИТИКА ИГРЫ</small><h2>Общая статистика и вклад участников</h2></div><span>{members.filter(m=>m.kind==='student').length} студентов</span></div>
    <div className="teacherAnalyticsCards">
     <div><small>ПУБЛИКАЦИИ</small><strong>{politicalPosts.length}</strong><span>политических процессов</span></div>
-    <div><small>РЕШЕНИЯ</small><strong>{politicalDecisions.length}</strong><span>принято и зарегистрировано</span></div>
+    <div><small>ПАРТИИ</small><strong>{parties.length}</strong><span>политических организаций в игре</span></div>
     <div><small>НПА</small><strong>{formalDocuments.length}</strong><span>в реестре</span></div>
     <div><small>ГОЛОСОВАНИЯ</small><strong>{votes.length}</strong><span>{votes.filter(v=>v.status==='open').length} открыто</span></div>
     <div><small>ИЗМЕНЕНИЯ KPI</small><strong>{metricHistory.filter(h=>h.source_type!=='baseline').length}</strong><span>зафиксированных изменений</span></div>
