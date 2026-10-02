@@ -1,5 +1,5 @@
 'use client';
-export default function ScoreFormula(){
+export default function ScoreFormula({embedded=false}:{embedded?:boolean}){
  const weights=[
  ['НПА студента','2','1'],
  ['Процедурное действие по НПА','1','0'],
@@ -15,8 +15,7 @@ export default function ScoreFormula(){
  ['Стратегические упоминания, не более 8','0','0,4'],
  ['Архивное подтверждённое решение','0','1,5']
  ];
- return <details className="surface scoreFormula"><summary>Как система рассчитывает ВСН <span>Формулы для преподавателя</span></summary>
- <div className="scoreFormulaBody">
+ const body=<div className="scoreFormulaBody">
  <p>Расчёт ведётся отдельно для студента и этапа, внутри временного окна этапа. Автоматические новости, переходы по меню и присутствие не заменяют содержательного участия. Итог преподаватель утверждает после проверки доказательств.</p>
  <div className="scoreEquations"><p><b>ВСН = 0</b>, если нет содержательного участия.</p><p>При участии: <b>ВСН = max(1; П + С + А)</b>, максимум 3 балла. Каждый критерий принимает значение 0 или 1.</p></div>
  <ol><li><b>П — право.</b> (Правовой сигнал ≥ 2 или есть законно решённый кейс в пределах полномочий) и нет неправомерного решения кейса на этом этапе.</li>
@@ -25,5 +24,6 @@ export default function ScoreFormula(){
  <div className="scoreWeights"><table><caption>Сигнал = сумма (число действий × коэффициент)</caption><thead><tr><th>Действие</th><th>Правовой сигнал</th><th>Стратегический сигнал</th></tr></thead><tbody>{weights.map(row=><tr key={row[0]}>{row.map((v,i)=>i===0?<th scope="row" key={i}>{v}</th>:<td key={i}>{v}</td>)}</tr>)}</tbody></table></div>
  <p>Упоминания определяются по словарям и служат предварительным признаком. Они не доказывают знание закона. В карточке оценки преподаватель видит исходные действия, критерии и историю пересчёта. Ручные изменения и штрафы записываются отдельно; утверждённый итог автоматический пересчёт не меняет.</p>
  <p>Источник формулы: серверная функция compute_vsn_assessment. Архивные решения учитываются только в ранее накопленных доказательствах; отдельная механика их создания убрана.</p>
- </div></details>;
+ </div>;
+ return embedded?body:<details className="surface scoreFormula"><summary>Критерии и формула ВСН</summary>{body}</details>;
 }

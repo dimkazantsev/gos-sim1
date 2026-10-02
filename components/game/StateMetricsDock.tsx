@@ -1,4 +1,5 @@
 'use client';
+import {metricQuantity} from '@/lib/formatQuantity';
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {Activity,BadgeCheck,Globe2,Handshake,HeartHandshake,MessageSquare,Scale,ShieldCheck,TrendingUp,UsersRound,Wallet} from 'lucide-react';
@@ -102,7 +103,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
   return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} onClick={()=>{setCompare([]);setBucket('changes');setFocusedPoint(null);setShowFullHistory(false);setSelected(m.id)}}>
    <span className="statePulseIcon" aria-hidden="true">{metricIcon(m.metric_key)}</span>
    <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.label}</b><span>{last?.note||m.description||'Игровой показатель'}</span></div>
-   <div className="statePulseValue"><strong>{Number(m.value).toLocaleString('ru-RU')}{m.unit||''}</strong><em className={changeTone(m,d)}>{d===0?'—':`${d>0?'▲ +':'▼ '}${Math.abs(d).toFixed(Math.abs(d)%1?1:0)}`}</em></div>
+   <div className="statePulseValue"><strong>{metricQuantity(Number(m.value),m.unit,m.metric_key)}</strong><em className={changeTone(m,d)}>{d===0?'—':`${d>0?'▲ +':'▼ '}${Math.abs(d).toFixed(Math.abs(d)%1?1:0)}`}</em></div>
    <div className="statePulseTrend">
     {mini.length>1&&<svg viewBox="0 0 120 32" aria-hidden="true"><path d={spark(mini,120,32)} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"/></svg>}
     {pct!=null&&<i><span style={{width:pct+'%'}}/></i>}
@@ -119,7 +120,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
    <section ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="metric-title" className="metricModal redesigned" onClick={e=>e.stopPropagation()}>
     <header><div className="metricModalTitle"><span>{metricIcon(chosen.metric_key)}</span><div><small>{groupLabel(chosen.group_key).toUpperCase()}</small><h2 id="metric-title">{chosen.label}</h2><p>{chosen.description||'Игровой показатель состояния государства.'}</p></div></div><IconAction onClick={()=>setSelected('')} label="Закрыть показатель"/></header>
     <div className="metricModalBody">
-    <div className="metricHeroValue"><strong>{Number(chosen.value).toLocaleString('ru-RU')}{chosen.unit||''}</strong><span className={changeTone(chosen,delta(chosen))}>{delta(chosen)===0?'Без изменений':(delta(chosen)>0?'▲ +':'▼ ')+Math.abs(delta(chosen)).toFixed(1)+' с прошлого изменения'}</span></div>
+    <div className="metricHeroValue"><strong>{metricQuantity(Number(chosen.value),chosen.unit,chosen.metric_key)}</strong><span className={changeTone(chosen,delta(chosen))}>{delta(chosen)===0?'Без изменений':(delta(chosen)>0?'▲ +':'▼ ')+Math.abs(delta(chosen)).toFixed(1)+' с прошлого изменения'}</span></div>
     {hist.at(-1)&&<div className="metricLastCause"><small>ПОСЛЕДНЯЯ ПРИЧИНА</small><b>{hist.at(-1)?.note||hist.at(-1)?.source_type}</b><span>{new Date(hist.at(-1)!.recorded_at).toLocaleString('ru-RU')}</span></div>}
     <div className="metricBucketTabs"><button className={bucket==='changes'?'active':''} aria-pressed={bucket==='changes'} onClick={()=>{setFocusedPoint(null);setBucket('changes')}}>Все изменения</button><button className={bucket==='day'?'active':''} aria-pressed={bucket==='day'} onClick={()=>{setFocusedPoint(null);setBucket('day')}}>По дням</button><button className={bucket==='week'?'active':''} aria-pressed={bucket==='week'} onClick={()=>{setFocusedPoint(null);setBucket('week')}}>По неделям</button></div>
     <section className="metricChart redesignedChart" aria-label="График динамики показателей">

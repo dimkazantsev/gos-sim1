@@ -202,14 +202,12 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
    <div className="gradesHeroLegend"><span className="draft">Черновик</span><span className="final">Итоговая</span><span className="empty">Нет оценки</span></div>
   </section>
 
-  <details className="surface gradesRules gradesRulesCompact"><summary>Критерии выставления баллов <span>0–3 балла · показать объяснение</span></summary><div className="gradesRuleItems">
+  <details className="surface gradesRules gradesRulesCompact"><summary>Критерии и формула ВСН <span>0–3 балла · раскрыть расчёт</span></summary><div className="gradesRuleItems">
    <div><b>1 балл</b><span>Право и правила</span><p>Знание норм, полномочий, процедур и корректное применение их в игровой ситуации.</p></div>
    <div><b>+1 балл</b><span>Стратегия и интересы</span><p>Осмысленные решения с учётом целей своей стороны, ресурсов, выгод, рисков и последствий.</p></div>
    <div><b>+1 балл</b><span>Анализ этапа</span><p>Причины, интересы, институты, результат и политические последствия произошедшего.</p></div>
    <div><b>0 баллов</b><span>Нет участия</span><p>На этапе не зафиксировано содержательных действий студента.</p></div>
-  </div></details>
-
-  {teacher&&<ScoreFormula/>}
+  </div>{teacher&&<ScoreFormula embedded/>}</details>
   <section className="surface gradesMatrixWrap">
    <div className="surfaceHead"><div><small>ГРУППА × ЭТАПЫ</small><h2>Оценки всех участников</h2></div><span>{sortedStudents.length} из {students.length}</span></div>
    <div className="gradesToolbar">
