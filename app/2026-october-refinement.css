@@ -44,6 +44,7 @@
 
 /* Scoring guide: keep the disclosure, cards and equations within their own
    reading grid instead of inheriting the legacy four-column rules panel. */
+.teacherCommand .teacherWorkspaceNav{background:#fff}
 .gradesPage>.vsnGuide{width:100%;max-width:100%;min-width:0;border-radius:14px}
 .gradesRulesCompact.vsnGuide>summary{display:grid;grid-template-columns:minmax(0,1fr) auto 20px;align-items:center;gap:12px;min-height:72px;padding:16px 20px;list-style:none;color:var(--gs-ink,#173c70);scroll-margin-block:90px}
 .vsnGuide>summary::-webkit-details-marker{display:none}
