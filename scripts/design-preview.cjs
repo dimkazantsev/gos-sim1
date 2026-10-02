@@ -7,6 +7,8 @@ Module._resolveFilename=function(request,...args){return originalResolve.call(th
 // Closed dialogs do not render in this static preview. Next.js supplies their
 // scoped styles in the real browser interaction checks.
 require.extensions['.css']=module=>{module.exports={}};
+// Static image imports use Next's asset shape; this preview has no bundler.
+for(const ext of ['.png','.jpg','.jpeg','.webp','.svg'])require.extensions[ext]=(module,file)=>{module.exports={src:require('node:url').pathToFileURL(file).href}};
 for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,file);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const h=React.createElement,noop=()=>{};
