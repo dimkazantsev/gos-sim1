@@ -14,7 +14,7 @@ fs.mkdirSync(shotDir,{recursive:true});
 async function main(){
  const browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
-  const page=await browser.newPage({viewport:{width:1440,height:940},deviceScaleFactor:1});
+  const page=await browser.newPage({viewport:{width:1440,height:940},deviceScaleFactor:1,reducedMotion:'reduce'});
   await page.goto('file://'+preview,{waitUntil:'load'});
   const frame=page.frameLocator('#preview');
   for(const width of [1440,1180,900,820,768,650,600,430,390,360,320]){
@@ -80,6 +80,17 @@ async function main(){
    // the opened guide in the actual teacher workspace, including its table.
    await page.locator('#screen').selectOption('teacher-grades');
    const guide=frame.locator('.vsnGuide');await guide.waitFor();
+   await guide.locator(':scope > summary').scrollIntoViewIfNeeded();
+   const closed=await guide.evaluate(el=>{
+    const rect=node=>{const r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
+    const summary=el.querySelector('summary'),r=summary.getBoundingClientRect();
+    const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
+    return {guide:rect(el),summary:rect(summary),matrix:rect(el.nextElementSibling),hit:hit?.className,clickable:!!hit&&summary.contains(hit)};
+   });
+   console.log('Scoring disclosure '+width+'px: '+JSON.stringify(closed));
+   await page.locator('#preview').screenshot({path:path.join(shotDir,'score-guide-closed-'+width+'.png')});
+   assert(closed.matrix.top>=closed.guide.bottom-2,'Grade matrix must not overlap scoring disclosure at '+width+'px: '+JSON.stringify(closed));
+   assert(closed.clickable,'Scoring summary must receive clicks at '+width+'px: '+JSON.stringify(closed));
    await guide.locator(':scope > summary').click();
    assert.equal(await guide.getAttribute('open'),'','Scoring guide expands at '+width+'px');
    const scoring=await guide.evaluate(el=>{

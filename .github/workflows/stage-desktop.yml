@@ -14,6 +14,7 @@ on:
       - 'components/game/ClassroomJournal.tsx'
       - 'components/game/ParticipantsAnalytics.tsx'
       - 'components/game/GradesView.tsx'
+      - 'components/game/ScoreFormula.tsx'
       - 'components/game/ProfileView.tsx'
       - 'components/GameClient.tsx'
       - 'app/stage-map.css'
@@ -21,6 +22,7 @@ on:
       - 'app/teacher-operations.css'
       - 'app/teacher-ui-polish.css'
       - 'app/teacher-extended.css'
+      - 'app/2026-october-refinement.css'
       - 'app/layout.tsx'
       - 'app/globals.css'
       - 'app/design-*.css'
@@ -28,6 +30,7 @@ on:
       - 'scripts/design-audit.mjs'
       - 'scripts/stage-desktop-browser-check.cjs'
       - 'scripts/teacher-command-browser-check.cjs'
+      - 'scripts/teacher-mobile-browser-check.cjs'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/stage-desktop.yml'
@@ -61,6 +64,10 @@ jobs:
         run: npm run design:check
       - name: Build real component preview
         run: npm run design:preview
+      - name: Scoring guide and mobile geometry
+        run: npm run design:mobile
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - name: Stage cards visual regression
         run: npm run design:stages
         env:
@@ -78,4 +85,5 @@ jobs:
             .design-review/screenshots/stages-*.png
             .design-review/screenshots/teacher-stages-*.png
             .design-review/screenshots/teacher-*.png
+            .design-review/screenshots/score-guide-*.png
           if-no-files-found: ignore
