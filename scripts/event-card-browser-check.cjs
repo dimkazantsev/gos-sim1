@@ -43,7 +43,7 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    const hashes=new Set();
    for(const number of [6,10,13,21,41,42,43,44,45,46,47,48,49,50]){
     const svg=page.locator('[data-case="bank-curated-v2-'+String(number).padStart(2,'0')+'"] svg[data-scene], [data-case="bank-curated-v2-'+String(number).padStart(2,'0')+'"] figure.cinematicRaster[data-scene]');
-    assert.equal(await svg.getAttribute('data-scene'),String(number));
+    assert.equal(await svg.getAttribute('data-scene'),String(number));const bounds=await svg.boundingBox();assert(bounds&&bounds.width>0&&bounds.height>0,'Every scene must have a visible image box: '+number);
     const buffer=await svg.screenshot();hashes.add(crypto.createHash('sha256').update(buffer).digest('hex'));
    }
    assert.equal(hashes.size,14,'Distinct scenes must never collapse to the same visible panel');
