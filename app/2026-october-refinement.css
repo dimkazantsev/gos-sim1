@@ -2,3 +2,183 @@
 .budgetStudentPath{padding:20px 24px;border:1px solid #dce4ed;border-radius:14px;background:#fff}.budgetStudentPath h2{margin:0 0 16px;font-size:19px;color:#152e57}.budgetStudentPath ol{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;padding:0;list-style:none;counter-reset:budget-step}.budgetStudentPath li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:7px 9px;counter-increment:budget-step}.budgetStudentPath li:before{content:counter(budget-step);grid-row:1/3;display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:#eaf0ff;color:#2453e6;font-weight:800}.budgetStudentPath li span{grid-column:2;color:#52647d;line-height:1.6;font-size:13px}.budgetLevelCards{direction:rtl}.budgetLevelCards article{direction:ltr}.budgetLevelCards h2{margin:0;font-size:18px}.budgetLevelCards dl{margin:0;display:grid;gap:12px}.budgetLevelCards dl>div{display:grid;gap:5px}.budgetLevelCards dt{font-size:13px;color:#536579}.budgetLevelCards dd{margin:0;color:#173c70;font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.budgetLevelCards article>span{font-size:12px;line-height:1.6}.budgetEnterpriseCount{margin:0;color:#52647d;font-size:14px}.budgetTaxGuide>summary{color:#173c70}.budgetTaxGuide>summary>span{margin-left:auto;color:#657990;font-size:12px}.budgetTaxGuideBody{padding-top:14px}.gradesRulesCompact>summary{min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px}.gradesRulesCompact .scoreFormulaBody{padding:18px 0 0;margin-top:18px;border-top:1px solid #dce4ed}.gradesRulesCompact .gradesRuleItems{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.gradesRuleItems>div{min-width:0}.statePulseValue>strong{white-space:nowrap}
 @media(max-width:1000px){.budgetStudentPath ol{grid-template-columns:repeat(2,minmax(0,1fr))}.gradesRulesCompact .gradesRuleItems{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.budgetStudentPath{padding:16px}.budgetLevelCards{direction:ltr;grid-template-columns:minmax(0,1fr)}.budgetStudentPath ol{grid-template-columns:minmax(0,1fr)}.budgetLevelCards dl{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.budgetLevelCards dl>div:last-child{grid-column:1/-1}.budgetLevelCards dd{font-size:21px}.gradesRulesCompact>summary{align-items:flex-start;flex-direction:column}.gradesRulesCompact .gradesRuleItems{grid-template-columns:minmax(0,1fr)}}
+
+/* Chat controls belong to one stable container; long channel names wrap inside it. */
+.gsChatV2 .chatTop{position:relative}.gsChatV2 .chatChannelPicker{position:static;min-width:0;flex:1}.gsChatV2 .chatChannelMenu{position:absolute;left:12px;right:12px;top:calc(100% - 2px);width:auto;min-width:0;max-width:none;max-height:min(45dvh,340px);overflow:auto;z-index:30;padding:8px;box-sizing:border-box}.gsChatV2 .chatChannelOption{display:grid;grid-template-columns:32px minmax(0,1fr) 18px;align-items:center;gap:10px;min-height:58px;width:100%;height:auto;padding:10px;text-align:left}.gsChatV2 .chatChannelOptionText{min-width:0;display:grid;gap:4px}.gsChatV2 .chatChannelOptionText b{white-space:normal;word-break:normal;overflow-wrap:anywhere;font-size:14px;line-height:1.4}.gsChatV2 .chatChannelOptionText small{white-space:normal;font-size:12px;line-height:1.4}.gsChatV2 .chatChannelOptionIcon{width:32px;height:32px;display:grid;place-items:center}.chatPersonalBar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 14px 10px;flex:none;border-bottom:1px solid #dce5f0}.chatPersonalBar>span{font-size:12px;color:#536579;line-height:1.5}.chatPersonalTrigger{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;background:#eff4fc;border:1px solid #d4e0f1;border-radius:9px;color:#2453e6;padding:8px 10px;white-space:nowrap}.directMessagePicker{position:static}.chatPersonalBar{position:relative}.directMessageMenu{position:absolute;left:12px;right:12px;top:calc(100% - 4px);width:auto;min-width:0;max-height:55dvh;overflow:auto;z-index:25;padding:12px;border:1px solid #dce5f0;box-shadow:0 12px 32px #19355724;border-radius:12px;background:white}.directMessageMenu header{display:flex;align-items:center;justify-content:space-between;gap:8px}.directMessageSearch{display:flex;align-items:center;gap:8px;padding:10px 0}.directMessageSearch input{width:100%;min-width:0;min-height:44px}.directMessagePeople{display:grid;max-height:35dvh;overflow:auto;gap:6px}.directMessagePeople button{display:grid;gap:5px;min-height:58px;padding:10px;text-align:left;width:100%;height:auto}.directMessagePeople small{font-size:12px}.gsChatV2 .chatProcessTags{margin:0 0 8px;padding:0;border:1px solid #dce5f0;border-radius:9px;background:#f8faff}.gsChatV2 .chatProcessTags>summary{min-height:44px;padding:10px 12px;box-sizing:border-box;color:#244774;font-size:13px;line-height:1.5}.gsChatV2 .chatProcessTags>small{display:block;margin:0;padding:0 12px 10px;color:#52647d}.gsChatV2 .chatProcessTags>div{display:flex;flex-wrap:wrap;align-content:start;gap:6px;max-height:min(160px,22dvh);overflow:auto;padding:0 10px 10px}.gsChatV2 .chatProcessTags button{min-height:36px;font-size:12px;padding:7px 9px;border-radius:8px;background:#eaf0ff;color:#254ca8}.gsChatV2 .chatCompose{flex:none;min-height:0}.gsChatV2 .chatMessages{min-height:0;flex:1;overflow:auto}.gsChatV2 .chatTop :is(.chatHeadIcon,.chatIconButton,.iconAction){flex:none}
+/* Same line and left edge for descriptions and metric actions. */
+.impactWorkbench .impactLedgerItem,.impactWorkbench .impactHistoryItem{min-width:0;align-items:start}.impactWorkbench .impactLedgerEffects{justify-content:flex-start;margin-left:0;width:100%}.impactWorkbench .impactLedgerEffects :is(button,.impactDelta){display:inline-flex;align-items:center;justify-content:center;text-align:center;gap:7px;min-height:40px;height:auto;margin:0;padding:8px 11px;line-height:1.45;white-space:normal}.impactWorkbench .impactLedgerEffects svg{flex:none;margin:0;position:static}.impactWorkbench .impactLedgerEffects .impactDelta b{display:inline-flex;align-items:center;justify-content:center}
+/* The form uses two usable columns instead of four compressed fields. */
+.deadlineControl{min-width:0}.deadlineControl>header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.deadlineControl .deadlineApplyGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:16px;padding:18px}.deadlineApplyGrid>label{display:grid;grid-template-rows:auto 44px;gap:8px;min-width:0;color:#334c70;font-size:14px;line-height:1.5}.deadlineApplyGrid :is(select,input){height:44px;min-height:44px;width:100%;min-width:0;box-sizing:border-box;margin:0;padding:9px 12px;font-size:14px}.deadlineApplyGrid .deadlineReason{grid-column:1/-1;grid-template-rows:auto auto}.deadlineApplyGrid textarea{width:100%;min-width:0;box-sizing:border-box;min-height:96px;padding:12px;color:#193557}.deadlineApplyGrid .deadlineGuide{grid-column:1/-1;padding:14px;border-radius:10px;background:#eff4fb;color:#294b78}.deadlineApplyGrid .deadlineGuide p{color:#52647d;margin:7px 0 0;line-height:1.6}.deadlineApplyGrid>.primary{justify-self:start;min-height:44px}.deadlineLedger article{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:start;gap:12px}.deadlineLedger article>div{min-width:0}.deadlineLedger :is(b,p,small){overflow-wrap:anywhere}.deadlineApply>summary{min-width:0;height:auto}.deadlineApply .disclosureText{min-width:0}
+/* Legacy paragraph/span styles cannot collapse a linked vote into tiny columns. */
+.processPortal .wallVoteLink{display:grid;grid-template-columns:24px minmax(0,1fr) auto;width:calc(100% - 44px);height:auto;min-height:76px;gap:12px;align-items:center;overflow:hidden;white-space:normal}.processPortal .wallVoteLink>span{display:grid;grid-template-columns:minmax(0,1fr);width:auto;max-width:none;min-width:0;margin:0;gap:6px}.processPortal .wallVoteLink :is(small,b,strong){display:block;width:auto;max-width:none;min-width:0;margin:0;white-space:normal;word-break:normal;overflow-wrap:anywhere;line-height:1.5;text-align:left}.processPortal .wallVoteLink>strong{max-width:180px}.processPortal .wallVoteLink>svg{position:static;margin:0;flex:none}.processPortal .wallPostActions{height:auto;min-height:44px;align-items:center;clear:both}.processPortal .wallPost{min-width:0;overflow:hidden}
+.documentNextStep{padding:16px 18px;border-left:3px solid #2453e6;border-radius:8px;background:#eff5fd;margin:12px 0 16px}.documentNextStep>span{font-size:12px;color:#536579}.documentNextStep h3{color:#173c70;font-size:18px;margin:7px 0}.documentNextStep p{margin:8px 0;color:#334e73;line-height:1.6}.documentNextStep small{color:#536579;font-size:13px;line-height:1.6}.legalRouting .formalSteps{display:flex;overflow-x:auto;gap:12px;scroll-snap-type:x proximity;padding-bottom:10px}.legalRouting .formalStep{flex:0 0 170px;min-width:0;height:auto;scroll-snap-align:start}.legalRouting .formalStep :is(b,small){white-space:normal;line-height:1.5;overflow-wrap:anywhere}
+/* Stage text must not inherit pale foregrounds from the old dark panels. */
+:is(.stageDetails,.stageDetail,.stageArticle,.stageWorkPanel,.stageModal,.stagePanel,.stageArtifacts,.stageBriefing,.stageInstitutional,.stageStrategy,.stageMechanics) :is(p,li,span,small,label){color:#435977}.stageArtifacts h3{color:#173c70}.stageArtifactResults{min-width:0}.stageArtifactResults>div{min-width:0}.stageArtifactResults button{height:auto;min-height:60px;display:flex;align-items:center;gap:12px;text-align:left;widt…31875 tokens truncated… TeacherPartyDossiers from './TeacherPartyDossiers';
+import TeacherGhostVotingPanel from './TeacherGhostVotingPanel';
+import EventWorkspace from './EventWorkspace';
+import type {ReturnTypeRepublic} from './viewTypes';
+import ImpactRulesPanel from './ImpactRulesPanel';
+import GradesView from './GradesView';
+import TeacherAwards from './TeacherAwards';
+import {useSavedGameState,savedChoice} from './useSavedGameState';
+
+function timerText(seconds:number){
+ const m=Math.floor(seconds/60),s=seconds%60;
+ return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools'|'event'|'awards';
+const WORKSPACES=[
+ {key:'overview',title:'Обзор',icon:Activity},
+ {key:'stages',title:'Этапы',icon:BookOpenText},
+ {key:'journal',title:'Журнал',icon:UsersRound},
+ {key:'analytics',title:'Аналитика',icon:BarChart3},
+ {key:'grades',title:'Оценки',icon:GraduationCap},
+ {key:'impact',title:'Модель последствий',icon:Network},
+ {key:'parties',title:'Фракции',icon:UsersRound},
+ {key:'tools',title:'Инструменты',icon:Wrench},
+ {key:'event',title:'Event',icon:BookOpenText},
+ {key:'awards',title:'Награды',icon:Award}
+] as const;
+
+export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void}){
+ const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
+
+ const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
+
+ const studentIds=useMemo(()=>new Set(members.filter(m=>m.kind!=='teacher').map(m=>m.user_id)),[members]);
+ const studentActivities=useMemo(()=>activities.filter(a=>studentIds.has(a.actor_id)),[activities,studentIds]);
+
+
+ if(!game)return null;
+ const pending=actions.filter(a=>a.status==='submitted');
+ const firstPending=[...pending].sort((a,b)=>new Date(a.submitted_at).getTime()-new Date(b.submitted_at).getTime())[0];
+ const onlineCount=members.filter(m=>m.kind==='student'&&presence.some(p=>p.user_id===m.user_id&&Date.now()-new Date(p.last_seen_at).getTime()<90000)).length;
+
+
+ function confirmNext(){if(window.confirm('Перейти к следующему этапу? Проверьте индикатор процедурной готовности выше: переход остаётся ручным и может быть выполнен даже при незавершённых процедурах.'))void nextStage()}
+ function confirmCrisis(){if(window.confirm('Разыграть случайный кризис для всей аудитории?'))void triggerCrisis()}
+ function confirmGhost(){if(window.confirm('Запустить ghost voting?'))void ghostVoting()}
+ function exportSession(){
+  const rows=[['Время','Участник','Тип','Действие','Раздел']];
+  for(const a of [...activities].reverse())rows.push([new Date(a.created_at).toLocaleString('ru-RU'),names[a.actor_id]||a.actor_id,a.event_type,a.label,a.view_key||'']);
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='gos-sims-activity-'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(url);
+ }
+
+ return <div className="teacherSimple teacherCommand">
+  <section className="teacherWorkspace" aria-label="Рабочие разделы управления">
+   <div className="teacherWorkspaceNav" role="tablist" aria-label="Рабочие разделы преподавателя">
+    {WORKSPACES.map(item=>{
+     const Icon=item.icon;
+     return <button key={item.key} type="button" role="tab" id={'teacher-tab-'+item.key}
+      aria-controls="teacher-workspace-panel" aria-selected={workspace===item.key} tabIndex={workspace===item.key?0:-1}
+      className={workspace===item.key?'active':''} onClick={()=>setWorkspace(item.key)}
+      onKeyDown={event=>{
+       if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+       event.preventDefault();
+       const index=WORKSPACES.findIndex(entry=>entry.key===item.key);
+       const nextIndex=event.key==='Home'?0:event.key==='End'?WORKSPACES.length-1:
+        (index+(event.key==='ArrowRight'?1:-1)+WORKSPACES.length)%WORKSPACES.length;
+       const next=WORKSPACES[nextIndex];setWorkspace(next.key);
+       document.getElementById('teacher-tab-'+next.key)?.focus();
+      }}>
+      <Icon size={18} strokeWidth={1.9} aria-hidden="true"/><span>{item.title}</span>
+      {item.key==='overview'&&pending.length>0&&<em>{pending.length}</em>}
+     </button>
+    })}
+   </div>
+   <section className="teacherCommandBar" aria-label="Быстрое управление игрой">
+   <div className="teacherCommandStage">
+    <span className="teacherEyebrow">ПУЛЬТ ПРЕПОДАВАТЕЛЯ</span>
+    <div className="teacherCommandStageLine">
+     <span className="teacherCommandStageNo">{String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</span>
+     <div>
+      <small>ТЕКУЩИЙ ЭТАП</small>
+      <h1>{currentStage?.title||'Подготовка игры'}</h1>
+     </div>
+    </div>
+   </div>
+   <div className="teacherCommandClock">
+    <span className={game.turn_open?'teacherTurnBadge isOpen':'teacherTurnBadge isPaused'}>{game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span>
+    <strong>{game.turn_open&&game.turn_ends_at?timerText(secondsLeft):'—'}</strong>
+   </div>
+   <div className="teacherQuickActions">
+    <button type="button" className={game.turn_open?'teacherQuick danger':'teacherQuick primary'} onClick={()=>setTurn(!game.turn_open)}>
+     <span>{game.turn_open?<Pause size={18} strokeWidth={2} aria-hidden="true"/>:<Play size={18} strokeWidth={2} aria-hidden="true"/>}</span>
+     <b>{game.turn_open?'Пауза':'Открыть ход'}</b>
+    </button>
+    <button type="button" className="teacherQuick" onClick={onOpenProcesses}>
+     <span><Radio size={18} strokeWidth={2} aria-hidden="true"/></span><b>Политический процесс</b>
+    </button>
+    <button type="button" className="teacherQuick" onClick={confirmNext}>
+     <span><ArrowRight size={18} strokeWidth={2} aria-hidden="true"/></span><b>Следующий этап</b>
+    </button>
+   </div>
+  </section>
+   <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
+    {workspace==='overview'&&<>
+     <div className="teacherOverviewStats">
+      <article><small>В ИГРЕ СЕЙЧАС</small><strong>{onlineCount}</strong><span>из {members.filter(m=>m.kind==='student').length} студентов онлайн</span></article>
+      <article><small>ЖДУТ РЕШЕНИЯ</small><strong>{pending.length}</strong><span>{pending.length?'необходимо рассмотреть':'очередь пуста'}</span></article>
+      <article><small>АКТИВНОСТЬ</small><strong>{studentActivities.length}</strong><span>событий в загруженной ленте</span></article>
+      <article><small>ГОТОВНОСТЬ</small><strong>{g.stages.filter(s=>s.status==='completed').length}/{g.stages.length}</strong><span>этапов завершено</span></article>
+     </div>
+     <div className="teacherOverviewDecision">
+      <div><small>ПЕРВОЕ РЕШЕНИЕ В ОЧЕРЕДИ</small><h3>{firstPending?.title||'Очередь пуста'}</h3>
+       <p>{firstPending?'Ожидает рассмотрения с '+new Date(firstPending.submitted_at).toLocaleString('ru-RU'):'Новых решений для преподавателя нет.'}</p></div>
+      <button type="button" onClick={onOpenProcesses} disabled={!firstPending}>Перейти к первому решению <ArrowRight size={18}/></button>
+     </div>
+    </>}
+
+    {workspace==='stages'&&<TeacherStageManager g={g} onOpenStage={onOpenStages}/>}
+    {workspace==='journal'&&<ClassroomJournal g={g}/>}
+
+    {workspace==='analytics'&&<section className="teacherAnalytics surface">
+   <div className="surfaceHead"><div><small>АНАЛИТИКА ИГРЫ</small><h2>Общая статистика и вклад участников</h2></div><span>{members.filter(m=>m.kind==='student').length} студентов</span></div>
+   <div className="teacherAnalyticsCards">
+    <div><small>ПУБЛИКАЦИИ</small><strong>{politicalPosts.length}</strong><span>политических процессов</span></div>
+    <div><small>РЕШЕНИЯ</small><strong>{politicalDecisions.length}</strong><span>принято и зарегистрировано</span></div>
+    <div><small>НПА</small><strong>{formalDocuments.length}</strong><span>в реестре</span></div>
+    <div><small>ГОЛОСОВАНИЯ</small><strong>{votes.length}</strong><span>{votes.filter(v=>v.status==='open').length} открыто</span></div>
+    <div><small>ИЗМЕНЕНИЯ KPI</small><strong>{metricHistory.filter(h=>h.source_type!=='baseline').length}</strong><span>зафиксированных изменений</span></div>
+   </div>
+   <ParticipantsAnalytics g={g}/>
+  </section>}
+
+    {workspace==='grades'&&<GradesView g={g}/>}
+    {workspace==='awards'&&<TeacherAwards g={g}/>}
+    {workspace==='impact'&&<ImpactRulesPanel g={g}/>}
+
+    {workspace==='parties'&&<TeacherPartyDossiers g={g} onOpenChat={onOpenChat}/>}
+
+    {workspace==='tools'&&<>
+    <details className="teacherDetails" open>
+   <summary><div><b>Быстрые инструменты</b><span>Таймер, кризис и Ghost Voting; публикации доступны в политических процессах</span></div><i>+</i></summary>
+   <div className="teacherDetailsBody">
+    <div className="directorButtons compact">
+     {[10,20,30,60].map(n=><button key={n} onClick={()=>setTurnMinutes(n)}><span><Clock3 size={21} strokeWidth={1.8}/></span><b>Ход на {n} минут</b></button>)}
+     <button className="dangerQuick" onClick={confirmCrisis}><span><AlertTriangle size={22} strokeWidth={1.8}/></span><b>Разыграть кризис</b></button>
+     <button onClick={confirmGhost}><span><Zap size={22} strokeWidth={1.8}/></span><b>Случайное Ghost Voting</b></button>
+     {parties.some(p=>p.ghost_active)&&<button onClick={()=>{if(confirm('Завершить ближайшее заседание ГД и восстановить полный состав всех фракций?'))void clearPartyGhostLoss()}}><span><RotateCcw size={22} strokeWidth={1.8}/></span><b>Завершить заседание ГД · снять GV</b></button>}
+     <button onClick={exportSession}><span><Download size={22} strokeWidth={1.8}/></span><b>Экспорт журнала</b></button>
+    </div>
+    <TeacherGhostVotingPanel g={g}/>
+
+   </div>
+  </details>
+
+  <details className="teacherDetails">
+   <summary><div><b>Игровые роли</b><span>Назначение должностей участникам; ручная корректировка рейтингов находится в модели последствий</span></div><i>+</i></summary>
+   <div className="teacherDetailsBody split">
+    
+    <div><h3>Игровые роли</h3><div className="evaluationRows">{members.filter(m=>m.kind!=='teacher').map(m=><div key={m.user_id}><div className="studentIdentity"><b>{m.full_name}</b><input key={m.user_id+(m.role_title||'')} defaultValue={m.role_title||''} onBlur={e=>updateMember(m.user_id,{role_title:e.target.value})} aria-label="Игровая роль участника" placeholder="Игровая роль"/></div></div>)}</div></div>
+   </div>
+  </details>
+    </>}
+    {workspace==='event'&&<EventWorkspace g={g} mode="manage"/>}
+   </div>
+  </section>
+ </div>;
+}

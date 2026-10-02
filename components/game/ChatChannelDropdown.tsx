@@ -47,16 +47,17 @@ export default function ChatChannelDropdown({
   <span className="chatEyebrow">Общение</span>
   <button type="button" ref={trigger} className="chatChannelTrigger" aria-label={'Выбрать канал: '+(current?.name||'Нет каналов')}
    aria-haspopup="menu" aria-expanded={open} aria-controls={open?menuId:undefined} disabled={!channels.length} onClick={toggle}>
-   <span className="chatChannelName">{(current?.kind==='public'?'Общая беседа':current?.name)||'Нет доступных каналов'}</span>
+   <span className="chatChannelName">{displayName(current?.name)||'Нет доступных каналов'}</span>
    <ChevronDown className="chatChannelChevron" aria-hidden="true" size={17}/>
   </button>
   {open&&<div className="chatChannelMenu" id={menuId} role="menu" aria-label="Каналы общения">
    {channels.map(c=><button key={c.id} type="button" role="menuitemradio" aria-checked={value===c.id}
     className={'chatChannelOption '+(value===c.id?'selected':'')} onClick={()=>choose(c.id)}>
     <span className="chatChannelOptionIcon" aria-hidden="true"><UsersRound size={16}/></span>
-    <span className="chatChannelOptionText"><b>{c.kind==='public'?'Общая беседа':c.name}</b><small>{c.kind==='public'?'Все участники':c.kind==='team'?'Фракция':c.kind==='teacher'?'Преподаватели':'Личная беседа'}</small></span>
+    <span className="chatChannelOptionText"><b>{displayName(c.name)}</b><small>{c.name==='Вне игры'?'Неформальное общение':c.kind==='public'?'Все участники':c.kind==='team'?'Фракция':c.kind==='teacher'?'Преподаватели':'Личная беседа'}</small></span>
     {value===c.id&&<Check size={17} className="chatChannelSelectedCheck" aria-hidden="true"/>}
    </button>)}
   </div>}
  </div>;
 }
+function displayName(name?:string){return name&&['Общая беседа','Общий штаб','Общий чат'].includes(name)?'Публичная политика':name}

@@ -2,6 +2,8 @@
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import DisclosureSummary from '../ui/DisclosureSummary';
+import {Scale} from 'lucide-react';
 
 type DeadlineIncident={
  id:string;game_id:string;stage_no:number;party_id:string|null;user_id:string|null;
@@ -85,10 +87,10 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
   {active.length>0&&<div className="deadlineLedger">{active.map(x=><article key={x.id}><div><b>{CONSEQUENCES[x.consequence_type].label}</b><small>{x.party_id?partyName(x.party_id):userName(x.user_id)} · {new Date(x.created_at).toLocaleString('ru-RU')}</small><p>{x.note}</p></div><strong>{x.magnitude!=null?String(x.magnitude)+' '+CONSEQUENCES[x.consequence_type].unit:'зафиксировано'}</strong>{teacher&&<button disabled={busy} onClick={()=>void revert(x.id)}>Отменить</button>}</article>)}</div>}
 
   {teacher&&<details className="deadlineApply">
-   <summary><div><b>Зафиксировать нарушение и последствие</b><span>Число задаёт преподаватель только там, где правила игры не дают фиксированной величины.</span></div><i>+</i></summary>
+   <DisclosureSummary icon={Scale} title="Зафиксировать нарушение и последствие" description="Выберите адресата, последствие и укажите основание"/>
    <div className="deadlineApplyGrid">
     <label>Партия<select value={partyId} onChange={e=>{setPartyId(e.target.value);if(e.target.value)setUserId('')}}><option value="">Не выбрана</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-    <label>Студент · индивидуальная запись<select value={userId} onChange={e=>{setUserId(e.target.value);if(e.target.value){setPartyId('');setKind('other')}}}><option value="">Не выбран</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>
+    <label>Студент<select value={userId} onChange={e=>{setUserId(e.target.value);if(e.target.value){setPartyId('');setKind('other')}}}><option value="">Не выбран</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>
     <label>Тип последствия<select value={kind} onChange={e=>{setKind(e.target.value as keyof typeof CONSEQUENCES);if(e.target.value!=='other')setUserId('')}}>{Object.entries(CONSEQUENCES).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select></label>
     {kind!=='other'&&<label>Величина<input type="number" min={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} max={kind==='representation_loss'?450:kind==='regional_seat_loss'?89:kind==='presidential_rating_loss'?100:undefined} step={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} value={magnitude} onChange={e=>setMagnitude(e.target.value)} placeholder={guide.unit}/></label>}
     <label className="deadlineReason">Основание<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Что именно не выполнено в установленный срок и почему применяется это последствие?"/></label>

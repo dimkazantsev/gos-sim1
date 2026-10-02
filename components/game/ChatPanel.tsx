@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
-import {ArrowDown,Download,FileText,Mic,Paperclip,Pin,PinOff,Plus,Search,Send,Square,Trash2,Video,X} from 'lucide-react';
+import {ArrowDown,Download,FileText,Mic,Paperclip,Pin,PinOff,Search,Send,Square,Trash2,Video,X} from 'lucide-react';
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
@@ -52,6 +52,7 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember,readOnly=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void;readOnly?:boolean}){
  const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
+ useEffect(()=>{if(!g.game?.id)return;let live=true;void supabase.rpc('ensure_social_channels',{p_game_id:g.game.id}).then(r=>{if(live){if(r.error)g.setError(r.error.message);else void g.refresh()}});return()=>{live=false}},[g.game?.id]);
  const [sending,setSending]=useState(false);
  const [uploading,setUploading]=useState(false);
  const [recordElapsed,setRecordElapsed]=useState(0);
@@ -251,10 +252,10 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   <header className="chatTop">
    <div className="chatHeadIcon" aria-hidden="true"><MessageIcon/></div>
    <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} initialOpen={previewChannelOpen}/>
-   {!readOnly&&<DirectMessagePicker g={g}/>}
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
    <IconAction onClick={()=>setChatOpen(false)} label="Закрыть чат"/>
   </header>
+  {!readOnly&&<div className="chatPersonalBar"><DirectMessagePicker g={g}/><span>Или введите @Фамилия в сообщении</span></div>}
   {chatPins.length>0&&<div className="chatPinnedWrap">
    <button type="button" className="chatPinnedToggle" aria-expanded={pinsOpen} aria-controls="chat-pinned-list" onClick={()=>setPinsOpen(v=>!v)}>
     <Pin size={16} aria-hidden="true"/><span>Закреплено</span><b>{chatPins.length}</b><span className="chatPinnedPreview">{pinnedMessages[0]?.text||'Материалы канала'}</span>
@@ -337,7 +338,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
   {!readOnly?<div className="chatCompose">
    {address&&<div className="chatAddressList" aria-label="Получатель личного сообщения"><small>Личное сообщение · Выберите адресата</small>{suggestions.map(x=><button type="button" key={x.member.user_id} disabled={sending} onClick={()=>void addressPerson(x.member.user_id)}><b>{x.member.full_name}</b><span>@{x.handle}</span></button>)}{!suggestions.length&&<span>Участник не найден.</span>}</div>}
-   {channels.find(c=>c.id===channelId)?.kind==='public'&&<details className="chatProcessTags"><summary>Сообщение для политического процесса</summary><small>Добавьте игровой тег: сообщение из общего чата автоматически появится в публичной ленте.</small><div>{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
+   {channels.find(c=>c.id===channelId)?.kind==='public'&&channels.find(c=>c.id===channelId)?.name!=='Вне игры'&&<details className="chatProcessTags"><summary>Сообщение для политического процесса</summary><small>Добавьте тег, чтобы направить сообщение в публичную ленту.</small><div aria-label="Теги сообщения">{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
    <div className="chatInputRow">
     <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)}
      placeholder={channelId?'Сообщение или @Фамилия для личной беседы':'Выберите канал'}
@@ -351,7 +352,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      <button type="button" ref={attachmentButton} className={'chatIconButton chatAttachButton '+(attachOpen?'active':'')}
       aria-label="Прикрепить файл" aria-haspopup="menu" aria-expanded={attachOpen}
       disabled={!channelId||uploading||chatLoading||!!recording||!!recordingPreview||recordingSaving}
-      onClick={()=>setAttachOpen(v=>!v)}><Plus aria-hidden="true"/></button>
+      onClick={()=>setAttachOpen(v=>!v)}><Paperclip aria-hidden="true"/></button>
      {attachOpen&&<div className="chatAttachMenu" role="menu" aria-label="Добавить в чат">
       <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);uploadInput.current?.click()}}>
        <Paperclip aria-hidden="true" size={18}/>Файл, фото, аудио или видео

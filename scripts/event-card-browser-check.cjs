@@ -17,8 +17,8 @@ assert.equal(new Set(cases.map(c=>JSON.stringify(eventSceneFrame(c.case_key,c.co
 assert.equal(eventSceneFrame('bank-curated-v2-13','scene-21').number,13,'Case key wins over a stale scene id');
 let css=fs.readFileSync(path.join(root,'app/globals.css'),'utf8').replace(/@import '\.\/([^']+)' layer\(legacy\);/g,(_,file)=>'@layer legacy {'+fs.readFileSync(path.join(root,'app',file),'utf8')+'}');
 for(const match of fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8').matchAll(/import ['"]\.\/([^'"]+\.css)['"]/g)){if(match[1]!=='globals.css')css+='\n'+fs.readFileSync(path.join(root,'app',match[1]),'utf8')}
-const illustration=c=>renderToStaticMarkup(React.createElement(EventComic,{title:c.title,category:c.category,caseKey:c.case_key,scene:c.comic_scene,silent:true})).replaceAll('/event-comics/',pathToFileURL(path.join(root,'public/event-comics/')).href);
-const cards=cases.map(c=>renderToStaticMarkup(React.createElement(EventCaseTile,{item:{...c,id:c.case_key},summary:true,selected:c===cases[12],meta:c.category,onClick:()=>{}})).replaceAll('/event-comics/',pathToFileURL(path.join(root,'public/event-comics/')).href)).join('');
+const illustration=c=>renderToStaticMarkup(React.createElement(EventComic,{title:c.title,category:c.category,caseKey:c.case_key,scene:c.comic_scene,silent:true})).replaceAll('/event-comics/',pathToFileURL(path.join(root,'public/event-comics/')).href).replaceAll('/event-art/',pathToFileURL(path.join(root,'public/event-art/')).href);
+const cards=cases.map(c=>renderToStaticMarkup(React.createElement(EventCaseTile,{item:{...c,id:c.case_key},summary:true,selected:c===cases[12],meta:c.category,onClick:()=>{}})).replaceAll('/event-comics/',pathToFileURL(path.join(root,'public/event-comics/')).href).replaceAll('/event-art/',pathToFileURL(path.join(root,'public/event-art/')).href)).join('');
 fs.mkdirSync(shots,{recursive:true});const fixture=path.join(out,'event-cards.html');
 const detail='<article class="eventBankDetail"><small>'+cases[12].category+'</small><h4>'+cases[12].title+'</h4><p>'+cases[12].situation+'</p><button>Назначить участнику</button></article>';
 fs.writeFileSync(fixture,'<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+css+'\nbody{margin:0;padding:16px;box-sizing:border-box;background:#f6f8fc}main{min-width:0}button{font-family:inherit}</style><main class="autoEventBankBody"><div class="eventBankWorkspace"><div class="eventBankTiles">'+cards+'</div>'+detail+'</div></main></html>');
@@ -38,10 +38,11 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    if(width===1440)assert(geometry.detail.left>=geometry.list.right,'Description is to the right of the bank');
    const clips=await page.locator('svg[data-scene]').evaluateAll(els=>els.map(svg=>({overflow:getComputedStyle(svg).overflow,view:svg.getAttribute('viewBox'),clip:svg.querySelector('g').getAttribute('clip-path'),rect:!!svg.querySelector('clipPath>rect')})));
    assert(clips.every(c=>c.overflow==='hidden'&&c.view.startsWith('0 0 ')&&c.clip&&c.rect),'Every illustration must paint only its own clipped scene');
-   assert.equal(await page.locator('[data-case] svg[data-scene]').count(),cases.length);
+   assert.equal(await page.locator('[data-case] svg[data-scene], [data-case] figure.cinematicRaster[data-scene]').count(),cases.length);
+   const raster=await page.locator('figure.cinematicRaster img').evaluateAll(els=>els.filter(img=>img.getBoundingClientRect().top<innerHeight).map(img=>({loaded:img.complete&&img.naturalWidth>0,ratio:img.naturalWidth/img.naturalHeight})));assert(raster.every(x=>x.loaded&&Math.abs(x.ratio-16/9)<.01),'Generated illustrations load in 16:9 without stretching');
    const hashes=new Set();
    for(const number of [6,10,13,21,41,42,43,44,45,46,47,48,49,50]){
-    const svg=page.locator('[data-case="bank-curated-v2-'+String(number).padStart(2,'0')+'"] svg');
+    const svg=page.locator('[data-case="bank-curated-v2-'+String(number).padStart(2,'0')+'"] svg[data-scene], [data-case="bank-curated-v2-'+String(number).padStart(2,'0')+'"] figure.cinematicRaster[data-scene]');
     assert.equal(await svg.getAttribute('data-scene'),String(number));
     const buffer=await svg.screenshot();hashes.add(crypto.createHash('sha256').update(buffer).digest('hex'));
    }

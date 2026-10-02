@@ -36,9 +36,9 @@ const previewUsesLayout=previewSourceTeacher.includes("readFileSync(path.join(ro
 check('Operations stylesheet loaded after teacher command styles in production and preview',
  layoutSource.indexOf("import './teacher-operations.css';")>layoutSource.indexOf("import './teacher-command.css';")&&
  layoutSource.indexOf("import './teacher-final-interactions.css';")>layoutSource.indexOf("import './teacher-master-detail.css';")&&previewUsesLayout);
-check('Nine upper navigation workspaces include Event, stages, journal, analytics and grades',
+check('Ten upper navigation workspaces include Event, stages, journal, analytics and grades',
  teacherSource.includes('const WORKSPACES=[')&&
- ["overview","stages","journal","analytics","grades","impact","parties","tools","event"].every(k=>teacherSource.includes("key:'"+k+"'"))&&
+ ["overview","stages","journal","analytics","grades","impact","parties","tools","event","awards"].every(k=>teacherSource.includes("key:'"+k+"'"))&&
  teacherSource.includes('className="teacherWorkspaceNav"')&&
  teacherSource.includes("event.key==='ArrowRight'"));
 check('Teacher stage matrix integrates readiness and safe reset actions',

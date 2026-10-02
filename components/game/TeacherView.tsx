@@ -1,6 +1,6 @@
 'use client';
 import {useMemo,useState} from 'react';
-import {Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
+import {Award,Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
 import ClassroomJournal from './ClassroomJournal';
 import ParticipantsAnalytics from './ParticipantsAnalytics';
 import TeacherStageManager from './TeacherStageManager';
@@ -10,6 +10,7 @@ import EventWorkspace from './EventWorkspace';
 import type {ReturnTypeRepublic} from './viewTypes';
 import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
+import TeacherAwards from './TeacherAwards';
 import {useSavedGameState,savedChoice} from './useSavedGameState';
 
 function timerText(seconds:number){
@@ -17,7 +18,7 @@ function timerText(seconds:number){
  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools'|'event';
+type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools'|'event'|'awards';
 const WORKSPACES=[
  {key:'overview',title:'Обзор',icon:Activity},
  {key:'stages',title:'Этапы',icon:BookOpenText},
@@ -27,7 +28,8 @@ const WORKSPACES=[
  {key:'impact',title:'Модель последствий',icon:Network},
  {key:'parties',title:'Фракции',icon:UsersRound},
  {key:'tools',title:'Инструменты',icon:Wrench},
- {key:'event',title:'Event',icon:BookOpenText}
+ {key:'event',title:'Event',icon:BookOpenText},
+ {key:'awards',title:'Награды',icon:Award}
 ] as const;
 
 export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void}){
@@ -137,6 +139,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
   </section>}
 
     {workspace==='grades'&&<GradesView g={g}/>}
+    {workspace==='awards'&&<TeacherAwards g={g}/>}
     {workspace==='impact'&&<ImpactRulesPanel g={g}/>}
 
     {workspace==='parties'&&<TeacherPartyDossiers g={g} onOpenChat={onOpenChat}/>}
