@@ -42,6 +42,57 @@
 .eventComicPlayer .eventPanelIllustration.cinematicRaster>img{position:static!important;inset:auto!important;display:block!important;width:100%!important;height:auto!important;aspect-ratio:16/9;object-fit:contain!important}
 .eventTileArtwork:has(.cinematicRaster){height:auto!important;aspect-ratio:16/9;padding:0!important;min-width:0}.eventTileArtwork:has(.cinematicRaster) .eventComicPlayer{display:block;height:auto;width:100%}
 
+/* Scoring guide: keep the disclosure, cards and equations within their own
+   reading grid instead of inheriting the legacy four-column rules panel. */
+.gradesPage>.vsnGuide{width:100%;max-width:100%;min-width:0;border-radius:14px}
+.gradesRulesCompact.vsnGuide>summary{display:grid;grid-template-columns:minmax(0,1fr) auto 20px;align-items:center;gap:12px;min-height:72px;padding:16px 20px;list-style:none;color:var(--gs-ink,#173c70)}
+.vsnGuide>summary::-webkit-details-marker{display:none}
+.vsnGuide>summary::marker{content:""}
+.vsnGuide>summary:focus-visible{outline:2px solid var(--gs-accent,#2453e6);outline-offset:-4px;border-radius:12px}
+.vsnGuideHeading{display:grid;gap:4px;min-width:0}
+.vsnGuideHeading>strong{font-size:16px;font-weight:800;line-height:1.45}
+.gradesRulesCompact.vsnGuide .vsnGuideHeading>span{margin:0;font-size:12px;font-weight:500;line-height:1.5;color:#5c6e86}
+.gradesRulesCompact.vsnGuide .vsnGuideRange{display:inline-flex;align-items:center;justify-content:center;margin:0;padding:6px 10px;border:1px solid #dce5f0;border-radius:8px;background:#f5f8fd;color:#294b78;font-size:12px;font-weight:750;line-height:1.5;white-space:nowrap}
+.vsnGuideChevron{display:block;position:static;margin:0;width:20px;height:20px;color:#526a89;transition:transform .15s ease}
+.vsnGuide[open]>summary{border-bottom:1px solid #e3eaf3}
+.vsnGuide[open] .vsnGuideChevron{transform:rotate(180deg)}
+.gradesRulesCompact.vsnGuide .vsnCriteria{grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px;margin:0;padding:20px;border:0;border-radius:0;background:transparent}
+.vsnCriteria>article{display:grid;align-content:start;gap:8px;min-width:0;padding:16px;border:1px solid #dce5f0;border-radius:12px;background:#f8faff}
+.gradesRulesCompact.vsnGuide .vsnCriteria b{display:inline-block;margin:0;color:#2453a4;font-size:16px;line-height:1.4;font-variant-numeric:tabular-nums}
+.vsnCriteria h3{margin:0;color:#294b78;font-size:14px;line-height:1.5;font-weight:750}
+.vsnCriteria p{margin:0;color:#53657d;font-size:13px;line-height:1.65;overflow-wrap:break-word}
+.scoreFormulaBody.vsnFormula{display:grid;gap:20px;min-width:0;max-width:100%;color:#435977;font-size:14px;line-height:1.65}
+.gradesRulesCompact.vsnGuide .vsnFormula{margin:0;padding:20px;border-top:1px solid #e3eaf3;border-right:0;border-bottom:0;border-left:0;border-radius:0;background:transparent}
+.vsnFormula p{margin:0;color:#435977;font-size:14px;line-height:1.65;overflow-wrap:break-word}
+.vsnFormula .vsnEquations{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin:0;padding:0;background:transparent;border-radius:0;min-width:0}
+.vsnEquations>section{display:grid;align-content:start;gap:10px;min-width:0;padding:16px;border:1px solid #dce5f0;border-radius:12px;background:#f4f7fc}
+.vsnFormula h3{margin:0;color:#294b78;font-size:14px;font-weight:750;line-height:1.5}
+.vsnFormula .vsnEquation{display:block;margin:0;color:#2453a4;font-size:clamp(17px,1.6vw,20px);font-weight:800;line-height:1.6;letter-spacing:0;overflow-wrap:break-word}
+.vsnCriteriaDetail{display:grid;gap:14px;min-width:0}
+.vsnTerms{display:grid;gap:16px;margin:0;min-width:0}
+.vsnTerms>div{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:start;gap:12px;min-width:0}
+.vsnTerms dt{display:grid;place-items:center;margin:0;width:32px;height:32px;border-radius:9px;background:#edf2fc;color:#2453a4;font-size:14px;font-weight:800;line-height:1}
+.vsnTerms dd{display:grid;gap:4px;min-width:0;margin:0}
+.vsnTerms dd>strong{display:block;margin:0;color:#294b78;font-size:14px;line-height:1.5}
+.vsnFormula .scoreWeights{margin:0;min-width:0;max-width:100%;overflow:visible}
+.vsnFormula .scoreWeights table{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse;font-size:13px;line-height:1.55}
+.vsnFormula .scoreWeights caption{padding:0 0 12px;text-align:left;color:#294b78;font-size:14px;font-weight:750;overflow-wrap:break-word}
+.vsnFormula .scoreWeights th,.vsnFormula .scoreWeights td{padding:10px 12px;border-bottom:1px solid #e3eaf3;font-size:13px;line-height:1.55;font-weight:500;overflow-wrap:break-word;vertical-align:top}
+.vsnFormula .scoreWeights th:first-child{width:50%;text-align:left}
+.vsnFormula .scoreWeights thead th{background:#f4f7fc;color:#294b78;font-weight:750;text-align:center}
+.vsnFormula .scoreWeights tbody th{color:#435977}
+.vsnFormula .scoreWeights td{color:#294b78;text-align:center;font-variant-numeric:tabular-nums}
+.vsnFormula p.vsnFormulaNote{padding:12px 14px;border-left:3px solid #cbd8ee;border-radius:0 8px 8px 0;background:#f8faff;color:#53657d;font-size:13px;line-height:1.65}
+@media(max-width:650px){
+ .gradesRulesCompact.vsnGuide>summary{grid-template-columns:minmax(0,1fr) auto 20px;gap:8px;padding:14px;align-items:center}
+ .vsnGuideHeading>strong{font-size:14px}
+ .gradesRulesCompact.vsnGuide .vsnGuideRange{padding:5px 7px;font-size:11px}
+ .gradesRulesCompact.vsnGuide .vsnCriteria,.gradesRulesCompact.vsnGuide .vsnFormula{padding:14px}
+ .vsnCriteria>article,.vsnEquations>section{padding:14px}
+ .vsnFormula .scoreWeights th,.vsnFormula .scoreWeights td{padding:9px 6px;font-size:12px}
+ .vsnFormula .scoreWeights th:first-child{width:46%}
+}
+
 /* Keep a readable conversation when pins, tags or recording previews are open. */
 .simChat.gsChatV2 .chatMessages{flex:1 1 120px!important;min-height:120px!important}
 .simChat.gsChatV2 .chatPinnedWrap{display:flex;flex-direction:column;flex:0 1 auto;min-height:44px;overflow:hidden}

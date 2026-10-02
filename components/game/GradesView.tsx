@@ -6,6 +6,7 @@ import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
 import ScoreFormula from './ScoreFormula';
+import {ChevronDown} from 'lucide-react';
 
 type Assessment={
  id:string;game_id:string;stage_no:number;user_id:string;auto_score:number;final_score:number|null;
@@ -202,11 +203,11 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
    <div className="gradesHeroLegend"><span className="draft">Черновик</span><span className="final">Итоговая</span><span className="empty">Нет оценки</span></div>
   </section>
 
-  <details className="surface gradesRules gradesRulesCompact"><summary>Критерии и формула ВСН <span>0–3 балла · раскрыть расчёт</span></summary><div className="gradesRuleItems">
-   <div><b>1 балл</b><span>Право и правила</span><p>Знание норм, полномочий, процедур и корректное применение их в игровой ситуации.</p></div>
-   <div><b>+1 балл</b><span>Стратегия и интересы</span><p>Осмысленные решения с учётом целей своей стороны, ресурсов, выгод, рисков и последствий.</p></div>
-   <div><b>+1 балл</b><span>Анализ этапа</span><p>Причины, интересы, институты, результат и политические последствия произошедшего.</p></div>
-   <div><b>0 баллов</b><span>Нет участия</span><p>На этапе не зафиксировано содержательных действий студента.</p></div>
+  <details className="surface gradesRulesCompact vsnGuide"><summary><div className="vsnGuideHeading"><strong>Критерии и формула ВСН</strong><span>Как рассчитывается оценка за этап</span></div><span className="vsnGuideRange">0–3 балла</span><ChevronDown className="vsnGuideChevron" size={20} aria-hidden="true"/></summary><div className="gradesRuleItems vsnCriteria">
+   <article><b>1 балл</b><h3>Право и правила</h3><p>Знание норм, полномочий и процедур. Корректное применение их в игровой ситуации.</p></article>
+   <article><b>1 балл</b><h3>Стратегия и интересы</h3><p>Осмысленные решения с учётом целей своей стороны, ресурсов, выгод, рисков и последствий.</p></article>
+   <article><b>1 балл</b><h3>Анализ этапа</h3><p>Разбор причин, интересов, институтов, результата и политических последствий.</p></article>
+   <article><b>0 баллов</b><h3>Нет участия</h3><p>На этапе не зафиксировано содержательных действий студента.</p></article>
   </div>{teacher&&<ScoreFormula embedded/>}</details>
   <section className="surface gradesMatrixWrap">
    <div className="surfaceHead"><div><small>ГРУППА × ЭТАПЫ</small><h2>Оценки всех участников</h2></div><span>{sortedStudents.length} из {students.length}</span></div>

@@ -17,7 +17,7 @@ async function main(){
   const page=await browser.newPage({viewport:{width:1440,height:940},deviceScaleFactor:1});
   await page.goto('file://'+preview,{waitUntil:'load'});
   const frame=page.frameLocator('#preview');
-  for(const width of [1180,900,820,768,650,430,390,360,320]){
+  for(const width of [1440,1180,900,820,768,650,600,430,390,360,320]){
    await page.locator('#preview').evaluate((el,w)=>{el.style.width=w+'px'},width);
    if(width<=900){
     await page.locator('#screen').selectOption('dashboard');
@@ -76,6 +76,36 @@ async function main(){
     }
    }
    await page.locator('#preview').screenshot({path:path.join(shotDir,'teacher-mobile-'+width+'.png')});
+   // The user reported clipping and enlarged, detached formula text. Review
+   // the opened guide in the actual teacher workspace, including its table.
+   await page.locator('#screen').selectOption('teacher-grades');
+   const guide=frame.locator('.vsnGuide');await guide.waitFor();
+   await guide.locator(':scope > summary').click();
+   assert.equal(await guide.getAttribute('open'),'','Scoring guide expands at '+width+'px');
+   const scoring=await guide.evaluate(el=>{
+    const box=el.getBoundingClientRect();
+    const selectors=['.vsnGuideHeading','.vsnGuideRange','.vsnGuideChevron','.vsnCriteria>article','.vsnFormulaIntro','.vsnEquations>section','.vsnEquation','.vsnTerms>div','.scoreWeights table','.scoreWeights th','.scoreWeights td','.vsnFormulaNote'];
+    const items=selectors.flatMap(selector=>[...el.querySelectorAll(selector)].map(node=>{
+     const r=node.getBoundingClientRect(),style=getComputedStyle(node);
+     return {selector,left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,scroll:node.scrollWidth,client:node.clientWidth,font:parseFloat(style.fontSize)};
+    }));
+    const cards=[...el.querySelectorAll('.vsnCriteria>article')].map(node=>{const r=node.getBoundingClientRect();return {top:r.top,height:r.height,width:r.width}});
+    return {left:box.left,right:box.right,viewport:document.documentElement.clientWidth,scroll:el.scrollWidth,client:el.clientWidth,items,cards,details:el.querySelectorAll('details').length};
+   });
+   assert.equal(scoring.details,0,'Criteria and calculation stay in one disclosure');
+   assert.equal(scoring.cards.length,4,'All four criteria are visible');
+   assert(scoring.left>=-2&&scoring.right<=scoring.viewport+2,'Scoring guide stays within viewport at '+width+'px: '+JSON.stringify(scoring));
+   assert(scoring.scroll<=scoring.client+2,'Scoring guide must not crop its content at '+width+'px');
+   for(const item of scoring.items){
+    assert(item.left>=scoring.left-2&&item.right<=scoring.right+2,'Scoring content escapes its panel at '+width+'px: '+JSON.stringify(item));
+    assert(item.scroll<=item.client+2,'Scoring text is clipped at '+width+'px: '+JSON.stringify(item));
+    if(item.selector==='.vsnEquation')assert(item.font>=17&&item.font<=20,'Formula stays proportionate at '+width+'px');
+   }
+   for(const card of scoring.cards){for(const other of scoring.cards){if(Math.abs(card.top-other.top)<2)assert(Math.abs(card.height-other.height)<2,'Criteria in the same row have equal height')}}
+   const header=await guide.locator(':scope > summary').evaluate(el=>[...el.children].map(node=>{const r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom}}));
+   for(let i=1;i<header.length;i++)assert(header[i].left>=header[i-1].right+6,'Scoring header items do not overlap at '+width+'px');
+   await guide.screenshot({path:path.join(shotDir,'score-guide-'+width+'.png')});
+   await guide.locator(':scope > summary').click();assert.equal(await guide.getAttribute('open'),null,'Scoring guide collapses at '+width+'px');
    if(width<=900){
     await page.locator('#screen').selectOption('mobile-all');
     const all=await page.frameLocator('#preview').locator('html').evaluate(html=>{
