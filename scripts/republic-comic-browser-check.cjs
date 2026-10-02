@@ -60,6 +60,8 @@ async function main(){
    await profile.getByRole('button',{name:'Вводный комикс',exact:true}).click();await page.locator('.comicOverlay h2').filter({hasText:'Республика после бури'}).waitFor();
    assert.equal(await page.locator('.comicFrame').count(),1);const art=await page.locator('.comicFrame .comicArtwork').boundingBox();assert(art.height>145&&art.width>250,'Cinematic artwork must have real dimensions');await geometry(page);
    await page.locator('.comicFrame img').evaluate(async img=>{await img.decode();if(!img.naturalWidth)throw Error('Prologue image did not load')});
+   const resolution=await page.locator('.comicFrame img').evaluate(img=>({chosen:Number(img.currentSrc.match(/-(\d+)\.webp/)?.[1]),needed:Math.min(1920,Math.max(img.clientWidth,img.clientHeight*16/9)*devicePixelRatio)}));
+   assert(resolution.chosen>=resolution.needed-2,'Portrait backdrop has enough source pixels for its height, not just its width: '+JSON.stringify(resolution));
    assert.equal(await page.locator('.comicOverlay h2 br').count(),1,'The opening title keeps the two-line composition from the reference');
    assert.equal(await page.locator('.comicFooterLabel span').textContent(),'01 / 04');
    assert.equal(await page.locator('.comicFrame img').getAttribute('data-comic-art'),'storm');

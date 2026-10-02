@@ -19,10 +19,12 @@ const ARTWORKS=[
  {key:'citizens',alt:'Рабочий, учитель и жители обсуждают свои требования с представителем власти.'},
  {key:'renewal',alt:'Молодые представители власти и инженер обсуждают восстановление городского моста.'}
 ];
-function Artwork({scene,cover=false,alt}:{scene:number;cover?:boolean;alt?:string}){
+function Artwork({scene,cover=false,backdrop=false,alt}:{scene:number;cover?:boolean;backdrop?:boolean;alt?:string}){
  const art=ARTWORKS[scene],base=process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'';
  const file=base+'/republic-art/intro-v2-'+art.key;
- return <img className={'comicArtwork '+styles.cinematicArtwork} src={file+'-1920.webp'} srcSet={[480,960,1920].map(width=>file+'-'+width+'.webp '+width+'w').join(', ')} sizes={cover?'(max-width:600px) 92vw, (max-width:850px) 45vw, 440px':'(max-width:600px) 100vw, (max-width:1420px) 98vw, 1392px'} width={1920} height={1080} alt={alt||art.alt} data-comic-art={art.key} loading={cover?'lazy':'eager'} decoding="async"/>;
+ // A portrait backdrop needs enough source pixels for its height as well as its width.
+ const sizes=cover?'(max-width:600px) 92vw, (max-width:850px) 45vw, 440px':backdrop?'(max-width:850px) 150vh, (max-width:1420px) 98vw, 1392px':'(max-width:850px) 92vw, 740px';
+ return <img className={'comicArtwork '+styles.cinematicArtwork} src={file+'-1920.webp'} srcSet={[480,960,1920].map(width=>file+'-'+width+'.webp '+width+'w').join(', ')} sizes={sizes} width={1920} height={1080} alt={alt||art.alt} data-comic-art={art.key} loading={cover?'lazy':'eager'} decoding="async"/>;
 }
 type Chapter={id:string;stage_no:number;kind:'completed'|'preview';title:string;body:string;snapshot:{documents?:number;votes?:number};created_at:string};
 type ComicView='intro'|'archive'|'chapter';
@@ -109,7 +111,7 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
     {archive.error&&<p role="status" className={styles.archiveNotice}>Не удалось загрузить главы: {archive.error} Вводный комикс можно читать без загрузки архива.</p>}
    </div>:<>
     <div ref={reader} role="region" aria-label="Сцена комикса" tabIndex={0} data-comic-kind={showingChapter?'chapter':'prologue'} data-playing={playing||showingChapter} className={'comicFrame '+styles.readerFrame+(!showingChapter?' '+styles.cinematicFrame:'')} key={showingChapter?chapter.id:scene}>
-     <div className={styles.illustration}>{showingChapter?<ChapterArtwork chapter={chapter}/>:<Artwork scene={scene}/>}</div>
+     <div className={styles.illustration}>{showingChapter?<ChapterArtwork chapter={chapter}/>:<Artwork scene={scene} backdrop/>}</div>
      <div className={'comicOverlay '+styles.story}>
       <span className="comicKicker">{item.kicker}</span><h2>{!showingChapter&&scene===0?<>Республика{' '}<br/>после бури</>:item.title}</h2><p>{item.body}</p><strong>{item.stamp}</strong>
      </div>
