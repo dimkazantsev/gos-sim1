@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Activity,BookOpen,Camera,ChevronDown,FileSignature,UserRound,UsersRound} from 'lucide-react';
+import {Activity,BookOpen,Camera,ChevronDown,FileSignature,Library,UserRound,UsersRound} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {AwardShelf} from './Achievements';
@@ -41,6 +41,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
  useEffect(()=>{mounted.current=true;void preparePortraitDetector().catch(()=>{});return()=>{mounted.current=false;if(previewRef.current)URL.revokeObjectURL(previewRef.current)}},[]);
  useEffect(()=>{if(previewRef.current)URL.revokeObjectURL(previewRef.current);previewRef.current='';setPhotoPreview('')},[target?.user_id]);
  const [saving,setSaving]=useState(false),[saved,setSaved]=useState(false),[showMyJournal,setShowMyJournal]=useState(false),[comicOpen,setComicOpen]=useState(false);
+ const [comicView,setComicView]=useState<'intro'|'archive'>('intro');
  const [publicScores,setPublicScores]=useState<PublicAssessment[]>([]);
  const [publicStats,setPublicStats]=useState<PublicStats|null>(null);
  const photoInput=useRef<HTMLInputElement>(null);
@@ -121,7 +122,8 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
      {allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}
     </div>
     <div className="profileHeroControls">
-     <button type="button" className="profileComicButton" onClick={()=>setComicOpen(true)}><BookOpen size={17}/> Комикс о Республике</button>
+     <button type="button" className="profileComicButton" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Вводный комикс</button>
+     <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
      {!own&&<button type="button" onClick={onOwnProfile}><UserRound size={17}/> Мой профиль</button>}
 
     </div>
@@ -198,6 +200,6 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
   </section>
   {own&&game&&<ProfileDocumentLinks gameId={game.id} userId={me.user_id}/>}
   {own&&teacher&&<SessionManager g={g}/>}
-  <RepublicComic gameId={game?.id} open={comicOpen} onClose={()=>setComicOpen(false)}/>
+  <RepublicComic gameId={game?.id} initialView={comicView} open={comicOpen} onClose={()=>setComicOpen(false)}/>
  </div>;
 }

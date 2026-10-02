@@ -1,0 +1,72 @@
+.backdrop.backdrop{box-sizing:border-box;grid-template-columns:minmax(0,1fr)}
+.dialog.dialog{width:min(1120px,100%);height:min(92dvh,800px);max-height:92dvh;min-height:0;box-sizing:border-box}
+.dialog .header{min-height:70px;padding:12px 20px;box-sizing:border-box}
+.dialog .header>b{min-width:0;overflow-wrap:anywhere;font-size:12px;letter-spacing:.06em}
+.dialog .header>div{gap:8px;align-items:center}
+.dialog .header button,.dialog .controls button{display:grid;place-items:center;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border-radius:11px;box-sizing:border-box}
+.dialog .header button>svg,.dialog .controls button>svg{display:block;flex:none;grid-area:1/1}
+.dialog button:disabled{opacity:.4;cursor:default}
+.dialog button:focus-visible,.library:focus-visible{outline:3px solid #8ef1dc;outline-offset:3px}
+.switcher{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid #c4d4ff26;flex:none}
+.switcher>button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 15px;border:1px solid #6983b650;border-radius:11px;background:#ffffff0b;color:#c5d9ff;font:inherit;font-size:13px;font-weight:750;cursor:pointer}
+.switcher>button[aria-pressed=true]{background:#dfeeff;border-color:#dfeeff;color:#203e70}
+.switcher>button>svg{flex:none}
+.dialog .readerFrame{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);align-items:center;align-content:center;gap:24px;flex:1 1 0;min-height:0;max-height:none;margin:0;padding:24px;overflow:auto;overscroll-behavior:contain;background:#101d3b;box-sizing:border-box}
+.illustration{position:relative;width:100%;min-width:0;aspect-ratio:900/510;overflow:hidden;border:1px solid #879fe040;border-radius:16px;background:#182d52;isolation:isolate}
+.illustration>svg{display:block;position:absolute;inset:0;width:100%;height:100%;max-height:100%;object-fit:contain}
+.dialog .story{display:grid;position:relative;inset:auto;gap:15px;padding:0;max-width:100%;min-width:0;background:transparent;animation:none}
+.dialog .story h2{font-size:clamp(27px,3vw,43px);line-height:1.12;letter-spacing:-.035em;overflow-wrap:anywhere}
+.dialog .story p{font-size:15px;line-height:1.7;white-space:pre-line;overflow-wrap:anywhere}
+.dialog .story :global(.comicKicker){max-width:100%;font-size:10px;letter-spacing:.08em;white-space:normal;box-sizing:border-box}
+.dialog .story strong{font-size:10px;letter-spacing:.03em;white-space:normal;max-width:100%;box-sizing:border-box}
+.dialog .footer{min-height:90px;padding:14px 20px;flex:none;box-sizing:border-box;border-top:1px solid #c4d4ff26}
+.dialog .footer>div:first-child{max-width:480px}
+.dialog .controls{gap:5px;flex:none;width:auto}
+.dialog .controls button:global(.comicDot){width:44px;height:44px;min-width:44px;min-height:44px;border-radius:11px}
+.library{flex:1 1 0;min-height:0;overflow:auto;overscroll-behavior:contain;padding:24px;background:#f7faff;color:#173253}
+.libraryHeading{display:grid;gap:8px;margin-bottom:20px}
+.libraryHeading h2{margin:0;font-size:25px;line-height:1.3}
+.libraryHeading p{margin:0;max-width:700px;font-size:14px;line-height:1.65;color:#526d90}
+.libraryGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:stretch}
+.libraryGrid .libraryCard{display:flex;flex-direction:column;align-items:stretch;min-width:0;padding:0;overflow:hidden;border:1px solid #d7e3f3;border-radius:16px;background:#fff;color:#173253;text-align:left;cursor:pointer;box-shadow:0 5px 18px #17325308;transition:box-shadow .15s,border-color .15s}
+.libraryGrid .libraryCard:hover{border-color:#5987dd;box-shadow:0 8px 24px #17325318}
+.cover{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#182d52;pointer-events:none}
+.cover>svg{display:block;position:absolute;inset:0;width:100%;height:100%;animation:none}
+.cover :global(.comicClouds),.cover :global(.comicStorm),.cover :global(.comicEmergency),.cover :global(.comicVault),.cover :global(.comicCrowd),.cover :global(.comicRebirth){animation:none}
+.cardText{display:flex;flex-direction:column;gap:9px;padding:16px;flex:1;min-width:0}
+.cardText small{font-size:11px;color:#6181a5}
+.cardText strong{font-size:17px;line-height:1.35;overflow-wrap:anywhere}
+.cardText span{font-size:12px;line-height:1.6;color:#68809d;overflow-wrap:anywhere}
+.cardText b{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:#2c5fc0;margin-top:auto;padding-top:10px;min-height:30px}
+.cardText b>svg{flex:none}
+.archiveNotice{margin:20px 0 0;padding:14px 16px;border:1px solid #d6e3f3;border-radius:11px;background:#fff;color:#516b8b;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+@media(max-width:850px){
+ .dialog .readerFrame{grid-template-columns:minmax(0,1fr);align-content:start;gap:22px;padding:22px}
+ .illustration{max-width:640px;justify-self:center}
+ .dialog .story{gap:12px}
+ .dialog .story h2{font-size:32px}
+ .libraryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .dialog .footer{flex-wrap:wrap;gap:10px}
+ .dialog .footer>div:first-child{max-width:none;flex:1 1 100%}
+ .dialog .controls{width:100%;justify-content:center}
+}
+@media(max-width:600px){
+ .backdrop.backdrop{padding:0}
+ .dialog.dialog{width:100%;height:100dvh;max-height:100dvh;border:0;border-radius:0}
+ .dialog .header{min-height:68px;padding:10px 12px;gap:10px}
+ .dialog .header>b{font-size:10px;line-height:1.5;letter-spacing:.035em}
+ .dialog .header>div{gap:4px}
+ .switcher{gap:8px;padding:10px 12px}
+ .switcher>button{flex:1 1 0;padding:9px 8px;font-size:12px;min-width:0}
+ .switcher>button>svg{width:16px;height:16px}
+ .dialog .readerFrame{padding:16px;gap:18px}
+ .dialog .story h2{font-size:29px}
+ .dialog .story p{font-size:14px;line-height:1.6}
+ .dialog .footer{padding:12px 12px max(12px,env(safe-area-inset-bottom));gap:12px}
+ .dialog .controls{gap:4px}
+ .library{padding:18px 14px}
+ .libraryGrid{grid-template-columns:minmax(0,1fr);gap:16px}
+ .libraryHeading h2{font-size:23px}
+ .libraryHeading p{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){.libraryCard{transition:none}}

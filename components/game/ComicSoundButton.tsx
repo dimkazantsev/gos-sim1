@@ -44,5 +44,5 @@ export default function ComicSoundButton({playing=true,iconOnly=false}:{playing?
   setFailure('');if(enabled){stop(id);return}
   try{await start(id)}catch{setFailure('Не удалось включить звук. Нажмите ещё раз.')}
  }
- return <button type="button" className={'comicSoundButton '+(iconOnly?'iconOnly':'')} aria-pressed={enabled} aria-label={enabled?'Выключить звук комикса':'Включить звук комикса'} title={failure||'Музыка · Плавный цикл 36 секунд'} onClick={()=>void toggle()}>{enabled?<Volume2 size={18}/>:<VolumeX size={18}/>}<span className={iconOnly?'sr-only':''}>{enabled?'Звук включён':'Включить звук'}</span></button>;
+ return <button type="button" className={'comicSoundButton '+(iconOnly?'iconOnly':'')} aria-pressed={enabled} aria-label={enabled?'Выключить звук комикса':'Включить звук комикса'} title={failure||'Музыка · Плавный цикл 36 секунд'} onClick={()=>void toggle()}>{enabled?<Volume2 size={18}/>:<VolumeX size={18}/>} {!iconOnly&&<span>{enabled?'Звук включён':'Включить звук'}</span>}</button>;
 }

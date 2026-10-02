@@ -16,6 +16,9 @@ on:
       - 'components/game/GradesView.tsx'
       - 'components/game/ScoreFormula.tsx'
       - 'components/game/ProfileView.tsx'
+      - 'components/game/RepublicComic.tsx'
+      - 'components/game/RepublicComic.module.css'
+      - 'components/game/ComicSoundButton.tsx'
       - 'components/game/RepublicLeadership.tsx'
       - 'components/game/gameRoster.ts'
       - 'components/game/useHorizontalWheel.ts'
@@ -37,6 +40,7 @@ on:
       - 'scripts/teacher-mobile-browser-check.cjs'
       - 'scripts/roster-leadership-browser-check.cjs'
       - 'scripts/game-roster-check.cjs'
+      - 'scripts/republic-comic-browser-check.cjs'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/stage-desktop.yml'
@@ -66,6 +70,12 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - name: TypeScript
         run: npm run typecheck
+      - name: Intro persistence and restored comic library
+        run: |
+          node scripts/intro-refresh-check.cjs
+          node scripts/republic-comic-browser-check.cjs
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - name: Classroom isolation and leadership selection
         run: node scripts/game-roster-check.cjs
       - name: Live roster, leadership and mouse wheel interactions
@@ -99,4 +109,5 @@ jobs:
             .design-review/screenshots/teacher-*.png
             .design-review/screenshots/score-guide-*.png
             .design-review/screenshots/roster-*.png
+            .design-review/screenshots/republic-comic-*.png
           if-no-files-found: ignore

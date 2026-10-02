@@ -1,11 +1,12 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
-import {ArrowLeft,ArrowRight,Pause,Play,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,BookOpen,Library,Pause,Play,X} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import ComicSoundButton from './ComicSoundButton';
+import styles from './RepublicComic.module.css';
 const SCENES=[
  {kicker:'ПРОЛОГ · ДЕНЬ НОЛЬ',title:'Республика после бури',body:'Вы пришли к власти не в идеальном государстве. Заводы простаивают, мосты требуют ремонта, бюджет трещит по швам, а граждане больше не верят красивым обещаниям.',stamp:'ДОВЕРИЕ: КРИТИЧЕСКОЕ',caption:'Начало не будет лёгким.'},
  {kicker:'ГЛАВА 01 · ПЕРВЫЙ СИГНАЛ',title:'Казна почти пуста',body:'У вас есть кабинеты, законы, партии и огромное количество вопросов. Деньги заканчиваются быстрее совещаний. Каждая программа забирает ресурсы у другой.',stamp:'РЕСУРСЫ: ОГРАНИЧЕНЫ',caption:'Цена любого решения реальна — хотя республика и вымышленная.'},
@@ -69,40 +70,105 @@ function Artwork({scene}:{scene:number}){
  </svg>;
 }
 type Chapter={id:string;stage_no:number;kind:'completed'|'preview';title:string;body:string;snapshot:{documents?:number;votes?:number};created_at:string};
-export default function RepublicComic({open,onClose,intro=false,gameId}:{open:boolean;onClose:()=>void;intro?:boolean;gameId?:string}){
- const [chapters,setChapters]=useState<Chapter[]>([]),[archiveOpen,setArchiveOpen]=useState(false),[archiveError,setArchiveError]=useState('');
- useEffect(()=>{if(!open||intro||!gameId)return;let live=true;void supabase.from('republic_comic_chapters').select('*').eq('game_id',gameId).order('stage_no').order('kind').then(r=>{if(!live)return;if(r.error)setArchiveError(userError(r.error));else{setChapters(r.data||[]);setArchiveError('')}});return()=>{live=false}},[open,intro,gameId]);
- const items=[...SCENES,...(intro?[]:chapters.map(c=>({kicker:(c.kind==='completed'?'ИТОГИ':'АНОНС')+' · ЭТАП '+c.stage_no,title:c.title,body:c.body,stamp:c.kind==='completed'?'Итоги сохранены':'Следующий ход',caption:c.kind==='completed'?'Фактический результат на момент завершения этапа.':'Задачи следующего этапа.'})))];
- const [scene,setScene]=useState(0),[playing,setPlaying]=useState(true);
- const closeRef=useRef(onClose);closeRef.current=onClose;
- const close=()=>{if(!intro||scene===items.length-1)closeRef.current()};
+type ComicView='intro'|'archive'|'chapter';
+type ArchiveState={gameId:string;chapters:Chapter[];loading:boolean;error:string};
+export default function RepublicComic({open,onClose,intro=false,gameId,initialView='intro'}:{
+ open:boolean;onClose:()=>void;intro?:boolean;gameId?:string;initialView?:'intro'|'archive';
+}){
+ const [view,setView]=useState<ComicView>(intro?'intro':initialView);
+ const [archive,setArchive]=useState<ArchiveState>({gameId:'',chapters:[],loading:false,error:''});
+ const [chapterId,setChapterId]=useState(''),[scene,setScene]=useState(0),[playing,setPlaying]=useState(intro);
+ const reader=useRef<HTMLDivElement>(null),closeRef=useRef(onClose);closeRef.current=onClose;
+ const chapters=archive.gameId===gameId?archive.chapters:[];
+ const chapter=chapters.find(c=>c.id===chapterId),chapterIndex=chapters.findIndex(c=>c.id===chapterId);
+ const showingArchive=!intro&&view==='archive',showingChapter=!intro&&view==='chapter'&&!!chapter;
+ const close=()=>{if(!intro||scene===SCENES.length-1)closeRef.current()};
  const dialog=useDialog(open,close);
- function go(index:number){const n=Math.max(0,Math.min(items.length-1,index));setScene(n)}
  useEffect(()=>{
-  if(!open||!playing)return;
+  if(!open)return;
+  setView(intro?'intro':initialView);setScene(0);setChapterId('');setPlaying(intro);
+ },[open,intro,initialView,gameId]);
+ useEffect(()=>{
+  if(!open||intro||!gameId)return;
+  let live=true;
+  setArchive(previous=>({gameId,chapters:previous.gameId===gameId?previous.chapters:[],loading:true,error:''}));
+  void supabase.from('republic_comic_chapters').select('*').eq('game_id',gameId).order('stage_no').order('kind').then(result=>{
+   if(!live)return;
+   setArchive(previous=>({gameId,chapters:result.error?previous.chapters:(result.data||[]),loading:false,error:result.error?userError(result.error):''}));
+  },error=>{
+   if(live)setArchive(previous=>({...previous,loading:false,error:userError(error)}));
+  });
+  return()=>{live=false};
+ },[open,intro,gameId,showingArchive]);
+ useEffect(()=>{
+  if(!open||!playing||showingArchive||showingChapter)return;
   const timer=window.setTimeout(()=>{
-   if(scene===items.length-1){if(intro)closeRef.current();else setScene(0)}
+   if(scene===SCENES.length-1){setPlaying(false);if(intro)closeRef.current()}
    else setScene(scene+1);
   },8200);
   return()=>window.clearTimeout(timer);
- },[open,playing,scene,intro,items.length]);
- useEffect(()=>{if(open){setScene(0);setPlaying(true)}},[open]);
-  if(!open||typeof document==='undefined')return null;
- const item=items[Math.min(scene,items.length-1)];
- return createPortal(<div className="comicBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!intro)close()}}>
-  <section ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Комикс о Республике" className="comicDialog">
-   <header><b>GOS//SIMS · КОМИКС О РЕСПУБЛИКЕ</b><div><ComicSoundButton playing={playing} iconOnly/>
-     <button aria-label={playing?'Остановить автоматическое воспроизведение':'Продолжить показ'} onClick={()=>setPlaying(!playing)}>{playing?<Pause size={19}/>:<Play size={19}/>}</button>
-     <button aria-label={intro?'Завершить пролог после просмотра':'Закрыть комикс'} disabled={intro&&scene!==items.length-1} onClick={close}><X size={20}/></button></div></header>
-   {!intro&&<div className='comicArchive'><button type='button' aria-expanded={archiveOpen} onClick={()=>{setArchiveOpen(!archiveOpen);setPlaying(false)}}>Архив глав · {items.length}</button>{archiveOpen&&<nav aria-label='Главы республики'>{items.map((x,i)=><button key={i} type='button' aria-current={scene===i?'step':undefined} onClick={()=>{go(i);setArchiveOpen(false);setPlaying(false)}}>{i<4?'Пролог '+(i+1):x.kicker} · {x.title}</button>)}{!chapters.length&&<p>Итоговая глава и анонс появятся после завершения этапа.</p>}{archiveError&&<p role='status'>{archiveError}</p>}</nav>}</div>}
-   <div className={'comicFrame'+(scene>=4?' comicChapterFrame':'')} key={scene}>{scene<4?<Artwork scene={scene}/>:<ChapterArtwork chapter={chapters[scene-4]}/>}<div className="comicOverlay">
-    <span className="comicKicker">{item.kicker}</span><h2>{item.title}</h2><p>{item.body}</p><strong>{item.stamp}</strong>
-   </div></div>
-   <footer><div className="comicFooterLabel"><small>{item.caption}{intro?' · После пролога откроется обязательная настройка профиля.':''}</small><span>{String(scene+1).padStart(2,'0')} / {String(items.length).padStart(2,'0')}</span></div>
-    <div className="comicControls"><button onClick={()=>go(scene-1)} aria-label="Предыдущая сцена"><ArrowLeft size={18}/></button>
-    {items.slice(Math.max(0,Math.min(scene-1,items.length-4)),Math.max(4,Math.min(scene+3,items.length))).map((x,j)=>{const i=items.indexOf(x);return <button key={i} className={'comicDot '+(scene===i?'active':'')} aria-current={scene===i?'step':undefined} aria-label={'Сцена '+(i+1)+': '+x.title} onClick={()=>go(i)}>{String(i+1).padStart(2,'0')}</button>})}
-    <button onClick={()=>scene===items.length-1?close():go(scene+1)} aria-label={scene===items.length-1?'Завершить просмотр':'Следующая сцена'}><ArrowRight size={18}/></button></div></footer>
-  </section></div>,document.body);
+ },[open,playing,scene,intro,showingArchive,showingChapter]);
+ useEffect(()=>{reader.current?.scrollTo({top:0})},[view,scene,chapterId]);
+ function openIntro(){setScene(0);setChapterId('');setView('intro');setPlaying(false)}
+ function openArchive(){setView('archive');setPlaying(false)}
+ function readChapter(id:string){setChapterId(id);setView('chapter');setPlaying(false)}
+ function go(index:number){setScene(Math.max(0,Math.min(SCENES.length-1,index)));setPlaying(false)}
+ function previous(){if(showingChapter){if(chapterIndex>0)readChapter(chapters[chapterIndex-1].id)}else go(scene-1)}
+ function next(){if(showingChapter){if(chapterIndex<chapters.length-1)readChapter(chapters[chapterIndex+1].id);else openArchive()}else if(scene===SCENES.length-1)close();else go(scene+1)}
+ if(!open||typeof document==='undefined')return null;
+ const item=showingChapter?{
+  kicker:(chapter.kind==='completed'?'Итоги':'Анонс')+' · Этап '+chapter.stage_no,
+  title:chapter.title,body:chapter.body,stamp:chapter.kind==='completed'?'Итоги сохранены':'Следующий этап',
+  caption:chapter.kind==='completed'?'Фактический результат на момент завершения этапа.':'Задачи следующего этапа.'
+ }:SCENES[scene];
+ return createPortal(<div className={'comicBackdrop '+styles.backdrop} onMouseDown={e=>{if(e.target===e.currentTarget&&!intro)close()}}>
+  <section ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Комикс о Республике" className={'comicDialog '+styles.dialog} onKeyDown={e=>{
+   if(showingArchive||e.altKey||e.ctrlKey||e.metaKey)return;
+   if(e.key==='ArrowLeft'){e.preventDefault();previous()}
+   if(e.key==='ArrowRight'){e.preventDefault();next()}
+  }}>
+   <header className={styles.header}><b>GOS//SIMS · Комиксы республики</b><div>
+    {!showingArchive&&<ComicSoundButton playing={playing||showingChapter} iconOnly/>}
+    {!showingArchive&&!showingChapter&&<button type="button" aria-label={playing?'Остановить автоматическое воспроизведение':'Продолжить показ'} onClick={()=>setPlaying(!playing)}>{playing?<Pause size={19}/>:<Play size={19}/>}</button>}
+    <button type="button" aria-label={intro?'Завершить пролог после просмотра':'Закрыть комикс'} disabled={intro&&scene!==SCENES.length-1} onClick={close}><X size={20}/></button>
+   </div></header>
+   {!intro&&<nav className={styles.switcher} aria-label="Разделы комиксов">
+    <button type="button" aria-pressed={!showingArchive&&!showingChapter} onClick={openIntro}><BookOpen size={18}/> Вводный комикс</button>
+    <button type="button" aria-pressed={showingArchive} onClick={openArchive}><Library size={18}/> Архив комиксов</button>
+   </nav>}
+   {showingArchive?<div className={styles.library} tabIndex={0}>
+    <div className={styles.libraryHeading}><h2>Архив комиксов</h2><p>Вводный комикс доступен всегда. Итоги и анонсы сохраняются по мере завершения этапов вашей игры.</p></div>
+    <div className={styles.libraryGrid}>
+     <button type="button" className={styles.libraryCard} onClick={openIntro}>
+      <div className={styles.cover}><Artwork scene={0}/></div>
+      <div className={styles.cardText}><small>Пролог · 4 сцены</small><strong>Вводный комикс</strong><span>Республика после бури: с чего начинается ваша история.</span><b>Читать с начала <ArrowRight size={16}/></b></div>
+     </button>
+     {chapters.map(c=><button key={c.id} type="button" className={styles.libraryCard} onClick={()=>readChapter(c.id)}>
+      <div className={styles.cover}><ChapterArtwork chapter={c}/></div>
+      <div className={styles.cardText}><small>{c.kind==='completed'?'Итоги':'Анонс'} · Этап {c.stage_no}</small><strong>{c.title}</strong><span>{c.kind==='completed'?'Сохранённые результаты этапа вашей игры.':'Следующая глава и задачи участников.'}</span><b>Открыть главу <ArrowRight size={16}/></b></div>
+     </button>)}
+    </div>
+    {archive.loading&&<p role="status" className={styles.archiveNotice}>Загружаем главы вашей игры…</p>}
+    {!archive.loading&&!chapters.length&&!archive.error&&<p className={styles.archiveNotice}>Этапы пока не завершены. После завершения этапа здесь появятся его итоги и анонс следующей главы.</p>}
+    {archive.error&&<p role="status" className={styles.archiveNotice}>Не удалось загрузить главы: {archive.error} Вводный комикс можно читать без загрузки архива.</p>}
+   </div>:<>
+    <div ref={reader} className={'comicFrame '+styles.readerFrame} key={showingChapter?chapter.id:scene}>
+     <div className={styles.illustration}>{showingChapter?<ChapterArtwork chapter={chapter}/>:<Artwork scene={scene}/>}</div>
+     <div className={'comicOverlay '+styles.story}>
+      <span className="comicKicker">{item.kicker}</span><h2>{item.title}</h2><p>{item.body}</p><strong>{item.stamp}</strong>
+     </div>
+    </div>
+    <footer className={styles.footer}>
+     <div className="comicFooterLabel"><small>{item.caption}{intro?' · После пролога откроется настройка профиля.':''}</small><span>{showingChapter?'Глава '+(chapterIndex+1)+' / '+chapters.length:'Сцена '+(scene+1)+' / '+SCENES.length}</span></div>
+     <div className={'comicControls '+styles.controls}>
+      <button type="button" disabled={showingChapter?chapterIndex<=0:scene===0} onClick={previous} aria-label={showingChapter?'Предыдущая глава':'Предыдущая сцена'}><ArrowLeft size={18}/></button>
+      {!showingChapter&&SCENES.map((x,i)=><button key={i} className={'comicDot '+(scene===i?'active':'')} aria-current={scene===i?'step':undefined} aria-label={'Сцена '+(i+1)+': '+x.title} onClick={()=>go(i)}>{String(i+1).padStart(2,'0')}</button>)}
+      <button type="button" onClick={next} aria-label={showingChapter?(chapterIndex===chapters.length-1?'Вернуться в архив':'Следующая глава'):(scene===SCENES.length-1?'Завершить просмотр':'Следующая сцена')}><ArrowRight size={18}/></button>
+     </div>
+    </footer>
+   </>}
+  </section>
+ </div>,document.body);
 }
 
 function ChapterArtwork({chapter:c}:{chapter:Chapter}){if(!c)return null;const p=(c.stage_no-1)%4,colors=['#327bea','#c2438a','#279982','#7a58b1'];return <svg className="comicArtwork" viewBox="0 0 1920 1080" role="img" aria-label={c.title} preserveAspectRatio="xMidYMid slice"><rect width="1920" height="1080" fill="#e6f1fd"/><circle cx={1490+p*40} cy="240" r="160" fill="#ffd68a"/><path d="M0 780Q460 590 940 740T1920 660V1080H0Z" fill="#b9d8e7"/><g stroke="#173253" strokeWidth="10"><path d="M90 880V500H230V880M260 880V390H390V880M1560 880V470H1710V880M1740 880V560H1900V880" fill="#8bacd1"/><path d="M610 770V340H1320V770Z" fill="#fff"/><path d="M610 340L965 150L1320 340Z" fill={colors[p]}/><path d="M760 420H1190M760 490H1140M760 560H1190" stroke="#aac0dd"/><rect x="720" y="635" width="480" height="100" rx="16" fill={colors[p]}/></g><text x="962" y="710" textAnchor="middle" fill="#fff" fontSize="60" fontWeight="900">Этап {String(c.stage_no).padStart(2,'0')}</text><g transform="translate(450 710)"><circle cy="-80" r="58" fill="#ebbd9c" stroke="#173253" strokeWidth="9"/><path d="M-90 220V40Q-80-20 0-20Q80-20 90 40V220Z" fill={colors[p]}/><path d="M65 65L260-20" stroke={colors[p]} strokeWidth="42" strokeLinecap="round"/><path d="M-30 220L-45 320M40 220L60 320" stroke="#173253" strokeWidth="40"/></g><g transform="translate(1420 710)"><circle cy="-80" r="58" fill="#d2a082" stroke="#173253" strokeWidth="9"/><path d="M-90 220V40Q-80-20 0-20Q80-20 90 40V220Z" fill="#e079a9"/><path d="M-65 65L-250-20" stroke="#e079a9" strokeWidth="42" strokeLinecap="round"/><path d="M-30 220L-45 320M40 220L60 320" stroke="#173253" strokeWidth="40"/></g>{c.kind==='completed'&&<g fill="#173253" fontSize="34" fontWeight="800"><text x="690" y="850">Документы: {c.snapshot.documents||0}</text><text x="1030" y="850">Голосования: {c.snapshot.votes||0}</text></g>}</svg>}
