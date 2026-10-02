@@ -113,7 +113,14 @@ async function main(){
   await desktop.setViewportSize({width,height:900});
   const tile=desktop.locator('.eventCaseTile').first();await tile.click();
   const modal=desktop.getByRole('dialog');await modal.waitFor();
-  assert.equal(await modal.locator('svg[data-scene]').count(),1,'One case, one illustration');
+  const artwork=modal.locator('svg[data-scene], figure.cinematicRaster[data-scene]');
+  assert.equal(await artwork.count(),1,'One case, one illustration');
+  assert.equal(await artwork.getAttribute('data-scene'),'1','The selected case keeps its own illustration');
+  const raster=artwork.locator('img');
+  if(await raster.count())await raster.evaluate(img=>img.complete?undefined:new Promise((resolve,reject)=>{img.addEventListener('load',resolve,{once:true});img.addEventListener('error',()=>reject(Error('Case artwork could not load')),{once:true})}));
+  const artworkBox=await artwork.boundingBox();
+  assert(artworkBox&&artworkBox.width>0&&artworkBox.height>0,'The illustration must be visible');
+  assert(Math.abs(artworkBox.width/artworkBox.height-16/9)<.03,'The illustration keeps its original proportions');
   assert.equal(await modal.locator('.eventOptionButtons').count(),0,'No duplicate answer controls');
   const answers=modal.locator('.eventAnswerChoice');assert.equal(await answers.count(),require('../content/events-v2.json')[0].decision_options.length,'All authored options are rendered once');await answers.first().click();await desktop.waitForFunction(()=>document.querySelector('.eventAnswerChoice[aria-pressed=true]')?.textContent.includes('67%'));assert.equal(await answers.first().locator('.eventVoter').count(),2);assert.equal(await answers.first().isDisabled(),true,'Submitted answer is locked');
   const modalBounds=await modal.boundingBox();assert(modalBounds.width<=width-15,'Modal fits the viewport');
