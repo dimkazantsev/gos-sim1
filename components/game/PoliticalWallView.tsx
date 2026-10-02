@@ -22,7 +22,7 @@ import PostInlineEditor from './PostInlineEditor';
 import NewsProposals from './NewsProposals';
 
 const PROCESS_TYPES=[
- ['statement','Заявление'],['initiative','Инициатива'],['decision','Проект решения'],['event','Событие'],
+ ['statement','Заявление'],['initiative','Инициатива'],['event','Событие'],
  ['negotiation','Переговоры'],['crisis_response','Антикризисная мера'],['information','Информационное сообщение'],['news','Новость СМИ']
 ];
 const RESOURCE_VIEWS:{value:View;label:string}[]=[
@@ -61,7 +61,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const filtered=useMemo(()=>politicalPosts.filter(p=>{
   const q=search.trim().replace(/^#/,'').toLowerCase();
   if(q&&!([p.title,p.body,p.actor_label,...(p.tags||[])].join(' ').toLowerCase().includes(q)))return false;
-  return (!filterActor||p.actor_key===filterActor)&&(!filterType||p.process_type===filterType)&&(!filterStage||String(p.context?.stage_no)===filterStage);
+  return (!filterActor||p.actor_key===filterActor)&&(!filterType||(filterType==='initiative'?['initiative','decision'].includes(p.process_type):p.process_type===filterType))&&(!filterStage||String(p.context?.stage_no)===filterStage);
  }).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||Date.parse(b.created_at)-Date.parse(a.created_at)),[politicalPosts,search,filterActor,filterType,filterStage]);
 
  function insertText(text:string){
@@ -106,7 +106,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
    const r=await supabase.rpc('submit_media_news',{p_game_id:game.id,p_title:title,p_body:body,p_actor_key:actor.key,p_tags:Array.from(new Set([...selectedTags,...Array.from(body.matchAll(/#([а-яёa-z0-9_]+)/gi),m=>m[1])])),p_external_url:externalUrl.trim()||null,p_internal_view:internalView||null,p_formal_ids:formalIds,p_files:attachments});if(r.error){setNotice(r.error.message);return}submitted=true;setNotice('Новость направлена преподавателю на согласование.');setProposalRefresh(n=>n+1);clearDraft();composer.current?.removeAttribute('open');
   }catch(e){setNotice(e instanceof Error?e.message:'Не удалось направить новость')}finally{if(!submitted&&uploadedPaths.length)await supabase.storage.from('game-assets').remove(uploadedPaths);setBusy(false)}
  }
- async function deletePost(p:PoliticalPost){if(!confirm('Удалить публикацию «'+p.title+'» из ленты? Зафиксированные решения и изменения показателей сохранятся в истории.'))return;setBusy(true);const r=await supabase.rpc('delete_process_post',{p_post_id:p.id});if(r.error)setNotice(r.error.message);else{if(editing?.id===p.id)setEditing(null);await g.refresh();setNotice('Публикация удалена из ленты.')}setBusy(false)}
+ async function deletePost(p:PoliticalPost){if(!confirm('Удалить публикацию «'+p.title+'» из ленты? Зафиксированные изменения показателей сохранятся в истории.'))return;setBusy(true);const r=await supabase.rpc('delete_process_post',{p_post_id:p.id});if(r.error)setNotice(r.error.message);else{if(editing?.id===p.id)setEditing(null);await g.refresh();setNotice('Публикация удалена из ленты.')}setBusy(false)}
  async function startVote(postId:string){
   if(busy)return;setBusy(true);
   try{const id=await g.createVoteFromPost(postId,voteBody,voteBody==='gd'?'mandate':'member',voteGroup);if(id){setVoteFor('');onOpenVotes()}}finally{setBusy(false)}
@@ -131,7 +131,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const mine=profiles.find(p=>p.user_id===me.user_id);
  return <div className="wallPage processPortal">
   <section className="wallHero">
-   <div><small>Официальная лента игры</small><h1>Политический процесс</h1><p>События, документы и решения участников. Регистрация, смена этапов и итоги голосований появляются автоматически.</p></div>
+   <div><small>Официальная лента игры</small><h1>Политический процесс</h1><p>События, документы и действия участников. Регистрация, смена этапов и итоги голосований появляются автоматически.</p></div>
    <div className="wallHeroStats"><div><strong>{politicalPosts.length}</strong><span>Публикаций в ленте</span></div><div><strong>{formalDocuments.length}</strong><span>Документов в реестре</span></div><div><strong>{votes.filter(v=>v.status==='open').length}</strong><span>Открытых голосований</span></div></div>
   </section>
   {!teacher&&!readOnly&&<section className="wallStageTask"><div className="wallStageTaskNo">{String(stageNo).padStart(2,'0')}</div><div className="wallStageTaskCopy"><small>Текущий этап</small><h2>{stageAction.title}</h2><p>{stageAction.body}</p></div><button className="primary" onClick={()=>onNavigate(stageAction.target)}>{stageAction.button}</button></section>}
@@ -159,7 +159,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     const links=postFormalLinks.filter(x=>x.post_id===p.id).flatMap(x=>formalDocuments.filter(d=>d.id===x.formal_document_id));
     const vote=votes.find(v=>v.source_post_id===p.id||v.id===p.context?.vote_id);
     const publicFiles=g.partyDocuments.filter(d=>p.context?.party_document_ids?.includes(d.id)&&d.url);
-    const label=p.actor_key==='teacher'?'GOS//SIMS':p.actor_label,kind=PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
+    const label=p.actor_key==='teacher'?'GOS//SIMS':p.actor_label,kind=p.process_type==='decision'?'Инициатива':PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
     const auto=!!p.source_key||p.context?.automatic===true;
     const own=p.author_id===me.user_id,editable=!readOnly&&(teacher||own&&!auto);
     const canRequestVote=!readOnly&&(teacher||own&&!auto);
@@ -168,7 +168,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
      {editing?.id===p.id&&<PostInlineEditor key={p.id} post={p} g={g} onClose={()=>setEditing(null)} onSaved={()=>{setEditing(null);setNotice('Изменения сохранены.')}}/>}
      <div className="wallPostBody"><div className="processPostMeta"><span>{kind}</span>{p.context?.stage_no&&<span>Этап {String(p.context.stage_no)}</span>}</div><h2>{p.title}</h2>
       {!!p.comic_scene&&<div className="wallPostComic"><EventComic silent title={p.comic_scene.title||p.title} category={p.comic_scene.category||'Событие'} caseKey={p.comic_scene.case_key||p.internal_ref_id||p.id} scene={p.comic_scene}/></div>}
-      {p.actor_key==='media'&&Array.isArray(p.context?.rating_changes)?<RatingNewsVisual g={g} post={p}/>:!media.some(m=>m.media_kind==='image')&&!p.comic_scene&&<div className="processSourceVisual"><div><PublisherAvatar actorKey={party?'party':p.actor_key} label={party?.name||label} partyLogo={party?.logo_url} avatar={pf?.avatar_url} gender={pf?.gender}/></div><span><small>{links.length?'Документы и решения':kind}</small><b>{party?.name||label}</b>{!!p.context?.stage_title&&<small>{String(p.context.stage_title)}</small>}</span></div>}
+      {p.actor_key==='media'&&Array.isArray(p.context?.rating_changes)?<RatingNewsVisual g={g} post={p}/>:!media.some(m=>m.media_kind==='image')&&!p.comic_scene&&<div className="processSourceVisual"><div><PublisherAvatar actorKey={party?'party':p.actor_key} label={party?.name||label} partyLogo={party?.logo_url} avatar={pf?.avatar_url} gender={pf?.gender}/></div><span><small>{links.length?'Связанные документы':kind}</small><b>{party?.name||label}</b>{!!p.context?.stage_title&&<small>{String(p.context.stage_title)}</small>}</span></div>}
       <PostText post={p} onNavigate={onNavigate} onOpenDocument={onOpenDocument}/>
      </div>
      {media.length>0&&<div className="wallMedia">{media.map(m=>m.media_kind==='image'?<a className="processImageLink" key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer"><img src={m.url||''} alt={m.file_name} loading="lazy" decoding="async"/></a>:m.media_kind==='video'?<video key={m.id} src={m.url||''} controls preload="metadata"/>:m.media_kind==='audio'?<div className="processAudio" key={m.id}><b>{m.file_name}</b><audio src={m.url||''} controls preload="metadata"/></div>:<a className="processFileLink" key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer"><BookOpenText size={18}/><span>{m.file_name}</span></a>)}</div>}
