@@ -34,11 +34,11 @@ async function main(){
   for(let i=0;i<60;i++){if(server.exitCode!==null)throw Error(logs.join(''));try{if((await fetch(url,{signal:AbortSignal.timeout(5000)})).ok)break}catch{}if(i===59)throw Error('Comic fixture failed to start');await new Promise(r=>setTimeout(r,800))}
   browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
   for(const {width,height} of [{width:320,height:640},{width:390,height:844},{width:768,height:1000},{width:1440,height:900},{width:1024,height:600}]){
-   const context=await browser.newContext({viewport:{width,height},reducedMotion:'reduce'}),page=await context.newPage(),errors=[],calls=[];let unavailable=false;
+   const context=await browser.newContext({viewport:{width,height},reducedMotion:'reduce'}),page=await context.newPage(),errors=[],calls=[];let unavailable=false,longChapter=false;
    page.on('pageerror',e=>errors.push(e.message));
    await page.route('https://*.supabase.co/**',async route=>{
     const address=new URL(route.request().url());let response=[];
-    if(address.pathname.includes('/republic_comic_chapters')){calls.push(address.searchParams.get('game_id'));if(unavailable){await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Network request failed'})});return}response=address.searchParams.get('game_id')==='eq.another-classroom'?[]:chapters}
+    if(address.pathname.includes('/republic_comic_chapters')){calls.push(address.searchParams.get('game_id'));if(unavailable){await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Network request failed'})});return}response=address.searchParams.get('game_id')==='eq.another-classroom'?[]:chapters.map(c=>longChapter&&c.id==='completed-10'?{...c,body:c.body+'\n\nПодробный протокол главы. '+('Участники проверили бюджетные назначения, сроки исполнения, источники финансирования и порядок парламентского контроля. Обоснования и приложения сохранены в реестре документов.\n\n').repeat(14)}:c)}
     if(address.pathname.includes('/get_member_public_stats'))response=[{posts:0,votes_cast:0,documents_created:0,activity_entries:0,events_decided:0}];
     if(address.pathname.includes('/get_achievement_catalog_counts'))response={open:60,hidden:40};
     if(address.pathname.includes('/is_my_platform_admin'))response=false;
@@ -54,6 +54,15 @@ async function main(){
    await page.getByRole('button',{name:'Завершить просмотр',exact:true}).click();await page.getByRole('dialog').waitFor({state:'hidden'});assert.equal(await page.locator('#intro-finished').textContent(),'0','Manual replay does not alter first-login progress');
    await profile.getByRole('button',{name:'Архив комиксов',exact:true}).click();await page.getByRole('button',{name:/Итоги · Этап 10/}).waitFor();assert.equal(await page.getByRole('button',{name:/Пролог · 4 сцены/}).count(),1,'Archive keeps the original four-scene introduction');await geometry(page);await page.screenshot({path:path.join(shots,'republic-comic-library-'+width+'.png')});
    await page.getByRole('button',{name:/Итоги · Этап 10/}).click();await page.locator('.comicOverlay h2').filter({hasText:'Государственные программы'}).waitFor();assert((await page.locator('.comicOverlay p').textContent()).includes('документ — 1'));await geometry(page);await page.screenshot({path:path.join(shots,'republic-comic-chapter-'+width+'.png')});
+   if(width===1024){
+    longChapter=true;const refreshed=page.waitForResponse(r=>r.url().includes('/republic_comic_chapters'));await page.getByRole('dialog').getByRole('button',{name:'Архив комиксов',exact:true}).click();await refreshed;
+    await page.getByRole('button',{name:/Итоги · Этап 10/}).click();await page.locator('.comicOverlay p').filter({hasText:'Подробный протокол главы'}).waitFor();
+    const initial=await page.locator('.comicFrame').evaluate(frame=>{frame.scrollTop=0;return {top:frame.getBoundingClientRect().top,storyTop:frame.querySelector('.comicOverlay').getBoundingClientRect().top,overflow:frame.scrollHeight-frame.clientHeight}});
+    assert(initial.overflow>300,'Fixture contains a genuinely long chapter');assert(initial.storyTop>=initial.top+10,'Long chapter starts in the reachable scroll area');
+    await page.screenshot({path:path.join(shots,'republic-comic-long-chapter-start-'+width+'.png')});await page.locator('.comicOverlay strong').scrollIntoViewIfNeeded();
+    const end=await page.locator('.comicFrame').evaluate(frame=>({bottom:frame.getBoundingClientRect().bottom,stampBottom:frame.querySelector('.comicOverlay strong').getBoundingClientRect().bottom,scroll:frame.scrollTop}));
+    assert(end.scroll>0&&end.stampBottom<=end.bottom+2,'Last paragraph and completion label remain reachable');console.log('PASS long chapter: beginning, full text and final label are reachable in a 600px window');
+   }
    await page.getByRole('button',{name:'Следующая глава',exact:true}).click();await page.locator('.comicOverlay h2').filter({hasText:'Заседание Правительства'}).waitFor();await page.getByRole('button',{name:'Вернуться в архив',exact:true}).click();await page.getByRole('button',{name:/Пролог · 4 сцены/}).click();await page.locator('.comicOverlay h2').filter({hasText:'Республика после бури'}).waitFor();
    await page.keyboard.press('Escape');await page.getByRole('dialog').waitFor({state:'hidden'});assert.equal(await page.evaluate(()=>document.activeElement?.textContent?.trim()),'Архив комиксов','Focus returns to the profile entry');
    await profile.getByRole('button',{name:'Вводный комикс',exact:true}).click();await page.locator('.comicOverlay h2').filter({hasText:'Республика после бури'}).waitFor();await page.getByRole('button',{name:'Закрыть комикс',exact:true}).click();
