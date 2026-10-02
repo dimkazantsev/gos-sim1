@@ -166,7 +166,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
    </section>}
   </>}
 
-  {game&&target.kind==='student'&&<AwardShelf gameId={game.id} userId={target.user_id}/>}
+  {game&&target.kind==='student'&&<AwardShelf gameId={game.id} userId={target.user_id} showCatalog={own||teacher}/>}
   {own&&target.kind==='student'&&<GradesView g={g} compact/>}
   {own&&<section className="profileJournalAccess">
    <div><Activity size={19} aria-hidden="true"/><div><b>{teacher?'Мой журнал действий':'Личный журнал действий'}</b><span>История ваших действий и переходов по разделам игры.</span></div></div>
