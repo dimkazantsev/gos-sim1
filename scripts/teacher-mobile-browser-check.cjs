@@ -80,7 +80,9 @@ async function main(){
    // the opened guide in the actual teacher workspace, including its table.
    await page.locator('#screen').selectOption('teacher-grades');
    const guide=frame.locator('.vsnGuide');await guide.waitFor();
-   await guide.locator(':scope > summary').scrollIntoViewIfNeeded();
+   // A fixed phone dock is outside the native viewport visibility check.
+   // Scroll the control into the reading area before testing an ordinary click.
+   await guide.locator(':scope > summary').evaluate(el=>el.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'}));
    const closed=await guide.evaluate(el=>{
     const rect=node=>{const r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
     const summary=el.querySelector('summary'),r=summary.getBoundingClientRect();
@@ -115,7 +117,21 @@ async function main(){
    for(const card of scoring.cards){for(const other of scoring.cards){if(Math.abs(card.top-other.top)<2)assert(Math.abs(card.height-other.height)<2,'Criteria in the same row have equal height')}}
    const header=await guide.locator(':scope > summary').evaluate(el=>[...el.children].map(node=>{const r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom}}));
    for(let i=1;i<header.length;i++)assert(header[i].left>=header[i-1].right+6,'Scoring header items do not overlap at '+width+'px');
-   await guide.screenshot({path:path.join(shotDir,'score-guide-'+width+'.png')});
+   // Capture real viewport views: an element taller than the iframe cannot
+   // produce a faithful full-panel screenshot of the inner scrolling surface.
+   await guide.locator(':scope > summary').evaluate(el=>el.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'}));
+   await page.locator('#preview').screenshot({path:path.join(shotDir,'score-guide-'+width+'.png')});
+   if([1440,600,320].includes(width)){
+    await guide.locator('.vsnEquations').evaluate(el=>el.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'}));
+    await page.locator('#preview').screenshot({path:path.join(shotDir,'score-guide-formula-'+width+'.png')});
+    await guide.locator('.scoreWeights tbody tr').last().evaluate(el=>el.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'}));
+    const lastRow=await guide.locator('.scoreWeights tbody tr').last().evaluate(el=>{
+     const r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom,height:window.innerHeight};
+    });
+    assert(lastRow.top>=80&&lastRow.bottom<=lastRow.height-90,'The last coefficient is reachable between fixed navigation bars at '+width+'px');
+    await page.locator('#preview').screenshot({path:path.join(shotDir,'score-guide-weights-'+width+'.png')});
+   }
+   await guide.locator(':scope > summary').evaluate(el=>el.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'}));
    await guide.locator(':scope > summary').click();assert.equal(await guide.getAttribute('open'),null,'Scoring guide collapses at '+width+'px');
    if(width<=900){
     await page.locator('#screen').selectOption('mobile-all');
