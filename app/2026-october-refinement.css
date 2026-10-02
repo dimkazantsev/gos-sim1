@@ -41,3 +41,10 @@
 .eventComicPlayer .eventPanelIllustration.cinematicRaster{display:block!important;aspect-ratio:16/9!important;width:100%!important;height:auto!important;min-height:0!important;margin:0!important;background:#fff!important}
 .eventComicPlayer .eventPanelIllustration.cinematicRaster>img{position:static!important;inset:auto!important;display:block!important;width:100%!important;height:auto!important;aspect-ratio:16/9;object-fit:contain!important}
 .eventTileArtwork:has(.cinematicRaster){height:auto!important;aspect-ratio:16/9;padding:0!important;min-width:0}.eventTileArtwork:has(.cinematicRaster) .eventComicPlayer{display:block;height:auto;width:100%}
+
+/* Keep a readable conversation when pins, tags or recording previews are open. */
+.simChat.gsChatV2 .chatMessages{flex:1 1 120px!important;min-height:120px!important}
+.simChat.gsChatV2 .chatPinnedWrap{display:flex;flex-direction:column;flex:0 1 auto;min-height:44px;overflow:hidden}
+.simChat.gsChatV2 .chatPinnedToggle{flex:none}
+.simChat.gsChatV2 .chatPinnedList{flex:0 1 auto;min-height:0;max-height:min(180px,22dvh);overflow-y:auto}
+.simChat.gsChatV2 .chatCompose{flex:0 1 auto!important;min-height:112px!important;max-height:min(360px,44dvh);overflow-y:auto}

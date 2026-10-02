@@ -183,7 +183,7 @@ async function main(){
     assert(dims.root.width<=dims.viewport+gap,'Chat panel wider than viewport at '+width+'px');
     assert(dims.header.bottom<=dims.messages.top+gap,'Chat header overlaps message list at '+width+'px');
     assert(dims.messages.bottom<=dims.composer.top+gap,'Chat messages overlap composer at '+width+'px');
-    assert(dims.messages.height>=100,'Chat message viewport collapsed at '+width+'px');
+    assert(dims.messages.height>=100,'Chat message viewport collapsed at '+width+'px ('+chatScreen+'): '+JSON.stringify(dims));
     assert(dims.root.bottom>=dims.composer.bottom-gap,'Composer escapes chat container at '+width+'px');
     assert(dims.textarea.left>=dims.root.x-gap&&dims.textarea.right<=dims.root.right+gap,'Chat input overflows panel at '+width+'px');
     assert(dims.overflow<=gap,'Chat page horizontally overflows at '+width+'px');
