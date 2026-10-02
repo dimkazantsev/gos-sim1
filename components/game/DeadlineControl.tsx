@@ -80,6 +80,7 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
 
  if(!game||!stage)return null;
  const guide=CONSEQUENCES[kind];
+ const unitPlaceholder=guide.unit?guide.unit.charAt(0).toLocaleUpperCase('ru-RU')+guide.unit.slice(1):'';
 
  return <section className={'deadlineControl '+(overdue?'overdue':'')}>
   <header><div><small>ДЕДЛАЙН И ПОСЛЕДСТВИЯ</small><h3>{timeText}</h3><p>{stage.deadline?new Date(stage.deadline).toLocaleString('ru-RU'):'Преподаватель ещё не установил срок этапа.'}</p></div><div className="deadlineCount"><strong>{active.length}</strong><span>активных последствий</span></div></header>
@@ -92,7 +93,7 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
     <label>Партия<select value={partyId} onChange={e=>{setPartyId(e.target.value);if(e.target.value)setUserId('')}}><option value="">Не выбрана</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
     <label>Студент<select value={userId} onChange={e=>{setUserId(e.target.value);if(e.target.value){setPartyId('');setKind('other')}}}><option value="">Не выбран</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>
     <label>Тип последствия<select value={kind} onChange={e=>{setKind(e.target.value as keyof typeof CONSEQUENCES);if(e.target.value!=='other')setUserId('')}}>{Object.entries(CONSEQUENCES).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select></label>
-    {kind!=='other'&&<label>Величина<input type="number" min={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} max={kind==='representation_loss'?450:kind==='regional_seat_loss'?89:kind==='presidential_rating_loss'?100:undefined} step={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} value={magnitude} onChange={e=>setMagnitude(e.target.value)} placeholder={guide.unit}/></label>}
+    {kind!=='other'&&<label>Величина<input type="number" min={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} max={kind==='representation_loss'?450:kind==='regional_seat_loss'?89:kind==='presidential_rating_loss'?100:undefined} step={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} value={magnitude} onChange={e=>setMagnitude(e.target.value)} placeholder={unitPlaceholder}/></label>}
     <label className="deadlineReason">Основание<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Что именно не выполнено в установленный срок и почему применяется это последствие?"/></label>
     <div className="deadlineGuide"><b>{guide.label}</b><p>{guide.hint}</p></div>
     <button className="primary" disabled={busy||(!partyId&&!userId)||note.trim().length<5||(kind!=='other'&&(!partyId||!Number.isFinite(Number(magnitude))||Number(magnitude)<=0))} onClick={()=>void record()}>Зафиксировать последствие</button>

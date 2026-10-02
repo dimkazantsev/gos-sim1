@@ -1,4 +1,5 @@
 import russia from '@/public/emblems/russia.png';
+import russianFlag from '@/public/emblems/russian-flag.svg';
 import gd from '@/public/emblems/gd.png';
 import sf from '@/public/emblems/sf.png';
 import minjustUser from '@/public/emblems/minjust-user.jpg';
@@ -24,6 +25,7 @@ const assetSrc=(asset:EmblemAsset)=>typeof asset==='string'?asset:asset.src;
 
 const EMBLEM={
  russia:assetSrc(russia),
+ flag:assetSrc(russianFlag),
  gd:assetSrc(gd),
  sf:assetSrc(sf),
  minjustUser:assetSrc(minjustUser),
@@ -45,18 +47,42 @@ const EMBLEM={
  emergency:assetSrc(emergency)
 } as const;
 
-export function institutionEmblem(subject:string,issuer=''){
- if(subject==='office'||subject.startsWith('office:')){if(/депутат|государственн.*дум/i.test(issuer))subject='gd';else if(/сенатор|совет федерац/i.test(issuer))subject='sf';else if(/министр|министерств/i.test(issuer))subject='ministry';else if(/муницип|глава города/i.test(issuer))subject='municipality';}
+export const gosSimsEmblem=EMBLEM.flag;
 
- if(subject==='minjust'||/юстиц/i.test(issuer))return EMBLEM.minjustUser;
- if(subject==='interior'||/внутренн|мвд/i.test(issuer))return EMBLEM.interiorUser;
- if(subject==='central_bank'||/центральн.*банк|банк россии/i.test(issuer))return EMBLEM.centralBank;
- if(subject==='municipality'||subject==='region')return null;
- if(subject==='gd'||subject==='gd_deputy')return EMBLEM.gd;
- if(subject==='sf'||subject==='sf_member')return EMBLEM.sf;
- if(subject==='ministry'){
-  const match:[RegExp,keyof typeof EMBLEM][]=[[/транспорт/i,'transport'],[/здравоохран/i,'health'],[/финанс/i,'finance'],[/культур/i,'culture'],[/наук|высш/i,'science'],[/просвещ|образован/i,'education'],[/эконом/i,'economy'],[/иностран/i,'foreign'],[/природ|эколог/i,'ecology'],[/труд|социальн.*защит/i,'labour'],[/энерг/i,'energy'],[/цифров|связи|минцифр/i,'digital'],[/внутренн|мвд/i,'interior'],[/чрезвычай|мчс/i,'emergency']];
-  const key=match.find(([regex])=>regex.test(issuer))?.[1];if(key)return EMBLEM[key];
+export function institutionEmblem(subject:string,issuer=''){
+ let key=subject.toLocaleLowerCase('ru-RU');
+ const hay=(key+' '+issuer).toLocaleLowerCase('ru-RU');
+
+ if(key==='office'||key.startsWith('office:')){
+  if(/депутат|государственн.*дум/.test(hay))key='gd';
+  else if(/сенатор|совет федерац/.test(hay))key='sf';
+  else if(/министр|министерств/.test(hay))key='ministry';
+  else if(/муницип|глава города|местн.*самоуправлен/.test(hay))key='municipality';
  }
+
+ if(key==='minjust'||/министерств.*юстиц|минюст|\bюстиц/.test(hay))return EMBLEM.minjustUser;
+ if(key==='interior'||/министерств.*внутренн|\bмвд\b|внутренн.*дел/.test(hay))return EMBLEM.interiorUser;
+ if(key==='central_bank'||/центральн.*банк|банк россии/.test(hay))return EMBLEM.centralBank;
+ if(key==='gd'||key==='gd_deputy'||/государственн.*дум/.test(hay))return EMBLEM.gd;
+ if(key==='sf'||key==='sf_member'||/совет федерац|сенатор/.test(hay))return EMBLEM.sf;
+
+ const ministry:[RegExp,keyof typeof EMBLEM][]=[
+  [/транспорт|минтранс/,'transport'],[/здравоохран|минздрав/,'health'],[/финанс|минфин/,'finance'],
+  [/культур|минкульт/,'culture'],[/наук|высш.*образован|минобрнаук/,'science'],[/просвещ|минпросвещ/,'education'],
+  [/эконом|минэкономразвит/,'economy'],[/иностран|\bмид\b/,'foreign'],[/природ|эколог|минприрод/,'ecology'],
+  [/труд|социальн.*защит|минтруд/,'labour'],[/энерг|минэнерго/,'energy'],[/цифров|связи|минцифр/,'digital'],
+  [/чрезвычай|\bмчс\b/,'emergency']
+ ];
+ const ministryKey=ministry.find(([regex])=>regex.test(hay))?.[1];
+ if(ministryKey)return EMBLEM[ministryKey];
+
+ // Для органов без отдельного локального файла используем государственный герб,
+ // а не внешний URL: так эмблема не исчезает при сетевых ошибках или деплое.
+ if(
+  key==='president'||key==='government'||key==='ks'||key==='vs'||key==='region'||
+  /президент|правительств|конституционн.*суд|верховн.*суд|счетн.*палат|счётн.*палат|прокуратур|следственн.*комитет|избирательн.*комисс|\bцик\b|совет безопасност|государственн.*совет|общественн.*палат|уполномоченн.*прав|росгвард|\bфсб\b|\bсвр\b|\bфсо\b|казначейств|\bфнс\b|\bфтс\b|росстат|роскомнадзор|росреестр|росимущество|\bфас\b|росфинмониторинг|\bфссп\b|\bфсин\b|роспотребнадзор|роструд|роспатент|росархив|минобороны|минсельхоз|минстрой|минпромторг|минспорт|минвостокразвит/.test(hay)
+ )return EMBLEM.russia;
+
+ if(key==='municipality'||/муницип|местн.*самоуправлен/.test(hay))return null;
  return EMBLEM.russia;
 }
