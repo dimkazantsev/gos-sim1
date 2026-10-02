@@ -10,15 +10,20 @@ import {CHAT_MAX_FILE_BYTES,preferredRecordingMime,recordingFileName,uploadedCha
 import type {ChatMediaKind} from './recordingMedia';
 import {sendChatMedia} from './chatMediaTransport';
 import {analyseVoiceBlob} from './voiceWaveform';
+import {currentGameMembers,currentGameProfiles} from './gameRoster';
+import type {GameOfficeAssignment} from './types';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
 
 export function useRepublicGame(gameId:string){
  const router=useRouter();
  const setError=(value:unknown)=>setErrorRaw(userError(value));
- const [game,setGame]=useState<Game|null>(null),[me,setMe]=useState<Member|null>(null),[metrics,setMetrics]=useState<Metric[]>([]),[events,setEvents]=useState<EventItem[]>([]),[actions,setActions]=useState<ActionItem[]>([]),[members,setMembers]=useState<Member[]>([]);
+ const [game,setGame]=useState<Game|null>(null),[me,setMe]=useState<Member|null>(null),[metrics,setMetrics]=useState<Metric[]>([]),[events,setEvents]=useState<EventItem[]>([]),[actions,setActions]=useState<ActionItem[]>([]),[memberRows,setMembers]=useState<Member[]>([]);
+ const [officeRows,setOfficeRows]=useState<GameOfficeAssignment[]>([]);
+ const activeGameRef=useRef(gameId),officeRequest=useRef(0);activeGameRef.current=gameId;
+ const members=useMemo(()=>currentGameMembers(memberRows,gameId),[memberRows,gameId]);
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]),[chatPins,setChatPins]=useState<ChatPin[]>([]),[pinnedMessages,setPinnedMessages]=useState<Message[]>([]),[chatLoading,setChatLoading]=useState(false);
- const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profiles,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[partyInvitations,setPartyInvitations]=useState<PartyInvitation[]>([]),[partyMandates,setPartyMandateRows]=useState<PartyMandateAllocation[]>([]),[partyAgreements,setPartyAgreements]=useState<PartyAgreement[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]),[politicalPosts,setPoliticalPosts]=useState<PoliticalPost[]>([]),[politicalMedia,setPoliticalMedia]=useState<PoliticalPostMedia[]>([]),[postFormalLinks,setPostFormalLinks]=useState<PoliticalPostFormalLink[]>([]),[politicalDecisions,setPoliticalDecisions]=useState<PoliticalDecision[]>([]),[metricHistory,setMetricHistory]=useState<MetricHistory[]>([]),[partySupportHistory,setPartySupportHistory]=useState<PartySupportHistory[]>([]),[impactRules,setImpactRules]=useState<ImpactRule[]>([]),[impactLedger,setImpactLedger]=useState<ImpactLedger[]>([]);
+ const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profileRows,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[partyInvitations,setPartyInvitations]=useState<PartyInvitation[]>([]),[partyMandates,setPartyMandateRows]=useState<PartyMandateAllocation[]>([]),[partyAgreements,setPartyAgreements]=useState<PartyAgreement[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]),[politicalPosts,setPoliticalPosts]=useState<PoliticalPost[]>([]),[politicalMedia,setPoliticalMedia]=useState<PoliticalPostMedia[]>([]),[postFormalLinks,setPostFormalLinks]=useState<PoliticalPostFormalLink[]>([]),[politicalDecisions,setPoliticalDecisions]=useState<PoliticalDecision[]>([]),[metricHistory,setMetricHistory]=useState<MetricHistory[]>([]),[partySupportHistory,setPartySupportHistory]=useState<PartySupportHistory[]>([]),[impactRules,setImpactRules]=useState<ImpactRule[]>([]),[impactLedger,setImpactLedger]=useState<ImpactLedger[]>([]);
  const [loading,setLoading]=useState(true),[error,setErrorRaw]=useState(''),[chatOpen,setChatOpen]=useState(false),[secondsLeft,setSecondsLeft]=useState(0);
  const [profileGameId,setProfileGameId]=useState('');
  const [introAccountSeen,setIntroAccountSeen]=useState(false);
@@ -28,8 +33,10 @@ export function useRepublicGame(gameId:string){
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,PendingMediaUpload>()),voiceAnalysisRef=useRef<Promise<{waveform:number[];duration:number}|null>|null>(null);
 
+ const profiles=useMemo(()=>currentGameProfiles(profileRows,members,gameId),[profileRows,members,gameId]);
+ const officeAssignments=useMemo(()=>officeRows.filter(o=>o.game_id===gameId&&members.some(m=>m.user_id===o.user_id)),[officeRows,members,gameId]);
  const teacher=me?.kind==='teacher';
- const names=useMemo(()=>Object.fromEntries(members.map(x=>[x.user_id,x.full_name])),[members]);
+ const names=useMemo(()=>Object.fromEntries(memberRows.filter(m=>m.game_id===gameId).map(x=>[x.user_id,x.full_name])),[memberRows,gameId]);
  const currentStage=useMemo(()=>stages.find(s=>s.status==='open')||stages.find(s=>s.stage_no===game?.current_round)||stages[0],[stages,game?.current_round]);
  const myEvaluations=useMemo(()=>evaluations.filter(e=>e.user_id===me?.user_id),[evaluations,me?.user_id]);
  const averageVsn=myEvaluations.length?myEvaluations.reduce((a,b)=>a+b.score,0)/myEvaluations.length:0;
@@ -40,6 +47,7 @@ export function useRepublicGame(gameId:string){
   const live=supabase.channel('republic:'+gameId)
    .on('postgres_changes',{event:'*',schema:'public',table:'games',filter:'id=eq.'+gameId},()=>void loadAll(false))
    .on('postgres_changes',{event:'*',schema:'public',table:'game_members',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_office_assignments',filter:'game_id=eq.'+gameId},()=>void loadRepublicOffices())
    .on('postgres_changes',{event:'*',schema:'public',table:'state_metrics',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
    .on('postgres_changes',{event:'*',schema:'public',table:'game_stages',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
    .on('postgres_changes',{event:'*',schema:'public',table:'game_parties',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
@@ -97,8 +105,10 @@ export function useRepublicGame(gameId:string){
  async function loadAll(show=true){
   if(show)setLoading(true);
   const u=(await supabase.auth.getUser()).data.user;
+  if(activeGameRef.current!==gameId)return;
   if(!u){router.replace('/');return}
   const access=await supabase.rpc('ensure_my_game_access',{p_game:gameId});
+  if(activeGameRef.current!==gameId)return;
   if(access.error){setError(access.error.message);setLoading(false);return}
   const [g,m,mt,ev,ac,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,pc,mh,psh]=await Promise.all([
    supabase.from('games').select('*').eq('id',gameId).single(),
@@ -131,6 +141,7 @@ export function useRepublicGame(gameId:string){
    supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
    supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000)
   ]);
+  if(activeGameRef.current!==gameId)return;
   if(g.error||m.error){setError(g.error?.message||m.error?.message||'Нет доступа к игре');setLoading(false);return}
   if(pf.error){setError('Не удалось загрузить профиль. '+pf.error.message);setLoading(false);return}
   setGame(g.data as Game);setMe(m.data as Member);setMetrics((mt.data||[]) as Metric[]);setEvents((ev.data||[]) as EventItem[]);setActions((ac.data||[]) as ActionItem[]);
@@ -143,20 +154,32 @@ export function useRepublicGame(gameId:string){
    return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url:null,signature_url:old?.signature_path===row.signature_path?old?.signature_url:null};
   }));
   const intro=await supabase.rpc('has_seen_my_intro');
+  if(activeGameRef.current!==gameId)return;
   if(intro.error){setError('Не удалось проверить первый вход. '+intro.error.message);setLoading(false);return}
   setIntroAccountSeen(!!intro.data);setProfileGameId(gameId);
   const rawPartyDocs=(pd.data||[]) as PartyDocument[];
   const profileRows=await Promise.all(rawProfiles.map(async x=>({...x,avatar_url:x.avatar_path?(await supabase.storage.from('game-assets').createSignedUrl(x.avatar_path,3600)).data?.signedUrl||null:null,signature_url:x.signature_path?(await supabase.storage.from('game-assets').createSignedUrl(x.signature_path,3600)).data?.signedUrl||null:null})));
   const partyRows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
   const docRows=await Promise.all(rawPartyDocs.map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
+  if(activeGameRef.current!==gameId)return;
   setProfiles(profileRows);setParties(partyRows);setPartyDocuments(docRows);setPartyInvitations((pi.data||[]) as PartyInvitation[]);setPartyMandateRows((pm.data||[]) as PartyMandateAllocation[]);setPartyAgreements((ag.data||[]) as PartyAgreement[]);
   const formalRows=await Promise.all(((fd.data||[]) as FormalDocument[]).map(async x=>x.source_file_path?{...x,file_url:(await supabase.storage.from('game-assets').createSignedUrl(x.source_file_path,3600)).data?.signedUrl||null}:x));
+  if(activeGameRef.current!==gameId)return;
   setFormalDocuments(formalRows);setFormalHistory((fh.data||[]) as FormalHistory[]);
   const mediaRows=await Promise.all(((px.data||[]) as PoliticalPostMedia[]).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
+  if(activeGameRef.current!==gameId)return;
   setPoliticalPosts((pp.data||[]) as PoliticalPost[]);setPoliticalMedia(mediaRows);setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);setPoliticalDecisions((pc.data||[]) as PoliticalDecision[]);setMetricHistory((mh.data||[]) as MetricHistory[]);setPartySupportHistory((psh.data||[]) as PartySupportHistory[]);
   if(!channelRef.current&&ch.data?.[0])setChannelId(ch.data[0].id);
-  await loadImpactEngine();
-  if(show)setLoading(false);
+  await Promise.all([loadImpactEngine(),loadRepublicOffices()]);
+  if(activeGameRef.current===gameId&&show)setLoading(false);
+ }
+
+ async function loadRepublicOffices(){
+  const token=++officeRequest.current;
+  const result=await supabase.from('game_office_assignments').select('*').eq('game_id',gameId).order('created_at');
+  if(activeGameRef.current!==gameId||token!==officeRequest.current)return;
+  if(result.error){setError('Не удалось загрузить состав руководства. '+result.error.message);return}
+  setOfficeRows((result.data||[]) as GameOfficeAssignment[]);
  }
 
  async function loadClassroomTelemetry(){
@@ -901,6 +924,6 @@ export function useRepublicGame(gameId:string){
   finally{mediaOperationRef.current=false;setRecordingSaving(false)}
  }
 
- return {game,me,metrics,events,actions,members,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
+ return {game,me,metrics,events,actions,members,officeAssignments,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,politicalDecisions,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
   refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,submitAction,judgeAction,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }

@@ -4,8 +4,9 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import type {View} from './types';
 import {STAGE_ACTIONS} from './stageActions';
 import StateMetricsDock from './StateMetricsDock';
+import RepublicLeadership from './RepublicLeadership';
 
-export default function DashboardView({g,onNavigate}:{g:ReturnTypeRepublic;onNavigate:(view:View)=>void}){
+export default function DashboardView({g,onNavigate,onOpenProfile}:{g:ReturnTypeRepublic;onNavigate:(view:View)=>void;onOpenProfile?:(id:string)=>void}){
  const {game,me,currentStage,stages,teacher,parties,members,events,actions,votes,ballots,formalDocuments,setChatOpen}=g;
  if(!game||!me)return null;
  const stageNo=currentStage?.stage_no||game.current_round||1;
@@ -40,8 +41,9 @@ export default function DashboardView({g,onNavigate}:{g:ReturnTypeRepublic;onNav
    <section className="overviewFeed"><div className="sectionTop"><h2>Что происходит</h2><button className="textButton" onClick={()=>onNavigate('actions')}>Все процессы<ArrowUpRight aria-hidden="true"/></button></div>
     {events.length?<ol className="eventTimeline">{events.slice(0,4).map(event=><li key={event.id}><span className={'eventDot '+event.severity}/><div><time dateTime={event.published_at}>{new Date(event.published_at).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</time><h3>{event.title}</h3><p>{event.body}</p></div></li>)}</ol>:<div className="overviewEmpty"><span><FileText aria-hidden="true"/></span><h3>История только начинается</h3><p>Здесь появятся объявления преподавателя и события вашей республики.</p><button className="textButton" onClick={()=>onNavigate('actions')}>Открыть ленту процессов<ArrowRight aria-hidden="true"/></button></div>}
    </section>
-   <section className="republicCard"><div className="sectionTop"><span className="overline">СОСТАВ РЕСПУБЛИКИ</span><Landmark aria-hidden="true"/></div><h2>{teacher?'Ваш учебный парламент':me.role_title||'Участник республики'}</h2><p>{teacher?'Команды, представители и принятые решения.':myParty?myParty.name:'Ваша роль и партия появятся здесь после назначения.'}</p>
+   <section className="republicCard"><div className="sectionTop"><span className="overline">СОСТАВ РЕСПУБЛИКИ</span><Landmark aria-hidden="true"/></div><h2>{teacher?'Ваш учебный парламент':me.role_title||'Участник республики'}</h2><p>{teacher?'Участники, партии и руководство республики.':myParty?myParty.name:'Ваша роль и партия появятся здесь после назначения.'}</p>
     <div className="republicStats"><div><Users aria-hidden="true"/><strong>{participants}</strong><span>участников</span></div><div><Landmark aria-hidden="true"/><strong>{parties.length}</strong><span>партий</span></div><div><FileText aria-hidden="true"/><strong>{formalDocuments.length}</strong><span>НПА в реестре</span></div></div>
+    <RepublicLeadership g={g} onOpenProfile={onOpenProfile}/>
     {totalMandates>0?<div className="mandateSummary"><div className="mandateLabel"><b>Распределение мандатов</b><span>{totalMandates}</span></div><div className="mandateBar" role="img" aria-label={parties.filter(p=>p.mandates>0).map(p=>`${p.name}: ${p.mandates}`).join('; ')}>{parties.filter(p=>p.mandates>0).map((p,i)=><span key={p.id} style={{width:p.mandates/totalMandates*100+'%',background:p.color||['#2453E6','#EFA5CB','#172E74'][i%3]}}/>)}</div><ul className="mandateLegend">{parties.filter(p=>p.mandates>0).map((p,i)=><li key={p.id}><i style={{background:p.color||['#2453E6','#EFA5CB','#172E74'][i%3]}}/><span>{p.name}</span><b>{p.mandates}</b></li>)}</ul></div>:<div className="republicPending"><Check aria-hidden="true"/><p>Мандаты появятся после проведения выборов.</p></div>}
     <button className="textButton" onClick={()=>onNavigate('parties')}>Открыть партии<ArrowUpRight aria-hidden="true"/></button>
    </section>

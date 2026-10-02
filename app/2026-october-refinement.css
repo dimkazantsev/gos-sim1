@@ -45,6 +45,26 @@
 /* Scoring guide: keep the disclosure, cards and equations within their own
    reading grid instead of inheriting the legacy four-column rules panel. */
 .teacherCommand .teacherWorkspaceNav{background:#fff}
+
+/* Compact teacher tabs: all routes fit sooner; touch and wheel still scroll. */
+.teacherCommand .teacherWorkspaceNav{gap:3px;padding:8px;overflow-x:auto;overflow-y:hidden}
+.teacherCommand .teacherWorkspaceNav>button{min-width:0;min-height:44px;padding:0 9px;gap:6px;font-size:12px;line-height:1.35}
+.teacherCommand .teacherWorkspaceNav>button svg{width:18px;height:18px;flex:none}
+.republicLeadership{min-width:0;margin:0 0 22px;border-bottom:1px solid var(--gs-border,#dce5f0)}
+.republicLeadership>h3{margin:0 0 8px;font-size:14px;line-height:1.5;color:#173c70}
+.republicOfficeCard{min-width:0;padding:12px 0;border-top:1px solid var(--gs-border,#dce5f0)}
+.republicOfficeCard h4{margin:0 0 7px;color:#526a8c;font-size:12px;line-height:1.5;font-weight:750}
+.republicOfficeCard ul{display:grid;gap:6px;list-style:none;margin:0;padding:0}
+.republicOfficeCard li{min-width:0}
+.republicOfficeCard button,.republicLeaderPerson{display:grid;grid-template-columns:38px minmax(0,1fr) 16px;align-items:center;gap:10px;min-height:44px;width:100%;padding:3px 0;border:0;border-radius:9px;background:transparent;text-align:left;color:#173c70;font:inherit}
+.republicOfficeCard button{cursor:pointer}
+.republicOfficeCard button:hover{background:#edf3ff}
+.republicOfficeCard button:focus-visible{outline:3px solid #5d86e9;outline-offset:3px}
+.republicLeaderName{min-width:0;overflow-wrap:anywhere;font-size:13px;line-height:1.55;font-weight:750}
+.republicLeaderAvatar{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;overflow:hidden;background:#e6eefb;color:#5979ad;flex:none}
+.republicLeaderAvatar>img,.republicLeaderAvatar>.profileFallbackAvatar,.republicLeaderAvatar>.profileFallbackAvatar>svg{display:block;width:100%;height:100%;object-fit:cover}
+.republicOfficeVacant{display:flex;align-items:center;gap:10px;min-height:44px;color:#647d9b;font-size:12px;line-height:1.5}
+@media(max-width:650px){.teacherCommand .teacherWorkspaceNav>button{padding:0 10px;gap:7px}.teacherCommand .teacherWorkspaceNav>button svg{width:20px;height:20px}.republicLeaderName{font-size:14px}}
 .gradesPage>.vsnGuide{width:100%;max-width:100%;min-width:0;border-radius:14px}
 .gradesRulesCompact.vsnGuide>summary{display:grid;grid-template-columns:minmax(0,1fr) auto 20px;align-items:center;gap:12px;min-height:72px;padding:16px 20px;list-style:none;color:var(--gs-ink,#173c70);scroll-margin-block:90px}
 .vsnGuide>summary::-webkit-details-marker{display:none}

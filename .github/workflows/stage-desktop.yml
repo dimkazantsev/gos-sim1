@@ -16,6 +16,10 @@ on:
       - 'components/game/GradesView.tsx'
       - 'components/game/ScoreFormula.tsx'
       - 'components/game/ProfileView.tsx'
+      - 'components/game/RepublicLeadership.tsx'
+      - 'components/game/gameRoster.ts'
+      - 'components/game/useHorizontalWheel.ts'
+      - 'components/game/useRepublicGame.ts'
       - 'components/GameClient.tsx'
       - 'app/stage-map.css'
       - 'app/teacher-command.css'
@@ -31,6 +35,8 @@ on:
       - 'scripts/stage-desktop-browser-check.cjs'
       - 'scripts/teacher-command-browser-check.cjs'
       - 'scripts/teacher-mobile-browser-check.cjs'
+      - 'scripts/roster-leadership-browser-check.cjs'
+      - 'scripts/game-roster-check.cjs'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/stage-desktop.yml'
@@ -60,6 +66,12 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - name: TypeScript
         run: npm run typecheck
+      - name: Classroom isolation and leadership selection
+        run: node scripts/game-roster-check.cjs
+      - name: Live roster, leadership and mouse wheel interactions
+        run: node scripts/roster-leadership-browser-check.cjs
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - name: Design audit
         run: npm run design:check
       - name: Build real component preview
@@ -86,4 +98,5 @@ jobs:
             .design-review/screenshots/teacher-stages-*.png
             .design-review/screenshots/teacher-*.png
             .design-review/screenshots/score-guide-*.png
+            .design-review/screenshots/roster-*.png
           if-no-files-found: ignore

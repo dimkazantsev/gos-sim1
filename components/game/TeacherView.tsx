@@ -12,6 +12,7 @@ import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
 import TeacherAwards from './TeacherAwards';
 import {useSavedGameState,savedChoice} from './useSavedGameState';
+import {useHorizontalWheel} from './useHorizontalWheel';
 
 function timerText(seconds:number){
  const m=Math.floor(seconds/60),s=seconds%60;
@@ -36,6 +37,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
  const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalDecisions,formalDocuments,votes,ballots,evaluations,actions,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
+ const navigationRef=useHorizontalWheel(game?.id);
 
  const studentIds=useMemo(()=>new Set(members.filter(m=>m.kind!=='teacher').map(m=>m.user_id)),[members]);
  const studentActivities=useMemo(()=>activities.filter(a=>studentIds.has(a.actor_id)),[activities,studentIds]);
@@ -60,7 +62,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
 
  return <div className="teacherSimple teacherCommand">
   <section className="teacherWorkspace" aria-label="Рабочие разделы управления">
-   <div className="teacherWorkspaceNav" role="tablist" aria-label="Рабочие разделы преподавателя">
+   <div ref={navigationRef} className="teacherWorkspaceNav" role="tablist" aria-label="Рабочие разделы преподавателя">
     {WORKSPACES.map(item=>{
      const Icon=item.icon;
      return <button key={item.key} type="button" role="tab" id={'teacher-tab-'+item.key}
