@@ -7,10 +7,10 @@ import MediaUploadButton from './MediaUploadButton';
 import FormalDocumentPicker from './FormalDocumentPicker';
 import StyledSelect from '../ui/StyledSelect';
 import {PROCESS_TAGS} from './processTags';
-const types=[['statement','Заявление'],['initiative','Инициатива'],['decision','Проект решения'],['event','Событие'],['negotiation','Переговоры'],['crisis_response','Антикризисная мера'],['information','Информационное сообщение'],['news','Новость СМИ']];
+const types=[['statement','Заявление'],['initiative','Инициатива'],['event','Событие'],['negotiation','Переговоры'],['crisis_response','Антикризисная мера'],['information','Информационное сообщение'],['news','Новость СМИ']];
 const resources=[['actions','Политический процесс'],['documents','Реестр НПА'],['votes','Голосования'],['parties','Партии'],['stages','Этапы'],['events','События'],['dashboard','Обзор игры']];
 export default function PostInlineEditor({post:p,g,onClose,onSaved}:{post:PoliticalPost;g:ReturnTypeRepublic;onClose:()=>void;onSaved:()=>void}){
- const [title,setTitle]=useState(p.title),[body,setBody]=useState(p.body),[type,setType]=useState(p.process_type),[tags,setTags]=useState(p.tags||[]),[external,setExternal]=useState(p.external_url||''),[internal,setInternal]=useState(p.internal_view||'');
+ const [title,setTitle]=useState(p.title),[body,setBody]=useState(p.body),[type,setType]=useState(p.process_type==='decision'?'initiative':p.process_type),[tags,setTags]=useState(p.tags||[]),[external,setExternal]=useState(p.external_url||''),[internal,setInternal]=useState(p.internal_view||'');
  const [ids,setIds]=useState(g.postFormalLinks.filter(l=>l.post_id===p.id).map(l=>l.formal_document_id)),[files,setFiles]=useState<File[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const [linkOpen,setLinkOpen]=useState(false),[linkLabel,setLinkLabel]=useState(''),[linkUrl,setLinkUrl]=useState(''),[linkView,setLinkView]=useState('');
  const input=useRef<HTMLTextAreaElement>(null);
