@@ -17,7 +17,7 @@ const phasePrompt:Record<string,string>={
 };
 
 export default function SystemDebriefLab({g}:{g:ReturnTypeRepublic}){
- const {game,me,teacher,members,stages,parties,votes,formalDocuments,politicalDecisions,crises,metricHistory,partyAgreements,setError}=g;
+ const {game,me,teacher,members,stages,parties,votes,formalDocuments,crises,metricHistory,partyAgreements,setError}=g;
  const [rows,setRows]=useState<Reflection[]>([]);
  const [drafts,setDrafts]=useState<Record<string,Draft>>({});
  const [feedback,setFeedback]=useState<Record<string,string>>({});
@@ -78,7 +78,6 @@ export default function SystemDebriefLab({g}:{g:ReturnTypeRepublic}){
    <article><small>ПАРТИИ</small><strong>{parties.length}</strong><span>политических организаций</span></article>
    <article><small>ГОЛОСОВАНИЯ</small><strong>{votes.length}</strong><span>{votes.filter(v=>v.status==='closed').length} завершено</span></article>
    <article><small>НПА</small><strong>{formalDocuments.length}</strong><span>в формальном реестре</span></article>
-   <article><small>РЕШЕНИЯ</small><strong>{politicalDecisions.length}</strong><span>политических решений</span></article>
    <article><small>КРИЗИСЫ</small><strong>{crises.length}</strong><span>{crises.filter(c=>c.status==='resolved').length} завершено</span></article>
    <article><small>ИЗМЕНЕНИЯ KPI</small><strong>{changedMetrics}</strong><span>после исходного состояния</span></article>
    <article><small>СОГЛАШЕНИЯ</small><strong>{acceptedAgreements}</strong><span>принято / исполнено</span></article>
