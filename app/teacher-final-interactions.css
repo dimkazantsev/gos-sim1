@@ -20,14 +20,6 @@
 .firstPendingDecision header span{color:#7589a3;font-size:12px}
 .firstPendingDecision p{margin:0;color:#496889;font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
 .firstPendingActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
-.firstPendingActions button,.teacherOverviewDecision button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:9px 14px;border:1px solid #b9cffa;border-radius:9px;background:#e7f0ff;color:#2b58a8;font-size:12px;font-weight:800;cursor:pointer}
-.firstPendingActions button:last-child,.teacherOverviewDecision button{background:#315fd0;color:white;border-color:#315fd0}
-.teacherOverviewDecision{display:flex;justify-content:space-between;align-items:center;gap:17px;flex-wrap:wrap;padding:19px 21px;border:1px solid #d5e3f6;border-radius:15px;background:#f9fbff;min-width:0}
-.teacherOverviewDecision>div{min-width:0}
-.teacherOverviewDecision small{font-size:11px;letter-spacing:.08em;font-weight:840;color:#6783a5}
-.teacherOverviewDecision h3{margin:6px 0;font-size:17px;color:#294666;overflow-wrap:anywhere}
-.teacherOverviewDecision p{margin:0;font-size:12px;color:#7c91ad}
-.teacherOverviewDecision button{flex:none;max-width:100%}
 .institutionRegistrationPanel{display:grid;gap:17px;min-width:0;padding:22px;border:1px solid #d5e2f3;border-radius:17px;background:#fff}
 .institutionRegistrationPanel>header{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .institutionRegistrationPanel>header>div{min-width:0}
@@ -78,8 +70,7 @@
 @media(max-width:650px){
  .institutionRegistrationPanel{padding:16px}
  .chatVideoNote{width:min(220px,62vw);height:min(220px,62vw)}
- .teacherOverviewDecision>button{width:100%}
- .journalToolbar>.styledSelect,.participantsToolbar>.styledSelect{flex:1 1 calc(50% - 9px)}
+  .journalToolbar>.styledSelect,.participantsToolbar>.styledSelect{flex:1 1 calc(50% - 9px)}
  .participantsToolbar>button:not(.styledSelectTrigger){flex:1 1 calc(50% - 9px);max-width:100%;width:auto;min-width:0}
  .ghostBulk{grid-template-columns:minmax(0,1fr)}
 }
