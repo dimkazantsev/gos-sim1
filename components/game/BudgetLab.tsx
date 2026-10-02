@@ -2,6 +2,7 @@
 import {scenarioUnit,scenarioMoney} from '@/lib/formatQuantity';
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type Scenario={id:string;game_id:string;title:string;budget_year:number;source_note:string|null;gdp:number;oil_price:number|null;cutoff_price:number|null;key_rate:number|null;fx_change_pct:number|null;fx_intervention:number|null;revenue:number;expenditure:number;debt_start:number;financing:number;balance:number;deficit_pct_gdp:number|null;debt_end:number;debt_pct_gdp:number|null;deficit_limit_pct:number|null;debt_limit_pct:number|null;status:'draft'|'final';formal_document_id:string|null;created_by:string;updated_at:string};
@@ -101,21 +102,21 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
    p_gdp:n(gdp),p_oil_price:num(oil),p_cutoff_price:num(cutoff),p_key_rate:num(rate),p_fx_change_pct:num(fx),p_fx_intervention:num(intervention),
    p_revenue:n(revenue),p_expenditure:n(expenditure),p_debt_start:n(debt),p_financing:n(financing),p_deficit_limit_pct:num(deficitLimit),p_debt_limit_pct:num(debtLimit)
   });
-  if(r.error)setError(r.error.message);else{if(newScenario&&r.data)setSelectedId(String(r.data));await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{if(newScenario&&r.data)setSelectedId(String(r.data));await load()}setBusy(false);
  }
  async function submitStream(key:string){
   if(!selected)return;const text=(streamDraft[selected.id+'-'+key]||'').trim();if(text.length<10)return;
   setBusy(true);const r=await supabase.rpc('submit_budget_workstream',{p_scenario_id:selected.id,p_workstream:key,p_summary:text,p_assumptions:{}});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
- async function finalize(){if(!selected)return;setBusy(true);const r=await supabase.rpc('finalize_budget_scenario',{p_scenario_id:selected.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function finalize(){if(!selected)return;setBusy(true);const r=await supabase.rpc('finalize_budget_scenario',{p_scenario_id:selected.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
  async function setAllocation(){
   if(!selected||!allocationProgram||Number(allocationAmount)<0)return;
   setBusy(true);const r=await supabase.rpc('set_budget_program_allocation',{p_scenario_id:selected.id,p_program_id:allocationProgram,p_amount:Number(allocationAmount)||0,p_note:allocationNote.trim()||null});
-  if(r.error)setError(r.error.message);else{setAllocationProgram('');setAllocationAmount('');setAllocationNote('');await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setAllocationProgram('');setAllocationAmount('');setAllocationNote('');await load()}setBusy(false);
  }
- async function deleteAllocation(id:string){setBusy(true);const r=await supabase.rpc('delete_budget_program_allocation',{p_allocation_id:id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function createBudgetDocument(){if(!selected)return;setBusy(true);const r=await supabase.rpc('create_budget_document_from_scenario',{p_scenario_id:selected.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function deleteAllocation(id:string){setBusy(true);const r=await supabase.rpc('delete_budget_program_allocation',{p_allocation_id:id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function createBudgetDocument(){if(!selected)return;setBusy(true);const r=await supabase.rpc('create_budget_document_from_scenario',{p_scenario_id:selected.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  return <section className="budgetLab">
   <header className="budgetLabHead"><div><small>МАКРОЭКОНОМИКА И ПУБЛИЧНЫЕ ФИНАНСЫ · ЭТАП 13</small><h2>Бюджетная лаборатория</h2><p>Пять аналитических потоков собираются в один проверяемый сценарий. Система автоматически считает баланс, дефицит к ВВП и долг, но не подменяет преподавателя: параметры бюджетного правила и сценарные ограничения вводятся с источником.</p></div><div className="budgetEquation"><b>Баланс</b><span>доходы − расходы</span><b>Дефицит, % ВВП</b><span>max(0, −баланс) / ВВП × 100</span><b>Долг</b><span>начальный долг + дефицит − финансирование</span></div></header>
