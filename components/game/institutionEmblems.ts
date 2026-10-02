@@ -1,50 +1,25 @@
-import russia from '@/public/emblems/russia.png';
-import russianFlag from '@/public/emblems/russian-flag.svg';
-import gd from '@/public/emblems/gd.png';
-import sf from '@/public/emblems/sf.png';
-import minjustUser from '@/public/emblems/minjust-user.jpg';
-import interiorUser from '@/public/emblems/interior-user.png';
-import centralBank from '@/public/emblems/central-bank.svg';
-import transport from '@/public/emblems/transport.png';
-import health from '@/public/emblems/health.png';
-import finance from '@/public/emblems/finance.png';
-import culture from '@/public/emblems/culture.png';
-import science from '@/public/emblems/science.png';
-import education from '@/public/emblems/education.png';
-import economy from '@/public/emblems/economy.png';
-import foreign from '@/public/emblems/foreign.png';
-import ecology from '@/public/emblems/ecology.jpg';
-import labour from '@/public/emblems/labour.png';
-import energy from '@/public/emblems/energy.jpg';
-import digital from '@/public/emblems/digital.png';
-import interior from '@/public/emblems/interior.png';
-import emergency from '@/public/emblems/emergency.png';
-
-type EmblemAsset=string|{src:string};
-const assetSrc=(asset:EmblemAsset)=>typeof asset==='string'?asset:asset.src;
-
 const EMBLEM={
- russia:assetSrc(russia),
- flag:assetSrc(russianFlag),
- gd:assetSrc(gd),
- sf:assetSrc(sf),
- minjustUser:assetSrc(minjustUser),
- interiorUser:assetSrc(interiorUser),
- centralBank:assetSrc(centralBank),
- transport:assetSrc(transport),
- health:assetSrc(health),
- finance:assetSrc(finance),
- culture:assetSrc(culture),
- science:assetSrc(science),
- education:assetSrc(education),
- economy:assetSrc(economy),
- foreign:assetSrc(foreign),
- ecology:assetSrc(ecology),
- labour:assetSrc(labour),
- energy:assetSrc(energy),
- digital:assetSrc(digital),
- interior:assetSrc(interior),
- emergency:assetSrc(emergency)
+ russia:'/emblems/russia.png',
+ flag:'/emblems/russian-flag.svg',
+ gd:'/emblems/gd.png',
+ sf:'/emblems/sf.png',
+ minjustUser:'/emblems/minjust-user.jpg',
+ interiorUser:'/emblems/interior-user.png',
+ centralBank:'/emblems/central-bank.svg',
+ transport:'/emblems/transport.png',
+ health:'/emblems/health.png',
+ finance:'/emblems/finance.png',
+ culture:'/emblems/culture.png',
+ science:'/emblems/science.png',
+ education:'/emblems/education.png',
+ economy:'/emblems/economy.png',
+ foreign:'/emblems/foreign.png',
+ ecology:'/emblems/ecology.jpg',
+ labour:'/emblems/labour.png',
+ energy:'/emblems/energy.jpg',
+ digital:'/emblems/digital.png',
+ interior:'/emblems/interior.png',
+ emergency:'/emblems/emergency.png'
 } as const;
 
 export const gosSimsEmblem=EMBLEM.flag;
