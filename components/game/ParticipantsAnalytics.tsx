@@ -8,7 +8,7 @@ type Assessment={user_id:string;stage_no:number;auto_score:number;final_score:nu
 type Sort='surname'|'name'|'score'|'average'|'approved'|'activity'|'posts'|'votes';
 const score=(a:Assessment)=>a.status==='final'?(a.final_score??a.auto_score):a.auto_score;
 export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
- const {game,members,activities,politicalPosts,politicalDecisions,formalDocuments,ballots,teacher}=g;
+ const {game,members,activities,politicalPosts,formalDocuments,ballots,teacher}=g;
  const [assessments,setAssessments]=useState<Assessment[]>([]);
  const [activityTotals,setActivityTotals]=useState<Record<string,number>|null>(null);
  const [sort,setSort]=useState<Sort>('score');
@@ -43,13 +43,12 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
   const sum=gradeRows.reduce((total,a)=>total+score(a),0);
   const approved=gradeRows.filter(a=>a.status==='final').length;
   const posts=politicalPosts.filter(p=>p.author_id===m.user_id);
-  const ids=new Set(posts.map(p=>p.id));
   return {m,sum,average:gradeRows.length?sum/gradeRows.length:null,assessed:gradeRows.length,approved,
-   posts:posts.length,decisions:politicalDecisions.filter(d=>ids.has(d.post_id)).length,
+   posts:posts.length,
    documents:formalDocuments.filter(d=>d.author_id===m.user_id).length,
    votes:ballots.filter(b=>b.voter_id===m.user_id).length,
    activity:activityTotals===null?activities.filter(a=>a.actor_id===m.user_id).length:activityTotals[m.user_id]||0};
- }),[members,assessments,stage,politicalPosts,politicalDecisions,formalDocuments,ballots,activities,activityTotals]);
+ }),[members,assessments,stage,politicalPosts,formalDocuments,ballots,activities,activityTotals]);
  const filtered=rows.filter(r=>(!team||(r.m.team||r.m.group_name||'')===team)&&(!onlyAssessed||r.assessed>0)&&
   (!search||[r.m.full_name,r.m.team||'',r.m.group_name||'',r.m.role_title||''].some(s=>s.toLocaleLowerCase('ru').includes(search.toLocaleLowerCase('ru'))))).sort((a,b)=>{
    const part=(n:string,index:number)=>n.trim().split(/\s+/)[index]||'';
@@ -64,9 +63,9 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
  const totalApproved=filtered.reduce((x,r)=>x+r.approved,0);
  const totalAssessed=filtered.reduce((x,r)=>x+r.assessed,0);
  function csv(){
-  const values=[['Фамилия и имя','Партия или группа','Балл всего','Средний балл','Оценено этапов','Утверждено','Посты','Решения','НПА','Голоса','Активность'],...filtered.map(r=>[
+  const values=[['Фамилия и имя','Партия или группа','Балл всего','Средний балл','Оценено этапов','Утверждено','Посты','НПА','Голоса','Активность'],...filtered.map(r=>[
    r.m.full_name,r.m.team||r.m.group_name||'',r.sum.toString(),r.average===null?'':r.average.toFixed(2),
-   String(r.assessed),String(r.approved),String(r.posts),String(r.decisions),String(r.documents),String(r.votes),String(r.activity)])];
+   String(r.assessed),String(r.approved),String(r.posts),String(r.documents),String(r.votes),String(r.activity)])];
   const contents=values.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');
   const blob=new Blob(['\ufeff'+contents],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='gos-sims-participants.csv';a.click();URL.revokeObjectURL(url);
@@ -94,9 +93,9 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
   </div>
   {error&&<p role="alert">{error}</p>}
   <div className="participantsTableScroll" role="region" aria-label="Таблица аналитики участников" tabIndex={0}>
-   <table className="participantsTable"><thead><tr><th>Участник</th><th>Сумма</th><th>Среднее</th><th>Этапы</th><th>Итоговых</th><th>Посты</th><th>Решения</th><th>НПА</th><th>Голоса</th><th>Активность</th></tr></thead>
+   <table className="participantsTable"><thead><tr><th>Участник</th><th>Сумма</th><th>Среднее</th><th>Этапы</th><th>Итоговых</th><th>Посты</th><th>НПА</th><th>Голоса</th><th>Активность</th></tr></thead>
     <tbody>{filtered.map(r=><tr key={r.m.user_id}><th scope="row"><strong>{r.m.full_name}</strong><small>{r.m.team||r.m.group_name||'Без группы'} · {r.m.role_title||'Роль не назначена'}</small></th>
-     <td><b>{r.assessed?r.sum:'—'}</b></td><td>{r.average===null?'—':r.average.toFixed(2)}</td><td>{r.assessed}/16</td><td>{r.approved}</td><td>{r.posts}</td><td>{r.decisions}</td><td>{r.documents}</td><td>{r.votes}</td><td>{r.activity}</td></tr>)}</tbody>
+     <td><b>{r.assessed?r.sum:'—'}</b></td><td>{r.average===null?'—':r.average.toFixed(2)}</td><td>{r.assessed}/16</td><td>{r.approved}</td><td>{r.posts}</td><td>{r.documents}</td><td>{r.votes}</td><td>{r.activity}</td></tr>)}</tbody>
    </table>
    {!filtered.length&&<div className="journalEmpty">Нет участников по выбранным условиям.</div>}
   </div>
