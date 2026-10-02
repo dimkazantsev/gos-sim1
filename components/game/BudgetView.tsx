@@ -27,6 +27,7 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  const region=regions.find(r=>r.region_code===selected),forecast=region?fiscalForecast(region,rates,undefined,context):null;
  const total=useMemo(()=>fiscalTotal(regions,rates,context),[regions,rates,context]);
  const tax=catalog.taxes.find(t=>t.key===taxKey)!;
+ const appliedRate=rates.find(r=>r.tax_key===taxKey&&r.region_code===(tax.level==='federal'?'00':selected))?.rate??tax.default_rate??'';
  async function load(){
   if(!g.game)return;const [r,c,p,m]=await Promise.all([supabase.rpc('get_fiscal_budget',{p_game_id:g.game.id}),supabase.rpc('list_regional_cases',{p_game_id:g.game.id}),supabase.rpc('get_fiscal_legal_plans',{p_game_id:g.game.id}),supabase.rpc('get_fiscal_context',{p_game_id:g.game.id})]);
   if(!m.error&&m.data)setContext(m.data);else if(m.error)g.setError(userError(m.error));
@@ -38,7 +39,8 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  useEffect(()=>{void load();if(!g.game)return;const id=setInterval(()=>void load(),20000);return()=>clearInterval(id)},[g.game?.id,g.me?.user_id]);
  useEffect(()=>{if(!g.game)return;let pending:ReturnType<typeof setTimeout>|undefined;const update=()=>{clearTimeout(pending);pending=setTimeout(()=>void load(),160)};let channel=supabase.channel('fiscal-live:'+g.game.id);for(const table of ['game_fiscal_policy','game_fiscal_regions','game_fiscal_rates','fiscal_rate_proposals','fiscal_change_ledger','state_metrics','budget_scenarios','budget_program_allocations'])channel=channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+g.game.id},update);channel.subscribe();return()=>{clearTimeout(pending);void supabase.removeChannel(channel)}},[g.game?.id,g.me?.user_id]);
  useEffect(()=>{if(!region)return;setParameters(Object.fromEntries(['enterprises','employees_per_firm','monthly_wage','profit_per_firm','consumption_per_firm','expenditure','transfer_in','debt','compliance'].map(k=>[k,String(region[k as keyof FiscalRegion])])));},[region?.region_code,region?.enterprises,region?.expenditure,region?.monthly_wage]);
- useEffect(()=>{const scope=tax.level==='federal'?'00':selected;setRate(String(rates.find(r=>r.tax_key===taxKey&&r.region_code===scope)?.rate??tax.default_rate??''));},[taxKey,selected,rates]);
+ // A refresh returning the same policy must not erase an unfinished proposal.
+ useEffect(()=>{setRate(String(appliedRate))},[taxKey,selected,appliedRate,g.game?.id]);
  async function propose(){
   if(!g.game||readOnly||busy||!Number.isFinite(Number(rate)))return;
   setBusy(true);const r=await supabase.rpc('propose_fiscal_rate',{p_game_id:g.game.id,p_region:selected,p_tax:taxKey,p_rate:Number(rate)});setBusy(false);

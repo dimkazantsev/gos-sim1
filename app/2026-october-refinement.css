@@ -47,7 +47,7 @@
 .teacherCommand .teacherWorkspaceNav{background:#fff}
 
 /* Compact teacher tabs: all routes fit sooner; touch and wheel still scroll. */
-.teacherCommand .teacherWorkspaceNav{gap:3px;padding:8px;overflow-x:auto;overflow-y:hidden}
+.teacherCommand .teacherWorkspaceNav{gap:3px;padding:8px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:none}
 .teacherCommand .teacherWorkspaceNav>button{min-width:0;min-height:44px;padding:0 9px;gap:6px;font-size:12px;line-height:1.35}
 .teacherCommand .teacherWorkspaceNav>button svg{width:18px;height:18px;flex:none}
 .republicLeadership{min-width:0;margin:0 0 22px;border-bottom:1px solid var(--gs-border,#dce5f0)}

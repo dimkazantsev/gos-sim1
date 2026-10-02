@@ -79,7 +79,9 @@ async function main(){
     assert.equal(await page.evaluate(()=>window.scrollY),before.y,'Horizontal wheel should retain page position');
     await page.mouse.wheel(0,-180);await page.waitForFunction(()=>document.querySelector('.teacherWorkspaceNav').scrollLeft===0);
     const notCancelled=await nav.evaluate(el=>el.dispatchEvent(new WheelEvent('wheel',{deltaY:-120,bubbles:true,cancelable:true})));assert(notCancelled,'At the beginning wheel must be released to the page');
-    await nav.evaluate(el=>el.scrollLeft=el.scrollWidth-el.clientWidth);assert(await nav.getByRole('tab',{name:'Награды',exact:true}).isVisible());
+    await nav.evaluate(el=>el.scrollLeft=el.scrollWidth-el.clientWidth);
+    const last=await nav.getByRole('tab',{name:'Награды',exact:true}).boundingBox();const container=await nav.boundingBox();
+    assert(last.x>=container.x-2&&last.x+last.width<=container.x+container.width+2,'Last workspace must be fully reachable');
    }
    await page.locator('.republicLeadership').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(shots,'roster-leadership-'+width+'.png')});
    await nav.evaluate(el=>{el.scrollLeft=0;el.scrollIntoView({block:'center'})});await page.screenshot({path:path.join(shots,'roster-tabs-'+width+'.png')});
