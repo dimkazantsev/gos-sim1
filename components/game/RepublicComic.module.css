@@ -7,7 +7,8 @@
 .dialog .header button>svg,.dialog .controls button>svg{display:block;flex:none;grid-area:1/1}
 .dialog button:disabled{opacity:.4;cursor:default}
 .dialog button:focus-visible,.library:focus-visible{outline:3px solid #8ef1dc;outline-offset:3px}
-.switcher{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid #c4d4ff26;flex:none}
+.readerFrame:focus-visible{outline:2px solid #8ef1dc;outline-offset:-3px}
+.switcher{display:flex;align-items:stretch;gap:10px;padding:12px 20px;border-bottom:1px solid #c4d4ff26;flex:none}
 .switcher>button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 15px;border:1px solid #6983b650;border-radius:11px;background:#ffffff0b;color:#c5d9ff;font:inherit;font-size:13px;font-weight:750;cursor:pointer}
 .switcher>button[aria-pressed=true]{background:#dfeeff;border-color:#dfeeff;color:#203e70}
 .switcher>button>svg{flex:none}
@@ -41,9 +42,9 @@
 .cardText b>svg{flex:none}
 .archiveNotice{margin:20px 0 0;padding:14px 16px;border:1px solid #d6e3f3;border-radius:11px;background:#fff;color:#516b8b;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
 @media(max-width:850px){
- .dialog .readerFrame{grid-template-columns:minmax(0,1fr);align-content:start;gap:22px;padding:22px}
- .illustration{max-width:640px;justify-self:center}
- .dialog .story{gap:12px}
+ .dialog .readerFrame{display:block;padding:22px}
+ .illustration{max-width:640px;margin-inline:auto}
+ .dialog .story{gap:12px;margin-top:22px}
  .dialog .story h2{font-size:32px}
  .libraryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .dialog .footer{flex-wrap:wrap;gap:10px}
@@ -59,7 +60,8 @@
  .switcher{gap:8px;padding:10px 12px}
  .switcher>button{flex:1 1 0;padding:9px 8px;font-size:12px;min-width:0}
  .switcher>button>svg{width:16px;height:16px}
- .dialog .readerFrame{padding:16px;gap:18px}
+ .dialog .readerFrame{padding:16px}
+ .dialog .story{margin-top:18px}
  .dialog .story h2{font-size:29px}
  .dialog .story p{font-size:14px;line-height:1.6}
  .dialog .footer{padding:12px 12px max(12px,env(safe-area-inset-bottom));gap:12px}

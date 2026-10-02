@@ -20,11 +20,13 @@ const chapters=[{id:'completed-10',stage_no:10,kind:'completed',title:'Госу�
 async function geometry(page){
  const result=await page.getByRole('dialog').evaluate(panel=>{
   const box=e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
-  const header=panel.querySelector('header');return {width:innerWidth,height:innerHeight,panel:box(panel),scroll:document.documentElement.scrollWidth,controls:[...header.querySelectorAll('button')].map(b=>({button:box(b),icon:box(b.querySelector('svg'))})),title:box(header.querySelector('b'))};
+  const header=panel.querySelector('header'),art=panel.querySelector('.comicFrame .comicArtwork'),story=panel.querySelector('.comicOverlay'),switcher=panel.querySelector('nav');return {width:innerWidth,height:innerHeight,panel:box(panel),scroll:document.documentElement.scrollWidth,controls:[...header.querySelectorAll('button')].map(b=>({button:box(b),icon:box(b.querySelector('svg'))})),title:box(header.querySelector('b')),art:art?box(art):null,story:story?box(story):null,switcherButtons:switcher?[...switcher.querySelectorAll('button')].map(box):[]};
  });
  assert(result.panel.height>=300&&result.panel.bottom<=result.height+2,'Reader must fit the viewport');
  assert(result.scroll<=result.width+2&&result.panel.right<=result.width+2,'No horizontal overflow');
  for(const {button,icon} of result.controls){assert(button.height>=44&&button.width===button.height);assert(Math.abs((button.left+button.right-icon.left-icon.right)/2)<1,'Icon horizontally centred');assert(Math.abs((button.top+button.bottom-icon.top-icon.bottom)/2)<1,'Icon vertically centred');assert(result.title.right<=button.left+2,'Header title must not overlap buttons')}
+ if(result.art&&result.story){if(result.width<=850)assert(result.story.top>=result.art.bottom+16,'Story must be below the illustration, including a genuinely scrollable 320px reader');else assert(result.story.left>=result.art.right+16,'Desktop artwork and text columns must not overlap')}
+ if(result.switcherButtons.length>1)assert(Math.abs(result.switcherButtons[0].height-result.switcherButtons[1].height)<1,'Intro and archive controls have the same height even when a label wraps');
 }
 async function main(){
  fs.mkdirSync(route,{recursive:true});fs.mkdirSync(shots,{recursive:true});fs.writeFileSync(path.join(route,'page.tsx'),source);

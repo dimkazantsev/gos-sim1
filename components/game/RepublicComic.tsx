@@ -152,7 +152,7 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
     {!archive.loading&&!chapters.length&&!archive.error&&<p className={styles.archiveNotice}>Этапы пока не завершены. После завершения этапа здесь появятся его итоги и анонс следующей главы.</p>}
     {archive.error&&<p role="status" className={styles.archiveNotice}>Не удалось загрузить главы: {archive.error} Вводный комикс можно читать без загрузки архива.</p>}
    </div>:<>
-    <div ref={reader} className={'comicFrame '+styles.readerFrame} key={showingChapter?chapter.id:scene}>
+    <div ref={reader} role="region" aria-label="Сцена комикса" tabIndex={0} className={'comicFrame '+styles.readerFrame} key={showingChapter?chapter.id:scene}>
      <div className={styles.illustration}>{showingChapter?<ChapterArtwork chapter={chapter}/>:<Artwork scene={scene}/>}</div>
      <div className={'comicOverlay '+styles.story}>
       <span className="comicKicker">{item.kicker}</span><h2>{item.title}</h2><p>{item.body}</p><strong>{item.stamp}</strong>
