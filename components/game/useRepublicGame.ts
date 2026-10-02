@@ -41,6 +41,24 @@ export function useRepublicGame(gameId:string){
  const myEvaluations=useMemo(()=>evaluations.filter(e=>e.user_id===me?.user_id),[evaluations,me?.user_id]);
  const averageVsn=myEvaluations.length?myEvaluations.reduce((a,b)=>a+b.score,0)/myEvaluations.length:0;
 
+ // Synchronize an existing simulator while the group works in documents or events.
+ // Opening another section must not pause delivery or the application of a published budget.
+ const budgetSyncBusy=useRef(false);
+ async function syncBudget(){
+  if(budgetSyncBusy.current)return;budgetSyncBusy.current=true;
+  try{
+   const marker=await supabase.from('budget_simulator_state').select('game_id').eq('game_id',gameId).maybeSingle();
+   if(marker.data&&activeGameRef.current===gameId){const r=await supabase.rpc('get_budget_simulator',{p_game_id:gameId});if(r.error&&activeGameRef.current===gameId)setError(r.error);}
+  }catch(e){if(activeGameRef.current===gameId)setError(e);}
+  finally{budgetSyncBusy.current=false;}
+ }
+ useEffect(()=>{
+  if(!me||me.kind==='observer')return;
+  void syncBudget();const timer=setInterval(()=>{if(document.visibilityState==='visible')void syncBudget();},30000);
+  const resume=()=>{if(document.visibilityState==='visible')void syncBudget();};document.addEventListener('visibilitychange',resume);
+  return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',resume);};
+ },[gameId,me?.user_id,me?.kind]);
+
  useEffect(()=>{
   setProfileGameId('');
   void loadAll();
@@ -67,6 +85,7 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'*',schema:'public',table:'party_agreements',filter:'game_id=eq.'+gameId},()=>void loadPartyRepresentation())
    .on('postgres_changes',{event:'*',schema:'public',table:'formal_documents',filter:'game_id=eq.'+gameId},()=>void loadFormalRegistry())
    .on('postgres_changes',{event:'*',schema:'public',table:'formal_document_history',filter:'game_id=eq.'+gameId},()=>void loadFormalRegistry())
+   .on('postgres_changes',{event:'INSERT',schema:'public',table:'event_case_outcomes',filter:'game_id=eq.'+gameId},()=>void syncBudget())
    .on('postgres_changes',{event:'*',schema:'public',table:'political_posts',filter:'game_id=eq.'+gameId},()=>void loadPoliticalWall())
    .on('postgres_changes',{event:'*',schema:'public',table:'political_post_media',filter:'game_id=eq.'+gameId},()=>void loadPoliticalWall())
    .on('postgres_changes',{event:'*',schema:'public',table:'political_decisions',filter:'game_id=eq.'+gameId},()=>void loadPoliticalWall())
@@ -239,6 +258,7 @@ export function useRepublicGame(gameId:string){
    setFormalDocuments(rows);
   }
   if(!fh.error)setFormalHistory((fh.data||[]) as FormalHistory[]);
+  if(fd.data?.some(d=>d.status_code==='published'&&d.metadata?.budget_simulator_plan_id))void syncBudget();
  }
 
  async function loadPoliticalWall(){

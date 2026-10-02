@@ -1,6 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),Module=require('node:module'),ts=require('typescript');
 const root=path.resolve(__dirname,'..'),resolve=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return resolve.call(this,request.startsWith('@/')?path.join(root,request.slice(2)):request,...args)};
+require.extensions['.css']=module=>{module.exports={}};
 for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,file);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),EventComic=require('../components/game/EventComic').default;
 const cases=['events-v2.json','events-legal-2026.json'].flatMap(file=>JSON.parse(fs.readFileSync(path.join(root,'content',file),'utf8')));
@@ -25,3 +26,7 @@ for(const c of cases){
 }
 assert.equal(clipIds.size+rasterPaths.size,200,'Every case has its own independent artwork');
 console.log('PASS All 200 case illustrations are independent; '+rasterPaths.size+' use responsive cinematic artwork');
+
+const budgetCases=require('../content/budget-cases-2026.json');
+for(const c of budgetCases){const html=renderToStaticMarkup(React.createElement(EventComic,{title:c.title,category:c.category,caseKey:c.case_key,scene:c.comic_scene,silent:true}));assert.match(html,/УЧЕБНОЕ ФИНАНСОВОЕ ДЕЛО/);assert(html.includes(c.title),'Budget case retains its own title');assert(!html.includes('event-art'),'Financial dossier never borrows an unrelated case illustration');}
+console.log('PASS 14 new financial cases have their own documentary covers');

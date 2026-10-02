@@ -19,7 +19,6 @@ import GovernmentFormationLab from './GovernmentFormationLab';
 import GovernmentStructurePanel from './GovernmentStructurePanel';
 import InstitutionStaffingLab from './InstitutionStaffingLab';
 import StateProgramLab from './StateProgramLab';
-import BudgetLab from './BudgetLab';
 import MunicipalProjectLab from './MunicipalProjectLab';
 import MunicipalGovernancePanel from './MunicipalGovernancePanel';
 import SystemDebriefLab from './SystemDebriefLab';
@@ -299,33 +298,33 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
 
      {selected.stage_no===1&&<PartiesView g={g}/>}
 
-     {(selected.stage_no===2||selected.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={selected.stage_no as 2|3} onOpenVotes={onOpenVotes}/>} 
+     {(selected.stage_no===2||selected.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={selected.stage_no as 2|3} onOpenVotes={onOpenVotes}/>}
 
-     {selected.stage_no===4&&<DumaLeadershipElection g={g}/>} 
+     {selected.stage_no===4&&<DumaLeadershipElection g={g}/>}
 
-     {selected.stage_no===5&&<GhostPolicyLab g={g} onOpenVotes={onOpenVotes}/>} 
+     {selected.stage_no===5&&<GhostPolicyLab g={g} onOpenVotes={onOpenVotes}/>}
 
-     {selected.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes}/>} 
+     {selected.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes}/>}
 
-     {(selected.stage_no===6||selected.stage_no===7)&&<PresidentialElectionLab g={g}/>} 
+     {(selected.stage_no===6||selected.stage_no===7)&&<PresidentialElectionLab g={g}/>}
 
-     {selected.stage_no===8&&<><GovernmentStructurePanel g={g}/><GovernmentFormationLab g={g}/></>} 
+     {selected.stage_no===8&&<><GovernmentStructurePanel g={g}/><GovernmentFormationLab g={g}/></>}
 
-     {selected.stage_no===9&&<InstitutionStaffingLab g={g}/>} 
+     {selected.stage_no===9&&<InstitutionStaffingLab g={g}/>}
 
-     {(selected.stage_no===10||selected.stage_no===11)&&<StateProgramLab g={g}/>} 
+     {(selected.stage_no===10||selected.stage_no===11)&&<StateProgramLab g={g}/>}
 
-     {selected.stage_no===11&&<GovernmentProgramSessionLab g={g} onOpenVotes={onOpenVotes}/>} 
+     {selected.stage_no===11&&<GovernmentProgramSessionLab g={g} onOpenVotes={onOpenVotes}/>}
 
-     {selected.stage_no===12&&<LegislativeSessionLab g={g} onOpenVotes={onOpenVotes}/>} 
+     {selected.stage_no===12&&<LegislativeSessionLab g={g} onOpenVotes={onOpenVotes}/>}
 
-     {selected.stage_no===13&&<BudgetLab g={g}/>} 
+     {selected.stage_no===13&&<section className="surface budgetLab"><h2>Расчет федерального бюджета · 2026</h2><p>Откройте вкладку «Бюджет»: проверьте доходы, распределите расходы по отраслям, рассмотрите запросы регионов и покройте дефицит. Сохраненный общий расчет появится в результатах этапа. Проект проходит чтения, Совет Федерации и подпись Президента в реестре НПА.</p><button type="button" className="primary" onClick={()=>onNavigate?.('budget')}><Landmark size={18}/> Открыть бюджетный калькулятор</button></section>}
 
-     {selected.stage_no===14&&<><MunicipalGovernancePanel g={g}/><MunicipalProjectLab g={g}/></>} 
+     {selected.stage_no===14&&<><MunicipalGovernancePanel g={g}/><MunicipalProjectLab g={g}/></>}
 
-     {selected.stage_no===15&&<CrisisRoom g={g}/>} 
+     {selected.stage_no===15&&<CrisisRoom g={g}/>}
 
-     {selected.stage_no===16&&<SystemDebriefLab g={g}/>} 
+     {selected.stage_no===16&&<SystemDebriefLab g={g}/>}
 
      <StageReadinessPanel g={g} stageNo={selected.stage_no}/>
      </fieldset>

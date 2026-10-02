@@ -5,6 +5,7 @@ const {chromium}=require('playwright-core');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'.design-review'),shots=path.join(out,'screenshots');
 const originalResolve=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return originalResolve.call(this,request.startsWith('@/')?path.join(root,request.slice(2)):request,...args)};
+require.extensions['.css']=module=>{module.exports={}};
 for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,file);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),EventComic=require('../components/game/EventComic').default,EventCaseTile=require('../components/game/EventCaseTile').default;
 const {eventSceneFrame}=require('../components/game/eventSceneFrame');
