@@ -20,7 +20,7 @@ const chapters=[{id:'completed-10',stage_no:10,kind:'completed',title:'Госу�
 async function geometry(page){
  const result=await page.getByRole('dialog').evaluate(panel=>{
   const box=e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
-  const header=panel.querySelector('header'),frame=panel.querySelector('.comicFrame'),art=panel.querySelector('.comicFrame .comicArtwork'),story=panel.querySelector('.comicOverlay'),switcher=panel.querySelector('nav');return {kind:frame?.dataset.comicKind,frame:frame?box(frame):null,footer:panel.querySelector('footer')?box(panel.querySelector('footer')):null,width:innerWidth,height:innerHeight,panel:box(panel),scroll:document.documentElement.scrollWidth,controls:[...header.querySelectorAll('button')].map(b=>({button:box(b),icon:box(b.querySelector('svg'))})),title:box(header.querySelector('b')),art:art?box(art):null,story:story?box(story):null,switcherButtons:switcher?[...switcher.querySelectorAll('button')].map(box):[]};
+  const header=panel.querySelector('header'),frame=panel.querySelector('.comicFrame'),art=panel.querySelector('.comicFrame .comicArtwork'),story=panel.querySelector('.comicOverlay'),switcher=panel.querySelector('nav');return {kind:frame?.dataset.comicKind,frame:frame?box(frame):null,footer:panel.querySelector('footer')?box(panel.querySelector('footer')):null,width:innerWidth,height:innerHeight,panel:box(panel),scroll:document.documentElement.scrollWidth,controls:[...header.querySelectorAll('button')].map(b=>({button:box(b),icon:box(b.querySelector('svg'))})),title:box(header.querySelector('b')),art:art?box(art.parentElement):null,story:story?box(story):null,switcherButtons:switcher?[...switcher.querySelectorAll('button')].map(box):[]};
  });
  assert(result.panel.height>=300&&result.panel.bottom<=result.height+2,'Reader must fit the viewport');
  assert(result.scroll<=result.width+2&&result.panel.right<=result.width+2,'No horizontal overflow');
@@ -45,7 +45,7 @@ async function main(){
   for(let i=0;i<60;i++){if(server.exitCode!==null)throw Error(logs.join(''));try{if((await fetch(url,{signal:AbortSignal.timeout(5000)})).ok)break}catch{}if(i===59)throw Error('Comic fixture failed to start');await new Promise(r=>setTimeout(r,800))}
   browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
   for(const {width,height} of [{width:320,height:640},{width:390,height:844},{width:768,height:1000},{width:1440,height:900},{width:1024,height:600}]){
-   const context=await browser.newContext({viewport:{width,height},reducedMotion:'reduce'}),page=await context.newPage(),errors=[],calls=[];let unavailable=false,longChapter=false;
+   const context=await browser.newContext({viewport:{width,height},reducedMotion:'no-preference'}),page=await context.newPage(),errors=[],calls=[];let unavailable=false,longChapter=false;
    page.on('pageerror',e=>errors.push(e.message));
    await page.route('https://*.supabase.co/**',async route=>{
     const address=new URL(route.request().url());let response=[];
@@ -58,6 +58,7 @@ async function main(){
    await page.goto(url);await page.addStyleTag({content:'nextjs-portal{display:none!important}'});await page.waitForFunction(()=>document.body.dataset.comicReady==='yes');
    const profile=page.locator('.profileHeroControls');assert.equal(await profile.getByRole('button',{name:'Вводный комикс',exact:true}).count(),1);assert.equal(await profile.getByRole('button',{name:'Архив комиксов',exact:true}).count(),1);
    await profile.getByRole('button',{name:'Вводный комикс',exact:true}).click();await page.locator('.comicOverlay h2').filter({hasText:'Республика после бури'}).waitFor();
+   assert(await page.getByRole('button',{name:'Остановить автоматическое воспроизведение',exact:true}).isVisible(),'Manual replay starts animation immediately');await page.getByRole('button',{name:'Остановить автоматическое воспроизведение',exact:true}).click();
    assert.equal(await page.locator('.comicFrame').count(),1);const art=await page.locator('.comicFrame .comicArtwork').boundingBox();assert(art.height>145&&art.width>250,'Cinematic artwork must have real dimensions');await geometry(page);
    await page.locator('.comicFrame img').evaluate(async img=>{await img.decode();if(!img.naturalWidth)throw Error('Prologue image did not load')});
    const resolution=await page.locator('.comicFrame img').evaluate(img=>({chosen:Number(img.currentSrc.match(/-(\d+)\.webp/)?.[1]),needed:Math.min(1920,Math.max(img.clientWidth,img.clientHeight*16/9)*devicePixelRatio)}));
@@ -69,8 +70,18 @@ async function main(){
     await page.getByRole('button',{name:'Включить звук комикса',exact:true}).click();await page.getByRole('button',{name:'Выключить звук комикса',exact:true}).waitFor();await page.getByRole('button',{name:'Выключить звук комикса',exact:true}).click();
     await page.emulateMedia({reducedMotion:'no-preference'});await page.getByRole('button',{name:'Продолжить показ',exact:true}).click();
     assert.equal(await page.locator('.comicFrame img').evaluate(img=>getComputedStyle(img).animationPlayState),'running');
+    const motion=()=>page.locator('[data-scene-motion]').evaluate(el=>({animations:el.getAnimations({subtree:true}).map(a=>({time:Number(a.currentTime),state:a.playState})),transform:getComputedStyle(el.querySelector('i')).transform}));
+    const before=await motion();await page.waitForTimeout(300);const after=await motion();
+    assert(after.animations.length>10&&after.animations[0].time>before.animations[0].time+150,'Rain and water have running timelines, not just an animation style');assert.notEqual(after.transform,before.transform,'Environmental objects visibly move');
+    for(let frame=0;frame<24;frame++){await page.screenshot({path:path.join(shots,'republic-comic-motion-'+String(frame).padStart(2,'0')+'.png')});await page.waitForTimeout(80)}
     await page.getByRole('button',{name:'Остановить автоматическое воспроизведение',exact:true}).click();
-    assert.equal(await page.locator('.comicFrame img').evaluate(img=>getComputedStyle(img).animationPlayState),'paused');await page.emulateMedia({reducedMotion:'reduce'});
+    const frozen=await motion();await page.waitForTimeout(250);const still=await motion();
+    assert(still.animations.every(a=>a.state==='paused'),'Pause freezes every environmental layer');assert(Math.abs(still.animations[0].time-frozen.animations[0].time)<25,'Paused time does not advance');
+    await page.emulateMedia({reducedMotion:'reduce'});await page.getByRole('button',{name:'Продолжить показ',exact:true}).click();
+    assert((await motion()).animations.some(a=>a.state==='running'),'An explicit Play works even with a reduced-motion system setting');
+    await page.getByRole('button',{name:'Остановить автоматическое воспроизведение',exact:true}).click();
+    assert.equal(await page.locator('.comicFrame img').evaluate(img=>getComputedStyle(img).animationPlayState),'paused');
+    console.log('PASS actual animation: immediate start, changing environmental frames, pause freezes time, explicit Play overrides reduced motion');
    }
    assert.equal(await page.locator('.comicDialog .comicSoundButton span').count(),0,'Icon-only sound must not leak a text label');
    await page.screenshot({path:path.join(shots,'republic-comic-intro-'+width+'.png')});
@@ -78,6 +89,7 @@ async function main(){
     await page.getByRole('button',{name:'Следующая сцена',exact:true}).click();await page.locator('.comicOverlay h2').filter({hasText:title}).waitFor();
     await page.locator('.comicFrame img').evaluate(img=>img.decode());
     assert.equal(await page.locator('.comicFrame img').getAttribute('data-comic-art'),['treasury','citizens','renewal'][index]);
+    if(width===390){await page.getByRole('button',{name:'Продолжить показ',exact:true}).click();const times=await page.locator('[data-scene-motion]').evaluate(el=>el.getAnimations({subtree:true}).map(a=>a.currentTime));assert(times.length>=1,'Every scene has its own animated environment');await page.getByRole('button',{name:'Остановить автоматическое воспроизведение',exact:true}).click()}
     if(width===1440)await page.screenshot({path:path.join(shots,'republic-comic-scene-'+(index+2)+'-'+width+'.png')});
    }
    await page.getByRole('button',{name:'Завершить просмотр',exact:true}).click();await page.getByRole('dialog').waitFor({state:'hidden'});assert.equal(await page.locator('#intro-finished').textContent(),'0','Manual replay does not alter first-login progress');
