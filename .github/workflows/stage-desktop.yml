@@ -70,6 +70,8 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - name: TypeScript
         run: npm run typecheck
+      - name: Build real component preview
+        run: npm run design:preview
       - name: Intro persistence and restored comic library
         run: |
           node scripts/intro-refresh-check.cjs
@@ -84,8 +86,6 @@ jobs:
           CHROME_BIN: /usr/bin/google-chrome
       - name: Design audit
         run: npm run design:check
-      - name: Build real component preview
-        run: npm run design:preview
       - name: Scoring guide and mobile geometry
         run: npm run design:mobile
         env:

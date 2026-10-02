@@ -4,6 +4,9 @@ const fs=require('node:fs'),path=require('node:path'),Module=require('node:modul
 const root=path.resolve(__dirname,'..');
 const originalResolve=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return originalResolve.call(this,request.startsWith('@/')?path.join(root,request.slice(2)):request,...args)};
+// Closed dialogs do not render in this static preview. Next.js supplies their
+// scoped styles in the real browser interaction checks.
+require.extensions['.css']=module=>{module.exports={}};
 for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,file);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const h=React.createElement,noop=()=>{};
