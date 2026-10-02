@@ -1,0 +1,139 @@
+{
+  "version": 2,
+  "generator": "Built-in image_gen",
+  "style": "Realistic cinematic animation; tangible people, architecture and interiors",
+  "scenes": [
+    {
+      "key": "storm",
+      "source_resolution": [
+        1672,
+        941
+      ],
+      "source_sha256": "638b3333bf129618a232d71be279ae4008e66f4b991471822c55155055847e53",
+      "processing": "16:9 web export, Lanczos resampling and responsive WebP compression",
+      "prompt": "Use case: illustration-story. A single detailed 16:9 cinematic animated frame, intended size 3840×2160. Show a peaceful provincial Russian river city after a rain shower in early morning: a stone embankment, wet streets, a bridge with maintenance scaffolding, recognizable apartment buildings and a factory in the distance. On the right half, two ordinary adult residents in coats walk beside a municipal worker examining a bridge plan. Natural faces, realistic human anatomy, real architecture, textured clothing, reflective water and stone. Refined realistic animated feature and cinematic anime illustration, finely painted backgrounds, subtle drawn contours, indigo shadows and warm light appearing under clouds. Reserve the left half as a quieter darker city and river landscape for later text overlay. No words, no UI, no watermark, no geometric abstractions, no collage. The first establishing shot of a grounded civic story.",
+      "exports": [
+        {
+          "path": "public/republic-art/intro-v2-storm-1920.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 532414,
+          "sha256": "5be8ec82e70cbe6737ea51cda6576cb95d6c61a107bb3f2be7b22a8e64a46eab"
+        },
+        {
+          "path": "public/republic-art/intro-v2-storm-960.webp",
+          "width": 960,
+          "height": 540,
+          "bytes": 136428,
+          "sha256": "c5f9b0a93ea16bf6512dc97a23a01cb5e9017f28274c3aa0473ed0c02295dea9"
+        },
+        {
+          "path": "public/republic-art/intro-v2-storm-480.webp",
+          "width": 480,
+          "height": 270,
+          "bytes": 40518,
+          "sha256": "ac5ce378b70fad82daa7fed9259ca2501abac200c7704eca2860f7c84d6dae3c"
+        }
+      ]
+    },
+    {
+      "key": "treasury",
+      "source_resolution": [
+        1672,
+        941
+      ],
+      "source_sha256": "242cdf7c40e20fb393ebac467e658fead94279e177da0fbb888c475dd1f728fd",
+      "processing": "16:9 web export, Lanczos resampling and responsive WebP compression",
+      "prompt": "Use case: illustration-story. Create one widescreen 16:9 cinematic frame for the second scene of the same Russian civic simulation comic. Render at 3840×2160, at least 1920×1080. Scene: an authentic government treasury office at dusk, a worried female finance official and a male analyst in realistic office clothing inspect a mostly empty open safe, budget folders, invoices and a calculator on a wood desk; papers show indistinct lines only, no readable writing. A tall window reveals a recognizable contemporary Russian city and the factory beyond. The open safe and two people are on right half. Left half is a darker, beautifully detailed part of the office with filing cabinets and generous quiet area reserved for text overlaid in a web page. Style: sophisticated contemporary animated feature / cinematic anime drama, realistic human anatomy and facial acting, detailed painted interior, textured metal safe, fabric and timber, restrained ink lines with fine comic texture in shadows, indigo shadows and warm amber window light. Tangible narrative, no abstraction, no vector shapes, no superheroes. No titles, no captions, no UI, no watermark. One scene only, no collage, no split panels.",
+      "exports": [
+        {
+          "path": "public/republic-art/intro-v2-treasury-1920.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 382922,
+          "sha256": "0c970c801bbc38b90486b595051641b6e67782a060cf42b65704a1f09cd74b1e"
+        },
+        {
+          "path": "public/republic-art/intro-v2-treasury-960.webp",
+          "width": 960,
+          "height": 540,
+          "bytes": 93712,
+          "sha256": "d4bffbfa98d14344f9f32c9d86f1b16fdc2b8bcb854b13952a272f32455a0284"
+        },
+        {
+          "path": "public/republic-art/intro-v2-treasury-480.webp",
+          "width": 480,
+          "height": 270,
+          "bytes": 29688,
+          "sha256": "ca6dfc1d695cbe12e0ae1c50ca81ac56f634ff3699c3c4222581d20ce3ea529e"
+        }
+      ]
+    },
+    {
+      "key": "citizens",
+      "source_resolution": [
+        1672,
+        941
+      ],
+      "source_sha256": "f25afd5e2861e31329f7134261b1707be3fcb067f43ec0488c2a76d7386ffa38",
+      "processing": "16:9 web export, Lanczos resampling and responsive WebP compression",
+      "prompt": "Use case: illustration-story. Create one widescreen 16:9 cinematic frame for the third scene of a Russian civic simulation comic. Render at 3840×2160, at least 1920×1080. Scene: a realistic contemporary Russian town square in front of a civic assembly building at evening. A factory worker in blue work clothes, a young woman holding a folder with environmental photographs, an older resident and a teacher speak to a young elected representative; they are concerned but engaged in civil dialogue, expressive believable faces, natural anatomy. A small group of citizens stands behind them and the town hall windows glow warmly. Main character group on right half, quieter cobblestone square and subtly detailed building frontage on the left reserved for later web text. Style: sophisticated contemporary animated feature / cinematic anime drama, detailed painted environments, natural proportions, expressive drawn faces, fabric texture, restrained ink contours, very subtle comic halftone in shadows, indigo and teal with warm amber highlights. No abstract figures, no vector geometry, no superheroes, no generic decorative symbols. No legible letters, no slogans, no UI, no watermark. One scene, not a collage or multiple panels.",
+      "exports": [
+        {
+          "path": "public/republic-art/intro-v2-citizens-1920.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 457638,
+          "sha256": "8f0fd5cad4141afafb04aca9cd08d63768dd8d3e6d31be47ae35a224c81532df"
+        },
+        {
+          "path": "public/republic-art/intro-v2-citizens-960.webp",
+          "width": 960,
+          "height": 540,
+          "bytes": 135836,
+          "sha256": "d8aca1302256df5eb0d47d1abcd25f612edd463a21e463564e53fb5322f22aa5"
+        },
+        {
+          "path": "public/republic-art/intro-v2-citizens-480.webp",
+          "width": 480,
+          "height": 270,
+          "bytes": 41938,
+          "sha256": "36c70ec16d7e3272d4d85951148c74e53965340285c7fd6bf04974f13071b7bb"
+        }
+      ]
+    },
+    {
+      "key": "renewal",
+      "source_resolution": [
+        1672,
+        941
+      ],
+      "source_sha256": "826902648e19212a55320f172311344c087173338212d2a6bd7fdc42c76de54b",
+      "processing": "16:9 web export, Lanczos resampling and responsive WebP compression",
+      "prompt": "Use case: illustration-story. Create one widescreen 16:9 cinematic closing frame for the fourth scene of a Russian civic simulation introduction comic. Render at 3840×2160, at least 1920×1080. Scene: sunrise over the same kind of believable contemporary Russian provincial city, a river bridge undergoing real repairs, scaffolding and a construction crew. On the right half a diverse small group of young elected representatives and a civil engineer, realistic human proportions and expressive faces, stand on an embankment with a folder of plans and look toward the bridge and city. Behind them recognisable buildings and factory windows begin to light up. Left half contains quieter atmospheric river and detailed city silhouettes with dark indigo foreground space for text overlaid later. Style: sophisticated contemporary animated feature / cinematic anime drama, convincing anatomy, detailed painted architecture, realistic fabric, stone, water and steel, restrained ink lines, subtle comic texture in shadows, hopeful teal and golden sunrise, cinematic 35mm composition. No abstractions, no vector shapes, no superheroes, no flags with real emblems, no captions or readable lettering, no UI, no watermark. Single image, no collage or split panels.",
+      "exports": [
+        {
+          "path": "public/republic-art/intro-v2-renewal-1920.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 478444,
+          "sha256": "10256ba00b632b9c579d81fbbbb9cab5d48d9232fee5b46b75b31729e0eb98f5"
+        },
+        {
+          "path": "public/republic-art/intro-v2-renewal-960.webp",
+          "width": 960,
+          "height": 540,
+          "bytes": 122746,
+          "sha256": "6d1e9f33c9369469d0f69ed084613f9cafb38cf13225b898fbcec7b7dba667dc"
+        },
+        {
+          "path": "public/republic-art/intro-v2-renewal-480.webp",
+          "width": 480,
+          "height": 270,
+          "bytes": 36842,
+          "sha256": "a8140c20d50a5cb3044dd00ee367add43c9554a8574d884fc305068307de44f8"
+        }
+      ]
+    }
+  ]
+}

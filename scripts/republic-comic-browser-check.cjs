@@ -20,12 +20,21 @@ const chapters=[{id:'completed-10',stage_no:10,kind:'completed',title:'Госу�
 async function geometry(page){
  const result=await page.getByRole('dialog').evaluate(panel=>{
   const box=e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
-  const header=panel.querySelector('header'),art=panel.querySelector('.comicFrame .comicArtwork'),story=panel.querySelector('.comicOverlay'),switcher=panel.querySelector('nav');return {width:innerWidth,height:innerHeight,panel:box(panel),scroll:document.documentElement.scrollWidth,controls:[...header.querySelectorAll('button')].map(b=>({button:box(b),icon:box(b.querySelector('svg'))})),title:box(header.querySelector('b')),art:art?box(art):null,story:story?box(story):null,switcherButtons:switcher?[...switcher.querySelectorAll('button')].map(box):[]};
+  const header=panel.querySelector('header'),frame=panel.querySelector('.comicFrame'),art=panel.querySelector('.comicFrame .comicArtwork'),story=panel.querySelector('.comicOverlay'),switcher=panel.querySelector('nav');return {kind:frame?.dataset.comicKind,frame:frame?box(frame):null,footer:panel.querySelector('footer')?box(panel.querySelector('footer')):null,width:innerWidth,height:innerHeight,panel:box(panel),scroll:document.documentElement.scrollWidth,controls:[...header.querySelectorAll('button')].map(b=>({button:box(b),icon:box(b.querySelector('svg'))})),title:box(header.querySelector('b')),art:art?box(art):null,story:story?box(story):null,switcherButtons:switcher?[...switcher.querySelectorAll('button')].map(box):[]};
  });
  assert(result.panel.height>=300&&result.panel.bottom<=result.height+2,'Reader must fit the viewport');
  assert(result.scroll<=result.width+2&&result.panel.right<=result.width+2,'No horizontal overflow');
  for(const {button,icon} of result.controls){assert(button.height>=44&&button.width===button.height);assert(Math.abs((button.left+button.right-icon.left-icon.right)/2)<1,'Icon horizontally centred');assert(Math.abs((button.top+button.bottom-icon.top-icon.bottom)/2)<1,'Icon vertically centred');assert(result.title.right<=button.left+2,'Header title must not overlap buttons')}
- if(result.art&&result.story){if(result.width<=850)assert(result.story.top>=result.art.bottom+16,'Story must be below the illustration, including a genuinely scrollable 320px reader');else assert(result.story.left>=result.art.right+16,'Desktop artwork and text columns must not overlap')}
+ if(result.art&&result.story){
+  if(result.kind==='prologue'){
+   assert.equal(result.switcherButtons.length,0,'The original prologue has no archive toolbar above its scene');
+   assert.equal(result.controls.length,3,'Sound, play and close preserve the original three controls');
+   assert(Math.abs(result.art.left-result.frame.left)<2&&Math.abs(result.art.right-result.frame.right)<2,'Cinematic illustration fills the entire scene width');
+   assert(result.story.left<=result.art.left+2&&result.story.right>=result.art.right-2,'Story is over the scene, never a separate text column');
+   assert(result.frame.bottom<=result.footer.top+2,'Footer controls stay outside the illustration and story');
+  }else if(result.width<=850)assert(result.story.top>=result.art.bottom+16,'Archive story stays below the illustration on narrow screens');
+  else assert(result.story.left>=result.art.right+16,'Archive artwork and text columns must not overlap');
+ }
  if(result.switcherButtons.length>1)assert(Math.abs(result.switcherButtons[0].height-result.switcherButtons[1].height)<1,'Intro and archive controls have the same height even when a label wraps');
 }
 async function main(){
@@ -49,15 +58,31 @@ async function main(){
    await page.goto(url);await page.addStyleTag({content:'nextjs-portal{display:none!important}'});await page.waitForFunction(()=>document.body.dataset.comicReady==='yes');
    const profile=page.locator('.profileHeroControls');assert.equal(await profile.getByRole('button',{name:'Вводный комикс',exact:true}).count(),1);assert.equal(await profile.getByRole('button',{name:'Архив комиксов',exact:true}).count(),1);
    await profile.getByRole('button',{name:'Вводный комикс',exact:true}).click();await page.locator('.comicOverlay h2').filter({hasText:'Республика после бури'}).waitFor();
-   assert.equal(await page.locator('.comicFrame').count(),1);const art=await page.locator('.comicFrame .comicArtwork').boundingBox();assert(art.height>145&&art.width>250,'Original artwork must have real dimensions');await geometry(page);
+   assert.equal(await page.locator('.comicFrame').count(),1);const art=await page.locator('.comicFrame .comicArtwork').boundingBox();assert(art.height>145&&art.width>250,'Cinematic artwork must have real dimensions');await geometry(page);
+   await page.locator('.comicFrame img').evaluate(async img=>{await img.decode();if(!img.naturalWidth)throw Error('Prologue image did not load')});
+   assert.equal(await page.locator('.comicOverlay h2 br').count(),1,'The opening title keeps the two-line composition from the reference');
+   assert.equal(await page.locator('.comicFooterLabel span').textContent(),'01 / 04');
+   assert.equal(await page.locator('.comicFrame img').getAttribute('data-comic-art'),'storm');
+   if(width===390){
+    await page.getByRole('button',{name:'Включить звук комикса',exact:true}).click();await page.getByRole('button',{name:'Выключить звук комикса',exact:true}).waitFor();await page.getByRole('button',{name:'Выключить звук комикса',exact:true}).click();
+    await page.emulateMedia({reducedMotion:'no-preference'});await page.getByRole('button',{name:'Продолжить показ',exact:true}).click();
+    assert.equal(await page.locator('.comicFrame img').evaluate(img=>getComputedStyle(img).animationPlayState),'running');
+    await page.getByRole('button',{name:'Остановить автоматическое воспроизведение',exact:true}).click();
+    assert.equal(await page.locator('.comicFrame img').evaluate(img=>getComputedStyle(img).animationPlayState),'paused');await page.emulateMedia({reducedMotion:'reduce'});
+   }
    assert.equal(await page.locator('.comicDialog .comicSoundButton span').count(),0,'Icon-only sound must not leak a text label');
    await page.screenshot({path:path.join(shots,'republic-comic-intro-'+width+'.png')});
-   for(const title of ['Казна почти пуста','Люди требуют ответа','Теперь решаете вы']){await page.getByRole('button',{name:'Следующая сцена',exact:true}).click();await page.locator('.comicOverlay h2').filter({hasText:title}).waitFor()}
+   for(const [index,title] of ['Казна почти пуста','Люди требуют ответа','Теперь решаете вы'].entries()){
+    await page.getByRole('button',{name:'Следующая сцена',exact:true}).click();await page.locator('.comicOverlay h2').filter({hasText:title}).waitFor();
+    await page.locator('.comicFrame img').evaluate(img=>img.decode());
+    assert.equal(await page.locator('.comicFrame img').getAttribute('data-comic-art'),['treasury','citizens','renewal'][index]);
+    if(width===1440)await page.screenshot({path:path.join(shots,'republic-comic-scene-'+(index+2)+'-'+width+'.png')});
+   }
    await page.getByRole('button',{name:'Завершить просмотр',exact:true}).click();await page.getByRole('dialog').waitFor({state:'hidden'});assert.equal(await page.locator('#intro-finished').textContent(),'0','Manual replay does not alter first-login progress');
    await profile.getByRole('button',{name:'Архив комиксов',exact:true}).click();await page.getByRole('button',{name:/Итоги · Этап 10/}).waitFor();assert.equal(await page.getByRole('button',{name:/Пролог · 4 сцены/}).count(),1,'Archive keeps the original four-scene introduction');await geometry(page);await page.screenshot({path:path.join(shots,'republic-comic-library-'+width+'.png')});
    await page.getByRole('button',{name:/Итоги · Этап 10/}).click();await page.locator('.comicOverlay h2').filter({hasText:'Государственные программы'}).waitFor();assert((await page.locator('.comicOverlay p').textContent()).includes('документ — 1'));await geometry(page);await page.screenshot({path:path.join(shots,'republic-comic-chapter-'+width+'.png')});
    if(width===1024){
-    longChapter=true;const refreshed=page.waitForResponse(r=>r.url().includes('/republic_comic_chapters'));await page.getByRole('dialog').getByRole('button',{name:'Архив комиксов',exact:true}).click();await refreshed;
+    longChapter=true;const refreshed=page.waitForResponse(r=>r.url().includes('/republic_comic_chapters'));await page.getByRole('dialog').getByRole('button',{name:'Открыть архив комиксов',exact:true}).click();await refreshed;
     await page.getByRole('button',{name:/Итоги · Этап 10/}).click();await page.locator('.comicOverlay p').filter({hasText:'Подробный протокол главы'}).waitFor();
     const initial=await page.locator('.comicFrame').evaluate(frame=>{frame.scrollTop=0;return {top:frame.getBoundingClientRect().top,storyTop:frame.querySelector('.comicOverlay').getBoundingClientRect().top,overflow:frame.scrollHeight-frame.clientHeight}});
     assert(initial.overflow>300,'Fixture contains a genuinely long chapter');assert(initial.storyTop>=initial.top+10,'Long chapter starts in the reachable scroll area');
@@ -74,7 +99,7 @@ async function main(){
    }
    await page.getByRole('button',{name:'Первый вход для проверки',exact:true}).click();assert(await page.getByRole('button',{name:'Завершить пролог после просмотра',exact:true}).isDisabled());assert.equal(await page.getByRole('button',{name:'Архив комиксов',exact:true}).count(),1,'Automatic prologue has no archive navigation');await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),1,'Required introduction stays open before its final scene');
    for(let i=0;i<3;i++)await page.getByRole('button',{name:'Следующая сцена',exact:true}).click();await page.getByRole('button',{name:'Завершить пролог после просмотра',exact:true}).click();assert.equal(await page.locator('#intro-finished').textContent(),'1');
-   assert.deepEqual(errors,[],'No runtime errors at '+width+'px');console.log('PASS '+width+'×'+height+': actual profile entries, original four scenes, nonzero artwork, archive/chapter/return, centred 44px controls, first-login gating');await context.close();
+   assert.deepEqual(errors,[],'No runtime errors at '+width+'px');console.log('PASS '+width+'×'+height+': reference composition, four distinct loaded cinematic images, sound/play, archive/chapter/return, centred 44px controls, first-login gating');await context.close();
   }
  }finally{await browser?.close();server?.kill('SIGTERM');fs.rmSync(route,{recursive:true,force:true})}
 }

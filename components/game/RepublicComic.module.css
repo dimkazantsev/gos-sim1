@@ -1,7 +1,7 @@
 .backdrop.backdrop{box-sizing:border-box;grid-template-columns:minmax(0,1fr)}
-.dialog.dialog{width:min(1120px,100%);height:min(92dvh,800px);max-height:92dvh;min-height:0;box-sizing:border-box}
+.dialog.dialog{width:min(1392px,100%);height:min(90dvh,700px);max-height:92dvh;min-height:0;box-sizing:border-box}
 .dialog .header{min-height:70px;padding:12px 20px;box-sizing:border-box}
-.dialog .header>b{min-width:0;overflow-wrap:anywhere;font-size:12px;letter-spacing:.06em}
+.dialog .header>b{min-width:0;overflow-wrap:anywhere;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
 .dialog .header>div{gap:8px;align-items:center}
 .dialog .header button,.dialog .controls button{display:grid;place-items:center;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border-radius:11px;box-sizing:border-box}
 .dialog .header button>svg,.dialog .controls button>svg{display:block;flex:none;grid-area:1/1}
@@ -14,7 +14,7 @@
 .switcher>button>svg{flex:none}
 .dialog .readerFrame{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);align-items:start;align-content:safe center;gap:24px;flex:1 1 0;min-height:0;max-height:none;margin:0;padding:24px;overflow:auto;overscroll-behavior:contain;background:#101d3b;box-sizing:border-box}
 .illustration{position:relative;width:100%;min-width:0;aspect-ratio:900/510;overflow:hidden;border:1px solid #879fe040;border-radius:16px;background:#182d52;isolation:isolate}
-.illustration>svg{display:block;position:absolute;inset:0;width:100%;height:100%;max-height:100%;object-fit:contain}
+.illustration>img{display:block;position:absolute;inset:0;width:100%;height:100%;max-height:100%;object-fit:cover}
 .dialog .story{display:grid;position:relative;inset:auto;gap:15px;padding:0;max-width:100%;min-width:0;background:transparent;animation:none}
 .dialog .story h2{font-size:clamp(27px,3vw,43px);line-height:1.12;letter-spacing:-.035em;overflow-wrap:anywhere}
 .dialog .story p{font-size:15px;line-height:1.7;white-space:pre-line;overflow-wrap:anywhere}
@@ -32,7 +32,7 @@
 .libraryGrid .libraryCard{display:flex;flex-direction:column;align-items:stretch;min-width:0;padding:0;overflow:hidden;border:1px solid #d7e3f3;border-radius:16px;background:#fff;color:#173253;text-align:left;cursor:pointer;box-shadow:0 5px 18px #17325308;transition:box-shadow .15s,border-color .15s}
 .libraryGrid .libraryCard:hover{border-color:#5987dd;box-shadow:0 8px 24px #17325318}
 .cover{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#182d52;pointer-events:none}
-.cover>svg{display:block;position:absolute;inset:0;width:100%;height:100%;animation:none}
+.cover>img{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:none}
 .cover :global(.comicClouds),.cover :global(.comicStorm),.cover :global(.comicEmergency),.cover :global(.comicVault),.cover :global(.comicCrowd),.cover :global(.comicRebirth){animation:none}
 .cardText{display:flex;flex-direction:column;gap:9px;padding:16px;flex:1;min-width:0}
 .cardText small{font-size:11px;color:#6181a5}
@@ -71,4 +71,30 @@
  .libraryHeading h2{font-size:23px}
  .libraryHeading p{font-size:13px}
 }
-@media(prefers-reduced-motion:reduce){.libraryCard{transition:none}}
+/* The prologue retains the original full-scene composition, separate from the archive. */
+.dialog .cinematicFrame{display:block;padding:0;background:#0e1931}
+.cinematicFrame .illustration{position:absolute;inset:0;width:100%;height:100%;min-height:100%;max-width:none;aspect-ratio:auto;margin:0;border:0;border-radius:0;pointer-events:none}
+.cinematicArtwork{filter:none;object-position:62% 36%}
+.cinematicFrame .cinematicArtwork{animation:cinematicCamera 14s ease-in-out infinite alternate}
+.cinematicFrame[data-playing=false] .cinematicArtwork{animation-play-state:paused}
+.dialog .cinematicFrame .story{position:relative;inset:auto;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:100%;margin:0;padding:clamp(28px,4vw,48px);gap:17px;box-sizing:border-box;background:linear-gradient(90deg,#07132fea 0%,#0a1531d9 24%,#0a153198 48%,#08142b16 76%),linear-gradient(0deg,#091329ad,transparent 65%)}
+.dialog .cinematicFrame .story h2{max-width:700px;font-size:clamp(42px,5vw,65px);line-height:1.06;letter-spacing:-.05em;text-shadow:0 2px 18px #030b2070}
+.dialog .cinematicFrame .story p{max-width:710px;font-size:clamp(15px,1.45vw,18px);line-height:1.65;color:#eaf2ff;text-shadow:0 1px 8px #020919b0}
+.dialog .cinematicFrame .story :global(.comicKicker){font-size:11px;padding:8px 10px}
+.dialog .cinematicFrame .story strong{font-size:11px;min-height:34px;padding:9px 13px}
+@keyframes cinematicCamera{from{transform:scale(1.01) translate3d(0,0,0)}to{transform:scale(1.055) translate3d(-.6%,.3%,0)}}
+@media(max-width:850px){
+ .dialog.dialog{height:min(92dvh,900px)}
+ .dialog .cinematicFrame .story{padding:30px;gap:15px;background:linear-gradient(90deg,#07132fdc,#0a153190 65%,#08142b35),linear-gradient(0deg,#091329bc,transparent 85%)}
+ .dialog .cinematicFrame .story h2{font-size:clamp(38px,6.5vw,54px)}
+}
+@media(max-width:600px){
+ .dialog.dialog{height:100dvh}
+ .cinematicFrame .cinematicArtwork{object-position:69% 36%}
+ .dialog .cinematicFrame .story{justify-content:flex-end;padding:110px 22px 28px;gap:14px;background:linear-gradient(0deg,#08132fee 0%,#08132fce 42%,#0b173a55 78%,#0b173a12)}
+ .dialog .cinematicFrame .story h2{font-size:clamp(36px,10vw,48px);line-height:1.08}
+ .dialog .cinematicFrame .story p{font-size:14px;line-height:1.65}
+ .dialog .cinematicFrame .story :global(.comicKicker){font-size:10px;letter-spacing:.055em}
+ .dialog .cinematicFrame .story strong{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.libraryCard{transition:none}.cinematicFrame .cinematicArtwork{animation:none!important}}
