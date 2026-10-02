@@ -1,0 +1,145 @@
+{
+  "scene-001": {
+    "generated_size": [
+      1672,
+      941
+    ],
+    "export_size": [
+      1920,
+      1080
+    ],
+    "source_sha256": "fa08f4e4d9f1e5655bc692bed4fdf461db4e48221aba167cec8ba279b9ccef5c",
+    "source_file": "exec-97ed689b-a9d0-47d1-a55f-efe5412eda63.png",
+    "method": "Image generation; 16:9 web export and responsive compression"
+  },
+  "scene-002": {
+    "generated_size": [
+      1672,
+      941
+    ],
+    "export_size": [
+      1920,
+      1080
+    ],
+    "source_sha256": "5d425a4bc7a7ad30d1f3be5a3a3f9d78f011c1568c286d3d9b2ec057e4435dce",
+    "source_file": "exec-4cee80e4-5763-46d6-ba8a-b01c1b34e165.png",
+    "method": "Image generation; 16:9 web export and responsive compression"
+  },
+  "scene-003": {
+    "generated_size": [
+      1672,
+      941
+    ],
+    "export_size": [
+      1920,
+      1080
+    ],
+    "source_sha256": "a3fc11b64dc2162d4372fa7165d8f47495b78589e940e673ac8041f8744927d6",
+    "source_file": "exec-cb2e61e4-ef60-4d1a-b353-3f88ab2614b8.png",
+    "method": "Image generation; 16:9 web export and responsive compression"
+  },
+  "scene-004": {
+    "generated_size": [
+      1672,
+      941
+    ],
+    "export_size": [
+      1920,
+      1080
+    ],
+    "source_sha256": "b58b9ff8e2fcd230ded37880264cf5f129903d4527484b1db5c58b6297ed31eb",
+    "source_file": "exec-4028118a-56f2-451d-87a4-846eeae84f90.png",
+    "method": "Image generation; 16:9 web export and responsive compression"
+  },
+  "scene-005": {
+    "generated_size": [
+      1672,
+      941
+    ],
+    "export_size": [
+      1920,
+      1080
+    ],
+    "source_sha256": "1cb8ae1899bb6c95049fa6216c0ddb363f79d7a4091dbc45f4f03198ab8072cb",
+    "source_file": "exec-8912a725-827d-44b1-9fa0-bf55b8ac8d28.png",
+    "method": "Image generation; 16:9 web export and responsive compression"
+  },
+  "scene-006": {
+    "generated_size": [
+      1672,
+      941
+    ],
+    "export_size": [
+      1920,
+      1080
+    ],
+    "source_sha256": "51e489f98604190a487151f7239a671b5b530bdb92ddc32442ed6d73f47b7b1c",
+    "source_file": "exec-df0434a8-bcb9-4088-8a1b-e8b4bcb6acf9.png",
+    "method": "Image generation; 16:9 web export and responsive compression"
+  },
+  "scene-007": {
+    "generated_size": [
+      1672,
+      941
+    ],
+    "export_size": [
+      1920,
+      1080
+    ],
+    "source_sha256": "d6d1b1d542f64cd5cef71f9e521834f2a651dce0e4b4184fe0ad82e698824cb2",
+    "source_file": "exec-23536d31-ebb6-4031-9b4e-a144829e855c.png",
+    "method": "Image generation; 16:9 web export and responsive compression"
+  },
+  "scene-008": {
+    "generated_size": [
+      1672,
+      941
+    ],
+    "export_size": [
+      1920,
+      1080
+    ],
+    "source_sha256": "fd5bff4f0f31e779bbd2b99ea81f9d33a88a4d22a3ca99788799042f968d7fc3",
+    "source_file": "exec-5b20a6f9-ff87-4970-973d-3ea5f57eb9fe.png",
+    "method": "Image generation; 16:9 web export and responsive compression"
+  },
+  "scene-009": {
+    "generated_size": [
+      1672,
+      940
+    ],
+    "export_size": [
+      1920,
+      1080
+    ],
+    "source_sha256": "062cc01ad8eaa363ee7558375657aa11017148494b2b697bcbd7849ccef668a3",
+    "source_file": "exec-fb206aaf-dcb7-43d0-b755-2fe75037cd44.png",
+    "method": "Image generation; 16:9 web export and responsive compression"
+  },
+  "scene-014": {
+    "generated_size": [
+      1672,
+      941
+    ],
+    "export_size": [
+      1920,
+      1080
+    ],
+    "source_sha256": "d51ff328bdf4ade2b5c58f94164d45f394c80d2191a37955c3ecba43edefd6e7",
+    "source_file": "exec-28af5201-188c-4ee3-8577-1d15d931ce70.png",
+    "method": "Image generation; 16:9 web export and responsive compression"
+  },
+  "scene-010": {
+    "generated_size": [
+      1672,
+      941
+    ],
+    "export_size": [
+      1920,
+      1080
+    ],
+    "source_sha256": "6efbf440446c35067e9ad6520eb2186b7bf9f1c13d0ce48eaa19beb079d6a769",
+    "source_file": "exec-fafe373a-bc18-4bac-b199-fea416446dd3.png",
+    "method": "Image generation; 16:9 web export and responsive compression"
+  }
+}

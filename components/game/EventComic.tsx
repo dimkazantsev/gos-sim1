@@ -3,10 +3,14 @@ import {useId,type CSSProperties} from 'react';
 import {eventSceneFrame} from './eventSceneFrame';
 import ComicSoundButton from './ComicSoundButton';
 import type {EventComicScene} from './types';
+import illustrations from '@/data/event-illustrations.json';
 type Props={title:string;category:string;caseKey:string;compact?:boolean;silent?:boolean;scene?:EventComicScene|null};
 function hash(s:string){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 export default function EventComic({title,category,caseKey,compact=false,silent=false,scene}:Props){
  const id=useId().replace(/:/g,'');
+ const art=(illustrations as Record<string,{src:string;srcSet:string;width:number;height:number}>)[caseKey];
+ const base=process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'';
+ if(art)return <div className="eventComicPlayer"><figure data-scene={Number(art.src.match(/scene-(\d+)/)?.[1])} className={'eventComic eventPanelIllustration cinematicRaster '+(compact?'isCompact':'')}><img src={base+art.src} srcSet={art.srcSet.split(', ').map(s=>base+s).join(', ')} data-case={caseKey} data-scene={Number(art.src.match(/scene-(\d+)/)?.[1])} sizes={compact?'(max-width:650px) 92vw, (max-width:1100px) 45vw, 360px':'(max-width:900px) 96vw, 1000px'} width={1920} height={1080} alt={scene?.alt||'Иллюстрация ситуации «'+title+'»'} loading={compact?'lazy':'eager'} decoding="async"/></figure>{!silent&&<ComicSoundButton/>}</div>;
  const frame=eventSceneFrame(caseKey);
  const sceneId=frame?('scene-'+String(frame.number).padStart(2,'0')):scene?.scene_id;
  if(sceneId&&/^scene-\d{2,4}$/.test(String(sceneId)))return <div className="eventComicPlayer">
