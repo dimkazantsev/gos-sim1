@@ -11,3 +11,9 @@ export function moneyMillions(value:number|null|undefined){
 export function metricQuantity(value:number,unit:string|null,key?:string){
  return quantity(value,key==='budget'&&unit==='млн'?'млн ₽':unit||'пунктов');
 }
+/** Legacy budget laboratories may state their own scale in the source note. */
+export function scenarioUnit(note:string|null|undefined){
+ const s=(note||'').toLowerCase();
+ return /трлн|триллион/.test(s)?'трлн ₽':/млрд|миллиард/.test(s)?'млрд ₽':/млн|миллион/.test(s)?'млн ₽':/тыс\.?|тысяч/.test(s)?'тыс. ₽':/рубл|₽/.test(s)?'₽':'млн ₽';
+}
+export function scenarioMoney(value:number|null|undefined,note?:string|null){return quantity(value,scenarioUnit(note));}

@@ -8,6 +8,7 @@ import type {Stage} from './types';
 import {formatDeadline} from './constants';
 import {STAGE_DETAILS} from './stageDetails';
 import {GAME_PHASES,STAGE_SYSTEM,gamePhaseForStage} from './stageSystem';
+import PartiesView from './PartiesView';
 import DeadlineControl from './DeadlineControl';
 import PresidentialElectionLab from './PresidentialElectionLab';
 import PresidentialSystemDecisionPanel from './PresidentialSystemDecisionPanel';
@@ -295,6 +296,8 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
      <fieldset className="labControls" disabled={readOnly}><legend className="srOnly">Рабочие действия этапа</legend>{readOnly&&<p className="readOnlyNote">Просмотр интерфейса участника. Рабочие действия доступны в его собственной сессии.</p>}
      <DeadlineControl g={g} stageNo={selected.stage_no}/>
      <StageArtifacts g={g} stage={selected} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>
+
+     {selected.stage_no===1&&<PartiesView g={g}/>}
 
      {(selected.stage_no===2||selected.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={selected.stage_no as 2|3} onOpenVotes={onOpenVotes}/>} 
 

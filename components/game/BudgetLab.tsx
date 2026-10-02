@@ -1,4 +1,5 @@
 'use client';
+import {scenarioUnit,scenarioMoney} from '@/lib/formatQuantity';
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -124,16 +125,16 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
   {(!selected||selected.status==='draft')&&<div className="budgetInputs">
    <label>Год<input type="number" value={year} onChange={e=>setYear(Number(e.target.value))}/></label>
    <label className="budgetTitle">Название сценария<input value={title} onChange={e=>setTitle(e.target.value)}/></label>
-   <label>ВВП<input type="number" value={gdp} onChange={e=>setGdp(e.target.value)}/></label>
-   <label>Цена нефти<input type="number" value={oil} onChange={e=>setOil(e.target.value)}/></label>
-   <label>Цена отсечения<input type="number" value={cutoff} onChange={e=>setCutoff(e.target.value)}/></label>
+   <label>ВВП, {scenarioUnit(source)}<input type="number" value={gdp} onChange={e=>setGdp(e.target.value)}/></label>
+   <label>Цена нефти, $/баррель<input type="number" value={oil} onChange={e=>setOil(e.target.value)}/></label>
+   <label>Цена отсечения, $/баррель<input type="number" value={cutoff} onChange={e=>setCutoff(e.target.value)}/></label>
    <label>Ключевая ставка, %<input type="number" value={rate} onChange={e=>setRate(e.target.value)}/></label>
    <label>Изменение курса, %<input type="number" value={fx} onChange={e=>setFx(e.target.value)}/></label>
-   <label>Валютные интервенции<input type="number" value={intervention} onChange={e=>setIntervention(e.target.value)}/></label>
-   <label>Доходы<input type="number" value={revenue} onChange={e=>setRevenue(e.target.value)}/></label>
-   <label>Расходы<input type="number" value={expenditure} onChange={e=>setExpenditure(e.target.value)}/></label>
-   <label>Долг на начало<input type="number" value={debt} onChange={e=>setDebt(e.target.value)}/></label>
-   <label>Иное финансирование<input type="number" value={financing} onChange={e=>setFinancing(e.target.value)}/></label>
+   <label>Валютные интервенции, {scenarioUnit(source)}<input type="number" value={intervention} onChange={e=>setIntervention(e.target.value)}/></label>
+   <label>Доходы, {scenarioUnit(source)}<input type="number" value={revenue} onChange={e=>setRevenue(e.target.value)}/></label>
+   <label>Расходы, {scenarioUnit(source)}<input type="number" value={expenditure} onChange={e=>setExpenditure(e.target.value)}/></label>
+   <label>Долг на начало, {scenarioUnit(source)}<input type="number" value={debt} onChange={e=>setDebt(e.target.value)}/></label>
+   <label>Иное финансирование, {scenarioUnit(source)}<input type="number" value={financing} onChange={e=>setFinancing(e.target.value)}/></label>
    <label>Лимит дефицита, % ВВП<input type="number" value={deficitLimit} onChange={e=>setDeficitLimit(e.target.value)}/></label>
    <label>Лимит долга, % ВВП<input type="number" value={debtLimit} onChange={e=>setDebtLimit(e.target.value)}/></label>
    <label className="budgetSource">Источник и допущения<textarea rows={3} value={source} onChange={e=>setSource(e.target.value)} placeholder="Дата данных, источник, единицы измерения, сценарные допущения. Не смешивайте реальные показатели и учебные числа без пометки."/></label>
@@ -141,18 +142,18 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
   </div>}
 
   <div className="budgetDashboard">
-   <article><small>ДОХОДЫ</small><strong>{n(revenue).toLocaleString('ru-RU')}</strong></article>
-   <article><small>РАСХОДЫ</small><strong>{n(expenditure).toLocaleString('ru-RU')}</strong></article>
-   <article className={previewBalance<0?'bad':'good'}><small>БАЛАНС</small><strong>{previewBalance.toLocaleString('ru-RU')}</strong><span>{previewBalance<0?'дефицит':'профицит / баланс'}</span></article>
+   <article><small>ДОХОДЫ</small><strong>{scenarioMoney(n(revenue),source)}</strong></article>
+   <article><small>РАСХОДЫ</small><strong>{scenarioMoney(n(expenditure),source)}</strong></article>
+   <article className={previewBalance<0?'bad':'good'}><small>БАЛАНС</small><strong>{scenarioMoney(previewBalance,source)}</strong><span>{previewBalance<0?'дефицит':'профицит / баланс'}</span></article>
    <article className={limitFlag(previewDeficit,deficitLimit)?'bad':''}><small>ДЕФИЦИТ / ВВП</small><strong>{previewDeficit==null?'—':previewDeficit.toFixed(2)+'%'}</strong>{deficitLimit&&<span>лимит {deficitLimit}%</span>}</article>
-   <article><small>ДОЛГ НА КОНЕЦ</small><strong>{previewDebt.toLocaleString('ru-RU')}</strong></article>
+   <article><small>ДОЛГ НА КОНЕЦ</small><strong>{scenarioMoney(previewDebt,source)}</strong></article>
    <article className={limitFlag(previewDebtPct,debtLimit)?'bad':''}><small>ДОЛГ / ВВП</small><strong>{previewDebtPct==null?'—':previewDebtPct.toFixed(2)+'%'}</strong>{debtLimit&&<span>лимит {debtLimit}%</span>}</article>
   </div>
 
   {selected&&<section className="budgetPrograms">
-   <div className="budgetProgramsHead"><div><small>ПРОГРАММНЫЕ РАСХОДЫ</small><h3>Принятые ГП → федеральный бюджет</h3><p>Здесь бюджетный сценарий получает содержательную структуру: принятые Правительством государственные программы превращаются в конкретные расходные обязательства.</p></div><div><strong>{allocatedTotal.toLocaleString('ru-RU')}</strong><span>{allocationCoverage.toFixed(1)}% расходов распределено по ГП</span></div></div>
-   <div className="budgetAllocationList">{myAllocations.length===0?<div className="emptyState">Принятые государственные программы пока не связаны с этим бюджетом.</div>:myAllocations.map(a=>{const p=adoptedPrograms.find(x=>x.id===a.program_id);return <article key={a.id}><div><b>{p?.title||'Государственная программа'}</b><small>{p?.responsible_ministry||'Ответственный исполнитель'}</small>{a.note&&<p>{a.note}</p>}</div><strong>{Number(a.amount).toLocaleString('ru-RU')}</strong>{selected.status==='draft'&&canFinalize&&<button onClick={()=>void deleteAllocation(a.id)}>×</button>}</article>})}</div>
-   {selected.status==='draft'&&canFinalize&&adoptedPrograms.length>0&&<div className="budgetAllocationForm"><select value={allocationProgram} onChange={e=>{setAllocationProgram(e.target.value);const p=adoptedPrograms.find(x=>x.id===e.target.value);if(p)setAllocationAmount(String(p.total_budget||0))}}><option value="">Выберите принятую ГП…</option>{adoptedPrograms.filter(p=>!myAllocations.some(a=>a.program_id===p.id)).map(p=><option key={p.id} value={p.id}>{p.title} · {p.responsible_ministry}</option>)}</select><input type="number" min="0" value={allocationAmount} onChange={e=>setAllocationAmount(e.target.value)} placeholder="Сумма финансирования"/><input value={allocationNote} onChange={e=>setAllocationNote(e.target.value)} placeholder="Комментарий / приоритет / корректировка"/><button disabled={busy||!allocationProgram} onClick={()=>void setAllocation()}>Добавить финансирование</button></div>}
+   <div className="budgetProgramsHead"><div><small>ПРОГРАММНЫЕ РАСХОДЫ</small><h3>Принятые ГП → федеральный бюджет</h3><p>Здесь бюджетный сценарий получает содержательную структуру: принятые Правительством государственные программы превращаются в конкретные расходные обязательства.</p></div><div><strong>{scenarioMoney(allocatedTotal,source)}</strong><span>{allocationCoverage.toFixed(1)}% расходов распределено по ГП</span></div></div>
+   <div className="budgetAllocationList">{myAllocations.length===0?<div className="emptyState">Принятые государственные программы пока не связаны с этим бюджетом.</div>:myAllocations.map(a=>{const p=adoptedPrograms.find(x=>x.id===a.program_id);return <article key={a.id}><div><b>{p?.title||'Государственная программа'}</b><small>{p?.responsible_ministry||'Ответственный исполнитель'}</small>{a.note&&<p>{a.note}</p>}</div><strong>{scenarioMoney(Number(a.amount),source)}</strong>{selected.status==='draft'&&canFinalize&&<button onClick={()=>void deleteAllocation(a.id)}>×</button>}</article>})}</div>
+   {selected.status==='draft'&&canFinalize&&adoptedPrograms.length>0&&<div className="budgetAllocationForm"><select value={allocationProgram} onChange={e=>{setAllocationProgram(e.target.value);const p=adoptedPrograms.find(x=>x.id===e.target.value);if(p)setAllocationAmount(String(p.total_budget||0))}}><option value="">Выберите принятую ГП…</option>{adoptedPrograms.filter(p=>!myAllocations.some(a=>a.program_id===p.id)).map(p=><option key={p.id} value={p.id}>{p.title} · {p.responsible_ministry}</option>)}</select><input type="number" min="0" value={allocationAmount} onChange={e=>setAllocationAmount(e.target.value)} aria-label={"Сумма финансирования, "+scenarioUnit(source)} placeholder={"Сумма, "+scenarioUnit(source)}/><input value={allocationNote} onChange={e=>setAllocationNote(e.target.value)} placeholder="Комментарий / приоритет / корректировка"/><button disabled={busy||!allocationProgram} onClick={()=>void setAllocation()}>Добавить финансирование</button></div>}
   </section>}
 
   {selected&&<div className="budgetStreams">{streams.map(([key,label,hint])=>{

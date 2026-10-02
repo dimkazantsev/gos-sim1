@@ -1,4 +1,6 @@
 'use client';
+import {useState} from 'react';
+import StageDocumentForm from './StageDocumentForm';
 import {ArrowUpRight,CheckCircle2,FilePlus2,FileText,Vote} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage,View} from './types';
@@ -23,11 +25,14 @@ export const STAGE_FORMS:Record<number,Task>={
  16:{title:'Итоговый разбор',help:'Заполните аналитический разбор в форме этапа ниже. Сопоставьте документы, голоса, бюджет и последствия; отделите свои предположения от подтверждённых результатов.',templates:[],target:'grades'}
 };
 export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreateDocument,onNavigate,onOpenVotes}:{g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:View)=>void;onOpenVotes:()=>void}){
+ const [form,setForm]=useState(''),[saved,setSaved]=useState('');
  const task=STAGE_FORMS[stage.stage_no];if(!task)return null;
  const docs=g.formalDocuments.filter(d=>d.stage_no===stage.stage_no),votes=g.votes.filter(v=>v.stage_no===stage.stage_no);
  const completed=stage.status==='completed';
  return <section className="stageArtifacts surface"><header><div><small>ФОРМЫ И РЕЗУЛЬТАТЫ · ЭТАП {stage.stage_no}</small><h3>{task.title}</h3></div>{completed&&<span><CheckCircle2 size={18}/> Завершён</span>}</header><p>{task.help}</p>
- <div className="stageArtifactActions">{task.templates.map(key=>{const t=DOCUMENT_TEMPLATES.find(x=>x.key===key);return t&&<button type="button" key={key} disabled={readOnly||!onCreateDocument} onClick={()=>onCreateDocument?.(key,stage.stage_no)}><FilePlus2 size={18}/><span>{t.title}</span></button>})}{task.target&&onNavigate&&<button type="button" onClick={()=>onNavigate(task.target!)}><ArrowUpRight size={18}/><span>Открыть {({parties:'партии',votes:'голосования',budget:'бюджет',events:'события',grades:'журнал оценок'} as Partial<Record<View,string>>)[task.target]||'раздел'}</span></button>}</div>
+ <div className="stageArtifactActions">{task.templates.map(key=>{const t=DOCUMENT_TEMPLATES.find(x=>x.key===key);return t&&<button type="button" key={key} disabled={readOnly} aria-expanded={form===key} onClick={()=>{setForm(form===key?'':key);setSaved('')}}><FilePlus2 size={18}/><span>{t.title}</span></button>})}{task.target&&onNavigate&&<button type="button" onClick={()=>onNavigate(task.target!)}><ArrowUpRight size={18}/><span>Открыть {({parties:'партии',votes:'голосования',budget:'бюджет',events:'события',grades:'журнал оценок'} as Partial<Record<View,string>>)[task.target]||'раздел'}</span></button>}</div>
+ {form&&!readOnly&&<StageDocumentForm key={form} g={g} templateKey={form} stageNo={stage.stage_no} onCancel={()=>setForm('')} onSaved={()=>{setSaved('Черновик сохранён в реестре НПА и связан с этапом.');setForm('')}}/>}
+ {saved&&<p className="stageDocumentSaved" role="status">{saved}</p>}
  <div className="stageArtifactResults"><div><b>Документы этапа · {docs.length}</b>{docs.length?docs.map(d=><button key={d.id} type="button" disabled={!onOpenDocument} onClick={()=>onOpenDocument?.(d.id)}><FileText size={18}/><span><strong>{d.title}</strong><small>{d.registry_no} · {d.status_label}</small></span><ArrowUpRight size={16}/></button>):<p>Документов пока нет. После создания в правовом портале они появятся здесь.</p>}</div><div><b>Голосования этапа · {votes.length}</b>{votes.length?votes.map(v=><button type="button" key={v.id} onClick={onOpenVotes}><Vote size={18}/><span><strong>{v.title}</strong><small>{v.status==='open'?'Идёт голосование':(v.result_label||'Завершено')} · За: {v.result_yes??0} · Против: {v.result_no??0} · Воздержались: {v.result_abstain??0}</small></span></button>):<p>Процедурные голосования отображаются после открытия заседания.</p>}</div></div>
  {completed&&<p className="stageArtifactCompletion">Этап завершён {stage.completed_at?new Date(stage.completed_at).toLocaleString('ru-RU'):''}. Результат каждого документа и голосования отражён выше; оценки доступны в журнале.</p>}
  </section>;
