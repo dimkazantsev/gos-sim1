@@ -102,9 +102,9 @@ export function metricDomain(metric:Metric,points:MetricPoint[],comparing:boolea
 export function drawMetricChart(
  series:MetricSeries[],
  comparing=series.length>1,
- width=700,height=230
+ width=700,height=230,leftInset=52
 ):MetricChartGeometry{
- const left=52,right=18,top=18,bottom=40;
+ const left=leftInset,right=18,top=18,bottom=40;
  const dates=series.flatMap(s=>s.points.map(p=>p.at));
  const minTime=dates.length?Math.min(...dates):0;
  const maxTime=dates.length?Math.max(...dates):0;

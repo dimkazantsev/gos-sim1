@@ -81,7 +81,11 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
   color:metric.id===chosen?.id?METRIC_COLORS[0]:METRIC_COLORS[(1+comparisonOptions.findIndex(option=>option.id===metric.id))%METRIC_COLORS.length],
   points:pointsForMetric(metric,metricHistory,bucket,game?.created_at,snapshotAt)
  }));
- const geometry=drawMetricChart(series,series.length>1,Math.max(240,plotWidth),plotWidth<460?222:250);
+ const moneyChart=series.length===1&&chosen?.metric_key==='budget';
+ const geometry=drawMetricChart(series,series.length>1,Math.max(240,plotWidth),plotWidth<460?222:250,moneyChart?72:52);
+ const axisMagnitude=Math.max(...geometry.yTicks.map(t=>Math.abs(t.value)),0);
+ const axisScale=moneyChart?(axisMagnitude>=1e6?1e6:axisMagnitude>=1000?1000:1):1;
+ const axisUnit=moneyChart?(axisScale===1e6?'трлн ₽':axisScale===1000?'млрд ₽':'млн ₽'):'';
  const chosenPoints=series[0]?.points||[];
  const singlePoint=geometry.lines.length===1&&chosenPoints.length===1;
  const activePoint=series.flatMap(s=>s.points.map(point=>({...point,metric:s.metric,color:s.color}))).find(p=>focusedPoint?.id===p.metric.id&&focusedPoint.at===p.at)
@@ -125,12 +129,12 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
     {hist.at(-1)&&<div className="metricLastCause"><small>ПОСЛЕДНЯЯ ПРИЧИНА</small><b>{hist.at(-1)?.note||hist.at(-1)?.source_type}</b><span>{new Date(hist.at(-1)!.recorded_at).toLocaleString('ru-RU')}</span></div>}
     <div className="metricBucketTabs"><button className={bucket==='changes'?'active':''} aria-pressed={bucket==='changes'} onClick={()=>{setFocusedPoint(null);setBucket('changes')}}>Все изменения</button><button className={bucket==='day'?'active':''} aria-pressed={bucket==='day'} onClick={()=>{setFocusedPoint(null);setBucket('day')}}>По дням</button><button className={bucket==='week'?'active':''} aria-pressed={bucket==='week'} onClick={()=>{setFocusedPoint(null);setBucket('week')}}>По неделям</button></div>
     <section className="metricChart redesignedChart" aria-label="График динамики показателей">
-     <div className="metricChartCaption"><b>{geometry.comparing?'Динамика показателей':'История показателя'}</b><span>{bucket==='changes'?'По игровым событиям':bucket==='day'?'По дням':'По неделям'} · {activeMetrics.length} из {MAX_CHART_SERIES} линий</span></div>
+     <div className="metricChartCaption"><b>{geometry.comparing?'Динамика показателей':'История показателя'}{axisUnit&&<small data-budget-chart-unit> · {axisUnit}</small>}</b><span>{bucket==='changes'?'По игровым событиям':bucket==='day'?'По дням':'По неделям'} · {activeMetrics.length} из {MAX_CHART_SERIES} линий</span></div>
      <div className="metricPlotViewport" ref={plotRef}>
      <svg viewBox={`0 0 ${geometry.width} ${geometry.height}`} role="group" aria-label={'Временной график: '+activeMetrics.map(m=>m.label).join(', ')} preserveAspectRatio="xMidYMid meet">
       {geometry.yTicks.map((tick,i)=><g key={i}>
        <line className="metricGridLine" x1={geometry.left} x2={geometry.width-geometry.right} y1={tick.y} y2={tick.y}/>
-       <text className="metricAxisText" x={geometry.left-8} y={tick.y+4} textAnchor="end">{geometry.comparing?tick.value+'%':tick.value.toLocaleString('ru-RU',{maximumFractionDigits:1})}</text>
+       <text className="metricAxisText" x={geometry.left-8} y={tick.y+4} textAnchor="end">{geometry.comparing?tick.value+'%':(tick.value/axisScale).toLocaleString('ru-RU',{maximumFractionDigits:moneyChart?4:1})}</text>
       </g>)}
       {visibleTicks.map((tick,i)=><g key={i}>
        <line className="metricDateLine" x1={tick.x} x2={tick.x} y1={geometry.top} y2={geometry.height-geometry.bottom}/>
