@@ -1,0 +1,134 @@
+/* GOS//SIMS achievement collection — Steam-inspired, unique per badge. */
+.steamAwards,.steamTeacherAwards{
+ --steam-ink:#07111d;--steam-panel:#0d1a2a;--steam-panel-2:#12243a;--steam-line:#28415b;--steam-muted:#91a8bd;
+ position:relative;isolation:isolate;color:#eaf6ff;
+ background:
+  radial-gradient(circle at 12% -20%,#1f79b955 0 24%,transparent 48%),
+  radial-gradient(circle at 88% 0%,#7653e93b 0 20%,transparent 46%),
+  linear-gradient(145deg,#07111d 0%,#0b1726 48%,#0c1c2f 100%)!important;
+ border:1px solid #28415b!important;box-shadow:0 24px 70px #06101b2b,inset 0 1px 0 #ffffff10;
+ overflow:hidden;
+}
+.steamAwards:before,.steamTeacherAwards:before{
+ content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;opacity:.23;
+ background-image:linear-gradient(#8fd7ff0b 1px,transparent 1px),linear-gradient(90deg,#8fd7ff0b 1px,transparent 1px);
+ background-size:32px 32px;mask-image:linear-gradient(180deg,#000,transparent 68%);
+}
+.awardShelfHeader{display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:20px!important;align-items:end!important;padding-bottom:20px!important;border-bottom:1px solid #29425a!important}
+.awardShelfIntro small,.steamTeacherAwards>header small{color:#66c0f4!important;font-weight:850!important;letter-spacing:.12em!important}
+.awardShelfIntro h2,.steamTeacherAwards h2{color:#f4fbff!important;font-size:clamp(22px,2.2vw,30px)!important;margin:7px 0 8px!important}
+.awardShelfIntro p,.steamTeacherAwards header p{max-width:720px!important;color:#a7bbce!important;font-size:13px!important;line-height:1.62!important}
+.awardCollectionSummary{
+ min-width:210px;padding:14px 15px;border:1px solid #34516c;border-radius:16px;
+ background:linear-gradient(145deg,#10243aee,#0b1828ee);box-shadow:inset 0 1px 0 #ffffff0e;
+}
+.awardCollectionNumbers{display:flex;align-items:baseline;gap:5px}.awardCollectionNumbers strong{font-size:28px;line-height:1;color:#fff}.awardCollectionNumbers span{color:#91a8bd}.awardCollectionNumbers em{margin-left:auto;font-size:12px;font-style:normal;font-weight:850;color:#66c0f4}
+.awardCollectionTrack{height:7px;margin:10px 0 8px;border-radius:999px;overflow:hidden;background:#07111d;box-shadow:inset 0 1px 3px #0008}
+.awardCollectionTrack i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#4aa9e9,#66c0f4,#8f7cff);box-shadow:0 0 14px #66c0f4aa}
+.awardCollectionSummary>span{font-size:11px;color:#91a8bd}
+.awardShelfTabs{grid-column:1/-1;display:flex!important;gap:8px!important;flex-wrap:wrap!important}
+.awardShelfTabs button{
+ min-height:42px!important;display:inline-flex!important;align-items:center!important;gap:7px!important;padding:9px 13px!important;
+ border:1px solid #2b465f!important;border-radius:10px!important;background:#0b1726!important;color:#a9bfd1!important;box-shadow:none!important
+}
+.awardShelfTabs button b{display:grid;place-items:center;min-width:24px;height:22px;padding:0 6px;border-radius:999px;background:#ffffff0b;color:#dceeff;font-size:11px}
+.awardShelfTabs button[aria-pressed=true]{border-color:#66c0f488!important;background:linear-gradient(135deg,#173b59,#1d4f73)!important;color:#fff!important;box-shadow:0 0 0 1px #66c0f41f inset,0 8px 24px #04101d50!important}
+.awardEarnedCount{border-color:#34516c!important;background:#10243a!important;color:#d8efff!important}
+.awardError{margin:16px 0 0;padding:12px 14px;border:1px solid #bd5e6f66;border-radius:12px;background:#6f263744;color:#ffd8df}
+.awardGrid{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:16px!important;margin-top:20px!important;align-items:stretch!important
+}
+.awardCard{
+ position:relative;display:flex!important;flex-direction:column!important;min-width:0!important;min-height:340px!important;padding:0!important;gap:0!important;
+ border:1px solid #28415b!important;border-radius:18px!important;overflow:hidden!important;
+ background:linear-gradient(180deg,#102238 0%,#0b1726 100%)!important;box-shadow:0 14px 28px #00000026!important;
+ transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease!important;content-visibility:auto;contain-intrinsic-size:340px
+}
+.awardCard:after{content:"";position:absolute;inset:auto 0 0;height:2px;background:linear-gradient(90deg,transparent,var(--award-accent,#66c0f4),transparent);opacity:0;transition:opacity .2s ease}
+.awardCard.earned:hover{transform:translateY(-5px)!important;border-color:color-mix(in srgb,var(--award-accent,#66c0f4) 58%,#28415b)!important;box-shadow:0 22px 45px #0000003d,0 0 32px color-mix(in srgb,var(--award-accent,#66c0f4) 12%,transparent)!important}
+.awardCard.earned:hover:after{opacity:1}.awardCard.unearned{background:linear-gradient(180deg,#0e1927,#09131f)!important}.awardCard.unearned .achievementArtwork{filter:saturate(.5) brightness(.78)}.awardCard.unearned .achievementMedal{filter:grayscale(.38)}
+.achievementArtwork{
+ --award-accent:#66c0f4;--award-accent-2:#8f7cff;--award-accent-3:#ff73b5;--award-deep:#0c1c2c;
+ position:relative;display:grid;place-items:center;isolation:isolate;overflow:hidden;aspect-ratio:16/9;min-height:138px;
+ background:
+  radial-gradient(circle at var(--award-shift,70%) 22%,color-mix(in srgb,var(--award-accent-2) 65%,transparent),transparent 32%),
+  radial-gradient(circle at 14% 78%,color-mix(in srgb,var(--award-accent-3) 36%,transparent),transparent 37%),
+  linear-gradient(128deg,var(--award-deep),#102a44 52%,#08131f 100%);
+ border-bottom:1px solid #ffffff12;
+}
+.achievementArtwork:before,.achievementArtwork:after{content:"";position:absolute;pointer-events:none}
+.achievementArtwork:before{width:58%;height:150%;right:-13%;top:-28%;border:1px solid color-mix(in srgb,var(--award-accent) 34%,transparent);border-radius:46%;transform:rotate(24deg);box-shadow:0 0 0 24px #ffffff05,0 0 0 48px #ffffff03}
+.achievementArtwork:after{inset:0;background:linear-gradient(112deg,transparent 0 36%,#ffffff12 48%,transparent 59%);transform:translateX(-120%);transition:transform .75s ease}
+.awardCard.earned:hover .achievementArtwork:after,.teacherAwardGrid article:hover .achievementArtwork:after{transform:translateX(120%)}
+.achievementArtwork[data-pattern="1"]:before{border-radius:18%;transform:rotate(45deg)}
+.achievementArtwork[data-pattern="2"]:before{width:72%;height:72%;top:-18%;right:-18%;border-radius:50%;box-shadow:0 0 0 16px #ffffff05,0 0 0 42px #ffffff03}
+.achievementArtwork[data-pattern="3"]:before{width:82%;height:30%;top:26%;right:-24%;border-radius:999px;transform:rotate(-24deg);box-shadow:0 22px 0 #ffffff04,0 -22px 0 #ffffff04}
+.achievementArtwork[data-pattern="4"]:before{width:48%;height:122%;top:-15%;right:6%;border-radius:0;transform:skewX(-19deg);box-shadow:34px 0 0 #ffffff04,-34px 0 0 #ffffff03}
+.achievementArtwork[data-pattern="5"]:before{width:110px;height:110px;top:16px;right:20px;border-radius:22px;transform:rotate(18deg);box-shadow:0 0 0 18px #ffffff04,0 0 0 38px #ffffff02}
+.achievementArtworkMesh{position:absolute;inset:0;z-index:-1;opacity:.38;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:20px 20px;mask-image:radial-gradient(circle at 50% 50%,#000,transparent 82%)}
+.achievementArtworkFlare{position:absolute;width:46%;height:46%;left:27%;top:27%;border-radius:50%;background:var(--award-accent);filter:blur(42px);opacity:.19}
+.achievementArtworkBrand,.achievementArtworkSerial{position:absolute;z-index:3;top:12px;font-size:9px;font-weight:900;letter-spacing:.15em;color:#e9f7ffcc;text-shadow:0 1px 5px #000}
+.achievementArtworkBrand{left:13px;display:flex;align-items:center;gap:5px}.achievementArtworkSerial{right:13px;color:#ffffff8a}
+.achievementArtwork .achievementMedal{z-index:2;width:104px;height:112px;border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
+.achievementArtwork .achievementMedal:before,.achievementArtwork .achievementMedal:after{display:none!important}
+.achievementArtwork .achievementMedalGlow{inset:14%;opacity:.38;filter:blur(32px)}
+.achievementArtwork .achievementMedal img{width:98px!important;height:108px!important;filter:drop-shadow(0 12px 13px #0009) saturate(1.22) contrast(1.03)!important}
+.achievementArtwork.is-locked .achievementMedal img{filter:grayscale(.52) saturate(.62) brightness(.86) drop-shadow(0 10px 12px #0008)!important}
+.achievementArtwork.is-compact{aspect-ratio:16/8.4;min-height:118px}.achievementArtwork.is-compact .achievementMedal{width:88px;height:96px}.achievementArtwork.is-compact .achievementMedal img{width:84px!important;height:92px!important}
+.achievementMedal{position:relative;display:grid;place-items:center;isolation:isolate;flex:none}
+.achievementMedalGlow{position:absolute;inset:16%;z-index:-1;border-radius:50%;background:var(--award-accent,#66c0f4);filter:blur(25px);opacity:.28}
+.achievementMedalFallback{width:50px;height:50px;color:var(--award-accent,#66c0f4);filter:drop-shadow(0 0 15px currentColor)}
+.awardCardBody{display:flex;flex:1;flex-direction:column;min-width:0;padding:15px 16px 16px}
+.awardCardMeta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.awardStateBadge,.awardSecretBadge{display:inline-flex;align-items:center;gap:5px;min-height:24px;padding:4px 7px;border-radius:7px;font-size:10px;font-weight:850;letter-spacing:.04em}
+.awardStateBadge.is-earned{background:#4ec9a31c;border:1px solid #54deb34c;color:#76e6c2}.awardStateBadge.is-progress{background:#66c0f414;border:1px solid #66c0f438;color:#8cd7ff}.awardSecretBadge{background:#9b7cff16;border:1px solid #9b7cff3d;color:#c3afff}
+.awardCard h3{margin:0 0 8px!important;color:#f4fbff!important;font-size:16px!important;line-height:1.34!important;letter-spacing:-.01em}
+.awardCard p{margin:0 0 14px!important;color:#9fb4c8!important;font-size:12px!important;line-height:1.55!important}
+.awardCardFooter,.awardProgressBlock{margin-top:auto;padding-top:12px;border-top:1px solid #ffffff0d}
+.awardCardFooter{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:10px;color:#728da5}.awardCardFooter b{color:#d7eafa;font-size:11px;font-weight:750}
+.awardProgressLine{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;font-size:10px;color:#7f98af}.awardProgressLine b{color:#c9e9fb}
+.awardProgress{height:7px;border-radius:999px;background:#050c14;overflow:hidden;box-shadow:inset 0 1px 3px #0009}.awardProgress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--award-accent,#4aa9e9),var(--award-accent-2,#8f7cff));box-shadow:0 0 12px color-mix(in srgb,var(--award-accent,#66c0f4) 72%,transparent)}
+.awardSecrets{display:flex!important;gap:13px!important;align-items:center!important;margin-top:18px!important;padding:14px 15px!important;border:1px solid #314a63!important;border-radius:14px!important;background:#0b1828!important;color:#9eb4c7!important}.awardSecrets svg{color:#9b86ff!important;flex:none}.awardSecrets div{display:grid;gap:3px}.awardSecrets b{color:#e7f3fb;font-size:12px}.awardSecrets span{font-size:11px;line-height:1.5}
+.awardEmpty{display:flex;align-items:center;gap:14px;margin-top:18px;padding:20px!important;border:1px dashed #35506a!important;border-radius:15px!important;background:#0b1827!important;color:#96aec2!important}.awardEmpty svg{color:#66c0f4;flex:none}.awardEmpty div{display:grid;gap:4px}.awardEmpty b{color:#eef9ff}.awardEmpty span{font-size:12px}
+
+/* Teacher achievement control deck. */
+.steamTeacherAwards{padding:22px!important}
+.steamTeacherAwards>header{display:flex!important;justify-content:space-between!important;align-items:flex-start!important;gap:18px!important;flex-wrap:wrap!important;padding-bottom:18px;border-bottom:1px solid #29425a}
+.teacherAwardSummary{display:grid;grid-template-columns:auto auto;align-items:baseline;gap:2px 7px;min-width:170px;padding:13px 14px;border:1px solid #34516c;border-radius:14px;background:#102238}.teacherAwardSummary strong{font-size:26px;color:#fff}.teacherAwardSummary span{font-size:11px;color:#91a8bd}.teacherAwardSummary em{grid-column:1/-1;font-size:10px;font-style:normal;color:#66c0f4}
+.steamTeacherAwards .teacherAwardFilters{margin:16px 0!important}.steamTeacherAwards .teacherAwardFilters>label{min-height:44px;padding:0 12px;border:1px solid #31506a;border-radius:10px;background:#091522;color:#7fa4c2}.steamTeacherAwards .teacherAwardFilters input{border:0!important;background:transparent!important;color:#eaf6ff!important;box-shadow:none!important}.steamTeacherAwards .teacherAwardFilters input::placeholder{color:#708ba1}
+.steamTeacherAwards .teacherAwardFilters nav button{border:1px solid #31506a!important;background:#0b1828!important;color:#9fb7ca!important}.steamTeacherAwards .teacherAwardFilters nav button[aria-pressed=true]{background:linear-gradient(135deg,#1d5379,#286e98)!important;border-color:#66c0f466!important;color:white!important}
+.steamTeacherAwards .awardVisibilityNotice{background:#14382f!important;border:1px solid #4ec9a34a!important;color:#8ce9c9!important}
+.teacherAwardGrid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:15px!important}
+.teacherAwardGrid article{display:flex!important;flex-direction:column!important;min-width:0!important;padding:0!important;gap:0!important;overflow:hidden!important;border:1px solid #29435b!important;border-radius:17px!important;background:linear-gradient(180deg,#102238,#0b1726)!important;box-shadow:0 12px 28px #0002!important;content-visibility:auto;contain-intrinsic-size:360px;transition:transform .18s ease,border-color .18s ease!important}
+.teacherAwardGrid article:hover{transform:translateY(-3px);border-color:#4b7193!important}.teacherAwardGrid article.is-hidden{background:linear-gradient(180deg,#111a2d,#0b1422)!important}.teacherAwardGrid article.is-hidden .achievementArtwork{filter:saturate(.68) brightness(.88)}
+.teacherAwardBody{display:flex;flex:1;flex-direction:column;padding:14px 15px 10px}.teacherAwardMeta{display:flex;justify-content:space-between;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px}.teacherAwardMeta>span{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#8fa9bf}.teacherAwardState{padding:4px 7px;border:1px solid #35516a;border-radius:7px;background:#0a1624;color:#bed5e7!important}
+.teacherAwardGrid h3{margin:0 0 8px!important;color:#f4fbff!important;font-size:15px!important;line-height:1.38!important}.teacherAwardGrid p{margin:0!important;color:#99b0c3!important;font-size:11px!important;line-height:1.55!important}
+.teacherAwardGrid article>button{display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;width:auto!important;min-height:42px!important;margin:0 14px 14px!important;padding:8px 10px!important;border:1px solid #31516b!important;border-radius:10px!important;background:#0c1b2c!important;color:#c9deed!important;font-size:11px!important}.teacherAwardGrid article>button:hover:not(:disabled){border-color:#66c0f47a!important;background:#13324b!important;color:#fff!important}.teacherAwardGrid article>button:disabled{opacity:.55}
+
+/* Unlock toast. */
+.steamAchievementBurst{
+ width:min(680px,calc(100vw - 28px))!important;display:grid!important;grid-template-columns:218px minmax(0,1fr)!important;gap:0!important;padding:0!important;
+ overflow:hidden!important;border:1px solid #4b7595!important;border-radius:20px!important;background:linear-gradient(135deg,#07121f,#0c1d30 60%,#102741)!important;
+ box-shadow:0 28px 100px #020913bb,0 0 0 1px #66c0f41a inset!important
+}
+.steamAchievementBurst .achievementArtwork{height:100%;min-height:172px;aspect-ratio:auto;border:0;border-right:1px solid #ffffff14}.steamAchievementBurst .achievementArtworkBrand{top:14px}.steamAchievementBurst .achievementArtwork .achievementMedal{width:118px;height:128px}.steamAchievementBurst .achievementArtwork .achievementMedal img{width:112px!important;height:122px!important}
+.steamAchievementBurst>button{top:9px!important;right:9px!important;z-index:8;width:36px!important;height:36px!important;min-height:36px!important;background:#07111dbd!important;color:#dceeff!important;border:1px solid #ffffff1b!important;backdrop-filter:blur(10px)}
+.achievementBurstCopy{display:flex;flex-direction:column;justify-content:center;min-width:0;padding:24px 52px 24px 22px}.achievementBurstCopy small{color:#66c0f4!important;font-size:10px!important;font-weight:900!important;letter-spacing:.13em}.achievementBurstCopy h2{margin:7px 0 6px!important;color:#fff!important;font-size:22px!important;line-height:1.2}.achievementBurstCopy p{margin:0!important;color:#a8bfd1!important;font-size:12px!important;line-height:1.55!important}.achievementBurstCopy>span{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin-top:12px;padding:6px 8px;border-radius:8px;background:#66c0f413;color:#9bdaff;font-size:10px;font-weight:800}
+.steamAchievementBurst .awardConfetti{z-index:9}
+
+/* Existing celebration animation tuned to the darker collection. */
+@keyframes awardSteamPulse{50%{transform:translateY(-2px) scale(1.025);filter:drop-shadow(0 0 24px var(--award-accent,#66c0f4))}}
+.steamAchievementBurst .achievementMedal{animation:awardSteamPulse 1.35s ease-in-out 3}
+
+@media(max-width:1180px){.awardGrid,.teacherAwardGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:760px){
+ .steamAwards,.steamTeacherAwards{padding:15px!important;border-radius:16px!important}
+ .awardShelfHeader{grid-template-columns:minmax(0,1fr)!important;align-items:stretch!important;gap:14px!important}.awardCollectionSummary{min-width:0}.awardShelfTabs{grid-column:1!important;display:grid!important;grid-template-columns:1fr 1fr!important}.awardShelfTabs button{justify-content:center!important}
+ .awardGrid,.teacherAwardGrid{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}.awardCard{min-height:0!important}.achievementArtwork{min-height:150px}.awardCardBody{padding:14px}
+ .steamTeacherAwards>header{display:grid!important}.teacherAwardSummary{min-width:0;width:100%;box-sizing:border-box}.teacherAwardFilters{display:grid!important}.teacherAwardFilters nav{display:grid!important;grid-template-columns:repeat(3,1fr)!important;width:100%}.teacherAwardFilters nav button{min-width:0!important;padding:8px!important}
+ .steamAchievementBurst{grid-template-columns:132px minmax(0,1fr)!important;bottom:78px!important}.steamAchievementBurst .achievementArtwork{min-height:142px}.steamAchievementBurst .achievementArtworkBrand,.steamAchievementBurst .achievementArtworkSerial{font-size:7px}.steamAchievementBurst .achievementArtwork .achievementMedal{width:88px;height:96px}.steamAchievementBurst .achievementArtwork .achievementMedal img{width:84px!important;height:92px!important}.achievementBurstCopy{padding:18px 42px 18px 14px}.achievementBurstCopy h2{font-size:17px!important}.achievementBurstCopy p{font-size:11px!important}.achievementBurstCopy>span{margin-top:8px}
+}
+@media(max-width:420px){
+ .awardShelfTabs{grid-template-columns:1fr!important}.awardCardFooter{align-items:flex-start;flex-direction:column;gap:3px}.steamAchievementBurst{grid-template-columns:104px minmax(0,1fr)!important}.steamAchievementBurst .achievementArtwork .achievementMedal{width:72px;height:82px}.steamAchievementBurst .achievementArtwork .achievementMedal img{width:68px!important;height:76px!important}.achievementBurstCopy{padding-left:11px}.achievementBurstCopy p{display:none}
+}
+@media(prefers-reduced-motion:reduce){.awardCard,.teacherAwardGrid article,.achievementArtwork:after,.steamAchievementBurst .achievementMedal{transition:none!important;animation:none!important}.awardCard.earned:hover,.teacherAwardGrid article:hover{transform:none!important}}
