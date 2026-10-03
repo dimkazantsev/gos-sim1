@@ -1,16 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
 <title>Считаю, значит спорю</title>
 <defs>
- <linearGradient id="bg97" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b87151"/><stop offset=".46" stop-color="#1b5b7f"/><stop offset="1" stop-color="#08141e"/></linearGradient>
- <radialGradient id="glow97"><stop stop-color="#66c0f4" stop-opacity=".55"/><stop offset="1" stop-color="#66c0f4" stop-opacity="0"/></radialGradient>
+ <filter id="gold97" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 .77  0 1 0 0 .48  0 0 1 0 .10  0 0 0 .65 0"/></filter>
+ <linearGradient id="steel97" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aeb4b8"/><stop offset=".18" stop-color="#343b40"/><stop offset=".56" stop-color="#777f84"/><stop offset="1" stop-color="#20262a"/></linearGradient>
+ <radialGradient id="v97"><stop stop-color="#171b1e"/><stop offset=".68" stop-color="#090b0d"/><stop offset="1" stop-color="#040506"/></radialGradient>
 </defs>
-<rect width="256" height="256" rx="12" fill="#0c1116"/>
-<rect x="5" y="5" width="246" height="246" rx="9" fill="url(#bg97)" stroke="#1b5b7f" stroke-width="3"/>
-<path d="M8 95 112 8h67L8 130Z" fill="#ffffff" opacity=".07"/>
-<circle cx="128" cy="128" r="92" fill="url(#glow97)" opacity=".48"/>
-<path d="M-10 210 210-10M20 250 250 20" stroke="#1b5b7f" stroke-width="18" opacity=".13"/>
-<g fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".96"><path d="M68 122h120v71H68Z"/><path d="M82 139h92M99 64h58v63H99Z"/><path d="m111 96 11 11 26-29"/></g>
-<path d="M18 224h92" stroke="#66c0f4" stroke-width="5" opacity=".76"/>
-<path d="M18 235h59" stroke="#ffffff" stroke-width="2" opacity=".34"/>
-<path d="M221 19h16v16" fill="none" stroke="#66c0f4" stroke-width="3" opacity=".7"/>
+<rect x="8" y="8" width="240" height="240" rx="5" fill="none" stroke="#d0a64f" stroke-width="6" filter="url(#gold97)" opacity=".88"/>
+<rect x="7" y="7" width="242" height="242" rx="5" fill="#07090a" stroke="#d0a64f" stroke-width="5"/>
+<rect x="13" y="13" width="230" height="230" rx="3" fill="url(#v97)" stroke="url(#steel97)" stroke-width="4"/>
+<rect x="18" y="18" width="220" height="220" rx="2" fill="none" stroke="#727a80" stroke-width="2" opacity=".75"/>
+<path d="M19 19h70L19 89Z" fill="#ffffff" opacity=".06"/>
+<path d="M128 20 239 128 128 236 17 128Z" fill="#7e1b22" opacity=".68"/><path d="M128 62 195 128 128 194 61 128Z" fill="#080a0c"/>
+<circle cx="184" cy="157" r="2" fill="#d8dde0" opacity=".24"/><circle cx="41" cy="188" r="3" fill="#d8dde0" opacity=".24"/><circle cx="88" cy="35" r="1" fill="#d8dde0" opacity=".24"/><circle cx="135" cy="66" r="2" fill="#d8dde0" opacity=".24"/><circle cx="182" cy="97" r="3" fill="#d8dde0" opacity=".24"/>
+<g transform="translate(12.16 12.16) scale(0.905) rotate(0 128 128)" fill="none" stroke="#e7e8e8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".98"><path d="M67 123h122v70H67Z"/><path d="M82 141h92M98 64h60v64H98Z"/><path d="m110 97 12 12 27-31"/></g>
+<path d="M26 219h162" stroke="#a4252f" stroke-width="5" opacity=".8"/>
+<path d="M26 229h132" stroke="#e7e8e8" stroke-width="2" opacity=".28"/>
 </svg>

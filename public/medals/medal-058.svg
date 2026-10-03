@@ -1,16 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
 <title>Два кресла, одна голова</title>
 <defs>
- <linearGradient id="bg58" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b8b051"/><stop offset=".46" stop-color="#52720a"/><stop offset="1" stop-color="#121908"/></linearGradient>
- <radialGradient id="glow58"><stop stop-color="#a4d007" stop-opacity=".55"/><stop offset="1" stop-color="#a4d007" stop-opacity="0"/></radialGradient>
+ <filter id="gold58" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 .77  0 1 0 0 .48  0 0 1 0 .10  0 0 0 .65 0"/></filter>
+ <linearGradient id="steel58" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aeb4b8"/><stop offset=".18" stop-color="#343b40"/><stop offset=".56" stop-color="#777f84"/><stop offset="1" stop-color="#20262a"/></linearGradient>
+ <radialGradient id="v58"><stop stop-color="#171b1e"/><stop offset=".68" stop-color="#090b0d"/><stop offset="1" stop-color="#040506"/></radialGradient>
 </defs>
-<rect width="256" height="256" rx="12" fill="#0c1116"/>
-<rect x="5" y="5" width="246" height="246" rx="9" fill="url(#bg58)" stroke="#52720a" stroke-width="3"/>
-<path d="M8 102 112 8h67L8 130Z" fill="#ffffff" opacity=".07"/>
-<circle cx="128" cy="128" r="92" fill="url(#glow58)" opacity=".48"/>
-<path d="M38 210 128 28l90 182Z" fill="none" stroke="#52720a" stroke-width="2" opacity=".28"/><path d="m78 210 50-101 50 101" fill="none" stroke="#a4d007" stroke-width="2" opacity=".2"/>
-<g fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".96"><path d="M65 181v-21q0-34 39-34t39 34v21Z"/><circle cx="104" cy="92" r="26"/><path d="M143 135q51 0 51 40v6h-39"/><circle cx="162" cy="101" r="22"/></g>
-<path d="M18 224h92" stroke="#a4d007" stroke-width="5" opacity=".76"/>
-<path d="M18 235h72" stroke="#ffffff" stroke-width="2" opacity=".34"/>
-<path d="M221 19h16v16" fill="none" stroke="#a4d007" stroke-width="3" opacity=".7"/>
+<rect x="8" y="8" width="240" height="240" rx="5" fill="none" stroke="#d0a64f" stroke-width="6" filter="url(#gold58)" opacity=".88"/>
+<rect x="7" y="7" width="242" height="242" rx="5" fill="#07090a" stroke="#d0a64f" stroke-width="5"/>
+<rect x="13" y="13" width="230" height="230" rx="3" fill="url(#v58)" stroke="url(#steel58)" stroke-width="4"/>
+<rect x="18" y="18" width="220" height="220" rx="2" fill="none" stroke="#727a80" stroke-width="2" opacity=".75"/>
+<path d="M19 19h70L19 89Z" fill="#ffffff" opacity=".06"/>
+<path d="M30 211 84 32h42L72 211Zm99 0L184 32h42l-55 179Z" fill="#842029" opacity=".69"/>
+<circle cx="193" cy="136" r="2" fill="#d8dde0" opacity=".24"/><circle cx="50" cy="167" r="3" fill="#d8dde0" opacity=".24"/><circle cx="97" cy="198" r="1" fill="#d8dde0" opacity=".24"/><circle cx="144" cy="45" r="2" fill="#d8dde0" opacity=".24"/><circle cx="191" cy="76" r="3" fill="#d8dde0" opacity=".24"/>
+<g transform="translate(8.96 8.96) scale(0.930) rotate(3 128 128)" fill="none" stroke="#e7e8e8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".98"><circle cx="104" cy="96" r="25"/><circle cx="161" cy="104" r="21"/><path d="M65 183v-21q0-33 39-33t39 33v21ZM145 138q45 0 45 38v7h-34"/></g>
+<path d="M26 219h90" stroke="#a4252f" stroke-width="5" opacity=".8"/>
+<path d="M26 229h90" stroke="#e7e8e8" stroke-width="2" opacity=".28"/>
 </svg>

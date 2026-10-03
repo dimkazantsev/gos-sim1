@@ -1,16 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
 <title>Кворум состоялся</title>
 <defs>
- <linearGradient id="bg32" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#95b851"/><stop offset=".46" stop-color="#8a4a1d"/><stop offset="1" stop-color="#211108"/></linearGradient>
- <radialGradient id="glow32"><stop stop-color="#e29455" stop-opacity=".55"/><stop offset="1" stop-color="#e29455" stop-opacity="0"/></radialGradient>
+ <filter id="gold32" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 .77  0 1 0 0 .48  0 0 1 0 .10  0 0 0 .65 0"/></filter>
+ <linearGradient id="steel32" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aeb4b8"/><stop offset=".18" stop-color="#343b40"/><stop offset=".56" stop-color="#777f84"/><stop offset="1" stop-color="#20262a"/></linearGradient>
+ <radialGradient id="v32"><stop stop-color="#171b1e"/><stop offset=".68" stop-color="#090b0d"/><stop offset="1" stop-color="#040506"/></radialGradient>
 </defs>
-<rect width="256" height="256" rx="12" fill="#0c1116"/>
-<rect x="5" y="5" width="246" height="246" rx="9" fill="url(#bg32)" stroke="#8a4a1d" stroke-width="3"/>
-<path d="M8 88 112 8h67L8 130Z" fill="#ffffff" opacity=".07"/>
-<circle cx="128" cy="128" r="92" fill="url(#glow32)" opacity=".48"/>
-<path d="M32 45h58M32 58h92M166 198h58M134 211h90" stroke="#e29455" stroke-width="3" opacity=".3"/>
-<g fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".96"><path d="M68 122h120v71H68Z"/><path d="M82 139h92M99 64h58v63H99Z"/><path d="m111 96 11 11 26-29"/></g>
-<path d="M18 224h92" stroke="#e29455" stroke-width="5" opacity=".76"/>
-<path d="M18 235h46" stroke="#ffffff" stroke-width="2" opacity=".34"/>
-<path d="M221 19h16v16" fill="none" stroke="#e29455" stroke-width="3" opacity=".7"/>
+<rect x="8" y="8" width="240" height="240" rx="5" fill="none" stroke="#d0a64f" stroke-width="6" filter="url(#gold32)" opacity=".88"/>
+<rect x="7" y="7" width="242" height="242" rx="5" fill="#07090a" stroke="#d0a64f" stroke-width="5"/>
+<rect x="13" y="13" width="230" height="230" rx="3" fill="url(#v32)" stroke="url(#steel32)" stroke-width="4"/>
+<rect x="18" y="18" width="220" height="220" rx="2" fill="none" stroke="#727a80" stroke-width="2" opacity=".75"/>
+<path d="M19 19h70L19 89Z" fill="#ffffff" opacity=".06"/>
+<path d="m128 21 41 54 67 19-43 51 5 69-70-26-70 26 5-69-43-51 67-19Z" fill="#6f1820" opacity=".7"/>
+<circle cx="199" cy="122" r="3" fill="#d8dde0" opacity=".24"/><circle cx="56" cy="153" r="1" fill="#d8dde0" opacity=".24"/><circle cx="103" cy="184" r="2" fill="#d8dde0" opacity=".24"/><circle cx="150" cy="215" r="3" fill="#d8dde0" opacity=".24"/><circle cx="197" cy="62" r="1" fill="#d8dde0" opacity=".24"/><path d="M169 39h39v39" fill="none" stroke="#d8dde0" stroke-width="3" opacity=".35"/>
+<g transform="translate(15.36 15.36) scale(0.880) rotate(0 128 128)" fill="none" stroke="#e7e8e8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".98"><path d="M67 123h122v70H67Z"/><path d="M82 141h92M98 64h60v64H98Z"/><path d="m110 97 12 12 27-31"/></g>
+<path d="M26 219h126" stroke="#a4252f" stroke-width="5" opacity=".8"/>
+<path d="M26 229h104" stroke="#e7e8e8" stroke-width="2" opacity=".28"/>
 </svg>
