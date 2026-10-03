@@ -4,7 +4,6 @@ export type Game={id:string;title:string;status:string;current_round:number;turn
 export type Metric={id:string;game_id:string;metric_key:string;label:string;value:number;previous_value:number|null;unit:string|null;is_public:boolean;group_key:string;description:string|null;min_value:number|null;max_value:number|null;sort_order:number};
 export type MetricHistory={id:number;game_id:string;metric_id:string|null;metric_key:string;value:number;previous_value:number|null;delta:number|null;source_type:string;source_id:string|null;actor_id:string|null;note:string|null;recorded_at:string};
 export type EventItem={id:string;game_id:string;category:string;severity:string;title:string;body:string;round_no:number;published_at:string};
-export type ActionItem={id:string;game_id:string;author_id:string;action_type:string;title:string;body:string;budget:number;status:string;submitted_at:string;teacher_feedback:string|null};
 export type Channel={id:string;game_id:string;name:string;kind:string};
 export type ChatPin={id:string;game_id:string;channel_id:string;message_id:string;pinned_by:string;pinned_at:string};
 export type Message={id:string;game_id:string;channel_id:string;author_id:string;kind:'text'|'audio'|'video'|'file'|'system';text:string|null;storage_path:string|null;mime_type:string|null;created_at:string;url?:string|null;voice_meta?:{duration?:number;waveform?:number[]}|null};
