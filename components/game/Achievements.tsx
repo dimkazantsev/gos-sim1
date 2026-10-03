@@ -7,15 +7,15 @@ import {userError} from '@/lib/userError';
 
 export type Achievement={id:string;title:string;description:string;hidden:boolean;earned_at:string|null;progress:number};
 
-function medalSrc(id:string,earned:boolean){
- return (process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'')+'/medals/'+id+(earned?'':'-locked')+'.svg';
+function medalSrc(id:string){
+ return (process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'')+'/medals/'+id+'.svg?v=20261003';
 }
 
 export function Medal({id,title,earned=true}:{id:string;title:string;earned?:boolean}){
  const [failed,setFailed]=useState(false);
  useEffect(()=>setFailed(false),[id,earned]);
  return <span className={'achievementMedal '+(earned?'is-earned':'is-locked')}>
-  {failed?<Award className="achievementMedalFallback" aria-label={title}/>:<Image unoptimized src={medalSrc(id,earned)} alt={title} width={256} height={256} loading="lazy" onError={()=>setFailed(true)}/>}
+  {failed?<Award className="achievementMedalFallback" aria-label={title}/>:<Image unoptimized src={medalSrc(id)} alt={title} width={512} height={512} loading="lazy" onError={()=>setFailed(true)}/>}
  </span>;
 }
 
@@ -26,7 +26,7 @@ function boundedProgress(value:number){
 
 export function AwardShelf({gameId,userId,showCatalog=true}:{gameId:string;userId:string;showCatalog?:boolean}){
  const [items,setItems]=useState<Achievement[]>([]);
- const [filter,setFilter]=useState<'earned'|'open'>('earned');
+ const [filter,setFilter]=useState<'earned'|'open'>(showCatalog?'open':'earned');
  const [error,setError]=useState('');
  const [counts,setCounts]=useState({total:100,open:60,hidden:40});
 

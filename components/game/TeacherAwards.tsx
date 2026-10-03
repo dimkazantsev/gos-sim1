@@ -42,7 +42,7 @@ export default function TeacherAwards({g}:{g:ReturnTypeRepublic}){
 
  return <section className="teacherAwards steamTeacherAwards surface">
   <header>
-   <div><small>УПРАВЛЕНИЕ ДОСТИЖЕНИЯМИ</small><h2><Award size={24}/> Награды</h2><p>Компактный каталог в логике Steam: квадратная эмблема, название, условие, состояние и видимость.</p></div>
+   <div><small>УПРАВЛЕНИЕ ДОСТИЖЕНИЯМИ</small><h2><Award size={24}/> Награды</h2><p>Все эмблемы показаны в цвете. Откройте или скройте условие для студентов — полученные награды сохранятся.</p></div>
    <div className="teacherAwardSummary"><strong>{items.length}</strong><span>всего</span><em>{openCount} открытых · {hiddenCount} скрытых</em></div>
   </header>
 
@@ -56,7 +56,7 @@ export default function TeacherAwards({g}:{g:ReturnTypeRepublic}){
 
   <div className="teacherAwardGrid">
    {shown.map(a=><article key={a.id} className={a.hidden?'is-hidden':'is-open'}>
-    <Medal id={a.id} title={a.title} earned={a.earned_count>0}/>
+    <Medal id={a.id} title={a.title}/>
     <div className="teacherAwardBody">
      <div className="teacherAwardTitle"><h3>{a.title}</h3><span>{a.hidden?<><EyeOff size={13}/> Скрытая</>:<><Eye size={13}/> Открытая</>}</span></div>
      <p>{a.description}</p>

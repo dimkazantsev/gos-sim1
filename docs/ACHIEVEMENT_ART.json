@@ -1,0 +1,1102 @@
+[
+  {
+    "id": "medal-001",
+    "scene": [
+      "pen",
+      "scroll",
+      "seal",
+      "desk"
+    ],
+    "layout": 0,
+    "fingerprint": "9a886d70daa22e1d53ac8899c947e092132ca95b5290ca5a21ed038eb5a4b0bc"
+  },
+  {
+    "id": "medal-002",
+    "scene": [
+      "document",
+      "lamp",
+      "pencil",
+      "desk"
+    ],
+    "layout": 1,
+    "fingerprint": "7a8ac8ca06850eb40c2618698bafff22c43cf808a430d18f5896c0fa3c143b07"
+  },
+  {
+    "id": "medal-003",
+    "scene": [
+      "law",
+      "rocket",
+      "scroll",
+      "steps"
+    ],
+    "layout": 2,
+    "fingerprint": "ec75a259924e1599dfe5aed24c746ff47f4eeada255b8545e004897d6b6c805f"
+  },
+  {
+    "id": "medal-004",
+    "scene": [
+      "constitution",
+      "crown",
+      "star",
+      "sun"
+    ],
+    "layout": 3,
+    "fingerprint": "8b5abaa9335ba17dfa39f6327c55a2efabcc58e7b743a9176aab3301c3982099"
+  },
+  {
+    "id": "medal-005",
+    "scene": [
+      "treasury",
+      "coins",
+      "quill",
+      "vault"
+    ],
+    "layout": 4,
+    "fingerprint": "caf1a6ff6ca525ff6d40cfe6a2f4f44f1f09ac651d9577666ada12f9d58d61db"
+  },
+  {
+    "id": "medal-006",
+    "scene": [
+      "eagle",
+      "decree",
+      "seal",
+      "palace"
+    ],
+    "layout": 5,
+    "fingerprint": "a04066fd60c3fcf1c5e7ef89bfd6d48c27aeb9691793856c93207f8bd8250b06"
+  },
+  {
+    "id": "medal-007",
+    "scene": [
+      "compass",
+      "decree",
+      "arrow",
+      "palace"
+    ],
+    "layout": 6,
+    "fingerprint": "73f9872f869e1e779a0c1aadac35976afc6409ce6c53c6ffbb1bd9f5d021155e"
+  },
+  {
+    "id": "medal-008",
+    "scene": [
+      "government",
+      "gavel",
+      "gear",
+      "steps"
+    ],
+    "layout": 7,
+    "fingerprint": "293e34a07d9b90ce282a141e8c8e6e4651c634b053fd814121475fa064e937f8"
+  },
+  {
+    "id": "medal-009",
+    "scene": [
+      "decree",
+      "key",
+      "clock",
+      "desk"
+    ],
+    "layout": 8,
+    "fingerprint": "0c558336a07c32932155d6d0d3e5a2afac41d14cec41db5c632b02f2b99169ac"
+  },
+  {
+    "id": "medal-010",
+    "scene": [
+      "parliament",
+      "microphone",
+      "scroll",
+      "hall"
+    ],
+    "layout": 9,
+    "fingerprint": "04f418c832ed621693931c4e2f0ddc111eeb15f952e54dcb40f07801d5240536"
+  },
+  {
+    "id": "medal-011",
+    "scene": [
+      "federation",
+      "map",
+      "flag",
+      "landscape"
+    ],
+    "layout": 0,
+    "fingerprint": "7c7154bab111c69e70b7b9e3f1904cf17ec45f3648c86f1a86ed22bafb4638c3"
+  },
+  {
+    "id": "medal-012",
+    "scene": [
+      "gear",
+      "document",
+      "seal",
+      "workshop"
+    ],
+    "layout": 1,
+    "fingerprint": "179857c4192db717c4da2f7510b3ac160ef1a994cf661abed2eaf86d2083e5e3"
+  },
+  {
+    "id": "medal-013",
+    "scene": [
+      "passport",
+      "seedling",
+      "sun",
+      "blueprint"
+    ],
+    "layout": 2,
+    "fingerprint": "7fc9a3cc532ea0a5a54b559d1d3392699e575f41d2c310e99ae822aefad5e831"
+  },
+  {
+    "id": "medal-014",
+    "scene": [
+      "town",
+      "bridge",
+      "tree",
+      "landscape"
+    ],
+    "layout": 3,
+    "fingerprint": "e866c9653cae7e9f87107d12b60ac1a08f9f8f5d3493e9c40beea02f7576b420"
+  },
+  {
+    "id": "medal-015",
+    "scene": [
+      "lamp",
+      "scroll",
+      "question",
+      "desk"
+    ],
+    "layout": 4,
+    "fingerprint": "2a8409dc5b8b7796a921104bead7d10c12ce6ecdc145f8937d399763cc8ffa09"
+  },
+  {
+    "id": "medal-016",
+    "scene": [
+      "books",
+      "chain",
+      "magnifier",
+      "library"
+    ],
+    "layout": 5,
+    "fingerprint": "cac9a36f6737e4b6571534663322b12a3c98a70cfa78f1352b1d3837fd22045b"
+  },
+  {
+    "id": "medal-017",
+    "scene": [
+      "calculator",
+      "coins",
+      "chart",
+      "blueprint"
+    ],
+    "layout": 6,
+    "fingerprint": "ac7769af982c2b1cf1eb6c0f1eba59a0d68862deaec8739ca768b40da3da2f32"
+  },
+  {
+    "id": "medal-018",
+    "scene": [
+      "government",
+      "check",
+      "folder",
+      "desk"
+    ],
+    "layout": 7,
+    "fingerprint": "14fac9c3aac1c88d091ab5fa2066f60e920e57ca54bfcc4d4bcdc4692a7ae2c8"
+  },
+  {
+    "id": "medal-019",
+    "scene": [
+      "magnifier",
+      "law",
+      "shield",
+      "library"
+    ],
+    "layout": 8,
+    "fingerprint": "94b3f6c907a6a763f860b6c2fe4c4b0c2e9aae826b1722a8fe9d8806a9c59342"
+  },
+  {
+    "id": "medal-020",
+    "scene": [
+      "minutes",
+      "clock",
+      "bell",
+      "hall"
+    ],
+    "layout": 9,
+    "fingerprint": "baaaa39785eb065fc82b4a43e1a1b84f135e76f0ff1caf7be68ee99ac39e195e"
+  },
+  {
+    "id": "medal-021",
+    "scene": [
+      "printing",
+      "document",
+      "check",
+      "sun"
+    ],
+    "layout": 0,
+    "fingerprint": "6fe61655583dca39e0f651032ef980c4df08ee8403acd967d8ec3bd84659db52"
+  },
+  {
+    "id": "medal-022",
+    "scene": [
+      "toolbox",
+      "law",
+      "gear",
+      "workshop"
+    ],
+    "layout": 1,
+    "fingerprint": "f637e46e394a890a82ea8cb4cb7f23b5dca43b4be767b1330680b01ee70f0722"
+  },
+  {
+    "id": "medal-023",
+    "scene": [
+      "chain",
+      "scroll",
+      "news",
+      "network"
+    ],
+    "layout": 2,
+    "fingerprint": "22b099b4d2aab3f891df68bbc7a7297ef0035fb5a3b2de902b1de1a932a5d601"
+  },
+  {
+    "id": "medal-024",
+    "scene": [
+      "folder",
+      "paperclip",
+      "shield",
+      "desk"
+    ],
+    "layout": 3,
+    "fingerprint": "4442767653b6cf888e1d330d887c00e52ad3afae2987969bbeb958e717e77197"
+  },
+  {
+    "id": "medal-025",
+    "scene": [
+      "typewriter",
+      "books",
+      "quill",
+      "library"
+    ],
+    "layout": 4,
+    "fingerprint": "9e00d44d7e56849545e134b76e1c5cdd95217d50e7f8ac89eea4ae61e1f3520b"
+  },
+  {
+    "id": "medal-026",
+    "scene": [
+      "ballot",
+      "finger",
+      "check",
+      "hall"
+    ],
+    "layout": 5,
+    "fingerprint": "2d8b09285f3bd70ceabd8248e2bce6c6e35ae5e9f34a9b15bfbbd811cae1af39"
+  },
+  {
+    "id": "medal-027",
+    "scene": [
+      "check",
+      "ballot",
+      "lamp",
+      "sun"
+    ],
+    "layout": 6,
+    "fingerprint": "e8dd0b6f51514b789ab6279248012756cdd14c1866bbea61f06ce6d0445d4be6"
+  },
+  {
+    "id": "medal-028",
+    "scene": [
+      "cross",
+      "ballot",
+      "gavel",
+      "steps"
+    ],
+    "layout": 7,
+    "fingerprint": "4e5732a13c60f1486b97d4a2bfb111e71b4fa539fcb825a9d86d3fc6bfb4efc3"
+  },
+  {
+    "id": "medal-029",
+    "scene": [
+      "pause",
+      "ballot",
+      "clock",
+      "night"
+    ],
+    "layout": 8,
+    "fingerprint": "3fb6222bdbb08e45b077ff11d4fad12cf41308f51d17802c4c2e3402bfed35e4"
+  },
+  {
+    "id": "medal-030",
+    "scene": [
+      "coins",
+      "ballot",
+      "shield",
+      "vault"
+    ],
+    "layout": 9,
+    "fingerprint": "0a6623835bb60a4bfb0c9c90bd1ca4fd8b8026a87dba9e5e458940b3909c442d"
+  },
+  {
+    "id": "medal-031",
+    "scene": [
+      "signpost",
+      "ballot",
+      "scales",
+      "network"
+    ],
+    "layout": 0,
+    "fingerprint": "40bef113555945bd57ad6a246ebf0b611266f3baeb5bfcdaa48b3dcf975d0571"
+  },
+  {
+    "id": "medal-032",
+    "scene": [
+      "people",
+      "ballot",
+      "bell",
+      "hall"
+    ],
+    "layout": 1,
+    "fingerprint": "7d45c9381e48d877ccac1cb2390379ef6dc767bcf3860198ffa2eed9708f2378"
+  },
+  {
+    "id": "medal-033",
+    "scene": [
+      "bridge",
+      "parliament",
+      "government",
+      "landscape"
+    ],
+    "layout": 2,
+    "fingerprint": "a895b5a07447397c179e3ba67ce01dd8e41c09bb700fe7d1f995b59d6da21d2e"
+  },
+  {
+    "id": "medal-034",
+    "scene": [
+      "shield",
+      "law",
+      "key",
+      "steps"
+    ],
+    "layout": 3,
+    "fingerprint": "f94034ff7532f3ffede314497537cefeca55f300c31fe26ba3bcfe23674685d5"
+  },
+  {
+    "id": "medal-035",
+    "scene": [
+      "handshake",
+      "shield",
+      "people",
+      "sun"
+    ],
+    "layout": 4,
+    "fingerprint": "edbd76a2ee1d1da9c3bd93726b209760129bca8e1e857e60277bed8051256c40"
+  },
+  {
+    "id": "medal-036",
+    "scene": [
+      "envelope",
+      "check",
+      "person",
+      "network"
+    ],
+    "layout": 5,
+    "fingerprint": "346f47987c56e2238a1c12027b0c157425385df6c058b097901a48788b53b0ff"
+  },
+  {
+    "id": "medal-037",
+    "scene": [
+      "chat",
+      "pencil",
+      "lamp",
+      "desk"
+    ],
+    "layout": 6,
+    "fingerprint": "2b9b2133e1f4beb7d9c4fd2e3df9954db11764843dc00e418715d00042c3a7b2"
+  },
+  {
+    "id": "medal-038",
+    "scene": [
+      "map",
+      "treasury",
+      "magnifier",
+      "landscape"
+    ],
+    "layout": 7,
+    "fingerprint": "c0df82b3f7ac9ce45aa7950d076dac15f5e51de5480669dfece3e034a3a65fb7"
+  },
+  {
+    "id": "medal-039",
+    "scene": [
+      "compass",
+      "map",
+      "bridge",
+      "landscape"
+    ],
+    "layout": 8,
+    "fingerprint": "399af50d36a4e8c95b2773eb546f0870b40dcc1029c3366fd17210cebbd0ca6e"
+  },
+  {
+    "id": "medal-040",
+    "scene": [
+      "chess",
+      "shield",
+      "chart",
+      "night"
+    ],
+    "layout": 9,
+    "fingerprint": "9e1b22ea8b40d8907b6d40a255bb0ee9d1afe821f8ad59a2bc76af7a4779dfbd"
+  },
+  {
+    "id": "medal-041",
+    "scene": [
+      "percent",
+      "quill",
+      "government",
+      "blueprint"
+    ],
+    "layout": 0,
+    "fingerprint": "a9965a8bd0bb3af9142c4c6934e8b53484eab23c9f048c593c3470f58af057c9"
+  },
+  {
+    "id": "medal-042",
+    "scene": [
+      "seal",
+      "percent",
+      "check",
+      "vault"
+    ],
+    "layout": 1,
+    "fingerprint": "2ccc5ea2b8cb634278ec1ec620a207d2e202cbd4b71384b103bdd077468419dd"
+  },
+  {
+    "id": "medal-043",
+    "scene": [
+      "news",
+      "pencil",
+      "sun",
+      "desk"
+    ],
+    "layout": 2,
+    "fingerprint": "c622acee51a5f98aea3203e7e49bb83f0d6b1f0e52aad16d74af9a5bbb4ffcb1"
+  },
+  {
+    "id": "medal-044",
+    "scene": [
+      "chain",
+      "globe",
+      "chat",
+      "network"
+    ],
+    "layout": 3,
+    "fingerprint": "09838ad3ccb5cbd1847b7a067f13dc96d1debc254a12c4c80508ab8706c8d9c3"
+  },
+  {
+    "id": "medal-045",
+    "scene": [
+      "signpost",
+      "town",
+      "chain",
+      "landscape"
+    ],
+    "layout": 4,
+    "fingerprint": "5897d75a48de768b23d96ce4b998a16d136b5873a898a077436f623de15e1967"
+  },
+  {
+    "id": "medal-046",
+    "scene": [
+      "tags",
+      "news",
+      "prism",
+      "sun"
+    ],
+    "layout": 5,
+    "fingerprint": "0eecafdbc74c1e2bfad3028b504e78f1d32168e8b22e9d6fd8e472982e5a5dde"
+  },
+  {
+    "id": "medal-047",
+    "scene": [
+      "camera",
+      "painting",
+      "news",
+      "sun"
+    ],
+    "layout": 6,
+    "fingerprint": "d13fd299ae47ef8ba396c5a3a8d15432039214013c1d3b9cdc870a6bfac76f4d"
+  },
+  {
+    "id": "medal-048",
+    "scene": [
+      "radio",
+      "microphone",
+      "tower",
+      "network"
+    ],
+    "layout": 7,
+    "fingerprint": "4cc1ff92b470884009cd4de9d5c3cbfa893b45f1b2d6a156e5454503937f342e"
+  },
+  {
+    "id": "medal-049",
+    "scene": [
+      "film",
+      "camera",
+      "play",
+      "night"
+    ],
+    "layout": 8,
+    "fingerprint": "a101ea218bd4cce21b9028a442099f8ce1021267c21935d64aa1e1e89db8095b"
+  },
+  {
+    "id": "medal-050",
+    "scene": [
+      "paperclip",
+      "news",
+      "folder",
+      "desk"
+    ],
+    "layout": 9,
+    "fingerprint": "d2515cf489052964df8512ca5a8eecbd1d699c24adec6f23515cbabca9889a77"
+  },
+  {
+    "id": "medal-051",
+    "scene": [
+      "envelope",
+      "news",
+      "microphone",
+      "network"
+    ],
+    "layout": 0,
+    "fingerprint": "70cab770307943854bf2d5639fe428ee8b457ca7a978ae25d5b71880507c4ca1"
+  },
+  {
+    "id": "medal-052",
+    "scene": [
+      "printing",
+      "check",
+      "radio",
+      "sun"
+    ],
+    "layout": 1,
+    "fingerprint": "704f97a7e5a292a4255270d96b33a4a7bdf193f8f41d047c83beade923ba43b6"
+  },
+  {
+    "id": "medal-053",
+    "scene": [
+      "chat",
+      "document",
+      "pen",
+      "library"
+    ],
+    "layout": 2,
+    "fingerprint": "d864baf37efbcac8514209436c9d14e33d819f1ab527d65c3926e41e6c7e730a"
+  },
+  {
+    "id": "medal-054",
+    "scene": [
+      "chat",
+      "news",
+      "person",
+      "desk"
+    ],
+    "layout": 3,
+    "fingerprint": "9e5554930b35472a81639c8d3cdafee8654f93123f5d4bcda4c8751294332f7d"
+  },
+  {
+    "id": "medal-055",
+    "scene": [
+      "scales",
+      "chat",
+      "books",
+      "steps"
+    ],
+    "layout": 4,
+    "fingerprint": "f7b91e1886388127ca8c071dc709f4c755f8d6535f83afa6a81a665c32485ea8"
+  },
+  {
+    "id": "medal-056",
+    "scene": [
+      "eye",
+      "books",
+      "magnifier",
+      "library"
+    ],
+    "layout": 5,
+    "fingerprint": "58e23138a3361f38852ef46d216b8cd3dd33bc433bab520564e002dfa691fcd6"
+  },
+  {
+    "id": "medal-057",
+    "scene": [
+      "suitcase",
+      "flag",
+      "folder",
+      "desk"
+    ],
+    "layout": 6,
+    "fingerprint": "48fe26ca27baea5c18f925f5819e8002a3bde4222e28f66bcfe26e78909a3561"
+  },
+  {
+    "id": "medal-058",
+    "scene": [
+      "chairs",
+      "crown",
+      "gear",
+      "palace"
+    ],
+    "layout": 7,
+    "fingerprint": "a0a99a67ddc3eb0faa86116c3710c11d1e7d7c3b52ae35f6566b77f583a35e3e"
+  },
+  {
+    "id": "medal-059",
+    "scene": [
+      "clock",
+      "coffee",
+      "moon",
+      "night"
+    ],
+    "layout": 8,
+    "fingerprint": "7be6334ea514f1ed32196bac421183756a8ab64c38d62ec6dabb29f3837ba5b9"
+  },
+  {
+    "id": "medal-060",
+    "scene": [
+      "town",
+      "chat",
+      "heart",
+      "landscape"
+    ],
+    "layout": 9,
+    "fingerprint": "4c078211bbeb8e11a9755824a4e2dfb15c8bd527ac2fe42bc8ac1e0ca32a46d8"
+  },
+  {
+    "id": "medal-061",
+    "scene": [
+      "seal",
+      "books",
+      "heart",
+      "sun"
+    ],
+    "layout": 0,
+    "fingerprint": "b12bb237b3f149f9f660e4111e179c31fc90895832be1ef74d34e3bd8abe95e2"
+  },
+  {
+    "id": "medal-062",
+    "scene": [
+      "treasury",
+      "law",
+      "calculator",
+      "vault"
+    ],
+    "layout": 1,
+    "fingerprint": "733d3f81a46df1f8384eef2cdc9d48176da17bfc29c699aa7cbadee74de0e3aa"
+  },
+  {
+    "id": "medal-063",
+    "scene": [
+      "coffee",
+      "magnifier",
+      "minutes",
+      "desk"
+    ],
+    "layout": 2,
+    "fingerprint": "8d16d5d7972316d8eceff21b8ca1d0b93295ce8f5037fc929784788e6394ab5b"
+  },
+  {
+    "id": "medal-064",
+    "scene": [
+      "handshake",
+      "percent",
+      "map",
+      "landscape"
+    ],
+    "layout": 3,
+    "fingerprint": "17c859768eab4fac3b6c9b509fdd025f56f5d720f8edeb559d6365a449e87493"
+  },
+  {
+    "id": "medal-065",
+    "scene": [
+      "chat",
+      "shield",
+      "gavel",
+      "workshop"
+    ],
+    "layout": 4,
+    "fingerprint": "4d06db5c83d8beed31480122dc24fb1a57ec8da33e92fdf4cc28ace15ada1368"
+  },
+  {
+    "id": "medal-066",
+    "scene": [
+      "key",
+      "envelope",
+      "people",
+      "network"
+    ],
+    "layout": 5,
+    "fingerprint": "d5da1c8b39830f2328e10ebd139012f27dd63ee2ff50ad44ef126fc96fea6664"
+  },
+  {
+    "id": "medal-067",
+    "scene": [
+      "pencil",
+      "document",
+      "eraser",
+      "blueprint"
+    ],
+    "layout": 6,
+    "fingerprint": "4f6a81804b613cd9004151483c00216738d5e15d3699b617986382afae2dd6ee"
+  },
+  {
+    "id": "medal-068",
+    "scene": [
+      "suitcase",
+      "folder",
+      "tags",
+      "library"
+    ],
+    "layout": 7,
+    "fingerprint": "277762f5cb03ce7367f3b5ad02c91bcc9e4200bf8c068e5c9fcbcdd9df150c1f"
+  },
+  {
+    "id": "medal-069",
+    "scene": [
+      "heart",
+      "news",
+      "people",
+      "sun"
+    ],
+    "layout": 8,
+    "fingerprint": "03d7717cc2fc832d5faf9f3f13d1a08c257f08af05f7f8ac74a8a53c91416217"
+  },
+  {
+    "id": "medal-070",
+    "scene": [
+      "chat",
+      "people",
+      "news",
+      "hall"
+    ],
+    "layout": 9,
+    "fingerprint": "ef0874002bac848b38cf6aea5f8ecb22a175247c2c6dc7a25c002ce87caf0b77"
+  },
+  {
+    "id": "medal-071",
+    "scene": [
+      "owl",
+      "books",
+      "chat",
+      "night"
+    ],
+    "layout": 0,
+    "fingerprint": "fade72a1769a4da18ce15341c3b7cdaae8fc0b6d9ab430528aecc03ac309f5b1"
+  },
+  {
+    "id": "medal-072",
+    "scene": [
+      "passport",
+      "microphone",
+      "seedling",
+      "blueprint"
+    ],
+    "layout": 1,
+    "fingerprint": "1ea511c7aa3e9a1f79319393c4f86f7b785c260a12ec5e13d8199cc5897e8c3a"
+  },
+  {
+    "id": "medal-073",
+    "scene": [
+      "film",
+      "town",
+      "camera",
+      "landscape"
+    ],
+    "layout": 2,
+    "fingerprint": "97a925bd4f7c8ec91a6909e72c8a45513300bcff7de5c29238f0093af25f9722"
+  },
+  {
+    "id": "medal-074",
+    "scene": [
+      "books",
+      "shield",
+      "lamp",
+      "library"
+    ],
+    "layout": 3,
+    "fingerprint": "c520b889bf177d332d909d6ee2d7ba3976ccd405359ccec7d14241b3156b4093"
+  },
+  {
+    "id": "medal-075",
+    "scene": [
+      "bridge",
+      "map",
+      "federation",
+      "landscape"
+    ],
+    "layout": 4,
+    "fingerprint": "0973b1b37a6448d6f5896198db37ec0129246b44036bc746f5ce6c66ebf7d11d"
+  },
+  {
+    "id": "medal-076",
+    "scene": [
+      "rake",
+      "books",
+      "arrow",
+      "workshop"
+    ],
+    "layout": 5,
+    "fingerprint": "7fd25a5a1c3c10a89376dfc67538af1bf21b171dfdd33d909bf18ea8dbf75e0d"
+  },
+  {
+    "id": "medal-077",
+    "scene": [
+      "chairs",
+      "ballot",
+      "chat",
+      "hall"
+    ],
+    "layout": 6,
+    "fingerprint": "9b6016f3f816cdc157239c1829dcf23cf2b1ca4b3c5cd5b604cc2744b1727c18"
+  },
+  {
+    "id": "medal-078",
+    "scene": [
+      "scales",
+      "check",
+      "pause",
+      "steps"
+    ],
+    "layout": 7,
+    "fingerprint": "6f7d100f1da353c71643b9bc76105418d48de758651d7e8505a420171ebc0365"
+  },
+  {
+    "id": "medal-079",
+    "scene": [
+      "pencil",
+      "person",
+      "crown",
+      "desk"
+    ],
+    "layout": 8,
+    "fingerprint": "703c8c5e8a189ffbfafe3e57448a92c2825a0bb2b02d15a63d5c5098f47f6c6b"
+  },
+  {
+    "id": "medal-080",
+    "scene": [
+      "news",
+      "magnifier",
+      "check",
+      "sun"
+    ],
+    "layout": 9,
+    "fingerprint": "f50a43d2c2c2a42fda199fdf5b810ce54ba19940130945c637097e5e816f5b15"
+  },
+  {
+    "id": "medal-081",
+    "scene": [
+      "printing",
+      "typewriter",
+      "rocket",
+      "library"
+    ],
+    "layout": 0,
+    "fingerprint": "d8b021bf7d9ae9b76d5f111f2b6332aa47b796823e9f6f6a38dbbf7e26222f99"
+  },
+  {
+    "id": "medal-082",
+    "scene": [
+      "flask",
+      "coins",
+      "check",
+      "blueprint"
+    ],
+    "layout": 1,
+    "fingerprint": "f6cb739a932b2822aaa8c307f5a682ccd257784c494cdbacd43d5dfc38b2a404"
+  },
+  {
+    "id": "medal-083",
+    "scene": [
+      "cow",
+      "map",
+      "shield",
+      "landscape"
+    ],
+    "layout": 2,
+    "fingerprint": "f96621c19dfea5d2a36e8830f9ff9bf9d7c1be38f7a50d01c1b0aaaafbd088a8"
+  },
+  {
+    "id": "medal-084",
+    "scene": [
+      "treasury",
+      "bandage",
+      "calculator",
+      "vault"
+    ],
+    "layout": 3,
+    "fingerprint": "c661019dcec77c43d9e403fdbb4ae5b765d9945cbfe64bdafd36cfbb08ea038b"
+  },
+  {
+    "id": "medal-085",
+    "scene": [
+      "question",
+      "document",
+      "percent",
+      "desk"
+    ],
+    "layout": 4,
+    "fingerprint": "7cbc912063f45310522145c38940b14877ad94f6dc05db5764065aea6e46b870"
+  },
+  {
+    "id": "medal-086",
+    "scene": [
+      "passport",
+      "envelope",
+      "lock",
+      "night"
+    ],
+    "layout": 5,
+    "fingerprint": "f4731e15dd151951e6899e0fe5d41fcaeb47f243ad1e084082f26880c98664ae"
+  },
+  {
+    "id": "medal-087",
+    "scene": [
+      "ghost",
+      "ballot",
+      "coins",
+      "night"
+    ],
+    "layout": 6,
+    "fingerprint": "c1f0db576fa996cbf2dd86f4dc64fdc5b32c281f072c451b33fbb99653171c1c"
+  },
+  {
+    "id": "medal-088",
+    "scene": [
+      "news",
+      "crown",
+      "sun",
+      "sun"
+    ],
+    "layout": 7,
+    "fingerprint": "e6045ebfceba1c4b6c4329519ba9eee15e3174647a1f4dde9e1c0ec020a96c40"
+  },
+  {
+    "id": "medal-089",
+    "scene": [
+      "factory",
+      "law",
+      "gear",
+      "workshop"
+    ],
+    "layout": 8,
+    "fingerprint": "170c62151709efe4642f6eaccdbe19bf09215373bb2fec8557989d7d17894163"
+  },
+  {
+    "id": "medal-090",
+    "scene": [
+      "wifi",
+      "shield",
+      "clock",
+      "night"
+    ],
+    "layout": 9,
+    "fingerprint": "4566830fc2070979df82f9e68ac528f6d543c37643c6025a173861036bc39367"
+  },
+  {
+    "id": "medal-091",
+    "scene": [
+      "calendar",
+      "moon",
+      "sun",
+      "night"
+    ],
+    "layout": 0,
+    "fingerprint": "ce8152b6bdebf2f058cf58abd5c6934c4982322178c7fba12e6096dc147e71a5"
+  },
+  {
+    "id": "medal-092",
+    "scene": [
+      "stairs",
+      "document",
+      "flag",
+      "steps"
+    ],
+    "layout": 1,
+    "fingerprint": "ee08fa895e7d657dac5fe4579ddc561d1da535064af89cffcd1f186bc9b9f863"
+  },
+  {
+    "id": "medal-093",
+    "scene": [
+      "orchestra",
+      "scroll",
+      "government",
+      "hall"
+    ],
+    "layout": 2,
+    "fingerprint": "b6dbc2249f6cdb33cb2a8d567815c218cedd75a21af9e0d80dcdfcfa15e18355"
+  },
+  {
+    "id": "medal-094",
+    "scene": [
+      "globe",
+      "law",
+      "town",
+      "landscape"
+    ],
+    "layout": 3,
+    "fingerprint": "8bd947e542e45fa9e53a69181f56250db616e1e13b0f2890d297ae2c5a8e3a01"
+  },
+  {
+    "id": "medal-095",
+    "scene": [
+      "government",
+      "radio",
+      "microphone",
+      "network"
+    ],
+    "layout": 4,
+    "fingerprint": "3a3d7522b847e8de6810daf59f4c7de5099fa372a1e8c985a606f432d6168f61"
+  },
+  {
+    "id": "medal-096",
+    "scene": [
+      "map",
+      "chat",
+      "tags",
+      "landscape"
+    ],
+    "layout": 5,
+    "fingerprint": "40f3a152b261961b193ac150ebf7e2857beca6056bbb0a6ed216b52ca827f1da"
+  },
+  {
+    "id": "medal-097",
+    "scene": [
+      "calculator",
+      "scales",
+      "ballot",
+      "blueprint"
+    ],
+    "layout": 6,
+    "fingerprint": "5350b8d1cae50c38dab90e6090b67c81db3c42ecc0220dddc758ed4b84090ac9"
+  },
+  {
+    "id": "medal-098",
+    "scene": [
+      "bookopen",
+      "key",
+      "star",
+      "sun"
+    ],
+    "layout": 7,
+    "fingerprint": "8d5f6efbbb62b0e5694711d4c6dd7f5eab9a8405990a8fab5a0bb18225ab7fb8"
+  },
+  {
+    "id": "medal-099",
+    "scene": [
+      "quill",
+      "books",
+      "lamp",
+      "library"
+    ],
+    "layout": 8,
+    "fingerprint": "875e93b6015e8cf0aee1996ce7e5d71646148707f6a073aaef9ab0fa890685a7"
+  },
+  {
+    "id": "medal-100",
+    "scene": [
+      "people",
+      "envelope",
+      "document",
+      "network"
+    ],
+    "layout": 9,
+    "fingerprint": "673eeb7697cac879bec22132d88325aada2e1bab3151a5cbb611bc974cc430f0"
+  }
+]
