@@ -28,7 +28,7 @@
 .awardCollectionTrack i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#2453e6,#6d4ac5 68%,#f3a8cf)}
 .awardShelfTabs{grid-column:1/-1;display:flex!important;gap:7px!important;flex-wrap:wrap}
 .awardShelfTabs button{
- display:inline-flex!important;align-items:center!important;gap:8px!important;min-height:38px!important;padding:8px 12px!important;
+ display:inline-flex!important;align-items:center!important;gap:8px!important;min-height:44px!important;padding:8px 12px!important;
  border:1px solid #d6deec!important;border-radius:10px!important;background:#f8f9fd!important;color:#586784!important;
  font-size:12px!important;box-shadow:none!important
 }
@@ -110,7 +110,7 @@
 .steamTeacherAwards .teacherAwardFilters input{border:0!important;background:transparent!important;color:#172447!important;box-shadow:none!important}
 .steamTeacherAwards .teacherAwardFilters input::placeholder{color:#7b879d}
 .steamTeacherAwards .teacherAwardFilters nav button{
- min-height:38px!important;border:1px solid #dce3f0!important;border-radius:10px!important;background:#f7f8fd!important;color:#586784!important
+ min-height:44px!important;border:1px solid #dce3f0!important;border-radius:10px!important;background:#f7f8fd!important;color:#586784!important
 }
 .steamTeacherAwards .teacherAwardFilters nav button[aria-pressed=true]{background:#2453e6!important;border-color:#2453e6!important;color:#fff!important}
 .steamTeacherAwards .awardVisibilityNotice{padding:10px!important;border:1px solid #c6e0d3!important;border-radius:10px!important;background:#e8f5ee!important;color:#16734f!important}
@@ -130,7 +130,7 @@
 .teacherAwardBody p{margin:3px 0 5px!important;color:#65738d!important;font-size:10px!important;line-height:1.45!important}
 .teacherAwardBody small{color:#78859a!important;font-size:9px!important}
 .teacherAwardGrid article>button{
- display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;min-height:36px!important;padding:7px 9px!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;min-height:44px!important;padding:7px 9px!important;
  border:1px solid #d8e0ed!important;border-radius:9px!important;background:#f7f8fd!important;color:#344467!important;font-size:9px!important;white-space:nowrap
 }
 .teacherAwardGrid article>button:hover:not(:disabled){border-color:#b9c8fa!important;background:#edf1ff!important;color:#2453e6!important}
@@ -138,7 +138,7 @@
 /* Compact unlock toast: project identity rather than black Steam chrome. */
 .steamAchievementToast{
  position:fixed!important;left:auto!important;right:18px!important;bottom:88px!important;transform:none!important;
- width:min(410px,calc(100vw - 28px))!important;display:grid!important;grid-template-columns:68px minmax(0,1fr) 30px!important;
+ width:min(410px,calc(100vw - 28px))!important;display:grid!important;grid-template-columns:68px minmax(0,1fr) 44px!important;
  align-items:center!important;gap:11px!important;padding:10px!important;border:1px solid #cad5e7!important;border-radius:16px!important;
  background:#fffffff5!important;backdrop-filter:blur(18px);box-shadow:0 20px 64px #17244724!important;
  animation:awardGsIn .28s ease-out!important
@@ -150,7 +150,7 @@
 .steamAchievementToast h2{margin:3px 0 2px!important;color:#172447!important;font-size:14px!important;line-height:1.25!important}
 .steamAchievementToast p{margin:0!important;color:#65738d!important;font-size:10px!important;line-height:1.4!important}
 .steamAchievementToast>button{
- position:static!important;display:grid!important;place-items:center!important;width:30px!important;height:30px!important;min-height:30px!important;
+ position:static!important;display:grid!important;place-items:center!important;width:44px!important;height:44px!important;min-height:44px!important;
  padding:0!important;border:0!important;background:transparent!important;color:#65738d!important
 }
 @keyframes awardGsIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
