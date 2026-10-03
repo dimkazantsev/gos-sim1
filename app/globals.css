@@ -202,10 +202,10 @@ button,input,textarea,select{font-size:14px}
 .surfaceHead{margin-bottom:16px}
 .surfaceHead h2{font-size:20px;letter-spacing:-.025em}
 .surfaceHead>b,.surfaceHead>span{height:35px;min-width:35px;font-size:13px}
-.surface input,.surface textarea,.surface select,.actionForm input,.actionForm textarea,.actionForm select,.voteBuilder input,.voteBuilder textarea,.voteBuilder select{
+.surface input,.surface textarea,.surface select,.voteBuilder input,.voteBuilder textarea,.voteBuilder select{
   min-height:44px;border-radius:12px;padding:11px 12px;font-size:13px
 }
-.surface textarea,.actionForm textarea,.voteBuilder textarea{line-height:1.55}
+.surface textarea,.voteBuilder textarea{line-height:1.55}
 :where(.surface,.voteCard,.partyCard,.documentCard,.proceduralVoteCard,.stageCard,.streamItem){
   transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease
 }
