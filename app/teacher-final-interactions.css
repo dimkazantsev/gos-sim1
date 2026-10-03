@@ -13,13 +13,6 @@
 .journalToolbar>.styledSelect,.participantsToolbar>.styledSelect{flex:1 1 145px;min-width:0;max-width:100%}
 .journalToolbar>.styledSelect>button,.participantsToolbar>.styledSelect>button{width:100%;height:43px}
 .participantsToolbar>button:not(.styledSelectTrigger){align-self:end;min-width:138px;flex:0 0 138px;width:138px;max-width:138px;height:43px}
-.firstPendingDecision{display:grid;gap:13px;min-width:0;margin:0 0 18px;padding:20px;border:1px solid #adcbf6;border-radius:16px;background:#f0f5ff}
-.firstPendingDecision header{display:flex;align-items:center;justify-content:space-between}
-.firstPendingDecision header small{font-size:11px;font-weight:800;color:#617ea6;letter-spacing:.07em}
-.firstPendingDecision h2{margin:5px 0;font-size:20px;line-height:1.3;color:#243e62}
-.firstPendingDecision header span{color:#7589a3;font-size:12px}
-.firstPendingDecision p{margin:0;color:#496889;font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
-.firstPendingActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 .institutionRegistrationPanel{display:grid;gap:17px;min-width:0;padding:22px;border:1px solid #d5e2f3;border-radius:17px;background:#fff}
 .institutionRegistrationPanel>header{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .institutionRegistrationPanel>header>div{min-width:0}
