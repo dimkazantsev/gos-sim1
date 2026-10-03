@@ -99,7 +99,7 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
    if(e.key==='ArrowRight'){e.preventDefault();next()}
   }}>
    <header className={styles.header}><b>GOS//SIMS · Комикс о республике</b><div>
-    {!showingArchive&&<ComicSoundButton playing={playing} iconOnly/>}
+    <ComicSoundButton playing={open} iconOnly/>
     {!showingArchive&&!showingChapter&&<button type="button" aria-label={playing?'Остановить автоматическое воспроизведение':'Продолжить показ'} title={playing?'Пауза анимации и смены сцен':'Включить анимацию и показ сцен'} onClick={togglePlaying}>{playing?<Pause size={19}/>:<Play size={19}/>}</button>}
     {showingChapter&&<button type="button" aria-label="Открыть архив комиксов" title="Архив комиксов" onClick={openArchive}><Library size={19}/></button>}
     <button type="button" aria-label={intro?'Завершить пролог после просмотра':'Закрыть комикс'} disabled={intro&&scene!==SCENES.length-1} onClick={close}><X size={20}/></button>

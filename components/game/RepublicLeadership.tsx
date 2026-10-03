@@ -7,7 +7,7 @@ import {REPUBLIC_LEADERSHIP,republicOfficeHolders} from './gameRoster';
 export default function RepublicLeadership({g,onOpenProfile}:{g:ReturnTypeRepublic;onOpenProfile?:(id:string)=>void}){
  if(!g.game)return null;
  return <section className="republicLeadership" aria-labelledby="republic-leadership-title">
-  <h3 id="republic-leadership-title">Руководство республики</h3>
+  <header className="republicLeadershipHeading"><span><Landmark size={18} aria-hidden="true"/></span><h3 id="republic-leadership-title">Руководство республики</h3></header>
   {REPUBLIC_LEADERSHIP.map(office=>{
    const holders=republicOfficeHolders(g.members,g.officeAssignments||[],g.game!.id,office.role);
    return <article key={office.key} className="republicOfficeCard" data-office={office.key}>

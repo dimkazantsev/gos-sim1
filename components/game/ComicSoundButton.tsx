@@ -1,48 +1,51 @@
 'use client';
 import {useEffect,useId,useState} from 'react';
-import {Volume2,VolumeX} from 'lucide-react';
+import {LoaderCircle,Volume2,VolumeX} from 'lucide-react';
 let context:AudioContext|undefined;
 let source:AudioBufferSourceNode|undefined;
-let active='';
-const listeners=new Set<(id:string)=>void>();
-function notify(){listeners.forEach(fn=>fn(active))}
+let scorePromise:Promise<AudioBuffer>|undefined;
+let active='',pending='',generation=0;
+const listeners=new Set<(owner:string,loading:string)=>void>();
+function notify(){listeners.forEach(fn=>fn(active,pending))}
 function stop(id?:string){
- if(id&&active!==id)return;
+ if(id&&active!==id&&pending!==id)return;
+ generation++;pending='';
  try{source?.stop()}catch{}
  source?.disconnect();source=undefined;active='';notify();
 }
-function score(ctx:AudioContext){
- const duration=36,length=Math.round(ctx.sampleRate*duration),buffer=ctx.createBuffer(2,length,ctx.sampleRate);
+/** Native offline rendering keeps preparation off the UI thread; reuse the finished score. */
+async function score(ctx:AudioContext){
+ const duration=36,offline=new OfflineAudioContext(2,Math.round(ctx.sampleRate*duration),ctx.sampleRate);
+ const master=offline.createGain();master.gain.value=.22;master.connect(offline.destination);
  const chords=[[130.81,164.81,196],[146.83,174.61,220],[164.81,196,246.94],[130.81,174.61,220],[130.81,164.81,196],[146.83,174.61,220],[164.81,196,246.94],[123.47,146.83,196],[130.81,164.81,196]];
- for(let channel=0;channel<2;channel++){
-  const samples=buffer.getChannelData(channel);
-  for(let i=0;i<length;i++){
-   const t=i/ctx.sampleRate,bar=Math.floor(t/4),local=t%4,fade=Math.min(1,t/1.5,(duration-t)/1.5);
-   const blend=Math.min(1,local/.65),smooth=blend*blend*(3-2*blend);
-   let tone=0;
-   for(let j=0;j<3;j++){
-    const current=Math.round(chords[bar][j]*duration)/duration,previous=Math.round(chords[(bar+8)%9][j]*duration)/duration;
-    const phase=j*.63+channel*.14;
-    tone+=(Math.sin(2*Math.PI*current*t+phase)*smooth+Math.sin(2*Math.PI*previous*t+phase)*(1-smooth))*.045;
-   }
-   const pulse=Math.pow(Math.max(0,Math.sin(Math.PI*(t%2)/2)),8)*.035*Math.sin(2*Math.PI*48*t);
-   samples[i]=(tone+pulse)*Math.max(0,fade)*.7;
-  }
- }
- return buffer;
+ chords.forEach((chord,bar)=>chord.forEach(frequency=>{
+  const oscillator=offline.createOscillator(),gain=offline.createGain(),start=bar*4,end=Math.min(duration,start+4.5);
+  oscillator.frequency.value=frequency;oscillator.type='sine';
+  gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(.12,start+.6);
+  gain.gain.setValueAtTime(.12,Math.max(start+.6,end-.7));gain.gain.linearRampToValueAtTime(0,end);
+  oscillator.connect(gain);gain.connect(master);oscillator.start(start);oscillator.stop(end);
+ }));
+ return offline.startRendering();
 }
 async function start(id:string){
- stop();context??=new AudioContext();await context.resume();
- source=context.createBufferSource();source.buffer=score(context);source.loop=true;source.loopStart=0;source.loopEnd=36;
- source.connect(context.destination);source.start();active=id;notify();
+ stop();const ticket=generation;pending=id;notify();
+ try{
+  context??=new AudioContext();await context.resume();
+  scorePromise??=score(context);const buffer=await scorePromise;
+  // Closing the dialog or pressing mute cancels a pending start, too.
+  if(ticket!==generation||pending!==id)return;
+  const next=context.createBufferSource();next.buffer=buffer;next.loop=true;next.loopEnd=36;
+  next.connect(context.destination);next.start();source=next;active=id;pending='';notify();
+ }catch(error){if(ticket===generation){pending='';scorePromise=undefined;notify();throw error;}}
 }
 export default function ComicSoundButton({playing=true,iconOnly=false}:{playing?:boolean;iconOnly?:boolean}){
- const id=useId(),[enabled,setEnabled]=useState(false),[failure,setFailure]=useState('');
- useEffect(()=>{const update=(owner:string)=>setEnabled(owner===id);listeners.add(update);return()=>{listeners.delete(update);stop(id)}},[id]);
+ const id=useId(),[enabled,setEnabled]=useState(false),[busy,setBusy]=useState(false),[failure,setFailure]=useState('');
+ useEffect(()=>{const update=(owner:string,loading:string)=>{setEnabled(owner===id);setBusy(loading===id)};listeners.add(update);return()=>{listeners.delete(update);stop(id)}},[id]);
  useEffect(()=>{if(!playing)stop(id)},[playing,id]);
  async function toggle(){
-  setFailure('');if(enabled){stop(id);return}
+  setFailure('');if(enabled||busy){stop(id);return}
   try{await start(id)}catch{setFailure('Не удалось включить звук. Нажмите ещё раз.')}
  }
- return <button type="button" className={'comicSoundButton '+(iconOnly?'iconOnly':'')} aria-pressed={enabled} aria-label={enabled?'Выключить звук комикса':'Включить звук комикса'} title={failure||'Музыка · Плавный цикл 36 секунд'} onClick={()=>void toggle()}>{enabled?<Volume2 size={18}/>:<VolumeX size={18}/>} {!iconOnly&&<span>{enabled?'Звук включён':'Включить звук'}</span>}</button>;
+ const label=busy?'Отменить включение звука':enabled?'Выключить звук комикса':'Включить звук комикса';
+ return <button type="button" className={'comicSoundButton '+(iconOnly?'iconOnly':'')} aria-pressed={enabled} aria-busy={busy} aria-label={label} title={failure||label} onClick={()=>void toggle()}>{busy?<LoaderCircle size={18}/>:enabled?<Volume2 size={18}/>:<VolumeX size={18}/>} {!iconOnly&&<span>{busy?'Подготовка звука…':enabled?'Звук включён':'Включить звук'}</span>}</button>;
 }
