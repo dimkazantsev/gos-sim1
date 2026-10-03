@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="280" viewBox="0 0 256 280"><title>Медаль республики</title><defs><linearGradient id="g68" x2="1" y2="1"><stop stop-color="#f9dbdf"/><stop offset=".5" stop-color="#dd314c"/><stop offset="1" stop-color="#23466b"/></linearGradient></defs><path d="m65 181-18 90 38-17 22 22 19-87m65-8 18 90-38-17-22 22-19-87" fill="#dd314c" stroke="#fff" stroke-width="6"/><g fill="url(#g68)" stroke="#173253" stroke-width="5"><path d="m128 22 48 20 37 38 19 48-19 48-37 38-48 20-48-20-37-38-19-48 19-48 37-38Z"/></g><circle cx="128" cy="128" r="63" fill="#fffaf0" stroke="#fff1ae" stroke-width="6"/><circle cx="128" cy="52" r="5" transform="rotate(0.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="52" r="5" transform="rotate(32.72727272727273 128 128)" fill="#fff4b4"/><circle cx="128" cy="52" r="5" transform="rotate(65.45454545454545 128 128)" fill="#fff4b4"/><circle cx="128" cy="52" r="5" transform="rotate(98.18181818181819 128 128)" fill="#fff4b4"/><circle cx="128" cy="52" r="5" transform="rotate(130.9090909090909 128 128)" fill="#fff4b4"/><circle cx="128" cy="52" r="5" transform="rotate(163.63636363636363 128 128)" fill="#fff4b4"/><circle cx="128" cy="52" r="5" transform="rotate(196.36363636363637 128 128)" fill="#fff4b4"/><circle cx="128" cy="52" r="5" transform="rotate(229.0909090909091 128 128)" fill="#fff4b4"/><circle cx="128" cy="52" r="5" transform="rotate(261.8181818181818 128 128)" fill="#fff4b4"/><circle cx="128" cy="52" r="5" transform="rotate(294.54545454545456 128 128)" fill="#fff4b4"/><circle cx="128" cy="52" r="5" transform="rotate(327.27272727272725 128 128)" fill="#fff4b4"/><g fill="none" stroke="#dd314c" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><circle cx="106" cy="102" r="22"/><circle cx="160" cy="108" r="19"/><path d="M71 177v-21q0-28 35-28t35 28v21ZM144 136q44-1 44 35v6h-35"/></g><path d="M48 72q30-37 65-34" fill="none" stroke="#fff" stroke-width="8" opacity=".55" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<title>Партийный чемодан</title>
+<defs>
+ <linearGradient id="bg68" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b85161"/><stop offset=".46" stop-color="#5f3d8b"/><stop offset="1" stop-color="#150d20"/></linearGradient>
+ <radialGradient id="glow68"><stop stop-color="#b889e8" stop-opacity=".55"/><stop offset="1" stop-color="#b889e8" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="256" height="256" rx="12" fill="#0c1116"/>
+<rect x="5" y="5" width="246" height="246" rx="9" fill="url(#bg68)" stroke="#5f3d8b" stroke-width="3"/>
+<path d="M8 88 112 8h67L8 130Z" fill="#ffffff" opacity=".07"/>
+<circle cx="128" cy="128" r="92" fill="url(#glow68)" opacity=".48"/>
+<path d="M32 45h58M32 58h92M166 198h58M134 211h90" stroke="#b889e8" stroke-width="3" opacity=".3"/>
+<g fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".96"><path d="M65 181v-21q0-34 39-34t39 34v21Z"/><circle cx="104" cy="92" r="26"/><path d="M143 135q51 0 51 40v6h-39"/><circle cx="162" cy="101" r="22"/></g>
+<path d="M18 224h92" stroke="#b889e8" stroke-width="5" opacity=".76"/>
+<path d="M18 235h98" stroke="#ffffff" stroke-width="2" opacity=".34"/>
+<path d="M221 19h16v16" fill="none" stroke="#b889e8" stroke-width="3" opacity=".7"/>
+</svg>

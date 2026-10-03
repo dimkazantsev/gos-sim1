@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="280" viewBox="0 0 256 280"><title>Медаль республики</title><defs><linearGradient id="g70" x2="1" y2="1"><stop stop-color="#e8dbf9"/><stop offset=".5" stop-color="#7a31dd"/><stop offset="1" stop-color="#23466b"/></linearGradient></defs><path d="m65 181-18 90 38-17 22 22 19-87m65-8 18 90-38-17-22 22-19-87" fill="#7a31dd" stroke="#fff" stroke-width="6"/><g fill="url(#g70)" stroke="#173253" stroke-width="5"><path d="m128 27 81 39 21 90-56 70H82L26 156l21-90Z"/></g><circle cx="128" cy="128" r="54" fill="#fffaf0" stroke="#fff1ae" stroke-width="6"/><circle cx="128" cy="61" r="4" transform="rotate(0.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="4" transform="rotate(60.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="4" transform="rotate(120.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="4" transform="rotate(180.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="4" transform="rotate(240.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="4" transform="rotate(300.0 128 128)" fill="#fff4b4"/><g fill="none" stroke="#7a31dd" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><circle cx="128" cy="130" r="56"/><path d="M128 88v42l27 17M118 63h20M128 63v11"/></g><path d="M48 72q30-37 65-34" fill="none" stroke="#fff" stroke-width="8" opacity=".55" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<title>Разговор после заголовка</title>
+<defs>
+ <linearGradient id="bg70" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7d51b8"/><stop offset=".46" stop-color="#813747"/><stop offset="1" stop-color="#200c11"/></linearGradient>
+ <radialGradient id="glow70"><stop stop-color="#de6f83" stop-opacity=".55"/><stop offset="1" stop-color="#de6f83" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="256" height="256" rx="12" fill="#0c1116"/>
+<rect x="5" y="5" width="246" height="246" rx="9" fill="url(#bg70)" stroke="#813747" stroke-width="3"/>
+<path d="M8 102 112 8h67L8 130Z" fill="#ffffff" opacity=".07"/>
+<circle cx="128" cy="128" r="92" fill="url(#glow70)" opacity=".48"/>
+<path d="M38 210 128 28l90 182Z" fill="none" stroke="#813747" stroke-width="2" opacity=".28"/><path d="m78 210 50-101 50 101" fill="none" stroke="#de6f83" stroke-width="2" opacity=".2"/>
+<g fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".96"><rect x="60" y="72" width="136" height="119" rx="8"/><path d="M75 92h105M78 117h39v50H78ZM132 119h44M132 139h44M132 160h33"/></g>
+<path d="M18 224h92" stroke="#de6f83" stroke-width="5" opacity=".76"/>
+<path d="M18 235h124" stroke="#ffffff" stroke-width="2" opacity=".34"/>
+<path d="M221 19h16v16" fill="none" stroke="#de6f83" stroke-width="3" opacity=".7"/>
+</svg>

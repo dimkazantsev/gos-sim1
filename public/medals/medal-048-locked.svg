@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<title>Радио республики</title>
+<defs>
+ <linearGradient id="bg48" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#30383e"/><stop offset=".46" stop-color="#4e5961"/><stop offset="1" stop-color="#161b20"/></linearGradient>
+ <radialGradient id="glow48"><stop stop-color="#7b848b" stop-opacity=".55"/><stop offset="1" stop-color="#7b848b" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="256" height="256" rx="12" fill="#0c1116"/>
+<rect x="5" y="5" width="246" height="246" rx="9" fill="url(#bg48)" stroke="#4e5961" stroke-width="3"/>
+<path d="M8 88 112 8h67L8 130Z" fill="#9ba2a7" opacity=".07"/>
+<circle cx="128" cy="128" r="92" fill="url(#glow48)" opacity=".48"/>
+<circle cx="210" cy="42" r="54" fill="none" stroke="#4e5961" stroke-width="2" opacity=".34"/><circle cx="210" cy="42" r="35" fill="none" stroke="#7b848b" stroke-width="2" opacity=".25"/>
+<g fill="none" stroke="#9ba2a7" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".66"><path d="M66 113h35l39-31v93l-39-31H66Z"/><path d="M158 105q23 24 0 48M174 91q39 38 0 76"/></g>
+<path d="M18 224h92" stroke="#7b848b" stroke-width="5" opacity=".76"/>
+<path d="M18 235h46" stroke="#9ba2a7" stroke-width="2" opacity=".34"/>
+<path d="M221 19h16v16" fill="none" stroke="#7b848b" stroke-width="3" opacity=".7"/>
+</svg>

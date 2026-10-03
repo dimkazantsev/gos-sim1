@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="280" viewBox="0 0 256 280"><title>Медаль республики</title><defs><linearGradient id="g71" x2="1" y2="1"><stop stop-color="#f9f0db"/><stop offset=".5" stop-color="#ddad31"/><stop offset="1" stop-color="#23466b"/></linearGradient></defs><path d="m65 181-18 90 38-17 22 22 19-87m65-8 18 90-38-17-22 22-19-87" fill="#ddad31" stroke="#fff" stroke-width="6"/><g fill="url(#g71)" stroke="#173253" stroke-width="5"><path d="m128 22 48 20 37 38 19 48-19 48-37 38-48 20-48-20-37-38-19-48 19-48 37-38Z"/></g><circle cx="128" cy="128" r="57" fill="#fffaf0" stroke="#fff1ae" stroke-width="6"/><circle cx="128" cy="58" r="5" transform="rotate(0.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="5" transform="rotate(51.42857142857143 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="5" transform="rotate(102.85714285714286 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="5" transform="rotate(154.28571428571428 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="5" transform="rotate(205.71428571428572 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="5" transform="rotate(257.14285714285717 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="5" transform="rotate(308.57142857142856 128 128)" fill="#fff4b4"/><g fill="none" stroke="#ddad31" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M85 65h67l24 27v96H85Z"/><path d="M151 65v30h25M104 118h50M104 137h50M104 156h31"/></g><path d="M48 72q30-37 65-34" fill="none" stroke="#fff" stroke-width="8" opacity=".55" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<title>Тихий архивариус</title>
+<defs>
+ <linearGradient id="bg71" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b89b51"/><stop offset=".46" stop-color="#365991"/><stop offset="1" stop-color="#0b1324"/></linearGradient>
+ <radialGradient id="glow71"><stop stop-color="#7da6ff" stop-opacity=".55"/><stop offset="1" stop-color="#7da6ff" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="256" height="256" rx="12" fill="#0c1116"/>
+<rect x="5" y="5" width="246" height="246" rx="9" fill="url(#bg71)" stroke="#365991" stroke-width="3"/>
+<path d="M8 109 112 8h67L8 130Z" fill="#ffffff" opacity=".07"/>
+<circle cx="128" cy="128" r="92" fill="url(#glow71)" opacity=".48"/>
+<rect x="24" y="24" width="208" height="208" rx="42" fill="none" stroke="#365991" stroke-width="2" opacity=".2" transform="rotate(11 128 128)"/><rect x="45" y="45" width="166" height="166" rx="34" fill="none" stroke="#7da6ff" stroke-width="2" opacity=".18" transform="rotate(-9 128 128)"/>
+<g fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".96"><path d="M62 84h132v100H62Z"/><path d="M72 64h112v20M86 108h84M99 132h58"/><path d="M108 184v13h40v-13"/></g>
+<path d="M18 224h92" stroke="#7da6ff" stroke-width="5" opacity=".76"/>
+<path d="M18 235h137" stroke="#ffffff" stroke-width="2" opacity=".34"/>
+<path d="M221 19h16v16" fill="none" stroke="#7da6ff" stroke-width="3" opacity=".7"/>
+</svg>

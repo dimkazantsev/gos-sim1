@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="280" viewBox="0 0 256 280"><title>Медаль республики</title><defs><linearGradient id="g30" x2="1" y2="1"><stop stop-color="#dbf9f2"/><stop offset=".5" stop-color="#31ddb3"/><stop offset="1" stop-color="#23466b"/></linearGradient></defs><path d="m65 181-18 90 38-17 22 22 19-87m65-8 18 90-38-17-22 22-19-87" fill="#31ddb3" stroke="#fff" stroke-width="6"/><g fill="url(#g30)" stroke="#173253" stroke-width="5"><circle cx="128" cy="128" r="98"/></g><circle cx="128" cy="128" r="54" fill="#fffaf0" stroke="#fff1ae" stroke-width="6"/><circle cx="128" cy="61" r="3" transform="rotate(0.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="3" transform="rotate(45.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="3" transform="rotate(90.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="3" transform="rotate(135.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="3" transform="rotate(180.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="3" transform="rotate(225.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="3" transform="rotate(270.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="61" r="3" transform="rotate(315.0 128 128)" fill="#fff4b4"/><g fill="none" stroke="#31ddb3" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M73 127h110v64H73ZM80 141h96M103 77h51v53h-51Z"/><path d="m112 103 9 9 22-23"/></g><path d="M48 72q30-37 65-34" fill="none" stroke="#fff" stroke-width="8" opacity=".55" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<title>Мандатная ответственность</title>
+<defs>
+ <linearGradient id="bg30" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#51b89f"/><stop offset=".46" stop-color="#813747"/><stop offset="1" stop-color="#200c11"/></linearGradient>
+ <radialGradient id="glow30"><stop stop-color="#de6f83" stop-opacity=".55"/><stop offset="1" stop-color="#de6f83" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="256" height="256" rx="12" fill="#0c1116"/>
+<rect x="5" y="5" width="246" height="246" rx="9" fill="url(#bg30)" stroke="#813747" stroke-width="3"/>
+<path d="M8 102 112 8h67L8 130Z" fill="#ffffff" opacity=".07"/>
+<circle cx="128" cy="128" r="92" fill="url(#glow30)" opacity=".48"/>
+<circle cx="210" cy="42" r="54" fill="none" stroke="#813747" stroke-width="2" opacity=".34"/><circle cx="210" cy="42" r="35" fill="none" stroke="#de6f83" stroke-width="2" opacity=".25"/>
+<g fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".96"><path d="M68 122h120v71H68Z"/><path d="M82 139h92M99 64h58v63H99Z"/><path d="m111 96 11 11 26-29"/></g>
+<path d="M18 224h92" stroke="#de6f83" stroke-width="5" opacity=".76"/>
+<path d="M18 235h124" stroke="#ffffff" stroke-width="2" opacity=".34"/>
+<path d="M221 19h16v16" fill="none" stroke="#de6f83" stroke-width="3" opacity=".7"/>
+</svg>

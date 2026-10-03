@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<title>Публичность без громкоговорителя</title>
+<defs>
+ <linearGradient id="bg69" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#30383e"/><stop offset=".46" stop-color="#4e5961"/><stop offset="1" stop-color="#161b20"/></linearGradient>
+ <radialGradient id="glow69"><stop stop-color="#7b848b" stop-opacity=".55"/><stop offset="1" stop-color="#7b848b" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="256" height="256" rx="12" fill="#0c1116"/>
+<rect x="5" y="5" width="246" height="246" rx="9" fill="url(#bg69)" stroke="#4e5961" stroke-width="3"/>
+<path d="M8 95 112 8h67L8 130Z" fill="#9ba2a7" opacity=".07"/>
+<circle cx="128" cy="128" r="92" fill="url(#glow69)" opacity=".48"/>
+<circle cx="34" cy="34" r="2" fill="#4e5961" opacity=".26"/><circle cx="71" cy="95" r="3" fill="#4e5961" opacity=".26"/><circle cx="108" cy="156" r="4" fill="#4e5961" opacity=".26"/><circle cx="145" cy="217" r="2" fill="#4e5961" opacity=".26"/><circle cx="182" cy="88" r="3" fill="#4e5961" opacity=".26"/><circle cx="219" cy="149" r="4" fill="#4e5961" opacity=".26"/><circle cx="66" cy="210" r="2" fill="#4e5961" opacity=".26"/><circle cx="103" cy="81" r="3" fill="#4e5961" opacity=".26"/><circle cx="140" cy="142" r="4" fill="#4e5961" opacity=".26"/><circle cx="177" cy="203" r="2" fill="#4e5961" opacity=".26"/>
+<g fill="none" stroke="#9ba2a7" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".66"><rect x="60" y="72" width="136" height="119" rx="8"/><path d="M75 92h105M78 117h39v50H78ZM132 119h44M132 139h44M132 160h33"/></g>
+<path d="M18 224h92" stroke="#7b848b" stroke-width="5" opacity=".76"/>
+<path d="M18 235h111" stroke="#9ba2a7" stroke-width="2" opacity=".34"/>
+<path d="M221 19h16v16" fill="none" stroke="#7b848b" stroke-width="3" opacity=".7"/>
+</svg>

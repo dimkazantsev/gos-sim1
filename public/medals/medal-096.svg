@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="280" viewBox="0 0 256 280"><title>Медаль республики</title><defs><linearGradient id="g96" x2="1" y2="1"><stop stop-color="#dbdbf9"/><stop offset=".5" stop-color="#3331dd"/><stop offset="1" stop-color="#23466b"/></linearGradient></defs><path d="m65 181-18 90 38-17 22 22 19-87m65-8 18 90-38-17-22 22-19-87" fill="#3331dd" stroke="#fff" stroke-width="6"/><g fill="url(#g96)" stroke="#173253" stroke-width="5"><circle cx="128" cy="128" r="98"/></g><circle cx="128" cy="128" r="57" fill="#fffaf0" stroke="#fff1ae" stroke-width="6"/><circle cx="128" cy="58" r="3" transform="rotate(0.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="3" transform="rotate(32.72727272727273 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="3" transform="rotate(65.45454545454545 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="3" transform="rotate(98.18181818181819 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="3" transform="rotate(130.9090909090909 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="3" transform="rotate(163.63636363636363 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="3" transform="rotate(196.36363636363637 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="3" transform="rotate(229.0909090909091 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="3" transform="rotate(261.8181818181818 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="3" transform="rotate(294.54545454545456 128 128)" fill="#fff4b4"/><circle cx="128" cy="58" r="3" transform="rotate(327.27272727272725 128 128)" fill="#fff4b4"/><g fill="none" stroke="#3331dd" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="m67 98 37-18 41 16 46-15v89l-46 19-41-16-37 15ZM104 80v93M145 96v93"/><circle cx="149" cy="127" r="12"/></g><path d="M48 72q30-37 65-34" fill="none" stroke="#fff" stroke-width="8" opacity=".55" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<title>Регион слышен</title>
+<defs>
+ <linearGradient id="bg96" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5351b8"/><stop offset=".46" stop-color="#8a4a1d"/><stop offset="1" stop-color="#211108"/></linearGradient>
+ <radialGradient id="glow96"><stop stop-color="#e29455" stop-opacity=".55"/><stop offset="1" stop-color="#e29455" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="256" height="256" rx="12" fill="#0c1116"/>
+<rect x="5" y="5" width="246" height="246" rx="9" fill="url(#bg96)" stroke="#8a4a1d" stroke-width="3"/>
+<path d="M8 88 112 8h67L8 130Z" fill="#ffffff" opacity=".07"/>
+<circle cx="128" cy="128" r="92" fill="url(#glow96)" opacity=".48"/>
+<circle cx="210" cy="42" r="54" fill="none" stroke="#8a4a1d" stroke-width="2" opacity=".34"/><circle cx="210" cy="42" r="35" fill="none" stroke="#e29455" stroke-width="2" opacity=".25"/>
+<g fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".96"><path d="m57 85 46-22 48 20 48-20v112l-48 20-48-20-46 22Z"/><path d="M103 63v112M151 83v112"/><circle cx="153" cy="122" r="12"/></g>
+<path d="M18 224h92" stroke="#e29455" stroke-width="5" opacity=".76"/>
+<path d="M18 235h46" stroke="#ffffff" stroke-width="2" opacity=".34"/>
+<path d="M221 19h16v16" fill="none" stroke="#e29455" stroke-width="3" opacity=".7"/>
+</svg>

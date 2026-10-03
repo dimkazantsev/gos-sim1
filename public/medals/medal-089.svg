@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="280" viewBox="0 0 256 280"><title>Медаль республики</title><defs><linearGradient id="g89" x2="1" y2="1"><stop stop-color="#f9dbdc"/><stop offset=".5" stop-color="#dd3136"/><stop offset="1" stop-color="#23466b"/></linearGradient></defs><path d="m65 181-18 90 38-17 22 22 19-87m65-8 18 90-38-17-22 22-19-87" fill="#dd3136" stroke="#fff" stroke-width="6"/><g fill="url(#g89)" stroke="#173253" stroke-width="5"><path d="m128 22 48 20 37 38 19 48-19 48-37 38-48 20-48-20-37-38-19-48 19-48 37-38Z"/></g><circle cx="128" cy="128" r="66" fill="#fffaf0" stroke="#fff1ae" stroke-width="6"/><circle cx="128" cy="49" r="5" transform="rotate(0.0 128 128)" fill="#fff4b4"/><circle cx="128" cy="49" r="5" transform="rotate(32.72727272727273 128 128)" fill="#fff4b4"/><circle cx="128" cy="49" r="5" transform="rotate(65.45454545454545 128 128)" fill="#fff4b4"/><circle cx="128" cy="49" r="5" transform="rotate(98.18181818181819 128 128)" fill="#fff4b4"/><circle cx="128" cy="49" r="5" transform="rotate(130.9090909090909 128 128)" fill="#fff4b4"/><circle cx="128" cy="49" r="5" transform="rotate(163.63636363636363 128 128)" fill="#fff4b4"/><circle cx="128" cy="49" r="5" transform="rotate(196.36363636363637 128 128)" fill="#fff4b4"/><circle cx="128" cy="49" r="5" transform="rotate(229.0909090909091 128 128)" fill="#fff4b4"/><circle cx="128" cy="49" r="5" transform="rotate(261.8181818181818 128 128)" fill="#fff4b4"/><circle cx="128" cy="49" r="5" transform="rotate(294.54545454545456 128 128)" fill="#fff4b4"/><circle cx="128" cy="49" r="5" transform="rotate(327.27272727272725 128 128)" fill="#fff4b4"/><g fill="none" stroke="#dd3136" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="m128 63 20 42 46 7-34 33 8 48-40-23-40 23 8-48-34-33 46-7Z"/></g><path d="M48 72q30-37 65-34" fill="none" stroke="#fff" stroke-width="8" opacity=".55" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<title>Фабрика норм</title>
+<defs>
+ <linearGradient id="bg89" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b85154"/><stop offset=".46" stop-color="#1b5b7f"/><stop offset="1" stop-color="#08141e"/></linearGradient>
+ <radialGradient id="glow89"><stop stop-color="#66c0f4" stop-opacity=".55"/><stop offset="1" stop-color="#66c0f4" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="256" height="256" rx="12" fill="#0c1116"/>
+<rect x="5" y="5" width="246" height="246" rx="9" fill="url(#bg89)" stroke="#1b5b7f" stroke-width="3"/>
+<path d="M8 95 112 8h67L8 130Z" fill="#ffffff" opacity=".07"/>
+<circle cx="128" cy="128" r="92" fill="url(#glow89)" opacity=".48"/>
+<rect x="24" y="24" width="208" height="208" rx="42" fill="none" stroke="#1b5b7f" stroke-width="2" opacity=".2" transform="rotate(11 128 128)"/><rect x="45" y="45" width="166" height="166" rx="34" fill="none" stroke="#66c0f4" stroke-width="2" opacity=".18" transform="rotate(-9 128 128)"/>
+<g fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".96"><path d="M128 55v119M84 83h88M84 83l-29 50h58ZM172 83l-29 50h58ZM92 188h72"/><circle cx="128" cy="55" r="9"/></g>
+<path d="M18 224h92" stroke="#66c0f4" stroke-width="5" opacity=".76"/>
+<path d="M18 235h59" stroke="#ffffff" stroke-width="2" opacity=".34"/>
+<path d="M221 19h16v16" fill="none" stroke="#66c0f4" stroke-width="3" opacity=".7"/>
+</svg>
