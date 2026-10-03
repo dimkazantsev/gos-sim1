@@ -55,3 +55,30 @@
 }
 @media(max-width:420px){.awardShelfTabs{grid-template-columns:1fr!important}}
 @media(prefers-reduced-motion:reduce){.awardItem,.steamAchievementToast{transition:none!important;animation:none!important}}
+
+
+/* 2026-10-03 exact emblem correction from the supplied Steam reference:
+   black miniature art, steel inner frame, warm-gold unlocked halo. */
+.achievementMedal{
+ border:1px solid #586168!important;
+ border-radius:2px!important;
+ background:#07090a!important;
+ box-shadow:0 1px 4px #000b!important;
+}
+.achievementMedal.is-earned{
+ border-color:#caa14e!important;
+ box-shadow:
+  0 0 0 1px #6e572a,
+  0 0 7px #d99d2d99,
+  0 0 14px #c8841f42,
+  0 1px 5px #000c!important;
+}
+.achievementMedal.is-locked{
+ border-color:#343c42!important;
+ box-shadow:0 1px 4px #000a!important;
+}
+.awardItem.earned .achievementMedal,
+.teacherAwardGrid article:not(.is-hidden) .achievementMedal.is-earned{
+ filter:saturate(1.03) contrast(1.03);
+}
+.awardItem.unearned .achievementMedal img{opacity:.82}
