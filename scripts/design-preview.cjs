@@ -86,6 +86,10 @@ fixture.impactLedger=[
 ];
 fixture.availableActors=()=>[{key:'participant',label:'Участник'},{key:'gd',label:'Государственная Дума'}];fixture.canVote=()=>false;fixture.ballotWeight=()=>0;
 fixture.tally=()=>({yes:245,no:70,abstain:30});fixture.quorum=()=>({cast:345,present:345,eligible:450,needed:226,met:true});
+const {newBudgetDraft,defaultSimulatorState,calculateFederalBudget}=require('../components/game/federalBudgetMath');
+const previewBudget=calculateFederalBudget(newBudgetDraft(),defaultSimulatorState(null,[]),null,[],[],[]);
+Object.assign(fixture.metrics.find(m=>m.metric_key==='budget'),{label:'Доходы бюджета',value:previewBudget.revenue,previous_value:previewBudget.revenue,unit:'млн ₽',min_value:null,max_value:null});
+fixture.budgetPulse={game_id:fixture.game.id,mode:'baseline',plan_id:null,document_id:null,plan_revision:null,note:'Условный прогноз для проверки интерфейса.',calculation:previewBudget,as_of:now,history:[]};fixture.budgetPulseError='';
 const g=new Proxy(fixture,{get:(target,key)=>key in target?target[key]:noop});
 Object.assign(fixture,{profilesLoaded:true,introAccountSeen:true,chatMediaError:'',chatMediaPhase:'idle'});
 fixture.profiles=fixture.members.map(m=>({game_id:'design-preview',user_id:m.user_id,onboarding_completed_at:now,intro_seen_at:now,bio:'Участник учебной симуляции.',avatar_path:null,signature_path:null}));

@@ -1,5 +1,5 @@
 'use client';
-import {useMemo,useState} from 'react';
+import {useState} from 'react';
 import {Award,Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
 import ClassroomJournal from './ClassroomJournal';
 import ParticipantsAnalytics from './ParticipantsAnalytics';
@@ -11,6 +11,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
 import TeacherAwards from './TeacherAwards';
+import TeacherOverview from './TeacherOverview';
 import {useSavedGameState,savedChoice} from './useSavedGameState';
 import {useHorizontalWheel} from './useHorizontalWheel';
 
@@ -33,18 +34,17 @@ const WORKSPACES=[
  {key:'awards',title:'Награды',icon:Award}
 ] as const;
 
-export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void}){
+export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat,onNavigate}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void;onNavigate?:(destination:'documents'|'votes'|'budget'|'actions')=>void}){
  const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,formalDocuments,votes,ballots,evaluations,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
  const navigationRef=useHorizontalWheel(game?.id);
 
- const studentIds=useMemo(()=>new Set(members.filter(m=>m.kind!=='teacher').map(m=>m.user_id)),[members]);
- const studentActivities=useMemo(()=>activities.filter(a=>studentIds.has(a.actor_id)),[activities,studentIds]);
+
 
 
  if(!game)return null;
- const onlineCount=members.filter(m=>m.kind==='student'&&presence.some(p=>p.user_id===m.user_id&&Date.now()-new Date(p.last_seen_at).getTime()<90000)).length;
+
 
 
  function confirmNext(){if(window.confirm('Перейти к следующему этапу? Проверьте индикатор процедурной готовности выше: переход остаётся ручным и может быть выполнен даже при незавершённых процедурах.'))void nextStage()}
@@ -108,14 +108,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    </div>
   </section>
    <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
-    {workspace==='overview'&&<>
-     <div className="teacherOverviewStats">
-      <article><small>В ИГРЕ СЕЙЧАС</small><strong>{onlineCount}</strong><span>из {members.filter(m=>m.kind==='student').length} студентов онлайн</span></article>
-      <article><small>ОТКРЫТЫЕ ГОЛОСОВАНИЯ</small><strong>{votes.filter(v=>v.status==='open').length}</strong><span>{votes.some(v=>v.status==='open')?'процедуры сейчас открыты':'открытых процедур нет'}</span></article>
-      <article><small>АКТИВНОСТЬ</small><strong>{studentActivities.length}</strong><span>событий в загруженной ленте</span></article>
-      <article><small>ГОТОВНОСТЬ</small><strong>{g.stages.filter(s=>s.status==='completed').length}/{g.stages.length}</strong><span>этапов завершено</span></article>
-     </div>
-    </>}
+    {workspace==='overview'&&<TeacherOverview g={g} onWorkspace={setWorkspace} onNavigate={onNavigate||(()=>onOpenProcesses())}/>}
 
     {workspace==='stages'&&<TeacherStageManager g={g} onOpenStage={onOpenStages}/>}
     {workspace==='journal'&&<ClassroomJournal g={g}/>}

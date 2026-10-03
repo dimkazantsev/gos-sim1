@@ -1,5 +1,6 @@
 'use client';
 import {userError} from '@/lib/userError';
+import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
 import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
@@ -41,23 +42,10 @@ export function useRepublicGame(gameId:string){
  const myEvaluations=useMemo(()=>evaluations.filter(e=>e.user_id===me?.user_id),[evaluations,me?.user_id]);
  const averageVsn=myEvaluations.length?myEvaluations.reduce((a,b)=>a+b.score,0)/myEvaluations.length:0;
 
- // Synchronize an existing simulator while the group works in documents or events.
- // Opening another section must not pause delivery or the application of a published budget.
- const budgetSyncBusy=useRef(false);
- async function syncBudget(){
-  if(budgetSyncBusy.current)return;budgetSyncBusy.current=true;
-  try{
-   const marker=await supabase.from('budget_simulator_state').select('game_id').eq('game_id',gameId).maybeSingle();
-   if(marker.data&&activeGameRef.current===gameId){const r=await supabase.rpc('get_budget_simulator',{p_game_id:gameId});if(r.error&&activeGameRef.current===gameId)setError(r.error);}
-  }catch(e){if(activeGameRef.current===gameId)setError(e);}
-  finally{budgetSyncBusy.current=false;}
- }
- useEffect(()=>{
-  if(!me||me.kind==='observer')return;
-  void syncBudget();const timer=setInterval(()=>{if(document.visibilityState==='visible')void syncBudget();},30000);
-  const resume=()=>{if(document.visibilityState==='visible')void syncBudget();};document.addEventListener('visibilitychange',resume);
-  return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',resume);};
- },[gameId,me?.user_id,me?.kind]);
+ const {budgetPulse,budgetPulseError,refreshBudgetPulse}=useBudgetPulse(gameId,!!me&&me.game_id===gameId);
+ const sharedMetrics=useMemo(()=>withBudgetIncome(metrics,budgetPulse),[metrics,budgetPulse]);
+ const sharedMetricHistory=useMemo(()=>budgetPulse?[...metricHistory.filter(h=>h.metric_key!=='budget'),...budgetPulse.history]:metricHistory,[metricHistory,budgetPulse]);
+ async function syncBudget(){await refreshBudgetPulse();}
 
  useEffect(()=>{
   setProfileGameId('');
@@ -337,7 +325,7 @@ export function useRepublicGame(gameId:string){
    return true;
   }catch(e){setChatPins(original);setError(e instanceof Error?e.message:'Не удалось изменить закрепление');return false}
  }
- async function refresh(){await loadAll(false);if(channelRef.current)await loadMessages(channelRef.current)}
+ async function refresh(){await Promise.all([loadAll(false),refreshBudgetPulse()]);if(channelRef.current)await loadMessages(channelRef.current)}
 
  async function logActivity(eventType:string,label:string,viewKey?:string,payload:Record<string,unknown>={}){
   const u=(await supabase.auth.getUser()).data.user;if(!u)return;
@@ -462,7 +450,7 @@ export function useRepublicGame(gameId:string){
  }
  async function updateMetric(id:string,value:number,note?:string){
   if(!teacher)return;const r=await supabase.rpc('set_state_metric',{p_metric_id:id,p_value:value,p_note:note||null});
-  if(r.error)setError(r.error.message);else await loadPoliticalWall();
+  if(r.error)setError(r.error.message);else await Promise.all([loadPoliticalWall(),refreshBudgetPulse()]);
  }
  async function updateImpactRule(ruleId:string,enabled:boolean,autoApply:boolean,effects:Record<string,unknown>,description?:string){
   const r=await supabase.rpc('update_impact_rule',{p_rule_id:ruleId,p_enabled:enabled,p_auto_apply:autoApply,p_effects:effects,p_description:description||null});
@@ -470,7 +458,7 @@ export function useRepublicGame(gameId:string){
  }
  async function revertImpactEntry(id:number){
   const r=await supabase.rpc('revert_impact_entry',{p_ledger_id:id});
-  if(r.error){setError(r.error.message);return false}await Promise.all([loadImpactEngine(),loadPoliticalWall()]);return true;
+  if(r.error){setError(r.error.message);return false}await Promise.all([loadImpactEngine(),loadPoliticalWall(),refreshBudgetPulse()]);return true;
  }
  async function createParty(name:string,ideology:string){
   if(!teacher||!me||!name.trim())return false;const n=name.trim();const colors=['#6f7cff','#4dc9ff','#55d99b','#ff8d72','#c77dff'];
@@ -932,6 +920,6 @@ export function useRepublicGame(gameId:string){
   finally{mediaOperationRef.current=false;setRecordingSaving(false)}
  }
 
- return {game,me,metrics,events,members,officeAssignments,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
+ return {game,me,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,events,members,officeAssignments,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
   refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }

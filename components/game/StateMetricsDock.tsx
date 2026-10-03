@@ -58,7 +58,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const primary=PRIMARY.map(k=>allowed.find(m=>m.metric_key===k)).filter(Boolean) as Metric[];
  const secondary=allowed.filter(m=>!PRIMARY.includes(m.metric_key));
  const visibleMetrics=[...primary,...secondary];
- const chosen=allowed.find(m=>m.id===selected);
+ const chosen=allowed.find(m=>m.id===selected&&(m.metric_key!=='budget'||g.budgetPulse));
  useEffect(()=>{
   if(!chosen||!plotRef.current)return;
   const node=plotRef.current;
@@ -72,7 +72,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
 
  function rowsFor(metricKey:string){return metricHistory.filter(h=>h.metric_key===metricKey)}
  const hist=chosen?rowsFor(chosen.metric_key).sort((a,b)=>Date.parse(a.recorded_at)-Date.parse(b.recorded_at)):[];
- const comparisonOptions=visibleMetrics.filter(m=>m.id!==chosen?.id);
+ const comparisonOptions=visibleMetrics.filter(m=>m.id!==chosen?.id&&(m.metric_key!=='budget'||g.budgetPulse));
  const activeMetrics=chosen?[chosen,...comparisonOptions.filter(m=>compare.includes(m.id))]:[];
  const comparisonLimitReached=activeMetrics.length>=MAX_CHART_SERIES;
  const snapshotAt=useMemo(()=>Date.now(),[selected]);
@@ -86,7 +86,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const singlePoint=geometry.lines.length===1&&chosenPoints.length===1;
  const activePoint=series.flatMap(s=>s.points.map(point=>({...point,metric:s.metric,color:s.color}))).find(p=>focusedPoint?.id===p.metric.id&&focusedPoint.at===p.at)
   ||(series[0]&&chosenPoints.length?{...chosenPoints[chosenPoints.length-1],metric:series[0].metric,color:series[0].color}:null);
- const formatValue=(v:number,unit:string|null)=>v.toLocaleString('ru-RU',{maximumFractionDigits:2})+(unit||'');
+ const formatValue=(v:number,unit:string|null)=>metricQuantity(v,unit,unit?.startsWith('млн')?'budget':undefined);
  const formatTime=(timestamp:number)=>new Date(timestamp).toLocaleString('ru-RU',{
   day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'
  });
@@ -96,14 +96,15 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
 
  function card(m:Metric){
   const d=delta(m);
+  const pending=m.metric_key==='budget'&&!g.budgetPulse;
   const rows=rowsFor(m.metric_key);
   const mini=rows.slice(-12).map(h=>Number(h.value));
   const last=rows.at(-1);
   const pct=m.max_value!=null&&m.min_value!=null?Math.max(0,Math.min(100,(Number(m.value)-Number(m.min_value))/Math.max(1,Number(m.max_value)-Number(m.min_value))*100)):null;
-  return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} onClick={()=>{setCompare([]);setBucket('changes');setFocusedPoint(null);setShowFullHistory(false);setSelected(m.id)}}>
+  return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} data-budget-metric-value={m.metric_key==='budget'&&!pending?m.value:undefined} disabled={pending} onClick={()=>{setCompare([]);setBucket('changes');setFocusedPoint(null);setShowFullHistory(false);setSelected(m.id)}}>
    <span className="statePulseIcon" aria-hidden="true">{metricIcon(m.metric_key)}</span>
-   <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.label}</b><span>{last?.note||m.description||'Игровой показатель'}</span></div>
-   <div className="statePulseValue"><strong>{metricQuantity(Number(m.value),m.unit,m.metric_key)}</strong><em className={changeTone(m,d)}>{d===0?'—':`${d>0?'▲ +':'▼ '}${Math.abs(d).toFixed(Math.abs(d)%1?1:0)}`}</em></div>
+   <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.metric_key==='budget'?'Доходы бюджета':m.label}</b><span>{pending?(g.budgetPulseError||'Получаем общий федеральный прогноз…'):last?.note||m.description||'Игровой показатель'}</span></div>
+   <div className="statePulseValue"><strong>{pending?'…':metricQuantity(Number(m.value),m.unit,m.metric_key)}</strong><em className={changeTone(m,d)}>{pending||d===0?'—':`${d>0?'▲ +':'▼ '}${m.metric_key==='budget'?metricQuantity(Math.abs(d),m.unit,m.metric_key):Math.abs(d).toFixed(Math.abs(d)%1?1:0)}`}</em></div>
    <div className="statePulseTrend">
     {mini.length>1&&<svg viewBox="0 0 120 32" aria-hidden="true"><path d={spark(mini,120,32)} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"/></svg>}
     {pct!=null&&<i><span style={{width:pct+'%'}}/></i>}
@@ -120,7 +121,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
    <section ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="metric-title" className="metricModal redesigned" onClick={e=>e.stopPropagation()}>
     <header><div className="metricModalTitle"><span>{metricIcon(chosen.metric_key)}</span><div><small>{groupLabel(chosen.group_key).toUpperCase()}</small><h2 id="metric-title">{chosen.label}</h2><p>{chosen.description||'Игровой показатель состояния государства.'}</p></div></div><IconAction onClick={()=>setSelected('')} label="Закрыть показатель"/></header>
     <div className="metricModalBody">
-    <div className="metricHeroValue"><strong>{metricQuantity(Number(chosen.value),chosen.unit,chosen.metric_key)}</strong><span className={changeTone(chosen,delta(chosen))}>{delta(chosen)===0?'Без изменений':(delta(chosen)>0?'▲ +':'▼ ')+Math.abs(delta(chosen)).toFixed(1)+' с прошлого изменения'}</span></div>
+    <div className="metricHeroValue"><strong>{metricQuantity(Number(chosen.value),chosen.unit,chosen.metric_key)}</strong><span className={changeTone(chosen,delta(chosen))}>{delta(chosen)===0?'Без изменений':(delta(chosen)>0?'▲ +':'▼ ')+(chosen.metric_key==='budget'?metricQuantity(Math.abs(delta(chosen)),chosen.unit,'budget'):Math.abs(delta(chosen)).toFixed(1))+' с прошлого изменения'}</span></div>
     {hist.at(-1)&&<div className="metricLastCause"><small>ПОСЛЕДНЯЯ ПРИЧИНА</small><b>{hist.at(-1)?.note||hist.at(-1)?.source_type}</b><span>{new Date(hist.at(-1)!.recorded_at).toLocaleString('ru-RU')}</span></div>}
     <div className="metricBucketTabs"><button className={bucket==='changes'?'active':''} aria-pressed={bucket==='changes'} onClick={()=>{setFocusedPoint(null);setBucket('changes')}}>Все изменения</button><button className={bucket==='day'?'active':''} aria-pressed={bucket==='day'} onClick={()=>{setFocusedPoint(null);setBucket('day')}}>По дням</button><button className={bucket==='week'?'active':''} aria-pressed={bucket==='week'} onClick={()=>{setFocusedPoint(null);setBucket('week')}}>По неделям</button></div>
     <section className="metricChart redesignedChart" aria-label="График динамики показателей">
