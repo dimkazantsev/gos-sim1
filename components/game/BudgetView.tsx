@@ -19,7 +19,7 @@ type Case={id:string;title:string;comic_scene:{region_code?:string};status:strin
 function mapViewport(mode:string,code:string){if(mode==='all')return '0 0 1040 600';if(mode==='west')return '15 145 420 435';const p=mapData.paths.find(p=>p.code===code);if(!p)return '0 0 1040 600';const pairs=[...p.path.matchAll(/[ML](-?[\d.]+),(-?[\d.]+)/g)].map(x=>[Number(x[1]),Number(x[2])]);if(!pairs.length)return '0 0 1040 600';const xs=pairs.map(x=>x[0]),ys=pairs.map(x=>x[1]),w=Math.max(45,Math.max(...xs)-Math.min(...xs)+24),h=Math.max(45,Math.max(...ys)-Math.min(...ys)+24);return [Math.min(...xs)-12,Math.min(...ys)-12,w,h].join(' ')}
 const money=(n:number|null)=>n===null?'—':new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(n);
 const profileLabel:Record<string,string>={metropolis:'Городская экономика',resources:'Добывающий сектор',agriculture:'Агропромышленный сектор',northern:'Высокая стоимость инфраструктуры',tourism:'Туризм и услуги',industrial:'Промышленность и услуги'};
-export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents,onOpenStage}:{g:ReturnTypeRepublic;readOnly?:boolean;onOpenDocument:(id:string)=>void;onOpenEvents:()=>void;onOpenStage?:(stageNo:number)=>void}){
+export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents,onOpenStage,onOpenVotes}:{g:ReturnTypeRepublic;readOnly?:boolean;onOpenDocument:(id:string)=>void;onOpenEvents:()=>void;onOpenVotes?:(id:string)=>void;onOpenStage?:(stageNo:number)=>void}){
  const [regions,setRegions]=useState<FiscalRegion[]>([]),[rates,setRates]=useState<FiscalRate[]>([]),[proposals,setProposals]=useState<Proposal[]>([]),[ledger,setLedger]=useState<Change[]>([]);
  const [context,setContext]=useState<FiscalContext|null>(null);
  const [plans,setPlans]=useState<LegalPlan[]>([]),[programs,setPrograms]=useState<ApprovedProgram[]>([]);
@@ -67,7 +67,7 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  <header className="budgetHero"><div><small>ФЕДЕРАЦИЯ · РЕГИОНЫ · МУНИЦИПАЛИТЕТЫ</small><h1>Бюджет</h1><p>Рассчитайте доходы и расходы, выберите источники покрытия дефицита и подготовьте проект бюджета для принятия через реестр НПА.</p></div><button type="button" className="secondary" onClick={()=>void load()} disabled={busy}><RefreshCw size={18}/> Обновить данные</button></header>
  
  {!ready?<p role="status">Загружаем общую бюджетную модель…</p>:<>
- <FederalBudgetSimulator g={g} context={context} regions={regions} rates={rates} readOnly={readOnly} onOpenDocument={onOpenDocument} onOpenEvents={onOpenEvents} onSaved={load}/>
+ <FederalBudgetSimulator g={g} context={context} regions={regions} rates={rates} readOnly={readOnly} onOpenDocument={onOpenDocument} onOpenEvents={onOpenEvents} onOpenVotes={onOpenVotes} onSaved={load}/>
  <details className="surface budgetMethod"><summary><Landmark size={18}/> Региональные и местные бюджеты · учебный прогноз</summary>
  <div className="budgetKpis budgetLevelCards">{[
  {label:'Региональные бюджеты',revenue:total.revenue,low:total.revenueLow,high:total.revenueHigh,expense:total.expenditure,note:'Самостоятельные региональные сценарии; не складываются с федеральным расчетом.'},
