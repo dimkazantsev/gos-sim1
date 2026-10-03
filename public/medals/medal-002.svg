@@ -1,18 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
 <title>Проект на стол</title>
-<defs>
- <filter id="gold2" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 .77  0 1 0 0 .48  0 0 1 0 .10  0 0 0 .65 0"/></filter>
- <linearGradient id="steel2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aeb4b8"/><stop offset=".18" stop-color="#343b40"/><stop offset=".56" stop-color="#777f84"/><stop offset="1" stop-color="#20262a"/></linearGradient>
- <radialGradient id="v2"><stop stop-color="#171b1e"/><stop offset=".68" stop-color="#090b0d"/><stop offset="1" stop-color="#040506"/></radialGradient>
-</defs>
-<rect x="8" y="8" width="240" height="240" rx="5" fill="none" stroke="#d0a64f" stroke-width="6" filter="url(#gold2)" opacity=".88"/>
-<rect x="7" y="7" width="242" height="242" rx="5" fill="#07090a" stroke="#d0a64f" stroke-width="5"/>
-<rect x="13" y="13" width="230" height="230" rx="3" fill="url(#v2)" stroke="url(#steel2)" stroke-width="4"/>
-<rect x="18" y="18" width="220" height="220" rx="2" fill="none" stroke="#727a80" stroke-width="2" opacity=".75"/>
-<path d="M19 19h70L19 89Z" fill="#ffffff" opacity=".06"/>
-<path d="m128 21 41 54 67 19-43 51 5 69-70-26-70 26 5-69-43-51 67-19Z" fill="#6f1820" opacity=".7"/>
-<circle cx="89" cy="120" r="3" fill="#d8dde0" opacity=".24"/><circle cx="136" cy="151" r="1" fill="#d8dde0" opacity=".24"/><circle cx="183" cy="182" r="2" fill="#d8dde0" opacity=".24"/><circle cx="40" cy="213" r="3" fill="#d8dde0" opacity=".24"/><circle cx="87" cy="60" r="1" fill="#d8dde0" opacity=".24"/>
-<g transform="translate(8.96 8.96) scale(0.930) rotate(0 128 128)" fill="none" stroke="#e7e8e8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".98"><path d="M128 55v120M84 83h88M84 83l-29 50h58ZM172 83l-29 50h58ZM91 188h74"/><circle cx="128" cy="55" r="9"/></g>
-<path d="M26 219h90" stroke="#a4252f" stroke-width="5" opacity=".8"/>
-<path d="M26 229h62" stroke="#e7e8e8" stroke-width="2" opacity=".28"/>
+<rect x="14" y="14" width="228" height="228" rx="22" fill="#F4F0FF"/><path d="M44 20v216M20 44h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M76 20v216M20 76h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M108 20v216M20 108h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M140 20v216M20 140h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M172 20v216M20 172h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M204 20v216M20 204h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M236 20v216M20 236h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M26 211 207 35" stroke="#F3A8CF" stroke-width="18" opacity=".12"/>
+<circle cx="62" cy="57" r="5" fill="#F3A8CF" opacity=".85"/><path d="M197 57h24" stroke="#172447" stroke-width="3" opacity=".34"/><path d="M62 204h57" stroke="#F3A8CF" stroke-width="4" opacity=".45"/>
+<g transform="translate(26.88 26.88) scale(0.790) rotate(-2 128 128)"
+ fill="none" stroke="#172447" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M128 45v137M80 79h96M80 79l-32 58h64ZM176 79l-32 58h64ZM87 202h82"/><circle cx="128" cy="45" r="10"/></g>
+<path d="M185 202h34M202 185v34" stroke="#F3A8CF" stroke-width="6" stroke-linecap="round"/>
+<path d="M29 229h38" stroke="#F3A8CF" stroke-width="7" stroke-linecap="round"/>
+<path d="M75 229h60" stroke="#172447" stroke-width="3" opacity=".22" stroke-linecap="round"/>
 </svg>

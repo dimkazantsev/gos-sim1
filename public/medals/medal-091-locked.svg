@@ -1,18 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
 <title>Республика не за один вечер</title>
-<defs>
- <filter id="gold91" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 .77  0 1 0 0 .48  0 0 1 0 .10  0 0 0 0 0"/></filter>
- <linearGradient id="steel91" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aeb4b8"/><stop offset=".18" stop-color="#343b40"/><stop offset=".56" stop-color="#777f84"/><stop offset="1" stop-color="#20262a"/></linearGradient>
- <radialGradient id="v91"><stop stop-color="#171b1e"/><stop offset=".68" stop-color="#090b0d"/><stop offset="1" stop-color="#040506"/></radialGradient>
-</defs>
-<rect x="8" y="8" width="240" height="240" rx="5" fill="none" stroke="#30363b" stroke-width="6" filter="url(#gold91)" opacity="0"/>
-<rect x="7" y="7" width="242" height="242" rx="5" fill="#07090a" stroke="#30363b" stroke-width="5"/>
-<rect x="13" y="13" width="230" height="230" rx="3" fill="url(#v91)" stroke="url(#steel91)" stroke-width="4"/>
-<rect x="18" y="18" width="220" height="220" rx="2" fill="none" stroke="#485057" stroke-width="2" opacity=".75"/>
-<path d="M19 19h70L19 89Z" fill="#ffffff" opacity=".025"/>
-<path d="M21 187 187 21h48L69 235H21Z" fill="#373b3e" opacity=".74"/>
-<circle cx="200" cy="83" r="2" fill="#454b50" opacity=".24"/><circle cx="57" cy="114" r="3" fill="#454b50" opacity=".24"/><circle cx="104" cy="145" r="1" fill="#454b50" opacity=".24"/><circle cx="151" cy="176" r="2" fill="#454b50" opacity=".24"/><circle cx="198" cy="207" r="3" fill="#454b50" opacity=".24"/>
-<g transform="translate(5.76 5.76) scale(0.955) rotate(-3 128 128)" fill="none" stroke="#777d82" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".74"><path d="m128 55 21 44 49 7-35 34 8 49-43-24-43 24 8-49-35-34 49-7Z"/></g>
-<path d="M26 219h54" stroke="#454a4e" stroke-width="5" opacity=".8"/>
-<path d="M26 229h48" stroke="#777d82" stroke-width="2" opacity=".28"/>
+<rect x="48" y="29" width="170" height="184" rx="23" fill="#BAC1CD" opacity=".22" transform="rotate(7 133 121)"/>
+        <rect x="32" y="37" width="183" height="181" rx="23" fill="#F2F4F8" stroke="#BAC1CD" stroke-width="5"/>
+        <rect x="46" y="51" width="155" height="153" rx="16" fill="#E6EAF1"/>
+<circle cx="63" cy="38" r="4" fill="#BAC1CD" opacity=".85"/><path d="M156 38h29" stroke="#677286" stroke-width="3" opacity=".34"/><path d="M63 193h46" stroke="#BAC1CD" stroke-width="4" opacity=".45"/>
+<g transform="translate(30.08 30.08) scale(0.765) rotate(5 128 128)"
+ fill="none" stroke="#697487" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="m128 45 24 51 56 8-40 39 9 57-49-28-49 28 9-57-40-39 56-8Z"/></g>
+<path d="M184 217 218 183" stroke="#BAC1CD" stroke-width="7" stroke-linecap="round"/>
+<path d="M29 229h38" stroke="#BBC2CD" stroke-width="7" stroke-linecap="round"/>
+<path d="M75 229h47" stroke="#677286" stroke-width="3" opacity=".22" stroke-linecap="round"/>
 </svg>

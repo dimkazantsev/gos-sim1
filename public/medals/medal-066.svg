@@ -1,18 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
 <title>Сначала полномочия</title>
-<defs>
- <filter id="gold66" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 .77  0 1 0 0 .48  0 0 1 0 .10  0 0 0 .65 0"/></filter>
- <linearGradient id="steel66" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aeb4b8"/><stop offset=".18" stop-color="#343b40"/><stop offset=".56" stop-color="#777f84"/><stop offset="1" stop-color="#20262a"/></linearGradient>
- <radialGradient id="v66"><stop stop-color="#171b1e"/><stop offset=".68" stop-color="#090b0d"/><stop offset="1" stop-color="#040506"/></radialGradient>
-</defs>
-<rect x="8" y="8" width="240" height="240" rx="5" fill="none" stroke="#d0a64f" stroke-width="6" filter="url(#gold66)" opacity=".88"/>
-<rect x="7" y="7" width="242" height="242" rx="5" fill="#07090a" stroke="#d0a64f" stroke-width="5"/>
-<rect x="13" y="13" width="230" height="230" rx="3" fill="url(#v66)" stroke="url(#steel66)" stroke-width="4"/>
-<rect x="18" y="18" width="220" height="220" rx="2" fill="none" stroke="#727a80" stroke-width="2" opacity=".75"/>
-<path d="M19 19h70L19 89Z" fill="#ffffff" opacity=".06"/>
-<path d="M27 104h202v48H27Z" fill="#8d2028" opacity=".72" transform="rotate(-17 128 128)"/>
-<circle cx="45" cy="112" r="1" fill="#d8dde0" opacity=".24"/><circle cx="92" cy="143" r="2" fill="#d8dde0" opacity=".24"/><circle cx="139" cy="174" r="3" fill="#d8dde0" opacity=".24"/><circle cx="186" cy="205" r="1" fill="#d8dde0" opacity=".24"/><circle cx="43" cy="52" r="2" fill="#d8dde0" opacity=".24"/><path d="M34 186h54" stroke="#a3242e" stroke-width="3" opacity=".55"/>
-<g transform="translate(8.96 8.96) scale(0.930) rotate(-3 128 128)" fill="none" stroke="#e7e8e8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".98"><circle cx="81" cy="105" r="22"/><circle cx="128" cy="88" r="27"/><circle cx="175" cy="105" r="22"/><path d="M49 183v-18q0-30 32-30M88 183v-24q0-39 40-39t40 39v24M175 135q32 0 32 30v18"/></g>
-<path d="M26 219h108" stroke="#a4252f" stroke-width="5" opacity=".8"/>
-<path d="M26 229h76" stroke="#e7e8e8" stroke-width="2" opacity=".28"/>
+<rect x="17" y="17" width="222" height="222" rx="20" fill="#FFF0F7"/>
+        <rect x="31" y="35" width="76" height="13" rx="6" fill="#F3A8CF"/>
+        <rect x="31" y="57" width="134" height="6" rx="3" fill="#172447" opacity=".18"/>
+        <rect x="31" y="72" width="103" height="6" rx="3" fill="#172447" opacity=".12"/>
+        <rect x="159" y="168" width="61" height="49" rx="13" fill="#F3A8CF" opacity=".92"/>
+<circle cx="70" cy="56" r="4" fill="#F3A8CF" opacity=".85"/><path d="M161 56h32" stroke="#172447" stroke-width="3" opacity=".34"/><path d="M70 178h46" stroke="#F3A8CF" stroke-width="4" opacity=".45"/>
+<g transform="translate(30.08 30.08) scale(0.765) rotate(-5 128 128)"
+ fill="none" stroke="#172447" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><circle cx="74" cy="107" r="24"/><circle cx="128" cy="87" r="31"/><circle cx="182" cy="107" r="24"/><path d="M35 198v-20q0-35 39-35M83 198v-29q0-47 45-47t45 47v29M182 143q39 0 39 35v20"/></g>
+<circle cx="202" cy="202" r="17" fill="none" stroke="#F3A8CF" stroke-width="5"/>
+<path d="M29 229h38" stroke="#F3A8CF" stroke-width="7" stroke-linecap="round"/>
+<path d="M75 229h34" stroke="#172447" stroke-width="3" opacity=".22" stroke-linecap="round"/>
 </svg>

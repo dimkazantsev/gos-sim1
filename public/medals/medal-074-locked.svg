@@ -1,18 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
 <title>Кодекс вместо шпаргалки</title>
-<defs>
- <filter id="gold74" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 .77  0 1 0 0 .48  0 0 1 0 .10  0 0 0 0 0"/></filter>
- <linearGradient id="steel74" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aeb4b8"/><stop offset=".18" stop-color="#343b40"/><stop offset=".56" stop-color="#777f84"/><stop offset="1" stop-color="#20262a"/></linearGradient>
- <radialGradient id="v74"><stop stop-color="#171b1e"/><stop offset=".68" stop-color="#090b0d"/><stop offset="1" stop-color="#040506"/></radialGradient>
-</defs>
-<rect x="8" y="8" width="240" height="240" rx="5" fill="none" stroke="#30363b" stroke-width="6" filter="url(#gold74)" opacity="0"/>
-<rect x="7" y="7" width="242" height="242" rx="5" fill="#07090a" stroke="#30363b" stroke-width="5"/>
-<rect x="13" y="13" width="230" height="230" rx="3" fill="url(#v74)" stroke="url(#steel74)" stroke-width="4"/>
-<rect x="18" y="18" width="220" height="220" rx="2" fill="none" stroke="#485057" stroke-width="2" opacity=".75"/>
-<path d="M19 19h70L19 89Z" fill="#ffffff" opacity=".025"/>
-<path d="M22 42h75l137 173v19h-62L22 63Z" fill="#373b3e" opacity=".72"/>
-<circle cx="87" cy="88" r="3" fill="#454b50" opacity=".24"/><circle cx="134" cy="119" r="1" fill="#454b50" opacity=".24"/><circle cx="181" cy="150" r="2" fill="#454b50" opacity=".24"/><circle cx="38" cy="181" r="3" fill="#454b50" opacity=".24"/><circle cx="85" cy="212" r="1" fill="#454b50" opacity=".24"/>
-<g transform="translate(8.96 8.96) scale(0.930) rotate(6 128 128)" fill="none" stroke="#777d82" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".74"><path d="M56 74h144v96h-75l-42 29v-29H56Z"/><path d="M80 106h96M80 132h69"/></g>
-<path d="M26 219h126" stroke="#454a4e" stroke-width="5" opacity=".8"/>
-<path d="M26 229h62" stroke="#777d82" stroke-width="2" opacity=".28"/>
+<rect x="14" y="14" width="228" height="228" rx="22" fill="#E6EAF1"/><path d="M44 20v216M20 44h216" stroke="#677286" stroke-width="1" opacity=".07"/><path d="M76 20v216M20 76h216" stroke="#677286" stroke-width="1" opacity=".07"/><path d="M108 20v216M20 108h216" stroke="#677286" stroke-width="1" opacity=".07"/><path d="M140 20v216M20 140h216" stroke="#677286" stroke-width="1" opacity=".07"/><path d="M172 20v216M20 172h216" stroke="#677286" stroke-width="1" opacity=".07"/><path d="M204 20v216M20 204h216" stroke="#677286" stroke-width="1" opacity=".07"/><path d="M236 20v216M20 236h216" stroke="#677286" stroke-width="1" opacity=".07"/><path d="M26 211 207 35" stroke="#BAC1CD" stroke-width="18" opacity=".12"/>
+<circle cx="62" cy="62" r="7" fill="#BAC1CD" opacity=".85"/><path d="M171 62h40" stroke="#677286" stroke-width="3" opacity=".34"/><path d="M62 192h79" stroke="#BAC1CD" stroke-width="4" opacity=".45"/>
+<g transform="translate(20.48 20.48) scale(0.840) rotate(-4 128 128)"
+ fill="none" stroke="#697487" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M47 66h162v111h-84l-49 34v-34H47Z"/><path d="M75 105h108M75 136h78"/></g>
+<path d="M185 202h34M202 185v34" stroke="#BAC1CD" stroke-width="6" stroke-linecap="round"/>
+<path d="M29 229h38" stroke="#BBC2CD" stroke-width="7" stroke-linecap="round"/>
+<path d="M75 229h60" stroke="#677286" stroke-width="3" opacity=".22" stroke-linecap="round"/>
 </svg>

@@ -1,18 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
 <title>Радио республики</title>
-<defs>
- <filter id="gold48" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 .77  0 1 0 0 .48  0 0 1 0 .10  0 0 0 0 0"/></filter>
- <linearGradient id="steel48" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aeb4b8"/><stop offset=".18" stop-color="#343b40"/><stop offset=".56" stop-color="#777f84"/><stop offset="1" stop-color="#20262a"/></linearGradient>
- <radialGradient id="v48"><stop stop-color="#171b1e"/><stop offset=".68" stop-color="#090b0d"/><stop offset="1" stop-color="#040506"/></radialGradient>
-</defs>
-<rect x="8" y="8" width="240" height="240" rx="5" fill="none" stroke="#30363b" stroke-width="6" filter="url(#gold48)" opacity="0"/>
-<rect x="7" y="7" width="242" height="242" rx="5" fill="#07090a" stroke="#30363b" stroke-width="5"/>
-<rect x="13" y="13" width="230" height="230" rx="3" fill="url(#v48)" stroke="url(#steel48)" stroke-width="4"/>
-<rect x="18" y="18" width="220" height="220" rx="2" fill="none" stroke="#485057" stroke-width="2" opacity=".75"/>
-<path d="M19 19h70L19 89Z" fill="#ffffff" opacity=".025"/>
-<path d="M30 211 84 32h42L72 211Zm99 0L184 32h42l-55 179Z" fill="#35393c" opacity=".69"/>
-<circle cx="93" cy="74" r="1" fill="#454b50" opacity=".24"/><circle cx="140" cy="105" r="2" fill="#454b50" opacity=".24"/><circle cx="187" cy="136" r="3" fill="#454b50" opacity=".24"/><circle cx="44" cy="167" r="1" fill="#454b50" opacity=".24"/><circle cx="91" cy="198" r="2" fill="#454b50" opacity=".24"/><path d="M34 177h54" stroke="#44484b" stroke-width="3" opacity=".55"/><path d="M169 39h39v39" fill="none" stroke="#454b50" stroke-width="3" opacity=".35"/>
-<g transform="translate(15.36 15.36) scale(0.880) rotate(3 128 128)" fill="none" stroke="#777d82" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".74"><path d="M66 113h35l39-31v93l-39-31H66Z"/><path d="M158 104q24 25 0 50M176 90q40 40 0 79"/></g>
-<path d="M26 219h162" stroke="#454a4e" stroke-width="5" opacity=".8"/>
-<path d="M26 229h76" stroke="#777d82" stroke-width="2" opacity=".28"/>
+<rect x="15" y="15" width="226" height="226" rx="28" fill="#E6EAF1"/>
+    <path d="M49 217 112 32h33l63 185Z" fill="#F2F4F8"/>
+    <circle cx="128" cy="79" r="33" fill="#BAC1CD"/>
+    <path d="M28 217h200" stroke="#677286" stroke-width="6" opacity=".18"/>
+<circle cx="52" cy="67" r="6" fill="#BAC1CD" opacity=".85"/><path d="M153 67h42" stroke="#677286" stroke-width="3" opacity=".34"/><path d="M52 204h68" stroke="#BAC1CD" stroke-width="4" opacity=".45"/>
+<g transform="translate(23.68 23.68) scale(0.815) rotate(1 128 128)"
+ fill="none" stroke="#697487" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M59 111h39l44-36v107l-44-36H59Z"/><path d="M164 101q28 29 0 58M184 84q48 49 0 96"/></g>
+<path d="M184 217 218 183" stroke="#BAC1CD" stroke-width="7" stroke-linecap="round"/>
+<path d="M29 229h38" stroke="#BBC2CD" stroke-width="7" stroke-linecap="round"/>
+<path d="M75 229h34" stroke="#677286" stroke-width="3" opacity=".22" stroke-linecap="round"/>
 </svg>

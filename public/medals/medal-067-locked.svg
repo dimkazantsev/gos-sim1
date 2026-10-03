@@ -1,18 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
 <title>Исправление — тоже работа</title>
-<defs>
- <filter id="gold67" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 .77  0 1 0 0 .48  0 0 1 0 .10  0 0 0 0 0"/></filter>
- <linearGradient id="steel67" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aeb4b8"/><stop offset=".18" stop-color="#343b40"/><stop offset=".56" stop-color="#777f84"/><stop offset="1" stop-color="#20262a"/></linearGradient>
- <radialGradient id="v67"><stop stop-color="#171b1e"/><stop offset=".68" stop-color="#090b0d"/><stop offset="1" stop-color="#040506"/></radialGradient>
-</defs>
-<rect x="8" y="8" width="240" height="240" rx="5" fill="none" stroke="#30363b" stroke-width="6" filter="url(#gold67)" opacity="0"/>
-<rect x="7" y="7" width="242" height="242" rx="5" fill="#07090a" stroke="#30363b" stroke-width="5"/>
-<rect x="13" y="13" width="230" height="230" rx="3" fill="url(#v67)" stroke="url(#steel67)" stroke-width="4"/>
-<rect x="18" y="18" width="220" height="220" rx="2" fill="none" stroke="#485057" stroke-width="2" opacity=".75"/>
-<path d="M19 19h70L19 89Z" fill="#ffffff" opacity=".025"/>
-<path d="M128 20 239 128 128 236 17 128Z" fill="#34383b" opacity=".68"/><path d="M128 62 195 128 128 194 61 128Z" fill="#080a0c"/>
-<circle cx="74" cy="155" r="2" fill="#454b50" opacity=".24"/><circle cx="121" cy="186" r="3" fill="#454b50" opacity=".24"/><circle cx="168" cy="217" r="1" fill="#454b50" opacity=".24"/><circle cx="215" cy="64" r="2" fill="#454b50" opacity=".24"/><circle cx="72" cy="95" r="3" fill="#454b50" opacity=".24"/>
-<g transform="translate(5.76 5.76) scale(0.955) rotate(0 128 128)" fill="none" stroke="#777d82" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".74"><path d="M63 188h130"/><path d="m82 158 73-73 29 29-73 73-37 8Z"/><path d="m154 86 28 28"/></g>
-<path d="M26 219h126" stroke="#454a4e" stroke-width="5" opacity=".8"/>
-<path d="M26 229h90" stroke="#777d82" stroke-width="2" opacity=".28"/>
+<rect x="48" y="29" width="170" height="184" rx="23" fill="#BAC1CD" opacity=".22" transform="rotate(7 133 121)"/>
+        <rect x="32" y="37" width="183" height="181" rx="23" fill="#F2F4F8" stroke="#BAC1CD" stroke-width="5"/>
+        <rect x="46" y="51" width="155" height="153" rx="16" fill="#E6EAF1"/>
+<circle cx="87" cy="69" r="5" fill="#BAC1CD" opacity=".85"/><path d="M184 69h33" stroke="#677286" stroke-width="3" opacity=".34"/><path d="M87 197h57" stroke="#BAC1CD" stroke-width="4" opacity=".45"/>
+<g transform="translate(26.88 26.88) scale(0.790) rotate(2 128 128)"
+ fill="none" stroke="#697487" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M50 203h154"/><path d="m75 167 83-83 34 34-83 83-45 10Z"/><path d="m158 84 34 34"/></g>
+<path d="M185 202h34M202 185v34" stroke="#BAC1CD" stroke-width="6" stroke-linecap="round"/>
+<path d="M29 229h38" stroke="#BBC2CD" stroke-width="7" stroke-linecap="round"/>
+<path d="M75 229h47" stroke="#677286" stroke-width="3" opacity=".22" stroke-linecap="round"/>
 </svg>

@@ -1,18 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
 <title>Распорядитель</title>
-<defs>
- <filter id="gold9" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 .77  0 1 0 0 .48  0 0 1 0 .10  0 0 0 0 0"/></filter>
- <linearGradient id="steel9" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aeb4b8"/><stop offset=".18" stop-color="#343b40"/><stop offset=".56" stop-color="#777f84"/><stop offset="1" stop-color="#20262a"/></linearGradient>
- <radialGradient id="v9"><stop stop-color="#171b1e"/><stop offset=".68" stop-color="#090b0d"/><stop offset="1" stop-color="#040506"/></radialGradient>
-</defs>
-<rect x="8" y="8" width="240" height="240" rx="5" fill="none" stroke="#30363b" stroke-width="6" filter="url(#gold9)" opacity="0"/>
-<rect x="7" y="7" width="242" height="242" rx="5" fill="#07090a" stroke="#30363b" stroke-width="5"/>
-<rect x="13" y="13" width="230" height="230" rx="3" fill="url(#v9)" stroke="url(#steel9)" stroke-width="4"/>
-<rect x="18" y="18" width="220" height="220" rx="2" fill="none" stroke="#485057" stroke-width="2" opacity=".75"/>
-<path d="M19 19h70L19 89Z" fill="#ffffff" opacity=".025"/>
-<circle cx="128" cy="128" r="84" fill="none" stroke="#373b3e" stroke-width="25" opacity=".7"/><path d="M57 183 197 72" stroke="#373b3e" stroke-width="22" opacity=".72"/>
-<circle cx="102" cy="53" r="1" fill="#454b50" opacity=".24"/><circle cx="149" cy="84" r="2" fill="#454b50" opacity=".24"/><circle cx="196" cy="115" r="3" fill="#454b50" opacity=".24"/><circle cx="53" cy="146" r="1" fill="#454b50" opacity=".24"/><circle cx="100" cy="177" r="2" fill="#454b50" opacity=".24"/><path d="M34 189h54" stroke="#44484b" stroke-width="3" opacity=".55"/>
-<g transform="translate(12.16 12.16) scale(0.905) rotate(6 128 128)" fill="none" stroke="#777d82" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".74"><path d="M128 55v120M84 83h88M84 83l-29 50h58ZM172 83l-29 50h58ZM91 188h74"/><circle cx="128" cy="55" r="9"/></g>
-<path d="M26 219h90" stroke="#454a4e" stroke-width="5" opacity=".8"/>
-<path d="M26 229h34" stroke="#777d82" stroke-width="2" opacity=".28"/>
+<rect x="16" y="16" width="224" height="224" rx="27" fill="#F2F4F8"/>
+        <path d="m45 81 57-37 43 27 49-13 24 62-31 51-63-4-48 39-40-64Z" fill="#E6EAF1"/>
+        <path d="m61 92 47-29 36 25 39-10" fill="none" stroke="#BAC1CD" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="169" cy="154" r="17" fill="#BAC1CD"/>
+<circle cx="37" cy="50" r="7" fill="#BAC1CD" opacity=".85"/><path d="M184 50h31" stroke="#677286" stroke-width="3" opacity=".34"/><path d="M37 199h79" stroke="#BAC1CD" stroke-width="4" opacity=".45"/>
+<g transform="translate(20.48 20.48) scale(0.840) rotate(3 128 128)"
+ fill="none" stroke="#697487" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M48 201h160M65 196v-89l63-37 63 37v89"/><path d="M89 196v-63h24v63M143 196v-63h24v63"/><path d="M64 108h128M51 105l77-47 77 47"/></g>
+<path d="M184 217 218 183" stroke="#BAC1CD" stroke-width="7" stroke-linecap="round"/>
+<path d="M29 229h38" stroke="#BBC2CD" stroke-width="7" stroke-linecap="round"/>
+<path d="M75 229h73" stroke="#677286" stroke-width="3" opacity=".22" stroke-linecap="round"/>
 </svg>

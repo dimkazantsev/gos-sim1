@@ -1,18 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
 <title>Паспорт остался дома</title>
-<defs>
- <filter id="gold86" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 .77  0 1 0 0 .48  0 0 1 0 .10  0 0 0 .65 0"/></filter>
- <linearGradient id="steel86" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aeb4b8"/><stop offset=".18" stop-color="#343b40"/><stop offset=".56" stop-color="#777f84"/><stop offset="1" stop-color="#20262a"/></linearGradient>
- <radialGradient id="v86"><stop stop-color="#171b1e"/><stop offset=".68" stop-color="#090b0d"/><stop offset="1" stop-color="#040506"/></radialGradient>
-</defs>
-<rect x="8" y="8" width="240" height="240" rx="5" fill="none" stroke="#d0a64f" stroke-width="6" filter="url(#gold86)" opacity=".88"/>
-<rect x="7" y="7" width="242" height="242" rx="5" fill="#07090a" stroke="#d0a64f" stroke-width="5"/>
-<rect x="13" y="13" width="230" height="230" rx="3" fill="url(#v86)" stroke="url(#steel86)" stroke-width="4"/>
-<rect x="18" y="18" width="220" height="220" rx="2" fill="none" stroke="#727a80" stroke-width="2" opacity=".75"/>
-<path d="M19 19h70L19 89Z" fill="#ffffff" opacity=".06"/>
-<path d="M27 104h202v48H27Z" fill="#8d2028" opacity=".72" transform="rotate(-17 128 128)"/>
-<circle cx="55" cy="52" r="3" fill="#d8dde0" opacity=".24"/><circle cx="102" cy="83" r="1" fill="#d8dde0" opacity=".24"/><circle cx="149" cy="114" r="2" fill="#d8dde0" opacity=".24"/><circle cx="196" cy="145" r="3" fill="#d8dde0" opacity=".24"/><circle cx="53" cy="176" r="1" fill="#d8dde0" opacity=".24"/>
-<g transform="translate(8.96 8.96) scale(0.930) rotate(-3 128 128)" fill="none" stroke="#e7e8e8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".98"><path d="M128 52 190 75v45q0 55-62 87-62-32-62-87V75Z"/><path d="m96 127 22 22 43-49"/></g>
-<path d="M26 219h90" stroke="#a4252f" stroke-width="5" opacity=".8"/>
-<path d="M26 229h104" stroke="#e7e8e8" stroke-width="2" opacity=".28"/>
+<rect x="14" y="14" width="228" height="228" rx="22" fill="#F4F0FF"/><path d="M44 20v216M20 44h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M76 20v216M20 76h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M108 20v216M20 108h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M140 20v216M20 140h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M172 20v216M20 172h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M204 20v216M20 204h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M236 20v216M20 236h216" stroke="#172447" stroke-width="1" opacity=".07"/><path d="M26 211 207 35" stroke="#F3A8CF" stroke-width="18" opacity=".12"/>
+<circle cx="50" cy="71" r="4" fill="#F3A8CF" opacity=".85"/><path d="M157 71h24" stroke="#172447" stroke-width="3" opacity=".34"/><path d="M50 190h46" stroke="#F3A8CF" stroke-width="4" opacity=".45"/>
+<g transform="translate(30.08 30.08) scale(0.765) rotate(3 128 128)"
+ fill="none" stroke="#172447" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M128 44 201 71v54q0 65-73 102-73-37-73-102V71Z"/><path d="m90 129 27 27 52-60"/></g>
+<path d="M184 217 218 183" stroke="#F3A8CF" stroke-width="7" stroke-linecap="round"/>
+<path d="M29 229h38" stroke="#F3A8CF" stroke-width="7" stroke-linecap="round"/>
+<path d="M75 229h60" stroke="#172447" stroke-width="3" opacity=".22" stroke-linecap="round"/>
 </svg>
