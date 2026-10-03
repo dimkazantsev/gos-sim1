@@ -127,7 +127,6 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   nextStage:blockedVoid,
   resetStageProgress:blocked as typeof g.resetStageProgress,
   setStageDeadline:blockedVoid,
-  submitAction:blocked as typeof g.submitAction,
   judgeAction:blockedVoid,
   createPoliticalPost:blockedNull as typeof g.createPoliticalPost,
   addMediaToPoliticalPost:blocked as typeof g.addMediaToPoliticalPost,

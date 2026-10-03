@@ -20,7 +20,7 @@ import {currentGameMembers,currentGameProfiles} from './gameRoster';
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
 type PublicStats={accepted_actions:number;posts:number;votes_cast:number;documents_created:number;activity_entries:number;events_decided:number};
 export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,readOnly=false}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;readOnly?:boolean}){
- const {me,game,parties,partyInvitations,partyMandates,averageVsn,myEvaluations,actions,politicalPosts,ballots,formalDocuments,activities,saveProfile,teacher}=g;
+ const {me,game,parties,partyInvitations,partyMandates,averageVsn,myEvaluations,politicalPosts,ballots,formalDocuments,activities,saveProfile,teacher}=g;
  const members=useMemo(()=>currentGameMembers(g.members,game?.id||''),[g.members,game?.id]);
  const profiles=useMemo(()=>currentGameProfiles(g.profiles,members,game?.id||''),[g.profiles,members,game?.id]);
  const target=members.find(m=>m.user_id===(targetUserId||me?.user_id))||me;
@@ -65,7 +65,6 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
  if(!me||!target)return null;
  const counted=publicScores.map(s=>s.status==='final'?(s.final_score??s.auto_score):s.auto_score);
  const avg=counted.length?counted.reduce((a,b)=>a+b,0)/counted.length:null;
- const numberOfActions=actions.filter(a=>a.author_id===target.user_id).length;
  const numberOfPosts=politicalPosts.filter(p=>p.author_id===target.user_id).length;
  const numberOfVotes=ballots.filter(b=>b.voter_id===target.user_id).length;
  const numberOfDocuments=formalDocuments.filter(d=>d.author_id===target.user_id).length;
