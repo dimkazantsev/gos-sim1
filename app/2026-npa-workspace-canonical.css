@@ -1797,3 +1797,67 @@
     min-width:0!important;
   }
 }
+
+
+/* NPA polish v6 — single history chevron and top-aligned readiness badge. */
+.legalPortal .formalHistorySummary{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 44px!important;
+  align-items:center!important;
+  gap:12px!important;
+  list-style:none!important;
+}
+.legalPortal .formalHistorySummary::-webkit-details-marker{
+  display:none!important;
+}
+.legalPortal .formalHistorySummary::marker{
+  content:""!important;
+}
+.legalPortal .formalHistorySummary:after{
+  content:none!important;
+  display:none!important;
+}
+.legalPortal .formalHistoryDisclosure[open]>.formalHistorySummary:after{
+  content:none!important;
+  display:none!important;
+}
+.legalPortal .formalHistoryChevron{
+  position:relative!important;
+  display:grid!important;
+  place-items:center!important;
+  justify-self:end!important;
+  width:40px!important;
+  height:40px!important;
+  min-width:40px!important;
+  min-height:40px!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  border:1px solid #d2deef!important;
+  border-radius:12px!important;
+  background:#f7f9fd!important;
+  color:#496b96!important;
+  line-height:0!important;
+}
+.legalPortal .formalHistoryChevron>svg{
+  display:block!important;
+  width:18px!important;
+  height:18px!important;
+  margin:0!important;
+  transition:transform .18s ease!important;
+}
+.legalPortal .formalHistoryDisclosure[open] .formalHistoryChevron>svg{
+  transform:rotate(180deg)!important;
+}
+
+/* Readiness badge belongs to the title line, not the vertical center of the card. */
+.legalPortal .billReadinessStepState{
+  align-self:start!important;
+  margin-top:8px!important;
+}
+@media(max-width:760px){
+  .legalPortal .billReadinessStepState{
+    margin-top:2px!important;
+  }
+}
