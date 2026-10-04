@@ -347,7 +347,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
      const totalSteps=Math.max(1,d.workflow_steps.length);
      const step=Math.min(totalSteps,Math.max(1,d.current_step+1));
      const completion=Math.round(step/totalSteps*100);
-     return <article key={d.id} className={selected?.id===d.id?'formalRegistryRow legalDocumentRow registryCard active':'formalRegistryRow legalDocumentRow registryCard'} onClick={e=>{if((e.target as HTMLElement).closest('button,a,input,select'))return;setSelectedId(d.id);onSelectDocument?.(d.id);setDetailReturn('registry');setDetailOpen(true);setDetailTab('text');setEditing(false)}}>
+     return <article key={d.id} className={selected?.id===d.id?'formalRegistryRow legalDocumentRow registryCard active':'formalRegistryRow legalDocumentRow registryCard'} onClick={e=>{if((e.target as HTMLElement).closest('button,a,input,select'))return;openRegistryDocument(d.id)}}>
       <header className="registryCardHead"><div className="registryCardIdentity"><span>{d.registry_no}</span><small>{typeLabel(d.doc_type)}</small></div><em className={'formalStatus '+statusTone(d.status_code)}>{d.status_label}</em></header>
       <div className="registryCardTitle"><h3>{d.title}</h3><p>{d.subject_label}</p></div>
       <div className="registryCardProgress"><div><span>Этап {step} из {totalSteps}</span><b>{ownerLabel(d.current_owner_key)}</b></div><div className="registryCardProgressTrack" aria-label={'Прогресс документа '+completion+'%'}><i style={{width:completion+'%'}}/></div></div>
