@@ -201,3 +201,26 @@
  .achievementBurst .achievementMedal img{width:74px!important;height:80px!important}
 }
 @media(prefers-reduced-motion:reduce){.awardGrid article{transition:none}.awardGrid article.earned:hover{transform:none}}
+
+
+/* Voting center — one vertical rhythm for top-level sections. */
+.civicVotes{
+ --votes-section-gap:24px;
+ row-gap:var(--votes-section-gap)!important;
+}
+.civicVotes > :is(
+ .votesHero,
+ .votesOverview,
+ .institutionRegistrationPanel,
+ .npaVoteQueue,
+ .voteManual,
+ .civicVoteSearch,
+ .voteTabs,
+ .proceduralVoteList
+){
+ margin-block:0!important;
+}
+.civicVotes > .civicVoteSearch{margin-bottom:0!important}
+@media(max-width:650px){
+ .civicVotes{--votes-section-gap:20px}
+}
