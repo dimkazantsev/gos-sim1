@@ -2490,3 +2490,34 @@
     transition:none!important;
   }
 }
+
+
+/* NPA registry v16 — explicit right-side open action + scroll target. */
+.legalPortal .registryCard>.formalRegistryRowActions{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto auto!important;
+  align-items:center!important;
+  gap:8px!important;
+}
+.legalPortal .registryCard>.formalRegistryRowActions>span{
+  min-width:0!important;
+}
+.legalPortal .registryCard>.formalRegistryRowActions>.legalOpenDocument{
+  justify-self:end!important;
+  margin-left:0!important;
+  white-space:nowrap!important;
+}
+#npa-document-workspace{
+  scroll-margin-top:88px;
+}
+@media(max-width:650px){
+  .legalPortal .registryCard>.formalRegistryRowActions{
+    grid-template-columns:minmax(0,1fr) auto!important;
+  }
+  .legalPortal .registryCard>.formalRegistryRowActions>span{
+    grid-column:1/-1!important;
+  }
+  .legalPortal .registryCard>.formalRegistryRowActions>.legalOpenDocument{
+    justify-self:end!important;
+  }
+}
