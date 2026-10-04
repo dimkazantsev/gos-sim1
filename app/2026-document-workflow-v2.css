@@ -1302,3 +1302,19 @@
     padding-bottom:18px!important;
   }
 }
+
+
+/* NPA workspace v10 — actual outer air before the working document card. */
+.legalPortal .formalWorkspace>.formalDetail:not([hidden]){
+  margin-top:34px!important;
+}
+@media(max-width:860px){
+  .legalPortal .formalWorkspace>.formalDetail:not([hidden]){
+    margin-top:26px!important;
+  }
+}
+@media(max-width:560px){
+  .legalPortal .formalWorkspace>.formalDetail:not([hidden]){
+    margin-top:20px!important;
+  }
+}
