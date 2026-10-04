@@ -608,3 +608,90 @@
 @media print{
   .legalPortal .legalPrintButton{display:none!important}
 }
+
+
+/* NPA create readiness v4 — neutral readiness indicator, not fake active navigation. */
+.legalCreateSteps{
+  align-items:stretch!important;
+}
+.legalCreateSteps li{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:30px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:9px!important;
+  min-height:62px!important;
+  padding:9px 11px!important;
+  border:1px solid #dbe5f2!important;
+  border-radius:11px!important;
+  background:#fff!important;
+  color:#667b96!important;
+  box-shadow:none!important;
+}
+.legalCreateSteps li.active{
+  border-color:#dbe5f2!important;
+  background:#fff!important;
+  color:#667b96!important;
+}
+.legalCreateSteps li b{
+  display:grid!important;
+  place-items:center!important;
+  width:28px!important;
+  height:28px!important;
+  border-radius:9px!important;
+  background:#edf2fb!important;
+  color:#315efb!important;
+  font-size:11px!important;
+}
+.legalCreateSteps li>span{
+  display:grid!important;
+  gap:2px!important;
+  min-width:0!important;
+}
+.legalCreateSteps li strong{
+  color:#405b7e!important;
+  font-size:11px!important;
+  font-weight:850!important;
+  line-height:1.3!important;
+}
+.legalCreateSteps li small{
+  color:#8898aa!important;
+  font-size:9px!important;
+  font-weight:700!important;
+  line-height:1.25!important;
+}
+.legalCreateSteps li.ready{
+  border-color:#cce3d9!important;
+  background:#f7fcf9!important;
+}
+.legalCreateSteps li.ready b{
+  background:#16805f!important;
+  color:#fff!important;
+}
+.legalCreateSteps li.ready strong{
+  color:#215f4c!important;
+}
+.legalCreateSteps li.ready small{
+  color:#5b8577!important;
+}
+.legalCreateSteps li.pending{
+  border-color:#dbe5f2!important;
+  background:#fff!important;
+}
+.legalCreateSteps li.pending b{
+  background:#edf2fb!important;
+  color:#315efb!important;
+}
+@media(max-width:900px){
+  .legalCreateSteps{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+@media(max-width:650px){
+  .legalCreateSteps{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .legalCreateSteps li{
+    min-height:54px!important;
+  }
+}
