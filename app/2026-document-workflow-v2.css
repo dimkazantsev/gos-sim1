@@ -2521,3 +2521,78 @@
     justify-self:end!important;
   }
 }
+
+
+/* NPA workspace v17 — exact chevron centering and equal column bottoms. */
+
+/* Screenshot 1: center the disclosure/history chevron geometrically inside its control. */
+.legalPortal .formalHistoryChevron{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  place-items:center!important;
+  box-sizing:border-box!important;
+  padding:0!important;
+  line-height:0!important;
+}
+.legalPortal .formalHistoryChevron>svg{
+  display:block!important;
+  width:18px!important;
+  height:18px!important;
+  margin:0!important;
+  flex:none!important;
+  transform-origin:50% 50%!important;
+}
+.legalPortal .projectDisclosure>summary.projectDisclosureSummary>.projectDisclosureArrow{
+  display:block!important;
+  align-self:center!important;
+  flex:none!important;
+  width:20px!important;
+  height:20px!important;
+  margin:0!important;
+}
+
+/* Screenshot 2: make the document column fill the same row height as the control card.
+   The paper absorbs spare height, so the delivery disclosure ends on the same baseline. */
+.legalPortal .legalUnifiedWorkspace{
+  align-items:stretch!important;
+}
+.legalPortal .legalDocumentColumn{
+  align-self:stretch!important;
+  height:100%!important;
+  grid-template-rows:minmax(0,1fr) auto!important;
+  align-content:stretch!important;
+}
+.legalPortal .legalDocumentColumn>.formalPaper{
+  align-self:stretch!important;
+  height:100%!important;
+  min-height:0!important;
+}
+.legalPortal .legalDocumentColumn>.documentTools{
+  align-self:end!important;
+  width:100%!important;
+}
+.legalPortal .legalControlRail{
+  align-self:stretch!important;
+}
+
+/* On stacked layouts each block returns to natural height. */
+@media(max-width:860px){
+  .legalPortal .legalUnifiedWorkspace{
+    align-items:start!important;
+  }
+  .legalPortal .legalDocumentColumn{
+    height:auto!important;
+    grid-template-rows:auto auto!important;
+    align-content:start!important;
+  }
+  .legalPortal .legalDocumentColumn>.formalPaper{
+    height:auto!important;
+  }
+  .legalPortal .legalDocumentColumn>.documentTools{
+    align-self:auto!important;
+  }
+  .legalPortal .legalControlRail{
+    align-self:auto!important;
+  }
+}
