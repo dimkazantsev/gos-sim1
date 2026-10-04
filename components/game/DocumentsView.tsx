@@ -6,7 +6,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import type {FormalDocument} from './types';
 import {FORMAL_SUBJECTS,FORMAL_TYPES,inferFormal,formalSignature,ownerLabel} from './formalInstitutions';
 import {votePresetForDocument} from './proceduralVoting';
-import {Activity,ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,Clock3,ClipboardList,FilePlus2,Paperclip,Plus,Printer,Route,Search,Vote,X} from 'lucide-react';
+import {ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,Clock3,ClipboardList,FilePlus2,Paperclip,Plus,Printer,Route,Search,Vote,X} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import DocumentPaper from './DocumentPaper';
 import BudgetDocumentAnnex from './BudgetDocumentAnnex';
@@ -63,9 +63,6 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const createBillReady=!!createBillCommittee&&(!createBillRepresentativeRequired||!!createBillRepresentative)&&createBillPreparedCount===createBillRequiredKinds.length;
  useEffect(()=>{if(!g.game?.id||readOnly)return;let active=true;async function load(){const r=await supabase.rpc('get_formal_subjects',{p_game_id:g.game!.id});if(active&&!r.error&&Array.isArray(r.data))setSubjectPermissions(r.data)}void load();const timer=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(timer)}},[g.game?.id,me?.user_id,me?.role_title,readOnly]);
  useEffect(()=>{if(!g.game?.id||!me?.user_id)return;let active=true;async function load(){const r=await supabase.from('game_office_assignments').select('role_title').eq('game_id',g.game!.id).eq('user_id',me!.user_id).eq('status','active');if(active&&!r.error)setActiveRoles((r.data||[]).map(x=>x.role_title))}void load();const timer=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(timer)}},[g.game?.id,me?.user_id]);
- const registryInProcessCount=formalDocuments.filter(d=>!['published','rejected'].includes(d.status_code)).length;
- const registryVotingCount=formalDocuments.filter(d=>votes.some(v=>v.formal_document_id===d.id&&v.status==='open')).length;
- const registryAcceptedCount=formalDocuments.filter(d=>['published','signed','adopted'].includes(d.status_code)).length;
  const filtered=useMemo(()=>formalDocuments.filter(d=>{
   const q=query.trim().toLowerCase();
   const voting=votes.some(v=>v.formal_document_id===d.id&&v.status==='open');
@@ -275,14 +272,10 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  return <div className="formalPage legalPortal">
   <section className="formalHero"><div><small>ПРАВОВАЯ ИНФОРМАЦИЯ ИГРЫ</small><h1>Официальный интернет-портал правовой информации</h1><p>Документы органов власти, их тексты, стадии рассмотрения и связанные голосования.</p></div><div className="formalHeroActions"><a href="https://sozd.duma.gov.ru/" target="_blank" rel="noreferrer">СОЗД ГД ↗</a><a href="https://publication.pravo.gov.ru/" target="_blank" rel="noreferrer">Официальное опубликование ↗</a></div></section>
 
-  <nav className="formalTabs legalPrimaryNav legalModeSwitch" aria-label="Разделы правового портала">
-   <button type="button" className={mode==='create'?'active':''} aria-pressed={mode==='create'} onClick={()=>setMode('create')}>
-    <span className="legalModeIcon"><FilePlus2 size={19}/></span><span className="legalModeText"><b>Создать документ</b><small>Новый НПА или загрузка файла</small></span>
-   </button>
-   <button type="button" className={mode==='registry'?'active':''} aria-pressed={mode==='registry'} onClick={()=>{setMode('registry');setDetailOpen(false);onSelectDocument?.()}}>
-    <span className="legalModeIcon"><BookOpen size={19}/></span><span className="legalModeText"><b>Реестр НПА</b><small>Поиск, стадии и контроль документов</small></span><span className="legalModeCount">{formalDocuments.length}</span>
-   </button>
-  </nav>
+  <section className="formalStats"><article><small>ВСЕГО В РЕЕСТРЕ</small><strong>{formalDocuments.length}</strong><span>документов</span></article><article><small>В ПРОЦЕССЕ</small><strong>{formalDocuments.filter(d=>!['published','rejected'].includes(d.status_code)).length}</strong><span>движутся по процедуре</span></article><article><small>Принято</small><strong>{formalDocuments.filter(d=>['published','signed','adopted'].includes(d.status_code)).length}</strong><span>принятых актов</span></article><article><small>МОИ ДОКУМЕНТЫ</small><strong>{formalDocuments.filter(d=>d.author_id===me?.user_id).length}</strong><span>инициировано вами</span></article></section>
+
+  <DocumentInbox gameId={g.game?.id} userId={me?.user_id} members={members} documents={formalDocuments} onOpen={id=>{setSelectedId(id);onSelectDocument?.(id);setQuery('');setFilterSubject('');setFilterStatus('');setDetailReturn('registry');setMode('registry');setDetailOpen(true);setDetailTab('text')}}/>
+  <nav className="formalTabs legalPrimaryNav" aria-label="Разделы правового портала"><button className={mode==='create'?'active':''} onClick={()=>setMode('create')}><FilePlus2 size={20}/> Создать / загрузить</button><button className={mode==='registry'?'active':''} onClick={()=>{setMode('registry');setDetailOpen(false);onSelectDocument?.()}}><BookOpen size={20}/> Реестр НПА <span>{formalDocuments.length}</span></button></nav>
 
   {mode==='create'&&<section className="formalCreate legalCreateV2" aria-labelledby="create-document-title">
    <header className="legalCreateIntro"><div><small>НОВЫЙ НПА</small><h2 id="create-document-title">Создать или загрузить документ</h2><p>Добавьте текст, проверьте реквизиты, подготовьте обязательные материалы и зарегистрируйте документ. Официальное движение по процедуре начнётся уже из карточки НПА.</p></div><ol className="legalCreateSteps"><li><b>1</b><span>Документ</span></li><li><b>2</b><span>Реквизиты</span></li><li className={creatingBill?'active':''}><b>3</b><span>{creatingBill?'Комплект внесения':'Регистрация'}</span></li></ol></header>
@@ -315,15 +308,6 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
      <div><small>РЕЕСТР НПА</small><h2>Документы игры</h2><p>Единое рабочее пространство для поиска, контроля стадии и открытия нормативных документов.</p></div>
      <button type="button" className="primary legalNewDocumentButton" onClick={()=>setMode('create')}><Plus size={17}/> Новый документ</button>
     </header>
-
-    <section className="registryKpis" aria-label="Сводка реестра">
-     <button type="button" aria-pressed={!filterStatus} onClick={()=>setFilterStatus('')}><span className="registryKpiIcon"><BookOpen size={18}/></span><span><small>ВСЕГО</small><strong>{formalDocuments.length}</strong><em>в реестре</em></span></button>
-     <button type="button" aria-pressed={filterStatus==='__active__'} onClick={()=>setFilterStatus(filterStatus==='__active__'?'':'__active__')}><span className="registryKpiIcon"><Activity size={18}/></span><span><small>В ПРОЦЕССЕ</small><strong>{registryInProcessCount}</strong><em>требуют движения</em></span></button>
-     <button type="button" aria-pressed={filterStatus==='__voting__'} onClick={()=>setFilterStatus(filterStatus==='__voting__'?'':'__voting__')}><span className="registryKpiIcon"><Vote size={18}/></span><span><small>ГОЛОСОВАНИЕ</small><strong>{registryVotingCount}</strong><em>открыто сейчас</em></span></button>
-     <button type="button" aria-pressed={filterStatus==='__accepted__'} onClick={()=>setFilterStatus(filterStatus==='__accepted__'?'':'__accepted__')}><span className="registryKpiIcon"><CheckCircle2 size={18}/></span><span><small>ПРИНЯТО</small><strong>{registryAcceptedCount}</strong><em>итоговые акты</em></span></button>
-    </section>
-
-    <DocumentInbox gameId={g.game?.id} userId={me?.user_id} members={members} documents={formalDocuments} onOpen={id=>{setSelectedId(id);onSelectDocument?.(id);setQuery('');setFilterSubject('');setFilterStatus('');setDetailReturn('registry');setMode('registry');setDetailOpen(true);setDetailTab('text')}}/>
 
     <div className="registryToolbar">
      <label className="registrySearch"><Search size={18} aria-hidden="true"/><input aria-label="Поиск в реестре НПА" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Номер, название, орган или автор"/>{query&&<button type="button" aria-label="Очистить поиск" onClick={()=>setQuery('')}><X size={16}/></button>}</label>

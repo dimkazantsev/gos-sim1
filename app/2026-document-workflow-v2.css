@@ -2067,3 +2067,30 @@
     transform:none!important;
   }
 }
+
+
+/* NPA registry v14 — keep redesign scoped to the registry and restore document opening. */
+.legalPortal .registryDashboard[hidden],
+.legalPortal .formalDetail[hidden]{
+  display:none!important;
+}
+
+/* The redesigned registry starts with search/filter tools; global page stats and inbox remain outside. */
+.legalPortal .registryDashboard{
+  gap:20px!important;
+}
+.legalPortal .registryDashboardHead{
+  margin-bottom:0!important;
+}
+.legalPortal .registryToolbar{
+  margin-top:0!important;
+}
+
+/* Registry document cards remain the only redesigned document list surface. */
+.legalPortal .registryCard{
+  cursor:pointer!important;
+}
+.legalPortal .registryCard:focus-within{
+  border-color:#8eaae0!important;
+  box-shadow:0 0 0 3px #315efb10,0 14px 28px #173c7010!important;
+}
