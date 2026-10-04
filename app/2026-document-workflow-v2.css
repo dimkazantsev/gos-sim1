@@ -26,3 +26,50 @@
 @media(max-width:1050px){.legalPortal .formalDetail[data-tab=text] .formalDocGrid{grid-template-columns:minmax(0,1fr)}.legalPortal .formalDetail[data-tab=text] .formalSidebar{grid-column:1;grid-row:auto;position:static}.legalPortal .formalPassport dl{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:900px){.legalCreateIntro{grid-template-columns:1fr}.billDossierLayout{grid-template-columns:1fr}.legalDetailToolbar{grid-template-columns:1fr!important}.legalDetailToolbar>nav{justify-content:flex-start!important}.legalDetailToolbar .legalEditDocument{justify-self:start}}
 @media(max-width:650px){.legalCreateIntro{padding:18px 16px}.legalCreateV2 .formalCreateForm{padding:16px!important}.legalCreateSteps{grid-template-columns:1fr}.legalCreateSection{padding:14px}.legalCreateSection>header{grid-template-columns:34px minmax(0,1fr)}.billCreatePackage>header>strong{grid-column:2;justify-self:start}.billCreateChecks,.billCreateFields{grid-template-columns:1fr}.billCreateFields>.styledSelect{grid-template-rows:auto 56px}.billCreateFields .styledSelectLabel{min-height:0}.billCreateFields .styledSelectTrigger{height:56px!important;min-height:56px!important}.billCreateAttachmentsHead{align-items:flex-start;flex-direction:column}.legalCreateV2 .formalCreateFooter{align-items:stretch!important}.legalCreateV2 .formalCreateFooter>button{width:100%;min-width:0}.legalPortal .formalRegistryHead{display:grid!important}.legalPortal .formalRegistryHead>.legalNewDocumentButton{width:100%!important;min-width:0!important}.legalPortal .formalRegistryRowActions{align-items:flex-start!important;flex-wrap:wrap}.legalPortal .formalRegistryRowActions>span{flex-basis:100%}.legalPortal .formalRegistryRowActions>button{flex:1}.legalDetailToolbar>nav{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}.legalDetailToolbar>nav>button{padding:9px 7px!important;font-size:11px!important}.legalDetailToolbar>nav>button>svg{width:16px;height:16px}.legalDetailToolbar .legalBackToRegistry,.legalDetailToolbar .legalEditDocument{width:100%}.formalProcedureBlocker{grid-template-columns:auto minmax(0,1fr)}.formalProcedureBlocker>button{grid-column:1/-1;width:100%}.billDossierV2{padding:14px!important}.legalPortal .formalPassport dl{grid-template-columns:1fr!important}}
+
+
+/* Compact registry CTA and left-aligned passport values. */
+.legalPortal .formalRegistryHead>.legalNewDocumentButton{
+  min-width:0!important;
+  min-height:40px!important;
+  width:auto!important;
+  height:40px!important;
+  padding:8px 12px!important;
+  border-radius:9px!important;
+  font-size:13px!important;
+  line-height:1!important;
+  font-weight:800!important;
+  gap:7px!important;
+}
+.legalPortal .formalRegistryHead>.legalNewDocumentButton svg{
+  width:16px!important;
+  height:16px!important;
+}
+.legalPortal .formalPassport dl>div{
+  justify-items:start!important;
+  text-align:left!important;
+}
+.legalPortal .formalPassport dt,
+.legalPortal .formalPassport dd{
+  width:100%;
+  text-align:left!important;
+  justify-self:stretch!important;
+}
+.legalPortal .formalPassport dd{
+  font-weight:750;
+  line-height:1.45;
+}
+.documentCopyExplainer{
+  border-left:3px solid #315efb;
+}
+.documentCopyExplainer span{
+  max-width:78ch;
+}
+@media(max-width:650px){
+ .legalPortal .formalRegistryHead>.legalNewDocumentButton{
+   width:auto!important;
+   justify-self:start!important;
+   min-width:0!important;
+   height:40px!important;
+ }
+}
