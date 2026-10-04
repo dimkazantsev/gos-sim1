@@ -121,7 +121,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
      {allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}
     </div>
     <div className="profileHeroControls">
-     <button type="button" className="profileComicButton" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Вводный комикс</button>
+     <button type="button" className="profileComicButton" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Пролог</button>
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
      {!own&&<button type="button" onClick={onOwnProfile}><UserRound size={17}/> Мой профиль</button>}
 
