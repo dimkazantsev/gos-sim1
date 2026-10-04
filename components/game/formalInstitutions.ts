@@ -75,7 +75,7 @@ export function formalSignature(subjectKey:string,fullName:string){
 
 export function ownerLabel(key:string){
  return {
-  author:'Автор / субъект инициативы',gd_staff:'Аппарат / Председатель ГД',committee:'Профильный комитет',
+  author:'Автор / Субъект инициативы',gd_staff:'Аппарат / Председатель ГД',committee:'Профильный комитет',
   gd_council:'Совет Государственной Думы',gd:'Государственная Дума',sf:'Совет Федерации',
   president:'Президент РФ',government:'Правительство РФ',ministry:'Министерство',municipality:'Муниципальный орган',conciliation:'Согласительная комиссия',
   teacher:'Преподаватель',system:'Завершено'
