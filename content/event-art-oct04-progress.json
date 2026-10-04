@@ -210,6 +210,21 @@
       "asset": "/event-art/scene-214-20261004-1920.webp",
       "generator": "Built-in imagegen",
       "source_file": "exec-a596cec1-1f98-451b-9c48-2bf3b72d9693.png"
+    },
+    "bank-curated-v2-01": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "c816185f66f16ba3644ea59434060421a0097ac7e3577ce1242aeb5297946c86",
+      "asset_sha256": "7384e243d237b7c390bd093005c1d9727f9a4d97881af92013e38c15038879fa",
+      "asset": "/event-art/scene-001-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-f7bf12bf-5e75-4852-8ddb-588a7db456e7.png"
     }
   }
 }

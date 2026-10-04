@@ -1,9 +1,9 @@
 {
   "bank-curated-v2-01": {
-    "src": "/event-art/scene-001-1920.webp",
+    "src": "/event-art/scene-001-20261004-1920.webp",
     "width": 1920,
     "height": 1080,
-    "srcSet": "/event-art/scene-001-480.webp 480w, /event-art/scene-001-960.webp 960w, /event-art/scene-001-1920.webp 1920w"
+    "srcSet": "/event-art/scene-001-20261004-480.webp 480w, /event-art/scene-001-20261004-960.webp 960w, /event-art/scene-001-20261004-1920.webp 1920w"
   },
   "bank-curated-v2-02": {
     "src": "/event-art/scene-002-1920.webp",
