@@ -50,10 +50,9 @@ function archiveCoverStyle(stage:number,kind:'intro'|'completed'|'preview'){
   '--archive-shift':`${18+(seed%58)}%`,
  } as CSSProperties;
 }
-function ArchiveCover({chapter}:{chapter?:Chapter}){
- const stage=chapter?.stage_no||0;
- const kind:'intro'|'completed'|'preview'=chapter?.kind||'intro';
- if(kind==='intro')return <Artwork scene={0} cover alt="Республика после бури — обложка пролога."/>;
+function ArchiveCover({chapter}:{chapter:Chapter}){
+ const stage=chapter.stage_no;
+ const kind:'completed'|'preview'=chapter.kind;
  const label=kind==='completed'?'ИТОГИ':'АНОНС';
  const code=String(stage).padStart(2,'0');
  const note=kind==='completed'?'СОХРАНЁННЫЙ РЕЗУЛЬТАТ':'СЛЕДУЮЩИЙ ЭТАП';
@@ -160,7 +159,17 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
     <div className={styles.libraryHeading}><h2>Архив комиксов</h2><p>Пролог доступен всегда. Итоги и анонсы сохраняются по мере завершения этапов вашей игры.</p></div>
     <div className={styles.libraryGrid}>
      <button type="button" className={styles.libraryCard} onClick={openIntro}>
-      <div className={styles.cover}><ArchiveCover/></div>
+      <div className={styles.cover}>
+       <img
+        className={styles.archivePrologueCover}
+        src={(process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'')+'/republic-art/intro-v2-storm-1920.webp?v=archive-prologue-storm-20261005'}
+        alt="Республика после бури — обложка пролога."
+        width={1920}
+        height={1080}
+        loading="eager"
+        decoding="async"
+       />
+      </div>
       <div className={styles.cardText}><small>Пролог · 4 сцены</small><strong>Пролог Республики</strong><span>Республика после бури: с чего начинается ваша история.</span><b>Открыть пролог <ArrowRight size={16}/></b></div>
      </button>
      {chapters.map(c=><button key={c.id} type="button" className={styles.libraryCard} onClick={()=>readChapter(c.id)}>

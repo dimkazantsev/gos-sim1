@@ -32,6 +32,7 @@
 .libraryGrid .libraryCard{display:flex;flex-direction:column;align-items:stretch;min-width:0;padding:0;overflow:hidden;border:1px solid #d7e3f3;border-radius:14px;background:#fff;color:#173253;text-align:left;cursor:pointer;box-shadow:0 4px 14px #17325308;transition:transform .17s ease,box-shadow .17s ease,border-color .17s ease;content-visibility:auto;contain-intrinsic-size:285px}
 .libraryGrid .libraryCard:hover{transform:translateY(-3px);border-color:#5987dd;box-shadow:0 11px 28px #17325319}
 .cover{position:relative;width:100%;aspect-ratio:16/8.35;overflow:hidden;background:#111d36;pointer-events:none}
+.archivePrologueCover{display:block;width:100%;height:100%;object-fit:cover;object-position:62% 42%;filter:saturate(1.08) contrast(1.03)}
 .abstractCover{--archive-a:#2a78d7;--archive-b:#8bd8ff;--archive-c:#e1936a;--archive-deep:#102338;position:absolute;inset:0;overflow:hidden;isolation:isolate;background:linear-gradient(180deg,color-mix(in srgb,var(--archive-a) 62%,#17394f) 0%,color-mix(in srgb,var(--archive-deep) 72%,#35556a) 58%,#17283a 100%);color:white}
 .abstractCover:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(112deg,#ffffff10 0 1px,transparent 1px 34%),radial-gradient(ellipse at 52% 110%,#f5c28a30,transparent 53%);opacity:.8}
 .abstractCover[data-kind=completed]{background:linear-gradient(180deg,color-mix(in srgb,var(--archive-a) 52%,#1d5b62),color-mix(in srgb,var(--archive-deep) 70%,#31504f) 58%,#122a2c)}
