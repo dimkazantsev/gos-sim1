@@ -269,6 +269,19 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   setBusy(false);
  }
 
+ function openRegistryDocument(id:string){
+  setSelectedId(id);
+  onSelectDocument?.(id);
+  setDetailReturn('registry');
+  setDetailOpen(true);
+  setDetailTab('text');
+  setEditing(false);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+   const target=document.getElementById('npa-document-workspace');
+   if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+  }));
+ }
+
  return <div className="formalPage legalPortal">
   <section className="formalHero"><div><small>ПРАВОВАЯ ИНФОРМАЦИЯ ИГРЫ</small><h1>Официальный интернет-портал правовой информации</h1><p>Документы органов власти, их тексты, стадии рассмотрения и связанные голосования.</p></div><div className="formalHeroActions"><a href="https://sozd.duma.gov.ru/" target="_blank" rel="noreferrer">СОЗД ГД ↗</a><a href="https://publication.pravo.gov.ru/" target="_blank" rel="noreferrer">Официальное опубликование ↗</a></div></section>
 
@@ -333,12 +346,12 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
       <div className="registryCardTitle"><h3>{d.title}</h3><p>{d.subject_label}</p></div>
       <div className="registryCardProgress"><div><span>Этап {step} из {totalSteps}</span><b>{ownerLabel(d.current_owner_key)}</b></div><div className="registryCardProgressTrack" aria-label={'Прогресс документа '+completion+'%'}><i style={{width:completion+'%'}}/></div></div>
       <div className="registryCardMeta"><span><Clock3 size={14}/> Обновлён {shortDate(d.updated_at)}</span>{voting&&<strong><Vote size={14}/> Идёт голосование</strong>}</div>
-      <footer className="formalRegistryRowActions"><span>Ответственный: {ownerLabel(d.current_owner_key)}</span><button type="button" className="legalOpenDocument" onClick={()=>{setSelectedId(d.id);onSelectDocument?.(d.id);setDetailReturn('registry');setDetailOpen(true);setDetailTab('text');setEditing(false)}}>Открыть документ →</button>{votes.find(v=>v.formal_document_id===d.id&&v.status==='open')&&<button type="button" className="legalVoteShortcut" onClick={()=>onOpenVotes(votes.find(v=>v.formal_document_id===d.id&&v.status==='open')?.id)}>Голосование</button>}</footer>
+      <footer className="formalRegistryRowActions"><span>Ответственный: {ownerLabel(d.current_owner_key)}</span>{votes.find(v=>v.formal_document_id===d.id&&v.status==='open')&&<button type="button" className="legalVoteShortcut" onClick={()=>onOpenVotes(votes.find(v=>v.formal_document_id===d.id&&v.status==='open')?.id)}>Голосование</button>}<button type="button" className="legalOpenDocument" onClick={()=>openRegistryDocument(d.id)}>Открыть документ →</button></footer>
      </article>
     }):<div className="registryEmptyState"><Search size={26}/><div><b>Документы не найдены</b><span>Измените запрос или сбросьте фильтры.</span></div><button type="button" className="secondary" onClick={()=>{setQuery('');setFilterSubject('');setFilterStatus('')}}>Показать все</button></div>}</div>
    </aside>
 
-   <article className="formalDetail" hidden={!detailOpen} data-tab="unified"><div className="legalDetailToolbar legalUnifiedToolbar"><button type="button" className="secondary legalBackToRegistry" onClick={()=>{setDetailOpen(false);onSelectDocument?.();setEditing(false);if(detailReturn==='create')setMode('create')}}>{detailReturn==='create'?<FilePlus2 size={18}/>:<ArrowLeft size={18}/>} {detailReturn==='create'?'Создать документ':'Реестр НПА'}</button><div className="legalWorkspaceLabel"><small>РАБОЧАЯ КАРТОЧКА НПА</small><b>Документ и процедура</b></div>{canEditSelected&&!editing?<button className="secondary legalEditDocument" onClick={()=>startEdit(selected)}>Редактировать текст</button>:editing?<span className="legalEditingBadge">Редактирование включено</span>:null}</div>{!selected?<div className="formalEmptyBig"><span>▤</span><h2>{formalDocuments.length?'Документы не найдены':'Реестр пока пуст'}</h2><p>{formalDocuments.length?'Измените запрос или фильтры, чтобы выбрать документ.':'Создайте нормативный документ — здесь будут текст, стадии и связанные голосования.'}</p>{formalDocuments.length>0&&<button className="secondary" onClick={()=>{setQuery('');setFilterSubject('');setFilterStatus('')}}>Сбросить фильтры</button>}<button className="primary" onClick={()=>setMode('create')}>Создать документ</button></div>:<>
+   <article id="npa-document-workspace" className="formalDetail" hidden={!detailOpen} data-tab="unified"><div className="legalDetailToolbar legalUnifiedToolbar"><button type="button" className="secondary legalBackToRegistry" onClick={()=>{setDetailOpen(false);onSelectDocument?.();setEditing(false);if(detailReturn==='create')setMode('create')}}>{detailReturn==='create'?<FilePlus2 size={18}/>:<ArrowLeft size={18}/>} {detailReturn==='create'?'Создать документ':'Реестр НПА'}</button><div className="legalWorkspaceLabel"><small>РАБОЧАЯ КАРТОЧКА НПА</small><b>Документ и процедура</b></div>{canEditSelected&&!editing?<button className="secondary legalEditDocument" onClick={()=>startEdit(selected)}>Редактировать текст</button>:editing?<span className="legalEditingBadge">Редактирование включено</span>:null}</div>{!selected?<div className="formalEmptyBig"><span>▤</span><h2>{formalDocuments.length?'Документы не найдены':'Реестр пока пуст'}</h2><p>{formalDocuments.length?'Измените запрос или фильтры, чтобы выбрать документ.':'Создайте нормативный документ — здесь будут текст, стадии и связанные голосования.'}</p>{formalDocuments.length>0&&<button className="secondary" onClick={()=>{setQuery('');setFilterSubject('');setFilterStatus('')}}>Сбросить фильтры</button>}<button className="primary" onClick={()=>setMode('create')}>Создать документ</button></div>:<>
     <header className="documentSummaryHeader"><div><span>{selected.registry_no} · Этап {selected.stage_no}</span><b>{typeLabel(selected.doc_type)}</b><small>Редакция {String(selected.metadata?.revision||1)} · {selected.subject_label}</small></div><div className="documentSummaryState"><span className={'formalStatus '+statusTone(selected.status_code)}>{selected.status_label}</span><small>Ответственный: {ownerLabel(selected.current_owner_key)}</small></div></header>
     {accessError&&<p className="error" role="alert">{accessError}</p>}
     <section className="legalUnifiedWorkspace" aria-label="Рабочее пространство нормативного документа">
