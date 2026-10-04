@@ -1,0 +1,125 @@
+{
+  "target": 314,
+  "completed": {
+    "budget-region-2026-05-equalization": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "47bc600c615e076959239bcdc8102d0f3f44aa6904bf09146d5391db1283fe46",
+      "asset_sha256": "20aaab97369e972f23f466104f3353b0ad67de8b07cbe085641a1b376bd27511",
+      "asset": "/event-art/scene-201-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-8e13a2be-5642-4b6b-916a-f6bdf36dbba4.png"
+    },
+    "budget-region-2026-14-credit": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "1d10968dba2be28ffd43e64007368ac604a19bfca107f6fa7cc42bb37a02f9bb",
+      "asset_sha256": "b278d5ee2f49680a21a3e62bf8c457f5901e97298879d5febffdc799aa44e757",
+      "asset": "/event-art/scene-202-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-54bd97c9-f470-477f-bd1f-f24a1ed2fa04.png"
+    },
+    "budget-region-2026-27-delegated": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "f1fe31764a38792d95ac30eeb01da41a5a47dc11c616a2a87b975ffbd57878ba",
+      "asset_sha256": "4ea96ecd6b345190a8fade3ada0c6d18676c9a3ea3c023733b85a5dbc67338bb",
+      "asset": "/event-art/scene-203-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-6fb12798-9591-4d69-a6f6-c171187b0c1c.png"
+    },
+    "budget-region-2026-38-emergency": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "9fcadd651b20b7ed685e8e13bcaa1b1669069dbcb6f37b26e8eb36801af90f83",
+      "asset_sha256": "25074aa596a3b82a9713e205ddc6789519987dff6f4b16a128ce92659db9cc4e",
+      "asset": "/event-art/scene-204-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-37e7e383-b407-4236-830b-7ddf1b83a12d.png"
+    },
+    "budget-region-2026-39-credit-return": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "56e2a5cbdc2789aefa9a69eec72a4afe767fd3ca31c0be48ab00d832db4480c8",
+      "asset_sha256": "6407751b8b25c4ca5764113cf143e36fd111bdee5dcca9c6bf6a8e1bced61012",
+      "asset": "/event-art/scene-205-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-e69d35da-6075-4680-a4e6-05a9b1b43121.png"
+    },
+    "budget-region-2026-54-cluster": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "602dac9ce666f074c3d302dfa40fcd222fda349bb301b7094e4179a28dc37c5a",
+      "asset_sha256": "f0d8f3112dee377a88317fae80d0bfda2de8e0566213abba546af08bdd403e3e",
+      "asset": "/event-art/scene-206-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-0ab547fb-ecca-44f9-8991-2ea07f38c369.png"
+    },
+    "budget-region-2026-59-consolidation": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "37292b9e9b4ae5add3fc743c36466ec3b007d00e93a7a9fa17c3b7083fd543b9",
+      "asset_sha256": "38f1b86134a1a0022c516c1629127293413b09ae3d1d5c20f600bb07951fee10",
+      "asset": "/event-art/scene-207-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-d61a05f7-f1a8-413b-b6ce-8b60b63938cf.png"
+    },
+    "budget-region-2026-77-recipient-insolvent": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "9f933be739486d70a1967439c2877514a292a562d6b278bbd48c27be78d46476",
+      "asset_sha256": "137c2a8fe61b91439ba1da87d61d732aabbc53526dd767c99875dafc8c62ea93",
+      "asset": "/event-art/scene-208-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-91317736-d00e-4ab3-83ed-17a06e15e4dc.png"
+    }
+  }
+}

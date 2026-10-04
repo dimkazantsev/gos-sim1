@@ -64,5 +64,53 @@
     "width": 1920,
     "height": 1080,
     "srcSet": "/event-art/scene-010-480.webp 480w, /event-art/scene-010-960.webp 960w, /event-art/scene-010-1920.webp 1920w"
+  },
+  "budget-region-2026-05-equalization": {
+    "src": "/event-art/scene-201-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-201-20261004-480.webp 480w, /event-art/scene-201-20261004-960.webp 960w, /event-art/scene-201-20261004-1920.webp 1920w"
+  },
+  "budget-region-2026-14-credit": {
+    "src": "/event-art/scene-202-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-202-20261004-480.webp 480w, /event-art/scene-202-20261004-960.webp 960w, /event-art/scene-202-20261004-1920.webp 1920w"
+  },
+  "budget-region-2026-27-delegated": {
+    "src": "/event-art/scene-203-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-203-20261004-480.webp 480w, /event-art/scene-203-20261004-960.webp 960w, /event-art/scene-203-20261004-1920.webp 1920w"
+  },
+  "budget-region-2026-38-emergency": {
+    "src": "/event-art/scene-204-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-204-20261004-480.webp 480w, /event-art/scene-204-20261004-960.webp 960w, /event-art/scene-204-20261004-1920.webp 1920w"
+  },
+  "budget-region-2026-39-credit-return": {
+    "src": "/event-art/scene-205-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-205-20261004-480.webp 480w, /event-art/scene-205-20261004-960.webp 960w, /event-art/scene-205-20261004-1920.webp 1920w"
+  },
+  "budget-region-2026-54-cluster": {
+    "src": "/event-art/scene-206-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-206-20261004-480.webp 480w, /event-art/scene-206-20261004-960.webp 960w, /event-art/scene-206-20261004-1920.webp 1920w"
+  },
+  "budget-region-2026-59-consolidation": {
+    "src": "/event-art/scene-207-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-207-20261004-480.webp 480w, /event-art/scene-207-20261004-960.webp 960w, /event-art/scene-207-20261004-1920.webp 1920w"
+  },
+  "budget-region-2026-77-recipient-insolvent": {
+    "src": "/event-art/scene-208-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-208-20261004-480.webp 480w, /event-art/scene-208-20261004-960.webp 960w, /event-art/scene-208-20261004-1920.webp 1920w"
   }
 }
