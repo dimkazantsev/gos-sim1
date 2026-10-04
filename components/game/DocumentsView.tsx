@@ -6,7 +6,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import type {FormalDocument} from './types';
 import {FORMAL_SUBJECTS,FORMAL_TYPES,inferFormal,formalSignature,ownerLabel} from './formalInstitutions';
 import {votePresetForDocument} from './proceduralVoting';
-import {ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,CircleDot,Clock3,ClipboardList,FilePlus2,FileText,Paperclip,Plus,Printer,Route,Search,Upload,Vote,X} from 'lucide-react';
+import {ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,CircleDot,Clock3,ClipboardList,FilePlus2,FileText,Paperclip,Plus,Printer,Route,Search,Undo2,Upload,Vote,X,XCircle} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import DocumentPaper from './DocumentPaper';
 import BudgetDocumentAnnex from './BudgetDocumentAnnex';
@@ -27,6 +27,7 @@ type BillReadiness={submission_ready:boolean;committee_ready:boolean;issues:stri
 type BudgetPreliminaryReview={document_id:string;documents_compliant:boolean;sent_to_all_committees:boolean;accounts_chamber_reviewed:boolean;committee_conclusion:string;decision:'draft'|'accept'|'return';note:string|null;updated_at:string};
 type SupportDocument={id:string;document_id:string;stage_code:string;category:string;title:string;note:string|null;storage_path:string|null;file_name:string|null;mime_type:string|null;file_size:number|null;created_by:string|null;created_at:string;url?:string|null};
 const billFileLabels:Record<string,string>={explanatory_note:'Пояснительная записка',affected_acts:'Перечень затрагиваемых актов',financial_economic:'Финансово-экономическое обоснование',government_opinion:'Заключение Правительства РФ',collegial_decision:'Решение коллегиального субъекта о внесении',other_review:'Отзыв иного субъекта законодательной инициативы'};
+const supportCategoryLabels:Record<string,string>={committee_conclusion:'Заключение комитета',decision:'Решение органа',protocol:'Протокол',opinion:'Заключение / отзыв',letter:'Сопроводительное письмо',review:'Экспертный отзыв',amendment:'Поправки',other:'Иной документ'};
 function readableBillIssue(issue:string){
  let text=issue;
  for(const [key,label] of Object.entries(billFileLabels))text=text.replaceAll(key,label);
@@ -255,6 +256,8 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const billReadinessStepsDone=Number(billProfileReady)+Number(billMaterialsReady)+Number(showBillCommitteeReadiness&&!!billReadiness?.committee_ready);
  const billReadinessPercent=Math.round(billReadinessStepsDone/billReadinessStepsTotal*100);
  const canMaintainBillPackage=!!selected&&!readOnly&&(teacher||selected.author_id===me?.user_id||canManage(selected));
+ const editingInitialPackage=!!selected&&selected.current_owner_key==='author'&&['draft','revision'].includes(selected.status_code);
+ const canAddSupportDocument=!!selected&&!readOnly&&(teacher||canManage(selected));
  function focusBillPackage(){setBillDossierOpen(true);requestAnimationFrame(()=>document.getElementById('bill-submission-package')?.scrollIntoView({behavior:'smooth',block:'start'}))}
  async function openProceduralVote(){
   if(!selected||!votePreset||busy||readOnly||!canManage(selected))return;
@@ -286,9 +289,35 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   if(r.error)g.setError(r.error.message);else if(selected)setLocalRefresh(x=>x+1);setBusy(false);
  }
  async function saveCommitteeConclusion(finalize:boolean){
-  if(readOnly)return;
-  if(!selected)return;setBusy(true);const r=await supabase.rpc('save_bill_committee_conclusion',{p_document_id:selected.id,p_rapporteur_user_id:committeeRapporteur||null,p_legal_compliance:committeeLegal,p_internal_logic:committeeLogic,p_affected_acts_completeness:committeeActs,p_recommendation:committeeRecommendation,p_finalize:finalize});
-  if(r.error)g.setError(r.error.message);else setLocalRefresh(x=>x+1);setBusy(false);
+  if(readOnly||!selected)return;
+  setBusy(true);
+  const r=await supabase.rpc('save_bill_committee_conclusion',{p_document_id:selected.id,p_rapporteur_user_id:committeeRapporteur||null,p_legal_compliance:committeeLegal,p_internal_logic:committeeLogic,p_affected_acts_completeness:committeeActs,p_recommendation:committeeRecommendation,p_finalize:finalize});
+  if(r.error)g.setError(r.error.message);
+  else{
+   setLocalRefresh(x=>x+1);
+   if(finalize){setBillDossierOpen(false);await g.refresh()}
+  }
+  setBusy(false);
+ }
+ async function addSupportDocument(){
+  if(readOnly||!selected||!g.game||supportTitle.trim().length<3)return;
+  setBusy(true);
+  let storagePath:string|null=null;
+  if(supportFile){
+   const ext=(supportFile.name.split('.').pop()||'bin').toLowerCase();
+   storagePath=g.game.id+'/formal/'+selected.id+'/support/'+crypto.randomUUID()+'.'+ext;
+   const up=await supabase.storage.from('game-assets').upload(storagePath,supportFile,{contentType:supportFile.type||'application/octet-stream'});
+   if(up.error){g.setError(up.error.message);setBusy(false);return}
+  }
+  const r=await supabase.rpc('add_formal_support_document',{
+   p_document_id:selected.id,p_category:supportCategory,p_title:supportTitle.trim(),p_note:supportNote.trim()||null,
+   p_storage_path:storagePath,p_file_name:supportFile?.name||null,p_mime_type:supportFile?.type||null,p_file_size:supportFile?.size||null
+  });
+  if(r.error)g.setError(r.error.message);
+  else{
+   setSupportTitle('');setSupportNote('');setSupportFile(null);setSupportFormOpen(false);setLocalRefresh(x=>x+1);
+  }
+  setBusy(false);
  }
  async function saveBudgetPreliminary(){
   if(readOnly)return;
@@ -396,7 +425,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
        :selected.status_code==='president'&&canManage(selected)?<div className="presidentialDecision"><small>РЕШЕНИЕ ПРЕЗИДЕНТА РФ</small><b>{selected.workflow_key==='budget'?'Федеральный бюджет поступил Президенту':'Закон поступил на промульгацию'}</b><p>{selected.workflow_key==='budget'?'Президент может подписать закон о бюджете либо отклонить его; при отклонении запускается согласительная процедура.':'Президент может подписать федеральный закон либо отклонить его. При вето Государственная Дума сможет поставить вопрос о преодолении вето.'}</p><div><button className="primary" disabled={busy} onClick={async()=>{setBusy(true);await advanceFormalDocument(selected.id,'advance','Подписано Президентом Российской Федерации');setBusy(false)}}>Подписать →</button><button className="vetoButton" disabled={busy} onClick={async()=>{if(!confirm('Отклонить документ Президентом Российской Федерации?'))return;setBusy(true);await vetoFormalDocument(selected.id,'Отклонено Президентом Российской Федерации');setBusy(false)}}>Наложить вето</button></div></div>
        :budgetReading1Rejected&&canManage(selected)?<div className="formalBranchPanel warning"><small>БЮДЖЕТ ОТКЛОНЁН В I ЧТЕНИИ</small><b>Выберите дальнейшую процедуру</b><p>Правила допускают согласительную комиссию, возврат проекта Правительству на доработку либо постановку вопроса о доверии Правительству.</p><div><button className="primary" disabled={busy} onClick={async()=>{setBusy(true);await startBudgetRejectionBranch(selected.id,'conciliation','После отклонения в I чтении');setBusy(false)}}>Согласительная комиссия</button><button className="secondary" disabled={busy} onClick={async()=>{setBusy(true);await startBudgetRejectionBranch(selected.id,'government_revision','Возврат бюджета Правительству после I чтения');setBusy(false)}}>Вернуть Правительству</button><button className="secondary" onClick={()=>onOpenVotes()}>Вопрос о доверии →</button></div></div>
        :votePreset?<div className={'formalVoteLink legal-'+votePreset.legalMode}><small>{votePreset.badge}</small><b>Требуется решение голосованием</b><span>{votePreset.rule}</span><p className="formalLegalBasis"><i>{votePreset.legalMode==='law'?'Действующее право':votePreset.legalMode==='reduction'?'Право + учебная редукция':'Правило игры'}</i>{votePreset.legalBasis}</p><>{canManage(selected)?<button className="primary" disabled={busy||readOnly} onClick={openProceduralVote}>{busy?'Открывается…':'Начать голосование по документу'}</button>:<span>Голосование открывает ответственный институт или преподаватель.</span>}</></div>
-       :currentAction?canManage(selected)?procedureBlocked?<div className="documentActionGate" role="status"><CircleAlert size={20}/><div><b>{procedureReadinessPending?'Проверяю комплект…':'Комплект внесения не готов'}</b><p>{procedureReadinessPending?'Система проверяет обязательные материалы.':'Недостающие пункты показаны ниже в едином блоке «Комплект внесения».'}</p></div>{!procedureReadinessPending&&<button type="button" className="secondary" onClick={focusBillPackage}>Исправить комплект</button>}</div>:<><button className="primary" disabled={busy} onClick={async()=>{setBusy(true);await advanceFormalDocument(selected.id,'advance');setBusy(false)}}>{currentAction} →</button>{selected.current_owner_key!=='author'&&<div className="formalSecondaryActions"><button onClick={()=>void advanceFormalDocument(selected.id,'return','Возвращено на доработку')}>↺ Вернуть автору</button><button onClick={()=>{if(confirm('Отклонить документ?'))void advanceFormalDocument(selected.id,'reject','Документ отклонён')}}>× Отклонить</button></div>}</>:<div className="formalWaiting">Ожидается действие другого института. Все участники видят изменение стадии автоматически.</div>
+       :currentAction?canManage(selected)?procedureBlocked?<div className="documentActionGate" role="status"><CircleAlert size={20}/><div><b>{procedureReadinessPending?'Проверяю комплект…':'Комплект внесения не готов'}</b><p>{procedureReadinessPending?'Система проверяет обязательные материалы.':'Недостающие пункты показаны ниже в едином блоке «Комплект внесения».'}</p></div>{!procedureReadinessPending&&<button type="button" className="secondary" onClick={focusBillPackage}>Исправить комплект</button>}</div>:<><button className="primary" disabled={busy} onClick={async()=>{setBusy(true);await advanceFormalDocument(selected.id,'advance');setBusy(false)}}>{currentAction} →</button>{selected.current_owner_key!=='author'&&<div className="formalSecondaryActions"><button onClick={()=>void advanceFormalDocument(selected.id,'return','Возвращено на доработку')}><Undo2 size={16}/> Вернуть автору</button><button onClick={()=>{if(confirm('Отклонить документ?'))void advanceFormalDocument(selected.id,'reject','Документ отклонён')}}><XCircle size={16}/> Отклонить</button></div>}</>:<div className="formalWaiting">Ожидается действие другого института. Все участники видят изменение стадии автоматически.</div>
        :<div className="formalWaiting done">Процедура завершена.</div>}</article>
       
       <article className="surface formalPassport"><div className="surfaceHead"><div><small>ПАСПОРТ ДОКУМЕНТА</small><h2>Карточка</h2></div></div><dl><div><dt>Номер</dt><dd>{selected.registry_no}</dd></div><div><dt>Субъект</dt><dd>{selected.subject_label}</dd></div><div><dt>Автор</dt><dd>{author?.full_name||'—'}</dd></div><div><dt>Создан</dt><dd>{fmtDateTime(selected.created_at)}</dd></div><div><dt>Ответственный сейчас</dt><dd>{ownerLabel(selected.current_owner_key)}</dd></div></dl>{selected.file_url&&<a className="formalSourceFile" href={selected.file_url} target="_blank" rel="noreferrer">Открыть исходный файл ↗<small>{selected.source_file_name}</small></a>}</article>
