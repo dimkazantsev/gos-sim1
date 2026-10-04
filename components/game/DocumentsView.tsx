@@ -229,8 +229,18 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const packageIssueCount=billReadiness?[...billReadiness.issues,...billReadiness.review_issues].length:0;
  const requiredBillKinds=billReadiness?.required_files||['explanatory_note','affected_acts'];
  const requiredBillPresent=requiredBillKinds.filter(kind=>billFiles.some(file=>file.file_kind===kind)).length;
+ const billRepresentativeRequired=!!selected&&['government','sf','region','ks','vs'].includes(selected.subject_key);
+ const billProfileReady=!!billCommittee&&(!billRepresentativeRequired||!!billRepresentative);
+ const billMaterialsReady=requiredBillPresent===requiredBillKinds.length;
+ const billSubmissionReady=!!billReadiness?.submission_ready;
  const billCommitteeLabel=committeeUnits.find(unit=>unit.unit_key===billCommittee)?.title||'Не выбран';
  const billRepresentativeLabel=members.find(member=>member.user_id===billRepresentative)?.full_name||'Не указан';
+ const missingBillMaterialLabels=requiredBillKinds.filter(kind=>!billFiles.some(file=>file.file_kind===kind)).map(kind=>billFileLabels[kind]||kind);
+ const billCommitteeStepIndex=selected?.workflow_key==='bill'?selected.workflow_steps.findIndex(step=>step.code==='committee'):-1;
+ const showBillCommitteeReadiness=!!selected&&billCommitteeStepIndex>=0&&selected.current_step>=billCommitteeStepIndex;
+ const billReadinessStepsTotal=showBillCommitteeReadiness?3:2;
+ const billReadinessStepsDone=Number(billProfileReady)+Number(billMaterialsReady)+Number(showBillCommitteeReadiness&&!!billReadiness?.committee_ready);
+ const billReadinessPercent=Math.round(billReadinessStepsDone/billReadinessStepsTotal*100);
  const canMaintainBillPackage=!!selected&&!readOnly&&(teacher||selected.author_id===me?.user_id||canManage(selected));
  function focusBillPackage(){setBillDossierOpen(true);requestAnimationFrame(()=>document.getElementById('bill-submission-package')?.scrollIntoView({behavior:'smooth',block:'start'}))}
  async function openProceduralVote(){
@@ -428,19 +438,54 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
      </section></div>
     </section>
     <div className="legalBudgetAnnexSlot"><BudgetDocumentAnnex document={selected} onOpenBudget={onOpenBudget} onOpenVotes={onOpenVotes}/></div>
-    {selected.workflow_key==='bill'&&<section id="bill-submission-package" className="surface billDossierCompact">
-      <header className="billDossierCompactHead">
-       <div><small>КОМПЛЕКТ ЗАКОНОПРОЕКТА</small><h2>Комплект внесения</h2><p>Основные материалы формируются при создании документа. Здесь — только состояние комплекта и точечное редактирование при необходимости.</p></div>
-       <span className={billReadiness?.committee_ready?'ok':billReadiness?.submission_ready?'warn':'bad'}>{billReadiness?.committee_ready?'Готово полностью':billReadiness?.submission_ready?'Можно вносить':'Нужно заполнить'}</span>
+    {selected.workflow_key==='bill'&&<section id="bill-submission-package" className="surface billDossierCompact billReadinessPanel">
+      <header className="billDossierCompactHead billReadinessHead">
+       <div><small>КОМПЛЕКТ ЗАКОНОПРОЕКТА</small><h2>Комплект внесения</h2><p>Перед движением законопроекта проверьте обязательные блоки ниже. Здесь показано только то, что влияет на готовность документа.</p></div>
+       <span className={billReadiness?.committee_ready?'ok':billSubmissionReady?'progress':'bad'}>{billReadiness?.committee_ready?'Готов полностью':billSubmissionReady?'Готов к внесению':'Не готов к внесению'}</span>
       </header>
-      <div className="billDossierCompactGrid">
-       <article><small>Профильный комитет</small><b>{billCommitteeLabel}</b></article>
-       <article><small>Представитель в ГД</small><b>{billRepresentativeLabel}</b></article>
-       <article><small>Обязательные материалы</small><b>{requiredBillPresent} из {requiredBillKinds.length}</b><span>{requiredBillPresent===requiredBillKinds.length?'Комплект приложений собран':'Есть недостающие приложения'}</span></article>
-       <article><small>Готовность</small><b>{billReadiness?.committee_ready?'Проверен комитетом':billReadiness?.submission_ready?'Готов к внесению':'Требует доработки'}</b><span>{packageIssueCount?packageIssueCount+' замечаний':'Замечаний нет'}</span></article>
+
+      <div className="billReadinessProgress">
+       <div><span>Готовность комплекта</span><b>{billReadinessStepsDone} из {billReadinessStepsTotal} блоков</b></div>
+       <div className="billReadinessProgressTrack" role="progressbar" aria-label="Готовность комплекта законопроекта" aria-valuemin={0} aria-valuemax={100} aria-valuenow={billReadinessPercent}><i style={{width:billReadinessPercent+'%'}}/></div>
       </div>
-      {packageIssueCount>0&&<div className="billDossierCompactIssues"><CircleAlert size={18}/><div><b>Что осталось сделать</b><span>{[...billReadiness!.issues,...billReadiness!.review_issues].slice(0,2).map(readableBillIssue).join(' · ')}{packageIssueCount>2?' · ещё '+(packageIssueCount-2):''}</span></div></div>}
-      {canMaintainBillPackage&&<button type="button" className="secondary billDossierToggle" aria-expanded={billDossierOpen} onClick={()=>setBillDossierOpen(open=>!open)}><ClipboardList size={17}/>{billDossierOpen?'Скрыть редактор':'Изменить комплект'}</button>}
+
+      <div className="billReadinessSteps">
+       <article className={billProfileReady?'ready':'needs-action'}>
+        <span className="billReadinessStepNo">{billProfileReady?<CheckCircle2 size={19}/>:1}</span>
+        <div className="billReadinessStepCopy">
+         <small>ШАГ 1</small><h3>Карточка внесения</h3>
+         <p>{billProfileReady?'Основные реквизиты заполнены.':'Заполните обязательные реквизиты законопроекта.'}</p>
+         <dl><div><dt>Профильный комитет</dt><dd className={billCommittee?'':'missing'}>{billCommitteeLabel}</dd></div><div><dt>Представитель в ГД</dt><dd className={billRepresentativeRequired&&!billRepresentative?'missing':''}>{billRepresentativeRequired?billRepresentativeLabel:(billRepresentative||'Не требуется')}</dd></div></dl>
+        </div>
+        <span className="billReadinessStepState">{billProfileReady?'Готово':'Нужно заполнить'}</span>
+       </article>
+
+       <article className={billMaterialsReady?'ready':'needs-action'}>
+        <span className="billReadinessStepNo">{billMaterialsReady?<CheckCircle2 size={19}/>:2}</span>
+        <div className="billReadinessStepCopy">
+         <small>ШАГ 2</small><h3>Обязательные материалы</h3>
+         <p>{billMaterialsReady?'Все обязательные приложения загружены.':'Добавьте недостающие приложения к законопроекту.'}</p>
+         <div className="billMaterialSummary"><b>{requiredBillPresent} из {requiredBillKinds.length}</b><span>{missingBillMaterialLabels.length?'Не хватает: '+missingBillMaterialLabels.join(', '):'Комплект приложений собран'}</span></div>
+        </div>
+        <span className="billReadinessStepState">{billMaterialsReady?'Готово':requiredBillPresent+' / '+requiredBillKinds.length}</span>
+       </article>
+
+       {showBillCommitteeReadiness&&<article className={billReadiness?.committee_ready?'ready':'needs-action'}>
+        <span className="billReadinessStepNo">{billReadiness?.committee_ready?<CheckCircle2 size={19}/>:3}</span>
+        <div className="billReadinessStepCopy">
+         <small>ШАГ 3</small><h3>Заключение профильного комитета</h3>
+         <p>{billReadiness?.committee_ready?'Итоговое заключение зафиксировано.':'После проверки материалов комитет должен зафиксировать итоговое заключение.'}</p>
+         {billConclusion&&<div className="billMaterialSummary"><b>{billConclusion.finalized?'Зафиксировано':'Черновик'}</b><span>{billConclusion.recommendation==='proceed'?'Рекомендовано продолжить процедуру':billConclusion.recommendation==='return'?'Рекомендовано вернуть на доработку':billConclusion.recommendation==='reject'?'Рекомендовано отклонить':'Итоговая рекомендация ещё не выбрана'}</span></div>}
+        </div>
+        <span className="billReadinessStepState">{billReadiness?.committee_ready?'Готово':'Требует решения'}</span>
+       </article>}
+      </div>
+
+      <footer className="billReadinessFooter">
+       <div><b>{billSubmissionReady?'Комплект для внесения сформирован':'Следующее действие'}</b><span>{billSubmissionReady?(showBillCommitteeReadiness&&!billReadiness?.committee_ready?'Ожидается заключение профильного комитета.':'Документ может двигаться дальше по процедуре.'):(billProfileReady?'Добавьте обязательные материалы.':'Заполните карточку внесения.')}</span></div>
+       {canMaintainBillPackage&&<button type="button" className={billSubmissionReady?'secondary':'primary'} aria-expanded={billDossierOpen} onClick={()=>setBillDossierOpen(open=>!open)}><ClipboardList size={17}/>{billDossierOpen?'Закрыть редактирование':billSubmissionReady?'Изменить комплект':'Заполнить комплект'}</button>}
+      </footer>
+
       {billDossierOpen&&<div className="billDossierEditor">
        <div className="billDossierEditorHead"><div><small>РЕДАКТИРОВАНИЕ КОМПЛЕКТА</small><h3>Карточка и приложения</h3></div><span>Изменения применяются к уже созданному НПА</span></div>
        <div className="billDossierLayout">
