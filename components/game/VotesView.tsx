@@ -79,6 +79,14 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    <div className="votesHeroState"><strong>{openCount}</strong><span>открытых голосований</span><button onClick={onOpenStages}>Этапы игры →</button></div>
   </section>
 
+  <section className="votesOverview">
+   <article><small>ВСЕГО</small><strong>{votes.length}</strong><span>процедур</span></article>
+   <article><small>ПРИНЯТО</small><strong>{votes.filter(v=>v.result_code==='passed').length}</strong><span>решений</span></article>
+   <article><small>ОТКЛОНЕНО</small><strong>{votes.filter(v=>v.result_code==='rejected').length}</strong><span>решений</span></article>
+   <article><small>БЕЗ КВОРУМА</small><strong>{votes.filter(v=>v.result_code==='no_quorum').length}</strong><span>заседаний</span></article>
+  </section>
+  <InstitutionRegistrationPanel g={g} onUnitsChange={setUnits}/>
+  <section className="npaVoteQueue"><header><h2>НПА, ожидающие голосования</h2><span>{pendingNpas.length}</span></header><p>Документы появляются здесь автоматически при переходе на стадию голосования. Правила процедуры берутся из документа.</p>{pendingNpas.map(d=>{const preset=votePresetForDocument(d)!;return <article key={d.id}><div><small>{d.registry_no} · {d.status_label}</small><b>{d.title}</b><span>{institutionLabel(preset.institutionKey)}</span></div><button className="secondary" onClick={()=>onOpenDocument(d.id)}>Открыть НПА</button><button className="primary" disabled={busy===d.id} onClick={()=>void openNpa(d.id)}>{busy===d.id?'Открывается…':'Открыть голосование'}</button></article>})}{!pendingNpas.length&&<span>Сейчас нет документов на стадии голосования.</span>}</section>
   {teacher&&<details className="teacherDetails voteManual projectDisclosure">
    <DisclosureSummary icon={VoteIcon} title="Открыть отдельное голосование" description="Самостоятельный вопрос или документ из реестра НПА"/>
    <div className="teacherDetailsBody">
@@ -102,16 +110,6 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
     </div>
    </div>
   </details>}
-
-  <section className="npaVoteQueue"><header><h2>НПА, ожидающие голосования</h2><span>{pendingNpas.length}</span></header><p>Документы появляются здесь автоматически при переходе на стадию голосования. Правила процедуры берутся из документа.</p>{pendingNpas.map(d=>{const preset=votePresetForDocument(d)!;return <article key={d.id}><div><small>{d.registry_no} · {d.status_label}</small><b>{d.title}</b><span>{institutionLabel(preset.institutionKey)}</span></div><button className="secondary" onClick={()=>onOpenDocument(d.id)}>Открыть НПА</button><button className="primary" disabled={busy===d.id} onClick={()=>void openNpa(d.id)}>{busy===d.id?'Открывается…':'Открыть голосование'}</button></article>})}{!pendingNpas.length&&<span>Сейчас нет документов на стадии голосования.</span>}</section>
-  <InstitutionRegistrationPanel g={g} onUnitsChange={setUnits}/>
-  <section className="votesOverview">
-   <article><small>ВСЕГО</small><strong>{votes.length}</strong><span>процедур</span></article>
-   <article><small>ПРИНЯТО</small><strong>{votes.filter(v=>v.result_code==='passed').length}</strong><span>решений</span></article>
-   <article><small>ОТКЛОНЕНО</small><strong>{votes.filter(v=>v.result_code==='rejected').length}</strong><span>решений</span></article>
-   <article><small>БЕЗ КВОРУМА</small><strong>{votes.filter(v=>v.result_code==='no_quorum').length}</strong><span>заседаний</span></article>
-  </section>
-
 
 
   <input className="civicVoteSearch" aria-label="Поиск голосований" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Поиск по вопросу, органу или группе"/>
