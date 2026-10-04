@@ -1261,3 +1261,44 @@
     width:100%!important;
   }
 }
+
+
+/* NPA workspace v9 — stronger separation between major document blocks. */
+.legalPortal .formalDetail{
+  row-gap:32px!important;
+}
+.legalPortal .legalUnifiedToolbar{
+  padding-bottom:22px!important;
+}
+.legalPortal .documentSummaryHeader{
+  margin:0!important;
+}
+.legalPortal .legalUnifiedWorkspace{
+  margin:0!important;
+}
+.legalPortal .legalDocumentColumn,
+.legalPortal .legalControlRail{
+  gap:22px!important;
+}
+.legalPortal .legalProcedureBottomGrid,
+.legalPortal .legalBudgetAnnexSlot,
+.legalPortal .billDossierV2,
+.legalPortal .formalHistoryDisclosure,
+.legalPortal .formalDetail>.civicDiscussion,
+.legalPortal .documentRevisionList{
+  scroll-margin-top:96px;
+}
+
+@media(max-width:860px){
+  .legalPortal .formalDetail{
+    row-gap:26px!important;
+  }
+}
+@media(max-width:560px){
+  .legalPortal .formalDetail{
+    row-gap:22px!important;
+  }
+  .legalPortal .legalUnifiedToolbar{
+    padding-bottom:18px!important;
+  }
+}
