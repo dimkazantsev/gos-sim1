@@ -53,7 +53,8 @@ function archiveCoverStyle(stage:number,kind:'intro'|'completed'|'preview'){
 function ArchiveCover({chapter}:{chapter?:Chapter}){
  const stage=chapter?.stage_no||0;
  const kind:'intro'|'completed'|'preview'=chapter?.kind||'intro';
- const label=kind==='intro'?'ПРОЛОГ':kind==='completed'?'ИТОГИ':'АНОНС';
+ if(kind==='intro')return <Artwork scene={0} cover alt="Республика после бури — обложка пролога."/>;
+ const label=kind==='completed'?'ИТОГИ':'АНОНС';
  const code=kind==='intro'?'PR':String(stage).padStart(2,'0');
  const note=kind==='intro'?'СТАРТ ИСТОРИИ':kind==='completed'?'СОХРАНЁННЫЙ РЕЗУЛЬТАТ':'СЛЕДУЮЩИЙ ЭТАП';
  return <div className={styles.abstractCover} style={archiveCoverStyle(stage,kind)} data-kind={kind} aria-hidden="true">
