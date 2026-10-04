@@ -274,3 +274,226 @@
   }
   .legalPortal .formalPassport dd{text-align:left!important}
 }
+
+
+/* Bill readiness v2 — one status, explicit steps, one action. */
+.legalPortal .billReadinessPanel{
+  display:grid!important;
+  gap:16px!important;
+}
+.legalPortal .billReadinessHead{
+  margin-bottom:0!important;
+}
+.legalPortal .billReadinessHead>span.progress{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:30px!important;
+  padding:5px 9px!important;
+  border-radius:999px!important;
+  background:#edf3ff!important;
+  color:#315efb!important;
+  font-size:10px!important;
+  font-weight:850!important;
+}
+.legalPortal .billReadinessProgress{
+  display:grid!important;
+  gap:8px!important;
+  padding:12px 14px!important;
+  border:1px solid #dfe7f1!important;
+  border-radius:13px!important;
+  background:#f8faff!important;
+}
+.legalPortal .billReadinessProgress>div:first-child{
+  display:flex!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  align-items:center!important;
+}
+.legalPortal .billReadinessProgress span{
+  color:#6f829a!important;
+  font-size:10px!important;
+  font-weight:750!important;
+}
+.legalPortal .billReadinessProgress b{
+  color:#24466f!important;
+  font-size:10px!important;
+}
+.legalPortal .billReadinessProgressTrack{
+  width:100%!important;
+  height:7px!important;
+  overflow:hidden!important;
+  border-radius:999px!important;
+  background:#e7edf5!important;
+}
+.legalPortal .billReadinessProgressTrack>i{
+  display:block!important;
+  height:100%!important;
+  border-radius:inherit!important;
+  background:linear-gradient(90deg,#315efb,#6c7cf2)!important;
+}
+.legalPortal .billReadinessSteps{
+  display:grid!important;
+  gap:10px!important;
+}
+.legalPortal .billReadinessSteps>article{
+  display:grid!important;
+  grid-template-columns:42px minmax(0,1fr) auto!important;
+  gap:12px!important;
+  align-items:center!important;
+  min-width:0!important;
+  padding:14px!important;
+  border:1px solid #dfe7f1!important;
+  border-radius:14px!important;
+  background:#fff!important;
+}
+.legalPortal .billReadinessSteps>article.ready{
+  border-color:#d2e7de!important;
+  background:#fbfefc!important;
+}
+.legalPortal .billReadinessSteps>article.needs-action{
+  border-color:#ead49f!important;
+  background:#fffdf8!important;
+}
+.legalPortal .billReadinessStepNo{
+  display:grid!important;
+  place-items:center!important;
+  width:42px!important;
+  height:42px!important;
+  border-radius:12px!important;
+  background:#edf3ff!important;
+  color:#315efb!important;
+  font-size:12px!important;
+  font-weight:900!important;
+}
+.legalPortal article.ready .billReadinessStepNo{
+  background:#e7f6ef!important;
+  color:#177655!important;
+}
+.legalPortal .billReadinessStepCopy{
+  display:grid!important;
+  gap:4px!important;
+  min-width:0!important;
+}
+.legalPortal .billReadinessStepCopy>small{
+  color:#8091a6!important;
+  font-size:8px!important;
+  font-weight:900!important;
+  letter-spacing:.08em!important;
+}
+.legalPortal .billReadinessStepCopy h3{
+  margin:0!important;
+  color:#173c70!important;
+  font-size:14px!important;
+  line-height:1.35!important;
+}
+.legalPortal .billReadinessStepCopy p{
+  margin:0!important;
+  color:#70839a!important;
+  font-size:10px!important;
+  line-height:1.5!important;
+}
+.legalPortal .billReadinessStepCopy dl{
+  display:grid!important;
+  gap:4px!important;
+  margin:6px 0 0!important;
+}
+.legalPortal .billReadinessStepCopy dl>div{
+  display:flex!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  padding-top:5px!important;
+  border-top:1px solid #edf1f5!important;
+}
+.legalPortal .billReadinessStepCopy dt,
+.legalPortal .billReadinessStepCopy dd{
+  margin:0!important;
+  font-size:9px!important;
+  line-height:1.4!important;
+}
+.legalPortal .billReadinessStepCopy dt{color:#7b8da2!important}
+.legalPortal .billReadinessStepCopy dd{
+  color:#2f4f76!important;
+  font-weight:800!important;
+  text-align:right!important;
+}
+.legalPortal .billReadinessStepCopy dd.missing{color:#a44a57!important}
+.legalPortal .billMaterialSummary{
+  display:grid!important;
+  gap:2px!important;
+  margin-top:6px!important;
+}
+.legalPortal .billMaterialSummary b{
+  color:#294c76!important;
+  font-size:10px!important;
+}
+.legalPortal .billMaterialSummary span{
+  color:#7a8ca2!important;
+  font-size:9px!important;
+  line-height:1.45!important;
+  overflow-wrap:anywhere!important;
+}
+.legalPortal .billReadinessStepState{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:28px!important;
+  padding:5px 8px!important;
+  border-radius:999px!important;
+  background:#fff3dc!important;
+  color:#896316!important;
+  font-size:9px!important;
+  font-weight:850!important;
+  white-space:nowrap!important;
+}
+.legalPortal article.ready .billReadinessStepState{
+  background:#e9f7f1!important;
+  color:#177655!important;
+}
+.legalPortal .billReadinessFooter{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+  padding-top:14px!important;
+  border-top:1px solid #e7edf4!important;
+}
+.legalPortal .billReadinessFooter>div{
+  display:grid!important;
+  gap:3px!important;
+  min-width:0!important;
+}
+.legalPortal .billReadinessFooter b{
+  color:#294b73!important;
+  font-size:11px!important;
+}
+.legalPortal .billReadinessFooter span{
+  color:#7a8ca2!important;
+  font-size:10px!important;
+  line-height:1.45!important;
+}
+.legalPortal .billReadinessFooter>button{
+  flex:none!important;
+  min-height:42px!important;
+  padding:9px 12px!important;
+}
+@media(max-width:720px){
+  .legalPortal .billReadinessSteps>article{
+    grid-template-columns:36px minmax(0,1fr)!important;
+  }
+  .legalPortal .billReadinessStepNo{
+    width:36px!important;
+    height:36px!important;
+  }
+  .legalPortal .billReadinessStepState{
+    grid-column:2!important;
+    justify-self:start!important;
+  }
+  .legalPortal .billReadinessFooter{
+    align-items:stretch!important;
+    flex-direction:column!important;
+  }
+  .legalPortal .billReadinessFooter>button{
+    width:100%!important;
+  }
+}
