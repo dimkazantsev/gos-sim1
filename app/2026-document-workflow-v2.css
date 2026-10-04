@@ -608,3 +608,270 @@
 @media print{
   .legalPortal .legalPrintButton{display:none!important}
 }
+
+
+/* NPA workspace v7 — final alignment and action hierarchy. */
+.legalPortal .legalPrimaryNav{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  width:100%!important;
+}
+.legalPortal .legalPrimaryNav>button{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:9px!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:54px!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+}
+.legalPortal .legalPrimaryNav>button>span{
+  flex:none;
+}
+.legalPortal .formalActions{
+  padding:20px!important;
+  border-radius:20px!important;
+}
+.legalPortal .formalActions>.surfaceHead{
+  margin-bottom:12px!important;
+}
+.legalPortal .documentNextStep{
+  margin:0 0 14px!important;
+  padding:17px 18px!important;
+  border-radius:17px!important;
+}
+.legalPortal .documentNextStep h3{
+  margin:7px 0!important;
+  line-height:1.35!important;
+}
+.legalPortal .documentNextStep p{
+  margin:7px 0 0!important;
+  line-height:1.55!important;
+}
+.legalPortal .formalActions>button.primary{
+  width:100%!important;
+  min-width:0!important;
+  min-height:52px!important;
+  justify-content:center!important;
+}
+.legalPortal .formalSecondaryActions{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+  width:100%!important;
+  margin-top:10px!important;
+}
+.legalPortal .formalSecondaryActions>button{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:48px!important;
+  padding:10px 12px!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+}
+.legalPortal .formalPassport,
+.legalPortal .budgetPreliminary,
+.legalPortal .formalProgress.legalRouting,
+.legalPortal .formalHistoryDisclosure{
+  border-radius:20px!important;
+}
+.legalPortal .documentToolsBar:empty{
+  display:none!important;
+}
+.legalPortal .documentDelivery{
+  width:100%!important;
+}
+.legalPortal .documentDelivery>summary.projectDisclosureSummary{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .documentDeliveryForm>button.primary{
+  width:100%!important;
+  min-height:50px!important;
+  justify-content:center!important;
+}
+.legalPortal .budgetPreliminaryChecks{
+  display:grid!important;
+  gap:10px!important;
+}
+.legalPortal .budgetPreliminaryChecks label{
+  display:grid!important;
+  grid-template-columns:22px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:11px!important;
+  min-height:66px!important;
+  padding:12px 13px!important;
+  border-radius:14px!important;
+  line-height:1.4!important;
+}
+.legalPortal .budgetPreliminaryChecks input[type=checkbox]{
+  align-self:center!important;
+  width:18px!important;
+  height:18px!important;
+  min-width:18px!important;
+  min-height:18px!important;
+  margin:0!important;
+}
+.legalPortal .legalProcedureBottomGrid .formalProgress.legalRouting{
+  overflow:hidden!important;
+}
+.legalPortal .legalProcedureBottomGrid .formalSteps{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+  max-height:560px!important;
+  padding:12px 14px 14px!important;
+  overflow:auto!important;
+}
+.legalPortal .legalProcedureBottomGrid .formalStep{
+  display:grid!important;
+  grid-template-columns:34px minmax(0,1fr)!important;
+  grid-template-rows:auto auto!important;
+  column-gap:10px!important;
+  row-gap:3px!important;
+  align-items:center!important;
+  min-width:0!important;
+  min-height:88px!important;
+  padding:12px!important;
+  border-radius:14px!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .legalProcedureBottomGrid .formalStep>span{
+  grid-column:1!important;
+  grid-row:1 / span 2!important;
+  display:grid!important;
+  place-items:center!important;
+  width:34px!important;
+  height:34px!important;
+  margin:0!important;
+  border-radius:11px!important;
+}
+.legalPortal .legalProcedureBottomGrid .formalStep>b{
+  grid-column:2!important;
+  grid-row:1!important;
+  min-width:0!important;
+  line-height:1.35!important;
+  overflow-wrap:anywhere!important;
+}
+.legalPortal .legalProcedureBottomGrid .formalStep>small{
+  grid-column:2!important;
+  grid-row:2!important;
+  min-width:0!important;
+  line-height:1.35!important;
+  overflow-wrap:anywhere!important;
+}
+
+/* Action journal — same civic visual language as the rest of the portal. */
+.legalPortal .formalHistoryDisclosure{
+  border:1px solid #d8e4f2!important;
+  background:
+    radial-gradient(circle at 0 0,#dfeaff 0,transparent 34%),
+    linear-gradient(180deg,#fbfdff 0%,#f5f8fd 100%)!important;
+  box-shadow:0 14px 34px #173c7010!important;
+}
+.legalPortal .formalHistorySummary{
+  min-height:76px!important;
+  padding:18px 20px!important;
+  background:linear-gradient(90deg,#ffffffb8,#f6f9ffcc)!important;
+}
+.legalPortal .formalHistorySummary small{
+  color:#4c6fc5!important;
+  letter-spacing:.1em!important;
+}
+.legalPortal .formalHistorySummary h2{
+  color:#173c70!important;
+  font-size:20px!important;
+}
+.legalPortal .formalHistorySummary>span{
+  min-height:34px!important;
+  padding:6px 12px!important;
+  border-color:#ccdafa!important;
+  background:#edf3ff!important;
+  color:#3156b9!important;
+}
+.legalPortal .formalHistoryBody{
+  padding:16px 18px 18px!important;
+  border-top:1px solid #e2eaf5!important;
+}
+.legalPortal .formalHistoryBody>.formalLinkedVotes{
+  margin:0 0 12px!important;
+}
+.legalPortal .formalHistoryBody>div:last-child{
+  display:grid!important;
+  gap:10px!important;
+}
+.legalPortal .formalHistoryRow{
+  position:relative;
+  display:grid!important;
+  grid-template-columns:14px minmax(0,1fr)!important;
+  gap:12px!important;
+  align-items:start!important;
+  min-width:0!important;
+  padding:13px 14px!important;
+  border:1px solid #e0e8f3!important;
+  border-radius:15px!important;
+  background:#fff!important;
+  box-shadow:0 5px 16px #173c7008!important;
+}
+.legalPortal .formalHistoryRow>span{
+  width:11px!important;
+  height:11px!important;
+  margin-top:5px!important;
+  border:3px solid #dfe8ff!important;
+  border-radius:999px!important;
+  background:#315efb!important;
+  box-shadow:0 0 0 1px #98aff2!important;
+}
+.legalPortal .formalHistoryRow>div{
+  min-width:0!important;
+}
+.legalPortal .formalHistoryRow time{
+  display:block!important;
+  margin:0 0 4px!important;
+  color:#8293aa!important;
+  font-size:10px!important;
+  font-weight:700!important;
+}
+.legalPortal .formalHistoryRow b{
+  display:block!important;
+  margin:0 0 4px!important;
+  color:#1b4279!important;
+  font-size:13px!important;
+  line-height:1.38!important;
+}
+.legalPortal .formalHistoryRow small{
+  display:block!important;
+  color:#667c96!important;
+  font-size:11px!important;
+  line-height:1.48!important;
+  overflow-wrap:anywhere!important;
+}
+
+@media(max-width:720px){
+  .legalPortal .legalPrimaryNav{
+    gap:8px!important;
+  }
+  .legalPortal .legalPrimaryNav>button{
+    min-height:50px!important;
+    padding:9px 8px!important;
+    font-size:12px!important;
+  }
+  .legalPortal .formalSecondaryActions{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .legalPortal .legalProcedureBottomGrid .formalSteps{
+    grid-template-columns:minmax(0,1fr)!important;
+    max-height:none!important;
+  }
+}
+@media(max-width:430px){
+  .legalPortal .legalPrimaryNav{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+}
