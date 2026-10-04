@@ -52,23 +52,38 @@ function archiveCoverStyle(stage:number,kind:'intro'|'completed'|'preview'){
 }
 function ArchiveCover({chapter}:{chapter?:Chapter}){
  const stage=chapter?.stage_no||0;
- const kind: 'intro'|'completed'|'preview'=chapter?.kind||'intro';
+ const kind:'intro'|'completed'|'preview'=chapter?.kind||'intro';
  const label=kind==='intro'?'ПРОЛОГ':kind==='completed'?'ИТОГИ':'АНОНС';
- const code=String(stage).padStart(2,'0');
- return <div className={styles.abstractCover} style={archiveCoverStyle(stage,kind)} data-kind={kind} data-variant={String(stage%4)} aria-hidden="true">
-  <i className={styles.posterSkyGlow}/>
-  <i className={styles.posterSun}/>
-  <span className={styles.posterSkyline}>
-   {Array.from({length:9},(_,i)=><i key={i} style={{'--tower':`${26+((stage*13+i*17)%48)}%`,'--delay':String(i)} as CSSProperties}/>)}
-  </span>
-  <span className={styles.posterGovernment}><i/><i/><i/><i/><i/></span>
-  <span className={styles.posterBridge}><i/><i/><i/><i/></span>
-  <span className={styles.posterRiver}/>
-  <span className={styles.posterPeople}><i/><i/><i/></span>
-  <span className={styles.abstractBrand}>GOS//SIMS</span>
-  <span className={styles.abstractKind}>{label}</span>
-  {stage>0&&<strong className={styles.abstractNumber}>{code}</strong>}
-  <span className={styles.abstractIcon}><BookOpen size={19}/></span>
+ const code=kind==='intro'?'PR':String(stage).padStart(2,'0');
+ const note=kind==='intro'?'СТАРТ ИСТОРИИ':kind==='completed'?'СОХРАНЁННЫЙ РЕЗУЛЬТАТ':'СЛЕДУЮЩИЙ ЭТАП';
+ return <div className={styles.abstractCover} style={archiveCoverStyle(stage,kind)} data-kind={kind} aria-hidden="true">
+  <i className={styles.coverGrid}/>
+  <i className={styles.coverGlow}/>
+  <i className={styles.coverGlowSecondary}/>
+  <div className={styles.coverTopBar}>
+   <span className={styles.abstractBrand}>GOS//SIMS</span>
+   <span className={styles.abstractIcon}><BookOpen size={18}/></span>
+  </div>
+  <div className={styles.coverCenter}>
+   <div className={styles.coverStageBadge}>
+    <small>{label}</small>
+    <strong>{code}</strong>
+    <span>РЕСПУБЛИКА</span>
+   </div>
+   <div className={styles.coverMetricStack}>
+    <div className={styles.coverMetricCard}><span>НОРМА</span><b>Проект</b><i/></div>
+    <div className={styles.coverMetricCard}><span>РЕСУРС</span><b>Баланс</b><i/></div>
+    <div className={styles.coverMetricCard}><span>ПРОЦЕСС</span><b>Решение</b><i/></div>
+   </div>
+  </div>
+  <div className={styles.coverFlow}>
+   <span className={styles.coverFlowLine}/>
+   <i/><i/><i/><i/>
+  </div>
+  <div className={styles.coverFooter}>
+   <span className={styles.abstractKind}>{label}</span>
+   <span className={styles.coverFooterNote}>{note}</span>
+  </div>
  </div>;
 }
 type ComicView='intro'|'archive'|'chapter';
@@ -145,7 +160,7 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
     <div className={styles.libraryGrid}>
      <button type="button" className={styles.libraryCard} onClick={openIntro}>
       <div className={styles.cover}><ArchiveCover/></div>
-      <div className={styles.cardText}><small>Пролог · 4 сцены</small><strong>Пролог Республики</strong><span>Республика после бури: с чего начинается ваша история.</span><b>Читать с начала <ArrowRight size={16}/></b></div>
+      <div className={styles.cardText}><small>Пролог · 4 сцены</small><strong>Пролог Республики</strong><span>Республика после бури: с чего начинается ваша история.</span><b>Открыть пролог <ArrowRight size={16}/></b></div>
      </button>
      {chapters.map(c=><button key={c.id} type="button" className={styles.libraryCard} onClick={()=>readChapter(c.id)}>
       <div className={styles.cover}><ArchiveCover chapter={c}/></div>
