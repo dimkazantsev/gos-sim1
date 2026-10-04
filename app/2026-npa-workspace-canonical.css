@@ -1324,3 +1324,10 @@
     width:100%!important;
   }
 }
+
+
+/* NPA typography v5 — sentence case for service labels, acronyms stay uppercase in content. */
+.legalPortal .legalRouteStepTitle small,
+.legalPortal .legalRouteStepDetails b{
+  text-transform:none!important;
+}
