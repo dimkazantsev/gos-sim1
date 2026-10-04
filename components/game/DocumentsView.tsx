@@ -39,6 +39,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const [mode,setMode]=useSavedGameState<'registry'|'create'>(g.game?.id,g.me?.user_id,'documents-mode','registry',savedChoice('registry','create')),[selectedId,setSelectedId]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-selected','',savedString),[query,setQuery]=useState(''),[filterSubject,setFilterSubject]=useState(''),[filterStatus,setFilterStatus]=useState(''),[sortOrder,setSortOrder]=useState('updated');
  const [detailOpen,setDetailOpen]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-detail',!!focusId,savedBoolean),[detailTab,setDetailTab]=useSavedGameState<'text'|'procedure'|'package'>(g.game?.id,g.me?.user_id,'documents-tab',initialDetailTab,savedChoice('text','procedure','package'));
  const [detailReturn,setDetailReturn]=useState<'registry'|'create'>('registry');
+ const [scrollOpenedDocument,setScrollOpenedDocument]=useState(false);
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[subjectKey,setSubjectKey]=useState('gd_deputy'),[docType,setDocType]=useState('fz_bill'),[file,setFile]=useState<File|null>(null),[extracting,setExtracting]=useState(false),[recognized,setRecognized]=useState(''),[busy,setBusy]=useState(false);
  const [templateKey,setTemplateKey]=useState('fz_bill'),[issuer,setIssuer]=useState(''),[place,setPlace]=useState('Москва');
  const [editing,setEditing]=useState(false),[editTitle,setEditTitle]=useState(''),[editBody,setEditBody]=useState('');
@@ -202,6 +203,14 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  }
 
  useEffect(()=>{setEditing(false);setBillDossierOpen(false)},[selected?.id]);
+ useEffect(()=>{
+  if(!scrollOpenedDocument||!detailOpen||!selectedId)return;
+  const frame=requestAnimationFrame(()=>{
+   document.getElementById('npa-document-workspace')?.scrollIntoView({behavior:'smooth',block:'start'});
+   setScrollOpenedDocument(false);
+  });
+  return()=>cancelAnimationFrame(frame);
+ },[scrollOpenedDocument,detailOpen,selectedId]);
  function startEdit(doc:FormalDocument){setEditRevision(Number(doc.metadata?.revision||1));setEditTitle(doc.title);setEditBody(doc.body_text||'');setEditNote('');setEditing(true)}
  async function saveEdit(){if(!selected)return;setBusy(true);const ok=await updateFormalDraft(selected.id,editTitle,editBody,{edit_note:editNote,expected_revision:editRevision});setBusy(false);if(ok){setEditing(false);setLocalRefresh(n=>n+1)}}
  const canEditSelected=!readOnly&&!!selected&&(documentAccess?.can_edit??(teacher||selected.author_id===me?.user_id&&selected.current_owner_key==='author'))&&!votes.some(v=>v.formal_document_id===selected.id&&v.status==='open');
@@ -276,10 +285,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   setDetailOpen(true);
   setDetailTab('text');
   setEditing(false);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-   const target=document.getElementById('npa-document-workspace');
-   if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
-  }));
+  setScrollOpenedDocument(true);
  }
 
  return <div className="formalPage legalPortal">
@@ -346,7 +352,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
       <div className="registryCardTitle"><h3>{d.title}</h3><p>{d.subject_label}</p></div>
       <div className="registryCardProgress"><div><span>Этап {step} из {totalSteps}</span><b>{ownerLabel(d.current_owner_key)}</b></div><div className="registryCardProgressTrack" aria-label={'Прогресс документа '+completion+'%'}><i style={{width:completion+'%'}}/></div></div>
       <div className="registryCardMeta"><span><Clock3 size={14}/> Обновлён {shortDate(d.updated_at)}</span>{voting&&<strong><Vote size={14}/> Идёт голосование</strong>}</div>
-      <footer className="formalRegistryRowActions"><span>Ответственный: {ownerLabel(d.current_owner_key)}</span>{votes.find(v=>v.formal_document_id===d.id&&v.status==='open')&&<button type="button" className="legalVoteShortcut" onClick={()=>onOpenVotes(votes.find(v=>v.formal_document_id===d.id&&v.status==='open')?.id)}>Голосование</button>}<button type="button" className="legalOpenDocument" onClick={()=>openRegistryDocument(d.id)}>Открыть документ →</button></footer>
+      <footer className="formalRegistryRowActions"><span>Ответственный: {ownerLabel(d.current_owner_key)}</span><div className="formalRegistryActions">{votes.find(v=>v.formal_document_id===d.id&&v.status==='open')&&<button type="button" className="legalVoteShortcut" onClick={()=>onOpenVotes(votes.find(v=>v.formal_document_id===d.id&&v.status==='open')?.id)}>Голосование</button>}<button type="button" className="legalOpenDocument" onClick={()=>openRegistryDocument(d.id)}>Открыть документ →</button></div></footer>
      </article>
     }):<div className="registryEmptyState"><Search size={26}/><div><b>Документы не найдены</b><span>Измените запрос или сбросьте фильтры.</span></div><button type="button" className="secondary" onClick={()=>{setQuery('');setFilterSubject('');setFilterStatus('')}}>Показать все</button></div>}</div>
    </aside>
