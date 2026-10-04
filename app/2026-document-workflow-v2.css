@@ -450,3 +450,161 @@
    min-width:0!important;
  }
 }
+
+
+/* Bottom procedure grid v6: budget review + route below the document. */
+.legalPortal .legalProcedureBottomGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+  align-items:start;
+  min-width:0;
+  width:100%;
+  margin:0;
+}
+.legalPortal .legalProcedureBottomGrid.single{
+  grid-template-columns:minmax(0,1fr);
+}
+.legalPortal .legalProcedureBottomCol{
+  min-width:0;
+}
+.legalPortal .legalProcedureBottomGrid .budgetPreliminary,
+.legalPortal .legalProcedureBottomGrid .formalProgress.legalRouting{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .legalProcedureBottomGrid .formalSteps{
+  max-height:520px;
+  overflow:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+}
+.legalPortal .legalProcedureBottomGrid .formalStep{
+  min-height:0!important;
+}
+.legalPortal .legalPaperFooterBar{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:14px!important;
+  min-height:54px;
+  padding:12px 0 0!important;
+  margin-top:22px!important;
+  border-top:1px solid #d9e0e8;
+  color:#7a8ca7;
+  font-size:12px;
+}
+.legalPortal .legalPaperFooterBar>span{
+  min-width:0;
+  line-height:1.45;
+}
+.legalPortal .legalPrintButton{
+  flex:none;
+  min-width:112px;
+  min-height:40px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  margin:0!important;
+  white-space:nowrap;
+}
+.legalPortal .formalHistoryDisclosure{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden;
+  box-sizing:border-box!important;
+}
+.legalPortal .formalHistorySummary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  min-height:68px;
+  padding:16px 18px;
+  cursor:pointer;
+  list-style:none;
+  user-select:none;
+}
+.legalPortal .formalHistorySummary::-webkit-details-marker{display:none}
+.legalPortal .formalHistorySummary>div{
+  min-width:0;
+}
+.legalPortal .formalHistorySummary small{
+  display:block;
+  color:#72849a;
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.08em;
+}
+.legalPortal .formalHistorySummary h2{
+  margin:3px 0 0;
+  color:#183c70;
+  font-size:19px;
+  line-height:1.25;
+}
+.legalPortal .formalHistorySummary>span{
+  flex:none;
+  display:inline-flex;
+  align-items:center;
+  min-height:30px;
+  padding:5px 10px;
+  border:1px solid #d9e3ef;
+  border-radius:999px;
+  background:#f7f9fc;
+  color:#667b94;
+  font-size:11px;
+  font-weight:800;
+}
+.legalPortal .formalHistorySummary:after{
+  content:"⌄";
+  flex:none;
+  color:#526b88;
+  font-size:20px;
+  line-height:1;
+  transform:rotate(0deg);
+  transition:transform .18s ease;
+}
+.legalPortal .formalHistoryDisclosure[open]>.formalHistorySummary:after{
+  transform:rotate(180deg);
+}
+.legalPortal .formalHistoryBody{
+  padding:0 18px 18px;
+  border-top:1px solid #e8edf4;
+}
+.legalPortal .formalHistoryBody>.formalLinkedVotes{
+  margin-top:14px;
+}
+@media(max-width:900px){
+  .legalPortal .legalProcedureBottomGrid{
+    grid-template-columns:minmax(0,1fr);
+    gap:12px;
+  }
+}
+@media(max-width:560px){
+  .legalPortal .legalPaperFooterBar{
+    align-items:stretch!important;
+    flex-direction:column;
+  }
+  .legalPortal .legalPrintButton{
+    width:100%;
+  }
+  .legalPortal .formalHistorySummary{
+    align-items:flex-start;
+    flex-wrap:wrap;
+    padding:14px;
+  }
+  .legalPortal .formalHistorySummary>span{
+    margin-left:auto;
+  }
+  .legalPortal .formalHistoryBody{
+    padding:0 14px 14px;
+  }
+}
+@media print{
+  .legalPortal .legalPrintButton{display:none!important}
+}
