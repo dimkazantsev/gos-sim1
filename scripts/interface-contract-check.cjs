@@ -4,7 +4,7 @@ Module._resolveFilename=function(request,...args){return resolve.call(this,reque
 require.extensions['.css']=module=>{module.exports={}};
 for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,file);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),EventComic=require('../components/game/EventComic').default;
-const cases=['events-v2.json','events-legal-2026.json'].flatMap(file=>JSON.parse(fs.readFileSync(path.join(root,'content',file),'utf8')));
+const cases=['events-v3-authority.json','events-legal-2026.json'].flatMap(file=>JSON.parse(fs.readFileSync(path.join(root,'content',file),'utf8')));
 const clipIds=new Set(),rasterPaths=new Set();
 for(const c of cases){
  const html=renderToStaticMarkup(React.createElement(EventComic,{title:c.title,category:c.category,caseKey:c.case_key,scene:c.comic_scene,silent:true}));
@@ -16,7 +16,14 @@ for(const c of cases){
   const src=html.match(/src="([^"]+1920.webp)"/)[1];
   assert.ok(!rasterPaths.has(src),c.case_key+': every situation must own its artwork');
   rasterPaths.add(src);
-  for(const width of [480,960,1920])assert.ok(fs.existsSync(path.join(root,'public',src.replace(/.*?(\/event-art\/)/,'$1').replace('1920.webp',width+'.webp'))),c.case_key+': encoding must be deployed');
+  for(const width of [480,960,1920]){
+   const file=path.join(root,'public',src.replace(/.*?(\/event-art\/)/,'$1').replace('1920.webp',width+'.webp'));
+   assert.ok(fs.existsSync(file),c.case_key+': encoding must be deployed');
+   const bytes=fs.readFileSync(file);
+   assert.ok(bytes.length>100,c.case_key+': encoding must not be empty');
+   assert.equal(bytes.toString('ascii',0,4),'RIFF',c.case_key+': valid WebP container');
+   assert.equal(bytes.toString('ascii',8,12),'WEBP',c.case_key+': valid WebP format');
+  }
   continue;
  }
  assert.match(html,/<clipPath[^>]*>[\s\S]*?<rect/,c.case_key+': artwork must explicitly clip its own scene');

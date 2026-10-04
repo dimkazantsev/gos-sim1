@@ -225,6 +225,126 @@
       "asset": "/event-art/scene-001-20261004-1920.webp",
       "generator": "Built-in imagegen",
       "source_file": "exec-f7bf12bf-5e75-4852-8ddb-588a7db456e7.png"
+    },
+    "bank-curated-v2-02": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "8ccd10bea0c7fbac4b02c876bdbef2c775dbc9799a64e808874ebe055218b223",
+      "asset_sha256": "71c3b8aecbeba18385a0c1346c2528ba1327b171cd46d337c9257bcfdf562e5b",
+      "asset": "/event-art/scene-002-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-8c5eac63-f688-4858-b5a8-fd58e432b6c5.png"
+    },
+    "bank-curated-v2-03": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "01b7561ae66a37b85d2d87b716f764656ee5698c7e8178ac99dfcd8a3ef303ab",
+      "asset_sha256": "4aeeb945ed03ba4352556269edea4620cc945770dc4db471c93bd824205693ff",
+      "asset": "/event-art/scene-003-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-33e75443-cf73-43ff-819e-1725929a1294.png"
+    },
+    "bank-curated-v2-05": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "01b5a98f52c7886f07fb2f1534af443c80d781bd4c5b5369c77b53b137557e99",
+      "asset_sha256": "883609981e50592902b39cd66ac8bdc0bf30b8fcc33a3cbdd5f26979d40311c4",
+      "asset": "/event-art/scene-005-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-59323649-bae7-4b1b-a181-a49cebe977f3.png"
+    },
+    "bank-curated-v2-04": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "c98afdbaa3c186d6623fc9da05bdc410a329f00b85764fdb8a99a613e3742136",
+      "asset_sha256": "e9ac2b86be07ff7f0e68f84a3efca97732f81e7ca0bf5f2466435d533b5a1041",
+      "asset": "/event-art/scene-004-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-2199c5d4-4f5e-408d-8dcc-491537b19a72.png"
+    },
+    "bank-curated-v2-06": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "a8f5c8315d259f1ff77afdd080121668ae70ab6a344055474f80dfb0ff8047b6",
+      "asset_sha256": "e8003dd7146be9ed08b48ccc9e4794a3b311951265d9d1d7f0300d3135fddc98",
+      "asset": "/event-art/scene-006-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-702194dd-8f1e-4b0b-a1ab-84f89d04248e.png"
+    },
+    "bank-curated-v2-08": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "09b408c2d831dec0f4c438aac31c1895376afa83ca9dbcd3a85a108cc00023e3",
+      "asset_sha256": "798acd9358f570642db4f761ce8d6ef56e0350c29d105aefa556d538f74dacb2",
+      "asset": "/event-art/scene-008-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-6192395e-91b0-499c-93a5-7e762187d55f.png"
+    },
+    "bank-curated-v2-09": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "396e4d63a0aa3d2fdac794993c98d67949e32873e01de639212a9b6b9dd82916",
+      "asset_sha256": "f0143e9dd9b52d2e411698094fcdc24147ab787ff272f6fd575c9d776ed476a0",
+      "asset": "/event-art/scene-009-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-ec38aa60-795a-4158-9cec-3f8a996f6a1a.png"
+    },
+    "bank-curated-v2-07": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "e09021cc84c0b3d5fe074dbc6a65ba16aab79a14c63096ea61dad8e16909d6d2",
+      "asset_sha256": "1e06b5f583f47c51bffdeb2f611e69553bd3e3de69e9691418a7905d5a5326be",
+      "asset": "/event-art/scene-007-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-30a57178-8892-4aca-9c54-ac117e0ab8ea.png"
     }
   }
 }
