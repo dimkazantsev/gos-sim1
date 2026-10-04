@@ -6,7 +6,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import type {FormalDocument} from './types';
 import {FORMAL_SUBJECTS,FORMAL_TYPES,inferFormal,formalSignature,ownerLabel} from './formalInstitutions';
 import {votePresetForDocument} from './proceduralVoting';
-import {ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,ClipboardList,FilePlus2,Paperclip,Plus,Printer,Route} from 'lucide-react';
+import {Activity,ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,Clock3,ClipboardList,FilePlus2,Paperclip,Plus,Printer,Route,Search,Vote,X} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import DocumentPaper from './DocumentPaper';
 import BudgetDocumentAnnex from './BudgetDocumentAnnex';
@@ -63,7 +63,19 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const createBillReady=!!createBillCommittee&&(!createBillRepresentativeRequired||!!createBillRepresentative)&&createBillPreparedCount===createBillRequiredKinds.length;
  useEffect(()=>{if(!g.game?.id||readOnly)return;let active=true;async function load(){const r=await supabase.rpc('get_formal_subjects',{p_game_id:g.game!.id});if(active&&!r.error&&Array.isArray(r.data))setSubjectPermissions(r.data)}void load();const timer=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(timer)}},[g.game?.id,me?.user_id,me?.role_title,readOnly]);
  useEffect(()=>{if(!g.game?.id||!me?.user_id)return;let active=true;async function load(){const r=await supabase.from('game_office_assignments').select('role_title').eq('game_id',g.game!.id).eq('user_id',me!.user_id).eq('status','active');if(active&&!r.error)setActiveRoles((r.data||[]).map(x=>x.role_title))}void load();const timer=setInterval(()=>void load(),30000);return()=>{active=false;clearInterval(timer)}},[g.game?.id,me?.user_id]);
- const filtered=useMemo(()=>formalDocuments.filter(d=>{const q=query.trim().toLowerCase();const voting=votes.some(v=>v.formal_document_id===d.id&&v.status==='open');return(!q||[d.registry_no,d.title,d.subject_label,typeLabel(d.doc_type),d.status_label,members.find(m=>m.user_id===d.author_id)?.full_name].join(' ').toLowerCase().includes(q))&&(!filterSubject||d.subject_key===filterSubject)&&(!filterStatus||(filterStatus==='__voting__'?voting:d.status_code===filterStatus))}).sort((a,b)=>sortOrder==='title'?a.title.localeCompare(b.title,'ru'):Date.parse(b[sortOrder==='created'?'created_at':'updated_at'])-Date.parse(a[sortOrder==='created'?'created_at':'updated_at'])),[formalDocuments,votes,members,query,filterSubject,filterStatus,sortOrder]);
+ const registryInProcessCount=formalDocuments.filter(d=>!['published','rejected'].includes(d.status_code)).length;
+ const registryVotingCount=formalDocuments.filter(d=>votes.some(v=>v.formal_document_id===d.id&&v.status==='open')).length;
+ const registryAcceptedCount=formalDocuments.filter(d=>['published','signed','adopted'].includes(d.status_code)).length;
+ const filtered=useMemo(()=>formalDocuments.filter(d=>{
+  const q=query.trim().toLowerCase();
+  const voting=votes.some(v=>v.formal_document_id===d.id&&v.status==='open');
+  const statusOk=!filterStatus
+   ||filterStatus==='__voting__'&&voting
+   ||filterStatus==='__active__'&&!['published','rejected'].includes(d.status_code)
+   ||filterStatus==='__accepted__'&&['published','signed','adopted'].includes(d.status_code)
+   ||(!filterStatus.startsWith('__')&&d.status_code===filterStatus);
+  return(!q||[d.registry_no,d.title,d.subject_label,typeLabel(d.doc_type),d.status_label,members.find(m=>m.user_id===d.author_id)?.full_name].join(' ').toLowerCase().includes(q))&&(!filterSubject||d.subject_key===filterSubject)&&statusOk
+ }).sort((a,b)=>sortOrder==='title'?a.title.localeCompare(b.title,'ru'):Date.parse(b[sortOrder==='created'?'created_at':'updated_at'])-Date.parse(a[sortOrder==='created'?'created_at':'updated_at'])),[formalDocuments,votes,members,query,filterSubject,filterStatus,sortOrder]);
  const selected=useMemo(()=>filtered.find(d=>d.id===selectedId)||filtered[0],[filtered,selectedId]);
  useEffect(()=>{setDocumentAccess(null);setAccessError('');if(!selected?.id)return;let active=true;void Promise.all([supabase.rpc('get_formal_document_tools',{p_document_id:selected.id}),supabase.from('formal_document_revisions').select('id,revision,title,body_text,created_at').eq('document_id',selected.id).order('revision',{ascending:false})]).then(([a,r])=>{if(!active)return;if(a.error)setAccessError(a.error.message);else setDocumentAccess(a.data as DocumentAccess);if(!r.error)setRevisions(r.data||[])});return()=>{active=false}},[selected?.id,selected?.updated_at,localRefresh]);
  useEffect(()=>{
@@ -263,10 +275,14 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  return <div className="formalPage legalPortal">
   <section className="formalHero"><div><small>ПРАВОВАЯ ИНФОРМАЦИЯ ИГРЫ</small><h1>Официальный интернет-портал правовой информации</h1><p>Документы органов власти, их тексты, стадии рассмотрения и связанные голосования.</p></div><div className="formalHeroActions"><a href="https://sozd.duma.gov.ru/" target="_blank" rel="noreferrer">СОЗД ГД ↗</a><a href="https://publication.pravo.gov.ru/" target="_blank" rel="noreferrer">Официальное опубликование ↗</a></div></section>
 
-  <section className="formalStats"><article><small>ВСЕГО В РЕЕСТРЕ</small><strong>{formalDocuments.length}</strong><span>документов</span></article><article><small>В ПРОЦЕССЕ</small><strong>{formalDocuments.filter(d=>!['published','rejected'].includes(d.status_code)).length}</strong><span>движутся по процедуре</span></article><article><small>Принято</small><strong>{formalDocuments.filter(d=>['published','signed','adopted'].includes(d.status_code)).length}</strong><span>принятых актов</span></article><article><small>МОИ ДОКУМЕНТЫ</small><strong>{formalDocuments.filter(d=>d.author_id===me?.user_id).length}</strong><span>инициировано вами</span></article></section>
-
-  <DocumentInbox gameId={g.game?.id} userId={me?.user_id} members={members} documents={formalDocuments} onOpen={id=>{setSelectedId(id);onSelectDocument?.(id);setQuery('');setFilterSubject('');setFilterStatus('');setDetailReturn('registry');setMode('registry');setDetailOpen(true);setDetailTab('text')}}/>
-  <nav className="formalTabs legalPrimaryNav" aria-label="Разделы правового портала"><button className={mode==='create'?'active':''} onClick={()=>setMode('create')}><FilePlus2 size={20}/> Создать / загрузить</button><button className={mode==='registry'?'active':''} onClick={()=>{setMode('registry');setDetailOpen(false);onSelectDocument?.()}}><BookOpen size={20}/> Реестр НПА <span>{formalDocuments.length}</span></button></nav>
+  <nav className="formalTabs legalPrimaryNav legalModeSwitch" aria-label="Разделы правового портала">
+   <button type="button" className={mode==='create'?'active':''} aria-pressed={mode==='create'} onClick={()=>setMode('create')}>
+    <span className="legalModeIcon"><FilePlus2 size={19}/></span><span className="legalModeText"><b>Создать документ</b><small>Новый НПА или загрузка файла</small></span>
+   </button>
+   <button type="button" className={mode==='registry'?'active':''} aria-pressed={mode==='registry'} onClick={()=>{setMode('registry');setDetailOpen(false);onSelectDocument?.()}}>
+    <span className="legalModeIcon"><BookOpen size={19}/></span><span className="legalModeText"><b>Реестр НПА</b><small>Поиск, стадии и контроль документов</small></span><span className="legalModeCount">{formalDocuments.length}</span>
+   </button>
+  </nav>
 
   {mode==='create'&&<section className="formalCreate legalCreateV2" aria-labelledby="create-document-title">
    <header className="legalCreateIntro"><div><small>НОВЫЙ НПА</small><h2 id="create-document-title">Создать или загрузить документ</h2><p>Добавьте текст, проверьте реквизиты, подготовьте обязательные материалы и зарегистрируйте документ. Официальное движение по процедуре начнётся уже из карточки НПА.</p></div><ol className="legalCreateSteps"><li><b>1</b><span>Документ</span></li><li><b>2</b><span>Реквизиты</span></li><li className={creatingBill?'active':''}><b>3</b><span>{creatingBill?'Комплект внесения':'Регистрация'}</span></li></ol></header>
@@ -294,7 +310,49 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
    </div>
   </section>}
 
-  {mode==='registry'&&<section className="formalWorkspace"><aside className="formalRegistry" hidden={detailOpen}><div className="formalRegistryHead"><div><small>РЕЕСТР НПА</small><h2>Документы игры</h2><p>Откройте документ: текст, текущая процедура, паспорт и служебные действия будут собраны на одном экране.</p></div><button type="button" className="primary legalNewDocumentButton" onClick={()=>setMode('create')}><Plus size={18}/> Новый документ</button></div><input aria-label="Поиск в реестре НПА" className="formalSearch" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Номер, название, орган или автор документа"/><div className="formalFilters"><StyledSelect label="Субъект" value={filterSubject} onChange={setFilterSubject} options={[{value:'',label:'Все субъекты'},...FORMAL_SUBJECTS.map(x=>({value:x.key,label:x.short}))]}/><StyledSelect label="Стадия" value={filterStatus} onChange={setFilterStatus} options={[{value:'',label:'Все стадии'},{value:'__voting__',label:'Идёт голосование'},{value:'draft',label:'Черновик'},{value:'registered',label:'Регистрация'},{value:'committee',label:'Комитет'},{value:'reading1',label:'I чтение'},{value:'reading2',label:'II чтение'},{value:'reading3',label:'III чтение'},{value:'president',label:'Президент'},{value:'published',label:'Опубликован'},{value:'rejected',label:'Отклонён'}]}/></div><StyledSelect label="Порядок документов" value={sortOrder} onChange={setSortOrder} options={[{value:'updated',label:'Сначала обновлённые'},{value:'created',label:'Сначала новые'},{value:'title',label:'По названию'}]}/><small className="formalResultCount">Найдено: {filtered.length} из {formalDocuments.length}</small><div className="formalRegistryList legalRegistryRows">{filtered.length?filtered.map(d=><article key={d.id} className={selected?.id===d.id?'formalRegistryRow legalDocumentRow active':'formalRegistryRow legalDocumentRow'} onClick={e=>{if((e.target as HTMLElement).closest('button,a,input,select'))return;setSelectedId(d.id);onSelectDocument?.(d.id);setDetailReturn('registry');setDetailOpen(true);setDetailTab('text');setEditing(false)}}><div className="formalRegistryNo">{d.registry_no}</div><b>{d.title}</b><span>{d.subject_label}</span>{votes.some(v=>v.formal_document_id===d.id&&v.status==='open')&&<small className="formalVoteBadge">Идёт голосование</small>}<div className="formalRegistryMeta"><em className={`formalStatus ${statusTone(d.status_code)}`}>{d.status_label}</em><time>{shortDate(d.updated_at)}</time></div><div className="formalRegistryRowActions"><span>Ответственный: {ownerLabel(d.current_owner_key)}</span><button type="button" className="legalOpenDocument" onClick={()=>{setSelectedId(d.id);onSelectDocument?.(d.id);setDetailReturn('registry');setDetailOpen(true);setDetailTab('text');setEditing(false)}}>Открыть документ →</button>{votes.find(v=>v.formal_document_id===d.id&&v.status==='open')&&<button type="button" className="legalVoteShortcut" onClick={()=>onOpenVotes(votes.find(v=>v.formal_document_id===d.id&&v.status==='open')?.id)}>Голосование</button>}</div></article>):<div className="emptyState">По этому фильтру документов нет.</div>}</div></aside>
+  {mode==='registry'&&<section className="formalWorkspace"><aside className="formalRegistry registryDashboard" hidden={detailOpen}>
+    <header className="formalRegistryHead registryDashboardHead">
+     <div><small>РЕЕСТР НПА</small><h2>Документы игры</h2><p>Единое рабочее пространство для поиска, контроля стадии и открытия нормативных документов.</p></div>
+     <button type="button" className="primary legalNewDocumentButton" onClick={()=>setMode('create')}><Plus size={17}/> Новый документ</button>
+    </header>
+
+    <section className="registryKpis" aria-label="Сводка реестра">
+     <button type="button" aria-pressed={!filterStatus} onClick={()=>setFilterStatus('')}><span className="registryKpiIcon"><BookOpen size={18}/></span><span><small>ВСЕГО</small><strong>{formalDocuments.length}</strong><em>в реестре</em></span></button>
+     <button type="button" aria-pressed={filterStatus==='__active__'} onClick={()=>setFilterStatus(filterStatus==='__active__'?'':'__active__')}><span className="registryKpiIcon"><Activity size={18}/></span><span><small>В ПРОЦЕССЕ</small><strong>{registryInProcessCount}</strong><em>требуют движения</em></span></button>
+     <button type="button" aria-pressed={filterStatus==='__voting__'} onClick={()=>setFilterStatus(filterStatus==='__voting__'?'':'__voting__')}><span className="registryKpiIcon"><Vote size={18}/></span><span><small>ГОЛОСОВАНИЕ</small><strong>{registryVotingCount}</strong><em>открыто сейчас</em></span></button>
+     <button type="button" aria-pressed={filterStatus==='__accepted__'} onClick={()=>setFilterStatus(filterStatus==='__accepted__'?'':'__accepted__')}><span className="registryKpiIcon"><CheckCircle2 size={18}/></span><span><small>ПРИНЯТО</small><strong>{registryAcceptedCount}</strong><em>итоговые акты</em></span></button>
+    </section>
+
+    <DocumentInbox gameId={g.game?.id} userId={me?.user_id} members={members} documents={formalDocuments} onOpen={id=>{setSelectedId(id);onSelectDocument?.(id);setQuery('');setFilterSubject('');setFilterStatus('');setDetailReturn('registry');setMode('registry');setDetailOpen(true);setDetailTab('text')}}/>
+
+    <div className="registryToolbar">
+     <label className="registrySearch"><Search size={18} aria-hidden="true"/><input aria-label="Поиск в реестре НПА" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Номер, название, орган или автор"/>{query&&<button type="button" aria-label="Очистить поиск" onClick={()=>setQuery('')}><X size={16}/></button>}</label>
+     <div className="registryFilterGrid">
+      <StyledSelect label="Субъект" value={filterSubject} onChange={setFilterSubject} options={[{value:'',label:'Все субъекты'},...FORMAL_SUBJECTS.map(x=>({value:x.key,label:x.short}))]}/>
+      <StyledSelect label="Стадия" value={filterStatus} onChange={setFilterStatus} options={[{value:'',label:'Все стадии'},{value:'__active__',label:'В процессе'},{value:'__voting__',label:'Идёт голосование'},{value:'__accepted__',label:'Принято'},{value:'draft',label:'Черновик'},{value:'registered',label:'Регистрация'},{value:'committee',label:'Комитет'},{value:'reading1',label:'I чтение'},{value:'reading2',label:'II чтение'},{value:'reading3',label:'III чтение'},{value:'president',label:'Президент'},{value:'published',label:'Опубликован'},{value:'rejected',label:'Отклонён'}]}/>
+      <StyledSelect label="Порядок" value={sortOrder} onChange={setSortOrder} options={[{value:'updated',label:'Сначала обновлённые'},{value:'created',label:'Сначала новые'},{value:'title',label:'По названию'}]}/>
+     </div>
+    </div>
+
+    <div className="registryResultsHead">
+     <div><small>РЕЗУЛЬТАТЫ</small><b>{filtered.length} из {formalDocuments.length}</b><span>{filterStatus||filterSubject||query?'Показаны документы по выбранным условиям':'Все документы реестра'}</span></div>
+     {(query||filterSubject||filterStatus||sortOrder!=='updated')&&<button type="button" className="secondary" onClick={()=>{setQuery('');setFilterSubject('');setFilterStatus('');setSortOrder('updated')}}>Сбросить фильтры</button>}
+    </div>
+
+    <div className="formalRegistryList legalRegistryRows registryCards">{filtered.length?filtered.map(d=>{
+     const voting=votes.some(v=>v.formal_document_id===d.id&&v.status==='open');
+     const totalSteps=Math.max(1,d.workflow_steps.length);
+     const step=Math.min(totalSteps,Math.max(1,d.current_step+1));
+     const completion=Math.round(step/totalSteps*100);
+     return <article key={d.id} className={selected?.id===d.id?'formalRegistryRow legalDocumentRow registryCard active':'formalRegistryRow legalDocumentRow registryCard'} onClick={e=>{if((e.target as HTMLElement).closest('button,a,input,select'))return;setSelectedId(d.id);onSelectDocument?.(d.id);setDetailReturn('registry');setDetailOpen(true);setDetailTab('text');setEditing(false)}}>
+      <header className="registryCardHead"><div className="registryCardIdentity"><span>{d.registry_no}</span><small>{typeLabel(d.doc_type)}</small></div><em className={'formalStatus '+statusTone(d.status_code)}>{d.status_label}</em></header>
+      <div className="registryCardTitle"><h3>{d.title}</h3><p>{d.subject_label}</p></div>
+      <div className="registryCardProgress"><div><span>Этап {step} из {totalSteps}</span><b>{ownerLabel(d.current_owner_key)}</b></div><div className="registryCardProgressTrack" aria-label={'Прогресс документа '+completion+'%'}><i style={{width:completion+'%'}}/></div></div>
+      <div className="registryCardMeta"><span><Clock3 size={14}/> Обновлён {shortDate(d.updated_at)}</span>{voting&&<strong><Vote size={14}/> Идёт голосование</strong>}</div>
+      <footer className="formalRegistryRowActions"><span>Ответственный: {ownerLabel(d.current_owner_key)}</span><button type="button" className="legalOpenDocument" onClick={()=>{setSelectedId(d.id);onSelectDocument?.(d.id);setDetailReturn('registry');setDetailOpen(true);setDetailTab('text');setEditing(false)}}>Открыть документ →</button>{votes.find(v=>v.formal_document_id===d.id&&v.status==='open')&&<button type="button" className="legalVoteShortcut" onClick={()=>onOpenVotes(votes.find(v=>v.formal_document_id===d.id&&v.status==='open')?.id)}>Голосование</button>}</footer>
+     </article>
+    }):<div className="registryEmptyState"><Search size={26}/><div><b>Документы не найдены</b><span>Измените запрос или сбросьте фильтры.</span></div><button type="button" className="secondary" onClick={()=>{setQuery('');setFilterSubject('');setFilterStatus('')}}>Показать все</button></div>}</div>
+   </aside>
 
    <article className="formalDetail" hidden={!detailOpen} data-tab="unified"><div className="legalDetailToolbar legalUnifiedToolbar"><button type="button" className="secondary legalBackToRegistry" onClick={()=>{setDetailOpen(false);onSelectDocument?.();setEditing(false);if(detailReturn==='create')setMode('create')}}>{detailReturn==='create'?<FilePlus2 size={18}/>:<ArrowLeft size={18}/>} {detailReturn==='create'?'Создать документ':'Реестр НПА'}</button><div className="legalWorkspaceLabel"><small>РАБОЧАЯ КАРТОЧКА НПА</small><b>Документ и процедура</b></div>{canEditSelected&&!editing?<button className="secondary legalEditDocument" onClick={()=>startEdit(selected)}>Редактировать текст</button>:editing?<span className="legalEditingBadge">Редактирование включено</span>:null}</div>{!selected?<div className="formalEmptyBig"><span>▤</span><h2>{formalDocuments.length?'Документы не найдены':'Реестр пока пуст'}</h2><p>{formalDocuments.length?'Измените запрос или фильтры, чтобы выбрать документ.':'Создайте нормативный документ — здесь будут текст, стадии и связанные голосования.'}</p>{formalDocuments.length>0&&<button className="secondary" onClick={()=>{setQuery('');setFilterSubject('');setFilterStatus('')}}>Сбросить фильтры</button>}<button className="primary" onClick={()=>setMode('create')}>Создать документ</button></div>:<>
     <header className="documentSummaryHeader"><div><span>{selected.registry_no} · Этап {selected.stage_no}</span><b>{typeLabel(selected.doc_type)}</b><small>Редакция {String(selected.metadata?.revision||1)} · {selected.subject_label}</small></div><div className="documentSummaryState"><span className={'formalStatus '+statusTone(selected.status_code)}>{selected.status_label}</span><small>Ответственный: {ownerLabel(selected.current_owner_key)}</small></div></header>
