@@ -28,25 +28,38 @@
 .libraryHeading{display:grid;gap:8px;margin-bottom:20px}
 .libraryHeading h2{margin:0;font-size:25px;line-height:1.3}
 .libraryHeading p{margin:0;max-width:700px;font-size:14px;line-height:1.65;color:#526d90}
-.libraryGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:stretch}
-.libraryGrid .libraryCard{display:flex;flex-direction:column;align-items:stretch;min-width:0;padding:0;overflow:hidden;border:1px solid #d7e3f3;border-radius:16px;background:#fff;color:#173253;text-align:left;cursor:pointer;box-shadow:0 5px 18px #17325308;transition:box-shadow .15s,border-color .15s}
-.libraryGrid .libraryCard:hover{border-color:#5987dd;box-shadow:0 8px 24px #17325318}
-.cover{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#182d52;pointer-events:none}
-.cover>img{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:none}
-.cover :global(.comicClouds),.cover :global(.comicStorm),.cover :global(.comicEmergency),.cover :global(.comicVault),.cover :global(.comicCrowd),.cover :global(.comicRebirth){animation:none}
-.cardText{display:flex;flex-direction:column;gap:9px;padding:16px;flex:1;min-width:0}
-.cardText small{font-size:11px;color:#6181a5}
-.cardText strong{font-size:17px;line-height:1.35;overflow-wrap:anywhere}
-.cardText span{font-size:12px;line-height:1.6;color:#68809d;overflow-wrap:anywhere}
-.cardText b{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:#2c5fc0;margin-top:auto;padding-top:10px;min-height:30px}
+.libraryGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:stretch}
+.libraryGrid .libraryCard{display:flex;flex-direction:column;align-items:stretch;min-width:0;padding:0;overflow:hidden;border:1px solid #d7e3f3;border-radius:14px;background:#fff;color:#173253;text-align:left;cursor:pointer;box-shadow:0 4px 14px #17325308;transition:transform .17s ease,box-shadow .17s ease,border-color .17s ease;content-visibility:auto;contain-intrinsic-size:285px}
+.libraryGrid .libraryCard:hover{transform:translateY(-3px);border-color:#5987dd;box-shadow:0 11px 28px #17325319}
+.cover{position:relative;width:100%;aspect-ratio:16/8.35;overflow:hidden;background:#111d36;pointer-events:none}
+.abstractCover{--archive-a:#4e80ff;--archive-b:#8cf2d3;--archive-c:#dc62b2;--archive-deep:#101a35;position:absolute;inset:0;overflow:hidden;isolation:isolate;background:radial-gradient(circle at var(--archive-shift,65%) 22%,color-mix(in srgb,var(--archive-b) 65%,transparent),transparent 31%),radial-gradient(circle at 12% 90%,color-mix(in srgb,var(--archive-c) 40%,transparent),transparent 38%),linear-gradient(126deg,var(--archive-deep),color-mix(in srgb,var(--archive-a) 42%,#13233f) 56%,#091224);color:white}
+.abstractCover:before,.abstractCover:after{content:"";position:absolute;pointer-events:none}
+.abstractCover:before{width:54%;height:142%;right:-15%;top:-27%;border:1px solid color-mix(in srgb,var(--archive-b) 46%,transparent);border-radius:48%;transform:rotate(28deg);box-shadow:0 0 0 18px #ffffff08,0 0 0 39px #ffffff04}
+.abstractCover:after{left:-12%;right:-12%;bottom:19%;height:1px;background:linear-gradient(90deg,transparent,#ffffff62 28%,var(--archive-b) 56%,transparent 82%);transform:rotate(-8deg);box-shadow:0 17px 0 #ffffff17,0 -17px 0 #ffffff0f}
+.abstractCover[data-kind=completed]{background:radial-gradient(circle at var(--archive-shift,65%) 22%,color-mix(in srgb,var(--archive-b) 64%,transparent),transparent 31%),radial-gradient(circle at 8% 88%,#4de0b43f,transparent 39%),linear-gradient(126deg,var(--archive-deep),color-mix(in srgb,var(--archive-a) 38%,#102a31) 56%,#071922)}
+.abstractCover[data-kind=preview]{background:radial-gradient(circle at var(--archive-shift,65%) 22%,color-mix(in srgb,var(--archive-b) 64%,transparent),transparent 31%),radial-gradient(circle at 8% 88%,#eea75a3a,transparent 39%),linear-gradient(126deg,var(--archive-deep),color-mix(in srgb,var(--archive-c) 30%,#17213a) 56%,#0a1123)}
+.abstractGrid{position:absolute;inset:0;z-index:-1;opacity:.38;background-image:linear-gradient(#ffffff0d 1px,transparent 1px),linear-gradient(90deg,#ffffff0d 1px,transparent 1px);background-size:20px 20px;mask-image:linear-gradient(90deg,#000,transparent 82%)}
+.abstractOrbit{position:absolute;width:116px;height:116px;right:13%;top:50%;border:1px solid #ffffff52;border-radius:50%;transform:translateY(-50%);box-shadow:0 0 0 16px #ffffff07,0 0 0 34px #ffffff04}
+.abstractOrbit:before{content:"";position:absolute;width:12px;height:12px;left:7px;top:17px;border-radius:50%;background:var(--archive-b);box-shadow:0 0 18px var(--archive-b)}
+.abstractRays{position:absolute;left:28%;top:-30%;width:2px;height:160%;background:#ffffff27;transform:rotate(31deg);box-shadow:28px 0 #ffffff12,56px 0 #ffffff0b}
+.abstractBrand,.abstractKind{position:absolute;z-index:2;left:14px;font-weight:900;text-shadow:0 1px 8px #0008}
+.abstractBrand{top:12px;font-size:9px;letter-spacing:.16em;color:#eaf5ffcc}
+.abstractKind{bottom:13px;font-size:9px;letter-spacing:.14em;color:#ffffffc9}
+.abstractNumber{position:absolute;z-index:1;right:12px;bottom:-12px;font-size:74px;line-height:1;font-weight:950;letter-spacing:-.08em;color:#ffffff16;text-shadow:none}
+.abstractIcon{position:absolute;z-index:2;right:17px;top:14px;display:grid;place-items:center;width:34px;height:34px;border:1px solid #ffffff2f;border-radius:11px;background:#06122450;color:#fff;backdrop-filter:blur(8px)}
+.cardText{display:flex;flex-direction:column;gap:7px;padding:13px 14px 12px;flex:1;min-width:0}
+.cardText small{font-size:10px;font-weight:760;letter-spacing:.02em;color:#6181a5}
+.cardText strong{font-size:15px;line-height:1.32;overflow-wrap:anywhere}
+.cardText span{font-size:11.5px;line-height:1.52;color:#68809d;overflow-wrap:anywhere}
+.cardText b{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;color:#2c5fc0;margin-top:auto;padding-top:7px;min-height:28px}
 .cardText b>svg{flex:none}
 .archiveNotice{margin:20px 0 0;padding:14px 16px;border:1px solid #d6e3f3;border-radius:11px;background:#fff;color:#516b8b;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+@media(max-width:1100px){.libraryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:850px){
  .dialog .readerFrame{display:block;padding:22px}
  .illustration{max-width:640px;margin-inline:auto}
  .dialog .story{gap:12px;margin-top:22px}
  .dialog .story h2{font-size:32px}
- .libraryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .dialog .footer{flex-wrap:wrap;gap:10px}
  .dialog .footer>div:first-child{max-width:none;flex:1 1 100%}
  .dialog .controls{width:100%;justify-content:center}
@@ -67,8 +80,10 @@
  .dialog .footer{padding:12px 12px max(12px,env(safe-area-inset-bottom));gap:12px}
  .dialog .controls{gap:4px}
  .library{padding:18px 14px}
- .libraryGrid{grid-template-columns:minmax(0,1fr);gap:16px}
+ .libraryGrid{grid-template-columns:minmax(0,1fr);gap:12px}
  .libraryHeading h2{font-size:23px}
+ .cover{aspect-ratio:16/8.1}
+ .abstractNumber{font-size:68px}
  .libraryHeading p{font-size:13px}
 }
 /* The prologue retains the original full-scene composition, separate from the archive. */

@@ -39,6 +39,32 @@ function SceneAtmosphere({scene}:{scene:number}){
 function chapterScene(chapter:Chapter){return chapter.stage_no===16?3:chapter.stage_no>=9?1:2}
 function defaultPlayback(){return !window.matchMedia('(prefers-reduced-motion: reduce)').matches}
 type Chapter={id:string;stage_no:number;kind:'completed'|'preview';title:string;body:string;snapshot:{documents?:number;votes?:number};created_at:string};
+function archiveCoverStyle(stage:number,kind:'intro'|'completed'|'preview'){
+ const seed=stage*47+(kind==='completed'?17:kind==='preview'?83:151);
+ const hue=seed%360,second=(hue+58+(stage*7)%54)%360,third=(hue+188+(stage*11)%48)%360;
+ return {
+  '--archive-a':`hsl(${hue} 86% 58%)`,
+  '--archive-b':`hsl(${second} 91% 65%)`,
+  '--archive-c':`hsl(${third} 78% 54%)`,
+  '--archive-deep':`hsl(${(hue+8)%360} 55% 12%)`,
+  '--archive-shift':`${18+(seed%58)}%`,
+ } as CSSProperties;
+}
+function ArchiveCover({chapter}:{chapter?:Chapter}){
+ const stage=chapter?.stage_no||0;
+ const kind: 'intro'|'completed'|'preview'=chapter?.kind||'intro';
+ const label=kind==='intro'?'ПРОЛОГ':kind==='completed'?'ИТОГИ':'АНОНС';
+ const code=String(stage).padStart(2,'0');
+ return <div className={styles.abstractCover} style={archiveCoverStyle(stage,kind)} data-kind={kind} aria-hidden="true">
+  <i className={styles.abstractGrid}/>
+  <i className={styles.abstractOrbit}/>
+  <i className={styles.abstractRays}/>
+  <span className={styles.abstractBrand}>GOS//SIMS</span>
+  <span className={styles.abstractKind}>{label}</span>
+  <strong className={styles.abstractNumber}>{code}</strong>
+  <span className={styles.abstractIcon}><BookOpen size={20}/></span>
+ </div>;
+}
 type ComicView='intro'|'archive'|'chapter';
 type ArchiveState={gameId:string;chapters:Chapter[];loading:boolean;error:string};
 export default function RepublicComic({open,onClose,intro=false,gameId,initialView='intro'}:{
@@ -112,11 +138,11 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
     <div className={styles.libraryHeading}><h2>Архив комиксов</h2><p>Вводный комикс доступен всегда. Итоги и анонсы сохраняются по мере завершения этапов вашей игры.</p></div>
     <div className={styles.libraryGrid}>
      <button type="button" className={styles.libraryCard} onClick={openIntro}>
-      <div className={styles.cover}><Artwork scene={0} cover/></div>
+      <div className={styles.cover}><ArchiveCover/></div>
       <div className={styles.cardText}><small>Пролог · 4 сцены</small><strong>Вводный комикс</strong><span>Республика после бури: с чего начинается ваша история.</span><b>Читать с начала <ArrowRight size={16}/></b></div>
      </button>
      {chapters.map(c=><button key={c.id} type="button" className={styles.libraryCard} onClick={()=>readChapter(c.id)}>
-      <div className={styles.cover}><ChapterArtwork chapter={c} cover/></div>
+      <div className={styles.cover}><ArchiveCover chapter={c}/></div>
       <div className={styles.cardText}><small>{c.kind==='completed'?'Итоги':'Анонс'} · Этап {c.stage_no}</small><strong>{c.title}</strong><span>{c.kind==='completed'?'Сохранённые результаты этапа вашей игры.':'Следующая глава и задачи участников.'}</span><b>Открыть главу <ArrowRight size={16}/></b></div>
      </button>)}
     </div>
