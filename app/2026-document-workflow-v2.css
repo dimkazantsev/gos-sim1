@@ -875,3 +875,389 @@
     grid-template-columns:minmax(0,1fr)!important;
   }
 }
+
+
+/* NPA workspace v8 — screenshot-driven geometry pass (2026-10-04). */
+
+/* 1. Route is permanent and matches the budget-review card height in the shared row. */
+.legalPortal .legalProcedureBottomGrid{
+  align-items:stretch!important;
+}
+.legalPortal .legalProcedureBottomCol{
+  display:flex!important;
+  min-height:0!important;
+}
+.legalPortal .legalProcedureBottomGrid .budgetPreliminary,
+.legalPortal .legalDocumentRouteCol .legalRouting{
+  flex:1 1 auto!important;
+  height:100%!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .legalDocumentRouteCol .legalRouting{
+  display:flex!important;
+  flex-direction:column!important;
+}
+.legalPortal .legalRoutingHead{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:14px!important;
+  min-height:58px!important;
+  padding:13px 15px!important;
+  border-bottom:1px solid #e5ebf3!important;
+  background:linear-gradient(180deg,#fff,#fbfcff)!important;
+}
+.legalPortal .legalRoutingHead>span{
+  min-width:0!important;
+  color:#173c70!important;
+  font-size:13px!important;
+  font-weight:850!important;
+}
+.legalPortal .legalRoutingHead>b{
+  min-width:0!important;
+  color:#6c809b!important;
+  font-size:11px!important;
+  font-weight:750!important;
+  line-height:1.35!important;
+  text-align:right!important;
+}
+.legalPortal .legalDocumentRouteCol .formalProgressTop{
+  padding:14px 15px 0!important;
+}
+.legalPortal .legalDocumentRouteCol .formalProgressLine{
+  margin-inline:15px!important;
+}
+.legalPortal .legalDocumentRouteCol .formalSteps{
+  flex:1 1 auto!important;
+  min-height:0!important;
+}
+
+/* 2. Blocked-transition panel: never squeeze the explanation into a word-wide column. */
+.legalPortal .formalProcedureBlocker{
+  display:grid!important;
+  grid-template-columns:34px minmax(0,1fr)!important;
+  gap:10px 12px!important;
+  align-items:start!important;
+  width:100%!important;
+  min-width:0!important;
+  padding:15px!important;
+  box-sizing:border-box!important;
+  border:1px solid #e7c978!important;
+  border-radius:15px!important;
+  background:linear-gradient(180deg,#fffaf0,#fff6dd)!important;
+}
+.legalPortal .formalProcedureBlocker>svg{
+  grid-column:1!important;
+  grid-row:1!important;
+  width:22px!important;
+  height:22px!important;
+  margin:2px auto 0!important;
+  color:#c58b10!important;
+}
+.legalPortal .formalProcedureBlocker>div{
+  grid-column:2!important;
+  grid-row:1!important;
+  min-width:0!important;
+}
+.legalPortal .formalProcedureBlocker b{
+  display:block!important;
+  color:#6b5014!important;
+  font-size:13px!important;
+  line-height:1.4!important;
+}
+.legalPortal .formalProcedureBlocker p{
+  margin:5px 0 0!important;
+  color:#7d6329!important;
+  font-size:12px!important;
+  line-height:1.55!important;
+}
+.legalPortal .formalProcedureBlocker ul{
+  margin:10px 0 0!important;
+  padding-left:18px!important;
+  color:#70591f!important;
+  font-size:11px!important;
+  line-height:1.55!important;
+  overflow-wrap:anywhere!important;
+}
+.legalPortal .formalProcedureBlocker>button{
+  grid-column:1/-1!important;
+  grid-row:2!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:46px!important;
+  margin:2px 0 0!important;
+  justify-content:center!important;
+  white-space:normal!important;
+}
+
+/* 3. Journal: count belongs to the left heading cluster; chevron gets a proper centered icon cell. */
+.legalPortal .formalHistorySummary{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 42px!important;
+  align-items:center!important;
+  gap:16px!important;
+}
+.legalPortal .formalHistorySummary:after{
+  content:none!important;
+  display:none!important;
+}
+.legalPortal .formalHistorySummaryMain{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:18px!important;
+  min-width:0!important;
+}
+.legalPortal .formalHistorySummaryMain>div{
+  min-width:0!important;
+}
+.legalPortal .formalHistoryCount{
+  flex:none!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:34px!important;
+  padding:6px 12px!important;
+  border:1px solid #cad9fa!important;
+  border-radius:999px!important;
+  background:#edf3ff!important;
+  color:#3156b9!important;
+  font-size:11px!important;
+  font-weight:850!important;
+  white-space:nowrap!important;
+}
+.legalPortal .formalHistoryChevron{
+  display:grid!important;
+  place-items:center!important;
+  width:40px!important;
+  height:40px!important;
+  justify-self:end!important;
+  border:1px solid #cbd9f4!important;
+  border-radius:12px!important;
+  background:#f3f7ff!important;
+  color:#315efb!important;
+  box-shadow:0 4px 12px #315efb10!important;
+}
+.legalPortal .formalHistoryChevron>svg{
+  display:block!important;
+  margin:0!important;
+  transition:transform .18s ease!important;
+}
+.legalPortal .formalHistoryDisclosure[open] .formalHistoryChevron>svg{
+  transform:rotate(180deg)!important;
+}
+
+/* 4. Required bill materials: aligned status tiles and a deliberate upload area. */
+.legalPortal .billDossierV2 .billPackageList{
+  display:grid!important;
+  gap:10px!important;
+  margin-top:4px!important;
+}
+.legalPortal .billDossierV2 .billPackageList>div{
+  display:grid!important;
+  grid-template-columns:40px minmax(0,1fr)!important;
+  gap:10px 12px!important;
+  align-items:center!important;
+  min-width:0!important;
+  min-height:76px!important;
+  padding:12px!important;
+  box-sizing:border-box!important;
+  border:1px solid #dce5f0!important;
+  border-radius:13px!important;
+  background:#fff!important;
+}
+.legalPortal .billDossierV2 .billPackageList>div>span{
+  grid-column:1!important;
+  grid-row:1!important;
+  display:grid!important;
+  place-items:center!important;
+  width:36px!important;
+  height:36px!important;
+  margin:0!important;
+  border-radius:10px!important;
+  background:#edf3fb!important;
+  color:#315da7!important;
+  font-size:17px!important;
+  font-weight:900!important;
+}
+.legalPortal .billDossierV2 .billPackageList>div.accepted>span{
+  background:#e5f6ee!important;
+  color:#177652!important;
+}
+.legalPortal .billDossierV2 .billPackageList>div.revision>span{
+  background:#fff2d9!important;
+  color:#9a6b0f!important;
+}
+.legalPortal .billDossierV2 .billPackageList>div>div:nth-child(2){
+  grid-column:2!important;
+  grid-row:1!important;
+  display:grid!important;
+  align-content:center!important;
+  justify-items:start!important;
+  gap:4px!important;
+  min-width:0!important;
+  text-align:left!important;
+}
+.legalPortal .billDossierV2 .billPackageList>div>div:nth-child(2)>b{
+  color:#24466f!important;
+  font-size:13px!important;
+  line-height:1.35!important;
+}
+.legalPortal .billDossierV2 .billPackageList>div>div:nth-child(2)>a,
+.legalPortal .billDossierV2 .billPackageList>div>div:nth-child(2)>small{
+  max-width:100%!important;
+  overflow-wrap:anywhere!important;
+  font-size:10px!important;
+  line-height:1.4!important;
+}
+.legalPortal .billDossierV2 .billPackageList>div>div:nth-child(3){
+  grid-column:1/-1!important;
+  grid-row:2!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto auto!important;
+  gap:8px!important;
+  align-items:center!important;
+  padding-top:10px!important;
+  border-top:1px solid #edf1f6!important;
+}
+.legalPortal .billDossierV2 .billPackageList>div>div:nth-child(3)>input{
+  width:100%!important;
+  min-width:0!important;
+  min-height:40px!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .billDossierV2 .billPackageList>div>div:nth-child(3)>button{
+  min-height:40px!important;
+  padding:8px 10px!important;
+}
+.legalPortal .billDossierV2 .billPackageUpload{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:10px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin-top:16px!important;
+  padding:16px!important;
+  box-sizing:border-box!important;
+  border:1px solid #dce5f0!important;
+  border-radius:14px!important;
+  background:#f8faff!important;
+}
+.legalPortal .billDossierV2 .billPackageUpload>.styledSelect,
+.legalPortal .billDossierV2 .billPackageUpload>.styledSelect .styledSelectTrigger{
+  width:100%!important;
+  min-width:0!important;
+}
+.legalPortal .billDossierV2 .billPackageUpload>label{
+  position:relative!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-height:50px!important;
+  padding:10px 14px!important;
+  box-sizing:border-box!important;
+  border:1px dashed #bdcce2!important;
+  border-radius:11px!important;
+  background:#fff!important;
+  color:#58708f!important;
+  font-weight:750!important;
+  text-align:center!important;
+  cursor:pointer!important;
+  overflow:hidden!important;
+}
+.legalPortal .billDossierV2 .billPackageUpload>label>input[type=file]{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  opacity:0!important;
+  cursor:pointer!important;
+}
+.legalPortal .billDossierV2 .billPackageUpload>button{
+  width:100%!important;
+  min-height:50px!important;
+  margin:0!important;
+  justify-content:center!important;
+}
+
+/* 5. Registry status and date need breathing room. */
+.legalPortal .formalRegistryMeta{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  flex-wrap:wrap!important;
+  gap:12px 18px!important;
+  min-width:0!important;
+  margin:3px 0 1px!important;
+}
+.legalPortal .formalRegistryMeta .formalStatus{
+  flex:none!important;
+}
+.legalPortal .formalRegistryMeta time{
+  display:inline-flex!important;
+  align-items:center!important;
+  min-height:28px!important;
+  color:#70809a!important;
+  font-size:12px!important;
+  line-height:1.4!important;
+  white-space:nowrap!important;
+}
+
+/* 7. Increase vertical rhythm between the large workspace blocks. */
+.legalPortal .formalDetail{
+  gap:22px!important;
+}
+.legalPortal .legalDocumentColumn,
+.legalPortal .legalControlRail{
+  gap:18px!important;
+}
+.legalPortal .legalProcedureBottomGrid{
+  gap:20px!important;
+}
+.legalPortal .legalBudgetAnnexSlot,
+.legalPortal .billDossierV2,
+.legalPortal .formalHistoryDisclosure,
+.legalPortal .formalDetail>.civicDiscussion,
+.legalPortal .documentRevisionList{
+  margin-top:2px!important;
+  margin-bottom:2px!important;
+}
+
+@media(max-width:900px){
+  .legalPortal .legalProcedureBottomCol{
+    display:block!important;
+  }
+  .legalPortal .legalDocumentRouteCol .legalRouting,
+  .legalPortal .legalProcedureBottomGrid .budgetPreliminary{
+    height:auto!important;
+  }
+  .legalPortal .legalRoutingHead{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:4px!important;
+  }
+  .legalPortal .legalRoutingHead>b{
+    text-align:left!important;
+  }
+}
+@media(max-width:650px){
+  .legalPortal .formalHistorySummary{
+    grid-template-columns:minmax(0,1fr) 40px!important;
+    gap:10px!important;
+    padding:14px!important;
+  }
+  .legalPortal .formalHistorySummaryMain{
+    display:grid!important;
+    gap:9px!important;
+  }
+  .legalPortal .formalHistoryCount{
+    justify-self:start!important;
+  }
+  .legalPortal .billDossierV2 .billPackageList>div>div:nth-child(3){
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .legalPortal .billDossierV2 .billPackageList>div>div:nth-child(3)>button{
+    width:100%!important;
+  }
+}
