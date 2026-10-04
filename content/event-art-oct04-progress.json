@@ -120,6 +120,96 @@
       "asset": "/event-art/scene-208-20261004-1920.webp",
       "generator": "Built-in imagegen",
       "source_file": "exec-91317736-d00e-4ab3-83ed-17a06e15e4dc.png"
+    },
+    "budget-risk-2026-bank_credit": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "0466afbe5285884f10e77caf8f217b7d78cc7d57bb7a6c502eff9ea3c9036336",
+      "asset_sha256": "41125a53e84b58de22a39502e05dec2609feb955334da7f9e67ab5ba91ef8c19",
+      "asset": "/event-art/scene-209-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-36691c81-06c5-435b-a5b6-2508cdabc111.png"
+    },
+    "budget-risk-2026-external": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "044e4ea77943d581eb7f5ca292e1f8276043056115633db6aedfffda102cd6ed",
+      "asset_sha256": "f657716a5eb84a818cec38f3b18d4fed4968a87f97f9d1950955ef6bf43cffd4",
+      "asset": "/event-art/scene-210-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-f44fc946-0bb3-4f85-b4e0-95822389126b.png"
+    },
+    "budget-risk-2026-ofz_fixed": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "b9f34f8947bfeb27ceed04f57e7921b273e20f820b7729af05ac8b1560fbab1e",
+      "asset_sha256": "ecc41c5644497cb2e68de9dede53a6504be524b0e9aa2af580bf5ba0b5d43a8c",
+      "asset": "/event-art/scene-211-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-eba4804b-ff77-4bfa-ab92-ef30aade7cd5.png"
+    },
+    "budget-risk-2026-ofz_float": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "009ffc0558a2898556ef8e43ef56de6009cd6aa5492cba4306b33a0654589c73",
+      "asset_sha256": "e82dd7f2b9d10d72a485b0abc5981a10d7c9b276af3855dd79f39db63e1edb02",
+      "asset": "/event-art/scene-212-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-d20f4b92-5ed0-4e35-8dbf-60efe2a4ebcf.png"
+    },
+    "budget-risk-2026-privatization": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "3dadc60d245949477acd9aca5243f2058e33fb23d054d424d5b17b74aca845e7",
+      "asset_sha256": "2e00f0dde087d5fa28f92eb45348346543fe6b5b3a22b3661f47be083af439cd",
+      "asset": "/event-art/scene-213-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-287c80ee-86f3-469c-8847-11f68c042334.png"
+    },
+    "budget-risk-2026-reserves": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "dd24d51937d0330689d503590375ebff9ee1384676c971260f5f6d3aa24731ad",
+      "asset_sha256": "7a4d6d67993659ba9d4a4b381417eb9c2b2f9e171896868e0c5bdbbed162a939",
+      "asset": "/event-art/scene-214-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "exec-a596cec1-1f98-451b-9c48-2bf3b72d9693.png"
     }
   }
 }

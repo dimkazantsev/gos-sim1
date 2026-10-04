@@ -112,5 +112,41 @@
     "width": 1920,
     "height": 1080,
     "srcSet": "/event-art/scene-208-20261004-480.webp 480w, /event-art/scene-208-20261004-960.webp 960w, /event-art/scene-208-20261004-1920.webp 1920w"
+  },
+  "budget-risk-2026-bank_credit": {
+    "src": "/event-art/scene-209-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-209-20261004-480.webp 480w, /event-art/scene-209-20261004-960.webp 960w, /event-art/scene-209-20261004-1920.webp 1920w"
+  },
+  "budget-risk-2026-external": {
+    "src": "/event-art/scene-210-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-210-20261004-480.webp 480w, /event-art/scene-210-20261004-960.webp 960w, /event-art/scene-210-20261004-1920.webp 1920w"
+  },
+  "budget-risk-2026-ofz_fixed": {
+    "src": "/event-art/scene-211-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-211-20261004-480.webp 480w, /event-art/scene-211-20261004-960.webp 960w, /event-art/scene-211-20261004-1920.webp 1920w"
+  },
+  "budget-risk-2026-ofz_float": {
+    "src": "/event-art/scene-212-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-212-20261004-480.webp 480w, /event-art/scene-212-20261004-960.webp 960w, /event-art/scene-212-20261004-1920.webp 1920w"
+  },
+  "budget-risk-2026-privatization": {
+    "src": "/event-art/scene-213-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-213-20261004-480.webp 480w, /event-art/scene-213-20261004-960.webp 960w, /event-art/scene-213-20261004-1920.webp 1920w"
+  },
+  "budget-risk-2026-reserves": {
+    "src": "/event-art/scene-214-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-214-20261004-480.webp 480w, /event-art/scene-214-20261004-960.webp 960w, /event-art/scene-214-20261004-1920.webp 1920w"
   }
 }
