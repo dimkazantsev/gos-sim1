@@ -28,5 +28,19 @@ assert.equal(clipIds.size+rasterPaths.size,200,'Every case has its own independe
 console.log('PASS All 200 case illustrations are independent; '+rasterPaths.size+' use responsive cinematic artwork');
 
 const budgetCases=require('../content/budget-cases-2026.json');
-for(const c of budgetCases){const html=renderToStaticMarkup(React.createElement(EventComic,{title:c.title,category:c.category,caseKey:c.case_key,scene:c.comic_scene,silent:true}));assert.match(html,/УЧЕБНОЕ ФИНАНСОВОЕ ДЕЛО/);assert(html.includes(c.title),'Budget case retains its own title');assert(!html.includes('event-art'),'Financial dossier never borrows an unrelated case illustration');}
-console.log('PASS 14 new financial cases have their own documentary covers');
+const budgetArtPaths=new Set();
+for(const c of budgetCases){
+ const html=renderToStaticMarkup(React.createElement(EventComic,{title:c.title,category:c.category,caseKey:c.case_key,scene:c.comic_scene,silent:true}));
+ assert(html.includes(c.title),'Budget case retains its own title');
+ if(html.includes('cinematicRaster')){
+  assert(html.includes('data-case="'+c.case_key+'"'),'Artwork belongs to this financial case');
+  assert.match(html,/width="1920" height="1080"/);
+  const src=html.match(/<img src="([^"]+)"/)[1];
+  assert(!budgetArtPaths.has(src),'Financial cases must not share artwork');
+  budgetArtPaths.add(src);
+ }else{
+  assert.match(html,/УЧЕБНОЕ ФИНАНСОВОЕ ДЕЛО/);
+  assert(!html.includes('event-art'),'Unillustrated dossier does not borrow another case image');
+ }
+}
+console.log('PASS 14 financial cases retain their identity; '+budgetArtPaths.size+' have individual cinematic artwork');
