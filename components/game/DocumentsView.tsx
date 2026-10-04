@@ -332,7 +332,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
    </>}</article>
   </section>}
 
-  <section className="formalLawBase"><div><small>ПРАВОВЫЕ ОРИЕНТИРЫ</small><h2>Как устроена процедура</h2></div><div className="formalLawLinks"><a href="https://www.consultant.ru/document/cons_doc_LAW_28399/" target="_blank" rel="noreferrer"><b>Конституция РФ</b><span>ст. 104–107 · законодательная инициатива и принятие законов ↗</span></a><a href="https://sozd.duma.gov.ru/" target="_blank" rel="noreferrer"><b>СОЗД Государственной Думы</b><span>образцы и реальное движение законопроектов ↗</span></a><a href="https://publication.pravo.gov.ru/" target="_blank" rel="noreferrer"><b>Официальное опубликование</b><span>официальные тексты принятых актов ↗</span></a></div></section>
+  <section className="formalLawBase"><div><small>ПРАВОВЫЕ ОРИЕНТИРЫ</small><h2>Как устроена процедура</h2></div><div className="formalLawLinks"><a href="https://www.consultant.ru/document/cons_doc_LAW_28399/" target="_blank" rel="noreferrer"><b>Конституция РФ</b><span>Ст. 104–107 · законодательная инициатива и принятие законов ↗</span></a><a href="https://sozd.duma.gov.ru/" target="_blank" rel="noreferrer"><b>СОЗД Государственной Думы</b><span>Образцы и реальное движение законопроектов ↗</span></a><a href="https://publication.pravo.gov.ru/" target="_blank" rel="noreferrer"><b>Официальное опубликование</b><span>Официальные тексты принятых актов ↗</span></a></div></section>
  <a className="legalEmblemSources" href="/emblems/sources.json" target="_blank" rel="noreferrer">Источники эмблем и условия использования</a>
  </div>;
 }
