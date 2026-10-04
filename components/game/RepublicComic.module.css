@@ -162,3 +162,43 @@
 
 .dialog .readerFrame[data-playing=false] .cinematicArtwork,.dialog .readerFrame[data-playing=false] .atmosphere *{animation-play-state:paused!important}
 .readerFrame[data-playing=false] .story h2,.readerFrame[data-playing=false] .story p{animation:none!important}
+
+
+/* 2026-10 premium archive covers: UI-first, no illustrated city scene. */
+.abstractCover .coverGrid{position:absolute;inset:0;z-index:-1;opacity:.27;background-image:linear-gradient(#ffffff0a 1px,transparent 1px),linear-gradient(90deg,#ffffff0a 1px,transparent 1px);background-size:22px 22px;mask-image:linear-gradient(180deg,#000 0%,#000 62%,transparent 100%)}
+.abstractCover .coverGlow,.abstractCover .coverGlowSecondary{position:absolute;z-index:-1;border-radius:50%;pointer-events:none;filter:blur(16px)}
+.abstractCover .coverGlow{width:52%;height:92%;left:4%;top:-27%;background:radial-gradient(circle,color-mix(in srgb,var(--archive-a) 58%,#62d7ff),transparent 67%);opacity:.28}
+.abstractCover .coverGlowSecondary{width:44%;height:72%;right:-7%;bottom:-21%;background:radial-gradient(circle,color-mix(in srgb,var(--archive-b) 42%,#8a6dff),transparent 70%);opacity:.28}
+.abstractCover .coverTopBar{position:absolute;top:12px;left:14px;right:14px;z-index:4;display:flex;align-items:center;justify-content:space-between}
+.abstractCover .coverTopBar .abstractBrand{position:static;display:inline-flex;align-items:center;min-height:28px;font-size:9px;font-weight:900;letter-spacing:.17em;color:#eef8ff;text-shadow:0 1px 8px #0008}
+.abstractCover .coverTopBar .abstractIcon{position:static;display:grid;place-items:center;width:34px;height:34px;border:1px solid #ffffff29;border-radius:11px;background:linear-gradient(145deg,#ffffff11,#07152366);color:#fff;box-shadow:inset 0 1px 0 #ffffff16,0 7px 18px #03101d3d;backdrop-filter:blur(9px)}
+.abstractCover .coverCenter{position:absolute;left:14px;right:14px;top:51%;z-index:3;display:grid;grid-template-columns:104px minmax(0,1fr);gap:11px;align-items:stretch;transform:translateY(-51%)}
+.abstractCover .coverStageBadge{position:relative;display:flex;flex-direction:column;justify-content:center;min-width:0;padding:12px;border:1px solid #ffffff1f;border-radius:14px;background:linear-gradient(145deg,#ffffff10,#0718285e);box-shadow:inset 0 1px 0 #ffffff10,0 12px 30px #03101d2b;backdrop-filter:blur(10px)}
+.abstractCover .coverStageBadge:after{content:"";position:absolute;left:12px;right:12px;bottom:10px;height:2px;border-radius:999px;background:linear-gradient(90deg,var(--archive-b),var(--archive-a),transparent);opacity:.78}
+.abstractCover .coverStageBadge small{font-size:8px;font-weight:900;letter-spacing:.13em;color:#bcd7ea}
+.abstractCover .coverStageBadge strong{margin:5px 0 17px;font-size:30px;line-height:.9;font-weight:950;letter-spacing:-.06em;color:#fff;text-shadow:0 3px 18px #0005}
+.abstractCover .coverStageBadge span{font-size:7px;font-weight:800;letter-spacing:.12em;color:#8eb1c9}
+.abstractCover .coverMetricStack{display:grid;grid-template-rows:repeat(3,1fr);gap:7px;min-width:0}
+.abstractCover .coverMetricCard{position:relative;display:grid;grid-template-columns:52px minmax(0,1fr) 25px;align-items:center;gap:7px;min-width:0;padding:7px 9px;border:1px solid #ffffff18;border-radius:11px;background:linear-gradient(90deg,#ffffff0b,#ffffff06);box-shadow:inset 0 1px 0 #ffffff0d;backdrop-filter:blur(9px)}
+.abstractCover .coverMetricCard span{font-size:7px;font-weight:900;letter-spacing:.11em;color:#7ea5bf}
+.abstractCover .coverMetricCard b{min-width:0;font-size:10px;font-weight:800;color:#e8f6ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.abstractCover .coverMetricCard i{position:relative;width:22px;height:5px;border-radius:999px;background:#05111d99;overflow:hidden}
+.abstractCover .coverMetricCard i:after{content:"";position:absolute;inset:0 auto 0 0;width:68%;border-radius:inherit;background:linear-gradient(90deg,var(--archive-b),var(--archive-a));box-shadow:0 0 8px color-mix(in srgb,var(--archive-a) 55%,transparent)}
+.abstractCover .coverMetricCard:nth-child(2) i:after{width:47%}.abstractCover .coverMetricCard:nth-child(3) i:after{width:82%}
+.abstractCover .coverFlow{position:absolute;left:15px;right:15px;bottom:34px;height:30px;z-index:3}
+.abstractCover .coverFlowLine{position:absolute;left:7%;right:7%;top:14px;height:1px;background:linear-gradient(90deg,#ffffff18,var(--archive-a),var(--archive-b),#ffffff18)}
+.abstractCover .coverFlow i{position:absolute;top:9px;width:11px;height:11px;border:2px solid #d9effc;border-radius:50%;background:#12304b;box-shadow:0 0 0 4px #ffffff06,0 0 11px #4dbde64a}
+.abstractCover .coverFlow i:nth-of-type(1){left:8%}.abstractCover .coverFlow i:nth-of-type(2){left:35%}.abstractCover .coverFlow i:nth-of-type(3){left:62%}.abstractCover .coverFlow i:nth-of-type(4){right:8%}
+.abstractCover .coverFooter{position:absolute;left:14px;right:14px;bottom:10px;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.abstractCover .coverFooter .abstractKind{position:static;font-size:8px;font-weight:900;letter-spacing:.15em;color:#edf8ff;text-shadow:0 1px 7px #0007}
+.abstractCover .coverFooterNote{font-size:8px;font-weight:750;letter-spacing:.05em;color:#91abc0}
+.abstractCover[data-kind=intro]{background:radial-gradient(circle at 20% 12%,#56d8d32b,transparent 31%),radial-gradient(circle at 82% 30%,#8ebcff20,transparent 29%),linear-gradient(135deg,#10233d 0%,#153658 48%,#0f2035 100%)}
+.abstractCover[data-kind=completed]{background:radial-gradient(circle at 18% 14%,#57dfba24,transparent 32%),radial-gradient(circle at 82% 32%,#8fead51b,transparent 29%),linear-gradient(135deg,#102d39 0%,#154253 48%,#10242f 100%)}
+.abstractCover[data-kind=preview]{background:radial-gradient(circle at 18% 14%,#7ea5ff24,transparent 32%),radial-gradient(circle at 82% 32%,#eda8621c,transparent 29%),linear-gradient(135deg,#182842 0%,#20375d 48%,#17253b 100%)}
+@media(max-width:600px){
+ .abstractCover .coverCenter{grid-template-columns:92px minmax(0,1fr);gap:9px}
+ .abstractCover .coverStageBadge{padding:10px}.abstractCover .coverStageBadge strong{font-size:25px;margin-bottom:16px}
+ .abstractCover .coverMetricCard{grid-template-columns:45px minmax(0,1fr) 21px;padding:6px 8px}
+ .abstractCover .coverMetricCard span{font-size:6.5px}.abstractCover .coverMetricCard b{font-size:9px}
+ .abstractCover .coverFooterNote{font-size:7px}
+}
