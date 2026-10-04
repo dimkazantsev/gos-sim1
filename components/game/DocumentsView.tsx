@@ -6,7 +6,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import type {FormalDocument} from './types';
 import {FORMAL_SUBJECTS,FORMAL_TYPES,inferFormal,formalSignature,ownerLabel} from './formalInstitutions';
 import {votePresetForDocument} from './proceduralVoting';
-import {ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,Clock3,ClipboardList,FilePlus2,Paperclip,Plus,Printer,Route,Search,Vote,X} from 'lucide-react';
+import {ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,CircleDot,Clock3,ClipboardList,FilePlus2,FileText,Paperclip,Plus,Printer,Route,Search,Upload,Vote,X} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import DocumentPaper from './DocumentPaper';
 import BudgetDocumentAnnex from './BudgetDocumentAnnex';
@@ -25,6 +25,7 @@ type BillFile={id:string;document_id:string;file_kind:string;title:string;storag
 type BillConclusion={document_id:string;rapporteur_user_id:string|null;legal_compliance:string;internal_logic:string;affected_acts_completeness:string;recommendation:'draft'|'proceed'|'return'|'reject';finalized:boolean};
 type BillReadiness={submission_ready:boolean;committee_ready:boolean;issues:string[];review_issues:string[];required_files:string[];committee_key:string|null;committee_recommendation:string|null;committee_finalized:boolean};
 type BudgetPreliminaryReview={document_id:string;documents_compliant:boolean;sent_to_all_committees:boolean;accounts_chamber_reviewed:boolean;committee_conclusion:string;decision:'draft'|'accept'|'return';note:string|null;updated_at:string};
+type SupportDocument={id:string;document_id:string;stage_code:string;category:string;title:string;note:string|null;storage_path:string|null;file_name:string|null;mime_type:string|null;file_size:number|null;created_by:string|null;created_at:string;url?:string|null};
 const billFileLabels:Record<string,string>={explanatory_note:'Пояснительная записка',affected_acts:'Перечень затрагиваемых актов',financial_economic:'Финансово-экономическое обоснование',government_opinion:'Заключение Правительства РФ',collegial_decision:'Решение коллегиального субъекта о внесении',other_review:'Отзыв иного субъекта законодательной инициативы'};
 function readableBillIssue(issue:string){
  let text=issue;
@@ -54,6 +55,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const [budgetReview,setBudgetReview]=useState<BudgetPreliminaryReview|null>(null),[budgetDocsOk,setBudgetDocsOk]=useState(false),[budgetDistributed,setBudgetDistributed]=useState(false),[budgetAccounts,setBudgetAccounts]=useState(false),[budgetConclusion,setBudgetConclusion]=useState(''),[budgetDecision,setBudgetDecision]=useState<'draft'|'accept'|'return'>('draft'),[budgetReviewNote,setBudgetReviewNote]=useState('');
  const [localRefresh,setLocalRefresh]=useState(0);
  const [documentSignatures,setDocumentSignatures]=useState<{id:string;signer_id:string;signed_at:string;history_id:number;url:string|null}[]>([]);
+ const [supportDocuments,setSupportDocuments]=useState<SupportDocument[]>([]),[supportCategory,setSupportCategory]=useState('opinion'),[supportTitle,setSupportTitle]=useState(''),[supportNote,setSupportNote]=useState(''),[supportFile,setSupportFile]=useState<File|null>(null),[supportFormOpen,setSupportFormOpen]=useState(false);
 
  const role=[me?.role_title||'',...activeRoles].join(' ').toLowerCase();
  const availableSubjects=useMemo(()=>subjectPermissions?FORMAL_SUBJECTS.filter(s=>subjectPermissions.includes(s.key)):teacher?FORMAL_SUBJECTS:FORMAL_SUBJECTS.filter(s=>s.roleHints.some(h=>role.includes(h))),[teacher,role,subjectPermissions]);
@@ -90,6 +92,17 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   })();
   return()=>{current=false};
  },[selected?.id,selected?.updated_at,formalHistory.length]);
+ useEffect(()=>{
+  if(!selected?.id){setSupportDocuments([]);return}
+  let active=true;
+  void (async()=>{
+   const r=await supabase.from('formal_support_documents').select('*').eq('document_id',selected.id).order('created_at',{ascending:true});
+   if(r.error||!active)return;
+   const items=await Promise.all(((r.data||[]) as SupportDocument[]).map(async row=>({...row,url:row.storage_path?(await supabase.storage.from('game-assets').createSignedUrl(row.storage_path,3600)).data?.signedUrl||null:null})));
+   if(active)setSupportDocuments(items);
+  })();
+  return()=>{active=false};
+ },[selected?.id,selected?.updated_at,localRefresh]);
  const lastSigned=documentSignatures[0];
  const [committeeUnits,setCommitteeUnits]=useState<{unit_key:string;title:string;head_user_id:string|null}[]>([]);
  useEffect(()=>{if(!me||!g.game)return;void supabase.from('institution_units').select('unit_key,title,head_user_id').eq('game_id',g.game.id).eq('unit_kind','committee').then(r=>{if(!r.error)setCommitteeUnits((r.data||[]) as any)})},[me?.user_id,g.game?.id]);
