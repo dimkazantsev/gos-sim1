@@ -1344,3 +1344,167 @@
     gap:22px!important;
   }
 }
+
+
+/* NPA workspace v12 — no duplicate full bill dossier after creation. */
+.legalPortal .billDossierCompact{
+  display:grid!important;
+  gap:16px!important;
+  padding:20px!important;
+  border:1px solid #cfdcf0!important;
+  border-radius:18px!important;
+  background:linear-gradient(180deg,#fbfdff 0%,#f7faff 100%)!important;
+  scroll-margin-top:96px;
+}
+.legalPortal .billDossierCompactHead{
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:space-between!important;
+  gap:18px!important;
+}
+.legalPortal .billDossierCompactHead>div{
+  min-width:0!important;
+}
+.legalPortal .billDossierCompactHead small,
+.legalPortal .billDossierEditorHead small{
+  color:#60779a!important;
+  font-size:10px!important;
+  font-weight:850!important;
+  letter-spacing:.09em!important;
+}
+.legalPortal .billDossierCompactHead h2{
+  margin:4px 0 5px!important;
+  color:#173c70!important;
+  font-size:20px!important;
+}
+.legalPortal .billDossierCompactHead p{
+  max-width:78ch!important;
+  margin:0!important;
+  color:#6c8099!important;
+  font-size:12px!important;
+  line-height:1.55!important;
+}
+.legalPortal .billDossierCompactHead>span{
+  flex:none!important;
+}
+.legalPortal .billDossierCompactGrid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+.legalPortal .billDossierCompactGrid>article{
+  display:grid!important;
+  align-content:start!important;
+  gap:5px!important;
+  min-width:0!important;
+  min-height:84px!important;
+  padding:13px 14px!important;
+  box-sizing:border-box!important;
+  border:1px solid #dde6f2!important;
+  border-radius:13px!important;
+  background:#fff!important;
+}
+.legalPortal .billDossierCompactGrid small{
+  color:#7b8da4!important;
+  font-size:10px!important;
+  line-height:1.35!important;
+}
+.legalPortal .billDossierCompactGrid b{
+  color:#24466f!important;
+  font-size:12px!important;
+  line-height:1.4!important;
+  overflow-wrap:anywhere!important;
+}
+.legalPortal .billDossierCompactGrid span{
+  color:#7a8ca2!important;
+  font-size:10px!important;
+  line-height:1.4!important;
+}
+.legalPortal .billDossierCompactIssues{
+  display:grid!important;
+  grid-template-columns:22px minmax(0,1fr)!important;
+  gap:10px!important;
+  align-items:start!important;
+  padding:12px 13px!important;
+  border:1px solid #ead29b!important;
+  border-radius:12px!important;
+  background:#fff9e9!important;
+  color:#73591e!important;
+}
+.legalPortal .billDossierCompactIssues>svg{
+  margin-top:1px!important;
+  color:#c28b15!important;
+}
+.legalPortal .billDossierCompactIssues>div{
+  display:grid!important;
+  gap:3px!important;
+  min-width:0!important;
+}
+.legalPortal .billDossierCompactIssues b{
+  font-size:11px!important;
+}
+.legalPortal .billDossierCompactIssues span{
+  font-size:10px!important;
+  line-height:1.5!important;
+  overflow-wrap:anywhere!important;
+}
+.legalPortal .billDossierToggle{
+  justify-self:start!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  min-height:42px!important;
+  padding:9px 12px!important;
+}
+.legalPortal .billDossierEditor{
+  display:grid!important;
+  gap:14px!important;
+  padding-top:16px!important;
+  border-top:1px solid #dfe7f1!important;
+}
+.legalPortal .billDossierEditorHead{
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+}
+.legalPortal .billDossierEditorHead h3{
+  margin:4px 0 0!important;
+  color:#173c70!important;
+  font-size:17px!important;
+}
+.legalPortal .billDossierEditorHead>span{
+  color:#7a8ca2!important;
+  font-size:10px!important;
+  text-align:right!important;
+}
+.legalPortal .billDossierEditor .billDossierLayout{
+  margin-top:0!important;
+}
+@media(max-width:1050px){
+  .legalPortal .billDossierCompactGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+@media(max-width:650px){
+  .legalPortal .billDossierCompact{
+    padding:15px!important;
+  }
+  .legalPortal .billDossierCompactHead,
+  .legalPortal .billDossierEditorHead{
+    display:grid!important;
+  }
+  .legalPortal .billDossierCompactHead>span{
+    justify-self:start!important;
+  }
+  .legalPortal .billDossierCompactGrid{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .legalPortal .billDossierToggle{
+    width:100%!important;
+    justify-content:center!important;
+  }
+  .legalPortal .billDossierEditorHead>span{
+    text-align:left!important;
+  }
+}
