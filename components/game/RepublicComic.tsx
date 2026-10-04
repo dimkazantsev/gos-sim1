@@ -55,14 +55,20 @@ function ArchiveCover({chapter}:{chapter?:Chapter}){
  const kind: 'intro'|'completed'|'preview'=chapter?.kind||'intro';
  const label=kind==='intro'?'ПРОЛОГ':kind==='completed'?'ИТОГИ':'АНОНС';
  const code=String(stage).padStart(2,'0');
- return <div className={styles.abstractCover} style={archiveCoverStyle(stage,kind)} data-kind={kind} aria-hidden="true">
-  <i className={styles.abstractGrid}/>
-  <i className={styles.abstractOrbit}/>
-  <i className={styles.abstractRays}/>
+ return <div className={styles.abstractCover} style={archiveCoverStyle(stage,kind)} data-kind={kind} data-variant={String(stage%4)} aria-hidden="true">
+  <i className={styles.posterSkyGlow}/>
+  <i className={styles.posterSun}/>
+  <span className={styles.posterSkyline}>
+   {Array.from({length:9},(_,i)=><i key={i} style={{'--tower':`${26+((stage*13+i*17)%48)}%`,'--delay':String(i)} as CSSProperties}/>)}
+  </span>
+  <span className={styles.posterGovernment}><i/><i/><i/><i/><i/></span>
+  <span className={styles.posterBridge}><i/><i/><i/><i/></span>
+  <span className={styles.posterRiver}/>
+  <span className={styles.posterPeople}><i/><i/><i/></span>
   <span className={styles.abstractBrand}>GOS//SIMS</span>
   <span className={styles.abstractKind}>{label}</span>
-  <strong className={styles.abstractNumber}>{code}</strong>
-  <span className={styles.abstractIcon}><BookOpen size={20}/></span>
+  {stage>0&&<strong className={styles.abstractNumber}>{code}</strong>}
+  <span className={styles.abstractIcon}><BookOpen size={19}/></span>
  </div>;
 }
 type ComicView='intro'|'archive'|'chapter';
@@ -131,15 +137,15 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
     <button type="button" aria-label={intro?'Завершить пролог после просмотра':'Закрыть комикс'} disabled={intro&&scene!==SCENES.length-1} onClick={close}><X size={20}/></button>
    </div></header>
    {showingArchive&&<nav className={styles.switcher} aria-label="Разделы комиксов">
-    <button type="button" aria-pressed={!showingArchive&&!showingChapter} onClick={openIntro}><BookOpen size={18}/> Вводный комикс</button>
+    <button type="button" aria-pressed={!showingArchive&&!showingChapter} onClick={openIntro}><BookOpen size={18}/> Пролог</button>
     <button type="button" aria-pressed={showingArchive} onClick={openArchive}><Library size={18}/> Архив комиксов</button>
    </nav>}
    {showingArchive?<div className={styles.library} tabIndex={0}>
-    <div className={styles.libraryHeading}><h2>Архив комиксов</h2><p>Вводный комикс доступен всегда. Итоги и анонсы сохраняются по мере завершения этапов вашей игры.</p></div>
+    <div className={styles.libraryHeading}><h2>Архив комиксов</h2><p>Пролог доступен всегда. Итоги и анонсы сохраняются по мере завершения этапов вашей игры.</p></div>
     <div className={styles.libraryGrid}>
      <button type="button" className={styles.libraryCard} onClick={openIntro}>
       <div className={styles.cover}><ArchiveCover/></div>
-      <div className={styles.cardText}><small>Пролог · 4 сцены</small><strong>Вводный комикс</strong><span>Республика после бури: с чего начинается ваша история.</span><b>Читать с начала <ArrowRight size={16}/></b></div>
+      <div className={styles.cardText}><small>Пролог · 4 сцены</small><strong>Пролог Республики</strong><span>Республика после бури: с чего начинается ваша история.</span><b>Читать с начала <ArrowRight size={16}/></b></div>
      </button>
      {chapters.map(c=><button key={c.id} type="button" className={styles.libraryCard} onClick={()=>readChapter(c.id)}>
       <div className={styles.cover}><ArchiveCover chapter={c}/></div>
@@ -148,7 +154,7 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
     </div>
     {archive.loading&&<p role="status" className={styles.archiveNotice}>Загружаем главы вашей игры…</p>}
     {!archive.loading&&!chapters.length&&!archive.error&&<p className={styles.archiveNotice}>Этапы пока не завершены. После завершения этапа здесь появятся его итоги и анонс следующей главы.</p>}
-    {archive.error&&<p role="status" className={styles.archiveNotice}>Не удалось загрузить главы: {archive.error} Вводный комикс можно читать без загрузки архива.</p>}
+    {archive.error&&<p role="status" className={styles.archiveNotice}>Не удалось загрузить главы: {archive.error} Пролог можно читать без загрузки архива.</p>}
    </div>:<>
     <div ref={reader} role="region" aria-label="Сцена комикса" tabIndex={0} data-comic-kind={showingChapter?'chapter':'prologue'} data-playing={playing} data-user-animation={motionRequested} className={'comicFrame '+styles.readerFrame+(!showingChapter?' '+styles.cinematicFrame:'')} key={showingChapter?chapter.id:scene}>
      <div className={styles.illustration}>{showingChapter?<ChapterArtwork chapter={chapter}/>:<Artwork scene={scene} backdrop/>}<SceneAtmosphere scene={showingChapter?chapterScene(chapter):scene}/></div>
