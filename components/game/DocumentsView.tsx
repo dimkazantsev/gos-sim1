@@ -369,7 +369,44 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
        <label className="budgetPreliminaryText">Примечание<textarea rows={2} value={budgetReviewNote} onChange={e=>setBudgetReviewNote(e.target.value)} placeholder="Замечания, условия возврата или организационные сведения"/></label>
        <div className="budgetPreliminaryDecision"><StyledSelect label="Предварительная проверка бюджета" value={budgetDecision} onChange={v=>setBudgetDecision(v as 'draft'|'accept'|'return')} options={[{value:'draft',label:'Черновик решения'},{value:'accept',label:'Принять к рассмотрению'},{value:'return',label:'Вернуть Правительству'}]}/><button className="primary" disabled={busy} onClick={()=>void saveBudgetPreliminary()}>Зафиксировать проверку</button></div>
       </article></div>}
-     <div className="legalProcedureBottomCol legalDocumentRouteCol"><section className="formalProgress legalRouting" aria-labelledby="legal-document-route-title"><header className="legalRoutingHead"><span id="legal-document-route-title">Маршрут документа</span><b>{selected.current_step+1} из {selected.workflow_steps.length} · {selected.status_label}</b></header><div className="formalProgressTop"><small>ДВИЖЕНИЕ ДОКУМЕНТА</small><span>{progress}% процедуры</span></div><div className="formalProgressLine"><i style={{width:progress+'%'}}/></div><div className="formalSteps">{selected.workflow_steps.map((s,i)=><div key={s.code} className={i<selected.current_step?'formalStep done':i===selected.current_step?'formalStep current':'formalStep'}><span>{i<selected.current_step?'✓':i+1}</span><b>{s.label}</b><small>{ownerLabel(s.owner)}</small></div>)}</div></section></div>
+     <div className="legalProcedureBottomCol legalDocumentRouteCol"><section className="formalProgress legalRouting legalRouteBoard" aria-labelledby="legal-document-route-title">
+      <header className="legalRouteBoardHead">
+       <div><small>ПРОЦЕДУРНАЯ КАРТА</small><h2 id="legal-document-route-title">Маршрут документа</h2><p>Полная последовательность движения документа по установленной процедуре.</p></div>
+       <div className="legalRouteBoardStatus"><span>{selected.current_step+1} из {selected.workflow_steps.length}</span><b>{selected.status_label}</b></div>
+      </header>
+      <div className="legalRouteProgress" aria-label={'Процедура выполнена на '+progress+'%'}>
+       <div><span>Начало процедуры</span><strong>{progress}%</strong><span>{progress===100?'Завершено':'Текущая стадия'}</span></div>
+       <div className="legalRouteProgressTrack"><i style={{width:progress+'%'}}/></div>
+      </div>
+      <ol className="legalRouteTimeline" aria-label="Стадии маршрута документа">
+       {selected.workflow_steps.map((s,i)=>{
+        const routeFinished=progress===100;
+        const done=i<selected.current_step||(routeFinished&&i===selected.current_step);
+        const current=!routeFinished&&i===selected.current_step;
+        const event=[...history].reverse().find(h=>h.to_status===s.code);
+        const eventDate=event?.created_at||(i===0?selected.created_at:null);
+        const actor=event?.actor_id?members.find(m=>m.user_id===event.actor_id)?.full_name:null;
+        return <li key={s.code} className={'legalRouteStep '+(done?'done':current?'current':'pending')}>
+         <div className="legalRouteRail" aria-hidden="true"><span>{done?<CheckCircle2 size={20}/>:i+1}</span>{i<selected.workflow_steps.length-1&&<i/>}</div>
+         <div className="legalRouteStepBody">
+          <div className="legalRouteStepTitle"><small>ЭТАП {i+1}</small><h3>{s.label}</h3></div>
+          <div className="legalRouteStepDetails">
+           <span><b>Ответственный</b>{ownerLabel(s.owner)}</span>
+           {actor&&<span><b>Действие выполнил</b>{actor}</span>}
+          </div>
+         </div>
+         <div className="legalRouteStepState">
+          <span>{done?'Завершено':current?'Текущая стадия':'Ожидается'}</span>
+          {eventDate&&<time dateTime={eventDate}><Clock3 size={13}/>{new Date(eventDate).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'})}</time>}
+         </div>
+        </li>
+       })}
+      </ol>
+      <footer className="legalRouteBoardFoot">
+       <div><Route size={18}/><span><b>{progress===100?'Процедура завершена':'Документ находится в процедуре'}</b><small>{progress===100?'Все предусмотренные стадии пройдены.':'Сейчас документ находится у: '+ownerLabel(selected.current_owner_key)+'.'}</small></span></div>
+       <strong>{selected.workflow_steps.length} {selected.workflow_steps.length===1?'стадия':selected.workflow_steps.length<5?'стадии':'стадий'}</strong>
+      </footer>
+     </section></div>
     </section>
     <div className="legalBudgetAnnexSlot"><BudgetDocumentAnnex document={selected} onOpenBudget={onOpenBudget} onOpenVotes={onOpenVotes}/></div>
     {selected.workflow_key==='bill'&&<section id="bill-submission-package" className="surface billDossierCompact">

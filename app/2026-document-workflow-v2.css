@@ -2094,3 +2094,399 @@
   border-color:#8eaae0!important;
   box-shadow:0 0 0 3px #315efb10,0 14px 28px #173c7010!important;
 }
+
+
+/* NPA route v15 — full procedural timeline, without changing surrounding NPA UI. */
+.legalPortal .legalDocumentRouteCol .legalRouteBoard{
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  border:1px solid #d5e0ee!important;
+  border-radius:20px!important;
+  background:
+    radial-gradient(circle at 100% 0,#eef3ff 0,transparent 30%),
+    linear-gradient(180deg,#fff 0%,#fbfcff 100%)!important;
+  box-shadow:0 12px 28px #173c7008!important;
+}
+.legalPortal .legalRouteBoardHead{
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:space-between!important;
+  gap:20px!important;
+  padding:18px 20px 16px!important;
+  border-bottom:1px solid #e4eaf2!important;
+}
+.legalPortal .legalRouteBoardHead>div:first-child{
+  min-width:0!important;
+}
+.legalPortal .legalRouteBoardHead small{
+  display:block!important;
+  margin-bottom:4px!important;
+  color:#6f83a1!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.11em!important;
+}
+.legalPortal .legalRouteBoardHead h2{
+  margin:0!important;
+  color:#14396c!important;
+  font-size:20px!important;
+  line-height:1.3!important;
+}
+.legalPortal .legalRouteBoardHead p{
+  max-width:62ch!important;
+  margin:5px 0 0!important;
+  color:#74869d!important;
+  font-size:11px!important;
+  line-height:1.5!important;
+}
+.legalPortal .legalRouteBoardStatus{
+  display:grid!important;
+  justify-items:end!important;
+  gap:4px!important;
+  flex:none!important;
+  text-align:right!important;
+}
+.legalPortal .legalRouteBoardStatus>span{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:28px!important;
+  padding:4px 9px!important;
+  border:1px solid #cad8f5!important;
+  border-radius:999px!important;
+  background:#edf3ff!important;
+  color:#315efb!important;
+  font-size:10px!important;
+  font-weight:900!important;
+}
+.legalPortal .legalRouteBoardStatus>b{
+  max-width:260px!important;
+  color:#526b8b!important;
+  font-size:11px!important;
+  line-height:1.4!important;
+}
+.legalPortal .legalRouteProgress{
+  display:grid!important;
+  gap:8px!important;
+  padding:14px 20px 16px!important;
+  background:#f8faff!important;
+  border-bottom:1px solid #e6ebf2!important;
+}
+.legalPortal .legalRouteProgress>div:first-child{
+  display:grid!important;
+  grid-template-columns:1fr auto 1fr!important;
+  align-items:center!important;
+  gap:10px!important;
+}
+.legalPortal .legalRouteProgress span{
+  color:#7d8fa5!important;
+  font-size:9px!important;
+  font-weight:750!important;
+}
+.legalPortal .legalRouteProgress span:last-child{
+  text-align:right!important;
+}
+.legalPortal .legalRouteProgress strong{
+  color:#315efb!important;
+  font-size:13px!important;
+}
+.legalPortal .legalRouteProgressTrack{
+  height:7px!important;
+  overflow:hidden!important;
+  border-radius:999px!important;
+  background:#e6ebf3!important;
+  box-shadow:inset 0 1px 2px #173c7010!important;
+}
+.legalPortal .legalRouteProgressTrack>i{
+  display:block!important;
+  height:100%!important;
+  border-radius:inherit!important;
+  background:linear-gradient(90deg,#2852e5 0%,#5967f4 58%,#7659ef 100%)!important;
+  box-shadow:0 0 12px #315efb35!important;
+}
+.legalPortal .legalRouteTimeline{
+  display:grid!important;
+  gap:0!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:520px!important;
+  margin:0!important;
+  padding:10px 18px 12px!important;
+  list-style:none!important;
+  overflow:auto!important;
+}
+.legalPortal .legalRouteStep{
+  display:grid!important;
+  grid-template-columns:48px minmax(0,1fr) minmax(118px,auto)!important;
+  gap:12px!important;
+  align-items:stretch!important;
+  min-width:0!important;
+  min-height:96px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+}
+.legalPortal .legalRouteRail{
+  position:relative!important;
+  display:grid!important;
+  grid-template-rows:48px minmax(0,1fr)!important;
+  justify-items:center!important;
+  min-height:100%!important;
+}
+.legalPortal .legalRouteRail>span{
+  position:relative!important;
+  z-index:2!important;
+  display:grid!important;
+  place-items:center!important;
+  width:40px!important;
+  height:40px!important;
+  margin-top:4px!important;
+  box-sizing:border-box!important;
+  border:2px solid #cfd9e7!important;
+  border-radius:14px!important;
+  background:#f6f8fb!important;
+  color:#7f90a6!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  box-shadow:0 4px 10px #173c7006!important;
+}
+.legalPortal .legalRouteRail>i{
+  width:2px!important;
+  min-height:48px!important;
+  margin-top:-3px!important;
+  background:#dce4ee!important;
+}
+.legalPortal .legalRouteStep.done .legalRouteRail>span{
+  border-color:#16805f!important;
+  background:#16805f!important;
+  color:#fff!important;
+}
+.legalPortal .legalRouteStep.done .legalRouteRail>i{
+  background:linear-gradient(#16805f,#a9d7c8)!important;
+}
+.legalPortal .legalRouteStep.current .legalRouteRail>span{
+  border-color:#315efb!important;
+  background:#315efb!important;
+  color:#fff!important;
+  box-shadow:0 0 0 5px #315efb13,0 7px 16px #315efb22!important;
+}
+.legalPortal .legalRouteStep.current .legalRouteRail>i{
+  background:linear-gradient(#315efb,#dce4ee)!important;
+}
+.legalPortal .legalRouteStepBody{
+  display:grid!important;
+  align-content:center!important;
+  gap:9px!important;
+  min-width:0!important;
+  margin:4px 0 12px!important;
+  padding:13px 15px!important;
+  border:1px solid #e0e7f0!important;
+  border-radius:14px!important;
+  background:#fff!important;
+}
+.legalPortal .legalRouteStep.done .legalRouteStepBody{
+  border-color:#d4e9e1!important;
+  background:#f7fbf9!important;
+}
+.legalPortal .legalRouteStep.current .legalRouteStepBody{
+  border-color:#b9cbf7!important;
+  background:#f3f6ff!important;
+  box-shadow:0 6px 18px #315efb0b!important;
+}
+.legalPortal .legalRouteStepTitle{
+  display:grid!important;
+  gap:3px!important;
+  min-width:0!important;
+}
+.legalPortal .legalRouteStepTitle small{
+  color:#7d8ea4!important;
+  font-size:8px!important;
+  font-weight:900!important;
+  letter-spacing:.1em!important;
+}
+.legalPortal .legalRouteStepTitle h3{
+  margin:0!important;
+  color:#163c70!important;
+  font-size:13px!important;
+  line-height:1.4!important;
+  overflow-wrap:anywhere!important;
+}
+.legalPortal .legalRouteStepDetails{
+  display:flex!important;
+  align-items:flex-start!important;
+  flex-wrap:wrap!important;
+  gap:8px 18px!important;
+}
+.legalPortal .legalRouteStepDetails>span{
+  display:grid!important;
+  gap:2px!important;
+  min-width:120px!important;
+  color:#647a95!important;
+  font-size:9px!important;
+  line-height:1.4!important;
+}
+.legalPortal .legalRouteStepDetails b{
+  color:#8a99ac!important;
+  font-size:8px!important;
+  font-weight:800!important;
+  text-transform:uppercase!important;
+  letter-spacing:.05em!important;
+}
+.legalPortal .legalRouteStepState{
+  display:grid!important;
+  align-content:center!important;
+  justify-items:end!important;
+  gap:7px!important;
+  min-width:0!important;
+  margin:4px 0 12px!important;
+  padding:10px 0!important;
+}
+.legalPortal .legalRouteStepState>span{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:28px!important;
+  padding:5px 9px!important;
+  border:1px solid #d6dfe9!important;
+  border-radius:999px!important;
+  background:#f5f7fa!important;
+  color:#78899e!important;
+  font-size:9px!important;
+  font-weight:850!important;
+  white-space:nowrap!important;
+}
+.legalPortal .legalRouteStep.done .legalRouteStepState>span{
+  border-color:#bfe0d3!important;
+  background:#eaf7f1!important;
+  color:#177655!important;
+}
+.legalPortal .legalRouteStep.current .legalRouteStepState>span{
+  border-color:#bdcdf6!important;
+  background:#edf3ff!important;
+  color:#315efb!important;
+}
+.legalPortal .legalRouteStepState time{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:5px!important;
+  color:#8293a8!important;
+  font-size:9px!important;
+  white-space:nowrap!important;
+}
+.legalPortal .legalRouteBoardFoot{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+  padding:14px 18px!important;
+  border-top:1px solid #e4eaf2!important;
+  background:#f8fafd!important;
+}
+.legalPortal .legalRouteBoardFoot>div{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  min-width:0!important;
+}
+.legalPortal .legalRouteBoardFoot svg{
+  flex:none!important;
+  color:#315efb!important;
+}
+.legalPortal .legalRouteBoardFoot>div>span{
+  display:grid!important;
+  gap:2px!important;
+  min-width:0!important;
+}
+.legalPortal .legalRouteBoardFoot b{
+  color:#274a75!important;
+  font-size:10px!important;
+}
+.legalPortal .legalRouteBoardFoot small{
+  color:#7a8ca2!important;
+  font-size:9px!important;
+  line-height:1.4!important;
+}
+.legalPortal .legalRouteBoardFoot>strong{
+  flex:none!important;
+  color:#607895!important;
+  font-size:10px!important;
+  font-weight:850!important;
+}
+@media(max-width:760px){
+  .legalPortal .legalRouteBoardHead{
+    display:grid!important;
+    gap:12px!important;
+    padding:16px!important;
+  }
+  .legalPortal .legalRouteBoardStatus{
+    justify-items:start!important;
+    text-align:left!important;
+  }
+  .legalPortal .legalRouteProgress{
+    padding:13px 16px 15px!important;
+  }
+  .legalPortal .legalRouteTimeline{
+    max-height:none!important;
+    padding:10px 12px 12px!important;
+    overflow:visible!important;
+  }
+  .legalPortal .legalRouteStep{
+    grid-template-columns:42px minmax(0,1fr)!important;
+    min-height:0!important;
+  }
+  .legalPortal .legalRouteRail{
+    grid-row:1 / span 2!important;
+  }
+  .legalPortal .legalRouteRail>span{
+    width:36px!important;
+    height:36px!important;
+    border-radius:12px!important;
+  }
+  .legalPortal .legalRouteStepBody{
+    grid-column:2!important;
+    margin-bottom:5px!important;
+  }
+  .legalPortal .legalRouteStepState{
+    grid-column:2!important;
+    grid-row:2!important;
+    justify-items:start!important;
+    align-content:start!important;
+    margin:0 0 14px!important;
+    padding:0 2px!important;
+  }
+  .legalPortal .legalRouteStepState>span{
+    min-height:25px!important;
+  }
+}
+@media(max-width:480px){
+  .legalPortal .legalRouteBoardHead h2{
+    font-size:18px!important;
+  }
+  .legalPortal .legalRouteProgress>div:first-child{
+    grid-template-columns:1fr auto!important;
+  }
+  .legalPortal .legalRouteProgress span:last-child{
+    display:none!important;
+  }
+  .legalPortal .legalRouteStep{
+    grid-template-columns:36px minmax(0,1fr)!important;
+    gap:8px!important;
+  }
+  .legalPortal .legalRouteStepDetails{
+    display:grid!important;
+    gap:7px!important;
+  }
+  .legalPortal .legalRouteBoardFoot{
+    align-items:flex-start!important;
+    flex-direction:column!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .legalPortal .legalRouteProgressTrack>i{
+    transition:none!important;
+  }
+}
