@@ -2711,3 +2711,39 @@
     justify-self:end!important;
   }
 }
+
+
+/* NPA registry v20 — structural right alignment for actions. */
+.legalPortal .registryCard>.formalRegistryRowActions{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:10px!important;
+}
+.legalPortal .registryCard>.formalRegistryRowActions>span{
+  min-width:0!important;
+  flex:1 1 auto!important;
+}
+.legalPortal .registryCard .formalRegistryActions{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:8px!important;
+  margin-left:auto!important;
+  flex:0 0 auto!important;
+}
+.legalPortal .registryCard .formalRegistryActions>.legalOpenDocument{
+  flex:0 0 auto!important;
+  white-space:nowrap!important;
+}
+@media(max-width:650px){
+  .legalPortal .registryCard>.formalRegistryRowActions{
+    align-items:flex-start!important;
+    flex-direction:column!important;
+  }
+  .legalPortal .registryCard .formalRegistryActions{
+    width:100%!important;
+    margin-left:0!important;
+    justify-content:flex-end!important;
+  }
+}
