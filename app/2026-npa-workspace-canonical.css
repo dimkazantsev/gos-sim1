@@ -1156,3 +1156,171 @@
   .legalPortal .supportDocumentForm>div:last-child{grid-column:1!important}
   .legalPortal .committeeConclusionActions{grid-template-columns:minmax(0,1fr)!important}
 }
+
+
+/* Bill readiness v4 — compact, aligned, no oversized cards. */
+.legalPortal .billReadinessPanel{
+  gap:14px!important;
+}
+.legalPortal .billReadinessHead{
+  align-items:center!important;
+  gap:14px!important;
+  margin:0!important;
+  padding-bottom:12px!important;
+}
+.legalPortal .billReadinessHead h2{
+  font-size:20px!important;
+  line-height:1.25!important;
+}
+.legalPortal .billReadinessHead p{
+  max-width:780px!important;
+  font-size:11px!important;
+  line-height:1.5!important;
+}
+.legalPortal .billReadinessHead>span{
+  min-height:30px!important;
+  padding:5px 9px!important;
+  font-size:10px!important;
+}
+
+.legalPortal .billReadinessProgress{
+  gap:7px!important;
+  padding:11px 13px!important;
+}
+.legalPortal .billReadinessProgress span,
+.legalPortal .billReadinessProgress b{
+  font-size:10px!important;
+}
+.legalPortal .billReadinessProgressTrack{
+  height:7px!important;
+}
+
+.legalPortal .billReadinessSteps{
+  gap:10px!important;
+}
+.legalPortal .billReadinessSteps>article{
+  display:grid!important;
+  grid-template-columns:44px minmax(0,1fr) 128px!important;
+  align-items:center!important;
+  gap:12px!important;
+  min-height:104px!important;
+  padding:13px 14px!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .billReadinessStepNo{
+  width:40px!important;
+  height:40px!important;
+  border-radius:11px!important;
+  font-size:13px!important;
+  align-self:center!important;
+}
+.legalPortal .billReadinessStepCopy{
+  display:grid!important;
+  gap:4px!important;
+  min-width:0!important;
+  align-content:center!important;
+}
+.legalPortal .billReadinessStepCopy>small{
+  font-size:8px!important;
+}
+.legalPortal .billReadinessStepCopy h3{
+  font-size:15px!important;
+  line-height:1.3!important;
+}
+.legalPortal .billReadinessStepCopy p{
+  font-size:10px!important;
+  line-height:1.4!important;
+}
+.legalPortal .billReadinessStepCopy dl{
+  gap:0!important;
+  margin:5px 0 0!important;
+}
+.legalPortal .billReadinessStepCopy dl>div{
+  display:grid!important;
+  grid-template-columns:160px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:5px 0 0!important;
+}
+.legalPortal .billReadinessStepCopy dt,
+.legalPortal .billReadinessStepCopy dd{
+  font-size:9px!important;
+  line-height:1.35!important;
+}
+.legalPortal .billReadinessStepCopy dd{
+  text-align:right!important;
+}
+.legalPortal .billMaterialSummary{
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr)!important;
+  align-items:baseline!important;
+  gap:4px 10px!important;
+  margin-top:5px!important;
+}
+.legalPortal .billMaterialSummary b{
+  font-size:10px!important;
+}
+.legalPortal .billMaterialSummary span{
+  font-size:9px!important;
+  line-height:1.4!important;
+}
+.legalPortal .billReadinessStepState{
+  justify-self:end!important;
+  min-width:104px!important;
+  min-height:28px!important;
+  padding:5px 8px!important;
+  font-size:9px!important;
+  text-align:center!important;
+}
+.legalPortal .billReadinessFooter{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:14px!important;
+  padding-top:13px!important;
+}
+.legalPortal .billReadinessFooter b{
+  font-size:11px!important;
+}
+.legalPortal .billReadinessFooter span{
+  font-size:10px!important;
+  line-height:1.4!important;
+}
+.legalPortal .billReadinessFooter>button{
+  min-height:42px!important;
+  padding:9px 13px!important;
+  font-size:11px!important;
+}
+
+@media(max-width:760px){
+  .legalPortal .billReadinessHead{
+    align-items:flex-start!important;
+  }
+  .legalPortal .billReadinessSteps>article{
+    grid-template-columns:40px minmax(0,1fr)!important;
+    min-height:0!important;
+    padding:12px!important;
+  }
+  .legalPortal .billReadinessStepState{
+    grid-column:2!important;
+    justify-self:start!important;
+    min-width:0!important;
+  }
+  .legalPortal .billReadinessStepCopy dl>div{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:2px!important;
+  }
+  .legalPortal .billReadinessStepCopy dd{
+    text-align:left!important;
+  }
+  .legalPortal .billMaterialSummary{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:2px!important;
+  }
+  .legalPortal .billReadinessFooter{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .legalPortal .billReadinessFooter>button{
+    width:100%!important;
+  }
+}
