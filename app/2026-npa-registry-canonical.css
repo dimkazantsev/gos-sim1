@@ -1,0 +1,281 @@
+/* Canonical NPA registry layout. Imported last on purpose.
+   Keep all registry-specific geometry here to avoid cascade drift. */
+
+.legalPortal .registryDashboard[hidden]{display:none!important}
+
+.legalPortal .registryDashboard{
+  position:static!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:18px!important;
+  width:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:22px!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+  border:1px solid #d8e2ef!important;
+  border-radius:18px!important;
+  background:#fff!important;
+  box-shadow:0 10px 28px rgba(22,60,112,.06)!important;
+}
+
+.legalPortal .registryDashboardHead{
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:space-between!important;
+  gap:20px!important;
+  margin:0!important;
+  padding:0 0 18px!important;
+  border-bottom:1px solid #e8edf4!important;
+}
+.legalPortal .registryDashboardHead>div{min-width:0!important}
+.legalPortal .registryDashboardHead small{
+  color:#6e82a0!important;font-size:10px!important;font-weight:850!important;letter-spacing:.1em!important
+}
+.legalPortal .registryDashboardHead h2{
+  margin:4px 0 5px!important;color:#153a6c!important;font-size:22px!important;line-height:1.25!important
+}
+.legalPortal .registryDashboardHead p{
+  margin:0!important;max-width:780px!important;color:#74869d!important;font-size:12px!important;line-height:1.5!important
+}
+.legalPortal .registryDashboardHead>.legalNewDocumentButton{
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-width:0!important;
+  min-height:42px!important;
+  padding:9px 13px!important;
+  border-radius:10px!important;
+  font-size:11px!important;
+}
+
+.legalPortal .registryToolbar{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:12px!important;
+  margin:0!important;
+  padding:14px!important;
+  box-sizing:border-box!important;
+  border:1px solid #e1e8f1!important;
+  border-radius:14px!important;
+  background:#f8fafd!important;
+}
+.legalPortal .registrySearch{
+  display:grid!important;
+  grid-template-columns:22px minmax(0,1fr) 34px!important;
+  align-items:center!important;
+  gap:8px!important;
+  min-height:48px!important;
+  padding:0 8px 0 12px!important;
+  border:1px solid #cedae9!important;
+  border-radius:11px!important;
+  background:#fff!important;
+  color:#66809f!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .registrySearch:focus-within{border-color:#7f9ee7!important;box-shadow:0 0 0 3px #315efb12!important}
+.legalPortal .registrySearch>input{
+  width:100%!important;min-width:0!important;height:46px!important;padding:0!important;border:0!important;outline:0!important;
+  background:transparent!important;color:#173d6e!important;font-size:13px!important;box-shadow:none!important
+}
+.legalPortal .registrySearch>button{
+  display:grid!important;place-items:center!important;width:34px!important;height:34px!important;min-height:34px!important;
+  padding:0!important;border:0!important;border-radius:9px!important;background:#edf2f8!important;color:#617c9e!important
+}
+
+.legalPortal .registryFilterGrid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+.legalPortal .registryFilterGrid>.styledSelect{
+  display:grid!important;grid-template-rows:auto 44px!important;gap:5px!important;min-width:0!important
+}
+.legalPortal .registryFilterGrid .styledSelectLabel{
+  margin:0!important;min-height:0!important;color:#74869d!important;font-size:10px!important
+}
+.legalPortal .registryFilterGrid .styledSelectTrigger{
+  width:100%!important;height:44px!important;min-height:44px!important;padding:0 11px!important;
+  border-radius:10px!important;background:#fff!important;font-size:11px!important
+}
+
+.legalPortal .registryResultsHead{
+  display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:14px!important;margin:0!important
+}
+.legalPortal .registryResultsHead>div{
+  display:grid!important;grid-template-columns:auto auto!important;gap:3px 8px!important;align-items:baseline!important;min-width:0!important
+}
+.legalPortal .registryResultsHead small{
+  grid-column:1/-1!important;color:#71839a!important;font-size:9px!important;font-weight:850!important;letter-spacing:.09em!important
+}
+.legalPortal .registryResultsHead b{color:#173c70!important;font-size:16px!important}
+.legalPortal .registryResultsHead span{color:#8191a5!important;font-size:10px!important}
+.legalPortal .registryResultsHead>button{
+  flex:0 0 auto!important;width:auto!important;min-height:36px!important;padding:7px 10px!important;border-radius:9px!important;font-size:10px!important
+}
+
+.legalPortal .registryCards,
+.legalPortal .formalRegistryList.registryCards{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:16px!important;
+  width:100%!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:visible!important;
+  align-items:stretch!important;
+}
+
+.legalPortal .registryCard,
+.legalPortal .formalRegistryRow.legalDocumentRow.registryCard{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  gap:0!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:320px!important;
+  height:100%!important;
+  margin:0!important;
+  padding:18px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  border:1px solid #d9e3ef!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  box-shadow:0 7px 22px rgba(23,60,112,.06)!important;
+  text-align:left!important;
+  white-space:normal!important;
+  cursor:pointer!important;
+  transition:border-color .15s ease,box-shadow .15s ease,transform .15s ease!important;
+}
+.legalPortal .registryCard:hover{
+  transform:translateY(-1px)!important;border-color:#aabfe2!important;box-shadow:0 12px 28px rgba(23,60,112,.10)!important
+}
+.legalPortal .registryCard.active{border-color:#91ace6!important;box-shadow:0 0 0 2px #315efb10!important}
+
+.legalPortal .registryCardHead{
+  display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:12px!important;width:100%!important
+}
+.legalPortal .registryCardIdentity{display:grid!important;gap:3px!important;min-width:0!important}
+.legalPortal .registryCardIdentity>span{color:#315da7!important;font-size:11px!important;font-weight:850!important}
+.legalPortal .registryCardIdentity>small{color:#8494a8!important;font-size:10px!important;line-height:1.35!important}
+.legalPortal .registryCard .formalStatus{
+  flex:0 0 auto!important;
+  min-height:28px!important;height:auto!important;padding:5px 8px!important;
+  border-radius:8px!important;font-size:10px!important;line-height:1.35!important;white-space:normal!important
+}
+
+.legalPortal .registryCardTitle{
+  display:grid!important;gap:5px!important;width:100%!important;margin:14px 0 13px!important
+}
+.legalPortal .registryCardTitle h3{
+  margin:0!important;color:#102f5e!important;font-size:18px!important;line-height:1.34!important;letter-spacing:-.015em!important;overflow-wrap:anywhere!important
+}
+.legalPortal .registryCardTitle p{
+  margin:0!important;color:#6f8299!important;font-size:11px!important;line-height:1.45!important;overflow-wrap:anywhere!important
+}
+
+.legalPortal .registryCardProgress{
+  display:grid!important;gap:8px!important;width:100%!important;padding:12px 0!important;
+  border-top:1px solid #edf1f5!important;border-bottom:1px solid #edf1f5!important
+}
+.legalPortal .registryCardProgress>div:first-child{
+  display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:12px!important;min-width:0!important
+}
+.legalPortal .registryCardProgress span{color:#71839a!important;font-size:10px!important;font-weight:750!important}
+.legalPortal .registryCardProgress b{
+  min-width:0!important;max-width:65%!important;color:#345477!important;font-size:10px!important;font-weight:750!important;text-align:right!important;overflow-wrap:anywhere!important
+}
+.legalPortal .registryCardProgressTrack{
+  width:100%!important;height:6px!important;border-radius:999px!important;background:#e9eef5!important;overflow:hidden!important
+}
+.legalPortal .registryCardProgressTrack>i{
+  display:block!important;height:100%!important;border-radius:inherit!important;background:linear-gradient(90deg,#315efb,#7180f5)!important
+}
+
+.legalPortal .registryCardMeta{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important;
+  gap:8px!important;width:100%!important;min-height:42px!important;padding:10px 0 8px!important;margin:0!important
+}
+.legalPortal .registryCardMeta>span,
+.legalPortal .registryCardMeta>strong{
+  display:inline-flex!important;align-items:center!important;gap:5px!important;font-size:10px!important;line-height:1.35!important
+}
+.legalPortal .registryCardMeta>span{color:#7a8ca2!important;font-weight:650!important}
+.legalPortal .registryCardMeta>strong{
+  padding:4px 7px!important;border-radius:7px!important;background:#fff3d9!important;color:#8b6414!important;font-weight:850!important
+}
+
+.legalPortal .registryCard>.formalRegistryRowActions{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:auto 0 0!important;
+  padding:13px 0 0!important;
+  box-sizing:border-box!important;
+  border-top:1px solid #e8edf4!important;
+}
+.legalPortal .registryCard>.formalRegistryRowActions>span{
+  flex:1 1 auto!important;min-width:0!important;color:#71839a!important;font-size:10px!important;line-height:1.45!important;overflow-wrap:anywhere!important
+}
+.legalPortal .registryCard .formalRegistryActions{
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;
+  flex:0 0 auto!important;margin:0 0 0 auto!important;padding:0!important
+}
+.legalPortal .registryCard .formalRegistryActions>button,
+.legalPortal .registryCard .formalRegistryActions>.legalOpenDocument,
+.legalPortal .registryCard .formalRegistryActions>.legalVoteShortcut{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 auto!important;width:auto!important;min-width:0!important;min-height:40px!important;height:40px!important;
+  margin:0!important;padding:0 12px!important;box-sizing:border-box!important;
+  border:1px solid #cbd8ef!important;border-radius:10px!important;
+  background:#edf3ff!important;color:#2852e5!important;
+  font:800 11px/1.2 inherit!important;text-align:center!important;white-space:nowrap!important;
+  box-shadow:none!important
+}
+.legalPortal .registryCard .formalRegistryActions>.legalVoteShortcut{
+  border-color:#e4cf99!important;background:#fff8e9!important;color:#82621e!important
+}
+.legalPortal .registryCard .formalRegistryActions>button:hover{
+  filter:none!important;transform:none!important;border-color:#9eb5df!important;background:#e6efff!important
+}
+
+.legalPortal .registryEmptyState{
+  grid-column:1/-1!important;
+  display:grid!important;grid-template-columns:38px minmax(0,1fr) auto!important;align-items:center!important;gap:12px!important;
+  min-height:94px!important;padding:16px!important;border:1px dashed #cbd8e8!important;border-radius:14px!important;background:#f8fafd!important
+}
+
+#npa-document-workspace{scroll-margin-top:92px!important}
+
+@media(max-width:1050px){
+  .legalPortal .registryCards,.legalPortal .formalRegistryList.registryCards{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(max-width:720px){
+  .legalPortal .registryDashboard{padding:16px!important}
+  .legalPortal .registryDashboardHead{display:grid!important}
+  .legalPortal .registryDashboardHead>.legalNewDocumentButton{justify-self:start!important}
+  .legalPortal .registryFilterGrid{grid-template-columns:minmax(0,1fr)!important}
+  .legalPortal .registryResultsHead{align-items:stretch!important;flex-direction:column!important}
+  .legalPortal .registryResultsHead>button{width:100%!important}
+  .legalPortal .registryCard,.legalPortal .formalRegistryRow.legalDocumentRow.registryCard{min-height:0!important}
+  .legalPortal .registryCard>.formalRegistryRowActions{align-items:flex-start!important;flex-direction:column!important}
+  .legalPortal .registryCard .formalRegistryActions{width:100%!important;justify-content:flex-end!important;margin-left:0!important}
+}
+@media(max-width:480px){
+  .legalPortal .registryCard .formalRegistryActions{display:grid!important;grid-template-columns:1fr 1fr!important}
+  .legalPortal .registryCard .formalRegistryActions>button{width:100%!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .legalPortal .registryCard{transition:none!important}
+  .legalPortal .registryCard:hover{transform:none!important}
+}
