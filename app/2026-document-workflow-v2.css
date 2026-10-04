@@ -2690,3 +2690,24 @@
     align-self:auto!important;
   }
 }
+
+
+/* NPA registry v19 — force action buttons into explicit grid columns. */
+.legalPortal .registryCard>.formalRegistryRowActions>.legalVoteShortcut{
+  grid-column:2!important;
+  justify-self:end!important;
+}
+.legalPortal .registryCard>.formalRegistryRowActions>.legalOpenDocument{
+  grid-column:3!important;
+  justify-self:end!important;
+}
+@media(max-width:650px){
+  .legalPortal .registryCard>.formalRegistryRowActions>.legalVoteShortcut{
+    grid-column:1!important;
+    justify-self:start!important;
+  }
+  .legalPortal .registryCard>.formalRegistryRowActions>.legalOpenDocument{
+    grid-column:2!important;
+    justify-self:end!important;
+  }
+}
