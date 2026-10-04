@@ -73,3 +73,323 @@
    height:40px!important;
  }
 }
+
+
+/* Unified NPA workspace v4: document, procedure and editing are visible in one panel. */
+.legalPortal .formalDetail{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.65fr) minmax(320px,.72fr)!important;
+  grid-template-rows:auto auto auto auto auto auto auto auto!important;
+  gap:16px 18px!important;
+  align-items:start!important;
+  padding:22px!important;
+  overflow:visible!important;
+}
+.legalPortal .legalUnifiedToolbar{
+  grid-column:1/-1!important;
+  grid-row:1!important;
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:14px!important;
+  padding-bottom:16px!important;
+}
+.legalWorkspaceLabel{
+  display:grid;
+  justify-items:center;
+  gap:2px;
+  min-width:0;
+  text-align:center;
+}
+.legalWorkspaceLabel small{
+  color:#6d819a;
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.08em;
+}
+.legalWorkspaceLabel b{
+  color:#183c70;
+  font-size:14px;
+}
+.legalEditingBadge{
+  display:inline-flex;
+  align-items:center;
+  min-height:40px;
+  padding:8px 11px;
+  border:1px solid #b7c9f4;
+  border-radius:9px;
+  background:#eef3ff;
+  color:#2852e5;
+  font-size:12px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.legalPortal .formalDetail>.documentSummaryHeader{
+  grid-column:1/-1!important;
+  grid-row:2!important;
+  margin:0!important;
+}
+.legalPortal .formalDetail>.error{
+  grid-column:1/-1!important;
+}
+.legalPortal .formalDetail>.formalActions{
+  grid-column:2!important;
+  grid-row:3!important;
+  display:block!important;
+  min-width:0!important;
+  margin:0!important;
+}
+.legalPortal .formalDetail>.formalProgress.legalRouting{
+  grid-column:2!important;
+  grid-row:4!important;
+  display:block!important;
+  min-width:0!important;
+  margin:0!important;
+}
+.legalPortal .formalDetail>.formalDocGrid{
+  display:contents!important;
+}
+.legalPortal .formalDetail .formalDocGrid>.formalPaper{
+  grid-column:1!important;
+  grid-row:3 / span 2!important;
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .formalDetail .formalDocGrid>.documentTools{
+  grid-column:1!important;
+  grid-row:5!important;
+  display:block!important;
+  min-width:0!important;
+  margin:0!important;
+}
+.legalPortal .formalDetail .formalDocGrid>.formalSidebar{
+  grid-column:2!important;
+  grid-row:5!important;
+  display:grid!important;
+  position:static!important;
+  min-width:0!important;
+  width:auto!important;
+  gap:14px!important;
+  margin:0!important;
+}
+.legalPortal .formalDetail>.legalBudgetAnnexSlot{
+  grid-column:1/-1!important;
+  grid-row:6!important;
+  display:block!important;
+  min-width:0!important;
+}
+.legalPortal .formalDetail>.legalBudgetAnnexSlot:empty{
+  display:none!important;
+}
+.legalPortal .formalDetail>.billDossier{
+  grid-column:1/-1!important;
+  grid-row:7!important;
+  display:block!important;
+  min-width:0!important;
+  margin:0!important;
+}
+.legalPortal .formalDetail>.formalHistory{
+  grid-column:1/-1!important;
+  grid-row:8!important;
+  display:block!important;
+  min-width:0!important;
+  margin:0!important;
+}
+.legalPortal .formalDetail>.civicDiscussion,
+.legalPortal .formalDetail>.documentRevisionList{
+  grid-column:1/-1!important;
+  display:block!important;
+  min-width:0!important;
+}
+/* Neutralize every older tab-visibility rule. */
+.legalPortal .formalDetail[data-tab=text]>.formalProgress,
+.legalPortal .formalDetail[data-tab=text]>.formalActions,
+.legalPortal .formalDetail[data-tab=text]>.formalHistory,
+.legalPortal .formalDetail[data-tab=text]>.billDossier,
+.legalPortal .formalDetail[data-tab=procedure]>.billDossier,
+.legalPortal .formalDetail[data-tab=procedure]>.formalDocGrid,
+.legalPortal .formalDetail[data-tab=procedure]>.civicDiscussion,
+.legalPortal .formalDetail[data-tab=procedure]>.documentRevisionList,
+.legalPortal .formalDetail[data-tab=package]>.formalProgress,
+.legalPortal .formalDetail[data-tab=package]>.formalActions,
+.legalPortal .formalDetail[data-tab=package]>.formalDocGrid,
+.legalPortal .formalDetail[data-tab=package]>.formalHistory,
+.legalPortal .formalDetail[data-tab=package]>.civicDiscussion,
+.legalPortal .formalDetail[data-tab=package]>.documentRevisionList{
+  display:revert!important;
+}
+.legalPortal .formalDetail[data-tab=text] .formalSidebar,
+.legalPortal .formalDetail[data-tab=procedure] .formalPaper{
+  display:revert!important;
+}
+
+/* Procedure column stays compact and never collides with controls. */
+.legalPortal .formalActions .surfaceHead{
+  margin-bottom:10px!important;
+}
+.legalPortal .formalActions .documentNextStep{
+  margin:0 0 10px!important;
+}
+.legalPortal .formalProgress.legalRouting>summary{
+  min-height:48px!important;
+}
+.legalPortal .formalSidebar>.surface{
+  min-width:0!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .budgetPreliminary{
+  overflow:hidden!important;
+}
+.legalPortal .budgetPreliminary .surfaceHead{
+  align-items:flex-start!important;
+}
+.legalPortal .budgetPreliminaryChecks{
+  gap:8px!important;
+}
+.legalPortal .budgetPreliminaryText,
+.legalPortal .budgetPreliminaryText textarea{
+  width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .budgetPreliminaryDecision{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:10px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin-top:12px!important;
+}
+.legalPortal .budgetPreliminaryDecision>.styledSelect,
+.legalPortal .budgetPreliminaryDecision>.styledSelect .styledSelectTrigger,
+.legalPortal .budgetPreliminaryDecision>button{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .budgetPreliminaryDecision>button{
+  min-height:44px!important;
+  white-space:normal!important;
+  line-height:1.35!important;
+}
+.legalPortal .formalPassport dl{
+  grid-template-columns:1fr!important;
+}
+.legalPortal .formalPassport dl>div{
+  min-width:0!important;
+}
+
+/* Inline editing belongs to the document itself. */
+.legalPortal .formalEditTitle,
+.legalPortal .formalEditBody,
+.legalPortal .documentEditNote input{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .formalEditBody{
+  min-height:420px!important;
+  resize:vertical!important;
+}
+.legalPortal .formalEditActions{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:10px!important;
+  margin-top:14px!important;
+}
+.legalPortal .formalEditActions>button{
+  min-width:150px!important;
+}
+
+/* Package/history are supporting sections, not alternate screens. */
+.legalPortal .billDossierV2{
+  margin-top:0!important;
+}
+.legalPortal .formalHistory{
+  padding:18px!important;
+}
+
+@media(max-width:1080px){
+ .legalPortal .formalDetail{
+   grid-template-columns:minmax(0,1.35fr) minmax(290px,.75fr)!important;
+   gap:14px!important;
+ }
+}
+@media(max-width:860px){
+ .legalPortal .formalDetail{
+   display:flex!important;
+   flex-direction:column!important;
+   gap:14px!important;
+   padding:16px!important;
+ }
+ .legalPortal .formalDetail>*{
+   width:100%!important;
+   min-width:0!important;
+   box-sizing:border-box!important;
+ }
+ .legalPortal .formalDetail>.formalDocGrid{
+   display:contents!important;
+ }
+ .legalPortal .formalDetail .formalDocGrid>.formalPaper,
+ .legalPortal .formalDetail .formalDocGrid>.documentTools,
+ .legalPortal .formalDetail .formalDocGrid>.formalSidebar{
+   width:100%!important;
+   position:static!important;
+ }
+ .legalPortal .legalUnifiedToolbar{
+   display:grid!important;
+   grid-template-columns:1fr auto!important;
+ }
+ .legalWorkspaceLabel{
+   grid-column:1/-1;
+   grid-row:1;
+   justify-items:start;
+   text-align:left;
+   order:-1;
+ }
+ .legalPortal .legalBackToRegistry{
+   grid-column:1;
+   grid-row:2;
+   justify-self:start;
+ }
+ .legalPortal .legalEditDocument,
+ .legalEditingBadge{
+   grid-column:2;
+   grid-row:2;
+   justify-self:end;
+ }
+}
+@media(max-width:560px){
+ .legalPortal .legalUnifiedToolbar{
+   grid-template-columns:1fr!important;
+ }
+ .legalWorkspaceLabel,
+ .legalPortal .legalBackToRegistry,
+ .legalPortal .legalEditDocument,
+ .legalEditingBadge{
+   grid-column:1!important;
+   grid-row:auto!important;
+   justify-self:stretch!important;
+   width:100%!important;
+   box-sizing:border-box!important;
+ }
+ .legalPortal .legalBackToRegistry,
+ .legalPortal .legalEditDocument{
+   justify-content:center!important;
+ }
+ .legalPortal .formalEditActions{
+   display:grid!important;
+   grid-template-columns:1fr!important;
+ }
+ .legalPortal .formalEditActions>button{
+   width:100%!important;
+   min-width:0!important;
+ }
+}
