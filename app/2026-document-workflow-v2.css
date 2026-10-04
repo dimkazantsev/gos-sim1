@@ -2596,3 +2596,97 @@
     align-self:auto!important;
   }
 }
+
+
+/* NPA workspace v18 — hard geometric centering + true equal-height document column. */
+
+/* Exact center for the square chevron control shown in screenshot 1. */
+.legalPortal .formalHistoryChevron{
+  position:relative!important;
+  display:block!important;
+  width:40px!important;
+  height:40px!important;
+  padding:0!important;
+  line-height:0!important;
+}
+.legalPortal .formalHistoryChevron>svg{
+  position:absolute!important;
+  top:50%!important;
+  left:50%!important;
+  width:18px!important;
+  height:18px!important;
+  margin:0!important;
+  transform:translate(-50%,-50%)!important;
+  transform-origin:50% 50%!important;
+}
+.legalPortal .formalHistoryDisclosure[open] .formalHistoryChevron>svg{
+  transform:translate(-50%,-50%) rotate(180deg)!important;
+}
+
+/* Screenshot 2: left side becomes a real full-height column.
+   The paper stretches; "Отправить для ознакомления" is pinned to the bottom. */
+.legalPortal .legalUnifiedWorkspace{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.8fr) minmax(310px,.72fr)!important;
+  align-items:stretch!important;
+}
+.legalPortal .legalDocumentColumn{
+  display:flex!important;
+  flex-direction:column!important;
+  align-self:stretch!important;
+  min-width:0!important;
+  height:auto!important;
+}
+.legalPortal .legalDocumentColumn>.formalPaper{
+  flex:1 1 auto!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+}
+.legalPortal .legalDocumentColumn>.documentTools{
+  flex:0 0 auto!important;
+  width:100%!important;
+  margin-top:12px!important;
+  align-self:auto!important;
+}
+.legalPortal .legalControlRail{
+  align-self:stretch!important;
+  height:auto!important;
+}
+
+/* Keep disclosure chevrons themselves centered inside their summary row. */
+.legalPortal .projectDisclosure>summary.projectDisclosureSummary{
+  align-items:center!important;
+}
+.legalPortal .projectDisclosure>summary.projectDisclosureSummary>.projectDisclosureArrow{
+  flex:none!important;
+  align-self:center!important;
+  margin:auto 0!important;
+}
+
+@media(max-width:1120px){
+  .legalPortal .legalUnifiedWorkspace{
+    grid-template-columns:minmax(0,1.45fr) minmax(300px,.75fr)!important;
+  }
+}
+@media(max-width:860px){
+  .legalPortal .legalUnifiedWorkspace{
+    grid-template-columns:minmax(0,1fr)!important;
+    align-items:start!important;
+  }
+  .legalPortal .legalDocumentColumn{
+    display:grid!important;
+    height:auto!important;
+  }
+  .legalPortal .legalDocumentColumn>.formalPaper{
+    height:auto!important;
+  }
+  .legalPortal .legalDocumentColumn>.documentTools{
+    margin-top:0!important;
+  }
+  .legalPortal .legalControlRail{
+    height:auto!important;
+    align-self:auto!important;
+  }
+}
