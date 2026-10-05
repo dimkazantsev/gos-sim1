@@ -138,7 +138,7 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
 
    <div className="deadlineCount"><strong>{active.length}</strong><span>активных последствий</span></div>
 
-   {teacher&&<button type="button" className="deadlineActionCard" disabled={!canApplyRule} onClick={()=>{if(canApplyRule)setApplyOpen(true)}}>
+   {teacher&&<button type="button" className="deadlineActionCard" disabled={!canApplyRule} onClick={()=>{if(canApplyRule){setTargetType(partyRuleReady?'party':'student');setApplyOpen(true)}}}>
     <span className="deadlineActionIcon" aria-hidden="true"><Scale size={20}/></span>
     <span className="deadlineActionCopy"><b>{overdue?'Применить правило просрочки':'Правило применится после дедлайна'}</b><small>{canApplyRule?'Выберите адресата — санкция подставится автоматически':'Настройте дедлайн и санкцию в правиле этапа'}</small></span>
     <ChevronRight size={18} aria-hidden="true"/>
