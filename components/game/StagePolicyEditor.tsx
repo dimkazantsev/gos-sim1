@@ -26,20 +26,16 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
  useEffect(()=>{
   if(!game||!stage)return;
   let active=true;
-  async function loadRule(){
-   const {data,error}=await supabase.from('stage_deadline_rules').select('*').eq('game_id',game.id).eq('stage_no',stageNo).maybeSingle();
-   if(!active)return;
-   if(error){setMessage(error.message);return}
-   setDeadline(localDate(data?.deadline_at??stage.deadline));
-   setInclusive(data?.inclusive??true);
-   setPenalty(String(data?.penalty_points??0));
-   setDescription(data?.penalty_description??'За просрочку отчёта по этапу');
-  }
-  void loadRule();
-  const channel=supabase.channel('stage-policy-editor:'+game.id+':'+stageNo)
-   .on('postgres_changes',{event:'*',schema:'public',table:'stage_deadline_rules',filter:'game_id=eq.'+game.id},()=>void loadRule())
-   .subscribe();
-  return()=>{active=false;void supabase.removeChannel(channel)};
+  void supabase.from('stage_deadline_rules').select('*').eq('game_id',game.id).eq('stage_no',stageNo).maybeSingle()
+   .then(({data,error})=>{
+    if(!active)return;
+    if(error){setMessage(error.message);return}
+    setDeadline(localDate(data?.deadline_at??stage.deadline));
+    setInclusive(data?.inclusive??true);
+    setPenalty(String(data?.penalty_points??0));
+    setDescription(data?.penalty_description??'За просрочку отчёта по этапу');
+   });
+  return()=>{active=false};
  },[game?.id,stageNo,stage?.deadline]);
  function fillRelative(){
   const n=Number(hours);
