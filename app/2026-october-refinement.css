@@ -224,3 +224,44 @@
 @media(max-width:650px){
  .civicVotes{--votes-section-gap:20px}
 }
+
+
+/* Registration disclosure — strict vertical centering. */
+.civicVotes .institutionRegistrationPanel>summary.projectDisclosureSummary{
+ display:grid!important;
+ grid-template-columns:42px minmax(0,1fr) 20px!important;
+ align-items:center!important;
+ column-gap:16px!important;
+ min-height:104px!important;
+ padding:0 24px!important;
+ box-sizing:border-box!important;
+}
+.civicVotes .institutionRegistrationPanel .projectDisclosureIcon{
+ align-self:center!important;
+ justify-self:center!important;
+ margin:0!important;
+}
+.civicVotes .institutionRegistrationPanel .projectDisclosureText{
+ align-self:center!important;
+ align-content:center!important;
+ min-height:0!important;
+ gap:4px!important;
+ margin:0!important;
+}
+.civicVotes .institutionRegistrationPanel .projectDisclosureText>b,
+.civicVotes .institutionRegistrationPanel .projectDisclosureText>small{
+ margin:0!important;
+}
+.civicVotes .institutionRegistrationPanel .projectDisclosureArrow{
+ align-self:center!important;
+ justify-self:end!important;
+ margin:0!important;
+}
+@media(max-width:650px){
+ .civicVotes .institutionRegistrationPanel>summary.projectDisclosureSummary{
+  grid-template-columns:42px minmax(0,1fr) 20px!important;
+  min-height:92px!important;
+  padding:0 16px!important;
+  column-gap:12px!important;
+ }
+}
