@@ -1224,3 +1224,339 @@
  .stageReadinessOverrideActions{align-items:stretch;flex-direction:column}
  .stageReadinessOverrideActions button{width:100%}
 }
+
+
+/* Unified stage policy and deadline controls */
+.stageWorkspaceTeacher{
+ display:grid;
+ grid-template-columns:minmax(0,1fr);
+ align-items:stretch;
+ gap:16px;
+ padding:20px 22px;
+ border-color:#d8e1ed;
+ background:#f8fafc;
+}
+.stageWorkspaceTeacherHead{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:18px;
+ min-width:0;
+}
+.stageWorkspaceTeacherHead>div{min-width:0}
+.stageWorkspaceTeacherHead h2{margin:4px 0 4px}
+.stageWorkspaceTeacherHead p{margin:0;color:#6d8098;font-size:12px;line-height:1.5}
+.stageWorkspaceTeacherHead>button{flex:none;min-height:44px}
+
+.stagePolicyEditor{
+ display:grid;
+ gap:14px;
+ min-width:0;
+ padding:16px;
+ border:1px solid #dce5f0;
+ border-radius:14px;
+ background:#fff;
+}
+.stagePolicyEditor>h4{
+ display:flex;
+ align-items:center;
+ gap:8px;
+ margin:0;
+ color:#173c70;
+ font-size:15px;
+}
+.stagePolicyEditor>p{
+ margin:0;
+ color:#6d8098;
+ font-size:11px;
+ line-height:1.55;
+}
+.stagePolicyQuick{
+ display:grid;
+ grid-template-columns:minmax(120px,.45fr) minmax(160px,.55fr) auto;
+ gap:10px;
+ align-items:end;
+}
+.stagePolicyQuick>label,
+.stagePolicyFields>label{
+ display:grid;
+ gap:6px;
+ min-width:0;
+ color:#536a87;
+ font-size:11px;
+ font-weight:800;
+}
+.stagePolicyQuick input,
+.stagePolicyFields input{
+ width:100%;
+ min-width:0;
+ min-height:44px;
+ box-sizing:border-box;
+ padding:0 12px;
+ border:1px solid #ccd9ea;
+ border-radius:10px;
+ background:#fff;
+ color:#17314f;
+ font:inherit;
+}
+.stagePolicyQuick>button,
+.stagePolicyFooter>button{
+ min-height:44px;
+ padding:0 13px;
+ border:1px solid #cbd8ef;
+ border-radius:10px;
+ background:#f8fbff;
+ color:#315a93;
+ font-size:11px;
+ font-weight:850;
+}
+.stagePolicyFields{
+ display:grid;
+ grid-template-columns:minmax(230px,1.1fr) minmax(180px,.8fr) minmax(140px,.45fr);
+ gap:12px;
+ align-items:end;
+}
+.stagePolicyDescription{grid-column:1/-1}
+.stagePolicyFooter{
+ display:flex;
+ align-items:center;
+ justify-content:flex-end;
+ gap:9px;
+ flex-wrap:wrap;
+}
+.stagePolicyFooter>button:last-child{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:7px;
+ border-color:#315efb;
+ background:#315efb;
+ color:#fff;
+}
+.stagePolicyMessage{
+ margin:0;
+ padding:9px 10px;
+ border:1px solid #dbe5f1;
+ border-radius:9px;
+ background:#f8fbff;
+ color:#536a87;
+ font-size:10px;
+}
+
+.deadlineControl{
+ display:grid;
+ gap:12px;
+ min-width:0;
+ margin:16px 0 0;
+ padding:0;
+ border:0;
+ background:transparent;
+}
+.deadlineControlTop{
+ display:grid;
+ grid-template-columns:minmax(320px,1.25fr) 190px minmax(360px,1fr);
+ gap:12px;
+ align-items:stretch;
+ min-width:0;
+}
+.deadlineControlTop:not(.hasAction){grid-template-columns:minmax(0,1fr) 190px}
+.deadlineOverview,
+.deadlineCount,
+.deadlineApply{
+ min-width:0;
+ min-height:108px;
+ box-sizing:border-box;
+ border:1px solid #d9e4f2;
+ border-radius:14px;
+ background:#fff;
+}
+.deadlineOverview{
+ display:flex;
+ align-items:center;
+ padding:16px 18px;
+}
+.deadlineOverviewCopy{display:grid;gap:3px;min-width:0;width:100%}
+.deadlineOverviewCopy>small{
+ color:#71839a;
+ font-size:10px;
+ font-weight:850;
+ letter-spacing:.08em;
+ text-transform:uppercase;
+}
+.deadlineOverviewCopy>h3{
+ margin:0;
+ color:#173c70;
+ font-size:20px;
+ line-height:1.25;
+}
+.deadlineControl.overdue .deadlineOverviewCopy>h3{color:#a54659}
+.deadlineOverviewCopy>p{
+ margin:0;
+ color:#6d8098;
+ font-size:11px;
+ line-height:1.45;
+}
+.deadlineRuleMeta{
+ display:flex;
+ flex-wrap:wrap;
+ gap:7px;
+ margin-top:7px;
+}
+.deadlineRuleMeta>span{
+ display:inline-flex;
+ align-items:center;
+ gap:6px;
+ min-height:28px;
+ padding:4px 8px;
+ border-radius:999px;
+ background:#f2f6fb;
+ color:#5d7390;
+ font-size:9px;
+ font-weight:800;
+}
+.deadlineRuleMeta>span.hasPenalty{background:#fff2e8;color:#9b5f20}
+.deadlineRuleDescription{
+ display:flex;
+ gap:6px;
+ align-items:flex-start;
+ margin-top:5px;
+ min-width:0;
+ color:#657a95;
+ font-size:9px;
+ line-height:1.45;
+}
+.deadlineRuleDescription b{flex:none;color:#435d7e}
+.deadlineRuleDescription span{min-width:0;overflow-wrap:anywhere}
+
+.deadlineCount{
+ display:grid;
+ place-items:center;
+ align-content:center;
+ gap:5px;
+ padding:14px;
+ text-align:center;
+ background:#f5f8fd;
+}
+.deadlineCount strong{color:#315a93;font-size:28px;line-height:1}
+.deadlineCount span{color:#7a8ca2;font-size:10px;line-height:1.35}
+
+.deadlineApply{
+ overflow:hidden;
+ margin:0;
+}
+.deadlineApply>summary{
+ min-height:108px;
+ height:100%;
+ box-sizing:border-box;
+ display:flex;
+ align-items:center;
+ padding:14px 16px;
+ cursor:pointer;
+ list-style:none;
+}
+.deadlineApply>summary::-webkit-details-marker{display:none}
+.deadlineApply>summary::marker{content:""}
+.deadlineApply .disclosureSummary{
+ width:100%;
+ min-width:0;
+}
+.deadlineApply .disclosureText b{color:#29496f;font-size:12px}
+.deadlineApply .disclosureText small{color:#7c8da2;font-size:9px;line-height:1.4}
+.deadlineApply[open]{grid-column:1/-1}
+.deadlineApply[open]>summary{
+ min-height:64px;
+ border-bottom:1px solid #e2e8f1;
+ background:#f8fbff;
+}
+.deadlineApplyGrid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:14px;
+ padding:16px;
+}
+.deadlineApplyGrid>label{
+ display:grid;
+ gap:7px;
+ min-width:0;
+ color:#536a87;
+ font-size:11px;
+ font-weight:800;
+}
+.deadlineApplyGrid :is(select,input,textarea){
+ width:100%;
+ min-width:0;
+ box-sizing:border-box;
+ border:1px solid #ccd9ea;
+ border-radius:10px;
+ background:#fff;
+ color:#17314f;
+ font:inherit;
+}
+.deadlineApplyGrid :is(select,input){min-height:44px;padding:0 11px}
+.deadlineApplyGrid textarea{min-height:94px;padding:11px 12px;line-height:1.55;resize:vertical}
+.deadlineReason,.deadlineGuide{grid-column:1/-1}
+.deadlineGuide{
+ padding:12px;
+ border-radius:10px;
+ background:#f3f6fb;
+}
+.deadlineGuide b{display:block;color:#29496f;font-size:11px}
+.deadlineGuide p{margin:4px 0 0;color:#6d8098;font-size:10px;line-height:1.5}
+.deadlineApplyGrid>.primary{justify-self:start;min-height:44px}
+
+.deadlineLedger{
+ display:grid;
+ gap:8px;
+}
+.deadlineLedger article{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) auto auto;
+ gap:10px;
+ align-items:center;
+ min-width:0;
+ padding:12px 13px;
+ border:1px solid #e0e7f1;
+ border-radius:12px;
+ background:#fff;
+}
+.deadlineLedger article>div{min-width:0}
+.deadlineLedger b{display:block;color:#29496f;font-size:11px}
+.deadlineLedger small{display:block;margin-top:2px;color:#8796a9;font-size:9px}
+.deadlineLedger p{margin:4px 0 0;color:#657a95;font-size:10px;line-height:1.45;overflow-wrap:anywhere}
+.deadlineLedger>article>strong{color:#a54659;font-size:11px;white-space:nowrap}
+.deadlineLedger button{
+ min-height:34px;
+ padding:0 9px;
+ border:1px solid #dbe3ed;
+ border-radius:9px;
+ background:#fff;
+ color:#61758f;
+ font-size:10px;
+ font-weight:850;
+}
+
+@media(max-width:1180px){
+ .deadlineControlTop{grid-template-columns:minmax(0,1fr) 160px}
+ .deadlineControlTop.hasAction .deadlineApply{grid-column:1/-1}
+ .deadlineControlTop.hasAction .deadlineApply>summary{min-height:64px}
+ .stagePolicyFields{grid-template-columns:1fr 1fr}
+ .stagePolicyDescription{grid-column:1/-1}
+}
+@media(max-width:760px){
+ .stageWorkspaceTeacherHead{align-items:stretch;flex-direction:column}
+ .stageWorkspaceTeacherHead>button{width:100%}
+ .stagePolicyQuick,.stagePolicyFields{grid-template-columns:minmax(0,1fr)}
+ .stagePolicyDescription{grid-column:auto}
+ .stagePolicyQuick>button{width:100%}
+ .stagePolicyFooter{display:grid;grid-template-columns:1fr}
+ .stagePolicyFooter>button{width:100%}
+ .deadlineControlTop,
+ .deadlineControlTop:not(.hasAction){grid-template-columns:minmax(0,1fr)}
+ .deadlineOverview,.deadlineCount,.deadlineApply{min-height:0}
+ .deadlineCount{min-height:84px}
+ .deadlineApply>summary{min-height:64px}
+ .deadlineApplyGrid{grid-template-columns:minmax(0,1fr);padding:14px}
+ .deadlineApplyGrid>.primary{width:100%}
+ .deadlineLedger article{grid-template-columns:minmax(0,1fr) auto}
+ .deadlineLedger article>button{grid-column:1/-1}
+}
