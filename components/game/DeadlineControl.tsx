@@ -54,6 +54,15 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  useEffect(()=>{setKind(recommended(stageNo));void load()},[game?.id,stageNo]);
  useEffect(()=>{
   if(!game)return;
+  const sync=(event:Event)=>{
+   const detail=(event as CustomEvent<{gameId?:string;stageNo?:number}>).detail;
+   if(detail?.gameId===game.id&&detail?.stageNo===stageNo)void load();
+  };
+  window.addEventListener('gos-stage-policy-updated',sync);
+  return()=>window.removeEventListener('gos-stage-policy-updated',sync);
+ },[game?.id,stageNo]);
+ useEffect(()=>{
+  if(!game)return;
   const ch=supabase.channel('deadline-control:'+game.id+':'+stageNo)
    .on('postgres_changes',{event:'*',schema:'public',table:'stage_deadline_incidents',filter:'game_id=eq.'+game.id},()=>void load())
    .on('postgres_changes',{event:'*',schema:'public',table:'stage_deadline_rules',filter:'game_id=eq.'+game.id},()=>void load())
