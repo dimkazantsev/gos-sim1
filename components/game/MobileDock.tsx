@@ -23,18 +23,18 @@ export function normalizePinnedDock(saved:unknown,available:View[]):View[]{
  return Array.isArray(saved)?[...new Set(saved.filter((key):key is View=>typeof key==='string'&&available.includes(key as View)))]:[];
 }
 
-const DRAG_HOLD_MS=360;
-const PIN_HOLD_MS=1450;
-const SWIPE_THRESHOLD=6;
+const DRAG_HOLD_MS=520;
+const PIN_HOLD_MS=1650;
+const SWIPE_THRESHOLD=10;
 type Gesture={
- id:number;key:View;
- startX:number;startY:number;lastX:number;lastY:number;lastTime:number;velocity:number;
+ id:number;key:View;target:HTMLButtonElement;
+ startX:number;startY:number;lastX:number;lastY:number;
  mode:'pending'|'scroll'|'drag';moved:boolean;
  timer:ReturnType<typeof setTimeout>|null;
  pinTimer:ReturnType<typeof setTimeout>|null;
 };
 
-export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll,onChat,chatOpen=false}:{
+export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll,onChat,chatOpen=false,allOpen=false}:{
  items:MobileDockItem[];
  activeView:View;
  storageKey:string;
@@ -44,6 +44,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  onAll:()=>void;
  onChat?:()=>void;
  chatOpen?:boolean;
+ allOpen?:boolean;
 }){
  const scrollRef=useRef<HTMLDivElement>(null);
  const gestureRef=useRef<Gesture|null>(null);
@@ -54,6 +55,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  const [dragging,setDragging]=useState<View|null>(null);
  const [point,setPoint]=useState<{x:number;y:number}|null>(null);
  const [announcement,setAnnouncement]=useState('');
+ const [optimisticView,setOptimisticView]=useState<View|null>(null);
  const available=useMemo(()=>items.map(i=>i.key),[items]);
  const normalized=normalizeDockOrder(order,available);
  const pinnedKeys=normalizePinnedDock(pinned,available);
@@ -61,6 +63,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  const ordered=normalized.filter(key=>!pinnedSet.has(key)).map(key=>items.find(item=>item.key===key)!).filter(Boolean);
  const pinnedItems=pinnedKeys.map(key=>items.find(item=>item.key===key)!).filter(Boolean);
  const draggedItem=items.find(i=>i.key===dragging);
+ const displayedView=chatOpen||allOpen?null:(optimisticView??activeView);
 
  useEffect(()=>{
   let savedOrder:unknown,savedPins:unknown;
@@ -72,8 +75,10 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[storageKey]);
 
+ useEffect(()=>{setOptimisticView(null)},[activeView,chatOpen,allOpen]);
+
  useEffect(()=>{
-  if(editing||pinnedSet.has(activeView))return;
+  if(editing||chatOpen||allOpen||pinnedSet.has(activeView))return;
   const scroller=scrollRef.current;
   const active=scroller?.querySelector<HTMLButtonElement>('[data-dock-item][aria-current="page"]');
   if(!scroller||!active)return;
@@ -113,8 +118,9 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
   try{navigator.vibrate?.(next.includes(key)?[28,30,28]:18)}catch{}
  }
  function activateDrag(g:Gesture){
-  if(gestureRef.current!==g||g.mode!=='pending')return;
+  if(gestureRef.current!==g||g.mode!=='pending'||g.moved)return;
   g.mode='drag';g.timer=null;
+  try{g.target.setPointerCapture(g.id)}catch{}
   suppressClickUntil.current=Date.now()+800;
   setEditing(true);setDragging(g.key);
   setPoint({x:g.lastX,y:g.lastY});
@@ -123,10 +129,8 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  function onPointerDown(event:ReactPointerEvent<HTMLButtonElement>,key:View){
   if(!event.isPrimary||(event.pointerType==='mouse'&&event.button!==0))return;
   clearGesture();
-  const now=performance.now();
-  const g:Gesture={id:event.pointerId,key,startX:event.clientX,startY:event.clientY,lastX:event.clientX,lastY:event.clientY,lastTime:now,velocity:0,mode:'pending',moved:false,timer:null,pinTimer:null};
+  const g:Gesture={id:event.pointerId,key,target:event.currentTarget,startX:event.clientX,startY:event.clientY,lastX:event.clientX,lastY:event.clientY,mode:'pending',moved:false,timer:null,pinTimer:null};
   gestureRef.current=g;
-  try{event.currentTarget.setPointerCapture(event.pointerId)}catch{}
   if(editing)activateDrag(g);
   else g.timer=setTimeout(()=>activateDrag(g),DRAG_HOLD_MS);
   // A stationary extra-long hold pins instead of dropping. Any movement cancels it.
@@ -138,9 +142,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  function onPointerMove(event:ReactPointerEvent<HTMLButtonElement|HTMLDivElement>){
   const g=gestureRef.current;
   if(!g||g.id!==event.pointerId)return;
-  const now=performance.now(),dx=event.clientX-g.lastX;
-  g.velocity=dx/Math.max(1,now-g.lastTime);
-  g.lastTime=now;g.lastX=event.clientX;g.lastY=event.clientY;
+  g.lastX=event.clientX;g.lastY=event.clientY;
   const distance=Math.hypot(event.clientX-g.startX,event.clientY-g.startY);
   if(distance>SWIPE_THRESHOLD){
    g.moved=true;
@@ -150,19 +152,16 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
     g.mode='scroll';
    }
   }
-  if(g.mode==='scroll'){
-   if(event.cancelable)event.preventDefault();
-   if(scrollRef.current)scrollRef.current.scrollLeft-=dx;
-   return;
-  }
+  // Native horizontal scrolling handles ordinary swipes. Only an activated
+  // long-press drag takes control of the pointer.
   if(g.mode!=='drag')return;
   if(event.cancelable)event.preventDefault();
   setPoint({x:event.clientX,y:event.clientY});
   const scroller=scrollRef.current;
   if(scroller&&g.moved){
    const r=scroller.getBoundingClientRect();
-   if(event.clientX<r.left+30)scroller.scrollLeft-=11;
-   if(event.clientX>r.right-30)scroller.scrollLeft+=11;
+   if(event.clientX<r.left+34)scroller.scrollLeft-=12;
+   if(event.clientX>r.right-34)scroller.scrollLeft+=12;
   }
  }
  function onPointerEnd(event:ReactPointerEvent<HTMLButtonElement|HTMLDivElement>){
@@ -175,13 +174,9 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
    const key=target?.dataset.dockItem as View|undefined;
    if(key&&key!==g.key&&available.includes(key)&&!pinnedSet.has(key))reorder(g.key,key);
   }
-  // Quick swipes move the strip in either direction; no CSS scroll-snap fights pointer movement.
-  if(wasScroll&&scrollRef.current&&Math.abs(g.velocity)>.5){
-   scrollRef.current.scrollBy({left:Math.max(-140,Math.min(140,-g.velocity*90)),behavior:'smooth'});
-  }
   clearGesture();
-  if(wasDrag||wasScroll)suppressClickUntil.current=Date.now()+450;
-  try{if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId)}catch{}
+  if(wasDrag||wasScroll)suppressClickUntil.current=Date.now()+(wasDrag?450:180);
+  try{if(g.target.hasPointerCapture(event.pointerId))g.target.releasePointerCapture(event.pointerId)}catch{}
  }
  function onPointerCancel(event:ReactPointerEvent<HTMLButtonElement|HTMLDivElement>){
   if(gestureRef.current?.id===event.pointerId){clearGesture();suppressClickUntil.current=Date.now()+450}
@@ -202,6 +197,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  }
  function click(event:React.MouseEvent<HTMLButtonElement>,key:View){
   if(editing||Date.now()<suppressClickUntil.current){event.preventDefault();event.stopPropagation();return}
+  setOptimisticView(key);
   onNavigate(key);
  }
  function keyMove(event:ReactKeyboardEvent<HTMLButtonElement>,key:View){
@@ -218,10 +214,10 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
   <nav className={'mobileDock mobileDockV2 '+(editing?'isEditing':'')} aria-label={editing?'Изменение порядка мобильной панели':'Мобильная навигация'}>
    <div ref={scrollRef} className="mobileDockScroll" aria-label="Прокручиваемые разделы" onPointerMove={onPointerMove} onPointerUp={onPointerEnd} onPointerCancel={onPointerCancel}>
     {ordered.map(item=><button key={item.key} data-dock-item={item.key} type="button"
-     aria-current={activeView===item.key?'page':undefined}
+     aria-current={displayedView===item.key?'page':undefined}
      aria-label={editing?item.label+'. Перетащите для изменения порядка или удерживайте ещё для закрепления.':item.label+'. Длительное удержание — перемещение, очень длительное — закрепление.'}
      title={item.label}
-     className={'mobileDockItem '+(activeView===item.key?'active ':'')+(dragging===item.key?'isDragged':'')}
+     className={'mobileDockItem '+(displayedView===item.key?'active ':'')+(dragging===item.key?'isDragged':'')}
      onPointerDown={e=>onPointerDown(e,item.key)}
      onContextMenu={e=>{if(editing||gestureRef.current?.key===item.key)e.preventDefault()}}
      onDragStart={e=>e.preventDefault()} onKeyDown={e=>keyMove(e,item.key)}
@@ -231,12 +227,12 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
     </button>)}
     {onChat&&<button type="button" className={'mobileDockChat mobileDockItem '+(chatOpen?'active':'')}
      aria-controls="game-chat" aria-expanded={chatOpen} aria-label={chatOpen?'Закрыть чат':'Открыть чат'}
-     onClick={onChat}><span className="mobileDockIcon"><MessageCircle aria-hidden="true"/></span><span className="mobileDockLabel">Чат</span></button>}
+     onClick={()=>{setOptimisticView(null);onChat()}}><span className="mobileDockIcon"><MessageCircle aria-hidden="true"/></span><span className="mobileDockLabel">Чат</span></button>}
    </div>
    <div className="mobileDockFixed">
     {pinnedItems.length>0&&<div className="mobileDockPinned" aria-label="Закреплённые разделы">
-     {pinnedItems.map(item=><button key={item.key} type="button" className={'mobileDockPinnedItem '+(activeView===item.key?'active':'')}
-      aria-current={activeView===item.key?'page':undefined}
+     {pinnedItems.map(item=><button key={item.key} type="button" className={'mobileDockPinnedItem '+(displayedView===item.key?'active':'')}
+      aria-current={displayedView===item.key?'page':undefined}
       aria-label={item.label+'. Удерживайте для открепления.'} title={item.label+' · удерживайте для открепления'}
       onPointerDown={e=>onPinnedDown(e,item.key)} onPointerMove={onPinnedMove}
       onPointerUp={clearPinnedGesture} onPointerCancel={clearPinnedGesture}
@@ -249,7 +245,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
     </div>}
     {editing?
      <button type="button" className="mobileDockDone" onClick={()=>{clearGesture();setEditing(false)}}><Check aria-hidden="true"/><span>Готово</span></button>:
-     <button type="button" className="mobileDockAll" aria-haspopup="dialog" onClick={onAll}><LayoutGrid aria-hidden="true"/><span>Все разделы</span></button>}
+     <button type="button" className={'mobileDockAll '+(allOpen?'active':'')} aria-haspopup="dialog" aria-expanded={allOpen} onClick={()=>{setOptimisticView(null);onAll()}}><LayoutGrid aria-hidden="true"/><span>Все разделы</span></button>}
    </div>
    <span className="mobileDockAnnouncement" role="status" aria-live="polite">{announcement}</span>
   </nav>
