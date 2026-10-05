@@ -68,8 +68,9 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
   const n=Number(penalty);
   if(!Number.isFinite(n)||n<0||n>3){setMessage('Штраф должен быть от 0 до 3 баллов.');return}
   if(deadline&&!Number.isFinite(new Date(deadline).getTime())){setMessage('Некорректная дата.');return}
-  const consequenceValue=consequenceType==='none'?null:Number(consequenceMagnitude);
-  if(consequenceType!=='none'&&(!Number.isFinite(consequenceValue)||Number(consequenceValue)<=0)){setMessage('Укажите положительную величину игрового последствия.');return}
+  const consequenceNumber=Number(consequenceMagnitude);
+  const consequenceValue=consequenceType==='none'?null:consequenceNumber;
+  if(consequenceType!=='none'&&(!Number.isFinite(consequenceNumber)||consequenceNumber<=0)){setMessage('Укажите положительную величину игрового последствия.');return}
   setSaving(true);setMessage('');
   const ok=await configureStageDeadline(stageNo,deadline?new Date(deadline).toISOString():null,inclusive,n,description,consequenceType,consequenceValue);
   setSaving(false);
