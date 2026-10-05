@@ -162,7 +162,7 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
       <div className={`${styles.cover} ${styles.prologueCover}`}>
        <img
         className={styles.archivePrologueCover}
-        src={(process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'')+'/republic-art/archive-prologue-storm.webp?v=storm-ocean-20261005b'}
+        src={(process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'')+'/republic-art/archive-prologue-storm.webp?v=storm-ocean-fixed-20261005'}
         alt="Республика после бури — обложка пролога."
         width={1920}
         height={1080}
