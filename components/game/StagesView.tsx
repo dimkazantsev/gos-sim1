@@ -27,6 +27,7 @@ import GovernmentProgramSessionLab from './GovernmentProgramSessionLab';
 import CrisisRoom from './CrisisRoom';
 import StageArtifacts from './StageArtifacts';
 import StageReadinessPanel from './StageReadinessPanel';
+import StageWorkspace from './StageWorkspace';
 import {useSavedGameState} from './useSavedGameState';
 
 // A consistent icon language for the sixteen institutions and decisions.
@@ -102,6 +103,18 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
   (stageFilter==='all'||(stageFilter==='voting'?votingStageNos.has(s.stage_no):s.status===stageFilter))&&
   (!normalizedSearch||[String(s.stage_no),String(s.stage_no).padStart(2,'0'),s.title,s.summary,s.mode].some(part=>part.toLocaleLowerCase('ru-RU').includes(normalizedSearch)))
  );
+ if(selected&&detail){
+  return <StageWorkspace
+   g={g}
+   stage={selected}
+   readOnly={readOnly}
+   onBack={()=>setSelected(null)}
+   onOpenVotes={onOpenVotes}
+   onOpenDocument={onOpenDocument}
+   onCreateDocument={onCreateDocument}
+   onNavigate={onNavigate}
+  />;
+ }
  return <div className="stagesPage stagesAtlas">
   <section className="stageAtlasHero" aria-labelledby="stage-atlas-title">
    <div className="stageAtlasHeading">
