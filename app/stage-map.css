@@ -1354,12 +1354,21 @@
 }
 .deadlineControlTop{
  display:grid;
- grid-template-columns:minmax(320px,1.25fr) 190px minmax(360px,1fr);
+ grid-template-columns:minmax(0,1.35fr) minmax(132px,.5fr) minmax(0,1fr);
  gap:12px;
  align-items:stretch;
+ width:100%;
+ max-width:100%;
  min-width:0;
+ box-sizing:border-box;
 }
-.deadlineControlTop:not(.hasAction){grid-template-columns:minmax(0,1fr) 190px}
+.deadlineControlTop:not(.hasAction){grid-template-columns:minmax(0,1fr) minmax(132px,.42fr)}
+.deadlineControlTop>*{
+ width:100%;
+ max-width:100%;
+ min-width:0;
+ box-sizing:border-box;
+}
 .deadlineOverview,
 .deadlineCount,
 .deadlineApply{
@@ -1536,11 +1545,23 @@
 }
 
 @media(max-width:1180px){
- .deadlineControlTop{grid-template-columns:minmax(0,1fr) 160px}
- .deadlineControlTop.hasAction .deadlineApply{grid-column:1/-1}
- .deadlineControlTop.hasAction .deadlineApply>summary{min-height:64px}
+ .deadlineControlTop{grid-template-columns:minmax(0,1.35fr) minmax(132px,.5fr) minmax(0,.9fr)}
  .stagePolicyFields{grid-template-columns:1fr 1fr}
  .stagePolicyDescription{grid-column:1/-1}
+}
+@media(max-width:980px){
+ .deadlineControlTop.hasAction{
+  grid-template-columns:minmax(0,1fr) minmax(132px,.34fr);
+  grid-template-areas:
+   "overview count"
+   "action action";
+ }
+ .deadlineControlTop.hasAction .deadlineOverview{grid-area:overview}
+ .deadlineControlTop.hasAction .deadlineCount{grid-area:count}
+ .deadlineControlTop.hasAction .deadlineActionCard{
+  grid-area:action;
+  min-height:62px;
+ }
 }
 @media(max-width:760px){
  .stageWorkspaceTeacherHead{align-items:stretch;flex-direction:column}
@@ -1565,6 +1586,9 @@
 /* Dedicated deadline violation panel */
 .deadlineActionCard{
  display:grid;
+ width:100%;
+ max-width:100%;
+ overflow:hidden;
  grid-template-columns:42px minmax(0,1fr) 18px;
  gap:11px;
  align-items:center;
@@ -2010,4 +2034,28 @@
  .deadlineViolationRulePreview{
   padding:12px;
  }
+}
+
+
+/* Deadline containment guard */
+.deadlineControl,
+.deadlineControlTop,
+.deadlineOverview,
+.deadlineCount,
+.deadlineActionCard,
+.deadlineActionCopy{
+ min-width:0;
+ max-width:100%;
+}
+.deadlineActionCopy :is(b,small),
+.deadlineOverviewCopy :is(h3,p,span){
+ overflow-wrap:break-word;
+ word-break:normal;
+}
+.stageWorkspaceExecution,
+.stageWorkspaceControls,
+.teacherStageInspectorSection{
+ min-width:0;
+ max-width:100%;
+ overflow-x:hidden;
 }
