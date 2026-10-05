@@ -1946,3 +1946,68 @@
   padding:12px 15px 0;
  }
 }
+
+
+/* Automatic stage deadline rule preview */
+.deadlineActionCard:disabled{
+ opacity:.6;
+ cursor:not-allowed;
+ background:#f7f9fc;
+}
+.deadlineActionCard:disabled:hover{
+ border-color:#d9e4f2;
+ background:#f7f9fc;
+}
+.deadlineViolationRulePreview{
+ background:#f8fbff;
+ border-color:#d6e2f1;
+}
+.deadlineAutomaticRule{
+ display:grid;
+ grid-template-columns:22px minmax(0,1fr);
+ gap:10px;
+ align-items:start;
+ padding:13px;
+ border:1px solid #d9e4f2;
+ border-radius:11px;
+ background:#fff;
+ color:#526b89;
+}
+.deadlineAutomaticRule>svg{
+ color:#315efb;
+ margin-top:2px;
+}
+.deadlineAutomaticRule b{
+ display:block;
+ color:#24466f;
+ font-size:12px;
+ line-height:1.4;
+}
+.deadlineAutomaticRule p{
+ margin:4px 0 0;
+ color:#74869d;
+ font-size:10px;
+ line-height:1.5;
+}
+.stagePolicyFields{
+ grid-template-columns:minmax(220px,1fr) minmax(180px,.8fr) minmax(160px,.65fr);
+}
+.stagePolicyFields>.styledSelect{
+ min-width:0;
+}
+@media(max-width:1180px){
+ .stagePolicyFields{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+}
+@media(max-width:700px){
+ .stagePolicyFields{
+  grid-template-columns:minmax(0,1fr);
+ }
+ .stagePolicyDescription{
+  grid-column:auto;
+ }
+ .deadlineViolationRulePreview{
+  padding:12px;
+ }
+}
