@@ -462,7 +462,7 @@ export function useRepublicGame(gameId:string){
  }
  async function createParty(name:string,ideology:string){
   if(!teacher||!me||!name.trim())return false;const n=name.trim();const colors=['#6f7cff','#4dc9ff','#55d99b','#ff8d72','#c77dff'];
-  const p=await supabase.from('game_parties').insert({game_id:gameId,name:n,ideology:ideology.trim()||null,color:colors[parties.length%colors.length]});
+  const p=await supabase.from('game_parties').insert({game_id:gameId,name:n,ideology:ideology.trim()||null,color:colors[parties.length%colors.length],created_by:me.user_id});
   if(p.error){setError(p.error.message);return false}
   const c=await supabase.from('chat_channels').insert({game_id:gameId,name:'Фракция · '+n,kind:'team',created_by:me.user_id});if(c.error)setError(c.error.message);
   await refresh();return true;
@@ -539,7 +539,6 @@ export function useRepublicGame(gameId:string){
   await refresh();return true;
  }
  async function deleteParty(partyId:string){
-  if(!teacher){setError('Удаление партий доступно только преподавателю.');return false}
   const r=await supabase.rpc('delete_party_with_assets',{p_party_id:partyId});
   if(r.error){setError(r.error.message);return false}
   const result=r.data as {assets?:{bucket:string;path:string}[]};
