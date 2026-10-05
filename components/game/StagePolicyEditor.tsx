@@ -26,16 +26,22 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
  useEffect(()=>{
   if(!game||!stage)return;
   let active=true;
-  void supabase.from('stage_deadline_rules').select('*').eq('game_id',game.id).eq('stage_no',stageNo).maybeSingle()
-   .then(({data,error})=>{
-    if(!active)return;
-    if(error){setMessage(error.message);return}
-    setDeadline(localDate(data?.deadline_at??stage.deadline));
-    setInclusive(data?.inclusive??true);
-    setPenalty(String(data?.penalty_points??0));
-    setDescription(data?.penalty_description??'За просрочку отчёта по этапу');
-   });
-  return()=>{active=false};
+  async function loadRule(){
+   const {data,error}=await supabase.from('stage_deadline_rules').select('*').eq('game_id',game.id).eq('stage_no',stageNo).maybeSingle();
+   if(!active)return;
+   if(error){setMessage(error.message);return}
+   setDeadline(localDate(data?.deadline_at??stage.deadline));
+   setInclusive(data?.inclusive??true);
+   setPenalty(String(data?.penalty_points??0));
+   setDescription(data?.penalty_description??'За просрочку отчёта по этапу');
+  }
+  const sync=(event:Event)=>{
+   const detail=(event as CustomEvent<{gameId?:string;stageNo?:number}>).detail;
+   if(detail?.gameId===game.id&&detail?.stageNo===stageNo)void loadRule();
+  };
+  void loadRule();
+  window.addEventListener('gos-stage-policy-updated',sync);
+  return()=>{active=false;window.removeEventListener('gos-stage-policy-updated',sync)};
  },[game?.id,stageNo,stage?.deadline]);
  function fillRelative(){
   const n=Number(hours);
