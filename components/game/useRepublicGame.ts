@@ -357,15 +357,16 @@ export function useRepublicGame(gameId:string){
   return true;
  }
 
- async function configureStageDeadline(stageNo:number,deadline:string|null,inclusive:boolean,penalty:number,description:string){
-  if(!teacher){setError('Настройки этапов доступны только преподавателю.');return false}
-  const r=await supabase.rpc('configure_stage_deadline',{p_game_id:gameId,p_stage_no:stageNo,p_deadline:deadline,
-   p_inclusive:inclusive,p_penalty_points:penalty,p_penalty_description:description});
-  if(r.error){setError(r.error.message);return false}
-  await refresh();
-  if(typeof window!=='undefined')window.dispatchEvent(new CustomEvent('gos-stage-policy-updated',{detail:{gameId,stageNo}}));
-  return true;
- }
+  async function configureStageDeadline(stageNo:number,deadline:string|null,inclusive:boolean,penalty:number,description:string,consequenceType:'none'|'representation_loss'|'regional_seat_loss'|'ghost_risk'|'presidential_rating_loss'='none',consequenceMagnitude:number|null=null){
+   if(!teacher){setError('Настройки этапов доступны только преподавателю.');return false}
+   const r=await supabase.rpc('configure_stage_deadline_rule',{p_game_id:gameId,p_stage_no:stageNo,p_deadline:deadline,
+    p_inclusive:inclusive,p_penalty_points:penalty,p_penalty_description:description,
+    p_consequence_type:consequenceType,p_consequence_magnitude:consequenceMagnitude});
+   if(r.error){setError(r.error.message);return false}
+   await refresh();
+   if(typeof window!=='undefined')window.dispatchEvent(new CustomEvent('gos-stage-policy-updated',{detail:{gameId,stageNo}}));
+   return true;
+  }
  async function setStageDeadline(stageId:string,value:string){const r=await supabase.from('game_stages').update({deadline:value?new Date(value).toISOString():null}).eq('id',stageId);if(r.error)setError(r.error.message);else await refresh()}
 
 
