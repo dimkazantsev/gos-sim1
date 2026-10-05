@@ -1,6 +1,7 @@
 'use client';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {AlertTriangle,CheckCircle2,ChevronDown,ExternalLink,History,RefreshCw,ShieldCheck,XCircle} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {STAGE_SYSTEM} from './stageSystem';
 
@@ -16,7 +17,7 @@ export type StageReadiness={
  original_blockers?:string[];
 };
 
-export default function StageReadinessPanel({g,stageNo,compact=false}:{g:ReturnTypeRepublic;stageNo:number;compact?:boolean}){
+export default function StageReadinessPanel({g,stageNo,compact=false,rulesUrl,rulesLabel}:{g:ReturnTypeRepublic;stageNo:number;compact?:boolean;rulesUrl?:string;rulesLabel?:string}){
  const {game,teacher,setError}=g;
  const [state,setState]=useState<StageReadiness|null>(null);
  const [overrideReason,setOverrideReason]=useState('');
@@ -61,14 +62,44 @@ export default function StageReadinessPanel({g,stageNo,compact=false}:{g:ReturnT
   <div><b>{title}</b><small>{state?.blockers?.[0]||state?.warnings?.[0]||card?.institution||'Проверка состояния этапа'}</small></div>
  </div>;
 
- return <section className={'stageReadinessPanel '+status}>
-  <header><div><small>ПРОЦЕДУРНАЯ ГОТОВНОСТЬ</small><h3>{title}</h3><p>{card?.institution||'Игровой институт'} · этап {stageNo}</p></div><strong>{status==='ready'?'✓':status==='warning'?'!':status==='loading'?'…':'×'}</strong></header>
-  {!!state&&state.blockers.length>0&&<div className="stageReadinessGroup blockers"><b>Обязательно завершить</b><ul>{state.blockers.map(x=><li key={x}>{x}</li>)}</ul></div>}
-  {!!state&&state.warnings.length>0&&<div className="stageReadinessGroup warnings"><b>Проверьте перед переходом</b><ul>{state.warnings.map(x=><li key={x}>{x}</li>)}</ul></div>}
-  {state?.ready&&!state.warnings?.length&&<div className="stageReadinessOk">Ключевые процедуры этого этапа зафиксированы в системе.</div>}
-  {state?.overridden&&<div className="stageReadinessOverrideNotice"><b>Историческое прохождение подтверждено</b><p>{state.override_reason}</p>{state.original_blockers&&state.original_blockers.length>0&&<details><summary>Какие структурированные записи отсутствуют</summary><ul>{state.original_blockers.map(x=><li key={x}>{x}</li>)}</ul></details>}{state.override_at&&<small>{new Date(state.override_at).toLocaleString('ru-RU')}</small>}</div>}
-  {teacher&&!state?.overridden&&state&&!state.ready&&<div className="stageReadinessOverrideForm"><label>Этап был пройден до появления структурированной механики<textarea rows={2} value={overrideReason} onChange={e=>setOverrideReason(e.target.value)} placeholder="Кратко укажите, где и как был зафиксирован результат старого этапа"/></label><button className="secondary" disabled={loading||overrideReason.trim().length<10} onClick={()=>void setOverride()}>Подтвердить историческое прохождение</button></div>}
-  {teacher&&state?.overridden&&<button className="secondary stageReadinessClearOverride" disabled={loading} onClick={()=>void clearOverride()}>Отменить историческое подтверждение</button>}
-  <button className="secondary stageReadinessRefresh" onClick={()=>void load()} disabled={loading}>↻ Перепроверить</button>
+ const blockerCount=state?.blockers?.length||0;
+ const warningCount=state?.warnings?.length||0;
+ const StatusIcon=status==='ready'?CheckCircle2:status==='warning'?AlertTriangle:status==='loading'?RefreshCw:XCircle;
+ return <section className={'stageReadinessPanel stageReadinessWorkspace '+status} aria-live="polite">
+  <header className="stageReadinessHero">
+   <div className="stageReadinessHeroIcon" aria-hidden="true"><StatusIcon size={22}/></div>
+   <div className="stageReadinessHeroCopy">
+    <small>ПРОЦЕДУРНАЯ ГОТОВНОСТЬ · ЭТАП {stageNo}</small>
+    <h3>{title}</h3>
+    <p>{card?.institution||'Игровой институт'}</p>
+   </div>
+   <div className="stageReadinessHeroActions">
+    {rulesUrl&&<a className="stageReadinessRules" href={rulesUrl} target="_blank" rel="noreferrer"><ExternalLink size={16}/><span>{rulesLabel||'Правила игры'}</span></a>}
+    <button type="button" className="stageReadinessRefresh" onClick={()=>void load()} disabled={loading} title="Перепроверить готовность"><RefreshCw size={17} className={loading?'isSpinning':''}/><span>Перепроверить</span></button>
+   </div>
+  </header>
+
+  <div className="stageReadinessStats" aria-label="Сводка процедурной готовности">
+   <div><small>Обязательных блокеров</small><b>{blockerCount}</b><span>{blockerCount?'Нужно завершить':'Нет препятствий'}</span></div>
+   <div><small>Предупреждений</small><b>{warningCount}</b><span>{warningCount?'Нужно проверить':'Замечаний нет'}</span></div>
+   <div><small>Статус</small><b className="stageReadinessStateText">{status==='ready'?'Готов':status==='warning'?'С оговорками':status==='loading'?'Проверка':'Не готов'}</b><span>Системная проверка</span></div>
+  </div>
+
+  {(blockerCount>0||warningCount>0)&&<div className="stageReadinessChecklist">
+   {blockerCount>0&&<section className="stageReadinessGroup blockers"><header><XCircle size={17}/><div><b>Обязательно завершить</b><small>Без этого этап процедурно не закрыт</small></div></header><ul>{state!.blockers.map(x=><li key={x}><span aria-hidden="true">•</span><p>{x}</p></li>)}</ul></section>}
+   {warningCount>0&&<section className="stageReadinessGroup warnings"><header><AlertTriangle size={17}/><div><b>Проверьте перед переходом</b><small>Не блокирует этап, но требует внимания</small></div></header><ul>{state!.warnings.map(x=><li key={x}><span aria-hidden="true">•</span><p>{x}</p></li>)}</ul></section>}
+  </div>}
+
+  {state?.ready&&!warningCount&&<div className="stageReadinessOk"><CheckCircle2 size={19}/><div><b>Все обязательные процедуры зафиксированы</b><span>Этап может быть завершён или использован как основание для перехода к следующему.</span></div></div>}
+
+  {state?.overridden&&<section className="stageReadinessOverrideNotice"><header><History size={18}/><div><b>Историческое прохождение подтверждено</b><small>Ручное подтверждение преподавателя</small></div></header><p>{state.override_reason}</p>{state.original_blockers&&state.original_blockers.length>0&&<details><summary>Какие структурированные записи отсутствуют <ChevronDown size={15}/></summary><ul>{state.original_blockers.map(x=><li key={x}>{x}</li>)}</ul></details>}{state.override_at&&<time>{new Date(state.override_at).toLocaleString('ru-RU')}</time>}{teacher&&<button type="button" className="stageReadinessClearOverride" disabled={loading} onClick={()=>void clearOverride()}>Отменить подтверждение</button>}</section>}
+
+  {teacher&&!state?.overridden&&state&&!state.ready&&<details className="stageReadinessOverride">
+   <summary><History size={18}/><span><b>Этап был пройден раньше?</b><small>Используйте только для результатов, которые были зафиксированы до появления структурированной механики</small></span><ChevronDown size={18}/></summary>
+   <div className="stageReadinessOverrideForm">
+    <label>Где и как был зафиксирован результат<textarea rows={4} value={overrideReason} onChange={e=>setOverrideReason(e.target.value)} placeholder="Например: протокол заседания, загруженный документ, запись преподавателя. Минимум 10 символов."/></label>
+    <div className="stageReadinessOverrideActions"><span><ShieldCheck size={16}/> Подтверждение сохранится в истории этапа</span><button type="button" className="secondary" disabled={loading||overrideReason.trim().length<10} onClick={()=>void setOverride()}>Подтвердить историческое прохождение</button></div>
+   </div>
+  </details>}
  </section>;
 }
