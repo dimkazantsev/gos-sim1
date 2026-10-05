@@ -2,8 +2,8 @@
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
-import DisclosureSummary from '../ui/DisclosureSummary';
-import {CalendarClock,Scale,ShieldAlert} from 'lucide-react';
+import {useDialog} from '../ui/useDialog';
+import {AlertTriangle,CalendarClock,ChevronRight,Scale,ShieldAlert,UserRound,UsersRound,X} from 'lucide-react';
 
 type DeadlineIncident={
  id:string;game_id:string;stage_no:number;party_id:string|null;user_id:string|null;
@@ -38,7 +38,9 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  const [magnitude,setMagnitude]=useState('');
  const [note,setNote]=useState('');
  const [busy,setBusy]=useState(false);
+ const [applyOpen,setApplyOpen]=useState(false);
  const [now,setNow]=useState(Date.now());
+ const applyDialogRef=useDialog(applyOpen,()=>setApplyOpen(false));
 
  async function load(){
   if(!game)return;
@@ -87,7 +89,11 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
    p_game_id:game.id,p_stage_no:stageNo,p_party_id:partyId||null,p_user_id:userId||null,
    p_consequence_type:kind,p_magnitude:requiresMagnitude?Number(magnitude):null,p_note:note.trim()
   });
-  if(r.error)setError(r.error.message);else{setMagnitude('');setNote('');await load()}
+  if(r.error)setError(r.error.message);
+  else{
+   setPartyId('');setUserId('');setMagnitude('');setNote('');setKind(recommended(stageNo));
+   await load();setApplyOpen(false);
+  }
   setBusy(false);
  }
  async function revert(id:string){
@@ -116,19 +122,58 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
 
    <div className="deadlineCount"><strong>{active.length}</strong><span>активных последствий</span></div>
 
-   {teacher&&<details className="deadlineApply">
-    <DisclosureSummary icon={Scale} title="Зафиксировать нарушение и последствие" description="Выберите адресата, последствие и укажите основание"/>
-    <div className="deadlineApplyGrid">
-     <label>Партия<select value={partyId} onChange={e=>{setPartyId(e.target.value);if(e.target.value)setUserId('')}}><option value="">Не выбрана</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-     <label>Студент<select value={userId} onChange={e=>{setUserId(e.target.value);if(e.target.value){setPartyId('');setKind('other')}}}><option value="">Не выбран</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>
-     <label>Тип последствия<select value={kind} onChange={e=>{setKind(e.target.value as keyof typeof CONSEQUENCES);if(e.target.value!=='other')setUserId('')}}>{Object.entries(CONSEQUENCES).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select></label>
-     {kind!=='other'&&<label>Величина<input type="number" min={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} max={kind==='representation_loss'?450:kind==='regional_seat_loss'?89:kind==='presidential_rating_loss'?100:undefined} step={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} value={magnitude} onChange={e=>setMagnitude(e.target.value)} placeholder={unitPlaceholder}/></label>}
-     <label className="deadlineReason">Основание<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Что именно не выполнено в установленный срок и почему применяется это последствие?"/></label>
-     <div className="deadlineGuide"><b>{guide.label}</b><p>{guide.hint}</p></div>
-     <button className="primary" disabled={busy||(!partyId&&!userId)||note.trim().length<5||(kind!=='other'&&(!partyId||!Number.isFinite(Number(magnitude))||Number(magnitude)<=0))} onClick={()=>void record()}>Зафиксировать последствие</button>
-    </div>
-   </details>}
+   {teacher&&<button type="button" className="deadlineActionCard" onClick={()=>setApplyOpen(true)}>
+    <span className="deadlineActionIcon" aria-hidden="true"><Scale size={20}/></span>
+    <span className="deadlineActionCopy"><b>Зафиксировать нарушение</b><small>Назначить последствие и указать основание</small></span>
+    <ChevronRight size={18} aria-hidden="true"/>
+   </button>}
   </div>
+
+  {teacher&&applyOpen&&<div className="deadlineViolationBackdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setApplyOpen(false)}}>
+   <section ref={applyDialogRef} className="deadlineViolationPanel" role="dialog" aria-modal="true" aria-labelledby="deadline-violation-title" tabIndex={-1} onMouseDown={e=>e.stopPropagation()}>
+    <header className="deadlineViolationHeader">
+     <div className="deadlineViolationHeaderIcon" aria-hidden="true"><Scale size={23}/></div>
+     <div><small>ПОСЛЕДСТВИЕ · ЭТАП {stageNo}</small><h3 id="deadline-violation-title">Зафиксировать нарушение</h3><p>Выберите адресата, задайте последствие и кратко обоснуйте решение.</p></div>
+     <button type="button" className="deadlineViolationClose" aria-label="Закрыть" onClick={()=>setApplyOpen(false)}><X size={19}/></button>
+    </header>
+
+    <div className="deadlineViolationContext">
+     <span><CalendarClock size={16}/><b>{timeText}</b><small>{deadlineLabel}</small></span>
+     <span><ShieldAlert size={16}/><b>{penaltyPoints>0?'Штраф: '+penaltyPoints+' балл'+(penaltyPoints===1?'':penaltyPoints<5?'а':'ов'):'Штраф не задан'}</b><small>{penaltyDescription}</small></span>
+    </div>
+
+    <div className="deadlineViolationBody">
+     <section className="deadlineViolationSection">
+      <div className="deadlineViolationSectionHead"><span>01</span><div><b>Адресат</b><small>К кому применяется последствие</small></div></div>
+      <div className="deadlineTargetSwitch" role="group" aria-label="Тип адресата">
+       <button type="button" className={userId?'':'active'} onClick={()=>{setUserId('');if(kind==='other')setKind(recommended(stageNo))}}><UsersRound size={17}/> Партия</button>
+       <button type="button" className={userId?'active':''} onClick={()=>{setPartyId('');setKind('other')}}><UserRound size={17}/> Студент</button>
+      </div>
+      {!userId?<label className="deadlineViolationField">Партия<select value={partyId} onChange={e=>setPartyId(e.target.value)}><option value="">Выберите партию</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+      :<label className="deadlineViolationField">Студент<select value={userId} onChange={e=>setUserId(e.target.value)}><option value="">Выберите студента</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>}
+     </section>
+
+     <section className="deadlineViolationSection">
+      <div className="deadlineViolationSectionHead"><span>02</span><div><b>Последствие</b><small>Что именно меняется в игре</small></div></div>
+      <div className="deadlineViolationFields">
+       <label className="deadlineViolationField">Тип последствия<select value={kind} onChange={e=>{setKind(e.target.value as keyof typeof CONSEQUENCES);if(e.target.value!=='other')setUserId('')}}>{Object.entries(CONSEQUENCES).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select></label>
+       {kind!=='other'&&<label className="deadlineViolationField">Величина<input type="number" min={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} max={kind==='representation_loss'?450:kind==='regional_seat_loss'?89:kind==='presidential_rating_loss'?100:undefined} step={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} value={magnitude} onChange={e=>setMagnitude(e.target.value)} placeholder={unitPlaceholder}/></label>}
+      </div>
+      <div className="deadlineViolationGuide"><AlertTriangle size={17}/><div><b>{guide.label}</b><p>{guide.hint}</p></div></div>
+     </section>
+
+     <section className="deadlineViolationSection">
+      <div className="deadlineViolationSectionHead"><span>03</span><div><b>Основание</b><small>Почему применяется именно это последствие</small></div></div>
+      <label className="deadlineViolationField">Комментарий<textarea rows={5} value={note} onChange={e=>setNote(e.target.value)} placeholder="Укажите, что именно не выполнено в срок, на каком основании применяется последствие и к чему оно относится."/></label>
+     </section>
+    </div>
+
+    <footer className="deadlineViolationFooter">
+     <button type="button" className="secondary" onClick={()=>setApplyOpen(false)} disabled={busy}>Отмена</button>
+     <button type="button" className="primary" disabled={busy||(!partyId&&!userId)||note.trim().length<5||(kind!=='other'&&(!partyId||!Number.isFinite(Number(magnitude))||Number(magnitude)<=0))} onClick={()=>void record()}>{busy?'Сохранение…':'Зафиксировать последствие'}</button>
+    </footer>
+   </section>
+  </div>}
 
   {active.length>0&&<div className="deadlineLedger">{active.map(x=><article key={x.id}><div><b>{CONSEQUENCES[x.consequence_type].label}</b><small>{x.party_id?partyName(x.party_id):userName(x.user_id)} · {new Date(x.created_at).toLocaleString('ru-RU')}</small><p>{x.note}</p></div><strong>{x.magnitude!=null?String(x.magnitude)+' '+CONSEQUENCES[x.consequence_type].unit:'зафиксировано'}</strong>{teacher&&<button disabled={busy} onClick={()=>void revert(x.id)}>Отменить</button>}</article>)}</div>}
  </section>;
