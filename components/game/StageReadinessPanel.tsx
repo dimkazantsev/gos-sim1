@@ -71,7 +71,11 @@ export default function StageReadinessPanel({g,stageNo,compact=false,rulesUrl,ru
    <div className="stageReadinessHeroCopy">
     <small>ПРОЦЕДУРНАЯ ГОТОВНОСТЬ · ЭТАП {stageNo}</small>
     <h3>{title}</h3>
-    <p>{card?.institution||'Игровой институт'}</p>
+    <div className="stageReadinessMeta">
+     <span className={blockerCount?'hasBlockers':''}><b>{blockerCount}</b> обязательных</span>
+     <span className={warningCount?'hasWarnings':''}><b>{warningCount}</b> замечаний</span>
+     <span>{card?.institution||'Игровой институт'}</span>
+    </div>
    </div>
    <div className="stageReadinessHeroActions">
     {rulesUrl&&<a className="stageReadinessRules" href={rulesUrl} target="_blank" rel="noreferrer"><ExternalLink size={16}/><span>{rulesLabel||'Правила игры'}</span></a>}
@@ -79,13 +83,7 @@ export default function StageReadinessPanel({g,stageNo,compact=false,rulesUrl,ru
    </div>
   </header>
 
-  <div className="stageReadinessStats" aria-label="Сводка процедурной готовности">
-   <div><small>Обязательных блокеров</small><b>{blockerCount}</b><span>{blockerCount?'Нужно завершить':'Нет препятствий'}</span></div>
-   <div><small>Предупреждений</small><b>{warningCount}</b><span>{warningCount?'Нужно проверить':'Замечаний нет'}</span></div>
-   <div><small>Статус</small><b className="stageReadinessStateText">{status==='ready'?'Готов':status==='warning'?'С оговорками':status==='loading'?'Проверка':'Не готов'}</b><span>Системная проверка</span></div>
-  </div>
-
-  {(blockerCount>0||warningCount>0)&&<div className="stageReadinessChecklist">
+  {(blockerCount>0||warningCount>0)&&<div className={'stageReadinessChecklist '+((blockerCount>0)!==(warningCount>0)?'single':'')}>
    {blockerCount>0&&<section className="stageReadinessGroup blockers"><header><XCircle size={17}/><div><b>Обязательно завершить</b><small>Без этого этап процедурно не закрыт</small></div></header><ul>{state!.blockers.map(x=><li key={x}><span aria-hidden="true">•</span><p>{x}</p></li>)}</ul></section>}
    {warningCount>0&&<section className="stageReadinessGroup warnings"><header><AlertTriangle size={17}/><div><b>Проверьте перед переходом</b><small>Не блокирует этап, но требует внимания</small></div></header><ul>{state!.warnings.map(x=><li key={x}><span aria-hidden="true">•</span><p>{x}</p></li>)}</ul></section>}
   </div>}
