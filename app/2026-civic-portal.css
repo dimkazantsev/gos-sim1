@@ -111,6 +111,12 @@
 .civicCheckbox input[type=checkbox] {flex:none;appearance:auto;width:20px!important;height:20px!important;min-height:20px!important;margin:0!important;accent-color:#466fc0}
 .civicVotes .proceduralVoteCard {padding:24px;min-width:0;overflow:visible}
 .civicVotes .proceduralVoteCard>header {display:flex;flex-wrap:wrap;gap:16px;min-width:0}
+.civicVotes .voteCardHeaderActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:0 0 auto;margin-left:auto}
+.civicVotes .deleteProceduralVote{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;min-width:40px;min-height:40px;margin:0;padding:0;border:1px solid #ebcdd3;border-radius:10px;background:#fff;color:#a54659}
+.civicVotes .deleteProceduralVote:hover:not(:disabled){border-color:#ddaab4;background:#fff5f7;color:#96384c}
+.civicVotes .deleteProceduralVote>svg{display:block;margin:0;position:static;width:18px;height:18px}
+.civicVotes .voteDeleteBusy{display:grid;place-items:center;width:18px;height:18px;font-size:17px;line-height:1}
+
 .civicVotes .voteInstitution {min-width:0;flex:1 1 260px}
 .civicVotes .voteInstitution>div {min-width:0}
 .civicVotes .voteInstitution b {overflow-wrap:break-word;white-space:normal;line-height:1.6}
@@ -210,6 +216,7 @@
  .legalPortal .formalDocHeader{padding:18px}.legalPortal .formalDocHeader h2{font-size:20px}.legalPortal .legalDocumentRow{min-height:150px}.legalPortal .formalHeroActions{display:grid;grid-template-columns:minmax(0,1fr);width:100%}
  .legalPortal .formalHeroActions>*{width:100%;box-sizing:border-box;white-space:normal}.legalPortal .formalPaper h1{font-size:18px}
  .civicVotes .voteRuleStrip{grid-template-columns:minmax(0,1fr);gap:12px}.civicVotes .voteRuleStrip>div{padding-bottom:10px;border-bottom:1px solid #e2e8f2}
+ .civicVotes .proceduralVoteCard>header{align-items:flex-start}.civicVotes .voteCardHeaderActions{width:100%;justify-content:space-between;margin-left:0}.civicVotes .deleteProceduralVote{flex-basis:44px;width:44px;height:44px;min-width:44px;min-height:44px}
  .civicVotes .deputyStudentRow{grid-template-columns:minmax(0,1fr) auto;gap:8px}.civicVotes .deputyStudentRow b{grid-column:1/-1}.civicVotes .deputyStudentRow strong{grid-column:1/-1}
  .civicVotes .voteChoiceButtons{grid-template-columns:minmax(0,1fr)}.civicSplitInputs{grid-template-columns:minmax(0,1fr)}.civicSplitInputs>label{grid-template-columns:minmax(0,1fr) 100px;align-items:center}
  .eventAnswerChoice{padding:13px!important}.eventAnswerHeading{gap:10px}.eventAnswerHeading b{font-size:13px}.eventAnswerHeading strong{font-size:17px}
