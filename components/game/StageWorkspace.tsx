@@ -12,6 +12,7 @@ import {formatDeadline} from './constants';
 import {STAGE_DETAILS} from './stageDetails';
 import {STAGE_SYSTEM,gamePhaseForStage} from './stageSystem';
 import DeadlineControl from './DeadlineControl';
+import StagePolicyEditor from './StagePolicyEditor';
 import StageArtifacts,{STAGE_FORMS} from './StageArtifacts';
 import StageReadinessPanel from './StageReadinessPanel';
 import PresidentialElectionLab from './PresidentialElectionLab';
@@ -149,11 +150,11 @@ export default function StageWorkspace({
   </section>}
 
   {g.teacher&&!readOnly&&<section className="stageWorkspaceTeacher">
-   <div><small>ПРЕПОДАВАТЕЛЬ</small><h2>Управление этапом</h2></div>
-   <div>
+   <header className="stageWorkspaceTeacherHead">
+    <div><small>ПРЕПОДАВАТЕЛЬ</small><h2>Управление этапом</h2><p>Настройки ниже синхронизированы с «Управление → Этапы».</p></div>
     {stage.status!=='open'&&<button type="button" className="primary" onClick={()=>void g.openStage(stage.stage_no)}>Открыть этот этап</button>}
-    <label>Дедлайн<input type="datetime-local" onChange={e=>void g.setStageDeadline(stage.id,e.target.value)}/></label>
-   </div>
+   </header>
+   <StagePolicyEditor g={g} stageNo={stage.stage_no}/>
   </section>}
 
   <section className="stageWorkspaceExecution">
