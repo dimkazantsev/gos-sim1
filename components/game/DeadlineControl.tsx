@@ -53,9 +53,10 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  useEffect(()=>{setTargetType('party');setPartyId('');setUserId('');setNote('');void load()},[game?.id,stageNo]);
  useEffect(()=>{
   if(!game)return;
+  const gameId=game.id;
   const sync=(event:Event)=>{
    const detail=(event as CustomEvent<{gameId?:string;stageNo?:number}>).detail;
-   if(detail?.gameId===game.id&&detail?.stageNo===stageNo)void load();
+   if(detail?.gameId===gameId&&detail?.stageNo===stageNo)void load();
   };
   window.addEventListener('gos-stage-policy-updated',sync);
   return()=>window.removeEventListener('gos-stage-policy-updated',sync);
