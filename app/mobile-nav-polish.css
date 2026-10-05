@@ -165,8 +165,8 @@
 
 /* The item handles touch gestures itself: native browser panning would cancel long-press drag. */
 @media(max-width:900px){
- .mobileDockV2 .mobileDockItem{touch-action:none!important;-webkit-user-select:none;user-select:none;}
- .mobileDockV2 .mobileDockScroll{touch-action:pan-y;}
+ .mobileDockV2 .mobileDockItem{touch-action:pan-x!important;-webkit-user-select:none;user-select:none;}
+ .mobileDockV2 .mobileDockScroll{touch-action:pan-x;}
 }
 
 /* Compact one-row mobile header, with stable sync footprint. */
@@ -273,12 +273,12 @@
   gap:3px;padding:0 4px 0 0;
   overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:none!important;scroll-behavior:auto;
-  touch-action:none;overscroll-behavior-x:contain;
+  touch-action:pan-x;overscroll-behavior-x:contain;
  }
  .mobileDockV2 .mobileDockItem{
   flex:0 0 56px;width:56px;min-width:56px;max-width:56px;
   min-height:48px;max-height:51px;gap:2px;padding:3px 2px;
-  scroll-snap-align:none;touch-action:none!important;
+  scroll-snap-align:none;touch-action:pan-x!important;
  }
  .mobileDockV2 .mobileDockIcon{
   position:relative;display:grid;place-items:center;
