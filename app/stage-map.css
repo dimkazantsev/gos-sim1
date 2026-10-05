@@ -2059,3 +2059,25 @@
  max-width:100%;
  overflow-x:hidden;
 }
+
+
+/* Deadline container-query fallback */
+@container (max-width:820px){
+ .deadlineControlTop.hasAction{
+  grid-template-columns:minmax(0,1fr) minmax(126px,.34fr);
+  grid-template-areas:
+   "overview count"
+   "action action";
+ }
+ .deadlineControlTop.hasAction .deadlineOverview{grid-area:overview}
+ .deadlineControlTop.hasAction .deadlineCount{grid-area:count}
+ .deadlineControlTop.hasAction .deadlineActionCard{
+  grid-area:action;
+  min-height:62px;
+ }
+}
+@container (max-width:520px){
+ .deadlineControlTop.hasAction{
+  grid-template-columns:minmax(0,1fr) 98px;
+ }
+}
