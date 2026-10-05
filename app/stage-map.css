@@ -1830,3 +1830,119 @@
  .deadlineViolationSectionHead>span{width:30px;height:30px}
  .deadlineTargetSwitch button{font-size:10px}
 }
+
+
+/* Compact shared readiness layout */
+.stageReadinessMeta{
+ display:flex;
+ align-items:center;
+ gap:7px;
+ flex-wrap:wrap;
+ margin-top:7px;
+}
+.stageReadinessMeta>span{
+ display:inline-flex;
+ align-items:center;
+ gap:4px;
+ min-height:26px;
+ padding:3px 7px;
+ border-radius:999px;
+ background:#f1f5fa;
+ color:#687d97;
+ font-size:9px;
+ font-weight:780;
+}
+.stageReadinessMeta>span b{
+ color:#315a93;
+ font-size:10px;
+ line-height:1;
+}
+.stageReadinessMeta>span.hasBlockers{
+ background:#fff0f2;
+ color:#9d5563;
+}
+.stageReadinessMeta>span.hasBlockers b{color:#a54659}
+.stageReadinessMeta>span.hasWarnings{
+ background:#fff6e5;
+ color:#8c6a28;
+}
+.stageReadinessMeta>span.hasWarnings b{color:#9a6a12}
+
+.stageReadinessChecklist.single{
+ grid-template-columns:minmax(0,1fr);
+}
+.stageReadinessChecklist.single .stageReadinessGroup{
+ width:100%;
+}
+.stageReadinessWorkspace .stageReadinessChecklist{
+ padding-bottom:16px;
+}
+.stageReadinessWorkspace .stageReadinessOverride,
+.stageReadinessWorkspace .stageReadinessOverrideNotice,
+.stageReadinessWorkspace .stageReadinessOk{
+ margin-top:14px;
+ margin-bottom:16px;
+}
+.stageReadinessWorkspace .stageReadinessOverride>summary{
+ min-height:52px;
+ padding-block:9px;
+}
+.stageReadinessWorkspace .stageReadinessGroup{
+ padding:12px 14px;
+}
+.stageReadinessWorkspace .stageReadinessGroup ul{
+ margin-top:9px;
+}
+.stageReadinessWorkspace .stageReadinessGroup li p{
+ line-height:1.45;
+}
+
+.teacherStageInspector .stageReadinessCompact{
+ margin:0;
+ padding:11px 12px;
+ border:1px solid #dde5ef;
+ border-radius:11px;
+ background:#fbfcfe;
+}
+.teacherStageInspector .stageReadinessCompact>span{
+ flex:0 0 26px;
+ width:26px;
+ height:26px;
+}
+.teacherStageInspector .stageReadinessCompact>div{
+ min-width:0;
+}
+.teacherStageInspector .stageReadinessCompact b{
+ font-size:11px;
+}
+.teacherStageInspector .stageReadinessCompact small{
+ margin-top:2px;
+ font-size:9px;
+ line-height:1.4;
+}
+
+@media(max-width:650px){
+ .stageReadinessHero{
+  grid-template-columns:42px minmax(0,1fr);
+  padding:14px 15px;
+ }
+ .stageReadinessHeroIcon{
+  width:42px;
+  height:42px;
+ }
+ .stageReadinessHeroActions{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  width:100%;
+ }
+ .stageReadinessHeroActions>*{
+  width:100%;
+ }
+ .stageReadinessMeta{
+  gap:5px;
+ }
+ .stageReadinessChecklist{
+  padding:12px 15px 0;
+ }
+}
