@@ -100,7 +100,10 @@ export default function StageWorkspace({
     <h2>{primaryView?'Основная работа ведётся в разделе «'+primaryLabel+'»':'Все рабочие формы находятся на этой странице'}</h2>
     <p>{task?.help||'Выполните действия ниже, сохраните документы и завершите связанные процедуры. Система автоматически подтянет результаты в карточку этапа.'}</p>
    </div>
-   {primaryView&&onNavigate&&<button type="button" className="primary" onClick={()=>onNavigate(primaryView)}><ExternalLink size={17}/> Перейти и выполнить</button>}
+   <div className="stageStudentRouteActions">
+    {detail.rulesUrl&&<a className="secondary stageRulesButton" href={detail.rulesUrl} target="_blank" rel="noreferrer"><BookOpenText size={17}/> Правила игры <ExternalLink size={14}/></a>}
+    {primaryView&&onNavigate&&<button type="button" className="primary" onClick={()=>onNavigate(primaryView)}><ExternalLink size={17}/> Перейти и выполнить</button>}
+   </div>
   </section>
 
   <div className="stageWorkspaceOverview">
@@ -145,6 +148,14 @@ export default function StageWorkspace({
    <div>{detail.notes.map((item,index)=><p key={index}><span>!</span>{item}</p>)}</div>
   </section>}
 
+  {g.teacher&&!readOnly&&<section className="stageWorkspaceTeacher">
+   <div><small>ПРЕПОДАВАТЕЛЬ</small><h2>Управление этапом</h2></div>
+   <div>
+    {stage.status!=='open'&&<button type="button" className="primary" onClick={()=>void g.openStage(stage.stage_no)}>Открыть этот этап</button>}
+    <label>Дедлайн<input type="datetime-local" onChange={e=>void g.setStageDeadline(stage.id,e.target.value)}/></label>
+   </div>
+  </section>}
+
   <section className="stageWorkspaceExecution">
    <div className="stageWorkspaceSectionHead">
     <div><small>РАБОЧЕЕ МЕСТО</small><h2>Документы, формы и процедуры</h2><p>Заполняйте формы здесь или переходите в профильный раздел. Сохранённые НПА, голосования и результаты синхронизируются с этапом.</p></div>
@@ -172,7 +183,7 @@ export default function StageWorkspace({
     {stage.stage_no===15&&<CrisisRoom g={g}/>}
     {stage.stage_no===16&&<SystemDebriefLab g={g}/>}
 
-    <StageReadinessPanel g={g} stageNo={stage.stage_no}/>
+    <StageReadinessPanel g={g} stageNo={stage.stage_no} rulesUrl={detail.rulesUrl} rulesLabel={detail.rulesSection||'Правила игры'}/>
    </fieldset>
   </section>
 
@@ -184,12 +195,6 @@ export default function StageWorkspace({
    </div>
   </section>}
 
-  {g.teacher&&!readOnly&&<section className="stageWorkspaceTeacher">
-   <div><small>ПРЕПОДАВАТЕЛЬ</small><h2>Управление этапом</h2></div>
-   <div>
-    {stage.status!=='open'&&<button type="button" className="primary" onClick={()=>void g.openStage(stage.stage_no)}>Открыть этот этап</button>}
-    <label>Дедлайн<input type="datetime-local" onChange={e=>void g.setStageDeadline(stage.id,e.target.value)}/></label>
-   </div>
-  </section>}
+
  </div>;
 }
