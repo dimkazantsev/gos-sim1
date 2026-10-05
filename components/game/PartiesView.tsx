@@ -2,7 +2,7 @@
 import JusticeDocuments from './JusticeDocuments';
 import {useMemo,useState,type ComponentType} from 'react';
 import {IconAction} from '../ui/IconAction';
-import {ChevronDown,FileText,PencilLine,Plus,UserPlus,UsersRound} from 'lucide-react';
+import {ChevronDown,FileText,PencilLine,Plus,Trash2,UserPlus,UsersRound} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import ProfileAvatar from './ProfileAvatar';
 import type {PartyDocument} from './types';
@@ -15,15 +15,28 @@ function PartyDisclosureSummary({icon:Icon,title,meta}:{icon:ComponentType<{size
 export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const {parties,members,profiles,partyDocuments,partyInvitations,partyMandates,me,teacher}=g;
  const [selectedId,setSelectedId]=useState(''),[query,setQuery]=useState(''),[description,setDescription]=useState(''),[logo,setLogo]=useState<File|null>(null),[busy,setBusy]=useState(false),[docKind,setDocKind]=useState<PartyDocument['doc_kind']>('application'),[docFile,setDocFile]=useState<File|null>(null),[docTitle,setDocTitle]=useState(''),[inviteUser,setInviteUser]=useState(''),[name,setName]=useState(''),[ideology,setIdeology]=useState('');
+ const [deletingPartyId,setDeletingPartyId]=useState('');
  const ranked=useMemo(()=>[...parties].filter(p=>!query.trim()||[p.name,p.ideology,p.description].join(' ').toLowerCase().includes(query.toLowerCase())).sort((a,b)=>b.support-a.support),[parties,query]);
  const selected=parties.find(p=>p.id===selectedId)||parties.find(p=>p.name===me?.team)||ranked[0],own=!!selected&&(teacher||selected.name===me?.team),editable=!!selected&&(teacher||selected.leader_user_id===me?.user_id),staff=members.filter(m=>m.kind==='student'&&m.team===selected?.name),leader=members.find(m=>m.user_id===selected?.leader_user_id),docs=partyDocuments.filter(d=>d.party_id===selected?.id),publicDocs=docs.filter(d=>['charter','program','symbol','congress_minutes'].includes(d.doc_kind)&&d.status!=='revision'),free=members.filter(m=>m.kind==='student'&&!m.team),pending=partyInvitations.filter(i=>i.party_id===selected?.id&&i.status==='pending'),inbox=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  async function saveIdentity(){if(!selected)return;setBusy(true);await g.savePartyIdentity(selected.id,description,logo||undefined);setLogo(null);setBusy(false)}
  async function upload(){if(!selected||!docFile)return;setBusy(true);const ok=await g.uploadPartyDocument(selected.id,docKind,docTitle.trim()||DOCS.find(d=>d.kind===docKind)?.title||docFile.name,docFile);if(ok){setDocFile(null);setDocTitle('')}setBusy(false)}
+ function canDeleteParty(p:typeof parties[number]){return !!me&&(teacher||(p.created_by===me.user_id&&p.registration_status!=='registered'))}
+ async function removeParty(p:typeof parties[number]){
+  if(!canDeleteParty(p)||deletingPartyId)return;
+  const warning=p.registration_status==='registered'
+   ?'Удалить зарегистрированную партию «'+p.name+'»? Это действие доступно преподавателю и удалит связанные партийные данные.'
+   :'Удалить партию «'+p.name+'»? Документы, приглашения, мандаты, соглашения и связанные партийные данные будут удалены.';
+  if(!confirm(warning))return;
+  setDeletingPartyId(p.id);
+  const ok=await g.deleteParty(p.id);
+  if(ok&&selectedId===p.id)setSelectedId('');
+  setDeletingPartyId('');
+ }
 
  return <div className="partyPage civicParties"><header className="pageHeader"><div><h1>Партии и фракции</h1><p>Публичные программы, партийные документы, руководство и состав.</p></div></header>
   {inbox.length>0&&<section className="civicPartyInbox"><h2>Приглашения в партии</h2>{inbox.map(i=><article key={i.id}><b>{parties.find(p=>p.id===i.party_id)?.name||'Партия'}</b><button className="primary" onClick={()=>void g.respondPartyInvitation(i.id,true)}>Принять</button><button className="secondary" onClick={()=>void g.respondPartyInvitation(i.id,false)}>Отклонить</button></article>)}</section>}
   <input className="civicPartySearch" aria-label="Поиск партий" placeholder="Название, идеология или программа" value={query} onChange={e=>setQuery(e.target.value)}/>
-  <section className="civicPartyTiles" aria-label="Публичные партии">{ranked.map(p=><button type="button" className={selected?.id===p.id?'civicPartyTile active':'civicPartyTile'} key={p.id} onClick={()=>{setSelectedId(p.id);setDescription(p.description||'')}}><span className="civicPartyLogo" style={{background:p.color}}>{p.logo_url?<img src={p.logo_url} alt=""/>:p.name.slice(0,1)}</span><span><b>{p.name}</b><small>{p.ideology||'Идеология не указана'}</small><small>{statusLabel[p.registration_status]}</small></span><span className="civicPartyTileStats"><b>{p.support}%</b> поддержка · <b>{p.mandates}</b> мандатов</span></button>)}{!ranked.length&&<p>Партии не найдены.</p>}</section>
+  <section className="civicPartyTiles" aria-label="Публичные партии">{ranked.map(p=><article className={selected?.id===p.id?'civicPartyTile active':'civicPartyTile'} key={p.id}><button type="button" className="civicPartyTileSelect" onClick={()=>{setSelectedId(p.id);setDescription(p.description||'')}}><span className="civicPartyLogo" style={{background:p.color}}>{p.logo_url?<img src={p.logo_url} alt=""/>:p.name.slice(0,1)}</span><span className="civicPartyTileCopy"><b>{p.name}</b><small>{p.ideology||'Идеология не указана'}</small><small>{statusLabel[p.registration_status]}</small></span><span className="civicPartyTileStats"><b>{p.support}%</b> поддержка · <b>{p.mandates}</b> мандатов</span></button>{canDeleteParty(p)&&<button type="button" className="civicPartyDelete" aria-label={'Удалить партию «'+p.name+'»'} title={teacher?'Удалить партию':'Удалить свою партию до регистрации'} disabled={deletingPartyId===p.id} onClick={()=>void removeParty(p)}>{deletingPartyId===p.id?<span aria-hidden="true">…</span>:<Trash2 size={17}/>}</button>}</article>)}{!ranked.length&&<p>Партии не найдены.</p>}</section>
   {selected&&<section className="civicPartyPublic"><header><span className="civicPartyLogo" style={{background:selected.color}}>{selected.logo_url?<img src={selected.logo_url} alt={'Эмблема: '+selected.name}/>:selected.name.slice(0,1)}</span><div><h2>{selected.name}</h2><p>{selected.ideology||'Идеология не указана'}</p></div><span>{statusLabel[selected.registration_status]}</span></header><p className="civicPartyDescription">{selected.description||'Публичное описание пока не опубликовано.'}</p><div className="civicPartyFacts"><span><b>{selected.support}%</b> поддержка</span><span><b>{selected.mandates}</b> мандатов</span><span><b>{selected.regions}</b> регионов</span><span><b>{staff.length}</b> участников</span></div>
    <div className="civicPartyLeader"><span className="eventVoter"><ProfileAvatar name={leader?.full_name||'Не назначен'} src={profiles.find(p=>p.user_id===leader?.user_id)?.avatar_url}/></span><div><small>Председатель партии</small><b>{leader?.full_name||'Не назначен'}</b></div></div>
    <section className="civicPublicDocs"><h3>Публичные документы</h3>{publicDocs.length?publicDocs.map(d=><a key={d.id} href={d.url||undefined} target="_blank" rel="noreferrer"><div><b>{DOCS.find(x=>x.kind===d.doc_kind)?.title||d.title}</b><span>{d.title}</span><small>{d.file_name}</small></div><span>Открыть</span></a>):<p>Устав, программа и решения съезда появятся после загрузки партийного пакета.</p>}</section>
