@@ -13,7 +13,7 @@
 .journalToolbar>.styledSelect,.participantsToolbar>.styledSelect{flex:1 1 145px;min-width:0;max-width:100%}
 .journalToolbar>.styledSelect>button,.participantsToolbar>.styledSelect>button{width:100%;height:43px}
 .participantsToolbar>button:not(.styledSelectTrigger){align-self:end;min-width:138px;flex:0 0 138px;width:138px;max-width:138px;height:43px}
-.institutionRegistrationPanel{display:grid;gap:17px;min-width:0;padding:22px;border:1px solid #d5e2f3;border-radius:17px;background:#fff}
+.institutionRegistrationPanel:not(.projectDisclosure){display:grid;gap:17px;min-width:0;padding:22px;border:1px solid #d5e2f3;border-radius:17px;background:#fff}
 .institutionRegistrationPanel>header{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .institutionRegistrationPanel>header>div{min-width:0}
 .institutionRegistrationPanel header small{display:block;color:#758ca6;font-size:10px;font-weight:850;letter-spacing:.09em}
@@ -61,7 +61,7 @@
 }
 @media(max-width:900px){.institutionRegistrationGrid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:650px){
- .institutionRegistrationPanel{padding:16px}
+ .institutionRegistrationPanel:not(.projectDisclosure){padding:16px}
  .chatVideoNote{width:min(220px,62vw);height:min(220px,62vw)}
   .journalToolbar>.styledSelect,.participantsToolbar>.styledSelect{flex:1 1 calc(50% - 9px)}
  .participantsToolbar>button:not(.styledSelectTrigger){flex:1 1 calc(50% - 9px);max-width:100%;width:auto;min-width:0}
