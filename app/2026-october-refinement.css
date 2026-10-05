@@ -516,3 +516,275 @@
  .journalEvent{grid-template-columns:66px minmax(0,1fr);gap:10px}
  .journalEventMarker{left:70px}
 }
+
+
+/* Mobile geometry correction: profile, journal, deadline */
+@media(max-width:700px){
+ /* Profile hero: controls are centered in the identity column, exactly like role chips. */
+ .profilePage .profileIntro{
+  min-width:0;
+  text-align:center;
+ }
+ .profilePage .profileChips{
+  justify-content:center;
+  width:100%;
+ }
+ .profilePage .profileHeroControls{
+  display:flex;
+  width:100%;
+  max-width:100%;
+  margin:15px auto 0;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  flex-wrap:wrap;
+ }
+ .profilePage .profileHeroControls>button{
+  flex:0 1 auto;
+  width:auto;
+  max-width:100%;
+  margin:0;
+  justify-content:center;
+ }
+}
+
+@media(max-width:650px){
+ /* Journal event is a true vertical content stack; title, section and action can never overlap. */
+ .classroomJournal .journalFeed{
+  display:grid;
+  grid-auto-flow:row;
+  align-content:start;
+ }
+ .classroomJournal .journalEvent{
+  position:relative;
+  display:grid;
+  grid-template-columns:68px minmax(0,1fr);
+  grid-template-rows:auto;
+  gap:0 13px;
+  align-items:start;
+  min-width:0;
+  min-height:0;
+  height:auto;
+  padding:14px 0;
+ }
+ .classroomJournal .journalEvent>time{
+  grid-column:1;
+  grid-row:1;
+  align-self:start;
+  min-width:0;
+  margin:0;
+  padding:2px 0 0;
+  line-height:1.35;
+  white-space:normal;
+ }
+ .classroomJournal .journalEventMarker{
+  position:absolute;
+  left:75px;
+  top:20px;
+  margin:0;
+ }
+ .classroomJournal .journalEvent>div{
+  grid-column:2;
+  grid-row:1;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  min-width:0;
+  gap:7px;
+  padding:0;
+ }
+ .classroomJournal .journalEventTitle{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:6px;
+  min-width:0;
+  width:100%;
+  margin:0;
+ }
+ .classroomJournal .journalEventTitle>strong{
+  display:block;
+  position:static;
+  width:100%;
+  min-width:0;
+  margin:0;
+  color:#315072;
+  font-size:13px;
+  line-height:1.35;
+  white-space:normal;
+  overflow-wrap:break-word;
+  word-break:normal;
+ }
+ .classroomJournal .journalEventTitle>span{
+  display:inline-flex;
+  position:static;
+  align-self:flex-start;
+  width:auto;
+  max-width:100%;
+  margin:0;
+  padding:4px 8px;
+  white-space:normal;
+  line-height:1.25;
+  overflow-wrap:break-word;
+  word-break:normal;
+ }
+ .classroomJournal .journalEvent>div>p{
+  display:block;
+  position:static;
+  width:100%;
+  min-width:0;
+  margin:0;
+  padding:0;
+  color:#526c89;
+  font-size:11px;
+  line-height:1.5;
+  white-space:normal;
+  overflow-wrap:break-word;
+  word-break:normal;
+ }
+
+ /* Deadline: two compact cards on top, one full-width action below. */
+ .deadlineControlTop,
+ .deadlineControlTop.hasAction,
+ .deadlineControlTop:not(.hasAction){
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 104px!important;
+  grid-template-areas:
+   "overview count"
+   "action action";
+  gap:9px!important;
+  align-items:stretch;
+ }
+ .deadlineOverview{
+  grid-area:overview;
+  width:auto;
+  min-width:0;
+  min-height:126px;
+  padding:14px 13px;
+  align-items:flex-start;
+ }
+ .deadlineOverviewCopy{
+  min-width:0;
+  width:100%;
+ }
+ .deadlineOverviewCopy>small{
+  font-size:9px;
+  line-height:1.35;
+ }
+ .deadlineOverviewCopy>h3{
+  margin-top:2px;
+  font-size:18px;
+  line-height:1.18;
+ }
+ .deadlineOverviewCopy>p{
+  margin-top:3px;
+  font-size:10px;
+  line-height:1.4;
+ }
+ .deadlineRuleMeta{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:5px;
+  margin-top:8px;
+ }
+ .deadlineRuleMeta>span{
+  width:fit-content;
+  max-width:100%;
+  min-height:25px;
+  padding:3px 7px;
+  font-size:8.5px;
+  line-height:1.25;
+ }
+ .deadlineRuleDescription{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:2px;
+  margin-top:6px;
+  font-size:8.5px;
+  line-height:1.35;
+ }
+ .deadlineCount{
+  grid-area:count;
+  width:auto;
+  min-width:0;
+  min-height:126px;
+  padding:11px 7px;
+  align-content:center;
+ }
+ .deadlineCount strong{
+  font-size:27px;
+ }
+ .deadlineCount span{
+  max-width:86px;
+  font-size:9px;
+  line-height:1.3;
+  overflow-wrap:normal;
+  word-break:normal;
+ }
+ .deadlineApply{
+  grid-area:action!important;
+  grid-column:auto!important;
+  width:100%;
+  min-width:0;
+  min-height:0;
+  margin:0;
+ }
+ .deadlineApply>summary,
+ .deadlineApply[open]>summary{
+  box-sizing:border-box;
+  width:100%;
+  min-height:62px;
+  height:auto;
+  padding:11px 13px;
+ }
+ .deadlineApply .disclosureSummary{
+  display:grid;
+  grid-template-columns:22px minmax(0,1fr) 18px;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  width:100%;
+ }
+ .deadlineApply .disclosureSummary>svg{
+  width:19px;
+  height:19px;
+ }
+ .deadlineApply .disclosureText{
+  min-width:0;
+ }
+ .deadlineApply .disclosureText>b{
+  display:block;
+  font-size:11px;
+  line-height:1.3;
+  white-space:normal;
+ }
+ .deadlineApply .disclosureText>small{
+  display:block;
+  margin-top:2px;
+  font-size:8.5px;
+  line-height:1.35;
+  white-space:normal;
+ }
+}
+
+@media(max-width:390px){
+ .profilePage .profileHeroControls{
+  gap:8px;
+ }
+ .profilePage .profileHeroControls>button{
+  min-height:42px;
+  padding-inline:12px;
+ }
+ .deadlineControlTop,
+ .deadlineControlTop.hasAction,
+ .deadlineControlTop:not(.hasAction){
+  grid-template-columns:minmax(0,1fr) 94px!important;
+  gap:8px!important;
+ }
+ .deadlineCount span{max-width:76px}
+ .classroomJournal .journalEvent{
+  grid-template-columns:62px minmax(0,1fr);
+  gap:0 11px;
+ }
+ .classroomJournal .journalEventMarker{left:68px}
+}
