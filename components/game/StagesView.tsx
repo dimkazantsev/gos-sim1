@@ -15,7 +15,7 @@ const STAGE_ICONS=[UsersRound,SlidersHorizontal,Map,Landmark,UserRoundX,Clipboar
 type StageFilter='all'|'open'|'voting'|'completed'|'locked';
 
 export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:import('./types').View)=>void;focusStageNo?:number;readOnly?:boolean}){
- const {stages,votes,teacher,nextStage,openStage,setStageDeadline}=g;
+ const {stages,votes,teacher,nextStage}=g;
  const [selectedStageNo,setSelectedStageNo]=useSavedGameState(g.game?.id,g.me?.user_id,'stage-selected',0,value=>Number.isInteger(value)&&Number(value)>=0&&Number(value)<=16);
  const selected=stages.find(s=>s.stage_no===selectedStageNo)||null;
  function setSelected(stage:Stage|null){setSelectedStageNo(stage?.stage_no||0)}
@@ -31,7 +31,6 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
  useEffect(()=>{if(focusStageNo)setSelected(stages.find(s=>s.stage_no===focusStageNo)||null)},[focusStageNo]);
  const detail=selected?STAGE_DETAILS[selected.stage_no]:null;
  const current=stages.find(s=>s.status==='open')||stages.find(s=>s.status!=='completed')||stages.at(-1);
- const currentPhase=current?gamePhaseForStage(current.stage_no):GAME_PHASES[0];
 
  const completedCount=stages.filter(s=>s.status==='completed').length;
  const openCount=stages.filter(s=>s.status==='open').length;
