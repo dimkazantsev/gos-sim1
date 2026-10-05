@@ -345,6 +345,126 @@
       "asset": "/event-art/scene-007-20261004-1920.webp",
       "generator": "Built-in imagegen",
       "source_file": "exec-30a57178-8892-4aca-9c54-ac117e0ab8ea.png"
+    },
+    "bank-curated-v2-10": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "723071a90a435fd3d58239ee81dbf226997b79b8e5adf9a70b916000501df04c",
+      "asset_sha256": "a36b9f5ef53f1e0e7a284533cd91cfa3f8f930530284120fcc8755af4ac311d9",
+      "asset": "/event-art/scene-010-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-10.png"
+    },
+    "bank-curated-v2-11": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "f7c779bf77b24c7fe610f09e52d6da79e8effcdd3639335b071753d9675e05c1",
+      "asset_sha256": "d77acb355722d2a60b5e86eb0e7c45ffe1786206e882243633b24254beaa4bb4",
+      "asset": "/event-art/scene-011-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-11.png"
+    },
+    "bank-curated-v2-12": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "1130ec0cd53abb76bb2eb699e23397e24a4e79f0cabb63d861bde09eaed3e295",
+      "asset_sha256": "87b10cfefc3e26cb5c56ee49a8dd5b2207c0068933513d55a781548e8ffade59",
+      "asset": "/event-art/scene-012-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-12.png"
+    },
+    "bank-curated-v2-13": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "9808b467ad878f0c0bfe68987dc1067ebf503c8901404c5acef9dcbccedbe177",
+      "asset_sha256": "68edfffe8c0663eb1a095f867b34fa1de54e0d4f7a0a8c7a9bb7c5a3a7d47820",
+      "asset": "/event-art/scene-013-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-13.png"
+    },
+    "bank-curated-v2-14": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "65c427dbdd7b0369612ddfcbca945ffc4819f423756528aa5ac926c6d5177678",
+      "asset_sha256": "fdc027ad8a9e315920f42aad4707d746636a96a17cc48e4f673d339fd17567c4",
+      "asset": "/event-art/scene-014-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-14.png"
+    },
+    "bank-curated-v2-15": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "39f64e03a9aa39faebef61b9af56d24c12d3a9c2f8aa2898ea0171c5bddadda7",
+      "asset_sha256": "e31f72df8822d0c9dde7a4fb4c70f24574432fc078200e1b935b0cea19f2417e",
+      "asset": "/event-art/scene-015-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-15.png"
+    },
+    "bank-curated-v2-16": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "eaca67b13ed81a7d770cdbf1ca8bc641ac2751b3e21adff5c96fdbc6bf17a1e7",
+      "asset_sha256": "80664e5e804001dc421bd52270789918294190f1896f1a1837c8b332187704f8",
+      "asset": "/event-art/scene-016-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-16.png"
+    },
+    "bank-curated-v2-17": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "b883655f990f703a123924615645fc1fc88eac78170ef0f01dfb020867a91c84",
+      "asset_sha256": "1abbd9c3bd131b0a07101247837b12e4834dad19676e81ac39ca84a172524a3f",
+      "asset": "/event-art/scene-017-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-17.png"
     }
   }
 }

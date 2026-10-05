@@ -54,16 +54,16 @@
     "srcSet": "/event-art/scene-009-20261004-480.webp 480w, /event-art/scene-009-20261004-960.webp 960w, /event-art/scene-009-20261004-1920.webp 1920w"
   },
   "bank-curated-v2-14": {
-    "src": "/event-art/scene-014-1920.webp",
+    "src": "/event-art/scene-014-20261004-1920.webp",
     "width": 1920,
     "height": 1080,
-    "srcSet": "/event-art/scene-014-480.webp 480w, /event-art/scene-014-960.webp 960w, /event-art/scene-014-1920.webp 1920w"
+    "srcSet": "/event-art/scene-014-20261004-480.webp 480w, /event-art/scene-014-20261004-960.webp 960w, /event-art/scene-014-20261004-1920.webp 1920w"
   },
   "bank-curated-v2-10": {
-    "src": "/event-art/scene-010-1920.webp",
+    "src": "/event-art/scene-010-20261004-1920.webp",
     "width": 1920,
     "height": 1080,
-    "srcSet": "/event-art/scene-010-480.webp 480w, /event-art/scene-010-960.webp 960w, /event-art/scene-010-1920.webp 1920w"
+    "srcSet": "/event-art/scene-010-20261004-480.webp 480w, /event-art/scene-010-20261004-960.webp 960w, /event-art/scene-010-20261004-1920.webp 1920w"
   },
   "budget-region-2026-05-equalization": {
     "src": "/event-art/scene-201-20261004-1920.webp",
@@ -148,5 +148,41 @@
     "width": 1920,
     "height": 1080,
     "srcSet": "/event-art/scene-214-20261004-480.webp 480w, /event-art/scene-214-20261004-960.webp 960w, /event-art/scene-214-20261004-1920.webp 1920w"
+  },
+  "bank-curated-v2-11": {
+    "src": "/event-art/scene-011-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-011-20261004-480.webp 480w, /event-art/scene-011-20261004-960.webp 960w, /event-art/scene-011-20261004-1920.webp 1920w"
+  },
+  "bank-curated-v2-12": {
+    "src": "/event-art/scene-012-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-012-20261004-480.webp 480w, /event-art/scene-012-20261004-960.webp 960w, /event-art/scene-012-20261004-1920.webp 1920w"
+  },
+  "bank-curated-v2-13": {
+    "src": "/event-art/scene-013-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-013-20261004-480.webp 480w, /event-art/scene-013-20261004-960.webp 960w, /event-art/scene-013-20261004-1920.webp 1920w"
+  },
+  "bank-curated-v2-15": {
+    "src": "/event-art/scene-015-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-015-20261004-480.webp 480w, /event-art/scene-015-20261004-960.webp 960w, /event-art/scene-015-20261004-1920.webp 1920w"
+  },
+  "bank-curated-v2-16": {
+    "src": "/event-art/scene-016-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-016-20261004-480.webp 480w, /event-art/scene-016-20261004-960.webp 960w, /event-art/scene-016-20261004-1920.webp 1920w"
+  },
+  "bank-curated-v2-17": {
+    "src": "/event-art/scene-017-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-017-20261004-480.webp 480w, /event-art/scene-017-20261004-960.webp 960w, /event-art/scene-017-20261004-1920.webp 1920w"
   }
 }
