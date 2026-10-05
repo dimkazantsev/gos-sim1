@@ -699,20 +699,6 @@ button,input,textarea,select{font-size:14px}
 @media(max-width:700px){.crisisShell{width:calc(100% - 20px);margin-top:10px}.crisisCommand{border-radius:19px}.crisisCommandHead{align-items:flex-start;flex-direction:column;padding:15px}.crisisClock{width:100%;text-align:left}.crisisIntel,.crisisResponsePanel{padding:14px}.crisisAnswer,.crisisAsk,.crisisReview{grid-template-columns:1fr;display:grid}}
 
 
-/* Deadline consequence control */
-.deadlineControl{margin:13px 0;padding:14px;border:1px solid #dfe6ef;border-radius:17px;background:#fbfcfe}
-.deadlineControl.overdue{border-color:#edb8c1;background:#fff7f8}
-.deadlineControl>header{display:flex;justify-content:space-between;gap:15px;align-items:center}
-.deadlineControl>header small{font-size:13px;font-weight:900;letter-spacing:.1em;color:#8290a3}
-.deadlineControl>header h3{margin:4px 0 2px;color:#28415f;font-size:18px}.deadlineControl.overdue>header h3{color:#b83e57}
-.deadlineControl>header p{margin:0;color:#7b8ba0;font-size:13px}
-.deadlineCount{min-width:92px;padding:9px 10px;border-radius:12px;background:#edf2f8;text-align:center}.deadlineCount strong{display:block;color:#35577e;font-size:22px}.deadlineCount span{display:block;color:#8190a4;font-size:13px}
-.deadlineLedger{display:grid;gap:7px;margin-top:11px}.deadlineLedger article{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 11px;border:1px solid #e0e7ef;border-radius:12px;background:#fff}
-.deadlineLedger b{display:block;color:#314965;font-size:13px}.deadlineLedger small{display:block;margin-top:2px;color:#8b98aa;font-size:13px}.deadlineLedger p{margin:4px 0 0;color:#667991;font-size:13px;line-height:1.45}.deadlineLedger>article>strong{color:#a44758;font-size:13px}.deadlineLedger button{min-height:34px;padding:0 9px;border:1px solid #dbe3ed;border-radius:9px;background:#fff;color:#61758f;font-size:13px;font-weight:900}
-.deadlineApply{margin-top:10px;border:1px solid #dde5ee;border-radius:13px;background:#fff;overflow:hidden}.deadlineApply>summary{display:flex;justify-content:space-between;gap:10px;align-items:center;min-height:55px;padding:11px 13px;cursor:pointer}.deadlineApply>summary b{display:block;color:#334d6e;font-size:13px}.deadlineApply>summary span{display:block;margin-top:2px;color:#8190a4;font-size:13px}.deadlineApply>summary i{font-style:normal;color:#315efb;font-size:18px}
-.deadlineApplyGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;border-top:1px solid #e3e8ef}.deadlineApplyGrid label{display:grid;gap:4px;color:#687b94;font-size:13px;font-weight:900}.deadlineApplyGrid input,.deadlineApplyGrid select,.deadlineApplyGrid textarea{width:100%;min-height:41px;border:1px solid #dbe4ed;border-radius:10px;background:#fff;padding:9px 10px;color:#29425f;font-size:13px}.deadlineReason{grid-column:1/-1}.deadlineReason textarea{line-height:1.45}.deadlineGuide{grid-column:1/4;padding:10px;border-radius:11px;background:#f2f5fa}.deadlineGuide b{display:block;color:#385576;font-size:13px}.deadlineGuide p{margin:3px 0 0;color:#718198;font-size:13px;line-height:1.45}.deadlineApplyGrid>.primary{align-self:stretch}
-@media(max-width:800px){.deadlineApplyGrid{grid-template-columns:1fr 1fr}.deadlineReason,.deadlineGuide{grid-column:1/-1}.deadlineApplyGrid>.primary{grid-column:1/-1}.deadlineLedger article{grid-template-columns:1fr auto}.deadlineLedger button{grid-column:1/-1}}
-@media(max-width:550px){.deadlineControl>header{align-items:flex-start;flex-direction:column}.deadlineCount{width:100%}.deadlineApplyGrid{grid-template-columns:1fr}.deadlineReason,.deadlineGuide,.deadlineApplyGrid>.primary{grid-column:auto}}
 
 
 /* Presidential election laboratory */
