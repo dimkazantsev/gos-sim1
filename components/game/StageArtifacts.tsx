@@ -1,7 +1,7 @@
 'use client';
 import {useState} from 'react';
 import StageDocumentForm from './StageDocumentForm';
-import {ArrowUpRight,CheckCircle2,FilePlus2,FileText,Vote} from 'lucide-react';
+import {ArrowUpRight,CheckCircle2,FilePlus2,FileText,Link2,PartyPopper,Vote} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage,View} from './types';
 import {DOCUMENT_TEMPLATES} from './documentTemplates';
@@ -29,7 +29,15 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
  const task=STAGE_FORMS[stage.stage_no];if(!task)return null;
  const docs=g.formalDocuments.filter(d=>d.stage_no===stage.stage_no),votes=g.votes.filter(v=>v.stage_no===stage.stage_no);
  const completed=stage.status==='completed';
+ const partySync=stage.stage_no===1?g.parties.map(p=>({
+  ...p,
+  documents:g.partyDocuments.filter(d=>d.party_id===p.id)
+ })):[];
  return <section className="stageArtifacts surface"><header><div><small>ФОРМЫ И РЕЗУЛЬТАТЫ · ЭТАП {stage.stage_no}</small><h3>{task.title}</h3></div>{completed&&<span><CheckCircle2 size={18}/> Завершён</span>}</header><p>{task.help}</p>
+ {stage.stage_no===1&&<section className="stageProfileSync">
+  <div className="stageProfileSyncHead"><div><Link2 size={18}/><span><small>СИНХРОНИЗАЦИЯ</small><b>Данные из раздела «Партии / фракции»</b></span></div>{onNavigate&&<button type="button" onClick={()=>onNavigate('parties')}>Открыть партии <ArrowUpRight size={15}/></button>}</div>
+  {partySync.length?<div className="stagePartySyncGrid">{partySync.map(p=><article key={p.id}><div><PartyPopper size={17}/><span><b>{p.name}</b><small>{p.ideology||'Идеология не указана'}</small></span></div><div className="stagePartySyncMeta"><span className={'is-'+p.registration_status}>{p.registration_status==='registered'?'Зарегистрирована':p.registration_status==='submitted'?'На проверке':p.registration_status==='revision'?'Нужна доработка':p.registration_status==='rejected'?'Отклонена':'Черновик'}</span><span>{p.documents.length} док.</span></div></article>)}</div>:<div className="stageProfileSyncEmpty">Партии ещё не созданы. Создайте партию в профильном разделе — она автоматически появится здесь.</div>}
+ </section>}
  <div className="stageArtifactActions">{task.templates.map(key=>{const t=DOCUMENT_TEMPLATES.find(x=>x.key===key);return t&&<button type="button" key={key} disabled={readOnly} aria-expanded={form===key} onClick={()=>{setForm(form===key?'':key);setSaved('')}}><FilePlus2 size={18}/><span>{t.title}</span></button>})}{task.target&&onNavigate&&<button type="button" onClick={()=>onNavigate(task.target!)}><ArrowUpRight size={18}/><span>Открыть {({parties:'партии',votes:'голосования',budget:'бюджет',events:'события',grades:'журнал оценок'} as Partial<Record<View,string>>)[task.target]||'раздел'}</span></button>}</div>
  {form&&!readOnly&&<StageDocumentForm key={form} g={g} templateKey={form} stageNo={stage.stage_no} onCancel={()=>setForm('')} onSaved={()=>{setSaved('Черновик сохранён в реестре НПА и связан с этапом.');setForm('')}}/>}
  {saved&&<p className="stageDocumentSaved" role="status">{saved}</p>}
