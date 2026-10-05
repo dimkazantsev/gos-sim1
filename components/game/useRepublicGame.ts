@@ -362,7 +362,9 @@ export function useRepublicGame(gameId:string){
   const r=await supabase.rpc('configure_stage_deadline',{p_game_id:gameId,p_stage_no:stageNo,p_deadline:deadline,
    p_inclusive:inclusive,p_penalty_points:penalty,p_penalty_description:description});
   if(r.error){setError(r.error.message);return false}
-  await refresh();return true;
+  await refresh();
+  if(typeof window!=='undefined')window.dispatchEvent(new CustomEvent('gos-stage-policy-updated',{detail:{gameId,stageNo}}));
+  return true;
  }
  async function setStageDeadline(stageId:string,value:string){const r=await supabase.from('game_stages').update({deadline:value?new Date(value).toISOString():null}).eq('id',stageId);if(r.error)setError(r.error.message);else await refresh()}
 
