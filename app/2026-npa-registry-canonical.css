@@ -245,6 +245,15 @@
 .legalPortal .registryCard .formalRegistryActions>.legalVoteShortcut{
   border-color:#e4cf99!important;background:#fff8e9!important;color:#82621e!important
 }
+.legalPortal .registryCard .formalRegistryActions>.legalDeleteDocument{
+  border-color:#ebcdd3!important;background:#fff!important;color:#a54659!important
+}
+.legalPortal .registryCard .formalRegistryActions>.legalDeleteDocument:hover:not(:disabled){
+  border-color:#ddaab4!important;background:#fff5f7!important;color:#96384c!important
+}
+.legalPortal .registryCard .formalRegistryActions>.legalDeleteDocument>svg{
+  width:16px!important;height:16px!important;display:block!important;position:static!important;margin:0!important
+}
 .legalPortal .registryCard .formalRegistryActions>button:hover{
   filter:none!important;transform:none!important;border-color:#9eb5df!important;background:#e6efff!important
 }
