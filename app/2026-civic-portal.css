@@ -142,11 +142,19 @@
 .civicParties {display:grid;gap:20px;min-width:0}
 .civicParties h1 {font-size:30px}
 .civicPartyTiles {display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;min-width:0}
-.civicPartyTile {display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:start;padding:18px;border:1px solid #d5e1f0;border-radius:12px;background:#fff;min-width:0;text-align:left;cursor:pointer;color:#315174}
-.civicPartyTile.active {border:2px solid #5c83c5;padding:17px;background:#f5f8ff}
-.civicPartyTile>span:nth-child(2) {display:grid;gap:6px;min-width:0;line-height:1.6}
+.civicPartyTile {position:relative;min-width:0;border:1px solid #d5e1f0;border-radius:12px;background:#fff;color:#315174;overflow:hidden}
+.civicPartyTile.active {border:2px solid #5c83c5;background:#f5f8ff}
+.civicPartyTileSelect {display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:start;width:100%;min-width:0;min-height:100%;padding:18px 56px 18px 18px;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}
+.civicPartyTile.active .civicPartyTileSelect {padding:17px 55px 17px 17px}
+.civicPartyTileSelect:hover {background:#f8fbff}
+.civicPartyTile.active .civicPartyTileSelect:hover {background:#f0f5ff}
+.civicPartyTileCopy {display:grid;gap:6px;min-width:0;line-height:1.6}
 .civicPartyTile small {font-size:12px;color:#6c829e}
 .civicPartyTileStats {grid-column:1/-1;font-size:12px;line-height:1.8}
+.civicPartyDelete {position:absolute;top:12px;right:12px;z-index:2;display:grid;place-items:center;width:36px;height:36px;min-width:36px;min-height:36px;padding:0;border:1px solid #ebcdd3;border-radius:10px;background:#fff;color:#a54659;box-shadow:0 3px 10px rgba(80,38,51,.05)}
+.civicPartyDelete:hover:not(:disabled) {border-color:#dca9b4;background:#fff3f5;color:#96384c}
+.civicPartyDelete:disabled {opacity:.55;cursor:wait}
+.civicPartyDelete>svg {display:block;margin:0;position:static}
 .civicPartyLogo {display:grid;place-items:center;flex:none;width:48px;height:48px;border-radius:10px;overflow:hidden;color:#fff;font-size:24px;font-weight:800}
 .civicPartyLogo img {width:100%;height:100%;object-fit:contain;background:#fff}
 .civicPartyPublic {display:grid;gap:24px;min-width:0;background:#fff;border:1px solid #d5e1f0;border-radius:14px;padding:28px}
@@ -226,6 +234,7 @@
 
 /* Party disclosure controls: compact but vertically centered on narrow screens. */
 @media(max-width:650px){
+ .civicPartyTileSelect{padding:15px 52px 15px 15px}.civicPartyTile.active .civicPartyTileSelect{padding:14px 51px 14px 14px}.civicPartyDelete{top:10px;right:10px;width:34px;height:34px;min-width:34px;min-height:34px}
  .civicPartyDisclosureSummary{grid-template-columns:40px minmax(0,1fr) 34px;gap:11px;min-height:68px;padding:10px 12px}
  .civicPartyDisclosureIcon{width:40px;height:40px;border-radius:11px}
  .civicPartyDisclosureText{min-height:40px}
