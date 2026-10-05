@@ -84,8 +84,22 @@ export default function StageReadinessPanel({g,stageNo,compact=false,rulesUrl,ru
   </header>
 
   {(blockerCount>0||warningCount>0)&&<div className={'stageReadinessChecklist '+((blockerCount>0)!==(warningCount>0)?'single':'')}>
-   {blockerCount>0&&<section className="stageReadinessGroup blockers"><header><XCircle size={17}/><div><b>Обязательно завершить</b><small>Без этого этап процедурно не закрыт</small></div></header><ul>{state!.blockers.map(x=><li key={x}><span aria-hidden="true">•</span><p>{x}</p></li>)}</ul></section>}
-   {warningCount>0&&<section className="stageReadinessGroup warnings"><header><AlertTriangle size={17}/><div><b>Проверьте перед переходом</b><small>Не блокирует этап, но требует внимания</small></div></header><ul>{state!.warnings.map(x=><li key={x}><span aria-hidden="true">•</span><p>{x}</p></li>)}</ul></section>}
+   {blockerCount>0&&<section className="stageReadinessGroup blockers">
+    <header>
+     <span className="stageReadinessGroupIcon" aria-hidden="true"><XCircle size={17}/></span>
+     <div><b>Нужно завершить</b><small>{blockerCount===1?'Одно обязательное условие блокирует переход':blockerCount+' обязательных условий блокируют переход'}</small></div>
+     <span className="stageReadinessGroupCount" aria-label={'Обязательных условий: '+blockerCount}>{blockerCount}</span>
+    </header>
+    <ol>{state!.blockers.map((x,i)=><li key={x}><span className="stageReadinessItemIndex" aria-hidden="true">{String(i+1).padStart(2,'0')}</span><p>{x}</p></li>)}</ol>
+   </section>}
+   {warningCount>0&&<section className="stageReadinessGroup warnings">
+    <header>
+     <span className="stageReadinessGroupIcon" aria-hidden="true"><AlertTriangle size={17}/></span>
+     <div><b>Стоит проверить</b><small>{warningCount===1?'Одно замечание не блокирует переход':warningCount+' замечаний не блокируют переход'}</small></div>
+     <span className="stageReadinessGroupCount" aria-label={'Замечаний: '+warningCount}>{warningCount}</span>
+    </header>
+    <ol>{state!.warnings.map((x,i)=><li key={x}><span className="stageReadinessItemIndex" aria-hidden="true">{String(i+1).padStart(2,'0')}</span><p>{x}</p></li>)}</ol>
+   </section>}
   </div>}
 
   {state?.ready&&!warningCount&&<div className="stageReadinessOk"><CheckCircle2 size={19}/><div><b>Все обязательные процедуры зафиксированы</b><span>Этап может быть завершён или использован как основание для перехода к следующему.</span></div></div>}
