@@ -40,11 +40,12 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
   if(!game||!stage)return;
   let active=true;
   const gameId=game.id;
+  const stageDeadline=stage.deadline;
   async function loadRule(){
    const {data,error}=await supabase.from('stage_deadline_rules').select('*').eq('game_id',gameId).eq('stage_no',stageNo).maybeSingle();
    if(!active)return;
    if(error){setMessage(error.message);return}
-   setDeadline(localDate(data?.deadline_at??stage.deadline));
+   setDeadline(localDate(data?.deadline_at??stageDeadline));
    setInclusive(data?.inclusive??true);
    setPenalty(String(data?.penalty_points??0));
    setDescription(data?.penalty_description??'За просрочку отчёта по этапу');
