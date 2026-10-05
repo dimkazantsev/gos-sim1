@@ -10,14 +10,14 @@ import {votePresetForDocument,institutionLabel,majorityLabel} from './procedural
 import VoteBallotControls from './VoteBallotControls';
 import {VOTING_BODIES,type VotingUnit} from './votingBodies';
 import {useSavedGameState,savedChoice} from './useSavedGameState';
-import {Vote as VoteIcon} from 'lucide-react';
+import {Trash2,Vote as VoteIcon} from 'lucide-react';
 import DisclosureSummary from '../ui/DisclosureSummary';
 
 function pct(n:number,d:number){return d>0?Math.round(n/d*100):0}
 function time(v:string){return new Date(v).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
 
 export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClearFocus}:{g:ReturnTypeRepublic;onOpenDocument:(id:string)=>void;onOpenStages:()=>void;focusId?:string;onClearFocus?:()=>void}){
- const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,createVote,canVote,castVote,closeVote,tally,quorum}=g;
+ const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,createVote,canVote,castVote,closeVote,deleteVote,tally,quorum}=g;
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[mode,setMode]=useState<'member'|'faction'|'mandate'>('member');
  const [institution,setInstitution]=useState('all'),[quorumValue,setQuorumValue]=useState(0.5),[majorityKind,setMajorityKind]=useState<'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction'>('present_majority'),[majorityValue,setMajorityValue]=useState(0.5);
  const [tab,setTab]=useSavedGameState<'open'|'closed'|'all'>(g.game?.id,g.me?.user_id,'votes-tab','open',savedChoice('open','closed','all')),[busy,setBusy]=useState('');
@@ -62,6 +62,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   if(ok){setTitle('');setBody('');setFormalId('')}
  }
 
+ function canDelete(v:Vote){return !!me&&(teacher||v.created_by===me.user_id)}
  function canClose(v:Vote){
   if(teacher)return true;if(!me)return false;if(units.some(u=>'unit:'+u.id===v.institution_key&&u.head_user_id===me.user_id))return true;
   const role=(me.role_title||'').toLowerCase();
@@ -122,10 +123,16 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    const denominator=Math.max(1,t.yes+t.no+t.abstain);
    const rule=majorityLabel(v.majority_kind,Number(v.majority_value));
    return <article id={'vote-'+v.id} tabIndex={-1} className={'proceduralVoteCard '+v.status+(focusId===v.id?' isFocused':'')} key={v.id}>
-    <header>
-     <div className="voteInstitution"><span>✓</span><div><small>{v.electorate_snapshot?.institution_label||institutionLabel(v.institution_key)}</small><b>{v.title}</b></div></div>
-     <div className={'voteState '+(v.status==='open'?'live':v.result_code||'closed')}>{v.status==='open'?'● ГОЛОСОВАНИЕ ИДЁТ':v.result_label||'ЗАВЕРШЕНО'}</div>
-    </header>
+     <header>
+      <div className="voteInstitution"><span>✓</span><div><small>{v.electorate_snapshot?.institution_label||institutionLabel(v.institution_key)}</small><b>{v.title}</b></div></div>
+      <div className="voteCardHeaderActions">
+       <div className={'voteState '+(v.status==='open'?'live':v.result_code||'closed')}>{v.status==='open'?'● ГОЛОСОВАНИЕ ИДЁТ':v.result_label||'ЗАВЕРШЕНО'}</div>
+       {canDelete(v)&&<button type="button" className="deleteProceduralVote" aria-label={'Удалить голосование «'+v.title+'»'} title="Удалить голосование" disabled={busy==='delete:'+v.id} onClick={async()=>{
+        const warning=v.status==='open'?'Удалить это голосование? Поданные голоса будут удалены, а связанный процесс вернётся в состояние до открытия голосования.':'Удалить завершённое голосование? Карточка и бюллетени будут удалены. Уже применённые результаты процесса не откатываются.';
+        if(!confirm(warning))return;setBusy('delete:'+v.id);await deleteVote(v.id);setBusy('');
+       }}>{busy==='delete:'+v.id?<span className="voteDeleteBusy" aria-hidden="true">…</span>:<Trash2 size={18}/>}</button>}
+      </div>
+     </header>
 
     {(doc||stage)&&<div className="voteRelations">
      {doc&&<button onClick={()=>onOpenDocument(doc.id)}><small>СВЯЗАННЫЙ НПА</small><b>{doc.registry_no}</b><span>{doc.title}</span></button>}
