@@ -66,7 +66,6 @@ export default function StageWorkspace({
  const votes=g.votes.filter(v=>v.stage_no===stage.stage_no);
  const openVotes=votes.filter(v=>v.status==='open');
  const completedDocs=docs.filter(d=>['published','signed','adopted'].includes(d.status_code)).length;
- const outputProgress=detail.outputs.length?Math.min(100,Math.round((completedDocs+Math.min(votes.length,1))/Math.max(1,detail.outputs.length)*100)):0;
  const primaryView=task?.target;
  const primaryLabel=primaryView?VIEW_LABELS[primaryView]||'профильный раздел':'эта страница';
 
@@ -90,7 +89,7 @@ export default function StageWorkspace({
     <div><small>Документы</small><b>{docs.length}</b><span>{completedDocs} финализировано</span></div>
     <div><small>Голосования</small><b>{votes.length}</b><span>{openVotes.length?openVotes.length+' требуют действия':'Нет открытых'}</span></div>
     <div><small>Результаты</small><b>{detail.outputs.length}</b><span>контрольных итогов</span></div>
-    <div><small>Ориентир</small><b>{outputProgress}%</b><span>по сохранённым результатам</span></div>
+    <div><small>Маршрут</small><b>{detail.steps.length}</b><span>пошаговых действий</span></div>
    </div>
   </header>
 
