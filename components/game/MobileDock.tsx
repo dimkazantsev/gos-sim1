@@ -227,7 +227,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
     </button>)}
     {onChat&&<button type="button" className={'mobileDockChat mobileDockItem '+(chatOpen?'active':'')}
      aria-controls="game-chat" aria-expanded={chatOpen} aria-label={chatOpen?'Закрыть чат':'Открыть чат'}
-     onClick={()=>{setOptimisticView(null);onChat()}}><span className="mobileDockIcon"><MessageCircle aria-hidden="true"/></span><span className="mobileDockLabel">Чат</span></button>}
+     onClick={()=>{setOptimisticView(null);onChat?.()}}><span className="mobileDockIcon"><MessageCircle aria-hidden="true"/></span><span className="mobileDockLabel">Чат</span></button>}
    </div>
    <div className="mobileDockFixed">
     {pinnedItems.length>0&&<div className="mobileDockPinned" aria-label="Закреплённые разделы">
