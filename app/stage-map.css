@@ -777,3 +777,135 @@
  .stageWorkspacePage .stageArtifactActions{display:grid;grid-template-columns:minmax(0,1fr)}
  .stageWorkspacePage .stageArtifactActions>button{width:100%}
 }
+
+
+/* Full stage document dossier */
+.stageWorkspacePage .stageDocumentFormFull{
+ margin:16px 0 0;
+ padding:20px;
+ border:1px solid #cbd9ec;
+ border-radius:16px;
+ background:#f8faff;
+}
+.stageWorkspacePage .stageDocumentFormFull>header{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:16px;
+ padding-bottom:14px;
+ border-bottom:1px solid #e0e8f3;
+}
+.stageWorkspacePage .stageDocumentFormFull>header svg{color:#315efb;flex:none}
+.stageWorkspacePage .stageDocumentFormFull>header h4{margin:4px 0 0;color:#173c70;font-size:20px}
+.stageWorkspacePage .stageDocumentFormFull>p{color:#536a87;line-height:1.65}
+.stageWorkspacePage .stageDocumentSection{
+ margin-top:14px;
+ padding:16px;
+ border:1px solid #dde6f1;
+ border-radius:13px;
+ background:#fff;
+}
+.stageWorkspacePage .stageDocumentSectionHead{
+ display:grid;
+ grid-template-columns:34px minmax(0,1fr);
+ gap:10px;
+ align-items:start;
+ margin-bottom:14px;
+}
+.stageWorkspacePage .stageDocumentSectionHead>small{
+ display:grid;
+ place-items:center;
+ width:34px;
+ height:34px;
+ border-radius:9px;
+ background:#eaf1ff;
+ color:#315efb;
+ font-weight:900;
+}
+.stageWorkspacePage .stageDocumentSectionHead b{display:block;color:#173c70;font-size:14px}
+.stageWorkspacePage .stageDocumentSectionHead span{display:block;margin-top:2px;color:#75869c;font-size:11px;line-height:1.45}
+.stageWorkspacePage .stageDocumentFields{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:14px;
+ margin:0;
+}
+.stageWorkspacePage .stageDocumentFields>label{
+ display:flex;
+ flex-direction:column;
+ gap:7px;
+ min-width:0;
+ color:#4d6480;
+ font-size:12px;
+ font-weight:750;
+}
+.stageWorkspacePage .stageDocumentFields input:not([type=file]),
+.stageWorkspacePage .stageDocumentFields textarea{
+ width:100%;
+ min-width:0;
+ box-sizing:border-box;
+ border:1px solid #ccd9ea;
+ border-radius:10px;
+ background:#fff;
+ color:#17314f;
+}
+.stageWorkspacePage .stageDocumentFields input:not([type=file]){min-height:44px;padding:0 12px}
+.stageWorkspacePage .stageDocumentFields textarea{padding:12px 13px;line-height:1.65;resize:vertical}
+.stageWorkspacePage .stageDocumentWide,
+.stageWorkspacePage .stageDocumentBody,
+.stageWorkspacePage .stageDocumentUpload{grid-column:1/-1}
+.stageWorkspacePage .stageDocumentUpload{
+ padding:14px;
+ border:1px dashed #bdcce0;
+ border-radius:11px;
+ background:#fbfcfe;
+}
+.stageWorkspacePage .stageDocumentUpload input{
+ width:100%;
+ min-height:42px;
+ box-sizing:border-box;
+ padding:8px;
+ border:1px solid #d7e0eb;
+ border-radius:8px;
+ background:#fff;
+}
+.stageWorkspacePage .stageDocumentUpload small{
+ margin-top:3px;
+ color:#7a8ca2;
+ text-transform:none;
+ letter-spacing:0;
+ font-weight:650;
+}
+.stageWorkspacePage .stageDocumentFormFull>footer{
+ display:flex;
+ justify-content:flex-end;
+ gap:9px;
+ flex-wrap:wrap;
+ margin-top:16px;
+}
+.stageWorkspacePage .stageDocumentFormFull>footer button{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:8px;
+ min-height:44px;
+}
+.stageWorkspacePage .stageDocumentHint{
+ display:flex;
+ align-items:center;
+ gap:8px;
+ margin:12px 0 0!important;
+ color:#2d755b!important;
+ font-size:12px!important;
+}
+.stageWorkspacePage .stageDocumentHint svg{flex:none}
+@media(max-width:680px){
+ .stageWorkspacePage .stageDocumentFields{grid-template-columns:minmax(0,1fr)}
+ .stageWorkspacePage .stageDocumentWide,
+ .stageWorkspacePage .stageDocumentBody,
+ .stageWorkspacePage .stageDocumentUpload{grid-column:auto}
+ .stageWorkspacePage .stageDocumentSection{padding:13px}
+ .stageWorkspacePage .stageDocumentFormFull{padding:14px}
+ .stageWorkspacePage .stageDocumentFormFull>footer{display:grid;grid-template-columns:1fr}
+ .stageWorkspacePage .stageDocumentFormFull>footer button{width:100%}
+}
