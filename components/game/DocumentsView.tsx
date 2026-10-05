@@ -6,7 +6,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import type {FormalDocument} from './types';
 import {FORMAL_SUBJECTS,FORMAL_TYPES,inferFormal,formalSignature,ownerLabel} from './formalInstitutions';
 import {votePresetForDocument} from './proceduralVoting';
-import {ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,CircleDot,Clock3,ClipboardList,FilePlus2,FileText,Paperclip,Plus,Printer,Route,Search,Undo2,Upload,Vote,X,XCircle} from 'lucide-react';
+import {ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,CircleDot,Clock3,ClipboardList,FilePlus2,FileText,Paperclip,Plus,Printer,Route,Search,Trash2,Undo2,Upload,Vote,X,XCircle} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import DocumentPaper from './DocumentPaper';
 import BudgetDocumentAnnex from './BudgetDocumentAnnex';
@@ -37,7 +37,7 @@ function readableBillIssue(issue:string){
 }
 
 export default function DocumentsView({g,focusId,createTemplate,createStageNo,onOpenVotes,onSelectDocument,onOpenBudget,readOnly=false,initialDetailTab='text'}:{g:ReturnTypeRepublic;initialDetailTab?:'text'|'procedure';focusId?:string;createTemplate?:string;createStageNo?:number;onOpenVotes:(voteId?:string)=>void;onSelectDocument?:(id?:string)=>void;onOpenBudget?:()=>void;readOnly?:boolean}){
- const {formalDocuments,formalHistory,votes,members,me,teacher,currentStage,createFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,createVote}=g;
+ const {formalDocuments,formalHistory,votes,members,me,teacher,currentStage,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,createVote}=g;
  const [mode,setMode]=useSavedGameState<'registry'|'create'>(g.game?.id,g.me?.user_id,'documents-mode','registry',savedChoice('registry','create')),[selectedId,setSelectedId]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-selected','',savedString),[query,setQuery]=useState(''),[filterSubject,setFilterSubject]=useState(''),[filterStatus,setFilterStatus]=useState(''),[sortOrder,setSortOrder]=useState('updated');
  const [detailOpen,setDetailOpen]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-detail',!!focusId,savedBoolean),[detailTab,setDetailTab]=useSavedGameState<'text'|'procedure'|'package'>(g.game?.id,g.me?.user_id,'documents-tab',initialDetailTab,savedChoice('text','procedure','package'));
  const [detailReturn,setDetailReturn]=useState<'registry'|'create'>('registry');
@@ -150,6 +150,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const signatureHolder=selected?(personalSigner?author:(members.find(m=>subject?.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||author)):undefined;
  const signature=selected?formalSignature(selected.subject_key,signatureHolder?.full_name||author?.full_name||'________________'):null;
 
+ function canDeleteDocument(doc:FormalDocument){return !readOnly&&!!me&&(teacher||doc.author_id===me.user_id)}
  function canManage(doc:FormalDocument){
   if(doc.id===selected?.id&&documentAccess)return !readOnly&&documentAccess.can_manage;
   if(readOnly)return false;if(teacher)return true;if(!me)return false;if(doc.current_owner_key==='author')return doc.author_id===me.user_id;
@@ -407,7 +408,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
       <div className="registryCardTitle"><h3>{d.title}</h3><p>{d.subject_label}</p></div>
       <div className="registryCardProgress"><div><span>Этап {step} из {totalSteps}</span><b>{ownerLabel(d.current_owner_key)}</b></div><div className="registryCardProgressTrack" aria-label={'Прогресс документа '+completion+'%'}><i style={{width:completion+'%'}}/></div></div>
       <div className="registryCardMeta"><span><Clock3 size={14}/> Обновлён {shortDate(d.updated_at)}</span>{voting&&<strong><Vote size={14}/> Идёт голосование</strong>}</div>
-      <footer className="formalRegistryRowActions"><span>Ответственный: {ownerLabel(d.current_owner_key)}</span><div className="formalRegistryActions">{votes.find(v=>v.formal_document_id===d.id&&v.status==='open')&&<button type="button" className="legalVoteShortcut" onClick={()=>onOpenVotes(votes.find(v=>v.formal_document_id===d.id&&v.status==='open')?.id)}>Голосование</button>}<button type="button" className="legalOpenDocument" onClick={()=>openRegistryDocument(d.id)}>Открыть документ →</button></div></footer>
+       <footer className="formalRegistryRowActions"><span>Ответственный: {ownerLabel(d.current_owner_key)}</span><div className="formalRegistryActions">{votes.find(v=>v.formal_document_id===d.id&&v.status==='open')&&<button type="button" className="legalVoteShortcut" onClick={()=>onOpenVotes(votes.find(v=>v.formal_document_id===d.id&&v.status==='open')?.id)}>Голосование</button>}{canDeleteDocument(d)&&<button type="button" className="legalDeleteDocument" aria-label={'Удалить НПА «'+d.title+'»'} title="Удалить НПА" disabled={busy} onClick={async()=>{const hasOpenVote=votes.some(v=>v.formal_document_id===d.id&&v.status==='open');const warning=hasOpenVote&&teacher?'Удалить этот НПА вместе с открытым голосованием? История документа и связанные записи будут удалены.':'Удалить этот НПА? История документа и связанные записи будут удалены.';if(!confirm(warning))return;setBusy(true);const ok=await deleteFormalDocument(d.id);if(ok&&selectedId===d.id){setSelectedId('');setDetailOpen(false);onSelectDocument?.();}setBusy(false)}}><Trash2 size={16}/><span>Удалить</span></button>}<button type="button" className="legalOpenDocument" onClick={()=>openRegistryDocument(d.id)}>Открыть документ →</button></div></footer>
      </article>
     }):<div className="registryEmptyState"><Search size={26}/><div><b>Документы не найдены</b><span>Измените запрос или сбросьте фильтры.</span></div><button type="button" className="secondary" onClick={()=>{setQuery('');setFilterSubject('');setFilterStatus('')}}>Показать все</button></div>}</div>
    </aside>
