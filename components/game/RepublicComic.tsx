@@ -159,16 +159,26 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
     <div className={styles.libraryHeading}><h2>Архив комиксов</h2><p>Пролог доступен всегда. Итоги и анонсы сохраняются по мере завершения этапов вашей игры.</p></div>
     <div className={styles.libraryGrid}>
      <button type="button" className={styles.libraryCard} onClick={openIntro}>
-      <div className={styles.cover}>
+      <div className={`${styles.cover} ${styles.prologueCover}`}>
        <img
         className={styles.archivePrologueCover}
-        src={(process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'')+'/republic-art/archive-prologue-storm.webp?v=storm-ocean-20261005'}
+        src={(process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'')+'/republic-art/archive-prologue-storm.webp?v=storm-ocean-20261005b'}
         alt="Республика после бури — обложка пролога."
         width={1920}
         height={1080}
         loading="eager"
         decoding="async"
        />
+       <span className={styles.prologueCoverShade} aria-hidden="true"/>
+       <span className={styles.prologueCoverGrid} aria-hidden="true"/>
+       <div className={styles.prologueCoverTop} aria-hidden="true">
+        <b>GOS//SIMS</b>
+        <span><BookOpen size={16}/></span>
+       </div>
+       <div className={styles.prologueCoverCaption} aria-hidden="true">
+        <small>ПРОЛОГ · ДЕНЬ НОЛЬ</small>
+        <strong>РЕСПУБЛИКА ПОСЛЕ БУРИ</strong>
+       </div>
       </div>
       <div className={styles.cardText}><small>Пролог · 4 сцены</small><strong>Пролог Республики</strong><span>Республика после бури: с чего начинается ваша история.</span><b>Открыть пролог <ArrowRight size={16}/></b></div>
      </button>
