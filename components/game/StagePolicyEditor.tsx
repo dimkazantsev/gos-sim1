@@ -39,8 +39,9 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
  useEffect(()=>{
   if(!game||!stage)return;
   let active=true;
+  const gameId=game.id;
   async function loadRule(){
-   const {data,error}=await supabase.from('stage_deadline_rules').select('*').eq('game_id',game.id).eq('stage_no',stageNo).maybeSingle();
+   const {data,error}=await supabase.from('stage_deadline_rules').select('*').eq('game_id',gameId).eq('stage_no',stageNo).maybeSingle();
    if(!active)return;
    if(error){setMessage(error.message);return}
    setDeadline(localDate(data?.deadline_at??stage.deadline));
@@ -52,7 +53,7 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
   }
   const sync=(event:Event)=>{
    const detail=(event as CustomEvent<{gameId?:string;stageNo?:number}>).detail;
-   if(detail?.gameId===game.id&&detail?.stageNo===stageNo)void loadRule();
+   if(detail?.gameId===gameId&&detail?.stageNo===stageNo)void loadRule();
   };
   void loadRule();
   window.addEventListener('gos-stage-policy-updated',sync);
