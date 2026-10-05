@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
-import type {StageReadiness} from './StageReadinessPanel';
+import StageReadinessPanel,{type StageReadiness} from './StageReadinessPanel';
 import {CheckCircle2,ChevronRight,CircleDot,LockKeyhole,RefreshCw,RotateCcw,Search,ShieldAlert,X} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -135,12 +135,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
      </div>
      <button type="button" className="teacherStageInspectorReset" onClick={()=>askReset(selectedStage.stage_no)} title="Сбросить этот этап" aria-label={'Сбросить этап '+selectedStage.stage_no} disabled={busy}><RotateCcw size={17}/></button></header>
      {selectedStage.summary&&<p className="teacherStageInspectorSummary">{selectedStage.summary}</p>}
-     <section className="teacherStageInspectorSection"><h4>Процедурная готовность</h4>
-      {selectedReady?<><p>{selectedReady.ready?'Основные требования выполнены.':'Необходимо выполнить процедуры.'}</p>
-       {selectedReady.blockers.map((v,i)=><p className="blocked" key={'b'+i}>{v}</p>)}
-       {selectedReady.warnings.map((v,i)=><p className="warning" key={'w'+i}>{v}</p>)}
-      </>:<p>Идёт проверка готовности.</p>}
-     </section>
+     <StageReadinessPanel g={g} stageNo={selectedStage.stage_no} compact/>
      <StagePolicyEditor key={selectedStage.id} g={g} stageNo={selectedStage.stage_no}/>
      <DeadlineControl g={g} stageNo={selectedStage.stage_no}/>
      <div className="teacherStageInspectorActions">
