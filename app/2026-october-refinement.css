@@ -222,3 +222,297 @@
 @media(max-width:650px){
  .civicVotes{--votes-section-gap:20px}
 }
+
+
+/* Mobile reliability pass: dock, journal and stage controls */
+@media(max-width:900px){
+ .mobileDock.mobileDockV2{
+  align-items:center;
+  min-height:64px;
+  padding-top:6px;
+  padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));
+ }
+ .mobileDockV2 .mobileDockScroll{
+  align-items:center;
+  gap:4px;
+  padding:0 5px 0 0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  touch-action:pan-x!important;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+ }
+ .mobileDockV2 .mobileDockItem,
+ .mobileDockV2 .mobileDockScroll>.mobileDockChat,
+ .mobileDockV2 .mobileDockPinnedItem,
+ .mobileDockV2 .mobileDockFixed>button{
+  box-sizing:border-box;
+  flex:0 0 60px;
+  width:60px;
+  min-width:60px;
+  max-width:60px;
+  height:54px;
+  min-height:54px;
+  max-height:54px;
+  display:grid;
+  grid-template-rows:20px 22px;
+  align-content:center;
+  justify-items:center;
+  row-gap:3px;
+  padding:4px 3px;
+  touch-action:pan-x!important;
+  -webkit-tap-highlight-color:transparent;
+ }
+ .mobileDockV2 .mobileDockIcon,
+ .mobileDockV2 .mobileDockScroll>.mobileDockChat .mobileDockIcon{
+  position:relative;
+  width:20px;
+  height:20px;
+  min-height:20px;
+  display:grid;
+  place-items:center;
+  align-self:center;
+  justify-self:center;
+ }
+ .mobileDockV2 .mobileDockIcon>svg,
+ .mobileDockV2 .mobileDockScroll>.mobileDockChat .mobileDockIcon>svg,
+ .mobileDockV2 .mobileDockFixed>button>svg{
+  display:block;
+  width:18px;
+  height:18px;
+  margin:0;
+  position:static;
+  align-self:center;
+  justify-self:center;
+ }
+ .mobileDockV2 .mobileDockLabel,
+ .mobileDockV2 .mobileDockFixed>button>span{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  width:100%;
+  min-width:0;
+  height:22px;
+  min-height:22px;
+  max-height:22px;
+  margin:0;
+  overflow:hidden;
+  white-space:normal;
+  overflow-wrap:normal;
+  word-break:normal;
+  text-align:center;
+  font-size:9px;
+  line-height:1.12;
+  font-weight:760;
+ }
+ .mobileDockV2 .mobileDockItem.active,
+ .mobileDockV2 .mobileDockScroll>.mobileDockChat.active,
+ .mobileDockV2 .mobileDockFixed>button.active{
+  background:#eef3ff;
+  border-color:#cbd9f5;
+  color:#315dba;
+ }
+ .mobileDockV2 .mobileDockFixed{
+  display:flex;
+  align-items:center;
+  flex:0 0 auto;
+  width:auto;
+  max-width:none;
+  min-width:0;
+  padding-left:5px;
+  border-left:1px solid #e1e8f1;
+ }
+ .mobileDockV2 .mobileDockFixed>button.mobileDockAll,
+ .mobileDockV2 .mobileDockFixed>button.mobileDockDone{
+  flex:0 0 64px;
+  width:64px;
+  min-width:64px;
+  max-width:64px;
+ }
+ .mobileDockV2 .mobileDockPinned{
+  align-items:center;
+  touch-action:pan-x;
+ }
+ .mobileDockV2 :is(.mobileDockItem,.mobileDockPinnedItem,.mobileDockFixed>button):active{
+  transform:scale(.97);
+ }
+ .simContentFlow,.simWorkspace.chatOpen .simContentFlow{
+  padding-bottom:calc(86px + env(safe-area-inset-bottom,0px));
+ }
+}
+
+@media(max-width:650px){
+ .classroomJournal{
+  min-width:0;
+  overflow:hidden;
+ }
+ .journalHeader{
+  display:grid;
+  gap:12px;
+ }
+ .journalCounters{
+  justify-content:flex-start;
+ }
+ .journalToolbar{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:9px;
+ }
+ .journalToolbar>label,
+ .journalToolbar>.styledSelect{
+  width:100%;
+  min-width:0;
+  max-width:none;
+ }
+ .journalPresence{
+  max-width:100%;
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+  touch-action:pan-x;
+ }
+ .journalFeed{
+  min-width:0;
+  padding:0 10px;
+  overflow-x:hidden;
+ }
+ .journalEvent{
+  position:relative;
+  display:grid;
+  grid-template-columns:74px minmax(0,1fr);
+  gap:12px;
+  align-items:start;
+  min-width:0;
+  min-height:0;
+  height:auto;
+  padding:14px 0;
+ }
+ .journalEvent time{
+  grid-column:1;
+  min-width:0;
+  padding-top:2px;
+  font-size:10px;
+  line-height:1.35;
+  white-space:normal;
+ }
+ .journalEventMarker{
+  position:absolute;
+  left:79px;
+  top:19px;
+  width:7px;
+  height:7px;
+  margin:0;
+ }
+ .journalEvent>div{
+  grid-column:2;
+  min-width:0;
+  display:grid;
+  gap:6px;
+  padding-left:2px;
+ }
+ .journalEventTitle{
+  display:grid;
+  gap:5px;
+  min-width:0;
+  align-items:start;
+ }
+ .journalEventTitle strong{
+  min-width:0;
+  font-size:13px;
+  line-height:1.35;
+  overflow-wrap:break-word;
+  word-break:normal;
+ }
+ .journalEventTitle span{
+  justify-self:start;
+  max-width:100%;
+  padding:4px 7px;
+  line-height:1.25;
+  white-space:normal;
+  overflow-wrap:break-word;
+ }
+ .journalEvent p{
+  margin:0;
+  min-width:0;
+  font-size:11px;
+  line-height:1.5;
+  overflow-wrap:break-word;
+  word-break:normal;
+ }
+ .journalMore{
+  width:100%;
+  min-height:46px;
+ }
+ .teacherCommand .teacherWorkspaceNav{
+  overflow-x:auto;
+  overflow-y:hidden;
+  touch-action:pan-x;
+  -webkit-overflow-scrolling:touch;
+ }
+ .teacherCommand .teacherWorkspaceNav>button{
+  flex:0 0 auto;
+  min-height:48px;
+ }
+ .deadlineControlTop,
+ .deadlineControlTop:not(.hasAction),
+ .deadlineControlTop.hasAction{
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:10px;
+ }
+ .deadlineOverview,
+ .deadlineCount,
+ .deadlineApply{
+  min-width:0;
+  width:100%;
+  min-height:0;
+ }
+ .deadlineOverview{
+  padding:15px;
+ }
+ .deadlineCount{
+  min-height:82px;
+ }
+ .deadlineApply{
+  grid-column:auto!important;
+ }
+ .deadlineApply>summary,
+ .deadlineApply[open]>summary{
+  min-height:64px;
+  height:auto;
+  padding:12px 14px;
+ }
+ .deadlineOverviewCopy,
+ .deadlineApply .disclosureText,
+ .deadlineApply .disclosureText :is(b,small){
+  min-width:0;
+  max-width:100%;
+  white-space:normal;
+  overflow-wrap:break-word;
+  word-break:normal;
+  hyphens:none;
+ }
+ .deadlineOverviewCopy>h3{font-size:18px}
+ .deadlineRuleDescription{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+ }
+}
+
+@media(max-width:390px){
+ .mobileDockV2 .mobileDockItem,
+ .mobileDockV2 .mobileDockScroll>.mobileDockChat{
+  flex-basis:56px;
+  width:56px;
+  min-width:56px;
+  max-width:56px;
+ }
+ .mobileDockV2 .mobileDockFixed>button.mobileDockAll,
+ .mobileDockV2 .mobileDockFixed>button.mobileDockDone{
+  flex-basis:60px;
+  width:60px;
+  min-width:60px;
+  max-width:60px;
+ }
+ .journalFeed{padding-inline:8px}
+ .journalEvent{grid-template-columns:66px minmax(0,1fr);gap:10px}
+ .journalEventMarker{left:70px}
+}
