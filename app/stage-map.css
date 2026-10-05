@@ -1096,29 +1096,90 @@
 }
 .stageReadinessGroup{
  min-width:0;
- padding:14px;
- border:1px solid #e0e7f1;
- border-radius:13px;
- background:#fbfcfe;
+ border:1px solid #e2e8f1;
+ border-radius:14px;
+ background:#fff;
+ overflow:hidden;
 }
-.stageReadinessGroup.blockers{border-color:#ebd4d8;background:#fffafb}
-.stageReadinessGroup.warnings{border-color:#eadbb7;background:#fffdf8}
+.stageReadinessGroup.blockers{border-color:#ead2d8;background:#fff}
+.stageReadinessGroup.warnings{border-color:#eadcb9;background:#fff}
 .stageReadinessGroup>header{
  display:grid;
- grid-template-columns:20px minmax(0,1fr);
- gap:8px;
- align-items:start;
+ grid-template-columns:34px minmax(0,1fr) auto;
+ gap:10px;
+ align-items:center;
+ padding:11px 12px;
+ border-bottom:1px solid #edf1f6;
+ background:#fbfcfe;
 }
-.stageReadinessGroup.blockers>header>svg{color:#a54659}
-.stageReadinessGroup.warnings>header>svg{color:#9a6a12}
-.stageReadinessGroup header b{display:block;color:#29496f;font-size:12px}
-.stageReadinessGroup header small{display:block;margin-top:2px;color:#8391a4;font-size:10px;text-transform:none;letter-spacing:0}
-.stageReadinessGroup ul{display:grid;gap:8px;margin:12px 0 0;padding:0;list-style:none}
-.stageReadinessGroup li{display:grid;grid-template-columns:12px minmax(0,1fr);gap:7px;align-items:start;color:#536a87}
-.stageReadinessGroup li>span{font-weight:900}
-.stageReadinessGroup.blockers li>span{color:#c04f62}
-.stageReadinessGroup.warnings li>span{color:#b9811f}
-.stageReadinessGroup li p{margin:0;font-size:11px;line-height:1.55}
+.stageReadinessGroup.blockers>header{background:#fffafb}
+.stageReadinessGroup.warnings>header{background:#fffdf8}
+.stageReadinessGroupIcon{
+ display:grid;
+ place-items:center;
+ width:34px;
+ height:34px;
+ border-radius:10px;
+ background:#f1f5fa;
+ color:#6d8098;
+}
+.stageReadinessGroup.blockers .stageReadinessGroupIcon{background:#fff0f2;color:#a54659}
+.stageReadinessGroup.warnings .stageReadinessGroupIcon{background:#fff4df;color:#936b18}
+.stageReadinessGroup header b{display:block;color:#29496f;font-size:12px;line-height:1.35}
+.stageReadinessGroup header small{display:block;margin-top:2px;color:#8391a4;font-size:9px;line-height:1.35;text-transform:none;letter-spacing:0}
+.stageReadinessGroupCount{
+ display:grid;
+ place-items:center;
+ min-width:28px;
+ height:28px;
+ padding:0 8px;
+ border-radius:999px;
+ background:#f1f5fa;
+ color:#5e7695;
+ font-size:10px;
+ font-weight:900;
+}
+.stageReadinessGroup.blockers .stageReadinessGroupCount{background:#fff0f2;color:#a54659}
+.stageReadinessGroup.warnings .stageReadinessGroupCount{background:#fff4df;color:#936b18}
+.stageReadinessGroup ol{
+ display:grid;
+ gap:0;
+ margin:0;
+ padding:0;
+ list-style:none;
+}
+.stageReadinessGroup li{
+ display:grid;
+ grid-template-columns:30px minmax(0,1fr);
+ gap:10px;
+ align-items:center;
+ min-height:46px;
+ padding:9px 12px;
+ color:#536a87;
+}
+.stageReadinessGroup li+li{border-top:1px solid #edf1f6}
+.stageReadinessItemIndex{
+ display:grid;
+ place-items:center;
+ width:30px;
+ height:30px;
+ border-radius:9px;
+ background:#f3f6fa;
+ color:#71839a;
+ font-size:9px;
+ font-weight:900;
+ letter-spacing:.03em;
+}
+.stageReadinessGroup.blockers .stageReadinessItemIndex{background:#fff3f5;color:#a95060}
+.stageReadinessGroup.warnings .stageReadinessItemIndex{background:#fff7e7;color:#966d18}
+.stageReadinessGroup li p{
+ margin:0;
+ min-width:0;
+ color:#526985;
+ font-size:10px;
+ line-height:1.45;
+ overflow-wrap:anywhere;
+}
 
 .stageReadinessOk{
  display:grid;
@@ -2079,5 +2140,33 @@
 @container (max-width:520px){
  .deadlineControlTop.hasAction{
   grid-template-columns:minmax(0,1fr) 98px;
+ }
+}
+
+
+/* Readiness single-row compaction */
+.stageReadinessChecklist.single{
+ padding-top:12px;
+}
+.stageReadinessChecklist.single .stageReadinessGroup{
+ max-width:none;
+}
+@media(max-width:650px){
+ .stageReadinessGroup>header{
+  grid-template-columns:32px minmax(0,1fr) auto;
+  padding:10px;
+ }
+ .stageReadinessGroupIcon{
+  width:32px;
+  height:32px;
+ }
+ .stageReadinessGroup li{
+  grid-template-columns:28px minmax(0,1fr);
+  min-height:44px;
+  padding:8px 10px;
+ }
+ .stageReadinessItemIndex{
+  width:28px;
+  height:28px;
  }
 }
