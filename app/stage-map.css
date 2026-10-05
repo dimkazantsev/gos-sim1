@@ -2170,3 +2170,43 @@
   height:28px;
  }
 }
+
+
+/* Stage policy explicit unit suffix */
+.stagePolicyMagnitudeField{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) auto;
+ align-items:center;
+ min-width:0;
+ border:1px solid #ccd9ea;
+ border-radius:10px;
+ background:#fff;
+ overflow:hidden;
+}
+.stagePolicyMagnitudeField>input{
+ width:100%;
+ min-width:0;
+ min-height:44px;
+ padding:0 12px;
+ border:0!important;
+ border-radius:0!important;
+ outline:0;
+ background:transparent;
+}
+.stagePolicyMagnitudeField>span{
+ align-self:stretch;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:0 12px;
+ border-left:1px solid #e0e7f1;
+ background:#f7f9fc;
+ color:#5f7390;
+ font-size:11px;
+ font-weight:850;
+ white-space:nowrap;
+}
+.stagePolicyMagnitudeField:focus-within{
+ border-color:#7aa0ff;
+ box-shadow:0 0 0 2px rgba(49,94,251,.14);
+}
