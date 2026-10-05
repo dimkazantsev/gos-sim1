@@ -13,7 +13,7 @@ type DeadlineIncident={
 
 type DeadlineRule={
  game_id:string;stage_no:number;deadline_at:string|null;inclusive:boolean;
- penalty_points:number;penalty_description:string;updated_at:string
+ penalty_points:number;penalty_description:string;consequence_type:'none'|'representation_loss'|'regional_seat_loss'|'ghost_risk'|'presidential_rating_loss';consequence_magnitude:number|null;updated_at:string
 };
 
 const CONSEQUENCES={
@@ -34,8 +34,7 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  const [rule,setRule]=useState<DeadlineRule|null>(null);
  const [partyId,setPartyId]=useState('');
  const [userId,setUserId]=useState('');
- const [kind,setKind]=useState<keyof typeof CONSEQUENCES>(recommended(stageNo));
- const [magnitude,setMagnitude]=useState('');
+ const [targetType,setTargetType]=useState<'party'|'student'>('party');
  const [note,setNote]=useState('');
  const [busy,setBusy]=useState(false);
  const [applyOpen,setApplyOpen]=useState(false);
@@ -46,12 +45,12 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
   if(!game)return;
   const [incidents,rules]=await Promise.all([
    supabase.from('stage_deadline_incidents').select('*').eq('game_id',game.id).eq('stage_no',stageNo).order('created_at',{ascending:false}),
-   supabase.from('stage_deadline_rules').select('game_id,stage_no,deadline_at,inclusive,penalty_points,penalty_description,updated_at').eq('game_id',game.id).eq('stage_no',stageNo).maybeSingle()
+   supabase.from('stage_deadline_rules').select('game_id,stage_no,deadline_at,inclusive,penalty_points,penalty_description,consequence_type,consequence_magnitude,updated_at').eq('game_id',game.id).eq('stage_no',stageNo).maybeSingle()
   ]);
   if(!incidents.error)setRows((incidents.data||[]) as DeadlineIncident[]);
   if(!rules.error)setRule((rules.data||null) as DeadlineRule|null);
  }
- useEffect(()=>{setKind(recommended(stageNo));void load()},[game?.id,stageNo]);
+ useEffect(()=>{setTargetType('party');setPartyId('');setUserId('');setNote('');void load()},[game?.id,stageNo]);
  useEffect(()=>{
   if(!game)return;
   const sync=(event:Event)=>{
@@ -90,17 +89,21 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  const userName=(id:string|null)=>members.find(m=>m.user_id===id)?.full_name||'—';
 
  async function record(){
-  if(!game||(!partyId&&!userId)||note.trim().length<5)return;
-  const requiresMagnitude=kind!=='other';
-  if(requiresMagnitude&&(!magnitude||!Number.isFinite(Number(magnitude))||Number(magnitude)<=0))return;
+  if(!game)return;
+  const targetParty=targetType==='party'?partyId:'';
+  const targetUser=targetType==='student'?userId:'';
+  if(!targetParty&&!targetUser)return;
   setBusy(true);
-  const r=await supabase.rpc('record_deadline_consequence',{
-   p_game_id:game.id,p_stage_no:stageNo,p_party_id:partyId||null,p_user_id:userId||null,
-   p_consequence_type:kind,p_magnitude:requiresMagnitude?Number(magnitude):null,p_note:note.trim()
+  const r=await supabase.rpc('apply_stage_deadline_rule',{
+   p_game_id:game.id,
+   p_stage_no:stageNo,
+   p_party_id:targetParty||null,
+   p_user_id:targetUser||null,
+   p_note:note.trim()||null
   });
   if(r.error)setError(r.error.message);
   else{
-   setPartyId('');setUserId('');setMagnitude('');setNote('');setKind(recommended(stageNo));
+   setPartyId('');setUserId('');setNote('');
    await load();setApplyOpen(false);
   }
   setBusy(false);
@@ -111,8 +114,12 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  }
 
  if(!game||!stage)return null;
- const guide=CONSEQUENCES[kind];
- const unitPlaceholder=guide.unit?guide.unit.charAt(0).toLocaleUpperCase('ru-RU')+guide.unit.slice(1):'';
+ const configuredConsequence=rule?.consequence_type??'none';
+ const configuredMagnitude=Number(rule?.consequence_magnitude??0);
+ const guide=configuredConsequence==='none'?null:CONSEQUENCES[configuredConsequence];
+ const partyRuleReady=configuredConsequence!=='none'&&configuredMagnitude>0;
+ const studentRuleReady=penaltyPoints>0;
+ const canApplyRule=overdue&&(partyRuleReady||studentRuleReady);
 
  return <section className={'deadlineControl '+(overdue?'overdue':'')}>
   <div className={'deadlineControlTop '+(teacher?'hasAction':'')}>
@@ -131,9 +138,9 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
 
    <div className="deadlineCount"><strong>{active.length}</strong><span>активных последствий</span></div>
 
-   {teacher&&<button type="button" className="deadlineActionCard" onClick={()=>setApplyOpen(true)}>
+   {teacher&&<button type="button" className="deadlineActionCard" disabled={!canApplyRule} onClick={()=>{if(canApplyRule)setApplyOpen(true)}}>
     <span className="deadlineActionIcon" aria-hidden="true"><Scale size={20}/></span>
-    <span className="deadlineActionCopy"><b>Зафиксировать нарушение</b><small>Назначить последствие и указать основание</small></span>
+    <span className="deadlineActionCopy"><b>{overdue?'Применить правило просрочки':'Правило применится после дедлайна'}</b><small>{canApplyRule?'Выберите адресата — санкция подставится автоматически':'Настройте дедлайн и санкцию в правиле этапа'}</small></span>
     <ChevronRight size={18} aria-hidden="true"/>
    </button>}
   </div>
@@ -148,38 +155,38 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
 
     <div className="deadlineViolationContext">
      <span><CalendarClock size={16}/><b>{timeText}</b><small>{deadlineLabel}</small></span>
-     <span><ShieldAlert size={16}/><b>{penaltyPoints>0?'Штраф: '+penaltyPoints+' балл'+(penaltyPoints===1?'':penaltyPoints<5?'а':'ов'):'Штраф не задан'}</b><small>{penaltyDescription}</small></span>
+     <span><ShieldAlert size={16}/><b>{targetType==='student'?(studentRuleReady?'−'+penaltyPoints+' балл'+(penaltyPoints===1?'':penaltyPoints<5?'а':'ов'):'Штраф студенту не настроен'):(partyRuleReady?(guide?.label||'Игровое последствие')+' · '+configuredMagnitude+' '+(guide?.unit||''):'Последствие партии не настроено')}</b><small>{penaltyDescription}</small></span>
     </div>
 
     <div className="deadlineViolationBody">
      <section className="deadlineViolationSection">
-      <div className="deadlineViolationSectionHead"><span>01</span><div><b>Адресат</b><small>К кому применяется последствие</small></div></div>
+      <div className="deadlineViolationSectionHead"><span>01</span><div><b>Адресат</b><small>Выберите, к кому применить уже настроенное правило</small></div></div>
       <div className="deadlineTargetSwitch" role="group" aria-label="Тип адресата">
-       <button type="button" className={userId?'':'active'} onClick={()=>{setUserId('');if(kind==='other')setKind(recommended(stageNo))}}><UsersRound size={17}/> Партия</button>
-       <button type="button" className={userId?'active':''} onClick={()=>{setPartyId('');setKind('other')}}><UserRound size={17}/> Студент</button>
+       {partyRuleReady&&<button type="button" className={targetType==='party'?'active':''} onClick={()=>{setTargetType('party');setUserId('')}}><UsersRound size={17}/> Партия</button>}
+       {studentRuleReady&&<button type="button" className={targetType==='student'?'active':''} onClick={()=>{setTargetType('student');setPartyId('')}}><UserRound size={17}/> Студент</button>}
       </div>
-      {!userId?<label className="deadlineViolationField">Партия<select value={partyId} onChange={e=>setPartyId(e.target.value)}><option value="">Выберите партию</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-      :<label className="deadlineViolationField">Студент<select value={userId} onChange={e=>setUserId(e.target.value)}><option value="">Выберите студента</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>}
+      {targetType==='party'&&partyRuleReady&&<label className="deadlineViolationField">Партия<select value={partyId} onChange={e=>setPartyId(e.target.value)}><option value="">Выберите партию</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>}
+      {targetType==='student'&&studentRuleReady&&<label className="deadlineViolationField">Студент<select value={userId} onChange={e=>setUserId(e.target.value)}><option value="">Выберите студента</option>{members.filter(m=>m.kind==='student').map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>}
+     </section>
+
+     <section className="deadlineViolationSection deadlineViolationRulePreview">
+      <div className="deadlineViolationSectionHead"><span>02</span><div><b>Будет применено автоматически</b><small>Значения берутся из единого правила этапа</small></div></div>
+      <div className="deadlineAutomaticRule">
+       {targetType==='student'
+        ?<><ShieldAlert size={18}/><div><b>Штраф: {penaltyPoints} балл{penaltyPoints===1?'':penaltyPoints<5?'а':'ов'}</b><p>{penaltyDescription}</p></div></>
+        :<><Scale size={18}/><div><b>{guide?.label||'Игровое последствие'} · {configuredMagnitude} {guide?.unit||''}</b><p>{guide?.hint||penaltyDescription}</p></div></>}
+      </div>
      </section>
 
      <section className="deadlineViolationSection">
-      <div className="deadlineViolationSectionHead"><span>02</span><div><b>Последствие</b><small>Что именно меняется в игре</small></div></div>
-      <div className="deadlineViolationFields">
-       <label className="deadlineViolationField">Тип последствия<select value={kind} onChange={e=>{setKind(e.target.value as keyof typeof CONSEQUENCES);if(e.target.value!=='other')setUserId('')}}>{Object.entries(CONSEQUENCES).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select></label>
-       {kind!=='other'&&<label className="deadlineViolationField">Величина<input type="number" min={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} max={kind==='representation_loss'?450:kind==='regional_seat_loss'?89:kind==='presidential_rating_loss'?100:undefined} step={kind==='ghost_risk'||kind==='presidential_rating_loss'?'0.1':'1'} value={magnitude} onChange={e=>setMagnitude(e.target.value)} placeholder={unitPlaceholder}/></label>}
-      </div>
-      <div className="deadlineViolationGuide"><AlertTriangle size={17}/><div><b>{guide.label}</b><p>{guide.hint}</p></div></div>
-     </section>
-
-     <section className="deadlineViolationSection">
-      <div className="deadlineViolationSectionHead"><span>03</span><div><b>Основание</b><small>Почему применяется именно это последствие</small></div></div>
-      <label className="deadlineViolationField">Комментарий<textarea rows={5} value={note} onChange={e=>setNote(e.target.value)} placeholder="Укажите, что именно не выполнено в срок, на каком основании применяется последствие и к чему оно относится."/></label>
+      <div className="deadlineViolationSectionHead"><span>03</span><div><b>Комментарий</b><small>Необязательно — если нужен дополнительный контекст</small></div></div>
+      <label className="deadlineViolationField">Комментарий<textarea rows={4} value={note} onChange={e=>setNote(e.target.value)} placeholder={penaltyDescription}/></label>
      </section>
     </div>
 
     <footer className="deadlineViolationFooter">
      <button type="button" className="secondary" onClick={()=>setApplyOpen(false)} disabled={busy}>Отмена</button>
-     <button type="button" className="primary" disabled={busy||(!partyId&&!userId)||note.trim().length<5||(kind!=='other'&&(!partyId||!Number.isFinite(Number(magnitude))||Number(magnitude)<=0))} onClick={()=>void record()}>{busy?'Сохранение…':'Зафиксировать последствие'}</button>
+     <button type="button" className="primary" disabled={busy||(targetType==='party'?!partyId:!userId)} onClick={()=>void record()}>{busy?'Применение…':'Применить правило'}</button>
     </footer>
    </section>
   </div>}
