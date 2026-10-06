@@ -3038,3 +3038,47 @@
  .stageWorkspacePage .ghostPolicyList{padding:0 12px 12px}
  .stageWorkspacePage .ghostPolicyCurrent{min-height:0}
 }
+
+
+/* Ghost voting proposal refinement */
+.stageWorkspacePage .ghostPolicyProposal{
+ grid-template-columns:minmax(220px,.72fr) minmax(360px,1.55fr);
+ grid-template-areas:
+  "mode rationale"
+  "action action";
+ align-items:start;
+ gap:14px 16px;
+ padding:18px;
+}
+.stageWorkspacePage .ghostPolicyProposal>label:first-child{grid-area:mode}
+.stageWorkspacePage .ghostPolicyProposal>label:nth-child(2){grid-area:rationale}
+.stageWorkspacePage .ghostPolicyProposal>button{
+ grid-area:action;
+ justify-self:end;
+ min-width:260px;
+ min-height:44px;
+ margin-top:2px;
+}
+.stageWorkspacePage .ghostPolicyProposal label{
+ align-content:start;
+}
+.stageWorkspacePage .ghostPolicyProposal textarea{
+ min-height:112px;
+}
+.stageWorkspacePage .ghostPolicyProposal select{
+ min-height:48px;
+}
+@media(max-width:760px){
+ .stageWorkspacePage .ghostPolicyProposal{
+  grid-template-columns:minmax(0,1fr);
+  grid-template-areas:
+   "mode"
+   "rationale"
+   "action";
+ }
+ .stageWorkspacePage .ghostPolicyProposal>button{
+  width:100%;
+  min-width:0;
+  justify-self:stretch;
+ }
+}
