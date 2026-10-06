@@ -104,7 +104,7 @@ function isHiddenChannel(channel:Channel){
  const name=(channel.name||'').trim();
  const lower=name.toLocaleLowerCase('ru-RU');
  if(lower.includes('архив'))return true;
- if(channel.kind==='direct'){
+ if(channel.kind==='private'){
   const parts=name.split('·').map(x=>x.trim()).filter(Boolean);
   if(parts.length===2&&parts[0].toLocaleLowerCase('ru-RU')===parts[1].toLocaleLowerCase('ru-RU'))return true;
  }
