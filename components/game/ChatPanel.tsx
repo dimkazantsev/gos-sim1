@@ -342,8 +342,6 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      placeholder={channelId?'Сообщение или @Фамилия для личной беседы':'Выберите канал'}
      disabled={!channelId||chatLoading} readOnly={sending} aria-busy={sending}
      onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
-    <button type="button" className="chatSendButton iconOnly" disabled={sending||uploading||chatLoading||!text.trim()||!channelId}
-     onClick={()=>void send()} aria-label="Отправить сообщение" title="Отправить"><Send aria-hidden="true" size={20}/></button>
    </div>
    <div className="chatComposeActions">
     <div className="chatAttachWrap" ref={attachWrap}>
@@ -377,9 +375,11 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      onClick={()=>{if(Date.now()<heldClickUntil.current)return;void toggleRecording('video')}}>
      <Video aria-hidden="true" size={19}/>
     </button>
-    <span className="chatComposerHint" aria-live="polite">
-     {uploading?'Загружается вложение…':recordingSaving?(chatMediaPhase==='analyzing'?'Анализируется запись…':chatMediaPhase==='uploading'?'Загружается запись…':'Публикуется сообщение…'):recording?'Идёт запись…' :'Удерживайте микрофон или камеру — отпустите для отправки; видео до 30 с'}
-    </span>
+    {(uploading||recordingSaving||recording)&&<span className="chatComposerHint" aria-live="polite">
+     {uploading?'Загружается вложение…':recordingSaving?(chatMediaPhase==='analyzing'?'Анализируется запись…':chatMediaPhase==='uploading'?'Загружается запись…':'Публикуется сообщение…'):'Идёт запись…'}
+    </span>}
+    <button type="button" className="chatSendButton iconOnly" disabled={sending||uploading||chatLoading||!text.trim()||!channelId}
+     onClick={()=>void send()} aria-label="Отправить сообщение" title="Отправить"><Send aria-hidden="true" size={20}/></button>
    </div>
   </div>:<div className="chatGuestNote">Гостевой режим: просмотр переписки без отправки сообщений.</div>}
  </aside>;
