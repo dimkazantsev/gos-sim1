@@ -1531,6 +1531,73 @@
  outline:3px solid #8da9e8;
  outline-offset:2px;
 }
+
+/* Compact chat composer: input above, media actions and send below. */
+.simChat.gsChatV2 .chatInputRow{
+ display:block;
+ width:100%;
+ min-width:0;
+ padding:0;
+ border:0;
+ border-radius:0;
+ background:transparent;
+ box-shadow:none;
+}
+.simChat.gsChatV2 .chatInputRow:focus-within{
+ border:0;
+ box-shadow:none;
+ background:transparent;
+}
+.simChat.gsChatV2 .chatInputRow>textarea{
+ width:100%;
+ min-height:48px;
+ height:48px;
+ padding:12px 13px;
+ border:1px solid #d7e2f7;
+ border-radius:13px;
+ background:#f9fbff;
+}
+.simChat.gsChatV2 .chatInputRow>textarea:focus{
+ border:1px solid #8ba8eb;
+ background:#fff;
+ box-shadow:0 0 0 3px #eaf0ff;
+}
+.simChat.gsChatV2 .chatComposeActions{
+ display:grid;
+ grid-template-columns:auto auto auto minmax(0,1fr) 42px;
+ align-items:center;
+ gap:6px;
+ margin-top:7px;
+ padding:0;
+}
+.simChat.gsChatV2 .chatComposeActions .chatIconButton{
+ width:36px;
+ min-width:36px;
+ height:36px;
+ min-height:36px;
+ border-radius:9px;
+}
+.simChat.gsChatV2 .chatComposeActions .chatComposerHint{
+ text-align:left;
+ font-size:11px;
+ line-height:1.25;
+ white-space:nowrap;
+ overflow:hidden;
+ text-overflow:ellipsis;
+}
+.simChat.gsChatV2 .chatComposeActions>.chatSendButton.iconOnly{
+ grid-column:5;
+ justify-self:end;
+ width:40px;
+ min-width:40px;
+ max-width:40px;
+ height:40px;
+ min-height:40px;
+ max-height:40px;
+ margin:0;
+ border-radius:11px;
+}
+
 @media(max-width:1099px){
  .simChat.gsChatV2{
   position:fixed;
@@ -1796,34 +1863,6 @@
  border:0;
 }
 .gsChatV2 .chatInputRow>textarea::-webkit-scrollbar{width:0;height:0}
-.simChat.gsChatV2 .chatInputRow>.chatSendButton.iconOnly{
- display:grid;
- place-items:center;
- align-self:flex-end;
- flex:0 0 42px;
- width:42px;
- min-width:42px;
- max-width:42px;
- height:42px;
- min-height:42px;
- max-height:42px;
- margin:1px;
- padding:0;
- border:0;
- border-radius:11px;
- color:#fff;
- background:#345ee5;
-}
-.simChat.gsChatV2 .chatInputRow>.chatSendButton.iconOnly:hover:not(:disabled){background:#254dc8}
-.simChat.gsChatV2 .chatInputRow>.chatSendButton.iconOnly:disabled{
- opacity:1;
- color:#8fa3d1;
- background:#ebf0ff;
-}
-.simChat.gsChatV2 .chatInputRow>.chatSendButton.iconOnly>svg{
- display:block;width:19px;height:19px;min-width:19px;
- stroke-width:1.9;transform:translate(-1px,1px);
-}
 .simChat.gsChatV2 .chatComposeActions{
  display:flex;
  align-items:center;
