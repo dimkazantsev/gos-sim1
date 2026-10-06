@@ -1337,6 +1337,140 @@ button,input,textarea,select{font-size:14px}
  font-size:10px;
 }
 .electoralCalculatorSummary b{color:#29496f}
+.electoralCalculatorControls{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:8px;
+}
+.electoralCalculatorControls label{
+ display:grid;
+ gap:6px;
+ min-width:0;
+ color:#607590;
+ font-size:10px;
+ font-weight:800;
+}
+.electoralCalculatorControls select,
+.electoralCalculatorControls input{
+ width:100%;
+ min-width:0;
+ min-height:42px;
+ box-sizing:border-box;
+ border:1px solid #ccd9ea;
+ border-radius:10px;
+ background:#fff;
+ color:#17314f;
+ padding:0 10px;
+ font:inherit;
+}
+.electoralCalculatorRow{
+ grid-template-columns:minmax(170px,1fr) repeat(2,minmax(130px,180px)) 92px;
+}
+.electoralCalculatorResult small{
+ color:#7c8ea5;
+ font-size:9px;
+ line-height:1.2;
+}
+.electoralPublishCalc{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:7px;
+ min-height:34px;
+ padding:7px 11px;
+ border:0;
+ border-radius:9px;
+}
+.electoralPublishedResult{
+ padding:18px 22px 20px;
+ border-top:1px solid #e4ebf3;
+ background:#f8fbff;
+}
+.electoralPublishedHead{
+ display:flex;
+ justify-content:space-between;
+ align-items:flex-start;
+ gap:16px;
+}
+.electoralPublishedHead small{
+ color:#71839a;
+ font-size:10px;
+ font-weight:850;
+ letter-spacing:.08em;
+}
+.electoralPublishedHead h3{
+ margin:4px 0;
+ color:#173c70;
+ font-size:18px;
+}
+.electoralPublishedHead p{
+ margin:0;
+ color:#71839a;
+ font-size:11px;
+}
+.electoralPublishedHead>strong{
+ flex:none;
+ padding:8px 10px;
+ border-radius:10px;
+ background:#e8f0ff;
+ color:#315efb;
+ font-size:12px;
+}
+.electoralPublishedGrid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:8px;
+ margin-top:14px;
+}
+.electoralPublishedGrid>div{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) auto auto;
+ align-items:center;
+ gap:8px;
+ min-height:48px;
+ padding:9px 11px;
+ border:1px solid #dfe7f2;
+ border-radius:11px;
+ background:#fff;
+}
+.electoralPublishedGrid span{
+ display:flex;
+ align-items:center;
+ gap:8px;
+ min-width:0;
+}
+.electoralPublishedGrid i{
+ width:8px;
+ height:8px;
+ border-radius:50%;
+ flex:none;
+}
+.electoralPublishedGrid b{
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+ color:#29496f;
+ font-size:11px;
+}
+.electoralPublishedGrid strong{
+ color:#315efb;
+ font-size:18px;
+}
+.electoralPublishedGrid small{
+ color:#7c8da3;
+ font-size:9px;
+}
+@media(max-width:900px){
+ .electoralCalculatorControls{grid-template-columns:1fr}
+ .electoralCalculatorRow{grid-template-columns:minmax(0,1fr) minmax(120px,160px) minmax(120px,160px) 78px}
+}
+@media(max-width:650px){
+ .electoralCalculatorRow{grid-template-columns:1fr}
+ .electoralCalculatorResult{justify-items:start}
+ .electoralPublishedGrid{grid-template-columns:1fr}
+ .electoralPublishedHead{flex-direction:column}
+ .electoralPublishCalc{width:100%}
+}
 
 .regionalProposal{grid-template-columns:minmax(190px,.7fr) minmax(0,1.3fr)}
 .regionalAllocation{
