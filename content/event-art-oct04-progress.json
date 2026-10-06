@@ -465,6 +465,501 @@
       "asset": "/event-art/scene-017-20261004-1920.webp",
       "generator": "Built-in imagegen",
       "source_file": "bank-curated-v2-17.png"
+    },
+    "bank-curated-v2-18": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "fcce9fe5f7b566d70f9f7709717d747c89011685a3c44554e50937e4c1761452",
+      "asset_sha256": "4f292e2b32605075140f99dd8df4b3484da46d02b4458ec7f8c61054102ab92b",
+      "asset": "/event-art/scene-018-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-18.png"
+    },
+    "bank-curated-v2-19": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "e7a7b94282ce9d731660a5626a778906ec3b74bb594444a1f00d6aaa9c34c24a",
+      "asset_sha256": "1ac01f21490469312b56854f1046f0e0f00a152023a4584e8e48cf7e4866654c",
+      "asset": "/event-art/scene-019-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-19.png"
+    },
+    "bank-curated-v2-20": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "116d947a654ba6e1784a5ed772be6b83487507022d17adf22f7fd36b3aacdb90",
+      "asset_sha256": "e6b3abed3d8f3a262dbe04591fd95a2adffb22bd6ad50ccf04e5b97f2dfc8fee",
+      "asset": "/event-art/scene-020-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-20.png"
+    },
+    "bank-curated-v2-21": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "c2e767aa2370b045d8d43fea50a5726ea152c8caeb31ec5205dae68ff98beb06",
+      "asset_sha256": "df61b8ce63c4ed414ccf451075453393c86bffcbfd16d13b2c676b9b56c50598",
+      "asset": "/event-art/scene-021-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-21.png"
+    },
+    "bank-curated-v2-22": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "1878a36de84a5e15e25c98fa87a1e9cfdebee146b05918b279667ae6e4534bf0",
+      "asset_sha256": "328e14ac3b93a33fd269a106eef2c6308abe5095556b273797971ce151b46c76",
+      "asset": "/event-art/scene-022-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-22.png"
+    },
+    "bank-curated-v2-23": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "bee478c5523974303307e4dbf8c16cfa4c3a6e8c2434883e481804a5f393f88d",
+      "asset_sha256": "e3c8a2df6b48c1934115586045c6faed4a43927a8f3e4b54c652d8998f9b37fe",
+      "asset": "/event-art/scene-023-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-23.png"
+    },
+    "bank-curated-v2-24": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "67a42809527d88c863e0b9e68f20f7606f9374e418dfa98c0bae9f144d3395c6",
+      "asset_sha256": "f0623bc5f7467d241dc47d67a78aa421038af9f2010feb9a48b01d33f77df732",
+      "asset": "/event-art/scene-024-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-24.png"
+    },
+    "bank-curated-v2-25": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "1ce46e4156472b39553da7bdfef05eb1bbf6c38c251e3f33f1cf95f86a5cd05b",
+      "asset_sha256": "99dc9337177f7af6f550a2ae46024452bc2c584267ff364d1c4deea340870648",
+      "asset": "/event-art/scene-025-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-25.png"
+    },
+    "bank-curated-v2-26": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "0df48587f46586079dea2e19a82133f3006176e4ffd97e3107f401373efd9c4f",
+      "asset_sha256": "51782a852f7b9642344f5d62129fb6d0fda0ee4d3301411995da2ba53d1b1c5f",
+      "asset": "/event-art/scene-026-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-26.png"
+    },
+    "bank-curated-v2-27": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "25cee12995389bbff6df414b44172c90e807d30fca62f584dac8d502ac5079af",
+      "asset_sha256": "99ec706855cef191e14919d7f7dc474bf61d24a0ffddecbf694aa6a21262f41d",
+      "asset": "/event-art/scene-027-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-27.png"
+    },
+    "bank-curated-v2-28": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "1cf0ecc391f06112bc42221c9204080409e8adc85ea178f6c839d26e544e8643",
+      "asset_sha256": "4e4314785d2f741958fb92b5ef394983b6159f42fce1b1b8a3168aa5caee430e",
+      "asset": "/event-art/scene-028-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-28.png"
+    },
+    "bank-curated-v2-29": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "50498d80b6a448b2fc6063106fb33ef49cb787ed391f7fd5fe2ee3d776bd2d3f",
+      "asset_sha256": "e69bca0a3cea039f1a97244f9de3ace3c6d832b29dc62bc5197742ed4c40199b",
+      "asset": "/event-art/scene-029-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-29.png"
+    },
+    "bank-curated-v2-30": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "e60e037fd539d450cb79912b8929a30c62d7c6c8ad7a8df73b2f0981423a209d",
+      "asset_sha256": "be84b71dce6799793099b39343021cb9456180045f4b473bec7e11e62167374f",
+      "asset": "/event-art/scene-030-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-30.png"
+    },
+    "bank-curated-v2-31": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "2026e06f4f902cd5ae479409f0c6de9dabf2c58c8307d059dc2faba00b09a44f",
+      "asset_sha256": "42dc2173cd1bf4bc009d4c3d53195802faea4cce8837c5bfd136ded8981973a5",
+      "asset": "/event-art/scene-031-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-31.png"
+    },
+    "bank-curated-v2-32": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "b7afd9111d42599bac2eb8ef5ca6d410e1d341c4a2464ff9db9493d5769fa77e",
+      "asset_sha256": "4d119fa3615dbfbe0c46934128e5221fff85dde4b01d3f49a4223807a3565278",
+      "asset": "/event-art/scene-032-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-32.png"
+    },
+    "bank-curated-v2-33": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "6f7240b06c94a2f40febfb731a5c4a13ec0c44a385c6e486fd822389d34e8d8b",
+      "asset_sha256": "02fa8bee9fbaaca405aaadd5bcc997f474956cc5f3cec26afa6c54fd08e17017",
+      "asset": "/event-art/scene-033-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-33.png"
+    },
+    "bank-curated-v2-34": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "c9ca88cb2e5f3c3492d5893de530d9740638ada6e27866f8bc9e234aa5570975",
+      "asset_sha256": "eaeb8e3f1f94506411aebdd3729cf7ad94cb1c77e9530155c240465e8257c901",
+      "asset": "/event-art/scene-034-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-34.png"
+    },
+    "bank-curated-v2-35": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "d4a7d8fc7758b0adf67efbad6688e0c6bd6f9e0eda9e055ac8215b68f069dd68",
+      "asset_sha256": "37d863827beaa9943f47c2221b630f43101829f6adf73926d87b8722ba617da9",
+      "asset": "/event-art/scene-035-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-35.png"
+    },
+    "bank-curated-v2-36": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "03753c9a635e7a0a54de186ae58b12ef988add8429c70ee1614b43b2c0b7b676",
+      "asset_sha256": "d6327ad7fecd56e363e2c1ed5fa9b1b62778d6b8e451bd9e5cde0b58c89a9f8d",
+      "asset": "/event-art/scene-036-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-36.png"
+    },
+    "bank-curated-v2-37": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "47bc13e5cd822c4f8df27063695ffb816e0aaf2ce400ae9ccf458e903e531054",
+      "asset_sha256": "ac107501304f1f6160e17eb5b43efdd10a491d47d4fc792744030032928221bd",
+      "asset": "/event-art/scene-037-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-37.png"
+    },
+    "bank-curated-v2-38": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "7e48f081a794e08cf6ec2682d15ac59065c0186165877dd04d2200304593d1fb",
+      "asset_sha256": "b30bc873c6fe03b05344c53165cf59b1d1de2d8a5da54e986bec4b3266297c6b",
+      "asset": "/event-art/scene-038-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-38.png"
+    },
+    "bank-curated-v2-39": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "150a89fa22ea087716709b06b87c04ae9668d412fadefee35d16d9aefa4af0c5",
+      "asset_sha256": "5e6e5362c72ab20880743d0acaf6e45b26963662264a5104132d8f512870b66d",
+      "asset": "/event-art/scene-039-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-39.png"
+    },
+    "bank-curated-v2-40": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "ec85f4daf335ead138b25c7344e1d48bcd4ea34698c42ad78f7ee268c7b8dc91",
+      "asset_sha256": "5fbcbe66bb7fe94d6c9efdf6d2abe26a435b85cd3d74fabd6492cc276359256f",
+      "asset": "/event-art/scene-040-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-40.png"
+    },
+    "bank-curated-v2-41": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "eb07ebccd1983da6b854d48ae5a820b4757179f07159de0de379f2673989a5d1",
+      "asset_sha256": "9aae5683a8a179e9056ab6ebfc2adc27d8343c7d0cc6ac63fe99a7a7ef06eb68",
+      "asset": "/event-art/scene-041-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-41.png"
+    },
+    "bank-curated-v2-42": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "a1b0ef6f732fe2265cb16e417331922f99f6f5a1f762ee9af10ae54637af02fd",
+      "asset_sha256": "a6f3cf9f302918e8fa20f7edb028f21eaf3acc57bce24a516923d1ebbae3bedf",
+      "asset": "/event-art/scene-042-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-42.png"
+    },
+    "bank-curated-v2-43": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "a34d42a0c80fd9a346ce4be7ecfa62e5a1f105ed243e1583f3d6f2d325080f3c",
+      "asset_sha256": "91003bef101047ce71b0b8462158ac8f9b0e9d6a5f52d46113c0c7a8ece46639",
+      "asset": "/event-art/scene-043-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-43.png"
+    },
+    "bank-curated-v2-44": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "1a99ff3a4384ea201f63f5b41637146a45f3fb039f6085b4722061b20db47f2b",
+      "asset_sha256": "e03a5a4d25b008279b6a96393b5b9497d25297d27ac80ac41f1c075285eedd02",
+      "asset": "/event-art/scene-044-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-44.png"
+    },
+    "bank-curated-v2-45": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "16beaa4bd391700b23f72676438d828b48ce04a7a35dfd79adacf9ee1f94ec34",
+      "asset_sha256": "9b1608e65862c211fadcefe5b049b0b2512e72138bdf3a7d03687d0baa1e854e",
+      "asset": "/event-art/scene-045-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-45.png"
+    },
+    "bank-curated-v2-46": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "09a14af8a987e04cad33627b48616c656829e291f0f04d134f6ecea6bbba3b8f",
+      "asset_sha256": "aa07fbd03d9933b176683ccb451a5f0f38b385848de45c2a2cea3e9c6c153cdf",
+      "asset": "/event-art/scene-046-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-46.png"
+    },
+    "bank-curated-v2-47": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "fd2cb3ba07eef61b9bb1d69211c0367503b351edf931097c648b8ab7a0652bbd",
+      "asset_sha256": "b38cf18f444fab97ecd1c7554dffae9b3a90fdd4f2d637b0df092667d5248ad6",
+      "asset": "/event-art/scene-047-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-47.png"
+    },
+    "bank-curated-v2-48": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "392258aaed7adaaf9d865232e61220184a4e08e7d82e7ca2add32a5b2150faa7",
+      "asset_sha256": "51f682acccb10eca14fbfd634071f0757e7bf641ff749cca34c20f6205cbe5b4",
+      "asset": "/event-art/scene-048-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-48.png"
+    },
+    "bank-curated-v2-49": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "040f38b15fb75b8464783ac8f05945a248aecfc52083c67faa9dd0a4ccfb3e92",
+      "asset_sha256": "cc19ac1924344f596a82045c226bd7bf5f2323b6b9c7bfce1da76dcda734da3b",
+      "asset": "/event-art/scene-049-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-49.png"
+    },
+    "bank-curated-v2-50": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "5cbee4626196eba38a530b5ac1f75842d5b2609f958014f2028f8382cd433cc6",
+      "asset_sha256": "c6e481a91a84433667d7a01ef602ac158a5a71bec6dfb1da1382767b4860ff17",
+      "asset": "/event-art/scene-050-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-curated-v2-50.png"
     }
   }
 }
