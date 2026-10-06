@@ -5,7 +5,6 @@ import {ArrowDown,Download,FileText,Mic,Paperclip,Pin,PinOff,Search,Send,Square,
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
-import DirectMessagePicker from './DirectMessagePicker';
 import ChatVoicePlayer from './ChatVoicePlayer';
 import ChatVideoNote from './ChatVideoNote';
 import {useDialog} from '../ui/useDialog';
@@ -255,7 +254,6 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
    <IconAction onClick={()=>setChatOpen(false)} label="Закрыть чат"/>
   </header>
-  {!readOnly&&<div className="chatPersonalBar"><DirectMessagePicker g={g}/><span>Или введите @Фамилия в сообщении</span></div>}
   {chatPins.length>0&&<div className="chatPinnedWrap">
    <button type="button" className="chatPinnedToggle" aria-expanded={pinsOpen} aria-controls="chat-pinned-list" onClick={()=>setPinsOpen(v=>!v)}>
     <Pin size={16} aria-hidden="true"/><span>Закреплено</span><b>{chatPins.length}</b><span className="chatPinnedPreview">{pinnedMessages[0]?.text||'Материалы канала'}</span>
