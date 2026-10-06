@@ -6,7 +6,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 type Proposal={id:string;game_id:string;system_type:'relative'|'absolute'|'qualified'|'preferential';threshold_pct:number|null;rationale:string|null;status:'draft'|'registered'|'vote_open'|'adopted'|'rejected'|'superseded';vote_id:string|null;proposed_by:string;created_at:string;updated_at:string;registered_at:string|null;bill_document_id:string|null;session_id:string|null;agenda_item_id:string|null;resolution_document_id:string|null};
 const labels={relative:'Относительное большинство',absolute:'Абсолютное большинство',qualified:'Квалифицированное большинство',preferential:'Преференциальное большинство'} as const;
 
-export default function PresidentialSystemDecisionPanel({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
+export default function PresidentialSystemDecisionPanel({g,onOpenVotes,stageNo=6}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;stageNo?:6|7}){
  const {game,me,teacher,parties,members,votes,formalDocuments,setError}=g;
  const [rows,setRows]=useState<Proposal[]>([]);
  const [system,setSystem]=useState<Proposal['system_type']>('absolute');
@@ -17,7 +17,7 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes}:{g:Retur
  const role=(me?.role_title||'').toLowerCase();
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  const canPropose=teacher||!!ledParty;
- const canManageVote=teacher||!!ledParty||(role.includes('председател')&&role.includes('дум'))||(role.includes('совет')&&role.includes('дум'));
+ const canManageVote=teacher||(role.includes('председател')&&role.includes('дум'))||(role.includes('совет')&&role.includes('дум'));
  const canCreateSf=teacher||role.includes('совет федерац')||role.includes('сенатор');
 
  async function load(){
@@ -59,8 +59,10 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes}:{g:Retur
   if(r.error)setError(r.error.message);else setResolutionBody('');setBusy(false);
  }
 
+ if(stageNo===7)return <section className="presSystemDecision presSystemAppointmentOnly"><section className="sfAppointment"><div><small>СОВЕТ ФЕДЕРАЦИИ · ЭТАП 7</small><h4>Постановление о назначении выборов Президента РФ</h4><p>{sfResolution?<>Создано: <b>{sfResolution.registry_no}</b> · {sfResolution.status_label}</>:<>Формальный акт ещё не создан.</>}</p></div>{canCreateSf&&!sfResolution&&<div className="sfAppointmentCreate"><textarea rows={2} value={resolutionBody} onChange={e=>setResolutionBody(e.target.value)} placeholder="Необязательно: уточните игровой срок проведения выборов"/><button className="primary" disabled={busy} onClick={()=>void createResolution()}>Создать постановление СФ</button></div>}</section></section>;
+
  return <section className="presSystemDecision">
-  <header><div><small>ГОСУДАРСТВЕННАЯ ДУМА · ЭТАП 7</small><h3>Поправка к ФЗ № 19-ФЗ о системе выборов Президента</h3><p>Фракция вносит проект, Председатель ГД регистрирует его, вопрос рассматривается на заседании Государственной Думы и выносится на мандатное голосование. По итогам система выпускает постановление ГД и только после принятия синхронизирует модель выборов.</p></div><div className="presSystemAdopted"><small>ДЕЙСТВУЕТ</small><strong>{adopted?labels[adopted.system_type]:'Решение не принято'}</strong>{adopted?.system_type==='qualified'&&<span>{adopted.threshold_pct}%</span>}</div></header>
+  <header><div><small>ГОСУДАРСТВЕННАЯ ДУМА ФС РФ · ЭТАП 6</small><h3>Поправка к ФЗ № 19-ФЗ о системе выборов Президента</h3><p>Фракция вносит проект, Председатель ГД регистрирует его, вопрос рассматривается на заседании Государственной Думы и выносится на мандатное голосование. По итогам система выпускает постановление ГД и только после принятия синхронизирует модель выборов.</p></div><div className="presSystemAdopted"><small>ДЕЙСТВУЕТ</small><strong>{adopted?labels[adopted.system_type]:'Решение не принято'}</strong>{adopted?.system_type==='qualified'&&<span>{adopted.threshold_pct}%</span>}</div></header>
 
   {canPropose&&<div className="presSystemProposal"><label>Система<select value={system} onChange={e=>setSystem(e.target.value as Proposal['system_type'])}><option value="relative">Относительное большинство</option><option value="absolute">Абсолютное большинство</option><option value="qualified">Квалифицированное большинство</option><option value="preferential">Преференциальное большинство</option></select></label>{system==='qualified'&&<label>Порог, %<input type="number" min="51" max="100" value={threshold} onChange={e=>setThreshold(Math.max(51,Math.min(100,Number(e.target.value)||60)))}/></label>}<label className="wide">Позиция фракции<textarea rows={2} value={rationale} onChange={e=>setRationale(e.target.value)} placeholder="Почему именно эта модель должна применяться на выборах Президента?"/></label><button className="primary" disabled={busy} onClick={()=>void propose()}>Создать проект поправки</button></div>}
 
@@ -76,14 +78,10 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes}:{g:Retur
    </div>
    <div className="presSystemProposalActions"><span>{p.status==='adopted'?'Принято':p.status==='vote_open'?'На голосовании':p.status==='registered'?'Зарегистрировано':p.status==='rejected'?'Отклонено':'Проект'}</span>{p.system_type==='qualified'&&<em>{p.threshold_pct}%</em>}{v&&<em>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</em>}
     {canManageVote&&p.status==='draft'&&<button disabled={busy} onClick={()=>void registerProposal(p.id)}>Зарегистрировать проект</button>}
-    {canManageVote&&p.status==='registered'&&<button className="primary" disabled={busy} onClick={()=>void openVote(p.id)}>Открыть заседание и голосование</button>}
+    {canManageVote&&p.status==='registered'&&<button className="primary" disabled={busy} onClick={()=>void openVote(p.id)}>Созвать заседание ГД и открыть голосование</button>}
     {v?.status==='open'&&<button onClick={onOpenVotes}>Перейти к голосованию →</button>}
    </div>
   </article>})}</div>
 
-  <section className="sfAppointment">
-   <div><small>СОВЕТ ФЕДЕРАЦИИ</small><h4>Постановление о назначении выборов Президента РФ</h4><p>{sfResolution?<>Создано: <b>{sfResolution.registry_no}</b> · {sfResolution.status_label}</>:<>Формальный акт ещё не создан.</>}</p></div>
-   {canCreateSf&&!sfResolution&&<div className="sfAppointmentCreate"><textarea rows={2} value={resolutionBody} onChange={e=>setResolutionBody(e.target.value)} placeholder="Необязательно: уточните игровой срок проведения выборов"/><button className="primary" disabled={busy} onClick={()=>void createResolution()}>Создать постановление СФ</button></div>}
-  </section>
  </section>;
 }
