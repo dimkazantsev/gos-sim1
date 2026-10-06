@@ -76,6 +76,7 @@ export default function StageWorkspace({
  const completedDocs=docs.filter(d=>['published','signed','adopted'].includes(d.status_code)).length;
  const primaryView=task?.target;
  const primaryLabel=primaryView?VIEW_LABELS[primaryView]||'профильный раздел':'эта страница';
+ const registrationBodies=STAGE_REGISTRATION_BODIES[stage.stage_no];
  const publicChannel=g.channels.find(channel=>
   channel.kind==='public'&&channel.name!=='Вне игры'&&['Публичная политика','Общая беседа','Общий штаб','Общий чат'].includes(channel.name)
  )||g.channels.find(channel=>channel.kind==='public'&&channel.name!=='Вне игры');
