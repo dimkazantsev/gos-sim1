@@ -51,7 +51,9 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember,readOnly=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void;readOnly?:boolean}){
  const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
- useEffect(()=>{if(!g.game?.id)return;let live=true;void supabase.rpc('ensure_social_channels',{p_game_id:g.game.id}).then(r=>{if(live){if(r.error)g.setError(r.error.message);else void g.refresh()}});return()=>{live=false}},[g.game?.id]);
+ useEffect(()=>{setSelectedMessages([])},[channelId]);
+ useEffect(()=>()=>{if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current)},[]);
+  useEffect(()=>{if(!g.game?.id)return;let live=true;void supabase.rpc('ensure_social_channels',{p_game_id:g.game.id}).then(r=>{if(live){if(r.error)g.setError(r.error.message);else void g.refresh()}});return()=>{live=false}},[g.game?.id]);
  const [sending,setSending]=useState(false);
  const [uploading,setUploading]=useState(false);
  const [recordElapsed,setRecordElapsed]=useState(0);
@@ -59,6 +61,9 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [searchOpen,setSearchOpen]=useState(false);
  const [pinsOpen,setPinsOpen]=useState(previewPinsOpen);
  const [pinBusy,setPinBusy]=useState<string|null>(null);
+ const [selectedMessages,setSelectedMessages]=useState<string[]>([]);
+ const [deletingMessages,setDeletingMessages]=useState(false);
+ const selectHoldTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const [search,setSearch]=useState('');
  const [onlyFiles,setOnlyFiles]=useState(false);
  const [attachOpen,setAttachOpen]=useState(false);
@@ -232,6 +237,31 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   try{if(!await setChatPin(m.id,!pinned))setLocalError('Не удалось изменить закрепление. Проверьте права или лимит канала.')}
   catch{setLocalError('Не удалось изменить закрепление. Попробуйте ещё раз.')}
   finally{setPinBusy(null)}
+ }
+ function canDeleteMessage(m:Message){return !!teacher||m.author_id===me?.user_id}
+ function toggleMessageSelection(m:Message){
+  if(!canDeleteMessage(m))return;
+  setSelectedMessages(current=>current.includes(m.id)?current.filter(id=>id!==m.id):[...current,m.id]);
+ }
+ function beginMessageSelection(m:Message){
+  if(!canDeleteMessage(m))return;
+  if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current);
+  selectHoldTimer.current=setTimeout(()=>{setSelectedMessages(current=>current.includes(m.id)?current:[...current,m.id])},420);
+ }
+ function cancelMessageSelectionHold(){
+  if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current);
+  selectHoldTimer.current=null;
+ }
+ async function deleteSelectedMessages(){
+  if(!selectedMessages.length||deletingMessages)return;
+  setDeletingMessages(true);setLocalError('');
+  try{
+   const r=await supabase.rpc('delete_chat_messages',{p_message_ids:selectedMessages});
+   if(r.error){setLocalError(userError(r.error));return}
+   setSelectedMessages([]);
+   await g.refresh();
+  }catch(e){setLocalError(userError(e))}
+  finally{setDeletingMessages(false)}
  }
  function showPinnedMessage(m:Message){
   setPinsOpen(false);
