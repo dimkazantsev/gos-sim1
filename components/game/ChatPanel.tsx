@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
-import {ArrowDown,Download,FileText,Mic,Paperclip,Pin,PinOff,Search,Send,Square,Trash2,Video,X} from 'lucide-react';
+import {ArrowDown,AtSign,Download,FileText,Mic,Paperclip,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
@@ -50,7 +50,7 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
 }
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember,readOnly=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void;readOnly?:boolean}){
- const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher}=g;
+ const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher,chatOverview,setChatChannelPinned}=g;
  useEffect(()=>{setSelectedMessages([])},[channelId]);
  useEffect(()=>()=>{if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current)},[]);
   useEffect(()=>{if(!g.game?.id)return;let live=true;void supabase.rpc('ensure_social_channels',{p_game_id:g.game.id}).then(r=>{if(live){if(r.error)g.setError(r.error.message);else void g.refresh()}});return()=>{live=false}},[g.game?.id]);
@@ -94,14 +94,29 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const entries=useMemo(()=>buildChatEntries(filtered,me?.user_id||''),[filtered,me?.user_id]);
  const hasFilter=!!search.trim()||onlyFiles;
  const handles=chatHandles(g.members).filter(x=>x.member.user_id!==me?.user_id);
- const address=text.match(/^@([а-яёa-z0-9_-]*)/i);
- const suggestions=address?handles.filter(x=>x.handle.startsWith(address[1].toLowerCase())||x.aliases.some(a=>a.startsWith(address[1].toLowerCase()))).slice(0,8):[];
- async function addressPerson(userId:string,sendNow=false){
+ const mentionMatch=text.match(/(?:^|\s)@([а-яёa-z0-9_-]*)$/i);
+ const mentionQuery=(mentionMatch?.[1]||'').toLocaleLowerCase('ru-RU');
+ const mentionSuggestions=mentionMatch?handles.filter(x=>x.handle.startsWith(mentionQuery)||x.aliases.some(a=>a.startsWith(mentionQuery))).slice(0,8):[];
+ const peopleResults=search.trim().length>0?handles.filter(x=>{
+  const q=search.trim().toLocaleLowerCase('ru-RU');
+  return x.member.full_name.toLocaleLowerCase('ru-RU').includes(q)||x.handle.includes(q)||x.aliases.some(a=>a.includes(q));
+ }).slice(0,8):[];
+ function insertMention(userId:string){
+  const person=handles.find(x=>x.member.user_id===userId);if(!person||!mentionMatch)return;
+  const surname=person.member.full_name.trim().split(/\s+/)[0]||person.surname;
+  const prefix=text.slice(0,text.length-mentionMatch[0].length)+(mentionMatch[0].startsWith(' ')?' ':'');
+  setText(prefix+'@'+surname+' ');requestAnimationFrame(()=>composer.current?.focus());
+ }
+ function mentionedUsers(value:string){
+  const tokens=[...value.matchAll(/@([\p{L}\d_-]+)/gu)].map(m=>m[1].toLocaleLowerCase('ru-RU'));
+  return [...new Set(handles.filter(x=>tokens.some(token=>x.handle===token||x.aliases.includes(token))).map(x=>x.member.user_id))];
+ }
+ async function openPersonChat(userId:string){
   if(!g.game||sending)return;setSending(true);setLocalError('');
   try{const r=await supabase.rpc('open_direct_conversation',{p_game:g.game.id,p_recipient:userId});
    if(r.error){setLocalError(userError(r.error));return}
-   const target=r.data as string,message=text.replace(/^@[а-яёa-z0-9_-]+\s*/i,'');await g.refresh();setChannelId(target);
-   if(sendNow&&message.trim()){const ok=await sendText(message,target);setText(ok?'':message);if(!ok)setLocalError('Не удалось отправить личное сообщение.')}else setText(message);composer.current?.focus();
+   const target=r.data as string;await g.refresh();setChannelId(target);setSearch('');setSearchOpen(false);setOnlyFiles(false);
+   requestAnimationFrame(()=>composer.current?.focus());
   }catch(e){setLocalError(userError(e))}finally{setSending(false)}
  }
  function beginHold(kind:'audio'|'video'){
@@ -205,14 +220,10 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
   if(pendingSend.current||sending||uploading||chatLoading||!text.trim()||!channelId)return;
-  if(address){const exact=handles.filter(x=>x.handle===address[1].toLowerCase()||x.aliases.includes(address[1].toLowerCase()));
-   if(exact.length!==1){setLocalError('Выберите адресата из списка под полем сообщения.');return}
-   pendingSend.current=true;try{await addressPerson(exact[0].member.user_id,true)}finally{pendingSend.current=false}return;
-  }
-  const sentText=text,fromChannel=channelId;
+  const sentText=text,fromChannel=channelId,mentions=mentionedUsers(text);
   pendingSend.current=true;setSending(true);setLocalError('');
   try{
-   const ok=await sendText(sentText);
+   const ok=await sendText(sentText,fromChannel,mentions);
    if(ok){
     if(lastChannel.current===fromChannel&&text===sentText)setText('');
     follow.current=true;
@@ -282,7 +293,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  }}}>
   <header className="chatTop">
    <div className="chatHeadIcon" aria-hidden="true"><MessageIcon/></div>
-   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} initialOpen={previewChannelOpen}/>
+   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} overview={chatOverview} onPin={setChatChannelPinned} initialOpen={previewChannelOpen}/>
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
    <IconAction onClick={()=>setChatOpen(false)} label="Закрыть чат"/>
   </header>
@@ -309,10 +320,13 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     })}
    </div>}
   </div>}
-  {searchOpen&&<div className="chatSearchBar">
-   <div className="chatSearchField"><Search size={18} aria-hidden="true"/><input ref={searchInput} value={search} onChange={e=>setSearch(e.target.value)} aria-label="Поиск по сообщениям этого канала" placeholder="Сообщения и документы…" type="search"/></div>
-   <button type="button" className={'chatFilesFilter '+(onlyFiles?'active':'')} aria-pressed={onlyFiles} onClick={()=>setOnlyFiles(x=>!x)}><Paperclip size={15} aria-hidden="true"/> Файлы</button>
-   <span className="chatSearchCount" aria-live="polite">{filtered.length} из {channelMessages.length}</span>
+  {searchOpen&&<div className="chatSearchArea">
+   <div className="chatSearchBar">
+    <div className="chatSearchField"><Search size={18} aria-hidden="true"/><input ref={searchInput} value={search} onChange={e=>setSearch(e.target.value)} aria-label="Поиск сообщений или человека" placeholder="Сообщение, имя или фамилия…" type="search"/></div>
+    <button type="button" className={'chatFilesFilter '+(onlyFiles?'active':'')} aria-pressed={onlyFiles} onClick={()=>setOnlyFiles(x=>!x)}><Paperclip size={15} aria-hidden="true"/> Файлы</button>
+    <span className="chatSearchCount" aria-live="polite">{filtered.length} сообщений</span>
+   </div>
+   {peopleResults.length>0&&<div className="chatPeopleResults" aria-label="Найденные участники"><small>Люди</small>{peopleResults.map(x=><button type="button" key={x.member.user_id} disabled={sending} onClick={()=>void openPersonChat(x.member.user_id)}><span className="chatPersonAvatar"><UserRound size={16} aria-hidden="true"/></span><span><b>{x.member.full_name}</b><small>{x.member.role_title||x.member.team||'Участник'}</small></span><em>Написать</em></button>)}</div>}
   </div>}
   <div className="chatMessages" ref={list} role="log" aria-label="Сообщения" aria-live={hasFilter?'off':'polite'} aria-relevant="additions" onScroll={()=>{const el=list.current;if(!el)return;const nearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<85;follow.current=nearBottom;setJumpVisible(!nearBottom&&!hasFilter&&channelMessages.length>0)}}>
    {chatLoading?<div className="chatEmpty" role="status"><span className="chatLoadingSpinner" aria-hidden="true"/><b>Загружаем сообщения…</b></div>:!entries.length?<div className="chatEmpty"><span className="chatEmptyIcon"><Search aria-hidden="true"/></span><b>{hasFilter?'Ничего не найдено':'Пока нет сообщений'}</b><p>{hasFilter?'Измените запрос или отключите фильтр.':'Начните обсуждение: сообщения увидят участники этого канала.'}</p></div>:
@@ -376,11 +390,11 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   {chatMediaError&&<div className="chatLocalError chatMediaError" role="alert"><span>{chatMediaError}</span></div>}
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
   {!readOnly?<div className="chatCompose">
-   {address&&<div className="chatAddressList" aria-label="Получатель личного сообщения"><small>Личное сообщение · Выберите адресата</small>{suggestions.map(x=><button type="button" key={x.member.user_id} disabled={sending} onClick={()=>void addressPerson(x.member.user_id)}><b>{x.member.full_name}</b><span>@{x.handle}</span></button>)}{!suggestions.length&&<span>Участник не найден.</span>}</div>}
+   {mentionMatch&&<div className="chatAddressList chatMentionList" aria-label="Упомянуть участника"><small><AtSign size={14} aria-hidden="true"/> Упомянуть в текущем чате</small>{mentionSuggestions.map(x=><button type="button" key={x.member.user_id} onClick={()=>insertMention(x.member.user_id)}><b>{x.member.full_name}</b><span>{x.member.role_title||x.member.team||'Участник'}</span></button>)}{!mentionSuggestions.length&&<span>Участник не найден.</span>}</div>}
    {channels.find(c=>c.id===channelId)?.kind==='public'&&channels.find(c=>c.id===channelId)?.name!=='Вне игры'&&<details className="chatProcessTags"><summary>Сообщение для политического процесса</summary><small>Добавьте тег, чтобы направить сообщение в публичную ленту.</small><div aria-label="Теги сообщения">{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
    <div className="chatInputRow">
     <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)}
-     placeholder={channelId?'Сообщение или @фамилия':'Выберите канал'}
+     placeholder={channelId?'Сообщение · @фамилия для упоминания':'Выберите чат'}
      disabled={!channelId||chatLoading} readOnly={sending} aria-busy={sending}
      onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
    </div>
