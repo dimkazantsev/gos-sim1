@@ -33,7 +33,8 @@ alter table public.institution_session_registrations add constraint institution_
 create or replace function private.role_matches_voting_body(p_role text,p_institution text) returns boolean
 language sql immutable set search_path=public,private,pg_temp as $$
 select case p_institution
- when 'gd' then p_role ~* 'депутат|государственн.*дум'
+ when 'ksrf' then p_role ~* 'председател.*парт|лидер.*парт|фракц|депутат'
+  when 'gd' then p_role ~* 'депутат|государственн.*дум'
  when 'government' then p_role ~* 'правительств|министр'
  when 'sf' then p_role ~* 'совет.*федерац|сенатор'
  when 'committee' then p_role ~* 'комитет|депутат'
@@ -67,7 +68,7 @@ declare roster jsonb;total numeric;label text;selected_group text;
 begin
  selected_group:=nullif(current_setting('app.vote_group',true),'');
  if selected_group is not null and not exists(select 1 from public.game_members where game_id=new.game_id and kind='student' and group_name=selected_group) then raise exception 'Учебная группа не найдена';end if;
- if new.institution_key not in ('all','factions','gd','government','municipality','sf','committee','region','cec','ks','vs','central_bank','accounts')
+ if new.institution_key not in ('all','factions','ksrf','gd','government','municipality','sf','committee','region','cec','ks','vs','central_bank','accounts')
  and not exists(select 1 from public.institution_units u where u.game_id=new.game_id and 'unit:'||u.id::text=new.institution_key) then raise exception 'Орган не найден';end if;
  if new.institution_key='gd' then new.voting_mode:='mandate';end if;
  if new.institution_key not in ('gd','all','factions') then new.voting_mode:='member';end if;
