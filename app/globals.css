@@ -2096,3 +2096,32 @@ button,input,textarea,select{font-size:14px}
 .cecReview{grid-template-columns:160px 90px 90px minmax(180px,1fr) minmax(180px,1fr) auto!important;align-items:end}.cecReview textarea{width:100%;min-height:62px;border:1px solid #dbe4ed;border-radius:9px;background:#fff;padding:8px;font-size:12px;resize:vertical}.cecReviewPublic,.cecReviewPrivate{display:grid!important;gap:4px!important}.cecReviewPrivate{color:#806d87!important}.cecReview button{min-height:42px!important}
 @media(max-width:1100px){.cecReview{grid-template-columns:1fr 1fr 1fr!important}.cecReviewPublic,.cecReviewPrivate{grid-column:span 3}.cecReview button{grid-column:span 3}.cecHead{grid-template-columns:1fr}}
 @media(max-width:700px){.cecTabs{margin-inline:-1px}.cecHeadSide{padding:11px}.cecHeadSide .cecEmblem{width:56px;height:56px;flex-basis:56px}.cecCandidateDecision{grid-template-columns:1fr}.cecCandidateDecision em{justify-self:start}.candidatePrivateGrid{grid-template-columns:1fr}.candidatePrivateGrid label.wide{grid-column:auto}.cecReview{grid-template-columns:1fr!important}.cecReviewPublic,.cecReviewPrivate,.cecReview button{grid-column:auto}}
+
+
+/* CEC printable decision and candidate credential */
+.cecDocumentOpen,.cecCredentialOpen{border:1px solid #d4dfec;border-radius:9px;background:#fff;color:#315b85;padding:7px 9px;font-size:11px;font-weight:900;cursor:pointer}
+.cecDocumentOpen{margin-top:10px}.cecCredentialOpen{justify-self:start}
+.cecDocumentModal{position:fixed;inset:0;z-index:1400;display:grid;place-items:center;padding:22px}.cecDocumentBackdrop{position:absolute;inset:0;background:rgba(10,20,35,.55);backdrop-filter:blur(6px)}
+.cecDocumentShell{position:relative;z-index:1;width:min(920px,100%);max-height:calc(100vh - 44px);overflow:auto;border-radius:18px;background:#eef2f7;box-shadow:0 24px 80px rgba(0,0,0,.28)}
+.cecDocumentTools{position:sticky;top:0;z-index:3;display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid #d8e0ea;background:rgba(255,255,255,.96);backdrop-filter:blur(10px)}
+.cecDocumentTools b{color:#314b69;font-size:13px}.cecDocumentTools button{min-height:36px;border:1px solid #d4ddea;border-radius:9px;background:#fff;color:#45617f;padding:0 10px;font-size:12px;font-weight:900}
+.cecPrintableDocument{margin:22px auto;background:#fff;color:#1e2f42;box-shadow:0 10px 32px rgba(20,40,65,.1)}
+.cecDecisionSheet{width:min(760px,calc(100% - 36px));padding:42px 48px;min-height:800px}
+.cecDecisionSheet>header{display:flex;align-items:center;gap:18px;text-align:left;border-bottom:2px solid #2a3c50;padding-bottom:18px}.cecDecisionSheet>header img,.cecDecisionSheet>header svg{object-fit:contain}.cecDecisionSheet>header b{display:block;font-size:16px;line-height:1.45;letter-spacing:.02em}.cecDecisionSheet>header span{display:block;margin-top:4px;color:#738195;font-size:11px}
+.cecDecisionMeta{display:flex;justify-content:space-between;gap:15px;margin-top:20px;color:#556579;font-size:12px}.cecDecisionSheet h3{margin:34px 0 24px;text-align:center;font-family:Georgia,'Times New Roman',serif;font-size:20px}.cecDecisionSheet>p{font-family:Georgia,'Times New Roman',serif;font-size:14px;line-height:1.75;text-align:justify}
+.cecResolution{margin-top:28px;padding:18px 20px;border-left:4px solid #315efb;background:#f4f7fb}.cecResolution small{display:block;color:#65758b;font-size:11px;font-weight:950;letter-spacing:.12em}.cecResolution strong{display:block;margin-top:7px;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.65}
+.cecDecisionSheet>footer{display:grid;grid-template-columns:1fr auto;gap:30px;align-items:end;margin-top:72px;padding-top:18px;border-top:1px solid #dfe4ea;color:#4f6074;font-size:12px}.cecDecisionSheet>footer b{font-size:18px;letter-spacing:.12em}
+.cecCredentialSheet{width:min(760px,calc(100% - 36px));padding:28px;background:#f8f3e7}
+.cecCredentialCover{width:360px;min-height:240px;margin:0 auto 22px;display:grid;place-items:center;align-content:center;gap:10px;border:2px solid #8c6f35;border-radius:8px;background:#6d1f25;color:#f2d897;text-align:center;box-shadow:inset 0 0 0 5px rgba(242,216,151,.08)}
+.cecCredentialCover img,.cecCredentialCover svg{filter:sepia(1) saturate(.45) brightness(1.55)}.cecCredentialCover b{font-family:Georgia,'Times New Roman',serif;font-size:22px;letter-spacing:.08em}.cecCredentialCover small{font-size:10px;letter-spacing:.14em;font-weight:900}
+.cecCredentialInside{display:grid;grid-template-columns:1fr 1fr;width:min(700px,100%);min-height:270px;margin:0 auto;border:1px solid #c9b98f;background:#fffef8;box-shadow:0 7px 20px rgba(75,58,26,.12)}
+.cecCredentialInside section{display:grid;align-content:start;justify-items:center;gap:9px;padding:26px 24px;text-align:center}.cecCredentialInside section+section{border-left:1px solid #d7caa8}.cecCredentialInside section>b{color:#344455;font-size:12px;line-height:1.4}.cecCredentialInside section>strong{margin-top:8px;font-family:Georgia,'Times New Roman',serif;font-size:15px;letter-spacing:.06em}.cecCredentialInside section>span{font-size:12px;font-weight:900}.cecCredentialInside h3{margin:20px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:18px;line-height:1.35}.cecCredentialInside p{margin:2px 0;color:#526273;font-family:Georgia,'Times New Roman',serif;font-size:12px;line-height:1.5}.cecCredentialInside small{color:#67788a;font-size:10px;line-height:1.45}.cecCredentialInside footer{margin-top:auto;padding-top:26px;color:#526273;font-size:10px}
+@media(max-width:700px){.cecDocumentModal{padding:0}.cecDocumentShell{width:100%;height:100%;max-height:none;border-radius:0}.cecDocumentTools{grid-template-columns:1fr auto auto}.cecDocumentTools span{display:none}.cecDecisionSheet{width:calc(100% - 20px);padding:24px 20px;min-height:0}.cecDecisionSheet>footer{grid-template-columns:1fr}.cecCredentialSheet{width:calc(100% - 20px);padding:14px}.cecCredentialCover{width:100%;min-height:210px}.cecCredentialInside{grid-template-columns:1fr}.cecCredentialInside section+section{border-left:0;border-top:1px solid #d7caa8}}
+@media print{
+ body *{visibility:hidden!important}
+ .cecDocumentModal,.cecDocumentModal *{visibility:visible!important}
+ .cecDocumentModal{position:absolute;inset:0;padding:0;background:#fff}
+ .cecDocumentBackdrop,.cecDocumentTools{display:none!important}
+ .cecDocumentShell{width:100%;max-height:none;overflow:visible;border-radius:0;background:#fff;box-shadow:none}
+ .cecPrintableDocument{margin:0 auto;box-shadow:none}
+}
