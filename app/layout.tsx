@@ -28,6 +28,7 @@ import './2026-achievements-steam.css';
 import './2026-document-workflow-v2.css';
 import './2026-npa-registry-canonical.css';
 import './2026-npa-workspace-canonical.css';
+import './2026-stage-system.css';
 import type {Metadata} from 'next';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
