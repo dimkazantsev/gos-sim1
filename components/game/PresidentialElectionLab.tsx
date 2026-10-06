@@ -8,12 +8,12 @@ import {institutionEmblem} from './institutionEmblems';
 import {extractCandidateDocumentText} from './candidateDocumentText';
 
 type Settings={game_id:string;system_type:'relative'|'absolute'|'qualified'|'preferential';threshold_pct:number;poll_enabled:boolean;status:'setup'|'round1'|'runoff'|'finished'|'manual_required';result:Record<string,any>};
-type Candidate={id:string;user_id:string|null;party_id:string|null;display_name:string;nomination_type:'party'|'self'|'fictional';registration_status:'submitted'|'registered'|'revision'|'rejected'|'withdrawn';program_summary:string|null;campaign_statement:string|null;registration_attempts:number;legal_error_count:number;rating_penalty:number;created_by:string;registration_number:string|null;registration_decision_no:string|null;registration_decision_at:string|null;registration_public_summary:string|null;cec_submitted_at:string|null;cec_submission_version:number};
+type Candidate={id:string;user_id:string|null;party_id:string|null;display_name:string;nomination_type:'party'|'self'|'fictional';registration_status:'submitted'|'registered'|'revision'|'rejected'|'withdrawn';program_summary:string|null;campaign_statement:string|null;registration_attempts:number;legal_error_count:number;rating_penalty:number;created_by:string;registration_number:string|null;registration_decision_no:string|null;registration_decision_at:string|null;registration_public_summary:string|null;cec_submitted_at:string|null;cec_submission_version:number;archived_at:string|null};
 type CecDecision={id:string;candidate_id:string;decision_type:'registered'|'revision'|'rejected'|'withdrawn';decision_number:string;public_summary:string;created_at:string;reasoning?:AutoReview|null};
 type CecPrivateNote={decision_id:string;candidate_id:string;private_summary:string|null};
 type PrivateProfile={candidate_id:string;birth_date:string|null;birth_place:string|null;contact_phone:string|null;contact_email:string|null;address_text:string|null;passport_note:string|null};
 type ProgramPoint={id:string;candidate_id:string;point_no:number;body:string};
-type CandidateDoc={id:string;candidate_id:string;doc_kind:string;title:string;storage_path:string;file_name:string;status:'submitted'|'accepted'|'revision';note:string|null;url?:string|null;extracted_text:string|null;extraction_status:'pending'|'extracted'|'no_text'|'unsupported'|'error';auto_check:{verdict?:'ok'|'issues'|'manual';summary?:string;issues?:string[];checks?:{label:string;ok:boolean}[];basis?:string};is_submitted:boolean;submitted_at:string|null};
+type CandidateDoc={id:string;candidate_id:string;doc_kind:string;title:string;storage_path:string;file_name:string;status:'submitted'|'accepted'|'revision';note:string|null;url?:string|null;extracted_text:string|null;extraction_status:'pending'|'extracted'|'no_text'|'unsupported'|'error';auto_check:{verdict?:'ok'|'issues'|'manual';summary?:string;issues?:string[];checks?:{label:string;ok:boolean}[];basis?:string};is_submitted:boolean;submitted_at:string|null;archived_at:string|null};
 type Supporter={id:string;candidate_id:string;supporter_user_id:string};
 type SignatureBatch={id:string;candidate_id:string;direction_label:string;signatures:number};
 type CandidateReadiness={ready:boolean;issues:string[];program_points:number;accepted_documents:number;required_documents:number;support_group:number;signatures:number;nomination_type:string};
@@ -77,10 +77,10 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   if(!game)return;
   const [a,b,c,p,d,sg,sb,cd,cn,pp]=await Promise.all([
    supabase.from('presidential_election_settings').select('*').eq('game_id',game.id).maybeSingle(),
-   supabase.from('presidential_candidates').select('*').eq('game_id',game.id).order('created_at'),
+   supabase.from('presidential_candidates').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at'),
    supabase.from('presidential_scorecards').select('*').eq('game_id',game.id),
    supabase.from('presidential_candidate_program_points').select('*').eq('game_id',game.id).order('point_no'),
-   supabase.from('presidential_candidate_documents').select('*').eq('game_id',game.id).order('created_at'),
+   supabase.from('presidential_candidate_documents').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at'),
    supabase.from('presidential_support_group').select('*').eq('game_id',game.id).order('created_at'),
    supabase.from('presidential_signature_batches').select('*').eq('game_id',game.id).order('direction_label'),
    supabase.from('presidential_cec_decisions').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
@@ -185,6 +185,22 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   const r=await supabase.rpc('save_presidential_candidate_document_text',{p_document_id:doc.id,p_text:text,p_extraction_status:text.length>=20?'extracted':'no_text'});
   if(r.error)setError(r.error.message);else await load();setBusy(false);
  }
+ async function archiveCandidateDocument(doc:CandidateDoc){
+  if(!teacher||busy)return;
+  if(typeof window!=='undefined'&&!window.confirm('Удалить документ «'+doc.file_name+'» из активного досье?'))return;
+  setBusy(true);
+  const r=await supabase.rpc('archive_presidential_candidate_document',{p_document_id:doc.id});
+  if(r.error)setError(r.error.message);else await load();
+  setBusy(false);
+ }
+ async function archiveCandidateRecord(candidate:Candidate){
+  if(!teacher||busy)return;
+  if(typeof window!=='undefined'&&!window.confirm('Удалить кандидата «'+candidate.display_name+'» из активного реестра ЦИК и досье?'))return;
+  setBusy(true);
+  const r=await supabase.rpc('archive_presidential_candidate',{p_candidate_id:candidate.id});
+  if(r.error)setError(r.error.message);else await load();
+  setBusy(false);
+ }
  async function submitToCec(candidateId:string){
   setBusy(true);const r=await supabase.rpc('submit_presidential_candidate_to_cec',{p_candidate_id:candidateId});
   if(r.error)setError(r.error.message);else{setPanelView('application');await load()}setBusy(false);
@@ -236,7 +252,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    const canManage=teacher||c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id);
    const requiredKinds=c.nomination_type==='party'?partyDocs:c.nomination_type==='self'?selfDocs:[];
    const usedSupporterIds=new Set(supporters.filter(x=>x.candidate_id!==c.id).map(x=>x.supporter_user_id));
-   return <article className={'candidateCard '+c.registration_status} key={c.id}><header><div className="candidateAvatar">{c.display_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</div><div><small>{party?.name||(c.nomination_type==='self'?'Самовыдвижение':'Сценарный кандидат')}</small><h3>{c.display_name}</h3></div><span>{candidateStatus[c.registration_status]}</span></header>{c.registration_decision_no&&<div className="cecCandidateDecision"><b>{c.registration_decision_no}</b><span>{c.registration_public_summary||'Решение ЦИК зафиксировано.'}</span>{c.registration_number&&<button className="cecCredentialOpen" onClick={()=>setDocumentPreview({kind:'credential',candidateId:c.id})}>Удостоверение {c.registration_number}</button>}</div>}{panelView!=='application'&&c.program_summary&&<p className="candidateProgramText">{c.program_summary}</p>}{panelView!=='application'&&c.campaign_statement&&<p className="candidateCampaignText"><b>Агитационный тезис</b>{c.campaign_statement}</p>}<div className="candidateAudit"><span>Подач <b>{c.registration_attempts}</b></span><span>Юр. ошибок <b>{c.legal_error_count}</b></span><span>Штраф <b>−{Number(c.rating_penalty).toFixed(1)} п.п.</b></span></div>
+   return <article className={'candidateCard '+c.registration_status} key={c.id}><header><div className="candidateAvatar">{c.display_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</div><div><small>{party?.name||(c.nomination_type==='self'?'Самовыдвижение':'Сценарный кандидат')}</small><h3>{c.display_name}</h3></div><div className="candidateHeaderActions"><span>{candidateStatus[c.registration_status]}</span>{teacher&&<IconAction variant="remove" onClick={()=>void archiveCandidateRecord(c)} label={'Удалить кандидата '+c.display_name}/>}</div></header>{c.registration_decision_no&&<div className="cecCandidateDecision"><b>{c.registration_decision_no}</b><span>{c.registration_public_summary||'Решение ЦИК зафиксировано.'}</span>{c.registration_number&&<button className="cecCredentialOpen" onClick={()=>setDocumentPreview({kind:'credential',candidateId:c.id})}>Удостоверение {c.registration_number}</button>}</div>}{panelView!=='application'&&c.program_summary&&<p className="candidateProgramText">{c.program_summary}</p>}{panelView!=='application'&&c.campaign_statement&&<p className="candidateCampaignText"><b>Агитационный тезис</b>{c.campaign_statement}</p>}<div className="candidateAudit"><span>Подач <b>{c.registration_attempts}</b></span><span>Юр. ошибок <b>{c.legal_error_count}</b></span><span>Штраф <b>−{Number(c.rating_penalty).toFixed(1)} п.п.</b></span></div>
    {panelView==='application'&&<section className="cecSubmissionPanel">
     <header><div><small>ПАКЕТ К РАССМОТРЕНИЮ</small><h4>{c.display_name}</h4></div><span className={c.cec_submitted_at?'submitted':'draft'}>{c.cec_submitted_at?'Подан в ЦИК':'Не подан'}</span></header>
     <div className="cecSubmissionProgress"><span><b>{docs.filter(x=>requiredKinds.includes(x.doc_kind)).length}</b> / {requiredKinds.length} документов</span><span><b>{candidatePoints.length}</b> / 10 пунктов программы</span>{c.nomination_type==='self'&&<><span><b>{group.length}</b> / 5 группа</span><span><b>{sigs.reduce((a,x)=>a+Number(x.signatures),0)}</b> / 15 подписей</span></>}</div>
@@ -259,7 +275,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
         <strong>{!doc?'Загрузить':'Заменить'}</strong>
        </label>
        {doc&&<div className="cecDocumentDetails">
-        <div className="cecDocumentFileLine"><a href={doc.url||'#'} target="_blank" rel="noreferrer">{doc.file_name}</a><span>{doc.is_submitted?'Передан в ЦИК':'Черновик'}</span></div>
+        <div className="cecDocumentFileLine"><a href={doc.url||'#'} target="_blank" rel="noreferrer">{doc.file_name}</a><span>{doc.is_submitted?'Передан в ЦИК':'Черновик'}</span>{teacher&&<IconAction variant="remove" onClick={()=>void archiveCandidateDocument(doc)} label={'Удалить документ '+doc.file_name}/>}</div>
         {doc.auto_check?.summary&&<p className={'cecAutoSummary '+state}>{doc.auto_check.summary}</p>}
         {!!doc.auto_check?.issues?.length&&<ul>{doc.auto_check.issues.map(issue=><li key={issue}>{issue}</li>)}</ul>}
         <details className="cecRecognizedText"><summary>{doc.extracted_text?'Распознанный текст и редактирование':'Добавить текст для проверки'}</summary>
