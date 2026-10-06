@@ -72,7 +72,7 @@ begin
  if exists(select 1 from public.game_votes where game_id=r.game_id and stage_no=2 and status='open') then raise exception 'Close the current stage 2 vote first';end if;
  v_body:='Система: '||r.system_type||coalesce('; метод распределения: '||r.allocation_method,'')||coalesce('; мажоритарное правило: '||r.majoritarian_method,'')||coalesce('; доля пропорциональной части: '||r.proportional_share||'%','')||coalesce('. Обоснование: '||r.rationale,'');
  insert into public.game_votes(game_id,stage_no,title,body,voting_mode,status,created_by,institution_key,procedure_key,quorum_kind,quorum_value,majority_kind,majority_value,allow_abstain,tie_breaker_chair,pass_transition,fail_transition)
- values(r.game_id,2,'КСРФ · избирательная система',v_body,'faction','open',v_uid,'factions','electoral_system','none',0,'yes_no_simple',0.5,true,false,'none','none') returning id into v_vote;
+ values(r.game_id,2,'КСРФ · избирательная система',v_body,'faction','open',v_uid,'ksrf','electoral_system','fraction',0.5,'eligible_majority',0.5,true,false,'none','none') returning id into v_vote;
  update public.parliamentary_election_rules set status='vote_open',vote_id=v_vote,updated_at=now() where id=r.id;return v_vote;
 end;$$;
 revoke all on function public.open_parliamentary_rule_vote(uuid) from public,anon;
@@ -95,7 +95,7 @@ begin
  if exists(select 1 from public.game_votes where game_id=r.game_id and stage_no=3 and status='open') then raise exception 'Close the current stage 3 vote first';end if;
  v_label:=case r.method when 'random' then 'демократический (случайный)' when 'proportional' then 'пропорциональный по мандатам ГД' else 'договорной' end;
  insert into public.game_votes(game_id,stage_no,title,body,voting_mode,status,created_by,institution_key,procedure_key,quorum_kind,quorum_value,majority_kind,majority_value,allow_abstain,tie_breaker_chair,pass_transition,fail_transition)
- values(r.game_id,3,'КСРФ · метод распределения 89 субъектов','Предлагается метод: '||v_label||coalesce('. Обоснование: '||r.rationale,''),'faction','open',v_uid,'factions','regional_system','none',0,'yes_no_simple',0.5,true,false,'none','none') returning id into v_vote;
+ values(r.game_id,3,'КСРФ · метод распределения 89 субъектов','Предлагается метод: '||v_label||coalesce('. Обоснование: '||r.rationale,''),'faction','open',v_uid,'ksrf','regional_system','fraction',0.5,'eligible_majority',0.5,true,false,'none','none') returning id into v_vote;
  update public.regional_election_rules set status='vote_open',vote_id=v_vote,updated_at=now() where id=r.id;return v_vote;
 end;$$;
 revoke all on function public.open_regional_rule_vote(uuid) from public,anon;
