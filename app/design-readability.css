@@ -2719,3 +2719,36 @@
   border-radius:11px;
 }
 .simChat.gsChatV2 .chatComposeActions>.chatSendButton.iconOnly{margin-left:auto!important}
+
+
+/* Chat ordering, unread and mention UX */
+.topChatIconWrap,.mobileMenuChatIcon{position:relative;display:inline-grid;place-items:center}
+.topChatUnread,.mobileChatUnread,.mobileMenuChatIcon>i,.chatUnreadBadge,.chatMentionBadge{
+ display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;
+ background:#315efb;color:#fff;font-size:12px;font-style:normal;font-weight:900;line-height:1;
+ box-shadow:0 0 0 2px #fff;
+}
+.topChatUnread{position:absolute;right:-10px;top:-9px}
+.topChatUnread.hasMention,.mobileChatUnread.hasMention,.mobileMenuChatIcon>i.hasMention,.chatMentionBadge{background:#d94665}
+.mobileChatUnread{position:absolute;right:-11px;top:-9px;z-index:2;min-width:17px;height:17px;padding:0 4px}
+.mobileMenuChatIcon>i{position:absolute;right:-11px;top:-9px}
+.chatChannelCounters{display:flex;align-items:center;gap:5px;margin-left:auto;flex:none}
+.chatChannelCounters i{box-shadow:none}
+.chatMentionBadge{background:#fff0f4!important;color:#bd3854!important;border:1px solid #f2beca}
+.chatUnreadBadge{background:#315efb!important;color:#fff!important}
+.chatChannelOptionText small{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chatPeopleResults{display:grid;gap:3px;padding:6px 10px 9px;border-top:1px solid #e4eaf3;background:#fbfcfe}
+.chatPeopleResults>small{padding:2px 4px;color:#8493a7;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+.chatPeopleResults>button{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:9px;width:100%;min-height:44px;padding:6px 8px;border:0;border-radius:10px;background:transparent;color:#294663;text-align:left}
+.chatPeopleResults>button:hover,.chatPeopleResults>button:focus-visible{background:#eef4ff}
+.chatPersonAvatar{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#eaf0ff;color:#315efb}
+.chatPeopleResults>button>span:nth-child(2){display:grid;gap:1px;min-width:0}
+.chatPeopleResults b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.chatPeopleResults small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#7a8ba0;font-size:12px}
+.chatPeopleResults em{color:#315efb;font-size:12px;font-style:normal;font-weight:900}
+.chatMentionList>small{display:flex!important;align-items:center;gap:5px}
+@media(max-width:640px){
+ .chatChannelOptionText small{max-width:160px}
+ .chatPeopleResults>button{grid-template-columns:32px minmax(0,1fr)}
+ .chatPeopleResults em{display:none}
+}
