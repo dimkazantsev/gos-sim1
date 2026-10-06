@@ -42,6 +42,16 @@ export function useRepublicGame(gameId:string){
  const myEvaluations=useMemo(()=>evaluations.filter(e=>e.user_id===me?.user_id),[evaluations,me?.user_id]);
  const averageVsn=myEvaluations.length?myEvaluations.reduce((a,b)=>a+b.score,0)/myEvaluations.length:0;
 
+ function chatMemoryKey(userId:string){return 'gos-sims:last-chat:'+gameId+':'+userId}
+ function rememberChatChannel(targetChannel:string,userId=me?.user_id){
+  if(typeof window==='undefined'||!userId||!targetChannel)return;
+  try{window.localStorage.setItem(chatMemoryKey(userId),targetChannel)}catch{}
+ }
+ function recalledChatChannel(userId:string,available:Channel[]){
+  if(typeof window==='undefined'||!userId||!available.length)return '';
+  try{const saved=window.localStorage.getItem(chatMemoryKey(userId))||'';return available.some(channel=>channel.id===saved)?saved:''}catch{return ''}
+ }
+
  const {budgetPulse,budgetPulseError,refreshBudgetPulse}=useBudgetPulse(gameId,!!me&&me.game_id===gameId);
  const sharedMetrics=useMemo(()=>withBudgetIncome(metrics,budgetPulse),[metrics,budgetPulse]);
  const sharedMetricHistory=useMemo(()=>budgetPulse?[...metricHistory.filter(h=>h.metric_key!=='budget'),...budgetPulse.history]:metricHistory,[metricHistory,budgetPulse]);
@@ -172,7 +182,10 @@ export function useRepublicGame(gameId:string){
   const mediaRows=await Promise.all(((px.data||[]) as PoliticalPostMedia[]).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
   if(activeGameRef.current!==gameId)return;
   setPoliticalPosts((pp.data||[]) as PoliticalPost[]);setPoliticalMedia(mediaRows);setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);setMetricHistory((mh.data||[]) as MetricHistory[]);setPartySupportHistory((psh.data||[]) as PartySupportHistory[]);
-  if(!channelRef.current&&ch.data?.[0])setChannelId(ch.data[0].id);
+  if(!channelRef.current&&ch.data?.[0]){
+   const available=(ch.data||[]) as Channel[];
+   setChannelId(recalledChatChannel(u.id,available)||available[0].id);
+  }
   await Promise.all([loadImpactEngine(),loadRepublicOffices()]);
   if(activeGameRef.current===gameId&&show)setLoading(false);
  }
@@ -795,7 +808,7 @@ export function useRepublicGame(gameId:string){
   await loadFormalRegistry();return true;
  }
 
- async function sendText(text:string,targetChannel=channelId){if(!me||!targetChannel||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:targetChannel,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}await loadMessages(targetChannel);return true}
+ async function sendText(text:string,targetChannel=channelId){if(!me||!targetChannel||!text.trim())return false;const r=await supabase.from('chat_messages').insert({game_id:gameId,channel_id:targetChannel,author_id:me.user_id,kind:'text',text:text.trim()});if(r.error){setError(r.error.message);return false}rememberChatChannel(targetChannel,me.user_id);await loadMessages(targetChannel);return true}
  async function storeChatAttachment(blob:Blob,fileName:string,mime:string,kind:'file'|ChatMediaKind,targetChannel:string,voiceMeta?:{duration?:number;waveform?:number[]}){
   if(!me||!targetChannel){setChatMediaError('Канал недоступен. Повторно откройте чат.');return false}
   setChatMediaError('');
@@ -826,6 +839,7 @@ export function useRepublicGame(gameId:string){
    return false;
   }
   pendingChatUploads.current.delete(blob);
+  rememberChatChannel(targetChannel,me.user_id);
   if(channelRef.current===targetChannel){
    void loadMessages(targetChannel).catch(()=>setChatMediaError('Файл отправлен, но история не обновилась. Переключите канал, чтобы увидеть сообщение.'));
   }
