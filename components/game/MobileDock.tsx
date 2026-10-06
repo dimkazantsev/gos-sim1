@@ -172,10 +172,13 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
   if(!g||g.id!==event.pointerId)return;
   const wasDrag=g.mode==='drag',wasScroll=g.mode==='scroll';
   if(wasDrag&&g.moved){
-   const under=document.elementFromPoint(event.clientX,event.clientY);
-   const target=under?.closest<HTMLButtonElement>('.mobileDockItem[data-dock-item]');
+   const scroller=scrollRef.current;
+   const candidates=scroller?[...scroller.querySelectorAll<HTMLButtonElement>('.mobileDockItem[data-dock-item]')].filter(button=>button.dataset.dockItem!==g.key):[];
+   const target=candidates
+    .map(button=>{const r=button.getBoundingClientRect();const dx=event.clientX-(r.left+r.width/2),dy=event.clientY-(r.top+r.height/2);return {button,distance:Math.hypot(dx,dy)}})
+    .sort((a,b)=>a.distance-b.distance)[0]?.button;
    const key=target?.dataset.dockItem as View|undefined;
-   if(key&&key!==g.key&&available.includes(key)&&!pinnedSet.has(key))reorder(g.key,key);
+   if(key&&available.includes(key)&&!pinnedSet.has(key))reorder(g.key,key);
   }
   clearGesture();
   if(wasDrag||wasScroll)suppressClickUntil.current=Date.now()+(wasDrag?450:180);
