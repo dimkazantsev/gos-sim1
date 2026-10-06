@@ -64,6 +64,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [selectedMessages,setSelectedMessages]=useState<string[]>([]);
  const [deletingMessages,setDeletingMessages]=useState(false);
  const selectHoldTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const selectHoldActivated=useRef(false);
  const [search,setSearch]=useState('');
  const [onlyFiles,setOnlyFiles]=useState(false);
  const [attachOpen,setAttachOpen]=useState(false);
@@ -246,7 +247,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  function beginMessageSelection(m:Message){
   if(!canDeleteMessage(m))return;
   if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current);
-  selectHoldTimer.current=setTimeout(()=>{setSelectedMessages(current=>current.includes(m.id)?current:[...current,m.id])},420);
+  selectHoldActivated.current=false;
+  selectHoldTimer.current=setTimeout(()=>{selectHoldActivated.current=true;setSelectedMessages(current=>current.includes(m.id)?current:[...current,m.id])},420);
  }
  function cancelMessageSelectionHold(){
   if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current);
@@ -324,7 +326,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
        onPointerDown={e=>{if((e.target as HTMLElement).closest('button,a,input,textarea,select'))return;beginMessageSelection(m)}}
        onPointerUp={cancelMessageSelectionHold} onPointerCancel={cancelMessageSelectionHold} onPointerLeave={cancelMessageSelectionHold}
        onContextMenu={e=>{if(!canDeleteMessage(m))return;e.preventDefault();cancelMessageSelectionHold();setSelectedMessages(current=>current.includes(m.id)?current:[...current,m.id])}}
-       onClick={e=>{if(!selectedMessages.length||!canDeleteMessage(m)||(e.target as HTMLElement).closest('button,a,input,textarea,select'))return;toggleMessageSelection(m)}}>
+       onClick={e=>{if(selectHoldActivated.current){selectHoldActivated.current=false;return}if(!selectedMessages.length||!canDeleteMessage(m)||(e.target as HTMLElement).closest('button,a,input,textarea,select'))return;toggleMessageSelection(m)}}>
        {!own&&<span className={'chatAvatar '+(!startsGroup?'placeholder':'')} aria-hidden="true">{startsGroup?initials(name):''}</span>}
        <div className="chatMessageColumn">
         {startsGroup&&<div className="chatAuthor">{onOpenMember&&g.members.some(member=>member.user_id===m.author_id)?<button type="button" className="chatAuthorProfile" onClick={()=>onOpenMember(m.author_id)}>{own?'Вы':name}</button>:<b>{own?'Вы':name}</b>}<time dateTime={m.created_at}>{formatChatTime(m.created_at)}</time></div>}
