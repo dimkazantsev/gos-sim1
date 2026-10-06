@@ -4,6 +4,7 @@ import {supabase} from '@/lib/supabase';
 import {AlertTriangle,CheckCircle2,ChevronDown,ExternalLink,History,RefreshCw,ShieldCheck,XCircle} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {STAGE_SYSTEM} from './stageSystem';
+import {STAGE_REALTIME_TABLES} from './stageRealtimeTables';
 
 export type StageReadiness={
  stage_no:number;
@@ -32,9 +33,8 @@ export default function StageReadinessPanel({g,stageNo,compact=false,rulesUrl,ru
  useEffect(()=>{void load()},[game?.id,stageNo]);
  useEffect(()=>{
   if(!game)return;
-  const tables=['stage_readiness_overrides','game_parties','game_votes','office_elections','presidential_candidates','presidential_election_settings','presidential_system_proposals','presidential_candidate_program_points','presidential_candidate_documents','presidential_support_group','presidential_signature_batches','government_nominations','government_structures','institution_units','institution_assignments','state_programs','state_program_budget_years','government_sessions','duma_sessions','formal_documents','budget_scenarios','municipal_mayor_elections','municipal_districts','municipal_district_members','municipal_projects','municipal_project_evidence','game_crises','game_reflections'];
   const ch=supabase.channel('stage-readiness:'+game.id+':'+stageNo);
-  for(const table of tables)ch.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+game.id},()=>void load());
+  for(const table of STAGE_REALTIME_TABLES)ch.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+game.id},()=>void load());
   ch.subscribe();
   return()=>{void supabase.removeChannel(ch)}
  },[game?.id,stageNo]);
