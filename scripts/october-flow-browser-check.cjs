@@ -92,9 +92,9 @@ async function ready(){
    const savedDoc=JSON.parse(await page.locator('#flow-output').textContent());assert.equal(savedDoc.kind,'document-edit');assert.equal(savedDoc.metadata.expected_revision,1,'Save includes the revision being edited');
    const delivery=page.locator('.documentDelivery');await delivery.locator('summary').click();
    await delivery.getByRole('button',{name:/Получатель/}).click();await page.getByRole('option',{name:/Анна Миронова/}).first().click();
-   await delivery.getByLabel('Сопроводительный текст',{exact:true}).fill('Ознакомьтесь с новой редакцией.');
-   await delivery.getByRole('button',{name:'Направить копию',exact:true}).click();
-   await page.locator('.documentToolSuccess').filter({hasText:'Документ направлен'}).waitFor();
+   await delivery.getByLabel('Комментарий получателю',{exact:true}).fill('Ознакомьтесь с новой редакцией.');
+   await delivery.getByRole('button',{name:'Отправить для ознакомления',exact:true}).click();
+   await page.locator('.documentToolSuccess').filter({hasText:'Документ отправлен для ознакомления'}).waitFor();
    assert.equal(toolCalls.filter(x=>x.rpc==='send_formal_document').at(-1).p_recipient_id,'student-0');
    assert.equal(toolCalls.filter(x=>x.rpc==='send_formal_document').at(-1).p_move,false);
    await page.getByRole('button',{name:'Подписать редакцию',exact:true}).click();await page.locator('.documentToolSuccess').filter({hasText:'Редакция подписана'}).waitFor();
