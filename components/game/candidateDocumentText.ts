@@ -15,7 +15,7 @@ export async function extractCandidateDocumentText(file:File):Promise<{text:stri
   }
   if(name.endsWith('.pdf')||file.type==='application/pdf'){
    const {extractText,getDocumentProxy}=await import('unpdf');
-   const pdf=await getDocumentProxy(new Uint8Array(await file.arrayBuffer()),{maxImageSize:16_777_216});
+   const pdf=await getDocumentProxy(new Uint8Array(await file.arrayBuffer()));
    if(pdf.numPages>80)return {text:'',status:'error',note:'PDF слишком большой для автоматической проверки: более 80 страниц.'};
    const extracted=await Promise.race([
     extractText(pdf,{mergePages:true}),
