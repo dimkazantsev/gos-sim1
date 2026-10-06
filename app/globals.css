@@ -2067,3 +2067,32 @@ button,input,textarea,select{font-size:14px}
 }
 
 }
+
+
+/* CEC presidential workflow — stages 6–7 */
+.cecWorkspace{position:relative}
+.cecHead{grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr)}
+.cecHeadSide{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.055)}
+.cecHeadSide .cecEmblem{width:72px;height:72px;object-fit:contain;flex:0 0 72px;filter:drop-shadow(0 7px 14px rgba(0,0,0,.22))}
+.cecHeadSide b{display:block;color:#fff;font-size:14px;line-height:1.35}.cecHeadSide span{display:block;margin-top:5px;color:#9fb4ca;font-size:13px;line-height:1.4}
+.cecTabs{display:flex;gap:6px;overflow-x:auto;margin-top:11px;padding:5px;border:1px solid #dce5ef;border-radius:14px;background:#f4f7fb;scrollbar-width:none}.cecTabs::-webkit-scrollbar{display:none}
+.cecTabs button{flex:none;min-height:39px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:#60748e;font-size:13px;font-weight:900;white-space:nowrap;cursor:pointer}
+.cecTabs button b{display:inline-grid;place-items:center;min-width:20px;height:20px;margin-left:5px;padding:0 5px;border-radius:999px;background:#e4eaf2;color:#687b93;font-size:11px}
+.cecTabs button.active{background:#fff;color:#24476d;box-shadow:0 3px 12px rgba(27,52,83,.09)}.cecTabs button.active b{background:#315efb;color:#fff}
+.cecDecisionRegistry{margin-top:11px;border:1px solid #dfe6ef;border-radius:17px;background:#fbfcfe;overflow:hidden}
+.cecDecisionRegistry>header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;border-bottom:1px solid #e4eaf1;background:#fff}
+.cecDecisionRegistry>header small{color:#8190a4;font-size:11px;font-weight:950;letter-spacing:.1em}.cecDecisionRegistry>header h3{margin:3px 0 0;color:#284565;font-size:17px}.cecDecisionRegistry>header>span{padding:6px 9px;border-radius:999px;background:#edf2f7;color:#657990;font-size:12px;font-weight:900}
+.cecDecision{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start;padding:14px 15px;border-top:1px solid #edf0f4;background:#fff}.cecDecision:first-of-type{border-top:0}
+.cecDecision>div>small{color:#8a98aa;font-size:11px;font-weight:850}.cecDecision h4{margin:4px 0;color:#294664;font-size:14px}.cecDecision p{margin:0;color:#60758d;font-size:13px;line-height:1.52}
+.cecDecision>strong{padding:6px 9px;border-radius:999px;background:#edf2f7;color:#667a91;font-size:11px;white-space:nowrap}.cecDecision.registered>strong{background:#dcf3e7;color:#25734f}.cecDecision.revision>strong{background:#fff0cc;color:#8e6615}.cecDecision.rejected>strong,.cecDecision.withdrawn>strong{background:#fce2e7;color:#a13d52}
+.cecDecision details{margin-top:9px;padding:8px 10px;border-radius:10px;background:#f6f8fb}.cecDecision summary{cursor:pointer;color:#5e7087;font-size:12px;font-weight:900}.cecDecision details p{margin-top:6px;color:#66778d}
+.cecCandidateDecision{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px 11px;align-items:center;padding:10px 13px;border-bottom:1px solid #e4eaf0;background:#eef5ff}
+.cecCandidateDecision b{color:#315efb;font-size:12px}.cecCandidateDecision span{color:#566f8a;font-size:12px;line-height:1.45}.cecCandidateDecision em{padding:5px 7px;border-radius:8px;background:#fff;color:#355b80;font-size:11px;font-style:normal;font-weight:900;white-space:nowrap}
+.candidateCampaignText{display:grid;gap:3px;margin:0;padding:10px 13px;border-bottom:1px solid #e9edf2;background:#fff;color:#5a6f87;font-size:13px;line-height:1.5}.candidateCampaignText b{color:#315efb;font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.candidatePrivateProfile{padding:12px;border:1px solid #e0e6ef;border-radius:14px;background:#f9fafc}.candidatePrivateProfile>header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.candidatePrivateProfile>header small{color:#8c7a99;font-size:11px;font-weight:950;letter-spacing:.09em}.candidatePrivateProfile>header h4{margin:2px 0 0;color:#3b4960;font-size:13px}.candidatePrivateProfile>header>span{padding:5px 7px;border-radius:8px;background:#eeeaf4;color:#715f80;font-size:11px;font-weight:900}
+.candidatePrivateGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.candidatePrivateGrid label{display:grid;gap:4px;color:#6d7d92;font-size:11px;font-weight:900}.candidatePrivateGrid label.wide{grid-column:1/-1}
+.candidatePrivateGrid input,.candidatePrivateGrid textarea{width:100%;border:1px solid #dce3eb;border-radius:9px;background:#fff;padding:8px 9px;color:#304963;font-size:12px}.candidatePrivateProfile>button{margin-top:9px;min-height:38px;border:1px solid #d5ddea;border-radius:9px;background:#fff;color:#45617f;padding:0 11px;font-size:12px;font-weight:900}
+.cecReview{grid-template-columns:160px 90px 90px minmax(180px,1fr) minmax(180px,1fr) auto!important;align-items:end}.cecReview textarea{width:100%;min-height:62px;border:1px solid #dbe4ed;border-radius:9px;background:#fff;padding:8px;font-size:12px;resize:vertical}.cecReviewPublic,.cecReviewPrivate{display:grid!important;gap:4px!important}.cecReviewPrivate{color:#806d87!important}.cecReview button{min-height:42px!important}
+@media(max-width:1100px){.cecReview{grid-template-columns:1fr 1fr 1fr!important}.cecReviewPublic,.cecReviewPrivate{grid-column:span 3}.cecReview button{grid-column:span 3}.cecHead{grid-template-columns:1fr}}
+@media(max-width:700px){.cecTabs{margin-inline:-1px}.cecHeadSide{padding:11px}.cecHeadSide .cecEmblem{width:56px;height:56px;flex-basis:56px}.cecCandidateDecision{grid-template-columns:1fr}.cecCandidateDecision em{justify-self:start}.candidatePrivateGrid{grid-template-columns:1fr}.candidatePrivateGrid label.wide{grid-column:auto}.cecReview{grid-template-columns:1fr!important}.cecReviewPublic,.cecReviewPrivate,.cecReview button{grid-column:auto}}
