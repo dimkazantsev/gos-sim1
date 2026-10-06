@@ -117,7 +117,7 @@ export default function StageWorkspace({
     <small>ИНСТИТУЦИОНАЛЬНАЯ ЛОГИКА</small>
     <h2>{system.institution}</h2>
     <p>{system.strategicQuestion}</p>
-    <div><span>{system.legalMode}</span><span>{system.gameMechanic}</span></div>
+    <div>{system.legalMode!=='Право РФ + игровая редукция'&&<span>{system.legalMode}</span>}<span>{system.gameMechanic}</span></div>
    </section>
   </div>
 
