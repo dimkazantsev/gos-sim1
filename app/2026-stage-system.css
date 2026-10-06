@@ -295,3 +295,207 @@
 @media(prefers-reduced-motion:reduce){
  .stageWorkspaceCanonical *{transition:none!important;animation-duration:.001ms!important}
 }
+
+
+/* CEC dossier workflow — draft, submission, public registry and legal review */
+.cecWorkspace .cecTabs{
+ display:grid;
+ grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:6px;
+ padding:6px;
+ border:1px solid #dce5ef;
+ border-radius:15px;
+ background:#f3f6fa;
+}
+.cecWorkspace .cecTabs>button{
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:7px;
+ min-height:46px;
+ padding:8px 12px;
+ border:0;
+ border-radius:11px;
+ background:transparent;
+ color:#58708d;
+ font-size:13px;
+ font-weight:850;
+ white-space:nowrap;
+}
+.cecWorkspace .cecTabs>button.active{
+ background:#fff;
+ color:#173f72;
+ box-shadow:0 5px 16px rgba(25,55,94,.09);
+}
+.cecWorkspace .cecTabs>button>b{
+ display:grid;
+ place-items:center;
+ min-width:22px;
+ height:22px;
+ padding:0 6px;
+ border-radius:999px;
+ background:#e5ecf8;
+ color:#5f7592;
+ font-size:12px;
+}
+.cecWorkspace .cecTabs>button.active>b{background:#315efb;color:#fff}
+
+.cecDraftDocuments>header{align-items:flex-start!important}
+.cecDraftDocuments>header p{
+ margin:5px 0 0;
+ max-width:720px;
+ color:#73849a;
+ font-size:12px;
+ line-height:1.55;
+}
+.cecDocumentChecklist{display:grid!important;gap:8px!important}
+.cecDocumentItem{
+ overflow:hidden;
+ border:1px solid #dfe7f0;
+ border-radius:13px;
+ background:#fff;
+ transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.cecDocumentItem:focus-within{border-color:#a8bdf5;box-shadow:0 0 0 3px rgba(49,94,251,.08)}
+.cecDocumentItem.ok{border-color:#bee2cf;background:#fbfefc}
+.cecDocumentItem.issues{border-color:#f0c5cd;background:#fffafb}
+.cecDocumentItem.manual{border-color:#e5d7ad;background:#fffdf8}
+.cecDocumentUploadTarget{
+ display:grid!important;
+ grid-template-columns:36px minmax(0,1fr) auto;
+ gap:11px!important;
+ align-items:center;
+ min-height:62px;
+ margin:0!important;
+ padding:10px 12px;
+ cursor:pointer;
+}
+.cecDocumentUploadTarget>input{position:absolute;inline-size:1px!important;block-size:1px!important;opacity:0;pointer-events:none}
+.cecDocumentState{
+ display:grid;
+ place-items:center;
+ width:34px;
+ height:34px;
+ border-radius:10px;
+ background:#edf2f8;
+ color:#7b8da3;
+ font-size:14px;
+ font-weight:950;
+}
+.cecDocumentItem.ok .cecDocumentState{background:#e5f6ed;color:#16825c}
+.cecDocumentItem.issues .cecDocumentState{background:#fff0f2;color:#bf425b}
+.cecDocumentItem.manual .cecDocumentState{background:#fff6dc;color:#9a6a0e}
+.cecDocumentCopy{display:grid;gap:2px;min-width:0}
+.cecDocumentCopy>b{color:#294863;font-size:13px;line-height:1.35}
+.cecDocumentCopy>small{color:#7b8ca0;font-size:12px;line-height:1.35}
+.cecDocumentUploadTarget>strong{
+ padding:7px 10px;
+ border:1px solid #d5dfeb;
+ border-radius:9px;
+ background:#fff;
+ color:#315c8d;
+ font-size:12px;
+}
+.cecDocumentDetails{
+ display:grid;
+ gap:8px;
+ padding:0 12px 12px 59px;
+}
+.cecDocumentFileLine{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cecDocumentFileLine>a{min-width:0;color:#315efb;font-size:12px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cecDocumentFileLine>span{padding:4px 7px;border-radius:999px;background:#eff3f8;color:#718299;font-size:12px}
+.cecAutoSummary{margin:0!important;padding:8px 10px;border-radius:9px;background:#f3f6fa;color:#62758d!important;font-size:12px!important;line-height:1.5!important}
+.cecAutoSummary.ok{background:#edf9f3;color:#36765d!important}
+.cecAutoSummary.issues{background:#fff1f3;color:#a44457!important}
+.cecAutoSummary.manual{background:#fff8e5;color:#8a681e!important}
+.cecDocumentDetails>ul{margin:0;padding-left:18px;color:#995064;font-size:12px;line-height:1.55}
+.cecRecognizedText{border-top:1px solid #e7edf3;padding-top:7px}
+.cecRecognizedText>summary{cursor:pointer;color:#56708d;font-size:12px;font-weight:850}
+.cecRecognizedText textarea{
+ width:100%;
+ min-height:150px;
+ margin-top:8px;
+ padding:10px 11px;
+ border:1px solid #d4dfeb;
+ border-radius:10px;
+ background:#fff;
+ color:#29445f;
+ font:inherit;
+ font-size:12px;
+ line-height:1.55;
+ resize:vertical;
+ box-sizing:border-box;
+}
+.cecRecognizedText>div{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:7px}
+.cecRecognizedText>div small{color:#7b8ca0;font-size:12px}
+.cecRecognizedText button{min-height:36px;padding:0 10px;border:1px solid #ccd9e8;border-radius:9px;background:#fff;color:#315b8c;font-size:12px;font-weight:850}
+
+.cecDraftAudit,.cecSubmissionPanel{
+ margin-top:12px;
+ padding:14px;
+ border:1px solid #dfe7f0;
+ border-radius:13px;
+ background:#fbfcfe;
+}
+.cecDraftAudit{display:grid;gap:5px}
+.cecDraftAudit.isReady{border-color:#bee2cf;background:#f8fcfa}
+.cecDraftAudit.hasIssues{border-color:#efd1d6;background:#fffafb}
+.cecDraftAudit>b{color:#294863;font-size:13px}
+.cecDraftAudit>span,.cecDraftAudit>small{color:#718299;font-size:12px;line-height:1.5}
+.cecDraftAudit ul{margin:4px 0;padding-left:18px;color:#8d4b5c;font-size:12px;line-height:1.5}
+
+.cecSubmissionPanel{display:grid;gap:12px;margin:12px 14px 14px}
+.cecSubmissionPanel>header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.cecSubmissionPanel>header small{color:#778aa1;font-size:12px;font-weight:900}
+.cecSubmissionPanel>header h4{margin:3px 0 0;color:#244666;font-size:16px}
+.cecSubmissionPanel>header>span{padding:6px 9px;border-radius:999px;font-size:12px;font-weight:900}
+.cecSubmissionPanel>header>span.draft{background:#eef2f7;color:#667b93}
+.cecSubmissionPanel>header>span.submitted{background:#e9f2ff;color:#315da6}
+.cecSubmissionProgress{display:flex;gap:7px;flex-wrap:wrap}
+.cecSubmissionProgress>span{padding:7px 9px;border-radius:9px;background:#f0f4f9;color:#657991;font-size:12px}
+.cecSubmissionProgress b{color:#294b6c}
+.cecAutoReview{overflow:hidden;border:1px solid #dfe7f0;border-radius:12px;background:#fff}
+.cecAutoReviewHead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;border-bottom:1px solid #e7edf4;background:#fafcff}
+.cecAutoReviewHead>div{display:grid;gap:2px}
+.cecAutoReviewHead b{color:#294863;font-size:13px}
+.cecAutoReviewHead small{color:#7b8ca0;font-size:12px}
+.cecAutoReviewHead>strong{padding:6px 8px;border-radius:8px;font-size:12px}
+.cecAutoReviewHead>strong.ok{background:#e7f7ef;color:#217355}
+.cecAutoReviewHead>strong.issues{background:#fff0f2;color:#b13f57}
+.cecAutoReview>ol{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.cecAutoReview>ol>li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;padding:10px 12px;border-top:1px solid #edf1f5}
+.cecAutoReview>ol>li:first-child{border-top:0}
+.cecAutoReview>ol>li>span{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:#eef2f7;color:#72859d;font-size:12px;font-weight:950}
+.cecAutoReview>ol>li.ok>span{background:#e5f6ed;color:#16825c}
+.cecAutoReview>ol>li.issues>span{background:#fff0f2;color:#bf425b}
+.cecAutoReview>ol>li.manual>span{background:#fff6dc;color:#9a6a0e}
+.cecAutoReview li>div{display:grid;gap:2px}
+.cecAutoReview li b{color:#38546f;font-size:12px}
+.cecAutoReview li small{color:#78899d;font-size:12px;line-height:1.45}
+.cecAutoReview li p{margin:2px 0 0;color:#9a4a5d;font-size:12px;line-height:1.45}
+.cecSubmitPackage,.cecUseAutoReview{justify-self:start;min-height:42px!important}
+.cecSubmittedNote{margin:0!important;color:#718299!important;font-size:12px!important}
+
+.cecReview{margin:0 14px 14px!important;padding:14px!important;border:1px solid #ccd9e9!important;border-radius:13px!important;background:#f8fbff!important}
+.cecReview:before{content:"Решение ЦИК";grid-column:1/-1;color:#24486e;font-size:14px;font-weight:950}
+.cecDecisionChecks{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.cecDecisionChecks span{padding:5px 7px;border-radius:8px;background:#f1f5fa;color:#6b7f96;font-size:12px}
+.cecDecisionReasoning{margin-top:24px}
+.cecDecisionReasoning h4{margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:15px}
+.cecDecisionReasoning ol{display:grid;gap:10px;margin:0;padding-left:22px}
+.cecDecisionReasoning li{padding-left:4px;font-family:Georgia,'Times New Roman',serif;font-size:13px;line-height:1.6}
+.cecDecisionReasoning li>b{display:block}
+.cecDecisionReasoning li>span{color:#4c6075}
+.cecDecisionReasoning li>p{margin:3px 0 0;color:#7e3f4d}
+.cecDecisionReasoningSummary{margin-top:14px;padding:10px 12px;border-left:3px solid #b44b61;background:#fff7f8}
+
+@media(max-width:760px){
+ .cecWorkspace .cecTabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .cecWorkspace .cecTabs>button{justify-content:flex-start}
+ .cecDocumentUploadTarget{grid-template-columns:34px minmax(0,1fr)}
+ .cecDocumentUploadTarget>strong{grid-column:2;justify-self:start}
+ .cecDocumentDetails{padding-left:12px}
+ .cecSubmissionPanel{margin:10px}
+ .cecAutoReviewHead{align-items:flex-start;flex-direction:column}
+ .cecRecognizedText>div{align-items:flex-start;flex-direction:column}
+}
