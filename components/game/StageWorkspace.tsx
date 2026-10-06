@@ -87,6 +87,10 @@ export default function StageWorkspace({
  }
 
  return <div className="stageWorkspacePage" style={{'--stage-phase-accent':phase.accent} as CSSProperties}>
+  <button type="button" className="stageWorkspaceFloatingBack" onClick={onBack} aria-label="Вернуться ко всем этапам">
+   <ArrowLeft size={18} aria-hidden="true"/>
+   <span>Все этапы</span>
+  </button>
   <header className="stageWorkspaceHero">
    <div className="stageWorkspaceTopNav"><button type="button" className="stageWorkspaceBack" onClick={onBack} aria-label="Вернуться ко всем этапам"><span className="stageWorkspaceBackIcon" aria-hidden="true"><ArrowLeft size={20}/></span><span className="stageWorkspaceBackCopy"><small>Вернуться</small><b>Все этапы</b></span></button><div className="stageWorkspaceContext" aria-label={"Текущий этап: "+stage.title}><span>Этап {String(stage.stage_no).padStart(2,'0')}</span><b>{stage.title}</b></div></div>
    <div className="stageWorkspaceHeroMain">
