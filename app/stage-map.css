@@ -3207,3 +3207,48 @@
  }
  .stageWorkspacePage .ghostPolicyProposalFooter>button{width:100%}
 }
+
+
+.stageWorkspaceFloatingBack{
+ position:fixed;
+ right:22px;
+ bottom:24px;
+ z-index:120;
+ display:inline-flex;
+ align-items:center;
+ gap:8px;
+ min-height:44px;
+ padding:0 14px;
+ border:1px solid #c8d7f2;
+ border-radius:14px;
+ background:rgba(255,255,255,.96);
+ color:#244d86;
+ font:inherit;
+ font-size:12px;
+ font-weight:850;
+ box-shadow:0 10px 28px rgba(25,54,96,.16);
+ backdrop-filter:blur(10px);
+ cursor:pointer;
+ transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+}
+.stageWorkspaceFloatingBack:hover{
+ transform:translateY(-1px);
+ border-color:#9eb9ee;
+ box-shadow:0 14px 34px rgba(25,54,96,.20);
+}
+.stageWorkspaceFloatingBack:focus-visible{
+ outline:none;
+ box-shadow:0 0 0 4px rgba(49,94,251,.14),0 14px 34px rgba(25,54,96,.18);
+}
+@media(max-width:760px){
+ .stageWorkspaceFloatingBack{
+  right:12px;
+  bottom:calc(76px + env(safe-area-inset-bottom));
+  min-width:44px;
+  width:44px;
+  padding:0;
+  justify-content:center;
+  border-radius:13px;
+ }
+ .stageWorkspaceFloatingBack span{display:none}
+}
