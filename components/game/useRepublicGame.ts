@@ -125,6 +125,11 @@ export function useRepublicGame(gameId:string){
 
  useEffect(()=>{channelRef.current=channelId;setMessages([]);setChatPins([]);setPinnedMessages([]);if(channelId){void loadMessages(channelId,true);void loadChatPins(channelId);if(chatOpen)void markChatRead(channelId)}else setChatLoading(false)},[channelId]);
  useEffect(()=>{if(chatOpen&&channelId)void markChatRead(channelId)},[chatOpen,channelId,messages.length]);
+ useEffect(()=>{
+  if(!chatOpen||!channels.length||!chatOverview.length)return;
+  const lastSent=[...chatOverview].filter(x=>x.last_sent_at).sort((a,b)=>Date.parse(b.last_sent_at!)-Date.parse(a.last_sent_at!))[0]?.channel_id||'';
+  if(lastSent&&lastSent!==channelRef.current&&channels.some(channel=>channel.id===lastSent))setChannelId(lastSent);
+ },[chatOpen]);
 
  useEffect(()=>{
   const tick=()=>{
