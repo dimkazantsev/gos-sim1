@@ -15,7 +15,7 @@ export default function ChatChannelDropdown({
  const menuId=useId();
  const safeOverview=Array.isArray(overview)?overview:[];
  const meta=useMemo(()=>new Map(safeOverview.map(x=>[x.channel_id,x])),[safeOverview]);
- const visibleChannels=channels.filter(c=>!isHiddenChannel(c)&&meta.has(c.id));
+ const visibleChannels=channels.filter(c=>!isHiddenChannel(c)&&(safeOverview.length===0||meta.has(c.id)));
  const lastSentId=[...safeOverview].filter(x=>x.last_sent_at).sort((a,b)=>Date.parse(b.last_sent_at!)-Date.parse(a.last_sent_at!))[0]?.channel_id||'';
  const orderedChannels=[...visibleChannels].sort((a,b)=>{
   const am=meta.get(a.id),bm=meta.get(b.id);
