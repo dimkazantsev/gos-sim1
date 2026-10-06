@@ -75,7 +75,7 @@ await input.pressSequentially('Обсудим основания докумен�
 await page.getByRole('button',{name:'Отправить сообщение',exact:true}).click();
 await page.waitForFunction(()=>document.querySelector('#iteration-output')?.textContent?.includes('Обсудим основания документа'));
 let dm=JSON.parse(await page.locator('#iteration-output').textContent());
-assert.equal(dm.channel,initial.channelId);assert(dm.text.includes('Обсудим основания документа'));assert.equal(calls.filter(x=>x.rpc==='open_direct_conversation').length,0,'Mention must not open a direct chat');
+assert.equal(dm.channel,fixture.channelId);assert(dm.text.includes('Обсудим основания документа'));assert.equal(calls.filter(x=>x.rpc==='open_direct_conversation').length,0,'Mention must not open a direct chat');
 await page.getByRole('button',{name:'Поиск в чате',exact:true}).click();
 const search=page.getByRole('searchbox',{name:'Поиск сообщений или человека'});await search.fill('Тихонов');
 await page.locator('.chatPeopleResults button').filter({hasText:'Илья Тихонов'}).click();
