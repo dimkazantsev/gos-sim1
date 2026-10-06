@@ -1,0 +1,297 @@
+/* Canonical stage system — 2026-10-06
+   Loaded last so all 16 stage workspaces share one visual and responsive language. */
+
+.stageWorkspaceCanonical{
+ --stage-canvas:#f4f7fb;
+ --stage-surface:#fff;
+ --stage-surface-soft:#f8fafc;
+ --stage-line:#dce5ef;
+ --stage-line-strong:#c9d5e4;
+ --stage-ink:#17314f;
+ --stage-body:#526a86;
+ --stage-muted:#7a8ca2;
+ --stage-accent:var(--stage-phase-accent,#315efb);
+ display:grid;
+ gap:14px;
+ min-width:0;
+ color:var(--stage-ink);
+}
+.stageWorkspaceCanonical :is(button,input,textarea,select){font-family:inherit}
+.stageWorkspaceCanonical :is(button,a,input,textarea,select):focus-visible{outline:3px solid color-mix(in srgb,var(--stage-accent) 28%,transparent);outline-offset:2px}
+.stageWorkspaceCanonical :is(.stageWorkspaceHero,.stageStudentRoute,.stageWorkspaceCard,.stageWorkspaceBlueprint,.stageWorkspaceExecution,.stageWorkspaceSources,.stageWorkspaceTeacher,.stageWorkspaceSyncBar,.stageWorkspacePager){
+ border:1px solid var(--stage-line);
+ border-radius:18px;
+ background:var(--stage-surface);
+ box-shadow:0 8px 28px rgba(20,43,75,.045);
+}
+.stageWorkspaceCanonical .stageWorkspaceHero{
+ overflow:hidden;
+ background:
+  radial-gradient(circle at 94% 4%,color-mix(in srgb,var(--stage-accent) 13%,transparent),transparent 31rem),
+  linear-gradient(180deg,#fff 0%,#fbfcff 100%);
+}
+.stageWorkspaceCanonical .stageWorkspaceBadge{
+ color:var(--stage-accent);
+ border-color:color-mix(in srgb,var(--stage-accent) 24%,#d8e2ee);
+ background:color-mix(in srgb,var(--stage-accent) 8%,#fff);
+}
+.stageWorkspaceCanonical .stageWorkspaceEyebrow,
+.stageWorkspaceCanonical .stageWorkspaceCard>small,
+.stageWorkspaceCanonical .stageWorkspaceSectionHead small,
+.stageWorkspaceCanonical .stageWorkspaceSources small,
+.stageWorkspaceCanonical .stageWorkspaceTeacher small{
+ color:color-mix(in srgb,var(--stage-accent) 62%,#526a86);
+}
+.stageWorkspaceCanonical .stageWorkspacePills>span,
+.stageWorkspaceCanonical .stageWorkspacePills>button{
+ min-height:34px;
+ border-radius:10px;
+}
+.stageWorkspaceSyncBar{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:16px;
+ padding:11px 14px;
+ background:#fbfcfe!important;
+}
+.stageWorkspaceSyncState{display:flex;align-items:center;gap:10px;min-width:0}
+.stageWorkspaceSyncState>svg{flex:none;color:#8395aa}
+.stageWorkspaceSyncState>span{display:grid;gap:1px;min-width:0}
+.stageWorkspaceSyncState b{color:#385675;font-size:12px}
+.stageWorkspaceSyncState small{color:#8797aa;font-size:10px}
+.stageWorkspaceSyncBar.is-connected .stageWorkspaceSyncState>svg{color:#16845f}
+.stageWorkspaceSyncBar.is-connected .stageWorkspaceSyncState b{color:#267052}
+.stageWorkspaceSyncBar.is-connecting .stageWorkspaceSyncState>svg{color:#a06a13}
+.stageWorkspaceSyncBar.is-disconnected{border-color:#e7cbd1;background:#fff9fa!important}
+.stageWorkspaceSyncBar.is-disconnected .stageWorkspaceSyncState>svg,
+.stageWorkspaceSyncBar.is-disconnected .stageWorkspaceSyncState b{color:#a74659}
+.stageWorkspaceSyncFacts{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+.stageWorkspaceSyncFacts span{display:inline-flex;align-items:center;gap:4px;min-height:29px;padding:0 9px;border:1px solid #e1e8f1;border-radius:9px;background:#fff;color:#6d8098;font-size:10px;white-space:nowrap}
+.stageWorkspaceSyncFacts b{color:#315273;font-size:11px}
+
+.stageWorkspaceCanonical .stageStudentRoute{
+ background:linear-gradient(135deg,#f9fbff,#f4f8ff);
+}
+.stageWorkspaceCanonical .stageWorkspaceCard,
+.stageWorkspaceCanonical .stageWorkspaceBlueprint,
+.stageWorkspaceCanonical .stageWorkspaceExecution,
+.stageWorkspaceCanonical .stageWorkspaceSources{
+ overflow:hidden;
+}
+.stageWorkspaceCanonical .stageWorkspaceOverview,
+.stageWorkspaceCanonical .stageWorkspaceTwoColumns{gap:12px}
+.stageWorkspaceCanonical .stageWorkspaceSteps article{
+ border-color:#e0e7f0;
+ background:#fbfcfe;
+}
+.stageWorkspaceCanonical .stageWorkspaceSteps article>span{
+ background:color-mix(in srgb,var(--stage-accent) 10%,#f4f7fb);
+ color:var(--stage-accent);
+}
+.stageWorkspaceCanonical .stageWorkspaceExecutionHead{
+ padding-bottom:16px;
+ border-bottom:1px solid #e7edf4;
+}
+.stageWorkspaceCoreTools{
+ display:grid;
+ gap:12px;
+ margin-top:14px;
+}
+.stageWorkspaceCoreTools>*{min-width:0;margin:0!important}
+.stageSpecializedModules{
+ display:grid;
+ gap:14px;
+ min-width:0;
+ margin-top:14px;
+}
+.stageSpecializedModules>*{
+ min-width:0;
+ margin:0!important;
+ content-visibility:auto;
+ contain-intrinsic-size:700px;
+}
+
+/* Every specialized stage module gets the same outer geometry. */
+.stageWorkspaceCanonical .stageSpecializedModules>:is(
+ .electoralLab,.dumaElection,.ghostPolicyLab,.presSystemDecision,.electionLab,
+ .governmentStructure,.governmentLab,.staffingLab,.programLab,.govSessionLab,
+ .legislativeLab,.budgetLab,.municipalGovernance,.municipalLab,.crisisCommand,.debriefLab
+){
+ width:100%;
+ border:1px solid var(--stage-line);
+ border-radius:17px;
+ background:#fff;
+ box-shadow:none;
+ overflow:hidden;
+}
+
+/* Canonical headers across modules. */
+.stageWorkspaceCanonical :is(
+ .electoralLabHead,.dumaElectionHead,.ghostPolicyHead,.electionLabHead,.governmentLabHead,
+ .staffingLabHead,.programLabHead,.govSessionHead,.legislativeLabHead,.budgetLabHead,
+ .municipalGovernanceHead,.municipalLabHead,.crisisCommandHead,.debriefHead
+){
+ border-radius:0;
+ box-shadow:none;
+}
+.stageWorkspaceCanonical .stageSpecializedModules>:is(
+ .electoralLab,.dumaElection,.ghostPolicyLab,.presSystemDecision,.electionLab,
+ .governmentStructure,.governmentLab,.staffingLab,.programLab,.govSessionLab,
+ .legislativeLab,.budgetLab,.municipalGovernance,.municipalLab,.crisisCommand,.debriefLab
+)>:first-child{
+ margin-top:0;
+}
+
+/* Normalize form controls and action density in all stage modules. */
+.stageWorkspaceCanonical .stageSpecializedModules :is(input:not([type=checkbox]):not([type=radio]),select,textarea){
+ max-width:100%;
+ min-width:0;
+ border-color:#d7e1ec;
+ border-radius:10px;
+ background:#fff;
+ color:#29445f;
+}
+.stageWorkspaceCanonical .stageSpecializedModules :is(input:not([type=checkbox]):not([type=radio]),select){min-height:40px}
+.stageWorkspaceCanonical .stageSpecializedModules textarea{padding:9px 10px;line-height:1.5}
+.stageWorkspaceCanonical .stageSpecializedModules :is(button,.primary,.secondary){
+ min-height:40px;
+ border-radius:10px;
+}
+.stageWorkspaceCanonical .stageSpecializedModules label{min-width:0}
+.stageWorkspaceCanonical .stageSpecializedModules :is(h2,h3,h4){text-wrap:balance}
+.stageWorkspaceCanonical .stageSpecializedModules :is(p,span,small,label){overflow-wrap:anywhere}
+
+/* Tame nested cards so complex stages do not look like unrelated mini-sites. */
+.stageWorkspaceCanonical .stageSpecializedModules :is(
+ .electoralProposal,.electoralPublishedResult,.dumaElectionCard,.ghostPolicyProposal,
+ .candidateCard,.governmentNomination,.staffingSection,.policyMandate,.policyPriorityArea,
+ .programCard,.govSessionCard,.legislativeSessionCard,.budgetScenario,.mayorElection,
+ .municipalProjectSummary,.crisisIntel,.crisisResponsePanel,.reflectionPhases,.debriefEvidence
+){
+ box-shadow:none;
+}
+.stageWorkspaceCanonical .stageSpecializedModules :is(
+ .candidateGrid,.governmentFlow,.committeeGrid,.municipalSummaryGrid,.reflectionGrid
+){gap:10px}
+
+/* Shared status language. */
+.stageWorkspaceCanonical :is(.registered,.approved,.appointed,.finished,.adopted,.ready){
+ --stage-state:#167a59;
+}
+.stageWorkspaceCanonical :is(.revision,.warning,.submitted,.open){
+ --stage-state:#a06a13;
+}
+.stageWorkspaceCanonical :is(.rejected,.blocked,.withdrawn){
+ --stage-state:#b04459;
+}
+
+/* Realtime and procedural readiness should read as one system. */
+.stageWorkspaceCanonical .stageReadinessWorkspace{
+ margin-top:14px!important;
+ box-shadow:none;
+}
+.stageWorkspaceCanonical .stageReadinessHero{
+ background:#fbfcfe;
+}
+.stageWorkspaceCanonical .stageReadinessHeroIcon{
+ border:1px solid #dfe7f0;
+}
+.stageWorkspaceCanonical .stageReadinessChecklist{gap:10px}
+
+/* Cross-stage pager is intentionally stable on every stage. */
+.stageWorkspacePager{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) minmax(150px,.55fr) minmax(0,1fr);
+ gap:8px;
+ padding:8px;
+ background:#f8fafc!important;
+}
+.stageWorkspacePager>button{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ min-width:0;
+ min-height:54px;
+ padding:8px 12px;
+ border:1px solid #dce5ef;
+ border-radius:11px;
+ background:#fff;
+ color:#4d6580;
+ text-align:left;
+}
+.stageWorkspacePager>button:last-child{justify-content:flex-end;text-align:right}
+.stageWorkspacePager>button:disabled{opacity:.42}
+.stageWorkspacePager>button>span{display:grid;gap:1px;min-width:0}
+.stageWorkspacePager small{color:#8a99ab;font-size:9px;text-transform:uppercase;letter-spacing:.07em}
+.stageWorkspacePager b{overflow:hidden;color:#2e4d6f;font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+.stageWorkspacePagerAll{justify-content:center!important;text-align:center!important;background:#f0f5ff!important;border-color:#cfddf8!important}
+.stageWorkspacePagerAll b{color:#315ebf}
+
+/* Atlas and workspace share the same phase accent treatment. */
+.stagesAtlas .stageAtlasPhase.isSelected,
+.stagesAtlas .stageAtlasCard.is-open{
+ box-shadow:inset 0 3px var(--phase-accent,#315efb);
+}
+.stagesAtlas .stageAtlasCard{content-visibility:auto;contain-intrinsic-size:220px}
+
+/* Dense desktop optimization. */
+@media(min-width:1180px){
+ .stageWorkspaceCanonical .stageWorkspaceExecution{padding:20px}
+ .stageWorkspaceCanonical .stageWorkspaceOverview,
+ .stageWorkspaceCanonical .stageWorkspaceTwoColumns{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .stageWorkspaceCanonical .stageSpecializedModules>:is(.governmentStructure,.presSystemDecision){padding:16px}
+}
+
+/* Tablet */
+@media(max-width:900px){
+ .stageWorkspaceSyncBar{align-items:flex-start;flex-direction:column}
+ .stageWorkspaceSyncFacts{justify-content:flex-start}
+ .stageWorkspaceCanonical .stageSpecializedModules :is(
+  .candidateGrid,.governmentFlow,.committeeGrid,.municipalSummaryGrid,.reflectionGrid
+ ){grid-template-columns:1fr}
+ .stageWorkspacePager{grid-template-columns:1fr 1fr}
+ .stageWorkspacePagerAll{grid-column:1/-1;grid-row:1}
+}
+
+/* Mobile */
+@media(max-width:640px){
+ .stageWorkspaceCanonical{gap:10px}
+ .stageWorkspaceCanonical :is(.stageWorkspaceHero,.stageStudentRoute,.stageWorkspaceCard,.stageWorkspaceBlueprint,.stageWorkspaceExecution,.stageWorkspaceSources,.stageWorkspaceTeacher,.stageWorkspaceSyncBar,.stageWorkspacePager){
+  border-radius:14px;
+ }
+ .stageWorkspaceSyncBar{padding:10px}
+ .stageWorkspaceSyncFacts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}
+ .stageWorkspaceSyncFacts span{justify-content:center;padding:0 6px;text-align:center;white-space:normal}
+ .stageWorkspaceCanonical .stageWorkspaceExecution{padding:13px}
+ .stageWorkspaceCoreTools,.stageSpecializedModules{gap:10px;margin-top:10px}
+ .stageWorkspaceCanonical .stageSpecializedModules>:is(
+  .electoralLab,.dumaElection,.ghostPolicyLab,.presSystemDecision,.electionLab,
+  .governmentStructure,.governmentLab,.staffingLab,.programLab,.govSessionLab,
+  .legislativeLab,.budgetLab,.municipalGovernance,.municipalLab,.crisisCommand,.debriefLab
+ ){border-radius:14px}
+ .stageWorkspaceCanonical .stageSpecializedModules :is(button,.primary,.secondary){min-height:44px}
+ .stageWorkspaceCanonical .stageSpecializedModules :is(input:not([type=checkbox]):not([type=radio]),select){min-height:44px}
+ .stageWorkspacePager{grid-template-columns:1fr;padding:7px}
+ .stageWorkspacePagerAll{grid-column:auto;grid-row:auto}
+ .stageWorkspacePager>button:last-child{justify-content:flex-start;text-align:left}
+ .stageWorkspacePager>button:last-child>span{order:2}
+ .stageWorkspacePager>button:last-child>svg{order:1;transform:rotate(180deg)}
+}
+
+/* Very small screens: eliminate horizontal overflow from legacy module grids. */
+@media(max-width:460px){
+ .stageWorkspaceCanonical .stageSpecializedModules *{max-width:100%}
+ .stageWorkspaceCanonical .stageSpecializedModules :is(
+  .scoreInputs,.candidateReview,.candidateNominationBody,.electionSettings,.electionLabHead,
+  .dumaElectionCreator,.dumaNomination,.governmentNominateGrid,.sfConsult,
+  .budgetInputs,.municipalEditor,.signatureComposer,.supportComposer,.candidatePrivateGrid
+ ){grid-template-columns:minmax(0,1fr)!important}
+ .stageWorkspaceCanonical .stageSpecializedModules :is(
+  .scoreInputs button,.candidateReview button,.candidateProgram,.wide
+ ){grid-column:auto!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+ .stageWorkspaceCanonical *{transition:none!important;animation-duration:.001ms!important}
+}
