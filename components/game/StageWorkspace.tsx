@@ -30,8 +30,15 @@ import SystemDebriefLab from './SystemDebriefLab';
 import LegislativeSessionLab from './LegislativeSessionLab';
 import GovernmentProgramSessionLab from './GovernmentProgramSessionLab';
 import CrisisRoom from './CrisisRoom';
+import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 
 const STAGE_ICONS=[UsersRound,Route,Map,Landmark,UserRoundX,ClipboardCheck,Vote,Building2,Network,Target,ClipboardList,Scale,Wallet,MapPin,ShieldAlert,ChartNoAxesCombined] as const;
+
+const STAGE_REGISTRATION_BODIES:Partial<Record<number,string[]>>={
+ 2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],7:['gd'],8:['gd','government'],
+ 9:['gd','committee','government'],11:['government'],12:['gd','committee'],
+ 13:['gd','committee','sf'],14:['municipality']
+};
 
 const VIEW_LABELS:Partial<Record<View,string>>={
  parties:'Партии / фракции',
