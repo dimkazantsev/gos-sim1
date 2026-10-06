@@ -113,16 +113,41 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  }
 
  const calculatorVotes=parties.map(p=>Math.max(0,Number(support[p.id])||0));
- const calculatorSeats=calculatorVotes.reduce((sum,value)=>sum+value,0)>0?allocate(calculatorVotes,450,calculatorMethod):calculatorVotes.map(()=>0);
- const preview=parties.map((p,i)=>({party:p,seats:calculatorSeats[i]||0}));
  const calculatorSupportTotal=calculatorVotes.reduce((sum,value)=>sum+value,0);
+ const proportionalPool=calculatorSystem==='proportional'?450:calculatorSystem==='mixed'?Math.round(450*calculatorMixedShare/100):0;
+ const districtPool=calculatorSystem==='majoritarian'?450:calculatorSystem==='mixed'?450-proportionalPool:0;
+ const proportionalSeats=proportionalPool>0&&calculatorSupportTotal>0?allocate(calculatorVotes,proportionalPool,calculatorMethod):calculatorVotes.map(()=>0);
+ const districtValues=parties.map(p=>Math.max(0,Math.floor(Number(districtSeats[p.id])||0)));
+ const districtTotal=districtValues.reduce((sum,value)=>sum+value,0);
+ const calculatorSeats=parties.map((_,i)=>calculatorSystem==='proportional'?proportionalSeats[i]||0:calculatorSystem==='majoritarian'?districtValues[i]||0:(proportionalSeats[i]||0)+(districtValues[i]||0));
+ const preview=parties.map((p,i)=>({party:p,seats:calculatorSeats[i]||0,proportional:proportionalSeats[i]||0,district:districtValues[i]||0}));
  const calculatorAllocatedTotal=calculatorSeats.reduce((sum,value)=>sum+value,0);
+ const calculatorReady=(proportionalPool===0||calculatorSupportTotal>0)&&(districtPool===0||districtTotal===districtPool)&&calculatorAllocatedTotal===450;
+ const latestSavedResult=savedResults[0];
 
  async function proposeP(){
   setBusy(true);const r=await supabase.rpc('propose_parliamentary_election_rule',{p_game_id:activeGame.id,p_system_type:system,p_allocation_method:system==='majoritarian'?null:method,p_majoritarian_method:system==='proportional'?null:majority,p_proportional_share:system==='mixed'?propShare:null,p_rationale:rationale.trim()||null});
   if(r.error)setError(r.error.message);else{setRationale('');await load()}setBusy(false);
  }
  async function voteP(id:string){setBusy(true);const r=await supabase.rpc('open_parliamentary_rule_vote',{p_rule_id:id});if(r.error)setError(r.error.message);else{await load();onOpenVotes()}setBusy(false)}
+ async function publishCalculatorResult(){
+  if(!teacher||!calculatorReady)return;
+  setBusy(true);
+  const supportPayload=Object.fromEntries(parties.map((p,i)=>[p.id,calculatorVotes[i]||0]));
+  const districtPayload=Object.fromEntries(parties.map((p,i)=>[p.id,districtValues[i]||0]));
+  const resultPayload=Object.fromEntries(parties.map((p,i)=>[p.id,calculatorSeats[i]||0]));
+  const r=await supabase.rpc('publish_electoral_calculator_result',{
+   p_game_id:activeGame.id,
+   p_system_type:calculatorSystem,
+   p_allocation_method:calculatorSystem==='majoritarian'?null:calculatorMethod,
+   p_proportional_share:calculatorSystem==='mixed'?calculatorMixedShare:null,
+   p_support:supportPayload,
+   p_district_seats:districtPayload,
+   p_result:resultPayload
+  });
+  if(r.error)setError(r.error.message);else await load();
+  setBusy(false);
+ }
  async function proposeR(){
   setBusy(true);const r=await supabase.rpc('propose_regional_election_rule',{p_game_id:activeGame.id,p_method:regionalMethod,p_rationale:regionalRationale.trim()||null});
   if(r.error)setError(r.error.message);else{setRegionalRationale('');await load()}setBusy(false);
