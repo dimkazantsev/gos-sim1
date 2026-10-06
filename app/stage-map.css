@@ -592,6 +592,38 @@
 .stageWorkspacePills .stageWorkspaceStatus.is-completed{background:#eef4ff;border-color:#d2def7;color:#315a93}
 .stageWorkspacePills .stageWorkspaceStatus.is-locked{background:#f4f6f9;border-color:#e0e5eb;color:#6e7f94}
 .stageWorkspacePills .isAttention{background:#fff7e8;border-color:#ecd49b;color:#8a6418}
+.stageWorkspacePublicChat{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:7px;
+ min-height:32px;
+ padding:5px 11px;
+ border:1px solid #cbd9f7;
+ border-radius:999px;
+ background:linear-gradient(180deg,#f7faff 0%,#eef4ff 100%);
+ color:#315a93;
+ font:inherit;
+ font-size:11px;
+ font-weight:850;
+ line-height:1.2;
+ cursor:pointer;
+ box-shadow:0 4px 12px rgba(49,94,251,.07);
+ transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.stageWorkspacePublicChat:hover{
+ transform:translateY(-1px);
+ border-color:#9eb9ee;
+ background:linear-gradient(180deg,#fff 0%,#eaf1ff 100%);
+ box-shadow:0 8px 18px rgba(49,94,251,.12);
+}
+.stageWorkspacePublicChat:focus-visible{
+ outline:none;
+ border-color:#6f93f8;
+ box-shadow:0 0 0 3px rgba(49,94,251,.14),0 8px 18px rgba(49,94,251,.10);
+}
+.stageWorkspacePublicChat svg{flex:none}
+
 .stageWorkspaceSummary{
  display:grid;
  grid-template-columns:repeat(2,minmax(0,1fr));
@@ -884,6 +916,14 @@
  .stageWorkspaceSources{grid-template-columns:minmax(0,1fr)}
  .stageWorkspacePage .stageArtifactResults{grid-template-columns:minmax(0,1fr)}
  .stageWorkspaceTeacher{align-items:stretch;flex-direction:column}
+}
+@media(max-width:640px){
+ .stageWorkspacePublicChat{
+  width:100%;
+  min-height:40px;
+  border-radius:12px;
+ }
+ .stageWorkspacePills{width:100%}
 }
 @media(max-width:520px){
  .stageWorkspaceHeroMain{gap:12px}
