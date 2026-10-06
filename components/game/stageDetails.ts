@@ -9,6 +9,29 @@ export type StageDetail={
   sources?:{label:string;url:string}[];
 };
 
+
+const OFFICIAL={
+ constitution:{label:'Конституция Российской Федерации · официальный текст',url:'http://pravo.gov.ru/proxy/ips/?docbody=&nd=102027595'},
+ politicalParties:{label:'95-ФЗ «О политических партиях» · Минюст России',url:'https://minjust.gov.ru/ru/documents/7722/'},
+ partyForms:{label:'Приказ Минюста России от 12.11.2024 № 333 · документы для регистрации политической партии',url:'https://minjust.gov.ru/ru/documents/7721/'},
+ legalEntities:{label:'129-ФЗ «О государственной регистрации юридических лиц и ИП» · официальный текст',url:'http://pravo.gov.ru/proxy/ips/?docbody=&nd=102072405'},
+ electionGuarantees:{label:'67-ФЗ «Об основных гарантиях избирательных прав…» · официальный текст',url:'http://pravo.gov.ru/proxy/ips/?docbody=&nd=102076507'},
+ dumaElections:{label:'20-ФЗ «О выборах депутатов Государственной Думы…» · официальный текст',url:'http://pravo.gov.ru/proxy/ips/?docbody=&nd=102171479'},
+ presidentElections:{label:'19-ФЗ «О выборах Президента Российской Федерации» · официальный текст',url:'http://pravo.gov.ru/proxy/ips/?docbody=&nd=102079674'},
+ regionalPower:{label:'414-ФЗ «Об общих принципах организации публичной власти в субъектах РФ» · официальный текст',url:'http://pravo.gov.ru/proxy/ips/?docbody=&nd=602663034'},
+ dumaRegulation:{label:'Регламент Государственной Думы Федерального Собрания РФ',url:'https://duma.gov.ru/duma/about/regulations/'},
+ deputyStatus:{label:'3-ФЗ «О статусе сенатора РФ и статусе депутата Государственной Думы…» · официальное издание ГД',url:'https://duma.gov.ru/media/files/ZWdqMkXace4JkrANZdisBWjCAOybpx8g.pdf'},
+ government:{label:'4-ФКЗ «О Правительстве Российской Федерации» · Правительство России',url:'https://government.ru/docs/all/130724/'},
+ strategicPlanning:{label:'172-ФЗ «О стратегическом планировании в Российской Федерации» · официальный текст',url:'http://pravo.gov.ru/proxy/ips/?docbody=&nd=102354386'},
+ statePrograms:{label:'Постановление Правительства РФ от 26.05.2021 № 786 «О системе управления государственными программами РФ»',url:'http://publication.pravo.gov.ru/Document/View/0001202105280009'},
+ budgetCode:{label:'Бюджетный кодекс Российской Федерации · официальный текст',url:'http://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721'},
+ localGovernment:{label:'33-ФЗ «Об общих принципах организации местного самоуправления в единой системе публичной власти»',url:'https://publication.pravo.gov.ru/document/0001202503200023'},
+ emergency:{label:'3-ФКЗ «О чрезвычайном положении» · официальный текст',url:'http://pravo.gov.ru/proxy/ips/?docbody=&nd=102071299'},
+ martialLaw:{label:'1-ФКЗ «О военном положении» · официальный текст',url:'http://pravo.gov.ru/proxy/ips/?docbody=&nd=102074700'},
+ emergencies:{label:'68-ФЗ «О защите населения и территорий от ЧС природного и техногенного характера» · официальный текст',url:'http://pravo.gov.ru/proxy/ips/?docbody=&nd=102033560'},
+ education:{label:'273-ФЗ «Об образовании в Российской Федерации» · официальное опубликование',url:'https://publication.pravo.gov.ru/document/0001201212300007'}
+} as const;
+
 export const STAGE_DETAILS:Record<number,StageDetail>={
  1:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -25,7 +48,7 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   outputs:['Название и идеология','Программа партии','Символика','Председатель','Регистрационный пакет документов'],
   procedure:['Работа проходит внутри партийной команды.','Результаты учредительного этапа публикуются после проверки преподавателем в игровой роли Минюста РФ.'],
   notes:['Не использовать реальные персональные данные.','Нарушение дедлайна по правилам может вести к потере игровых преимуществ.'],
-  sources:[{label:'95-ФЗ «О политических партиях»',url:'https://www.consultant.ru/document/cons_doc_LAW_32459/'}]
+  sources:[OFFICIAL.constitution,OFFICIAL.politicalParties,OFFICIAL.partyForms,OFFICIAL.legalEntities]
  },
  2:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -40,7 +63,8 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   ],
   outputs:['Решение КСРФ о типе избирательной системы','Выбранная электоральная формула'],
   procedure:['Одна фракция — один голос.','Позиция фракции оглашается её представителем.','Решение принимается простым большинством.'],
-  notes:['В модели государства 100 млн избирателей.','Каждая партия заинтересована в формуле, которая увеличивает её представительство.']
+  notes:['В модели государства 100 млн избирателей.','Каждая партия заинтересована в формуле, которая увеличивает её представительство.'],
+  sources:[OFFICIAL.constitution,OFFICIAL.electionGuarantees,OFFICIAL.dumaElections]
  },
  3:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -55,7 +79,8 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   ],
   outputs:['Выбранный механизм региональных выборов','Распределение контроля над субъектами РФ'],
   procedure:['При демократическом методе регионы распределяются случайно.','При пропорциональном — по доле партийного представительства.','При договорном — партии договариваются сами.'],
-  notes:['Контроль над большим числом регионов усиливает позицию партии при последующих конституционных процедурах.']
+  notes:['Контроль над большим числом регионов усиливает позицию партии при последующих конституционных процедурах.'],
+  sources:[OFFICIAL.constitution,OFFICIAL.electionGuarantees,OFFICIAL.regionalPower]
  },
  4:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -70,7 +95,8 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   ],
   outputs:['Состав ГД РФ','Распределение мандатов','Распределение регионального контроля','Председатель ГД','Совет ГД'],
   procedure:['Рейтинг партий зависит прежде всего от учебного рейтинга и дополнительно от действий партий в игре.','Руководящие решения оформляются в соответствии с парламентской процедурой.'],
-  notes:['Партии могут использовать согласованную агитационную активность для улучшения игровых позиций.']
+  notes:['Партии могут использовать согласованную агитационную активность для улучшения игровых позиций.'],
+  sources:[OFFICIAL.constitution,OFFICIAL.dumaElections,OFFICIAL.dumaRegulation,OFFICIAL.deputyStatus]
  },
  5:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -86,7 +112,8 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   ],
   outputs:['Постановление ГД о ghost voting','Результат случайного уменьшения числа доступных голосов'],
   procedure:['Решение принимается простым большинством.','Этап может повторяться.','Ghost voting меняет фактическое число голосов непосредственно перед заседанием.'],
-  notes:['Этап специально создаёт неопределённость и может менять баланс большинства.']
+  notes:['Этап специально создаёт неопределённость и может менять баланс большинства.'],
+  sources:[OFFICIAL.constitution,OFFICIAL.dumaRegulation,OFFICIAL.deputyStatus]
  },
  6:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -103,7 +130,7 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   outputs:['Кандидат в Президенты','Регистрационный пакет','Подписные листы при необходимости','Программа кандидата'],
   procedure:['Одна партия вправе выдвинуть одного кандидата.','Ошибки в регистрационных документах могут влиять на итоговый рейтинг кандидата.'],
   notes:['Этап требует внимательной работы с правовыми требованиями и регистрационными документами.'],
-  sources:[{label:'19-ФЗ «О выборах Президента РФ»',url:'https://www.consultant.ru/document/cons_doc_LAW_40445/'}]
+  sources:[OFFICIAL.constitution,OFFICIAL.presidentElections,OFFICIAL.electionGuarantees]
  },
  7:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -119,7 +146,8 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   ],
   outputs:['Модель президентских выборов','Постановление о назначении выборов','Результаты выборов','Инаугурированный Президент РФ'],
   procedure:['На этапе начинает действовать ghost voting.','В зависимости от выбранной модели может потребоваться второй тур.'],
-  notes:['Победивший участник переходит к роли Президента РФ.']
+  notes:['Победивший участник переходит к роли Президента РФ.'],
+  sources:[OFFICIAL.constitution,OFFICIAL.presidentElections,OFFICIAL.electionGuarantees]
  },
  8:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -134,7 +162,8 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   ],
   outputs:['Председатель Правительства','Состав Правительства','Постановления Правительства'],
   procedure:['ГД рассматривает внесённые кандидатуры.','Многократное отклонение кандидатур может запускать предусмотренные правилами игры политико-правовые последствия.'],
-  notes:['Один из ключевых этапов взаимодействия ветвей власти.']
+  notes:['Один из ключевых этапов взаимодействия ветвей власти.'],
+  sources:[OFFICIAL.constitution,OFFICIAL.government,OFFICIAL.dumaRegulation]
  },
  9:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -149,7 +178,8 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   ],
   outputs:['Комитеты ГД','Председатели комитетов','Структура Правительства','Состав министерств'],
   procedure:['Комитеты формируются с учётом принципа пропорционального представительства фракций.','В игре один участник может совмещать депутатскую и министерскую роль в разные моменты.'],
-  notes:['После формирования Правительства партийные интересы уступают беспартийному принципу работы исполнительной власти.']
+  notes:['После формирования Правительства партийные интересы уступают беспартийному принципу работы исполнительной власти.'],
+  sources:[OFFICIAL.constitution,OFFICIAL.dumaRegulation,OFFICIAL.deputyStatus,OFFICIAL.government]
  },
  10:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -166,7 +196,7 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   outputs:['Обращение Президента','Паспорт ГП','Структура ГП','Проект государственной программы'],
   procedure:['Министры руководят разработкой.','Председатель Правительства координирует и проверяет программы.'],
   notes:['В правилах приведён образец структуры и паспорта ГП, а также перечень источников по стратегическому планированию.'],
-  sources:[{label:'Портал государственных программ РФ',url:'https://programs.gov.ru/portal/'}]
+  sources:[OFFICIAL.constitution,OFFICIAL.strategicPlanning,OFFICIAL.statePrograms,{label:'Портал государственных программ РФ',url:'https://programs.gov.ru/portal/'}]
  },
  11:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -181,7 +211,8 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   ],
   outputs:['Проведённое заседание Правительства','Решения по государственным программам','Постановления Правительства'],
   procedure:['Заседание правомочно при наличии не менее половины членов Правительства.','Решения обычно принимаются общим согласием, а при голосовании — большинством присутствующих.','При равенстве решающим является голос председательствующего.'],
-  notes:['Заседание ведёт Председатель Правительства либо другое предусмотренное правилами лицо.']
+  notes:['Заседание ведёт Председатель Правительства либо другое предусмотренное правилами лицо.'],
+  sources:[OFFICIAL.constitution,OFFICIAL.government,OFFICIAL.statePrograms]
  },
  12:{
   rulesUrl:'https://clck.ru/XwJ5j32',
@@ -198,7 +229,7 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   outputs:['Законопроект','Заключения комитетов','Поправки','Решения по чтениям','Постановление ГД'],
   procedure:['Этап может повторяться многократно.','Работа строится по повестке дня и кворуму.','В правилах отдельно рассматриваются субъекты законодательной инициативы и особенности конституционных поправок.'],
   notes:['Один из самых сложных процедурных этапов; может идти параллельно с представлением государственных программ.'],
-  sources:[{label:'Система обеспечения законодательной деятельности',url:'https://sozd.duma.gov.ru/'}]
+  sources:[OFFICIAL.constitution,OFFICIAL.dumaRegulation,OFFICIAL.deputyStatus,{label:'Система обеспечения законодательной деятельности · Государственная Дума',url:'https://sozd.duma.gov.ru/'}]
  },
  13:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -216,7 +247,7 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   outputs:['Макроэкономические расчёты','Проект федерального бюджета','Заключения комитетов','Поправки','Принятый закон о бюджете'],
   procedure:['Первое чтение посвящено основным характеристикам бюджета.','Во втором чтении рассматриваются поправки.','В третьем законопроект голосуется в целом.','При разногласиях может формироваться согласительная комиссия.'],
   notes:['Один из самых сложных этапов игры; требует расчётов, работы с бюджетными данными и понимания процедуры.'],
-  sources:[{label:'Единый портал бюджетной системы РФ',url:'https://budget.gov.ru/'}]
+  sources:[OFFICIAL.constitution,OFFICIAL.budgetCode,OFFICIAL.dumaRegulation,OFFICIAL.government,{label:'Единый портал бюджетной системы РФ',url:'https://budget.gov.ru/'}]
  },
  14:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -233,7 +264,8 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   ],
   outputs:['Материалы исследования территории','Проект развития района','Презентация','Бюджет проекта','Решение Администрации'],
   procedure:['Проекты рассматриваются на общем заседании.','Время выступления команды ограничено.','Решение о принятии или отклонении принимается простым большинством.'],
-  notes:['В исходных правилах этап привязан к районам Барнаула и вопросам местного значения.']
+  notes:['В исходных правилах этап привязан к районам Барнаула и вопросам местного значения.'],
+  sources:[OFFICIAL.constitution,OFFICIAL.localGovernment,OFFICIAL.budgetCode]
  },
  15:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -248,7 +280,8 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   ],
   outputs:['Кризисный сценарий','Публичная реакция органов власти','Антикризисные решения'],
   procedure:['Этап может быть запущен преподавателем практически в любой момент игры.','В правилах предусмотрены различные типы событий — от стихийных бедствий до международных и внутренних конфликтов.'],
-  notes:['Кризис может радикально менять положение игровых ролей и ход всей симуляции.']
+  notes:['Кризис может радикально менять положение игровых ролей и ход всей симуляции.'],
+  sources:[OFFICIAL.constitution,OFFICIAL.emergency,OFFICIAL.martialLaw,OFFICIAL.emergencies]
  },
  16:{
   rulesUrl:'https://clck.ru/XwJ5j',
@@ -263,6 +296,7 @@ export const STAGE_DETAILS:Record<number,StageDetail>={
   ],
   outputs:['Итоговая рефлексия','Разбор решений','Предложения по улучшению курса'],
   procedure:['Обсуждение проходит совместно с преподавателем на заключительном занятии.'],
-  notes:['Задача этапа — не выбрать победителя, а осмыслить причинно-следственные связи и качество управленческих решений.']
+  notes:['Задача этапа — не выбрать победителя, а осмыслить причинно-следственные связи и качество управленческих решений.'],
+  sources:[OFFICIAL.constitution,OFFICIAL.education]
  }
 };
