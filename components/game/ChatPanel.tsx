@@ -104,8 +104,10 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  function insertMention(userId:string){
   const person=handles.find(x=>x.member.user_id===userId);if(!person||!mentionMatch)return;
   const surname=person.member.full_name.trim().split(/\s+/)[0]||person.surname;
+  const duplicateSurname=handles.filter(x=>(x.member.full_name.trim().split(/\s+/)[0]||'').toLocaleLowerCase('ru-RU')===surname.toLocaleLowerCase('ru-RU')).length>1;
+  const mentionLabel=duplicateSurname?person.handle:surname;
   const prefix=text.slice(0,text.length-mentionMatch[0].length)+(mentionMatch[0].startsWith(' ')?' ':'');
-  setText(prefix+'@'+surname+' ');requestAnimationFrame(()=>composer.current?.focus());
+  setText(prefix+'@'+mentionLabel+' ');requestAnimationFrame(()=>composer.current?.focus());
  }
  function mentionedUsers(value:string){
   const tokens=[...value.matchAll(/@([\p{L}\d_-]+)/gu)].map(m=>m[1].toLocaleLowerCase('ru-RU'));
