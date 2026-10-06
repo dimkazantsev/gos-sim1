@@ -220,11 +220,12 @@
         1920,
         1080
       ],
-      "source_sha256": "c816185f66f16ba3644ea59434060421a0097ac7e3577ce1242aeb5297946c86",
-      "asset_sha256": "7384e243d237b7c390bd093005c1d9727f9a4d97881af92013e38c15038879fa",
+      "source_sha256": "e78d840f175bfc11f9aa994e80aae6f1657c7b0b8cc513698a26f2ac680fb345",
+      "asset_sha256": "a16d8274713324f1452c29726ef5b4d619c7d55fcbb755080e145426513866b9",
       "asset": "/event-art/scene-001-20261004-1920.webp",
       "generator": "Built-in imagegen",
-      "source_file": "exec-f7bf12bf-5e75-4852-8ddb-588a7db456e7.png"
+      "source_file": "bank-curated-v2-01.png",
+      "style_pass": "2D animation"
     },
     "bank-curated-v2-02": {
       "source_dimensions": [
@@ -235,11 +236,12 @@
         1920,
         1080
       ],
-      "source_sha256": "8ccd10bea0c7fbac4b02c876bdbef2c775dbc9799a64e808874ebe055218b223",
-      "asset_sha256": "71c3b8aecbeba18385a0c1346c2528ba1327b171cd46d337c9257bcfdf562e5b",
+      "source_sha256": "6018b9e5c413e997ca9cfa768656ca9676db2a9f50041c76c119fbcee1201580",
+      "asset_sha256": "79dfee78e957748566cbc1eea1610646de92a75dee323beddc6ccf5b2c582ec3",
       "asset": "/event-art/scene-002-20261004-1920.webp",
       "generator": "Built-in imagegen",
-      "source_file": "exec-8c5eac63-f688-4858-b5a8-fd58e432b6c5.png"
+      "source_file": "bank-curated-v2-02.png",
+      "style_pass": "2D animation"
     },
     "bank-curated-v2-03": {
       "source_dimensions": [
