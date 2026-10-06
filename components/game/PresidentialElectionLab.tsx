@@ -5,19 +5,22 @@ import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
 import {institutionEmblem} from './institutionEmblems';
+import {extractCandidateDocumentText} from './candidateDocumentText';
 
 type Settings={game_id:string;system_type:'relative'|'absolute'|'qualified'|'preferential';threshold_pct:number;poll_enabled:boolean;status:'setup'|'round1'|'runoff'|'finished'|'manual_required';result:Record<string,any>};
-type Candidate={id:string;user_id:string|null;party_id:string|null;display_name:string;nomination_type:'party'|'self'|'fictional';registration_status:'submitted'|'registered'|'revision'|'rejected'|'withdrawn';program_summary:string|null;campaign_statement:string|null;registration_attempts:number;legal_error_count:number;rating_penalty:number;created_by:string;registration_number:string|null;registration_decision_no:string|null;registration_decision_at:string|null;registration_public_summary:string|null};
-type CecDecision={id:string;candidate_id:string;decision_type:'registered'|'revision'|'rejected'|'withdrawn';decision_number:string;public_summary:string;created_at:string};
+type Candidate={id:string;user_id:string|null;party_id:string|null;display_name:string;nomination_type:'party'|'self'|'fictional';registration_status:'submitted'|'registered'|'revision'|'rejected'|'withdrawn';program_summary:string|null;campaign_statement:string|null;registration_attempts:number;legal_error_count:number;rating_penalty:number;created_by:string;registration_number:string|null;registration_decision_no:string|null;registration_decision_at:string|null;registration_public_summary:string|null;cec_submitted_at:string|null;cec_submission_version:number};
+type CecDecision={id:string;candidate_id:string;decision_type:'registered'|'revision'|'rejected'|'withdrawn';decision_number:string;public_summary:string;created_at:string;reasoning?:AutoReview|null};
 type CecPrivateNote={decision_id:string;candidate_id:string;private_summary:string|null};
 type PrivateProfile={candidate_id:string;birth_date:string|null;birth_place:string|null;contact_phone:string|null;contact_email:string|null;address_text:string|null;passport_note:string|null};
 type ProgramPoint={id:string;candidate_id:string;point_no:number;body:string};
-type CandidateDoc={id:string;candidate_id:string;doc_kind:string;title:string;storage_path:string;file_name:string;status:'submitted'|'accepted'|'revision';note:string|null;url?:string|null};
+type CandidateDoc={id:string;candidate_id:string;doc_kind:string;title:string;storage_path:string;file_name:string;status:'submitted'|'accepted'|'revision';note:string|null;url?:string|null;extracted_text:string|null;extraction_status:'pending'|'extracted'|'no_text'|'unsupported'|'error';auto_check:{verdict?:'ok'|'issues'|'manual';summary?:string;issues?:string[];checks?:{label:string;ok:boolean}[];basis?:string};is_submitted:boolean;submitted_at:string|null};
 type Supporter={id:string;candidate_id:string;supporter_user_id:string};
 type SignatureBatch={id:string;candidate_id:string;direction_label:string;signatures:number};
 type CandidateReadiness={ready:boolean;issues:string[];program_points:number;accepted_documents:number;required_documents:number;support_group:number;signatures:number;nomination_type:string};
 type Score={candidate_id:string;round_no:1|2;teacher_program_pct:number|null;teacher_campaign_pct:number|null;game_rating_pct:number|null;poll_pct:number|null;teacher_runoff_pct:number|null;computed_pct:number|null};
 type Draft={program:string;campaign:string;rating:string;poll:string;runoff:string};
+type AutoReviewItem={kind:string;title:string;state:string;verdict:'ok'|'issues'|'manual';summary?:string;issues?:string[];file_name?:string};
+type AutoReview={ready:boolean;recommended_status:'registered'|'revision';error_count:number;manual_count:number;issues:string[];items:AutoReviewItem[];program_points:number;support_group:number;signatures:number;legal_basis:string[]};
 
 const systemNames={relative:'Относительное большинство',absolute:'Абсолютное большинство',qualified:'Квалифицированное большинство',preferential:'Преференциальная'} as const;
 const candidateStatus={submitted:'На проверке',registered:'Зарегистрирован',revision:'На доработке',rejected:'Отказано',withdrawn:'Снят'} as const;
@@ -50,6 +53,8 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const [privateProfiles,setPrivateProfiles]=useState<Record<string,PrivateProfile>>({});
  const [privateDrafts,setPrivateDrafts]=useState<Record<string,PrivateProfile>>({});
  const [readiness,setReadiness]=useState<Record<string,CandidateReadiness>>({});
+ const [autoReviews,setAutoReviews]=useState<Record<string,AutoReview>>({});
+ const [docTextDraft,setDocTextDraft]=useState<Record<string,string>>({});
  const [system,setSystem]=useState<Settings['system_type']>('absolute');
  const [threshold,setThreshold]=useState(50);
  const [pollEnabled,setPollEnabled]=useState(true);
@@ -58,13 +63,11 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const [candidateName,setCandidateName]=useState('');
  const [program,setProgram]=useState('');
  const [campaign,setCampaign]=useState('');
- const [panelView,setPanelView]=useState<'application'|'decisions'|'candidates'|'dossier'>('candidates');
+ const [panelView,setPanelView]=useState<'application'|'decisions'|'candidates'|'dossier'>('dossier');
  const [documentPreview,setDocumentPreview]=useState<{kind:'decision'|'credential';candidateId:string;decisionId?:string}|null>(null);
  const [review,setReview]=useState<Record<string,{status:'registered'|'revision'|'rejected'|'withdrawn';errors:string;penalty:string;publicSummary:string;privateSummary:string}>>({});
  const [drafts,setDrafts]=useState<Record<string,Draft>>({});
  const [pointDraft,setPointDraft]=useState<Record<string,string>>({});
- const [docKindDraft,setDocKindDraft]=useState<Record<string,string>>({});
- const [docFileDraft,setDocFileDraft]=useState<Record<string,File|null>>({});
  const [supporterDraft,setSupporterDraft]=useState<Record<string,string>>({});
  const [directionDraft,setDirectionDraft]=useState<Record<string,string>>({});
  const [signatureDraft,setSignatureDraft]=useState<Record<string,string>>({});
@@ -93,7 +96,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   if(!d.error){
    const docs=(d.data||[]) as CandidateDoc[];
    const withUrls=await Promise.all(docs.map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
-   setCandidateDocs(withUrls);
+   setCandidateDocs(withUrls);setDocTextDraft(v=>({...v,...Object.fromEntries(withUrls.map(x=>[x.id,x.extracted_text||'']))}));
   }
   if(!sg.error)setSupporters((sg.data||[]) as Supporter[]);
   if(!sb.error)setSignatureBatches((sb.data||[]) as SignatureBatch[]);
@@ -101,9 +104,16 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   if(!cn.error)setPrivateNotes((cn.data||[]) as CecPrivateNote[]);
   if(!pp.error){const rows=(pp.data||[]) as PrivateProfile[];const map=Object.fromEntries(rows.map(x=>[x.candidate_id,x]));setPrivateProfiles(map);setPrivateDrafts(v=>({...v,...map}))}
   if(!b.error){
-   const rr:Record<string,CandidateReadiness>={};
-   await Promise.all(((b.data||[]) as Candidate[]).map(async x=>{const q=await supabase.rpc('get_presidential_candidate_readiness',{p_candidate_id:x.id});if(!q.error&&q.data)rr[x.id]=q.data as CandidateReadiness}));
-   setReadiness(rr);
+   const rr:Record<string,CandidateReadiness>={},ar:Record<string,AutoReview>={};
+   await Promise.all(((b.data||[]) as Candidate[]).map(async x=>{
+    const [q,audit]=await Promise.all([
+     supabase.rpc('get_presidential_candidate_readiness',{p_candidate_id:x.id}),
+     supabase.rpc('get_presidential_cec_auto_review',{p_candidate_id:x.id})
+    ]);
+    if(!q.error&&q.data)rr[x.id]=q.data as CandidateReadiness;
+    if(!audit.error&&audit.data)ar[x.id]=audit.data as AutoReview;
+   }));
+   setReadiness(rr);setAutoReviews(ar);
   }
  }
  useEffect(()=>{void load()},[game?.id]);
@@ -156,14 +166,40 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   if(r.error)setError(r.error.message);else{setPointDraft(v=>({...v,[candidateId]:''}));await load()}setBusy(false);
  }
  async function deleteProgramPoint(id:string){setBusy(true);const r=await supabase.rpc('delete_presidential_program_point',{p_point_id:id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function uploadCandidateDoc(candidateId:string){
-  const file=docFileDraft[candidateId],kind=docKindDraft[candidateId];if(!file||!kind)return;
+ async function uploadCandidateDoc(candidateId:string,kind:string,file:File){
+  if(!file||!kind)return;
   const ext=(file.name.split('.').pop()||'bin').toLowerCase();
   const storagePath=activeGame.id+'/presidential/'+candidateId+'/docs/'+crypto.randomUUID()+'.'+ext;
-  setBusy(true);const up=await supabase.storage.from('game-assets').upload(storagePath,file,{contentType:file.type||'application/octet-stream'});
+  setBusy(true);
+  const up=await supabase.storage.from('game-assets').upload(storagePath,file,{contentType:file.type||'application/octet-stream'});
   if(up.error){setError(up.error.message);setBusy(false);return}
   const r=await supabase.rpc('add_presidential_candidate_document',{p_candidate_id:candidateId,p_doc_kind:kind,p_title:docLabels[kind]||file.name,p_storage_path:storagePath,p_file_name:file.name,p_mime_type:file.type||null,p_file_size:file.size});
-  if(r.error)setError(r.error.message);else{setDocFileDraft(v=>({...v,[candidateId]:null}));await load()}setBusy(false);
+  if(r.error){setError(r.error.message);setBusy(false);return}
+  const documentId=String(r.data||'');
+  const extracted=await extractCandidateDocumentText(file);
+  if(documentId){
+   const saved=await supabase.rpc('save_presidential_candidate_document_text',{p_document_id:documentId,p_text:extracted.text,p_extraction_status:extracted.status});
+   if(saved.error)setError(saved.error.message);
+  }
+  await load();setBusy(false);
+ }
+ async function saveDocumentText(doc:CandidateDoc){
+  setBusy(true);const text=(docTextDraft[doc.id]??doc.extracted_text??'').trim();
+  const r=await supabase.rpc('save_presidential_candidate_document_text',{p_document_id:doc.id,p_text:text,p_extraction_status:text.length>=20?'extracted':'no_text'});
+  if(r.error)setError(r.error.message);else await load();setBusy(false);
+ }
+ async function submitToCec(candidateId:string){
+  setBusy(true);const r=await supabase.rpc('submit_presidential_candidate_to_cec',{p_candidate_id:candidateId});
+  if(r.error)setError(r.error.message);else{setPanelView('application');await load()}setBusy(false);
+ }
+ function fillSuggestedDecision(id:string){
+  const audit=autoReviews[id];if(!audit)return;
+  const status:'registered'|'revision'=audit.error_count>0?'revision':'registered';
+  const listed=audit.items.map((item,i)=>String(i+1)+'. '+item.title+' — '+(item.verdict==='ok'?'предварительно соответствует':item.verdict==='manual'?'требует ручной проверки':'есть замечания')+(item.issues?.length?': '+item.issues.join('; '):'')+'.').join('\n');
+  const resolution=status==='registered'
+   ?'Представленный комплект документов проверен. По результатам автоматической предварительной проверки существенные несоответствия не выявлены. Окончательное решение принимает ЦИК.'
+   :'В представленном комплекте выявлены замечания. Документы подлежат доработке либо дополнительной ручной проверке до принятия окончательного решения ЦИК.';
+  setReview(v=>({...v,[id]:{...(v[id]||{errors:'0',penalty:'0',publicSummary:'',privateSummary:''}),status,errors:String(audit.error_count),publicSummary:resolution,privateSummary:listed}}));
  }
  async function reviewCandidateDoc(id:string,status:'accepted'|'revision'){
   setBusy(true);const r=await supabase.rpc('review_presidential_candidate_document',{p_document_id:id,p_status:status,p_note:null});
@@ -184,15 +220,15 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
 
  return <section className="electionLab cecWorkspace">
   <header className="electionLabHead cecHead"><div><small>ЦИК РФ · ЭТАПЫ 6–7</small><h2>Выборы Президента</h2><p>Регистрация кандидатов, решения комиссии и публичный реестр. Персональные сведения и регистрационные документы доступны только кандидату, его ответственному представителю и преподавателю.</p></div><div className="cecHeadSide"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" className="cecEmblem" width={72} height={72}/><div><b>Центральная избирательная комиссия</b><span>{currentStage?.stage_no===6?'Регистрация кандидатов':'Выборы и подведение итогов'}</span></div></div></header>
-  <nav className="cecTabs" aria-label="Разделы президентских выборов"><button className={panelView==='application'?'active':''} onClick={()=>setPanelView('application')}>Подача в ЦИК</button><button className={panelView==='decisions'?'active':''} onClick={()=>setPanelView('decisions')}>Решения ЦИК <b>{decisions.length}</b></button><button className={panelView==='candidates'?'active':''} onClick={()=>setPanelView('candidates')}>Кандидаты <b>{candidates.length}</b></button><button className={panelView==='dossier'?'active':''} onClick={()=>setPanelView('dossier')}>Моё досье</button></nav>
+  <nav className="cecTabs" aria-label="Разделы президентских выборов"><button className={panelView==='dossier'?'active':''} onClick={()=>setPanelView('dossier')}>Моё досье</button><button className={panelView==='application'?'active':''} onClick={()=>setPanelView('application')}>Подача в ЦИК <b>{candidates.filter(x=>x.cec_submitted_at&&x.registration_status==='submitted').length}</b></button><button className={panelView==='candidates'?'active':''} onClick={()=>setPanelView('candidates')}>Кандидаты <b>{candidates.filter(x=>x.cec_submitted_at).length}</b></button><button className={panelView==='decisions'?'active':''} onClick={()=>setPanelView('decisions')}>Решения ЦИК <b>{decisions.length}</b></button></nav>
 
   <div className="electionSettings"><div><small>СИСТЕМА</small><strong>{systemNames[settings?.system_type||system]}</strong><span>{settings?.system_type==='qualified'?'Порог '+settings.threshold_pct+'%':settings?.system_type==='preferential'?'Алгоритм подсчёта задаёт преподаватель':settings?.poll_enabled===false?'Без соцопроса':'Соцопрос включён'}</span></div>{teacher&&<div className="electionSettingsEdit"><select value={system} onChange={e=>setSystem(e.target.value as Settings['system_type'])}><option value="relative">Относительное большинство</option><option value="absolute">Абсолютное большинство</option><option value="qualified">Квалифицированное большинство</option><option value="preferential">Преференциальная</option></select>{system==='qualified'&&<input type="number" min="0" max="100" step="0.1" value={threshold} onChange={e=>setThreshold(Number(e.target.value))}/>}<label><input type="checkbox" checked={pollEnabled} onChange={e=>setPollEnabled(e.target.checked)}/> соцопрос</label><button disabled={busy} onClick={()=>void configure()}>Сохранить</button></div>}</div>
 
-  {panelView==='application'&&canNominate&&<details className="candidateNomination" open><summary><div><b>Выдвинуть кандидата</b><span>Партия может иметь одного активного кандидата.</span></div><i>+</i></summary><div className="candidateNominationBody">{teacher&&<label>Партия<select value={candidateParty} onChange={e=>{setCandidateParty(e.target.value);setCandidateUser('')}}><option value="">Самовыдвижение / сценарный кандидат</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>}<label>Участник<select value={candidateUser} onChange={e=>setCandidateUser(e.target.value)}><option value="">{teacher?'Не привязывать к участнику':ledParty?'Выберите члена партии':'Я сам'}</option>{(teacher?(candidateParty?partyUsers(candidateParty):members.filter(m=>m.kind==='student')):ledParty?partyUsers(ledParty.id):[]).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>{teacher&&<label>Имя в бюллетене<input value={candidateName} onChange={e=>setCandidateName(e.target.value)} placeholder="Для вымышленного кандидата обязательно"/></label>}<label className="candidateProgram">Программа кандидата · один пункт с новой строки<textarea rows={7} value={program} onChange={e=>setProgram(e.target.value)} placeholder={"1. Положение программы\n2. Положение программы\n…\n10. Положение программы"}/></label><label className="candidateProgram">Публичный агитационный тезис<textarea rows={3} value={campaign} onChange={e=>setCampaign(e.target.value)} placeholder="Короткий публичный тезис кандидата"/></label><button className="primary" disabled={busy||(!teacher&&!!ledParty&&!candidateUser)} onClick={()=>void nominate()}>Подать на регистрацию</button></div></details>}
+  {panelView==='dossier'&&canNominate&&candidates.filter(c=>c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id)).length===0&&<details className="candidateNomination" open><summary><div><b>Выдвинуть кандидата</b><span>Партия может иметь одного активного кандидата.</span></div><i>+</i></summary><div className="candidateNominationBody">{teacher&&<label>Партия<select value={candidateParty} onChange={e=>{setCandidateParty(e.target.value);setCandidateUser('')}}><option value="">Самовыдвижение / сценарный кандидат</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>}<label>Участник<select value={candidateUser} onChange={e=>setCandidateUser(e.target.value)}><option value="">{teacher?'Не привязывать к участнику':ledParty?'Выберите члена партии':'Я сам'}</option>{(teacher?(candidateParty?partyUsers(candidateParty):members.filter(m=>m.kind==='student')):ledParty?partyUsers(ledParty.id):[]).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>{teacher&&<label>Имя в бюллетене<input value={candidateName} onChange={e=>setCandidateName(e.target.value)} placeholder="Для вымышленного кандидата обязательно"/></label>}<label className="candidateProgram">Программа кандидата · один пункт с новой строки<textarea rows={7} value={program} onChange={e=>setProgram(e.target.value)} placeholder={"1. Положение программы\n2. Положение программы\n…\n10. Положение программы"}/></label><label className="candidateProgram">Публичный агитационный тезис<textarea rows={3} value={campaign} onChange={e=>setCampaign(e.target.value)} placeholder="Короткий публичный тезис кандидата"/></label><button className="primary" disabled={busy||(!teacher&&!!ledParty&&!candidateUser)} onClick={()=>void nominate()} >Создать черновик досье</button></div></details>}
 
   {panelView==='decisions'&&<section className="cecDecisionRegistry"><header><div><small>ПУБЛИЧНЫЙ РЕЕСТР</small><h3>Решения ЦИК РФ</h3></div><span>{decisions.length} решений</span></header>{decisions.length===0?<div className="emptyState">Решения ещё не принимались.</div>:decisions.map(x=>{const c=candidates.find(v=>v.id===x.candidate_id);const note=privateNotes.find(v=>v.decision_id===x.id);return <article key={x.id} className={'cecDecision '+x.decision_type}><div><small>{x.decision_number} · {new Date(x.created_at).toLocaleString('ru-RU')}</small><h4>{c?.display_name||'Кандидат'}</h4><p>{x.public_summary}</p>{note?.private_summary&&<details><summary>Служебное примечание ЦИК</summary><p>{note.private_summary}</p></details>}<button className="cecDocumentOpen" onClick={()=>setDocumentPreview({kind:'decision',candidateId:x.candidate_id,decisionId:x.id})}>Открыть решение ЦИК</button></div><strong>{candidateStatus[x.decision_type]}</strong></article>})}</section>}
 
-  {(panelView==='candidates'||panelView==='dossier')&&<div className="candidateGrid">{candidates.length===0?<div className="emptyState">Кандидаты ещё не выдвинуты.</div>:candidates.filter(c=>panelView==='candidates'||teacher||c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id)).map(c=>{
+  {(panelView==='candidates'||panelView==='dossier'||panelView==='application')&&<div className="candidateGrid">{candidates.length===0?<div className="emptyState">Кандидаты ещё не выдвинуты.</div>:candidates.filter(c=>panelView==='candidates'?!!c.cec_submitted_at:panelView==='application'?(teacher?!!c.cec_submitted_at:(c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id))):(c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id))).map(c=>{
    const d1=draft(c.id,1),d2=draft(c.id,2),s1=score(c.id,1),s2=score(c.id,2),party=parties.find(p=>p.id===c.party_id);
    const runoffIds=(settings?.result?.candidate_ids||[]) as string[];
    const candidatePoints=points.filter(x=>x.candidate_id===c.id).sort((a,b)=>a.point_no-b.point_no);
@@ -204,7 +240,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    const requiredKinds=c.nomination_type==='party'?partyDocs:c.nomination_type==='self'?selfDocs:[];
    const usedSupporterIds=new Set(supporters.filter(x=>x.candidate_id!==c.id).map(x=>x.supporter_user_id));
    return <article className={'candidateCard '+c.registration_status} key={c.id}><header><div className="candidateAvatar">{c.display_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</div><div><small>{party?.name||(c.nomination_type==='self'?'Самовыдвижение':'Сценарный кандидат')}</small><h3>{c.display_name}</h3></div><span>{candidateStatus[c.registration_status]}</span></header>{c.registration_decision_no&&<div className="cecCandidateDecision"><b>{c.registration_decision_no}</b><span>{c.registration_public_summary||'Решение ЦИК зафиксировано.'}</span>{c.registration_number&&<button className="cecCredentialOpen" onClick={()=>setDocumentPreview({kind:'credential',candidateId:c.id})}>Удостоверение {c.registration_number}</button>}</div>}{c.program_summary&&<p className="candidateProgramText">{c.program_summary}</p>}{c.campaign_statement&&<p className="candidateCampaignText"><b>Агитационный тезис</b>{c.campaign_statement}</p>}<div className="candidateAudit"><span>Подач <b>{c.registration_attempts}</b></span><span>Юр. ошибок <b>{c.legal_error_count}</b></span><span>Штраф <b>−{Number(c.rating_penalty).toFixed(1)} п.п.</b></span></div>
-   {canManage&&c.nomination_type!=='fictional'&&<details className="candidateDossier" open={panelView==='dossier'||c.registration_status!=='registered'}>
+   {panelView==='dossier'&&canManage&&c.nomination_type!=='fictional'&&<details className="candidateDossier" open>
     <summary><div><b>Досье кандидата</b><span>{ready?.ready?'✓ готово к регистрации':(ready?.issues?.[0]||'проверка комплекта')}</span></div><strong>{ready?.program_points||0}/10 · {ready?.accepted_documents||0}/{ready?.required_documents||requiredKinds.length}</strong></summary>
     <div className="candidateDossierBody">
      <section className="candidateProgramPoints"><header><div><small>ПРОГРАММА</small><h4>Минимум 10 положений</h4></div><span>{candidatePoints.length}/10</span></header><div>{candidatePoints.map(x=><p key={x.id}><b>{x.point_no}.</b><span>{x.body}</span>{canManage&&c.registration_status!=='registered'&&<IconAction variant="remove" onClick={()=>void deleteProgramPoint(x.id)} label={'Удалить положение программы № '+x.point_no}/>}</p>)}</div>{canManage&&c.registration_status!=='registered'&&<div className="candidatePointComposer"><input value={pointDraft[c.id]||''} onChange={e=>setPointDraft(v=>({...v,[c.id]:e.target.value}))} placeholder="Следующее положение программы"/><button disabled={busy||(pointDraft[c.id]||'').trim().length<5} onClick={()=>void addProgramPoint(c.id)}>＋ Добавить</button></div>}</section>
@@ -216,7 +252,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
      {ready&&!ready.ready&&<div className="candidateReadinessIssues"><b>До регистрации осталось</b><ul>{ready.issues.map(x=><li key={x}>{x}</li>)}</ul></div>}
     </div>
    </details>}
-   {teacher&&<div className="candidateReview cecReview"><select value={review[c.id]?.status||'revision'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{errors:'0',penalty:'0',publicSummary:'',privateSummary:''}),status:e.target.value as 'registered'|'revision'|'rejected'|'withdrawn'}}))}><option value="registered">Зарегистрировать</option><option value="revision">На доработку</option><option value="rejected">Отказать</option><option value="withdrawn">Снять</option></select><label>Ошибки<input type="number" min="0" value={review[c.id]?.errors||'0'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',penalty:'0',publicSummary:'',privateSummary:''}),errors:e.target.value}}))}/></label><label>Штраф<input type="number" min="0" step="0.1" value={review[c.id]?.penalty||'0'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',publicSummary:'',privateSummary:''}),penalty:e.target.value}}))}/></label><label className="cecReviewPublic">Публичная формулировка<textarea rows={2} value={review[c.id]?.publicSummary||''} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',penalty:'0',privateSummary:''}),publicSummary:e.target.value}}))}/></label><label className="cecReviewPrivate">Служебное примечание<textarea rows={2} value={review[c.id]?.privateSummary||''} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',penalty:'0',publicSummary:''}),privateSummary:e.target.value}}))}/></label><button disabled={busy} onClick={()=>void reviewCandidate(c.id)}>Выпустить решение ЦИК</button></div>}
+   {panelView==='application'&&teacher&&c.cec_submitted_at&&<div className="candidateReview cecReview"><select value={review[c.id]?.status||'revision'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{errors:'0',penalty:'0',publicSummary:'',privateSummary:''}),status:e.target.value as 'registered'|'revision'|'rejected'|'withdrawn'}}))}><option value="registered">Зарегистрировать</option><option value="revision">На доработку</option><option value="rejected">Отказать</option><option value="withdrawn">Снять</option></select><label>Ошибки<input type="number" min="0" value={review[c.id]?.errors||'0'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',penalty:'0',publicSummary:'',privateSummary:''}),errors:e.target.value}}))}/></label><label>Штраф<input type="number" min="0" step="0.1" value={review[c.id]?.penalty||'0'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',publicSummary:'',privateSummary:''}),penalty:e.target.value}}))}/></label><label className="cecReviewPublic">Публичная формулировка<textarea rows={2} value={review[c.id]?.publicSummary||''} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',penalty:'0',privateSummary:''}),publicSummary:e.target.value}}))}/></label><label className="cecReviewPrivate">Служебное примечание<textarea rows={2} value={review[c.id]?.privateSummary||''} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',penalty:'0',publicSummary:''}),privateSummary:e.target.value}}))}/></label><button disabled={busy} onClick={()=>void reviewCandidate(c.id)}>Выпустить решение ЦИК</button></div>}
    {!!parties.find(p=>p.id===c.party_id)?.presidential_rating_modifier&&<p className="candidateDeadlineNote">Последствие по правилам игры: {parties.find(p=>p.id===c.party_id)?.presidential_rating_modifier} п.п. Учтено в первом туре; завершённые выборы сохраняют прежний результат.</p>}{c.registration_status==='registered'&&<div className="candidateScores"><div className="candidateRound"><div className="candidateRoundTitle"><b>1 тур</b><strong>{s1?.computed_pct!=null?Number(s1.computed_pct).toFixed(2)+'%':'—'}</strong></div>{teacher&&<div className="scoreInputs"><label>Программа<input type="number" min="0" max="100" value={d1.program} onChange={e=>setDraft(c.id,1,'program',e.target.value)}/></label><label>Агитация<input type="number" min="0" max="100" value={d1.campaign} onChange={e=>setDraft(c.id,1,'campaign',e.target.value)}/></label><label>Рейтинг<input type="number" min="0" max="100" value={d1.rating} onChange={e=>setDraft(c.id,1,'rating',e.target.value)}/></label>{pollEnabled&&<label>Опрос<input type="number" min="0" max="100" value={d1.poll} onChange={e=>setDraft(c.id,1,'poll',e.target.value)}/></label>}<button disabled={busy} onClick={()=>void saveScore(c.id,1)}>Рассчитать</button></div>}</div>{settings?.status==='runoff'&&runoffIds.includes(c.id)&&<div className="candidateRound runoff"><div className="candidateRoundTitle"><b>2 тур</b><strong>{s2?.computed_pct!=null?Number(s2.computed_pct).toFixed(2)+'%':'—'}</strong></div>{teacher&&<div className="scoreInputs runoff"><label>Новое голосование ППС<input type="number" min="0" max="100" value={d2.runoff} onChange={e=>setDraft(c.id,2,'runoff',e.target.value)}/></label><button disabled={busy} onClick={()=>void saveScore(c.id,2)}>Рассчитать</button></div>}</div>}</div>}</article>
   })}</div>}
 
