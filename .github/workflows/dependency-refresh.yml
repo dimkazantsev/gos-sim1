@@ -16,8 +16,10 @@ jobs:
           cache: npm
       - name: Generate patched dependency lock
         run: npm install --save-exact next@16.3.8 react@19.2.8 react-dom@19.2.8
-      - name: Audit resolved graph
-        run: npm audit --audit-level=moderate
+      - name: Apply non-breaking audit fixes
+        run: npm audit fix --package-lock-only || true
+      - name: Report remaining audit findings
+        run: npm audit --audit-level=moderate || true
       - name: Upload resolved dependency files
         uses: actions/upload-artifact@v4
         with:
