@@ -1,0 +1,28 @@
+name: Dependency security refresh
+on:
+  push:
+    paths:
+      - '.github/workflows/dependency-refresh.yml'
+permissions:
+  contents: read
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Generate patched dependency lock
+        run: npm install --save-exact next@16.3.8 react@19.2.8 react-dom@19.2.8
+      - name: Audit resolved graph
+        run: npm audit --audit-level=moderate
+      - name: Upload resolved dependency files
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-refresh-files
+          path: |
+            package.json
+            package-lock.json
+          retention-days: 1
