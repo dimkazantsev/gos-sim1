@@ -284,6 +284,11 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
    <IconAction onClick={()=>setChatOpen(false)} label="Закрыть чат"/>
   </header>
+  {selectedMessages.length>0&&<div className="chatSelectionBar" role="toolbar" aria-label="Выбранные сообщения">
+   <button type="button" className="chatSelectionCancel" onClick={()=>setSelectedMessages([])} aria-label="Снять выделение"><X size={18} aria-hidden="true"/></button>
+   <b>{selectedMessages.length}</b><span>Выбрано</span>
+   <button type="button" className="chatSelectionDelete" disabled={deletingMessages} onClick={()=>void deleteSelectedMessages()} aria-label="Удалить выбранные сообщения"><Trash2 size={18} aria-hidden="true"/><span>{deletingMessages?'Удаление…':'Удалить'}</span></button>
+  </div>}
   {chatPins.length>0&&<div className="chatPinnedWrap">
    <button type="button" className="chatPinnedToggle" aria-expanded={pinsOpen} aria-controls="chat-pinned-list" onClick={()=>setPinsOpen(v=>!v)}>
     <Pin size={16} aria-hidden="true"/><span>Закреплено</span><b>{chatPins.length}</b><span className="chatPinnedPreview">{pinnedMessages[0]?.text||'Материалы канала'}</span>
@@ -315,7 +320,11 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      const showText=!!m.text&&(m.kind==='text'||m.kind==='system');
      return <div className="chatEntry" key={m.id} data-chat-date={day}>
       {startsDay&&<div className="chatDateSeparator"><span>{dayLabel}</span></div>}
-      <article className={'chatMsg '+(own?'mine':'theirs')+(startsGroup?' groupStart':' grouped')} data-message-id={m.id} aria-label={name+', '+formatChatTime(m.created_at)}>
+      <article className={'chatMsg '+(own?'mine':'theirs')+(startsGroup?' groupStart':' grouped')+(selectedMessages.includes(m.id)?' selected':'')+(canDeleteMessage(m)?' selectable':'')} data-message-id={m.id} aria-label={name+', '+formatChatTime(m.created_at)} aria-selected={selectedMessages.includes(m.id)}
+       onPointerDown={e=>{if((e.target as HTMLElement).closest('button,a,input,textarea,select'))return;beginMessageSelection(m)}}
+       onPointerUp={cancelMessageSelectionHold} onPointerCancel={cancelMessageSelectionHold} onPointerLeave={cancelMessageSelectionHold}
+       onContextMenu={e=>{if(!canDeleteMessage(m))return;e.preventDefault();cancelMessageSelectionHold();setSelectedMessages(current=>current.includes(m.id)?current:[...current,m.id])}}
+       onClick={e=>{if(!selectedMessages.length||!canDeleteMessage(m)||(e.target as HTMLElement).closest('button,a,input,textarea,select'))return;toggleMessageSelection(m)}}>
        {!own&&<span className={'chatAvatar '+(!startsGroup?'placeholder':'')} aria-hidden="true">{startsGroup?initials(name):''}</span>}
        <div className="chatMessageColumn">
         {startsGroup&&<div className="chatAuthor">{onOpenMember&&g.members.some(member=>member.user_id===m.author_id)?<button type="button" className="chatAuthorProfile" onClick={()=>onOpenMember(m.author_id)}>{own?'Вы':name}</button>:<b>{own?'Вы':name}</b>}<time dateTime={m.created_at}>{formatChatTime(m.created_at)}</time></div>}
@@ -326,7 +335,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
          {!startsGroup&&<time className="chatInlineTime" dateTime={m.created_at}>{formatChatTime(m.created_at)}</time>}
         </div>
        </div>
-       <button type="button" className={'chatPinAction '+(chatPins.some(p=>p.message_id===m.id)?'isPinned':'')} disabled={!!pinBusy||(chatPins.length>=12&&!chatPins.some(p=>p.message_id===m.id))||(chatPins.some(p=>p.message_id===m.id&&p.pinned_by!==me?.user_id)&&!teacher)} aria-label={chatPins.some(p=>p.message_id===m.id)?'Открепить сообщение':'Закрепить сообщение'} aria-pressed={chatPins.some(p=>p.message_id===m.id)} title={chatPins.some(p=>p.message_id===m.id)?'Открепить':'Закрепить'} onClick={()=>void togglePin(m)}><Pin size={15} aria-hidden="true"/></button>
+       {selectedMessages.length===0&&<button type="button" className={'chatPinAction '+(chatPins.some(p=>p.message_id===m.id)?'isPinned':'')} disabled={!!pinBusy||(chatPins.length>=12&&!chatPins.some(p=>p.message_id===m.id))||(chatPins.some(p=>p.message_id===m.id&&p.pinned_by!==me?.user_id)&&!teacher)} aria-label={chatPins.some(p=>p.message_id===m.id)?'Открепить сообщение':'Закрепить сообщение'} aria-pressed={chatPins.some(p=>p.message_id===m.id)} title={chatPins.some(p=>p.message_id===m.id)?'Открепить':'Закрепить'} onClick={()=>void togglePin(m)}><Pin size={15} aria-hidden="true"/></button>}
       </article>
      </div>;
     })}
