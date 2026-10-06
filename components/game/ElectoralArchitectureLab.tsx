@@ -166,17 +166,41 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
 
   <div className="electoralRuleList">{activeP.length===0?<div className="emptyState">Предложений ещё нет.</div>:activeP.map(r=>{const v=voteStatus(r.vote_id);return <article key={r.id} className={r.status}><header><span>{sysLabel[r.system_type]}</span><b>{r.allocation_method?allocationLabel[r.allocation_method]:r.majoritarian_method?majLabel[r.majoritarian_method]:'Правило'}</b><em>{r.status==='adopted'?'Принято':r.status==='vote_open'?'На голосовании':r.status==='rejected'?'Отклонено':'Проект'}</em></header>{r.rationale&&<p>{r.rationale}</p>}<footer><span>{proposer(r.proposed_by)}</span>{r.system_type==='mixed'&&<span>{r.proportional_share}% пропорционально</span>}{v&&<span>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</span>}{canPropose&&r.status==='draft'&&<button disabled={busy} onClick={()=>void voteP(r.id)}>Вынести на голосование →</button>}</footer></article>})}</div>
 
-  {teacher&&  <section className="electoralCalculator">
+  {latestSavedResult&&<section className="electoralPublishedResult">
+   <div className="electoralPublishedHead">
+    <div><small>ОПУБЛИКОВАННЫЙ РАСЧЁТ</small><h3>{sysLabel[latestSavedResult.system_type]}</h3><p>Сохранён преподавателем · {new Date(latestSavedResult.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p></div>
+    <strong>450 мест</strong>
+   </div>
+   <div className="electoralPublishedGrid">
+    {parties.map(p=><div key={p.id}><span><i style={{background:p.color}}/><b>{p.name}</b></span><strong>{Number(latestSavedResult.result?.[p.id]||0)}</strong><small>мандатов</small></div>)}
+   </div>
+  </section>}
+
+  {teacher&&<section className="electoralCalculator">
    <div className="electoralCalculatorHead">
-    <div><small>КАЛЬКУЛЯТОР МАНДАТОВ</small><h3>Распределение 450 мест</h3><p>Введите долю поддержки каждой партии и выберите формулу расчёта.</p></div>
-    <label className="electoralCalculatorFormula"><span>Формула</span><select value={calculatorMethod} onChange={e=>setCalculatorMethod(e.target.value as NonNullable<PRule['allocation_method']>)}><option value="hare">Квота Хэйра</option><option value="droop">Квота Друпа</option><option value="dhondt">Д’Ондт</option><option value="sainte_lague">Сент-Лагю</option><option value="imperiali">Империали</option></select></label>
+    <div><small>КАЛЬКУЛЯТОР ПРЕПОДАВАТЕЛЯ</small><h3>Распределение 450 мест</h3><p>Студенты не видят расчёт до публикации результата.</p></div>
+    <div className="electoralCalculatorControls">
+     <label><span>Система</span><select value={calculatorSystem} onChange={e=>setCalculatorSystem(e.target.value as PRule['system_type'])}><option value="proportional">Пропорциональная</option><option value="majoritarian">Мажоритарная</option><option value="mixed">Смешанная</option></select></label>
+     {calculatorSystem!=='majoritarian'&&<label><span>Формула</span><select value={calculatorMethod} onChange={e=>setCalculatorMethod(e.target.value as NonNullable<PRule['allocation_method']>)}><option value="hare">Квота Хэйра</option><option value="droop">Квота Друпа</option><option value="dhondt">Д’Ондт</option><option value="sainte_lague">Сент-Лагю</option><option value="imperiali">Империали</option></select></label>}
+     {calculatorSystem==='mixed'&&<label><span>Пропорциональная часть, %</span><input type="number" min="1" max="99" value={calculatorMixedShare} onChange={e=>setCalculatorMixedShare(Math.max(1,Math.min(99,Number(e.target.value)||50)))}/></label>}
+    </div>
    </div>
    <div className="electoralCalculatorList">
-    {parties.map((p,i)=><div className="electoralCalculatorRow" key={p.id}><span className="electoralCalculatorParty"><i style={{background:p.color}}/><b>{p.name}</b></span><label><span>Поддержка</span><span className="electoralCalculatorInput"><input type="number" min="0" max="100" step="0.1" value={support[p.id]??''} onChange={e=>setSupport(v=>({...v,[p.id]:e.target.value}))}/><em>%</em></span></label><div className="electoralCalculatorResult"><span>Мандаты</span><strong>{preview[i]?.seats||0}</strong></div></div>)}
+    {parties.map((p,i)=><div className="electoralCalculatorRow" key={p.id}>
+     <span className="electoralCalculatorParty"><i style={{background:p.color}}/><b>{p.name}</b></span>
+     {calculatorSystem!=='majoritarian'&&<label><span>Поддержка</span><span className="electoralCalculatorInput"><input type="number" min="0" max="100" step="0.1" value={support[p.id]??''} onChange={e=>setSupport(v=>({...v,[p.id]:e.target.value}))}/><em>%</em></span></label>}
+     {calculatorSystem!=='proportional'&&<label><span>Выиграно округов</span><span className="electoralCalculatorInput"><input type="number" min="0" max={districtPool} step="1" value={districtSeats[p.id]??'0'} onChange={e=>setDistrictSeats(v=>({...v,[p.id]:e.target.value}))}/><em>окр.</em></span></label>}
+     <div className="electoralCalculatorResult"><span>Мандаты</span><strong>{preview[i]?.seats||0}</strong>{calculatorSystem==='mixed'&&<small>{preview[i]?.proportional||0} + {preview[i]?.district||0}</small>}</div>
+    </div>)}
    </div>
-   <div className="electoralCalculatorSummary"><span>Сумма поддержки <b>{calculatorSupportTotal.toLocaleString('ru-RU',{maximumFractionDigits:1})}%</b></span><span>Распределено <b>{calculatorAllocatedTotal} / 450</b></span></div>
-  </section>
-}
+   <div className="electoralCalculatorSummary">
+    {calculatorSystem!=='majoritarian'&&<span>Сумма поддержки <b>{calculatorSupportTotal.toLocaleString('ru-RU',{maximumFractionDigits:1})}%</b></span>}
+    {calculatorSystem!=='proportional'&&<span>Округа <b>{districtTotal} / {districtPool}</b></span>}
+    {calculatorSystem==='mixed'&&<span>Пропорционально <b>{proportionalPool}</b></span>}
+    <span>Распределено <b>{calculatorAllocatedTotal} / 450</b></span>
+    <button type="button" className="primary electoralPublishCalc" disabled={busy||!calculatorReady} onClick={()=>void publishCalculatorResult()}><Save size={16} aria-hidden="true"/>Сохранить и открыть всем</button>
+   </div>
+  </section>}
  </section>;
 
  return <section className="electoralLab regionalLab">
