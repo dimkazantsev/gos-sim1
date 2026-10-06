@@ -2701,3 +2701,21 @@
  margin-left:auto !important;
  flex:0 0 44px;
 }
+
+
+/* Final chat composer geometry: every primary action uses one optical/touch size. */
+.simChat.gsChatV2 .chatComposeActions .chatIconButton,
+.simChat.gsChatV2 .chatComposeActions>.chatSendButton.iconOnly{
+  box-sizing:border-box;
+  flex:0 0 42px;
+  width:42px;
+  min-width:42px;
+  max-width:42px;
+  height:42px;
+  min-height:42px;
+  max-height:42px;
+  padding:0;
+  margin:0;
+  border-radius:11px;
+}
+.simChat.gsChatV2 .chatComposeActions>.chatSendButton.iconOnly{margin-left:auto!important}
