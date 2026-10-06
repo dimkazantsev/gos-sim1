@@ -28,7 +28,7 @@ const PIN_HOLD_MS=1650;
 const SWIPE_THRESHOLD=10;
 type Gesture={
  id:number;key:View;target:HTMLButtonElement;
- startX:number;startY:number;lastX:number;lastY:number;
+ startX:number;startY:number;lastX:number;lastY:number;startScrollLeft:number;
  mode:'pending'|'scroll'|'drag';moved:boolean;
  timer:ReturnType<typeof setTimeout>|null;
  pinTimer:ReturnType<typeof setTimeout>|null;
@@ -129,7 +129,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  function onPointerDown(event:ReactPointerEvent<HTMLButtonElement>,key:View){
   if(!event.isPrimary||(event.pointerType==='mouse'&&event.button!==0))return;
   clearGesture();
-  const g:Gesture={id:event.pointerId,key,target:event.currentTarget,startX:event.clientX,startY:event.clientY,lastX:event.clientX,lastY:event.clientY,mode:'pending',moved:false,timer:null,pinTimer:null};
+  const g:Gesture={id:event.pointerId,key,target:event.currentTarget,startX:event.clientX,startY:event.clientY,lastX:event.clientX,lastY:event.clientY,startScrollLeft:scrollRef.current?.scrollLeft||0,mode:'pending',moved:false,timer:null,pinTimer:null};
   gestureRef.current=g;
   if(editing)activateDrag(g);
   else g.timer=setTimeout(()=>activateDrag(g),DRAG_HOLD_MS);
@@ -152,12 +152,15 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
     g.mode='scroll';
    }
   }
-  // Native horizontal scrolling handles ordinary swipes. Only an activated
-  // long-press drag takes control of the pointer.
+  const scroller=scrollRef.current;
+  if(g.mode==='scroll'){
+   if(event.cancelable)event.preventDefault();
+   if(scroller)scroller.scrollLeft=Math.max(0,g.startScrollLeft+(g.startX-event.clientX));
+   return;
+  }
   if(g.mode!=='drag')return;
   if(event.cancelable)event.preventDefault();
   setPoint({x:event.clientX,y:event.clientY});
-  const scroller=scrollRef.current;
   if(scroller&&g.moved){
    const r=scroller.getBoundingClientRect();
    if(event.clientX<r.left+34)scroller.scrollLeft-=12;
