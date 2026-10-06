@@ -1636,6 +1636,91 @@
  .simChat.gsChatV2{animation:none}
 }
 
+/* Telegram-like chat message selection and deletion. */
+.gsChatV2 .chatSelectionBar{
+ display:grid;
+ grid-template-columns:36px auto minmax(0,1fr) auto;
+ align-items:center;
+ gap:8px;
+ min-height:52px;
+ padding:7px 12px;
+ border-bottom:1px solid #dce5f2;
+ background:#f8faff;
+ color:#29496f;
+}
+.gsChatV2 .chatSelectionBar>b{
+ min-width:22px;
+ color:#315efb;
+ font-size:16px;
+ text-align:center;
+}
+.gsChatV2 .chatSelectionBar>span{
+ color:#62758f;
+ font-size:12px;
+ font-weight:750;
+}
+.gsChatV2 .chatSelectionCancel,
+.gsChatV2 .chatSelectionDelete{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:7px;
+ min-height:36px;
+ border:0;
+ border-radius:9px;
+ cursor:pointer;
+}
+.gsChatV2 .chatSelectionCancel{
+ width:36px;
+ padding:0;
+ background:#edf2fa;
+ color:#526b8b;
+}
+.gsChatV2 .chatSelectionDelete{
+ padding:0 11px;
+ background:#fff0f2;
+ color:#b63e58;
+ font-size:11px;
+ font-weight:850;
+}
+.gsChatV2 .chatSelectionDelete:hover:not(:disabled){background:#ffe5e9}
+.gsChatV2 .chatSelectionDelete:disabled{opacity:.55;cursor:wait}
+.gsChatV2 .chatMsg.selectable{touch-action:pan-y}
+.gsChatV2 .chatMsg.selected{
+ position:relative;
+ border-radius:14px;
+ background:#eaf1ff;
+ box-shadow:0 0 0 1px #aec4f5 inset;
+}
+.gsChatV2 .chatMsg.selected::before{
+ content:'✓';
+ position:absolute;
+ top:50%;
+ left:4px;
+ z-index:3;
+ display:grid;
+ place-items:center;
+ width:20px;
+ height:20px;
+ border-radius:50%;
+ background:#315efb;
+ color:#fff;
+ font-size:12px;
+ font-weight:900;
+ transform:translateY(-50%);
+ box-shadow:0 2px 7px #315efb33;
+}
+.gsChatV2 .chatMsg.selected.mine::before{
+ left:auto;
+ right:4px;
+}
+.gsChatV2 .chatMsg.selected .chatMessageColumn{opacity:.94}
+@media(max-width:430px){
+ .gsChatV2 .chatSelectionBar{grid-template-columns:36px auto minmax(0,1fr) 40px;padding-inline:10px}
+ .gsChatV2 .chatSelectionDelete{width:40px;padding:0}
+ .gsChatV2 .chatSelectionDelete>span{display:none}
+}
+
 .gsChatV2 .chatSearchMatch{
  padding:0 1px;
  border-radius:3px;
