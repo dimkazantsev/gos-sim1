@@ -4,6 +4,7 @@ import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {STAGE_SYSTEM} from './stageSystem';
 import type {StageReadiness} from './StageReadinessPanel';
+import {STAGE_REALTIME_TABLES} from './stageRealtimeTables';
 
 export default function GameReadinessMatrix({g}:{g:ReturnTypeRepublic}){
  const {game,stages}=g;
@@ -17,6 +18,13 @@ export default function GameReadinessMatrix({g}:{g:ReturnTypeRepublic}){
   setLoading(false);
  }
  useEffect(()=>{void load()},[game?.id]);
+ useEffect(()=>{
+  if(!game)return;
+  const ch=supabase.channel('game-readiness:'+game.id);
+  for(const table of STAGE_REALTIME_TABLES)ch.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+game.id},()=>void load());
+  ch.subscribe();
+  return()=>{void supabase.removeChannel(ch)};
+ },[game?.id]);
  if(!game)return null;
 
  const ready=rows.filter(x=>x.ready).length;
