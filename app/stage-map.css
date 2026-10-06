@@ -680,7 +680,7 @@
  display:grid;
  grid-template-columns:38px minmax(0,1fr);
  gap:11px;
- align-items:start;
+ align-items:center;
  min-width:0;
  padding:13px;
  border:1px solid #e1e8f1;
@@ -698,7 +698,7 @@
  font-size:11px;
  font-weight:900;
 }
-.stageWorkspaceSteps p{margin:2px 0 0;color:#3f5673;font-size:13px;line-height:1.6}
+.stageWorkspaceSteps p{margin:0;color:#3f5673;font-size:13px;line-height:1.6}
 .stageWorkspaceTwoColumns{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .stageWorkspaceCheckList,
 .stageWorkspaceProcedure{display:grid;gap:9px;margin:0;padding:0;list-style:none}
