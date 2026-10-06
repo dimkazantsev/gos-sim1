@@ -2691,3 +2691,13 @@
 .simChat.gsChatV2 .chatAttachmentUnavailable button:focus-visible{
  outline:2px solid #7a9ce6;outline-offset:2px;
 }
+
+
+/* Chat send pinned right */
+.simChat.gsChatV2 .chatComposeActions{
+ width:100%;
+}
+.simChat.gsChatV2 .chatComposeActions>.chatSendButton.iconOnly{
+ margin-left:auto !important;
+ flex:0 0 44px;
+}
