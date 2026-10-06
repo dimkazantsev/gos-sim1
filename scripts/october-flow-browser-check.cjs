@@ -105,7 +105,7 @@ async function ready(){
    await docDiscussion.getByRole('button',{name:'Не нравится',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.formalDetail .civicDiscussionStats button[aria-label="Нравится"]')?.textContent==='2');
    await docDiscussion.getByRole('button',{name:/Комментарии/}).click();await docDiscussion.getByRole('textbox',{name:'Ваш комментарий',exact:true}).fill('Комментарий к новой редакции документа.');
    await docDiscussion.getByRole('button',{name:'Отправить',exact:true}).click();await docDiscussion.locator('.civicCommentContent p').filter({hasText:'Комментарий к новой редакции'}).waitFor();
-   const historyPosition=await page.locator('.formalDetail').evaluate(el=>{const paper=el.querySelector('.formalPaper').getBoundingClientRect(),history=el.querySelector('.formalHistory').getBoundingClientRect();return history.top>=paper.bottom});assert(historyPosition,'Document history is below the document');
+   const historyPosition=await page.locator('.formalDetail').evaluate(el=>{const paper=el.querySelector('.formalPaper').getBoundingClientRect(),history=el.querySelector('.formalHistoryDisclosure').getBoundingClientRect();return history.top>=paper.bottom});assert(historyPosition,'Document history is below the document');
    await page.screenshot({path:path.join(screens,'registry-live-discussion-'+width+'.png')});
    await page.getByRole('button',{name:'Реестр НПА',exact:true}).click();
    await page.getByRole('button',{name:/Создать \/ загрузить/}).click();
