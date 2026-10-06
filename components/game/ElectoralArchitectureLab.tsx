@@ -8,6 +8,7 @@ type PRule={id:string;system_type:'proportional'|'majoritarian'|'mixed';allocati
 type RRule={id:string;method:'random'|'proportional'|'agreement';rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'allocated'|'superseded';vote_id:string|null;proposed_by:string;created_at:string};
 type RegionAllocation={id:string;rule_id:string;party_id:string;regions:number;source:'random'|'proportional'|'agreement'};
 type ElectoralCalcResult={id:string;system_type:PRule['system_type'];allocation_method:PRule['allocation_method'];proportional_share:number|null;support:Record<string,number>;district_seats:Record<string,number>;result:Record<string,number>;created_at:string};
+type RegionalCalcResult={id:string;method:RRule['method'];inputs:Record<string,unknown>;result:Record<string,number>;created_at:string};
 
 const sysLabel={proportional:'Пропорциональная',majoritarian:'Мажоритарная',mixed:'Смешанная'} as const;
 const allocationLabel={hare:'Квота Хэйра + наибольшие остатки',droop:'Квота Друпа + наибольшие остатки',dhondt:'Д’Ондт',sainte_lague:'Сент-Лагю',imperiali:'Империали'} as const;
@@ -50,6 +51,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const [rRules,setRRules]=useState<RRule[]>([]);
  const [allocations,setAllocations]=useState<RegionAllocation[]>([]);
  const [savedResults,setSavedResults]=useState<ElectoralCalcResult[]>([]);
+ const [regionalSavedResults,setRegionalSavedResults]=useState<RegionalCalcResult[]>([]);
  const [system,setSystem]=useState<PRule['system_type']>('proportional');
  const [method,setMethod]=useState<NonNullable<PRule['allocation_method']>>('dhondt');
  const [calculatorMethod,setCalculatorMethod]=useState<NonNullable<PRule['allocation_method']>>('dhondt');
@@ -60,6 +62,9 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const [propShare,setPropShare]=useState(50);
  const [rationale,setRationale]=useState('');
  const [regionalMethod,setRegionalMethod]=useState<RRule['method']>('random');
+ const [regionalCalculatorMethod,setRegionalCalculatorMethod]=useState<RRule['method']>('proportional');
+ const [regionalCalculatorDraft,setRegionalCalculatorDraft]=useState<Record<string,string>>({});
+ const [regionalLottery,setRegionalLottery]=useState<Record<string,number>>({});
  const [regionalRationale,setRegionalRationale]=useState('');
  const [regionDraft,setRegionDraft]=useState<Record<string,string>>({});
  const [support,setSupport]=useState<Record<string,string>>({});
