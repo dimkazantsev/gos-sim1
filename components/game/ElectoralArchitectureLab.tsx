@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
+import {MessageCircle} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 
@@ -93,6 +94,13 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const proposer=(id:string)=>members.find(m=>m.user_id===id)?.full_name||'Фракция';
  const regionRows=adoptedR?allocations.filter(x=>x.rule_id===adoptedR.id):[];
  const totalAgreement=regionRows.reduce((a,x)=>a+Number(x.regions||0),0);
+ const publicPolicyChannel=g.channels.find(c=>c.kind==='public'&&c.name.toLocaleLowerCase('ru-RU').includes('публич'))
+  ||g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры')
+  ||g.channels.find(c=>c.kind==='public');
+ function openPublicPolicyChat(){
+  if(publicPolicyChannel)g.setChannelId(publicPolicyChannel.id);
+  g.setChatOpen(true);
+ }
 
  const preview=(()=>{
   const values=parties.map(p=>Math.max(0,Number(support[p.id])||0));
@@ -118,7 +126,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  async function executeR(){if(!adoptedR)return;setBusy(true);const r=await supabase.rpc('execute_regional_allocation',{p_rule_id:adoptedR.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
 
  if(stageNo===2)return <section className="electoralLab">
-  <header className="electoralLabHead"><div><small>КСРФ · ЭТАП 2</small><h2>Архитектура парламентских выборов</h2><p>Фракции выбирают тип избирательной системы и формулу распределения. Решение принимается отдельным фракционным голосованием простым большинством.</p></div><div className="electoralAdopted"><small>ПРИНЯТОЕ ПРАВИЛО</small><strong>{adoptedP?sysLabel[adoptedP.system_type]:'Не принято'}</strong><span>{adoptedP?.allocation_method?allocationLabel[adoptedP.allocation_method]:adoptedP?.majoritarian_method?majLabel[adoptedP.majoritarian_method]:''}</span></div></header>
+  <header className="electoralLabHead"><div className="electoralLabIntro"><small>КСРФ · ЭТАП 2</small><h2>Архитектура парламентских выборов</h2><p>Фракции выбирают тип избирательной системы и формулу распределения. Решение принимается отдельным фракционным голосованием простым большинством.</p><div className="electoralLabActions"><button type="button" className="electoralDiscuss" onClick={openPublicPolicyChat}><MessageCircle size={17} aria-hidden="true"/><span><b>Обсудить решение</b><small>{publicPolicyChannel?.name||'Публичная политика'}</small></span></button></div></div><div className="electoralAdopted"><small>ПРИНЯТОЕ ПРАВИЛО</small><strong>{adoptedP?sysLabel[adoptedP.system_type]:'Не принято'}</strong><span>{adoptedP?.allocation_method?allocationLabel[adoptedP.allocation_method]:adoptedP?.majoritarian_method?majLabel[adoptedP.majoritarian_method]:''}</span></div></header>
 
   {canPropose&&<div className="electoralProposal"><label>Система<select value={system} onChange={e=>setSystem(e.target.value as PRule['system_type'])}><option value="proportional">Пропорциональная</option><option value="majoritarian">Мажоритарная</option><option value="mixed">Смешанная</option></select></label>{system!=='majoritarian'&&<label>Квота / делители<select value={method} onChange={e=>setMethod(e.target.value as NonNullable<PRule['allocation_method']>)}><option value="hare">Квота Хэйра</option><option value="droop">Квота Друпа</option><option value="dhondt">Д’Ондт</option><option value="sainte_lague">Сент-Лагю</option><option value="imperiali">Империали</option></select></label>}{system!=='proportional'&&<label>Мажоритарное правило<select value={majority} onChange={e=>setMajority(e.target.value as NonNullable<PRule['majoritarian_method']>)}><option value="plurality">Относительное большинство</option><option value="absolute_two_round">Абсолютное + 2-й тур</option></select></label>}{system==='mixed'&&<label>Пропорциональная часть, %<input type="number" min="1" max="99" value={propShare} onChange={e=>setPropShare(Math.max(1,Math.min(99,Number(e.target.value)||50)))}/></label>}<label className="wide">Аргументация фракции<textarea rows={3} value={rationale} onChange={e=>setRationale(e.target.value)} placeholder="Почему эта система выгодна и институционально оправдана?"/></label><button className="primary" disabled={busy} onClick={()=>void proposeP()}>Внести предложение в КСРФ</button></div>}
 
