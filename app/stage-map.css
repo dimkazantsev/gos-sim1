@@ -2368,3 +2368,32 @@
  border-color:#7aa0ff;
  box-shadow:0 0 0 2px rgba(49,94,251,.14);
 }
+
+.stageWorkspaceExecutionTools{
+ display:flex;
+ align-items:center;
+ justify-content:flex-end;
+ gap:10px;
+ flex:none;
+}
+.stageWorkspacePublicChatInner{
+ min-height:38px;
+ padding:7px 12px;
+ border-radius:12px;
+}
+.stageWorkspaceExecutionTools>svg{color:#315efb;flex:none}
+@media(max-width:760px){
+ .stageWorkspaceExecutionHead{
+  align-items:stretch;
+  flex-direction:column;
+ }
+ .stageWorkspaceExecutionTools{
+  width:100%;
+  justify-content:stretch;
+ }
+ .stageWorkspacePublicChatInner{
+  width:100%;
+  min-height:42px;
+ }
+ .stageWorkspaceExecutionTools>svg{display:none}
+}
