@@ -167,9 +167,12 @@ export default function StageWorkspace({
   </section>}
 
   <section className="stageWorkspaceExecution">
-   <div className="stageWorkspaceSectionHead">
+   <div className="stageWorkspaceSectionHead stageWorkspaceExecutionHead">
     <div><small>РАБОЧЕЕ МЕСТО</small><h2>Документы, формы и процедуры</h2><p>Заполняйте формы здесь или переходите в профильный раздел. Сохранённые НПА, голосования и результаты синхронизируются с этапом.</p></div>
-    <Layers3 size={25}/>
+    <div className="stageWorkspaceExecutionTools">
+     {publicChannel&&<button type="button" className="stageWorkspacePublicChat stageWorkspacePublicChatInner" onClick={openPublicChat}><MessageCircle size={16} aria-hidden="true"/><span>Обсудить в публичном чате</span></button>}
+     <Layers3 size={25} aria-hidden="true"/>
+    </div>
    </div>
 
    <fieldset className="stageWorkspaceControls" disabled={readOnly}>
