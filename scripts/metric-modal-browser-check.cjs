@@ -198,12 +198,13 @@ async function main(){
      const mic=el.querySelector('.chatMediaShortcut').getBoundingClientRect();
      const video=el.querySelectorAll('.chatMediaShortcut')[1].getBoundingClientRect();
      const composer=el.getBoundingClientRect();
-     return {rowTop:row.top,rowBottom:row.bottom,inputRight:textarea.right,sendLeft:send.left,
-      sendRight:send.right,sendBottom:send.bottom,composerRight:composer.right,
+     return {rowTop:row.top,rowBottom:row.bottom,inputLeft:textarea.left,inputTop:textarea.top,inputRight:textarea.right,inputBottom:textarea.bottom,sendLeft:send.left,
+      sendTop:send.top,sendRight:send.right,sendBottom:send.bottom,composerRight:composer.right,
       micBottom:mic.bottom,videoBottom:video.bottom,composerBottom:composer.bottom,
       sendWidth:send.width};
     });
-    assert(composeLayout.inputRight<=composeLayout.sendLeft+3,'Send must not overlap the editable field');
+    const composerOverlap=!(composeLayout.inputRight<=composeLayout.sendLeft+3||composeLayout.sendRight<=composeLayout.inputLeft+3||composeLayout.inputBottom<=composeLayout.sendTop+3||composeLayout.sendBottom<=composeLayout.inputTop+3);
+    assert(!composerOverlap,'Send must not overlap the editable field');
     assert(composeLayout.sendRight<=composeLayout.composerRight+3,'Send must stay within the composer');
     assert(composeLayout.sendWidth>=40&&composeLayout.sendWidth<=45,'Send must be an accessible compact icon');
     assert(composeLayout.micBottom<=composeLayout.composerBottom+3&&composeLayout.videoBottom<=composeLayout.composerBottom+3,'Media shortcuts stay inside the footer');
