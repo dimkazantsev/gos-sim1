@@ -4,7 +4,7 @@ import type {CSSProperties} from 'react';
 import {
  ArrowLeft,BookOpenText,Building2,CalendarClock,ChartNoAxesCombined,CheckCircle2,
  CircleDot,ClipboardCheck,ClipboardList,ExternalLink,Landmark,Layers3,LockKeyhole,
- Map,MapPin,MessageCircle,Network,Route,Scale,ShieldAlert,Target,UserRoundX,UsersRound,Vote,Wallet
+ Map,MapPin,MessageCircle,Network,RadioTower,Route,Scale,ShieldAlert,Target,UserRoundX,UsersRound,Vote,Wallet,ChevronLeft,ChevronRight
 } from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage,View} from './types';
@@ -53,12 +53,13 @@ const VIEW_LABELS:Partial<Record<View,string>>={
 };
 
 export default function StageWorkspace({
- g,stage,readOnly=false,onBack,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate
+ g,stage,readOnly=false,onBack,onOpenStage,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate
 }:{
  g:ReturnTypeRepublic;
  stage:Stage;
  readOnly?:boolean;
  onBack:()=>void;
+ onOpenStage?:(stageNo:number)=>void;
  onOpenVotes:()=>void;
  onOpenDocument?:(id:string)=>void;
  onCreateDocument?:(key:string,stageNo:number)=>void;
@@ -77,6 +78,9 @@ export default function StageWorkspace({
  const primaryView=task?.target;
  const primaryLabel=primaryView?VIEW_LABELS[primaryView]||'профильный раздел':'эта страница';
  const registrationBodies=STAGE_REGISTRATION_BODIES[stage.stage_no];
+ const previousStage=g.stages.find(item=>item.stage_no===stage.stage_no-1)||null;
+ const nextStageRecord=g.stages.find(item=>item.stage_no===stage.stage_no+1)||null;
+ const syncLabel=g.realtimeState==='connected'?'Синхронизировано':g.realtimeState==='connecting'?'Подключение…':'Связь потеряна';
  const publicChannel=g.channels.find(channel=>
   channel.kind==='public'&&channel.name!=='Вне игры'&&['Публичная политика','Общая беседа','Общий штаб','Общий чат'].includes(channel.name)
  )||g.channels.find(channel=>channel.kind==='public'&&channel.name!=='Вне игры');
@@ -86,7 +90,7 @@ export default function StageWorkspace({
   g.setChatOpen(true);
  }
 
- return <div className="stageWorkspacePage" style={{'--stage-phase-accent':phase.accent} as CSSProperties}>
+ return <div className="stageWorkspacePage stageWorkspaceCanonical" data-stage={stage.stage_no} data-phase={phase.id} style={{'--stage-phase-accent':phase.accent} as CSSProperties}>
   <button type="button" className="stageWorkspaceFloatingBack" onClick={onBack} aria-label="Вернуться ко всем этапам">
    <ArrowLeft size={18} aria-hidden="true"/>
    <span>Все этапы</span>
@@ -114,6 +118,11 @@ export default function StageWorkspace({
     <div><small>Маршрут</small><b>{detail.steps.length}</b><span>пошаговых действий</span></div>
    </div>
   </header>
+
+  <section className={'stageWorkspaceSyncBar is-'+g.realtimeState} aria-label="Состояние синхронизации этапа">
+   <div className="stageWorkspaceSyncState"><RadioTower size={18} aria-hidden="true"/><span><b>{syncLabel}</b><small>Supabase Realtime · данные этапа {String(stage.stage_no).padStart(2,'0')}</small></span></div>
+   <div className="stageWorkspaceSyncFacts"><span><b>{docs.length}</b> документов</span><span><b>{votes.length}</b> голосований</span><span><b>{g.activities.filter(x=>x.payload?.stage_no===stage.stage_no||x.payload?.stage===stage.stage_no).length}</b> событий журнала</span></div>
+  </section>
 
   <section className="stageStudentRoute">
    <div className="stageStudentRouteIcon"><Route size={24}/></div>
@@ -191,23 +200,27 @@ export default function StageWorkspace({
     <legend className="srOnly">Рабочие действия этапа</legend>
     {readOnly&&<p className="readOnlyNote">Режим просмотра участника: формы показаны для проверки интерфейса, но изменение данных заблокировано.</p>}
 
-    {registrationBodies&&<InstitutionRegistrationPanel g={g} readOnly={readOnly} stageNo={stage.stage_no} initialBody={registrationBodies[0]} allowedBodies={registrationBodies}/>}
-    <DeadlineControl g={g} stageNo={stage.stage_no}/>
-    <StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>
+    <div className="stageWorkspaceCoreTools">
+     {registrationBodies&&<InstitutionRegistrationPanel g={g} readOnly={readOnly} stageNo={stage.stage_no} initialBody={registrationBodies[0]} allowedBodies={registrationBodies}/>}
+     <DeadlineControl g={g} stageNo={stage.stage_no}/>
+     <StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>
+    </div>
 
-    {(stage.stage_no===2||stage.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={stage.stage_no as 2|3} onOpenVotes={onOpenVotes}/>}
-    {stage.stage_no===4&&<DumaLeadershipElection g={g}/>}
-    {stage.stage_no===5&&<GhostPolicyLab g={g} onOpenVotes={onOpenVotes}/>}
-    {stage.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes}/>}
-    {(stage.stage_no===6||stage.stage_no===7)&&<PresidentialElectionLab g={g}/>}
-    {stage.stage_no===8&&<><GovernmentStructurePanel g={g}/><GovernmentFormationLab g={g}/></>}
-    {stage.stage_no===9&&<InstitutionStaffingLab g={g}/>}
-    {(stage.stage_no===10||stage.stage_no===11)&&<StateProgramLab g={g}/>}
-    {stage.stage_no===11&&<GovernmentProgramSessionLab g={g} onOpenVotes={onOpenVotes}/>}
-    {stage.stage_no===12&&<LegislativeSessionLab g={g} onOpenVotes={onOpenVotes}/>}
-    {stage.stage_no===14&&<><MunicipalGovernancePanel g={g}/><MunicipalProjectLab g={g}/></>}
-    {stage.stage_no===15&&<CrisisRoom g={g}/>}
-    {stage.stage_no===16&&<SystemDebriefLab g={g}/>}
+    <div className="stageSpecializedModules" aria-label="Специализированные процедуры этапа">
+     {(stage.stage_no===2||stage.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={stage.stage_no as 2|3} onOpenVotes={onOpenVotes}/>}
+     {stage.stage_no===4&&<DumaLeadershipElection g={g}/>}
+     {stage.stage_no===5&&<GhostPolicyLab g={g} onOpenVotes={onOpenVotes}/>}
+     {stage.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes}/>}
+     {(stage.stage_no===6||stage.stage_no===7)&&<PresidentialElectionLab g={g}/>}
+     {stage.stage_no===8&&<><GovernmentStructurePanel g={g}/><GovernmentFormationLab g={g}/></>}
+     {stage.stage_no===9&&<InstitutionStaffingLab g={g}/>}
+     {(stage.stage_no===10||stage.stage_no===11)&&<StateProgramLab g={g}/>}
+     {stage.stage_no===11&&<GovernmentProgramSessionLab g={g} onOpenVotes={onOpenVotes}/>}
+     {stage.stage_no===12&&<LegislativeSessionLab g={g} onOpenVotes={onOpenVotes}/>}
+     {stage.stage_no===14&&<><MunicipalGovernancePanel g={g}/><MunicipalProjectLab g={g}/></>}
+     {stage.stage_no===15&&<CrisisRoom g={g}/>}
+     {stage.stage_no===16&&<SystemDebriefLab g={g}/>}
+    </div>
 
     <StageReadinessPanel g={g} stageNo={stage.stage_no} rulesUrl={detail.rulesUrl} rulesLabel={detail.rulesSection||'Правила игры'}/>
    </fieldset>
@@ -220,6 +233,12 @@ export default function StageWorkspace({
     {detail.rulesUrl&&<a href={detail.rulesUrl} target="_blank" rel="noreferrer"><BookOpenText size={17}/><span>{detail.rulesSection||'Полные правила этапа'}</span><ExternalLink size={14}/></a>}
    </div>
   </section>}
+
+  <nav className="stageWorkspacePager" aria-label="Переход между этапами">
+   <button type="button" disabled={!previousStage||!onOpenStage} onClick={()=>previousStage&&onOpenStage?.(previousStage.stage_no)}><ChevronLeft size={17} aria-hidden="true"/><span><small>Предыдущий</small><b>{previousStage?'Этап '+String(previousStage.stage_no).padStart(2,'0'):'Нет этапа'}</b></span></button>
+   <button type="button" className="stageWorkspacePagerAll" onClick={onBack}><span><small>Карта игры</small><b>Все 16 этапов</b></span></button>
+   <button type="button" disabled={!nextStageRecord||!onOpenStage} onClick={()=>nextStageRecord&&onOpenStage?.(nextStageRecord.stage_no)}><span><small>Следующий</small><b>{nextStageRecord?'Этап '+String(nextStageRecord.stage_no).padStart(2,'0'):'Финиш'}</b></span><ChevronRight size={17} aria-hidden="true"/></button>
+  </nav>
 
 
  </div>;
