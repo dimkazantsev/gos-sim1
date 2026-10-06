@@ -50,6 +50,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const [allocations,setAllocations]=useState<RegionAllocation[]>([]);
  const [system,setSystem]=useState<PRule['system_type']>('proportional');
  const [method,setMethod]=useState<NonNullable<PRule['allocation_method']>>('dhondt');
+ const [calculatorMethod,setCalculatorMethod]=useState<NonNullable<PRule['allocation_method']>>('dhondt');
  const [majority,setMajority]=useState<NonNullable<PRule['majoritarian_method']>>('plurality');
  const [propShare,setPropShare]=useState(50);
  const [rationale,setRationale]=useState('');
@@ -102,12 +103,11 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   g.setChatOpen(true);
  }
 
- const preview=(()=>{
-  const values=parties.map(p=>Math.max(0,Number(support[p.id])||0));
-  const seats=system==='mixed'?Math.round(450*propShare/100):system==='proportional'?450:0;
-  const result=seats>0?allocate(values,seats,method):values.map(()=>0);
-  return parties.map((p,i)=>({party:p,seats:result[i]}));
- })();
+ const calculatorVotes=parties.map(p=>Math.max(0,Number(support[p.id])||0));
+ const calculatorSeats=calculatorVotes.reduce((sum,value)=>sum+value,0)>0?allocate(calculatorVotes,450,calculatorMethod):calculatorVotes.map(()=>0);
+ const preview=parties.map((p,i)=>({party:p,seats:calculatorSeats[i]||0}));
+ const calculatorSupportTotal=calculatorVotes.reduce((sum,value)=>sum+value,0);
+ const calculatorAllocatedTotal=calculatorSeats.reduce((sum,value)=>sum+value,0);
 
  async function proposeP(){
   setBusy(true);const r=await supabase.rpc('propose_parliamentary_election_rule',{p_game_id:activeGame.id,p_system_type:system,p_allocation_method:system==='majoritarian'?null:method,p_majoritarian_method:system==='proportional'?null:majority,p_proportional_share:system==='mixed'?propShare:null,p_rationale:rationale.trim()||null});
@@ -132,7 +132,16 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
 
   <div className="electoralRuleList">{activeP.length===0?<div className="emptyState">Предложений ещё нет.</div>:activeP.map(r=>{const v=voteStatus(r.vote_id);return <article key={r.id} className={r.status}><header><span>{sysLabel[r.system_type]}</span><b>{r.allocation_method?allocationLabel[r.allocation_method]:r.majoritarian_method?majLabel[r.majoritarian_method]:'Правило'}</b><em>{r.status==='adopted'?'Принято':r.status==='vote_open'?'На голосовании':r.status==='rejected'?'Отклонено':'Проект'}</em></header>{r.rationale&&<p>{r.rationale}</p>}<footer><span>{proposer(r.proposed_by)}</span>{r.system_type==='mixed'&&<span>{r.proportional_share}% пропорционально</span>}{v&&<span>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</span>}{canPropose&&r.status==='draft'&&<button disabled={busy} onClick={()=>void voteP(r.id)}>Вынести на голосование →</button>}</footer></article>})}</div>
 
-  <section className="electoralSandbox"><div className="electoralSandboxHead"><div><small>КОНТРФАКТИЧЕСКИЙ КАЛЬКУЛЯТОР</small><h3>Как формула меняет распределение мандатов</h3><p>Это учебная модель, а не официальный результат этапа 4. Введите одинаковые исходные доли поддержки и сравнивайте формулы.</p></div><span>{system==='majoritarian'?'Нужны данные по округам':(system==='mixed'?Math.round(450*propShare/100):450)+' пропорциональных мест'}</span></div><div className="electoralSandboxRows">{parties.map((p,i)=><div key={p.id}><i style={{background:p.color}}/><b>{p.name}</b><input type="number" min="0" step="0.1" value={support[p.id]??''} onChange={e=>setSupport(v=>({...v,[p.id]:e.target.value}))}/><span>%</span><strong>{system==='majoritarian'?'—':preview[i]?.seats||0}</strong><small>мандатов</small></div>)}</div>{system==='majoritarian'&&<p className="electoralCaveat">Национальная доля голосов сама по себе не позволяет корректно вывести число мандатов при мажоритарной системе: нужны результаты по отдельным округам. Система намеренно не «угадывает» их.</p>}</section>
+  <section className="electoralCalculator">
+   <div className="electoralCalculatorHead">
+    <div><small>КАЛЬКУЛЯТОР МАНДАТОВ</small><h3>Распределение 450 мест</h3><p>Введите долю поддержки каждой партии и выберите формулу расчёта.</p></div>
+    <label className="electoralCalculatorFormula"><span>Формула</span><select value={calculatorMethod} onChange={e=>setCalculatorMethod(e.target.value as NonNullable<PRule['allocation_method']>)}><option value="hare">Квота Хэйра</option><option value="droop">Квота Друпа</option><option value="dhondt">Д’Ондт</option><option value="sainte_lague">Сент-Лагю</option><option value="imperiali">Империали</option></select></label>
+   </div>
+   <div className="electoralCalculatorList">
+    {parties.map((p,i)=><div className="electoralCalculatorRow" key={p.id}><span className="electoralCalculatorParty"><i style={{background:p.color}}/><b>{p.name}</b></span><label><span>Поддержка</span><span className="electoralCalculatorInput"><input type="number" min="0" max="100" step="0.1" value={support[p.id]??''} onChange={e=>setSupport(v=>({...v,[p.id]:e.target.value}))}/><em>%</em></span></label><div className="electoralCalculatorResult"><span>Мандаты</span><strong>{preview[i]?.seats||0}</strong></div></div>)}
+   </div>
+   <div className="electoralCalculatorSummary"><span>Сумма поддержки <b>{calculatorSupportTotal.toLocaleString('ru-RU',{maximumFractionDigits:1})}%</b></span><span>Распределено <b>{calculatorAllocatedTotal} / 450</b></span></div>
+  </section>
  </section>;
 
  return <section className="electoralLab regionalLab">
