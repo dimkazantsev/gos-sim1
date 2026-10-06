@@ -4,7 +4,7 @@ import postcss from 'postcss';
 import {execFileSync} from 'node:child_process';
 
 const read=p=>fs.readFileSync(p,'utf8');
-const styles=['design-tokens','design-shell','design-views','design-responsive','design-readability'];
+const styles=['design-tokens','design-shell','design-views','design-responsive','design-readability','2026-stage-system'];
 const css=Object.fromEntries(styles.map(name=>[name,read(`app/${name}.css`)]));
 let count=0;
 function check(label,test){assert.ok(test,label);console.log(`PASS ${label}`);count++;}

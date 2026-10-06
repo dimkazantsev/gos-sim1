@@ -31,6 +31,7 @@ export function useRepublicGame(gameId:string){
  const [chatMediaError,setChatMediaError]=useState(''),[chatMediaPhase,setChatMediaPhase]=useState<MediaUploadPhase>('idle');
  const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]);
+ const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false);
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,PendingMediaUpload>()),voiceAnalysisRef=useRef<Promise<{waveform:number[];duration:number}|null>|null>(null);
 
@@ -56,23 +57,36 @@ export function useRepublicGame(gameId:string){
  const sharedMetrics=useMemo(()=>withBudgetIncome(metrics,budgetPulse),[metrics,budgetPulse]);
  const sharedMetricHistory=useMemo(()=>budgetPulse?[...metricHistory.filter(h=>h.metric_key!=='budget'),...budgetPulse.history]:metricHistory,[metricHistory,budgetPulse]);
  async function syncBudget(){await refreshBudgetPulse();}
+ function scheduleRealtimeReload(delay=180){
+  if(realtimeReloadTimer.current)clearTimeout(realtimeReloadTimer.current);
+  realtimeReloadTimer.current=setTimeout(()=>{realtimeReloadTimer.current=null;void flushRealtimeReload()},delay);
+ }
+ async function flushRealtimeReload(){
+  if(realtimeReloadRunning.current){realtimeReloadQueued.current=true;return}
+  realtimeReloadRunning.current=true;
+  try{await loadAll(false)}
+  finally{
+   realtimeReloadRunning.current=false;
+   if(realtimeReloadQueued.current){realtimeReloadQueued.current=false;scheduleRealtimeReload(80)}
+  }
+ }
 
  useEffect(()=>{
   setProfileGameId('');
   void loadAll();
   const live=supabase.channel('republic:'+gameId)
-   .on('postgres_changes',{event:'*',schema:'public',table:'games',filter:'id=eq.'+gameId},()=>void loadAll(false))
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_members',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
+   .on('postgres_changes',{event:'*',schema:'public',table:'games',filter:'id=eq.'+gameId},()=>scheduleRealtimeReload())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_members',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_office_assignments',filter:'game_id=eq.'+gameId},()=>void loadRepublicOffices())
-   .on('postgres_changes',{event:'*',schema:'public',table:'state_metrics',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_stages',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_parties',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_votes',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_ballots'},()=>void loadAll(false))
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_evaluations',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_crises',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_events',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_documents',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
+   .on('postgres_changes',{event:'*',schema:'public',table:'state_metrics',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_stages',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_parties',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_votes',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_ballots'},()=>scheduleRealtimeReload())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_evaluations',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_crises',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_events',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_documents',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_activity',filter:'game_id=eq.'+gameId},()=>void loadClassroomTelemetry())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_presence',filter:'game_id=eq.'+gameId},()=>void loadClassroomTelemetry())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_profiles',filter:'game_id=eq.'+gameId},()=>void loadPartyAssets())
@@ -88,13 +102,13 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'*',schema:'public',table:'state_metric_history',filter:'game_id=eq.'+gameId},()=>void loadPoliticalWall())
    .on('postgres_changes',{event:'*',schema:'public',table:'impact_rules',filter:'game_id=eq.'+gameId},()=>void loadImpactEngine())
    .on('postgres_changes',{event:'*',schema:'public',table:'impact_ledger',filter:'game_id=eq.'+gameId},()=>void loadImpactEngine())
-   .on('postgres_changes',{event:'*',schema:'public',table:'chat_channels',filter:'game_id=eq.'+gameId},()=>void loadAll(false))
-   .on('postgres_changes',{event:'*',schema:'public',table:'channel_members'},()=>void loadAll(false))
+   .on('postgres_changes',{event:'*',schema:'public',table:'chat_channels',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
+   .on('postgres_changes',{event:'*',schema:'public',table:'channel_members'},()=>scheduleRealtimeReload())
    .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'game_id=eq.'+gameId},()=>{if(channelRef.current)void loadMessages(channelRef.current)})
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_pins',filter:'game_id=eq.'+gameId},()=>{if(channelRef.current)void loadChatPins(channelRef.current)})
    .subscribe(status=>{setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'?'disconnected':'connecting')});
   liveRef.current=live;
-  return()=>{if(liveRef.current)void supabase.removeChannel(liveRef.current)};
+  return()=>{if(realtimeReloadTimer.current){clearTimeout(realtimeReloadTimer.current);realtimeReloadTimer.current=null}if(liveRef.current)void supabase.removeChannel(liveRef.current)};
  },[gameId]);
 
  useEffect(()=>()=>{

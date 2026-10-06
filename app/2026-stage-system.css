@@ -59,7 +59,7 @@
 .stageWorkspaceSyncState>svg{flex:none;color:#8395aa}
 .stageWorkspaceSyncState>span{display:grid;gap:1px;min-width:0}
 .stageWorkspaceSyncState b{color:#385675;font-size:12px}
-.stageWorkspaceSyncState small{color:#8797aa;font-size:10px}
+.stageWorkspaceSyncState small{color:#8797aa;font-size:12px}
 .stageWorkspaceSyncBar.is-connected .stageWorkspaceSyncState>svg{color:#16845f}
 .stageWorkspaceSyncBar.is-connected .stageWorkspaceSyncState b{color:#267052}
 .stageWorkspaceSyncBar.is-connecting .stageWorkspaceSyncState>svg{color:#a06a13}
@@ -67,8 +67,8 @@
 .stageWorkspaceSyncBar.is-disconnected .stageWorkspaceSyncState>svg,
 .stageWorkspaceSyncBar.is-disconnected .stageWorkspaceSyncState b{color:#a74659}
 .stageWorkspaceSyncFacts{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
-.stageWorkspaceSyncFacts span{display:inline-flex;align-items:center;gap:4px;min-height:29px;padding:0 9px;border:1px solid #e1e8f1;border-radius:9px;background:#fff;color:#6d8098;font-size:10px;white-space:nowrap}
-.stageWorkspaceSyncFacts b{color:#315273;font-size:11px}
+.stageWorkspaceSyncFacts span{display:inline-flex;align-items:center;gap:4px;min-height:29px;padding:0 9px;border:1px solid #e1e8f1;border-radius:9px;background:#fff;color:#6d8098;font-size:12px;white-space:nowrap}
+.stageWorkspaceSyncFacts b{color:#315273;font-size:12px}
 
 .stageWorkspaceCanonical .stageStudentRoute{
  background:linear-gradient(135deg,#f9fbff,#f4f8ff);
@@ -223,7 +223,7 @@
 .stageWorkspacePager>button:last-child{justify-content:flex-end;text-align:right}
 .stageWorkspacePager>button:disabled{opacity:.42}
 .stageWorkspacePager>button>span{display:grid;gap:1px;min-width:0}
-.stageWorkspacePager small{color:#8a99ab;font-size:9px;text-transform:uppercase;letter-spacing:.07em}
+.stageWorkspacePager small{color:#8a99ab;font-size:12px;text-transform:uppercase;letter-spacing:.07em}
 .stageWorkspacePager b{overflow:hidden;color:#2e4d6f;font-size:12px;text-overflow:ellipsis;white-space:nowrap}
 .stageWorkspacePagerAll{justify-content:center!important;text-align:center!important;background:#f0f5ff!important;border-color:#cfddf8!important}
 .stageWorkspacePagerAll b{color:#315ebf}
