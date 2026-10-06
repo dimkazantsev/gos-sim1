@@ -132,7 +132,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
 
   <div className="electoralRuleList">{activeP.length===0?<div className="emptyState">Предложений ещё нет.</div>:activeP.map(r=>{const v=voteStatus(r.vote_id);return <article key={r.id} className={r.status}><header><span>{sysLabel[r.system_type]}</span><b>{r.allocation_method?allocationLabel[r.allocation_method]:r.majoritarian_method?majLabel[r.majoritarian_method]:'Правило'}</b><em>{r.status==='adopted'?'Принято':r.status==='vote_open'?'На голосовании':r.status==='rejected'?'Отклонено':'Проект'}</em></header>{r.rationale&&<p>{r.rationale}</p>}<footer><span>{proposer(r.proposed_by)}</span>{r.system_type==='mixed'&&<span>{r.proportional_share}% пропорционально</span>}{v&&<span>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</span>}{canPropose&&r.status==='draft'&&<button disabled={busy} onClick={()=>void voteP(r.id)}>Вынести на голосование →</button>}</footer></article>})}</div>
 
-  <section className="electoralCalculator">
+  {teacher&&  <section className="electoralCalculator">
    <div className="electoralCalculatorHead">
     <div><small>КАЛЬКУЛЯТОР МАНДАТОВ</small><h3>Распределение 450 мест</h3><p>Введите долю поддержки каждой партии и выберите формулу расчёта.</p></div>
     <label className="electoralCalculatorFormula"><span>Формула</span><select value={calculatorMethod} onChange={e=>setCalculatorMethod(e.target.value as NonNullable<PRule['allocation_method']>)}><option value="hare">Квота Хэйра</option><option value="droop">Квота Друпа</option><option value="dhondt">Д’Ондт</option><option value="sainte_lague">Сент-Лагю</option><option value="imperiali">Империали</option></select></label>
@@ -142,6 +142,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
    </div>
    <div className="electoralCalculatorSummary"><span>Сумма поддержки <b>{calculatorSupportTotal.toLocaleString('ru-RU',{maximumFractionDigits:1})}%</b></span><span>Распределено <b>{calculatorAllocatedTotal} / 450</b></span></div>
   </section>
+}
  </section>;
 
  return <section className="electoralLab regionalLab">
