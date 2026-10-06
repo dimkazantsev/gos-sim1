@@ -438,7 +438,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      </div>}
     </div>}
 
-    <ChatToggleButton chatOpen={chatOpen} onToggle={()=>setChatOpen(!chatOpen)}/>
+    <ChatToggleButton chatOpen={chatOpen} onToggle={()=>setChatOpen(!chatOpen)} unreadCount={g.chatUnreadCount} mentionCount={g.chatMentionCount}/>
    </header>
 
    {previewMode&&<div className="studentPreviewBanner">
@@ -472,12 +472,12 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
    <section ref={mobileDialogRef} tabIndex={-1} className="mobileMoreSheet" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
     <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><IconAction onClick={()=>setMobileMenuOpen(false)} label="Закрыть меню"/></header>
-    <div className="mobileAllGrid">{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} onClick={()=>navigate(k)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" className={chatOpen?'active':''} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);setChatOpen(true)}}><MessageCircle aria-hidden="true"/><span>Чат</span></button></div>
+    <div className="mobileAllGrid">{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} onClick={()=>navigate(k)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" className={chatOpen?'active':''} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);setChatOpen(true)}}><span className="mobileMenuChatIcon"><MessageCircle aria-hidden="true"/>{g.chatUnreadCount>0&&<i className={g.chatMentionCount>0?'hasMention':''}>{g.chatUnreadCount>99?'99+':g.chatUnreadCount}</i>}</span><span>Чат</span></button></div>
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
   {onboardingRequired&&introSeen&&!introOpen&&!previewMode&&<div className="onboardingBar" role="status"><div><strong>Первое знакомство с Республикой</strong><span>Обязательные поля: ФИО, пол, подпись, описание и подтверждённая почта с паролем.</span>{(onboardingNotice||introSyncError)&&<small>{onboardingNotice||introSyncError}</small>}</div><button type="button" disabled={completingProfile} onClick={()=>{setSelectedProfileId('');navigate('profile');void completeOnboarding()}}>{completingProfile?'Проверяем…':'Закончить настройку'}</button></div>}
   <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={me?.kind==='student'&&!previewMode&&!introOpen}/>
   <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>
-  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
+  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }
