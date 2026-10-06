@@ -289,7 +289,7 @@
   padding:0 5px 0 0;
   overflow-x:auto;
   overflow-y:hidden;
-  touch-action:pan-x!important;
+  touch-action:none!important;
   overscroll-behavior-x:contain;
   -webkit-overflow-scrolling:touch;
  }
@@ -311,7 +311,7 @@
   justify-items:center;
   row-gap:3px;
   padding:4px 3px;
-  touch-action:pan-x!important;
+  touch-action:none!important;
   -webkit-tap-highlight-color:transparent;
  }
  .mobileDockV2 .mobileDockIcon,
