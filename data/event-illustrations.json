@@ -382,5 +382,47 @@
     "width": 1920,
     "height": 1080,
     "srcSet": "/event-art/scene-050-20261004-480.webp 480w, /event-art/scene-050-20261004-960.webp 960w, /event-art/scene-050-20261004-1920.webp 1920w"
+  },
+  "bank-legal-2026-025": {
+    "src": "/event-art/scene-075-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-075-20261004-480.webp 480w, /event-art/scene-075-20261004-960.webp 960w, /event-art/scene-075-20261004-1920.webp 1920w"
+  },
+  "bank-legal-2026-026": {
+    "src": "/event-art/scene-076-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-076-20261004-480.webp 480w, /event-art/scene-076-20261004-960.webp 960w, /event-art/scene-076-20261004-1920.webp 1920w"
+  },
+  "bank-legal-2026-027": {
+    "src": "/event-art/scene-077-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-077-20261004-480.webp 480w, /event-art/scene-077-20261004-960.webp 960w, /event-art/scene-077-20261004-1920.webp 1920w"
+  },
+  "bank-legal-2026-028": {
+    "src": "/event-art/scene-078-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-078-20261004-480.webp 480w, /event-art/scene-078-20261004-960.webp 960w, /event-art/scene-078-20261004-1920.webp 1920w"
+  },
+  "bank-legal-2026-029": {
+    "src": "/event-art/scene-079-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-079-20261004-480.webp 480w, /event-art/scene-079-20261004-960.webp 960w, /event-art/scene-079-20261004-1920.webp 1920w"
+  },
+  "bank-legal-2026-030": {
+    "src": "/event-art/scene-080-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-080-20261004-480.webp 480w, /event-art/scene-080-20261004-960.webp 960w, /event-art/scene-080-20261004-1920.webp 1920w"
+  },
+  "bank-legal-2026-031": {
+    "src": "/event-art/scene-081-20261004-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/scene-081-20261004-480.webp 480w, /event-art/scene-081-20261004-960.webp 960w, /event-art/scene-081-20261004-1920.webp 1920w"
   }
 }

@@ -24,6 +24,34 @@ jobs:
           cache-dependency-path: package.json
       - run: npm install
       - run: npx playwright-core install chromium --with-deps
+      - run: python -m pip install Pillow
+      - name: Validate every responsive illustration
+        run: |
+          python - <<'PY'
+          import json, hashlib, re
+          from pathlib import Path
+          from PIL import Image
+          m = json.loads(Path("data/event-illustrations.json").read_text())
+          d = json.loads(Path("content/event-art-oct04-progress.json").read_text())
+          assert set(m) == set(d["completed"])
+          hashes = set()
+          for key, v in m.items():
+              assert v["width"] == 1920 and v["height"] == 1080, key
+              assert re.fullmatch(r"/event-art/scene-\d{3}-\d{8}-1920\.webp", v["src"]), key
+              expected = ", ".join(v["src"].replace("-1920.webp", f"-{w}.webp") + f" {w}w" for w in [480, 960, 1920])
+              assert v["srcSet"] == expected, key
+              for w, h in [(1920, 1080), (960, 540), (480, 270)]:
+                  p = Path("public") / v["src"].lstrip("/").replace("-1920.webp", f"-{w}.webp")
+                  im = Image.open(p)
+                  assert im.size == (w, h), (key, im.size)
+                  im.verify()
+                  if w == 1920:
+                      sha = hashlib.sha256(p.read_bytes()).hexdigest()
+                      assert sha == d["completed"][key]["asset_sha256"], key
+                      assert sha not in hashes, key
+                      hashes.add(sha)
+          print(f"PASS {len(m)} separate case images and {len(m) * 3} responsive files")
+          PY
       - run: node scripts/interface-contract-check.cjs
       - run: node scripts/event-card-browser-check.cjs
       - uses: actions/upload-artifact@v4

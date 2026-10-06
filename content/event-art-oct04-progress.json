@@ -962,6 +962,118 @@
       "asset": "/event-art/scene-050-20261004-1920.webp",
       "generator": "Built-in imagegen",
       "source_file": "bank-curated-v2-50.png"
+    },
+    "bank-legal-2026-025": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "72e8ad63a77d997732dc000dae2a96ea98cf814ab6e8de237d5ea1f60f61dca9",
+      "asset_sha256": "3e0ad3ea12f5cc19463aa1abc2d7b765da0d0bdf9fa04b8f4b77e1958ca863d8",
+      "asset": "/event-art/scene-075-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-legal-2026-025.png",
+      "style_pass": "2D animation"
+    },
+    "bank-legal-2026-026": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "daf698d2ea9d8efcdbe03a102d26f350d2c3dec5837ef7f75de6efd4d267258c",
+      "asset_sha256": "dfa6589877fd883cc6fd3e521912638b7eda1d57cc8fe6cf1f1683768b545d22",
+      "asset": "/event-art/scene-076-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-legal-2026-026.png",
+      "style_pass": "2D animation"
+    },
+    "bank-legal-2026-027": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "99fa4d5891861643e87906c395756136bd99d84b301932ec9ee139cbe82d6074",
+      "asset_sha256": "591cfdd32d39d1327c145ae1e5a9c666b93b1c7a20ea9283a4cb951f5920fae8",
+      "asset": "/event-art/scene-077-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-legal-2026-027.png",
+      "style_pass": "2D animation"
+    },
+    "bank-legal-2026-028": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "d8c9b22aac3daae734481b03e64cde97332359387f302d91830e17ca6ef96431",
+      "asset_sha256": "358fbfa073c621241f005a5299d5c901dd5f489a3f5c934a2a1a750559bcc643",
+      "asset": "/event-art/scene-078-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-legal-2026-028.png",
+      "style_pass": "2D animation"
+    },
+    "bank-legal-2026-029": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "6ee28ce431645aed018e0ae2c30a8a1e52e50de658592a172da3d1ab7a0185fe",
+      "asset_sha256": "68bf0666df9a31eee224c1661031d7785845d86658b0ecc4152b2af3c15fff21",
+      "asset": "/event-art/scene-079-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-legal-2026-029.png",
+      "style_pass": "2D animation"
+    },
+    "bank-legal-2026-030": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "6c6cbaebcf5f2d9e8f2bd70bac38984fc30400f44dec39f2b0237055a1f20ad8",
+      "asset_sha256": "2042392be04ca9e3d3ff00380dcb52f6e92b2de55405d8fd498ef9142c1c5182",
+      "asset": "/event-art/scene-080-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-legal-2026-030.png",
+      "style_pass": "2D animation"
+    },
+    "bank-legal-2026-031": {
+      "source_dimensions": [
+        1672,
+        941
+      ],
+      "export_dimensions": [
+        1920,
+        1080
+      ],
+      "source_sha256": "e71be8748bb4e17e66400fb593d49f047ce539abdf235a8c4e7d7780f21dda26",
+      "asset_sha256": "5ea9a82387551d0bea939ea6d46724fa83e6a2b41d966a6d104b023c8bf77622",
+      "asset": "/event-art/scene-081-20261004-1920.webp",
+      "generator": "Built-in imagegen",
+      "source_file": "bank-legal-2026-031.png",
+      "style_pass": "2D animation"
     }
   }
 }
