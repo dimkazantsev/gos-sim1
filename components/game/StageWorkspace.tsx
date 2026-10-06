@@ -187,6 +187,7 @@ export default function StageWorkspace({
     <legend className="srOnly">Рабочие действия этапа</legend>
     {readOnly&&<p className="readOnlyNote">Режим просмотра участника: формы показаны для проверки интерфейса, но изменение данных заблокировано.</p>}
 
+    {registrationBodies&&<InstitutionRegistrationPanel g={g} readOnly={readOnly} stageNo={stage.stage_no} initialBody={registrationBodies[0]} allowedBodies={registrationBodies}/>}
     <DeadlineControl g={g} stageNo={stage.stage_no}/>
     <StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>
 
