@@ -203,7 +203,7 @@ export default function StageWorkspace({
     <div className="stageWorkspaceCoreTools">
      {registrationBodies&&<InstitutionRegistrationPanel g={g} readOnly={readOnly} stageNo={stage.stage_no} initialBody={registrationBodies[0]} allowedBodies={registrationBodies}/>}
      <DeadlineControl g={g} stageNo={stage.stage_no}/>
-     <StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>
+     {stage.stage_no!==6&&<StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>} 
     </div>
 
     <div className="stageSpecializedModules" aria-label="Специализированные процедуры этапа">
