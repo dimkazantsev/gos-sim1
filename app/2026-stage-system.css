@@ -501,7 +501,7 @@
 }
 
 
-/* Stage 7: parliamentary route for presidential electoral-system amendment */
+/* Parliamentary route for presidential electoral-system amendment */
 .presSystemDecision>header{
  display:grid;
  grid-template-columns:minmax(0,1fr) minmax(220px,.34fr);
@@ -640,3 +640,9 @@
  .presSystemProposal .wide,.presSystemProposal>button{grid-column:auto}
  .presSystemRoute{grid-template-columns:1fr}
 }
+
+.candidateHeaderActions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.candidateHeaderActions>span{white-space:nowrap}
+.cecDocumentFileLine .iconAction{margin-left:auto;flex:none}
+.presSystemAppointmentOnly{padding:0!important}
+@media(max-width:640px){.candidateHeaderActions{align-items:flex-end;flex-direction:column}.cecDocumentFileLine .iconAction{margin-left:0}}
