@@ -133,6 +133,34 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const calculatorAllocatedTotal=calculatorSeats.reduce((sum,value)=>sum+value,0);
  const calculatorReady=(proportionalPool===0||calculatorSupportTotal>0)&&(districtPool===0||districtTotal===districtPool)&&calculatorAllocatedTotal===450;
  const latestSavedResult=savedResults[0];
+ const regionalMandates=parties.map(p=>Math.max(0,Number(p.mandates)||0));
+ const regionalMandateTotal=regionalMandates.reduce((a,b)=>a+b,0);
+ const proportionalRegional=(()=>{
+  if(regionalMandateTotal<=0)return parties.map(()=>0);
+  const raw=regionalMandates.map(v=>v/regionalMandateTotal*89);
+  const out=raw.map(v=>Math.floor(v));
+  let remain=89-out.reduce((a,b)=>a+b,0);
+  const order=raw.map((v,i)=>({i,r:v-Math.floor(v)})).sort((a,b)=>b.r-a.r||a.i-b.i);
+  for(let k=0;k<remain;k++)out[order[k%order.length].i]++;
+  return out;
+ })();
+ const agreementRegional=parties.map(p=>Math.max(0,Math.floor(Number(regionalCalculatorDraft[p.id])||0)));
+ const agreementRegionalTotal=agreementRegional.reduce((a,b)=>a+b,0);
+ const randomRegional=parties.map(p=>Math.max(0,Math.floor(Number(regionalLottery[p.id])||0)));
+ const regionalPreview=parties.map((p,i)=>({
+  party:p,
+  regions:regionalCalculatorMethod==='proportional'?proportionalRegional[i]||0:regionalCalculatorMethod==='agreement'?agreementRegional[i]||0:randomRegional[i]||0
+ }));
+ const regionalPreviewTotal=regionalPreview.reduce((a,x)=>a+x.regions,0);
+ const regionalCalculatorReady=regionalCalculatorMethod==='proportional'?regionalMandateTotal>0:regionalCalculatorMethod==='agreement'?agreementRegionalTotal===89:regionalPreviewTotal===89;
+ const latestRegionalSaved=regionalSavedResults[0];
+
+ function drawRegionalLottery(){
+  if(!parties.length)return;
+  const out:Record<string,number>={};for(const p of parties)out[p.id]=0;
+  for(let i=0;i<89;i++){const p=parties[Math.floor(Math.random()*parties.length)];out[p.id]=(out[p.id]||0)+1}
+  setRegionalLottery(out);
+ }
 
  async function proposeP(){
   setBusy(true);const r=await supabase.rpc('propose_parliamentary_election_rule',{p_game_id:activeGame.id,p_system_type:system,p_allocation_method:system==='majoritarian'?null:method,p_majoritarian_method:system==='proportional'?null:majority,p_proportional_share:system==='mixed'?propShare:null,p_rationale:rationale.trim()||null});
@@ -157,7 +185,20 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   if(r.error)setError(r.error.message);else await load();
   setBusy(false);
  }
- async function proposeR(){
+ async function publishRegionalCalculatorResult(){
+  if(!teacher||!regionalCalculatorReady)return;
+  setBusy(true);
+  const inputs=regionalCalculatorMethod==='proportional'
+   ?{mandates:Object.fromEntries(parties.map((p,i)=>[p.id,regionalMandates[i]||0]))}
+   :regionalCalculatorMethod==='agreement'
+    ?{agreement:Object.fromEntries(parties.map((p,i)=>[p.id,agreementRegional[i]||0]))}
+    :{draw:'random'};
+  const result=Object.fromEntries(regionalPreview.map(x=>[x.party.id,x.regions]));
+  const r=await supabase.rpc('publish_regional_calculator_result',{p_game_id:activeGame.id,p_method:regionalCalculatorMethod,p_inputs:inputs,p_result:result});
+  if(r.error)setError(r.error.message);else await load();
+  setBusy(false);
+ }
+  async function proposeR(){
   setBusy(true);const r=await supabase.rpc('propose_regional_election_rule',{p_game_id:activeGame.id,p_method:regionalMethod,p_rationale:regionalRationale.trim()||null});
   if(r.error)setError(r.error.message);else{setRegionalRationale('');await load()}setBusy(false);
  }
@@ -213,11 +254,37 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  </section>;
 
  return <section className="electoralLab regionalLab">
-  <header className="electoralLabHead"><div><small>КСРФ · ЭТАП 3</small><h2>89 субъектов Российской Федерации</h2><p>После выбора метода система либо проводит случайную жеребьёвку, либо распределяет регионы пропорционально действующим мандатам ГД, либо проверяет договор фракций на сумму ровно 89.</p></div><div className="electoralAdopted"><small>ПРИНЯТЫЙ МЕТОД</small><strong>{adoptedR?regionalLabel[adoptedR.method]:'Не принят'}</strong><span>{adoptedR?.status==='allocated'?'Результат зафиксирован':''}</span></div></header>
+  <header className="electoralLabHead"><div><small>КСРФ · ЭТАП 3</small><h2>89 субъектов Российской Федерации</h2><p>В игре фракции распределяют условный политический контроль над 89 субъектами одним из трёх методов: жеребьёвкой, пропорционально мандатам Госдумы или договором. Это игровая модель, а не реальный порядок формирования органов власти субъектов РФ.</p></div><div className="electoralAdopted"><small>ПРИНЯТЫЙ МЕТОД</small><strong>{adoptedR?regionalLabel[adoptedR.method]:'Не принят'}</strong><span>{adoptedR?.status==='allocated'?'Результат зафиксирован':''}</span></div></header>
 
   {canPropose&&<div className="electoralProposal regionalProposal"><label>Метод<select value={regionalMethod} onChange={e=>setRegionalMethod(e.target.value as RRule['method'])}><option value="random">Демократический / случайный</option><option value="proportional">Пропорциональный</option><option value="agreement">Договорной</option></select></label><label className="wide">Аргументация<textarea rows={3} value={regionalRationale} onChange={e=>setRegionalRationale(e.target.value)}/></label><button className="primary" disabled={busy} onClick={()=>void proposeR()}>Внести предложение</button></div>}
 
   <div className="electoralRuleList">{activeR.length===0?<div className="emptyState">Предложений ещё нет.</div>:activeR.map(r=>{const v=voteStatus(r.vote_id);return <article key={r.id} className={r.status}><header><span>МЕТОД</span><b>{regionalLabel[r.method]}</b><em>{r.status==='allocated'?'Распределено':r.status==='adopted'?'Принято':r.status==='vote_open'?'На голосовании':r.status==='rejected'?'Отклонено':'Проект'}</em></header>{r.rationale&&<p>{r.rationale}</p>}<footer><span>{proposer(r.proposed_by)}</span>{v&&<span>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</span>}{canPropose&&r.status==='draft'&&<button disabled={busy} onClick={()=>void voteR(r.id)}>Вынести на голосование →</button>}</footer></article>})}</div>
+
+  {latestRegionalSaved&&<section className="regionalPublishedResult">
+   <div className="regionalPublishedHead"><div><small>ОПУБЛИКОВАННЫЙ РАСЧЁТ</small><h3>{regionalLabel[latestRegionalSaved.method]}</h3><p>Сохранён преподавателем · {new Date(latestRegionalSaved.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p></div><strong>89 субъектов</strong></div>
+   <div className="regionalPublishedGrid">{parties.map(p=><div key={p.id}><span><i style={{background:p.color}}/><b>{p.name}</b></span><strong>{Number(latestRegionalSaved.result?.[p.id]||0)}</strong><small>субъектов</small></div>)}</div>
+  </section>}
+
+  {teacher&&<section className="regionalCalculator">
+   <div className="regionalCalculatorHead">
+    <div><small>КАЛЬКУЛЯТОР ПРЕПОДАВАТЕЛЯ</small><h3>Распределение 89 субъектов</h3><p>Расчёт скрыт от студентов до публикации результата.</p></div>
+    <label><span>Метод</span><select value={regionalCalculatorMethod} onChange={e=>setRegionalCalculatorMethod(e.target.value as RRule['method'])}><option value="random">Жеребьёвка</option><option value="proportional">Пропорционально мандатам ГД</option><option value="agreement">Договорной</option></select></label>
+   </div>
+   {regionalCalculatorMethod==='random'&&<div className="regionalCalculatorLottery"><button type="button" className="primary" onClick={drawRegionalLottery}>Провести жеребьёвку</button><span>Каждый из 89 субъектов случайно назначается одной из партий.</span></div>}
+   <div className="regionalCalculatorRows">
+    {parties.map((p,i)=><div key={p.id}><span className="regionalCalculatorParty"><i style={{background:p.color}}/><b>{p.name}</b></span>
+     {regionalCalculatorMethod==='proportional'&&<span className="regionalCalculatorSource"><small>Мандаты ГД</small><b>{regionalMandates[i]||0}</b></span>}
+     {regionalCalculatorMethod==='agreement'&&<label><span>По договору</span><input type="number" min="0" max="89" value={regionalCalculatorDraft[p.id]??'0'} onChange={e=>setRegionalCalculatorDraft(v=>({...v,[p.id]:e.target.value}))}/></label>}
+     <span className="regionalCalculatorResult"><small>Субъекты</small><strong>{regionalPreview[i]?.regions||0}</strong></span>
+    </div>)}
+   </div>
+   <div className="regionalCalculatorSummary">
+    {regionalCalculatorMethod==='proportional'&&<span>Мандаты ГД <b>{regionalMandateTotal}</b></span>}
+    {regionalCalculatorMethod==='agreement'&&<span>По договору <b>{agreementRegionalTotal} / 89</b></span>}
+    {regionalCalculatorMethod==='random'&&<span>Распределено <b>{regionalPreviewTotal} / 89</b></span>}
+    <button type="button" className="primary" disabled={busy||!regionalCalculatorReady} onClick={()=>void publishRegionalCalculatorResult()}><Save size={16} aria-hidden="true"/>Сохранить и открыть всем</button>
+   </div>
+  </section>}
 
   {adoptedR&&<section className="regionalAllocation"><div className="regionalAllocationHead"><div><small>РАСПРЕДЕЛЕНИЕ КОНТРОЛЯ</small><h3>{regionalLabel[adoptedR.method]}</h3></div><strong>{regionRows.reduce((a,x)=>a+Number(x.regions||0),0)} / 89</strong></div>
    {adoptedR.method==='proportional'&&<div className="regionalAmbiguity"><b>Неоднозначность авторских правил</b><p>В общем описании упомянут и бюджет партии, однако математический вес бюджета не задан; детальное описание определяет пропорцию по мандатам ГД. Поэтому автоматический расчёт использует только мандаты и не выдумывает коэффициент бюджета.</p></div>}
