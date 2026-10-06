@@ -55,7 +55,20 @@ export default function GhostPolicyLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onO
 
   <div className="ghostCadenceNote"><b>Почему частота не автоматизирована жёстко</b><p>Фразы «через каждые 2 заседания» и «через одно заседание» допускают разные трактовки точки отсчёта. Поэтому система фиксирует выбранный режим и показывает авторскую формулировку дословно, а сам запуск конкретной жеребьёвки остаётся у преподавателя.</p></div>
 
-  {canPropose&&<div className="ghostPolicyProposal"><label>Предлагаемый режим<select value={mode} onChange={e=>setMode(e.target.value as Policy['policy_mode'])}><option value="prohibited">Запрещено</option><option value="justified">Разрешено по уважительной причине</option><option value="allowed">Разрешено</option></select></label><label>Обоснование<textarea rows={3} value={rationale} onChange={e=>setRationale(e.target.value)} placeholder="Почему этот режим выгоден вашей фракции и как он влияет на устойчивость большинства?"/></label><button className="primary" disabled={busy} onClick={()=>void propose()}>Внести проект постановления</button></div>}
+  {canPropose&&<section className="ghostPolicyProposal">
+   <div className="ghostPolicyProposalHead">
+    <div><small>ПРОЕКТ ПОСТАНОВЛЕНИЯ</small><h3>Выберите режим Ghost voting</h3><p>Один вариант станет предметом рассмотрения Государственной Думы.</p></div>
+   </div>
+   <div className="ghostPolicyModes" role="radiogroup" aria-label="Предлагаемый режим">
+    {([
+     ['prohibited','Запрещено','Ghost voting не применяется'],
+     ['justified','По уважительной причине','Допускается только при обоснованном отсутствии'],
+     ['allowed','Разрешено','Ghost voting применяется без дополнительного ограничения']
+    ] as const).map(([value,title,desc])=><button key={value} type="button" role="radio" aria-checked={mode===value} className={mode===value?'active':''} onClick={()=>setMode(value)}><span>{title}</span><small>{desc}</small></button>)}
+   </div>
+   <label className="ghostPolicyRationale"><span>Обоснование</span><textarea rows={4} value={rationale} onChange={e=>setRationale(e.target.value)} placeholder="Почему этот режим выгоден вашей фракции и как он влияет на устойчивость большинства?"/></label>
+   <footer className="ghostPolicyProposalFooter"><span>После внесения проект появится в списке ниже и сможет быть вынесен на голосование.</span><button className="primary" disabled={busy} onClick={()=>void propose()}>Внести проект постановления</button></footer>
+  </section>}
 
   <div className="ghostPolicyList">{visible.length===0?<div className="emptyState">Проектов постановления ещё нет.</div>:visible.map(p=>{const v=vote(p.vote_id);return <article key={p.id} className={p.status}><header><div><small>РЕЖИМ</small><b>{labels[p.policy_mode]}</b></div><em>{p.status==='adopted'?'Принят':p.status==='vote_open'?'Голосование':p.status==='rejected'?'Отклонён':'Проект'}</em></header><p>{cadence[p.policy_mode]}</p>{p.rationale&&<blockquote>{p.rationale}</blockquote>}<footer><span>{proposer(p.proposed_by)}</span>{v&&<span>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</span>}{(teacher||ledParty)&&p.status==='draft'&&<button disabled={busy} onClick={()=>void openVote(p.id)}>Вынести в зал ГД →</button>}</footer></article>})}</div>
  </section>;
