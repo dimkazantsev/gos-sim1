@@ -74,18 +74,21 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
 
  async function load(){
   if(!game)return;
-  const [p,r,a,calc]=await Promise.all([
+  const [p,r,a,calc,regionalCalc]=await Promise.all([
    supabase.from('parliamentary_election_rules').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
    supabase.from('regional_election_rules').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
    supabase.from('regional_allocations').select('*').eq('game_id',game.id),
-   supabase.from('electoral_calculator_results').select('*').eq('game_id',game.id).eq('published',true).order('created_at',{ascending:false}).limit(20)
+   supabase.from('electoral_calculator_results').select('*').eq('game_id',game.id).eq('published',true).order('created_at',{ascending:false}).limit(20),
+   supabase.from('regional_calculator_results').select('*').eq('game_id',game.id).eq('published',true).order('created_at',{ascending:false}).limit(20)
   ]);
   if(!p.error)setPRules((p.data||[]) as PRule[]);
   if(!r.error)setRRules((r.data||[]) as RRule[]);
   if(!a.error)setAllocations((a.data||[]) as RegionAllocation[]);
   if(!calc.error)setSavedResults((calc.data||[]) as ElectoralCalcResult[]);
+  if(!regionalCalc.error)setRegionalSavedResults((regionalCalc.data||[]) as RegionalCalcResult[]);
   setSupport(v=>{const n={...v};for(const x of parties)if(n[x.id]===undefined)n[x.id]=String(Number(x.support||0));return n});
   setDistrictSeats(v=>{const n={...v};for(const x of parties)if(n[x.id]===undefined)n[x.id]='0';return n});
+  setRegionalCalculatorDraft(v=>{const n={...v};for(const x of parties)if(n[x.id]===undefined)n[x.id]='0';return n});
  }
  useEffect(()=>{void load()},[game?.id,parties.length]);
  useEffect(()=>{
@@ -95,6 +98,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
    .on('postgres_changes',{event:'*',schema:'public',table:'regional_election_rules',filter:'game_id=eq.'+game.id},()=>void load())
    .on('postgres_changes',{event:'*',schema:'public',table:'regional_allocations',filter:'game_id=eq.'+game.id},()=>void load())
    .on('postgres_changes',{event:'*',schema:'public',table:'electoral_calculator_results',filter:'game_id=eq.'+game.id},()=>void load())
+   .on('postgres_changes',{event:'*',schema:'public',table:'regional_calculator_results',filter:'game_id=eq.'+game.id},()=>void load())
    .subscribe();
   return()=>{void supabase.removeChannel(ch)}
  },[game?.id]);
