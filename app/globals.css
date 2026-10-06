@@ -949,6 +949,9 @@ button,input,textarea,select{font-size:14px}
  background:#fff;
  box-shadow:0 10px 28px rgba(26,55,98,.045);
  overflow:hidden;
+ .electoralCalculatorRow{grid-template-columns:1fr;gap:9px}
+ .electoralCalculatorResult{justify-items:start;grid-template-columns:auto auto;align-items:end;gap:8px}
+ .electoralCalculatorSummary{justify-content:flex-start}
 }
 .electoralLabHead{
  display:grid;
@@ -1181,83 +1184,160 @@ button,input,textarea,select{font-size:14px}
  font-size:10px;
  font-weight:850;
 }
-.electoralSandbox{
- margin:0;
+.electoralCalculator{
  padding:20px 22px 22px;
  border-top:1px solid #e4ebf3;
  background:#fff;
 }
-.electoralSandboxHead{
- display:flex;
- justify-content:space-between;
- gap:16px;
- align-items:flex-start;
+.electoralCalculatorHead{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) minmax(220px,280px);
+ gap:18px;
+ align-items:end;
 }
-.electoralSandboxHead>div{min-width:0}
-.electoralSandboxHead small{
+.electoralCalculatorHead small{
  font-size:10px;
  font-weight:850;
  letter-spacing:.08em;
  color:#71839a;
  text-transform:uppercase;
 }
-.electoralSandboxHead h3{
+.electoralCalculatorHead h3{
  margin:4px 0 5px;
  color:#173c70;
- font-size:17px;
+ font-size:18px;
+ line-height:1.3;
 }
-.electoralSandboxHead p{
- max-width:780px;
+.electoralCalculatorHead p{
  margin:0;
  color:#6c7f97;
  font-size:11px;
  line-height:1.55;
 }
-.electoralSandboxHead>span{
- flex:none;
- padding:7px 9px;
- border-radius:999px;
- background:#edf3ff;
- color:#315a93;
- font-size:10px;
- font-weight:850;
-}
-.electoralSandboxRows{display:grid;gap:7px;margin-top:14px}
-.electoralSandboxRows>div{
+.electoralCalculatorFormula{
  display:grid;
- grid-template-columns:8px minmax(130px,1fr) 92px 18px 64px 58px;
- gap:8px;
- align-items:center;
- min-height:46px;
- padding:7px 10px;
- border:1px solid #e2e9f2;
+ gap:6px;
+ color:#607590;
+ font-size:10px;
+ font-weight:800;
+}
+.electoralCalculatorFormula select{
+ min-height:42px;
+ width:100%;
+ border:1px solid #ccd9ea;
  border-radius:10px;
+ background:#fff;
+ color:#17314f;
+ padding:0 11px;
+ font:inherit;
+}
+.electoralCalculatorList{
+ display:grid;
+ gap:8px;
+ margin-top:16px;
+}
+.electoralCalculatorRow{
+ display:grid;
+ grid-template-columns:minmax(180px,1fr) minmax(150px,190px) 100px;
+ gap:14px;
+ align-items:center;
+ min-height:58px;
+ padding:9px 12px;
+ border:1px solid #e1e8f1;
+ border-radius:12px;
  background:#fbfcfe;
 }
-.electoralSandboxRows i{width:8px;height:8px;border-radius:50%}
-.electoralSandboxRows b{color:#334e6c;font-size:11px}
-.electoralSandboxRows input{
- min-height:36px;
+.electoralCalculatorParty{
+ display:flex;
+ align-items:center;
+ gap:9px;
+ min-width:0;
+}
+.electoralCalculatorParty i{
+ flex:none;
+ width:9px;
+ height:9px;
+ border-radius:50%;
+}
+.electoralCalculatorParty b{
+ min-width:0;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+ color:#29496f;
+ font-size:12px;
+}
+.electoralCalculatorRow>label{
+ display:grid;
+ gap:4px;
+ color:#71839a;
+ font-size:9px;
+ font-weight:800;
+}
+.electoralCalculatorInput{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) 26px;
+ align-items:center;
+ min-height:38px;
  border:1px solid #ccd9ea;
- border-radius:8px;
- padding:0 8px;
- font-size:11px;
+ border-radius:9px;
  background:#fff;
+ overflow:hidden;
 }
-.electoralSandboxRows span,
-.electoralSandboxRows small{color:#8795a7;font-size:10px}
-.electoralSandboxRows strong{color:#315e91;text-align:right;font-size:12px}
-.electoralCaveat,
-.regionalAmbiguity{
- margin:10px 0 0;
- padding:11px 12px;
- border-radius:10px;
- background:#fff8ec;
- border:1px solid #ead7a8;
- color:#776344;
- font-size:11px;
- line-height:1.5;
+.electoralCalculatorInput input{
+ width:100%;
+ min-width:0;
+ min-height:36px;
+ padding:0 9px;
+ border:0;
+ outline:0;
+ background:transparent;
+ color:#17314f;
+ font:inherit;
 }
+.electoralCalculatorInput em{
+ display:grid;
+ place-items:center;
+ align-self:stretch;
+ border-left:1px solid #e2e9f2;
+ color:#8190a6;
+ font-size:10px;
+ font-style:normal;
+ font-weight:800;
+}
+.electoralCalculatorResult{
+ display:grid;
+ justify-items:end;
+ gap:2px;
+}
+.electoralCalculatorResult span{
+ color:#71839a;
+ font-size:9px;
+ font-weight:800;
+ text-transform:uppercase;
+ letter-spacing:.05em;
+}
+.electoralCalculatorResult strong{
+ color:#315efb;
+ font-size:20px;
+ line-height:1;
+}
+.electoralCalculatorSummary{
+ display:flex;
+ justify-content:flex-end;
+ gap:8px;
+ flex-wrap:wrap;
+ margin-top:12px;
+}
+.electoralCalculatorSummary>span{
+ padding:7px 9px;
+ border-radius:9px;
+ background:#f1f5fb;
+ color:#607590;
+ font-size:10px;
+}
+.electoralCalculatorSummary b{color:#29496f}
+
 .regionalProposal{grid-template-columns:minmax(190px,.7fr) minmax(0,1.3fr)}
 .regionalAllocation{
  margin:0;
@@ -1314,15 +1394,14 @@ button,input,textarea,select{font-size:14px}
 }
 @media(max-width:600px){
  .electoralLab{border-radius:16px}
- .electoralLabHead,.electoralProposal,.electoralRuleList,.electoralSandbox,.regionalAllocation{padding:16px}
+ .electoralLabHead,.electoralProposal,.electoralRuleList,.electoralCalculator,.regionalAllocation{padding:16px}
  .electoralLabHead h2{font-size:21px}
  .electoralProposal,.regionalProposal{grid-template-columns:1fr}
  .electoralProposal .wide,.electoralProposal>.primary{grid-column:auto}
  .electoralProposal>.primary{width:100%}
  .electoralDiscuss{width:100%;box-sizing:border-box}
- .electoralSandboxHead{align-items:flex-start;flex-direction:column}
- .electoralSandboxRows>div{grid-template-columns:8px minmax(0,1fr) 70px 18px}
- .electoralSandboxRows strong,.electoralSandboxRows small{grid-column:auto}
+ .electoralCalculatorHead{grid-template-columns:1fr}
+ .electoralCalculatorRow{grid-template-columns:minmax(0,1fr) minmax(120px,160px) 86px}
  .regionalPartyRows>div{grid-template-columns:8px 1fr auto}
  .regionalPartyRows input,.regionalPartyRows button{grid-column:2/-1}
 }
