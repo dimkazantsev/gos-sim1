@@ -380,7 +380,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    {channels.find(c=>c.id===channelId)?.kind==='public'&&channels.find(c=>c.id===channelId)?.name!=='Вне игры'&&<details className="chatProcessTags"><summary>Сообщение для политического процесса</summary><small>Добавьте тег, чтобы направить сообщение в публичную ленту.</small><div aria-label="Теги сообщения">{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
    <div className="chatInputRow">
     <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)}
-     placeholder={channelId?'Сообщение или @Фамилия для личной беседы':'Выберите канал'}
+     placeholder={channelId?'Сообщение или @фамилия':'Выберите канал'}
      disabled={!channelId||chatLoading} readOnly={sending} aria-busy={sending}
      onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
    </div>
