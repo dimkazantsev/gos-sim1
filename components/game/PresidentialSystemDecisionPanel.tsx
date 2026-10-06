@@ -3,7 +3,7 @@ import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 
-type Proposal={id:string;game_id:string;system_type:'relative'|'absolute'|'qualified'|'preferential';threshold_pct:number|null;rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'superseded';vote_id:string|null;proposed_by:string;created_at:string;updated_at:string};
+type Proposal={id:string;game_id:string;system_type:'relative'|'absolute'|'qualified'|'preferential';threshold_pct:number|null;rationale:string|null;status:'draft'|'registered'|'vote_open'|'adopted'|'rejected'|'superseded';vote_id:string|null;proposed_by:string;created_at:string;updated_at:string;registered_at:string|null;bill_document_id:string|null;session_id:string|null;agenda_item_id:string|null;resolution_document_id:string|null};
 const labels={relative:'Относительное большинство',absolute:'Абсолютное большинство',qualified:'Квалифицированное большинство',preferential:'Преференциальное большинство'} as const;
 
 export default function PresidentialSystemDecisionPanel({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
@@ -46,6 +46,10 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes}:{g:Retur
   setBusy(true);const r=await supabase.rpc('propose_presidential_system',{p_game_id:activeGame.id,p_system_type:system,p_threshold_pct:system==='qualified'?threshold:null,p_rationale:rationale.trim()||null});
   if(r.error)setError(r.error.message);else{setRationale('');await load()}setBusy(false);
  }
+ async function registerProposal(id:string){
+  setBusy(true);const r=await supabase.rpc('register_presidential_system_proposal',{p_proposal_id:id});
+  if(r.error)setError(r.error.message);else await load();setBusy(false);
+ }
  async function openVote(id:string){
   setBusy(true);const r=await supabase.rpc('open_presidential_system_vote',{p_proposal_id:id});
   if(r.error)setError(r.error.message);else{await load();onOpenVotes()}setBusy(false);
@@ -56,11 +60,26 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes}:{g:Retur
  }
 
  return <section className="presSystemDecision">
-  <header><div><small>ГОСУДАРСТВЕННАЯ ДУМА · ЭТАП 7</small><h3>Какая система определит победителя?</h3><p>Тип мажоритарной системы сначала выбирается депутатами ГД. После принятия решения настройка расчёта выборов синхронизируется автоматически.</p></div><div className="presSystemAdopted"><small>ПРИНЯТО</small><strong>{adopted?labels[adopted.system_type]:'Нет решения'}</strong>{adopted?.system_type==='qualified'&&<span>{adopted.threshold_pct}%</span>}</div></header>
+  <header><div><small>ГОСУДАРСТВЕННАЯ ДУМА · ЭТАП 7</small><h3>Поправка к ФЗ № 19-ФЗ о системе выборов Президента</h3><p>Фракция вносит проект, Председатель ГД регистрирует его, вопрос рассматривается на заседании Государственной Думы и выносится на мандатное голосование. По итогам система выпускает постановление ГД и только после принятия синхронизирует модель выборов.</p></div><div className="presSystemAdopted"><small>ДЕЙСТВУЕТ</small><strong>{adopted?labels[adopted.system_type]:'Решение не принято'}</strong>{adopted?.system_type==='qualified'&&<span>{adopted.threshold_pct}%</span>}</div></header>
 
-  {canPropose&&<div className="presSystemProposal"><label>Система<select value={system} onChange={e=>setSystem(e.target.value as Proposal['system_type'])}><option value="relative">Относительное большинство</option><option value="absolute">Абсолютное большинство</option><option value="qualified">Квалифицированное большинство</option><option value="preferential">Преференциальное большинство</option></select></label>{system==='qualified'&&<label>Порог, %<input type="number" min="51" max="100" value={threshold} onChange={e=>setThreshold(Math.max(51,Math.min(100,Number(e.target.value)||60)))}/></label>}<label className="wide">Позиция фракции<textarea rows={2} value={rationale} onChange={e=>setRationale(e.target.value)} placeholder="Почему именно эта модель должна применяться на выборах Президента?"/></label><button className="primary" disabled={busy} onClick={()=>void propose()}>Внести предложение</button></div>}
+  {canPropose&&<div className="presSystemProposal"><label>Система<select value={system} onChange={e=>setSystem(e.target.value as Proposal['system_type'])}><option value="relative">Относительное большинство</option><option value="absolute">Абсолютное большинство</option><option value="qualified">Квалифицированное большинство</option><option value="preferential">Преференциальное большинство</option></select></label>{system==='qualified'&&<label>Порог, %<input type="number" min="51" max="100" value={threshold} onChange={e=>setThreshold(Math.max(51,Math.min(100,Number(e.target.value)||60)))}/></label>}<label className="wide">Позиция фракции<textarea rows={2} value={rationale} onChange={e=>setRationale(e.target.value)} placeholder="Почему именно эта модель должна применяться на выборах Президента?"/></label><button className="primary" disabled={busy} onClick={()=>void propose()}>Создать проект поправки</button></div>}
 
-  <div className="presSystemList">{visible.map(p=>{const v=vote(p.vote_id);return <article key={p.id} className={p.status}><div><small>{proposer(p.proposed_by)}</small><b>{labels[p.system_type]}</b>{p.rationale&&<p>{p.rationale}</p>}</div><div><span>{p.status==='adopted'?'Принято':p.status==='vote_open'?'На голосовании':p.status==='rejected'?'Отклонено':'Проект'}</span>{p.system_type==='qualified'&&<em>{p.threshold_pct}%</em>}{v&&<em>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</em>}{canManageVote&&p.status==='draft'&&<button disabled={busy} onClick={()=>void openVote(p.id)}>Голосование ГД →</button>}</div></article>})}</div>
+  <div className="presSystemList">{visible.map(p=>{const v=vote(p.vote_id);const bill=p.bill_document_id?formalDocuments.find(d=>d.id===p.bill_document_id):undefined;const resolution=p.resolution_document_id?formalDocuments.find(d=>d.id===p.resolution_document_id):undefined;return <article key={p.id} className={p.status}>
+   <div className="presSystemProposalMain"><small>{proposer(p.proposed_by)}</small><b>{labels[p.system_type]}</b>{p.rationale&&<p>{p.rationale}</p>}<div className="presSystemRoute">
+    <span className="done">1 · Проект внесён</span>
+    <span className={p.registered_at?'done':''}>2 · Регистрация в ГД</span>
+    <span className={p.vote_id?'done':''}>3 · Заседание и голосование</span>
+    <span className={p.resolution_document_id?'done':''}>4 · Постановление ГД</span>
+   </div>
+   {bill&&<p className="presSystemDocumentRef">Законопроект: <b>{bill.registry_no||'зарегистрирован'}</b> · {bill.status_label}</p>}
+   {resolution&&<p className="presSystemDocumentRef">Постановление: <b>{resolution.registry_no||'оформлено'}</b> · {resolution.status_label}</p>}
+   </div>
+   <div className="presSystemProposalActions"><span>{p.status==='adopted'?'Принято':p.status==='vote_open'?'На голосовании':p.status==='registered'?'Зарегистрировано':p.status==='rejected'?'Отклонено':'Проект'}</span>{p.system_type==='qualified'&&<em>{p.threshold_pct}%</em>}{v&&<em>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</em>}
+    {canManageVote&&p.status==='draft'&&<button disabled={busy} onClick={()=>void registerProposal(p.id)}>Зарегистрировать проект</button>}
+    {canManageVote&&p.status==='registered'&&<button className="primary" disabled={busy} onClick={()=>void openVote(p.id)}>Открыть заседание и голосование</button>}
+    {v?.status==='open'&&<button onClick={onOpenVotes}>Перейти к голосованию →</button>}
+   </div>
+  </article>})}</div>
 
   <section className="sfAppointment">
    <div><small>СОВЕТ ФЕДЕРАЦИИ</small><h4>Постановление о назначении выборов Президента РФ</h4><p>{sfResolution?<>Создано: <b>{sfResolution.registry_no}</b> · {sfResolution.status_label}</>:<>Формальный акт ещё не создан.</>}</p></div>
