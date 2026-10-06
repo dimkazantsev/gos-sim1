@@ -1,12 +1,13 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {MessageCircle} from 'lucide-react';
+import {MessageCircle,Save} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type PRule={id:string;system_type:'proportional'|'majoritarian'|'mixed';allocation_method:'hare'|'droop'|'dhondt'|'sainte_lague'|'imperiali'|null;majoritarian_method:'plurality'|'absolute_two_round'|null;proportional_share:number|null;rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'superseded';vote_id:string|null;proposed_by:string;created_at:string};
 type RRule={id:string;method:'random'|'proportional'|'agreement';rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'allocated'|'superseded';vote_id:string|null;proposed_by:string;created_at:string};
 type RegionAllocation={id:string;rule_id:string;party_id:string;regions:number;source:'random'|'proportional'|'agreement'};
+type ElectoralCalcResult={id:string;system_type:PRule['system_type'];allocation_method:PRule['allocation_method'];proportional_share:number|null;support:Record<string,number>;district_seats:Record<string,number>;result:Record<string,number>;created_at:string};
 
 const sysLabel={proportional:'Пропорциональная',majoritarian:'Мажоритарная',mixed:'Смешанная'} as const;
 const allocationLabel={hare:'Квота Хэйра + наибольшие остатки',droop:'Квота Друпа + наибольшие остатки',dhondt:'Д’Ондт',sainte_lague:'Сент-Лагю',imperiali:'Империали'} as const;
@@ -48,9 +49,13 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const [pRules,setPRules]=useState<PRule[]>([]);
  const [rRules,setRRules]=useState<RRule[]>([]);
  const [allocations,setAllocations]=useState<RegionAllocation[]>([]);
+ const [savedResults,setSavedResults]=useState<ElectoralCalcResult[]>([]);
  const [system,setSystem]=useState<PRule['system_type']>('proportional');
  const [method,setMethod]=useState<NonNullable<PRule['allocation_method']>>('dhondt');
  const [calculatorMethod,setCalculatorMethod]=useState<NonNullable<PRule['allocation_method']>>('dhondt');
+ const [calculatorSystem,setCalculatorSystem]=useState<PRule['system_type']>('proportional');
+ const [calculatorMixedShare,setCalculatorMixedShare]=useState(50);
+ const [districtSeats,setDistrictSeats]=useState<Record<string,string>>({});
  const [majority,setMajority]=useState<NonNullable<PRule['majoritarian_method']>>('plurality');
  const [propShare,setPropShare]=useState(50);
  const [rationale,setRationale]=useState('');
