@@ -2,6 +2,7 @@
 import {ArrowRight,ArrowUpRight,BookOpenText,Building2,CalendarClock,ChartNoAxesCombined,CheckCircle2,ChevronRight,CircleDot,ClipboardCheck,ClipboardList,Landmark,Layers3,LockKeyhole,Map,MapPin,Network,Search,Scale,ShieldAlert,SlidersHorizontal,Target,RotateCcw,TriangleAlert,UserRoundX,UsersRound,Vote,Wallet,X} from 'lucide-react';
 import {useEffect,useState,type CSSProperties} from 'react';
 import {useDialog} from '../ui/useDialog';
+import {IconAction} from '../ui/IconAction';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage} from './types';
 import {formatDeadline} from './constants';
@@ -111,7 +112,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
    </div>
   </section>
 
-  {resetNotice&&<div className="stageAtlasResetNotice" role="status"><CheckCircle2 size={17} aria-hidden="true"/>{resetNotice}<button type="button" onClick={()=>setResetNotice('')} aria-label="Скрыть сообщение"><X size={15} aria-hidden="true"/></button></div>}
+  {resetNotice&&<div className="stageAtlasResetNotice" role="status"><CheckCircle2 size={17} aria-hidden="true"/>{resetNotice}<IconAction onClick={()=>setResetNotice('')} label="Скрыть сообщение"/></div>}
   <section className="stageAtlasPhases" aria-label="Фазы государственного строительства">
    <div className="stageAtlasSectionHead">
     <div><span className="stageAtlasEyebrow">МАРШРУТ</span><h2>Шесть фаз игры</h2></div>
