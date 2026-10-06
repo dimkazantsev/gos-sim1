@@ -27,17 +27,17 @@
     "geist": "^1.7.0",
     "lucide-react": "^0.468.0",
     "mammoth": "1.12.3",
-    "next": "16.3.6",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
+    "next": "16.3.8",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "unpdf": "1.8.1"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "playwright-core": "^1.55.0",
     "postcss": "8.5.23",
-    "typescript": "^5.9.0",
-    "playwright-core": "^1.55.0"
+    "typescript": "^5.9.0"
   }
 }
