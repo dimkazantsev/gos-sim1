@@ -499,3 +499,144 @@
  .cecAutoReviewHead{align-items:flex-start;flex-direction:column}
  .cecRecognizedText>div{align-items:flex-start;flex-direction:column}
 }
+
+
+/* Stage 7: parliamentary route for presidential electoral-system amendment */
+.presSystemDecision>header{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) minmax(220px,.34fr);
+ gap:16px;
+ align-items:start;
+ padding:18px;
+ border-bottom:1px solid #e4eaf2;
+ background:linear-gradient(135deg,#fbfcff,#f6f9ff);
+}
+.presSystemDecision>header small{color:#70849c;font-size:12px;font-weight:900;letter-spacing:.04em}
+.presSystemDecision>header h3{margin:4px 0 7px;color:#244665;font-size:20px}
+.presSystemDecision>header p{margin:0;max-width:850px;color:#6e8198;font-size:13px;line-height:1.55}
+.presSystemAdopted{
+ display:grid;
+ gap:3px;
+ align-content:start;
+ padding:12px 14px;
+ border:1px solid #dbe5f1;
+ border-radius:12px;
+ background:#fff;
+}
+.presSystemAdopted>strong{color:#24486d;font-size:15px}
+.presSystemAdopted>span{color:#315efb;font-size:12px;font-weight:900}
+
+.presSystemProposal{
+ display:grid;
+ grid-template-columns:minmax(180px,.8fr) minmax(110px,.4fr) minmax(0,1.6fr) auto;
+ gap:9px;
+ align-items:end;
+ padding:14px 18px;
+ border-bottom:1px solid #e9eef4;
+ background:#fff;
+}
+.presSystemProposal label{display:grid;gap:5px;color:#61768f;font-size:12px;font-weight:800}
+.presSystemProposal .wide{min-width:0}
+.presSystemProposal textarea{min-height:72px}
+
+.presSystemList{display:grid;gap:10px;padding:14px 18px 18px}
+.presSystemList>article{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) auto;
+ gap:14px;
+ align-items:start;
+ padding:14px;
+ border:1px solid #dfe6ef;
+ border-radius:13px;
+ background:#fff;
+}
+.presSystemList>article.adopted{border-color:#bfe0cf;background:#fbfefc}
+.presSystemList>article.vote_open{border-color:#cbd8fb;background:#fbfcff}
+.presSystemList>article.rejected{border-color:#edccd2;background:#fffafb}
+.presSystemProposalMain{display:grid;gap:5px;min-width:0}
+.presSystemProposalMain>small{color:#8292a5;font-size:12px}
+.presSystemProposalMain>b{color:#294a69;font-size:15px}
+.presSystemProposalMain>p{margin:0;color:#6f8197;font-size:12px;line-height:1.5}
+.presSystemRoute{
+ display:grid;
+ grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:6px;
+ margin-top:7px;
+}
+.presSystemRoute>span{
+ display:flex;
+ align-items:center;
+ min-height:34px;
+ padding:6px 8px;
+ border:1px solid #dfe6ef;
+ border-radius:9px;
+ background:#f6f8fb;
+ color:#8695a8;
+ font-size:11px;
+ font-weight:800;
+ line-height:1.25;
+}
+.presSystemRoute>span.done{
+ border-color:#bedfce;
+ background:#eef9f3;
+ color:#267557;
+}
+.presSystemDocumentRef{
+ margin-top:2px!important;
+ padding:7px 9px;
+ border-radius:8px;
+ background:#f3f6fa;
+ color:#677a90!important;
+}
+.presSystemDocumentRef>b{color:#315b88}
+.presSystemProposalActions{
+ display:grid;
+ gap:7px;
+ justify-items:end;
+ min-width:190px;
+}
+.presSystemProposalActions>span,
+.presSystemProposalActions>em{
+ padding:5px 8px;
+ border-radius:999px;
+ background:#eef3f8;
+ color:#677b93;
+ font-size:12px;
+ font-style:normal;
+ font-weight:850;
+}
+.presSystemProposalActions button{min-width:180px}
+
+.electionSettingsReadOnly{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) minmax(220px,.45fr)!important;
+ gap:12px!important;
+}
+.electionSystemSource{
+ display:grid;
+ gap:3px;
+ align-content:center;
+ padding:10px 12px;
+ border-left:1px solid #e1e8f0;
+}
+.electionSystemSource small{color:#8091a6;font-size:11px;font-weight:900}
+.electionSystemSource b{color:#355675;font-size:13px}
+.electionSystemSource span{color:#7b8ca0;font-size:12px}
+
+@media(max-width:820px){
+ .presSystemDecision>header{grid-template-columns:1fr}
+ .presSystemProposal{grid-template-columns:1fr 1fr}
+ .presSystemProposal .wide{grid-column:1/-1}
+ .presSystemProposal>button{grid-column:1/-1;justify-self:start}
+ .presSystemList>article{grid-template-columns:1fr}
+ .presSystemProposalActions{justify-items:start;min-width:0}
+ .presSystemProposalActions button{min-width:0;width:100%}
+ .presSystemRoute{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .electionSettingsReadOnly{grid-template-columns:1fr!important}
+ .electionSystemSource{border-left:0;border-top:1px solid #e1e8f0}
+}
+@media(max-width:520px){
+ .presSystemProposal{grid-template-columns:1fr}
+ .presSystemProposal .wide,.presSystemProposal>button{grid-column:auto}
+ .presSystemRoute{grid-template-columns:1fr}
+}
