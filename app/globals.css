@@ -2125,3 +2125,47 @@ button,input,textarea,select{font-size:14px}
  .cecDocumentShell{width:100%;max-height:none;overflow:visible;border-radius:0;background:#fff;box-shadow:none}
  .cecPrintableDocument{margin:0 auto;box-shadow:none}
 }
+
+
+/* Electoral calculator: keep the mandate result visually connected to its label. */
+.electoralCalculatorResult{
+ display:inline-flex;
+ align-items:baseline;
+ justify-content:flex-end;
+ justify-self:end;
+ width:max-content;
+ max-width:100%;
+ gap:8px;
+ padding:7px 10px;
+ border:1px solid #dce6f3;
+ border-radius:10px;
+ background:#f6f9ff;
+}
+.electoralCalculatorResult span{
+ color:#657991;
+ font-size:12px;
+ font-weight:750;
+ text-transform:none;
+ letter-spacing:0;
+}
+.electoralCalculatorResult strong{
+ color:#315efb;
+ font-size:18px;
+ line-height:1;
+}
+.electoralCalculatorResult small{
+ color:#7c8ea5;
+ font-size:10px;
+ line-height:1.2;
+}
+@media(max-width:980px){
+ .electoralCalculatorResult{
+  grid-column:1/-1;
+  justify-self:start;
+  justify-content:flex-start;
+  grid-template-columns:none;
+ }
+}
+@media(max-width:650px){
+ .electoralCalculatorResult{grid-column:auto}
+}
