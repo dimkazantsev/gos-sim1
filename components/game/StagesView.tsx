@@ -82,6 +82,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
    stage={selected}
    readOnly={readOnly}
    onBack={()=>setSelected(null)}
+   onOpenStage={stageNo=>setSelected(stages.find(item=>item.stage_no===stageNo)||null)}
    onOpenVotes={onOpenVotes}
    onOpenDocument={onOpenDocument}
    onCreateDocument={onCreateDocument}
