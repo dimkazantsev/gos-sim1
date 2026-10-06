@@ -34,7 +34,7 @@ type Gesture={
  pinTimer:ReturnType<typeof setTimeout>|null;
 };
 
-export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll,onChat,chatOpen=false,allOpen=false}:{
+export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll,onChat,chatOpen=false,chatUnreadCount=0,chatMentionCount=0,allOpen=false}:{
  items:MobileDockItem[];
  activeView:View;
  storageKey:string;
@@ -44,6 +44,8 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  onAll:()=>void;
  onChat?:()=>void;
  chatOpen?:boolean;
+ chatUnreadCount?:number;
+ chatMentionCount?:number;
  allOpen?:boolean;
 }){
  const scrollRef=useRef<HTMLDivElement>(null);
@@ -233,7 +235,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
     </button>)}
     {onChat&&<button type="button" className={'mobileDockChat mobileDockItem '+(chatOpen?'active':'')}
      aria-controls="game-chat" aria-expanded={chatOpen} aria-label={chatOpen?'Закрыть чат':'Открыть чат'}
-     onClick={()=>{setOptimisticView(null);onChat?.()}}><span className="mobileDockIcon"><MessageCircle aria-hidden="true"/></span><span className="mobileDockLabel">Чат</span></button>}
+     onClick={()=>{setOptimisticView(null);onChat?.()}}><span className="mobileDockIcon"><MessageCircle aria-hidden="true"/>{chatUnreadCount>0&&<i className={'mobileChatUnread '+(chatMentionCount>0?'hasMention':'')} aria-label={(chatMentionCount>0?'Упоминаний: '+chatMentionCount+'. ':'')+'Непрочитанных сообщений: '+chatUnreadCount}>{chatUnreadCount>99?'99+':chatUnreadCount}</i>}</span><span className="mobileDockLabel">Чат</span></button>}
    </div>
    <div className="mobileDockFixed">
     {pinnedItems.length>0&&<div className="mobileDockPinned" aria-label="Закреплённые разделы">
