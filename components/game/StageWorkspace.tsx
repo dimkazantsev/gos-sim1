@@ -4,7 +4,7 @@ import type {CSSProperties} from 'react';
 import {
  ArrowLeft,BookOpenText,Building2,CalendarClock,ChartNoAxesCombined,CheckCircle2,
  CircleDot,ClipboardCheck,ClipboardList,ExternalLink,Landmark,Layers3,LockKeyhole,
- Map,MapPin,Network,Route,Scale,ShieldAlert,Target,UserRoundX,UsersRound,Vote,Wallet
+ Map,MapPin,MessageCircle,Network,Route,Scale,ShieldAlert,Target,UserRoundX,UsersRound,Vote,Wallet
 } from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage,View} from './types';
@@ -69,6 +69,14 @@ export default function StageWorkspace({
  const completedDocs=docs.filter(d=>['published','signed','adopted'].includes(d.status_code)).length;
  const primaryView=task?.target;
  const primaryLabel=primaryView?VIEW_LABELS[primaryView]||'профильный раздел':'эта страница';
+ const publicChannel=g.channels.find(channel=>
+  channel.kind==='public'&&channel.name!=='Вне игры'&&['Публичная политика','Общая беседа','Общий штаб','Общий чат'].includes(channel.name)
+ )||g.channels.find(channel=>channel.kind==='public'&&channel.name!=='Вне игры');
+ function openPublicChat(){
+  if(!publicChannel)return;
+  g.setChannelId(publicChannel.id);
+  g.setChatOpen(true);
+ }
 
  return <div className="stageWorkspacePage" style={{'--stage-phase-accent':phase.accent} as CSSProperties}>
   <header className="stageWorkspaceHero">
@@ -83,6 +91,7 @@ export default function StageWorkspace({
       <span className={'stageWorkspaceStatus is-'+stage.status}><StatusIcon size={15}/>{stage.status==='open'?'Этап открыт':stage.status==='completed'?'Этап завершён':'Этап закрыт'}</span>
       {stage.deadline&&<span><CalendarClock size={15}/> До {formatDeadline(stage.deadline)}</span>}
       {votes.length>0&&<span className={openVotes.length?'isAttention':''}><Vote size={15}/>{openVotes.length?openVotes.length+' открытых голосований':'Голосований: '+votes.length}</span>}
+      {publicChannel&&<button type="button" className="stageWorkspacePublicChat" onClick={openPublicChat}><MessageCircle size={15} aria-hidden="true"/><span>Обсудить в публичном чате</span></button>}
      </div>
     </div>
    </div>
