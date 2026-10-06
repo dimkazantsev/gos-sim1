@@ -1688,6 +1688,7 @@
 .gsChatV2 .chatMsg.selectable{touch-action:pan-y}
 .gsChatV2 .chatMsg.selected{
  position:relative;
+ padding-left:30px;
  border-radius:14px;
  background:#eaf1ff;
  box-shadow:0 0 0 1px #aec4f5 inset;
@@ -1696,7 +1697,7 @@
  content:'✓';
  position:absolute;
  top:50%;
- left:4px;
+ left:5px;
  z-index:3;
  display:grid;
  place-items:center;
@@ -1709,10 +1710,11 @@
  font-weight:900;
  transform:translateY(-50%);
  box-shadow:0 2px 7px #315efb33;
+ pointer-events:none;
 }
 .gsChatV2 .chatMsg.selected.mine::before{
- left:auto;
- right:4px;
+ left:5px;
+ right:auto;
 }
 .gsChatV2 .chatMsg.selected .chatMessageColumn{opacity:.94}
 @media(max-width:430px){
