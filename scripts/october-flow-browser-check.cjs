@@ -79,8 +79,8 @@ async function ready(){
    await page.goto(address);await page.waitForFunction(()=>document.body.dataset.flowReady==='yes');
    await page.locator('.formalRegistryRow').first().click();await page.locator('.formalPaper').waitFor({state:'visible'});
    assert.equal(await page.getByRole('button',{name:'Редактировать текст',exact:true}).count(),0,'An open ballot locks document editing');
-   await page.getByRole('button',{name:'Процедура и история',exact:true}).click();await page.locator('.formalActions').waitFor({state:'visible'});
-   await page.getByRole('button',{name:'К списку документов',exact:true}).click();await page.locator('.formalRegistry').waitFor({state:'visible'});
+   await page.locator('.formalActions').waitFor({state:'visible'});
+   await page.getByRole('button',{name:'Реестр НПА',exact:true}).click();await page.locator('.formalRegistry').waitFor({state:'visible'});
    await page.locator('.formalRegistryRow').filter({hasText:'— документ 1'}).click();
    await page.getByRole('button',{name:'Редактировать текст',exact:true}).first().click();
    await page.getByRole('textbox',{name:'Название редактируемого документа',exact:true}).fill('Уточнённое постановление');
@@ -107,7 +107,7 @@ async function ready(){
    await docDiscussion.getByRole('button',{name:'Отправить',exact:true}).click();await docDiscussion.locator('.civicCommentContent p').filter({hasText:'Комментарий к новой редакции'}).waitFor();
    const historyPosition=await page.locator('.formalDetail').evaluate(el=>{const paper=el.querySelector('.formalPaper').getBoundingClientRect(),history=el.querySelector('.formalHistory').getBoundingClientRect();return history.top>=paper.bottom});assert(historyPosition,'Document history is below the document');
    await page.screenshot({path:path.join(screens,'registry-live-discussion-'+width+'.png')});
-   await page.getByRole('button',{name:'К списку документов',exact:true}).click();
+   await page.getByRole('button',{name:'Реестр НПА',exact:true}).click();
    await page.getByRole('button',{name:/Создать \/ загрузить/}).click();
    await page.getByRole('button',{name:'Использовать образец',exact:true}).click();
    assert((await page.locator('.formalTextEditor').inputValue()).length>30,'Editable template opens');
