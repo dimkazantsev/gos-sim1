@@ -13,7 +13,7 @@ export default function ChatToggleButton({chatOpen,onToggle,unreadCount=0,mentio
   aria-expanded={chatOpen}
   aria-controls="game-chat"
  >
-  <i className="topChatIconWrap"><MessageCircle aria-hidden="true" focusable="false"/>{unreadCount>0&&<i className={'topChatUnread '+(mentionCount>0?'hasMention':'')} aria-label={(mentionCount>0?'Упоминаний: '+mentionCount+'. ':'')+'Непрочитанных сообщений: '+unreadCount}>{unreadCount>99?'99+':unreadCount}</i>}</span>
+  <i className="topChatIconWrap"><MessageCircle aria-hidden="true" focusable="false"/>{unreadCount>0&&<i className={'topChatUnread '+(mentionCount>0?'hasMention':'')} aria-label={(mentionCount>0?'Упоминаний: '+mentionCount+'. ':'')+'Непрочитанных сообщений: '+unreadCount}>{unreadCount>99?'99+':unreadCount}</i>}</i>
   <span>Чат</span>
  </button>;
 }
