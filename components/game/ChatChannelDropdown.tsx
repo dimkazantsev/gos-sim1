@@ -7,15 +7,16 @@ import type {Channel,ChatOverview} from './types';
 /** Mirrors the game's "Режим просмотра" dropdown: a styled list rather
  * than browser-native options, including predictable focus on mobile. */
 export default function ChatChannelDropdown({
- channels,value,onChange,overview,onPin,initialOpen=false
-}:{channels:Channel[];value:string;onChange:(id:string)=>void;overview:ChatOverview[];onPin:(id:string,pin:boolean)=>Promise<boolean>;initialOpen?:boolean}){
+ channels,value,onChange,overview=[],onPin=async()=>false,initialOpen=false
+}:{channels:Channel[];value:string;onChange:(id:string)=>void;overview?:ChatOverview[];onPin?:(id:string,pin:boolean)=>Promise<boolean>;initialOpen?:boolean}){
  const [open,setOpen]=useState(initialOpen);
  const root=useRef<HTMLDivElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
  const menuId=useId();
- const meta=useMemo(()=>new Map(overview.map(x=>[x.channel_id,x])),[overview]);
+ const safeOverview=Array.isArray(overview)?overview:[];
+ const meta=useMemo(()=>new Map(safeOverview.map(x=>[x.channel_id,x])),[safeOverview]);
  const visibleChannels=channels.filter(c=>!isHiddenChannel(c)&&meta.has(c.id));
- const lastSentId=[...overview].filter(x=>x.last_sent_at).sort((a,b)=>Date.parse(b.last_sent_at!)-Date.parse(a.last_sent_at!))[0]?.channel_id||'';
+ const lastSentId=[...safeOverview].filter(x=>x.last_sent_at).sort((a,b)=>Date.parse(b.last_sent_at!)-Date.parse(a.last_sent_at!))[0]?.channel_id||'';
  const orderedChannels=[...visibleChannels].sort((a,b)=>{
   const am=meta.get(a.id),bm=meta.get(b.id);
   const ap=am?.pinned_at?0:1,bp=bm?.pinned_at?0:1;
