@@ -2764,3 +2764,277 @@
  .stageWorkspacePage .dumaNomination,
  .stageWorkspacePage .dumaCloseRow{padding-inline:14px}
 }
+
+
+/* Stage 5 · Ghost voting policy */
+.stageWorkspacePage .ghostPolicyLab{
+ display:grid;
+ gap:14px;
+ margin:18px 0;
+ padding:0;
+ overflow:hidden;
+ border:1px solid #dce5f1;
+ border-radius:18px;
+ background:#fff;
+ box-shadow:0 8px 28px rgba(22,43,76,.045);
+ color:#193353;
+}
+.stageWorkspacePage .ghostPolicyHead{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) 300px;
+ gap:24px;
+ align-items:center;
+ margin:0;
+ padding:24px 26px;
+ border:0;
+ border-bottom:1px solid #dfe8f5;
+ background:
+  radial-gradient(circle at 95% 10%,rgba(49,94,251,.08),transparent 42%),
+  linear-gradient(180deg,#f8fbff 0%,#f3f7fe 100%);
+ color:#193353;
+}
+.stageWorkspacePage .ghostPolicyHead>div:first-child{min-width:0}
+.stageWorkspacePage .ghostPolicyHead small{
+ color:#607b9f;
+ font-size:12px;
+ font-weight:900;
+ letter-spacing:.09em;
+}
+.stageWorkspacePage .ghostPolicyHead h2{
+ margin:7px 0 8px;
+ color:#173c70;
+ font-size:24px;
+ line-height:1.2;
+ letter-spacing:-.025em;
+}
+.stageWorkspacePage .ghostPolicyHead p{
+ max-width:82ch;
+ margin:0;
+ color:#4f6786;
+ font-size:13px;
+ line-height:1.7;
+}
+.stageWorkspacePage .ghostPolicyCurrent{
+ display:grid;
+ gap:6px;
+ min-height:112px;
+ padding:16px 18px;
+ border:1px solid #cbdaf4;
+ border-radius:15px;
+ background:#fff;
+ box-shadow:0 8px 20px rgba(49,94,251,.07);
+ align-content:center;
+}
+.stageWorkspacePage .ghostPolicyCurrent small{
+ color:#607b9f;
+ font-size:12px;
+ font-weight:900;
+}
+.stageWorkspacePage .ghostPolicyCurrent strong{
+ color:#315efb;
+ font-size:21px;
+ line-height:1.2;
+}
+.stageWorkspacePage .ghostPolicyCurrent span{
+ color:#63758f;
+ font-size:12px;
+ line-height:1.5;
+}
+.stageWorkspacePage .ghostCadenceNote{
+ margin:0 18px;
+ padding:14px 16px;
+ border:1px solid #d8e4f6;
+ border-left:4px solid #7b98e8;
+ border-radius:12px;
+ background:#f8fbff;
+}
+.stageWorkspacePage .ghostCadenceNote b{
+ display:block;
+ margin-bottom:5px;
+ color:#274d83;
+ font-size:13px;
+}
+.stageWorkspacePage .ghostCadenceNote p{
+ margin:0;
+ color:#61758f;
+ font-size:12px;
+ line-height:1.65;
+}
+.stageWorkspacePage .ghostPolicyProposal{
+ display:grid;
+ grid-template-columns:minmax(220px,.8fr) minmax(0,1.5fr) auto;
+ gap:12px;
+ align-items:end;
+ margin:0 18px;
+ padding:16px;
+ border:1px solid #dfe7f2;
+ border-radius:14px;
+ background:#f8fafd;
+}
+.stageWorkspacePage .ghostPolicyProposal label{
+ display:grid;
+ gap:7px;
+ min-width:0;
+ color:#60738e;
+ font-size:12px;
+ font-weight:850;
+}
+.stageWorkspacePage .ghostPolicyProposal select,
+.stageWorkspacePage .ghostPolicyProposal textarea{
+ width:100%;
+ min-width:0;
+ box-sizing:border-box;
+ border:1px solid #cfd9e8;
+ border-radius:11px;
+ background:#fff;
+ color:#18355a;
+ font:inherit;
+ font-size:13px;
+ font-weight:700;
+ outline:none;
+}
+.stageWorkspacePage .ghostPolicyProposal select{
+ min-height:46px;
+ padding:0 40px 0 13px;
+}
+.stageWorkspacePage .ghostPolicyProposal textarea{
+ min-height:94px;
+ padding:12px 13px;
+ line-height:1.55;
+ resize:vertical;
+}
+.stageWorkspacePage .ghostPolicyProposal :is(select,textarea):focus{
+ border-color:#7192ef;
+ box-shadow:0 0 0 3px rgba(49,94,251,.12);
+}
+.stageWorkspacePage .ghostPolicyProposal>button{
+ min-height:46px;
+ padding-inline:18px;
+ border-radius:11px;
+ white-space:nowrap;
+}
+.stageWorkspacePage .ghostPolicyList{
+ display:grid;
+ gap:12px;
+ padding:0 18px 18px;
+}
+.stageWorkspacePage .ghostPolicyList>.emptyState{
+ display:grid;
+ place-items:center;
+ min-height:112px;
+ margin:0;
+ padding:22px;
+ border:1px dashed #cbd8ea;
+ border-radius:14px;
+ background:#f8faff;
+ color:#71839a;
+ font-size:13px;
+ text-align:center;
+}
+.stageWorkspacePage .ghostPolicyList>article{
+ overflow:hidden;
+ border:1px solid #dfe6ef;
+ border-radius:14px;
+ background:#fff;
+ box-shadow:0 4px 14px rgba(22,43,76,.035);
+}
+.stageWorkspacePage .ghostPolicyList>article>header{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:14px;
+ padding:15px 17px;
+ border-bottom:1px solid #e6ecf3;
+ background:#fbfcfe;
+}
+.stageWorkspacePage .ghostPolicyList>article>header b{
+ display:block;
+ margin-top:3px;
+ color:#173c70;
+ font-size:15px;
+}
+.stageWorkspacePage .ghostPolicyList>article>header em{
+ display:inline-flex;
+ align-items:center;
+ min-height:29px;
+ padding:5px 9px;
+ border-radius:9px;
+ background:#eef3fb;
+ color:#476487;
+ font-size:12px;
+ font-style:normal;
+ font-weight:850;
+}
+.stageWorkspacePage .ghostPolicyList>article.vote_open>header em{
+ background:#eaf2ff;
+ color:#315fc3;
+}
+.stageWorkspacePage .ghostPolicyList>article.adopted>header em{
+ background:#e8f6ef;
+ color:#247151;
+}
+.stageWorkspacePage .ghostPolicyList>article.rejected>header em{
+ background:#fff0f2;
+ color:#b44c62;
+}
+.stageWorkspacePage .ghostPolicyList>article>p{
+ margin:0;
+ padding:14px 17px 8px;
+ color:#536a87;
+ font-size:12px;
+ line-height:1.6;
+}
+.stageWorkspacePage .ghostPolicyList blockquote{
+ margin:8px 17px 14px;
+ padding:11px 13px;
+ border-left:3px solid #b7c9ef;
+ border-radius:0 9px 9px 0;
+ background:#f7f9fd;
+ color:#526985;
+ font-size:12px;
+ line-height:1.6;
+}
+.stageWorkspacePage .ghostPolicyList footer{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ flex-wrap:wrap;
+ padding:12px 17px 15px;
+ border-top:1px solid #edf1f6;
+ color:#71839a;
+ font-size:12px;
+}
+.stageWorkspacePage .ghostPolicyList footer span:first-child{margin-right:auto}
+.stageWorkspacePage .ghostPolicyList footer button{
+ min-height:40px;
+ padding:8px 12px;
+ border:1px solid #c9d8ef;
+ border-radius:10px;
+ background:#eef4ff;
+ color:#315a93;
+ font-weight:850;
+}
+.stageWorkspacePage .ghostPolicyList footer button:hover:not(:disabled){
+ border-color:#aac1ef;
+ background:#e7efff;
+}
+
+@media(max-width:900px){
+ .stageWorkspacePage .ghostPolicyHead{
+  grid-template-columns:minmax(0,1fr);
+  padding:20px;
+ }
+ .stageWorkspacePage .ghostPolicyProposal{
+  grid-template-columns:minmax(0,1fr);
+ }
+ .stageWorkspacePage .ghostPolicyProposal>button{width:100%}
+}
+@media(max-width:560px){
+ .stageWorkspacePage .ghostPolicyLab{border-radius:15px}
+ .stageWorkspacePage .ghostPolicyHead{padding:17px}
+ .stageWorkspacePage .ghostPolicyHead h2{font-size:21px}
+ .stageWorkspacePage .ghostCadenceNote,
+ .stageWorkspacePage .ghostPolicyProposal{margin-inline:12px}
+ .stageWorkspacePage .ghostPolicyList{padding:0 12px 12px}
+ .stageWorkspacePage .ghostPolicyCurrent{min-height:0}
+}
