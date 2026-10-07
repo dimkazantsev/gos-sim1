@@ -61,7 +61,7 @@ export default function StageWorkspace({
  readOnly?:boolean;
  onBack:()=>void;
  onOpenStage?:(stageNo:number)=>void;
- onOpenVotes:()=>void;
+ onOpenVotes:(voteId?:string)=>void;
  onOpenDocument?:(id:string)=>void;
  onCreateDocument?:(key:string,stageNo:number)=>void;
  onNavigate?:(view:View)=>void;
