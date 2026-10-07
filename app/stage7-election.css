@@ -10,3 +10,33 @@
 
 @media(max-width:900px){.stage7Grid,.pollGrid{grid-template-columns:1fr}.scoreInputs{grid-template-columns:repeat(2,1fr)}.scoreInputs button{grid-column:1/-1}.stage7Hero{align-items:flex-start}.stage7HeroMark{min-width:0}.campaignQueue{max-height:none}}
 @media(max-width:620px){.stage7Hero{padding:18px;display:grid}.stage7Hero h2{font-size:21px}.stage7HeroMark{display:none}.stage7Tabs{grid-template-columns:1fr}.stage7Tabs button{justify-content:flex-start;padding-inline:12px}.stage7Panel{padding:16px;border-radius:18px}.campaignForm,.inaugurationForm,.ceremonyAudio{grid-template-columns:1fr}.campaignForm .wide,.inaugurationForm .wide{grid-column:auto}.campaignSubmit{display:grid}.pollDecisionStatus{display:grid}.pollCreate,.pollLink{display:grid}.scoreInputs{grid-template-columns:1fr 1fr}.runoffInput{grid-template-columns:1fr}.winnerCard{align-items:flex-start}.winnerPhoto img,.winnerPhoto span{width:68px;height:68px}.candidatePhotoUpload{align-items:flex-start}.publicElectionPoll{padding:14px}.publicPollHead{padding:16px}.publicPollHead img{width:52px;height:52px}.publicPollHead h1{font-size:20px}.publicPollCandidate{grid-template-columns:48px 1fr auto}.publicPollCandidate img,.publicPollCandidate .fallback{width:48px;height:48px}}
+
+.calculatorForm{display:grid;gap:12px}
+.calculatorFormula{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:15px;background:#fbfcff}
+.calculatorFormula>div:first-child{display:grid;gap:3px}
+.calculatorFormula small{font-size:12px;font-weight:900;letter-spacing:.06em;color:#6f84a0}
+.calculatorFormula strong{font-size:15px;color:#203f63}
+.calculatorFormula p{margin:0;max-width:720px;color:var(--muted);font-size:12px;line-height:1.45}
+.formulaWeights{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px}
+.formulaWeights span{display:grid;gap:1px;min-width:94px;padding:8px 10px;border:1px solid var(--line);border-radius:11px;background:#fff;color:#687d96;font-size:12px}
+.formulaWeights b{color:#315efb;font-size:14px}
+.calculatorColumns{display:grid;grid-template-columns:minmax(190px,1.35fr) repeat(4,minmax(90px,.72fr)) minmax(78px,.55fr) minmax(112px,.8fr);gap:8px;padding:0 12px;color:#8091a6;font-size:12px;font-weight:900}
+.scoreCandidateForm{display:grid;grid-template-columns:minmax(190px,1.35fr) repeat(4,minmax(90px,.72fr)) minmax(78px,.55fr) minmax(112px,.8fr);gap:8px;align-items:end}
+.scoreCandidateForm>label{display:grid;gap:5px;min-width:0}
+.scoreCandidateForm>label>small,.scoreComputed small{display:none;font-size:12px;font-weight:850;color:#768aa1}
+.scoreCandidateForm input,.calculatorEmptyForm input{width:100%;min-height:42px;border:1px solid var(--line);border-radius:11px;background:#fbfcfe;padding:9px 10px}
+.scoreCandidateForm input:disabled,.calculatorEmptyForm input:disabled{background:#f2f4f7;color:#97a5b5}
+.scoreComputed{display:grid;gap:4px;align-content:center;min-height:42px;padding:0 4px}
+.scoreComputed strong{font-size:18px;color:#173f72}
+.scoreCalculateButton{min-height:42px}
+.scoreCandidateForm .runoffInput{grid-column:1/-1}
+.calculatorEmptyForm{display:grid;grid-template-columns:minmax(190px,1.35fr) repeat(4,minmax(90px,.72fr)) minmax(78px,.55fr) minmax(112px,.8fr);gap:8px;align-items:center;padding:14px;border:1px dashed var(--line-strong);border-radius:15px;background:#fafbfd}
+.calculatorEmptyCandidate{display:flex;align-items:center;gap:10px;min-width:0}
+.calculatorEmptyCandidate>span{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#edf1f6;color:#8a99aa;font-weight:900}
+.calculatorEmptyCandidate b,.calculatorEmptyCandidate small{display:block}
+.calculatorEmptyCandidate small{color:var(--muted);font-size:12px;line-height:1.35}
+.calculatorFooter{align-items:center;justify-content:space-between;gap:14px}
+.calculatorFooter>span{color:var(--muted);font-size:12px;font-weight:750}
+@media(max-width:1100px){.calculatorColumns{display:none}.scoreCandidateForm,.calculatorEmptyForm{grid-template-columns:minmax(180px,1.2fr) repeat(2,minmax(100px,1fr))}.scoreCandidateForm>label>small,.scoreComputed small{display:block}.scoreCandidateForm .runoffInput{grid-column:1/-1}}
+@media(max-width:760px){.calculatorFormula{grid-template-columns:1fr}.formulaWeights{justify-content:flex-start}.scoreCandidateForm,.calculatorEmptyForm{grid-template-columns:1fr 1fr}.scoreCandidateIdentity,.calculatorEmptyCandidate{grid-column:1/-1}.scoreCalculateButton{grid-column:1/-1}.calculatorFooter{align-items:stretch;flex-direction:column}.calculatorFooter button{width:100%}}
+@media(max-width:520px){.scoreCandidateForm,.calculatorEmptyForm{grid-template-columns:1fr}.scoreCandidateIdentity,.calculatorEmptyCandidate,.scoreCalculateButton{grid-column:auto}.formulaWeights{display:grid;grid-template-columns:1fr 1fr}}
