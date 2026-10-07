@@ -23,8 +23,8 @@ export default function PublicPresidentialPoll(){
   if(data){
    const candidates=await Promise.all((data.candidates||[]).map(async c=>{
     if(!c.photo_path)return c;
-    const s=await supabase.storage.from('game-assets').createSignedUrl(c.photo_path,3600);
-    return {...c,photo_url:s.data?.signedUrl||undefined};
+    const url=supabase.storage.from('game-assets').getPublicUrl(c.photo_path).data.publicUrl;
+    return {...c,photo_url:url||undefined};
    }));
    setPoll({...data,candidates});
   }else setPoll(null);
