@@ -1,0 +1,360 @@
+'use client';
+
+import {useEffect,useState} from 'react';
+import {
+ ArrowRight,Building2,Check,ClipboardCheck,Landmark,MessageCircle,
+ ShieldCheck,UserRoundPlus,UsersRound,Vote,X
+} from 'lucide-react';
+import {supabase} from '@/lib/supabase';
+import type {ReturnTypeRepublic} from './viewTypes';
+
+type Structure={
+ game_id:string;
+ social_title:string;
+ economic_title:string;
+ defence_title:string;
+ foreign_title:string;
+ internal_title:string;
+ status:'draft'|'submitted'|'approved'|'revision';
+ note:string|null;
+};
+
+type Nomination={
+ id:string;
+ game_id:string;
+ office_key:string;
+ office_title:string;
+ office_kind:'prime_minister'|'deputy_pm'|'duma_minister'|'security_minister'|'central_bank_chair';
+ route:'president_to_duma'|'pm_to_duma'|'president_after_sf';
+ candidate_user_id:string|null;
+ candidate_name:string;
+ attempt_no:number;
+ status:'submitted'|'vote_open'|'approved'|'rejected'|'consultation_pending'|'consulted'|'appointed'|'withdrawn';
+ vote_id:string|null;
+ note:string|null;
+ created_at:string;
+};
+
+type PortfolioKey='social'|'economic'|'defence'|'foreign'|'internal';
+
+const DEFAULT_TITLES:Record<PortfolioKey,string>={
+ social:'Министерство по социальной политике',
+ economic:'Министерство по экономической политике',
+ defence:'Министерство по обороне и внутренней безопасности',
+ foreign:'Министерство по внешней политике',
+ internal:'Министерство по внутренней политике и государству'
+};
+
+const PORTFOLIOS:Array<{key:PortfolioKey;label:string;route:'duma'|'sf';scope:string}>= [
+ {key:'social',label:'Социальная политика',route:'duma',scope:'Труд, демография, культура, образование, здравоохранение'},
+ {key:'economic',label:'Экономическая политика',route:'duma',scope:'Финансы, налоги, транспорт, энергетика и развитие'},
+ {key:'foreign',label:'Внешняя политика',route:'duma',scope:'Международные отношения и внешнеполитическая координация'},
+ {key:'defence',label:'Оборона и безопасность',route:'sf',scope:'Оборона, безопасность государства и силовой блок'},
+ {key:'internal',label:'Внутренняя политика и государство',route:'sf',scope:'ОГВ, ОМС, МВД, МЧС, национальности, гражданское общество'}
+];
+
+const STATUS:Record<Nomination['status'],string>={
+ submitted:'Внесена в повестку',
+ vote_open:'Голосование открыто',
+ approved:'Утверждена Государственной Думой',
+ rejected:'Отклонена Государственной Думой',
+ consultation_pending:'Ожидает консультации с Советом Федерации',
+ consulted:'Консультация проведена',
+ appointed:'Назначен(а)',
+ withdrawn:'Отозвана'
+};
+
+export default function GovernmentStage8Workspace({
+ g,onOpenVotes,onOpenStage
+}:{
+ g:ReturnTypeRepublic;
+ onOpenVotes:(voteId?:string)=>void;
+ onOpenStage?:(stageNo:number)=>void;
+}){
+ const {game,me,teacher,members,votes,setError}=g;
+ const [rows,setRows]=useState<Nomination[]>([]);
+ const [structure,setStructure]=useState<Structure|null>(null);
+ const [titles,setTitles]=useState<Record<PortfolioKey,string>>(DEFAULT_TITLES);
+ const [structureNote,setStructureNote]=useState('');
+ const [registrations,setRegistrations]=useState<Array<{user_id:string}>>([]);
+ const [selected,setSelected]=useState<Record<string,string>>({});
+ const [manual,setManual]=useState<Record<string,string>>({});
+ const [consultNotes,setConsultNotes]=useState<Record<string,string>>({});
+ const [deputyPortfolio,setDeputyPortfolio]=useState<PortfolioKey>('social');
+ const [busy,setBusy]=useState<string|null>(null);
+
+ const role=(me?.role_title||'').toLowerCase();
+ const isPresident=role.includes('президент');
+ const isPM=role.includes('председател')&&role.includes('правительств');
+ const canPresident=teacher||isPresident;
+ const canPM=teacher||isPM;
+ const students=members.filter(m=>m.kind==='student');
+
+ async function load(){
+  if(!game)return;
+  const [n,s,r]=await Promise.all([
+   supabase.from('government_nominations').select('*').eq('game_id',game.id).eq('stage_no',8).order('created_at',{ascending:true}),
+   supabase.from('government_structures').select('*').eq('game_id',game.id).maybeSingle(),
+   supabase.from('institution_session_registrations').select('user_id').eq('game_id',game.id).eq('stage_no',8).eq('institution_key','gd')
+  ]);
+  if(!n.error){
+   const next=(n.data||[]) as Nomination[];
+   setRows(next);
+   const deputy=[...next].reverse().find(x=>x.office_kind==='deputy_pm'&&!['rejected','withdrawn'].includes(x.status));
+   if(deputy?.office_key.startsWith('ministry_')){
+    const key=deputy.office_key.replace('ministry_','') as PortfolioKey;
+    if(['social','economic','foreign'].includes(key))setDeputyPortfolio(key);
+   }
+  }
+  if(!s.error){
+   const x=(s.data||null) as Structure|null;
+   setStructure(x);
+   if(x)setTitles({
+    social:x.social_title,economic:x.economic_title,defence:x.defence_title,
+    foreign:x.foreign_title,internal:x.internal_title
+   });
+  }
+  if(!r.error)setRegistrations(r.data||[]);
+ }
+
+ useEffect(()=>{void load()},[game?.id]);
+ useEffect(()=>{
+  if(!game)return;
+  let ch=supabase.channel('stage8-government-workspace:'+game.id);
+  for(const table of ['government_nominations','government_structures','institution_session_registrations']){
+   ch=ch.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+game.id},()=>void load());
+  }
+  ch.subscribe();
+  return()=>{void supabase.removeChannel(ch)}
+ },[game?.id]);
+
+ if(!game||!me)return null;
+ const activeGame=game;
+
+ const latest=(officeKey:string)=>[...rows].reverse().find(x=>x.office_key===officeKey);
+ const rejections=(officeKey:string)=>rows.filter(x=>x.office_key===officeKey&&x.status==='rejected').length;
+ const pm=latest('prime_minister');
+ const cbr=latest('central_bank_chair');
+ const pmAppointed=rows.some(x=>x.office_kind==='prime_minister'&&x.status==='appointed');
+ const structureApproved=structure?.status==='approved';
+ const activeDeputy=rows.find(x=>x.office_kind==='deputy_pm'&&!['rejected','withdrawn'].includes(x.status));
+ const allMinistersAppointed=PORTFOLIOS.every(p=>latest('ministry_'+p.key)?.status==='appointed');
+ const phase=allMinistersAppointed?4:structureApproved?3:pmAppointed?2:1;
+
+ const dumaRows=rows.filter(x=>x.route==='president_to_duma'||x.route==='pm_to_duma');
+ const openDumaVotes=dumaRows.map(n=>n.vote_id?votes.find(v=>v.id===n.vote_id):undefined).filter(v=>v?.status==='open');
+ const activeVoteId=openDumaVotes[0]?.id||dumaRows.find(x=>x.vote_id)?.vote_id||undefined;
+ const publicChannel=g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры'&&['Публичная политика','Общая беседа','Общий штаб','Общий чат'].includes(c.name))
+  ||g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры');
+
+ const nextAction=phase===1
+  ?(!pm?'Президенту необходимо внести кандидатуру Председателя Правительства':pm.status==='submitted'?'Открыть голосование Государственной Думы':pm.status==='vote_open'?'Провести голосование по кандидатуре Председателя Правительства':pm.status==='approved'?'Президенту необходимо назначить утверждённого Председателя Правительства':pm.status==='rejected'&&pm.attempt_no<3?'Внести кандидатуру повторно':'Разрешить последствия трёх отклонений')
+  :phase===2
+   ?(!structure?'Председателю Правительства необходимо предложить структуру из пяти министерств':structure.status==='submitted'?'Президенту необходимо рассмотреть структуру Правительства':structure.status==='revision'?'Председателю Правительства необходимо переименовать министерства и представить структуру повторно':'Завершить утверждение структуры Правительства')
+   :phase===3
+    ?'Заполнить пять министерств: три кандидатуры проходят Государственную Думу, две — консультацию с Советом Федерации'
+    :'Состав Правительства сформирован';
+
+ const memberName=(id:string)=>students.find(m=>m.user_id===id)?.full_name||'';
+ const candidateName=(slot:string)=>((manual[slot]||'').trim()||memberName(selected[slot]||'')).trim();
+
+ async function submitNomination(slot:string,officeKey:string,officeTitle:string,officeKind:Nomination['office_kind']){
+  const name=candidateName(slot);
+  if(name.length<3)return;
+  setBusy('submit:'+slot);
+  const r=await supabase.rpc('submit_government_nomination',{
+   p_game_id:activeGame.id,p_office_key:officeKey,p_office_title:officeTitle,
+   p_office_kind:officeKind,p_candidate_user_id:selected[slot]||null,p_candidate_name:name
+  });
+  if(r.error)setError(r.error.message);
+  else{
+   setSelected(v=>({...v,[slot]:''}));
+   setManual(v=>({...v,[slot]:''}));
+   await load();
+  }
+  setBusy(null);
+ }
+
+ async function openVote(id:string){
+  setBusy('vote:'+id);
+  const r=await supabase.rpc('open_government_nomination_vote',{p_nomination_id:id});
+  if(r.error)setError(r.error.message);
+  else{
+   await g.refresh();await load();onOpenVotes(String(r.data));
+  }
+  setBusy(null);
+ }
+
+ async function appoint(id:string){
+  setBusy('appoint:'+id);
+  const r=await supabase.rpc('appoint_government_nominee',{p_nomination_id:id});
+  if(r.error)setError(r.error.message);else{await g.refresh();await load()}
+  setBusy(null);
+ }
+
+ async function consult(id:string){
+  setBusy('consult:'+id);
+  const r=await supabase.rpc('record_sf_consultation',{p_nomination_id:id,p_note:(consultNotes[id]||'').trim()||null});
+  if(r.error)setError(r.error.message);else await load();
+  setBusy(null);
+ }
+
+ async function saveStructure(submit:boolean){
+  setBusy(submit?'structure-submit':'structure-save');
+  const r=await supabase.rpc('save_government_structure',{
+   p_game_id:activeGame.id,
+   p_social_title:titles.social,p_economic_title:titles.economic,p_defence_title:titles.defence,
+   p_foreign_title:titles.foreign,p_internal_title:titles.internal,p_submit:submit
+  });
+  if(r.error)setError(r.error.message);else await load();
+  setBusy(null);
+ }
+
+ async function reviewStructure(action:'approve'|'revision'){
+  setBusy('structure-review');
+  const r=await supabase.rpc('review_government_structure',{
+   p_game_id:activeGame.id,p_action:action,p_note:structureNote.trim()||null
+  });
+  if(r.error)setError(r.error.message);else{setStructureNote('');await load()}
+  setBusy(null);
+ }
+
+ function openChat(){
+  if(!publicChannel)return;
+  g.setChannelId(publicChannel.id);g.setChatOpen(true);
+ }
+
+ function openVoting(id?:string|null){
+  onOpenVotes(id||activeVoteId);
+ }
+
+ const stepState=(n:number)=>n<phase?'done':n===phase?'current':'locked';
+
+ function NomineeFields({slot,disabled=false}:{slot:string;disabled?:boolean}){
+  return <div className="gov8NomineeFields">
+   <label>Участник<select disabled={disabled} value={selected[slot]||''} onChange={e=>setSelected(v=>({...v,[slot]:e.target.value}))}><option value="">Выберите участника или введите Ф.И.О.</option>{students.map(m=><option key={m.user_id} value={m.user_id}>{m.full_name} · {m.role_title||'участник'}</option>)}</select></label>
+   <label>Ф.И.О. кандидатуры<input disabled={disabled} value={manual[slot]||''} onChange={e=>setManual(v=>({...v,[slot]:e.target.value}))} placeholder={memberName(selected[slot]||'')||'Ф.И.О. кандидата'}/></label>
+  </div>;
+ }
+
+ function AgendaRow({n,index}:{n:Nomination;index:number}){
+  const vote=n.vote_id?votes.find(v=>v.id===n.vote_id):undefined;
+  const rejects=rejections(n.office_key);
+  return <article className={'gov8AgendaRow is-'+n.status}>
+   <span className="gov8AgendaIndex">{String(index+1).padStart(2,'0')}</span>
+   <div className="gov8AgendaMain">
+    <small>{n.office_title}</small><b>{n.candidate_name}</b>
+    <span>Попытка {n.attempt_no}/3 · {STATUS[n.status]}{rejects?' · отклонений: '+rejects:''}</span>
+   </div>
+   <div className="gov8AgendaActions">
+    {teacher&&n.status==='submitted'&&<button className="primary" disabled={!!busy} onClick={()=>void openVote(n.id)}>Открыть голосование</button>}
+    {vote?.status==='open'&&<button className="secondary" onClick={()=>openVoting(vote.id)}>Регистрация и голосование</button>}
+    {n.status==='approved'&&canPresident&&n.office_kind!=='central_bank_chair'&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(n.id)}>Назначить</button>}
+    {vote?.status==='closed'&&n.status!=='approved'&&n.status!=='appointed'&&<span className="gov8ResultTag">{vote.result_label||STATUS[n.status]}</span>}
+   </div>
+  </article>;
+ }
+
+ return <section className="gov8Workspace">
+  <header className="gov8Overview">
+   <div className="gov8OverviewCopy">
+    <small>ЭТАП 8 · ФОРМИРОВАНИЕ ПРАВИТЕЛЬСТВА</small>
+    <h2>От кандидатуры Председателя Правительства — к пяти министерствам</h2>
+    <p>Один процедурный контур: кандидатуры попадают прямо в повестку Государственной Думы, решения ГД меняют статус назначения, а после назначения Председателя Правительства открывается структура из пяти министерств.</p>
+   </div>
+   <div className="gov8NextAction"><small>СЛЕДУЮЩЕЕ ДЕЙСТВИЕ</small><b>{nextAction}</b><span>Фаза {phase} из 4</span></div>
+  </header>
+
+  <div className="gov8Progress" aria-label="Этапы формирования Правительства">
+   {[
+    ['01','Председатель Правительства','Кандидатура → ГД → назначение'],
+    ['02','Структура','Ровно пять министерств'],
+    ['03','Состав','3 через ГД · 2 через СФ'],
+    ['04','Правительство','Состав сформирован']
+   ].map((x,i)=><div key={x[0]} className={'gov8ProgressStep is-'+stepState(i+1)}><span>{x[0]}</span><div><b>{x[1]}</b><small>{x[2]}</small></div>{i+1<4&&<ArrowRight size={16}/>}</div>)}
+  </div>
+
+  <section className="gov8Duma">
+   <header className="gov8SectionHead">
+    <div><span className="gov8SectionIcon"><Landmark size={20}/></span><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>Заседание по формированию Правительства</h3><p>Кандидатуры находятся здесь же — в повестке. Никакого отдельного «конструктора» ниже.</p></div></div>
+    <div className="gov8SessionFacts"><span><b>{registrations.length}</b> зарегистрировано</span><span><b>{dumaRows.length}</b> вопросов</span><span><b>{openDumaVotes.length}</b> открыто</span></div>
+   </header>
+
+   <div className="gov8Procedure">
+    <button disabled={!activeVoteId} onClick={()=>openVoting(activeVoteId)} className={registrations.some(x=>x.user_id===me.user_id)?'isDone':activeVoteId?'isCurrent':'isLocked'}><span>01</span><ClipboardCheck size={18}/><div><small>ПРИСУТСТВИЕ</small><b>Регистрация</b><em>{activeVoteId?'Откроется в разделе голосования':'После открытия первого вопроса'}</em></div></button>
+    <button disabled={!publicChannel} onClick={openChat}><span>02</span><MessageCircle size={18}/><div><small>ОБСУЖДЕНИЕ</small><b>Публичный чат</b><em>{publicChannel?'Обсудить кандидатуры':'Нет публичного канала'}</em></div></button>
+    <button onClick={()=>document.getElementById('gov8-agenda')?.scrollIntoView({behavior:'smooth',block:'center'})}><span>03</span><UsersRound size={18}/><div><small>ПОВЕСТКА</small><b>Кандидатуры</b><em>{dumaRows.length?dumaRows.length+' вопросов':'Сформируйте первый вопрос'}</em></div></button>
+    <button disabled={!activeVoteId} onClick={()=>openVoting(activeVoteId)} className={openDumaVotes.length?'isLive':''}><span>04</span><Vote size={18}/><div><small>РЕШЕНИЕ</small><b>Голосование</b><em>{openDumaVotes.length?'Открыто: '+openDumaVotes.length:'Ожидает открытия'}</em></div></button>
+   </div>
+
+   <div id="gov8-agenda" className="gov8Agenda">
+    <div className="gov8AgendaTitle"><div><small>ПОВЕСТКА</small><h4>Вопросы заседания</h4></div><span>{dumaRows.filter(x=>['approved','rejected','appointed'].includes(x.status)).length}/{dumaRows.length} рассмотрено</span></div>
+
+    {!pm||pm.status==='rejected'?<article className="gov8SubmissionCard isPrimary">
+     <div className="gov8SubmissionIntro"><span><UserRoundPlus size={19}/></span><div><small>ВОПРОС 1</small><b>Председатель Правительства Российской Федерации</b><p>Президент вносит кандидатуру. После внесения преподаватель открывает связанное голосование ГД.</p></div></div>
+     {canPresident?<><NomineeFields slot="prime_minister"/><button className="primary" disabled={!!busy||candidateName('prime_minister').length<3||rejections('prime_minister')>=3} onClick={()=>void submitNomination('prime_minister','prime_minister','Председатель Правительства Российской Федерации','prime_minister')}>Внести кандидатуру в повестку</button></>:<div className="gov8LockedHint">Ожидается действие Президента Российской Федерации.</div>}
+    </article>:null}
+
+    {!cbr||cbr.status==='rejected'?<article className="gov8SubmissionCard">
+     <div className="gov8SubmissionIntro"><span><Building2 size={19}/></span><div><small>ВОПРОС 2</small><b>Председатель Банка России</b><p>Отдельный вопрос той же повестки. Положительное голосование ГД является назначением.</p></div></div>
+     {canPresident?<><NomineeFields slot="central_bank_chair"/><button className="secondary" disabled={!!busy||candidateName('central_bank_chair').length<3} onClick={()=>void submitNomination('central_bank_chair','central_bank_chair','Председатель Центрального банка Российской Федерации','central_bank_chair')}>Внести кандидатуру</button></>:<div className="gov8LockedHint">Ожидается действие Президента Российской Федерации.</div>}
+    </article>:null}
+
+    {dumaRows.length>0&&<div className="gov8AgendaList">{dumaRows.map((n,i)=><AgendaRow key={n.id} n={n} index={i}/>)}</div>}
+
+    {rejections('prime_minister')>=3&&<div className="gov8ConstitutionAlert"><ShieldCheck size={20}/><div><b>Три отклонения кандидатуры Председателя Правительства</b><p>По правилам игры активируется конституционная развилка: Президент назначает Председателя Правительства и получает право распустить Государственную Думу и назначить новые выборы.</p></div>{onOpenStage&&<button className="secondary" onClick={()=>onOpenStage(2)}>К выборам ГД</button>}</div>}
+   </div>
+  </section>
+
+  <section className={'gov8Ministries '+(!pmAppointed?'isLocked':'')}>
+   <header className="gov8SectionHead">
+    <div><span className="gov8SectionIcon"><Building2 size={20}/></span><div><small>СТРУКТУРА ПРАВИТЕЛЬСТВА</small><h3>Пять министерств</h3><p>Функции фиксированы правилами игры. После назначения Председатель Правительства может уточнить только названия; Президент одобряет структуру или возвращает её на переименование.</p></div></div>
+    <span className={'gov8StatusPill is-'+(structure?.status||'locked')}>{!pmAppointed?'Закрыто':structure?.status==='approved'?'Одобрено':structure?.status==='submitted'?'На рассмотрении':structure?.status==='revision'?'На доработке':'Черновик'}</span>
+   </header>
+
+   {!pmAppointed&&<div className="gov8Gate"><span>02</span><div><b>Сначала назначьте Председателя Правительства</b><p>После назначения здесь автоматически откроются пять министерств и работа со структурой.</p></div></div>}
+
+   {pmAppointed&&<>
+    {structure?.note&&<div className="gov8RevisionNote"><b>Замечание Президента</b><p>{structure.note}</p></div>}
+    <div className="gov8MinistryGrid">
+     {PORTFOLIOS.map((p,index)=>{
+      const nomination=latest('ministry_'+p.key);
+      const editable=canPM&&(!structure||structure.status==='draft'||structure.status==='revision');
+      const isDeputy=p.route==='duma'&&deputyPortfolio===p.key;
+      const canNominate=p.route==='duma'?canPM:canPresident;
+      const officeKind:Nomination['office_kind']=p.route==='sf'?'security_minister':isDeputy?'deputy_pm':'duma_minister';
+      const officeTitle=isDeputy?'Заместитель Председателя Правительства РФ — '+titles[p.key]:titles[p.key];
+      const slot='ministry_'+p.key;
+      return <article key={p.key} className={'gov8MinistryCard route-'+p.route+' '+(nomination?'hasNomination':'')}>
+       <header><span>{String(index+1).padStart(2,'0')}</span><div><small>{p.label}</small><b>{titles[p.key]}</b></div><em>{p.route==='duma'?'Государственная Дума':'Совет Федерации'}</em></header>
+       <p>{p.scope}</p>
+       <label className="gov8MinistryTitle">Название<input disabled={!editable} value={titles[p.key]} onChange={e=>setTitles(v=>({...v,[p.key]:e.target.value}))}/></label>
+
+       {structureApproved&&p.route==='duma'&&!activeDeputy&&<label className="gov8DeputyChoice"><input type="radio" name="gov8-deputy" checked={deputyPortfolio===p.key} onChange={()=>setDeputyPortfolio(p.key)}/><span>Этот министр одновременно является заместителем Председателя Правительства</span></label>}
+       {structureApproved&&activeDeputy?.office_key===slot&&<div className="gov8DeputyFlag">Заместитель Председателя Правительства</div>}
+
+       {structureApproved&&<>
+        {nomination&&!['rejected','withdrawn'].includes(nomination.status)?<div className="gov8MinistryNominee"><small>КАНДИДАТУРА</small><b>{nomination.candidate_name}</b><span>{STATUS[nomination.status]} · попытка {nomination.attempt_no}/3</span>
+         {nomination.status==='consultation_pending'&&teacher&&<div className="gov8Consult"><textarea rows={2} value={consultNotes[nomination.id]||''} onChange={e=>setConsultNotes(v=>({...v,[nomination.id]:e.target.value}))} placeholder="Итог консультации с Советом Федерации"/><button className="secondary" disabled={!!busy} onClick={()=>void consult(nomination.id)}>Зафиксировать консультацию</button></div>}
+         {nomination.status==='consulted'&&canPresident&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(nomination.id)}>Назначить министром</button>}
+         {nomination.status==='approved'&&canPresident&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(nomination.id)}>Назначить после решения ГД</button>}
+         {nomination.vote_id&&votes.find(v=>v.id===nomination.vote_id)?.status==='open'&&<button className="secondary" onClick={()=>openVoting(nomination.vote_id)}>Регистрация и голосование</button>}
+        </div>:canNominate?<div className="gov8MinistryNomination"><NomineeFields slot={slot}/><button className="secondary" disabled={!!busy||candidateName(slot).length<3} onClick={()=>void submitNomination(slot,slot,officeTitle,officeKind)}>{nomination?.status==='rejected'?'Внести новую кандидатуру':'Внести кандидатуру'}</button></div>:<div className="gov8LockedHint">{p.route==='duma'?'Ожидается кандидатура Председателя Правительства':'Ожидается кандидатура Президента'}</div>}
+       </>}
+      </article>
+     })}
+    </div>
+
+    {canPM&&(!structure||structure.status==='draft'||structure.status==='revision')&&<div className="gov8StructureActions"><button className="secondary" disabled={!!busy} onClick={()=>void saveStructure(false)}>Сохранить названия</button><button className="primary" disabled={!!busy} onClick={()=>void saveStructure(true)}>Представить структуру Президенту</button></div>}
+    {canPresident&&structure?.status==='submitted'&&<div className="gov8PresidentReview"><label>Комментарий Президента<textarea rows={2} value={structureNote} onChange={e=>setStructureNote(e.target.value)} placeholder="Комментарий при возврате на переименование"/></label><div><button className="secondary" disabled={!!busy} onClick={()=>void reviewStructure('revision')}><X size={16}/> Вернуть на переименование</button><button className="primary" disabled={!!busy} onClick={()=>void reviewStructure('approve')}><Check size={16}/> Одобрить пять министерств</button></div></div>}
+   </>}
+  </section>
+
+  <section className="gov8RulesStrip">
+   <div><small>ЛОГИКА ПРАВИЛ</small><b>1 заместитель + 4 министра = 5 руководителей министерств</b></div>
+   <span>3 портфеля: Председатель Правительства → ГД → Президент</span>
+   <span>2 специальных портфеля: Президент → консультация СФ → назначение</span>
+   <span>СФ в игровой модели консультирует преподаватель</span>
+  </section>
+ </section>;
+}
