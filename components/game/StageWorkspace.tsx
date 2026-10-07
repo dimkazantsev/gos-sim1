@@ -36,7 +36,7 @@ import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 const STAGE_ICONS=[UsersRound,Route,Map,Landmark,UserRoundX,ClipboardCheck,Vote,Building2,Network,Target,ClipboardList,Scale,Wallet,MapPin,ShieldAlert,ChartNoAxesCombined] as const;
 
 const STAGE_REGISTRATION_BODIES:Partial<Record<number,string[]>>={
- 2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],7:['gd'],8:['gd','government'],
+ 2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],6:['gd'],7:['sf'],8:['gd','government'],
  9:['gd','committee','government'],11:['government'],12:['gd','committee'],
  13:['gd','committee','sf'],14:['municipality']
 };
@@ -211,9 +211,9 @@ export default function StageWorkspace({
      {(stage.stage_no===2||stage.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={stage.stage_no as 2|3} onOpenVotes={onOpenVotes}/>}
      {stage.stage_no===4&&<DumaLeadershipElection g={g}/>}
      {stage.stage_no===5&&<GhostPolicyLab g={g} onOpenVotes={onOpenVotes}/>}
-     {stage.stage_no===6&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} stageNo={6}/>}
+     {stage.stage_no===6&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} onNavigate={onNavigate} stageNo={6}/>}
      {stage.stage_no===6&&<PresidentialElectionLab g={g}/>}
-     {stage.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} stageNo={7}/>}
+     {stage.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} onNavigate={onNavigate} stageNo={7}/>}
      {stage.stage_no===7&&<PresidentialElectionStage7 g={g}/>}
      {stage.stage_no===8&&<><GovernmentStructurePanel g={g}/><GovernmentFormationLab g={g}/></>}
      {stage.stage_no===9&&<InstitutionStaffingLab g={g}/>}
