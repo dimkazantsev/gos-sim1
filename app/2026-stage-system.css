@@ -862,3 +862,34 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
  .sfAppointmentDateTool{grid-template-columns:1fr}
  .sfAppointmentDateTool>span{grid-column:auto}
 }
+
+.governmentDumaSession{display:grid;gap:12px;margin-bottom:14px;border:1px solid #d9e4ef;border-radius:20px;background:#fff;overflow:hidden}
+.governmentDumaSessionHead{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,.55fr);gap:18px;align-items:center;padding:20px 22px;background:linear-gradient(135deg,#102f4d 0%,#173d60 100%);color:#fff}
+.governmentDumaSessionHead small{font-size:12px;font-weight:900;letter-spacing:.08em;color:#89a8c8}
+.governmentDumaSessionHead h2{margin:4px 0 6px;font-size:23px;line-height:1.2}
+.governmentDumaSessionHead p{margin:0;max-width:850px;color:#d9e6f2;font-size:13px;line-height:1.55}
+.governmentDumaSessionState{display:grid;gap:4px;padding:14px 16px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.06)}
+.governmentDumaSessionState b{font-size:16px}
+.governmentDumaSessionState span{font-size:12px;color:#c3d4e5}
+.governmentProcedureHub{border-bottom:0;padding:14px 18px 2px}
+.governmentDumaRegistration{padding:0 18px}
+.governmentDumaAgenda{display:grid;gap:10px;padding:4px 18px 18px}
+.governmentDumaAgenda>header{display:flex;align-items:end;justify-content:space-between;gap:16px}
+.governmentDumaAgenda>header small{font-size:12px;font-weight:900;letter-spacing:.07em;color:#7c90a8}
+.governmentDumaAgenda>header h3{margin:2px 0 0;color:#183f65;font-size:17px}
+.governmentDumaAgenda>header>span{font-size:12px;font-weight:850;color:#6e8298}
+.governmentDumaAgendaEmpty{padding:18px;border:1px dashed #cfdbea;border-radius:14px;background:#f9fbfe;color:#7c8ea3}
+.governmentDumaAgendaList{display:grid;gap:8px}
+.governmentDumaAgendaItem{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid #dde6ef;border-radius:13px;background:#fff}
+.governmentDumaAgendaItem.vote_open{border-color:#b8caff;background:#f8faff}
+.governmentDumaAgendaItem.approved,.governmentDumaAgendaItem.appointed{border-color:#c8e2d5;background:#fbfefc}
+.governmentDumaAgendaItem.rejected{border-color:#ebccd4;background:#fffafb}
+.governmentDumaAgendaNo{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#edf3ff;color:#315efb;font-size:12px;font-weight:900}
+.governmentDumaAgendaItem>div{display:grid;gap:2px}
+.governmentDumaAgendaItem>div small{color:#71849a;font-size:12px}
+.governmentDumaAgendaItem>div b{color:#234666;font-size:14px}
+.governmentDumaAgendaItem>div span{color:#8393a5;font-size:12px}
+.governmentDumaAgendaItem>strong{font-size:12px;color:#49637d}
+#stage8-government-nominations{scroll-margin-top:92px}
+@media(max-width:900px){.governmentDumaSessionHead{grid-template-columns:1fr}.governmentDumaAgendaItem{grid-template-columns:auto 1fr}.governmentDumaAgendaItem>button,.governmentDumaAgendaItem>strong{grid-column:1/-1}}
+@media(max-width:620px){.governmentDumaSessionHead{padding:17px}.governmentDumaAgenda{padding:4px 12px 14px}.governmentDumaAgendaItem{grid-template-columns:1fr}.governmentDumaAgendaNo{width:30px;height:30px}}
