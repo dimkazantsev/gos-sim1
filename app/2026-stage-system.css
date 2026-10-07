@@ -983,4 +983,55 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
 .gov8FieldError{grid-column:1/-1;display:block;margin-top:-2px;color:#b43b52;font-size:12px;font-weight:800}
 .gov8NomineeFields select:disabled,.gov8NomineeFields input:disabled{cursor:not-allowed}
 
-/* stage8-write-path-test */
+
+/* Stage 8 refinement v3 */
+.gov8InlineRegistration{padding:2px 0 4px}
+.gov8InlineRegistration .institutionRegistrationPanel{margin:0;border-radius:16px;border:1px solid #d8e4ef;background:#fbfdff}
+.gov8InlineRegistration .projectDisclosure>summary{border-radius:15px}
+
+.gov8AgendaActions{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:10px!important;align-items:center!important;min-width:min(560px,50vw)}
+.gov8AgendaLinks,.gov8AgendaPrimaryActions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.gov8AgendaPrimaryActions{justify-content:flex-end}
+.gov8LinkButton,.gov8MinistryLinks button{min-height:32px;padding:6px 9px;border:1px solid #d9e4ef;border-radius:9px;background:#f8fafc;color:#58718b;font-size:11px;font-weight:850;line-height:1.2}
+.gov8LinkButton:hover,.gov8MinistryLinks button:hover{border-color:#b8cae5;background:#f1f6ff;color:#315efb}
+
+.gov8MinistryGrid{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:12px!important}
+.gov8MinistryCard{grid-column:span 2;min-height:100%;grid-template-rows:auto auto auto auto 1fr;box-shadow:0 7px 18px rgba(30,65,105,.035)}
+.gov8MinistryCard:nth-child(4){grid-column:2/span 2}
+.gov8MinistryCard:nth-child(5){grid-column:4/span 2}
+.gov8MinistryNomination,.gov8MinistryNominee{align-self:end}
+.gov8MinistryLinks{display:flex;flex-wrap:wrap;gap:6px}
+
+.gov8StructureDocument{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #cde2d7;border-radius:12px;background:#f8fdf9;color:#4f725f;font-size:12px;font-weight:800}
+.gov8SubmissionCard{grid-template-columns:minmax(260px,.75fr) minmax(380px,1.3fr) minmax(160px,.45fr)!important;align-items:end!important}
+.gov8SubmissionCard .gov8NomineeFields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+
+.gov8Overview{background:linear-gradient(145deg,#ffffff 0%,#f7faff 58%,#edf4ff 100%)!important}
+.gov8Duma,.gov8Ministries{box-shadow:0 12px 32px rgba(26,60,97,.045)}
+.gov8Duma{border-color:#cfddec}
+.gov8Ministries{border-color:#d7e1eb}
+.gov8Procedure>button{transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+.gov8Procedure>button:hover:not(:disabled){transform:translateY(-1px)}
+.gov8AgendaRow{grid-template-columns:auto minmax(220px,.72fr) minmax(0,1.28fr)!important}
+.gov8AgendaMain b{font-size:14px}
+.gov8AgendaMain span{line-height:1.35}
+
+@media(max-width:1180px){
+ .gov8AgendaActions{grid-template-columns:1fr!important;min-width:0}
+ .gov8AgendaPrimaryActions{justify-content:flex-start}
+ .gov8SubmissionCard{grid-template-columns:1fr!important}
+ .gov8SubmissionCard>button{justify-self:start}
+ .gov8MinistryGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .gov8MinistryCard,.gov8MinistryCard:nth-child(4),.gov8MinistryCard:nth-child(5){grid-column:auto}
+ .gov8AgendaRow{grid-template-columns:auto minmax(0,1fr)!important}
+ .gov8AgendaActions{grid-column:1/-1}
+}
+@media(max-width:700px){
+ .gov8MinistryGrid{grid-template-columns:1fr!important}
+ .gov8AgendaLinks,.gov8AgendaPrimaryActions{display:grid;grid-template-columns:1fr 1fr}
+ .gov8AgendaLinks button,.gov8AgendaPrimaryActions button{width:100%}
+ .gov8StructureDocument{align-items:stretch;flex-direction:column}
+ .gov8AgendaRow{grid-template-columns:1fr!important}
+ .gov8AgendaActions{grid-column:auto}
+ .gov8SubmissionCard .gov8NomineeFields{grid-template-columns:1fr}
+}
