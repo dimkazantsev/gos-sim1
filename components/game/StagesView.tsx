@@ -15,7 +15,7 @@ import {useSavedGameState} from './useSavedGameState';
 const STAGE_ICONS=[UsersRound,SlidersHorizontal,Map,Landmark,UserRoundX,ClipboardCheck,Vote,Building2,Network,Target,ClipboardList,Scale,Wallet,MapPin,ShieldAlert,ChartNoAxesCombined] as const;
 type StageFilter='all'|'open'|'voting'|'completed'|'locked';
 
-export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:import('./types').View)=>void;focusStageNo?:number;readOnly?:boolean}){
+export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:(voteId?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:import('./types').View)=>void;focusStageNo?:number;readOnly?:boolean}){
  const {stages,votes,teacher,nextStage}=g;
  const [selectedStageNo,setSelectedStageNo]=useSavedGameState(g.game?.id,g.me?.user_id,'stage-selected',0,value=>Number.isInteger(value)&&Number(value)>=0&&Number(value)<=16);
  const selected=stages.find(s=>s.stage_no===selectedStageNo)||null;
@@ -171,7 +171,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
       <div className="stageAtlasCardFooter">
        <div className="stageAtlasCardDeadline">{s.deadline?<><CalendarClock size={15} aria-hidden="true"/>До {formatDeadline(s.deadline)}</>:hasOpenVote?<span className="stageAtlasVoteIndicator"><span/>Требует внимания</span>:<span className="stageAtlasCardStageName">Этап {String(s.stage_no).padStart(2,'0')}</span>}</div>
        <div className="stageAtlasCardActions">
-        {hasOpenVote&&<button type="button" className="stageAtlasVoteAction" onClick={onOpenVotes} aria-label={'Открыть голосования этапа '+s.stage_no}><Vote size={16} aria-hidden="true"/>Голосование</button>}
+        {hasOpenVote&&<button type="button" className="stageAtlasVoteAction" onClick={()=>onOpenVotes()} aria-label={'Открыть голосования этапа '+s.stage_no}><Vote size={16} aria-hidden="true"/>Голосование</button>}
         <button type="button" className="stageAtlasDetailAction" onClick={openDetails} aria-label={'Подробнее об этапе '+s.stage_no+': '+s.title}>Подробнее <ArrowUpRight size={16} strokeWidth={2} aria-hidden="true"/></button>
         {teacher&&!readOnly&&<button type="button" className="stageAtlasResetStage" title={'Сбросить этап '+s.stage_no} aria-label={'Сбросить этап '+s.stage_no+': '+s.title} onClick={()=>requestReset(s.stage_no)} disabled={resetBusy}><RotateCcw size={17} strokeWidth={1.9} aria-hidden="true"/></button>}
        </div>
