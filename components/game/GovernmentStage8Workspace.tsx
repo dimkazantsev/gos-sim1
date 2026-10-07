@@ -303,6 +303,42 @@ export default function GovernmentStage8Workspace({
  function AgendaRow({n,index}:{n:Nomination;index:number}){
   const vote=n.vote_id?votes.find(v=>v.id===n.vote_id):undefined;
   const rejects=rejections(n.office_key);
+
+  let actionLabel='Ожидает решения';
+  let actionKind:'primary'|'secondary'='secondary';
+  let actionDisabled=true;
+  let actionHandler:(()=>void)|null=null;
+
+  if(teacher&&n.status==='submitted'){
+   actionLabel='Открыть голосование';
+   actionKind='primary';
+   actionDisabled=false;
+   actionHandler=()=>void openVote(n.id);
+  }else if(vote?.status==='open'){
+   actionLabel='Перейти к голосованию';
+   actionKind='primary';
+   actionDisabled=false;
+   actionHandler=()=>openVoting(vote.id);
+  }else if(n.status==='approved'&&canPresident&&n.office_kind!=='central_bank_chair'){
+   actionLabel='Назначить';
+   actionKind='primary';
+   actionDisabled=false;
+   actionHandler=()=>void appoint(n.id);
+  }else if(n.status==='rejected'&&rejects>=3&&latest(n.office_key)?.id===n.id&&canPresident&&n.office_kind!=='central_bank_chair'){
+   actionLabel='Назначить после 3 отклонений';
+   actionKind='primary';
+   actionDisabled=false;
+   actionHandler=()=>void appointAfterThree(n.id);
+  }else if(n.status==='appointed'){
+   actionLabel='Назначено';
+  }else if(n.status==='rejected'){
+   actionLabel='Отклонено';
+  }else if(n.status==='approved'){
+   actionLabel='Утверждено';
+  }else if(vote?.status==='closed'){
+   actionLabel=vote.result_label||STATUS[n.status];
+  }
+
   return <article className={'gov8AgendaRow is-'+n.status}>
    <span className="gov8AgendaIndex">{String(index+1).padStart(2,'0')}</span>
    <div className="gov8AgendaMain">
@@ -311,18 +347,16 @@ export default function GovernmentStage8Workspace({
    </div>
    <div className="gov8AgendaActions">
     <div className="gov8AgendaLinks">
-     {n.formal_document_id&&<button className="gov8LinkButton" onClick={()=>onOpenDocument?.(n.formal_document_id!)}>Документ</button>}
-     {n.formal_document_id&&<button className="gov8LinkButton" onClick={()=>onNavigate?.('documents')}>Реестр НПА</button>}
-     {n.vote_id&&<button className="gov8LinkButton" onClick={()=>openVoting(n.vote_id)}>Голосование</button>}
+     <button className="gov8LinkButton" disabled={!n.formal_document_id} onClick={()=>n.formal_document_id&&onOpenDocument?.(n.formal_document_id)}>Документ</button>
+     <button className="gov8LinkButton" disabled={!n.formal_document_id} onClick={()=>n.formal_document_id&&onNavigate?.('documents')}>Реестр НПА</button>
+     <button className="gov8LinkButton" disabled={!n.vote_id} onClick={()=>n.vote_id&&openVoting(n.vote_id)}>Голосование</button>
      <button className="gov8LinkButton" onClick={()=>onNavigate?.('actions')}>Политический процесс</button>
     </div>
-    <div className="gov8AgendaPrimaryActions">
-     {teacher&&n.status==='submitted'&&<button className="primary" disabled={!!busy} onClick={()=>void openVote(n.id)}>Открыть голосование</button>}
-     {vote?.status==='open'&&<button className="secondary" onClick={()=>openVoting(vote.id)}>Перейти к голосованию</button>}
-     {n.status==='approved'&&canPresident&&n.office_kind!=='central_bank_chair'&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(n.id)}>Назначить</button>}
-     {n.status==='rejected'&&rejects>=3&&latest(n.office_key)?.id===n.id&&canPresident&&n.office_kind!=='central_bank_chair'&&<button className="primary" disabled={!!busy} onClick={()=>void appointAfterThree(n.id)}>Назначить после 3 отклонений</button>}
-     {vote?.status==='closed'&&n.status!=='approved'&&n.status!=='appointed'&&<span className="gov8ResultTag">{vote.result_label||STATUS[n.status]}</span>}
-    </div>
+    <button
+     className={actionKind+' gov8AgendaCta'}
+     disabled={actionDisabled||!!busy}
+     onClick={()=>actionHandler?.()}
+    >{actionLabel}</button>
    </div>
   </article>;
  }
