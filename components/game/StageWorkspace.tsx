@@ -180,7 +180,7 @@ export default function StageWorkspace({
    <div>{detail.notes.map((item,index)=><p key={index}><span>!</span>{item}</p>)}</div>
   </section>}
 
-  {g.teacher&&!readOnly&&<section className="stageWorkspaceTeacher">
+  {g.teacher&&!readOnly&&stage.stage_no!==7&&<section className="stageWorkspaceTeacher">
    <header className="stageWorkspaceTeacherHead">
     <div><small>ПРЕПОДАВАТЕЛЬ</small><h2>Управление этапом</h2><p>Настройки ниже синхронизированы с «Управление → Этапы».</p></div>
     {stage.status!=='open'&&<button type="button" className="primary" onClick={()=>void g.openStage(stage.stage_no)}>Открыть этот этап</button>}
@@ -203,8 +203,8 @@ export default function StageWorkspace({
 
     <div className="stageWorkspaceCoreTools">
      {registrationBodies&&<div id={'stage-registration-'+stage.stage_no} className="stageRegistrationAnchor"><InstitutionRegistrationPanel g={g} readOnly={readOnly} stageNo={stage.stage_no} initialBody={registrationBodies[0]} allowedBodies={registrationBodies}/></div>}
-     <DeadlineControl g={g} stageNo={stage.stage_no}/>
-     {stage.stage_no!==6&&<StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>} 
+     {stage.stage_no!==7&&<DeadlineControl g={g} stageNo={stage.stage_no}/>}
+     {stage.stage_no!==6&&stage.stage_no!==7&&<StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>} 
     </div>
 
     <div className="stageSpecializedModules" aria-label="Специализированные процедуры этапа">
