@@ -16,6 +16,7 @@ import StagePolicyEditor from './StagePolicyEditor';
 import StageArtifacts,{STAGE_FORMS} from './StageArtifacts';
 import StageReadinessPanel from './StageReadinessPanel';
 import PresidentialElectionLab from './PresidentialElectionLab';
+import PresidentialElectionStage7 from './PresidentialElectionStage7';
 import PresidentialSystemDecisionPanel from './PresidentialSystemDecisionPanel';
 import DumaLeadershipElection from './DumaLeadershipElection';
 import GhostPolicyLab from './GhostPolicyLab';
