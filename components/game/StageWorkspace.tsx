@@ -192,7 +192,7 @@ export default function StageWorkspace({
    <div className="stageWorkspaceSectionHead stageWorkspaceExecutionHead">
     <div><small>РАБОЧЕЕ МЕСТО</small><h2>Документы, формы и процедуры</h2><p>Заполняйте формы здесь или переходите в профильный раздел. Сохранённые НПА, голосования и результаты синхронизируются с этапом.</p></div>
     <div className="stageWorkspaceExecutionTools">
-     {publicChannel&&<button type="button" className="stageWorkspacePublicChat stageWorkspacePublicChatInner" onClick={openPublicChat}><MessageCircle size={16} aria-hidden="true"/><span>Обсудить в публичном чате</span></button>}
+     {publicChannel&&![6,7].includes(stage.stage_no)&&<button type="button" className="stageWorkspacePublicChat stageWorkspacePublicChatInner" onClick={openPublicChat}><MessageCircle size={16} aria-hidden="true"/><span>Обсудить в публичном чате</span></button>}
      <Layers3 size={25} aria-hidden="true"/>
     </div>
    </div>
@@ -211,9 +211,9 @@ export default function StageWorkspace({
      {(stage.stage_no===2||stage.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={stage.stage_no as 2|3} onOpenVotes={onOpenVotes}/>}
      {stage.stage_no===4&&<DumaLeadershipElection g={g}/>}
      {stage.stage_no===5&&<GhostPolicyLab g={g} onOpenVotes={onOpenVotes}/>}
-     {stage.stage_no===6&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} onNavigate={onNavigate} stageNo={6}/>}
+     {stage.stage_no===6&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} onNavigate={onNavigate} onOpenDocument={onOpenDocument} stageNo={6}/>}
      {stage.stage_no===6&&<PresidentialElectionLab g={g}/>}
-     {stage.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} onNavigate={onNavigate} stageNo={7}/>}
+     {stage.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} onNavigate={onNavigate} onOpenDocument={onOpenDocument} stageNo={7}/>}
      {stage.stage_no===7&&<PresidentialElectionStage7 g={g}/>}
      {stage.stage_no===8&&<><GovernmentStructurePanel g={g}/><GovernmentFormationLab g={g}/></>}
      {stage.stage_no===9&&<InstitutionStaffingLab g={g}/>}
