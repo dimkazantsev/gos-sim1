@@ -20,7 +20,6 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  const role=(me?.role_title||'').toLowerCase();
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  const canPropose=teacher||!!ledParty;
- const canManageVote=teacher||(role.includes('председател')&&role.includes('дум'))||(role.includes('совет')&&role.includes('дум'));
  const canCreateSf=teacher||role.includes('совет федерац')||role.includes('сенатор');
  const sessionBody=stageNo===6?'gd':'sf';
 
@@ -83,16 +82,15 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  </section>;
 
  async function propose(){
-  setBusy(true);const r=await supabase.rpc('propose_presidential_system',{p_game_id:activeGame.id,p_system_type:system,p_threshold_pct:system==='qualified'?threshold:null,p_rationale:rationale.trim()||null});
-  if(r.error)setError(r.error.message);else{setRationale('');await load()}setBusy(false);
- }
- async function registerProposal(id:string){
-  setBusy(true);const r=await supabase.rpc('register_presidential_system_proposal',{p_proposal_id:id});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
- }
- async function openVote(id:string){
-  setBusy(true);const r=await supabase.rpc('open_presidential_system_vote',{p_proposal_id:id});
-  if(r.error)setError(r.error.message);else{await load();onOpenVotes()}setBusy(false);
+  setBusy(true);
+  const r=await supabase.rpc('propose_presidential_system',{p_game_id:activeGame.id,p_system_type:system,p_threshold_pct:system==='qualified'?threshold:null,p_rationale:rationale.trim()||null});
+  if(r.error)setError(r.error.message);
+  else{
+   setRationale('');
+   await g.refresh();
+   await load();
+  }
+  setBusy(false);
  }
  async function createResolution(){
   setBusy(true);const r=await supabase.rpc('create_presidential_election_appointment_resolution',{p_game_id:activeGame.id,p_body:resolutionBody.trim()||null});
@@ -102,25 +100,24 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  if(stageNo===7)return <section className="presSystemDecision presSystemAppointmentOnly">{procedureHub}<section className="sfAppointment"><div><small>СОВЕТ ФЕДЕРАЦИИ · ЭТАП 7</small><h4>Постановление о назначении выборов Президента РФ</h4><p>{sfResolution?<>Создано: <b>{sfResolution.registry_no}</b> · {sfResolution.status_label}</>:<>Формальный акт ещё не создан.</>}</p></div>{canCreateSf&&!sfResolution&&<div className="sfAppointmentCreate"><textarea rows={2} value={resolutionBody} onChange={e=>setResolutionBody(e.target.value)} placeholder="Необязательно: уточните игровой срок проведения выборов"/><button className="primary" disabled={busy} onClick={()=>void createResolution()}>Создать постановление СФ</button></div>}</section></section>;
 
  return <section className="presSystemDecision">
-  <header><div><small>ГОСУДАРСТВЕННАЯ ДУМА ФС РФ · ЭТАП 6</small><h3>Поправка к ФЗ № 19-ФЗ о системе выборов Президента</h3><p>Фракция вносит проект, Председатель ГД регистрирует его, вопрос рассматривается на заседании Государственной Думы и выносится на мандатное голосование. По итогам система выпускает постановление ГД и только после принятия синхронизирует модель выборов.</p></div><div className="presSystemAdopted"><small>ДЕЙСТВУЕТ</small><strong>{adopted?labels[adopted.system_type]:'Решение не принято'}</strong>{adopted?.system_type==='qualified'&&<span>{adopted.threshold_pct}%</span>}</div></header>
+  <header><div><small>ГОСУДАРСТВЕННАЯ ДУМА ФС РФ · ЭТАП 6</small><h3>Поправка к ФЗ № 19-ФЗ о системе выборов Президента</h3><p>Фракция создаёт проект поправки. Система сразу добавляет законопроект в реестр НПА и создаёт связанное голосование ГД. Участники регистрируются на заседание, обсуждают проект и голосуют. Принятое решение автоматически синхронизирует модель выборов и открывает процедуру ЦИК ниже.</p></div><button type="button" className={'presSystemAdopted '+(adopted?'isReady':'')} disabled={!adopted} onClick={()=>document.getElementById('stage6-cec')?.scrollIntoView({behavior:'smooth',block:'start'})}><small>ДЕЙСТВУЕТ</small><strong>{adopted?labels[adopted.system_type]:'Решение не принято'}</strong>{adopted?.system_type==='qualified'&&<span>{adopted.threshold_pct}%</span>}{adopted&&<em>Перейти к ЦИК ↓</em>}</button></header>
 
   {procedureHub}
   {canPropose&&<div className="presSystemProposal"><label>Система<select value={system} onChange={e=>setSystem(e.target.value as Proposal['system_type'])}><option value="relative">Относительное большинство</option><option value="absolute">Абсолютное большинство</option><option value="qualified">Квалифицированное большинство</option><option value="preferential">Преференциальное большинство</option></select></label>{system==='qualified'&&<label>Порог, %<input type="number" min="51" max="100" value={threshold} onChange={e=>setThreshold(Math.max(51,Math.min(100,Number(e.target.value)||60)))}/></label>}<label className="wide">Позиция фракции<textarea rows={2} value={rationale} onChange={e=>setRationale(e.target.value)} placeholder="Почему именно эта модель должна применяться на выборах Президента?"/></label><button className="primary" disabled={busy} onClick={()=>void propose()}>Создать проект поправки</button></div>}
 
   <div className="presSystemList">{visible.map(p=>{const v=vote(p.vote_id);const bill=p.bill_document_id?formalDocuments.find(d=>d.id===p.bill_document_id):undefined;const resolution=p.resolution_document_id?formalDocuments.find(d=>d.id===p.resolution_document_id):undefined;return <article key={p.id} className={p.status}>
    <div className="presSystemProposalMain"><small>{proposer(p.proposed_by)}</small><b>{labels[p.system_type]}</b>{p.rationale&&<p>{p.rationale}</p>}<div className="presSystemRoute">
-    <span className="done">1 · Проект внесён</span>
-    <span className={p.registered_at?'done':''}>2 · Регистрация в ГД</span>
-    <span className={p.vote_id?'done':''}>3 · Заседание и голосование</span>
-    <span className={p.resolution_document_id?'done':''}>4 · Постановление ГД</span>
+    <span className="done">1 · Проект создан</span>
+    <span className={p.bill_document_id?'done':''}>2 · НПА в реестре</span>
+    <span className={p.vote_id?'done':''}>3 · Голосование создано</span>
+    <span className={p.resolution_document_id?'done':''}>4 · Решение ГД</span>
    </div>
    {bill&&<p className="presSystemDocumentRef">Законопроект: <b>{bill.registry_no||'зарегистрирован'}</b> · {bill.status_label}</p>}
    {resolution&&<p className="presSystemDocumentRef">Постановление: <b>{resolution.registry_no||'оформлено'}</b> · {resolution.status_label}</p>}
    </div>
    <div className="presSystemProposalActions"><span>{p.status==='adopted'?'Принято':p.status==='vote_open'?'На голосовании':p.status==='registered'?'Зарегистрировано':p.status==='rejected'?'Отклонено':'Проект'}</span>{p.system_type==='qualified'&&<em>{p.threshold_pct}%</em>}{v&&<em>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</em>}
-    {canManageVote&&p.status==='draft'&&<button disabled={busy} onClick={()=>void registerProposal(p.id)}>Зарегистрировать проект</button>}
-    {canManageVote&&p.status==='registered'&&<button className="primary" disabled={busy} onClick={()=>void openVote(p.id)}>Созвать заседание ГД и открыть голосование</button>}
-    {v?.status==='open'&&<button onClick={onOpenVotes}>Перейти к голосованию →</button>}
+    {bill&&<button onClick={()=>onOpenDocument?.(bill.id)}>Открыть проект НПА →</button>}
+    {v?.status==='open'&&<button className="primary" onClick={onOpenVotes}>Перейти к голосованию →</button>}
    </div>
   </article>})}</div>
 
