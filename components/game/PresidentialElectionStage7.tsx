@@ -23,6 +23,7 @@ const emptyScore=():ScoreDraft=>({program:'',campaign:'',rating:'',poll:'',runof
 
 export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,parties,setError}=g;
+ const gameId=game?.id||'';
  const [tab,setTab]=useState<'campaign'|'poll'|'results'>('campaign');
  const [candidates,setCandidates]=useState<Candidate[]>([]);
  const [materials,setMaterials]=useState<Material[]>([]);
@@ -77,16 +78,16 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   return r.data?.signedUrl||'';
  }
  async function load(){
-  if(!game)return;
+  if(!gameId)return;
   const [cr,mr,dr,dvr,pr,sr,sc,ir]=await Promise.all([
-   supabase.from('presidential_candidates').select('id,user_id,party_id,created_by,display_name,registration_status,photo_path,program_summary,campaign_statement').eq('game_id',game.id).is('archived_at',null).order('display_name'),
-   supabase.from('presidential_campaign_materials').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
-   supabase.from('presidential_poll_decision').select('*').eq('game_id',game.id).maybeSingle(),
-   supabase.from('presidential_poll_decision_votes').select('*').eq('game_id',game.id),
-   supabase.from('presidential_public_polls').select('*').eq('game_id',game.id).order('round_no'),
-   supabase.from('presidential_election_settings').select('*').eq('game_id',game.id).maybeSingle(),
-   supabase.from('presidential_scorecards').select('*').eq('game_id',game.id),
-   supabase.from('presidential_inauguration').select('*').eq('game_id',game.id).maybeSingle()
+   supabase.from('presidential_candidates').select('id,user_id,party_id,created_by,display_name,registration_status,photo_path,program_summary,campaign_statement').eq('game_id',gameId).is('archived_at',null).order('display_name'),
+   supabase.from('presidential_campaign_materials').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('presidential_poll_decision').select('*').eq('game_id',gameId).maybeSingle(),
+   supabase.from('presidential_poll_decision_votes').select('*').eq('game_id',gameId),
+   supabase.from('presidential_public_polls').select('*').eq('game_id',gameId).order('round_no'),
+   supabase.from('presidential_election_settings').select('*').eq('game_id',gameId).maybeSingle(),
+   supabase.from('presidential_scorecards').select('*').eq('game_id',gameId),
+   supabase.from('presidential_inauguration').select('*').eq('game_id',gameId).maybeSingle()
   ]);
   if(!cr.error){
    const rows=(cr.data||[]) as Candidate[];setCandidates(rows);
@@ -115,15 +116,15 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    }
   }
  }
- useEffect(()=>{void load()},[game?.id]);
+ useEffect(()=>{void load()},[gameId]);
  useEffect(()=>{
-  if(!game)return;
+  if(!gameId)return;
   const tables=['presidential_campaign_materials','presidential_poll_decision','presidential_poll_decision_votes','presidential_public_polls','presidential_scorecards','presidential_election_settings','presidential_inauguration'];
-  let ch=supabase.channel('presidential-stage7:'+game.id);
-  for(const table of tables)ch=ch.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+game.id},()=>void load());
+  let ch=supabase.channel('presidential-stage7:'+gameId);
+  for(const table of tables)ch=ch.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>void load());
   ch.subscribe();
   return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ },[gameId]);
 
  if(!game||!me)return null;
  const baseUrl=typeof window!=='undefined'?window.location.origin:'';
@@ -141,7 +142,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    const attachments=[];
    for(const file of files){
     if(file.size>104857600)throw new Error('Размер одного вложения не должен превышать 100 МБ');
-    const path=game.id+'/presidential/'+selectedCandidate.id+'/campaign/'+crypto.randomUUID()+'.'+(file.name.split('.').pop()||'bin');
+    const path=gameId+'/presidential/'+selectedCandidate.id+'/campaign/'+crypto.randomUUID()+'.'+(file.name.split('.').pop()||'bin');
     const up=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'application/octet-stream'});
     if(up.error)throw up.error;uploaded.push(path);
     attachments.push({storage_path:path,file_name:file.name,mime_type:file.type||null,file_size:file.size,media_kind:file.type.startsWith('image/')?'image':file.type.startsWith('audio/')?'audio':file.type.startsWith('video/')?'video':'file'});
@@ -160,14 +161,14 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   setBusy(true);const r=await supabase.rpc('review_presidential_campaign_material',{p_material_id:id,p_approve:approve,p_note:(reviewNotes[id]||'').trim()||null});
   if(r.error)setError(r.error.message);else{setNotice(approve?'Материал одобрен и опубликован в политическом процессе.':'Материал отклонён.');await load()}setBusy(false);
  }
- async function openPollDecision(){setBusy(true);const r=await supabase.rpc('open_presidential_poll_decision',{p_game_id:game.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function votePollDecision(choice:boolean){setBusy(true);const r=await supabase.rpc('vote_presidential_poll_decision',{p_game_id:game.id,p_choice:choice});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function closePollDecision(){setBusy(true);const r=await supabase.rpc('close_presidential_poll_decision',{p_game_id:game.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function openPollDecision(){setBusy(true);const r=await supabase.rpc('open_presidential_poll_decision',{p_game_id:gameId});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function votePollDecision(choice:boolean){setBusy(true);const r=await supabase.rpc('vote_presidential_poll_decision',{p_game_id:gameId,p_choice:choice});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function closePollDecision(){setBusy(true);const r=await supabase.rpc('close_presidential_poll_decision',{p_game_id:gameId});if(r.error)setError(r.error.message);else await load();setBusy(false)}
  async function createPublicPoll(){
-  setBusy(true);const r=await supabase.rpc('create_presidential_public_poll',{p_game_id:game.id,p_round_no:activeRound,p_closes_at:pollClose?new Date(pollClose).toISOString():null});
+  setBusy(true);const r=await supabase.rpc('create_presidential_public_poll',{p_game_id:gameId,p_round_no:activeRound,p_closes_at:pollClose?new Date(pollClose).toISOString():null});
   if(r.error)setError(r.error.message);else{setNotice('Публичный опрос открыт. Ссылку можно распространять во внешних сетях.');await load()}setBusy(false);
  }
- async function closePublicPoll(){if(!publicPoll)return;setBusy(true);const r=await supabase.rpc('close_presidential_public_poll',{p_game_id:game.id,p_round_no:publicPoll.round_no});if(r.error)setError(r.error.message);else{setNotice('Опрос закрыт; его проценты перенесены в калькулятор выборов.');await load()}setBusy(false)}
+ async function closePublicPoll(){if(!publicPoll)return;setBusy(true);const r=await supabase.rpc('close_presidential_public_poll',{p_game_id:gameId,p_round_no:publicPoll.round_no});if(r.error)setError(r.error.message);else{setNotice('Опрос закрыт; его проценты перенесены в калькулятор выборов.');await load()}setBusy(false)}
  async function copyPoll(){if(!pollUrl)return;await navigator.clipboard.writeText(pollUrl);setNotice('Ссылка на опрос скопирована.')}
  function share(service:'vk'|'tg'){if(!pollUrl)return;const u=encodeURIComponent(pollUrl),t=encodeURIComponent('Социологический опрос: выборы Президента РФ');window.open(service==='vk'?'https://vk.com/share.php?url='+u+'&title='+t:'https://t.me/share/url?url='+u+'&text='+t,'_blank','noopener,noreferrer')}
  async function saveScore(id:string,round:1|2){
@@ -175,13 +176,13 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   const r=await supabase.rpc('set_presidential_scorecard',{p_candidate_id:id,p_round_no:round,p_teacher_program_pct:round===1?num(d.program):null,p_teacher_campaign_pct:round===1?num(d.campaign):null,p_game_rating_pct:round===1?num(d.rating):null,p_poll_pct:round===1&&settings?.poll_enabled!==false?num(d.poll):null,p_teacher_runoff_pct:round===2?num(d.runoff):null});
   if(r.error)setError(r.error.message);else await load();setBusy(false);
  }
- async function finishRound(round:1|2){setBusy(true);const r=await supabase.rpc('finalize_presidential_round',{p_game_id:game.id,p_round_no:round});if(r.error)setError(r.error.message);else{setTab('results');await load()}setBusy(false)}
- async function uploadAudio(file:File,kind:'hymn'|'music'){const path=game.id+'/presidential/inauguration/'+kind+'-'+crypto.randomUUID()+'.'+(file.name.split('.').pop()||'audio');const r=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'audio/mpeg'});if(r.error)throw r.error;return path}
+ async function finishRound(round:1|2){setBusy(true);const r=await supabase.rpc('finalize_presidential_round',{p_game_id:gameId,p_round_no:round});if(r.error)setError(r.error.message);else{setTab('results');await load()}setBusy(false)}
+ async function uploadAudio(file:File,kind:'hymn'|'music'){const path=gameId+'/presidential/inauguration/'+kind+'-'+crypto.randomUUID()+'.'+(file.name.split('.').pop()||'audio');const r=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'audio/mpeg'});if(r.error)throw r.error;return path}
  async function saveCeremony(){
   setBusy(true);try{
    let hymn=inauguration?.hymn_path||null,music=inauguration?.ceremonial_music_path||null;
    if(hymnFile)hymn=await uploadAudio(hymnFile,'hymn');if(musicFile)music=await uploadAudio(musicFile,'music');
-   const r=await supabase.rpc('save_presidential_inauguration',{p_game_id:game.id,p_scheduled_at:ceremonyAt?new Date(ceremonyAt).toISOString():null,p_venue:venue.trim()||null,p_notes:ceremonyNotes.trim()||null,p_hymn_path:hymn,p_ceremonial_music_path:music});
+   const r=await supabase.rpc('save_presidential_inauguration',{p_game_id:gameId,p_scheduled_at:ceremonyAt?new Date(ceremonyAt).toISOString():null,p_venue:venue.trim()||null,p_notes:ceremonyNotes.trim()||null,p_hymn_path:hymn,p_ceremonial_music_path:music});
    if(r.error)throw r.error;setHymnFile(null);setMusicFile(null);setNotice('Параметры инаугурации сохранены.');await load();
   }catch(e){setError(e instanceof Error?e.message:String(e))}finally{setBusy(false)}
  }
