@@ -54,3 +54,34 @@
 .juryCriterionEmpty{min-height:108px;color:#8b9aac;background:#f8fafc}.juryCriterionEmpty .jurySlotGrid input{background:#f0f3f7!important;border-style:dashed}.juryCriterionEmpty .juryCriterionHead{width:100%}
 @media(max-width:1100px){.jurySlotGrid{grid-template-columns:repeat(8,minmax(40px,1fr))}}
 @media(max-width:760px){.jurySlotGrid{grid-template-columns:repeat(4,minmax(42px,1fr))}}
+
+
+.scoreCandidateCard{display:grid!important;grid-template-columns:1fr!important;gap:14px!important;align-items:stretch!important;padding:16px!important;overflow:hidden}
+.scoreCandidateHeader{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.scoreCandidateHeader .scoreCandidateIdentity{min-width:0}
+.candidatePenaltyBadge{display:grid;justify-items:end;gap:2px;padding:8px 10px;border:1px solid #f0d4da;border-radius:11px;background:#fff8fa}
+.candidatePenaltyBadge small{font-size:11px;font-weight:900;color:#9a6672}
+.candidatePenaltyBadge strong{font-size:14px;color:#b3314f}
+.juryCriteriaRow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;min-width:0}
+.juryCriteriaRow .juryCriterion{min-width:0;overflow:hidden}
+.jurySlotGrid{grid-template-columns:repeat(8,minmax(44px,1fr))!important;gap:6px!important}
+.jurySlotGrid input{width:100%!important;min-width:0!important}
+.scoreMetricsRow{display:grid;grid-template-columns:repeat(2,minmax(140px,1fr)) minmax(100px,.65fr) minmax(130px,.8fr);gap:10px;align-items:end;padding-top:2px}
+.scoreMetricsRow>label{display:grid;gap:6px;min-width:0;font-size:12px;font-weight:800;color:var(--body)}
+.scoreMetricsRow input{width:100%;min-height:42px;border:1px solid var(--line);border-radius:11px;background:#fbfcfe;padding:9px 10px}
+.scoreMetricsRow .scoreComputed{min-height:42px;padding:7px 10px;border:1px solid var(--line);border-radius:11px;background:#f8faff}
+.scoreMetricsRow .scoreCalculateButton{min-height:42px;width:100%}
+.calculatorEmptyCard{display:grid!important;grid-template-columns:1fr!important;gap:14px!important;align-items:stretch!important}
+.calculatorEmptyCard .calculatorEmptyCandidate{grid-column:auto!important}
+.cecModerationPanel{gap:12px;padding:14px;border:1px solid #d8e4f2;border-radius:14px;background:#f9fbff}
+.cecModerationTitle{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.cecModerationTitle>div{display:grid;gap:2px}.cecModerationTitle small{font-size:11px;font-weight:900;letter-spacing:.08em;color:#315efb}.cecModerationTitle b{font-size:14px;color:#244766}.cecModerationTitle>span{font-size:12px;color:#7a8da3}.cecModerationTitle strong{color:#b3314f}
+.cecModerationPanel>label{display:grid;gap:6px}.cecModerationPanel>label>span,.cecPenaltyGrid label>span{font-size:12px;font-weight:850;color:#536b84}
+.cecModerationPanel textarea,.cecModerationPanel input{width:100%;border:1px solid var(--line);border-radius:11px;background:#fff;padding:10px 11px;outline:none}
+.cecPenaltyGrid{display:grid;grid-template-columns:minmax(150px,.35fr) minmax(0,1fr);gap:10px}
+.cecDecisionActions{display:flex;justify-content:flex-end;gap:8px}
+.cecDecisionSummary{display:grid;gap:8px;margin-top:11px;padding:11px;border:1px solid #dfe7f1;border-radius:12px;background:#f8fafc}
+.cecDecisionSummary>div{display:grid;gap:3px}.cecDecisionSummary small{font-size:10px;font-weight:900;letter-spacing:.07em;color:#7a8da3}.cecDecisionSummary p{margin:0;white-space:pre-wrap;color:#52677f;font-size:12px}
+.cecPenaltySummary{padding:9px 10px;border:1px solid #f0d4da;border-radius:10px;background:#fff8fa}.cecPenaltySummary b{color:#b3314f}
+@media(max-width:1050px){.juryCriteriaRow{grid-template-columns:1fr}.jurySlotGrid{grid-template-columns:repeat(8,minmax(40px,1fr))!important}.scoreMetricsRow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.scoreCandidateHeader,.cecModerationTitle{align-items:flex-start;flex-direction:column}.candidatePenaltyBadge{justify-items:start}.jurySlotGrid{grid-template-columns:repeat(4,minmax(48px,1fr))!important}.scoreMetricsRow,.cecPenaltyGrid{grid-template-columns:1fr}.cecDecisionActions{display:grid;grid-template-columns:1fr}.cecDecisionActions button{width:100%}}
