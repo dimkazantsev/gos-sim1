@@ -124,6 +124,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  },[game?.id]);
 
  if(!game||!me)return null;
+ if(!systemReady)return null;
  const activeGame=game;
  const activeMe=me;
  const partyUsers=(partyId:string)=>{const p=parties.find(x=>x.id===partyId);return p?members.filter(m=>m.kind==='student'&&m.team===p.name):[]};
@@ -233,8 +234,18 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   <header className="electionLabHead cecHead"><div><small>ЦИК РФ · ЭТАП 6</small><h2>Регистрация кандидатов в Президенты</h2><p>После определения Государственной Думой типа избирательной системы кандидаты формируют досье и подают документы в ЦИК. Агитация, голосование и подсчёт результатов начинаются на 7-м этапе.</p></div><div className="cecHeadSide"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" className="cecEmblem" width={72} height={72}/><div><b>Центральная избирательная комиссия</b><span>Регистрация кандидатов</span></div></div></header>
   <nav className="cecTabs" aria-label="Разделы президентских выборов"><button className={panelView==='dossier'?'active':''} onClick={()=>setPanelView('dossier')}>Моё досье</button><button className={panelView==='application'?'active':''} onClick={()=>setPanelView('application')}>Подача в ЦИК <b>{candidates.filter(x=>x.cec_submitted_at&&x.registration_status==='submitted').length}</b></button><button className={panelView==='candidates'?'active':''} onClick={()=>setPanelView('candidates')}>Кандидаты <b>{candidates.filter(x=>x.cec_submitted_at).length}</b></button><button className={panelView==='decisions'?'active':''} onClick={()=>setPanelView('decisions')}>Решения ЦИК <b>{decisions.length}</b></button></nav>
 
-  <div className="electionSettings electionSettingsReadOnly"><div><small>ДЕЙСТВУЮЩАЯ СИСТЕМА</small><strong>{settings?systemNames[settings.system_type]:'Не определена Государственной Думой'}</strong><span>{!settings?'Сначала примите поправку к ФЗ № 19-ФЗ на заседании ГД ФС РФ. До этого подача документов в ЦИК закрыта.':settings.system_type==='qualified'?'Установленный порог: '+settings.threshold_pct+'%':settings.system_type==='preferential'?'Порядок подсчёта определяется принятым решением ГД':settings.poll_enabled===false?'Соцопрос не используется':'Соцопрос включён в модель рейтинга'}</span></div><div className="electionSystemSource"><small>ИСТОЧНИК</small><b>Решение Государственной Думы</b><span>Изменяется только через парламентскую процедуру выше.</span></div></div>
-  {!systemReady&&<div className="cecSystemGate"><b>Сначала — решение Государственной Думы</b><span>Выдвижение и подача регистрационного пакета в ЦИК станут доступны только после утверждения типа избирательной системы.</span></div>}
+  <section className="electionSystemStatusCard" aria-label="Действующая система выборов Президента">
+   <div className="electionSystemStatusMain">
+    <span className="electionSystemStatusBadge">Утверждено Государственной Думой</span>
+    <small>ДЕЙСТВУЮЩАЯ СИСТЕМА</small>
+    <strong>{systemNames[settings.system_type]}</strong>
+    <p>{settings.system_type==='qualified'?'Порог квалифицированного большинства — '+settings.threshold_pct+'%.':settings.system_type==='preferential'?'Подсчёт проводится по преференциальной модели, утверждённой Государственной Думой.':settings.poll_enabled===false?'Социологический опрос не включён в модель результата.':'Система синхронизирована с моделью выборов Президента.'}</p>
+   </div>
+   <div className="electionSystemStatusMeta">
+    <div><small>ОСНОВАНИЕ</small><b>Решение Государственной Думы</b></div>
+    <div><small>ПРОЦЕДУРА</small><span>Поправка к ФЗ № 19-ФЗ</span></div>
+   </div>
+  </section>
 
   {panelView==='dossier'&&canNominate&&candidates.filter(c=>c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id)).length===0&&<details className="candidateNomination" open><summary><div><b>Выдвинуть кандидата</b><span>Партия может иметь одного активного кандидата.</span></div><i>+</i></summary><div className="candidateNominationBody">{teacher&&<label>Партия<select value={candidateParty} onChange={e=>{setCandidateParty(e.target.value);setCandidateUser('')}}><option value="">Самовыдвижение / сценарный кандидат</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>}<label>Участник<select value={candidateUser} onChange={e=>setCandidateUser(e.target.value)}><option value="">{teacher?'Не привязывать к участнику':ledParty?'Выберите члена партии':'Я сам'}</option>{(teacher?(candidateParty?partyUsers(candidateParty):members.filter(m=>m.kind==='student')):ledParty?partyUsers(ledParty.id):[]).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>{teacher&&<label>Имя в бюллетене<input value={candidateName} onChange={e=>setCandidateName(e.target.value)} placeholder="Для вымышленного кандидата обязательно"/></label>}<label className="candidateProgram">Программа кандидата · один пункт с новой строки<textarea rows={7} value={program} onChange={e=>setProgram(e.target.value)} placeholder={"1. Положение программы\n2. Положение программы\n…\n10. Положение программы"}/></label><label className="candidateProgram">Публичный агитационный тезис<textarea rows={3} value={campaign} onChange={e=>setCampaign(e.target.value)} placeholder="Короткий публичный тезис кандидата"/></label><button className="primary" disabled={busy||(!teacher&&!!ledParty&&!candidateUser)} onClick={()=>void nominate()} >Создать черновик досье</button></div></details>}
 
