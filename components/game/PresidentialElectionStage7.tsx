@@ -7,8 +7,8 @@ import InstitutionEmblemImage from './InstitutionEmblemImage';
 import {institutionEmblem} from './institutionEmblems';
 import MediaUploadButton from './MediaUploadButton';
 
-type Candidate={id:string;user_id:string|null;party_id:string|null;created_by:string;display_name:string;registration_status:string;photo_path:string|null;program_summary:string|null;campaign_statement:string|null};
-type Material={id:string;candidate_id:string;author_id:string;title:string;body:string;material_type:string;print_run:number;publisher_name:string|null;production_date:string|null;imprint_text:string|null;external_url:string|null;files:Array<{storage_path:string;file_name:string;mime_type?:string|null;file_size?:number;media_kind?:string}>;status:'pending'|'approved'|'rejected';review_note:string|null;post_id:string|null;created_at:string};
+type Candidate={id:string;user_id:string|null;party_id:string|null;created_by:string;display_name:string;registration_status:string;photo_path:string|null;program_summary:string|null;campaign_statement:string|null;rating_penalty:number};
+type Material={id:string;candidate_id:string;author_id:string;title:string;body:string;material_type:string;print_run:number;publisher_name:string|null;production_date:string|null;imprint_text:string|null;external_url:string|null;files:Array<{storage_path:string;file_name:string;mime_type?:string|null;file_size?:number;media_kind?:string}>;status:'pending'|'approved'|'rejected';review_note:string|null;cec_errors:string|null;cec_response:string|null;penalty_points:number;penalty_reason:string|null;post_id:string|null;created_at:string};
 type PollDecision={game_id:string;status:'open'|'closed';result:boolean|null;opened_at:string;closed_at:string|null};
 type PollDecisionVote={user_id:string;choice:boolean};
 type PublicPoll={id:string;game_id:string;round_no:number;slug:string;title:string;status:'draft'|'open'|'closed';opened_at:string|null;closes_at:string|null;closed_at:string|null};
@@ -50,6 +50,10 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const [externalUrl,setExternalUrl]=useState('');
  const [files,setFiles]=useState<File[]>([]);
  const [reviewNotes,setReviewNotes]=useState<Record<string,string>>({});
+ const [reviewErrors,setReviewErrors]=useState<Record<string,string>>({});
+ const [reviewResponses,setReviewResponses]=useState<Record<string,string>>({});
+ const [reviewPenalties,setReviewPenalties]=useState<Record<string,string>>({});
+ const [reviewPenaltyReasons,setReviewPenaltyReasons]=useState<Record<string,string>>({});
  const [pollClose,setPollClose]=useState('');
  const [scoreDrafts,setScoreDrafts]=useState<Record<string,ScoreDraft>>({});
  const [ceremonyAt,setCeremonyAt]=useState('');
@@ -82,7 +86,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  async function load(){
   if(!gameId)return;
   const [cr,mr,dr,dvr,pr,sr,sc,ir,jr]=await Promise.all([
-   supabase.from('presidential_candidates').select('id,user_id,party_id,created_by,display_name,registration_status,photo_path,program_summary,campaign_statement').eq('game_id',gameId).is('archived_at',null).order('display_name'),
+   supabase.from('presidential_candidates').select('id,user_id,party_id,created_by,display_name,registration_status,photo_path,program_summary,campaign_statement,rating_penalty').eq('game_id',gameId).is('archived_at',null).order('display_name'),
    supabase.from('presidential_campaign_materials').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
    supabase.from('presidential_poll_decision').select('*').eq('game_id',gameId).maybeSingle(),
    supabase.from('presidential_poll_decision_votes').select('*').eq('game_id',gameId),
@@ -170,7 +174,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    const r=await supabase.rpc('submit_presidential_campaign_material',{p_candidate_id:selectedCandidate.id,p_title:title.trim(),p_body:body.trim(),p_material_type:materialType,p_print_run:Math.max(0,Number(printRun)||0),p_publisher_name:publisher.trim()||null,p_production_date:productionDate||null,p_imprint_text:imprint.trim()||null,p_external_url:externalUrl.trim()||null,p_files:attachments});
    if(r.error)throw r.error;
    setTitle('');setBody('');setPrintRun('');setPublisher('');setProductionDate('');setImprint('');setExternalUrl('');setFiles([]);
-   setNotice('Материал направлен в ЦИК. После одобрения преподавателем он автоматически появится в «Политическом процессе».');
+   setNotice('Материал направлен в ЦИК. После одобрения ЦИК он автоматически появится в «Политическом процессе».');
    await load();
   }catch(e){
    if(uploaded.length)await supabase.storage.from('game-assets').remove(uploaded);
@@ -178,8 +182,24 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   }finally{setBusy(false)}
  }
  async function reviewMaterial(id:string,approve:boolean){
-  setBusy(true);const r=await supabase.rpc('review_presidential_campaign_material',{p_material_id:id,p_approve:approve,p_note:(reviewNotes[id]||'').trim()||null});
-  if(r.error)setError(r.error.message);else{setNotice(approve?'Материал одобрен и опубликован в политическом процессе.':'Материал отклонён.');await load()}setBusy(false);
+  const penaltyRaw=(reviewPenalties[id]||'').trim();
+  const penalty=penaltyRaw===''?0:Math.max(0,Math.min(100,Number(penaltyRaw)||0));
+  setBusy(true);
+  const r=await supabase.rpc('review_presidential_campaign_material_cec',{
+   p_material_id:id,
+   p_approve:approve,
+   p_note:(reviewNotes[id]||'').trim()||null,
+   p_errors:(reviewErrors[id]||'').trim()||null,
+   p_response:(reviewResponses[id]||'').trim()||null,
+   p_penalty_points:penalty,
+   p_penalty_reason:(reviewPenaltyReasons[id]||'').trim()||null
+  });
+  if(r.error)setError(r.error.message);
+  else{
+   setNotice(approve?'ЦИК одобрил материал и опубликовал его в политическом процессе.':'ЦИК отклонил материал.');
+   await load();
+  }
+  setBusy(false);
  }
  async function openPollDecision(){setBusy(true);const r=await supabase.rpc('open_presidential_poll_decision',{p_game_id:gameId});if(r.error)setError(r.error.message);else await load();setBusy(false)}
  async function votePollDecision(choice:boolean){setBusy(true);const r=await supabase.rpc('vote_presidential_poll_decision',{p_game_id:gameId,p_choice:choice});if(r.error)setError(r.error.message);else await load();setBusy(false)}
@@ -220,7 +240,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   {notice&&<div className="stage7Notice">{notice}</div>}
 
   {tab==='campaign'&&<div className="stage7Grid">
-   <section className="stage7Panel campaignComposer"><div className="stage7PanelHead"><div><small>ПОДАЧА В ЦИК</small><h3>Агитационный материал</h3><p>Форма повторяет публикацию в «Политическом процессе», но без НПА и голосований. До публикации материал проходит модерацию преподавателя.</p></div><FileUp size={24}/></div>
+   <section className="stage7Panel campaignComposer"><div className="stage7PanelHead"><div><small>ПОДАЧА В ЦИК</small><h3>Агитационный материал</h3><p>Форма повторяет публикацию в «Политическом процессе», но без НПА и голосований. До публикации материал проходит проверку и модерацию ЦИК.</p></div><FileUp size={24}/></div>
     {mine.length?<div className="campaignForm">
      <label>Кандидат<select value={selectedCandidate?.id||''} onChange={e=>setCandidateId(e.target.value)}>{mine.map(c=><option key={c.id} value={c.id}>{c.display_name}</option>)}</select></label><label>Тип материала<select value={materialType} onChange={e=>setMaterialType(e.target.value)}>{Object.entries(MATERIAL_LABELS).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label>
      <label className="wide">Заголовок<input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Название агитационного материала"/></label><label className="wide">Текст<textarea rows={6} value={body} onChange={e=>setBody(e.target.value)} placeholder="Новость, обращение кандидата, текст листовки или описание видео"/></label>
@@ -229,8 +249,29 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
      <div className="campaignSubmit wide"><span>После одобрения ЦИК публикация автоматически появится в политическом процессе от имени кандидата.</span><button className="primary" disabled={busy||!selectedCandidate||title.trim().length<3||body.trim().length<3||((materialType==='poster'||materialType==='leaflet')&&(!Number(printRun)||imprint.trim().length<3))} onClick={()=>void submitMaterial()}><Send size={17}/>{busy?'Отправляется…':'Направить в ЦИК'}</button></div>
     </div>:<div className="stage7Empty">Нет зарегистрированного кандидата, которым вы можете управлять.</div>}
    </section>
-   <section className="stage7Panel"><div className="stage7PanelHead"><div><small>РЕЕСТР</small><h3>Материалы кампании</h3><p>{teacher?'Проверьте материалы. Одобрение публикует их в политическом процессе автоматически.':'Следите за статусом отправленных материалов.'}</p></div><Landmark size={24}/></div>
-    <div className="campaignQueue">{materials.filter(m=>teacher||mine.some(c=>c.id===m.candidate_id)).map(m=>{const c=registered.find(x=>x.id===m.candidate_id);return <article key={m.id} className={'campaignCard '+m.status}><div className="campaignCardTop"><div className="candidateMini">{photoUrls[m.candidate_id]?<img src={photoUrls[m.candidate_id]} alt=""/>:<span>{(c?.display_name||'?').slice(0,1)}</span>}<div><small>{MATERIAL_LABELS[m.material_type]||m.material_type}</small><b>{c?.display_name||'Кандидат'}</b></div></div><em>{m.status==='pending'?'На проверке':m.status==='approved'?'Опубликовано':'Отклонено'}</em></div><h4>{m.title}</h4><p>{m.body}</p>{(m.print_run>0||m.imprint_text)&&<div className="campaignImprint">{m.print_run>0&&<span>Тираж: <b>{m.print_run.toLocaleString('ru-RU')}</b></span>}{m.imprint_text&&<span>{m.imprint_text}</span>}</div>}{m.review_note&&<div className="campaignReviewNote">{m.review_note}</div>}{teacher&&m.status==='pending'&&<div className="campaignModeration"><textarea rows={2} value={reviewNotes[m.id]||''} onChange={e=>setReviewNotes(v=>({...v,[m.id]:e.target.value}))} placeholder="Комментарий ЦИК (необязательно)"/><div><button className="secondary dangerAction" disabled={busy} onClick={()=>void reviewMaterial(m.id,false)}><X size={16}/>Отклонить</button><button className="primary" disabled={busy} onClick={()=>void reviewMaterial(m.id,true)}><Check size={16}/>Одобрить и опубликовать</button></div></div>}</article>})}{!materials.length&&<div className="stage7Empty">Агитационные материалы ещё не поданы.</div>}</div>
+   <section className="stage7Panel"><div className="stage7PanelHead"><div><small>РЕЕСТР</small><h3>Материалы кампании</h3><p>{teacher?'Панель ЦИК: зафиксируйте ошибки и официальный ответ, при необходимости назначьте штраф. Одобрение публикует материал автоматически.':'Следите за статусом отправленных материалов.'}</p></div><Landmark size={24}/></div>
+     <div className="campaignQueue">{materials.filter(m=>teacher||mine.some(c=>c.id===m.candidate_id)).map(m=>{const c=registered.find(x=>x.id===m.candidate_id);return <article key={m.id} className={'campaignCard '+m.status}>
+      <div className="campaignCardTop"><div className="candidateMini">{photoUrls[m.candidate_id]?<img src={photoUrls[m.candidate_id]} alt=""/>:<span>{(c?.display_name||'?').slice(0,1)}</span>}<div><small>{MATERIAL_LABELS[m.material_type]||m.material_type}</small><b>{c?.display_name||'Кандидат'}</b></div></div><em>{m.status==='pending'?'На проверке ЦИК':m.status==='approved'?'Одобрено ЦИК':'Отклонено ЦИК'}</em></div>
+      <h4>{m.title}</h4><p>{m.body}</p>
+      {(m.print_run>0||m.imprint_text)&&<div className="campaignImprint">{m.print_run>0&&<span>Тираж: <b>{m.print_run.toLocaleString('ru-RU')}</b></span>}{m.imprint_text&&<span>{m.imprint_text}</span>}</div>}
+      {(m.cec_errors||m.cec_response||m.review_note||Number(m.penalty_points)>0)&&<div className="cecDecisionSummary">
+       {m.cec_errors&&<div><small>ОШИБКИ / НАРУШЕНИЯ</small><p>{m.cec_errors}</p></div>}
+       {m.cec_response&&<div><small>ОТВЕТ ЦИК</small><p>{m.cec_response}</p></div>}
+       {m.review_note&&<div><small>КОММЕНТАРИЙ</small><p>{m.review_note}</p></div>}
+       {Number(m.penalty_points)>0&&<div className="cecPenaltySummary"><small>ШТРАФ</small><b>−{Number(m.penalty_points).toFixed(2)} п.</b>{m.penalty_reason&&<p>{m.penalty_reason}</p>}</div>}
+      </div>}
+      {teacher&&m.status==='pending'&&<div className="campaignModeration cecModerationPanel">
+       <div className="cecModerationTitle"><div><small>ПАНЕЛЬ ЦИК</small><b>Решение по агитационному материалу</b></div>{c&&<span>Суммарный штраф кандидата: <strong>−{Number(c.rating_penalty||0).toFixed(2)} п.</strong></span>}</div>
+       <label><span>Ошибки / нарушения</span><textarea rows={3} value={reviewErrors[m.id]||''} onChange={e=>setReviewErrors(v=>({...v,[m.id]:e.target.value}))} placeholder="Что нарушено, какие реквизиты отсутствуют, какие ошибки обнаружены"/></label>
+       <label><span>Официальный ответ ЦИК</span><textarea rows={3} value={reviewResponses[m.id]||''} onChange={e=>setReviewResponses(v=>({...v,[m.id]:e.target.value}))} placeholder="Что необходимо исправить / разъяснение решения ЦИК"/></label>
+       <div className="cecPenaltyGrid">
+        <label><span>Штраф, баллов</span><input type="number" min="0" max="100" step="0.5" value={reviewPenalties[m.id]||''} onChange={e=>setReviewPenalties(v=>({...v,[m.id]:e.target.value}))} placeholder="0"/></label>
+        <label><span>Основание штрафа</span><input value={reviewPenaltyReasons[m.id]||''} onChange={e=>setReviewPenaltyReasons(v=>({...v,[m.id]:e.target.value}))} placeholder="Причина и основание"/></label>
+       </div>
+       <label><span>Служебный комментарий ЦИК</span><textarea rows={2} value={reviewNotes[m.id]||''} onChange={e=>setReviewNotes(v=>({...v,[m.id]:e.target.value}))} placeholder="Дополнительный комментарий"/></label>
+       <div className="cecDecisionActions"><button className="secondary dangerAction" disabled={busy} onClick={()=>void reviewMaterial(m.id,false)}><X size={16}/>Отклонить</button><button className="primary" disabled={busy} onClick={()=>void reviewMaterial(m.id,true)}><Check size={16}/>Одобрить и опубликовать</button></div>
+      </div>}
+     </article>})}{!materials.length&&<div className="stage7Empty">Агитационные материалы ещё не поданы.</div>}</div>
    </section>
   </div>}
 
@@ -251,24 +292,16 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
      <div className="stage7PanelHead"><div><small>КАЛЬКУЛЯТОР ЦИК · ТОЛЬКО ПРЕПОДАВАТЕЛЬ</small><h3>Расчёт результата по утверждённой системе</h3><p>Система выборов берётся из решения Государственной Думы на 6-м этапе. Студенты калькулятор не видят.</p></div><BarChart3 size={24}/></div>
      <div className="electionSystemStrip"><span>Система</span><b>{settings?SYSTEM_NAMES[settings.system_type]:'Не определена'}</b>{settings?.system_type==='qualified'&&<em>Порог {settings.threshold_pct}%</em>}<em>{settings?.poll_enabled===false?'Соцопрос исключён':'Соцопрос учитывается'}</em></div>
      {teacher?<div className="calculatorForm">
-      <section className="calculatorFormula">
-       <div><small>ФОРМУЛА 1 ТУРА</small><strong>{settings?'Среднее арифметическое компонентов':'Ожидает решения Государственной Думы'}</strong><p>{settings?'«Программа» и «Агитация» — средняя оценка среди преподавателей, которые фактически проголосовали (до 8 человек). Пустые слоты в знаменатель не входят. Штрафы ЦИК и партийный модификатор применяются автоматически.':'Форма показана заранее, но ввод и расчёт заблокированы до синхронизации системы выборов с 6-го этапа.'}</p></div>
-       <div className="formulaWeights"><span><b>{formulaWeight}%</b>Программа</span><span><b>{formulaWeight}%</b>Агитация</span><span><b>{formulaWeight}%</b>Рейтинг игры</span>{settings?.poll_enabled!==false&&<span><b>{formulaWeight}%</b>Соцопрос</span>}</div>
-      </section>
-      <div className="calculatorColumns" aria-hidden="true"><span>Кандидат</span><span>Программа</span><span>Агитация</span><span>Рейтинг</span>{settings?.poll_enabled!==false&&<span>Соцопрос</span>}<span>Итог</span><span>Действие</span></div>
-      {registered.length?<div className="scoreTable">{registered.map(c=>{const d1=draft(c.id,1),d2=draft(c.id,2),s1=roundScore(c.id,1),s2=roundScore(c.id,2),runoff=runoffIds.includes(c.id);return <article key={c.id} className="scoreCandidate scoreCandidateForm">
-       <div className="scoreCandidateIdentity">{photoUrls[c.id]?<img src={photoUrls[c.id]} alt={c.display_name}/>:<span>{c.display_name.slice(0,1)}</span>}<div><b>{c.display_name}</b><small>{parties.find(p=>p.id===c.party_id)?.name||'Самовыдвижение'}</small></div></div>
-       <div className="juryCriterion"><div className="juryCriterionHead"><small>Программа</small><strong>{juryAverage(c.id,'program')!=null?juryAverage(c.id,'program')!.toFixed(2)+'%':'—'}</strong><em>{juryCount(c.id,'program')}/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'p-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" min="0" max="100" placeholder="—" disabled={!settings||busy} defaultValue={juryScore(c.id,slot,'program')??''} onBlur={e=>void saveJuryScore(c.id,slot,'program',e.target.value)}/></label>)}</div></div>
-       <div className="juryCriterion"><div className="juryCriterionHead"><small>Агитация</small><strong>{juryAverage(c.id,'campaign')!=null?juryAverage(c.id,'campaign')!.toFixed(2)+'%':'—'}</strong><em>{juryCount(c.id,'campaign')}/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'c-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" min="0" max="100" placeholder="—" disabled={!settings||busy} defaultValue={juryScore(c.id,slot,'campaign')??''} onBlur={e=>void saveJuryScore(c.id,slot,'campaign',e.target.value)}/></label>)}</div></div>
-       <label><small>Рейтинг</small><input type="number" min="0" max="100" placeholder="0–100" disabled={!settings||busy} value={d1.rating} onChange={e=>setDraft(c.id,1,'rating',e.target.value)}/></label>
-       {settings?.poll_enabled!==false&&<label><small>Соцопрос</small><input type="number" min="0" max="100" placeholder="0–100" disabled={!settings||busy} value={d1.poll} onChange={e=>setDraft(c.id,1,'poll',e.target.value)}/></label>}
-       <div className="scoreComputed"><small>Итог</small><strong>{s1?.computed_pct!=null?Number(s1.computed_pct).toFixed(2)+'%':'—'}</strong></div>
-       <button className="secondary scoreCalculateButton" disabled={busy||!settings||!round1DraftComplete(c.id)} onClick={()=>void saveScore(c.id,1)}>Рассчитать</button>
+      <section className="calculatorFormula"><div><small>ФОРМУЛА 1 ТУРА</small><strong>{settings?'Среднее арифметическое компонентов':'Ожидает решения Государственной Думы'}</strong><p>{settings?'«Программа» и «Агитация» — средняя оценка среди преподавателей, которые фактически проголосовали (до 8 человек). Пустые слоты в знаменатель не входят. Штрафы ЦИК и партийный модификатор применяются автоматически.':'Форма показана заранее, но ввод и расчёт заблокированы до синхронизации системы выборов с 6-го этапа.'}</p></div><div className="formulaWeights"><span><b>{formulaWeight}%</b>Программа</span><span><b>{formulaWeight}%</b>Агитация</span><span><b>{formulaWeight}%</b>Рейтинг игры</span>{settings?.poll_enabled!==false&&<span><b>{formulaWeight}%</b>Соцопрос</span>}</div></section>
+      {registered.length?<div className="scoreTable">{registered.map(c=>{const d1=draft(c.id,1),d2=draft(c.id,2),s1=roundScore(c.id,1),s2=roundScore(c.id,2),runoff=runoffIds.includes(c.id);return <article key={c.id} className="scoreCandidate scoreCandidateCard">
+       <header className="scoreCandidateHeader"><div className="scoreCandidateIdentity">{photoUrls[c.id]?<img src={photoUrls[c.id]} alt={c.display_name}/>:<span>{c.display_name.slice(0,1)}</span>}<div><b>{c.display_name}</b><small>{parties.find(p=>p.id===c.party_id)?.name||'Самовыдвижение'}</small></div></div><div className="candidatePenaltyBadge"><small>ШТРАФ ЦИК</small><strong>−{Number(c.rating_penalty||0).toFixed(2)} п.</strong></div></header>
+       <div className="juryCriteriaRow">
+        <div className="juryCriterion"><div className="juryCriterionHead"><small>Программа</small><strong>{juryAverage(c.id,'program')!=null?juryAverage(c.id,'program')!.toFixed(2)+'%':'—'}</strong><em>{juryCount(c.id,'program')}/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'p-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" min="0" max="100" placeholder="—" disabled={!settings||busy} defaultValue={juryScore(c.id,slot,'program')??''} onBlur={e=>void saveJuryScore(c.id,slot,'program',e.target.value)}/></label>)}</div></div>
+        <div className="juryCriterion"><div className="juryCriterionHead"><small>Агитация</small><strong>{juryAverage(c.id,'campaign')!=null?juryAverage(c.id,'campaign')!.toFixed(2)+'%':'—'}</strong><em>{juryCount(c.id,'campaign')}/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'c-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" min="0" max="100" placeholder="—" disabled={!settings||busy} defaultValue={juryScore(c.id,slot,'campaign')??''} onBlur={e=>void saveJuryScore(c.id,slot,'campaign',e.target.value)}/></label>)}</div></div>
+       </div>
+       <div className="scoreMetricsRow"><label><small>Рейтинг игры</small><input type="number" min="0" max="100" placeholder="0–100" disabled={!settings||busy} value={d1.rating} onChange={e=>setDraft(c.id,1,'rating',e.target.value)}/></label>{settings?.poll_enabled!==false&&<label><small>Соцопрос</small><input type="number" min="0" max="100" placeholder="0–100" disabled={!settings||busy} value={d1.poll} onChange={e=>setDraft(c.id,1,'poll',e.target.value)}/></label>}<div className="scoreComputed"><small>Итог</small><strong>{s1?.computed_pct!=null?Number(s1.computed_pct).toFixed(2)+'%':'—'}</strong></div><button className="secondary scoreCalculateButton" disabled={busy||!settings||!round1DraftComplete(c.id)} onClick={()=>void saveScore(c.id,1)}>Рассчитать</button></div>
        {settings?.status==='runoff'&&runoff&&<div className="runoffInput"><label>Повторное голосование ППС<input type="number" min="0" max="100" placeholder="0–100" disabled={busy} value={d2.runoff} onChange={e=>setDraft(c.id,2,'runoff',e.target.value)}/></label><div className="scoreComputed"><small>Итог 2 тура</small><strong>{s2?.computed_pct!=null?Number(s2.computed_pct).toFixed(2)+'%':'—'}</strong></div><button className="secondary" disabled={busy||d2.runoff.trim()===''} onClick={()=>void saveScore(c.id,2)}>Рассчитать 2 тур</button></div>}
-      </article>})}</div>:<div className="calculatorEmptyForm">
-       <div className="calculatorEmptyCandidate"><span>—</span><div><b>Нет зарегистрированных кандидатов</b><small>После регистрации в ЦИК кандидаты автоматически появятся в этой форме.</small></div></div>
-       <div className="juryCriterion juryCriterionEmpty"><div className="juryCriterionHead"><small>Программа</small><strong>—</strong><em>0/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'empty-p-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" disabled placeholder="—"/></label>)}</div></div><div className="juryCriterion juryCriterionEmpty"><div className="juryCriterionHead"><small>Агитация</small><strong>—</strong><em>0/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'empty-c-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" disabled placeholder="—"/></label>)}</div></div><input disabled placeholder="0–100"/>{settings?.poll_enabled!==false&&<input disabled placeholder="0–100"/>}<strong>—</strong><button className="secondary" disabled>Рассчитать</button>
-      </div>}
+      </article>})}</div>:<div className="calculatorEmptyForm calculatorEmptyCard"><div className="calculatorEmptyCandidate"><span>—</span><div><b>Нет зарегистрированных кандидатов</b><small>После регистрации в ЦИК кандидаты автоматически появятся в этой форме.</small></div></div><div className="juryCriteriaRow"><div className="juryCriterion juryCriterionEmpty"><div className="juryCriterionHead"><small>Программа</small><strong>—</strong><em>0/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'empty-p-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" disabled placeholder="—"/></label>)}</div></div><div className="juryCriterion juryCriterionEmpty"><div className="juryCriterionHead"><small>Агитация</small><strong>—</strong><em>0/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'empty-c-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" disabled placeholder="—"/></label>)}</div></div></div><div className="scoreMetricsRow"><label><small>Рейтинг игры</small><input disabled placeholder="0–100"/></label>{settings?.poll_enabled!==false&&<label><small>Соцопрос</small><input disabled placeholder="0–100"/></label>}<div className="scoreComputed"><small>Итог</small><strong>—</strong></div><button className="secondary" disabled>Рассчитать</button></div></div>}
      </div>:<div className="teacherOnlyNotice">Калькулятор скрыт. Итоги появятся после расчёта преподавателем.</div>}
      {teacher&&<div className="calculatorFooter"><span>{!settings?'Сначала утвердите систему выборов на 6-м этапе.':!registered.length?'Нет зарегистрированных кандидатов.':settings?.status==='runoff'&&!round2Ready?'Рассчитайте второй тур для обоих кандидатов.':settings?.status!=='runoff'&&!round1Ready?'Рассчитайте 1 тур для всех кандидатов.':'Расчёт готов к фиксации.'}</span>{settings?.status==='runoff'?<button className="primary" disabled={busy||!round2Ready} onClick={()=>void finishRound(2)}>Зафиксировать итоги 2 тура</button>:settings?.status!=='finished'&&<button className="primary" disabled={busy||!round1Ready} onClick={()=>void finishRound(1)}>Зафиксировать итоги 1 тура</button>}</div>}
     </section>
