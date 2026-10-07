@@ -44,7 +44,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   return()=>{live=false;void supabase.removeChannel(channel)};
  },[g.game?.id]);
  function voteNeedsRegistration(v:Vote){
-  return !!v.electorate_snapshot?.attendance_required||['registered_session','presidential_system','sf_resolution'].includes(v.procedure_key||'');
+  return !!v.electorate_snapshot?.attendance_required||['registered_session','presidential_system','sf_resolution','government_nomination'].includes(v.procedure_key||'');
  }
  function isRegisteredForVote(v:Vote){
   return !voteNeedsRegistration(v)||
