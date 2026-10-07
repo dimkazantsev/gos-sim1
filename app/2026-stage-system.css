@@ -637,21 +637,66 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
 }
 .presSystemProposalActions button{min-width:180px}
 
-.electionSettingsReadOnly{
- display:grid!important;
- grid-template-columns:minmax(0,1fr) minmax(220px,.45fr)!important;
- gap:12px!important;
-}
-.electionSystemSource{
+.electionSystemStatusCard{
  display:grid;
- gap:3px;
- align-content:center;
- padding:10px 12px;
- border-left:1px solid #e1e8f0;
+ grid-template-columns:minmax(0,1fr) auto;
+ align-items:stretch;
+ gap:0;
+ overflow:hidden;
+ border:1px solid #d9e4ef;
+ border-radius:18px;
+ background:linear-gradient(135deg,#ffffff 0%,#f8fbff 100%);
+ box-shadow:0 7px 24px rgba(30,69,111,.055);
 }
-.electionSystemSource small{color:#8091a6;font-size:12px;font-weight:900}
-.electionSystemSource b{color:#355675;font-size:13px}
-.electionSystemSource span{color:#7b8ca0;font-size:12px}
+.electionSystemStatusMain{
+ display:grid;
+ align-content:center;
+ gap:4px;
+ min-height:112px;
+ padding:17px 20px;
+}
+.electionSystemStatusBadge{
+ width:max-content;
+ max-width:100%;
+ padding:5px 9px;
+ border-radius:999px;
+ background:#eaf7f0;
+ color:#247052;
+ font-size:12px;
+ font-weight:900;
+}
+.electionSystemStatusMain>small,
+.electionSystemStatusMeta small{
+ color:#8293a8;
+ font-size:12px;
+ font-weight:900;
+ letter-spacing:.06em;
+}
+.electionSystemStatusMain>strong{
+ color:#163c63;
+ font-size:20px;
+ line-height:1.2;
+ letter-spacing:-.015em;
+}
+.electionSystemStatusMain>p{
+ margin:2px 0 0;
+ color:#71839a;
+ font-size:13px;
+ line-height:1.45;
+}
+.electionSystemStatusMeta{
+ display:grid;
+ grid-template-columns:1fr;
+ align-content:center;
+ gap:11px;
+ min-width:285px;
+ padding:16px 20px;
+ border-left:1px solid #e1e8f0;
+ background:rgba(247,250,254,.72);
+}
+.electionSystemStatusMeta>div{display:grid;gap:2px}
+.electionSystemStatusMeta b{color:#315674;font-size:13px}
+.electionSystemStatusMeta span{color:#6f8298;font-size:13px}
 
 @media(max-width:820px){
  .presSystemDecision>header{grid-template-columns:1fr}
@@ -662,10 +707,13 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
  .presSystemProposalActions{justify-items:start;min-width:0}
  .presSystemProposalActions button{min-width:0;width:100%}
  .presSystemRoute{grid-template-columns:repeat(2,minmax(0,1fr))}
- .electionSettingsReadOnly{grid-template-columns:1fr!important}
- .electionSystemSource{border-left:0;border-top:1px solid #e1e8f0}
+ .electionSystemStatusCard{grid-template-columns:1fr}
+ .electionSystemStatusMeta{min-width:0;border-left:0;border-top:1px solid #e1e8f0}
 }
 @media(max-width:520px){
+ .electionSystemStatusMain{min-height:0;padding:14px 15px}
+ .electionSystemStatusMain>strong{font-size:18px}
+ .electionSystemStatusMeta{padding:13px 15px}
  .presSystemProposal{grid-template-columns:1fr}
  .presSystemProposal .wide,.presSystemProposal>button{grid-column:auto}
  .presSystemRoute{grid-template-columns:1fr}
