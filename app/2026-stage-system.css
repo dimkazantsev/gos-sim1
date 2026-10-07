@@ -522,7 +522,12 @@
  border:1px solid #dbe5f1;
  border-radius:12px;
  background:#fff;
+ text-align:left;
 }
+button.presSystemAdopted{width:100%;font:inherit;color:inherit}
+button.presSystemAdopted.isReady{cursor:pointer;border-color:#bdd9ca;background:#fbfefc}
+button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)}
+.presSystemAdopted>em{margin-top:5px;color:#267557;font-size:12px;font-style:normal;font-weight:900}
 .presSystemAdopted>strong{color:#24486d;font-size:15px}
 .presSystemAdopted>span{color:#315efb;font-size:12px;font-weight:900}
 
@@ -671,3 +676,5 @@
 .cecDocumentFileLine .iconAction{margin-left:auto;flex:none}
 .presSystemAppointmentOnly{padding:0!important}
 @media(max-width:640px){.candidateHeaderActions{align-items:flex-end;flex-direction:column}.cecDocumentFileLine .iconAction{margin-left:0}}
+
+.stageRegistrationAnchor{scroll-margin-top:92px}.stageRegistrationAnchor>details[open]{box-shadow:0 0 0 2px rgba(49,94,251,.1)}#stage6-cec{scroll-margin-top:92px}
