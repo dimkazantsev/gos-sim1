@@ -51,6 +51,6 @@
 .jurySlotGrid label{position:relative;display:block}
 .jurySlotGrid label>span{position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:900;color:#93a2b4;pointer-events:none}
 .jurySlotGrid input{min-height:34px!important;padding:6px 5px 6px 20px!important;text-align:center;font-size:12px}
-.juryCriterionEmpty{min-height:72px;place-items:center;color:#8b9aac}
+.juryCriterionEmpty{min-height:108px;color:#8b9aac;background:#f8fafc}.juryCriterionEmpty .jurySlotGrid input{background:#f0f3f7!important;border-style:dashed}.juryCriterionEmpty .juryCriterionHead{width:100%}
 @media(max-width:1100px){.jurySlotGrid{grid-template-columns:repeat(8,minmax(40px,1fr))}}
 @media(max-width:760px){.jurySlotGrid{grid-template-columns:repeat(4,minmax(42px,1fr))}}
