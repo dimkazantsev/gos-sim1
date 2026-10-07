@@ -28,26 +28,43 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  const pendingNpas=formalDocuments.filter(d=>votePresetForDocument(d)&&!votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open'));
  const focused=useRef('');
  useEffect(()=>{if(focusId)setTab('all')},[focusId]);
- useEffect(()=>{if(!focusId||focused.current===focusId)return;const node=document.getElementById('vote-'+focusId);if(node){focused.current=focusId;node.scrollIntoView({block:'start',behavior:'smooth'});node.focus({preventScroll:true})}},[focusId,tab,votes]);
  const [checkedIn,setCheckedIn]=useState<{user_id:string;institution_key:string;stage_no:number}[]>([]);
+ const [checkinLoaded,setCheckinLoaded]=useState(false);
  useEffect(()=>{
   if(!g.game)return;
   let live=true;
   async function reload(){
    const game=g.game;if(!game)return;
    const r=await supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no').eq('game_id',game.id);
-   if(live&&!r.error)setCheckedIn(r.data||[]);
+   if(live&&!r.error){setCheckedIn(r.data||[]);setCheckinLoaded(true)}
   }
   void reload();
   const channel=supabase.channel('vote-checkin:'+g.game.id)
    .on('postgres_changes',{schema:'public',table:'institution_session_registrations',event:'*',filter:'game_id=eq.'+g.game.id},()=>void reload()).subscribe();
   return()=>{live=false;void supabase.removeChannel(channel)};
  },[g.game?.id]);
+ function voteNeedsRegistration(v:Vote){
+  return !!v.electorate_snapshot?.attendance_required||['registered_session','presidential_system','sf_resolution'].includes(v.procedure_key||'');
+ }
  function isRegisteredForVote(v:Vote){
-  return (!v.electorate_snapshot?.attendance_required&&v.procedure_key!=='registered_session')||
+  return !voteNeedsRegistration(v)||
    checkedIn.some(row=>row.user_id===me?.user_id&&row.institution_key===v.institution_key&&row.stage_no===v.stage_no);
  }
  function canCast(v:Vote){return canVote(v)&&isRegisteredForVote(v)}
+ const focusedVote=focusId?votes.find(v=>v.id===focusId):undefined;
+ const focusedNeedsRegistration=!!focusedVote&&voteNeedsRegistration(focusedVote)&&!isRegisteredForVote(focusedVote);
+ useEffect(()=>{
+  if(!focusId||!checkinLoaded)return;
+  if(focusedNeedsRegistration){
+   const registration=document.getElementById('vote-registration');
+   registration?.querySelector('details')?.setAttribute('open','');
+   registration?.scrollIntoView({block:'start',behavior:'smooth'});
+   return;
+  }
+  if(focused.current===focusId)return;
+  const node=document.getElementById('vote-'+focusId);
+  if(node){focused.current=focusId;node.scrollIntoView({block:'start',behavior:'smooth'});node.focus({preventScroll:true})}
+ },[focusId,tab,votes,checkedIn,checkinLoaded,focusedNeedsRegistration]);
 
 
  const visible=useMemo(()=>votes.filter(v=>(tab==='all'||v.status===tab)&&(!query.trim()||[v.title,institutionLabel(v.institution_key),v.group_name,v.electorate_snapshot?.institution_label].join(' ').toLowerCase().includes(query.trim().toLowerCase()))),[votes,tab,query]);
@@ -86,7 +103,17 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    <article><small>ОТКЛОНЕНО</small><strong>{votes.filter(v=>v.result_code==='rejected').length}</strong><span>решений</span></article>
    <article><small>БЕЗ КВОРУМА</small><strong>{votes.filter(v=>v.result_code==='no_quorum').length}</strong><span>заседаний</span></article>
   </section>
-  <InstitutionRegistrationPanel g={g} onUnitsChange={setUnits}/>
+  <div id="vote-registration" className={focusedNeedsRegistration?'voteRegistrationFocus isRequired':'voteRegistrationFocus'}>
+   <InstitutionRegistrationPanel
+    g={g}
+    onUnitsChange={setUnits}
+    stageNo={focusedVote?.stage_no}
+    initialBody={focusedVote&&!['all','factions'].includes(focusedVote.institution_key)?focusedVote.institution_key:undefined}
+    allowedBodies={focusedVote&&!['all','factions'].includes(focusedVote.institution_key)?[focusedVote.institution_key]:undefined}
+    defaultOpen={!!focusedVote&&voteNeedsRegistration(focusedVote)}
+   />
+   {focusedNeedsRegistration&&<p className="voteRegistrationHint">Сначала зарегистрируйтесь на заседание. После регистрации система автоматически переведёт вас к связанному голосованию.</p>}
+  </div>
   <section className="npaVoteQueue"><header><h2>НПА, ожидающие голосования</h2><span>{pendingNpas.length}</span></header><p>Документы появляются здесь автоматически при переходе на стадию голосования. Правила процедуры берутся из документа.</p>{pendingNpas.map(d=>{const preset=votePresetForDocument(d)!;return <article key={d.id}><div><small>{d.registry_no} · {d.status_label}</small><b>{d.title}</b><span>{institutionLabel(preset.institutionKey)}</span></div><button className="secondary" onClick={()=>onOpenDocument(d.id)}>Открыть НПА</button><button className="primary" disabled={busy===d.id} onClick={()=>void openNpa(d.id)}>{busy===d.id?'Открывается…':'Открыть голосование'}</button></article>})}{!pendingNpas.length&&<span>Сейчас нет документов на стадии голосования.</span>}</section>
   {teacher&&<details className="teacherDetails voteManual projectDisclosure">
    <DisclosureSummary icon={VoteIcon} title="Открыть отдельное голосование" description="Самостоятельный вопрос или документ из реестра НПА"/>
