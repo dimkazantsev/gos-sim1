@@ -15,6 +15,7 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  const [threshold,setThreshold]=useState(60);
  const [rationale,setRationale]=useState('');
  const [resolutionBody,setResolutionBody]=useState('');
+ const [electionDate,setElectionDate]=useState('');
  const [registrations,setRegistrations]=useState<Array<{user_id:string;institution_key:string;stage_no:number}>>([]);
  const [busy,setBusy]=useState(false);
  const role=(me?.role_title||'').toLowerCase();
@@ -33,6 +34,7 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
   if(!reg.error)setRegistrations(reg.data||[]);
  }
  useEffect(()=>{void load()},[game?.id,stageNo]);
+ useEffect(()=>{if(stageNo===7)setElectionDate(storedElectionDate)},[stageNo,storedElectionDate]);
  useEffect(()=>{
   if(!game)return;
   const ch=supabase.channel('presidential-system:'+game.id+':'+stageNo)
@@ -47,6 +49,7 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  const adopted=rows.find(x=>x.status==='adopted');
  const visible=rows.filter(x=>x.status!=='superseded');
  const sfResolution=formalDocuments.find(d=>d.stage_no===7&&d.doc_type==='sf_resolution'&&d.metadata?.purpose==='presidential_election_appointment');
+ const storedElectionDate=typeof sfResolution?.metadata?.election_date==='string'?String(sfResolution.metadata.election_date):'';
  const proposer=(id:string)=>members.find(m=>m.user_id===id)?.full_name||'Фракция';
  const vote=(id:string|null)=>id?votes.find(v=>v.id===id):undefined;
  const publicChannel=g.channels.find(channel=>channel.kind==='public'&&channel.name!=='Вне игры'&&['Публичная политика','Общая беседа','Общий штаб','Общий чат'].includes(channel.name))||g.channels.find(channel=>channel.kind==='public'&&channel.name!=='Вне игры');
@@ -88,9 +91,16 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
   }
   setBusy(false);
  }
- async function createResolution(){
-  setBusy(true);const r=await supabase.rpc('create_presidential_election_appointment_resolution',{p_game_id:activeGame.id,p_body:resolutionBody.trim()||null});
-  if(r.error)setError(r.error.message);else setResolutionBody('');setBusy(false);
+ async function saveElectionDate(){
+  if(!teacher||!electionDate)return;
+  setBusy(true);
+  const r=await supabase.rpc('set_presidential_election_date',{p_game_id:activeGame.id,p_election_date:electionDate});
+  if(r.error)setError(r.error.message);
+  else{
+   await g.refresh();
+   await load();
+  }
+  setBusy(false);
  }
 
  if(stageNo===7)return <section className="presSystemDecision presSystemAppointmentOnly">{procedureHub}<section className="sfAppointment"><div><small>СОВЕТ ФЕДЕРАЦИИ · ЭТАП 7</small><h4>Постановление о назначении выборов Президента РФ</h4><p>{sfResolution?<>Создано: <b>{sfResolution.registry_no}</b> · {sfResolution.status_label}</>:<>Формальный акт ещё не создан.</>}</p></div>{canCreateSf&&!sfResolution&&<div className="sfAppointmentCreate"><textarea rows={2} value={resolutionBody} onChange={e=>setResolutionBody(e.target.value)} placeholder="Необязательно: уточните игровой срок проведения выборов"/><button className="primary" disabled={busy} onClick={()=>void createResolution()}>Создать постановление СФ</button></div>}</section></section>;
