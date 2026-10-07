@@ -143,7 +143,7 @@ export default function GovernmentStage8Workspace({
 
  const dumaRows=rows.filter(x=>x.route==='president_to_duma'||x.route==='pm_to_duma');
  const openDumaVotes=dumaRows.map(n=>n.vote_id?votes.find(v=>v.id===n.vote_id):undefined).filter(v=>v?.status==='open');
- const activeVoteId=openDumaVotes[0]?.id||dumaRows.find(x=>x.vote_id)?.vote_id||undefined;
+ const activeVoteId=openDumaVotes[0]?.id||undefined;
  const publicChannel=g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры'&&['Публичная политика','Общая беседа','Общий штаб','Общий чат'].includes(c.name))
   ||g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры');
 
@@ -192,6 +192,13 @@ export default function GovernmentStage8Workspace({
   setBusy(null);
  }
 
+ async function appointAfterThree(id:string){
+  setBusy('force-appoint:'+id);
+  const r=await supabase.rpc('appoint_government_nominee_after_three_rejections',{p_nomination_id:id});
+  if(r.error)setError(r.error.message);else{await g.refresh();await load()}
+  setBusy(null);
+ }
+
  async function consult(id:string){
   setBusy('consult:'+id);
   const r=await supabase.rpc('record_sf_consultation',{p_nomination_id:id,p_note:(consultNotes[id]||'').trim()||null});
@@ -231,9 +238,21 @@ export default function GovernmentStage8Workspace({
  const stepState=(n:number)=>n<phase?'done':n===phase?'current':'locked';
 
  function NomineeFields({slot,disabled=false}:{slot:string;disabled?:boolean}){
+  const value=manual[slot]||'';
+  const invalid=value.trim().length>0&&value.trim().length<3;
+  function choose(userId:string){
+   setSelected(v=>({...v,[slot]:userId}));
+   setManual(v=>({...v,[slot]:userId?memberName(userId):''}));
+  }
+  function typeName(name:string){
+   const selectedName=memberName(selected[slot]||'');
+   setManual(v=>({...v,[slot]:name}));
+   if(selected[slot]&&name!==selectedName)setSelected(v=>({...v,[slot]:''}));
+  }
   return <div className="gov8NomineeFields">
-   <label>Участник<select disabled={disabled} value={selected[slot]||''} onChange={e=>setSelected(v=>({...v,[slot]:e.target.value}))}><option value="">Выберите участника или введите Ф.И.О.</option>{students.map(m=><option key={m.user_id} value={m.user_id}>{m.full_name} · {m.role_title||'участник'}</option>)}</select></label>
-   <label>Ф.И.О. кандидатуры<input disabled={disabled} value={manual[slot]||''} onChange={e=>setManual(v=>({...v,[slot]:e.target.value}))} placeholder={memberName(selected[slot]||'')||'Ф.И.О. кандидата'}/></label>
+   <label>Участник игры<select disabled={disabled||students.length===0} value={selected[slot]||''} onChange={e=>choose(e.target.value)}><option value="">{students.length?'Выберите участника':'Нет активных участников — используйте Ф.И.О.'}</option>{students.map(m=><option key={m.user_id} value={m.user_id}>{m.full_name} · {m.role_title||'участник'}</option>)}</select></label>
+   <label>Ф.И.О. кандидатуры<input disabled={disabled} value={value} onChange={e=>typeName(e.target.value)} placeholder="Введите Ф.И.О. вручную"/></label>
+   {invalid&&<small className="gov8FieldError">Введите не менее 3 символов.</small>}
   </div>;
  }
 
@@ -250,6 +269,7 @@ export default function GovernmentStage8Workspace({
     {teacher&&n.status==='submitted'&&<button className="primary" disabled={!!busy} onClick={()=>void openVote(n.id)}>Открыть голосование</button>}
     {vote?.status==='open'&&<button className="secondary" onClick={()=>openVoting(vote.id)}>Регистрация и голосование</button>}
     {n.status==='approved'&&canPresident&&n.office_kind!=='central_bank_chair'&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(n.id)}>Назначить</button>}
+    {n.status==='rejected'&&rejects>=3&&latest(n.office_key)?.id===n.id&&canPresident&&n.office_kind!=='central_bank_chair'&&<button className="primary" disabled={!!busy} onClick={()=>void appointAfterThree(n.id)}>Назначить после 3 отклонений</button>}
     {vote?.status==='closed'&&n.status!=='approved'&&n.status!=='appointed'&&<span className="gov8ResultTag">{vote.result_label||STATUS[n.status]}</span>}
    </div>
   </article>;
@@ -312,7 +332,7 @@ export default function GovernmentStage8Workspace({
     <span className={'gov8StatusPill is-'+(structure?.status||'preview')}>{!pmAppointed?'Предпросмотр':structure?.status==='approved'?'Одобрено':structure?.status==='submitted'?'На рассмотрении':structure?.status==='revision'?'На доработке':'Черновик'}</span>
    </header>
 
-   {!pmAppointed&&<div className="gov8Gate"><span>02</span><div><b>Сначала назначьте Председателя Правительства</b><p>Форма уже показана полностью. После назначения станут активны редактирование структуры и последующие кадровые действия.</p></div></div>}
+   {!pmAppointed&&<div className="gov8PreviewNotice"><span>Предпросмотр</span><p>Все пять министерств и кадровые поля показаны ниже. Они активируются последовательно после назначения Председателя Правительства и утверждения структуры.</p></div>}
 
    {structure?.note&&<div className="gov8RevisionNote"><b>Замечание Президента</b><p>{structure.note}</p></div>}
     <div className="gov8MinistryGrid">
@@ -336,8 +356,9 @@ export default function GovernmentStage8Workspace({
         {nomination.status==='consultation_pending'&&teacher&&<div className="gov8Consult"><textarea rows={2} value={consultNotes[nomination.id]||''} onChange={e=>setConsultNotes(v=>({...v,[nomination.id]:e.target.value}))} placeholder="Итог консультации с Советом Федерации"/><button className="secondary" disabled={!!busy} onClick={()=>void consult(nomination.id)}>Зафиксировать консультацию</button></div>}
         {nomination.status==='consulted'&&canPresident&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(nomination.id)}>Назначить министром</button>}
         {nomination.status==='approved'&&canPresident&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(nomination.id)}>Назначить после решения ГД</button>}
+        {nomination.status==='rejected'&&rejections(slot)>=3&&canPresident&&p.route==='duma'&&<button className="primary" disabled={!!busy} onClick={()=>void appointAfterThree(nomination.id)}>Назначить после 3 отклонений</button>}
         {nomination.vote_id&&votes.find(v=>v.id===nomination.vote_id)?.status==='open'&&<button className="secondary" onClick={()=>openVoting(nomination.vote_id)}>Регистрация и голосование</button>}
-       </div>:canNominate?<div className={'gov8MinistryNomination '+(!structureApproved?'isPreview':'')}><NomineeFields slot={slot} disabled={!structureApproved}/><button className="secondary" disabled={!structureApproved||!!busy||candidateName(slot).length<3} onClick={()=>void submitNomination(slot,slot,officeTitle,officeKind)}>{nomination?.status==='rejected'?'Внести новую кандидатуру':'Внести кандидатуру'}</button>{!structureApproved&&<small className="gov8FormGate">{!pmAppointed?'Активируется после назначения Председателя Правительства и утверждения структуры':'Активируется после утверждения структуры Президентом'}</small>}</div>:<div className="gov8LockedHint">{p.route==='duma'?'Ожидается кандидатура Председателя Правительства':'Ожидается кандидатура Президента'}</div>}
+       </div>:<div className={'gov8MinistryNomination '+(!structureApproved||!canNominate?'isPreview':'')}><NomineeFields slot={slot} disabled={!structureApproved||!canNominate}/><button className="secondary" disabled={!structureApproved||!canNominate||rejections(slot)>=3||!!busy||candidateName(slot).length<3} onClick={()=>void submitNomination(slot,slot,officeTitle,officeKind)}>{nomination?.status==='rejected'?'Внести новую кандидатуру':'Внести кандидатуру'}</button><small className="gov8FormGate">{!structureApproved?(!pmAppointed?'Активируется после назначения Председателя Правительства и утверждения структуры':'Активируется после утверждения структуры Президентом'):!canNominate?(p.route==='duma'?'Кандидатуру вносит Председатель Правительства':'Кандидатуру вносит Президент'):rejections(slot)>=3?'После трёх отклонений используется специальное назначение по правилам этапа':'Можно внести кандидатуру'}</small></div>}
       </article>
      })}
     </div>
