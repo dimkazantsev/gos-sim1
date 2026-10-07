@@ -128,7 +128,8 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
 
  if(!game||!me)return null;
  const baseUrl=typeof window!=='undefined'?window.location.origin:'';
- const pollUrl=publicPoll?baseUrl+'/poll/'+publicPoll.slug:'';
+ const assetBase=(process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'').replace(/\/$/,'');
+ const pollUrl=publicPoll?baseUrl+assetBase+'/poll?slug='+encodeURIComponent(publicPoll.slug):'';
  const pollCanOpen=decision?.status==='closed'&&decision.result===true&&settings?.poll_enabled!==false;
  const roundScore=(id:string,round:1|2)=>scores.find(s=>s.candidate_id===id&&s.round_no===round);
  const draft=(id:string,round:1|2)=>scoreDrafts[id+'-'+round]||emptyScore();
