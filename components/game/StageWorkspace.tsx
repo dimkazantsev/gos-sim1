@@ -202,7 +202,7 @@ export default function StageWorkspace({
     {readOnly&&<p className="readOnlyNote">Режим просмотра участника: формы показаны для проверки интерфейса, но изменение данных заблокировано.</p>}
 
     <div className="stageWorkspaceCoreTools">
-     {registrationBodies&&<InstitutionRegistrationPanel g={g} readOnly={readOnly} stageNo={stage.stage_no} initialBody={registrationBodies[0]} allowedBodies={registrationBodies}/>}
+     {registrationBodies&&<div id={'stage-registration-'+stage.stage_no} className="stageRegistrationAnchor"><InstitutionRegistrationPanel g={g} readOnly={readOnly} stageNo={stage.stage_no} initialBody={registrationBodies[0]} allowedBodies={registrationBodies}/></div>}
      <DeadlineControl g={g} stageNo={stage.stage_no}/>
      {stage.stage_no!==6&&<StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>} 
     </div>
