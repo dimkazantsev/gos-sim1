@@ -1,6 +1,7 @@
 'use client';
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useState} from 'react';
+import {LockKeyhole} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
@@ -124,7 +125,38 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  },[game?.id]);
 
  if(!game||!me)return null;
- if(!systemReady)return null;
+ if(!systemReady)return <section id="stage6-cec" className="electionLab cecWorkspace cecWorkspaceLocked" aria-disabled="true">
+  <header className="electionLabHead cecHead">
+   <div>
+    <small>ЦИК РФ · ЭТАП 6 · СЛЕДУЮЩИЙ ШАГ</small>
+    <h2>Регистрация кандидатов в Президенты</h2>
+    <p>Рабочее место ЦИК уже сформировано, но станет активным только после того, как Государственная Дума утвердит тип избирательной системы.</p>
+   </div>
+   <div className="cecHeadSide cecHeadSideLocked">
+    <InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" className="cecEmblem" width={72} height={72}/>
+    <div><b>Центральная избирательная комиссия</b><span>Ожидает решения Государственной Думы</span></div>
+   </div>
+  </header>
+  <nav className="cecTabs cecTabsLocked" aria-label="Разделы ЦИК — временно недоступны">
+   <button disabled>Моё досье</button>
+   <button disabled>Подача в ЦИК <b>0</b></button>
+   <button disabled>Кандидаты <b>0</b></button>
+   <button disabled>Решения ЦИК <b>0</b></button>
+  </nav>
+  <section className="cecLockedPreview">
+   <div className="cecLockedIcon"><LockKeyhole size={26}/></div>
+   <div className="cecLockedCopy">
+    <small>ДОСТУП К ЦИК ЗАКРЫТ</small>
+    <h3>Сначала Государственная Дума определяет систему выборов</h3>
+    <p>После принятия связанного проекта поправки к ФЗ № 19-ФЗ этот блок разблокируется автоматически. Здесь появятся выдвижение кандидатов, досье, подача документов и решения ЦИК.</p>
+   </div>
+   <div className="cecLockedSequence" aria-label="Последовательность процедуры">
+    <span className="done">1 · Проект поправки</span>
+    <span className="current">2 · Решение ГД</span>
+    <span>3 · ЦИК</span>
+   </div>
+  </section>
+ </section>;
  const activeGame=game;
  const activeMe=me;
  const partyUsers=(partyId:string)=>{const p=parties.find(x=>x.id===partyId);return p?members.filter(m=>m.kind==='student'&&m.team===p.name):[]};
