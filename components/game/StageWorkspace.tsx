@@ -22,6 +22,7 @@ import DumaLeadershipElection from './DumaLeadershipElection';
 import GhostPolicyLab from './GhostPolicyLab';
 import ElectoralArchitectureLab from './ElectoralArchitectureLab';
 import GovernmentFormationLab from './GovernmentFormationLab';
+import GovernmentDumaSessionPanel from './GovernmentDumaSessionPanel';
 import GovernmentStructurePanel from './GovernmentStructurePanel';
 import InstitutionStaffingLab from './InstitutionStaffingLab';
 import StateProgramLab from './StateProgramLab';
@@ -36,7 +37,7 @@ import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 const STAGE_ICONS=[UsersRound,Route,Map,Landmark,UserRoundX,ClipboardCheck,Vote,Building2,Network,Target,ClipboardList,Scale,Wallet,MapPin,ShieldAlert,ChartNoAxesCombined] as const;
 
 const STAGE_REGISTRATION_BODIES:Partial<Record<number,string[]>>={
- 2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],6:['gd'],8:['gd','government'],
+ 2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],6:['gd'],
  9:['gd','committee','government'],11:['government'],12:['gd','committee'],
  13:['gd','committee','sf'],14:['municipality']
 };
@@ -201,10 +202,11 @@ export default function StageWorkspace({
     <legend className="srOnly">Рабочие действия этапа</legend>
     {readOnly&&<p className="readOnlyNote">Режим просмотра участника: формы показаны для проверки интерфейса, но изменение данных заблокировано.</p>}
 
+    {stage.stage_no===8&&<GovernmentDumaSessionPanel g={g} onOpenVotes={onOpenVotes}/>}
     <div className="stageWorkspaceCoreTools">
      {registrationBodies&&<div id={'stage-registration-'+stage.stage_no} className="stageRegistrationAnchor"><InstitutionRegistrationPanel g={g} readOnly={readOnly} stageNo={stage.stage_no} initialBody={registrationBodies[0]} allowedBodies={registrationBodies}/></div>}
      {stage.stage_no!==7&&<DeadlineControl g={g} stageNo={stage.stage_no}/>}
-     {stage.stage_no!==6&&stage.stage_no!==7&&<StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>} 
+     {stage.stage_no!==6&&stage.stage_no!==7&&stage.stage_no!==8&&<StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>} 
     </div>
 
     <div className="stageSpecializedModules" aria-label="Специализированные процедуры этапа">
@@ -215,7 +217,7 @@ export default function StageWorkspace({
      {stage.stage_no===6&&<PresidentialElectionLab g={g}/>}
      {stage.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} onNavigate={onNavigate} onOpenDocument={onOpenDocument} stageNo={7}/>}
      {stage.stage_no===7&&<PresidentialElectionStage7 g={g}/>}
-     {stage.stage_no===8&&<><GovernmentStructurePanel g={g}/><GovernmentFormationLab g={g}/></>}
+     {stage.stage_no===8&&<><GovernmentStructurePanel g={g}/><div id="stage8-government-nominations"><GovernmentFormationLab g={g}/></div></>}
      {stage.stage_no===9&&<InstitutionStaffingLab g={g}/>}
      {(stage.stage_no===10||stage.stage_no===11)&&<StateProgramLab g={g}/>}
      {stage.stage_no===11&&<GovernmentProgramSessionLab g={g} onOpenVotes={onOpenVotes}/>}
