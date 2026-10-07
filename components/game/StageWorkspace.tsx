@@ -189,7 +189,7 @@ export default function StageWorkspace({
 
   <section className="stageWorkspaceExecution">
    <div className="stageWorkspaceSectionHead stageWorkspaceExecutionHead">
-    <div><small>РАБОЧЕЕ МЕСТО</small><h2>Документы, формы и процедуры</h2><p>Заполняйте формы здесь или переходите в профильный раздел. Сохранённые НПА, голосования и результаты синхронизируются с этапом.</p></div>
+    <div><small>РАБОЧЕЕ МЕСТО</small><h2>{stage.stage_no===8?'Формирование Правительства':'Документы, формы и процедуры'}</h2><p>{stage.stage_no===8?'Единый контур этапа: повестка Государственной Думы, регистрация, кандидатуры, голосования, НПА, назначения и структура пяти министерств.':'Заполняйте формы здесь или переходите в профильный раздел. Сохранённые НПА, голосования и результаты синхронизируются с этапом.'}</p></div>
     <div className="stageWorkspaceExecutionTools">
      {publicChannel&&![6,7,8].includes(stage.stage_no)&&<button type="button" className="stageWorkspacePublicChat stageWorkspacePublicChatInner" onClick={openPublicChat}><MessageCircle size={16} aria-hidden="true"/><span>Обсудить в публичном чате</span></button>}
      <Layers3 size={25} aria-hidden="true"/>
@@ -200,7 +200,7 @@ export default function StageWorkspace({
     <legend className="srOnly">Рабочие действия этапа</legend>
     {readOnly&&<p className="readOnlyNote">Режим просмотра участника: формы показаны для проверки интерфейса, но изменение данных заблокировано.</p>}
 
-    {stage.stage_no===8&&<GovernmentStage8Workspace g={g} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage}/>} 
+    {stage.stage_no===8&&<GovernmentStage8Workspace g={g} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onOpenDocument={onOpenDocument} onNavigate={onNavigate}/>} 
     <div className="stageWorkspaceCoreTools">
      {registrationBodies&&<div id={'stage-registration-'+stage.stage_no} className="stageRegistrationAnchor"><InstitutionRegistrationPanel g={g} readOnly={readOnly} stageNo={stage.stage_no} initialBody={registrationBodies[0]} allowedBodies={registrationBodies}/></div>}
      {stage.stage_no!==7&&stage.stage_no!==8&&<DeadlineControl g={g} stageNo={stage.stage_no}/>} 
