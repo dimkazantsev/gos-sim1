@@ -8,7 +8,7 @@ import type {View} from './types';
 type Proposal={id:string;game_id:string;system_type:'relative'|'absolute'|'qualified'|'preferential';threshold_pct:number|null;rationale:string|null;status:'draft'|'registered'|'vote_open'|'adopted'|'rejected'|'superseded';vote_id:string|null;proposed_by:string;created_at:string;updated_at:string;registered_at:string|null;bill_document_id:string|null;session_id:string|null;agenda_item_id:string|null;resolution_document_id:string|null};
 const labels={relative:'Относительное большинство',absolute:'Абсолютное большинство',qualified:'Квалифицированное большинство',preferential:'Преференциальное большинство'} as const;
 
-export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigate,stageNo=6}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onNavigate?:(view:View)=>void;stageNo?:6|7}){
+export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigate,onOpenDocument,stageNo=6}:{g:ReturnTypeRepublic;onOpenVotes:()=>void;onNavigate?:(view:View)=>void;onOpenDocument?:(id:string)=>void;stageNo?:6|7}){
  const {game,me,teacher,parties,members,votes,formalDocuments,setError}=g;
  const [rows,setRows]=useState<Proposal[]>([]);
  const [system,setSystem]=useState<Proposal['system_type']>('absolute');
@@ -33,7 +33,7 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
   if(!r.error)setRows((r.data||[]) as Proposal[]);
   if(!reg.error)setRegistrations(reg.data||[]);
  }
- useEffect(()=>{void load()},[game?.id]);
+ useEffect(()=>{void load()},[game?.id,stageNo]);
  useEffect(()=>{
   if(!game)return;
   const ch=supabase.channel('presidential-system:'+game.id+':'+stageNo)
@@ -55,20 +55,30 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  const stageDocs=formalDocuments.filter(d=>d.stage_no===stageNo);
  const myRegistered=registrations.some(r=>r.user_id===me.user_id);
  const openStageVotes=stageVotes.filter(v=>v.status==='open');
- function openPublicChat(){if(!publicChannel)return;g.setChannelId(publicChannel.id);g.setChatOpen(true)}
+ const activeProposal=visible.find(x=>['vote_open','registered','adopted'].includes(x.status))||visible[0];
+ const linkedDocument=stageNo===7
+  ?sfResolution
+  :formalDocuments.find(d=>d.id===(activeProposal?.resolution_document_id||activeProposal?.bill_document_id))||stageDocs.find(d=>d.metadata?.purpose==='presidential_electoral_system')||stageDocs[0];
+ const canEnterDiscussion=teacher||myRegistered;
+ const canOpenVoteSystem=stageVotes.length>0||!!linkedDocument;
+ function openPublicChat(){if(!publicChannel||!canEnterDiscussion)return;g.setChannelId(publicChannel.id);g.setChatOpen(true)}
  function openRegistration(){
   const root=document.getElementById('stage-registration-'+stageNo);
   const details=root?.querySelector('details');
   if(details)details.setAttribute('open','');
   root?.scrollIntoView({behavior:'smooth',block:'center'});
  }
- const procedureHub=<section className="presProcedureHub" aria-label={stageNo===6?'Единый контур заседания Государственной Думы':'Единый контур заседания Совета Федерации'}>
-  <div className="presProcedureHubIntro"><small>ЕДИНЫЙ КОНТУР ЗАСЕДАНИЯ</small><b>{stageNo===6?'Государственная Дума':'Совет Федерации'} · этап {stageNo}</b><span>Обсуждение, присутствие, голосование и НПА связаны с одной процедурой. Регистрация влияет на допуск к голосованию, а голосование связано с документом из реестра НПА.</span></div>
+ function openRegistry(){
+  if(linkedDocument&&onOpenDocument){onOpenDocument(linkedDocument.id);return}
+  onNavigate?.('documents');
+ }
+ const procedureHub=<section className="presProcedureHub" aria-label={stageNo===6?'Маршрут заседания Государственной Думы':'Маршрут заседания Совета Федерации'}>
+  <header className="presProcedureHubHead"><div><small>МАРШРУТ ЗАСЕДАНИЯ</small><b>{stageNo===6?'Государственная Дума':'Совет Федерации'} · этап {stageNo}</b></div><span>Регистрация → обсуждение → НПА → голосование</span></header>
   <div className="presProcedureHubActions">
-   <button type="button" disabled={!publicChannel} onClick={openPublicChat}><MessageCircle size={18}/><span><small>01 · ОБСУЖДЕНИЕ</small><b>Публичный чат</b><em>{publicChannel?'Открыть обсуждение':'Нет публичного канала'}</em></span></button>
-   <button type="button" onClick={openRegistration}><ClipboardCheck size={18}/><span><small>02 · ПРИСУТСТВИЕ</small><b>Регистрация на заседание</b><em>{myRegistered?'Вы зарегистрированы':'Зарегистрировано: '+registrations.length}</em></span></button>
-   <button type="button" onClick={onOpenVotes}><Vote size={18}/><span><small>03 · РЕШЕНИЕ</small><b>Голосование</b><em>{openStageVotes.length?'Открыто: '+openStageVotes.length:stageVotes.length?'Завершено: '+stageVotes.length:'Ожидает открытия'}</em></span></button>
-   <button type="button" onClick={()=>onNavigate?.('documents')} disabled={!onNavigate}><LibraryBig size={18}/><span><small>04 · ДОКУМЕНТ</small><b>Реестр НПА</b><em>{stageDocs.length?'Документов этапа: '+stageDocs.length:'Документ появится после регистрации проекта'}</em></span></button>
+   <button type="button" className={myRegistered?'isDone':'isCurrent'} onClick={openRegistration}><span className="presProcedureStepNo">01</span><ClipboardCheck size={18}/><span><small>ПРИСУТСТВИЕ</small><b>Регистрация на заседание</b><em>{myRegistered?'Вы зарегистрированы':'Зарегистрировано: '+registrations.length}</em></span></button>
+   <button type="button" className={canEnterDiscussion?'isReady':'isLocked'} disabled={!publicChannel||!canEnterDiscussion} onClick={openPublicChat}><span className="presProcedureStepNo">02</span><MessageCircle size={18}/><span><small>ОБСУЖДЕНИЕ</small><b>Публичный чат</b><em>{!publicChannel?'Нет публичного канала':canEnterDiscussion?'Открыть обсуждение':'Сначала зарегистрируйтесь'}</em></span></button>
+   <button type="button" className={linkedDocument?'isDone':'isWaiting'} onClick={openRegistry} disabled={!onNavigate&&!onOpenDocument}><span className="presProcedureStepNo">03</span><LibraryBig size={18}/><span><small>ДОКУМЕНТ</small><b>Реестр НПА</b><em>{linkedDocument?(linkedDocument.registry_no||'Документ создан')+' · '+linkedDocument.status_label:'Проект появится после регистрации'}</em></span></button>
+   <button type="button" className={openStageVotes.length?'isLive':stageVotes.length?'isDone':'isWaiting'} onClick={onOpenVotes} disabled={!canOpenVoteSystem}><span className="presProcedureStepNo">04</span><Vote size={18}/><span><small>РЕШЕНИЕ</small><b>Голосование</b><em>{openStageVotes.length?'Открыто: '+openStageVotes.length:stageVotes.length?'Завершено: '+stageVotes.length:linkedDocument?'Открыть голосование по НПА':'Сначала зарегистрируйте проект'}</em></span></button>
   </div>
  </section>;
 
