@@ -20,6 +20,8 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  const canPropose=teacher||!!ledParty;
  const sessionBody=stageNo===6?'gd':'sf';
+ const sfResolution=formalDocuments.find(d=>d.stage_no===7&&d.doc_type==='sf_resolution'&&d.metadata?.purpose==='presidential_election_appointment');
+ const storedElectionDate=typeof sfResolution?.metadata?.election_date==='string'?String(sfResolution.metadata.election_date):'';
 
  async function load(){
   if(!game)return;
@@ -45,8 +47,6 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  const activeGame=game;
  const adopted=rows.find(x=>x.status==='adopted');
  const visible=rows.filter(x=>x.status!=='superseded');
- const sfResolution=formalDocuments.find(d=>d.stage_no===7&&d.doc_type==='sf_resolution'&&d.metadata?.purpose==='presidential_election_appointment');
- const storedElectionDate=typeof sfResolution?.metadata?.election_date==='string'?String(sfResolution.metadata.election_date):'';
  const proposer=(id:string)=>members.find(m=>m.user_id===id)?.full_name||'Фракция';
  const vote=(id:string|null)=>id?votes.find(v=>v.id===id):undefined;
  const publicChannel=g.channels.find(channel=>channel.kind==='public'&&channel.name!=='Вне игры'&&['Публичная политика','Общая беседа','Общий штаб','Общий чат'].includes(channel.name))||g.channels.find(channel=>channel.kind==='public'&&channel.name!=='Вне игры');
