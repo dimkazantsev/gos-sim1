@@ -211,8 +211,10 @@ export default function StageWorkspace({
      {(stage.stage_no===2||stage.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={stage.stage_no as 2|3} onOpenVotes={onOpenVotes}/>}
      {stage.stage_no===4&&<DumaLeadershipElection g={g}/>}
      {stage.stage_no===5&&<GhostPolicyLab g={g} onOpenVotes={onOpenVotes}/>}
-     {stage.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes}/>}
-     {(stage.stage_no===6||stage.stage_no===7)&&<PresidentialElectionLab g={g}/>}
+     {stage.stage_no===6&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} stageNo={6}/>}
+     {stage.stage_no===6&&<PresidentialElectionLab g={g}/>}
+     {stage.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} stageNo={7}/>}
+     {stage.stage_no===7&&<PresidentialElectionStage7 g={g}/>}
      {stage.stage_no===8&&<><GovernmentStructurePanel g={g}/><GovernmentFormationLab g={g}/></>}
      {stage.stage_no===9&&<InstitutionStaffingLab g={g}/>}
      {(stage.stage_no===10||stage.stage_no===11)&&<StateProgramLab g={g}/>}
