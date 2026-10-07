@@ -21,9 +21,7 @@ import PresidentialSystemDecisionPanel from './PresidentialSystemDecisionPanel';
 import DumaLeadershipElection from './DumaLeadershipElection';
 import GhostPolicyLab from './GhostPolicyLab';
 import ElectoralArchitectureLab from './ElectoralArchitectureLab';
-import GovernmentFormationLab from './GovernmentFormationLab';
-import GovernmentDumaSessionPanel from './GovernmentDumaSessionPanel';
-import GovernmentStructurePanel from './GovernmentStructurePanel';
+import GovernmentStage8Workspace from './GovernmentStage8Workspace';
 import InstitutionStaffingLab from './InstitutionStaffingLab';
 import StateProgramLab from './StateProgramLab';
 import MunicipalProjectLab from './MunicipalProjectLab';
@@ -193,7 +191,7 @@ export default function StageWorkspace({
    <div className="stageWorkspaceSectionHead stageWorkspaceExecutionHead">
     <div><small>РАБОЧЕЕ МЕСТО</small><h2>Документы, формы и процедуры</h2><p>Заполняйте формы здесь или переходите в профильный раздел. Сохранённые НПА, голосования и результаты синхронизируются с этапом.</p></div>
     <div className="stageWorkspaceExecutionTools">
-     {publicChannel&&![6,7].includes(stage.stage_no)&&<button type="button" className="stageWorkspacePublicChat stageWorkspacePublicChatInner" onClick={openPublicChat}><MessageCircle size={16} aria-hidden="true"/><span>Обсудить в публичном чате</span></button>}
+     {publicChannel&&![6,7,8].includes(stage.stage_no)&&<button type="button" className="stageWorkspacePublicChat stageWorkspacePublicChatInner" onClick={openPublicChat}><MessageCircle size={16} aria-hidden="true"/><span>Обсудить в публичном чате</span></button>}
      <Layers3 size={25} aria-hidden="true"/>
     </div>
    </div>
@@ -202,10 +200,10 @@ export default function StageWorkspace({
     <legend className="srOnly">Рабочие действия этапа</legend>
     {readOnly&&<p className="readOnlyNote">Режим просмотра участника: формы показаны для проверки интерфейса, но изменение данных заблокировано.</p>}
 
-    {stage.stage_no===8&&<GovernmentDumaSessionPanel g={g} onOpenVotes={onOpenVotes}/>}
+    {stage.stage_no===8&&<GovernmentStage8Workspace g={g} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage}/>} 
     <div className="stageWorkspaceCoreTools">
      {registrationBodies&&<div id={'stage-registration-'+stage.stage_no} className="stageRegistrationAnchor"><InstitutionRegistrationPanel g={g} readOnly={readOnly} stageNo={stage.stage_no} initialBody={registrationBodies[0]} allowedBodies={registrationBodies}/></div>}
-     {stage.stage_no!==7&&<DeadlineControl g={g} stageNo={stage.stage_no}/>}
+     {stage.stage_no!==7&&stage.stage_no!==8&&<DeadlineControl g={g} stageNo={stage.stage_no}/>} 
      {stage.stage_no!==6&&stage.stage_no!==7&&stage.stage_no!==8&&<StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>} 
     </div>
 
@@ -217,7 +215,7 @@ export default function StageWorkspace({
      {stage.stage_no===6&&<PresidentialElectionLab g={g}/>}
      {stage.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} onNavigate={onNavigate} onOpenDocument={onOpenDocument} stageNo={7}/>}
      {stage.stage_no===7&&<PresidentialElectionStage7 g={g}/>}
-     {stage.stage_no===8&&<><GovernmentStructurePanel g={g}/><div id="stage8-government-nominations"><GovernmentFormationLab g={g}/></div></>}
+     
      {stage.stage_no===9&&<InstitutionStaffingLab g={g}/>}
      {(stage.stage_no===10||stage.stage_no===11)&&<StateProgramLab g={g}/>}
      {stage.stage_no===11&&<GovernmentProgramSessionLab g={g} onOpenVotes={onOpenVotes}/>}
