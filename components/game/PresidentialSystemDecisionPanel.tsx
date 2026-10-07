@@ -14,14 +14,11 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  const [system,setSystem]=useState<Proposal['system_type']>('absolute');
  const [threshold,setThreshold]=useState(60);
  const [rationale,setRationale]=useState('');
- const [resolutionBody,setResolutionBody]=useState('');
  const [electionDate,setElectionDate]=useState('');
  const [registrations,setRegistrations]=useState<Array<{user_id:string;institution_key:string;stage_no:number}>>([]);
  const [busy,setBusy]=useState(false);
- const role=(me?.role_title||'').toLowerCase();
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  const canPropose=teacher||!!ledParty;
- const canCreateSf=teacher||role.includes('совет федерац')||role.includes('сенатор');
  const sessionBody=stageNo===6?'gd':'sf';
 
  async function load(){
@@ -103,7 +100,23 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
   setBusy(false);
  }
 
- if(stageNo===7)return <section className="presSystemDecision presSystemAppointmentOnly">{procedureHub}<section className="sfAppointment"><div><small>СОВЕТ ФЕДЕРАЦИИ · ЭТАП 7</small><h4>Постановление о назначении выборов Президента РФ</h4><p>{sfResolution?<>Создано: <b>{sfResolution.registry_no}</b> · {sfResolution.status_label}</>:<>Формальный акт ещё не создан.</>}</p></div>{canCreateSf&&!sfResolution&&<div className="sfAppointmentCreate"><textarea rows={2} value={resolutionBody} onChange={e=>setResolutionBody(e.target.value)} placeholder="Необязательно: уточните игровой срок проведения выборов"/><button className="primary" disabled={busy} onClick={()=>void createResolution()}>Создать постановление СФ</button></div>}</section></section>;
+ if(stageNo===7)return <section className="presSystemDecision presSystemAppointmentOnly stage7TeacherAppointment">
+  <section className="sfAppointment sfAppointmentTeacher">
+   <div className="sfAppointmentIntro">
+    <small>ЭТАП 7 · НАЗНАЧЕНИЕ ВЫБОРОВ</small>
+    <h4>Дата выборов Президента Российской Федерации</h4>
+    <p>В игровой модели полномочие Совета Федерации выполняет преподаватель. Дополнительное заседание, регистрация и отдельное голосование СФ не требуются.</p>
+   </div>
+   {teacher?<div className="sfAppointmentDateTool">
+    <label>Дата выборов<input type="date" value={electionDate} onChange={e=>setElectionDate(e.target.value)}/></label>
+    <button className="primary" disabled={busy||!electionDate} onClick={()=>void saveElectionDate()}>{sfResolution?'Сохранить новую дату':'Назначить выборы'}</button>
+    {sfResolution&&<span>Постановление СФ оформлено автоматически: <b>{sfResolution.registry_no||'без номера'}</b> · {sfResolution.status_label}</span>}
+   </div>:<div className="sfAppointmentPublicDate">
+    <small>ДАТА ВЫБОРОВ</small>
+    <b>{storedElectionDate?new Date(storedElectionDate+'T00:00:00').toLocaleDateString('ru-RU'):'Преподаватель ещё не назначил дату'}</b>
+   </div>}
+  </section>
+ </section>;
 
  return <section className="presSystemDecision">
   <header><div><small>ГОСУДАРСТВЕННАЯ ДУМА ФС РФ · ЭТАП 6</small><h3>Поправка к ФЗ № 19-ФЗ о системе выборов Президента</h3><p>Фракция создаёт проект поправки. Система сразу добавляет законопроект в реестр НПА и создаёт связанное голосование ГД. Участники регистрируются на заседание, обсуждают проект и голосуют. Принятое решение автоматически синхронизирует модель выборов и открывает процедуру ЦИК ниже.</p></div><button type="button" className={'presSystemAdopted '+(adopted?'isReady':'')} disabled={!adopted} onClick={()=>document.getElementById('stage6-cec')?.scrollIntoView({behavior:'smooth',block:'start'})}><small>ДЕЙСТВУЕТ</small><strong>{adopted?labels[adopted.system_type]:'Решение не принято'}</strong>{adopted?.system_type==='qualified'&&<span>{adopted.threshold_pct}%</span>}{adopted&&<em>Перейти к ЦИК ↓</em>}</button></header>
