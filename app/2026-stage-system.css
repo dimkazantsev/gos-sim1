@@ -528,7 +528,7 @@
 
 .presProcedureHub{display:grid;grid-template-columns:minmax(240px,.7fr) minmax(0,1.6fr);gap:14px;padding:14px 18px;border-bottom:1px solid #e4eaf2;background:#fff}
 .presProcedureHubIntro{display:grid;align-content:start;gap:4px;padding:12px 14px;border:1px solid #dfe7f2;border-radius:13px;background:#f8faff}
-.presProcedureHubIntro small{font-size:10px;font-weight:900;letter-spacing:.08em;color:#315efb}
+.presProcedureHubIntro small{font-size:12px;font-weight:900;letter-spacing:.08em;color:#315efb}
 .presProcedureHubIntro b{font-size:14px;color:#244665}
 .presProcedureHubIntro span{font-size:12px;line-height:1.45;color:#71839a}
 .presProcedureHubActions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
@@ -537,9 +537,9 @@
 .presProcedureHubActions>button:disabled{opacity:.5;cursor:not-allowed}
 .presProcedureHubActions>button>svg{margin-top:2px;color:#315efb}
 .presProcedureHubActions>button>span{display:grid;gap:2px;min-width:0}
-.presProcedureHubActions small{font-size:9px;font-weight:900;letter-spacing:.07em;color:#8293a8}
-.presProcedureHubActions b{font-size:12px;color:#294a69}
-.presProcedureHubActions em{font-style:normal;font-size:10px;line-height:1.25;color:#74869c}
+.presProcedureHubActions small{font-size:12px;font-weight:900;letter-spacing:.07em;color:#8293a8}
+.presProcedureHubActions b{font-size:13px;color:#294a69}
+.presProcedureHubActions em{font-style:normal;font-size:12px;line-height:1.25;color:#74869c}
 @media(max-width:1000px){.presProcedureHub{grid-template-columns:1fr}.presProcedureHubActions{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.presProcedureHub{padding:12px}.presProcedureHubActions{grid-template-columns:1fr}}
 
