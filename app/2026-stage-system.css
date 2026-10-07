@@ -968,3 +968,10 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
 @media(max-width:1220px){.gov8MinistryGrid{grid-template-columns:repeat(3,minmax(0,1fr))}.gov8SubmissionCard{grid-template-columns:1fr}.gov8SubmissionCard>button{justify-self:start}.gov8RulesStrip{grid-template-columns:1fr 1fr}}
 @media(max-width:900px){.gov8Overview{grid-template-columns:1fr}.gov8Progress{grid-template-columns:1fr 1fr}.gov8Procedure{grid-template-columns:1fr 1fr}.gov8SectionHead{display:grid}.gov8SessionFacts{justify-content:flex-start}.gov8MinistryGrid{grid-template-columns:1fr 1fr}.gov8PresidentReview{grid-template-columns:1fr}.gov8PresidentReview>div{flex-wrap:wrap}}
 @media(max-width:620px){.gov8Overview,.gov8Duma,.gov8Ministries{padding:14px;border-radius:17px}.gov8OverviewCopy h2{font-size:20px}.gov8Progress,.gov8Procedure,.gov8MinistryGrid,.gov8RulesStrip,.gov8NomineeFields{grid-template-columns:1fr}.gov8ProgressStep>svg{display:none}.gov8AgendaRow,.gov8ConstitutionAlert{grid-template-columns:1fr}.gov8AgendaActions{justify-content:flex-start}.gov8StructureActions,.gov8PresidentReview>div{display:grid;grid-template-columns:1fr}.gov8StructureActions button,.gov8PresidentReview button{width:100%}}
+
+.gov8MinistryNomination.isPreview{opacity:.78}
+.gov8MinistryNomination.isPreview .gov8NomineeFields input,
+.gov8MinistryNomination.isPreview .gov8NomineeFields select{background:#f3f5f8;color:#74869a}
+.gov8FormGate{display:block;padding:7px 8px;border-radius:9px;background:#f3f5f8;color:#74869a;font-size:12px;line-height:1.4}
+.gov8DeputyChoice.isDisabled{opacity:.62;background:#f3f5f8}
+.gov8StatusPill.is-preview{background:#eef2f6;color:#6f8195}
