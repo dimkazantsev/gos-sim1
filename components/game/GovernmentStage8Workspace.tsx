@@ -309,17 +309,16 @@ export default function GovernmentStage8Workspace({
   <section className={'gov8Ministries '+(!pmAppointed?'isLocked':'')}>
    <header className="gov8SectionHead">
     <div><span className="gov8SectionIcon"><Building2 size={20}/></span><div><small>СТРУКТУРА ПРАВИТЕЛЬСТВА</small><h3>Пять министерств</h3><p>Функции фиксированы правилами игры. После назначения Председатель Правительства может уточнить только названия; Президент одобряет структуру или возвращает её на переименование.</p></div></div>
-    <span className={'gov8StatusPill is-'+(structure?.status||'locked')}>{!pmAppointed?'Закрыто':structure?.status==='approved'?'Одобрено':structure?.status==='submitted'?'На рассмотрении':structure?.status==='revision'?'На доработке':'Черновик'}</span>
+    <span className={'gov8StatusPill is-'+(structure?.status||'preview')}>{!pmAppointed?'Предпросмотр':structure?.status==='approved'?'Одобрено':structure?.status==='submitted'?'На рассмотрении':structure?.status==='revision'?'На доработке':'Черновик'}</span>
    </header>
 
-   {!pmAppointed&&<div className="gov8Gate"><span>02</span><div><b>Сначала назначьте Председателя Правительства</b><p>После назначения здесь автоматически откроются пять министерств и работа со структурой.</p></div></div>}
+   {!pmAppointed&&<div className="gov8Gate"><span>02</span><div><b>Сначала назначьте Председателя Правительства</b><p>Форма уже показана полностью. После назначения станут активны редактирование структуры и последующие кадровые действия.</p></div></div>}
 
-   {pmAppointed&&<>
-    {structure?.note&&<div className="gov8RevisionNote"><b>Замечание Президента</b><p>{structure.note}</p></div>}
+   {structure?.note&&<div className="gov8RevisionNote"><b>Замечание Президента</b><p>{structure.note}</p></div>}
     <div className="gov8MinistryGrid">
      {PORTFOLIOS.map((p,index)=>{
       const nomination=latest('ministry_'+p.key);
-      const editable=canPM&&(!structure||structure.status==='draft'||structure.status==='revision');
+      const editable=pmAppointed&&canPM&&(!structure||structure.status==='draft'||structure.status==='revision');
       const isDeputy=p.route==='duma'&&deputyPortfolio===p.key;
       const canNominate=p.route==='duma'?canPM:canPresident;
       const officeKind:Nomination['office_kind']=p.route==='sf'?'security_minister':isDeputy?'deputy_pm':'duma_minister';
@@ -330,24 +329,21 @@ export default function GovernmentStage8Workspace({
        <p>{p.scope}</p>
        <label className="gov8MinistryTitle">Название<input disabled={!editable} value={titles[p.key]} onChange={e=>setTitles(v=>({...v,[p.key]:e.target.value}))}/></label>
 
-       {structureApproved&&p.route==='duma'&&!activeDeputy&&<label className="gov8DeputyChoice"><input type="radio" name="gov8-deputy" checked={deputyPortfolio===p.key} onChange={()=>setDeputyPortfolio(p.key)}/><span>Этот министр одновременно является заместителем Председателя Правительства</span></label>}
-       {structureApproved&&activeDeputy?.office_key===slot&&<div className="gov8DeputyFlag">Заместитель Председателя Правительства</div>}
+       {p.route==='duma'&&!activeDeputy&&<label className={'gov8DeputyChoice '+(!structureApproved?'isDisabled':'')}><input type="radio" name="gov8-deputy" disabled={!structureApproved} checked={deputyPortfolio===p.key} onChange={()=>setDeputyPortfolio(p.key)}/><span>Этот министр одновременно является заместителем Председателя Правительства</span></label>}
+       {activeDeputy?.office_key===slot&&<div className="gov8DeputyFlag">Заместитель Председателя Правительства</div>}
 
-       {structureApproved&&<>
-        {nomination&&!['rejected','withdrawn'].includes(nomination.status)?<div className="gov8MinistryNominee"><small>КАНДИДАТУРА</small><b>{nomination.candidate_name}</b><span>{STATUS[nomination.status]} · попытка {nomination.attempt_no}/3</span>
-         {nomination.status==='consultation_pending'&&teacher&&<div className="gov8Consult"><textarea rows={2} value={consultNotes[nomination.id]||''} onChange={e=>setConsultNotes(v=>({...v,[nomination.id]:e.target.value}))} placeholder="Итог консультации с Советом Федерации"/><button className="secondary" disabled={!!busy} onClick={()=>void consult(nomination.id)}>Зафиксировать консультацию</button></div>}
-         {nomination.status==='consulted'&&canPresident&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(nomination.id)}>Назначить министром</button>}
-         {nomination.status==='approved'&&canPresident&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(nomination.id)}>Назначить после решения ГД</button>}
-         {nomination.vote_id&&votes.find(v=>v.id===nomination.vote_id)?.status==='open'&&<button className="secondary" onClick={()=>openVoting(nomination.vote_id)}>Регистрация и голосование</button>}
-        </div>:canNominate?<div className="gov8MinistryNomination"><NomineeFields slot={slot}/><button className="secondary" disabled={!!busy||candidateName(slot).length<3} onClick={()=>void submitNomination(slot,slot,officeTitle,officeKind)}>{nomination?.status==='rejected'?'Внести новую кандидатуру':'Внести кандидатуру'}</button></div>:<div className="gov8LockedHint">{p.route==='duma'?'Ожидается кандидатура Председателя Правительства':'Ожидается кандидатура Президента'}</div>}
-       </>}
+       {nomination&&!['rejected','withdrawn'].includes(nomination.status)?<div className="gov8MinistryNominee"><small>КАНДИДАТУРА</small><b>{nomination.candidate_name}</b><span>{STATUS[nomination.status]} · попытка {nomination.attempt_no}/3</span>
+        {nomination.status==='consultation_pending'&&teacher&&<div className="gov8Consult"><textarea rows={2} value={consultNotes[nomination.id]||''} onChange={e=>setConsultNotes(v=>({...v,[nomination.id]:e.target.value}))} placeholder="Итог консультации с Советом Федерации"/><button className="secondary" disabled={!!busy} onClick={()=>void consult(nomination.id)}>Зафиксировать консультацию</button></div>}
+        {nomination.status==='consulted'&&canPresident&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(nomination.id)}>Назначить министром</button>}
+        {nomination.status==='approved'&&canPresident&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(nomination.id)}>Назначить после решения ГД</button>}
+        {nomination.vote_id&&votes.find(v=>v.id===nomination.vote_id)?.status==='open'&&<button className="secondary" onClick={()=>openVoting(nomination.vote_id)}>Регистрация и голосование</button>}
+       </div>:canNominate?<div className={'gov8MinistryNomination '+(!structureApproved?'isPreview':'')}><NomineeFields slot={slot} disabled={!structureApproved}/><button className="secondary" disabled={!structureApproved||!!busy||candidateName(slot).length<3} onClick={()=>void submitNomination(slot,slot,officeTitle,officeKind)}>{nomination?.status==='rejected'?'Внести новую кандидатуру':'Внести кандидатуру'}</button>{!structureApproved&&<small className="gov8FormGate">{!pmAppointed?'Активируется после назначения Председателя Правительства и утверждения структуры':'Активируется после утверждения структуры Президентом'}</small>}</div>:<div className="gov8LockedHint">{p.route==='duma'?'Ожидается кандидатура Председателя Правительства':'Ожидается кандидатура Президента'}</div>}
       </article>
      })}
     </div>
 
-    {canPM&&(!structure||structure.status==='draft'||structure.status==='revision')&&<div className="gov8StructureActions"><button className="secondary" disabled={!!busy} onClick={()=>void saveStructure(false)}>Сохранить названия</button><button className="primary" disabled={!!busy} onClick={()=>void saveStructure(true)}>Представить структуру Президенту</button></div>}
+    {canPM&&(!structure||structure.status==='draft'||structure.status==='revision')&&<div className="gov8StructureActions"><button className="secondary" disabled={!pmAppointed||!!busy} onClick={()=>void saveStructure(false)}>Сохранить названия</button><button className="primary" disabled={!pmAppointed||!!busy} onClick={()=>void saveStructure(true)}>Представить структуру Президенту</button></div>}
     {canPresident&&structure?.status==='submitted'&&<div className="gov8PresidentReview"><label>Комментарий Президента<textarea rows={2} value={structureNote} onChange={e=>setStructureNote(e.target.value)} placeholder="Комментарий при возврате на переименование"/></label><div><button className="secondary" disabled={!!busy} onClick={()=>void reviewStructure('revision')}><X size={16}/> Вернуть на переименование</button><button className="primary" disabled={!!busy} onClick={()=>void reviewStructure('approve')}><Check size={16}/> Одобрить пять министерств</button></div></div>}
-   </>}
   </section>
 
   <section className="gov8RulesStrip">
