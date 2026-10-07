@@ -1140,3 +1140,60 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
  .gov8AgendaActions{grid-template-columns:1fr!important}
  .gov8AgendaCta{width:100%;min-width:0}
 }
+
+
+/* Stage 8 agenda overflow and removal controls */
+.gov8AgendaLinks .gov8LinkButton{
+  white-space:normal!important;
+  min-width:0!important;
+  line-height:1.15;
+  padding:7px 8px;
+}
+.gov8AgendaActions{
+  overflow:hidden;
+}
+.gov8AgendaLinks{
+  min-width:0;
+}
+.gov8AgendaNameRow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+.gov8AgendaNameRow>b{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.gov8RemoveNomination{
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  border:1px solid #efd5dc;
+  border-radius:9px;
+  background:#fff8fa;
+  color:#b43b52;
+}
+.gov8RemoveNomination:hover:not(:disabled){
+  border-color:#e8b7c2;
+  background:#fff1f4;
+}
+.gov8RemoveNomination:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+@media(max-width:1320px){
+ .gov8AgendaRow{
+   grid-template-columns:44px minmax(250px,.8fr) minmax(0,1.2fr)!important;
+ }
+ .gov8AgendaActions{
+   grid-template-columns:minmax(0,1fr) 210px!important;
+ }
+ .gov8AgendaCta{
+   width:210px;
+   min-width:210px;
+ }
+}
