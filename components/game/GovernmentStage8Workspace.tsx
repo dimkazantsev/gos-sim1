@@ -3,7 +3,7 @@
 import {useEffect,useState} from 'react';
 import {
  ArrowRight,Building2,Check,ClipboardCheck,Landmark,MessageCircle,
- ShieldCheck,UserRoundPlus,UsersRound,Vote,X
+ ShieldCheck,Trash2,UserRoundPlus,UsersRound,Vote,X
 } from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
@@ -150,7 +150,7 @@ export default function GovernmentStage8Workspace({
    supabase.from('institution_session_registrations').select('user_id').eq('game_id',game.id).eq('stage_no',8).eq('institution_key','gd')
   ]);
   if(!n.error){
-   const next=(n.data||[]) as Nomination[];
+   const next=((n.data||[]) as Nomination[]).filter(x=>x.status!=='withdrawn');
    setRows(next);
    const deputy=[...next].reverse().find(x=>x.office_kind==='deputy_pm'&&!['rejected','withdrawn'].includes(x.status));
    if(deputy?.office_key.startsWith('ministry_')){
@@ -234,6 +234,15 @@ export default function GovernmentStage8Workspace({
   else{
    await g.refresh();await load();onOpenVotes(String(r.data));
   }
+  setBusy(null);
+ }
+
+ async function withdrawNomination(id:string,name:string){
+  if(!window.confirm('Снять кандидатуру «'+name+'» с повестки? Связанное голосование будет отменено, а проект НПА помечен как снятый.'))return;
+  setBusy('withdraw:'+id);
+  const r=await supabase.rpc('withdraw_government_nomination',{p_nomination_id:id});
+  if(r.error)setError(r.error.message);
+  else{await g.refresh();await load()}
   setBusy(null);
  }
 
@@ -342,7 +351,8 @@ export default function GovernmentStage8Workspace({
   return <article className={'gov8AgendaRow is-'+n.status}>
    <span className="gov8AgendaIndex">{String(index+1).padStart(2,'0')}</span>
    <div className="gov8AgendaMain">
-    <small>{n.office_title}</small><b>{n.candidate_name}</b>
+    <small>{n.office_title}</small>
+    <div className="gov8AgendaNameRow"><b>{n.candidate_name}</b>{teacher&&n.status!=='appointed'&&<button className="gov8RemoveNomination" title="Снять кандидатуру" aria-label={'Снять кандидатуру '+n.candidate_name} disabled={!!busy} onClick={()=>void withdrawNomination(n.id,n.candidate_name)}><Trash2 size={15}/></button>}</div>
     <span>Попытка {n.attempt_no}/3 · {STATUS[n.status]}{rejects?' · отклонений: '+rejects:''}</span>
    </div>
    <div className="gov8AgendaActions">
