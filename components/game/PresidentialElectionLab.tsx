@@ -229,7 +229,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   if(r.error)setError(r.error.message);else{setDirectionDraft(v=>({...v,[candidateId]:''}));setSignatureDraft(v=>({...v,[candidateId]:''}));await load()}setBusy(false);
  }
 
- return <section className="electionLab cecWorkspace">
+ return <section id="stage6-cec" className="electionLab cecWorkspace">
   <header className="electionLabHead cecHead"><div><small>ЦИК РФ · ЭТАП 6</small><h2>Регистрация кандидатов в Президенты</h2><p>После определения Государственной Думой типа избирательной системы кандидаты формируют досье и подают документы в ЦИК. Агитация, голосование и подсчёт результатов начинаются на 7-м этапе.</p></div><div className="cecHeadSide"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" className="cecEmblem" width={72} height={72}/><div><b>Центральная избирательная комиссия</b><span>Регистрация кандидатов</span></div></div></header>
   <nav className="cecTabs" aria-label="Разделы президентских выборов"><button className={panelView==='dossier'?'active':''} onClick={()=>setPanelView('dossier')}>Моё досье</button><button className={panelView==='application'?'active':''} onClick={()=>setPanelView('application')}>Подача в ЦИК <b>{candidates.filter(x=>x.cec_submitted_at&&x.registration_status==='submitted').length}</b></button><button className={panelView==='candidates'?'active':''} onClick={()=>setPanelView('candidates')}>Кандидаты <b>{candidates.filter(x=>x.cec_submitted_at).length}</b></button><button className={panelView==='decisions'?'active':''} onClick={()=>setPanelView('decisions')}>Решения ЦИК <b>{decisions.length}</b></button></nav>
 
