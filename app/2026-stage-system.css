@@ -1084,3 +1084,59 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
    max-width:none;
  }
 }
+
+
+/* Stage 8 agenda row unification */
+.gov8AgendaRow{
+  grid-template-columns:48px minmax(280px,.9fr) minmax(560px,1.5fr)!important;
+  min-height:92px;
+  align-items:center!important;
+}
+.gov8AgendaActions{
+  grid-template-columns:minmax(0,1fr) 230px!important;
+  gap:12px!important;
+  min-width:0!important;
+}
+.gov8AgendaLinks{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:8px!important;
+}
+.gov8AgendaLinks .gov8LinkButton{
+  width:100%;
+  min-height:42px;
+  justify-content:center;
+  text-align:center;
+  white-space:nowrap;
+}
+.gov8AgendaLinks .gov8LinkButton:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+.gov8AgendaCta{
+  width:230px;
+  min-width:230px;
+  min-height:50px!important;
+  height:50px;
+  white-space:nowrap;
+  justify-self:stretch;
+}
+.gov8AgendaMain{
+  min-width:0;
+}
+.gov8AgendaMain small,
+.gov8AgendaMain b,
+.gov8AgendaMain span{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+@media(max-width:1180px){
+ .gov8AgendaRow{grid-template-columns:48px minmax(0,1fr)!important}
+ .gov8AgendaActions{grid-column:1/-1;grid-template-columns:minmax(0,1fr) 230px!important}
+}
+@media(max-width:760px){
+ .gov8AgendaLinks{grid-template-columns:1fr 1fr!important}
+ .gov8AgendaActions{grid-template-columns:1fr!important}
+ .gov8AgendaCta{width:100%;min-width:0}
+}
