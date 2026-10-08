@@ -32,6 +32,11 @@ export async function sendChatMedia(input:MediaSendInput):Promise<MediaSendResul
  if(!gameId||!channelId||!userId)return{ok:false,stage:'validation',error:'Канал недоступен. Повторно откройте чат.'};
  const ext=(fileName.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'')||'bin';
  let pending=input.pending;
+ if(pending){
+  const parts=pending.path.split('/');
+  if(parts.length!==4||parts[0]!==gameId||parts[1]!==channelId||parts[2]!==userId||!parts[3])
+   return{ok:false,stage:'validation',error:'Эта запись загружена для другого канала или пользователя. Вернитесь в исходный чат для повторной отправки.',pending};
+ }
  if(!pending){
   pending={messageId:input.generateId(),path:gameId+'/'+channelId+'/'+userId+'/'+input.generateId()+'.'+ext};
   input.onPhase?.('uploading');

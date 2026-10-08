@@ -20,7 +20,9 @@ type Debrief={id:string;game_id:string;stage_no:number;user_id:string;body:strin
 
 const STAGES=Array.from({length:16},(_,i)=>i+1);
 const shownScore=(a?:Assessment)=>a?(a.status==='final'?(a.final_score??a.auto_score):a.auto_score):null;
-const level=(n:number)=>n===3?'Высокий':n===2?'Средний':n===1?'Низкий':'Нет участия';
+const level=(n:number)=>n===3?'Высокий':n===2?'Средний':n===1?'Низкий':n>0?'С учётом штрафа':'Нет участия';
+const isFinalScore=(n:number|null):n is number=>n!==null&&Number.isInteger(n)&&n>=0&&n<=3;
+const finalScoreChoice=(a?:Assessment)=>{const score=shownScore(a);return isFinalScore(score)?score:null;};
 const when=(v?:string|null)=>v?new Date(v).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
 
 export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnTypeRepublic;compact?:boolean;onOpenProfile?:(id:string)=>void}){
@@ -32,7 +34,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
  const evidenceRequest=useRef(0);
  const [evidence,setEvidence]=useState<Evidence|null>(null);
  const [loadingEvidence,setLoadingEvidence]=useState(false);
- const [editScore,setEditScore]=useState(0);
+ const [editScore,setEditScore]=useState<number|null>(null);
  const [note,setNote]=useState('');
  const [busy,setBusy]=useState(false);
  const [debrief,setDebrief]=useState('');
@@ -126,7 +128,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
   const request=++evidenceRequest.current;
   const a=rows.find(x=>x.user_id===userId&&x.stage_no===stageNo);
   setSelected({userId,stageNo});
-  setEditScore(shownScore(a)??0);
+  setEditScore(finalScoreChoice(a));
   setNote(a?.teacher_note||'');
   setEvidence(null);setRuns([]);
   if(!game||(!teacher&&(userId!==me?.user_id||authId!==me.user_id)))return;
@@ -141,12 +143,15 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
  }
  const assessment=selected?rows.find(x=>x.user_id===selected.userId&&x.stage_no===selected.stageNo):undefined;
  const selectedStudent=selected?members.find(m=>m.user_id===selected.userId):undefined;
+ useEffect(()=>{
+  if(teacher&&assessment?.status==='draft'&&!Number.isInteger(assessment.auto_score))setEditScore(null);
+ },[assessment?.id,assessment?.auto_score,assessment?.status,teacher]);
 
  async function syncTeacherDraft(assessmentId:string){
   const fresh=await supabase.from('stage_assessments').select('*').eq('id',assessmentId).single();
   if(!fresh.error&&fresh.data){
    const a=fresh.data as Assessment;
-   setEditScore(shownScore(a)??0);
+   setEditScore(finalScoreChoice(a));
    setNote(a.teacher_note||'');
   }
   await load();
@@ -166,7 +171,8 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
   setBusy(false);
  }
  async function finalize(){
-  if(!assessment)return;
+  if(!assessment||!teacher)return;
+  if(!isFinalScore(editScore)){g.setError('Выберите итоговый целый балл от 0 до 3.');return;}
   setBusy(true);
   const r=await supabase.rpc('finalize_stage_assessment',{p_assessment_id:assessment.id,p_score:editScore,p_teacher_note:note||null});
   if(r.error)g.setError(r.error.message);else await load();
@@ -255,7 +261,7 @@ function AssessmentModal(p:any){
    <section className="gradeRationale"><small>ИНТЕРПРЕТАЦИЯ ДЕЙСТВИЙ</small><p>{a.public_rationale}</p><footer><span>Пересчёт: {when(a.last_auto_at)}</span><span>{a.last_run_type}</span><span>версия {a.revision_count}</span></footer></section>
    {a.teacher_note&&<section className="gradeTeacherNote"><small>КОММЕНТАРИЙ ПРЕПОДАВАТЕЛЯ</small><p>{a.teacher_note}</p></section>}
 </>}
-   {teacher&&<section className="gradeApproval"><StyledSelect label="Итоговый балл" value={String(editScore)} onChange={v=>setEditScore(Number(v))} options={[0,1,2,3].map(n=>({value:String(n),label:n+' · '+level(n)}))}/><label>Комментарий<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Почему вы подтверждаете или меняете автооценку"/></label><div>{a.status==='final'?<button onClick={()=>void reopen()} disabled={busy}>Переоткрыть оценку</button>:<><button onClick={()=>void recalc()} disabled={busy}>Пересчитать сейчас</button><button className="primary" onClick={()=>void finalize()} disabled={busy}>Утвердить как итоговую</button></>}</div></section>}
+   {teacher&&<section className="gradeApproval"><StyledSelect label="Итоговый балл" value={editScore===null?'':String(editScore)} onChange={v=>setEditScore(v===''?null:Number(v))} options={[{value:'',label:'Выберите итоговый балл'},...[0,1,2,3].map(n=>({value:String(n),label:n+' · '+level(n)}))]}/><label>Комментарий<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Почему вы подтверждаете или меняете автооценку"/></label><div>{a.status==='final'?<button onClick={()=>void reopen()} disabled={busy}>Переоткрыть оценку</button>:<><button onClick={()=>void recalc()} disabled={busy}>Пересчитать сейчас</button><button className="primary" onClick={()=>void finalize()} disabled={busy||!isFinalScore(editScore)}>Утвердить как итоговую</button></>}</div></section>}
   </>}
   {a&&runs?.length>0&&<details className="gradeRunHistory"><summary>История автоматических пересчётов <span>{runs.length}</span></summary><div>{runs.map((r:Run)=><article key={r.id}><time>{when(r.created_at)}</time><b>{r.auto_score}/3 · {level(r.auto_score)}</b><span>{r.run_type}</span><em>{r.criterion_law?'Право ✓':'Право ○'} · {r.criterion_strategy?'Стратегия ✓':'Стратегия ○'} · {r.criterion_debrief?'Анализ ✓':'Анализ ○'}</em></article>)}</div></details>}
   {canSeeEvidence&&<section className="gradeEvidence"><div className="gradeEvidenceHead"><div><small>ДОКАЗАТЕЛЬСТВА</small><h3>Все зафиксированные действия на этапе</h3></div></div>{loading?<div className="emptyState">Собираю данные…</div>:evidence?<Evidence evidence={evidence}/>:<div className="emptyState">Доказательства ещё не загружены.</div>}</section>}

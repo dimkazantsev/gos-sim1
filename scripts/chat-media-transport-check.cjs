@@ -44,6 +44,14 @@ async function run(){
  assert(second.ok);assert.equal(retry.calls.uploads.length,1);
  assert.equal(retry.calls.inserts[0].id,retry.calls.inserts[1].id);
  console.log('PASS failed message insert preserves upload and retries same message UUID without duplicate Storage objects');
+ for(const changed of [{gameId:'other-game'},{channelId:'other-channel'},{userId:'other-user'}]){
+  const blocked=await sendChatMedia({...retry.args,...changed,pending:first.pending});
+  assert(!blocked.ok&&blocked.stage==='validation');
+  assert.deepEqual(blocked.pending,first.pending);
+  assert.equal(retry.calls.uploads.length,1);
+  assert.equal(retry.calls.inserts.length,2);
+ }
+ console.log('PASS pending uploads stay bound to their original game, channel and author without discarding the recording');
  const uncertain=input();
  uncertain.transport.insert=async row=>{uncertain.existing.add(row.id);throw new Error('network reset after commit')};
  const confirmed=await sendChatMedia(uncertain.args);

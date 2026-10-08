@@ -1,13 +1,17 @@
--- Configure qa.teacher_id, qa.student_a_id and qa.student_b_id for authorized test accounts.
--- Isolated game, real authenticated RPCs, complete rollback. No student data persists.
+-- Isolated game and fictional student identities; real authenticated RPCs.
+-- Requires an existing classroom owner. Every fixture is rolled back.
 begin;
-do $$ declare g uuid:=gen_random_uuid();p uuid:=gen_random_uuid();admin uuid:=current_setting('qa.teacher_id')::uuid;a uuid:=current_setting('qa.student_a_id')::uuid;b uuid:=current_setting('qa.student_b_id')::uuid;begin
+do $$ declare g uuid:=gen_random_uuid();p uuid:=gen_random_uuid();admin uuid;a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();begin
+ select owner_id into admin from public.games order by created_at limit 1;
+ if admin is null then raise exception 'QA requires an existing classroom owner';end if;
+ insert into auth.users(id,aud,role) values(a,'authenticated','authenticated'),(b,'authenticated','authenticated');
  perform set_config('request.jwt.claim.sub',admin::text,true);
  insert into public.games(id,title,game_code,owner_id,status,current_round,turn_open) values(g,'QA civic procedures','QA'||substr(replace(g::text,'-',''),1,10),admin,'running',11,true);
  insert into public.game_members(game_id,user_id,full_name,kind,role_title,group_name) values(g,admin,'Проверка преподавателя','teacher','Преподаватель',null);
  insert into public.game_parties(id,game_id,name,mandates,leader_user_id) values(p,g,'QA civic party',450,a);
  insert into public.game_members(game_id,user_id,full_name,kind,role_title,group_name,team) values(g,a,'Проверка А','student','Депутат Государственной Думы','QA','QA civic party'),(g,b,'Проверка Б','student','Депутат Государственной Думы','QA','QA civic party');
  perform set_config('qa.civic_game',g::text,true);perform set_config('qa.civic_party',p::text,true);
+ perform set_config('qa.teacher_id',admin::text,true);perform set_config('qa.student_a_id',a::text,true);perform set_config('qa.student_b_id',b::text,true);
 end;$$;
 
 do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;begin

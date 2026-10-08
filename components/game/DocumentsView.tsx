@@ -1,6 +1,6 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {FormalDocument} from './types';
@@ -58,6 +58,16 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const [documentSignatures,setDocumentSignatures]=useState<{id:string;signer_id:string;signed_at:string;history_id:number;url:string|null}[]>([]);
  const [supportDocuments,setSupportDocuments]=useState<SupportDocument[]>([]),[supportCategory,setSupportCategory]=useState('opinion'),[supportTitle,setSupportTitle]=useState(''),[supportNote,setSupportNote]=useState(''),[supportFile,setSupportFile]=useState<File|null>(null),[supportFormOpen,setSupportFormOpen]=useState(false);
 
+ const editorScope=JSON.stringify([g.game?.id,me?.user_id,readOnly]),scope=useRef(editorScope),alive=useRef(true),extractionRequest=useRef(0),extractionAbort=useRef<AbortController|null>(null);
+ const draftFields=useRef({title,body}),draftVersions=useRef({title:0,body:0,requisites:0});
+ const dossierDirty=useRef({profile:0,committee:0,budget:0}),dossierSaved=useRef({profile:0,committee:0,budget:0}),selectedDocument=useRef('');
+ scope.current=editorScope;draftFields.current={title,body};
+ function cancelExtraction(){extractionRequest.current++;extractionAbort.current?.abort();extractionAbort.current=null;setExtracting(false)}
+ function changeTitle(value:string){draftVersions.current.title++;draftFields.current.title=value;setTitle(value)}
+ function changeBody(value:string){draftVersions.current.body++;draftFields.current.body=value;setBody(value)}
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false;extractionRequest.current++;extractionAbort.current?.abort()}},[]);
+ useEffect(()=>{cancelExtraction();setBusy(false);setTitle('');setBody('');setFile(null);setRecognized('');setEditing(false);setEditTitle('');setEditBody('');setEditNote('');setIssuer('');setPlace('Москва');setSubjectKey('gd_deputy');setDocType('fz_bill');setDocumentAccess(null);setActiveRoles([]);setSubjectPermissions(null);setCommitteeUnits([]);resetPreparedBillPackage()},[editorScope]);
+
  const role=[me?.role_title||'',...activeRoles].join(' ').toLowerCase();
  const availableSubjects=useMemo(()=>subjectPermissions?FORMAL_SUBJECTS.filter(s=>subjectPermissions.includes(s.key)):teacher?FORMAL_SUBJECTS:FORMAL_SUBJECTS.filter(s=>s.roleHints.some(h=>role.includes(h))),[teacher,role,subjectPermissions]);
  const createType=FORMAL_TYPES.find(x=>x.key===docType),creatingBill=createType?.workflow==='bill';
@@ -81,7 +91,14 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   return(!q||[d.registry_no,d.title,d.subject_label,typeLabel(d.doc_type),d.status_label,members.find(m=>m.user_id===d.author_id)?.full_name].join(' ').toLowerCase().includes(q))&&(!filterSubject||d.subject_key===filterSubject)&&statusOk
  }).sort((a,b)=>sortOrder==='title'?a.title.localeCompare(b.title,'ru'):Date.parse(b[sortOrder==='created'?'created_at':'updated_at'])-Date.parse(a[sortOrder==='created'?'created_at':'updated_at'])),[formalDocuments,votes,members,query,filterSubject,filterStatus,sortOrder]);
  const selected=useMemo(()=>filtered.find(d=>d.id===selectedId)||filtered[0],[filtered,selectedId]);
- useEffect(()=>{setDocumentAccess(null);setAccessError('');if(!selected?.id)return;let active=true;void Promise.all([supabase.rpc('get_formal_document_tools',{p_document_id:selected.id}),supabase.from('formal_document_revisions').select('id,revision,title,body_text,created_at').eq('document_id',selected.id).order('revision',{ascending:false})]).then(([a,r])=>{if(!active)return;if(a.error)setAccessError(a.error.message);else setDocumentAccess(a.data as DocumentAccess);if(!r.error)setRevisions(r.data||[])});return()=>{active=false}},[selected?.id,selected?.updated_at,localRefresh]);
+ selectedDocument.current=selected?.id||'';
+ useEffect(()=>{
+  dossierDirty.current={profile:0,committee:0,budget:0};dossierSaved.current={profile:0,committee:0,budget:0};
+  setBillProfile(null);setBillFiles([]);setBillConclusion(null);setBillReadiness(null);setBillFinancial(false);setBillGovernmentOpinion(false);setBillCommittee('');setBillRepresentative('');setBillNote('');
+  setCommitteeRapporteur('');setCommitteeLegal('');setCommitteeLogic('');setCommitteeActs('');setCommitteeRecommendation('draft');
+  setBudgetReview(null);setBudgetDocsOk(false);setBudgetDistributed(false);setBudgetAccounts(false);setBudgetConclusion('');setBudgetDecision('draft');setBudgetReviewNote('');
+ },[selected?.id,editorScope]);
+ useEffect(()=>{setDocumentAccess(null);setAccessError('');if(!selected?.id)return;let active=true;void Promise.all([supabase.rpc('get_formal_document_tools',{p_document_id:selected.id}),supabase.from('formal_document_revisions').select('id,revision,title,body_text,created_at').eq('document_id',selected.id).order('revision',{ascending:false})]).then(([a,r])=>{if(!active)return;if(a.error)setAccessError(a.error.message);else setDocumentAccess(a.data as DocumentAccess);if(!r.error)setRevisions(r.data||[])});return()=>{active=false}},[selected?.id,selected?.updated_at,localRefresh,editorScope]);
  useEffect(()=>{
   if(!selected?.id){setDocumentSignatures([]);return}
   let current=true;
@@ -109,40 +126,49 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  },[selected?.id,selected?.updated_at,localRefresh]);
  const lastSigned=documentSignatures[0];
  const [committeeUnits,setCommitteeUnits]=useState<{unit_key:string;title:string;head_user_id:string|null}[]>([]);
- useEffect(()=>{if(!me||!g.game)return;void supabase.from('institution_units').select('unit_key,title,head_user_id').eq('game_id',g.game.id).eq('unit_kind','committee').then(r=>{if(!r.error)setCommitteeUnits((r.data||[]) as any)})},[me?.user_id,g.game?.id]);
+ useEffect(()=>{if(!me||!g.game)return;let active=true;void supabase.from('institution_units').select('unit_key,title,head_user_id').eq('game_id',g.game.id).eq('unit_kind','committee').then(r=>{if(active&&!r.error)setCommitteeUnits((r.data||[]) as any)});return()=>{active=false}},[me?.user_id,g.game?.id]);
  useEffect(()=>{if(focusId&&formalDocuments.some(d=>d.id===focusId)){setQuery('');setFilterSubject('');setFilterStatus('');setSelectedId(focusId);setDetailReturn('registry');setDetailOpen(true);setMode('registry')}},[focusId]);
  useEffect(()=>{
   if(!selected||selected.workflow_key!=='bill'){setBillProfile(null);setBillFiles([]);setBillConclusion(null);setBillReadiness(null);return}
+  let active=true;const documentId=selected.id,current=()=>active&&alive.current&&scope.current===editorScope&&selectedDocument.current===documentId;
   void (async()=>{
+   try{
    const [p,f,cc,r]=await Promise.all([
     supabase.from('bill_submission_profiles').select('*').eq('document_id',selected.id).maybeSingle(),
     supabase.from('bill_package_files').select('*').eq('document_id',selected.id).order('created_at'),
     supabase.from('bill_committee_conclusions').select('*').eq('document_id',selected.id).maybeSingle(),
     supabase.rpc('get_bill_dossier_readiness',{p_document_id:selected.id})
    ]);
+   if(!current())return;
+   const failed=[p,f,cc,r].find(result=>result.error);if(failed?.error)throw failed.error;
    const bp=(p.data||null) as BillProfile|null;setBillProfile(bp);
-   setBillFinancial(!!bp?.requires_financial_justification);setBillGovernmentOpinion(!!bp?.requires_government_opinion);setBillCommittee(bp?.committee_key||'');setBillRepresentative(bp?.representative_user_id||'');setBillNote(bp?.note||'');
+   if(dossierDirty.current.profile===dossierSaved.current.profile){setBillFinancial(!!bp?.requires_financial_justification);setBillGovernmentOpinion(!!bp?.requires_government_opinion);setBillCommittee(bp?.committee_key||'');setBillRepresentative(bp?.representative_user_id||'');setBillNote(bp?.note||'')}
    if(!f.error){
     const rows=(f.data||[]) as BillFile[];
     const withUrls=await Promise.all(rows.map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
+    if(!current())return;
     setBillFiles(withUrls);
    }
    const bc=(cc.data||null) as BillConclusion|null;setBillConclusion(bc);
-   setCommitteeRapporteur(bc?.rapporteur_user_id||'');setCommitteeLegal(bc?.legal_compliance||'');setCommitteeLogic(bc?.internal_logic||'');setCommitteeActs(bc?.affected_acts_completeness||'');setCommitteeRecommendation(bc?.recommendation||'draft');
+   if(dossierDirty.current.committee===dossierSaved.current.committee){setCommitteeRapporteur(bc?.rapporteur_user_id||'');setCommitteeLegal(bc?.legal_compliance||'');setCommitteeLogic(bc?.internal_logic||'');setCommitteeActs(bc?.affected_acts_completeness||'');setCommitteeRecommendation(bc?.recommendation||'draft')}
    if(!r.error)setBillReadiness(r.data as BillReadiness);
+   }catch(error){if(current())g.setError(error)}
   })();
- },[selected?.id,selected?.updated_at,localRefresh]);
+  return()=>{active=false};
+ },[selected?.id,selected?.updated_at,localRefresh,editorScope]);
  useEffect(()=>{
   if(!selected||selected.workflow_key!=='budget'){setBudgetReview(null);return}
-  void supabase.from('budget_preliminary_reviews').select('*').eq('document_id',selected.id).maybeSingle().then(r=>{
-   if(r.error)return;
+  let active=true;const documentId=selected.id,current=()=>active&&alive.current&&scope.current===editorScope&&selectedDocument.current===documentId;
+  void Promise.resolve(supabase.from('budget_preliminary_reviews').select('*').eq('document_id',selected.id).maybeSingle()).then(r=>{
+   if(!current())return;
+   if(r.error){g.setError(r.error);return}
    const x=(r.data||null) as BudgetPreliminaryReview|null;setBudgetReview(x);
-   setBudgetDocsOk(!!x?.documents_compliant);setBudgetDistributed(!!x?.sent_to_all_committees);setBudgetAccounts(!!x?.accounts_chamber_reviewed);
-   setBudgetConclusion(x?.committee_conclusion||'');setBudgetDecision(x?.decision||'draft');setBudgetReviewNote(x?.note||'');
-  });
- },[selected?.id,selected?.updated_at,localRefresh]);
+   if(dossierDirty.current.budget===dossierSaved.current.budget){setBudgetDocsOk(!!x?.documents_compliant);setBudgetDistributed(!!x?.sent_to_all_committees);setBudgetAccounts(!!x?.accounts_chamber_reviewed);setBudgetConclusion(x?.committee_conclusion||'');setBudgetDecision(x?.decision||'draft');setBudgetReviewNote(x?.note||'')}
+  }).catch(error=>{if(current())g.setError(error)});
+  return()=>{active=false};
+ },[selected?.id,selected?.updated_at,localRefresh,editorScope]);
 
- useEffect(()=>{if(!createTemplate||readOnly)return;const t=DOCUMENT_TEMPLATES.find(x=>x.key===createTemplate);if(!t)return;setTemplateKey(t.key);setTitle(t.title);setBody(t.body);setDocType(t.docType);setSubjectKey(t.subject);setFile(null);setRecognized('Образец для этапа '+(createStageNo||currentStage?.stage_no||1)+'. Проверьте субъект и заполните поля в квадратных скобках.');setDetailOpen(false);setMode('create')},[createTemplate,createStageNo,readOnly]);
+ useEffect(()=>{if(!createTemplate||readOnly)return;const t=DOCUMENT_TEMPLATES.find(x=>x.key===createTemplate);if(!t)return;cancelExtraction();setTemplateKey(t.key);setTitle(t.title);setBody(t.body);setDocType(t.docType);setSubjectKey(t.subject);setFile(null);setRecognized('Образец для этапа '+(createStageNo||currentStage?.stage_no||1)+'. Проверьте субъект и заполните поля в квадратных скобках.');setDetailOpen(false);setMode('create')},[createTemplate,createStageNo,readOnly]);
  const history=selected?formalHistory.filter(h=>h.document_id===selected.id).slice().reverse():[];
  const author=selected?members.find(m=>m.user_id===selected.author_id):undefined;
  const subject=selected?FORMAL_SUBJECTS.find(s=>s.key===selected.subject_key):undefined;
@@ -167,28 +193,44 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  }
 
  function applyInference(nextBody=body,nextTitle=title){
+  draftVersions.current.requisites++;
   const found=inferFormal(nextBody,nextTitle,me?.role_title);
   if(teacher||availableSubjects.some(s=>s.key===found.subject.key))setSubjectKey(found.subject.key);else if(availableSubjects[0])setSubjectKey(availableSubjects[0].key);
   setDocType(found.type.key);setRecognized('Распознано: '+found.type.label+' · '+found.subject.short);
  }
 
  async function extractFile(next:File){
+  if(readOnly||busy)return;
+  cancelExtraction();
+  const version=++extractionRequest.current,controller=new AbortController(),fields={...draftVersions.current};
+  extractionAbort.current=controller;
+  const current=()=>alive.current&&scope.current===editorScope&&extractionRequest.current===version;
   setFile(next);setExtracting(true);setRecognized('');
   try{
    const fd=new FormData();fd.append('file',next);
-   const res=await fetch((process.env.NEXT_PUBLIC_GAME_API_ORIGIN||'')+'/api/extract-document',{method:'POST',body:fd});const data=await res.json();
+   const session=await supabase.auth.getSession();
+   if(!current())return;
+   if(!session.data.session){setRecognized('Войдите в игру для распознавания документа. Файл можно прикрепить вручную.');return}
+   if(session.data.session.user?.id&&session.data.session.user.id!==me?.user_id){setRecognized('Учётная запись изменилась. Откройте документ заново.');return}
+   const res=await fetch((process.env.NEXT_PUBLIC_GAME_API_ORIGIN||'')+'/api/extract-document',{method:'POST',headers:{Authorization:'Bearer '+session.data.session.access_token},body:fd,signal:controller.signal});const data=await res.json();
+   if(!current())return;
    if(!res.ok){setRecognized(data.error||'Не удалось распознать текст. Файл всё равно можно прикрепить.');return}
-   const baseTitle=title||next.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');if(!title)setTitle(baseTitle);
+   const baseTitle=draftFields.current.title||next.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');
+   if(!draftFields.current.title&&draftVersions.current.title===fields.title){draftFields.current.title=baseTitle;setTitle(baseTitle)}
    const extracted=typeof data.text==='string'?data.text:'';
-   if(extracted)setBody(extracted);
+   const bodyUnchanged=draftVersions.current.body===fields.body,requisitesUnchanged=draftVersions.current.requisites===fields.requisites;
+   if(extracted&&bodyUnchanged){draftFields.current.body=extracted;setBody(extracted)}
+   if(!bodyUnchanged){setRecognized('✓ Файл прикреплён. Введённый текст сохранён. Для проверки реквизитов нажмите «Распознать реквизиты».');return}
+   if(!requisitesUnchanged){setRecognized(extracted?'✓ Текст извлечён. Введённые реквизиты сохранены.':'✓ Файл прикреплён. Введённые реквизиты сохранены.');return}
    const found=inferFormal(extracted,baseTitle,me?.role_title);
    if(teacher||availableSubjects.some(s=>s.key===found.subject.key))setSubjectKey(found.subject.key);else if(availableSubjects[0])setSubjectKey(availableSubjects[0].key);
    setDocType(found.type.key);
    setRecognized(extracted?('✓ Текст извлечён'+(data.pages?' · '+data.pages+' стр.':'')+' · '+found.type.label+' · '+found.subject.short):('✓ Файл прикреплён · предварительно: '+found.type.label+' · '+found.subject.short+'. Вставьте текст ниже для точного распознавания.'));
-  }catch(e){setRecognized(userError(e)||'Ошибка распознавания')}finally{setExtracting(false)}
+  }catch(e){if(current()&&!controller.signal.aborted)setRecognized(userError(e)||'Ошибка распознавания')}
+  finally{if(current()){extractionAbort.current=null;setExtracting(false)}}
  }
 
- function chooseSubject(key:string){setSubjectKey(key);const s=FORMAL_SUBJECTS.find(x=>x.key===key);if(s){const current=FORMAL_TYPES.find(x=>x.key===docType);if(!current||current.workflow==='generic'||current.key==='other')setDocType(s.defaultType)}}
+ function chooseSubject(key:string){draftVersions.current.requisites++;setSubjectKey(key);const s=FORMAL_SUBJECTS.find(x=>x.key===key);if(s){const current=FORMAL_TYPES.find(x=>x.key===docType);if(!current||current.workflow==='generic'||current.key==='other')setDocType(s.defaultType)}}
 
  async function savePreparedBillPackage(documentId:string){
   const errors:string[]=[];
@@ -209,6 +251,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  function resetPreparedBillPackage(){setCreateBillFinancial(false);setCreateBillGovernmentOpinion(false);setCreateBillCommittee('');setCreateBillRepresentative('');setCreateBillNote('');setCreateBillFiles({})}
 
  async function create(){
+  if(readOnly||busy||extracting)return;
   const s=FORMAL_SUBJECTS.find(x=>x.key===subjectKey),t=FORMAL_TYPES.find(x=>x.key===docType);if(!s||!t||title.trim().length<3)return;
   const personalSigner=['gd_deputy','sf_member','region','ks','vs'].includes(s.key);
   const holder=personalSigner?me:(members.find(m=>s.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||me);const signatureMeta=formalSignature(s.key,holder?.full_name||me?.full_name||'');
@@ -217,7 +260,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   let packageErrors:string[]=[];
   if(id&&t.workflow==='bill')packageErrors=await savePreparedBillPackage(id);
   setBusy(false);
-  if(id){setSelectedId(id);onSelectDocument?.(id);setDetailReturn('create');setDetailOpen(true);setMode('registry');setDetailTab('procedure');setTitle('');setBody('');setFile(null);setRecognized('');resetPreparedBillPackage();if(packageErrors.length)g.setError('Документ зарегистрирован, но комплект внесения сохранён не полностью: '+packageErrors.join(' · '))}
+  if(id){cancelExtraction();setSelectedId(id);onSelectDocument?.(id);setDetailReturn('create');setDetailOpen(true);setMode('registry');setDetailTab('procedure');setTitle('');setBody('');setFile(null);setRecognized('');resetPreparedBillPackage();if(packageErrors.length)g.setError('Документ зарегистрирован, но комплект внесения сохранён не полностью: '+packageErrors.join(' · '))}
  }
 
  useEffect(()=>{setEditing(false);setBillDossierOpen(false)},[selected?.id]);
@@ -273,10 +316,15 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  }
  const requiresVote=(doc:FormalDocument)=>doc.workflow_steps.some(step=>!!votePresetForDocument({...doc,status_code:step.code}));
  async function saveBillProfile(){
-  if(readOnly)return;
-  if(!selected)return;setBusy(true);
-  const r=await supabase.rpc('save_bill_submission_profile',{p_document_id:selected.id,p_requires_financial_justification:billFinancial,p_requires_government_opinion:billGovernmentOpinion,p_committee_key:billCommittee||null,p_representative_user_id:billRepresentative||null,p_note:billNote.trim()||null});
-  if(r.error)g.setError(r.error.message);else setLocalRefresh(x=>x+1);setBusy(false);
+  if(readOnly||busy||!selected)return;
+  const documentId=selected.id,version=dossierDirty.current.profile,current=()=>alive.current&&scope.current===editorScope&&selectedDocument.current===documentId;
+  setBusy(true);
+  try{
+   const r=await supabase.rpc('save_bill_submission_profile',{p_document_id:documentId,p_requires_financial_justification:billFinancial,p_requires_government_opinion:billGovernmentOpinion,p_committee_key:billCommittee||null,p_representative_user_id:billRepresentative||null,p_note:billNote.trim()||null});
+   if(!current())return;
+   if(r.error)g.setError(r.error.message);else{if(dossierDirty.current.profile===version)dossierSaved.current.profile=version;setLocalRefresh(x=>x+1)}
+  }catch(error){if(current())g.setError(error)}
+  finally{if(alive.current&&scope.current===editorScope)setBusy(false)}
  }
  async function uploadBillFile(){
   if(readOnly)return;
@@ -293,15 +341,20 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   if(r.error)g.setError(r.error.message);else if(selected)setLocalRefresh(x=>x+1);setBusy(false);
  }
  async function saveCommitteeConclusion(finalize:boolean){
-  if(readOnly||!selected)return;
+  if(readOnly||busy||!selected)return;
+  const documentId=selected.id,version=dossierDirty.current.committee,current=()=>alive.current&&scope.current===editorScope&&selectedDocument.current===documentId;
   setBusy(true);
-  const r=await supabase.rpc('save_bill_committee_conclusion',{p_document_id:selected.id,p_rapporteur_user_id:committeeRapporteur||null,p_legal_compliance:committeeLegal,p_internal_logic:committeeLogic,p_affected_acts_completeness:committeeActs,p_recommendation:committeeRecommendation,p_finalize:finalize});
-  if(r.error)g.setError(r.error.message);
-  else{
-   setLocalRefresh(x=>x+1);
-   if(finalize){setBillDossierOpen(false);await g.refresh()}
-  }
-  setBusy(false);
+  try{
+   const r=await supabase.rpc('save_bill_committee_conclusion',{p_document_id:documentId,p_rapporteur_user_id:committeeRapporteur||null,p_legal_compliance:committeeLegal,p_internal_logic:committeeLogic,p_affected_acts_completeness:committeeActs,p_recommendation:committeeRecommendation,p_finalize:finalize});
+   if(!current())return;
+   if(r.error)g.setError(r.error.message);
+   else{
+    if(dossierDirty.current.committee===version)dossierSaved.current.committee=version;
+    setLocalRefresh(x=>x+1);
+    if(finalize){setBillDossierOpen(false);await g.refresh()}
+   }
+  }catch(error){if(current())g.setError(error)}
+  finally{if(alive.current&&scope.current===editorScope)setBusy(false)}
  }
  async function addSupportDocument(){
   if(readOnly||!selected||!g.game||supportTitle.trim().length<3)return;
@@ -324,14 +377,18 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   setBusy(false);
  }
  async function saveBudgetPreliminary(){
-  if(readOnly)return;
-  if(!selected)return;setBusy(true);
-  const r=await supabase.rpc('save_budget_preliminary_review',{
-   p_document_id:selected.id,p_documents_compliant:budgetDocsOk,p_sent_to_all_committees:budgetDistributed,
-   p_accounts_chamber_reviewed:budgetAccounts,p_committee_conclusion:budgetConclusion,p_decision:budgetDecision,p_note:budgetReviewNote.trim()||null
-  });
-  if(r.error)g.setError(r.error.message);else setLocalRefresh(x=>x+1);
-  setBusy(false);
+  if(readOnly||busy||!selected)return;
+  const documentId=selected.id,version=dossierDirty.current.budget,current=()=>alive.current&&scope.current===editorScope&&selectedDocument.current===documentId;
+  setBusy(true);
+  try{
+   const r=await supabase.rpc('save_budget_preliminary_review',{
+    p_document_id:documentId,p_documents_compliant:budgetDocsOk,p_sent_to_all_committees:budgetDistributed,
+    p_accounts_chamber_reviewed:budgetAccounts,p_committee_conclusion:budgetConclusion,p_decision:budgetDecision,p_note:budgetReviewNote.trim()||null
+   });
+   if(!current())return;
+   if(r.error)g.setError(r.error.message);else{if(dossierDirty.current.budget===version)dossierSaved.current.budget=version;setLocalRefresh(x=>x+1)}
+  }catch(error){if(current())g.setError(error)}
+  finally{if(alive.current&&scope.current===editorScope)setBusy(false)}
  }
 
  function openRegistryDocument(id:string){
@@ -356,14 +413,14 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
    <header className="legalCreateIntro"><div><small>Новый НПА</small><h2 id="create-document-title">Создать или загрузить документ</h2><p>Добавьте текст, проверьте реквизиты, подготовьте обязательные материалы и зарегистрируйте документ. Официальное движение по процедуре начнётся уже из карточки НПА.</p></div><ol className="legalCreateSteps" aria-label="Готовность создания документа"><li className={createDocumentReady?'ready':'pending'}><b>{createDocumentReady?<CheckCircle2 size={15}/>:1}</b><span><strong>Документ</strong><small>{createDocumentReady?'Готово':'Нужно заполнить'}</small></span></li><li className={createRequisitesReady?'ready':'pending'}><b>{createRequisitesReady?<CheckCircle2 size={15}/>:2}</b><span><strong>Реквизиты</strong><small>{createRequisitesReady?'Готово':'Нужно заполнить'}</small></span></li><li className={createFinalReady?'ready':'pending'}><b>{createFinalReady?<CheckCircle2 size={15}/>:3}</b><span><strong>{creatingBill?'Комплект внесения':'Регистрация'}</strong><small>{createFinalReady?'Готово':creatingBill?'Нужно заполнить':'Ожидает готовности'}</small></span></li></ol></header>
    <div className="formalCreateForm">
     <section className="legalCreateSection"><header><span>1</span><div><small>Исходный материал</small><h3>Документ</h3><p>Импортируйте файл, используйте образец или вставьте текст вручную.</p></div></header>
-     <CloudDocumentPicker gameId={g.game?.id} userId={me?.user_id} disabled={readOnly||busy} onImport={(nextTitle,text,url)=>{setTitle(nextTitle);setBody(text);setFile(null);applyInference(text,nextTitle);setRecognized('Текст импортирован из '+url)}}/>
-     <div className="legalTemplatePicker"><StyledSelect label="Образец документа" value={templateKey} onChange={setTemplateKey} options={DOCUMENT_TEMPLATES.map(t=>({value:t.key,label:t.title}))}/><button type="button" className="secondary" onClick={()=>{const t=DOCUMENT_TEMPLATES.find(x=>x.key===templateKey);if(t){setTitle(t.title);setBody(t.body);setDocType(t.docType);if(t.key.startsWith('party_'))setIssuer(me?.team||'Политическая партия [наименование]');else setIssuer(t.subject==='ministry'?(me?.role_title?.replace(/^Министр/,'Министерство')||'Федеральное министерство'):'');if(teacher||availableSubjects.some(x=>x.key===t.subject))setSubjectKey(t.subject);setRecognized('Образец загружен. Заполните поля в квадратных скобках.')}}}>Использовать образец</button></div>
+     <CloudDocumentPicker gameId={g.game?.id} userId={me?.user_id} disabled={readOnly||busy} onImport={(nextTitle,text,url)=>{cancelExtraction();setTitle(nextTitle);setBody(text);setFile(null);applyInference(text,nextTitle);setRecognized('Текст импортирован из '+url)}}/>
+     <div className="legalTemplatePicker"><StyledSelect label="Образец документа" value={templateKey} onChange={setTemplateKey} options={DOCUMENT_TEMPLATES.map(t=>({value:t.key,label:t.title}))}/><button type="button" className="secondary" onClick={()=>{const t=DOCUMENT_TEMPLATES.find(x=>x.key===templateKey);if(t){cancelExtraction();setTitle(t.title);setBody(t.body);setDocType(t.docType);if(t.key.startsWith('party_'))setIssuer(me?.team||'Политическая партия [наименование]');else setIssuer(t.subject==='ministry'?(me?.role_title?.replace(/^Министр/,'Министерство')||'Федеральное министерство'):'');if(teacher||availableSubjects.some(x=>x.key===t.subject))setSubjectKey(t.subject);setRecognized('Образец загружен. Заполните поля в квадратных скобках.')}}}>Использовать образец</button></div>
      <div className="formalFileDrop"><input aria-label="Загрузить документ для распознавания" type="file" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" onChange={e=>{const x=e.target.files?.[0];if(x)void extractFile(x)}}/><div><span>⇧</span><b>{file?file.name:'Загрузить PDF, DOCX или TXT'}</b><small>{extracting?'Извлекаю текст…':'Исходный файл сохранится вместе с НПА'}</small></div></div>
-     <div className="formalEditorHead"><label>Текст документа</label><button type="button" onClick={()=>applyInference()}>◇ Распознать реквизиты</button></div><textarea aria-label="Текст документа" className="formalTextEditor" value={body} onChange={e=>setBody(e.target.value)} placeholder="Вставьте полный текст документа…"/>
+     <div className="formalEditorHead"><label>Текст документа</label><button type="button" onClick={()=>applyInference()}>◇ Распознать реквизиты</button></div><textarea aria-label="Текст документа" className="formalTextEditor" value={body} onChange={e=>changeBody(e.target.value)} placeholder="Вставьте полный текст документа…"/>
     </section>
     <section className="legalCreateSection"><header><span>2</span><div><small>Карточка НПА</small><h3>Реквизиты и маршрут</h3><p>Вид акта и субъект определяют официальный маршрут документа.</p></div></header>
-     {recognized&&<div className="recognitionResult">{recognized}</div>}<div className="formalInputBlock"><label>Название документа</label><input aria-label="Название документа" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Например: О внесении изменений в Федеральный закон…"/></div>
-     <div className="formalRecognitionGrid"><StyledSelect label="Субъект" value={subjectKey} onChange={chooseSubject} options={availableSubjects.map(x=>({value:x.key,label:x.label}))}/><StyledSelect label="Вид документа" value={docType} onChange={setDocType} options={FORMAL_TYPES.map(x=>({value:x.key,label:x.label}))}/></div>
+     {recognized&&<div className="recognitionResult">{recognized}</div>}<div className="formalInputBlock"><label>Название документа</label><input aria-label="Название документа" value={title} onChange={e=>changeTitle(e.target.value)} placeholder="Например: О внесении изменений в Федеральный закон…"/></div>
+     <div className="formalRecognitionGrid"><StyledSelect label="Субъект" value={subjectKey} onChange={chooseSubject} options={availableSubjects.map(x=>({value:x.key,label:x.label}))}/><StyledSelect label="Вид документа" value={docType} onChange={value=>{draftVersions.current.requisites++;setDocType(value)}} options={FORMAL_TYPES.map(x=>({value:x.key,label:x.label}))}/></div>
      <div className="legalIssuerFields"><label>Наименование органа<input value={issuer} onChange={e=>setIssuer(e.target.value)} placeholder={FORMAL_SUBJECTS.find(x=>x.key===subjectKey)?.label}/></label><label>Место издания<input value={place} onChange={e=>setPlace(e.target.value)}/></label></div>
      <p className="legalEditorNote"><Route size={16}/> Номер и дата присваиваются при регистрации. После регистрации официальные переходы выполняются в блоке управления процедурой рядом с документом.</p>
     </section>
@@ -374,7 +431,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
      <div className="billCreateAttachments"><div className="billCreateAttachmentsHead"><div><Paperclip size={18}/><b>Обязательные приложения</b></div><span>{createBillPreparedCount} из {createBillRequiredKinds.length} выбрано</span></div>{createBillRequiredKinds.map(kind=>{const nextFile=createBillFiles[kind];return <label key={kind} className={nextFile?'has-file':''}><span><b>{billFileLabels[kind]||kind}</b><small>{nextFile?nextFile.name:'PDF, DOC/DOCX или TXT'}</small></span><input type="file" accept=".pdf,.doc,.docx,.txt" onChange={e=>setCreateBillFiles(v=>({...v,[kind]:e.target.files?.[0]||null}))}/><em>{nextFile?'Заменить':'Выбрать файл'}</em></label>})}</div>
      <p className="billCreateRule"><ClipboardList size={17}/> Зарегистрировать черновик можно и с неполным комплектом. Но официальный переход «Внести в Государственную Думу» будет доступен только после заполнения обязательных материалов.</p>
     </section>}
-    <div className="formalCreateFooter"><div className="legalStageValue"><span>Этап игры:</span><b>{createStageNo||currentStage?.stage_no||'—'}</b></div><button type="button" className="primary" disabled={busy||title.trim().length<3||(!teacher&&!availableSubjects.length)} onClick={create}>{busy?'Регистрирую и сохраняю комплект…':'Зарегистрировать документ →'}</button></div>
+    <div className="formalCreateFooter"><div className="legalStageValue"><span>Этап игры:</span><b>{createStageNo||currentStage?.stage_no||'—'}</b></div><button type="button" className="primary" disabled={readOnly||busy||extracting||title.trim().length<3||(!teacher&&!availableSubjects.length)} onClick={create}>{busy?'Регистрирую и сохраняю комплект…':'Зарегистрировать документ →'}</button></div>
    </div>
   </section>}
 
@@ -439,10 +496,10 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
     <section className={'legalProcedureBottomGrid'+(showBudgetPreliminary?'':' single')} aria-label="Процедура документа">
      {showBudgetPreliminary&&<div className="legalProcedureBottomCol legalBudgetReviewCol"><article className="surface budgetPreliminary"><div className="surfaceHead"><div><small>Ст. 192 БК РФ · Этап 13</small><h2>Предварительная проверка бюджета</h2></div><span className={budgetReview?.decision==='accept'?'ok':budgetReview?.decision==='return'?'bad':'warn'}>{budgetReview?.decision==='accept'?'Принят к рассмотрению':budgetReview?.decision==='return'?'Возврат':'Проверка'}</span></div>
        <p className="budgetPreliminaryIntro">До I чтения Комитет по бюджету проверяет комплектность проекта. После принятия к рассмотрению проект и материалы направляются комитетам ГД и Счётной палате.</p>
-       <div className="budgetPreliminaryChecks"><label><input type="checkbox" checked={budgetDocsOk} onChange={e=>setBudgetDocsOk(e.target.checked)}/> Документы и материалы соответствуют требованиям</label><label><input type="checkbox" checked={budgetDistributed} onChange={e=>setBudgetDistributed(e.target.checked)}/> Проект направлен во все комитеты ГД</label><label><input type="checkbox" checked={budgetAccounts} onChange={e=>setBudgetAccounts(e.target.checked)}/> Получено/смоделировано заключение Счётной палаты</label></div>
-       <label className="budgetPreliminaryText">Заключение Комитета по бюджету<textarea rows={4} value={budgetConclusion} onChange={e=>setBudgetConclusion(e.target.value)} placeholder="Оцените соответствие комплекта требованиям, полноту материалов и готовность проекта к рассмотрению Государственной Думой."/></label>
-       <label className="budgetPreliminaryText">Примечание<textarea rows={2} value={budgetReviewNote} onChange={e=>setBudgetReviewNote(e.target.value)} placeholder="Замечания, условия возврата или организационные сведения"/></label>
-       <div className="budgetPreliminaryDecision"><StyledSelect label="Предварительная проверка бюджета" value={budgetDecision} onChange={v=>setBudgetDecision(v as 'draft'|'accept'|'return')} options={[{value:'draft',label:'Черновик решения'},{value:'accept',label:'Принять к рассмотрению'},{value:'return',label:'Вернуть Правительству'}]}/><button className="primary" disabled={busy} onClick={()=>void saveBudgetPreliminary()}>Зафиксировать проверку</button></div>
+       <div className="budgetPreliminaryChecks"><label><input type="checkbox" checked={budgetDocsOk} onChange={e=>{dossierDirty.current.budget++;setBudgetDocsOk(e.target.checked)}}/> Документы и материалы соответствуют требованиям</label><label><input type="checkbox" checked={budgetDistributed} onChange={e=>{dossierDirty.current.budget++;setBudgetDistributed(e.target.checked)}}/> Проект направлен во все комитеты ГД</label><label><input type="checkbox" checked={budgetAccounts} onChange={e=>{dossierDirty.current.budget++;setBudgetAccounts(e.target.checked)}}/> Получено/смоделировано заключение Счётной палаты</label></div>
+       <label className="budgetPreliminaryText">Заключение Комитета по бюджету<textarea rows={4} value={budgetConclusion} onChange={e=>{dossierDirty.current.budget++;setBudgetConclusion(e.target.value)}} placeholder="Оцените соответствие комплекта требованиям, полноту материалов и готовность проекта к рассмотрению Государственной Думой."/></label>
+       <label className="budgetPreliminaryText">Примечание<textarea rows={2} value={budgetReviewNote} onChange={e=>{dossierDirty.current.budget++;setBudgetReviewNote(e.target.value)}} placeholder="Замечания, условия возврата или организационные сведения"/></label>
+       <div className="budgetPreliminaryDecision"><StyledSelect label="Предварительная проверка бюджета" value={budgetDecision} onChange={v=>{dossierDirty.current.budget++;setBudgetDecision(v as 'draft'|'accept'|'return')}} options={[{value:'draft',label:'Черновик решения'},{value:'accept',label:'Принять к рассмотрению'},{value:'return',label:'Вернуть Правительству'}]}/><button className="primary" disabled={busy} onClick={()=>void saveBudgetPreliminary()}>Зафиксировать проверку</button></div>
       </article></div>}
      <div className="legalProcedureBottomCol legalDocumentRouteCol"><section className="formalProgress legalRouting legalRouteBoard" aria-labelledby="legal-document-route-title">
       <header className="legalRouteBoardHead">
@@ -536,7 +593,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
        <div className="billDossierEditorHead"><div><small>{editingInitialPackage?'ИСХОДНЫЙ КОМПЛЕКТ':'СОПРОВОЖДЕНИЕ ДОКУМЕНТА'}</small><h3>{editingInitialPackage?'Карточка и материалы инициатора':'Документы, поступающие по ходу процедуры'}</h3></div><span>{editingInitialPackage?'До внесения законопроекта':'Все заключения, решения, отзывы и письма сохраняются в хронологии НПА'}</span></div>
 
        {editingInitialPackage?<div className="billDossierLayout">
-        <section className="billDossierCard"><div className="billDossierCardHead"><b>Карточка внесения</b><small>Комитет, представитель и параметры исходного комплекта</small></div><div className="billProfileForm"><label><input type="checkbox" checked={billFinancial} onChange={e=>setBillFinancial(e.target.checked)}/> Требуется ФЭО</label><label><input type="checkbox" checked={billGovernmentOpinion} onChange={e=>setBillGovernmentOpinion(e.target.checked)}/> Требуется заключение Правительства</label><StyledSelect label="Профильный комитет" value={billCommittee} onChange={setBillCommittee} options={[{value:'',label:'Не выбран'},...committeeUnits.map(x=>({value:x.unit_key,label:x.title}))]}/><StyledSelect label="Представитель в ГД" value={billRepresentative} onChange={setBillRepresentative} options={[{value:'',label:'Не указан'},...members.filter(m=>m.kind==='student').map(m=>({value:m.user_id,label:m.full_name}))]}/><textarea rows={2} value={billNote} onChange={e=>setBillNote(e.target.value)} placeholder="Комментарий к внесению"/>{(selected.author_id===me?.user_id||teacher)&&<button className="secondary" disabled={busy} onClick={()=>void saveBillProfile()}>{busy?'Сохраняю…':'Сохранить карточку'}</button>}</div></section>
+        <section className="billDossierCard"><div className="billDossierCardHead"><b>Карточка внесения</b><small>Комитет, представитель и параметры исходного комплекта</small></div><div className="billProfileForm"><label><input type="checkbox" checked={billFinancial} onChange={e=>{dossierDirty.current.profile++;setBillFinancial(e.target.checked)}}/> Требуется ФЭО</label><label><input type="checkbox" checked={billGovernmentOpinion} onChange={e=>{dossierDirty.current.profile++;setBillGovernmentOpinion(e.target.checked)}}/> Требуется заключение Правительства</label><StyledSelect label="Профильный комитет" value={billCommittee} onChange={value=>{dossierDirty.current.profile++;setBillCommittee(value)}} options={[{value:'',label:'Не выбран'},...committeeUnits.map(x=>({value:x.unit_key,label:x.title}))]}/><StyledSelect label="Представитель в ГД" value={billRepresentative} onChange={value=>{dossierDirty.current.profile++;setBillRepresentative(value)}} options={[{value:'',label:'Не указан'},...members.filter(m=>m.kind==='student').map(m=>({value:m.user_id,label:m.full_name}))]}/><textarea rows={2} value={billNote} onChange={e=>{dossierDirty.current.profile++;setBillNote(e.target.value)}} placeholder="Комментарий к внесению"/>{(selected.author_id===me?.user_id||teacher)&&<button className="secondary" disabled={busy} onClick={()=>void saveBillProfile()}>{busy?'Сохраняю…':'Сохранить карточку'}</button>}</div></section>
         <section className="billDossierCard"><div className="billDossierCardHead"><b>Материалы субъекта инициативы</b><small>Только документы, обязательные при первоначальном внесении</small></div><div className="billPackageList billPackageListCanonical">{requiredBillKinds.map(kind=>{const bf=billFiles.find(x=>x.file_kind===kind);return <div key={kind} className={bf?.status||'missing'}><span className="billPackageStatusIcon">{bf?.status==='accepted'?<CheckCircle2 size={18}/>:bf?.status==='revision'?<CircleAlert size={18}/>:bf?<CircleDot size={18}/>:<FileText size={18}/>}</span><div><b>{billFileLabels[kind]||kind}</b>{bf&&<a href={bf.url||'#'} target="_blank" rel="noreferrer">{bf.file_name}</a>}{bf?.note&&<small>{bf.note}</small>}</div></div>})}</div>{selected.author_id===me?.user_id&&<div className="billPackageUpload"><StyledSelect label="Добавить материал" value={billFileKind} onChange={setBillFileKind} options={Object.entries(billFileLabels).map(([k,v])=>({value:k,label:v}))}/><label><Upload size={17}/>{billFile?.name||'Выберите файл'}<input type="file" accept=".pdf,.doc,.docx,.txt" onChange={e=>setBillFile(e.target.files?.[0]||null)}/></label><button disabled={busy||!billFile} onClick={()=>void uploadBillFile()}>{busy?'Загрузка…':'Загрузить'}</button></div>}</section>
        </div>:<section className="supportLedger">
         <header className="supportLedgerHead"><div><small>Накопительное сопровождение</small><h3>Сопроводительные документы</h3><p>Каждый орган процесса может добавить документ на своей стадии. Уже добавленные материалы не исчезают при дальнейшем движении НПА.</p></div><span>{supportDocuments.length}</span></header>
@@ -551,11 +608,11 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
        {(selected.status_code==='committee'||billConclusion)&&<section className="billCommitteeConclusion billDossierCard">
         <div className="billDossierCardHead"><b>Заключение профильного комитета</b><small>{billConclusion?.finalized?'Заключение уже включено в сопровождение документа':'После фиксации заключение попадёт в сопровождение и сразу изменит дальнейший маршрут'}</small></div>
         {billConclusion?.finalized?<div className="committeeConclusionFinal"><CheckCircle2 size={22}/><div><b>Заключение зафиксировано</b><span>{billConclusion.recommendation==='proceed'?'Документ передан в Совет Государственной Думы.':billConclusion.recommendation==='return'?'Документ возвращён автору на доработку.':'Документ отклонён по итоговой рекомендации.'}</span></div></div>:<>
-         <StyledSelect label="Докладчик" value={committeeRapporteur} onChange={setCommitteeRapporteur} options={[{value:'',label:'Не выбран'},...members.filter(m=>m.kind==='student').map(m=>({value:m.user_id,label:m.full_name}))]}/>
-         <label>Соответствие Конституции, ФКЗ и ФЗ<textarea rows={3} value={committeeLegal} onChange={e=>setCommitteeLegal(e.target.value)}/></label>
-         <label>Внутренняя логика и противоречия<textarea rows={3} value={committeeLogic} onChange={e=>setCommitteeLogic(e.target.value)}/></label>
-         <label>Полнота перечня изменяемых актов<textarea rows={3} value={committeeActs} onChange={e=>setCommitteeActs(e.target.value)}/></label>
-         <StyledSelect label="Рекомендация" value={committeeRecommendation} onChange={v=>setCommitteeRecommendation(v as typeof committeeRecommendation)} options={[{value:'draft',label:'Черновик'},{value:'proceed',label:'Передать в Совет ГД'},{value:'return',label:'Вернуть субъекту инициативы'},{value:'reject',label:'Рекомендовать отклонить'}]}/>
+         <StyledSelect label="Докладчик" value={committeeRapporteur} onChange={value=>{dossierDirty.current.committee++;setCommitteeRapporteur(value)}} options={[{value:'',label:'Не выбран'},...members.filter(m=>m.kind==='student').map(m=>({value:m.user_id,label:m.full_name}))]}/>
+         <label>Соответствие Конституции, ФКЗ и ФЗ<textarea rows={3} value={committeeLegal} onChange={e=>{dossierDirty.current.committee++;setCommitteeLegal(e.target.value)}}/></label>
+         <label>Внутренняя логика и противоречия<textarea rows={3} value={committeeLogic} onChange={e=>{dossierDirty.current.committee++;setCommitteeLogic(e.target.value)}}/></label>
+         <label>Полнота перечня изменяемых актов<textarea rows={3} value={committeeActs} onChange={e=>{dossierDirty.current.committee++;setCommitteeActs(e.target.value)}}/></label>
+         <StyledSelect label="Рекомендация" value={committeeRecommendation} onChange={v=>{dossierDirty.current.committee++;setCommitteeRecommendation(v as typeof committeeRecommendation)}} options={[{value:'draft',label:'Черновик'},{value:'proceed',label:'Передать в Совет ГД'},{value:'return',label:'Вернуть субъекту инициативы'},{value:'reject',label:'Рекомендовать отклонить'}]}/>
          <div className="committeeConclusionOutcome"><CircleAlert size={17}/><span>{committeeRecommendation==='proceed'?'После фиксации документ автоматически перейдёт на этап «Совет Государственной Думы».':committeeRecommendation==='return'?'После фиксации документ автоматически вернётся автору на доработку.':committeeRecommendation==='reject'?'После фиксации документ будет переведён в статус «Отклонён».':'Выберите итоговую рекомендацию, чтобы система могла завершить этап комитета.'}</span></div>
          {canManage(selected)&&<div className="committeeConclusionActions"><button className="secondary" disabled={busy} onClick={()=>void saveCommitteeConclusion(false)}>Сохранить черновик</button><button className="primary" disabled={busy||committeeRecommendation==='draft'} onClick={()=>void saveCommitteeConclusion(true)}>{committeeRecommendation==='proceed'?'Зафиксировать и передать в Совет ГД':committeeRecommendation==='return'?'Зафиксировать и вернуть автору':committeeRecommendation==='reject'?'Зафиксировать и отклонить':'Зафиксировать заключение'}</button></div>}
         </>}

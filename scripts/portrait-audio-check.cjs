@@ -1,4 +1,5 @@
-/* Algorithm checks. Browser decoding, upload interaction and audible playback remain separate checks. */
+/* Portrait algorithms and real browser OfflineAudioContext rendering.
+ * Upload interaction and audible playback remain separate checks. */
 const fs=require('node:fs'),assert=require('node:assert/strict'),ts=require('typescript'),sharp=require('sharp');
 function load(file,dependencies={}){const module={exports:{}};const js=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;new Function('require','module','exports',js)(name=>dependencies[name],module,module.exports);return module.exports}
 const pico=load('lib/vendor/pico.js'),portrait=load('components/game/avatarCrop.ts',{'@/lib/vendor/pico':pico});
@@ -7,11 +8,32 @@ for(const [width,height,face] of [[400,900],[900,400],[500,500,{x:180,y:150,widt
  if(face)assert(face.x+face.width/2>=b.x&&face.x+face.width/2<=b.x+b.size);
 }
 const source=fs.readFileSync('components/game/ComicSoundButton.tsx','utf8');
-const score=new Function('return function score(ctx){'+source.split('function score(ctx:AudioContext){')[1].split('async function start')[0])();
-let samples;
-score({sampleRate:44100,createBuffer(channels,length,rate){assert.equal(channels,2);assert.equal(length/rate,36);samples=Array.from({length:channels},()=>new Float32Array(length));return {getChannelData:i=>samples[i]}}});
-for(const channel of samples){assert(channel.every(Number.isFinite));assert(Math.abs(channel[0]-channel[channel.length-1])<.001);assert(channel.every(v=>Math.abs(v)<.3));assert(channel.some(v=>Math.abs(v)>.02))}
+const scoreBody=source.split('async function score(ctx:AudioContext){')[1]?.split('async function start')[0];
+assert(scoreBody,'Current async score renderer is present');
 (async()=>{
+ const {chromium}=require('playwright-core');
+ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser','/opt/google/chrome/chrome'].find(p=>p&&fs.existsSync(p));
+ const browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
+ try{
+  const page=await browser.newPage();
+  const renders=await page.evaluate(async body=>{
+   const score=new Function('return async function score(ctx){'+body)();
+   const renders=[];
+   for(const sampleRate of [22050,44100]){
+    const buffer=await score({sampleRate});
+    const channels=Array.from({length:buffer.numberOfChannels},(_,i)=>{
+     const samples=buffer.getChannelData(i);
+     return {finite:samples.every(Number.isFinite),boundary:Math.abs(samples[0]-samples[samples.length-1]),bounded:samples.every(v=>Math.abs(v)<.3),audible:samples.some(v=>Math.abs(v)>.02)};
+    });
+    renders.push({channels,duration:buffer.duration,sampleRate:buffer.sampleRate});
+   }
+   return renders;
+  },scoreBody);
+  for(const render of renders){
+   assert.equal(render.channels.length,2);assert.equal(render.duration,36);
+   for(const channel of render.channels){assert(channel.finite);assert(channel.boundary<.001);assert(channel.bounded);assert(channel.audible)}
+  }
+ }finally{await browser.close()}
  const fixture=process.argv[2];
  if(fixture){
   const {data,info}=await sharp(fixture).resize({width:480,height:480,fit:'inside'}).removeAlpha().raw().toBuffer({resolveWithObject:true});
