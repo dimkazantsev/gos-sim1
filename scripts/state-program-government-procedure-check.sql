@@ -98,7 +98,7 @@ set local role authenticated;
 do $real_government_procedure$
 declare
  g uuid:=current_setting('qa.gov.game')::uuid;users jsonb:=current_setting('qa.gov.users')::jsonb;
- payload jsonb:=current_setting('qa.gov.payload')::jsonb;v_program_id uuid;v_vote_id uuid;actor text;outcome text;choice text;
+ payload jsonb:=current_setting('qa.gov.payload')::jsonb;v_program_id uuid;v_vote_id uuid;actor text;outcome text;v_choice text;
  signed_row jsonb;after_row jsonb;budget_entry jsonb;result jsonb;closed_snapshot jsonb;repeated_snapshot jsonb;
  resolution_route boolean:=current_setting('qa.gov.resolution_trigger')::boolean;protocols jsonb:='[]'::jsonb;resolution_id uuid;
 begin
@@ -130,14 +130,14 @@ begin
    perform pg_temp.sp_expect_rejection(format('select public.cast_procedural_vote(%L::uuid,%L)',v_vote_id,'yes'),'office-only PM cannot vote before registration');
    perform pg_temp.sp_assert(not exists(select 1 from public.game_ballots where vote_id=v_vote_id),'attendance denial produces no ballot');
   end if;
-  choice:=case when outcome='passed' then 'yes' else 'no' end;
+  v_choice:=case when outcome='passed' then 'yes' else 'no' end;
   foreach actor in array array['creator','minister','pm'] loop
    perform pg_temp.sp_as_user((users->>actor)::uuid);
    perform public.register_institution_session_at_stage(g,'government',11);
-   perform public.cast_procedural_vote(v_vote_id,choice);
+   perform public.cast_procedural_vote(v_vote_id,v_choice);
   end loop;
   perform pg_temp.sp_assert((select count(*) from public.institution_session_registrations r where r.game_id=g and r.stage_no=11 and r.institution_key='government')=3
-   and (select count(*) from public.game_ballots b where b.vote_id=v_vote_id and b.choice=choice and b.weight=1)=3,'all three government members register and cast their own unit votes');
+   and (select count(*) from public.game_ballots b where b.vote_id=v_vote_id and b.choice=v_choice and b.weight=1)=3,'all three government members register and cast their own unit votes');
   -- The existing procedure explicitly permits the teacher to preside. This
   -- isolates vote/NPA preservation from primary-role-only legacy chair checks.
   perform pg_temp.sp_as_user((users->>'teacher')::uuid);

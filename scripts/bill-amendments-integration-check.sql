@@ -91,7 +91,7 @@ do $$declare g uuid:=current_setting('qa.bill_game')::uuid;t uuid:=current_setti
  perform public.reject_bill_amendment(amendment,'QA source text changed; new submission required.');
  perform set_config('request.jwt.claim.sub',a::text,true);
  v:=public.create_civic_vote(g,'QA completed second reading',null,'mandate','gd','bill_reading2','fraction',.5,'eligible_majority',.5,true,false,d,'advance','reject',null);
- perform public.cast_vote_allocation(v,225,0,0);perform set_config('request.jwt.claim.sub',b::text,true);perform public.cast_vote_allocation(v,225,0,0);perform set_config('request.jwt.claim.sub',a::text,true);perform public.close_procedural_vote(v,'QA whole reading');
+ perform public.cast_vote_allocation(v,225,0,0);perform set_config('request.jwt.claim.sub',b::text,true);perform public.cast_vote_allocation(v,225,0,0);perform set_config('request.jwt.claim.sub',t::text,true);perform public.close_procedural_vote(v,'QA whole reading');
  if (select status_code from public.formal_documents where id=d)<>'reading3' then raise exception 'FAIL subsequent whole bill route';end if;
  v:=public.create_civic_vote(g,'QA zero amendment route',null,'mandate','gd','bill_reading2','fraction',.5,'eligible_majority',.5,true,false,current_setting('qa.bill_zero')::uuid,'advance','reject',null);
  if v is null then raise exception 'FAIL zero amendment route blocked';end if;
