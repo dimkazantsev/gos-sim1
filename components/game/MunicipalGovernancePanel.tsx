@@ -26,6 +26,7 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
  const [headPick,setHeadPick]=useState<Record<string,string>>({});
  const [memberPick,setMemberPick]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
+  const [electionFeedback,setElectionFeedback]=useState('');
  const scopeKey=[game?.id,me?.user_id,me?.kind,me?.role_title,me?.roster_archived_at,teacher].join('|');
  const scope=useRef(scopeKey),generation=useRef(0),request=useRef(0),busyRef=useRef(false);
  const [stateScope,setStateScope]=useState(scopeKey);
@@ -34,7 +35,7 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
  useEffect(()=>{
   generation.current++;request.current++;busyRef.current=false;
   setStateScope(scopeKey);setElections([]);setCandidates([]);setDistricts([]);setDistrictMembers([]);setResults({});
-  setVoteCandidate('');setHeadPick({});setMemberPick({});setBusy(false);
+  setVoteCandidate('');setHeadPick({});setMemberPick({});setBusy(false);setElectionFeedback('');
   return()=>{generation.current++;request.current++;};
  },[scopeKey]);
 
@@ -64,7 +65,7 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
    if(!current())return;
    setElections(rows);setResults(rr);setCandidates((c.data||[]) as Candidate[]);
    setDistricts((d.data||[]) as District[]);setDistrictMembers((m.data||[]) as DistrictMember[]);
-  }catch(error){if(current())setError(error instanceof Error?error.message:String(error));}
+  }catch(error){if(current()){const message=error instanceof Error?error.message:String(error);setError(message);if(name==='create_municipal_mayor_election')setElectionFeedback('Ошибка создания выборов: '+message);}}
  }
  useGameTableSync(game?.id,['municipal_mayor_elections','municipal_mayor_candidates','municipal_mayor_ballots','municipal_districts','municipal_district_members'],load,scopeKey);
  const latest=elections[0];
@@ -85,12 +86,12 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
   const key=scopeKey,epoch=generation.current;
   const current=()=>scope.current===key&&generation.current===epoch;
   busyRef.current=true;setBusy(true);
-  try{const r=await supabase.rpc(name,args);if(!current())return;if(r.error)setError(r.error.message);else{after?.();await load();}}
+  try{const r=await supabase.rpc(name,args);if(!current())return;if(r.error){setError(r.error.message);if(name==='create_municipal_mayor_election')setElectionFeedback('Не удалось создать выборы: '+r.error.message);}else{after?.();if(name==='create_municipal_mayor_election')setElectionFeedback('Выборы созданы. Теперь можно выдвигать кандидатов.');await load();}}
   catch(error){if(current())setError(error instanceof Error?error.message:String(error));}
   finally{if(current()){busyRef.current=false;setBusy(false);}}
  }
  async function createElection(){
-  if(teacher)await act('create_municipal_mayor_election',{p_game_id:activeGame.id});
+  if(teacher){setElectionFeedback('');await act('create_municipal_mayor_election',{p_game_id:activeGame.id});}
  }
  async function nominate(uid:string){
   if(latest?.status!=='nomination'||(!teacher&&me?.user_id!==uid))return;
@@ -129,7 +130,8 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
 
   <section className="mayorElection">
    <div className="mayorElectionTitle"><div><small>14.1 · ТАЙНОЕ ГОЛОСОВАНИЕ</small><h3>Выборы главы Барнаула</h3></div><span>{latest?electionStatus[latest.status]:'Выборы не созданы'}</span></div>
-   {!latest&&teacher&&<button className="primary" disabled={busy} onClick={()=>void createElection()}>Создать выборы главы города</button>}
+   {!latest&&teacher&&<div className="mayorCreateActions"><button type="button" className="primary" disabled={busy} onClick={()=>void createElection()}>{busy?'Создание выборов…':'Создать выборы главы города'}</button><p>После создания откроется выдвижение кандидатов. Тайное голосование запускается отдельно.</p></div>}
+    {electionFeedback&&<p role="status" className="mayorElectionFeedback">{electionFeedback}</p>}
    {latest?.status==='nomination'&&<>
     <div className="mayorCandidates">{latestCandidates.map(x=><span key={x.id}>{name(x.user_id)}</span>)}</div>
     <div className="mayorNominationActions">
