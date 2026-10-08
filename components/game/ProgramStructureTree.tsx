@@ -58,7 +58,7 @@ export default function ProgramStructureTree(p:Props){
         const filled=!!(directionTitle.trim()&&c.title.trim()&&c.goal_text.trim());
         const sum=costs.length||!p.legacyBudgets?.[c.key]?kopecksMoney(amountFor(costs)):programMoney(p.legacyBudgets[c.key]);
         return <article className={styles.treeComponent} key={c.key}>
-         <details defaultOpen={i===nodes.length-1||nodes.length===1}>
+         <details ref={el=>{if(el&&!el.dataset.initialized){el.open=i===nodes.length-1||nodes.length===1;el.dataset.initialized='true';}}}>
           <summary className={styles.treeComponentSummary}>
            <span className={styles.treeNodeIndex}>{n}.{i+1}</span>
            <span className={styles.treeNodeText}><b>{c.title.trim()||'Новый структурный элемент'}</b><small>{kinds.find(k=>k.value===c.component_kind)?.label} · Расходы: {sum}</small></span>
