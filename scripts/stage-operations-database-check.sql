@@ -20,6 +20,7 @@ begin
    values(g,u,'QA participant '||i,'student','Депутат Государственной Думы','QA');
   end if;
  end loop;
+ insert into public.government_structures(game_id,status,proposed_by,reviewed_by) values(g,'approved',t,t);
  perform set_config('qa.stage_game',g::text,true);
  perform set_config('qa.stage_teacher',t::text,true);
  perform set_config('qa.stage_users',array_to_json(ids)::text,true);
@@ -30,7 +31,7 @@ declare g uuid:=current_setting('qa.stage_game')::uuid;t uuid:=current_setting('
  ids uuid[];i integer;before_rows text;after_rows text;v uuid;r jsonb;blocked boolean;
 begin
  select array_agg(value::uuid) into ids from jsonb_array_elements_text(current_setting('qa.stage_users')::jsonb);
- perform public.ensure_stage9_units(g);
+ perform public.ensure_duma_committees(g);perform public.ensure_stage9_units(g);
  select string_agg(id::text||ctid::text,',' order by id) into before_rows from public.institution_units where game_id=g;
  perform public.ensure_stage9_units(g);perform public.ensure_stage9_units(g);
  select string_agg(id::text||ctid::text,',' order by id) into after_rows from public.institution_units where game_id=g;

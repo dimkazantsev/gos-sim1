@@ -28,7 +28,7 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
  async function load(){
   if(!game)return;
   const [e,c,b]=await Promise.all([
-   supabase.from('office_elections').select('*').eq('game_id',game.id).eq('stage_no',4).order('created_at',{ascending:true}),
+   supabase.from('office_elections').select('*').eq('game_id',game.id).eq('stage_no',4).in('office_key',['gd_chair','gd_deputy_1','gd_deputy_2']).order('created_at',{ascending:true}),
    supabase.from('office_candidates').select('*').eq('game_id',game.id).order('created_at'),
    supabase.from('office_ballots').select('*').eq('game_id',game.id)
   ]);
@@ -91,7 +91,7 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
     <header><div><small>{e.round_no===2?'ВТОРОЙ ТУР':'ПЕРВЫЙ ТУР'} · {e.vote_mode==='secret'?'ТАЙНОЕ':'ОТКРЫТОЕ'}</small><h3>{e.office_title}</h3></div><span>{e.status==='nomination'?'Выдвижение':e.status==='open'?'Голосование':e.status==='finished'?'Избран':'Завершено'}</span></header>
 
     {e.status==='nomination'&&<div className="dumaNomination">
-     {(teacher||ledParty)&&<><select value={nominee[e.id]||''} onChange={x=>setNominee(v=>({...v,[e.id]:x.target.value}))}><option value="">Выберите кандидата…</option>{eligibleNominees.filter(m=>!ec.some(c=>c.user_id===m.user_id)).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select><button disabled={busy||!nominee[e.id]} onClick={()=>void nominate(e.id)}>Выдвинуть</button></>}
+     {(teacher||ledParty)&&<><select aria-label={'Кандидат: '+e.office_title} value={nominee[e.id]||''} onChange={x=>setNominee(v=>({...v,[e.id]:x.target.value}))}><option value="">Выберите кандидата…</option>{eligibleNominees.filter(m=>!ec.some(c=>c.user_id===m.user_id)).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select><button disabled={busy||!nominee[e.id]} onClick={()=>void nominate(e.id)}>Выдвинуть</button></>}
      {teacher&&<button className="primary" disabled={busy||ec.length===0} onClick={()=>void open(e.id)}>Открыть голосование</button>}
     </div>}
 
@@ -102,7 +102,7 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
      return <div className={'dumaCandidate '+(winner?.id===c.id?'winner':'')} key={c.id}>
       <div className="dumaCandidateIdentity"><span style={{background:p?.color||'#315efb'}}>{(person?.full_name||'?').split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</span><div><b>{person?.full_name||'Кандидат'}</b><small>{p?.name||'Фракция'}</small></div></div>
       <div className="dumaCandidateScore"><strong>{visibleTotal?total:(own??'•')}</strong><span>{visibleTotal?'голосов':own!=null?'ваших голосов':'тайно'}</span></div>
-      {e.status==='open'&&ledParty&&<div className="dumaVoteAllocation"><input type="number" min="0" max={myCapacity} value={voteDraft[e.id+'-'+c.id]??String(own??0)} onChange={x=>setVoteDraft(v=>({...v,[e.id+'-'+c.id]:x.target.value}))}/><button disabled={busy} onClick={()=>void vote(e.id,c.id)}>Записать</button></div>}
+      {e.status==='open'&&ledParty&&<div className="dumaVoteAllocation"><input aria-label={'Мандаты за '+(person?.full_name||'кандидата')+' на должность '+e.office_title} type="number" min="0" max={myCapacity} value={voteDraft[e.id+'-'+c.id]??String(own??0)} onChange={x=>setVoteDraft(v=>({...v,[e.id+'-'+c.id]:x.target.value}))}/><button disabled={busy} onClick={()=>void vote(e.id,c.id)}>Записать</button></div>}
      </div>
     })}</div>
 

@@ -22,11 +22,17 @@ import MunicipalProjectLab from './MunicipalProjectLab';
 import CrisisRoom from './CrisisRoom';
 import SystemDebriefLab from './SystemDebriefLab';
 import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
+import ElectoralArchitectureLab from './ElectoralArchitectureLab';
+import DumaLeadershipElection from './DumaLeadershipElection';
+import GhostPolicyLab from './GhostPolicyLab';
+import PresidentialSystemDecisionPanel from './PresidentialSystemDecisionPanel';
+import PresidentialElectionLab from './PresidentialElectionLab';
+import PresidentialElectionStage7 from './PresidentialElectionStage7';
 
 type Tab='work'|'rules'|'materials'|'check'|'settings';
 type Props={g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;onBack:()=>void;onOpenStage?:(no:number)=>void;onOpenVotes:(id?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,no:number)=>void;onNavigate?:(view:View)=>void};
 const VIEW_NAMES:Partial<Record<View,string>>={parties:'Партии и фракции',votes:'Голосования',documents:'Реестр НПА',budget:'Бюджет',events:'События',grades:'Журнал оценок',actions:'Политический процесс',profile:'Профиль'};
-const BODIES:Partial<Record<number,string[]>>={9:['gd','committee','government'],11:['government'],12:['gd','committee'],13:['gd','committee','sf'],14:['municipality']};
+const BODIES:Partial<Record<number,string[]>>={2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],6:['gd'],11:['government'],12:['gd','committee'],13:['gd','committee','sf'],14:['municipality']};
 
 export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,onOpenStage,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate}:Props){
  const [tab,setTab]=useState<Tab>('work');
@@ -70,8 +76,14 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
     <legend className="srOnly">Действия этапа {stage.stage_no}</legend>
     {bodies&&<div className="stageOperationsRegistration"><InstitutionRegistrationPanel g={g} readOnly={viewer} stageNo={stage.stage_no} initialBody={bodies[0]} allowedBodies={bodies}/></div>}
     <div className="stageOperationsModules">
+     {stage.stage_no===1&&<section className="stageOperationsFoundation"><h2>Создание и регистрация партии</h2><p>Название, идеология, программа, устав, символика и регистрационные документы заполняются в разделе «Партии и фракции». Минюст проверяет пакет; замечания и итог регистрации доступны участникам.</p><div className="stageOperationsPartyList">{g.parties.map(p=><article key={p.id}><strong>{p.name}</strong><span>{p.registration_status==='registered'?'Зарегистрирована':p.registration_status==='submitted'?'На проверке':p.registration_status==='revision'?'Нужна доработка':p.registration_status==='rejected'?'Отклонена':'Черновик'}</span></article>)}</div>{!g.parties.length&&<p>Партии пока не созданы.</p>}<button type="button" className="primary" disabled={!onNavigate} onClick={()=>onNavigate?.('parties')}>Открыть партии и регистрационные пакеты</button></section>}
+     {(stage.stage_no===2||stage.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={stage.stage_no as 2|3} onOpenVotes={onOpenVotes}/>}
+     {stage.stage_no===4&&<><DumaLeadershipElection g={g}/><InstitutionStaffingLab g={g} mode="committees"/></>}
+     {stage.stage_no===5&&<GhostPolicyLab g={g} onOpenVotes={onOpenVotes}/>}
+     {stage.stage_no===6&&<><PresidentialSystemDecisionPanel g={g} stageNo={6} onOpenVotes={onOpenVotes} onNavigate={onNavigate} onOpenDocument={onOpenDocument}/><PresidentialElectionLab g={g}/></>}
+     {stage.stage_no===7&&<><PresidentialSystemDecisionPanel g={g} stageNo={7} onOpenVotes={onOpenVotes} onNavigate={onNavigate} onOpenDocument={onOpenDocument}/><PresidentialElectionStage7 g={g}/></>}
      {stage.stage_no===8&&<GovernmentStage8Workspace g={g} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onOpenDocument={onOpenDocument} onNavigate={onNavigate}/>}
-     {stage.stage_no===9&&<InstitutionStaffingLab g={g}/>}
+     {stage.stage_no===9&&<><div className="stageOperationsActionBar"><p>Министры назначаются на этапе 8. Здесь они набирают сотрудников своих ведомств; комитеты ГД формируются на первом заседании палаты, в этапе 4.</p><button type="button" className="secondary" disabled={!onOpenStage} onClick={()=>onOpenStage?.(8)}>Открыть назначения</button></div><InstitutionStaffingLab g={g} mode="ministries"/></>}
      {stage.stage_no===10&&<StateProgramLab g={g}/>}
      {stage.stage_no===11&&<><GovernmentProgramSessionLab g={g} onOpenVotes={onOpenVotes}/><details className="stageOperationsDisclosure"><summary><BookOpenText size={18}/>Послание и паспорта государственных программ</summary><StateProgramLab g={g}/></details></>}
      {stage.stage_no===12&&<><div className="stageOperationsActionBar"><p>Сначала подготовьте законопроект и материалы досье, затем включите документ в повестку.</p><button type="button" className="primary" onClick={()=>setTab('materials')}><FileText size={17}/>Подготовить документы</button></div><LegislativeSessionLab g={g} onOpenVotes={onOpenVotes}/></>}
@@ -105,7 +117,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
 
   {teacher&&<section id={sectionId+'-settings'} className="stageOperationsPane" hidden={tab!=='settings'} aria-label="Настройки преподавателя"><div className="stageOperationsRuleIntro"><h2>Управление этапом</h2><p>Сроки и правила оценивания общие с разделом «Управление».</p></div><StagePolicyEditor g={g} stageNo={stage.stage_no}/>{stage.status!=='open'&&<button type="button" className="primary" onClick={()=>void g.openStage(stage.stage_no)}>Открыть этап {stage.stage_no}</button>}</section>}
 
-  <nav className="stageOperationsPager" aria-label="Переход между этапами"><button type="button" disabled={!onOpenStage} onClick={()=>onOpenStage?.(stage.stage_no-1)}><ChevronLeft size={18}/><span>Этап {stage.stage_no-1}</span></button><button type="button" onClick={onBack}>Карта игры</button><button type="button" disabled={stage.stage_no===16||!onOpenStage} onClick={()=>onOpenStage?.(stage.stage_no+1)}><span>{stage.stage_no===16?'Финал':'Этап '+(stage.stage_no+1)}</span><ChevronRight size={18}/></button></nav>
+  <nav className="stageOperationsPager" aria-label="Переход между этапами"><button type="button" disabled={stage.stage_no===1||!onOpenStage} onClick={()=>onOpenStage?.(stage.stage_no-1)}><ChevronLeft size={18}/><span>{stage.stage_no===1?'Начало':'Этап '+(stage.stage_no-1)}</span></button><button type="button" onClick={onBack}>Карта игры</button><button type="button" disabled={stage.stage_no===16||!onOpenStage} onClick={()=>onOpenStage?.(stage.stage_no+1)}><span>{stage.stage_no===16?'Финал':'Этап '+(stage.stage_no+1)}</span><ChevronRight size={18}/></button></nav>
  </div>;
 }
 

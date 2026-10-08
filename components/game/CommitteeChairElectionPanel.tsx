@@ -1,7 +1,9 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {useGameTableSync} from './useGameTableSync';
+import {stageRoleTitles} from './stageRoles';
 
 type Unit={id:string;title:string;head_user_id:string|null};
 type Assignment={unit_id:string;user_id:string;party_id:string|null};
@@ -20,7 +22,7 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
  const [voteDraft,setVoteDraft]=useState<Record<string,string>>({});
  const [mode,setMode]=useState<Record<string,'open'|'secret'>>({});
  const [busy,setBusy]=useState(false);
- const role=(me?.role_title||'').toLowerCase();
+ const role=stageRoleTitles(g);
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  const canCreate=teacher||(role.includes('председател')&&role.includes('дум'))||(role.includes('совет')&&role.includes('дум'));
 
@@ -29,27 +31,18 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
   const [u,a,e,c,b]=await Promise.all([
    supabase.from('institution_units').select('id,title,head_user_id').eq('game_id',game.id).eq('unit_kind','committee').order('unit_key'),
    supabase.from('institution_assignments').select('unit_id,user_id,party_id').eq('game_id',game.id).eq('unit_kind','committee'),
-   supabase.from('office_elections').select('*').eq('game_id',game.id).eq('stage_no',9).order('created_at'),
+   supabase.from('office_elections').select('*').eq('game_id',game.id).eq('stage_no',4).like('office_key','committee:%').order('created_at'),
    supabase.from('office_candidates').select('*').eq('game_id',game.id).order('created_at'),
    supabase.from('office_ballots').select('election_id,party_id,candidate_id,votes').eq('game_id',game.id)
   ]);
+  const failure=[u,a,e,c,b].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
   if(!u.error)setUnits((u.data||[]) as Unit[]);
   if(!a.error)setAssignments((a.data||[]) as Assignment[]);
   if(!e.error)setElections((e.data||[]) as Election[]);
   if(!c.error)setCandidates((c.data||[]) as Candidate[]);
   if(!b.error)setBallots((b.data||[]) as Ballot[]);
  }
- useEffect(()=>{void load()},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('committee-chair-elections:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'office_elections',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'office_candidates',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'office_ballots',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'institution_units',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ useGameTableSync(game?.id,['office_elections','office_candidates','office_ballots','institution_units','institution_assignments'],load,me?.user_id||'');
 
  if(!game||!me)return null;
  const activeMandates=(partyId:string)=>partyMandates.filter(x=>x.party_id===partyId).reduce((a,x)=>a+Number(x.effective_mandates||0),0);
@@ -89,13 +82,13 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
    const myCapacity=ledParty?activeMandates(ledParty.id):0;
    const myUsed=election&&ledParty?used(election.id,ledParty.id):0;
    return <article key={u.id} className={'committeeElectionCard '+(election?.status||'idle')}>
-    <header><div><small>КОМИТЕТ</small><b>{u.title}</b><span>Председатель: {name(u.head_user_id)}</span></div>{!e&&canCreate&&<div className="committeeElectionCreate"><select value={mode[u.id]||'open'} onChange={x=>setMode(v=>({...v,[u.id]:x.target.value as 'open'|'secret'}))}><option value="open">Открыто</option><option value="secret">Тайно</option></select><button disabled={busy} onClick={()=>void create(u.id)}>Начать выборы</button></div>}</header>
+    <header><div><small>КОМИТЕТ</small><b>{u.title}</b><span>Председатель: {name(u.head_user_id)}</span></div>{!e&&canCreate&&<div className="committeeElectionCreate"><select aria-label={'Форма выборов председателя: '+u.title} value={mode[u.id]||'open'} onChange={x=>setMode(v=>({...v,[u.id]:x.target.value as 'open'|'secret'}))}><option value="open">Открыто</option><option value="secret">Тайно</option></select><button disabled={busy} onClick={()=>void create(u.id)}>Начать выборы</button></div>}</header>
     {election&&<><div className="committeeElectionState"><span>{election.round_no===2?'II тур':'I тур'}</span><b>{election.status==='nomination'?'Выдвижение':election.status==='open'?'Голосование':election.status==='finished'?'Завершено':'Тур закрыт'}</b><em>{election.vote_mode==='secret'?'тайное':'открытое'}</em></div>
-    {election.status==='nomination'&&(teacher||ledParty)&&<div className="committeeNominate"><select value={nominee[election.id]||''} onChange={x=>setNominee(v=>({...v,[election.id]:x.target.value}))}><option value="">Кандидат от фракции…</option>{(teacher?assignments.filter(a=>a.unit_id===u.id).map(a=>a.user_id):ownCandidates).filter(uid=>!cs.some(c=>c.user_id===uid)).map(uid=><option key={uid} value={uid}>{name(uid)}</option>)}</select><button disabled={busy||!nominee[election.id]} onClick={()=>void nominate(election.id)}>Выдвинуть</button>{teacher&&<button className="primary" disabled={busy||cs.length===0} onClick={()=>void open(election.id)}>Открыть голосование</button>}</div>}
+    {election.status==='nomination'&&(teacher||ledParty)&&<div className="committeeNominate"><select aria-label={'Кандидат в председатели: '+u.title} value={nominee[election.id]||''} onChange={x=>setNominee(v=>({...v,[election.id]:x.target.value}))}><option value="">Кандидат от фракции…</option>{(teacher?assignments.filter(a=>a.unit_id===u.id).map(a=>a.user_id):ownCandidates).filter(uid=>!cs.some(c=>c.user_id===uid)).map(uid=><option key={uid} value={uid}>{name(uid)}</option>)}</select><button disabled={busy||!nominee[election.id]} onClick={()=>void nominate(election.id)}>Выдвинуть</button>{teacher&&<button className="primary" disabled={busy||cs.length===0} onClick={()=>void open(election.id)}>Открыть голосование</button>}</div>}
     <div className="committeeCandidateList">{cs.map(c=>{
      const own=ledParty?eb(election.id).find(b=>b.party_id===ledParty.id&&b.candidate_id===c.id)?.votes:undefined;
      const visible=election.vote_mode==='open'||!['nomination','open'].includes(election.status)||teacher;
-     return <div key={c.id}><span style={{background:party(c.party_id)?.color||'#315efb'}}>{name(c.user_id).split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</span><div><b>{name(c.user_id)}</b><small>{party(c.party_id)?.name||'Фракция'}</small></div><strong>{visible?totalFor(election.id,c.id):(own??'•')}</strong>{election.status==='open'&&ledParty&&<div className="committeeBallot"><input type="number" min="0" max={myCapacity} value={voteDraft[election.id+'-'+c.id]??String(own??0)} onChange={x=>setVoteDraft(v=>({...v,[election.id+'-'+c.id]:x.target.value}))}/><button disabled={busy} onClick={()=>void cast(election.id,c.id)}>Записать</button></div>}</div>
+     return <div key={c.id}><span style={{background:party(c.party_id)?.color||'#315efb'}}>{name(c.user_id).split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</span><div><b>{name(c.user_id)}</b><small>{party(c.party_id)?.name||'Фракция'}</small></div><strong>{visible?totalFor(election.id,c.id):(own??'•')}</strong>{election.status==='open'&&ledParty&&<div className="committeeBallot"><input aria-label={'Мандаты за '+name(c.user_id)+' в комитете '+u.title} type="number" min="0" max={myCapacity} value={voteDraft[election.id+'-'+c.id]??String(own??0)} onChange={x=>setVoteDraft(v=>({...v,[election.id+'-'+c.id]:x.target.value}))}/><button disabled={busy} onClick={()=>void cast(election.id,c.id)}>Записать</button></div>}</div>
     })}</div>
     {election.status==='open'&&ledParty&&<div className="committeeMandateUse">{ledParty.name}: <b>{myUsed}/{myCapacity}</b> мандатов распределено</div>}
     {election.status==='open'&&teacher&&<button className="primary committeeCloseVote" disabled={busy} onClick={()=>void close(election.id)}>Закрыть голосование</button>}</>}
