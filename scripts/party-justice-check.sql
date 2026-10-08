@@ -17,11 +17,25 @@ reset role;
 insert into public.party_documents(game_id,party_id,doc_kind,title,storage_path,file_name,uploaded_by,status)
 select current_setting('qa.civic_game')::uuid,current_setting('qa.civic_party')::uuid,k,k,'qa/'||k,k||'.txt','89de1d45-8973-4f38-980d-26042af9e53e','accepted' from unnest(array['application','charter','program','fee','symbol','congress_minutes']) k;
 set local role authenticated;
-do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;p uuid:=current_setting('qa.civic_party')::uuid;d uuid;n integer;blocked boolean:=false;begin
+do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;p uuid:=current_setting('qa.civic_party')::uuid;d uuid;cert uuid;official_post uuid;media_post uuid;blocked boolean:=false;begin
  d:=public.issue_party_justice_response(p,'registered','Министерство юстиции рассмотрело пакет. Принято решение о регистрации партии.');
  if (select count(*) from public.formal_documents where game_id=g and doc_type='party_certificate')<>1 then raise exception 'FAIL certificate';end if;
  if (select metadata->>'signed_by' from public.formal_documents where id=d)<>'9fdf732c-1a84-4435-979d-e0272c2b81db' then raise exception 'FAIL signer';end if;
- if (select count(*) from public.political_post_formal_links where game_id=g)<>2 then raise exception 'FAIL links';end if;
+ select id into cert from public.formal_documents where game_id=g and doc_type='party_certificate' and metadata->>'party_id'=p::text;
+ select pp.id into official_post from public.political_posts pp
+ join public.political_post_formal_links link on link.post_id=pp.id and link.formal_document_id=d
+ where pp.game_id=g and pp.actor_key='minjust' and pp.context->>'party_id'=p::text;
+ select id into media_post from public.political_posts
+ where game_id=g and actor_key='media' and source_key='media-party-registration:'||cert::text and context->>'party_id'=p::text;
+ -- The official response and the automatic registration story each link the
+ -- signed response and certificate. Other publications may add game links.
+ if official_post is null or media_post is null then raise exception 'FAIL registration publications';end if;
+ if (select count(*) from public.political_post_formal_links where game_id=g and post_id=official_post)<>2
+  or (select count(*) from public.political_post_formal_links where game_id=g and post_id=official_post and formal_document_id in (d,cert))<>2
+  then raise exception 'FAIL justice response links';end if;
+ if (select count(*) from public.political_post_formal_links where game_id=g and post_id=media_post)<>2
+  or (select count(*) from public.political_post_formal_links where game_id=g and post_id=media_post and formal_document_id in (d,cert))<>2
+  then raise exception 'FAIL registration media links';end if;
  perform public.issue_party_justice_response(p,'registered','Повторное направление подписанного ответа о регистрации партии.');
  if (select count(*) from public.formal_documents where game_id=g and doc_type='party_certificate')<>1 then raise exception 'FAIL duplicate certificate';end if;
  perform set_config('request.jwt.claim.sub','89de1d45-8973-4f38-980d-26042af9e53e',true);

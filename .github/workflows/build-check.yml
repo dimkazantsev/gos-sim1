@@ -2,7 +2,7 @@ name: Build Check
 
 on:
   push:
-    branches: [main, "codex/civic-*", "codex/budget-amendments-*"]
+    branches: [main, "codex/civic-*", "codex/budget-amendments-*", "codex/project-audit-*"]
   workflow_dispatch:
 
 jobs:
@@ -26,6 +26,14 @@ jobs:
       - run: node scripts/game-roster-check.cjs
       - run: node scripts/user-error-check.cjs
       - run: node scripts/intro-refresh-check.cjs
+      - run: node scripts/republic-game-resilience-check.cjs
+      - run: node scripts/editor-async-resilience-check.cjs
+      - run: node scripts/readiness-matrix-check.cjs
+      - run: node scripts/document-input-check.cjs
+      - run: node scripts/electoral-math-check.cjs
+      - run: node scripts/grade-fractional-check.cjs
+      - run: node scripts/chat-media-transport-check.cjs
+      - run: node scripts/event-option-legality-check.cjs
       - run: npm run design:check
       - run: node scripts/interface-contract-check.cjs
       - run: node scripts/fiscal-model-check.cjs

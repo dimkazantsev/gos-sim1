@@ -1,21 +1,29 @@
 import {NextResponse} from 'next/server';
-import {extractText} from 'unpdf';
-import mammoth from 'mammoth';
+import {DOCUMENT_MAX_BYTES,DocumentInputError,documentClient,documentCors,parseDocument,readDocumentBody} from '@/lib/server/documentInput';
+
 export const runtime='nodejs';
-function cors(request:Request):Record<string,string>{const origin=request.headers.get('origin');return origin==='https://dimkazantsev.github.io'?{'Access-Control-Allow-Origin':origin,'Vary':'Origin'}:{}}
-export async function OPTIONS(request:Request){return new Response(null,{status:204,headers:{...cors(request),'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type'}})}
+export const maxDuration=40;
+
+export async function OPTIONS(request:Request){
+ return new Response(null,{status:204,headers:{...documentCors(request),'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Authorization, Content-Type','Cache-Control':'no-store'}});
+}
 export async function POST(request:Request){
- const json=(body:unknown,options?:{status:number})=>NextResponse.json(body,{...options,headers:cors(request)});
+ const json=(body:unknown,status=200)=>NextResponse.json(body,{status,headers:{...documentCors(request),'Cache-Control':'no-store'}});
  try{
-  const form=await request.formData(),file=form.get('file');
-  if(!(file instanceof File))return json({error:'Файл не передан.'},{status:400});
-  if(file.size>10*1024*1024)return json({error:'Файл больше 10 МБ.'},{status:413});
-  const name=file.name.toLowerCase();let text='';
-  if(file.type==='text/plain'||name.endsWith('.txt'))text=await file.text();
-  else if(name.endsWith('.docx'))text=(await mammoth.extractRawText({buffer:Buffer.from(await file.arrayBuffer())})).value;
-  else if(name.endsWith('.pdf'))text=(await extractText(new Uint8Array(await file.arrayBuffer()),{mergePages:true})).text;
-  else return json({error:'Загрузите PDF, DOCX или TXT.'},{status:415});
-  text=text.replace(/\u0000/g,'').replace(/\r\n/g,'\n').trim();
-  return json({text:text.slice(0,120000),truncated:text.length>120000,needsManualText:!text,message:!text?'В документе нет текстового слоя. Вставьте текст в редактор; скан сохранён как приложение.':undefined});
- }catch{return json({error:'Не удалось прочитать документ. Проверьте формат и защиту файла; при необходимости вставьте текст вручную.'},{status:422})}
+  const {client,userId}=await documentClient(request);
+  const member=await client.from('game_members').select('game_id').eq('user_id',userId).is('roster_archived_at',null).neq('kind','observer').limit(1).maybeSingle();
+  if(member.error||!member.data)throw new DocumentInputError('Работа с документами доступна действующим участникам игры.',403);
+  const bytes=await readDocumentBody(request,DOCUMENT_MAX_BYTES+128*1024);
+  const bounded=new Request(request.url,{method:'POST',headers:{'Content-Type':request.headers.get('content-type')||''},body:Buffer.from(bytes)});
+  const form=await bounded.formData(),file=form.get('file');
+  if(!(file instanceof File))throw new DocumentInputError('Файл не передан.',400);
+  if(file.size>DOCUMENT_MAX_BYTES)throw new DocumentInputError('Файл больше 10 МБ.',413);
+  const name=file.name.toLowerCase();
+  const kind=name.endsWith('.docx')?'docx':name.endsWith('.pdf')?'pdf':file.type==='text/plain'||name.endsWith('.txt')?'txt':null;
+  if(!kind)throw new DocumentInputError('Загрузите PDF, DOCX или TXT.',415);
+  const result=await parseDocument(new Uint8Array(await file.arrayBuffer()),kind);
+  return json({...result,message:result.needsManualText?'В документе нет текстового слоя. Вставьте текст в редактор; скан сохранён как приложение.':undefined});
+ }catch(error){
+  return json({error:error instanceof DocumentInputError?error.message:'Не удалось прочитать документ. Проверьте формат и защиту файла; при необходимости вставьте текст вручную.'},error instanceof DocumentInputError?error.status:422);
+ }
 }

@@ -3,6 +3,7 @@ import {useEffect,useState} from 'react';
 import {MessageCircle,Save} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {allocateElectoralSeats as allocate,allocateRegionalSeats} from './electoralMath';
 
 type PRule={id:string;system_type:'proportional'|'majoritarian'|'mixed';allocation_method:'hare'|'droop'|'dhondt'|'sainte_lague'|'imperiali'|null;majoritarian_method:'plurality'|'absolute_two_round'|null;proportional_share:number|null;rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'superseded';vote_id:string|null;proposed_by:string;created_at:string};
 type RRule={id:string;method:'random'|'proportional'|'agreement';rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'allocated'|'superseded';vote_id:string|null;proposed_by:string;created_at:string};
@@ -14,36 +15,6 @@ const sysLabel={proportional:'Пропорциональная',majoritarian:'М
 const allocationLabel={hare:'Квота Хэйра + наибольшие остатки',droop:'Квота Друпа + наибольшие остатки',dhondt:'Д’Ондт',sainte_lague:'Сент-Лагю',imperiali:'Империали'} as const;
 const majLabel={plurality:'Относительное большинство',absolute_two_round:'Абсолютное большинство + 2-й тур'} as const;
 const regionalLabel={random:'Демократический / случайный',proportional:'Пропорционально мандатам ГД',agreement:'Договорной'} as const;
-
-function divisorAllocate(values:number[],seats:number,method:'dhondt'|'sainte_lague'|'imperiali'){
- const out=values.map(()=>0);
- for(let s=0;s<seats;s++){
-  let best=-1,bestQ=-1;
-  for(let i=0;i<values.length;i++){
-   const d=method==='dhondt'?out[i]+1:method==='sainte_lague'?out[i]*2+1:out[i]+2;
-   const q=values[i]/d;
-   if(q>bestQ){bestQ=q;best=i}
-  }
-  if(best>=0)out[best]++;
- }
- return out;
-}
-function quotaAllocate(values:number[],seats:number,method:'hare'|'droop'){
- const total=values.reduce((a,b)=>a+b,0);if(total<=0)return values.map(()=>0);
- const quota=method==='hare'?total/seats:Math.floor(total/(seats+1))+1;
- const raw=values.map(v=>v/quota);
- const out=raw.map(x=>Math.floor(x));
- let remain=Math.max(0,seats-out.reduce((a,b)=>a+b,0));
- const order=raw.map((x,i)=>({i,r:x-Math.floor(x)})).sort((a,b)=>b.r-a.r);
- for(let k=0;k<remain;k++)out[order[k%order.length].i]++;
- while(out.reduce((a,b)=>a+b,0)>seats){const i=out.indexOf(Math.max(...out));out[i]--}
- return out;
-}
-function allocate(values:number[],seats:number,method:PRule['allocation_method']){
- if(!method||seats<=0||values.reduce((n,v)=>n+v,0)<=0)return values.map(()=>0);
- if(method==='hare'||method==='droop')return quotaAllocate(values,seats,method);
- return divisorAllocate(values,seats,method);
-}
 
 export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:ReturnTypeRepublic;stageNo:2|3;onOpenVotes:()=>void}){
  const {game,me,teacher,parties,members,votes,setError}=g;
@@ -135,15 +106,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const latestSavedResult=savedResults[0];
  const regionalMandates=parties.map(p=>Math.max(0,Number(p.mandates)||0));
  const regionalMandateTotal=regionalMandates.reduce((a,b)=>a+b,0);
- const proportionalRegional=(()=>{
-  if(regionalMandateTotal<=0)return parties.map(()=>0);
-  const raw=regionalMandates.map(v=>v/regionalMandateTotal*89);
-  const out=raw.map(v=>Math.floor(v));
-  let remain=89-out.reduce((a,b)=>a+b,0);
-  const order=raw.map((v,i)=>({i,r:v-Math.floor(v)})).sort((a,b)=>b.r-a.r||a.i-b.i);
-  for(let k=0;k<remain;k++)out[order[k%order.length].i]++;
-  return out;
- })();
+ const proportionalRegional=allocateRegionalSeats(regionalMandates);
  const agreementRegional=parties.map(p=>Math.max(0,Math.floor(Number(regionalCalculatorDraft[p.id])||0)));
  const agreementRegionalTotal=agreementRegional.reduce((a,b)=>a+b,0);
  const randomRegional=parties.map(p=>Math.max(0,Math.floor(Number(regionalLottery[p.id])||0)));

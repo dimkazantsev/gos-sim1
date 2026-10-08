@@ -19,6 +19,10 @@ type Assignment={id:string;case_id:string;game_id:string;recipient_id:string;sta
 type Decision={id:string;case_id:string;actor_id:string;choice:string;role_snapshot?:string};
 type Authority={decision_id:string;case_id:string;actor_id:string;authority_ok:boolean;lawful:boolean;strategy_point:boolean;role_snapshot:string;legal_basis:string};
 type Outcome={case_id:string;winner:string;trust_delta:number;votes_count:number;assignments_count:number;media_post_id:string|null;requested_trust_delta?:number;resolution_kind?:string};
+type OptionDraft={label:string;trust:number;description:string;lawful:boolean|null;authorizedRoles:string;legalBasis:string;protectsRoleInterest:boolean};
+const newOption=(trust=0):OptionDraft=>({label:'',trust,description:'',lawful:null,authorizedRoles:'',legalBasis:'',protectsRoleInterest:false});
+const initialOptions=()=>[newOption(2),newOption(),newOption(-2)];
+const authorizedRoles=(value:string)=>[...new Set(value.split(/[,;]/).map(role=>role.trim()).filter(Boolean))];
 export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnTypeRepublic;readOnly?:boolean;mode?:'feed'|'manage'}){
  const {game,me,members,teacher}=g;
  const [invitations,setInvitations]=useState<EventInvitation[]>([]);
@@ -37,7 +41,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const [situation,setSituation]=useState('');
  const [category,setCategory]=useState('Государственное управление');
  const [roleFilter,setRoleFilter]=useState('');
- const [options,setOptions]=useState([{label:'',trust:2,description:''},{label:'',trust:0,description:''},{label:'',trust:-2,description:''}]);
+ const [options,setOptions]=useState(initialOptions);
  const [seriousness,setSeriousness]=useState<'serious'|'light'>('serious');
  const [audience,setAudience]=useState<'single'|'group'|'all'>('single');
  const [selected,setSelected]=useState<string[]>([]);
@@ -80,17 +84,20 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const mine=assignments.filter(a=>a.recipient_id===me?.user_id);
  const readyCases=cases.filter(c=>c.status==='ready');
  const eligible=audience==='all'?students.map(m=>m.user_id):selected;
- const canSend=title.trim().length>=6&&situation.trim().length>=20&&options.every(o=>o.label.trim().length>=2&&o.description.trim().length>=5&&Number.isFinite(o.trust))&&new Set(options.map(o=>o.label.trim().toLowerCase())).size===options.length&&
+ const canSend=title.trim().length>=6&&situation.trim().length>=20&&options.every(o=>{
+  const roles=authorizedRoles(o.authorizedRoles);
+  return o.label.trim().length>=2&&o.description.trim().length>=5&&Number.isFinite(o.trust)&&o.lawful!==null&&roles.length>=1&&roles.length<=20&&roles.every(role=>role.length>=2&&role.length<=120)&&o.legalBasis.trim().length>=5&&o.legalBasis.length<=2000;
+ })&&new Set(options.map(o=>o.label.trim().toLowerCase())).size===options.length&&
   (audience==='all'?students.length>0:audience==='single'?selected.length===1:selected.length>=2&&selected.length<=3);
  async function create(){
   if(!game||!me||!teacher||saving||!canSend||readOnly)return;
   setSaving(true);setNotice('');
   const r=await supabase.rpc('create_assigned_event',{
    p_game_id:game.id,p_title:title.trim(),p_situation:situation.trim(),p_category:category,
-   p_seriousness:seriousness,p_audience:audience,p_options:options,p_recipients:eligible,p_roles:roleFilter?[roleFilter]:[]
+   p_seriousness:seriousness,p_audience:audience,p_options:options.map(o=>({label:o.label,trust:o.trust,description:o.description,authorized_roles:authorizedRoles(o.authorizedRoles),lawful:o.lawful,legal_basis:o.legalBasis.trim(),protects_role_interest:o.protectsRoleInterest})),p_recipients:eligible,p_roles:roleFilter?[roleFilter]:[]
   });
   if(r.error)setNotice(r.error.message);
-  else{setNotice('Событие направлено участникам: '+eligible.length);setTitle('');setSituation('');setSelected([]);setOptions([{label:'',trust:2,description:''},{label:'',trust:0,description:''},{label:'',trust:-2,description:''}]);await reload()}
+  else{setNotice('Событие направлено участникам: '+eligible.length);setTitle('');setSituation('');setSelected([]);setOptions(initialOptions());await reload()}
   setSaving(false);
  }
  async function answer(assignment:Assignment,choice:string){
@@ -170,7 +177,11 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     <label>Доверие, п.п.<input type="number" min={-100} max={100} step="0.5" value={o.trust} onChange={e=>setOptions(old=>old.map((v,j)=>j===i?{...v,trust:e.target.valueAsNumber}:v))}/></label>
     <button type="button" disabled={options.length<=2} onClick={()=>setOptions(old=>old.filter((_,j)=>j!==i))}>Удалить вариант</button>
     <label className="eventChoiceDescription">Последствия решения<textarea rows={2} value={o.description} maxLength={2000} onChange={e=>setOptions(old=>old.map((v,j)=>j===i?{...v,description:e.target.value}:v))} placeholder="Что изменится после этого решения?"/></label>
-   </article>)}<button type="button" disabled={options.length>=6} onClick={()=>setOptions(old=>[...old,{label:'',trust:0,description:''}])}>Добавить вариант</button></div>
+    <div className="eventChoiceDescription"><StyledSelect label="Правомерность решения" value={o.lawful===null?'':String(o.lawful)} onChange={value=>setOptions(old=>old.map((v,j)=>j===i?{...v,lawful:value==='true'?true:value==='false'?false:null}:v))} options={[{value:'',label:'Выберите правовую оценку'},{value:'true',label:'Правомерно'},{value:'false',label:'Неправомерно'}]}/></div>
+    <label className="eventChoiceDescription">Полномочные должности<input value={o.authorizedRoles} maxLength={2500} onChange={e=>setOptions(old=>old.map((v,j)=>j===i?{...v,authorizedRoles:e.target.value}:v))} placeholder="Министр финансов; Председатель правительства"/><small>Названия должностей через запятую или точку с запятой.</small></label>
+    <label className="eventChoiceDescription">Правовое основание<textarea rows={2} value={o.legalBasis} maxLength={2000} onChange={e=>setOptions(old=>old.map((v,j)=>j===i?{...v,legalBasis:e.target.value}:v))} placeholder="Норма, которая разрешает или запрещает решение (от 5 символов)"/></label>
+    <label className="eventChoiceDescription" style={{display:'flex',alignItems:'center'}}><input type="checkbox" style={{width:17,minHeight:17}} checked={o.protectsRoleInterest} onChange={e=>setOptions(old=>old.map((v,j)=>j===i?{...v,protectsRoleInterest:e.target.checked}:v))}/>Защищает интересы своей роли</label>
+   </article>)}<button type="button" disabled={options.length>=6} onClick={()=>setOptions(old=>[...old,newOption()])}>Добавить вариант</button></div>
    {audience!=='all'&&<div className="eventRecipients"><strong>Получатели · {selected.length}/{audience==='single'?1:3}</strong><div>{recipients.map(m=><label key={m.user_id}><input type="checkbox" checked={selected.includes(m.user_id)} disabled={!selected.includes(m.user_id)&&selected.length>=(audience==='single'?1:3)} onChange={e=>setSelected(old=>e.target.checked?[...old,m.user_id]:old.filter(x=>x!==m.user_id))}/>{m.full_name}<small>{m.role_title||'Студент'}</small></label>)}</div></div>}
    <footer><span>{audience==='all'?'Получатели: вся аудитория':'Выбрано: '+selected.length}</span><button type="button" onClick={()=>void create()} disabled={!canSend||saving||readOnly}>{saving?'Отправка…':'Назначить событие'}</button></footer>
   </div></details>}

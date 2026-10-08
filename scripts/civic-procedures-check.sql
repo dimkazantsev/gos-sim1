@@ -1,15 +1,23 @@
 -- Isolated game, real authenticated RPCs, complete rollback. No student data persists.
 begin;
-do $$ declare g uuid:=gen_random_uuid();p uuid:=gen_random_uuid();admin uuid:='9fdf732c-1a84-4435-979d-e0272c2b81db';a uuid:='89de1d45-8973-4f38-980d-26042af9e53e';b uuid:='a4795eef-fbf3-4584-bc0b-f7bfee68b783';begin
+do $ declare g uuid:=gen_random_uuid();p uuid:=gen_random_uuid();admin uuid;a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();begin
+ select owner_id into admin from public.games order by created_at limit 1;
+ if admin is null then raise exception 'QA requires an existing classroom owner';end if;
+ insert into auth.users(id,aud,role) values(a,'authenticated','authenticated'),(b,'authenticated','authenticated');
  perform set_config('request.jwt.claim.sub',admin::text,true);
  insert into public.games(id,title,game_code,owner_id,status,current_round,turn_open) values(g,'QA civic procedures','QA'||substr(replace(g::text,'-',''),1,10),admin,'running',11,true);
+ insert into public.game_stages(game_id,stage_no,title,mode,summary,status)
+ select g,s.stage_no,'QA stage '||s.stage_no,'Учебная процедура','QA',
+  case when s.stage_no=(select current_round from public.games where id=g)then 'open' else 'locked' end
+ from generate_series(1,16)as s(stage_no);
  insert into public.game_members(game_id,user_id,full_name,kind,role_title,group_name) values(g,admin,'Проверка преподавателя','teacher','Преподаватель',null);
  insert into public.game_parties(id,game_id,name,mandates,leader_user_id) values(p,g,'QA civic party',450,a);
  insert into public.game_members(game_id,user_id,full_name,kind,role_title,group_name,team) values(g,a,'Проверка А','student','Депутат Государственной Думы','QA','QA civic party'),(g,b,'Проверка Б','student','Депутат Государственной Думы','QA','QA civic party');
  perform set_config('qa.civic_game',g::text,true);perform set_config('qa.civic_party',p::text,true);
+ perform set_config('qa.civic_teacher',admin::text,true);perform set_config('qa.civic_a',a::text,true);perform set_config('qa.civic_b',b::text,true);
 end;$$;
 set local role authenticated;
-do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;p uuid:=current_setting('qa.civic_party')::uuid;admin uuid:='9fdf732c-1a84-4435-979d-e0272c2b81db';a uuid:='89de1d45-8973-4f38-980d-26042af9e53e';b uuid:='a4795eef-fbf3-4584-bc0b-f7bfee68b783';v uuid;result jsonb;blocked boolean;office uuid;d1 uuid;d2 uuid;c uuid;assignment uuid;step integer;body uuid;begin
+do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;p uuid:=current_setting('qa.civic_party')::uuid;admin uuid:=current_setting('qa.civic_teacher')::uuid;a uuid:=current_setting('qa.civic_a')::uuid;b uuid:=current_setting('qa.civic_b')::uuid;v uuid;result jsonb;blocked boolean;office uuid;d1 uuid;d2 uuid;c uuid;assignment uuid;step integer;body uuid;begin
  perform public.set_student_mandates(p,jsonb_build_object(a::text,240,b::text,210));
  if (select base_mandates from public.party_member_mandates where party_id=p and user_id=a)<>240 then raise exception 'FAIL custom mandate allocation';end if;
  blocked:=false;begin perform public.set_student_mandates(p,jsonb_build_object(a::text,240.5,b::text,209.5));exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL fractional mandates accepted';end if;

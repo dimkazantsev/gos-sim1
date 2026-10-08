@@ -15,7 +15,7 @@ do $$declare g uuid:=gen_random_uuid();admin uuid;a uuid:=gen_random_uuid();b uu
 end$$;
 
 
-do $$declare g uuid:=current_setting('qa.game')::uuid;t uuid:=current_setting('qa.teacher')::uuid;a uuid:=current_setting('qa.a')::uuid;b uuid:=current_setting('qa.b')::uuid;p uuid;incident uuid;candidate uuid;s numeric;blocked boolean;v game_votes%rowtype;regional uuid;begin
+do $$declare g uuid:=current_setting('qa.game')::uuid;t uuid:=current_setting('qa.teacher')::uuid;a uuid:=current_setting('qa.a')::uuid;b uuid:=current_setting('qa.b')::uuid;p uuid;incident uuid;candidate uuid;s numeric;blocked boolean;v game_votes%rowtype;regional uuid;slot integer;begin
  perform set_config('request.jwt.claim.sub',t::text,true);
  insert into game_parties(game_id,name,mandates,regions,leader_user_id) values(g,'QA фракция',100,8,a) returning id into p;
  update game_members set team='QA фракция' where game_id=g and user_id in (a,b);
@@ -29,6 +29,12 @@ do $$declare g uuid:=current_setting('qa.game')::uuid;t uuid:=current_setting('q
  blocked:=false;begin perform public.record_deadline_consequence(g,2,p,null,'representation_loss',1.5,'QA invalid fraction');exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL fractional seats';end if;
  insert into presidential_candidates(game_id,party_id,display_name,nomination_type,registration_status,rating_penalty,created_by) values(g,p,'QA кандидат','fictional','registered',3,t) returning id into candidate;
  insert into presidential_election_settings(game_id,poll_enabled,updated_by) values(g,false,t) on conflict(game_id) do update set poll_enabled=false;
+ -- The current scorecard uses completed jury scores, rather than the legacy
+ -- program/campaign arguments. All eight fictional slots score both at 80.
+ for slot in 1..8 loop
+  perform public.set_presidential_teacher_jury_score(g,candidate,slot,'program',80);
+  perform public.set_presidential_teacher_jury_score(g,candidate,slot,'campaign',80);
+ end loop;
  s:=public.set_presidential_scorecard(candidate,1,80,80,80,null,null);if s<>77 then raise exception 'FAIL initial candidate score';end if;
  incident:=public.record_deadline_consequence(g,6,p,null,'presidential_rating_loss',11,'QA rating deadline');
  select computed_pct into s from presidential_scorecards where candidate_id=candidate and round_no=1;if s<>66 then raise exception 'FAIL deadline in candidate score';end if;
