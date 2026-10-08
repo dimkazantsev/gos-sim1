@@ -84,9 +84,11 @@ begin
  select array_agg(value::uuid) into ids from jsonb_array_elements_text(current_setting('qa.early_users')::jsonb);
  perform set_config('request.jwt.claim.sub',t::text,true);
  insert into public.government_structures(game_id,status,proposed_by,reviewed_by) values(g,'approved',t,t);
+ insert into public.government_nominations(game_id,stage_no,office_key,office_title,office_kind,route,candidate_user_id,candidate_name,nominated_by,status)
+ values(g,8,'prime_minister','Председатель Правительства','prime_minister','president_to_duma',ids[10],'QA PM',t,'appointed');
  for i in 1..5 loop
   insert into public.government_nominations(game_id,stage_no,office_key,office_title,office_kind,route,candidate_user_id,candidate_name,nominated_by,status)
-  values(g,8,'ministry_'||keys[i],'Министр QA '||i,'duma_minister','pm_to_duma',ids[i],'QA minister '||i,t,'appointed');
+  values(g,9,'ministry_'||keys[i],'Министр QA '||i,case when i=1 then 'deputy_pm' when i in (3,5) then 'security_minister' else 'duma_minister' end,case when i in (3,5) then 'president_after_sf' else 'pm_to_duma' end,ids[i],'QA minister '||i,t,'appointed');
  end loop;
 end;$ministries$;
 set local role authenticated;
@@ -116,5 +118,5 @@ begin
  if not blocked then raise exception 'FAIL outsider syncs ministries';end if;
 end;$staffing$;
 reset role;
-select jsonb_build_object('stage9_no_automatic_creation','PASS','student_observer_outsider_creation_denied','PASS','active_duma_chair_creation','PASS','five_committees_only','PASS','idempotent_committee_creation','PASS','quota_90','PASS','chair_election_stage4','PASS','duplicate_election_denied','PASS','outsider_election_denied','PASS','candidate_membership','PASS','226_votes_and_saved_ballot','PASS','stage4_readiness','PASS','stage9_staffing_only_readiness','PASS','approved_ministries_and_saved_heads','PASS','idempotent_ministry_refresh','PASS','minister_appointment_bypass_denied','PASS','staffing_readiness','PASS','outsider_rls','PASS') checks;
+select jsonb_build_object('stage9_no_automatic_creation','PASS','student_observer_outsider_creation_denied','PASS','active_duma_chair_creation','PASS','five_committees_only','PASS','idempotent_committee_creation','PASS','quota_90','PASS','chair_election_stage4','PASS','duplicate_election_denied','PASS','outsider_election_denied','PASS','candidate_membership','PASS','226_votes_and_saved_ballot','PASS','stage4_readiness','PASS','stage9_no_committee_readiness','PASS','approved_ministries_and_saved_heads','PASS','idempotent_ministry_refresh','PASS','minister_appointment_bypass_denied','PASS','staffing_readiness','PASS','outsider_rls','PASS') checks;
 rollback;

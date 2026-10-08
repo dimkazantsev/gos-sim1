@@ -11,7 +11,7 @@ import {gamePhaseForStage} from './stageSystem';
 import StageArtifacts from './StageArtifacts';
 import StageReadinessPanel from './StageReadinessPanel';
 import StagePolicyEditor from './StagePolicyEditor';
-import GovernmentStage8Workspace from './GovernmentStage8Workspace';
+import GovernmentFormationWorkspace from './GovernmentFormationWorkspace';
 import InstitutionStaffingLab from './InstitutionStaffingLab';
 import StateProgramLab from './StateProgramLab';
 import GovernmentProgramSessionLab from './GovernmentProgramSessionLab';
@@ -82,8 +82,8 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
      {stage.stage_no===5&&<GhostPolicyLab g={g} onOpenVotes={onOpenVotes}/>}
      {stage.stage_no===6&&<><PresidentialSystemDecisionPanel g={g} stageNo={6} onOpenVotes={onOpenVotes} onNavigate={onNavigate} onOpenDocument={onOpenDocument}/><PresidentialElectionLab g={g}/></>}
      {stage.stage_no===7&&<><PresidentialSystemDecisionPanel g={g} stageNo={7} onOpenVotes={onOpenVotes} onNavigate={onNavigate} onOpenDocument={onOpenDocument}/><PresidentialElectionStage7 g={g}/></>}
-     {stage.stage_no===8&&<GovernmentStage8Workspace g={g} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onOpenDocument={onOpenDocument} onNavigate={onNavigate}/>}
-     {stage.stage_no===9&&<><div className="stageOperationsActionBar"><p>Министры назначаются на этапе 8. Здесь они набирают сотрудников своих ведомств; комитеты ГД формируются на первом заседании палаты, в этапе 4.</p><button type="button" className="secondary" disabled={!onOpenStage} onClick={()=>onOpenStage?.(8)}>Открыть назначения</button></div><InstitutionStaffingLab g={g} mode="ministries"/></>}
+     {stage.stage_no===8&&<GovernmentFormationWorkspace g={g} stageNo={8} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onOpenDocument={onOpenDocument} onNavigate={onNavigate}/>}
+     {stage.stage_no===9&&<><GovernmentFormationWorkspace g={g} stageNo={9} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onOpenDocument={onOpenDocument} onNavigate={onNavigate}/><section id="ministry-teams" className="stageOperationsMinistryTeams"><InstitutionStaffingLab g={g} mode="ministries"/></section></>}
      {stage.stage_no===10&&<StateProgramLab g={g}/>}
      {stage.stage_no===11&&<><GovernmentProgramSessionLab g={g} onOpenVotes={onOpenVotes}/><details className="stageOperationsDisclosure"><summary><BookOpenText size={18}/>Послание и паспорта государственных программ</summary><StateProgramLab g={g}/></details></>}
      {stage.stage_no===12&&<><div className="stageOperationsActionBar"><p>Сначала подготовьте законопроект и материалы досье, затем включите документ в повестку.</p><button type="button" className="primary" onClick={()=>setTab('materials')}><FileText size={17}/>Подготовить документы</button></div><LegislativeSessionLab g={g} onOpenVotes={onOpenVotes}/></>}

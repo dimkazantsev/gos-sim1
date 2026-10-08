@@ -64,7 +64,11 @@ export default function GhostPolicyLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onO
      ['prohibited','Запрещено','Ghost voting не применяется'],
      ['justified','По уважительной причине','Допускается только при обоснованном отсутствии'],
      ['allowed','Разрешено','Ghost voting применяется без дополнительного ограничения']
-    ] as const).map(([value,title,desc])=><button key={value} type="button" role="radio" aria-checked={mode===value} className={mode===value?'active':''} onClick={()=>setMode(value)}><span>{title}</span><small>{desc}</small></button>)}
+    ] as const).map(([value,title,desc],index)=><button key={value} type="button" role="radio" aria-checked={mode===value} tabIndex={mode===value?0:-1} className={mode===value?'active':''} onClick={()=>setMode(value)} onKeyDown={e=>{
+     const choices=['prohibited','justified','allowed'] as const;
+     const next=e.key==='ArrowRight'||e.key==='ArrowDown'?(index+1)%3:e.key==='ArrowLeft'||e.key==='ArrowUp'?(index+2)%3:e.key==='Home'?0:e.key==='End'?2:null;
+     if(next===null)return;e.preventDefault();setMode(choices[next]);e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]')[next]?.focus();
+    }}><span>{title}</span><small>{desc}</small></button>)}
    </div>
    <label className="ghostPolicyRationale"><span>Обоснование</span><textarea rows={4} value={rationale} onChange={e=>setRationale(e.target.value)} placeholder="Почему этот режим выгоден вашей фракции и как он влияет на устойчивость большинства?"/></label>
    <footer className="ghostPolicyProposalFooter"><span>После внесения проект появится в списке ниже и сможет быть вынесен на голосование.</span><button className="primary" disabled={busy} onClick={()=>void propose()}>Внести проект постановления</button></footer>

@@ -794,19 +794,19 @@
 .stageWorkspaceControls>.stageReadinessPanel{
  margin-top:16px;
 }
-.stageWorkspacePage .stageArtifacts{
+:is(.stageWorkspacePage,.stageOperations) .stageArtifacts{
  border:1px solid #d9e4f2;
  border-radius:16px;
  background:#fff;
  padding:20px;
 }
-.stageWorkspacePage .stageArtifactActions{
+:is(.stageWorkspacePage,.stageOperations) .stageArtifactActions{
  display:flex;
  flex-wrap:wrap;
  gap:9px;
  margin:14px 0 0;
 }
-.stageWorkspacePage .stageArtifactActions>button{
+:is(.stageWorkspacePage,.stageOperations) .stageArtifactActions>button{
  min-height:44px;
  display:inline-flex;
  align-items:center;
@@ -819,21 +819,21 @@
  color:#315a93;
  font-weight:800;
 }
-.stageWorkspacePage .stageArtifactActions>button:hover{background:#edf3ff;border-color:#afc4ec}
-.stageWorkspacePage .stageArtifactResults{
+:is(.stageWorkspacePage,.stageOperations) .stageArtifactActions>button:hover{background:#edf3ff;border-color:#afc4ec}
+:is(.stageWorkspacePage,.stageOperations) .stageArtifactResults{
  display:grid;
  grid-template-columns:1fr 1fr;
  gap:14px;
  margin-top:16px;
 }
-.stageWorkspacePage .stageArtifactResults>div{
+:is(.stageWorkspacePage,.stageOperations) .stageArtifactResults>div{
  min-width:0;
  padding:14px;
  border:1px solid #e1e8f1;
  border-radius:12px;
  background:#fbfcfe;
 }
-.stageWorkspacePage .stageArtifactResults>div>b{display:block;margin-bottom:10px;color:#29496f}
+:is(.stageWorkspacePage,.stageOperations) .stageArtifactResults>div>b{display:block;margin-bottom:10px;color:#29496f}
 .stageWorkspaceSources{
  display:grid;
  grid-template-columns:minmax(220px,.55fr) minmax(0,1.45fr);
@@ -914,7 +914,7 @@
  .stageStudentRoute>button{grid-column:1/-1;width:100%}
  .stageWorkspaceSteps{grid-template-columns:minmax(0,1fr)}
  .stageWorkspaceSources{grid-template-columns:minmax(0,1fr)}
- .stageWorkspacePage .stageArtifactResults{grid-template-columns:minmax(0,1fr)}
+ :is(.stageWorkspacePage,.stageOperations) .stageArtifactResults{grid-template-columns:minmax(0,1fr)}
  .stageWorkspaceTeacher{align-items:stretch;flex-direction:column}
 }
 @media(max-width:640px){
@@ -932,8 +932,8 @@
  .stageWorkspaceSummary>div{padding:12px}
  .stageWorkspaceSummary b{font-size:20px}
  .stageWorkspaceBlueprint,.stageWorkspaceExecution,.stageWorkspaceCard,.stageWorkspaceSources,.stageWorkspaceTeacher{padding:16px}
- .stageWorkspacePage .stageArtifactActions{display:grid;grid-template-columns:minmax(0,1fr)}
- .stageWorkspacePage .stageArtifactActions>button{width:100%}
+ :is(.stageWorkspacePage,.stageOperations) .stageArtifactActions{display:grid;grid-template-columns:minmax(0,1fr)}
+ :is(.stageWorkspacePage,.stageOperations) .stageArtifactActions>button{width:100%}
 }
 
 
@@ -1070,30 +1070,30 @@
 
 
 /* Stage profile synchronization */
-.stageWorkspacePage .stageProfileSync{
+:is(.stageWorkspacePage,.stageOperations) .stageProfileSync{
  margin-top:14px;
  padding:15px;
  border:1px solid #d7e2ef;
  border-radius:13px;
  background:#f8fbff;
 }
-.stageWorkspacePage .stageProfileSyncHead{
+:is(.stageWorkspacePage,.stageOperations) .stageProfileSyncHead{
  display:flex;
  align-items:center;
  justify-content:space-between;
  gap:14px;
 }
-.stageWorkspacePage .stageProfileSyncHead>div{
+:is(.stageWorkspacePage,.stageOperations) .stageProfileSyncHead>div{
  display:flex;
  align-items:center;
  gap:10px;
  min-width:0;
  color:#315efb;
 }
-.stageWorkspacePage .stageProfileSyncHead>div>span{min-width:0}
-.stageWorkspacePage .stageProfileSyncHead b{display:block;color:#29496f;font-size:13px}
-.stageWorkspacePage .stageProfileSyncHead small{color:#71839a;font-size:10px}
-.stageWorkspacePage .stageProfileSyncHead>button{
+:is(.stageWorkspacePage,.stageOperations) .stageProfileSyncHead>div>span{min-width:0}
+:is(.stageWorkspacePage,.stageOperations) .stageProfileSyncHead b{display:block;color:#29496f;font-size:13px}
+:is(.stageWorkspacePage,.stageOperations) .stageProfileSyncHead small{color:#71839a;font-size:10px}
+:is(.stageWorkspacePage,.stageOperations) .stageProfileSyncHead>button{
  display:inline-flex;
  align-items:center;
  gap:7px;
@@ -1107,13 +1107,13 @@
  font-weight:800;
  white-space:nowrap;
 }
-.stageWorkspacePage .stagePartySyncGrid{
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncGrid{
  display:grid;
  grid-template-columns:repeat(2,minmax(0,1fr));
  gap:9px;
  margin-top:12px;
 }
-.stageWorkspacePage .stagePartySyncGrid article{
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncGrid article{
  display:flex;
  align-items:center;
  justify-content:space-between;
@@ -1124,17 +1124,17 @@
  border-radius:10px;
  background:#fff;
 }
-.stageWorkspacePage .stagePartySyncGrid article>div:first-child{
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncGrid article>div:first-child{
  display:flex;
  align-items:center;
  gap:9px;
  min-width:0;
 }
-.stageWorkspacePage .stagePartySyncGrid article>div:first-child>svg{color:#315efb;flex:none}
-.stageWorkspacePage .stagePartySyncGrid article b{display:block;color:#29496f;font-size:12px;overflow-wrap:anywhere}
-.stageWorkspacePage .stagePartySyncGrid article small{display:block;margin-top:2px;color:#7b8ca1;font-size:10px;text-transform:none;letter-spacing:0}
-.stageWorkspacePage .stagePartySyncMeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.stageWorkspacePage .stagePartySyncMeta>span{
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncGrid article>div:first-child>svg{color:#315efb;flex:none}
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncGrid article b{display:block;color:#29496f;font-size:12px;overflow-wrap:anywhere}
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncGrid article small{display:block;margin-top:2px;color:#7b8ca1;font-size:10px;text-transform:none;letter-spacing:0}
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncMeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncMeta>span{
  padding:5px 7px;
  border-radius:999px;
  background:#f1f4f8;
@@ -1143,11 +1143,11 @@
  font-weight:850;
  white-space:nowrap;
 }
-.stageWorkspacePage .stagePartySyncMeta>.is-registered{background:#eaf7f0;color:#247151}
-.stageWorkspacePage .stagePartySyncMeta>.is-submitted{background:#eef4ff;color:#315a93}
-.stageWorkspacePage .stagePartySyncMeta>.is-revision{background:#fff5df;color:#8a6418}
-.stageWorkspacePage .stagePartySyncMeta>.is-rejected{background:#fff0f2;color:#a54659}
-.stageWorkspacePage .stageProfileSyncEmpty{
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncMeta>.is-registered{background:#eaf7f0;color:#247151}
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncMeta>.is-submitted{background:#eef4ff;color:#315a93}
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncMeta>.is-revision{background:#fff5df;color:#8a6418}
+:is(.stageWorkspacePage,.stageOperations) .stagePartySyncMeta>.is-rejected{background:#fff0f2;color:#a54659}
+:is(.stageWorkspacePage,.stageOperations) .stageProfileSyncEmpty{
  margin-top:12px;
  padding:12px;
  border:1px dashed #cbd8e8;
@@ -1158,9 +1158,9 @@
  background:#fff;
 }
 @media(max-width:700px){
- .stageWorkspacePage .stageProfileSyncHead{align-items:flex-start;flex-direction:column}
- .stageWorkspacePage .stageProfileSyncHead>button{width:100%;justify-content:center}
- .stageWorkspacePage .stagePartySyncGrid{grid-template-columns:minmax(0,1fr)}
+ :is(.stageWorkspacePage,.stageOperations) .stageProfileSyncHead{align-items:flex-start;flex-direction:column}
+ :is(.stageWorkspacePage,.stageOperations) .stageProfileSyncHead>button{width:100%;justify-content:center}
+ :is(.stageWorkspacePage,.stageOperations) .stagePartySyncGrid{grid-template-columns:minmax(0,1fr)}
 }
 
 
@@ -2767,7 +2767,7 @@
 
 
 /* Stage 5 · Ghost voting policy */
-.stageWorkspacePage .ghostPolicyLab{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyLab{
  display:grid;
  gap:14px;
  margin:18px 0;
@@ -2779,7 +2779,7 @@
  box-shadow:0 8px 28px rgba(22,43,76,.045);
  color:#193353;
 }
-.stageWorkspacePage .ghostPolicyHead{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyHead{
  display:grid;
  grid-template-columns:minmax(0,1fr) 300px;
  gap:24px;
@@ -2793,28 +2793,28 @@
   linear-gradient(180deg,#f8fbff 0%,#f3f7fe 100%);
  color:#193353;
 }
-.stageWorkspacePage .ghostPolicyHead>div:first-child{min-width:0}
-.stageWorkspacePage .ghostPolicyHead small{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyHead>div:first-child{min-width:0}
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyHead small{
  color:#607b9f;
  font-size:12px;
  font-weight:900;
  letter-spacing:.09em;
 }
-.stageWorkspacePage .ghostPolicyHead h2{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyHead h2{
  margin:7px 0 8px;
  color:#173c70;
  font-size:24px;
  line-height:1.2;
  letter-spacing:-.025em;
 }
-.stageWorkspacePage .ghostPolicyHead p{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyHead p{
  max-width:82ch;
  margin:0;
  color:#4f6786;
  font-size:13px;
  line-height:1.7;
 }
-.stageWorkspacePage .ghostPolicyCurrent{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyCurrent{
  display:grid;
  gap:6px;
  min-height:112px;
@@ -2825,22 +2825,22 @@
  box-shadow:0 8px 20px rgba(49,94,251,.07);
  align-content:center;
 }
-.stageWorkspacePage .ghostPolicyCurrent small{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyCurrent small{
  color:#607b9f;
  font-size:12px;
  font-weight:900;
 }
-.stageWorkspacePage .ghostPolicyCurrent strong{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyCurrent strong{
  color:#315efb;
  font-size:21px;
  line-height:1.2;
 }
-.stageWorkspacePage .ghostPolicyCurrent span{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyCurrent span{
  color:#63758f;
  font-size:12px;
  line-height:1.5;
 }
-.stageWorkspacePage .ghostCadenceNote{
+:is(.stageWorkspacePage,.stageOperations) .ghostCadenceNote{
  margin:0 18px;
  padding:14px 16px;
  border:1px solid #d8e4f6;
@@ -2848,19 +2848,19 @@
  border-radius:12px;
  background:#f8fbff;
 }
-.stageWorkspacePage .ghostCadenceNote b{
+:is(.stageWorkspacePage,.stageOperations) .ghostCadenceNote b{
  display:block;
  margin-bottom:5px;
  color:#274d83;
  font-size:13px;
 }
-.stageWorkspacePage .ghostCadenceNote p{
+:is(.stageWorkspacePage,.stageOperations) .ghostCadenceNote p{
  margin:0;
  color:#61758f;
  font-size:12px;
  line-height:1.65;
 }
-.stageWorkspacePage .ghostPolicyProposal{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal{
  display:grid;
  grid-template-columns:minmax(220px,.8fr) minmax(0,1.5fr) auto;
  gap:12px;
@@ -2871,7 +2871,7 @@
  border-radius:14px;
  background:#f8fafd;
 }
-.stageWorkspacePage .ghostPolicyProposal label{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal label{
  display:grid;
  gap:7px;
  min-width:0;
@@ -2879,8 +2879,8 @@
  font-size:12px;
  font-weight:850;
 }
-.stageWorkspacePage .ghostPolicyProposal select,
-.stageWorkspacePage .ghostPolicyProposal textarea{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal select,
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal textarea{
  width:100%;
  min-width:0;
  box-sizing:border-box;
@@ -2893,32 +2893,32 @@
  font-weight:700;
  outline:none;
 }
-.stageWorkspacePage .ghostPolicyProposal select{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal select{
  min-height:46px;
  padding:0 40px 0 13px;
 }
-.stageWorkspacePage .ghostPolicyProposal textarea{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal textarea{
  min-height:94px;
  padding:12px 13px;
  line-height:1.55;
  resize:vertical;
 }
-.stageWorkspacePage .ghostPolicyProposal :is(select,textarea):focus{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal :is(select,textarea):focus{
  border-color:#7192ef;
  box-shadow:0 0 0 3px rgba(49,94,251,.12);
 }
-.stageWorkspacePage .ghostPolicyProposal>button{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal>button{
  min-height:46px;
  padding-inline:18px;
  border-radius:11px;
  white-space:nowrap;
 }
-.stageWorkspacePage .ghostPolicyList{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList{
  display:grid;
  gap:12px;
  padding:0 18px 18px;
 }
-.stageWorkspacePage .ghostPolicyList>.emptyState{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList>.emptyState{
  display:grid;
  place-items:center;
  min-height:112px;
@@ -2931,14 +2931,14 @@
  font-size:13px;
  text-align:center;
 }
-.stageWorkspacePage .ghostPolicyList>article{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList>article{
  overflow:hidden;
  border:1px solid #dfe6ef;
  border-radius:14px;
  background:#fff;
  box-shadow:0 4px 14px rgba(22,43,76,.035);
 }
-.stageWorkspacePage .ghostPolicyList>article>header{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList>article>header{
  display:flex;
  align-items:center;
  justify-content:space-between;
@@ -2947,13 +2947,13 @@
  border-bottom:1px solid #e6ecf3;
  background:#fbfcfe;
 }
-.stageWorkspacePage .ghostPolicyList>article>header b{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList>article>header b{
  display:block;
  margin-top:3px;
  color:#173c70;
  font-size:15px;
 }
-.stageWorkspacePage .ghostPolicyList>article>header em{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList>article>header em{
  display:inline-flex;
  align-items:center;
  min-height:29px;
@@ -2965,26 +2965,26 @@
  font-style:normal;
  font-weight:850;
 }
-.stageWorkspacePage .ghostPolicyList>article.vote_open>header em{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList>article.vote_open>header em{
  background:#eaf2ff;
  color:#315fc3;
 }
-.stageWorkspacePage .ghostPolicyList>article.adopted>header em{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList>article.adopted>header em{
  background:#e8f6ef;
  color:#247151;
 }
-.stageWorkspacePage .ghostPolicyList>article.rejected>header em{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList>article.rejected>header em{
  background:#fff0f2;
  color:#b44c62;
 }
-.stageWorkspacePage .ghostPolicyList>article>p{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList>article>p{
  margin:0;
  padding:14px 17px 8px;
  color:#536a87;
  font-size:12px;
  line-height:1.6;
 }
-.stageWorkspacePage .ghostPolicyList blockquote{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList blockquote{
  margin:8px 17px 14px;
  padding:11px 13px;
  border-left:3px solid #b7c9ef;
@@ -2994,7 +2994,7 @@
  font-size:12px;
  line-height:1.6;
 }
-.stageWorkspacePage .ghostPolicyList footer{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList footer{
  display:flex;
  align-items:center;
  gap:10px;
@@ -3004,8 +3004,8 @@
  color:#71839a;
  font-size:12px;
 }
-.stageWorkspacePage .ghostPolicyList footer span:first-child{margin-right:auto}
-.stageWorkspacePage .ghostPolicyList footer button{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList footer span:first-child{margin-right:auto}
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList footer button{
  min-height:40px;
  padding:8px 12px;
  border:1px solid #c9d8ef;
@@ -3014,34 +3014,34 @@
  color:#315a93;
  font-weight:850;
 }
-.stageWorkspacePage .ghostPolicyList footer button:hover:not(:disabled){
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyList footer button:hover:not(:disabled){
  border-color:#aac1ef;
  background:#e7efff;
 }
 
 @media(max-width:900px){
- .stageWorkspacePage .ghostPolicyHead{
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyHead{
   grid-template-columns:minmax(0,1fr);
   padding:20px;
  }
- .stageWorkspacePage .ghostPolicyProposal{
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal{
   grid-template-columns:minmax(0,1fr);
  }
- .stageWorkspacePage .ghostPolicyProposal>button{width:100%}
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal>button{width:100%}
 }
 @media(max-width:560px){
- .stageWorkspacePage .ghostPolicyLab{border-radius:15px}
- .stageWorkspacePage .ghostPolicyHead{padding:17px}
- .stageWorkspacePage .ghostPolicyHead h2{font-size:21px}
- .stageWorkspacePage .ghostCadenceNote,
- .stageWorkspacePage .ghostPolicyProposal{margin-inline:12px}
- .stageWorkspacePage .ghostPolicyList{padding:0 12px 12px}
- .stageWorkspacePage .ghostPolicyCurrent{min-height:0}
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyLab{border-radius:15px}
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyHead{padding:17px}
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyHead h2{font-size:21px}
+ :is(.stageWorkspacePage,.stageOperations) .ghostCadenceNote,
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal{margin-inline:12px}
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyList{padding:0 12px 12px}
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyCurrent{min-height:0}
 }
 
 
 /* Ghost voting proposal refinement */
-.stageWorkspacePage .ghostPolicyProposal{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal{
  grid-template-columns:minmax(220px,.72fr) minmax(360px,1.55fr);
  grid-template-areas:
   "mode rationale"
@@ -3050,33 +3050,33 @@
  gap:14px 16px;
  padding:18px;
 }
-.stageWorkspacePage .ghostPolicyProposal>label:first-child{grid-area:mode}
-.stageWorkspacePage .ghostPolicyProposal>label:nth-child(2){grid-area:rationale}
-.stageWorkspacePage .ghostPolicyProposal>button{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal>label:first-child{grid-area:mode}
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal>label:nth-child(2){grid-area:rationale}
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal>button{
  grid-area:action;
  justify-self:end;
  min-width:260px;
  min-height:44px;
  margin-top:2px;
 }
-.stageWorkspacePage .ghostPolicyProposal label{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal label{
  align-content:start;
 }
-.stageWorkspacePage .ghostPolicyProposal textarea{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal textarea{
  min-height:112px;
 }
-.stageWorkspacePage .ghostPolicyProposal select{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal select{
  min-height:48px;
 }
 @media(max-width:760px){
- .stageWorkspacePage .ghostPolicyProposal{
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal{
   grid-template-columns:minmax(0,1fr);
   grid-template-areas:
    "mode"
    "rationale"
    "action";
  }
- .stageWorkspacePage .ghostPolicyProposal>button{
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal>button{
   width:100%;
   min-width:0;
   justify-self:stretch;
@@ -3085,41 +3085,41 @@
 
 
 /* Ghost voting proposal cards */
-.stageWorkspacePage .ghostPolicyProposal{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposal{
  display:grid;
  grid-template-columns:1fr;
  grid-template-areas:none;
  gap:16px;
  padding:18px;
 }
-.stageWorkspacePage .ghostPolicyProposalHead{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposalHead{
  display:flex;
  align-items:flex-start;
  justify-content:space-between;
  gap:18px;
 }
-.stageWorkspacePage .ghostPolicyProposalHead small{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposalHead small{
  color:#607b9f;
  font-size:12px;
  font-weight:900;
  letter-spacing:.09em;
 }
-.stageWorkspacePage .ghostPolicyProposalHead h3{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposalHead h3{
  margin:4px 0 5px;
  color:#173c70;
  font-size:18px;
 }
-.stageWorkspacePage .ghostPolicyProposalHead p{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposalHead p{
  margin:0;
  color:#6a7d97;
  font-size:12px;
 }
-.stageWorkspacePage .ghostPolicyModes{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyModes{
  display:grid;
  grid-template-columns:repeat(3,minmax(0,1fr));
  gap:10px;
 }
-.stageWorkspacePage .ghostPolicyModes button{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyModes button{
  display:grid;
  gap:5px;
  min-height:94px;
@@ -3132,36 +3132,36 @@
  cursor:pointer;
  transition:border-color .16s ease,box-shadow .16s ease,background .16s ease,transform .16s ease;
 }
-.stageWorkspacePage .ghostPolicyModes button:hover{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyModes button:hover{
  transform:translateY(-1px);
  border-color:#abc0ec;
  box-shadow:0 7px 18px rgba(49,94,251,.08);
 }
-.stageWorkspacePage .ghostPolicyModes button.active{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyModes button.active{
  border-color:#6f92ef;
  background:#eef4ff;
  box-shadow:0 0 0 3px rgba(49,94,251,.09);
 }
-.stageWorkspacePage .ghostPolicyModes button span{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyModes button span{
  color:#173c70;
  font-size:14px;
  font-weight:850;
 }
-.stageWorkspacePage .ghostPolicyModes button small{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyModes button small{
  color:#6f8199;
  font-size:12px;
  line-height:1.45;
 }
-.stageWorkspacePage .ghostPolicyRationale{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyRationale{
  display:grid;
  gap:7px;
 }
-.stageWorkspacePage .ghostPolicyRationale>span{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyRationale>span{
  color:#60738e;
  font-size:12px;
  font-weight:850;
 }
-.stageWorkspacePage .ghostPolicyRationale textarea{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyRationale textarea{
  min-height:118px;
  width:100%;
  box-sizing:border-box;
@@ -3176,36 +3176,36 @@
  resize:vertical;
  outline:none;
 }
-.stageWorkspacePage .ghostPolicyRationale textarea:focus{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyRationale textarea:focus{
  border-color:#7192ef;
  box-shadow:0 0 0 3px rgba(49,94,251,.12);
 }
-.stageWorkspacePage .ghostPolicyProposalFooter{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposalFooter{
  display:flex;
  align-items:center;
  justify-content:space-between;
  gap:16px;
  padding-top:2px;
 }
-.stageWorkspacePage .ghostPolicyProposalFooter>span{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposalFooter>span{
  max-width:70ch;
  color:#7a8ba2;
  font-size:12px;
  line-height:1.5;
 }
-.stageWorkspacePage .ghostPolicyProposalFooter>button{
+:is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposalFooter>button{
  flex:0 0 auto;
  min-height:44px;
  padding-inline:18px;
  border-radius:11px;
 }
 @media(max-width:820px){
- .stageWorkspacePage .ghostPolicyModes{grid-template-columns:1fr}
- .stageWorkspacePage .ghostPolicyProposalFooter{
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyModes{grid-template-columns:1fr}
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposalFooter{
   align-items:stretch;
   flex-direction:column;
  }
- .stageWorkspacePage .ghostPolicyProposalFooter>button{width:100%}
+ :is(.stageWorkspacePage,.stageOperations) .ghostPolicyProposalFooter>button{width:100%}
 }
 
 

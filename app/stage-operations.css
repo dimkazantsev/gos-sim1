@@ -99,6 +99,30 @@
 .stageOperationsModules :is(.committeeElectionCreate,.committeeNominate){display:flex;flex-wrap:wrap;gap:10px}.stageOperationsModules :is(.committeeElectionCreate,.committeeNominate)>select{flex:1 1 180px;min-width:0}
 .stageOperationsModules :is(.stage7Panel,.campaignQueue,.campaignCard,.cecModerationPanel,.cecModerationPanel>label,.cecPenaltyGrid,.cecPenaltyGrid>label){min-width:0;max-width:100%}
 .stageOperationsModules .cecModerationPanel{overflow-wrap:anywhere}
+.stageOperations .stageArtifacts{margin:0;padding:22px;overflow-wrap:anywhere}
+.stageOperations .stageArtifacts>header{align-items:flex-start}
+.stageOperations .stageArtifacts>p{max-width:80ch;font-size:15px;line-height:1.65}
+.stageOperations .stageProfileSyncHead>div>span{display:grid;gap:4px}
+.stageOperations .stageProfileSyncHead small{font-size:13px;color:var(--stage-muted)}
+.stageOperations .stageProfileSyncHead b{font-size:16px;color:var(--stage-ink)}
+.stageOperations .stageProfileSyncHead>button{min-height:44px;font-size:14px;white-space:normal}
+.stageOperations .stagePartySyncGrid article{align-items:flex-start;gap:14px;padding:16px}
+.stageOperations .stagePartySyncGrid article b{font-size:16px;color:var(--stage-ink)}
+.stageOperations .stagePartySyncGrid article small{font-size:14px;line-height:1.5;color:var(--stage-muted)}
+.stageOperations .stagePartySyncMeta>span{font-size:12px}
+.stageOperations .stageArtifacts :is(.stageProfileSyncHead,.stagePartySyncGrid article,.stageArtifactActions) svg{flex-shrink:0}
+.stageOperations .ghostPolicyProposal{min-width:0;gap:18px}
+.stageOperations .ghostPolicyProposalHead p{font-size:15px;line-height:1.6;color:var(--stage-muted)}
+.stageOperations .ghostPolicyModes button{align-content:start;gap:9px;min-height:112px;padding:16px}
+.stageOperations .ghostPolicyModes button span{font-size:16px;color:var(--stage-ink)}
+.stageOperations .ghostPolicyModes button small{font-size:14px;line-height:1.55;color:var(--stage-muted)}
+.stageOperations .ghostPolicyRationale :is(span,textarea),.stageOperations .ghostPolicyProposalFooter>span{font-size:15px;line-height:1.6}
+.stageOperations .ghostPolicyRationale textarea{min-height:128px}
+.stageOperationsMinistryTeams{scroll-margin-top:96px;min-width:0}
+.stageOperations .gov8Overview{background:#edf2ff;background-image:none;box-shadow:none;border-color:var(--stage-line)}
+.stageOperations .gov8OverviewCopy h2{font-size:23px;line-height:1.3;color:var(--stage-ink)}
+.stageOperations :is(.gov8OverviewCopy,.gov8SectionHead) p{font-size:15px;line-height:1.65;color:var(--stage-muted)}
+@media(max-width:700px){.stageOperations .stageArtifacts{padding:16px}.stageOperations .stagePartySyncGrid article{flex-wrap:wrap}.stageOperations .stagePartySyncMeta{justify-content:flex-start}.stageOperations .gov8Progress{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:700px){.stageOperationsModules .cecPenaltyGrid{grid-template-columns:minmax(0,1fr)}.stageOperationsModules .cecModerationTitle{align-items:flex-start;flex-direction:column}}
 .stageOperationsModules .presSystemDecision>header{background:#edf2ff;background-image:none;color:var(--stage-ink);box-shadow:none;border-color:var(--stage-line)}
 .stageOperationsModules .presSystemDecision>header :is(h2,h3){color:var(--stage-ink)}.stageOperationsModules .presSystemDecision>header p{color:var(--stage-muted)}
