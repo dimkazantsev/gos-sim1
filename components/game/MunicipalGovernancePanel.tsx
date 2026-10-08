@@ -2,6 +2,7 @@
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type Election={id:string;game_id:string;status:'nomination'|'open'|'finished'|'tie';winner_user_id:string|null;created_at:string;opened_at:string|null;closed_at:string|null};
@@ -31,6 +32,7 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
    supabase.from('municipal_districts').select('*').eq('game_id',game.id).order('title'),
    supabase.from('municipal_district_members').select('*').eq('game_id',game.id).order('created_at')
   ]);
+  const failure=[e,c,d,m].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
   if(!e.error){
    const rows=(e.data||[]) as Election[];setElections(rows);
    const rr:Record<string,Result>={};
@@ -44,17 +46,7 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
   if(!d.error)setDistricts((d.data||[]) as District[]);
   if(!m.error)setDistrictMembers((m.data||[]) as DistrictMember[]);
  }
- useEffect(()=>{void load()},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('municipal-governance:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'municipal_mayor_elections',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'municipal_mayor_candidates',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'municipal_districts',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'municipal_district_members',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ useGameTableSync(game?.id,['municipal_mayor_elections','municipal_mayor_candidates','municipal_mayor_ballots','municipal_districts','municipal_district_members'],load,me?.user_id||'');
 
  if(!game||!me)return null;
  const activeGame=game;

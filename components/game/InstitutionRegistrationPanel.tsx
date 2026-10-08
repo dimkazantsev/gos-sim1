@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
 import {VOTING_BODIES,bodyQuorum,type VotingUnit} from './votingBodies';
@@ -16,20 +17,21 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  const detailsRef=useRef<HTMLDetailsElement>(null);
  const stage=stageNo||g.game?.current_round||1,students=g.members.filter(m=>m.kind==='student'),groups=[...new Set(students.map(m=>m.group_name).filter((s):s is string=>!!s))];
  async function load(){if(!g.game)return;const [r,u,a,b,o]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active')]);
+  const failure=[r,u,a,b,o].find(x=>x.error);if(failure?.error){g.setError(failure.error.message);return;}
   if(!r.error)setRows(r.data||[]);if(!u.error){setUnits(u.data||[]);onUnitsChange?.(u.data||[])}setAssignments([...(a.data||[]),...(b.data||[])]);if(!o.error)setOffices(o.data||[]);
  }
  useEffect(()=>{if(initialBody)setBody(initialBody)},[initialBody]);
  useEffect(()=>{if(defaultOpen&&detailsRef.current)detailsRef.current.open=true},[defaultOpen,stage,initialBody]);
- useEffect(()=>{if(!g.game)return;void load();const channel=supabase.channel('civic-registration:'+g.game.id).on('postgres_changes',{schema:'public',table:'institution_session_registrations',event:'*',filter:'game_id=eq.'+g.game.id},()=>void load()).subscribe();return()=>{void supabase.removeChannel(channel)}},[g.game?.id,stage]);
+ useGameTableSync(g.game?.id,['institution_session_registrations','institution_units','institution_assignments','game_voting_body_members','game_office_assignments'],load,String(stage));
  if(!g.game||!g.me)return null;
  const availableBodies=VOTING_BODIES.filter(item=>!allowedBodies||allowedBodies.includes(item.key));
  const config=VOTING_BODIES.find(b=>b.key===body),unit=units.find(u=>'unit:'+u.id===body);
- function eligible(uid:string){const m=g.members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;if(unit)return assignments.some(a=>a.unit_id===unit.id&&a.user_id===uid);if(body==='ksrf')return g.parties.some(p=>p.leader_user_id===uid);return !!config&&(config.role.test(m.role_title||'')||offices.some(o=>o.user_id===uid&&config.role.test(o.role_title)))}
- const participants=students.filter(m=>(body==='ksrf'||!group||m.group_name===group)&&eligible(m.user_id));
+ function eligible(uid:string){const m=g.members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;if(unit)return assignments.some(a=>a.unit_id===unit.id&&a.user_id===uid);if(body==='ksrf')return g.parties.some(p=>p.leader_user_id===uid);return !!config&&(config.role.test(m.role_title||'')||(m.kind==='student'&&offices.some(o=>o.user_id===uid&&config.role.test(o.role_title))))}
+ const participants=g.members.filter(m=>(body==='ksrf'||!group||m.group_name===group)&&eligible(m.user_id));
  const registered=rows.filter(r=>r.institution_key===body&&participants.some(m=>m.user_id===r.user_id));
  const mine=rows.some(r=>r.institution_key===body&&r.user_id===g.me?.user_id);
  const factionCount=body==='ksrf'?g.parties.length:0;
- const total=body==='ksrf'?factionCount:body==='gd'?450:['government','municipality'].includes(body)?students.filter(m=>!group||m.group_name===group).length:unit?.mandate_capacity??participants.length;
+ const total=body==='ksrf'?factionCount:body==='gd'?450:body==='government'?participants.length:body==='municipality'?students.filter(m=>!group||m.group_name===group).length:unit?.mandate_capacity??participants.length;
  const present=body==='ksrf'?new Set(registered.map(r=>g.parties.find(p=>p.leader_user_id===r.user_id)?.id).filter(Boolean)).size:body==='gd'?registered.reduce((n,r)=>n+(g.partyMandates.find(a=>a.user_id===r.user_id)?.effective_mandates||0),0):registered.length;
  const needed=bodyQuorum(body,total);
  async function register(){if(!g.game)return;setBusy(true);const r=await supabase.rpc('register_institution_session_at_stage',{p_game_id:g.game.id,p_institution:body,p_stage_no:stage});if(r.error)g.setError(r.error.message);else{await load();setNotice('Вы зарегистрированы на заседание.')}setBusy(false)}

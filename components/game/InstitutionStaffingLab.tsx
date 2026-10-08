@@ -2,6 +2,8 @@
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
+import {stageRoleTitles} from './stageRoles';
 import type {ReturnTypeRepublic} from './viewTypes';
 import CommitteeChairElectionPanel from './CommitteeChairElectionPanel';
 
@@ -17,7 +19,7 @@ export default function InstitutionStaffingLab({g}:{g:ReturnTypeRepublic}){
  const [pick,setPick]=useState<Record<string,string>>({});
  const [headPick,setHeadPick]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
- const role=(me?.role_title||'').toLowerCase();
+ const role=stageRoleTitles(g);
  const isPM=role.includes('председател')&&role.includes('правительств');
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
 
@@ -29,19 +31,12 @@ export default function InstitutionStaffingLab({g}:{g:ReturnTypeRepublic}){
    supabase.from('institution_assignments').select('*').eq('game_id',game.id).order('created_at'),
    supabase.rpc('get_committee_matrix',{p_game_id:game.id})
   ]);
+  const failure=[u,a,m].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
   if(!u.error)setUnits((u.data||[]) as Unit[]);
   if(!a.error)setAssignments((a.data||[]) as Assignment[]);
   if(!m.error)setMatrix((m.data||[]) as Matrix[]);
  }
- useEffect(()=>{void load()},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('institution-staffing:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'institution_units',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'institution_assignments',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ useGameTableSync(game?.id,['institution_units','institution_assignments','game_parties','party_member_mandates','government_nominations','government_structures'],load,me?.user_id||'');
 
  if(!game||!me)return null;
  const activeMe=me;

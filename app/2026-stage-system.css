@@ -1185,7 +1185,7 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
   opacity:.45;
   cursor:not-allowed;
 }
-@media(max-width:1320px){
+@media(min-width:1000px) and (max-width:1320px){
  .gov8AgendaRow{
    grid-template-columns:44px minmax(250px,.8fr) minmax(0,1.2fr)!important;
  }

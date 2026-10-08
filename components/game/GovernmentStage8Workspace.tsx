@@ -1,6 +1,7 @@
 'use client';
 
-import {useEffect,useState} from 'react';
+import {useRef,useState} from 'react';
+import {useGameTableSync} from './useGameTableSync';
 import {
  ArrowRight,Building2,Check,ClipboardCheck,Landmark,MessageCircle,
  ShieldCheck,Trash2,UserRoundPlus,UsersRound,Vote,X
@@ -8,6 +9,7 @@ import {
 import {supabase} from '@/lib/supabase';
 import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {stageRoleTitles} from './stageRoles';
 
 type Structure={
  game_id:string;
@@ -134,8 +136,9 @@ export default function GovernmentStage8Workspace({
  const [deputyPortfolio,setDeputyPortfolio]=useState<PortfolioKey>('social');
  const [busy,setBusy]=useState<string|null>(null);
  const [registrationOpen,setRegistrationOpen]=useState(false);
+ const structureDirty=useRef(false);
 
- const role=(me?.role_title||'').toLowerCase();
+ const role=stageRoleTitles(g);
  const isPresident=role.includes('президент');
  const isPM=role.includes('председател')&&role.includes('правительств');
  const canPresident=teacher||isPresident;
@@ -149,6 +152,7 @@ export default function GovernmentStage8Workspace({
    supabase.from('government_structures').select('*').eq('game_id',game.id).maybeSingle(),
    supabase.from('institution_session_registrations').select('user_id').eq('game_id',game.id).eq('stage_no',8).eq('institution_key','gd')
   ]);
+  const failure=[n,s,r].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
   if(!n.error){
    const next=((n.data||[]) as Nomination[]).filter(x=>x.status!=='withdrawn');
    setRows(next);
@@ -161,7 +165,7 @@ export default function GovernmentStage8Workspace({
   if(!s.error){
    const x=(s.data||null) as Structure|null;
    setStructure(x);
-   if(x)setTitles({
+   if(x&&!structureDirty.current)setTitles({
     social:x.social_title,economic:x.economic_title,defence:x.defence_title,
     foreign:x.foreign_title,internal:x.internal_title
    });
@@ -169,16 +173,7 @@ export default function GovernmentStage8Workspace({
   if(!r.error)setRegistrations(r.data||[]);
  }
 
- useEffect(()=>{void load()},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  let ch=supabase.channel('stage8-government-workspace:'+game.id);
-  for(const table of ['government_nominations','government_structures','institution_session_registrations']){
-   ch=ch.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+game.id},()=>void load());
-  }
-  ch.subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ useGameTableSync(game?.id,['government_nominations','government_structures','institution_session_registrations','game_office_assignments','game_votes','game_ballots'],load,me?.user_id||'');
 
  if(!game||!me)return null;
  const activeGame=game;
@@ -274,7 +269,7 @@ export default function GovernmentStage8Workspace({
    p_social_title:titles.social,p_economic_title:titles.economic,p_defence_title:titles.defence,
    p_foreign_title:titles.foreign,p_internal_title:titles.internal,p_submit:submit
   });
-  if(r.error)setError(r.error.message);else await load();
+  if(r.error)setError(r.error.message);else{structureDirty.current=false;await load()}
   setBusy(null);
  }
 
@@ -445,7 +440,7 @@ export default function GovernmentStage8Workspace({
       return <article key={p.key} className={'gov8MinistryCard route-'+p.route+' '+(nomination?'hasNomination':'')}>
        <header><span>{String(index+1).padStart(2,'0')}</span><div><small>{p.label}</small><b>{titles[p.key]}</b></div><em>{p.route==='duma'?'Государственная Дума':'Совет Федерации'}</em></header>
        <p>{p.scope}</p>
-       <label className="gov8MinistryTitle">Название<input disabled={!editable} value={titles[p.key]} onChange={e=>setTitles(v=>({...v,[p.key]:e.target.value}))}/></label>
+       <label className="gov8MinistryTitle">Название<input disabled={!editable} value={titles[p.key]} onChange={e=>{structureDirty.current=true;setTitles(v=>({...v,[p.key]:e.target.value}))}}/></label>
 
        {p.route==='duma'&&!activeDeputy&&<label className={'gov8DeputyChoice '+(!structureApproved?'isDisabled':'')}><input type="radio" name="gov8-deputy" disabled={!structureApproved} checked={deputyPortfolio===p.key} onChange={()=>setDeputyPortfolio(p.key)}/><span>Этот министр одновременно является заместителем Председателя Правительства</span></label>}
        {activeDeputy?.office_key===slot&&<div className="gov8DeputyFlag">Заместитель Председателя Правительства</div>}

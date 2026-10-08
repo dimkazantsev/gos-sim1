@@ -2,6 +2,7 @@
 import {useEffect,useMemo,useRef,useState,type InputHTMLAttributes} from 'react';
 import {ArrowRight,Calculator,ChartNoAxesCombined,Check,ChevronDown,Coins,FileText,Landmark,Plus,RefreshCw,Save,Send,Wallet,Clock,ArrowRightLeft} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
 import {userError} from '@/lib/userError';
 import {moneyMillions} from '@/lib/formatQuantity';
 import {budgetModeLabel} from './useBudgetPulse';
@@ -40,8 +41,8 @@ export default function FederalBudgetSimulator({g,context,regions,rates,readOnly
    else if(!editor.current.dirty){const remote=(d.plans||[]).find((p:Plan)=>p.id===editor.current.selectedId);if(remote&&remote.revision!==editor.current.revision){setDraft(remote.draft);setRevision(remote.revision);}}
   }catch(e){if(requestedScope===scope.current)setError(userError(e));}
  }
- useEffect(()=>{initialized.current='';void load();if(!g.game)return;const id=setInterval(()=>void load(),15000);return()=>clearInterval(id);},[g.game?.id,g.me?.user_id]);
- useEffect(()=>{if(!g.game)return;let pending:ReturnType<typeof setTimeout>|undefined;const update=()=>{clearTimeout(pending);pending=setTimeout(()=>void load(),200);};let ch=supabase.channel('federal-budget:'+g.game.id);for(const table of ['budget_simulator_plans','budget_simulator_state','budget_transfer_requests','budget_finance_contracts','budget_simulator_ledger','formal_documents','budget_faction_amendments'])ch=ch.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+g.game.id},update);ch.subscribe();return()=>{clearTimeout(pending);void supabase.removeChannel(ch);};},[g.game?.id,g.me?.user_id]);
+ useEffect(()=>{initialized.current=''},[g.game?.id,g.me?.user_id]);
+ useGameTableSync(g.game?.id,['budget_simulator_plans','budget_simulator_state','budget_transfer_requests','budget_finance_contracts','budget_simulator_ledger','formal_documents','budget_faction_amendments'],load,g.me?.user_id||'');
  function edit(change:Partial<BudgetDraft>){if(readOnly)return;if(selected&&selected.status!=='draft'){setSelectedId('');setRevision(0);}setDraft(d=>({...d,...change}));setDirty(true);setNotice('');}
  function openPlan(p:Plan){setDraft(p.draft);setSelectedId(p.id);setRevision(p.revision);setDirty(false);setNotice('');setError('');}
  function reset(){const current=plans.find(p=>p.id===state?.last_plan_id);setDraft(current?{...current.draft,title:'Изменения федерального бюджета на 2026 год',note:''}:newBudgetDraft());setSelectedId('');setRevision(0);setDirty(false);setNotice(current?'Расчет поправок на основе действующего игрового бюджета.':'Новый расчет на основе плана 2026 года.');}

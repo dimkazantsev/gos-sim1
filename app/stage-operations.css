@@ -1,0 +1,80 @@
+.stageOperations{--stage-line:#dce4f1;--stage-ink:#142644;--stage-muted:#536580;display:grid;gap:20px;min-width:0;color:var(--stage-ink);font-family:inherit}
+.stageOperations *, .stageOperations *::before,.stageOperations *::after{box-sizing:border-box}
+.stageOperations [hidden]{display:none!important}
+.stageOperations button,.stageOperations a,.stageOperations summary{touch-action:manipulation}
+.stageOperations button svg,.stageOperations a svg,.stageOperations summary svg{flex:0 0 auto;display:block}
+.stageOperations button:focus-visible,.stageOperations a:focus-visible,.stageOperations summary:focus-visible{outline:3px solid #91adff;outline-offset:3px}
+.stageOperationsHeader{padding:22px 26px;border:1px solid var(--stage-line);border-radius:22px;background:#fff}
+.stageOperationsBreadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:12px;font-size:14px;color:var(--stage-muted);margin-bottom:18px}
+.stageOperationsBreadcrumb>button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:6px 12px;border:1px solid var(--stage-line);border-radius:10px;background:#fff;color:#2453e6;font-size:14px}
+.stageOperationsStatus{margin-left:auto;padding:7px 12px;border-radius:9px;background:#eef2f8;font-weight:650}
+.stageOperationsStatus.is-open{color:#2453e6;background:#eaf0ff}.stageOperationsStatus.is-completed{color:#146749;background:#e7f5ef}
+.stageOperationsTitle{display:grid;grid-template-columns:56px minmax(0,1fr);gap:16px;align-items:center}
+.stageOperationsNumber{display:grid;place-items:center;align-self:start;width:56px;height:56px;border:1px solid #cedbff;border-radius:16px;background:#edf2ff;color:#2453e6;font-size:23px;font-weight:750;font-variant-numeric:tabular-nums}
+.stageOperationsTitle h1{margin:0 0 7px;font-size:clamp(24px,2.4vw,32px);line-height:1.2;letter-spacing:-.025em;overflow-wrap:anywhere}
+.stageOperationsTitle p{margin:0;color:var(--stage-muted);font-size:16px;line-height:1.6;max-width:85ch}
+.stageOperationsMeta{display:flex;align-items:center;flex-wrap:wrap;gap:10px 22px;margin-top:20px;font-size:14px}
+.stageOperationsMeta>span,.stageOperationsMeta>button{display:inline-flex;align-items:center;gap:8px;min-width:0}
+.stageOperationsMeta>button{margin-left:auto;min-height:40px;padding:8px 12px;border:1px solid var(--stage-line);border-radius:10px;background:#fff;font-size:14px;color:#2453e6}
+.stageOperationsConnection{color:var(--stage-muted)}.stageOperationsConnection.is-disconnected{color:#ac394d}
+.stageOperationsTabs{display:flex;gap:6px;padding:6px;border:1px solid var(--stage-line);border-radius:16px;background:#f5f7fb;overflow-x:auto;scrollbar-width:thin}
+.stageOperationsTabs>button{display:flex;align-items:center;justify-content:center;gap:8px;flex:1 0 auto;min-height:46px;padding:10px 14px;background:transparent;border:1px solid transparent;border-radius:11px;color:var(--stage-muted);font-size:14px;font-weight:650;white-space:nowrap}
+.stageOperationsTabs>button[aria-current]{background:#2453e6;color:#fff;border-color:#2453e6}
+.stageOperationsTabs b{display:grid;place-items:center;min-width:23px;height:23px;padding:0 5px;border-radius:7px;background:#e4eaf5;font-size:12px;font-variant-numeric:tabular-nums}
+.stageOperationsTabs>button[aria-current] b{background:#ffffff26;color:#fff}
+.stageOperationsPane{min-width:0;display:grid;gap:20px}.stageOperationsPane>*{min-width:0}
+.stageOperationsHandoff{display:grid;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);gap:18px;align-items:center;background:#edf2ff;border:1px solid #d4e0ff;border-radius:16px;padding:16px 20px}
+.stageOperationsHandoff>div{display:grid;gap:5px;min-width:0}.stageOperationsHandoff small{color:#536580;font-size:13px;font-weight:650}.stageOperationsHandoff span{font-size:14px;line-height:1.5;font-weight:600;overflow-wrap:anywhere}
+.stageOperationsControls{min-width:0;margin:0;padding:0;border:0;display:grid;gap:16px}.stageOperationsModules{min-width:0;display:grid;gap:20px}.stageOperationsModules>*{min-width:0;max-width:100%;margin:0}
+.stageOperationsNotice{margin:0;padding:14px 18px;border:1px solid #d4e0ff;background:#f4f7ff;border-radius:12px;font-size:14px;line-height:1.6}
+.stageOperationsWorkFooter,.stageOperationsActionBar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 20px;border:1px solid var(--stage-line);border-radius:16px;background:#fff}
+.stageOperationsWorkFooter>span{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.5;flex:1 1 240px}.stageOperationsWorkFooter svg{flex-shrink:0}.stageOperationsActionBar p{margin:0;font-size:14px;line-height:1.6;flex:1 1 260px}
+.stageOperationsRuleIntro{padding:22px;border:1px solid var(--stage-line);border-radius:18px;background:#fff}.stageOperationsRuleIntro h2{margin:0 0 12px;font-size:22px}.stageOperationsRuleIntro p{font-size:16px;line-height:1.65;margin:10px 0;color:var(--stage-muted)}
+.stageOperationsRoute{padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;list-style:none}
+.stageOperationsRoute>li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start;border:1px solid var(--stage-line);border-radius:14px;padding:18px;background:#fff}
+.stageOperationsRoute>li>span{display:grid;place-items:center;min-height:34px;background:#eaf0ff;color:#2453e6;border-radius:10px;font-weight:700;font-size:14px}.stageOperationsRoute p{margin:4px 0 0;font-size:15px;line-height:1.65;overflow-wrap:anywhere}
+.stageOperationsRuleColumns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.stageOperationsRuleColumns>section{border:1px solid var(--stage-line);border-radius:18px;background:#fff;padding:22px;min-width:0}.stageOperationsRuleColumns h3{font-size:18px;margin:0 0 16px}.stageOperationsRuleColumns ul{margin:0;padding-left:20px;font-size:15px;line-height:1.7}.stageOperationsRuleColumns li+li{margin-top:12px}.stageOperationsRuleColumns .stageOperationsOutputs{list-style:none;padding:0}.stageOperationsOutputs li{display:flex;gap:10px;align-items:flex-start}.stageOperationsOutputs svg{flex:0 0 auto;color:#2453e6;margin-top:4px}
+.stageOperationsLegal{padding:20px 22px;border-left:3px solid #2453e6;background:#f0f4fb;border-radius:0 14px 14px 0}.stageOperationsLegal h3{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:17px}.stageOperationsLegal p{font-size:15px;line-height:1.7;margin:8px 0;overflow-wrap:anywhere}
+.stageOperationsSources{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stageOperationsSources>a{display:flex;align-items:center;gap:12px;padding:14px 16px;min-width:0;border:1px solid var(--stage-line);border-radius:12px;background:#fff;color:#2453e6;font-size:14px;line-height:1.6;text-decoration:none}.stageOperationsSources span{overflow-wrap:anywhere}
+.stageOperationsDisclosure{min-width:0;background:#fff;border:1px solid var(--stage-line);border-radius:18px;padding:18px}.stageOperationsDisclosure>summary{display:flex;gap:12px;align-items:center;min-height:42px;color:#2453e6;font-weight:650;font-size:15px;cursor:pointer}.stageOperationsDisclosure[open]>summary{margin-bottom:18px}
+.stageOperationsRelated{background:#fff;border:1px solid var(--stage-line);border-radius:16px;padding:20px}.stageOperationsRelated h3{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:17px}.stageOperationsRelated>div{display:flex;flex-wrap:wrap;gap:10px}.stageOperationsRelated button{min-height:44px;background:#fff;border:1px solid var(--stage-line);border-radius:10px;font-size:14px;padding:10px 14px;color:#2453e6}
+.stageOperationsCheckSummary{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:16px 20px;border:1px solid var(--stage-line);background:#fff;border-radius:14px}.stageOperationsCheckSummary>span{display:flex;gap:10px;align-items:center;font-size:14px}.stageOperationsSettingsLink{justify-self:start}
+.stageOperationsPager{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding-top:4px}.stageOperationsPager button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px;border:1px solid var(--stage-line);border-radius:12px;background:#fff;color:#2453e6;font-size:14px}.stageOperationsPager button:disabled{color:#687b96;background:#f1f4f9}
+/* These modules share the same grid and heading geometry. Their business
+   controls keep their own classes and behavior. */
+.stageOperationsModules :is(.staffingLab,.programLab,.govSessionLab,.legislativeLab,.municipalGovernance,.municipalLab,.crisisRoom,.debriefLab){border-radius:18px;border-color:var(--stage-line);max-width:100%}
+.stageOperationsModules :is(.staffingLabHead,.programLabHead,.govSessionHead,.legislativeLabHead,.municipalLabHead,.debriefHead){display:flex;align-items:flex-start;justify-content:space-between;gap:20px;min-width:0}
+.stageOperationsModules :is(.staffingLabHead,.programLabHead,.govSessionHead,.legislativeLabHead,.municipalLabHead,.debriefHead)>div:first-child{flex:1 1 0;min-width:0}
+.stageOperationsModules :is(.staffingLabHead,.programLabHead,.govSessionHead,.legislativeLabHead,.municipalLabHead,.debriefHead) h2{font-size:23px;line-height:1.3;overflow-wrap:anywhere}
+.stageOperationsModules :is(.staffingLabHead,.programLabHead,.govSessionHead,.legislativeLabHead,.municipalLabHead,.debriefHead) p{font-size:15px;line-height:1.65;max-width:80ch}
+.stageOperationsModules :is(.staffingLabHead,.programLabHead,.govSessionHead,.legislativeLabHead,.municipalLabHead,.municipalGovernanceHead,.debriefHead){background:#edf2ff;background-image:none;color:var(--stage-ink);border-color:var(--stage-line);box-shadow:none}
+.stageOperationsModules :is(.staffingLabHead,.programLabHead,.govSessionHead,.legislativeLabHead,.municipalLabHead,.municipalGovernanceHead,.debriefHead) :is(h2,h3){color:var(--stage-ink)}
+.stageOperationsModules :is(.staffingLabHead,.programLabHead,.govSessionHead,.legislativeLabHead,.municipalLabHead,.municipalGovernanceHead,.debriefHead) p{color:var(--stage-muted)}
+.stageOperationsModules :is(.staffingLabHead,.programLabHead,.govSessionHead,.legislativeLabHead,.municipalLabHead,.municipalGovernanceHead,.debriefHead) small{color:#2453e6}
+.stageOperationsModules :is(.programNorm,.staffingBalance,.govSessionState,.legislativeClock,.debriefState){background:#fff;color:#2453e6;border-color:#d4e0ff}
+.stageOperationsModules :is(.programNorm,.staffingBalance,.govSessionState,.legislativeClock,.debriefState) :is(strong,span,em){color:inherit}
+.stageOperationsModules .municipalSteps{width:260px;max-width:100%;flex-shrink:0;min-width:0}
+.stageOperationsModules .municipalSteps span{background:#fff;color:var(--stage-ink)}
+.stageOperationsModules .municipalSteps b{background:#eaf0ff;color:#2453e6}
+.stageOperationsModules .municipalMayorStatus{background:#fff;border-color:#d4e0ff}
+.stageOperationsModules .municipalMayorStatus strong{color:var(--stage-ink)}
+.stageOperationsModules .municipalMayorStatus span{color:var(--stage-muted)}
+.stageOperationsModules .policyMandate>header{background:#2453e6;background-image:none}
+.stageOperationsModules :is(.committeeGrid,.ministryGrid){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.stageOperationsModules :is(.institutionUnit,.govAgendaItem,.legislativeAgendaItem,.reflectionCard){min-width:0;overflow-wrap:anywhere}
+.stageOperationsModules :is(.unitAssign,.govAgendaBuilder,.legislativeAgendaBuilder){display:flex;flex-wrap:wrap;align-items:end;gap:10px}.stageOperationsModules :is(.unitAssign,.govAgendaBuilder,.legislativeAgendaBuilder)>select{flex:1 1 200px;min-width:0}
+.stageOperationsModules :is(input:not([type=checkbox]):not([type=radio]),select,textarea){max-width:100%;min-width:0;font-size:16px;line-height:1.5}.stageOperationsModules textarea{resize:vertical}
+.stageOperationsModules :is(button,.primary,.secondary){min-height:42px;white-space:normal;line-height:1.4}.stageOperationsModules .iconAction{min-height:44px;min-width:44px;flex-shrink:0}
+.stageOperationsModules .budgetHero{display:none}.stageOperationsModules .budgetPage{margin:0;gap:18px}
+.stageOperationsModules .debriefEvidence{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.stageOperations :is(.gov8Overview,.gov8SubmissionCard,.gov8NomineeFields,.gov8NomineeFields>label,.gov8MinistryTitle,.gov8MinistryCard,.gov8PresidentReview)>*{min-width:0}
+.stageOperations .gov8NomineeFields{min-width:0}
+.stageOperations :is(.gov8Workspace,.gov8Duma,.gov8Ministries,.gov8Agenda){min-width:0;grid-template-columns:minmax(0,1fr)}
+@media(max-width:700px){.stageOperations :is(.gov8Overview,.gov8SubmissionCard,.gov8MinistryGrid,.gov8NomineeFields){grid-template-columns:minmax(0,1fr)!important}.stageOperations .gov8MinistryCard{grid-column:auto!important}}
+.stageOperations .gov8AgendaRow{min-width:0;grid-template-columns:44px minmax(0,1fr)!important}
+.stageOperations .gov8AgendaActions{grid-column:1/-1;min-width:0;grid-template-columns:minmax(0,1fr) auto!important}
+.stageOperations .gov8AgendaCta{min-width:0}
+@media(max-width:700px){.stageOperations .gov8AgendaRow{grid-template-columns:minmax(0,1fr)!important}.stageOperations .gov8AgendaActions{grid-template-columns:minmax(0,1fr)!important}.stageOperations .gov8AgendaCta{width:100%;min-width:0}}
+@media(max-width:1000px){.stageOperationsModules :is(.committeeGrid,.ministryGrid){grid-template-columns:minmax(0,1fr)}.stageOperationsModules :is(.govAgendaItem,.legislativeAgendaItem){grid-template-columns:34px minmax(0,1fr)}.stageOperationsModules :is(.govAgendaActions,.agendaActions){grid-column:2;min-width:0}}
+@media(max-width:700px){.stageOperations{gap:14px}.stageOperationsHeader{padding:16px;border-radius:18px}.stageOperationsBreadcrumb{gap:8px;font-size:13px;margin-bottom:14px}.stageOperationsBreadcrumb>span:nth-child(2){display:none}.stageOperationsTitle{grid-template-columns:44px minmax(0,1fr);gap:12px}.stageOperationsNumber{width:44px;height:44px;font-size:20px;border-radius:12px}.stageOperationsTitle h1{font-size:24px}.stageOperationsTitle p{font-size:15px}.stageOperationsMeta{gap:12px;font-size:13px;margin-top:16px}.stageOperationsMeta>button{margin-left:0}.stageOperationsTabs{border-radius:12px;gap:4px;padding:5px}.stageOperationsTabs>button{flex:0 0 auto;min-height:44px;padding:8px 12px}.stageOperationsHandoff{grid-template-columns:minmax(0,1fr);gap:12px;padding:16px}.stageOperationsHandoff>svg{display:none}.stageOperationsHandoff>div+div{padding-top:12px;border-top:1px solid #d4e0ff}.stageOperationsRoute,.stageOperationsRuleColumns,.stageOperationsSources{grid-template-columns:minmax(0,1fr)}.stageOperationsPane{gap:14px}.stageOperationsRuleIntro,.stageOperationsRuleColumns>section{padding:18px}.stageOperationsModules :is(.staffingLabHead,.programLabHead,.govSessionHead,.legislativeLabHead,.municipalLabHead,.debriefHead){flex-direction:column;gap:14px}.stageOperationsModules :is(.staffingBalance,.programReadiness,.govSessionState,.legislativeClock,.debriefState){width:100%;max-width:100%;align-self:stretch}.stageOperationsModules :is(.programForm,.programPassport,.reflectionGrid,.municipalForm,.municipalProjectForm){grid-template-columns:minmax(0,1fr)}.stageOperationsModules .debriefEvidence{grid-template-columns:repeat(2,minmax(0,1fr))}.stageOperationsWorkFooter{padding:14px}.stageOperationsWorkFooter>button,.stageOperationsActionBar>button{width:100%}.stageOperationsPager{gap:7px}.stageOperationsPager button{padding:8px 5px;font-size:13px;gap:3px}.stageOperationsCheckSummary{padding:14px;gap:12px}.stageOperationsModules :is(.govAgendaItem,.legislativeAgendaItem){grid-template-columns:28px minmax(0,1fr);gap:12px}.stageOperationsModules :is(.unitHead>div,.unitMembers>div){flex-wrap:wrap}.stageOperationsModules .unitHead>div>select{min-width:0;max-width:100%;flex:1 1 180px}.stageOperationsModules .unitMembers>div>span{flex:1 1 140px;min-width:0}}
+@media(prefers-reduced-motion:reduce){.stageOperations *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}

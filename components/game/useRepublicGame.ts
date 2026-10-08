@@ -1,5 +1,6 @@
 'use client';
 import {userError} from '@/lib/userError';
+import {notifyGameDataRefresh} from './useGameTableSync';
 import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
 import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {useEffect,useMemo,useRef,useState} from 'react';
@@ -107,10 +108,14 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'game_id=eq.'+gameId},()=>{void loadChatOverview();if(channelRef.current)void loadMessages(channelRef.current)})
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_pins',filter:'game_id=eq.'+gameId},()=>{if(channelRef.current)void loadChatPins(channelRef.current)})
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_channel_state',filter:'game_id=eq.'+gameId},()=>void loadChatOverview())
-   .on('postgres_changes',{event:'*',schema:'public',table:'chat_mentions',filter:'game_id=eq.'+gameId},()=>void loadChatOverview())
-   .subscribe(status=>{setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'?'disconnected':'connecting')});
+   .on('postgres_changes',{event:'*',schema:'public',table:'chat_mentions',filter:'game_id=eq.'+gameId},()=>void loadChatOverview());
+  for(const table of ['game_members','game_office_assignments','game_stages','game_parties','game_votes','formal_documents','formal_document_history','party_member_mandates','party_agreements','game_crises','chat_channels'])live.on('postgres_changes',{event:'DELETE',schema:'public',table},()=>scheduleRealtimeReload());
+  live.subscribe(status=>{setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');if(status==='SUBSCRIBED')scheduleRealtimeReload()});
+  const recover=()=>{scheduleRealtimeReload();notifyGameDataRefresh(gameId);void refreshBudgetPulse()};
+  const visible=()=>{if(document.visibilityState==='visible')recover()};
+  window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
   liveRef.current=live;
-  return()=>{if(realtimeReloadTimer.current){clearTimeout(realtimeReloadTimer.current);realtimeReloadTimer.current=null}if(liveRef.current)void supabase.removeChannel(liveRef.current)};
+  return()=>{window.removeEventListener('focus',recover);window.removeEventListener('online',recover);document.removeEventListener('visibilitychange',visible);if(realtimeReloadTimer.current){clearTimeout(realtimeReloadTimer.current);realtimeReloadTimer.current=null}if(liveRef.current)void supabase.removeChannel(liveRef.current)};
  },[gameId]);
 
  useEffect(()=>()=>{
@@ -384,7 +389,7 @@ export function useRepublicGame(gameId:string){
    return true;
   }catch(e){setChatPins(original);setError(e instanceof Error?e.message:'Не удалось изменить закрепление');return false}
  }
- async function refresh(){await Promise.all([loadAll(false),refreshBudgetPulse()]);if(channelRef.current)await loadMessages(channelRef.current)}
+ async function refresh(){await Promise.all([loadAll(false),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
 
  async function logActivity(eventType:string,label:string,viewKey?:string,payload:Record<string,unknown>={}){
   const u=(await supabase.auth.getUser()).data.user;if(!u)return;
@@ -656,7 +661,9 @@ export function useRepublicGame(gameId:string){
   const m=members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;
   const role=(m.role_title||'').trim();
   if(institution==='all'||institution==='factions')return m.kind==='student'||(m.kind==='teacher'&&!['','Руководитель симуляции','Преподаватель','Администратор'].includes(role));
-  return VOTING_BODIES.find(b=>b.key===institution)?.role.test(role)||false;
+  if(institution==='ksrf'&&parties.some(p=>p.leader_user_id===uid))return true;
+  const body=VOTING_BODIES.find(b=>b.key===institution);
+  return !!body&&(body.role.test(role)||(m.kind==='student'&&officeAssignments.some(o=>o.user_id===uid&&o.status==='active'&&body.role.test(o.role_title))));
  }
  function canVote(v:Vote){
   if(!me||me.kind==='observer'||v.status!=='open')return false;
@@ -677,7 +684,8 @@ export function useRepublicGame(gameId:string){
   if(v.status==='closed'&&v.result_eligible!=null)return Number(v.result_eligible);
   if(v.electorate_snapshot)return Number(v.electorate_snapshot.eligible);
   if(v.institution_key==='gd')return 450;
-  if(['government','municipality'].includes(v.institution_key))return members.filter(m=>m.kind==='student'&&(!v.group_name||m.group_name===v.group_name)).length;
+  if(v.institution_key==='government')return members.filter(m=>(!v.group_name||m.group_name===v.group_name)&&memberMatchesInstitution(m.user_id,'government')).length;
+  if(v.institution_key==='municipality')return members.filter(m=>m.kind==='student'&&(!v.group_name||m.group_name===v.group_name)).length;
   if(v.voting_mode==='faction')return parties.filter(p=>p.leader_user_id).length;
   if(v.voting_mode==='mandate')return parties.reduce((a,p)=>a+Math.max(0,Number(p.mandates)||0),0);
   return members.filter(m=>memberMatchesInstitution(m.user_id,v.institution_key||'all')).length;

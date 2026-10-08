@@ -1,10 +1,11 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {AlertTriangle,CheckCircle2,ChevronDown,ExternalLink,History,RefreshCw,ShieldCheck,XCircle} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {STAGE_SYSTEM} from './stageSystem';
 import {STAGE_REALTIME_TABLES} from './stageRealtimeTables';
+import {useGameTableSync} from './useGameTableSync';
 
 export type StageReadiness={
  stage_no:number;
@@ -18,43 +19,42 @@ export type StageReadiness={
  original_blockers?:string[];
 };
 
-export default function StageReadinessPanel({g,stageNo,compact=false,rulesUrl,rulesLabel}:{g:ReturnTypeRepublic;stageNo:number;compact?:boolean;rulesUrl?:string;rulesLabel?:string}){
- const {game,teacher,setError}=g;
+export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=false,rulesUrl,rulesLabel}:{g:ReturnTypeRepublic;stageNo:number;compact?:boolean;readOnly?:boolean;rulesUrl?:string;rulesLabel?:string}){
+ const {game,setError}=g;
+ const teacher=g.teacher&&!readOnly;
  const [state,setState]=useState<StageReadiness|null>(null);
  const [overrideReason,setOverrideReason]=useState('');
  const [loading,setLoading]=useState(false);
+ const [loadError,setLoadError]=useState('');
+ const request=useRef(0);
 
  async function load(){
-  if(!game)return;setLoading(true);
-  const r=await supabase.rpc('get_stage_readiness',{p_game_id:game.id,p_stage_no:stageNo});
-  if(!r.error&&r.data)setState(r.data as StageReadiness);
-  setLoading(false);
+  if(!game)return;const version=++request.current;setLoading(true);
+  try{
+   const r=await supabase.rpc('get_stage_readiness',{p_game_id:game.id,p_stage_no:stageNo});
+   if(version!==request.current)return;
+   if(r.error){setState(null);setLoadError(r.error.message)}else if(r.data){setState(r.data as StageReadiness);setLoadError('')}else{setState(null);setLoadError('Сервер не вернул результат проверки.')}
+  }catch(error){if(version===request.current){setState(null);setLoadError(error instanceof Error?error.message:'Не удалось загрузить проверку.')}}
+  finally{if(version===request.current)setLoading(false)}
  }
- useEffect(()=>{void load()},[game?.id,stageNo]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('stage-readiness:'+game.id+':'+stageNo);
-  for(const table of STAGE_REALTIME_TABLES)ch.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+game.id},()=>void load());
-  ch.subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id,stageNo]);
+ useGameTableSync(game?.id,STAGE_REALTIME_TABLES,load,String(stageNo));
 
  async function setOverride(){
-  if(!game||overrideReason.trim().length<10)return;
+  if(!game||!teacher||overrideReason.trim().length<10)return;
   setLoading(true);
   const r=await supabase.rpc('set_stage_readiness_override',{p_game_id:game.id,p_stage_no:stageNo,p_reason:overrideReason.trim()});
   if(r.error)setError(r.error.message);else{setOverrideReason('');await load()}
   setLoading(false);
  }
  async function clearOverride(){
-  if(!game)return;setLoading(true);
+  if(!game||!teacher)return;setLoading(true);
   const r=await supabase.rpc('clear_stage_readiness_override',{p_game_id:game.id,p_stage_no:stageNo});
   if(r.error)setError(r.error.message);else await load();
   setLoading(false);
  }
 
  const status=loading?'loading':state?.ready?(state.warnings?.length?'warning':'ready'):'blocked';
- const title=loading?'Проверка…':state?.ready?(state.warnings?.length?'Основная процедура завершена':'Этап процедурно готов'):'Есть незавершённые процедуры';
+ const title=loading?'Проверка…':loadError?'Проверка недоступна':state?.ready?(state.warnings?.length?'Основная процедура завершена':'Этап процедурно готов'):'Есть незавершённые процедуры';
  const card=STAGE_SYSTEM[stageNo];
 
  if(compact)return <div className={'stageReadinessCompact '+status}>
@@ -82,6 +82,8 @@ export default function StageReadinessPanel({g,stageNo,compact=false,rulesUrl,ru
     <button type="button" className="stageReadinessRefresh" onClick={()=>void load()} disabled={loading} title="Перепроверить готовность"><RefreshCw size={17} className={loading?'isSpinning':''}/><span>Перепроверить</span></button>
    </div>
   </header>
+
+  {loadError&&<p className="stageOperationsNotice" role="alert">{loadError} Повторите проверку после восстановления связи.</p>}
 
   {(blockerCount>0||warningCount>0)&&<div className={'stageReadinessChecklist '+((blockerCount>0)!==(warningCount>0)?'single':'')}>
    {blockerCount>0&&<section className="stageReadinessGroup blockers">
