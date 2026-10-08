@@ -66,7 +66,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes}:{g:ReturnTyp
 
   <div className="govSessionTabs">
    <div>{sessions.map(s=><button key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'идёт':s.status==='closed'?'закрыто':'проект'}</em></button>)}</div>
-   {canManage&&<details className="govSessionCreate"><summary>＋ Новое заседание</summary><div><input aria-label="Название заседания" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Название"/><label>Общий регламент, мин.<input type="number" min="5" max="240" value={timeLimit} onChange={e=>setTimeLimit(Number(e.target.value)||60)}/></label><button disabled={busy} onClick={()=>void create()}>Создать</button></div></details>}
+   {canManage&&<details className="govSessionCreate"><summary>＋ Новое заседание</summary><div><label>Название заседания<input aria-label="Название заседания" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Например, заседание № 1"/></label><label>Общий регламент, мин.<input type="number" min="5" max="240" value={timeLimit} onChange={e=>setTimeLimit(Number(e.target.value)||60)}/></label><button type="button" disabled={busy||timeLimit<5||timeLimit>240} onClick={()=>void create()}>{busy?'Создание…':'Создать заседание'}</button></div></details>}
   </div>
 
   {selected&&<>
