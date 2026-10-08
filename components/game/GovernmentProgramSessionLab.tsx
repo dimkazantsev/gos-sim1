@@ -1,4 +1,5 @@
 'use client';
+import StageModuleHeader from '../ui/StageModuleHeader';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
@@ -61,10 +62,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes}:{g:ReturnTyp
  async function close(){if(!selected)return;setBusy(true);const r=await supabase.rpc('close_government_session',{p_session_id:selected.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
 
  return <section className="govSessionLab">
-  <header className="govSessionHead">
-   <div><small>КОЛЛЕГИАЛЬНОЕ РЕШЕНИЕ · ЭТАП 11</small><h2>Заседание Правительства</h2><p>Председатель задаёт повестку и временной регламент. Каждая государственная программа сначала представляется, затем переходит к решению Правительства. Кворум и результат считаются существующим процедурным движком.</p></div>
-   <div className="govSessionState"><strong>{selected?'№ '+selected.session_no:'—'}</strong><span>{selected?.status==='open'?'Заседание идёт':selected?.status==='closed'?'Закрыто':'Повестка формируется'}</span><em>{selected?selected.time_limit_minutes+' мин.':'—'}</em></div>
-  </header>
+  <StageModuleHeader eyebrow="Этап 11 · Правительство" title="Заседание Правительства" description="Председатель формирует повестку и регламент. Министры представляют программы, члены Правительства регистрируются на заседание и голосуют; принятое решение оформляется постановлением." stats={[{label:"Заседание",value:selected?"№ "+selected.session_no:"Не создано",detail:selected?.status==="open"?"Идёт":selected?.status==="closed"?"Закрыто":"Подготовка повестки"},{label:"Регламент",value:selected?selected.time_limit_minutes+" мин.":"Не задан"}]}/>
 
   <div className="govSessionTabs">
    <div>{sessions.map(s=><button key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'идёт':s.status==='closed'?'закрыто':'проект'}</em></button>)}</div>

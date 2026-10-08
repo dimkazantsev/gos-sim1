@@ -4,9 +4,9 @@ import {createPortal} from 'react-dom';
 import {Check,ChevronDown} from 'lucide-react';
 
 export type SelectOption={value:string;label:string;disabled?:boolean};
-export default function StyledSelect({label,value,options,onChange,disabled=false,wide=false,placeholder='Выберите…',className=''}:{
+export default function StyledSelect({label,value,options,onChange,disabled=false,wide=false,wrap=false,placeholder='Выберите…',className=''}:{
  label:string;value:string;options:SelectOption[];onChange:(next:string)=>void;
- disabled?:boolean;wide?:boolean;placeholder?:string;className?:string
+ disabled?:boolean;wide?:boolean;wrap?:boolean;placeholder?:string;className?:string
 }){
  const [open,setOpen]=useState(false);
  const [cursor,setCursor]=useState(0);
@@ -61,10 +61,10 @@ export default function StyledSelect({label,value,options,onChange,disabled=fals
  }
  return <div ref={ref} className={'styledSelect '+(wide?'wide ':'')+className}>
   <span className="styledSelectLabel" id={id+'-label'}>{label}</span>
-  <button ref={trigger} type="button" className={'styledSelectTrigger '+(open?'isOpen':'')} disabled={disabled}
+  <button ref={trigger} type="button" className={'styledSelectTrigger '+(open?'isOpen':'')} disabled={disabled} style={wrap?{height:'auto',padding:'11px 14px'}:undefined}
    aria-haspopup="listbox" aria-expanded={open} aria-labelledby={id+'-label '+id+'-value'} aria-controls={open?id+'-list':undefined}
    onClick={()=>open?setOpen(false):show()} onKeyDown={keydown}>
-   <span id={id+'-value'} className="styledSelectValue">{selected?.label||placeholder}</span>
+   <span id={id+'-value'} className="styledSelectValue" style={wrap?{whiteSpace:'normal',overflow:'visible',textOverflow:'clip',overflowWrap:'anywhere'}:undefined}>{selected?.label||placeholder}</span>
    <ChevronDown size={17} aria-hidden="true"/>
   </button>
   {open&&typeof document!=='undefined'&&createPortal(<div ref={popup} id={id+'-list'} role="listbox"

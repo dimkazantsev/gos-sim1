@@ -827,7 +827,8 @@ export function useRepublicGame(gameId:string){
   if(r.error){setError(r.error.message);return false}await refresh();return true;
  }
  async function closeVote(id:string,note?:string){
-  const r=await supabase.rpc('close_procedural_vote',{p_vote_id:id,p_note:note||null});
+  const rpc=votes.find(v=>v.id===id)?.procedure_key==='bill_amendments'?'close_bill_amendment_vote':'close_procedural_vote';
+  const r=await supabase.rpc(rpc,{p_vote_id:id,p_note:note||null});
   if(r.error){setError(r.error.message);return null}
   await refresh();return r.data;
  }
@@ -846,11 +847,12 @@ export function useRepublicGame(gameId:string){
  }
 
  async function publishEvent(title:string,body:string,severity='notice',category='Режиссёрская'){if(!me||!title.trim()||!body.trim())return false;const r=await supabase.from('game_events').insert({game_id:gameId,round_no:currentStage?.stage_no||1,category,severity,title:title.trim(),body:body.trim(),created_by:me.user_id});if(r.error){setError(r.error.message);return false}await refresh();return true}
- async function triggerCrisis(){
+ async function triggerCrisis(choice?:{type:string;intensity:'low'|'medium'|'high'|'ultra'}){
   if(!teacher||!me)return;
-  const c=CRISES[Math.floor(Math.random()*CRISES.length)];
+  const c=choice?CRISES.find(scenario=>scenario.type===choice.type):CRISES[Math.floor(Math.random()*CRISES.length)];
   const keys=['low','medium','high','ultra'] as const;
-  const intensity=keys[Math.floor(Math.random()*keys.length)];
+  if(!c||choice&&!keys.includes(choice.intensity)){setError('Выберите сценарий и интенсивность из каталога.');return}
+  const intensity=choice?.intensity||keys[Math.floor(Math.random()*keys.length)];
   const description=c.levels[intensity];
   const r=await supabase.rpc('launch_crisis',{p_game_id:gameId,p_crisis_type:c.type,p_intensity:intensity,p_description:description,p_response_minutes:20});
   if(r.error)setError(r.error.message);else await refresh();

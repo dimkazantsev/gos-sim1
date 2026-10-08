@@ -1,15 +1,50 @@
 'use client';
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {useEffect,useId,useMemo,useRef,useState} from 'react';
+import {BookOpen,Play,Shuffle} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import StageModuleHeader from '@/components/ui/StageModuleHeader';
+import {CRISES,INTENSITY_LABEL} from './constants';
 import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
+import styles from './CrisisRoom.module.css';
 
 type InfoRequest={id:string;crisis_id:string;game_id:string;requester_id:string;question:string;answer:string|null;status:'pending'|'answered';created_at:string;answered_at:string|null};
 type CrisisResponse={id:string;crisis_id:string;game_id:string;user_id:string;role_title:string|null;action_plan:string;legal_basis:string|null;resources:string|null;public_message:string|null;teacher_note:string|null;status:'submitted'|'reviewed';created_at:string;updated_at:string};
 type RoleConsequence={game_id:string;user_id:string;crisis_id:string|null;status:'active'|'suspended'|'arrested'|'detained'|'deceased'|'incapacitated';reason:string|null;until_at:string|null;set_at:string};
 
-const intensityLabel:Record<string,string>={low:'Низкая',medium:'Средняя',high:'Высокая',ultra:'Ультра'};
-const intensityClass=(x:string)=>x==='ultra'?'ultra':x==='high'?'high':x==='medium'?'medium':'low';
+type CrisisIntensity=keyof typeof INTENSITY_LABEL;
+type CrisisChoice={type:string;intensity:CrisisIntensity};
+const intensityKeys=['low','medium','high','ultra'] as const;
+
+function CrisisCatalog({busy,active,onLaunch}:{busy:boolean;active:boolean;onLaunch:(choice?:CrisisChoice)=>Promise<void>}){
+ const [selectedId,setSelectedId]=useState<string>(CRISES[0].id);
+ const [intensity,setIntensity]=useState<CrisisIntensity>('low');
+ const intensityGroup=useId();
+ const selected=CRISES.find(c=>c.id===selectedId)||CRISES[0];
+ const sourceLabel=selected.source==='rules'?'Из правил':'Дополнительный';
+
+ return <div className={styles.catalog} data-crisis-catalog>
+  <div className={styles.catalogHeading}><div><h3>Каталог кризисов</h3><p>Выберите событие, сравните четыре степени интенсивности и запустите нужный вариант.</p></div><span className={styles.catalogCount}>{CRISES.length} сценариев · 4 уровня</span></div>
+  <p className={styles.gameNote}>Все события — условные учебные сценарии. Девять сценариев сохранены из авторских правил, шесть административных случаев добавлены для игры.</p>
+  {(['rules','additional'] as const).map(source=><section className={styles.catalogGroup} key={source} aria-label={source==='rules'?'Сценарии из правил':'Дополнительные административные сценарии'}>
+   <div className={styles.groupHeading}><h4>{source==='rules'?'Сценарии из правил':'Административные случаи'}</h4><span>{CRISES.filter(c=>c.source===source).length}</span></div>
+   <div className={styles.scenarioGrid}>{CRISES.filter(c=>c.source===source).map(c=><button type="button" className={styles.scenario} key={c.id} aria-pressed={selected.id===c.id} onClick={()=>setSelectedId(c.id)}>
+    <span className={styles.scenarioNumber}>{String(CRISES.indexOf(c)+1).padStart(2,'0')}</span><span className={styles.scenarioCopy}><b>{c.type}</b><small className={styles.sourceBadge}>{c.source==='rules'?'Из правил':'Дополнительный'}</small></span>
+   </button>)}</div>
+  </section>)}
+  <section className={styles.configuration} aria-label="Предпросмотр и интенсивность выбранного сценария">
+   <div className={styles.previewHeading}><div><small>ПРЕДПРОСМОТР СЦЕНАРИЯ</small><h3>{selected.type}</h3></div><span className={styles.sourceBadge}>{sourceLabel}</span></div>
+   <fieldset className={styles.intensityFieldset}><legend>Степень интенсивности</legend><div className={styles.intensityGrid}>{intensityKeys.map(level=><label className={styles.intensityOption} data-selected={intensity===level} key={level}>
+    <span className={styles.intensityTitle}><input type="radio" name={intensityGroup} value={level} checked={intensity===level} onChange={()=>setIntensity(level)}/><b>{INTENSITY_LABEL[level]}</b></span><span>{selected.levels[level]}</span>
+   </label>)}</div></fieldset>
+   {selected.id==='pandemic'&&<p className={styles.gameNote}>Проценты смертности — условные показатели из авторских правил игры.</p>}
+   <div className={styles.launchSummary} aria-live="polite"><span>Выбрано: <b>{selected.type}</b> · {INTENSITY_LABEL[intensity]} интенсивность</span><span>Первичная реакция участников: <b>20 минут</b></span></div>
+   {active&&<p className={styles.gameNote}>Завершите текущий кризис, чтобы запустить следующий. Каталог доступен для предварительного выбора.</p>}
+   <div className={styles.launchActions}><button type="button" className="secondary" disabled={busy||active} onClick={()=>void onLaunch()}><Shuffle size={17} aria-hidden="true"/>Запустить случайный кризис</button><button type="button" className="primary" disabled={busy||active} onClick={()=>void onLaunch({type:selected.type,intensity})}><Play size={17} aria-hidden="true"/>{busy?'Запуск…':'Запустить выбранный сценарий'}</button></div>
+   <p className={styles.launchHint}>После запуска участники смогут запросить сведения, отправить план действий, указать полномочия, ресурсы и публичное сообщение. Преподаватель разберёт решения и зафиксирует итог.</p>
+  </section>
+ </div>;
+}
 
 export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,crises,members,currentStage,triggerCrisis,setError}=g;
@@ -54,12 +89,19 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
  useGameTableSync(game?.id,['game_crises','crisis_information_requests','crisis_responses','game_role_consequences'],load,active?.id||'');
  useEffect(()=>{const id=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(id)},[]);
 
+ async function launch(choice?:CrisisChoice){
+  if(busy||active)return;
+  setBusy(true);
+  try{await triggerCrisis(choice)}catch(error){setError(error instanceof Error?error.message:'Не удалось запустить кризис. Повторите попытку.')}
+  finally{setBusy(false)}
+ }
+
  if(!game||!me)return null;
  if(!active){
-  if(!teacher)return <section className="crisisCommand crisisLauncher"><h2>Активного кризиса нет</h2><p>Преподаватель может запустить сценарий на любом этапе. После запуска здесь появятся сведения и формы реагирования.</p></section>;
-  return <section className="crisisCommand crisisLauncher">
-   <header className="crisisCommandHead"><div className="crisisSignal"><span>!</span><div><small>ЭТАП 15 · КРИЗИСНОЕ УПРАВЛЕНИЕ</small><h2>Сценарий ещё не запущен</h2><p>Система случайно выберет тип кризиса и интенсивность, после чего участники получат ограниченное окно для запроса данных и управленческой реакции.</p></div></div><div className="crisisClock"><small>СОСТОЯНИЕ</small><strong>ГОТОВ</strong><span>ожидается запуск преподавателем</span></div></header>
-   <div className="crisisLaunchBody"><div><b>Что произойдёт после запуска</b><p>Создастся кризис этапа 15, включится 20-минутное окно первичной реакции, появятся запросы сведений, планы действий, правовые основания, ресурсы и публичная коммуникация.</p></div><button className="primary" disabled={busy} onClick={async()=>{setBusy(true);await triggerCrisis();setBusy(false)}}>⚠ Запустить случайный кризис</button></div>
+  if(!teacher)return <section className={'crisisCommand '+styles.room}><StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · КРИЗИСНОЕ УПРАВЛЕНИЕ`} title="Активного кризиса нет" description="Преподаватель может запустить сценарий на любом этапе. После запуска здесь появятся сведения и формы реагирования."/></section>;
+  return <section className={'crisisCommand '+styles.room}>
+   <StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · КРИЗИСНОЕ УПРАВЛЕНИЕ`} title="Выберите кризисный сценарий" description="Преподаватель задаёт событие и интенсивность или проводит случайную жеребьёвку. Первичная реакция участников длится 20 минут." icon={<BookOpen size={18} aria-hidden="true"/>} stats={[{label:'Сценарии',value:CRISES.length,detail:'9 из правил · 6 дополнительных'},{label:'Первичная реакция',value:'20 мин',detail:'После запуска сценария'}]}/>
+   <CrisisCatalog busy={busy} active={false} onLaunch={launch}/>
   </section>;
  }
  const deadline=active.response_deadline?new Date(active.response_deadline).getTime():null;
@@ -101,11 +143,8 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
   setBusy(false);
  }
 
- return <section className={'crisisCommand '+intensityClass(active.intensity)}>
-  <header className="crisisCommandHead">
-   <div className="crisisSignal"><span>!</span><div><small>АКТИВНЫЙ КРИЗИС · ЭТАП {active.stage_no}</small><h2>{active.crisis_type}</h2><p>{active.description}</p></div></div>
-   <div className="crisisClock"><small>ОКНО ПЕРВИЧНОЙ РЕАКЦИИ</small><strong className={late?'late':''}>{late?'СРОК ИСТЁК':mm}</strong><span>{intensityLabel[active.intensity]} интенсивность</span></div>
-  </header>
+ return <section className={'crisisCommand '+styles.room}>
+  <StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · АКТИВНЫЙ КРИЗИС`} title={active.crisis_type} description={active.description} stats={[{label:'Окно первичной реакции',value:<span className={late?styles.expired:undefined}>{late?'Срок истёк':mm}</span>,detail:`Запущен на этапе ${active.stage_no}`},{label:'Интенсивность',value:INTENSITY_LABEL[active.intensity]}]}/>
 
   <div className="crisisCommandGrid">
    <article className="crisisIntel">
@@ -129,5 +168,6 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
   </section>}
 
   {teacher&&<footer className="crisisResolution"><div><small>ЗАВЕРШЕНИЕ СЦЕНАРИЯ</small><p>Фиксируйте результат только после разбора решений: что сработало, какие полномочия были использованы корректно и какие последствия возникли.</p></div><textarea rows={3} value={resolution} onChange={e=>setResolution(e.target.value)} placeholder="Итог кризиса и ключевые последствия"/><button className="primary" disabled={busy} onClick={()=>void resolve()}>Завершить кризис</button></footer>}
+  {teacher&&<details className={styles.nextCatalog}><summary>Каталог сценариев для следующего запуска <span>{CRISES.length} сценариев · 4 уровня</span></summary><CrisisCatalog busy={busy} active onLaunch={launch}/></details>}
  </section>;
 }

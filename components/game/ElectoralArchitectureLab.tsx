@@ -1,4 +1,5 @@
 'use client';
+import StyledSelect from '../ui/StyledSelect';
 import {useEffect,useState} from 'react';
 import {MessageCircle,Save} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -231,7 +232,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   {teacher&&<section className="regionalCalculator">
    <div className="regionalCalculatorHead">
     <div><small>КАЛЬКУЛЯТОР ПРЕПОДАВАТЕЛЯ</small><h3>Распределение 89 субъектов</h3><p>Расчёт скрыт от студентов до публикации результата.</p></div>
-    <label><span>Метод</span><select value={regionalCalculatorMethod} onChange={e=>setRegionalCalculatorMethod(e.target.value as RRule['method'])}><option value="random">Жеребьёвка</option><option value="proportional">Пропорционально мандатам ГД</option><option value="agreement">Договорной</option></select></label>
+    <StyledSelect wrap label="Метод распределения" value={regionalCalculatorMethod} onChange={value=>setRegionalCalculatorMethod(value as RRule['method'])} options={[{value:"random",label:"Жеребьёвка"},{value:"proportional",label:"Пропорционально мандатам Государственной Думы"},{value:"agreement",label:"Договорной"}]}/>
    </div>
    {regionalCalculatorMethod==='random'&&<div className="regionalCalculatorLottery"><button type="button" className="primary" onClick={drawRegionalLottery}>Провести жеребьёвку</button><span>Каждый из 89 субъектов случайно назначается одной из партий.</span></div>}
    <div className="regionalCalculatorRows">

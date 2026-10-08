@@ -12,6 +12,7 @@ import FiscalMacroPanel from './FiscalMacroPanel';
 import FederalBudgetSimulator from './FederalBudgetSimulator';
 import {userError} from '@/lib/userError';
 import StyledSelect from '../ui/StyledSelect';
+import SignedProgramBudget from './SignedProgramBudget';
 type Proposal={id:string;tax_key:string;region_code:string;new_rate:number;status:string;document_id:string|null;author_id:string};
 type Change={id:number;region_code:string|null;note:string;source_type:string;created_at:string};
 type LegalPlan={id:string;title:string;budget_year:number;source_note:string|null;revenue:number;expenditure:number;balance:number;debt_end:number;financing:number;legal_status:'draft'|'ready'|'published';document_id:string|null;registry_no:string|null;document_status:string|null;allocations:{program_id:string;title:string;ministry:string;amount:number}[]};
@@ -68,6 +69,7 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  <header className="budgetHero"><div><small>ФЕДЕРАЦИЯ · РЕГИОНЫ · МУНИЦИПАЛИТЕТЫ</small><h1>Бюджет</h1><p>Рассчитайте доходы и расходы, выберите источники покрытия дефицита и подготовьте проект бюджета для принятия через реестр НПА.</p></div><button type="button" className="secondary" onClick={()=>void load()} disabled={busy}><RefreshCw size={18}/> Обновить данные</button></header>
  
  {!ready?<p role="status">Загружаем общую бюджетную модель…</p>:<>
+ <SignedProgramBudget g={g} onOpenStage={onOpenStage}/>
  <FederalBudgetSimulator g={g} context={context} regions={regions} rates={rates} readOnly={readOnly} onOpenDocument={onOpenDocument} onOpenEvents={onOpenEvents} onOpenVotes={onOpenVotes} onSaved={load}/>
  <details className="surface budgetMethod"><summary><Landmark size={18}/> Региональные и местные бюджеты · учебный прогноз</summary>
  <div className="budgetKpis budgetLevelCards">{[

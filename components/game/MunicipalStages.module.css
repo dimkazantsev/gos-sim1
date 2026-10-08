@@ -1,0 +1,35 @@
+.panel{min-width:0;max-width:100%;box-shadow:none;color:var(--gs-ink,#172447)}
+.panel :global(.styledSelect){min-width:0;max-width:100%}
+.panel :global(.styledSelectTrigger){width:100%;min-height:44px}
+.panel :global(.mayorNominationActions),.panel :global(.mayorBallot){gap:12px;align-items:flex-end}
+.panel :global(.mayorNominationActions) :global(.styledSelect),.panel :global(.mayorBallot) :global(.styledSelect){flex:1 1 240px}
+.panel :global(.districtHead)>div,.panel :global(.districtAdd){grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end}
+.panel :global(.districtMembers)>div{grid-template-columns:minmax(0,1fr) auto auto}
+.panel :global(.municipalEditor){grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;padding:20px}
+.panel :global(.municipalEditor) label{gap:7px;min-width:0;font-size:14px;line-height:1.5}
+.panel :global(.municipalEditor) input,.panel :global(.municipalEditor) textarea{min-width:0;font-size:15px;line-height:1.6}
+.panel :global(.municipalPicker)>div{min-width:0}
+.panel :global(.municipalTeam){gap:18px;align-items:flex-start;flex-wrap:wrap}
+.panel :global(.municipalTeam)>div{min-width:0}
+.panel :global(.municipalTeam)>div:last-child{gap:10px;align-items:end;flex:1 1 280px}
+.panel :global(.municipalTeam)>div:last-child :global(.styledSelect){flex:1}
+.panel :global(.municipalDecision)>div:last-child{align-items:center;flex-wrap:wrap}
+.panel :global(.municipalSummaryGrid) p{white-space:pre-wrap;overflow-wrap:anywhere}
+.panel :global(.municipalStatus){flex-shrink:0}
+.panel [data-stage-module-head] dd{white-space:normal;overflow-wrap:anywhere}
+.steps{display:flex;gap:10px;flex-wrap:wrap;padding:0;margin:0 0 18px;list-style:none}
+.steps li{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--gs-border,#dce3f0);border-radius:10px;color:var(--gs-muted,#586784);font-size:13px}
+.steps b{color:var(--gs-accent,#2453e6);font-variant-numeric:tabular-nums}
+.districtField{display:grid;gap:8px;align-content:start;min-width:0}
+.presentations{min-width:0;margin:0;padding:18px;border:1px solid var(--gs-border,#dce3f0);border-radius:12px;background:#fff}
+.presentations legend{padding:0 6px;color:var(--gs-ink,#172447);font-size:16px;font-weight:750}
+.presentations>p{margin:0 0 16px;font-size:14px;line-height:1.6;color:var(--gs-muted,#586784)}
+.presentationRows{display:grid;gap:14px;margin-bottom:14px}
+.presentationRow{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr) auto;align-items:end;gap:12px;padding:14px;border:1px solid var(--gs-border,#dce3f0);border-radius:10px;background:var(--gs-bg-elevated,#f9faff)}
+.linkError{grid-column:1/-1;margin:0;color:var(--gs-red,#b62c45);font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.savedPresentations{min-width:0;margin-top:16px;padding:18px;border:1px solid var(--gs-border,#dce3f0);border-radius:12px}
+.savedPresentations h3{margin:0 0 10px;font-size:17px}
+.savedPresentations ul{display:grid;gap:10px;margin:0;padding-left:20px}
+.savedPresentations a{color:var(--gs-accent,#2453e6);font-size:15px;line-height:1.6;overflow-wrap:anywhere;text-decoration:underline;text-underline-offset:3px}
+.draftNotice{flex-basis:100%;margin:0;font-size:13px;line-height:1.6;color:var(--gs-muted,#586784)}
+@media(max-width:700px){.panel :global(.municipalEditor){grid-template-columns:minmax(0,1fr);padding:14px}.panel :global(.districtHead)>div,.panel :global(.districtAdd){grid-template-columns:minmax(0,1fr)}.panel :global(.mayorNominationActions) :global(.styledSelect),.panel :global(.mayorBallot) :global(.styledSelect){flex-basis:auto;width:100%}.panel :global(.districtMembers)>div{grid-template-columns:minmax(0,1fr) auto}.panel :global(.districtMembers)>div>span{grid-column:1;grid-row:2}.panel :global(.districtMembers)>div>button{grid-column:2;grid-row:1/3}.panel :global(.municipalTeam)>div:last-child{display:grid;grid-template-columns:minmax(0,1fr);width:100%;flex-basis:auto}.presentationRow{grid-template-columns:minmax(0,1fr);padding:12px}.presentationRow>button{justify-self:end}.presentations,.savedPresentations{padding:14px}.linkError{grid-column:auto}.steps{gap:8px}.steps li{padding:7px 9px}.panel :global(.municipalUpload),.panel :global(.municipalSummaryGrid){grid-template-columns:minmax(0,1fr)}}

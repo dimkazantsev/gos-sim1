@@ -1,4 +1,5 @@
 'use client';
+import StageModuleHeader from '../ui/StageModuleHeader';
 import {useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
@@ -65,10 +66,7 @@ export default function SystemDebriefLab({g}:{g:ReturnTypeRepublic}){
  }
 
  return <section className="debriefLab">
-  <header className="debriefHead">
-   <div><small>ЭТАП 16 · РЕФЛЕКСИЯ</small><h2>Разбор построенного государства</h2><p>Финал не просит пересказать правила. Нужно восстановить собственные решения, причинную цепочку и институциональные последствия, а затем предложить конкретное изменение следующего запуска игры.</p></div>
-   <div className="debriefState"><strong>{completedStages}/16</strong><span>этапов завершено</span><em>{myRows.filter(x=>x.status!=='draft').length}/6 рефлексий сдано</em></div>
-  </header>
+  <StageModuleHeader eyebrow="Этап 16 · Рефлексия" title="Разбор построенного государства" description="Восстановите свои решения, объясните их причины и последствия, оцените результат и предложите изменения для следующей игры." stats={[{label:"Завершённые этапы",value:completedStages+" / 16"},{label:teacher?"Рефлексии участников":"Ваши рефлексии",value:teacher?studentProgress.filter(x=>x.submitted===6).length+" / "+studentProgress.length:myRows.filter(x=>x.status!=="draft").length+" / 6",detail:teacher?"Сдали все шесть разделов":"Разделов сдано"}]}/>
 
   <div className="debriefEvidence">
    <article><small>ПАРТИИ</small><strong>{parties.length}</strong><span>политических организаций</span></article>

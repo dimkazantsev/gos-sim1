@@ -82,6 +82,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  function canDelete(v:Vote){return !!me&&(teacher||v.created_by===me.user_id)}
  function canClose(v:Vote){
   if(teacher)return true;if(!me)return false;if(units.some(u=>'unit:'+u.id===v.institution_key&&u.head_user_id===me.user_id))return true;
+  if(v.procedure_key==='bill_amendments'&&v.created_by===me.user_id)return true;
   const role=(me.role_title||'').toLowerCase();
   if(v.institution_key==='gd')return (role.includes('председател')&&role.includes('дум'))||(role.includes('совет')&&role.includes('дум'));
   if(v.institution_key==='government')return role.includes('председател')&&role.includes('правительств');
