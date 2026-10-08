@@ -17,30 +17,33 @@ const pct=(value:number|null|undefined)=>value==null?'—':Number(value).toLocal
 export default function PresidentialRulesCalculator({g,candidates,settings,onSaved}:{g:ReturnTypeRepublic;candidates:Candidate[];settings:Settings|null;onSaved:()=>Promise<void>}){
  const [calculation,setCalculation]=useState<Calculation|null>(null),[ballots,setBallots]=useState<Ballot[]>([]),[busy,setBusy]=useState(false),[size,setSize]=useState('8');
  const [drafts,setDrafts]=useState<Record<string,{points:string;poll:string}>>({}),[notice,setNotice]=useState('');
- const sequence=useRef(0),dirty=useRef(new Set<string>()),versions=useRef(new Map<string,number>()),sizeDirty=useRef(false);
- const scope=g.game?.id+'|'+g.me?.user_id+'|'+g.teacher,liveScope=useRef(scope);liveScope.current=scope;
+ const sequence=useRef(0),dirty=useRef(new Set<string>()),versions=useRef(new Map<string,number>()),sizeDirty=useRef(false),alive=useRef(true),busyRef=useRef(false);
  const round=settings?.status==='runoff'||settings?.result?.round===2?2:1;
- useEffect(()=>{sequence.current++;dirty.current.clear();versions.current.clear();sizeDirty.current=false;setDrafts({});setCalculation(null);setBallots([]);setSize('8');setBusy(false);setNotice('')},[scope]);
+ const scope=[g.game?.id,g.me?.user_id,g.teacher,settings?.status,round].join('|'),liveScope=useRef(scope);liveScope.current=scope;
+ const active=()=>alive.current&&scope===liveScope.current;
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false;sequence.current++;busyRef.current=false}},[]);
+ useEffect(()=>{sequence.current++;dirty.current.clear();versions.current.clear();sizeDirty.current=false;busyRef.current=false;setDrafts({});setCalculation(null);setBallots([]);setSize('8');setBusy(false);setNotice('')},[scope]);
  async function load(){
-  if(!g.game||!g.teacher)return;const ticket=++sequence.current,captured=scope;
+  if(!active()||!g.game||!g.teacher)return;const ticket=++sequence.current;
   const [r,b]=await Promise.all([supabase.rpc('get_presidential_rules_calculation',{p_game_id:g.game.id,p_round_no:round}),supabase.from('presidential_teacher_ballots').select('round_no,criterion,slot_no,candidate_id').eq('game_id',g.game.id)]);
-  if(ticket!==sequence.current||captured!==liveScope.current)return;
+  if(ticket!==sequence.current||!active())return;
   if(r.error||b.error){g.setError(r.error||b.error);return;}
   const next=r.data as Calculation;setCalculation(next);setBallots((b.data||[]) as Ballot[]);if(!sizeDirty.current)setSize(String(next.jury_size||8));
   setDrafts(old=>{const copy={...old};for(const x of next.rows)if(!dirty.current.has(x.candidate_id))copy[x.candidate_id]={points:String(x.points??0),poll:String(x.poll_pct??'')};return copy;});
  }
- useGameTableSync(g.game?.id,['presidential_teacher_ballots','presidential_scorecards','presidential_election_settings','presidential_candidates','game_members','game_parties'],load,scope+'|'+round);
+ useGameTableSync(g.game?.id,['presidential_teacher_ballots','presidential_scorecards','presidential_election_settings','presidential_candidates','game_members','game_parties'],load,scope);
  if(!g.teacher||!g.game)return null;
  if(settings?.status==='finished'&&settings.result?.rules_version!==2)return <section className={styles.panel}><h3>Расчёт завершённых выборов</h3><p>Сохранённый исторический результат доступен во вкладке итогов. Новая формула применяется к незавершённым выборам; завершённая процедура сохраняет свой протокол.</p></section>;
  const locked=!settings||['finished','manual_required'].includes(settings.status);
  const eligible=candidates.filter(c=>c.user_id&&(round===1||Array.isArray(settings?.result?.candidate_ids)&&settings!.result.candidate_ids.includes(c.id)));
  async function run(name:string,args:Record<string,unknown>){
-  if(busy)return false;setBusy(true);const captured=scope;
-  try{const r=await supabase.rpc(name,args);if(captured!==liveScope.current)return false;if(r.error){g.setError(r.error);return false;}await onSaved();await load();return true;}
-  catch(error){if(captured===liveScope.current)g.setError(error);return false;}
-  finally{if(captured===liveScope.current)setBusy(false);}
+  if(!active()||!g.teacher||!g.game||busyRef.current)return false;busyRef.current=true;setBusy(true);
+  try{const r=await supabase.rpc(name,args);if(!active())return false;if(r.error){g.setError(r.error);return false;}await onSaved();if(!active())return false;await load();return active();}
+  catch(error){if(active())g.setError(error);return false;}
+  finally{if(active()){busyRef.current=false;setBusy(false);}}
  }
  async function saveInputs(id:string){
+  if(!active())return;
   const d=drafts[id];if(!d||!Number.isFinite(Number(d.points))||d.points.trim()===''){g.setError('Введите баллы кандидата.');return;}
   const version=versions.current.get(id);
   const ok=await run('set_presidential_rules_input',{p_candidate_id:id,p_game_points:Number(d.points),p_poll_pct:d.poll.trim()===''?null:Number(d.poll)});

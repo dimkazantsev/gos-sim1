@@ -30,6 +30,7 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
  const scope=useRef(scopeKey),generation=useRef(0),request=useRef(0),busyRef=useRef(false);
  const [stateScope,setStateScope]=useState(scopeKey);
  scope.current=scopeKey;
+ const renderGeneration=generation.current;
  useEffect(()=>{
   generation.current++;request.current++;busyRef.current=false;
   setStateScope(scopeKey);setElections([]);setCandidates([]);setDistricts([]);setDistrictMembers([]);setResults({});
@@ -80,7 +81,7 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
  const assignedIds=new Set(districtMembers.map(x=>x.user_id));
 
  async function act(name:string,args:Record<string,unknown>,after?:()=>void){
-  if(busyRef.current)return;
+  if(busyRef.current||scope.current!==scopeKey||generation.current!==renderGeneration)return;
   const key=scopeKey,epoch=generation.current;
   const current=()=>scope.current===key&&generation.current===epoch;
   busyRef.current=true;setBusy(true);

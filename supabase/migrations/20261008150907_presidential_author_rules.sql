@@ -201,3 +201,34 @@ begin
 end;$$;
 create trigger presidential_settings_protocol_lock before update on public.presidential_election_settings for each row execute function private.lock_presidential_protocol_settings();
 revoke all on function private.lock_presidential_protocol_settings() from public,anon,authenticated;
+
+create function private.require_active_presidential_teacher(p_game_id uuid) returns void
+language plpgsql security definer set search_path=public,private,pg_temp as $$
+declare m game_members%rowtype;
+begin
+ if auth.uid() is null then raise exception 'Teacher access required';end if;
+ if private.is_platform_admin() then return;end if;
+ select * into m from game_members where game_id=p_game_id and user_id=auth.uid() for update;
+ if m.user_id is null or m.kind<>'teacher' or m.roster_archived_at is not null then raise exception 'Доступ действующего преподавателя этой игры обязателен';end if;
+end;$$;
+revoke all on function private.require_active_presidential_teacher(uuid) from public,anon,authenticated;
+
+-- Keep the RPC signatures/grants while adding the same actor lock at entry.
+do $actor_guards$
+declare f record;definition text;count_functions integer:=0;call_text text;
+begin
+ for f in select p.oid,p.proname from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname in ('set_presidential_jury_size','set_presidential_teacher_ballot','set_presidential_rules_input','finalize_presidential_round','get_presidential_rules_calculation','set_presidential_scorecard') loop
+  definition:=pg_get_functiondef(f.oid);
+  if f.proname='get_presidential_rules_calculation' then
+   call_text:=E'\n if not private.is_platform_admin() and not exists(select 1 from game_members where game_id=p_game_id and user_id=auth.uid() and kind=\'teacher\' and roster_archived_at is null) then raise exception \'Teacher access required\';end if;\n';
+  elsif f.proname in ('set_presidential_rules_input','set_presidential_scorecard') then
+   call_text:=E'\n perform private.require_active_presidential_teacher((select game_id from presidential_candidates where id=p_candidate_id));\n';
+  else call_text:=E'\n perform private.require_active_presidential_teacher(p_game_id);\n';end if;
+  if position(call_text in definition)=0 then
+   if position(E'\nbegin\n' in definition)=0 then raise exception 'Unsupported RPC body: %',f.proname;end if;
+   execute regexp_replace(definition,E'\nbegin\n',E'\nbegin\n'||call_text);
+  end if;
+  count_functions:=count_functions+1;
+ end loop;
+ if count_functions<>6 then raise exception 'Expected exactly six election RPCs';end if;
+end;$actor_guards$;

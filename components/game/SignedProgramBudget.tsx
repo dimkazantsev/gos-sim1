@@ -5,7 +5,7 @@ import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {programMoney} from './stateProgramModel';
 import styles from './StageForms.module.css';
-type SignedProgram={id:string;title:string;ministry:string;total_budget:number;program_status:string;signed_at:string;years:{year:number;amount:number;status:'planned'|'approved'|'rejected'}[]};
+type SignedProgram={id:string;title:string;ministry:string;total_budget:number|string;program_status:string;signed_at:string;years:{year:number;amount:number|string;status:'planned'|'approved'|'rejected'}[]};
 export default function SignedProgramBudget({g,onOpenStage}:{g:ReturnTypeRepublic;onOpenStage?:(stageNo:number)=>void}){
  const [programs,setPrograms]=useState<SignedProgram[]>([]),[ready,setReady]=useState(false);
  const sequence=useRef(0),scope=[g.game?.id,g.me?.user_id].join('|'),live=useRef(scope);live.current=scope;

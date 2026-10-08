@@ -41,19 +41,37 @@ create unique index bill_amendment_packs_one_active on public.bill_amendment_pac
 
 create or replace function private.bill_amendment_actor_available(p_game uuid,p_user uuid)
 returns boolean language sql stable security definer set search_path=public,private,pg_temp as $$
- select p_user is not null and exists(
-  select 1 from public.game_members m join public.games g on g.id=m.game_id
+ select p_user is not null and ((p_user=auth.uid() and private.is_platform_admin()) or exists(
+  select 1 from public.game_members m
   where m.game_id=p_game and m.user_id=p_user and m.kind<>'observer' and m.roster_archived_at is null
-   and (m.kind<>'teacher' or g.owner_id=p_user) and private.role_is_available(p_game,p_user)
- );
+   and private.role_is_available(p_game,p_user)
+ ));
 $$;
+
+-- Serialize membership/archival changes with every amendment mutation. Acquire
+-- the actor first, then the document, then the amendment/pack/vote row.
+create or replace function private.lock_bill_amendment_actor(p_game uuid,p_user uuid)
+returns void language plpgsql security definer set search_path=public,private,pg_temp as $$
+declare actor public.game_members%rowtype;
+begin
+ if p_user is null or p_user is distinct from auth.uid() then raise exception 'Нет полномочий для изменения поправок';end if;
+ select * into actor from public.game_members
+ where game_id=p_game and user_id=p_user for update;
+ -- A global platform administrator retains authority without classroom
+ -- membership, but locks any membership row that exists before the bill.
+ if private.is_platform_admin() then return;end if;
+ if actor.user_id is null or actor.kind='observer' or actor.roster_archived_at is not null
+  or not private.role_is_available(p_game,p_user)
+  then raise exception 'Нет полномочий для изменения поправок';end if;
+end;$$;
 
 create or replace function private.can_manage_bill_amendments(p_document uuid,p_user uuid)
 returns boolean language sql stable security definer set search_path=public,private,pg_temp as $$
  select exists(select 1 from public.formal_documents d where d.id=p_document and d.workflow_key='bill'
   and private.bill_amendment_actor_available(d.game_id,p_user) and (
-   exists(select 1 from public.games g join public.game_members m on m.game_id=g.id
-    where g.id=d.game_id and g.owner_id=p_user and m.user_id=p_user and m.kind='teacher' and m.roster_archived_at is null)
+   (p_user=auth.uid() and private.is_platform_admin())
+   or exists(select 1 from public.game_members m
+    where m.game_id=d.game_id and m.user_id=p_user and m.kind='teacher' and m.roster_archived_at is null)
    or exists(select 1 from private.formal_user_roles(d.game_id,p_user) r where r like '%председател%дум%' or r like '%совет%дум%')
    or private.is_bill_committee_member(d.id,p_user)
   ));
@@ -73,9 +91,9 @@ returns jsonb language plpgsql stable security definer set search_path=public,pr
 declare d public.formal_documents%rowtype;uid uuid:=auth.uid();subjects jsonb:='[]';subject text;available boolean;
 begin
  select * into d from public.formal_documents where id=p_document_id;
- if d.id is null or d.workflow_key<>'bill' or uid is null or not exists(
+ if d.id is null or d.workflow_key<>'bill' or uid is null or (not private.is_platform_admin() and not exists(
   select 1 from public.game_members m where m.game_id=d.game_id and m.user_id=uid and m.roster_archived_at is null
- ) then raise exception 'Нет доступа к поправкам этого законопроекта';end if;
+ )) then raise exception 'Нет доступа к поправкам этого законопроекта';end if;
  available:=private.bill_amendment_actor_available(d.game_id,uid);
  if available then
   foreach subject in array array['president','gd_deputy','sf','sf_member','government','region','ks','vs'] loop
@@ -92,117 +110,58 @@ begin
   'packs',(select coalesce(jsonb_agg(to_jsonb(p)||jsonb_build_object('result_code',v.result_code,'result_label',v.result_label) order by p.created_at desc,p.id),'[]'::jsonb) from public.bill_amendment_packs p left join public.game_votes v on v.id=p.vote_id where p.document_id=d.id));
 end;$$;
 
--- Preserve the live voting engine; extend only the reserved pack opening and
--- pack-specific chair/committee closing authorization. All count math is unchanged.
-CREATE OR REPLACE FUNCTION public.create_procedural_vote(p_game_id uuid, p_title text, p_body text, p_voting_mode text, p_institution_key text, p_procedure_key text, p_quorum_kind text DEFAULT 'fraction'::text, p_quorum_value numeric DEFAULT 0.6666667, p_majority_kind text DEFAULT 'yes_no_simple'::text, p_majority_value numeric DEFAULT 0.5, p_allow_abstain boolean DEFAULT true, p_tie_breaker_chair boolean DEFAULT false, p_formal_document_id uuid DEFAULT NULL::uuid, p_pass_transition text DEFAULT 'none'::text, p_fail_transition text DEFAULT 'none'::text)
- RETURNS uuid
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'private', 'pg_temp'
-AS $function$
-declare
-  v_uid uuid:=(select auth.uid());
-  v_id uuid:=gen_random_uuid();
-  d public.formal_documents%rowtype;
-  v_step_code text;
-  v_existing uuid;
+-- An isolated amendment closer: no legacy voting function or grant is replaced.
+-- The existing electorate/registration helpers and weighted ballots remain the
+-- source of truth; only the linked amendment pack can be decided by this RPC.
+create or replace function public.close_bill_amendment_vote(p_vote_id uuid,p_note text default null)
+returns jsonb language plpgsql security definer set search_path=public,private,pg_temp as $$
+declare uid uuid:=auth.uid();v public.game_votes%rowtype;pack public.bill_amendment_packs%rowtype;d public.formal_documents%rowtype;
+ eligible numeric;casted numeric;present numeric;y numeric;n numeric;a numeric;needed numeric;q boolean;pass boolean;result text;label text;
 begin
-  if v_uid is null or not private.is_game_member(p_game_id) then
-    raise exception 'Game access required';
-  end if;
-  if p_voting_mode not in ('member','faction','mandate') then
-    raise exception 'Unsupported voting mode';
-  end if;
-  if length(trim(coalesce(p_title,'')))<3 then
-    raise exception 'Vote title is required';
-  end if;
-
-  if p_procedure_key='bill_amendments' then
-    if p_formal_document_id is not null or p_institution_key<>'gd' or p_voting_mode<>'mandate'
-       or p_quorum_kind<>'fraction' or p_quorum_value is distinct from 0.5::numeric
-       or p_majority_kind<>'eligible_majority' or p_majority_value is distinct from 0.5::numeric
-       or p_allow_abstain is distinct from true or p_tie_breaker_chair is distinct from false
-       or p_pass_transition is distinct from 'none' or p_fail_transition is distinct from 'none'
-       or not private.bill_amendment_vote_context(p_game_id,v_uid,p_title,p_body)
-    then raise exception 'Поправочное голосование открывается только из проверенного пакета';end if;
-  elsif p_formal_document_id is not null then
-    select * into d from public.formal_documents where id=p_formal_document_id for update;
-    if d.id is null or d.game_id<>p_game_id then raise exception 'Formal document not found'; end if;
-    if not (
-      private.is_game_teacher(p_game_id)
-      or private.matches_formal_owner(d.game_id,v_uid,d.current_owner_key,d.author_id)
-    ) then raise exception 'Current institution cannot open this vote'; end if;
-    v_step_code:=d.status_code;
-    select id into v_existing from public.game_votes where formal_document_id=d.id and formal_step_code=v_step_code and status='open' order by opened_at limit 1;
-    if v_existing is not null then return v_existing; end if;
-  else
-    if not private.is_game_teacher(p_game_id) then
-      raise exception 'Only teacher can open an unlinked vote';
-    end if;
-  end if;
-
-  insert into public.game_votes(
-    id,game_id,stage_no,title,body,voting_mode,created_by,
-    formal_document_id,formal_step_code,institution_key,procedure_key,
-    quorum_kind,quorum_value,majority_kind,majority_value,allow_abstain,tie_breaker_chair,
-    pass_transition,fail_transition
-  )
-  values(
-    v_id,p_game_id,(select current_round from public.games where id=p_game_id),trim(p_title),nullif(trim(coalesce(p_body,'')),''),
-    p_voting_mode,v_uid,p_formal_document_id,v_step_code,p_institution_key,p_procedure_key,
-    p_quorum_kind,p_quorum_value,p_majority_kind,p_majority_value,p_allow_abstain,p_tie_breaker_chair,
-    p_pass_transition,p_fail_transition
-  );
-  return v_id;
-end;
-$function$
-;
-CREATE OR REPLACE FUNCTION public.close_procedural_vote(p_vote_id uuid, p_note text DEFAULT NULL::text)
- RETURNS jsonb
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'private', 'pg_temp'
-AS $function$
-declare uid uuid:=auth.uid();v public.game_votes%rowtype;eligible numeric;casted numeric;present numeric;y numeric;n numeric;a numeric;needed numeric;q boolean;pass boolean;result text;label text;chair text;
-begin
+ select * into pack from public.bill_amendment_packs where vote_id=p_vote_id;
+ if pack.id is null then raise exception 'Голосование не связано с пакетом поправок';end if;
+ perform private.lock_bill_amendment_actor(pack.game_id,uid);
+ select * into d from public.formal_documents where id=pack.document_id for update;
+ if d.id is null or d.game_id is distinct from pack.game_id or d.workflow_key is distinct from 'bill'
+  or not private.can_manage_bill_amendments(d.id,uid)
+  then raise exception 'Завершить пакет может действующий председатель ГД или профильный комитет';end if;
  select * into v from public.game_votes where id=p_vote_id for update;
- if v.id is null or uid is null or not private.is_game_member(v.game_id) then raise exception 'Нет доступа к голосованию';end if;
- if exists(select 1 from public.bill_amendment_packs p where p.vote_id=v.id and not private.can_manage_bill_amendments(p.document_id,uid))
- then raise exception 'Завершить пакет может действующий председатель ГД или профильный комитет';end if;
- if not private.can_close_procedural_vote(v.game_id,uid,v.institution_key,v.formal_document_id)
- and not exists(select 1 from public.bill_amendment_packs p where p.vote_id=v.id and private.can_manage_bill_amendments(p.document_id,uid))
- and not exists(select 1 from public.institution_units u where u.game_id=v.game_id and 'unit:'||u.id::text=v.institution_key and u.head_user_id=uid)
- then raise exception 'Закрыть голосование может председательствующий или преподаватель';end if;
- if v.status<>'open' then return jsonb_build_object('result',v.result_code,'label',v.result_label);end if;
+ if v.id is null or v.game_id is distinct from pack.game_id or v.procedure_key is distinct from 'bill_amendments'
+  or v.formal_document_id is not null or v.institution_key is distinct from 'gd' or v.voting_mode is distinct from 'mandate'
+  or v.quorum_kind is distinct from 'fraction' or v.quorum_value is distinct from 0.5::numeric
+  or v.majority_kind is distinct from (case when d.doc_type='fkz_bill' then 'eligible_fraction' else 'eligible_majority' end)
+  or v.majority_value is distinct from (case when d.doc_type='fkz_bill' then 2.0/3 else 0.5::numeric end)
+  or v.allow_abstain is distinct from true or v.tie_breaker_chair is distinct from false
+  or v.pass_transition is distinct from 'none' or v.fail_transition is distinct from 'none'
+  then raise exception 'Некорректная связь голосования с пакетом поправок';end if;
+ if v.status='closed' then return jsonb_build_object('result',v.result_code,'label',v.result_label);end if;
+ if v.status is distinct from 'open' or pack.status is distinct from 'voting' or d.status_code not in ('amendments','reading2')
+  or d.status_code is distinct from pack.source_status or d.body_text is distinct from pack.source_body_text
+  then raise exception 'Законопроект или пакет изменился во время голосования';end if;
  eligible:=private.vote_total_eligible_weight(v);present:=private.vote_present_weight(v);
  select coalesce(sum(weight),0),coalesce(sum(coalesce(yes_weight,case when choice='yes' then weight else 0 end)),0),coalesce(sum(coalesce(no_weight,case when choice='no' then weight else 0 end)),0),coalesce(sum(coalesce(abstain_weight,case when choice='abstain' then weight else 0 end)),0)
  into casted,y,n,a from public.game_ballots where vote_id=v.id;
- needed:=case when v.quorum_kind='none' then 0 when v.institution_key in ('gd','sf','committee','region','cec') and abs(v.quorum_value-0.5)<0.000001 then floor(eligible/2)+1 else ceil(eligible*v.quorum_value-0.000001) end;
- q:=v.quorum_kind='none' or (eligible>0 and present>=needed);
+ needed:=floor(eligible/2)+1;q:=eligible>0 and present>=needed;
  if not q then pass:=false;result:='no_quorum';label:='Нет кворума';
  else
-  pass:=case v.majority_kind when 'eligible_majority' then y>eligible/2 when 'eligible_fraction' then y>=ceil(eligible*v.majority_value) when 'present_majority' then y>present/2 else y>n end;
-  if not pass and v.tie_breaker_chair and y=n and y>0 then
-   select b.choice into chair from public.game_ballots b join public.game_members m on m.game_id=v.game_id and m.user_id=b.voter_id
-   where b.vote_id=v.id and m.role_title ~* 'председател.*правительств|председател.*дум|председател.*совет.*федерац' limit 1;
-   pass:=coalesce(chair='yes',false);
-  end if;
+  -- An exact ratio avoids ceil(450 * rounded(2/3)) accidentally requiring 301.
+  pass:=case when d.doc_type='fkz_bill' then y*3>=eligible*2 else y>eligible/2 end;
   result:=case when pass then 'passed' else 'rejected' end;label:=case when pass then 'Решение принято' else 'Решение отклонено' end;
  end if;
  update public.game_votes set status='closed',closed_at=now(),result_code=result,result_label=label,result_yes=y,result_no=n,result_abstain=a,result_eligible=eligible,result_cast=casted,result_present=present,result_quorum_met=q,decision_note=nullif(trim(p_note),'') where id=v.id;
- if q then perform private.apply_formal_vote_transition(v.formal_document_id,case when pass then v.pass_transition else v.fail_transition end,uid,v.id,p_note);end if;
+ -- Only bill_amendment_vote_closed applies this pack; there is no whole-bill
+ -- transition, and this RPC can never close an unrelated legacy vote.
  return jsonb_build_object('result',result,'label',label,'yes',y,'no',n,'abstain',a,'eligible',eligible,'cast',casted,'present',present,'quorum',q,'needed',needed);
-end;$function$
-;
-revoke all on function public.create_procedural_vote(uuid,text,text,text,text,text,text,numeric,text,numeric,boolean,boolean,uuid,text,text),public.close_procedural_vote(uuid,text) from public,anon;
-grant execute on function public.create_procedural_vote(uuid,text,text,text,text,text,text,numeric,text,numeric,boolean,boolean,uuid,text,text),public.close_procedural_vote(uuid,text) to authenticated;
+end;$$;
 
 create or replace function public.submit_bill_amendment(p_document_id uuid,p_subject_key text,p_old_text text,p_new_text text,p_rationale text,p_competence_note text default null)
 returns uuid language plpgsql security definer set search_path=public,private,pg_temp as $$
-declare d public.formal_documents%rowtype;uid uuid:=auth.uid();position integer;amendment uuid;
+declare d public.formal_documents%rowtype;uid uuid:=auth.uid();actor_game uuid;position integer;amendment uuid;
 begin
+ select game_id into actor_game from public.formal_documents where id=p_document_id;
+ perform private.lock_bill_amendment_actor(actor_game,uid);
  select * into d from public.formal_documents where id=p_document_id for update;
- if d.id is null or d.workflow_key<>'bill' or not private.bill_amendment_actor_available(d.game_id,uid)
+ if d.id is null or d.game_id is distinct from actor_game or d.workflow_key<>'bill' or not private.bill_amendment_actor_available(d.game_id,uid)
   then raise exception 'Нет полномочий для внесения поправки';end if;
  if d.status_code not in ('amendments','reading2') then raise exception 'Поправки вносятся только при подготовке и проведении II чтения';end if;
  if exists(select 1 from public.game_votes where formal_document_id=d.id and status='open')
@@ -234,6 +193,7 @@ returns void language plpgsql security definer set search_path=public,private,pg
 declare a public.bill_amendments%rowtype;d public.formal_documents%rowtype;uid uuid:=auth.uid();
 begin
  select * into a from public.bill_amendments where id=p_amendment_id;
+ perform private.lock_bill_amendment_actor(a.game_id,uid);
  select * into d from public.formal_documents where id=a.document_id for update;
  select * into a from public.bill_amendments where id=p_amendment_id for update;
  if a.id is null or a.author_id is distinct from uid or not private.bill_amendment_actor_available(a.game_id,uid)
@@ -249,6 +209,7 @@ returns void language plpgsql security definer set search_path=public,private,pg
 declare a public.bill_amendments%rowtype;d public.formal_documents%rowtype;uid uuid:=auth.uid();
 begin
  select * into a from public.bill_amendments where id=p_amendment_id;
+ perform private.lock_bill_amendment_actor(a.game_id,uid);
  select * into d from public.formal_documents where id=a.document_id for update;
  select * into a from public.bill_amendments where id=p_amendment_id for update;
  if a.id is null or not private.can_manage_bill_amendments(a.document_id,uid) then raise exception 'Решение принимает председатель ГД или профильный комитет';end if;
@@ -261,11 +222,13 @@ end;$$;
 
 create or replace function public.open_bill_amendment_vote(p_document_id uuid,p_amendment_ids uuid[])
 returns uuid language plpgsql security definer set search_path=public,private,pg_temp as $$
-declare d public.formal_documents%rowtype;a public.bill_amendments%rowtype;uid uuid:=auth.uid();pack uuid;vote uuid;
+declare d public.formal_documents%rowtype;a public.bill_amendments%rowtype;uid uuid:=auth.uid();actor_game uuid;pack uuid;vote uuid;
  result_text text;vote_text text;vote_title text;count_selected integer;last_end integer:=0;position integer;
 begin
+ select game_id into actor_game from public.formal_documents where id=p_document_id;
+ perform private.lock_bill_amendment_actor(actor_game,uid);
  select * into d from public.formal_documents where id=p_document_id for update;
- if d.id is null or not private.can_manage_bill_amendments(d.id,uid) then raise exception 'Пакет выбирает председатель ГД или профильный комитет';end if;
+ if d.id is null or d.game_id is distinct from actor_game or not private.can_manage_bill_amendments(d.id,uid) then raise exception 'Пакет выбирает председатель ГД или профильный комитет';end if;
  if d.status_code not in ('amendments','reading2') then raise exception 'Голосование по поправкам доступно только во II чтении';end if;
  if exists(select 1 from public.game_votes where formal_document_id=d.id and status='open')
   or exists(select 1 from public.bill_amendment_packs where document_id=d.id and status in ('opening','voting'))
@@ -291,11 +254,20 @@ begin
  for a in select * from public.bill_amendments where id=any(p_amendment_ids) order by quote_start desc,id loop
   result_text:=overlay(result_text placing a.new_text from a.quote_start for length(a.old_text));
  end loop;
- if length(result_text)>120000 then raise exception 'Итоговый текст превышает 120000 знаков';end if;
+ if length(trim(result_text))=0 or length(result_text)>120000 then raise exception 'Итоговый текст должен содержать 1–120000 знаков';end if;
  vote_title:='Поправки ко II чтению · '||d.registry_no;
  insert into public.bill_amendment_packs(game_id,document_id,amendment_ids,created_by,vote_title,vote_body,source_status,source_body_text,result_body_text)
  values(d.game_id,d.id,p_amendment_ids,uid,vote_title,vote_text,d.status_code,d.body_text,result_text) returning id into pack;
- vote:=public.create_civic_vote(d.game_id,vote_title,vote_text,'mandate','gd','bill_amendments','fraction',0.5,'eligible_majority',0.5,true,false,null,'none','none',null);
+ -- The verified opening pack is visible only in this transaction. Existing
+ -- BEFORE INSERT metadata/electorate triggers still take the GD snapshot.
+ perform set_config('app.vote_group','',true);
+ insert into public.game_votes(game_id,stage_no,title,body,voting_mode,created_by,
+  formal_document_id,formal_step_code,institution_key,procedure_key,quorum_kind,quorum_value,
+  majority_kind,majority_value,allow_abstain,tie_breaker_chair,pass_transition,fail_transition)
+ values(d.game_id,(select current_round from public.games where id=d.game_id),vote_title,vote_text,'mandate',uid,
+  null,null,'gd','bill_amendments','fraction',0.5,
+  case when d.doc_type='fkz_bill' then 'eligible_fraction' else 'eligible_majority' end,
+  case when d.doc_type='fkz_bill' then 2.0/3 else 0.5::numeric end,true,false,'none','none') returning id into vote;
  update public.bill_amendment_packs set status='voting',vote_id=vote where id=pack;
  update public.bill_amendments set status='voting',vote_id=vote,updated_at=now() where id=any(p_amendment_ids);
  insert into public.formal_document_history(document_id,game_id,actor_id,action,from_status,to_status,from_owner,to_owner,note)
@@ -305,11 +277,13 @@ end;$$;
 
 create or replace function private.bill_amendment_vote_closed()
 returns trigger language plpgsql security definer set search_path=public,private,pg_temp as $$
-declare p public.bill_amendment_packs%rowtype;d public.formal_documents%rowtype;revision integer;uid uuid:=auth.uid();
+declare p public.bill_amendment_packs%rowtype;d public.formal_documents%rowtype;v_revision integer;uid uuid:=auth.uid();
 begin
+ if new.procedure_key is distinct from 'bill_amendments' then return new;end if;
  if new.status<>'closed' or old.status='closed' then return new;end if;
  select * into p from public.bill_amendment_packs where vote_id=new.id;
  if p.id is null then return new;end if;
+ perform private.lock_bill_amendment_actor(p.game_id,uid);
  select * into d from public.formal_documents where id=p.document_id for update;
  select * into p from public.bill_amendment_packs where vote_id=new.id for update;
  if p.status<>'voting' then raise exception 'Пакет поправок уже рассмотрен';end if;
@@ -319,12 +293,12 @@ begin
  if d.body_text is distinct from p.source_body_text or d.status_code is distinct from p.source_status then raise exception 'Законопроект изменился во время голосования';end if;
  if new.result_code='passed' then
   if not coalesce(new.result_quorum_met,false) then raise exception 'Поправки не могут быть приняты без кворума';end if;
-  revision:=coalesce((d.metadata->>'revision')::integer,1);
+  v_revision:=coalesce((d.metadata->>'revision')::integer,1);
   insert into public.formal_document_revisions(game_id,document_id,revision,title,body_text,metadata,editor_id)
-  values(d.game_id,d.id,revision,d.title,d.body_text,d.metadata,uid) on conflict(document_id,revision) do nothing;
+  values(d.game_id,d.id,v_revision,d.title,d.body_text,d.metadata,uid) on conflict(document_id,revision) do nothing;
   update public.bill_amendment_packs set status='accepted',decided_at=now() where id=p.id;
   update public.bill_amendments set status='accepted',applied_at=now(),updated_at=now() where id=any(p.amendment_ids) and status='voting' and vote_id=new.id;
-  update public.formal_documents set body_text=p.result_body_text,metadata=coalesce(metadata,'{}')||jsonb_build_object('revision',revision+1,'bill_amendment_pack_id',p.id),updated_at=now() where id=d.id;
+  update public.formal_documents set body_text=p.result_body_text,metadata=coalesce(metadata,'{}')||jsonb_build_object('revision',v_revision+1,'bill_amendment_pack_id',p.id),updated_at=now() where id=d.id;
  elsif new.result_code='no_quorum' then
   update public.bill_amendment_packs set status='no_quorum',decided_at=now() where id=p.id;
   update public.bill_amendments set status='submitted',updated_at=now() where id=any(p.amendment_ids) and status='voting' and vote_id=new.id;
@@ -340,8 +314,9 @@ create trigger bill_amendment_vote_closed after update of status on public.game_
 
 create or replace function private.guard_bill_amendment_vote()
 returns trigger language plpgsql security definer set search_path=public,private,pg_temp as $$
-declare p public.bill_amendment_packs%rowtype;eligible numeric;present numeric;yes_votes numeric;quorum boolean;result text;
+declare p public.bill_amendment_packs%rowtype;d public.formal_documents%rowtype;eligible numeric;present numeric;yes_votes numeric;quorum boolean;result text;
 begin
+ if old.procedure_key is distinct from 'bill_amendments' then return new;end if;
  select * into p from public.bill_amendment_packs where vote_id=old.id;
  if p.id is null then return new;end if;
  if old.status='closed' and to_jsonb(new) is distinct from to_jsonb(old) then raise exception 'Итог поправочного голосования зафиксирован';end if;
@@ -355,11 +330,14 @@ begin
   or new.body is distinct from p.vote_body or new.title is distinct from p.vote_title
   then raise exception 'Состав, пороги и текст поправочного голосования зафиксированы';end if;
  if new.status='closed' and old.status='open' then
+  perform private.lock_bill_amendment_actor(p.game_id,auth.uid());
+  select * into d from public.formal_documents where id=p.document_id for update;
   if not private.can_manage_bill_amendments(p.document_id,auth.uid()) then raise exception 'Нет полномочий для завершения пакета';end if;
   eligible:=private.vote_total_eligible_weight(old);present:=private.vote_present_weight(old);
   select coalesce(sum(coalesce(yes_weight,case when choice='yes' then weight else 0 end)),0) into yes_votes from public.game_ballots where vote_id=old.id;
   quorum:=eligible>0 and present>=floor(eligible/2)+1;
-  result:=case when not quorum then 'no_quorum' when yes_votes>eligible/2 then 'passed' else 'rejected' end;
+  result:=case when not quorum then 'no_quorum'
+   when case when d.doc_type='fkz_bill' then yes_votes*3>=eligible*2 else yes_votes>eligible/2 end then 'passed' else 'rejected' end;
   if new.result_code is distinct from result or new.result_quorum_met is distinct from quorum
    then raise exception 'Итог должен соответствовать зарегистрированным депутатам и поданным голосам';end if;
  end if;
@@ -370,15 +348,67 @@ create trigger guard_bill_amendment_vote before update on public.game_votes for 
 create or replace function private.guard_bill_amendment_document()
 returns trigger language plpgsql security definer set search_path=public,private,pg_temp as $$
 begin
+ if tg_op='DELETE' then
+  -- FK cascades from games run after the parent row has gone. Preserve the
+  -- audit of a live classroom, while allowing complete classroom deletion.
+  if exists(select 1 from public.games where id=old.game_id)
+   and exists(select 1 from public.bill_amendments where document_id=old.id)
+   then raise exception 'Законопроект с историей поправок сохраняется в реестре до удаления игры';end if;
+  return old;
+ end if;
  if exists(select 1 from public.bill_amendments where document_id=old.id and status in ('submitted','voting'))
   and (new.status_code is distinct from old.status_code or new.current_step is distinct from old.current_step
-   or new.workflow_key is distinct from old.workflow_key or new.game_id is distinct from old.game_id)
+   or new.current_owner_key is distinct from old.current_owner_key or new.workflow_steps is distinct from old.workflow_steps
+   or new.doc_type is distinct from old.doc_type or new.workflow_key is distinct from old.workflow_key or new.game_id is distinct from old.game_id)
   then raise exception 'Сначала рассмотрите или отзовите все поправки ко II чтению';end if;
- if new.body_text is distinct from old.body_text and exists(select 1 from public.bill_amendment_packs where document_id=old.id and status in ('opening','voting'))
+ if (new.body_text is distinct from old.body_text or new.title is distinct from old.title or new.metadata->>'revision' is distinct from old.metadata->>'revision')
+  and exists(select 1 from public.bill_amendment_packs where document_id=old.id and status in ('opening','voting'))
   then raise exception 'Текст законопроекта зафиксирован до завершения голосования по поправкам';end if;
  return new;
 end;$$;
-create trigger guard_bill_amendment_document before update on public.formal_documents for each row execute function private.guard_bill_amendment_document();
+create trigger guard_bill_amendment_document before update or delete on public.formal_documents for each row execute function private.guard_bill_amendment_document();
+
+create or replace function private.guard_bill_amendment_delete()
+returns trigger language plpgsql security definer set search_path=public,private,pg_temp as $$
+begin
+ if exists(select 1 from public.games where id=old.game_id) then raise exception 'История поправок сохраняется; до голосования автор может отозвать поправку';end if;
+ return old;
+end;$$;
+create trigger guard_bill_amendment_delete before delete on public.bill_amendments for each row execute function private.guard_bill_amendment_delete();
+create trigger guard_bill_amendment_pack_delete before delete on public.bill_amendment_packs for each row execute function private.guard_bill_amendment_delete();
+
+-- This new protocol is reserved for a verified opening pack. Legacy procedure
+-- keys return immediately; none of their creation rules or functions change.
+create or replace function private.guard_bill_amendment_vote_insert()
+returns trigger language plpgsql security definer set search_path=public,private,pg_temp as $$
+declare p public.bill_amendment_packs%rowtype;d public.formal_documents%rowtype;uid uuid:=auth.uid();
+begin
+ if new.procedure_key is distinct from 'bill_amendments' then return new;end if;
+ if uid is null or new.created_by is distinct from uid then raise exception 'Поправочное голосование открывается только из проверенного пакета';end if;
+ perform private.lock_bill_amendment_actor(new.game_id,uid);
+ select * into p from public.bill_amendment_packs where game_id=new.game_id and created_by=uid
+  and status='opening' and vote_id is null and vote_title=new.title and vote_body=new.body order by created_at,id limit 1;
+ if p.id is null then raise exception 'Поправочное голосование открывается только из проверенного пакета';end if;
+ select * into d from public.formal_documents where id=p.document_id for update;
+ select * into p from public.bill_amendment_packs where id=p.id for update;
+ if d.id is null or d.game_id is distinct from new.game_id or d.workflow_key is distinct from 'bill'
+  or d.status_code not in ('amendments','reading2') or d.status_code is distinct from p.source_status
+  or d.body_text is distinct from p.source_body_text or not private.can_manage_bill_amendments(d.id,uid)
+  or p.status is distinct from 'opening' or p.vote_id is not null
+  or new.status is distinct from 'open' or new.formal_document_id is not null or new.formal_step_code is not null
+  or new.institution_key is distinct from 'gd' or new.voting_mode is distinct from 'mandate'
+  or new.stage_no is distinct from (select current_round from public.games where id=new.game_id)
+  or new.quorum_kind is distinct from 'fraction' or new.quorum_value is distinct from 0.5::numeric
+  or new.majority_kind is distinct from (case when d.doc_type='fkz_bill' then 'eligible_fraction' else 'eligible_majority' end)
+  or new.majority_value is distinct from (case when d.doc_type='fkz_bill' then 2.0/3 else 0.5::numeric end)
+  or new.allow_abstain is distinct from true or new.tie_breaker_chair is distinct from false
+  or new.pass_transition is distinct from 'none' or new.fail_transition is distinct from 'none'
+  or nullif(current_setting('app.vote_group',true),'') is not null or new.group_name is not null
+  or new.title is distinct from p.vote_title or new.body is distinct from p.vote_body
+  then raise exception 'Состав, пороги и текст поправочного голосования должны соответствовать проверенному пакету';end if;
+ return new;
+end;$$;
+create trigger guard_bill_amendment_vote_insert before insert on public.game_votes for each row execute function private.guard_bill_amendment_vote_insert();
 
 create or replace function private.guard_bill_second_reading_vote()
 returns trigger language plpgsql security definer set search_path=public,private,pg_temp as $$
@@ -400,9 +430,9 @@ grant select on table public.bill_amendments,public.bill_amendment_packs to auth
 create policy bill_amendments_member_read on public.bill_amendments for select to authenticated using(exists(select 1 from public.game_members m where m.game_id=bill_amendments.game_id and m.user_id=auth.uid() and m.roster_archived_at is null));
 create policy bill_amendment_packs_member_read on public.bill_amendment_packs for select to authenticated using(exists(select 1 from public.game_members m where m.game_id=bill_amendment_packs.game_id and m.user_id=auth.uid() and m.roster_archived_at is null));
 
-revoke all on function private.bill_amendment_actor_available(uuid,uuid),private.can_manage_bill_amendments(uuid,uuid),private.bill_amendment_vote_context(uuid,uuid,text,text),private.bill_amendment_vote_closed(),private.guard_bill_amendment_vote(),private.guard_bill_amendment_document(),private.guard_bill_second_reading_vote() from public,anon,authenticated;
-revoke all on function public.get_bill_amendments(uuid),public.submit_bill_amendment(uuid,text,text,text,text,text),public.withdraw_bill_amendment(uuid),public.reject_bill_amendment(uuid,text),public.open_bill_amendment_vote(uuid,uuid[]) from public,anon,authenticated;
-grant execute on function public.get_bill_amendments(uuid),public.submit_bill_amendment(uuid,text,text,text,text,text),public.withdraw_bill_amendment(uuid),public.reject_bill_amendment(uuid,text),public.open_bill_amendment_vote(uuid,uuid[]) to authenticated;
+revoke all on function private.bill_amendment_actor_available(uuid,uuid),private.lock_bill_amendment_actor(uuid,uuid),private.can_manage_bill_amendments(uuid,uuid),private.bill_amendment_vote_context(uuid,uuid,text,text),private.bill_amendment_vote_closed(),private.guard_bill_amendment_vote(),private.guard_bill_amendment_document(),private.guard_bill_amendment_delete(),private.guard_bill_amendment_vote_insert(),private.guard_bill_second_reading_vote() from public,anon,authenticated;
+revoke all on function public.get_bill_amendments(uuid),public.submit_bill_amendment(uuid,text,text,text,text,text),public.withdraw_bill_amendment(uuid),public.reject_bill_amendment(uuid,text),public.open_bill_amendment_vote(uuid,uuid[]),public.close_bill_amendment_vote(uuid,text) from public,anon,authenticated;
+grant execute on function public.get_bill_amendments(uuid),public.submit_bill_amendment(uuid,text,text,text,text,text),public.withdraw_bill_amendment(uuid),public.reject_bill_amendment(uuid,text),public.open_bill_amendment_vote(uuid,uuid[]),public.close_bill_amendment_vote(uuid,text) to authenticated;
 
 do $$begin
  if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='bill_amendments')then alter publication supabase_realtime add table public.bill_amendments;end if;

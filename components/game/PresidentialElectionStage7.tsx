@@ -18,11 +18,8 @@ type Settings={game_id:string;system_type:'relative'|'absolute'|'qualified'|'pre
 type Score={candidate_id:string;round_no:1|2;teacher_program_pct:number|null;teacher_campaign_pct:number|null;game_rating_pct:number|null;poll_pct:number|null;teacher_runoff_pct:number|null;computed_pct:number|null};
 type Inauguration={game_id:string;scheduled_at:string|null;venue:string|null;notes:string|null;hymn_path:string|null;ceremonial_music_path:string|null;updated_at:string};
 
-
-
 const MATERIAL_LABELS:Record<string,string>={poster:'Плакат',leaflet:'Листовка',video:'Видео',audio:'Аудио',news:'Новость',other:'Другое'};
 const SYSTEM_NAMES={relative:'Относительное большинство',absolute:'Абсолютное большинство',qualified:'Квалифицированное большинство',preferential:'Преференциальная система'} as const;
-
 
 export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,parties,setError}=g;
@@ -35,7 +32,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const [publicPolls,setPublicPolls]=useState<PublicPoll[]>([]);
  const [settings,setSettings]=useState<Settings|null>(null);
  const [scores,setScores]=useState<Score[]>([]);
- 
+
  const [inauguration,setInauguration]=useState<Inauguration|null>(null);
  const [photoUrls,setPhotoUrls]=useState<Record<string,string>>({});
  const [audioUrls,setAudioUrls]=useState<Record<string,string>>({});
@@ -57,13 +54,13 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const [reviewPenalties,setReviewPenalties]=useState<Record<string,string>>({});
  const [reviewPenaltyReasons,setReviewPenaltyReasons]=useState<Record<string,string>>({});
  const [pollClose,setPollClose]=useState('');
- 
+
  const [ceremonyAt,setCeremonyAt]=useState('');
  const [venue,setVenue]=useState('');
  const [ceremonyNotes,setCeremonyNotes]=useState('');
  const [hymnFile,setHymnFile]=useState<File|null>(null);
  const [musicFile,setMusicFile]=useState<File|null>(null);
- 
+
  const viewScope=JSON.stringify([gameId,me?.user_id,me?.kind,teacher]);
  const scope=useRef(viewScope),request=useRef(0),alive=useRef(true),ceremonyDirty=useRef(false);
  scope.current=viewScope;
@@ -125,7 +122,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   setCandidateId(previous=>rows.some(x=>x.id===previous&&x.registration_status==='registered'&&canManage(x))?previous:preferred?.id||'');
   setMaterials((mr.data||[]) as Material[]);setDecision(dr.data as PollDecision|null);setDecisionVotes((dvr.data||[]) as PollDecisionVote[]);setPublicPolls((pr.data||[]) as PublicPoll[]);setSettings(sr.data as Settings|null);
   setScores(scoreRows);
-  
+
   setInauguration(ceremony);setAudioUrls({hymn,music});
   if(!ceremonyDirty.current){setCeremonyAt(ceremony?.scheduled_at?new Date(ceremony.scheduled_at).toISOString().slice(0,16):'');setVenue(ceremony?.venue||'');setCeremonyNotes(ceremony?.notes||'')}
   }catch(error){if(current())setError(error)}
@@ -137,21 +134,6 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const assetBase=(process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'').replace(/\/$/,'');
  const pollUrl=publicPoll?baseUrl+assetBase+'/poll?slug='+encodeURIComponent(publicPoll.slug):'';
  const pollCanOpen=activeRound===1&&['setup','round1'].includes(settings?.status||'')&&decision?.status==='closed'&&decision.result===true&&settings?.poll_enabled!==false;
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
 
  async function submitMaterial(){
   if(!selectedCandidate||busy||title.trim().length<3||body.trim().length<3)return;
@@ -205,9 +187,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  async function closePublicPoll(){if(!publicPoll)return;setBusy(true);const r=await supabase.rpc('close_presidential_public_poll',{p_game_id:gameId,p_round_no:publicPoll.round_no});if(r.error)setError(r.error.message);else{setNotice('Опрос закрыт; его проценты перенесены в калькулятор выборов.');await load()}setBusy(false)}
  async function copyPoll(){if(!pollUrl)return;await navigator.clipboard.writeText(pollUrl);setNotice('Ссылка на опрос скопирована.')}
  function share(service:'vk'|'tg'){if(!pollUrl)return;const u=encodeURIComponent(pollUrl),t=encodeURIComponent('Социологический опрос: выборы Президента РФ');window.open(service==='vk'?'https://vk.com/share.php?url='+u+'&title='+t:'https://t.me/share/url?url='+u+'&text='+t,'_blank','noopener,noreferrer')}
- 
- 
- 
+
  async function uploadAudio(file:File,kind:'hymn'|'music'){const path=gameId+'/presidential/inauguration/'+kind+'-'+crypto.randomUUID()+'.'+(file.name.split('.').pop()||'audio');const r=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'audio/mpeg'});if(r.error)throw r.error;return path}
  async function saveCeremony(){
   setBusy(true);try{

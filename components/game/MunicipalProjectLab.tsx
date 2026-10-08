@@ -45,6 +45,7 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
  const selectedRef=useRef(''),selectionTouched=useRef(false),dirtyDrafts=useRef(new Set<string>()),versions=useRef<Record<string,number>>({}),fileVersion=useRef(0);
  const [stateScope,setStateScope]=useState(scopeKey);
  scope.current=scopeKey;
+ const renderGeneration=generation.current;
  useEffect(()=>{
   generation.current++;request.current++;busyRef.current=false;selectedRef.current='';selectionTouched.current=false;
   dirtyDrafts.current.clear();versions.current={};fileVersion.current++;
@@ -105,7 +106,7 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
  const draftDirty=dirtyDrafts.current.has(draftKey);
 
  async function withBusy(action:(current:()=>boolean)=>Promise<void>){
-  if(busyRef.current)return;
+  if(busyRef.current||scope.current!==scopeKey||generation.current!==renderGeneration)return;
   const key=scopeKey,epoch=generation.current,current=()=>scope.current===key&&generation.current===epoch;
   busyRef.current=true;setBusy(true);
   try{await action(current);}catch(error){if(current())setError(error instanceof Error?error.message:String(error));}

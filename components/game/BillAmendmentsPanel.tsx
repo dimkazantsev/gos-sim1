@@ -31,10 +31,14 @@ export default function BillAmendmentsPanel({g,document,onOpenVotes,readOnly=fal
   const version=++request.current,current=()=>mounted.current&&active.current===scope&&version===request.current;
   setLoading(true);
   try{
+   if(!g.game||document.game_id!==g.game.id)throw new Error('Выберите законопроект текущей игры.');
    const r=await supabase.rpc('get_bill_amendments',{p_document_id:document.id});if(!current())return;
    if(r.error)throw new Error(r.error.message);
    const value=r.data as AmendmentState;
-   if(!value||value.document_id!==document.id||!Array.isArray(value.amendments)||!Array.isArray(value.subjects)||!Array.isArray(value.packs)||typeof value.pending_count!=='number')throw new Error('Сервер не вернул проверку поправок.');
+   if(!value||value.document_id!==document.id||typeof value.body_text!=='string'||typeof value.status_code!=='string'||
+    typeof value.can_manage!=='boolean'||typeof value.can_submit!=='boolean'||!Array.isArray(value.amendments)||
+    !Array.isArray(value.subjects)||value.subjects.some(subject=>typeof subject!=='string')||!Array.isArray(value.packs)||
+    !Number.isInteger(value.pending_count)||value.pending_count<0)throw new Error('Сервер не вернул проверку поправок.');
    setResult({scope,data:value});setFailure(null);
    setSelected(ids=>ids.filter(id=>value.amendments.some(a=>a.id===id&&a.status==='submitted'&&!a.stale)));
    setSubject(currentSubject=>value.subjects.includes(currentSubject)?currentSubject:value.subjects[0]||'');
@@ -44,7 +48,7 @@ export default function BillAmendmentsPanel({g,document,onOpenVotes,readOnly=fal
  useGameTableSync(g.game?.id,tables,load,'bill-amendments:'+document.id+':'+(g.me?.user_id||''));
  useEffect(()=>{void load()},[scope,document.updated_at]);
  async function mutate(name:string,args:Record<string,unknown>,success?:(value:unknown)=>void){
-  if(readOnly||busy||!data)return;setBusy(true);
+  if(readOnly||busy||!data||document.game_id!==g.game?.id)return;setBusy(true);
   try{
    const r=await supabase.rpc(name,args);if(!mounted.current||active.current!==scope)return;
    if(r.error){g.setError(r.error.message);return;}
@@ -66,7 +70,7 @@ export default function BillAmendmentsPanel({g,document,onOpenVotes,readOnly=fal
   {!data&&!error&&<p role="status">Загружаю поправки и проверяю полномочия…</p>}
   {data&&<>
    <p className={styles.notice} role="status">{data.pending_count?`Ожидают решения: ${data.pending_count}. Сначала рассмотрите или отзовите эти поправки, затем продолжайте чтения законопроекта.`:phase?'Нерассмотренных поправок нет. Законопроект может продолжить установленный маршрут.':'Внести новую поправку можно при подготовке и проведении II чтения.'}</p>
-   {openVote&&<div className={styles.actions}><button type="button" className="primary" onClick={()=>onOpenVotes(openVote)}>Открыть голосование по пакету</button>{canManage&&<button type="button" disabled={busy} onClick={()=>void mutate('close_procedural_vote',{p_vote_id:openVote,p_note:'Итог пакета поправок ко II чтению'})}>Завершить голосование по пакету</button>}</div>}
+   {openVote&&<div className={styles.actions}><button type="button" className="primary" onClick={()=>onOpenVotes(openVote)}>Открыть голосование по пакету</button>{canManage&&<button type="button" disabled={busy} onClick={()=>void mutate('close_bill_amendment_vote',{p_vote_id:openVote,p_note:'Итог пакета поправок ко II чтению'})}>Завершить голосование по пакету</button>}</div>}
    {phase&&data.can_submit&&!readOnly&&<form className={styles.form} onSubmit={e=>{e.preventDefault();if(canSubmit)void mutate('submit_bill_amendment',{p_document_id:document.id,p_subject_key:subject,p_old_text:oldText,p_new_text:newText,p_rationale:rationale.trim(),p_competence_note:court?competence.trim():null},()=>{setOldText('');setNewText('');setRationale('');setCompetence('')});}}>
     <StyledSelect wrap label="Субъект законодательной инициативы" value={subject} onChange={setSubject} options={data.subjects.map(key=>({value:key,label:FORMAL_SUBJECTS.find(s=>s.key===key)?.label||key}))} disabled={busy}/>
     <div className={styles.grid}><label className={styles.field}>Действующий фрагмент<textarea rows={4} maxLength={120000} value={oldText} onChange={e=>setOldText(e.target.value)} placeholder="Скопируйте точную уникальную цитату из текста законопроекта" disabled={busy}/></label><label className={styles.field}>Предлагаемая редакция<textarea rows={4} maxLength={120000} value={newText} onChange={e=>setNewText(e.target.value)} placeholder="Новый текст; пустое поле означает удаление фрагмента" disabled={busy}/></label></div>

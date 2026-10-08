@@ -31,6 +31,74 @@ alter table public.municipal_projects
  add constraint municipal_projects_presentation_links_valid
  check(private.municipal_presentation_links_valid(presentation_links));
 
+-- Both endpoints require a current writer, including former project owners.
+-- Lock the actor before reading eligibility so an archive/removal cannot race a save.
+create function private.require_municipal_project_writer(p_game_id uuid,p_estimated_cost numeric)
+returns uuid
+language plpgsql volatile security invoker
+set search_path = ''
+as $function$
+declare writer_id uuid:=(select auth.uid());actor public.game_members%rowtype;
+begin
+ if writer_id is null then raise exception 'Game access required'; end if;
+ if not private.is_platform_admin() then
+  select * into actor from public.game_members where game_id=p_game_id and user_id=writer_id for update;
+  if not found or actor.kind not in ('student','teacher') or actor.roster_archived_at is not null
+     or not private.role_is_available(p_game_id,writer_id)
+  then raise exception 'Game access required'; end if;
+ end if;
+ if coalesce(p_estimated_cost,0)::text in ('NaN','Infinity','-Infinity')
+    or coalesce(p_estimated_cost,0)<0 or coalesce(p_estimated_cost,0)>1000000000000000
+ then raise exception 'Cost must be finite, nonnegative and not exceed 1000000000000000'; end if;
+ return writer_id;
+end;
+$function$;
+revoke all on function private.require_municipal_project_writer(uuid,numeric) from public,anon,authenticated,service_role;
+
+-- Preserve the original endpoint/signature and its project validation and locks,
+-- while applying the same current-writer and finite-cost guard as the wrapper.
+create or replace function public.save_municipal_project(
+ p_game_id uuid,p_project_id uuid,p_team_name text,p_problem_title text,p_location_text text,
+ p_problem_description text,p_legal_competence text,p_proposed_solution text,
+ p_estimated_cost numeric,p_expected_effect text
+)
+returns uuid
+language plpgsql security definer
+set search_path = ''
+as $function$
+declare v_uid uuid;v_id uuid;
+begin
+ v_uid:=private.require_municipal_project_writer(p_game_id,p_estimated_cost);
+ if length(trim(coalesce(p_problem_title,'')))<5 or length(trim(coalesce(p_location_text,'')))<3
+    or length(trim(coalesce(p_problem_description,'')))<20 or length(trim(coalesce(p_legal_competence,'')))<10
+    or length(trim(coalesce(p_proposed_solution,'')))<20 or length(trim(coalesce(p_expected_effect,'')))<10
+ then raise exception 'Complete the problem, location, competence, solution and expected effect'; end if;
+ if p_project_id is null then
+  insert into public.municipal_projects(
+   game_id,team_name,problem_title,location_text,problem_description,legal_competence,proposed_solution,estimated_cost,expected_effect,created_by,status
+  ) values(
+   p_game_id,nullif(trim(coalesce(p_team_name,'')),''),trim(p_problem_title),trim(p_location_text),trim(p_problem_description),
+   trim(p_legal_competence),trim(p_proposed_solution),coalesce(p_estimated_cost,0),trim(p_expected_effect),v_uid,'draft'
+  ) returning id into v_id;
+  insert into public.municipal_project_members(project_id,game_id,user_id) values(v_id,p_game_id,v_uid) on conflict do nothing;
+ else
+  perform 1 from public.municipal_projects where id=p_project_id and game_id=p_game_id for update;
+  if not found then raise exception 'Project not found in this game'; end if;
+  if not private.can_edit_municipal_project(p_project_id,v_uid) then raise exception 'Project editing access required'; end if;
+  if exists(select 1 from public.municipal_projects where id=p_project_id and status not in ('fieldwork','draft'))
+  then raise exception 'Submitted project is locked'; end if;
+  update public.municipal_projects set team_name=nullif(trim(coalesce(p_team_name,'')),''),
+   problem_title=trim(p_problem_title),location_text=trim(p_location_text),problem_description=trim(p_problem_description),
+   legal_competence=trim(p_legal_competence),proposed_solution=trim(p_proposed_solution),estimated_cost=coalesce(p_estimated_cost,0),
+   expected_effect=trim(p_expected_effect),status='draft',updated_at=now()
+  where id=p_project_id and game_id=p_game_id returning id into v_id;
+ end if;
+ return v_id;
+end;
+$function$;
+revoke all on function public.save_municipal_project(uuid,uuid,text,text,text,text,text,text,numeric,text) from public,anon;
+grant execute on function public.save_municipal_project(uuid,uuid,text,text,text,text,text,text,numeric,text) to authenticated;
+
 create function public.save_municipal_project_with_presentations(
  p_game_id uuid,p_project_id uuid,p_team_name text,p_problem_title text,p_location_text text,
  p_problem_description text,p_legal_competence text,p_proposed_solution text,
@@ -42,8 +110,7 @@ set search_path = ''
 as $function$
 declare saved_id uuid; normalized_links jsonb;
 begin
- if (select auth.uid()) is null or not private.is_game_member(p_game_id)
- then raise exception 'Game access required'; end if;
+ perform private.require_municipal_project_writer(p_game_id,p_estimated_cost);
  if not private.municipal_presentation_links_valid(p_presentation_links)
  then raise exception 'Добавьте до 10 презентаций: название до 120 символов и HTTPS-ссылка на презентацию Google до 2048 символов'; end if;
 

@@ -39,9 +39,21 @@ create policy state_program_expenses_read on public.state_program_expenses for s
 create policy state_program_budget_commitments_read on public.state_program_budget_commitments for select to authenticated using(private.is_game_member(game_id));
 alter publication supabase_realtime add table public.state_program_expenses,public.state_program_budget_commitments;
 
+create function private.lock_active_program_actor(p_game_id uuid) returns void
+language plpgsql security definer set search_path=public,private,pg_temp as $$
+declare m game_members%rowtype;
+begin
+ if auth.uid() is null or p_game_id is null then raise exception 'Нет доступа к программе';end if;
+ if private.is_platform_admin() then return;end if;
+ select * into m from game_members where game_id=p_game_id and user_id=auth.uid() for update;
+ if m.user_id is null or m.kind not in ('student','teacher') or m.roster_archived_at is not null then raise exception 'Требуется действующий участник этой игры';end if;
+ if m.kind='student' and not private.role_is_available(p_game_id,m.user_id) then raise exception 'Участник временно недоступен';end if;
+end;$$;
+revoke all on function private.lock_active_program_actor(uuid) from public,anon,authenticated;
+
 create or replace function private.can_edit_state_program(p_program uuid,p_user uuid) returns boolean
 language sql stable security definer set search_path=public,private,pg_temp as $$
- select p_user=auth.uid() and not private.is_game_observer(p.game_id)
+ select p_user=auth.uid() and (private.is_platform_admin() or exists(select 1 from game_members gm where gm.game_id=p.game_id and gm.user_id=p_user and gm.kind in ('teacher','student') and gm.roster_archived_at is null)) and not private.is_game_observer(p.game_id)
  and (private.is_game_teacher(p.game_id) or private.role_is_available(p.game_id,p_user))
  and p.status in ('draft','revision','minister_review') and p.signed_at is null
  and (private.is_game_teacher(p.game_id) or p.created_by=p_user or p.responsible_minister_id=p_user)
@@ -54,6 +66,7 @@ language plpgsql security definer set search_path=public,private,pg_temp as $$
 declare p state_programs%rowtype;pid uuid;
 begin
  pid:=case when tg_op='DELETE' then old.program_id else new.program_id end;
+ if exists(select 1 from games where id=case when tg_op='DELETE' then old.game_id else new.game_id end) then perform private.lock_active_program_actor(case when tg_op='DELETE' then old.game_id else new.game_id end);end if;
  select * into p from state_programs where id=pid for update;
  if p.id is not null and (p.status not in ('draft','revision','minister_review') or p.signed_at is not null) then raise exception 'Согласованный или подписанный текст программы защищён от изменений';end if;
  if tg_op='DELETE' then return old;else return new;end if;
@@ -72,6 +85,7 @@ CREATE OR REPLACE FUNCTION public.save_state_program(p_game_id uuid, p_program_i
 AS $function$
 declare v_uid uuid:=(select auth.uid());v_id uuid;v_role text;
 begin
+ perform private.lock_active_program_actor(p_game_id);
  if v_uid is null or not private.is_game_member(p_game_id) or private.is_game_observer(p_game_id) or (not private.is_game_teacher(p_game_id) and not private.role_is_available(p_game_id,v_uid)) then raise exception 'Game access required'; end if;
  if length(trim(coalesce(p_title,'')))<5 or length(trim(coalesce(p_responsible_ministry,'')))<3 then raise exception 'Program title and responsible ministry are required'; end if;
  if p_total_budget<0 or p_total_budget::text in ('NaN','Infinity','-Infinity') then raise exception 'Budget cannot be negative'; end if;
@@ -106,8 +120,55 @@ begin
  end if;
  return v_id;
 end;
-$function$
+$function$;
 
+
+create function private.replace_state_program_rows(p_program_id uuid,p_payload jsonb) returns void
+language plpgsql security definer set search_path=public,private,pg_temp as $$
+declare p state_programs%rowtype;v_program_id uuid:=p_program_id;p_game_id uuid;uid uuid:=auth.uid();starts date;ends date;
+ x jsonb;c_id uuid;component_ids uuid[]:='{}';component_total numeric;idx integer:=0;year_no integer;component_start date;component_end date;
+begin
+ perform private.lock_active_program_actor((select game_id from state_programs where id=p_program_id));
+ select * into p from state_programs where id=p_program_id for update;
+ if p.id is null or not private.can_edit_state_program(p.id,uid) then raise exception 'Нет доступа к строкам программы';end if;
+ p_game_id:=p.game_id;starts:=p.start_date;ends:=p.end_date;
+ delete from state_program_expenses where program_id=v_program_id and game_id=p_game_id;
+ -- Use the existing item APIs so their authorization and locking stay central.
+ for c_id in select id from state_program_goals where program_id=v_program_id and game_id=p_game_id loop
+  perform public.delete_state_program_item('goal',c_id);
+ end loop;
+ for c_id in select id from state_program_components where program_id=v_program_id and game_id=p_game_id loop
+  perform public.delete_state_program_item('component',c_id);
+ end loop;
+ for c_id in select id from state_program_budget_years where program_id=v_program_id and game_id=p_game_id loop
+  perform public.delete_state_program_budget_year(c_id);
+ end loop;
+ update state_programs set participants=nullif(trim(p_payload->>'participants'),''),presidential_priority_id=nullif(p_payload->>'presidential_priority_id','')::uuid,form_version=2,updated_at=now() where state_programs.id=v_program_id;
+ for x in select value from jsonb_array_elements(p_payload->'goals') loop
+  if coalesce(nullif(x->>'baseline_value','')::numeric,0)::text in ('NaN','Infinity','-Infinity') or coalesce(nullif(x->>'target_value','')::numeric,0)::text in ('NaN','Infinity','-Infinity') then raise exception 'Значения показателей должны быть конечными числами';end if;
+  year_no:=nullif(x->>'target_year','')::integer;
+  if year_no is not null and (year_no not between 2000 and 2100 or (starts is not null and year_no<extract(year from starts)) or (ends is not null and year_no>extract(year from ends))) then raise exception 'Целевой год показателя должен входить в срок программы';end if;
+  perform public.add_state_program_goal(v_program_id,x->>'goal_text',x->>'indicator_name',x->>'unit',nullif(x->>'baseline_value','')::numeric,nullif(x->>'target_value','')::numeric,year_no);
+ end loop;
+ for x in select value from jsonb_array_elements(p_payload->'components') loop
+  idx:=idx+1;component_start:=nullif(x->>'start_date','')::date;component_end:=nullif(x->>'end_date','')::date;
+  if (component_start is not null and starts is not null and component_start<starts) or (component_end is not null and ends is not null and component_end>ends) or (component_start is not null and component_end is not null and component_end<component_start) then raise exception 'Сроки мероприятия должны входить в срок программы';end if;
+  select coalesce(sum((value->>'amount')::numeric),0) into component_total from jsonb_array_elements(p_payload->'expenses') where (value->>'component_no')::integer=idx;
+  c_id:=public.add_state_program_component(v_program_id,(x->>'direction_no')::integer,x->>'direction_title',x->>'component_kind',x->>'title',x->>'goal_text',component_start,component_end,component_total);
+  component_ids:=array_append(component_ids,c_id);
+ end loop;
+ idx:=0;
+ for x in select value from jsonb_array_elements(p_payload->'expenses') loop
+  idx:=idx+1;
+  insert into state_program_expenses(program_id,game_id,component_id,indicator_name,justification,budget_year,amount,position,created_by)
+  values(v_program_id,p_game_id,component_ids[(x->>'component_no')::integer],trim(x->>'indicator_name'),trim(x->>'justification'),(x->>'budget_year')::integer,(x->>'amount')::numeric,idx,uid);
+ end loop;
+ -- Include zero years, so annual readiness keeps the original rules.
+ insert into state_program_budget_years(program_id,game_id,budget_year,amount,created_by)
+ select v_program_id,p_game_id,y,coalesce((select sum(amount) from state_program_expenses e where e.program_id=v_program_id and e.budget_year=y),0),uid
+ from generate_series(extract(year from starts)::integer,extract(year from ends)::integer) y;
+end;$$;
+revoke all on function private.replace_state_program_rows(uuid,jsonb) from public,anon,authenticated;
 
 create function public.save_state_program_draft(p_game_id uuid,p_program_id uuid,p_payload jsonb,p_confirm boolean default false) returns uuid
 language plpgsql security definer set search_path=public,private,pg_temp as $$
@@ -115,6 +176,7 @@ declare p state_programs%rowtype;uid uuid:=auth.uid();v_program_id uuid;c_id uui
  total numeric:=0;component_total numeric;amount numeric;idx integer:=0;year_no integer;component_no integer;
  starts date;ends date;minister uuid;curator uuid;priority uuid;component_start date;component_end date;
 begin
+ perform private.lock_active_program_actor(p_game_id);
  if uid is null or not private.is_game_member(p_game_id) or private.is_game_observer(p_game_id)
  or (not private.is_game_teacher(p_game_id) and not private.role_is_available(p_game_id,uid)) then raise exception 'Нет доступа к разработке программы';end if;
  if p_payload is null or jsonb_typeof(p_payload)<>'object' or octet_length(p_payload::text)>262144 then raise exception 'Некорректная форма программы';end if;
@@ -141,34 +203,7 @@ begin
  end loop;
  v_program_id:=public.save_state_program(p_game_id,p_program_id,p_payload->>'title',p_payload->>'responsible_ministry',minister,curator,p_payload->>'national_goal',starts,ends,total,p_payload->>'expected_results');
  if v_program_id is null then raise exception 'Программа не сохранена';end if;
- delete from state_program_expenses where program_id=v_program_id;
- delete from state_program_goals where program_id=v_program_id;
- delete from state_program_components where program_id=v_program_id;
- delete from state_program_budget_years where program_id=v_program_id;
- update state_programs set participants=nullif(trim(p_payload->>'participants'),''),presidential_priority_id=priority,form_version=2,updated_at=now() where state_programs.id=v_program_id;
- for x in select value from jsonb_array_elements(p_payload->'goals') loop
-  if coalesce(nullif(x->>'baseline_value','')::numeric,0)::text in ('NaN','Infinity','-Infinity') or coalesce(nullif(x->>'target_value','')::numeric,0)::text in ('NaN','Infinity','-Infinity') then raise exception 'Значения показателей должны быть конечными числами';end if;
-  year_no:=nullif(x->>'target_year','')::integer;
-  if year_no is not null and (year_no not between 2000 and 2100 or (starts is not null and year_no<extract(year from starts)) or (ends is not null and year_no>extract(year from ends))) then raise exception 'Целевой год показателя должен входить в срок программы';end if;
-  perform public.add_state_program_goal(v_program_id,x->>'goal_text',x->>'indicator_name',x->>'unit',nullif(x->>'baseline_value','')::numeric,nullif(x->>'target_value','')::numeric,year_no);
- end loop;
- for x in select value from jsonb_array_elements(p_payload->'components') loop
-  idx:=idx+1;component_start:=nullif(x->>'start_date','')::date;component_end:=nullif(x->>'end_date','')::date;
-  if (component_start is not null and starts is not null and component_start<starts) or (component_end is not null and ends is not null and component_end>ends) or (component_start is not null and component_end is not null and component_end<component_start) then raise exception 'Сроки мероприятия должны входить в срок программы';end if;
-  select coalesce(sum((value->>'amount')::numeric),0) into component_total from jsonb_array_elements(p_payload->'expenses') where (value->>'component_no')::integer=idx;
-  c_id:=public.add_state_program_component(v_program_id,(x->>'direction_no')::integer,x->>'direction_title',x->>'component_kind',x->>'title',x->>'goal_text',component_start,component_end,component_total);
-  component_ids:=array_append(component_ids,c_id);
- end loop;
- idx:=0;
- for x in select value from jsonb_array_elements(p_payload->'expenses') loop
-  idx:=idx+1;
-  insert into state_program_expenses(program_id,game_id,component_id,indicator_name,justification,budget_year,amount,position,created_by)
-  values(v_program_id,p_game_id,component_ids[(x->>'component_no')::integer],trim(x->>'indicator_name'),trim(x->>'justification'),(x->>'budget_year')::integer,(x->>'amount')::numeric,idx,uid);
- end loop;
- -- Include zero years, so annual readiness keeps the original rules.
- insert into state_program_budget_years(program_id,game_id,budget_year,amount,created_by)
- select v_program_id,p_game_id,y,coalesce((select sum(amount) from state_program_expenses e where e.program_id=v_program_id and e.budget_year=y),0),uid
- from generate_series(extract(year from starts)::integer,extract(year from ends)::integer) y;
+ perform private.replace_state_program_rows(v_program_id,p_payload);
  if p_confirm then perform public.advance_state_program(v_program_id,'submit_minister');end if;
  return v_program_id;
 end;$$;
@@ -223,8 +258,8 @@ create function public.get_signed_state_program_budget(p_game_id uuid) returns j
 language plpgsql stable security definer set search_path=public,private,pg_temp as $$
 begin
  if auth.uid() is null or not private.is_game_member(p_game_id) then raise exception 'Нет доступа к бюджету этой игры';end if;
- return coalesce((select jsonb_agg(jsonb_build_object('id',p.id,'title',p.title,'ministry',p.responsible_ministry,'total_budget',p.total_budget,'program_status',p.status,'signed_by',p.signed_by,'signed_at',p.signed_at,'publication_post_id',p.publication_post_id,'years',
-  (select jsonb_agg(jsonb_build_object('year',c.budget_year,'amount',c.amount,'status',c.status) order by c.budget_year) from state_program_budget_commitments c where c.program_id=p.id)) order by p.signed_at desc)
+ return coalesce((select jsonb_agg(jsonb_build_object('id',p.id,'title',p.title,'ministry',p.responsible_ministry,'total_budget',p.total_budget::text,'program_status',p.status,'signed_by',p.signed_by,'signed_at',p.signed_at,'publication_post_id',p.publication_post_id,'years',
+  (select jsonb_agg(jsonb_build_object('year',c.budget_year,'amount',c.amount::text,'status',c.status) order by c.budget_year) from state_program_budget_commitments c where c.program_id=p.id)) order by p.signed_at desc)
  from state_programs p where p.game_id=p_game_id and p.signed_at is not null),'[]'::jsonb);
 end;$$;
 
@@ -275,15 +310,25 @@ begin
  ) then v_issues:=v_issues||jsonb_build_array('В одном из направлений превышен лимит пяти проектов или пяти целевых программ'); end if;
  if v_expected_years>0 and v_budget_years<>v_expected_years
  then v_issues:=v_issues||jsonb_build_array('Финансирование указано не для каждого года реализации программы'); end if;
- if p.total_budget>0 and abs(v_annual_total-p.total_budget)>0.01
+ if p.total_budget>0 and ((p.form_version=2 and v_annual_total is distinct from p.total_budget) or (p.form_version<>2 and abs(v_annual_total-p.total_budget)>0.01))
  then v_issues:=v_issues||jsonb_build_array('Сумма годовых бюджетных ассигнований не равна общему бюджету программы'); end if;
  if v_has_published_address and p.presidential_priority_id is null
  then v_issues:=v_issues||jsonb_build_array('Программа не связана с опубликованным приоритетом послания Президента'); end if;
 
+ if p.total_budget::text in ('NaN','Infinity','-Infinity') or exists(select 1 from state_program_components where program_id=p.id and budget::text in ('NaN','Infinity','-Infinity')) then v_issues:=v_issues||jsonb_build_array('Бюджет должен состоять из конечных сумм');end if;
+ if v_goals>50 or exists(select 1 from state_program_goals where program_id=p.id and (coalesce(baseline_value::text,'0') in ('NaN','Infinity','-Infinity') or coalesce(target_value::text,'0') in ('NaN','Infinity','-Infinity') or target_year not between 2000 and 2100 or target_year<extract(year from p.start_date) or target_year>extract(year from p.end_date))) then v_issues:=v_issues||jsonb_build_array('Проверьте число показателей, конечные значения и целевые годы в периоде программы');end if;
+ if p.form_version=2 then
+  if exists(select 1 from (select budget_year,sum(delta) difference from (
+   select budget_year,amount as delta from state_program_expenses where program_id=p.id
+   union all select budget_year,-amount from state_program_budget_years where program_id=p.id
+  ) changes group by budget_year having sum(delta)<>0) inconsistent) then v_issues:=v_issues||jsonb_build_array('Годовое финансирование должно совпадать с построчными расходами каждого года');end if;
+  if exists(select 1 from state_program_components c where c.program_id=p.id and c.budget is distinct from coalesce((select sum(e.amount) from state_program_expenses e where e.component_id=c.id and e.program_id=p.id),0)) then v_issues:=v_issues||jsonb_build_array('Бюджеты мероприятий должны совпадать со связанными строками расходов');end if;
+ end if;
+
  if p.form_version=2 then
   if p.responsible_minister_id is null then v_issues:=v_issues||jsonb_build_array('Не назначен ответственный министр');end if;
   if not exists(select 1 from state_program_expenses where program_id=p.id) then v_issues:=v_issues||jsonb_build_array('Нет построчной таблицы расходов с обоснованиями');end if;
-  if abs(coalesce((select sum(amount) from state_program_expenses where program_id=p.id),0)-p.total_budget)>0.01 then v_issues:=v_issues||jsonb_build_array('Сумма расходов не соответствует паспорту программы');end if;
+  if coalesce((select sum(amount) from state_program_expenses where program_id=p.id),0) is distinct from p.total_budget then v_issues:=v_issues||jsonb_build_array('Сумма расходов не соответствует паспорту программы');end if;
   if exists(select 1 from state_program_components c where c.program_id=p.id and (c.start_date<p.start_date or c.end_date>p.end_date or c.end_date<c.start_date)) then v_issues:=v_issues||jsonb_build_array('Сроки мероприятий выходят за период программы');end if;
   if exists(select 1 from state_program_goals where program_id=p.id and (target_value is null or target_year is null or nullif(trim(unit),'') is null)) then v_issues:=v_issues||jsonb_build_array('Каждому показателю нужны единица, целевое значение и год');end if;
  end if;
@@ -292,7 +337,7 @@ begin
    'components',v_components,'component_budget',v_component_budget,'total_budget',p.total_budget,
    'budget_years',v_budget_years,'expected_budget_years',v_expected_years,'annual_budget_total',v_annual_total
  );
-end;$function$
+end;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.advance_state_program(p_program_id uuid, p_action text)
@@ -301,15 +346,16 @@ CREATE OR REPLACE FUNCTION public.advance_state_program(p_program_id uuid, p_act
  SECURITY DEFINER
  SET search_path TO 'public', 'private', 'pg_temp'
 AS $function$
-declare p public.state_programs%rowtype;v_uid uuid:=(select auth.uid());v_role text;v_ready jsonb;
+declare p public.state_programs%rowtype;v_uid uuid:=(select auth.uid());v_is_pm boolean;v_ready jsonb;
 begin
+ perform private.lock_active_program_actor((select game_id from public.state_programs where id=p_program_id));
  select * into p from public.state_programs where id=p_program_id for update;
  if p.id is null then raise exception 'Program not found'; end if;
  if v_uid is null or not private.is_game_member(p.game_id) or private.is_game_observer(p.game_id) then raise exception 'Game participant access required';end if;
  if not private.is_game_teacher(p.game_id) and not private.role_is_available(p.game_id,v_uid) then raise exception 'Участник недоступен для согласования';end if;
- select coalesce(string_agg(r,' '),'') into v_role from private.formal_user_roles(p.game_id,v_uid) r;
+ select exists(select 1 from private.formal_user_roles(p.game_id,v_uid) r where r ~* '^председатель[[:space:]]+правительства([[:space:]]|$)') into v_is_pm;
  if p_action='pm_ready' and p.signed_at is not null then
-  if not private.is_game_teacher(p.game_id) and v_role not like '%председател%правительств%' then raise exception 'Prime Minister access required';end if;
+  if not private.is_game_teacher(p.game_id) and not v_is_pm then raise exception 'Prime Minister access required';end if;
   return;
  end if;
  if p_action='submit_minister' then
@@ -328,7 +374,7 @@ begin
   update public.state_programs set status=case when p_action='minister_approve' then 'pm_review' else 'revision' end,updated_at=now() where id=p.id;
  elsif p_action in ('pm_ready','pm_revision') then
   if p.status<>'pm_review' then raise exception 'Program is not awaiting Prime Minister review';end if;
-  if not private.is_game_teacher(p.game_id) and v_role not like '%председател%правительств%' then raise exception 'Prime Minister access required'; end if;
+  if not private.is_game_teacher(p.game_id) and not v_is_pm then raise exception 'Prime Minister access required'; end if;
   if p_action='pm_ready' then
    v_ready:=private.state_program_readiness_json(p.id);
    if not coalesce((v_ready->>'ready')::boolean,false) then raise exception 'Программа не готова к подписи: %',v_ready->'issues';end if;
@@ -336,10 +382,37 @@ begin
   update public.state_programs set status=case when p_action='pm_ready' then 'ready' else 'revision' end,updated_at=now() where id=p.id;
   if p_action='pm_ready' then perform private.publish_signed_state_program(p.id,v_uid);end if;
  else raise exception 'Unsupported program action'; end if;
-end;$function$
+end;$function$;
 
 
 revoke all on function private.state_program_readiness_json(uuid) from public,anon,authenticated;
 revoke all on function public.advance_state_program(uuid,text) from public,anon;
 grant execute on function public.advance_state_program(uuid,text) to authenticated;
+
+-- Preserve the existing government vote while sharing the signature's active
+-- actor and exact Prime Minister checks, including formal office assignments.
+create or replace function public.open_state_program_government_vote(p_program_id uuid)
+returns uuid language plpgsql security definer set search_path=public,private,pg_temp as $$
+declare p public.state_programs%rowtype;v_uid uuid:=auth.uid();v_vote uuid;
+begin
+ perform private.lock_active_program_actor((select game_id from public.state_programs where id=p_program_id));
+ select * into p from public.state_programs where id=p_program_id for update;
+ if p.id is null then raise exception 'Program not found';end if;
+ if not private.is_game_teacher(p.game_id) and not exists(
+  select 1 from private.formal_user_roles(p.game_id,v_uid) r
+  where r ~* '^председатель[[:space:]]+правительства([[:space:]]|$)'
+ ) then raise exception 'Prime Minister access required';end if;
+ if p.status<>'ready' then raise exception 'Program must pass minister and Prime Minister review first';end if;
+ if p.form_version=2 and p.signed_at is null then raise exception 'Program must be signed before government voting';end if;
+ insert into public.game_votes(game_id,stage_no,title,body,voting_mode,status,created_by,institution_key,procedure_key,
+  quorum_kind,quorum_value,majority_kind,majority_value,allow_abstain,tie_breaker_chair,pass_transition,fail_transition)
+ values(p.game_id,11,'Государственная программа · '||p.title,
+  'Решение Правительства по государственной программе. Кворум — не менее половины состава; решение при голосовании — большинством присутствующих.',
+  'member','open',v_uid,'government','state_program','fraction',0.5,'present_majority',0.5,true,true,'none','none')
+ returning id into v_vote;
+ update public.state_programs set status='government_vote',government_vote_id=v_vote,updated_at=now() where id=p.id;
+ return v_vote;
+end;$$;
+revoke all on function public.open_state_program_government_vote(uuid) from public,anon;
+grant execute on function public.open_state_program_government_vote(uuid) to authenticated;
 

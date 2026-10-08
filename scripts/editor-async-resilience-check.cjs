@@ -14,7 +14,7 @@ function harness(component){
  const file=path.join(root,'components/game',component+'.tsx');
  const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const slots=[],pendingEffects=[],channels=[],counts=new Map(),holds=new Map(),errors=[],fetches=[],failures=new Set(),profileNotes=new Map(),committeeLegal=new Map(),budgetConclusions=new Map();
- let cursor=0,dirty=false,tree,latestTableLoad,revision=1,rating=50,jury=10,serverVenue='Saved venue',clock=0,sessionUser='teacher-a',props;
+ let cursor=0,dirty=false,tree,latestTableLoad,revision=1,serverVenue='Saved venue',clock=0,sessionUser='teacher-a',props;
  const g={game:{id:'game-a'},me:{game_id:'game-a',user_id:'teacher-a',kind:'teacher',full_name:'Teacher A'},teacher:true,currentStage:{stage_no:7},formalDocuments:[],formalHistory:[],votes:[],members:[],parties:[],setError:error=>errors.push(String(error?.message||error))};
  for(const name of ['createFormalDocument','deleteFormalDocument','advanceFormalDocument','updateFormalDraft','vetoFormalDocument','resolveBudgetConciliation','startBudgetRejectionBranch','createVote'])g[name]=async()=>null;
  g.refresh=async()=>{};
@@ -27,13 +27,12 @@ function harness(component){
  };
  const supabase={
   auth:{getSession:async()=>({data:{session:sessionUser?{user:{id:sessionUser},access_token:'simulation-only'}:null},error:null})},
-  from(table){const number=(counts.get(table)||0)+1;counts.set(table,number);const snapshot={revision,rating,jury,serverVenue,user:g.me.user_id,game:g.game.id},filters={};const query={select(){return this;},eq(key,value){filters[key]=value;return this;},is(){return this;},order(){return this;},maybeSingle(){return this;},async then(resolve,reject){try{
+  from(table){const number=(counts.get(table)||0)+1;counts.set(table,number);const snapshot={revision,serverVenue,user:g.me.user_id,game:g.game.id},filters={};const query={select(){return this;},eq(key,value){filters[key]=value;return this;},is(){return this;},order(){return this;},maybeSingle(){return this;},async then(resolve,reject){try{
    await holds.get(table+':'+number)?.promise;
    let data=[];
    if(table==='presidential_candidates')data=['a','b'].map(letter=>({id:'candidate-'+letter,user_id:snapshot.user,created_by:snapshot.user,registration_status:'registered',display_name:'Candidate '+letter+' revision '+snapshot.revision,photo_path:null,party_id:null,rating_penalty:0}));
    if(table==='presidential_election_settings')data={game_id:snapshot.game,system_type:'relative',status:'round1',poll_enabled:true,result:{}};
-   if(table==='presidential_scorecards')data=['a','b'].map(letter=>({candidate_id:'candidate-'+letter,round_no:1,game_rating_pct:snapshot.rating,poll_pct:20,computed_pct:snapshot.revision}));
-   if(table==='presidential_teacher_jury_scores')data=[{candidate_id:'candidate-a',slot_no:1,criterion:'program',score:snapshot.jury},{candidate_id:'candidate-a',slot_no:1,criterion:'campaign',score:25}];
+   if(table==='presidential_scorecards')data=['a','b'].map(letter=>({candidate_id:'candidate-'+letter,round_no:1,poll_pct:20,computed_pct:snapshot.revision}));
    if(table==='presidential_inauguration')data={game_id:snapshot.game,scheduled_at:'2026-10-08T12:00:00Z',venue:snapshot.serverVenue,notes:'Saved notes',hymn_path:null,ceremonial_music_path:null};
    if(table==='bill_submission_profiles')data={document_id:filters.document_id,committee_key:'committee-1',requires_financial_justification:false,requires_government_opinion:false,note:profileNotes.get(filters.document_id)||'Saved profile '+filters.document_id+' revision '+snapshot.revision};
    if(table==='bill_committee_conclusions')data={document_id:filters.document_id,legal_compliance:committeeLegal.get(filters.document_id)||'Saved legal '+filters.document_id+' revision '+snapshot.revision,internal_logic:'Saved logic',affected_acts_completeness:'Saved acts',recommendation:'draft',finalized:false};
@@ -41,8 +40,6 @@ function harness(component){
    resolve(failures.has(table)?{data:null,error:{message:'simulated table failure'}}:{data,error:null});
   }catch(error){reject(error);}}};return query;},
   rpc:async(name,args)=>{
-   if(name==='set_presidential_scorecard')rating=args.p_game_rating_pct;
-   if(name==='set_presidential_teacher_jury_score')jury=args.p_score;
    if(name==='save_presidential_inauguration')serverVenue=args.p_venue;
    if(name==='save_bill_submission_profile')profileNotes.set(args.p_document_id,args.p_note);
    if(name==='save_bill_committee_conclusion')committeeLegal.set(args.p_document_id,args.p_legal_compliance);
@@ -82,14 +79,14 @@ function harness(component){
  const clickResults=()=>all('button',byClass('stage7Tabs'))[2].props.onClick();
  return{
   g,render,settle,errors,fetches,byClass,all,byLabel,clickResults,setProps:value=>Object.assign(props,value),
-  ratingInput:()=>all('input',byClass('scoreMetricsRow'))[0],venueInput:()=>all('input',byClass('inaugurationForm'))[1],juryInput:()=>all('input',byClass('jurySlotGrid'))[0],
+  venueInput:()=>all('input',byClass('inaugurationForm'))[1],
   selectCandidate:()=>all('select',byClass('campaignForm'))[0],
   createEditor(){all('button',byClass('formalTabs'))[0].props.onClick();render();},
   openDossier(){all('button',byClass('billReadinessFooter'))[0].props.onClick();render();},
   refreshDocument(){return nodes(tree,node=>node.type?.displayName==='DocumentTools')[0].props.onRefresh();},
   remoteProfile(value,id='doc-a'){profileNotes.set(id,value);},remoteLegal(value,id='doc-a'){committeeLegal.set(id,value);},remoteBudget(value,id='doc-a'){budgetConclusions.set(id,value);},
   resolveFetch(index,data,ok=true){fetches[index].response.resolve({ok,json:async()=>data});},
-  setRevision:value=>{revision=value;},setRating:value=>{rating=value;},setJury:value=>{jury=value;},setVenue:value=>{serverVenue=value;},setSessionUser:value=>{sessionUser=value;},
+  setRevision:value=>{revision=value;},setVenue:value=>{serverVenue=value;},setSessionUser:value=>{sessionUser=value;},
   fail:table=>failures.add(table),
   hold(table){const pending=deferred();holds.set(table+':'+((counts.get(table)||0)+1),pending);return pending;},
   refresh(){if(latestTableLoad)return latestTableLoad();for(const channel of channels)for(const {filter,callback} of channel.handlers)if(filter.table==='presidential_scorecards')callback();},
@@ -100,25 +97,26 @@ function harness(component){
 async function main(){
  const failures=[];
  async function check(name,fn){try{await fn();console.log('PASS '+name);}catch(error){failures.push(name);console.error('FAIL '+name+': '+error.message);}}
- await check('Stage7 refresh preserves edited calculator rows and inauguration fields',async()=>{
-  const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();h.ratingInput().props.onChange({target:{value:'95'}});h.venueInput().props.onChange({target:{value:'Unsaved venue'}});h.render();h.setRating(60);h.setVenue('Other saved venue');await h.refresh();await h.settle();assert.equal(h.ratingInput().props.value,'95');assert.equal(h.venueInput().props.value,'Unsaved venue');h.dispose();
+ await check('Stage7 refresh preserves inauguration edits and delegates calculator controls',async()=>{
+  const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();h.venueInput().props.onChange({target:{value:'Unsaved venue'}});h.render();h.setVenue('Other saved venue');await h.refresh();await h.settle();assert.equal(h.venueInput().props.value,'Unsaved venue');const calculator=nodes(h.render(),node=>node.type?.displayName==='PresidentialRulesCalculator')[0];assert.ok(calculator,'The actual calculator is mounted as a separate component');assert.equal(calculator.props.g,h.g);assert.equal(calculator.props.settings.status,'round1');assert.equal(calculator.props.candidates.length,2);assert.equal(h.byClass('scoreMetricsRow'),undefined);h.dispose();
  });
  await check('Stage7 background callbacks keep a manually selected candidate',async()=>{
   const h=harness('PresidentialElectionStage7');await h.settle();h.selectCandidate().props.onChange({target:{value:'candidate-b'}});h.render();await h.refresh();await h.settle();assert.equal(h.selectCandidate().props.value,'candidate-b');h.dispose();
  });
- await check('Stage7 ignores late reads from an older refresh and another game',async()=>{
-  const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();const old=h.hold('presidential_scorecards');h.setRating(60);const first=h.refresh();await tick();h.setRating(70);await h.refresh();await h.settle();assert.equal(h.ratingInput().props.value,'70');old.resolve();await first;await h.settle();assert.equal(h.ratingInput().props.value,'70');
-  const other=h.hold('presidential_scorecards');const pending=h.refresh();await tick();h.g.game.id='game-b';h.g.me.game_id='game-b';h.setRating(80);await h.settle();other.resolve();await pending;await h.settle();assert.equal(h.ratingInput().props.value,'80');h.dispose();
+ await check('Stage7 official standings ignore older refreshes and another game',async()=>{
+  const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();const old=h.hold('presidential_scorecards');h.setRevision(2);const first=h.refresh();await tick();h.setRevision(3);await h.refresh();await h.settle();assert.match(text(h.byClass('resultBars')),/3\.00%/);old.resolve();await first;await h.settle();assert.match(text(h.byClass('resultBars')),/revision 3/);
+  const other=h.hold('presidential_scorecards');const pending=h.refresh();await tick();h.g.game.id='game-b';h.g.me.game_id='game-b';h.setRevision(4);h.setVenue('Other game venue');await h.settle();other.resolve();await pending;await h.settle();assert.match(text(h.byClass('resultBars')),/revision 4/);assert.equal(h.venueInput().props.value,'Other game venue');h.dispose();
  });
- await check('Jury inputs keep unsaved edits and follow server values after save',async()=>{
-  const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();h.juryInput().props.onChange({target:{value:'99'}});h.render();h.setJury(20);await h.refresh();await h.settle();assert.equal(h.juryInput().props.value,'99');h.juryInput().props.onBlur({target:{value:'99'}});await h.settle();h.setJury(70);await h.refresh();await h.settle();assert.equal(h.juryInput().props.value,70);h.dispose();
+ await check('Stage7 students retain public standings and ceremony without teacher inputs',async()=>{
+  const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();h.g.teacher=false;h.g.me.kind='student';await h.settle();assert.match(text(h.byClass('resultBars')),/1\.00%/);assert.equal(h.byClass('inaugurationForm'),undefined);assert.match(text(h.byClass('ceremonyPublic')),/Saved venue/);const calculator=nodes(h.render(),node=>node.type?.displayName==='PresidentialRulesCalculator')[0];assert.equal(calculator.props.g.teacher,false);h.dispose();
  });
- await check('Saved calculator and ceremony drafts accept later server refreshes',async()=>{
-  const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();h.ratingInput().props.onChange({target:{value:'90'}});h.venueInput().props.onChange({target:{value:'New venue'}});h.render();h.all('button',h.byClass('scoreMetricsRow'))[0].props.onClick();await h.settle();h.all('button',h.byClass('inaugurationForm'))[0].props.onClick();await h.settle();h.setRating(45);h.setVenue('Remote venue');await h.refresh();await h.settle();assert.equal(h.ratingInput().props.value,'45');assert.equal(h.venueInput().props.value,'Remote venue');h.dispose();
+ await check('Saved ceremony drafts accept later server refreshes',async()=>{
+  const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();h.venueInput().props.onChange({target:{value:'New venue'}});h.render();h.all('button',h.byClass('inaugurationForm'))[0].props.onClick();await h.settle();h.setVenue('Remote venue');await h.refresh();await h.settle();assert.equal(h.venueInput().props.value,'Remote venue');h.dispose();
  });
  await check('Stage7 failed reads expose an error and retain accepted values',async()=>{
-  const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();h.fail('presidential_scorecards');await h.refresh();await h.settle();assert.equal(h.ratingInput().props.value,'50');assert.match(h.errors.at(-1),/simulated table failure/);h.dispose();
+  const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();h.fail('presidential_scorecards');h.setRevision(2);h.setVenue('Unavailable venue');await h.refresh();await h.settle();assert.match(text(h.byClass('resultBars')),/revision 1/);assert.equal(h.venueInput().props.value,'Saved venue');assert.match(h.errors.at(-1),/simulated table failure/);h.dispose();
  });
+ await require('./presidential-calculator-resilience-check.cjs').runChecks(check);
  await check('The latest selected file wins even if older extraction finishes last',async()=>{
   const h=harness('DocumentsView');await h.settle();h.createEditor();const upload=h.byLabel('Загрузить документ для распознавания');upload.props.onChange({target:{files:[new File(['a'],'source-a.txt')]}});await h.settle();h.byLabel('Загрузить документ для распознавания').props.onChange({target:{files:[new File(['b'],'source-b.txt')]}});await h.settle();h.resolveFetch(1,{text:'Latest extracted document text'});await h.settle();h.resolveFetch(0,{text:'Stale extracted text'});await h.settle();assert.equal(h.byLabel('Текст документа').props.value,'Latest extracted document text');assert.equal(h.byLabel('Название документа').props.value,'source b');h.dispose();
  });
