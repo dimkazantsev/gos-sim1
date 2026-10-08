@@ -1,7 +1,9 @@
 'use client';
 import {IconAction} from '../ui/IconAction';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
+import {stageRoleTitles} from './stageRoles';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type Program={id:string;game_id:string;title:string;responsible_ministry:string;responsible_minister_id:string|null;curator_id:string|null;national_goal:string|null;presidential_priority_id:string|null;participants:string|null;start_date:string|null;end_date:string|null;total_budget:number;expected_results:string|null;status:'draft'|'minister_review'|'revision'|'pm_review'|'ready'|'government_vote'|'adopted'|'rejected';government_vote_id:string|null;created_by:string;created_at:string;updated_at:string};
@@ -68,7 +70,8 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  const [priorityNationalGoal,setPriorityNationalGoal]=useState('');
  const [priorityLink,setPriorityLink]=useState('');
  const [busy,setBusy]=useState(false);
- const role=(me?.role_title||'').toLowerCase();
+ const programDirty=useRef(false),addressDirty=useRef(false),participantsDirty=useRef(false),hydratedProgram=useRef('');
+ const role=stageRoleTitles(g);
  const isPM=role.includes('председател')&&role.includes('правительств');
  const isMinister=role.includes('министр');
  const isPresident=role.includes('президент');
@@ -83,6 +86,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
    supabase.from('presidential_priorities').select('*').eq('game_id',game.id).order('priority_no'),
    supabase.from('state_program_budget_years').select('*').eq('game_id',game.id).order('budget_year')
   ]);
+  const failure=[p,g,c,a,pr,by].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
   if(!p.error){
    const rows=(p.data||[]) as Program[];setPrograms(rows);
    if(!selectedId&&rows[0])setSelectedId(rows[0].id);
@@ -92,7 +96,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
   if(!a.error){
    const rows=(a.data||[]) as Address[];setAddresses(rows);
    const draft=rows.find(x=>x.status==='draft')||rows[0];
-   if(draft){setAddressTitle(draft.title);setAddressBody(draft.body_text);setAddressVideo(draft.video_url||'')}
+   if(draft&&!addressDirty.current){setAddressTitle(draft.title);setAddressBody(draft.body_text);setAddressVideo(draft.video_url||'')}
   }
   if(!pr.error)setPriorities((pr.data||[]) as Priority[]);
   if(!by.error)setBudgetYears((by.data||[]) as BudgetYear[]);
@@ -103,34 +107,26 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
    setReadiness(next);
   }
  }
- useEffect(()=>{void load()},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('state-programs:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'state_programs',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'state_program_goals',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'state_program_components',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'presidential_addresses',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'presidential_priorities',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'state_program_budget_years',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ useGameTableSync(game?.id,['state_programs','state_program_goals','state_program_components','presidential_addresses','presidential_priorities','state_program_budget_years'],load,me?.user_id||'');
 
  const selected=programs.find(p=>p.id===selectedId);
  useEffect(()=>{
   if(!selected)return;
+  if(hydratedProgram.current===selected.id&&programDirty.current)return;
+  hydratedProgram.current=selected.id;programDirty.current=false;
   setTitle(selected.title);setMinistry(selected.responsible_ministry);setMinister(selected.responsible_minister_id||'');
   setCurator(selected.curator_id||'');setNationalGoal(selected.national_goal||'');setStart(selected.start_date||'');setEnd(selected.end_date||'');
-  setBudget(String(selected.total_budget??0));setExpected(selected.expected_results||'');setParticipantsDraft(selected.participants||'');
+  setBudget(String(selected.total_budget??0));setExpected(selected.expected_results||'');
  },[selected?.id,selected?.updated_at]);
+ useEffect(()=>{participantsDirty.current=false;setParticipantsDraft(selected?.participants||'')},[selected?.id]);
+ useEffect(()=>{if(!participantsDirty.current)setParticipantsDraft(selected?.participants||'')},[selected?.updated_at]);
 
  if(!game||!me)return null;
  const activeGame=game;
  const activeMe=me;
  const myGoals=selected?goals.filter(x=>x.program_id===selected.id):[];
  const myComponents=selected?components.filter(x=>x.program_id===selected.id):[];
- const dirs=useMemo(()=>[...new Set(myComponents.map(x=>x.direction_no))].sort(),[myComponents]);
+ const dirs=[...new Set(myComponents.map(x=>x.direction_no))].sort();
  const canEdit=!!selected&&(teacher||selected.created_by===activeMe.user_id||selected.responsible_minister_id===activeMe.user_id);
  const memberName=(id:string|null)=>members.find(m=>m.user_id===id)?.full_name||'—';
  const vote=selected?.government_vote_id?votes.find(v=>v.id===selected.government_vote_id):undefined;
@@ -149,7 +145,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
    p_responsible_ministry:ministry.trim(),p_responsible_minister_id:minister||null,p_curator_id:curator||null,
    p_national_goal:nationalGoal||null,p_start_date:start||null,p_end_date:end||null,p_total_budget:Number(budget)||0,p_expected_results:expected.trim()||null
   });
-  if(r.error)setError(r.error.message);else{if(newProgram&&r.data)setSelectedId(String(r.data));await load()}setBusy(false);
+  if(r.error)setError(r.error.message);else{programDirty.current=false;if(newProgram&&r.data)setSelectedId(String(r.data));await load()}setBusy(false);
  }
  async function addGoal(){
   if(!selected||goalText.trim().length<5||indicator.trim().length<3)return;setBusy(true);
@@ -166,7 +162,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  async function openVote(){if(!selected)return;setBusy(true);const r=await supabase.rpc('open_state_program_government_vote',{p_program_id:selected.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
  async function saveAddress(){
   setBusy(true);const r=await supabase.rpc('save_presidential_address',{p_game_id:activeGame.id,p_address_id:activeAddress?.status==='draft'?activeAddress.id:null,p_title:addressTitle.trim(),p_body_text:addressBody.trim(),p_video_url:addressVideo.trim()||null});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(r.error.message);else{addressDirty.current=false;await load()}setBusy(false);
  }
  async function addPriority(){
   const addr=addresses.find(x=>x.status==='draft');if(!addr)return;
@@ -182,7 +178,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  }
  async function saveParticipants(){
   if(!selected)return;setBusy(true);const r=await supabase.rpc('set_state_program_participants',{p_program_id:selected.id,p_participants:participantsDraft.trim()});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(r.error.message);else{participantsDirty.current=false;await load()}setBusy(false);
  }
  async function saveBudgetYear(){
   if(!selected||!budgetYearDraft)return;setBusy(true);const r=await supabase.rpc('set_state_program_budget_year',{p_program_id:selected.id,p_budget_year:Number(budgetYearDraft),p_amount:Number(budgetAmountDraft)||0});
@@ -198,9 +194,9 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
   <section className="policyMandate">
    <header><div><small>ПОЛИТИЧЕСКИЙ МАНДАТ · ЭТАП 10</small><h3>Послание Президента → приоритеты → государственные программы</h3><p>Послание становится источником целей для последующей работы Правительства. После публикации его приоритеты фиксируются и могут быть привязаны к конкретным государственным программам.</p></div><span className={publishedAddress?'published':'draft'}>{publishedAddress?'Опубликовано':'Черновик'}</span></header>
    {(teacher||isPresident)&&!publishedAddress&&<div className="policyMandateEditor">
-    <label>Название<input value={addressTitle} onChange={e=>setAddressTitle(e.target.value)}/></label>
-    <label>Видео / ссылка<input value={addressVideo} onChange={e=>setAddressVideo(e.target.value)} placeholder="Ссылка на опубликованную видеоверсию"/></label>
-    <label className="wide">Текст послания<textarea rows={5} value={addressBody} onChange={e=>setAddressBody(e.target.value)} placeholder="Основные цели и приоритеты государственной политики"/></label>
+    <label>Название<input value={addressTitle} onChange={e=>{addressDirty.current=true;setAddressTitle(e.target.value)}}/></label>
+    <label>Видео / ссылка<input value={addressVideo} onChange={e=>{addressDirty.current=true;setAddressVideo(e.target.value)}} placeholder="Ссылка на опубликованную видеоверсию"/></label>
+    <label className="wide">Текст послания<textarea rows={5} value={addressBody} onChange={e=>{addressDirty.current=true;setAddressBody(e.target.value)}} placeholder="Основные цели и приоритеты государственной политики"/></label>
     <button className="secondary" disabled={busy||addressBody.trim().length<20} onClick={()=>void saveAddress()}>Сохранить послание</button>
    </div>}
    {activeAddress&&<div className="policyPriorityArea">
@@ -214,7 +210,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
    {(teacher||isMinister||isPM)&&<button className="programNew" onClick={()=>{setSelectedId('');setTitle('');setMinistry('');setMinister('');setCurator('');setNationalGoal('');setStart('');setEnd('');setBudget('0');setExpected('')}}>＋ Новая программа</button>}
   </div>
 
-  {(!selected&&(teacher||isMinister||isPM))&&<div className="programPassportEditor new">
+  {(!selected&&(teacher||isMinister||isPM))&&<div onChangeCapture={()=>{programDirty.current=true}} className="programPassportEditor new">
    <h3>Новая государственная программа</h3>
    <PassportFields members={members} title={title} setTitle={setTitle} ministry={ministry} setMinistry={setMinistry} minister={minister} setMinister={setMinister} curator={curator} setCurator={setCurator} nationalGoal={nationalGoal} setNationalGoal={setNationalGoal} start={start} setStart={setStart} end={end} setEnd={setEnd} budget={budget} setBudget={setBudget} expected={expected} setExpected={setExpected}/>
    <button className="primary" disabled={busy||title.trim().length<5||ministry.trim().length<3} onClick={()=>void saveProgram(true)}>Создать программу</button>
@@ -224,13 +220,13 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
    <div className="programPassport">
     <div className="programPassportHead"><div><small>ПАСПОРТ ГП</small><h3>{selected.title}</h3><p>{selected.responsible_ministry}</p></div><span className={'programStatus '+selected.status}>{statusLabel[selected.status]}</span></div>
     <div className="programPassportFacts"><div><small>Ответственный министр</small><b>{memberName(selected.responsible_minister_id)}</b></div><div><small>Куратор</small><b>{memberName(selected.curator_id)}</b></div><div><small>Период</small><b>{selected.start_date||'—'} → {selected.end_date||'—'}</b></div><div><small>Бюджет</small><b>{Number(selected.total_budget).toLocaleString('ru-RU')}</b></div></div>
-    <div className="programParticipants"><small>УЧАСТНИКИ ПРОГРАММЫ</small><p>{selected.participants||'Не указаны'}</p>{canEdit&&['draft','revision','minister_review'].includes(selected.status)&&<div><textarea rows={2} value={participantsDraft} onChange={e=>setParticipantsDraft(e.target.value)} placeholder="Органы, организации и иные участники реализации"/><button onClick={()=>void saveParticipants()}>Сохранить</button></div>}</div>
+    <div className="programParticipants"><small>УЧАСТНИКИ ПРОГРАММЫ</small><p>{selected.participants||'Не указаны'}</p>{canEdit&&['draft','revision','minister_review'].includes(selected.status)&&<div><textarea rows={2} value={participantsDraft} onChange={e=>{participantsDirty.current=true;setParticipantsDraft(e.target.value)}} placeholder="Органы, организации и иные участники реализации"/><button onClick={()=>void saveParticipants()}>Сохранить</button></div>}</div>
     {selected.national_goal&&<div className="programNationalGoal"><small>НАЦИОНАЛЬНАЯ ЦЕЛЬ</small><p>{selected.national_goal}</p></div>}
     <div className="programPolicyLink"><small>ПРИОРИТЕТ ПОСЛАНИЯ ПРЕЗИДЕНТА</small>{selectedPriority?<><b>{selectedPriority.title}</b>{selectedPriority.description&&<p>{selectedPriority.description}</p>}</>:<p>Не связан</p>}{canEdit&&publishedPriorities.length>0&&<div><select value={priorityLink||selected.presidential_priority_id||''} onChange={e=>setPriorityLink(e.target.value)}><option value="">Не связывать</option>{publishedPriorities.map(x=><option key={x.id} value={x.id}>{x.priority_no}. {x.title}</option>)}</select><button onClick={()=>void linkPriority()}>Сохранить связь</button></div>}</div>
     {selected.expected_results&&<div className="programExpected"><small>ОЖИДАЕМЫЕ РЕЗУЛЬТАТЫ</small><p>{selected.expected_results}</p></div>}
    </div>
 
-   {canEdit&&selected.status!=='adopted'&&selected.status!=='rejected'&&<details className="programEdit"><summary><div><b>Редактировать паспорт</b><span>Ответственный исполнитель, куратор, цель, сроки, бюджет и ожидаемые результаты.</span></div><i>+</i></summary><div className="programEditBody"><PassportFields members={members} title={title} setTitle={setTitle} ministry={ministry} setMinistry={setMinistry} minister={minister} setMinister={setMinister} curator={curator} setCurator={setCurator} nationalGoal={nationalGoal} setNationalGoal={setNationalGoal} start={start} setStart={setStart} end={end} setEnd={setEnd} budget={budget} setBudget={setBudget} expected={expected} setExpected={setExpected}/><button className="primary" disabled={busy} onClick={()=>void saveProgram(false)}>Сохранить паспорт</button></div></details>}
+   {canEdit&&selected.status!=='adopted'&&selected.status!=='rejected'&&<details className="programEdit" onChangeCapture={()=>{programDirty.current=true}}><summary><div><b>Редактировать паспорт</b><span>Ответственный исполнитель, куратор, цель, сроки, бюджет и ожидаемые результаты.</span></div><i>+</i></summary><div className="programEditBody"><PassportFields members={members} title={title} setTitle={setTitle} ministry={ministry} setMinistry={setMinistry} minister={minister} setMinister={setMinister} curator={curator} setCurator={setCurator} nationalGoal={nationalGoal} setNationalGoal={setNationalGoal} start={start} setStart={setStart} end={end} setEnd={setEnd} budget={budget} setBudget={setBudget} expected={expected} setExpected={setExpected}/><button className="primary" disabled={busy} onClick={()=>void saveProgram(false)}>Сохранить паспорт</button></div></details>}
 
    <section className="programAnnualBudget">
     <div className="programSectionTitle"><div><small>БЮДЖЕТНЫЕ АССИГНОВАНИЯ</small><h3>Финансирование по годам</h3></div><span>{annualBudgetTotal.toLocaleString('ru-RU')} / {Number(selected.total_budget).toLocaleString('ru-RU')}</span></div>

@@ -172,6 +172,11 @@ fixture.metricHistory.push({id:40,game_id:'design-preview',metric_id:'metric-0',
 fixture.postFormalLinks=[{game_id:'design-preview',post_id:'post-demo',formal_document_id:'formal-demo',created_by:'teacher-demo',created_at:now}];
 const defs=[['stages','Этапы','StagesView'],['parties','Партии','PartiesView'],['votes','Голосования','VotesView'],['documents','Реестр НПА','DocumentsView'],['document-detail','Текст НПА','DocumentsView'],['document-procedure','Процедура НПА','DocumentsView'],['actions','Процессы','PoliticalWallView'],['grades','Оценки','GradesView'],['teacher','Управление','TeacherView'],['profile','Профиль','ProfileView']];
 for(const [id,label,file] of defs){const Component=require('../components/game/'+file).default;const content=renderToStaticMarkup(h(Component,{g,focusId:id.startsWith('document-')?fixture.formalDocuments[0].id:undefined,initialDetailTab:id==='document-procedure'?'procedure':'text',onNavigate:noop,onOpenVotes:noop,onOpenStages:noop,onOpenDocument:noop,onOpenProcesses:noop}));pages.push([id,label,base.replace(/(<main id="game-main"[^>]*>)[\s\S]*?(<\/main>)/,(_,start,end)=>start+content+end)]);}
+const StageWorkspacePreview=require('../components/game/StageWorkspace').default;
+for(const stage of fixture.stages.filter(s=>s.stage_no>=8)){
+ const content=renderToStaticMarkup(h(StageWorkspacePreview,{g,stage,onBack:noop,onOpenStage:noop,onOpenVotes:noop,onOpenDocument:noop,onNavigate:noop}));
+ pages.push(['stage-'+stage.stage_no,'Этап '+stage.stage_no+' · '+stage.title,base.replace(/(<main id="game-main"[^>]*>)[\s\S]*?(<\/main>)/,(_,start,end)=>start+content+end)]);
+}
 const TeacherViewPreview=require('../components/game/TeacherView').default;
 for(const [id,label,initialWorkspace] of [['teacher-stages','Управление · этапы','stages'],['teacher-journal','Управление · журнал','journal'],['teacher-analytics','Управление · аналитика','analytics'],['teacher-grades','Управление · оценки','grades'],['teacher-event','Управление · Event','event'],['teacher-parties','Управление · фракции','parties'],['teacher-tools','Управление · инструменты','tools']]){
  const content=renderToStaticMarkup(h(TeacherViewPreview,{g,onOpenStages:noop,onOpenProcesses:noop,initialWorkspace}));

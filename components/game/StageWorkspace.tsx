@@ -21,23 +21,13 @@ import PresidentialSystemDecisionPanel from './PresidentialSystemDecisionPanel';
 import DumaLeadershipElection from './DumaLeadershipElection';
 import GhostPolicyLab from './GhostPolicyLab';
 import ElectoralArchitectureLab from './ElectoralArchitectureLab';
-import GovernmentStage8Workspace from './GovernmentStage8Workspace';
-import InstitutionStaffingLab from './InstitutionStaffingLab';
-import StateProgramLab from './StateProgramLab';
-import MunicipalProjectLab from './MunicipalProjectLab';
-import MunicipalGovernancePanel from './MunicipalGovernancePanel';
-import SystemDebriefLab from './SystemDebriefLab';
-import LegislativeSessionLab from './LegislativeSessionLab';
-import GovernmentProgramSessionLab from './GovernmentProgramSessionLab';
-import CrisisRoom from './CrisisRoom';
 import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
+import GovernanceStageWorkspace from './GovernanceStageWorkspace';
 
 const STAGE_ICONS=[UsersRound,Route,Map,Landmark,UserRoundX,ClipboardCheck,Vote,Building2,Network,Target,ClipboardList,Scale,Wallet,MapPin,ShieldAlert,ChartNoAxesCombined] as const;
 
 const STAGE_REGISTRATION_BODIES:Partial<Record<number,string[]>>={
- 2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],6:['gd'],
- 9:['gd','committee','government'],11:['government'],12:['gd','committee'],
- 13:['gd','committee','sf'],14:['municipality']
+ 2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],6:['gd']
 };
 
 const VIEW_LABELS:Partial<Record<View,string>>={
@@ -89,6 +79,8 @@ export default function StageWorkspace({
   g.setChannelId(publicChannel.id);
   g.setChatOpen(true);
  }
+
+ if(stage.stage_no>=8)return <GovernanceStageWorkspace key={stage.stage_no} g={g} stage={stage} readOnly={readOnly} onBack={onBack} onOpenStage={onOpenStage} onOpenVotes={onOpenVotes} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate}/>;
 
  return <div className="stageWorkspacePage stageWorkspaceCanonical" data-stage={stage.stage_no} data-phase={phase.id} style={{'--stage-phase-accent':phase.accent} as CSSProperties}>
   <button type="button" className="stageWorkspaceFloatingBack" onClick={onBack} aria-label="Вернуться ко всем этапам">
@@ -189,9 +181,9 @@ export default function StageWorkspace({
 
   <section className="stageWorkspaceExecution">
    <div className="stageWorkspaceSectionHead stageWorkspaceExecutionHead">
-    <div><small>РАБОЧЕЕ МЕСТО</small><h2>{stage.stage_no===8?'Формирование Правительства':'Документы, формы и процедуры'}</h2><p>{stage.stage_no===8?'Единый контур этапа: повестка Государственной Думы, регистрация, кандидатуры, голосования, НПА, назначения и структура пяти министерств.':'Заполняйте формы здесь или переходите в профильный раздел. Сохранённые НПА, голосования и результаты синхронизируются с этапом.'}</p></div>
+    <div><small>РАБОЧЕЕ МЕСТО</small><h2>Документы, формы и процедуры</h2><p>Заполняйте формы здесь или переходите в профильный раздел. Сохранённые НПА, голосования и результаты синхронизируются с этапом.</p></div>
     <div className="stageWorkspaceExecutionTools">
-     {publicChannel&&![6,7,8].includes(stage.stage_no)&&<button type="button" className="stageWorkspacePublicChat stageWorkspacePublicChatInner" onClick={openPublicChat}><MessageCircle size={16} aria-hidden="true"/><span>Обсудить в публичном чате</span></button>}
+     {publicChannel&&![6,7].includes(stage.stage_no)&&<button type="button" className="stageWorkspacePublicChat stageWorkspacePublicChatInner" onClick={openPublicChat}><MessageCircle size={16} aria-hidden="true"/><span>Обсудить в публичном чате</span></button>}
      <Layers3 size={25} aria-hidden="true"/>
     </div>
    </div>
@@ -200,11 +192,10 @@ export default function StageWorkspace({
     <legend className="srOnly">Рабочие действия этапа</legend>
     {readOnly&&<p className="readOnlyNote">Режим просмотра участника: формы показаны для проверки интерфейса, но изменение данных заблокировано.</p>}
 
-    {stage.stage_no===8&&<GovernmentStage8Workspace g={g} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onOpenDocument={onOpenDocument} onNavigate={onNavigate}/>} 
     <div className="stageWorkspaceCoreTools">
      {registrationBodies&&<div id={'stage-registration-'+stage.stage_no} className="stageRegistrationAnchor"><InstitutionRegistrationPanel g={g} readOnly={readOnly} stageNo={stage.stage_no} initialBody={registrationBodies[0]} allowedBodies={registrationBodies}/></div>}
-     {stage.stage_no!==7&&stage.stage_no!==8&&<DeadlineControl g={g} stageNo={stage.stage_no}/>} 
-     {stage.stage_no!==6&&stage.stage_no!==7&&stage.stage_no!==8&&<StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>} 
+     {stage.stage_no!==7&&<DeadlineControl g={g} stageNo={stage.stage_no}/>}
+     {stage.stage_no!==6&&stage.stage_no!==7&&<StageArtifacts g={g} stage={stage} readOnly={readOnly} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>}
     </div>
 
     <div className="stageSpecializedModules" aria-label="Специализированные процедуры этапа">
@@ -215,17 +206,10 @@ export default function StageWorkspace({
      {stage.stage_no===6&&<PresidentialElectionLab g={g}/>}
      {stage.stage_no===7&&<PresidentialSystemDecisionPanel g={g} onOpenVotes={onOpenVotes} onNavigate={onNavigate} onOpenDocument={onOpenDocument} stageNo={7}/>}
      {stage.stage_no===7&&<PresidentialElectionStage7 g={g}/>}
-     
-     {stage.stage_no===9&&<InstitutionStaffingLab g={g}/>}
-     {(stage.stage_no===10||stage.stage_no===11)&&<StateProgramLab g={g}/>}
-     {stage.stage_no===11&&<GovernmentProgramSessionLab g={g} onOpenVotes={onOpenVotes}/>}
-     {stage.stage_no===12&&<LegislativeSessionLab g={g} onOpenVotes={onOpenVotes}/>}
-     {stage.stage_no===14&&<><MunicipalGovernancePanel g={g}/><MunicipalProjectLab g={g}/></>}
-     {stage.stage_no===15&&<CrisisRoom g={g}/>}
-     {stage.stage_no===16&&<SystemDebriefLab g={g}/>}
+
     </div>
 
-    <StageReadinessPanel g={g} stageNo={stage.stage_no} rulesUrl={detail.rulesUrl} rulesLabel={detail.rulesSection||'Правила игры'}/>
+    <StageReadinessPanel g={g} stageNo={stage.stage_no} readOnly={readOnly} rulesUrl={detail.rulesUrl} rulesLabel={detail.rulesSection||'Правила игры'}/>
    </fieldset>
   </section>
 

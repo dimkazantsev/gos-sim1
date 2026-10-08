@@ -1,13 +1,15 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
+import {stageRoleTitles} from './stageRoles';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type Session={id:string;game_id:string;session_no:number;title:string;time_limit_minutes:number;status:'draft'|'open'|'closed';chair_user_id:string|null;created_at:string;opened_at:string|null;closed_at:string|null};
 type Item={id:string;session_id:string;program_id:string;agenda_no:number;report_minutes:number;status:'pending'|'presenting'|'decision'|'completed'|'withdrawn';vote_id:string|null;result_note:string|null;started_at:string|null;completed_at:string|null};
 type Program={id:string;title:string;responsible_ministry:string;status:string;responsible_minister_id:string|null};
 
-export default function GovernmentProgramSessionLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
+export default function GovernmentProgramSessionLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:(id?:string)=>void}){
  const {game,me,teacher,members,votes,setError}=g;
  const [sessions,setSessions]=useState<Session[]>([]);
  const [items,setItems]=useState<Item[]>([]);
@@ -18,7 +20,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes}:{g:ReturnTyp
  const [programId,setProgramId]=useState('');
  const [reportMinutes,setReportMinutes]=useState(7);
  const [busy,setBusy]=useState(false);
- const role=(me?.role_title||'').toLowerCase();
+ const role=stageRoleTitles(g);
  const canManage=teacher||(role.includes('председател')&&role.includes('правительств'))||role.includes('президент');
 
  async function load(){
@@ -28,20 +30,12 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes}:{g:ReturnTyp
    supabase.from('government_program_agenda').select('*').eq('game_id',game.id).order('agenda_no'),
    supabase.from('state_programs').select('id,title,responsible_ministry,status,responsible_minister_id').eq('game_id',game.id).order('title')
   ]);
+  const failure=[s,i,p].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
   if(!s.error){const rows=(s.data||[]) as Session[];setSessions(rows);if(!selectedId&&rows[0])setSelectedId(rows[0].id)}
   if(!i.error)setItems((i.data||[]) as Item[]);
   if(!p.error)setPrograms((p.data||[]) as Program[]);
  }
- useEffect(()=>{void load()},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('government-program-session:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'government_sessions',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'government_program_agenda',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'state_programs',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ useGameTableSync(game?.id,['government_sessions','government_program_agenda','state_programs','game_votes','game_ballots','institution_session_registrations'],load,me?.user_id||'');
 
  if(!game||!me)return null;
  const activeGame=game;
@@ -74,7 +68,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes}:{g:ReturnTyp
 
   <div className="govSessionTabs">
    <div>{sessions.map(s=><button key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'идёт':s.status==='closed'?'закрыто':'проект'}</em></button>)}</div>
-   {canManage&&<details className="govSessionCreate"><summary>＋ Новое заседание</summary><div><input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Название"/><label>Общий регламент, мин.<input type="number" min="5" max="240" value={timeLimit} onChange={e=>setTimeLimit(Number(e.target.value)||60)}/></label><button disabled={busy} onClick={()=>void create()}>Создать</button></div></details>}
+   {canManage&&<details className="govSessionCreate"><summary>＋ Новое заседание</summary><div><input aria-label="Название заседания" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Название"/><label>Общий регламент, мин.<input type="number" min="5" max="240" value={timeLimit} onChange={e=>setTimeLimit(Number(e.target.value)||60)}/></label><button disabled={busy} onClick={()=>void create()}>Создать</button></div></details>}
   </div>
 
   {selected&&<>
@@ -84,7 +78,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes}:{g:ReturnTyp
 
    <div className="govAgenda">
     {agenda.length===0?<div className="emptyState">В повестке пока нет государственных программ.</div>:agenda.map(i=>{const p=program(i.program_id),v=vote(i.vote_id);return <article className={'govAgendaItem '+i.status} key={i.id}><div className="govAgendaNo">{String(i.agenda_no).padStart(2,'0')}</div><div><small>{p?.responsible_ministry||'Ответственный исполнитель'}</small><h3>{p?.title||'Государственная программа'}</h3><p>Доклад: {i.report_minutes} мин. · ответственный министр: {name(p?.responsible_minister_id||null)}</p><div className="govAgendaTags"><span>{i.status==='pending'?'Ожидает':i.status==='presenting'?'Доклад':i.status==='decision'?'Решение Правительства':i.status==='completed'?'Рассмотрено':'Снято'}</span>{v&&<span className={v.status==='open'?'live':''}>{v.status==='open'?'● Голосование открыто':v.result_label||'Голосование закрыто'}</span>}</div>{i.result_note&&<blockquote>{i.result_note}</blockquote>}</div>
-     {canManage&&selected.status==='open'&&<div className="govAgendaActions">{i.status==='pending'&&<button disabled={busy||!!current} onClick={()=>void start(i.id)}>Начать доклад</button>}{i.status==='presenting'&&<button className="primary" disabled={busy} onClick={()=>void decision(i.id)}>Перейти к решению →</button>}{i.status==='decision'&&<button onClick={onOpenVotes}>Открыть голосование →</button>}</div>}
+     {canManage&&selected.status==='open'&&<div className="govAgendaActions">{i.status==='pending'&&<button disabled={busy||!!current} onClick={()=>void start(i.id)}>Начать доклад</button>}{i.status==='presenting'&&<button className="primary" disabled={busy} onClick={()=>void decision(i.id)}>Перейти к решению →</button>}{i.status==='decision'&&<button onClick={()=>onOpenVotes(i.vote_id||undefined)}>Открыть голосование →</button>}</div>}
     </article>})}
    </div>
 

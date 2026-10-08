@@ -1,6 +1,8 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
+import {stageRoleTitles} from './stageRoles';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type Session={id:string;game_id:string;session_no:number;title:string;scheduled_start:string|null;scheduled_end:string|null;status:'draft'|'open'|'closed';chair_user_id:string|null;created_at:string;opened_at:string|null;closed_at:string|null};
@@ -8,7 +10,7 @@ type AgendaItem={id:string;session_id:string;formal_document_id:string;agenda_no
 
 const statusLabel:Record<AgendaItem['status'],string>={pending:'Ожидает',in_progress:'Рассматривается',completed:'Рассмотрено',carried_over:'Перенесено',withdrawn:'Снято'};
 
-export default function LegislativeSessionLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:()=>void}){
+export default function LegislativeSessionLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes:(id?:string)=>void}){
  const {game,me,teacher,formalDocuments,votes,setError}=g;
  const [sessions,setSessions]=useState<Session[]>([]);
  const [agenda,setAgenda]=useState<AgendaItem[]>([]);
@@ -19,7 +21,7 @@ export default function LegislativeSessionLab({g,onOpenVotes}:{g:ReturnTypeRepub
  const [docId,setDocId]=useState('');
  const [note,setNote]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
- const role=(me?.role_title||'').toLowerCase();
+ const role=stageRoleTitles(g);
  const canManage=teacher||role.includes('председател')&&role.includes('дум')||role.includes('совет')&&role.includes('дум');
 
  async function load(){
@@ -28,21 +30,14 @@ export default function LegislativeSessionLab({g,onOpenVotes}:{g:ReturnTypeRepub
    supabase.from('duma_sessions').select('*').eq('game_id',game.id).order('session_no',{ascending:false}),
    supabase.from('duma_agenda_items').select('*').eq('game_id',game.id).order('agenda_no')
   ]);
+  const failure=[s,a].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
   if(!s.error){
    const rows=(s.data||[]) as Session[];setSessions(rows);
    if(!selectedId&&rows[0])setSelectedId(rows[0].id);
   }
   if(!a.error)setAgenda((a.data||[]) as AgendaItem[]);
  }
- useEffect(()=>{void load()},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('duma-sessions:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'duma_sessions',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'duma_agenda_items',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ useGameTableSync(game?.id,['duma_sessions','duma_agenda_items','formal_documents','game_votes','game_ballots','bill_committee_conclusions'],load,me?.user_id||'');
 
  if(!game||!me)return null;
  const activeGame=game;
@@ -56,7 +51,7 @@ export default function LegislativeSessionLab({g,onOpenVotes}:{g:ReturnTypeRepub
 
  async function create(){
   setBusy(true);
-  const r=await supabase.rpc('create_duma_session',{p_game_id:activeGame.id,p_title:title.trim()||'Заседание Государственной Думы',p_scheduled_start:start||null,p_scheduled_end:end||null});
+  const r=await supabase.rpc('create_duma_session',{p_game_id:activeGame.id,p_title:title.trim()||'Заседание Государственной Думы',p_scheduled_start:start?new Date(start).toISOString():null,p_scheduled_end:end?new Date(end).toISOString():null});
   if(r.error)setError(r.error.message);else{setTitle('');setStart('');setEnd('');if(r.data)setSelectedId(String(r.data));await load()}
   setBusy(false);
  }
@@ -83,7 +78,7 @@ export default function LegislativeSessionLab({g,onOpenVotes}:{g:ReturnTypeRepub
 
   <div className="legislativeSessionTabs">
    <div>{sessions.map(s=><button key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'идёт':s.status==='closed'?'закрыто':'проект'}</em></button>)}</div>
-   {canManage&&<details className="legislativeCreate"><summary>＋ Новое заседание</summary><div><input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Название"/><label>Начало<input type="datetime-local" value={start} onChange={e=>setStart(e.target.value)}/></label><label>Окончание<input type="datetime-local" value={end} onChange={e=>setEnd(e.target.value)}/></label><button disabled={busy} onClick={()=>void create()}>Создать</button></div></details>}
+   {canManage&&<details className="legislativeCreate"><summary>＋ Новое заседание</summary><div><input aria-label="Название заседания" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Название"/><label>Начало<input type="datetime-local" value={start} onChange={e=>setStart(e.target.value)}/></label><label>Окончание<input type="datetime-local" value={end} onChange={e=>setEnd(e.target.value)}/></label><button disabled={busy} onClick={()=>void create()}>Создать</button></div></details>}
   </div>
 
   {selected&&<>
@@ -104,7 +99,7 @@ export default function LegislativeSessionLab({g,onOpenVotes}:{g:ReturnTypeRepub
       {selected.status==='open'&&canManage&&<div className="agendaActions">
        {i.status==='pending'&&<button disabled={busy||!!current} onClick={()=>void setStatus(i.id,'in_progress')}>Начать вопрос</button>}
        {i.status==='in_progress'&&<><textarea rows={2} value={note[i.id]||''} onChange={e=>setNote(x=>({...x,[i.id]:e.target.value}))} placeholder="Итог рассмотрения / решение"/><button className="primary" disabled={busy} onClick={()=>void setStatus(i.id,'completed')}>Завершить вопрос</button><button disabled={busy} onClick={()=>void setStatus(i.id,'withdrawn')}>Снять</button></>}
-       {v&&<button onClick={onOpenVotes}>К голосованию →</button>}
+       {v&&<button onClick={()=>onOpenVotes(v.id)}>К голосованию →</button>}
       </div>}
      </article>
     })}

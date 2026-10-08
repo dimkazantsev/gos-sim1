@@ -1,6 +1,7 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type Project={id:string;game_id:string;team_name:string|null;district_key:string|null;problem_title:string;location_text:string;problem_description:string;legal_competence:string;proposed_solution:string;estimated_cost:number;expected_effect:string;status:'fieldwork'|'draft'|'submitted'|'vote_open'|'adopted'|'rejected';vote_id:string|null;created_by:string;created_at:string;updated_at:string;submitted_at:string|null};
@@ -31,6 +32,7 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
  const [files,setFiles]=useState<File[]>([]);
  const [evidenceNote,setEvidenceNote]=useState('');
  const [busy,setBusy]=useState(false);
+ const draftDirty=useRef(false),hydratedProject=useRef('');
 
  async function load(){
   if(!game)return;
@@ -40,6 +42,7 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
    supabase.from('municipal_project_evidence').select('*').eq('game_id',game.id).order('created_at'),
    supabase.from('municipal_districts').select('id,district_key,title').eq('game_id',game.id).order('title')
   ]);
+  const failure=[p,m,e,d].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
   if(!p.error){const rows=(p.data||[]) as Project[];setProjects(rows);if(!selectedId&&rows[0])setSelectedId(rows[0].id)}
   if(!m.error)setProjectMembers((m.data||[]) as ProjectMember[]);
   if(!d.error)setDistricts((d.data||[]) as District[]);
@@ -50,21 +53,13 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
    setUrls(next);
   }
  }
- useEffect(()=>{void load()},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('municipal-projects:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'municipal_projects',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'municipal_project_members',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'municipal_project_evidence',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'municipal_districts',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ useGameTableSync(game?.id,['municipal_projects','municipal_project_members','municipal_project_evidence','municipal_districts','game_votes'],load,me?.user_id||'');
 
  const selected=projects.find(p=>p.id===selectedId);
  useEffect(()=>{
   if(!selected)return;
+  if(hydratedProject.current===selected.id&&draftDirty.current)return;
+  hydratedProject.current=selected.id;draftDirty.current=false;
   setTeam(selected.team_name||'');setDistrictKey(selected.district_key||'');setProblem(selected.problem_title);setLocation(selected.location_text);setDescription(selected.problem_description);
   setCompetence(selected.legal_competence);setSolution(selected.proposed_solution);setCost(String(selected.estimated_cost));setEffect(selected.expected_effect);
  },[selected?.id,selected?.updated_at]);
@@ -86,7 +81,7 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
   if(problem.trim().length<5||location.trim().length<3||description.trim().length<20||competence.trim().length<10||solution.trim().length<20||effect.trim().length<10)return;
   setBusy(true);
   const r=await supabase.rpc('save_municipal_project',{p_game_id:activeGame.id,p_project_id:newProject?null:(selected?.id||null),p_team_name:team.trim()||null,p_problem_title:problem.trim(),p_location_text:location.trim(),p_problem_description:description.trim(),p_legal_competence:competence.trim(),p_proposed_solution:solution.trim(),p_estimated_cost:Number(cost)||0,p_expected_effect:effect.trim()});
-  if(r.error)setError(r.error.message);else{if(newProject&&r.data)setSelectedId(String(r.data));await load()}setBusy(false);
+  if(r.error)setError(r.error.message);else{draftDirty.current=false;if(newProject&&r.data)setSelectedId(String(r.data));await load()}setBusy(false);
  }
  async function setDistrict(){
   if(!selected||!districtKey)return;setBusy(true);const r=await supabase.rpc('set_municipal_project_district',{p_project_id:selected.id,p_district_key:districtKey});
@@ -109,7 +104,7 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
  async function submit(){if(!selected)return;setBusy(true);const r=await supabase.rpc('submit_municipal_project',{p_project_id:selected.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
  async function openVote(){if(!selected)return;setBusy(true);const r=await supabase.rpc('open_municipal_project_vote',{p_project_id:selected.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
 
- return <section className="municipalLab">
+ return <section className="municipalLab" onChangeCapture={()=>{draftDirty.current=true}}>
   <header className="municipalLabHead"><div><small>ПОЛЕВОЕ ИССЛЕДОВАНИЕ · ЭТАП 14</small><h2>Городская проектная мастерская</h2><p>Проект начинается не с решения, а с наблюдаемой проблемы. Зафиксируйте место и доказательства, покажите, почему вопрос относится к местному управлению, оцените стоимость и ожидаемый эффект — только после этого проект можно вынести на заседание.</p></div><div className="municipalSteps"><span><b>01</b>Наблюдение</span><span><b>02</b>Доказательства</span><span><b>03</b>Компетенция</span><span><b>04</b>Проект</span><span><b>05</b>Решение</span></div></header>
 
   <div className="municipalPicker"><div>{projects.map(p=><button key={p.id} className={p.id===selectedId?'active':''} onClick={()=>setSelectedId(p.id)}><b>{p.problem_title}</b><span>{p.location_text}</span><em>{statusLabel[p.status]}</em></button>)}</div><button onClick={()=>{setSelectedId('');setTeam('');setProblem('');setLocation('');setDescription('');setCompetence('');setSolution('');setCost('');setEffect('')}}>＋ Новый проект</button></div>

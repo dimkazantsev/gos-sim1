@@ -1,6 +1,7 @@
 'use client';
-import {useEffect,useMemo,useState} from 'react';
+import {useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {GAME_PHASES} from './stageSystem';
 
@@ -22,49 +23,44 @@ export default function SystemDebriefLab({g}:{g:ReturnTypeRepublic}){
  const [drafts,setDrafts]=useState<Record<string,Draft>>({});
  const [feedback,setFeedback]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
+ const dirtyPhases=useRef(new Set<string>());
 
  async function load(){
   if(!game)return;
   const r=await supabase.from('game_reflections').select('*').eq('game_id',game.id).order('updated_at',{ascending:false});
+  if(r.error){setError(r.error.message);return;}
   if(!r.error){
    const data=(r.data||[]) as Reflection[];setRows(data);
    const mine=data.filter(x=>x.user_id===me?.user_id);
    const next:Record<string,Draft>={};
-   for(const x of mine)next[x.phase_key]={decision:x.decision_memory,causal:x.causal_analysis,effectiveness:x.effectiveness,improvement:x.improvement};
+   for(const x of mine)if(!dirtyPhases.current.has(x.phase_key))next[x.phase_key]={decision:x.decision_memory,causal:x.causal_analysis,effectiveness:x.effectiveness,improvement:x.improvement};
    setDrafts(v=>({...v,...next}));
   }
  }
- useEffect(()=>{void load()},[game?.id,me?.user_id]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('game-reflections:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_reflections',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ useGameTableSync(game?.id,['game_reflections'],load,me?.user_id||'');
 
  if(!game||!me)return null;
  const activeGame=game;
  const myRows=rows.filter(x=>x.user_id===me.user_id);
  const phaseRow=(key:string)=>myRows.find(x=>x.phase_key===key);
  const d=(key:string)=>drafts[key]||{decision:'',causal:'',effectiveness:'',improvement:''};
- const setD=(key:string,field:keyof Draft,value:string)=>setDrafts(v=>({...v,[key]:{...(v[key]||{decision:'',causal:'',effectiveness:'',improvement:''}),[field]:value}}));
+ const setD=(key:string,field:keyof Draft,value:string)=>{dirtyPhases.current.add(key);setDrafts(v=>({...v,[key]:{...(v[key]||{decision:'',causal:'',effectiveness:'',improvement:''}),[field]:value}}))};
  const completedStages=stages.filter(s=>s.status==='completed').length;
  const changedMetrics=metricHistory.filter(x=>x.source_type!=='baseline').length;
  const acceptedAgreements=partyAgreements.filter(x=>['accepted','fulfilled'].includes(x.status)).length;
 
- const studentProgress=useMemo(()=>members.filter(m=>m.kind==='student').map(m=>{
+ const studentProgress=members.filter(m=>m.kind==='student').map(m=>{
   const rr=rows.filter(x=>x.user_id===m.user_id);
   return {m,submitted:rr.filter(x=>x.status==='submitted'||x.status==='reviewed').length,reviewed:rr.filter(x=>x.status==='reviewed').length};
- }).sort((a,b)=>b.submitted-a.submitted||a.m.full_name.localeCompare(b.m.full_name)),[members,rows]);
+ }).sort((a,b)=>b.submitted-a.submitted||a.m.full_name.localeCompare(b.m.full_name));
 
  async function save(key:string,submit:boolean){
   const x=d(key);setBusy(true);
   const r=await supabase.rpc('save_game_reflection',{p_game_id:activeGame.id,p_phase_key:key,p_decision_memory:x.decision,p_causal_analysis:x.causal,p_effectiveness:x.effectiveness,p_improvement:x.improvement,p_submit:submit});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(r.error.message);else{dirtyPhases.current.delete(key);await load()}setBusy(false);
  }
  async function review(id:string){
-  setBusy(true);const r=await supabase.rpc('review_game_reflection',{p_reflection_id:id,p_feedback:(feedback[id]||'').trim()||null});
+  setBusy(true);const r=await supabase.rpc('review_game_reflection',{p_reflection_id:id,p_feedback:(feedback[id]??rows.find(row=>row.id===id)?.teacher_feedback??'').trim()||null});
   if(r.error)setError(r.error.message);else await load();setBusy(false);
  }
 

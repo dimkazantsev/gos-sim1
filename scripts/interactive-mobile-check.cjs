@@ -1,8 +1,9 @@
 /* Exercise the REAL interactive React dock and impact inputs in Chromium/iOS-style touch mode.
    A temporary Next.js page is created only while this test runs and is deleted afterward. */
 const assert=require('node:assert/strict');
-const fs=require('node:fs'),path=require('node:path'),{spawn}=require('node:child_process');
+const fs=require('node:fs'),path=require('node:path');
 const {chromium}=require('playwright-core');
+const {startTestServer,closeTestBrowser,stopTestServer,cleanTestRoute}=require('./browser-test-runtime.cjs');
 const root=path.resolve(__dirname,'..');
 const route=path.join(root,'app','ui-interaction-test-route');
 const screens=path.join(root,'.design-review','screenshots');
@@ -59,7 +60,7 @@ export default function UiTest(){
 }
 `;
 let server,browser;
-const address='http://localhost:3998/ui-interaction-test-route';
+const address='http://127.0.0.1:3998/ui-interaction-test-route';
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 async function ready(){
  for(let n=0;n<45;n++){
@@ -90,10 +91,7 @@ async function checkUnits(page,width){
 async function main(){
  fs.mkdirSync(route,{recursive:true});
  fs.writeFileSync(path.join(route,'page.tsx'),pageSource);
- server=spawn(process.execPath,[require.resolve('next/dist/bin/next'),'dev','-p','3998'],{
-  cwd:root,stdio:['ignore','pipe','pipe'],
-  env:{...process.env,NEXT_PUBLIC_SUPABASE_URL:'https://example.supabase.co',NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:'placeholder'}
- });
+ server=startTestServer(root,3998,{NEXT_PUBLIC_SUPABASE_URL:'https://example.supabase.co',NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:'placeholder'});
  const lines=[];
  server.stdout.on('data',chunk=>{lines.push(String(chunk));if(lines.length>50)lines.shift()});
  server.stderr.on('data',chunk=>{lines.push(String(chunk));if(lines.length>50)lines.shift()});
@@ -288,12 +286,7 @@ async function main(){
  await touchContext.close();
 }finally{
  console.log('Next dev server output:',lines.join('').slice(-6000));
- if(browser)await browser.close();
- if(server){server.kill('SIGTERM');await sleep(1500)}
- fs.rmSync(route,{recursive:true,force:true});
- // Next dev generates route validators. The temporary route must leave no stale
- // validator behind or a later production build fails after the route is removed.
- fs.rmSync(path.join(root,'.next','dev','types'),{recursive:true,force:true});
+ try{await closeTestBrowser(browser)}finally{try{await stopTestServer(server)}finally{cleanTestRoute(root,route)}}
 }
 }
 main().catch(error=>{console.error(error);process.exitCode=1});

@@ -1,7 +1,8 @@
 'use client';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {ArrowRight,ChartNoAxesCombined,Coins,FileText,Landmark,List,Map as MapIcon,RefreshCw,Save,Search} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import catalog from '@/data/taxes-2026.json';
 import mapData from '@/data/region-paths.json';
@@ -25,6 +26,7 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  const [plans,setPlans]=useState<LegalPlan[]>([]),[programs,setPrograms]=useState<ApprovedProgram[]>([]);
  const [selected,setSelected]=useState('54'),[mode,setMode]=useState<'map'|'table'>('map'),[mapZoom,setMapZoom]=useState('all'),[search,setSearch]=useState(''),[sort,setSort]=useState('name'),[busy,setBusy]=useState(false),[ready,setReady]=useState(false),[canPropose,setCanPropose]=useState(false),[notice,setNotice]=useState('');
  const [taxKey,setTaxKey]=useState('corporate_property'),[rate,setRate]=useState('2.2'),[parameters,setParameters]=useState<Record<string,string>>({}),[cases,setCases]=useState<Case[]>([]),[act,setAct]=useState('');
+ const parameterDirty=useRef(false),hydratedRegion=useRef('');
  const region=regions.find(r=>r.region_code===selected),forecast=region?fiscalForecast(region,rates,undefined,context):null;
  const total=useMemo(()=>fiscalTotal(regions,rates,context),[regions,rates,context]);
  const tax=catalog.taxes.find(t=>t.key===taxKey)!;
@@ -37,9 +39,8 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
   if(r.error){g.setError(userError(r.error));return}
   if(r.data&&typeof r.data==='object'){setRegions(r.data.regions||[]);setRates(r.data.rates||[]);setProposals(r.data.proposals||[]);setLedger(r.data.ledger||[]);setCanPropose(!!r.data.can_propose);}setReady(true);
  }
- useEffect(()=>{void load();if(!g.game)return;const id=setInterval(()=>void load(),20000);return()=>clearInterval(id)},[g.game?.id,g.me?.user_id]);
- useEffect(()=>{if(!g.game)return;let pending:ReturnType<typeof setTimeout>|undefined;const update=()=>{clearTimeout(pending);pending=setTimeout(()=>void load(),160)};let channel=supabase.channel('fiscal-live:'+g.game.id);for(const table of ['game_fiscal_policy','game_fiscal_regions','game_fiscal_rates','fiscal_rate_proposals','fiscal_change_ledger','state_metrics','budget_scenarios','budget_program_allocations'])channel=channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+g.game.id},update);channel.subscribe();return()=>{clearTimeout(pending);void supabase.removeChannel(channel)}},[g.game?.id,g.me?.user_id]);
- useEffect(()=>{if(!region)return;setParameters(Object.fromEntries(['enterprises','employees_per_firm','monthly_wage','profit_per_firm','consumption_per_firm','expenditure','transfer_in','debt','compliance'].map(k=>[k,String(region[k as keyof FiscalRegion])])));},[region?.region_code,region?.enterprises,region?.expenditure,region?.monthly_wage]);
+ useGameTableSync(g.game?.id,['game_fiscal_policy','game_fiscal_regions','game_fiscal_rates','fiscal_rate_proposals','fiscal_change_ledger','state_metrics','budget_scenarios','budget_program_allocations','federal_budget_plans','state_programs'],load,g.me?.user_id||'');
+ useEffect(()=>{if(!region)return;if(hydratedRegion.current===region.region_code&&parameterDirty.current)return;hydratedRegion.current=region.region_code;parameterDirty.current=false;setParameters(Object.fromEntries(['enterprises','employees_per_firm','monthly_wage','profit_per_firm','consumption_per_firm','expenditure','transfer_in','debt','compliance'].map(k=>[k,String(region[k as keyof FiscalRegion])])));},[region]);
  // A refresh returning the same policy must not erase an unfinished proposal.
  useEffect(()=>{setRate(String(appliedRate))},[taxKey,selected,appliedRate,g.game?.id]);
  async function propose(){
@@ -51,7 +52,7 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
   if(!g.game||readOnly||!g.teacher||busy)return;
   const values=Object.fromEntries(Object.entries(parameters).map(([k,v])=>[k,Number(v)]));if(Object.values(values).some(v=>!Number.isFinite(v))){setNotice('Заполните числовые параметры.');return}
   setBusy(true);const r=await supabase.rpc('set_fiscal_parameters',{p_game_id:g.game.id,p_region:selected,p_values:values});setBusy(false);
-  if(r.error)g.setError(userError(r.error));else{setNotice('Параметры сценария сохранены для всей группы.');await load()}
+  if(r.error)g.setError(userError(r.error));else{parameterDirty.current=false;setNotice('Параметры сценария сохранены для всей группы.');await load()}
  }
  async function apply(id:string){
   if(readOnly||busy||!g.teacher)return;setBusy(true);const r=await supabase.rpc('apply_fiscal_rate_proposal',{p_proposal:id,p_document:act||null});setBusy(false);
@@ -102,7 +103,7 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  {proposals.filter(p=>p.region_code===selected||p.region_code==='00').slice(0,12).map(p=><article className="budgetProposal" key={p.id}><div><b>{catalog.taxes.find(t=>t.key===p.tax_key)?.label}: {quantity(p.new_rate,catalog.taxes.find(t=>t.key===p.tax_key)?.unit||'%')}</b><span>{p.status==='applied'?'Введена актом':'Ожидает принятия акта'}</span></div>{p.document_id&&<button type="button" onClick={()=>onOpenDocument(p.document_id!)}>Проект НПА</button>}{g.teacher&&p.status==='pending'&&!readOnly&&<button type="button" disabled={busy} onClick={()=>void apply(p.id)}>Проверить и применить</button>}</article>)}
  {g.teacher&&!readOnly&&<StyledSelect label="Опубликованный акт для подтверждения меры" value={act} onChange={setAct} options={[{value:'',label:'Использовать связанный акт'},...g.formalDocuments.filter(d=>d.status_code==='published').map(d=>({value:d.id,label:d.registry_no+' · '+d.title}))]}/>}
  </section>}
- {g.teacher&&region&&!readOnly&&<details className="surface budgetParameters"><summary>Параметры экономического сценария · преподаватель</summary><p>Только эти параметры определяют экономическую и финансовую основу; студенты изменяют налоговую политику через предложения.</p><div>{Object.entries(parameters).map(([key,v])=><label key={key}>{({enterprises:'Предприятия, шт.',employees_per_firm:'Работников на предприятие',monthly_wage:'Зарплата, ₽/месяц',profit_per_firm:'Прибыль на предприятие, млн ₽',consumption_per_firm:'Облагаемая добавленная стоимость, млн ₽',expenditure:'Обязательства, млн ₽',transfer_in:'Трансферты, млн ₽',debt:'Исходный долг, млн ₽',compliance:'Собираемость, 0–1'} as Record<string,string>)[key]}<input type="number" step="any" min="0" value={v} onChange={e=>setParameters(old=>({...old,[key]:e.target.value}))}/></label>)}</div><button type="button" className="primary" disabled={busy} onClick={()=>void saveParameters()}><Save size={18}/> Сохранить параметры</button></details>}
+ {g.teacher&&region&&!readOnly&&<details className="surface budgetParameters"><summary>Параметры экономического сценария · преподаватель</summary><p>Только эти параметры определяют экономическую и финансовую основу; студенты изменяют налоговую политику через предложения.</p><div>{Object.entries(parameters).map(([key,v])=><label key={key}>{({enterprises:'Предприятия, шт.',employees_per_firm:'Работников на предприятие',monthly_wage:'Зарплата, ₽/месяц',profit_per_firm:'Прибыль на предприятие, млн ₽',consumption_per_firm:'Облагаемая добавленная стоимость, млн ₽',expenditure:'Обязательства, млн ₽',transfer_in:'Трансферты, млн ₽',debt:'Исходный долг, млн ₽',compliance:'Собираемость, 0–1'} as Record<string,string>)[key]}<input type="number" step="any" min="0" value={v} onChange={e=>{parameterDirty.current=true;setParameters(old=>({...old,[key]:e.target.value}))}}/></label>)}</div><button type="button" className="primary" disabled={busy} onClick={()=>void saveParameters()}><Save size={18}/> Сохранить параметры</button></details>}
  <section className="surface budgetChangeLog"><h2>Движение бюджета</h2>{ledger.length?ledger.map(x=><article key={x.id}><time>{new Date(x.created_at).toLocaleString('ru-RU')}</time><div><b>{x.note}</b><span>{regions.find(r=>r.region_code===x.region_code)?.name||'Федеральный уровень'}</span></div></article>):<p>Налоговые меры, изменения сценария и исходы кейсов будут записаны здесь с источником.</p>}</section>
  </>}
  {notice&&<p className="budgetNotice" role="status">{notice}</p>}
