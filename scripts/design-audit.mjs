@@ -144,7 +144,7 @@ const closeFiles=[
  'components/game/MediaUploadButton.tsx',
  'components/game/PartiesView.tsx',
  'components/game/PresidentialElectionLab.tsx',
- 'components/game/StateProgramLab.tsx',
+ 'components/game/StateProgramEditor.tsx',
  'components/game/InstitutionStaffingLab.tsx',
  'components/game/MunicipalGovernancePanel.tsx'
 ];

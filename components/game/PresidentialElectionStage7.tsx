@@ -1,4 +1,5 @@
 'use client';
+import PresidentialRulesCalculator from './PresidentialRulesCalculator';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useGameTableSync} from './useGameTableSync';
 import {BarChart3,Check,Copy,ExternalLink,FileUp,Landmark,Send,Share2,Vote,X} from 'lucide-react';
@@ -16,12 +17,12 @@ type PublicPoll={id:string;game_id:string;round_no:number;slug:string;title:stri
 type Settings={game_id:string;system_type:'relative'|'absolute'|'qualified'|'preferential';threshold_pct:number;poll_enabled:boolean;status:'setup'|'round1'|'runoff'|'finished'|'manual_required';result:Record<string,any>};
 type Score={candidate_id:string;round_no:1|2;teacher_program_pct:number|null;teacher_campaign_pct:number|null;game_rating_pct:number|null;poll_pct:number|null;teacher_runoff_pct:number|null;computed_pct:number|null};
 type Inauguration={game_id:string;scheduled_at:string|null;venue:string|null;notes:string|null;hymn_path:string|null;ceremonial_music_path:string|null;updated_at:string};
-type ScoreDraft={program:string;campaign:string;rating:string;poll:string;runoff:string};
-type JuryScore={candidate_id:string;slot_no:number;criterion:'program'|'campaign';score:number};
+
+
 
 const MATERIAL_LABELS:Record<string,string>={poster:'Плакат',leaflet:'Листовка',video:'Видео',audio:'Аудио',news:'Новость',other:'Другое'};
 const SYSTEM_NAMES={relative:'Относительное большинство',absolute:'Абсолютное большинство',qualified:'Квалифицированное большинство',preferential:'Преференциальная система'} as const;
-const emptyScore=():ScoreDraft=>({program:'',campaign:'',rating:'',poll:'',runoff:''});
+
 
 export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,parties,setError}=g;
@@ -34,7 +35,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const [publicPolls,setPublicPolls]=useState<PublicPoll[]>([]);
  const [settings,setSettings]=useState<Settings|null>(null);
  const [scores,setScores]=useState<Score[]>([]);
- const [juryScores,setJuryScores]=useState<JuryScore[]>([]);
+ 
  const [inauguration,setInauguration]=useState<Inauguration|null>(null);
  const [photoUrls,setPhotoUrls]=useState<Record<string,string>>({});
  const [audioUrls,setAudioUrls]=useState<Record<string,string>>({});
@@ -56,21 +57,21 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const [reviewPenalties,setReviewPenalties]=useState<Record<string,string>>({});
  const [reviewPenaltyReasons,setReviewPenaltyReasons]=useState<Record<string,string>>({});
  const [pollClose,setPollClose]=useState('');
- const [scoreDrafts,setScoreDrafts]=useState<Record<string,ScoreDraft>>({});
+ 
  const [ceremonyAt,setCeremonyAt]=useState('');
  const [venue,setVenue]=useState('');
  const [ceremonyNotes,setCeremonyNotes]=useState('');
  const [hymnFile,setHymnFile]=useState<File|null>(null);
  const [musicFile,setMusicFile]=useState<File|null>(null);
- const [juryDrafts,setJuryDrafts]=useState<Record<string,string>>({});
+ 
  const viewScope=JSON.stringify([gameId,me?.user_id,me?.kind,teacher]);
- const scope=useRef(viewScope),request=useRef(0),alive=useRef(true),scoreDirty=useRef(new Map<string,number>()),juryDirty=useRef(new Map<string,number>()),ceremonyDirty=useRef(false);
+ const scope=useRef(viewScope),request=useRef(0),alive=useRef(true),ceremonyDirty=useRef(false);
  scope.current=viewScope;
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{
-  request.current++;scoreDirty.current.clear();juryDirty.current.clear();ceremonyDirty.current=false;
-  setCandidates([]);setMaterials([]);setDecision(null);setDecisionVotes([]);setPublicPolls([]);setSettings(null);setScores([]);setJuryScores([]);setInauguration(null);setPhotoUrls({});setAudioUrls({});
-  setCandidateId('');setScoreDrafts({});setJuryDrafts({});setCeremonyAt('');setVenue('');setCeremonyNotes('');setHymnFile(null);setMusicFile(null);setBusy(false);setNotice('');
+  request.current++;ceremonyDirty.current=false;
+  setCandidates([]);setMaterials([]);setDecision(null);setDecisionVotes([]);setPublicPolls([]);setSettings(null);setScores([]);setInauguration(null);setPhotoUrls({});setAudioUrls({});
+  setCandidateId('');setCeremonyAt('');setVenue('');setCeremonyNotes('');setHymnFile(null);setMusicFile(null);setBusy(false);setNotice('');
   setTitle('');setBody('');setPrintRun('');setPublisher('');setProductionDate('');setImprint('');setExternalUrl('');setFiles([]);
   setMaterialType('poster');setPollClose('');setReviewNotes({});setReviewErrors({});setReviewResponses({});setReviewPenalties({});setReviewPenaltyReasons({});
  },[viewScope]);
@@ -85,12 +86,12 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const myDecisionVote=decisionVotes.find(v=>v.user_id===me?.user_id)?.choice;
  const yesVotes=decisionVotes.filter(v=>v.choice).length,noVotes=decisionVotes.length-yesVotes;
  const activeRound=settings?.status==='runoff'?2:1;
- const publicPoll=publicPolls.find(p=>p.round_no===activeRound)||publicPolls.find(p=>p.round_no===1)||null;
+ const publicPoll=publicPolls.find(p=>p.round_no===1)||null;
  const resultRows=useMemo(()=>registered.map(c=>({
   candidate:c,
-  score:scores.find(s=>s.candidate_id===c.id&&s.round_no===(settings?.status==='runoff'?2:1))?.computed_pct??scores.find(s=>s.candidate_id===c.id&&s.round_no===1)?.computed_pct??null,
+  score:scores.find(s=>s.candidate_id===c.id&&s.round_no===(settings?.status==='runoff'||settings?.result?.round===2?2:1))?.computed_pct??scores.find(s=>s.candidate_id===c.id&&s.round_no===1)?.computed_pct??null,
   poll:scores.find(s=>s.candidate_id===c.id&&s.round_no===1)?.poll_pct??null
- })).sort((a,b)=>Number(b.score??-1)-Number(a.score??-1)),[registered,scores,settings?.status]);
+ })).sort((a,b)=>Number(b.score??-1)-Number(a.score??-1)),[registered,scores,settings?.status,settings?.result?.round]);
 
  async function signed(path:string|null){
   if(!path)return '';
@@ -101,7 +102,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   if(!gameId)return;
   const version=++request.current,current=()=>activeScope()&&version===request.current;
   try{
-  const [cr,mr,dr,dvr,pr,sr,sc,ir,jr]=await Promise.all([
+  const [cr,mr,dr,dvr,pr,sr,sc,ir]=await Promise.all([
    supabase.from('presidential_candidates').select('id,user_id,party_id,created_by,display_name,registration_status,photo_path,program_summary,campaign_statement,rating_penalty').eq('game_id',gameId).is('archived_at',null).order('display_name'),
    supabase.from('presidential_campaign_materials').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
    supabase.from('presidential_poll_decision').select('*').eq('game_id',gameId).maybeSingle(),
@@ -109,11 +110,10 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    supabase.from('presidential_public_polls').select('*').eq('game_id',gameId).order('round_no'),
    supabase.from('presidential_election_settings').select('*').eq('game_id',gameId).maybeSingle(),
    supabase.from('presidential_scorecards').select('*').eq('game_id',gameId),
-   supabase.from('presidential_inauguration').select('*').eq('game_id',gameId).maybeSingle(),
-   supabase.from('presidential_teacher_jury_scores').select('candidate_id,slot_no,criterion,score').eq('game_id',gameId)
+   supabase.from('presidential_inauguration').select('*').eq('game_id',gameId).maybeSingle()
   ]);
   if(!current())return;
-  const failure=[cr,mr,dr,dvr,pr,sr,sc,ir,jr].find(result=>result.error);if(failure?.error)throw failure.error;
+  const failure=[cr,mr,dr,dvr,pr,sr,sc,ir].find(result=>result.error);if(failure?.error)throw failure.error;
   const rows=(cr.data||[]) as Candidate[],scoreRows=(sc.data||[]) as Score[],ceremony=ir.data as Inauguration|null;
   const [pairs,hymn,music]=await Promise.all([
    Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,await signed(x.photo_path)] as const)),
@@ -124,44 +124,34 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   const preferred=rows.find(x=>x.registration_status==='registered'&&canManage(x));
   setCandidateId(previous=>rows.some(x=>x.id===previous&&x.registration_status==='registered'&&canManage(x))?previous:preferred?.id||'');
   setMaterials((mr.data||[]) as Material[]);setDecision(dr.data as PollDecision|null);setDecisionVotes((dvr.data||[]) as PollDecisionVote[]);setPublicPolls((pr.data||[]) as PublicPoll[]);setSettings(sr.data as Settings|null);
-  setScores(scoreRows);setJuryScores((jr.data||[]) as JuryScore[]);
-  setScoreDrafts(previous=>{
-   const next={...previous};
-   for(const x of scoreRows){const key=x.candidate_id+'-'+x.round_no;if(!scoreDirty.current.has(key))next[key]={program:String(x.teacher_program_pct??''),campaign:String(x.teacher_campaign_pct??''),rating:String(x.game_rating_pct??''),poll:String(x.poll_pct??''),runoff:String(x.teacher_runoff_pct??'')}}
-   return next;
-  });
+  setScores(scoreRows);
+  
   setInauguration(ceremony);setAudioUrls({hymn,music});
   if(!ceremonyDirty.current){setCeremonyAt(ceremony?.scheduled_at?new Date(ceremony.scheduled_at).toISOString().slice(0,16):'');setVenue(ceremony?.venue||'');setCeremonyNotes(ceremony?.notes||'')}
   }catch(error){if(current())setError(error)}
  }
- useGameTableSync(gameId,['presidential_candidates','presidential_campaign_materials','presidential_poll_decision','presidential_poll_decision_votes','presidential_public_polls','presidential_scorecards','presidential_election_settings','presidential_inauguration','presidential_teacher_jury_scores','game_parties'],load,viewScope);
+ useGameTableSync(gameId,['presidential_candidates','presidential_campaign_materials','presidential_poll_decision','presidential_poll_decision_votes','presidential_public_polls','presidential_scorecards','presidential_election_settings','presidential_inauguration','game_parties'],load,viewScope);
 
  if(!game||!me)return null;
  const baseUrl=typeof window!=='undefined'?window.location.origin:'';
  const assetBase=(process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'').replace(/\/$/,'');
  const pollUrl=publicPoll?baseUrl+assetBase+'/poll?slug='+encodeURIComponent(publicPoll.slug):'';
- const pollCanOpen=decision?.status==='closed'&&decision.result===true&&settings?.poll_enabled!==false;
- const roundScore=(id:string,round:1|2)=>scores.find(s=>s.candidate_id===id&&s.round_no===round);
- const draft=(id:string,round:1|2)=>scoreDrafts[id+'-'+round]||emptyScore();
- const setDraft=(id:string,round:1|2,key:keyof ScoreDraft,value:string)=>{const row=id+'-'+round;scoreDirty.current.set(row,(scoreDirty.current.get(row)||0)+1);setScoreDrafts(v=>({...v,[row]:{...emptyScore(),...(v[row]||{}),[key]:value}}))};
- const juryKey=(id:string,slot:number,criterion:'program'|'campaign')=>id+'-'+slot+'-'+criterion;
- const setJuryDraft=(id:string,slot:number,criterion:'program'|'campaign',value:string)=>{const key=juryKey(id,slot,criterion);juryDirty.current.set(key,(juryDirty.current.get(key)||0)+1);setJuryDrafts(previous=>({...previous,[key]:value}))};
- const num=(x:string)=>x.trim()===''?null:Number(x);
- const juryScore=(candidateId:string,slot:number,criterion:'program'|'campaign')=>juryScores.find(x=>x.candidate_id===candidateId&&x.slot_no===slot&&x.criterion===criterion)?.score;
- const juryAverage=(candidateId:string,criterion:'program'|'campaign')=>{
-  const rows=juryScores.filter(x=>x.candidate_id===candidateId&&x.criterion===criterion);
-  return rows.length?rows.reduce((sum,x)=>sum+Number(x.score),0)/rows.length:null;
- };
- const juryCount=(candidateId:string,criterion:'program'|'campaign')=>juryScores.filter(x=>x.candidate_id===candidateId&&x.criterion===criterion).length;
- const formulaParts=settings?.poll_enabled===false?3:4;
- const formulaWeight=(100/formulaParts).toFixed(1);
- const round1DraftComplete=(id:string)=>{
-  const d=draft(id,1);
-  return juryAverage(id,'program')!=null&&juryAverage(id,'campaign')!=null&&d.rating.trim()!==''&&(settings?.poll_enabled===false||d.poll.trim()!=='');
- };
- const round1Ready=!!settings&&registered.length>0&&registered.every(c=>roundScore(c.id,1)?.computed_pct!=null);
- const runoffIds=Array.isArray(settings?.result?.candidate_ids)?settings.result.candidate_ids as string[]:[];
- const round2Ready=settings?.status==='runoff'&&runoffIds.length>0&&runoffIds.every(id=>roundScore(id,2)?.computed_pct!=null);
+ const pollCanOpen=activeRound===1&&['setup','round1'].includes(settings?.status||'')&&decision?.status==='closed'&&decision.result===true&&settings?.poll_enabled!==false;
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 
  async function submitMaterial(){
   if(!selectedCandidate||busy||title.trim().length<3||body.trim().length<3)return;
@@ -215,30 +205,9 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  async function closePublicPoll(){if(!publicPoll)return;setBusy(true);const r=await supabase.rpc('close_presidential_public_poll',{p_game_id:gameId,p_round_no:publicPoll.round_no});if(r.error)setError(r.error.message);else{setNotice('Опрос закрыт; его проценты перенесены в калькулятор выборов.');await load()}setBusy(false)}
  async function copyPoll(){if(!pollUrl)return;await navigator.clipboard.writeText(pollUrl);setNotice('Ссылка на опрос скопирована.')}
  function share(service:'vk'|'tg'){if(!pollUrl)return;const u=encodeURIComponent(pollUrl),t=encodeURIComponent('Социологический опрос: выборы Президента РФ');window.open(service==='vk'?'https://vk.com/share.php?url='+u+'&title='+t:'https://t.me/share/url?url='+u+'&text='+t,'_blank','noopener,noreferrer')}
- async function saveJuryScore(candidateId:string,slot:number,criterion:'program'|'campaign',value:string){
-  const key=juryKey(candidateId,slot,criterion),version=juryDirty.current.get(key);
-  const score=value.trim()===''?null:Math.max(0,Math.min(100,Number(value)));
-  setBusy(true);
-  try{
-   const r=await supabase.rpc('set_presidential_teacher_jury_score',{p_game_id:gameId,p_candidate_id:candidateId,p_slot_no:slot,p_criterion:criterion,p_score:Number.isFinite(score as number)?score:null});
-   if(!activeScope())return;
-   if(r.error)setError(r.error.message);else{
-    if(juryDirty.current.get(key)===version){juryDirty.current.delete(key);setJuryDrafts(previous=>{const next={...previous};delete next[key];return next})}
-    await load();
-   }
-  }catch(error){if(activeScope())setError(error)}
-  finally{if(activeScope())setBusy(false)}
- }
- async function saveScore(id:string,round:1|2){
-  const key=id+'-'+round,version=scoreDirty.current.get(key),d=draft(id,round);setBusy(true);
-  try{
-   const r=await supabase.rpc('set_presidential_scorecard',{p_candidate_id:id,p_round_no:round,p_teacher_program_pct:null,p_teacher_campaign_pct:null,p_game_rating_pct:round===1?num(d.rating):null,p_poll_pct:round===1&&settings?.poll_enabled!==false?num(d.poll):null,p_teacher_runoff_pct:round===2?num(d.runoff):null});
-   if(!activeScope())return;
-   if(r.error)setError(r.error.message);else{if(scoreDirty.current.get(key)===version)scoreDirty.current.delete(key);await load()}
-  }catch(error){if(activeScope())setError(error)}
-  finally{if(activeScope())setBusy(false)}
- }
- async function finishRound(round:1|2){setBusy(true);const r=await supabase.rpc('finalize_presidential_round',{p_game_id:gameId,p_round_no:round});if(r.error)setError(r.error.message);else{setTab('results');await load()}setBusy(false)}
+ 
+ 
+ 
  async function uploadAudio(file:File,kind:'hymn'|'music'){const path=gameId+'/presidential/inauguration/'+kind+'-'+crypto.randomUUID()+'.'+(file.name.split('.').pop()||'audio');const r=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'audio/mpeg'});if(r.error)throw r.error;return path}
  async function saveCeremony(){
   setBusy(true);try{
@@ -291,7 +260,8 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    </section>
   </div>}
 
-  {tab==='poll'&&<div className="stage7Grid pollGrid">
+  {tab==='poll'&&activeRound===2&&<div className="stage7Empty">Во втором туре проводится новое голосование преподавателей. Внесите его во вкладке итогов ЦИК; публичный соцопрос в формулу второго тура не входит.</div>}
+  {tab==='poll'&&activeRound===1&&<div className="stage7Grid pollGrid">
    <section className="stage7Panel"><div className="stage7PanelHead"><div><small>РЕШЕНИЕ УЧАСТНИКОВ</small><h3>Нужен ли социологический опрос?</h3><p>Сначала студенты голосуют «за» или «против». После закрытия определяется, входит ли опрос в формулу выборов.</p></div><Vote size={24}/></div>
     {!decision&&teacher&&<button className="primary stage7MainAction" disabled={busy} onClick={()=>void openPollDecision()}>Открыть голосование студентов</button>}
     {decision&&<div className="pollDecision"><div className="pollDecisionStatus"><b>{decision.status==='open'?'Голосование открыто':decision.result?'Опрос включён в модель':'Опрос исключён из модели'}</b><span>За — {yesVotes} · Против — {noVotes}</span></div><div className="pollDecisionBar"><i style={{width:(decisionVotes.length?yesVotes/decisionVotes.length*100:50)+'%'}}/></div>{decision.status==='open'&&isStudent&&<div className="pollChoice"><button className={myDecisionVote===true?'active yes':''} disabled={busy} onClick={()=>void votePollDecision(true)}>За соцопрос</button><button className={myDecisionVote===false?'active no':''} disabled={busy} onClick={()=>void votePollDecision(false)}>Против соцопроса</button></div>}{decision.status==='open'&&teacher&&<button className="secondary stage7MainAction" disabled={busy} onClick={()=>void closePollDecision()}>Закрыть голосование и зафиксировать решение</button>}</div>}
@@ -299,28 +269,12 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    <section className="stage7Panel"><div className="stage7PanelHead"><div><small>ПУБЛИЧНЫЙ ОПРОС</small><h3>Опрос избирателей</h3><p>Открытая форма доступна по внешней ссылке без входа в игру.</p></div><Share2 size={24}/></div>
     {!pollCanOpen&&<div className="stage7Empty">{decision?.status==='open'?'Сначала завершите голосование студентов.':decision?.result===false?'Студенты решили не использовать соцопрос в формуле выборов.':'Решение о соцопросе ещё не принято.'}</div>}
     {pollCanOpen&&!publicPoll&&teacher&&<div className="pollCreate"><label>Закрыть опрос<input type="datetime-local" value={pollClose} onChange={e=>setPollClose(e.target.value)}/></label><button className="primary" disabled={busy} onClick={()=>void createPublicPoll()}>Создать публичный опрос</button></div>}
-    {publicPoll&&<div className="publicPollControl"><div className="pollLink"><input readOnly value={pollUrl}/><button className="secondary" onClick={()=>void copyPoll()}><Copy size={16}/>Копировать</button></div><div className="pollShareButtons"><button onClick={()=>share('vk')}>VK</button><button onClick={()=>share('tg')}>Telegram</button><a href={pollUrl} target="_blank" rel="noreferrer">Открыть <ExternalLink size={14}/></a></div><p>Статус: <b>{publicPoll.status==='open'?'открыт':'закрыт'}</b>{publicPoll.closes_at?' · до '+new Date(publicPoll.closes_at).toLocaleString('ru-RU'):''}</p>{teacher&&publicPoll.status==='open'&&<button className="secondary stage7MainAction" disabled={busy} onClick={()=>void closePublicPoll()}>Закрыть опрос и перенести проценты в калькулятор</button>}</div>}
+    {publicPoll&&<div className="publicPollControl"><div className="pollLink"><input readOnly value={pollUrl}/><button className="secondary" onClick={()=>void copyPoll()}><Copy size={16}/>Копировать</button></div><div className="pollShareButtons"><button onClick={()=>share('vk')}>VK</button><button onClick={()=>share('tg')}>Telegram</button><a href={pollUrl} target="_blank" rel="noreferrer">Открыть <ExternalLink size={14}/></a></div><p>Статус: <b>{publicPoll.status==='open'?'открыт':'закрыт'}</b>{publicPoll.closes_at?' · до '+new Date(publicPoll.closes_at).toLocaleString('ru-RU'):''}</p>{teacher&&pollCanOpen&&publicPoll.status==='open'&&<button className="secondary stage7MainAction" disabled={busy} onClick={()=>void closePublicPoll()}>Закрыть опрос и перенести проценты в калькулятор</button>}</div>}
    </section>
   </div>}
 
   {tab==='results'&&<div className="stage7Results">
-    <section className="stage7Panel electionCalculator">
-     <div className="stage7PanelHead"><div><small>КАЛЬКУЛЯТОР ЦИК · ТОЛЬКО ПРЕПОДАВАТЕЛЬ</small><h3>Расчёт результата по утверждённой системе</h3><p>Система выборов берётся из решения Государственной Думы на 6-м этапе. Студенты калькулятор не видят.</p></div><BarChart3 size={24}/></div>
-     <div className="electionSystemStrip"><span>Система</span><b>{settings?SYSTEM_NAMES[settings.system_type]:'Не определена'}</b>{settings?.system_type==='qualified'&&<em>Порог {settings.threshold_pct}%</em>}<em>{settings?.poll_enabled===false?'Соцопрос исключён':'Соцопрос учитывается'}</em></div>
-     {teacher?<div className="calculatorForm">
-      <section className="calculatorFormula"><div><small>ФОРМУЛА 1 ТУРА</small><strong>{settings?'Среднее арифметическое компонентов':'Ожидает решения Государственной Думы'}</strong><p>{settings?'«Программа» и «Агитация» — средняя оценка среди преподавателей, которые фактически проголосовали (до 8 человек). Пустые слоты в знаменатель не входят. Штрафы ЦИК и партийный модификатор применяются автоматически.':'Форма показана заранее, но ввод и расчёт заблокированы до синхронизации системы выборов с 6-го этапа.'}</p></div><div className="formulaWeights"><span><b>{formulaWeight}%</b>Программа</span><span><b>{formulaWeight}%</b>Агитация</span><span><b>{formulaWeight}%</b>Рейтинг игры</span>{settings?.poll_enabled!==false&&<span><b>{formulaWeight}%</b>Соцопрос</span>}</div></section>
-      {registered.length?<div className="scoreTable">{registered.map(c=>{const d1=draft(c.id,1),d2=draft(c.id,2),s1=roundScore(c.id,1),s2=roundScore(c.id,2),runoff=runoffIds.includes(c.id);return <article key={c.id} className="scoreCandidate scoreCandidateCard">
-       <header className="scoreCandidateHeader"><div className="scoreCandidateIdentity">{photoUrls[c.id]?<img src={photoUrls[c.id]} alt={c.display_name}/>:<span>{c.display_name.slice(0,1)}</span>}<div><b>{c.display_name}</b><small>{parties.find(p=>p.id===c.party_id)?.name||'Самовыдвижение'}</small></div></div><div className="candidatePenaltyBadge"><small>ШТРАФ ЦИК</small><strong>−{Number(c.rating_penalty||0).toFixed(2)} п.</strong></div></header>
-       <div className="juryCriteriaRow">
-        <div className="juryCriterion"><div className="juryCriterionHead"><small>Программа</small><strong>{juryAverage(c.id,'program')!=null?juryAverage(c.id,'program')!.toFixed(2)+'%':'—'}</strong><em>{juryCount(c.id,'program')}/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'p-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" min="0" max="100" placeholder="—" disabled={!settings||busy} value={juryDrafts[juryKey(c.id,slot,'program')]??juryScore(c.id,slot,'program')??''} onChange={e=>setJuryDraft(c.id,slot,'program',e.target.value)} onBlur={e=>void saveJuryScore(c.id,slot,'program',e.target.value)}/></label>)}</div></div>
-        <div className="juryCriterion"><div className="juryCriterionHead"><small>Агитация</small><strong>{juryAverage(c.id,'campaign')!=null?juryAverage(c.id,'campaign')!.toFixed(2)+'%':'—'}</strong><em>{juryCount(c.id,'campaign')}/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'c-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" min="0" max="100" placeholder="—" disabled={!settings||busy} value={juryDrafts[juryKey(c.id,slot,'campaign')]??juryScore(c.id,slot,'campaign')??''} onChange={e=>setJuryDraft(c.id,slot,'campaign',e.target.value)} onBlur={e=>void saveJuryScore(c.id,slot,'campaign',e.target.value)}/></label>)}</div></div>
-       </div>
-       <div className="scoreMetricsRow"><label><small>Рейтинг игры</small><input type="number" min="0" max="100" placeholder="0–100" disabled={!settings||busy} value={d1.rating} onChange={e=>setDraft(c.id,1,'rating',e.target.value)}/></label>{settings?.poll_enabled!==false&&<label><small>Соцопрос</small><input type="number" min="0" max="100" placeholder="0–100" disabled={!settings||busy} value={d1.poll} onChange={e=>setDraft(c.id,1,'poll',e.target.value)}/></label>}<div className="scoreComputed"><small>Итог</small><strong>{s1?.computed_pct!=null?Number(s1.computed_pct).toFixed(2)+'%':'—'}</strong></div><button className="secondary scoreCalculateButton" disabled={busy||!settings||!round1DraftComplete(c.id)} onClick={()=>void saveScore(c.id,1)}>Рассчитать</button></div>
-       {settings?.status==='runoff'&&runoff&&<div className="runoffInput"><label>Повторное голосование ППС<input type="number" min="0" max="100" placeholder="0–100" disabled={busy} value={d2.runoff} onChange={e=>setDraft(c.id,2,'runoff',e.target.value)}/></label><div className="scoreComputed"><small>Итог 2 тура</small><strong>{s2?.computed_pct!=null?Number(s2.computed_pct).toFixed(2)+'%':'—'}</strong></div><button className="secondary" disabled={busy||d2.runoff.trim()===''} onClick={()=>void saveScore(c.id,2)}>Рассчитать 2 тур</button></div>}
-      </article>})}</div>:<div className="calculatorEmptyForm calculatorEmptyCard"><div className="calculatorEmptyCandidate"><span>—</span><div><b>Нет зарегистрированных кандидатов</b><small>После регистрации в ЦИК кандидаты автоматически появятся в этой форме.</small></div></div><div className="juryCriteriaRow"><div className="juryCriterion juryCriterionEmpty"><div className="juryCriterionHead"><small>Программа</small><strong>—</strong><em>0/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'empty-p-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" disabled placeholder="—"/></label>)}</div></div><div className="juryCriterion juryCriterionEmpty"><div className="juryCriterionHead"><small>Агитация</small><strong>—</strong><em>0/8 оценок</em></div><div className="jurySlotGrid">{Array.from({length:8},(_,i)=>i+1).map(slot=><label key={'empty-c-'+slot} title={'Преподаватель '+slot}><span>{slot}</span><input type="number" disabled placeholder="—"/></label>)}</div></div></div><div className="scoreMetricsRow"><label><small>Рейтинг игры</small><input disabled placeholder="0–100"/></label>{settings?.poll_enabled!==false&&<label><small>Соцопрос</small><input disabled placeholder="0–100"/></label>}<div className="scoreComputed"><small>Итог</small><strong>—</strong></div><button className="secondary" disabled>Рассчитать</button></div></div>}
-     </div>:<div className="teacherOnlyNotice">Калькулятор скрыт. Итоги появятся после расчёта преподавателем.</div>}
-     {teacher&&<div className="calculatorFooter"><span>{!settings?'Сначала утвердите систему выборов на 6-м этапе.':!registered.length?'Нет зарегистрированных кандидатов.':settings?.status==='runoff'&&!round2Ready?'Рассчитайте второй тур для обоих кандидатов.':settings?.status!=='runoff'&&!round1Ready?'Рассчитайте 1 тур для всех кандидатов.':'Расчёт готов к фиксации.'}</span>{settings?.status==='runoff'?<button className="primary" disabled={busy||!round2Ready} onClick={()=>void finishRound(2)}>Зафиксировать итоги 2 тура</button>:settings?.status!=='finished'&&<button className="primary" disabled={busy||!round1Ready} onClick={()=>void finishRound(1)}>Зафиксировать итоги 1 тура</button>}</div>}
-    </section>
+    <PresidentialRulesCalculator g={g} candidates={registered} settings={settings} onSaved={load}/>
    <section className="stage7Panel officialResults"><div className="stage7PanelHead"><div><small>ОФИЦИАЛЬНЫЕ ИТОГИ</small><h3>{settings?.status==='finished'?'Выборы завершены':settings?.status==='runoff'?'Назначен второй тур':'Ожидается расчёт ЦИК'}</h3></div><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" width={52} height={52}/></div>
     {settings?.status==='finished'&&<div className="winnerCard">{(()=>{const winner=registered.find(c=>c.id===settings.result?.winner_id)||resultRows[0]?.candidate;return winner?<><div className="winnerPhoto">{photoUrls[winner.id]?<img src={photoUrls[winner.id]} alt={winner.display_name}/>:<span>{winner.display_name.slice(0,1)}</span>}</div><div><small>ИЗБРАННЫЙ ПРЕЗИДЕНТ</small><h2>{winner.display_name}</h2><p>{settings.result?.score!=null?Number(settings.result.score).toFixed(2)+'% · ':''}{SYSTEM_NAMES[settings.system_type]}</p></div></>:null})()}</div>}
     <div className="resultBars">{resultRows.map((row,index)=><div key={row.candidate.id} className="resultBarRow"><div><span>{index+1}</span><b>{row.candidate.display_name}</b><strong>{row.score!=null?Number(row.score).toFixed(2)+'%':'—'}</strong></div><div className="resultBar"><i style={{width:Math.max(0,Math.min(100,Number(row.score)||0))+'%'}}/></div>{row.poll!=null&&<small>Соцопрос: {Number(row.poll).toFixed(2)}%</small>}</div>)}</div>
