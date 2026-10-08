@@ -65,7 +65,7 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
    if(!current())return;
    setElections(rows);setResults(rr);setCandidates((c.data||[]) as Candidate[]);
    setDistricts((d.data||[]) as District[]);setDistrictMembers((m.data||[]) as DistrictMember[]);
-  }catch(error){if(current()){const message=error instanceof Error?error.message:String(error);setError(message);if(name==='create_municipal_mayor_election')setElectionFeedback('Ошибка создания выборов: '+message);}}
+  }catch(error){if(current())setError(error instanceof Error?error.message:String(error));}
  }
  useGameTableSync(game?.id,['municipal_mayor_elections','municipal_mayor_candidates','municipal_mayor_ballots','municipal_districts','municipal_district_members'],load,scopeKey);
  const latest=elections[0];
