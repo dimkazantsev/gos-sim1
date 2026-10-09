@@ -155,7 +155,7 @@ async function main(){
    assert(Math.abs(Number(await sim.locator('[data-budget-expense-total]').getAttribute('data-budget-expense-total'))-beforeTransfer-1250)<.000001,'The selected subsidy is added once to the healthcare total');
    assert.equal(f.requests[0].status,'requested','Local expenditure approval still does not grant money');
    await openTab(page,'Баланс');await layout(page,'balance '+width);assert.equal(await sim.locator('[data-financing-source]').count(),7,'Borrowing and reserve sources remain separate from revenue');
-   await sim.locator('[data-financing-source="bank_credit"]').getByLabel(/Объ[её]м, млрд ₽/).fill('16.1');await sim.locator('[data-financing-source="external"]').getByLabel(/Объ[её]м, млрд ₽/).fill('32.3');
+   await sim.locator('[data-financing-source="bank_credit"]').getByLabel(/Объ[её]м, трлн ₽/).fill('0.0161');await sim.locator('[data-financing-source="external"]').getByLabel(/Объ[её]м, трлн ₽/).fill('0.0323');
    assert(Number(await sim.locator('[data-budget-funding-gap]').getAttribute('data-budget-funding-gap'))>0,'Additional obligations must be financed');
    await sim.locator('[data-financing-source="ofz_fixed"]').getByRole('button',{name:'Покрыть остаток',exact:true}).click();assert.equal(Number(await sim.locator('[data-budget-funding-gap]').getAttribute('data-budget-funding-gap')),0,'Gap closure also finances the new coupon cost with no residual kopeck');
    await openTab(page,'Проект ФЗ');await layout(page,'law '+width);await sim.screenshot({path:path.join(output,'law-'+width+'.png')});
