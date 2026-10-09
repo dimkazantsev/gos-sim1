@@ -45,6 +45,7 @@ async function mockTransport(context,page,f){
    case 'get_fiscal_context':response=f.context;break;
    case 'get_fiscal_legal_plans':response={plans:[],programs:[]};break;
    case 'list_regional_cases':response=f.regional_events.map(e=>({...e,comic_scene:{region_code:e.region_code}}));break;
+   case 'delete_budget_simulator_draft':{const idx=f.plans.findIndex(x=>x.id===p.p_plan_id&&x.status==='draft'&&!x.document_id);assert(idx>=0,'Only a draft may be deleted');assert.equal(f.plans[idx].revision,p.p_revision);f.plans.splice(idx,1);response=true;break;}
    case 'get_budget_simulator':response={state:f.state,plans:f.plans,requests:f.requests,contracts:f.contracts,ledger:[],can_prepare:true,can_request:true,event_count:f.regional_events.length,regional_events:f.regional_events};break;
    case 'get_signed_state_program_budget':response=f.programmes.map(x=>({...x.program,ministry:x.program.responsible_ministry,program_status:x.program.status,indicators:x.indicators,expense_breakdown:x.expense_breakdown,years:[{year:x.commitment.budget_year,amount:x.commitment.amount,status:x.commitment.status}]}));break;
    case 'get_budget_amendments':response={party_ids:[],can_open:true,can_apply:true,can_submit_neutral:true,amendments:[]};break;
@@ -182,6 +183,8 @@ async function main(){
    await projectTabs.getByRole('tab',{name:/Создать вариант/}).click();
    assert.equal(await sim.getByLabel('Название расчета').inputValue(),'Альтернативный вариант без сохранения','Unsaved draft survives switching');
    await projectTabs.getByRole('tab',{name:/Учебный бюджет: проверка полной процедуры/}).click();
+   assert.equal(await sim.getByRole('button',{name:'Удалить черновик'}).count(),1,'Deletion is next to the selected draft');
+   assert.equal(await sim.getByRole('button',{name:'Сохранить новую версию'}).count(),1,'Saving is available inside the project tabs');
    await sim.getByRole('button',{name:'Создать проект ФЗ о бюджете',exact:true}).click();const annex=page.getByRole('region',{name:'Расчётные приложения к бюджету'});await annex.waitFor();assert.equal(f.state.last_plan_id,null,'Creating the law does not bypass Duma, Council or presidential signature');
    await annex.getByText('Приложение 1. Ставки, базы и статьи доходов',{exact:true}).click();assert.equal(await annex.getByRole('table',{name:'Денежные базы и доходы · млн ₽'}).locator('tbody tr').count(),12,'The law retains the exact detailed revenue breakdown');
    await annex.getByText('Приложение 3. Государственные программы и мероприятия',{exact:true}).click();const itemTable=annex.getByRole('table',{name:'Подробные ассигнования · ₽'});assert.equal(await itemTable.locator('tbody tr').count(),2);assert.match(await itemTable.innerText(),/123\s*456\s*789,12/,'The annex preserves itemised rubles and kopecks');
