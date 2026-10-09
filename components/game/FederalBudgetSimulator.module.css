@@ -121,3 +121,15 @@
 
 .projectActions{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:10px;margin-top:12px}.projectActions button{min-height:44px;text-align:center}.projectDelete{color:#a13b4c!important;border-color:#e8cbd2!important;background:#fff!important}.projectDelete:hover:not(:disabled){background:#fff4f5!important}
 @container(max-width:420px){.projectActions{display:grid;grid-template-columns:minmax(0,1fr)}.projectActions button{width:100%}}
+
+/* A unified single-chevron disclosure, including financing source details. */
+.simulator details>summary{position:relative;list-style:none;display:flex;align-items:center;gap:10px;min-height:56px}
+.simulator details>summary::-webkit-details-marker{display:none}
+.simulator details>summary:before{content:none!important;display:none!important}
+.simulator details>summary:after{content:''!important;display:block!important;flex:none;width:9px;height:9px;border-right:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(45deg);margin:0 5px 4px auto;transition:transform .15s}
+.simulator details[open]>summary:after{transform:rotate(225deg);margin-top:5px;margin-bottom:0}
+.simulator .fundingGrid details{background:#fafbfe;border:1px solid var(--line);border-radius:11px;padding:0 12px}
+.simulator .fundingGrid details>summary{font-size:12px;line-height:1.45}
+.deleteConfirmation{margin:12px 0;padding:14px 16px;border:1px solid #efc5cd;background:#fff9fa;border-radius:12px}
+.deleteConfirmation strong{font-size:13px}.deleteConfirmation p{font-size:12px;margin:6px 0 10px}.deleteConfirmation>div{display:flex;gap:10px;flex-wrap:wrap}
+.deleteConfirmation button{min-height:44px}.projectError{margin:10px 0;padding:10px 12px;border-radius:9px;background:#fff1f3;color:#922745;font-size:12px}
