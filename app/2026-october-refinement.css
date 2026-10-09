@@ -914,3 +914,21 @@
 .legislativeFeedback{margin:12px 0;padding:13px;border:1px solid var(--gs-border,#dce3f0);border-radius:10px;background:var(--gs-accent-soft,#edf1ff)}
 @media(max-width:1080px){.legislativeRouteGuide>div{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:650px){.legislativeCreateWide>div.legislativeCreateGrid{grid-template-columns:minmax(0,1fr);padding:14px!important}.legislativeCreateGrid>label:first-child,.legislativeCreateGrid>p{grid-column:auto}.legislativeCreateGrid>button{width:100%}.legislativeRouteGuide{padding:12px}.legislativeRouteGuide>div{grid-template-columns:repeat(3,minmax(0,1fr))}.legislativeDocBridge{padding:13px}}
+
+
+/* Fiscal macro: deliberately scoped to the budget module, no global summary overrides. */
+.budgetPage .fiscalMacroPanel{border:1px solid #e2e4ef;border-radius:16px;padding:22px;background:#fff;min-width:0}
+.budgetPage .fiscalMacroPanel>header{display:flex;align-items:center;gap:13px}
+.budgetPage .fiscalMacroPanel>header>svg{flex:none;color:#6558cf}
+.budgetPage .fiscalMacroPanel h2{color:#20213d;font-size:21px;line-height:1.3}
+.budgetPage .fiscalMacroStats article{border:1px solid #e2e4ef;border-radius:12px;background:#fafbfe;padding:15px;min-width:0}
+.budgetPage .fiscalMacroStats span{color:#62677d}
+.budgetPage .fiscalMacroStats b{color:#20213d;font-variant-numeric:tabular-nums}
+.budgetPage .fiscalMacroPanel>details{border:1px solid #e2e4ef;border-radius:12px;background:#fafbfe;padding:0 15px 12px;margin-top:12px;min-width:0}
+.budgetPage .fiscalMacroPanel>details>summary{color:#20213d;padding:12px 0;min-height:48px;line-height:1.5;font-weight:700}
+.budgetPage .fiscalMacroPanel>details>summary:focus-visible{outline:3px solid #a69bf2;outline-offset:2px}
+.budgetPage .fiscalMacroEditor{background:#fff!important}
+.budgetPage .fiscalMacroFields label{min-width:0}
+.budgetPage .fiscalMacroFields input,.budgetPage .fiscalMacroFields textarea{border:1px solid #cdd0e2;border-radius:10px;padding:10px 12px;background:#fff;min-height:44px;box-sizing:border-box}
+.budgetPage .fiscalMacroEditor>button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px}
+@media(max-width:550px){.budgetPage .fiscalMacroPanel{padding:15px}.budgetPage .fiscalMacroStats{gap:8px}.budgetPage .fiscalMacroStats article{padding:11px}.budgetPage .fiscalMacroPanel>header{align-items:flex-start}.budgetPage .fiscalMacroEditor>button{width:100%}}

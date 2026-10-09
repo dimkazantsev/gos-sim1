@@ -49,7 +49,7 @@
 .regionToolbar{display:grid;grid-template-columns:minmax(160px,1fr) minmax(220px,1.5fr) auto;align-items:end;gap:16px;margin:20px 0}
 .regionMap{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fafbfe;min-width:0}
 .regionMap svg{width:100%;height:auto;display:block;margin:16px 0;max-height:500px}
-.regionMap path{cursor:pointer}.regionMap path:hover,.regionMap path:focus-visible{stroke:#20213d;stroke-width:2;outline:none}
+.regionMap path{cursor:pointer;transition:fill .18s ease,filter .18s ease}.regionMap path:hover,.regionMap path:focus-visible{stroke:#fff;stroke-width:1.7;outline:none;filter:drop-shadow(0 0 3px rgba(101,88,207,.55))}
 .mapLegend{display:flex;flex-wrap:wrap;gap:12px 20px;font-size:12px;color:var(--muted)}.mapLegend span{display:flex;align-items:center;gap:7px}.mapLegend i{width:13px;height:13px;border-radius:3px;flex:none}
 .eventList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
 .eventList>article{border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
@@ -73,3 +73,8 @@
 .dataTable td.numeric strong,.dataTable td.numeric b{display:inline-block;max-width:100%;white-space:normal;overflow-wrap:anywhere}
 .dataTable tbody th details{margin-top:5px}
 .fundingGrid a{color:#5945b2;font-weight:650;text-underline-offset:3px}
+
+/* One active plan is an inline action row, not a separate archive accordion. */
+.currentProject{margin:12px 24px;padding:12px 15px;border:1px solid var(--line);border-radius:12px;background:#faf9fd;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
+.currentProject>div:first-child{display:flex;align-items:center;gap:10px;min-width:180px;flex:1}.currentProject>div:first-child>svg{flex:none;color:var(--accent)}.currentProject span{min-width:0;display:grid;gap:4px}.currentProject b{font-size:13px;line-height:1.4;overflow-wrap:anywhere}.currentProject small{font-size:11px;color:var(--muted)}.currentProject .actions{flex:0 1 auto}.currentProject button{min-height:44px}
+@container(max-width:750px){.currentProject{margin:12px 16px;align-items:stretch}.currentProject .actions{width:100%;flex:1 1 100%}.currentProject .actions button{flex:1 1 150px}}
