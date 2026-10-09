@@ -16,6 +16,7 @@ import {DocumentTools,DocumentInbox,type DocumentAccess} from './DocumentTools';
 import CivicDiscussion from './CivicDiscussion';
 import CloudDocumentPicker from './CloudDocumentPicker';
 import BillAmendmentsPanel,{type BillAmendmentGate} from './BillAmendmentsPanel';
+import BudgetLawAmendmentsPanel from './BudgetLawAmendmentsPanel';
 
 function typeLabel(key:string){return FORMAL_TYPES.find(x=>x.key===key)?.label||key}
 function shortDate(v:string){return new Date(v).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'})}
@@ -93,7 +94,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   return(!q||[d.registry_no,d.title,d.subject_label,typeLabel(d.doc_type),d.status_label,members.find(m=>m.user_id===d.author_id)?.full_name].join(' ').toLowerCase().includes(q))&&(!filterSubject||d.subject_key===filterSubject)&&statusOk
  }).sort((a,b)=>sortOrder==='title'?a.title.localeCompare(b.title,'ru'):Date.parse(b[sortOrder==='created'?'created_at':'updated_at'])-Date.parse(a[sortOrder==='created'?'created_at':'updated_at'])),[formalDocuments,votes,members,query,filterSubject,filterStatus,sortOrder]);
  const selected=useMemo(()=>filtered.find(d=>d.id===selectedId)||filtered[0],[filtered,selectedId]);
- const billSecondReadingBlocked=!!selected&&selected.workflow_key==='bill'&&['amendments','reading2'].includes(selected.status_code)&&
+ const billSecondReadingBlocked=!!selected&&['bill','budget'].includes(selected.workflow_key)&&['amendments','reading2'].includes(selected.status_code)&&
   (billAmendmentGate?.documentId!==selected.id||!billAmendmentGate.checked||billAmendmentGate.pending);
  selectedDocument.current=selected?.id||'';
  useEffect(()=>{
@@ -478,6 +479,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
     <header className="documentSummaryHeader"><div><span>{selected.registry_no} · Этап {selected.stage_no}</span><b>{typeLabel(selected.doc_type)}</b><small>Редакция {String(selected.metadata?.revision||1)} · {selected.subject_label}</small></div><div className="documentSummaryState"><span className={'formalStatus '+statusTone(selected.status_code)}>{selected.status_label}</span><small>Ответственный: {ownerLabel(selected.current_owner_key)}</small></div></header>
     {accessError&&<p className="error" role="alert">{accessError}</p>}
     {selected.workflow_key==='bill'&&<BillAmendmentsPanel g={g} document={selected} onOpenVotes={onOpenVotes} readOnly={readOnly} onPendingChange={gate=>setBillAmendmentGate(previous=>previous?.documentId===gate.documentId&&previous.pending===gate.pending&&previous.checked===gate.checked?previous:gate)}/>}
+    {selected.workflow_key==='budget'&&<BudgetLawAmendmentsPanel g={g} document={selected} onOpenVotes={onOpenVotes} readOnly={readOnly} onPendingChange={gate=>setBillAmendmentGate(previous=>previous?.documentId===gate.documentId&&previous.pending===gate.pending&&previous.checked===gate.checked?previous:gate)}/>}
     <section className="legalUnifiedWorkspace" aria-label="Рабочее пространство нормативного документа">
      <section className="legalDocumentColumn" aria-label="Текст и материалы документа">
       <DocumentPaper document={selected} history={history} members={members} signature={editing?undefined:lastSigned} footerSlot={<button type="button" className="secondary legalPrintButton" onClick={()=>window.print()}><Printer size={17} aria-hidden="true"/> Печать</button>} titleSlot={editing?<input aria-label="Название редактируемого документа" className="formalEditTitle" value={editTitle} onChange={e=>setEditTitle(e.target.value)}/>:undefined}>{editing?<><label className="documentEditBodyLabel">Текст документа<textarea aria-label="Редактируемый текст документа" className="formalEditBody" value={editBody} onChange={e=>setEditBody(e.target.value)}/></label><label className="documentEditNote">Основание изменения<input value={editNote} onChange={e=>setEditNote(e.target.value)} maxLength={2000} placeholder="Например: Поправка к статье 2"/></label><div className="formalEditActions"><button className="primary" disabled={busy||editTitle.trim().length<3} onClick={saveEdit}>Сохранить текст</button><button className="secondary" disabled={busy} onClick={()=>setEditing(false)}>Отмена</button></div></>:<div className="formalPaperBody">{selected.body_text?<p>{selected.body_text}</p>:<p className="muted">Текст в системе не сохранён. Используйте прикреплённый оригинал.</p>}</div>}</DocumentPaper>

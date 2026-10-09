@@ -16,4 +16,52 @@
 @container(max-width:750px){.simulator{border-radius:16px}.heading,.panel,.submission{padding:18px}.heading p{font-size:13px}.kpis{padding:16px 16px 0;gap:10px}.kpis article{padding:14px 12px}.kpis strong{font-size:19px}.kpis article>div{font-size:11px;gap:7px}.path{padding:18px 16px;display:block}.path ol{margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.path li{font-size:11px}.planHead{padding:0 16px 18px}.tabs{grid-template-columns:repeat(2,minmax(0,1fr));padding:0 16px 18px}.tableHead{display:none}.line{grid-template-columns:minmax(0,1fr) minmax(100px,.7fr);gap:10px 16px;padding:18px 0}.line>div:first-child{grid-column:1/-1}.line>span{font-size:11px;color:var(--muted);white-space:normal}.line>span:before{content:'План: ';}.line>label{grid-column:2;grid-row:auto}.line input{height:44px}.line>strong,.line>div:last-child:not(:first-child){grid-column:1/-1;text-align:right}.line>strong:before,.line>div:last-child>strong:before{content:'Расчет: ';font-size:11px;color:var(--muted);font-weight:500}.fundingGrid,.requests{grid-template-columns:1fr}.fundingGrid>article>p:first-of-type{min-height:0}.debtSplit,.fundingBalance{grid-template-columns:1fr}.debtSplit article:last-child{grid-column:auto}.fundingBalance>span{flex-direction:row;align-items:center;justify-content:space-between;gap:12px}.debtSplit b{font-size:21px}.fields,.comparison{grid-template-columns:1fr}.taxCalculator,.requestForm,.contracts{padding:8px 13px 14px}.saved,.sources,.journal{margin:12px 16px}.journal>article{grid-template-columns:1fr;gap:7px}.notice,.error{margin:14px 16px}.actions>button{flex:1;min-width:160px}.submission .actions{align-items:stretch}.simulator summary{line-height:1.4}.loanTerms{grid-template-columns:1fr 120px}.requests header{flex-wrap:wrap}.simulator input{font-size:16px}.simulator textarea{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.simulator *{transition:none!important}}
 
+.tabs button[aria-selected=true]{color:#fff;background:var(--accent);border-color:var(--accent)}
+.stepNumber{font-size:12px;display:grid;place-items:center;width:23px;height:23px;border:1px solid currentColor;border-radius:50%;flex:none}
+.formula{border-left:3px solid var(--accent);padding:15px 18px;background:#f8f7fd;font-size:14px;line-height:1.6;font-weight:700;margin:18px 0}
+.explanation{font-size:13px;color:var(--muted)}
+.tableWrap{max-width:100%;overflow:auto;min-width:0;border:1px solid var(--line);border-radius:12px;margin:18px 0;overscroll-behavior-x:contain}
+.tableWrap:focus-visible{outline:3px solid #968bea;outline-offset:3px}
+.dataTable{width:100%;min-width:900px;border-collapse:collapse;font-size:13px;line-height:1.55;text-align:left}
+.dataTable caption{padding:14px 16px;text-align:left;background:#f8f7fd;font-weight:700;color:var(--ink)}
+.dataTable th,.dataTable td{padding:15px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+.dataTable thead th{font-size:12px;background:#f8f9fc;color:var(--muted);font-weight:700;white-space:normal}
+.dataTable tbody th{min-width:250px;max-width:360px;font-weight:500;overflow-wrap:anywhere}
+.dataTable tbody th b{font-size:13px;font-weight:700;display:block}
+.dataTable tbody small,.dataTable td small{display:block;margin-top:6px;color:var(--muted);font-size:12px;font-weight:400;line-height:1.5;white-space:normal}
+.dataTable tbody td:not(.numeric){min-width:170px;max-width:360px;overflow-wrap:anywhere}
+.dataTable tfoot th,.dataTable tfoot td{background:#faf9ff;font-weight:700}
+.dataTable tr:last-child th,.dataTable tr:last-child td{border-bottom:0}
+.dataTable details{max-width:300px}
+.dataTable details summary{min-height:40px;font-size:12px;font-weight:500;color:var(--accent)}
+.dataTable details p{font-size:12px;font-weight:400;color:var(--muted)}
+.numeric{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;font-feature-settings:'tnum'}
+.numeric b,.numeric strong{white-space:nowrap}
+.scrollHint{display:none;font-size:12px!important;color:var(--muted);margin:8px 0!important}
+.kpis strong{white-space:nowrap}
+.expenseSection,.selectedRegion{border-top:1px solid var(--line);padding-top:22px;margin-top:24px;min-width:0}
+.expenseSection>p{font-size:13px;color:var(--muted)}
+.sectionHead{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.sectionHead>div{flex:1;min-width:200px}.sectionHead p{font-size:13px;color:var(--muted)}
+.programRow{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding:18px 0;border-bottom:1px solid var(--line);min-width:0}
+.programRow>div:first-child{flex:1;min-width:0}.programRow b{font-size:14px;line-height:1.6;overflow-wrap:anywhere}.programRow small{display:block;font-size:12px;line-height:1.6;color:var(--muted);margin-top:5px}.programRow p{font-size:13px;margin:7px 0}
+.programActions{display:grid;gap:10px;max-width:350px;min-width:220px}
+.regionToolbar{display:grid;grid-template-columns:minmax(160px,1fr) minmax(220px,1.5fr) auto;align-items:end;gap:16px;margin:20px 0}
+.regionMap{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fafbfe;min-width:0}
+.regionMap svg{width:100%;height:auto;display:block;margin:16px 0;max-height:500px}
+.regionMap path{cursor:pointer}.regionMap path:hover,.regionMap path:focus-visible{stroke:#20213d;stroke-width:2;outline:none}
+.mapLegend{display:flex;flex-wrap:wrap;gap:12px 20px;font-size:12px;color:var(--muted)}.mapLegend span{display:flex;align-items:center;gap:7px}.mapLegend i{width:13px;height:13px;border-radius:3px;flex:none}
+.eventList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.eventList>article{border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
+.eventList header{display:flex;align-items:flex-start!important;gap:10px;flex-wrap:wrap}.eventList b{font-size:14px;line-height:1.55}.eventList small{font-size:12px;color:var(--muted);line-height:1.5}.eventList p{font-size:13px}
+.inlineError,.inlineNotice{border-radius:10px;padding:14px 16px;font-size:13px!important;line-height:1.6;background:#fff1f3;color:#922745!important}.inlineNotice{background:#f0f6f3;color:#28604c!important}
+.requestForm>label{margin:14px 0}.requestForm>.actions{margin-top:16px}
+.lawChecklist{padding:14px 18px;background:#f8f7fd;border:1px solid var(--line);border-radius:12px;margin:18px 0;font-size:13px;line-height:1.6}
+.lawSteps{padding-left:24px;font-size:13px;line-height:1.7}.lawSteps li{padding:8px 0}
+.panel>.actions{margin:18px 0}
+@container(max-width:1000px){.regionToolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.regionToolbar>.actions{grid-column:1/-1}.eventList{grid-template-columns:1fr}}
+@container(max-width:750px){.tableWrap{border-radius:10px}.dataTable{font-size:13px}.regionToolbar{grid-template-columns:1fr}.regionToolbar>.actions{grid-column:auto}.programRow{flex-direction:column;gap:12px}.programActions{width:100%;min-width:0;max-width:none}.regionMap{padding:12px}.tabs button{padding:10px 6px;gap:6px;justify-content:flex-start;font-size:12px}.tabs button:last-child{grid-column:1/-1}.sectionHead>div{min-width:0}.eventList>article{padding:16px}.lawChecklist{padding:12px}.mapLegend{gap:10px 15px}}
+@container(max-width:750px){.scrollHint{display:block}.kpis strong{font-size:clamp(16px,5cqw,25px)}}
+@container(max-width:750px){.sectionHead{flex-direction:column;align-items:stretch}.sectionHead>div{width:100%;flex:initial}.sectionHead>button{align-self:flex-start}.programRow{align-items:stretch}.programRow>div:first-child{width:100%;flex:initial}}
+
 .shared{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 22px;margin:18px 24px 0;border:1px solid #dfdbef;border-left:4px solid var(--accent);border-radius:12px;background:#faf9ff;min-width:0}.shared>div{min-width:0;flex:1}.shared small{display:block;color:var(--muted);font-size:12px;line-height:1.5}.shared b{display:block;font-size:13px;line-height:1.5;margin-top:5px}.shared p{font-size:12px;color:var(--muted);line-height:1.6;margin:6px 0 0}.shared>strong{font-size:clamp(21px,2.4vw,28px);line-height:1.4;white-space:nowrap}.workLabel{font-size:12px;color:var(--muted);padding:16px 24px 0;margin:0!important}.workLabel+.kpis{padding-top:14px}@container(max-width:750px){.shared{margin:16px 16px 0;padding:16px;flex-direction:column;align-items:flex-start;gap:12px}.shared>strong{white-space:normal}.workLabel{padding:16px 16px 0}}

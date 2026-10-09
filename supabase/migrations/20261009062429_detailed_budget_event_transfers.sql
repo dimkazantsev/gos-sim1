@@ -824,4 +824,3 @@ grant execute on function public.save_budget_simulator(uuid,uuid,jsonb,integer),
  public.create_budget_transfer_request(uuid,text,text,numeric,numeric,text,text),
  public.create_budget_simulator_document(uuid),public.get_budget_simulator(uuid),public.start_regional_case(uuid) to authenticated;
 notify pgrst,'reload schema';
-

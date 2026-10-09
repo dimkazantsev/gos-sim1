@@ -1,4 +1,5 @@
 import baseline from '@/data/federal-budget-2026.json';
+import revenueModel from '@/data/budget-revenue-model.json';
 import type {FiscalContext,FiscalRate,FiscalRegion} from './fiscalMath';
 
 export const FINANCING_SOURCES = [
@@ -11,17 +12,27 @@ export const FINANCING_SOURCES = [
  {key:'other',label:'Прочие источники и изменение остатков',lender:'Казначейские остатки и сальдо иных операций',debt:'none',spread:0,risk:'Отрицательное значение означает отток средств. Нельзя считать эту строку налоговым доходом.'}
 ] as const;
 export type FundingKey=typeof FINANCING_SOURCES[number]['key'];
-export type BudgetTransfer={id:string;region_code:string;region_name:string;kind:'grant'|'subsidy'|'subvention'|'budget_credit';amount:number;cofinancing:number;purpose:string;section_key:string;status:'requested'|'included'|'granted'|'rejected';document_id?:string|null;repaid_at?:string|null};
-export type BudgetDraft={title:string;income_changes:Record<string,number>;spending_changes:Record<string,number>;revenue_adjustments:Record<string,number>;financing:Record<FundingKey,number>;terms:Record<string,number>;transfer_ids:string[];note:string};
+export type BudgetTransfer={id:string;region_code:string;region_name:string;kind:'grant'|'subsidy'|'subvention'|'budget_credit';amount:number;cofinancing:number;purpose:string;section_key:string;status:'requested'|'included'|'granted'|'rejected';document_id?:string|null;repaid_at?:string|null;event_case_id?:string|null;event_title?:string|null;expected_result?:string|null};
+export type BudgetExpenseItem={id:string;section_key:string;title:string;indicator:string;justification:string;amount:number;program_id?:string|null;budget_year?:number};
+export type BudgetDraft={title:string;income_changes:Record<string,number>;spending_changes:Record<string,number>;base_reallocations?:Record<string,number>;revenue_adjustments:Record<string,number>;financing:Record<FundingKey,number>;terms:Record<string,number>;transfer_ids:string[];expense_items?:BudgetExpenseItem[];note:string};
+export type BudgetIncomeDetail={key:string;group_key:string;label:string;rate:number;rate_unit:string;base:number;base_unit:string;collection:number;federal_share:number;amount:number;baseline:number;base_label:string;driver_note:string;model_rate:boolean};
 export type SimulatorAnchor={enterprises:number;key_rate:number;fx_rate:number;oil_price:number;inflation:number;economy:number;trust:number};
 export type SimulatorState={anchor:SimulatorAnchor;internal_debt:number;external_debt:number;reserve_remaining:number;service_adjustment:number;revenue_adjustment:number;last_financing:Record<FundingKey,number>;financing_rates?:Record<string,number>;month:number;last_document_id:string|null;last_plan_id:string|null;version:number};
-export type BudgetCalculation={income_lines:{key:string;label:string;amount:number;baseline:number}[];expense_lines:{key:string;label:string;amount:number;baseline:number}[];revenue:number;expenditure:number;balance:number;deficit:number;surplus:number;deficit_pct_gdp:number;financing:number;funding_need:number;funding_gap:number;cash_excess:number;internal_debt:number;external_debt:number;debt_total:number;debt_pct_gdp:number;annual_interest:number;interest_delta:number;transfer_expense:number;credit_outflow:number;reserve_remaining:number;activity:number;cost:number;fx:number;uncertainty:number;revenue_low:number;revenue_high:number;expenditure_low:number;expenditure_high:number};
-export function newBudgetDraft():BudgetDraft {return {title:'Проект федерального бюджета на 2026 год',income_changes:{},spending_changes:{},revenue_adjustments:{},financing:{...baseline.financing},terms:{ofz_fixed:60,ofz_float:60,bank_credit:12,external:60},transfer_ids:[],note:''};}
+export type BudgetCalculation={income_lines:{key:string;label:string;amount:number;baseline:number}[];income_details?:BudgetIncomeDetail[];expense_lines:{key:string;label:string;amount:number;baseline:number;base_amount?:number;base_reallocation_amount?:number;items_amount?:number;transfer_amount?:number;interest_amount?:number}[];expense_items?:BudgetExpenseItem[];transfer_requests?:BudgetTransfer[];program_expenses?:{program_id:string;title:string;indicators:string;expense_breakdown:{indicator_name:string;justification:string;amount:string;budget_year:number;component_title:string}[]}[];income_rounding?:number;revenue_adjustment?:number;revenue:number;expenditure:number;balance:number;deficit:number;surplus:number;deficit_pct_gdp:number;financing:number;funding_need:number;funding_gap:number;cash_excess:number;internal_debt:number;external_debt:number;debt_total:number;debt_pct_gdp:number;annual_interest:number;interest_delta:number;transfer_expense:number;credit_outflow:number;reserve_remaining:number;activity:number;cost:number;fx:number;uncertainty:number;revenue_low:number;revenue_high:number;expenditure_low:number;expenditure_high:number};
+export function newBudgetDraft():BudgetDraft {return {title:'Проект федерального бюджета на 2026 год',income_changes:{},spending_changes:{},revenue_adjustments:{},financing:{...baseline.financing},terms:{ofz_fixed:60,ofz_float:60,bank_credit:12,external:60},transfer_ids:[],expense_items:[],note:''};}
 export function defaultSimulatorState(context:FiscalContext|null,regions:FiscalRegion[]):SimulatorState {
  const p=context?.policy;return {anchor:{enterprises:regions.reduce((s,r)=>s+r.enterprises*r.activity_multiplier,0)||1,key_rate:p?.key_rate??16,fx_rate:p?.fx_rate??80,oil_price:Math.max(.01,p?.oil_price??75),inflation:p?.inflation??6,economy:context?.metrics.economy??50,trust:context?.metrics.public_trust??50},internal_debt:baseline.internal_debt_end,external_debt:baseline.external_debt_end,reserve_remaining:baseline.reserve_available_model,service_adjustment:0,revenue_adjustment:0,last_financing:{...baseline.financing},month:0,last_document_id:null,last_plan_id:null,version:0};
 }
 const clamp=(n:number,a:number,b:number)=>Math.max(a,Math.min(b,n));
 const round=(n:number)=>Math.round((n+Number.EPSILON)*100)/100;
+export const budgetMoney=(n:number)=>Number(n.toFixed(8));
+/** Sum canonical million-ruble amounts as integer kopecks, without floating drift. */
+export function budgetMoneySum(...values:number[]):number {
+ if(values.some(n=>!Number.isFinite(n)||Math.abs(n)>=1e21))return budgetMoney(values.reduce((sum,n)=>sum+n,0));
+ const units=values.reduce((sum,n)=>sum+BigInt(n.toFixed(8).replace('.','')),0n);
+ const digits=(units<0n?-units:units).toString().padStart(9,'0');
+ return Number((units<0n?'-':'')+digits.slice(0,-8)+'.'+digits.slice(-8));
+}
 export function financingRate(key:string,keyRate:number){return key==='external'?7.5:key==='bank_credit'?keyRate+3:key==='ofz_float'?keyRate+.5:key==='ofz_fixed'?keyRate:0;}
 export function fundingAnnualInterest(key:FundingKey,draft:BudgetDraft,state:SimulatorState,keyRate:number){
  const amount=draft.financing[key],issued=state.last_plan_id?Math.min(amount,state.last_financing[key]):0;
@@ -38,24 +49,50 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
  const oil=clamp((p?.oil_price??a.oil_price)/a.oil_price*fx/a.fx_rate,.1,3);
  const vat=rates.find(r=>r.region_code==='00'&&r.tax_key==='vat')?.rate??22,profit=rates.find(r=>r.region_code==='00'&&r.tax_key==='profit')?.rate??25;
  const income_lines=baseline.income_lines.map(l=>{const driver=l.driver==='oil'?oil:l.driver==='activity'?activity:1;const tax=l.key==='turnover'?1+.72*(vat/22-1):l.key==='income'?1+.8*(profit/25-1):1;return {key:l.key,label:l.label,baseline:l.amount,amount:round(Math.max(0,l.amount*driver*tax*(1+(draft.income_changes[l.key]??0)/100)+(draft.revenue_adjustments[l.key]??0)))};});
+ const income_details:BudgetIncomeDetail[]=revenueModel.map(m=>{
+  const l=baseline.income_lines.find(x=>x.key===m.group_key)!;
+  const driver=l.driver==='oil'?oil:l.driver==='activity'?activity:1;
+  const groupTax=l.key==='turnover'?1+.72*(vat/22-1):l.key==='income'?1+.8*(profit/25-1):1;
+  const baseDriver=driver*(1+(draft.income_changes[l.key]??0)/100);
+  const rawGroup=l.amount*baseDriver*groupTax;
+  const scale=rawGroup>0?income_lines.find(x=>x.key===l.key)!.amount/rawGroup:0;
+  const rate=m.key==='vat'?vat:m.key==='profit'?profit:m.reference_rate;
+  const divisor=m.rate_unit==='rubles'?m.reference_rate/1e6:m.reference_rate/100;
+  const base=l.amount*m.share/(divisor*m.federal_share)*baseDriver*scale;
+  const amount=base*(m.rate_unit==='rubles'?rate/1e6:rate/100)*m.federal_share;
+  return {...m,rate,base,collection:1,amount,baseline:l.amount*m.share};
+ });
  const selected=requests.filter(r=>draft.transfer_ids.includes(r.id)&&r.status!=='rejected');
- const transfer_expense=selected.filter(r=>r.kind!=='budget_credit').reduce((s,r)=>s+r.amount,0),credit_outflow=selected.filter(r=>r.kind==='budget_credit').reduce((s,r)=>s+r.amount,0);
+ const transfer_expense=budgetMoneySum(...selected.filter(r=>r.kind!=='budget_credit').map(r=>Number(r.amount))),credit_outflow=budgetMoneySum(...selected.filter(r=>r.kind==='budget_credit').map(r=>Number(r.amount)));
  const annual_interest=FINANCING_SOURCES.filter(s=>s.debt!=='none').reduce((sum,s)=>sum+fundingAnnualInterest(s.key,draft,state,key),0);
  // Half-year convention for new net borrowings; this is an explicit teaching assumption.
  const interest_delta=(annual_interest-baseline.financing.ofz_fixed*a.key_rate/100)*.5+state.service_adjustment;
- const expense_lines=baseline.expense_lines.map(l=>({key:l.key,label:l.label,baseline:l.amount,amount:round(Math.max(0,l.amount*(1+(draft.spending_changes[l.key]??0)/100)*cost+(l.key==='13'?interest_delta:0)+selected.filter(r=>r.kind!=='budget_credit'&&r.section_key===l.key).reduce((s,r)=>s+r.amount,0)))}));
- const revenue=round(income_lines.reduce((s,r)=>s+r.amount,baseline.income_rounding)+state.revenue_adjustment),expenditure=round(expense_lines.reduce((s,r)=>s+r.amount,baseline.expense_rounding));
- const balance=round(revenue-expenditure),deficit=Math.max(0,-balance),surplus=Math.max(0,balance),financing=round(FINANCING_SOURCES.reduce((s,f)=>s+draft.financing[f.key],0));
- const internal=FINANCING_SOURCES.filter(s=>s.debt==='internal').reduce((s,f)=>s+draft.financing[f.key]-state.last_financing[f.key],0);
- const internal_debt=round(Math.max(0,state.internal_debt+internal)),external_debt=round(Math.max(0,state.external_debt*fx/a.fx_rate+draft.financing.external-state.last_financing.external));
- const funding_need=round(deficit+credit_outflow),funding_gap=round(Math.max(0,funding_need-financing)),cash_excess=round(Math.max(0,financing-funding_need)+surplus);
+ const expense_items=draft.expense_items??[];
+ const expense_lines=baseline.expense_lines.map(l=>{
+  const raw_base=l.amount*(1+(draft.spending_changes[l.key]??0)/100)*cost;
+  const base_reallocation_amount=draft.base_reallocations?.[l.key]??0;
+  const transfer_amount=budgetMoneySum(...selected.filter(r=>r.kind!=='budget_credit'&&r.section_key===l.key).map(r=>Number(r.amount)));
+  const items_amount=budgetMoneySum(...expense_items.filter(i=>i.section_key===l.key).map(i=>Number(i.amount)));
+  const interest_amount=l.key==='13'?interest_delta:0;
+  // Keep a voted redistribution after the legacy rounding of base obligations.
+  // The displayed constituents add up to the exact appropriation for the section.
+  const rounded_base_and_interest=round(Math.max(0,raw_base+interest_amount));
+  const base_amount=budgetMoneySum(rounded_base_and_interest,-interest_amount,base_reallocation_amount);
+  return {key:l.key,label:l.label,baseline:l.amount,base_amount,base_reallocation_amount,transfer_amount,items_amount,interest_amount,amount:budgetMoneySum(rounded_base_and_interest,base_reallocation_amount,transfer_amount,items_amount)};
+ });
+ const revenue=round(budgetMoneySum(...income_lines.map(r=>r.amount),baseline.income_rounding,state.revenue_adjustment)),expenditure=budgetMoneySum(...expense_lines.map(r=>r.amount),baseline.expense_rounding);
+ const balance=budgetMoneySum(revenue,-expenditure),deficit=Math.max(0,-balance),surplus=Math.max(0,balance),financing=budgetMoneySum(...FINANCING_SOURCES.map(f=>draft.financing[f.key]));
+ const internal=budgetMoneySum(...FINANCING_SOURCES.filter(s=>s.debt==='internal').flatMap(f=>[draft.financing[f.key],-state.last_financing[f.key]]));
+ const internal_debt=Math.max(0,budgetMoneySum(state.internal_debt,internal)),external_debt=Math.max(0,budgetMoneySum(state.external_debt*fx/a.fx_rate,draft.financing.external,-state.last_financing.external));
+ const funding_need=budgetMoneySum(deficit,credit_outflow),funding_gap=Math.max(0,budgetMoneySum(funding_need,-financing)),cash_excess=budgetMoneySum(Math.max(0,budgetMoneySum(financing,-funding_need)),surplus);
  const uncertainty=clamp(.04+Math.abs(economy)*.001+Math.abs(trust)*.001+Math.abs((p?.inflation??a.inflation)-a.inflation)*.003,.025,.2);
- return {income_lines,expense_lines,revenue,expenditure,balance,deficit,surplus,deficit_pct_gdp:deficit/baseline.gdp*100,financing,funding_need,funding_gap,cash_excess,internal_debt,external_debt,debt_total:internal_debt+external_debt,debt_pct_gdp:(internal_debt+external_debt)/baseline.gdp*100,annual_interest,interest_delta,transfer_expense,credit_outflow,reserve_remaining:round(state.reserve_remaining-draft.financing.reserves+(state.last_plan_id?state.last_financing.reserves:0)),activity,cost,fx,uncertainty,revenue_low:revenue*(1-uncertainty),revenue_high:revenue*(1+uncertainty),expenditure_low:expenditure*(1-uncertainty),expenditure_high:expenditure*(1+uncertainty)};
+ const debt_total=budgetMoneySum(internal_debt,external_debt);
+ return {income_lines,income_details,expense_lines,expense_items,transfer_requests:selected,revenue,expenditure,balance,deficit,surplus,deficit_pct_gdp:deficit/baseline.gdp*100,financing,funding_need,funding_gap,cash_excess,internal_debt,external_debt,debt_total,debt_pct_gdp:debt_total/baseline.gdp*100,annual_interest,interest_delta,transfer_expense,credit_outflow,reserve_remaining:budgetMoneySum(state.reserve_remaining,-draft.financing.reserves,state.last_plan_id?state.last_financing.reserves:0),activity,cost,fx,uncertainty,revenue_low:revenue*(1-uncertainty),revenue_high:revenue*(1+uncertainty),expenditure_low:expenditure*(1-uncertainty),expenditure_high:expenditure*(1+uncertainty)};
 }
 export function coverFundingGap(draft:BudgetDraft,key:FundingKey,state:SimulatorState,context:FiscalContext|null,regions:FiscalRegion[],rates:FiscalRate[],requests:BudgetTransfer[]){
  const next={...draft,financing:{...draft.financing}};
- for(let i=0;i<12;i++){const c=calculateFederalBudget(next,state,context,regions,rates,requests);if(c.funding_gap<=.01)break;next.financing[key]=round(next.financing[key]+c.funding_gap);}
+ for(let i=0;i<30;i++){const c=calculateFederalBudget(next,state,context,regions,rates,requests);if(c.funding_gap<=0)break;next.financing[key]=budgetMoneySum(next.financing[key],Math.max(.00000001,c.funding_gap));}
  return next;
 }
-export const billions=(n:number)=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n/(Math.abs(n)>=1000000?1000000:1000))+(Math.abs(n)>=1000000?' трлн ₽':' млрд ₽');
+export const billions=(n:number)=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n/(Math.abs(n)>=1000000?1000000:1000))+(Math.abs(n)>=1000000?'\u00a0трлн\u00a0₽':'\u00a0млрд\u00a0₽');
 export const transferLabels={grant:'Дотация',subsidy:'Субсидия',subvention:'Субвенция',budget_credit:'Бюджетный кредит'};

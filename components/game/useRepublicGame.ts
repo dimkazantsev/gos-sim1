@@ -827,7 +827,8 @@ export function useRepublicGame(gameId:string){
   if(r.error){setError(r.error.message);return false}await refresh();return true;
  }
  async function closeVote(id:string,note?:string){
-  const rpc=votes.find(v=>v.id===id)?.procedure_key==='bill_amendments'?'close_bill_amendment_vote':'close_procedural_vote';
+  const procedure=votes.find(v=>v.id===id)?.procedure_key;
+  const rpc=procedure==='bill_amendments'?'close_bill_amendment_vote':procedure==='budget_second_reading_amendment'?'close_budget_law_amendment_vote':procedure==='budget_government_submission'?'close_budget_government_vote':'close_procedural_vote';
   const r=await supabase.rpc(rpc,{p_vote_id:id,p_note:note||null});
   if(r.error){setError(r.error.message);return null}
   await refresh();return r.data;
