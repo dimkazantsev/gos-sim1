@@ -32,7 +32,7 @@ async function geometry(page,label){const r=await page.evaluate(()=>{
  const visible=e=>{const r=e.getBoundingClientRect();return r.width>0&&r.height>0};
  const panel=document.querySelector('[aria-label="Мониторинг текущей игры"]')||document.querySelector('[aria-label="Федеральный бюджетный симулятор"]')||document.querySelector('.metricDirectorStudio');
  const bounds=panel.getBoundingClientRect();
- const clipped=[...panel.querySelectorAll('article,button,strong,dt,dd,h2')].filter(visible).filter(e=>{const r=e.getBoundingClientRect();return r.left<bounds.left-2||r.right>bounds.right+2}).map(e=>e.textContent.slice(0,100));
+ const clipped=[...panel.querySelectorAll('article,button,strong,dt,dd,h2')].filter(visible).filter(e=>!e.closest('[class*="tableWrap"]')).filter(e=>{const r=e.getBoundingClientRect();return r.left<bounds.left-2||r.right>bounds.right+2}).map(e=>e.textContent.slice(0,100));
  const cards=[...panel.querySelectorAll('[data-overview-card]')].map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}});
  const overlap=cards.some((a,i)=>cards.some((b,j)=>j>i&&a.x<b.x+b.w-1&&a.x+a.w>b.x+1&&a.y<b.y+b.h-1&&a.y+a.h>b.y+1));
  const touch=[...panel.querySelectorAll('button')].filter(visible).map(e=>e.getBoundingClientRect().height);
@@ -55,6 +55,7 @@ async function geometry(page,label){const r=await page.evaluate(()=>{
     if(rpc){calls.push({rpc,...p});if(p.p_game_id)assert.equal(p.p_game_id,initial.game.id,'RPC classroom scope');}
     if(apiError&&(rpc==='get_budget_pulse'||rpc==='get_teacher_overview'))return route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({code:'503',message:'Service temporarily unavailable'})});
     if(rpc==='get_teacher_overview')response=stats;
+     if(rpc==='get_fiscal_context')response={policy:{key_rate:16,fx_rate:80,oil_price:75,cutoff_price:60,inflation:6},metrics:{economy:50,public_trust:50},can_change_rate:true};
     if(rpc==='get_budget_pulse')response=shared();
     if(rpc==='get_budget_simulator')response={state,plans,requests:[],contracts:[],ledger:[],can_prepare:await page.evaluate(()=>document.body.dataset.overviewTeacher!=='false'),can_request:true,event_count:0};
     if(rpc==='set_state_metric_and_post'){state.revenue_adjustment+=p.p_value-calculation().revenue;response=null;}

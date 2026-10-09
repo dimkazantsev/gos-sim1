@@ -5,6 +5,8 @@ import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import {moneyMillions,quantity} from '@/lib/formatQuantity';
 import {budgetModeLabel} from './useBudgetPulse';
+import {budgetDisplay} from './federalBudgetMath';
+import type {FiscalContext} from './fiscalMath';
 import type {ReturnTypeRepublic} from './viewTypes';
 import styles from './TeacherOverview.module.css';
 
@@ -13,6 +15,7 @@ type Destination='documents'|'votes'|'budget'|'actions';
 export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnTypeRepublic;onWorkspace:(key:'stages'|'parties'|'grades'|'event'|'impact'|'journal')=>void;onNavigate?:(destination:Destination)=>void}){
  const gameId=g.game?.id;
  const [snapshot,setSnapshot]=useState<Snapshot|null>(null),[error,setError]=useState('');
+ const [macro,setMacro]=useState<FiscalContext|null>(null);
  const request=useRef(0),alive=useRef(false),scope=useRef(gameId),snapshotScope=useRef('');scope.current=gameId;
  const refresh=useCallback(async()=>{
   if(!gameId||!g.teacher)return;
@@ -21,6 +24,7 @@ export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnType
    if(!alive.current||ticket!==request.current||scope.current!==gameId)return;
    if(r.error)throw r.error;if(!r.data?.as_of)throw new Error('Обзор управления не вернул данные.');
    snapshotScope.current=gameId;setSnapshot(r.data as Snapshot);setError('');
+   void supabase.rpc('get_fiscal_context',{p_game_id:gameId}).then(m=>{if(!m.error&&m.data?.policy&&alive.current&&scope.current===gameId)setMacro(m.data as FiscalContext);});
   }catch(e){if(alive.current&&ticket===request.current&&scope.current===gameId)setError(userError(e));}
  },[gameId,g.teacher]);
  useEffect(()=>{
@@ -60,7 +64,8 @@ export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnType
   </div>
   <section className={styles.queue} aria-label="Очередь проверки преподавателя"><header><BookOpenText size={21}/><h2>Требуют внимания</h2><b>{s?waiting:'…'}</b></header><div>{[{label:'Регистрация партий',count:s?.parties_waiting,action:()=>onWorkspace('parties')},{label:'Новости для СМИ',count:s?.media_waiting,action:navigate('actions')},{label:'Оценки на проверке',count:s?.grades_waiting,action:()=>onWorkspace('grades')},{label:'Просроченные этапы',count:s?.stages_overdue,action:()=>onWorkspace('stages')}].map(q=><button type="button" key={q.label} onClick={q.action}><span>{q.label}</span><b>{number(q.count)}</b><ArrowRight size={16}/></button>)}</div></section>
   <div className={styles.grid}>{cards.map(({key,title,Icon,value,unit,items,action,button})=><article key={key} data-overview-card={key}><header><span><Icon size={20}/></span><h2>{title}</h2></header><strong data-overview-kpi={key}>{number(value)}</strong><small>{unit}</small><dl>{items.map(([label,value])=><div key={String(label)}><dt>{label}</dt><dd>{typeof value==='string'?value:number(value as number|undefined)}</dd></div>)}</dl><button type="button" className="secondary" onClick={action}>{button}<ArrowRight size={16}/></button></article>)}</div>
-  <section className={styles.budget} aria-label="Общий федеральный прогноз"><header><Wallet size={21}/><div><h2>Федеральный бюджет · 2026</h2><p>{pulse?budgetModeLabel(pulse.mode):'Загрузка общего расчета…'}</p></div><button type="button" className="secondary" onClick={navigate('budget')}>Открыть бюджет<ArrowRight size={16}/></button></header><div className={styles.budgetNumbers}>{[{label:'Планируемые доходы',value:c?.revenue,key:'income'},{label:'Планируемые расходы',value:c?.expenditure,key:'expense'},{label:c&&c.balance>=0?'Профицит':'Дефицит',value:c?c.balance>=0?c.surplus:c.deficit:undefined,key:'balance'},{label:'Госдолг на конец периода',value:c?.debt_total,key:'debt'}].map(k=><article key={k.key}><span>{k.label}</span><strong data-budget-shared={k.key} data-budget-value={k.value}>{k.value===undefined?'…':moneyMillions(k.value)}</strong></article>)}</div><p>{pulse?.note} До опубликования закона показан прогноз. Несохраненные изменения личного калькулятора сюда не входят.</p>{g.budgetPulseError&&<p role="alert" className={styles.error}>{g.budgetPulseError} {pulse?'Показан последний полученный расчет.':''}</p>}</section>
+  {macro&&<section className={styles.budget} aria-label="Макроэкономические показатели"><header><Landmark size={21}/><div><h2>Макроэкономические показатели</h2><p>Единые параметры бюджета и финансового прогноза. Обновляются после решений и событий.</p></div><button type="button" className="secondary" onClick={navigate('budget')}>Открыть параметры<ArrowRight size={16}/></button></header><div className={styles.budgetNumbers}>{[{label:'Ключевая ставка',value:quantity(macro.policy.key_rate,'% годовых')},{label:'Курс',value:quantity(macro.policy.fx_rate,'₽ / USD')},{label:'Нефть',value:quantity(macro.policy.oil_price,'USD / баррель')},{label:'Инфляция',value:quantity(macro.policy.inflation,'%')}].map(x=><article key={x.label}><span>{x.label}</span><strong>{x.value}</strong></article>)}</div></section>}
+  <section className={styles.budget} aria-label="Общий федеральный прогноз"><header><Wallet size={21}/><div><h2>Федеральный бюджет · 2026</h2><p>{pulse?budgetModeLabel(pulse.mode):'Загрузка общего расчета…'}</p></div><button type="button" className="secondary" onClick={navigate('budget')}>Открыть бюджет<ArrowRight size={16}/></button></header><div className={styles.budgetNumbers}>{[{label:'Планируемые доходы',value:c?.revenue,key:'income'},{label:'Планируемые расходы',value:c?.expenditure,key:'expense'},{label:c&&c.balance>=0?'Профицит':'Дефицит',value:c?c.balance>=0?c.surplus:c.deficit:undefined,key:'balance'},{label:'Госдолг на конец периода',value:c?.debt_total,key:'debt'}].map(k=><article key={k.key}><span>{k.label}</span><strong data-budget-shared={k.key} data-budget-value={k.value}>{k.value===undefined?'…':budgetDisplay(k.value)}</strong></article>)}</div><p>{pulse?.note} До опубликования закона показан прогноз. Несохраненные изменения личного калькулятора сюда не входят.</p>{g.budgetPulseError&&<p role="alert" className={styles.error}>{g.budgetPulseError} {pulse?'Показан последний полученный расчет.':''}</p>}</section>
   <p className={styles.note}>Счетчики учитывают текущую игру. Активность и оценки — действующих студентов; завершенные процедуры и документы остаются в истории игры.</p>
  </section>;
 }
