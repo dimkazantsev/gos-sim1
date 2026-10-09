@@ -220,8 +220,8 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
       <div className="eventStoryRecipients">{assigned.map(a=><span key={a.id}>{members.find(m=>m.user_id===a.recipient_id)?.full_name||'Участник'} · {members.find(m=>m.user_id===a.recipient_id)?.role_title||'Без должности'}</span>)}</div>
       <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили · {pct(responded.length,assigned.length)}%</span>
       </div>
-      <EventChoicePanel labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,choice)}} notice={pendingInvites?'Ожидаем ответа на приглашения.':undefined}/>
-      {mineAnswer&&me.kind==='student'&&<EventDecisionFeedback caseId={c.id}/>}
+      <EventChoicePanel labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,choice)}} revealResults={teacher||!!outcome} shuffleSeed={c.id+':'+me.user_id} notice={pendingInvites?'Ожидаем ответа на приглашения.':undefined}/>
+      {mineAnswer&&outcome&&me.kind==='student'&&<EventDecisionFeedback caseId={c.id}/>}
       {mineAnswer&&!teacher&&<div className="eventOutcomeNote">Ваш голос: {labels[mineAnswer.choice==='accept'?0:mineAnswer.choice==='reject'?1:Math.max(0,Number(mineAnswer.choice.replace('option_',''))-1)]||'Учтён'}</div>}
       {outcome&&<div className="eventOutcomeNote final"><strong>Итог голосования: {outcome.winner==='tie'?'Большинство участников не поддержало единый вариант — решение не принято':labels[winnerIndex]}</strong>
        {chosenEffect?.description&&<p>{chosenEffect.description}</p>}
