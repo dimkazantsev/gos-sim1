@@ -1,32 +1,47 @@
 name: Budget simulator verification
 on:
   push:
-    branches: [main, "codex/budget-amendments-*"]
+    branches: [main, "codex/budget-amendments-*", "codex/budget-workflow-*"]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   budget:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 30
     env:
       NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: build-placeholder-key
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run typecheck
       - run: node scripts/budget-simulator-math-check.cjs
+      - run: node scripts/budget-workflow-math-check.cjs
       - run: npm run design:preview
+      - name: Select Chrome browser
+        run: |
+          for binary in /usr/bin/google-chrome /usr/bin/google-chrome-stable /usr/bin/chromium; do
+            if test -x "$binary"; then echo "CHROME_BIN=$binary" >> "$GITHUB_ENV"; exit 0; fi
+          done
+          echo "Chrome is required for budget browser checks" >&2
+          exit 1
       - run: node scripts/budget-simulator-browser-check.cjs
-      - uses: actions/upload-artifact@v4
+      - run: node scripts/budget-law-amendments-browser-check.cjs
+      - run: node scripts/overview-budget-browser-check.cjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: budget-simulator-responsive-screenshots
-          path: .design-review/screenshots/budget-simulator-*.png
+          path: |
+            .design-review/screenshots/budget-*.png
+            .design-review/budget-workflow/*.png
+            .design-review/budget-law-amendments/*.png
           if-no-files-found: ignore
           retention-days: 7

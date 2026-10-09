@@ -65,7 +65,9 @@ const surplus=run({...draft,income_changes:{oil_gas:100}});assert(surplus.surplu
 assert(run({...draft,financing:{...draft.financing,reserves:5000000}}).reserve_remaining<0,'Overuse is visible before server validation');
 const regional=fiscalForecast(regions[0],[]),regionalCredit=fiscalForecast({...regions[0],budget_credit_cash:1000},[]);
 assert.equal(regionalCredit.revenue,regional.revenue,'Regional loans are not transfer income');assert.equal(regionalCredit.financing,1000);
-assert.match(billions(742000),/742 млрд ₽$/);assert.match(billions(40283300),/40[,.]28 трлн ₽$/);
+const plainMoney=value=>value.replace(/[\u00a0\u202f]/g,' ');
+assert.equal(billions(742000),'742\u00a0млрд\u00a0₽','Formatted labels use nonbreaking spaces');
+assert.match(plainMoney(billions(742000)),/742 млрд ₽$/);assert.match(plainMoney(billions(40283300)),/40[,.]28 трлн ₽$/);
 const cases=require('../content/budget-cases-2026.json'),old=require('../content/events-legal-2026.json');
 assert.equal(cases.length,14);assert.equal(cases.filter(c=>c.comic_scene.region_code).length,8);
 assert(cases.every(c=>c.situation.length>=500&&c.effect_plan.options.every(o=>o.description.length>=250)));

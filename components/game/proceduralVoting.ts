@@ -48,6 +48,20 @@ export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
  }
 
  if(doc.workflow_key==='budget'){
+  if(doc.doc_type==='federal_budget'&&(doc.status_code==='government'||doc.status_code==='revision'&&doc.current_owner_key==='government'&&doc.current_step===1)){
+   return {
+    title:'Внесение бюджета в Государственную Думу: '+doc.title,
+    body:'Правительство принимает коллегиальное решение о внесении проекта федерального бюджета и его расчётных приложений в Государственную Думу. Средства перечисляются после принятия и опубликования закона.',
+    mode:'member',institutionKey:'government',procedureKey:'budget_government_submission',
+    quorumKind:'fraction',quorumValue:0.5,
+    majorityKind:'present_majority',majorityValue:0.5,
+    allowAbstain:true,tieBreakerChair:true,
+    passTransition:'advance',failTransition:'return_author',
+    badge:'ВНЕСЕНИЕ БЮДЖЕТА · ПРАВИТЕЛЬСТВО',
+    rule:'Регистрация членов Правительства; кворум — не менее половины состава; большинство присутствующих; при равенстве решает председательствующий',
+    legalMode:'game',legalBasis:'Правила деловой игры, этап 13.1.5: коллегиальное решение Правительства о внесении проекта ФЗ о федеральном бюджете вместе с пакетом документов. Регистрация, кворум и голос председательствующего соответствуют принятой в проекте модели заседания Правительства.'
+   };
+  }
   if(['reading1','reading2','reading3'].includes(doc.status_code)){
    const label=doc.status_code==='reading1'?'I чтение бюджета':doc.status_code==='reading2'?'II чтение бюджета':'III чтение бюджета';
    return {

@@ -70,10 +70,10 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  const visible=useMemo(()=>votes.filter(v=>(tab==='all'||v.status===tab)&&(!query.trim()||[v.title,institutionLabel(v.institution_key),v.group_name,v.electorate_snapshot?.institution_label].join(' ').toLowerCase().includes(query.trim().toLowerCase()))),[votes,tab,query]);
  const openCount=votes.filter(v=>v.status==='open').length;
 
- async function openNpa(id:string){const d=formalDocuments.find(d=>d.id===id),preset=d?votePresetForDocument(d):null;if(!d||!preset)return;setBusy(id);try{await createVote({...preset,formalDocumentId:id,groupName:group||null})}finally{setBusy('')}}
+ async function openNpa(id:string){const d=formalDocuments.find(d=>d.id===id),preset=d?votePresetForDocument(d):null;if(!d||!preset)return;setBusy(id);try{await createVote({...preset,formalDocumentId:id,groupName:d.workflow_key==='budget'?null:group||null})}finally{setBusy('')}}
  function chooseNpa(ids:string[]){setFormalId(ids[0]||'');const d=formalDocuments.find(d=>d.id===ids[0]);if(d){const preset=votePresetForDocument(d);setTitle(preset?.title||d.title);setBody(d.body_text||preset?.body||'');if(preset){setInstitution(preset.institutionKey);setMode(preset.mode);setQuorumValue(preset.quorumValue);setMajorityKind(preset.majorityKind);setMajorityValue(preset.majorityValue)}}}
  async function create(){
-  if(selectedNpa){const preset=votePresetForDocument(selectedNpa);if(preset){const ok=await createVote({...preset,title:title||preset.title,body:body||preset.body,formalDocumentId:formalId,groupName:group||null});if(ok){setTitle('');setBody('');setFormalId('')}return}}
+  if(selectedNpa){const preset=votePresetForDocument(selectedNpa);if(preset){const ok=await createVote({...preset,title:title||preset.title,body:body||preset.body,formalDocumentId:formalId,groupName:selectedNpa.workflow_key==='budget'?null:group||null});if(ok){setTitle('');setBody('');setFormalId('')}return}}
 
   const ok=await createVote({title,body,mode,institutionKey:institution,procedureKey:!['all','factions'].includes(institution)?'registered_session':'manual',quorumKind:'fraction',quorumValue,majorityKind,majorityValue,allowAbstain:true,tieBreakerChair:institution==='government',formalDocumentId:formalId||null,groupName:group||null});
   if(ok){setTitle('');setBody('');setFormalId('')}
@@ -82,8 +82,9 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  function canDelete(v:Vote){return !!me&&(teacher||v.created_by===me.user_id)}
  function canClose(v:Vote){
   if(teacher)return true;if(!me)return false;if(units.some(u=>'unit:'+u.id===v.institution_key&&u.head_user_id===me.user_id))return true;
-  if(v.procedure_key==='bill_amendments'&&v.created_by===me.user_id)return true;
+  if(['bill_amendments','budget_second_reading_amendment','budget_government_submission'].includes(v.procedure_key||'')&&v.created_by===me.user_id)return true;
   const role=(me.role_title||'').toLowerCase();
+  if(v.procedure_key==='budget_government_submission')return me.kind==='student'&&(/^председатель\s+правительства(?:\s|$)/i.test(me.role_title||'')||g.officeAssignments.some(o=>o.user_id===me.user_id&&o.status==='active'&&/^председатель\s+правительства(?:\s|$)/i.test(o.role_title)));
   if(v.institution_key==='gd')return (role.includes('председател')&&role.includes('дум'))||(role.includes('совет')&&role.includes('дум'));
   if(v.institution_key==='government')return role.includes('председател')&&role.includes('правительств');
   if(v.institution_key==='sf')return role.includes('председател')&&role.includes('совет')&&role.includes('федерац');
@@ -125,7 +126,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
      <textarea aria-label="Проект решения" value={body} onChange={e=>setBody(e.target.value)} placeholder="Проект решения / пояснение"/>
      <div className="voteBuilderGrid">
       <StyledSelect label="Кто голосует" value={institution} onChange={key=>{setInstitution(key);setMode(key==='gd'?'mandate':'member');setQuorumValue(VOTING_BODIES.find(b=>b.key===key)?.quorum||.5);setMajorityKind(key==='gd'?'eligible_majority':'present_majority')}} options={[{value:'all',label:'Все участники'},{value:'factions',label:'Фракции'},...VOTING_BODIES.map(b=>({value:b.key,label:b.title})),...units.map(u=>({value:'unit:'+u.id,label:u.title}))]}/>
-      <StyledSelect label="Учебная группа" value={group} onChange={setGroup} options={[{value:'',label:'Все группы'},...groups.map(s=>({value:s,label:s}))]}/>
+      <StyledSelect label="Учебная группа" value={selectedNpa?.workflow_key==='budget'?'':group} onChange={setGroup} disabled={selectedNpa?.workflow_key==='budget'} options={[{value:'',label:'Все группы'},...groups.map(s=>({value:s,label:s}))]}/>
       <StyledSelect label="Способ подсчёта" value={mode} onChange={v=>setMode(v as typeof mode)} options={institution==='gd'?[{value:'mandate',label:'По числу депутатских мандатов'}]:['all','factions'].includes(institution)?[{value:'member',label:'Один участник — один голос'},{value:'faction',label:'Одна фракция — один голос'}]:[{value:'member',label:'Один участник — один голос'}]}/>
       <StyledSelect label="Кворум" value={String(quorumValue)} onChange={v=>setQuorumValue(Number(v))}
        options={[...(institution==='ks'?[{value:String(6/11),label:'Учебный кворум КС · 6/11'}]:[]),{value:'0.5',label:'Не менее 1/2'},{value:String(2/3),label:'Не менее 2/3'},{value:'0.75',label:'Не менее 3/4'}]}/>
@@ -135,7 +136,8 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
      </div>
      {majorityKind==='eligible_fraction'&&<StyledSelect label="Необходимая доля" value={String(majorityValue)}
        onChange={v=>setMajorityValue(Number(v))} options={[{value:String(2/3),label:'2/3'},{value:'0.75',label:'3/4'}]}/>}
-     <p className="civicVoteBase">{institution==='gd'?'Общий состав: 450 мандатов. GV уменьшает доступные голоса, сохраняя базу расчёта кворума.':['government','municipality'].includes(institution)?'Общий состав: '+members.filter(m=>m.kind==='student'&&(!group||m.group_name===group)).length+' студентов выбранной группы.':'Состав и право голоса фиксируются при открытии процедуры.'}</p><button className="primary" disabled={title.trim().length<3} onClick={create}>Открыть голосование</button>
+     {selectedNpa?.workflow_key==='budget'&&<p className="civicVoteBase">Бюджет рассматривает полный состав соответствующего органа. Аналитическая учебная группа не сокращает состав Правительства или Государственной Думы.</p>}
+     <p className="civicVoteBase">{selectedNpa?.workflow_key==='budget'&&institution==='government'?'Состав Правительства и право голоса фиксируются при открытии процедуры. Учитываются действующие должности и регистрация на заседании.':institution==='gd'?'Общий состав: 450 мандатов. GV уменьшает доступные голоса, сохраняя базу расчёта кворума.':['government','municipality'].includes(institution)?'Общий состав: '+members.filter(m=>m.kind==='student'&&(!group||m.group_name===group)).length+' студентов выбранной группы.':'Состав и право голоса фиксируются при открытии процедуры.'}</p><button className="primary" disabled={title.trim().length<3} onClick={create}>Открыть голосование</button>
     </div>
    </div>
   </details>}
