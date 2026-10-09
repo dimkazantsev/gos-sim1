@@ -24,7 +24,7 @@ export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnType
    if(!alive.current||ticket!==request.current||scope.current!==gameId)return;
    if(r.error)throw r.error;if(!r.data?.as_of)throw new Error('Обзор управления не вернул данные.');
    snapshotScope.current=gameId;setSnapshot(r.data as Snapshot);setError('');
-   void supabase.rpc('get_fiscal_context',{p_game_id:gameId}).then(m=>{if(!m.error&&alive.current&&scope.current===gameId)setMacro(m.data as FiscalContext);});
+   void supabase.rpc('get_fiscal_context',{p_game_id:gameId}).then(m=>{if(!m.error&&m.data?.policy&&alive.current&&scope.current===gameId)setMacro(m.data as FiscalContext);});
   }catch(e){if(alive.current&&ticket===request.current&&scope.current===gameId)setError(userError(e));}
  },[gameId,g.teacher]);
  useEffect(()=>{
