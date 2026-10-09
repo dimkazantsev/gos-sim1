@@ -179,7 +179,7 @@ async function main(){
    await sim.getByLabel('Название расчета').fill('Альтернативный вариант без сохранения');
    await projectTabs.getByRole('tab',{name:/Учебный бюджет: проверка полной процедуры/}).click();
    assert.equal(await sim.getByLabel('Название расчета').inputValue(),'Учебный бюджет: проверка полной процедуры','Switching returns to saved plan');
-   await projectTabs.getByRole('tab',{name:/Новый вариант/}).click();
+   await projectTabs.getByRole('tab',{name:/Создать вариант/}).click();
    assert.equal(await sim.getByLabel('Название расчета').inputValue(),'Альтернативный вариант без сохранения','Unsaved draft survives switching');
    await projectTabs.getByRole('tab',{name:/Учебный бюджет: проверка полной процедуры/}).click();
    await sim.getByRole('button',{name:'Создать проект ФЗ о бюджете',exact:true}).click();const annex=page.getByRole('region',{name:'Расчётные приложения к бюджету'});await annex.waitFor();assert.equal(f.state.last_plan_id,null,'Creating the law does not bypass Duma, Council or presidential signature');
