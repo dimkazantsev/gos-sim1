@@ -847,7 +847,6 @@
 .mayorElection{display:grid;gap:14px;padding:18px!important;background:var(--gs-bg-elevated,#f9faff)!important;border-color:var(--gs-border,#dce3f0)!important}
 .mayorElectionTitle{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.mayorElectionTitle>div{min-width:0;flex:1}.mayorElectionTitle h3{font-size:17px!important;line-height:1.45!important}
 .mayorCreateActions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.mayorCreateActions .primary{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 20px!important;border-radius:11px;font-weight:750;white-space:normal}.mayorCreateActions p{margin:0;color:var(--gs-muted,#586784);font-size:13px;line-height:1.6;flex:1 1 260px}.mayorElectionFeedback{margin:0;padding:10px 12px;border-radius:10px;border:1px solid var(--gs-border,#dce3f0);background:white;color:var(--gs-ink,#172447)}
-.govSessionLab [data-stage-module-head] .stats{align-self:center!important;align-items:stretch!important}.govSessionLab [data-stage-module-head] .stats>div{min-height:118px;justify-content:center!important}
 .govSessionTabs{align-items:start!important;gap:16px!important;flex-wrap:wrap}.govSessionTabs>div{flex:1 1 280px;min-width:0}.govSessionCreate{flex:0 1 330px;min-width:min(100%,280px);border-radius:14px!important;border:1px solid var(--gs-border,#dce3f0)!important;overflow:hidden}.govSessionCreate summary{display:flex;align-items:center;min-height:48px;padding:12px 16px!important}.govSessionCreate>div{display:grid;gap:14px!important;padding:16px!important}.govSessionCreate label{display:grid;gap:7px!important;font-weight:700!important;color:var(--gs-muted,#586784)!important}.govSessionCreate input{width:100%;box-sizing:border-box;min-height:48px!important;padding:0 12px!important;font-size:15px!important;background:#fff}.govSessionCreate button{min-height:48px!important;font-size:14px!important;margin-top:2px}
 .programLab .programPicker,.programLab .programTabs{gap:14px}.programLab .programNew{min-height:46px}
 @media(max-width:820px){.govSessionCreate{flex:1 1 100%;width:100%;min-width:0}.mayorCreateActions{align-items:stretch;flex-direction:column}.mayorCreateActions .primary{width:100%}.govSessionLab [data-stage-module-head] .stats>div{min-height:96px}}
@@ -867,11 +866,23 @@
 @media(max-width:760px){.govMeetingCreateFields,.govQuestionEditor,.govQuestionAdd,.govReviewForm{grid-template-columns:minmax(0,1fr)}.govQuestionEditor label:nth-of-type(2),.govQuestionAdd label:nth-of-type(2),.govReviewForm label:nth-of-type(n+3){grid-column:auto}.govSessionCreateWide>div.govMeetingCreate,.govAgendaDocument,.govQuestionsPanel,.govProgramReview{padding:14px!important}.govQuestionItem{grid-template-columns:28px minmax(0,1fr)}.govQuestionItem>button{grid-column:2;justify-self:start}.govMeetingCreateActions button{flex:1 1 180px}}
 
 /* Stage 11 header: same card dimensions, aligned text baselines and centered group */
-.govSessionLab [data-stage-module-head]{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(330px,360px)!important;align-items:center!important;gap:24px!important}
-.govSessionLab [data-stage-module-head] .stats{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important;align-self:center!important;justify-self:end!important;gap:12px!important;width:100%!important;max-width:none!important;margin:0!important}
-.govSessionLab [data-stage-module-head] .stats>div{box-sizing:border-box!important;display:grid!important;grid-template-rows:20px minmax(32px,auto) 19px!important;align-content:center!important;justify-content:stretch!important;gap:5px!important;min-width:0!important;max-width:none!important;width:100%!important;min-height:124px!important;height:100%!important;padding:14px!important}
-.govSessionLab [data-stage-module-head] .stats dt{line-height:20px!important;margin:0!important}
-.govSessionLab [data-stage-module-head] .stats dd{line-height:32px!important;min-height:32px!important;margin:0!important;font-size:20px!important;white-space:normal!important}
-.govSessionLab [data-stage-module-head] .stats span{display:block!important;line-height:19px!important;min-height:19px!important;margin:0!important}
-@media(max-width:950px){.govSessionLab [data-stage-module-head]{grid-template-columns:minmax(0,1fr)!important}.govSessionLab [data-stage-module-head] .stats{justify-self:stretch!important;max-width:390px!important}}
-@media(max-width:420px){.govSessionLab [data-stage-module-head] .stats{max-width:none!important}.govSessionLab [data-stage-module-head] .stats>div{padding:12px!important}.govSessionLab [data-stage-module-head] .stats dd{font-size:17px!important}}
+
+
+/* Stage 11: all fields top-aligned within consistent card geometry. */
+.govSessionLab .govSessionCreateWide{background:var(--gs-surface,#fff);border:1px solid var(--gs-border,#dce3f0);border-radius:16px}
+.govSessionLab .govSessionCreateWide>summary{background:var(--gs-bg-elevated,#f9faff);color:var(--gs-ink,#172447);font-weight:750;padding:18px 22px!important;border-bottom:0}
+.govSessionLab .govSessionCreateWide[open]>summary{border-bottom:1px solid var(--gs-border,#dce3f0)}
+.govSessionLab .govSessionCreateWide>div.govMeetingCreate{padding:24px!important;gap:22px!important}
+.govSessionLab .govMeetingCreateFields,.govSessionLab .govQuestionEditor{align-items:start}
+.govSessionLab .govQuestionEditor{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 165px;column-gap:16px;row-gap:14px;padding:20px;border-radius:14px}
+.govSessionLab .govQuestionEditor>b{font-size:15px;line-height:22px}
+.govSessionLab .govQuestionEditor>label,.govSessionLab .govMeetingCreateFields>label,.govSessionLab .govQuestionAdd>label{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:9px!important;min-width:0!important;margin:0!important;line-height:20px;font-size:13px;font-weight:700;color:var(--gs-muted,#586784)}
+.govSessionLab .govQuestionEditor>label:nth-of-type(2){grid-column:auto}
+.govSessionLab .govQuestionEditor>label>input,.govSessionLab .govQuestionEditor>label>textarea,.govSessionLab .govMeetingCreateFields>label>input{box-sizing:border-box!important;display:block!important;width:100%!important;min-width:0!important;margin:0!important;border:1px solid var(--gs-border-strong,#b8c5dc);border-radius:11px;background:var(--gs-surface,#fff);color:var(--gs-ink,#172447);font:inherit;font-size:15px}
+.govSessionLab .govQuestionEditor>label>input,.govSessionLab .govMeetingCreateFields>label>input{height:56px!important;min-height:56px!important;padding:0 14px!important}
+.govSessionLab .govQuestionEditor>label>textarea{height:88px!important;min-height:88px!important;max-height:240px!important;padding:14px!important;resize:vertical}
+.govSessionLab .govQuestionEditor>label>input{align-self:start!important}
+.govSessionLab .govMeetingCreateActions{gap:16px;margin-top:0;padding-top:0}
+.govSessionLab .govMeetingCreateActions>button{display:inline-flex;justify-content:center;align-items:center;min-height:48px;padding:12px 18px;border-radius:12px}
+@media(max-width:820px){.govSessionLab .govQuestionEditor{grid-template-columns:repeat(2,minmax(0,1fr))}.govSessionLab .govQuestionEditor>label:nth-of-type(2){grid-column:2}.govSessionLab .govQuestionEditor>label:nth-of-type(3){grid-column:1}}
+@media(max-width:580px){.govSessionLab .govQuestionEditor,.govSessionLab .govMeetingCreateFields{grid-template-columns:minmax(0,1fr)}.govSessionLab .govQuestionEditor>label:nth-of-type(2),.govSessionLab .govQuestionEditor>label:nth-of-type(3){grid-column:auto}.govSessionLab .govSessionCreateWide>div.govMeetingCreate{padding:16px!important}.govSessionLab .govMeetingCreateActions>button{flex:1 1 100%}}
