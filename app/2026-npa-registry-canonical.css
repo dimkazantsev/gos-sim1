@@ -263,6 +263,13 @@
   display:grid!important;grid-template-columns:38px minmax(0,1fr) auto!important;align-items:center!important;gap:12px!important;
   min-height:94px!important;padding:16px!important;border:1px dashed #cbd8e8!important;border-radius:14px!important;background:#f8fafd!important
 }
+.legalPortal .registryEmptyState>div{display:grid!important;gap:5px!important;min-width:0!important;line-height:1.5!important}
+.legalPortal .registryEmptyState>div>b,.legalPortal .registryEmptyState>div>span{display:block!important;overflow-wrap:anywhere!important}
+.legalPortal .registryEmptyState>div>b{font-size:14px!important;color:#173c70!important}
+.legalPortal .registryEmptyState>div>span{font-size:12px!important;color:#647994!important}
+.legalPortal .registryEmptyState>svg{color:#5275ac!important;justify-self:center!important}
+.legalPortal .registryEmptyState>button{min-height:42px!important;white-space:normal!important}
+@media(max-width:540px){.legalPortal .registryEmptyState{grid-template-columns:30px minmax(0,1fr)!important}.legalPortal .registryEmptyState>button{grid-column:2;justify-self:start!important}}
 
 #npa-document-workspace{scroll-margin-top:92px!important}
 

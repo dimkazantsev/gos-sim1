@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useId,useMemo,useRef,useState,type InputHTMLAttributes,type KeyboardEvent} from 'react';
-import {ArrowRight,Calculator,ChartNoAxesCombined,Check,ChevronDown,Coins,FileText,Landmark,Plus,RefreshCw,Save,Send,Wallet,Clock,ArrowRightLeft} from 'lucide-react';
+import {ArrowRight,Calculator,ChartNoAxesCombined,Check,ChevronDown,Coins,FileText,Landmark,Plus,RefreshCw,Save,Trash2,Send,Wallet,Clock,ArrowRightLeft} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
 import {userError} from '@/lib/userError';
@@ -55,6 +55,16 @@ export default function FederalBudgetSimulator({g,context,regions,rates,programs
   if(!g.game||busy||readOnly||!canPrepare)return null;setBusy(true);setError('');
   try{const r=await supabase.rpc('save_budget_simulator',{p_game_id:g.game.id,p_plan_id:selected?.status==='draft'?selected.id:null,p_draft:draft,p_revision:selected?.status==='draft'?revision:null});if(r.error){setError(userError(r.error));return null;}draftSessions.current.delete(selectedId||'new');setSelectedId(r.data.id);setRevision(r.data.revision);setDirty(false);editor.current={selectedId:r.data.id,revision:r.data.revision,dirty:false};setNotice('Расчет сохранен для всей группы. Действующий бюджет изменится после опубликования закона.');await Promise.all([load(),onSaved(),g.refreshBudgetPulse?.()]);return r.data.id as string;}catch(e){setError(userError(e));return null;}finally{setBusy(false);}
  }
+ async function deleteDraft(){if(!g.game||!selected||selected.status!=='draft'||selected.document_id||busy||readOnly||!canPrepare)return;
+  if(!window.confirm('Удалить черновик «'+selected.title+'»? Это действие нельзя отменить. Проекты с документами и исполненными операциями защищены.'))return;
+  setBusy(true);setError('');
+  try{const r=await supabase.rpc('delete_budget_simulator_draft',{p_game_id:g.game.id,p_plan_id:selected.id,p_revision:revision});
+   if(r.error){setError(userError(r.error));return;}draftSessions.current.delete(selected.id);setPlans(previous=>previous.filter(p=>p.id!==selected.id));
+   const other=plans.find(p=>p.id!==selected.id);setDraft(other?.draft||newBudgetDraft());setSelectedId(other?.id||'');setRevision(other?.revision||0);setDirty(false);
+   editor.current={selectedId:other?.id||'',revision:other?.revision||0,dirty:false};setNotice('Черновик удалён. Связанные с законами версии не затронуты.');
+   await Promise.all([load(),onSaved(),g.refreshBudgetPulse?.()]);
+  }catch(e){setError(userError(e));}finally{setBusy(false);}
+ }
  async function document(){
   if(busy||readOnly||!canPrepare)return;if(selected?.document_id&&!dirty){onOpenDocument(selected.document_id);return;}
   const id=dirty||!selectedId?await save():selectedId;if(!id)return;setBusy(true);
@@ -77,6 +87,10 @@ export default function FederalBudgetSimulator({g,context,regions,rates,programs
     </div>
     <div className={styles.projectEditor} role="tabpanel" id={projectPanelId} aria-labelledby={projectTabId+'-'+(selectedId||'new')}>
       <div className={styles.planHead}><label>Название расчета<input value={draft.title} maxLength={160} onChange={e=>edit({title:e.target.value})} disabled={readOnly}/></label><span role="status">{dirty?'Изменения не сохранены':selected?.status==='published'?'Закон опубликован':selected?.status==='document'?'Проект зарегистрирован в реестре':selected?'Версия '+revision+' сохранена':'Новый вариант не сохранён'}</span></div>
+      <div className={styles.projectActions}>
+       <button type="button" className="primary" onClick={()=>void save()} disabled={busy||readOnly||!canPrepare}><Save size={17}/> {dirty||!selectedId?'Сохранить вариант':'Сохранить новую версию'}</button>
+       {selected?.status==='draft'&&!selected.document_id&&!readOnly&&canPrepare&&<button type="button" className={'secondary '+styles.projectDelete} onClick={()=>void deleteDraft()} disabled={busy}><Trash2 size={17}/> Удалить черновик</button>}
+      </div>
       {selected?.document_id&&<button type="button" className={'secondary '+styles.projectDocumentButton} onClick={()=>onOpenDocument(selected.document_id!)}><FileText size={17}/> Открыть связанный документ{selected.registry_no?' · '+selected.registry_no:''}</button>}
     </div>
    </section>

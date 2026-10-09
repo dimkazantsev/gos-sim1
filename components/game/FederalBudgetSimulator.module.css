@@ -118,3 +118,6 @@
 /* Mobile project tabs remain fully visible: never hide action targets in a horizontal scroller. */
 @container(max-width:750px){.projectTabList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible}.projectTabList>button{width:100%;min-width:0;max-width:none;min-height:66px}.projectTabName{white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}}
 @container(max-width:420px){.projectTabList{grid-template-columns:minmax(0,1fr)}}
+
+.projectActions{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:10px;margin-top:12px}.projectActions button{min-height:44px;text-align:center}.projectDelete{color:#a13b4c!important;border-color:#e8cbd2!important;background:#fff!important}.projectDelete:hover:not(:disabled){background:#fff4f5!important}
+@container(max-width:420px){.projectActions{display:grid;grid-template-columns:minmax(0,1fr)}.projectActions button{width:100%}}
