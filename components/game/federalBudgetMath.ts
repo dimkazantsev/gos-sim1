@@ -5,8 +5,8 @@ import type {FiscalContext,FiscalRate,FiscalRegion} from './fiscalMath';
 export const FINANCING_SOURCES = [
  {key:'ofz_fixed',label:'ОФЗ с постоянным купоном',lender:'Банки, фонды и граждане через рынок ценных бумаг',debt:'internal',spread:0,risk:'Стоимость фиксируется при размещении. Остаются риск слабого спроса и необходимость погашения.'},
  {key:'ofz_float',label:'ОФЗ с переменным купоном',lender:'Участники рынка государственных облигаций',debt:'internal',spread:0.5,risk:'Платежи растут при увеличении ставки. Риск проверяется в следующем финансовом периоде.'},
- {key:'bank_credit',label:'Кредит кредитной организации',lender:'Учебный банк «Казначейский партнер»',debt:'internal',spread:3,risk:'Зависимость от одного кредитора и его платежной инфраструктуры. Банкротство банка не прекращает долг.'},
- {key:'external',label:'Внешнее заимствование',lender:'Иностранный кредитор в учебном сценарии',debt:'external',spread:0,risk:'Валютная переоценка, платежные ограничения и договорный порядок исполнения.'},
+ {key:'bank_credit',label:'Кредит кредитной организации',lender:'Кредитная организация по договору',debt:'internal',spread:3,risk:'Зависимость от одного кредитора и его платежной инфраструктуры. Банкротство банка не прекращает долг.'},
+ {key:'external',label:'Внешнее заимствование',lender:'Иностранный кредитор по кредитному соглашению',debt:'external',spread:0,risk:'Валютная переоценка, платежные ограничения и договорный порядок исполнения.'},
  {key:'reserves',label:'Средства ФНБ',lender:'Резервные активы государства',debt:'none',spread:0,risk:'Долг не растет, запас доступных резервов уменьшается. Требуется предусмотренное законом основание.'},
  {key:'privatization',label:'Приватизация акций',lender:'Покупатели государственной доли',debt:'none',spread:0,risk:'Разовый источник: государство теряет долю будущих дивидендов. Продажа нефинансового имущества учитывается иначе.'},
  {key:'other',label:'Прочие источники и изменение остатков',lender:'Казначейские остатки и сальдо иных операций',debt:'none',spread:0,risk:'Отрицательное значение означает отток средств. Нельзя считать эту строку налоговым доходом.'}
@@ -93,6 +93,16 @@ export function coverFundingGap(draft:BudgetDraft,key:FundingKey,state:Simulator
  const next={...draft,financing:{...draft.financing}};
  for(let i=0;i<30;i++){const c=calculateFederalBudget(next,state,context,regions,rates,requests);if(c.funding_gap<=0)break;next.financing[key]=budgetMoneySum(next.financing[key],Math.max(.00000001,c.funding_gap));}
  return next;
+}
+/** Human-readable amounts. All internal calculations remain in million roubles. */
+export function budgetDisplay(n:number):string {
+ if(!Number.isFinite(n))return '—';
+ const size=Math.abs(n),digits=size<.01?8:2;
+ const format=(v:number,max=digits)=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:max}).format(v);
+ if(size>=1000000)return format(n/1000000,2)+'\u00a0трлн\u00a0₽';
+ if(size>=1000)return format(n/1000,2)+'\u00a0млрд\u00a0₽';
+ if(size>=1)return format(n,2)+'\u00a0млн\u00a0₽';
+ return format(n*1000000,2)+'\u00a0₽';
 }
 export const billions=(n:number)=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n/(Math.abs(n)>=1000000?1000000:1000))+(Math.abs(n)>=1000000?'\u00a0трлн\u00a0₽':'\u00a0млрд\u00a0₽');
 export const transferLabels={grant:'Дотация',subsidy:'Субсидия',subvention:'Субвенция',budget_credit:'Бюджетный кредит'};
