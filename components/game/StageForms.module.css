@@ -10,3 +10,8 @@
 .goalElementLink{width:100%;text-align:left;white-space:normal;overflow-wrap:anywhere;min-height:44px;display:block;box-sizing:border-box;padding:10px 14px;border:1px solid var(--gs-border,#dce3f0);border-radius:10px;background:#fff;color:var(--gs-accent-strong,#183fae);text-decoration:none;font-size:13px;font-weight:700;line-height:1.6}.goalElementLink:hover{border-color:var(--gs-accent,#2453e6);background:var(--gs-accent-soft,#edf1ff)}.goalElementLink:focus-visible{outline:2px solid var(--gs-accent,#2453e6);outline-offset:2px}
 @media(max-width:850px){.treeExpenseTable{table-layout:auto}.treeExpenseTable th{width:auto!important}.treeExpenseTable{min-width:680px}.treeDirectionBody{padding:12px}.treeBranches{padding-left:12px}.treeComponent:before{left:-12px;width:10px}.treeExpenseHead strong{white-space:normal}}
 @media(max-width:520px){.treeDirectionHeader{padding:12px;gap:9px}.treeDirectionHeader h4{font-size:14px}.treeIndex{width:30px;height:30px}.treeDirectionBody{gap:12px}.treeComponentBody{padding:12px}.treeExpenses{padding:10px}.treeAddActions{display:grid;grid-template-columns:minmax(0,1fr)}.treeAddActions button{width:100%}}
+
+/* Keep the add-goal control visually separate from the preceding goal card. */
+.addGoalAction{display:flex;align-items:center;justify-content:flex-start;gap:12px;margin-top:20px;padding-top:4px;min-width:0}
+.addGoalAction>button{min-height:46px;max-width:100%;margin:0;white-space:normal}
+@media(max-width:520px){.addGoalAction>button{width:100%}}
