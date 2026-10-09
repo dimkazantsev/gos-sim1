@@ -49,7 +49,10 @@
 .regionToolbar{display:grid;grid-template-columns:minmax(160px,1fr) minmax(220px,1.5fr) auto;align-items:end;gap:16px;margin:20px 0}
 .regionMap{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fafbfe;min-width:0}
 .regionMap svg{width:100%;height:auto;display:block;margin:16px 0;max-height:500px}
-.regionMap path{cursor:pointer;transition:fill .18s ease,filter .18s ease}.regionMap path:hover,.regionMap path:focus-visible{stroke:#fff;stroke-width:1.7;outline:none;filter:drop-shadow(0 0 3px rgba(101,88,207,.55))}
+.regionMap svg path[role="button"]{cursor:pointer;transition:fill .18s ease,stroke .18s ease,filter .18s ease;outline:none!important;box-shadow:none!important;-webkit-tap-highlight-color:transparent}
+.regionMap svg path[role="button"]:focus,.regionMap svg path[role="button"]:focus-visible{outline:none!important;outline-width:0!important;box-shadow:none!important}
+.regionMap svg path[role="button"]:hover,.regionMap svg path[role="button"]:focus-visible{stroke:#6558cf;stroke-width:2.5;filter:drop-shadow(0 0 3px rgba(101,88,207,.4))}
+.regionMap svg path[role="button"][aria-pressed="true"]:hover,.regionMap svg path[role="button"][aria-pressed="true"]:focus-visible{stroke:#fff;stroke-width:2.5}
 .mapLegend{display:flex;flex-wrap:wrap;gap:12px 20px;font-size:12px;color:var(--muted)}.mapLegend span{display:flex;align-items:center;gap:7px}.mapLegend i{width:13px;height:13px;border-radius:3px;flex:none}
 .eventList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
 .eventList>article{border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
