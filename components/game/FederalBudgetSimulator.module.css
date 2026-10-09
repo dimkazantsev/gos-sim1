@@ -96,3 +96,25 @@
 .simulator :is(.requestForm,.sources,.contracts,.saved,.journal)[open]{padding-bottom:16px}
 .simulator :is(.requestForm,.sources,.contracts,.saved,.journal)>summary:focus-visible{outline:3px solid #a69bf2;outline-offset:3px;border-radius:6px}
 @container(max-width:750px){.simulator :is(.requestForm,.sources,.contracts,.saved,.journal){margin:12px 16px;padding-inline:13px}}
+
+
+.projectWorkspace{margin:4px 24px 20px;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden;min-width:0}
+.projectHeading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 18px 12px}
+.projectHeading h3{font-size:16px;margin:0 0 5px}.projectHeading p{font-size:12px;line-height:1.5;color:var(--muted);margin:0}.projectHeading>small{font-size:11px;color:var(--muted);white-space:nowrap}
+.projectTabList{display:flex;align-items:stretch;gap:8px;overflow-x:auto;padding:0 18px 12px;scrollbar-width:thin}
+.projectTabList>button{flex:0 0 auto;min-width:160px;max-width:min(290px,75vw);min-height:62px;display:flex;align-items:flex-start;justify-content:center;flex-direction:column;gap:4px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#f8f9fd;color:var(--ink);text-align:left}
+.projectTabList>button[aria-selected=true]{background:#f0eefc;border-color:#796dd5;box-shadow:inset 0 0 0 1px #796dd5}
+.projectTabName{width:100%;font-size:12px;font-weight:750;line-height:1.4;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.projectTabList button small{font-size:10px;font-weight:500;color:var(--muted)}
+.projectTabList .projectNewTab{display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;border-style:dashed;color:#5147ae;min-width:150px;flex-wrap:wrap}
+.projectNewTab small{flex-basis:100%;text-align:center}
+.projectEditor{padding:13px 18px 16px;border-top:1px solid var(--line);background:#fcfcff}
+.projectEditor .planHead{padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.projectEditor .planHead>label{min-width:0}
+.projectEditor .planHead>span{flex-basis:auto}
+.projectDocumentButton{margin-top:10px}
+@container(max-width:750px){.projectWorkspace{margin:4px 16px 18px}.projectHeading{padding:13px}.projectTabList{padding:0 13px 12px}.projectEditor{padding:13px}.projectTabList>button{min-width:145px;max-width:235px}}
+
+/* Mobile project tabs remain fully visible: never hide action targets in a horizontal scroller. */
+@container(max-width:750px){.projectTabList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible}.projectTabList>button{width:100%;min-width:0;max-width:none;min-height:66px}.projectTabName{white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}}
+@container(max-width:420px){.projectTabList{grid-template-columns:minmax(0,1fr)}}
