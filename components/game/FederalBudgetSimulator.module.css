@@ -80,5 +80,16 @@
 @container(max-width:750px){.currentProject{margin:12px 16px;align-items:stretch}.currentProject .actions{width:100%;flex:1 1 100%}.currentProject .actions button{flex:1 1 150px}}
 
 /* Unified current-draft line and one icon for details. */
-.sharedTotal{display:grid;gap:5px;text-align:right;flex:none}.sharedTotal strong{font-size:clamp(21px,2.4vw,28px);white-space:nowrap}.sharedTotal small{font-size:11px}.sources>summary:before{content:none!important}.sources>summary{justify-content:flex-start}.sources>summary:after{content:'⌄';color:var(--accent);margin-left:auto;font-size:19px}.sources[open]>summary:after{transform:rotate(180deg)}
+.sharedTotal{display:grid;gap:5px;text-align:right;flex:none}.sharedTotal strong{font-size:clamp(21px,2.4vw,28px);white-space:nowrap}.sharedTotal small{font-size:11px}
 @container(max-width:750px){.sharedTotal{text-align:left;width:100%}}
+
+/* Canonical accessible disclosure card, shared by budget calculations and their notes. */
+.simulator :is(.requestForm,.sources,.contracts,.saved,.journal){background:#fafbfe;border:1px solid var(--line);border-radius:13px;margin:14px 24px;padding:0 16px;min-width:0}
+.simulator :is(.requestForm,.sources,.contracts,.saved,.journal)>summary{display:flex;align-items:center;gap:10px;min-height:56px;padding:12px 0;line-height:1.4;color:var(--ink);font-weight:700}
+.simulator :is(.requestForm,.sources,.contracts,.saved,.journal)>summary:before{display:none!important}
+.simulator :is(.requestForm,.sources,.contracts,.saved,.journal)>summary:after{content:'⌄';margin-left:auto;color:var(--accent);font-size:20px;line-height:1;transition:transform .15s}
+.simulator :is(.requestForm,.sources,.contracts,.saved,.journal)[open]>summary:after{transform:rotate(180deg)}
+.simulator :is(.requestForm,.sources,.contracts,.saved,.journal)>summary svg{flex:none;color:var(--accent)}
+.simulator :is(.requestForm,.sources,.contracts,.saved,.journal)[open]{padding-bottom:16px}
+.simulator :is(.requestForm,.sources,.contracts,.saved,.journal)>summary:focus-visible{outline:3px solid #a69bf2;outline-offset:3px;border-radius:6px}
+@container(max-width:750px){.simulator :is(.requestForm,.sources,.contracts,.saved,.journal){margin:12px 16px;padding-inline:13px}}
