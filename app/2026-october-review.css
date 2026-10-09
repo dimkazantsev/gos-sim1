@@ -178,3 +178,8 @@
 .budgetPage .budgetTaxWorkspace .budgetTaxActions button{display:inline-flex;justify-content:center;align-items:center;text-align:center;min-height:44px}
 .budgetPage .budgetTaxWorkspace .budgetTaxHint{max-width:100%;margin:8px 0 0;line-height:1.6}
 @media(max-width:700px){.budgetPage .budgetTaxCatalogHeading{grid-template-columns:1fr}.budgetPage .budgetTaxCatalogHeading>span{padding:0;text-align:left}.budgetPage .budgetTaxCard,.budgetPage .budgetTaxParameters{padding:13px}.budgetPage .budgetTaxCard .budgetTaxSpecial{padding-inline:13px}}
+
+/* Budget page disclosures match simulator chevrons. */
+.budgetPage .budgetTaxSpecial>summary,.budgetPage .budgetTaxParameters>summary{min-height:56px;display:flex;align-items:center;gap:10px}
+.budgetPage .budgetTaxSpecial>summary:after,.budgetPage .budgetTaxParameters>summary:after{content:''!important;display:block!important;flex:none;width:9px;height:9px;border-right:2px solid #6558cf;border-bottom:2px solid #6558cf;transform:rotate(45deg);margin:0 5px 4px auto}
+.budgetPage .budgetTaxSpecial[open]>summary:after,.budgetPage .budgetTaxParameters[open]>summary:after{transform:rotate(225deg);margin-top:5px;margin-bottom:0}
