@@ -92,7 +92,7 @@ export default function FederalBudgetSimulator({g,context,regions,rates,programs
        {selected?.status==='draft'&&!selected.document_id&&!readOnly&&canPrepare&&<button type="button" className={'secondary '+styles.projectDelete} onClick={()=>{setError('');setConfirmDelete(true)}} disabled={busy}><Trash2 size={17}/> Удалить черновик</button>}
       </div>
       {confirmDelete&&selected?.status==='draft'&&<div className={styles.deleteConfirmation} role="group" aria-label="Подтвердить удаление черновика"><strong>Удалить «{selected.title}»?</strong><p>Отменить удаление будет невозможно. Связанные с законами и финансовыми решениями версии защищены.</p><div><button type="button" className="secondary" onClick={()=>setConfirmDelete(false)}>Отмена</button><button type="button" className={'secondary '+styles.projectDelete} disabled={busy} onClick={()=>void deleteDraft()}>Подтвердить удаление</button></div></div>}
-      {error&&<p role="alert" className={styles.projectError}>{error}</p>}
+      {error&&tab==='law'&&<p role="alert" className={styles.projectError}>{error}</p>}
       {selected?.document_id&&<button type="button" className={'secondary '+styles.projectDocumentButton} onClick={()=>onOpenDocument(selected.document_id!)}><FileText size={17}/> Открыть связанный документ{selected.registry_no?' · '+selected.registry_no:''}</button>}
     </div>
    </section>
@@ -120,6 +120,6 @@ export default function FederalBudgetSimulator({g,context,regions,rates,programs
    {ledger.filter(e=>e.kind==='publication_blocked'&&plans.some(p=>p.status!=='published'&&e.source_key==='blocked:'+p.id)).map(e=><p key={e.id} role="alert" className={styles.error}>{e.note} Откройте проект в реестре и подготовьте расчет поправок с учетом действующего бюджета.</p>)}
    {ledger.length>0&&<details className={styles.journal}><summary><Clock size={18}/> История исполнения бюджета · {ledger.length}</summary>{ledger.length?ledger.map(e=><article key={e.id}><time>{new Date(e.created_at).toLocaleString('ru-RU')}</time><span>{e.note}</span>{e.amount!==null&&<b>{billions(e.amount)}</b>}</article>):<p>Записи появятся после сохранения проекта, опубликования бюджета, перечисления поддержки и финансовых событий.</p>}</details>}
   </>}
-  {error&&!state&&<p role="alert" className={styles.error}>{error}</p>}{notice&&<p role="status" className={styles.notice}>{notice}</p>}
+  {error&&(!state||tab!=='law')&&<p role="alert" className={styles.error}>{error}</p>}{notice&&<p role="status" className={styles.notice}>{notice}</p>}
  </section>;
 }
