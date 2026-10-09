@@ -123,3 +123,31 @@
 .budgetPlanGrid details,.budgetApprovedPrograms{margin-top:16px}.budgetLegalPlans summary{cursor:pointer;min-height:44px;align-content:center;font-weight:600}
 .budgetPlanAllocation{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-top:1px solid #e2e8f2}.budgetPlanAllocation>span{min-width:0}.budgetPlanAllocation b,.budgetPlanAllocation small{display:block;overflow-wrap:anywhere}.budgetPlanAllocation small{margin-top:5px;color:#52688e;font-size:12px}.budgetPlanAllocation>strong{font-variant-numeric:tabular-nums;white-space:nowrap}
 @media(max-width:600px){.budgetPlanGrid article{padding:16px}.budgetPlanAllocation{flex-wrap:wrap}.budgetLegalPlans>header>button{width:100%}}
+
+
+/* Budget: consistent tax workflow cards and responsive legal procedure. */
+.budgetTaxWorkspace{display:grid;gap:18px}
+.budgetTaxHeader{align-items:flex-start!important}
+.budgetTaxHeader h2{margin:4px 0 7px;font-size:21px;color:#20213d}
+.budgetTaxHeader small{color:#6558cf;font-size:11px;letter-spacing:.08em;font-weight:800}
+.budgetTaxHeader p{margin:0;color:#52627d;font-size:13px}
+.budgetTaxSwitch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.budgetTaxSwitch button{border:1px solid #dce2ed;border-radius:11px;background:#f7f8fc;color:#35435d;padding:10px 12px;font-weight:700;min-width:0}
+.budgetTaxSwitch button[aria-pressed=true]{background:#6558cf;color:white;border-color:#6558cf}
+.budgetTaxSwitch button:focus-visible,.budgetTaxWorkspace button:focus-visible,.budgetTaxWorkspace summary:focus-visible{outline:3px solid #a69bf2;outline-offset:2px}
+.budgetTaxProcess{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.budgetTaxProcess span{background:#f7f7fc;border:1px solid #e2e4ef;border-radius:11px;padding:12px 10px;font-size:12px;line-height:1.45;color:#35435d;display:flex;gap:8px;align-items:center;min-width:0}
+.budgetTaxProcess b{display:grid;place-items:center;background:#e8e5fa;color:#6558cf;border-radius:50%;width:25px;height:25px;min-width:25px;font-size:12px}
+.budgetTaxCard,.budgetTaxParameters{padding:18px;border:1px solid #e2e4ef;border-radius:14px;background:#fff;min-width:0}
+.budgetTaxCard h3{margin:0 0 8px;color:#20213d;font-size:17px}.budgetTaxCardHead p,.budgetTaxHint{margin:4px 0 12px;font-size:12px;line-height:1.6;color:#62677d}
+.budgetTaxWorkspace .budgetTaxCard .primary{display:inline-flex;gap:8px;align-items:center;justify-content:center;min-height:44px}
+.budgetTaxEffective{padding:12px 14px;background:#f8f7fd;border-radius:10px;font-size:12px;line-height:1.6;color:#35435d}
+.budgetTaxSpecial{margin-top:16px;border-top:1px solid #e2e4ef;padding-top:10px}
+.budgetTaxSpecial p{font-size:12px;color:#52627d}
+.budgetTaxActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.budgetTaxWorkspace .budgetPlanAllocation{gap:10px;flex-wrap:wrap}
+.budgetTaxParameters{background:#fafbfe}
+.budgetTaxParameters>summary{min-height:44px}
+.budgetTaxWorkspace input{width:100%;min-width:0;box-sizing:border-box;min-height:44px}
+@media(max-width:950px){.budgetTaxProcess{grid-template-columns:repeat(2,minmax(0,1fr))}.budgetTaxProcess span:last-child{grid-column:1/-1}}
+@media(max-width:550px){.budgetTaxWorkspace{gap:12px}.budgetTaxCard,.budgetTaxParameters{padding:13px}.budgetTaxSwitch{gap:5px}.budgetTaxSwitch button{padding:9px 4px;font-size:11px}.budgetTaxProcess{grid-template-columns:1fr}.budgetTaxProcess span:last-child{grid-column:auto}.budgetTaxWorkspace .budgetTaxCard .primary{width:100%}.budgetTaxActions{width:100%}.budgetTaxActions button{flex:1 1 100%}}
