@@ -124,6 +124,15 @@ async function main(){
    await sim.getByRole('button',{name:'Обновить федеральный бюджет',exact:true}).click();assert.equal(await sim.getByLabel('Изменение базы: Нефтегазовые доходы, %').inputValue(),'-2.5','Background refresh preserves an unfinished forecast');
    await openTab(page,'Регионы');await layout(page,'regions '+width);await sim.screenshot({path:path.join(output,'regions-'+width+'.png')});
    assert.equal(await sim.locator('svg path[role=button]').count(),89,'Every region can be reached from the map');
+   const regionPath=sim.locator('svg path[role=button]').first();
+   await regionPath.click();
+   assert.equal(await regionPath.evaluate(el=>getComputedStyle(el).outlineStyle),'none','Pointer selection cannot create a rectangular SVG focus outline');
+   assert.equal(await regionPath.evaluate(el=>getComputedStyle(el).boxShadow),'none','Pointer selection cannot create a rectangular box shadow');
+   await regionPath.focus();
+   assert.equal(await regionPath.evaluate(el=>getComputedStyle(el).outlineStyle),'none','Keyboard focus uses the region silhouette instead of a rectangle');
+   await regionPath.press('Enter');
+   assert.equal(await regionPath.getAttribute('aria-pressed'),'true','Keyboard activation selects the focused region');
+   await sim.locator('svg path[role=button][aria-label^="Новосибирская область"]').click();
    assert.equal(await sim.getByRole('button',{name:/Включить в (проект|расходы)/}).count(),0,'Transfer approval is reserved for expenditure planning');
    const ownTransfers=f.regions.find(r=>r.region_code==='54').transfer_in,event=sim.locator('[data-budget-regional-event="qa-event-54"]');
    await event.getByRole('button',{name:'Начать событие',exact:true}).click();await event.getByRole('button',{name:'Подготовить заявку',exact:true}).waitFor();
