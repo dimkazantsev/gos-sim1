@@ -886,3 +886,31 @@
 .govSessionLab .govMeetingCreateActions>button{display:inline-flex;justify-content:center;align-items:center;min-height:48px;padding:12px 18px;border-radius:12px}
 @media(max-width:820px){.govSessionLab .govQuestionEditor{grid-template-columns:repeat(2,minmax(0,1fr))}.govSessionLab .govQuestionEditor>label:nth-of-type(2){grid-column:2}.govSessionLab .govQuestionEditor>label:nth-of-type(3){grid-column:1}}
 @media(max-width:580px){.govSessionLab .govQuestionEditor,.govSessionLab .govMeetingCreateFields{grid-template-columns:minmax(0,1fr)}.govSessionLab .govQuestionEditor>label:nth-of-type(2),.govSessionLab .govQuestionEditor>label:nth-of-type(3){grid-column:auto}.govSessionLab .govSessionCreateWide>div.govMeetingCreate{padding:16px!important}.govSessionLab .govMeetingCreateActions>button{flex:1 1 100%}}
+
+
+/* Stage 12: legislative agenda uses the same balanced project visual language as stage 11. */
+.legislativeLab{min-width:0;overflow:hidden}
+.legislativeSessionTabsFull{margin:18px 0 14px;min-height:0}.legislativeSessionTabsFull>div{display:flex;flex-wrap:wrap;gap:10px;width:100%;overflow:visible}.legislativeSessionTabsFull>div:empty{display:none}
+.legislativeCreateWide{box-sizing:border-box;display:block!important;width:100%!important;min-width:0!important;max-width:none!important;margin:14px 0 20px;border:1px solid var(--gs-border,#dce3f0)!important;border-radius:16px!important;background:#fff!important;overflow:hidden}
+.legislativeCreateWide>summary{display:flex;align-items:center;min-height:56px;padding:14px 20px!important;font-size:15px!important;font-weight:750!important;color:var(--gs-ink,#172447)!important;cursor:pointer;background:var(--gs-bg-elevated,#f9faff)}
+.legislativeCreateWide[open]>summary{border-bottom:1px solid var(--gs-border,#dce3f0)}
+.legislativeCreateWide>div.legislativeCreateGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px!important;padding:20px!important}
+.legislativeCreateGrid>label{display:grid!important;align-items:start;align-content:start;gap:8px!important;min-width:0;font-size:13px!important;font-weight:750;color:var(--gs-muted,#586784)}
+.legislativeCreateGrid>label:first-child{grid-column:1/-1}
+.legislativeCreateGrid>label input{box-sizing:border-box;width:100%;min-width:0;min-height:52px!important;padding:0 14px!important;background:#fff!important;border:1px solid var(--gs-border-strong,#b8c5dc);border-radius:11px!important;font:inherit;font-size:15px!important;color:var(--gs-ink,#172447)}
+.legislativeCreateGrid>p{grid-column:1/-1;font-size:13px;line-height:1.6;color:var(--gs-muted,#586784);margin:0}
+.legislativeCreateGrid>button{justify-self:start;min-height:48px!important;padding:10px 18px!important;font-size:14px!important;border-radius:11px!important}
+.legislativeDocBridge{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin:18px 0;padding:18px 20px;border:1px solid var(--gs-border,#dce3f0);border-radius:14px;background:var(--gs-bg-elevated,#f9faff)}
+.legislativeDocBridge>div{flex:1 1 330px;min-width:0}.legislativeDocBridge b{font-size:15px}.legislativeDocBridge p{margin:6px 0 0;color:var(--gs-muted,#586784);font-size:13px;line-height:1.6}
+.legislativeDocBridge button{min-height:44px;white-space:normal}
+.legislativeRouteGuide{padding:20px;margin:18px 0;border:1px solid var(--gs-border,#dce3f0);border-radius:14px;background:#fff;min-width:0}
+.legislativeRouteGuide h3{font-size:17px;margin:0 0 14px}.legislativeRouteGuide>div{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:7px}
+.legislativeRouteGuide>div>span{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:72px;padding:9px 4px;text-align:center;gap:5px;line-height:1.4;border-radius:10px;background:var(--gs-bg-elevated,#f9faff);border:1px solid var(--gs-border,#dce3f0);font-size:11px;overflow-wrap:anywhere}
+.legislativeRouteGuide>div small{display:grid;place-items:center;width:21px;height:21px;border-radius:8px;background:var(--gs-accent-soft,#edf1ff);color:var(--gs-accent,#2453e6);font-weight:800}
+.legislativeRouteGuide>p{font-size:13px;line-height:1.6;color:var(--gs-muted,#586784);margin:12px 0 0}
+.legislativeReadingProgress{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}.legislativeReadingProgress>span{padding:5px 8px;border-radius:7px;background:#fff;border:1px solid var(--gs-border,#dce3f0);font-size:11px;color:var(--gs-muted,#586784)}
+.legislativeReadingProgress>span.done,.legislativeReadingProgress>span.active{color:var(--gs-accent,#2453e6);border-color:var(--gs-border-strong,#b8c5dc);background:var(--gs-accent-soft,#edf1ff)}
+.legislativeCurrentStep{color:var(--gs-accent,#2453e6);font-weight:750}
+.legislativeFeedback{margin:12px 0;padding:13px;border:1px solid var(--gs-border,#dce3f0);border-radius:10px;background:var(--gs-accent-soft,#edf1ff)}
+@media(max-width:1080px){.legislativeRouteGuide>div{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.legislativeCreateWide>div.legislativeCreateGrid{grid-template-columns:minmax(0,1fr);padding:14px!important}.legislativeCreateGrid>label:first-child,.legislativeCreateGrid>p{grid-column:auto}.legislativeCreateGrid>button{width:100%}.legislativeRouteGuide{padding:12px}.legislativeRouteGuide>div{grid-template-columns:repeat(3,minmax(0,1fr))}.legislativeDocBridge{padding:13px}}
