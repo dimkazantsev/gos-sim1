@@ -10,7 +10,7 @@ type Session={id:string;game_id:string;session_no:number;title:string;time_limit
 type Item={id:string;session_id:string;program_id:string;agenda_no:number;report_minutes:number;status:'pending'|'presenting'|'decision'|'completed'|'withdrawn';vote_id:string|null;result_note:string|null;started_at:string|null;completed_at:string|null};
 type Program={id:string;title:string;responsible_ministry:string;status:string;responsible_minister_id:string|null};
 type Question={id:string;session_id:string;title:string;description:string;duration_minutes:number;program_agenda_id:string|null;status:'pending'|'discussed';created_at:string};
-type Proposal={id:string;program_id:string;section_key:string;original_text:string;proposed_text:string;justification:string;status:'submitted'|'accepted'|'rejected';review_note:string|null;created_by:string;created_at:string};
+type Proposal={id:string;session_id:string|null;program_id:string;section_key:string;original_text:string;proposed_text:string;justification:string;status:'submitted'|'accepted'|'rejected';review_note:string|null;created_by:string;created_at:string};
 
 export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocument}:{g:ReturnTypeRepublic;onOpenVotes:(id?:string)=>void;onOpenDocument?:(id:string)=>void}){
  const {game,me,teacher,members,votes,setError}=g;
@@ -42,7 +42,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
    supabase.from('state_program_review_proposals').select('*').eq('game_id',game.id).order('created_at',{ascending:false})
   ]);
   const failure=[s,i,p,q,r].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
-  if(!s.error){const rows=(s.data||[]) as Session[];setSessions(rows);if(!selectedId&&rows[0])setSelectedId(rows[0].id)}
+  if(!s.error){const rows=(s.data||[]) as Session[];setSessions(rows);if(!rows.some(row=>row.id===selectedId)&&rows[0])setSelectedId(rows[0].id)}
   if(!i.error)setItems((i.data||[]) as Item[]);
   if(!p.error)setPrograms((p.data||[]) as Program[]);
   if(!q.error)setQuestions((q.data||[]) as Question[]);
@@ -56,15 +56,17 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const agenda=selected?items.filter(x=>x.session_id===selected.id).sort((a,b)=>a.agenda_no-b.agenda_no):[];
  const readyPrograms=programs.filter(p=>p.status==='ready');
  const meetingQuestions=selected?questions.filter(q=>q.session_id===selected.id):[];
+ const reviewablePrograms=selected?programs.filter(p=>agenda.some(a=>a.program_id===p.id)):[];
+ const meetingProposals=selected?proposals.filter(p=>p.session_id===selected.id):[];
  const current=agenda.find(x=>x.status==='presenting'||x.status==='decision');
  const name=(id:string|null)=>members.find(m=>m.user_id===id)?.full_name||'—';
  const program=(id:string)=>programs.find(p=>p.id===id);
  const vote=(id:string|null)=>id?votes.find(v=>v.id===id):undefined;
 
  async function submitReview(){
-  if(!reviewProgram||reviewProposed.trim().length<5||busy)return;
+  if(!selected||!reviewablePrograms.some(p=>p.id===reviewProgram)||reviewProposed.trim().length<5||busy||selected.status==='closed')return;
   setBusy(true);
-  try{const r=await supabase.rpc('submit_state_program_review_proposal',{p_program_id:reviewProgram,p_section_key:reviewSection,p_original_text:reviewOriginal,p_proposed_text:reviewProposed,p_justification:reviewReason});if(r.error)throw r.error;setReviewProposed('');setReviewOriginal('');setReviewReason('');await load();setNotice('Предложение к государственной программе зарегистрировано.')}catch(e){setError(e)}finally{setBusy(false)}
+  try{const r=await supabase.rpc('submit_government_agenda_program_proposal',{p_session_id:selected.id,p_program_id:reviewProgram,p_section_key:reviewSection,p_original_text:reviewOriginal,p_proposed_text:reviewProposed,p_justification:reviewReason});if(r.error)throw r.error;setReviewProposed('');setReviewOriginal('');setReviewReason('');await load();setNotice('Предложение к государственной программе зарегистрировано.')}catch(e){setError(e)}finally{setBusy(false)}
  }
  async function resolveReview(id:string,action:'accepted'|'rejected'){
   if(busy)return;setBusy(true);
@@ -110,30 +112,6 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  return <section className="govSessionLab">
   <StageModuleHeader eyebrow="Этап 11 · Правительство" title="Заседание Правительства" description="Председатель формирует повестку и регламент. Министры представляют программы, члены Правительства регистрируются на заседание и голосуют; принятое решение оформляется постановлением." stats={[{label:"Заседание",value:selected?"№ "+selected.session_no:"Не создано",detail:selected?.status==="open"?"Идёт":selected?.status==="closed"?"Закрыто":"Подготовка повестки"},{label:"Регламент",value:selected?selected.time_limit_minutes+" мин.":"Не задан"}]}/>
 
-  <section className="govProgramReview">
-   <div className="govProgramReviewHeader"><div><h3>Государственные программы на рассмотрении</h3><p>Программы подготовлены на этапе 10. Здесь обсуждаются предложения о корректировке, замечания и решения. Повторного заполнения паспорта нет.</p></div><span>{programs.length} программ</span></div>
-   <div className="govProgramReviewGrid">{programs.length?programs.map(p=><article key={p.id}>
-    <small>{p.responsible_ministry}</small><h4>{p.title}</h4>
-    <span>{p.status==='ready'?'Готова к заседанию':p.status==='adopted'?'Принята':p.status==='rejected'?'Отклонена':p.status==='government_vote'?'На голосовании':'В подготовке и согласовании'}</span>
-    <p>{proposals.filter(q=>q.program_id===p.id).length} предложений по изменению</p>
-    <button type="button" onClick={()=>{setReviewProgram(p.id);document.getElementById('gov-review-form')?.scrollIntoView({block:'nearest',behavior:'smooth'})}}>Рассмотреть и предложить правку</button>
-   </article>):<p>Государственные программы пока не представлены. Их подготовка выполняется на этапе 10.</p>}</div>
-   <div id="gov-review-form" className="govReviewForm">
-    <h4>Предложение к программе</h4>
-    <label>Программа<select value={reviewProgram} onChange={e=>setReviewProgram(e.target.value)}><option value="">Выберите программу</option>{programs.map(p=><option value={p.id} key={p.id}>{p.title}</option>)}</select></label>
-    <label>Раздел<select value={reviewSection} onChange={e=>setReviewSection(e.target.value)}><option value="passport">Паспорт</option><option value="goals">Цели и показатели</option><option value="structure">Направления и мероприятия</option><option value="expenses">Финансирование и расходы</option><option value="other">Другое</option></select></label>
-    <label>Действующая формулировка<textarea rows={2} value={reviewOriginal} onChange={e=>setReviewOriginal(e.target.value)} placeholder="Укажите исходный фрагмент программы"/></label>
-    <label>Предлагаемая редакция<textarea rows={3} value={reviewProposed} onChange={e=>setReviewProposed(e.target.value)} placeholder="Опишите конкретное изменение"/></label>
-    <label>Обоснование<textarea rows={2} value={reviewReason} onChange={e=>setReviewReason(e.target.value)} placeholder="Почему необходима корректировка?"/></label>
-    <button type="button" className="primary" disabled={busy||!reviewProgram||reviewProposed.trim().length<5||me.kind==='observer'} onClick={()=>void submitReview()}>Зарегистрировать предложение</button>
-   </div>
-   {proposals.length>0&&<div className="govReviewList"><h4>Реестр предложений</h4>{proposals.map(p=><article key={p.id}>
-    <div><b>{programs.find(x=>x.id===p.program_id)?.title||'Госпрограмма'}</b><small>{p.status==='submitted'?'На рассмотрении':p.status==='accepted'?'Одобрено к учёту':'Отклонено'}</small></div>
-    <p>{p.proposed_text}</p>{p.justification&&<p>Обоснование: {p.justification}</p>}
-    {canManage&&p.status==='submitted'&&<div className="govMeetingCreateActions"><button type="button" disabled={busy} onClick={()=>void resolveReview(p.id,'accepted')}>Одобрить предложение</button><button type="button" disabled={busy} onClick={()=>void resolveReview(p.id,'rejected')}>Отклонить</button></div>}
-   </article>)}</div>}
-   <p className="govReviewDisclaimer">Одобрение предложения фиксирует решение о корректировке. Подписанный паспорт и бюджет автоматически не изменяются: для изменения утверждённых сумм требуется отдельная процедура.</p>
-  </section>
   <div className="govSessionTabs govSessionTabsFull">
    <div>{sessions.map(s=><button type="button" key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'Идёт':s.status==='closed'?'Завершено':'Проект'}</em></button>)}</div>
   </div>
@@ -190,6 +168,30 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
     </article>})}
    </div>
 
+  <section className="govProgramReview">
+   <div className="govProgramReviewHeader"><div><h3>Государственные программы на рассмотрении</h3><p>Программы этапа 10 рассматриваются только после включения в повестку выбранного заседания.</p></div><span>{reviewablePrograms.length} программ</span></div>
+   <div className="govProgramReviewGrid">{reviewablePrograms.length?reviewablePrograms.map(p=><article key={p.id}>
+    <small>{p.responsible_ministry}</small><h4>{p.title}</h4>
+    <span>{p.status==='ready'?'Готова к заседанию':p.status==='adopted'?'Принята':p.status==='rejected'?'Отклонена':p.status==='government_vote'?'На голосовании':'В подготовке и согласовании'}</span>
+    <p>{meetingProposals.filter(q=>q.program_id===p.id).length} предложений по изменению</p>
+    <button type="button" onClick={()=>{setReviewProgram(p.id);document.getElementById('gov-review-form')?.scrollIntoView({block:'nearest',behavior:'smooth'})}}>Рассмотреть и предложить правку</button>
+   </article>):<p>Сначала включите программу из этапа 10 в повестку заседания.</p>}</div>
+   {reviewablePrograms.length>0&&selected.status!=='closed'&&<div id="gov-review-form" className="govReviewForm">
+    <h4>Предложение к программе</h4>
+    <label>Программа<select value={reviewProgram} onChange={e=>setReviewProgram(e.target.value)}><option value="">Выберите программу</option>{reviewablePrograms.map(p=><option value={p.id} key={p.id}>{p.title}</option>)}</select></label>
+    <label>Раздел<select value={reviewSection} onChange={e=>setReviewSection(e.target.value)}><option value="passport">Паспорт</option><option value="goals">Цели и показатели</option><option value="structure">Направления и мероприятия</option><option value="expenses">Финансирование и расходы</option><option value="other">Другое</option></select></label>
+    <label>Действующая формулировка<textarea rows={2} value={reviewOriginal} onChange={e=>setReviewOriginal(e.target.value)} placeholder="Укажите исходный фрагмент программы"/></label>
+    <label>Предлагаемая редакция<textarea rows={3} value={reviewProposed} onChange={e=>setReviewProposed(e.target.value)} placeholder="Опишите конкретное изменение"/></label>
+    <label>Обоснование<textarea rows={2} value={reviewReason} onChange={e=>setReviewReason(e.target.value)} placeholder="Почему необходима корректировка?"/></label>
+    <button type="button" className="primary" disabled={busy||!reviewProgram||reviewProposed.trim().length<5||me.kind==='observer'} onClick={()=>void submitReview()}>Зарегистрировать предложение</button>
+   </div>}
+   {meetingProposals.length>0&&<div className="govReviewList"><h4>Реестр предложений</h4>{meetingProposals.map(p=><article key={p.id}>
+    <div><b>{programs.find(x=>x.id===p.program_id)?.title||'Госпрограмма'}</b><small>{p.status==='submitted'?'На рассмотрении':p.status==='accepted'?'Одобрено к учёту':'Отклонено'}</small></div>
+    <p>{p.proposed_text}</p>{p.justification&&<p>Обоснование: {p.justification}</p>}
+    {canManage&&p.status==='submitted'&&<div className="govMeetingCreateActions"><button type="button" disabled={busy} onClick={()=>void resolveReview(p.id,'accepted')}>Одобрить предложение</button><button type="button" disabled={busy} onClick={()=>void resolveReview(p.id,'rejected')}>Отклонить</button></div>}
+   </article>)}</div>}
+   <p className="govReviewDisclaimer">Одобрение предложения фиксирует решение о корректировке. Подписанный паспорт и бюджет автоматически не изменяются: для изменения утверждённых сумм требуется отдельная процедура.</p>
+  </section>
    <footer className="govSessionRule"><b>Процедура решения</b><p>Если требуется голосование, решение принимается большинством присутствующих при наличии кворума не менее половины состава Правительства; при равенстве голосов решающим является голос председательствующего. Система голосования уже учитывает эту модель.</p></footer>
   </>}
  </section>;
