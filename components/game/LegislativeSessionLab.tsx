@@ -8,8 +8,8 @@ import {useGameTableSync} from './useGameTableSync';
 import {stageRoleTitles} from './stageRoles';
 import type {ReturnTypeRepublic} from './viewTypes';
 
-type Session={id:string;game_id:string;session_no:number;title:string;scheduled_start:string|null;scheduled_end:string|null;status:'draft'|'open'|'closed';chair_user_id:string|null;created_at:string;opened_at:string|null;closed_at:string|null};
-type AgendaItem={id:string;session_id:string;formal_document_id:string;agenda_no:number;status:'pending'|'in_progress'|'completed'|'carried_over'|'withdrawn';result_note:string|null;started_at:string|null;completed_at:string|null};
+type Session={id:string;game_id:string;session_no:number;title:string;scheduled_start:string|null;scheduled_end:string|null;agenda_document_id:string|null;status:'draft'|'open'|'closed';chair_user_id:string|null;created_at:string;opened_at:string|null;closed_at:string|null};
+type AgendaItem={id:string;session_id:string;formal_document_id:string;agenda_no:number;opened_document_step:string|null;status:'pending'|'in_progress'|'completed'|'carried_over'|'withdrawn';result_note:string|null;started_at:string|null;completed_at:string|null};
 
 const statusLabel:Record<AgendaItem['status'],string>={pending:'Ожидает',in_progress:'Рассматривается',completed:'Рассмотрено',carried_over:'Перенесено',withdrawn:'Снято'};
 
@@ -24,6 +24,7 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument}:{g:
  const [docId,setDocId]=useState('');
  const [note,setNote]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
+ const [feedback,setFeedback]=useState('');
  const role=stageRoleTitles(g);
  const canManage=teacher||role.includes('председател')&&role.includes('дум')||role.includes('совет')&&role.includes('дум');
 
@@ -36,7 +37,7 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument}:{g:
   const failure=[s,a].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
   if(!s.error){
    const rows=(s.data||[]) as Session[];setSessions(rows);
-   if(!selectedId&&rows[0])setSelectedId(rows[0].id);
+   if(!rows.some(x=>x.id===selectedId)&&rows[0])setSelectedId(rows[0].id);
   }
   if(!a.error)setAgenda((a.data||[]) as AgendaItem[]);
  }
@@ -46,16 +47,19 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument}:{g:
  const activeGame=game;
  const selected=sessions.find(x=>x.id===selectedId)||sessions[0];
  const items=selected?agenda.filter(x=>x.session_id===selected.id).sort((a,b)=>a.agenda_no-b.agenda_no):[];
- const docs=formalDocuments.filter(d=>['bill','budget','gd_resolution'].includes(d.workflow_key));
+ const docs=formalDocuments.filter(d=>['bill','budget','gd_resolution'].includes(d.workflow_key)&&d.doc_type!=='meeting_agenda'&&d.status_code!=='rejected'&&d.status_code!=='published'&&d.current_owner_key!=='system');
  const doc=(id:string)=>formalDocuments.find(d=>d.id===id);
  const voteFor=(id:string)=>votes.find(v=>v.formal_document_id===id&&v.status==='open');
  const unfinished=items.filter(x=>x.status==='pending'||x.status==='in_progress').length;
  const current=items.find(x=>x.status==='in_progress');
+ const routed=items.filter(x=>{const d=formalDocuments.find(doc=>doc.id===x.formal_document_id);return d&&['bill','budget'].includes(d.workflow_key)});
+ const readings=['reading1','amendments','reading2','reading3','sf','president','published'];
+ const readingText:Record<string,string>={draft:'Подготовка законопроекта',registered:'Регистрация в Государственной Думе',committee:'Профильный комитет',council:'Совет Государственной Думы',reading1:'I чтение',amendments:'Поправки ко II чтению',reading2:'II чтение',reading3:'III чтение',sf:'Совет Федерации',president:'Президент Российской Федерации',published:'Опубликован',rejected:'Отклонён'};
 
  async function create(){
-  setBusy(true);
+  setBusy(true);setFeedback('');
   const r=await supabase.rpc('create_duma_session',{p_game_id:activeGame.id,p_title:title.trim()||'Заседание Государственной Думы',p_scheduled_start:start?new Date(start).toISOString():null,p_scheduled_end:end?new Date(end).toISOString():null});
-  if(r.error)setError(r.error.message);else{setTitle('');setStart('');setEnd('');if(r.data)setSelectedId(String(r.data));await load()}
+  if(r.error)setError(r.error.message);else{setTitle('');setStart('');setEnd('');if(r.data)setSelectedId(String(r.data));await load();setFeedback('Заседание создано. Повестка зарегистрирована в реестре НПА.')}
   setBusy(false);
  }
  async function add(){
@@ -74,13 +78,23 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument}:{g:
  }
 
  return <section className="legislativeLab">
-  <StageModuleHeader eyebrow="Этап 12 · Государственная Дума" title="Заседание Государственной Думы" description="Регистрация депутатов, повестка и рассмотрение законопроектов по чтениям. Откройте НПА из повестки, рассмотрите поправки ко второму чтению и проведите связанное голосование." stats={[{label:"Заседание",value:selected?"№ "+selected.session_no:"Не создано",detail:selected?.status==="open"?"Идёт":selected?.status==="closed"?"Закрыто":"Подготовка повестки"},{label:"Ожидают рассмотрения",value:unfinished}]}/>
+  <StageModuleHeader variant="government" eyebrow="Этап 12 · Государственная Дума" title="Заседание Государственной Думы" description="Регистрация депутатов, повестка и рассмотрение законопроектов по чтениям. Откройте НПА из повестки, рассмотрите поправки ко второму чтению и проведите связанное голосование." stats={[{label:"Заседание",value:selected?"№ "+selected.session_no:"Не создано",detail:selected?.status==="open"?"Идёт":selected?.status==="closed"?"Закрыто":"Подготовка повестки"},{label:"Ожидают рассмотрения",value:unfinished}]}/>
 
-  <div className="legislativeSessionTabs">
-   <div>{sessions.map(s=><button key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'идёт':s.status==='closed'?'закрыто':'проект'}</em></button>)}</div>
-   {canManage&&<details className="legislativeCreate"><summary>＋ Новое заседание</summary><div><input aria-label="Название заседания" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Название"/><label>Начало<input type="datetime-local" value={start} onChange={e=>setStart(e.target.value)}/></label><label>Окончание<input type="datetime-local" value={end} onChange={e=>setEnd(e.target.value)}/></label><button disabled={busy} onClick={()=>void create()}>Создать</button></div></details>}
+  <div className="legislativeSessionTabs legislativeSessionTabsFull">
+   <div>{sessions.map(s=><button type="button" key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'Идёт':s.status==='closed'?'Завершено':'Подготовка'}</em></button>)}</div>
   </div>
+  {canManage&&<details className="legislativeCreate legislativeCreateWide">
+   <summary>＋ Подготовить заседание Государственной Думы</summary>
+   <div className="legislativeCreateGrid">
+    <label>Название заседания<input aria-label="Название заседания" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Очередное заседание Государственной Думы"/></label>
+    <label>Начало заседания<input type="datetime-local" value={start} onChange={e=>setStart(e.target.value)}/></label>
+    <label>Окончание заседания<input type="datetime-local" min={start||undefined} value={end} onChange={e=>setEnd(e.target.value)}/></label>
+    <p>Если время не задано, действует игровой регламент 20:00–00:00 по часовому поясу игры. Документ повестки появится в реестре автоматически; законопроекты добавляются из реестра ниже.</p>
+    <button type="button" className="primary" disabled={busy||!!(start&&end&&new Date(end)<=new Date(start))} onClick={()=>void create()}>{busy?'Создание…':'Создать заседание и документ повестки'}</button>
+   </div>
+  </details>}
 
+  {feedback&&<p role="status" className="legislativeFeedback">{feedback}</p>}
   {selected&&<>
    <div className="legislativeSessionBar">
     <div><small>СЕССИЯ</small><h3>{selected.title}</h3><p>{selected.scheduled_start?new Date(selected.scheduled_start).toLocaleString('ru-RU'):'Начало не задано'}{selected.scheduled_end?' → '+new Date(selected.scheduled_end).toLocaleString('ru-RU'):''}</p></div>
@@ -88,24 +102,26 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument}:{g:
     {canManage&&selected.status==='open'&&<button className="primary" disabled={busy} onClick={()=>void close()}>Закрыть и перенести остаток</button>}
    </div>
 
+   <section className="legislativeDocBridge"><div><b>Реестр НПА · повестка заседания № {selected.session_no}</b><p>Повестка связана с существующими документами. Рассмотрение и голосование выполняются только на текущей стадии каждого НПА.</p></div>{selected.agenda_document_id&&<button type="button" disabled={!onOpenDocument} onClick={()=>onOpenDocument?.(selected.agenda_document_id!)}>Открыть документ повестки →</button>}</section>
    {canManage&&selected.status==='draft'&&<div className={styles.grid}><StyledSelect wrap label="Документ для повестки" value={docId} onChange={setDocId} options={[{value:'',label:'Выберите документ из реестра НПА…'},...docs.filter(d=>!items.some(i=>i.formal_document_id===d.id)).map(d=>({value:d.id,label:d.registry_no+' · '+d.title+' · '+d.status_label}))]}/><div className={styles.actions}><button disabled={busy||!docId} onClick={()=>void add()}>Добавить в повестку</button></div></div>}
 
+   <div className="legislativeRouteGuide"><h3>Маршрут законопроекта</h3><div>{['Регистрация','Комитет','Совет ГД','I чтение','Поправки','II чтение','III чтение','Совет Федерации','Президент'].map((x,i)=><span key={x}><small>{i+1}</small>{x}</span>)}</div><p>Поправки принимаются во время подготовки ко II чтению. Успешное голосование переводит законопроект на следующую стадию в реестре. Закон, принятый в III чтении, направляется в Совет Федерации, затем Президенту.</p></div>
    <div className="legislativeAgenda">
     {items.length===0?<div className="emptyState">Повестка пуста. По правилам игры без повестки заседание не проводится.</div>:items.map(i=>{
      const d=doc(i.formal_document_id),v=voteFor(i.formal_document_id);
      return <article className={'legislativeAgendaItem '+i.status} key={i.id}>
       <div className="agendaNo">{String(i.agenda_no).padStart(2,'0')}</div>
-      <div className="agendaDoc"><small>{d?.registry_no||'НПА'} · {d?.status_label||'Статус документа'}</small><h3>{d?.title||'Документ'}</h3><div className="agendaMeta"><span>{statusLabel[i.status]}</span>{v&&<span className="live">● Голосование открыто</span>}</div>{d&&onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(d.id)}>{d.workflow_key==='bill'&&['amendments','reading2'].includes(d.status_code)?'Открыть НПА и поправки':'Открыть НПА'}</button>}{i.result_note&&<p>{i.result_note}</p>}</div>
+      <div className="agendaDoc"><small>{d?.registry_no||'НПА'} · {d?.status_label||'Статус документа'}</small><h3>{d?.title||'Документ'}</h3><div className="agendaMeta"><span>{statusLabel[i.status]}</span><span className="legislativeCurrentStep">{readingText[d?.status_code||'']||d?.status_label||'Без стадии'}</span>{v&&<span className="live">● Голосование открыто</span>}</div>{d&&['bill','budget'].includes(d.workflow_key)&&<div className="legislativeReadingProgress">{readings.map(code=><span key={code} className={readings.indexOf(code)<=readings.indexOf(d.status_code)?'done':code===d.status_code?'active':''}>{readingText[code]}</span>)}</div>}{d&&onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(d.id)}>{d.workflow_key==='bill'&&['amendments','reading2'].includes(d.status_code)?'Открыть НПА и поправки':'Открыть НПА'}</button>}{i.result_note&&<p>{i.result_note}</p>}</div>
       {selected.status==='open'&&canManage&&<div className="agendaActions">
        {i.status==='pending'&&<button disabled={busy||!!current} onClick={()=>void setStatus(i.id,'in_progress')}>Начать вопрос</button>}
-       {i.status==='in_progress'&&<><textarea rows={2} value={note[i.id]||''} onChange={e=>setNote(x=>({...x,[i.id]:e.target.value}))} placeholder="Итог рассмотрения / решение"/><button className="primary" disabled={busy} onClick={()=>void setStatus(i.id,'completed')}>Завершить вопрос</button><button disabled={busy} onClick={()=>void setStatus(i.id,'withdrawn')}>Снять</button></>}
+       {i.status==='in_progress'&&<><textarea rows={2} value={note[i.id]||''} onChange={e=>setNote(x=>({...x,[i.id]:e.target.value}))} placeholder="Итог рассмотрения / решение"/><button className="primary" disabled={busy||!!v||d?.status_code===i.opened_document_step} title={v?'Сначала закройте голосование':'НПА должен пройти предусмотренный маршрут в реестре'} onClick={()=>void setStatus(i.id,'completed')}>Зафиксировать результат после решения по НПА</button><button disabled={busy} onClick={()=>void setStatus(i.id,'withdrawn')}>Снять</button></>}
        {v&&<button onClick={()=>onOpenVotes(v.id)}>К голосованию →</button>}
       </div>}
      </article>
     })}
    </div>
 
-   <footer className="legislativeSessionRule"><b>Логика переноса</b><p>При закрытии заседания все пункты со статусом «ожидает» или «рассматривается» автоматически становятся перенесёнными и создаются в повестке следующего заседания. Сам документ при этом не меняет стадий движения без отдельного процедурного решения в реестре НПА.</p></footer>
+   <footer className="legislativeSessionRule"><b>Логика переноса и голосований</b><p>При закрытии заседания все пункты со статусом «ожидает» или «рассматривается» автоматически становятся перенесёнными и создаются в повестке следующего заседания. Сам документ при этом не меняет стадий движения без отдельного процедурного решения в реестре НПА.</p></footer>
   </>}
  </section>;
 }
