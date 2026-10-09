@@ -32,7 +32,7 @@ async function geometry(page,label){const r=await page.evaluate(()=>{
  const visible=e=>{const r=e.getBoundingClientRect();return r.width>0&&r.height>0};
  const panel=document.querySelector('[aria-label="Мониторинг текущей игры"]')||document.querySelector('[aria-label="Федеральный бюджетный симулятор"]')||document.querySelector('.metricDirectorStudio');
  const bounds=panel.getBoundingClientRect();
- const clipped=[...panel.querySelectorAll('article,button,strong,dt,dd,h2')].filter(visible).filter(e=>{const r=e.getBoundingClientRect();return r.left<bounds.left-2||r.right>bounds.right+2}).map(e=>e.textContent.slice(0,100));
+ const clipped=[...panel.querySelectorAll('article,button,strong,dt,dd,h2')].filter(visible).filter(e=>!e.closest('[class*="tableWrap"]')).filter(e=>{const r=e.getBoundingClientRect();return r.left<bounds.left-2||r.right>bounds.right+2}).map(e=>e.textContent.slice(0,100));
  const cards=[...panel.querySelectorAll('[data-overview-card]')].map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}});
  const overlap=cards.some((a,i)=>cards.some((b,j)=>j>i&&a.x<b.x+b.w-1&&a.x+a.w>b.x+1&&a.y<b.y+b.h-1&&a.y+a.h>b.y+1));
  const touch=[...panel.querySelectorAll('button')].filter(visible).map(e=>e.getBoundingClientRect().height);
