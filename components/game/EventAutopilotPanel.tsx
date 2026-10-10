@@ -9,7 +9,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 type Settings={enabled:boolean;interval_hours:number;activity_weight:number;max_daily:number;trust_per_20:number;backlog_penalty:number;last_run_at:string|null};
 type BankCase={comic_scene?:EventComicScene|null;id:string;case_key:string;title:string;situation:string;category:string;seriousness:string;allowed_roles:string[];audience:'single'|'all'|'group';status:string;source_note:string|null};
 const DEFAULT:Settings={enabled:false,interval_hours:12,activity_weight:1,max_daily:2,trust_per_20:2,backlog_penalty:1,last_run_at:null};
-export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;onChanged:()=>Promise<void>}){
+export default function EventAutopilotPanel({g,onChanged,readyCaseCount}:{g:ReturnTypeRepublic;onChanged:()=>Promise<void>;readyCaseCount:number}){
  const {game,members,teacher}=g;
  const [settings,setSettings]=useState<Settings>(DEFAULT);
  const [bank,setBank]=useState<BankCase[]>([]);
@@ -30,7 +30,7 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
   if(!game)return;
   const [a,b,c0,d]=await Promise.all([
    supabase.from('event_auto_settings').select('*').eq('game_id',game.id).maybeSingle(),
-   supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,audience,status,source_note,comic_scene').eq('game_id',game.id).like('case_key','bank-%').eq('status','ready').order('category').order('title'),
+   supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,audience,status,source_note,comic_scene').eq('game_id',game.id).eq('status','ready').order('category').order('title'),
    supabase.from('event_assignments').select('case_id,recipient_id').eq('game_id',game.id),
    supabase.from('event_case_outcomes').select('case_id').eq('game_id',game.id)
   ]);
@@ -116,7 +116,7 @@ export default function EventAutopilotPanel({g,onChanged}:{g:ReturnTypeRepublic;
   <button type="button" className="autoEventSave" disabled={busy} onClick={()=>void save(settings)}><Check size={17}/> {busy?'Сохранение…':'Сохранить настройки'}</button>
   <div className="autoEventBank">
    <button type="button" className="autoEventBankToggle" aria-expanded={openBank} onClick={()=>setOpenBank(!openBank)}>
-    <BookOpenText size={19}/><span><b>Банк игровых ситуаций</b><small>{bank.length} авторских учебных кейсов</small></span><ChevronDown size={19}/>
+    <BookOpenText size={19}/><span><b>Банк игровых ситуаций</b><small>{readyCaseCount} готовых ситуаций · {bank.length} доступны для выбора</small></span><ChevronDown size={19}/>
    </button>
    {openBank&&<div className="autoEventBankBody">
     <div className="autoEventBankSearch"><input aria-label="Найти ситуацию" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Найти ситуацию по названию, сфере или тексту…"/><button type="button" disabled={busy} onClick={()=>void seed()}><RefreshCw size={16}/> Сверить банк</button></div>

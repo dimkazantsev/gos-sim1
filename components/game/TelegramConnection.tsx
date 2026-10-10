@@ -10,11 +10,20 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
    const {data,error:authError}=await supabase.auth.getSession();
    if(authError||!data.session?.access_token){setError('Сначала войдите в игру.');setBusy(false);return}
    try{
-     const response=await fetch('/api/telegram/register',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+data.session.access_token},body:JSON.stringify({gameId})});
+     const headers={'Content-Type':'application/json',Authorization:'Bearer '+data.session.access_token};
+     const payload=JSON.stringify({gameId});
+     // Use a dedicated POST endpoint; keep the legacy route as a safe fallback.
+     let response=await fetch('/api/telegram/activate',{method:'POST',headers,body:payload,cache:'no-store'});
+     if(response.status===404||response.status===405){
+       response=await fetch('/api/telegram/register',{method:'POST',headers,body:payload,cache:'no-store'});
+     }
      const contentType=response.headers.get('content-type')||'';
-     if(!contentType.toLowerCase().includes('application/json'))throw new Error(response.status===401||response.status===403?'Доступ к серверному API ограничен настройками Vercel.':'Сервер вернул HTML вместо JSON. Код ответа: '+response.status);
+     if(!contentType.toLowerCase().includes('application/json')){
+       if(response.status===405)throw new Error('Сервер Vercel отклонил POST-запрос (HTTP 405). Проверьте, открыт ли основной адрес gos-sim1.vercel.app, и повторите попытку.');
+       throw new Error('Сервер активации не вернул JSON (HTTP '+response.status+').');
+     }
      const result=await response.json() as {ok?:boolean;error?:string};
-     if(!response.ok||!result.ok)throw new Error(result.error||'Не удалось включить бота.');
+     if(!response.ok||!result.ok)throw new Error(result.error||'Не удалось активировать бота.');
      setActivated('Webhook Telegram зарегистрирован.');
    }catch(e){setError(e instanceof Error?e.message:'Ошибка активации')}
    finally{setBusy(false)}
