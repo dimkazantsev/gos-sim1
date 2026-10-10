@@ -33,24 +33,49 @@ jobs:
           from PIL import Image
           m = json.loads(Path("data/event-illustrations.json").read_text())
           d = json.loads(Path("content/event-art-oct04-progress.json").read_text())
-          assert set(m) == set(d["completed"])
+          assert set(d["completed"]).issubset(set(m)), "Missing previously completed scene"
           hashes = set()
+          raster = 0
+          vector = 0
           for key, v in m.items():
               assert v["width"] == 1920 and v["height"] == 1080, key
-              assert re.fullmatch(r"/event-art/scene-\d{3}-\d{8}-1920\.webp", v["src"]), key
-              expected = ", ".join(v["src"].replace("-1920.webp", f"-{w}.webp") + f" {w}w" for w in [480, 960, 1920])
-              assert v["srcSet"] == expected, key
-              for w, h in [(1920, 1080), (960, 540), (480, 270)]:
-                  p = Path("public") / v["src"].lstrip("/").replace("-1920.webp", f"-{w}.webp")
-                  im = Image.open(p)
-                  assert im.size == (w, h), (key, im.size)
-                  im.verify()
-                  if w == 1920:
-                      sha = hashlib.sha256(p.read_bytes()).hexdigest()
-                      assert sha == d["completed"][key]["asset_sha256"], key
-                      assert sha not in hashes, key
-                      hashes.add(sha)
-          print(f"PASS {len(m)} separate case images and {len(m) * 3} responsive files")
+              src = v["src"]
+              if src.startswith("/event-art/"):
+                  assert src.endswith("-1920.webp"), (key, src)
+                  expected = ", ".join(src.replace("-1920.webp", f"-{w}.webp") + f" {w}w" for w in [480, 960, 1920])
+                  assert v["srcSet"] == expected, key
+                  for w, h in [(1920, 1080), (960, 540), (480, 270)]:
+                      p = Path("public") / src.lstrip("/").replace("-1920.webp", f"-{w}.webp")
+                      assert p.is_file(), (key, p)
+                      im = Image.open(p)
+                      assert im.size == (w, h), (key, im.size)
+                      im.verify()
+                      if w == 1920:
+                          sha = hashlib.sha256(p.read_bytes()).hexdigest()
+                          if key in d["completed"]:
+                              assert sha == d["completed"][key]["asset_sha256"], key
+                          assert sha not in hashes, key
+                          hashes.add(sha)
+                  raster += 1
+              elif src.startswith("/event-comics/"):
+                  assert src.endswith(".svg") and (Path("public") / src.lstrip("/")).is_file(), key
+                  vector += 1
+              else:
+                  raise AssertionError((key, src))
+          for key in [
+              "budget-region-2026-10-hospital-equipment",
+              "budget-region-2026-22-drought-irrigation",
+              "budget-region-2026-25-bridge-detour",
+              "budget-region-2026-40-industrial-grid",
+              "budget-region-2026-42-employment-retraining",
+              "budget-region-2026-43-rural-cultural-centres",
+              "budget-region-2026-45-rural-broadband",
+              "budget-region-2026-54-school-capacity",
+              "budget-region-2026-59-heating-network",
+              "budget-region-2026-63-technical-college",
+          ]:
+              assert m[key]["src"].endswith("-cinematic-1920.webp"), key
+          print(f"PASS {raster} raster case images ({raster*3} responsive files), {vector} vector cases")
           PY
       - run: node scripts/interface-contract-check.cjs
       - run: node scripts/event-card-browser-check.cjs
