@@ -29,6 +29,7 @@ create table if not exists public.telegram_outbox (
   user_id uuid not null,
   category text not null check (category in ('chat','stage','vote','event','document')),
   source_id uuid,
+  channel_id uuid references public.chat_channels(id) on delete set null,
   body text not null check (length(body) <= 4000),
   created_at timestamptz not null default now(),
   next_attempt_at timestamptz not null default now(),
@@ -155,9 +156,9 @@ begin
  if new.kind not in ('text','system') or coalesce(new.text,'')='' then return new; end if;
  select * into v_channel from public.chat_channels where id=new.channel_id;
  select full_name into v_author from public.game_members where game_id=new.game_id and user_id=new.author_id;
- insert into public.telegram_outbox(game_id,user_id,category,source_id,body)
+ insert into public.telegram_outbox(game_id,user_id,category,source_id,body,channel_id)
  select new.game_id,l.user_id,'chat',new.id,
- left('Чат «'||v_channel.name||'»'||E'\n'||coalesce(v_author,'Система')||': '||left(new.text,3000),3900)
+ left('Чат «'||v_channel.name||'»'||E'\n'||coalesce(v_author,'Система')||': '||left(new.text,3000),3900),new.channel_id
  from public.telegram_links l join public.game_members m on m.game_id=l.game_id and m.user_id=l.user_id
  where l.game_id=new.game_id and l.user_id is distinct from new.author_id
    and l.notifications_enabled and m.roster_archived_at is null
@@ -194,7 +195,7 @@ as $fn$
 begin
  if new.status='open' and (tg_op='INSERT' or old.status is distinct from new.status) then
   insert into public.telegram_outbox(game_id,user_id,category,source_id,body)
-  select new.game_id,l.user_id,'vote',new.id,left('Открыто голосование: '||new.title,3900)
+  select new.game_id,l.user_id,'vote',new.id,'В игре открыто голосование. Перейдите на сайт, чтобы проверить доступ и проголосовать.'
   from public.telegram_links l join public.game_members m on m.game_id=l.game_id and m.user_id=l.user_id
   where l.game_id=new.game_id and l.notifications_enabled and m.roster_archived_at is null
   on conflict do nothing;
@@ -204,3 +205,41 @@ end;$fn$;
 drop trigger if exists telegram_vote_enqueue on public.game_votes;
 create trigger telegram_vote_enqueue after insert or update of status on public.game_votes
 for each row execute function private.telegram_vote_enqueue();
+
+-- Generic notifications deliberately do not expose private event/document content.
+create or replace function private.telegram_event_enqueue() returns trigger
+language plpgsql security definer set search_path = ''
+as $fn$
+begin
+ if new.published_at is not null and (tg_op='INSERT' or old.published_at is distinct from new.published_at) then
+  insert into public.telegram_outbox(game_id,user_id,category,source_id,body)
+  select new.game_id,l.user_id,'event',new.id,'В игре появилось новое событие. Откройте GOS//SIMS, чтобы проверить доступ и ознакомиться.'
+  from public.telegram_links l
+  join public.game_members m on m.game_id=l.game_id and m.user_id=l.user_id
+  where l.game_id=new.game_id and l.notifications_enabled and m.roster_archived_at is null
+  on conflict do nothing;
+ end if;
+ return new;
+end;$fn$;
+drop trigger if exists telegram_event_enqueue on public.game_events;
+create trigger telegram_event_enqueue after insert or update of published_at on public.game_events
+for each row execute function private.telegram_event_enqueue();
+
+create or replace function private.telegram_document_enqueue() returns trigger
+language plpgsql security definer set search_path = ''
+as $fn$
+begin
+ if new.status_code <> 'draft'
+   and (tg_op='INSERT' or old.status_code is distinct from new.status_code) then
+  insert into public.telegram_outbox(game_id,user_id,category,source_id,body)
+  select new.game_id,l.user_id,'document',new.id,'Изменился статус документа в игре. Откройте реестр GOS//SIMS, чтобы проверить доступ и ознакомиться.'
+  from public.telegram_links l
+  join public.game_members m on m.game_id=l.game_id and m.user_id=l.user_id
+  where l.game_id=new.game_id and l.notifications_enabled and m.roster_archived_at is null
+  on conflict do nothing;
+ end if;
+ return new;
+end;$fn$;
+drop trigger if exists telegram_document_enqueue on public.formal_documents;
+create trigger telegram_document_enqueue after insert or update of status_code on public.formal_documents
+for each row execute function private.telegram_document_enqueue();
