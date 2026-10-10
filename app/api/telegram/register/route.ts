@@ -18,7 +18,7 @@ export async function POST(request:Request){
  if(memberError||member?.kind!=='teacher')return NextResponse.json({error:'Только преподаватель может активировать бота.'},{status:403});
  const webhook='https://gos-sim1.vercel.app/api/telegram/webhook';
  try{
-  const response=await fetch('https://api.telegram.org/bot'+config.token+'/setWebhook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:webhook,secret_token:config.secret,allowed_updates:['message'],drop_pending_updates:false,max_connections:20}),cache:'no-store'});
+  const response=await fetch('https://api.telegram.org/bot'+config.token+'/setWebhook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:webhook,secret_token:config.secret,allowed_updates:['message'],drop_pending_updates:false,max_connections:20}),cache:'no-store',signal:AbortSignal.timeout(12000)});
   const json=await response.json() as {ok?:boolean;description?:string};
   if(!response.ok||!json.ok)throw new Error('Telegram API rejected the webhook: '+(json.description||'Unknown error'));
   return NextResponse.json({ok:true,url:webhook});

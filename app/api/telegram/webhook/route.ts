@@ -24,11 +24,10 @@ export async function POST(request:Request){
   }
   const {data:links,error:linksError}=await config.db.from('telegram_links').select('game_id,user_id,default_channel_id').eq('telegram_user_id',telegramId);
   if(linksError)throw linksError;
-  const valid=[];
-  for(const l of links||[]){
+  const valid=(await Promise.all((links||[]).map(async l=>{
    const {data:member}=await config.db.from('game_members').select('user_id').eq('game_id',l.game_id).eq('user_id',l.user_id).is('roster_archived_at',null).maybeSingle();
-   if(member)valid.push(l);
-  }
+   return member?l:null;
+  }))).filter((link):link is NonNullable<typeof link>=>link!==null);
   if(!valid.length){await reply('Аккаунт ещё не привязан. Откройте свой профиль на сайте игры.');return NextResponse.json({ok:true})}
   const args=text.split(/\s+/),command=args[0].split('@')[0];
   if(command==='/games'){
