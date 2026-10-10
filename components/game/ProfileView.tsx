@@ -15,6 +15,7 @@ import {cropPortrait,decodePortrait,preparePortraitDetector} from './avatarCrop'
 import ProfileAvatar from './ProfileAvatar';
 import ProfileDocumentLinks from './ProfileDocumentLinks';
 import ProfileOffices from './ProfileOffices';
+import TelegramConnection from './TelegramConnection';
 import {currentGameMembers,currentGameProfiles} from './gameRoster';
 
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
@@ -197,6 +198,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
     {targetProfile?.bio&&<div className="profileBioPreview"><small>Описание</small><p>{targetProfile.bio}</p></div>}
    </aside>
   </section>
+  {own&&game&&<TelegramConnection gameId={game.id} teacher={teacher}/>}
   {own&&game&&<ProfileDocumentLinks gameId={game.id} userId={me.user_id}/>}
   {own&&teacher&&<SessionManager g={g}/>}
   <RepublicComic gameId={game?.id} initialView={comicView} open={comicOpen} onClose={()=>setComicOpen(false)}/>
