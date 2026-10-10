@@ -20,6 +20,10 @@ assert.ok(readFileSync(join(built,'components/StaticLanding.tsx'),'utf8').includ
 const documents=readFileSync(join(built,'components/game/DocumentsView.tsx'),'utf8');
 assert.ok(!documents.includes("fetch('/api/"),'A static host cannot serve document POST requests.');
 assert.ok(documents.includes('NEXT_PUBLIC_GAME_API_ORIGIN'),'Use the shared API for PDF/DOCX extraction.');
+const telegram=readFileSync(join(built,'components/game/TelegramConnection.tsx'),'utf8');
+assert.ok(telegram.includes('NEXT_PUBLIC_GAME_API_ORIGIN'),'Telegram activation must use the shared server API; GitHub Pages cannot handle POST.');
+assert.ok(!telegram.includes("fetch('/api/telegram/"),'Telegram must not POST to a relative static-host API route.');
+
 assert.ok(existsSync(join(built,'data/region-paths.json')),'Shared region data');
 assert.ok(!readFileSync(join(built,'components/game/portableSession.ts'),'utf8').includes("asset('/portable/"),'Portable assets need the repository prefix.');
 console.log(`PASS ${refs.size} HTML asset links, ${scenes.length} scenes, dynamic game entry, recovery route, document attachments and portable files.`);
