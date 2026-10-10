@@ -57,15 +57,6 @@ export function useRepublicGame(gameId:string){
  function readCurrent(ticket:ReadTicket,scope?:ReadScope){
   return readActive(ticket)&&(scope?ticket.versions[scope]===readVersions.current[scope]:Object.entries(ticket.versions).every(([key,version])=>readVersions.current[key as ReadScope]===version));
  }
- // Limit the initial fan-out: 28 concurrent PostgREST requests can exhaust a
- // small database connection pool when a classroom opens the game together.
- async function inBatches<const T extends readonly (()=>PromiseLike<unknown>)[]>(queries:T, size=7):Promise<{[K in keyof T]:Awaited<ReturnType<T[K]>>}>{
-  const results:unknown[]=[];
-  for(let offset=0;offset<queries.length;offset+=size){
-   results.push(...await Promise.all(queries.slice(offset,offset+size).map(run=>run())));
-  }
-  return results as {[K in keyof T]:Awaited<ReturnType<T[K]>>};
- }
  function requireSuccessful(results:readonly {error:unknown}[]){const failed=results.find(result=>result.error);if(failed)throw failed.error}
  async function readSafely<T>(scopes:ReadScope[],load:(ticket:ReadTicket)=>Promise<T>):Promise<T|undefined>{
   const ticket=startRead(...scopes);
@@ -176,7 +167,7 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_channel_state',filter:'game_id=eq.'+gameId},()=>void loadChatOverview())
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_mentions',filter:'game_id=eq.'+gameId},()=>void loadChatOverview());
   for(const table of ['game_members','game_office_assignments','game_stages','game_parties','game_votes','formal_documents','formal_document_history','party_member_mandates','party_agreements','game_crises','chat_channels'])live.on('postgres_changes',{event:'DELETE',schema:'public',table},()=>scheduleRealtimeReload());
-  live.subscribe(status=>{if(disposed)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');// The initial load already fetches the snapshot. Do not trigger 28 more reads on subscription.});
+  live.subscribe(status=>{if(disposed)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');// Initial load is already in flight; no need to immediately load everything again.});
   const recover=()=>{scheduleRealtimeReload();notifyGameDataRefresh(gameId);void refreshBudgetPulse()};
   const visible=()=>{if(document.visibilityState==='visible')recover()};
   window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
@@ -214,8 +205,6 @@ export function useRepublicGame(gameId:string){
   let ticket=startRead('all');
   if(show)setLoading(true);
   try{
-  // Every request is authorized by the server-side JWT and RLS. Avoid a redundant
-  // Auth /user round trip on each game refresh (a frequent source of 504s).
   const auth=await supabase.auth.getSession();
   if(!readCurrent(ticket,'all'))return;
   if(auth.error)throw auth.error;
@@ -226,35 +215,35 @@ export function useRepublicGame(gameId:string){
   if(!readCurrent(ticket,'all'))return;
   requireSuccessful([access]);
   const sections=startRead('members','metrics','telemetry','profiles','parties','partyDocuments','partyRepresentation','formal','political','overview');
-  const [g,m,mt,ev,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,mh,psh,co]=await inBatches([
-   ()=>supabase.from('games').select('*').eq('id',gameId).single(),
-   ()=>supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',u.id).single(),
-   ()=>supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label'),
-   ()=>supabase.from('game_events').select('*').eq('game_id',gameId).order('published_at',{ascending:false}).limit(100),
-   ()=>supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name'),
-   ()=>supabase.from('chat_channels').select('*').eq('game_id',gameId).order('name'),
-   ()=>supabase.from('game_stages').select('*').eq('game_id',gameId).order('stage_no'),
-   ()=>supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'),
-   ()=>supabase.from('game_votes').select('*').eq('game_id',gameId).order('opened_at',{ascending:false}),
-   ()=>supabase.from('game_ballots').select('*'),
-   ()=>supabase.from('game_evaluations').select('*').eq('game_id',gameId).order('stage_no'),
-   ()=>supabase.from('game_crises').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   ()=>supabase.from('game_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   ()=>supabase.from('game_activity').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
-   ()=>supabase.from('game_presence').select('*').eq('game_id',gameId).order('last_seen_at',{ascending:false}),
-   ()=>supabase.from('game_profiles').select('*').eq('game_id',gameId),
-   ()=>supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   ()=>supabase.from('party_invitations').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   ()=>supabase.from('party_member_mandates').select('*').eq('game_id',gameId),
-   ()=>supabase.from('party_agreements').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   ()=>supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}),
-   ()=>supabase.from('formal_document_history').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   ()=>supabase.from('political_posts').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
-   ()=>supabase.from('political_post_media').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   ()=>supabase.from('political_post_formal_links').select('*').eq('game_id',gameId),
-   ()=>supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
-   ()=>supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
-   ()=>supabase.rpc('get_my_chat_overview',{p_game_id:gameId})
+  const [g,m,mt,ev,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,mh,psh,co]=await Promise.all([
+   supabase.from('games').select('*').eq('id',gameId).single(),
+   supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',u.id).single(),
+   supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label'),
+   supabase.from('game_events').select('*').eq('game_id',gameId).order('published_at',{ascending:false}).limit(100),
+   supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name'),
+   supabase.from('chat_channels').select('*').eq('game_id',gameId).order('name'),
+   supabase.from('game_stages').select('*').eq('game_id',gameId).order('stage_no'),
+   supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'),
+   supabase.from('game_votes').select('*').eq('game_id',gameId).order('opened_at',{ascending:false}),
+   supabase.from('game_ballots').select('*'),
+   supabase.from('game_evaluations').select('*').eq('game_id',gameId).order('stage_no'),
+   supabase.from('game_crises').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('game_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('game_activity').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
+   supabase.from('game_presence').select('*').eq('game_id',gameId).order('last_seen_at',{ascending:false}),
+   supabase.from('game_profiles').select('*').eq('game_id',gameId),
+   supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('party_invitations').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('party_member_mandates').select('*').eq('game_id',gameId),
+   supabase.from('party_agreements').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}),
+   supabase.from('formal_document_history').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('political_posts').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
+   supabase.from('political_post_media').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+   supabase.from('political_post_formal_links').select('*').eq('game_id',gameId),
+   supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
+   supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
+   supabase.rpc('get_my_chat_overview',{p_game_id:gameId})
   ]);
   if(!readCurrent(ticket,'all'))return;
   const denied=[g,m].find(result=>result.error&&['PGRST116','42501'].includes(result.error.code));
