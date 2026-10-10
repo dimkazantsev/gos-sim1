@@ -664,5 +664,65 @@
     "srcSet": "/event-comics/cinematic-bank-curated-light-12-1920.svg 1920w",
     "width": 1920,
     "height": 1080
+  },
+  "bank-curated-light-13": {
+    "src": "/event-comics/cinematic-bank-curated-light-13-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-13-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-14": {
+    "src": "/event-comics/cinematic-bank-curated-light-14-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-14-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-serious-03": {
+    "src": "/event-comics/cinematic-bank-curated-serious-03-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-03-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-serious-04": {
+    "src": "/event-comics/cinematic-bank-curated-serious-04-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-04-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-serious-05": {
+    "src": "/event-comics/cinematic-bank-curated-serious-05-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-05-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-serious-07": {
+    "src": "/event-comics/cinematic-bank-curated-serious-07-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-07-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-serious-09": {
+    "src": "/event-comics/cinematic-bank-curated-serious-09-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-09-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-serious-10": {
+    "src": "/event-comics/cinematic-bank-curated-serious-10-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-10-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-serious-11": {
+    "src": "/event-comics/cinematic-bank-curated-serious-11-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-11-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-serious-12": {
+    "src": "/event-comics/cinematic-bank-curated-serious-12-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-12-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
   }
 }
