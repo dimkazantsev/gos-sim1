@@ -3,7 +3,7 @@ import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 export default function TelegramConnection({gameId}:{gameId:string}){
  const [status,setStatus]=useState<{linked:boolean;notifications_enabled:boolean}|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('');
- const username=process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME||'';
+ const username=process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME||'GosSimsGameBot';
  async function refresh(){const r=await supabase.rpc('telegram_status',{p_game_id:gameId});if(!r.error)setStatus(r.data as typeof status)}
  useEffect(()=>{void refresh()},[gameId]);
  async function link(){
