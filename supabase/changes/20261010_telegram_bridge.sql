@@ -171,7 +171,7 @@ end;$fn$;
 revoke execute on function public.telegram_generate_link(uuid),public.telegram_status(uuid),public.telegram_unlink(uuid),public.telegram_configure(uuid,boolean),
  public.telegram_connect(text,bigint,bigint),public.telegram_post_chat(bigint,uuid,uuid,text,bigint,bigint),public.telegram_select_channel(bigint,uuid,uuid) from public,anon,authenticated;
 grant execute on function public.telegram_generate_link(uuid),public.telegram_status(uuid),public.telegram_unlink(uuid),public.telegram_configure(uuid,boolean) to authenticated;
-grant execute on function public.telegram_connect(text,bigint,bigint),public.telegram_post_chat(bigint,uuid,uuid,text),public.telegram_select_channel(bigint,uuid,uuid) to service_role;
+grant execute on function public.telegram_connect(text,bigint,bigint),public.telegram_post_chat(bigint,uuid,uuid,text,bigint,bigint),public.telegram_select_channel(bigint,uuid,uuid) to service_role;
 
 -- Chat delivery is queued after successful writes; no external HTTP inside DB transactions.
 create or replace function private.telegram_chat_enqueue() returns trigger
