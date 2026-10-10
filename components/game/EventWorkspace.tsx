@@ -155,12 +155,12 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    <article><small>Негативные последствия</small><strong>{noCount}</strong><span>{ratio(noCount,relevantDecisions.length)}% от ответов</span></article>
    <article><small>Нейтральные решения</small><strong>{neutralCount}</strong><span>{ratio(neutralCount,relevantDecisions.length)}% от ответов</span></article>
   </div>}
-  {mode==='manage'&&teacher&&<EventAutopilotPanel g={g} onChanged={reload}/>}
-  {mode==='manage'&&teacher&&<div className="eventCatalogTargets" aria-label="План будущей библиотеки ситуаций">
-   <div><strong>{readyCases.length}</strong><small>Уникальных кейсов в текущей игре</small></div>
-   <div><strong>{readyCases.filter(c=>c.seriousness==='serious').length}</strong><small>Серьёзные ситуации</small></div>
-   <div><strong>{readyCases.filter(c=>c.seriousness==='light').length}</strong><small>Повседневные ситуации</small></div>
-   <div><strong>{readyCases.filter(c=>c.case_key.startsWith('bank-curated-v2-')).length}<span>/50</span></strong><small>Новая авторская итерация</small></div>
+  {mode==='manage'&&teacher&&<EventAutopilotPanel g={g} onChanged={reload} readyCaseCount={readyCases.length}/>}
+  {mode==='manage'&&teacher&&<div className="eventCatalogTargets" aria-label="Состав банка игровых ситуаций">
+   <div><strong>{cases.length}</strong><small>Всего ситуаций в игре, включая {cases.filter(c=>c.status!=='ready').length} черновиков</small></div>
+   <div><strong>{readyCases.length}</strong><small>Готовы к назначению</small></div>
+   <div><strong>{readyCases.filter(c=>c.seriousness==='serious').length}</strong><small>Серьёзные ситуации из готовых</small></div>
+   <div><strong>{readyCases.filter(c=>c.seriousness==='light').length}</strong><small>Повседневные ситуации из готовых</small></div>
   </div>}
   {mode==='manage'&&teacher&&<details className="eventComposerPanel civicDisclosure projectDisclosure">
    <DisclosureSummary icon={Send} title="Направить событие…" description="Ситуация, варианты решения и участники"/><div className="civicDisclosureBody">
