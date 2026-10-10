@@ -43,14 +43,27 @@ export default function Home(){
  }
 
  async function login(e:FormEvent){
-  e.preventDefault();setBusy(true);setError('');
+  e.preventDefault();if(busy)return;setBusy(true);setError('');
+  let phase:'authentication'|'game'='authentication';
   try{
-   const auth=await supabase.auth.signInWithPassword({email:loginEmail.trim().toLowerCase(),password:loginPassword});
-   if(auth.error)throw auth.error;
+   if(typeof navigator!=='undefined'&&!navigator.onLine)throw new Error('Устройство не подключено к интернету. Проверьте сеть.');
+   // Preserve a valid session when only the game lookup temporarily fails.
+   const existing=await supabase.auth.getSession();
+   if(existing.error)throw existing.error;
+   if(!existing.data.session?.user||existing.data.session.user.email?.toLowerCase()!==loginEmail.trim().toLowerCase()){
+    const auth=await supabase.auth.signInWithPassword({email:loginEmail.trim().toLowerCase(),password:loginPassword});
+    if(auth.error)throw auth.error;
+   }
+   phase='game';
    const r=await supabase.rpc('resume_member_game',{p_game_code:loginGameCode.trim()});
    if(r.error)throw r.error;
+   if(!r.data)throw new Error('Сервер не подтвердил участие в игре.');
    router.push('/game/'+r.data);
-  }catch(e){setError(readableError(e))}finally{setBusy(false)}
+  }catch(e){
+   const message=readableError(e);
+   const transient=/Нет ответа от сервера|network|fetch|timeout|соединен|сеть|подключено к интернету/i.test(message);
+   setError((phase==='authentication'?'Проверка учётной записи: ':'Открытие игровой сессии: ')+message+(transient?' Если используете VPN, проверьте доступность Supabase без него и повторите вход.':''));
+  }finally{setBusy(false)}
  }
  async function recover(){
   if(!loginEmail.includes('@')){setError('Укажите почту, к которой привязана ваша учётная запись.');return}
