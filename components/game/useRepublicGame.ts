@@ -240,10 +240,11 @@ export function useRepublicGame(gameId:string){
  },[game?.turn_ends_at,game?.turn_open]);
 
  async function readIdentity(userId:string){
-  return Promise.all([
-   supabase.from('games').select('*').eq('id',gameId).maybeSingle(),
-   supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',userId).maybeSingle()
-  ]);
+  const r=await supabase.rpc('get_my_game_identity',{p_game:gameId});
+  if(r.error)return [{data:null,error:r.error},{data:null,error:r.error}] as const;
+  const payload=(r.data||{}) as {game?:Game|null;member?:Member|null};
+  const member=payload.member&&payload.member.user_id===userId?payload.member:null;
+  return [{data:payload.game||null,error:null},{data:member,error:null}] as const;
  }
 
  async function acceptIdentity(g:{data:unknown;error:unknown},m:{data:unknown;error:unknown},userId:string){
