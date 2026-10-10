@@ -19,15 +19,6 @@ export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:strin
 type ReadScope='all'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
 
-// Supabase PostgREST builders start requests only when awaited. Limit the
-// burst of optional reads on game entry to avoid saturating the connection
-// pool under simultaneous classroom logins.
-async function limitedReads<T extends readonly unknown[]>(queries:T,limit=6):Promise<{[K in keyof T]:Awaited<T[K]>}>{
- const result:unknown[]=[];
- for(let i=0;i<queries.length;i+=limit)result.push(...await Promise.all(queries.slice(i,i+limit)));
- return result as {[K in keyof T]:Awaited<T[K]>};
-}
-
 export function useRepublicGame(gameId:string){
  const router=useRouter();
  const setError=(value:unknown)=>setErrorRaw(userError(value));
@@ -223,42 +214,23 @@ export function useRepublicGame(gameId:string){
   let ticket=startRead('all');
   if(show)setLoading(true);
   try{
-  // getUser() makes a remote /auth/v1/user request, which can return 500/504
-  // even for an otherwise valid browser session. Fetch the local session
-  // instead; ensure_my_game_access and every table's RLS verify the JWT on
-  // the server. Never use the stored user record as an authorization grant.
-  const auth=await supabase.auth.getSession();
+  // A verified game member can refresh through PostgREST directly.
+  // Avoid calling Auth /user for every realtime update; RLS still validates
+  // the JWT on all database reads and refuses an expired session.
+  const knownUserId=authUser.current&&acceptedMember.current?.user_id===authUser.current?authUser.current:null;
+  const auth=knownUserId?null:await supabase.auth.getUser();
   if(!readCurrent(ticket,'all'))return;
-  if(auth.error)throw auth.error;
-  const u=auth.data.session?.user;
+  if(auth?.error)throw auth.error;
+  const u=knownUserId?{id:knownUserId}:auth?.data.user;
   if(!u){adoptUser(null);setLoading(false);router.replace('/');return}
   if(adoptUser(u.id)){ticket=startRead('all');if(show)setLoading(true)}
   const access=await supabase.rpc('ensure_my_game_access',{p_game:gameId});
   if(!readCurrent(ticket,'all'))return;
   requireSuccessful([access]);
-  // Open the shell after only two small, RLS-protected reads. Loading
-  // every module before showing anything turns one optional outage into
-  // a complete login failure and issues a 28-request burst per visitor.
-  const [g,m]=await Promise.all([
-   supabase.from('games').select('*').eq('id',gameId).single(),
-   supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',u.id).single()
-  ]);
-  if(!readCurrent(ticket,'all'))return;
-  const denied=[g,m].find(result=>result.error&&['PGRST116','42501'].includes(result.error.code));
-  if(denied?.error||(!g.error&&!m.error&&(!g.data||!m.data))){
-   readEpoch.current++;clearGameData();setLoading(false);setError(denied?.error||'Нет доступа к игре');return;
-  }
-  requireSuccessful([g,m]);
-  const member=m.data as Member;
-  const previousMember=acceptedMember.current;
-  if(previousMember&&(['kind','role_title','team','group_name','roster_archived_at'] as const).some(key=>previousMember[key]!==member[key])){
-   readEpoch.current++;clearGameData();acceptedMember.current=member;setMe(member);setGame(g.data as Game);setLoading(false);scheduleRealtimeReload(0);return;
-  }
-  acceptedMember.current=member;setGame(g.data as Game);setMe(member);setError('');
-  setLoading(false);
-  // Secondary state is fetched after the initial screen is accessible.
   const sections=startRead('members','metrics','telemetry','profiles','parties','partyDocuments','partyRepresentation','formal','political','overview');
-  const [mt,ev,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,mh,psh,co]=await limitedReads([
+  const [g,m,mt,ev,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,mh,psh,co]=await Promise.all([
+   supabase.from('games').select('*').eq('id',gameId).single(),
+   supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',u.id).single(),
    supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label'),
    supabase.from('game_events').select('*').eq('game_id',gameId).order('published_at',{ascending:false}).limit(100),
    supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name'),
@@ -287,13 +259,26 @@ export function useRepublicGame(gameId:string){
    supabase.rpc('get_my_chat_overview',{p_game_id:gameId})
   ]);
   if(!readCurrent(ticket,'all'))return;
-  // An optional table outage must not discard the already-accepted game
-  // and membership, but it must also never erase the last good table snapshot.
-  requireSuccessful([mt,ev,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,mh,psh,co]);
+  const denied=[g,m].find(result=>result.error&&['PGRST116','42501'].includes(result.error.code));
+  if(denied?.error||(!g.error&&!m.error&&(!g.data||!m.data))){
+   readEpoch.current++;clearGameData();setLoading(false);setError(denied?.error||'Нет доступа к игре');return;
+  }
+  requireSuccessful([g,m]);
+  const member=m.data as Member;
+  const previousMember=acceptedMember.current;
+  if(previousMember&&(['kind','role_title','team','group_name','roster_archived_at'] as const).some(key=>previousMember[key]!==member[key])){
+   // A role change invalidates old private slices even when another table is
+   // unavailable. Reload those slices under the newly accepted membership.
+   readEpoch.current++;clearGameData();acceptedMember.current=member;setMe(member);setGame(g.data as Game);setLoading(false);scheduleRealtimeReload(0);return;
+  }
+  // A failed read is not an empty table. Keep the last accepted snapshot and
+  // expose the failure instead of replacing valid rows with empty arrays.
+  requireSuccessful([g,m,mt,ev,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,mh,psh,co]);
+  if(!g.data||!m.data)throw new Error('Нет доступа к игре');
   const intro=await supabase.rpc('has_seen_my_intro');
   if(!readCurrent(ticket,'all'))return;
   requireSuccessful([intro]);
-  setEvents((ev.data||[]) as EventItem[]);
+  acceptedMember.current=member;setGame(g.data as Game);setMe(member);setEvents((ev.data||[]) as EventItem[]);
   if(readCurrent(sections,'metrics'))setMetrics((mt.data||[]) as Metric[]);
   if(readCurrent(sections,'members'))setMembers((mb.data||[]) as Member[]);
   const overviewRows=(co.data||[]) as ChatOverview[];
@@ -536,13 +521,13 @@ export function useRepublicGame(gameId:string){
  async function refresh(){await Promise.all([loadAll(false),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
 
  async function logActivity(eventType:string,label:string,viewKey?:string,payload:Record<string,unknown>={}){
-  const userId=me?.user_id;if(!userId||authUser.current!==userId)return;
-  await supabase.from('game_activity').insert({game_id:gameId,actor_id:userId,event_type:eventType,label,view_key:viewKey||null,payload});
+  const u=(await supabase.auth.getUser()).data.user;if(!u)return;
+  await supabase.from('game_activity').insert({game_id:gameId,actor_id:u.id,event_type:eventType,label,view_key:viewKey||null,payload});
  }
  async function touchPresence(viewKey:string,label?:string){
   if(typeof document!=='undefined'&&document.visibilityState==='hidden')return;
-  const userId=me?.user_id;if(!userId||authUser.current!==userId)return;
-  await supabase.from('game_presence').upsert({game_id:gameId,user_id:userId,current_view:viewKey,last_seen_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
+  const u=(await supabase.auth.getUser()).data.user;if(!u)return;
+  await supabase.from('game_presence').upsert({game_id:gameId,user_id:u.id,current_view:viewKey,last_seen_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
   if(label)await logActivity('navigation',label,viewKey);
  }
 
