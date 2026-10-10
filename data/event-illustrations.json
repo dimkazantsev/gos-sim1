@@ -318,10 +318,10 @@
     "srcSet": "/event-art/scene-039-20261004-480.webp 480w, /event-art/scene-039-20261004-960.webp 960w, /event-art/scene-039-20261004-1920.webp 1920w"
   },
   "bank-curated-v2-40": {
-    "src": "/event-art/scene-040-20261004-1920.webp",
+    "src": "/event-art/bank-curated-v2-40-20261011-1920.webp",
     "width": 1920,
     "height": 1080,
-    "srcSet": "/event-art/scene-040-20261004-480.webp 480w, /event-art/scene-040-20261004-960.webp 960w, /event-art/scene-040-20261004-1920.webp 1920w"
+    "srcSet": "/event-art/bank-curated-v2-40-20261011-480.webp 480w, /event-art/bank-curated-v2-40-20261011-960.webp 960w, /event-art/bank-curated-v2-40-20261011-1920.webp 1920w"
   },
   "bank-curated-v2-41": {
     "src": "/event-art/scene-041-20261004-1920.webp",
@@ -534,10 +534,10 @@
     "srcSet": "/event-comics/cinematic-bank-curated-serious-02-1920.svg 1920w"
   },
   "bank-curated-serious-06": {
-    "src": "/event-comics/cinematic-bank-curated-serious-06-1920.svg",
+    "src": "/event-art/bank-curated-serious-06-20261011-1920.webp",
     "width": 1920,
     "height": 1080,
-    "srcSet": "/event-comics/cinematic-bank-curated-serious-06-1920.svg 1920w"
+    "srcSet": "/event-art/bank-curated-serious-06-20261011-480.webp 480w, /event-art/bank-curated-serious-06-20261011-960.webp 960w, /event-art/bank-curated-serious-06-20261011-1920.webp 1920w"
   },
   "bank-curated-serious-08": {
     "src": "/event-comics/cinematic-bank-curated-serious-08-1920.svg",
@@ -604,5 +604,53 @@
     "srcSet": "/event-comics/cinematic-bank-curated-light-02-1920.svg 1920w",
     "width": 1920,
     "height": 1080
+  },
+  "bank-curated-serious-07": {
+    "src": "/event-art/bank-curated-serious-07-20261011-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/bank-curated-serious-07-20261011-480.webp 480w, /event-art/bank-curated-serious-07-20261011-960.webp 960w, /event-art/bank-curated-serious-07-20261011-1920.webp 1920w"
+  },
+  "bank-expanded-serious-03-01": {
+    "src": "/event-art/bank-expanded-serious-03-01-20261011-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/bank-expanded-serious-03-01-20261011-480.webp 480w, /event-art/bank-expanded-serious-03-01-20261011-960.webp 960w, /event-art/bank-expanded-serious-03-01-20261011-1920.webp 1920w"
+  },
+  "bank-expanded-serious-05-01": {
+    "src": "/event-art/bank-expanded-serious-05-01-20261011-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/bank-expanded-serious-05-01-20261011-480.webp 480w, /event-art/bank-expanded-serious-05-01-20261011-960.webp 960w, /event-art/bank-expanded-serious-05-01-20261011-1920.webp 1920w"
+  },
+  "bank-expanded-serious-07-01": {
+    "src": "/event-art/bank-expanded-serious-07-01-20261011-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/bank-expanded-serious-07-01-20261011-480.webp 480w, /event-art/bank-expanded-serious-07-01-20261011-960.webp 960w, /event-art/bank-expanded-serious-07-01-20261011-1920.webp 1920w"
+  },
+  "bank-expanded-serious-21-01": {
+    "src": "/event-art/bank-expanded-serious-21-01-20261011-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/bank-expanded-serious-21-01-20261011-480.webp 480w, /event-art/bank-expanded-serious-21-01-20261011-960.webp 960w, /event-art/bank-expanded-serious-21-01-20261011-1920.webp 1920w"
+  },
+  "bank-legal-2026-007": {
+    "src": "/event-art/bank-legal-2026-007-20261011-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/bank-legal-2026-007-20261011-480.webp 480w, /event-art/bank-legal-2026-007-20261011-960.webp 960w, /event-art/bank-legal-2026-007-20261011-1920.webp 1920w"
+  },
+  "bank-legal-2026-022": {
+    "src": "/event-art/bank-legal-2026-022-20261011-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/bank-legal-2026-022-20261011-480.webp 480w, /event-art/bank-legal-2026-022-20261011-960.webp 960w, /event-art/bank-legal-2026-022-20261011-1920.webp 1920w"
+  },
+  "bank-legal-2026-036": {
+    "src": "/event-art/bank-legal-2026-036-20261011-1920.webp",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-art/bank-legal-2026-036-20261011-480.webp 480w, /event-art/bank-legal-2026-036-20261011-960.webp 960w, /event-art/bank-legal-2026-036-20261011-1920.webp 1920w"
   }
 }
