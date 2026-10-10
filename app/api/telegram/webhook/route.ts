@@ -48,12 +48,12 @@ export async function POST(request:Request){
    await reply((data||[]).map(s=>s.stage_no+'. '+s.title+' ['+s.status+']').join('\n').slice(0,3900)||'Этапов нет');return NextResponse.json({ok:true});
   }
   if(command==='/votes'){
-   const {data}=await config.db.from('game_votes').select('title,status').eq('game_id',game.game_id).eq('status','open').limit(12);
-   await reply('Открытые голосования:\n'+((data||[]).map(v=>'• '+v.title).join('\n')||'Нет')+'\n'+gameUrl(game.game_id));return NextResponse.json({ok:true});
+   const {data}=await config.db.from('game_votes').select('id,status').eq('game_id',game.game_id).eq('status','open').limit(12);
+   await reply('Открытые голосования:\n'+((data||[]).map(()=>'• Голосование открыто').join('\n')||'Нет')+'\n'+gameUrl(game.game_id));return NextResponse.json({ok:true});
   }
   if(command==='/docs'){
-   const {data}=await config.db.from('formal_documents').select('title,status_label').eq('game_id',game.game_id).order('updated_at',{ascending:false}).limit(12);
-   await reply('Документы:\n'+((data||[]).map(d=>'• '+d.title+' — '+d.status_label).join('\n')||'Нет')+'\n'+gameUrl(game.game_id));return NextResponse.json({ok:true});
+   const {data}=await config.db.from('formal_documents').select('id,status_label').eq('game_id',game.game_id).order('updated_at',{ascending:false}).limit(12);
+   await reply('Документы:\n'+((data||[]).map(d=>'• Документ — '+d.status_label).join('\n')||'Нет')+'\n'+gameUrl(game.game_id));return NextResponse.json({ok:true});
   }
   if(command==='/channels'){
    const {data:member}=await config.db.from('game_members').select('kind').eq('game_id',game.game_id).eq('user_id',game.user_id).single();
