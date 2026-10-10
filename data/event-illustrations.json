@@ -544,5 +544,11 @@
     "width": 1920,
     "height": 1080,
     "srcSet": "/event-comics/variety-20261010-dam-fish-1920.svg 1920w"
+  },
+  "bank-expanded-serious-27-01": {
+    "src": "/event-comics/air-quality-cinematic-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/air-quality-cinematic-1920.svg 1920w"
   }
 }
