@@ -15,7 +15,7 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
      // GitHub Pages is static and has no /api routes. Use the shared Vercel API
      // used by the document uploader; same-origin requests stay relative on Vercel.
      const origin=(process.env.NEXT_PUBLIC_GAME_API_ORIGIN||
-       (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':'')).replace(/\\/$/,'');
+       (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':'')).replace(/[/]$/,'');
      const endpoint=origin+'/api/telegram/activate';
      const response=await fetch(endpoint,{method:'POST',headers,body:payload,cache:'no-store',signal:AbortSignal.timeout(20000)});
      const contentType=response.headers.get('content-type')||'';
