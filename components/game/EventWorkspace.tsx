@@ -69,7 +69,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  useEffect(()=>{
   if(!game?.id||!me?.user_id)return;
   void reload();
-  const poll=setInterval(()=>void reload(),5000);
+  const poll=setInterval(()=>void reload(),30000);
   const channel=supabase.channel('event-workspace:'+game.id+':'+me.user_id)
    .on('postgres_changes',{event:'*',schema:'public',table:'event_cases',filter:'game_id=eq.'+game.id},()=>void reload())
    .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>void reload())
