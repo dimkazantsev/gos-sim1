@@ -214,14 +214,13 @@ export function useRepublicGame(gameId:string){
   let ticket=startRead('all');
   if(show)setLoading(true);
   try{
-  // A verified game member can refresh through PostgREST directly.
-  // Avoid calling Auth /user for every realtime update; RLS still validates
-  // the JWT on all database reads and refuses an expired session.
-  const knownUserId=authUser.current&&acceptedMember.current?.user_id===authUser.current?authUser.current:null;
-  const auth=knownUserId?null:await supabase.auth.getUser();
+  // Local session lookup avoids the failing Auth /user endpoint.
+  // The following ensure_my_game_access RPC and PostgREST RLS remain the
+  // server-side authorities for membership and permissions.
+  const auth=await supabase.auth.getSession();
   if(!readCurrent(ticket,'all'))return;
-  if(auth?.error)throw auth.error;
-  const u=knownUserId?{id:knownUserId}:auth?.data.user;
+  if(auth.error)throw auth.error;
+  const u=auth.data.session?.user;
   if(!u){adoptUser(null);setLoading(false);router.replace('/');return}
   if(adoptUser(u.id)){ticket=startRead('all');if(show)setLoading(true)}
   const access=await supabase.rpc('ensure_my_game_access',{p_game:gameId});
@@ -273,28 +272,36 @@ export function useRepublicGame(gameId:string){
   }
   // A failed read is not an empty table. Keep the last accepted snapshot and
   // expose the failure instead of replacing valid rows with empty arrays.
-  requireSuccessful([g,m,mt,ev,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,mh,psh,co]);
   if(!g.data||!m.data)throw new Error('Нет доступа к игре');
+  const optional=[mt,ev,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,mh,psh,co];
+  // One optional table timeout must not invalidate a verified member.
+  // Never replace an accepted snapshot with an empty list after a failed read.
+  const optionalFailure=optional.find(result=>result.error)?.error;
   const intro=await supabase.rpc('has_seen_my_intro');
   if(!readCurrent(ticket,'all'))return;
-  requireSuccessful([intro]);
-  acceptedMember.current=member;setGame(g.data as Game);setMe(member);setEvents((ev.data||[]) as EventItem[]);
-  if(readCurrent(sections,'metrics'))setMetrics((mt.data||[]) as Metric[]);
-  if(readCurrent(sections,'members'))setMembers((mb.data||[]) as Member[]);
-  const overviewRows=(co.data||[]) as ChatOverview[];
+  acceptedMember.current=member;setGame(g.data as Game);setMe(member);
+  setError(optionalFailure||intro.error||'');
+  if(!ev.error)setEvents((ev.data||[]) as EventItem[]);
+  if(!mt.error&&readCurrent(sections,'metrics'))setMetrics((mt.data||[]) as Metric[]);
+  if(!mb.error&&readCurrent(sections,'members'))setMembers((mb.data||[]) as Member[]);
+  const overviewRows=(!co.error?(co.data||[]):[]) as ChatOverview[];
   const overviewIds=new Set(overviewRows.map(x=>x.channel_id));
-  const availableChannels=((ch.data||[]) as Channel[]).filter(channel=>overviewIds.has(channel.id));
-  if(readCurrent(sections,'overview')){setChatOverview(overviewRows);setChannels(availableChannels)}
-  setStages((st.data||[]) as Stage[]);setVotes((vo.data||[]) as Vote[]);
-  const voteIds=new Set(((vo.data||[]) as Vote[]).map(v=>v.id));setBallots(((ba.data||[]) as Ballot[]).filter(b=>voteIds.has(b.vote_id)));
-  setEvaluations((ge.data||[]) as Evaluation[]);setCrises((cr.data||[]) as Crisis[]);setDocuments((dc.data||[]) as GameDocument[]);
-  if(readCurrent(sections,'telemetry')){setActivities((al.data||[]) as Activity[]);setPresence((pr.data||[]) as Presence[])}
-  const rawProfiles=(pf.data||[]) as GameProfile[];
-  if(readCurrent(sections,'profiles'))setProfiles(previous=>rawProfiles.map(row=>{
+  const availableChannels=(!ch.error?(ch.data||[]):[] as Channel[]).filter((channel:Channel)=>overviewIds.has(channel.id)) as Channel[];
+  if(!co.error&&!ch.error&&readCurrent(sections,'overview')){setChatOverview(overviewRows);setChannels(availableChannels)}
+  if(!st.error)setStages((st.data||[]) as Stage[]);
+  if(!vo.error)setVotes((vo.data||[]) as Vote[]);
+  if(!vo.error&&!ba.error){const voteIds=new Set(((vo.data||[]) as Vote[]).map(v=>v.id));setBallots(((ba.data||[]) as Ballot[]).filter(b=>voteIds.has(b.vote_id)));}
+  if(!ge.error)setEvaluations((ge.data||[]) as Evaluation[]);
+  if(!cr.error)setCrises((cr.data||[]) as Crisis[]);
+  if(!dc.error)setDocuments((dc.data||[]) as GameDocument[]);
+  if(!al.error&&!pr.error&&readCurrent(sections,'telemetry')){setActivities((al.data||[]) as Activity[]);setPresence((pr.data||[]) as Presence[])}
+  const rawProfiles=(!pf.error?(pf.data||[]):[]) as GameProfile[];
+  if(!pf.error&&readCurrent(sections,'profiles'))setProfiles(previous=>rawProfiles.map(row=>{
    const old=previous.find(p=>p.user_id===row.user_id);
    return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url:null,signature_url:old?.signature_path===row.signature_path?old?.signature_url:null};
   }));
-  setIntroAccountSeen(!!intro.data);setProfileGameId(gameId);
+  if(!intro.error)setIntroAccountSeen(!!intro.data);
+  if(!pf.error)setProfileGameId(gameId);
   // Show the game as soon as required data arrives; media URLs load afterwards.
   if(readCurrent(ticket,'all'))setLoading(false);
   const rawPartyDocs=(pd.data||[]) as PartyDocument[];
@@ -302,22 +309,32 @@ export function useRepublicGame(gameId:string){
   const partyRows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
   const docRows=await Promise.all(rawPartyDocs.map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
   if(!readCurrent(ticket,'all'))return;
-  if(readCurrent(sections,'profiles'))setProfiles(profileRows);
-  if(readCurrent(sections,'parties'))setParties(partyRows);
-  if(readCurrent(sections,'partyDocuments'))setPartyDocuments(docRows);
-  if(readCurrent(sections,'partyRepresentation')){setPartyInvitations((pi.data||[]) as PartyInvitation[]);setPartyMandateRows((pm.data||[]) as PartyMandateAllocation[]);setPartyAgreements((ag.data||[]) as PartyAgreement[])}
+  if(!pf.error&&readCurrent(sections,'profiles'))setProfiles(profileRows);
+  if(!pa.error&&readCurrent(sections,'parties'))setParties(partyRows);
+  if(!pd.error&&readCurrent(sections,'partyDocuments'))setPartyDocuments(docRows);
+  if(readCurrent(sections,'partyRepresentation')){
+   if(!pi.error)setPartyInvitations((pi.data||[]) as PartyInvitation[]);
+   if(!pm.error)setPartyMandateRows((pm.data||[]) as PartyMandateAllocation[]);
+   if(!ag.error)setPartyAgreements((ag.data||[]) as PartyAgreement[]);
+  }
   const formalRows=await Promise.all(((fd.data||[]) as FormalDocument[]).map(async x=>x.source_file_path?{...x,file_url:(await supabase.storage.from('game-assets').createSignedUrl(x.source_file_path,3600)).data?.signedUrl||null}:x));
   if(!readCurrent(ticket,'all'))return;
-  if(readCurrent(sections,'formal')){setFormalDocuments(formalRows);setFormalHistory((fh.data||[]) as FormalHistory[])}
+  if(readCurrent(sections,'formal')){if(!fd.error)setFormalDocuments(formalRows);if(!fh.error)setFormalHistory((fh.data||[]) as FormalHistory[]);}
   const mediaRows=await Promise.all(((px.data||[]) as PoliticalPostMedia[]).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
   if(!readCurrent(ticket,'all'))return;
-  if(readCurrent(sections,'political')){setPoliticalPosts((pp.data||[]) as PoliticalPost[]);setPoliticalMedia(mediaRows);setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);setMetricHistory((mh.data||[]) as MetricHistory[]);setPartySupportHistory((psh.data||[]) as PartySupportHistory[])}
-  if(readCurrent(sections,'overview')&&availableChannels.length){
+  if(readCurrent(sections,'political')){
+   if(!pp.error)setPoliticalPosts((pp.data||[]) as PoliticalPost[]);
+   if(!px.error)setPoliticalMedia(mediaRows);
+   if(!pl.error)setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);
+   if(!mh.error)setMetricHistory((mh.data||[]) as MetricHistory[]);
+   if(!psh.error)setPartySupportHistory((psh.data||[]) as PartySupportHistory[]);
+  }
+  if(!co.error&&!ch.error&&readCurrent(sections,'overview')&&availableChannels.length){
    const lastSent=[...overviewRows].filter(x=>x.last_sent_at).sort((a,b)=>Date.parse(b.last_sent_at!)-Date.parse(a.last_sent_at!))[0]?.channel_id||'';
    const orderedFirst=overviewRows[0]?.channel_id||availableChannels[0].id;
    const currentValid=availableChannels.some(channel=>channel.id===channelRef.current);
    if(!currentValid)setChannelId(lastSent||recalledChatChannel(u.id,availableChannels)||orderedFirst);
-  }else if(readCurrent(sections,'overview')&&channelRef.current)setChannelId('');
+  }else if(!co.error&&!ch.error&&readCurrent(sections,'overview')&&channelRef.current)setChannelId('');
   await Promise.all([loadImpactEngine(),loadRepublicOffices()]);
   }catch(error){if(readCurrent(ticket,'all'))setError(error)}
   finally{if(readCurrent(ticket,'all'))setLoading(false)}
@@ -521,13 +538,13 @@ export function useRepublicGame(gameId:string){
  async function refresh(){await Promise.all([loadAll(false),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
 
  async function logActivity(eventType:string,label:string,viewKey?:string,payload:Record<string,unknown>={}){
-  const u=(await supabase.auth.getUser()).data.user;if(!u)return;
-  await supabase.from('game_activity').insert({game_id:gameId,actor_id:u.id,event_type:eventType,label,view_key:viewKey||null,payload});
+  const uid=me?.user_id;if(!uid||authUser.current!==uid)return;
+  await supabase.from('game_activity').insert({game_id:gameId,actor_id:uid,event_type:eventType,label,view_key:viewKey||null,payload});
  }
  async function touchPresence(viewKey:string,label?:string){
   if(typeof document!=='undefined'&&document.visibilityState==='hidden')return;
-  const u=(await supabase.auth.getUser()).data.user;if(!u)return;
-  await supabase.from('game_presence').upsert({game_id:gameId,user_id:u.id,current_view:viewKey,last_seen_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
+  const uid=me?.user_id;if(!uid||authUser.current!==uid)return;
+  await supabase.from('game_presence').upsert({game_id:gameId,user_id:uid,current_view:viewKey,last_seen_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
   if(label)await logActivity('navigation',label,viewKey);
  }
 
