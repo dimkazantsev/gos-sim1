@@ -55,10 +55,21 @@ export default function Home(){
     if(auth.error)throw auth.error;
    }
    phase='game';
-   const r=await supabase.rpc('resume_member_game',{p_game_code:loginGameCode.trim()});
-   if(r.error)throw r.error;
-   if(!r.data)throw new Error('Сервер не подтвердил участие в игре.');
-   router.push('/game/'+r.data);
+   // PostgREST can temporarily return 503 while rebuilding its schema cache.
+   // Resume is idempotent, unlike join_game_with_code which records an audit event.
+   let resumedGameId='';
+   for(let attempt=0;attempt<3;attempt++){
+    const r=await supabase.rpc('resume_member_game',{p_game_code:loginGameCode.trim()});
+    if(!r.error){
+     if(!r.data)throw new Error('Сервер не подтвердил участие в игре.');
+     resumedGameId=String(r.data);break;
+    }
+    const detail=[r.error.code,r.error.message].filter(Boolean).join(' ');
+    const retry=/PGRST00[0-3]|schema cache|temporarily unavailable|Нет ответа от сервера|fetch failed|network/i.test(detail)||r.error.code==='503'||r.error.code==='504';
+    if(!retry||attempt===2)throw r.error;
+    await new Promise(resolve=>setTimeout(resolve,800*(attempt+1)));
+   }
+   router.push('/game/'+resumedGameId);
   }catch(e){
    const message=readableError(e);
    const transient=/Нет ответа от сервера|network|fetch|timeout|соединен|сеть|подключено к интернету/i.test(message);
