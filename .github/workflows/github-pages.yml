@@ -27,6 +27,7 @@ jobs:
           NEXT_PUBLIC_GAME_API_ORIGIN: https://gos-sim1.vercel.app
           NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLIC_KEY || secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      - run: node scripts/install-github-pages-fallback.mjs
       - run: node scripts/github-pages-check.mjs
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -12,6 +12,9 @@ for(const file of files(out).filter(x=>x.endsWith('.html'))){
   refs.add(relative);assert.ok(existsSync(join(out,relative))||existsSync(join(out,relative,'index.html')),'Missing asset: '+relative);
  }
 }
+const fallback=readFileSync(join(out,'404.html'),'utf8');
+assert.ok(fallback.includes('window.location.replace(base+"/?game="'),'Legacy dynamic game routes should redirect to static game entry.');
+assert.ok(fallback.includes('^[0-9a-f]{8}'),'Only UUID game routes may redirect.');
 for(const name of ['.nojekyll','models/facefinder.bin','portable/template.html','portable/engine.mjs','portable/server.mjs','event-comics/atlas-main.webp','event-comics/atlas-extra.webp','auth/update-password/index.html'])assert.ok(existsSync(join(out,name)),name);
 const scenes=readdirSync(join(root,'public/event-comics')).filter(x=>/^scene-.*\.svg$/.test(x));
 for(const name of scenes)assert.ok(existsSync(join(out,'event-comics',name)),name);
