@@ -150,33 +150,9 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'*',schema:'public',table:'game_stages',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_parties',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_votes',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_ballots'},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_evaluations',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_crises',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_events',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_documents',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_activity',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='teacher')void loadClassroomTelemetry()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_presence',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='teacher')void loadClassroomTelemetry()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_profiles',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='parties'||activeViewRef.current==='profile')void loadPartyAssets()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'party_documents',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='parties')void loadPartyAssets()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'party_invitations',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='parties'||activeViewRef.current==='teacher')void loadPartyRepresentation()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'party_member_mandates',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='parties'||activeViewRef.current==='teacher')void loadPartyRepresentation()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'party_agreements',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='parties'||activeViewRef.current==='teacher')void loadPartyRepresentation()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'formal_documents',filter:'game_id=eq.'+gameId},()=>{scheduleRealtimeReload();if(activeViewRef.current==='documents')void loadFormalRegistry()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'formal_document_history',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='documents')void loadFormalRegistry()})
-   .on('postgres_changes',{event:'INSERT',schema:'public',table:'event_case_outcomes',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='budget')void syncBudget()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'political_posts',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='actions'||activeViewRef.current==='teacher')void loadPoliticalWall()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'political_post_media',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='actions'||activeViewRef.current==='teacher')void loadPoliticalWall()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'state_metric_history',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='actions'||activeViewRef.current==='teacher')void loadPoliticalWall()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'impact_rules',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='teacher')void loadImpactEngine()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'impact_ledger',filter:'game_id=eq.'+gameId},()=>{if(activeViewRef.current==='teacher')void loadImpactEngine()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'chat_channels',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'channel_members'},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'game_id=eq.'+gameId},()=>{if(chatOpenRef.current){void loadChatOverview();if(channelRef.current)void loadMessages(channelRef.current)}})
-   .on('postgres_changes',{event:'*',schema:'public',table:'chat_pins',filter:'game_id=eq.'+gameId},()=>{if(channelRef.current)void loadChatPins(channelRef.current)})
-   .on('postgres_changes',{event:'*',schema:'public',table:'chat_channel_state',filter:'game_id=eq.'+gameId},()=>{if(chatOpenRef.current)void loadChatOverview()})
-   .on('postgres_changes',{event:'*',schema:'public',table:'chat_mentions',filter:'game_id=eq.'+gameId},()=>{if(chatOpenRef.current)void loadChatOverview()});
-  for(const table of ['game_members','game_office_assignments','game_stages','game_parties','game_votes','formal_documents','formal_document_history','party_member_mandates','party_agreements','game_crises','chat_channels'])live.on('postgres_changes',{event:'DELETE',schema:'public',table},()=>scheduleRealtimeReload());
+   .on('postgres_changes',{event:'*',schema:'public',table:'formal_documents',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload());
+  for(const table of ['game_members','game_office_assignments','game_stages','game_parties','game_votes','formal_documents'])live.on('postgres_changes',{event:'DELETE',schema:'public',table},()=>scheduleRealtimeReload());
   live.subscribe(status=>{if(disposed)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');});
   const recover=()=>{void hydrateActiveView();notifyGameDataRefresh(gameId);if(activeViewRef.current==='budget')void refreshBudgetPulse()};
   const visible=()=>{if(document.visibilityState==='visible')recover()};
@@ -184,6 +160,48 @@ export function useRepublicGame(gameId:string){
   liveRef.current=live;
   return()=>{disposed=true;alive.current=false;readEpoch.current++;subscription.unsubscribe();clearTimeout(authReloadTimer);window.removeEventListener('focus',recover);window.removeEventListener('online',recover);document.removeEventListener('visibilitychange',visible);if(realtimeReloadTimer.current){clearTimeout(realtimeReloadTimer.current);realtimeReloadTimer.current=null}realtimeReloadVersion.current++;realtimeReloadRunning.current=false;realtimeReloadQueued.current=false;if(liveRef.current===live)liveRef.current=null;void supabase.removeChannel(live)};
  },[gameId]);
+
+ useEffect(()=>{
+  if(!me?.user_id)return;
+  let live=supabase.channel('republic-view:'+gameId+':'+activeView+':'+(chatOpen?'chat':'quiet'));
+  let handlers=0;
+  const on=(table:string,callback:()=>void,event:'*'|'INSERT'='*',filter=true)=>{
+   handlers++;
+   live=live.on('postgres_changes',{event,schema:'public',table,...(filter?{filter:'game_id=eq.'+gameId}:{})},callback);
+  };
+  if(activeView==='votes'){on('game_ballots',()=>scheduleRealtimeReload(),'*',false);on('game_evaluations',()=>scheduleRealtimeReload());}
+  if(activeView==='events'||activeView==='teacher')on('game_crises',()=>scheduleRealtimeReload());
+  if(activeView==='documents')on('formal_document_history',()=>void loadFormalRegistry());
+  if(activeView==='parties'||activeView==='profile'){on('game_profiles',()=>void loadPartyAssets());on('party_documents',()=>void loadPartyAssets());}
+  if(activeView==='parties'||activeView==='teacher'){
+   on('party_invitations',()=>void loadPartyRepresentation());
+   on('party_member_mandates',()=>void loadPartyRepresentation());
+   on('party_agreements',()=>void loadPartyRepresentation());
+  }
+  if(activeView==='actions'||activeView==='teacher'){
+   on('political_posts',()=>void loadPoliticalWall());
+   on('political_post_media',()=>void loadPoliticalWall());
+   on('state_metric_history',()=>void loadPoliticalWall());
+  }
+  if(activeView==='teacher'){
+   on('game_activity',()=>void loadClassroomTelemetry());
+   on('game_presence',()=>void loadClassroomTelemetry());
+   on('impact_rules',()=>void loadImpactEngine());
+   on('impact_ledger',()=>void loadImpactEngine());
+  }
+  if(activeView==='budget')on('event_case_outcomes',()=>void syncBudget(),'INSERT');
+  if(chatOpen){
+   on('chat_channels',()=>void loadChatOverview());
+   on('channel_members',()=>void loadChatOverview(),'*',false);
+   on('chat_messages',()=>{void loadChatOverview();if(channelRef.current)void loadMessages(channelRef.current)},'INSERT');
+   on('chat_pins',()=>{if(channelRef.current)void loadChatPins(channelRef.current)});
+   on('chat_channel_state',()=>void loadChatOverview());
+   on('chat_mentions',()=>void loadChatOverview());
+  }
+  if(!handlers)return;
+  live.subscribe();
+  return()=>{void supabase.removeChannel(live)};
+ },[gameId,activeView,chatOpen,me?.user_id]);
 
  useEffect(()=>()=>{
   const rec=recorder.current;
