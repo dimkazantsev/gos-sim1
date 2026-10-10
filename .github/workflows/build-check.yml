@@ -2,7 +2,7 @@ name: Build Check
 
 on:
   push:
-    branches: [main, "codex/civic-*", "codex/budget-amendments-*", "codex/project-audit-*", "fix/fast-login-*"]
+    branches: [main, "codex/civic-*", "codex/budget-amendments-*", "codex/project-audit-*", "fix/fast-login-*", "fix/stabilize-runtime-*"]
   workflow_dispatch:
 
 jobs:
