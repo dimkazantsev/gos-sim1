@@ -520,5 +520,29 @@
     "width": 1920,
     "height": 1080,
     "srcSet": "/event-comics/scene-budget-016.svg 1920w"
+  },
+  "bank-curated-serious-01": {
+    "src": "/event-comics/variety-20261010-cyberattack-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/variety-20261010-cyberattack-1920.svg 1920w"
+  },
+  "bank-curated-serious-02": {
+    "src": "/event-comics/variety-20261010-landslide-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/variety-20261010-landslide-1920.svg 1920w"
+  },
+  "bank-curated-serious-06": {
+    "src": "/event-comics/variety-20261010-winter-power-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/variety-20261010-winter-power-1920.svg 1920w"
+  },
+  "bank-curated-serious-08": {
+    "src": "/event-comics/variety-20261010-dam-fish-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/variety-20261010-dam-fish-1920.svg 1920w"
   }
 }
