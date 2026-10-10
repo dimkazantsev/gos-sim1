@@ -12,20 +12,21 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
    try{
      const headers={'Content-Type':'application/json',Authorization:'Bearer '+data.session.access_token};
      const payload=JSON.stringify({gameId});
-     // Use a dedicated POST endpoint; keep the legacy route as a safe fallback.
-     let response=await fetch('/api/telegram/activate',{method:'POST',headers,body:payload,cache:'no-store'});
-     if(response.status===404||response.status===405){
-       response=await fetch('/api/telegram/register',{method:'POST',headers,body:payload,cache:'no-store'});
-     }
+     // GitHub Pages is static and has no /api routes. Use the shared Vercel API
+     // used by the document uploader; same-origin requests stay relative on Vercel.
+     const origin=(process.env.NEXT_PUBLIC_GAME_API_ORIGIN||
+       (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':'')).replace(/\\/$/,'');
+     const endpoint=origin+'/api/telegram/activate';
+     const response=await fetch(endpoint,{method:'POST',headers,body:payload,cache:'no-store',signal:AbortSignal.timeout(20000)});
      const contentType=response.headers.get('content-type')||'';
      if(!contentType.toLowerCase().includes('application/json')){
-       if(response.status===405)throw new Error('Сервер Vercel отклонил POST-запрос (HTTP 405). Проверьте, открыт ли основной адрес gos-sim1.vercel.app, и повторите попытку.');
+       if(response.status===405)throw new Error('HTTP 405: серверный API не принимает POST. Используйте обновлённую версию сайта и проверьте адрес API.');
        throw new Error('Сервер активации не вернул JSON (HTTP '+response.status+').');
      }
      const result=await response.json() as {ok?:boolean;error?:string};
      if(!response.ok||!result.ok)throw new Error(result.error||'Не удалось активировать бота.');
-     setActivated('Webhook Telegram зарегистрирован.');
-   }catch(e){setError(e instanceof Error?e.message:'Ошибка активации')}
+     setActivated('Webhook Telegram зарегистрирован.');setError('');
+   }catch(e){setError(e instanceof Error?e.name==='TimeoutError'?'Сервер не ответил за 20 секунд. Повторите попытку.':e.message:'Ошибка активации')}
    finally{setBusy(false)}
  }
  async function refresh(){
