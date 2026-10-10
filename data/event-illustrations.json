@@ -580,5 +580,29 @@
     "width": 1920,
     "height": 1080,
     "srcSet": "/event-comics/cinematic-bank-bus-1920.svg 1920w"
+  },
+  "bank-cat-mayor": {
+    "src": "/event-comics/cinematic-bank-cat-mayor-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-cat-mayor-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-ceremony": {
+    "src": "/event-comics/cinematic-bank-ceremony-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-ceremony-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-01": {
+    "src": "/event-comics/cinematic-bank-curated-light-01-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-01-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-02": {
+    "src": "/event-comics/cinematic-bank-curated-light-02-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-02-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
   }
 }
