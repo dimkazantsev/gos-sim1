@@ -39,6 +39,20 @@ create table if not exists public.telegram_outbox (
   unique (game_id,user_id,category,source_id),
   foreign key (game_id,user_id) references public.game_members(game_id,user_id) on delete cascade
 );
+create table if not exists public.telegram_incoming_messages (
+  chat_id bigint not null,
+  telegram_message_id bigint not null,
+  game_id uuid not null references public.games(id) on delete cascade,
+  user_id uuid not null,
+  posted_message_id uuid references public.chat_messages(id) on delete set null,
+  created_at timestamptz not null default now(),
+  primary key(chat_id,telegram_message_id),
+  foreign key(game_id,user_id) references public.game_members(game_id,user_id) on delete cascade
+);
+create index if not exists telegram_incoming_messages_created_idx on public.telegram_incoming_messages(created_at);
+alter table public.telegram_incoming_messages enable row level security;
+revoke all on table public.telegram_incoming_messages from public,anon,authenticated;
+grant select,insert,update,delete on table public.telegram_incoming_messages to service_role;
 create index if not exists telegram_outbox_ready_idx on public.telegram_outbox(next_attempt_at,id) where sent_at is null and attempts < 5;
 alter table public.telegram_links enable row level security;
 alter table public.telegram_link_requests enable row level security;
@@ -107,22 +121,34 @@ begin
  delete from public.telegram_link_requests where game_id=v_req.game_id and user_id=v_req.user_id;
  return v_req.game_id;
 end;$fn$;
-create or replace function public.telegram_post_chat(p_telegram_user_id bigint,p_game_id uuid,p_channel_id uuid,p_text text)
+create or replace function public.telegram_post_chat(p_telegram_user_id bigint,p_game_id uuid,p_channel_id uuid,p_text text,p_chat_id bigint,p_message_id bigint)
 returns uuid language plpgsql security invoker set search_path = ''
 as $fn$
-declare v_user uuid;v_kind public.member_kind;v_channel text;v_id uuid;
+declare v_user uuid;v_kind public.member_kind;v_channel text;v_id uuid;v_duplicate uuid;
 begin
  if length(trim(coalesce(p_text,'')))=0 or length(p_text)>3500 then raise exception 'Длина сообщения: от 1 до 3500 символов.'; end if;
  select l.user_id,m.kind into v_user,v_kind from public.telegram_links l
  join public.game_members m on m.game_id=l.game_id and m.user_id=l.user_id
- where l.telegram_user_id=p_telegram_user_id and l.game_id=p_game_id and m.roster_archived_at is null;
+ where l.telegram_user_id=p_telegram_user_id and l.game_id=p_game_id and l.chat_id=p_chat_id and m.roster_archived_at is null;
  if v_user is null or v_kind='observer' then raise exception 'Нет права отправлять сообщения.'; end if;
  select kind into v_channel from public.chat_channels where id=p_channel_id and game_id=p_game_id;
  if v_channel is null or not (v_channel='public' or v_kind='teacher' or exists(
     select 1 from public.channel_members where channel_id=p_channel_id and user_id=v_user
  )) then raise exception 'Нет доступа к каналу.'; end if;
+ if p_message_id < 1 then raise exception 'Неверный идентификатор сообщения Telegram.'; end if;
+ insert into public.telegram_incoming_messages(chat_id,telegram_message_id,game_id,user_id)
+ values(p_chat_id,p_message_id,p_game_id,v_user)
+ on conflict (chat_id,telegram_message_id) do nothing;
+ if not found then
+   select posted_message_id into v_duplicate from public.telegram_incoming_messages
+   where chat_id=p_chat_id and telegram_message_id=p_message_id;
+   if v_duplicate is null then raise exception 'Повторная отправка уже обрабатывается.'; end if;
+   return v_duplicate;
+ end if;
  insert into public.chat_messages(game_id,channel_id,author_id,kind,text)
  values(p_game_id,p_channel_id,v_user,'text',trim(p_text)) returning id into v_id;
+ update public.telegram_incoming_messages
+ set posted_message_id=v_id where chat_id=p_chat_id and telegram_message_id=p_message_id;
  return v_id;
 end;$fn$;
 create or replace function public.telegram_select_channel(p_telegram_user_id bigint,p_game_id uuid,p_channel_id uuid)
@@ -143,7 +169,7 @@ begin
 end;$fn$;
 
 revoke execute on function public.telegram_generate_link(uuid),public.telegram_status(uuid),public.telegram_unlink(uuid),public.telegram_configure(uuid,boolean),
- public.telegram_connect(text,bigint,bigint),public.telegram_post_chat(bigint,uuid,uuid,text),public.telegram_select_channel(bigint,uuid,uuid) from public,anon,authenticated;
+ public.telegram_connect(text,bigint,bigint),public.telegram_post_chat(bigint,uuid,uuid,text,bigint,bigint),public.telegram_select_channel(bigint,uuid,uuid) from public,anon,authenticated;
 grant execute on function public.telegram_generate_link(uuid),public.telegram_status(uuid),public.telegram_unlink(uuid),public.telegram_configure(uuid,boolean) to authenticated;
 grant execute on function public.telegram_connect(text,bigint,bigint),public.telegram_post_chat(bigint,uuid,uuid,text),public.telegram_select_channel(bigint,uuid,uuid) to service_role;
 
@@ -243,3 +269,22 @@ end;$fn$;
 drop trigger if exists telegram_document_enqueue on public.formal_documents;
 create trigger telegram_document_enqueue after insert or update of status_code on public.formal_documents
 for each row execute function private.telegram_document_enqueue();
+
+-- Targeted alerts for assigned training cases. Never expose the case description to an unverified Telegram chat.
+create or replace function private.telegram_assignment_enqueue() returns trigger
+language plpgsql security definer set search_path = ''
+as $fn$
+begin
+ insert into public.telegram_outbox(game_id,user_id,category,source_id,body)
+ select new.game_id,l.user_id,'event',new.id,
+  'Вам назначена новая игровая ситуация. Откройте GOS//SIMS для изучения условий и ответа.'
+ from public.telegram_links l
+ join public.game_members m on m.game_id=l.game_id and m.user_id=l.user_id
+ where l.game_id=new.game_id and l.user_id=new.recipient_id
+   and l.notifications_enabled and m.roster_archived_at is null
+ on conflict do nothing;
+ return new;
+end;$fn$;
+drop trigger if exists telegram_assignment_enqueue on public.event_assignments;
+create trigger telegram_assignment_enqueue after insert on public.event_assignments
+for each row execute function private.telegram_assignment_enqueue();
