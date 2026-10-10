@@ -35,7 +35,7 @@ export function useRepublicGame(gameId:string){
  const [chatMediaError,setChatMediaError]=useState(''),[chatMediaPhase,setChatMediaPhase]=useState<MediaUploadPhase>('idle');
  const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]);
- const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0);
+ const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,PendingMediaUpload>()),voiceAnalysisRef=useRef<Promise<{waveform:number[];duration:number}|null>|null>(null);
 
@@ -99,19 +99,24 @@ export function useRepublicGame(gameId:string){
  const sharedMetrics=useMemo(()=>withBudgetIncome(metrics,budgetPulse),[metrics,budgetPulse]);
  const sharedMetricHistory=useMemo(()=>budgetPulse?[...metricHistory.filter(h=>h.metric_key!=='budget'),...budgetPulse.history]:metricHistory,[metricHistory,budgetPulse]);
  async function syncBudget(){await refreshBudgetPulse();}
- function scheduleRealtimeReload(delay=180){
-  if(realtimeReloadTimer.current)clearTimeout(realtimeReloadTimer.current);
-  realtimeReloadTimer.current=setTimeout(()=>{realtimeReloadTimer.current=null;void flushRealtimeReload()},delay);
+ function scheduleRealtimeReload(delay=1200){
+  // Keep the first pending refresh: continuous Realtime events must not
+  // indefinitely postpone it or refetch dozens of tables on every change.
+  if(typeof document!=='undefined'&&document.visibilityState==='hidden')return;
+  if(realtimeReloadTimer.current)return;
+  const cooldown=Math.max(0,8000-(Date.now()-lastFullReloadAt.current));
+  realtimeReloadTimer.current=setTimeout(()=>{realtimeReloadTimer.current=null;void flushRealtimeReload()},Math.max(delay,cooldown));
  }
  async function flushRealtimeReload(){
   if(realtimeReloadRunning.current){realtimeReloadQueued.current=true;return}
   const version=++realtimeReloadVersion.current;
   realtimeReloadRunning.current=true;
+  lastFullReloadAt.current=Date.now();
   try{await loadAll(false)}
   finally{
    if(version!==realtimeReloadVersion.current)return;
    realtimeReloadRunning.current=false;
-   if(realtimeReloadQueued.current){realtimeReloadQueued.current=false;scheduleRealtimeReload(80)}
+   if(realtimeReloadQueued.current){realtimeReloadQueued.current=false;scheduleRealtimeReload()}
   }
  }
 
@@ -122,6 +127,10 @@ export function useRepublicGame(gameId:string){
   const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
    if(disposed)return;
    const nextUser=session?.user.id||null;
+   // A temporary refresh-token outage is not an explicit sign-out.
+   // Only navigate away when a confirmed missing session is detected in
+   // loadAll, or when the user explicitly signs out.
+   if(!nextUser&&event!=='SIGNED_OUT')return;
    if(!adoptUser(nextUser,event==='SIGNED_OUT'))return;
    setError('');setLoading(!!nextUser);
    if(!nextUser)setRealtimeState('disconnected');
@@ -205,10 +214,14 @@ export function useRepublicGame(gameId:string){
   let ticket=startRead('all');
   if(show)setLoading(true);
   try{
-  const auth=await supabase.auth.getUser();
+  // A verified game member can refresh through PostgREST directly.
+  // Avoid calling Auth /user for every realtime update; RLS still validates
+  // the JWT on all database reads and refuses an expired session.
+  const knownUserId=authUser.current&&acceptedMember.current?.user_id===authUser.current?authUser.current:null;
+  const auth=knownUserId?null:await supabase.auth.getUser();
   if(!readCurrent(ticket,'all'))return;
-  if(auth.error)throw auth.error;
-  const u=auth.data.user;
+  if(auth?.error)throw auth.error;
+  const u=knownUserId?{id:knownUserId}:auth?.data.user;
   if(!u){adoptUser(null);setLoading(false);router.replace('/');return}
   if(adoptUser(u.id)){ticket=startRead('all');if(show)setLoading(true)}
   const access=await supabase.rpc('ensure_my_game_access',{p_game:gameId});

@@ -48,9 +48,14 @@ export default function Home(){
   try{
    if(typeof navigator!=='undefined'&&!navigator.onLine)throw new Error('Устройство не подключено к интернету. Проверьте сеть.');
    // Preserve a valid session when only the game lookup temporarily fails.
-   const existing=await supabase.auth.getSession();
-   if(existing.error)throw existing.error;
-   if(!existing.data.session?.user||existing.data.session.user.email?.toLowerCase()!==loginEmail.trim().toLowerCase()){
+   // If Auth temporarily cannot refresh a stored token, allow an explicit
+   // password login instead of trapping the user behind a broken old session.
+   let existing=await supabase.auth.getSession();
+   if(existing.error&&((existing.error as {status?:number}).status||0)>=500){
+    await new Promise(resolve=>setTimeout(resolve,500));
+    existing=await supabase.auth.getSession();
+   }
+   if(existing.error||!existing.data.session?.user||existing.data.session.user.email?.toLowerCase()!==loginEmail.trim().toLowerCase()){
     const auth=await supabase.auth.signInWithPassword({email:loginEmail.trim().toLowerCase(),password:loginPassword});
     if(auth.error)throw auth.error;
    }
