@@ -167,7 +167,7 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_channel_state',filter:'game_id=eq.'+gameId},()=>void loadChatOverview())
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_mentions',filter:'game_id=eq.'+gameId},()=>void loadChatOverview());
   for(const table of ['game_members','game_office_assignments','game_stages','game_parties','game_votes','formal_documents','formal_document_history','party_member_mandates','party_agreements','game_crises','chat_channels'])live.on('postgres_changes',{event:'DELETE',schema:'public',table},()=>scheduleRealtimeReload());
-  live.subscribe(status=>{if(disposed)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');if(status==='SUBSCRIBED')scheduleRealtimeReload()});
+  live.subscribe(status=>{if(disposed)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');// Initial snapshot is already loading; avoid a second bulk refresh.});
   const recover=()=>{scheduleRealtimeReload();notifyGameDataRefresh(gameId);void refreshBudgetPulse()};
   const visible=()=>{if(document.visibilityState==='visible')recover()};
   window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
