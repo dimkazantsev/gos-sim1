@@ -424,5 +424,101 @@
     "width": 1920,
     "height": 1080,
     "srcSet": "/event-art/scene-081-20261004-480.webp 480w, /event-art/scene-081-20261004-960.webp 960w, /event-art/scene-081-20261004-1920.webp 1920w"
+  },
+  "budget-region-2026-05-essential-services-gap": {
+    "src": "/event-comics/scene-budget-001.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-001.svg 1920w"
+  },
+  "budget-region-2026-10-hospital-equipment": {
+    "src": "/event-comics/scene-budget-002.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-002.svg 1920w"
+  },
+  "budget-region-2026-22-drought-irrigation": {
+    "src": "/event-comics/scene-budget-003.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-003.svg 1920w"
+  },
+  "budget-region-2026-25-bridge-detour": {
+    "src": "/event-comics/scene-budget-004.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-004.svg 1920w"
+  },
+  "budget-region-2026-38-forest-recovery": {
+    "src": "/event-comics/scene-budget-005.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-005.svg 1920w"
+  },
+  "budget-region-2026-40-industrial-grid": {
+    "src": "/event-comics/scene-budget-006.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-006.svg 1920w"
+  },
+  "budget-region-2026-42-employment-retraining": {
+    "src": "/event-comics/scene-budget-007.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-007.svg 1920w"
+  },
+  "budget-region-2026-43-rural-cultural-centres": {
+    "src": "/event-comics/scene-budget-008.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-008.svg 1920w"
+  },
+  "budget-region-2026-45-rural-broadband": {
+    "src": "/event-comics/scene-budget-009.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-009.svg 1920w"
+  },
+  "budget-region-2026-47-food-logistics": {
+    "src": "/event-comics/scene-budget-010.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-010.svg 1920w"
+  },
+  "budget-region-2026-54-school-capacity": {
+    "src": "/event-comics/scene-budget-011.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-011.svg 1920w"
+  },
+  "budget-region-2026-56-flood-drainage": {
+    "src": "/event-comics/scene-budget-012.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-012.svg 1920w"
+  },
+  "budget-region-2026-59-heating-network": {
+    "src": "/event-comics/scene-budget-013.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-013.svg 1920w"
+  },
+  "budget-region-2026-63-technical-college": {
+    "src": "/event-comics/scene-budget-014.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-014.svg 1920w"
+  },
+  "budget-region-2026-64-wastewater-cleaning": {
+    "src": "/event-comics/scene-budget-015.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-015.svg 1920w"
+  },
+  "budget-region-2026-72-temporary-family-housing": {
+    "src": "/event-comics/scene-budget-016.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/scene-budget-016.svg 1920w"
   }
 }
