@@ -7,7 +7,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
  useEffect(()=>{
   setCounts({});if(!gameId||!userId||readOnly)return;let live=true;
   async function load(){const r=await supabase.rpc('get_section_updates',{p_game_id:gameId});if(live&&!r.error&&r.data)setCounts(r.data as Record<string,number>);}
-  void load();const id=setInterval(()=>void load(),20000);
+  void load();const id=setInterval(()=>void load(),60000);
   return()=>{live=false;clearInterval(id)};
  },[gameId,userId,readOnly,view]);
  useEffect(()=>{
