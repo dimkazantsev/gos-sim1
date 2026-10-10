@@ -19,6 +19,15 @@ export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:strin
 type ReadScope='all'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
 
+// Supabase PostgREST builders start requests only when awaited. Limit the
+// burst of optional reads on game entry to avoid saturating the connection
+// pool under simultaneous classroom logins.
+async function limitedReads<T extends readonly unknown[]>(queries:T,limit=6):Promise<{[K in keyof T]:Awaited<T[K]>}>{
+ const result:unknown[]=[];
+ for(let i=0;i<queries.length;i+=limit)result.push(...await Promise.all(queries.slice(i,i+limit)));
+ return result as {[K in keyof T]:Awaited<T[K]>};
+}
+
 export function useRepublicGame(gameId:string){
  const router=useRouter();
  const setError=(value:unknown)=>setErrorRaw(userError(value));
@@ -249,7 +258,7 @@ export function useRepublicGame(gameId:string){
   setLoading(false);
   // Secondary state is fetched after the initial screen is accessible.
   const sections=startRead('members','metrics','telemetry','profiles','parties','partyDocuments','partyRepresentation','formal','political','overview');
-  const [mt,ev,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,mh,psh,co]=await Promise.all([
+  const [mt,ev,mb,ch,st,pa,vo,ba,ge,cr,dc,al,pr,pf,pd,pi,pm,ag,fd,fh,pp,px,pl,mh,psh,co]=await limitedReads([
    supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label'),
    supabase.from('game_events').select('*').eq('game_id',gameId).order('published_at',{ascending:false}).limit(100),
    supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name'),
