@@ -282,6 +282,8 @@ export function useRepublicGame(gameId:string){
    return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url:null,signature_url:old?.signature_path===row.signature_path?old?.signature_url:null};
   }));
   setIntroAccountSeen(!!intro.data);setProfileGameId(gameId);
+  // Show the game as soon as required data arrives; media URLs load afterwards.
+  if(readCurrent(ticket,'all'))setLoading(false);
   const rawPartyDocs=(pd.data||[]) as PartyDocument[];
   const profileRows=await Promise.all(rawProfiles.map(async x=>({...x,avatar_url:x.avatar_path?(await supabase.storage.from('game-assets').createSignedUrl(x.avatar_path,3600)).data?.signedUrl||null:null,signature_url:x.signature_path?(await supabase.storage.from('game-assets').createSignedUrl(x.signature_path,3600)).data?.signedUrl||null:null})));
   const partyRows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));

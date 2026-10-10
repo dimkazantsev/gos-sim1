@@ -6,7 +6,7 @@ export const runtimeConfig=()=>{
  return {token,secret,db:createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}})};
 };
 export async function telegramSend(token:string,chatId:number|string,text:string){
- const result=await fetch('https://api.telegram.org/bot'+token+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chatId,text,link_preview_options:{is_disabled:true}})});
+ const result=await fetch('https://api.telegram.org/bot'+token+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(9000),body:JSON.stringify({chat_id:chatId,text,link_preview_options:{is_disabled:true}})});
  const data=await result.json() as {ok:boolean;description?:string};
  if(!result.ok||!data.ok)throw new Error(data.description||'Telegram sendMessage failed');
 }

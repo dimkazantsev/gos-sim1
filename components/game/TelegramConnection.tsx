@@ -11,20 +11,28 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
    if(authError||!data.session?.access_token){setError('Сначала войдите в игру.');setBusy(false);return}
    try{
      const response=await fetch('/api/telegram/register',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+data.session.access_token},body:JSON.stringify({gameId})});
+     const contentType=response.headers.get('content-type')||'';
+     if(!contentType.toLowerCase().includes('application/json'))throw new Error(response.status===401||response.status===403?'Доступ к серверному API ограничен настройками Vercel.':'Сервер вернул HTML вместо JSON. Код ответа: '+response.status);
      const result=await response.json() as {ok?:boolean;error?:string};
      if(!response.ok||!result.ok)throw new Error(result.error||'Не удалось включить бота.');
      setActivated('Webhook Telegram зарегистрирован.');
    }catch(e){setError(e instanceof Error?e.message:'Ошибка активации')}
    finally{setBusy(false)}
  }
- async function refresh(){const r=await supabase.rpc('telegram_status',{p_game_id:gameId});if(!r.error)setStatus(r.data as typeof status)}
+ async function refresh(){
+   try{const r=await supabase.rpc('telegram_status',{p_game_id:gameId});if(r.error)throw r.error;setStatus(r.data as typeof status)}
+   catch(e){setError(e instanceof Error?e.message:'Не удалось получить состояние Telegram')}
+ }
  useEffect(()=>{void refresh()},[gameId]);
  async function link(){
   setBusy(true);setError('');
   const r=await supabase.rpc('telegram_generate_link',{p_game_id:gameId});
   if(r.error)setError(r.error.message);
   else if(!username)setError('Имя Telegram-бота пока не настроено на сервере.');
-  else window.open('https://t.me/'+username+'?start='+r.data,'_blank','noopener,noreferrer');
+  else {const link='https://t.me/'+username+'?start='+r.data;
+   const popup=window.open(link,'_blank','noopener,noreferrer');
+   if(!popup)setActivated('Если Telegram не открылся, воспользуйтесь ссылкой: '+link);
+  }
   setBusy(false);
  }
  async function change(kind:'unlink'|'toggle'){
@@ -43,7 +51,7 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
    <button type="button" onClick={()=>void refresh()}>Обновить статус</button>
    {teacher&&<button type="button" disabled={busy} onClick={()=>void activate()}>Активировать бота</button>}
   </div>
-  {activated&&<p role="status">{activated}</p>}
+  {activated&&<p role="status">{activated.startsWith('Если Telegram')?<a href={activated.split('ссылкой: ')[1]} target="_blank" rel="noopener noreferrer">Открыть Telegram для привязки</a>:activated}</p>}
   {error&&<p role="alert" style={{color:'var(--danger,#b73535)'}}>{error}</p>}
  </section>;
 }
