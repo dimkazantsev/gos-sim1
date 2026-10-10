@@ -26,7 +26,7 @@ function harness({effects=false}={}){
  };
  const supabase={
   auth:{
-   getSession:async()=>{requests++;if(authError)throw authError;return{data:{session:user?{user:{id:user}}:null},error:null};},
+   getUser:async()=>{requests++;if(authError)throw authError;return{data:{user:user?{id:user}:null},error:null};},
    onAuthStateChange(callback){authCallback=callback;return{data:{subscription:{unsubscribe(){if(authCallback===callback)authCallback=undefined;}}}};},
    signOut:async()=>{user=null;authCallback?.('SIGNED_OUT',null);return{error:null};}
   },
