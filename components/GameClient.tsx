@@ -190,6 +190,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  },validScreenHistory);
  const currentScreen=screenHistory.entries[screenHistory.index];
  const view=currentScreen.view;
+ useEffect(()=>{g.setActiveView(view)},[g.setActiveView,view]);
  const focusFormalId=currentScreen.documentId;
  const focusStage=currentScreen.stageNo;
  const [viewAs,setViewAs]=useState('');
