@@ -18,6 +18,12 @@ import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
 type ReadScope='all'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
+const BOOTSTRAP_TIMEOUT_MS=12000;
+async function within<T>(promise:PromiseLike<T>,ms=BOOTSTRAP_TIMEOUT_MS,label='Запрос к серверу'):Promise<T>{
+ let timer:ReturnType<typeof setTimeout>|undefined;
+ try{return await Promise.race([Promise.resolve(promise),new Promise<T>((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+' не завершился за '+Math.round(ms/1000)+' с. Сервер игровых данных не отвечает.')),ms)})])}
+ finally{if(timer)clearTimeout(timer)}
+}
 
 export function useRepublicGame(gameId:string){
  const router=useRouter();
@@ -33,7 +39,7 @@ export function useRepublicGame(gameId:string){
  const [profileGameId,setProfileGameId]=useState('');
  const [introAccountSeen,setIntroAccountSeen]=useState(false);
  const [chatMediaError,setChatMediaError]=useState(''),[chatMediaPhase,setChatMediaPhase]=useState<MediaUploadPhase>('idle');
- const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
+ const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('disconnected');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),activeViewRef=useRef<View>('dashboard'),chatOpenRef=useRef(false);
  activeViewRef.current=activeView;chatOpenRef.current=chatOpen;
  const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
@@ -123,26 +129,30 @@ export function useRepublicGame(gameId:string){
 
  useEffect(()=>{
   alive.current=true;
-  clearGameData();setLoading(true);setRealtimeState('connecting');
+  clearGameData();setLoading(true);setRealtimeState('disconnected');
   let disposed=false,authReloadTimer:ReturnType<typeof setTimeout>|undefined;
   const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
    if(disposed)return;
    const nextUser=session?.user.id||null;
-   // A temporary refresh-token outage is not an explicit sign-out.
-   // Only navigate away when a confirmed missing session is detected in
-   // loadAll, or when the user explicitly signs out.
    if(!nextUser&&event!=='SIGNED_OUT')return;
    if(!adoptUser(nextUser,event==='SIGNED_OUT'))return;
    setError('');setLoading(!!nextUser);
    if(!nextUser)setRealtimeState('disconnected');
    clearTimeout(authReloadTimer);
-   // Supabase invokes this callback while holding its auth lock. Start reads
-   // after the callback returns, rather than awaiting another auth operation.
    authReloadTimer=setTimeout(()=>{if(!disposed){if(nextUser)void loadAll();else router.replace('/')}},0);
   });
   setProfileGameId('');
   void loadAll();
-  const live=supabase.channel('republic:'+gameId)
+  const recover=()=>{if(authUser.current&&acceptedMember.current){void hydrateActiveView();notifyGameDataRefresh(gameId);if(activeViewRef.current==='budget')void refreshBudgetPulse()}};
+  const visible=()=>{if(document.visibilityState==='visible')recover()};
+  window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
+  return()=>{disposed=true;alive.current=false;readEpoch.current++;subscription.unsubscribe();clearTimeout(authReloadTimer);window.removeEventListener('focus',recover);window.removeEventListener('online',recover);document.removeEventListener('visibilitychange',visible);if(realtimeReloadTimer.current){clearTimeout(realtimeReloadTimer.current);realtimeReloadTimer.current=null}realtimeReloadVersion.current++;realtimeReloadRunning.current=false;realtimeReloadQueued.current=false;};
+ },[gameId]);
+
+ useEffect(()=>{
+  if(!me?.user_id||me.game_id!==gameId)return;
+  setRealtimeState('connecting');
+  const live=supabase.channel('republic:'+gameId+':'+me.user_id)
    .on('postgres_changes',{event:'*',schema:'public',table:'games',filter:'id=eq.'+gameId},()=>scheduleRealtimeReload())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_members',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_office_assignments',filter:'game_id=eq.'+gameId},()=>void loadRepublicOffices())
@@ -153,13 +163,11 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'*',schema:'public',table:'game_events',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
    .on('postgres_changes',{event:'*',schema:'public',table:'formal_documents',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload());
   for(const table of ['game_members','game_office_assignments','game_stages','game_parties','game_votes','formal_documents'])live.on('postgres_changes',{event:'DELETE',schema:'public',table},()=>scheduleRealtimeReload());
-  live.subscribe(status=>{if(disposed)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');});
-  const recover=()=>{void hydrateActiveView();notifyGameDataRefresh(gameId);if(activeViewRef.current==='budget')void refreshBudgetPulse()};
-  const visible=()=>{if(document.visibilityState==='visible')recover()};
-  window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
+  live.subscribe(status=>{if(!alive.current)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');});
   liveRef.current=live;
-  return()=>{disposed=true;alive.current=false;readEpoch.current++;subscription.unsubscribe();clearTimeout(authReloadTimer);window.removeEventListener('focus',recover);window.removeEventListener('online',recover);document.removeEventListener('visibilitychange',visible);if(realtimeReloadTimer.current){clearTimeout(realtimeReloadTimer.current);realtimeReloadTimer.current=null}realtimeReloadVersion.current++;realtimeReloadRunning.current=false;realtimeReloadQueued.current=false;if(liveRef.current===live)liveRef.current=null;void supabase.removeChannel(live)};
- },[gameId]);
+  return()=>{if(liveRef.current===live)liveRef.current=null;void supabase.removeChannel(live)};
+ },[gameId,me?.user_id]);
+
 
  useEffect(()=>{
   if(!me?.user_id)return;
@@ -253,24 +261,24 @@ export function useRepublicGame(gameId:string){
   let ticket=startRead('all');
   if(show)setLoading(true);
   try{
-   const auth=await supabase.auth.getSession();
+   const auth=await within(supabase.auth.getSession(),8000,'Проверка сессии');
    if(!readCurrent(ticket,'all'))return;
    if(auth.error)throw auth.error;
    const u=auth.data.session?.user;
    if(!u){adoptUser(null);setLoading(false);router.replace('/');return}
    if(adoptUser(u.id)){ticket=startRead('all');if(show)setLoading(true)}
-   let [g,m]=await readIdentity(u.id);
+   let [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Открытие игровой сессии');
    if(!readCurrent(ticket,'all'))return;
    if(g.error||m.error){
     await new Promise(resolve=>setTimeout(resolve,250));
-    [g,m]=await readIdentity(u.id);
+    [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Повторное открытие игровой сессии');
     if(!readCurrent(ticket,'all'))return;
    }
    if(!g.error&&!m.error&&(!g.data||!m.data)){
-    const access=await supabase.rpc('ensure_my_game_access',{p_game:gameId});
+    const access=await within(supabase.rpc('ensure_my_game_access',{p_game:gameId}),BOOTSTRAP_TIMEOUT_MS,'Проверка доступа к игре');
     if(!readCurrent(ticket,'all'))return;
     if(access.error)throw access.error;
-    [g,m]=await readIdentity(u.id);
+    [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Чтение доступа к игре');
     if(!readCurrent(ticket,'all'))return;
    }
    if(!await acceptIdentity(g,m,u.id)){
