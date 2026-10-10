@@ -426,10 +426,10 @@
     "srcSet": "/event-art/scene-081-20261004-480.webp 480w, /event-art/scene-081-20261004-960.webp 960w, /event-art/scene-081-20261004-1920.webp 1920w"
   },
   "budget-region-2026-05-essential-services-gap": {
-    "src": "/event-comics/scene-budget-001.svg",
+    "src": "/event-comics/cinematic-budget-region-2026-05-essential-services-gap-1920.svg",
+    "srcSet": "/event-comics/cinematic-budget-region-2026-05-essential-services-gap-1920.svg 1920w",
     "width": 1920,
-    "height": 1080,
-    "srcSet": "/event-comics/scene-budget-001.svg 1920w"
+    "height": 1080
   },
   "budget-region-2026-10-hospital-equipment": {
     "src": "/event-art/budget-region-2026-10-hospital-equipment-cinematic-1920.webp",
@@ -450,10 +450,10 @@
     "srcSet": "/event-art/budget-region-2026-25-bridge-detour-cinematic-480.webp 480w, /event-art/budget-region-2026-25-bridge-detour-cinematic-960.webp 960w, /event-art/budget-region-2026-25-bridge-detour-cinematic-1920.webp 1920w"
   },
   "budget-region-2026-38-forest-recovery": {
-    "src": "/event-comics/scene-budget-005.svg",
+    "src": "/event-comics/cinematic-budget-region-2026-38-forest-recovery-1920.svg",
+    "srcSet": "/event-comics/cinematic-budget-region-2026-38-forest-recovery-1920.svg 1920w",
     "width": 1920,
-    "height": 1080,
-    "srcSet": "/event-comics/scene-budget-005.svg 1920w"
+    "height": 1080
   },
   "budget-region-2026-40-industrial-grid": {
     "src": "/event-art/budget-region-2026-40-industrial-grid-cinematic-1920.webp",
@@ -480,10 +480,10 @@
     "srcSet": "/event-art/budget-region-2026-45-rural-broadband-cinematic-480.webp 480w, /event-art/budget-region-2026-45-rural-broadband-cinematic-960.webp 960w, /event-art/budget-region-2026-45-rural-broadband-cinematic-1920.webp 1920w"
   },
   "budget-region-2026-47-food-logistics": {
-    "src": "/event-comics/scene-budget-010.svg",
+    "src": "/event-comics/cinematic-budget-region-2026-47-food-logistics-1920.svg",
+    "srcSet": "/event-comics/cinematic-budget-region-2026-47-food-logistics-1920.svg 1920w",
     "width": 1920,
-    "height": 1080,
-    "srcSet": "/event-comics/scene-budget-010.svg 1920w"
+    "height": 1080
   },
   "budget-region-2026-54-school-capacity": {
     "src": "/event-art/budget-region-2026-54-school-capacity-cinematic-1920.webp",
@@ -492,10 +492,10 @@
     "srcSet": "/event-art/budget-region-2026-54-school-capacity-cinematic-480.webp 480w, /event-art/budget-region-2026-54-school-capacity-cinematic-960.webp 960w, /event-art/budget-region-2026-54-school-capacity-cinematic-1920.webp 1920w"
   },
   "budget-region-2026-56-flood-drainage": {
-    "src": "/event-comics/scene-budget-012.svg",
+    "src": "/event-comics/cinematic-budget-region-2026-56-flood-drainage-1920.svg",
+    "srcSet": "/event-comics/cinematic-budget-region-2026-56-flood-drainage-1920.svg 1920w",
     "width": 1920,
-    "height": 1080,
-    "srcSet": "/event-comics/scene-budget-012.svg 1920w"
+    "height": 1080
   },
   "budget-region-2026-59-heating-network": {
     "src": "/event-art/budget-region-2026-59-heating-network-cinematic-1920.webp",
@@ -516,10 +516,10 @@
     "srcSet": "/event-comics/cinematic-budget-region-2026-64-wastewater-cleaning-1920.svg 1920w"
   },
   "budget-region-2026-72-temporary-family-housing": {
-    "src": "/event-comics/scene-budget-016.svg",
+    "src": "/event-comics/cinematic-budget-region-2026-72-temporary-family-housing-1920.svg",
+    "srcSet": "/event-comics/cinematic-budget-region-2026-72-temporary-family-housing-1920.svg 1920w",
     "width": 1920,
-    "height": 1080,
-    "srcSet": "/event-comics/scene-budget-016.svg 1920w"
+    "height": 1080
   },
   "bank-curated-serious-01": {
     "src": "/event-comics/cinematic-bank-curated-serious-01-1920.svg",
@@ -602,6 +602,66 @@
   "bank-curated-light-02": {
     "src": "/event-comics/cinematic-bank-curated-light-02-1920.svg",
     "srcSet": "/event-comics/cinematic-bank-curated-light-02-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-03": {
+    "src": "/event-comics/cinematic-bank-curated-light-03-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-03-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-04": {
+    "src": "/event-comics/cinematic-bank-curated-light-04-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-04-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-05": {
+    "src": "/event-comics/cinematic-bank-curated-light-05-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-05-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-06": {
+    "src": "/event-comics/cinematic-bank-curated-light-06-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-06-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-07": {
+    "src": "/event-comics/cinematic-bank-curated-light-07-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-07-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-08": {
+    "src": "/event-comics/cinematic-bank-curated-light-08-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-08-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-09": {
+    "src": "/event-comics/cinematic-bank-curated-light-09-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-09-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-10": {
+    "src": "/event-comics/cinematic-bank-curated-light-10-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-10-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-11": {
+    "src": "/event-comics/cinematic-bank-curated-light-11-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-11-1920.svg 1920w",
+    "width": 1920,
+    "height": 1080
+  },
+  "bank-curated-light-12": {
+    "src": "/event-comics/cinematic-bank-curated-light-12-1920.svg",
+    "srcSet": "/event-comics/cinematic-bank-curated-light-12-1920.svg 1920w",
     "width": 1920,
     "height": 1080
   }
