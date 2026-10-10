@@ -1,7 +1,7 @@
 import {NextResponse} from 'next/server';
 import {gameUrl,runtimeConfig,telegramSend} from '@/lib/server/telegram';
 export const runtime='nodejs';
-type TelegramUpdate={message?:{chat:{id:number;type:string};from?:{id:number};text?:string}};
+type TelegramUpdate={message?:{chat:{id:number;type:string};from?:{id:number};message_id:number;text?:string}};
 export async function POST(request:Request){
  let config:ReturnType<typeof runtimeConfig>;
  try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
@@ -70,7 +70,7 @@ export async function POST(request:Request){
   if(command==='/chat'){
    if(!game.default_channel_id){await reply('Сначала выберите канал через /channels');return NextResponse.json({ok:true})}
    const payload=text.slice(command.length).trim();if(!payload){await reply('Введите /chat ваш текст');return NextResponse.json({ok:true})}
-   const {error}=await config.db.rpc('telegram_post_chat',{p_telegram_user_id:telegramId,p_game_id:game.game_id,p_channel_id:game.default_channel_id,p_text:payload});
+   const {error}=await config.db.rpc('telegram_post_chat',{p_telegram_user_id:telegramId,p_game_id:game.game_id,p_channel_id:game.default_channel_id,p_text:payload,p_chat_id:chatId,p_message_id:message.message_id});
    await reply(error?'Не удалось отправить: '+error.message:'Сообщение отправлено в игру.');return NextResponse.json({ok:true});
   }
   await reply('Неизвестная команда. Используйте /help');
