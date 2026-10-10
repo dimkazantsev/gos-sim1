@@ -510,15 +510,75 @@
     "srcSet": "/event-art/budget-region-2026-63-technical-college-cinematic-480.webp 480w, /event-art/budget-region-2026-63-technical-college-cinematic-960.webp 960w, /event-art/budget-region-2026-63-technical-college-cinematic-1920.webp 1920w"
   },
   "budget-region-2026-64-wastewater-cleaning": {
-    "src": "/event-comics/scene-budget-015.svg",
+    "src": "/event-comics/cinematic-budget-region-2026-64-wastewater-cleaning-1920.svg",
     "width": 1920,
     "height": 1080,
-    "srcSet": "/event-comics/scene-budget-015.svg 1920w"
+    "srcSet": "/event-comics/cinematic-budget-region-2026-64-wastewater-cleaning-1920.svg 1920w"
   },
   "budget-region-2026-72-temporary-family-housing": {
     "src": "/event-comics/scene-budget-016.svg",
     "width": 1920,
     "height": 1080,
     "srcSet": "/event-comics/scene-budget-016.svg 1920w"
+  },
+  "bank-curated-serious-01": {
+    "src": "/event-comics/cinematic-bank-curated-serious-01-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-01-1920.svg 1920w"
+  },
+  "bank-curated-serious-02": {
+    "src": "/event-comics/cinematic-bank-curated-serious-02-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-02-1920.svg 1920w"
+  },
+  "bank-curated-serious-06": {
+    "src": "/event-comics/cinematic-bank-curated-serious-06-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-06-1920.svg 1920w"
+  },
+  "bank-curated-serious-08": {
+    "src": "/event-comics/cinematic-bank-curated-serious-08-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/cinematic-bank-curated-serious-08-1920.svg 1920w"
+  },
+  "bank-expanded-serious-27-01": {
+    "src": "/event-comics/air-quality-cinematic-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/air-quality-cinematic-1920.svg 1920w"
+  },
+  "bank-environment": {
+    "src": "/event-comics/cinematic-bank-environment-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/cinematic-bank-environment-1920.svg 1920w"
+  },
+  "bank-budget-bridge": {
+    "src": "/event-comics/cinematic-bank-budget-bridge-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/cinematic-bank-budget-bridge-1920.svg 1920w"
+  },
+  "bank-budget-health": {
+    "src": "/event-comics/cinematic-bank-budget-health-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/cinematic-bank-budget-health-1920.svg 1920w"
+  },
+  "bank-budget-school": {
+    "src": "/event-comics/cinematic-bank-budget-school-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/cinematic-bank-budget-school-1920.svg 1920w"
+  },
+  "bank-bus": {
+    "src": "/event-comics/cinematic-bank-bus-1920.svg",
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/event-comics/cinematic-bank-bus-1920.svg 1920w"
   }
 }
