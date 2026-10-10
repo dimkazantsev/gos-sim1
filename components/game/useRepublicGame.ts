@@ -99,7 +99,7 @@ export function useRepublicGame(gameId:string){
  const sharedMetrics=useMemo(()=>withBudgetIncome(metrics,budgetPulse),[metrics,budgetPulse]);
  const sharedMetricHistory=useMemo(()=>budgetPulse?[...metricHistory.filter(h=>h.metric_key!=='budget'),...budgetPulse.history]:metricHistory,[metricHistory,budgetPulse]);
  async function syncBudget(){await refreshBudgetPulse();}
- function scheduleRealtimeReload(delay=900){
+ function scheduleRealtimeReload(delay=180){
   if(realtimeReloadTimer.current)clearTimeout(realtimeReloadTimer.current);
   realtimeReloadTimer.current=setTimeout(()=>{realtimeReloadTimer.current=null;void flushRealtimeReload()},delay);
  }
@@ -111,7 +111,7 @@ export function useRepublicGame(gameId:string){
   finally{
    if(version!==realtimeReloadVersion.current)return;
    realtimeReloadRunning.current=false;
-   if(realtimeReloadQueued.current){realtimeReloadQueued.current=false;scheduleRealtimeReload(1500)}
+   if(realtimeReloadQueued.current){realtimeReloadQueued.current=false;scheduleRealtimeReload(80)}
   }
  }
 
@@ -120,7 +120,7 @@ export function useRepublicGame(gameId:string){
   clearGameData();setLoading(true);setRealtimeState('connecting');
   let disposed=false,authReloadTimer:ReturnType<typeof setTimeout>|undefined;
   const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
-   if(disposed||event==='INITIAL_SESSION')return;
+   if(disposed)return;
    const nextUser=session?.user.id||null;
    if(!adoptUser(nextUser,event==='SIGNED_OUT'))return;
    setError('');setLoading(!!nextUser);
@@ -167,7 +167,7 @@ export function useRepublicGame(gameId:string){
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_channel_state',filter:'game_id=eq.'+gameId},()=>void loadChatOverview())
    .on('postgres_changes',{event:'*',schema:'public',table:'chat_mentions',filter:'game_id=eq.'+gameId},()=>void loadChatOverview());
   for(const table of ['game_members','game_office_assignments','game_stages','game_parties','game_votes','formal_documents','formal_document_history','party_member_mandates','party_agreements','game_crises','chat_channels'])live.on('postgres_changes',{event:'DELETE',schema:'public',table},()=>scheduleRealtimeReload());
-  live.subscribe(status=>{if(disposed)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');// Initial load is already in flight; no need to immediately load everything again.});
+  live.subscribe(status=>{if(disposed)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');// Initial snapshot is already loading; avoid a second bulk refresh.});
   const recover=()=>{scheduleRealtimeReload();notifyGameDataRefresh(gameId);void refreshBudgetPulse()};
   const visible=()=>{if(document.visibilityState==='visible')recover()};
   window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
@@ -205,10 +205,10 @@ export function useRepublicGame(gameId:string){
   let ticket=startRead('all');
   if(show)setLoading(true);
   try{
-  const auth=await supabase.auth.getSession();
+  const auth=await supabase.auth.getUser();
   if(!readCurrent(ticket,'all'))return;
   if(auth.error)throw auth.error;
-  const u=auth.data.session?.user;
+  const u=auth.data.user;
   if(!u){adoptUser(null);setLoading(false);router.replace('/');return}
   if(adoptUser(u.id)){ticket=startRead('all');if(show)setLoading(true)}
   const access=await supabase.rpc('ensure_my_game_access',{p_game:gameId});
