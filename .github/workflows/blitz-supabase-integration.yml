@@ -39,11 +39,16 @@ jobs:
         run: |
           set -euo pipefail
           cd /tmp/blitz-supabase
-          supabase status -o env \
-            --override-name api.url=SUPABASE_URL \
-            --override-name auth.anon_key=SUPABASE_ANON_KEY \
-            --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
-            | sed -E 's/^([^=]+)="(.*)"$/\\1=\\2/' >> "$GITHUB_ENV"
+          while IFS='=' read -r key value; do
+            value="${value#\"}"
+            value="${value%\"}"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(
+            supabase status -o env \
+              --override-name api.url=SUPABASE_URL \
+              --override-name auth.anon_key=SUPABASE_ANON_KEY \
+              --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY
+          )
       - name: Create disposable Blitz integration schema
         shell: bash
         run: |
