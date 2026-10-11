@@ -1,0 +1,68 @@
+name: Blitz isolated PostgreSQL concurrency
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/*blitz_attempt_lock_hardening.sql'
+      - 'supabase/tests/blitz_load_*'
+      - '.github/workflows/blitz-postgres-concurrency.yml'
+  push:
+    branches: ["feature/blitz-questions-*"]
+  workflow_dispatch:
+jobs:
+  blitz-postgres-concurrency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create isolated database fixtures
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/blitz_load_fixture.sql
+      - name: Apply exactly the proposed production RPC migration
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261012100100_blitz_attempt_lock_hardening.sql
+      - name: Thirty simultaneous participant transactions
+        shell: bash
+        run: |
+          set -euo pipefail
+          pids=()
+          for i in $(seq 1 30); do
+            psql -v i="$i" -f supabase/tests/blitz_load_worker.sql > "/tmp/blitz-worker-$i.log" 2>&1 &
+            pids+=("$!")
+          done
+          for pid in "${pids[@]}"; do wait "$pid"; done
+      - name: Five concurrent opens for the same participant
+        shell: bash
+        run: |
+          set -euo pipefail
+          pids=()
+          for i in $(seq 1 5); do
+            psql -f supabase/tests/blitz_load_open_once.sql > "/tmp/blitz-open-$i.log" 2>&1 &
+            pids+=("$!")
+          done
+          for pid in "${pids[@]}"; do wait "$pid"; done
+      - name: Assert no duplicate answers, wrong concurrency, leaks or timer bypass
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/blitz_load_assert.sql
+      - name: Upload debugging logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blitz-postgres-load-logs
+          path: /tmp/blitz-*.log
