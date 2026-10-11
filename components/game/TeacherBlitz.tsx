@@ -19,7 +19,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
  const gameId=g.game?.id||'';
  const students=g.members.filter(m=>m.game_id===gameId&&m.kind==='student');
  const [questions,setQuestions]=useState<Question[]>([]),[items,setItems]=useState<Assignment[]>([]),[stats,setStats]=useState<Stats[]>([]);
- const [showBank,setShowBank]=useState(false),[query,setQuery]=useState(''),[sort,setSort]=useState<'question'|'topic'>('question'),[limit,setLimit]=useState(30);
+ const [showBank,setShowBank]=useState(true),[query,setQuery]=useState(''),[sort,setSort]=useState<'question'|'topic'>('question'),[limit,setLimit]=useState(30);
  const [notes,setNotes]=useState<Record<string,string>>({}),[error,setError]=useState(''),[saved,setSaved]=useState('');
  const loadedIds=useRef<Set<number>>(new Set()),sentinel=useRef<HTMLDivElement>(null);
  useEffect(()=>{if(!gameId)return;let active=true;loadedIds.current.clear();setItems([]);
