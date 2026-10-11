@@ -155,20 +155,24 @@ export function useRepublicGame(gameId:string){
  useEffect(()=>{
   if(!me?.user_id||me.game_id!==gameId)return;
   setRealtimeState('connecting');
+  // A classroom enters in a burst. Spread subscription registration over a
+  // few seconds so 30 clients do not hit Realtime's publication catalog at
+  // the same instant.
+  const seed=[...me.user_id].reduce((n,ch)=>(n*33+ch.charCodeAt(0))>>>0,5381);
+  const subscribeDelay=800+(seed%4200);
   const live=supabase.channel('republic:'+gameId+':'+me.user_id)
    .on('postgres_changes',{event:'*',schema:'public',table:'games',filter:'id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_members',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_office_assignments',filter:'game_id=eq.'+gameId},()=>void loadRepublicOffices())
    .on('postgres_changes',{event:'*',schema:'public',table:'state_metrics',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_stages',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_parties',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
    .on('postgres_changes',{event:'*',schema:'public',table:'game_votes',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_events',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'formal_documents',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload());
-  for(const table of ['game_members','game_office_assignments','game_stages','game_parties','game_votes','formal_documents'])live.on('postgres_changes',{event:'DELETE',schema:'public',table},()=>scheduleRealtimeReload());
-  live.subscribe(status=>{if(!alive.current)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');});
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_events',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload());
+  let subscribed=false;
+  const timer=setTimeout(()=>{
+   subscribed=true;
+   live.subscribe(status=>{if(!alive.current)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');});
+  },subscribeDelay);
   liveRef.current=live;
-  return()=>{if(liveRef.current===live)liveRef.current=null;void supabase.removeChannel(live)};
+  return()=>{clearTimeout(timer);if(liveRef.current===live)liveRef.current=null;if(subscribed)void supabase.removeChannel(live)};
  },[gameId,me?.user_id]);
 
 
@@ -182,8 +186,9 @@ export function useRepublicGame(gameId:string){
   };
   if(activeView==='votes'){on('game_ballots',()=>scheduleRealtimeReload(),'*',false);on('game_evaluations',()=>scheduleRealtimeReload());}
   if(activeView==='events'||activeView==='teacher')on('game_crises',()=>scheduleRealtimeReload());
-  if(activeView==='documents')on('formal_document_history',()=>void loadFormalRegistry());
+  if(activeView==='documents'){on('formal_documents',()=>void loadFormalRegistry());on('formal_document_history',()=>void loadFormalRegistry());}
   if(activeView==='parties'||activeView==='profile'){on('game_profiles',()=>void loadPartyAssets());on('party_documents',()=>void loadPartyAssets());}
+  if(activeView==='parties')on('game_parties',()=>void loadPartyAssets());
   if(activeView==='parties'||activeView==='teacher'){
    on('party_invitations',()=>void loadPartyRepresentation());
    on('party_member_mandates',()=>void loadPartyRepresentation());
