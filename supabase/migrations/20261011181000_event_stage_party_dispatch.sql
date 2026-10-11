@@ -60,12 +60,13 @@ begin
              v_now-(greatest(4,s.interval_hours/(1+s.activity_weight*least(2,
                least(120,greatest(0,extract(epoch from(v_now-coalesce(pr.last_seen_at,v_now-interval '72 hours')))/3600))/48)))*interval '1 hour')
     order by random()
-    limit case when c.destination in('regional_joint','federal_joint') then 3
+    limit case when c.destination='regional_joint' then 1
+               when c.destination='federal_joint' then 3
                when c.destination in('regional','federal_collective') then 500
                else 1 end
   ) eligible;
   n:=coalesce(cardinality(chosen),0);
-  if c.destination in('regional_joint','federal_joint') and n<2 then continue;end if;
+  if c.destination='federal_joint' and n<2 then continue;end if;
   if c.destination='federal_collective' and n<2 then continue;end if;
   if n<1 then continue;end if;
   -- Regulatory guard enforces "single" and "group" capacities; regional group originally has 2-3.
