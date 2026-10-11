@@ -6,7 +6,7 @@ const bank=read('components/game/EventAutopilotPanel.tsx');
 const sql=read('supabase/migrations/20261011160000_lazy_event_bank_bulk_delete.sql');
 assert(feed.includes("supabase.from('event_cases').select('*').eq('game_id',game.id).in('id',caseIds)"),'Feed fetches only assigned cases');
 assert(!feed.includes("supabase.from('event_cases').select('*').eq('game_id',game.id).order("),'No eager full-bank fetch');
-assert(feed.includes('panelMode="bank"')&&feed.lastIndexOf('panelMode="bank"')>feed.lastIndexOf('className="eventList"'),'Bank comes after feed');
+assert(feed.includes('panelMode="bank"')&&feed.lastIndexOf('panelMode="bank"')<feed.lastIndexOf('className="eventList"'),'Bank comes immediately before the participant feed');
 assert(feed.includes("count:'exact'"),'Only count fetched without catalog');
 assert(bank.includes("if(openBank&&panelMode==='bank'&&!bankLoaded&&!loadingBank)void loadBank()"),'Bank lazy loading guarded');
 assert(bank.includes('Выделить доступные')&&bank.includes('Удалить выбранные'),'Bulk UI controls');
