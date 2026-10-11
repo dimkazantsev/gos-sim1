@@ -41,6 +41,10 @@ async function main(){
 
  const sessions=await Promise.all(students.map(login));
  const realtimeSeen=new Set();
+ const adminSeen=new Set();
+ await admin.realtime.setAuth(service);
+ const adminChannel=admin.channel('qa-admin').on('postgres_changes',{event:'UPDATE',schema:'public',table:'blitz_assignments'},payload=>{if(payload.new?.answered_at)adminSeen.add(payload.new.user_id)});
+ await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(new Error('Admin Realtime subscription timeout')),15000);adminChannel.subscribe((status,err)=>{if(status==='SUBSCRIBED'){clearTimeout(t);resolve()}else if(status==='CHANNEL_ERROR'){clearTimeout(t);reject(err||new Error('Admin Realtime channel error'))}})});
  const channels=sessions.map(s=>s.client.channel('qa-'+s.i).on('postgres_changes',{event:'UPDATE',schema:'public',table:'blitz_assignments'},payload=>{if(payload.new?.user_id===s.id&&payload.new?.answered_at)realtimeSeen.add(s.id)}));
  await Promise.all(channels.map(ch=>new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(new Error('Realtime subscription timeout')),15000);ch.subscribe(status=>{if(status==='SUBSCRIBED'){clearTimeout(t);resolve()}else if(status==='CHANNEL_ERROR'){clearTimeout(t);reject(new Error('Realtime channel error'))}})})));
 
@@ -48,8 +52,9 @@ async function main(){
  for(const [i,x] of opened.entries()){if(x.error)throw new Error(`open ${i+1}: ${x.error.message}`);assert(x.data?.id,'RPC did not return assignment')}
  const answered=await Promise.all(sessions.map((s,i)=>s.client.rpc('blitz_answer',{p_id:opened[i].data.id,p_choice:0})));
  for(const [i,x] of answered.entries()){if(x.error)throw new Error(`answer ${i+1}: ${x.error.message}`);assert.equal(x.data.is_correct,true);assert.equal(x.data.chosen_index,0)}
- for(let tries=0;tries<40&&realtimeSeen.size<30;tries++)await new Promise(r=>setTimeout(r,250));
- assert.equal(realtimeSeen.size,30,'Realtime did not observe all 30 answer updates');
+ for(let tries=0;tries<60&&(realtimeSeen.size<30||adminSeen.size<30);tries++)await new Promise(r=>setTimeout(r,250));
+ assert.equal(adminSeen.size,30,'Realtime publication pipeline did not deliver all 30 updates to service role');
+ assert.equal(realtimeSeen.size,30,'Realtime RLS did not deliver all 30 owner-visible answer updates');
 
  const owned=await Promise.all(sessions.map(s=>s.client.from('blitz_assignments').select('id,is_correct,answered_at').eq('user_id',s.id)));
  for(const [i,x] of owned.entries()){if(x.error)throw x.error;assert.equal(x.data.length,1,`owner row count ${i+1}`);assert.equal(x.data[0].is_correct,true)}
@@ -67,7 +72,7 @@ async function main(){
  same.forEach(x=>{if(x.error)throw x.error});
  assert.equal(new Set(same.map(x=>x.data.id)).size,1,'Concurrent opens returned different assignments');
 
- await Promise.all(channels.map(ch=>ch.unsubscribe()));
+ await Promise.all([...channels.map(ch=>ch.unsubscribe()),adminChannel.unsubscribe()]);
  console.log('PASS: 30 Supabase Auth sessions + RPC + RLS/REST + Realtime + same-user open serialization');
 }
 main().catch(e=>{console.error(e);process.exit(1)});
