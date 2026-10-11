@@ -26,7 +26,7 @@ export async function preparePortableSession(archive:SessionArchive):Promise<Por
  }));
  const json=JSON.stringify(data).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
  const html=template.replace('__GOS_SESSION_DATA__',()=>json).replace('__GOS_SESSION_ENGINE__',()=>engine.replace('export function applyPortableAction','function applyPortableAction'));
- const readme=`GOS//SIMS · Сеанс ${data.game.game_code}\n\n`+
+ const readme=`ГОС.ID · Сеанс ${data.game.game_code}\n\n`+
   '1. Открытие В Одном Браузере\nОткройте Index.html. Прогресс хранится в этом браузере. Файловый режим предназначен для самостоятельного просмотра и учебной репетиции; переключение ролей здесь свободное.\n\n'+
   '2. Общая Игра В Локальной Сети\nУстановите Node.js 20.9 или новее. В папке архива запустите: node server.mjs\nОткройте http://localhost:8080. Другие компьютеры подключаются к http://IP-АДРЕС-СЕРВЕРА:8080. Коды преподавателя и участников показаны в терминале. Участник вводит своё ФИО точно как в исходном сеансе. Гость входит без кода и не может менять данные.\n'+
   'Чтобы сохранить коды после перезапуска, задайте GOS_TEACHER_CODE и GOS_STUDENT_CODE в окружении. Не открывайте этот учебный сервер в интернете. Progress.json содержит общий прогресс. Изменения записываются после каждого действия.\n\n'+
