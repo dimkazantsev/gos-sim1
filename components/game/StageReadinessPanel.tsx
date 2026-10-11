@@ -1,5 +1,5 @@
 'use client';
-import {useRef,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {AlertTriangle,CheckCircle2,ChevronDown,ExternalLink,History,RefreshCw,ShieldCheck,XCircle} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -36,7 +36,8 @@ export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=fa
   }catch(error){if(version===request.current){setState(null);setLoadError(error instanceof Error?error.message:'Не удалось загрузить проверку.')}}
   finally{if(version===request.current)setLoading(false)}
  }
- const resultIsCurrent=checkedAt?.gameId===game?.id&&checkedAt.stageNo===stageNo;
+ useEffect(()=>()=>{request.current++;},[game?.id,stageNo]);
+ const resultIsCurrent=checkedAt!==null&&checkedAt.gameId===game?.id&&checkedAt.stageNo===stageNo;
  const checkedState=resultIsCurrent?state:null;
 
  async function setOverride(){
