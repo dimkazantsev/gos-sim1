@@ -199,6 +199,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    {audience!=='all'&&<div className="eventRecipients"><strong>Получатели · {selected.length}/{audience==='single'?1:3}</strong><div>{recipients.map(m=><label key={m.user_id}><input type="checkbox" checked={selected.includes(m.user_id)} disabled={!selected.includes(m.user_id)&&selected.length>=(audience==='single'?1:3)} onChange={e=>setSelected(old=>e.target.checked?[...old,m.user_id]:old.filter(x=>x!==m.user_id))}/>{m.full_name}<small>{m.role_title||'Студент'}</small></label>)}</div></div>}
    <footer><span>{audience==='all'?'Получатели: вся аудитория':'Выбрано: '+selected.length}</span><button type="button" onClick={()=>void create()} disabled={!canSend||saving||readOnly}>{saving?'Отправка…':'Назначить событие'}</button></footer>
   </div></details>}
+  {mode==='manage'&&teacher&&<EventAutopilotPanel g={g} panelMode="bank" onChanged={()=>reload(true)} readyCaseCount={readyCaseCount} readOnly={readOnly}/>}
   {<div className="eventList"><header className="eventFeedHeader"><div><small>ЛЕНТА НАЗНАЧЕННЫХ СИТУАЦИЙ</small><h3>{teacher||me.kind==='observer'?'Решения участников':'Мои события'}</h3></div><span>{visibleCases.length} событий</span></header>
    {<div className="eventFeedFilters">
     <StyledSelect label="Участник" value={feedPerson} onChange={setFeedPerson} options={[{value:'',label:'Все участники'},...students.map(m=>({value:m.user_id,label:m.full_name}))]}/>
@@ -250,7 +251,6 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     {expandedCase&&<EventCollaboration g={g} caseId={c.id} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={()=>reload(false)} readOnly={readOnly}/>}
     </div></EventCaseModal>;
    })}
-  {mode==='manage'&&teacher&&<EventAutopilotPanel g={g} panelMode="bank" onChanged={()=>reload(true)} readyCaseCount={readyCaseCount} readOnly={readOnly}/>}
   {notice&&<p className="eventNotice" role="status">{notice}</p>}
  </section>;
 }
