@@ -66,6 +66,20 @@ jobs:
           sleep 4
       - name: Run 30 real local Supabase sessions
         run: node supabase/tests/blitz_supabase_30_sessions.cjs
+      - name: Realtime diagnostics on failure
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          docker ps --format '{{.Names}} {{.Status}}'
+          REALTIME_CONTAINER="$(docker ps -a --format '{{.Names}}' | grep '^supabase_realtime_' | head -1)"
+          if [ -n "$REALTIME_CONTAINER" ]; then docker logs --tail 300 "$REALTIME_CONTAINER"; fi
+          cd /tmp/blitz-supabase
+          DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\(.*\)"$/\1/p')"
+          if [ -n "$DB_URL" ]; then
+            psql "$DB_URL" -c "SELECT pubname,schemaname,tablename FROM pg_publication_tables WHERE pubname='supabase_realtime';"
+            psql "$DB_URL" -c "SELECT slot_name,plugin,slot_type,active FROM pg_replication_slots;"
+          fi
       - name: Stop local Supabase
         if: always()
         run: |
