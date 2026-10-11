@@ -1,0 +1,24 @@
+name: Events Focused Verification
+on:
+  push:
+    branches: ["fix/events-targeted-stability-*"]
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: build-placeholder-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: node scripts/event-option-legality-check.cjs
+      - run: node scripts/event-card-browser-check.cjs
+      - run: node scripts/interface-contract-check.cjs
+      - run: npm run build
