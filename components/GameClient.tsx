@@ -398,7 +398,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    </nav>
 
    <div className="sidebarFooter">
-    <div className="sidebarRealtime"><Wifi aria-hidden="true"/><span>{g.realtimeState==='connected'?'Синхронизация активна':g.realtimeState==='connecting'?'Подключение…':'Нет соединения'}</span><i className={g.realtimeState}/></div>
+    <div className="sidebarRealtime"><Wifi aria-hidden="true"/><span>{g.realtimeState==='polling'?'Периодическое обновление':g.realtimeState==='connected'?'Синхронизация активна':g.realtimeState==='connecting'?'Подключение…':'Нет сети'}</span><i className={g.realtimeState}/></div>
     <div className="sidebarUser">
      <div className="simAvatar">{initials(shownMe.full_name)}</div>
      <div className="simUserText"><b>{shownMe.full_name}</b><span>{previewMode?'Просмотр · '+(shownMe.role_title||'Участник'):shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
@@ -419,7 +419,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      <div className="topIndicators">
       <span className={`livePill ${game.turn_open?'on':'off'}`} aria-label={game.turn_open?'Ход открыт':'Пауза'} title={game.turn_open?'Ход открыт':'Пауза'}><Radio aria-hidden="true"/><span className="livePillText">{game.turn_open?'Ход открыт':'Пауза'}</span></span>
       {game.turn_open&&game.turn_ends_at&&<span className="timerPill" aria-label="Время до конца хода">{fmtTimer(secondsLeft)}</span>}
-      <span className={`connectionPill ${g.realtimeState}`} role="status" aria-label={g.realtimeState==='connected'?'Синхронизация активна':g.realtimeState==='connecting'?'Подключение':'Нет соединения'} title={g.realtimeState==='connected'?'Синхронизация активна':g.realtimeState==='connecting'?'Подключение':'Нет соединения'}><Wifi aria-hidden="true"/><span className="connectionLabel">{g.realtimeState==='connected'?'В сети':g.realtimeState==='connecting'?'Подключение':'Нет связи'}</span></span>
+      <span className={`connectionPill ${g.realtimeState}`} role="status" aria-label={g.realtimeState==='polling'?'Данные обновляются периодически':g.realtimeState==='connected'?'Синхронизация активна':g.realtimeState==='connecting'?'Подключение':'Браузер сообщает, что сети нет'} title={g.realtimeState==='polling'?'Обновление при открытии раздела, действиях пользователя и по расписанию. Это не проверка доступности сервера.':g.realtimeState==='connected'?'Синхронизация активна':g.realtimeState==='connecting'?'Подключение':'Браузер сообщает, что сети нет'}><Wifi aria-hidden="true"/><span className="connectionLabel">{g.realtimeState==='polling'?'По расписанию':g.realtimeState==='connected'?'В сети':g.realtimeState==='connecting'?'Подключение':'Нет сети'}</span></span>
      </div>
     </div>
 
