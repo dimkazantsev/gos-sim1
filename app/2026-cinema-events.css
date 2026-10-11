@@ -245,3 +245,6 @@
 .eventWorkspace .eventBankSelectableTile>.eventBankSelection{padding:3px 6px;min-height:27px}
 .eventWorkspace .eventBankSelectableTile>.eventCaseTile{width:100%;min-width:0}
 @media(max-width:620px){.eventWorkspace .eventBankBulkActions>.eventBankDeleteButton{flex:1 1 100%;justify-content:center;margin-left:0}}
+
+.eventWorkspace .eventBankTiles>.eventBankShowMore{min-height:44px;padding:9px 12px;background:#f1f6ff;border:1px solid #c9d9f4;border-radius:10px;color:#325ba0;font-size:13px;font-weight:750}
+.eventWorkspace .eventBankTiles>.eventBankShowMore:hover{background:#e6efff}
