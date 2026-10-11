@@ -22,7 +22,7 @@ async function login(u){
  if(s.error)throw s.error;
  assert.equal(s.data.user.id,u.id);
  if(!s.data.session?.access_token)throw new Error('Missing session access token');
- client.realtime.setAuth(s.data.session.access_token);
+ await client.realtime.setAuth(s.data.session.access_token);
  return {...u,client};
 }
 async function main(){
