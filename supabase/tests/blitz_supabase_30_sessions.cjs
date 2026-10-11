@@ -41,7 +41,7 @@ async function main(){
 
  const sessions=await Promise.all(students.map(login));
  const realtimeSeen=new Set();
- const channels=sessions.map(s=>s.client.channel('qa-'+s.i).on('postgres_changes',{event:'UPDATE',schema:'public',table:'blitz_assignments',filter:'user_id=eq.'+s.id},payload=>{if(payload.new?.answered_at)realtimeSeen.add(s.id)}));
+ const channels=sessions.map(s=>s.client.channel('qa-'+s.i).on('postgres_changes',{event:'UPDATE',schema:'public',table:'blitz_assignments'},payload=>{if(payload.new?.user_id===s.id&&payload.new?.answered_at)realtimeSeen.add(s.id)}));
  await Promise.all(channels.map(ch=>new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(new Error('Realtime subscription timeout')),15000);ch.subscribe(status=>{if(status==='SUBSCRIBED'){clearTimeout(t);resolve()}else if(status==='CHANNEL_ERROR'){clearTimeout(t);reject(new Error('Realtime channel error'))}})})));
 
  const opened=await Promise.all(sessions.map(s=>s.client.rpc('blitz_open',{p_game:gameId})));
