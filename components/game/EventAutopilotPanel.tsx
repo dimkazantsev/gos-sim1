@@ -50,7 +50,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
    supabase.from('budget_transfer_requests').select('event_case_id').eq('game_id',game.id).not('event_case_id','is',null)
   ]);
   const errors=[b,c0,d,decision,invites,discussion,authority,budget].filter(x=>x.error);
-  if(errors.length){setNotice('Ошибка загрузки банка: '+errors[0].error?.message);setLoadingBank(false);return}
+  if(errors.length){setNotice('Ошибка загрузки банка: '+errors[0].error?.message);setBankLoaded(true);setLoadingBank(false);return}
   const protectedSet=new Set([
    ...(c0.data||[]).map(x=>x.case_id),...(d.data||[]).map(x=>x.case_id),
    ...(decision.data||[]).map(x=>x.case_id),...(invites.data||[]).map(x=>x.case_id),
@@ -62,7 +62,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
   setSelectedForDelete([]);setBankLoaded(true);setLoadingBank(false);
  }
  useEffect(()=>{if(panelMode==='settings')void loadSettings()},[game?.id,panelMode]);
- useEffect(()=>{if(!game?.id)return;setBank([]);setBankTotal(null);setBankLoaded(false);setSelectedForDelete([]);setChosen('');setOpenBank(false)},[game?.id]);
+ useEffect(()=>{if(!game?.id)return;setBank([]);setBankTotal(null);setBankLoaded(false);setSelectedForDelete([]);setProtectedIds([]);setChosen('');setOpenBank(false)},[game?.id]);
  useEffect(()=>{if(openBank&&panelMode==='bank'&&!bankLoaded&&!loadingBank)void loadBank()},[openBank,panelMode,bankLoaded,loadingBank,game?.id]);
  useEffect(()=>{if(bank.length&&!bank.some(c=>c.id===chosen))setChosen(bank[0].id)},[bank,chosen]);
  const selectable=visible.filter(c=>!protectedIds.includes(c.id));
@@ -158,7 +158,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
     <BookOpenText size={19}/><span><b>Банк игровых ситуаций</b><small>{readyCaseCount??'…'} готовых ситуаций · {openBank?(loadingBank?'Загрузка…':(bankTotal??0)+' загружено'):'откройте для загрузки'}</small></span><ChevronDown size={19}/>
    </button>
    {openBank&&<div className="autoEventBankBody">
-    <div className="autoEventBankSearch"><input aria-label="Найти ситуацию" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Найти ситуацию по названию, сфере или тексту…"/><button type="button" disabled={busy||readOnly||loadingBank} onClick={()=>void seed()}><RefreshCw size={16}/> Сверить банк</button></div>
+    <div className="autoEventBankSearch"><input aria-label="Найти ситуацию" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Найти ситуацию по названию, сфере или тексту…"/><button type="button" disabled={busy||loadingBank} onClick={()=>void loadBank()}><RefreshCw size={16}/> Обновить список</button><button type="button" disabled={busy||readOnly||loadingBank} onClick={()=>void seed()}><RefreshCw size={16}/> Сверить банк</button></div>
     <p className="eventBankHint">Выберите плитку слева. Описание и назначение ситуации — справа. Отметьте несколько неназначенных ситуаций для удаления.</p>
     <div className="eventBankBulkActions">
      <label><input type="checkbox" aria-label="Выделить все неназначенные результаты поиска" checked={selectable.length>0&&selectable.every(c=>selectedForDelete.includes(c.id))} disabled={busy||readOnly||!selectable.length} onChange={e=>setSelectedForDelete(old=>e.target.checked?[...new Set([...old,...selectable.map(c=>c.id)])]:old.filter(id=>!selectable.some(c=>c.id===id)))}/>Выделить доступные ({selectable.length})</label>
