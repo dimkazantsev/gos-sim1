@@ -14,9 +14,9 @@ function assertLocalIcon(c){
  const html=renderToStaticMarkup(React.createElement(EventComic,{title:c.title,category:c.category,caseKey:c.case_key,scene:c.comic_scene,silent:true}));
  assert.match(html,/class="eventComic eventPanelIllustration situationSymbol/,c.case_key+': local icon');
  assert(html.includes('data-case="'+c.case_key+'"'),c.case_key+': icon belongs to this case');
- assert(!/<(?:img|image|video|source)\\b/i.test(html),c.case_key+': no bitmap or external imagery');
- assert(!/event-art|event-comics|cinematicRaster|srcSet|<use\\b|href=/.test(html),c.case_key+': no illustration fetch');
- assert.equal((html.match(/<svg\\b/g)||[]).length,2,c.case_key+': local primary and modifier glyphs');
+ assert(!/<(?:img|image|video|source)\b/i.test(html),c.case_key+': no bitmap or external imagery');
+ assert(!/event-art|event-comics|cinematicRaster|srcSet|<use\b|href=/.test(html),c.case_key+': no illustration fetch');
+ assert.equal((html.match(/<svg\b/g)||[]).length,2,c.case_key+': local primary and modifier glyphs');
  assert(resolveSituationIcon(c.case_key,c.title,c.category).key,c.case_key+': stable topic mapping');
  const signature=html.match(/data-icon-fingerprint="([^"]+)"/)?.[1];
  assert(signature,c.case_key+': stable fingerprint');
