@@ -58,9 +58,10 @@ export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=fa
  const card=STAGE_SYSTEM[stageNo];
 
  if(compact)return <div className={'stageReadinessCompact '+status}>
-  {!checkedState&&!loading&&<button type="button" className="secondary" onClick={()=>void load()}>Проверить готовность</button>}
-  <span>{status==='ready'?'✓':status==='warning'?'!':status==='loading'?'…':'×'}</span>
-  <div><b>{title}</b><small>{state?.blockers?.[0]||state?.warnings?.[0]||card?.institution||'Проверка состояния этапа'}</small></div>
+  <span>{status==='ready'?'✓':status==='warning'?'!':status==='loading'?'…':checkedState?'×':'—'}</span>
+  <div><b>{title}</b><small>{checkedState?.blockers?.[0]||checkedState?.warnings?.[0]||card?.institution||'Проверка состояния этапа'}</small>
+   <button type="button" className="secondary" disabled={loading} onClick={()=>void load()}>{loading?'Проверяем…':checkedState?'Перепроверить':'Проверить готовность'}</button>
+  </div>
  </div>;
 
  const blockerCount=checkedState?.blockers?.length||0;
