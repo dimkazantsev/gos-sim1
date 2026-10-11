@@ -1,0 +1,2 @@
+-- Event authority scoring: independent audited migration.
+-- Follow-up implementation requires verified decision-actor attribution and an explicit contribution ledger.
