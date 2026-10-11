@@ -11,6 +11,8 @@ begin
  if not found or not s.enabled then return jsonb_build_object('sent',0,'reason','paused');end if;
  if s.last_run_at>v_now-interval '55 minutes' then return jsonb_build_object('sent',0,'reason','already_checked');end if;
  select current_round into v_round from public.games where id=p_game;
+ if not exists(select 1 from public.game_stages where game_id=p_game and stage_no=v_round and status='open') then
+  return jsonb_build_object('sent',0,'reason','stage_not_open');end if;
  if not exists(select 1 from public.event_case_routing where game_id=p_game) then
   return jsonb_build_object('sent',0,'reason','routing_not_configured');
  end if;
