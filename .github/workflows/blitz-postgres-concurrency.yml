@@ -74,6 +74,12 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f supabase/tests/blitz_vsn_fixture.sql
           psql -v ON_ERROR_STOP=1 -f /tmp/blitz-components.sql
           psql -v ON_ERROR_STOP=1 -f supabase/tests/blitz_vsn_assert.sql
+      - name: Apply legal release gate migrations
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261012103000_blitz_legal_release_gate.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261012103100_blitz_legal_review_rpc.sql
+      - name: Assert legal approval gate
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/blitz_legal_gate_assert.sql
       - name: Upload debugging logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
