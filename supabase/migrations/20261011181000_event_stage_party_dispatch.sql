@@ -60,14 +60,12 @@ begin
           or not exists(select 1 from public.event_assignments ea where ea.game_id=p_game and ea.recipient_id=gm.user_id)
     order by random()
     limit case when c.destination in('regional_joint','federal_joint') then 3
-               when c.destination='federal_collective' then 500
+               when c.destination in('regional','federal_collective') then 500
                else 1 end
   ) eligible;
   n:=coalesce(cardinality(chosen),0);
   if c.destination in('regional_joint','federal_joint') and n<2 then continue;end if;
-  if c.destination='federal_collective' and
-    (n<>(select count(*) from public.game_members gm where gm.game_id=p_game and gm.kind='student'))
-  then continue;end if;
+  if c.destination='federal_collective' and n<2 then continue;end if;
   if n<1 then continue;end if;
   -- Regulatory guard enforces "single" and "group" capacities; regional group originally has 2-3.
   insert into public.event_assignments(case_id,game_id,recipient_id,created_by)
