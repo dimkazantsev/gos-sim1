@@ -20,6 +20,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
  const [groupRecipients,setGroupRecipients]=useState<string[]>([]);
  const [openBank,setOpenBank]=useState(false);
  const [search,setSearch]=useState('');
+ const [shown,setShown]=useState(30);
  const [selectedForDelete,setSelectedForDelete]=useState<string[]>([]);
  const [loadingBank,setLoadingBank]=useState(false);
  const [bankLoaded,setBankLoaded]=useState(false);
@@ -66,6 +67,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
  useEffect(()=>{if(openBank&&panelMode==='bank'&&!bankLoaded&&!loadingBank)void loadBank()},[openBank,panelMode,bankLoaded,loadingBank,game?.id]);
  useEffect(()=>{if(bank.length&&!bank.some(c=>c.id===chosen))setChosen(bank[0].id)},[bank,chosen]);
  const selectable=visible.filter(c=>!protectedIds.includes(c.id));
+ useEffect(()=>setShown(30),[search,game?.id]);
  async function removeSelected(){
   if(!game||!teacher||readOnly||busy||!selectedForDelete.length)return;
   const ids=selectedForDelete.filter(id=>bank.some(c=>c.id===id)&&!protectedIds.includes(id));
@@ -165,7 +167,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
      <span>Выбрано: {selectedForDelete.length}</span>
      <button type="button" className="eventBankDeleteButton" disabled={busy||readOnly||!selectedForDelete.length} onClick={()=>void removeSelected()}><Trash2 size={16}/>Удалить выбранные</button>
     </div>
-    {loadingBank?<p role="status">Загрузка банка ситуаций…</p>:<div className="eventBankWorkspace"><div className="eventBankTiles" role="group" aria-label="Выбор ситуации">{visible.map(c=><div key={c.id} className="eventBankSelectableTile"><label className="eventBankSelection"><input type="checkbox" aria-label={'Выделить для удаления: '+c.title} checked={selectedForDelete.includes(c.id)} disabled={busy||readOnly||protectedIds.includes(c.id)} onChange={e=>setSelectedForDelete(old=>e.target.checked?[...old,c.id]:old.filter(id=>id!==c.id))}/>{protectedIds.includes(c.id)?'Назначено / используется':'Выделить'}</label><EventCaseTile item={c} selected={chosen===c.id} summary meta={c.category+' · '+(c.seriousness==='light'?'Повседневное':'Серьёзное')} onClick={()=>{setChosen(c.id);setRecipient('');setGroupRecipients([])}}/></div>)}{!visible.length&&<p className="eventGridEmpty">Ситуации по вашему запросу не найдены.</p>}</div>
+    {loadingBank?<p role="status">Загрузка банка ситуаций…</p>:<div className="eventBankWorkspace"><div className="eventBankTiles" role="group" aria-label="Выбор ситуации">{visible.slice(0,shown).map(c=><div key={c.id} className="eventBankSelectableTile"><label className="eventBankSelection"><input type="checkbox" aria-label={'Выделить для удаления: '+c.title} checked={selectedForDelete.includes(c.id)} disabled={busy||readOnly||protectedIds.includes(c.id)} onChange={e=>setSelectedForDelete(old=>e.target.checked?[...old,c.id]:old.filter(id=>id!==c.id))}/>{protectedIds.includes(c.id)?'Назначено / используется':'Выделить'}</label><EventCaseTile item={c} selected={chosen===c.id} summary meta={c.category+' · '+(c.seriousness==='light'?'Повседневное':'Серьёзное')} onClick={()=>{setChosen(c.id);setRecipient('');setGroupRecipients([])}}/></div>)}{!visible.length&&<p className="eventGridEmpty">Ситуации по вашему запросу не найдены.</p>}{visible.length>shown&&<button type="button" className="eventBankShowMore" onClick={()=>setShown(n=>n+30)}>Показать ещё 30 · {visible.length-shown} осталось</button>}</div>
      <article className="eventBankDetail">{selected?<><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}{selected.audience==='all'?' · Вся аудитория':''}</small><h4>{selected.title}</h4><p>{selected.situation}</p><em>{selected.source_note||'Авторский учебный кейс'}</em>
        {selected.audience==='all'?<div className="autoEventCaseAssign">
         <p>Ситуация для всей аудитории. При назначении каждый участник получает личное задание, а результаты объединяются в статистике.</p>
