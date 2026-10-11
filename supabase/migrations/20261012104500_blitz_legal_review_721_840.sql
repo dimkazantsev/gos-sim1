@@ -2,7 +2,7 @@
 WITH fixes(id,article,source_url) AS (VALUES
  (805::bigint,'статья 95','https://www.consultant.ru/document/cons_doc_LAW_28399/a966cb7bf74cfc516528e2d2b8b56ae756147013/'),
  (806::bigint,'статья 97','https://www.consultant.ru/document/cons_doc_LAW_28399/b609d63d916e795b53c1e27dc4df3ff8d994a0b9/'),
- (807::bigint,'статья 97','https://www.consult.ru/document/cons_doc_LAW_28399/b609d63d916e795b53c1e27dc4df3ff8d994a0b9/'),
+ (807::bigint,'статья 97','https://www.consultant.ru/document/cons_doc_LAW_28399/b609d63d916e795b53c1e27dc4df3ff8d994a0b9/'),
  (808::bigint,'статья 99','https://www.consultant.ru/document/cons_doc_LAW_28399/4777b3ea56f0dd9ddfe8686104aa20cb400b7bdb/'),
  (809::bigint,'статья 99','https://www.consultant.ru/document/cons_doc_LAW_28399/4777b3ea56f0dd9ddfe8686104aa20cb400b7bdb/'),
  (810::bigint,'статья 99','https://www.consultant.ru/document/cons_doc_LAW_28399/4777b3ea56f0dd9ddfe8686104aa20cb400b7bdb/'),
