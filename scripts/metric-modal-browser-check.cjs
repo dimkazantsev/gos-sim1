@@ -93,8 +93,8 @@ async function main(){
     }else if(screen==='student'){
      assert(!layout.role,'Students must not see teacher preview controls');
     }else if(screen==='offline'){
-     assert(layout.connection&&layout.connection.text.includes('По расписанию'),
-      'Disconnected realtime uses visible scheduled refresh status while browser is online');
+     assert.equal(await page.frameLocator('#preview').locator('.connectionPill.polling').count(),1,'Disconnected realtime must be classified as scheduled polling, not browser network loss');
+     assert(!layout.connection,'Scheduled polling pill is intentionally hidden in the compact top bar');
     }
     if(layout.scroll>layout.width+2){
      const details=await page.frameLocator('#preview').locator('.simTop').evaluate(el=>({
