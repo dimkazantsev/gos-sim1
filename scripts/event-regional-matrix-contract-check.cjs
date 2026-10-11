@@ -21,7 +21,7 @@ assert(matrix.includes("region_code is not null)<>113"),'All 113 regional cases 
 assert(dispatch.includes("status='open'"),'Only opened game stages are eligible');
 assert(dispatch.includes("private.member_party_id(p_game,gm.user_id)=c.party_id"),'Regional case targets party membership');
 assert(dispatch.includes("earliest_stage")&&dispatch.includes("latest_stage"),'Stage gates enforced');
-assert(dispatch.includes("limit case when c.destination in('regional_joint','federal_joint') then 3"),'Joint audience capped');
+assert(dispatch.includes("when c.destination='regional_joint' then 1")&&dispatch.includes("when c.destination='federal_joint' then 3"),'Regional leader starts invitation; federal joint audience capped');
 assert(dispatch.includes("case_id=ec.id"),'No repeated case assignment');
 assert(dispatch.includes('s.max_daily'),'Player rate cap preserved');
 assert(!dispatch.includes(' or not exists(select 1 from public.event_assignments ea where ea.game_id=p_game and ea.recipient_id=gm.user_id)'),'No OR-based authorization bypass');
