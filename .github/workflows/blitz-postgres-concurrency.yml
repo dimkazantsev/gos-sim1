@@ -80,6 +80,27 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261012103100_blitz_legal_review_rpc.sql
       - name: Assert legal approval gate
         run: psql -v ON_ERROR_STOP=1 -f supabase/tests/blitz_legal_gate_assert.sql
+      - name: Verify complete 1000-question legal-review migration coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/blitz_legal_review_1000_fixture.sql
+          python3 - <<'PY'
+          from pathlib import Path
+          paths=[]
+          for p in sorted(Path("supabase/migrations").glob("2026101210*_blitz_legal_review_*.sql")):
+              stamp=int(p.name.split("_",1)[0])
+              if 20261012103200 <= stamp <= 20261012104699:
+                  paths.append(p)
+          if len(paths) != 15:
+              raise SystemExit(f"Expected 15 legal-review batch migrations, got {len(paths)}: {paths}")
+          Path("/tmp/legal-review-migrations.txt").write_text("\n".join(str(p) for p in paths))
+          PY
+          while IFS= read -r migration; do
+            echo "Applying $migration"
+            psql -v ON_ERROR_STOP=1 -f "$migration"
+          done < /tmp/legal-review-migrations.txt
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/blitz_legal_review_1000_assert.sql
       - name: Upload debugging logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
