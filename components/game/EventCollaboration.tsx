@@ -10,7 +10,7 @@ export default function EventCollaboration({g,caseId,invitations,assignedIds,clo
  const assigned=assignedIds.includes(g.me?.user_id||'');
  const canChat=(assigned||g.teacher)&&!readOnly&&g.me?.kind!=='observer';
  async function load(){if(!assigned&&!g.teacher)return;const r=await supabase.from('event_discussion_messages').select('*').eq('case_id',caseId).order('created_at',{ascending:false}).limit(100);if(!r.error)setEntries(((r.data||[]) as Entry[]).reverse())}
- useEffect(()=>{void load();const id=setInterval(()=>void load(),5000);return()=>clearInterval(id)},[caseId,assigned,g.teacher]);
+ useEffect(()=>{if(!assigned&&!g.teacher)return;void load();const id=setInterval(()=>{if(document.visibilityState==='visible')void load()},30000);return()=>clearInterval(id)},[caseId,assigned,g.teacher]);
  async function act(name:string,params:Record<string,unknown>){if(busy)return;setBusy(true);const r=await supabase.rpc(name,params);setNotice(r.error?r.error.message:'');if(!r.error){setText('');await Promise.all([onChanged(),load()])}setBusy(false)}
  return <section className="eventCollaboration">
  {myInvite&&!readOnly&&<div className="eventInvitation"><strong>{g.names[myInvite.inviter_id]||'Участник'} приглашает вас к совместному решению</strong><div><button disabled={busy} onClick={()=>void act('respond_event_invitation',{p_id:myInvite.id,p_accept:true})}>Принять приглашение</button><button disabled={busy} onClick={()=>void act('respond_event_invitation',{p_id:myInvite.id,p_accept:false})}>Отклонить</button></div></div>}

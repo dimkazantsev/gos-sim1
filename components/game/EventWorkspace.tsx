@@ -48,10 +48,10 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const [saving,setSaving]=useState(false);
  const [notice,setNotice]=useState('');
  const [busyId,setBusyId]=useState<string|null>(null);
- async function reload(){
+ async function reload(includeCatalog=true){
   if(!game||!me)return;
   const [a,b,c,d,e,f]=await Promise.all([
-   supabase.from('event_cases').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).limit(1000),
+   includeCatalog?supabase.from('event_cases').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).limit(1000):Promise.resolve({data:null,error:null}),
    supabase.from('event_assignments').select('*').eq('game_id',game.id),
    supabase.from('event_decisions').select('*').eq('game_id',game.id),
    supabase.from('event_case_outcomes').select('*').eq('game_id',game.id),
@@ -61,22 +61,33 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   const error=[a,b,c,d,e,f].find(r=>r.error)?.error;
   if(error){setNotice(error.message);return}
   setInvitations((e.data||[]) as EventInvitation[]);setAuthority((f.data||[]) as Authority[]);
-  setCases((a.data||[]) as CaseRow[]);
+  if(includeCatalog)setCases((a.data||[]) as CaseRow[]);
   if(!b.error)setAssignments((b.data||[]) as Assignment[]);
   if(!c.error)setDecisions((c.data||[]) as Decision[]);
   if(!d.error)setOutcomes((d.data||[]) as Outcome[]);
  }
  useEffect(()=>{
   if(!game?.id||!me?.user_id)return;
-  void reload();
-  const poll=setInterval(()=>void reload(),30000);
+  void reload(true);
+  // Large authored situations are immutable while students are answering:
+  // poll only decision state, and never poll a hidden tab.
+  const poll=setInterval(()=>{if(document.visibilityState==='visible')void reload(false)},180000);
+  let pending:ReturnType<typeof setTimeout>|undefined,needsCatalog=false;
+  const changed=(catalog=false)=>{
+   needsCatalog=needsCatalog||catalog;
+   if(pending)clearTimeout(pending);
+   pending=setTimeout(()=>{
+    pending=undefined;
+    if(document.visibilityState==='visible'){void reload(needsCatalog);needsCatalog=false;}
+   },2500);
+  };
   const channel=supabase.channel('event-workspace:'+game.id+':'+me.user_id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_cases',filter:'game_id=eq.'+game.id},()=>void reload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>void reload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_decisions',filter:'game_id=eq.'+game.id},()=>void reload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_case_outcomes',filter:'game_id=eq.'+game.id},()=>void reload())
+   .on('postgres_changes',{event:'*',schema:'public',table:'event_cases',filter:'game_id=eq.'+game.id},()=>changed(true))
+   .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>changed())
+   .on('postgres_changes',{event:'*',schema:'public',table:'event_decisions',filter:'game_id=eq.'+game.id},()=>changed())
+   .on('postgres_changes',{event:'*',schema:'public',table:'event_case_outcomes',filter:'game_id=eq.'+game.id},()=>changed())
    .subscribe();
-  return()=>{clearInterval(poll);void supabase.removeChannel(channel)};
+  return()=>{clearInterval(poll);if(pending)clearTimeout(pending);void supabase.removeChannel(channel)};
  },[game?.id,me?.user_id]);
  const students=members.filter(m=>m.kind==='student');
  const roles=[...new Set(students.map(m=>m.role_title?.trim()).filter((r):r is string=>!!r))].sort((a,b)=>a.localeCompare(b,'ru'));
@@ -104,7 +115,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   if(busyId||readOnly||me?.kind!=='student')return;
   eventButtonSound();setBusyId(assignment.id);setNotice('');
   const r=await supabase.rpc('submit_event_decision',{p_assignment_id:assignment.id,p_choice:choice,p_rationale:null});
-  if(r.error)setNotice(r.error.message);else await Promise.all([reload(),g.refresh()]);
+  if(r.error)setNotice(r.error.message);else await Promise.all([reload(false),g.refresh()]);
   setBusyId(null);
  }
  const assignedCaseIds=new Set(assignments.map(a=>a.case_id));
@@ -143,11 +154,11 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   if(!teacher||busyId||!window.confirm('Подвести итог по текущим ответам и завершить голосование досрочно?'))return;
   setBusyId(id);const r=await supabase.rpc('finalize_event_case',{p_case_id:id});
   setNotice(r.error?r.error.message:r.data?.reason==='no_answers'?'Пока нет голосов.':'Итог зафиксирован.');
-  if(!r.error)await Promise.all([reload(),g.refresh()]);setBusyId(null);
+  if(!r.error)await Promise.all([reload(false),g.refresh()]);setBusyId(null);
  }
  if(!game||!me)return null;
  return <section className="eventWorkspace" aria-label="Event — ситуационные решения">
-  <header><div><small>EVENT · ИГРОВЫЕ СИТУАЦИИ</small><h2>События и решения</h2><p>Индивидуальные задания, совместные решения 2–3 участников и общее голосование. После решения здесь видны голоса по каждому варианту, последствия и итоговое изменение доверия.</p></div><span><CalendarDays size={17} aria-hidden="true"/>{teacher?'Назначенные ситуации':me.kind==='observer'?'Гостевой просмотр':'Ваши задания'}</span></header>
+  <header><div><small>EVENT · ИГРОВЫЕ СИТУАЦИИ</small><h2>События и решения</h2><p>Индивидуальные задания, совместные решения 2–3 участников и общее голосование. После решения здесь видны голоса по каждому варианту, последствия и итоговое изменение доверия.</p><button type="button" className="secondary" onClick={()=>void reload(true)} aria-label="Обновить список событий и результаты">↻ Обновить события</button></div><span><CalendarDays size={17} aria-hidden="true"/>{teacher?'Назначенные ситуации':me.kind==='observer'?'Гостевой просмотр':'Ваши задания'}</span></header>
   {mode==='manage'&&teacher&&<div className="eventDecisionOverview" aria-label="Статистика решений по игровым событиям">
    <article><small>Назначено заданий</small><strong>{seenAssignments.length}</strong><span>{teacher?'Всем участникам':'Вам'}</span></article>
    <article><small>Решено</small><strong>{completedCount}<em> / {seenAssignments.length}</em></strong><span>{ratio(completedCount,seenAssignments.length)}% заданий</span></article>
@@ -155,7 +166,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    <article><small>Негативные последствия</small><strong>{noCount}</strong><span>{ratio(noCount,relevantDecisions.length)}% от ответов</span></article>
    <article><small>Нейтральные решения</small><strong>{neutralCount}</strong><span>{ratio(neutralCount,relevantDecisions.length)}% от ответов</span></article>
   </div>}
-  {mode==='manage'&&teacher&&<EventAutopilotPanel g={g} onChanged={reload} readyCaseCount={readyCases.length}/>}
+  {mode==='manage'&&teacher&&<EventAutopilotPanel g={g} onChanged={()=>reload(true)} readyCaseCount={readyCases.length}/>}
   {mode==='manage'&&teacher&&<div className="eventCatalogTargets" aria-label="Состав банка игровых ситуаций">
    <div><strong>{cases.length}</strong><small>Всего ситуаций в игре, включая {cases.filter(c=>c.status!=='ready').length} черновиков</small></div>
    <div><strong>{readyCases.length}</strong><small>Готовы к назначению</small></div>
@@ -233,7 +244,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
       </>}
      </div>
     </article>
-    {expandedCase&&<EventCollaboration g={g} caseId={c.id} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={reload} readOnly={readOnly}/>}
+    {expandedCase&&<EventCollaboration g={g} caseId={c.id} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={()=>reload(false)} readOnly={readOnly}/>}
     </div></EventCaseModal>;
    })}
   {notice&&<p className="eventNotice" role="status">{notice}</p>}
