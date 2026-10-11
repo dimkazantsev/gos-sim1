@@ -22,3 +22,17 @@ export const supabase = createClient(url, publishableKey, {
   auth: { persistSession: true, autoRefreshToken: true },
   realtime: { params: { eventsPerSecond: 20 } }
 });
+
+
+export function createPasswordAuthClient(){
+  return createClient(url, publishableKey, {
+    global:{fetch:async(input,init)=>{
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),12000);
+      try{return await fetch(input,{...init,signal:controller.signal})}
+      catch(error){throw new Error(error instanceof DOMException&&error.name==='AbortError'?'Сервер авторизации не ответил за 12 секунд.':userError(error))}
+      finally{clearTimeout(timer)}
+    }},
+    auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+  });
+}
