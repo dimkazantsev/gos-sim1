@@ -64,7 +64,7 @@ export function useRepublicGame(gameId:string){
  const [profileGameId,setProfileGameId]=useState('');
  const [introAccountSeen,setIntroAccountSeen]=useState(false);
  const [chatMediaError,setChatMediaError]=useState(''),[chatMediaPhase,setChatMediaPhase]=useState<MediaUploadPhase>('idle');
- const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('disconnected');
+ const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'|'polling'>('disconnected');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),activeViewRef=useRef<View>('dashboard'),chatOpenRef=useRef(false);
  activeViewRef.current=activeView;chatOpenRef.current=chatOpen;
  const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
@@ -183,7 +183,13 @@ export function useRepublicGame(gameId:string){
   // supabase_realtime publication. Do not let that infrastructure path
   // compete with 30 classroom clients. Keep the UI eventually consistent
   // through one bounded visible-tab refresh and immediate local invalidation.
-  setRealtimeState('disconnected');
+  // Realtime WebSocket is deliberately disabled to save Supabase resources.
+  // Distinguish that from an actual browser-level offline condition. A polling
+  // badge communicates the mode of synchronization, not verified API health.
+  const updateConnectionMode=()=>setRealtimeState(navigator.onLine?'polling':'disconnected');
+  updateConnectionMode();
+  window.addEventListener('online',updateConnectionMode);
+  window.addEventListener('offline',updateConnectionMode);
   let running=false,queued=false;
   async function update(){
    if(!alive.current||document.visibilityState==='hidden')return;
@@ -195,7 +201,7 @@ export function useRepublicGame(gameId:string){
   // Poll only the visible screen; avoid loading the entire game every 30 seconds.
   // Explicit writes still invalidate local views. Stagger clients by identity.
   const interval=setInterval(()=>void update(),180000);
-  return()=>{clearInterval(interval)};
+  return()=>{clearInterval(interval);window.removeEventListener('online',updateConnectionMode);window.removeEventListener('offline',updateConnectionMode)};
  },[gameId,me?.user_id]);
 
 
