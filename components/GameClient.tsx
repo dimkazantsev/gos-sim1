@@ -305,10 +305,10 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    const [r,i]=await Promise.all([supabase.from('event_assignments').select('id',{count:'exact',head:true}).eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending'),supabase.from('event_collaboration_invites').select('id',{count:'exact',head:true}).eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending')]);
    if(live&&!r.error&&!i.error)setPendingEvents((r.count||0)+(i.count||0));
   }
-  void count();const poll=setInterval(()=>void count(),30000);
-  const channel=supabase.channel('event-count:'+game.id+':'+me.user_id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>void count()).subscribe();
-  return()=>{live=false;clearInterval(poll);void supabase.removeChannel(channel)};
+  void count();
+  // Active-view refreshes continue without opening a Postgres Changes replication channel.
+  const poll=setInterval(()=>{if(document.visibilityState==='visible')void count()},120000);
+  return()=>{live=false;clearInterval(poll)};
  },[game?.id,me?.user_id,previewMode,view]);
 
 
@@ -343,7 +343,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(!me||previewMode||me.kind==='observer')return;
   const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политический процесс',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Event · ситуации',budget:'Бюджет'};
   void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
-  const id=setInterval(()=>void touchPresence(view),30000);
+  const id=setInterval(()=>{if(document.visibilityState==='visible')void touchPresence(view)},60000);
   return()=>clearInterval(id);
  },[view,me?.user_id,previewMode]);
 
