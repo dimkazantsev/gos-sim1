@@ -183,3 +183,16 @@
 .budgetPage .budgetTaxSpecial>summary,.budgetPage .budgetTaxParameters>summary{min-height:56px;display:flex;align-items:center;gap:10px}
 .budgetPage .budgetTaxSpecial>summary:after,.budgetPage .budgetTaxParameters>summary:after{content:''!important;display:block!important;flex:none;width:9px;height:9px;border-right:2px solid #6558cf;border-bottom:2px solid #6558cf;transform:rotate(45deg);margin:0 5px 4px auto}
 .budgetPage .budgetTaxSpecial[open]>summary:after,.budgetPage .budgetTaxParameters[open]>summary:after{transform:rotate(225deg);margin-top:5px;margin-bottom:0}
+
+/* Compact chat composer: preserve voice, video and attachment controls, return vertical space to conversation. */
+.gsChatV2 .chatCompose.chatComposeCompact{display:grid;gap:5px;padding:7px 10px 8px}
+.gsChatV2 .chatComposeCompact .chatProcessTags{margin:0;padding:0;border-radius:9px}
+.gsChatV2 .chatComposeCompact .chatProcessTags summary{min-height:30px;padding:5px 10px;font-size:12px;line-height:18px}
+.gsChatV2 .chatComposeCompact .chatProcessTags:not([open]){max-height:32px}
+.gsChatV2 .chatComposeCompact .chatInputRow{margin:0;min-height:35px;padding:0}
+.gsChatV2 .chatComposeCompact .chatInputRow textarea{display:block;min-height:35px;max-height:104px;margin:0;padding:7px 10px;font-size:13px;line-height:19px}
+.gsChatV2 .chatComposeCompact .chatComposeActions{display:flex;align-items:center;gap:5px;min-height:36px;margin:0;padding:0}
+.gsChatV2 .chatComposeCompact .chatIconButton,.gsChatV2 .chatComposeCompact .chatSendButton{width:36px;min-width:36px;height:36px;min-height:36px;padding:0;margin:0;border-radius:10px}
+.gsChatV2 .chatComposeCompact .chatSendButton{margin-left:auto}
+.gsChatV2 .chatComposeCompact .chatComposerHint{font-size:11px;min-width:0;flex:1}
+@media(max-width:540px){.gsChatV2 .chatCompose.chatComposeCompact{padding:5px 8px 6px;gap:4px}.gsChatV2 .chatComposeCompact .chatInputRow textarea{font-size:13px}}
