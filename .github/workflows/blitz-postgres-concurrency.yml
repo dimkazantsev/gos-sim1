@@ -94,7 +94,7 @@ jobs:
                   paths.append(p)
           if len(paths) != 15:
               raise SystemExit(f"Expected 15 legal-review batch migrations, got {len(paths)}: {paths}")
-          Path("/tmp/legal-review-migrations.txt").write_text("\n".join(str(p) for p in paths))
+          Path("/tmp/legal-review-migrations.txt").write_text("\n".join(str(p) for p in paths)+"\n")
           PY
           while IFS= read -r migration; do
             echo "Applying $migration"
