@@ -47,18 +47,21 @@ export default function Home(){
   let phase:'authentication'|'game'='authentication';
   try{
    if(typeof navigator!=='undefined'&&!navigator.onLine)throw new Error('Устройство не подключено к интернету. Проверьте сеть.');
-   // Preserve a valid session when only the game lookup temporarily fails.
-   // If Auth temporarily cannot refresh a stored token, allow an explicit
-   // password login instead of trapping the user behind a broken old session.
-   let existing=await supabase.auth.getSession();
-   if(existing.error&&((existing.error as {status?:number}).status||0)>=500){
-    await new Promise(resolve=>setTimeout(resolve,500));
-    existing=await supabase.auth.getSession();
-   }
-   if(existing.error||!existing.data.session?.user||existing.data.session.user.email?.toLowerCase()!==loginEmail.trim().toLowerCase()){
+   // Explicit password login must not depend on a stored refresh token.
+   // getSession() may auto-refresh an old local session before checking the
+   // credentials entered in this form, so a transient refresh-token 504 can
+   // incorrectly block a valid password login.
+   let authError:unknown=null;
+   for(let attempt=0;attempt<2;attempt++){
     const auth=await supabase.auth.signInWithPassword({email:loginEmail.trim().toLowerCase(),password:loginPassword});
-    if(auth.error)throw auth.error;
+    if(!auth.error){authError=null;break}
+    authError=auth.error;
+    const detail=[auth.error.status,auth.error.code,auth.error.message].filter(Boolean).join(' ');
+    const retry=/\b5\d\d\b|request_timeout|context deadline exceeded|timeout|temporarily unavailable|fetch failed|network/i.test(detail);
+    if(!retry||attempt===1)throw auth.error;
+    await new Promise(resolve=>setTimeout(resolve,900));
    }
+   if(authError)throw authError;
    phase='game';
    // PostgREST can temporarily return 503 while rebuilding its schema cache.
    // Resume is idempotent, unlike join_game_with_code which records an audit event.
