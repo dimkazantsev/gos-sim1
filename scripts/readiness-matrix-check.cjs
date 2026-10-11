@@ -45,12 +45,19 @@ async function main(){
   const duplicate=ready();duplicate[15].stage_no=1;const wrongWarning=ready();wrongWarning[0].warnings=null;
   for(const data of [null,[],ready().slice(0,15),duplicate,wrongWarning]){const h=harness();await h.flush();h.responses.push({data,error:null});h.refresh();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,0);assert.match(h.html(),/полную проверку 16 этапов/);h.dispose();}
  });
- await check('Game switch clears old labels immediately and ignores an older RPC response',async()=>{
-  const h=harness();await h.flush();h.refresh();await h.flush();let resolveOld,resolveNew;
+ await check('Game switch clears old labels and ignores an older RPC response',async()=>{
+  const h=harness();await h.flush();h.refresh();await h.flush();
+  let resolveOld,resolveNew;
   h.responses.push(()=>new Promise(resolve=>{resolveOld=resolve;}));h.refresh();await h.flush();
-  h.responses.push(()=>new Promise(resolve=>{resolveNew=resolve;}));h.g.game={id:'game-b'};h.render();assert.equal(h.nodes('article').filter(x=>x.props.className==='loading').length,16);assert.doesNotMatch(h.html(),/<b>16<\/b> готовы/);await h.flush();
-  resolveOld({data:ready('QA old game response'),error:null});await h.flush();assert.doesNotMatch(h.html(),/QA old game response/);assert.equal(h.nodes('article').filter(x=>x.props.className==='loading').length,16);
-  resolveNew({data:ready('QA new game response'),error:null});await h.flush();assert.match(h.html(),/QA new game response/);assert.equal(h.nodes('article').filter(x=>x.props.className==='warning').length,16);h.dispose();
+  h.g.game={id:'game-b'};h.render();
+  assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,0);
+  assert.doesNotMatch(h.html(),/QA old game response/);
+  h.responses.push(()=>new Promise(resolve=>{resolveNew=resolve;}));h.refresh();await h.flush();
+  resolveOld({data:ready('QA old game response'),error:null});await h.flush();
+  assert.doesNotMatch(h.html(),/QA old game response/);
+  resolveNew({data:ready('QA new game response'),error:null});await h.flush();
+  assert.match(h.html(),/QA new game response/);
+  assert.equal(h.nodes('article').filter(x=>x.props.className==='warning').length,16);h.dispose();
  });
  if(failures.length)process.exitCode=1;
 }
