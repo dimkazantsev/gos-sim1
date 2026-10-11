@@ -2,7 +2,7 @@ name: Build Check
 
 on:
   push:
-    branches: [main, "codex/civic-*", "codex/budget-amendments-*", "codex/project-audit-*", "fix/fast-login-*", "fix/stabilize-runtime-*", "fix/realtime-capacity-*", "fix/situation-icons-only-*", "fix/realtime-capacity-sync-indicator-*", "fix/bootstrap-no-realtime-*", "fix/password-login-bypass-refresh-*", "fix/profile-refresh-navigation-*", "fix/restore-current-screen-on-refresh-*", "fix/events-targeted-stability-*", "fix/event-header-button-style-*", "fix/event-refresh-next-to-status-*", "fix/lazy-event-bank-bulk-manage-*", "fix/lazy-event-bank-bulk-manage-reorder-*"]
+    branches: [main, "codex/civic-*", "codex/budget-amendments-*", "codex/project-audit-*", "fix/fast-login-*", "fix/stabilize-runtime-*", "fix/realtime-capacity-*", "fix/situation-icons-only-*", "fix/realtime-capacity-sync-indicator-*", "fix/bootstrap-no-realtime-*", "fix/password-login-bypass-refresh-*", "fix/profile-refresh-navigation-*", "fix/restore-current-screen-on-refresh-*", "fix/events-targeted-stability-*", "fix/event-header-button-style-*", "fix/event-refresh-next-to-status-*", "fix/lazy-event-bank-bulk-manage-*", "fix/lazy-event-bank-bulk-manage-reorder-*", "feat/pau-regional-event-routing-*"]
   workflow_dispatch:
 
 jobs:
