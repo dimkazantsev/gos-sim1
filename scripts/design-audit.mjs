@@ -267,7 +267,8 @@ check('Pinned media is secured, persistent and available outside recent history'
  read('supabase/migrations/068_chat_pins.sql').includes('private.can_access_channel')&&
  read('supabase/migrations/068_chat_pins.sql').includes('set_chat_pin')&&
  read('components/game/useRepublicGame.ts').includes('pinnedMessages')&&
- (read('components/game/useRepublicGame.ts').includes("table:'chat_pins'")||read('components/game/useRepublicGame.ts').includes("on('chat_pins'"))&&
+ read('components/game/useRepublicGame.ts').includes('async function loadChatPins')&&
+ read('components/game/useRepublicGame.ts').includes("from('chat_pins')")&&
  chat.includes('chatPinnedWrap')&&chat.includes('chatPinnedMedia'));
 check('Audio and video files can be uploaded and played in chat',
  chat.includes('audio/*,video/*')&&
