@@ -152,14 +152,14 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   {!readOnly&&<NewsProposals g={g} refreshKey={proposalRefresh} onOpenDocument={onOpenDocument} onNavigate={onNavigate} onPublished={title=>{setSearch(title);setNotice('Новость опубликована в СМИ.')}}/>}
   {notice&&<p className="processNotice" role="status">{notice}</p>}
   <>
-   <section className="wallSearch"><label>Поиск<input type="search" aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Текст, название или тег"/></label><StyledSelect label="Субъект" value={filterActor} onChange={setFilterActor} options={[{value:'',label:'Все субъекты'},...Array.from(new Map(politicalPosts.map(p=>[p.actor_key,p.actor_key==='teacher'?'GOS//SIMS':p.actor_label])).entries()).map(([value,label])=>({value,label}))]}/><StyledSelect label="Вид публикации" value={filterType} onChange={setFilterType} options={[{value:'',label:'Все публикации'},...PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))]}/><StyledSelect label="Этап" value={filterStage} onChange={setFilterStage} options={[{value:'',label:'Все этапы'},...g.stages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></section>
+   <section className="wallSearch"><label>Поиск<input type="search" aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Текст, название или тег"/></label><StyledSelect label="Субъект" value={filterActor} onChange={setFilterActor} options={[{value:'',label:'Все субъекты'},...Array.from(new Map(politicalPosts.map(p=>[p.actor_key,p.actor_key==='teacher'?'ГОС.ID':p.actor_label])).entries()).map(([value,label])=>({value,label}))]}/><StyledSelect label="Вид публикации" value={filterType} onChange={setFilterType} options={[{value:'',label:'Все публикации'},...PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))]}/><StyledSelect label="Этап" value={filterStage} onChange={setFilterStage} options={[{value:'',label:'Все этапы'},...g.stages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></section>
    <section className="wallFeed">{!filtered.length?<div className="emptyState">Подходящих публикаций нет.</div>:filtered.map(p=>{
     const party=g.parties.find(x=>x.id===p.context?.party_id||x.name===p.actor_label),pf=profiles.find(x=>x.user_id===p.author_id);
     const media=politicalMedia.filter(x=>x.post_id===p.id);
     const links=postFormalLinks.filter(x=>x.post_id===p.id).flatMap(x=>formalDocuments.filter(d=>d.id===x.formal_document_id));
     const vote=votes.find(v=>v.source_post_id===p.id||v.id===p.context?.vote_id);
     const publicFiles=g.partyDocuments.filter(d=>p.context?.party_document_ids?.includes(d.id)&&d.url);
-    const label=p.actor_key==='teacher'?'GOS//SIMS':p.actor_label,kind=p.process_type==='decision'?'Инициатива':PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
+    const label=p.actor_key==='teacher'?'ГОС.ID':p.actor_label,kind=p.process_type==='decision'?'Инициатива':PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
     const auto=!!p.source_key||p.context?.automatic===true;
     const own=p.author_id===me.user_id,editable=!readOnly&&(teacher||own&&!auto);
     const canRequestVote=!readOnly&&(teacher||own&&!auto);
