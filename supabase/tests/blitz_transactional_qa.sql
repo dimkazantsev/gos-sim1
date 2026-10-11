@@ -17,6 +17,14 @@ BEGIN
  IF public.blitz_issue_for_day(gameid,uid,(now() at time zone 'Europe/Moscow')::date,1)<>0 THEN RAISE EXCEPTION 'Second allocation duplicated items'; END IF;
  v:=public.blitz_archive(gameid,uid,0,50);
  IF EXISTS(SELECT 1 FROM jsonb_array_elements(v) x WHERE x->>'question' IS NOT NULL OR x->>'options' IS NOT NULL OR x->>'correct_index' IS NOT NULL) THEN RAISE EXCEPTION 'Pending data leaked into archive'; END IF;
+ -- A guessed assignment ID must not disclose answers or consume a pending question.
+ SELECT id INTO q FROM public.blitz_assignments WHERE game_id=gameid AND user_id=uid AND started_at IS NULL LIMIT 1;
+ blocked:=false;
+ BEGIN PERFORM public.blitz_answer(q,0); EXCEPTION WHEN SQLSTATE '22023' THEN blocked:=true; END;
+ IF NOT blocked THEN RAISE EXCEPTION 'Pre-open answer request was accepted'; END IF;
+ IF EXISTS(SELECT 1 FROM public.blitz_assignments WHERE id=q AND (answered_at IS NOT NULL OR started_at IS NOT NULL)) THEN
+  RAISE EXCEPTION 'Pre-open request consumed assignment';
+ END IF;
  UPDATE public.blitz_assignments SET available_at=clock_timestamp()-interval '2 minutes' WHERE game_id=gameid AND user_id=uid;
  v:=public.blitz_open(gameid);
  IF v IS NULL OR v ? 'correct_index' THEN RAISE EXCEPTION 'Question open error or secret leak'; END IF;
