@@ -11,6 +11,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
 import TeacherAwards from './TeacherAwards';
+import TeacherBlitz from './TeacherBlitz';
 import TeacherOverview from './TeacherOverview';
 import {useSavedGameState,savedChoice} from './useSavedGameState';
 import {useHorizontalWheel} from './useHorizontalWheel';
@@ -20,7 +21,7 @@ function timerText(seconds:number){
  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools'|'event'|'awards';
+type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools'|'event'|'awards'|'blitz';
 const WORKSPACES=[
  {key:'overview',title:'Обзор',icon:Activity},
  {key:'stages',title:'Этапы',icon:BookOpenText},
@@ -31,7 +32,8 @@ const WORKSPACES=[
  {key:'parties',title:'Фракции',icon:UsersRound},
  {key:'tools',title:'Инструменты',icon:Wrench},
  {key:'event',title:'Event',icon:BookOpenText},
- {key:'awards',title:'Награды',icon:Award}
+ {key:'awards',title:'Награды',icon:Award},
+ {key:'blitz',title:'Блиц-вопросы',icon:BookOpenText}
 ] as const;
 
 export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat,onNavigate}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void;onNavigate?:(destination:'documents'|'votes'|'budget'|'actions')=>void}){
@@ -127,6 +129,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
 
     {workspace==='grades'&&<GradesView g={g}/>}
     {workspace==='awards'&&<TeacherAwards g={g}/>}
+    {workspace==='blitz'&&<TeacherBlitz g={g}/>}
     {workspace==='impact'&&<ImpactRulesPanel g={g}/>}
 
     {workspace==='parties'&&<TeacherPartyDossiers g={g} onOpenChat={onOpenChat}/>}
