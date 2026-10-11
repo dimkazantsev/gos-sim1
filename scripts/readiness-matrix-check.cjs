@@ -5,7 +5,7 @@ const source=fs.readFileSync(process.argv[2]||path.join(root,'components/game/Ga
 const transpile=s=>ts.transpileModule(s,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}}).outputText;
 const ready=(label='')=>Array.from({length:16},(_,i)=>({stage_no:i+1,ready:true,blockers:[],warnings:label?[label]:[],override:null}));
 function harness(){
- const slots=[],effects=[],timers=new Map(),listeners=new Map(),channels=[],responses=[],calls=[];let cursor=0,dirty=false,tree,clock=0;
+ const slots=[],effects=[],timers=new Map(),intervals=new Map(),listeners=new Map(),channels=[],responses=[],calls=[];let cursor=0,dirty=false,tree,clock=0;
  const g={game:{id:'game-a'},stages:Array.from({length:16},(_,i)=>({stage_no:i+1,title:'Этап '+(i+1)})),teacher:true};
  const react={useState(initial){const i=cursor++;slots[i]??={value:typeof initial==='function'?initial():initial};return[slots[i].value,next=>{const value=typeof next==='function'?next(slots[i].value):next;if(!Object.is(slots[i].value,value)){slots[i].value=value;dirty=true;}}];},useRef(initial){const i=cursor++;return(slots[i]??={value:{current:initial}}).value;},useId(){const i=cursor++;return 'qa-'+i;},useEffect(effect,deps){const i=cursor++,old=slots[i];if(!old||!deps||deps.some((v,j)=>!Object.is(v,old.deps?.[j]))){slots[i]={deps,cleanup:old?.cleanup};effects.push(()=>{slots[i].cleanup?.();slots[i].cleanup=effect();});}}};
  const eventTarget={addEventListener(name,fn){if(!listeners.has(name))listeners.set(name,new Set());listeners.get(name).add(fn);},removeEventListener(name,fn){listeners.get(name)?.delete(fn);}};
@@ -20,13 +20,13 @@ function harness(){
   }
   throw Error('Unexpected fixture import '+request);
  }
- context=vm.createContext({console,Promise,Error,Object,Number,Array,Set,Map,window:eventTarget,document:{...eventTarget,visibilityState:'visible'},setTimeout:fn=>{const id=++clock;timers.set(id,fn);return id;},clearTimeout:id=>timers.delete(id)});
+ context=vm.createContext({console,Promise,Error,Object,Number,Array,Set,Map,window:eventTarget,document:{...eventTarget,visibilityState:'visible'},setTimeout:fn=>{const id=++clock;timers.set(id,fn);return id;},clearTimeout:id=>timers.delete(id),setInterval:fn=>{const id=++clock;intervals.set(id,fn);return id;},clearInterval:id=>intervals.delete(id)});
  const module={exports:{}};vm.runInContext('(function(require,module,exports){'+transpile(source)+'\n})',context)(requireFor,module,module.exports);
  function render(){cursor=0;dirty=false;tree=module.exports.default({g});while(effects.length)effects.shift()();return tree;}
  async function flush(){for(let i=0;i<24;i++){render();await Promise.resolve();await Promise.resolve();await Promise.resolve();}return tree;}
  function nodes(type,node=tree,out=[]){if(!node||typeof node!=='object')return out;if(node.type===type)out.push(node);for(const child of [node.props?.children].flat(Infinity))if(child!==undefined)nodes(type,child,out);return out;}
  function runTimers(){const batch=[...timers.values()];timers.clear();batch.forEach(fn=>fn());}
- return{g,flush,render,responses,calls,nodes,html:()=>renderToStaticMarkup(tree),refresh:()=>nodes('button').find(x=>x.props.className==='secondary').props.onClick(),event:name=>{for(const fn of listeners.get(name)||[])fn({});runTimers();},change(payload){for(const ch of channels.filter(x=>!x.removed))ch.handlers[0].callback(payload);runTimers();},dispose(){slots.forEach(x=>x?.cleanup?.());}};
+ return{g,flush,render,responses,calls,nodes,html:()=>renderToStaticMarkup(tree),refresh:()=>nodes('button').find(x=>x.props.className==='secondary').props.onClick(),event:(name,payload={})=>{for(const fn of listeners.get(name)||[])fn(payload);runTimers();},localRefresh:gameId=>{for(const fn of listeners.get('gos-sims:refresh')||[])fn({detail:{gameId}});runTimers();},dispose(){slots.forEach(x=>x?.cleanup?.());}};
 }
 async function main(){
  const failures=[];async function check(name,fn){try{await fn();console.log('PASS '+name);}catch(error){failures.push(name);console.error('FAIL '+name+': '+error.stack);}}
@@ -35,11 +35,11 @@ async function main(){
   h.responses.push({data:null,error:{message:'QA readiness unavailable'}});h.refresh();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,0);assert.equal(h.nodes('article').filter(x=>x.props.className==='unavailable').length,16);assert.match(h.html(),/role="alert"/);assert.match(h.html(),/<b>—<\/b> готовы/);
   h.refresh();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,16);h.dispose();
  });
- await check('Shared focus, online and realtime recovery preserves teacher overrides',async()=>{
+ await check('Shared focus, online and local refresh recovery preserves teacher overrides',async()=>{
   const h=harness();await h.flush();const override=ready();override[8]={...override[8],warnings:['QA teacher override'],override:{reason:'QA teacher override'}};
   h.responses.push({data:override,error:null});h.event('focus');await h.flush();assert.match(h.html(),/QA teacher override/);assert.equal(h.nodes('article')[8].props.className,'warning');
   h.responses.push(()=>{throw Error('QA network offline');});h.refresh();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,0);h.event('online');await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,16);
-  const n=h.calls.length;h.change({eventType:'UPDATE',new:{game_id:'other-game'}});await h.flush();assert.equal(h.calls.length,n);h.change({eventType:'UPDATE',new:{game_id:'game-a'}});await h.flush();assert.ok(h.calls.length>n);h.dispose();
+  const n=h.calls.length;h.localRefresh('other-game');await h.flush();assert.equal(h.calls.length,n);h.localRefresh('game-a');await h.flush();assert.ok(h.calls.length>n);h.dispose();
  });
  await check('Incomplete or malformed matrix never implies readiness',async()=>{
   const duplicate=ready();duplicate[15].stage_no=1;const wrongWarning=ready();wrongWarning[0].warnings=null;

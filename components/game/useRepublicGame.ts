@@ -18,6 +18,12 @@ import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
 type ReadScope='all'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
+const BOOTSTRAP_TIMEOUT_MS=12000;
+async function within<T>(promise:PromiseLike<T>,ms=BOOTSTRAP_TIMEOUT_MS,label='Запрос к серверу'):Promise<T>{
+ let timer:ReturnType<typeof setTimeout>|undefined;
+ try{return await Promise.race([Promise.resolve(promise),new Promise<T>((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+' не завершился за '+Math.round(ms/1000)+' с. Сервер игровых данных не отвечает.')),ms)})])}
+ finally{if(timer)clearTimeout(timer)}
+}
 
 export function useRepublicGame(gameId:string){
  const router=useRouter();
@@ -33,7 +39,7 @@ export function useRepublicGame(gameId:string){
  const [profileGameId,setProfileGameId]=useState('');
  const [introAccountSeen,setIntroAccountSeen]=useState(false);
  const [chatMediaError,setChatMediaError]=useState(''),[chatMediaPhase,setChatMediaPhase]=useState<MediaUploadPhase>('idle');
- const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('connecting');
+ const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('disconnected');
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),activeViewRef=useRef<View>('dashboard'),chatOpenRef=useRef(false);
  activeViewRef.current=activeView;chatOpenRef.current=chatOpen;
  const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
@@ -123,85 +129,48 @@ export function useRepublicGame(gameId:string){
 
  useEffect(()=>{
   alive.current=true;
-  clearGameData();setLoading(true);setRealtimeState('connecting');
+  clearGameData();setLoading(true);setRealtimeState('disconnected');
   let disposed=false,authReloadTimer:ReturnType<typeof setTimeout>|undefined;
   const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
    if(disposed)return;
    const nextUser=session?.user.id||null;
-   // A temporary refresh-token outage is not an explicit sign-out.
-   // Only navigate away when a confirmed missing session is detected in
-   // loadAll, or when the user explicitly signs out.
+   // The explicit loadAll below owns the initial bootstrap. Ignoring the
+   // duplicate INITIAL_SESSION callback avoids a second simultaneous entry.
+   if(event==='INITIAL_SESSION'&&authUser.current===undefined)return;
    if(!nextUser&&event!=='SIGNED_OUT')return;
    if(!adoptUser(nextUser,event==='SIGNED_OUT'))return;
    setError('');setLoading(!!nextUser);
    if(!nextUser)setRealtimeState('disconnected');
    clearTimeout(authReloadTimer);
-   // Supabase invokes this callback while holding its auth lock. Start reads
-   // after the callback returns, rather than awaiting another auth operation.
    authReloadTimer=setTimeout(()=>{if(!disposed){if(nextUser)void loadAll();else router.replace('/')}},0);
   });
   setProfileGameId('');
   void loadAll();
-  const live=supabase.channel('republic:'+gameId)
-   .on('postgres_changes',{event:'*',schema:'public',table:'games',filter:'id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_members',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_office_assignments',filter:'game_id=eq.'+gameId},()=>void loadRepublicOffices())
-   .on('postgres_changes',{event:'*',schema:'public',table:'state_metrics',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_stages',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_parties',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_votes',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_events',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'formal_documents',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload());
-  for(const table of ['game_members','game_office_assignments','game_stages','game_parties','game_votes','formal_documents'])live.on('postgres_changes',{event:'DELETE',schema:'public',table},()=>scheduleRealtimeReload());
-  live.subscribe(status=>{if(disposed)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');});
-  const recover=()=>{void hydrateActiveView();notifyGameDataRefresh(gameId);if(activeViewRef.current==='budget')void refreshBudgetPulse()};
+  const recover=()=>{if(authUser.current&&acceptedMember.current){void hydrateActiveView();notifyGameDataRefresh(gameId);if(activeViewRef.current==='budget')void refreshBudgetPulse()}};
   const visible=()=>{if(document.visibilityState==='visible')recover()};
   window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
-  liveRef.current=live;
-  return()=>{disposed=true;alive.current=false;readEpoch.current++;subscription.unsubscribe();clearTimeout(authReloadTimer);window.removeEventListener('focus',recover);window.removeEventListener('online',recover);document.removeEventListener('visibilitychange',visible);if(realtimeReloadTimer.current){clearTimeout(realtimeReloadTimer.current);realtimeReloadTimer.current=null}realtimeReloadVersion.current++;realtimeReloadRunning.current=false;realtimeReloadQueued.current=false;if(liveRef.current===live)liveRef.current=null;void supabase.removeChannel(live)};
+  return()=>{disposed=true;alive.current=false;readEpoch.current++;subscription.unsubscribe();clearTimeout(authReloadTimer);window.removeEventListener('focus',recover);window.removeEventListener('online',recover);document.removeEventListener('visibilitychange',visible);if(realtimeReloadTimer.current){clearTimeout(realtimeReloadTimer.current);realtimeReloadTimer.current=null}realtimeReloadVersion.current++;realtimeReloadRunning.current=false;realtimeReloadQueued.current=false;};
  },[gameId]);
 
  useEffect(()=>{
-  if(!me?.user_id)return;
-  let live=supabase.channel('republic-view:'+gameId+':'+activeView+':'+(chatOpen?'chat':'quiet'));
-  let handlers=0;
-  const on=(table:string,callback:()=>void,event:'*'|'INSERT'='*',filter=true)=>{
-   handlers++;
-   live=live.on('postgres_changes',{event,schema:'public',table,...(filter?{filter:'game_id=eq.'+gameId}:{})},callback);
-  };
-  if(activeView==='votes'){on('game_ballots',()=>scheduleRealtimeReload(),'*',false);on('game_evaluations',()=>scheduleRealtimeReload());}
-  if(activeView==='events'||activeView==='teacher')on('game_crises',()=>scheduleRealtimeReload());
-  if(activeView==='documents')on('formal_document_history',()=>void loadFormalRegistry());
-  if(activeView==='parties'||activeView==='profile'){on('game_profiles',()=>void loadPartyAssets());on('party_documents',()=>void loadPartyAssets());}
-  if(activeView==='parties'||activeView==='teacher'){
-   on('party_invitations',()=>void loadPartyRepresentation());
-   on('party_member_mandates',()=>void loadPartyRepresentation());
-   on('party_agreements',()=>void loadPartyRepresentation());
+  if(!me?.user_id||me.game_id!==gameId)return;
+  // Supabase Realtime currently spends seconds scanning the large
+  // supabase_realtime publication. Do not let that infrastructure path
+  // compete with 30 classroom clients. Keep the UI eventually consistent
+  // through one bounded visible-tab refresh and immediate local invalidation.
+  setRealtimeState('disconnected');
+  let running=false,queued=false;
+  async function update(){
+   if(!alive.current||document.visibilityState==='hidden')return;
+   if(running){queued=true;return}
+   running=true;
+   try{await hydrateActiveView()}
+   finally{running=false;if(queued&&alive.current){queued=false;setTimeout(()=>void update(),500)}}
   }
-  if(activeView==='actions'||activeView==='teacher'){
-   on('political_posts',()=>void loadPoliticalWall());
-   on('political_post_media',()=>void loadPoliticalWall());
-   on('state_metric_history',()=>void loadPoliticalWall());
-  }
-  if(activeView==='teacher'){
-   on('game_activity',()=>void loadClassroomTelemetry());
-   on('game_presence',()=>void loadClassroomTelemetry());
-   on('impact_rules',()=>void loadImpactEngine());
-   on('impact_ledger',()=>void loadImpactEngine());
-  }
-  if(activeView==='budget')on('event_case_outcomes',()=>void syncBudget(),'INSERT');
-  if(chatOpen){
-   on('chat_channels',()=>void loadChatOverview());
-   on('channel_members',()=>void loadChatOverview(),'*',false);
-   on('chat_messages',()=>{void loadChatOverview();if(channelRef.current)void loadMessages(channelRef.current)},'INSERT');
-   on('chat_pins',()=>{if(channelRef.current)void loadChatPins(channelRef.current)});
-   on('chat_channel_state',()=>void loadChatOverview());
-   on('chat_mentions',()=>void loadChatOverview());
-  }
-  if(!handlers)return;
-  live.subscribe();
-  return()=>{void supabase.removeChannel(live)};
- },[gameId,activeView,chatOpen,me?.user_id]);
+  const interval=setInterval(()=>void update(),30000);
+  return()=>{clearInterval(interval)};
+ },[gameId,me?.user_id]);
+
 
  useEffect(()=>()=>{
   const rec=recorder.current;
@@ -232,10 +201,11 @@ export function useRepublicGame(gameId:string){
  },[game?.turn_ends_at,game?.turn_open]);
 
  async function readIdentity(userId:string){
-  return Promise.all([
-   supabase.from('games').select('*').eq('id',gameId).maybeSingle(),
-   supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',userId).maybeSingle()
-  ]);
+  const r=await supabase.rpc('get_my_game_identity',{p_game:gameId});
+  if(r.error)return [{data:null,error:r.error},{data:null,error:r.error}] as const;
+  const payload=(r.data||{}) as {game?:Game|null;member?:Member|null};
+  const member=payload.member&&payload.member.user_id===userId?payload.member:null;
+  return [{data:payload.game||null,error:null},{data:member,error:null}] as const;
  }
 
  async function acceptIdentity(g:{data:unknown;error:unknown},m:{data:unknown;error:unknown},userId:string){
@@ -253,31 +223,30 @@ export function useRepublicGame(gameId:string){
   let ticket=startRead('all');
   if(show)setLoading(true);
   try{
-   const auth=await supabase.auth.getSession();
+   const auth=await within(supabase.auth.getSession(),8000,'Проверка сессии');
    if(!readCurrent(ticket,'all'))return;
    if(auth.error)throw auth.error;
    const u=auth.data.session?.user;
    if(!u){adoptUser(null);setLoading(false);router.replace('/');return}
    if(adoptUser(u.id)){ticket=startRead('all');if(show)setLoading(true)}
-   let [g,m]=await readIdentity(u.id);
+   let [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Открытие игровой сессии');
    if(!readCurrent(ticket,'all'))return;
    if(g.error||m.error){
     await new Promise(resolve=>setTimeout(resolve,250));
-    [g,m]=await readIdentity(u.id);
+    [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Повторное открытие игровой сессии');
     if(!readCurrent(ticket,'all'))return;
    }
    if(!g.error&&!m.error&&(!g.data||!m.data)){
-    const access=await supabase.rpc('ensure_my_game_access',{p_game:gameId});
+    const access=await within(supabase.rpc('ensure_my_game_access',{p_game:gameId}),BOOTSTRAP_TIMEOUT_MS,'Проверка доступа к игре');
     if(!readCurrent(ticket,'all'))return;
     if(access.error)throw access.error;
-    [g,m]=await readIdentity(u.id);
+    [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Чтение доступа к игре');
     if(!readCurrent(ticket,'all'))return;
    }
    if(!await acceptIdentity(g,m,u.id)){
     readEpoch.current++;clearGameData();setError('Нет доступа к игре');setLoading(false);return;
    }
    setLoading(false);
-   if(show)void hydrateActiveView();else await hydrateActiveView();
   }catch(error){if(readCurrent(ticket,'all'))setError(error)}
   finally{if(readCurrent(ticket,'all'))setLoading(false)}
  }
