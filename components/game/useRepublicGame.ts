@@ -510,7 +510,8 @@ export function useRepublicGame(gameId:string){
   if(!messageId||!storagePath)return null;
   if(!messages.some(m=>m.id===messageId&&m.storage_path===storagePath)&&
      !pinnedMessages.some(m=>m.id===messageId&&m.storage_path===storagePath))return null;
-  const r=await cachedSignedAsset('game-media',storagePath,3600);
+  // Explicit media refresh must renew an expired signed URL, not reuse the cache.
+  const r=await supabase.storage.from('game-media').createSignedUrl(storagePath,3600);
   if(!readActive(ticket))return null;
   if(r.error||!r.data?.signedUrl){setChatMediaError('Не удалось обновить ссылку на аудио: '+(r.error?.message||'Повторите попытку.'));return null}
   const url=r.data.signedUrl;
