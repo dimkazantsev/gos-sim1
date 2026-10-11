@@ -3,7 +3,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 type Assignment={id:string;question_id:number;user_id:string;chosen_index:number|null;is_correct:boolean|null;answered_at:string|null;stage_no:number};
-type Question={id:number;question:string;options:string[];correct_index:number;topic:string};
+type Question={id:number;question:string;options:string[];correct_index:number;topic:string;explanation:string;legal_act:string;article:string;source_url:string};
 type Stats={user_id:string;correct:number;incorrect:number;pending:number};
 const CHECKS=[
  ['daily','3–5 заданий в сутки без повторов','Восстанавливаются ли вопросы, назначенные во время отсутствия участника?'],
@@ -71,7 +71,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
    <div className="blitzReviewList">{shown.map((q,i)=><details key={q.id}><summary>{i+1}. {q.question}</summary>
     <p><strong>Тема:</strong> {q.topic}</p>
     <ol>{q.options.map((option,index)=><li key={index} className={index===q.correct_index?'correct':''}>{option}{index===q.correct_index?' ✓ Правильный ответ':''}</li>)}</ol>
-    <p>Пояснение и нормативное основание доступны в записи банка. Для замечаний используйте «Проверки и корректировки» ниже.</p>
+    <p><strong>Объяснение:</strong> {q.explanation}</p><p><strong>НПА:</strong> <a href={q.source_url} target="_blank" rel="noopener noreferrer">{q.legal_act}, {q.article} ↗</a></p><label>Корректировка к вопросу<textarea rows={2} value={notes['q:'+q.id]||''} onChange={e=>setNotes(prev=>({...prev,['q:'+q.id]:e.target.value}))}/></label><button type="button" onClick={()=>void saveNote('q:'+q.id)}>Сохранить замечание</button>
    </details>)}</div>
   </details>
   <details open><summary>Матрица ответов — {questions.length} вопросов, {students.length} участников</summary>
