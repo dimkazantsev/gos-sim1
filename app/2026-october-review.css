@@ -196,3 +196,8 @@
 .gsChatV2 .chatComposeCompact .chatSendButton{margin-left:auto}
 .gsChatV2 .chatComposeCompact .chatComposerHint{font-size:11px;min-width:0;flex:1}
 @media(max-width:540px){.gsChatV2 .chatCompose.chatComposeCompact{padding:5px 8px 6px;gap:4px}.gsChatV2 .chatComposeCompact .chatInputRow textarea{font-size:13px}}
+
+/* Overrides the older 112px reserved composer minimum only for compact chat. */
+.simChat.gsChatV2 .chatCompose.chatComposeCompact{min-height:0!important;flex:0 0 auto!important;max-height:min(240px,35dvh);overflow-y:visible}
+.gsChatV2 .chatComposeCompact .chatProcessTags>summary{min-height:30px;padding:5px 10px;line-height:18px}
+.gsChatV2 .chatComposeCompact .chatInputRow textarea{min-height:35px!important}
