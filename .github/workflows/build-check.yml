@@ -2,7 +2,7 @@ name: Build Check
 
 on:
   push:
-    branches: [main, "codex/civic-*", "codex/budget-amendments-*", "codex/project-audit-*", "fix/fast-login-*", "fix/stabilize-runtime-*", "fix/realtime-capacity-*", "fix/situation-icons-only-*", "fix/realtime-capacity-sync-indicator-*", "fix/bootstrap-no-realtime-*", "fix/password-login-bypass-refresh-*", "fix/profile-refresh-navigation-*", "fix/restore-current-screen-on-refresh-*"]
+    branches: [main, "codex/civic-*", "codex/budget-amendments-*", "codex/project-audit-*", "fix/fast-login-*", "fix/stabilize-runtime-*", "fix/realtime-capacity-*", "fix/situation-icons-only-*", "fix/realtime-capacity-sync-indicator-*", "fix/bootstrap-no-realtime-*", "fix/password-login-bypass-refresh-*", "fix/profile-refresh-navigation-*", "fix/restore-current-screen-on-refresh-*", "fix/events-targeted-stability-*"]
   workflow_dispatch:
 
 jobs:
