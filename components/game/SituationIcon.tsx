@@ -56,7 +56,11 @@ export function resolveSituationIcon(caseKey:string,title:string,category:string
  const seed=fnv(caseKey||category+' '+title);
  // A stable case-specific accent supplements the 324 thematic combinations.
  // New cases need no schema migration and previously assigned identities stay stable.
- const secondary=fnv('modifier:'+caseKey)%BADGES.length;
+ const curated=caseKey.match(/^bank-curated-v2-(\\d+)$/);
+ const legal=caseKey.match(/^bank-legal-2026-(\\d+)$/);
+ const authoredIndex=curated?Number(curated[1])-1:legal?50+Number(legal[1])-1:null;
+ const secondary=authoredIndex!==null&&authoredIndex>=0&&authoredIndex<324
+  ?Math.floor(authoredIndex/18)%BADGES.length:fnv('modifier:'+caseKey)%BADGES.length;
  return{primary,secondary,signature:seed.toString(16).padStart(8,'0'),key:TOPICS[primary].key+'-'+BADGES[secondary].key,label:TOPICS[primary].label};
 }
 const COLORS=[
