@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {CalendarDays,CheckCircle2,Send,UsersRound} from 'lucide-react';
+import {CalendarDays,CheckCircle2,RefreshCw,Send,UsersRound} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
@@ -158,7 +158,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  }
  if(!game||!me)return null;
  return <section className="eventWorkspace" aria-label="Event — ситуационные решения">
-  <header><div><small>EVENT · ИГРОВЫЕ СИТУАЦИИ</small><h2>События и решения</h2><p>Индивидуальные задания, совместные решения 2–3 участников и общее голосование. После решения здесь видны голоса по каждому варианту, последствия и итоговое изменение доверия.</p><button type="button" className="secondary" onClick={()=>void reload(true)} aria-label="Обновить список событий и результаты">↻ Обновить события</button></div><span><CalendarDays size={17} aria-hidden="true"/>{teacher?'Назначенные ситуации':me.kind==='observer'?'Гостевой просмотр':'Ваши задания'}</span></header>
+  <header className="eventWorkspaceHeader"><div className="eventWorkspaceHeading"><small>EVENT · ИГРОВЫЕ СИТУАЦИИ</small><div className="eventWorkspaceTitleRow"><h2>События и решения</h2><button type="button" className="eventRefreshButton secondary" onClick={()=>void reload(true)} aria-label="Обновить список событий и результаты"><RefreshCw size={16} aria-hidden="true"/><span>Обновить</span></button></div><p>Индивидуальные задания, совместные решения 2–3 участников и общее голосование. После решения здесь видны голоса по каждому варианту, последствия и итоговое изменение доверия.</p></div><span><CalendarDays size={17} aria-hidden="true"/>{teacher?'Назначенные ситуации':me.kind==='observer'?'Гостевой просмотр':'Ваши задания'}</span></header>
   {mode==='manage'&&teacher&&<div className="eventDecisionOverview" aria-label="Статистика решений по игровым событиям">
    <article><small>Назначено заданий</small><strong>{seenAssignments.length}</strong><span>{teacher?'Всем участникам':'Вам'}</span></article>
    <article><small>Решено</small><strong>{completedCount}<em> / {seenAssignments.length}</em></strong><span>{ratio(completedCount,seenAssignments.length)}% заданий</span></article>
@@ -174,7 +174,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    <div><strong>{readyCases.filter(c=>c.seriousness==='light').length}</strong><small>Повседневные ситуации из готовых</small></div>
   </div>}
   {mode==='manage'&&teacher&&<details className="eventComposerPanel civicDisclosure projectDisclosure">
-   <DisclosureSummary icon={Send} title="Направить событие…" description="Ситуация, варианты решения и участники"/><div className="civicDisclosureBody">
+   <DisclosureSummary icon={Send} title="Создать событие" description="Ситуация, варианты решения и участники"/><div className="civicDisclosureBody">
    <div className="eventEditorGrid">
     <label>Название<input value={title} maxLength={180} onChange={e=>setTitle(e.target.value)} placeholder="Краткий заголовок ситуации"/></label>
     <StyledSelect label="Сфера" value={category} onChange={setCategory} options={['Государственное управление','Экономика','Международные отношения','Образование','Здравоохранение','Экология','Муниципальное управление','Культура и протокол','Социальная политика'].map(v=>({value:v,label:v}))}/>
