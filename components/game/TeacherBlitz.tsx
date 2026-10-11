@@ -19,7 +19,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
  const gameId=g.game?.id||'';
  const students=g.members.filter(m=>m.game_id===gameId&&m.kind==='student');
  const [questions,setQuestions]=useState<Question[]>([]),[items,setItems]=useState<Assignment[]>([]),[stats,setStats]=useState<Stats[]>([]);
- const [showBank,setShowBank]=useState(true),[query,setQuery]=useState(''),[sort,setSort]=useState<'question'|'topic'>('question'),[limit,setLimit]=useState(30);
+ const [showBank,setShowBank]=useState(true),[query,setQuery]=useState(''),[actFilter,setActFilter]=useState('all'),[sort,setSort]=useState<'question'|'topic'>('question'),[limit,setLimit]=useState(30);
  const [notes,setNotes]=useState<Record<string,string>>({}),[error,setError]=useState(''),[saved,setSaved]=useState('');
  const loadedIds=useRef<Set<number>>(new Set()),sentinel=useRef<HTMLDivElement>(null);
  useEffect(()=>{if(!gameId)return;let active=true;loadedIds.current.clear();setItems([]);
@@ -35,7 +35,8 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   }
   void load();return()=>{active=false}
  },[gameId]);
- const filtered=useMemo(()=>questions.filter(q=>(q.question+' '+q.topic).toLocaleLowerCase('ru').includes(query.trim().toLocaleLowerCase('ru'))).sort((a,b)=>sort==='topic'?(a.topic.localeCompare(b.topic,'ru')||a.question.localeCompare(b.question,'ru')):a.question.localeCompare(b.question,'ru')),[questions,query,sort]);
+ const acts=useMemo(()=>[...new Set(questions.map(q=>q.legal_act))].sort((a,b)=>a.localeCompare(b,'ru')),[questions]);
+  const filtered=useMemo(()=>questions.filter(q=>(actFilter==='all'||q.legal_act===actFilter)&&(q.question+' '+q.topic+' '+q.legal_act+' '+q.article).toLocaleLowerCase('ru').includes(query.trim().toLocaleLowerCase('ru'))).sort((a,b)=>sort==='topic'?(a.topic.localeCompare(b.topic,'ru')||a.question.localeCompare(b.question,'ru')):a.question.localeCompare(b.question,'ru')),[questions,query,actFilter,sort]);
  const shown=useMemo(()=>filtered.slice(0,limit),[filtered,limit]);
  const questionIds=shown.map(q=>q.id).join(',');
  useEffect(()=>{if(!gameId||!questionIds)return;let valid=true;
@@ -65,10 +66,11 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   {error&&<p role="alert">{error}</p>}
   <div className="blitzFilters">
    <input type="search" aria-label="Поиск блиц-вопросов" placeholder="Поиск по вопросу или теме" value={query} onChange={e=>{setQuery(e.target.value);setLimit(30)}}/>
+   <select aria-label="Фильтр по нормативному акту" value={actFilter} onChange={e=>{setActFilter(e.target.value);setLimit(30)}}><option value="all">Все нормативные акты</option>{acts.map(act=><option key={act} value={act}>{act}</option>)}</select>
    <select aria-label="Сортировка вопросов" value={sort} onChange={e=>{setSort(e.target.value as 'question'|'topic');setLimit(30)}}><option value="question">По вопросу</option><option value="topic">По тематике</option></select>
   </div>
   <details open={showBank} onToggle={e=>setShowBank(e.currentTarget.open)}><summary>Просмотр банка вопросов — {questions.length} записей (варианты, ответ и НПА)</summary>
-   <div className="blitzReviewList">{shown.map((q,i)=><details key={q.id}><summary>{i+1}. {q.question}</summary>
+   <div className="blitzReviewList">{shown.map((q,i)=><details key={q.id} open><summary>{i+1}. {q.question}</summary>
     <p><strong>Тема:</strong> {q.topic}</p>
     <ol>{q.options.map((option,index)=><li key={index} className={index===q.correct_index?'correct':''}>{option}{index===q.correct_index?' ✓ Правильный ответ':''}</li>)}</ol>
     <p><strong>Объяснение:</strong> {q.explanation}</p><p><strong>НПА:</strong> <a href={q.source_url} target="_blank" rel="noopener noreferrer">{q.legal_act}, {q.article} ↗</a></p><label>Корректировка к вопросу<textarea rows={2} value={notes['q:'+q.id]||''} onChange={e=>setNotes(prev=>({...prev,['q:'+q.id]:e.target.value}))}/></label><button type="button" onClick={()=>void saveNote('q:'+q.id)}>Сохранить замечание</button>
