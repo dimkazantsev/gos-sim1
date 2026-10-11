@@ -1,0 +1,26 @@
+name: Event Credit and Compact Chat Verification
+on:
+  push:
+    branches: ["fix/pau-events-deliberate-routing-authority-*"]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: node scripts/event-delegation-scoring-check.cjs
+      - run: node scripts/event-option-legality-check.cjs
+      - run: node scripts/chat-logic-check.cjs
+      - run: node scripts/chat-media-transport-check.cjs
+      - run: node scripts/chat-voice-player-check.cjs
+      - run: npm run design:check
+      - run: npm run build
