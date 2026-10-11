@@ -44,6 +44,7 @@ export function useRepublicGame(gameId:string){
  activeViewRef.current=activeView;chatOpenRef.current=chatOpen;
  const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const bootstrapRunning=useRef(false),bootstrapQueued=useRef(false);
  const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,PendingMediaUpload>()),voiceAnalysisRef=useRef<Promise<{waveform:number[];duration:number}|null>|null>(null);
 
  const profiles=useMemo(()=>currentGameProfiles(profileRows,members,gameId),[profileRows,members,gameId]);
@@ -259,6 +260,8 @@ export function useRepublicGame(gameId:string){
  }
 
  async function loadAll(show=true){
+  if(bootstrapRunning.current){bootstrapQueued.current=true;return}
+  bootstrapRunning.current=true;
   let ticket=startRead('all');
   if(show)setLoading(true);
   try{
@@ -286,9 +289,12 @@ export function useRepublicGame(gameId:string){
     readEpoch.current++;clearGameData();setError('Нет доступа к игре');setLoading(false);return;
    }
    setLoading(false);
-   if(show)void hydrateActiveView();else await hydrateActiveView();
   }catch(error){if(readCurrent(ticket,'all'))setError(error)}
-  finally{if(readCurrent(ticket,'all'))setLoading(false)}
+  finally{
+   bootstrapRunning.current=false;
+   if(readCurrent(ticket,'all'))setLoading(false);
+   if(bootstrapQueued.current&&alive.current){bootstrapQueued.current=false;queueMicrotask(()=>void loadAll(false))}
+  }
  }
 
  async function loadCoreSections(){
