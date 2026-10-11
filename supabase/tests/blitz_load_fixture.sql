@@ -11,7 +11,8 @@ CREATE TABLE public.game_members (game_id uuid NOT NULL, user_id uuid NOT NULL, 
 CREATE TABLE public.blitz_questions (
  id bigint PRIMARY KEY, question text NOT NULL, topic text NOT NULL, options jsonb NOT NULL,
  correct_index integer NOT NULL, legal_act text NOT NULL, article text NOT NULL,
- source_url text NOT NULL, explanation text NOT NULL
+ source_url text NOT NULL, explanation text NOT NULL,
+ verified boolean NOT NULL DEFAULT true
 );
 CREATE TABLE public.blitz_assignments (
  id uuid PRIMARY KEY, game_id uuid NOT NULL, user_id uuid NOT NULL,
