@@ -51,7 +51,23 @@ function harness({effects=false}={}){
     }catch(error){reject(error);}}
    };return query;
   },
-  rpc:async(name,args)=>{requests++;return{data:name==='has_seen_my_intro'?true:name==='get_my_chat_overview'?[{channel_id:'channel-a',unread_count:0}]:[],error:null};},
+  rpc:async(name,args)=>{
+   requests++;
+   if(name==='get_my_game_identity'){
+    const snapshot={revision,user,gameId,memberKind};
+    const gameNumber=(counts.get('games')||0)+1;counts.set('games',gameNumber);
+    const memberNumber=(counts.get('game_members')||0)+1;counts.set('game_members',memberNumber);
+    await holds.get('games:'+gameNumber)?.promise;
+    await holds.get('game_members:'+memberNumber)?.promise;
+    if(failures.has('games'))return{data:null,error:{message:'simulated read outage games',code:failureCodes.get('games')}};
+    if(failures.has('game_members'))return{data:null,error:{message:'simulated read outage game_members',code:failureCodes.get('game_members')}};
+    return{data:{
+     game:{id:snapshot.gameId,current_round:snapshot.revision,title:'revision-'+snapshot.revision},
+     member:{game_id:snapshot.gameId,user_id:snapshot.user,full_name:snapshot.user,kind:snapshot.user==='teacher-a'?snapshot.memberKind:'student'}
+    },error:null};
+   }
+   return{data:name==='has_seen_my_intro'?true:name==='get_my_chat_overview'?[{channel_id:'channel-a',unread_count:0}]:[],error:null};
+  },
   storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/media'},error:null})})}
  };
  const win={addEventListener:(key,fn)=>listeners.set(key,fn),removeEventListener:(key,fn)=>{if(listeners.get(key)===fn)listeners.delete(key);},localStorage:{getItem:()=>null,setItem:()=>{}}};
