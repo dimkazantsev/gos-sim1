@@ -59,7 +59,11 @@ jobs:
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_setup.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261012100100_blitz_attempt_lock_hardening.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
-          sleep 2
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -c "SELECT schemaname,tablename FROM pg_publication_tables WHERE pubname='supabase_realtime' AND schemaname='public' AND tablename='blitz_assignments';" | grep -q blitz_assignments
+          REALTIME_CONTAINER="$(docker ps --format '{{.Names}}' | grep '^supabase_realtime_' | head -1)"
+          test -n "$REALTIME_CONTAINER"
+          docker restart "$REALTIME_CONTAINER"
+          sleep 4
       - name: Run 30 real local Supabase sessions
         run: node supabase/tests/blitz_supabase_30_sessions.cjs
       - name: Stop local Supabase
