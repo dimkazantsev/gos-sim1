@@ -19,16 +19,17 @@ import styles from './FederalBudgetSimulator.module.css';
 type Plan={id:string;title:string;draft:BudgetDraft;revision:number;status:'draft'|'document'|'published';document_id:string|null;registry_no:string|null;updated_at:string;calculation:{revenue:number;expenditure:number;funding_gap:number}};
 type Contract={id:string;source_key:FundingKey;principal:number;annual_rate:number;maturity_month:number;status:string};
 type Entry={id:number;note:string;amount:number|null;created_at:string;kind:string;source_key:string};
-type Props={g:ReturnTypeRepublic;context:FiscalContext|null;regions:FiscalRegion[];rates:FiscalRate[];programs?:SignedBudgetProgram[];readOnly:boolean;onOpenDocument:(id:string)=>void;onOpenEvents:()=>void;onOpenVotes?:(id:string)=>void;onOpenStage?:(stageNo:number)=>void;onSaved:()=>Promise<void>};
+type BudgetTab='revenue'|'regions'|'expense'|'finance'|'law';
+type Props={activeTab:BudgetTab;onActiveTabChange:(tab:BudgetTab)=>void;g:ReturnTypeRepublic;context:FiscalContext|null;regions:FiscalRegion[];rates:FiscalRate[];programs?:SignedBudgetProgram[];readOnly:boolean;onOpenDocument:(id:string)=>void;onOpenEvents:()=>void;onOpenVotes?:(id:string)=>void;onOpenStage?:(stageNo:number)=>void;onSaved:()=>Promise<void>};
 const pct=(n:number)=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n)+' %';
 function AmountInput({value,onValue,...props}:{value:number;onValue:(n:number)=>void}&Omit<InputHTMLAttributes<HTMLInputElement>,'value'|'onChange'>){
  const [text,setText]=useState(String(value));const focused=useRef(false);
  useEffect(()=>{if(!focused.current)setText(String(value));},[value]);
  return <input {...props} type="number" value={text} onFocus={()=>{focused.current=true;}} onChange={e=>{const v=e.target.value;setText(v);if(v.trim()&&Number.isFinite(Number(v)))onValue(Number(v));}} onBlur={()=>{focused.current=false;setText(String(value));}}/>;
 }
-export default function FederalBudgetSimulator({g,context,regions,rates,programs=[],readOnly,onOpenDocument,onOpenEvents,onOpenVotes,onOpenStage,onSaved}:Props){
+export default function FederalBudgetSimulator({activeTab:tab,onActiveTabChange:setTab,g,context,regions,rates,programs=[],readOnly,onOpenDocument,onOpenEvents,onOpenVotes,onOpenStage,onSaved}:Props){
  const [state,setState]=useState<SimulatorState|null>(null),[plans,setPlans]=useState<Plan[]>([]),[requests,setRequests]=useState<BudgetTransfer[]>([]),[contracts,setContracts]=useState<Contract[]>([]),[ledger,setLedger]=useState<Entry[]>([]),[canPrepare,setCanPrepare]=useState(false),[canRequest,setCanRequest]=useState(false);
- const [draft,setDraft]=useState<BudgetDraft>(newBudgetDraft),[selectedId,setSelectedId]=useState(''),[revision,setRevision]=useState(0),[dirty,setDirty]=useState(false),[tab,setTab]=useState('revenue'),[busy,setBusy]=useState(false),[confirmDelete,setConfirmDelete]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[eventCount,setEventCount]=useState(0),[regionalEvents,setRegionalEvents]=useState<BudgetRegionalEvent[]>([]);
+ const [draft,setDraft]=useState<BudgetDraft>(newBudgetDraft),[selectedId,setSelectedId]=useState(''),[revision,setRevision]=useState(0),[dirty,setDirty]=useState(false),[busy,setBusy]=useState(false),[confirmDelete,setConfirmDelete]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[eventCount,setEventCount]=useState(0),[regionalEvents,setRegionalEvents]=useState<BudgetRegionalEvent[]>([]);
  const tabId=useId(),projectTabId=useId(),projectPanelId=useId();const tabs=[['revenue','Доходы',Coins],['regions','Регионы',Send],['expense','Расходы',Wallet],['finance','Баланс',Landmark],['law','Проект ФЗ',FileText]] as const;
  const draftSessions=useRef(new Map<string,{draft:BudgetDraft;dirty:boolean;revision:number}>());
  const initialized=useRef('');const scope=useRef('');scope.current=(g.game?.id||'')+':'+(g.me?.user_id||'');
