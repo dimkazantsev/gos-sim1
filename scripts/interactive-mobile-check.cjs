@@ -44,7 +44,7 @@ export default function UiTest(){
    },revertImpactEntry:async()=>true} as unknown as ReturnTypeRepublic;
  return <div style={{width:'100%',maxWidth:'100vw',padding:'12px 12px 120px'}}>
   <section className="interfaceCaseTest"><div className="eventTileGrid">{caseTiles.map(c=><EventCaseTile key={c.id} item={c} meta={c.category} onClick={()=>{setOpened(c.id);setAnswer('')}}/>)}</div></section>
-  {activeCase&&<EventCaseModal title={activeCase.title} onClose={()=>setOpened('')}><EventComic title={activeCase.title} caseKey={activeCase.case_key} category={activeCase.category} scene={activeCase.comic_scene}/><p>{activeCase.situation}</p><EventChoicePanel labels={activeCase.decision_options} decisions={[{actor_id:'a',choice:'option_1'},{actor_id:'b',choice:'option_2'},...(answer?[{actor_id:'c',choice:answer}]:[])]} members={[{user_id:'a',full_name:'Анна'},{user_id:'b',full_name:'Илья'},{user_id:'c',full_name:'Мария'}] as any} profiles={[]} currentChoice={answer} canAnswer={!answer} onAnswer={setAnswer}/></EventCaseModal>}
+  {activeCase&&<EventCaseModal title={activeCase.title} onClose={()=>setOpened('')}><EventComic title={activeCase.title} caseKey={activeCase.case_key} category={activeCase.category} scene={activeCase.comic_scene}/><p>{activeCase.situation}</p><EventChoicePanel labels={activeCase.decision_options} decisions={[{actor_id:'a',choice:'option_1'},{actor_id:'b',choice:'option_2'},...(answer?[{actor_id:'c',choice:answer}]:[])]} members={[{user_id:'a',full_name:'Анна'},{user_id:'b',full_name:'Илья'},{user_id:'c',full_name:'Мария'}] as any} profiles={[]} currentChoice={answer} canAnswer={!answer} revealResults={!!answer} onAnswer={setAnswer}/></EventCaseModal>}
   <section className="civicVotes"><VoteBallotControls vote={{id:'test-vote',voting_mode:'mandate',status:'open',allow_abstain:true} as any} maxWeight={216} canCast={true} onSubmit={async(y,n,a)=>{setAllocation([y,n,a].join('/'));return true}}/><output id="ballot-result">{allocation}</output></section>
   <main className="teacherSimple"><ImpactRulesPanel g={g} initialExpandedRuleId="r1"/></main>
   {menu&&<div className="mobileMoreBackdrop" onClick={()=>setMenu(false)}>
@@ -120,7 +120,20 @@ async function main(){
   assert(artworkBox&&artworkBox.width>0&&artworkBox.height>0,'Vector must be visible');
   assert(Math.abs(artworkBox.width/artworkBox.height-16/9)<.03,'Icon panel is 16:9');
   assert.equal(await modal.locator('.eventOptionButtons').count(),0,'No duplicate answer controls');
-  const answers=modal.locator('.eventAnswerChoice');assert.equal(await answers.count(),require('../content/events-v2.json')[0].decision_options.length,'All authored options are rendered once');await answers.first().click();await desktop.waitForFunction(()=>document.querySelector('.eventAnswerChoice[aria-pressed=true]')?.textContent.includes('67%'));assert.equal(await answers.first().locator('.eventVoter').count(),2);assert.equal(await answers.first().isDisabled(),true,'Submitted answer is locked');
+  const answers=modal.locator('.eventAnswerChoice');
+   assert.equal(await answers.count(),require('../content/events-v2.json')[0].decision_options.length,'All authored options are rendered once');
+   assert.equal(await modal.locator('.eventAnswerProgress').count(),0,'Unanswered situation must not reveal other votes');
+   const firstLabel=await answers.first().locator('.eventAnswerHeading b').textContent();
+   const firstIndex=require('../content/events-v2.json')[0].decision_options.indexOf(firstLabel);
+   assert(firstIndex>=0,'Displayed option must match one authored answer despite deterministic shuffling');
+   await answers.first().click();
+   await desktop.waitForFunction(()=>document.querySelector('.eventAnswerChoice[aria-pressed=true] .eventAnswerProgress')!==null);
+   const chosen=modal.locator('.eventAnswerChoice[aria-pressed=true]');
+   const expectedVotes=1+(firstIndex<2?1:0);
+   const expectedPercent=Math.round(expectedVotes/3*100);
+   assert((await chosen.locator('.eventAnswerHeading strong').textContent()).includes(expectedPercent+'%'),'Chosen option percentage reflects recorded voters');
+   assert.equal(await chosen.locator('.eventVoter').count(),expectedVotes,'Visible voters match the selected choice');
+   assert.equal(await chosen.isDisabled(),true,'Submitted answer is locked');
   const modalBounds=await modal.boundingBox();assert(modalBounds.width<=width-15,'Modal fits the viewport');
   await desktop.screenshot({path:path.join(screens,'event-modal-'+width+'.png')});
   await desktop.keyboard.press('Escape');await modal.waitFor({state:'detached'});
