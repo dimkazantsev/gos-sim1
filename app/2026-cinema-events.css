@@ -230,3 +230,18 @@
 .eventWorkspace .eventWorkspaceHeaderActions>.eventWorkspaceStatus>svg{flex:none}
 .eventWorkspace .eventWorkspaceHeaderActions>.eventRefreshButton.secondary{min-height:44px;align-self:center}
 @media(max-width:740px){.eventWorkspace .eventWorkspaceHeaderActions{justify-content:flex-start;width:100%}}
+
+/* Lazy event bank: standalone bottom disclosure with scoped bulk controls. */
+.eventWorkspace>.autoEventBankPanel{padding:0;background:transparent;border:0;box-shadow:none}
+.eventWorkspace .autoEventBankPanel .autoEventBank{border-radius:15px;border-color:#d4e1f3}
+.eventWorkspace .eventBankBulkActions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 12px;border-radius:11px;border:1px solid #dce6f5;background:#f8fbff}
+.eventWorkspace .eventBankBulkActions>label,.eventWorkspace .eventBankSelection{display:inline-flex;align-items:center;gap:8px;color:#46658f;font-size:12px;font-weight:720}
+.eventWorkspace .eventBankBulkActions input[type=checkbox],.eventWorkspace .eventBankSelection input[type=checkbox]{width:17px;height:17px;min-width:17px;min-height:17px;margin:0;accent-color:#315efb}
+.eventWorkspace .eventBankBulkActions>span{font-size:12px;color:#6980a1}
+.eventWorkspace .eventBankBulkActions>.eventBankDeleteButton{margin-left:auto;min-height:40px;padding:8px 13px;border:1px solid #e6bbc5;border-radius:10px;background:#fff7f8;color:#ab3451;font-size:12px;font-weight:780;display:inline-flex;align-items:center;gap:8px}
+.eventWorkspace .eventBankBulkActions>.eventBankDeleteButton:hover:not(:disabled){background:#fff0f2;border-color:#dc9eac}
+.eventWorkspace .eventBankBulkActions>.eventBankDeleteButton:disabled{opacity:.4}
+.eventWorkspace .eventBankSelectableTile{display:grid;gap:6px;min-width:0;padding:7px;border:1px solid #dfe7f2;border-radius:12px;background:white}
+.eventWorkspace .eventBankSelectableTile>.eventBankSelection{padding:3px 6px;min-height:27px}
+.eventWorkspace .eventBankSelectableTile>.eventCaseTile{width:100%;min-width:0}
+@media(max-width:620px){.eventWorkspace .eventBankBulkActions>.eventBankDeleteButton{flex:1 1 100%;justify-content:center;margin-left:0}}
