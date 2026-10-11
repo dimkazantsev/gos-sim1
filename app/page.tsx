@@ -3,7 +3,7 @@ import {FormEvent,useMemo,useState} from 'react';
 import {ArrowUpRight,ArrowRight,Eye,EyeOff,GraduationCap,Landmark,LockKeyhole,LoaderCircle} from 'lucide-react';
 import CivicArtwork from '@/components/ui/CivicArtwork';
 import {useRouter} from 'next/navigation';
-import {supabase} from '@/lib/supabase';
+import {createPasswordAuthClient,supabase} from '@/lib/supabase';
 
 function readableError(err:unknown){
  const raw=err&&typeof err==='object'&&'message' in err?String((err as {message?:unknown}).message??''):err instanceof Error?err.message:'';
@@ -51,19 +51,24 @@ export default function Home(){
    // getSession() may auto-refresh an old local session before checking the
    // credentials entered in this form, so a transient refresh-token 504 can
    // incorrectly block a valid password login.
-   let authError:unknown=null,authenticated=false;
-   supabase.auth.stopAutoRefresh();
+   let authError:unknown=null,session:null|{access_token:string;refresh_token:string}=null;
+   const loginClient=createPasswordAuthClient();
    for(let attempt=0;attempt<2;attempt++){
-    const auth=await supabase.auth.signInWithPassword({email:loginEmail.trim().toLowerCase(),password:loginPassword});
-    if(!auth.error){authError=null;authenticated=true;break}
-    authError=auth.error;
-    const detail=[auth.error.status,auth.error.code,auth.error.message].filter(Boolean).join(' ');
-    const retry=/\b5\d\d\b|request_timeout|context deadline exceeded|timeout|temporarily unavailable|fetch failed|network/i.test(detail);
-    if(!retry||attempt===1)throw auth.error;
+    const auth=await loginClient.auth.signInWithPassword({email:loginEmail.trim().toLowerCase(),password:loginPassword});
+    if(!auth.error&&auth.data.session){
+     authError=null;
+     session={access_token:auth.data.session.access_token,refresh_token:auth.data.session.refresh_token};
+     break;
+    }
+    authError=auth.error||new Error('Сервер авторизации не вернул сессию.');
+    const detail=String(authError&&typeof authError==='object'&&'message' in authError?(authError as {message?:unknown}).message:authError||'');
+    const retry=/\b5\d\d\b|request_timeout|context deadline exceeded|timeout|temporarily unavailable|fetch failed|network|12 секунд/i.test(detail);
+    if(!retry||attempt===1)throw authError;
     await new Promise(resolve=>setTimeout(resolve,900));
    }
-   if(authError)throw authError;
-   if(authenticated)supabase.auth.startAutoRefresh();
+   if(authError||!session)throw authError||new Error('Сервер авторизации не вернул сессию.');
+   const adopted=await supabase.auth.setSession(session);
+   if(adopted.error)throw adopted.error;
    phase='game';
    // PostgREST can temporarily return 503 while rebuilding its schema cache.
    // Resume is idempotent, unlike join_game_with_code which records an audit event.
