@@ -14,11 +14,18 @@ function readableError(err:unknown){
  return raw||'Не удалось выполнить вход.';
 }
 
+function withDeadline<T>(operation:PromiseLike<T>,limitMs:number,message:string):Promise<T>{
+ let timer:ReturnType<typeof setTimeout>|undefined;
+ const deadline=new Promise<never>((_,reject)=>{timer=setTimeout(()=>reject(new Error(message)),limitMs)});
+ return Promise.race([Promise.resolve(operation),deadline]).finally(()=>{if(timer)clearTimeout(timer)});
+}
+
 export default function Home(){
  const router=useRouter();
  const [mode,setMode]=useState<'student'|'teacher'|'guest'>('student'),[createMode,setCreateMode]=useState(false);
  const [gameTitle,setGameTitle]=useState('Республика Политология'),[studentCode,setStudentCode]=useState(''),[fio,setFio]=useState(''),[group,setGroup]=useState(''),[gameCode,setGameCode]=useState(''),[invite,setInvite]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const [showCode,setShowCode]=useState(false);
+ const [loginStage,setLoginStage]=useState('');
  const [personalLogin,setPersonalLogin]=useState(false);
  const [loginEmail,setLoginEmail]=useState(''),[loginPassword,setLoginPassword]=useState(''),[loginGameCode,setLoginGameCode]=useState(''),[recoverySent,setRecoverySent]=useState(false);
  const heading=useMemo(()=>mode==='teacher'&&createMode?'Новое государство':mode==='teacher'?'Начнём занятие':mode==='guest'?'Просмотр Республики':'Ваш ход. Входите.',[mode,createMode]);
@@ -43,7 +50,7 @@ export default function Home(){
  }
 
  async function login(e:FormEvent){
-  e.preventDefault();if(busy)return;setBusy(true);setError('');
+  e.preventDefault();if(busy)return;setBusy(true);setError('');setLoginStage('Проверяем учётную запись…');
   let phase:'authentication'|'game'='authentication';
   try{
    if(typeof navigator!=='undefined'&&!navigator.onLine)throw new Error('Устройство не подключено к интернету. Проверьте сеть.');
@@ -51,45 +58,39 @@ export default function Home(){
    // getSession() may auto-refresh an old local session before checking the
    // credentials entered in this form, so a transient refresh-token 504 can
    // incorrectly block a valid password login.
-   let authError:unknown=null,session:null|{access_token:string;refresh_token:string}=null;
+   // A single bounded password request avoids amplifying Auth/DB outages.
    const loginClient=createPasswordAuthClient();
-   for(let attempt=0;attempt<2;attempt++){
-    const auth=await loginClient.auth.signInWithPassword({email:loginEmail.trim().toLowerCase(),password:loginPassword});
-    if(!auth.error&&auth.data.session){
-     authError=null;
-     session={access_token:auth.data.session.access_token,refresh_token:auth.data.session.refresh_token};
-     break;
-    }
-    authError=auth.error||new Error('Сервер авторизации не вернул сессию.');
-    const detail=String(authError&&typeof authError==='object'&&'message' in authError?(authError as {message?:unknown}).message:authError||'');
-    const retry=/\b5\d\d\b|request_timeout|context deadline exceeded|timeout|temporarily unavailable|fetch failed|network|12 секунд/i.test(detail);
-    if(!retry||attempt===1)throw authError;
-    await new Promise(resolve=>setTimeout(resolve,900));
-   }
-   if(authError||!session)throw authError||new Error('Сервер авторизации не вернул сессию.');
-   const adopted=await supabase.auth.setSession(session);
+   const auth=await loginClient.auth.signInWithPassword({email:loginEmail.trim().toLowerCase(),password:loginPassword});
+   if(auth.error)throw auth.error;
+   if(!auth.data.session)throw new Error('Сервер авторизации не вернул сессию.');
+   setLoginStage('Восстанавливаем сессию…');
+   const adopted=await withDeadline(
+    supabase.auth.setSession({
+     access_token:auth.data.session.access_token,
+     refresh_token:auth.data.session.refresh_token
+    }),12000,'Не удалось восстановить сессию за 12 секунд. Сервер авторизации недоступен.'
+   );
    if(adopted.error)throw adopted.error;
    phase='game';
+   setLoginStage('Открываем игровую сессию…');
    // PostgREST can temporarily return 503 while rebuilding its schema cache.
    // Resume is idempotent, unlike join_game_with_code which records an audit event.
+   // Abort slow membership lookup instead of silently retrying through an outage.
+   const controller=new AbortController();
+   const resumeTimer=setTimeout(()=>controller.abort(),15000);
    let resumedGameId='';
-   for(let attempt=0;attempt<3;attempt++){
-    const r=await supabase.rpc('resume_member_game',{p_game_code:loginGameCode.trim()});
-    if(!r.error){
-     if(!r.data)throw new Error('Сервер не подтвердил участие в игре.');
-     resumedGameId=String(r.data);break;
-    }
-    const detail=[r.error.code,r.error.message].filter(Boolean).join(' ');
-    const retry=/PGRST00[0-3]|schema cache|temporarily unavailable|Нет ответа от сервера|fetch failed|network/i.test(detail)||r.error.code==='503'||r.error.code==='504';
-    if(!retry||attempt===2)throw r.error;
-    await new Promise(resolve=>setTimeout(resolve,800*(attempt+1)));
-   }
+   try{
+    const result=await supabase.rpc('resume_member_game',{p_game_code:loginGameCode.trim()}).abortSignal(controller.signal);
+    if(result.error)throw result.error;
+    if(!result.data)throw new Error('Сервер не подтвердил участие в игре.');
+    resumedGameId=String(result.data);
+   }finally{clearTimeout(resumeTimer)}
    router.push('/game/'+resumedGameId);
   }catch(e){
    const message=readableError(e);
    const transient=/Нет ответа от сервера|network|fetch|timeout|соединен|сеть|подключено к интернету/i.test(message);
    setError((phase==='authentication'?'Проверка учётной записи: ':'Открытие игровой сессии: ')+message+(transient?' Если используете VPN, проверьте доступность Supabase без него и повторите вход.':''));
-  }finally{setBusy(false)}
+  }finally{setBusy(false);setLoginStage('')}
  }
  async function recover(){
   if(!loginEmail.includes('@')){setError('Укажите почту, к которой привязана ваша учётная запись.');return}
@@ -136,7 +137,7 @@ export default function Home(){
       <label className="entryField">Личный пароль<input required type="password" autoComplete="current-password" value={loginPassword} onChange={e=>setLoginPassword(e.target.value)} placeholder="Ваш личный пароль"/></label>
       {error&&<div className="errorBox" role="alert">{error}</div>}
       {recoverySent&&<div className="entryRecoveryNotice" role="status">Если этот адрес привязан к игре, письмо со ссылкой для смены пароля будет отправлено.</div>}
-      <button type="submit" className="primary entrySubmit" disabled={busy}>{busy?'Проверка…':'Войти в мою игру'}<ArrowRight size={18}/></button>
+      <button type="submit" className="primary entrySubmit" disabled={busy}>{busy?(loginStage||'Проверка…'):'Войти в мою игру'}<ArrowRight size={18}/></button>
       <button type="button" className="entryForgot" disabled={busy} onClick={()=>void recover()}>Забыли пароль? Отправить ссылку для восстановления</button>
      </fieldset>
     </form>}
