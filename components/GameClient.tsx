@@ -185,6 +185,23 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
 
 export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:string;initialMobileMenuOpen?:boolean}){
  const g=useRepublicGame(gameId);
+ // The game deliberately uses scheduled API refreshes instead of always-on
+ // Supabase Realtime. A disconnected WebSocket is not the same as being offline.
+ // Browser onLine is a network hint, not a server health check.
+ const [browserOnline,setBrowserOnline]=useState(true);
+ useEffect(()=>{
+  const update=()=>setBrowserOnline(navigator.onLine);
+  update();
+  window.addEventListener('online',update);
+  window.addEventListener('offline',update);
+  return()=>{
+   window.removeEventListener('online',update);
+   window.removeEventListener('offline',update);
+  };
+ },[]);
+ const connectionDisplay=g.realtimeState==='disconnected'&&browserOnline?'polling':g.realtimeState;
+ const connectionLabel=connectionDisplay==='polling'?'По расписанию':connectionDisplay==='connected'?'В сети':connectionDisplay==='connecting'?'Подключение…':'Нет сети';
+ const connectionDescription=connectionDisplay==='polling'?'Данные обновляются периодически, при действиях и открытии разделов. Это не проверка доступности сервера.':connectionDisplay==='connected'?'Постоянная синхронизация активна':connectionDisplay==='connecting'?'Подключение…':'Браузер сообщает об отсутствии сети';
  const [screenHistory,setScreenHistory]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
  },validScreenHistory);
@@ -398,7 +415,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    </nav>
 
    <div className="sidebarFooter">
-    <div className="sidebarRealtime"><Wifi aria-hidden="true"/><span>{g.realtimeState==='connected'?'Синхронизация активна':g.realtimeState==='connecting'?'Подключение…':'Нет соединения'}</span><i className={g.realtimeState}/></div>
+    <div className="sidebarRealtime"><Wifi aria-hidden="true"/><span>{connectionDisplay==='polling'?'Периодическое обновление':connectionDisplay==='connected'?'Синхронизация активна':connectionDisplay==='connecting'?'Подключение…':'Нет сети'}</span><i className={connectionDisplay}/></div>
     <div className="sidebarUser">
      <div className="simAvatar">{initials(shownMe.full_name)}</div>
      <div className="simUserText"><b>{shownMe.full_name}</b><span>{previewMode?'Просмотр · '+(shownMe.role_title||'Участник'):shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
@@ -419,7 +436,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      <div className="topIndicators">
       <span className={`livePill ${game.turn_open?'on':'off'}`} aria-label={game.turn_open?'Ход открыт':'Пауза'} title={game.turn_open?'Ход открыт':'Пауза'}><Radio aria-hidden="true"/><span className="livePillText">{game.turn_open?'Ход открыт':'Пауза'}</span></span>
       {game.turn_open&&game.turn_ends_at&&<span className="timerPill" aria-label="Время до конца хода">{fmtTimer(secondsLeft)}</span>}
-      <span className={`connectionPill ${g.realtimeState}`} role="status" aria-label={g.realtimeState==='connected'?'Синхронизация активна':g.realtimeState==='connecting'?'Подключение':'Нет соединения'} title={g.realtimeState==='connected'?'Синхронизация активна':g.realtimeState==='connecting'?'Подключение':'Нет соединения'}><Wifi aria-hidden="true"/><span className="connectionLabel">{g.realtimeState==='connected'?'В сети':g.realtimeState==='connecting'?'Подключение':'Нет связи'}</span></span>
+      <span className={`connectionPill ${connectionDisplay}`} role="status" aria-label={connectionDescription} title={connectionDescription}><Wifi aria-hidden="true"/><span className="connectionLabel">{connectionLabel}</span></span>
      </div>
     </div>
 
