@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
-type Feedback={role:string;authority_ok:boolean;lawful:boolean;legal_basis:string;chosen_consequence:string;lawful_choices:{label:string;description:string;roles:string[]}[]};
+type Feedback={role:string;authority_ok:boolean;delegated_ok?:boolean;best_option?:boolean;score_share?:number;lawful:boolean;legal_basis:string;chosen_consequence:string;lawful_choices:{label:string;description:string;roles:string[]}[]};
 export default function EventDecisionFeedback({caseId}:{caseId:string}){
  const [value,setValue]=useState<Feedback|null>(null),[error,setError]=useState('');
  useEffect(()=>{let active=true;void supabase.rpc('get_event_decision_feedback',{p_case_id:caseId}).then(r=>{if(active){if(r.error)setError('Не удалось загрузить разбор. Откройте событие повторно.');else setValue(r.data as Feedback)}});return()=>{active=false}},[caseId]);
