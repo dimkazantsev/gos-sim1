@@ -15,6 +15,7 @@ import styles from './FederalBudgetSimulator.module.css';
 type Proposal={id:string;tax_key:string;region_code:string;new_rate:number;status:string;document_id:string|null;author_id:string};
 export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents,onOpenStage,onOpenVotes}:{g:ReturnTypeRepublic;readOnly?:boolean;onOpenDocument:(id:string)=>void;onOpenEvents:()=>void;onOpenVotes?:(id:string)=>void;onOpenStage?:(stageNo:number)=>void}){
  const [regions,setRegions]=useState<FiscalRegion[]>([]),[rates,setRates]=useState<FiscalRate[]>([]),[context,setContext]=useState<FiscalContext|null>(null),[programs,setPrograms]=useState<SignedBudgetProgram[]>([]),[proposals,setProposals]=useState<Proposal[]>([]);
+ const [budgetTab,setBudgetTab]=useState<'revenue'|'regions'|'expense'|'finance'|'law'>('revenue');
  const [ready,setReady]=useState(false),[busy,setBusy]=useState(false),[canPropose,setCanPropose]=useState(false),[notice,setNotice]=useState(''),[error,setError]=useState('');
  const [taxLevel,setTaxLevel]=useState<'federal'|'regional'|'municipal'>('federal'),[taxSearch,setTaxSearch]=useState(''),[regionCode,setRegionCode]=useState('54'),[taxKey,setTaxKey]=useState('vat'),[rate,setRate]=useState('22'),[parameters,setParameters]=useState<Record<string,string>>({});
  const scope=[g.game?.id,g.me?.user_id].join('|'),live=useRef(scope),sequence=useRef(0),parameterDirty=useRef(false);live.current=scope;
@@ -23,6 +24,7 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  const taxChangeCount=availableTaxes.filter(t=>t.default_rate!==null).length;
  function chooseTaxLevel(level:'federal'|'regional'|'municipal'){setTaxLevel(level);setTaxSearch('');const first=catalog.taxes.find(t=>t.level===level);if(first)setTaxKey(first.key);}
  const currentRate=rates.find(r=>r.tax_key===taxKey&&r.region_code===(tax.level==='federal'?'00':regionCode))?.rate??tax.default_rate??0;
+ useEffect(()=>{setBudgetTab('revenue')},[g.game?.id]);
  useEffect(()=>{sequence.current++;setReady(false);setRegions([]);setRates([]);setContext(null);setPrograms([]);setProposals([]);setError('');setNotice('');parameterDirty.current=false;},[scope]);
  async function load(){
   if(!g.game)return;const requested=scope,version=++sequence.current;
@@ -41,7 +43,7 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  const labels:Record<string,string>={enterprises:'Предприятия, ед.',employees_per_firm:'Работники на предприятие, чел.',monthly_wage:'Средняя зарплата в месяц, ₽',profit_per_firm:'Прибыль на предприятие, млн ₽ в год',consumption_per_firm:'Оборот на предприятие, млн ₽ в год',expenditure:'Расходы региона, млн ₽',transfer_in:'Ранее полученные трансферты, млн ₽',debt:'Исходный долг региона, млн ₽',compliance:'Собираемость, от 0 до 1'};
  return <div className="budgetPage"><header className="budgetHero"><div><small>ЭТАП 13 · ФЕДЕРАЛЬНЫЙ БЮДЖЕТ</small><h1>Бюджет</h1><p>Макроэкономические параметры и пять последовательных шагов от расчёта доходов до закона. События, госпрограммы и региональные заявки связаны с общими расходами.</p></div><button type="button" className="secondary" onClick={()=>void load()} disabled={busy}><RefreshCw size={18}/> Обновить данные</button></header>
   {error&&<p role="alert" className="budgetNotice">{error}</p>}
-  {!ready?<p role="status">Загружаем общие исходные данные бюджета…</p>:<><FiscalMacroPanel g={g} context={context} readOnly={readOnly} onSaved={async()=>{await load();await g.refreshBudgetPulse?.();}}/><FederalBudgetSimulator key={scope} g={g} context={context} regions={regions} rates={rates} programs={programs} readOnly={readOnly} onOpenDocument={onOpenDocument} onOpenEvents={onOpenEvents} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onSaved={load}/>
+  {!ready?<p role="status">Загружаем общие исходные данные бюджета…</p>:<><FiscalMacroPanel g={g} context={context} readOnly={readOnly} onSaved={async()=>{await load();await g.refreshBudgetPulse?.();}}/><FederalBudgetSimulator key={scope} activeTab={budgetTab} onActiveTabChange={setBudgetTab} g={g} context={context} regions={regions} rates={rates} programs={programs} readOnly={readOnly} onOpenDocument={onOpenDocument} onOpenEvents={onOpenEvents} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onSaved={load}/>
    <section className="surface budgetMethod budgetTaxWorkspace" aria-label="Налоговые решения и региональные параметры">
      <header className="budgetTaxHeader"><div><small>НОРМАТИВНЫЕ РЕШЕНИЯ</small><h2>Налоговые инициативы</h2><p>Сначала выбирают налог и оценивают последствия. Изменение ставки учитывается только после вступления соответствующего НПА в силу.</p></div></header>
      <div className="budgetTaxSwitch" role="group" aria-label="Уровень налогового решения">
