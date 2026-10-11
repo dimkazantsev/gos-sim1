@@ -75,7 +75,8 @@ async function check(){
     assert.equal(await frame.locator('.gradeTotalHead').count(),2,'Grade totals missing');
    }
    if(screen==='teacher-event'){
-    assert.equal(await frame.locator('.eventCatalogTargets>div').count(),4,'Event case budget must contain four targets');
+    assert.equal(await frame.locator('.autoEventPanel').count(),2,'Settings and event bank must be present');
+    assert.equal(await frame.locator('.eventComposerPanel').count(),1,'Event creation editor must remain available');
     assert((await frame.locator('.eventEditorGrid .styledSelect').count())>=4,'Event must have category, seriousness, role and audience controls');
    }
    if(screen==='teacher-parties'){
