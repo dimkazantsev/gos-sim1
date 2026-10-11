@@ -2,6 +2,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
+import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import type {BudgetCalculation} from './federalBudgetMath';
 import type {Metric,MetricHistory} from './types';
 
@@ -28,16 +29,16 @@ export function useBudgetPulse(gameId:string,enabled:boolean){
   alive.current=true;setPulse(null);setError('');
   if(!enabled)return()=>{alive.current=false;request.current++;};
   void refresh();
-  const timer=setInterval(()=>{if(document.visibilityState==='visible')void refresh();},20000);
-  const resume=()=>{if(document.visibilityState==='visible')void refresh();};
+  // Budget data is only loaded while its section is open, with direct refresh after edits.
+  const timer=setInterval(()=>{if(document.visibilityState==='visible')void refresh();},120000);
+  let lastFocusRefresh=Date.now();
+  const resume=()=>{if(document.visibilityState==='visible'&&Date.now()-lastFocusRefresh>60000){lastFocusRefresh=Date.now();void refresh();}};
   document.addEventListener('visibilitychange',resume);
   let pending:ReturnType<typeof setTimeout>|undefined;
   const changed=()=>{clearTimeout(pending);pending=setTimeout(()=>void refresh(),250);};
-  let channel=supabase.channel('budget-pulse:'+gameId);
-  for(const table of ['budget_simulator_plans','budget_simulator_state','budget_transfer_requests','game_fiscal_policy','game_fiscal_regions','game_fiscal_rates','formal_documents','event_case_outcomes','state_metrics'])
-   channel=channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},changed);
-  channel.subscribe();
-  return()=>{alive.current=false;request.current++;clearInterval(timer);clearTimeout(pending);document.removeEventListener('visibilitychange',resume);void supabase.removeChannel(channel);};
+  const changedLocal=(event:Event)=>{if((event as CustomEvent<{gameId:string}>).detail?.gameId===gameId)changed();};
+  window.addEventListener(GAME_DATA_REFRESH_EVENT,changedLocal);
+  return()=>{alive.current=false;request.current++;clearInterval(timer);clearTimeout(pending);document.removeEventListener('visibilitychange',resume);window.removeEventListener(GAME_DATA_REFRESH_EVENT,changedLocal);};
  },[gameId,enabled,refresh]);
  return {budgetPulse:enabled&&pulse?.game_id===gameId?pulse:null,budgetPulseError:enabled?error:'',refreshBudgetPulse:refresh};
 }
