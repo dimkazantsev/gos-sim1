@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
-import {Activity,BookOpenText,CalendarClock,Check,ChevronDown,PauseCircle,PlayCircle,RefreshCw,Send,Settings2,ShieldCheck} from 'lucide-react';
+import {Activity,BookOpenText,CalendarClock,Check,ChevronDown,PauseCircle,PlayCircle,RefreshCw,Send,Settings2,ShieldCheck,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import EventCaseTile from './EventCaseTile';
 import type {EventComicScene} from './types';
@@ -9,7 +9,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 type Settings={enabled:boolean;interval_hours:number;activity_weight:number;max_daily:number;trust_per_20:number;backlog_penalty:number;last_run_at:string|null};
 type BankCase={comic_scene?:EventComicScene|null;id:string;case_key:string;title:string;situation:string;category:string;seriousness:string;allowed_roles:string[];audience:'single'|'all'|'group';status:string;source_note:string|null};
 const DEFAULT:Settings={enabled:false,interval_hours:12,activity_weight:1,max_daily:2,trust_per_20:2,backlog_penalty:1,last_run_at:null};
-export default function EventAutopilotPanel({g,onChanged,readyCaseCount}:{g:ReturnTypeRepublic;onChanged:()=>Promise<void>;readyCaseCount:number}){
+export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMode='settings',readOnly=false}:{g:ReturnTypeRepublic;onChanged:()=>Promise<void>;readyCaseCount:number|null;panelMode?:'settings'|'bank';readOnly?:boolean}){
  const {game,members,teacher}=g;
  const [settings,setSettings]=useState<Settings>(DEFAULT);
  const [bank,setBank]=useState<BankCase[]>([]);
@@ -20,26 +20,65 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount}:{g:Retu
  const [groupRecipients,setGroupRecipients]=useState<string[]>([]);
  const [openBank,setOpenBank]=useState(false);
  const [search,setSearch]=useState('');
+ const [selectedForDelete,setSelectedForDelete]=useState<string[]>([]);
+ const [loadingBank,setLoadingBank]=useState(false);
+ const [bankLoaded,setBankLoaded]=useState(false);
+ const [bankTotal,setBankTotal]=useState<number|null>(null);
+ const [protectedIds,setProtectedIds]=useState<string[]>([]);
  const [assigned,setAssigned]=useState<{case_id:string;recipient_id:string}[]>([]);
  const students=members.filter(m=>m.kind==='student');
- const visible=useMemo(()=>bank.filter(c=>[c.title,c.category,c.situation].join(' ').toLowerCase().includes(search.toLowerCase())),[bank,search]);
+ const visible=useMemo(()=>bank.filter(c=>[c.title,c.category,c.situation].join(' ').toLowerCase().includes(search.trim().toLowerCase())),[bank,search]);
  const selected=bank.find(c=>c.id===chosen);
  const eligible=students;
  const effectiveInterval=settings.activity_weight===0?settings.interval_hours:Math.max(4,settings.interval_hours/(1+settings.activity_weight*2));
- async function load(){
+ async function loadSettings(){
   if(!game)return;
-  const [a,b,c0,d]=await Promise.all([
-   supabase.from('event_auto_settings').select('*').eq('game_id',game.id).maybeSingle(),
+  const {data,error}=await supabase.from('event_auto_settings').select('*').eq('game_id',game.id).maybeSingle();
+  if(!error&&data)setSettings(data as Settings);
+ }
+ async function loadBank(){
+  if(!game||loadingBank)return;
+  setLoadingBank(true);
+  const [b,c0,d,decision,invites,discussion,authority,budget]=await Promise.all([
    supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,audience,status,source_note,comic_scene').eq('game_id',game.id).eq('status','ready').order('category').order('title'),
    supabase.from('event_assignments').select('case_id,recipient_id').eq('game_id',game.id),
-   supabase.from('event_case_outcomes').select('case_id').eq('game_id',game.id)
+   supabase.from('event_case_outcomes').select('case_id').eq('game_id',game.id),
+   supabase.from('event_decisions').select('case_id').eq('game_id',game.id),
+   supabase.from('event_collaboration_invites').select('case_id').eq('game_id',game.id),
+   supabase.from('event_discussion_messages').select('case_id').eq('game_id',game.id),
+   supabase.from('event_authority_evidence').select('case_id').eq('game_id',game.id),
+   supabase.from('budget_transfer_requests').select('event_case_id').eq('game_id',game.id).not('event_case_id','is',null)
   ]);
-  if(!a.error&&a.data)setSettings(a.data as Settings);
-  if(!b.error&&!d.error){const closed=new Set((d.data||[]).map(o=>o.case_id));setBank(((b.data||[]) as BankCase[]).filter(c=>!closed.has(c.id)&&!(c.audience==='single'&&(c0.data||[]).some(a=>a.case_id===c.id))))}
-  if(!c0.error)setAssigned(c0.data||[]);
+  const errors=[b,c0,d,decision,invites,discussion,authority,budget].filter(x=>x.error);
+  if(errors.length){setNotice('Ошибка загрузки банка: '+errors[0].error?.message);setLoadingBank(false);return}
+  const protectedSet=new Set([
+   ...(c0.data||[]).map(x=>x.case_id),...(d.data||[]).map(x=>x.case_id),
+   ...(decision.data||[]).map(x=>x.case_id),...(invites.data||[]).map(x=>x.case_id),
+   ...(discussion.data||[]).map(x=>x.case_id),...(authority.data||[]).map(x=>x.case_id),
+   ...(budget.data||[]).map(x=>x.event_case_id)
+  ]);
+  setBank((b.data||[]) as BankCase[]);setBankTotal((b.data||[]).length);
+  setProtectedIds([...protectedSet]);setAssigned(c0.data||[]);
+  setSelectedForDelete([]);setBankLoaded(true);setLoadingBank(false);
  }
- useEffect(()=>{void load()},[game?.id]);
+ useEffect(()=>{if(panelMode==='settings')void loadSettings()},[game?.id,panelMode]);
+ useEffect(()=>{if(!game?.id)return;setBank([]);setBankTotal(null);setBankLoaded(false);setSelectedForDelete([]);setChosen('');setOpenBank(false)},[game?.id]);
+ useEffect(()=>{if(openBank&&panelMode==='bank'&&!bankLoaded&&!loadingBank)void loadBank()},[openBank,panelMode,bankLoaded,loadingBank,game?.id]);
  useEffect(()=>{if(bank.length&&!bank.some(c=>c.id===chosen))setChosen(bank[0].id)},[bank,chosen]);
+ const selectable=visible.filter(c=>!protectedIds.includes(c.id));
+ async function removeSelected(){
+  if(!game||!teacher||readOnly||busy||!selectedForDelete.length)return;
+  const ids=selectedForDelete.filter(id=>bank.some(c=>c.id===id)&&!protectedIds.includes(id));
+  if(ids.length!==selectedForDelete.length){setNotice('Нельзя удалить ситуации с назначениями или игровой историей. Обновите банк.');return}
+  if(!window.confirm('Удалить '+ids.length+' неназначенных ситуаций из банка? Это действие нельзя отменить.'))return;
+  setBusy(true);setNotice('');
+  // Check the server-side RPC atomically: a case that acquired assignments
+  // between selection and deletion must not be removed.
+  const result=await supabase.rpc('delete_unused_event_cases',{p_game_id:game.id,p_case_ids:ids});
+  setNotice(result.error?'Ошибка: '+result.error.message:'Удалено ситуаций: '+String(result.data??0));
+  if(!result.error){await loadBank();await onChanged();}
+  setBusy(false);
+ }
  async function save(next:Settings){
   if(!game||!teacher||busy)return;
   setBusy(true);setNotice('');
@@ -50,7 +89,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount}:{g:Retu
   });
   if(r.error){setNotice('Ошибка: '+r.error.message)}else{
    setSettings(next);setNotice(next.enabled?'Автоматическая отправка активирована.':'Настройки сохранены. Автоматическая отправка остановлена.');
-   await load();await onChanged();
+   if(openBank)await loadBank();await onChanged();
   }
   setBusy(false);
  }
@@ -59,7 +98,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount}:{g:Retu
   setBusy(true);setNotice('');
   const r=await supabase.rpc('seed_game_event_bank',{p_game_id:game.id});
   setNotice(r.error?'Ошибка: '+r.error.message:'Банк проверен. Новых ситуаций: '+(r.data??0));
-  await load();await onChanged();setBusy(false);
+  if(openBank)await loadBank();await onChanged();setBusy(false);
  }
  async function run(){
   if(!game||busy)return;
@@ -67,7 +106,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount}:{g:Retu
   const r=await supabase.rpc('run_game_event_autopilot',{p_game_id:game.id});
   if(r.error)setNotice('Ошибка: '+r.error.message);
   else setNotice('Назначено новых ситуаций: '+(r.data?.sent??0)+'. '+(r.data?.reason==='paused'?'Автоматическая отправка приостановлена.':r.data?.reason==='already_checked'?'Повторная проверка доступна через час.':''));
-  await load();await onChanged();setBusy(false);
+  if(openBank)await loadBank();await onChanged();setBusy(false);
  }
  async function assign(){
   const ids=selected?.audience==='group'?groupRecipients:[recipient];
@@ -75,7 +114,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount}:{g:Retu
   setBusy(true);setNotice('');
   const r=await supabase.rpc('assign_event_case',{p_case_id:chosen,p_recipients:ids});
   setNotice(r.error?'Ошибка: '+r.error.message:'Назначено новых заданий: '+r.data+'.');
-  await load();await onChanged();setBusy(false);
+  if(openBank)await loadBank();await onChanged();setBusy(false);
  }
  async function assignAll(){
   if(!game||!chosen||!teacher||busy||selected?.audience!=='all')return;
@@ -85,11 +124,11 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount}:{g:Retu
   setBusy(true);setNotice('');
   const r=await supabase.rpc('assign_event_case',{p_case_id:chosen,p_recipients:students.map(m=>m.user_id)});
   setNotice(r.error?'Ошибка: '+r.error.message:'Назначено новых заданий: '+r.data+'.');
-  await load();await onChanged();setBusy(false);
+  if(openBank)await loadBank();await onChanged();setBusy(false);
  }
  if(!teacher||!game)return null;
- return <section className="autoEventPanel" aria-label="Автоматические события и банк ситуаций">
-  <header className="autoEventHeading"><div><small>Автоматические события</small><h3>Автоматический сценарий</h3>
+ return <section className={'autoEventPanel'+(panelMode==='bank'?' autoEventBankPanel':'')} aria-label="Автоматические события и банк ситуаций">
+  {panelMode==='settings'&&<><header className="autoEventHeading"><div><small>Автоматические события</small><h3>Автоматический сценарий</h3>
    <p>События подбираются по игровой должности и активности. Решения и изменение доверия записываются в общую базу.</p></div>
    <span className={'autoEventState '+(settings.enabled?'enabled':'paused')}>{settings.enabled?<PlayCircle size={16}/>:<PauseCircle size={16}/>} {settings.enabled?'Работает':'Пауза'}</span>
   </header>
@@ -113,15 +152,20 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount}:{g:Retu
   <div className="autoEventFormula">
    <Activity size={18} aria-hidden="true"/><p>Интервал = Макс(4 ч.; базовый интервал / (1 + вес активности × Мин(2; часы отсутствия / 48))). Диапазон: от {Math.round(effectiveInterval*10)/10} до {settings.interval_hours} ч. Не более {settings.max_daily} событий за 24 часа и не более трёх нерешённых одновременно. Участникам, давно не заходившим в игру, чаще предлагаются необычные ситуации. За каждые 20 общих решений в интересах общества — +{settings.trust_per_20} п.п. доверия; за каждые три задания старше 48 часов — −{settings.backlog_penalty} п.п. в сутки, но не более −3 п.п. в день.</p>
   </div>
-  <button type="button" className="autoEventSave" disabled={busy} onClick={()=>void save(settings)}><Check size={17}/> {busy?'Сохранение…':'Сохранить настройки'}</button>
-  <div className="autoEventBank">
-   <button type="button" className="autoEventBankToggle" aria-expanded={openBank} onClick={()=>setOpenBank(!openBank)}>
-    <BookOpenText size={19}/><span><b>Банк игровых ситуаций</b><small>{readyCaseCount} готовых ситуаций · {bank.length} доступны для выбора</small></span><ChevronDown size={19}/>
+  <button type="button" className="autoEventSave" disabled={busy||readOnly} onClick={()=>void save(settings)}><Check size={17}/> {busy?'Сохранение…':'Сохранить настройки'}</button></>}
+  {panelMode==='bank'&&<div className="autoEventBank">
+   <button type="button" className="autoEventBankToggle" aria-expanded={openBank} onClick={()=>setOpenBank(v=>!v)}>
+    <BookOpenText size={19}/><span><b>Банк игровых ситуаций</b><small>{readyCaseCount??'…'} готовых ситуаций · {openBank?(loadingBank?'Загрузка…':(bankTotal??0)+' загружено'):'откройте для загрузки'}</small></span><ChevronDown size={19}/>
    </button>
    {openBank&&<div className="autoEventBankBody">
-    <div className="autoEventBankSearch"><input aria-label="Найти ситуацию" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Найти ситуацию по названию, сфере или тексту…"/><button type="button" disabled={busy} onClick={()=>void seed()}><RefreshCw size={16}/> Сверить банк</button></div>
-    <p className="eventBankHint">Выберите плитку слева. Описание и назначение ситуации — справа.</p>
-    <div className="eventBankWorkspace"><div className="eventBankTiles" role="group" aria-label="Выбор ситуации">{visible.map(c=><EventCaseTile key={c.id} item={c} selected={chosen===c.id} summary meta={c.category+' · '+(c.seriousness==='light'?'Повседневное':'Серьёзное')} onClick={()=>{setChosen(c.id);setRecipient('');setGroupRecipients([])}}/>)}{!visible.length&&<p className="eventGridEmpty">Ситуации по вашему запросу не найдены.</p>}</div>
+    <div className="autoEventBankSearch"><input aria-label="Найти ситуацию" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Найти ситуацию по названию, сфере или тексту…"/><button type="button" disabled={busy||readOnly||loadingBank} onClick={()=>void seed()}><RefreshCw size={16}/> Сверить банк</button></div>
+    <p className="eventBankHint">Выберите плитку слева. Описание и назначение ситуации — справа. Отметьте несколько неназначенных ситуаций для удаления.</p>
+    <div className="eventBankBulkActions">
+     <label><input type="checkbox" aria-label="Выделить все неназначенные результаты поиска" checked={selectable.length>0&&selectable.every(c=>selectedForDelete.includes(c.id))} disabled={busy||readOnly||!selectable.length} onChange={e=>setSelectedForDelete(old=>e.target.checked?[...new Set([...old,...selectable.map(c=>c.id)])]:old.filter(id=>!selectable.some(c=>c.id===id)))}/>Выделить доступные ({selectable.length})</label>
+     <span>Выбрано: {selectedForDelete.length}</span>
+     <button type="button" className="eventBankDeleteButton" disabled={busy||readOnly||!selectedForDelete.length} onClick={()=>void removeSelected()}><Trash2 size={16}/>Удалить выбранные</button>
+    </div>
+    {loadingBank?<p role="status">Загрузка банка ситуаций…</p>:<div className="eventBankWorkspace"><div className="eventBankTiles" role="group" aria-label="Выбор ситуации">{visible.map(c=><div key={c.id} className="eventBankSelectableTile"><label className="eventBankSelection"><input type="checkbox" aria-label={'Выделить для удаления: '+c.title} checked={selectedForDelete.includes(c.id)} disabled={busy||readOnly||protectedIds.includes(c.id)} onChange={e=>setSelectedForDelete(old=>e.target.checked?[...old,c.id]:old.filter(id=>id!==c.id))}/>{protectedIds.includes(c.id)?'Назначено / используется':'Выделить'}</label><EventCaseTile item={c} selected={chosen===c.id} summary meta={c.category+' · '+(c.seriousness==='light'?'Повседневное':'Серьёзное')} onClick={()=>{setChosen(c.id);setRecipient('');setGroupRecipients([])}}/></div>)}{!visible.length&&<p className="eventGridEmpty">Ситуации по вашему запросу не найдены.</p>}</div>
      <article className="eventBankDetail">{selected?<><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}{selected.audience==='all'?' · Вся аудитория':''}</small><h4>{selected.title}</h4><p>{selected.situation}</p><em>{selected.source_note||'Авторский учебный кейс'}</em>
        {selected.audience==='all'?<div className="autoEventCaseAssign">
         <p>Ситуация для всей аудитории. При назначении каждый участник получает личное задание, а результаты объединяются в статистике.</p>
@@ -130,9 +174,9 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount}:{g:Retu
        :selected.audience==='group'?<div className="autoEventCaseAssign"><p>Выберите 2–3 участников для совместного голосования.</p><div className="eventGroupRecipients">{eligible.map(m=><label key={m.user_id}><input type="checkbox" checked={groupRecipients.includes(m.user_id)} disabled={!groupRecipients.includes(m.user_id)&&groupRecipients.length>=3} onChange={e=>setGroupRecipients(old=>e.target.checked?[...old,m.user_id]:old.filter(id=>id!==m.user_id))}/>{m.full_name}</label>)}</div><button type="button" disabled={busy||groupRecipients.length<2} onClick={()=>void assign()}><Send size={16}/> Назначить группе</button></div>
        :<div className="autoEventCaseAssign"><StyledSelect label="Назначить участнику" value={recipient} onChange={setRecipient} options={[{value:'',label:'Выберите участника'},...eligible.map(m=>({value:m.user_id,label:m.full_name,disabled:assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id)}))]}/>
        <button type="button" disabled={busy||!recipient||!eligible.some(m=>m.user_id===recipient)||assigned.some(a=>a.case_id===chosen&&a.recipient_id===recipient)} onClick={()=>void assign()}><Send size={16}/> Назначить</button></div>}
-      </>:<p>Выберите плитку ситуации.</p>}</article></div>
+      </>:<p>Выберите плитку ситуации.</p>}</article></div>}
    </div>}
-  </div>
+  </div>}
   {notice&&<p className="autoEventNotice" role="status">{notice}</p>}
  </section>;
 }
