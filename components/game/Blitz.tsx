@@ -1,14 +1,16 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useState,useRef} from 'react';
 import {supabase} from '@/lib/supabase';
 type Row={id:string;question:string;topic:string;options:string[];stage_no:number;deadline?:string;answered_at?:string|null;chosen_index?:number|null;correct_index?:number|null;is_correct?:boolean|null;explanation?:string|null;legal_act?:string|null;article?:string|null;source_url?:string|null};
 const legal=(r:Row)=>r.source_url&&/^https:\/\//.test(r.source_url)?<a href={r.source_url} target="_blank" rel="noopener noreferrer">{r.legal_act}, {r.article} ↗</a>:<span>{r.legal_act} {r.article}</span>;
 export function BlitzOverlay({gameId,enabled}:{gameId:string;enabled:boolean}){
+ const refreshBusy=useRef(false);
  const [card,setCard]=useState<Row|null>(null),[feedback,setFeedback]=useState<Row|null>(null),[time,setTime]=useState(20),[busy,setBusy]=useState(false),[error,setError]=useState('');
- useEffect(()=>{if(!enabled)return;let stopped=false;async function refresh(){const d=await supabase.rpc('blitz_issue_today',{p_game:gameId});if(d.error){setError('');return}const r=await supabase.rpc('blitz_open',{p_game:gameId});if(!stopped&&!r.error&&r.data)setCard(r.data as Row)}void refresh();const id=setInterval(()=>{if(!card&&!feedback)void refresh()},90000);return()=>{stopped=true;clearInterval(id)}},[gameId,enabled,!!card,!!feedback]);
+ useEffect(()=>{if(!enabled)return;let stopped=false;async function refresh(){if(refreshBusy.current)return;refreshBusy.current=true;try{const d=await supabase.rpc('blitz_issue_today',{p_game:gameId});if(d.error){setError('');return}const r=await supabase.rpc('blitz_open',{p_game:gameId});if(!stopped&&!r.error&&r.data)setCard(r.data as Row)}finally{refreshBusy.current=false}}void refresh();const id=setInterval(()=>{if(!card&&!feedback)void refresh()},90000);return()=>{stopped=true;clearInterval(id)}},[gameId,enabled,!!card,!!feedback]);
  useEffect(()=>{if(!card?.deadline)return;const f=()=>setTime(Math.max(0,Math.ceil((Date.parse(card.deadline!)-Date.now())/1000)));f();const id=setInterval(f,250);return()=>clearInterval(id)},[card?.deadline]);
  async function answer(choice:number){if(!card||busy||feedback)return;setBusy(true);const r=await supabase.rpc('blitz_answer',{p_id:card.id,p_choice:choice});if(r.error)setError(r.error.message);else setFeedback({...card,...r.data});setBusy(false)}
  useEffect(()=>{if(card&&time===0&&!feedback&&!busy)void answer(-1)},[card?.id,time,!!feedback,busy]);
+ useEffect(()=>{if(!feedback)return;const id=setTimeout(()=>{setCard(null);setFeedback(null);setError('')},4800);return()=>clearTimeout(id)},[feedback]);
  if(!enabled)return null;
  if(!card)return null;
  return <div className="blitzBackdrop" role="presentation"><section className="blitzCard" role="dialog" aria-modal="true" aria-label="Блиц-вопрос">
