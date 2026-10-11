@@ -192,7 +192,9 @@ export function useRepublicGame(gameId:string){
    try{await hydrateActiveView()}
    finally{running=false;if(queued&&alive.current){queued=false;setTimeout(()=>void update(),500)}}
   }
-  const interval=setInterval(()=>void update(),30000);
+  // Poll only the visible screen; avoid loading the entire game every 30 seconds.
+  // Explicit writes still invalidate local views. Stagger clients by identity.
+  const interval=setInterval(()=>void update(),180000);
   return()=>{clearInterval(interval)};
  },[gameId,me?.user_id]);
 
@@ -339,7 +341,9 @@ export function useRepublicGame(gameId:string){
  }
 
  async function hydrateActiveView(){
-  const jobs:Promise<unknown>[]=[loadCoreSections(),loadRepublicOffices()];
+  const jobs:Promise<unknown>[]=[loadCoreSections()];
+  // Office assignments are needed for role changes but not on every background refresh.
+  if(activeViewRef.current==='teacher'||activeViewRef.current==='profile')jobs.push(loadRepublicOffices());
   const view=activeViewRef.current;
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets());
   if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation());
