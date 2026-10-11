@@ -270,7 +270,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  function navigate(next:View,target?:{stageNo?:number;documentId?:string;voteId?:string;templateKey?:string},profileVerified=false){
   const owner=g.me;
   const p=g.profiles.find(row=>row.user_id===owner?.user_id);
-  if(!profileVerified&&owner&&owner.kind!=='observer'&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'){
+  if(!profileVerified&&owner&&owner.kind!=='observer'&&g.profilesLoaded&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'){
    setOnboardingNotice('Сначала завершите оформление личного профиля.');
    next='profile';
   }
@@ -340,9 +340,11 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const shownMe=vg.me||me;
  const chatDraftKey=(shownMe?.user_id||'')+':'+g.channelId;
  useEffect(()=>{
-  if(!game||!me||me.kind==='observer'||introOpen||!introSeen||myProfile?.onboarding_completed_at)return;
+  // Never interpret a temporarily missing profile row during initial loading
+  // as an incomplete onboarding. Doing so overwrites the restored screen on F5.
+  if(!game||!me||g.loading||!g.profilesLoaded||me.kind==='observer'||introOpen||!introSeen||myProfile?.onboarding_completed_at)return;
   if(view!=='profile')navigate('profile');
- },[game?.id,me?.user_id,introSeen,myProfile?.onboarding_completed_at,introOpen,view]);
+ },[game?.id,me?.user_id,g.loading,g.profilesLoaded,introSeen,myProfile?.onboarding_completed_at,introOpen,view]);
  async function completeOnboarding(){
   if(!game||!me||completingProfile)return;
   setCompletingProfile(true);setOnboardingNotice('');
