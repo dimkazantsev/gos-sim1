@@ -22,6 +22,9 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const [pRules,setPRules]=useState<PRule[]>([]);
  const [rRules,setRRules]=useState<RRule[]>([]);
  const [allocations,setAllocations]=useState<RegionAllocation[]>([]);
+ const [fixedRegions,setFixedRegions]=useState<{code:string;name:string;party_id:string}[]>([]);
+ const [regionMapLoaded,setRegionMapLoaded]=useState(false);
+ const [regionMapBusy,setRegionMapBusy]=useState(false);
  const [savedResults,setSavedResults]=useState<ElectoralCalcResult[]>([]);
  const [regionalSavedResults,setRegionalSavedResults]=useState<RegionalCalcResult[]>([]);
  const [system,setSystem]=useState<PRule['system_type']>('proportional');
@@ -63,6 +66,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   setRegionalCalculatorDraft(v=>{const n={...v};for(const x of parties)if(n[x.id]===undefined)n[x.id]='0';return n});
  }
  useEffect(()=>{void load()},[game?.id,parties.length]);
+ useEffect(()=>{setFixedRegions([]);setRegionMapLoaded(false)},[game?.id]);
  useEffect(()=>{
   if(!game)return;
   const ch=supabase.channel('electoral-architecture:'+game.id)
@@ -84,6 +88,23 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const voteStatus=(id:string|null)=>id?votes.find(v=>v.id===id):undefined;
  const proposer=(id:string)=>members.find(m=>m.user_id===id)?.full_name||'Фракция';
  const regionRows=adoptedR?allocations.filter(x=>x.rule_id===adoptedR.id):[];
+ async function loadFixedRegions(){
+  if(!game||regionMapBusy)return;
+  setRegionMapBusy(true);
+  const [control,reference]=await Promise.all([
+   supabase.from('game_region_party_control').select('region_code,party_id').eq('game_id',game.id),
+   supabase.from('fiscal_region_reference').select('code,name').order('code')
+  ]);
+  if(control.error||reference.error){
+   setError(control.error?.message||reference.error?.message||'Не удалось получить список регионов');
+  }else{
+   const names=new Map((reference.data||[]).map(x=>[x.code,x.name]));
+   setFixedRegions((control.data||[]).map(x=>({code:x.region_code,name:names.get(x.region_code)||x.region_code,party_id:x.party_id})).sort((a,b)=>a.code.localeCompare(b.code)));
+   setRegionMapLoaded(true);
+  }
+  setRegionMapBusy(false);
+ }
+
  const totalAgreement=regionRows.reduce((a,x)=>a+Number(x.regions||0),0);
  const publicPolicyChannel=g.channels.find(c=>c.kind==='public'&&c.name.toLocaleLowerCase('ru-RU').includes('публич'))
   ||g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры')
@@ -256,5 +277,14 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
    {adoptedR.method==='agreement'&&adoptedR.status==='adopted'&&<div className={totalAgreement===89?'regionalTotal ok':'regionalTotal'}><span>Сумма договорённостей</span><b>{totalAgreement} / 89</b></div>}
    {teacher&&adoptedR.status==='adopted'&&<button className="primary regionalExecute" disabled={busy||(adoptedR.method==='agreement'&&totalAgreement!==89)} onClick={()=>void executeR()}>{adoptedR.method==='random'?'Провести жеребьёвку 89 субъектов':adoptedR.method==='proportional'?'Рассчитать 89 субъектов':'Зафиксировать договор'}</button>}
   </section>}
+  {adoptedR?.status==='allocated'&&<section className="regionalFixedPartyMap">
+    <details onToggle={e=>{if(e.currentTarget.open&&!regionMapLoaded)void loadFixedRegions()}}>
+     <summary><strong>Какие конкретно 89 субъектов закреплены за партиями</strong><span>{regionMapLoaded?fixedRegions.length+' из 89':'Открыть список'}</span></summary>
+     {regionMapBusy?<p>Загрузка распределения…</p>:regionMapLoaded?
+       <div className="regionalFixedPartyMapList">{fixedRegions.map(x=><div key={x.code}><span>{x.code} · {x.name}</span><b>{parties.find(p=>p.id===x.party_id)?.name||'Неизвестная партия'}</b></div>)}
+        {fixedRegions.length!==89&&<p role="alert">Внимание: закреплено {fixedRegions.length} из 89 регионов. Проверьте итог распределения.</p>}</div>
+       :<p>Список ещё не загружен.</p>}
+    </details>
+   </section>}
  </section>;
 }
