@@ -60,6 +60,20 @@ jobs:
           for pid in "${pids[@]}"; do wait "$pid"; done
       - name: Assert no duplicate answers, wrong concurrency, leaks or timer bypass
         run: psql -v ON_ERROR_STOP=1 -f supabase/tests/blitz_load_assert.sql
+      - name: Verify exact VSN fractional component against fixture rows
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path("supabase/migrations/20261012101500_blitz_vsn_opt_in_integration.sql").read_text()
+          beginning=s.index("CREATE OR REPLACE FUNCTION private.blitz_vsn_components(")
+          ending=s.index("REVOKE ALL ON FUNCTION private.blitz_vsn_components(",beginning)
+          Path("/tmp/blitz-components.sql").write_text("CREATE SCHEMA IF NOT EXISTS private;\n"+s[beginning:ending])
+          PY
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/blitz_vsn_fixture.sql
+          psql -v ON_ERROR_STOP=1 -f /tmp/blitz-components.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/blitz_vsn_assert.sql
       - name: Upload debugging logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
