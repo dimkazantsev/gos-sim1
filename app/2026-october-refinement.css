@@ -943,3 +943,34 @@
 .budgetPage .fiscalMacroFields input,.budgetPage .fiscalMacroFields textarea{border:1px solid #cdd0e2;border-radius:10px;padding:10px 12px;background:#fff;min-height:44px;box-sizing:border-box}
 .budgetPage .fiscalMacroEditor>button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;margin-bottom:14px}
 @media(max-width:550px){.budgetPage .fiscalMacroPanel{padding:15px;gap:12px}.budgetPage .fiscalMacroPanel>.fiscalMacroHeading{grid-template-columns:40px minmax(0,1fr);gap:10px}.budgetPage .fiscalMacroHeadingIcon{width:40px;height:40px}.budgetPage .fiscalMacroHeadingText h2{font-size:18px}.budgetPage .fiscalMacroStats{gap:8px}.budgetPage .fiscalMacroStats article{padding:11px}.budgetPage .fiscalMacroEditor>button{width:100%}}
+
+/* Final modal SVG-icon rules: legacy comic selectors must not stretch inline
+   Lucide glyphs into full-frame 16:9 images or alter the icon-panel ratio. */
+.eventCaseModal .eventComicPlayer .situationSymbol.eventComic{
+ display:grid!important;
+ width:100%!important;
+ height:auto!important;
+ min-height:0!important;
+ aspect-ratio:16/9!important;
+ overflow:hidden!important;
+}
+.eventCaseModal .situationSymbol.eventComic .situationSymbolMain svg{
+ position:static!important;
+ inset:auto!important;
+ width:56px!important;
+ height:56px!important;
+ aspect-ratio:1!important;
+ object-fit:contain!important;
+}
+.eventCaseModal .situationSymbol.eventComic .situationSymbolBadge svg{
+ position:static!important;
+ inset:auto!important;
+ width:24px!important;
+ height:24px!important;
+ aspect-ratio:1!important;
+ object-fit:contain!important;
+}
+@media(max-width:600px){
+ .eventCaseModal .situationSymbol.eventComic .situationSymbolMain svg{width:48px!important;height:48px!important}
+ .eventCaseModal .situationSymbol.eventComic .situationSymbolBadge svg{width:20px!important;height:20px!important}
+}
