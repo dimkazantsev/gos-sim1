@@ -202,7 +202,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const connectionDisplay=g.realtimeState==='disconnected'&&browserOnline?'polling':g.realtimeState;
  const connectionLabel=connectionDisplay==='polling'?'По расписанию':connectionDisplay==='connected'?'В сети':connectionDisplay==='connecting'?'Подключение…':'Нет сети';
  const connectionDescription=connectionDisplay==='polling'?'Данные обновляются периодически, при действиях и открытии разделов. Это не проверка доступности сервера.':connectionDisplay==='connected'?'Постоянная синхронизация активна':connectionDisplay==='connecting'?'Подключение…':'Браузер сообщает об отсутствии сети';
- const [screenHistory,setScreenHistory]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
+ const [screenHistory,setScreenHistory,navigationHydrated,navigationRestored]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
  },validScreenHistory);
  const currentScreen=screenHistory.entries[screenHistory.index];
@@ -270,7 +270,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  function navigate(next:View,target?:{stageNo?:number;documentId?:string;voteId?:string;templateKey?:string},profileVerified=false){
   const owner=g.me;
   const p=g.profiles.find(row=>row.user_id===owner?.user_id);
-  if(!profileVerified&&owner&&owner.kind!=='observer'&&g.profilesLoaded&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'){
+  if(!profileVerified&&owner&&owner.kind!=='observer'&&navigationHydrated&&g.profilesLoaded&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'){
    setOnboardingNotice('Сначала завершите оформление личного профиля.');
    next='profile';
   }
@@ -342,9 +342,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  useEffect(()=>{
   // Never interpret a temporarily missing profile row during initial loading
   // as an incomplete onboarding. Doing so overwrites the restored screen on F5.
-  if(!game||!me||g.loading||!g.profilesLoaded||me.kind==='observer'||introOpen||!introSeen||myProfile?.onboarding_completed_at)return;
+  if(!game||!me||g.loading||!g.profilesLoaded||!navigationHydrated||navigationRestored||me.kind==='observer'||introOpen||!introSeen||myProfile?.onboarding_completed_at)return;
   if(view!=='profile')navigate('profile');
- },[game?.id,me?.user_id,g.loading,g.profilesLoaded,introSeen,myProfile?.onboarding_completed_at,introOpen,view]);
+ },[game?.id,me?.user_id,g.loading,g.profilesLoaded,navigationHydrated,navigationRestored,introSeen,myProfile?.onboarding_completed_at,introOpen,view]);
  async function completeOnboarding(){
   if(!game||!me||completingProfile)return;
   setCompletingProfile(true);setOnboardingNotice('');
@@ -374,7 +374,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  },[previewStudent?.user_id]);
 
 
- if(loading||!game||!me||!shownMe)return <main className="connectionPage"><section className="connectionCard" aria-live="polite"><span className="wordmark">GOS//SIMS</span>{!error&&<div className="spinner"/>}<h1>{error?'Не удалось открыть игру':'Подключаемся к республике'}</h1><p>{error||'Загружаем этапы, команды и последние события.'}</p>{error&&<div><button className="primary" onClick={()=>window.location.reload()}>Попробовать снова</button><a className="secondary" href="/">Вернуться ко входу</a></div>}</section></main>;
+ if(loading||!game||!me||!shownMe||!navigationHydrated)return <main className="connectionPage"><section className="connectionCard" aria-live="polite"><span className="wordmark">GOS//SIMS</span>{!error&&<div className="spinner"/>}<h1>{error?'Не удалось открыть игру':'Подключаемся к республике'}</h1><p>{error||'Загружаем этапы, команды и последние события.'}</p>{error&&<div><button className="primary" onClick={()=>window.location.reload()}>Попробовать снова</button><a className="secondary" href="/">Вернуться ко входу</a></div>}</section></main>;
 
  const nav:[View,string][]=[['dashboard','Обзор игры'],['stages','Этапы и задачи'],['actions','Политический процесс'],['parties',teacher&&!previewMode?'Партии':'Моя партия'],['votes','Голосования'],['documents','Реестр НПА'],['budget','Бюджет'],['grades','Оценки и разбор'],['events','События и ситуации'],...(teacher&&!previewMode?[['teacher','Управление'] as [View,string]]:[]),['profile','Мой профиль']];
 
