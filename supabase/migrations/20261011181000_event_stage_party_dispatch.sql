@@ -53,11 +53,10 @@ begin
              and ea.created_at>=v_now-interval '24 hours')<s.max_daily
       and (select count(*) from public.event_assignments ea
              where ea.game_id=p_game and ea.recipient_id=gm.user_id and ea.status='pending')<3
-      and (select max(created_at) from public.event_assignments ea
-             where ea.game_id=p_game and ea.recipient_id=gm.user_id) <
+      and coalesce((select max(created_at) from public.event_assignments ea
+             where ea.game_id=p_game and ea.recipient_id=gm.user_id),'-infinity'::timestamptz) <
              v_now-(greatest(4,s.interval_hours/(1+s.activity_weight*least(2,
                least(120,greatest(0,extract(epoch from(v_now-coalesce(pr.last_seen_at,v_now-interval '72 hours')))/3600))/48)))*interval '1 hour')
-          or not exists(select 1 from public.event_assignments ea where ea.game_id=p_game and ea.recipient_id=gm.user_id)
     order by random()
     limit case when c.destination in('regional_joint','federal_joint') then 3
                when c.destination in('regional','federal_collective') then 500
