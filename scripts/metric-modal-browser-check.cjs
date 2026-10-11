@@ -83,7 +83,7 @@ async function main(){
      };
      return {bounds:header.getBoundingClientRect().toJSON(),width:header.clientWidth,scroll:header.scrollWidth,
       previous:get('.screenHistoryButton'),status:get('.livePill'),
-      countdown:get('.timerPill'),connection:get('.connectionPill.disconnected'),
+      countdown:get('.timerPill'),connection:get('.connectionPill.polling'),
       role:get('.viewAsTrigger'),chat:get('.topChatButton')};
     });
     assert(layout.status&&(width<=900||layout.chat),'Status and desktop chat must exist in '+screen);
@@ -93,8 +93,8 @@ async function main(){
     }else if(screen==='student'){
      assert(!layout.role,'Students must not see teacher preview controls');
     }else if(screen==='offline'){
-     assert(layout.connection&&layout.connection.text.includes('Нет связи'),
-      'Disconnected state is visible with a full status label');
+     assert(layout.connection&&layout.connection.text.includes('По расписанию'),
+      'Disconnected realtime uses visible scheduled refresh status while browser is online');
     }
     if(layout.scroll>layout.width+2){
      const details=await page.frameLocator('#preview').locator('.simTop').evaluate(el=>({
