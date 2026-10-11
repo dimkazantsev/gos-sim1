@@ -9,6 +9,7 @@ import ClassroomJournal from './ClassroomJournal';
 import SignatureUpload from './SignatureUpload';
 import ProfileSecurityPanel from './ProfileSecurityPanel';
 import RepublicComic from './RepublicComic';
+import {BlitzArchive} from './Blitz';
 import SessionManager from './SessionManager';
 import StyledSelect from '../ui/StyledSelect';
 import {cropPortrait,decodePortrait,preparePortraitDetector} from './avatarCrop';
@@ -124,6 +125,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
     <div className="profileHeroControls">
      <button type="button" className="profileComicButton" aria-label="Вводный комикс" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Пролог</button>
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
+     {game&&target.kind==='student'&&<BlitzArchive gameId={game.id} userId={target.user_id}/>}
      {!own&&<button type="button" onClick={onOwnProfile}><UserRound size={17}/> Мой профиль</button>}
 
     </div>
