@@ -154,70 +154,23 @@ export function useRepublicGame(gameId:string){
 
  useEffect(()=>{
   if(!me?.user_id||me.game_id!==gameId)return;
-  setRealtimeState('connecting');
-  // A classroom enters in a burst. Spread subscription registration over a
-  // few seconds so 30 clients do not hit Realtime's publication catalog at
-  // the same instant.
-  const seed=[...me.user_id].reduce((n,ch)=>(n*33+ch.charCodeAt(0))>>>0,5381);
-  const subscribeDelay=800+(seed%4200);
-  const live=supabase.channel('republic:'+gameId+':'+me.user_id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'games',filter:'id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'state_metrics',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_stages',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_votes',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_events',filter:'game_id=eq.'+gameId},()=>scheduleRealtimeReload());
-  let subscribed=false;
-  const timer=setTimeout(()=>{
-   subscribed=true;
-   live.subscribe(status=>{if(!alive.current)return;setRealtimeState(status==='SUBSCRIBED'?'connected':status==='CLOSED'||status==='CHANNEL_ERROR'||status==='TIMED_OUT'?'disconnected':'connecting');});
-  },subscribeDelay);
-  liveRef.current=live;
-  return()=>{clearTimeout(timer);if(liveRef.current===live)liveRef.current=null;if(subscribed)void supabase.removeChannel(live)};
+  // Supabase Realtime currently spends seconds scanning the large
+  // supabase_realtime publication. Do not let that infrastructure path
+  // compete with 30 classroom clients. Keep the UI eventually consistent
+  // through one bounded visible-tab refresh and immediate local invalidation.
+  setRealtimeState('disconnected');
+  let running=false,queued=false;
+  async function update(){
+   if(!alive.current||document.visibilityState==='hidden')return;
+   if(running){queued=true;return}
+   running=true;
+   try{await hydrateActiveView()}
+   finally{running=false;if(queued&&alive.current){queued=false;setTimeout(()=>void update(),500)}}
+  }
+  const interval=setInterval(()=>void update(),30000);
+  return()=>{clearInterval(interval)};
  },[gameId,me?.user_id]);
 
-
- useEffect(()=>{
-  if(!me?.user_id)return;
-  let live=supabase.channel('republic-view:'+gameId+':'+activeView+':'+(chatOpen?'chat':'quiet'));
-  let handlers=0;
-  const on=(table:string,callback:()=>void,event:'*'|'INSERT'='*',filter=true)=>{
-   handlers++;
-   live=live.on('postgres_changes',{event,schema:'public',table,...(filter?{filter:'game_id=eq.'+gameId}:{})},callback);
-  };
-  if(activeView==='votes'){on('game_ballots',()=>scheduleRealtimeReload(),'*',false);on('game_evaluations',()=>scheduleRealtimeReload());}
-  if(activeView==='events'||activeView==='teacher')on('game_crises',()=>scheduleRealtimeReload());
-  if(activeView==='documents'){on('formal_documents',()=>void loadFormalRegistry());on('formal_document_history',()=>void loadFormalRegistry());}
-  if(activeView==='parties'||activeView==='profile'){on('game_profiles',()=>void loadPartyAssets());on('party_documents',()=>void loadPartyAssets());}
-  if(activeView==='parties')on('game_parties',()=>void loadPartyAssets());
-  if(activeView==='parties'||activeView==='teacher'){
-   on('party_invitations',()=>void loadPartyRepresentation());
-   on('party_member_mandates',()=>void loadPartyRepresentation());
-   on('party_agreements',()=>void loadPartyRepresentation());
-  }
-  if(activeView==='actions'||activeView==='teacher'){
-   on('political_posts',()=>void loadPoliticalWall());
-   on('political_post_media',()=>void loadPoliticalWall());
-   on('state_metric_history',()=>void loadPoliticalWall());
-  }
-  if(activeView==='teacher'){
-   on('game_activity',()=>void loadClassroomTelemetry());
-   on('game_presence',()=>void loadClassroomTelemetry());
-   on('impact_rules',()=>void loadImpactEngine());
-   on('impact_ledger',()=>void loadImpactEngine());
-  }
-  if(activeView==='budget')on('event_case_outcomes',()=>void syncBudget(),'INSERT');
-  if(chatOpen){
-   on('chat_channels',()=>void loadChatOverview());
-   on('channel_members',()=>void loadChatOverview(),'*',false);
-   on('chat_messages',()=>{void loadChatOverview();if(channelRef.current)void loadMessages(channelRef.current)},'INSERT');
-   on('chat_pins',()=>{if(channelRef.current)void loadChatPins(channelRef.current)});
-   on('chat_channel_state',()=>void loadChatOverview());
-   on('chat_mentions',()=>void loadChatOverview());
-  }
-  if(!handlers)return;
-  live.subscribe();
-  return()=>{void supabase.removeChannel(live)};
- },[gameId,activeView,chatOpen,me?.user_id]);
 
  useEffect(()=>()=>{
   const rec=recorder.current;
