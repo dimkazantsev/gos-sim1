@@ -3,7 +3,8 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 type Assignment={id:string;question_id:number;user_id:string;chosen_index:number|null;is_correct:boolean|null;answered_at:string|null;stage_no:number};
-type Question={id:number;question:string;options:string[];correct_index:number;topic:string;explanation:string;legal_act:string;article:string;source_url:string};
+type ReviewStatus='pending'|'approved'|'rejected';
+type Question={id:number;question:string;options:string[];correct_index:number;topic:string;explanation:string;legal_act:string;article:string;source_url:string;verified:boolean;legal_review_status:ReviewStatus;legal_reviewed_at:string|null;legal_review_note:string|null};
 type Stats={user_id:string;correct:number;incorrect:number;pending:number};
 const CHECKS=[
  ['daily','3–5 заданий в сутки без повторов','Восстанавливаются ли вопросы, назначенные во время отсутствия участника?'],
@@ -19,8 +20,8 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
  const gameId=g.game?.id||'';
  const students=g.members.filter(m=>m.game_id===gameId&&m.kind==='student');
  const [questions,setQuestions]=useState<Question[]>([]),[items,setItems]=useState<Assignment[]>([]),[stats,setStats]=useState<Stats[]>([]);
- const [showBank,setShowBank]=useState(true),[query,setQuery]=useState(''),[actFilter,setActFilter]=useState('all'),[sort,setSort]=useState<'question'|'topic'>('question'),[limit,setLimit]=useState(30);
- const [notes,setNotes]=useState<Record<string,string>>({}),[error,setError]=useState(''),[saved,setSaved]=useState('');
+ const [showBank,setShowBank]=useState(true),[query,setQuery]=useState(''),[actFilter,setActFilter]=useState('all'),[reviewFilter,setReviewFilter]=useState<'all'|ReviewStatus>('all'),[sort,setSort]=useState<'question'|'topic'>('question'),[limit,setLimit]=useState(30);
+ const [notes,setNotes]=useState<Record<string,string>>({}),[error,setError]=useState(''),[saved,setSaved]=useState(''),[reviewBusy,setReviewBusy]=useState<number|null>(null);
  const loadedIds=useRef<Set<number>>(new Set()),sentinel=useRef<HTMLDivElement>(null);
  useEffect(()=>{if(!gameId)return;let active=true;loadedIds.current.clear();setItems([]);
   async function load(){const [q,n,s]=await Promise.all([
@@ -36,7 +37,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   void load();return()=>{active=false}
  },[gameId]);
  const acts=useMemo(()=>[...new Set(questions.map(q=>q.legal_act))].sort((a,b)=>a.localeCompare(b,'ru')),[questions]);
-  const filtered=useMemo(()=>questions.filter(q=>(actFilter==='all'||q.legal_act===actFilter)&&(q.question+' '+q.topic+' '+q.legal_act+' '+q.article).toLocaleLowerCase('ru').includes(query.trim().toLocaleLowerCase('ru'))).sort((a,b)=>sort==='topic'?(a.topic.localeCompare(b.topic,'ru')||a.question.localeCompare(b.question,'ru')):a.question.localeCompare(b.question,'ru')),[questions,query,actFilter,sort]);
+  const filtered=useMemo(()=>questions.filter(q=>(actFilter==='all'||q.legal_act===actFilter)&&(reviewFilter==='all'||q.legal_review_status===reviewFilter)&&(q.question+' '+q.topic+' '+q.legal_act+' '+q.article).toLocaleLowerCase('ru').includes(query.trim().toLocaleLowerCase('ru'))).sort((a,b)=>sort==='topic'?(a.topic.localeCompare(b.topic,'ru')||a.question.localeCompare(b.question,'ru')):a.question.localeCompare(b.question,'ru')),[questions,query,actFilter,reviewFilter,sort]);
  const shown=useMemo(()=>filtered.slice(0,limit),[filtered,limit]);
  const questionIds=shown.map(q=>q.id).join(',');
  useEffect(()=>{if(!gameId||!questionIds)return;let valid=true;
@@ -57,23 +58,30 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
  },{rootMargin:'200px'});observer.observe(sentinel.current);return()=>observer.disconnect()},[shown.length,filtered.length]);
  const answerMap=useMemo(()=>new Map(items.map(x=>[x.question_id+':'+x.user_id,x])),[items]);
  const statsMap=useMemo(()=>new Map(stats.map(x=>[x.user_id,x])),[stats]);
+ const reviewCounts=useMemo(()=>questions.reduce((a,q)=>{a[q.legal_review_status]=(a[q.legal_review_status]||0)+1;return a},{pending:0,approved:0,rejected:0} as Record<ReviewStatus,number>),[questions]);
+ async function reviewQuestion(q:Question,status:ReviewStatus){if(!gameId||reviewBusy)return;setReviewBusy(q.id);setSaved('');const note=notes['q:'+q.id]||q.legal_review_note||'';
+  const r=await supabase.rpc('blitz_set_legal_review',{p_game:gameId,p_question:q.id,p_status:status,p_note:note||null});
+  if(r.error){setError(r.error.message)}else{setError('');setQuestions(prev=>prev.map(x=>x.id===q.id?{...x,legal_review_status:status,legal_reviewed_at:status==='pending'?null:new Date().toISOString(),legal_review_note:note||null}:x));setSaved(status==='approved'?'Вопрос допущен к выдаче.':status==='rejected'?'Вопрос отклонён.':'Вопрос возвращён на проверку.')}
+  setReviewBusy(null);
+ }
  async function saveNote(key:string){if(!g.me||!gameId)return;setSaved('');
   const r=await supabase.from('blitz_check_notes').upsert({game_id:gameId,check_key:key,teacher_id:g.me.user_id,correction:notes[key]||'',updated_at:new Date().toISOString()});
   setSaved(r.error?r.error.message:'Корректировка сохранена.');
  }
  return <section className="surface blitzTeacher">
-  <header><h2>Блиц-вопросы</h2><p>Матрица фактических ответов участников. ✓ — верно, ✕ — неверно, — — ответа нет.</p></header>
+  <header><h2>Блиц-вопросы</h2><p>Матрица фактических ответов участников. ✓ — верно, ✕ — неверно, — — ответа нет.</p><p><strong>Юридический допуск:</strong> одобрено {reviewCounts.approved}, ожидают проверки {reviewCounts.pending}, отклонено {reviewCounts.rejected}. Студентам выдаются только одобренные вопросы.</p></header>
   {error&&<p role="alert">{error}</p>}
   <div className="blitzFilters">
    <input type="search" aria-label="Поиск блиц-вопросов" placeholder="Поиск по вопросу или теме" value={query} onChange={e=>{setQuery(e.target.value);setLimit(30)}}/>
    <select aria-label="Фильтр по нормативному акту" value={actFilter} onChange={e=>{setActFilter(e.target.value);setLimit(30)}}><option value="all">Все нормативные акты</option>{acts.map(act=><option key={act} value={act}>{act}</option>)}</select>
+   <select aria-label="Юридический статус" value={reviewFilter} onChange={e=>{setReviewFilter(e.target.value as 'all'|ReviewStatus);setLimit(30)}}><option value="all">Все юридические статусы</option><option value="pending">Ожидают проверки</option><option value="approved">Одобрены</option><option value="rejected">Отклонены</option></select>
    <select aria-label="Сортировка вопросов" value={sort} onChange={e=>{setSort(e.target.value as 'question'|'topic');setLimit(30)}}><option value="question">По вопросу</option><option value="topic">По тематике</option></select>
   </div>
   <details open={showBank} onToggle={e=>setShowBank(e.currentTarget.open)}><summary>Просмотр банка вопросов — {questions.length} записей (варианты, ответ и НПА)</summary>
    <div className="blitzReviewList">{shown.map((q,i)=><details key={q.id} open><summary>{i+1}. {q.question}</summary>
     <p><strong>Тема:</strong> {q.topic}</p>
     <ol>{q.options.map((option,index)=><li key={index} className={index===q.correct_index?'correct':''}>{option}{index===q.correct_index?' ✓ Правильный ответ':''}</li>)}</ol>
-    <p><strong>Объяснение:</strong> {q.explanation}</p><p><strong>НПА:</strong> <a href={q.source_url} target="_blank" rel="noopener noreferrer">{q.legal_act}, {q.article} ↗</a></p><label>Корректировка к вопросу<textarea rows={2} value={notes['q:'+q.id]||''} onChange={e=>setNotes(prev=>({...prev,['q:'+q.id]:e.target.value}))}/></label><button type="button" onClick={()=>void saveNote('q:'+q.id)}>Сохранить замечание</button>
+    <p><strong>Объяснение:</strong> {q.explanation}</p><p><strong>НПА:</strong> <a href={q.source_url} target="_blank" rel="noopener noreferrer">{q.legal_act}, {q.article} ↗</a></p><p><strong>Юридический статус:</strong> {q.legal_review_status==='approved'?'Одобрен':q.legal_review_status==='rejected'?'Отклонён':'Ожидает проверки'}{q.verified?' · технически проверен':' · техническая проверка не завершена'}</p><label>Корректировка / юридическое примечание<textarea rows={2} value={notes['q:'+q.id]??q.legal_review_note??''} onChange={e=>setNotes(prev=>({...prev,['q:'+q.id]:e.target.value}))}/></label><div><button type="button" onClick={()=>void saveNote('q:'+q.id)}>Сохранить замечание</button> <button type="button" disabled={reviewBusy===q.id||!q.verified} onClick={()=>void reviewQuestion(q,'approved')}>Одобрить для выдачи</button> <button type="button" disabled={reviewBusy===q.id} onClick={()=>void reviewQuestion(q,'rejected')}>Отклонить</button> <button type="button" disabled={reviewBusy===q.id} onClick={()=>void reviewQuestion(q,'pending')}>Вернуть на проверку</button></div>
    </details>)}</div>
   </details>
   <details open><summary>Матрица ответов — {questions.length} вопросов, {students.length} участников</summary>
