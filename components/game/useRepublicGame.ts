@@ -44,7 +44,6 @@ export function useRepublicGame(gameId:string){
  activeViewRef.current=activeView;chatOpenRef.current=chatOpen;
  const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
- const bootstrapRunning=useRef(false),bootstrapQueued=useRef(false);
  const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,PendingMediaUpload>()),voiceAnalysisRef=useRef<Promise<{waveform:number[];duration:number}|null>|null>(null);
 
  const profiles=useMemo(()=>currentGameProfiles(profileRows,members,gameId),[profileRows,members,gameId]);
@@ -135,6 +134,9 @@ export function useRepublicGame(gameId:string){
   const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
    if(disposed)return;
    const nextUser=session?.user.id||null;
+   // The explicit loadAll below owns the initial bootstrap. Ignoring the
+   // duplicate INITIAL_SESSION callback avoids a second simultaneous entry.
+   if(event==='INITIAL_SESSION'&&authUser.current===undefined)return;
    if(!nextUser&&event!=='SIGNED_OUT')return;
    if(!adoptUser(nextUser,event==='SIGNED_OUT'))return;
    setError('');setLoading(!!nextUser);
@@ -260,8 +262,6 @@ export function useRepublicGame(gameId:string){
  }
 
  async function loadAll(show=true){
-  if(bootstrapRunning.current){bootstrapQueued.current=true;return}
-  bootstrapRunning.current=true;
   let ticket=startRead('all');
   if(show)setLoading(true);
   try{
@@ -290,11 +290,7 @@ export function useRepublicGame(gameId:string){
    }
    setLoading(false);
   }catch(error){if(readCurrent(ticket,'all'))setError(error)}
-  finally{
-   bootstrapRunning.current=false;
-   if(readCurrent(ticket,'all'))setLoading(false);
-   if(bootstrapQueued.current&&alive.current){bootstrapQueued.current=false;queueMicrotask(()=>void loadAll(false))}
-  }
+  finally{if(readCurrent(ticket,'all'))setLoading(false)}
  }
 
  async function loadCoreSections(){
