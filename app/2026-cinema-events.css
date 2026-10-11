@@ -248,3 +248,7 @@
 
 .eventWorkspace .eventBankTiles>.eventBankShowMore{min-height:44px;padding:9px 12px;background:#f1f6ff;border:1px solid #c9d9f4;border-radius:10px;color:#325ba0;font-size:13px;font-weight:750}
 .eventWorkspace .eventBankTiles>.eventBankShowMore:hover{background:#e6efff}
+
+/* Read-only context for events controlled by a regional branch of a nationwide party. */
+.eventWorkspace .eventRegionAssignmentNotice{padding:13px 16px;margin:8px 0 14px;border:1px solid #cfdbec;border-radius:12px;background:#f4f8ff;color:#31537d;font-size:13px;line-height:1.6}
+.eventWorkspace .eventRegionAssignmentNotice strong{color:#244b83}
