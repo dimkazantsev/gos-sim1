@@ -55,20 +55,40 @@ alter table public.blitz_check_notes enable row level security;
 revoke all on public.blitz_questions,public.blitz_daily_plans,public.blitz_assignments,public.blitz_check_notes from anon,authenticated;
 grant select on public.blitz_assignments,public.blitz_daily_plans,public.blitz_check_notes to authenticated;
 grant insert,update on public.blitz_check_notes to authenticated;
-create policy blitz_student_assigned on public.blitz_assignments for select to authenticated using (
+DO $policy$ BEGIN
+ IF NOT EXISTS(SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='blitz_assignments' AND policyname='blitz_student_assigned') THEN
+  EXECUTE $policy_sql$create policy blitz_student_assigned on public.blitz_assignments for select to authenticated using (
  user_id = (select auth.uid())
  or exists(select 1 from public.game_members m where m.game_id=blitz_assignments.game_id and m.user_id=(select auth.uid()) and m.kind='teacher')
-);
-create policy blitz_student_daily on public.blitz_daily_plans for select to authenticated using (
+);$policy_sql$;
+ END IF;
+END $policy$;
+DO $policy$ BEGIN
+ IF NOT EXISTS(SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='blitz_daily_plans' AND policyname='blitz_student_daily') THEN
+  EXECUTE $policy_sql$create policy blitz_student_daily on public.blitz_daily_plans for select to authenticated using (
  user_id=(select auth.uid())
  or exists(select 1 from public.game_members m where m.game_id=blitz_daily_plans.game_id and m.user_id=(select auth.uid()) and m.kind='teacher')
-);
-create policy blitz_teacher_notes_read on public.blitz_check_notes for select to authenticated using (
+);$policy_sql$;
+ END IF;
+END $policy$;
+DO $policy$ BEGIN
+ IF NOT EXISTS(SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='blitz_check_notes' AND policyname='blitz_teacher_notes_read') THEN
+  EXECUTE $policy_sql$create policy blitz_teacher_notes_read on public.blitz_check_notes for select to authenticated using (
  exists(select 1 from public.game_members m where m.game_id=blitz_check_notes.game_id and m.user_id=(select auth.uid()) and m.kind='teacher')
-);
-create policy blitz_teacher_notes_insert on public.blitz_check_notes for insert to authenticated with check (
+);$policy_sql$;
+ END IF;
+END $policy$;
+DO $policy$ BEGIN
+ IF NOT EXISTS(SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='blitz_check_notes' AND policyname='blitz_teacher_notes_insert') THEN
+  EXECUTE $policy_sql$create policy blitz_teacher_notes_insert on public.blitz_check_notes for insert to authenticated with check (
  teacher_id=(select auth.uid()) and exists(select 1 from public.game_members m where m.game_id=blitz_check_notes.game_id and m.user_id=(select auth.uid()) and m.kind='teacher')
-);
-create policy blitz_teacher_notes_update on public.blitz_check_notes for update to authenticated using (
+);$policy_sql$;
+ END IF;
+END $policy$;
+DO $policy$ BEGIN
+ IF NOT EXISTS(SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='blitz_check_notes' AND policyname='blitz_teacher_notes_update') THEN
+  EXECUTE $policy_sql$create policy blitz_teacher_notes_update on public.blitz_check_notes for update to authenticated using (
  exists(select 1 from public.game_members m where m.game_id=blitz_check_notes.game_id and m.user_id=(select auth.uid()) and m.kind='teacher')
-) with check (teacher_id=(select auth.uid()));
+) with check (teacher_id=(select auth.uid()));$policy_sql$;
+ END IF;
+END $policy$;
