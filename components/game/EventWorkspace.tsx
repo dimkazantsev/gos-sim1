@@ -30,6 +30,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const [expanded,setExpanded]=useState('');
  const [legalFilter,setLegalFilter]=useState('all');
  const [cases,setCases]=useState<CaseRow[]>([]);
+ const [caseRegions,setCaseRegions]=useState<Record<string,{name:string;party:string}>>({});
  const [readyCaseCount,setReadyCaseCount]=useState<number|null>(null);
  const [assignments,setAssignments]=useState<Assignment[]>([]);
  const [decisions,setDecisions]=useState<Decision[]>([]);
@@ -69,7 +70,23 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    const result=await supabase.from('event_cases').select('*').eq('game_id',game.id).in('id',caseIds);
    if(result.error){setNotice(result.error.message);return}
    setCases((result.data||[]) as CaseRow[]);
-  }else setCases([]);
+   const routing=await supabase.from('event_case_routing').select('case_id,region_code').eq('game_id',game.id).in('case_id',caseIds).not('region_code','is',null);
+   if(!routing.error&&routing.data?.length){
+    const regionCodes=[...new Set(routing.data.map(x=>x.region_code))];
+    const [reference,control]=await Promise.all([
+     supabase.from('fiscal_region_reference').select('code,name').in('code',regionCodes),
+     supabase.from('game_region_party_control').select('region_code,party_id').eq('game_id',game.id).in('region_code',regionCodes)
+    ]);
+    if(!reference.error&&!control.error){
+     const names=new Map((reference.data||[]).map(r=>[r.code,r.name]));
+     const parties=new Map((g.parties||[]).map(p=>[p.id,p.name]));
+     const controllers=new Map((control.data||[]).map(r=>[r.region_code,parties.get(r.party_id)||'партия-победитель']));
+     setCaseRegions(Object.fromEntries(routing.data.filter(r=>controllers.has(r.region_code)).map(r=>[
+      r.case_id,{name:names.get(r.region_code)||r.region_code,party:controllers.get(r.region_code)||''}
+     ])));
+    }
+   }else setCaseRegions({});
+  }else {setCases([]);setCaseRegions({})}
   setInvitations(invitedRows);setAuthority((f.data||[]) as Authority[]);
   setAssignments(assignedRows);setDecisions((c.data||[]) as Decision[]);setOutcomes((d.data||[]) as Outcome[]);
   if(includeCount){
@@ -231,7 +248,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
      <div className="eventStoryVisual"><EventComic silent title={c.title} category={c.category} caseKey={c.case_key} scene={c.comic_scene} compact/></div>
      <div className="eventStoryContent">
       {teacher&&<div className="eventCaseTop"><span>{c.category}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {invites.some(i=>i.status==='accepted')?'Совместно':c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>}
-      <h4>{c.title}</h4>{expandedCase&&<><p>{c.situation.replace(/\\n/g,'\n')}</p>
+      <h4>{c.title}</h4>{caseRegions[c.id]&&<p className="eventRegionAssignmentNotice"><strong>Региональное отделение партии {caseRegions[c.id].party}</strong> · {caseRegions[c.id].name}. В данном субъекте победили губернатор и партия, получившая контроль над законодательным органом субъекта РФ. Поэтому вашей партийной команде необходимо решить эту ситуацию. При необходимости пригласите компетентных участников другого органа власти.</p>}{expandedCase&&<><p>{c.situation.replace(/\\n/g,'\n')}</p>
       <div className="eventStoryRecipients">{assigned.map(a=><span key={a.id}>{members.find(m=>m.user_id===a.recipient_id)?.full_name||'Участник'} · {members.find(m=>m.user_id===a.recipient_id)?.role_title||'Без должности'}</span>)}</div>
       <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили · {pct(responded.length,assigned.length)}%</span>
       </div>
