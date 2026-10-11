@@ -3,7 +3,7 @@ BEGIN;
 DO $blitz_test$
 DECLARE
  gameid uuid; uid uuid; stranger uuid:=gen_random_uuid();
- n integer; v jsonb; q uuid; wrongq uuid; lateq uuid; good integer; bad integer;
+ n integer; v jsonb; knowledge jsonb; q uuid; wrongq uuid; lateq uuid; good integer; bad integer;
  nopts integer; first_answer jsonb; repeated jsonb; blocked boolean:=false; pending jsonb;
 BEGIN
  SELECT id INTO gameid FROM public.games ORDER BY created_at LIMIT 1;
@@ -36,6 +36,8 @@ BEGIN
  UPDATE public.blitz_assignments SET started_at=clock_timestamp()-interval '40 seconds' WHERE id=lateq;
  v:=public.blitz_answer(lateq,0);
  IF (v->>'is_correct')::boolean IS DISTINCT FROM false OR v->>'chosen_index' IS NOT NULL THEN RAISE EXCEPTION 'Deadline bypass'; END IF;
+ knowledge:=public.blitz_vsn(gameid,uid,1);
+ IF (knowledge->>'score')::numeric NOT BETWEEN 0 AND 1 OR (knowledge->>'quiz_answered')::integer<>2 THEN RAISE EXCEPTION 'Invalid knowledge aggregation: %',knowledge; END IF;
  PERFORM set_config('request.jwt.claim.sub',stranger::text,true);
  BEGIN PERFORM public.blitz_answer(q,0); EXCEPTION WHEN SQLSTATE '42501' THEN blocked:=true; END;
  IF NOT blocked THEN RAISE EXCEPTION 'Cross-user write allowed'; END IF;
