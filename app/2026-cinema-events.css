@@ -223,3 +223,10 @@
 .eventWorkspace .eventRefreshButton.secondary>svg{display:block;width:16px;height:16px;flex:none;margin:0;position:static;transform:none}
 .eventWorkspace .eventWorkspaceHeading>p{margin-top:8px}
 @media(max-width:520px){.eventWorkspace .eventWorkspaceTitleRow{gap:8px}.eventWorkspace .eventRefreshButton.secondary{min-height:36px;padding:7px 10px;font-size:12px}}
+
+/* Events header actions: one right-aligned group, with safe wrapping on narrow screens. */
+.eventWorkspace .eventWorkspaceHeaderActions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex:0 1 auto;min-width:0;flex-wrap:wrap}
+.eventWorkspace .eventWorkspaceHeaderActions>.eventWorkspaceStatus{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;max-width:100%;padding:9px 14px;border:1px solid #d8e5f8;border-radius:12px;background:#f7faff;color:#496997;font-size:13px;font-weight:750;line-height:1.4;white-space:normal}
+.eventWorkspace .eventWorkspaceHeaderActions>.eventWorkspaceStatus>svg{flex:none}
+.eventWorkspace .eventWorkspaceHeaderActions>.eventRefreshButton.secondary{min-height:44px;align-self:center}
+@media(max-width:740px){.eventWorkspace .eventWorkspaceHeaderActions{justify-content:flex-start;width:100%}}
