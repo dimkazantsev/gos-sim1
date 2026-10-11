@@ -51,10 +51,11 @@ export default function Home(){
    // getSession() may auto-refresh an old local session before checking the
    // credentials entered in this form, so a transient refresh-token 504 can
    // incorrectly block a valid password login.
-   let authError:unknown=null;
+   let authError:unknown=null,authenticated=false;
+   supabase.auth.stopAutoRefresh();
    for(let attempt=0;attempt<2;attempt++){
     const auth=await supabase.auth.signInWithPassword({email:loginEmail.trim().toLowerCase(),password:loginPassword});
-    if(!auth.error){authError=null;break}
+    if(!auth.error){authError=null;authenticated=true;break}
     authError=auth.error;
     const detail=[auth.error.status,auth.error.code,auth.error.message].filter(Boolean).join(' ');
     const retry=/\b5\d\d\b|request_timeout|context deadline exceeded|timeout|temporarily unavailable|fetch failed|network/i.test(detail);
@@ -62,6 +63,7 @@ export default function Home(){
     await new Promise(resolve=>setTimeout(resolve,900));
    }
    if(authError)throw authError;
+   if(authenticated)supabase.auth.startAutoRefresh();
    phase='game';
    // PostgREST can temporarily return 503 while rebuilding its schema cache.
    // Resume is idempotent, unlike join_game_with_code which records an audit event.
