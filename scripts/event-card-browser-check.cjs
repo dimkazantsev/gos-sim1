@@ -8,14 +8,14 @@ Module._resolveFilename=function(request,...args){return originalResolve.call(th
 require.extensions['.css']=module=>{module.exports={}};
 for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,file);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),EventComic=require('../components/game/EventComic').default,EventCaseTile=require('../components/game/EventCaseTile').default;
-const {eventSceneFrame}=require('../components/game/eventSceneFrame');
+const {resolveSituationIcon,SITUATION_ICON_COMBINATIONS}=require('../components/game/SituationIcon');
 const old=JSON.parse(fs.readFileSync(path.join(root,'content/events-v2.json'),'utf8'));
 const extra=JSON.parse(fs.readFileSync(path.join(root,'content/events-legal-2026.json'),'utf8'));
 assert.equal(extra.length,150);
 const cases=[...old,...extra];
 assert.equal(cases.length,200);
-assert.equal(new Set(cases.map(c=>JSON.stringify(eventSceneFrame(c.case_key,c.comic_scene.scene_id)))).size,cases.length);
-assert.equal(eventSceneFrame('bank-curated-v2-13','scene-21').number,13,'Case key wins over a stale scene id');
+assert.equal(SITUATION_ICON_COMBINATIONS,324);
+assert(cases.every(c=>resolveSituationIcon(c.case_key,c.title,c.category).key),'Every case resolves to a vector icon');
 let css=fs.readFileSync(path.join(root,'app/globals.css'),'utf8').replace(/@import '\.\/([^']+)' layer\(legacy\);/g,(_,file)=>'@layer legacy {'+fs.readFileSync(path.join(root,'app',file),'utf8')+'}');
 for(const match of fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8').matchAll(/import ['"]\.\/([^'"]+\.css)['"]/g)){if(match[1]!=='globals.css')css+='\n'+fs.readFileSync(path.join(root,'app',match[1]),'utf8')}
 const illustration=c=>renderToStaticMarkup(React.createElement(EventComic,{title:c.title,category:c.category,caseKey:c.case_key,scene:c.comic_scene,silent:true})).replaceAll('/event-comics/',pathToFileURL(path.join(root,'public/event-comics/')).href).replaceAll('/event-art/',pathToFileURL(path.join(root,'public/event-art/')).href);
@@ -37,19 +37,19 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    assert.equal(geometry.first.top,geometry.second.top,'First tiles share a row');
    assert(geometry.second.left>geometry.first.left,'Tiles run left to right');
    if(width===1440)assert(geometry.detail.left>=geometry.list.right,'Description is to the right of the bank');
-   const clips=await page.locator('svg[data-scene]').evaluateAll(els=>els.map(svg=>({overflow:getComputedStyle(svg).overflow,view:svg.getAttribute('viewBox'),clip:svg.querySelector('g').getAttribute('clip-path'),rect:!!svg.querySelector('clipPath>rect')})));
-   assert(clips.every(c=>c.overflow==='hidden'&&c.view.startsWith('0 0 ')&&c.clip&&c.rect),'Every illustration must paint only its own clipped scene');
-   assert.equal(await page.locator('[data-case] svg[data-scene], [data-case] figure.cinematicRaster[data-scene]').count(),cases.length);
-   const raster=await page.locator('figure.cinematicRaster img').evaluateAll(els=>els.filter(img=>img.getBoundingClientRect().top<innerHeight).map(img=>({loaded:img.complete&&img.naturalWidth>0,ratio:img.naturalWidth/img.naturalHeight})));assert(raster.every(x=>x.loaded&&Math.abs(x.ratio-16/9)<.01),'Generated illustrations load in 16:9 without stretching');
-   const hashes=new Set();
-   for(const number of [6,10,13,21,41,42,43,44,45,46,47,48,49,50]){
-    const svg=page.locator('[data-case="bank-curated-v2-'+String(number).padStart(2,'0')+'"] svg[data-scene], [data-case="bank-curated-v2-'+String(number).padStart(2,'0')+'"] figure.cinematicRaster[data-scene]');
-    assert.equal(await svg.getAttribute('data-scene'),String(number));const bounds=await svg.boundingBox();assert(bounds&&bounds.width>0&&bounds.height>0,'Every scene must have a visible image box: '+number);
-    const buffer=await svg.screenshot();hashes.add(crypto.createHash('sha256').update(buffer).digest('hex'));
-   }
-   assert.equal(hashes.size,14,'Distinct scenes must never collapse to the same visible panel');
+   assert.equal(await page.locator('.eventCaseTile .situationSymbol').count(),cases.length);
+   assert.equal(await page.locator('.eventCaseTile img, .eventCaseTile image').count(),0,
+    'Event tiles must never fetch bitmap or external SVG art');
+   const icons=await page.locator('.eventCaseTile .situationSymbol').evaluateAll(nodes=>nodes.map(n=>({
+    key:n.getAttribute('data-icon-key'),fingerprint:n.getAttribute('data-icon-fingerprint'),
+    visible:n.getBoundingClientRect().width>0&&n.getBoundingClientRect().height>0,
+    svg:n.querySelectorAll('svg').length,
+    external:n.querySelectorAll('img,image,video,source').length
+   })));
+   assert(icons.every(icon=>icon.visible&&icon.svg===2&&!icon.external&&icon.key),'Each vector card must render two local glyphs');
+   assert.equal(new Set(icons.map(icon=>icon.fingerprint)).size,cases.length,'Every authored case must have a stable distinct fingerprint');
    await page.screenshot({path:path.join(shots,'event-cards-'+width+'.png'),fullPage:true});
-   console.log('PASS Separate case scenes and wrapping card grid and selected case panel at '+width+'px');
+   console.log('PASS Local vector icons without bitmap requests, responsive bank at '+width+'px');
   }
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
