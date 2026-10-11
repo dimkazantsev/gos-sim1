@@ -19,3 +19,12 @@ set source_note=replace(replace(replace(replace(replace(source_note,
  'учебной процедуры','процедуры')
 where game_id='541b6fde-16d5-4225-8f67-1fc2c7c15523'
  and source_note ilike '%учебн%';
+
+update public.event_cases
+set source_note=replace(replace(replace(replace(source_note,
+ 'Авторский вымышленный учебный сценарий','Смоделированная ситуация'),
+ 'Оригинальный вымышленный учебный кейс','Смоделированная ситуация'),
+ 'Авторская учебная задача','Ситуация'),
+ 'учебной модели','модели')
+where game_id='541b6fde-16d5-4225-8f67-1fc2c7c15523'
+ and source_note ilike '%учебн%';
