@@ -30,6 +30,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const [expanded,setExpanded]=useState('');
  const [legalFilter,setLegalFilter]=useState('all');
  const [cases,setCases]=useState<CaseRow[]>([]);
+ const [readyCaseCount,setReadyCaseCount]=useState<number|null>(null);
  const [assignments,setAssignments]=useState<Assignment[]>([]);
  const [decisions,setDecisions]=useState<Decision[]>([]);
  const [outcomes,setOutcomes]=useState<Outcome[]>([]);
@@ -48,29 +49,38 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const [saving,setSaving]=useState(false);
  const [notice,setNotice]=useState('');
  const [busyId,setBusyId]=useState<string|null>(null);
- async function reload(includeCatalog=true){
+ async function reload(includeCount=false){
   if(!game||!me)return;
-  const [a,b,c,d,e,f]=await Promise.all([
-   includeCatalog?supabase.from('event_cases').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).limit(1000):Promise.resolve({data:null,error:null}),
+  // Assigned cases belong to the active feed. The large unassigned bank
+  // is intentionally fetched only by the bottom disclosure on demand.
+  const [b,c,d,e,f]=await Promise.all([
    supabase.from('event_assignments').select('*').eq('game_id',game.id),
    supabase.from('event_decisions').select('*').eq('game_id',game.id),
    supabase.from('event_case_outcomes').select('*').eq('game_id',game.id),
    supabase.from('event_collaboration_invites').select('*').eq('game_id',game.id),
    supabase.from('event_authority_evidence').select('*').eq('game_id',game.id)
   ]);
-  const error=[a,b,c,d,e,f].find(r=>r.error)?.error;
+  const error=[b,c,d,e,f].find(r=>r.error)?.error;
   if(error){setNotice(error.message);return}
-  setInvitations((e.data||[]) as EventInvitation[]);setAuthority((f.data||[]) as Authority[]);
-  if(includeCatalog)setCases((a.data||[]) as CaseRow[]);
-  if(!b.error)setAssignments((b.data||[]) as Assignment[]);
-  if(!c.error)setDecisions((c.data||[]) as Decision[]);
-  if(!d.error)setOutcomes((d.data||[]) as Outcome[]);
+  const assignedRows=(b.data||[]) as Assignment[];
+  const invitedRows=(e.data||[]) as EventInvitation[];
+  const caseIds=[...new Set([...assignedRows.map(a=>a.case_id),...invitedRows.map(v=>v.case_id)])];
+  if(caseIds.length){
+   const result=await supabase.from('event_cases').select('*').eq('game_id',game.id).in('id',caseIds);
+   if(result.error){setNotice(result.error.message);return}
+   setCases((result.data||[]) as CaseRow[]);
+  }else setCases([]);
+  setInvitations(invitedRows);setAuthority((f.data||[]) as Authority[]);
+  setAssignments(assignedRows);setDecisions((c.data||[]) as Decision[]);setOutcomes((d.data||[]) as Outcome[]);
+  if(includeCount){
+   const result=await supabase.from('event_cases').select('id',{head:true,count:'exact'}).eq('game_id',game.id).eq('status','ready');
+   if(!result.error)setReadyCaseCount(result.count??0);
+  }
  }
  useEffect(()=>{
   if(!game?.id||!me?.user_id)return;
   void reload(true);
-  // Large authored situations are immutable while students are answering:
-  // poll only decision state, and never poll a hidden tab.
+  // Poll assignment state only while visible; bank content stays lazy.
   const poll=setInterval(()=>{if(document.visibilityState==='visible')void reload(false)},180000);
   let pending:ReturnType<typeof setTimeout>|undefined,needsCatalog=false;
   const changed=(catalog=false)=>{
@@ -93,7 +103,6 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const roles=[...new Set(students.map(m=>m.role_title?.trim()).filter((r):r is string=>!!r))].sort((a,b)=>a.localeCompare(b,'ru'));
  const recipients=roleFilter&&audience!=='all'?students.filter(m=>m.role_title===roleFilter):students;
  const mine=assignments.filter(a=>a.recipient_id===me?.user_id);
- const readyCases=cases.filter(c=>c.status==='ready');
  const eligible=audience==='all'?students.map(m=>m.user_id):selected;
  const canSend=title.trim().length>=6&&situation.trim().length>=20&&options.every(o=>{
   const roles=authorizedRoles(o.authorizedRoles);
@@ -125,7 +134,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  }
  const filteredCases=cases.filter(c=>{
   const casesAssignments=assignments.filter(a=>a.case_id===c.id);
-  if(!assignedCaseIds.has(c.id)&&!(teacher&&c.status==='ready'))return false;
+  if(!assignedCaseIds.has(c.id)&&!invitations.some(i=>i.case_id===c.id))return false;
   if(!teacher&&me?.kind!=='observer'&&!casesAssignments.some(a=>a.recipient_id===me?.user_id)&&!invitations.some(i=>i.case_id===c.id&&i.recipient_id===me?.user_id&&i.status==='pending'))return false;
   if(feedPerson&&!casesAssignments.some(a=>a.recipient_id===feedPerson))return false;
   if(feedRole&&!casesAssignments.some(a=>members.find(m=>m.user_id===a.recipient_id)?.role_title===feedRole))return false;
@@ -166,13 +175,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    <article><small>Негативные последствия</small><strong>{noCount}</strong><span>{ratio(noCount,relevantDecisions.length)}% от ответов</span></article>
    <article><small>Нейтральные решения</small><strong>{neutralCount}</strong><span>{ratio(neutralCount,relevantDecisions.length)}% от ответов</span></article>
   </div>}
-  {mode==='manage'&&teacher&&<EventAutopilotPanel g={g} onChanged={()=>reload(true)} readyCaseCount={readyCases.length}/>}
-  {mode==='manage'&&teacher&&<div className="eventCatalogTargets" aria-label="Состав банка игровых ситуаций">
-   <div><strong>{cases.length}</strong><small>Всего ситуаций в игре, включая {cases.filter(c=>c.status!=='ready').length} черновиков</small></div>
-   <div><strong>{readyCases.length}</strong><small>Готовы к назначению</small></div>
-   <div><strong>{readyCases.filter(c=>c.seriousness==='serious').length}</strong><small>Серьёзные ситуации из готовых</small></div>
-   <div><strong>{readyCases.filter(c=>c.seriousness==='light').length}</strong><small>Повседневные ситуации из готовых</small></div>
-  </div>}
+  {mode==='manage'&&teacher&&<EventAutopilotPanel g={g} panelMode="settings" onChanged={()=>reload(true)} readyCaseCount={readyCaseCount} readOnly={readOnly}/>}
   {mode==='manage'&&teacher&&<details className="eventComposerPanel civicDisclosure projectDisclosure">
    <DisclosureSummary icon={Send} title="Создать событие" description="Ситуация, варианты решения и участники"/><div className="civicDisclosureBody">
    <div className="eventEditorGrid">
@@ -247,6 +250,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     {expandedCase&&<EventCollaboration g={g} caseId={c.id} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={()=>reload(false)} readOnly={readOnly}/>}
     </div></EventCaseModal>;
    })}
+  {mode==='manage'&&teacher&&<EventAutopilotPanel g={g} panelMode="bank" onChanged={()=>reload(true)} readyCaseCount={readyCaseCount} readOnly={readOnly}/>}
   {notice&&<p className="eventNotice" role="status">{notice}</p>}
  </section>;
 }
