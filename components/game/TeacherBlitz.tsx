@@ -31,7 +31,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   ]);
    if(!active)return;
    if(q.error||s.error){setError(q.error?.message||s.error?.message||'Нет доступа к вопросам');return}
-   setQuestions((q.data||[]) as Question[]);setStats((s.data||[]) as Stats[]);
+   setQuestions(((q.data||[]) as Partial<Question>[]).map(row=>({...row,verified:row.verified!==false,legal_review_status:(row.legal_review_status||'pending') as ReviewStatus,legal_reviewed_at:row.legal_reviewed_at||null,legal_review_note:row.legal_review_note||null}) as Question));setStats((s.data||[]) as Stats[]);
    setNotes(Object.fromEntries((n.data||[]).map(x=>[x.check_key,x.correction])));
   }
   void load();return()=>{active=false}
