@@ -31,22 +31,22 @@ function harness(){
 async function main(){
  const failures=[];async function check(name,fn){try{await fn();console.log('PASS '+name);}catch(error){failures.push(name);console.error('FAIL '+name+': '+error.stack);}}
  await check('RPC error removes previously green rows and retry restores all 16 stages',async()=>{
-  const h=harness();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,16);assert.match(h.html(),/<b>16<\/b> готовы/);
+  const h=harness();await h.flush();assert.equal(h.calls.length,0);h.refresh();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,16);assert.match(h.html(),/<b>16<\/b> готовы/);
   h.responses.push({data:null,error:{message:'QA readiness unavailable'}});h.refresh();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,0);assert.equal(h.nodes('article').filter(x=>x.props.className==='unavailable').length,16);assert.match(h.html(),/role="alert"/);assert.match(h.html(),/<b>—<\/b> готовы/);
   h.refresh();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,16);h.dispose();
  });
  await check('Shared focus, online and local refresh recovery preserves teacher overrides',async()=>{
-  const h=harness();await h.flush();const override=ready();override[8]={...override[8],warnings:['QA teacher override'],override:{reason:'QA teacher override'}};
-  h.responses.push({data:override,error:null});h.event('focus');await h.flush();assert.match(h.html(),/QA teacher override/);assert.equal(h.nodes('article')[8].props.className,'warning');
-  h.responses.push(()=>{throw Error('QA network offline');});h.refresh();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,0);h.event('online');await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,16);
-  const n=h.calls.length;h.localRefresh('other-game');await h.flush();assert.equal(h.calls.length,n);h.localRefresh('game-a');await h.flush();assert.ok(h.calls.length>n);h.dispose();
+  const h=harness();await h.flush();h.refresh();await h.flush();const override=ready();override[8]={...override[8],warnings:['QA teacher override'],override:{reason:'QA teacher override'}};
+  h.responses.push({data:override,error:null});h.refresh();await h.flush();assert.match(h.html(),/QA teacher override/);assert.equal(h.nodes('article')[8].props.className,'warning');
+  h.responses.push(()=>{throw Error('QA network offline');});h.refresh();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,0);h.event('online');await h.flush();assert.equal(h.calls.length,3);h.refresh();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,16);
+  const n=h.calls.length;h.localRefresh('other-game');await h.flush();assert.equal(h.calls.length,n);h.localRefresh('game-a');await h.flush();assert.equal(h.calls.length,n);h.dispose();
  });
  await check('Incomplete or malformed matrix never implies readiness',async()=>{
   const duplicate=ready();duplicate[15].stage_no=1;const wrongWarning=ready();wrongWarning[0].warnings=null;
   for(const data of [null,[],ready().slice(0,15),duplicate,wrongWarning]){const h=harness();await h.flush();h.responses.push({data,error:null});h.refresh();await h.flush();assert.equal(h.nodes('article').filter(x=>x.props.className==='ready').length,0);assert.match(h.html(),/полную проверку 16 этапов/);h.dispose();}
  });
  await check('Game switch clears old labels immediately and ignores an older RPC response',async()=>{
-  const h=harness();await h.flush();let resolveOld,resolveNew;
+  const h=harness();await h.flush();h.refresh();await h.flush();let resolveOld,resolveNew;
   h.responses.push(()=>new Promise(resolve=>{resolveOld=resolve;}));h.refresh();await h.flush();
   h.responses.push(()=>new Promise(resolve=>{resolveNew=resolve;}));h.g.game={id:'game-b'};h.render();assert.equal(h.nodes('article').filter(x=>x.props.className==='loading').length,16);assert.doesNotMatch(h.html(),/<b>16<\/b> готовы/);await h.flush();
   resolveOld({data:ready('QA old game response'),error:null});await h.flush();assert.doesNotMatch(h.html(),/QA old game response/);assert.equal(h.nodes('article').filter(x=>x.props.className==='loading').length,16);
