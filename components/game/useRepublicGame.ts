@@ -15,6 +15,31 @@ import {analyseVoiceBlob} from './voiceWaveform';
 import {currentGameMembers,currentGameProfiles} from './gameRoster';
 import type {GameOfficeAssignment,ChatOverview} from './types';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
+// Reuse one signed asset URL while valid. Frequent refreshes must not issue
+// a new Storage signing request (and potentially bypass asset caches) each time.
+// Keep the cache per browser tab; never store signed URLs across user sessions.
+const signedAssetCache=new Map<string,{url:string;validUntil:number}>();
+type SignedResponse={data:{signedUrl:string}|null;error:{message:string}|null};
+const pendingSignedAssets=new Map<string,Promise<SignedResponse>>();
+async function cachedSignedAsset(bucket:string,path:string,expiresIn=3600):Promise<SignedResponse>{
+ const key=bucket+'\\n'+path+'\\n'+expiresIn;
+ const old=signedAssetCache.get(key);
+ if(old&&Date.now()<old.validUntil)return {data:{signedUrl:old.url},error:null};
+ const pending=pendingSignedAssets.get(key);
+ if(pending)return pending;
+ const request=(async():Promise<SignedResponse>=>{
+  const result=await supabase.storage.from(bucket).createSignedUrl(path,expiresIn);
+  const url=result.data?.signedUrl||null;
+  if(url){
+   // Leave 15 minutes of expiry headroom for clock skew and slow clients.
+   signedAssetCache.set(key,{url,validUntil:Date.now()+Math.max(0,expiresIn-900)*1000});
+  }else signedAssetCache.delete(key);
+  return{data:url?{signedUrl:url}:null,error:result.error};
+ })();
+ pendingSignedAssets.set(key,request);
+ try{return await request}finally{pendingSignedAssets.delete(key)}
+}
+
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
 type ReadScope='all'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
@@ -356,15 +381,15 @@ export function useRepublicGame(gameId:string){
   if(!readActive(ticket))return;
   requireSuccessful([pa,pf,pd]);
   if(readCurrent(ticket,'parties')){
-   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
+   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await cachedSignedAsset('game-assets',x.logo_path,3600)).data?.signedUrl||null}:x));
    if(readCurrent(ticket,'parties'))setParties(rows);
   }
   if(readCurrent(ticket,'profiles')){
-   const rows=await Promise.all(((pf.data||[]) as GameProfile[]).map(async x=>({...x,avatar_url:x.avatar_path?(await supabase.storage.from('game-assets').createSignedUrl(x.avatar_path,3600)).data?.signedUrl||null:null,signature_url:x.signature_path?(await supabase.storage.from('game-assets').createSignedUrl(x.signature_path,3600)).data?.signedUrl||null:null})));
+   const rows=await Promise.all(((pf.data||[]) as GameProfile[]).map(async x=>({...x,avatar_url:x.avatar_path?(await cachedSignedAsset('game-assets',x.avatar_path,3600)).data?.signedUrl||null:null,signature_url:x.signature_path?(await cachedSignedAsset('game-assets',x.signature_path,3600)).data?.signedUrl||null:null})));
    if(readCurrent(ticket,'profiles'))setProfiles(rows);
   }
   if(readCurrent(ticket,'partyDocuments')){
-   const rows=await Promise.all(((pd.data||[]) as PartyDocument[]).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
+   const rows=await Promise.all(((pd.data||[]) as PartyDocument[]).map(async x=>({...x,url:(await cachedSignedAsset('game-assets',x.storage_path,3600)).data?.signedUrl||null})));
    if(readCurrent(ticket,'partyDocuments'))setPartyDocuments(rows);
   }
   });
@@ -384,7 +409,7 @@ export function useRepublicGame(gameId:string){
   if(readCurrent(ticket,'partyRepresentation')){setPartyInvitations((pi.data||[]) as PartyInvitation[]);setPartyMandateRows((pm.data||[]) as PartyMandateAllocation[]);setPartyAgreements((ag.data||[]) as PartyAgreement[])}
   if(readCurrent(ticket,'members'))setMembers((mb.data||[]) as Member[]);
   if(readCurrent(ticket,'parties')){
-   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
+   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await cachedSignedAsset('game-assets',x.logo_path,3600)).data?.signedUrl||null}:x));
    if(readCurrent(ticket,'parties'))setParties(rows);
   }
   });
@@ -398,7 +423,7 @@ export function useRepublicGame(gameId:string){
   ]);
   if(!readCurrent(ticket))return;
   requireSuccessful([fd,fh]);
-  const rows=await Promise.all(((fd.data||[]) as FormalDocument[]).map(async x=>x.source_file_path?{...x,file_url:(await supabase.storage.from('game-assets').createSignedUrl(x.source_file_path,3600)).data?.signedUrl||null}:x));
+  const rows=await Promise.all(((fd.data||[]) as FormalDocument[]).map(async x=>x.source_file_path?{...x,file_url:(await cachedSignedAsset('game-assets',x.source_file_path,3600)).data?.signedUrl||null}:x));
   if(!readCurrent(ticket))return;
   setFormalDocuments(rows);setFormalHistory((fh.data||[]) as FormalHistory[]);
   if(fd.data?.some(d=>d.status_code==='published'&&d.metadata?.budget_simulator_plan_id))void syncBudget();
@@ -419,12 +444,12 @@ export function useRepublicGame(gameId:string){
   if(!readActive(ticket))return;
   requireSuccessful([pp,px,pl,mh,psh,mt,pa]);
   if(readCurrent(ticket,'political')){
-   const rows=await Promise.all(((px.data||[]) as PoliticalPostMedia[]).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
+   const rows=await Promise.all(((px.data||[]) as PoliticalPostMedia[]).map(async x=>({...x,url:(await cachedSignedAsset('game-assets',x.storage_path,3600)).data?.signedUrl||null})));
    if(readCurrent(ticket,'political')){setPoliticalPosts((pp.data||[]) as PoliticalPost[]);setPoliticalMedia(rows);setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);setMetricHistory((mh.data||[]) as MetricHistory[]);setPartySupportHistory((psh.data||[]) as PartySupportHistory[])}
   }
   if(readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
   if(readCurrent(ticket,'parties')){
-   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
+   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await cachedSignedAsset('game-assets',x.logo_path,3600)).data?.signedUrl||null}:x));
    if(readCurrent(ticket,'parties'))setParties(rows);
   }
   });
@@ -471,7 +496,7 @@ export function useRepublicGame(gameId:string){
    const r=await supabase.from('chat_messages').select('*').eq('channel_id',cid).order('created_at',{ascending:false}).limit(150);
    if(!readCurrent(ticket)||channelRef.current!==cid)return;
    requireSuccessful([r]);
-   const rows=await Promise.all(((r.data||[]) as Message[]).map(async m=>{if(!m.storage_path)return m;const x=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);return {...m,url:x.data?.signedUrl||null}}));
+   const rows=await Promise.all(((r.data||[]) as Message[]).map(async m=>{if(!m.storage_path)return m;const x=await cachedSignedAsset('game-media',m.storage_path,3600);return {...m,url:x.data?.signedUrl||null}}));
    if(readCurrent(ticket)&&channelRef.current===cid)setMessages(rows.reverse());
   }finally{if(readCurrent(ticket)&&channelRef.current===cid)setChatLoading(false)}
   });
@@ -481,7 +506,7 @@ export function useRepublicGame(gameId:string){
   if(!messageId||!storagePath)return null;
   if(!messages.some(m=>m.id===messageId&&m.storage_path===storagePath)&&
      !pinnedMessages.some(m=>m.id===messageId&&m.storage_path===storagePath))return null;
-  const r=await supabase.storage.from('game-media').createSignedUrl(storagePath,3600);
+  const r=await cachedSignedAsset('game-media',storagePath,3600);
   if(!readActive(ticket))return null;
   if(r.error||!r.data?.signedUrl){setChatMediaError('Не удалось обновить ссылку на аудио: '+(r.error?.message||'Повторите попытку.'));return null}
   const url=r.data.signedUrl;
@@ -503,7 +528,7 @@ export function useRepublicGame(gameId:string){
   requireSuccessful([linked]);
   const media=await Promise.all(((linked.data||[]) as Message[]).map(async m=>{
    if(!m.storage_path)return m;
-   const url=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);
+   const url=await cachedSignedAsset('game-media',m.storage_path,3600);
    return {...m,url:url.data?.signedUrl||null};
   }));
   if(readCurrent(ticket)&&channelRef.current===cid){setChatPins(pins);setPinnedMessages(media)}
