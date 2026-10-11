@@ -19,7 +19,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
  const gameId=g.game?.id||'';
  const students=g.members.filter(m=>m.game_id===gameId&&m.kind==='student');
  const [questions,setQuestions]=useState<Question[]>([]),[items,setItems]=useState<Assignment[]>([]),[stats,setStats]=useState<Stats[]>([]);
- const [query,setQuery]=useState(''),[sort,setSort]=useState<'question'|'topic'>('question'),[limit,setLimit]=useState(30);
+ const [showBank,setShowBank]=useState(false),[query,setQuery]=useState(''),[sort,setSort]=useState<'question'|'topic'>('question'),[limit,setLimit]=useState(30);
  const [notes,setNotes]=useState<Record<string,string>>({}),[error,setError]=useState(''),[saved,setSaved]=useState('');
  const loadedIds=useRef<Set<number>>(new Set()),sentinel=useRef<HTMLDivElement>(null);
  useEffect(()=>{if(!gameId)return;let active=true;loadedIds.current.clear();setItems([]);
@@ -67,6 +67,13 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
    <input type="search" aria-label="Поиск блиц-вопросов" placeholder="Поиск по вопросу или теме" value={query} onChange={e=>{setQuery(e.target.value);setLimit(30)}}/>
    <select aria-label="Сортировка вопросов" value={sort} onChange={e=>{setSort(e.target.value as 'question'|'topic');setLimit(30)}}><option value="question">По вопросу</option><option value="topic">По тематике</option></select>
   </div>
+  <details open={showBank} onToggle={e=>setShowBank(e.currentTarget.open)}><summary>Просмотр банка вопросов — {questions.length} записей (варианты, ответ и НПА)</summary>
+   <div className="blitzReviewList">{shown.map((q,i)=><details key={q.id}><summary>{i+1}. {q.question}</summary>
+    <p><strong>Тема:</strong> {q.topic}</p>
+    <ol>{q.options.map((option,index)=><li key={index} className={index===q.correct_index?'correct':''}>{option}{index===q.correct_index?' ✓ Правильный ответ':''}</li>)}</ol>
+    <p>Пояснение и нормативное основание доступны в записи банка. Для замечаний используйте «Проверки и корректировки» ниже.</p>
+   </details>)}</div>
+  </details>
   <details open><summary>Матрица ответов — {questions.length} вопросов, {students.length} участников</summary>
    <div className="blitzMatrixScroll"><table><thead><tr><th>Вопрос и правильный ответ</th>{students.map(m=><th key={m.user_id}>{m.full_name}</th>)}</tr></thead>
    <tbody>{shown.map(q=><tr key={q.id}><th>{q.question}<small>{q.options[q.correct_index]}</small></th>{students.map(m=>{const a=answerMap.get(q.id+':'+m.user_id);return <td key={m.user_id} className={a?.is_correct?'correct':a?.answered_at?'incorrect':''} title={a?.answered_at?'Этап '+a.stage_no:'Не отвечал'}>{!a?.answered_at?'—':a.is_correct?'✓':'✕'}</td>})}</tr>)}</tbody></table></div>
