@@ -74,6 +74,17 @@ async function main(){
   const refreshed=harness(g,storage);await refreshed.flush();assert.equal(refreshed.find('DocumentsView').props.focusId,'qa-document');refreshed.dispose();
   const other=gameState('user-b');other.profiles=[{user_id:'user-b',onboarding_completed_at:'2026-09-30T00:00:00Z'}];const isolated=harness(other,storage);await isolated.flush();assert.equal(isolated.find('DocumentsView'),null);assert(isolated.find('DashboardView'));isolated.dispose();
  });
+ await check('Delayed profile loading cannot hijack a restored screen on F5',async()=>{
+  const storage=new Map([['gos-sims:section:game-a:user-a:navigation',JSON.stringify({entries:[{view:'documents',stageNo:0,documentId:'qa-document'}],index:0})]]);
+  const g=gameState();g.profilesLoaded=false;g.loading=false;g.profiles=[];g.introAccountSeen=true;
+  const h=harness(g,storage);await h.flush();
+  assert.equal(h.find('DocumentsView').props.focusId,'qa-document');
+  g.profiles=[{user_id:'user-a',onboarding_completed_at:'2026-09-30T00:00:00Z'}];
+  g.profilesLoaded=true;await h.flush();
+  assert.equal(h.find('DocumentsView').props.focusId,'qa-document');
+  assert.equal(h.find('ProfileView'),null);
+  h.dispose();
+ });
  await check('Returning from a document to its registry survives refresh',async()=>{
   const storage=new Map([['gos-sims:section:game-a:user-a:navigation',JSON.stringify({entries:[{view:'documents',stageNo:0,documentId:'qa-document'}],index:0})]]);
   const g=gameState();g.profiles=[{user_id:'user-a',onboarding_completed_at:'2026-09-30T00:00:00Z'}];const h=harness(g,storage);await h.flush();
