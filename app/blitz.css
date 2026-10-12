@@ -33,7 +33,7 @@
 .blitzTeacher .blitzPagerActions button,.blitzTeacher .blitzPagerActions select,.blitzTeacher .blitzAction,.blitzTeacher .blitzQuestionActions button{border:1px solid var(--line,#d8e1ee);background:#fff;color:var(--navy,#0b234a);border-radius:9px;font-size:12px;min-height:35px;padding:7px 10px;font-weight:700}
 .blitzTeacher .blitzPagerActions button{display:inline-flex;align-items:center;gap:3px}
 .blitzTeacher .blitzPagerActions button:disabled,.blitzTeacher .blitzQuestionActions button:disabled{opacity:.42}
-.blitzTeacher .blitzPagerActions select{min-height:35px;margin-left:5px;padding:5px 7px}
+.blitzTeacher .blitzPagerActions select{width:auto;min-height:35px;margin-left:5px;padding:5px 7px}
 .blitzTeacher .blitzPagerActions button:not(:disabled):hover,.blitzTeacher .blitzQuestionActions button:not(:disabled):hover{background:var(--blue-soft,#eaf2ff);border-color:#b6cff4}
 .blitzQuestionList{display:grid;gap:7px;min-width:0}
 .blitzQuestion{border:1px solid var(--line,#d8e1ee);border-radius:11px;min-width:0;overflow:hidden;background:#fff}
