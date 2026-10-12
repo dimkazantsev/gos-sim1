@@ -12,6 +12,10 @@ on:
       - 'scripts/political-wall-status-browser-check.cjs'
       - 'components/game/GradesView.tsx'
       - 'supabase/migrations/*blitz*'
+      - 'supabase/migrations/*crisis_baseline*'
+      - 'components/game/CivicDiscussion.tsx'
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/crisis-baseline-check.cjs'
       - '.github/workflows/build-check.yml'
   push:
     branches: [main, "feature/blitz-questions-*", "codex/civic-*", "codex/budget-amendments-*", "codex/project-audit-*", "fix/fast-login-*", "fix/stabilize-runtime-*", "fix/realtime-capacity-*", "fix/situation-icons-only-*", "fix/realtime-capacity-sync-indicator-*", "fix/bootstrap-no-realtime-*", "fix/password-login-bypass-refresh-*", "fix/profile-refresh-navigation-*", "fix/restore-current-screen-on-refresh-*", "fix/events-targeted-stability-*", "fix/event-header-button-style-*", "fix/event-refresh-next-to-status-*", "fix/lazy-event-bank-bulk-manage-*", "fix/lazy-event-bank-bulk-manage-reorder-*", "feat/pau-regional-event-routing-*"]
@@ -49,6 +53,7 @@ jobs:
       - run: npm run design:check
       - run: node scripts/interface-contract-check.cjs
       - run: node scripts/political-wall-feed-check.cjs
+      - run: node scripts/crisis-baseline-check.cjs
 
       - run: node scripts/fiscal-model-check.cjs
       - run: node scripts/event-card-browser-check.cjs
