@@ -45,4 +45,4 @@ export async function telegramSetProfilePhoto(token:string){
  const data=await response.json() as {ok?:boolean;description?:string};
  if(!response.ok||!data.ok)throw new Error('Telegram rejected the approved brand image: '+(data.description||'Unknown error'));
 }
-export function gameUrl(gameId:string){return (process.env.NEXT_PUBLIC_GAME_URL||'https://gos-sim1.vercel.app').replace(/\/$/,'')+'/game/'+encodeURIComponent(gameId);}
+
