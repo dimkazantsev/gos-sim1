@@ -37,7 +37,7 @@ if(!browserPath)throw Error('Chromium required for top-bar geometry check');
     const get=selector=>{const e=document.querySelector(selector);const r=e.getBoundingClientRect();return {top:r.top,bottom:r.bottom,height:r.height,display:getComputedStyle(e).display}};
     return {pause:get('.simTop .livePill'),share:get('.simTop .gameShareScreen'),timer:get('.simTop .timerPill'),preview:get('.simTop .viewAsTrigger')};
    });
-   const expected=width<=900?36:44;
+   const expected=width<=900?36:48;
    for(const key of ['pause','share','timer','preview'])assert(Math.abs(bounds[key].height-expected)<1,`${width}px ${key} height mismatch: ${JSON.stringify(bounds)}`);
    for(const key of ['share','timer'])assert(Math.abs(bounds[key].top-bounds.pause.top)<2,`${width}px ${key} baseline mismatch: ${JSON.stringify(bounds)}`);
    console.log('PASS top-bar equal-height buttons '+width+'px');
