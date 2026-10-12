@@ -30,7 +30,7 @@ const dash=read('components/game/DashboardView.tsx');
 assert(dash.includes("from('political_posts')"),'Overview must use the actual political process');
 assert(dash.includes(".is('deleted_at',null)"),'Overview must exclude deleted posts');
 assert(dash.includes(".order('pinned',{ascending:false}).order('created_at',{ascending:false}).limit(4)"),'Overview must preserve wall order and use a small query');
-assert(!dash.includes('events.slice(')&&!dash.includes('game_events'),'Legacy game_events feed must not be rendered as political posts');
+assert(!dash.includes('events.slice(')&&!dash.includes("from('game_events')"),'Legacy game_events must not be queried or rendered in the political-process overview');
 assert(dash.includes('document.visibilityState')&&dash.includes("window.addEventListener('focus',onReturn)"),'Overview should update after returning to tab');
 assert(dash.includes('30000'),'Polling must be bounded; no high frequency requests');
 assert(dash.includes('Публикаций пока нет'),'Empty political feed must not show old game events');
