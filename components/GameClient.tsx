@@ -429,7 +429,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
   <div className={'simWorkspace '+(chatOpen?'chatOpen':'')}>
    <header className="simTop">
-    <div className="mobileBrand"><BrandIdentity/></div>
+    <div className="mobileBrand"><BrandIdentity tagline/></div>
     <nav className="topScreenHistory" aria-label="История разделов">
      <button type="button" className="screenHistoryButton" onClick={()=>moveHistory(backIndex)} disabled={backIndex<0} aria-label="Вернуться к предыдущему экрану" title="Назад"><ChevronLeft aria-hidden="true"/></button>
      <button type="button" className="screenHistoryButton" onClick={()=>moveHistory(forwardIndex)} disabled={forwardIndex<0} aria-label="Перейти к следующему экрану" title="Вперёд"><ChevronRight aria-hidden="true"/></button>
