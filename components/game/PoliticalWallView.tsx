@@ -20,6 +20,7 @@ import RatingNewsVisual from './RatingNewsVisual';
 import CivicDiscussion from './CivicDiscussion';
 import PostInlineEditor from './PostInlineEditor';
 import NewsProposals from './NewsProposals';
+import {POLITICAL_POST_BATCH_SIZE,nextPoliticalPostCount,visiblePoliticalPostCount} from './politicalWallPaging';
 
 const PROCESS_TYPES=[
  ['statement','Заявление'],['initiative','Инициатива'],['event','Событие'],
@@ -47,6 +48,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const [externalUrl,setExternalUrl]=useState(''),[internalView,setInternalView]=useState(''),[formalIds,setFormalIds]=useState<string[]>([]);
  const [files,setFiles]=useState<File[]>([]),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
  const [search,setSearch]=useState(''),[filterActor,setFilterActor]=useState(''),[filterType,setFilterType]=useState(''),[filterStage,setFilterStage]=useState('');
+ const [visiblePostCount,setVisiblePostCount]=useState(POLITICAL_POST_BATCH_SIZE);
  const [editing,setEditing]=useState<PoliticalPost|null>(null);
  const [proposalRefresh,setProposalRefresh]=useState(0);
  const [linkOpen,setLinkOpen]=useState(false),[linkLabel,setLinkLabel]=useState(''),[linkUrl,setLinkUrl]=useState(''),[linkView,setLinkView]=useState('');
@@ -63,6 +65,10 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   if(q&&!([p.title,p.body,p.actor_label,...(p.tags||[])].join(' ').toLowerCase().includes(q)))return false;
   return (!filterActor||p.actor_key===filterActor)&&(!filterType||(filterType==='initiative'?['initiative','decision'].includes(p.process_type):p.process_type===filterType))&&(!filterStage||String(p.context?.stage_no)===filterStage);
  }).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||Date.parse(b.created_at)-Date.parse(a.created_at)),[politicalPosts,search,filterActor,filterType,filterStage]);
+ // Reset the window when the feed criteria change. Older posts and their interactive
+ // widgets are mounted only when requested; the underlying game state is untouched.
+ useEffect(()=>setVisiblePostCount(POLITICAL_POST_BATCH_SIZE),[game?.id,search,filterActor,filterType,filterStage]);
+ const visiblePosts=useMemo(()=>filtered.slice(0,visiblePoliticalPostCount(filtered.length,visiblePostCount)),[filtered,visiblePostCount]);
 
  function insertText(text:string){
   const start=textInput.current?.selectionStart??body.length,end=textInput.current?.selectionEnd??body.length;
@@ -153,7 +159,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   {notice&&<p className="processNotice" role="status">{notice}</p>}
   <>
    <section className="wallSearch"><label>Поиск<input type="search" aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Текст, название или тег"/></label><StyledSelect label="Субъект" value={filterActor} onChange={setFilterActor} options={[{value:'',label:'Все субъекты'},...Array.from(new Map(politicalPosts.map(p=>[p.actor_key,p.actor_key==='teacher'?'GOS//SIMS':p.actor_label])).entries()).map(([value,label])=>({value,label}))]}/><StyledSelect label="Вид публикации" value={filterType} onChange={setFilterType} options={[{value:'',label:'Все публикации'},...PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))]}/><StyledSelect label="Этап" value={filterStage} onChange={setFilterStage} options={[{value:'',label:'Все этапы'},...g.stages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></section>
-   <section className="wallFeed">{!filtered.length?<div className="emptyState">Подходящих публикаций нет.</div>:filtered.map(p=>{
+   <section className="wallFeed">{!filtered.length?<div className="emptyState">Подходящих публикаций нет.</div>:visiblePosts.map(p=>{
     const party=g.parties.find(x=>x.id===p.context?.party_id||x.name===p.actor_label),pf=profiles.find(x=>x.user_id===p.author_id);
     const media=politicalMedia.filter(x=>x.post_id===p.id);
     const links=postFormalLinks.filter(x=>x.post_id===p.id).flatMap(x=>formalDocuments.filter(d=>d.id===x.formal_document_id));
@@ -191,6 +197,12 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
      {npaFor===p.id&&<div className="quickNpa"><StyledSelect label="Вид НПА" value={npaType} onChange={setNpaType} options={[{value:'fz_bill',label:'Проект ФЗ'},{value:'fkz_bill',label:'Проект ФКЗ'},{value:'federal_budget',label:'Федеральный бюджет'},{value:'president_decree',label:'Указ Президента'},{value:'government_resolution',label:'Постановление Правительства'},{value:'gd_resolution',label:'Постановление ГД'},{value:'sf_resolution',label:'Постановление СФ'},{value:'municipal_act',label:'Муниципальный акт'}]}/><button className="primary" disabled={busy} onClick={()=>void quickNpa(p)}>Создать проект из публикации</button></div>}
     </article>;
    })}</section>
+   {filtered.length>POLITICAL_POST_BATCH_SIZE&&<div className="wallFeedPaging" role="group" aria-label="Загрузка публикаций">
+    <span role="status">Показано {visiblePosts.length} из {filtered.length} публикаций</span>
+    {visiblePosts.length<filtered.length
+     ?<button type="button" className="secondary wallFeedMore" onClick={()=>setVisiblePostCount(current=>nextPoliticalPostCount(current,filtered.length))}>Показать ещё {Math.min(POLITICAL_POST_BATCH_SIZE,filtered.length-visiblePosts.length)}<ChevronDown size={17}/></button>
+     :<button type="button" className="secondary wallFeedMore" onClick={()=>setVisiblePostCount(POLITICAL_POST_BATCH_SIZE)}>Свернуть до 10<ChevronDown className="wallFeedCollapseIcon" size={17}/></button>}
+   </div>}
   </>
   {metricPost&&<div className="eventCaseBackdrop processMetricBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setMetricPost(null)}}><section ref={metricDialog} className="eventCaseModal processMetricDialog" tabIndex={-1} role="dialog" aria-modal="true" aria-label="Показатели публикации"><header className="eventModalHeader"><div><small>Публикация</small><h3>{metricPost.title}</h3></div><button className="eventModalClose" aria-label="Закрыть редактор показателей" onClick={()=>setMetricPost(null)}><X size={20}/></button></header><div className="eventModalBody"><TeacherMetricStudio key={metricPost.id} g={g} postId={metricPost.id}/></div></section></div>}
  </div>;

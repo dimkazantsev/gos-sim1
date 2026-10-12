@@ -43,6 +43,7 @@ jobs:
       - run: node scripts/event-option-legality-check.cjs
       - run: npm run design:check
       - run: node scripts/interface-contract-check.cjs
+      - run: node scripts/political-wall-feed-check.cjs
       - run: node scripts/fiscal-model-check.cjs
       - run: node scripts/event-card-browser-check.cjs
       - run: npm run design:preview

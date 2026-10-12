@@ -182,3 +182,10 @@
 .gradeRunHistory article>span{padding:3px 5px;border-radius:6px;background:#eef3f9;color:#66809c;font-size:13px;text-align:center}
 .gradeRunHistory em{color:#72849a;font-size:13px;font-style:normal}
 @media(max-width:650px){.gradeRunHistory article{grid-template-columns:90px 1fr}.gradeRunHistory article>span,.gradeRunHistory em{grid-column:2}}
+
+/* Political-process feed: lightweight 10-post progressive disclosure. */
+.wallFeedPaging{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:0 4px 14px rgba(22,43,82,.035)}
+.wallFeedPaging>span{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.wallFeedPaging .wallFeedMore{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding-inline:15px;font-weight:800}
+.wallFeedPaging .wallFeedCollapseIcon{transform:rotate(180deg)}
+@media(max-width:560px){.wallFeedPaging{padding:11px 10px;gap:9px}.wallFeedPaging .wallFeedMore{width:100%}}
