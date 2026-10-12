@@ -17,7 +17,8 @@ for(const file of files(out).filter(x=>x.endsWith('.html'))){
 const html=readFileSync(join(out,'index.html'),'utf8');
 const pagesOrigin='https://dimkazantsev.github.io';
 const pagesUrl=pagesOrigin+base+'/';
-const previewUrl=pagesOrigin+base+'/share/gos-id-preview.jpg';
+const imageBaseUrl=pagesOrigin+base+'/share/gos-id-preview.jpg';
+const previewUrl=imageBaseUrl+'?v=20261013-1';
 const imagePath=join(out,'share/gos-id-preview.jpg');
 assert.ok(existsSync(imagePath),'Approved share image must be exported to GitHub Pages');
 const jpeg=readFileSync(imagePath);
@@ -28,6 +29,24 @@ for(const [type,value] of [['property="og:image"',previewUrl],['name="twitter:im
 }
 assert.ok(!html.includes('https://gos-sim1.vercel.app/share/gos-id-preview.jpg'),
  'Social preview must not point to Vercel on GitHub Pages');
+// The site root (including links without the trailing slash or with ?section)
+// must include one unambiguous preview at the very start of <head>.
+const rootHead=html.slice(0,html.indexOf('</head>'));
+assert.ok(html.includes('<head>')&&rootHead.endsWith('</head>')===false,'Expected a real head');
+for(const [kind,name,value] of [
+ ['property','og:title','ГОС.ID — Цифровая платформа России'],
+ ['property','og:description','Моделирование работы органов публичной власти России, подготовка законов и принятие государственных решений.'],
+ ['property','og:image',previewUrl],
+ ['property','og:image:secure_url',previewUrl],
+ ['name','twitter:card','summary_large_image'],
+ ['name','twitter:image',previewUrl]
+]){
+ const tag=kind+'="'+name+'"';
+ assert.equal(rootHead.split(tag).length-1,1,'Expected exactly one root '+name);
+ assert.ok(rootHead.includes(tag+' content="'+value+'"'),'Wrong root '+name);
+}
+assert.ok(rootHead.indexOf('property="og:image"')<3500,'Root image preview must be at beginning of <head>');
+assert.ok(rootHead.includes('<title>ГОС.ID — Цифровая платформа России</title>'),'Correct root page title');
 // Fresh social entry isolates new previews from old messenger URL caches.
 const visitHtml=readFileSync(join(out,'visit/index.html'),'utf8');
 const visitUrl=pagesUrl+'visit/';
@@ -35,8 +54,8 @@ for(const [tag,value] of [
  ['property="og:url"',visitUrl],
  ['property="og:title"','ГОС.ID — Цифровая платформа России'],
  ['property="og:description"','Моделирование работы органов публичной власти России'],
- ['property="og:image"',previewUrl],
- ['property="og:image:secure_url"',previewUrl],
+ ['property="og:image"',imageBaseUrl],
+ ['property="og:image:secure_url"',imageBaseUrl],
  ['property="og:image:type"','image/jpeg'],
  ['property="og:image:width"','1200'],
  ['property="og:image:height"','632'],
