@@ -14,18 +14,21 @@ const shell=read('components/GameClient.tsx');
 const layout=read('app/layout.tsx');
 const icon=read('app/icon.svg');
 assert(brand.includes("BRAND_NAME='ГОС.ID'"),'Canonical brand name missing');
-assert(brand.includes("BRAND_TAGLINE='Республиканская цифровая платформа'"),'Canonical tagline missing');
-assert(brand.includes('г<span>//</span>id'),'Slash motif must remain in mark');
-assert(brand.includes('gosIdSuffix'),'ID letters must be independently stylable');
+assert(brand.includes("BRAND_TAGLINE='Цифровая платформа России'"),'Canonical tagline missing');
+assert(brand.includes('aria-hidden="true">ID</span>'),'Pictogram must display only ID');
+assert(!brand.includes('г<span>')&&!brand.includes('//</span>'),'Obsolete slash logo must not return');
+assert(css.includes('color:#08090d'),'Wordmark must be black');
+assert(css.includes('background:#2453e6;color:#fff'),'Primary mark must be blue with white ID');
+assert(!icon.includes('>ГОС</text>')&&!icon.includes('<path'),'Favicon must contain only ID');
 for(const variant of ['blue-pink','pink-blue']){
  assert(css.includes('gosIdMark--'+variant),'Missing '+variant+' icon palette');
  assert(css.includes('gosIdWordmark--'+variant),'Missing '+variant+' wordmark palette');
 }
 assert(layout.includes("import './brand-identity.css'"),'Brand styles must load after legacy layers');
 assert(layout.includes('applicationName:BRAND_NAME'),'Metadata must use canonical brand');
-assert(home.includes('<BrandIdentity/>'),'Home entry must use shared brand');
+assert(home.includes('<BrandIdentity tagline/>'),'Home entry must show the approved tagline');
 assert(shell.includes('<BrandIdentity tagline/>'),'Sidebar should show canonical tagline');
-assert(shell.includes('<div className="mobileBrand"><BrandIdentity/></div>'),'Mobile brand must use shared component');
+assert(shell.includes('<div className="mobileBrand"><BrandIdentity tagline/></div>'),'Mobile brand must use shared component');
 assert(icon.includes('aria-label="ГОС.ID"'),'Site icon must use new brand');
 assert(overview.includes("import StateMetricsDock from './StateMetricsDock'"),'Overview should reuse StateMetricsDock');
 assert(overview.includes('<StateMetricsDock g={g}/>'),'Overview must render canonical live metric panel');
