@@ -1,0 +1,66 @@
+/* Shared optical height for top-bar status/actions. Keep Pause, Share and
+   preview-mode control on one baseline without touching stage navigation. */
+.simWorkspace .simTop .topIndicators{
+ align-items:center;
+}
+.simWorkspace .simTop .topIndicators > :is(.livePill,.timerPill,.connectionPill,.gameShareScreen){
+ box-sizing:border-box;
+ height:44px;
+ min-height:44px;
+ max-height:44px;
+ align-self:center;
+ line-height:1.25;
+}
+.simWorkspace .simTop .topIndicators > .gameShareScreen{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:6px;
+ padding:0 12px;
+}
+.simWorkspace .simTop .topIndicators > :is(.livePill,.timerPill,.connectionPill){
+ align-items:center;
+ justify-content:center;
+}
+.simWorkspace .simTop .viewAsSwitcher{
+ box-sizing:border-box;
+ height:44px;
+ min-height:44px;
+ padding-block:0;
+ align-items:center;
+}
+.simWorkspace .simTop .viewAsSwitcher .viewAsTrigger{
+ box-sizing:border-box;
+ display:flex;
+ align-items:center;
+ height:44px;
+ min-height:44px;
+ max-height:44px;
+}
+@media(max-width:900px){
+ .simWorkspace .simTop .topIndicators > :is(.livePill,.timerPill,.connectionPill,.gameShareScreen){
+  height:36px;
+  min-height:36px;
+  max-height:36px;
+ }
+ .simWorkspace .simTop .topIndicators > .gameShareScreen{
+  display:grid;
+  place-items:center;
+  flex:0 0 36px;
+  width:36px;
+  min-width:36px;
+  max-width:36px;
+  padding:0;
+ }
+ .simWorkspace .simTop .viewAsSwitcher,
+ .simWorkspace .simTop .viewAsSwitcher .viewAsTrigger{
+  height:36px;
+  min-height:36px;
+  max-height:36px;
+  padding:0;
+ }
+ .simWorkspace .simTop .viewAsSwitcher .viewAsTrigger{
+  display:grid;
+  place-items:center;
+ }
+}
