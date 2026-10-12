@@ -19,11 +19,11 @@ Object.assign(initial.formalDocuments[1],{current_step:3,status_code:'signed',st
 export default function FlowCheck(){
  const [data,setData]=useState<any>(initial),[view,setView]=useState('registry'),[output,setOutput]=useState('');
  useEffect(()=>{document.body.dataset.flowReady='yes'},[]);
- const g={...data,availableActors:()=>data.teacher?[{key:'teacher',label:'GOS//SIMS · Нейтральная публикация'},{key:'participant',label:data.me.full_name},{key:'minjust',label:'Министерство юстиции Российской Федерации'},{key:'gd',label:'Государственная Дума'}]:[{key:'participant',label:data.me.full_name},{key:'office',label:data.me.role_title},{key:'gd',label:'Государственная Дума'}],
+ const g={...data,availableActors:()=>data.teacher?[{key:'teacher',label:'ГОС.ID · Нейтральная публикация'},{key:'participant',label:data.me.full_name},{key:'minjust',label:'Министерство юстиции Российской Федерации'},{key:'gd',label:'Государственная Дума'}]:[{key:'participant',label:data.me.full_name},{key:'office',label:data.me.role_title},{key:'gd',label:'Государственная Дума'}],
   refresh:async()=>{setData((old:any)=>{const deleted=(window as any).__flowDeleted||[],approved=(window as any).__flowApproved||[];return {...old,politicalPosts:[...approved.filter((p:any)=>!old.politicalPosts.some((x:any)=>x.id===p.id)),...old.politicalPosts].filter((p:any)=>!deleted.includes(p.id))}})},setError:(message:string)=>setOutput(message),judgeAction:async()=>true,
   createPoliticalPost:async(p:any,files:File[])=>{
    setOutput(JSON.stringify({...p,files:files.map(f=>f.name)}));
-   setData((old:any)=>({...old,politicalPosts:[{...old.politicalPosts[0],id:'published-ui-post',author_id:old.me.user_id,title:p.title,body:p.body,tags:p.tags,actor_key:p.actorKey,actor_label:p.actorKey==='teacher'?'GOS//SIMS':p.actorLabel,source_key:null,context:{stage_no:11},created_at:new Date().toISOString()},...old.politicalPosts],postFormalLinks:[...old.postFormalLinks,...p.formalIds.map((id:string)=>({post_id:'published-ui-post',formal_document_id:id}))]}));return 'published-ui-post';
+   setData((old:any)=>({...old,politicalPosts:[{...old.politicalPosts[0],id:'published-ui-post',author_id:old.me.user_id,title:p.title,body:p.body,tags:p.tags,actor_key:p.actorKey,actor_label:p.actorKey==='teacher'?'ГОС.ID':p.actorLabel,source_key:null,context:{stage_no:11},created_at:new Date().toISOString()},...old.politicalPosts],postFormalLinks:[...old.postFormalLinks,...p.formalIds.map((id:string)=>({post_id:'published-ui-post',formal_document_id:id}))]}));return 'published-ui-post';
   },updatePoliticalPost:async(id:string,p:any)=>{setData((old:any)=>({...old,politicalPosts:old.politicalPosts.map((x:any)=>x.id===id?{...x,title:p.title,body:p.body,tags:p.tags}:x)}));return true},
   addMediaToPoliticalPost:async()=>true,createVoteFromPost:async()=>null,
   createFormalDocument:async()=>null,advanceFormalDocument:async()=>false,
@@ -113,13 +113,13 @@ async function ready(){
    assert((await page.locator('.formalTextEditor').inputValue()).length>30,'Editable template opens');
    await page.locator('.formalTextEditor').fill('Текст документа для проверки редактора.');
    await page.getByRole('navigation',{name:'Проверяемый раздел'}).getByRole('button',{name:'Политический процесс',exact:true}).click();
-   await page.locator('.wallPostAvatar img[alt^="GOS//SIMS"]').evaluate(img=>img.decode());
+   await page.locator('.wallPostAvatar img[alt^="ГОС.ID"]').evaluate(img=>img.decode());
    await page.locator('#process-rating-demo .ratingNewsVisual').scrollIntoViewIfNeeded();
    assert.equal(await page.locator('#process-rating-demo .ratingVisualValues').textContent(),'Было 65 %Стало 68 %','News shows recorded before/after values');
    await page.screenshot({path:path.join(screens,'process-live-news-'+width+'.png')});
    const composer=page.locator('.wallComposer');assert.equal(await composer.locator('.processComposerBody').isVisible(),false,'Composer starts folded');
    await composer.locator('summary').first().click();
-   assert(await composer.locator('.wallAvatar img[alt^="GOS//SIMS"]').isVisible(),'Teacher uses game logo');
+   assert(await composer.locator('.wallAvatar img[alt^="ГОС.ID"]').isVisible(),'Teacher uses game logo');
    await page.getByRole('textbox',{name:'Заголовок публикации',exact:true}).fill('Проверка публикации');
    await page.getByRole('textbox',{name:'Текст публикации',exact:true}).fill('Проект решения готов к обсуждению. ');
    await composer.getByRole('button',{name:/Ход игры/}).click();
