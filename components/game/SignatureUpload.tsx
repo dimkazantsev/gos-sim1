@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import {Check,ImageUp,Scissors,ShieldCheck} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 
-export default function SignatureUpload({g}:{g:ReturnTypeRepublic}){
+export default function SignatureUpload({g,onSaved}:{g:ReturnTypeRepublic;onSaved?:()=>void}){
  const input=useRef<HTMLInputElement>(null);
  const [file,setFile]=useState<File|null>(null);
  const [url,setUrl]=useState('');
@@ -52,7 +52,7 @@ export default function SignatureUpload({g}:{g:ReturnTypeRepublic}){
   setBusy(true);setNotice('');
   const ok=await g.saveSignature(file);
   setBusy(false);
-  if(ok){setFile(null);setNotice('Подпись сохранена. При подписании последующих НПА будет записан неизменяемый снимок изображения.')}
+  if(ok){setFile(null);onSaved?.();setNotice('Подпись сохранена. При подписании последующих НПА будет записан неизменяемый снимок изображения.')}
   else setNotice('Подпись не сохранена. Проверьте уведомление в игре.');
  }
  return <section className="profileSignature" aria-label="Игровая подпись">
