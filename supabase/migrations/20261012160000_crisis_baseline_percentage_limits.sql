@@ -96,14 +96,17 @@ for each row execute function private.seed_crisis_start_on_new_game();
 -- without replaying already applied decisions or touching the monetary budget.
 do $$
 declare
- target_game uuid:='541b6fde-16d5-4225-8f67-1fc2c7c15523';
+ target_game uuid;
+ matched_games integer;
  mark text:='20261012:crisis-start';
  current_metric public.state_metrics%rowtype;
  target record;
 begin
- if not exists(
-  select 1 from public.games where id=target_game and title='ПАУ' and current_round=1
- ) then raise exception 'PAU crisis calibration refused: expected game/stage not found';end if;
+ select count(*),min(id) into matched_games,target_game
+ from public.games where title='ПАУ' and current_round=1;
+ if matched_games <> 1 then
+  raise exception 'PAU crisis calibration refused: expected exactly one named stage-one game, found %',matched_games;
+ end if;
  if exists(
   select 1 from public.state_metric_history
   where game_id=target_game and source_type='crisis_rebaseline' and source_id=mark
