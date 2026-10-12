@@ -1,5 +1,6 @@
 import {NextResponse} from 'next/server';
-import {runtimeConfig} from '@/lib/server/telegram';
+import {runtimeConfig,telegramApi} from '@/lib/server/telegram';
+import {TELEGRAM_COMMANDS} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
 // Only an authenticated active teacher may configure the production Telegram webhook.
 export async function POST(request:Request){
@@ -18,9 +19,24 @@ export async function POST(request:Request){
  if(memberError||member?.kind!=='teacher')return NextResponse.json({error:'Только преподаватель может активировать бота.'},{status:403});
  const webhook='https://gos-sim1.vercel.app/api/telegram/webhook';
  try{
-  const response=await fetch('https://api.telegram.org/bot'+config.token+'/setWebhook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:webhook,secret_token:config.secret,allowed_updates:['message'],drop_pending_updates:false,max_connections:20}),cache:'no-store',signal:AbortSignal.timeout(12000)});
-  const json=await response.json() as {ok?:boolean;description?:string};
-  if(!response.ok||!json.ok)throw new Error('Telegram API rejected the webhook: '+(json.description||'Unknown error'));
-  return NextResponse.json({ok:true,url:webhook});
- }catch(e){console.error('Telegram webhook configuration failed',e instanceof Error?e.message:'unknown');return NextResponse.json({error:'Telegram не подтвердил настройку webhook.'},{status:502})}
+  await telegramApi(config.token,'setWebhook',{
+   url:webhook,secret_token:config.secret,allowed_updates:['message','callback_query'],
+   drop_pending_updates:false,max_connections:20
+  });
+  // Native Telegram Menu button remains available in every private chat.
+  // Registration is teacher-authorized, repeatable, and does not mutate game data.
+  await telegramApi(config.token,'setMyCommands',{
+   commands:TELEGRAM_COMMANDS,scope:{type:'all_private_chats'}
+  });
+  await telegramApi(config.token,'setChatMenuButton',{
+   menu_button:{type:'commands'}
+  });
+  await telegramApi(config.token,'setMyShortDescription',{
+   short_description:'🏛 ГОС.ID — Цифровая платформа России. События, решения, этапы и голосования.'
+  });
+  await telegramApi(config.token,'setMyDescription',{
+   description:'🏛 ГОС.ID — Цифровая платформа России.\\n\\nПолучайте уведомления о жизни республики, следите за государственными решениями, голосованиями, этапами и документами.\\n\\n🚀 Нажмите «Начать», чтобы открыть меню.\\n🔐 Для игровых уведомлений привяжите Telegram в личном профиле ГОС.ID.'
+  });
+  return NextResponse.json({ok:true,url:webhook,menu:true});
+ }catch(e){console.error('Telegram setup failed',e instanceof Error?e.message:'unknown');return NextResponse.json({error:'Telegram не подтвердил полную настройку webhook и меню. Повторите активацию.'},{status:502})}
 }
