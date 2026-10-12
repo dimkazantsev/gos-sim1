@@ -542,6 +542,28 @@ export function useRepublicGame(gameId:string){
 
  async function openStage(stageNo:number){
   if(!teacher)return;
+  const closing=stages.find(stage=>stage.status==='open');
+  if(closing&&closing.stage_no!==stageNo){
+   // Fresh one-shot preflight on the teacher's transition, not a background poll.
+   // Never treat an RPC failure as a green check or reuse a cached widget result.
+   try{
+    const check=await supabase.rpc('get_stage_readiness',{p_game_id:gameId,p_stage_no:closing.stage_no});
+    const verdict=check.data as {ready?:boolean;blockers?:unknown;warnings?:unknown}|null;
+    if(check.error||!verdict||typeof verdict.ready!=='boolean'||!Array.isArray(verdict.blockers)||!Array.isArray(verdict.warnings)){
+     setError(check.error?.message||'Невозможно проверить процедуры перед завершением этапа. Повторите попытку.');
+     return;
+    }
+    const blockers=verdict.blockers.filter((x):x is string=>typeof x==='string');
+    const warnings=verdict.warnings.filter((x):x is string=>typeof x==='string');
+    const note=verdict.ready
+     ?'Все обязательные процедуры этапа '+closing.stage_no+' выполнены.'+(warnings.length?' Замечаний: '+warnings.length+'.':'')
+     :'Этап '+closing.stage_no+' содержит '+blockers.length+' незавершённых обязательных процедур:\n'+blockers.slice(0,6).map((x,i)=>(i+1)+'. '+x).join('\n')+(blockers.length>6?'\n…и ещё '+(blockers.length-6):'');
+    if(!window.confirm(note+'\n\n'+(verdict.ready?'Завершить текущий этап и открыть этап '+stageNo+'?':'Преподаватель: завершить этап и перейти к этапу '+stageNo+' несмотря на препятствия?')))return;
+   }catch(error){
+    setError(error instanceof Error?error.message:'Не удалось проверить процедуры перед завершением этапа.');
+    return;
+   }
+  }
   const r=await supabase.rpc('set_game_stage',{p_game_id:gameId,p_stage_no:stageNo,p_minutes:12});
   if(r.error)setError(r.error.message);else await refresh();
  }
