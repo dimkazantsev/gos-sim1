@@ -16,7 +16,7 @@ function harness(score){
   if(request==='../ui/StyledSelect')return{__esModule:true,default:StyledSelect};
   if(request==='../ui/useDialog')return{useDialog:()=>({current:null})};
   if(request==='../ui/IconAction')return{IconAction:({label,onClick})=>React.createElement('button',{'aria-label':label,onClick})};
-  if(request==='./ScoreFormula')return{__esModule:true,default:()=>null};if(request==='lucide-react')return{ChevronDown:()=>null};
+  if(request==='./ScoreFormula')return{__esModule:true,default:()=>null};if(request==='./BlitzKnowledgeScore')return{__esModule:true,default:()=>null};if(request==='lucide-react')return{ChevronDown:()=>null};
   throw Error('Unexpected grade fixture import '+request);
  }
  const module={exports:{}};vm.runInNewContext('(function(require,module,exports){'+code+'\nmodule.exports.fixtureModal=AssessmentModal;})',{console,Date,Promise,Map,Set,Object,Number,Math})(requireFor,module,module.exports);

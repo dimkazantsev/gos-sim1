@@ -83,7 +83,7 @@ async function main(){
      };
      return {bounds:header.getBoundingClientRect().toJSON(),width:header.clientWidth,scroll:header.scrollWidth,
       previous:get('.screenHistoryButton'),status:get('.livePill'),
-      countdown:get('.timerPill'),connection:get('.connectionPill.disconnected'),
+      countdown:get('.timerPill'),connection:get('.connectionPill.polling'),
       role:get('.viewAsTrigger'),chat:get('.topChatButton')};
     });
     assert(layout.status&&(width<=900||layout.chat),'Status and desktop chat must exist in '+screen);
@@ -93,8 +93,8 @@ async function main(){
     }else if(screen==='student'){
      assert(!layout.role,'Students must not see teacher preview controls');
     }else if(screen==='offline'){
-     assert(layout.connection&&layout.connection.text.includes('Нет связи'),
-      'Disconnected state is visible with a full status label');
+     assert.equal(await page.frameLocator('#preview').locator('.connectionPill.polling').count(),1,'Disconnected realtime must be classified as scheduled polling, not browser network loss');
+     assert(!layout.connection||layout.connection.text.includes('По расписанию'),'Polling status is hidden on desktop or correctly labelled when mobile CSS displays it');
     }
     if(layout.scroll>layout.width+2){
      const details=await page.frameLocator('#preview').locator('.simTop').evaluate(el=>({

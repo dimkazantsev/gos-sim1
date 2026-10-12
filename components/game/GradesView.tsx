@@ -6,6 +6,7 @@ import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
 import ScoreFormula from './ScoreFormula';
+import BlitzKnowledgeScore from './BlitzKnowledgeScore';
 import {ChevronDown} from 'lucide-react';
 
 type Assessment={
@@ -256,6 +257,7 @@ function AssessmentModal(p:any){
   <header><div><small>ЭТАП {selected.stageNo}</small><h2 id="assessment-title">{student?.full_name||g.me?.full_name}</h2><p>{g.stages.find((s:any)=>s.stage_no===selected.stageNo)?.title}</p></div><IconAction onClick={close} label="Закрыть оценку"/></header>
   {!a?<div className="emptyState gradeEmpty">Черновик ещё не создан.{teacher&&<><br/><button className="primary" disabled={busy} onClick={()=>void ensureDraft()}>Рассчитать сейчас</button></>}</div>:<>
    <div className={'gradeScoreHero '+a.status}><strong>{v}</strong><div><b>{level(v??0)}</b><span>{a.status==='final'?'Итоговая оценка преподавателя':'Автоматический черновик'}</span></div></div>
+<BlitzKnowledgeScore gameId={g.game?.id||''} userId={selected.userId} stageNo={selected.stageNo}/>
 {canSeeEvidence&&<>
    <div className="gradeCriteria"><span className={a.criterion_law?'ok':'miss'}><b>{a.criterion_law?'✓':'○'}</b> Право и правила</span><span className={a.criterion_strategy?'ok':'miss'}><b>{a.criterion_strategy?'✓':'○'}</b> Стратегия и интересы</span><span className={a.criterion_debrief?'ok':'miss'}><b>{a.criterion_debrief?'✓':'○'}</b> Анализ этапа</span></div>
    <section className="gradeRationale"><small>ИНТЕРПРЕТАЦИЯ ДЕЙСТВИЙ</small><p>{a.public_rationale}</p><footer><span>Пересчёт: {when(a.last_auto_at)}</span><span>{a.last_run_type}</span><span>версия {a.revision_count}</span></footer></section>

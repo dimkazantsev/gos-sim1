@@ -38,7 +38,8 @@ async function check(){
    assert.equal(data.rows.length,16,'Stage list must contain all 16 stages at '+width+'px');
    assert.equal(data.reset,1,'Exactly one contextual stage reset button');
    assert.equal(data.allReset,1,'Exactly one global stage reset');
-   assert.equal(data.workspaceCount,10,'Ten teacher workspaces');
+   assert.equal(data.workspaceCount,11,'Eleven teacher workspaces');
+    assert.equal(await frame.locator('#teacher-tab-blitz').count(),1,'Blitz workspace must be navigable');
    assert(data.scroll<=data.width+3,'Stage management overflows at '+width+'px: '+JSON.stringify(data));
    for(const row of data.rows)assert(row.left>=data.list.left-2&&row.right<=data.list.right+2,'Stage row leaves list at '+width+'px');
    assert(data.inspector.left>=-2&&data.inspector.right<=data.width+3,'Stage details leave viewport at '+width+'px');
@@ -47,7 +48,7 @@ async function check(){
      path:path.join(screenshots,'teacher-stages-'+width+'.png'),animations:'disabled'
     });
    }
-   console.log('PASS '+width+'px: 16 stable list rows, contextual reset, ten workspaces, no overflow');
+   console.log('PASS '+width+'px: 16 stable list rows, contextual reset, eleven workspaces, no overflow');
   }
   for(const [screen,selector] of [
    ['teacher-journal','.classroomJournal'],
@@ -59,7 +60,7 @@ async function check(){
   ]){
    await page.locator('#screen').selectOption(screen);
    await frame.locator(selector).first().waitFor();
-   assert.equal(await frame.locator('.teacherWorkspaceNav [role=tab]').count(),10,'Ten workspaces required');
+   assert.equal(await frame.locator('.teacherWorkspaceNav [role=tab]').count(),11,'Eleven workspaces required');
    if(screen==='teacher-journal'){
     assert((await frame.locator('.journalToolbar .styledSelect').count())>=2,'Participant and section journal filters missing');
     assert.equal(await frame.locator('.journalCounters button[title="Экспорт показанных строк в CSV"]').count(),1,'Journal CSV export missing');
@@ -74,7 +75,8 @@ async function check(){
     assert.equal(await frame.locator('.gradeTotalHead').count(),2,'Grade totals missing');
    }
    if(screen==='teacher-event'){
-    assert.equal(await frame.locator('.eventCatalogTargets>div').count(),4,'Event case budget must contain four targets');
+    assert.equal(await frame.locator('.autoEventPanel').count(),2,'Settings and event bank must be present');
+    assert.equal(await frame.locator('.eventComposerPanel').count(),1,'Event creation editor must remain available');
     assert((await frame.locator('.eventEditorGrid .styledSelect').count())>=4,'Event must have category, seriousness, role and audience controls');
    }
    if(screen==='teacher-parties'){

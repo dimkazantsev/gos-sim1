@@ -1,3 +1,4 @@
+import './blitz.css';
 import './globals.css';
 import './design-tokens.css';
 import './design-shell.css';

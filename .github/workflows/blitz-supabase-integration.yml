@@ -1,0 +1,69 @@
+name: Blitz local Supabase integration
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/*blitz*'
+      - 'supabase/tests/blitz_supabase_*'
+      - '.github/workflows/blitz-supabase-integration.yml'
+  push:
+    branches: ["feature/blitz-questions-*"]
+  workflow_dispatch:
+jobs:
+  local-supabase-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - uses: supabase/setup-cli@v3
+        with:
+          version: latest
+      - name: Initialize isolated local Supabase project
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/blitz-supabase
+          mkdir -p /tmp/blitz-supabase
+          cd /tmp/blitz-supabase
+          supabase init
+      - name: Start minimal local Supabase stack
+        run: |
+          set -euo pipefail
+          cd /tmp/blitz-supabase
+          supabase start -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Export local credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/blitz-supabase
+          while IFS='=' read -r key value; do
+            value="${value#\"}"
+            value="${value%\"}"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(
+            supabase status -o env \
+              --override-name api.url=SUPABASE_URL \
+              --override-name auth.anon_key=SUPABASE_ANON_KEY \
+              --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY
+          )
+      - name: Create disposable Blitz integration schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/blitz-supabase
+          DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\(.*\)"$/\1/p')"
+          test -n "$DB_URL"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_setup.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261012100100_blitz_attempt_lock_hardening.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
+          sleep 2
+      - name: Run 30 real local Supabase sessions
+        run: node supabase/tests/blitz_supabase_30_sessions.cjs
+      - name: Stop local Supabase
+        if: always()
+        run: |
+          cd /tmp/blitz-supabase || exit 0
+          supabase stop --no-backup

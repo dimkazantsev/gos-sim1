@@ -1,0 +1,1 @@
+create index if not exists blitz_assignment_question_ref_idx on public.blitz_assignments(question_id);

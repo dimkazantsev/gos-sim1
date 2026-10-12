@@ -23,6 +23,7 @@ import {useIntroProgress} from './game/introProgress';
 import ChatPanel from './game/ChatPanel';
 import EventWorkspace from './game/EventWorkspace';
 import {AchievementCelebration} from './game/Achievements';
+import {BlitzOverlay} from './game/Blitz';
 import BudgetView from './game/BudgetView';
 import {useSectionUpdates} from './game/useSectionUpdates';
 import {supabase} from '@/lib/supabase';
@@ -497,6 +498,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    </section>
   </div>}
   {onboardingRequired&&introSeen&&!introOpen&&!previewMode&&<div className="onboardingBar" role="status"><div><strong>Первое знакомство с Республикой</strong><span>Обязательные поля: ФИО, пол, подпись, описание и подтверждённая почта с паролем.</span>{(onboardingNotice||introSyncError)&&<small>{onboardingNotice||introSyncError}</small>}</div><button type="button" disabled={completingProfile} onClick={()=>{setSelectedProfileId('');navigate('profile');void completeOnboarding()}}>{completingProfile?'Проверяем…':'Закончить настройку'}</button></div>}
+  <BlitzOverlay gameId={gameId} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired}/>
   <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={me?.kind==='student'&&!previewMode&&!introOpen}/>
   <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>
   <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;

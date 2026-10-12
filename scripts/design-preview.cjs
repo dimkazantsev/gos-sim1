@@ -98,8 +98,13 @@ fixture.partyMandates=fixture.members.filter(m=>m.kind==='student').map(m=>{cons
 fixture.partyDocuments=fixture.parties.flatMap(p=>['charter','program','fee'].map((kind,i)=>({id:p.id+'-'+kind,game_id:'design-preview',party_id:p.id,doc_kind:kind,title:kind==='charter'?'Устав политической партии':kind==='program'?'Программа общественного развития':'Сведения об уплате пошлины',file_name:'Документ партии «'+p.name+'» — редакция учредительного съезда.txt',status:'pending',uploaded_by:p.leader_user_id,created_at:now,url:'data:text/plain;charset=utf-8,Учебный образец'})));
 // Replace only this process's hook export. The application source remains unchanged.
 require('../components/game/useRepublicGame').useRepublicGame=()=>g;
+// Offline SSR has no effects or localStorage: emulate *only in this preview*
+// the already-restored navigation state. Otherwise GameClient renders the
+// initial connection screen, and every embedded screen silently lacks its UI.
+require('../components/game/useSavedGameState').useSavedGameState=(_game,_user,_key,initial)=>[initial,()=>{},true,false];
 const GameClient=require('../components/GameClient').default;
 const base=renderToStaticMarkup(h(GameClient,{gameId:'design-preview'}));
+if(!base.includes('id="game-main"'))throw Error('Offline preview did not render game-main; navigation hydration mock is missing');
 const {AppRouterContext}=require('next/dist/shared/lib/app-router-context.shared-runtime');
 const Home=require('../app/page').default;
 const login=renderToStaticMarkup(h(AppRouterContext.Provider,{value:{push:noop,replace:noop,prefetch:noop,back:noop,forward:noop,refresh:noop}},h(Home)));
