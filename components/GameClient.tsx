@@ -211,6 +211,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  useEffect(()=>{
   if(!navigationHydrated||!g.me?.user_id||sharedLinkHandled.current)return;
   sharedLinkHandled.current=true;
+  if(typeof URLSearchParams==='undefined'||!window.location?.search)return;
   const q=new URLSearchParams(window.location.search);
   const section=q.get('section');
   if(!section||!SCREEN_VIEWS.includes(section)||section==='teacher')return;
