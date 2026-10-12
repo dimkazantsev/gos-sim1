@@ -243,7 +243,6 @@
 .processPortal .wallFeed .wallPost>header>.wallPostWho small{line-height:1.5}
 .processPortal .wallFeed .wallPost>header>.postStatus{
  grid-area:status;
- grid-column:auto;
  justify-self:end;
  align-self:center;
  max-width:100%;
@@ -270,8 +269,7 @@
   gap:7px;
  }
  .processPortal .wallFeed .wallPost>header>.postStatus{
-  grid-column:auto;
-  justify-self:start;
+   justify-self:start;
   align-self:start;
  }
 }
