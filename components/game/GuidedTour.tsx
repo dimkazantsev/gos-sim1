@@ -42,7 +42,7 @@ export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:To
   let timer:number|undefined,frame:number|undefined;
   function update(){const el=targetElement(step.target);if(!el){setRect(null);return}const r=el.getBoundingClientRect();setRect({left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height})}
   const el=targetElement(step.target);
-  el?.scrollIntoView({block:'nearest',inline:'nearest',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+  el?.scrollIntoView({block:'nearest',inline:'nearest',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
   frame=requestAnimationFrame(update);
   timer=window.setTimeout(update,420);
   window.addEventListener('resize',update);
