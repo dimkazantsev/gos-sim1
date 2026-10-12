@@ -49,7 +49,8 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
 
 
 
- function confirmNext(){if(window.confirm('Перейти к следующему этапу? Проверьте индикатор процедурной готовности выше: переход остаётся ручным и может быть выполнен даже при незавершённых процедурах.'))void nextStage()}
+ // The stage transition itself performs a fresh readiness check and asks for confirmation.
+ function confirmNext(){void nextStage()}
  function confirmCrisis(){if(window.confirm('Разыграть случайный кризис для всей аудитории?'))void triggerCrisis()}
  function confirmGhost(){if(window.confirm('Запустить ghost voting?'))void ghostVoting()}
  function exportSession(){
