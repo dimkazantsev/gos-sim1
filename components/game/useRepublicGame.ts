@@ -419,7 +419,10 @@ export function useRepublicGame(gameId:string){
   if(!readActive(ticket))return;
   requireSuccessful([pp,px,pl,mh,psh,mt,pa]);
   if(readCurrent(ticket,'political')){
-   const rows=await Promise.all(((px.data||[]) as PoliticalPostMedia[]).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
+   // Deleted posts are excluded by political_posts RLS. Do not sign orphaned
+   // attachments for them: they no longer have a rendered card.
+   const visiblePostIds=new Set(((pp.data||[]) as PoliticalPost[]).map(p=>p.id));
+   const rows=await Promise.all(((px.data||[]) as PoliticalPostMedia[]).filter(x=>visiblePostIds.has(x.post_id)).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
    if(readCurrent(ticket,'political')){setPoliticalPosts((pp.data||[]) as PoliticalPost[]);setPoliticalMedia(rows);setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);setMetricHistory((mh.data||[]) as MetricHistory[]);setPartySupportHistory((psh.data||[]) as PartySupportHistory[])}
   }
   if(readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
