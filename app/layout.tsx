@@ -34,6 +34,7 @@ import './stage-operations.css';
 import './brand-identity.css';
 import './topbar-controls-alignment.css';
 import './profile-first-setup.css';
+import './onboarding-tour.css';
 import type {Metadata} from 'next';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import '@fontsource-variable/manrope';
