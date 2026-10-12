@@ -257,6 +257,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [setupStatus,setSetupStatus]=useState<ProfileSetupStatus|null>(null);
  const [setupChecking,setSetupChecking]=useState(false);
  const [setupPromptBusy,setSetupPromptBusy]=useState(false);
+ const [setupWelcomeActive,setSetupWelcomeActive]=useState(false);
+ const setupPromptScope=useRef('');
  const [setupFocusVersion,setSetupFocusVersion]=useState(0);
  const setupRequest=useRef(0);
  useEffect(()=>{
@@ -365,36 +367,42 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   void loadProfileSetup();
   return()=>{setupRequest.current++};
  },[game?.id,me?.user_id,g.profilesLoaded,navigationHydrated,introSeen,observer,previewMode,myProfile?.onboarding_completed_at]);
- const showSetupWelcome=!!onboardingRequired&&!!setupStatus&&!setupStatus.prompt_seen&&!setupStatus.completed&&!setupChecking&&introSeen&&!introOpen&&!previewMode;
+ useEffect(()=>{
+  setupWelcomeActive&&setSetupWelcomeActive(false);
+  setupPromptScope.current='';
+ },[game?.id,me?.user_id]);
+ useEffect(()=>{
+  if(!game||!me||!introSeen||introOpen||previewMode||!onboardingRequired||!setupStatus||setupChecking||setupStatus.completed||setupStatus.prompt_seen)return;
+  const scope=game.id+':'+me.user_id;
+  if(setupPromptScope.current===scope)return;
+  setupPromptScope.current=scope;
+  setSetupWelcomeActive(true);
+  // Record the FIRST display, not every login or each click. The dialog stays
+  // open until the person explicitly proceeds to the missing profile fields.
+  void supabase.rpc('mark_my_game_profile_setup_prompt_seen',{p_game:game.id}).then(r=>{
+   if(r.error){setOnboardingNotice('Не удалось сохранить первое знакомство: '+r.error.message);setupPromptScope.current='';return}
+   setSetupStatus(prev=>prev?{...prev,prompt_seen:true}:prev);
+  });
+ },[game?.id,me?.user_id,introSeen,introOpen,previewMode,onboardingRequired,setupStatus?.completed,setupStatus?.prompt_seen,setupChecking]);
+ const showSetupWelcome=!!onboardingRequired&&setupWelcomeActive&&!!setupStatus&&!setupStatus.completed&&introSeen&&!introOpen&&!previewMode;
  const setupDialogRef=useDialog(showSetupWelcome,()=>{});
  async function goToIncompleteProfile(){
   if(!game||!me||setupPromptBusy)return;
   setSetupPromptBusy(true);
-  const r=await supabase.rpc('mark_my_game_profile_setup_prompt_seen',{p_game:game.id});
-  if(r.error){
-   setOnboardingNotice('Не удалось сохранить первое знакомство: '+r.error.message);
-   setSetupPromptBusy(false);return;
+  if(!setupStatus?.prompt_seen){
+   const r=await supabase.rpc('mark_my_game_profile_setup_prompt_seen',{p_game:game.id});
+   if(r.error){
+    setOnboardingNotice('Не удалось сохранить первое знакомство: '+r.error.message);
+    setSetupPromptBusy(false);return;
+   }
+   setSetupStatus(prev=>prev?{...prev,prompt_seen:true}:prev);
   }
-  setSetupStatus(prev=>prev?{...prev,prompt_seen:true}:prev);
+  setSetupWelcomeActive(false);
   setSelectedProfileId('');
   navigate('profile');
   setSetupFocusVersion(x=>x+1);
   setSetupPromptBusy(false);
  }
-
- useEffect(()=>{
-  if(!game||!me||previewMode)return;
-  let live=true;
-  async function count(){
-   const [r,i]=await Promise.all([supabase.from('event_assignments').select('id',{count:'exact',head:true}).eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending'),supabase.from('event_collaboration_invites').select('id',{count:'exact',head:true}).eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending')]);
-   if(live&&!r.error&&!i.error)setPendingEvents((r.count||0)+(i.count||0));
-  }
-  void count();const poll=setInterval(()=>void count(),30000);
-  const channel=supabase.channel('event-count:'+game.id+':'+me.user_id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>void count()).subscribe();
-  return()=>{live=false;clearInterval(poll);void supabase.removeChannel(channel)};
- },[game?.id,me?.user_id,previewMode,view]);
-
 
  const backIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,-1,previewMode);
  const forwardIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,1,previewMode);
