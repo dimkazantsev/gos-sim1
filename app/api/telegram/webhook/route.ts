@@ -62,12 +62,18 @@ export async function POST(request:Request){
   const args=text.split(/\s+/),command=args[0].split('@')[0];
   if(command==='/games'){
    const {data:games}=await config.db.from('games').select('id,title').in('id',valid.map(l=>l.game_id));
-   await reply((games||[]).map(g=>g.title+' — /game '+g.id).join('\n')||'Нет игр');return NextResponse.json({ok:true});
+   const groups=await Promise.all(valid.map(async l=>{
+    const {data:member}=await config.db.from('game_members').select('group_name').eq('game_id',l.game_id).eq('user_id',l.user_id).maybeSingle();
+    return {id:l.game_id,group:member?.group_name||'Группа не указана'};
+   }));
+   const entries=(games||[]).map(g=>'🏛 '+g.title+'\n👥 '+(groups.find(x=>x.id===g.id)?.group||'Группа не указана'));
+   await reply('🏛 ГОС.ID · Мои игры\n\n'+(entries.join('\n\n')||'Нет подключённых республик.')+'\n\n👤 Перейдите в профиль через кнопку ниже.',telegramSectionButtons('profile','Мой профиль'));
+   return NextResponse.json({ok:true});
   }
   const requested=command==='/game'?args[1]:args[1]&&/^[0-9a-f-]{36}$/.test(args[1])?args[1]:undefined;
   const game=valid.find(l=>l.game_id===requested)|| (valid.length===1?valid[0]:undefined);
-  if(!game){await reply('Укажите игру командой /game <id>. Список: /games');return NextResponse.json({ok:true})}
-  if(command==='/game'){await reply('Игра выбрана для этой команды: '+gameUrl(game.game_id)+'\nЕсли у вас несколько игр, указывайте её UUID в командах.');return NextResponse.json({ok:true})}
+  if(!game){await reply('Выберите республику командой /game UUID. Список: /games');return NextResponse.json({ok:true})}
+  if(command==='/game'){await reply('🏛 ГОС.ID · Республика выбрана\n\nИспользуйте кнопки бота для просмотра информации.',telegramSectionButtons('dashboard','Открыть республику'));return NextResponse.json({ok:true})}
   if(command==='/status'){
    const {data}=await config.db.from('games').select('title,current_round,turn_open').eq('id',game.game_id).single();
    const {data:stage}=await config.db.from('game_stages').select('title').eq('game_id',game.game_id).eq('stage_no',data?.current_round||1).maybeSingle();
@@ -95,10 +101,18 @@ export async function POST(request:Request){
   }
   if(command==='/channels'){
    const {data:member}=await config.db.from('game_members').select('kind').eq('game_id',game.game_id).eq('user_id',game.user_id).single();
-   const {data:channels}=await config.db.from('chat_channels').select('id,name,kind').eq('game_id',game.game_id);
-   const {data:membership}=await config.db.from('channel_members').select('channel_id').eq('user_id',game.user_id);
+   const [{data:channels},{data:membership}]=await Promise.all([
+    config.db.from('chat_channels').select('id,name,kind').eq('game_id',game.game_id),
+    config.db.from('channel_members').select('channel_id').eq('user_id',game.user_id)
+   ]);
    const allowed=(channels||[]).filter(c=>c.kind==='public'||member?.kind==='teacher'||membership?.some(m=>m.channel_id===c.id));
-   await reply(allowed.map(c=>c.name+' — /channel '+c.id).join('\n').slice(0,3900)||'Нет доступных каналов');return NextResponse.json({ok:true});
+   const ids=allowed.map(c=>c.id);
+   const {data:messages}=ids.length?await config.db.from('chat_messages').select('channel_id,author_id,text,kind').eq('game_id',game.game_id).in('channel_id',ids).order('created_at',{ascending:false}).limit(2):{data:[]};
+   const authorIds=[...new Set((messages||[]).map(m=>m.author_id))];
+   const {data:people}=authorIds.length?await config.db.from('game_members').select('user_id,full_name').eq('game_id',game.game_id).in('user_id',authorIds):{data:[]};
+   const entries=(messages||[]).map(m=>'💬 '+(allowed.find(c=>c.id===m.channel_id)?.name||'Беседа')+'\n'+(people?.find(x=>x.user_id===m.author_id)?.full_name||'Участник')+': '+(m.kind==='text'?m.text?.slice(0,230)||'Сообщение':'Медиафайл'));
+   await reply('🏛 ГОС.ID · Чаты\n\nПоследние два сообщения:\n\n'+(entries.join('\n\n')||'Сообщений пока нет.')+'\n\nДоступных чатов: '+allowed.length,telegramSectionButtons('dashboard','Открыть ГОС.ID'));
+   return NextResponse.json({ok:true});
   }
   if(command==='/channel'){
    const id=args[1];if(!id){await reply('Выберите канал через /channels');return NextResponse.json({ok:true})}
