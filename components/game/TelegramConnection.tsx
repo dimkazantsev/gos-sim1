@@ -23,9 +23,9 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
        if(response.status===405)throw new Error('HTTP 405: серверный API не принимает POST. Используйте обновлённую версию сайта и проверьте адрес API.');
        throw new Error('Сервер активации не вернул JSON (HTTP '+response.status+').');
      }
-     const result=await response.json() as {ok?:boolean;error?:string};
+     const result=await response.json() as {ok?:boolean;error?:string;logo?:boolean};
      if(!response.ok||!result.ok)throw new Error(result.error||'Не удалось активировать бота.');
-     setActivated('Telegram активирован: приветствие, меню, кнопки и команды настроены.');setError('');
+     setActivated(result.logo===false?'Меню и название ГОС.ID обновлены. Логотип Telegram не подтвердил — проверьте обложку и повторите активацию.':'Telegram активирован: название ГОС.ID, логотип, меню, кнопки и команды настроены.');setError('');
    }catch(e){setError(e instanceof Error?e.name==='TimeoutError'?'Сервер не ответил за 20 секунд. Повторите попытку.':e.message:'Ошибка активации')}
    finally{setBusy(false)}
  }
