@@ -1,0 +1,57 @@
+/* First-time profile setup: one modal per account/game, and persistent field hints. */
+.profileSetupBackdrop{
+ position:fixed;inset:0;z-index:9900;display:grid;place-items:center;
+ padding:clamp(12px,3vw,30px);background:rgba(11,30,59,.58);
+ backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+}
+.profileSetupWelcome{
+ box-sizing:border-box;width:min(100%,540px);max-height:min(92dvh,760px);
+ overflow-y:auto;background:linear-gradient(153deg,#fff 0%,#f5f8fe 100%);
+ border:1px solid #d0e1fc;border-radius:25px;padding:clamp(22px,3.3vw,36px);
+ box-shadow:0 24px 80px rgba(10,31,69,.28);color:#162e54;
+ display:grid;gap:16px;
+}
+.profileSetupWelcomeIcon{
+ width:56px;height:56px;display:grid;place-items:center;border-radius:17px;
+ background:linear-gradient(145deg,#e1edff,#f6eaff);color:#2452a5;
+}
+.profileSetupEyebrow{font-size:11px;font-weight:800;letter-spacing:.11em;color:#607bac}
+.profileSetupWelcome h2{font-size:clamp(22px,3vw,28px);line-height:1.24;margin:0;letter-spacing:-.03em}
+.profileSetupWelcome p{margin:0;font-size:14px;line-height:1.65;color:#506787}
+.profileSetupProgress{display:grid;gap:8px;font-size:13px;font-weight:700}
+.profileSetupProgressTrack{height:9px;overflow:hidden;border-radius:99px;background:#dce7f6}
+.profileSetupProgressTrack i{display:block;height:100%;border-radius:inherit;background:#3267d6;transition:width .2s}
+.profileSetupChecklist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.profileSetupChecklist>span{display:flex;align-items:center;gap:8px;min-width:0;padding:10px 11px;
+ border:1px solid #f3d5d9;border-radius:12px;background:#fff7f8;color:#923b4a;font-size:12px;line-height:1.4}
+.profileSetupChecklist>span>span{font-size:17px;flex:none}
+.profileSetupChecklist>span.isDone{border-color:#cae7d7;background:#f0faf5;color:#286a4d}
+.profileSetupStart{width:100%;min-height:48px;border-radius:12px;font-weight:750}
+.profileSetupModalError{color:#9c2d3e!important;font-weight:650}
+.profileOnboardingHint.isIncomplete{
+ border:1px solid #eaaab6!important;border-left:4px solid #c53851!important;
+ background:#fff4f5!important;border-radius:13px;padding:14px!important;color:#8c2b41!important
+}
+.profileSetupMissingList{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.profileSetupMissingList span{display:inline-flex;align-items:center;border:1px solid #f0ccd3;
+ border-radius:999px;padding:5px 9px;background:#fff;color:#9d3449;font-size:12px;font-weight:650}
+.profileEditor .profileSetupInvalid{border:1.5px solid #db526b!important;border-radius:12px;
+ background:#fff5f6;padding:10px!important;outline-offset:3px;scroll-margin-block:100px}
+.profileEditor label.profileSetupInvalid input,
+.profileEditor .profileSetupInvalid :is(input,textarea,.styledSelectTrigger){
+ border-color:#c83952!important;outline-color:#c83952;
+ background:#fff!important
+}
+.profileSetupFieldError{display:block;margin-top:6px;color:#b52945;font-size:12px;font-weight:700}
+.profileSetupFeedback{padding:10px 13px;border-radius:9px;color:#79324a;
+ background:#fff2f4;border:1px solid #edc5cf;font-size:13px;line-height:1.5}
+.profileSetupFinish{display:flex;align-items:center;flex-wrap:wrap;gap:12px;
+ padding:14px;border:1px solid #dce7f6;border-radius:13px;background:#f6f9ff}
+.profileSetupFinish .primary{min-height:42px}
+.profileSetupFinish p{margin:0;font-size:12px;color:#61738c;line-height:1.5}
+@media(max-width:540px){
+ .profileSetupWelcome{border-radius:19px;padding:20px;gap:12px}
+ .profileSetupChecklist{grid-template-columns:1fr}
+ .profileSetupBackdrop{padding:12px}
+}
+@media(prefers-reduced-motion:reduce){.profileSetupProgressTrack i{transition:none}}
