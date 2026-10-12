@@ -160,12 +160,16 @@ begin
  select target_game,l.user_id,'mention_'||section_name,source,
  '🔔 '||coalesce(author_name,'Участник')||' упомянул(а) вас. Вас ждут в разделе «'||
  case when section_name='documents' then 'Документы' else 'Политический процесс' end||'».'
- from (select distinct lower((regexp_matches(body,'@([[:alpha:]]+)','g'))[1]) as surname) tokens
+ from (select distinct lower((regexp_matches(body,'@([[:alpha:]0-9_]+)','g'))[1]) as handle) tokens
  join public.game_members m on m.game_id=target_game and m.kind<>'observer' and m.roster_archived_at is null
-  and lower(split_part(btrim(m.full_name),' ',1))=tokens.surname and m.user_id<>creator
+  and m.user_id<>creator
  join public.telegram_links l on l.game_id=target_game and l.user_id=m.user_id and l.notifications_enabled
- where (select count(*) from public.game_members dm where dm.game_id=target_game
-  and dm.roster_archived_at is null and lower(split_part(btrim(dm.full_name),' ',1))=tokens.surname)=1
+ where (
+  (lower(split_part(btrim(m.full_name),' ',1))=tokens.handle and
+   (select count(*) from public.game_members dm where dm.game_id=target_game and dm.roster_archived_at is null
+      and lower(split_part(btrim(dm.full_name),' ',1))=tokens.handle)=1)
+  or (lower(split_part(btrim(m.full_name),' ',1))||'_'||left(replace(m.user_id::text,'-',''),8)=tokens.handle)
+ )
  on conflict do nothing;
  return new;
 end $$;
