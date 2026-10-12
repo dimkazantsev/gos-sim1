@@ -1,11 +1,9 @@
 'use client';
-import {useRef,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {AlertTriangle,CheckCircle2,ChevronDown,ExternalLink,History,RefreshCw,ShieldCheck,XCircle} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {STAGE_SYSTEM} from './stageSystem';
-import {STAGE_REALTIME_TABLES} from './stageRealtimeTables';
-import {useGameTableSync} from './useGameTableSync';
 
 export type StageReadiness={
  stage_no:number;
@@ -26,18 +24,21 @@ export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=fa
  const [overrideReason,setOverrideReason]=useState('');
  const [loading,setLoading]=useState(false);
  const [loadError,setLoadError]=useState('');
+ const [checked,setChecked]=useState(false);
  const request=useRef(0);
+
+ // A new stage/game invalidates the prior result; never trigger an RPC on mount.
+ useEffect(()=>{request.current++;setState(null);setLoadError('');setChecked(false);setLoading(false);setOverrideReason('')},[game?.id,stageNo]);
 
  async function load(){
   if(!game)return;const version=++request.current;setLoading(true);
   try{
    const r=await supabase.rpc('get_stage_readiness',{p_game_id:game.id,p_stage_no:stageNo});
    if(version!==request.current)return;
-   if(r.error){setState(null);setLoadError(r.error.message)}else if(r.data){setState(r.data as StageReadiness);setLoadError('')}else{setState(null);setLoadError('Сервер не вернул результат проверки.')}
-  }catch(error){if(version===request.current){setState(null);setLoadError(error instanceof Error?error.message:'Не удалось загрузить проверку.')}}
+   if(r.error){setState(null);setLoadError(r.error.message)}else if(r.data){setState(r.data as StageReadiness);setLoadError('')}else{setState(null);setLoadError('Сервер не вернул результат проверки.')}setChecked(true)
+  }catch(error){if(version===request.current){setState(null);setLoadError(error instanceof Error?error.message:'Не удалось загрузить проверку.');setChecked(true)}}
   finally{if(version===request.current)setLoading(false)}
  }
- useGameTableSync(game?.id,STAGE_REALTIME_TABLES,load,String(stageNo));
 
  async function setOverride(){
   if(!game||!teacher||overrideReason.trim().length<10)return;
@@ -53,18 +54,18 @@ export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=fa
   setLoading(false);
  }
 
- const status=loading?'loading':state?.ready?(state.warnings?.length?'warning':'ready'):'blocked';
- const title=loading?'Проверка…':loadError?'Проверка недоступна':state?.ready?(state.warnings?.length?'Основная процедура завершена':'Этап процедурно готов'):'Есть незавершённые процедуры';
+ const status=loading?'loading':loadError?'unavailable':!checked?'unchecked':state?.ready?(state.warnings?.length?'warning':'ready'):'blocked';
+ const title=loading?'Проверка…':loadError?'Проверка недоступна':!checked?'Проверка ещё не выполнялась':state?.ready?(state.warnings?.length?'Основная процедура завершена':'Этап процедурно готов'):'Есть незавершённые процедуры';
  const card=STAGE_SYSTEM[stageNo];
 
  if(compact)return <div className={'stageReadinessCompact '+status}>
-  <span>{status==='ready'?'✓':status==='warning'?'!':status==='loading'?'…':'×'}</span>
-  <div><b>{title}</b><small>{state?.blockers?.[0]||state?.warnings?.[0]||card?.institution||'Проверка состояния этапа'}</small></div>
+  <span>{status==='ready'?'✓':status==='warning'?'!':status==='loading'?'…':status==='blocked'?'×':'—'}</span>
+  <div><b>{title}</b><small>{!checked&&!loadError?'Нажмите «Перепроверить» для проверки процедур':state?.blockers?.[0]||state?.warnings?.[0]||card?.institution||'Проверка состояния этапа'}</small></div>
  </div>;
 
  const blockerCount=state?.blockers?.length||0;
  const warningCount=state?.warnings?.length||0;
- const StatusIcon=status==='ready'?CheckCircle2:status==='warning'?AlertTriangle:status==='loading'?RefreshCw:XCircle;
+ const StatusIcon=status==='ready'?CheckCircle2:status==='warning'||status==='unavailable'?AlertTriangle:status==='blocked'?XCircle:RefreshCw;
  return <section className={'stageReadinessPanel stageReadinessWorkspace '+status} aria-live="polite">
   <header className="stageReadinessHero">
    <div className="stageReadinessHeroIcon" aria-hidden="true"><StatusIcon size={22}/></div>
@@ -72,8 +73,7 @@ export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=fa
     <small>ПРОЦЕДУРНАЯ ГОТОВНОСТЬ · ЭТАП {stageNo}</small>
     <h3>{title}</h3>
     <div className="stageReadinessMeta">
-     <span className={blockerCount?'hasBlockers':''}><b>{blockerCount}</b> обязательных</span>
-     <span className={warningCount?'hasWarnings':''}><b>{warningCount}</b> замечаний</span>
+     {checked&&state?<><span className={blockerCount?'hasBlockers':''}><b>{blockerCount}</b> обязательных</span><span className={warningCount?'hasWarnings':''}><b>{warningCount}</b> замечаний</span></>:<span>Проверка только по нажатию кнопки</span>}
      <span>{card?.institution||'Игровой институт'}</span>
     </div>
    </div>

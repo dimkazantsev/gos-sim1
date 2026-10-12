@@ -3252,3 +3252,22 @@
  }
  .stageWorkspaceFloatingBack span{display:none}
 }
+
+/* Readable stage-readiness text and explicit, non-automatic verification state. */
+.stageReadinessWorkspace.unchecked{border-color:#d8e3f1}
+.stageReadinessWorkspace.unchecked .stageReadinessHeroIcon{background:#edf3ff;color:#315a93}
+.stageReadinessWorkspace .stageReadinessHeroCopy>small{font-size:13px;line-height:1.45}
+.stageReadinessWorkspace .stageReadinessMeta>span{font-size:12px;line-height:1.45;padding:5px 9px;min-height:30px}
+.stageReadinessWorkspace .stageReadinessMeta>span b{font-size:12px}
+.stageReadinessWorkspace :is(.stageReadinessRules,.stageReadinessRefresh){font-size:13px;min-height:44px;padding:9px 13px;line-height:1.35}
+.stageReadinessWorkspace .stageReadinessGroup header b{font-size:14px;line-height:1.4}
+.stageReadinessWorkspace .stageReadinessGroup header small{font-size:12px;line-height:1.5;color:#667b96}
+.stageReadinessWorkspace .stageReadinessGroupCount{font-size:12px}
+.stageReadinessWorkspace .stageReadinessGroup li{min-height:52px;padding:12px 14px}
+.stageReadinessWorkspace .stageReadinessItemIndex{font-size:11px}
+.stageReadinessWorkspace .stageReadinessGroup li p{font-size:14px;line-height:1.55;color:#405977}
+.stageReadinessWorkspace .stageReadinessOk :is(b,span){font-size:13px;line-height:1.5}
+.stageReadinessWorkspace .stageReadinessOverride>summary>span :is(b,small){font-size:13px;line-height:1.45}
+.stageReadinessWorkspace .stageReadinessOverrideNotice :is(b,small,p){font-size:13px;line-height:1.5}
+.teacherStageInspector .stageReadinessCompact b{font-size:13px}
+.teacherStageInspector .stageReadinessCompact small{font-size:12px;line-height:1.45}
