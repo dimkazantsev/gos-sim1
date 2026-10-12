@@ -35,7 +35,7 @@ import './brand-identity.css';
 import './topbar-controls-alignment.css';
 import './profile-first-setup.css';
 import type {Metadata} from 'next';
-import {BRAND_NAME,BRAND_TAGLINE} from '@/components/ui/BrandIdentity';
+import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
 
