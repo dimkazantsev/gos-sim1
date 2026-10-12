@@ -42,6 +42,7 @@ async function mockTransport(context,page,f){
   if(rpc)f.calls.push({rpc,...p});
   switch(rpc){
    case 'get_fiscal_budget':response={regions:f.regions,rates:f.rates,proposals:[],ledger:[],can_propose:true};break;
+   case 'get_budget_change_registry':response=[];break;
    case 'get_fiscal_context':response=f.context;break;
    case 'get_fiscal_legal_plans':response={plans:[],programs:[]};break;
    case 'list_regional_cases':response=f.regional_events.map(e=>({...e,comic_scene:{region_code:e.region_code}}));break;
