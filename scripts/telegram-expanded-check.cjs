@@ -27,7 +27,7 @@ assert.ok(reg.includes("'setMyName',{name:'ГОС.ID',language_code:'ru'}"));
 assert.ok(reg.includes('telegramSetProfilePhoto(config.token)'));
 assert.ok(reg.includes("member?.kind!=='teacher'"));
 const bot=read('lib/server/telegram.ts');
-assert.ok(bot.includes("'setMyProfilePhoto'"));
+assert.ok(bot.includes("/setMyProfilePhoto"));
 assert.ok(bot.includes('Approved brand image'));
 const dispatch=read('app/api/telegram/dispatch/route.ts');
 assert.ok(dispatch.includes("job.category==='mention_chat'"));
