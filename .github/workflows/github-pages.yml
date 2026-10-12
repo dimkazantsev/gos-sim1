@@ -7,6 +7,7 @@ on:
       - 'scripts/prepare-github-pages.mjs'
       - 'scripts/github-pages-check.mjs'
       - 'public/share/gos-id-preview.jpg'
+      - 'public/visit/index.html'
       - 'app/layout.tsx'
       - '.github/workflows/github-pages.yml'
   workflow_dispatch:
