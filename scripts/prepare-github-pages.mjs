@@ -20,6 +20,22 @@ for(const name of ['app','components','lib','public','data','package.json','pack
 rmSync(resolve(target,'app/game'),{recursive:true,force:true});rmSync(resolve(target,'app/api'),{recursive:true,force:true});
 transform('lib/supabase.ts',"'build-placeholder-key'",JSON.stringify(publicKey));
 writeFileSync(resolve(target,'next.config.ts'),`export default {output:'export',basePath:${JSON.stringify(base)},assetPrefix:${JSON.stringify(base)},trailingSlash:true,images:{unoptimized:true},experimental:{useTypeScriptCli:false}};\n`);
+// The GitHub Pages host has a repository subpath; Vercel metadata must not leak
+// into social previews sent from https://dimkazantsev.github.io/gos-sim1/.
+// Absolute URLs are intentional: Telegram and other crawlers do not resolve
+// relative og:image paths against the client-side query-string navigation.
+const pagesOrigin='https://dimkazantsev.github.io';
+const pagesUrl=pagesOrigin+base+'/';
+const pagesImage=pagesOrigin+base+'/share/gos-id-preview.jpg';
+transform('app/layout.tsx',
+ "metadataBase:new URL('https://gos-sim1.vercel.app'),",
+ 'metadataBase:new URL('+JSON.stringify(pagesOrigin+base)+'),');
+transform('app/layout.tsx',
+ "const socialPreview='/share/gos-id-preview.jpg';",
+ 'const socialPreview='+JSON.stringify(pagesImage)+';');
+transform('app/layout.tsx',
+ "type:'website',locale:'ru_RU',url:'/',siteName:BRAND_NAME,",
+ "type:'website',locale:'ru_RU',url:"+JSON.stringify(pagesUrl)+",siteName:BRAND_NAME,");
 let home=readFileSync(resolve(target,'app/page.tsx'),'utf8');
 home=home.replaceAll("router.push('/game/'+r.data)","window.location.assign("+JSON.stringify(base+'/?game=')+"+r.data)");
 home=home.replaceAll('href="/"','href='+JSON.stringify(base+'/'));
