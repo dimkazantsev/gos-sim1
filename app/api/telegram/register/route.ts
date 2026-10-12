@@ -35,7 +35,7 @@ export async function POST(request:Request){
    short_description:'🏛 ГОС.ID — Цифровая платформа России. События, решения, этапы и голосования.'
   });
   await telegramApi(config.token,'setMyDescription',{
-   description:'🏛 ГОС.ID — Цифровая платформа России.\\n\\nПолучайте уведомления о жизни республики, следите за государственными решениями, голосованиями, этапами и документами.\\n\\n🚀 Нажмите «Начать», чтобы открыть меню.\\n🔐 Для игровых уведомлений привяжите Telegram в личном профиле ГОС.ID.'
+   description:'🏛 ГОС.ID — Цифровая платформа России.\n\nПолучайте уведомления о жизни республики, следите за государственными решениями, голосованиями, этапами и документами.\n\n🚀 Нажмите «Начать», чтобы открыть меню.\n🔐 Для игровых уведомлений привяжите Telegram в личном профиле ГОС.ID.'
   });
   return NextResponse.json({ok:true,url:webhook,menu:true});
  }catch(e){console.error('Telegram setup failed',e instanceof Error?e.message:'unknown');return NextResponse.json({error:'Telegram не подтвердил полную настройку webhook и меню. Повторите активацию.'},{status:502})}
