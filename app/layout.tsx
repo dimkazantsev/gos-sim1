@@ -31,6 +31,7 @@ import './2026-npa-registry-canonical.css';
 import './2026-npa-workspace-canonical.css';
 import './2026-stage-system.css';
 import './stage-operations.css';
+import './brand-identity.css';
 import type {Metadata} from 'next';
 import {BRAND_NAME,BRAND_TAGLINE} from '@/components/ui/BrandIdentity';
 import '@fontsource-variable/manrope';
