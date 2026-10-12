@@ -39,10 +39,21 @@ import {BRAND_NAME,BRAND_TAGLINE} from '@/components/ui/BrandIdentity';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
 
+const socialTitle=BRAND_NAME+' — '+BRAND_TAGLINE;
+const socialDescription='Моделируй. Анализируй. Принимай решения.';
+const socialPreview='/share/gos-id-preview.jpg';
+
 export const metadata:Metadata={
- title:BRAND_NAME+' — '+BRAND_TAGLINE,
+ metadataBase:new URL('https://gos-sim1.vercel.app'),
+ title:socialTitle,
  description:'Цифровая платформа России: политический процесс, НПА, голосования, партии, аналитика и государственное управление.',
  applicationName:BRAND_NAME,
+ openGraph:{
+  type:'website',locale:'ru_RU',url:'/',siteName:BRAND_NAME,
+  title:socialTitle,description:socialDescription,
+  images:[{url:socialPreview,width:1200,height:632,alt:BRAND_NAME+' — '+BRAND_TAGLINE}]
+ },
+ twitter:{card:'summary_large_image',title:socialTitle,description:socialDescription,images:[socialPreview]},
  other:{'gos-sims-release':(process.env.VERCEL_GIT_COMMIT_SHA||process.env.GITHUB_SHA)?.slice(0,8)||'local'}
 };
 
