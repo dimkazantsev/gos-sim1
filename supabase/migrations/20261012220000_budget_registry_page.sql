@@ -15,7 +15,7 @@ begin
   select value,ordinal,row_number() over(order by ordinal) rn
   from jsonb_array_elements(items) with ordinality as records(value,ordinal)
   where (nullif(p_category,'') is null or p_category='Все' or value->>'category'=p_category)
-   and (nullif(trim(p_search),'') is null or (coalesce(value->>'title','')||' '||coalesce(value->>'details','')||' '||coalesce(value->>'status','')) ilike '%'||replace(replace(trim(p_search),'%','\\%'),'_','\\_')||'%' escape '\\')
+   and (nullif(trim(p_search),'') is null or strpos(lower(coalesce(value->>'title','')||' '||coalesce(value->>'details','')||' '||coalesce(value->>'status','')),lower(trim(p_search)))>0)
  ) records;
  return result;
 end;$$;
