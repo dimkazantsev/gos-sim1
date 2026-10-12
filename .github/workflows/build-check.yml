@@ -5,6 +5,16 @@ on:
     paths:
       - 'components/game/Blitz*.tsx'
       - 'components/game/TeacherBlitz.tsx'
+      - 'components/game/DashboardView.tsx'
+      - 'app/page.tsx'
+      - 'app/layout.tsx'
+      - 'app/icon.svg'
+      - 'app/gos-id-brand.css'
+      - 'public/brand/*.svg'
+      - 'scripts/gos-id-overview-check.cjs'
+      - 'components/GameClient.tsx'
+      - 'components/PublicScreen.tsx'
+      - 'components/game/PublisherAvatar.tsx'
       - 'components/game/PoliticalWallView.tsx'
       - 'app/2026-political-process.css'
       - 'components/game/politicalWallPaging.ts'
@@ -54,6 +64,7 @@ jobs:
       - run: node scripts/interface-contract-check.cjs
       - run: node scripts/political-wall-feed-check.cjs
       - run: node scripts/crisis-baseline-check.cjs
+      - run: node scripts/gos-id-overview-check.cjs
 
       - run: node scripts/fiscal-model-check.cjs
       - run: node scripts/event-card-browser-check.cjs

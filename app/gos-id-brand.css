@@ -1,0 +1,30 @@
+/* ГОС.ID / Russian Federation digital platform. Visual-only brand layer. */
+.gosIdLogo{display:block;object-fit:cover;flex:none;background:transparent;overflow:hidden}
+.wordmark.gosIdWordmark{display:inline-flex;align-items:center;gap:13px;text-decoration:none;letter-spacing:normal;min-width:0}
+.gosIdBrandCopy{display:flex;flex-direction:column;min-width:0;gap:2px}
+.wordmark.gosIdWordmark .gosIdBrandCopy>b{font-weight:900;font-size:24px;line-height:1.1;letter-spacing:-.05em}
+.gosIdBrandCopy>b>span,.gosIdTextAccent,.gosIdSidebarText>b>span{color:#DB66A1}
+.gosIdBrandCopy>small{color:var(--gs-muted,#5a6883);font-weight:600;font-size:10px;line-height:1.3;letter-spacing:0;max-width:330px}
+.gosIdBrandCopy>small i{font-weight:900;color:#2354E6;font-style:normal;margin-right:4px}
+.sidebarBrand .gosIdSidebarText{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sidebarBrand .gosIdSidebarText>b{font-size:22px;line-height:1.15;font-weight:900;letter-spacing:-.055em}
+.sidebarBrand .gosIdSidebarText>small{font-size:10px;line-height:1.35;margin:0;max-width:158px;overflow-wrap:normal}
+.mobileBrand .gosIdLogo{object-fit:cover}
+.publicBrand .gosIdPublicLogo{display:block;width:46px;height:46px;flex:none;object-fit:cover;border-radius:12px}
+.publicBrand>div{min-width:0}
+.publicBrand>div>b{font-weight:900;font-size:20px;letter-spacing:-.04em}
+.publicBrand>div>small{font-size:9px;line-height:1.4;letter-spacing:.035em;max-width:265px}
+@media(max-width:900px){
+ .mobileBrand{min-width:0;max-width:220px}
+ .mobileBrand b{white-space:nowrap}
+}
+@media(max-width:720px){
+ .entryHeader .wordmark.gosIdWordmark{gap:9px}
+ .wordmark.gosIdWordmark .gosIdBrandCopy>b{font-size:21px}
+ .gosIdBrandCopy>small{font-size:9px;max-width:210px}
+}
+@media(max-width:390px){
+ .wordmark.gosIdWordmark .gosIdBrandCopy>b{font-size:19px}
+ .gosIdBrandCopy>small{font-size:9px;max-width:155px}
+ .publicBrand>div>small{max-width:150px}
+}

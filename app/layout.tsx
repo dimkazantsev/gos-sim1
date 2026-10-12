@@ -31,14 +31,15 @@ import './2026-npa-registry-canonical.css';
 import './2026-npa-workspace-canonical.css';
 import './2026-stage-system.css';
 import './stage-operations.css';
+import './gos-id-brand.css';
 import type {Metadata} from 'next';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
 
 export const metadata:Metadata={
- title:'GOS//SIMS — Республика Политология · симулятор',
+ title:'ГОС.ID — Цифровая платформа Российской Федерации',
  description:'Учебная многопользовательская платформа: политические процессы, НПА, голосования, партии, аналитика и автоматический журнал ВСН по 16 этапам',
- applicationName:'GOS//SIMS',
+ applicationName:'ГОС.ID',
  other:{'gos-sims-release':(process.env.VERCEL_GIT_COMMIT_SHA||process.env.GITHUB_SHA)?.slice(0,8)||'local'}
 };
 

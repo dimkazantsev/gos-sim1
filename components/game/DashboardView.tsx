@@ -1,5 +1,7 @@
 'use client';
 import {ArrowRight,ArrowUpRight,BookOpen,Check,Clock3,FileText,Landmark,MessageCircle,Vote,Users} from 'lucide-react';
+import {useEffect,useState} from 'react';
+import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {View} from './types';
 import {STAGE_ACTIONS} from './stageActions';
@@ -7,7 +9,31 @@ import StateMetricsDock from './StateMetricsDock';
 import RepublicLeadership from './RepublicLeadership';
 
 export default function DashboardView({g,onNavigate,onOpenProfile}:{g:ReturnTypeRepublic;onNavigate:(view:View)=>void;onOpenProfile?:(id:string)=>void}){
- const {game,me,currentStage,stages,teacher,parties,members,events,votes,ballots,formalDocuments,setChatOpen}=g;
+ const {game,me,currentStage,stages,teacher,parties,members,votes,ballots,formalDocuments,setChatOpen}=g;
+ // game_events is a separate historical audit stream, not the Political Process.
+ // The overview must show the same active posts as the political-process feed.
+ const [latestPosts,setLatestPosts]=useState<{id:string;title:string;body:string;actor_label:string;created_at:string;pinned:boolean}[]>([]);
+ const [feedLoading,setFeedLoading]=useState(true),[feedError,setFeedError]=useState('');
+ useEffect(()=>{
+  if(!game?.id)return;
+  let active=true;setLatestPosts([]);setFeedLoading(true);setFeedError('');
+  async function fetchOverview(){
+   if(!active)return;
+   const {data,error}=await supabase.from('political_posts')
+    .select('id,title,body,actor_label,created_at,pinned')
+    .eq('game_id',game!.id).is('deleted_at',null)
+    .order('pinned',{ascending:false}).order('created_at',{ascending:false}).limit(4);
+   if(!active)return;
+   if(error)setFeedError(error.message);
+   else{setLatestPosts(data||[]);setFeedError('')}
+   setFeedLoading(false);
+  }
+  void fetchOverview();
+  const onReturn=()=>{if(document.visibilityState==='visible')void fetchOverview()};
+  const timer=window.setInterval(onReturn,30000);
+  window.addEventListener('focus',onReturn);
+  return()=>{active=false;window.clearInterval(timer);window.removeEventListener('focus',onReturn)};
+ },[game?.id]);
  if(!game||!me)return null;
  const stageNo=currentStage?.stage_no||game.current_round||1;
  const task=STAGE_ACTIONS[stageNo]||STAGE_ACTIONS[1];
@@ -38,7 +64,7 @@ export default function DashboardView({g,onNavigate,onOpenProfile}:{g:ReturnType
   <section className="overviewMetrics"><div className="sectionTop"><div><span className="overline">ПОКАЗАТЕЛИ И ПОСЛЕДСТВИЯ</span><h2>Пульс государства</h2></div><span className="sectionHint">Нажмите на показатель, чтобы увидеть историю</span></div><StateMetricsDock g={g}/></section>
   <div className="overviewBottom">
    <section className="overviewFeed"><div className="sectionTop"><h2>Что происходит</h2><button className="textButton" onClick={()=>onNavigate('actions')}>Все процессы<ArrowUpRight aria-hidden="true"/></button></div>
-    {events.length?<ol className="eventTimeline">{events.slice(0,4).map(event=><li key={event.id}><span className={'eventDot '+event.severity}/><div><time dateTime={event.published_at}>{new Date(event.published_at).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</time><h3>{event.title}</h3><p>{event.body}</p></div></li>)}</ol>:<div className="overviewEmpty"><span><FileText aria-hidden="true"/></span><h3>История только начинается</h3><p>Здесь появятся объявления преподавателя и события вашей республики.</p><button className="textButton" onClick={()=>onNavigate('actions')}>Открыть ленту процессов<ArrowRight aria-hidden="true"/></button></div>}
+    {latestPosts.length?<ol className="eventTimeline">{latestPosts.map(post=><li key={post.id}><span className="eventDot process"/><div><time dateTime={post.created_at}>{new Date(post.created_at).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</time><h3>{post.title}</h3><p>{post.actor_label} · {post.body.slice(0,190)}{post.body.length>190?'…':''}</p></div></li>)}</ol>:<div className="overviewEmpty"><span><FileText aria-hidden="true"/></span><h3>{feedLoading?'Загружаем политический процесс…':feedError?'Не удалось обновить ленту':'Публикаций пока нет'}</h3><p>{feedError?'Проверьте подключение. При возвращении на вкладку лента обновится автоматически.':'Здесь появятся опубликованные и не удалённые материалы политического процесса.'}</p><button className="textButton" onClick={()=>onNavigate('actions')}>Открыть политический процесс<ArrowRight aria-hidden="true"/></button></div>}
    </section>
    <section className="republicCard"><div className="sectionTop"><span className="overline">СОСТАВ РЕСПУБЛИКИ</span><Landmark aria-hidden="true"/></div><h2>{teacher?'Ваш учебный парламент':me.role_title||'Участник республики'}</h2><p>{teacher?'Участники, партии и руководство республики.':myParty?myParty.name:'Ваша роль и партия появятся здесь после назначения.'}</p>
     <div className="republicStats"><div><Users aria-hidden="true"/><strong>{participants}</strong><span>участников</span></div><div><Landmark aria-hidden="true"/><strong>{parties.length}</strong><span>партий</span></div><div><FileText aria-hidden="true"/><strong>{formalDocuments.length}</strong><span>НПА в реестре</span></div></div>
