@@ -1,26 +1,40 @@
-/* ГОС.ID identity. Lightweight CSS lettering — no images, fonts or network requests.
-   Two authorized palettes; technical keys and URLs remain unchanged. */
-.gosIdMark{display:inline-flex;align-items:center;justify-content:center;gap:0;font-size:13px;letter-spacing:-.075em;font-weight:900;white-space:nowrap}
-.gosIdMark>span{padding:0 1px}
-.gosIdMark--blue-pink{background:#244fe5;color:#fff}
-.gosIdMark--blue-pink>span{color:#ffacdb}
-.gosIdMark--pink-blue{background:#f2a4d1;color:#183d9b}
-.gosIdMark--pink-blue>span{color:#193b8e}
+/* Approved ГОС.ID identity. A single ID-only icon and black wordmark,
+   using native CSS (no fonts, raster assets, scripts or external requests).
+   Alternate pink palette is opt-in; the default and favicon remain blue. */
+.gosIdMark{
+ display:inline-flex;align-items:center;justify-content:center;
+ box-sizing:border-box;flex:0 0 auto;
+ width:46px;height:46px;min-width:0;
+ border-radius:13px;
+ font-family:inherit;font-size:23px;font-weight:850;line-height:1;
+ letter-spacing:-.045em;white-space:nowrap;
+ box-shadow:none;
+}
+.gosIdMark--blue-pink{background:#2453e6;color:#fff}
+.gosIdMark--pink-blue{background:#f5c8e0;color:#174ad8}
 .gosIdIdentityCopy{display:flex;flex-direction:column;min-width:0;justify-content:center}
-.gosIdWordmark{font-size:inherit;line-height:1.07;letter-spacing:-.045em;font-weight:850;white-space:nowrap;color:#192b4f}
-.gosIdWordmark .gosIdSeparator{color:inherit}
-.gosIdWordmark--blue-pink .gosIdSuffix{color:#cd4d9a}
-.gosIdWordmark--pink-blue .gosIdSuffix{color:#2853c5}
-.gosIdTagline{display:block;font-size:10px;line-height:1.35;letter-spacing:0;color:var(--gs-muted,#64748b);font-weight:600;white-space:normal;max-width:192px;margin-top:3px}
+.gosIdWordmark,.gosIdWordmark--blue-pink,.gosIdWordmark--pink-blue{
+ display:block;font-size:inherit;line-height:1.1;letter-spacing:-.045em;
+ font-weight:850;white-space:nowrap;color:#0b0b0d;
+}
+.gosIdTagline{
+ display:block;margin-top:4px;max-width:210px;
+ font-size:11px;line-height:1.28;letter-spacing:0;
+ color:var(--gs-muted,#596477);font-weight:500;white-space:normal;
+}
 .sidebarBrand .gosIdIdentityCopy{min-width:0}
-.sidebarBrand .gosIdWordmark{font-size:23px}
+.sidebarBrand .gosIdWordmark{font-size:23px;color:#0b0b0d}
 .sidebarBrand .gosIdTagline{font-size:10.5px}
-.mobileBrand .gosIdWordmark{font-size:18px}
+.mobileBrand .gosIdWordmark{font-size:18px;color:#0b0b0d}
 .mobileBrand .gosIdIdentityCopy{display:inline-flex}
-.entryHeader .wordmark .gosIdWordmark{font-size:24px}
+.mobileBrand .gosIdTagline{font-size:9px;line-height:1.18;margin-top:2px;max-width:164px}
+.entryHeader .wordmark .gosIdWordmark{font-size:24px;color:#0b0b0d}
 .entryHeader .gosIdMark{width:46px;height:46px}
 @media(max-width:560px){
- .mobileBrand .gosIdMark{width:36px;height:36px;font-size:11px}
+ .mobileBrand .gosIdMark{width:36px;height:36px;font-size:18px;border-radius:10px}
  .mobileBrand .gosIdWordmark{font-size:17px}
  .entryHeader .wordmark .gosIdWordmark{font-size:20px}
+}
+@media(max-width:380px){
+ .mobileBrand .gosIdTagline{font-size:8px;max-width:134px}
 }
