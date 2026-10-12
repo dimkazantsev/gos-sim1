@@ -43,8 +43,6 @@ CREATE TABLE public.blitz_assignments (
  is_correct boolean
 );
 ALTER TABLE public.blitz_assignments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.blitz_assignments REPLICA IDENTITY FULL;
 CREATE POLICY blitz_assignment_owner_read ON public.blitz_assignments
  FOR SELECT TO authenticated USING ((select auth.uid())=user_id);
 GRANT SELECT ON public.blitz_assignments TO authenticated;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.blitz_assignments;
