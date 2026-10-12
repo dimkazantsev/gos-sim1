@@ -92,10 +92,10 @@
 }
 .legalWorkspaceLabel{
   display:grid;
-  justify-items:center;
+  justify-items:start;
   gap:2px;
   min-width:0;
-  text-align:center;
+  text-align:left;
 }
 .legalWorkspaceLabel small{
   color:#6f8198;
@@ -394,17 +394,18 @@
    padding:16px!important;
  }
  .legalPortal .legalUnifiedToolbar{
-   grid-template-columns:1fr auto!important;
+   grid-template-columns:auto minmax(0,1fr)!important;
  }
- .legalWorkspaceLabel{
-   grid-column:1/-1;
+ .legalPortal .legalUnifiedToolbar .legalWorkspaceLabel{
+   grid-column:2;
    grid-row:1;
+   min-width:0;
    justify-items:start;
    text-align:left;
  }
  .legalPortal .legalBackToRegistry{
    grid-column:1;
-   grid-row:2;
+   grid-row:1;
    justify-self:start;
  }
  .legalPortal .legalEditDocument,
@@ -425,22 +426,33 @@
 }
 @media(max-width:560px){
  .legalPortal .legalUnifiedToolbar{
-   grid-template-columns:minmax(0,1fr)!important;
+   grid-template-columns:auto minmax(0,1fr)!important;
+   gap:10px!important;
  }
- .legalWorkspaceLabel,
- .legalPortal .legalBackToRegistry,
+ .legalPortal .legalBackToRegistry{
+   grid-column:1!important;
+   grid-row:1!important;
+   justify-self:start!important;
+   width:auto!important;
+   justify-content:flex-start!important;
+ }
+ .legalPortal .legalUnifiedToolbar .legalWorkspaceLabel{
+   grid-column:2!important;
+   grid-row:1!important;
+   justify-self:start!important;
+   width:auto!important;
+   min-width:0!important;
+   text-align:left!important;
+ }
  .legalPortal .legalEditDocument,
  .legalEditingBadge{
-   grid-column:1!important;
-   grid-row:auto!important;
+   grid-column:1/-1!important;
+   grid-row:2!important;
    justify-self:stretch!important;
    width:100%!important;
    box-sizing:border-box!important;
  }
- .legalPortal .legalBackToRegistry,
- .legalPortal .legalEditDocument{
-   justify-content:center!important;
- }
+ .legalPortal .legalEditDocument{justify-content:center!important}
  .legalPortal .formalEditActions{
    display:grid!important;
    grid-template-columns:minmax(0,1fr)!important;
@@ -694,4 +706,12 @@
   .legalCreateSteps li{
     min-height:54px!important;
   }
+}
+
+/* Narrow phones stack the title below the back button without centering. */
+@media(max-width:360px){
+ .legalPortal .legalUnifiedToolbar{grid-template-columns:minmax(0,1fr)!important}
+ .legalPortal .legalBackToRegistry{grid-column:1!important;grid-row:1!important}
+ .legalPortal .legalUnifiedToolbar .legalWorkspaceLabel{grid-column:1!important;grid-row:2!important}
+ .legalPortal .legalEditDocument,.legalEditingBadge{grid-column:1!important;grid-row:3!important}
 }
