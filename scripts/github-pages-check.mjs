@@ -33,7 +33,7 @@ const visitHtml=readFileSync(join(out,'visit/index.html'),'utf8');
 const visitUrl=pagesUrl+'visit/';
 for(const [tag,value] of [
  ['property="og:url"',visitUrl],
- ['property="og:title"','ГОС.ID — Республиканская цифровая платформа'],
+ ['property="og:title"','ГОС.ID — Цифровая платформа России'],
  ['property="og:description"','Моделирование работы органов публичной власти России'],
  ['property="og:image"',previewUrl],
  ['property="og:image:secure_url"',previewUrl],
@@ -44,7 +44,18 @@ for(const [tag,value] of [
 ])assert.ok(visitHtml.includes(tag)&&visitHtml.includes(value),'Invalid social entry: '+tag);
 assert.ok(visitHtml.includes('window.location.replace('),'Social entry must forward browsers to the game');
 assert.ok(!/симулятор/i.test(visitHtml),'Public sharing text must not use old branding');
-assert.ok(html.includes('Республиканская цифровая платформа'),'Root social title must be current');
+assert.ok(html.includes('Цифровая платформа России'),'Root social title must be current');
+// Sharing from the live game must use the same preview entry for every section.
+const gameClient=readFileSync(join(root,'components/GameClient.tsx'),'utf8');
+assert.ok(gameClient.includes("u.pathname='/gos-sim1/visit/'"),'Pages sharing must use the preview route');
+assert.ok(gameClient.includes("u.searchParams.set('section',currentScreen.view)"),'Preserve section deep links');
+for(const parameter of ['stage','document','vote'])
+ assert.ok(gameClient.includes("u.searchParams.set('"+parameter+"'"),'Preserve shared '+parameter+' context');
+assert.ok(gameClient.includes("title:'ГОС.ID — Цифровая платформа России'"),'Use the correct social share name');
+// Query strings do not select another HTML file on GitHub Pages; confirm the
+// entry for ?section=dashboard is the same index.html with a real OG image.
+assert.ok(html.includes('property="og:image"')&&html.includes(previewUrl),
+ 'Root ?section=dashboard links must retain an absolute OG preview');
 const fallback=readFileSync(join(out,'404.html'),'utf8');
 assert.ok(fallback.includes('window.location.replace(base+"/?game="'),'Legacy dynamic game routes should redirect to static game entry.');
 assert.ok(fallback.includes('^[0-9a-f]{8}'),'Only UUID game routes may redirect.');
