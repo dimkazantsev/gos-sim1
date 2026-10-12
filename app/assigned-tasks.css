@@ -1,0 +1,36 @@
+.assignedTaskPage{max-width:1160px;margin:0 auto;display:grid;gap:20px;padding:8px 0 30px}
+.assignedTaskHero{padding:20px 22px 24px;border-radius:24px;background:linear-gradient(130deg,#eff4ff,#fff 60%,#e6f3ee);border:1px solid var(--border,#dce5ef)}
+.assignedTaskHero small{display:block;font-size:11px;letter-spacing:.1em;font-weight:800;color:#426c89;margin-top:20px}
+.assignedTaskHero h1{font-size:clamp(26px,3vw,36px);margin:8px 0;color:var(--text,#18334b)}
+.assignedTaskHero p{margin:0;color:var(--muted,#546879)}
+.assignedTaskBack{display:inline-flex;align-items:center;gap:8px;min-height:38px;border:1px solid #cfdded;border-radius:12px;background:#fff;padding:8px 14px;font-weight:750;color:#2453a7}
+.assignedTaskForm,.assignedTaskList{padding:24px;border-radius:22px;display:grid;gap:18px}
+.assignedTaskForm .surfaceHead,.assignedTaskList .surfaceHead{display:flex;justify-content:space-between;align-items:center}
+.assignedTaskGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px}
+.assignedTaskGrid label{display:grid;gap:8px;font-weight:750;color:var(--text,#233d52)}
+.assignedTaskGrid input:not([type=checkbox]),.assignedTaskGrid textarea,.assignedTaskGrid select{width:100%;box-sizing:border-box;min-height:44px;padding:11px 13px;border:1px solid #cddae7;background:var(--surface,#fff);color:var(--text,#213a50);border-radius:13px;font:inherit}
+.assignedTaskGrid textarea{resize:vertical;min-height:124px}
+.assignedTaskGrid input:focus-visible,.assignedTaskGrid textarea:focus-visible,.assignedTaskGrid select:focus-visible{outline:3px solid #95b7f4;outline-offset:1px}
+.assignedTaskWide{grid-column:1/-1}
+.assignedTaskGrid .assignedTaskCheck{display:flex;gap:11px;align-items:center;padding:12px;border:1px solid #e2e9f2;border-radius:13px}
+.assignedTaskCheck input{width:18px;height:18px;accent-color:#2453e6;flex:none}
+.assignedTaskCheck span{display:grid;gap:3px}
+.assignedTaskCheck small{font-size:12px;color:var(--muted,#667887);font-weight:400}
+.assignedTaskActions{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.assignedTaskActions>span{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted,#546879)}
+.assignedTaskActions button,.assignedTaskCard button{display:inline-flex;align-items:center;gap:8px;min-height:42px;border-radius:12px;padding:10px 16px}
+.assignedTaskCards{display:grid;gap:14px}
+.assignedTaskCard{padding:18px;border:1px solid #e1e9f2;border-radius:16px;background:linear-gradient(120deg,#fff,#f7faff)}
+.assignedTaskCard.confirmed{background:linear-gradient(120deg,#fff,#eef8f3)}
+.assignedTaskCardTitle{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.assignedTaskCardTitle h3{margin:0;font-size:18px}
+.assignedTaskCardTitle span{font-size:12px;color:#3166a4;font-weight:800}
+.assignedTaskCard.confirmed .assignedTaskCardTitle span{color:#16764d}
+.assignedTaskCard>p{white-space:pre-wrap;overflow-wrap:anywhere}
+.assignedTaskCard dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 20px;margin:16px 0}
+.assignedTaskCard dl div{min-width:0}.assignedTaskCard dt{color:var(--muted,#667887);font-size:12px}
+.assignedTaskCard dd{margin:3px 0 0;font-weight:650;overflow-wrap:anywhere}
+.assignedTaskCard dd svg{vertical-align:middle}
+.assignedTaskError,.assignedTaskNotice{padding:12px 16px;border-radius:12px;margin:0}
+.assignedTaskError{background:#fff0ef;color:#a42c27}.assignedTaskNotice{background:#effaf3;color:#206544}
+@media(max-width:700px){.assignedTaskPage{gap:12px}.assignedTaskGrid{grid-template-columns:1fr}.assignedTaskForm,.assignedTaskList{padding:16px}.assignedTaskCard dl{grid-template-columns:repeat(2,minmax(0,1fr))}.assignedTaskHero{padding:16px}.assignedTaskActions button{width:100%;justify-content:center}}
