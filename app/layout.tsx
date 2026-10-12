@@ -51,7 +51,7 @@ export const metadata:Metadata={
  openGraph:{
   type:'website',locale:'ru_RU',url:'/',siteName:BRAND_NAME,
   title:socialTitle,description:socialDescription,
-  images:[{url:socialPreview,width:1200,height:632,alt:BRAND_NAME+' — '+BRAND_TAGLINE}]
+  images:[{url:socialPreview,width:1200,height:632,alt:socialTitle}]
  },
  twitter:{card:'summary_large_image',title:socialTitle,description:socialDescription,images:[socialPreview]},
  other:{'gos-sims-release':(process.env.VERCEL_GIT_COMMIT_SHA||process.env.GITHUB_SHA)?.slice(0,8)||'local'}
