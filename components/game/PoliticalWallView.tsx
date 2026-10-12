@@ -50,8 +50,9 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const [search,setSearch]=useState(''),[filterActor,setFilterActor]=useState(''),[filterType,setFilterType]=useState(''),[filterStage,setFilterStage]=useState('');
  const [visiblePostCount,setVisiblePostCount]=useState(POLITICAL_POST_BATCH_SIZE);
  const [bulkMode,setBulkMode]=useState(false),[selectedPostIds,setSelectedPostIds]=useState<Set<string>>(()=>new Set()),[bulkProgress,setBulkProgress]=useState(0);
+ const [locallyRemovedIds,setLocallyRemovedIds]=useState<Set<string>>(()=>new Set());
  // Bulk selection is local to one game. Never carry ids into another game.
- useEffect(()=>{setBulkMode(false);setSelectedPostIds(new Set());setBulkProgress(0)},[game?.id]);
+ useEffect(()=>{setBulkMode(false);setSelectedPostIds(new Set());setBulkProgress(0);setLocallyRemovedIds(new Set())},[game?.id]);
  useEffect(()=>{
   const active=new Set(politicalPosts.map(post=>post.id));
   setSelectedPostIds(previous=>{
@@ -71,10 +72,12 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const selectedBody=VOTING_BODIES.find(x=>x.key===voteBody);
  const isGroupBody=voteBody==='government'||voteBody==='municipality';
  const filtered=useMemo(()=>politicalPosts.filter(p=>{
+  // Unmount a deleted post and its discussion immediately to avoid stale retry messages.
+  if(locallyRemovedIds.has(p.id))return false;
   const q=search.trim().replace(/^#/,'').toLowerCase();
   if(q&&!([p.title,p.body,p.actor_label,...(p.tags||[])].join(' ').toLowerCase().includes(q)))return false;
   return (!filterActor||p.actor_key===filterActor)&&(!filterType||(filterType==='initiative'?['initiative','decision'].includes(p.process_type):p.process_type===filterType))&&(!filterStage||String(p.context?.stage_no)===filterStage);
- }).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||Date.parse(b.created_at)-Date.parse(a.created_at)),[politicalPosts,search,filterActor,filterType,filterStage]);
+ }).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||Date.parse(b.created_at)-Date.parse(a.created_at)),[politicalPosts,locallyRemovedIds,search,filterActor,filterType,filterStage]);
  // Reset the window when the feed criteria change. Older posts and their interactive
  // widgets are mounted only when requested; the underlying game state is untouched.
  useEffect(()=>setVisiblePostCount(POLITICAL_POST_BATCH_SIZE),[game?.id,search,filterActor,filterType,filterStage]);
@@ -98,6 +101,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   const preview=ids.slice(0,3).map(id=>'• '+(available.get(id)?.title||'Публикация')).join('\n');
   if(!confirm('Удалить выбранные публикации ('+ids.length+')?\n\n'+preview+(ids.length>3?'\n… и ещё '+(ids.length-3):'')+'\n\nПубликации исчезнут из ленты. История изменений показателей сохранится.'))return;
   setBusy(true);setBulkProgress(0);setNotice('');
+  setLocallyRemovedIds(previous=>new Set([...previous,...ids]));
   const failed:string[]=[];let succeeded=0;
   try{
    // Existing RPC checks server-side teacher rights and soft-deletes each post.
@@ -111,14 +115,15 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     for(const result of results){if(result.error)failed.push(result.id);else succeeded++}
     setBulkProgress(Math.min(index+batch.length,ids.length));
    }
+   if(failed.length)setLocallyRemovedIds(previous=>{const next=new Set(previous);failed.forEach(id=>next.delete(id));return next});
    setSelectedPostIds(new Set(failed));
    if(!failed.length)setBulkMode(false);
    if(succeeded)await g.refresh();
-   setNotice(failed.length
-    ?'Удалено публикаций: '+succeeded+'. Не удалось удалить: '+failed.length+'. Неудалённые публикации остались выделенными для повторной попытки.'
-    :'Удалено публикаций: '+succeeded+'. Связанные документы и история показателей сохранены.');
+   // Successful bulk deletion is silent; only actual failures show a notice.
+   if(failed.length)setNotice('Не удалось удалить '+failed.length+' публикаций. Неудалённые записи снова показаны и оставлены выделенными.');
   }catch(error){
-   setNotice('Операции удаления выполнены частично ('+succeeded+'). Обновление ленты завершилось ошибкой: '+(error instanceof Error?error.message:'неизвестная ошибка')+'. Перезагрузите раздел для сверки результата.');
+   setLocallyRemovedIds(previous=>{const next=new Set(previous);ids.forEach(id=>{if(failed.includes(id))next.delete(id)});return next});
+   setNotice('Не удалось обновить ленту. Для проверки результата обновите раздел: '+(error instanceof Error?error.message:'неизвестная ошибка'));
   }finally{setBulkProgress(0);setBusy(false)}
  }
 
@@ -164,7 +169,20 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
    const r=await supabase.rpc('submit_media_news',{p_game_id:game.id,p_title:title,p_body:body,p_actor_key:actor.key,p_tags:Array.from(new Set([...selectedTags,...Array.from(body.matchAll(/#([а-яёa-z0-9_]+)/gi),m=>m[1])])),p_external_url:externalUrl.trim()||null,p_internal_view:internalView||null,p_formal_ids:formalIds,p_files:attachments});if(r.error){setNotice(r.error.message);return}submitted=true;setNotice('Новость направлена преподавателю на согласование.');setProposalRefresh(n=>n+1);clearDraft();composer.current?.removeAttribute('open');
   }catch(e){setNotice(e instanceof Error?e.message:'Не удалось направить новость')}finally{if(!submitted&&uploadedPaths.length)await supabase.storage.from('game-assets').remove(uploadedPaths);setBusy(false)}
  }
- async function deletePost(p:PoliticalPost){if(!confirm('Удалить публикацию «'+p.title+'» из ленты? Зафиксированные изменения показателей сохранятся в истории.'))return;setBusy(true);const r=await supabase.rpc('delete_process_post',{p_post_id:p.id});if(r.error)setNotice(r.error.message);else{if(editing?.id===p.id)setEditing(null);await g.refresh();setNotice('Публикация удалена из ленты.')}setBusy(false)}
+ async function deletePost(p:PoliticalPost){
+  if(busy||!confirm('Удалить публикацию «'+p.title+'» из ленты? Зафиксированные изменения показателей сохранятся в истории.'))return;
+  setBusy(true);setNotice('');
+  setLocallyRemovedIds(previous=>new Set(previous).add(p.id));
+  try{
+   const {error}=await supabase.rpc('delete_process_post',{p_post_id:p.id});
+   if(error)throw error;
+   if(editing?.id===p.id)setEditing(null);
+   await g.refresh();
+  }catch(error){
+   setLocallyRemovedIds(previous=>{const next=new Set(previous);next.delete(p.id);return next});
+   setNotice(error instanceof Error?error.message:'Не удалось удалить публикацию.');
+  }finally{setBusy(false)}
+ }
  async function startVote(postId:string){
   if(busy)return;setBusy(true);
   try{const id=await g.createVoteFromPost(postId,voteBody,voteBody==='gd'?'mandate':'member',voteGroup);if(id){setVoteFor('');onOpenVotes()}}finally{setBusy(false)}
