@@ -1,0 +1,24 @@
+/* Guided tour: the actual navigation remains clickable through the spotlight. */
+.root{position:fixed;inset:0;z-index:11000;pointer-events:none;font-family:inherit;color:#15243b}
+.shades{position:fixed;inset:0;pointer-events:none}
+.shades>div,.fullShade{position:fixed;background:rgba(7,16,33,.76);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);pointer-events:auto}
+.fullShade{inset:0}
+.ring{position:fixed;pointer-events:none;border:1.5px solid rgba(145,219,255,.98);border-radius:13px;box-shadow:0 0 0 3px rgba(95,192,255,.22),0 0 24px 8px rgba(80,175,245,.37);animation:tour-breathe 2s ease-in-out infinite;transition:left .22s,top .22s,width .22s,height .22s}
+.connector{position:fixed;left:0;top:0;overflow:visible;pointer-events:none;filter:drop-shadow(0 1px 3px rgba(24,136,240,.45))}
+.card{position:fixed;pointer-events:auto;box-sizing:border-box;border-radius:22px;background:linear-gradient(145deg,#fff 0%,#f1f7ff 100%);border:1px solid rgba(185,211,240,.95);box-shadow:0 20px 70px rgba(2,12,30,.46);padding:20px 22px 16px;max-height:calc(100dvh - 24px);overflow-y:auto;transition:top .2s ease,left .2s ease}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#416b9b}
+.header>span{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:850;letter-spacing:.13em}
+.header>button{border:0;background:#e9f0fa;border-radius:9px;width:31px;height:31px;display:grid;place-items:center;color:#3d5c85;cursor:pointer}
+.progressLabel{font-size:12px;font-weight:760;color:#5b759a;margin-top:16px}
+.progress{height:5px;background:#dfebf9;border-radius:20px;overflow:hidden;margin-top:7px}
+.progress>span{display:block;background:linear-gradient(90deg,#317ad4,#60badd);height:100%;border-radius:20px;transition:width .25s}
+.card h2{margin:16px 0 8px;font-size:clamp(20px,3vw,25px);font-weight:850;line-height:1.2;letter-spacing:-.035em;color:#132b4e}
+.card p{font-size:13.5px;line-height:1.62;color:#405a79;margin:0}
+.action{display:flex;align-items:center;gap:10px;background:#e3f1ff;border:1px solid #c5dfff;padding:12px 13px;border-radius:12px;margin-top:15px;color:#1e578f;font-size:13px;line-height:1.5}
+.action svg{flex-shrink:0}
+.skip{display:block;margin:12px 0 0 auto;padding:7px 2px;border:0;background:transparent;color:#6a7990;font-size:12px;text-decoration:underline;cursor:pointer}
+.fallback{display:block;width:100%;margin-top:12px;border-radius:10px;border:1px solid #b3d1f7;background:white;color:#205a9d;padding:11px;cursor:pointer;font-weight:750}
+.card button:focus-visible{outline:3px solid #2a79d9;outline-offset:2px}
+@keyframes tour-breathe{50%{box-shadow:0 0 0 5px rgba(95,192,255,.28),0 0 30px 10px rgba(80,175,245,.52)}}
+@media(max-width:600px){.card{padding:17px 18px 12px;border-radius:17px}.card h2{font-size:21px;margin-top:12px}.card p{font-size:12.5px}.action{margin-top:10px;padding:9px 10px;font-size:12px}.progressLabel{margin-top:10px}}
+@media(prefers-reduced-motion:reduce){.ring{animation:none;transition:none}.card{transition:none}.progress>span{transition:none}}

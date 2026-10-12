@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Activity,BookOpen,Camera,ChevronDown,FileSignature,Library,UserRound,UsersRound} from 'lucide-react';
+import {Activity,BookOpen,Camera,ChevronDown,Compass,FileSignature,Library,UserRound,UsersRound} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {AwardShelf} from './Achievements';
@@ -23,7 +23,7 @@ import {currentGameMembers,currentGameProfiles} from './gameRoster';
 
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
 type PublicStats={accepted_actions:number;posts:number;votes_cast:number;documents_created:number;activity_entries:number;events_decided:number};
-export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,readOnly=false,setupStatus=null,setupNotice='',setupFocusVersion=0,onProfileChanged,onFinishSetup}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;readOnly?:boolean;setupStatus?:ProfileSetupStatus|null;setupNotice?:string;setupFocusVersion?:number;onProfileChanged?:()=>void;onFinishSetup?:()=>void}){
+export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,onStartTutorial,readOnly=false,setupStatus=null,setupNotice='',setupFocusVersion=0,onProfileChanged,onFinishSetup}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;onStartTutorial?:()=>void;readOnly?:boolean;setupStatus?:ProfileSetupStatus|null;setupNotice?:string;setupFocusVersion?:number;onProfileChanged?:()=>void;onFinishSetup?:()=>void}){
  const {me,game,parties,partyInvitations,partyMandates,averageVsn,myEvaluations,politicalPosts,ballots,formalDocuments,activities,saveProfile,teacher}=g;
  const members=useMemo(()=>currentGameMembers(g.members,game?.id||''),[g.members,game?.id]);
  const profiles=useMemo(()=>currentGameProfiles(g.profiles,members,game?.id||''),[g.profiles,members,game?.id]);
@@ -141,6 +141,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
     <div className="profileHeroControls">
      <button type="button" className="profileComicButton" aria-label="Вводный комикс" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Пролог</button>
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
+     {own&&onStartTutorial&&<button type="button" onClick={onStartTutorial} title="Повторить интерактивное обучение навигации"><Compass size={17}/> {teacher?'Пройти обучение':'Обучение'}</button>}
      {game&&target.kind==='student'&&<BlitzArchive gameId={game.id} userId={target.user_id}/>}
      {!own&&<button type="button" onClick={onOwnProfile}><UserRound size={17}/> Мой профиль</button>}
 

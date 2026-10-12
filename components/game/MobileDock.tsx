@@ -221,7 +221,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  return <>
   <nav className={'mobileDock mobileDockV2 '+(editing?'isEditing':'')} aria-label={editing?'Изменение порядка мобильной панели':'Мобильная навигация'}>
    <div ref={scrollRef} className="mobileDockScroll" aria-label="Прокручиваемые разделы" onPointerMove={onPointerMove} onPointerUp={onPointerEnd} onPointerCancel={onPointerCancel}>
-    {ordered.map(item=><button key={item.key} data-dock-item={item.key} type="button"
+    {ordered.map(item=><button key={item.key} data-dock-item={item.key} data-tour-view={item.key} type="button"
      aria-current={displayedView===item.key?'page':undefined}
      aria-label={editing?item.label+'. Перетащите для изменения порядка или удерживайте ещё для закрепления.':item.label+'. Длительное удержание — перемещение, очень длительное — закрепление.'}
      title={item.label}
@@ -239,7 +239,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
    </div>
    <div className="mobileDockFixed">
     {pinnedItems.length>0&&<div className="mobileDockPinned" aria-label="Закреплённые разделы">
-     {pinnedItems.map(item=><button key={item.key} type="button" className={'mobileDockPinnedItem '+(displayedView===item.key?'active':'')}
+     {pinnedItems.map(item=><button key={item.key} data-tour-view={item.key} type="button" className={'mobileDockPinnedItem '+(displayedView===item.key?'active':'')}
       aria-current={displayedView===item.key?'page':undefined}
       aria-label={item.label+'. Удерживайте для открепления.'} title={item.label+' · удерживайте для открепления'}
       onPointerDown={e=>onPinnedDown(e,item.key)} onPointerMove={onPinnedMove}

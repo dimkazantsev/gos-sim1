@@ -1,6 +1,6 @@
 'use client';
 import {useState} from 'react';
-import {Award,Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
+import {Award,Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Compass,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
 import ClassroomJournal from './ClassroomJournal';
 import ParticipantsAnalytics from './ParticipantsAnalytics';
 import TeacherStageManager from './TeacherStageManager';
@@ -36,7 +36,7 @@ const WORKSPACES=[
  {key:'blitz',title:'Блиц-вопросы',icon:BookOpenText}
 ] as const;
 
-export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat,onNavigate}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void;onNavigate?:(destination:'documents'|'votes'|'budget'|'actions')=>void}){
+export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat,onNavigate,onStartTutorial}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void;onNavigate?:(destination:'documents'|'votes'|'budget'|'actions')=>void;onStartTutorial?:()=>void}){
  const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,formalDocuments,votes,ballots,evaluations,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
@@ -98,6 +98,9 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     <strong>{game.turn_open&&game.turn_ends_at?timerText(secondsLeft):'—'}</strong>
    </div>
    <div className="teacherQuickActions">
+    {onStartTutorial&&<button type="button" className="teacherQuick teacherTourButton" onClick={onStartTutorial} aria-label="Пройти интерактивное обучение" title="Просмотреть все подсказки без изменения игровых данных">
+     <span><Compass size={18} strokeWidth={2} aria-hidden="true"/></span><b>Пройти обучение</b>
+    </button>}
     <button type="button" className={game.turn_open?'teacherQuick danger':'teacherQuick primary'} onClick={()=>setTurn(!game.turn_open)}>
      <span>{game.turn_open?<Pause size={18} strokeWidth={2} aria-hidden="true"/>:<Play size={18} strokeWidth={2} aria-hidden="true"/>}</span>
      <b>{game.turn_open?'Пауза':'Открыть ход'}</b>

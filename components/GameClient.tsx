@@ -21,6 +21,7 @@ import TeacherView from './game/TeacherView';
 import ProfileView from './game/ProfileView';
 import {PROFILE_SETUP_FIELDS,PROFILE_SETUP_LABELS,validProfileSetupStatus,type ProfileSetupStatus} from './game/profileSetup';
 import RepublicComic from './game/RepublicComic';
+import GuidedTour,{getTourSteps,type TourTarget} from './game/GuidedTour';
 import {useIntroProgress} from './game/introProgress';
 import ChatPanel from './game/ChatPanel';
 import EventWorkspace from './game/EventWorkspace';
@@ -263,6 +264,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [setupWelcomeActive,setSetupWelcomeActive]=useState(false);
  const setupPromptScope=useRef('');
  const [setupFocusVersion,setSetupFocusVersion]=useState(0);
+ const [tourMode,setTourMode]=useState<'idle'|'choice'|'tour'>('idle');
+ const [tourIndex,setTourIndex]=useState(0);
+ const tourOfferedScope=useRef('');
  const setupRequest=useRef(0);
  useEffect(()=>{
   if(!viewAsOpen)return;
@@ -304,12 +308,19 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(window.matchMedia('(max-width:1099px)').matches)g.setChatOpen(false);
   requestAnimationFrame(()=>document.getElementById('game-main')?.focus());
  }
- function navigate(next:View,target?:{stageNo?:number;documentId?:string;voteId?:string;templateKey?:string},profileVerified=false){
+ function navigate(next:View,target?:{stageNo?:number;documentId?:string;voteId?:string;templateKey?:string},profileVerified=false,fromTourClick=false){
   const owner=g.me;
   const p=g.profiles.find(row=>row.user_id===owner?.user_id);
-  if(!profileVerified&&owner&&owner.kind!=='observer'&&navigationHydrated&&g.profilesLoaded&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'){
+  if(!profileVerified&&owner&&owner.kind!=='observer'&&navigationHydrated&&g.profilesLoaded&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'&&tourMode!=='tour'){
    setOnboardingNotice('Сначала завершите оформление личного профиля.');
    next='profile';
+  }
+  if(fromTourClick&&tourMode==='tour'){
+   const steps=getTourSteps(!!g.teacher);
+   if(steps[tourIndex]?.target===next){
+    if(tourIndex===steps.length-1){rememberTourChoice('completed');setTourMode('idle')}
+    else setTourIndex(value=>value+1);
+   }
   }
   const destination:ScreenLocation={view:next,stageNo:target?.stageNo??0,documentId:target?.documentId??'',voteId:target?.voteId??'',templateKey:target?.templateKey??''};
   setScreenHistory(previous=>{
@@ -352,6 +363,36 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   }
  });
  const onboardingRequired=!!me&&!observer&&!myProfile?.onboarding_completed_at;
+ function rememberTourChoice(choice:'accepted'|'skipped'|'completed'){
+  if(!game||!me)return;
+  try{window.localStorage.setItem('gos-id:tour-choice:v1:'+game.id+':'+me.user_id,choice)}catch{/* The tutorial is optional. */}
+ }
+ function beginTour(){
+  rememberTourChoice('accepted');
+  setTourIndex(0);setTourMode('tour');setMobileMenuOpen(false);setSelectedProfileId('');
+  setChatOpen(false);navigate('dashboard',undefined,true);
+ }
+ function skipTour(){
+  rememberTourChoice('skipped');setTourMode('idle');setMobileMenuOpen(false);setChatOpen(false);
+  if(onboardingRequired)navigate('profile',undefined,true);
+ }
+ function toggleTourChat(){
+  const opening=!chatOpen;
+  setChatOpen(opening);
+  if(tourMode==='tour'&&opening&&getTourSteps(!!teacher)[tourIndex]?.target==='chat')setTourIndex(x=>x+1);
+ }
+ useEffect(()=>{
+  if(!game||!me||observer||previewMode||g.loading||!g.profilesLoaded||!navigationHydrated||introOpen||!introSeen||!onboardingRequired)return;
+  const scope=game.id+':'+me.user_id;
+  if(tourOfferedScope.current===scope)return;
+  let seen=false;
+  try{seen=!!window.localStorage.getItem('gos-id:tour-choice:v1:'+scope)}catch{}
+  if(seen)return;
+  tourOfferedScope.current=scope;
+  setTourMode('choice');
+  navigate('dashboard',undefined,true);
+ },[game?.id,me?.user_id,observer,previewMode,g.loading,g.profilesLoaded,navigationHydrated,introOpen,introSeen,onboardingRequired]);
+
  async function loadProfileSetup(){
   if(!game||!me||observer)return;
   const token=++setupRequest.current;
@@ -375,7 +416,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   setupPromptScope.current='';
  },[game?.id,me?.user_id]);
  useEffect(()=>{
-  if(!game||!me||!introSeen||introOpen||previewMode||!onboardingRequired||!setupStatus||setupChecking||setupStatus.completed||setupStatus.prompt_seen)return;
+  if(!game||!me||!introSeen||introOpen||previewMode||tourMode!=='idle'||!onboardingRequired||!setupStatus||setupChecking||setupStatus.completed||setupStatus.prompt_seen)return;
   const scope=game.id+':'+me.user_id;
   if(setupPromptScope.current===scope)return;
   setupPromptScope.current=scope;
@@ -386,9 +427,10 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    if(r.error){setOnboardingNotice('Не удалось сохранить первое знакомство: '+r.error.message);setupPromptScope.current='';return}
    setSetupStatus(prev=>prev?{...prev,prompt_seen:true}:prev);
   });
- },[game?.id,me?.user_id,introSeen,introOpen,previewMode,onboardingRequired,setupStatus?.completed,setupStatus?.prompt_seen,setupChecking]);
- const showSetupWelcome=!!onboardingRequired&&setupWelcomeActive&&!!setupStatus&&!setupStatus.completed&&introSeen&&!introOpen&&!previewMode;
+ },[game?.id,me?.user_id,introSeen,introOpen,previewMode,tourMode,onboardingRequired,setupStatus?.completed,setupStatus?.prompt_seen,setupChecking]);
+ const showSetupWelcome=!!onboardingRequired&&setupWelcomeActive&&!!setupStatus&&!setupStatus.completed&&introSeen&&!introOpen&&!previewMode&&tourMode==='idle';
  const setupDialogRef=useDialog(showSetupWelcome,()=>{});
+ const tourChoiceDialogRef=useDialog(tourMode==='choice'&&!introOpen,()=>{});
  async function goToIncompleteProfile(){
   if(!game||!me||setupPromptBusy)return;
   setSetupPromptBusy(true);
@@ -434,9 +476,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  useEffect(()=>{
   // Never interpret a temporarily missing profile row during initial loading
   // as an incomplete onboarding. Doing so overwrites the restored screen on F5.
-  if(!game||!me||g.loading||!g.profilesLoaded||!navigationHydrated||navigationRestored||me.kind==='observer'||introOpen||!introSeen||myProfile?.onboarding_completed_at)return;
+  if(!game||!me||g.loading||!g.profilesLoaded||!navigationHydrated||navigationRestored||me.kind==='observer'||introOpen||!introSeen||tourMode!=='idle'||myProfile?.onboarding_completed_at)return;
   if(view!=='profile')navigate('profile');
- },[game?.id,me?.user_id,g.loading,g.profilesLoaded,navigationHydrated,navigationRestored,introSeen,myProfile?.onboarding_completed_at,introOpen,view]);
+ },[game?.id,me?.user_id,g.loading,g.profilesLoaded,navigationHydrated,navigationRestored,introSeen,myProfile?.onboarding_completed_at,introOpen,tourMode,view]);
  async function completeOnboarding(){
   if(!game||!me||completingProfile)return;
   setCompletingProfile(true);setOnboardingNotice('');
@@ -446,7 +488,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   setCompletingProfile(false);
  }
  function finishIntro(){
-  closeIntro();navigate('profile');
+  closeIntro();setTourMode('choice');navigate('dashboard',undefined,true);
  }
  
 
@@ -501,7 +543,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
    <nav className="focusNav" aria-label="Разделы игры">
     <div className="focusNavInner">
-     {[...nav].sort((a,b)=>{const rank=(key:string)=>sidebarOrder.includes(key)?sidebarOrder.indexOf(key):sidebarOrder.length+nav.findIndex(x=>x[0]===key);return rank(a[0])-rank(b[0])}).map(([k,label])=><button key={k} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();const from=sidebarDrag.current;if(from)reorderSidebar(from,k);sidebarDrag.current=''}} className={view===k?'active':''} onClick={()=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} aria-current={view===k?'page':undefined}>
+     {[...nav].sort((a,b)=>{const rank=(key:string)=>sidebarOrder.includes(key)?sidebarOrder.indexOf(key):sidebarOrder.length+nav.findIndex(x=>x[0]===key);return rank(a[0])-rank(b[0])}).map(([k,label])=><button key={k} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();const from=sidebarDrag.current;if(from)reorderSidebar(from,k);sidebarDrag.current=''}} className={view===k?'active':''} data-tour-view={k} onClick={()=>{if(k==='profile')setSelectedProfileId('');navigate(k,undefined,false,true)}} aria-current={view===k?'page':undefined}>
       <span className="sidebarDragHandle" draggable tabIndex={0} role="button" aria-label={'Переместить раздел «'+label+'». Стрелки вверх и вниз меняют порядок.'} title="Перетащите для изменения порядка" onClick={e=>e.stopPropagation()} onDragStart={e=>{sidebarDrag.current=k;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',k)}} onDragEnd={()=>{sidebarDrag.current=''}} onKeyDown={e=>{if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;e.preventDefault();e.stopPropagation();const order=sidebarKeys(),i=order.indexOf(k),to=i+(e.key==='ArrowUp'?-1:1);if(to>=0&&to<order.length)reorderSidebar(k,order[to])}}><GripVertical size={15} aria-hidden="true"/></span>
       {navIcon(k)}<span className="sidebarRouteLabel">{label}</span>{sectionBadge(k)>0&&<i className="navBadge" aria-label={'Новых: '+sectionBadge(k)}>{sectionBadge(k)}</i>}</button>)}
     </div>
@@ -550,7 +592,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      </div>}
     </div>}
 
-    <ChatToggleButton chatOpen={chatOpen} onToggle={()=>setChatOpen(!chatOpen)} unreadCount={g.chatUnreadCount} mentionCount={g.chatMentionCount}/>
+    <ChatToggleButton chatOpen={chatOpen} onToggle={toggleTourChat} unreadCount={g.chatUnreadCount} mentionCount={g.chatMentionCount}/>
    </header>
 
    {previewMode&&<div className="studentPreviewBanner">
@@ -571,9 +613,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} createTemplate={currentScreen.templateKey} createStageNo={focusStage} onSelectDocument={rememberDocument} onOpenBudget={()=>navigate('budget')} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
      {view==='grades'&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
      {view==='actions'&&<PoliticalWallView g={vg} readOnly={previewMode||observer} focusPending={true} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
-     {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}} setupStatus={setupStatus} setupNotice={onboardingNotice} setupFocusVersion={setupFocusVersion} onProfileChanged={()=>void loadProfileSetup()} onFinishSetup={()=>void completeOnboarding()}/>}
+     {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onStartTutorial={beginTour} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}} setupStatus={setupStatus} setupNotice={onboardingNotice} setupFocusVersion={setupFocusVersion} onProfileChanged={()=>void loadProfileSetup()} onFinishSetup={()=>void completeOnboarding()}/>}
      {view==='events'&&<EventWorkspace g={vg} readOnly={previewMode||observer}/>}
-     {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onNavigate={destination=>navigate(destination)} onOpenProcesses={()=>navigate('actions')} onOpenStages={stageNo=>navigate('stages',{stageNo})}
+     {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onStartTutorial={beginTour} onNavigate={destination=>navigate(destination)} onOpenProcesses={()=>navigate('actions')} onOpenStages={stageNo=>navigate('stages',{stageNo})}
        onOpenChat={channelId=>{g.setChannelId(channelId);g.setChatOpen(true)}}/>}
     </main>
    </div>
@@ -584,10 +626,21 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
    <section ref={mobileDialogRef} tabIndex={-1} className="mobileMoreSheet" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
     <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><IconAction onClick={()=>setMobileMenuOpen(false)} label="Закрыть меню"/></header>
-    <div className="mobileAllGrid">{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} onClick={()=>navigate(k)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" className={chatOpen?'active':''} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);setChatOpen(true)}}><span className="mobileMenuChatIcon"><MessageCircle aria-hidden="true"/>{g.chatUnreadCount>0&&<i className={g.chatMentionCount>0?'hasMention':''}>{g.chatUnreadCount>99?'99+':g.chatUnreadCount}</i>}</span><span>Чат</span></button></div>
+    <div className="mobileAllGrid">{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} data-tour-view={k} onClick={()=>navigate(k,undefined,false,true)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" className={chatOpen?'active':''} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);setChatOpen(true)}}><span className="mobileMenuChatIcon"><MessageCircle aria-hidden="true"/>{g.chatUnreadCount>0&&<i className={g.chatMentionCount>0?'hasMention':''}>{g.chatUnreadCount>99?'99+':g.chatUnreadCount}</i>}</span><span>Чат</span></button></div>
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
+  {tourMode==='choice'&&!introOpen&&!previewMode&&<div className="tourChoiceBackdrop">
+    <section ref={tourChoiceDialogRef} role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="tour-choice-title" className="tourChoice">
+     <small>ГОС.ID · НАЧАЛО РАБОТЫ</small>
+     <h2 id="tour-choice-title">Познакомимся с Республикой?</h2>
+     <p>Пролог закончился. Предлагаем пройти интерактивное обучение: интерфейс затемнится, а подсказки по очереди покажут основные разделы. Нажимайте на выделенные кнопки, чтобы открыть их и перейти к следующему шагу.</p>
+     <p>После экскурсии вы завершите оформление профиля. Если пропустите экскурсию, профиль всё равно потребуется заполнить. Обучение можно повторить в любой момент через личный профиль.</p>
+     <div className="tourChoiceActions"><button type="button" className="tourStart" onClick={beginTour}>Пройти обучение</button><button type="button" className="tourLater" onClick={skipTour}>Пропустить</button></div>
+     <span className="tourChoiceNote">Экскурсия не меняет игровые данные, оценки и решения.</span>
+    </section>
+   </div>}
+  {tourMode==='tour'&&!introOpen&&!previewMode&&<GuidedTour step={getTourSteps(!!teacher)[tourIndex]} index={tourIndex} total={getTourSteps(!!teacher).length} onSkip={skipTour} onFallback={(target:TourTarget)=>target==='chat'?toggleTourChat():navigate(target,undefined,true,true)}/>}
   {showSetupWelcome&&setupStatus&&<div className="profileSetupBackdrop">
     <section ref={setupDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="profile-setup-title" aria-describedby="profile-setup-description" className="profileSetupWelcome">
      <div className="profileSetupWelcomeIcon"><UserRound size={26} aria-hidden="true"/></div>
@@ -599,8 +652,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {(onboardingNotice||introSyncError)&&<p role="alert" className="profileSetupModalError">{onboardingNotice||introSyncError}</p>}
      <button type="button" className="primary profileSetupStart" disabled={setupPromptBusy} onClick={()=>void goToIncompleteProfile()}>{setupPromptBusy?'Открываем профиль…':'Перейти к заполнению'}</button>
     </section>
-   </div>} <BlitzOverlay gameId={gameId} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired}/>
+   </div>} <BlitzOverlay gameId={gameId} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'}/>
   <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={me?.kind==='student'&&!previewMode&&!introOpen}/>
   <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>
-  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
+  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k,undefined,false,true)}} onChat={()=>{setMobileMenuOpen(false);toggleTourChat()}} chatOpen={chatOpen} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }

@@ -1,0 +1,31 @@
+const fs=require('node:fs'),assert=require('node:assert/strict');
+const read=path=>fs.readFileSync(path,'utf8');
+const client=read('components/GameClient.tsx');
+const tour=read('components/game/GuidedTour.tsx');
+const style=read('components/game/GuidedTour.module.css');
+const profile=read('components/game/ProfileView.tsx');
+const dock=read('components/game/MobileDock.tsx');
+const layout=read('app/layout.tsx');
+const steps=[...tour.matchAll(/\{target:'(dashboard|stages|actions|parties|documents|votes|budget|events|grades|chat|profile)',title:/g)].map(x=>x[1]);
+assert.deepEqual(steps,['dashboard','stages','actions','parties','documents','votes','budget','events','grades','chat','profile'],'The entire participant route must remain present and ordered');
+assert(tour.includes("target:'teacher'")&&tour.includes('getTourSteps(teacher:boolean)'),'Teacher-only management step must be conditional');
+for(const target of steps.filter(x=>x!=='chat')){
+ assert(client.includes("['"+target+"'")||client.includes("'"+target+"'"),'Navigation route missing: '+target);
+}
+assert(client.includes('fromTourClick')&&client.includes('getTourSteps(!!g.teacher)'),'Tour steps must follow actual navigation clicks');
+assert(client.includes("tourMode!=='tour'")&&client.includes('profileVerified'),'Profile gating must permit guided-only navigation');
+assert(client.includes('const showSetupWelcome=')&&client.includes("tourMode==='idle'"),'Tour must not compete with required profile modal');
+assert(client.includes('complete_my_game_profile'),'Server still completes profiles');
+assert(client.includes("setTourMode('choice')")&&client.includes("setTourMode('tour')"),'Comic-to-choice-to-tour transition required');
+assert(client.includes("navigate('profile',undefined,true)")&&client.includes("rememberTourChoice('skipped')"),'Skip must preserve profile setup');
+assert(client.includes('onStartTutorial={beginTour}')&&profile.includes('Архив комиксов</button>')&&profile.includes("'Пройти обучение':'Обучение'"),'Replay must be adjacent to comic archive for participants and explicitly labelled for teachers');
+const teacherView=read('components/game/TeacherView.tsx');
+assert(teacherView.includes('className="teacherQuick teacherTourButton"')&&teacherView.includes('onClick={onStartTutorial}')&&teacherView.includes('Пройти обучение'),'Teacher must have a direct launch button in management');
+assert(client.includes('<TeacherView g={g} onStartTutorial={beginTour}'),'Teacher management must launch the existing tour rather than a duplicate tutorial');
+assert(dock.includes('data-tour-view={item.key}')&&client.includes('data-tour-view={k}'),'Desktop and mobile need actual spotlight targets');
+assert(tour.includes('.mobileDockChat')&&tour.includes('.topChatButton'),'Both chat buttons must be discoverable');
+assert(tour.includes('onFallback')&&tour.includes('onSkip'),'Unreachable target and skip paths need controls');
+assert(style.includes('pointer-events:auto')&&style.includes('pointer-events:none'),'Overlay must pass pointer events through active hole');
+assert(layout.includes("import './onboarding-tour.css'"),'Initial tutorial choice stylesheet must load');
+assert(client.includes("tourMode==='idle'}"),'Time-sensitive blitz must not obscure the guided tour');
+console.log('PASS guided route, comic choice, real navigation, replay, mobile, skip, profile gate and nonintrusive overlay');
