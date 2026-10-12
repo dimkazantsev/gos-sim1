@@ -19,6 +19,11 @@ on:
       - 'components/game/profileSetup.ts'
       - 'components/game/TelegramConnection.tsx'
       - 'app/api/telegram/webhook/route.ts'
+      - 'app/api/telegram/register/route.ts'
+      - 'lib/server/telegram.ts'
+      - 'lib/server/telegramPresentation.ts'
+      - 'app/api/telegram/dispatch/route.ts'
+      - 'scripts/telegram-onboarding-check.cjs'
       - 'components/PublicScreen.tsx'
       - 'app/poll/page.tsx'
       - 'components/game/DocumentPaper.tsx'
@@ -101,6 +106,7 @@ jobs:
       - run: node scripts/grade-fractional-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
+      - run: node scripts/telegram-onboarding-check.cjs
       - run: node scripts/event-option-legality-check.cjs
       - run: npm run design:check
       - run: node scripts/interface-contract-check.cjs

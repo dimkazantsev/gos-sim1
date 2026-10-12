@@ -1,0 +1,98 @@
+/** Telegram's own markup controls are kept independent of the game UI and database. */
+export const TELEGRAM_PROJECT_URL='https://dimkazantsev.github.io/gos-sim1/';
+export type TelegramButton={text:string;callback_data?:string;url?:string};
+export type TelegramMarkup={inline_keyboard:TelegramButton[][]};
+export const TELEGRAM_WELCOME_BUTTONS:TelegramMarkup={
+ inline_keyboard:[
+  [{text:'🚀 Начать',callback_data:'gos:begin'}],
+  [{text:'🌐 Открыть ГОС.ID',url:TELEGRAM_PROJECT_URL}]
+ ]
+};
+export const TELEGRAM_MENU_BUTTONS:TelegramMarkup={
+ inline_keyboard:[
+  [{text:'📊 Состояние',callback_data:'gos:status'},{text:'🗺 Этапы',callback_data:'gos:stages'}],
+  [{text:'🗳 Голосования',callback_data:'gos:votes'},{text:'📜 Документы',callback_data:'gos:docs'}],
+  [{text:'💬 Чаты',callback_data:'gos:channels'},{text:'🏛 Мои игры',callback_data:'gos:games'}],
+  [{text:'❔ Помощь',callback_data:'gos:help'}],
+  [{text:'🌐 Открыть ГОС.ID',url:TELEGRAM_PROJECT_URL}]
+ ]
+};
+export const TELEGRAM_BACK_BUTTONS:TelegramMarkup={
+ inline_keyboard:[
+  [{text:'🏛 Меню',callback_data:'gos:menu'},{text:'🌐 ГОС.ID',url:TELEGRAM_PROJECT_URL}]
+ ]
+};
+export const TELEGRAM_COMMANDS=[
+ {command:'start',description:'🚀 Начать работу с ГОС.ID'},
+ {command:'menu',description:'🏛 Главное меню бота'},
+ {command:'games',description:'🏛 Мои игры'},
+ {command:'status',description:'📊 Состояние республики'},
+ {command:'stages',description:'🗺 Этапы и задачи'},
+ {command:'votes',description:'🗳 Открытые голосования'},
+ {command:'docs',description:'📜 Документы и НПА'},
+ {command:'channels',description:'💬 Доступные чаты'},
+ {command:'help',description:'❔ Справка и команды'}
+];
+const CALLBACK_TO_COMMAND:Record<string,string>={
+ 'gos:begin':'/menu','gos:menu':'/menu','gos:games':'/games',
+ 'gos:status':'/status','gos:stages':'/stages','gos:votes':'/votes',
+ 'gos:docs':'/docs','gos:channels':'/channels','gos:help':'/help'
+};
+export function telegramCallbackCommand(data:string):string|undefined{
+ return Object.prototype.hasOwnProperty.call(CALLBACK_TO_COMMAND,data)?CALLBACK_TO_COMMAND[data]:undefined;
+}
+export function telegramWelcomeText(connected=false){
+ return [
+  '🏛 ГОС.ID — Цифровая платформа России',
+  '',
+  connected?'✅ Ваш Telegram подключён к ГОС.ID.':'👋 Добро пожаловать в ГОС.ID!',
+  'Здесь вы будете получать сообщения о событиях республики и сможете следить за этапами, голосованиями и документами.',
+  connected?'Нажмите «Начать», чтобы перейти к функциям бота.':'Нажмите «Начать», чтобы открыть меню. Для уведомлений из вашей игры привяжите Telegram в личном профиле ГОС.ID.',
+  '',
+  '⚡ Всё важное — в одном месте.'
+ ].join('\n');
+}
+export function telegramMenuText(connected:boolean){
+ return [
+  '🏛 ГОС.ID · Главное меню',
+  '',
+  'Выберите раздел с помощью кнопок ниже.',
+  '📊 Состояние и 🗺 Этапы — информация о республике.',
+  '🗳 Голосования и 📜 Документы — работа институтов.',
+  '💬 Чаты — общение, 🏛 Мои игры — доступные республики.',
+  '',
+  connected?'✅ Ваш аккаунт подключён.':'🔐 Чтобы получить доступ к данным игры, привяжите Telegram в профиле ГОС.ID.',
+  'Кнопка «Меню» в Telegram остаётся доступной рядом с полем сообщения.'
+ ].join('\n');
+}
+export function telegramHelpText(){
+ return [
+  '❔ ГОС.ID · Помощь',
+  '',
+  'Выберите действие с помощью кнопок или меню Telegram.',
+  '/games — мои игры, /status — состояние, /stages — этапы.',
+  '/votes — голосования, /docs — документы, /channels — чаты.',
+  '/game UUID — указать игру при наличии нескольких.',
+  '/channel UUID — выбрать доступный канал.',
+  '/chat текст — отправить сообщение в выбранный канал.',
+  '/menu — открыть главное меню.',
+  '',
+  'Для первой привязки перейдите в личный профиль на платформе.'
+ ].join('\n');
+}
+export function escapeTelegramHtml(text:string){
+ return text.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+}
+/** Always retain the verified linked signature at the very bottom. */
+export function telegramMessageHtml(text:string){
+ let safe='',size=0,truncated=false;
+ for(const char of text){
+  const part=escapeTelegramHtml(char);
+  if(size+part.length>3650){truncated=true;break}
+  safe+=part;size+=part.length;
+ }
+ if(truncated)safe+='…';
+ const newline=safe.indexOf('\n');
+ const main=newline===-1?'<b>'+safe+'</b>':'<b>'+safe.slice(0,newline)+'</b>'+safe.slice(newline);
+ return main+'\n\n━━━━━━━━\n🔗 <a href="'+TELEGRAM_PROJECT_URL+'">ГОС.ID</a>';
+}

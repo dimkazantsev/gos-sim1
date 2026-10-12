@@ -1,26 +1,56 @@
 import {NextResponse} from 'next/server';
-import {gameUrl,runtimeConfig,telegramSend} from '@/lib/server/telegram';
+import {gameUrl,runtimeConfig,telegramSend,telegramAcknowledge} from '@/lib/server/telegram';
+import {telegramCallbackCommand,telegramHelpText,telegramMenuText,telegramWelcomeText,TELEGRAM_MENU_BUTTONS,TELEGRAM_WELCOME_BUTTONS} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
-type TelegramUpdate={message?:{chat:{id:number;type:string};from?:{id:number};message_id:number;text?:string}};
+type PrivateMessage={chat:{id:number;type:string};from?:{id:number};message_id:number;text?:string};
+type TelegramUpdate={message?:PrivateMessage;callback_query?:{id:string;from:{id:number};data?:string;message?:PrivateMessage}};
 export async function POST(request:Request){
  let config:ReturnType<typeof runtimeConfig>;
  try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
  if(request.headers.get('x-telegram-bot-api-secret-token')!==config.secret)return new Response('Unauthorized',{status:401});
  let update:TelegramUpdate;try{update=await request.json() as TelegramUpdate}catch{return new Response('Bad payload',{status:400})}
- const message=update.message;
- if(!message||message.chat.type!=='private'||!message.from?.id||!message.text)return NextResponse.json({ok:true});
- const telegramId=message.from.id,chatId=message.chat.id,text=message.text.trim();
- async function reply(value:string){await telegramSend(config.token,chatId,value)}
+ const callback=update.callback_query;
+ const message=update.message||callback?.message;
+ if(!message||message.chat.type!=='private')return NextResponse.json({ok:true});
+ const telegramId=callback?.from.id||message.from?.id,chatId=message.chat.id;
+ if(!telegramId)return NextResponse.json({ok:true});
+ // Only a strict list of callbacks may invoke commands. All data access below
+ // continues through the existing active-member and channel permission checks.
+ const callbackCommand=callback?telegramCallbackCommand(callback.data||''):undefined;
+ if(callback){
+  try{await telegramAcknowledge(config.token,callback.id)}catch(e){console.error('Telegram callback acknowledgement failed',e instanceof Error?e.message:'unknown')}
+  if(!callbackCommand)return NextResponse.json({ok:true});
+ }
+ const text=callbackCommand||message.text?.trim()||'';
+ if(!text)return NextResponse.json({ok:true});
+ async function reply(value:string,buttons?:Parameters<typeof telegramSend>[3]){
+  await telegramSend(config.token,chatId,value,buttons);
+ }
  try{
   if(text.startsWith('/start ')){
    const token=text.slice(7).trim();
-   if(!/^[a-f0-9]{48}$/.test(token)){await reply('Неверный код привязки. Создайте новый код в профиле игры.');return NextResponse.json({ok:true})}
+   if(!/^[a-f0-9]{48}$/.test(token)){
+    await reply('⚠️ Код привязки устарел или неверен. Получите новый в профиле ГОС.ID.\n\n'+telegramWelcomeText(),TELEGRAM_WELCOME_BUTTONS);
+    return NextResponse.json({ok:true});
+   }
    const {data,error}=await config.db.rpc('telegram_connect',{p_token:token,p_telegram_user_id:telegramId,p_chat_id:chatId});
-   await reply(error?'Не удалось связать аккаунт: '+error.message:'ГОС.ID подключён. Для команд отправьте /help. Игра: '+gameUrl(data as string));
+   await reply(error?'⚠️ Привязка не подтверждена. Создайте новый код в профиле и попробуйте ещё раз.':
+    telegramWelcomeText(true)+'\n\n🎮 '+gameUrl(data as string),TELEGRAM_WELCOME_BUTTONS);
    return NextResponse.json({ok:true});
   }
-  if(text==='/start'||text==='/help'){
-   await reply('ГОС.ID\n/games — подключённые игры\n/status — состояние игры\n/stages — этапы\n/votes — голосования\n/docs — документы\n/channels — каналы чата\n/chat Текст — отправить в выбранный канал\n/help — помощь\nВыбрать игру: /game <id>\nВыбрать канал: /channel <id>');return NextResponse.json({ok:true});
+  if(text==='/start'){
+   await reply(telegramWelcomeText(),TELEGRAM_WELCOME_BUTTONS);
+   return NextResponse.json({ok:true});
+  }
+  if(text==='/menu'||text==='🏛 Меню'){
+   const {data,error}=await config.db.from('telegram_links').select('game_id').eq('telegram_user_id',telegramId).limit(1);
+   if(error)throw error;
+   await reply(telegramMenuText(!!data?.length),TELEGRAM_MENU_BUTTONS);
+   return NextResponse.json({ok:true});
+  }
+  if(text==='/help'){
+   await reply(telegramHelpText(),TELEGRAM_MENU_BUTTONS);
+   return NextResponse.json({ok:true});
   }
   const {data:links,error:linksError}=await config.db.from('telegram_links').select('game_id,user_id,default_channel_id').eq('telegram_user_id',telegramId);
   if(linksError)throw linksError;

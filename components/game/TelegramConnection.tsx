@@ -25,7 +25,7 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
      }
      const result=await response.json() as {ok?:boolean;error?:string};
      if(!response.ok||!result.ok)throw new Error(result.error||'Не удалось активировать бота.');
-     setActivated('Webhook Telegram зарегистрирован.');setError('');
+     setActivated('Telegram активирован: приветствие, меню, кнопки и команды настроены.');setError('');
    }catch(e){setError(e instanceof Error?e.name==='TimeoutError'?'Сервер не ответил за 20 секунд. Повторите попытку.':e.message:'Ошибка активации')}
    finally{setBusy(false)}
  }
@@ -52,7 +52,7 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
  }
  return <section className="surface" style={{padding:20,marginTop:20}}>
   <h2 style={{fontSize:19,margin:'0 0 8px'}}>Telegram — ГОС.ID</h2>
-  <p style={{margin:'0 0 14px',opacity:.8}}>{status?.linked?'Telegram привязан к вашему игровому аккаунту.':'Получайте уведомления и отправляйте сообщения прямо из Telegram.'}</p>
+  <p style={{margin:'0 0 14px',opacity:.8}}>{status?.linked?'Telegram привязан к вашему игровому аккаунту.':'Откройте бота, нажмите «Начать» и пользуйтесь удобным меню. Уведомления о вашей игре доступны после привязки.'}</p>
   <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
    {!status?.linked?<button type="button" disabled={busy} onClick={()=>void link()}>Привязать Telegram</button>:<>
     <button type="button" disabled={busy} onClick={()=>void change('toggle')}>{status.notifications_enabled?'Отключить уведомления':'Включить уведомления'}</button>
