@@ -6,6 +6,8 @@ on:
     paths:
       - 'scripts/prepare-github-pages.mjs'
       - 'scripts/github-pages-check.mjs'
+      - 'scripts/finalize-github-pages-social.mjs'
+      - 'scripts/verify-github-pages-live.mjs'
       - 'public/share/gos-id-preview.jpg'
       - 'public/visit/index.html'
       - 'app/layout.tsx'
@@ -36,6 +38,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLIC_KEY || secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
       - run: node scripts/install-github-pages-fallback.mjs
+      - run: node scripts/finalize-github-pages-social.mjs
       - run: node scripts/github-pages-check.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -54,3 +57,5 @@ jobs:
       - name: Publish game
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify live link previews and JPEG
+        run: node scripts/verify-github-pages-live.mjs
