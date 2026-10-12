@@ -51,7 +51,7 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
   if(r.error)setError(r.error.message);else await refresh();setBusy(false);
  }
  return <section className="surface" style={{padding:20,marginTop:20}}>
-  <h2 style={{fontSize:19,margin:'0 0 8px'}}>Telegram — GOS//SIMS</h2>
+  <h2 style={{fontSize:19,margin:'0 0 8px'}}>Telegram — ГОС.ID</h2>
   <p style={{margin:'0 0 14px',opacity:.8}}>{status?.linked?'Telegram привязан к вашему игровому аккаунту.':'Получайте уведомления и отправляйте сообщения прямо из Telegram.'}</p>
   <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
    {!status?.linked?<button type="button" disabled={busy} onClick={()=>void link()}>Привязать Telegram</button>:<>

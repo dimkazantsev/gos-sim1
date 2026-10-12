@@ -9,6 +9,20 @@ on:
       - 'components/ui/BrandIdentity.tsx'
       - 'components/game/DashboardView.tsx'
       - 'components/game/StageReadinessPanel.tsx'
+      - 'components/game/ProfileView.tsx'
+      - 'components/game/ProfileSecurityPanel.tsx'
+      - 'components/game/SignatureUpload.tsx'
+      - 'components/game/profileSetup.ts'
+      - 'components/game/TelegramConnection.tsx'
+      - 'app/api/telegram/webhook/route.ts'
+      - 'components/PublicScreen.tsx'
+      - 'app/poll/page.tsx'
+      - 'components/game/DocumentPaper.tsx'
+      - 'components/game/Achievements.tsx'
+      - 'components/game/PresidentialElectionLab.tsx'
+      - 'app/profile-first-setup.css'
+      - 'supabase/migrations/20261012230000_profile_setup_once_status.sql'
+      - 'scripts/profile-setup-and-brand-check.cjs'
       - 'components/game/BudgetChangeRegistry.tsx'
       - 'components/game/BudgetView.tsx'
       - 'scripts/budget-change-registry-check.cjs'
@@ -71,6 +85,7 @@ jobs:
       - run: node scripts/readiness-matrix-check.cjs
       - run: node scripts/budget-change-registry-check.cjs
       - run: node scripts/stage-readiness-manual-check.cjs
+      - run: node scripts/profile-setup-and-brand-check.cjs
       - run: node scripts/document-input-check.cjs
       - run: node scripts/electoral-math-check.cjs
       - run: node scripts/grade-fractional-check.cjs

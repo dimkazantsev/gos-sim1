@@ -48,7 +48,7 @@ export default function PublicPresidentialPoll(){
  }
 
  return <main className="publicElectionPoll"><div className="publicPollShell">
-  <header className="publicPollHead"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" width={64} height={64}/><div><small>GOS//SIMS · ЦИК РФ · УЧЕБНАЯ МОДЕЛЬ</small><h1>{poll?.title||'Социологический опрос'}</h1><p>{poll?.closes_at?'Голосование доступно до '+new Date(poll.closes_at).toLocaleString('ru-RU'):'Выборы Президента Российской Федерации'}</p></div></header>
+  <header className="publicPollHead"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" width={64} height={64}/><div><small>ГОС.ID · ЦИК РФ · УЧЕБНАЯ МОДЕЛЬ</small><h1>{poll?.title||'Социологический опрос'}</h1><p>{poll?.closes_at?'Голосование доступно до '+new Date(poll.closes_at).toLocaleString('ru-RU'):'Выборы Президента Российской Федерации'}</p></div></header>
   {loading&&<div className="publicPollState"><b>Загрузка опроса…</b></div>}
   {!loading&&!slug&&<div className="publicPollState"><b>Не указан код опроса</b><p>Откройте ссылку, сформированную преподавателем в 7-м этапе.</p></div>}
   {!loading&&slug&&!poll&&<div className="publicPollState"><b>Опрос не найден</b><p>Проверьте ссылку.</p></div>}
