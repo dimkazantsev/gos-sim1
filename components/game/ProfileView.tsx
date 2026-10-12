@@ -17,11 +17,13 @@ import ProfileAvatar from './ProfileAvatar';
 import ProfileDocumentLinks from './ProfileDocumentLinks';
 import ProfileOffices from './ProfileOffices';
 import TelegramConnection from './TelegramConnection';
+import type {ProfileSetupStatus,ProfileSetupField} from './profileSetup';
+import {PROFILE_SETUP_LABELS} from './profileSetup';
 import {currentGameMembers,currentGameProfiles} from './gameRoster';
 
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
 type PublicStats={accepted_actions:number;posts:number;votes_cast:number;documents_created:number;activity_entries:number;events_decided:number};
-export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,readOnly=false}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;readOnly?:boolean}){
+export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,readOnly=false,setupStatus=null,setupNotice='',setupFocusVersion=0,onProfileChanged,onFinishSetup}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;readOnly?:boolean;setupStatus?:ProfileSetupStatus|null;setupNotice?:string;setupFocusVersion?:number;onProfileChanged?:()=>void;onFinishSetup?:()=>void}){
  const {me,game,parties,partyInvitations,partyMandates,averageVsn,myEvaluations,politicalPosts,ballots,formalDocuments,activities,saveProfile,teacher}=g;
  const members=useMemo(()=>currentGameMembers(g.members,game?.id||''),[g.members,game?.id]);
  const profiles=useMemo(()=>currentGameProfiles(g.profiles,members,game?.id||''),[g.profiles,members,game?.id]);
@@ -49,6 +51,20 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
  const photoInput=useRef<HTMLInputElement>(null);
  const initials=useMemo(()=>target?.full_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()||'Я',[target?.full_name]);
  useEffect(()=>{setFullName(target?.full_name||'');setBio(targetProfile?.bio||'');setGender(targetProfile?.gender||'unspecified')},[target?.user_id,targetProfile?.bio,targetProfile?.gender]);
+ const setupMissing=setupStatus?.completed?[]:(setupStatus?.missing||[]);
+ const needs=(field:ProfileSetupField)=>own&&setupMissing.includes(field);
+ useEffect(()=>{
+  if(!own||setupFocusVersion<=0)return;
+  const key=setupMissing[0];if(!key)return;
+  const frame=requestAnimationFrame(()=>{
+   const panel=document.querySelector<HTMLElement>('[data-profile-setup-field="'+key+'"]');
+   panel?.scrollIntoView({behavior:'smooth',block:'center'});
+   const input=panel?.querySelector<HTMLElement>('input:not([type="hidden"]),textarea,button,select,[tabindex="0"]');
+   (input||panel)?.focus({preventScroll:true});
+  });
+  return()=>cancelAnimationFrame(frame);
+ },[setupFocusVersion,own]);
+
 
  useEffect(()=>{
   if(!game||!target)return;
@@ -79,7 +95,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
    if(identity.error){g.setError(identity.error.message);setSaving(false);return}
   }
   const ok=await saveProfile(bio,undefined,gender);
-  if(ok)await g.refresh();setSaving(false);if(ok){setSaved(true)}
+  if(ok){await g.refresh();onProfileChanged?.()}setSaving(false);if(ok){setSaved(true)}
  }
  async function changeFile(next:File|undefined){
   if(!next||!own||photoBusy)return;
@@ -177,16 +193,18 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,r
   {own&&showMyJournal&&<ClassroomJournal g={g}/>}
 
   <section className="profileGrid">
-   {own&&<article className="surface profileEditor">
-    <div className="surfaceHead"><div><small>О СЕБЕ В ИГРЕ</small><h2>Игровая визитка</h2></div></div>{!targetProfile?.onboarding_completed_at&&<div className="profileOnboardingHint"><strong>Обязательная настройка профиля</strong><p>Для начала игры укажите ФИО, выберите пол, напишите краткое описание и загрузите подпись. Далее подтвердите электронную почту и установите пароль. После этого нажмите «Закончить настройку» в нижней панели.</p></div>}
-    <label className="profileFullNameField">Фамилия, имя и отчество<input autoComplete="name" value={fullName} onChange={e=>setFullName(e.target.value)} minLength={5} placeholder="Иванов Иван Иванович"/></label>
+   {own&&<article className="surface profileEditor" id="profile-setup-editor">
+    <div className="surfaceHead"><div><small>О СЕБЕ В ИГРЕ</small><h2>Игровая визитка</h2></div></div>{!targetProfile?.onboarding_completed_at&&<div className={'profileOnboardingHint'+(setupMissing.length?' isIncomplete':'')} role="status"><strong>{setupMissing.length?'Профиль заполнен не полностью':'Обязательная настройка профиля'}</strong><p>{setupMissing.length?'Заполните отмеченные красным поля. После сохранения нажмите «Закончить настройку» здесь.':'Проверьте ФИО, пол, описание, подпись, почту и личный пароль.'}</p>{setupMissing.length>0&&<div className="profileSetupMissingList">{setupMissing.map(k=><span key={k}>{PROFILE_SETUP_LABELS[k]}</span>)}</div>}</div>}
+    {setupNotice&&<p className="profileSetupFeedback" role="status">{setupNotice}</p>}
+    <label data-profile-setup-field="name" className={'profileFullNameField'+(needs('name')?' profileSetupInvalid':'')}>Фамилия, имя и отчество<input aria-invalid={needs('name')} autoComplete="name" value={fullName} onChange={e=>setFullName(e.target.value)} minLength={5} placeholder="Иванов Иван Иванович"/></label>
     <p className="profileHint">Опишите свою игровую должность, интересы и компетенции. Этот текст смогут прочитать другие участники.</p>
-    <StyledSelect label="Пол для оформления аватара" value={gender} onChange={v=>setGender(v as typeof gender)} options={[{value:"unspecified",label:"Выберите пол"},{value:"male",label:"Мужской"},{value:"female",label:"Женский"}]}/>
-    <textarea aria-label="О себе в игре" rows={3} maxLength={350} value={bio} onChange={e=>{setBio(e.target.value);setSaved(false)}}
-      placeholder="Например: Отвечаю за переговоры и подготовку законопроектов…"/>
+    <div data-profile-setup-field="gender" className={needs('gender')?'profileSetupInvalid':''}><StyledSelect label="Пол для оформления аватара" value={gender} onChange={v=>setGender(v as typeof gender)} options={[{value:"unspecified",label:"Выберите пол"},{value:"male",label:"Мужской"},{value:"female",label:"Женский"}]}/>{needs('gender')&&<small className="profileSetupFieldError">Обязательное поле</small>}</div>
+    <div data-profile-setup-field="bio" className={needs('bio')?'profileSetupInvalid':''}><textarea aria-invalid={needs('bio')} aria-label="О себе в игре" rows={3} maxLength={350} value={bio} onChange={e=>{setBio(e.target.value);setSaved(false)}}
+      placeholder="Например: Отвечаю за переговоры и подготовку законопроектов…"/>{needs('bio')&&<small className="profileSetupFieldError">Укажите не менее 15 символов</small>}</div>
     <div className="profileSaveRow"><button className="primary" disabled={saving} onClick={()=>void save()}>{saving?'Сохранение…':'Сохранить визитку'}</button><span>{bio.length}/350</span>{saved&&<span>✓ Сохранено</span>}</div>
-    <SignatureUpload g={g}/>
-    <ProfileSecurityPanel g={g}/>
+    <div data-profile-setup-field="signature" className={needs('signature')?'profileSetupInvalid':''}><SignatureUpload g={g} onSaved={onProfileChanged}/>{needs('signature')&&<small className="profileSetupFieldError">Загрузите и сохраните подпись</small>}</div>
+    <ProfileSecurityPanel g={g} missing={setupMissing} onChanged={onProfileChanged}/>
+    {!targetProfile?.onboarding_completed_at&&<div className="profileSetupFinish"><button type="button" className="primary" onClick={onFinishSetup}>Закончить настройку</button><p>После подтверждения всех полей предупреждения исчезнут навсегда.</p></div>}
    </article>}
    <aside className="surface profileSummary">
     <div className="surfaceHead"><div><small>ПРЕДСТАВИТЕЛЬСТВО</small><h2>Фракция и мандаты</h2></div></div>
