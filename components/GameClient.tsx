@@ -223,7 +223,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  },[navigationHydrated,g.me?.user_id,gameId]);
  const sharedChatHandled=useRef(false);
  useEffect(()=>{
-  if(sharedChatHandled.current||!navigationHydrated||!g.me||g.me.kind==='observer'||typeof window==='undefined')return;
+  if(sharedChatHandled.current||!navigationHydrated||!g.me||g.me.kind==='observer'||typeof window==='undefined'||typeof URLSearchParams==='undefined')return;
   const q=new URLSearchParams(window.location.search);
   if(q.get('openChat')!=='1')return;
   if(!g.channels.length)return;
