@@ -121,7 +121,7 @@ export function escapeTelegramHtml(text:string){
 /** Always retain the verified linked signature at the very bottom. */
 export function telegramMessageHtml(text:string){
  let safe='',size=0,truncated=false;
- for(const char of text){
+ for(const char of text.replaceAll('GOS//SIMS','ГОС.ID')){
   const part=escapeTelegramHtml(char);
   if(size+part.length>3650){truncated=true;break}
   safe+=part;size+=part.length;
