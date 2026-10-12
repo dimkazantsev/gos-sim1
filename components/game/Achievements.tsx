@@ -59,7 +59,7 @@ export function AwardShelf({gameId,userId,showCatalog=true}:{gameId:string;userI
  return <section className="awardShelf steamAwards surface">
   <header className="awardShelfHeader">
    <div className="awardShelfIntro">
-    <small>ДОСТИЖЕНИЯ GOS//SIMS</small>
+    <small>ДОСТИЖЕНИЯ ГОС.ID</small>
     <h2><Trophy size={24}/> Награды</h2>
     <p>Полученные достижения и доступные условия. Награды не изменяют ВСН.</p>
    </div>
