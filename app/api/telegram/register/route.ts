@@ -1,5 +1,5 @@
 import {NextResponse} from 'next/server';
-import {runtimeConfig,telegramApi} from '@/lib/server/telegram';
+import {runtimeConfig,telegramApi,telegramSetProfilePhoto} from '@/lib/server/telegram';
 import {TELEGRAM_COMMANDS} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
 // Only an authenticated active teacher may configure the production Telegram webhook.
@@ -40,6 +40,9 @@ export async function POST(request:Request){
   await telegramApi(config.token,'setMyDescription',{
    description:'🏛 ГОС.ID — Цифровая платформа России.\n\nПолучайте уведомления о жизни республики, следите за государственными решениями, голосованиями, этапами и документами.\n\n🚀 Нажмите «Начать», чтобы открыть меню.\n🔐 Для игровых уведомлений привяжите Telegram в личном профиле ГОС.ID.'
   });
-  return NextResponse.json({ok:true,url:webhook,menu:true});
+  let logoApplied=true;
+  try{await telegramSetProfilePhoto(config.token)}
+  catch(e){logoApplied=false;console.error('Telegram brand avatar was not applied',e instanceof Error?e.message:'unknown')}
+  return NextResponse.json({ok:true,url:webhook,menu:true,logo:logoApplied});
  }catch(e){console.error('Telegram setup failed',e instanceof Error?e.message:'unknown');return NextResponse.json({error:'Telegram не подтвердил полную настройку webhook и меню. Повторите активацию.'},{status:502})}
 }
