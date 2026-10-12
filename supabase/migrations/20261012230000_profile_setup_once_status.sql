@@ -57,3 +57,23 @@ revoke all on function public.get_my_game_profile_setup(uuid) from public,anon;
 grant execute on function public.get_my_game_profile_setup(uuid) to authenticated;
 revoke all on function public.mark_my_game_profile_setup_prompt_seen(uuid) from public,anon;
 grant execute on function public.mark_my_game_profile_setup_prompt_seen(uuid) to authenticated;
+-- Clients must not forge the persistent first-display flag via direct RLS updates.
+-- Server-side SECURITY DEFINER RPCs remain responsible for updating it.
+create or replace function private.guard_profile_completion_flags()
+returns trigger language plpgsql set search_path='' as $$
+begin
+ if current_user='authenticated' then
+  if tg_op='INSERT' and
+     (new.onboarding_completed_at is not null or new.intro_seen_at is not null
+      or new.profile_setup_prompt_seen_at is not null) then
+   raise exception 'Пройдите приветствие и завершите настройку профиля';
+  end if;
+  if tg_op='UPDATE' and
+     (new.onboarding_completed_at is distinct from old.onboarding_completed_at
+      or new.intro_seen_at is distinct from old.intro_seen_at
+      or new.profile_setup_prompt_seen_at is distinct from old.profile_setup_prompt_seen_at) then
+   raise exception 'Завершайте настройку через форму профиля';
+  end if;
+ end if;
+ return new;
+end;$$;
