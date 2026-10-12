@@ -1,0 +1,13 @@
+const fs=require('node:fs'),assert=require('node:assert/strict');
+const file=p=>fs.readFileSync(p,'utf8');
+const view=file('components/game/BudgetView.tsx'),registry=file('components/game/BudgetChangeRegistry.tsx'),nav=file('components/GameClient.tsx'),sql=file('supabase/migrations/20261012210000_unified_budget_change_registry.sql');
+assert(view.includes('<BudgetChangeRegistry'),'Unified registry must be displayed in budget');
+assert(!view.includes('<h3>Реестр налоговых инициатив</h3>'),'Old tax-only registry must be removed');
+assert(registry.includes('get_budget_change_registry')&&registry.includes('hide_budget_change_registry_entry'));
+assert(registry.includes('g.teacher&&!readOnly'),'Hide controls must be teacher-only');
+assert(registry.includes('setCount(x=>x+PAGE_SIZE)'),'Pagination required');
+assert(registry.includes("u.searchParams.set('entry',entry.entry_key)"),'Entry links must be deep links');
+assert(nav.includes('sharedLinkHandled')&&nav.includes('navigator.clipboard.writeText'),'Shared deep links must resolve after login');
+assert(sql.includes('private.is_game_teacher(p_game_id)'),'Server must enforce teacher privilege');
+assert(sql.includes('budget_registry_hidden')&&!sql.includes('delete from public.'),'Hiding must not delete financial state');
+console.log('PASS budget change register and safe sharing contracts');

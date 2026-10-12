@@ -8,6 +8,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import catalog from '@/data/taxes-2026.json';
 import type {FiscalContext,FiscalRegion,FiscalRate} from './fiscalMath';
 import FiscalMacroPanel from './FiscalMacroPanel';
+import BudgetChangeRegistry from './BudgetChangeRegistry';
 import FederalBudgetSimulator from './FederalBudgetSimulator';
 import type {SignedBudgetProgram} from './BudgetExpenses';
 import StyledSelect from '../ui/StyledSelect';
@@ -63,10 +64,10 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
        <p className="budgetTaxHint">При наличии полномочий система автоматически создаёт связанный проект документа в реестре НПА. Инициатива не равнозначна принятому акту.</p>
        {availableTaxes.some(t=>t.default_rate===null)&&<details className="budgetTaxSpecial"><summary>Налоги со специальными ставками и формулами</summary><p>Для этих платежей нельзя заменить правовую формулу одним процентом. Просмотрите правила и подготовьте отдельный нормативный документ.</p>{availableTaxes.filter(t=>t.default_rate===null).map(t=><p key={t.key}><b>{t.label}:</b> {t.explanation}</p>)}</details>}
      </div>
-     <div className="budgetTaxCard"><h3>Реестр налоговых инициатив</h3>{proposals.length===0?<p className="budgetTaxHint">Пока нет направленных налоговых инициатив.</p>:proposals.map(p=><article key={p.id} className="budgetPlanAllocation"><span><b>{catalog.taxes.find(t=>t.key===p.tax_key)?.label||p.tax_key}</b><small>{p.new_rate} · {p.status==='applied'?'Учтено в расчёте':p.status==='pending'?'Ожидает вступления акта в силу':p.status} · {p.region_code==='00'?'Федеральное решение':regions.find(r=>r.region_code===p.region_code)?.name||'Регион '+p.region_code}</small></span><div className="budgetTaxActions">{p.document_id&&<button type="button" className="secondary" onClick={()=>onOpenDocument(p.document_id!)}>Открыть документ</button>}{p.status==='pending'&&g.teacher&&!readOnly&&<button type="button" className="secondary" disabled={busy||!p.document_id} onClick={()=>void apply(p.id)}>Проверить и применить вступивший в силу акт</button>}</div></article>)}</div>
+     
      {g.teacher&&<details className="budgetTaxParameters"><summary>Исходные параметры выбранного региона</summary><div className={styles.fields}><StyledSelect label="Субъект РФ" value={regionCode} onChange={value=>{parameterDirty.current=false;setRegionCode(value)}} options={regions.map(r=>({value:r.region_code,label:r.name}))} wrap/>{Object.entries(labels).map(([key,label])=><label key={key}>{label}<input type="number" value={parameters[key]??''} onChange={e=>{parameterDirty.current=true;setParameters(p=>({...p,[key]:e.target.value}));}} disabled={readOnly}/></label>)}</div><button type="button" className="secondary" onClick={()=>void saveParameters()} disabled={readOnly||busy}><Save size={18}/> Сохранить параметры региона</button></details>}
      <p className="budgetTaxHint">Региональные доходы не добавляются повторно к федеральным. Бюджетные последствия рассчитываются после применения вступившего в силу акта.</p>
      {notice&&<p role="status" className="budgetNotice">{notice}</p>}
-   </section></>}
+   </section><BudgetChangeRegistry g={g} readOnly={readOnly} onOpenDocument={onOpenDocument}/></>}
  </div>;
 }

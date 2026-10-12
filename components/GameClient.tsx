@@ -3,7 +3,7 @@ import {IconAction} from './ui/IconAction';
 import {BrandIdentity,BrandName} from './ui/BrandIdentity';
 import ChatToggleButton from './game/ChatToggleButton';
 import {useEffect,useRef,useState} from 'react';
-import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon,Wifi} from 'lucide-react';
+import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon,Wifi} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
@@ -207,6 +207,30 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [screenHistory,setScreenHistory,navigationHydrated,navigationRestored]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
  },validScreenHistory);
+ const sharedLinkHandled=useRef(false);
+ useEffect(()=>{
+  if(!navigationHydrated||!g.me?.user_id||sharedLinkHandled.current)return;
+  sharedLinkHandled.current=true;
+  if(typeof URLSearchParams==='undefined'||!window.location?.search)return;
+  const q=new URLSearchParams(window.location.search);
+  const section=q.get('section');
+  if(!section||!SCREEN_VIEWS.includes(section)||section==='teacher')return;
+  const id=q.get('document')||'',vote=q.get('vote')||'',step=Number(q.get('stage')||0);
+  const target:ScreenLocation={view:section as View,stageNo:Number.isInteger(step)&&step>=1&&step<=16?step:0,documentId:/^[0-9a-f-]{36}$/i.test(id)?id:'',voteId:/^[0-9a-f-]{36}$/i.test(vote)?vote:''};
+  setScreenHistory(prev=>({entries:[target],index:0}));
+ },[navigationHydrated,g.me?.user_id,gameId]);
+ async function shareCurrentScreen(){
+  const u=new URL(window.location.href);
+  u.search='';u.hash='';u.searchParams.set('section',currentScreen.view);
+  if(currentScreen.stageNo)u.searchParams.set('stage',String(currentScreen.stageNo));
+  if(currentScreen.documentId)u.searchParams.set('document',currentScreen.documentId);
+  if(currentScreen.voteId)u.searchParams.set('vote',currentScreen.voteId);
+  try{
+   if(navigator.share){await navigator.share({title:'ГОС.ID — '+currentScreen.view,url:u.toString()});return}
+   await navigator.clipboard.writeText(u.toString());
+   window.alert('Ссылка скопирована. Доступна участникам этой игры.');
+  }catch(e){if((e as Error).name!=='AbortError')window.alert('Не удалось отправить ссылку.')}
+ }
  const currentScreen=screenHistory.entries[screenHistory.index];
  const view=currentScreen.view;
  useEffect(()=>{g.setActiveView?.(view)},[g.setActiveView,view]);
@@ -434,6 +458,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      <button type="button" className="screenHistoryButton" onClick={()=>moveHistory(backIndex)} disabled={backIndex<0} aria-label="Вернуться к предыдущему экрану" title="Назад"><ChevronLeft aria-hidden="true"/></button>
      <button type="button" className="screenHistoryButton" onClick={()=>moveHistory(forwardIndex)} disabled={forwardIndex<0} aria-label="Перейти к следующему экрану" title="Вперёд"><ChevronRight aria-hidden="true"/></button>
     </nav>
+    <button type="button" className="gameShareScreen" onClick={()=>void shareCurrentScreen()} title="Поделиться текущим разделом или документом" aria-label="Поделиться текущим разделом"><Share2 size={17} aria-hidden="true"/><span>Поделиться</span></button>
     <div className="simTopCenter">
      <div className="topStageCopy"><small>ЭТАП {String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</small><strong>{nav.find(([key])=>key===view)?.[1]||game.title}</strong></div>
      <div className="topIndicators">

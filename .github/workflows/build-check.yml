@@ -9,6 +9,10 @@ on:
       - 'components/ui/BrandIdentity.tsx'
       - 'components/game/DashboardView.tsx'
       - 'components/game/StageReadinessPanel.tsx'
+      - 'components/game/BudgetChangeRegistry.tsx'
+      - 'components/game/BudgetView.tsx'
+      - 'scripts/budget-change-registry-check.cjs'
+      - 'supabase/migrations/20261012210000_unified_budget_change_registry.sql'
       - 'components/game/TeacherView.tsx'
       - 'app/stage-map.css'
       - 'scripts/stage-readiness-manual-check.cjs'
@@ -63,6 +67,7 @@ jobs:
       - run: node scripts/republic-game-resilience-check.cjs
       - run: node scripts/editor-async-resilience-check.cjs
       - run: node scripts/readiness-matrix-check.cjs
+      - run: node scripts/budget-change-registry-check.cjs
       - run: node scripts/stage-readiness-manual-check.cjs
       - run: node scripts/document-input-check.cjs
       - run: node scripts/electoral-math-check.cjs
