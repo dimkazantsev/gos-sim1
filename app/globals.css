@@ -2170,3 +2170,29 @@ button,input,textarea,select{font-size:14px}
 @media(max-width:650px){
  .electoralCalculatorResult{grid-column:auto}
 }
+
+/* Unified budget change registry and share links (scoped, responsive). */
+.budgetChangeRegistry{margin-top:22px!important;padding:20px!important;display:grid;gap:16px}
+.budgetChangeRegistryHead{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.budgetChangeRegistryHead small{font-size:12px;letter-spacing:.06em;color:#687d97}
+.budgetChangeRegistryHead h2{font-size:21px;line-height:1.35;margin:4px 0 6px}
+.budgetChangeRegistryHead p{margin:0;font-size:14px;line-height:1.5;color:#526985}
+.budgetChangeRegistryTools{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+.budgetChangeRegistryTools label{display:flex;gap:7px;align-items:center;font-size:13px;color:#536a87}
+.budgetChangeRegistryTools input,.budgetChangeRegistryTools select{min-height:42px;min-width:180px;border:1px solid #d3e0ed;background:#fff;border-radius:10px;padding:8px 10px;color:#17314f;font:inherit}
+.budgetChangeRegistryTools>span{font-size:13px;color:#64748b;margin-left:auto}
+.budgetChangeRegistryList{display:grid;gap:10px}
+.budgetChangeRegistryEntry{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px;border:1px solid #dce5f0;background:#fff;border-radius:12px;scroll-margin-top:110px}
+.budgetChangeRegistryEntry.isFocused{outline:2px solid #6086d5;outline-offset:2px}
+.budgetChangeRegistryEntryCopy{min-width:0;flex:1 1 300px}
+.budgetChangeRegistryEntryMeta{display:flex;gap:10px;flex-wrap:wrap;color:#64748b;font-size:12px}
+.budgetChangeRegistryEntry h3{font-size:16px;line-height:1.4;margin:6px 0}
+.budgetChangeRegistryEntry p{font-size:13px;line-height:1.55;color:#526985;margin:0 0 5px}
+.budgetChangeRegistryEntry strong{font-size:13px}
+.budgetChangeRegistryActions{display:flex;gap:8px;flex-wrap:wrap}
+.budgetChangeRegistryActions button{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:7px 11px;font-size:13px}
+.budgetChangeRegistryDelete{color:#a34454!important}
+.budgetChangeRegistryFootnote,.budgetChangeRegistryEmpty{font-size:13px;line-height:1.5;color:#61758e}
+.budgetChangeRegistryMore{justify-self:start}
+.gameShareScreen{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:6px 12px;border:1px solid #d0dbe9;border-radius:9px;background:#fff;color:#315a93;font-size:13px;font-weight:700;cursor:pointer;flex:none}
+@media(max-width:700px){.budgetChangeRegistry{padding:14px!important}.budgetChangeRegistryTools label{width:100%}.budgetChangeRegistryTools input,.budgetChangeRegistryTools select{flex:1;min-width:0}.budgetChangeRegistryActions{width:100%}.gameShareScreen{padding:5px 8px;font-size:12px}}
