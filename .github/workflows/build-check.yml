@@ -8,6 +8,9 @@ on:
       - 'components/game/PoliticalWallView.tsx'
       - 'components/ui/BrandIdentity.tsx'
       - 'components/game/DashboardView.tsx'
+      - 'app/2026-document-workflow-v2.css'
+      - 'scripts/overview-live-posts-check.cjs'
+      - 'scripts/npa-toolbar-alignment-browser-check.cjs'
       - 'components/GameClient.tsx'
       - 'app/brand-identity.css'
       - 'app/icon.svg'
@@ -51,6 +54,7 @@ jobs:
       - run: node scripts/user-error-check.cjs
       - run: node scripts/intro-refresh-check.cjs
       - run: node scripts/brand-overview-check.cjs
+      - run: node scripts/overview-live-posts-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
       - run: node scripts/editor-async-resilience-check.cjs
       - run: node scripts/readiness-matrix-check.cjs
@@ -69,6 +73,7 @@ jobs:
       - run: npm run design:preview
       - run: node scripts/overview-budget-browser-check.cjs
       - run: node scripts/political-wall-status-browser-check.cjs
+      - run: node scripts/npa-toolbar-alignment-browser-check.cjs
       - run: node scripts/registry-browser-check.cjs
       - run: node scripts/october-flow-browser-check.cjs
       - run: node scripts/october-budget-awards-browser-check.cjs
