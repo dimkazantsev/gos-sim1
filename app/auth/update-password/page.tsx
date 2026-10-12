@@ -23,7 +23,7 @@ export default function UpdatePassword(){
   setBusy(false);
  }
  return <main className="passwordRecoveryPage"><div className="passwordRecoveryCard">
-  <span className="wordmark">GOS//SIMS</span><KeyRound size={32} aria-hidden="true"/>
+  <span className="wordmark">ГОС.ID</span><KeyRound size={32} aria-hidden="true"/>
   <h1>Восстановление доступа</h1>
   {!ready?<p>Перейдите по ссылке из письма для восстановления. Если ссылка устарела, запросите новую на странице входа.</p>:
    <form onSubmit={save}><label>Новый пароль<input autoComplete="new-password" type="password" minLength={10} required value={newPassword} onChange={e=>setNewPassword(e.target.value)} disabled={busy||done}/></label>
