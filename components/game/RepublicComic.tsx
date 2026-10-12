@@ -5,6 +5,7 @@ import {ArrowLeft,ArrowRight,BookOpen,Library,Pause,Play,X} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
+import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import ComicSoundButton from './ComicSoundButton';
 import styles from './RepublicComic.module.css';
 const SCENES=[
@@ -61,7 +62,7 @@ function ArchiveCover({chapter}:{chapter:Chapter}){
   <i className={styles.coverGlow}/>
   <i className={styles.coverGlowSecondary}/>
   <div className={styles.coverTopBar}>
-   <span className={styles.abstractBrand}>GOS//SIMS</span>
+   <span className={styles.abstractBrand}>{BRAND_NAME}</span>
    <span className={styles.abstractIcon}><BookOpen size={18}/></span>
   </div>
   <div className={styles.coverCenter}>
@@ -145,7 +146,7 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
    if(e.key==='ArrowLeft'){e.preventDefault();previous()}
    if(e.key==='ArrowRight'){e.preventDefault();next()}
   }}>
-   <header className={styles.header}><b>GOS//SIMS · Комикс о республике</b><div>
+   <header className={styles.header}><b>{BRAND_NAME} · Комикс о республике</b><div>
     <ComicSoundButton playing={open} iconOnly/>
     {!showingArchive&&!showingChapter&&<button type="button" aria-label={playing?'Остановить автоматическое воспроизведение':'Продолжить показ'} title={playing?'Пауза анимации и смены сцен':'Включить анимацию и показ сцен'} onClick={togglePlaying}>{playing?<Pause size={19}/>:<Play size={19}/>}</button>}
     {showingChapter&&<button type="button" aria-label="Открыть архив комиксов" title="Архив комиксов" onClick={openArchive}><Library size={19}/></button>}
@@ -172,7 +173,7 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
        <span className={styles.prologueCoverShade} aria-hidden="true"/>
        <span className={styles.prologueCoverGrid} aria-hidden="true"/>
        <div className={styles.prologueCoverTop} aria-hidden="true">
-        <b>GOS//SIMS</b>
+        <b>{BRAND_NAME}</b>
         <span><BookOpen size={16}/></span>
        </div>
        <div className={styles.prologueCoverCaption} aria-hidden="true">

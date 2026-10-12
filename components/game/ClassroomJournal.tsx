@@ -79,7 +79,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   const contents=[header,...rows].map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');
   const blob=new Blob(['\ufeff'+contents],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
-  const anchor=document.createElement('a');anchor.href=url;anchor.download='gos-sims-journal.csv';anchor.click();
+  const anchor=document.createElement('a');anchor.href=url;anchor.download='gos-id-journal.csv';anchor.click();
   URL.revokeObjectURL(url);
  }
  if(!me)return null;

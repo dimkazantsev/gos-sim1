@@ -6,6 +6,14 @@ on:
       - 'components/game/Blitz*.tsx'
       - 'components/game/TeacherBlitz.tsx'
       - 'components/game/PoliticalWallView.tsx'
+      - 'components/ui/BrandIdentity.tsx'
+      - 'components/game/DashboardView.tsx'
+      - 'components/GameClient.tsx'
+      - 'app/brand-identity.css'
+      - 'app/icon.svg'
+      - 'app/page.tsx'
+      - 'app/layout.tsx'
+      - 'scripts/brand-overview-check.cjs'
       - 'app/2026-political-process.css'
       - 'components/game/politicalWallPaging.ts'
       - 'scripts/political-wall-feed-check.cjs'
@@ -42,6 +50,7 @@ jobs:
       - run: node scripts/game-roster-check.cjs
       - run: node scripts/user-error-check.cjs
       - run: node scripts/intro-refresh-check.cjs
+      - run: node scripts/brand-overview-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
       - run: node scripts/editor-async-resilience-check.cjs
       - run: node scripts/readiness-matrix-check.cjs

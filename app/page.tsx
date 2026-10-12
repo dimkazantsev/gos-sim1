@@ -2,6 +2,7 @@
 import {FormEvent,useMemo,useState} from 'react';
 import {ArrowUpRight,ArrowRight,Eye,EyeOff,GraduationCap,Landmark,LockKeyhole,LoaderCircle} from 'lucide-react';
 import CivicArtwork from '@/components/ui/CivicArtwork';
+import {BrandIdentity,BRAND_NAME,BRAND_TAGLINE} from '@/components/ui/BrandIdentity';
 import {useRouter} from 'next/navigation';
 import {createPasswordAuthClient,supabase} from '@/lib/supabase';
 
@@ -100,7 +101,7 @@ export default function Home(){
  }
  return <main className="entryPage">
   <a className="skipLink" href="#entry-form">Перейти ко входу</a>
-  <header className="entryHeader"><a className="wordmark" href="/" aria-label="GOS//SIMS — главная"><span className="brandMark" aria-hidden="true">g<span>//</span>ss</span><b>GOS<span>//</span>SIMS</b></a><span className="entryEdition">Лаборатория государственного управления <i>2026</i></span></header>
+  <header className="entryHeader"><a className="wordmark" href="/" aria-label={BRAND_NAME+" — главная"}><BrandIdentity/></a><span className="entryEdition">Лаборатория государственного управления <i>2026</i></span></header>
   <div className="entryGrid">
    <section className="entryStory" aria-labelledby="entry-title">
     <div className="entryEyebrow"><span/>Учебная игра · ГМУ</div>
@@ -143,6 +144,6 @@ export default function Home(){
     <div className="entryAccessNote"><span>01 — 16</span><p>Здесь каждое решение<br/>меняет ход игры.</p><ArrowUpRight aria-hidden="true"/></div>
    </section>
   </div>
-  <footer className="entryFooter"><span>GOS//SIMS · Республика Политология</span><span>Деловая игра по ПАУ / ГПУ</span><span>Учебная модель государственных институтов</span></footer>
+  <footer className="entryFooter"><span>{BRAND_NAME} · {BRAND_TAGLINE}</span><span>Деловая игра по ПАУ / ГПУ</span><span>Учебная модель государственных институтов</span></footer>
  </main>;
 }
