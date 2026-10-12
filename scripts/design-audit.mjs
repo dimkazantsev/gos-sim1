@@ -181,9 +181,11 @@ for(const name of brandingFiles){
  check(name+': consistent GOS//SIMS branding',
   !oldFullBrand.test(source)&&!oldRichBrand.test(source)&&!oldCompactBrand.test(source));
 }
-check('Main and mobile masthead show the new full brand',
- read('components/GameClient.tsx').includes('GOS<span>//</span>SIMS')&&
- read('components/GameClient.tsx').includes('<b>GOS//SIMS</b>'));
+check('Main and mobile masthead share the canonical ГОС.ID component',
+ read('components/GameClient.tsx').includes('<BrandIdentity tagline/>')&&
+ read('components/GameClient.tsx').includes('<div className="mobileBrand"><BrandIdentity/></div>')&&
+ read('components/ui/BrandIdentity.tsx').includes("BRAND_NAME='ГОС.ID'")&&
+ read('components/ui/BrandIdentity.tsx').includes('г<span>//</span>id'));
 
 
 const dock=read('components/game/StateMetricsDock.tsx');
