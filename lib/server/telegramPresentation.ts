@@ -22,6 +22,8 @@ export function telegramSectionUrl(section:'dashboard'|'stages'|'votes'|'documen
  const url=new URL(TELEGRAM_PROJECT_URL);
  url.searchParams.set('section',section);
  if(section==='documents'&&id)url.searchParams.set('document',id);
+ if(section==='profile'&&id==='tasks')url.searchParams.set('tasks','1');
+ if(section==='dashboard'&&id){url.searchParams.set('openChat','1');url.searchParams.set('channel',id)}
  if(section==='votes'&&id)url.searchParams.set('vote',id);
  return url.toString();
 }
@@ -29,6 +31,18 @@ export function telegramSectionButtons(section:'dashboard'|'stages'|'votes'|'doc
  return {inline_keyboard:[
   [{text:'↗ '+label,url:telegramSectionUrl(section)}],
   [{text:'🏛 Меню',callback_data:'gos:menu'},{text:'🌐 ГОС.ID',url:TELEGRAM_PROJECT_URL}]
+ ]};
+}
+export function telegramTaskButtons():TelegramMarkup{
+ return {inline_keyboard:[
+  [{text:'📌 Открыть поручения',url:telegramSectionUrl('profile','tasks')}],
+  [{text:'🏛 Меню',callback_data:'gos:menu'}]
+ ]};
+}
+export function telegramChatButtons(channelId?:string):TelegramMarkup{
+ return {inline_keyboard:[
+  [{text:'💬 Перейти к беседе',url:telegramSectionUrl('dashboard',channelId)}],
+  [{text:'🏛 Меню',callback_data:'gos:menu'}]
  ]};
 }
 export function telegramDocumentButtons(documents:{id:string;title:string}[]):TelegramMarkup{
