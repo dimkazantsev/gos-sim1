@@ -5,7 +5,14 @@ assert(view.includes('<BudgetChangeRegistry'),'Unified registry must be displaye
 assert(!view.includes('<h3>Реестр налоговых инициатив</h3>'),'Old tax-only registry must be removed');
 assert(registry.includes('get_budget_change_registry')&&registry.includes('hide_budget_change_registry_entry'));
 assert(registry.includes('g.teacher&&!readOnly'),'Hide controls must be teacher-only');
-assert(registry.includes('setCount(x=>x+PAGE_SIZE)'),'Pagination required');
+assert(registry.includes('const PAGE_SIZE=10'),'Page size must be ten');
+assert(registry.includes('get_budget_change_registry_page'),'Server-side pagination RPC required');
+assert(registry.includes('!gameId||!expanded'),'Collapsed registry must not request entries');
+assert(registry.includes('setExpanded(value=>!value)'),'Registry toggle must work');
+assert(registry.includes('setFocus(key);setExpanded(true)'),'Deep-linked entry must open the registry');
+const pageSQL=file('supabase/migrations/20261012215000_budget_registry_page_10.sql');
+assert(pageSQL.includes('v_limit integer := least(greatest(coalesce(p_limit,10),1),10)'),'Server limits every response to ten records');
+assert(pageSQL.includes('public.get_budget_change_registry(p_game_id)'),'Existing game-member permissions remain enforced');
 assert(registry.includes("u.searchParams.set('entry',entry.entry_key)"),'Entry links must be deep links');
 assert(nav.includes('sharedLinkHandled')&&nav.includes('navigator.clipboard.writeText'),'Shared deep links must resolve after login');
 assert(sql.includes('private.is_game_teacher(p_game_id)'),'Server must enforce teacher privilege');
