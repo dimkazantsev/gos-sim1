@@ -56,6 +56,10 @@ on:
       - 'supabase/migrations/*crisis_baseline*'
       - 'components/game/CivicDiscussion.tsx'
       - 'components/game/useRepublicGame.ts'
+      - 'components/game/ChatPanel.tsx'
+      - 'components/game/ChatChannelDropdown.tsx'
+      - 'components/game/chatChannelSelection.ts'
+      - 'scripts/chat-channel-selection-check.cjs'
       - 'scripts/crisis-baseline-check.cjs'
       - '.github/workflows/build-check.yml'
   push:
@@ -95,6 +99,7 @@ jobs:
       - run: node scripts/document-input-check.cjs
       - run: node scripts/electoral-math-check.cjs
       - run: node scripts/grade-fractional-check.cjs
+      - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
       - run: node scripts/event-option-legality-check.cjs
       - run: npm run design:check

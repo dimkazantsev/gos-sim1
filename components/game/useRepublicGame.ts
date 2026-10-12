@@ -13,6 +13,7 @@ import type {ChatMediaKind} from './recordingMedia';
 import {sendChatMedia} from './chatMediaTransport';
 import {analyseVoiceBlob} from './voiceWaveform';
 import {currentGameMembers,currentGameProfiles} from './gameRoster';
+import {resolveChatChannelId,visibleChatChannels} from './chatChannelSelection';
 import type {GameOfficeAssignment,ChatOverview} from './types';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
@@ -185,10 +186,16 @@ export function useRepublicGame(gameId:string){
  useEffect(()=>{channelRef.current=channelId;setMessages([]);setChatPins([]);setPinnedMessages([]);if(channelId){void loadMessages(channelId,true);void loadChatPins(channelId);if(chatOpen)void markChatRead(channelId)}else setChatLoading(false)},[channelId]);
  useEffect(()=>{if(chatOpen&&channelId)void markChatRead(channelId)},[chatOpen,channelId,messages.length]);
  useEffect(()=>{
-  if(!chatOpen||!channels.length||!chatOverview.length)return;
-  const lastSent=[...chatOverview].filter(x=>x.last_sent_at).sort((a,b)=>Date.parse(b.last_sent_at!)-Date.parse(a.last_sent_at!))[0]?.channel_id||'';
-  if(lastSent&&lastSent!==channelRef.current&&channels.some(channel=>channel.id===lastSent))setChannelId(lastSent);
- },[chatOpen]);
+  // The chat header and composer must reflect exactly the same selected ID.
+  // On opening, restore the user's last channel, then fall back to the latest
+  // conversation or the first available channel. Never override a valid choice.
+  if(!chatOpen||!visibleMe||!channels.length)return;
+  const available=visibleChatChannels(channels,chatOverview);
+  const saved=recalledChatChannel(visibleMe.user_id,available);
+  const next=resolveChatChannelId(available,channelId,saved,chatOverview);
+  if(next!==channelId){setChannelId(next);return}
+  if(next)rememberChatChannel(next,visibleMe.user_id);
+ },[chatOpen,channels,chatOverview,channelId,visibleMe?.user_id,gameId]);
 
  useEffect(()=>{if(me?.user_id)void hydrateActiveView();},[activeView,me?.user_id,chatOpen,gameId]);
 

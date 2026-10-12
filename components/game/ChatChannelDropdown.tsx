@@ -3,6 +3,7 @@ import {useEffect,useId,useMemo,useRef,useState} from 'react';
 import type {KeyboardEvent} from 'react';
 import {Check,ChevronDown,Pin,PinOff,UsersRound} from 'lucide-react';
 import type {Channel,ChatOverview} from './types';
+import {visibleChatChannels} from './chatChannelSelection';
 
 /** Mirrors the game's "Режим просмотра" dropdown: a styled list rather
  * than browser-native options, including predictable focus on mobile. */
@@ -15,7 +16,7 @@ export default function ChatChannelDropdown({
  const menuId=useId();
  const safeOverview=Array.isArray(overview)?overview:[];
  const meta=useMemo(()=>new Map(safeOverview.map(x=>[x.channel_id,x])),[safeOverview]);
- const visibleChannels=channels.filter(c=>!isHiddenChannel(c)&&(safeOverview.length===0||meta.has(c.id)));
+ const visibleChannels=visibleChatChannels(channels,safeOverview);
  const lastSentId=[...safeOverview].filter(x=>x.last_sent_at).sort((a,b)=>Date.parse(b.last_sent_at!)-Date.parse(a.last_sent_at!))[0]?.channel_id||'';
  const orderedChannels=[...visibleChannels].sort((a,b)=>{
   const am=meta.get(a.id),bm=meta.get(b.id);
@@ -26,7 +27,7 @@ export default function ChatChannelDropdown({
   if(b.id===lastSentId&&a.id!==lastSentId)return 1;
   return Date.parse(bm?.last_message_at||'1970-01-01')-Date.parse(am?.last_message_at||'1970-01-01');
  });
- const current=visibleChannels.find(c=>c.id===value)||orderedChannels[0];
+ const current=visibleChannels.find(c=>c.id===value);
  const options=()=>Array.from(root.current?.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]')||[]);
  const focusSelected=()=>requestAnimationFrame(()=>{
   const items=options();
@@ -82,13 +83,3 @@ export default function ChatChannelDropdown({
  </div>;
 }
 function displayName(name?:string){return name&&['Общая беседа','Общий штаб','Общий чат'].includes(name)?'Публичная политика':name}
-function isHiddenChannel(channel:Channel){
- const name=(channel.name||'').trim();
- const lower=name.toLocaleLowerCase('ru-RU');
- if(lower.includes('архив'))return true;
- if(channel.kind==='private'){
-  const parts=name.split('·').map(x=>x.trim()).filter(Boolean);
-  if(parts.length===2&&parts[0].toLocaleLowerCase('ru-RU')===parts[1].toLocaleLowerCase('ru-RU'))return true;
- }
- return false;
-}
