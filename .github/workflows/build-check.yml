@@ -9,6 +9,7 @@ on:
       - 'components/ui/BrandIdentity.tsx'
       - 'components/game/DashboardView.tsx'
       - 'app/2026-document-workflow-v2.css'
+      - 'app/2026-npa-workspace-canonical.css'
       - 'scripts/overview-live-posts-check.cjs'
       - 'scripts/npa-toolbar-alignment-browser-check.cjs'
       - 'components/GameClient.tsx'
