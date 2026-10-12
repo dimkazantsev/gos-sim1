@@ -49,6 +49,16 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const [files,setFiles]=useState<File[]>([]),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
  const [search,setSearch]=useState(''),[filterActor,setFilterActor]=useState(''),[filterType,setFilterType]=useState(''),[filterStage,setFilterStage]=useState('');
  const [visiblePostCount,setVisiblePostCount]=useState(POLITICAL_POST_BATCH_SIZE);
+ const [bulkMode,setBulkMode]=useState(false),[selectedPostIds,setSelectedPostIds]=useState<Set<string>>(()=>new Set()),[bulkProgress,setBulkProgress]=useState(0);
+ // Bulk selection is local to one game. Never carry ids into another game.
+ useEffect(()=>{setBulkMode(false);setSelectedPostIds(new Set());setBulkProgress(0)},[game?.id]);
+ useEffect(()=>{
+  const active=new Set(politicalPosts.map(post=>post.id));
+  setSelectedPostIds(previous=>{
+   if([...previous].every(id=>active.has(id)))return previous;
+   return new Set([...previous].filter(id=>active.has(id)));
+  });
+ },[politicalPosts]);
  const [editing,setEditing]=useState<PoliticalPost|null>(null);
  const [proposalRefresh,setProposalRefresh]=useState(0);
  const [linkOpen,setLinkOpen]=useState(false),[linkLabel,setLinkLabel]=useState(''),[linkUrl,setLinkUrl]=useState(''),[linkView,setLinkView]=useState('');
@@ -69,6 +79,48 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  // widgets are mounted only when requested; the underlying game state is untouched.
  useEffect(()=>setVisiblePostCount(POLITICAL_POST_BATCH_SIZE),[game?.id,search,filterActor,filterType,filterStage]);
  const visiblePosts=useMemo(()=>filtered.slice(0,visiblePoliticalPostCount(filtered.length,visiblePostCount)),[filtered,visiblePostCount]);
+ const bulkAllowed=teacher&&!readOnly;
+ const allVisibleSelected=visiblePosts.length>0&&visiblePosts.every(p=>selectedPostIds.has(p.id));
+ function toggleSelectedPost(id:string){
+  if(!bulkAllowed||busy)return;
+  setSelectedPostIds(previous=>{const next=new Set(previous);if(next.has(id))next.delete(id);else next.add(id);return next});
+ }
+ function toggleVisibleSelection(){
+  if(!bulkAllowed||busy)return;
+  setSelectedPostIds(previous=>{const next=new Set(previous);for(const post of visiblePosts){if(allVisibleSelected)next.delete(post.id);else next.add(post.id)}return next});
+ }
+ function exitBulkMode(){if(busy)return;setBulkMode(false);setSelectedPostIds(new Set());setBulkProgress(0)}
+ async function deleteSelectedPosts(){
+  if(!bulkAllowed||!game||busy)return;
+  const available=new Map(politicalPosts.map(post=>[post.id,post]));
+  const ids=Array.from(selectedPostIds).filter(id=>available.has(id));
+  if(!ids.length)return;
+  const preview=ids.slice(0,3).map(id=>'• '+(available.get(id)?.title||'Публикация')).join('\n');
+  if(!confirm('Удалить выбранные публикации ('+ids.length+')?\n\n'+preview+(ids.length>3?'\n… и ещё '+(ids.length-3):'')+'\n\nПубликации исчезнут из ленты. История изменений показателей сохранится.'))return;
+  setBusy(true);setBulkProgress(0);setNotice('');
+  const failed:string[]=[];let succeeded=0;
+  try{
+   // Existing RPC checks server-side teacher rights and soft-deletes each post.
+   // Limit simultaneous requests to avoid a burst against Supabase.
+   for(let index=0;index<ids.length;index+=3){
+    const batch=ids.slice(index,index+3);
+    const results=await Promise.all(batch.map(async id=>{
+     try{const {error}=await supabase.rpc('delete_process_post',{p_post_id:id});return {id,error:error?.message||''}}
+     catch(error){return {id,error:error instanceof Error?error.message:'Ошибка подключения'}}
+    }));
+    for(const result of results){if(result.error)failed.push(result.id);else succeeded++}
+    setBulkProgress(Math.min(index+batch.length,ids.length));
+   }
+   setSelectedPostIds(new Set(failed));
+   if(!failed.length)setBulkMode(false);
+   if(succeeded)await g.refresh();
+   setNotice(failed.length
+    ?'Удалено публикаций: '+succeeded+'. Не удалось удалить: '+failed.length+'. Неудалённые публикации остались выделенными для повторной попытки.'
+    :'Удалено публикаций: '+succeeded+'. Связанные документы и история показателей сохранены.');
+  }catch(error){
+   setNotice('Операции удаления выполнены частично ('+succeeded+'). Обновление ленты завершилось ошибкой: '+(error instanceof Error?error.message:'неизвестная ошибка')+'. Перезагрузите раздел для сверки результата.');
+  }finally{setBulkProgress(0);setBusy(false)}
+ }
 
  function insertText(text:string){
   const start=textInput.current?.selectionStart??body.length,end=textInput.current?.selectionEnd??body.length;
@@ -158,6 +210,18 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   {!readOnly&&<NewsProposals g={g} refreshKey={proposalRefresh} onOpenDocument={onOpenDocument} onNavigate={onNavigate} onPublished={title=>{setSearch(title);setNotice('Новость опубликована в СМИ.')}}/>}
   {notice&&<p className="processNotice" role="status">{notice}</p>}
   <>
+   {bulkAllowed&&<section className="wallBulkControls" aria-label="Массовое удаление публикаций">
+    <div className="wallBulkIntro"><strong>Публикации</strong><small>{bulkMode?'Отметьте публикации в ленте. Выбор сохраняется при раскрытии следующих постов.':'Управление выбранными публикациями'}</small></div>
+    {!bulkMode
+     ?<button type="button" className="secondary wallBulkToggle" disabled={busy} aria-pressed={false} onClick={()=>{setBulkMode(true);setNotice('')}}><Trash2 size={17}/>Массовое удаление</button>
+     :<div className="wallBulkActions">
+      <span className="wallBulkCount" role="status">Выбрано: {selectedPostIds.size}</span>
+      <button type="button" className="secondary" disabled={busy||!visiblePosts.length} onClick={toggleVisibleSelection}>{allVisibleSelected?'Снять выбор с показанных':'Выбрать показанные'}</button>
+      <button type="button" className="secondary" disabled={busy||!selectedPostIds.size} onClick={()=>setSelectedPostIds(new Set())}>Снять всё</button>
+      <button type="button" className="wallBulkDelete" disabled={busy||!selectedPostIds.size} onClick={()=>void deleteSelectedPosts()}><Trash2 size={16}/>{busy?'Удаление '+bulkProgress+' из '+selectedPostIds.size:'Удалить выбранные ('+selectedPostIds.size+')'}</button>
+      <button type="button" className="secondary" disabled={busy} onClick={exitBulkMode}>Отмена</button>
+     </div>}
+   </section>}
    <section className="wallSearch"><label>Поиск<input type="search" aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Текст, название или тег"/></label><StyledSelect label="Субъект" value={filterActor} onChange={setFilterActor} options={[{value:'',label:'Все субъекты'},...Array.from(new Map(politicalPosts.map(p=>[p.actor_key,p.actor_key==='teacher'?'GOS//SIMS':p.actor_label])).entries()).map(([value,label])=>({value,label}))]}/><StyledSelect label="Вид публикации" value={filterType} onChange={setFilterType} options={[{value:'',label:'Все публикации'},...PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))]}/><StyledSelect label="Этап" value={filterStage} onChange={setFilterStage} options={[{value:'',label:'Все этапы'},...g.stages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></section>
    <section className="wallFeed">{!filtered.length?<div className="emptyState">Подходящих публикаций нет.</div>:visiblePosts.map(p=>{
     const party=g.parties.find(x=>x.id===p.context?.party_id||x.name===p.actor_label),pf=profiles.find(x=>x.user_id===p.author_id);
@@ -169,8 +233,8 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     const auto=!!p.source_key||p.context?.automatic===true;
     const own=p.author_id===me.user_id,editable=!readOnly&&(teacher||own&&!auto);
     const canRequestVote=!readOnly&&(teacher||own&&!auto);
-    return <article className={'wallPost '+p.status} key={p.id} id={'process-'+p.id}>
-     <header><div className="wallPostAvatar"><PublisherAvatar actorKey={p.actor_key} label={label} partyLogo={party?.logo_url} avatar={pf?.avatar_url} gender={pf?.gender} name={names[p.author_id]}/></div><div className="wallPostWho"><b>{label}</b><small>{auto?'Автоматическая публикация':p.actor_key==='participant'?names[p.author_id]||'Участник':'Официальное сообщение'} · <time dateTime={p.created_at}>{new Date(p.created_at).toLocaleString('ru-RU')}</time></small></div><span className={'postStatus '+p.status}>{p.status==='accepted'?'Принято':p.status==='rejected'?'Отклонено':'Опубликовано'}</span></header>
+    return <article className={'wallPost '+p.status+(bulkMode&&bulkAllowed?' bulkSelecting':'')+(selectedPostIds.has(p.id)&&bulkMode&&bulkAllowed?' bulkSelected':'')} key={p.id} id={'process-'+p.id}>
+     <header>{bulkMode&&bulkAllowed&&<label className="wallBulkPostSelect" title={'Выбрать публикацию: '+p.title}><input type="checkbox" aria-label={'Выбрать публикацию: '+p.title} checked={selectedPostIds.has(p.id)} disabled={busy} onChange={()=>toggleSelectedPost(p.id)}/></label>}<div className="wallPostAvatar"><PublisherAvatar actorKey={p.actor_key} label={label} partyLogo={party?.logo_url} avatar={pf?.avatar_url} gender={pf?.gender} name={names[p.author_id]}/></div><div className="wallPostWho"><b>{label}</b><small>{auto?'Автоматическая публикация':p.actor_key==='participant'?names[p.author_id]||'Участник':'Официальное сообщение'} · <time dateTime={p.created_at}>{new Date(p.created_at).toLocaleString('ru-RU')}</time></small></div><span className={'postStatus '+p.status}>{p.status==='accepted'?'Принято':p.status==='rejected'?'Отклонено':'Опубликовано'}</span></header>
      {editing?.id===p.id&&<PostInlineEditor key={p.id} post={p} g={g} onClose={()=>setEditing(null)} onSaved={()=>{setEditing(null);setNotice('Изменения сохранены.')}}/>}
      <div className="wallPostBody"><div className="processPostMeta"><span>{kind}</span>{p.context?.stage_no&&<span>Этап {String(p.context.stage_no)}</span>}</div><h2>{p.title}</h2>
       {!!p.comic_scene&&<div className="wallPostComic"><EventComic silent title={p.comic_scene.title||p.title} category={p.comic_scene.category||'Событие'} caseKey={p.comic_scene.case_key||p.internal_ref_id||p.id} scene={p.comic_scene}/></div>}

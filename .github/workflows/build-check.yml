@@ -5,6 +5,9 @@ on:
     paths:
       - 'components/game/Blitz*.tsx'
       - 'components/game/TeacherBlitz.tsx'
+      - 'components/game/PoliticalWallView.tsx'
+      - 'components/game/politicalWallPaging.ts'
+      - 'scripts/political-wall-feed-check.cjs'
       - 'components/game/GradesView.tsx'
       - 'supabase/migrations/*blitz*'
       - '.github/workflows/build-check.yml'
