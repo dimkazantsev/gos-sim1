@@ -427,7 +427,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    if(r.error){setOnboardingNotice('Не удалось сохранить первое знакомство: '+r.error.message);setupPromptScope.current='';return}
    setSetupStatus(prev=>prev?{...prev,prompt_seen:true}:prev);
   });
- },[game?.id,me?.user_id,introSeen,introOpen,previewMode,onboardingRequired,setupStatus?.completed,setupStatus?.prompt_seen,setupChecking]);
+ },[game?.id,me?.user_id,introSeen,introOpen,previewMode,tourMode,onboardingRequired,setupStatus?.completed,setupStatus?.prompt_seen,setupChecking]);
  const showSetupWelcome=!!onboardingRequired&&setupWelcomeActive&&!!setupStatus&&!setupStatus.completed&&introSeen&&!introOpen&&!previewMode&&tourMode==='idle';
  const setupDialogRef=useDialog(showSetupWelcome,()=>{});
  const tourChoiceDialogRef=useDialog(tourMode==='choice'&&!introOpen,()=>{});
