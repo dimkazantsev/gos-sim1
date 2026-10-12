@@ -404,6 +404,20 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   setSetupPromptBusy(false);
  }
 
+ useEffect(()=>{
+  if(!game||!me||previewMode)return;
+  let live=true;
+  async function count(){
+   const [r,i]=await Promise.all([supabase.from('event_assignments').select('id',{count:'exact',head:true}).eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending'),supabase.from('event_collaboration_invites').select('id',{count:'exact',head:true}).eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending')]);
+   if(live&&!r.error&&!i.error)setPendingEvents((r.count||0)+(i.count||0));
+  }
+  void count();const poll=setInterval(()=>void count(),30000);
+  const channel=supabase.channel('event-count:'+game.id+':'+me.user_id)
+   .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>void count()).subscribe();
+  return()=>{live=false;clearInterval(poll);void supabase.removeChannel(channel)};
+ },[game?.id,me?.user_id,previewMode,view]);
+
+
  const backIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,-1,previewMode);
  const forwardIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,1,previewMode);
  function moveHistory(index:number){
