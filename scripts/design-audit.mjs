@@ -181,9 +181,15 @@ for(const name of brandingFiles){
  check(name+': consistent GOS//SIMS branding',
   !oldFullBrand.test(source)&&!oldRichBrand.test(source)&&!oldCompactBrand.test(source));
 }
-check('Main and mobile masthead show the new full brand',
- read('components/GameClient.tsx').includes('GOS<span>//</span>SIMS')&&
- read('components/GameClient.tsx').includes('<b>GOS//SIMS</b>'));
+check('Main and mobile masthead show ГОС.ID in both variants',
+ read('components/GameClient.tsx').includes('gos-id-blue.svg')&&
+ read('components/GameClient.tsx').includes('gos-id-pink.svg')&&
+ read('components/GameClient.tsx').includes('ГОС<span>.ID</span>')&&
+ read('app/page.tsx').includes('Цифровая платформа Российской Федерации'));
+check('Legacy brand is absent from live page headings',
+ !/GOS\/\/SIMS/.test(read('components/GameClient.tsx'))&&
+ !/GOS\/\/SIMS/.test(read('app/page.tsx'))&&
+ !/GOS\/\/SIMS/.test(read('components/PublicScreen.tsx')));
 
 
 const dock=read('components/game/StateMetricsDock.tsx');
