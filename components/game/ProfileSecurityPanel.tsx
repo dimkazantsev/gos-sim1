@@ -3,8 +3,9 @@ import {useEffect,useState} from 'react';
 import {CheckCircle2,KeyRound,LockKeyhole,Mail,RefreshCw,ShieldCheck} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import type {ProfileSetupField} from './profileSetup';
 type LoginEmail={user_id:string;email:string;verified_at:string};
-export default function ProfileSecurityPanel({g}:{g:ReturnTypeRepublic}){
+export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnTypeRepublic;missing?:ProfileSetupField[];onChanged?:()=>void}){
  const {game,me,teacher,members}=g;
  const [registered,setRegistered]=useState<LoginEmail[]>([]);
  const [email,setEmail]=useState('');
@@ -43,7 +44,7 @@ export default function ProfileSecurityPanel({g}:{g:ReturnTypeRepublic}){
    setVerified(true);setEmail(actor.email);
    const r=await supabase.from('member_login_emails').upsert({game_id:game.id,user_id:actor.id,email:actor.email.toLowerCase(),verified_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
    setNotice(r.error?'Почта подтверждена, но запись профиля не обновлена: '+r.error.message:'Почта подтверждена. Установите личный пароль.');
-   await load();
+   await load();onChanged?.();
   }
   setBusy(false);
  }
@@ -52,7 +53,7 @@ export default function ProfileSecurityPanel({g}:{g:ReturnTypeRepublic}){
   setBusy(true);setNotice('');
   const r=await supabase.auth.updateUser({password});
   if(r.error)setNotice('Не удалось установить пароль: '+r.error.message);
-  else{setPassword('');setConfirm('');await load();setNotice('Личный пароль сохранён. Используйте почту и пароль при следующем входе.')}
+  else{setPassword('');setConfirm('');await load();onChanged?.();setNotice('Личный пароль сохранён. Используйте почту и пароль при следующем входе.')}
   setBusy(false);
  }
  async function reset(targetEmail:string){
@@ -67,15 +68,16 @@ export default function ProfileSecurityPanel({g}:{g:ReturnTypeRepublic}){
   <header><div><small>БЕЗОПАСНОСТЬ УЧЁТНОЙ ЗАПИСИ</small><h2>Личный пароль</h2></div><KeyRound size={22}/></header>
   <p>Для входа с другого устройства привяжите почту и установите пароль. Преподаватель может отправить письмо для восстановления, но прочитать чужой пароль не может.</p>
   <div className="profileSecurityGrid">
-   <label>Ваш адрес электронной почты<input type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Имя@пример.рф" disabled={verified||busy}/></label>
+   <label data-profile-setup-field="email" className={missing.includes('email')?'profileSetupInvalid':''}>Ваш адрес электронной почты<input aria-invalid={missing.includes('email')} type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Имя@пример.рф" disabled={verified||busy}/></label>
    <button type="button" disabled={busy||verified||!email.includes('@')} onClick={()=>void link()}><Mail size={17}/>{verified?'Почта подтверждена':'Привязать почту'}</button>
    <button type="button" disabled={busy||verified} onClick={()=>void check()}><RefreshCw size={17}/> Проверить подтверждение</button>
   </div>
-  {verified&&<div className="profilePasswordFields">
+  {verified&&<div className={'profilePasswordFields'+(missing.includes('password')?' profileSetupInvalid':'')} data-profile-setup-field="password">
    <label>Новый личный пароль<input type="password" autoComplete="new-password" minLength={10} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Не менее 10 символов"/></label>
    <label>Повторите пароль<input type="password" autoComplete="new-password" minLength={10} value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="Подтверждение пароля"/></label>
    <button type="button" className="primary" disabled={busy||password.length<10||password!==confirm} onClick={()=>void savePassword()}><ShieldCheck size={17}/> Сохранить пароль</button>
   </div>}
+  {(missing.includes('email')||missing.includes('password'))&&<p className="profileSetupFieldError">{missing.includes('email')?'Подтвердите почту. ':''}{missing.includes('password')?'Установите личный пароль.':''}</p>}
   {mine&&<p className="profileSecurityVerified"><CheckCircle2 size={17}/> Для входа привязана почта: {mine.email}</p>}
   {teacher&&<details className="profileSecurityRecovery"><summary><LockKeyhole size={17}/> Восстановление доступа участников</summary>
    <p>В целях безопасности пароли не отображаются. После нажатия студент получит письмо со ссылкой для установки нового пароля. Общий код игры остаётся без изменений.</p>
