@@ -34,3 +34,8 @@
 .assignedTaskError,.assignedTaskNotice{padding:12px 16px;border-radius:12px;margin:0}
 .assignedTaskError{background:#fff0ef;color:#a42c27}.assignedTaskNotice{background:#effaf3;color:#206544}
 @media(max-width:700px){.assignedTaskPage{gap:12px}.assignedTaskGrid{grid-template-columns:1fr}.assignedTaskForm,.assignedTaskList{padding:16px}.assignedTaskCard dl{grid-template-columns:repeat(2,minmax(0,1fr))}.assignedTaskHero{padding:16px}.assignedTaskActions button{width:100%;justify-content:center}}
+
+.civicMentionMenu{display:grid;gap:4px;background:var(--surface,#fff);border:1px solid #d7e3ee;border-radius:12px;padding:6px;box-shadow:0 12px 24px #0d275018;max-height:220px;overflow-y:auto}
+.civicMentionMenu button{border:0;text-align:left;background:transparent;color:var(--text,#223c51);font:inherit;font-size:13px;padding:9px 12px;border-radius:8px;cursor:pointer}
+.civicMentionMenu button:hover,.civicMentionMenu button:focus-visible{background:#eaf1ff;color:#2453e6}
+.civicMentionMenu small{padding:10px;color:var(--muted,#64778a)}
