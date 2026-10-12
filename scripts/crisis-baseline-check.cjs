@@ -30,6 +30,8 @@ assert(migration.includes('after insert on public.games'),'New games must initia
 assert(migration.includes('trg_zz_crisis_game_start'),'Crisis trigger must follow existing default seeding');
 assert(migration.includes("source_type='baseline'"),'New game baseline must be corrected, not appear prosperous');
 assert(migration.includes("current_round=1"),'Existing calibration must be stage-one gated');
+assert(migration.includes('matched_games <> 1'),'Existing calibration must target exactly one matching PAU game');
+assert(!migration.includes('541b6fde-'),'Migrations must not hardcode generated database IDs');
 assert(migration.includes("source_type='crisis_rebaseline'"),'Existing history must have a distinct audit event');
 assert(migration.includes('insert into public.state_metric_history'),'Do not silently replace impact history');
 assert(!/\b(delete|truncate)\s+from\s+public\.(state_metric_history|political_posts)/i.test(migration),'Never erase recorded decisions');
