@@ -39,7 +39,7 @@ import {GeistMono} from 'geist/font/mono';
 
 export const metadata:Metadata={
  title:BRAND_NAME+' — '+BRAND_TAGLINE,
- description:'Республиканская цифровая платформа: политический процесс, НПА, голосования, партии, аналитика и государственное управление.',
+ description:'Цифровая платформа России: политический процесс, НПА, голосования, партии, аналитика и государственное управление.',
  applicationName:BRAND_NAME,
  other:{'gos-sims-release':(process.env.VERCEL_GIT_COMMIT_SHA||process.env.GITHUB_SHA)?.slice(0,8)||'local'}
 };

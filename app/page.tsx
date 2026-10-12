@@ -101,7 +101,7 @@ export default function Home(){
  }
  return <main className="entryPage">
   <a className="skipLink" href="#entry-form">Перейти ко входу</a>
-  <header className="entryHeader"><a className="wordmark" href="/" aria-label={BRAND_NAME+" — главная"}><BrandIdentity/></a><span className="entryEdition">Лаборатория государственного управления <i>2026</i></span></header>
+  <header className="entryHeader"><a className="wordmark" href="/" aria-label={BRAND_NAME+" — главная"}><BrandIdentity tagline/></a><span className="entryEdition">Лаборатория государственного управления <i>2026</i></span></header>
   <div className="entryGrid">
    <section className="entryStory" aria-labelledby="entry-title">
     <div className="entryEyebrow"><span/>Учебная игра · ГМУ</div>

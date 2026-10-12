@@ -1,26 +1,44 @@
-/* ГОС.ID identity. Lightweight CSS lettering — no images, fonts or network requests.
-   Two authorized palettes; technical keys and URLs remain unchanged. */
-.gosIdMark{display:inline-flex;align-items:center;justify-content:center;gap:0;font-size:13px;letter-spacing:-.075em;font-weight:900;white-space:nowrap}
-.gosIdMark>span{padding:0 1px}
-.gosIdMark--blue-pink{background:#244fe5;color:#fff}
-.gosIdMark--blue-pink>span{color:#ffacdb}
-.gosIdMark--pink-blue{background:#f2a4d1;color:#183d9b}
-.gosIdMark--pink-blue>span{color:#193b8e}
-.gosIdIdentityCopy{display:flex;flex-direction:column;min-width:0;justify-content:center}
-.gosIdWordmark{font-size:inherit;line-height:1.07;letter-spacing:-.045em;font-weight:850;white-space:nowrap;color:#192b4f}
-.gosIdWordmark .gosIdSeparator{color:inherit}
-.gosIdWordmark--blue-pink .gosIdSuffix{color:#cd4d9a}
-.gosIdWordmark--pink-blue .gosIdSuffix{color:#2853c5}
-.gosIdTagline{display:block;font-size:10px;line-height:1.35;letter-spacing:0;color:var(--gs-muted,#64748b);font-weight:600;white-space:normal;max-width:192px;margin-top:3px}
-.sidebarBrand .gosIdIdentityCopy{min-width:0}
+/* ГОС.ID — approved identity: ID-only icon, black wordmark, Russia tagline.
+   CSS-only, no external image requests. Blue primary; pink alternate. */
+.brandMark.gosIdMark{
+ box-sizing:border-box;
+ display:inline-flex;align-items:center;justify-content:center;
+ width:46px;height:46px;min-width:46px;aspect-ratio:1;
+ border-radius:12px;line-height:1;font-size:23px;
+ letter-spacing:-.045em;font-weight:900;
+ font-family:inherit;white-space:nowrap;
+ background:#2453e6;color:#fff;
+ flex:none;
+}
+.brandMark.gosIdMark--blue-pink{background:#2453e6;color:#fff}
+.brandMark.gosIdMark--pink-blue{background:#f6cbe4;color:#1448dc}
+.gosIdIdentityCopy{
+ display:inline-flex;flex-direction:column;min-width:0;
+ justify-content:center;gap:3px;
+}
+.gosIdIdentityCopy .gosIdWordmark{
+ display:block;font-size:inherit;line-height:1.08;
+ font-weight:850;letter-spacing:-.035em;
+ white-space:nowrap;color:#08090d;
+}
+.gosIdIdentityCopy .gosIdWordmark--blue-pink,
+.gosIdIdentityCopy .gosIdWordmark--pink-blue{color:#08090d}
+.gosIdTagline{
+ display:block;font-size:11px;line-height:1.35;
+ color:#596274;font-weight:500;letter-spacing:0;
+ white-space:normal;max-width:210px;
+}
 .sidebarBrand .gosIdWordmark{font-size:23px}
 .sidebarBrand .gosIdTagline{font-size:10.5px}
 .mobileBrand .gosIdWordmark{font-size:18px}
-.mobileBrand .gosIdIdentityCopy{display:inline-flex}
+.mobileBrand .gosIdTagline{font-size:10px;max-width:145px}
 .entryHeader .wordmark .gosIdWordmark{font-size:24px}
-.entryHeader .gosIdMark{width:46px;height:46px}
+.entryHeader .wordmark .gosIdTagline{font-size:12px;max-width:240px}
 @media(max-width:560px){
- .mobileBrand .gosIdMark{width:36px;height:36px;font-size:11px}
+ .mobileBrand .brandMark.gosIdMark{width:36px;height:36px;min-width:36px;border-radius:10px;font-size:18px}
  .mobileBrand .gosIdWordmark{font-size:17px}
+ .mobileBrand .gosIdTagline{font-size:9px;max-width:130px}
+ .entryHeader .wordmark .brandMark.gosIdMark{width:40px;height:40px;min-width:40px;border-radius:11px;font-size:20px}
  .entryHeader .wordmark .gosIdWordmark{font-size:20px}
+ .entryHeader .wordmark .gosIdTagline{font-size:10px;max-width:180px}
 }
