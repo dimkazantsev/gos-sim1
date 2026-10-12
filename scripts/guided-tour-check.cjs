@@ -18,7 +18,10 @@ assert(client.includes('const showSetupWelcome=')&&client.includes("tourMode==='
 assert(client.includes('complete_my_game_profile'),'Server still completes profiles');
 assert(client.includes("setTourMode('choice')")&&client.includes("setTourMode('tour')"),'Comic-to-choice-to-tour transition required');
 assert(client.includes("navigate('profile',undefined,true)")&&client.includes("rememberTourChoice('skipped')"),'Skip must preserve profile setup');
-assert(client.includes('onStartTutorial={beginTour}')&&profile.includes('Архив комиксов</button>')&&profile.includes('Обучение</button>'),'Replay must be adjacent to comic archive');
+assert(client.includes('onStartTutorial={beginTour}')&&profile.includes('Архив комиксов</button>')&&profile.includes("'Пройти обучение':'Обучение'"),'Replay must be adjacent to comic archive for participants and explicitly labelled for teachers');
+const teacherView=read('components/game/TeacherView.tsx');
+assert(teacherView.includes('className="teacherQuick teacherTourButton"')&&teacherView.includes('onClick={onStartTutorial}')&&teacherView.includes('Пройти обучение'),'Teacher must have a direct launch button in management');
+assert(client.includes('<TeacherView g={g} onStartTutorial={beginTour}'),'Teacher management must launch the existing tour rather than a duplicate tutorial');
 assert(dock.includes('data-tour-view={item.key}')&&client.includes('data-tour-view={k}'),'Desktop and mobile need actual spotlight targets');
 assert(tour.includes('.mobileDockChat')&&tour.includes('.topChatButton'),'Both chat buttons must be discoverable');
 assert(tour.includes('onFallback')&&tour.includes('onSkip'),'Unreachable target and skip paths need controls');
