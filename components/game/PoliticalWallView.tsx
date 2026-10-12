@@ -52,6 +52,13 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const [bulkMode,setBulkMode]=useState(false),[selectedPostIds,setSelectedPostIds]=useState<Set<string>>(()=>new Set()),[bulkProgress,setBulkProgress]=useState(0);
  // Bulk selection is local to one game. Never carry ids into another game.
  useEffect(()=>{setBulkMode(false);setSelectedPostIds(new Set());setBulkProgress(0)},[game?.id]);
+ useEffect(()=>{
+  const active=new Set(politicalPosts.map(post=>post.id));
+  setSelectedPostIds(previous=>{
+   if([...previous].every(id=>active.has(id)))return previous;
+   return new Set([...previous].filter(id=>active.has(id)));
+  });
+ },[politicalPosts]);
  const [editing,setEditing]=useState<PoliticalPost|null>(null);
  const [proposalRefresh,setProposalRefresh]=useState(0);
  const [linkOpen,setLinkOpen]=useState(false),[linkLabel,setLinkLabel]=useState(''),[linkUrl,setLinkUrl]=useState(''),[linkView,setLinkView]=useState('');
