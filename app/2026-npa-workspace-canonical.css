@@ -1861,3 +1861,13 @@
     margin-top:2px!important;
   }
 }
+
+/* npa-panel-vertical-air-20261012: give adjacent registry and document panels a readable separation. */
+.legalPortal .formalWorkspace > .formalDetail{
+  margin-top:20px!important;
+}
+@media(max-width:650px){
+  .legalPortal .formalWorkspace > .formalDetail{
+    margin-top:16px!important;
+  }
+}
