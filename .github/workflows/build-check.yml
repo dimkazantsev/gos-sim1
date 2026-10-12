@@ -41,6 +41,7 @@ on:
       - 'app/icon.svg'
       - 'app/page.tsx'
       - 'app/layout.tsx'
+      - 'public/share/gos-id-preview.jpg'
       - 'scripts/brand-overview-check.cjs'
       - 'app/2026-political-process.css'
       - 'components/game/politicalWallPaging.ts'
