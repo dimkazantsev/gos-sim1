@@ -43,7 +43,7 @@ assert(source.includes("bulkMode&&bulkAllowed&&<label"),'Checkboxes must only ap
 assert(source.includes("visiblePosts.every(p=>selectedPostIds.has(p.id))"),'Select-all state must derive from visible posts');
 assert(source.includes("for(const post of visiblePosts)"),'Select-all must not select hidden posts');
 assert(source.includes("setSelectedPostIds(previous=>{const next=new Set(previous)"),'Selection must be updated immutably');
-assert(source.includes("setSelectedPostIds(new Set());setBulkProgress(0)},[game?.id]"),'Selection must reset between games');
+assert(source.includes("setSelectedPostIds(new Set());setBulkProgress(0);setLocallyRemovedIds(new Set())},[game?.id]"),'Selection and local deletion state must reset between games');
 assert(source.includes("if(!bulkAllowed||!game||busy)return"),'Bulk delete must not execute without teacher rights');
 assert(source.includes("if(!confirm("),'Bulk deletion requires an explicit confirmation');
 assert(source.includes("index+=3"),'Mass deletion requests must use bounded concurrency');
