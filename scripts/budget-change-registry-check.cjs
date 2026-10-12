@@ -5,7 +5,9 @@ assert(view.includes('<BudgetChangeRegistry'),'Unified registry must be displaye
 assert(!view.includes('<h3>Реестр налоговых инициатив</h3>'),'Old tax-only registry must be removed');
 assert(registry.includes('get_budget_change_registry')&&registry.includes('hide_budget_change_registry_entry'));
 assert(registry.includes('g.teacher&&!readOnly'),'Hide controls must be teacher-only');
-assert(registry.includes('setCount(x=>x+PAGE_SIZE)'),'Pagination required');
+assert(registry.includes('const PAGE_SIZE=10')&&registry.includes('get_budget_change_registry_page')&&registry.includes('load(entries.length)'),'Server pagination by ten required');
+assert(registry.includes('aria-expanded={expanded}')&&registry.includes('{expanded&&<div'),'Registry must be collapsible');
+assert(nav.indexOf('className="gameShareScreen"')>nav.indexOf('className={`livePill'),'Share must be next to pause');
 assert(registry.includes("u.searchParams.set('entry',entry.entry_key)"),'Entry links must be deep links');
 assert(nav.includes('sharedLinkHandled')&&nav.includes('navigator.clipboard.writeText'),'Shared deep links must resolve after login');
 assert(sql.includes('private.is_game_teacher(p_game_id)'),'Server must enforce teacher privilege');
