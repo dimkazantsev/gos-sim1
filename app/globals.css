@@ -2196,3 +2196,8 @@ button,input,textarea,select{font-size:14px}
 .budgetChangeRegistryMore{justify-self:start}
 .gameShareScreen{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:6px 12px;border:1px solid #d0dbe9;border-radius:9px;background:#fff;color:#315a93;font-size:13px;font-weight:700;cursor:pointer;flex:none}
 @media(max-width:700px){.budgetChangeRegistry{padding:14px!important}.budgetChangeRegistryTools label{width:100%}.budgetChangeRegistryTools input,.budgetChangeRegistryTools select{flex:1;min-width:0}.budgetChangeRegistryActions{width:100%}.gameShareScreen{padding:5px 8px;font-size:12px}}
+
+@media(max-width:900px){
+ .simWorkspace .simTop .gameShareScreen{position:fixed;left:12px;right:auto;bottom:calc(var(--gs-mobile-dock-height,64px) + 14px);z-index:46;width:44px;min-width:44px;height:44px;min-height:44px;padding:0;display:grid;place-items:center;box-shadow:0 4px 14px rgba(19,51,93,.12)}
+ .simWorkspace .simTop .gameShareScreen span{display:none}
+}
