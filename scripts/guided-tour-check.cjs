@@ -26,6 +26,10 @@ assert(dock.includes('data-tour-view={item.key}')&&client.includes('data-tour-vi
 assert(tour.includes('.mobileDockChat')&&tour.includes('.topChatButton'),'Both chat buttons must be discoverable');
 assert(tour.includes('onFallback')&&tour.includes('onSkip'),'Unreachable target and skip paths need controls');
 assert(style.includes('pointer-events:auto')&&style.includes('pointer-events:none'),'Overlay must pass pointer events through active hole');
+assert(/\.header>button\{[^}]*position:absolute[^}]*place-items:center[^}]*padding:0/.test(style),'Tour close button must stay anchored and clear inherited padding');
+assert(/\.header>button>svg\{[^}]*width:19px[^}]*margin:0/.test(style),'Close icon geometry must not inherit offsets');
+assert(/\.header\{[^}]*padding-right:48px/.test(style),'Title must reserve room for absolute close button');
+assert(/@media\(max-width:600px\)[^\n]*\.header>button\{top:17px;right:18px\}/.test(style),'Mobile close button must match compact card padding');
 assert(layout.includes("import './onboarding-tour.css'"),'Initial tutorial choice stylesheet must load');
 assert(client.includes("tourMode==='idle'}"),'Time-sensitive blitz must not obscure the guided tour');
 console.log('PASS guided route, comic choice, real navigation, replay, mobile, skip, profile gate and nonintrusive overlay');
