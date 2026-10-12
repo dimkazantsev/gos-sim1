@@ -102,8 +102,9 @@ declare
  current_metric public.state_metrics%rowtype;
  target record;
 begin
- select count(*),min(id) into matched_games,target_game
+ select count(*) into matched_games
  from public.games where title='ПАУ' and current_round=1;
+ select id into target_game from public.games where title='ПАУ' and current_round=1 limit 1;
  if matched_games <> 1 then
   raise exception 'PAU crisis calibration refused: expected exactly one named stage-one game, found %',matched_games;
  end if;
