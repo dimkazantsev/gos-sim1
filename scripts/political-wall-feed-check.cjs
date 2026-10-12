@@ -34,3 +34,21 @@ assert(source.includes('Показать ещё'),'Standard expand action must b
 assert(source.includes('Свернуть до 10'),'Collapse action must remain possible');
 assert(source.includes('role="status"'),'Counter must announce displayed/total posts');
 console.log('PASS process feed component wiring');
+
+
+/* Teacher bulk deletion regression: visible-only selection, role gating,
+ * and reuse of the audited soft-delete RPC rather than direct table DELETE. */
+assert(source.includes("const bulkAllowed=teacher&&!readOnly"),'Bulk actions must be teacher-only and hidden in read-only mode');
+assert(source.includes("bulkMode&&bulkAllowed&&<label"),'Checkboxes must only appear for teacher when bulk mode is active');
+assert(source.includes("visiblePosts.every(p=>selectedPostIds.has(p.id))"),'Select-all state must derive from visible posts');
+assert(source.includes("for(const post of visiblePosts)"),'Select-all must not select hidden posts');
+assert(source.includes("setSelectedPostIds(previous=>{const next=new Set(previous)"),'Selection must be updated immutably');
+assert(source.includes("setSelectedPostIds(new Set());setBulkProgress(0)},[game?.id]"),'Selection must reset between games');
+assert(source.includes("if(!bulkAllowed||!game||busy)return"),'Bulk delete must not execute without teacher rights');
+assert(source.includes("if(!confirm("),'Bulk deletion requires an explicit confirmation');
+assert(source.includes("index+=3"),'Mass deletion requests must use bounded concurrency');
+assert(source.includes("supabase.rpc('delete_process_post',{p_post_id:id})"),'Bulk delete must reuse the existing protected soft-delete RPC');
+assert(!source.includes("supabase.from('political_posts').delete("),'Direct client table deletion must not be introduced');
+assert(source.includes("if(succeeded)await g.refresh()"),'Refresh should happen once after a batch, not for every post');
+assert(source.includes("setSelectedPostIds(new Set(failed))"),'Failed deletions must remain selected for retry');
+console.log('PASS political-process bulk-delete contract');
