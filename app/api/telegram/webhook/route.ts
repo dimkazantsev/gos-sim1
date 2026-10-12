@@ -16,11 +16,11 @@ export async function POST(request:Request){
    const token=text.slice(7).trim();
    if(!/^[a-f0-9]{48}$/.test(token)){await reply('Неверный код привязки. Создайте новый код в профиле игры.');return NextResponse.json({ok:true})}
    const {data,error}=await config.db.rpc('telegram_connect',{p_token:token,p_telegram_user_id:telegramId,p_chat_id:chatId});
-   await reply(error?'Не удалось связать аккаунт: '+error.message:'GOS//SIMS подключён. Для команд отправьте /help. Игра: '+gameUrl(data as string));
+   await reply(error?'Не удалось связать аккаунт: '+error.message:'ГОС.ID подключён. Для команд отправьте /help. Игра: '+gameUrl(data as string));
    return NextResponse.json({ok:true});
   }
   if(text==='/start'||text==='/help'){
-   await reply('GOS//SIMS\n/games — подключённые игры\n/status — состояние игры\n/stages — этапы\n/votes — голосования\n/docs — документы\n/channels — каналы чата\n/chat Текст — отправить в выбранный канал\n/help — помощь\nВыбрать игру: /game <id>\nВыбрать канал: /channel <id>');return NextResponse.json({ok:true});
+   await reply('ГОС.ID\n/games — подключённые игры\n/status — состояние игры\n/stages — этапы\n/votes — голосования\n/docs — документы\n/channels — каналы чата\n/chat Текст — отправить в выбранный канал\n/help — помощь\nВыбрать игру: /game <id>\nВыбрать канал: /channel <id>');return NextResponse.json({ok:true});
   }
   const {data:links,error:linksError}=await config.db.from('telegram_links').select('game_id,user_id,default_channel_id').eq('telegram_user_id',telegramId);
   if(linksError)throw linksError;
@@ -40,7 +40,7 @@ export async function POST(request:Request){
   if(command==='/game'){await reply('Игра выбрана для этой команды: '+gameUrl(game.game_id)+'\nЕсли у вас несколько игр, указывайте её UUID в командах.');return NextResponse.json({ok:true})}
   if(command==='/status'){
    const {data}=await config.db.from('games').select('title,status,current_round,turn_open').eq('id',game.game_id).single();
-   await reply('GOS//SIMS — '+(data?.title||'Игра')+'\nСостояние: '+(data?.status||'—')+'\nЭтап: '+(data?.current_round||'—')+'\nХод: '+(data?.turn_open?'открыт':'закрыт')+'\n'+gameUrl(game.game_id));return NextResponse.json({ok:true});
+   await reply('ГОС.ID — '+(data?.title||'Игра')+'\nСостояние: '+(data?.status||'—')+'\nЭтап: '+(data?.current_round||'—')+'\nХод: '+(data?.turn_open?'открыт':'закрыт')+'\n'+gameUrl(game.game_id));return NextResponse.json({ok:true});
   }
   if(command==='/stages'){
    const {data}=await config.db.from('game_stages').select('stage_no,title,status').eq('game_id',game.game_id).order('stage_no');
