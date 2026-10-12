@@ -56,6 +56,15 @@ assert.ok(gameClient.includes("title:'ГОС.ID — Цифровая платф�
 // entry for ?section=dashboard is the same index.html with a real OG image.
 assert.ok(html.includes('property="og:image"')&&html.includes(previewUrl),
  'Root ?section=dashboard links must retain an absolute OG preview');
+// Meta crawlers such as WhatsApp may ignore Open Graph tags outside <head>.
+// Searching the whole HTML (the previous test) was not sufficient.
+for(const [name,document] of [['root',html],['visit',visitHtml]]){
+ const end=document.indexOf('</head>');
+ assert.ok(end>=0,name+' missing </head>');
+ const head=document.slice(0,end);
+ for(const field of ['property="og:title"','property="og:description"','property="og:image"','name="twitter:card"'])
+  assert.ok(head.includes(field),name+' must expose '+field+' within <head>');
+}
 const fallback=readFileSync(join(out,'404.html'),'utf8');
 assert.ok(fallback.includes('window.location.replace(base+"/?game="'),'Legacy dynamic game routes should redirect to static game entry.');
 assert.ok(fallback.includes('^[0-9a-f]{8}'),'Only UUID game routes may redirect.');
