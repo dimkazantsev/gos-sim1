@@ -188,7 +188,7 @@ begin
  select m.role_title into position from public.game_members m where m.game_id=new.game_id and m.user_id=new.recipient_id;
  insert into public.telegram_outbox(game_id,user_id,category,source_id,body)
  select new.game_id,l.user_id,'document_delivery',new.id,
- case when coalesce(position,'') ilike '%президент%' or new.destination ilike '%подпис%'
+ case when coalesce(new.destination,'') ilike '%подпис%' or coalesce(new.delivery_kind,'') ilike '%sign%'
  then '🖋 К вам на подпись поступил документ: ' else '📜 Вам поступил документ на рассмотрение: ' end
  ||coalesce(left(title,180),'Документ')||'. Откройте реестр НПА.'
  from public.telegram_links l join public.game_members m on m.game_id=l.game_id and m.user_id=l.user_id
