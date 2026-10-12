@@ -2197,7 +2197,49 @@ button,input,textarea,select{font-size:14px}
 .gameShareScreen{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:6px 12px;border:1px solid #d0dbe9;border-radius:9px;background:#fff;color:#315a93;font-size:13px;font-weight:700;cursor:pointer;flex:none}
 @media(max-width:700px){.budgetChangeRegistry{padding:14px!important}.budgetChangeRegistryTools label{width:100%}.budgetChangeRegistryTools input,.budgetChangeRegistryTools select{flex:1;min-width:0}.budgetChangeRegistryActions{width:100%}.gameShareScreen{padding:5px 8px;font-size:12px}}
 
+
+/* Restore the pre-sharing stage header; sharing belongs beside the Pause indicator. */
+.simWorkspace .simTopCenter .topIndicators .gameShareScreen{
+ position:static;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+ flex:none;min-height:32px;padding:5px 10px;margin:0;
+ border:1px solid var(--gs-border,#d0dbe9);border-radius:9px;
+ background:#fff;color:#315a93;font-size:12px;font-weight:750;white-space:nowrap;
+ box-shadow:none;
+}
+.simWorkspace .simTopCenter .topIndicators .gameShareScreen:hover{background:#f1f5ff}
 @media(max-width:900px){
- .simWorkspace .simTop .gameShareScreen{position:fixed;left:12px;right:auto;bottom:calc(var(--gs-mobile-dock-height,64px) + 14px);z-index:46;width:44px;min-width:44px;height:44px;min-height:44px;padding:0;display:grid;place-items:center;box-shadow:0 4px 14px rgba(19,51,93,.12)}
- .simWorkspace .simTop .gameShareScreen span{display:none}
+ .simWorkspace .simTop .topIndicators .gameShareScreen{
+  display:grid;place-items:center;position:static;flex:0 0 36px;
+  width:36px;min-width:36px;max-width:36px;height:36px;min-height:36px;max-height:36px;
+  padding:0;margin:0;box-shadow:none;
+ }
+ .simWorkspace .simTop .topIndicators .gameShareScreen span{display:none}
+}
+@media(max-width:390px){
+ /* Leave space for status, Share, history and the user switcher at 320px. */
+ .simWorkspace .simTop .mobileBrand b{display:none}
+}
+
+/* The budget registry is a small closed disclosure until explicitly opened. */
+.budgetChangeRegistry{padding:0!important;gap:0!important;overflow:hidden}
+.budgetChangeRegistryHead{display:block;min-width:0}
+.budgetChangeRegistryDisclosure{
+ display:flex;align-items:center;justify-content:space-between;gap:15px;text-align:left;
+ width:100%;min-width:0;padding:18px 20px;margin:0;border:0;background:transparent;
+ font:inherit;color:inherit;cursor:pointer;
+}
+.budgetChangeRegistryDisclosure:hover{background:#f8faff}
+.budgetChangeRegistryDisclosure:focus-visible{outline:2px solid #6086d5;outline-offset:-3px}
+.budgetChangeRegistryDisclosure h2{font-size:19px;line-height:1.35;margin:5px 0 0}
+.budgetChangeRegistryToggle{display:flex;align-items:center;gap:10px;flex:none;color:#315a93;font-size:13px;font-weight:750}
+.budgetChangeRegistryToggle svg{transition:transform .18s ease}
+.budgetChangeRegistryDisclosure[aria-expanded="true"] .budgetChangeRegistryToggle svg{transform:rotate(180deg)}
+.budgetChangeRegistryBody{display:grid;gap:16px;padding:0 20px 20px;border-top:1px solid #e7edf5}
+.budgetChangeRegistryIntro{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:16px}
+.budgetChangeRegistryIntro p{margin:0;font-size:14px;line-height:1.5;color:#526985}
+@media(max-width:700px){
+ .budgetChangeRegistryDisclosure{padding:15px 14px}
+ .budgetChangeRegistryBody{padding:0 14px 14px}
+ .budgetChangeRegistryDisclosure h2{font-size:17px}
+ .budgetChangeRegistryToggle{gap:5px}
 }
