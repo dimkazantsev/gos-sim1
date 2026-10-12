@@ -84,7 +84,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   });
  },[gameId,opened.bank,opened.checks]);
  useEffect(()=>{
-  if(!gameId||!opened.stats)return;
+  if(!gameId||!opened.stats||!students.length)return;
   let live=true;setStatsBusy(true);
   void supabase.rpc('blitz_teacher_stats',{p_game:gameId}).then(({data,error:loadError})=>{
    if(!live)return;setStatsBusy(false);
@@ -92,7 +92,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
    setStats((data||[]) as Stats[]);
   });
   return ()=>{live=false};
- },[gameId,opened.stats]);
+ },[gameId,opened.stats,students.length]);
  const acts=useMemo(()=>[...new Set(questions.map(q=>q.legal_act))].sort((a,b)=>a.localeCompare(b,'ru')),[questions]);
  const filtered=useMemo(()=>questions.filter(q=>(actFilter==='all'||q.legal_act===actFilter)&&(reviewFilter==='all'||q.legal_review_status===reviewFilter)&&(q.question+' '+q.topic+' '+q.legal_act+' '+q.article).toLocaleLowerCase('ru').includes(query.trim().toLocaleLowerCase('ru'))).sort((a,b)=>sort==='topic'?(a.topic.localeCompare(b.topic,'ru')||a.id-b.id):a.id-b.id),[questions,query,actFilter,reviewFilter,sort]);
  const bankRows=useMemo(()=>filtered.slice(bankPage*PAGE_SIZE,(bankPage+1)*PAGE_SIZE),[filtered,bankPage]);
