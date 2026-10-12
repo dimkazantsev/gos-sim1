@@ -51,6 +51,12 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # The deploy job uses a fresh runner; checkout is required for the
+      # post-deploy smoke test script (the build job's checkout is not shared).
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - uses: actions/configure-pages@v5
         with:
           enablement: true
