@@ -19,6 +19,7 @@ import DocumentsView from './game/DocumentsView';
 import GradesView from './game/GradesView';
 import TeacherView from './game/TeacherView';
 import ProfileView from './game/ProfileView';
+import {PROFILE_SETUP_FIELDS,PROFILE_SETUP_LABELS,validProfileSetupStatus,type ProfileSetupStatus} from './game/profileSetup';
 import RepublicComic from './game/RepublicComic';
 import {useIntroProgress} from './game/introProgress';
 import ChatPanel from './game/ChatPanel';
@@ -253,6 +254,11 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [selectedProfileId,setSelectedProfileId]=useSavedGameState(gameId,g.me?.user_id,'profile-selected','',savedString);
  const [completingProfile,setCompletingProfile]=useState(false);
  const [onboardingNotice,setOnboardingNotice]=useState('');
+ const [setupStatus,setSetupStatus]=useState<ProfileSetupStatus|null>(null);
+ const [setupChecking,setSetupChecking]=useState(false);
+ const [setupPromptBusy,setSetupPromptBusy]=useState(false);
+ const [setupFocusVersion,setSetupFocusVersion]=useState(0);
+ const setupRequest=useRef(0);
  useEffect(()=>{
   if(!viewAsOpen)return;
   function onPointerDown(event:PointerEvent){
@@ -341,6 +347,41 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   }
  });
  const onboardingRequired=!!me&&!observer&&!myProfile?.onboarding_completed_at;
+ async function loadProfileSetup(){
+  if(!game||!me||observer)return;
+  const token=++setupRequest.current;
+  setSetupChecking(true);
+  const r=await supabase.rpc('get_my_game_profile_setup',{p_game:game.id});
+  if(token!==setupRequest.current)return;
+  if(r.error||!validProfileSetupStatus(r.data)){
+   setOnboardingNotice('Не удалось проверить полноту профиля. Повторите проверку в профиле.');
+  }else setSetupStatus(r.data);
+  setSetupChecking(false);
+ }
+ useEffect(()=>{
+  if(!game||!me||observer||g.loading||!g.profilesLoaded||!navigationHydrated||!introSeen||previewMode){
+   setupRequest.current++;setSetupStatus(null);return;
+  }
+  void loadProfileSetup();
+  return()=>{setupRequest.current++};
+ },[game?.id,me?.user_id,g.profilesLoaded,navigationHydrated,introSeen,observer,previewMode,myProfile?.onboarding_completed_at]);
+ const showSetupWelcome=!!onboardingRequired&&!!setupStatus&&!setupStatus.prompt_seen&&!setupStatus.completed&&!setupChecking&&introSeen&&!introOpen&&!previewMode;
+ const setupDialogRef=useDialog(showSetupWelcome,()=>{});
+ async function goToIncompleteProfile(){
+  if(!game||!me||setupPromptBusy)return;
+  setSetupPromptBusy(true);
+  const r=await supabase.rpc('mark_my_game_profile_setup_prompt_seen',{p_game:game.id});
+  if(r.error){
+   setOnboardingNotice('Не удалось сохранить первое знакомство: '+r.error.message);
+   setSetupPromptBusy(false);return;
+  }
+  setSetupStatus(prev=>prev?{...prev,prompt_seen:true}:prev);
+  setSelectedProfileId('');
+  navigate('profile');
+  setSetupFocusVersion(x=>x+1);
+  setSetupPromptBusy(false);
+ }
+
  useEffect(()=>{
   if(!game||!me||previewMode)return;
   let live=true;
@@ -375,8 +416,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(!game||!me||completingProfile)return;
   setCompletingProfile(true);setOnboardingNotice('');
   const r=await supabase.rpc('complete_my_game_profile',{p_game:game.id});
-  if(r.error){setOnboardingNotice('Проверьте обязательные поля: '+r.error.message)}
-  else{setOnboardingNotice('Профиль заполнен. Добро пожаловать в игру!');await g.refresh();navigate('dashboard',undefined,true)}
+  if(r.error){setOnboardingNotice('Проверьте обязательные поля: '+r.error.message);await loadProfileSetup();setSetupFocusVersion(x=>x+1)}
+  else{setOnboardingNotice('Профиль заполнен. Добро пожаловать в игру!');setSetupStatus({completed:true,prompt_seen:true,missing:[]});await g.refresh();navigate('dashboard',undefined,true)}
   setCompletingProfile(false);
  }
  function finishIntro(){
@@ -505,7 +546,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} createTemplate={currentScreen.templateKey} createStageNo={focusStage} onSelectDocument={rememberDocument} onOpenBudget={()=>navigate('budget')} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
      {view==='grades'&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
      {view==='actions'&&<PoliticalWallView g={vg} readOnly={previewMode||observer} focusPending={true} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
-     {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}}/>}
+     {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}} setupStatus={setupStatus} setupNotice={onboardingNotice} setupFocusVersion={setupFocusVersion} onProfileChanged={()=>void loadProfileSetup()} onFinishSetup={()=>void completeOnboarding()}/>}
      {view==='events'&&<EventWorkspace g={vg} readOnly={previewMode||observer}/>}
      {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onNavigate={destination=>navigate(destination)} onOpenProcesses={()=>navigate('actions')} onOpenStages={stageNo=>navigate('stages',{stageNo})}
        onOpenChat={channelId=>{g.setChannelId(channelId);g.setChatOpen(true)}}/>}
@@ -522,8 +563,18 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
-  {onboardingRequired&&introSeen&&!introOpen&&!previewMode&&<div className="onboardingBar" role="status"><div><strong>Первое знакомство с Республикой</strong><span>Обязательные поля: ФИО, пол, подпись, описание и подтверждённая почта с паролем.</span>{(onboardingNotice||introSyncError)&&<small>{onboardingNotice||introSyncError}</small>}</div><button type="button" disabled={completingProfile} onClick={()=>{setSelectedProfileId('');navigate('profile');void completeOnboarding()}}>{completingProfile?'Проверяем…':'Закончить настройку'}</button></div>}
-  <BlitzOverlay gameId={gameId} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired}/>
+  {showSetupWelcome&&setupStatus&&<div className="profileSetupBackdrop">
+    <section ref={setupDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="profile-setup-title" aria-describedby="profile-setup-description" className="profileSetupWelcome">
+     <div className="profileSetupWelcomeIcon"><UserRound size={26} aria-hidden="true"/></div>
+     <small className="profileSetupEyebrow">ГОС.ID · ПЕРВОЕ ЗНАКОМСТВО</small>
+     <h2 id="profile-setup-title">Первое знакомство с Республикой</h2>
+     <p id="profile-setup-description">Подготовьте личный профиль участника: заполните обязательные сведения, подтвердите почту и установите пароль.</p>
+     <div className="profileSetupProgress"><span>Заполнено {PROFILE_SETUP_FIELDS.length-setupStatus.missing.length} из {PROFILE_SETUP_FIELDS.length}</span><div className="profileSetupProgressTrack"><i style={{width:String((PROFILE_SETUP_FIELDS.length-setupStatus.missing.length)/PROFILE_SETUP_FIELDS.length*100)+'%'}}/></div></div>
+     <div className="profileSetupChecklist">{PROFILE_SETUP_FIELDS.map(field=><span key={field} className={!setupStatus.missing.includes(field)?'isDone':''}><span aria-hidden="true">{setupStatus.missing.includes(field)?'○':'✓'}</span>{PROFILE_SETUP_LABELS[field]}</span>)}</div>
+     {(onboardingNotice||introSyncError)&&<p role="alert" className="profileSetupModalError">{onboardingNotice||introSyncError}</p>}
+     <button type="button" className="primary profileSetupStart" disabled={setupPromptBusy} onClick={()=>void goToIncompleteProfile()}>{setupPromptBusy?'Открываем профиль…':'Перейти к заполнению'}</button>
+    </section>
+   </div>} <BlitzOverlay gameId={gameId} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired}/>
   <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={me?.kind==='student'&&!previewMode&&!introOpen}/>
   <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>
   <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k)}} onChat={()=>{setMobileMenuOpen(false);setChatOpen(!chatOpen)}} chatOpen={chatOpen} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
