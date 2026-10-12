@@ -28,6 +28,23 @@ for(const [type,value] of [['property="og:image"',previewUrl],['name="twitter:im
 }
 assert.ok(!html.includes('https://gos-sim1.vercel.app/share/gos-id-preview.jpg'),
  'Social preview must not point to Vercel on GitHub Pages');
+// Fresh social entry isolates new previews from old messenger URL caches.
+const visitHtml=readFileSync(join(out,'visit/index.html'),'utf8');
+const visitUrl=pagesUrl+'visit/';
+for(const [tag,value] of [
+ ['property="og:url"',visitUrl],
+ ['property="og:title"','ГОС.ID — Республиканская цифровая платформа'],
+ ['property="og:description"','Моделирование работы органов публичной власти России'],
+ ['property="og:image"',previewUrl],
+ ['property="og:image:secure_url"',previewUrl],
+ ['property="og:image:type"','image/jpeg'],
+ ['property="og:image:width"','1200'],
+ ['property="og:image:height"','632'],
+ ['name="twitter:card"','summary_large_image']
+])assert.ok(visitHtml.includes(tag)&&visitHtml.includes(value),'Invalid social entry: '+tag);
+assert.ok(visitHtml.includes('window.location.replace('),'Social entry must forward browsers to the game');
+assert.ok(!/симулятор/i.test(visitHtml),'Public sharing text must not use old branding');
+assert.ok(html.includes('Республиканская цифровая платформа'),'Root social title must be current');
 const fallback=readFileSync(join(out,'404.html'),'utf8');
 assert.ok(fallback.includes('window.location.replace(base+"/?game="'),'Legacy dynamic game routes should redirect to static game entry.');
 assert.ok(fallback.includes('^[0-9a-f]{8}'),'Only UUID game routes may redirect.');

@@ -35,23 +35,23 @@ import './brand-identity.css';
 import './topbar-controls-alignment.css';
 import './profile-first-setup.css';
 import type {Metadata} from 'next';
-import {BRAND_NAME,BRAND_TAGLINE} from '@/components/ui/BrandIdentity';
+import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
 
-const socialTitle=BRAND_NAME+' — '+BRAND_TAGLINE;
-const socialDescription='Моделируй. Анализируй. Принимай решения.';
+const socialTitle=BRAND_NAME+' — Республиканская цифровая платформа';
+const socialDescription='Моделирование работы органов публичной власти России, подготовка законов и принятие государственных решений.';
 const socialPreview='/share/gos-id-preview.jpg';
 
 export const metadata:Metadata={
  metadataBase:new URL('https://gos-sim1.vercel.app'),
  title:socialTitle,
- description:'Цифровая платформа России: политический процесс, НПА, голосования, партии, аналитика и государственное управление.',
+ description:socialDescription,
  applicationName:BRAND_NAME,
  openGraph:{
   type:'website',locale:'ru_RU',url:'/',siteName:BRAND_NAME,
   title:socialTitle,description:socialDescription,
-  images:[{url:socialPreview,width:1200,height:632,alt:BRAND_NAME+' — '+BRAND_TAGLINE}]
+  images:[{url:socialPreview,width:1200,height:632,alt:socialTitle}]
  },
  twitter:{card:'summary_large_image',title:socialTitle,description:socialDescription,images:[socialPreview]},
  other:{'gos-sims-release':(process.env.VERCEL_GIT_COMMIT_SHA||process.env.GITHUB_SHA)?.slice(0,8)||'local'}
