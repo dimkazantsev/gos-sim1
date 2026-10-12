@@ -214,3 +214,59 @@
  .wallPost.bulkSelecting>header{grid-template-columns:32px 38px minmax(0,1fr);gap:7px}
  .wallPost.bulkSelecting>header .postStatus{grid-column:3}
 }
+
+
+/* Political post headers: stable explicit slots for author/status, with or
+   without teacher bulk selection. Long government names wrap inside the card. */
+.wallPost>header{
+ grid-template-columns:42px minmax(0,1fr) max-content;
+ grid-template-areas:"avatar author status";
+ min-width:0;
+}
+.wallPost>header>.wallPostAvatar{grid-area:avatar}
+.wallPost>header>.wallPostWho{
+ grid-area:author;
+ min-width:0;
+ max-width:100%;
+ overflow-wrap:anywhere;
+}
+.wallPost>header>.wallPostWho b,
+.wallPost>header>.wallPostWho small{
+ min-width:0;
+ overflow-wrap:anywhere;
+}
+.wallPost>header>.wallPostWho small{line-height:1.5}
+.wallPost>header>.postStatus{
+ grid-area:status;
+ grid-column:auto;
+ justify-self:end;
+ align-self:center;
+ max-width:100%;
+ width:max-content;
+ white-space:nowrap;
+ line-height:1.3;
+ text-align:center;
+}
+.wallPost.bulkSelecting>header{
+ grid-template-columns:36px 42px minmax(0,1fr) max-content;
+ grid-template-areas:"select avatar author status";
+}
+.wallPost.bulkSelecting>header>.wallBulkPostSelect{grid-area:select}
+@media(max-width:650px){
+ .wallPost>header{
+  grid-template-columns:38px minmax(0,1fr);
+  grid-template-areas:"avatar author" ". status";
+  align-items:start;
+  gap:7px 9px;
+ }
+ .wallPost.bulkSelecting>header{
+  grid-template-columns:32px 38px minmax(0,1fr);
+  grid-template-areas:"select avatar author" ". . status";
+  gap:7px;
+ }
+ .wallPost>header>.postStatus{
+  grid-column:auto;
+  justify-self:start;
+  align-self:start;
+ }
+}
