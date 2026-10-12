@@ -92,4 +92,4 @@ const server=http.createServer(async(req,res)=>{
   json(res,404,{error:'Страница Не Найдена'});
  }catch(error){json(res,400,{error:error.message||'Ошибка Сеанса'})}
 });
-server.listen(port,host,()=>{console.log('GOS//SIMS: http://localhost:'+port);console.log('Код Преподавателя: '+teacherCode);console.log('Код Участников: '+studentCode);console.log('Гость Не Требует Кода. Прогресс Сохраняется В Progress.json.');});
+server.listen(port,host,()=>{console.log('ГОС.ID: http://localhost:'+port);console.log('Код Преподавателя: '+teacherCode);console.log('Код Участников: '+studentCode);console.log('Гость Не Требует Кода. Прогресс Сохраняется В Progress.json.');});

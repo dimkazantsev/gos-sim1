@@ -1,4 +1,4 @@
-# GOS//SIMS production client
+# ГОС.ID production client
 
 ## Setup
 

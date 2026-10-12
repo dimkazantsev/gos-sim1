@@ -36,14 +36,14 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
    const suffix=s.game_code.replace(/[^a-zA-Zа-яА-Я0-9-]/g,'_');
    if(format==='zip'){
     const blob=await downloadFullGameArchive(s.id,(done,total)=>setProgress('Файлов включено: '+done+' из '+total));
-    saveGameBlob(blob,'GOS-SIMS-'+suffix+'-full.zip');
+    saveGameBlob(blob,'GOS-ID-'+suffix+'-full.zip');
    }else{
     const r=await supabase.rpc('export_game_data',{p_game:s.id});
     if(r.error)throw r.error;
     if(format==='html'){
      const portable=await preparePortableSession(r.data as SessionArchive);
-     saveGameBlob(new Blob([portable.html],{type:'text/html'}),'GOS-SIMS-'+suffix+'.html');
-    }else saveGameBlob(new Blob([JSON.stringify(r.data,null,2)],{type:'application/json'}),'GOS-SIMS-'+suffix+'.json');
+     saveGameBlob(new Blob([portable.html],{type:'text/html'}),'GOS-ID-'+suffix+'.html');
+    }else saveGameBlob(new Blob([JSON.stringify(r.data,null,2)],{type:'application/json'}),'GOS-ID-'+suffix+'.json');
    }
    if(format==='zip')setBackedUp(old=>old.includes(s.id)?old:[...old,s.id]);
    setNotice('Архив сформирован и передан браузеру. Проверьте, что файл действительно сохранился перед удалением.');
