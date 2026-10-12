@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="GOS//SIMS">
- <rect width="128" height="128" rx="31" fill="#2453e6"/>
- <path d="M39 91 61 37M67 91 89 37" fill="none" stroke="#f0a6cb" stroke-width="13" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="ГОС.ID">
+ <rect width="128" height="128" rx="28" fill="#2354E6"/>
+ <text x="11" y="70" font-family="Arial,DejaVu Sans,sans-serif" font-size="34" font-weight="900" letter-spacing="-1.5" fill="#FFFFFF">ГОС</text>
+ <text x="16" y="102" font-family="Arial,DejaVu Sans,sans-serif" font-size="41" font-weight="900" letter-spacing="-2" fill="#F29BC4">.ID</text>
+ <path d="M99 22l8-9m-5 23 9-11" stroke="#F29BC4" stroke-width="4" stroke-linecap="round"/>
 </svg>
