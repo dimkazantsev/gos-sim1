@@ -36,6 +36,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  const allocation=party?partyMandates.find(x=>x.party_id===party.id&&x.user_id===target?.user_id):undefined;
  const pendingInvites=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  const [tasksOpen,setTasksOpen]=useState(false);
+ useEffect(()=>{if(typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('tasks')==='1')setTasksOpen(true)},[game?.id]);
  const [bio,setBio]=useState(targetProfile?.bio||'');
  const [fullName,setFullName]=useState(target?.full_name||'');
  const [gender,setGender]=useState<'male'|'female'|'unspecified'>(targetProfile?.gender||'unspecified');
