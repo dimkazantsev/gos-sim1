@@ -49,6 +49,12 @@ async function mockTransport(context,page,f){
    case 'delete_budget_simulator_draft':{const idx=f.plans.findIndex(x=>x.id===p.p_plan_id&&x.status==='draft'&&!x.document_id);assert(idx>=0,'Only a draft may be deleted');assert.equal(f.plans[idx].revision,p.p_revision);f.plans.splice(idx,1);response=true;break;}
    case 'get_budget_simulator':response={state:f.state,plans:f.plans,requests:f.requests,contracts:f.contracts,ledger:[],can_prepare:true,can_request:true,event_count:f.regional_events.length,regional_events:f.regional_events};break;
    case 'get_signed_state_program_budget':response=f.programmes.map(x=>({...x.program,ministry:x.program.responsible_ministry,program_status:x.program.status,indicators:x.indicators,expense_breakdown:x.expense_breakdown,years:[{year:x.commitment.budget_year,amount:x.commitment.amount,status:x.commitment.status}]}));break;
+   case 'get_budget_change_registry_page':{
+    const samples=Array.from({length:12},(_,i)=>({entry_key:'income:'+(i+1),category:'Доходы',title:'Изменение доходов '+(i+1),status:'Сохранено',changed_at:'2026-10-12T12:00:00Z',actor_id:null,document_id:null,details:'Доходы федерального бюджета',amount:i+1}));
+    const ordered=p.p_focus?[...samples].sort((a,b)=>Number(b.entry_key===p.p_focus)-Number(a.entry_key===p.p_focus)):samples;
+    const filtered=ordered.filter(e=>(!p.p_category||e.category===p.p_category)&&(!p.p_query||e.title.toLowerCase().includes(p.p_query.toLowerCase())));
+    response={entries:filtered.slice(p.p_offset,p.p_offset+Math.min(10,p.p_limit)),total:filtered.length,categories:['Доходы']};break;
+   }
    case 'get_budget_amendments':response={party_ids:[],can_open:true,can_apply:true,can_submit_neutral:true,amendments:[]};break;
    case 'start_regional_case':{const event=f.regional_events.find(e=>e.id===p.p_case_id);assert(event,'Only an actual regional event can be selected');event.assigned=true;event.status='assigned';response='qa-assignment-'+event.id;break;}
    case 'create_budget_event_transfer_request':{
@@ -107,6 +113,18 @@ async function main(){
    page.on('pageerror',e=>errors.push(e.message));await mockTransport(context,page,f);
    await loadPage(page,width);await page.addStyleTag({content:'nextjs-portal{display:none!important}'});
    const sim=page.getByRole('region',{name:'Федеральный бюджетный симулятор'});await sim.locator('[data-budget-kpi=income]').waitFor();
+   if(width===320){
+    const registry=page.locator('.budgetChangeRegistry'),disclose=registry.getByRole('button',{name:/Реестр изменений бюджета/});
+    assert.equal(f.calls.filter(c=>c.rpc==='get_budget_change_registry_page').length,0,'Closed registry does not request data');
+    assert.equal(await disclose.getAttribute('aria-expanded'),'false','Registry starts collapsed');
+    await disclose.click();await registry.locator('.budgetChangeRegistryEntry').first().waitFor();
+    assert.equal(await registry.locator('.budgetChangeRegistryEntry').count(),10,'Initially only ten rows are transferred and rendered');
+    assert.equal(f.calls.filter(c=>c.rpc==='get_budget_change_registry_page')[0].p_limit,10,'Server request has a ten-item limit');
+    await registry.getByRole('button',{name:'Показать ещё 2'}).click();
+    await page.waitForFunction(()=>document.querySelectorAll('.budgetChangeRegistryEntry').length===12);
+    await disclose.click();assert.equal(await disclose.getAttribute('aria-expanded'),'false','Disclosure closes without losing budget state');
+   }
+
    const nav=sim.getByRole('tablist',{name:'Разделы бюджетного расчёта'}),tabs=await nav.getByRole('tab').allTextContents();assert.deepEqual(tabs.map(s=>s.replace(/\s+/g,' ').trim().replace(/^\d+\s*/,'')),['Доходы','Регионы','Расходы','Баланс','Проект ФЗ']);
    await openTab(page,'Доходы');await layout(page,'income '+width);await sim.screenshot({path:path.join(output,'income-'+width+'.png')});
    assert.equal(await sim.getByRole('table',{name:/Доходы/}).count(),1,'Revenue is a real table');assert.equal(await sim.locator('[data-budget-income-detail]').count(),12,'Each revenue article shows its own formula');
