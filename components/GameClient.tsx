@@ -222,12 +222,15 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  },[navigationHydrated,g.me?.user_id,gameId]);
  async function shareCurrentScreen(){
   const u=new URL(window.location.href);
+  // GitHub Pages serves one static HTML for all ?section=... links. Share the
+  // dedicated public preview page, which forwards users to the same section.
+  if(u.hostname==='dimkazantsev.github.io'&&u.pathname.startsWith('/gos-sim1/'))u.pathname='/gos-sim1/visit/';
   u.search='';u.hash='';u.searchParams.set('section',currentScreen.view);
   if(currentScreen.stageNo)u.searchParams.set('stage',String(currentScreen.stageNo));
   if(currentScreen.documentId)u.searchParams.set('document',currentScreen.documentId);
   if(currentScreen.voteId)u.searchParams.set('vote',currentScreen.voteId);
   try{
-   if(navigator.share){await navigator.share({title:'ГОС.ID — '+currentScreen.view,url:u.toString()});return}
+   if(navigator.share){await navigator.share({title:'ГОС.ID — Цифровая платформа России',url:u.toString()});return}
    await navigator.clipboard.writeText(u.toString());
    window.alert('Ссылка скопирована. Доступна участникам этой игры.');
   }catch(e){if((e as Error).name!=='AbortError')window.alert('Не удалось отправить ссылку.')}
