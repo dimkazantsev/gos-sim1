@@ -25,4 +25,24 @@ export async function telegramSend(token:string,chatId:number|string,text:string
 export async function telegramAcknowledge(token:string,callbackId:string){
  await telegramApi(token,'answerCallbackQuery',{callback_query_id:callbackId});
 }
+/**
+ * Upload the existing, approved ГОС.ID social brand image as a profile photo.
+ * Bot API InputProfilePhotoStatic only accepts a newly uploaded JPG, not an SVG URL.
+ */
+export async function telegramSetProfilePhoto(token:string){
+ const logoUrl='https://dimkazantsev.github.io/gos-sim1/share/gos-id-preview.jpg';
+ const imageResponse=await fetch(logoUrl,{cache:'no-store',signal:AbortSignal.timeout(12000)});
+ if(!imageResponse.ok||!(imageResponse.headers.get('content-type')||'').includes('image/jpeg'))
+  throw new Error('Approved bot brand image unavailable');
+ const image=await imageResponse.arrayBuffer();
+ if(image.byteLength<1000||image.byteLength>5_000_000)throw new Error('Approved brand image size is invalid');
+ const form=new FormData();
+ form.append('photo',JSON.stringify({type:'static',photo:'attach://logo'}));
+ form.append('logo',new Blob([image],{type:'image/jpeg'}),'gos-id.jpg');
+ const response=await fetch('https://api.telegram.org/bot'+token+'/setMyProfilePhoto',{
+  method:'POST',body:form,signal:AbortSignal.timeout(15000)
+ });
+ const data=await response.json() as {ok?:boolean;description?:string};
+ if(!response.ok||!data.ok)throw new Error('Telegram rejected the approved brand image: '+(data.description||'Unknown error'));
+}
 export function gameUrl(gameId:string){return (process.env.NEXT_PUBLIC_GAME_URL||'https://gos-sim1.vercel.app').replace(/\/$/,'')+'/game/'+encodeURIComponent(gameId);}
