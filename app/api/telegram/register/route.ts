@@ -25,6 +25,9 @@ export async function POST(request:Request){
   });
   // Native Telegram Menu button remains available in every private chat.
   // Registration is teacher-authorized, repeatable, and does not mutate game data.
+  await telegramApi(config.token,'setMyName',{name:'ГОС.ID',language_code:''});
+  // Reapply for Russian clients, including users who had a localized bot name.
+  await telegramApi(config.token,'setMyName',{name:'ГОС.ID',language_code:'ru'});
   await telegramApi(config.token,'setMyCommands',{
    commands:TELEGRAM_COMMANDS,scope:{type:'all_private_chats'}
   });
