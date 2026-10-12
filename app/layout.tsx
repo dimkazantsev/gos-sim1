@@ -39,7 +39,7 @@ import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
 
-const socialTitle=BRAND_NAME+' — Республиканская цифровая платформа';
+const socialTitle=BRAND_NAME+' — Цифровая платформа России';
 const socialDescription='Моделирование работы органов публичной власти России, подготовка законов и принятие государственных решений.';
 const socialPreview='/share/gos-id-preview.jpg';
 
