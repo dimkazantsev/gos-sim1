@@ -375,7 +375,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  },[previewStudent?.user_id]);
 
 
- if(loading||!game||!me||!shownMe||!navigationHydrated)return <main className="connectionPage"><section className="connectionCard" aria-live="polite"><span className="wordmark">GOS//SIMS</span>{!error&&<div className="spinner"/>}<h1>{error?'Не удалось открыть игру':'Подключаемся к республике'}</h1><p>{error||'Загружаем этапы, команды и последние события.'}</p>{error&&<div><button className="primary" onClick={()=>window.location.reload()}>Попробовать снова</button><a className="secondary" href="/">Вернуться ко входу</a></div>}</section></main>;
+ if(loading||!game||!me||!shownMe||!navigationHydrated)return <main className="connectionPage"><section className="connectionCard" aria-live="polite"><span className="wordmark">ГОС.ID</span>{!error&&<div className="spinner"/>}<h1>{error?'Не удалось открыть игру':'Подключаемся к республике'}</h1><p>{error||'Загружаем этапы, команды и последние события.'}</p>{error&&<div><button className="primary" onClick={()=>window.location.reload()}>Попробовать снова</button><a className="secondary" href="/">Вернуться ко входу</a></div>}</section></main>;
 
  const nav:[View,string][]=[['dashboard','Обзор игры'],['stages','Этапы и задачи'],['actions','Политический процесс'],['parties',teacher&&!previewMode?'Партии':'Моя партия'],['votes','Голосования'],['documents','Реестр НПА'],['budget','Бюджет'],['grades','Оценки и разбор'],['events','События и ситуации'],...(teacher&&!previewMode?[['teacher','Управление'] as [View,string]]:[]),['profile','Мой профиль']];
 
@@ -399,8 +399,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   <a className="skipLink" href="#game-main">Перейти к содержимому</a>
   <aside className="simSidebar">
    <div className="sidebarBrand">
-    <div className="brandMark" aria-hidden="true">g<span>//</span>ss</div>
-    <div><b>GOS<span>//</span>SIMS</b><small>Республика Политология</small></div>
+    <img className="brandMark gosIdLogo" src="/brand/gos-id-blue.svg" alt=""/>
+    <div className="gosIdSidebarText"><b>ГОС<span>.ID</span></b><small>// Цифровая платформа Российской Федерации</small></div>
    </div>
 
    <section className="sidebarStage">
@@ -429,7 +429,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
   <div className={'simWorkspace '+(chatOpen?'chatOpen':'')}>
    <header className="simTop">
-    <div className="mobileBrand"><div className="brandMark" aria-hidden="true">g<span>//</span>ss</div><b>GOS//SIMS</b></div>
+    <div className="mobileBrand"><img className="brandMark gosIdLogo" src="/brand/gos-id-pink.svg" alt=""/><b>ГОС<span className="gosIdTextAccent">.ID</span></b></div>
     <nav className="topScreenHistory" aria-label="История разделов">
      <button type="button" className="screenHistoryButton" onClick={()=>moveHistory(backIndex)} disabled={backIndex<0} aria-label="Вернуться к предыдущему экрану" title="Назад"><ChevronLeft aria-hidden="true"/></button>
      <button type="button" className="screenHistoryButton" onClick={()=>moveHistory(forwardIndex)} disabled={forwardIndex<0} aria-label="Перейти к следующему экрану" title="Вперёд"><ChevronRight aria-hidden="true"/></button>
