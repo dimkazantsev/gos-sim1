@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
 import {runtimeConfig,telegramSend} from '@/lib/server/telegram';
-import {telegramSectionButtons,telegramDocumentButtons} from '@/lib/server/telegramPresentation';
+import {telegramSectionButtons,telegramDocumentButtons,telegramTaskButtons,telegramChatButtons} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
 export async function GET(request:Request){
  let config:ReturnType<typeof runtimeConfig>;try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
@@ -23,10 +23,10 @@ export async function GET(request:Request){
    buttons=telegramDocumentButtons([{id:delivery.document_id,title:'Открыть документ'}]);
   }else if(job.category==='document'){
    buttons=telegramDocumentButtons([{id:job.source_id,title:'Открыть документ'}]);
-  }else if(job.category==='task'||job.category==='task_done')buttons=telegramSectionButtons('profile','Мои поручения');
+  }else if(job.category==='task'||job.category==='task_done')buttons=telegramTaskButtons();
   else if(job.category==='mention_actions')buttons=telegramSectionButtons('actions','Открыть обсуждение');
   else if(job.category==='mention_documents')buttons=telegramSectionButtons('documents','Открыть документы');
-  else if(job.category==='chat'||job.category==='mention_chat')buttons=telegramSectionButtons('dashboard','Открыть чат');
+  else if(job.category==='chat'||job.category==='mention_chat')buttons=telegramChatButtons(job.channel_id||undefined);
   else if(job.category==='stage')buttons=telegramSectionButtons('stages','Открыть этап');
   else if(job.category==='vote')buttons=telegramSectionButtons('votes','Открыть голосование');
   try{await telegramSend(config.token,link.chat_id,job.body,buttons);await config.db.from('telegram_outbox').update({sent_at:new Date().toISOString(),last_error:null}).eq('id',job.id);sent++}
