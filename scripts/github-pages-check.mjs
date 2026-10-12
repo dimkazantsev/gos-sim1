@@ -12,6 +12,22 @@ for(const file of files(out).filter(x=>x.endsWith('.html'))){
   refs.add(relative);assert.ok(existsSync(join(out,relative))||existsSync(join(out,relative,'index.html')),'Missing asset: '+relative);
  }
 }
+// Public link previews must be served from this same GitHub Pages domain,
+// not from the separate Vercel deployment. Test the exported HTML and bytes.
+const html=readFileSync(join(out,'index.html'),'utf8');
+const pagesOrigin='https://dimkazantsev.github.io';
+const pagesUrl=pagesOrigin+base+'/';
+const previewUrl=pagesOrigin+base+'/share/gos-id-preview.jpg';
+const imagePath=join(out,'share/gos-id-preview.jpg');
+assert.ok(existsSync(imagePath),'Approved share image must be exported to GitHub Pages');
+const jpeg=readFileSync(imagePath);
+assert.ok(jpeg.length>20000&&jpeg[0]===0xff&&jpeg[1]===0xd8,'Social preview must be a nonempty JPEG');
+for(const [type,value] of [['property="og:image"',previewUrl],['name="twitter:image"',previewUrl],['property="og:url"',pagesUrl]]){
+ assert.ok(html.includes(type),'Missing social tag '+type);
+ assert.ok(html.includes(value),'Missing GitHub Pages social URL '+value);
+}
+assert.ok(!html.includes('https://gos-sim1.vercel.app/share/gos-id-preview.jpg'),
+ 'Social preview must not point to Vercel on GitHub Pages');
 const fallback=readFileSync(join(out,'404.html'),'utf8');
 assert.ok(fallback.includes('window.location.replace(base+"/?game="'),'Legacy dynamic game routes should redirect to static game entry.');
 assert.ok(fallback.includes('^[0-9a-f]{8}'),'Only UUID game routes may redirect.');
