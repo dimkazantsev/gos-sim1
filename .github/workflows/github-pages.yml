@@ -2,6 +2,13 @@ name: Public game on GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
+    paths:
+      - 'scripts/prepare-github-pages.mjs'
+      - 'scripts/github-pages-check.mjs'
+      - 'public/share/gos-id-preview.jpg'
+      - 'app/layout.tsx'
+      - '.github/workflows/github-pages.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -33,6 +40,7 @@ jobs:
         with:
           path: .pages-build/out
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-24.04
     environment:
