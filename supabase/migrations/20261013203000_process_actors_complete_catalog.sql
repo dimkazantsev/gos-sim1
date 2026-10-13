@@ -138,7 +138,7 @@ begin
   order by u.title,u.id loop
   result:=result||jsonb_build_array(jsonb_build_object('key','unit:'||a.id::text,'label',a.title));
  end loop;
- for a in select gp.id,gp.name from public.game_parties gp
+ for a in select gp.id,gp.name,gp.mandates from public.game_parties gp
   join public.game_members gm on gm.game_id=p_game_id and gm.user_id=v_uid
   where gp.game_id=p_game_id and (v_teacher or gp.leader_user_id=v_uid
     or lower(gp.name)=lower(coalesce(gm.team,'')) or exists(
@@ -146,6 +146,9 @@ begin
        and ia.party_id=gp.id and ia.user_id=v_uid))
   order by gp.name,gp.id loop
   result:=result||jsonb_build_array(jsonb_build_object('key','party:'||a.id::text,'label',a.name));
+  if coalesce(a.mandates,0)>0 then
+   result:=result||jsonb_build_array(jsonb_build_object('key','faction:'||a.id::text,'label','Фракция «'||a.name||'»'));
+  end if;
  end loop;
  for a in select id from public.game_office_assignments
   where game_id=p_game_id and (v_teacher or user_id=v_uid) and status='active'
