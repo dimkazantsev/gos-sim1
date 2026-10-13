@@ -26,23 +26,40 @@ export async function telegramAcknowledge(token:string,callbackId:string){
  await telegramApi(token,'answerCallbackQuery',{callback_query_id:callbackId});
 }
 /**
- * Upload the existing, approved ГОС.ID social brand image as a profile photo.
- * Bot API InputProfilePhotoStatic only accepts a newly uploaded JPG, not an SVG URL.
+ * A Telegram profile photo must be a newly uploaded JPEG (never a URL/file_id).
+ * The authorized teacher provides a JPEG rendered from the approved ID vector.
+ * We verify JPEG structure and exact 1024×1024 dimensions before uploading.
  */
-export async function telegramSetProfilePhoto(token:string){
- const logoUrl='https://dimkazantsev.github.io/gos-sim1/share/gos-id-preview.jpg';
- const imageResponse=await fetch(logoUrl,{cache:'no-store',signal:AbortSignal.timeout(12000)});
- if(!imageResponse.ok||!(imageResponse.headers.get('content-type')||'').includes('image/jpeg'))
-  throw new Error('Approved bot brand image unavailable');
- const image=await imageResponse.arrayBuffer();
- if(image.byteLength<1000||image.byteLength>5_000_000)throw new Error('Approved brand image size is invalid');
+export async function telegramSetProfilePhoto(token:string,base64:string){
+ if(typeof base64!=='string'||base64.length<1000||base64.length>1_000_000||
+    !/^[A-Za-z0-9+/]+={0,2}$/.test(base64))throw new Error('Некорректные данные эмблемы ГОС.ID');
+ const image=Buffer.from(base64,'base64');
+ if(image.length<1000||image.length>750_000||image[0]!==0xff||image[1]!==0xd8||
+    image[image.length-2]!==0xff||image[image.length-1]!==0xd9)
+  throw new Error('Ожидается JPEG-эмблема ГОС.ID');
+ let sizeOk=false;
+ for(let offset=2;offset+10<image.length;){
+  if(image[offset]!==0xff)break;
+  while(image[offset]===0xff)offset++;
+  const marker=image[offset++];
+  if(marker===0xda||marker===0xd9)break;
+  if(marker===0x01||(marker>=0xd0&&marker<=0xd7))continue;
+  if(offset+2>image.length)break;
+  const length=image.readUInt16BE(offset);
+  if(length<2||offset+length>image.length)break;
+  if([0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9,0xca,0xcb].includes(marker)&&length>=7){
+   sizeOk=image.readUInt16BE(offset+3)===1024&&image.readUInt16BE(offset+5)===1024;
+   break;
+  }
+  offset+=length;
+ }
+ if(!sizeOk)throw new Error('Для бота необходима квадратная эмблема 1024 × 1024');
  const form=new FormData();
  form.append('photo',JSON.stringify({type:'static',photo:'attach://logo'}));
- form.append('logo',new Blob([image],{type:'image/jpeg'}),'gos-id.jpg');
+ form.append('logo',new Blob([new Uint8Array(image)],{type:'image/jpeg'}),'gos-id-1024.jpg');
  const response=await fetch('https://api.telegram.org/bot'+token+'/setMyProfilePhoto',{
-  method:'POST',body:form,signal:AbortSignal.timeout(15000)
+  method:'POST',body:form,signal:AbortSignal.timeout(18000)
  });
  const data=await response.json() as {ok?:boolean;description?:string};
  if(!response.ok||!data.ok)throw new Error('Telegram rejected the approved brand image: '+(data.description||'Unknown error'));
 }
-

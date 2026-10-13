@@ -32,6 +32,8 @@ on:
       - 'app/api/telegram/dispatch/route.ts'
       - 'scripts/telegram-onboarding-check.cjs'
       - 'scripts/telegram-expanded-check.cjs'
+      - 'components/game/telegramBotAvatar.ts'
+      - 'scripts/telegram-bot-avatar-check.cjs'
       - 'components/game/AssignedTasks.tsx'
       - 'components/game/CivicDiscussion.tsx'
       - 'lib/server/telegramPresentation.ts'
@@ -124,6 +126,7 @@ jobs:
       - run: node scripts/chat-media-transport-check.cjs
       - run: node scripts/telegram-onboarding-check.cjs
       - run: node scripts/telegram-expanded-check.cjs
+      - run: node scripts/telegram-bot-avatar-check.cjs
       - run: node scripts/event-option-legality-check.cjs
       - run: npm run design:check
       - run: node scripts/interface-contract-check.cjs

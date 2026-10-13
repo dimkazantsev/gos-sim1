@@ -11,8 +11,12 @@ export async function POST(request:Request){
  if(!header.startsWith('Bearer '))return NextResponse.json({error:'Требуется вход в игру.'},{status:401});
  const {data:{user},error:authError}=await config.db.auth.getUser(header.slice(7));
  if(authError||!user)return NextResponse.json({error:'Невозможно проверить пользователя.'},{status:401});
- let gameId:string|undefined;
- try{const body=await request.json() as {gameId?:unknown};gameId=typeof body.gameId==='string'?body.gameId:undefined}catch{}
+ let gameId:string|undefined,avatarJpegBase64:string|undefined;
+ try{
+  const body=await request.json() as {gameId?:unknown;avatarJpegBase64?:unknown};
+  gameId=typeof body.gameId==='string'?body.gameId:undefined;
+  avatarJpegBase64=typeof body.avatarJpegBase64==='string'?body.avatarJpegBase64:undefined;
+ }catch{}
  if(!gameId||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(gameId))
  return NextResponse.json({error:'Не указана игра.'},{status:400});
  const {data:member,error:memberError}=await config.db.from('game_members').select('kind').eq('game_id',gameId).eq('user_id',user.id).is('roster_archived_at',null).maybeSingle();
@@ -41,7 +45,7 @@ export async function POST(request:Request){
    description:'🏛 ГОС.ID — Цифровая платформа России.\n\nПолучайте уведомления о жизни республики, следите за государственными решениями, голосованиями, этапами и документами.\n\n🚀 Нажмите «Начать», чтобы открыть меню.\n🔐 Для игровых уведомлений привяжите Telegram в личном профиле ГОС.ID.'
   });
   let logoApplied=true;
-  try{await telegramSetProfilePhoto(config.token)}
+  try{await telegramSetProfilePhoto(config.token,avatarJpegBase64||'')}
   catch(e){logoApplied=false;console.error('Telegram brand avatar was not applied',e instanceof Error?e.message:'unknown')}
   return NextResponse.json({ok:true,url:webhook,menu:true,logo:logoApplied});
  }catch(e){console.error('Telegram setup failed',e instanceof Error?e.message:'unknown');return NextResponse.json({error:'Telegram не подтвердил полную настройку webhook и меню. Повторите активацию.'},{status:502})}
