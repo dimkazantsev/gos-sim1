@@ -8,7 +8,7 @@ import {userError} from '@/lib/userError';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import ComicSoundButton from './ComicSoundButton';
 import styles from './RepublicComic.module.css';
-import {COMIC_THEMES,comicSlides,comicStages,type ComicChapter,type ComicFact} from './stageComicModel';
+import {COMIC_THEMES,comicSlides,comicStages,teacherComicPreviews,type ComicChapter,type ComicFact} from './stageComicModel';
 const SCENES=[
  {kicker:'ПРОЛОГ · ДЕНЬ НОЛЬ',title:'Республика после бури',body:'Вы пришли к власти не в идеальном государстве. Заводы простаивают, мосты требуют ремонта, бюджет трещит по швам, а граждане больше не верят красивым обещаниям.',stamp:'ДОВЕРИЕ: КРИТИЧЕСКОЕ',caption:'Начало не будет лёгким.'},
  {kicker:'ГЛАВА 01 · ПЕРВЫЙ СИГНАЛ',title:'Казна почти пуста',body:'У вас есть кабинеты, законы, партии и огромное количество вопросов. Деньги заканчиваются быстрее совещаний. Каждая программа забирает ресурсы у другой.',stamp:'РЕСУРСЫ: ОГРАНИЧЕНЫ',caption:'Цена любого решения реальна — хотя республика и вымышленная.'},
@@ -90,15 +90,16 @@ function ArchiveCover({chapter}:{chapter:Chapter}){
 }
 type ComicView='intro'|'archive'|'chapter';
 type ArchiveState={gameId:string;chapters:Chapter[];loading:boolean;error:string};
-export default function RepublicComic({open,onClose,intro=false,gameId,initialView='intro',initialChapter}:{
- open:boolean;onClose:()=>void;intro?:boolean;gameId?:string;initialView?:'intro'|'archive';initialChapter?:ComicChapter;
+export default function RepublicComic({open,onClose,intro=false,gameId,initialView='intro',initialChapter,teacherPreview=false}:{
+ open:boolean;onClose:()=>void;intro?:boolean;gameId?:string;initialView?:'intro'|'archive';initialChapter?:ComicChapter;teacherPreview?:boolean;
 }){
  const [view,setView]=useState<ComicView>(initialChapter?'chapter':intro?'intro':initialView);
  const [archive,setArchive]=useState<ArchiveState>({gameId:'',chapters:[],loading:false,error:''});
  const [chapterId,setChapterId]=useState(initialChapter?.id||''),[scene,setScene]=useState(0),[playing,setPlaying]=useState(!!initialChapter||intro||initialView==='intro');
  const [motionRequested,setMotionRequested]=useState(false);
  const reader=useRef<HTMLDivElement>(null),closeRef=useRef(onClose);closeRef.current=onClose;
- const chapters=archive.gameId===gameId?archive.chapters:[];
+ const savedChapters=archive.gameId===gameId?archive.chapters:[];
+ const chapters=teacherPreview&&gameId?[...savedChapters,...teacherComicPreviews(gameId,savedChapters)].sort((a,b)=>a.stage_no-b.stage_no):savedChapters;
  const chapter=chapters.find(c=>c.id===chapterId)||(initialChapter?.id===chapterId?initialChapter:undefined),chapterIndex=chapters.findIndex(c=>c.id===chapterId);
  const showingArchive=!intro&&view==='archive',showingChapter=!intro&&view==='chapter'&&!!chapter;
  const cinematicChapter=showingChapter&&chapter.snapshot?.version===2;
@@ -141,9 +142,9 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
  function next(){if(cinematicChapter){if(scene<sceneCount-1)go(scene+1);else if(initialChapter)close();else openArchive()}else if(showingChapter){if(chapterIndex<chapters.length-1)readChapter(chapters[chapterIndex+1].id);else openArchive()}else if(scene===SCENES.length-1)close();else go(scene+1)}
  if(!open||typeof document==='undefined')return null;
  const item=showingChapter?{
-  kicker:chapter.stage_no===16?'ЭПИЛОГ · ИТОГИ ИГРЫ':(chapter.kind==='completed'?'Итоги':'Анонс')+' · '+(cinematicChapter&&comicStages(chapter.stage_no).length===2?'Этапы '+comicStages(chapter.stage_no).join(' и '):'Этап '+chapter.stage_no),
-  title:cinematicChapter?slide.title:chapter.title,body:cinematicChapter?slide.body:chapter.body,stamp:chapter.kind==='completed'?'Итоги сохранены':'Следующий этап',
-  caption:chapter.snapshot?.source==='reconstructed'?'Сводка по сохранённым данным. Этап завершён до обновления комиксов.':chapter.kind==='completed'?'Фактический результат на момент завершения этапа.':'Задачи следующего этапа.'
+  kicker:chapter.kind==='preview'?'ПРЕДПРОСМОТР · ТОЛЬКО ПРЕПОДАВАТЕЛЬ':chapter.stage_no===16?'ЭПИЛОГ · ИТОГИ ИГРЫ':(chapter.kind==='completed'?'Итоги':'Анонс')+' · '+(cinematicChapter&&comicStages(chapter.stage_no).length===2?'Этапы '+comicStages(chapter.stage_no).join(' и '):'Этап '+chapter.stage_no),
+  title:cinematicChapter?slide.title:chapter.title,body:cinematicChapter?slide.body:chapter.body,stamp:chapter.kind==='preview'?'МАКЕТ · БЕЗ РЕЗУЛЬТАТОВ':chapter.kind==='completed'?'Итоги сохранены':'Следующий этап',
+  caption:chapter.kind==='preview'?'Макет для проверки преподавателем. Пока этап не завершён, реальные результаты не сформированы.':chapter.snapshot?.source==='reconstructed'?'Сводка по сохранённым данным. Этап завершён до обновления комиксов.':chapter.kind==='completed'?'Фактический результат на момент завершения этапа.':'Задачи следующего этапа.'
  }:SCENES[scene];
  return createPortal(<div className={'comicBackdrop '+styles.backdrop} onMouseDown={e=>{if(e.target===e.currentTarget&&!intro)close()}}>
   <section ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" data-automatic-comic={initialChapter?'true':undefined} aria-label="Комикс о Республике" className={'comicDialog '+styles.dialog} onKeyDown={e=>{
@@ -162,7 +163,7 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
     <button type="button" aria-pressed={showingArchive} onClick={openArchive}><Library size={18}/> Архив комиксов</button>
    </nav>}
    {showingArchive?<div className={styles.library} tabIndex={0}>
-    <div className={styles.libraryHeading}><h2>Архив комиксов</h2><p>Пролог доступен всегда. Итоги сохраняются после этапов 1, 3, 5, 7, 8, 11–15; после этапа 16 появляется эпилог.</p></div>
+    <div className={styles.libraryHeading}><h2>Архив комиксов</h2><p>Пролог доступен всегда. Итоги сохраняются после этапов 1, 3, 5, 7, 8, 11–15; после этапа 16 появляется эпилог.</p>{teacherPreview&&<p role="status">Предпросмотр преподавателя: можно открыть все подготовленные главы, включая эпилог. Главы с пометкой «Макет» не содержат результатов игры и не доступны участникам до завершения этапов.</p>}</div>
     <div className={styles.libraryGrid}>
      <button type="button" className={styles.libraryCard} onClick={openIntro}>
       <div className={`${styles.cover} ${styles.prologueCover}`}>
@@ -189,12 +190,12 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
       <div className={styles.cardText}><small>Пролог · 4 сцены</small><strong>Пролог Республики</strong><span>Республика после бури: с чего начинается ваша история.</span><b>Открыть пролог <ArrowRight size={16}/></b></div>
      </button>
      {chapters.map(c=><button key={c.id} type="button" className={styles.libraryCard} onClick={()=>readChapter(c.id)}>
-      <div className={styles.cover}>{c.snapshot?.version===2?<><ChapterArtwork chapter={c} cover/><span className={styles.prologueCoverShade}/><div className={styles.prologueCoverCaption}><small>{c.stage_no===16?'ЭПИЛОГ':comicStages(c.stage_no).length===2?'ЭТАПЫ '+comicStages(c.stage_no).join(' И '):'ЭТАП '+c.stage_no}</small><strong>{COMIC_THEMES[c.stage_no]?.title||c.title}</strong></div></>:<ArchiveCover chapter={c}/>}</div>
-      <div className={styles.cardText}><small>{c.stage_no===16?'Эпилог':(c.kind==='completed'?'Итоги':'Анонс')+' · '+(c.snapshot?.version===2&&comicStages(c.stage_no).length===2?'Этапы '+comicStages(c.stage_no).join(' и '):'Этап '+c.stage_no)}{c.snapshot?.version===2?' · '+comicSlides(c).length+' слайда':''}</small><strong>{c.snapshot?.version===2?COMIC_THEMES[c.stage_no]?.title||c.title:c.title}</strong><span>{c.kind==='completed'?'Сохранённые результаты этапа вашей игры.':'Следующая глава и задачи участников.'}</span><b>Открыть главу <ArrowRight size={16}/></b></div>
+      <div className={styles.cover}>{c.snapshot?.version===2?<><ChapterArtwork chapter={c} cover/><span className={styles.prologueCoverShade}/><div className={styles.prologueCoverCaption}><small>{c.kind==='preview'?'МАКЕТ · ':''}{c.stage_no===16?'ЭПИЛОГ':comicStages(c.stage_no).length===2?'ЭТАПЫ '+comicStages(c.stage_no).join(' И '):'ЭТАП '+c.stage_no}</small><strong>{COMIC_THEMES[c.stage_no]?.title||c.title}</strong></div></>:<ArchiveCover chapter={c}/>}</div>
+      <div className={styles.cardText}><small>{c.kind==='preview'?'Макет · ':''}{c.stage_no===16?'Эпилог':(c.kind==='completed'?'Итоги':'Предпросмотр')+' · '+(c.snapshot?.version===2&&comicStages(c.stage_no).length===2?'Этапы '+comicStages(c.stage_no).join(' и '):'Этап '+c.stage_no)}{c.snapshot?.version===2?' · '+comicSlides(c).length+' слайда':''}</small><strong>{c.snapshot?.version===2?COMIC_THEMES[c.stage_no]?.title||c.title:c.title}</strong><span>{c.kind==='completed'?'Сохранённые результаты этапа вашей игры.':'Макет для преподавателя: данные появятся после завершения этапов.'}</span><b>{c.kind==='preview'?'Посмотреть макет':'Открыть главу'} <ArrowRight size={16}/></b></div>
      </button>)}
     </div>
     {archive.loading&&<p role="status" className={styles.archiveNotice}>Загружаем главы вашей игры…</p>}
-    {!archive.loading&&!chapters.length&&!archive.error&&<p className={styles.archiveNotice}>Этапы пока не завершены. После завершения указанных этапов здесь появятся их итоги.</p>}
+    {!archive.loading&&!savedChapters.length&&!teacherPreview&&!archive.error&&<p className={styles.archiveNotice}>Этапы пока не завершены. После завершения указанных этапов здесь появятся их итоги.</p>}
     {archive.error&&<p role="status" className={styles.archiveNotice}>Не удалось загрузить главы: {archive.error} Пролог можно читать без загрузки архива.</p>}
    </div>:<>
     <div ref={reader} role="region" aria-label="Сцена комикса" tabIndex={0} data-comic-kind={showingChapter?'chapter':'prologue'} data-comic-stage={showingChapter?chapter.stage_no:undefined} data-comic-slide={scene+1} data-cinematic-chapter={cinematicChapter||undefined} data-playing={playing} data-user-animation={motionRequested} onWheel={()=>{if(cinematicChapter)setPlaying(false)}} onTouchMove={()=>{if(cinematicChapter)setPlaying(false)}} className={'comicFrame '+styles.readerFrame+(!showingChapter||cinematicChapter?' '+styles.cinematicFrame:'')+(cinematicChapter?' '+styles.chapterFrame:'')} key={showingChapter?chapter.id+':'+scene:scene}>

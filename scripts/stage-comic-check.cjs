@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {PGlite}=require('@electric-sql/pglite');
 const root=path.resolve(__dirname,'..');
 require.extensions['.ts']=(m,file)=>m._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,file);
-const {COMIC_STAGES,comicSlides,eligibleComicStages}=require('../components/game/stageComicModel');
+const {COMIC_STAGES,comicSlides,eligibleComicStages,teacherComicPreviews}=require('../components/game/stageComicModel');
 for(const key of ['parties','regions','duma','president','government','programs','laws','budget','municipal','crisis','epilogue'])for(const width of [480,960,1920]){
  const bytes=fs.readFileSync(path.join(root,'public/republic-art/chapters',key+'-'+width+'.webp'));
  assert(bytes.length>2000&&bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP'&&bytes.readUInt32LE(4)+8===bytes.length,'Complete WebP artwork: '+key+' '+width);
@@ -11,6 +11,17 @@ for(const key of ['parties','regions','duma','president','government','programs'
 const metadata=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures/stage-comic-schema.json'),'utf8'));
 const migration=fs.readFileSync(path.join(root,'supabase/migrations/20261013045928_stage_result_comics.sql'),'utf8');
 const uid=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0'),game=uid(1),other=uid(2),winner=uid(100);
+const teachingDrafts=teacherComicPreviews(game,[]);
+assert.equal(teachingDrafts.length,11,'All teacher previews must exist before any stage completes');
+for(const draft of teachingDrafts){
+ assert.equal(draft.kind,'preview','Teacher previews must never be marked completed');
+ assert.equal(draft.snapshot.version,2,'Teacher previews use original chapter layout');
+ const slides=comicSlides(draft);
+ assert.equal(slides.length,draft.stage_no===16?4:3,'Three slides per stage chapter, four in epilogue');
+ assert(slides.every(slide=>slide.body.includes('Предварительный просмотр')&&slide.facts.every(fact=>fact.value==='Ожидает завершения')),'Teacher draft must not pretend to contain completed results');
+}
+assert.equal(teacherComicPreviews(game,[teachingDrafts[0]]).length,10,'Saved chapters must replace their previews without duplication');
+
 async function main(){
  const db=new PGlite();
  try{

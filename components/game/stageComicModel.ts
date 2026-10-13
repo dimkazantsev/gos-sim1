@@ -10,6 +10,15 @@ export const COMIC_THEMES:Record<number,{title:string;art:string}>={
  1:{title:'Партии вышли на политическую сцену',art:'parties'},3:{title:'Правила выборов и регионы',art:'regions'},5:{title:'Государственная Дума начала работу',art:'duma'},7:{title:'Выборы Президента',art:'president'},8:{title:'Руководство Правительства',art:'government'},11:{title:'Решения по государственным программам',art:'programs'},12:{title:'Законодательные решения',art:'laws'},13:{title:'Федеральный бюджет',art:'budget'},14:{title:'Решения для муниципалитетов',art:'municipal'},15:{title:'Государство в условиях кризиса',art:'crisis'},16:{title:'Эпилог · Итоги игры',art:'epilogue'}
 };
 export function comicStages(stage:number){return stage===3?[2,3]:stage===5?[4,5]:stage===16?Array.from({length:16},(_,i)=>i+1):[stage]}
+/** Visual drafts are local to the teacher. They are never saved or considered completed results. */
+export function teacherComicPreviews(gameId:string,stored:ComicChapter[]):ComicChapter[]{
+ const existing=new Set(stored.map(c=>c.stage_no));
+ return COMIC_STAGES.filter(stage=>!existing.has(stage)).map(stage=>({
+  id:'teacher-preview:'+gameId+':'+stage,game_id:gameId,stage_no:stage,kind:'preview' as const,
+  title:COMIC_THEMES[stage].title,body:'Предварительный просмотр оформления. Итоги появятся после завершения этапов.',
+  snapshot:{version:2,counters:{}},created_at:''
+ }));
+}
 export function eligibleComicStages(stages:{stage_no:number;status:string}[]){
  const completed=new Set(stages.filter(s=>s.status==='completed').map(s=>s.stage_no));
  return COMIC_STAGES.filter(no=>completed.has(no)&&(no===3||no===5?comicStages(no).every(n=>completed.has(n)):true));
@@ -21,7 +30,14 @@ const money=(n:number|string|undefined)=>n==null?'Не зафиксирован�
 const status=(s:string|undefined)=>s?ruleLabels[s]||labels[s]||s:'Не зафиксировано';
 export function comicSlides(chapter:ComicChapter):ComicSlide[]{
  const s=chapter.snapshot||{},no=chapter.stage_no,theme=COMIC_THEMES[no];
- if(s.version!==2||!theme||chapter.kind!=='completed')return [{title:chapter.title,body:chapter.body,art:no===16?'epilogue':no>=9?'programs':'regions',facts:[]}];
+ if(s.version!==2||!theme)return [{title:chapter.title,body:chapter.body,art:no===16?'epilogue':no>=9?'programs':'regions',facts:[]}];
+ if(chapter.kind==='preview'){
+  const draft=comicSlides({...chapter,kind:'completed'});
+  return draft.map(slide=>({...slide,
+   body:'Предварительный просмотр для преподавателя. После завершения '+(comicStages(no).length===2?'обоих этапов':'этапа')+' вместо заглушек появятся сохранённые результаты игры. Это не фактический итог.',
+   facts:slide.facts.map(fact=>({...fact,value:'Ожидает завершения',detail:undefined}))
+  }));
+ }
  const c=s.counters||{};
  const count=(key:string,label:string,icon:ComicIcon='check'):ComicFact=>({icon,label,value:typeof c[key]==='number'?fmt(c[key]):'Не зафиксировано'});
  const rows=(items:ResultRow[]|undefined,icon:ComicIcon,detail:(r:ResultRow)=>string):ComicFact[]=>items?.length?items.map(r=>({icon,label:r.name||r.title||r.role||'Запись',value:detail(r)})):[{icon,label:'Результат',value:'Нет зафиксированных записей'}];
