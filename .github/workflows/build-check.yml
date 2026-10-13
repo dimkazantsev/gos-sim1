@@ -10,6 +10,9 @@ on:
       - 'components/game/DashboardView.tsx'
       - 'components/game/StageReadinessPanel.tsx'
       - 'components/game/ProfileView.tsx'
+      - 'components/game/SessionManager.tsx'
+      - 'components/game/sessionDeletionGuard.ts'
+      - 'scripts/session-deletion-guard-check.cjs'
       - 'components/game/RepublicComic.tsx'
       - 'components/game/RepublicComic.module.css'
       - 'components/game/stageComicModel.ts'
@@ -118,6 +121,7 @@ jobs:
       - run: node scripts/budget-change-registry-check.cjs
       - run: node scripts/stage-readiness-manual-check.cjs
       - run: node scripts/profile-setup-and-brand-check.cjs
+      - run: node scripts/session-deletion-guard-check.cjs
       - run: node scripts/guided-tour-check.cjs
       - run: node scripts/document-input-check.cjs
       - run: node scripts/electoral-math-check.cjs
