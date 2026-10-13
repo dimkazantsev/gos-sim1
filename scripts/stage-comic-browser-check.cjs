@@ -10,11 +10,11 @@ import RepublicComic from '../../components/game/RepublicComic';
 import StageComics from '../../components/game/StageComics';
 import type {Stage} from '../../components/game/types';
 const gameId='${fixture.gameId}';
-export default function Test(){const [archive,setArchive]=useState(false),[auto,setAuto]=useState(false),[other,setOther]=useState(false),[blocked,setBlocked]=useState(false),[status,setStatus]=useState(false);
+export default function Test(){const [archive,setArchive]=useState(false),[auto,setAuto]=useState(false),[other,setOther]=useState(false),[blocked,setBlocked]=useState(false),[status,setStatus]=useState(false),[teacherPreview,setTeacherPreview]=useState(false);
 const stages=Array.from({length:16},(_,i)=>({stage_no:i+1,status:'completed'})) as Stage[];
-return <main><button onClick={()=>setArchive(true)}>Открыть архив</button><button onClick={()=>setAuto(true)}>Автопоказ итогов</button><button onClick={()=>{setBlocked(true);setAuto(true)}}>Автопоказ после проверки</button><button onClick={()=>setOther(!other)}>Сменить игру</button><output id="auto-open">{String(status)}</output>
+return <main><button onClick={()=>setArchive(true)}>Открыть архив</button><button onClick={()=>{setTeacherPreview(true);setArchive(true)}}>Макеты преподавателя</button><button onClick={()=>setAuto(true)}>Автопоказ итогов</button><button onClick={()=>{setBlocked(true);setAuto(true)}}>Автопоказ после проверки</button><button onClick={()=>setOther(!other)}>Сменить игру</button><output id="auto-open">{String(status)}</output>
 {blocked&&<section role="dialog" aria-modal="true" aria-label="Текущая проверка"><h2>Текущая проверка</h2><button onClick={()=>setBlocked(false)}>Закончить проверку</button></section>}
-<RepublicComic gameId={other?'other-game':gameId} open={archive} initialView="archive" onClose={()=>setArchive(false)}/>
+<RepublicComic teacherPreview={teacherPreview} gameId={other?'other-game':gameId} open={archive} initialView="archive" onClose={()=>setArchive(false)}/>
 <StageComics key={other?'other-game':gameId} gameId={other?'other-game':gameId} userId="test-user" stages={auto?stages:[]} enabled={auto} onOpenChange={setStatus}/></main>}
 `;
 let server,browser;const logs=[];const url='http://localhost:3995/stage-comic-test-route';
@@ -69,6 +69,22 @@ async function main(){
    await page.locator('.comicDialog').waitFor({state:'hidden'});assert.equal(calls.length,autoCalls,'No extra requests per slide/chapter');
    await page.reload();await page.getByRole('button',{name:'Автопоказ итогов',exact:true}).click();await page.waitForTimeout(200);assert.equal(await page.locator('.comicDialog').count(),0,'Reload does not replay viewed results');
    await page.getByRole('button',{name:'Сменить игру',exact:true}).click();await page.waitForTimeout(150);assert.equal(await page.locator('.comicDialog').count(),0,'Another game cannot inherit result queue');
+   await page.getByRole('button',{name:'Открыть архив',exact:true}).click();
+   await page.getByText('Этапы пока не завершены.',{exact:false}).waitFor();
+   assert.equal(await page.locator('.comicDialog .comicArtwork').count(),0,'Student with zero completed stages sees only prologue');
+   await page.getByRole('button',{name:'Закрыть комикс',exact:true}).click();
+   await page.getByRole('button',{name:'Макеты преподавателя',exact:true}).click();
+   await page.getByText('Предпросмотр преподавателя:',{exact:false}).waitFor();
+   assert.equal(await page.locator('.comicDialog .comicArtwork').count(),11,'Teacher sees all eleven draft covers in an empty game');
+   await page.getByRole('button',{name:/Макет · Предпросмотр · Этап 1 · 3 слайда/}).click();
+   assert.equal(await page.locator('.comicDot').count(),3,'Teacher stage preview contains three slides');
+   assert((await page.locator('.comicFrame').textContent()).includes('Ожидает завершения'),'Teacher draft explicitly masks game results');
+   await page.getByRole('button',{name:'Закрыть комикс',exact:true}).click();
+   await page.getByRole('button',{name:'Макеты преподавателя',exact:true}).click();
+   await page.getByRole('button',{name:/Макет · Эпилог · 4 слайда/}).click();
+   assert.equal(await page.locator('.comicDot').count(),4,'Teacher epilogue preview contains four slides');
+   assert(!(await page.locator('.comicFrame').textContent()).includes('Тестовая партия'),'Empty preview must not reveal fixture game data');
+   await page.getByRole('button',{name:'Закрыть комикс',exact:true}).click();
    assert.deepEqual(errors,[],'No React runtime errors at '+width+'px');await context.close();
    console.log('PASS '+width+'×'+height+': 11 themed chapters, three/four slides, icons, actual names/counts, scroll/controls, modal priority, automatic queue, no per-slide requests, reload/game isolation');
   }
