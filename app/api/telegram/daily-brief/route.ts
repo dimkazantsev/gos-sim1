@@ -17,8 +17,7 @@ export async function GET(request:Request){
    .eq('game_id',l.game_id).eq('user_id',l.user_id).is('roster_archived_at',null).maybeSingle();
   if(!member){skipped++;continue}
   const {data:pref}=await config.db.from('telegram_bot_preferences')
-   .select('daily_digest,timezone').eq('game_id',l.game_id).eq('user_id',l.user_id).maybeSingle();
-  if(pref?.daily_digest===false){skipped++;continue}
+   .select('daily_digest,notify_tasks,timezone').eq('game_id',l.game_id).eq('user_id',l.user_id).maybeSingle();
   const tz=pref?.timezone||'Asia/Barnaul';
   const day=new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
   const [{data:game},{data:stage},{data:tasks},{data:deliveries},{data:votes}]=await Promise.all([
@@ -36,6 +35,19 @@ export async function GET(request:Request){
    '\n🗳 Открытых голосований: '+(votes?.length||0)+
    (nextTask?'\n\nБлижайшие поручения:\n'+nextTask:'')+
    '\n\nОткройте «Личный аппарат» в меню бота для подробностей.';
+  if(pref?.notify_tasks!==false){
+   for(const t of (tasks||[]).filter(item=>new Date(item.due_at).getTime()<=Date.now()+24*60*60*1000).slice(0,4)){
+    const {error:reminderError}=await config.db.from('telegram_outbox').insert({
+     game_id:l.game_id,user_id:l.user_id,category:'task_reminder_'+day,
+     source_id:t.id,
+     body:'⏰ ГОС.ID · Срок поручения\n\n«'+t.title.slice(0,150)+'»\nИсполнить до: '+
+      new Date(t.due_at).toLocaleString('ru-RU',{timeZone:tz,dateStyle:'medium',timeStyle:'short'})+
+      '\n\nОткройте «Поручения» в меню бота.'
+    });
+    if(reminderError?.code==='23505')skipped++;else if(reminderError)failed++;else queued++;
+   }
+  }
+  if(pref?.daily_digest===false){skipped++;continue}
   // category is date-specific; source_id is the game UUID. Unique index on
   // (game_id,user_id,category,source_id) prevents duplicate notifications.
   const {error:insertError}=await config.db.from('telegram_outbox').insert({
