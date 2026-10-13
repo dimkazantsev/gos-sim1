@@ -105,6 +105,11 @@ const CALLBACK_TO_COMMAND:Record<string,string>={
  'gos:appeals':'/appeals','gos:appeal':'/appeal'
 };
 export function telegramCallbackCommand(data:string):string|undefined{
+ if(data==='gos:appeal:test')return '/appeal_test';
+ const page=data.match(/^gos:appeal:page:([0-9]{1,2})$/);
+ if(page)return '/appeal_page '+page[1];
+ const action=data.match(/^gos:appeal:(pick|confirm|edit|cancel):([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})$/i);
+ if(action)return '/appeal_'+action[1]+' '+action[2];
  return Object.prototype.hasOwnProperty.call(CALLBACK_TO_COMMAND,data)?CALLBACK_TO_COMMAND[data]:undefined;
 }
 export function telegramWelcomeText(connected=false){
@@ -143,7 +148,9 @@ export function telegramHelpText(){
   '/docs — документы.',
   '/channels — чаты.',
   '/chat текст — написать в выбранный чат.',
-  '/appeal @Фамилия текст — направить обращение другому участнику.',
+  '/appeal — выбрать адресата, подготовить и подтвердить обращение.',
+  '/appeal @Фамилия текст — подготовить обращение вручную.',
+  '/appeal_test — проверка приёмной для преподавателя без отправки.',
   '/appeals — мои обращения.',
   '/reply КОД текст — ответить на входящее обращение.',
   '/menu — открыть главное меню.',

@@ -18,7 +18,7 @@ assert.ok(!html.includes('━━━━━━━━'),'No unnecessary divider');
 const injection=presentation.telegramMessageHtml('Заголовок\n<важные> & "данные"');
 assert.ok(injection.includes('&lt;важные&gt; &amp; &quot;данные&quot;'),'Telegram HTML must be escaped');
 const hook=fs.readFileSync('app/api/telegram/webhook/route.ts','utf8');
-assert.ok(hook.includes('Код обращения: '),'Human-friendly reference on creation');
+assert.ok(fs.readFileSync('lib/server/telegramAppealWorkflow.ts','utf8').includes('Код обращения: '),'Human-friendly reference on confirmation');
 assert.ok(hook.includes("Код: '+code"),'Human-friendly reference in list');
 assert.ok(!hook.includes('/reply UUID'),'Never expose a technical UUID placeholder');
 assert.ok(hook.includes("if(actor.kind!=='teacher')query=query.eq('recipient_id',game.user_id)"));
