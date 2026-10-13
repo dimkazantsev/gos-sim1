@@ -18,6 +18,12 @@ on:
       - 'components/game/ProfileView.tsx'
       - 'components/game/RepublicComic.tsx'
       - 'components/game/RepublicComic.module.css'
+      - 'components/game/stageComicModel.ts'
+      - 'components/game/StageComics.tsx'
+      - 'supabase/migrations/*stage_result_comics*'
+      - 'scripts/stage-comic*'
+      - 'scripts/fixtures/stage-comic-schema.json'
+      - 'public/republic-art/chapters/**'
       - 'components/game/ComicSoundButton.tsx'
       - 'components/game/RepublicLeadership.tsx'
       - 'components/game/gameRoster.ts'
@@ -76,6 +82,12 @@ jobs:
         run: |
           node scripts/intro-refresh-check.cjs
           node scripts/republic-comic-browser-check.cjs
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+      - name: Saved stage results, epilogue, rights and automatic comic playback
+        run: |
+          node scripts/stage-comic-check.cjs
+          node scripts/stage-comic-browser-check.cjs
         env:
           CHROME_BIN: /usr/bin/google-chrome
       - name: Classroom isolation and leadership selection
