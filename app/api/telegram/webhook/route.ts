@@ -126,7 +126,7 @@ export async function POST(request:Request){
     p_telegram_user_id:telegramId,p_game_id:game.game_id,p_recipient_id:matches[0].user_id,p_body:body,p_message_id:message.message_id
    });
    if(result.error)throw result.error;
-   await reply('📨 ГОС.ID · Приёмная\n\nОбращение зарегистрировано и направлено адресату.\nНомер: '+result.data);
+   await reply('📨 ГОС.ID · Приёмная\n\nОбращение зарегистрировано и направлено адресату.\nКод обращения: '+String(result.data).replace(/-/g,'').slice(0,12).toUpperCase());
    return NextResponse.json({ok:true});
   }
   if(command==='/appeals'){
@@ -134,20 +134,48 @@ export async function POST(request:Request){
     .eq('game_id',game.game_id).or('author_id.eq.'+game.user_id+',recipient_id.eq.'+game.user_id)
     .order('created_at',{ascending:false}).limit(8);
    if(error)throw error;
-   const lines=(data||[]).map((a,i)=>(i+1)+'. '+(a.status==='replied'?'✅ Ответ получен':'📨 На рассмотрении')+
-    '\n'+a.body.slice(0,130)+'\nID: '+a.id+(a.reply_text?'\nОтвет: '+a.reply_text.slice(0,180):''));
-   await reply('🏛 ГОС.ID · Приёмная\n\n'+(lines.join('\n\n')||'Обращений пока нет.')+
-    '\n\nДля ответа: /reply UUID Текст');
+   const lines=(data||[]).map((a,i)=>{
+    const incoming=a.recipient_id===game.user_id;
+    const code=a.id.replace(/-/g,'').slice(0,12).toUpperCase();
+    return (i+1)+'. '+(incoming?'📥 Входящее':'📤 Исходящее')+
+     ' · '+(a.status==='replied'?'✅ Ответ получен':'🕒 На рассмотрении')+
+     '\nКод: '+code+'\n'+a.body.slice(0,130)+
+     (a.reply_text?'\nОтвет: '+a.reply_text.slice(0,180):
+       incoming&&a.status==='open'?'\nОтветить: /reply '+code+' Ваш текст':'');
+   });
+   await reply('🏛 ГОС.ID · Приёмная\n\n'+(lines.join('\n\n')||'Обращений пока нет.'));
    return NextResponse.json({ok:true});
   }
   if(command==='/reply'){
-   const match=text.match(/^\/reply\s+([0-9a-f-]{36})\s+([\s\S]{1,4000})$/i);
-   if(!match){await reply('📬 Ответ на обращение\n\nИспользуйте /reply UUID Текст ответа. Номер обращения находится в разделе «Приёмная».');return NextResponse.json({ok:true})}
+   // Short, stable codes shown in /appeals; keep accepting full historical IDs.
+   const match=text.match(/^\/reply\s+([0-9a-f]{12}|[0-9a-f-]{36})\s+([\s\S]{1,4000})$/i);
+   if(!match){
+    await reply('📬 ГОС.ID · Ответ на обращение\n\nОткройте «Приёмную», найдите входящее обращение и скопируйте его код.\n\nПример: /reply A1B2C3D4E5F6 Текст ответа.');
+    return NextResponse.json({ok:true});
+   }
+   const {data:actor,error:actorError}=await config.db.from('game_members').select('kind').eq('game_id',game.game_id).eq('user_id',game.user_id).is('roster_archived_at',null).maybeSingle();
+   if(actorError||!actor)throw actorError||new Error('Active membership required');
+   const code=match[1].replace(/-/g,'').toLowerCase();
+   let query=config.db.from('official_appeals').select('id,recipient_id').eq('game_id',game.game_id);
+   if(actor.kind!=='teacher')query=query.eq('recipient_id',game.user_id);
+   if(code.length===32)query=query.eq('id',match[1]);
+   else{
+    // PostgreSQL UUID ordering supports exact prefix lookup without listing all appeals.
+    const prefix=code.slice(0,8)+'-'+code.slice(8,12)+'-';
+    query=query.gte('id',prefix+'0000-0000-000000000000')
+      .lte('id',prefix+'ffff-ffff-ffffffffffff');
+   }
+   const {data:matching,error:lookupError}=await query.limit(2);
+   if(lookupError)throw lookupError;
+   if(matching?.length!==1){
+    await reply('📬 ГОС.ID · Приёмная\n\nКод обращения не найден или неоднозначен. Сверьте его со списком входящих обращений.');
+    return NextResponse.json({ok:true});
+   }
    const result=await config.db.rpc('telegram_reply_official_appeal',{
-    p_telegram_user_id:telegramId,p_appeal_id:match[1],p_text:match[2].trim(),p_message_id:message.message_id
+    p_telegram_user_id:telegramId,p_appeal_id:matching[0].id,p_text:match[2].trim(),p_message_id:message.message_id
    });
    if(result.error)throw result.error;
-   await reply('✅ Ответ зарегистрирован и отправлен автору обращения.');
+   await reply('📬 ГОС.ID · Приёмная\n\n✅ Ответ зарегистрирован и направлен автору обращения.');
    return NextResponse.json({ok:true});
   }
   if(command==='/status'){
