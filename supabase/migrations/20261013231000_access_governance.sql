@@ -35,25 +35,31 @@ begin
  );
 end $$;
 
-create or replace function private.can_game_member_action(p_game uuid,p_action text)
+create or replace function private.can_game_member_action(p_game uuid,p_action text,p_actor uuid default null)
 returns boolean language plpgsql stable security definer set search_path to '' as $$
-declare v_uid uuid:=auth.uid();v_mode text;v_actions text[];v_until timestamptz;
+declare v_uid uuid:=coalesce(p_actor,auth.uid());v_kind public.member_kind;
+ v_mode text;v_actions text[];v_until timestamptz;
 begin
- if v_uid is null then return true; end if; -- server-side scheduled maintenance
- if not private.is_game_member(p_game) then return false; end if;
- select mode,restricted_actions,expires_at into v_mode,v_actions,v_until
- from private.game_member_access where game_id=p_game and user_id=v_uid;
- if not found then return true; end if;
- if v_until is not null and v_until<=now() then return v_mode<>'removed'; end if;
+ if v_uid is null then return true; end if; -- genuine authorless system maintenance
+ if exists(select 1 from public.platform_admins where user_id=v_uid) then return true; end if;
+ select gm.kind,a.mode,a.restricted_actions,a.expires_at
+ into v_kind,v_mode,v_actions,v_until
+ from public.game_members gm
+ left join private.game_member_access a on a.game_id=gm.game_id and a.user_id=gm.user_id
+ where gm.game_id=p_game and gm.user_id=v_uid;
+ if not found then return false; end if;
+ if v_kind='teacher' or v_mode is null then return true; end if;
+ if v_mode='removed' then return false; end if;
+ if v_until is not null and v_until<=now() then return true; end if;
  return v_mode='active' and not (p_action=any(v_actions));
 end $$;
+revoke all on function private.can_game_member_action(uuid,text,uuid) from public,anon,authenticated;
 
 -- Trigger guard also applies to SECURITY DEFINER RPCs; UI-only restrictions are insufficient.
 create or replace function private.guard_game_member_action()
 returns trigger language plpgsql security definer set search_path to '' as $$
-declare v_game uuid;v_action text;
+declare v_game uuid;v_action text;v_actor uuid:=auth.uid();
 begin
- if auth.uid() is null then return new; end if;
  if tg_table_name='game_ballots' then
   select game_id into v_game from public.game_votes where id=new.vote_id;
   v_action:='votes';
@@ -66,8 +72,18 @@ begin
    when 'event_decisions' then 'cases'
   end;
  end if;
- if v_game is not null and v_action is not null
-    and not private.can_game_member_action(v_game,v_action) then
+ -- Telegram and other service-role inserts have no auth.uid(); enforce using the record author.
+ if v_actor is null and tg_op='INSERT' then
+  v_actor:=case tg_table_name
+   when 'chat_messages' then new.author_id
+   when 'political_posts' then new.author_id
+   when 'formal_documents' then new.author_id
+   when 'event_decisions' then new.actor_id
+   when 'game_ballots' then new.voter_id
+  end;
+ end if;
+ if v_actor is not null and v_game is not null and v_action is not null
+    and not private.can_game_member_action(v_game,v_action,v_actor) then
   raise exception 'Действие временно ограничено преподавателем или доступ к игре закрыт' using errcode='42501';
  end if;
  return new;
