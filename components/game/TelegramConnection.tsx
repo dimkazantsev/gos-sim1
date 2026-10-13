@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {prepareTelegramBotAvatar} from './telegramBotAvatar';
 export default function TelegramConnection({gameId,teacher=false}:{gameId:string;teacher?:boolean}){
  const [status,setStatus]=useState<{linked:boolean;notifications_enabled:boolean}|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const username=process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME||'GosSimsGameBot';
@@ -11,7 +12,8 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
    if(authError||!data.session?.access_token){setError('Сначала войдите в игру.');setBusy(false);return}
    try{
      const headers={'Content-Type':'application/json',Authorization:'Bearer '+data.session.access_token};
-     const payload=JSON.stringify({gameId});
+     const avatarJpegBase64=await prepareTelegramBotAvatar();
+     const payload=JSON.stringify({gameId,avatarJpegBase64});
      // GitHub Pages is static and has no /api routes. Use the shared Vercel API
      // used by the document uploader; same-origin requests stay relative on Vercel.
      const origin=(process.env.NEXT_PUBLIC_GAME_API_ORIGIN||
