@@ -66,6 +66,16 @@ begin
   values(v_game,v_student,'telegram forbidden');
  exception when others then v_failed:=true;end;
  if not v_failed then raise exception 'Service-role chat bypassed participant sanction';end if;
+ -- Institutional publishers have no member identity, and server-generated posts must still work.
+ insert into public.political_posts(game_id,author_id)
+ values(v_game,'55555555-5555-4555-8555-555555555555');
+ -- An authenticated nonmember with the same identity cannot publish.
+ perform set_config('test.user_id','55555555-5555-4555-8555-555555555555',true);
+ v_failed:=false;
+ begin insert into public.political_posts(game_id,author_id)
+  values(v_game,'55555555-5555-4555-8555-555555555555');
+ exception when others then v_failed:=true;end;
+ if not v_failed then raise exception 'Unauthenticated game outsider may publish';end if;
 end $$;
 -- The matching student invitation makes the rejoin test exercise the ban, not missing-code errors.
 insert into public.invite_codes(game_id,code_hash,kind,active)
