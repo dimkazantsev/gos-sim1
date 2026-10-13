@@ -19,15 +19,15 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
      const origin=(process.env.NEXT_PUBLIC_GAME_API_ORIGIN||
        (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':'')).replace(/[/]$/,'');
      const endpoint=origin+'/api/telegram/activate';
-     const response=await fetch(endpoint,{method:'POST',headers,body:payload,cache:'no-store',signal:AbortSignal.timeout(20000)});
+     const response=await fetch(endpoint,{method:'POST',headers,body:payload,cache:'no-store',signal:AbortSignal.timeout(55000)});
      const contentType=response.headers.get('content-type')||'';
      if(!contentType.toLowerCase().includes('application/json')){
        if(response.status===405)throw new Error('HTTP 405: серверный API не принимает POST. Используйте обновлённую версию сайта и проверьте адрес API.');
        throw new Error('Сервер активации не вернул JSON (HTTP '+response.status+').');
      }
-     const result=await response.json() as {ok?:boolean;error?:string;logo?:boolean};
+     const result=await response.json() as {ok?:boolean;error?:string;logo?:boolean;warnings?:string[];webhook?:boolean;commands?:boolean;menu?:boolean};
      if(!response.ok||!result.ok)throw new Error(result.error||'Не удалось активировать бота.');
-     setActivated(result.logo===false?'Меню и название ГОС.ID обновлены. Логотип Telegram не подтвердил — проверьте обложку и повторите активацию.':'Telegram активирован: название ГОС.ID, логотип, меню, кнопки и команды настроены.');setError('');
+     setActivated((result.warnings?.length?'Webhook, команды и меню подтверждены. Дополнительные настройки: '+result.warnings.join('; '):'Webhook, команды и меню подтверждены Telegram API.')+(result.logo?' Эмблема обновлена.':''));setError('');
    }catch(e){setError(e instanceof Error?e.name==='TimeoutError'?'Сервер не ответил за 20 секунд. Повторите попытку.':e.message:'Ошибка активации')}
    finally{setBusy(false)}
  }
