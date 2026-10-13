@@ -81,7 +81,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
   return <StageWorkspace
    g={g}
    stage={selected}
-   readOnly={readOnly}
+   readOnly={readOnly||(!teacher&&(selected.status!=='open'||!!selected.deadline&&Date.parse(selected.deadline)<=Date.now()))}
    onBack={()=>setSelected(null)}
    onOpenStage={stageNo=>setSelected(stages.find(item=>item.stage_no===stageNo)||null)}
    onOpenVotes={onOpenVotes}
@@ -173,6 +173,8 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
        <div className="stageAtlasCardActions">
         {hasOpenVote&&<button type="button" className="stageAtlasVoteAction" onClick={()=>onOpenVotes()} aria-label={'Открыть голосования этапа '+s.stage_no}><Vote size={16} aria-hidden="true"/>Голосование</button>}
         <button type="button" className="stageAtlasDetailAction" onClick={openDetails} aria-label={'Подробнее об этапе '+s.stage_no+': '+s.title}>Подробнее <ArrowUpRight size={16} strokeWidth={2} aria-hidden="true"/></button>
+        {teacher&&!readOnly&&<button type="button" className="secondary" onClick={()=>void g.manageStage(s.stage_no,s.status==='open'?'close':'open',30)}>{s.status==='open'?'Завершить этап':'Открыть этап'}</button>}
+        {teacher&&!readOnly&&s.status==='open'&&<button type="button" className="secondary" onClick={()=>void g.manageStage(s.stage_no,'extend',30)}>Продлить на 30 мин</button>}
         {teacher&&!readOnly&&<button type="button" className="stageAtlasResetStage" title={'Сбросить этап '+s.stage_no} aria-label={'Сбросить этап '+s.stage_no+': '+s.title} onClick={()=>requestReset(s.stage_no)} disabled={resetBusy}><RotateCcw size={17} strokeWidth={1.9} aria-hidden="true"/></button>}
        </div>
       </div>
