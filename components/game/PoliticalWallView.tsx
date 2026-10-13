@@ -225,7 +225,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  if(!game||!me)return null;
  const stageNo=currentStage?.stage_no||game.current_round||1,stageAction=STAGE_ACTIONS[stageNo]||STAGE_ACTIONS[1];
  const publisherKey=actor?.key||'participant',publisherLabel=actor?.label||me.full_name;
- const composerParty=g.parties.find(p=>p.name===publisherLabel);
+ const composerParty=g.parties.find(p=>p.name===publisherLabel||actor?.key==='party:'+p.id||actor?.key==='faction:'+p.id);
  const mine=profiles.find(p=>p.user_id===me.user_id);
  return <div className="wallPage processPortal">
   <section className="wallHero">
@@ -271,7 +271,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
    </section>}
    <section className="wallSearch"><label>Поиск<input type="search" aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Текст, название или тег"/></label><StyledSelect label="Субъект" value={filterActor} onChange={setFilterActor} options={[{value:'',label:'Все субъекты'},...Array.from(new Map(politicalPosts.map(p=>[p.actor_key,p.actor_key==='teacher'?BRAND_NAME:p.actor_label])).entries()).map(([value,label])=>({value,label}))]}/><StyledSelect label="Вид публикации" value={filterType} onChange={setFilterType} options={[{value:'',label:'Все публикации'},...PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))]}/><StyledSelect label="Этап" value={filterStage} onChange={setFilterStage} options={[{value:'',label:'Все этапы'},...g.stages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></section>
    <section className="wallFeed">{!filtered.length?<div className="emptyState">Подходящих публикаций нет.</div>:visiblePosts.map(p=>{
-    const party=g.parties.find(x=>x.id===p.context?.party_id||x.name===p.actor_label),pf=profiles.find(x=>x.user_id===p.author_id);
+    const party=g.parties.find(x=>x.id===p.context?.party_id||x.name===p.actor_label||p.actor_key==='party:'+x.id||p.actor_key==='faction:'+x.id),pf=profiles.find(x=>x.user_id===p.author_id);
     const media=politicalMedia.filter(x=>x.post_id===p.id);
     const links=postFormalLinks.filter(x=>x.post_id===p.id).flatMap(x=>formalDocuments.filter(d=>d.id===x.formal_document_id));
     const vote=votes.find(v=>v.source_post_id===p.id||v.id===p.context?.vote_id);
