@@ -3,7 +3,7 @@ import {IconAction} from './ui/IconAction';
 import {BrandIdentity,BrandName} from './ui/BrandIdentity';
 import ChatToggleButton from './game/ChatToggleButton';
 import {useEffect,useRef,useState} from 'react';
-import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon,Wifi} from 'lucide-react';
+import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
@@ -190,23 +190,6 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
 
 export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:string;initialMobileMenuOpen?:boolean}){
  const g=useRepublicGame(gameId);
- // The game deliberately uses scheduled API refreshes instead of always-on
- // Supabase Realtime. A disconnected WebSocket is not the same as being offline.
- // Browser onLine is a network hint, not a server health check.
- const [browserOnline,setBrowserOnline]=useState(true);
- useEffect(()=>{
-  const update=()=>setBrowserOnline(navigator.onLine);
-  update();
-  window.addEventListener('online',update);
-  window.addEventListener('offline',update);
-  return()=>{
-   window.removeEventListener('online',update);
-   window.removeEventListener('offline',update);
-  };
- },[]);
- const connectionDisplay=g.realtimeState==='disconnected'&&browserOnline?'polling':g.realtimeState;
- const connectionLabel=connectionDisplay==='polling'?'По расписанию':connectionDisplay==='connected'?'В сети':connectionDisplay==='connecting'?'Подключение…':'Нет сети';
- const connectionDescription=connectionDisplay==='polling'?'Данные обновляются периодически, при действиях и открытии разделов. Это не проверка доступности сервера.':connectionDisplay==='connected'?'Постоянная синхронизация активна':connectionDisplay==='connecting'?'Подключение…':'Браузер сообщает об отсутствии сети';
  const [screenHistory,setScreenHistory,navigationHydrated,navigationRestored]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
  },validScreenHistory);
@@ -233,7 +216,10 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   g.setChatOpen(true);
   sharedChatHandled.current=true;
  },[navigationHydrated,g.me?.user_id,g.channels,gameId]);
- async function shareCurrentScreen(){
+ const [shareUrl,setShareUrl]=useState('');
+ const [shareNotice,setShareNotice]=useState('');
+ const shareDialog=useDialog(!!shareUrl,()=>setShareUrl(''));
+ function shareCurrentScreen(){
   const u=new URL(window.location.href);
   // GitHub Pages serves one static HTML for all ?section=... links. Share the
   // dedicated public preview page, which forwards users to the same section.
@@ -242,11 +228,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(currentScreen.stageNo)u.searchParams.set('stage',String(currentScreen.stageNo));
   if(currentScreen.documentId)u.searchParams.set('document',currentScreen.documentId);
   if(currentScreen.voteId)u.searchParams.set('vote',currentScreen.voteId);
-  try{
-   if(navigator.share){await navigator.share({title:'ГОС.ID — Цифровая платформа России',url:u.toString()});return}
-   await navigator.clipboard.writeText(u.toString());
-   window.alert('Ссылка скопирована. Доступна участникам этой игры.');
-  }catch(e){if((e as Error).name!=='AbortError')window.alert('Не удалось отправить ссылку.')}
+  setShareNotice('');setShareUrl(u.toString());
  }
  const currentScreen=screenHistory.entries[screenHistory.index];
  const view=currentScreen.view;
@@ -316,10 +298,17 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    event.key==='ArrowDown'?(current+1)%options.length:(current+options.length-1)%options.length;
   options[index]?.focus();
  }
- function finishScreenNavigation(){
+ function finishScreenNavigation(resetScroll=true){
   setMobileMenuOpen(false);
   if(window.matchMedia('(max-width:1099px)').matches)g.setChatOpen(false);
-  requestAnimationFrame(()=>document.getElementById('game-main')?.focus());
+  requestAnimationFrame(()=>{
+   document.getElementById('game-main')?.focus({preventScroll:true});
+   if(resetScroll){
+    document.querySelector<HTMLElement>('.simContentFlow')?.scrollTo({top:0});
+    document.querySelector<HTMLElement>('#game-main')?.scrollTo({top:0});
+    window.scrollTo({top:0});
+   }
+  });
  }
  function navigate(next:View,target?:{stageNo?:number;documentId?:string;voteId?:string;templateKey?:string},profileVerified=false,fromTourClick=false){
   const owner=g.me;
@@ -481,7 +470,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  function moveHistory(index:number){
   if(index<0||onboardingRequired)return;
   setScreenHistory(previous=>({...previous,index}));
-  finishScreenNavigation();
+  finishScreenNavigation(false);
  }
  const vg=previewStudent?buildStudentPreview(g,previewStudent):observer&&me?{...buildStudentPreview(g,me),logout:g.logout} as ReturnTypeRepublic:g;
  const shownMe=vg.me||me;
@@ -563,7 +552,6 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    </nav>
 
    <div className="sidebarFooter">
-    <div className="sidebarRealtime"><Wifi aria-hidden="true"/><span>{connectionDisplay==='polling'?'Периодическое обновление':connectionDisplay==='connected'?'Синхронизация активна':connectionDisplay==='connecting'?'Подключение…':'Нет сети'}</span><i className={connectionDisplay}/></div>
     <div className="sidebarUser">
      <div className="simAvatar">{initials(shownMe.full_name)}</div>
      <div className="simUserText"><b>{shownMe.full_name}</b><span>{previewMode?'Просмотр · '+(shownMe.role_title||'Участник'):shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
@@ -582,10 +570,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <div className="simTopCenter">
      <div className="topStageCopy"><small>ЭТАП {String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</small><strong>{nav.find(([key])=>key===view)?.[1]||game.title}</strong></div>
      <div className="topIndicators">
-      <span className={`livePill ${game.turn_open?'on':'off'}`} aria-label={game.turn_open?'Ход открыт':'Пауза'} title={game.turn_open?'Ход открыт':'Пауза'}><Radio aria-hidden="true"/><span className="livePillText">{game.turn_open?'Ход открыт':'Пауза'}</span></span>
+      <span className={`livePill ${game.turn_open?'on':'off'}`} aria-label={game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'} title={game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'}><Radio aria-hidden="true"/><span className="livePillText">{game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'}</span></span>
       <button type="button" className="gameShareScreen" onClick={()=>void shareCurrentScreen()} title="Поделиться текущим разделом или документом" aria-label="Поделиться текущим разделом"><Share2 size={17} aria-hidden="true"/><span>Поделиться</span></button>
       {game.turn_open&&game.turn_ends_at&&<span className="timerPill" aria-label="Время до конца хода">{fmtTimer(secondsLeft)}</span>}
-      <span className={`connectionPill ${connectionDisplay}`} role="status" aria-label={connectionDescription} title={connectionDescription}><Wifi aria-hidden="true"/><span className="connectionLabel">{connectionLabel}</span></span>
      </div>
     </div>
 
@@ -641,6 +628,17 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><IconAction onClick={()=>setMobileMenuOpen(false)} label="Закрыть меню"/></header>
     <div className="mobileAllGrid">{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} data-tour-view={k} onClick={()=>navigate(k,undefined,false,true)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" className={chatOpen?'active':''} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);setChatOpen(true)}}><span className="mobileMenuChatIcon"><MessageCircle aria-hidden="true"/>{g.chatUnreadCount>0&&<i className={g.chatMentionCount>0?'hasMention':''}>{g.chatUnreadCount>99?'99+':g.chatUnreadCount}</i>}</span><span>Чат</span></button></div>
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
+   </section>
+  </div>}
+  {shareUrl&&<div className="eventCaseBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setShareUrl('')}}>
+   <section className="eventCaseModal" ref={shareDialog} role="dialog" tabIndex={-1} aria-modal="true" aria-label="Ссылка и QR-код на текущий раздел">
+    <header className="eventModalHeader"><h2>Поделиться разделом</h2><button type="button" className="secondary" onClick={()=>setShareUrl('')}>Закрыть</button></header>
+    <div className="eventModalBody" style={{display:'grid',gap:16,justifyItems:'center',padding:24}}>
+     <img width={192} height={192} alt="QR-код ссылки на текущий раздел ГОС.ID" src={'https://api.qrserver.com/v1/create-qr-code/?size=192x192&data='+encodeURIComponent(shareUrl)}/>
+     <input aria-label="Ссылка на текущий раздел" readOnly value={shareUrl} onFocus={e=>e.target.select()} style={{width:'100%',maxWidth:520}}/>
+     <button type="button" className="primary" onClick={()=>void navigator.clipboard.writeText(shareUrl).then(()=>setShareNotice('Ссылка скопирована'),()=>setShareNotice('Выделите ссылку в поле и скопируйте вручную.'))}>Копировать ссылку</button>
+     {shareNotice&&<p role="status">{shareNotice}</p>}
+    </div>
    </section>
   </div>}
   {tourMode==='choice'&&!introOpen&&!previewMode&&<div className="tourChoiceBackdrop">
