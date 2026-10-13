@@ -1,5 +1,6 @@
 import {NextResponse} from 'next/server';
 import {telegramCabinetCard} from '@/lib/server/telegramCabinet';
+import {telegramVisibleChatChannels} from '@/lib/server/telegramVisibleChatChannels';
 import {runtimeConfig,telegramSend,telegramAcknowledge} from '@/lib/server/telegram';
 import {telegramCallbackCommand,telegramHelpText,telegramMenuText,telegramWelcomeText,TELEGRAM_MENU_BUTTONS,TELEGRAM_WELCOME_BUTTONS,telegramSectionButtons,telegramDocumentButtons} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
@@ -204,27 +205,55 @@ export async function POST(request:Request){
    return NextResponse.json({ok:true});
   }
   if(command==='/channels'){
-   const {data:member}=await config.db.from('game_members').select('kind').eq('game_id',game.game_id).eq('user_id',game.user_id).single();
-   const [{data:channels},{data:membership}]=await Promise.all([
-    config.db.from('chat_channels').select('id,name,kind').eq('game_id',game.game_id),
-    config.db.from('channel_members').select('channel_id').eq('user_id',game.user_id)
-   ]);
-   const allowed=(channels||[]).filter(c=>c.kind==='public'||member?.kind==='teacher'||membership?.some(m=>m.channel_id===c.id));
+   const allowed=await telegramVisibleChatChannels(config.db,game.game_id,game.user_id);
    const ids=allowed.map(c=>c.id);
-   const {data:messages}=ids.length?await config.db.from('chat_messages').select('channel_id,author_id,text,kind').eq('game_id',game.game_id).in('channel_id',ids).order('created_at',{ascending:false}).limit(2):{data:[]};
+   if(!ids.length){
+    await reply('🏛 ГОС.ID · Чаты\n\nДоступных бесед пока нет.',telegramSectionButtons('dashboard','Открыть ГОС.ID'));
+    return NextResponse.json({ok:true});
+   }
+   // Archived channels are already removed from `allowed`. Source messages
+   // must also pass the same one-hour media visibility used by the game RLS.
+   const cutoff=new Date(Date.now()-3600000).toISOString();
+   const {data:messages,error:messageError}=await config.db.from('chat_messages')
+    .select('channel_id,author_id,text,kind').eq('game_id',game.game_id)
+    .in('channel_id',ids)
+    .or('kind.not.in.(audio,video),created_at.gt.'+cutoff)
+    .order('created_at',{ascending:false}).limit(2);
+   if(messageError)throw messageError;
    const authorIds=[...new Set((messages||[]).map(m=>m.author_id))];
-   const {data:people}=authorIds.length?await config.db.from('game_members').select('user_id,full_name').eq('game_id',game.game_id).in('user_id',authorIds):{data:[]};
-   const entries=(messages||[]).map(m=>'💬 '+(allowed.find(c=>c.id===m.channel_id)?.name||'Беседа')+'\n'+(people?.find(x=>x.user_id===m.author_id)?.full_name||'Участник')+': '+(m.kind==='text'?m.text?.slice(0,230)||'Сообщение':'Медиафайл'));
-   await reply('🏛 ГОС.ID · Чаты\n\nПоследние два сообщения:\n\n'+(entries.join('\n\n')||'Сообщений пока нет.')+'\n\nДоступных чатов: '+allowed.length,telegramSectionButtons('dashboard','Открыть ГОС.ID'));
+   const {data:people,error:peopleError}=authorIds.length
+    ?await config.db.from('game_members').select('user_id,full_name')
+      .eq('game_id',game.game_id).in('user_id',authorIds)
+    :{data:[],error:null};
+   if(peopleError)throw peopleError;
+   const entries=(messages||[]).map(m=>
+    '💬 '+(allowed.find(c=>c.id===m.channel_id)?.name||'Беседа')+'\n'+
+    (people?.find(x=>x.user_id===m.author_id)?.full_name||'Участник')+': '+
+    (m.kind==='text'||m.kind==='system'?(m.text?.slice(0,230)||'Сообщение'):'Медиафайл'));
+   await reply('🏛 ГОС.ID · Чаты\n\n'+
+    (entries.length?'Последние два сообщения:\n\n'+entries.join('\n\n'):'В доступных чатах пока нет сообщений.')+
+    '\n\nДоступных чатов: '+allowed.length,
+    telegramSectionButtons('dashboard','Открыть ГОС.ID'));
    return NextResponse.json({ok:true});
   }
   if(command==='/channel'){
-   const id=args[1];if(!id){await reply('Выберите канал через /channels');return NextResponse.json({ok:true})}
+   const id=args[1];
+   if(!id){await reply('Выберите канал через /channels');return NextResponse.json({ok:true})}
+   const allowed=await telegramVisibleChatChannels(config.db,game.game_id,game.user_id);
+   if(!allowed.some(c=>c.id===id)){
+    await reply('🏛 ГОС.ID · Чаты\n\nБеседа недоступна или перенесена в архив. Выберите действующий чат.');
+    return NextResponse.json({ok:true});
+   }
    const {data,error}=await config.db.rpc('telegram_select_channel',{p_telegram_user_id:telegramId,p_game_id:game.game_id,p_channel_id:id});
    await reply(error||!data?'Нет доступа к каналу.':'Канал выбран. Отправка: /chat текст');return NextResponse.json({ok:true});
   }
   if(command==='/chat'){
    if(!game.default_channel_id){await reply('Сначала выберите канал через /channels');return NextResponse.json({ok:true})}
+   const allowed=await telegramVisibleChatChannels(config.db,game.game_id,game.user_id);
+   if(!allowed.some(c=>c.id===game.default_channel_id)){
+    await reply('🏛 ГОС.ID · Чаты\n\nВыбранная беседа больше недоступна. Выберите действующий канал через /channels.');
+    return NextResponse.json({ok:true});
+   }
    const payload=text.slice(command.length).trim();if(!payload){await reply('Введите /chat ваш текст');return NextResponse.json({ok:true})}
    const {error}=await config.db.rpc('telegram_post_chat',{p_telegram_user_id:telegramId,p_game_id:game.game_id,p_channel_id:game.default_channel_id,p_text:payload,p_chat_id:chatId,p_message_id:message.message_id});
    await reply(error?'Не удалось отправить: '+error.message:'Сообщение отправлено в игру.');return NextResponse.json({ok:true});

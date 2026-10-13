@@ -1,4 +1,5 @@
 import {NextResponse} from 'next/server';
+import {telegramVisibleChatChannels} from '@/lib/server/telegramVisibleChatChannels';
 import {runtimeConfig,telegramSend} from '@/lib/server/telegram';
 import {telegramSectionButtons,telegramDocumentButtons,telegramTaskButtons,telegramChatButtons} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
@@ -15,7 +16,72 @@ export async function GET(request:Request){
   const {data:link}=await config.db.from('telegram_links').select('chat_id,notifications_enabled').eq('game_id',job.game_id).eq('user_id',job.user_id).maybeSingle();
   const {data:member}=await config.db.from('game_members').select('user_id').eq('game_id',job.game_id).eq('user_id',job.user_id).is('roster_archived_at',null).maybeSingle();
   if(!link?.notifications_enabled||!member){await config.db.from('telegram_outbox').update({sent_at:new Date().toISOString(),last_error:'Subscription inactive'}).eq('id',job.id);continue}
-  if(job.category==='chat'||job.category==='mention_chat'){const {data:channel}=await config.db.from('chat_channels').select('kind').eq('id',job.channel_id).eq('game_id',job.game_id).maybeSingle();const {data:receiver}=await config.db.from('game_members').select('kind').eq('game_id',job.game_id).eq('user_id',job.user_id).maybeSingle();const {data:channelMember}=await config.db.from('channel_members').select('user_id').eq('channel_id',job.channel_id).eq('user_id',job.user_id).maybeSingle();if(!channel||(channel.kind!=='public'&&receiver?.kind!=='teacher'&&!channelMember)){await config.db.from('telegram_outbox').update({sent_at:new Date().toISOString(),last_error:'Channel access revoked'}).eq('id',job.id);continue}}
+  // Outbox entries can outlive the underlying record. Never deliver material
+  // which was deleted, archived, revoked, or hidden from the current game UI.
+  const dismiss=async(reason:string)=>{
+   await config.db.from('telegram_outbox').update({sent_at:new Date().toISOString(),last_error:reason}).eq('id',job.id);
+  };
+  if(job.category==='chat'||job.category==='mention_chat'){
+   const allowed=await telegramVisibleChatChannels(config.db,job.game_id,job.user_id);
+   if(!job.channel_id||!allowed.some(c=>c.id===job.channel_id)){
+    await dismiss('Chat channel hidden or access revoked');continue;
+   }
+   let messageId=job.source_id;
+   if(job.category==='mention_chat'){
+    const {data:mention,error:mentionError}=await config.db.from('chat_mentions')
+     .select('message_id').eq('id',job.source_id).eq('game_id',job.game_id)
+     .eq('channel_id',job.channel_id).maybeSingle();
+    if(mentionError){console.error('Telegram mention lookup failed',mentionError.code);continue}
+    messageId=mention?.message_id||null;
+   }
+   if(!messageId){await dismiss('Chat source deleted');continue}
+   const {data:message,error:messageError}=await config.db.from('chat_messages')
+    .select('id').eq('id',messageId).eq('game_id',job.game_id)
+    .eq('channel_id',job.channel_id).maybeSingle();
+   if(messageError){console.error('Telegram message lookup failed',messageError.code);continue}
+   if(!message){await dismiss('Chat message deleted');continue}
+  }
+  if(job.category==='mention_actions'||job.category==='mention_documents'){
+   let visible=false;
+   const {data:post,error:postError}=await config.db.from('political_posts')
+    .select('id').eq('id',job.source_id).eq('game_id',job.game_id)
+    .is('deleted_at',null).maybeSingle();
+   if(postError){console.error('Telegram post lookup failed',postError.code);continue}
+   visible=!!post&&job.category==='mention_actions';
+   if(!visible){
+    const {data:comment,error:commentError}=await config.db.from('civic_comments')
+     .select('target_kind,target_id').eq('id',job.source_id).eq('game_id',job.game_id).maybeSingle();
+    if(commentError){console.error('Telegram comment lookup failed',commentError.code);continue}
+    if(comment&&((job.category==='mention_actions'&&comment.target_kind==='post')||
+       (job.category==='mention_documents'&&comment.target_kind==='document'))){
+     const table=comment.target_kind==='post'?'political_posts':'formal_documents';
+     let query=config.db.from(table).select('id').eq('id',comment.target_id).eq('game_id',job.game_id);
+     if(comment.target_kind==='post')query=query.is('deleted_at',null);
+     const {data:target,error:targetError}=await query.maybeSingle();
+     if(targetError){console.error('Telegram comment target lookup failed',targetError.code);continue}
+     visible=!!target;
+    }
+   }
+   if(!visible){await dismiss('Mention source no longer visible');continue}
+  }
+  if(job.category==='document'){
+   const {data:document,error:docError}=await config.db.from('formal_documents')
+    .select('id').eq('id',job.source_id).eq('game_id',job.game_id).maybeSingle();
+   if(docError){console.error('Telegram document lookup failed',docError.code);continue}
+   if(!document){await dismiss('Document removed');continue}
+  }
+  if(job.category==='vote'||job.category==='task'||job.category==='task_done'){
+   const table=job.category==='vote'?'game_votes':'game_assigned_tasks';
+   const {data:entity,error:entityError}=await config.db.from(table)
+    .select('id,status').eq('id',job.source_id).eq('game_id',job.game_id).maybeSingle();
+   if(entityError){console.error('Telegram source lookup failed',entityError.code);continue}
+   if(!entity||
+     (job.category==='vote'&&entity.status!=='open')||
+     (job.category==='task'&&entity.status==='confirmed')||
+     (job.category==='task_done'&&entity.status!=='completed')){
+    await dismiss('Source removed or no longer active');continue;
+   }
+  }
   const {data:preferences,error:prefsError}=await config.db.from('telegram_notification_preferences')
    .select('daily_brief,task_reminders,mentions,documents,votes,events,quiet_hours')
    .eq('game_id',job.game_id).eq('user_id',job.user_id).maybeSingle();
@@ -44,7 +110,11 @@ export async function GET(request:Request){
   else if(job.category==='daily_brief')buttons={inline_keyboard:[[{text:'🏛 Личный аппарат',callback_data:'gos:office'}],[{text:'⚙️ Настройки',callback_data:'gos:settings'}]]};
   else if(job.category==='document_delivery'){
    const {data:delivery}=await config.db.from('formal_document_deliveries').select('document_id').eq('id',job.source_id).eq('recipient_id',job.user_id).eq('game_id',job.game_id).maybeSingle();
-   if(!delivery){await config.db.from('telegram_outbox').update({sent_at:new Date().toISOString(),last_error:'Delivery revoked'}).eq('id',job.id);continue}
+   if(!delivery){await dismiss('Delivery revoked');continue}
+   const {data:document,error:docError}=await config.db.from('formal_documents')
+    .select('id').eq('id',delivery.document_id).eq('game_id',job.game_id).maybeSingle();
+   if(docError){console.error('Telegram delivery document lookup failed',docError.code);continue}
+   if(!document){await dismiss('Delivery document deleted');continue}
    buttons=telegramDocumentButtons([{id:delivery.document_id,title:'Открыть документ'}]);
   }else if(job.category==='document'){
    buttons=telegramDocumentButtons([{id:job.source_id,title:'Открыть документ'}]);

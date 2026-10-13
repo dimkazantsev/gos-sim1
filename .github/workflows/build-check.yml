@@ -41,6 +41,8 @@ on:
       - 'lib/server/telegramCabinet.ts'
       - 'scripts/telegram-cabinet-check.cjs'
       - 'scripts/telegram-message-quality-check.cjs'
+      - 'scripts/telegram-current-visibility-check.cjs'
+      - 'lib/server/telegramVisibleChatChannels.ts'
       - 'scripts/telegram-digest-prefs-check.cjs'
       - 'scripts/telegram-official-reception-check.cjs'
       - 'supabase/migrations/20261013083000_telegram_official_reception.sql'
@@ -144,6 +146,7 @@ jobs:
       - run: node scripts/telegram-expanded-check.cjs
       - run: node scripts/telegram-cabinet-check.cjs
       - run: node scripts/telegram-message-quality-check.cjs
+      - run: node scripts/telegram-current-visibility-check.cjs
       - run: node scripts/telegram-digest-prefs-check.cjs
       - run: node scripts/telegram-official-reception-check.cjs
       - run: node scripts/telegram-bot-avatar-check.cjs
