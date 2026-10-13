@@ -10,6 +10,7 @@ function readableError(err:unknown){
  const raw=err&&typeof err==='object'&&'message' in err?String((err as {message?:unknown}).message??''):err instanceof Error?err.message:'';
  if(raw.includes('Invite codes must be at least 4 characters'))return 'Коды доступа должны содержать не менее 4 символов.';
  if(raw.includes('Teacher and student codes must be different'))return 'Код преподавателя и код студентов должны отличаться.';
+ if(raw.includes('Group required'))return 'Укажите свою группу либо используйте код группы, выданный преподавателем.';
  if(raw.includes('Invalid game or invite code'))return 'Неверный код игры или код участника.';
  if(raw.includes('duplicate key value')||raw.includes('games_game_code_key'))return 'Игра с таким кодом уже существует. Укажите другой код игры.';
  return raw||'Не удалось выполнить вход.';
@@ -29,7 +30,7 @@ export default function Home(){
   try{
    const name=fio.trim(),code=gameCode.trim(),access=invite.trim(),students=studentCode.trim();
    if(name.length<2)throw new Error('Введите ФИО.');
-   if(mode==='student'&&group.trim().length<1)throw new Error('Укажите группу.');
+   // Group-specific codes assign a group on the server; common codes still require a group.
    if(code.length<2)throw new Error('Введите код игры.');
    if(access.length<(mode==='guest'?6:4))throw new Error(mode==='guest'?'Код гостя должен содержать минимум 6 символов.':'Код доступа должен содержать минимум 4 символа.');
    if(mode==='teacher'&&createMode){if(students.length<4)throw new Error('Код студентов должен содержать минимум 4 символа.');if(students===access)throw new Error('Коды преподавателя и студентов должны отличаться.')}
@@ -119,7 +120,7 @@ export default function Home(){
       {mode==='teacher'&&<div className="entryMode"><button type="button" aria-pressed={!createMode} className={!createMode?'active':''} onClick={()=>{setCreateMode(false);setError('')}}>Войти в игру</button><button type="button" aria-pressed={createMode} className={createMode?'active':''} onClick={()=>{setCreateMode(true);setError('')}}>Создать игру</button></div>}
       <label className="entryField">Ваше ФИО<input name="fullName" autoComplete="name" value={fio} onChange={e=>setFio(e.target.value)} placeholder="Иванов Иван Иванович" minLength={2} required/></label>
       {mode==='teacher'&&createMode&&<label className="entryField">Название игры<input name="gameTitle" value={gameTitle} onChange={e=>setGameTitle(e.target.value)} required/></label>}
-      <div className={'entryFieldRow '+(mode==='teacher'?'single':'')}><label className="entryField">Код игры<input name="gameCode" autoComplete="off" autoCapitalize="none" spellCheck={false} value={gameCode} onChange={e=>setGameCode(e.target.value)} placeholder="GPU-2026" minLength={2} required/></label>{mode==='student'&&<label className="entryField">Группа<input name="group" value={group} onChange={e=>setGroup(e.target.value)} placeholder="Например, 1241" required/></label>}</div>
+      <div className={'entryFieldRow '+(mode==='teacher'?'single':'')}><label className="entryField">Код игры<input name="gameCode" autoComplete="off" autoCapitalize="none" spellCheck={false} value={gameCode} onChange={e=>setGameCode(e.target.value)} placeholder="GPU-2026" minLength={2} required/></label>{mode==='student'&&<label className="entryField">Группа<input name="group" value={group} onChange={e=>setGroup(e.target.value)} placeholder="Укажите при общем коде участника"/></label>}</div>
       <div className="entryField"><label htmlFor="invite-code">{mode==='teacher'?'Код преподавателя':mode==='guest'?'Код гостя':'Код участника'}</label><span className="entrySecret"><input id="invite-code" name="inviteCode" autoComplete={createMode?'new-password':'current-password'} type={showCode?'text':'password'} minLength={mode==='guest'?6:4} value={invite} onChange={e=>setInvite(e.target.value)} required aria-describedby="code-hint"/><button type="button" onClick={()=>setShowCode(!showCode)} aria-label={showCode?'Скрыть код':'Показать код'} aria-pressed={showCode}>{showCode?<EyeOff/>:<Eye/>}</button></span><small id="code-hint">{mode==='teacher'?(createMode?'Придумайте код из 4 или более символов.':'Используйте код преподавателя, заданный при создании игры.'):'Отдельный код доступа, полученный от преподавателя.'}</small></div>
       {mode==='teacher'&&createMode&&<div className="entryField"><label htmlFor="student-code">Код для студентов</label><input id="student-code" name="studentCode" type="password" autoComplete="new-password" minLength={4} value={studentCode} onChange={e=>setStudentCode(e.target.value)} required aria-describedby="student-code-hint"/><small id="student-code-hint">Не должен совпадать с кодом преподавателя.</small></div>}
       {error&&<div className="errorBox" role="alert">{error}</div>}

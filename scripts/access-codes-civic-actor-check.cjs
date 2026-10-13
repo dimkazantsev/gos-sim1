@@ -1,0 +1,39 @@
+/* Targeted regression: no Mini App; old data and RPC routes remain valid. */
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const read=p=>fs.readFileSync(p,'utf8');
+const migration=read('supabase/migrations/20261013214500_teacher_access_codes_groups.sql');
+const actors=read('supabase/migrations/20261013215000_process_actors_instantiated_only.sql');
+const codes=read('components/game/TeacherAccessCodes.tsx');
+const sessions=read('components/game/SessionManager.tsx');
+const home=read('app/page.tsx');
+const wall=read('components/game/PoliticalWallView.tsx');
+const webhook=read('app/api/telegram/webhook/route.ts');
+const tg=read('lib/server/telegramPresentation.ts');
+const art=read('components/ui/CivicArtwork.tsx');
+const css=read('app/design-shell.css');
+for(const name of ['teacher_create_access_code','teacher_update_game_code','teacher_access_code_list','teacher_revoke_access_code','private.game_group_access_codes','private.is_game_teacher','join_game_with_code','extensions.crypt','grant execute','revoke all']){
+ assert.ok(migration.includes(name),'Access-code contract missing: '+name);
+}
+assert.ok(migration.includes('ic.code_hash=extensions.crypt(p_invite_code,ic.code_hash)'),'Old encrypted invite authentication retained');
+assert.ok(migration.includes("if g is null then raise exception 'Invalid game or invite code'"),'Old invite error retained');
+assert.ok(migration.includes("k='student'")&&migration.includes('v_group:=coalesce(v_group'),'Group codes must bind server-side');
+assert.ok(migration.includes("if v_group is null then raise exception 'Group required'"),'Common code still needs a group');
+assert.ok(migration.includes("kind='student' and active"),'Revocation cannot cancel teacher or guest codes');
+assert.ok(migration.includes('enable row level security')&&migration.includes('revoke all on private.game_group_access_codes'),'New group mapping not readable directly');
+assert.ok(!/delete from public\.(games|game_members|invite_codes)/i.test(migration),'Existing data must be preserved');
+for(const rpc of ['teacher_create_access_code','teacher_update_game_code','teacher_access_code_list','teacher_revoke_access_code'])assert.ok(codes.includes(rpc),'Missing UI action '+rpc);
+assert.ok(sessions.includes('<TeacherAccessCodes')&&sessions.includes('create_observer_invite'),'New codes adjacent to existing guest code');
+assert.ok(home.includes('Group required')&&!home.includes("if(mode==='student'&&group.trim().length<1)"),'Group code does not require duplicate manual entry');
+assert.ok(actors.includes('private.process_actor_active_now')&&actors.includes("gp.registration_status='registered'"),'Actors must exist and parties must be registered');
+assert.ok(actors.includes('for a in select u.id,u.title from public.institution_units')&&actors.includes('from public.game_office_assignments'),'Actual game offices and units remain');
+assert.ok(!actors.includes('for a in select actor_key,actor_label from private.process_actor_catalog()'),'Arbitrary federal catalogue must not be displayed');
+assert.ok(actors.includes("raise exception 'Нельзя публиковать от имени органа, отсутствующего в текущей игре'"),'Forged static publisher must be denied by server');
+assert.ok(!/delete from public\.political_posts|update public\.political_posts/i.test(actors),'Historical posts unchanged');
+assert.ok(wall.includes("serverActors??(me?[{key:'participant'"),'Never show synthetic or previous-game publishers during RPC load');
+assert.ok(webhook.includes("'🏛 Игра: '")&&webhook.includes("'\\n👥 Группа: '"),'Telegram /games must display precise labels');
+assert.ok(!webhook.includes("||'Республика')"),'Missing group must never be called republic');
+assert.ok(tg.includes("const main=newline===-1?'<b>'+safe+'</b>'"),'Heading is plain bold, not a link');
+assert.ok(tg.includes("return main+'\\n\\n🔗 <a href="),'Only signature remains linked');
+for(const marker of ['civicSun','civicCross','civicArrow','civicSmallCircle','civicCuckoo','gos-cuckoo-window'])assert.ok(art.includes(marker),'Missing animation element '+marker);
+assert.ok(css.includes('gosCuckooPeek 30s')&&css.includes('prefers-reduced-motion:reduce'),'Every 30 seconds, disabled when motion is reduced');
+console.log('PASS teacher access codes, group login, role gates, Telegram cards, and civic animation');

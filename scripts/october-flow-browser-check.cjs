@@ -55,11 +55,12 @@ async function ready(){
   await ready();browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
   for(const width of [320,390,768,1440]){
    const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce',hasTouch:width<600,isMobile:width<600});
-   const page=await context.newPage(),errors=[],metricCalls=[],toolCalls=[],discussions=new Map(),deleted=[],proposals=[];activePage=page;page.on('pageerror',e=>errors.push(e.message));
+   const page=await context.newPage(),errors=[],metricCalls=[],toolCalls=[],discussions=new Map(),deleted=[],proposals=[];let teacherMode=true;activePage=page;page.on('pageerror',e=>errors.push(e.message));
    function discussion(kind,id){const key=kind+':'+id;if(!discussions.has(key))discussions.set(key,{likes:2,dislikes:0,mine:0,views:7,comment_count:0,comments:[],recorded:false});return discussions.get(key)}
    await page.route('https://*.supabase.co/**',async route=>{
     const url=route.request().url(),rpc=url.split('/rpc/')[1]?.split('?')[0],p=rpc?route.request().postDataJSON():null;let response=rpc?null:[];
     if(rpc==='set_post_state_metric')metricCalls.push(p);
+    if(rpc==='get_process_actors')response=teacherMode?[{key:'participant',label:'Преподаватель'}]:[{key:'participant',label:'Анна Миронова'},{key:'office',label:'Депутат Государственной Думы'}];
     if(rpc==='get_formal_document_tools')response={can_edit:p.p_document_id!=='formal-demo',can_manage:true,can_copy:true,can_sign:p.p_document_id!=='formal-demo',vote_required:p.p_document_id==='formal-demo',open_vote:p.p_document_id==='formal-demo',next_owner:'system',next_action:'Опубликовать'};
     if(['send_formal_document','sign_formal_document'].includes(rpc)){toolCalls.push({rpc,...p});response=1}
     if(['get_civic_discussion','record_civic_view','react_to_civic_content','comment_on_civic_content','delete_civic_comment'].includes(rpc)){
@@ -165,7 +166,7 @@ async function ready(){
    assert.equal(metricCalls.at(-1).p_post_id,'published-ui-post');assert.equal(metricCalls.at(-1).p_value,71);
    await page.screenshot({path:path.join(screens,'process-live-metric-'+width+'.png')});
    await page.keyboard.press('Escape');assert.equal(await editor.count(),0,'Escape closes metric dialog');
-   await page.getByRole('navigation',{name:'Проверяемый раздел'}).getByRole('button',{name:'Режим участника',exact:true}).click();
+   teacherMode=false;await page.getByRole('navigation',{name:'Проверяемый раздел'}).getByRole('button',{name:'Режим участника',exact:true}).click();
    await composer.locator('summary').first().click();
    await composer.getByRole('button',{name:/Опубликовать от имени/}).click();await page.getByRole('option',{name:'Депутат Государственной Думы',exact:true}).click();
    await composer.getByRole('textbox',{name:'Заголовок публикации',exact:true}).fill('Новость участника для согласования');
@@ -175,7 +176,7 @@ async function ready(){
    await queue.getByRole('button',{name:/Новость участника для согласования/}).click();
    assert((await queue.locator('.mediaProposalBy').textContent()).includes('Депутат Государственной Думы'),'Office author is retained in the proposal');
    assert.equal(toolCalls.filter(x=>x.rpc==='submit_media_news').at(-1).p_actor_key,'office');
-   await page.getByRole('navigation',{name:'Проверяемый раздел'}).getByRole('button',{name:'Режим преподавателя',exact:true}).click();
+   teacherMode=true;await page.getByRole('navigation',{name:'Проверяемый раздел'}).getByRole('button',{name:'Режим преподавателя',exact:true}).click();
    await queue.getByLabel('Комментарий к решению',{exact:true}).fill('Согласовано для публикации.');
    await page.screenshot({path:path.join(screens,'process-live-news-review-'+width+'.png')});
    await queue.getByRole('button',{name:'Опубликовать в СМИ',exact:true}).click();await page.locator('#process-published-media-ui-post').waitFor();
