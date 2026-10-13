@@ -4,8 +4,8 @@ const root=path.resolve(__dirname,'..');
 function read(file){return fs.readFileSync(path.join(root,file),'utf8')}
 const source=read('components/game/achievementPreview.ts');
 const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-const exports={};new Function('exports',code)(exports);
-const {publicAchievementPreview}=exports;
+const compiledExports={};new Function('exports',code)(compiledExports);
+const {publicAchievementPreview}=compiledExports;
 const catalog=Array.from({length:100},(_,i)=>({
  id:'award-'+i,title:'Достижение '+i,description:'Заслужить '+i,
  hidden:i>=60,earned_at:i%3===0?'2026-10-13T02:00:00Z':null,progress:i%2?90:100
