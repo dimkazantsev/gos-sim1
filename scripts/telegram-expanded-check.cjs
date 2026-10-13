@@ -28,7 +28,7 @@ assert.ok(reg.includes('telegramSetProfilePhoto(config.token)'));
 assert.ok(reg.includes("member?.kind!=='teacher'"));
 const bot=read('lib/server/telegram.ts');
 assert.ok(bot.includes("/setMyProfilePhoto"));
-assert.ok(bot.includes('Approved brand image'));
+assert.ok(bot.includes('1024 × 1024'));
 const dispatch=read('app/api/telegram/dispatch/route.ts');
 assert.ok(dispatch.includes("job.category==='mention_chat'"));
 assert.ok(dispatch.includes("select('document_id').eq('id',job.source_id).eq('recipient_id',job.user_id)"));
