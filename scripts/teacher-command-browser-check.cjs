@@ -38,7 +38,7 @@ async function check(){
    assert.equal(data.rows.length,16,'Stage list must contain all 16 stages at '+width+'px');
    assert.equal(data.reset,1,'Exactly one contextual stage reset button');
    assert.equal(data.allReset,1,'Exactly one global stage reset');
-   assert.equal(data.workspaceCount,11,'Eleven teacher workspaces');
+   assert.equal(data.workspaceCount,12,'Twelve teacher workspaces');
     assert.equal(await frame.locator('#teacher-tab-blitz').count(),1,'Blitz workspace must be navigable');
    assert(data.scroll<=data.width+3,'Stage management overflows at '+width+'px: '+JSON.stringify(data));
    for(const row of data.rows)assert(row.left>=data.list.left-2&&row.right<=data.list.right+2,'Stage row leaves list at '+width+'px');
@@ -48,7 +48,7 @@ async function check(){
      path:path.join(screenshots,'teacher-stages-'+width+'.png'),animations:'disabled'
     });
    }
-   console.log('PASS '+width+'px: 16 stable list rows, contextual reset, eleven workspaces, no overflow');
+   console.log('PASS '+width+'px: 16 stable list rows, contextual reset, twelve workspaces, no overflow');
   }
   for(const [screen,selector] of [
    ['teacher-journal','.classroomJournal'],
@@ -60,7 +60,7 @@ async function check(){
   ]){
    await page.locator('#screen').selectOption(screen);
    await frame.locator(selector).first().waitFor();
-   assert.equal(await frame.locator('.teacherWorkspaceNav [role=tab]').count(),11,'Eleven workspaces required');
+   assert.equal(await frame.locator('.teacherWorkspaceNav [role=tab]').count(),12,'Twelve workspaces required');
    if(screen==='teacher-journal'){
     assert((await frame.locator('.journalToolbar .styledSelect').count())>=2,'Participant and section journal filters missing');
     assert.equal(await frame.locator('.journalCounters button[title="Экспорт показанных строк в CSV"]').count(),1,'Journal CSV export missing');
