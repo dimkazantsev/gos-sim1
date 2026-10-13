@@ -52,3 +52,23 @@
 @keyframes gosCivicArrow{0%,82%,100%{transform:translate(0,0)}89%{transform:translate(6px,-6px)}}
 @keyframes gosCuckooPeek{0%,2%,11%,100%{transform:translateY(34px)}4%,8%{transform:translateY(0)}6%{transform:translateY(-3px)}}
 @media(prefers-reduced-motion:reduce){.civicOrbit,.civicSun,.civicSmallCircle,.civicCross,.civicArrow,.civicCuckoo{animation:none!important}.civicCuckoo{transform:translateY(34px)}}
+
+/* Teacher profile: scoped access-code controls, no generic component overrides. */
+.teacherAccessCodes{margin:18px 0;padding:22px;border:1px solid var(--gs-border,#d9e1ed);border-radius:18px;background:#fff}
+.teacherAccessHead{display:flex;align-items:flex-start;gap:12px}.teacherAccessHead svg{flex-shrink:0;color:#2453e6}
+.teacherAccessHead h3{margin:0 0 5px}.teacherAccessHead p{margin:0 0 16px;color:#62758b;font-size:13px}
+.teacherCodeGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.teacherCodeEditor{display:flex;flex-direction:column;gap:10px;min-width:0;padding:16px;border:1px solid #e2e8f2;border-radius:14px;background:#f8faff}
+.teacherCodeEditor label{display:grid;gap:5px;font-size:13px;font-weight:650;color:#293e61}
+.teacherCodeEditor input,.teacherCodeEditor select{width:100%;min-height:42px;border:1px solid #cbd6e6;border-radius:9px;background:#fff;padding:8px;color:#122443}
+.teacherCodeEditor button,.teacherCodeCreated button,.teacherCodeRow button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:8px 11px;border-radius:9px;border:1px solid #bacbea;background:white;color:#173da3;font-weight:650;cursor:pointer}
+.teacherCodeEditor button:disabled,.teacherCodeRow button:disabled{opacity:.5;cursor:not-allowed}
+.teacherCodeValue{display:block;overflow-wrap:anywhere;font-family:monospace;font-size:16px;padding:8px 10px;border:1px solid #cbd6e6;border-radius:9px;background:white}
+.teacherCodeActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
+.teacherCodeCreated{display:flex;align-items:center;flex-wrap:wrap;gap:12px;background:#edf8f5;border:1px solid #b4dfcf;border-radius:12px;padding:12px;margin-top:14px}
+.teacherCodeCreated code{overflow-wrap:anywhere;font-weight:700}.teacherCodeCreated p{margin:4px 0 0;font-size:12px}
+.teacherCodeRows{margin-top:15px}.teacherCodeRows h4{margin:0 0 8px}
+.teacherCodeRow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-top:1px solid #e0e7f0}
+.teacherCodeRow div{display:grid;gap:4px}.teacherCodeRow small{color:#63758e}
+.teacherCodeNotice{margin:12px 0 0;font-size:13px;color:#23436b;overflow-wrap:anywhere}
+@media(max-width:780px){.teacherCodeGrid{grid-template-columns:1fr}.teacherAccessCodes{padding:14px}.teacherCodeRow{flex-wrap:wrap}}
