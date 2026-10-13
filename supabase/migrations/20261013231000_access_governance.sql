@@ -76,13 +76,11 @@ begin
  end if;
  -- Telegram and other service-role inserts have no auth.uid(); enforce using the record author.
  if v_actor is null and tg_op='INSERT' then
-  v_actor:=case tg_table_name
-   when 'chat_messages' then new.author_id
-   when 'political_posts' then new.author_id
-   when 'formal_documents' then new.author_id
-   when 'event_decisions' then new.actor_id
-   when 'game_ballots' then new.voter_id
-  end;
+  -- Different tables have different actor column names; resolve only the active branch.
+  if tg_table_name='event_decisions' then v_actor:=new.actor_id;
+  elsif tg_table_name='game_ballots' then v_actor:=new.voter_id;
+  else v_actor:=new.author_id;
+  end if;
  end if;
  if v_actor is not null and v_game is not null and v_action is not null
     and not private.can_game_member_action(v_game,v_action,v_actor) then
