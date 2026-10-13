@@ -10,10 +10,15 @@ export const TELEGRAM_WELCOME_BUTTONS:TelegramMarkup={
 };
 export const TELEGRAM_MENU_BUTTONS:TelegramMarkup={
  inline_keyboard:[
-  [{text:'📊 Состояние',callback_data:'gos:status'},{text:'🗺 Этапы',callback_data:'gos:stages'}],
-  [{text:'🗳 Голосования',callback_data:'gos:votes'},{text:'📜 Документы',callback_data:'gos:docs'}],
-  [{text:'💬 Чаты',callback_data:'gos:channels'},{text:'🏛 Мои игры',callback_data:'gos:games'}],
-  [{text:'❔ Помощь',callback_data:'gos:help'}],
+  [{text:'🏛 Мой аппарат',callback_data:'gos:office'},{text:'🌅 Доклад',callback_data:'gos:brief'}],
+  [{text:'📥 Канцелярия',callback_data:'gos:inbox'},{text:'📌 Поручения',callback_data:'gos:deadlines'}],
+  [{text:'🗓 Повестка',callback_data:'gos:agenda'},{text:'🚨 События',callback_data:'gos:alerts'}],
+  [{text:'💬 Связь',callback_data:'gos:channels'},{text:'⚖️ Право',callback_data:'gos:law'}],
+  [{text:'📰 Хроника',callback_data:'gos:news'},{text:'🏢 Приёмная',callback_data:'gos:reception'}],
+  [{text:'📈 Экономика',callback_data:'gos:economy'},{text:'🏅 Карьера',callback_data:'gos:career'}],
+  [{text:'🧠 Блиц',callback_data:'gos:blitz'},{text:'⚙️ Уведомления',callback_data:'gos:settings'}],
+  [{text:'🗳 Голосования',callback_data:'gos:votes'},{text:'📜 НПА',callback_data:'gos:docs'}],
+  [{text:'🎮 Мои игры',callback_data:'gos:games'},{text:'❔ Помощь',callback_data:'gos:help'}],
   [{text:'🌐 Открыть ГОС.ID',url:TELEGRAM_PROJECT_URL}]
  ]
 };
@@ -59,19 +64,32 @@ export const TELEGRAM_BACK_BUTTONS:TelegramMarkup={
 };
 export const TELEGRAM_COMMANDS=[
  {command:'start',description:'🚀 Начать работу с ГОС.ID'},
- {command:'menu',description:'🏛 Главное меню бота'},
- {command:'games',description:'🏛 Мои игры'},
+ {command:'menu',description:'🏛 Главное меню'},
+ {command:'office',description:'🏛 Личный аппарат'},
+ {command:'brief',description:'🌅 Государственный доклад'},
+ {command:'inbox',description:'📥 Моя канцелярия'},
+ {command:'deadlines',description:'📌 Поручения и сроки'},
+ {command:'agenda',description:'🗓 Повестка и заседания'},
+ {command:'alerts',description:'🚨 Адресные события'},
+ {command:'channels',description:'💬 Чаты республики'},
+ {command:'law',description:'⚖️ Правовые источники'},
+ {command:'news',description:'📰 Государственная хроника'},
+ {command:'reception',description:'🏢 Приёмная ведомства'},
+ {command:'economy',description:'📈 Экономический бюллетень'},
+ {command:'career',description:'🏅 Служебная карьера'},
+ {command:'blitz',description:'🧠 Подготовка к блицу'},
+ {command:'settings',description:'⚙️ Настройки уведомлений'},
+ {command:'games',description:'🎮 Мои республики'},
  {command:'status',description:'📊 Состояние республики'},
- {command:'stages',description:'🗺 Этапы и задачи'},
- {command:'votes',description:'🗳 Открытые голосования'},
- {command:'docs',description:'📜 Документы и НПА'},
- {command:'channels',description:'💬 Доступные чаты'},
- {command:'help',description:'❔ Справка и команды'}
+ {command:'stages',description:'🗺 Этапы'},
+ {command:'votes',description:'🗳 Голосования'},
+ {command:'docs',description:'📜 Реестр НПА'},
+ {command:'help',description:'❔ Справка'}
 ];
 const CALLBACK_TO_COMMAND:Record<string,string>={
  'gos:begin':'/menu','gos:menu':'/menu','gos:games':'/games',
  'gos:status':'/status','gos:stages':'/stages','gos:votes':'/votes',
- 'gos:docs':'/docs','gos:channels':'/channels','gos:help':'/help'
+ 'gos:docs':'/docs','gos:channels':'/channels','gos:help':'/help','gos:office':'/office','gos:brief':'/brief','gos:inbox':'/inbox','gos:deadlines':'/deadlines','gos:agenda':'/agenda','gos:alerts':'/alerts','gos:law':'/law','gos:news':'/news','gos:reception':'/reception','gos:economy':'/economy','gos:career':'/career','gos:blitz':'/blitz','gos:settings':'/settings'
 };
 export function telegramCallbackCommand(data:string):string|undefined{
  return Object.prototype.hasOwnProperty.call(CALLBACK_TO_COMMAND,data)?CALLBACK_TO_COMMAND[data]:undefined;
@@ -92,9 +110,9 @@ export function telegramMenuText(connected:boolean){
   '🏛 ГОС.ID · Главное меню',
   '',
   'Выберите раздел с помощью кнопок ниже.',
-  '📊 Состояние и 🗺 Этапы — информация о республике.',
-  '🗳 Голосования и 📜 Документы — работа институтов.',
-  '💬 Чаты — общение, 🏛 Мои игры — доступные республики.',
+  'Ваш аппарат объединяет входящие документы, поручения, сроки и сообщения.',
+  '«Доклад» показывает актуальную сводку, «Приёмная» — входящие обращения.',
+  'Все действия учитывают ваши полномочия и текущую республику.',
   '',
   connected?'✅ Ваш аккаунт подключён.':'🔐 Чтобы получить доступ к данным игры, привяжите Telegram в профиле ГОС.ID.',
   'Кнопка «Меню» в Telegram остаётся доступной рядом с полем сообщения.'
@@ -110,6 +128,11 @@ export function telegramHelpText(){
   '/game UUID — указать игру при наличии нескольких.',
   '/channel UUID — выбрать доступный канал.',
   '/chat текст — отправить сообщение в выбранный канал.',
+  '/office, /brief, /inbox, /agenda, /alerts — личный аппарат.',
+  '/deadlines, /news, /reception, /economy, /career, /blitz — разделы.',
+  '/law — официальные правовые источники; /settings — уведомления.',
+  '/appeal @Фамилия | тема | текст — отправить обращение.',
+  '/answer UUID | ответ — ответить из приёмной по полномочиям.',
   '/menu — открыть главное меню.',
   '',
   'Для первой привязки перейдите в личный профиль на платформе.'

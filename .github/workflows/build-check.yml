@@ -35,6 +35,10 @@ on:
       - 'app/api/telegram/dispatch/route.ts'
       - 'scripts/telegram-onboarding-check.cjs'
       - 'scripts/telegram-expanded-check.cjs'
+      - 'lib/server/telegramOffice.ts'
+      - 'app/api/telegram/daily-brief/route.ts'
+      - 'supabase/migrations/20261013120000_telegram_personal_office.sql'
+      - 'scripts/telegram-office-suite-check.cjs'
       - 'components/game/telegramBotAvatar.ts'
       - 'scripts/telegram-bot-avatar-check.cjs'
       - 'components/game/AssignedTasks.tsx'
@@ -130,6 +134,7 @@ jobs:
       - run: node scripts/chat-media-transport-check.cjs
       - run: node scripts/telegram-onboarding-check.cjs
       - run: node scripts/telegram-expanded-check.cjs
+      - run: node scripts/telegram-office-suite-check.cjs
       - run: node scripts/telegram-bot-avatar-check.cjs
       - run: node scripts/event-option-legality-check.cjs
       - run: npm run design:check
