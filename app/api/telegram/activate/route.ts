@@ -20,7 +20,7 @@ export function OPTIONS(request:Request){
  const origin=request.headers.get('origin');
  if(origin&&!ALLOWED_ORIGINS.has(origin))
    return NextResponse.json({error:'Недоверенный источник запроса.'},{status:403,headers:noStore});
- return new Response(null,{status:204,headers:{...cors(request),'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Authorization, Content-Type',...noStore}});
+ return new Response(null,{status:204,headers:{...cors(request),'Access-Control-Allow-Methods':'GET, POST, OPTIONS','Access-Control-Allow-Headers':'Authorization, Content-Type',...noStore}});
 }
 
 // Without credentials this remains a public method probe. The detailed
