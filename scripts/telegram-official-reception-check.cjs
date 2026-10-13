@@ -10,6 +10,9 @@ for(const word of [
  'm.roster_archived_at is null','on conflict(game_id,author_id,telegram_message_id)',
  'gos_appeal_notify','grant execute on function public.telegram_reply_official_appeal'
 ])assert.ok(sql.includes(word),'Missing security invariant: '+word);
+assert.ok(sql.includes("grant select,insert,update on public.official_appeals to service_role"),'Privileged dispatcher needs explicit table grant');
+const digestSql=q('supabase/migrations/20261013070000_telegram_digest_prefs.sql');
+for(const category of ["'appeal'","'appeal_reply'","'daily_brief'"])assert.ok(digestSql.includes(category),'Queue CHECK must permit '+category);
 const hook=q('app/api/telegram/webhook/route.ts');
 assert.ok(hook.includes("if(command==='/appeal')")&&hook.includes("if(command==='/reply')"));
 assert.ok(hook.includes("config.db.rpc('telegram_create_official_appeal'"));
