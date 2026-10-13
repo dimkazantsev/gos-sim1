@@ -751,7 +751,7 @@ export function useRepublicGame(gameId:string){
  async function inviteToParty(partyId:string,userId:string){
   const r=await supabase.rpc('invite_to_party',{p_party_id:partyId,p_user_id:userId});
   if(r.error){setError(r.error.message);return false}
-  await loadPartyRepresentation();return true;
+  await loadPartyRepresentation();void kickTelegramDispatch();return true;
  }
  async function respondPartyInvitation(invitationId:string,accept:boolean){
   const r=await supabase.rpc('respond_party_invitation',{p_invitation_id:invitationId,p_accept:accept});
@@ -1011,13 +1011,13 @@ export function useRepublicGame(gameId:string){
   if(up.error){setError(up.error.message);return false}
   const r=await supabase.from('party_documents').insert({game_id:gameId,party_id:partyId,doc_kind:kind,title:title.trim()||file.name,storage_path:path,file_name:file.name,mime_type:file.type||null,file_size:file.size,uploaded_by:me.user_id,status:'submitted'});
   if(r.error){setError(r.error.message);return false}
-  await loadPartyAssets();return true;
+  await loadPartyAssets();void kickTelegramDispatch();return true;
  }
  async function reviewPartyDocument(id:string,status:'accepted'|'revision',note?:string):Promise<boolean>{
   if(!teacher){setError('Рассмотрение документов доступно только преподавателю.');return false}
   const r=await supabase.from('party_documents').update({status,note:note?.trim()||null}).eq('id',id).neq('status',status).select('id,status').maybeSingle();
   if(r.error){setError(r.error.message);return false}
-  await loadPartyAssets();return !!r.data;
+  await loadPartyAssets();if(r.data)void kickTelegramDispatch();return !!r.data;
  }
 
  async function createFormalDocument(data:{stageNo:number;title:string;docType:string;subjectKey:string;subjectLabel:string;bodyText:string;workflowKey:string;metadata?:Record<string,unknown>},file?:File){
