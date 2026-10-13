@@ -7,7 +7,7 @@ const page=read('app/page.tsx');
 const sql=read('supabase/migrations/20261013234000_unified_guest_access_codes.sql');
 assert.ok(session.includes('<TeacherAccessCodes gameId={game.id}/>'));
 assert.ok(!session.includes('profileGuestInvites')&&!session.includes('guestCode,setGuestCode'),'No duplicate guest code editor');
-for(const marker of ['participant','group','guest' ,'teacher_create_saved_invitation','teacher_access_code_list',
+for(const marker of ['participant','group','guest' ,'teacher_create_saved_invitation','teacher_saved_invitation_list',
  'teacher_revoke_access_code','teacher_delete_access_code','Сгенерировать','Создать приглашение','Копировать']){
  assert.ok(source.includes(marker),'Missing single-panel feature '+marker);
 }
