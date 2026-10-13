@@ -5,10 +5,38 @@ import {runtimeConfig,telegramSend} from '@/lib/server/telegram';
 import {telegramSectionButtons,telegramDocumentButtons,telegramTaskButtons,telegramChatButtons} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
 export async function GET(request:Request){
- let config:ReturnType<typeof runtimeConfig>;try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
  const cron=process.env.CRON_SECRET;
  if(!cron||request.headers.get('authorization')!=='Bearer '+cron)return new Response('Unauthorized',{status:401});
- const {data:jobs,error}=await config.db.from('telegram_outbox').select('id,game_id,user_id,body,attempts,category,channel_id,source_id').is('sent_at',null).lt('attempts',5).lte('next_attempt_at',new Date().toISOString()).order('id').limit(40);
+ return dispatchOutbox();
+}
+export async function POST(request:Request){
+ // Signed-in game members can wake the dispatcher for their own game only.
+ // No service-role or bot credentials are sent to the browser.
+ let config:ReturnType<typeof runtimeConfig>;
+ try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
+ const authorization=request.headers.get('authorization')||'';
+ if(!authorization.startsWith('Bearer '))return new Response('Unauthorized',{status:401});
+ const token=authorization.slice('Bearer '.length);
+ const {data:identity,error:authError}=await config.db.auth.getUser(token);
+ if(authError||!identity.user)return new Response('Unauthorized',{status:401});
+ let gameId:string;
+ try{
+  const json=(await request.json()) as {gameId?:string};
+  gameId=String(json.gameId||'');
+ }catch{return NextResponse.json({error:'Invalid request'},{status:400})}
+ if(!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(gameId))
+  return NextResponse.json({error:'Invalid game'},{status:400});
+ const {data:member,error:memberError}=await config.db.from('game_members')
+  .select('user_id').eq('game_id',gameId).eq('user_id',identity.user.id)
+  .is('roster_archived_at',null).maybeSingle();
+ if(memberError||!member)return new Response('Forbidden',{status:403});
+ return dispatchOutbox(gameId);
+}
+async function dispatchOutbox(gameId?:string){
+ let config:ReturnType<typeof runtimeConfig>;try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
+ let queue=config.db.from('telegram_outbox').select('id,game_id,user_id,body,attempts,category,channel_id,source_id').is('sent_at',null).lt('attempts',5).lte('next_attempt_at',new Date().toISOString());
+ if(gameId)queue=queue.eq('game_id',gameId);
+ const {data:jobs,error}=await queue.order('id').limit(40);
  if(error)return NextResponse.json({error:'Queue query failed'},{status:500});
  let sent=0;
  for(const job of jobs||[]){
