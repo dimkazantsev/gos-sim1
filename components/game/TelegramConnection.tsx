@@ -31,6 +31,26 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
    }catch(e){setError(e instanceof Error?e.name==='TimeoutError'?'Сервер не ответил за 20 секунд. Повторите попытку.':e.message:'Ошибка активации')}
    finally{setBusy(false)}
  }
+ async function checkBot(){
+  setBusy(true);setError('');setActivated('');
+  try{
+   const auth=await supabase.auth.getSession();
+   if(!auth.data.session?.access_token)throw new Error('Войдите в игру.');
+   const origin=(process.env.NEXT_PUBLIC_GAME_API_ORIGIN||
+     (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':'')).replace(/[/]$/,'');
+   const response=await fetch(origin+'/api/telegram/activate?gameId='+encodeURIComponent(gameId),{
+    headers:{Authorization:'Bearer '+auth.data.session.access_token},cache:'no-store',
+    signal:AbortSignal.timeout(17000)
+   });
+   const x=await response.json() as {ok?:boolean;error?:string;webhook?:boolean;commands?:boolean;menu?:boolean};
+   if(!response.ok||!x.ok)throw new Error(x.error||'Не удалось проверить Telegram.');
+   setActivated('Webhook: '+(x.webhook?'подтверждён':'не подтверждён')+
+    '. Команды: '+(x.commands?'подтверждены':'не подтверждены')+
+    '. Меню: '+(x.menu?'подтверждено':'не подтверждено')+'.');
+   if(!x.webhook||!x.commands||!x.menu)setError('Настройка неполная. Выполните повторную активацию.');
+  }catch(e){setError(e instanceof Error?e.message:'Ошибка проверки Telegram.')}
+  finally{setBusy(false)}
+ }
  async function refresh(){
    try{const r=await supabase.rpc('telegram_status',{p_game_id:gameId});if(r.error)throw r.error;setStatus(r.data as typeof status)}
    catch(e){setError(e instanceof Error?e.message:'Не удалось получить состояние Telegram')}
@@ -60,8 +80,8 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
     <button type="button" disabled={busy} onClick={()=>void change('toggle')}>{status.notifications_enabled?'Отключить уведомления':'Включить уведомления'}</button>
     <button type="button" disabled={busy} onClick={()=>void change('unlink')}>Отвязать Telegram</button>
    </>}
-   <button type="button" onClick={()=>void refresh()}>Обновить статус</button>
-   {teacher&&<button type="button" disabled={busy} onClick={()=>void activate()}>Активировать бота</button>}
+   <button type="button" onClick={()=>void refresh()}>Обновить статус привязки</button>
+   {teacher&&<><button type="button" disabled={busy} onClick={()=>void checkBot()}>Проверить Telegram</button><button type="button" disabled={busy} onClick={()=>void activate()}>Активировать бота</button></>}
   </div>
   {activated&&<p role="status">{activated.startsWith('Если Telegram')?<a href={activated.split('ссылкой: ')[1]} target="_blank" rel="noopener noreferrer">Открыть Telegram для привязки</a>:activated}</p>}
   {error&&<p role="alert" style={{color:'var(--danger,#b73535)'}}>{error}</p>}
