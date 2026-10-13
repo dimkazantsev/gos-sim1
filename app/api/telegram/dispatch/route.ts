@@ -23,7 +23,7 @@ export async function GET(request:Request){
   const muted=(category.startsWith('digest_')&&pref?.daily_digest===false)||
    ((category==='task'||category==='task_done'||category.startsWith('task_reminder'))&&pref?.notify_tasks===false)||
    ((category==='document'||category==='document_delivery'||category==='mention_documents')&&pref?.notify_documents===false)||
-   ((category==='chat'||category==='mention_chat'||category==='mention_actions'||category==='reception')&&pref?.notify_messages===false)||
+   ((category==='chat'||category==='mention_chat'||category==='mention_actions'||category==='reception'||category==='reception_answer')&&pref?.notify_messages===false)||
    ((category==='stage'||category==='vote'||category==='event')&&pref?.notify_events===false);
   if(muted){
    await config.db.from('telegram_outbox').update({sent_at:new Date().toISOString(),last_error:'Disabled in personal settings'}).eq('id',job.id);
@@ -52,6 +52,7 @@ export async function GET(request:Request){
   else if(job.category==='chat'||job.category==='mention_chat')buttons=telegramChatButtons(job.channel_id||undefined);
   else if(job.category==='stage')buttons=telegramSectionButtons('stages','Открыть этап');
   else if(job.category==='vote')buttons=telegramSectionButtons('votes','Открыть голосование');
+  else if(job.category==='reception_answer')buttons={inline_keyboard:[[{text:'🏢 Моя приёмная',callback_data:'gos:reception'}],[{text:'🏛 Меню',callback_data:'gos:menu'}]]};
   else if(job.category==='reception')buttons={inline_keyboard:[[{text:'🏢 Приёмная',callback_data:'gos:reception'}],[{text:'🏛 Меню',callback_data:'gos:menu'}]]};
   else if((job.category||'').startsWith('digest_'))buttons={inline_keyboard:[[{text:'🏛 Личный аппарат',callback_data:'gos:office'}],[{text:'🌐 Открыть ГОС.ID',url:'https://dimkazantsev.github.io/gos-sim1/'}]]};
   try{await telegramSend(config.token,link.chat_id,job.body,buttons);await config.db.from('telegram_outbox').update({sent_at:new Date().toISOString(),last_error:null}).eq('id',job.id);sent++}
