@@ -34,6 +34,7 @@ assert.ok(webhook.includes("'🏛 Игра: '")&&webhook.includes("'\\n👥 Гр
 assert.ok(!webhook.includes("||'Республика')"),'Missing group must never be called republic');
 assert.ok(tg.includes("const main=newline===-1?'<b>'+safe+'</b>'"),'Heading is plain bold, not a link');
 assert.ok(tg.includes("return main+'\\n\\n🔗 <a href="),'Only signature remains linked');
-for(const marker of ['civicSun','civicCross','civicArrow','civicSmallCircle','civicCuckoo','gos-cuckoo-window'])assert.ok(art.includes(marker),'Missing animation element '+marker);
-assert.ok(css.includes('gosCuckooPeek 30s')&&css.includes('prefers-reduced-motion:reduce'),'Every 30 seconds, disabled when motion is reduced');
-console.log('PASS teacher access codes, group login, role gates, Telegram cards, and civic animation');
+assert.ok(art.includes('className="civicOrbit"'),'Original dotted orbit must remain');
+assert.ok(css.includes('.civicOrbit{transform-origin:523px 94px;animation:spin 100s linear infinite}'),'Only dotted orbit rotates');
+for(const marker of ['civicCuckoo','gos-cuckoo-window','gosCuckooPeek','gosCivicBreathe','gosCivicArrow','gosCivicRock'])assert.ok(!art.includes(marker)&&!css.includes(marker),'Reverted illustration must remain unchanged: '+marker);
+console.log('PASS teacher access codes, group login, role gates, Telegram cards, and original dotted-orbit artwork');

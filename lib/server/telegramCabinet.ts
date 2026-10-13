@@ -75,7 +75,7 @@ export async function telegramCabinetCard(db:Db,gameId:string,userId:string,sect
   const posts=await query.order('pinned',{ascending:false}).order('created_at',{ascending:false}).limit(5);
   if(posts.error)throw posts.error;
   const items=posts.data||[];
-  return{text:heading+(section==='news'?'Новости республики':'Ситуационный центр')+'\n\n'+
+  return{text:heading+(section==='news'?'Новости игры':'Ситуационный центр')+'\n\n'+
    (items.length?printList(items.map((post,i)=>(i+1)+'. '+safeTitle(post.title)+'\n📅 '+date(post.created_at))):
     section==='news'?'В политическом процессе пока нет публикаций.':'В политическом процессе пока нет сообщений о кризисах.'),
    buttons:telegramSectionButtons('actions','Открыть политический процесс')};

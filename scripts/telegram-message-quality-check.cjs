@@ -11,10 +11,13 @@ function imported(path,mocks={}){
 }
 const presentation=imported('lib/server/telegramPresentation.ts');
 const html=presentation.telegramMessageHtml('🏛 ГОС.ID · Настройки\\n\\nТекст настройки\\n✅ Документы');
-assert.ok(html.startsWith('<b>🏛 ГОС.ID · Настройки</b>\n\nТекст настройки\n✅ Документы'));
+assert.ok(html.startsWith('<b>🏛 ГОС.\u200BID · Настройки</b>\n\nТекст настройки\n✅ Документы'));
+assert.ok(!html.includes('<b>🏛 ГОС.ID'),'Telegram title must not auto-link as misleading mixed-script domain');
+assert.ok(html.endsWith('<a href="'+presentation.TELEGRAM_PROJECT_URL+'">ГОС.ID</a>'),'Footer must be an explicit verified URL');
 assert.ok(!html.includes('\\n'),'Visible backslash-n sequences must be converted to real newlines');
 assert.equal((html.match(/<b>/g)||[]).length,1,'Only the title can be bold');
 assert.ok(!html.includes('━━━━━━━━'),'No unnecessary divider');
+assert.ok(!presentation.telegramMessageHtml('⚠️ ГОС.ID · Приёмная').includes('<b>⚠️ ГОС.ID'),'Same protection applies to every heading');
 const injection=presentation.telegramMessageHtml('Заголовок\n<важные> & "данные"');
 assert.ok(injection.includes('&lt;важные&gt; &amp; &quot;данные&quot;'),'Telegram HTML must be escaped');
 const hook=fs.readFileSync('app/api/telegram/webhook/route.ts','utf8');

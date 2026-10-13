@@ -15,7 +15,7 @@ assert.ok(present.telegramSectionUrl('dashboard','abc').includes('openChat=1'));
 assert.equal(present.telegramCallbackCommand('__proto__'),undefined);
 assert.ok(present.telegramMessageHtml('<script>evil</script>').includes('&lt;script&gt;'));
 const webhook=read('app/api/telegram/webhook/route.ts');
-assert.ok(webhook.includes("🏛 ГОС.ID · Состояние республики"));
+assert.ok(webhook.includes("🏛 ГОС.ID · Состояние игры"));
 assert.ok(webhook.includes("stage?.title"));
 assert.ok(webhook.includes("telegramDocumentButtons(data||[])"));
 assert.ok(webhook.includes("order('created_at',{ascending:false}).limit(2)"));

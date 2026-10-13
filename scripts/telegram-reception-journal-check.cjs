@@ -23,7 +23,7 @@ assert.equal(presentation.telegramCallbackCommand('gos:appeal:confirm:bad'),unde
 assert.equal(presentation.telegramCallbackCommand('gos:appeal:pick:'+uid+';DROP'),undefined);
 const individual=notice.telegramSystemNotice('task','Поручение получено.');
 const html=presentation.telegramMessageHtml(individual);
-assert.ok(html.startsWith('<b>🏛 ГОС.ID · Поручения</b>\n\nПоручение получено.'));
+assert.ok(html.startsWith('<b>🏛 ГОС.\u200BID · Поручения</b>\n\nПоручение получено.'));
 assert.equal((html.match(/<b>/g)||[]).length,1,'Only heading bold');
 assert.ok(notice.telegramGroupNotices('task',['Поручение 1.','Поручение 2.'])
  .includes('1. Поручение 1.\n\n2. Поручение 2.'));
