@@ -67,7 +67,10 @@ begin
  if not found then raise exception 'Member not found'; end if;
  if v_member.kind='teacher' then raise exception 'Teacher accounts are protected'; end if;
  if p_confirm_name is distinct from v_member.full_name then raise exception 'Confirmation mismatch'; end if;
- -- Change member BEFORE installing block, so the blocking trigger cannot intercept this update.
+ -- With a row lock held, remove any previous block within this transaction to allow escalation from exclusion to profile erasure.
+ -- Other transactions cannot observe the temporary removal before commit.
+ delete from public.game_member_access_blocks where game_id=p_game_id and user_id=p_user_id;
+ -- Change member BEFORE reinstalling block, so the blocking trigger cannot intercept this update.
  update public.game_members set
   roster_archived_at=coalesce(roster_archived_at,now()),
   full_name=case when p_action='erase_profile' then 'Удалённый участник' else full_name end,
@@ -92,3 +95,9 @@ revoke all on function public.teacher_participant_roster(uuid) from public,anon,
 grant execute on function public.teacher_participant_roster(uuid) to authenticated;
 revoke all on function public.teacher_manage_participant(uuid,uuid,text,text) from public,anon,authenticated;
 grant execute on function public.teacher_manage_participant(uuid,uuid,text,text) to authenticated;
+
+-- Own-row blitz policies alone do not check game membership; restrict those reads after exclusion.
+create policy blitz_assignments_current_member on public.blitz_assignments as restrictive
+ for select to authenticated using (private.is_game_member(game_id));
+create policy blitz_daily_plans_current_member on public.blitz_daily_plans as restrictive
+ for select to authenticated using (private.is_game_member(game_id));
