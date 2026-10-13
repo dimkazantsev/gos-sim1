@@ -1,5 +1,6 @@
 import {NextResponse} from 'next/server';
 import {telegramVisibleChatChannels} from '@/lib/server/telegramVisibleChatChannels';
+import {telegramGroupNotices,telegramSystemNotice} from '@/lib/server/telegramNotice';
 import {runtimeConfig,telegramSend} from '@/lib/server/telegram';
 import {telegramSectionButtons,telegramDocumentButtons,telegramTaskButtons,telegramChatButtons} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
@@ -124,8 +125,44 @@ export async function GET(request:Request){
   else if(job.category==='chat'||job.category==='mention_chat')buttons=telegramChatButtons(job.channel_id||undefined);
   else if(job.category==='stage')buttons=telegramSectionButtons('stages','Открыть этап');
   else if(job.category==='vote')buttons=telegramSectionButtons('votes','Открыть голосование');
-  try{await telegramSend(config.token,link.chat_id,job.body,buttons);await config.db.from('telegram_outbox').update({sent_at:new Date().toISOString(),last_error:null}).eq('id',job.id);sent++}
-  catch(e){await config.db.from('telegram_outbox').update({last_error:e instanceof Error?e.message.slice(0,250):'Unknown error',next_attempt_at:new Date(Date.now()+Math.pow(2,Math.min(job.attempts,4))*60000).toISOString()}).eq('id',job.id)}
+  // Combine only low-urgency, same-recipient open task notices. Each extra
+  // job is independently claimed and its live source rechecked; no cross-game
+  // or cross-user aggregation and no batching of urgent appeals or votes.
+  const grouped=[{id:job.id,body:job.body}];
+  if(job.category==='task'){
+   for(const extra of (jobs||[]).filter(candidate=>candidate.id!==job.id&&
+      candidate.game_id===job.game_id&&candidate.user_id===job.user_id&&
+      candidate.category==='task').slice(0,3)){
+    const {data:extraClaim}=await config.db.from('telegram_outbox')
+     .update({attempts:extra.attempts+1,next_attempt_at:new Date(Date.now()+120000).toISOString()})
+     .eq('id',extra.id).eq('attempts',extra.attempts).is('sent_at',null).select('id').maybeSingle();
+    if(!extraClaim)continue;
+    const {data:source,error:sourceError}=await config.db.from('game_assigned_tasks')
+     .select('id,status').eq('game_id',extra.game_id).eq('id',extra.source_id).maybeSingle();
+    if(sourceError){
+     await config.db.from('telegram_outbox').update({last_error:'Task lookup error'})
+      .eq('id',extra.id);
+     continue;
+    }
+    if(!source||source.status==='confirmed'){
+     await config.db.from('telegram_outbox').update({
+      sent_at:new Date().toISOString(),last_error:'Task no longer active'
+     }).eq('id',extra.id);
+     continue;
+    }
+    grouped.push({id:extra.id,body:extra.body});
+   }
+  }
+  const output=grouped.length>1
+   ?telegramGroupNotices(job.category,grouped.map(item=>item.body))
+   :telegramSystemNotice(job.category,job.body);
+  try{
+   await telegramSend(config.token,link.chat_id,output,buttons);
+   for(const item of grouped)await config.db.from('telegram_outbox')
+    .update({sent_at:new Date().toISOString(),last_error:null}).eq('id',item.id);
+   sent+=grouped.length;
+  }
+  catch(e){for(const item of grouped)await config.db.from('telegram_outbox').update({last_error:e instanceof Error?e.message.slice(0,250):'Unknown error',next_attempt_at:new Date(Date.now()+Math.pow(2,Math.min(job.attempts,4))*60000).toISOString()}).eq('id',item.id)}
  }
  return NextResponse.json({ok:true,processed:(jobs||[]).length,sent});
 }
