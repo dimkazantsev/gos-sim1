@@ -128,7 +128,7 @@ export function telegramMenuText(connected:boolean){
   '💬 Чаты — общение, 🏛 Мои игры — доступные республики.',
   '',
   connected?'✅ Ваш аккаунт подключён.':'🔐 Чтобы получить доступ к данным игры, привяжите Telegram в профиле ГОС.ID.',
-  'Кнопка «Меню» в Telegram остаётся доступной рядом с полем сообщения.'
+  'Меню Telegram также доступно рядом с полем сообщения.'
  ].join('\n');
 }
 export function telegramHelpText(){
@@ -136,11 +136,18 @@ export function telegramHelpText(){
   '❔ ГОС.ID · Помощь',
   '',
   'Выберите действие с помощью кнопок или меню Telegram.',
-  '/games — мои игры, /status — состояние, /stages — этапы.',
-  '/votes — голосования, /docs — документы, /channels — чаты.',
-  '/game UUID — указать игру при наличии нескольких.',
-  '/channel UUID — выбрать доступный канал.',
-  '/chat текст — отправить сообщение в выбранный канал.',
+  '/games — мои республики.',
+  '/status — состояние республики.',
+  '/stages — этапы и задачи.',
+  '/votes — голосования.',
+  '/docs — документы.',
+  '/channels — чаты.',
+  '/games — список республик; для выбора используется код республики.',
+  '/channels — список доступных чатов.',
+  '/chat текст — написать в выбранный чат.',
+  '/appeal @Фамилия текст — направить обращение.',
+  '/appeals — мои обращения.',
+  '/reply КОД текст — ответить на входящее обращение.',
   '/menu — открыть главное меню.',
   '',
   'Для первой привязки перейдите в личный профиль на платформе.'
@@ -151,14 +158,19 @@ export function escapeTelegramHtml(text:string){
 }
 /** Always retain the verified linked signature at the very bottom. */
 export function telegramMessageHtml(text:string){
+ // Some earlier cards stored escaped newline sequences as literal text.
+ // Normalize them at the single Telegram delivery boundary, before escaping HTML.
+ const normalized=text.replace(/\\r\\n|\\n|\\r/g,'\n').replace(/\r\n?/g,'\n')
+  .replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
  let safe='',size=0,truncated=false;
- for(const char of text.replaceAll('GOS//SIMS','ГОС.ID')){
+ for(const char of normalized.replaceAll('GOS//SIMS','ГОС.ID')){
   const part=escapeTelegramHtml(char);
   if(size+part.length>3650){truncated=true;break}
   safe+=part;size+=part.length;
  }
  if(truncated)safe+='…';
  const newline=safe.indexOf('\n');
+ // Bold only the title (first line); the body remains normal weight.
  const main=newline===-1?'<b>'+safe+'</b>':'<b>'+safe.slice(0,newline)+'</b>'+safe.slice(newline);
- return main+'\n\n━━━━━━━━\n🔗 <a href="'+TELEGRAM_PROJECT_URL+'">ГОС.ID</a>';
+ return main+'\n\n🔗 <a href="'+TELEGRAM_PROJECT_URL+'">ГОС.ID</a>';
 }

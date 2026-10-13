@@ -6,7 +6,7 @@ type Card={text:string;buttons?:ReturnType<typeof telegramSectionButtons>};
 type Section='office'|'brief'|'agenda'|'tasks'|'inbox'|'news'|'economy'|'career'|'crises'|'legal'|'training'|'settings';
 const date=(value:string|null|undefined)=>value?new Date(value).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Barnaul'}):'не указана';
 const safeTitle=(v:string|null|undefined)=>v?.trim()||'Без названия';
-const printList=(a:string[])=>a.length?a.join('\n'):'Нет новых элементов';
+const printList=(a:string[])=>a.length?a.join('\n\n'):'Нет новых элементов';
 
 /** Each query is scoped to the already authenticated and active game membership. */
 export async function telegramCabinetCard(db:Db,gameId:string,userId:string,section:Section):Promise<Card>{
@@ -66,10 +66,18 @@ export async function telegramCabinetCard(db:Db,gameId:string,userId:string,sect
   ]),buttons:telegramSectionButtons('stages','Перейти к этапам')};
  }
  if(section==='news'||section==='crises'){
-  const eventResult=await db.from('game_events').select('title,published_at,category,severity').eq('game_id',gameId).not('published_at','is',null).contains('audience',{public:true}).order('published_at',{ascending:false}).limit(12);
-  if(eventResult.error)throw eventResult.error;
-  const events=(eventResult.data||[]).filter(e=>section==='news'||e.severity==='critical'||e.severity==='high');
-  return{text:heading+(section==='news'?'Новости республики':'Ситуационный центр')+'\n\n'+printList(events.map(e=>'📰 '+safeTitle(e.title)+'\n   '+date(e.published_at))),buttons:telegramSectionButtons('events','Открыть события')};
+  // Political process is the source of truth. game_events persists historical
+  // entries after their associated wall posts have been soft-deleted.
+  let query=db.from('political_posts').select('title,created_at')
+   .eq('game_id',gameId).is('deleted_at',null);
+  if(section==='crises')query=query.eq('process_type','crisis_response');
+  const posts=await query.order('pinned',{ascending:false}).order('created_at',{ascending:false}).limit(5);
+  if(posts.error)throw posts.error;
+  const items=posts.data||[];
+  return{text:heading+(section==='news'?'Новости республики':'Ситуационный центр')+'\n\n'+
+   (items.length?printList(items.map((post,i)=>(i+1)+'. '+safeTitle(post.title)+'\n📅 '+date(post.created_at))):
+    section==='news'?'В политическом процессе пока нет публикаций.':'В политическом процессе пока нет сообщений о кризисах.'),
+   buttons:telegramSectionButtons('actions','Открыть политический процесс')};
  }
  if(section==='career'){
   const scores=await db.from('stage_assessments').select('stage_no,final_score,status').eq('game_id',gameId).eq('user_id',userId).order('stage_no',{ascending:false}).limit(12);
@@ -91,7 +99,7 @@ export async function telegramCabinetCard(db:Db,gameId:string,userId:string,sect
   ['events','🚨 События',config.events],
   ['quiet','🌙 Тихие часы',config.quiet_hours]
  ] as const;
- return{text:heading+'Настройки уведомлений\\n\\nНажмите на категорию, чтобы включить или выключить её.\\n🌙 Тихие часы: 22:00–08:00 (Барнаул).\\n\\n'+labels.map(([_,name,on])=>(on?'✅ ':'⚪ ')+name).join('\\n'),
+ return{text:heading+'Настройки уведомлений\n\nНажмите на категорию, чтобы включить или выключить её.\n\n🌙 Тихие часы: 22:00–08:00 (Барнаул).\n\n'+labels.map(([_,name,on])=>(on?'✅ ':'⚪ ')+name).join('\n'),
   buttons:{inline_keyboard:[
    ...labels.map(([key,name,on])=>[{text:(on?'✅ ':'⚪ ')+name,callback_data:'gos:prefs:'+key}]),
    [{text:'🏛 Меню',callback_data:'gos:menu'}]

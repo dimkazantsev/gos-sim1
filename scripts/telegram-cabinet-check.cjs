@@ -12,7 +12,7 @@ for(const k of ['office','brief','agenda','tasks','inbox','news','crises','econo
 const names=menu.TELEGRAM_MENU_BUTTONS.inline_keyboard.flat().map(x=>x.callback_data);
 assert.ok(names.includes('gos:office')&&names.includes('gos:settings'));
 const s=read('lib/server/telegramCabinet.ts');
-for(const x of ["eq('game_id',gameId)","eq('user_id',userId)","roster_archived_at","recipient_id.eq.'+userId","not('published_at','is',null)","eq('status','open')"]){
+for(const x of ["eq('game_id',gameId)","eq('user_id',userId)","roster_archived_at","recipient_id.eq.'+userId","is('deleted_at',null)","eq('status','open')"]){
  assert.ok(s.includes(x),'Expected data-scope guard '+x);
 }
 assert.ok(s.includes("s.status==='final'"),'Unfinalized grades cannot be exposed as official');
@@ -23,4 +23,7 @@ assert.ok(membership>=0&&newOffice>membership,'Office must be behind active memb
 assert.ok(hook.includes("if(!game){await reply"),'Game must be selected before office data');
 assert.ok(!s.includes('service_role'),'No service key exposed in cards');
 assert.ok(!s.includes("from('blitz_questions')"),'Quiz answer bank must remain inaccessible');
-console.log('PASS Telegram office commands and authorization contracts');
+assert.ok(s.includes("from('political_posts')"),'News must reflect the visible political wall');
+assert.ok(!s.includes("from('game_events')"),'Do not resurrect deleted historical events');
+assert.ok(s.includes('.limit(5)'),'News cards limited to five posts');
+console.log('PASS Telegram office commands, current-wall news and authorization contracts');
