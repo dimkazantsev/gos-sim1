@@ -228,6 +228,6 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
   {own&&game&&<TelegramConnection gameId={game.id} teacher={teacher}/>}
   {own&&game&&<ProfileDocumentLinks gameId={game.id} userId={me.user_id}/>}
   {own&&teacher&&<SessionManager g={g}/>}
-  <RepublicComic gameId={game?.id} initialView={comicView} open={comicOpen} onClose={()=>setComicOpen(false)}/>
+  <RepublicComic gameId={game?.id} initialView={comicView} teacherPreview={Boolean(own&&teacher)} open={comicOpen} onClose={()=>setComicOpen(false)}/>
  </div>;
 }
