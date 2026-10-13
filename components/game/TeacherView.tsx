@@ -13,6 +13,7 @@ import GradesView from './GradesView';
 import TeacherAwards from './TeacherAwards';
 import TeacherBlitz from './TeacherBlitz';
 import TeacherOverview from './TeacherOverview';
+import TeacherParticipantRoster from './TeacherParticipantRoster';
 import {useSavedGameState,savedChoice} from './useSavedGameState';
 import {useHorizontalWheel} from './useHorizontalWheel';
 
@@ -21,9 +22,10 @@ function timerText(seconds:number){
  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools'|'event'|'awards'|'blitz';
+type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools'|'event'|'awards'|'blitz'|'participants';
 const WORKSPACES=[
  {key:'overview',title:'Обзор',icon:Activity},
+ {key:'participants',title:'Участники и доступ',icon:UsersRound},
  {key:'stages',title:'Этапы',icon:BookOpenText},
  {key:'journal',title:'Журнал',icon:UsersRound},
  {key:'analytics',title:'Аналитика',icon:BarChart3},
@@ -114,6 +116,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    </div>
   </section>
    <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
+    {workspace==='participants'&&<TeacherParticipantRoster g={g}/>}
     {workspace==='overview'&&<TeacherOverview g={g} onWorkspace={setWorkspace} onNavigate={onNavigate||(()=>onOpenProcesses())}/>}
 
     {workspace==='stages'&&<TeacherStageManager g={g} onOpenStage={onOpenStages}/>}
