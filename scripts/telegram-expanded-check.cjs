@@ -24,7 +24,7 @@ assert.ok(!webhook.includes('gos-sim1.vercel.app/game/'));
 const reg=read('app/api/telegram/register/route.ts');
 assert.ok(reg.includes("'setMyName',{name:'ГОС.ID',language_code:''}"));
 assert.ok(reg.includes("'setMyName',{name:'ГОС.ID',language_code:'ru'}"));
-assert.ok(reg.includes('telegramSetProfilePhoto(config.token)'));
+assert.ok(reg.includes('telegramSetProfilePhoto(config.token,avatarJpegBase64'));
 assert.ok(reg.includes("member?.kind!=='teacher'"));
 const bot=read('lib/server/telegram.ts');
 assert.ok(bot.includes("/setMyProfilePhoto"));
