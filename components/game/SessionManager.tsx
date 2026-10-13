@@ -5,6 +5,7 @@ import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {downloadFullGameArchive,enumerateGameAssets,purgeGameAssets,saveGameBlob} from './gameArchive';
 import {preparePortableSession,type SessionArchive} from './portableSession';
+import {canPermanentlyDeleteGame,freshGameBackupReceipt,gameBackupReceiptKey} from './sessionDeletionGuard';
 type Session={id:string;title:string;game_code:string;owner_id:string;status:string;created_at:string};
 export default function SessionManager({g}:{g:ReturnTypeRepublic}){
  const {me,teacher,game}=g;
@@ -12,7 +13,7 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
  const [admin,setAdmin]=useState(false);
  const [selected,setSelected]=useState('');
  const [typed,setTyped]=useState('');
- const [backedUp,setBackedUp]=useState<string[]>([]);
+ const [backedUp,setBackedUp]=useState<Record<string,string>>({});
  const [confirmed,setConfirmed]=useState(false);
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
@@ -20,6 +21,11 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
  const [guestCode,setGuestCode]=useState('');
  const [guestCreated,setGuestCreated]=useState('');
  const candidate=sessions.find(s=>s.id===selected);
+ const receiptKey=candidate&&me?gameBackupReceiptKey(me.user_id,candidate.id):'';
+ let storedReceipt:string|null=null;
+ try{if(receiptKey&&typeof window!=='undefined')storedReceipt=window.sessionStorage.getItem(receiptKey)}catch{}
+ const backupReady=freshGameBackupReceipt(backedUp[receiptKey]||storedReceipt);
+ const deleteAllowed=!!candidate&&canPermanentlyDeleteGame({busy,confirmed,typed,code:candidate.game_code,backupReady});
  async function refresh(){
   if(!teacher||!me)return;
   const [a,b]=await Promise.all([
@@ -45,7 +51,11 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
      saveGameBlob(new Blob([portable.html],{type:'text/html'}),'GOS-ID-'+suffix+'.html');
     }else saveGameBlob(new Blob([JSON.stringify(r.data,null,2)],{type:'application/json'}),'GOS-ID-'+suffix+'.json');
    }
-   if(format==='zip')setBackedUp(old=>old.includes(s.id)?old:[...old,s.id]);
+   if(format==='zip'&&me){
+    const key=gameBackupReceiptKey(me.user_id,s.id),timestamp=String(Date.now());
+    setBackedUp(old=>({...old,[key]:timestamp}));
+    try{window.sessionStorage.setItem(key,timestamp)}catch{/* In-memory receipt remains usable until the page is closed. */}
+   }
    setNotice('Архив сформирован и передан браузеру. Проверьте, что файл действительно сохранился перед удалением.');
   }catch(e){setNotice('Ошибка экспорта: '+(e instanceof Error?e.message:'Неизвестная ошибка'))}
   finally{setBusy(false);setProgress('')}
@@ -59,9 +69,9 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
   setBusy(false);
  }
  async function deleteOne(){
-  const s=candidate;if(!s||!teacher||busy||!confirmed||typed!==s.game_code)return;
+  const s=candidate;if(!s||!teacher||!deleteAllowed)return;
   if(s.owner_id!==me?.user_id&&!admin){setNotice('Удалять сеансы может только их владелец или подтверждённый глобальный администратор.');return}
-  if(!backedUp.includes(s.id)){setNotice('Сначала сформируйте и сохраните резервную копию этого сеанса.');return}
+  if(!backupReady){setNotice('Сначала сформируйте свежий полный ZIP-архив этого сеанса и проверьте, что файл сохранён.');return}
   if(!window.confirm('Вы действительно хотите безвозвратно удалить игру «'+s.title+'»? Будут удалены все записи, участники, события, оценки, сообщения, НПА и файлы.'))return;
   setBusy(true);setNotice('');
   try{
@@ -78,6 +88,7 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
    const last=await supabase.rpc('delete_game_permanently',{p_game:s.id,p_code:typed});
    if(last.error)throw last.error;
    setNotice('Сеанс «'+s.title+'» и все его файлы удалены. Принадлежащие человеку аккаунты Auth других игр не затронуты.');
+   if(receiptKey){try{window.sessionStorage.removeItem(receiptKey)}catch{};setBackedUp(old=>{const next={...old};delete next[receiptKey];return next})}
    setSelected('');setTyped('');setConfirmed(false);await refresh();
    if(s.id===game?.id)window.location.assign('/');
   }catch(e){setNotice('Операция остановлена: '+(e instanceof Error?e.message:'Неизвестная ошибка')+'. Сеанс сохраняется в архивном состоянии, пока очистка не завершена.')}
@@ -105,7 +116,8 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
    <p>После удаления восстановление возможно только из резервной копии. Останутся лишь самостоятельные аккаунты пользователей и сведения, относящиеся к другим играм. Отдельные файлы должны быть удалены до удаления базы.</p>
    <label>Введите точный код сеанса: {candidate.game_code}<input autoComplete="off" value={typed} onChange={e=>setTyped(e.target.value.toUpperCase())} placeholder="Код сеанса"/></label>
    <label className="profileSessionConfirm"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/> Я сохранил(а) резервную копию и понимаю, что действие необратимо.</label>
-   <button type="button" className="danger" disabled={busy||!confirmed||typed!==candidate.game_code||!backedUp.includes(candidate.id)} onClick={()=>void deleteOne()}><Trash2 size={17}/> Полностью удалить сеанс</button>
+   <p role="status" className="profileSessionNotice">{backupReady?'Полный ZIP подготовлен в этом сеансе браузера. Убедитесь, что файл действительно сохранился. После проверки кода и подтверждения можно удалить игру.':'Для разблокировки удаления сначала нажмите «ZIP · Локальная Игра» у этого сеанса и дождитесь завершения экспорта. Затем проверьте, что ZIP сохранился. Отметка экспорта сохраняется при обновлении страницы в этой вкладке в течение одного часа.'}</p>
+   <button type="button" className="danger" disabled={!deleteAllowed} onClick={()=>void deleteOne()}><Trash2 size={17}/> Полностью удалить сеанс</button>
    <button type="button" onClick={()=>{setSelected('');setTyped('');setConfirmed(false)}}>Отмена</button>
   </div>}
   {progress&&<p role="status" className="profileSessionProgress">{progress}</p>}
