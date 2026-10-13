@@ -1,0 +1,15 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const read=p=>fs.readFileSync(p,'utf8');
+const ui=read('components/game/TeacherAccessCodes.tsx');
+const css=read('app/design-shell.css');
+const sql=read('supabase/migrations/20261014001000_teacher_invitation_inventory.sql');
+assert.ok(ui.includes("type InventoryScope=Scope|'teacher'"));
+assert.ok(ui.includes('Все приглашения ({rows.length})'));
+assert.ok(ui.includes("row.scope==='teacher'?<span"),'Teacher invite must not expose revoke/delete button');
+assert.ok(ui.includes('Защищённый доступ'));
+assert.ok(sql.includes("i.kind in ('student','observer','teacher')"),'All kinds in list');
+assert.ok(sql.includes('private.is_game_teacher(p_game_id)'),'Teacher-only read');
+assert.ok(!sql.includes('code_hash'),'No secret hashes returned');
+assert.ok(css.includes('.teacherAccessCodes .teacherAccessListHead h4{margin:0;line-height:1.4}'));
+assert.ok(css.includes('padding:0 0 14px'),'Refresh separated from divider');
+console.log('PASS all invitation types shown and aligned without exposing protected secrets');
