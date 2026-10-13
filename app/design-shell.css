@@ -40,3 +40,15 @@
 /* Scheduled API synchronization is not a realtime connection error. */
 .sidebarRealtime i.polling{background:var(--gs-amber)}
 .connectionPill.polling{display:inline-flex;background:#f4f6fa;border-color:var(--gs-border);color:var(--gs-muted)}
+
+/* ГОС.ID civic illustration: independent lightweight animations. */
+.civicSun{transform-box:fill-box;transform-origin:center;animation:gosCivicBreathe 7s ease-in-out infinite}
+.civicSmallCircle{transform-box:fill-box;transform-origin:center;animation:gosCivicBreathe 5.5s ease-in-out infinite}
+.civicCross{transform-box:fill-box;transform-origin:center;animation:gosCivicRock 8s ease-in-out infinite}
+.civicArrow{animation:gosCivicArrow 6s ease-in-out infinite}
+.civicCuckoo{animation:gosCuckooPeek 30s ease-in-out infinite;transform:translateY(34px)}
+@keyframes gosCivicBreathe{0%,100%{transform:scale(.97)}50%{transform:scale(1.035)}}
+@keyframes gosCivicRock{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(7deg)}}
+@keyframes gosCivicArrow{0%,82%,100%{transform:translate(0,0)}89%{transform:translate(6px,-6px)}}
+@keyframes gosCuckooPeek{0%,2%,11%,100%{transform:translateY(34px)}4%,8%{transform:translateY(0)}6%{transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){.civicOrbit,.civicSun,.civicSmallCircle,.civicCross,.civicArrow,.civicCuckoo{animation:none!important}.civicCuckoo{transform:translateY(34px)}}
