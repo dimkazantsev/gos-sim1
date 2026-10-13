@@ -66,7 +66,7 @@ export async function telegramCabinetCard(db:Db,gameId:string,userId:string,sect
   ]),buttons:telegramSectionButtons('stages','Перейти к этапам')};
  }
  if(section==='news'||section==='crises'){
-  const eventResult=await db.from('game_events').select('title,published_at,category,severity').eq('game_id',gameId).not('published_at','is',null).order('published_at',{ascending:false}).limit(12);
+  const eventResult=await db.from('game_events').select('title,published_at,category,severity').eq('game_id',gameId).not('published_at','is',null).contains('audience',{public:true}).order('published_at',{ascending:false}).limit(12);
   if(eventResult.error)throw eventResult.error;
   const events=(eventResult.data||[]).filter(e=>section==='news'||e.severity==='critical'||e.severity==='high');
   return{text:heading+(section==='news'?'Новости республики':'Ситуационный центр')+'\n\n'+printList(events.map(e=>'📰 '+safeTitle(e.title)+'\n   '+date(e.published_at))),buttons:telegramSectionButtons('events','Открыть события')};
