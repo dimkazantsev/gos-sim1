@@ -24,8 +24,10 @@ do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;admin uuid:='9fdf73
  perform set_config('request.jwt.claim.sub',admin::text,true);
  perform public.save_presidential_candidate(g,null,a,null,'Кандидат QA','self','Программа QA');
  if not exists(select 1 from public.political_posts where game_id=g and title='Выдвинут кандидат: Кандидат QA') then raise exception 'FAIL candidate automation';end if;
- p:=public.create_political_post(g,'initiative','teacher','Проект решения QA','Текст проекта решения');
- if (select actor_label from public.political_posts where id=p)<>'GOS//SIMS' then raise exception 'FAIL neutral teacher publisher';end if;
+ p:=public.create_political_post(g,'initiative','government','Проект решения QA','Текст проекта решения');
+ if (select actor_label from public.political_posts where id=p)<>'Правительство Российской Федерации' then raise exception 'FAIL authorized government publisher';end if;
+ blocked:=false;begin perform public.create_political_post(g,'initiative','teacher','Устаревший субъект QA','Публикация не должна пройти');exception when others then blocked:=true;end;
+ if not blocked then raise exception 'FAIL obsolete GOS//SIMS publisher remains authorized';end if;
  v:=public.open_process_vote(p,'gd',null);
  if public.open_process_vote(p,'gd',null)<>v then raise exception 'FAIL duplicate ballot';end if;
  perform public.close_procedural_vote(v);
@@ -49,5 +51,5 @@ do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;admin uuid:='9fdf73
  blocked:=false;begin perform public.open_process_vote(p,'gd',null);exception when others then blocked:=true;end;
  if not blocked then raise exception 'FAIL student institutional poll allowed';end if;
 end;$$;
-select jsonb_build_object('public_event','PASS','private_event','PASS','tagged_chat','PASS','candidate','PASS','neutral_teacher','PASS','gd_450','PASS','duplicate_vote','PASS','vote_result_news','PASS','editing','PASS','teacher_metric_link','PASS','student_guards','PASS','student_poll','PASS') as checks;
+select jsonb_build_object('public_event','PASS','private_event','PASS','tagged_chat','PASS','candidate','PASS','legacy_publisher_denied','PASS','gd_450','PASS','duplicate_vote','PASS','vote_result_news','PASS','editing','PASS','teacher_metric_link','PASS','student_guards','PASS','student_poll','PASS') as checks;
 rollback;
