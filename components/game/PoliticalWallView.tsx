@@ -43,9 +43,18 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const {game,me,teacher,currentStage,politicalPosts,politicalMedia,postFormalLinks,formalDocuments,votes,profiles,names,availableActors}=g;
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('');
  const [serverActors,setServerActors]=useState<{key:string;label:string}[]|null>(null);
+ const [actorSearch,setActorSearch]=useState('');
  useEffect(()=>{if(!game?.id||readOnly)return;let active=true;async function loadActors(){const r=await supabase.rpc('get_process_actors',{p_game_id:game!.id});if(active&&!r.error&&Array.isArray(r.data))setServerActors(r.data)}void loadActors();const timer=setInterval(()=>void loadActors(),30000);return()=>{active=false;clearInterval(timer)}},[game?.id,me?.user_id,me?.role_title,readOnly]);
- const actors=serverActors||availableActors();
- const actor=actors.find(x=>x.key===actorKey)||(teacher?actors.find(x=>x.key==='teacher'):null)||actors[0];
+ // The obsolete system publisher must not appear, even while RPC data loads.
+ const actors=(serverActors||availableActors()).filter(x=>x.key!=='teacher'&&
+  !/^(?:GOS\/\/SIMS|GOSSIMS)$/i.test(x.label.trim()));
+ const actor=actors.find(x=>x.key===actorKey)||actors.find(x=>x.key==='participant')||actors[0];
+ const actorSearchQuery=actorSearch.trim().toLocaleLowerCase('ru-RU');
+ const searchedActors=actorSearchQuery
+  ?actors.filter(a=>a.label.toLocaleLowerCase('ru-RU').includes(actorSearchQuery))
+  :actors;
+ const actorChoices=actor&&actorSearchQuery&&!searchedActors.some(a=>a.key===actor.key)
+  ?[actor,...searchedActors]:searchedActors;
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[selectedTags,setSelectedTags]=useState<string[]>([]);
  const [externalUrl,setExternalUrl]=useState(''),[internalView,setInternalView]=useState(''),[formalIds,setFormalIds]=useState<string[]>([]);
  const [files,setFiles]=useState<File[]>([]),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
@@ -216,7 +225,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  if(!game||!me)return null;
  const stageNo=currentStage?.stage_no||game.current_round||1,stageAction=STAGE_ACTIONS[stageNo]||STAGE_ACTIONS[1];
  const publisherKey=actor?.key||'participant',publisherLabel=actor?.label||me.full_name;
- const composerParty=g.parties.find(p=>p.name===publisherLabel);
+ const composerParty=g.parties.find(p=>p.name===publisherLabel||actor?.key==='party:'+p.id||actor?.key==='faction:'+p.id);
  const mine=profiles.find(p=>p.user_id===me.user_id);
  return <div className="wallPage processPortal">
   <section className="wallHero">
@@ -228,7 +237,14 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   {!readOnly&&<details ref={composer} className="wallComposer surface">
    <summary><span className="processSummaryIcon"><Plus size={20}/></span><span><b>Создать публикацию</b><small>Текст, документы, медиа и голосование</small></span><ChevronDown size={20}/></summary>
    <div className="processComposerBody">
-    <div className="wallComposerIdentity"><div className="wallAvatar"><PublisherAvatar actorKey={publisherKey} label={publisherLabel} partyLogo={composerParty?.logo_url} avatar={mine?.avatar_url} gender={mine?.gender}/></div><div><StyledSelect label="Опубликовать от имени" value={actor?.key||''} onChange={setActorKey} options={actors.map(a=>({value:a.key,label:a.label}))}/></div></div>
+    <div className="wallComposerIdentity"><div className="wallAvatar"><PublisherAvatar actorKey={publisherKey} label={publisherLabel} partyLogo={composerParty?.logo_url} avatar={mine?.avatar_url} gender={mine?.gender}/></div><div className="wallActorPicker">
+     {actors.length>12&&<label className="wallActorSearch">Поиск субъекта
+      <input type="search" value={actorSearch} onChange={e=>setActorSearch(e.target.value)}
+       placeholder="Министерство, партия, орган…" aria-label="Найти субъекта публикации"/>
+     </label>}
+     <StyledSelect label="Опубликовать от имени" value={actor?.key||''} onChange={setActorKey}
+      options={actorChoices.map(a=>({value:a.key,label:a.label}))} wrap/>
+    </div></div>
     <div className="wallComposerGrid"><StyledSelect label="Вид публикации" value={processType} onChange={setProcessType} options={PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))}/><label>Заголовок<input aria-label="Заголовок публикации" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Что произошло?"/></label></div>
     <label className="processTextField">Текст публикации<textarea ref={textInput} aria-label="Текст публикации" rows={5} value={body} onChange={e=>setBody(e.target.value)} placeholder="Опишите решение · @фамилия приглашает участника."/>{postMentionMatch&&<div className="civicMentionMenu" aria-label="Упоминание в публикации">{postMentionOptions.length?postMentionOptions.map(x=><button type="button" key={x.member.user_id} onClick={()=>insertPostMention(x.member.user_id)}>{x.member.full_name} · {x.member.role_title||'Участник'}</button>):<small>Участник не найден</small>}</div>}</label>
     <div className="processTagPicker"><span>Добавить тег в текст</span><div>{PROCESS_TAGS.map(t=><button key={t.key} type="button" aria-pressed={selectedTags.includes(t.key)} title={'#'+t.key} onClick={()=>addTag(t.key)}>{t.label}<small>#{t.key}</small></button>)}</div></div>
@@ -255,7 +271,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
    </section>}
    <section className="wallSearch"><label>Поиск<input type="search" aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Текст, название или тег"/></label><StyledSelect label="Субъект" value={filterActor} onChange={setFilterActor} options={[{value:'',label:'Все субъекты'},...Array.from(new Map(politicalPosts.map(p=>[p.actor_key,p.actor_key==='teacher'?BRAND_NAME:p.actor_label])).entries()).map(([value,label])=>({value,label}))]}/><StyledSelect label="Вид публикации" value={filterType} onChange={setFilterType} options={[{value:'',label:'Все публикации'},...PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))]}/><StyledSelect label="Этап" value={filterStage} onChange={setFilterStage} options={[{value:'',label:'Все этапы'},...g.stages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></section>
    <section className="wallFeed">{!filtered.length?<div className="emptyState">Подходящих публикаций нет.</div>:visiblePosts.map(p=>{
-    const party=g.parties.find(x=>x.id===p.context?.party_id||x.name===p.actor_label),pf=profiles.find(x=>x.user_id===p.author_id);
+    const party=g.parties.find(x=>x.id===p.context?.party_id||x.name===p.actor_label||p.actor_key==='party:'+x.id||p.actor_key==='faction:'+x.id),pf=profiles.find(x=>x.user_id===p.author_id);
     const media=politicalMedia.filter(x=>x.post_id===p.id);
     const links=postFormalLinks.filter(x=>x.post_id===p.id).flatMap(x=>formalDocuments.filter(d=>d.id===x.formal_document_id));
     const vote=votes.find(v=>v.source_post_id===p.id||v.id===p.context?.vote_id);
