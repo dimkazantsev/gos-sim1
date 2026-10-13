@@ -67,7 +67,7 @@ export async function GET(request:Request){
   if(job.category==='document'||job.category==='vote'||job.category==='task'||job.category==='task_done'){
    const table=job.category==='document'?'formal_documents':job.category==='vote'?'game_votes':'game_assigned_tasks';
    const {data:entity,error:entityError}=await config.db.from(table)
-    .select('id,status').eq('id',job.source_id).eq('game_id',job.game_id).maybeSingle();
+    .select(job.category==='document'?'id':'id,status').eq('id',job.source_id).eq('game_id',job.game_id).maybeSingle();
    if(entityError){console.error('Telegram source lookup failed',entityError.code);continue}
    if(!entity||
      (job.category==='vote'&&entity.status!=='open')||
