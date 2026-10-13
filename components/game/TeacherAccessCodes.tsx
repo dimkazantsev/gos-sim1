@@ -150,7 +150,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
    {rows.length===0&&<p>Приглашений пока нет. Коды, созданные при запуске игры, также отображаются здесь без раскрытия секретного значения.</p>}
    {rows.map(row=><div key={row.id} className="teacherCodeRow">
     <div><b>{inventoryLabels[row.scope]}{row.scope==='group'&&row.group_name?': '+row.group_name:''}</b><small>{row.active?'Активно':'Отключено'} · {new Date(row.created_at).toLocaleDateString('ru-RU')} · Код защищён хешированием</small></div>
-    {row.code?<button type="button" onClick={()=>void copy(row.code!)}><Copy size={15}/> Копировать код</button>:<small>Старый код нельзя восстановить из хеша</small>}{row.scope==='teacher'?<span className="teacherCodeProtected">Защищённый доступ</span>:row.active?<button type="button" disabled={busy} onClick={()=>void revoke(row)}>Отключить</button>:
+    {row.code?<span className="teacherInviteSecret"><code>{row.code}</code><button type="button" onClick={()=>void copy(row.code!)}><Copy size={15}/> Копировать</button></span>:<small>Старый код нельзя восстановить из хеша</small>}{row.scope==='teacher'?<span className="teacherCodeProtected">Защищённый доступ</span>:row.active?<button type="button" disabled={busy} onClick={()=>void revoke(row)}>Отключить</button>:
      <button type="button" disabled={busy} onClick={()=>void remove(row)}><Trash2 size={15}/> Удалить</button>}
    </div>)}
   </div>
