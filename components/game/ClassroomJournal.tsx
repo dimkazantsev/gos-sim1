@@ -113,11 +113,13 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   <div className="journalFeed" role="region" aria-label="Записи журнала" tabIndex={0}>
    {visible.length===0?<div className="journalEmpty">По выбранным фильтрам записей нет.</div>:visible.slice(0,showAll?visible.length:50).map(a=>{
     const m=members.find(x=>x.user_id===a.actor_id);
-    return <article key={a.id} className="journalEvent">
-     <time dateTime={a.created_at}>{new Date(a.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</time>
-     <span className="journalEventMarker" aria-hidden="true"/>
-     <div><div className="journalEventTitle"><strong>{m?.full_name||'Участник'}</strong><span>{VIEW_NAMES[a.view_key||'']||a.view_key||'Игра'}</span></div>
-      <p>{a.label}</p></div>
+    return <article key={a.id} className="gosJournalRecord">
+     <time className="gosJournalRecordTime" dateTime={a.created_at}>{new Date(a.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</time>
+     <div className="gosJournalRecordBody">
+      <strong className="gosJournalRecordAuthor">{m?.full_name||'Участник'}</strong>
+      <span className="gosJournalRecordSection">{VIEW_NAMES[a.view_key||'']||a.view_key||'Игра'}</span>
+      <p className="gosJournalRecordAction">{a.label}</p>
+     </div>
     </article>;
    })}
   </div>
