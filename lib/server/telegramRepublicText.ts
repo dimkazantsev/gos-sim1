@@ -24,13 +24,13 @@ export function resolveAppealRecipient(people:Recipient[],senderId:string,rawTar
 }
 export function appealRecipientError(result:Exclude<AppealMatch,{kind:'found'}>):string{
  if(result.kind==='self')return '⚠️ ГОС.ID · Приёмная\n\nОбращение нельзя направить самому себе. Выберите другого действующего участника республики.';
- if(result.kind==='missing')return '⚠️ ГОС.ID · Приёмная\n\nАдресат не найден среди действующих участников республики. Проверьте фамилию и используйте команду /appeal @Фамилия Текст обращения.';
+ if(result.kind==='missing')return '⚠️ ГОС.ID · Приёмная\n\nАдресат не найден среди действующих участников игры. Проверьте фамилию и используйте команду /appeal @Фамилия Текст обращения.';
  return '⚠️ ГОС.ID · Приёмная\n\nНайдено несколько адресатов с такой фамилией. Используйте одно из обозначений ниже.\n\n'+result.hints.join('\n');
 }
 /** Obsolete internal titles remain untouched in the database. */
 export function telegramRepublicName(name:string|null|undefined){
  const cleaned=name?.trim();
- return !cleaned||/^ПАУ$/iu.test(cleaned)?'Республика':cleaned;
+ return !cleaned||/^(?:ПАУ|Республика)$/iu.test(cleaned)?'ГОС.ID':cleaned;
 }
 export function telegramSentence(text:string){
  const value=text.trim();
