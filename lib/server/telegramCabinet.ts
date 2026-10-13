@@ -27,26 +27,58 @@ export async function telegramCabinetCard(db:Db,gameId:string,userId:string,sect
  const stage=stages.find(s=>s.stage_no===game?.current_round);
  const myTasks=tasks.filter(t=>t.recipient_id===userId&&t.status!=='confirmed');
  const heading='🏛 ГОС.ID · ';
- if(section==='office'||section==='brief'){
+ if(section==='office'){
+  // Only this member's work queue belongs in the personal apparatus.
+  const deadline=myTasks.map(t=>t.due_at).filter((v):v is string=>!!v).sort()[0];
+  const upcoming=myTasks.slice(0,4).map((t,i)=>
+   (i+1)+'. '+safeTitle(t.title)+(t.due_at?' · до '+date(t.due_at):' · без срока'));
   const lines=[
-   heading+(section==='brief'?'Служебный доклад':'Личный аппарат'),
+   heading+'Личный аппарат',
    '',
    '👤 '+safeTitle(user.full_name),
    '🏷 '+telegramSentence((user.role_title||'Участник')+' · '+telegramRepublicName(user.group_name)),
-   '📍 '+telegramSentence(stage?.title||'Этап не определён'),
    '',
-   '📌 Поручения к исполнению: '+myTasks.length,
-   '📥 Поступившие документы: '+docs.length,
-   '🗳 Открытые голосования: '+votes.length,
-   '📆 Ближайший срок: '+(myTasks.length?date(myTasks[0].due_at):'нет'),
+   '📌 Мои поручения к исполнению: '+myTasks.length,
+   ...upcoming,
+   '📥 Мои входящие документы: '+docs.length,
+   '🗳 Открытые голосования в игре: '+votes.length,
+   '📆 Мой ближайший срок: '+(deadline?date(deadline):'нет'),
    '',
-   game?.turn_open?'🟢 Работа по этапу открыта.':'🕰 Ход закрыт.'
+   'Личный аппарат показывает только ваши поручения и документы.'
   ];
   return{text:lines.join('\n'),buttons:{inline_keyboard:[
-   [{text:'📌 Мои поручения',callback_data:'gos:tasks'},{text:'📥 Входящие',callback_data:'gos:inbox'}],
-   [{text:'📅 Повестка',callback_data:'gos:agenda'},{text:'📰 Новости',callback_data:'gos:news'}],
-   [{text:'⚙️ Уведомления',callback_data:'gos:settings'}],
+   [{text:'📌 Мои поручения',callback_data:'gos:tasks'},{text:'📥 Мои входящие',callback_data:'gos:inbox'}],
+   [{text:'📅 Повестка',callback_data:'gos:agenda'},{text:'⚙️ Уведомления',callback_data:'gos:settings'}],
    [{text:'🌐 Мой профиль',url:'https://dimkazantsev.github.io/gos-sim1/?section=profile'}],
+   [{text:'🏛 Главное меню',callback_data:'gos:menu'}]
+  ]}};
+ }
+ if(section==='brief'){
+  // The service report covers the whole game's public process, not personal tasks.
+  const publications=await db.from('political_posts')
+   .select('title,created_at').eq('game_id',gameId).is('deleted_at',null)
+   .order('created_at',{ascending:false}).limit(3);
+  if(publications.error)throw publications.error;
+  const completed=stages.filter(s=>s.status==='closed'||s.status==='completed').length;
+  const recent=(publications.data||[]).map((p,i)=>
+   (i+1)+'. '+safeTitle(p.title)+' · '+date(p.created_at));
+  const lines=[
+   heading+'Служебный доклад',
+   '',
+   '📍 Текущий этап: '+(stage?'№ '+stage.stage_no+' · '+safeTitle(stage.title):'не определён'),
+   '🕰 Режим: '+(game?.turn_open?'работа по этапу открыта':'ход закрыт'),
+   '✅ Завершённые этапы: '+completed+' из '+stages.length,
+   '🗳 Открытые голосования: '+votes.length,
+   ...votes.slice(0,3).map(v=>'• '+safeTitle(v.title)),
+   '',
+   '📰 Последние сообщения политического процесса:',
+   ...(recent.length?recent:['Публикаций пока нет.']),
+   '',
+   'Доклад отражает состояние игры на момент запроса.'
+  ];
+  return{text:lines.join('\n'),buttons:{inline_keyboard:[
+   [{text:'🗺 Этапы',callback_data:'gos:stages'},{text:'🗳 Голосования',callback_data:'gos:votes'}],
+   [{text:'📰 Новости',callback_data:'gos:news'},{text:'📅 Повестка',callback_data:'gos:agenda'}],
    [{text:'🏛 Главное меню',callback_data:'gos:menu'}]
   ]}};
  }
