@@ -11,7 +11,7 @@ const webhook=read('app/api/telegram/webhook/route.ts');
 const tg=read('lib/server/telegramPresentation.ts');
 const art=read('components/ui/CivicArtwork.tsx');
 const css=read('app/design-shell.css');
-for(const name of ['teacher_create_access_code','teacher_update_game_code','teacher_access_code_list','teacher_revoke_access_code','private.game_group_access_codes','private.is_game_teacher','join_game_with_code','extensions.crypt','grant execute','revoke all']){
+for(const name of ['teacher_create_access_code','teacher_update_game_code','teacher_saved_invitation_list','teacher_revoke_access_code','private.game_group_access_codes','private.is_game_teacher','join_game_with_code','extensions.crypt','grant execute','revoke all']){
  assert.ok(migration.includes(name),'Access-code contract missing: '+name);
 }
 assert.ok(migration.includes('ic.code_hash=extensions.crypt(p_invite_code,ic.code_hash)'),'Old encrypted invite authentication retained');
@@ -21,7 +21,7 @@ assert.ok(migration.includes("if v_group is null then raise exception 'Group req
 assert.ok(migration.includes("kind='student' and active"),'Revocation cannot cancel teacher or guest codes');
 assert.ok(migration.includes('enable row level security')&&migration.includes('revoke all on private.game_group_access_codes'),'New group mapping not readable directly');
 assert.ok(!/delete from public\.(games|game_members|invite_codes)/i.test(migration),'Existing data must be preserved');
-for(const rpc of ['teacher_create_access_code','teacher_update_game_code','teacher_access_code_list','teacher_revoke_access_code'])assert.ok(codes.includes(rpc),'Missing UI action '+rpc);
+for(const rpc of ['teacher_create_access_code','teacher_update_game_code','teacher_saved_invitation_list','teacher_revoke_access_code'])assert.ok(codes.includes(rpc),'Missing UI action '+rpc);
 assert.ok(sessions.includes('<TeacherAccessCodes')&&codes.includes('teacher_create_saved_invitation')&&!sessions.includes('profileGuestInvites'),'Unified access panel owns guest invitations without duplicate editor');
 assert.ok(home.includes('Group required')&&!home.includes("if(mode==='student'&&group.trim().length<1)"),'Group code does not require duplicate manual entry');
 assert.ok(actors.includes('private.process_actor_active_now')&&actors.includes("gp.registration_status='registered'"),'Actors must exist and parties must be registered');
