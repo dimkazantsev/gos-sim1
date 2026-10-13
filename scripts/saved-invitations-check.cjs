@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const read=p=>fs.readFileSync(p,'utf8');
+const sql=read('supabase/migrations/20261014004500_saved_invitation_vault.sql');
+const ui=read('components/game/TeacherAccessCodes.tsx');
+assert.ok(sql.includes('private.is_game_teacher(p_game_id)'));
+assert.ok(sql.includes('vault.create_secret')&&sql.includes('vault.decrypted_secrets'));
+assert.ok(sql.includes('enable row level security')&&sql.includes('revoke all on private.game_invitation_secrets'));
+assert.ok(sql.includes("i.kind in ('teacher','student','observer')"));
+assert.ok(ui.includes('teacher_create_saved_invitation')&&ui.includes('teacher_saved_invitation_list'));
+assert.ok(ui.includes('<code>{row.code}</code>')&&ui.includes('copy(row.code!)'));
+assert.ok(ui.includes('Старый код нельзя восстановить из хеша'));
+console.log('PASS teacher-only saved code store and permanent copy UI');
