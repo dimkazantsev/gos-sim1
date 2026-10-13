@@ -72,7 +72,7 @@ async function main(){
    await nav.evaluate(el=>el.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'}));
    const bounds=await nav.boundingBox();await page.mouse.move(bounds.x+bounds.width/2,bounds.y+bounds.height/2);
    const before=await nav.evaluate(el=>({max:el.scrollWidth-el.clientWidth,y:window.scrollY,left:el.scrollLeft}));
-   assert.equal(await nav.getByRole('tab').count(),11,'All 11 teacher workspaces, including Blitz, are present');
+   assert.equal(await nav.getByRole('tab').count(),12,'All 12 teacher workspaces, including Blitz and participant access, are present');
    if(width===1440)assert(before.max<=2,'Desktop routes should fit in one compact line');
    if(before.max>2){
     await nav.evaluate(el=>el.scrollLeft=0);await page.mouse.wheel(0,180);await page.waitForFunction(()=>document.querySelector('.teacherWorkspaceNav').scrollLeft>0);
