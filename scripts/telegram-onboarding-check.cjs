@@ -56,7 +56,7 @@ assert.ok(register.includes("member?.kind!=='teacher'"),'only teacher registers 
 assert.ok(register.includes("process.env.VERCEL_ENV!=='production'"),'preview cannot register bot');
 assert.ok(register.includes("allowed_updates:['message','callback_query']"),'callbacks are actually delivered');
 assert.ok(register.includes("'setMyCommands'")&&register.includes("'setChatMenuButton'"),'Telegram native menu configured');
-assert.ok(outbox.includes("telegramSend(config.token,link.chat_id,job.body)"),'notifications use same footer helper');
+assert.ok(outbox.includes("telegramSend(config.token,link.chat_id,job.body,buttons)"),'notifications use same footer helper');
 
 const calls=[];
 const oldFetch=global.fetch;

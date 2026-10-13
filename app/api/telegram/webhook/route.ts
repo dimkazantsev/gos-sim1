@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
-import {gameUrl,runtimeConfig,telegramSend,telegramAcknowledge} from '@/lib/server/telegram';
-import {telegramCallbackCommand,telegramHelpText,telegramMenuText,telegramWelcomeText,TELEGRAM_MENU_BUTTONS,TELEGRAM_WELCOME_BUTTONS} from '@/lib/server/telegramPresentation';
+import {runtimeConfig,telegramSend,telegramAcknowledge} from '@/lib/server/telegram';
+import {telegramCallbackCommand,telegramHelpText,telegramMenuText,telegramWelcomeText,TELEGRAM_MENU_BUTTONS,TELEGRAM_WELCOME_BUTTONS,telegramSectionButtons,telegramDocumentButtons} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
 type PrivateMessage={chat:{id:number;type:string};from?:{id:number};message_id:number;text?:string};
 type TelegramUpdate={message?:PrivateMessage;callback_query?:{id:string;from:{id:number};data?:string;message?:PrivateMessage}};
@@ -35,7 +35,7 @@ export async function POST(request:Request){
    }
    const {data,error}=await config.db.rpc('telegram_connect',{p_token:token,p_telegram_user_id:telegramId,p_chat_id:chatId});
    await reply(error?'⚠️ Привязка не подтверждена. Создайте новый код в профиле и попробуйте ещё раз.':
-    telegramWelcomeText(true)+'\n\n🎮 '+gameUrl(data as string),TELEGRAM_WELCOME_BUTTONS);
+    telegramWelcomeText(true)+'\n\n✅ Республика успешно привязана.',TELEGRAM_WELCOME_BUTTONS);
    return NextResponse.json({ok:true});
   }
   if(text==='/start'){
@@ -62,34 +62,57 @@ export async function POST(request:Request){
   const args=text.split(/\s+/),command=args[0].split('@')[0];
   if(command==='/games'){
    const {data:games}=await config.db.from('games').select('id,title').in('id',valid.map(l=>l.game_id));
-   await reply((games||[]).map(g=>g.title+' — /game '+g.id).join('\n')||'Нет игр');return NextResponse.json({ok:true});
+   const groups=await Promise.all(valid.map(async l=>{
+    const {data:member}=await config.db.from('game_members').select('group_name').eq('game_id',l.game_id).eq('user_id',l.user_id).maybeSingle();
+    return {id:l.game_id,group:member?.group_name||'Группа не указана'};
+   }));
+   const entries=(games||[]).map(g=>'🏛 '+g.title+'\n👥 '+(groups.find(x=>x.id===g.id)?.group||'Группа не указана'));
+   await reply('🏛 ГОС.ID · Мои игры\n\n'+(entries.join('\n\n')||'Нет подключённых республик.')+'\n\n👤 Перейдите в профиль через кнопку ниже.',telegramSectionButtons('profile','Мой профиль'));
+   return NextResponse.json({ok:true});
   }
   const requested=command==='/game'?args[1]:args[1]&&/^[0-9a-f-]{36}$/.test(args[1])?args[1]:undefined;
   const game=valid.find(l=>l.game_id===requested)|| (valid.length===1?valid[0]:undefined);
-  if(!game){await reply('Укажите игру командой /game <id>. Список: /games');return NextResponse.json({ok:true})}
-  if(command==='/game'){await reply('Игра выбрана для этой команды: '+gameUrl(game.game_id)+'\nЕсли у вас несколько игр, указывайте её UUID в командах.');return NextResponse.json({ok:true})}
+  if(!game){await reply('Выберите республику командой /game UUID. Список: /games');return NextResponse.json({ok:true})}
+  if(command==='/game'){await reply('🏛 ГОС.ID · Республика выбрана\n\nИспользуйте кнопки бота для просмотра информации.',telegramSectionButtons('dashboard','Открыть республику'));return NextResponse.json({ok:true})}
   if(command==='/status'){
-   const {data}=await config.db.from('games').select('title,status,current_round,turn_open').eq('id',game.game_id).single();
-   await reply('ГОС.ID — '+(data?.title||'Игра')+'\nСостояние: '+(data?.status||'—')+'\nЭтап: '+(data?.current_round||'—')+'\nХод: '+(data?.turn_open?'открыт':'закрыт')+'\n'+gameUrl(game.game_id));return NextResponse.json({ok:true});
+   const {data}=await config.db.from('games').select('title,current_round,turn_open').eq('id',game.game_id).single();
+   const {data:stage}=await config.db.from('game_stages').select('title').eq('game_id',game.game_id).eq('stage_no',data?.current_round||1).maybeSingle();
+   await reply('🏛 ГОС.ID · Состояние республики\n\n📍 Этап: '+(stage?.title||'Ожидает назначения')+'\n'+
+    (data?.turn_open?'🟢 Работа по этапу продолжается':'🕰 Ход закрыт')+
+    '\n\n'+(data?.title||'Республика'),telegramSectionButtons('dashboard','Открыть обзор'));
+   return NextResponse.json({ok:true});
   }
   if(command==='/stages'){
    const {data}=await config.db.from('game_stages').select('stage_no,title,status').eq('game_id',game.game_id).order('stage_no');
-   await reply((data||[]).map(s=>s.stage_no+'. '+s.title+' ['+s.status+']').join('\n').slice(0,3900)||'Этапов нет');return NextResponse.json({ok:true});
+   const label=(s:string)=>s==='open'?'🟢 Открыт':s==='closed'||s==='completed'?'✅ Завершён':'🔒 Ожидает';
+   await reply('🏛 ГОС.ID · Этапы\n\n'+((data||[]).map(s=>'Этап '+s.stage_no+'. '+s.title+'\n'+label(s.status)).join('\n\n')||'Этапов пока нет.'),telegramSectionButtons('stages','Открыть этапы'));
+   return NextResponse.json({ok:true});
   }
   if(command==='/votes'){
-   const {data}=await config.db.from('game_votes').select('id,status').eq('game_id',game.game_id).eq('status','open').limit(12);
-   await reply('Открытые голосования:\n'+((data||[]).map(()=>'• Голосование открыто').join('\n')||'Нет')+'\n'+gameUrl(game.game_id));return NextResponse.json({ok:true});
+   const {data}=await config.db.from('game_votes').select('id,title').eq('game_id',game.game_id).eq('status','open').limit(10);
+   await reply('🏛 ГОС.ID · Голосования\n\n🗳 Открытые голосования:\n'+((data||[]).map((v,i)=>(i+1)+'. '+v.title).join('\n')||'Нет активных голосований.'),telegramSectionButtons('votes','Открыть голосования'));
+   return NextResponse.json({ok:true});
   }
   if(command==='/docs'){
-   const {data}=await config.db.from('formal_documents').select('id,status_label').eq('game_id',game.game_id).order('updated_at',{ascending:false}).limit(12);
-   await reply('Документы:\n'+((data||[]).map(d=>'• Документ — '+d.status_label).join('\n')||'Нет')+'\n'+gameUrl(game.game_id));return NextResponse.json({ok:true});
+   const {data}=await config.db.from('formal_documents').select('id,title,status_label').eq('game_id',game.game_id).order('updated_at',{ascending:false}).limit(10);
+   const entries=(data||[]).map((d,i)=>(i+1)+'. '+d.title+'\n'+(d.status_label||'На рассмотрении'));
+   await reply('🏛 ГОС.ID · Документы\n\n📜 Последние документы:\n\n'+(entries.join('\n\n')||'Документов пока нет.')+'\n\nОткройте нужный документ кнопкой ниже.',telegramDocumentButtons(data||[]));
+   return NextResponse.json({ok:true});
   }
   if(command==='/channels'){
    const {data:member}=await config.db.from('game_members').select('kind').eq('game_id',game.game_id).eq('user_id',game.user_id).single();
-   const {data:channels}=await config.db.from('chat_channels').select('id,name,kind').eq('game_id',game.game_id);
-   const {data:membership}=await config.db.from('channel_members').select('channel_id').eq('user_id',game.user_id);
+   const [{data:channels},{data:membership}]=await Promise.all([
+    config.db.from('chat_channels').select('id,name,kind').eq('game_id',game.game_id),
+    config.db.from('channel_members').select('channel_id').eq('user_id',game.user_id)
+   ]);
    const allowed=(channels||[]).filter(c=>c.kind==='public'||member?.kind==='teacher'||membership?.some(m=>m.channel_id===c.id));
-   await reply(allowed.map(c=>c.name+' — /channel '+c.id).join('\n').slice(0,3900)||'Нет доступных каналов');return NextResponse.json({ok:true});
+   const ids=allowed.map(c=>c.id);
+   const {data:messages}=ids.length?await config.db.from('chat_messages').select('channel_id,author_id,text,kind').eq('game_id',game.game_id).in('channel_id',ids).order('created_at',{ascending:false}).limit(2):{data:[]};
+   const authorIds=[...new Set((messages||[]).map(m=>m.author_id))];
+   const {data:people}=authorIds.length?await config.db.from('game_members').select('user_id,full_name').eq('game_id',game.game_id).in('user_id',authorIds):{data:[]};
+   const entries=(messages||[]).map(m=>'💬 '+(allowed.find(c=>c.id===m.channel_id)?.name||'Беседа')+'\n'+(people?.find(x=>x.user_id===m.author_id)?.full_name||'Участник')+': '+(m.kind==='text'?m.text?.slice(0,230)||'Сообщение':'Медиафайл'));
+   await reply('🏛 ГОС.ID · Чаты\n\nПоследние два сообщения:\n\n'+(entries.join('\n\n')||'Сообщений пока нет.')+'\n\nДоступных чатов: '+allowed.length,telegramSectionButtons('dashboard','Открыть ГОС.ID'));
+   return NextResponse.json({ok:true});
   }
   if(command==='/channel'){
    const id=args[1];if(!id){await reply('Выберите канал через /channels');return NextResponse.json({ok:true})}

@@ -17,6 +17,8 @@ import ProfileAvatar from './ProfileAvatar';
 import ProfileDocumentLinks from './ProfileDocumentLinks';
 import ProfileOffices from './ProfileOffices';
 import TelegramConnection from './TelegramConnection';
+import AssignedTasks from './AssignedTasks';
+import {ListTodo} from 'lucide-react';
 import type {ProfileSetupStatus,ProfileSetupField} from './profileSetup';
 import {PROFILE_SETUP_LABELS} from './profileSetup';
 import {currentGameMembers,currentGameProfiles} from './gameRoster';
@@ -33,6 +35,8 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  const party=parties.find(p=>p.name===target?.team);
  const allocation=party?partyMandates.find(x=>x.party_id===party.id&&x.user_id===target?.user_id):undefined;
  const pendingInvites=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
+ const [tasksOpen,setTasksOpen]=useState(false);
+ useEffect(()=>{if(typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('tasks')==='1')setTasksOpen(true)},[game?.id]);
  const [bio,setBio]=useState(targetProfile?.bio||'');
  const [fullName,setFullName]=useState(target?.full_name||'');
  const [gender,setGender]=useState<'male'|'female'|'unspecified'>(targetProfile?.gender||'unspecified');
@@ -120,6 +124,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
   }catch(err){g.setError(err instanceof Error?err.message:'Не удалось обработать фотографию.')}
   finally{if(nextUrl)URL.revokeObjectURL(nextUrl);if(mounted.current)setPhotoBusy(false)}
  }
+ if(tasksOpen&&game&&me)return <AssignedTasks gameId={game.id} userId={me.user_id} teacher={teacher} members={members} onBack={()=>setTasksOpen(false)}/>;
  return <div className="profilePage">
   <section className="profileHero">
    <div className="profilePhoto">
@@ -142,6 +147,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
      <button type="button" className="profileComicButton" aria-label="Вводный комикс" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Пролог</button>
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
      {own&&onStartTutorial&&<button type="button" onClick={onStartTutorial} title="Повторить интерактивное обучение навигации"><Compass size={17}/> {teacher?'Пройти обучение':'Обучение'}</button>}
+     {own&&target.kind!=='observer'&&<button type="button" onClick={()=>setTasksOpen(true)}><ListTodo size={17}/> Назначить задачу</button>}
      {game&&target.kind==='student'&&<BlitzArchive gameId={game.id} userId={target.user_id}/>}
      {!own&&<button type="button" onClick={onOwnProfile}><UserRound size={17}/> Мой профиль</button>}
 

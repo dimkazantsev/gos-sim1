@@ -4,6 +4,7 @@ import {BookOpenText,ChevronDown,FilePlus2,Link2,Newspaper,Pencil,Plus,SlidersHo
 import {supabase} from '@/lib/supabase';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {chatHandles} from './chatHandles';
 import type {PoliticalPost,View} from './types';
 import MediaUploadButton from './MediaUploadButton';
 import FormalDocumentPicker from './FormalDocumentPicker';
@@ -128,6 +129,17 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   }finally{setBulkProgress(0);setBusy(false)}
  }
 
+ const postMentionMatch=body.match(/(?:^|\\s)@([а-яёa-z0-9_-]*)$/i);
+ const postQuery=(postMentionMatch?.[1]||'').toLocaleLowerCase('ru-RU');
+ const postAddressees=chatHandles(g.members.filter(m=>m.game_id===g.game?.id&&m.user_id!==g.me?.user_id));
+ const postMentionOptions=postMentionMatch?postAddressees.filter(x=>x.surname.toLocaleLowerCase('ru-RU').startsWith(postQuery)||x.handle.startsWith(postQuery)).slice(0,6):[];
+ function insertPostMention(id:string){
+  const chosen=postAddressees.find(x=>x.member.user_id===id);if(!chosen||!postMentionMatch)return;
+  const duplicate=postAddressees.some(x=>x.member.user_id!==id&&x.surname.toLocaleLowerCase('ru-RU')===chosen.surname.toLocaleLowerCase('ru-RU'));
+  const tag=chosen.surname+(duplicate?'_'+id.replace(/-/g,'').slice(0,8):'');
+  setBody(body.slice(0,body.length-postMentionMatch[0].length)+(postMentionMatch[0].startsWith(' ')?' ':'')+'@'+tag+' ');
+  requestAnimationFrame(()=>textInput.current?.focus());
+ }
  function insertText(text:string){
   const start=textInput.current?.selectionStart??body.length,end=textInput.current?.selectionEnd??body.length;
   setBody(body.slice(0,start)+text+body.slice(end));
@@ -218,7 +230,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
    <div className="processComposerBody">
     <div className="wallComposerIdentity"><div className="wallAvatar"><PublisherAvatar actorKey={publisherKey} label={publisherLabel} partyLogo={composerParty?.logo_url} avatar={mine?.avatar_url} gender={mine?.gender}/></div><div><StyledSelect label="Опубликовать от имени" value={actor?.key||''} onChange={setActorKey} options={actors.map(a=>({value:a.key,label:a.label}))}/></div></div>
     <div className="wallComposerGrid"><StyledSelect label="Вид публикации" value={processType} onChange={setProcessType} options={PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))}/><label>Заголовок<input aria-label="Заголовок публикации" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Что произошло?"/></label></div>
-    <label className="processTextField">Текст публикации<textarea ref={textInput} aria-label="Текст публикации" rows={5} value={body} onChange={e=>setBody(e.target.value)} placeholder="Опишите действие, участников, документ и результат."/></label>
+    <label className="processTextField">Текст публикации<textarea ref={textInput} aria-label="Текст публикации" rows={5} value={body} onChange={e=>setBody(e.target.value)} placeholder="Опишите решение · @фамилия приглашает участника."/>{postMentionMatch&&<div className="civicMentionMenu" aria-label="Упоминание в публикации">{postMentionOptions.length?postMentionOptions.map(x=><button type="button" key={x.member.user_id} onClick={()=>insertPostMention(x.member.user_id)}>{x.member.full_name} · {x.member.role_title||'Участник'}</button>):<small>Участник не найден</small>}</div>}</label>
     <div className="processTagPicker"><span>Добавить тег в текст</span><div>{PROCESS_TAGS.map(t=><button key={t.key} type="button" aria-pressed={selectedTags.includes(t.key)} title={'#'+t.key} onClick={()=>addTag(t.key)}>{t.label}<small>#{t.key}</small></button>)}</div></div>
     <div className="processAttachmentTools"><MediaUploadButton files={files} onChange={setFiles} label="Фото, видео, аудио или файл" hint="До 12 вложений"/><FormalDocumentPicker documents={formalDocuments} value={formalIds} onChange={setFormalIds}/><button type="button" className="secondary" aria-expanded={linkOpen} onClick={()=>setLinkOpen(v=>!v)}><Link2 size={18}/>Ссылка в тексте</button></div>
     {linkOpen&&<div className="processInlineLinkEditor"><label>Текст ссылки<input value={linkLabel} onChange={e=>setLinkLabel(e.target.value)} placeholder="Название ресурса"/></label><StyledSelect label="Внутренний ресурс" value={linkView} onChange={setLinkView} options={[{value:'',label:'Внешняя ссылка'},...RESOURCE_VIEWS]}/>{!linkView&&<label>Адрес<input type="url" value={linkUrl} onChange={e=>setLinkUrl(e.target.value)} placeholder="https://…"/></label>}<button type="button" className="secondary" onClick={insertLink} disabled={!linkLabel.trim()||(!linkView&&!/^https?:\/\/\S+$/.test(linkUrl.trim()))}>Вставить ссылку</button></div>}

@@ -17,6 +17,41 @@ export const TELEGRAM_MENU_BUTTONS:TelegramMarkup={
   [{text:'🌐 Открыть ГОС.ID',url:TELEGRAM_PROJECT_URL}]
  ]
 };
+/** Real public game deep links: no Vercel API URL or internal UUID-only path. */
+export function telegramSectionUrl(section:'dashboard'|'stages'|'votes'|'documents'|'actions'|'profile'|'budget'|'events',id?:string){
+ const url=new URL(TELEGRAM_PROJECT_URL);
+ url.searchParams.set('section',section);
+ if(section==='documents'&&id)url.searchParams.set('document',id);
+ if(section==='profile'&&id==='tasks')url.searchParams.set('tasks','1');
+ if(section==='dashboard'&&id){url.searchParams.set('openChat','1');url.searchParams.set('channel',id)}
+ if(section==='votes'&&id)url.searchParams.set('vote',id);
+ return url.toString();
+}
+export function telegramSectionButtons(section:'dashboard'|'stages'|'votes'|'documents'|'actions'|'profile'|'budget'|'events',label='Открыть раздел'):TelegramMarkup{
+ return {inline_keyboard:[
+  [{text:'↗ '+label,url:telegramSectionUrl(section)}],
+  [{text:'🏛 Меню',callback_data:'gos:menu'},{text:'🌐 ГОС.ID',url:TELEGRAM_PROJECT_URL}]
+ ]};
+}
+export function telegramTaskButtons():TelegramMarkup{
+ return {inline_keyboard:[
+  [{text:'📌 Открыть поручения',url:telegramSectionUrl('profile','tasks')}],
+  [{text:'🏛 Меню',callback_data:'gos:menu'}]
+ ]};
+}
+export function telegramChatButtons(channelId?:string):TelegramMarkup{
+ return {inline_keyboard:[
+  [{text:'💬 Перейти к беседе',url:telegramSectionUrl('dashboard',channelId)}],
+  [{text:'🏛 Меню',callback_data:'gos:menu'}]
+ ]};
+}
+export function telegramDocumentButtons(documents:{id:string;title:string}[]):TelegramMarkup{
+ return {inline_keyboard:[
+  ...documents.slice(0,10).map(d=>[{text:'📄 '+d.title.slice(0,48),url:telegramSectionUrl('documents',d.id)}]),
+  [{text:'📜 Реестр НПА',url:telegramSectionUrl('documents')}],
+  [{text:'🏛 Меню',callback_data:'gos:menu'}]
+ ]};
+}
 export const TELEGRAM_BACK_BUTTONS:TelegramMarkup={
  inline_keyboard:[
   [{text:'🏛 Меню',callback_data:'gos:menu'},{text:'🌐 ГОС.ID',url:TELEGRAM_PROJECT_URL}]
@@ -86,7 +121,7 @@ export function escapeTelegramHtml(text:string){
 /** Always retain the verified linked signature at the very bottom. */
 export function telegramMessageHtml(text:string){
  let safe='',size=0,truncated=false;
- for(const char of text){
+ for(const char of text.replaceAll('GOS//SIMS','ГОС.ID')){
   const part=escapeTelegramHtml(char);
   if(size+part.length>3650){truncated=true;break}
   safe+=part;size+=part.length;

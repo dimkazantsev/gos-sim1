@@ -1,3 +1,4 @@
+import './assigned-tasks.css';
 import './blitz.css';
 import './globals.css';
 import './design-tokens.css';

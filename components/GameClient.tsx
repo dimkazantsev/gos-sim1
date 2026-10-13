@@ -221,6 +221,17 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   const target:ScreenLocation={view:section as View,stageNo:Number.isInteger(step)&&step>=1&&step<=16?step:0,documentId:/^[0-9a-f-]{36}$/i.test(id)?id:'',voteId:/^[0-9a-f-]{36}$/i.test(vote)?vote:''};
   setScreenHistory(prev=>({entries:[target],index:0}));
  },[navigationHydrated,g.me?.user_id,gameId]);
+ const sharedChatHandled=useRef(false);
+ useEffect(()=>{
+  if(sharedChatHandled.current||!navigationHydrated||!g.me||g.me.kind==='observer'||typeof window==='undefined'||typeof URLSearchParams==='undefined')return;
+  const q=new URLSearchParams(window.location.search);
+  if(q.get('openChat')!=='1')return;
+  if(!g.channels.length)return;
+  const desired=q.get('channel')||'';
+  if(desired&&g.channels.some(c=>c.id===desired))g.setChannelId(desired);
+  g.setChatOpen(true);
+  sharedChatHandled.current=true;
+ },[navigationHydrated,g.me?.user_id,g.channels,gameId]);
  async function shareCurrentScreen(){
   const u=new URL(window.location.href);
   // GitHub Pages serves one static HTML for all ?section=... links. Share the

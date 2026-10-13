@@ -24,6 +24,14 @@ on:
       - 'lib/server/telegramPresentation.ts'
       - 'app/api/telegram/dispatch/route.ts'
       - 'scripts/telegram-onboarding-check.cjs'
+      - 'scripts/telegram-expanded-check.cjs'
+      - 'components/game/AssignedTasks.tsx'
+      - 'components/game/CivicDiscussion.tsx'
+      - 'lib/server/telegramPresentation.ts'
+      - 'app/api/maintenance/chat-media/route.ts'
+      - 'app/assigned-tasks.css'
+      - 'supabase/migrations/20261013050000_telegram_mentions_assignments.sql'
+      - 'vercel.json'
       - 'components/PublicScreen.tsx'
       - 'app/poll/page.tsx'
       - 'components/game/DocumentPaper.tsx'
@@ -107,6 +115,7 @@ jobs:
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
       - run: node scripts/telegram-onboarding-check.cjs
+      - run: node scripts/telegram-expanded-check.cjs
       - run: node scripts/event-option-legality-check.cjs
       - run: npm run design:check
       - run: node scripts/interface-contract-check.cjs

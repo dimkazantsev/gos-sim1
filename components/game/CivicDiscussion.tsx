@@ -3,10 +3,22 @@ import {useCallback,useEffect,useRef,useState} from 'react';
 import {Eye,MessageCircle,Send,ThumbsDown,ThumbsUp,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import ProfileAvatar from './ProfileAvatar';
+import {chatHandles} from './chatHandles';
 import type {ReturnTypeRepublic} from './viewTypes';
 type Discussion={likes:number;dislikes:number;mine:number;views:number;comment_count:number;comments:{id:string;author_id:string;full_name:string;body:string;created_at:string}[]};
 export default function CivicDiscussion({kind,targetId,g,readOnly=false}:{kind:'post'|'document';targetId:string;g:ReturnTypeRepublic;readOnly?:boolean}){
  const [data,setData]=useState<Discussion|null>(null),[open,setOpen]=useState(false),[limit,setLimit]=useState(30),[body,setBody]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[visible,setVisible]=useState(false);
+ const mentionMatch=body.match(/(?:^|\\s)@([а-яёa-z0-9_-]*)$/i);
+ const query=(mentionMatch?.[1]||'').toLocaleLowerCase('ru-RU');
+ const addresses=chatHandles(g.members.filter(m=>m.game_id===g.game?.id&&m.user_id!==g.me?.user_id));
+ const mentionOptions=mentionMatch?addresses.filter(x=>x.surname.toLocaleLowerCase('ru-RU').startsWith(query)||x.handle.startsWith(query)).slice(0,6):[];
+ function insertMention(userId:string){
+  const chosen=addresses.find(x=>x.member.user_id===userId);if(!chosen||!mentionMatch)return;
+  const surname=chosen.surname;
+  const ambiguous=addresses.some(x=>x.member.user_id!==userId&&x.surname.toLocaleLowerCase('ru-RU')===surname.toLocaleLowerCase('ru-RU'));
+  const label=ambiguous?surname+'_'+userId.replace(/-/g,'').slice(0,8):surname;
+  setBody(body.slice(0,body.length-mentionMatch[0].length)+(mentionMatch[0].startsWith(' ')?' ':'')+'@'+label+' ');
+ }
  const ref=useRef<HTMLDivElement>(null),seen=useRef(''),missingPost=useRef(false);
  const refreshGame=useRef(g.refresh);refreshGame.current=g.refresh;
  const load=useCallback(async()=>{
@@ -36,7 +48,7 @@ export default function CivicDiscussion({kind,targetId,g,readOnly=false}:{kind:'
    {data&&!data.comment_count&&<p className="muted">Комментариев пока нет.</p>}
    {data&&data.comment_count>limit&&limit<200&&<button type="button" className="secondary" onClick={()=>setLimit(n=>Math.min(200,n+50))}>Показать ещё комментарии</button>}
    {data&&data.comment_count>200&&limit===200&&<small>Показаны 200 последних комментариев.</small>}
-   {!readOnly&&<form className="civicCommentForm" onSubmit={e=>{e.preventDefault();void comment()}}><label>Ваш комментарий<textarea aria-label="Ваш комментарий" rows={2} maxLength={6000} value={body} onChange={e=>setBody(e.target.value)} placeholder="Обсудите текст и решение"/></label><button className="primary" type="submit" disabled={busy||!body.trim()}><Send size={18}/> Отправить</button></form>}
+   {!readOnly&&<form className="civicCommentForm" onSubmit={e=>{e.preventDefault();void comment()}}><label>Ваш комментарий<textarea aria-label="Ваш комментарий" rows={2} maxLength={6000} value={body} onChange={e=>setBody(e.target.value)} placeholder="Обсудите решение · @фамилия для приглашения участника"/>{mentionMatch&&<div className="civicMentionMenu" aria-label="Упомянуть участника">{mentionOptions.length?mentionOptions.map(x=><button type="button" key={x.member.user_id} onClick={()=>insertMention(x.member.user_id)}>{x.member.full_name} · {x.member.role_title||'Участник'}</button>):<small>Участник не найден</small>}</div>}</label><button className="primary" type="submit" disabled={busy||!body.trim()}><Send size={18}/> Отправить</button></form>}
   </section>}
  </div>;
 }
