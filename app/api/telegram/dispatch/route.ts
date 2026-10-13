@@ -37,7 +37,8 @@ export async function GET(request:Request){
    continue;
   }
   let buttons:Parameters<typeof telegramSend>[3]|undefined;
-  if(job.category==='daily_brief')buttons={inline_keyboard:[[{text:'🏛 Личный аппарат',callback_data:'gos:office'}],[{text:'⚙️ Настройки',callback_data:'gos:settings'}]]};
+  if(job.category==='appeal'||job.category==='appeal_reply')buttons={inline_keyboard:[[{text:'📨 Приёмная',callback_data:'gos:appeals'}],[{text:'🏛 Меню',callback_data:'gos:menu'}]]};
+  else if(job.category==='daily_brief')buttons={inline_keyboard:[[{text:'🏛 Личный аппарат',callback_data:'gos:office'}],[{text:'⚙️ Настройки',callback_data:'gos:settings'}]]};
   else if(job.category==='document_delivery'){
    const {data:delivery}=await config.db.from('formal_document_deliveries').select('document_id').eq('id',job.source_id).eq('recipient_id',job.user_id).eq('game_id',job.game_id).maybeSingle();
    if(!delivery){await config.db.from('telegram_outbox').update({sent_at:new Date().toISOString(),last_error:'Delivery revoked'}).eq('id',job.id);continue}
