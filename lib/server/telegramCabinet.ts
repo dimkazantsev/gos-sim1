@@ -7,7 +7,7 @@ type Card={text:string;buttons?:ReturnType<typeof telegramSectionButtons>};
 type Section='office'|'brief'|'agenda'|'tasks'|'inbox'|'news'|'economy'|'career'|'crises'|'legal'|'training'|'settings';
 const date=(value:string|null|undefined)=>value?new Date(value).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Barnaul'}):'не указана';
 const safeTitle=(v:string|null|undefined)=>v?.trim()||'Без названия';
-const printList=(a:string[])=>a.length?a.join('\n\n'):'Нет новых элементов';
+const printList=(a:string[])=>a.length?a.join('\n\n'):'Новых сведений нет.';
 
 /** Each query is scoped to the already authenticated and active game membership. */
 export async function telegramCabinetCard(db:Db,gameId:string,userId:string,section:Section):Promise<Card>{
