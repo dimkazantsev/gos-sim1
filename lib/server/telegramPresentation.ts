@@ -68,7 +68,7 @@ export const TELEGRAM_COMMANDS=[
  {command:'start',description:'🚀 Начать работу с ГОС.ID'},
  {command:'menu',description:'🏛 Главное меню бота'},
  {command:'games',description:'🏛 Мои игры'},
- {command:'status',description:'📊 Состояние республики'},
+ {command:'status',description:'📊 Состояние игры'},
  {command:'stages',description:'🗺 Этапы и задачи'},
  {command:'votes',description:'🗳 Открытые голосования'},
  {command:'docs',description:'📜 Документы и НПА'},
@@ -78,7 +78,7 @@ export const TELEGRAM_COMMANDS=[
  {command:'agenda',description:'📅 Повестка и сроки'},
  {command:'tasks',description:'📌 Мои поручения'},
  {command:'inbox',description:'📥 Входящие документы'},
- {command:'news',description:'📰 Новости республики'},
+ {command:'news',description:'📰 Новости игры'},
  {command:'crises',description:'🚨 Ситуационный центр'},
  {command:'economy',description:'📈 Экономика'},
  {command:'career',description:'🏅 Служебная карьера'},
@@ -117,7 +117,7 @@ export function telegramWelcomeText(connected=false){
   '🏛 ГОС.ID — Цифровая платформа России',
   '',
   connected?'✅ Ваш Telegram подключён к ГОС.ID.':'👋 Добро пожаловать в ГОС.ID!',
-  'Здесь вы будете получать сообщения о событиях республики и сможете следить за этапами, голосованиями и документами.',
+  'Здесь вы будете получать сообщения о событиях игры и сможете следить за этапами, голосованиями и документами.',
   connected?'Нажмите «Начать», чтобы перейти к функциям бота.':'Нажмите «Начать», чтобы открыть меню. Для уведомлений из вашей игры привяжите Telegram в личном профиле ГОС.ID.',
   '',
   '⚡ Всё важное — в одном месте.'
@@ -128,9 +128,9 @@ export function telegramMenuText(connected:boolean){
   '🏛 ГОС.ID · Главное меню',
   '',
   'Выберите раздел с помощью кнопок ниже.',
-  '📊 Состояние и 🗺 Этапы — информация о республике.',
+  '📊 Состояние и 🗺 Этапы — информация об игре.',
   '🗳 Голосования и 📜 Документы — работа институтов.',
-  '💬 Чаты — общение, 🏛 Мои игры — доступные республики.',
+  '💬 Чаты — общение, 🏛 Мои игры — доступные игры.',
   '',
   connected?'✅ Ваш аккаунт подключён.':'🔐 Чтобы получить доступ к данным игры, привяжите Telegram в профиле ГОС.ID.',
   'Меню Telegram также доступно рядом с полем сообщения.'
@@ -141,8 +141,8 @@ export function telegramHelpText(){
   '❔ ГОС.ID · Помощь',
   '',
   'Выберите действие с помощью кнопок или меню Telegram.',
-  '/games — мои республики.',
-  '/status — состояние республики.',
+  '/games — мои игры.',
+  '/status — состояние игры.',
   '/stages — этапы и задачи.',
   '/votes — голосования.',
   '/docs — документы.',
@@ -168,7 +168,10 @@ export function telegramMessageHtml(text:string){
  const normalized=text.replace(/\\r\\n|\\n|\\r/g,'\n').replace(/\r\n?/g,'\n')
   .replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
  let safe='',size=0,truncated=false;
- for(const char of normalized.replaceAll('GOS//SIMS','ГОС.ID')){
+ // Telegram auto-detects the mixed-script brand as a homograph domain.
+ // Insert a zero-width separator only in displayed text, never in button URLs.
+ // The official footer link continues to point at TELEGRAM_PROJECT_URL.
+ for(const char of normalized.replaceAll('GOS//SIMS','ГОС.ID').replaceAll('ГОС.ID','ГОС.\u200BID')){
   const part=escapeTelegramHtml(char);
   if(size+part.length>3650){truncated=true;break}
   safe+=part;size+=part.length;
