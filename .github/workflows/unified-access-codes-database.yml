@@ -1,0 +1,43 @@
+name: Unified access codes database
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/*unified_guest_access_codes.sql'
+      - 'components/game/TeacherAccessCodes.tsx'
+      - 'components/game/SessionManager.tsx'
+      - 'scripts/unified-access-codes*'
+      - '.github/workflows/unified-access-codes-database.yml'
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: access_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d access_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: access_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create disposable fixture
+        run: psql -v ON_ERROR_STOP=1 -f scripts/unified-access-codes-fixture.sql
+      - name: Apply migration in isolated database
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261013234000_unified_guest_access_codes.sql
+      - name: Test teacher rights, list and invitation lifecycle
+        run: psql -v ON_ERROR_STOP=1 -f scripts/unified-access-codes-database-check.sql
+      - name: Check UI contracts
+        run: node scripts/unified-access-codes-check.cjs
