@@ -21,6 +21,7 @@ import TeacherView from './game/TeacherView';
 import ProfileView from './game/ProfileView';
 import {PROFILE_SETUP_FIELDS,PROFILE_SETUP_LABELS,validProfileSetupStatus,type ProfileSetupStatus} from './game/profileSetup';
 import RepublicComic from './game/RepublicComic';
+import StageComics from './game/StageComics';
 import GuidedTour,{getTourSteps,type TourTarget} from './game/GuidedTour';
 import {useIntroProgress} from './game/introProgress';
 import ChatPanel from './game/ChatPanel';
@@ -277,6 +278,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [setupFocusVersion,setSetupFocusVersion]=useState(0);
  const [tourMode,setTourMode]=useState<'idle'|'choice'|'tour'>('idle');
  const [tourIndex,setTourIndex]=useState(0);
+ const [stageComicOpen,setStageComicOpen]=useState(false);
  const tourOfferedScope=useRef('');
  const setupRequest=useRef(0);
  useEffect(()=>{
@@ -663,8 +665,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {(onboardingNotice||introSyncError)&&<p role="alert" className="profileSetupModalError">{onboardingNotice||introSyncError}</p>}
      <button type="button" className="primary profileSetupStart" disabled={setupPromptBusy} onClick={()=>void goToIncompleteProfile()}>{setupPromptBusy?'Открываем профиль…':'Перейти к заполнению'}</button>
     </section>
-   </div>} <BlitzOverlay gameId={gameId} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'}/>
-  <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={me?.kind==='student'&&!previewMode&&!introOpen}/>
+   </div>} <BlitzOverlay gameId={gameId} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'&&!stageComicOpen}/>
+  <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!stageComicOpen}/>
+  <StageComics key={gameId+':'+me?.user_id} gameId={gameId} userId={me?.user_id||''} stages={g.stages} enabled={!g.loading&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'} onOpenChange={setStageComicOpen}/>
   <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>
   <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k,undefined,false,true)}} onChat={()=>{setMobileMenuOpen(false);toggleTourChat()}} chatOpen={chatOpen} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }

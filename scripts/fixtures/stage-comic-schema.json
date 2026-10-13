@@ -1,0 +1,2152 @@
+{
+  "source": "Supabase information_schema, gos-sim, 2026-10-13; column types only. Tests create nullable tables; production foreign keys and unrelated policies are outside this fixture.",
+  "tables": [
+    {
+      "table_name": "blitz_assignments",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "question_id",
+          "type": "bigint"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "assigned_day",
+          "type": "date"
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "started_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "answered_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "chosen_index",
+          "type": "integer"
+        },
+        {
+          "name": "is_correct",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "table_name": "budget_scenarios",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "budget_year",
+          "type": "integer"
+        },
+        {
+          "name": "source_note",
+          "type": "text"
+        },
+        {
+          "name": "gdp",
+          "type": "numeric"
+        },
+        {
+          "name": "oil_price",
+          "type": "numeric"
+        },
+        {
+          "name": "cutoff_price",
+          "type": "numeric"
+        },
+        {
+          "name": "key_rate",
+          "type": "numeric"
+        },
+        {
+          "name": "fx_change_pct",
+          "type": "numeric"
+        },
+        {
+          "name": "fx_intervention",
+          "type": "numeric"
+        },
+        {
+          "name": "revenue",
+          "type": "numeric"
+        },
+        {
+          "name": "expenditure",
+          "type": "numeric"
+        },
+        {
+          "name": "debt_start",
+          "type": "numeric"
+        },
+        {
+          "name": "financing",
+          "type": "numeric"
+        },
+        {
+          "name": "balance",
+          "type": "numeric"
+        },
+        {
+          "name": "deficit_pct_gdp",
+          "type": "numeric"
+        },
+        {
+          "name": "debt_end",
+          "type": "numeric"
+        },
+        {
+          "name": "debt_pct_gdp",
+          "type": "numeric"
+        },
+        {
+          "name": "deficit_limit_pct",
+          "type": "numeric"
+        },
+        {
+          "name": "debt_limit_pct",
+          "type": "numeric"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "updated_by",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "formal_document_id",
+          "type": "uuid"
+        }
+      ]
+    },
+    {
+      "table_name": "budget_transfer_requests",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "region_code",
+          "type": "text"
+        },
+        {
+          "name": "kind",
+          "type": "text"
+        },
+        {
+          "name": "amount",
+          "type": "numeric"
+        },
+        {
+          "name": "cofinancing",
+          "type": "numeric"
+        },
+        {
+          "name": "purpose",
+          "type": "text"
+        },
+        {
+          "name": "section_key",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid"
+        },
+        {
+          "name": "plan_id",
+          "type": "uuid"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "decided_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "maturity_month",
+          "type": "integer"
+        },
+        {
+          "name": "repaid_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "event_case_id",
+          "type": "uuid"
+        },
+        {
+          "name": "expected_result",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "table_name": "chat_messages",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "channel_id",
+          "type": "uuid"
+        },
+        {
+          "name": "author_id",
+          "type": "uuid"
+        },
+        {
+          "name": "kind",
+          "type": "text"
+        },
+        {
+          "name": "text",
+          "type": "text"
+        },
+        {
+          "name": "storage_path",
+          "type": "text"
+        },
+        {
+          "name": "mime_type",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "voice_meta",
+          "type": "jsonb"
+        }
+      ]
+    },
+    {
+      "table_name": "civic_comments",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "target_kind",
+          "type": "text"
+        },
+        {
+          "name": "target_id",
+          "type": "uuid"
+        },
+        {
+          "name": "author_id",
+          "type": "uuid"
+        },
+        {
+          "name": "body",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "civic_reactions",
+      "columns": [
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "target_kind",
+          "type": "text"
+        },
+        {
+          "name": "target_id",
+          "type": "uuid"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "value",
+          "type": "smallint"
+        }
+      ]
+    },
+    {
+      "table_name": "crisis_responses",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "crisis_id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "role_title",
+          "type": "text"
+        },
+        {
+          "name": "action_plan",
+          "type": "text"
+        },
+        {
+          "name": "legal_basis",
+          "type": "text"
+        },
+        {
+          "name": "resources",
+          "type": "text"
+        },
+        {
+          "name": "public_message",
+          "type": "text"
+        },
+        {
+          "name": "teacher_note",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "reviewed_by",
+          "type": "uuid"
+        }
+      ]
+    },
+    {
+      "table_name": "duma_sessions",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "session_no",
+          "type": "integer"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "scheduled_start",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "scheduled_end",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "chair_user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "opened_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "closed_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "agenda_document_id",
+          "type": "uuid"
+        }
+      ]
+    },
+    {
+      "table_name": "event_assignments",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "case_id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "recipient_id",
+          "type": "uuid"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "event_case_outcomes",
+      "columns": [
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "case_id",
+          "type": "uuid"
+        },
+        {
+          "name": "winner",
+          "type": "text"
+        },
+        {
+          "name": "yes_votes",
+          "type": "integer"
+        },
+        {
+          "name": "no_votes",
+          "type": "integer"
+        },
+        {
+          "name": "votes_count",
+          "type": "integer"
+        },
+        {
+          "name": "assignments_count",
+          "type": "integer"
+        },
+        {
+          "name": "trust_delta",
+          "type": "numeric"
+        },
+        {
+          "name": "media_post_id",
+          "type": "uuid"
+        },
+        {
+          "name": "resolved_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "requested_trust_delta",
+          "type": "numeric"
+        },
+        {
+          "name": "resolution_kind",
+          "type": "text"
+        },
+        {
+          "name": "option_tallies",
+          "type": "jsonb"
+        }
+      ]
+    },
+    {
+      "table_name": "event_decisions",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "assignment_id",
+          "type": "uuid"
+        },
+        {
+          "name": "case_id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid"
+        },
+        {
+          "name": "choice",
+          "type": "text"
+        },
+        {
+          "name": "rationale",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "role_snapshot",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "table_name": "formal_document_revisions",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "document_id",
+          "type": "uuid"
+        },
+        {
+          "name": "revision",
+          "type": "integer"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "body_text",
+          "type": "text"
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb"
+        },
+        {
+          "name": "editor_id",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "formal_documents",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "registry_no",
+          "type": "text"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "doc_type",
+          "type": "text"
+        },
+        {
+          "name": "subject_key",
+          "type": "text"
+        },
+        {
+          "name": "subject_label",
+          "type": "text"
+        },
+        {
+          "name": "author_id",
+          "type": "uuid"
+        },
+        {
+          "name": "body_text",
+          "type": "text"
+        },
+        {
+          "name": "source_file_path",
+          "type": "text"
+        },
+        {
+          "name": "source_file_name",
+          "type": "text"
+        },
+        {
+          "name": "source_mime_type",
+          "type": "text"
+        },
+        {
+          "name": "workflow_key",
+          "type": "text"
+        },
+        {
+          "name": "workflow_steps",
+          "type": "jsonb"
+        },
+        {
+          "name": "current_step",
+          "type": "integer"
+        },
+        {
+          "name": "status_code",
+          "type": "text"
+        },
+        {
+          "name": "status_label",
+          "type": "text"
+        },
+        {
+          "name": "current_owner_key",
+          "type": "text"
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "game_achievements",
+      "columns": [
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "achievement_id",
+          "type": "text"
+        },
+        {
+          "name": "earned_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "notified_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "game_assigned_tasks",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "assigned_by",
+          "type": "uuid"
+        },
+        {
+          "name": "author_id",
+          "type": "uuid"
+        },
+        {
+          "name": "recipient_id",
+          "type": "uuid"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "due_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "requires_confirmation",
+          "type": "boolean"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "confirmed_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "game_ballots",
+      "columns": [
+        {
+          "name": "vote_id",
+          "type": "uuid"
+        },
+        {
+          "name": "voter_id",
+          "type": "uuid"
+        },
+        {
+          "name": "choice",
+          "type": "text"
+        },
+        {
+          "name": "weight",
+          "type": "numeric"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "yes_weight",
+          "type": "numeric"
+        },
+        {
+          "name": "no_weight",
+          "type": "numeric"
+        },
+        {
+          "name": "abstain_weight",
+          "type": "numeric"
+        }
+      ]
+    },
+    {
+      "table_name": "game_crises",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "crisis_type",
+          "type": "text"
+        },
+        {
+          "name": "intensity",
+          "type": "text"
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "effects",
+          "type": "jsonb"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "response_deadline",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "resolved_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "resolution_note",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "table_name": "game_members",
+      "columns": [
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "full_name",
+          "type": "text"
+        },
+        {
+          "name": "group_name",
+          "type": "text"
+        },
+        {
+          "name": "kind",
+          "type": "text"
+        },
+        {
+          "name": "role_title",
+          "type": "text"
+        },
+        {
+          "name": "team",
+          "type": "text"
+        },
+        {
+          "name": "score",
+          "type": "numeric"
+        },
+        {
+          "name": "joined_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "party_joined_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "roster_archived_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "game_office_assignments",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "role_title",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "appointed_by",
+          "type": "uuid"
+        },
+        {
+          "name": "approved_by",
+          "type": "uuid"
+        },
+        {
+          "name": "legal_basis",
+          "type": "text"
+        },
+        {
+          "name": "educational_exception",
+          "type": "boolean"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "game_parties",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "name": "ideology",
+          "type": "text"
+        },
+        {
+          "name": "support",
+          "type": "numeric"
+        },
+        {
+          "name": "mandates",
+          "type": "integer"
+        },
+        {
+          "name": "regions",
+          "type": "integer"
+        },
+        {
+          "name": "budget",
+          "type": "numeric"
+        },
+        {
+          "name": "leader_user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "color",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "logo_path",
+          "type": "text"
+        },
+        {
+          "name": "ghost_loss_current",
+          "type": "integer"
+        },
+        {
+          "name": "ghost_active",
+          "type": "boolean"
+        },
+        {
+          "name": "ghost_started_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "representation_penalty",
+          "type": "integer"
+        },
+        {
+          "name": "regional_seat_penalty",
+          "type": "integer"
+        },
+        {
+          "name": "ghost_risk_weight",
+          "type": "numeric"
+        },
+        {
+          "name": "presidential_rating_modifier",
+          "type": "numeric"
+        },
+        {
+          "name": "registration_status",
+          "type": "text"
+        },
+        {
+          "name": "registration_note",
+          "type": "text"
+        },
+        {
+          "name": "registration_submitted_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "registration_reviewed_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "registration_reviewed_by",
+          "type": "uuid"
+        },
+        {
+          "name": "mandate_allocation_mode",
+          "type": "text"
+        },
+        {
+          "name": "regional_seats_awarded",
+          "type": "integer"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        }
+      ]
+    },
+    {
+      "table_name": "game_stages",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "mode",
+          "type": "text"
+        },
+        {
+          "name": "summary",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "deadline",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "opened_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "game_votes",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "body",
+          "type": "text"
+        },
+        {
+          "name": "voting_mode",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "opened_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "closed_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "formal_document_id",
+          "type": "uuid"
+        },
+        {
+          "name": "formal_step_code",
+          "type": "text"
+        },
+        {
+          "name": "institution_key",
+          "type": "text"
+        },
+        {
+          "name": "procedure_key",
+          "type": "text"
+        },
+        {
+          "name": "quorum_kind",
+          "type": "text"
+        },
+        {
+          "name": "quorum_value",
+          "type": "numeric"
+        },
+        {
+          "name": "majority_kind",
+          "type": "text"
+        },
+        {
+          "name": "majority_value",
+          "type": "numeric"
+        },
+        {
+          "name": "allow_abstain",
+          "type": "boolean"
+        },
+        {
+          "name": "tie_breaker_chair",
+          "type": "boolean"
+        },
+        {
+          "name": "pass_transition",
+          "type": "text"
+        },
+        {
+          "name": "fail_transition",
+          "type": "text"
+        },
+        {
+          "name": "result_code",
+          "type": "text"
+        },
+        {
+          "name": "result_label",
+          "type": "text"
+        },
+        {
+          "name": "result_yes",
+          "type": "numeric"
+        },
+        {
+          "name": "result_no",
+          "type": "numeric"
+        },
+        {
+          "name": "result_abstain",
+          "type": "numeric"
+        },
+        {
+          "name": "result_eligible",
+          "type": "numeric"
+        },
+        {
+          "name": "result_cast",
+          "type": "numeric"
+        },
+        {
+          "name": "result_quorum_met",
+          "type": "boolean"
+        },
+        {
+          "name": "decision_note",
+          "type": "text"
+        },
+        {
+          "name": "source_post_id",
+          "type": "uuid"
+        },
+        {
+          "name": "group_name",
+          "type": "text"
+        },
+        {
+          "name": "electorate_snapshot",
+          "type": "jsonb"
+        },
+        {
+          "name": "result_present",
+          "type": "numeric"
+        }
+      ]
+    },
+    {
+      "table_name": "government_structures",
+      "columns": [
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "social_title",
+          "type": "text"
+        },
+        {
+          "name": "economic_title",
+          "type": "text"
+        },
+        {
+          "name": "defence_title",
+          "type": "text"
+        },
+        {
+          "name": "foreign_title",
+          "type": "text"
+        },
+        {
+          "name": "internal_title",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "note",
+          "type": "text"
+        },
+        {
+          "name": "proposed_by",
+          "type": "uuid"
+        },
+        {
+          "name": "reviewed_by",
+          "type": "uuid"
+        },
+        {
+          "name": "submitted_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "formal_document_id",
+          "type": "uuid"
+        }
+      ]
+    },
+    {
+      "table_name": "municipal_districts",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "district_key",
+          "type": "text"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "head_user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "municipal_projects",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "team_name",
+          "type": "text"
+        },
+        {
+          "name": "problem_title",
+          "type": "text"
+        },
+        {
+          "name": "location_text",
+          "type": "text"
+        },
+        {
+          "name": "problem_description",
+          "type": "text"
+        },
+        {
+          "name": "legal_competence",
+          "type": "text"
+        },
+        {
+          "name": "proposed_solution",
+          "type": "text"
+        },
+        {
+          "name": "estimated_cost",
+          "type": "numeric"
+        },
+        {
+          "name": "expected_effect",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "vote_id",
+          "type": "uuid"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "submitted_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "district_key",
+          "type": "text"
+        },
+        {
+          "name": "presentation_links",
+          "type": "jsonb"
+        }
+      ]
+    },
+    {
+      "table_name": "parliamentary_election_rules",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "system_type",
+          "type": "text"
+        },
+        {
+          "name": "allocation_method",
+          "type": "text"
+        },
+        {
+          "name": "majoritarian_method",
+          "type": "text"
+        },
+        {
+          "name": "proportional_share",
+          "type": "integer"
+        },
+        {
+          "name": "rationale",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "vote_id",
+          "type": "uuid"
+        },
+        {
+          "name": "proposed_by",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "political_posts",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "author_id",
+          "type": "uuid"
+        },
+        {
+          "name": "process_type",
+          "type": "text"
+        },
+        {
+          "name": "actor_key",
+          "type": "text"
+        },
+        {
+          "name": "actor_label",
+          "type": "text"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "body",
+          "type": "text"
+        },
+        {
+          "name": "tags",
+          "type": "text[]"
+        },
+        {
+          "name": "external_url",
+          "type": "text"
+        },
+        {
+          "name": "internal_view",
+          "type": "text"
+        },
+        {
+          "name": "internal_ref_id",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "impact_plan",
+          "type": "jsonb"
+        },
+        {
+          "name": "impact_approved_by",
+          "type": "uuid"
+        },
+        {
+          "name": "impact_approved_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "effects_applied",
+          "type": "boolean"
+        },
+        {
+          "name": "accepted_by",
+          "type": "uuid"
+        },
+        {
+          "name": "accepted_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "pinned",
+          "type": "boolean"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "comic_scene",
+          "type": "jsonb"
+        },
+        {
+          "name": "context",
+          "type": "jsonb"
+        },
+        {
+          "name": "source_key",
+          "type": "text"
+        },
+        {
+          "name": "deleted_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "deleted_by",
+          "type": "uuid"
+        }
+      ]
+    },
+    {
+      "table_name": "presidential_candidates",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "party_id",
+          "type": "uuid"
+        },
+        {
+          "name": "display_name",
+          "type": "text"
+        },
+        {
+          "name": "nomination_type",
+          "type": "text"
+        },
+        {
+          "name": "registration_status",
+          "type": "text"
+        },
+        {
+          "name": "program_summary",
+          "type": "text"
+        },
+        {
+          "name": "registration_attempts",
+          "type": "integer"
+        },
+        {
+          "name": "legal_error_count",
+          "type": "integer"
+        },
+        {
+          "name": "rating_penalty",
+          "type": "numeric"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "campaign_statement",
+          "type": "text"
+        },
+        {
+          "name": "registration_number",
+          "type": "text"
+        },
+        {
+          "name": "registration_decision_no",
+          "type": "text"
+        },
+        {
+          "name": "registration_decision_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "registration_public_summary",
+          "type": "text"
+        },
+        {
+          "name": "cec_submitted_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "cec_submission_version",
+          "type": "integer"
+        },
+        {
+          "name": "archived_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "photo_path",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "table_name": "presidential_election_settings",
+      "columns": [
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "system_type",
+          "type": "text"
+        },
+        {
+          "name": "threshold_pct",
+          "type": "numeric"
+        },
+        {
+          "name": "poll_enabled",
+          "type": "boolean"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "result",
+          "type": "jsonb"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_by",
+          "type": "uuid"
+        },
+        {
+          "name": "jury_size",
+          "type": "integer"
+        }
+      ]
+    },
+    {
+      "table_name": "regional_election_rules",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "method",
+          "type": "text"
+        },
+        {
+          "name": "rationale",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "vote_id",
+          "type": "uuid"
+        },
+        {
+          "name": "proposed_by",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "republic_comic_chapters",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "kind",
+          "type": "text"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "body",
+          "type": "text"
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "stage_assessments",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "auto_score",
+          "type": "numeric"
+        },
+        {
+          "name": "final_score",
+          "type": "integer"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "criterion_law",
+          "type": "boolean"
+        },
+        {
+          "name": "criterion_strategy",
+          "type": "boolean"
+        },
+        {
+          "name": "criterion_debrief",
+          "type": "boolean"
+        },
+        {
+          "name": "public_rationale",
+          "type": "text"
+        },
+        {
+          "name": "evidence_summary",
+          "type": "jsonb"
+        },
+        {
+          "name": "last_run_type",
+          "type": "text"
+        },
+        {
+          "name": "last_auto_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "revision_count",
+          "type": "integer"
+        },
+        {
+          "name": "teacher_note",
+          "type": "text"
+        },
+        {
+          "name": "finalized_by",
+          "type": "uuid"
+        },
+        {
+          "name": "finalized_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "stage_debriefs",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid"
+        },
+        {
+          "name": "body",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        }
+      ]
+    },
+    {
+      "table_name": "state_metrics",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "metric_key",
+          "type": "text"
+        },
+        {
+          "name": "label",
+          "type": "text"
+        },
+        {
+          "name": "value",
+          "type": "numeric"
+        },
+        {
+          "name": "previous_value",
+          "type": "numeric"
+        },
+        {
+          "name": "unit",
+          "type": "text"
+        },
+        {
+          "name": "is_public",
+          "type": "boolean"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "group_key",
+          "type": "text"
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "min_value",
+          "type": "numeric"
+        },
+        {
+          "name": "max_value",
+          "type": "numeric"
+        },
+        {
+          "name": "sort_order",
+          "type": "integer"
+        }
+      ]
+    },
+    {
+      "table_name": "state_programs",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "game_id",
+          "type": "uuid"
+        },
+        {
+          "name": "stage_no",
+          "type": "integer"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "responsible_ministry",
+          "type": "text"
+        },
+        {
+          "name": "responsible_minister_id",
+          "type": "uuid"
+        },
+        {
+          "name": "curator_id",
+          "type": "uuid"
+        },
+        {
+          "name": "national_goal",
+          "type": "text"
+        },
+        {
+          "name": "start_date",
+          "type": "date"
+        },
+        {
+          "name": "end_date",
+          "type": "date"
+        },
+        {
+          "name": "total_budget",
+          "type": "numeric"
+        },
+        {
+          "name": "expected_results",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text"
+        },
+        {
+          "name": "government_vote_id",
+          "type": "uuid"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "presidential_priority_id",
+          "type": "uuid"
+        },
+        {
+          "name": "participants",
+          "type": "text"
+        },
+        {
+          "name": "form_version",
+          "type": "integer"
+        },
+        {
+          "name": "signed_by",
+          "type": "uuid"
+        },
+        {
+          "name": "signed_at",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "publication_post_id",
+          "type": "uuid"
+        }
+      ]
+    }
+  ]
+}

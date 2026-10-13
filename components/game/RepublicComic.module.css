@@ -173,6 +173,25 @@
 .dialog .readerFrame[data-playing=false] .cinematicArtwork,.dialog .readerFrame[data-playing=false] .atmosphere *{animation-play-state:paused!important}
 .readerFrame[data-playing=false] .story h2,.readerFrame[data-playing=false] .story p{animation:none!important}
 
+/* Saved stage results keep the prologue's full-scene layout. Live facts stay selectable. */
+.dialog .chapterFrame .story{justify-content:flex-start;min-height:100%;padding:28px 40px;gap:12px;background:linear-gradient(90deg,#07132ff5 0%,#07132fde 58%,#07132f70 100%)}
+.dialog .chapterFrame .story h2{max-width:950px;font-size:clamp(28px,3.1vw,44px)}
+.dialog .chapterFrame .story p{max-width:950px;font-size:14px;line-height:1.55}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:2px 0 6px;max-width:1010px;width:100%;box-sizing:border-box}
+.fact{display:flex;align-items:flex-start;gap:10px;min-width:0;padding:12px 14px;border:1px solid #b7d4ec30;border-radius:12px;background:#0c2038de;backdrop-filter:blur(8px);box-sizing:border-box}
+.fact>svg{flex:none;color:#8edbcf;margin-top:2px}
+.fact>div{min-width:0;display:grid;gap:5px}
+.fact dt{font-size:11px;line-height:1.35;color:#afc6df;overflow-wrap:anywhere}
+.fact dd{margin:0;font-size:15px;font-weight:800;line-height:1.4;color:#f4f8ff;overflow-wrap:anywhere}
+.fact small{font-size:11px;line-height:1.5;color:#b5cce0;overflow-wrap:anywhere}
+.cover>.cinematicArtwork{width:100%;height:100%;object-fit:cover}
+@media(max-width:850px){.dialog .chapterFrame .story{padding:25px;gap:12px}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ .dialog .chapterFrame .story{padding:24px 16px;justify-content:flex-start;background:linear-gradient(180deg,#07132fe8,#07132ff5)}
+ .dialog .chapterFrame .story h2{font-size:29px}.dialog .chapterFrame .story p{font-size:13px}
+ .facts{gap:8px}.fact{padding:10px 9px;gap:7px}.fact>svg{width:16px;height:16px}.fact dt{font-size:10px}.fact dd{font-size:13px}
+}
+
 
 /* 2026-10 premium archive covers: UI-first, no illustrated city scene. */
 .abstractCover .coverGrid{position:absolute;inset:0;z-index:-1;opacity:.27;background-image:linear-gradient(#ffffff0a 1px,transparent 1px),linear-gradient(90deg,#ffffff0a 1px,transparent 1px);background-size:22px 22px;mask-image:linear-gradient(180deg,#000 0%,#000 62%,transparent 100%)}
