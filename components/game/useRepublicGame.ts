@@ -1002,10 +1002,11 @@ export function useRepublicGame(gameId:string){
   if(r.error){setError(r.error.message);return false}
   await loadPartyAssets();return true;
  }
- async function reviewPartyDocument(id:string,status:'accepted'|'revision',note?:string){
-  if(!teacher)return;
-  const r=await supabase.from('party_documents').update({status,note:note?.trim()||null}).eq('id',id);
-  if(r.error)setError(r.error.message);else await loadPartyAssets();
+ async function reviewPartyDocument(id:string,status:'accepted'|'revision',note?:string):Promise<boolean>{
+  if(!teacher){setError('Рассмотрение документов доступно только преподавателю.');return false}
+  const r=await supabase.from('party_documents').update({status,note:note?.trim()||null}).eq('id',id).neq('status',status).select('id,status').maybeSingle();
+  if(r.error){setError(r.error.message);return false}
+  await loadPartyAssets();return !!r.data;
  }
 
  async function createFormalDocument(data:{stageNo:number;title:string;docType:string;subjectKey:string;subjectLabel:string;bodyText:string;workflowKey:string;metadata?:Record<string,unknown>},file?:File){
