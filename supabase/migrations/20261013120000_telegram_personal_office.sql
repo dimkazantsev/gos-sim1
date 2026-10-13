@@ -36,6 +36,9 @@ create table if not exists public.telegram_reception_requests (
   subject text not null check(length(btrim(subject)) between 3 and 160),
   body text not null check(length(btrim(body)) between 5 and 3000),
   status text not null default 'received' check(status in ('received','processing','answered','closed')),
+  answer text check(answer is null or length(btrim(answer)) between 3 and 3000),
+  answered_at timestamptz,
+  answer_message_id bigint,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique(game_id,sender_id,telegram_chat_id,telegram_message_id),
@@ -74,6 +77,28 @@ drop trigger if exists gos_reception_telegram_notify on public.telegram_receptio
 create trigger gos_reception_telegram_notify
  after insert on public.telegram_reception_requests
  for each row execute function private.gos_reception_telegram_enqueue();
+
+
+-- Reply notification only on the first successfully recorded answer.
+create or replace function private.gos_reception_answer_telegram_enqueue()
+returns trigger language plpgsql security definer set search_path to '' as $
+begin
+ if old.status is distinct from 'answered' and new.status='answered' and new.answer is not null then
+  insert into public.telegram_outbox(game_id,user_id,category,source_id,body)
+  select new.game_id,new.sender_id,'reception_answer',new.id,
+   '🏢 ГОС.ID · Ответ на обращение «'||left(new.subject,115)||'»:'||E'\n\n'||left(new.answer,2000)
+  from public.telegram_links l
+  join public.game_members m on m.game_id=l.game_id and m.user_id=l.user_id
+  where l.game_id=new.game_id and l.user_id=new.sender_id
+   and l.notifications_enabled and m.roster_archived_at is null
+  on conflict do nothing;
+ end if;
+ return new;
+end $;
+drop trigger if exists gos_reception_answer_notify on public.telegram_reception_requests;
+create trigger gos_reception_answer_notify
+ after update of status on public.telegram_reception_requests
+ for each row execute function private.gos_reception_answer_telegram_enqueue();
 
 comment on table public.telegram_bot_preferences is 'Private per-game Telegram digest, category and quiet-hours preferences.';
 comment on table public.telegram_reception_requests is 'Authenticated cross-office correspondence via Telegram; never publicly writable.';
