@@ -1,7 +1,8 @@
 import {NextResponse} from 'next/server';
 import {telegramCabinetCard} from '@/lib/server/telegramCabinet';
+import {handleTelegramAppeal} from '@/lib/server/telegramAppealWorkflow';
 import {telegramVisibleChatChannels} from '@/lib/server/telegramVisibleChatChannels';
-import {resolveAppealRecipient,appealRecipientError,telegramRepublicName,telegramSentence} from '@/lib/server/telegramRepublicText';
+import {telegramRepublicName,telegramSentence} from '@/lib/server/telegramRepublicText';
 import {runtimeConfig,telegramSend,telegramAcknowledge} from '@/lib/server/telegram';
 import {telegramCallbackCommand,telegramHelpText,telegramMenuText,telegramWelcomeText,TELEGRAM_MENU_BUTTONS,TELEGRAM_WELCOME_BUTTONS,telegramSectionButtons,telegramDocumentButtons} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
@@ -107,33 +108,12 @@ export async function POST(request:Request){
    await reply(card.text,card.buttons);
    return NextResponse.json({ok:true});
   }
-  if(command==='/appeal'){
-   const match=text.match(/^\/appeal\s+@([\p{L}0-9_-]+)\s+([\s\S]{10,4000})$/u);
-   if(!match){
-    await reply('🏛 ГОС.ID · Приёмная\n\nЧтобы направить обращение, введите:\n/appeal @Фамилия Текст обращения\n\nАдресат должен быть действующим участником республики. Нельзя направить обращение самому себе.');
-    return NextResponse.json({ok:true});
-   }
-   const body=match[2].trim();
-   if(body.length<10){
-    await reply('⚠️ ГОС.ID · Приёмная\n\nТекст обращения должен содержать не менее 10 символов.');
-    return NextResponse.json({ok:true});
-   }
-   const {data:people,error:rosterError}=await config.db.from('game_members')
-    .select('user_id,full_name').eq('game_id',game.game_id)
-    .is('roster_archived_at',null).neq('kind','observer');
-   if(rosterError)throw rosterError;
-   const recipient=resolveAppealRecipient(people||[],game.user_id,match[1]);
-   if(recipient.kind!=='found'){
-    await reply(appealRecipientError(recipient));
-    return NextResponse.json({ok:true});
-   }
-   const result=await config.db.rpc('telegram_create_official_appeal',{
-    p_telegram_user_id:telegramId,p_game_id:game.game_id,p_recipient_id:recipient.recipient.user_id,
-    p_body:body,p_message_id:message.message_id
+  if(command==='/appeal'||command.startsWith('/appeal_')||(!text.startsWith('/')&&!callback)){
+   const handled=await handleTelegramAppeal({
+    db:config.db,gameId:game.game_id,userId:game.user_id,telegramId,
+    messageId:message.message_id,text,isCallback:!!callback,reply
    });
-   if(result.error)throw result.error;
-   await reply('📨 ГОС.ID · Приёмная\n\nОбращение зарегистрировано и направлено адресату.\nКод обращения: '+String(result.data).replace(/-/g,'').slice(0,12).toUpperCase());
-   return NextResponse.json({ok:true});
+   if(handled)return NextResponse.json({ok:true});
   }
   if(command==='/appeals'){
    const {data,error}=await config.db.from('official_appeals').select('id,author_id,recipient_id,body,status,reply_text,created_at')
