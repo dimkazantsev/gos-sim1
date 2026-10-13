@@ -96,24 +96,24 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
  const acts=useMemo(()=>[...new Set(questions.map(q=>q.legal_act))].sort((a,b)=>a.localeCompare(b,'ru')),[questions]);
  const filtered=useMemo(()=>questions.filter(q=>(actFilter==='all'||q.legal_act===actFilter)&&(reviewFilter==='all'||q.legal_review_status===reviewFilter)&&(q.question+' '+q.topic+' '+q.legal_act+' '+q.article).toLocaleLowerCase('ru').includes(query.trim().toLocaleLowerCase('ru'))).sort((a,b)=>sort==='topic'?(a.topic.localeCompare(b.topic,'ru')||a.id-b.id):a.id-b.id),[questions,query,actFilter,reviewFilter,sort]);
  const bankRows=useMemo(()=>filtered.slice(bankPage*PAGE_SIZE,(bankPage+1)*PAGE_SIZE),[filtered,bankPage]);
- const matrixRows=useMemo(()=>filtered.slice(matrixPage*PAGE_SIZE,(matrixPage+1)*PAGE_SIZE),[filtered,matrixPage]);
- const matrixIds=matrixRows.map(q=>q.id).join(',');
+ const answeredQuestionIds=useMemo(()=>[...new Set(items.filter(x=>!!x.answered_at).map(x=>x.question_id))].sort((a,b)=>a-b),[items]);
+ const matrixRows=useMemo(()=>answeredQuestionIds.slice(matrixPage*PAGE_SIZE,(matrixPage+1)*PAGE_SIZE),[answeredQuestionIds,matrixPage]);
  useEffect(()=>{
-  if(!gameId||!opened.matrix||!matrixIds||!students.length){setItems([]);setMatrixBusy(false);return}
-  let live=true;setMatrixBusy(true);setItems([]);
-  const ids=matrixIds.split(',').map(Number);
+  if(!gameId||!opened.matrix||!students.length){setItems([]);setMatrixBusy(false);return}
+  let live=true;setMatrixBusy(true);
   async function load(){
    const results:Assignment[]=[];
-   for(let i=0;i<ids.length;i+=10){
-    const {data,error:loadError}=await supabase.from('blitz_assignments').select('id,question_id,user_id,chosen_index,is_correct,answered_at,stage_no').eq('game_id',gameId).in('question_id',ids.slice(i,i+10)).limit(1000);
+   for(let offset=0;offset<15000;offset+=1000){
+    const {data,error:loadError}=await supabase.from('blitz_assignments').select('id,question_id,user_id,chosen_index,is_correct,answered_at,stage_no').eq('game_id',gameId).not('answered_at','is',null).order('answered_at',{ascending:false}).range(offset,offset+999);
     if(!live)return;
     if(loadError){setError(loadError.message);setMatrixBusy(false);return}
     results.push(...((data||[]) as Assignment[]));
+    if(!data||data.length<1000)break;
    }
    if(live){setItems(results);setMatrixBusy(false)}
   }
   void load();return ()=>{live=false};
- },[gameId,opened.matrix,matrixIds,students.length]);
+ },[gameId,opened.matrix,students.length]);
  const answerMap=useMemo(()=>new Map(items.map(x=>[x.question_id+':'+x.user_id,x])),[items]);
  const statsMap=useMemo(()=>new Map(stats.map(x=>[x.user_id,x])),[stats]);
  const reviewCounts=useMemo(()=>questions.reduce((a,q)=>{a[q.legal_review_status]=(a[q.legal_review_status]||0)+1;return a},{pending:0,approved:0,rejected:0} as Record<ReviewStatus,number>),[questions]);
@@ -172,17 +172,20 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
     </>}
    </BlitzSection>
    <BlitzSection id="matrix" title="Матрица ответов" subtitle="Ответ каждого участника по каждому вопросу" badge={students.length+' участников'} icon={Table2} open={opened.matrix} onToggle={()=>toggle('matrix')}>
-    {catalogLoading?<p className="blitzLoading" role="status">Загрузка банка вопросов…</p>:catalogError||(!students.length?<div className="blitzEmpty"><strong>Пока нет участников</strong><p>Матрица появится после присоединения участников к игре. Банк из {questions.length} вопросов доступен выше.</p></div>:<>
-     <div className="blitzMatrixLegend"><span><i className="isCorrect">✓</i> Верно</span><span><i className="isIncorrect">✕</i> Неверно</span><span><i>—</i> Нет ответа</span></div>
-     <BlitzPager page={matrixPage} total={filtered.length} onChange={setMatrixPage} label="матрицы ответов"/>
+    {!students.length?<div className="blitzEmpty"><strong>Пока нет участников</strong><p>Матрица появится после присоединения участников.</p></div>:<>
+     <div className="blitzMatrixLegend"><span><i className="isCorrect">✓</i> Верно</span><span><i className="isIncorrect">✕</i> Неверно</span></div>
      {matrixBusy&&<p className="blitzLoading" role="status">Загрузка ответов…</p>}
-     <div className="blitzMatrixScroll" role="region" aria-label="Матрица ответов по вопросам" tabIndex={0}>
-      <table className="blitzMatrixTable"><thead><tr><th scope="col">Вопрос и правильный ответ</th>{students.map(m=><th scope="col" key={m.user_id}>{m.full_name}</th>)}</tr></thead>
-       <tbody>{matrixRows.map(q=><tr key={q.id}><th scope="row"><span className="blitzMatrixNumber">№ {q.id}</span><span className="blitzMatrixQuestion">{q.question}</span><small>{q.options[q.correct_index]}</small></th>{students.map(m=>{const a=answerMap.get(q.id+':'+m.user_id);return <td key={m.user_id} className={a?.is_correct?'correct':a?.answered_at?'incorrect':''} title={a?.answered_at?'Этап '+a.stage_no:'Нет ответа'}>{matrixBusy?'…':!a?.answered_at?'—':a.is_correct?'✓':'✕'}</td>})}</tr>)}</tbody>
-      </table>
-     </div>
-     <BlitzPager page={matrixPage} total={filtered.length} onChange={setMatrixPage} label="матрицы ответов"/>
-    </>)}
+     {!matrixBusy&&!answeredQuestionIds.length&&<p className="blitzEmpty">Ответов на блиц пока нет.</p>}
+     {answeredQuestionIds.length>0&&<>
+      <BlitzPager page={matrixPage} total={answeredQuestionIds.length} onChange={setMatrixPage} label="матрицы ответов"/>
+      <div className="blitzMatrixScroll" role="region" aria-label="Студенты и номера отвеченных вопросов" tabIndex={0}>
+       <table className="blitzMatrixTable"><thead><tr><th scope="col">ФИО студента</th>{matrixRows.map(id=><th key={id} scope="col" title={'Вопрос № '+id}>№ {id}</th>)}</tr></thead>
+        <tbody>{students.map(m=><tr key={m.user_id}><th scope="row">{m.full_name}</th>{matrixRows.map(id=>{const a=answerMap.get(id+':'+m.user_id);return <td key={id} className={a?.is_correct?'correct':a?.answered_at?'incorrect':''} title={!a?.answered_at?'Не отвечал':a.is_correct?'Правильный ответ':'Неправильный ответ'}>{!a?.answered_at?'—':a.is_correct?'✓':'✕'}</td>})}</tr>)}</tbody>
+       </table>
+      </div>
+      <BlitzPager page={matrixPage} total={answeredQuestionIds.length} onChange={setMatrixPage} label="матрицы ответов"/>
+     </>}
+    </>}
    </BlitzSection>
    <BlitzSection id="stats" title="Статистика участников" subtitle="Верные, неверные и ожидающие ответы" badge={students.length+' участников'} icon={BarChart3} open={opened.stats} onToggle={()=>toggle('stats')}>
     {!students.length?<div className="blitzEmpty"><strong>Участников пока нет</strong><p>После подключения участников здесь появятся их результаты.</p></div>:<>
