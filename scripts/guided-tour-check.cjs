@@ -18,7 +18,7 @@ assert(client.includes('const showSetupWelcome=')&&client.includes("tourMode==='
 assert(client.includes('complete_my_game_profile'),'Server still completes profiles');
 assert(client.includes("setTourMode('choice')")&&client.includes("setTourMode('tour')"),'Comic-to-choice-to-tour transition required');
 assert(client.includes("navigate('profile',undefined,true)")&&client.includes("rememberTourChoice('skipped')"),'Skip must preserve profile setup');
-assert(client.includes('onStartTutorial={beginTour}')&&profile.includes('Архив комиксов</button>')&&profile.includes("'Пройти обучение':'Обучение'"),'Replay must be adjacent to comic archive for participants and explicitly labelled for teachers');
+assert(client.includes('onStartTutorial={beginTour}')&&profile.includes('Архив комиксов</button>')&&profile.includes('<Compass size={17}/> Пройти обучение</button>'),'Replay must be adjacent to comic archive and say «Пройти обучение» for both roles');
 const teacherView=read('components/game/TeacherView.tsx');
 assert(teacherView.includes('className="teacherQuick teacherTourButton"')&&teacherView.includes('onClick={onStartTutorial}')&&teacherView.includes('Пройти обучение'),'Teacher must have a direct launch button in management');
 assert(client.includes('<TeacherView g={g} onStartTutorial={beginTour}'),'Teacher management must launch the existing tour rather than a duplicate tutorial');
