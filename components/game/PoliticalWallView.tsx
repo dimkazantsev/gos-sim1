@@ -44,9 +44,9 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('');
  const [serverActors,setServerActors]=useState<{key:string;label:string}[]|null>(null);
  const [actorSearch,setActorSearch]=useState('');
- useEffect(()=>{if(!game?.id||readOnly)return;let active=true;async function loadActors(){const r=await supabase.rpc('get_process_actors',{p_game_id:game!.id});if(active&&!r.error&&Array.isArray(r.data))setServerActors(r.data)}void loadActors();const timer=setInterval(()=>void loadActors(),30000);return()=>{active=false;clearInterval(timer)}},[game?.id,me?.user_id,me?.role_title,readOnly]);
+ useEffect(()=>{setServerActors(null);if(!game?.id||readOnly)return;let active=true;async function loadActors(){const r=await supabase.rpc('get_process_actors',{p_game_id:game!.id});if(active&&!r.error&&Array.isArray(r.data))setServerActors(r.data)}void loadActors();const timer=setInterval(()=>void loadActors(),30000);return()=>{active=false;clearInterval(timer)}},[game?.id,me?.user_id,me?.role_title,readOnly]);
  // The obsolete system publisher must not appear, even while RPC data loads.
- const actors=(serverActors||availableActors()).filter(x=>x.key!=='teacher'&&
+ const actors=(readOnly?availableActors():serverActors??(me?[{key:'participant',label:me.full_name}]:[])).filter(x=>x.key!=='teacher'&&
   !/^(?:GOS\/\/SIMS|GOSSIMS)$/i.test(x.label.trim()));
  const actor=actors.find(x=>x.key===actorKey)||actors.find(x=>x.key==='participant')||actors[0];
  const actorSearchQuery=actorSearch.trim().toLocaleLowerCase('ru-RU');
