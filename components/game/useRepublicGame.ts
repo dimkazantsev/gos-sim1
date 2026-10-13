@@ -576,34 +576,23 @@ export function useRepublicGame(gameId:string){
  async function setTurn(open:boolean){const r=await supabase.from('games').update({turn_open:open,status:open?'running':'paused',turn_ends_at:open?new Date(Date.now()+12*60*1000).toISOString():null}).eq('id',gameId);if(r.error)setError(r.error.message);else await refresh()}
  async function setTurnMinutes(minutes:number){if(!game)return;const r=await supabase.from('games').update({turn_open:true,status:'running',turn_ends_at:new Date(Date.now()+minutes*60*1000).toISOString()}).eq('id',gameId);if(r.error)setError(r.error.message);else await refresh()}
 
+ async function manageStage(stageNo:number,action:'open'|'close'|'extend',minutes=30):Promise<boolean>{
+  if(!teacher){setError('Только преподаватель может управлять этапами.');return false}
+  const r=await supabase.rpc('manage_game_stage',{p_game_id:gameId,p_stage_no:stageNo,p_action:action,p_minutes:minutes});
+  if(r.error){setError(r.error.message);return false}
+  await refresh();
+  return true;
+ }
  async function openStage(stageNo:number){
   if(!teacher)return;
-  const closing=stages.find(stage=>stage.status==='open');
-  if(closing&&closing.stage_no!==stageNo){
-   // Fresh one-shot preflight on the teacher's transition, not a background poll.
-   // Never treat an RPC failure as a green check or reuse a cached widget result.
-   try{
-    const check=await supabase.rpc('get_stage_readiness',{p_game_id:gameId,p_stage_no:closing.stage_no});
-    const verdict=check.data as {ready?:boolean;blockers?:unknown;warnings?:unknown}|null;
-    if(check.error||!verdict||typeof verdict.ready!=='boolean'||!Array.isArray(verdict.blockers)||!Array.isArray(verdict.warnings)){
-     setError(check.error?.message||'Невозможно проверить процедуры перед завершением этапа. Повторите попытку.');
-     return;
-    }
-    const blockers=verdict.blockers.filter((x):x is string=>typeof x==='string');
-    const warnings=verdict.warnings.filter((x):x is string=>typeof x==='string');
-    const note=verdict.ready
-     ?'Все обязательные процедуры этапа '+closing.stage_no+' выполнены.'+(warnings.length?' Замечаний: '+warnings.length+'.':'')
-     :'Этап '+closing.stage_no+' содержит '+blockers.length+' незавершённых обязательных процедур:\n'+blockers.slice(0,6).map((x,i)=>(i+1)+'. '+x).join('\n')+(blockers.length>6?'\n…и ещё '+(blockers.length-6):'');
-    if(!window.confirm(note+'\n\n'+(verdict.ready?'Завершить текущий этап и открыть этап '+stageNo+'?':'Преподаватель: завершить этап и перейти к этапу '+stageNo+' несмотря на препятствия?')))return;
-   }catch(error){
-    setError(error instanceof Error?error.message:'Не удалось проверить процедуры перед завершением этапа.');
-    return;
-   }
-  }
-  const r=await supabase.rpc('set_game_stage',{p_game_id:gameId,p_stage_no:stageNo,p_minutes:12});
-  if(r.error)setError(r.error.message);else await refresh();
+  await manageStage(stageNo,'open',30);
  }
- async function nextStage(){const active=stages.find(s=>s.status==='open');const next=active?Math.min(16,active.stage_no+1):(stages.find(s=>s.status!=='completed')?.stage_no||1);await openStage(next)}
+ async function nextStage(){
+  if(!teacher)return;
+  const firstLocked=stages.filter(s=>s.status==='locked').sort((a,b)=>a.stage_no-b.stage_no)[0];
+  if(firstLocked)await openStage(firstLocked.stage_no);
+ }
+
  async function resetStageProgress(stageNo:number|null):Promise<boolean>{
   if(!teacher||!me){setError('Сброс этапов доступен только преподавателю.');return false}
   if(stageNo!==null&&(!Number.isInteger(stageNo)||stageNo<1||stageNo>16)){setError('Неверный номер этапа.');return false}
@@ -1208,5 +1197,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
+  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }
