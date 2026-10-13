@@ -55,9 +55,13 @@ const voiceRms=Array.from({length:36},(_,i)=>{
 });
 const peak=Math.max(...voiceRms,1e-6);
 const voiceWave=voiceRms.map(v=>Math.round(Math.max(18,Math.min(100,18+82*(v/peak)**.65))));
+// Fresh media fixtures must stay inside the one-hour retention window.
+// Historical text/document fixtures intentionally keep their old timestamps.
+const chatMediaFixtureTime = new Date(Date.now()-2*60*1000).toISOString();
 fixture.messages.push(
- {id:'c8',game_id:'design-preview',channel_id:'public-demo',author_id:'teacher-demo',kind:'audio',text:'voice-preview.wav',storage_path:'preview/mock.wav',mime_type:'audio/wav',url:voicePreviewUrl,voice_meta:{duration:1,waveform:voiceWave},created_at:'2026-09-28T12:00:00Z'},
- {id:'c9',game_id:'design-preview',channel_id:'public-demo',author_id:'student-0',kind:'video',text:null,storage_path:'preview/video.webm',mime_type:'video/webm',created_at:'2026-09-28T12:03:00Z'}
+ {id:'c8',game_id:'design-preview',channel_id:'public-demo',author_id:'teacher-demo',kind:'audio',text:'voice-preview.wav',storage_path:'preview/mock.wav',mime_type:'audio/wav',url:voicePreviewUrl,voice_meta:{duration:1,waveform:voiceWave},created_at:chatMediaFixtureTime},
+ {id:'c9',game_id:'design-preview',channel_id:'public-demo',author_id:'student-0',kind:'video',text:null,storage_path:'preview/video.webm',mime_type:'video/webm',created_at:chatMediaFixtureTime},
+ {id:'c8-expired',game_id:'design-preview',channel_id:'public-demo',author_id:'teacher-demo',kind:'audio',text:'expired-voice.wav',storage_path:'preview/expired.wav',mime_type:'audio/wav',url:voicePreviewUrl,voice_meta:{duration:1,waveform:voiceWave},created_at:'2026-09-28T11:00:00Z'}
 );
 fixture.chatPins=[{id:'pin-audio',game_id:'design-preview',channel_id:'public-demo',message_id:'c8',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:01:00Z'},{id:'pin-video',game_id:'design-preview',channel_id:'public-demo',message_id:'c9',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:02:00Z'},{id:'pin-file',game_id:'design-preview',channel_id:'public-demo',message_id:'c5',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:00:00Z'}];
 fixture.pinnedMessages=fixture.messages.filter(m=>fixture.chatPins.some(pin=>pin.message_id===m.id));
