@@ -47,7 +47,9 @@ begin
  from public.game_members gm
  left join private.game_member_access a on a.game_id=gm.game_id and a.user_id=gm.user_id
  where gm.game_id=p_game and gm.user_id=v_uid;
- if not found then return false; end if;
+ -- Existing political posts may use generated institutional author IDs without game_members.
+ -- Permit those only for trusted server-originated writes; not for authenticated outsiders.
+ if not found then return auth.uid() is null and p_actor is not null; end if;
  if v_kind='teacher' or v_mode is null then return true; end if;
  if v_mode='removed' then return false; end if;
  if v_until is not null and v_until<=now() then return true; end if;
