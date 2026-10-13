@@ -43,6 +43,7 @@ assert.ok(long.length<4096&&long.endsWith('</a>'),'long messages keep complete H
 
 const webhook=fs.readFileSync('app/api/telegram/webhook/route.ts','utf8');
 const register=fs.readFileSync('app/api/telegram/register/route.ts','utf8');
+const activation=fs.readFileSync('lib/server/telegramActivation.ts','utf8');
 const outbox=fs.readFileSync('app/api/telegram/dispatch/route.ts','utf8');
 assert.ok(webhook.includes("x-telegram-bot-api-secret-token"),'webhook secret enforced');
 assert.ok(webhook.includes("message.chat.type!=='private'"),'no commands in group chats');
