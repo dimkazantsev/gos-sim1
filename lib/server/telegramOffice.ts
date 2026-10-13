@@ -116,9 +116,9 @@ export async function telegramOfficeCommand(ctx:Context):Promise<Result|undefine
    .or('sender_id.eq.'+userId+',recipient_id.eq.'+userId)
    .order('created_at',{ascending:false}).limit(12);
   return {text:'🏢 ГОС.ID · Приёмная\n\n'+bullet((data||[]).map(a=>
-   '• '+short(a.subject,105)+' — '+(a.status==='received'?'зарегистрировано':a.status==='processing'?'на рассмотрении':a.status==='answered'?'получен ответ':'закрыто')
+   '• '+short(a.subject,105)+' — '+(a.status==='received'?'зарегистрировано':a.status==='processing'?'на рассмотрении':a.status==='answered'?'получен ответ':'закрыто')+'\n   ID: '+a.id
   ),'Обращений пока нет.')+
-   '\n\nНаправить обращение:\n/appeal @Фамилия | Тема обращения | Текст\n\nПри совпадении фамилий бот попросит уточнить адресата.',
+   '\n\nОтправить: /appeal @Фамилия | Тема | Текст\nОтветить на адресованное вам обращение: /answer UUID_обращения | Текст ответа.',
    buttons:gameSec('profile')};
  }
  if(command==='/appeal'){
@@ -145,6 +145,23 @@ export async function telegramOfficeCommand(ctx:Context):Promise<Result|undefine
   return {text:'🏢 ГОС.ID · Приёмная\n\n'+(error?'Это обращение уже было зарегистрировано.':'✅ Обращение зарегистрировано.')+
    '\nАдресат: '+short(target.full_name,110)+'\nТема: '+short(subject,160)+'\nСтатус: принято к рассмотрению.',
    buttons:gameSec('profile')};
+ }
+ if(command==='/answer'){
+  const match=text.match(/^\/answer\s+([0-9a-f-]{36})\s*\|\s*([\s\S]{3,3000})$/i);
+  if(!match)return {text:'🏢 Формат ответа: /answer UUID_обращения | Текст ответа (3–3000 знаков).'};
+  const [,requestId,responseText]=match;
+  const {data:pending}=await q('telegram_reception_requests').select('id,subject,status')
+   .eq('id',requestId).eq('game_id',gameId).eq('recipient_id',userId).maybeSingle();
+  if(!pending)return {text:'Обращение не найдено или ответ на него вам не поручен.'};
+  if(pending.status==='answered'||pending.status==='closed')return {text:'На это обращение уже дан ответ или оно закрыто.'};
+  const {data:updated,error}=await q('telegram_reception_requests')
+   .update({answer:responseText.trim(),answered_at:new Date().toISOString(),answer_message_id:messageId,status:'answered'})
+   .eq('id',requestId).eq('game_id',gameId).eq('recipient_id',userId)
+   .in('status',['received','processing']).select('id').maybeSingle();
+  if(error)throw error;
+  if(!updated)return {text:'Ответ уже отправлен другим действием. Повторно не отправляем.'};
+  return {text:'✅ ГОС.ID · Приёмная\n\nОтвет на обращение «'+short(pending.subject,110)+
+   '» зарегистрирован и направлен отправителю.',buttons:TELEGRAM_BACK_BUTTONS};
  }
  if(command==='/economy'){
   // Only approved and formally published budget objects, not internal drafts.
