@@ -88,9 +88,13 @@ export async function POST(request:Request){
    if(readError)throw readError;
    const now=current as Record<string,boolean>|null;
    const oldValue=now?.[key]??(key!=='quiet_hours');
-   const update=await config.db.from('telegram_notification_preferences').upsert({
-    game_id:game.game_id,user_id:game.user_id,[key]:!oldValue,updated_at:new Date().toISOString()
-   },{onConflict:'game_id,user_id'});
+   // Update only the toggled column: upsert with omitted columns would reset
+   // other notification preferences to their database defaults.
+   const table=config.db.from('telegram_notification_preferences');
+   const update=now
+    ? await table.update({[key]:!oldValue,updated_at:new Date().toISOString()})
+       .eq('game_id',game.game_id).eq('user_id',game.user_id)
+    : await table.insert({game_id:game.game_id,user_id:game.user_id,[key]:!oldValue,updated_at:new Date().toISOString()});
    if(update.error)throw update.error;
    const card=await telegramCabinetCard(config.db,game.game_id,game.user_id,'settings');
    await reply(card.text,card.buttons);
