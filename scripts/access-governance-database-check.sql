@@ -66,7 +66,7 @@ begin
   values(v_game,v_student,'telegram forbidden');
  exception when others then v_failed:=true;end;
  if not v_failed then raise exception 'Service-role chat bypassed participant sanction';end if;
-end $;
+end $$;
 -- The matching student invitation makes the rejoin test exercise the ban, not missing-code errors.
 insert into public.invite_codes(game_id,code_hash,kind,active)
 values('11111111-1111-4111-8111-111111111111',extensions.crypt('STUDENT-SECRET-TEST',extensions.gen_salt('bf')),'student',true);
