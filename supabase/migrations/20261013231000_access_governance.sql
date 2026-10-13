@@ -114,7 +114,7 @@ create or replace function public.teacher_set_member_access(
  p_expires_at timestamptz,p_reason text
 ) returns boolean language plpgsql security definer set search_path to '' as $$
 declare v_kind public.member_kind;v_actions text[]:=coalesce(p_actions,'{}'::text[]);
-declare v_reason text:=btrim(coalesce(p_reason,''));
+ v_reason text:=btrim(coalesce(p_reason,''));
 begin
  if not private.is_game_teacher(p_game_id) then raise exception 'Teacher required'; end if;
  select kind into v_kind from public.game_members where game_id=p_game_id and user_id=p_user_id for update;
@@ -229,3 +229,15 @@ begin
   jsonb_build_object('kind',k,'full_name',v_name));
  return g;
 end $$;
+
+-- Inactive invitations may be deleted by the teacher without touching memberships.
+create or replace function public.teacher_delete_access_code(p_game_id uuid,p_invite_id uuid)
+returns boolean language plpgsql security definer set search_path to '' as $$
+begin
+ if not private.is_game_teacher(p_game_id) then raise exception 'Teacher required'; end if;
+ delete from public.invite_codes where id=p_invite_id and game_id=p_game_id
+  and kind in ('student','observer') and active=false;
+ return found;
+end $$;
+revoke all on function public.teacher_delete_access_code(uuid,uuid) from public,anon,authenticated;
+grant execute on function public.teacher_delete_access_code(uuid,uuid) to authenticated;
