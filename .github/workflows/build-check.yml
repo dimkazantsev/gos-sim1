@@ -100,6 +100,10 @@ on:
       - 'scripts/political-wall-feed-check.cjs'
       - 'scripts/political-publisher-catalog-check.cjs'
       - 'scripts/access-codes-civic-actor-check.cjs'
+      - 'scripts/access-governance-check.cjs'
+      - 'supabase/migrations/*access_governance*'
+      - 'components/game/TeacherParticipants.tsx'
+      - 'app/access-governance.css'
       - 'components/game/TeacherAccessCodes.tsx'
       - 'supabase/migrations/20261013214500_teacher_access_codes_groups.sql'
       - 'supabase/migrations/20261013215000_process_actors_instantiated_only.sql'
@@ -176,6 +180,7 @@ jobs:
       - run: node scripts/political-wall-feed-check.cjs
       - run: node scripts/political-publisher-catalog-check.cjs
       - run: node scripts/access-codes-civic-actor-check.cjs
+      - run: node scripts/access-governance-check.cjs
       - run: node scripts/crisis-baseline-check.cjs
 
       - run: node scripts/fiscal-model-check.cjs
