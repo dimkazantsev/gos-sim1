@@ -43,9 +43,18 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const {game,me,teacher,currentStage,politicalPosts,politicalMedia,postFormalLinks,formalDocuments,votes,profiles,names,availableActors}=g;
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('');
  const [serverActors,setServerActors]=useState<{key:string;label:string}[]|null>(null);
+ const [actorSearch,setActorSearch]=useState('');
  useEffect(()=>{if(!game?.id||readOnly)return;let active=true;async function loadActors(){const r=await supabase.rpc('get_process_actors',{p_game_id:game!.id});if(active&&!r.error&&Array.isArray(r.data))setServerActors(r.data)}void loadActors();const timer=setInterval(()=>void loadActors(),30000);return()=>{active=false;clearInterval(timer)}},[game?.id,me?.user_id,me?.role_title,readOnly]);
- const actors=serverActors||availableActors();
- const actor=actors.find(x=>x.key===actorKey)||(teacher?actors.find(x=>x.key==='teacher'):null)||actors[0];
+ // The obsolete system publisher must not appear, even while RPC data loads.
+ const actors=(serverActors||availableActors()).filter(x=>x.key!=='teacher'&&
+  !/^(?:GOS\/\/SIMS|GOSSIMS)$/i.test(x.label.trim()));
+ const actor=actors.find(x=>x.key===actorKey)||actors.find(x=>x.key==='participant')||actors[0];
+ const actorSearchQuery=actorSearch.trim().toLocaleLowerCase('ru-RU');
+ const searchedActors=actorSearchQuery
+  ?actors.filter(a=>a.label.toLocaleLowerCase('ru-RU').includes(actorSearchQuery))
+  :actors;
+ const actorChoices=actor&&actorSearchQuery&&!searchedActors.some(a=>a.key===actor.key)
+  ?[actor,...searchedActors]:searchedActors;
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[selectedTags,setSelectedTags]=useState<string[]>([]);
  const [externalUrl,setExternalUrl]=useState(''),[internalView,setInternalView]=useState(''),[formalIds,setFormalIds]=useState<string[]>([]);
  const [files,setFiles]=useState<File[]>([]),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
@@ -228,7 +237,14 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   {!readOnly&&<details ref={composer} className="wallComposer surface">
    <summary><span className="processSummaryIcon"><Plus size={20}/></span><span><b>Создать публикацию</b><small>Текст, документы, медиа и голосование</small></span><ChevronDown size={20}/></summary>
    <div className="processComposerBody">
-    <div className="wallComposerIdentity"><div className="wallAvatar"><PublisherAvatar actorKey={publisherKey} label={publisherLabel} partyLogo={composerParty?.logo_url} avatar={mine?.avatar_url} gender={mine?.gender}/></div><div><StyledSelect label="Опубликовать от имени" value={actor?.key||''} onChange={setActorKey} options={actors.map(a=>({value:a.key,label:a.label}))}/></div></div>
+    <div className="wallComposerIdentity"><div className="wallAvatar"><PublisherAvatar actorKey={publisherKey} label={publisherLabel} partyLogo={composerParty?.logo_url} avatar={mine?.avatar_url} gender={mine?.gender}/></div><div className="wallActorPicker">
+     {actors.length>12&&<label className="wallActorSearch">Поиск субъекта
+      <input type="search" value={actorSearch} onChange={e=>setActorSearch(e.target.value)}
+       placeholder="Министерство, партия, орган…" aria-label="Найти субъекта публикации"/>
+     </label>}
+     <StyledSelect label="Опубликовать от имени" value={actor?.key||''} onChange={setActorKey}
+      options={actorChoices.map(a=>({value:a.key,label:a.label}))} wrap/>
+    </div></div>
     <div className="wallComposerGrid"><StyledSelect label="Вид публикации" value={processType} onChange={setProcessType} options={PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))}/><label>Заголовок<input aria-label="Заголовок публикации" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Что произошло?"/></label></div>
     <label className="processTextField">Текст публикации<textarea ref={textInput} aria-label="Текст публикации" rows={5} value={body} onChange={e=>setBody(e.target.value)} placeholder="Опишите решение · @фамилия приглашает участника."/>{postMentionMatch&&<div className="civicMentionMenu" aria-label="Упоминание в публикации">{postMentionOptions.length?postMentionOptions.map(x=><button type="button" key={x.member.user_id} onClick={()=>insertPostMention(x.member.user_id)}>{x.member.full_name} · {x.member.role_title||'Участник'}</button>):<small>Участник не найден</small>}</div>}</label>
     <div className="processTagPicker"><span>Добавить тег в текст</span><div>{PROCESS_TAGS.map(t=><button key={t.key} type="button" aria-pressed={selectedTags.includes(t.key)} title={'#'+t.key} onClick={()=>addTag(t.key)}>{t.label}<small>#{t.key}</small></button>)}</div></div>
