@@ -82,7 +82,10 @@ begin
  delete from public.game_presence where game_id=p_game_id and user_id=p_user_id;
  if p_action='erase_profile' then
   delete from public.game_profiles where game_id=p_game_id and user_id=p_user_id;
+  delete from public.member_login_emails where game_id=p_game_id and user_id=p_user_id;
  end if;
+ insert into public.audit_log(game_id,actor_id,action,entity_type,payload)
+ values(p_game_id,v_actor,'teacher_participant_access','member',jsonb_build_object('target_user_id',p_user_id,'mode',p_action));
  return case when p_action='exclude' then 'excluded' else 'profile_erased' end;
 end $$;
 revoke all on function public.teacher_participant_roster(uuid) from public,anon,authenticated;
