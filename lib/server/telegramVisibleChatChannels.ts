@@ -15,7 +15,8 @@ export async function telegramVisibleChatChannels(db:Db,gameId:string,userId:str
  ]);
  if(person.error)throw person.error;
  if(rooms.error)throw rooms.error;
- if(!person.data)return [];
+ const actorKind=person.data?.kind;
+ if(!actorKind)return [];
  const channels=rooms.data||[];
  if(!channels.length)return [];
  const {data:memberships,error}=await db.from('channel_members').select('channel_id,user_id')
@@ -30,6 +31,6 @@ export async function telegramVisibleChatChannels(db:Db,gameId:string,userId:str
  return channels.filter(c=>
   !isHiddenChatChannel(c)&&
   (c.kind!=='private'||counts.get(c.id)===2)&&
-  (c.kind==='public'||person.data.kind==='teacher'||mine.has(c.id))
+  (c.kind==='public'||actorKind==='teacher'||mine.has(c.id))
  );
 }
