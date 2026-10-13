@@ -126,3 +126,16 @@ begin
   alter publication supabase_realtime add table public.party_chair_ballots;
  end if;
 end $migration$;
+
+-- The older permissive guest filters did not constrain writes by party.
+-- Keep teacher INSERT/UPDATE policy; student founding goes through secure RPC.
+drop policy if exists guests_cannot_insert on public.game_parties;
+drop policy if exists guests_cannot_update on public.game_parties;
+
+-- Party members may upload files; only Minjust/teacher may approve/revise.
+drop policy if exists guests_cannot_insert on public.party_documents;
+drop policy if exists guests_cannot_update on public.party_documents;
+drop policy if exists party_documents_update on public.party_documents;
+create policy party_documents_update on public.party_documents
+ for update to authenticated using (private.is_game_teacher(game_id))
+ with check (private.is_game_teacher(game_id));
