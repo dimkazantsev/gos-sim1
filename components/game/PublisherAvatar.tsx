@@ -8,6 +8,6 @@ export default function PublisherAvatar({actorKey,label,partyLogo,avatar,name,ge
  if(actorKey==='participant')return <ProfileAvatar src={avatar} name={name||label} gender={gender}/>;
  if(actorKey==='teacher')return <InstitutionEmblemImage src={gosSimsEmblem} alt={BRAND_NAME+" · флаг Российской Федерации"}/>;
  if(actorKey==='media')return <Newspaper size={24} aria-label="Редакция СМИ"/>;
- if(actorKey==='party'||actorKey.startsWith('party:'))return <InstitutionEmblemImage src={partyLogo} alt={'Логотип партии «'+label+'»'} fallback="party"/>;
+ if(actorKey==='party'||actorKey.startsWith('party:')||actorKey.startsWith('faction:'))return <InstitutionEmblemImage src={partyLogo} alt={'Логотип партии «'+label+'»'} fallback="party"/>;
  return <InstitutionEmblemImage src={institutionEmblem(actorKey,label)} alt={label}/>;
 }
