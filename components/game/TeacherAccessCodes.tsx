@@ -5,7 +5,7 @@ import {supabase} from '@/lib/supabase';
 
 type Scope='participant'|'group'|'guest';
 type InventoryScope=Scope|'teacher';
-type CodeRow={id:string;scope:InventoryScope;group_name:string|null;active:boolean;created_at:string};
+type CodeRow={id:string;scope:InventoryScope;group_name:string|null;active:boolean;created_at:string;code:string|null};
 const LETTERS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function generateCode(prefix:string){
  const bytes=new Uint8Array(12);
@@ -35,7 +35,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
  const refresh=useCallback(async()=>{
-  const r=await supabase.rpc('teacher_access_code_list',{p_game_id:gameId});
+  const r=await supabase.rpc('teacher_saved_invitation_list',{p_game_id:gameId});
   if(r.error)throw r.error;
   setRows(Array.isArray(r.data)?r.data as CodeRow[]:[]);
  },[gameId]);
@@ -44,7 +44,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
   setCurrentGameCode('');setNewGameCode('');setCreated('');setRows([]);setNotice('');
   async function load(){
    const [r,c]=await Promise.all([
-    supabase.rpc('teacher_access_code_list',{p_game_id:gameId}),
+    supabase.rpc('teacher_saved_invitation_list',{p_game_id:gameId}),
     supabase.from('games').select('game_code').eq('id',gameId).single()
    ]);
    if(!alive)return;
@@ -76,16 +76,11 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
   if(busy||secret.length<(scope==='guest'?6:8)||scope==='group'&&!groupName.trim())return;
   setBusy(true);setNotice('');setCreated('');
   try{
-   const r=scope==='guest'
-    ?await supabase.rpc('create_observer_invite',{p_game_id:gameId,p_code:secret})
-    :await supabase.rpc('teacher_create_access_code',{
-      p_game_id:gameId,p_code:secret,p_scope:scope,
-      p_group_name:scope==='group'?groupName.trim():null
-     });
+   const r=await supabase.rpc('teacher_create_saved_invitation',{p_game_id:gameId,p_code:secret,p_scope:scope,p_group_name:scope==='group'?groupName.trim():null});
    if(r.error)throw r.error;
    setCreated(secret);setCreatedKind(scope);setNewInvite('');
    await refresh();
-   setNotice('Приглашение создано. Код показан один раз, в базе хранится только его хеш.');
+   setNotice('Приглашение создано. Код можно копировать из списка.');
   }catch(e){setNotice('Не удалось создать приглашение: '+(e instanceof Error?e.message:'Ошибка сервера'))}
   finally{setBusy(false)}
  }
@@ -149,13 +144,13 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
     </div>
    </div>
   </div>
-  {created&&<div className="teacherCodeCreated" role="status"><ShieldCheck size={18}/><div><b>Сохраните: {labels[createdKind].toLowerCase()}</b> <code>{created}</code><p>Повторно посмотреть секретное значение нельзя.</p></div><button type="button" onClick={()=>void copy(created)}><Copy size={16}/> Копировать</button></div>}
+  {created&&<div className="teacherCodeCreated" role="status"><ShieldCheck size={18}/><div><b>Сохраните: {labels[createdKind].toLowerCase()}</b> <code>{created}</code><p>Код сохранён для преподавателя.</p></div><button type="button" onClick={()=>void copy(created)}><Copy size={16}/> Копировать</button></div>}
   <div className="teacherCodeRows">
    <div className="teacherAccessListHead"><h4>Все приглашения ({rows.length})</h4><button type="button" disabled={busy} onClick={()=>void refresh().catch(e=>setNotice(String(e)))}><RotateCw size={15}/> Обновить</button></div>
    {rows.length===0&&<p>Приглашений пока нет. Коды, созданные при запуске игры, также отображаются здесь без раскрытия секретного значения.</p>}
    {rows.map(row=><div key={row.id} className="teacherCodeRow">
     <div><b>{inventoryLabels[row.scope]}{row.scope==='group'&&row.group_name?': '+row.group_name:''}</b><small>{row.active?'Активно':'Отключено'} · {new Date(row.created_at).toLocaleDateString('ru-RU')} · Код защищён хешированием</small></div>
-    {row.scope==='teacher'?<span className="teacherCodeProtected">Защищённый доступ</span>:row.active?<button type="button" disabled={busy} onClick={()=>void revoke(row)}>Отключить</button>:
+    {row.code?<button type="button" onClick={()=>void copy(row.code!)}><Copy size={15}/> Копировать код</button>:<small>Старый код нельзя восстановить из хеша</small>}{row.scope==='teacher'?<span className="teacherCodeProtected">Защищённый доступ</span>:row.active?<button type="button" disabled={busy} onClick={()=>void revoke(row)}>Отключить</button>:
      <button type="button" disabled={busy} onClick={()=>void remove(row)}><Trash2 size={15}/> Удалить</button>}
    </div>)}
   </div>
