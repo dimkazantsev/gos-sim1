@@ -98,7 +98,8 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
  if(!teacher||!me)return null;
  return <section className="profileSessionManager" aria-label="Экспорт и удаление сеансов">
   <header><div><small>АРХИВ И БЕЗОПАСНОСТЬ</small><h2>Мои игровые сеансы</h2><p>JSON сохраняет данные; HTML открывается в одном браузере; ZIP включает файлы и сервер для локальной сети. Перед удалением сохраните полный ZIP.</p></div><Archive size={22}/></header>
-  {game&&<TeacherAccessCodes gameId={game.id} gameCode={game.game_code}/>}\n  <div className="profileGuestInvites"><h3>Гостевой просмотр текущей игры</h3><p>Гость сможет читать открытые разделы и журнал, но не сможет голосовать, загружать документы, менять показатели или отправлять сообщения.</p>
+  {game&&<TeacherAccessCodes gameId={game.id} gameCode={game.game_code}/>}
+  <div className="profileGuestInvites"><h3>Гостевой просмотр текущей игры</h3><p>Гость сможет читать открытые разделы и журнал, но не сможет голосовать, загружать документы, менять показатели или отправлять сообщения.</p>
    <div><input type="text" aria-label="Новый код гостя" autoComplete="off" minLength={6} value={guestCode} onChange={e=>setGuestCode(e.target.value)} placeholder="Новый код гостя · не менее 6 символов"/>
      <button type="button" disabled={busy||guestCode.trim().length<6} onClick={()=>void inviteGuest()}>Создать гостевой код</button></div>
    {guestCreated&&<p role="status">Созданный код: <code>{guestCreated}</code> · Передайте гостю для входа с главной страницы.</p>}
