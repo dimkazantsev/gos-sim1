@@ -2,9 +2,9 @@
 select set_config('test.user_id','22222222-2222-4222-8222-222222222222',false);
 do $$
 declare v_game uuid:='11111111-1111-4111-8111-111111111111';
-declare v_student uuid:='33333333-3333-4333-8333-333333333333';
-declare v_teacher uuid:='22222222-2222-4222-8222-222222222222';
-declare v_guest_id uuid; v_list jsonb; v_failed boolean;
+ v_student uuid:='33333333-3333-4333-8333-333333333333';
+ v_teacher uuid:='22222222-2222-4222-8222-222222222222';
+ v_guest_id uuid; v_list jsonb; v_failed boolean;
 begin
  if not private.is_game_member(v_game) then raise exception 'Teacher lost access';end if;
  perform public.create_observer_invite(v_game,'GUEST-SECRET-TEST');
@@ -59,6 +59,9 @@ begin
  exception when others then v_failed:=true;end;
  if not v_failed then raise exception 'Participant read teacher-only roster';end if;
 end $$;
+-- The matching student invitation makes the rejoin test exercise the ban, not missing-code errors.
+insert into public.invite_codes(game_id,code_hash,kind,active)
+values('11111111-1111-4111-8111-111111111111',extensions.crypt('STUDENT-SECRET-TEST',extensions.gen_salt('bf')),'student',true);
 -- Teacher may ban, exclude and restore the participant without deleting work.
 select set_config('test.user_id','22222222-2222-4222-8222-222222222222',false);
 select public.teacher_set_member_access('11111111-1111-4111-8111-111111111111','33333333-3333-4333-8333-333333333333','blocked','{}'::text[],now()+interval '1 day','Temporary ban');
@@ -80,8 +83,10 @@ begin
  if private.is_game_member('11111111-1111-4111-8111-111111111111') then raise exception 'Exclusion ineffective';end if;
  begin
   perform public.join_game_with_code('GOS-TEST','STUDENT-SECRET-TEST','Student','8.414');
- exception when others then v_failed:=true;end;
- if not v_failed then raise exception 'Excluded member rejoined';end if;
+ exception when others then
+  if sqlerrm like '%Доступ к игре ограничен преподавателем%' then v_failed:=true;end if;
+ end;
+ if not v_failed then raise exception 'Excluded member could rejoin or join failed for another reason';end if;
 end $$;
 select set_config('test.user_id','22222222-2222-4222-8222-222222222222',false);
 select public.teacher_set_member_access('11111111-1111-4111-8111-111111111111','33333333-3333-4333-8333-333333333333','active','{}'::text[],null,'');
