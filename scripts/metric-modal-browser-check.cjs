@@ -225,6 +225,7 @@ async function main(){
      assert.equal(await frame.locator('.chatChannelMenu [aria-checked="true"]').count(),1,'Selected channel is marked');
     }
     if(chatScreen==='chat-panel'||chatScreen==='chat-pins'){
+     assert.equal(await frame.locator('[data-message-id="c8-expired"]').count(),0,'Audio older than one hour must be hidden in the chat');
      const player=frame.locator('.chatMessages .chatVoicePlayer').first();
      assert.equal(await player.count(),1,'Voice message uses compact horizontal player');
      assert.equal(await frame.locator('.chatMessages audio[controls]').count(),0,'Native vertical audio widget is never shown');
