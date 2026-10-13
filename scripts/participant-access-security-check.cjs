@@ -1,5 +1,7 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const sql=fs.readFileSync('supabase/migrations/20261013191740_teacher_participant_access_20261014.sql','utf8');
+const guard=fs.readFileSync('supabase/migrations/20261013192104_teacher_participant_null_action_guard_20261014.sql','utf8');
+assert.match(guard,/p_action is null or p_action not in/,'Null action must never erase a profile');
 const ui=fs.readFileSync('components/game/TeacherParticipantRoster.tsx','utf8');
 assert.match(sql,/private\.is_game_teacher\(p_game_id\)/,'Read/write RPC must check teacher role');
 assert.match(sql,/p_user_id=v_actor or p_user_id=v_owner/,'Self and owner must be protected');

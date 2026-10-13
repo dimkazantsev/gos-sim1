@@ -4,6 +4,7 @@ on:
     paths:
       - 'components/game/TeacherParticipantRoster.tsx'
       - 'supabase/migrations/20261013191740_teacher_participant_access_20261014.sql'
+      - 'supabase/migrations/20261013192104_teacher_participant_null_action_guard_20261014.sql'
       - 'scripts/participant-access-security-check.cjs'
       - '.github/workflows/participant-access.yml'
   push:
@@ -11,6 +12,7 @@ on:
     paths:
       - 'components/game/TeacherParticipantRoster.tsx'
       - 'supabase/migrations/20261013191740_teacher_participant_access_20261014.sql'
+      - 'supabase/migrations/20261013192104_teacher_participant_null_action_guard_20261014.sql'
       - 'scripts/participant-access-security-check.cjs'
 jobs:
   source-regression:
