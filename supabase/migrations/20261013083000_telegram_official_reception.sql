@@ -19,6 +19,7 @@ create index if not exists official_appeals_receiver on public.official_appeals(
 alter table public.official_appeals enable row level security;
 revoke all on public.official_appeals from anon,authenticated;
 grant select on public.official_appeals to authenticated;
+grant select,insert,update on public.official_appeals to service_role;
 drop policy if exists official_appeals_read on public.official_appeals;
 create policy official_appeals_read on public.official_appeals for select to authenticated
  using((author_id=(select auth.uid()) or recipient_id=(select auth.uid())
