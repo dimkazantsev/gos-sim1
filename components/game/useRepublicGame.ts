@@ -45,6 +45,22 @@ export function useRepublicGame(gameId:string){
  activeViewRef.current=activeView;chatOpenRef.current=chatOpen;
  const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const lastTelegramDispatch=useRef(0);
+ async function kickTelegramDispatch(){
+  if(typeof window==='undefined'||!me?.user_id||Date.now()-lastTelegramDispatch.current<12000)return;
+  lastTelegramDispatch.current=Date.now();
+  try{
+   const {data}=await supabase.auth.getSession();
+   if(!data.session?.access_token)return;
+   await fetch('/api/telegram/dispatch',{
+    method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+data.session.access_token},
+    body:JSON.stringify({gameId}),keepalive:true
+   });
+  }catch{
+   // Telegram delivery has its own durable outbox; never block in-game actions.
+  }
+ }
+
  const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,PendingMediaUpload>()),voiceAnalysisRef=useRef<Promise<{waveform:number[];duration:number}|null>|null>(null);
 
  const profiles=useMemo(()=>currentGameProfiles(profileRows,members,gameId),[profileRows,members,gameId]);
@@ -156,20 +172,21 @@ export function useRepublicGame(gameId:string){
  useEffect(()=>{
   if(!me?.user_id||me.game_id!==gameId)return;
   let disposed=false,running=false,again=false;
-  let dirtyCore=false,dirtyChat=false,dirtyPins=false;
+  let dirtyCore=false,dirtyChat=false,dirtyPins=false,telegramWake=false;
   let timer:ReturnType<typeof setTimeout>|undefined;
   async function flush(){
    if(disposed||document.visibilityState==='hidden')return;
    if(running){again=true;return}
    running=true;
-   const core=dirtyCore,chat=dirtyChat,pins=dirtyPins;
-   dirtyCore=false;dirtyChat=false;dirtyPins=false;
+   const core=dirtyCore,chat=dirtyChat,pins=dirtyPins,wake=telegramWake;
+   dirtyCore=false;dirtyChat=false;dirtyPins=false;telegramWake=false;
    try{
     const jobs:Promise<unknown>[]=[];
     if(core){jobs.push(hydrateActiveView());notifyGameDataRefresh(gameId)}
     if(chat){jobs.push(loadChatOverview());if(channelRef.current)jobs.push(loadMessages(channelRef.current))}
     if(pins&&channelRef.current)jobs.push(loadChatPins(channelRef.current));
     await Promise.allSettled(jobs);
+    if(wake)void kickTelegramDispatch();
    }finally{
     running=false;
     if(again||dirtyCore||dirtyChat||dirtyPins){again=false;queue(250)}
@@ -181,12 +198,12 @@ export function useRepublicGame(gameId:string){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
     if(table==='chat_pins')dirtyPins=true;
     else dirtyChat=true;
-    queue();
+    telegramWake=true;queue();
    });
   }
   for(const table of ['game_stages','game_parties','party_invitations','party_documents','party_chair_ballots','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
-    dirtyCore=true;queue();
+    dirtyCore=true;telegramWake=true;queue();
    });
   }
   liveRef.current=channel;
@@ -559,7 +576,7 @@ export function useRepublicGame(gameId:string){
    return true;
   }catch(e){setChatPins(original);setError(e instanceof Error?e.message:'Не удалось изменить закрепление');return false}
  }
- async function refresh(){await Promise.all([loadAll(false),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
+ async function refresh(){await Promise.all([loadAll(false),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current);void kickTelegramDispatch()}
 
  async function logActivity(eventType:string,label:string,viewKey?:string,payload:Record<string,unknown>={}){
   const uid=me?.user_id;if(!uid||authUser.current!==uid)return;
