@@ -102,16 +102,16 @@ export async function POST(request:Request){
    return NextResponse.json({ok:true});
   }
   if(command==='/appeal'){
-   const match=text.match(/^\/appeal\s+@([\\p{L}0-9_-]+)\s+([\\s\\S]{10,4000})$/u);
+   const match=text.match(/^\/appeal\s+@([\p{L}0-9_-]+)\s+([\s\S]{10,4000})$/u);
    if(!match){
-    await reply('🏛 ГОС.ID · Приёмная\\n\\nЧтобы направить обращение, введите:\\n/appeal @Фамилия Текст обращения\\n\\nАдресат должен быть участником вашей республики. При совпадении фамилий укажите суффикс ID.');
+    await reply('🏛 ГОС.ID · Приёмная\n\nЧтобы направить обращение, введите:\n/appeal @Фамилия Текст обращения\n\nАдресат должен быть участником вашей республики. При совпадении фамилий укажите суффикс ID.');
     return NextResponse.json({ok:true});
    }
    const target=match[1].toLocaleLowerCase('ru-RU'),body=match[2].trim();
    const {data:people,error:rosterError}=await config.db.from('game_members').select('user_id,full_name,kind').eq('game_id',game.game_id).is('roster_archived_at',null).neq('kind','observer');
    if(rosterError)throw rosterError;
    const matches=(people||[]).filter(p=>{
-    const surname=(p.full_name||'').trim().split(/\\s+/)[0].toLocaleLowerCase('ru-RU');
+    const surname=(p.full_name||'').trim().split(/\s+/)[0].toLocaleLowerCase('ru-RU');
     return surname===target||surname+'_'+p.user_id.replace(/-/g,'').slice(0,8)===target;
    }).filter(p=>p.user_id!==game.user_id);
    if(matches.length!==1){
@@ -122,7 +122,7 @@ export async function POST(request:Request){
     p_telegram_user_id:telegramId,p_game_id:game.game_id,p_recipient_id:matches[0].user_id,p_body:body,p_message_id:message.message_id
    });
    if(result.error)throw result.error;
-   await reply('📨 ГОС.ID · Приёмная\\n\\nОбращение зарегистрировано и направлено адресату.\\nНомер: '+result.data);
+   await reply('📨 ГОС.ID · Приёмная\n\nОбращение зарегистрировано и направлено адресату.\nНомер: '+result.data);
    return NextResponse.json({ok:true});
   }
   if(command==='/appeals'){
@@ -131,14 +131,14 @@ export async function POST(request:Request){
     .order('created_at',{ascending:false}).limit(8);
    if(error)throw error;
    const lines=(data||[]).map((a,i)=>(i+1)+'. '+(a.status==='replied'?'✅ Ответ получен':'📨 На рассмотрении')+
-    '\\n'+a.body.slice(0,130)+'\\nID: '+a.id+(a.reply_text?'\\nОтвет: '+a.reply_text.slice(0,180):''));
-   await reply('🏛 ГОС.ID · Приёмная\\n\\n'+(lines.join('\\n\\n')||'Обращений пока нет.')+
-    '\\n\\nДля ответа: /reply UUID Текст');
+    '\n'+a.body.slice(0,130)+'\nID: '+a.id+(a.reply_text?'\nОтвет: '+a.reply_text.slice(0,180):''));
+   await reply('🏛 ГОС.ID · Приёмная\n\n'+(lines.join('\n\n')||'Обращений пока нет.')+
+    '\n\nДля ответа: /reply UUID Текст');
    return NextResponse.json({ok:true});
   }
   if(command==='/reply'){
-   const match=text.match(/^\/reply\s+([0-9a-f-]{36})\s+([\\s\\S]{1,4000})$/i);
-   if(!match){await reply('📬 Ответ на обращение\\n\\nИспользуйте /reply UUID Текст ответа. Номер обращения находится в разделе «Приёмная».');return NextResponse.json({ok:true})}
+   const match=text.match(/^\/reply\s+([0-9a-f-]{36})\s+([\s\S]{1,4000})$/i);
+   if(!match){await reply('📬 Ответ на обращение\n\nИспользуйте /reply UUID Текст ответа. Номер обращения находится в разделе «Приёмная».');return NextResponse.json({ok:true})}
    const result=await config.db.rpc('telegram_reply_official_appeal',{
     p_telegram_user_id:telegramId,p_appeal_id:match[1],p_text:match[2].trim(),p_message_id:message.message_id
    });
