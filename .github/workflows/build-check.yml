@@ -177,6 +177,7 @@ jobs:
       - run: node scripts/political-publisher-catalog-check.cjs
       - run: node scripts/access-codes-civic-actor-check.cjs
       - run: node scripts/all-invitations-layout-check.cjs
+      - run: node scripts/saved-invitations-check.cjs
       - run: node scripts/crisis-baseline-check.cjs
 
       - run: node scripts/fiscal-model-check.cjs
