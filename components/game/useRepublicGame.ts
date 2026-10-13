@@ -184,7 +184,7 @@ export function useRepublicGame(gameId:string){
     queue();
    });
   }
-  for(const table of ['game_stages','game_parties','party_invitations','party_documents','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
+  for(const table of ['game_stages','game_parties','party_invitations','party_documents','party_chair_ballots','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
     dirtyCore=true;queue();
    });
@@ -720,11 +720,16 @@ export function useRepublicGame(gameId:string){
   if(r.error){setError(r.error.message);return false}await Promise.all([loadImpactEngine(),loadPoliticalWall(),refreshBudgetPulse()]);return true;
  }
  async function createParty(name:string,ideology:string){
-  if(!teacher||!me||!name.trim())return false;const n=name.trim();const colors=['#6f7cff','#4dc9ff','#55d99b','#ff8d72','#c77dff'];
-  const p=await supabase.from('game_parties').insert({game_id:gameId,name:n,ideology:ideology.trim()||null,color:colors[parties.length%colors.length],created_by:me.user_id});
-  if(p.error){setError(p.error.message);return false}
-  const c=await supabase.from('chat_channels').insert({game_id:gameId,name:'Фракция · '+n,kind:'team',created_by:me.user_id});if(c.error)setError(c.error.message);
+  if(!me||me.kind==='observer'||!name.trim())return false;
+  const r=await supabase.rpc('found_game_party',{p_game:gameId,p_name:name.trim(),p_ideology:ideology.trim()});
+  if(r.error){setError(r.error.message);return false}
   await refresh();return true;
+ }
+ async function voteForPartyChair(partyId:string,candidateId:string){
+  if(!me||me.kind!=='student'){setError('На выборах председателя голосуют участники партии.');return false}
+  const r=await supabase.rpc('vote_for_party_chair',{p_party_id:partyId,p_candidate_id:candidateId});
+  if(r.error){setError(r.error.message);return false}
+  await Promise.all([loadPartyRepresentation(),loadPartyAssets()]);notifyGameDataRefresh(gameId);return true;
  }
  async function updateParty(id:string,patch:Partial<Party>){const r=await supabase.from('game_parties').update(patch).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
  async function setPartyLeader(partyId:string,userId:string){
@@ -1203,5 +1208,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
+  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }
