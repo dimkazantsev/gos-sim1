@@ -48,6 +48,8 @@ on:
       - 'lib/server/telegramVisibleChatChannels.ts'
       - 'scripts/telegram-digest-prefs-check.cjs'
       - 'scripts/telegram-official-reception-check.cjs'
+      - 'scripts/telegram-republic-appeal-check.cjs'
+      - 'lib/server/telegramRepublicText.ts'
       - 'supabase/migrations/20261013083000_telegram_official_reception.sql'
       - 'app/api/telegram/digest/route.ts'
       - 'supabase/migrations/20261013070000_telegram_digest_prefs.sql'
@@ -153,6 +155,7 @@ jobs:
       - run: node scripts/telegram-current-visibility-check.cjs
       - run: node scripts/telegram-digest-prefs-check.cjs
       - run: node scripts/telegram-official-reception-check.cjs
+      - run: node scripts/telegram-republic-appeal-check.cjs
       - run: node scripts/telegram-bot-avatar-check.cjs
       - run: node scripts/event-option-legality-check.cjs
       - run: npm run design:check

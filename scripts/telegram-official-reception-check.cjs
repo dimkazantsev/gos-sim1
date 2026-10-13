@@ -20,7 +20,7 @@ assert.ok(hook.includes("config.db.rpc('telegram_reply_official_appeal'"));
 assert.ok(hook.includes('p_telegram_user_id:telegramId'));
 assert.ok(hook.includes('p_message_id:message.message_id'));
 assert.ok(hook.indexOf("const valid=")<hook.indexOf("if(command==='/appeal')"),'Active linked membership required before appeal');
-assert.ok(hook.includes('matches.length!==1'),'Ambiguous surnames rejected');
+assert.ok(hook.includes("recipient.kind!=='found'")&&hook.includes('resolveAppealRecipient('),'All invalid recipients rejected before RPC');
 assert.ok(/match=text\.match\(\/\^\\\/appeal\\s\+@/.test(hook)||hook.includes('const match=text.match(/^\\/appeal\\s+@('),'Appeal parser must match slash and whitespace');
 const menu=q('lib/server/telegramPresentation.ts');
 assert.ok(menu.includes("'gos:appeals':'/appeals'"));

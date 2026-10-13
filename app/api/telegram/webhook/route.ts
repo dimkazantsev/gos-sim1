@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {telegramCabinetCard} from '@/lib/server/telegramCabinet';
 import {telegramVisibleChatChannels} from '@/lib/server/telegramVisibleChatChannels';
+import {resolveAppealRecipient,appealRecipientError,telegramRepublicName,telegramSentence} from '@/lib/server/telegramRepublicText';
 import {runtimeConfig,telegramSend,telegramAcknowledge} from '@/lib/server/telegram';
 import {telegramCallbackCommand,telegramHelpText,telegramMenuText,telegramWelcomeText,TELEGRAM_MENU_BUTTONS,TELEGRAM_WELCOME_BUTTONS,telegramSectionButtons,telegramDocumentButtons} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
@@ -68,7 +69,7 @@ export async function POST(request:Request){
     const {data:member}=await config.db.from('game_members').select('group_name').eq('game_id',l.game_id).eq('user_id',l.user_id).maybeSingle();
     return {id:l.game_id,group:member?.group_name||'Группа не указана'};
    }));
-   const entries=(games||[]).map(g=>'🏛 '+g.title+'\n👥 '+(groups.find(x=>x.id===g.id)?.group||'Группа не указана'));
+   const entries=(games||[]).map(g=>'🏛 '+telegramRepublicName(g.title)+'\n👥 '+telegramRepublicName(groups.find(x=>x.id===g.id)?.group||'Республика')+'.');
    await reply('🏛 ГОС.ID · Мои игры\n\n'+(entries.join('\n\n')||'Нет подключённых республик.')+'\n\n👤 Перейдите в профиль через кнопку ниже.',telegramSectionButtons('profile','Мой профиль'));
    return NextResponse.json({ok:true});
   }
@@ -109,22 +110,26 @@ export async function POST(request:Request){
   if(command==='/appeal'){
    const match=text.match(/^\/appeal\s+@([\p{L}0-9_-]+)\s+([\s\S]{10,4000})$/u);
    if(!match){
-    await reply('🏛 ГОС.ID · Приёмная\n\nЧтобы направить обращение, введите:\n/appeal @Фамилия Текст обращения\n\nАдресат должен быть участником вашей республики. При совпадении фамилий укажите суффикс ID.');
+    await reply('🏛 ГОС.ID · Приёмная\n\nЧтобы направить обращение, введите:\n/appeal @Фамилия Текст обращения\n\nАдресат должен быть действующим участником республики. Нельзя направить обращение самому себе.');
     return NextResponse.json({ok:true});
    }
-   const target=match[1].toLocaleLowerCase('ru-RU'),body=match[2].trim();
-   const {data:people,error:rosterError}=await config.db.from('game_members').select('user_id,full_name,kind').eq('game_id',game.game_id).is('roster_archived_at',null).neq('kind','observer');
+   const body=match[2].trim();
+   if(body.length<10){
+    await reply('⚠️ ГОС.ID · Приёмная\n\nТекст обращения должен содержать не менее 10 символов.');
+    return NextResponse.json({ok:true});
+   }
+   const {data:people,error:rosterError}=await config.db.from('game_members')
+    .select('user_id,full_name').eq('game_id',game.game_id)
+    .is('roster_archived_at',null).neq('kind','observer');
    if(rosterError)throw rosterError;
-   const matches=(people||[]).filter(p=>{
-    const surname=(p.full_name||'').trim().split(/\s+/)[0].toLocaleLowerCase('ru-RU');
-    return surname===target||surname+'_'+p.user_id.replace(/-/g,'').slice(0,8)===target;
-   }).filter(p=>p.user_id!==game.user_id);
-   if(matches.length!==1){
-    await reply('⚠️ Не удалось однозначно определить адресата. Уточните фамилию или используйте ссылку на профиль.');
+   const recipient=resolveAppealRecipient(people||[],game.user_id,match[1]);
+   if(recipient.kind!=='found'){
+    await reply(appealRecipientError(recipient));
     return NextResponse.json({ok:true});
    }
    const result=await config.db.rpc('telegram_create_official_appeal',{
-    p_telegram_user_id:telegramId,p_game_id:game.game_id,p_recipient_id:matches[0].user_id,p_body:body,p_message_id:message.message_id
+    p_telegram_user_id:telegramId,p_game_id:game.game_id,p_recipient_id:recipient.recipient.user_id,
+    p_body:body,p_message_id:message.message_id
    });
    if(result.error)throw result.error;
    await reply('📨 ГОС.ID · Приёмная\n\nОбращение зарегистрировано и направлено адресату.\nКод обращения: '+String(result.data).replace(/-/g,'').slice(0,12).toUpperCase());
@@ -180,11 +185,15 @@ export async function POST(request:Request){
    return NextResponse.json({ok:true});
   }
   if(command==='/status'){
-   const {data}=await config.db.from('games').select('title,current_round,turn_open').eq('id',game.game_id).single();
-   const {data:stage}=await config.db.from('game_stages').select('title').eq('game_id',game.game_id).eq('stage_no',data?.current_round||1).maybeSingle();
-   await reply('🏛 ГОС.ID · Состояние республики\n\n📍 Этап: '+(stage?.title||'Ожидает назначения')+'\n'+
-    (data?.turn_open?'🟢 Работа по этапу продолжается':'🕰 Ход закрыт')+
-    '\n\n'+(data?.title||'Республика'),telegramSectionButtons('dashboard','Открыть обзор'));
+   const {data,error}=await config.db.from('games').select('current_round,turn_open').eq('id',game.game_id).single();
+   if(error)throw error;
+   const {data:stage,error:stageError}=await config.db.from('game_stages').select('title')
+    .eq('game_id',game.game_id).eq('stage_no',data?.current_round||1).maybeSingle();
+   if(stageError)throw stageError;
+   await reply('🏛 ГОС.ID · Состояние республики\n\n📍 Этап: '+
+    telegramSentence(stage?.title||'Ожидает назначения')+'\n'+
+    (data?.turn_open?'🟢 Работа по этапу продолжается.':'🕰 Ход закрыт.'),
+    telegramSectionButtons('dashboard','Открыть обзор'));
    return NextResponse.json({ok:true});
   }
   if(command==='/stages'){

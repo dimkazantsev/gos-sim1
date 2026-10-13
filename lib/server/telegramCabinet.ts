@@ -1,4 +1,5 @@
 import {runtimeConfig} from './telegram';
+import {telegramRepublicName,telegramSentence} from './telegramRepublicText';
 import {telegramSectionButtons,telegramTaskButtons,telegramDocumentButtons} from './telegramPresentation';
 
 type Db=ReturnType<typeof runtimeConfig>['db'];
@@ -6,7 +7,7 @@ type Card={text:string;buttons?:ReturnType<typeof telegramSectionButtons>};
 type Section='office'|'brief'|'agenda'|'tasks'|'inbox'|'news'|'economy'|'career'|'crises'|'legal'|'training'|'settings';
 const date=(value:string|null|undefined)=>value?new Date(value).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Barnaul'}):'не указана';
 const safeTitle=(v:string|null|undefined)=>v?.trim()||'Без названия';
-const printList=(a:string[])=>a.length?a.join('\n\n'):'Нет новых элементов';
+const printList=(a:string[])=>a.length?a.join('\n\n'):'Новых сведений нет.';
 
 /** Each query is scoped to the already authenticated and active game membership. */
 export async function telegramCabinetCard(db:Db,gameId:string,userId:string,section:Section):Promise<Card>{
@@ -31,15 +32,15 @@ export async function telegramCabinetCard(db:Db,gameId:string,userId:string,sect
    heading+(section==='brief'?'Служебный доклад':'Личный аппарат'),
    '',
    '👤 '+safeTitle(user.full_name),
-   '🏷 '+(user.role_title||'Участник')+' · '+(user.group_name||'Республика'),
-   '📍 '+(stage?.title||'Этап не определён'),
+   '🏷 '+telegramSentence((user.role_title||'Участник')+' · '+telegramRepublicName(user.group_name)),
+   '📍 '+telegramSentence(stage?.title||'Этап не определён'),
    '',
    '📌 Поручения к исполнению: '+myTasks.length,
    '📥 Поступившие документы: '+docs.length,
    '🗳 Открытые голосования: '+votes.length,
    '📆 Ближайший срок: '+(myTasks.length?date(myTasks[0].due_at):'нет'),
    '',
-   game?.turn_open?'🟢 Работа по этапу открыта':'🕰 Ход закрыт'
+   game?.turn_open?'🟢 Работа по этапу открыта.':'🕰 Ход закрыт.'
   ];
   return{text:lines.join('\n'),buttons:{inline_keyboard:[
    [{text:'📌 Мои поручения',callback_data:'gos:tasks'},{text:'📥 Входящие',callback_data:'gos:inbox'}],

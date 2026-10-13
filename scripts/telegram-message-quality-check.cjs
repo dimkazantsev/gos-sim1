@@ -60,7 +60,9 @@ function from(table){
  return query;
 }
 const db={from};
+const textHelpers=imported('lib/server/telegramRepublicText.ts');
 const card=imported('lib/server/telegramCabinet.ts',{
+ './telegramRepublicText':textHelpers,
  './telegram':{runtimeConfig:()=>({db})},
  './telegramPresentation':{
   telegramSectionButtons:(section)=>({section}),
