@@ -58,7 +58,15 @@ begin
  begin perform public.teacher_member_access_list(v_game);
  exception when others then v_failed:=true;end;
  if not v_failed then raise exception 'Participant read teacher-only roster';end if;
-end $$;
+ -- External transports insert via service_role without auth.uid().
+ -- Such messages still need to respect restrictions on their actual author.
+ perform set_config('test.user_id','',true);
+ v_failed:=false;
+ begin insert into public.chat_messages(game_id,author_id,text)
+  values(v_game,v_student,'telegram forbidden');
+ exception when others then v_failed:=true;end;
+ if not v_failed then raise exception 'Service-role chat bypassed participant sanction';end if;
+end $;
 -- The matching student invitation makes the rejoin test exercise the ban, not missing-code errors.
 insert into public.invite_codes(game_id,code_hash,kind,active)
 values('11111111-1111-4111-8111-111111111111',extensions.crypt('STUDENT-SECRET-TEST',extensions.gen_salt('bf')),'student',true);
