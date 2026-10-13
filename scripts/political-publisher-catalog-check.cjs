@@ -21,7 +21,7 @@ for(const fragment of [
  "from public.institution_units u", "from public.game_parties gp",
  "from public.institution_assignments ia", "from public.game_office_assignments",
  "u.head_user_id=v_uid", "gp.leader_user_id=v_uid",
- "where gp.id=substring(p_actor_key from 7)::uuid",
+ "where gp.id=split_part(p_actor_key,':',2)::uuid",
  "where u.id=substring(p_actor_key from 6)::uuid",
  "gm.roster_archived_at" // not a direct predicate; existing game membership is canonical
 ].filter(x=>x!=="gm.roster_archived_at"))assert.ok(sql.includes(fragment),'Missing rights or dynamic data source '+fragment);
