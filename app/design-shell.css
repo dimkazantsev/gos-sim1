@@ -81,3 +81,7 @@
 .teacherAccessCodes .teacherCodeRow{min-height:64px}
 .teacherAccessCodes .teacherCodeProtected{font-size:12px;font-weight:650;color:#64748b;padding:7px 10px;white-space:nowrap}
 @media(max-width:520px){.teacherAccessCodes .teacherAccessListHead{align-items:flex-start}.teacherAccessCodes .teacherCodeProtected{white-space:normal}}
+
+.teacherInviteSecret{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:100%}
+.teacherInviteSecret code{font-size:12px;padding:7px 9px;border:1px solid #d7e1ee;border-radius:8px;background:#f5f8fc;overflow-wrap:anywhere;user-select:all}
+.teacherCodeRow .teacherInviteSecret button{white-space:nowrap}
