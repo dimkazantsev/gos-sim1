@@ -31,6 +31,13 @@ assert.ok(wall.includes("const actorSearchQuery=")&&wall.includes('actorChoices.
 assert.ok(wall.includes("g.createPoliticalPost(data,files)"),'Actual posting route unchanged');
 assert.ok(!game.includes("key:'teacher',label:"),'Local fallback excludes decommissioned publisher');
 assert.ok(avatar.includes("actorKey.startsWith('party:')"),'Live party logos retain avatar behavior');
+assert.ok(sql.includes("p_actor_key like 'faction:%'")&&sql.includes("coalesce(gp.mandates,0)>0"),'Real parliamentary factions are derived only from parties with mandates');
+assert.ok(sql.includes("'key','faction:'||a.id::text"),'All authorized active factions are listed');
+assert.ok(sql.includes("(a.user_id=v_uid or private.is_game_teacher(p_game_id))"),'Teacher can publish as active appointed offices');
+assert.ok(sql.includes("(v_teacher or user_id=v_uid) and status='active'"),'Only active offices are listed');
+assert.ok(avatar.includes("actorKey.startsWith('faction:')"),'Factions use party emblems');
+assert.ok(wall.includes("actor?.key==='faction:'+p.id"),'Composer uses faction party logo');
+
 assert.ok(style.includes('.processPortal .wallActorSearch'));
 assert.ok(layout.includes("import './political-publishers.css'"));
 const processQA=fs.readFileSync('scripts/political-process-check.sql','utf8');
