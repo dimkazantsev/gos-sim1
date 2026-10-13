@@ -74,7 +74,7 @@ export async function POST(request:Request){
    await reply('🏛 ГОС.ID · Мои игры\n\n'+(entries.join('\n\n')||'Нет подключённых республик.')+'\n\n👤 Перейдите в профиль через кнопку ниже.',telegramSectionButtons('profile','Мой профиль'));
    return NextResponse.json({ok:true});
   }
-  const requested=command==='/game'?args[1]:args[1]&&/^[0-9a-f-]{36}$/.test(args[1])?args[1]:undefined;
+  const requested=command==='/game'?args[1]:!command.startsWith('/appeal_')&&args[1]&&/^[0-9a-f-]{36}$/.test(args[1])?args[1]:undefined;
   const game=valid.find(l=>l.game_id===requested)|| (valid.length===1?valid[0]:undefined);
   if(!game){await reply('Выберите республику командой /game UUID. Список: /games');return NextResponse.json({ok:true})}
   if(command==='/game'){await reply('🏛 ГОС.ID · Республика выбрана\n\nИспользуйте кнопки бота для просмотра информации.',telegramSectionButtons('dashboard','Открыть республику'));return NextResponse.json({ok:true})}
