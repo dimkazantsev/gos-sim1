@@ -1,5 +1,13 @@
 -- ГОС.ID Telegram notification preferences and idempotent morning digests.
 -- This migration adds independent data and never updates or deletes game records.
+-- Expand only the explicit dispatcher categories. Existing five remain permitted.
+-- Older notification types (tasks, mentions, deliveries) were already emitted by
+-- the application but missing from the legacy category CHECK.
+alter table public.telegram_outbox drop constraint if exists telegram_outbox_category_check;
+alter table public.telegram_outbox add constraint telegram_outbox_category_check
+ check (category in ('chat','stage','vote','event','document',
+  'task','task_done','mention_chat','mention_actions','mention_documents','document_delivery',
+  'daily_brief','appeal','appeal_reply'));
 create table if not exists public.telegram_notification_preferences(
  game_id uuid not null,
  user_id uuid not null,
@@ -17,6 +25,7 @@ create table if not exists public.telegram_notification_preferences(
 alter table public.telegram_notification_preferences enable row level security;
 revoke all on public.telegram_notification_preferences from anon;
 grant select,insert,update on public.telegram_notification_preferences to authenticated;
+grant select,insert,update on public.telegram_notification_preferences to service_role;
 drop policy if exists telegram_prefs_owner_select on public.telegram_notification_preferences;
 create policy telegram_prefs_owner_select on public.telegram_notification_preferences
  for select to authenticated using(user_id=(select auth.uid()) and
@@ -29,7 +38,13 @@ create policy telegram_prefs_owner_insert on public.telegram_notification_prefer
   and gm.user_id=(select auth.uid()) and gm.roster_archived_at is null));
 drop policy if exists telegram_prefs_owner_update on public.telegram_notification_preferences;
 create policy telegram_prefs_owner_update on public.telegram_notification_preferences
- for update to authenticated using(user_id=(select auth.uid())) with check(user_id=(select auth.uid()));
+ for update to authenticated
+ using(user_id=(select auth.uid()) and exists(
+  select 1 from public.game_members gm where gm.game_id=telegram_notification_preferences.game_id
+  and gm.user_id=(select auth.uid()) and gm.roster_archived_at is null))
+ with check(user_id=(select auth.uid()) and exists(
+  select 1 from public.game_members gm where gm.game_id=telegram_notification_preferences.game_id
+  and gm.user_id=(select auth.uid()) and gm.roster_archived_at is null));
 -- Avoid an externally editable "already sent" marker (digest ID is internal).
 create table if not exists private.telegram_daily_digest_ledger(
  game_id uuid not null,user_id uuid not null,day_local date not null,
