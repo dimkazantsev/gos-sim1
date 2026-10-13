@@ -25,7 +25,7 @@ import {currentGameMembers,currentGameProfiles} from './gameRoster';
 
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
 type PublicStats={accepted_actions:number;posts:number;votes_cast:number;documents_created:number;activity_entries:number;events_decided:number};
-export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,onStartTutorial,readOnly=false,setupStatus=null,setupNotice='',setupFocusVersion=0,onProfileChanged,onFinishSetup}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;onStartTutorial?:()=>void;readOnly?:boolean;setupStatus?:ProfileSetupStatus|null;setupNotice?:string;setupFocusVersion?:number;onProfileChanged?:()=>void;onFinishSetup?:()=>void}){
+export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,onStartTutorial,previewAchievementsUserId,readOnly=false,setupStatus=null,setupNotice='',setupFocusVersion=0,onProfileChanged,onFinishSetup}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;onStartTutorial?:()=>void;previewAchievementsUserId?:string;readOnly?:boolean;setupStatus?:ProfileSetupStatus|null;setupNotice?:string;setupFocusVersion?:number;onProfileChanged?:()=>void;onFinishSetup?:()=>void}){
  const {me,game,parties,partyInvitations,partyMandates,averageVsn,myEvaluations,politicalPosts,ballots,formalDocuments,activities,saveProfile,teacher}=g;
  const members=useMemo(()=>currentGameMembers(g.members,game?.id||''),[g.members,game?.id]);
  const profiles=useMemo(()=>currentGameProfiles(g.profiles,members,game?.id||''),[g.profiles,members,game?.id]);
@@ -78,12 +78,12 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
   return()=>{valid=false};
  },[game?.id,target?.user_id]);
  useEffect(()=>{
-  if(!game||!target)return;
+  if(!game||!target||previewAchievementsUserId)return;
   let active=true;setPublicStats(null);
   void supabase.rpc('get_member_public_stats',{p_game_id:game.id,p_user_id:target.user_id})
    .then(r=>{if(active&&!r.error&&r.data?.[0])setPublicStats(r.data[0] as PublicStats)});
   return()=>{active=false};
- },[game?.id,target?.user_id]);
+ },[game?.id,target?.user_id,previewAchievementsUserId]);
  if(!me||!target)return null;
  const counted=publicScores.map(s=>s.status==='final'?(s.final_score??s.auto_score):s.auto_score);
  const avg=counted.length?counted.reduce((a,b)=>a+b,0)/counted.length:null;
@@ -148,7 +148,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
      {own&&onStartTutorial&&<button type="button" onClick={onStartTutorial} title="Повторить интерактивное обучение навигации"><Compass size={17}/> Пройти обучение</button>}
      {own&&target.kind!=='observer'&&<button type="button" onClick={()=>setTasksOpen(true)}><ListTodo size={17}/> Назначить задачу</button>}
-     {game&&target.kind==='student'&&<BlitzArchive gameId={game.id} userId={target.user_id}/>}
+     {game&&target.kind==='student'&&!previewAchievementsUserId&&<BlitzArchive gameId={game.id} userId={target.user_id}/>}
      {!own&&<button type="button" onClick={onOwnProfile}><UserRound size={17}/> Мой профиль</button>}
 
     </div>
@@ -191,7 +191,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
    </section>}
   </>}
 
-  {game&&target.kind==='student'&&<AwardShelf gameId={game.id} userId={target.user_id} showCatalog={own||teacher}/>}
+  {game&&target.kind==='student'&&<AwardShelf gameId={game.id} userId={previewAchievementsUserId||target.user_id} showCatalog={own||teacher||!!previewAchievementsUserId} previewOnly={!!previewAchievementsUserId}/>}
   {own&&target.kind==='student'&&<GradesView g={g} compact/>}
   {own&&<section className="profileJournalAccess">
    <div><Activity size={19} aria-hidden="true"/><div><b>{teacher?'Мой журнал действий':'Личный журнал действий'}</b><span>История ваших действий и переходов по разделам игры.</span></div></div>

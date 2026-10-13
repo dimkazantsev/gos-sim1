@@ -4,6 +4,7 @@ import {useEffect,useRef,useState} from 'react';
 import {Award,CheckCircle2,LockKeyhole,Sparkles,Trophy,X} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
+import {publicAchievementPreview} from './achievementPreview';
 
 export type Achievement={id:string;title:string;description:string;hidden:boolean;earned_at:string|null;progress:number};
 
@@ -24,7 +25,7 @@ function boundedProgress(value:number){
  return Math.max(0,Math.min(100,value));
 }
 
-export function AwardShelf({gameId,userId,showCatalog=true}:{gameId:string;userId:string;showCatalog?:boolean}){
+export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false}:{gameId:string;userId:string;showCatalog?:boolean;previewOnly?:boolean}){
  const [items,setItems]=useState<Achievement[]>([]);
  const [filter,setFilter]=useState<'earned'|'open'>(showCatalog?'open':'earned');
  const [error,setError]=useState('');
@@ -41,7 +42,7 @@ export function AwardShelf({gameId,userId,showCatalog=true}:{gameId:string;userI
    if(!live)return;
    if(r.error)setError(userError(r.error));
    else{
-    setItems(r.data||[]);
+    setItems(previewOnly?publicAchievementPreview((r.data||[]) as Achievement[]):r.data||[]);
     if(!c.error&&c.data)setCounts(c.data);
     setError('');
    }
@@ -49,11 +50,12 @@ export function AwardShelf({gameId,userId,showCatalog=true}:{gameId:string;userI
   void load();
   const timer=setInterval(()=>void load(),30000);
   return()=>{live=false;clearInterval(timer)};
- },[gameId,userId]);
+ },[gameId,userId,previewOnly]);
 
- const earned=items.filter(x=>x.earned_at);
+ const visibleItems=previewOnly?publicAchievementPreview(items):items;
+ const earned=visibleItems.filter(x=>x.earned_at);
  const hiddenEarned=earned.filter(x=>x.hidden);
- const shown=filter==='earned'?earned:items.filter(x=>!x.hidden);
+ const shown=filter==='earned'?earned:visibleItems.filter(x=>!x.hidden);
  const collectionProgress=counts.total?Math.round(earned.length/counts.total*100):0;
 
  return <section className="awardShelf steamAwards surface">
@@ -62,6 +64,7 @@ export function AwardShelf({gameId,userId,showCatalog=true}:{gameId:string;userI
     <small>ДОСТИЖЕНИЯ ГОС.ID</small>
     <h2><Trophy size={24}/> Награды</h2>
     <p>Полученные достижения и доступные условия. Награды не изменяют ВСН.</p>
+    {previewOnly&&<p role="status">Демонстрационный профиль: показаны условия открытых наград. Начисления и прогресс появятся у реальных участников.</p>}
    </div>
    <div className="awardCollectionSummary">
     <div><strong>{earned.length}</strong><span>из {counts.total}</span><b>{collectionProgress}%</b></div>
