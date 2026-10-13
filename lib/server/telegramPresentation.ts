@@ -93,7 +93,11 @@ const CALLBACK_TO_COMMAND:Record<string,string>={
  'gos:office':'/office','gos:brief':'/brief','gos:agenda':'/agenda',
  'gos:tasks':'/tasks','gos:inbox':'/inbox','gos:news':'/news',
  'gos:crises':'/crises','gos:economy':'/economy','gos:career':'/career',
- 'gos:legal':'/legal','gos:training':'/training','gos:settings':'/settings'
+ 'gos:legal':'/legal','gos:training':'/training','gos:settings':'/settings',
+ 'gos:prefs:brief':'/settings_brief','gos:prefs:tasks':'/settings_tasks',
+ 'gos:prefs:mentions':'/settings_mentions','gos:prefs:documents':'/settings_documents',
+ 'gos:prefs:votes':'/settings_votes','gos:prefs:events':'/settings_events',
+ 'gos:prefs:quiet':'/settings_quiet'
 };
 export function telegramCallbackCommand(data:string):string|undefined{
  return Object.prototype.hasOwnProperty.call(CALLBACK_TO_COMMAND,data)?CALLBACK_TO_COMMAND[data]:undefined;

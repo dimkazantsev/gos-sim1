@@ -75,6 +75,31 @@ export async function POST(request:Request){
   const game=valid.find(l=>l.game_id===requested)|| (valid.length===1?valid[0]:undefined);
   if(!game){await reply('Выберите республику командой /game UUID. Список: /games');return NextResponse.json({ok:true})}
   if(command==='/game'){await reply('🏛 ГОС.ID · Республика выбрана\n\nИспользуйте кнопки бота для просмотра информации.',telegramSectionButtons('dashboard','Открыть республику'));return NextResponse.json({ok:true})}
+  const prefMap:Record<string,string>={
+   '/settings_brief':'daily_brief','/settings_tasks':'task_reminders',
+   '/settings_mentions':'mentions','/settings_documents':'documents',
+   '/settings_votes':'votes','/settings_events':'events','/settings_quiet':'quiet_hours'
+  };
+  const key=prefMap[command];
+  if(key){
+   const {data:current,error:readError}=await config.db.from('telegram_notification_preferences')
+    .select('daily_brief,task_reminders,mentions,documents,votes,events,quiet_hours')
+    .eq('game_id',game.game_id).eq('user_id',game.user_id).maybeSingle();
+   if(readError)throw readError;
+   const now=current as Record<string,boolean>|null;
+   const oldValue=now?.[key]??(key!=='quiet_hours');
+   // Update only the toggled column: upsert with omitted columns would reset
+   // other notification preferences to their database defaults.
+   const table=config.db.from('telegram_notification_preferences');
+   const update=now
+    ? await table.update({[key]:!oldValue,updated_at:new Date().toISOString()})
+       .eq('game_id',game.game_id).eq('user_id',game.user_id)
+    : await table.insert({game_id:game.game_id,user_id:game.user_id,[key]:!oldValue,updated_at:new Date().toISOString()});
+   if(update.error)throw update.error;
+   const card=await telegramCabinetCard(config.db,game.game_id,game.user_id,'settings');
+   await reply(card.text,card.buttons);
+   return NextResponse.json({ok:true});
+  }
   if(['/office','/brief','/agenda','/tasks','/inbox','/news','/crises','/economy','/career','/legal','/training','/settings'].includes(command)){
    const card=await telegramCabinetCard(config.db,game.game_id,game.user_id,command.slice(1) as Parameters<typeof telegramCabinetCard>[3]);
    await reply(card.text,card.buttons);

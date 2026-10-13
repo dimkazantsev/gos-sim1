@@ -79,5 +79,22 @@ export async function telegramCabinetCard(db:Db,gameId:string,userId:string,sect
  if(section==='economy')return{text:heading+'Экономический бюллетень\n\n📊 Бюджет и показатели экономики доступны в финансовом разделе платформы. Показатели не воспроизводятся без подтверждённых расчётов.',buttons:telegramSectionButtons('budget','Открыть бюджет')};
  if(section==='legal')return{text:heading+'Правовая справочная\n\n⚖️ Используйте реестр НПА для проверки компетенции, процедуры принятия решений и действующих редакций. Ответы на текущие задания и блиц не раскрываются.',buttons:telegramSectionButtons('documents','Открыть НПА')};
  if(section==='training')return{text:heading+'Подготовка и знания\n\n🎓 Тренировки и результаты блица доступны в ГОС.ID. Бот не раскрывает правильные ответы до завершения попытки.',buttons:telegramSectionButtons('stages','Открыть этапы')};
- return{text:heading+'Уведомления\n\n🔔 Управление персональными уведомлениями доступно в профиле ГОС.ID. Для изменения рассылки используются действующие настройки привязки Telegram.',buttons:telegramSectionButtons('profile','Настройки профиля')};
+ const {data:settings,error:settingsError}=await db.from('telegram_notification_preferences').select('daily_brief,task_reminders,mentions,documents,votes,events,quiet_hours').eq('game_id',gameId).eq('user_id',userId).maybeSingle();
+ if(settingsError)throw settingsError;
+ const config=settings||{daily_brief:true,task_reminders:true,mentions:true,documents:true,votes:true,events:true,quiet_hours:false};
+ const labels=[
+  ['brief','☀️ Утренний доклад',config.daily_brief],
+  ['tasks','📌 Поручения',config.task_reminders],
+  ['mentions','💬 Упоминания',config.mentions],
+  ['documents','📜 Документы',config.documents],
+  ['votes','🗳 Голосования',config.votes],
+  ['events','🚨 События',config.events],
+  ['quiet','🌙 Тихие часы',config.quiet_hours]
+ ] as const;
+ return{text:heading+'Настройки уведомлений\\n\\nНажмите на категорию, чтобы включить или выключить её.\\n🌙 Тихие часы: 22:00–08:00 (Барнаул).\\n\\n'+labels.map(([_,name,on])=>(on?'✅ ':'⚪ ')+name).join('\\n'),
+  buttons:{inline_keyboard:[
+   ...labels.map(([key,name,on])=>[{text:(on?'✅ ':'⚪ ')+name,callback_data:'gos:prefs:'+key}]),
+   [{text:'🏛 Меню',callback_data:'gos:menu'}]
+  ]}
+ };
 }
