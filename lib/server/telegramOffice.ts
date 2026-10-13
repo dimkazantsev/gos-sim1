@@ -118,17 +118,25 @@ export async function telegramOfficeCommand(ctx:Context):Promise<Result|undefine
   return {text:'🏢 ГОС.ID · Приёмная\n\n'+bullet((data||[]).map(a=>
    '• '+short(a.subject,105)+' — '+(a.status==='received'?'зарегистрировано':a.status==='processing'?'на рассмотрении':a.status==='answered'?'получен ответ':'закрыто')
   ),'Обращений пока нет.')+
-   '\n\nНаправить обращение:\n/appeal UUID_адресата | Тема обращения | Текст\n\nАдресат должен занимать действующую должность в вашей республике.',
+   '\n\nНаправить обращение:\n/appeal @Фамилия | Тема обращения | Текст\n\nПри совпадении фамилий бот попросит уточнить адресата.',
    buttons:gameSec('profile')};
  }
  if(command==='/appeal'){
   const raw=text.slice(text.indexOf(' ')+1);
-  const match=raw.match(/^([0-9a-f-]{36})\s*\|\s*([^|]{3,160})\s*\|\s*([\s\S]{5,3000})$/i);
-  if(!match)return {text:'🏢 Формат обращения:\n/appeal UUID_адресата | Тема (3–160 знаков) | Текст (5–3000 знаков)'};
-  const [,recipient,subject,body]=match;
-  if(recipient===userId)return {text:'Адресатом обращения должен быть другой участник.'};
-  const {data:target}=await q('game_members').select('user_id,full_name,role_title').eq('game_id',gameId).eq('user_id',recipient).is('roster_archived_at',null).neq('kind','observer').maybeSingle();
-  if(!target)return {text:'Адресат недоступен или не входит в вашу республику.'};
+  const match=raw.match(/^([^|]{2,100})\s*\|\s*([^|]{3,160})\s*\|\s*([\s\S]{5,3000})$/i);
+  if(!match)return {text:'🏢 Формат обращения:\n/appeal @Фамилия | Тема (3–160 знаков) | Текст (5–3000 знаков)'};
+  const [,handle,subject,body]=match;
+  const cleaned=handle.trim().replace(/^@/,'').toLocaleLowerCase('ru-RU');
+  const {data:people}=await q('game_members').select('user_id,full_name,role_title').eq('game_id',gameId)
+   .is('roster_archived_at',null).neq('kind','observer').limit(200);
+  const matches=(people||[]).filter(p=>p.user_id.toLowerCase()===cleaned||
+    p.full_name.trim().split(/\s+/)[0]?.toLocaleLowerCase('ru-RU')===cleaned);
+  if(matches.length!==1)return {text:matches.length>1?
+   'В республике несколько участников с такой фамилией. Для точного адресата используйте UUID участника из его профиля.':
+   'Участник с указанной фамилией не найден в вашей республике.'};
+  const target=matches[0];
+  if(target.user_id===userId)return {text:'Адресатом обращения должен быть другой участник.'};
+  const recipient=target.user_id;
   const {error}=await q('telegram_reception_requests').insert({
    game_id:gameId,sender_id:userId,recipient_id:recipient,subject:subject.trim(),body:body.trim(),
    telegram_chat_id:chatId,telegram_message_id:messageId
