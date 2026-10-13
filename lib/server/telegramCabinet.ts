@@ -91,7 +91,7 @@ export async function telegramCabinetCard(db:Db,gameId:string,userId:string,sect
   ['events','🚨 События',config.events],
   ['quiet','🌙 Тихие часы',config.quiet_hours]
  ] as const;
- return{text:heading+'Настройки уведомлений\\n\\nНажмите на категорию, чтобы включить или выключить её.\\n🌙 Тихие часы: 22:00–08:00 (Барнаул).\\n\\n'+labels.map(([_,name,on])+(on?'✅ ':'⚪ ')+name).join('\\n'),
+ return{text:heading+'Настройки уведомлений\\n\\nНажмите на категорию, чтобы включить или выключить её.\\n🌙 Тихие часы: 22:00–08:00 (Барнаул).\\n\\n'+labels.map(([_,name,on])=>(on?'✅ ':'⚪ ')+name).join('\\n'),
   buttons:{inline_keyboard:[
    ...labels.map(([key,name,on])=>[{text:(on?'✅ ':'⚪ ')+name,callback_data:'gos:prefs:'+key}]),
    [{text:'🏛 Меню',callback_data:'gos:menu'}]
