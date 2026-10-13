@@ -60,3 +60,11 @@
 .teacherCodeRow div{display:grid;gap:4px}.teacherCodeRow small{color:#63758e}
 .teacherCodeNotice{margin:12px 0 0;font-size:13px;color:#23436b;overflow-wrap:anywhere}
 @media(max-width:780px){.teacherCodeGrid{grid-template-columns:1fr}.teacherAccessCodes{padding:14px}.teacherCodeRow{flex-wrap:wrap}}
+
+/* One access-code panel for participants, groups, and guests. */
+.teacherAccessCodes .teacherCodeEditor h4{margin:0 0 7px;font-size:15px;color:#1a3766}
+.teacherAccessCodes .teacherAccessExplanation{margin:3px 0 10px;font-size:12px;line-height:1.5;color:#667e9e}
+.teacherAccessCodes .teacherAccessListHead{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.teacherAccessCodes .teacherAccessListHead button,.teacherAccessCodes .teacherCodeRow button{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.teacherAccessCodes .teacherCodeCreated code{display:inline-block;max-width:100%;overflow-wrap:anywhere;user-select:all}
+.teacherAccessCodes .teacherCodeRow b{overflow-wrap:anywhere}
