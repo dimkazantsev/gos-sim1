@@ -98,6 +98,9 @@ on:
       - 'app/2026-political-process.css'
       - 'components/game/politicalWallPaging.ts'
       - 'scripts/political-wall-feed-check.cjs'
+      - 'scripts/political-publisher-catalog-check.cjs'
+      - 'supabase/migrations/20261013203000_process_actors_complete_catalog.sql'
+      - 'app/political-publishers.css'
       - 'scripts/political-wall-status-browser-check.cjs'
       - 'components/game/GradesView.tsx'
       - 'supabase/migrations/*blitz*'
@@ -167,6 +170,7 @@ jobs:
       - run: npm run design:check
       - run: node scripts/interface-contract-check.cjs
       - run: node scripts/political-wall-feed-check.cjs
+      - run: node scripts/political-publisher-catalog-check.cjs
       - run: node scripts/crisis-baseline-check.cjs
 
       - run: node scripts/fiscal-model-check.cjs
