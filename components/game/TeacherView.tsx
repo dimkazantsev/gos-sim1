@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import {Award,Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Compass,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
 import ClassroomJournal from './ClassroomJournal';
 import ParticipantsAnalytics from './ParticipantsAnalytics';
@@ -37,11 +37,18 @@ const WORKSPACES=[
 ] as const;
 
 export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat,onNavigate,onStartTutorial}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void;onNavigate?:(destination:'documents'|'votes'|'budget'|'actions')=>void;onStartTutorial?:()=>void}){
- const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,formalDocuments,votes,ballots,evaluations,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
+ const {game,currentStage,stages,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,formalDocuments,votes,ballots,evaluations,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
  const navigationRef=useHorizontalWheel(game?.id);
  const pendingFactionCount=parties.filter(p=>p.registration_status==='submitted').length+g.partyDocuments.filter(d=>d.status==='submitted').length;
+ const [clockIndex,setClockIndex]=useState(0);
+ const [clockNow,setClockNow]=useState(0);
+ useEffect(()=>{const interval=setInterval(()=>setClockNow(Date.now()),1000);return()=>clearInterval(interval)},[]);
+ const activeStageClocks=stages.filter(s=>s.status==='open').sort((a,b)=>(a.deadline?Date.parse(a.deadline):Infinity)-(b.deadline?Date.parse(b.deadline):Infinity)||a.stage_no-b.stage_no);
+ const clockStage=activeStageClocks[clockIndex%Math.max(1,activeStageClocks.length)];
+ const clockSeconds=clockStage?.deadline&&clockNow?Math.max(0,Math.ceil((Date.parse(clockStage.deadline)-clockNow)/1000)):0;
+
 
 
 
@@ -96,7 +103,10 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    </div>
    <div className="teacherCommandClock">
     <span className={game.turn_open?'teacherTurnBadge isOpen':'teacherTurnBadge isPaused'}>{game.turn_open?'ХОД ОТКРЫТ':currentStage?.status==='completed'?'ЭТАП ЗАВЕРШЁН':'ЭТАП НЕ ОТКРЫТ'}</span>
-    <strong>{game.turn_open&&game.turn_ends_at?timerText(secondsLeft):'—'}</strong>
+    <button type="button" className="teacherClockSwitch" disabled={activeStageClocks.length<2} onClick={()=>setClockIndex(v=>(v+1)%activeStageClocks.length)} aria-label="Переключить таймеры открытых этапов" title={activeStageClocks.length>1?'Нажмите, чтобы увидеть срок следующего открытого этапа':'Таймер активного этапа'}>
+      <strong>{clockStage?'Этап '+clockStage.stage_no+' · '+(clockStage.deadline?timerText(clockSeconds):'без срока'):'—'}</strong>
+      {activeStageClocks.length>1&&<small>{clockIndex%activeStageClocks.length+1} / {activeStageClocks.length} · нажмите для следующего</small>}
+     </button>
    </div>
    <div className="teacherQuickActions">
     {onStartTutorial&&<button type="button" className="teacherQuick teacherTourButton" onClick={onStartTutorial} aria-label="Пройти интерактивное обучение" title="Просмотреть все подсказки без изменения игровых данных">
