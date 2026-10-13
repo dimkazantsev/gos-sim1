@@ -64,10 +64,16 @@ export async function GET(request:Request){
    }
    if(!visible){await dismiss('Mention source no longer visible');continue}
   }
-  if(job.category==='document'||job.category==='vote'||job.category==='task'||job.category==='task_done'){
-   const table=job.category==='document'?'formal_documents':job.category==='vote'?'game_votes':'game_assigned_tasks';
+  if(job.category==='document'){
+   const {data:document,error:docError}=await config.db.from('formal_documents')
+    .select('id').eq('id',job.source_id).eq('game_id',job.game_id).maybeSingle();
+   if(docError){console.error('Telegram document lookup failed',docError.code);continue}
+   if(!document){await dismiss('Document removed');continue}
+  }
+  if(job.category==='vote'||job.category==='task'||job.category==='task_done'){
+   const table=job.category==='vote'?'game_votes':'game_assigned_tasks';
    const {data:entity,error:entityError}=await config.db.from(table)
-    .select(job.category==='document'?'id':'id,status').eq('id',job.source_id).eq('game_id',job.game_id).maybeSingle();
+    .select('id,status').eq('id',job.source_id).eq('game_id',job.game_id).maybeSingle();
    if(entityError){console.error('Telegram source lookup failed',entityError.code);continue}
    if(!entity||
      (job.category==='vote'&&entity.status!=='open')||
