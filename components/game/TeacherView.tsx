@@ -3,6 +3,7 @@ import {useState} from 'react';
 import {Award,Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Compass,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
 import ClassroomJournal from './ClassroomJournal';
 import ParticipantsAnalytics from './ParticipantsAnalytics';
+import TeacherParticipants from './TeacherParticipants';
 import TeacherStageManager from './TeacherStageManager';
 import TeacherPartyDossiers from './TeacherPartyDossiers';
 import TeacherGhostVotingPanel from './TeacherGhostVotingPanel';
@@ -21,12 +22,13 @@ function timerText(seconds:number){
  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools'|'event'|'awards'|'blitz';
+type Workspace='overview'|'stages'|'journal'|'analytics'|'participants'|'grades'|'impact'|'parties'|'tools'|'event'|'awards'|'blitz';
 const WORKSPACES=[
  {key:'overview',title:'Обзор',icon:Activity},
  {key:'stages',title:'Этапы',icon:BookOpenText},
  {key:'journal',title:'Журнал',icon:UsersRound},
  {key:'analytics',title:'Аналитика',icon:BarChart3},
+ {key:'participants',title:'Участники',icon:UsersRound},
  {key:'grades',title:'Оценки',icon:GraduationCap},
  {key:'impact',title:'Модель последствий',icon:Network},
  {key:'parties',title:'Фракции',icon:UsersRound},
@@ -131,6 +133,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    <ParticipantsAnalytics g={g}/>
   </section>}
 
+    {workspace==='participants'&&<TeacherParticipants g={g}/>}
     {workspace==='grades'&&<GradesView g={g}/>}
     {workspace==='awards'&&<TeacherAwards g={g}/>}
     {workspace==='blitz'&&<TeacherBlitz g={g}/>}
