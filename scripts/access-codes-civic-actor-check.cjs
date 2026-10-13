@@ -11,7 +11,7 @@ const webhook=read('app/api/telegram/webhook/route.ts');
 const tg=read('lib/server/telegramPresentation.ts');
 const art=read('components/ui/CivicArtwork.tsx');
 const css=read('app/design-shell.css');
-for(const name of ['teacher_create_access_code','teacher_update_game_code','teacher_saved_invitation_list','teacher_revoke_access_code','private.game_group_access_codes','private.is_game_teacher','join_game_with_code','extensions.crypt','grant execute','revoke all']){
+for(const name of ['teacher_create_access_code','teacher_update_game_code','teacher_access_code_list','teacher_revoke_access_code','private.game_group_access_codes','private.is_game_teacher','join_game_with_code','extensions.crypt','grant execute','revoke all']){
  assert.ok(migration.includes(name),'Access-code contract missing: '+name);
 }
 assert.ok(migration.includes('ic.code_hash=extensions.crypt(p_invite_code,ic.code_hash)'),'Old encrypted invite authentication retained');
