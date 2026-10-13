@@ -13,6 +13,12 @@ export const TELEGRAM_MENU_BUTTONS:TelegramMarkup={
   [{text:'📊 Состояние',callback_data:'gos:status'},{text:'🗺 Этапы',callback_data:'gos:stages'}],
   [{text:'🗳 Голосования',callback_data:'gos:votes'},{text:'📜 Документы',callback_data:'gos:docs'}],
   [{text:'💬 Чаты',callback_data:'gos:channels'},{text:'🏛 Мои игры',callback_data:'gos:games'}],
+  [{text:'🏛 Личный аппарат',callback_data:'gos:office'},{text:'☀️ Доклад',callback_data:'gos:brief'}],
+  [{text:'📅 Повестка',callback_data:'gos:agenda'},{text:'📌 Поручения',callback_data:'gos:tasks'}],
+  [{text:'📥 Входящие',callback_data:'gos:inbox'},{text:'📰 Новости',callback_data:'gos:news'}],
+  [{text:'🚨 Ситуации',callback_data:'gos:crises'},{text:'📈 Экономика',callback_data:'gos:economy'}],
+  [{text:'🏅 Карьера',callback_data:'gos:career'},{text:'⚖️ НПА',callback_data:'gos:legal'}],
+  [{text:'🎓 Блиц',callback_data:'gos:training'},{text:'⚙️ Настройки',callback_data:'gos:settings'}],
   [{text:'❔ Помощь',callback_data:'gos:help'}],
   [{text:'🌐 Открыть ГОС.ID',url:TELEGRAM_PROJECT_URL}]
  ]
@@ -66,12 +72,28 @@ export const TELEGRAM_COMMANDS=[
  {command:'votes',description:'🗳 Открытые голосования'},
  {command:'docs',description:'📜 Документы и НПА'},
  {command:'channels',description:'💬 Доступные чаты'},
+ {command:'office',description:'🏛 Личный аппарат'},
+ {command:'brief',description:'☀️ Служебный доклад'},
+ {command:'agenda',description:'📅 Повестка и сроки'},
+ {command:'tasks',description:'📌 Мои поручения'},
+ {command:'inbox',description:'📥 Входящие документы'},
+ {command:'news',description:'📰 Новости республики'},
+ {command:'crises',description:'🚨 Ситуационный центр'},
+ {command:'economy',description:'📈 Экономика'},
+ {command:'career',description:'🏅 Служебная карьера'},
+ {command:'legal',description:'⚖️ Правовая справочная'},
+ {command:'training',description:'🎓 Подготовка к блицу'},
+ {command:'settings',description:'⚙️ Настройки уведомлений'},
  {command:'help',description:'❔ Справка и команды'}
 ];
 const CALLBACK_TO_COMMAND:Record<string,string>={
  'gos:begin':'/menu','gos:menu':'/menu','gos:games':'/games',
  'gos:status':'/status','gos:stages':'/stages','gos:votes':'/votes',
- 'gos:docs':'/docs','gos:channels':'/channels','gos:help':'/help'
+ 'gos:docs':'/docs','gos:channels':'/channels','gos:help':'/help',
+ 'gos:office':'/office','gos:brief':'/brief','gos:agenda':'/agenda',
+ 'gos:tasks':'/tasks','gos:inbox':'/inbox','gos:news':'/news',
+ 'gos:crises':'/crises','gos:economy':'/economy','gos:career':'/career',
+ 'gos:legal':'/legal','gos:training':'/training','gos:settings':'/settings'
 };
 export function telegramCallbackCommand(data:string):string|undefined{
  return Object.prototype.hasOwnProperty.call(CALLBACK_TO_COMMAND,data)?CALLBACK_TO_COMMAND[data]:undefined;
