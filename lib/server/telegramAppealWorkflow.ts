@@ -4,7 +4,7 @@ import {resolveAppealRecipient,appealRecipientError,telegramSentence} from './te
 
 type Db=ReturnType<typeof runtimeConfig>['db'];
 type Reply=(text:string,buttons?:TelegramMarkup)=>Promise<void>;
-type Person={user_id:string;full_name:string|null;kind:string};
+type Person={user_id:string;full_name:string|null;kind:string;role_title:string|null};
 type Params={
  db:Db;gameId:string;userId:string;telegramId:number;messageId:number;
  text:string;isCallback:boolean;reply:Reply;
@@ -12,6 +12,7 @@ type Params={
 const ACTIVE=['awaiting_text','preview'];
 const uuid=/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 const name=(p:Pick<Person,'full_name'>)=>p.full_name?.trim()||'Участник';
+const namedRole=(p:Person)=>name(p)+(p.role_title?' · '+p.role_title:'');
 const options=(name:string,id:string)=>({text:name.slice(0,56),callback_data:'gos:appeal:pick:'+id});
 const back:TelegramMarkup={inline_keyboard:[[{text:'🏛 Меню',callback_data:'gos:menu'}]]};
 
@@ -24,7 +25,7 @@ function previewButtons(id:string):TelegramMarkup{
  ]};
 }
 async function getRoster(db:Db,gameId:string):Promise<Person[]>{
- const {data,error}=await db.from('game_members').select('user_id,full_name,kind')
+ const {data,error}=await db.from('game_members').select('user_id,full_name,kind,role_title')
   .eq('game_id',gameId).is('roster_archived_at',null)
   .neq('kind','observer').order('full_name').limit(150);
  if(error)throw error;
@@ -79,7 +80,7 @@ export async function handleTelegramAppeal({db,gameId,userId,telegramId,messageI
   const {data:actor}=await db.from('game_members').select('kind')
    .eq('game_id',gameId).eq('user_id',userId).is('roster_archived_at',null).maybeSingle();
   const buttons:TelegramMarkup={inline_keyboard:[
-   ...shown.map(p=>[options(name(p),p.user_id)]),
+   ...shown.map(p=>[options(namedRole(p),p.user_id)]),
    ...(totalPages>1?[[
     ...(current>0?[{text:'← Назад',callback_data:'gos:appeal:page:'+(current-1)}]:[]),
     ...(current<totalPages-1?[{text:'Далее →',callback_data:'gos:appeal:page:'+(current+1)}]:[])
@@ -118,7 +119,7 @@ export async function handleTelegramAppeal({db,gameId,userId,telegramId,messageI
    if(!person){await reply('⚠️ ГОС.ID · Приёмная\n\nАдресат больше недоступен. Обновите список через /appeal.');return true}
    await replaceDraft(db,gameId,userId,id);
    await reply('✍️ ГОС.ID · Новое обращение\n\nАдресат: '+name(person)+
-    '\n\nОтправьте текст обращения обычным сообщением длиной от 10 до 4000 символов. Перед отправкой вы сможете проверить и изменить текст.');
+    '\nДолжность: '+(person.role_title||'Не указана')+'\n\nОтправьте текст обращения обычным сообщением длиной от 10 до 4000 символов. Перед отправкой вы сможете проверить и изменить текст.');
    return true;
   }
   const {data:draft,error}=await db.from('telegram_appeal_drafts')
