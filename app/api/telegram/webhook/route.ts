@@ -68,7 +68,7 @@ export async function POST(request:Request){
    const {data:games}=await config.db.from('games').select('id,title').in('id',valid.map(l=>l.game_id));
    const groups=await Promise.all(valid.map(async l=>{
     const {data:member}=await config.db.from('game_members').select('group_name').eq('game_id',l.game_id).eq('user_id',l.user_id).maybeSingle();
-    return {id:l.game_id,group:member?.group_name||'Группа не указана'};
+    return {id:l.game_id,group:member?.group_name||'не указана'};
    }));
    const entries=(games||[]).map(g=>'🏛 Игра: '+telegramRepublicName(g.title)+'\n👥 Группа: '+(groups.find(x=>x.id===g.id)?.group||'не указана'));
    await reply('🏛 ГОС.ID · Мои игры\n\n'+(entries.join('\n\n')||'Нет подключённых республик.')+'\n\n👤 Перейдите в профиль через кнопку ниже.',telegramSectionButtons('profile','Мой профиль'));
