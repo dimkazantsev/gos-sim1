@@ -111,6 +111,41 @@ async function dispatchOutbox(gameId?:string){
     await dismiss('Source removed or no longer active');continue;
    }
   }
+  // Party notices may become invalid before delivery. Check the live source and
+  // recipient permissions immediately before contacting Telegram.
+  if(job.category==='party_invite'){
+   const {data:invitation,error:invitationError}=await config.db.from('party_invitations')
+    .select('id').eq('id',job.source_id).eq('game_id',job.game_id)
+    .eq('invited_user_id',job.user_id).eq('status','pending').maybeSingle();
+   if(invitationError){console.error('Telegram invitation lookup failed',invitationError.code);continue}
+   if(!invitation){await dismiss('Party invitation no longer pending');continue}
+  }
+  if(job.category==='party_registration'||job.category==='party_document'){
+   const {data:teacherMember,error:teacherError}=await config.db.from('game_members')
+    .select('user_id').eq('game_id',job.game_id).eq('user_id',job.user_id)
+    .eq('kind','teacher').is('roster_archived_at',null).maybeSingle();
+   if(teacherError){console.error('Telegram party teacher lookup failed',teacherError.code);continue}
+   if(!teacherMember){await dismiss('Minjust notification recipient no longer a teacher');continue}
+   if(job.category==='party_registration'){
+    const {data:party,error:partyError}=await config.db.from('game_parties')
+     .select('id').eq('id',job.source_id).eq('game_id',job.game_id)
+     .eq('registration_status','submitted').maybeSingle();
+    if(partyError){console.error('Telegram party registration lookup failed',partyError.code);continue}
+    if(!party){await dismiss('Party registration no longer pending');continue}
+   }else{
+    const {data:document,error:docError}=await config.db.from('party_documents')
+     .select('id').eq('id',job.source_id).eq('game_id',job.game_id).eq('status','submitted').maybeSingle();
+    if(docError){console.error('Telegram party document lookup failed',docError.code);continue}
+    if(!document){await dismiss('Party document no longer pending');continue}
+   }
+  }
+  if(job.category==='party_review'){
+   const {data:document,error:docError}=await config.db.from('party_documents')
+    .select('id').eq('id',job.source_id).eq('game_id',job.game_id)
+    .eq('uploaded_by',job.user_id).in('status',['accepted','revision']).maybeSingle();
+   if(docError){console.error('Telegram party review lookup failed',docError.code);continue}
+   if(!document){await dismiss('Party review no longer current');continue}
+  }
   const {data:preferences,error:prefsError}=await config.db.from('telegram_notification_preferences')
    .select('daily_brief,task_reminders,mentions,documents,votes,events,quiet_hours')
    .eq('game_id',job.game_id).eq('user_id',job.user_id).maybeSingle();
@@ -118,6 +153,7 @@ async function dispatchOutbox(gameId?:string){
   const categoryKey:Record<string,string>={
    daily_brief:'daily_brief',task:'task_reminders',task_done:'task_reminders',
    mention_chat:'mentions',mention_actions:'mentions',mention_documents:'mentions',
+   party_invite:'events',party_registration:'events',party_document:'events',party_review:'events',
    document:'documents',document_delivery:'documents',vote:'votes',stage:'events',event:'events'
   };
   const setting=categoryKey[job.category];
@@ -152,6 +188,7 @@ async function dispatchOutbox(gameId?:string){
   else if(job.category==='mention_documents')buttons=telegramSectionButtons('documents','Открыть документы');
   else if(job.category==='chat'||job.category==='mention_chat')buttons=telegramChatButtons(job.channel_id||undefined);
   else if(job.category==='stage')buttons=telegramSectionButtons('stages','Открыть этап');
+  else if(job.category==='party_invite'||job.category==='party_registration'||job.category==='party_document'||job.category==='party_review')buttons=telegramSectionButtons('parties','Открыть партии');
   else if(job.category==='vote')buttons=telegramSectionButtons('votes','Открыть голосование');
   // Combine only low-urgency, same-recipient open task notices. Each extra
   // job is independently claimed and its live source rechecked; no cross-game
