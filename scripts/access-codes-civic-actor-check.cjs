@@ -22,7 +22,7 @@ assert.ok(migration.includes("kind='student' and active"),'Revocation cannot can
 assert.ok(migration.includes('enable row level security')&&migration.includes('revoke all on private.game_group_access_codes'),'New group mapping not readable directly');
 assert.ok(!/delete from public\.(games|game_members|invite_codes)/i.test(migration),'Existing data must be preserved');
 for(const rpc of ['teacher_create_access_code','teacher_update_game_code','teacher_access_code_list','teacher_revoke_access_code'])assert.ok(codes.includes(rpc),'Missing UI action '+rpc);
-assert.ok(sessions.includes('<TeacherAccessCodes')&&codes.includes('create_observer_invite')&&!sessions.includes('profileGuestInvites'),'Unified access panel owns guest invitations without duplicate editor');
+assert.ok(sessions.includes('<TeacherAccessCodes')&&codes.includes('teacher_create_saved_invitation')&&!sessions.includes('profileGuestInvites'),'Unified access panel owns guest invitations without duplicate editor');
 assert.ok(home.includes('Group required')&&!home.includes("if(mode==='student'&&group.trim().length<1)"),'Group code does not require duplicate manual entry');
 assert.ok(actors.includes('private.process_actor_active_now')&&actors.includes("gp.registration_status='registered'"),'Actors must exist and parties must be registered');
 assert.ok(actors.includes('for a in select u.id,u.title from public.institution_units')&&actors.includes('from public.game_office_assignments'),'Actual game offices and units remain');
