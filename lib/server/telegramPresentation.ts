@@ -17,6 +17,7 @@ export const TELEGRAM_MENU_BUTTONS:TelegramMarkup={
   [{text:'📅 Повестка',callback_data:'gos:agenda'},{text:'📌 Поручения',callback_data:'gos:tasks'}],
   [{text:'📥 Входящие',callback_data:'gos:inbox'},{text:'📰 Новости',callback_data:'gos:news'}],
   [{text:'🚨 Ситуации',callback_data:'gos:crises'},{text:'📈 Экономика',callback_data:'gos:economy'}],
+  [{text:'📨 Приёмная',callback_data:'gos:appeals'},{text:'✍️ Написать обращение',callback_data:'gos:appeal'}],
   [{text:'🏅 Карьера',callback_data:'gos:career'},{text:'⚖️ НПА',callback_data:'gos:legal'}],
   [{text:'🎓 Блиц',callback_data:'gos:training'},{text:'⚙️ Настройки',callback_data:'gos:settings'}],
   [{text:'❔ Помощь',callback_data:'gos:help'}],
@@ -84,6 +85,9 @@ export const TELEGRAM_COMMANDS=[
  {command:'legal',description:'⚖️ Правовая справочная'},
  {command:'training',description:'🎓 Подготовка к блицу'},
  {command:'settings',description:'⚙️ Настройки уведомлений'},
+ {command:'appeals',description:'📨 Мои официальные обращения'},
+ {command:'appeal',description:'✍️ Направить обращение'},
+ {command:'reply',description:'📬 Ответить на обращение'},
  {command:'help',description:'❔ Справка и команды'}
 ];
 const CALLBACK_TO_COMMAND:Record<string,string>={
@@ -97,7 +101,8 @@ const CALLBACK_TO_COMMAND:Record<string,string>={
  'gos:prefs:brief':'/settings_brief','gos:prefs:tasks':'/settings_tasks',
  'gos:prefs:mentions':'/settings_mentions','gos:prefs:documents':'/settings_documents',
  'gos:prefs:votes':'/settings_votes','gos:prefs:events':'/settings_events',
- 'gos:prefs:quiet':'/settings_quiet'
+ 'gos:prefs:quiet':'/settings_quiet',
+ 'gos:appeals':'/appeals','gos:appeal':'/appeal'
 };
 export function telegramCallbackCommand(data:string):string|undefined{
  return Object.prototype.hasOwnProperty.call(CALLBACK_TO_COMMAND,data)?CALLBACK_TO_COMMAND[data]:undefined;
