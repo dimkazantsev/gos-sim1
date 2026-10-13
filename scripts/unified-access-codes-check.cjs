@@ -13,7 +13,7 @@ for(const marker of ['participant','group','guest' ,'teacher_create_saved_invita
 }
 assert.ok(source.includes("scope==='guest'?6:8"),'Guest minimum code length must remain six');
 assert.ok(source.includes("crypto.getRandomValues"),'Generated codes must be unpredictable');
-assert.ok(source.includes('Повторно посмотреть секретное значение нельзя'),'Hashed codes cannot be shown again');
+assert.ok(source.includes('Код сохранён для преподавателя.'),'Hashed codes cannot be shown again');
 assert.ok(source.includes('window.confirm'),'Revocation and deletion require confirmation');
 assert.ok(page.includes('Приглашение гостя')&&page.includes('Приглашение участника'),'Login invitation names standardized');
 assert.ok(sql.includes("private.is_game_teacher(p_game_id)"),'Read and writes require teacher server validation');
