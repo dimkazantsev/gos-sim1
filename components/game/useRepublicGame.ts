@@ -155,21 +155,50 @@ export function useRepublicGame(gameId:string){
 
  useEffect(()=>{
   if(!me?.user_id||me.game_id!==gameId)return;
-  // Supabase Realtime currently spends seconds scanning the large
-  // supabase_realtime publication. Do not let that infrastructure path
-  // compete with 30 classroom clients. Keep the UI eventually consistent
-  // through one bounded visible-tab refresh and immediate local invalidation.
-  setRealtimeState('disconnected');
-  let running=false,queued=false;
-  async function update(){
-   if(!alive.current||document.visibilityState==='hidden')return;
-   if(running){queued=true;return}
+  let disposed=false,running=false,again=false;
+  let dirtyCore=false,dirtyChat=false,dirtyPins=false;
+  let timer:ReturnType<typeof setTimeout>|undefined;
+  async function flush(){
+   if(disposed||document.visibilityState==='hidden')return;
+   if(running){again=true;return}
    running=true;
-   try{await hydrateActiveView()}
-   finally{running=false;if(queued&&alive.current){queued=false;setTimeout(()=>void update(),500)}}
+   const core=dirtyCore,chat=dirtyChat,pins=dirtyPins;
+   dirtyCore=false;dirtyChat=false;dirtyPins=false;
+   try{
+    const jobs:Promise<unknown>[]=[];
+    if(core){jobs.push(hydrateActiveView());notifyGameDataRefresh(gameId)}
+    if(chat){jobs.push(loadChatOverview());if(channelRef.current)jobs.push(loadMessages(channelRef.current))}
+    if(pins&&channelRef.current)jobs.push(loadChatPins(channelRef.current));
+    await Promise.allSettled(jobs);
+   }finally{
+    running=false;
+    if(again||dirtyCore||dirtyChat||dirtyPins){again=false;queue(250)}
+   }
   }
-  const interval=setInterval(()=>void update(),30000);
-  return()=>{clearInterval(interval)};
+  function queue(delay=180){if(disposed)return;clearTimeout(timer);timer=setTimeout(()=>void flush(),delay)}
+  const channel=supabase.channel('gos-id-live:'+gameId+':'+me.user_id);
+  for(const table of ['chat_messages','chat_mentions','chat_channel_state','chat_pins']){
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
+    if(table==='chat_pins')dirtyPins=true;
+    else dirtyChat=true;
+    queue();
+   });
+  }
+  for(const table of ['game_stages','game_parties','party_invitations','party_documents','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
+    dirtyCore=true;queue();
+   });
+  }
+  liveRef.current=channel;
+  setRealtimeState('connecting');
+  channel.subscribe(status=>{if(!disposed)setRealtimeState(status==='SUBSCRIBED'?'connected':'disconnected')});
+  // Recovery if Realtime is unavailable: visible screens still update.
+  const poll=setInterval(()=>{if(document.visibilityState==='visible'){dirtyCore=true;dirtyChat=true;dirtyPins=true;queue(0)}},30000);
+  return()=>{
+   disposed=true;clearTimeout(timer);clearInterval(poll);
+   if(liveRef.current===channel)liveRef.current=null;
+   void supabase.removeChannel(channel);
+  };
  },[gameId,me?.user_id]);
 
 
