@@ -33,7 +33,10 @@ export async function GET(request:Request){
   const time=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Barnaul',hour:'2-digit',hourCycle:'h23'}).format(new Date());
   if(preferences?.quiet_hours&&(Number(time)>=22||Number(time)<8)){
    // Keep pending until a later dispatcher run, never mark the alert delivered.
-   await config.db.from('telegram_outbox').update({next_attempt_at:new Date(Date.now()+3600000).toISOString()}).eq('id',job.id);
+   // Quiet-hour deferral is not a failed delivery; preserve retry budget.
+   await config.db.from('telegram_outbox').update({
+    attempts:job.attempts,next_attempt_at:new Date(Date.now()+3600000).toISOString()
+   }).eq('id',job.id).eq('attempts',job.attempts+1).is('sent_at',null);
    continue;
   }
   let buttons:Parameters<typeof telegramSend>[3]|undefined;
