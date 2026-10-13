@@ -304,9 +304,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   requestAnimationFrame(()=>{
    document.getElementById('game-main')?.focus({preventScroll:true});
    if(resetScroll){
-    document.querySelector<HTMLElement>('.simContentFlow')?.scrollTo({top:0});
-    document.querySelector<HTMLElement>('#game-main')?.scrollTo({top:0});
-    window.scrollTo({top:0});
+    document.querySelector?.<HTMLElement>('.simContentFlow')?.scrollTo?.({top:0});
+    document.querySelector?.<HTMLElement>('#game-main')?.scrollTo?.({top:0});
+    window.scrollTo?.({top:0});
    }
   });
  }
