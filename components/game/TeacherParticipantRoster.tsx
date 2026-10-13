@@ -11,7 +11,7 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
  const gameId=g.game?.id;
  const [entries,setEntries]=useState<Entry[]>([]);
  const [search,setSearch]=useState('');
- const [filter,setFilter]=useState('all');
+ const [filter,setFilter]=useState('current');
  const [status,setStatus]=useState('');
  const [loading,setLoading]=useState(false);
  const [busy,setBusy]=useState(false);
@@ -27,7 +27,7 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
  },[gameId,g.teacher]);
  useEffect(()=>{void refresh();},[refresh]);
  const rows=useMemo(()=>entries.filter(e=>
-  (filter==='all'||filter==='blocked'&&!!e.access_action||(filter==='guest'&&e.kind==='observer')||filter===e.kind)
+  (filter==='all'||filter==='current'&&e.access_action!=='profile_erased'||filter==='removed'&&e.access_action==='profile_erased'||filter==='blocked'&&e.access_action==='excluded'||filter==='guest'&&e.kind==='observer'||filter===e.kind&&e.access_action!=='profile_erased')
   &&[e.full_name,e.role_title,e.user_id].some(v=>String(v||'').toLocaleLowerCase('ru').includes(search.toLocaleLowerCase('ru')))
  ).sort((a,b)=>a.full_name.localeCompare(b.full_name,'ru')),[entries,filter,search]);
  async function submit(){
@@ -43,11 +43,11 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
  if(!g.teacher||!gameId)return null;
  return <section className="surface" aria-label="Участники и доступ" style={{padding:20}}>
   <div className="surfaceHead"><div><small>ДОСТУП К ИГРЕ</small><h2>Участники и доступ</h2>
-  <p>Все зарегистрированные пользователи текущей игры, включая исключённых. Исключение сохраняет историю; очистка профиля обезличивает запись, но не удаляет общую учётную запись Auth или исторические документы.</p></div><b>{entries.length}</b></div>
+  <p>Все зарегистрированные пользователи текущей игры, включая исключённых. Исключение сохраняет историю; очистка профиля обезличивает запись, но не удаляет общую учётную запись Auth или исторические документы.</p></div><b>{entries.filter(e=>e.access_action!=='profile_erased').length}</b></div>
   <div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:16}}>
    <input aria-label="Поиск участника" placeholder="ФИО, должность, ID" value={search} onChange={e=>setSearch(e.target.value)}/>
    <select aria-label="Фильтр роли" value={filter} onChange={e=>setFilter(e.target.value)}>
-    <option value="all">Все</option><option value="student">Участники</option><option value="guest">Гости</option><option value="teacher">Преподаватели</option><option value="blocked">Исключённые</option>
+    <option value="current">Текущий реестр</option><option value="all">Все записи</option><option value="removed">Удалённые записи</option><option value="student">Участники</option><option value="guest">Гости</option><option value="teacher">Преподаватели</option><option value="blocked">Исключённые</option>
    </select>
    <button type="button" className="secondary" disabled={loading||busy} onClick={()=>void refresh()}><RefreshCw size={16}/> Обновить</button>
   </div>
