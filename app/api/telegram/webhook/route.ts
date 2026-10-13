@@ -1,5 +1,6 @@
 import {NextResponse} from 'next/server';
 import {runtimeConfig,telegramSend,telegramAcknowledge} from '@/lib/server/telegram';
+import {telegramOfficeCommand} from '@/lib/server/telegramOffice';
 import {telegramCallbackCommand,telegramHelpText,telegramMenuText,telegramWelcomeText,TELEGRAM_MENU_BUTTONS,TELEGRAM_WELCOME_BUTTONS,telegramSectionButtons,telegramDocumentButtons} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
 type PrivateMessage={chat:{id:number;type:string};from?:{id:number};message_id:number;text?:string};
@@ -74,6 +75,11 @@ export async function POST(request:Request){
   const game=valid.find(l=>l.game_id===requested)|| (valid.length===1?valid[0]:undefined);
   if(!game){await reply('Выберите республику командой /game UUID. Список: /games');return NextResponse.json({ok:true})}
   if(command==='/game'){await reply('🏛 ГОС.ID · Республика выбрана\n\nИспользуйте кнопки бота для просмотра информации.',telegramSectionButtons('dashboard','Открыть республику'));return NextResponse.json({ok:true})}
+  const office=await telegramOfficeCommand({
+   db:config.db,gameId:game.game_id,userId:game.user_id,telegramId,
+   chatId,messageId:message.message_id,text,command
+  });
+  if(office){await reply(office.text,office.buttons);return NextResponse.json({ok:true})}
   if(command==='/status'){
    const {data}=await config.db.from('games').select('title,current_round,turn_open').eq('id',game.game_id).single();
    const {data:stage}=await config.db.from('game_stages').select('title').eq('game_id',game.game_id).eq('stage_no',data?.current_round||1).maybeSingle();
