@@ -30,8 +30,10 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
  async function link(){
   if(!email.trim()||busy)return;
   setBusy(true);setNotice('');
-  const r=await supabase.auth.updateUser({email:email.trim().toLowerCase()});
-  setNotice(r.error?'Не удалось привязать почту: '+r.error.message:'Проверьте почту и перейдите по ссылке подтверждения. Затем вернитесь сюда.');
+  const redirect=new URL('/game/'+encodeURIComponent(game!.id),window.location.origin);
+   redirect.searchParams.set('section','profile');
+   const r=await supabase.auth.updateUser({email:email.trim().toLowerCase()},{emailRedirectTo:redirect.toString()});
+  setNotice(r.error?'Не удалось привязать почту: '+r.error.message:'Проверьте почту: после подтверждения адреса ссылка вернёт вас в профиль ГОС.ID.');
   setBusy(false);
  }
  async function check(){
