@@ -43,6 +43,7 @@ assert.ok(long.length<4096&&long.endsWith('</a>'),'long messages keep complete H
 
 const webhook=fs.readFileSync('app/api/telegram/webhook/route.ts','utf8');
 const register=fs.readFileSync('app/api/telegram/register/route.ts','utf8');
+const activation=fs.readFileSync('lib/server/telegramActivation.ts','utf8');
 const outbox=fs.readFileSync('app/api/telegram/dispatch/route.ts','utf8');
 assert.ok(webhook.includes("x-telegram-bot-api-secret-token"),'webhook secret enforced');
 assert.ok(webhook.includes("message.chat.type!=='private'"),'no commands in group chats');
@@ -54,8 +55,11 @@ assert.ok(webhook.includes("TELEGRAM_WELCOME_BUTTONS"),'first contact has Start 
 assert.ok(webhook.includes("TELEGRAM_MENU_BUTTONS"),'menu is actionable');
 assert.ok(register.includes("member?.kind!=='teacher'"),'only teacher registers menu and webhook');
 assert.ok(register.includes("process.env.VERCEL_ENV!=='production'"),'preview cannot register bot');
-assert.ok(register.includes("allowed_updates:['message','callback_query']"),'callbacks are actually delivered');
-assert.ok(register.includes("'setMyCommands'")&&register.includes("'setChatMenuButton'"),'Telegram native menu configured');
+assert.ok(activation.includes("allowed_updates:['message','callback_query']"),'callbacks are actually delivered');
+
+assert.ok(activation.includes("'setMyCommands'")&&activation.includes("'setChatMenuButton'"),'Telegram native menu configured');
+assert.ok(activation.includes("'getWebhookInfo'")&&activation.includes("'getMyCommands'")&&activation.includes("'getChatMenuButton'"),'Bot setup is verified with Telegram API');
+assert.ok(register.includes('TelegramSetupError'),'Failed activation step is returned explicitly');
 assert.ok(outbox.includes("telegramSend(config.token,link.chat_id,job.body,buttons)"),'notifications use same footer helper');
 
 const calls=[];

@@ -1,7 +1,8 @@
 import {NextResponse} from 'next/server';
-import {runtimeConfig,telegramApi,telegramSetProfilePhoto} from '@/lib/server/telegram';
-import {TELEGRAM_COMMANDS} from '@/lib/server/telegramPresentation';
+import {runtimeConfig} from '@/lib/server/telegram';
+import {activateTelegramBot,TelegramSetupError} from '@/lib/server/telegramActivation';
 export const runtime='nodejs';
+export const maxDuration=60;
 // Only an authenticated active teacher may configure the production Telegram webhook.
 export async function POST(request:Request){
  if(process.env.VERCEL_ENV!=='production')return NextResponse.json({error:'Доступно только в рабочей версии игры.'},{status:403});
@@ -21,32 +22,16 @@ export async function POST(request:Request){
  return NextResponse.json({error:'Не указана игра.'},{status:400});
  const {data:member,error:memberError}=await config.db.from('game_members').select('kind').eq('game_id',gameId).eq('user_id',user.id).is('roster_archived_at',null).maybeSingle();
  if(memberError||member?.kind!=='teacher')return NextResponse.json({error:'Только преподаватель может активировать бота.'},{status:403});
- const webhook='https://gos-sim1.vercel.app/api/telegram/webhook';
  try{
-  await telegramApi(config.token,'setWebhook',{
-   url:webhook,secret_token:config.secret,allowed_updates:['message','callback_query'],
-   drop_pending_updates:false,max_connections:20
-  });
-  // Native Telegram Menu button remains available in every private chat.
-  // Registration is teacher-authorized, repeatable, and does not mutate game data.
-  await telegramApi(config.token,'setMyName',{name:'ГОС.ID',language_code:''});
-  // Reapply for Russian clients, including users who had a localized bot name.
-  await telegramApi(config.token,'setMyName',{name:'ГОС.ID',language_code:'ru'});
-  await telegramApi(config.token,'setMyCommands',{
-   commands:TELEGRAM_COMMANDS,scope:{type:'all_private_chats'}
-  });
-  await telegramApi(config.token,'setChatMenuButton',{
-   menu_button:{type:'commands'}
-  });
-  await telegramApi(config.token,'setMyShortDescription',{
-   short_description:'🏛 ГОС.ID — Цифровая платформа России. События, решения, этапы и голосования.'
-  });
-  await telegramApi(config.token,'setMyDescription',{
-   description:'🏛 ГОС.ID — Цифровая платформа России.\n\nПолучайте уведомления о жизни республики, следите за государственными решениями, голосованиями, этапами и документами.\n\n🚀 Нажмите «Начать», чтобы открыть меню.\n🔐 Для игровых уведомлений привяжите Telegram в личном профиле ГОС.ID.'
-  });
-  let logoApplied=true;
-  try{await telegramSetProfilePhoto(config.token,avatarJpegBase64||'')}
-  catch(e){logoApplied=false;console.error('Telegram brand avatar was not applied',e instanceof Error?e.message:'unknown')}
-  return NextResponse.json({ok:true,url:webhook,menu:true,logo:logoApplied});
- }catch(e){console.error('Telegram setup failed',e instanceof Error?e.message:'unknown');return NextResponse.json({error:'Telegram не подтвердил полную настройку webhook и меню. Повторите активацию.'},{status:502})}
+  const result=await activateTelegramBot(config.token,config.secret,avatarJpegBase64||'');
+  return NextResponse.json(result);
+ }catch(e){
+  const stage=e instanceof TelegramSetupError?e.step:'unknown';
+  const reason=e instanceof TelegramSetupError?e.message:'Не удалось завершить регистрацию Telegram.';
+  console.error('Telegram activation failed at',stage);
+  return NextResponse.json({
+   ok:false,stage,reason,
+   error:'Настройка Telegram не завершена ('+stage+'): '+reason
+  },{status:502});
+ }
 }

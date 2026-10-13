@@ -8,13 +8,18 @@ export const runtimeConfig=()=>{
  return {token,secret,db:createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}})};
 };
 /** No token, secret or user content is written to logs by these helpers. */
-export async function telegramApi(token:string,method:string,payload:Record<string,unknown>){
- const result=await fetch('https://api.telegram.org/bot'+token+'/'+method,{
+export async function telegramApiResult<T>(token:string,method:string,payload:Record<string,unknown>):Promise<T>{
+ const response=await fetch('https://api.telegram.org/bot'+token+'/'+method,{
   method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(12000),
   cache:'no-store',body:JSON.stringify(payload)
  });
- const data=await result.json() as {ok?:boolean;description?:string};
- if(!result.ok||!data.ok)throw new Error('Telegram '+method+' failed: '+(data.description||'Unknown error'));
+ const data=await response.json() as {ok?:boolean;description?:string;result?:T};
+ if(!response.ok||!data.ok||data.result===undefined)
+  throw new Error('Telegram '+method+' failed: '+(data.description||'Unexpected API response'));
+ return data.result;
+}
+export async function telegramApi(token:string,method:string,payload:Record<string,unknown>){
+ await telegramApiResult<unknown>(token,method,payload);
 }
 export async function telegramSend(token:string,chatId:number|string,text:string,replyMarkup:TelegramMarkup=TELEGRAM_BACK_BUTTONS){
  await telegramApi(token,'sendMessage',{
