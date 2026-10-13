@@ -10,8 +10,8 @@ function generateCode(prefix:string){
  crypto.getRandomValues(bytes);
  return prefix+'-'+Array.from(bytes,b=>LETTERS[b%LETTERS.length]).join('');
 }
-export default function TeacherAccessCodes({gameId,gameCode}:{gameId:string;gameCode:string}){
- const [currentGameCode,setCurrentGameCode]=useState(gameCode);
+export default function TeacherAccessCodes({gameId}:{gameId:string}){
+ const [currentGameCode,setCurrentGameCode]=useState('');
  const [newGameCode,setNewGameCode]=useState('');
  const [scope,setScope]=useState<'participant'|'group'>('participant');
  const [groupName,setGroupName]=useState('');
@@ -20,13 +20,17 @@ export default function TeacherAccessCodes({gameId,gameCode}:{gameId:string;game
  const [rows,setRows]=useState<CodeRow[]>([]);
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
- useEffect(()=>{setCurrentGameCode(gameCode);setNewGameCode('');setCreated('');},[gameId,gameCode]);
+ useEffect(()=>{setCurrentGameCode('');setNewGameCode('');setCreated('');},[gameId]);
  useEffect(()=>{
   let alive=true;
   async function load(){
-   const r=await supabase.rpc('teacher_access_code_list',{p_game_id:gameId});
+   const [r,c]=await Promise.all([
+    supabase.rpc('teacher_access_code_list',{p_game_id:gameId}),
+    supabase.from('games').select('game_code').eq('id',gameId).single()
+   ]);
    if(!alive)return;
-   if(r.error){setNotice('Не удалось загрузить коды: '+r.error.message);return;}
+   if(c.error||r.error){setNotice('Не удалось загрузить коды доступа: '+(c.error?.message||r.error?.message));return;}
+   setCurrentGameCode(c.data?.game_code||'');
    setRows(Array.isArray(r.data)?r.data as CodeRow[]:[]);
   }
   void load();return()=>{alive=false};
