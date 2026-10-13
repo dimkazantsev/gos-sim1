@@ -60,7 +60,7 @@ assert.ok(activation.includes("allowed_updates:['message','callback_query']"),'c
 assert.ok(activation.includes("'setMyCommands'")&&activation.includes("'setChatMenuButton'"),'Telegram native menu configured');
 assert.ok(activation.includes("'getWebhookInfo'")&&activation.includes("'getMyCommands'")&&activation.includes("'getChatMenuButton'"),'Bot setup is verified with Telegram API');
 assert.ok(register.includes('TelegramSetupError'),'Failed activation step is returned explicitly');
-assert.ok(outbox.includes("telegramSend(config.token,link.chat_id,job.body,buttons)"),'notifications use same footer helper');
+assert.ok(outbox.includes("telegramSend(config.token,link.chat_id,output,buttons)"),'notifications use same footer helper');
 
 const calls=[];
 const oldFetch=global.fetch;
