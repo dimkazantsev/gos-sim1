@@ -119,7 +119,10 @@ async function ready(){
    await page.screenshot({path:path.join(screens,'process-live-news-'+width+'.png')});
    const composer=page.locator('.wallComposer');assert.equal(await composer.locator('.processComposerBody').isVisible(),false,'Composer starts folded');
    await composer.locator('summary').first().click();
-   assert(await composer.locator('.wallAvatar img[alt^="ГОС.ID"]').isVisible(),'Teacher uses game logo');
+   assert.equal(await composer.locator('.wallAvatar img[alt^="ГОС.ID"]').count(),0,'The obsolete system publisher is not the default');
+   await composer.getByRole('button',{name:/Опубликовать от имени/}).click();
+   assert.equal(await page.getByRole('option',{name:/GOS\/\/SIMS|Нейтральная публикация/}).count(),0,'Retired publisher is absent');
+   await page.keyboard.press('Escape');
    await page.getByRole('textbox',{name:'Заголовок публикации',exact:true}).fill('Проверка публикации');
    await page.getByRole('textbox',{name:'Текст публикации',exact:true}).fill('Проект решения готов к обсуждению. ');
    await composer.getByRole('button',{name:/Ход игры/}).click();
