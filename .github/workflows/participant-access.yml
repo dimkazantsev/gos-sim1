@@ -3,14 +3,14 @@ on:
   pull_request:
     paths:
       - 'components/game/TeacherParticipantRoster.tsx'
-      - 'supabase/migrations/20261014010000_teacher_participant_access.sql'
+      - 'supabase/migrations/20261013191740_teacher_participant_access_20261014.sql'
       - 'scripts/participant-access-security-check.cjs'
       - '.github/workflows/participant-access.yml'
   push:
     branches: [main]
     paths:
       - 'components/game/TeacherParticipantRoster.tsx'
-      - 'supabase/migrations/20261014010000_teacher_participant_access.sql'
+      - 'supabase/migrations/20261013191740_teacher_participant_access_20261014.sql'
       - 'scripts/participant-access-security-check.cjs'
 jobs:
   source-regression:
