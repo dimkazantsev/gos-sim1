@@ -44,7 +44,9 @@ for(const required of [
  'telegram_reception_participant_read',
  'gos_reception_telegram_notify',
  'unique(game_id,sender_id,telegram_chat_id,telegram_message_id)',
- 'on conflict do nothing'
+ 'on conflict do nothing',
+ 'gos_reception_answer_notify',
+ 'recipient_id uuid not null',
 ])assert.ok(schema.includes(required),'Migration required: '+required);
 const d=read('app/api/telegram/daily-brief/route.ts');
 assert.ok(d.includes('CRON_SECRET'),'Digest must require server authorization');
@@ -96,6 +98,8 @@ async function run(){
  assert.ok(setting.text.includes('Утренний доклад'));
  const invalid=await telegramOfficeCommand({...ctx,command:'/settings',text:'/settings timezone Bad/Region'});
  assert.ok(invalid.text.includes('Допустимые пояса'));
+ const replyBad=await telegramOfficeCommand({...ctx,command:'/answer',text:'/answer bad'});
+ assert.ok(replyBad.text.includes('Формат ответа'));
  const answer=await telegramOfficeCommand({...ctx,command:'/not-real',text:'/not-real'});
  assert.equal(answer,undefined);
  assert.ok(entries.some(x=>x.table==='blitz_questions'&&x.columns==='legal_act,article,source_url'));
