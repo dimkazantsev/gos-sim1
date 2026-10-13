@@ -32,6 +32,9 @@ function highlightChatText(value:string,search:string):ReactNode{
  return chunks.length?chunks:value;
 }
 function formatBytes(size:number){return size<1024*1024?Math.max(1,Math.round(size/1024))+' КБ':(size/1024/1024).toFixed(1)+' МБ';}
+function visibleChatMedia(m:Message,now:number){
+ return (m.kind!=='audio'&&m.kind!=='video')||new Date(m.created_at).getTime()+60*60*1000>now;
+}
 function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messageId:string,path:string)=>Promise<string|null>}){
  if(!m.url)return <div className="chatAttachmentUnavailable">
   <span>Не удалось открыть вложение</span>
@@ -55,6 +58,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  useEffect(()=>()=>{if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current)},[]);
   useEffect(()=>{if(!g.game?.id)return;let live=true;void supabase.rpc('ensure_social_channels',{p_game_id:g.game.id}).then(r=>{if(live){if(r.error)g.setError(r.error.message);else void g.refresh()}});return()=>{live=false}},[g.game?.id]);
  const [sending,setSending]=useState(false);
+ const [retentionClock,setRetentionClock]=useState(()=>Date.now());
+ useEffect(()=>{const id=window.setInterval(()=>setRetentionClock(Date.now()),15000);return()=>window.clearInterval(id)},[]);
  const [uploading,setUploading]=useState(false);
  const [recordElapsed,setRecordElapsed]=useState(0);
  const [overlay,setOverlay]=useState(false);
@@ -88,8 +93,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const panel=useDialog(overlay,()=>setChatOpen(false));
  const channel=channels.find(c=>c.id===channelId);
  const chatPins=useMemo(()=>allPins.filter(p=>p.channel_id===channelId),[allPins,channelId]);
- const pinnedMessages=useMemo(()=>allPinnedMessages.filter(m=>m.channel_id===channelId),[allPinnedMessages,channelId]);
- const channelMessages=useMemo(()=>messages.filter(m=>m.channel_id===channelId),[messages,channelId]);
+ const pinnedMessages=useMemo(()=>allPinnedMessages.filter(m=>m.channel_id===channelId&&visibleChatMedia(m,retentionClock)),[allPinnedMessages,channelId,retentionClock]);
+ const channelMessages=useMemo(()=>messages.filter(m=>m.channel_id===channelId&&visibleChatMedia(m,retentionClock)),[messages,channelId,retentionClock]);
  const filtered=useMemo(()=>channelMessages.filter(m=>matchChatMessage(m,search,names[m.author_id]||'Система',onlyFiles)),[channelMessages,search,names,onlyFiles]);
  const entries=useMemo(()=>buildChatEntries(filtered,me?.user_id||''),[filtered,me?.user_id]);
  const hasFilter=!!search.trim()||onlyFiles;
@@ -389,6 +394,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     </button>
    </div>
   </section>}
+  <div className="chatRetentionNotice" role="note" style={{padding:"10px 16px",borderTop:"1px solid #dce5f2",background:"#f6f9fe",color:"#52678b",fontSize:12,lineHeight:1.5}}>Аудио и видео хранятся 1 час после отправки, затем автоматически удаляются.</div>
   {chatMediaError&&<div className="chatLocalError chatMediaError" role="alert"><span>{chatMediaError}</span></div>}
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
   {!readOnly?<div className="chatCompose chatComposeCompact">
