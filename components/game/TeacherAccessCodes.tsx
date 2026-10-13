@@ -4,7 +4,8 @@ import {Copy,KeyRound,RotateCw,ShieldCheck,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 
 type Scope='participant'|'group'|'guest';
-type CodeRow={id:string;scope:Scope;group_name:string|null;active:boolean;created_at:string};
+type InventoryScope=Scope|'teacher';
+type CodeRow={id:string;scope:InventoryScope;group_name:string|null;active:boolean;created_at:string};
 const LETTERS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function generateCode(prefix:string){
  const bytes=new Uint8Array(12);
@@ -16,6 +17,7 @@ const labels:Record<Scope,string>={
  group:'Приглашение группы',
  guest:'Приглашение гостя'
 };
+const inventoryLabels:Record<InventoryScope,string>={...labels,teacher:'Приглашение преподавателя'};
 const hints:Record<Scope,string>={
  participant:'Позволяет участнику присоединиться к игре. При входе нужно указать группу.',
  group:'Привязывает нового участника к указанной группе автоматически.',
@@ -108,7 +110,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
   finally{setBusy(false)}
  }
  return <section className="teacherAccessCodes" aria-label="Коды доступа к игре">
-  <div className="teacherAccessHead"><KeyRound size={20} aria-hidden="true"/><div><h3>Доступ к игре</h3><p>Код игры и приглашения для участников, групп и гостей. Приглашение преподавателя, заданное при создании игры, также действует, но его секрет не отображается повторно. Личный пароль задаётся в профиле.</p></div></div>
+  <div className="teacherAccessHead"><KeyRound size={20} aria-hidden="true"/><div><h3>Доступ к игре</h3><p>Код игры и приглашения для участников, групп и гостей. Приглашение преподавателя также указано в списке и защищено от отключения. Личный пароль задаётся в профиле.</p></div></div>
   <div className="teacherCodeGrid">
    <div className="teacherCodeEditor">
     <h4>Код игры</h4>
@@ -149,11 +151,11 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
   </div>
   {created&&<div className="teacherCodeCreated" role="status"><ShieldCheck size={18}/><div><b>Сохраните: {labels[createdKind].toLowerCase()}</b> <code>{created}</code><p>Повторно посмотреть секретное значение нельзя.</p></div><button type="button" onClick={()=>void copy(created)}><Copy size={16}/> Копировать</button></div>}
   <div className="teacherCodeRows">
-   <div className="teacherAccessListHead"><h4>Выданные приглашения ({rows.length})</h4><button type="button" disabled={busy} onClick={()=>void refresh().catch(e=>setNotice(String(e)))}><RotateCw size={15}/> Обновить</button></div>
+   <div className="teacherAccessListHead"><h4>Все приглашения ({rows.length})</h4><button type="button" disabled={busy} onClick={()=>void refresh().catch(e=>setNotice(String(e)))}><RotateCw size={15}/> Обновить</button></div>
    {rows.length===0&&<p>Приглашений пока нет. Коды, созданные при запуске игры, также отображаются здесь без раскрытия секретного значения.</p>}
    {rows.map(row=><div key={row.id} className="teacherCodeRow">
-    <div><b>{labels[row.scope]}{row.scope==='group'&&row.group_name?': '+row.group_name:''}</b><small>{row.active?'Активно':'Отключено'} · {new Date(row.created_at).toLocaleDateString('ru-RU')}</small></div>
-    {row.active?<button type="button" disabled={busy} onClick={()=>void revoke(row)}>Отключить</button>:
+    <div><b>{inventoryLabels[row.scope]}{row.scope==='group'&&row.group_name?': '+row.group_name:''}</b><small>{row.active?'Активно':'Отключено'} · {new Date(row.created_at).toLocaleDateString('ru-RU')} · Код защищён хешированием</small></div>
+    {row.scope==='teacher'?<span className="teacherCodeProtected">Защищённый доступ</span>:row.active?<button type="button" disabled={busy} onClick={()=>void revoke(row)}>Отключить</button>:
      <button type="button" disabled={busy} onClick={()=>void remove(row)}><Trash2 size={15}/> Удалить</button>}
    </div>)}
   </div>
