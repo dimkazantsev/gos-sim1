@@ -19,7 +19,7 @@ const injection=presentation.telegramMessageHtml('Заголовок\n<важн�
 assert.ok(injection.includes('&lt;важные&gt; &amp; &quot;данные&quot;'),'Telegram HTML must be escaped');
 const hook=fs.readFileSync('app/api/telegram/webhook/route.ts','utf8');
 assert.ok(hook.includes('Код обращения: '),'Human-friendly reference on creation');
-assert.ok(hook.includes('Код: '+ 'code'),'Human-friendly reference in list');
+assert.ok(hook.includes("Код: '+code"),'Human-friendly reference in list');
 assert.ok(!hook.includes('/reply UUID'),'Never expose a technical UUID placeholder');
 assert.ok(hook.includes("if(actor.kind!=='teacher')query=query.eq('recipient_id',game.user_id)"));
 assert.ok(hook.includes("matching?.length!==1"),'Reject unknown or ambiguous codes');
@@ -30,8 +30,8 @@ let postRows=[];
 function from(table){
  const rules=[],orders=[];let limit=Infinity;
  const select=()=> {
-  let rows=table==='game_members'?[{user_id:'u1',kind:'student',full_name:'Петров'}]
-   :table==='games'?[{title:'Республика',current_round:1,turn_open:true}]
+  let rows=table==='game_members'?[{game_id:'g1',user_id:'u1',kind:'student',full_name:'Петров',roster_archived_at:null}]
+   :table==='games'?[{id:'g1',title:'Республика',current_round:1,turn_open:true}]
    :table==='political_posts'?postRows.slice():[];
   for(const [type,key,val] of rules){
    if(type==='eq')rows=rows.filter(row=>row[key]===val);
