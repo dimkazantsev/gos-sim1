@@ -37,6 +37,9 @@ on:
       - 'lib/server/telegramPresentation.ts'
       - 'app/api/telegram/dispatch/route.ts'
       - 'scripts/telegram-onboarding-check.cjs'
+      - 'lib/server/telegramActivation.ts'
+      - 'scripts/telegram-activation-verification-check.cjs'
+      - 'app/api/telegram/activate/route.ts'
       - 'scripts/telegram-expanded-check.cjs'
       - 'lib/server/telegramCabinet.ts'
       - 'scripts/telegram-cabinet-check.cjs'
@@ -143,6 +146,7 @@ jobs:
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
       - run: node scripts/telegram-onboarding-check.cjs
+      - run: node scripts/telegram-activation-verification-check.cjs
       - run: node scripts/telegram-expanded-check.cjs
       - run: node scripts/telegram-cabinet-check.cjs
       - run: node scripts/telegram-message-quality-check.cjs
