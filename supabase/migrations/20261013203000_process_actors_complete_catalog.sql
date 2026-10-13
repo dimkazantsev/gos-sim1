@@ -103,7 +103,7 @@ begin
  else raise exception 'Нет полномочий для публикации от этого субъекта';
  end if;
 
- return v_label;end;$function$
+ return v_label;end;$function$;
 
 
 create or replace function public.get_process_actors(p_game_id uuid)
