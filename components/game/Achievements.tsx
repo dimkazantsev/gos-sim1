@@ -52,9 +52,10 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false}:{g
   return()=>{live=false;clearInterval(timer)};
  },[gameId,userId,previewOnly]);
 
- const earned=items.filter(x=>x.earned_at);
+ const visibleItems=previewOnly?publicAchievementPreview(items):items;
+ const earned=visibleItems.filter(x=>x.earned_at);
  const hiddenEarned=earned.filter(x=>x.hidden);
- const shown=filter==='earned'?earned:items.filter(x=>!x.hidden);
+ const shown=filter==='earned'?earned:visibleItems.filter(x=>!x.hidden);
  const collectionProgress=counts.total?Math.round(earned.length/counts.total*100):0;
 
  return <section className="awardShelf steamAwards surface">
