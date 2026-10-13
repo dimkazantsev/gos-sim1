@@ -49,8 +49,8 @@ export default function FederalBudgetSimulator({g,context,regions,rates,programs
  function changeBudgetTab(next:string){
   setTab(next);
   window.requestAnimationFrame(()=>{
-   document.querySelector<HTMLElement>('.simContentFlow')?.scrollTo({top:0});
-   document.getElementById(tabId+'-'+next)?.focus({preventScroll:true});
+   window.document.querySelector<HTMLElement>('.simContentFlow')?.scrollTo({top:0});
+   window.document.getElementById(tabId+'-'+next)?.focus({preventScroll:true});
    window.scrollTo({top:0});
   });
  }
