@@ -172,11 +172,15 @@ export async function telegramOfficeCommand(ctx:Context):Promise<Result|undefine
    '\n\nНеутверждённые расчёты и черновики ведомств не раскрываются.',buttons:gameSec('budget')};
  }
  if(command==='/career'){
-  const {count}=await q('game_assigned_tasks').select('id',{count:'exact',head:true}).eq('game_id',gameId).eq('recipient_id',userId).eq('status','confirmed');
+  const [{count},{data:awards}]=await Promise.all([
+   q('game_assigned_tasks').select('id',{count:'exact',head:true}).eq('game_id',gameId).eq('recipient_id',userId).eq('status','confirmed'),
+   q('game_achievements').select('achievement_id,earned_at').eq('game_id',gameId).eq('user_id',userId).not('earned_at','is',null).limit(120)
+  ]);
   return {text:'🏅 ГОС.ID · Служебная карьера\n\n👤 '+name+'\n🏛 Должность: '+role+
    '\n👥 Группа: '+short(me.group_name,80)+'\n⭐ Баллы: '+String(me.score??0)+
    '\n✅ Подтверждённые поручения: '+String(count||0)+
-   '\n\nСведения о наградах отображаются в игровом профиле; непроверенные награды бот не присваивает.',buttons:gameSec('profile')};
+   '\n🏆 Получено наград: '+String(awards?.length||0)+
+   '\n\nКоллекция и описания полученных медалей доступны в вашем профиле ГОС.ID.',buttons:gameSec('profile')};
  }
  if(command==='/blitz'){
   const {data}=await q('blitz_assignments').select('answered_at,is_correct').eq('game_id',gameId).eq('user_id',userId).limit(1000);
