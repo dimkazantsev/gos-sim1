@@ -26,6 +26,7 @@ assert.ok(bot.includes('gameId:string;userId:string;chatId:number;telegramId:num
 assert.ok(bot.includes("if(memberError||!me)"),'Office requires active membership');
 assert.ok(!/\.select\([^)]*(correct_index|explanation|options|question)[^)]*\)/.test(bot),'Never query solutions');
 assert.ok(bot.includes("eq('verified',true)")&&bot.includes("select('legal_act,article,source_url')"));
+assert.ok(bot.includes("q('game_achievements')")&&bot.includes("eq('user_id',userId)"),'Career must show real earned badges only');
 for(const key of ["recipient_id',userId","game_id',gameId","roster_archived_at',null","status','published","telegram_chat_id:chatId","telegram_message_id:messageId"])
  assert.ok(bot.includes(key),'Missing scope/audit '+key);
 assert.ok(bot.includes("error.code!=='23505'"),'Duplicate Telegram updates must be idempotent');
@@ -46,6 +47,8 @@ for(const required of [
  'unique(game_id,sender_id,telegram_chat_id,telegram_message_id)',
  'on conflict do nothing',
  'gos_reception_answer_notify',
+ 'gos_achievement_notification',
+
  'recipient_id uuid not null',
 ])assert.ok(schema.includes(required),'Migration required: '+required);
 const d=read('app/api/telegram/daily-brief/route.ts');
