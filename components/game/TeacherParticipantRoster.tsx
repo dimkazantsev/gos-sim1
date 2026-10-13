@@ -27,7 +27,7 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
  },[gameId,g.teacher]);
  useEffect(()=>{void refresh();},[refresh]);
  const rows=useMemo(()=>entries.filter(e=>
-  (filter==='all'||filter==='blocked'&&!!e.access_action||filter===e.kind)
+  (filter==='all'||filter==='blocked'&&!!e.access_action||(filter==='guest'&&e.kind==='observer')||filter===e.kind)
   &&[e.full_name,e.role_title,e.user_id].some(v=>String(v||'').toLocaleLowerCase('ru').includes(search.toLocaleLowerCase('ru')))
  ).sort((a,b)=>a.full_name.localeCompare(b.full_name,'ru')),[entries,filter,search]);
  async function submit(){
@@ -55,7 +55,7 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
   {loading&&<p role="status">Обновление списка…</p>}
   <div style={{display:'grid',gap:8}}>
    {rows.map(e=>{const protectedUser=e.kind==='teacher'||e.user_id===g.me?.user_id;return <article key={e.user_id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,padding:12,border:'1px solid #d7dce3',borderRadius:12,flexWrap:'wrap'}}>
-    <div><b>{e.full_name}</b><div><small>{e.kind==='teacher'?'Преподаватель':e.kind==='guest'?'Гость':'Участник'} · {e.role_title||'Без должности'}</small></div>
+    <div><b>{e.full_name}</b><div><small>{e.kind==='teacher'?'Преподаватель':e.kind==='observer'||e.kind==='guest'?'Гость':'Участник'} · {e.role_title||'Без должности'}</small></div>
     <small>{e.access_action?'Доступ закрыт':e.last_seen_at&&Date.now()-new Date(e.last_seen_at).getTime()<90000?'В сети':'Не в сети'}
     {' · '}Последняя активность: {e.last_seen_at?new Date(e.last_seen_at).toLocaleString('ru-RU'):'Не зафиксирована'}</small></div>
     {!protectedUser&&<div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
