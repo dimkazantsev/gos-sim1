@@ -41,6 +41,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
  const navigationRef=useHorizontalWheel(game?.id);
+ const pendingFactionCount=parties.filter(p=>p.registration_status==='submitted').length+g.partyDocuments.filter(d=>d.status==='submitted').length;
 
 
 
@@ -78,7 +79,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
        const next=WORKSPACES[nextIndex];setWorkspace(next.key);
        document.getElementById('teacher-tab-'+next.key)?.focus();
       }}>
-      <Icon size={18} strokeWidth={1.9} aria-hidden="true"/><span>{item.title}</span>
+      <Icon size={18} strokeWidth={1.9} aria-hidden="true"/><span>{item.title}</span>{item.key==='parties'&&pendingFactionCount>0&&<span className="sectionUnreadBadge" aria-label={'Требуют рассмотрения: '+pendingFactionCount}>{pendingFactionCount}</span>}
      </button>
     })}
    </div>
@@ -94,7 +95,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     </div>
    </div>
    <div className="teacherCommandClock">
-    <span className={game.turn_open?'teacherTurnBadge isOpen':'teacherTurnBadge isPaused'}>{game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span>
+    <span className={game.turn_open?'teacherTurnBadge isOpen':'teacherTurnBadge isPaused'}>{game.turn_open?'ХОД ОТКРЫТ':currentStage?.status==='completed'?'ЭТАП ЗАВЕРШЁН':'ЭТАП НЕ ОТКРЫТ'}</span>
     <strong>{game.turn_open&&game.turn_ends_at?timerText(secondsLeft):'—'}</strong>
    </div>
    <div className="teacherQuickActions">
