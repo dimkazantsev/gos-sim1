@@ -139,7 +139,7 @@ async function ready(){
    assert.equal(bounds.offenders.length,0,'Expanded composer fits '+width+': '+JSON.stringify(bounds));
    await page.screenshot({path:path.join(screens,'process-live-composer-'+width+'.png')});
    await composer.getByRole('button',{name:'Опубликовать',exact:true}).click();await page.locator('#process-published-ui-post').waitFor();
-   const submitted=JSON.parse(await page.locator('#flow-output').textContent());assert.equal(submitted.actorKey,'teacher');assert.deepEqual(submitted.formalIds,['formal-demo']);assert.deepEqual(submitted.files,['Пояснение.txt']);assert(submitted.tags.includes('ходигры_gpyasu'));assert(submitted.body.includes('[Правовой портал](https://pravo.gov.ru/)'));
+   const submitted=JSON.parse(await page.locator('#flow-output').textContent());assert.equal(submitted.actorKey,'participant','Personal publication replaces decommissioned system author');assert.deepEqual(submitted.formalIds,['formal-demo']);assert.deepEqual(submitted.files,['Пояснение.txt']);assert(submitted.tags.includes('ходигры_gpyasu'));assert(submitted.body.includes('[Правовой портал](https://pravo.gov.ru/)'));
    await page.locator('#process-published-ui-post').getByRole('button',{name:'Редактировать',exact:true}).click();
    const postEditor=page.locator('#process-published-ui-post .processInlineEditor');await postEditor.waitFor();
    await composer.locator('summary').first().click();
