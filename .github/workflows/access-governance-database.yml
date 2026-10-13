@@ -1,0 +1,56 @@
+name: Access governance database
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/*access_governance*'
+      - 'scripts/access-governance*'
+      - '.github/workflows/access-governance-database.yml'
+  workflow_dispatch:
+jobs:
+  postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: access_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d access_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: access_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create isolated schema
+        run: psql -v ON_ERROR_STOP=1 -f scripts/access-governance-test-fixture.sql
+      - name: Parse and execute migration on isolated PostgreSQL
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261013231000_access_governance.sql
+      - name: Run authorization and moderation regression
+        run: psql -v ON_ERROR_STOP=1 -f scripts/access-governance-database-check.sql
+      - name: Thirty concurrent member writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 30); do
+            (
+              psql -v ON_ERROR_STOP=1 -qAt <<'SQL' >/dev/null
+          select set_config('test.user_id','33333333-3333-4333-8333-333333333333',false);
+          insert into public.political_posts(game_id,author_id)
+          values('11111111-1111-4111-8111-111111111111','33333333-3333-4333-8333-333333333333');
+          SQL
+            ) &
+          done
+          for pid in $(jobs -p); do wait "$pid"; done
+          value=$(psql -qAtc "select count(*) from public.political_posts where author_id='33333333-3333-4333-8333-333333333333';")
+          test "$value" = 31
+          echo "PASS 30 concurrent inserts without data loss"
