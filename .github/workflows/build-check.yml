@@ -99,6 +99,10 @@ on:
       - 'components/game/politicalWallPaging.ts'
       - 'scripts/political-wall-feed-check.cjs'
       - 'scripts/political-publisher-catalog-check.cjs'
+      - 'scripts/access-codes-civic-actor-check.cjs'
+      - 'components/game/TeacherAccessCodes.tsx'
+      - 'supabase/migrations/20261013214500_teacher_access_codes_groups.sql'
+      - 'supabase/migrations/20261013215000_process_actors_instantiated_only.sql'
       - 'supabase/migrations/20261013203000_process_actors_complete_catalog.sql'
       - 'app/political-publishers.css'
       - 'scripts/political-wall-status-browser-check.cjs'
@@ -171,6 +175,7 @@ jobs:
       - run: node scripts/interface-contract-check.cjs
       - run: node scripts/political-wall-feed-check.cjs
       - run: node scripts/political-publisher-catalog-check.cjs
+      - run: node scripts/access-codes-civic-actor-check.cjs
       - run: node scripts/crisis-baseline-check.cjs
 
       - run: node scripts/fiscal-model-check.cjs
