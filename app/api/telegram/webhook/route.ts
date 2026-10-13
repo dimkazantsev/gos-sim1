@@ -39,7 +39,7 @@ export async function POST(request:Request){
    }
    const {data,error}=await config.db.rpc('telegram_connect',{p_token:token,p_telegram_user_id:telegramId,p_chat_id:chatId});
    await reply(error?'⚠️ Привязка не подтверждена. Создайте новый код в профиле и попробуйте ещё раз.':
-    telegramWelcomeText(true)+'\n\n✅ Республика успешно привязана.',TELEGRAM_WELCOME_BUTTONS);
+    telegramWelcomeText(true)+'\n\n✅ Игра успешно привязана.',TELEGRAM_WELCOME_BUTTONS);
    return NextResponse.json({ok:true});
   }
   if(text==='/start'){
@@ -71,13 +71,13 @@ export async function POST(request:Request){
     return {id:l.game_id,group:member?.group_name||'не указана'};
    }));
    const entries=(games||[]).map(g=>'🏛 Игра: '+telegramRepublicName(g.title)+'\n👥 Группа: '+(groups.find(x=>x.id===g.id)?.group||'не указана'));
-   await reply('🏛 ГОС.ID · Мои игры\n\n'+(entries.join('\n\n')||'Нет подключённых республик.')+'\n\n👤 Перейдите в профиль через кнопку ниже.',telegramSectionButtons('profile','Мой профиль'));
+   await reply('🏛 ГОС.ID · Мои игры\n\n'+(entries.join('\n\n')||'Нет подключённых игр.')+'\n\n👤 Перейдите в профиль через кнопку ниже.',telegramSectionButtons('profile','Мой профиль'));
    return NextResponse.json({ok:true});
   }
   const requested=command==='/game'?args[1]:!command.startsWith('/appeal_')&&args[1]&&/^[0-9a-f-]{36}$/.test(args[1])?args[1]:undefined;
   const game=valid.find(l=>l.game_id===requested)|| (valid.length===1?valid[0]:undefined);
-  if(!game){await reply('Выберите республику командой /game UUID. Список: /games');return NextResponse.json({ok:true})}
-  if(command==='/game'){await reply('🏛 ГОС.ID · Республика выбрана\n\nИспользуйте кнопки бота для просмотра информации.',telegramSectionButtons('dashboard','Открыть республику'));return NextResponse.json({ok:true})}
+  if(!game){await reply('Выберите игру командой /game UUID. Список: /games');return NextResponse.json({ok:true})}
+  if(command==='/game'){await reply('🏛 ГОС.ID · Игра выбрана\n\nИспользуйте кнопки бота для просмотра информации.',telegramSectionButtons('dashboard','Открыть игру'));return NextResponse.json({ok:true})}
   const prefMap:Record<string,string>={
    '/settings_brief':'daily_brief','/settings_tasks':'task_reminders',
    '/settings_mentions':'mentions','/settings_documents':'documents',
@@ -170,7 +170,7 @@ export async function POST(request:Request){
    const {data:stage,error:stageError}=await config.db.from('game_stages').select('title')
     .eq('game_id',game.game_id).eq('stage_no',data?.current_round||1).maybeSingle();
    if(stageError)throw stageError;
-   await reply('🏛 ГОС.ID · Состояние республики\n\n📍 Этап: '+
+   await reply('🏛 ГОС.ID · Состояние игры\n\n📍 Этап: '+
     telegramSentence(stage?.title||'Ожидает назначения')+'\n'+
     (data?.turn_open?'🟢 Работа по этапу продолжается.':'🕰 Ход закрыт.'),
     telegramSectionButtons('dashboard','Открыть обзор'));
