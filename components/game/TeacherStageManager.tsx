@@ -34,6 +34,19 @@ export default function TeacherStageManager({g,onOpenStage}:{
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState('');
  const [notice,setNotice]=useState('');
+ const [stageActionBusy,setStageActionBusy]=useState(false);
+ const [extensionMinutes,setExtensionMinutes]=useState(30);
+ async function changeStage(stageNo:number,action:'open'|'close'|'extend'){
+  if(stageActionBusy)return;
+  if(action==='close'&&!window.confirm('Завершить этап '+stageNo+' досрочно? Студенты не смогут изменять его результаты.'))return;
+  if(action==='open'&&!window.confirm('Открыть этап '+stageNo+' независимо от остальных открытых этапов?'))return;
+  setStageActionBusy(true);setError('');setNotice('');
+  try{
+   const ok=await g.manageStage(stageNo,action,action==='extend'?extensionMinutes:30);
+   if(ok){setNotice(action==='open'?'Этап '+stageNo+' открыт.':action==='close'?'Этап '+stageNo+' завершён.':'Срок этапа '+stageNo+' продлён на '+extensionMinutes+' минут.');void refreshReadiness();}
+   else setError('Не удалось изменить статус этапа. Проверьте сообщение системы.');
+  }finally{setStageActionBusy(false)}
+ }
  async function refreshReadiness(){
   if(!game)return;
   setReadinessLoading(true);
@@ -139,7 +152,13 @@ export default function TeacherStageManager({g,onOpenStage}:{
      <StagePolicyEditor key={selectedStage.id} g={g} stageNo={selectedStage.stage_no}/>
      <DeadlineControl g={g} stageNo={selectedStage.stage_no}/>
      <div className="teacherStageInspectorActions">
-      {selectedStage.status!=='open'&&<button type="button" onClick={()=>{if(window.confirm('Сделать этап '+selectedStage.stage_no+' текущим?'))void g.openStage(selectedStage.stage_no)}}>Сделать текущим</button>}
+      {selectedStage.status!=='open'
+       ?<button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'open')}>Открыть этап</button>
+       :<>
+        <button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'close')}>Завершить этап</button>
+        <label>Продление, минут <input type="number" min={1} max={43200} value={extensionMinutes} onChange={e=>setExtensionMinutes(Math.max(1,Math.min(43200,Number(e.target.value)||1)))}/></label>
+        <button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'extend')}>Продлить этап</button>
+       </>}
       <button type="button" className="primary" onClick={()=>onOpenStage(selectedStage.stage_no)}>Открыть процедуры этапа <ChevronRight size={16}/></button>
      </div>
     </>:<p>Выберите этап из списка.</p>}
