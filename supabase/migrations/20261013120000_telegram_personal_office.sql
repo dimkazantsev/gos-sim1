@@ -100,5 +100,28 @@ create trigger gos_reception_answer_notify
  after update of status on public.telegram_reception_requests
  for each row execute function private.gos_reception_answer_telegram_enqueue();
 
+-- Announce only earned achievements. Never expose secret badge conditions.
+create or replace function private.gos_earned_achievement_notify()
+returns trigger language plpgsql security definer set search_path to '' as $
+declare achievement_title text;
+begin
+ if new.earned_at is null then return new;end if;
+ select c.title into achievement_title from private.achievement_catalog c where c.id=new.achievement_id;
+ insert into public.telegram_outbox(game_id,user_id,category,source_id,body)
+ select new.game_id,new.user_id,'achievement',md5(new.achievement_id)::uuid,
+  '🏅 ГОС.ID · Новое достижение!'||E'\n'||coalesce(achievement_title,'Награда')||
+  E'\n\nОткройте профиль, чтобы посмотреть новую медаль.'
+ from public.telegram_links l
+ join public.game_members m on m.game_id=l.game_id and m.user_id=l.user_id
+ where l.game_id=new.game_id and l.user_id=new.user_id
+  and l.notifications_enabled and m.roster_archived_at is null
+ on conflict do nothing;
+ return new;
+end $;
+drop trigger if exists gos_achievement_notification on public.game_achievements;
+create trigger gos_achievement_notification
+ after insert on public.game_achievements
+ for each row execute function private.gos_earned_achievement_notify();
+
 comment on table public.telegram_bot_preferences is 'Private per-game Telegram digest, category and quiet-hours preferences.';
 comment on table public.telegram_reception_requests is 'Authenticated cross-office correspondence via Telegram; never publicly writable.';
