@@ -12,7 +12,7 @@ for(const k of ['office','brief','agenda','tasks','inbox','news','crises','econo
 const names=menu.TELEGRAM_MENU_BUTTONS.inline_keyboard.flat().map(x=>x.callback_data);
 assert.ok(names.includes('gos:office')&&names.includes('gos:settings'));
 const s=read('lib/server/telegramCabinet.ts');
-for(const x of ["eq('game_id',gameId)","eq('user_id',userId)","roster_archived_at","eq('recipient_id',userId)","not('published_at','is',null)","eq('status','open')"]){
+for(const x of ["eq('game_id',gameId)","eq('user_id',userId)","roster_archived_at","recipient_id.eq.'+userId","not('published_at','is',null)","eq('status','open')"]){
  assert.ok(s.includes(x),'Expected data-scope guard '+x);
 }
 assert.ok(s.includes("s.status==='final'"),'Unfinalized grades cannot be exposed as official');
