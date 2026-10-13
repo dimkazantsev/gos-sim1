@@ -108,7 +108,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
   finally{setBusy(false)}
  }
  return <section className="teacherAccessCodes" aria-label="Коды доступа к игре">
-  <div className="teacherAccessHead"><KeyRound size={20} aria-hidden="true"/><div><h3>Доступ к игре</h3><p>Один код игры, три вида приглашений. Личный пароль участники устанавливают самостоятельно в профиле.</p></div></div>
+  <div className="teacherAccessHead"><KeyRound size={20} aria-hidden="true"/><div><h3>Доступ к игре</h3><p>Код игры и приглашения для участников, групп и гостей. Приглашение преподавателя, заданное при создании игры, также действует, но его секрет не отображается повторно. Личный пароль задаётся в профиле.</p></div></div>
   <div className="teacherCodeGrid">
    <div className="teacherCodeEditor">
     <h4>Код игры</h4>
