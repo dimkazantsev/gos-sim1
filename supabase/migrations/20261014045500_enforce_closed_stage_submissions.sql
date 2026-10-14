@@ -19,6 +19,14 @@ begin
  else
   raise exception 'Unsupported stage guard' using errcode='22023';
  end if;
+ -- The party dossier must follow a completed chair election. An old
+ -- permissive INSERT policy alone cannot enforce this ordering.
+ if tg_table_name='party_documents' and tg_op='INSERT' and not exists(
+  select 1 from public.game_parties p where p.id=new.party_id
+   and p.game_id=v_game and p.leader_user_id is not null
+ ) then
+  raise exception 'Сначала изберите председателя партии.' using errcode='42501';
+ end if;
  if not exists(select 1 from public.game_members gm
      where gm.game_id=v_game and gm.user_id=auth.uid() and gm.kind='student'
       and gm.roster_archived_at is null) then
