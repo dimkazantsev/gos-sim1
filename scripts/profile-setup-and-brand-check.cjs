@@ -41,4 +41,13 @@ for(const target of targets)assert(!/GOS\/\/SIMS/.test(file(target)),'Visible le
 assert(file('components/game/TelegramConnection.tsx').includes("GosSimsGameBot"),'Do not change the real Telegram bot username');
 assert(file('components/GameClient.tsx').includes('gos-sims-dock:'),'Storage keys must stay backward-compatible');
 assert(file('components/game/portableSession.ts').includes("'GOS-SIMS'"),'Archive format remains unchanged');
+// Email confirmation UX: request accepted is not the same as email verified.
+assert(auth.includes("if(r.error){setMailRequested(false);setNotice('Не удалось отправить письмо: '"),'Do not announce mail sent on Supabase error');
+assert(auth.includes("setNotice('Письмо отправлено на '+requestedEmail"),'An accepted verification request must clearly say the email was sent');
+assert(auth.includes('независимо от того, какая страница открылась по ссылке'),'After clicking the link, students must know to return even if the result was unexpected');
+assert(auth.includes('Проверить подтверждение» ещё раз'),'Unverified state must explain the retry rather than imply email was not sent');
+assert(auth.includes('Отправить письмо повторно')&&auth.includes('Отправить письмо для подтверждения'),'Email button labels must match the request state');
+assert(auth.includes('disabled={busy} onClick={()=>void check()}'),'The follow-up confirmation button must remain usable after returning from the link');
+assert(auth.indexOf('{notice&&<p className="profileSecurityNotice"')<auth.indexOf('{verified&&<div className='),'The request result must be displayed next to email actions, not below unrelated controls');
+assert(auth.includes('Почта подтверждена. Теперь установите личный пароль'),'Successful confirmation must explicitly identify the next action');
 console.log('PASS first-visit persisted modal, profile field focus/labels, safe RPC and visible brand migration');

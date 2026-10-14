@@ -12,6 +12,7 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
  const [password,setPassword]=useState('');
  const [confirm,setConfirm]=useState('');
  const [verified,setVerified]=useState(false);
+ const [mailRequested,setMailRequested]=useState(false);
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
  const mine=registered.find(x=>x.user_id===me?.user_id);
@@ -50,8 +51,13 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
    (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':window.location.origin)).replace(/[/]$/,'');
   const redirect=new URL('/game/'+encodeURIComponent(game!.id),origin);
   redirect.searchParams.set('section','profile');
-  const r=await supabase.auth.updateUser({email:email.trim().toLowerCase()},{emailRedirectTo:redirect.toString()});
-  setNotice(r.error?'Не удалось привязать почту: '+r.error.message:'Проверьте почту: после подтверждения адреса ссылка вернёт вас в профиль ГОС.ID.');
+  const requestedEmail=email.trim().toLowerCase();
+  const r=await supabase.auth.updateUser({email:requestedEmail},{emailRedirectTo:redirect.toString()});
+  if(r.error){setMailRequested(false);setNotice('Не удалось отправить письмо: '+r.error.message)}
+  else{
+   setMailRequested(true);
+   setNotice('Письмо отправлено на '+requestedEmail+'. Откройте ссылку в письме, затем вернитесь сюда и нажмите «Проверить подтверждение» — независимо от того, какая страница открылась по ссылке.');
+  }
   setBusy(false);
  }
  async function check(){
@@ -59,11 +65,12 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   setBusy(true);setNotice('');
   const u=await supabase.auth.getUser();const actor=u.data.user;
   if(!actor?.email||actor.is_anonymous||!actor.email_confirmed_at){
-   setNotice('Почта пока не подтверждена. Проверьте входящие и папку «Спам».');
+   setNotice('Подтверждение пока не получено. Если письмо уже открывали, попробуйте нажать «Проверить подтверждение» ещё раз. Если ссылку не открывали — проверьте письмо и папку «Спам». Если ссылка недействительна, отправьте письмо повторно.');
   }else{
    setVerified(true);setEmail(actor.email);
    const r=await supabase.from('member_login_emails').upsert({game_id:game.id,user_id:actor.id,email:actor.email.toLowerCase(),verified_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
-   setNotice(r.error?'Почта подтверждена, но запись профиля не обновлена: '+r.error.message:'Почта подтверждена. Установите личный пароль.');
+   setNotice(r.error?'Почта подтверждена, но запись профиля не обновлена: '+r.error.message:'Почта подтверждена. Теперь установите личный пароль и нажмите «Сохранить пароль».');
+   if(!r.error)setMailRequested(false);
    await load();onChanged?.();
   }
   setBusy(false);
@@ -90,19 +97,21 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
  if(!game||!me)return null;
  return <section className="profileSecurity" aria-label="Личный вход и восстановление доступа">
   <header><div><small>БЕЗОПАСНОСТЬ УЧЁТНОЙ ЗАПИСИ</small><h2>Личный пароль</h2></div><KeyRound size={22}/></header>
-  <p>Для входа с другого устройства привяжите почту и установите пароль. Преподаватель может отправить письмо для восстановления, но прочитать чужой пароль не может.</p>
+  <p>Для входа с другого устройства подтвердите почту и установите личный пароль. Преподаватель может отправить письмо для восстановления, но не может узнать ваш пароль.</p>
+  <p>1. Нажмите «Отправить письмо для подтверждения». 2. Откройте письмо и перейдите по ссылке. 3. Вернитесь в этот раздел и нажмите «Проверить подтверждение» — независимо от того, что открылось по ссылке. 4. После подтверждения сохраните личный пароль.</p>
   <div className="profileSecurityGrid">
-   <label data-profile-setup-field="email" className={missing.includes('email')?'profileSetupInvalid':''}>Ваш адрес электронной почты<input aria-invalid={missing.includes('email')} type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Имя@пример.рф" disabled={verified||busy}/></label>
-   <button type="button" disabled={busy||verified||!email.includes('@')} onClick={()=>void link()}><Mail size={17}/>{verified?'Почта подтверждена':'Привязать почту'}</button>
-   <button type="button" disabled={busy||verified} onClick={()=>void check()}><RefreshCw size={17}/> Проверить подтверждение</button>
+   <label data-profile-setup-field="email" className={missing.includes('email')?'profileSetupInvalid':''}>Ваш адрес электронной почты<input aria-invalid={missing.includes('email')} type="email" autoComplete="email" value={email} onChange={e=>{setEmail(e.target.value);setMailRequested(false);setNotice('')}} placeholder="Имя@пример.рф" disabled={verified||busy}/></label>
+   <button type="button" disabled={busy||verified||!email.includes('@')} onClick={()=>void link()}><Mail size={17}/>{verified?'Почта подтверждена':mailRequested?'Отправить письмо повторно':'Отправить письмо для подтверждения'}</button>
+   <button type="button" disabled={busy} onClick={()=>void check()}><RefreshCw size={17}/> Проверить подтверждение</button>
   </div>
+  {notice&&<p className="profileSecurityNotice" role="status">{notice}</p>}
   {verified&&<div className={'profilePasswordFields'+(missing.includes('password')?' profileSetupInvalid':'')} data-profile-setup-field="password">
    <label>Новый личный пароль<input type="password" autoComplete="new-password" minLength={10} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Не менее 10 символов"/></label>
    <label>Повторите пароль<input type="password" autoComplete="new-password" minLength={10} value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="Подтверждение пароля"/></label>
    <button type="button" className="primary" disabled={busy||password.length<10||password!==confirm} onClick={()=>void savePassword()}><ShieldCheck size={17}/> Сохранить пароль</button>
   </div>}
   {(missing.includes('email')||missing.includes('password'))&&<p className="profileSetupFieldError">{missing.includes('email')?'Подтвердите почту. ':''}{missing.includes('password')?'Установите личный пароль.':''}</p>}
-  {mine&&<p className="profileSecurityVerified"><CheckCircle2 size={17}/> Для входа привязана почта: {mine.email}</p>}
+  {mine&&verified&&<p className="profileSecurityVerified"><CheckCircle2 size={17}/> Для входа привязана почта: {mine.email}</p>}
   {teacher&&<details className="profileSecurityRecovery"><summary><LockKeyhole size={17}/> Восстановление доступа участников</summary>
    <p>В целях безопасности пароли не отображаются. После нажатия студент получит письмо со ссылкой для установки нового пароля. Общий код игры остаётся без изменений.</p>
    <div>{members.filter(m=>m.kind==='student').map(m=>{const item=registered.find(x=>x.user_id===m.user_id);
@@ -110,6 +119,5 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
       <button type="button" disabled={busy||!item} onClick={()=>item&&void reset(item.email)}>Отправить восстановление</button></article>
    })}</div>
   </details>}
-  {notice&&<p className="profileSecurityNotice" role="status">{notice}</p>}
  </section>;
 }
