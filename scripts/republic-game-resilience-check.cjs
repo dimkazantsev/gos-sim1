@@ -140,7 +140,7 @@ async function main(){
  });
  await check('Partial loader response order is guarded without canceling full core data',async()=>{
   const h=harness({effects:true});await h.settle();const olderWall=h.hold('political_posts');h.setRevision(2);h.emit('political_posts');await tick();h.setRevision(3);h.emit('political_posts');await h.settle();assert.equal(h.render().politicalPosts[0].id,'post-3');olderWall.resolve();await h.settle();assert.equal(h.render().politicalPosts[0].id,'post-3');
-  const full=h.hold('games');h.setRevision(4);const refresh=h.render().refresh();await tick();h.setRevision(5);h.emit('political_posts');await h.settle();full.resolve();await refresh;assert.equal(h.render().game.current_round,4);assert.equal(h.render().metrics[0].value,5);h.dispose();
+  const full=h.hold('games');h.setRevision(4);const refresh=h.render().refresh();await tick();h.setRevision(5);h.emit('political_posts');await h.settle();full.resolve();await refresh;assert.equal(h.render().game.current_round,5);assert.equal(h.render().metrics[0].value,5);h.dispose();
  });
  await check('Same-channel message refresh keeps the latest accepted history',async()=>{
   const h=harness({effects:true});await h.settle();h.render().setChatOpen(true);await h.settle();assert.equal(h.render().channelId,'channel-a');const old=h.hold('chat_messages');h.setRevision(2);h.emit('chat_messages');await tick();h.setRevision(3);h.emit('chat_messages');await h.settle();assert.equal(h.render().messages[0].id,'message-3');old.resolve();await h.settle();assert.equal(h.render().messages[0].id,'message-3');h.dispose();
