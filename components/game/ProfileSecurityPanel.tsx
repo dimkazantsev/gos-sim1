@@ -30,9 +30,13 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
  async function link(){
   if(!email.trim()||busy)return;
   setBusy(true);setNotice('');
-  const redirect=new URL('/game/'+encodeURIComponent(game!.id),window.location.origin);
-   redirect.searchParams.set('section','profile');
-   const r=await supabase.auth.updateUser({email:email.trim().toLowerCase()},{emailRedirectTo:redirect.toString()});
+  // GitHub Pages is a static shell: it cannot serve /game/[id] dynamically.
+  // Complete the verification on the application server and deep-link to the profile.
+  const origin=(process.env.NEXT_PUBLIC_GAME_API_ORIGIN||
+   (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':window.location.origin)).replace(/[/]$/,'');
+  const redirect=new URL('/game/'+encodeURIComponent(game!.id),origin);
+  redirect.searchParams.set('section','profile');
+  const r=await supabase.auth.updateUser({email:email.trim().toLowerCase()},{emailRedirectTo:redirect.toString()});
   setNotice(r.error?'Не удалось привязать почту: '+r.error.message:'Проверьте почту: после подтверждения адреса ссылка вернёт вас в профиль ГОС.ID.');
   setBusy(false);
  }
