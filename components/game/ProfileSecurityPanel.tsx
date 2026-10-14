@@ -23,8 +23,22 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   ]);
   if(!r.error)setRegistered((r.data||[]) as LoginEmail[]);
   const actor=u.data.user;
-  if(actor?.email){setEmail(actor.email);setVerified(!actor.is_anonymous&&!!actor.email_confirmed_at)}
-  else setVerified(false);
+  if(actor?.email){
+   setEmail(actor.email);
+   const confirmed=!actor.is_anonymous&&!!actor.email_confirmed_at;
+   setVerified(confirmed);
+   // A verification redirect must complete the game-profile binding without
+   // requiring a second manual click after the user returns to ГОС.ID.
+   const stored=(r.data||[]).find(entry=>entry.user_id===actor.id);
+   if(confirmed&&actor.id===me?.user_id&&(!stored||stored.email.toLowerCase()!==actor.email.toLowerCase())){
+    const saved=await supabase.from('member_login_emails').upsert({
+     game_id:game.id,user_id:actor.id,email:actor.email.toLowerCase(),
+     verified_at:actor.email_confirmed_at
+    },{onConflict:'game_id,user_id'});
+    if(saved.error)setNotice('Почта подтверждена, но профиль не обновился: '+saved.error.message);
+    else onChanged?.();
+   }
+  }else setVerified(false);
  }
  useEffect(()=>{void load()},[game?.id,me?.user_id]);
  async function link(){
