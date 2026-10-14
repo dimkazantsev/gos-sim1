@@ -1,0 +1,40 @@
+/* Entry QR: quiet, self-contained styles; do not change existing form geometry. */
+.entryQrCard{
+ display:grid;grid-template-columns:86px minmax(0,1fr);align-items:center;gap:14px;
+ width:100%;min-width:0;min-height:110px;margin:14px 0 0;padding:12px 14px;
+ background:linear-gradient(120deg,#fbfcff,#f3f6ff);border:1px solid #dce5f5;
+ border-radius:15px;box-shadow:0 2px 12px rgba(19,44,96,.035);
+ font:inherit;color:#172447;text-align:left;cursor:zoom-in;
+ transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+.entryQrCard:hover{border-color:#a8beec;box-shadow:0 8px 24px rgba(24,51,107,.10);transform:translateY(-1px)}
+.entryQrCard:focus-visible{outline:3px solid #2854ed;outline-offset:3px}
+.entryQrThumbnail{display:block;aspect-ratio:1;width:86px;height:86px;background:#fff;border-radius:6px;flex:none}
+.entryQrCopy{display:flex;flex-direction:column;min-width:0;gap:4px}
+.entryQrCopy strong{font-size:14px;line-height:1.35;font-weight:800;color:#172447}
+.entryQrCopy>span{font-size:12px;line-height:1.5;color:#647593}
+.entryQrCopy small{font-size:11px;line-height:1.4;color:#7183a1;overflow-wrap:anywhere}
+.entryQrDialog{
+ box-sizing:border-box;width:min(482px,calc(100vw - 32px));max-width:100%;
+ max-height:calc(100dvh - 32px);margin:auto;padding:clamp(20px,3vw,34px);
+ border:1px solid #e5ecf6;border-radius:22px;background:#fff;
+ box-shadow:0 24px 90px rgba(8,18,50,.28);text-align:center;
+ color:#172447;overflow:auto;
+}
+.entryQrDialog:not([open]){display:none}
+.entryQrDialog::backdrop{background:rgba(13,26,58,.65);backdrop-filter:blur(3px)}
+.entryQrZoomGraphic{
+ display:block;box-sizing:border-box;width:min(100%,390px);height:auto;
+ max-height:68dvh;aspect-ratio:1;background:#fff;margin:0 auto;
+ border-radius:4px;user-select:none;
+}
+.entryQrDialog p{margin:20px 0 0;font-size:13px;line-height:1.6;color:#7182a1}
+@media(max-width:420px){
+ .entryQrCard{grid-template-columns:74px minmax(0,1fr);gap:10px;min-height:94px;padding:10px}
+ .entryQrThumbnail{width:74px;height:74px}
+ .entryQrCopy strong{font-size:13px}
+ .entryQrCopy>span{font-size:11px}
+ .entryQrCopy small{font-size:10px}
+ .entryQrDialog{padding:20px;border-radius:18px}
+}
+@media(prefers-reduced-motion:reduce){.entryQrCard{transition:none}.entryQrCard:hover{transform:none}}
