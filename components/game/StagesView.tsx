@@ -19,7 +19,13 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
  const {stages,votes,teacher,nextStage}=g;
  const [selectedStageNo,setSelectedStageNo]=useSavedGameState(g.game?.id,g.me?.user_id,'stage-selected',0,value=>Number.isInteger(value)&&Number(value)>=0&&Number(value)<=16);
  const selected=stages.find(s=>s.stage_no===selectedStageNo)||null;
- function setSelected(stage:Stage|null){setSelectedStageNo(stage?.stage_no||0)}
+ function setSelected(stage:Stage|null,scroll=true){
+  setSelectedStageNo(stage?.stage_no||0);
+  if(scroll&&typeof window!=='undefined')requestAnimationFrame(()=>{
+   document.querySelector?.<HTMLElement>('.simContentFlow')?.scrollTo?.({top:0});
+   window.scrollTo?.({top:0});
+  });
+ }
  const [resetTarget,setResetTarget]=useState<number|'all'|null>(null);
  const [resetConfirmation,setResetConfirmation]=useState('');
  const [resetBusy,setResetBusy]=useState(false);
@@ -29,7 +35,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
  const [stageFilter,setStageFilter]=useState<StageFilter>('all');
  const [phaseFilter,setPhaseFilter]=useState<string|null>(null);
  const [stageSearch,setStageSearch]=useState('');
- useEffect(()=>{if(focusStageNo)setSelected(stages.find(s=>s.stage_no===focusStageNo)||null)},[focusStageNo]);
+ useEffect(()=>{if(focusStageNo)setSelected(stages.find(s=>s.stage_no===focusStageNo)||null,false)},[focusStageNo]);
  const detail=selected?STAGE_DETAILS[selected.stage_no]:null;
  const current=stages.find(s=>s.status==='open')||stages.find(s=>s.status!=='completed')||stages.at(-1);
 
@@ -81,7 +87,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
   return <StageWorkspace
    g={g}
    stage={selected}
-   readOnly={readOnly}
+   readOnly={readOnly||(!teacher&&(selected.status!=='open'||!!selected.deadline&&Date.parse(selected.deadline)<=Date.now()))}
    onBack={()=>setSelected(null)}
    onOpenStage={stageNo=>setSelected(stages.find(item=>item.stage_no===stageNo)||null)}
    onOpenVotes={onOpenVotes}
@@ -173,6 +179,8 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
        <div className="stageAtlasCardActions">
         {hasOpenVote&&<button type="button" className="stageAtlasVoteAction" onClick={()=>onOpenVotes()} aria-label={'Открыть голосования этапа '+s.stage_no}><Vote size={16} aria-hidden="true"/>Голосование</button>}
         <button type="button" className="stageAtlasDetailAction" onClick={openDetails} aria-label={'Подробнее об этапе '+s.stage_no+': '+s.title}>Подробнее <ArrowUpRight size={16} strokeWidth={2} aria-hidden="true"/></button>
+        {teacher&&!readOnly&&<button type="button" className="secondary" onClick={()=>void g.manageStage(s.stage_no,s.status==='open'?'close':'open',30)}>{s.status==='open'?'Завершить этап':'Открыть этап'}</button>}
+        {teacher&&!readOnly&&s.status==='open'&&<button type="button" className="secondary" onClick={()=>void g.manageStage(s.stage_no,'extend',30)}>Продлить на 30 мин</button>}
         {teacher&&!readOnly&&<button type="button" className="stageAtlasResetStage" title={'Сбросить этап '+s.stage_no} aria-label={'Сбросить этап '+s.stage_no+': '+s.title} onClick={()=>requestReset(s.stage_no)} disabled={resetBusy}><RotateCcw size={17} strokeWidth={1.9} aria-hidden="true"/></button>}
        </div>
       </div>

@@ -11,6 +11,14 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
  const [selected,setSelected]=useState<string|null>(null);
  const [confirm,setConfirm]=useState('');
  const [busy,setBusy]=useState(false);
+ const [reviewingId,setReviewingId]=useState('');
+ const [reviewNotice,setReviewNotice]=useState('');
+ async function review(id:string,status:'accepted'|'revision'){
+  if(reviewingId)return;
+  setReviewingId(id);setReviewNotice('');
+  try{const ok=await g.reviewPartyDocument(id,status);setReviewNotice(ok?(status==='accepted'?'Документ принят Минюстом.':'Документ отправлен на доработку.'):'Изменение не подтверждено. Проверьте сообщение об ошибке.');}
+  finally{setReviewingId('')}
+ }
  const [notice,setNotice]=useState('');
  const [error,setError]=useState('');
  const target=parties.find(p=>p.id===selected);
@@ -49,7 +57,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
      {staff.length?<ul>{staff.map(m=>{const alloc=partyMandates.find(a=>a.party_id===p.id&&a.user_id===m.user_id);return <li key={m.user_id}><span>{m.full_name}<small>{m.role_title||'Участник'}</small></span><b>{alloc?.effective_mandates||0} гол.</b></li>})}</ul>:<p className="teacherPartyMuted"><UsersRound size={15} aria-hidden="true"/> Участники пока не назначены</p>}
     </div>
     <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы ({docs.length})</h4>
-     {docs.length?<ul>{docs.map(d=><li key={d.id}><span>{docLabels[d.doc_kind]||d.doc_kind}<small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {d.status==='accepted'?'Принят':d.status==='revision'?'На доработке':'Загружен'}</small></span>{d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title}><ExternalLink size={15}/></a>:<span>—</span>}<div className="civicDocReview"><button type="button" className="secondary" onClick={()=>void g.reviewPartyDocument(d.id,'accepted')}>Принять</button><button type="button" className="secondary" onClick={()=>void g.reviewPartyDocument(d.id,'revision')}>На доработку</button></div></li>)}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
+     {docs.length?<ul>{docs.map(d=><li key={d.id}><span>{docLabels[d.doc_kind]||d.doc_kind}<small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {d.status==='accepted'?'Принят':d.status==='revision'?'На доработке':'Загружен'}</small></span>{d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title}><ExternalLink size={15}/></a>:<span>—</span>}<div className="civicDocReview"><button type="button" className={d.status==='accepted'?'primary':'secondary'} disabled={!!reviewingId||d.status==='accepted'} aria-disabled={d.status==='accepted'} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Рассматривается…':d.status==='accepted'?'Принято':'Принять'}</button><button type="button" className="secondary" disabled={!!reviewingId||d.status==='revision'} onClick={()=>void review(d.id,'revision')}>На доработку</button></div></li>)}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
     </div>
     <PartyJusticeReview g={g} party={p}/><PartyMandateEditor g={g} party={p}/>
     <footer><span>{posts.length} партийных публикаций · {staff.length} участников</span><button type="button" onClick={()=>{setSelected(p.id);setConfirm('');setNotice('')}}><Trash2 size={15} aria-hidden="true"/> Удалить партию</button></footer>

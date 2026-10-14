@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import {Award,Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Compass,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
 import ClassroomJournal from './ClassroomJournal';
 import ParticipantsAnalytics from './ParticipantsAnalytics';
@@ -39,10 +39,18 @@ const WORKSPACES=[
 ] as const;
 
 export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat,onNavigate,onStartTutorial}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void;onNavigate?:(destination:'documents'|'votes'|'budget'|'actions')=>void;onStartTutorial?:()=>void}){
- const {game,currentStage,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,formalDocuments,votes,ballots,evaluations,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
+ const {game,currentStage,stages,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,formalDocuments,votes,ballots,evaluations,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
  const navigationRef=useHorizontalWheel(game?.id);
+ const pendingFactionCount=parties.filter(p=>p.registration_status==='submitted').length+(g.partyDocuments||[]).filter(d=>d.status==='submitted').length;
+ const [clockIndex,setClockIndex]=useState(0);
+ const [clockNow,setClockNow]=useState(0);
+ useEffect(()=>{const interval=setInterval(()=>setClockNow(Date.now()),1000);return()=>clearInterval(interval)},[]);
+ const activeStageClocks=(stages||[]).filter(s=>s.status==='open').sort((a,b)=>(a.deadline?Date.parse(a.deadline):Infinity)-(b.deadline?Date.parse(b.deadline):Infinity)||a.stage_no-b.stage_no);
+ const clockStage=activeStageClocks[clockIndex%Math.max(1,activeStageClocks.length)];
+ const clockSeconds=clockStage?.deadline&&clockNow?Math.max(0,Math.ceil((Date.parse(clockStage.deadline)-clockNow)/1000)):0;
+
 
 
 
@@ -80,7 +88,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
        const next=WORKSPACES[nextIndex];setWorkspace(next.key);
        document.getElementById('teacher-tab-'+next.key)?.focus();
       }}>
-      <Icon size={18} strokeWidth={1.9} aria-hidden="true"/><span>{item.title}</span>
+      <Icon size={18} strokeWidth={1.9} aria-hidden="true"/><span>{item.title}</span>{item.key==='parties'&&pendingFactionCount>0&&<span className="sectionUnreadBadge" aria-label={'Требуют рассмотрения: '+pendingFactionCount}>{pendingFactionCount}</span>}
      </button>
     })}
    </div>
@@ -88,24 +96,27 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    <div className="teacherCommandStage">
     <span className="teacherEyebrow">ПУЛЬТ ПРЕПОДАВАТЕЛЯ</span>
     <div className="teacherCommandStageLine">
-     <span className="teacherCommandStageNo">{String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</span>
+     <span className="teacherCommandStageNo">{String(clockStage?.stage_no||currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</span>
      <div>
       <small>ТЕКУЩИЙ ЭТАП</small>
-      <h1>{currentStage?.title||'Подготовка игры'}</h1>
+      <h1>{clockStage?.title||currentStage?.title||'Подготовка игры'}</h1>
      </div>
     </div>
    </div>
    <div className="teacherCommandClock">
-    <span className={game.turn_open?'teacherTurnBadge isOpen':'teacherTurnBadge isPaused'}>{game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span>
-    <strong>{game.turn_open&&game.turn_ends_at?timerText(secondsLeft):'—'}</strong>
+    <span className={clockStage?'teacherTurnBadge isOpen':'teacherTurnBadge isPaused'}>{clockStage?'ХОД ОТКРЫТ':currentStage?.status==='completed'?'ЭТАП ЗАВЕРШЁН':'ЭТАП НЕ ОТКРЫТ'}</span>
+    <button type="button" className="teacherClockSwitch" disabled={activeStageClocks.length<2} onClick={()=>setClockIndex(v=>(v+1)%activeStageClocks.length)} aria-label="Переключить таймеры открытых этапов" title={activeStageClocks.length>1?'Нажмите, чтобы увидеть срок следующего открытого этапа':'Таймер активного этапа'}>
+      <strong>{clockStage?'Этап '+clockStage.stage_no+' · '+(clockStage.deadline?timerText(clockSeconds):'без срока'):'—'}</strong>
+      {activeStageClocks.length>1&&<small>{clockIndex%activeStageClocks.length+1} / {activeStageClocks.length} · нажмите для следующего</small>}
+     </button>
    </div>
    <div className="teacherQuickActions">
     {onStartTutorial&&<button type="button" className="teacherQuick teacherTourButton" onClick={onStartTutorial} aria-label="Пройти интерактивное обучение" title="Просмотреть все подсказки без изменения игровых данных">
      <span><Compass size={18} strokeWidth={2} aria-hidden="true"/></span><b>Пройти обучение</b>
     </button>}
-    <button type="button" className={game.turn_open?'teacherQuick danger':'teacherQuick primary'} onClick={()=>setTurn(!game.turn_open)}>
-     <span>{game.turn_open?<Pause size={18} strokeWidth={2} aria-hidden="true"/>:<Play size={18} strokeWidth={2} aria-hidden="true"/>}</span>
-     <b>{game.turn_open?'Пауза':'Открыть ход'}</b>
+    <button type="button" className={clockStage?'teacherQuick danger':'teacherQuick primary'} onClick={()=>{const target=clockStage?.stage_no||stages.find(s=>s.status==='locked')?.stage_no||currentStage?.stage_no||game.current_round;const action=clockStage?'close':'open';if(action==='close'||window.confirm('Открыть этап '+target+'?'))void g.manageStage(target,action,30)}}>
+     <span>{clockStage?<Pause size={18} strokeWidth={2} aria-hidden="true"/>:<Play size={18} strokeWidth={2} aria-hidden="true"/>}</span>
+     <b>{clockStage?'Завершить этап':'Открыть этап'}</b>
     </button>
     <button type="button" className="teacherQuick" onClick={onOpenProcesses}>
      <span><Radio size={18} strokeWidth={2} aria-hidden="true"/></span><b>Политический процесс</b>

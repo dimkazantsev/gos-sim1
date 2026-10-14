@@ -45,6 +45,24 @@ export function useRepublicGame(gameId:string){
  activeViewRef.current=activeView;chatOpenRef.current=chatOpen;
  const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const lastTelegramDispatch=useRef(0);
+ async function kickTelegramDispatch(){
+  if(typeof window==='undefined'||!me?.user_id||Date.now()-lastTelegramDispatch.current<12000)return;
+  lastTelegramDispatch.current=Date.now();
+  try{
+   const {data}=await supabase.auth.getSession();
+   if(!data.session?.access_token)return;
+   const origin=(process.env.NEXT_PUBLIC_GAME_API_ORIGIN||
+    (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':'')).replace(/[/]$/,'');
+   await fetch(origin+'/api/telegram/dispatch',{
+    method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+data.session.access_token},
+    body:JSON.stringify({gameId}),keepalive:true
+   });
+  }catch{
+   // Telegram delivery has its own durable outbox; never block in-game actions.
+  }
+ }
+
  const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,PendingMediaUpload>()),voiceAnalysisRef=useRef<Promise<{waveform:number[];duration:number}|null>|null>(null);
 
  const profiles=useMemo(()=>currentGameProfiles(profileRows,members,gameId),[profileRows,members,gameId]);
@@ -155,23 +173,52 @@ export function useRepublicGame(gameId:string){
 
  useEffect(()=>{
   if(!me?.user_id||me.game_id!==gameId)return;
-  // Supabase Realtime currently spends seconds scanning the large
-  // supabase_realtime publication. Do not let that infrastructure path
-  // compete with 30 classroom clients. Keep the UI eventually consistent
-  // through one bounded visible-tab refresh and immediate local invalidation.
-  setRealtimeState('disconnected');
-  let running=false,queued=false;
-  async function update(){
-   if(!alive.current||document.visibilityState==='hidden')return;
-   if(running){queued=true;return}
-   running=true;
-   try{await hydrateActiveView()}
-   finally{running=false;if(queued&&alive.current){queued=false;setTimeout(()=>void update(),500)}}
+  let disposed=false,scheduled=false;
+  let dirtyCore=false,dirtyChat=false,dirtyPins=false,telegramWake=false;
+  let timer:ReturnType<typeof setTimeout>|undefined;
+  function flush(){
+   if(disposed||document.visibilityState==='hidden')return;
+   const core=dirtyCore,chat=dirtyChat,pins=dirtyPins,wake=telegramWake;
+   dirtyCore=false;dirtyChat=false;dirtyPins=false;telegramWake=false;
+   // Read tickets in the loaders guard overlapping requests: never serialize
+   // new events behind a stalled, older fetch.
+   if(core){void hydrateActiveView();notifyGameDataRefresh(gameId)}
+   if(chat){void loadChatOverview();if(channelRef.current)void loadMessages(channelRef.current)}
+   if(pins&&channelRef.current)void loadChatPins(channelRef.current);
+   if(wake)void kickTelegramDispatch();
   }
-  const interval=setInterval(()=>void update(),30000);
-  return()=>{clearInterval(interval)};
+  function schedule(){
+   if(disposed||scheduled)return;
+   scheduled=true;
+   // Collapse bursts in the same JS turn without delaying the first update.
+   void Promise.resolve().then(()=>{scheduled=false;flush()});
+  }
+  const channel=supabase.channel('gos-id-live:'+gameId+':'+me.user_id);
+  for(const table of ['chat_messages','chat_mentions','chat_channel_state','chat_pins']){
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
+    if(table==='chat_pins')dirtyPins=true;
+    else dirtyChat=true;
+    telegramWake=true;schedule();
+   });
+  }
+  for(const table of ['game_stages','game_parties','party_invitations','party_documents','party_chair_ballots','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
+    dirtyCore=true;telegramWake=true;schedule();
+   });
+  }
+  liveRef.current=channel;
+  setRealtimeState('connecting');
+  channel.subscribe(status=>{if(!disposed)setRealtimeState(status==='SUBSCRIBED'?'connected':'disconnected')});
+  // Visible-tab recovery works even when a WebSocket cannot connect.
+  const poll=setInterval(()=>{
+   if(document.visibilityState==='visible'){dirtyCore=true;dirtyChat=true;dirtyPins=true;schedule()}
+  },30000);
+  return()=>{
+   disposed=true;clearTimeout(timer);clearInterval(poll);
+   if(liveRef.current===channel)liveRef.current=null;
+   void supabase.removeChannel(channel);
+  };
  },[gameId,me?.user_id]);
-
 
  useEffect(()=>()=>{
   const rec=recorder.current;
@@ -293,6 +340,7 @@ export function useRepublicGame(gameId:string){
   }
   acceptedMember.current=member;setGame(g.data as Game);setMe(member);
   if(!mt.error&&readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
+  if(mt.error&&readCurrent(ticket,'metrics'))setError(mt.error);
   if(!ev.error)setEvents((ev.data||[]) as EventItem[]);
   if(!mb.error&&readCurrent(ticket,'members'))setMembers((mb.data||[]) as Member[]);
   if(!ch.error&&readCurrent(ticket,'overview'))setChannels((ch.data||[]) as Channel[]);
@@ -326,7 +374,7 @@ export function useRepublicGame(gameId:string){
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets());
   if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation());
   if(view==='documents')jobs.push(loadFormalRegistry());
-  if(view==='actions')jobs.push(loadPoliticalWall());
+  if(view==='actions'||view==='dashboard')jobs.push(loadPoliticalWall());
   if(view==='teacher')jobs.push(loadClassroomTelemetry(),loadImpactEngine());
   if(chatOpenRef.current)jobs.push(loadChatOverview());
   await Promise.allSettled(jobs);
@@ -530,7 +578,7 @@ export function useRepublicGame(gameId:string){
    return true;
   }catch(e){setChatPins(original);setError(e instanceof Error?e.message:'Не удалось изменить закрепление');return false}
  }
- async function refresh(){await Promise.all([loadAll(false),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
+ async function refresh(){await loadAll(false);await Promise.all([hydrateActiveView(),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
 
  async function logActivity(eventType:string,label:string,viewKey?:string,payload:Record<string,unknown>={}){
   const uid=me?.user_id;if(!uid||authUser.current!==uid)return;
@@ -547,34 +595,34 @@ export function useRepublicGame(gameId:string){
  async function setTurn(open:boolean){const r=await supabase.from('games').update({turn_open:open,status:open?'running':'paused',turn_ends_at:open?new Date(Date.now()+12*60*1000).toISOString():null}).eq('id',gameId);if(r.error)setError(r.error.message);else await refresh()}
  async function setTurnMinutes(minutes:number){if(!game)return;const r=await supabase.from('games').update({turn_open:true,status:'running',turn_ends_at:new Date(Date.now()+minutes*60*1000).toISOString()}).eq('id',gameId);if(r.error)setError(r.error.message);else await refresh()}
 
+ async function manageStage(stageNo:number,action:'open'|'close'|'extend',minutes=30):Promise<boolean>{
+  if(!teacher){setError('Только преподаватель может управлять этапами.');return false}
+  if(action==='close'){
+   const check=await supabase.rpc('get_stage_readiness',{p_game_id:gameId,p_stage_no:stageNo});
+   const data=check.data as {ready?:boolean;blockers?:unknown;warnings?:unknown}|null;
+   if(check.error||!data||typeof data.ready!=='boolean'||!Array.isArray(data.blockers)||!Array.isArray(data.warnings)){
+    setError(check.error?.message||'Не удалось проверить обязательные процедуры этапа перед завершением.');return false;
+   }
+   const blockers=data.blockers.filter((item):item is string=>typeof item==='string');
+   const warnings=data.warnings.filter((item):item is string=>typeof item==='string');
+   const notice=data.ready?'Обязательные процедуры выполнены.':'Не завершены обязательные процедуры:\n'+blockers.slice(0,7).join('\n');
+   if(!window.confirm('Этап '+stageNo+'. '+notice+(warnings.length?'\nЗамечаний: '+warnings.length+'.':'')+'\n\nЗавершить этап?'))return false;
+  }
+  const r=await supabase.rpc('manage_game_stage',{p_game_id:gameId,p_stage_no:stageNo,p_action:action,p_minutes:minutes});
+  if(r.error){setError(r.error.message);return false}
+  await refresh();
+  return true;
+ }
  async function openStage(stageNo:number){
   if(!teacher)return;
-  const closing=stages.find(stage=>stage.status==='open');
-  if(closing&&closing.stage_no!==stageNo){
-   // Fresh one-shot preflight on the teacher's transition, not a background poll.
-   // Never treat an RPC failure as a green check or reuse a cached widget result.
-   try{
-    const check=await supabase.rpc('get_stage_readiness',{p_game_id:gameId,p_stage_no:closing.stage_no});
-    const verdict=check.data as {ready?:boolean;blockers?:unknown;warnings?:unknown}|null;
-    if(check.error||!verdict||typeof verdict.ready!=='boolean'||!Array.isArray(verdict.blockers)||!Array.isArray(verdict.warnings)){
-     setError(check.error?.message||'Невозможно проверить процедуры перед завершением этапа. Повторите попытку.');
-     return;
-    }
-    const blockers=verdict.blockers.filter((x):x is string=>typeof x==='string');
-    const warnings=verdict.warnings.filter((x):x is string=>typeof x==='string');
-    const note=verdict.ready
-     ?'Все обязательные процедуры этапа '+closing.stage_no+' выполнены.'+(warnings.length?' Замечаний: '+warnings.length+'.':'')
-     :'Этап '+closing.stage_no+' содержит '+blockers.length+' незавершённых обязательных процедур:\n'+blockers.slice(0,6).map((x,i)=>(i+1)+'. '+x).join('\n')+(blockers.length>6?'\n…и ещё '+(blockers.length-6):'');
-    if(!window.confirm(note+'\n\n'+(verdict.ready?'Завершить текущий этап и открыть этап '+stageNo+'?':'Преподаватель: завершить этап и перейти к этапу '+stageNo+' несмотря на препятствия?')))return;
-   }catch(error){
-    setError(error instanceof Error?error.message:'Не удалось проверить процедуры перед завершением этапа.');
-    return;
-   }
-  }
-  const r=await supabase.rpc('set_game_stage',{p_game_id:gameId,p_stage_no:stageNo,p_minutes:12});
-  if(r.error)setError(r.error.message);else await refresh();
+  await manageStage(stageNo,'open',30);
  }
- async function nextStage(){const active=stages.find(s=>s.status==='open');const next=active?Math.min(16,active.stage_no+1):(stages.find(s=>s.status!=='completed')?.stage_no||1);await openStage(next)}
+ async function nextStage(){
+  if(!teacher)return;
+  const firstLocked=stages.filter(s=>s.status==='locked').sort((a,b)=>a.stage_no-b.stage_no)[0];
+  if(firstLocked)await openStage(firstLocked.stage_no);
+ }
+
  async function resetStageProgress(stageNo:number|null):Promise<boolean>{
   if(!teacher||!me){setError('Сброс этапов доступен только преподавателю.');return false}
   if(stageNo!==null&&(!Number.isInteger(stageNo)||stageNo<1||stageNo>16)){setError('Неверный номер этапа.');return false}
@@ -610,6 +658,7 @@ export function useRepublicGame(gameId:string){
   if(teacher||role.includes('муницип')||role.includes('глава города'))x.push({key:'municipality',label:'Орган местного самоуправления'});
   if(teacher||role.includes('сми')||role.includes('журналист'))x.push({key:'media',label:'Средства массовой информации'});
   // The retired system publisher is intentionally absent; the server enumerates real actors.
+  if(teacher||me.kind==='student')x.push({key:'ksrf',label:'КСРФ'});
   if(teacher||role.includes('юстиц'))x.push({key:'minjust',label:'Министерство юстиции Российской Федерации'});
   if(teacher||role.includes('внутренн'))x.push({key:'interior',label:'Министерство внутренних дел Российской Федерации'});
   const offices=[['cec','Избирательная комиссия',/избирательн.*комисс|цик/i],['ks','Конституционный Суд Российской Федерации',/конституционн.*суд/i],['vs','Верховный Суд Российской Федерации',/верховн.*суд/i],['central_bank','Банк России',/центральн.*банк|банк.*россии/i],['accounts','Счётная палата Российской Федерации',/сч[её]тн.*палат/i]] as const;
@@ -691,11 +740,16 @@ export function useRepublicGame(gameId:string){
   if(r.error){setError(r.error.message);return false}await Promise.all([loadImpactEngine(),loadPoliticalWall(),refreshBudgetPulse()]);return true;
  }
  async function createParty(name:string,ideology:string){
-  if(!teacher||!me||!name.trim())return false;const n=name.trim();const colors=['#6f7cff','#4dc9ff','#55d99b','#ff8d72','#c77dff'];
-  const p=await supabase.from('game_parties').insert({game_id:gameId,name:n,ideology:ideology.trim()||null,color:colors[parties.length%colors.length],created_by:me.user_id});
-  if(p.error){setError(p.error.message);return false}
-  const c=await supabase.from('chat_channels').insert({game_id:gameId,name:'Фракция · '+n,kind:'team',created_by:me.user_id});if(c.error)setError(c.error.message);
+  if(!me||me.kind==='observer'||!name.trim())return false;
+  const r=await supabase.rpc('found_game_party',{p_game:gameId,p_name:name.trim(),p_ideology:ideology.trim()});
+  if(r.error){setError(r.error.message);return false}
   await refresh();return true;
+ }
+ async function voteForPartyChair(partyId:string,candidateId:string){
+  if(!me||me.kind!=='student'){setError('На выборах председателя голосуют участники партии.');return false}
+  const r=await supabase.rpc('vote_for_party_chair',{p_party_id:partyId,p_candidate_id:candidateId});
+  if(r.error){setError(r.error.message);return false}
+  await Promise.all([loadPartyRepresentation(),loadPartyAssets()]);notifyGameDataRefresh(gameId);return true;
  }
  async function updateParty(id:string,patch:Partial<Party>){const r=await supabase.from('game_parties').update(patch).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
  async function setPartyLeader(partyId:string,userId:string){
@@ -711,7 +765,7 @@ export function useRepublicGame(gameId:string){
  async function inviteToParty(partyId:string,userId:string){
   const r=await supabase.rpc('invite_to_party',{p_party_id:partyId,p_user_id:userId});
   if(r.error){setError(r.error.message);return false}
-  await loadPartyRepresentation();return true;
+  await loadPartyRepresentation();void kickTelegramDispatch();return true;
  }
  async function respondPartyInvitation(invitationId:string,accept:boolean){
   const r=await supabase.rpc('respond_party_invitation',{p_invitation_id:invitationId,p_accept:accept});
@@ -824,7 +878,7 @@ export function useRepublicGame(gameId:string){
   const m=members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;
   const role=(m.role_title||'').trim();
   if(institution==='all'||institution==='factions')return m.kind==='student'||(m.kind==='teacher'&&!['','Руководитель симуляции','Преподаватель','Администратор'].includes(role));
-  if(institution==='ksrf'&&parties.some(p=>p.leader_user_id===uid))return true;
+  if(institution==='ksrf'&&m.kind==='student')return true;
   const body=VOTING_BODIES.find(b=>b.key===institution);
   return !!body&&(body.role.test(role)||(m.kind==='student'&&officeAssignments.some(o=>o.user_id===uid&&o.status==='active'&&body.role.test(o.role_title))));
  }
@@ -971,12 +1025,13 @@ export function useRepublicGame(gameId:string){
   if(up.error){setError(up.error.message);return false}
   const r=await supabase.from('party_documents').insert({game_id:gameId,party_id:partyId,doc_kind:kind,title:title.trim()||file.name,storage_path:path,file_name:file.name,mime_type:file.type||null,file_size:file.size,uploaded_by:me.user_id,status:'submitted'});
   if(r.error){setError(r.error.message);return false}
-  await loadPartyAssets();return true;
+  await loadPartyAssets();void kickTelegramDispatch();return true;
  }
- async function reviewPartyDocument(id:string,status:'accepted'|'revision',note?:string){
-  if(!teacher)return;
-  const r=await supabase.from('party_documents').update({status,note:note?.trim()||null}).eq('id',id);
-  if(r.error)setError(r.error.message);else await loadPartyAssets();
+ async function reviewPartyDocument(id:string,status:'accepted'|'revision',note?:string):Promise<boolean>{
+  if(!teacher){setError('Рассмотрение документов доступно только преподавателю.');return false}
+  const r=await supabase.from('party_documents').update({status,note:note?.trim()||null}).eq('id',id).neq('status',status).select('id,status').maybeSingle();
+  if(r.error){setError(r.error.message);return false}
+  await loadPartyAssets();if(r.data)void kickTelegramDispatch();return !!r.data;
  }
 
  async function createFormalDocument(data:{stageNo:number;title:string;docType:string;subjectKey:string;subjectLabel:string;bodyText:string;workflowKey:string;metadata?:Record<string,unknown>},file?:File){
@@ -1173,5 +1228,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
+  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,setPartyLeader,setPartyMandates,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }

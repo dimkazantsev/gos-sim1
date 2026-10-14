@@ -257,10 +257,12 @@
 .stagesAtlas .stageRulesCalloutIcon{display:grid;place-items:center}
 @container atlas-card (max-width:480px){
  .stagesAtlas .stageAtlasCardMain{gap:11px;padding:17px 15px 14px}
- .stagesAtlas .stageAtlasCardFooter{gap:6px;padding:8px 12px 8px 15px}
+ .stagesAtlas .stageAtlasCardFooter{gap:6px;padding:8px 12px 8px 15px;flex-wrap:wrap}
  .stagesAtlas .stageAtlasCardTopline{gap:7px}
  .stagesAtlas .stageAtlasCardStatus{font-size:10px;padding:4px 6px}
- .stagesAtlas .stageAtlasCardActions{gap:5px}
+ /* Teacher controls may add several long buttons; keep actions inside each card
+    instead of letting them overflow the adjacent stage at mid-size widths. */
+ .stagesAtlas .stageAtlasCardActions{gap:5px;flex:1 1 100%;flex-wrap:wrap;max-width:100%}
  .stagesAtlas .stageAtlasCardDeadline{font-size:10px}
  .stagesAtlas .stageAtlasVoteAction,.stagesAtlas .stageAtlasDetailAction{padding:0 10px}
 }

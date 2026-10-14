@@ -24,10 +24,10 @@ async function main(){
     const header=await frame.locator('.simTop').evaluate(el=>{
      const r=el.getBoundingClientRect();
      const parts=[...el.querySelectorAll('.mobileBrand,.topScreenHistory,.simTopCenter,.viewAsSwitcher')].filter(x=>getComputedStyle(x).display!=='none').map(x=>{const a=x.getBoundingClientRect();return {name:x.className,left:a.left,right:a.right,top:a.top,bottom:a.bottom}});
-     return {height:r.height,width:document.documentElement.clientWidth,parts,connection:getComputedStyle(el.querySelector('.connectionPill')).display};
+     return {height:r.height,width:document.documentElement.clientWidth,parts,connection:!!el.querySelector('.connectionPill')};
     });
     assert(header.height<=60,'Mobile header must fit one row at '+width+'px: '+JSON.stringify(header));
-    assert(header.connection!=='none','Sync indicator must be present and stable');
+    assert(!header.connection,'Removed connection indicator must not remain in the mobile header');
     for(const part of header.parts)assert(part.left>=-2&&part.right<=header.width+2,'Header overflows at '+width+': '+JSON.stringify(header));
     await page.locator('#screen').selectOption('chat');
     // The sheet deliberately slides up; assert final position after the animation.

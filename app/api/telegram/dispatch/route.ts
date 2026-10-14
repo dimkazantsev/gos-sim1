@@ -4,11 +4,63 @@ import {telegramGroupNotices,telegramSystemNotice} from '@/lib/server/telegramNo
 import {runtimeConfig,telegramSend} from '@/lib/server/telegram';
 import {telegramSectionButtons,telegramDocumentButtons,telegramTaskButtons,telegramChatButtons} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
+const ALLOWED_ORIGINS=new Set(['https://dimkazantsev.github.io','https://gos-sim1.vercel.app']);
+function cors(request:Request):Record<string,string>{
+ const origin=request.headers.get('origin');
+ return origin&&ALLOWED_ORIGINS.has(origin)
+  ?{'Access-Control-Allow-Origin':origin,'Vary':'Origin','Cache-Control':'no-store'}
+  :{'Vary':'Origin','Cache-Control':'no-store'};
+}
+export function OPTIONS(request:Request){
+ const origin=request.headers.get('origin');
+ if(origin&&!ALLOWED_ORIGINS.has(origin))return new Response('Forbidden',{status:403});
+ return new Response(null,{status:204,headers:{...cors(request),'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Authorization, Content-Type'}});
+}
+
 export async function GET(request:Request){
- let config:ReturnType<typeof runtimeConfig>;try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
  const cron=process.env.CRON_SECRET;
- if(!cron||request.headers.get('authorization')!=='Bearer '+cron)return new Response('Unauthorized',{status:401});
- const {data:jobs,error}=await config.db.from('telegram_outbox').select('id,game_id,user_id,body,attempts,category,channel_id,source_id').is('sent_at',null).lt('attempts',5).lte('next_attempt_at',new Date().toISOString()).order('id').limit(40);
+ const dbWake=process.env.TELEGRAM_DISPATCH_SECRET;
+ const provided=request.headers.get('authorization');
+ if(!provided||!((cron&&provided==='Bearer '+cron)||(dbWake&&provided==='Bearer '+dbWake)))
+  return new Response('Unauthorized',{status:401});
+ return dispatchOutbox();
+}
+export async function POST(request:Request){
+ const origin=request.headers.get('origin');
+ if(origin&&!ALLOWED_ORIGINS.has(origin))return new Response('Forbidden',{status:403});
+ const response=await authenticatedDispatch(request);
+ const headers=new Headers(response.headers);
+ for(const [key,value] of Object.entries(cors(request)))headers.set(key,value);
+ return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+}
+async function authenticatedDispatch(request:Request){
+ // Signed-in game members can wake the dispatcher for their own game only.
+ // No service-role or bot credentials are sent to the browser.
+ let config:ReturnType<typeof runtimeConfig>;
+ try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
+ const authorization=request.headers.get('authorization')||'';
+ if(!authorization.startsWith('Bearer '))return new Response('Unauthorized',{status:401});
+ const token=authorization.slice('Bearer '.length);
+ const {data:identity,error:authError}=await config.db.auth.getUser(token);
+ if(authError||!identity.user)return new Response('Unauthorized',{status:401});
+ let gameId:string;
+ try{
+  const json=(await request.json()) as {gameId?:string};
+  gameId=String(json.gameId||'');
+ }catch{return NextResponse.json({error:'Invalid request'},{status:400})}
+ if(!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(gameId))
+  return NextResponse.json({error:'Invalid game'},{status:400});
+ const {data:member,error:memberError}=await config.db.from('game_members')
+  .select('user_id').eq('game_id',gameId).eq('user_id',identity.user.id)
+  .is('roster_archived_at',null).maybeSingle();
+ if(memberError||!member)return new Response('Forbidden',{status:403});
+ return dispatchOutbox(gameId);
+}
+async function dispatchOutbox(gameId?:string){
+ let config:ReturnType<typeof runtimeConfig>;try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
+ let queue=config.db.from('telegram_outbox').select('id,game_id,user_id,body,attempts,category,channel_id,source_id').is('sent_at',null).lt('attempts',5).lte('next_attempt_at',new Date().toISOString());
+ if(gameId)queue=queue.eq('game_id',gameId);
+ const {data:jobs,error}=await queue.order('id').limit(40);
  if(error)return NextResponse.json({error:'Queue query failed'},{status:500});
  let sent=0;
  for(const job of jobs||[]){
@@ -65,6 +117,29 @@ export async function GET(request:Request){
    }
    if(!visible){await dismiss('Mention source no longer visible');continue}
   }
+  if(job.category==='party_invite'){
+   const {data:invite,error:inviteError}=await config.db.from('party_invitations')
+    .select('id,status,invited_user_id').eq('id',job.source_id)
+    .eq('game_id',job.game_id).maybeSingle();
+   if(inviteError){console.error('Telegram party invitation lookup failed',inviteError.code);continue}
+   if(!invite||invite.status!=='pending'||invite.invited_user_id!==job.user_id){await dismiss('Invitation no longer pending');continue}
+  }
+  if(job.category==='party_registration'){
+   const {data:party,error:partyError}=await config.db.from('game_parties')
+    .select('id,registration_status').eq('id',job.source_id)
+    .eq('game_id',job.game_id).maybeSingle();
+   if(partyError){console.error('Telegram party registration lookup failed',partyError.code);continue}
+   if(!party||party.registration_status!=='submitted'){await dismiss('Party registration no longer pending');continue}
+  }
+  if(job.category==='party_document'||job.category==='party_review'){
+   const {data:doc,error:docError}=await config.db.from('party_documents')
+    .select('id,status').eq('id',job.source_id)
+    .eq('game_id',job.game_id).maybeSingle();
+   if(docError){console.error('Telegram party document lookup failed',docError.code);continue}
+   if(!doc||job.category==='party_review'&&!['accepted','revision'].includes(doc.status)){
+    await dismiss('Party document no longer available');continue;
+   }
+  }
   if(job.category==='document'){
    const {data:document,error:docError}=await config.db.from('formal_documents')
     .select('id').eq('id',job.source_id).eq('game_id',job.game_id).maybeSingle();
@@ -83,6 +158,41 @@ export async function GET(request:Request){
     await dismiss('Source removed or no longer active');continue;
    }
   }
+  // Party notices may become invalid before delivery. Check the live source and
+  // recipient permissions immediately before contacting Telegram.
+  if(job.category==='party_invite'){
+   const {data:invitation,error:invitationError}=await config.db.from('party_invitations')
+    .select('id').eq('id',job.source_id).eq('game_id',job.game_id)
+    .eq('invited_user_id',job.user_id).eq('status','pending').maybeSingle();
+   if(invitationError){console.error('Telegram invitation lookup failed',invitationError.code);continue}
+   if(!invitation){await dismiss('Party invitation no longer pending');continue}
+  }
+  if(job.category==='party_registration'||job.category==='party_document'){
+   const {data:teacherMember,error:teacherError}=await config.db.from('game_members')
+    .select('user_id').eq('game_id',job.game_id).eq('user_id',job.user_id)
+    .eq('kind','teacher').is('roster_archived_at',null).maybeSingle();
+   if(teacherError){console.error('Telegram party teacher lookup failed',teacherError.code);continue}
+   if(!teacherMember){await dismiss('Minjust notification recipient no longer a teacher');continue}
+   if(job.category==='party_registration'){
+    const {data:party,error:partyError}=await config.db.from('game_parties')
+     .select('id').eq('id',job.source_id).eq('game_id',job.game_id)
+     .eq('registration_status','submitted').maybeSingle();
+    if(partyError){console.error('Telegram party registration lookup failed',partyError.code);continue}
+    if(!party){await dismiss('Party registration no longer pending');continue}
+   }else{
+    const {data:document,error:docError}=await config.db.from('party_documents')
+     .select('id').eq('id',job.source_id).eq('game_id',job.game_id).eq('status','submitted').maybeSingle();
+    if(docError){console.error('Telegram party document lookup failed',docError.code);continue}
+    if(!document){await dismiss('Party document no longer pending');continue}
+   }
+  }
+  if(job.category==='party_review'){
+   const {data:document,error:docError}=await config.db.from('party_documents')
+    .select('id').eq('id',job.source_id).eq('game_id',job.game_id)
+    .eq('uploaded_by',job.user_id).in('status',['accepted','revision']).maybeSingle();
+   if(docError){console.error('Telegram party review lookup failed',docError.code);continue}
+   if(!document){await dismiss('Party review no longer current');continue}
+  }
   const {data:preferences,error:prefsError}=await config.db.from('telegram_notification_preferences')
    .select('daily_brief,task_reminders,mentions,documents,votes,events,quiet_hours')
    .eq('game_id',job.game_id).eq('user_id',job.user_id).maybeSingle();
@@ -90,6 +200,7 @@ export async function GET(request:Request){
   const categoryKey:Record<string,string>={
    daily_brief:'daily_brief',task:'task_reminders',task_done:'task_reminders',
    mention_chat:'mentions',mention_actions:'mentions',mention_documents:'mentions',
+   party_invite:'events',party_registration:'events',party_document:'events',party_review:'events',
    document:'documents',document_delivery:'documents',vote:'votes',stage:'events',event:'events'
   };
   const setting=categoryKey[job.category];
@@ -123,7 +234,9 @@ export async function GET(request:Request){
   else if(job.category==='mention_actions')buttons=telegramSectionButtons('actions','Открыть обсуждение');
   else if(job.category==='mention_documents')buttons=telegramSectionButtons('documents','Открыть документы');
   else if(job.category==='chat'||job.category==='mention_chat')buttons=telegramChatButtons(job.channel_id||undefined);
+  else if(job.category==='party_invite'||job.category==='party_registration'||job.category==='party_document'||job.category==='party_review')buttons=telegramSectionButtons('parties','Открыть партии');
   else if(job.category==='stage')buttons=telegramSectionButtons('stages','Открыть этап');
+  else if(job.category==='party_invite'||job.category==='party_registration'||job.category==='party_document'||job.category==='party_review')buttons=telegramSectionButtons('parties','Открыть партии');
   else if(job.category==='vote')buttons=telegramSectionButtons('votes','Открыть голосование');
   // Combine only low-urgency, same-recipient open task notices. Each extra
   // job is independently claimed and its live source rechecked; no cross-game
