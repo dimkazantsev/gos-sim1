@@ -35,6 +35,21 @@ async function check(){
     const entries=[...list.querySelectorAll('.teacherStageListItem')];
     return {width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
      list:rect(list),inspector:rect(inspector),rows:entries.map(rect),
+     frameHeight:window.innerHeight,
+     listScrollHeight:list.scrollHeight,
+     listClientHeight:list.clientHeight,
+     visibleStageRows:entries.filter(entry=>{
+      const card=entry.getBoundingClientRect(),viewport=list.getBoundingClientRect();
+      return card.bottom>viewport.top+3&&card.top<viewport.bottom-3;
+     }).length,
+     stageParts:entries.map(entry=>({
+      card:rect(entry),
+      title:rect(entry.querySelector('.teacherStageListCopy strong')),
+      status:rect(entry.querySelector('.teacherStageListCopy small')),
+      icon:rect(entry.querySelector('.teacherStageListCopy small svg')),
+      number:rect(entry.querySelector('.teacherStageNumber')),
+      arrow:rect(entry.querySelector(':scope > svg'))
+     })),
      deadline:deadline?rect(deadline):null,actions:actions?rect(actions):null,policy:policy?rect(policy):null,
      duplicateTimer:root.querySelectorAll('.teacherCommandClock,.teacherClockSwitch').length,
      stageStatus:root.querySelectorAll('.teacherCommandBar .teacherTurnBadge').length,
@@ -57,6 +72,18 @@ async function check(){
    assert.equal(data.procedures,1,'Procedures action must remain available');
    assert.equal(data.extension,1,'Stage extension input must remain accessible');
    assert(data.deadline&&data.actions&&data.policy,'Deadline, actions and policy must remain visible');
+   const ratio=width>=1121?.75:width>650?.68:.64;
+   const cap=width>=1121?820:width>650?700:640;
+   const expectedHeight=Math.min(data.frameHeight*ratio,cap);
+   assert(Math.abs(data.list.height-expectedHeight)<=5,
+    'Stage list must occupy its extended viewport height at '+width+'px: '+JSON.stringify({list:data.list,expectedHeight,frameHeight:data.frameHeight}));
+   assert(data.listScrollHeight>data.listClientHeight+5,'Sixteen stages must remain scrollable at '+width+'px');
+   const minVisible=width>=1121?5:width>650?6:3;
+   assert(data.visibleStageRows>=minVisible,'Expanded list must show additional stages at '+width+'px: '+JSON.stringify({visible:data.visibleStageRows,minVisible}));
+   if(width>=1280){
+    const gap=data.deadline.top-data.list.bottom;
+    assert(gap>=10&&gap<=30,'Deadline must follow list with consistent spacing at '+width+'px: '+JSON.stringify({gap,list:data.list,deadline:data.deadline}));
+   }
    assert(data.actions.bottom<=data.policy.top+3,'Stage actions must precede the long policy form at '+width+'px');
    if(width>=1280){
     assert(data.deadline.right<=data.inspector.left+3,'Desktop deadline summary must occupy the left column at '+width+'px');
@@ -66,6 +93,19 @@ async function check(){
     assert.equal(await frame.locator('#teacher-tab-blitz').count(),1,'Blitz workspace must be navigable');
    assert(data.scroll<=data.width+3,'Stage management overflows at '+width+'px: '+JSON.stringify(data));
    for(const row of data.rows)assert(row.left>=data.list.left-2&&row.right<=data.list.right+2,'Stage row leaves list at '+width+'px');
+   for(const part of data.stageParts){
+    const {card,title,status,icon,number,arrow}=part;
+    assert(card.height>=91,'Stage card compressed at '+width+'px: '+JSON.stringify(part));
+    assert(title.top>=card.top+9&&title.bottom<=status.top-5,'Title/status overlap at '+width+'px: '+JSON.stringify(part));
+    assert(status.bottom<=card.bottom-9,'Stage status touches card border at '+width+'px: '+JSON.stringify(part));
+    assert(icon.top>=status.top-2&&icon.bottom<=status.bottom+2,'Stage status icon exceeds its line at '+width+'px: '+JSON.stringify(part));
+    for(const control of [number,arrow])
+     assert(control.top>=card.top+7&&control.bottom<=card.bottom-7,'Stage glyph or arrow exceeds card at '+width+'px: '+JSON.stringify(part));
+   }
+   for(const [index,card] of data.rows.entries()){
+    const next=data.rows.slice(index+1).find(row=>Math.abs(row.left-card.left)<=2&&row.top>card.top+3);
+    if(next)assert(next.top-card.bottom>=5,'Stage cards collide at '+width+'px: '+JSON.stringify({card,next}));
+   }
    assert(data.inspector.left>=-2&&data.inspector.right<=data.width+3,'Stage details leave viewport at '+width+'px');
    if([1440,900,390].includes(width)){
     await frame.locator('.teacherStageManager').screenshot({
