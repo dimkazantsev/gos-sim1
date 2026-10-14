@@ -482,3 +482,160 @@
  .gradeModalRefined .gradeModalHeading h2{font-size:21px}
  .gradesDebriefRefined .gradesDebriefHeading h2{font-size:21px}
 }
+
+
+/* Пояснения оценки: три самостоятельных критерия, исходные счётчики раскрываются по запросу. */
+.gradeModalRefined .gradeRationaleExplained .gradeRationaleHeading{padding-bottom:15px}
+.gradeModalRefined .gradeRationaleIntro{
+ margin:8px 0 0;
+ font-size:13px;
+ line-height:1.65;
+ color:#607793;
+ max-width:760px;
+}
+.gradeModalRefined .gradeExplanation{display:grid;gap:18px;margin-top:16px}
+.gradeModalRefined .gradeExplanationCriteria{display:grid;gap:12px}
+.gradeModalRefined .gradeExplanationCriterion{
+ min-width:0;
+ padding:17px 18px;
+ border:1px solid #e0e8f3;
+ border-radius:14px;
+ background:#fafcff;
+}
+.gradeModalRefined .gradeExplanationTop{
+ display:flex;
+ align-items:flex-start;
+ gap:12px;
+}
+.gradeModalRefined .gradeExplanationNumber{
+ display:grid;
+ place-items:center;
+ flex:0 0 31px;
+ width:31px;
+ height:31px;
+ border-radius:10px;
+ background:#eaf1fc;
+ color:#366395;
+ font-size:14px;
+ font-weight:800;
+ font-variant-numeric:tabular-nums;
+}
+.gradeModalRefined .gradeExplanationName{
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ flex-wrap:wrap;
+ gap:6px 14px;
+ flex:1;
+}
+.gradeModalRefined .gradeExplanationName h4{
+ margin:3px 0 0;
+ font-size:15px;
+ font-weight:800;
+ line-height:1.45;
+ color:#26496e;
+}
+.gradeModalRefined .gradeExplanationStatus{
+ flex:none;
+ display:inline-flex;
+ align-items:center;
+ padding:5px 9px;
+ border:1px solid #dbe4f0;
+ background:#f2f6fb;
+ border-radius:999px;
+ color:#627b9b;
+ font-size:11px;
+ font-weight:700;
+ line-height:1.4;
+}
+.gradeModalRefined .gradeExplanationCriterion.isMet .gradeExplanationStatus{
+ border-color:#c6e3d1;
+ background:#ecf7f0;
+ color:#356b4b;
+}
+.gradeModalRefined .gradeExplanationCriterion>p{
+ margin:10px 0 0;
+ font-size:13px;
+ line-height:1.68;
+ font-weight:400;
+ color:#4e6580;
+ overflow-wrap:anywhere;
+}
+.gradeModalRefined .gradeExplanationCriterion .gradeExplanationNext{
+ color:#45688d;
+ background:#f0f5fc;
+ border-left:2px solid #b6ccee;
+ border-radius:0 8px 8px 0;
+ padding:10px 12px;
+}
+.gradeModalRefined .gradeExplanationDetails{
+ margin-top:12px;
+ padding-top:11px;
+ border-top:1px solid #e6edf6;
+}
+.gradeModalRefined .gradeExplanationDetails summary,
+.gradeModalRefined .gradeExplanationExtra summary{
+ width:100%;
+ color:#3c689c;
+ font-size:12px;
+ line-height:1.6;
+ font-weight:750;
+ cursor:pointer;
+}
+.gradeModalRefined .gradeExplanationDetails p,
+.gradeModalRefined .gradeExplanationExtra p{
+ margin:8px 0 0;
+ color:#5a7190;
+ font-size:12px;
+ line-height:1.7;
+ overflow-wrap:anywhere;
+}
+.gradeModalRefined .gradeExplanationExtras{
+ padding:14px 17px;
+ border:1px solid #e3ebf6;
+ border-radius:14px;
+ background:#f8fafc;
+}
+.gradeModalRefined .gradeExplanationExtras h4{
+ margin:0;
+ color:#315473;
+ font-size:14px;
+ font-weight:800;
+ line-height:1.4;
+}
+.gradeModalRefined .gradeExplanationExtras>p{
+ margin:6px 0 11px;
+ color:#7287a0;
+ font-size:12px;
+ line-height:1.65;
+}
+.gradeModalRefined .gradeExplanationExtra{
+ border-top:1px solid #e3eaf4;
+ padding:10px 0;
+}
+.gradeModalRefined .gradeExplanationExtra:last-child{padding-bottom:0}
+.gradeModalRefined .gradeExplanationExtra h5{
+ margin:0 0 2px;
+ color:#315473;
+ font-size:13px;
+ line-height:1.4;
+ font-weight:800;
+}
+.gradeModalRefined .gradeExplanationExtra details{
+ margin-top:8px;
+}
+
+.gradeModalRefined .gradeExplanationExtra .gradeExplanationRaw{
+ padding:8px 10px;
+ border:1px solid #e5ebf4;
+ border-radius:9px;
+ background:#fff;
+ color:#587089;
+}
+@media(max-width:600px){
+ .gradeModalRefined .gradeExplanationCriterion{padding:14px}
+ .gradeModalRefined .gradeExplanationName{display:grid;gap:8px}
+ .gradeModalRefined .gradeExplanationName h4{font-size:14px}
+ .gradeModalRefined .gradeExplanationNumber{flex-basis:28px;width:28px;height:28px}
+ .gradeModalRefined .gradeExplanationExtras{padding:13px}
+}

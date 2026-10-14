@@ -8,7 +8,7 @@ import StyledSelect from '../ui/StyledSelect';
 import ScoreFormula from './ScoreFormula';
 import BlitzKnowledgeScore from './BlitzKnowledgeScore';
 import {ChevronDown} from 'lucide-react';
-import {assessmentRationaleParagraphs,assessmentRunLabel} from './assessmentPresentation';
+import {assessmentRationaleParagraphs,assessmentRationaleSections,assessmentRationaleDetail,assessmentRunLabel} from './assessmentPresentation';
 
 type Assessment={
  id:string;game_id:string;stage_no:number;user_id:string;auto_score:number;final_score:number|null;
@@ -270,7 +270,13 @@ function AssessmentModal(p:any){
 <BlitzKnowledgeScore gameId={g.game?.id||''} userId={selected.userId} stageNo={selected.stageNo}/>
 {canSeeEvidence&&<>
    <div className="gradeCriteria"><span className={a.criterion_law?'ok':'miss'}><b>{a.criterion_law?'✓':'○'}</b> Право и правила</span><span className={a.criterion_strategy?'ok':'miss'}><b>{a.criterion_strategy?'✓':'○'}</b> Стратегия и интересы</span><span className={a.criterion_debrief?'ok':'miss'}><b>{a.criterion_debrief?'✓':'○'}</b> Анализ этапа</span></div>
-   <section className="gradeRationale"><header className="gradeRationaleHeading"><small>ПОЯСНЕНИЕ ОЦЕНКИ</small><h3>Интерпретация действий</h3></header><div className="gradeRationaleText">{assessmentRationaleParagraphs(a.public_rationale).map((text:string,i:number)=><p key={i}>{text}</p>)}</div><footer><span>Пересчёт: {when(a.last_auto_at)}</span><span>{assessmentRunLabel(a.last_run_type)}</span><span>Версия {a.revision_count}</span></footer></section>
+   <section className="gradeRationale gradeRationaleExplained">
+    <header className="gradeRationaleHeading"><small>ПОЯСНЕНИЕ ОЦЕНКИ</small><h3>За что начисляются баллы</h3>
+     <p className="gradeRationaleIntro">За этап учитываются три направления: соблюдение законов, участие в принятии решений и анализ результатов. Правовые знания могут давать дробные баллы. Окончательную оценку утверждает преподаватель.</p>
+    </header>
+    <AssessmentExplanation assessment={a} paragraphs={assessmentRationaleParagraphs(a.public_rationale)}/>
+    <footer><span>Пересчёт: {when(a.last_auto_at)}</span><span>{assessmentRunLabel(a.last_run_type)}</span><span>Версия {a.revision_count}</span></footer>
+   </section>
    {a.teacher_note&&<section className="gradeTeacherNote"><small>КОММЕНТАРИЙ ПРЕПОДАВАТЕЛЯ</small><p>{a.teacher_note}</p></section>}
 </>}
    {teacher&&<section className="gradeApproval"><StyledSelect label="Итоговый балл" value={editScore===null?'':String(editScore)} onChange={v=>setEditScore(v===''?null:Number(v))} options={[{value:'',label:'Выберите итоговый балл'},...[0,1,2,3].map(n=>({value:String(n),label:n+' · '+level(n)}))]}/><label>Комментарий<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Почему вы подтверждаете или меняете автооценку"/></label><div>{a.status==='final'?<button onClick={()=>void reopen()} disabled={busy}>Переоткрыть оценку</button>:<><button onClick={()=>void recalc()} disabled={busy}>Пересчитать сейчас</button><button className="primary" onClick={()=>void finalize()} disabled={busy||!isFinalScore(editScore)}>Утвердить как итоговую</button></>}</div></section>}
@@ -279,6 +285,73 @@ function AssessmentModal(p:any){
   {canSeeEvidence&&<section className="gradeEvidence"><div className="gradeEvidenceHead"><div><small>ДОКАЗАТЕЛЬСТВА</small><h3>Все зафиксированные действия на этапе</h3></div></div>{loading?<div className="emptyState">Собираю данные…</div>:evidence?<Evidence evidence={evidence}/>:<div className="emptyState">Доказательства ещё не загружены.</div>}</section>}
   {!canSeeEvidence&&<div className="gradePrivacy">Подробные тексты и действия доступны только самому студенту и преподавателю.</div>}
  </article></div>;
+}
+
+type AssessmentCriterionKey='law'|'strategy'|'debrief';
+const CRITERION_EXPLANATIONS:{
+ key:AssessmentCriterionKey;title:string;meaning:string;next:string
+}[]=[
+ {key:'law',title:'Законность решений и соблюдение процедур',
+  meaning:'Учитываются правовые документы, действия в пределах полномочий, голосования по НПА и применение правовых норм. Кейсы и блиц-вопросы входят в правовую часть оценки.',
+  next:'Чтобы улучшить результат, выполняйте правомерные действия и правильно решайте назначенные кейсы и блиц-вопросы.'},
+ {key:'strategy',title:'Политическая стратегия и участие',
+  meaning:'Учитываются предложения, публикации, голосования, обоснованные решения, партийные инициативы и участие в политическом процессе.',
+  next:'Чтобы улучшить результат, предлагайте решения, учитывайте интересы участников и используйте доступные полномочия.'},
+ {key:'debrief',title:'Обоснованный анализ результатов этапа',
+  meaning:'Оценивается объяснение причин и последствий решений, интересов сторон и применённых правил. Также учитывается содержательное обсуждение.',
+  next:'Подготовьте анализ этапа: объясните причины, последствия, интересы и правовые основания. Для автоматического подтверждения разбор должен содержать не менее 80 знаков и раскрывать хотя бы три из этих четырёх тем; другой путь — два аналитических высказывания в обсуждении.'}
+];
+
+function AssessmentExplanation({assessment:a,paragraphs}:{assessment:Assessment;paragraphs:string[]}){
+ // Keep the original rationale as the only source of factual counters.
+ const raw=paragraphs.join(' ');
+ const groups=assessmentRationaleSections(raw);
+ const fulfilled:Record<AssessmentCriterionKey,boolean>={
+  law:a.criterion_law,strategy:a.criterion_strategy,debrief:a.criterion_debrief
+ };
+ const otherRows=[
+  {key:'automatic' as const,title:'Предварительный расчёт',
+   description:'Система рассчитала результат по зафиксированным действиям. Это не дополнительный критерий и не утверждённая преподавателем оценка.'},
+  {key:'events' as const,title:'Решения в событиях',
+   description:'Отдельно учитываются правомерные решения в рамках полномочий и зафиксированные нарушения.'},
+  {key:'blitz' as const,title:'Правовые знания и блиц',
+   description:'Входят в первый критерий: кейсы (до 0,30), правомерные действия (до 0,30), правильные ответы блица (до 0,30) и полнота ответов (до 0,10).'},
+  {key:'legal' as const,title:'Правовая часть',
+   description:'Это уточнение к первому критерию, а не четвёртая оценка. Подробная сумма за знания и правоприменение показана выше.'}
+ ];
+ return <div className="gradeExplanation">
+  <div className="gradeExplanationCriteria">
+   {CRITERION_EXPLANATIONS.map((item,i)=>{
+    const detail=groups[item.key];
+    return <article key={item.key} className={'gradeExplanationCriterion '+(fulfilled[item.key]?'isMet':'isPending')}>
+     <div className="gradeExplanationTop"><span className="gradeExplanationNumber">{i+1}</span>
+      <div className="gradeExplanationName"><h4>{item.title}</h4><span className="gradeExplanationStatus">{fulfilled[item.key]?'Критерий подтверждён':'Пока не подтверждён'}</span></div>
+     </div>
+     <p>{item.meaning}</p>
+     {!fulfilled[item.key]&&<p className="gradeExplanationNext">{item.next}</p>}
+     {!!detail.length&&<details className="gradeExplanationDetails"><summary>Что зафиксировано системой</summary>
+      {detail.map((part,j)=><p key={j}>{assessmentRationaleDetail(part)}</p>)}
+     </details>}
+    </article>
+   })}
+  </div>
+  <div className="gradeExplanationExtras">
+   <h4>Дополнительные сведения о расчёте</h4>
+   <p>Они помогают понять результат, но не добавляют новых критериев к трём перечисленным.</p>
+   {otherRows.filter(item=>groups[item.key].length>0).map(item=>
+    <div key={item.key} className="gradeExplanationExtra">
+     <h5>{item.title}</h5><p>{item.description}</p>
+     <details><summary>Показать показатели системы</summary>
+      {groups[item.key].map((part,j)=><p className="gradeExplanationRaw" key={j}>{assessmentRationaleDetail(part)}</p>)}
+     </details>
+    </div>
+   )}
+   {groups.other.length>0&&<details className="gradeExplanationExtra">
+    <summary>Другие сведения, сохранённые системой</summary>
+    {groups.other.map((part,j)=><p className="gradeExplanationRaw" key={j}>{part}</p>)}
+   </details>}
+  </div>
+ </div>;
 }
 
 function Evidence({evidence}:{evidence:Evidence}){

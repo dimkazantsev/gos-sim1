@@ -3,6 +3,15 @@ const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const root=path.resolve(__dirname,'..');
 const source=fs.readFileSync(process.argv[2]||path.join(root,'components/game/GradesView.tsx'),'utf8');
 const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}}).outputText;
+const Module=require('node:module');
+const presentationPath=path.join(root,'components/game/assessmentPresentation.ts');
+const presentationModule=new Module(presentationPath,module);
+presentationModule.filename=presentationPath;
+presentationModule.paths=module.paths;
+presentationModule._compile(ts.transpileModule(fs.readFileSync(presentationPath,'utf8'),{
+ compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
+}).outputText,presentationPath);
+const presentation=presentationModule.exports;
 function harness(score){
  const slots=[],effects=[],channels=[],calls=[],errors=[];let cursor=0,tree,nextScore=score;
  const teacher={user_id:'qa-teacher',kind:'teacher',full_name:'QA teacher'},student={user_id:'qa-student',kind:'student',full_name:'QA student'};
@@ -17,7 +26,7 @@ function harness(score){
   if(request==='../ui/useDialog')return{useDialog:()=>({current:null})};
   if(request==='../ui/IconAction')return{IconAction:({label,onClick})=>React.createElement('button',{'aria-label':label,onClick})};
   if(request==='./ScoreFormula')return{__esModule:true,default:()=>null};if(request==='./BlitzKnowledgeScore')return{__esModule:true,default:()=>null};if(request==='lucide-react')return{ChevronDown:()=>null};
-  if(request==='./assessmentPresentation')return{assessmentRunLabel:kind=>kind==='hourly'?'Ежечасно':'Автоматически',assessmentRationaleParagraphs:text=>[text]};
+  if(request==='./assessmentPresentation')return presentation;
   throw Error('Unexpected grade fixture import '+request);
  }
  const module={exports:{}};vm.runInNewContext('(function(require,module,exports){'+code+'\nmodule.exports.fixtureModal=AssessmentModal;})',{console,Date,Promise,Map,Set,Object,Number,Math})(requireFor,module,module.exports);
