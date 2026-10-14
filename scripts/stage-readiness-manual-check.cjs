@@ -34,6 +34,15 @@ const lifecycleSql=read('supabase/migrations/20261014045000_stage_parallel_lifec
 const roundUpdates=lifecycleSql.match(/current_round=greatest\(current_round,coalesce\(v_next,current_round\)\)/g)||[];
 assert.equal(roundUpdates.length,2,'Manual and automatic stage closure must not rewind the current stage');
 assert(lifecycleSql.includes("pg_advisory_xact_lock(hashtextextended('stage-control:'||g,0))"),'Automatic stage expiry must use the same game-scoped lock as teacher controls');
+const partySql=read('supabase/migrations/20261014044000_party_stage_one_democracy.sql');
+const guardSql=read('supabase/migrations/20261014045500_enforce_closed_stage_submissions.sql');
+assert(partySql.includes('drop policy if exists guests_cannot_delete on public.party_documents;'),
+ 'Obsolete guest document delete policy must not override owner-only access');
+assert(guardSql.includes('before insert or delete on public.party_documents'),
+ 'Stage 1 completion must block deleting a party document as well as uploading it');
+assert(guardSql.includes("v_game uuid:=case when tg_op='DELETE' then old.game_id else new.game_id end;"),
+ 'Stage guard must use OLD on DELETE without accessing NEW');
+
 
 assert(css.includes('.stageReadinessWorkspace .stageReadinessGroup li p{font-size:14px'), 'Blockers must be readable');
 assert(css.includes('.stageReadinessWorkspace .stageReadinessGroup header small{font-size:12px'), 'Small explanatory labels must be readable');
