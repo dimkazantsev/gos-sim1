@@ -53,7 +53,12 @@ export function assessmentRationaleSections(rationale:string|null|undefined):Rec
  return grouped;
 }
 
-/** Drop only the machine-generated heading; preserve evidence text as written by server. */
+/** Capitalize the first visible word without changing saved server evidence. */
+export function assessmentDisplaySentence(text:string):string{
+ return text.trim().replace(/^\p{L}/u,letter=>letter.toLocaleUpperCase('ru-RU'));
+}
+
+/** Drop the machine heading, then capitalize only the displayed sentence. */
 export function assessmentRationaleDetail(text:string):string{
- return text.replace(/^(?:Критерий\s+[123]\s*[·:—-][^:]*|Автооценка|События|Правовой критерий|Блиц и правовые знания)\s*:\s*/u,'').trim();
+ return assessmentDisplaySentence(text.replace(/^(?:Критерий\s+[123]\s*[·:—-][^:]*|Автооценка|События|Правовой критерий|Блиц и правовые знания)\s*:\s*/u,''));
 }
