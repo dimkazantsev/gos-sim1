@@ -10,7 +10,7 @@ const events=file('components/game/EventChoicePanel.tsx');
 const workspace=file('components/game/EventWorkspace.tsx');
 const staffing=file('components/game/InstitutionStaffingLab.tsx');
 const migration=file('supabase/migrations/20261014120000_ksrf_electorate_registration_cumulative_deputies.sql');
-assert(profile.includes('showCatalog={!!previewAchievementsUserId}'),'Real students see earned-only shelf');
+assert(profile.includes('showCatalog={own||teacher||!!previewAchievementsUserId}'),'Own and teacher profile can open catalog, visitor profiles stay earned-only');
 assert(profile.includes('previewOnly={!!previewAchievementsUserId} defaultCollapsed/>'),'Prior collapsed default preserved');
 assert(profile.includes('!previewAchievementsUserId&&<BlitzArchive'),'No bogus demo-user RPC');
 assert(blitz.includes('useEffect(()=>{setRows([])'),'Standalone Blitz archive must load on profile entry');
@@ -32,6 +32,8 @@ assert(events.includes("i===correctIndex?'correct':selected?'incorrect'"),'Green
 assert(workspace.includes('correctIndex={outcome&&'),'Never reveal best answer before final outcome');
 assert(staffing.includes('Договоритесь об этом в общем чате'),'Parliamentary committee instructions in place');
 assert(awards.includes("const earned=visibleItems.filter(x=>x.earned_at)"));
+assert(awards.includes("const shown=filter==='earned'?earned:visibleItems.filter(x=>!x.hidden||!!x.earned_at)"),'Earned shelf remains default, hidden unearned conditions are not disclosed');
+assert(awards.includes('className="awardShelfCatalogButton"')&&awards.includes("setFilter('open');setExpanded(true)"),'The all-awards button must open the full visible catalog');
 const committee=file('components/game/CommitteeChairElectionPanel.tsx');
 const committeeSql=file('supabase/migrations/20261014121000_committee_chair_before_staffing.sql');
 assert(committee.includes("personalMandates.filter(a=>a.base_mandates>0)"),'Candidates must be deputies before committee assignment');

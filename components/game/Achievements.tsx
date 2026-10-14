@@ -27,13 +27,13 @@ function boundedProgress(value:number){
 
 export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,defaultCollapsed=false}:{gameId:string;userId:string;showCatalog?:boolean;previewOnly?:boolean;defaultCollapsed?:boolean}){
  const [items,setItems]=useState<Achievement[]>([]);
- const [filter,setFilter]=useState<'earned'|'open'>(showCatalog?'open':'earned');
+ const [filter,setFilter]=useState<'earned'|'open'>('earned');
  const [error,setError]=useState('');
  const [expanded,setExpanded]=useState(!defaultCollapsed);
  const contentId=useId();
  const [counts,setCounts]=useState({total:100,open:60,hidden:40});
 
- useEffect(()=>{if(!showCatalog)setFilter('earned')},[showCatalog]);
+ useEffect(()=>setFilter('earned'),[gameId,userId,previewOnly,showCatalog]);
  useEffect(()=>setExpanded(!defaultCollapsed),[gameId,userId,defaultCollapsed]);
  useEffect(()=>{
   let live=true;
@@ -58,8 +58,9 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
  const visibleItems=previewOnly?publicAchievementPreview(items):items;
  const earned=visibleItems.filter(x=>x.earned_at);
  const hiddenEarned=earned.filter(x=>x.hidden);
- const shown=filter==='earned'?earned:visibleItems.filter(x=>!x.hidden);
+ const shown=filter==='earned'?earned:visibleItems.filter(x=>!x.hidden||!!x.earned_at);
  const collectionProgress=counts.total?Math.round(earned.length/counts.total*100):0;
+ const catalogCount=counts.open+hiddenEarned.length;
 
  return <section className="awardShelf steamAwards surface">
   <header className="awardShelfHeader">
@@ -67,7 +68,10 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
     <small>ДОСТИЖЕНИЯ ГОС.ID</small>
     <h2><Trophy size={24}/> Награды</h2>
     <p>Полученные достижения и доступные условия. Награды не изменяют ВСН.</p>
-    {defaultCollapsed&&<button type="button" className="awardShelfToggle" aria-expanded={expanded} aria-controls={contentId} onClick={()=>setExpanded(open=>!open)}>{expanded?'Свернуть награды':'Показать награды'}<ChevronDown size={16} className={expanded?'is-expanded':''} aria-hidden="true"/></button>}
+    {defaultCollapsed&&<div className="awardShelfActions">
+     <button type="button" className="awardShelfToggle" aria-expanded={expanded} aria-controls={contentId} onClick={()=>{if(!expanded)setFilter('earned');setExpanded(open=>!open)}}>{expanded?'Свернуть награды':'Показать награды'}<ChevronDown size={16} className={expanded?'is-expanded':''} aria-hidden="true"/></button>
+     {showCatalog&&!expanded&&<button type="button" className="awardShelfCatalogButton" aria-expanded={expanded} aria-controls={contentId} onClick={()=>{setFilter('open');setExpanded(true)}}>Все награды <Award size={16} aria-hidden="true"/></button>}
+    </div>}
     {previewOnly&&<p role="status">Демонстрационный профиль: показаны условия открытых наград. Начисления и прогресс появятся у реальных участников.</p>}
    </div>
    <div className="awardCollectionSummary">
@@ -76,8 +80,8 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
    </div>
    {showCatalog&&expanded?<nav className="awardShelfTabs" aria-label="Показать награды">
     <button type="button" aria-pressed={filter==='earned'} onClick={()=>setFilter('earned')}>Полученные <b>{earned.length}</b></button>
-    <button type="button" aria-pressed={filter==='open'} onClick={()=>setFilter('open')}>Все доступные <b>{counts.open}</b></button>
-   </nav>:!showCatalog?<span className="awardEarnedCount">{earned.length} получено</span>:null}
+    <button type="button" aria-pressed={filter==='open'} onClick={()=>setFilter('open')}>Все награды <b>{catalogCount}</b></button>
+   </nav>:!expanded?<span className="awardEarnedCount">{earned.length} получено</span>:null}
   </header>
 
   {error&&<p className="awardError" role="alert">{error}</p>}
