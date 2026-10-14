@@ -47,6 +47,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
  const [gradeSort,setGradeSort]=useState<'surname'|'name'|'sum'|'average'|'final'|'graded'>('surname');
  const [gradeAsc,setGradeAsc]=useState(true);
  const [gradeOnlyPending,setGradeOnlyPending]=useState(false);
+ const [gradesScrolled,setGradesScrolled]=useState(false);
  const students=members.filter(m=>m.kind==='student');
  const gradeByStudent=useMemo(()=>{
   const map=new Map<string,{sum:number;average:number|null;final:number;graded:number}>();
@@ -228,10 +229,11 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
     <button type="button" className="gradesSortDir" onClick={()=>setGradeAsc(!gradeAsc)} aria-label={gradeAsc?'Сортировать по убыванию':'Сортировать по возрастанию'}>{gradeAsc?'↑':'↓'}</button>
     <label className="gradesPending"><input type="checkbox" checked={gradeOnlyPending} onChange={e=>setGradeOnlyPending(e.target.checked)}/> Есть неутверждённые</label>
    </div>
-   <div className="gradesMatrix" role="table" aria-label="Матрица оценок по этапам">
+   <div className={gradesScrolled?'gradesMatrix gradesMatrixScrolled':'gradesMatrix'} role="table" aria-label="Матрица оценок по этапам"
+    onScroll={event=>{const scrollLeft=event.currentTarget.scrollLeft;setGradesScrolled(previous=>scrollLeft>24?true:scrollLeft<8?false:previous);}}>
     <div className="gradesMatrixHead" role="row"><b>Студент</b><span className="gradeTotalHead">Σ</span><span className="gradeTotalHead">Ср.</span>{STAGES.map(n=><span key={n} title={stages.find(s=>s.stage_no===n)?.title||''}>{n}</span>)}</div>
     {sortedStudents.length===0?<div className="emptyState">Нет студентов по выбранным фильтрам.</div>:sortedStudents.map(s=><div className="gradesMatrixRow" role="row" key={s.user_id}>
-     <div>{onOpenProfile?<button type="button" className="gradesProfileLink" onClick={()=>onOpenProfile(s.user_id)}>{s.full_name}</button>:<b>{s.full_name}</b>}<small>{s.team||'Без партии'} · {s.role_title||'Роль не назначена'}</small></div>
+     <div className="gradesStudentCell">{onOpenProfile?<button type="button" className="gradesProfileLink" onClick={()=>onOpenProfile(s.user_id)} aria-label={s.full_name} title={s.full_name}><span className="gradesNameFull">{s.full_name}</span><span className="gradesNameShort" aria-hidden="true">{s.full_name.trim().split(/\s+/)[0]||s.full_name}</span></button>:<b className="gradesStudentName" title={s.full_name}><span className="gradesNameFull">{s.full_name}</span><span className="gradesNameShort" aria-hidden="true">{s.full_name.trim().split(/\s+/)[0]||s.full_name}</span></b>}<small>{s.team||'Без партии'} · {s.role_title||'Роль не назначена'}</small></div>
      <span className="gradeTotal">{gradeByStudent.get(s.user_id)?.graded?gradeByStudent.get(s.user_id)?.sum:'—'}</span>
      <span className="gradeTotal">{gradeByStudent.get(s.user_id)?.average?.toFixed(2)??'—'}</span>
      {STAGES.map(n=>{const a=rows.find(x=>x.user_id===s.user_id&&x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(s.user_id,n)} aria-label={s.full_name+', этап '+n+', '+(v??'нет оценки')}><b>{v??'—'}</b><small>{a?.status==='final'?'итог':a?'авто':''}</small></button>})}

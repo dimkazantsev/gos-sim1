@@ -180,3 +180,49 @@
  .gradeModal .gradeRunHistory .gradeRunCriteria{grid-column:1}
  .gradeModal .gradeRunHistory .gradeRunTrigger{width:auto;max-width:100%;min-width:0}
 }
+
+/* Mobile/tablet grade matrix: surname-only pinned column while scrolling.
+   Shared head/row grid tracks change together, so totals remain aligned. */
+.gradesPage .gradesMatrixRow .gradesNameShort{display:none}
+@media(max-width:1100px){
+ .gradesPage .gradesMatrixHead,.gradesPage .gradesMatrixRow{
+  grid-template-columns:minmax(0,204px) 74px 80px repeat(16,56px);
+ }
+ .gradesPage .gradesMatrix.gradesMatrixScrolled .gradesMatrixHead,
+ .gradesPage .gradesMatrix.gradesMatrixScrolled .gradesMatrixRow{
+  grid-template-columns:minmax(0,124px) 74px 80px repeat(16,56px);
+ }
+ .gradesPage .gradesMatrixHead>b:first-child,
+ .gradesPage .gradesMatrixRow>.gradesStudentCell{
+  min-width:0;
+  overflow:hidden;
+  isolation:isolate;
+  border-right:1px solid #e2eaf4;
+  box-shadow:4px 0 8px -8px rgba(22,49,89,.30);
+ }
+ .gradesPage .gradesMatrixRow>.gradesStudentCell .gradesProfileLink,
+ .gradesPage .gradesMatrixRow>.gradesStudentCell .gradesStudentName{
+  display:block;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  text-align:left;
+ }
+ .gradesPage .gradesMatrixRow>.gradesStudentCell>small{
+  max-width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+ }
+ .gradesPage .gradesMatrix.gradesMatrixScrolled .gradesMatrixRow .gradesNameFull{display:none}
+ .gradesPage .gradesMatrix.gradesMatrixScrolled .gradesMatrixRow .gradesNameShort{
+  display:block;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+ }
+ .gradesPage .gradesMatrix.gradesMatrixScrolled .gradesMatrixRow>.gradesStudentCell>small{display:none}
+}
