@@ -137,6 +137,8 @@ drop policy if exists guests_cannot_update on public.game_parties;
 -- Party members may upload files; only Minjust/teacher may approve/revise.
 drop policy if exists guests_cannot_insert on public.party_documents;
 drop policy if exists guests_cannot_update on public.party_documents;
+-- An old permissive DELETE policy let any non-observer delete another party's file.
+drop policy if exists guests_cannot_delete on public.party_documents;
 drop policy if exists party_documents_update on public.party_documents;
 create policy party_documents_update on public.party_documents
  for update to authenticated using (private.is_game_teacher(game_id))
