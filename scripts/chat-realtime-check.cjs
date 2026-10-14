@@ -34,4 +34,5 @@ assert(source.includes('void loadRecentChatMessages(channelRef.current)'),'Recov
 assert(source.includes('},6000);'),'Recovery should not wait for 30s periodic snapshot');
 assert(source.includes("else dirtyChat=true"),'Handle updated message rows');
 assert(source.includes('messageRowsRef.current.some(old=>old.id===m.id)'),'Avoid duplicate media signing');
+assert(source.includes('void Promise.allSettled([loadMessages(targetChannel),loadChatOverview()])'),'Text sends must not wait for history readback');
 console.log('PASS 30 chat clients, ordered deduplicated messages, signed media, realtime INSERT and six-second incremental recovery');
