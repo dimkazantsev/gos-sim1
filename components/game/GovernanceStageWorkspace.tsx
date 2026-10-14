@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect,useState,type CSSProperties} from 'react';
-import {ArrowLeft,BookOpenText,CalendarClock,CheckCircle2,ChevronLeft,ChevronRight,ClipboardCheck,FileText,Landmark,Link2,MessageCircle,RadioTower,Route,Settings2,Vote} from 'lucide-react';
+import {ArrowLeft,BookOpenText,CalendarClock,CheckCircle2,ChevronLeft,ChevronRight,ClipboardCheck,FileText,Landmark,Link2,MessageCircle,Route,Settings2,Vote} from 'lucide-react';
 import type {Stage,View} from './types';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {formatDeadline} from './constants';
@@ -11,6 +11,8 @@ import {gamePhaseForStage} from './stageSystem';
 import StageArtifacts from './StageArtifacts';
 import StageReadinessPanel from './StageReadinessPanel';
 import StagePolicyEditor from './StagePolicyEditor';
+import {supabase} from '@/lib/supabase';
+import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import GovernmentFormationWorkspace from './GovernmentFormationWorkspace';
 import InstitutionStaffingLab from './InstitutionStaffingLab';
 import StateProgramLab from './StateProgramLab';
@@ -36,6 +38,25 @@ const BODIES:Partial<Record<number,string[]>>={2:['ksrf'],3:['ksrf'],4:['gd'],5:
 
 export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,onOpenStage,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate}:Props){
  const [tab,setTab]=useState<Tab>('work');
+ const [liveRule,setLiveRule]=useState<{deadline_at:string|null;inclusive:boolean;penalty_points:number;penalty_description:string;consequence_type:string;consequence_magnitude:number|null}|null>(null);
+ useEffect(()=>{
+  if(!g.game)return;
+  const gameId=g.game.id;let active=true;
+  async function load(){
+   const {data,error}=await supabase.from('stage_deadline_rules')
+    .select('deadline_at,inclusive,penalty_points,penalty_description,consequence_type,consequence_magnitude')
+    .eq('game_id',gameId).eq('stage_no',stage.stage_no).maybeSingle();
+   if(active&&!error)setLiveRule(data||null);
+  }
+  const update=(e:Event)=>{
+   const detail=(e as CustomEvent<{gameId?:string;stageNo?:number}>).detail;
+   if(detail?.gameId===gameId&&(detail.stageNo===undefined||detail.stageNo===stage.stage_no))void load();
+  };
+  void load();
+  window.addEventListener(GAME_DATA_REFRESH_EVENT,update);
+  window.addEventListener('gos-stage-policy-updated',update);
+  return()=>{active=false;window.removeEventListener(GAME_DATA_REFRESH_EVENT,update);window.removeEventListener('gos-stage-policy-updated',update)};
+ },[g.game?.id,stage.stage_no,stage.deadline]);
  const operation=STAGE_OPERATIONS[stage.stage_no],detail=STAGE_DETAILS[stage.stage_no],phase=gamePhaseForStage(stage.stage_no);
  const docs=g.formalDocuments.filter(d=>d.stage_no===stage.stage_no);
  const votes=g.votes.filter(v=>v.stage_no===stage.stage_no);
@@ -60,7 +81,6 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
    <div className="stageOperationsTitle"><span className="stageOperationsNumber">{String(stage.stage_no).padStart(2,'0')}</span><div><h1>{operation.title}</h1><p>{operation.action}</p></div></div>
    <div className="stageOperationsMeta">
     <span><CalendarClock size={17}/>{stage.deadline?'До '+formatDeadline(stage.deadline):'Срок не установлен'}</span>
-    <span className={'stageOperationsConnection is-'+g.realtimeState}><RadioTower size={17}/>{g.realtimeState==='connected'?'Обновления подключены':g.realtimeState==='connecting'?'Подключение обновлений':'Связь потеряна'}</span>
     {publicChannel&&<button type="button" onClick={chat}><MessageCircle size={17}/>Обсудить</button>}
    </div>
   </header>
@@ -98,6 +118,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
 
   <section id={sectionId+'-rules'} className="stageOperationsPane" hidden={tab!=='rules'} aria-label="Маршрут и правила">
    <div className="stageOperationsRuleIntro"><h2>Порядок работы</h2><p>{detail.goal}</p><p><b>Участники: </b>{operation.participants}</p></div>
+   <section className="stageOperationsRuleIntro" aria-label="Действующие правила этапа"><h3>Установленные преподавателем сроки и последствия</h3><p><b>Статус:</b> {stage.status==='open'?'Этап открыт':stage.status==='completed'?'Этап завершён':'Этап ещё не открыт'}</p><p><b>Срок:</b> {stage.deadline?formatDeadline(stage.deadline):'Преподаватель не установил'}</p>{liveRule&&<><p><b>Правило:</b> {liveRule.inclusive?'До указанного времени включительно':'Строго до указанного времени'}</p><p><b>Штраф:</b> {liveRule.penalty_points||0} баллов. {liveRule.penalty_description}</p>{liveRule.consequence_type!=='none'&&<p><b>Последствие:</b> {liveRule.consequence_type} — {liveRule.consequence_magnitude}</p>}</>}</section>
    <ol className="stageOperationsRoute">{detail.steps.map((step,i)=><li key={step}><span>{i+1}</span><p>{step}</p></li>)}</ol>
    <div className="stageOperationsRuleColumns"><section><h3>Процедура</h3><ul>{detail.procedure.map(text=><li key={text}>{text}</li>)}</ul></section><section><h3>Контрольные результаты</h3><ul className="stageOperationsOutputs">{detail.outputs.map(text=><li key={text}><CheckCircle2 size={17}/><span>{text}</span></li>)}</ul></section></div>
    <section className="stageOperationsLegal"><ScaleLabel/><p>{operation.legalNote}</p>{detail.notes.map(note=><p key={note}>{note}</p>)}</section>
@@ -121,4 +142,4 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
  </div>;
 }
 
-function ScaleLabel(){return <h3><Landmark size={18}/>Правовые основания и учебная модель</h3>}
+function ScaleLabel(){return <h3><Landmark size={18}/>Правовые основания и порядок проведения</h3>}
