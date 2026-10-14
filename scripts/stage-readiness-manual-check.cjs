@@ -30,6 +30,11 @@ assert(transition.includes("typeof data.ready!=='boolean'"),'Invalid or failed v
 assert(transition.includes("window.confirm("),'Teacher must explicitly confirm the checked closure');
 assert(!game.includes("supabase.rpc('set_game_stage'"),'Old stage switching RPC would complete unrelated stages');
 assert(!teacher.includes("if(window.confirm('Перейти к следующему этапу?"),'Double confirmation must be removed');
+const lifecycleSql=read('supabase/migrations/20261014045000_stage_parallel_lifecycle.sql');
+const roundUpdates=lifecycleSql.match(/current_round=greatest\(current_round,coalesce\(v_next,current_round\)\)/g)||[];
+assert.equal(roundUpdates.length,2,'Manual and automatic stage closure must not rewind the current stage');
+assert(lifecycleSql.includes("pg_advisory_xact_lock(hashtextextended('stage-control:'||g,0))"),'Automatic stage expiry must use the same game-scoped lock as teacher controls');
+
 assert(css.includes('.stageReadinessWorkspace .stageReadinessGroup li p{font-size:14px'), 'Blockers must be readable');
 assert(css.includes('.stageReadinessWorkspace .stageReadinessGroup header small{font-size:12px'), 'Small explanatory labels must be readable');
 console.log('PASS manual stage readiness, neutral unverified state, confirmed stage transition and larger text');
