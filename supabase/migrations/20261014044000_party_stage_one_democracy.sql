@@ -18,7 +18,8 @@ create policy party_chair_ballots_member_read on public.party_chair_ballots
   private.is_game_teacher(game_id) or
   exists(select 1 from public.game_members m join public.game_parties p on p.game_id=m.game_id
    where p.id=party_id and m.game_id=party_chair_ballots.game_id
-     and m.user_id=(select auth.uid()) and m.kind='student' and m.team=p.name)
+     and m.user_id=(select auth.uid()) and m.kind='student' and m.team=p.name
+     and m.roster_archived_at is null)
  );
 
 create or replace function public.found_game_party(p_game uuid,p_name text,p_ideology text)
@@ -28,7 +29,7 @@ declare v_uid uuid:=auth.uid();v_m public.game_members%rowtype;v_name text:=btri
 begin
  if v_uid is null then raise exception 'Sign in required' using errcode='42501';end if;
  select * into v_m from public.game_members where game_id=p_game and user_id=v_uid for update;
- if not found or v_m.kind not in ('student','teacher') then raise exception 'Forbidden' using errcode='42501';end if;
+ if not found or v_m.kind not in ('student','teacher') or v_m.roster_archived_at is not null then raise exception 'Forbidden' using errcode='42501';end if;
  v_teacher:=v_m.kind='teacher' and private.is_game_teacher(p_game);
  if private.has_open_duma_mandate_vote(p_game) then raise exception 'Party founding is frozen during a Duma mandate vote' using errcode='42501';end if;
  if not v_teacher and (
@@ -66,14 +67,14 @@ begin
  select * into p from public.game_parties where id=p_party_id;
  if not found then raise exception 'Party not found';end if;
  select * into actor from public.game_members where game_id=p.game_id and user_id=v_uid;
- if not (private.is_game_teacher(p.game_id) or (actor.kind='student' and actor.team=p.name))
+ if actor.roster_archived_at is not null or not (private.is_game_teacher(p.game_id) or (actor.kind='student' and actor.team=p.name))
  then raise exception 'Party member access required' using errcode='42501';end if;
  if not private.is_game_teacher(p.game_id) and
   not exists(select 1 from public.game_stages s where s.game_id=p.game_id and s.stage_no=1 and s.status='open'
    and (s.deadline is null or s.deadline>clock_timestamp()))
  then raise exception 'Stage 1 has ended' using errcode='42501'; end if;
  select * into gm from public.game_members where game_id=p.game_id and user_id=p_user_id;
- if gm.user_id is null or gm.kind<>'student' then raise exception 'Student not found';end if;
+ if gm.user_id is null or gm.kind<>'student' or gm.roster_archived_at is not null then raise exception 'Student not found';end if;
  if gm.team is not null then raise exception 'Student already belongs to a party';end if;
  insert into public.party_invitations(game_id,party_id,invited_user_id,invited_by)
  values(p.game_id,p.id,p_user_id,v_uid) on conflict do nothing returning id into v_id;
@@ -99,18 +100,33 @@ begin
   raise exception 'Chair election stage has ended' using errcode='42501';end if;
  if p.leader_user_id is not null then raise exception 'Chair election already completed' using errcode='23505';end if;
  if private.has_open_duma_mandate_vote(p.game_id) then raise exception 'Chair election is frozen during a Duma mandate vote' using errcode='42501';end if;
- if not exists(select 1 from public.game_members where game_id=p.game_id and user_id=v_uid and kind='student' and team=p.name)
- or not exists(select 1 from public.game_members where game_id=p.game_id and user_id=p_candidate_id and kind='student' and team=p.name)
+ if not exists(select 1 from public.game_members where game_id=p.game_id and user_id=v_uid and kind='student' and team=p.name and roster_archived_at is null)
+ or not exists(select 1 from public.game_members where game_id=p.game_id and user_id=p_candidate_id and kind='student' and team=p.name and roster_archived_at is null)
  then raise exception 'Both voter and candidate must be party members' using errcode='42501';end if;
  insert into public.party_chair_ballots(game_id,party_id,voter_id,candidate_id)
  values(p.game_id,p.id,v_uid,p_candidate_id)
  on conflict(party_id,voter_id) do update set candidate_id=excluded.candidate_id,voted_at=clock_timestamp();
- select count(*) into v_members from public.game_members where game_id=p.game_id and kind='student' and team=p.name;
- select count(*) into v_votes from public.party_chair_ballots where party_id=p.id;
+ select count(*) into v_members from public.game_members where game_id=p.game_id and kind='student' and team=p.name and roster_archived_at is null;
+ select count(*) into v_votes from public.party_chair_ballots b
+  join public.game_members voter on voter.game_id=p.game_id and voter.user_id=b.voter_id
+   and voter.kind='student' and voter.team=p.name and voter.roster_archived_at is null
+  join public.game_members candidate on candidate.game_id=p.game_id and candidate.user_id=b.candidate_id
+   and candidate.kind='student' and candidate.team=p.name and candidate.roster_archived_at is null
+  where b.party_id=p.id;
  if v_votes>=v_members then
-  select max(n) into v_max from (select count(*) n from public.party_chair_ballots where party_id=p.id group by candidate_id) c;
+  select max(n) into v_max from (select b.candidate_id,count(*) n from public.party_chair_ballots b
+    join public.game_members voter on voter.game_id=p.game_id and voter.user_id=b.voter_id
+     and voter.kind='student' and voter.team=p.name and voter.roster_archived_at is null
+    join public.game_members candidate on candidate.game_id=p.game_id and candidate.user_id=b.candidate_id
+     and candidate.kind='student' and candidate.team=p.name and candidate.roster_archived_at is null
+    where b.party_id=p.id group by b.candidate_id) c;
   select count(*),(array_agg(candidate_id order by candidate_id))[1] into v_tied,v_winner
-   from (select candidate_id,count(*) n from public.party_chair_ballots where party_id=p.id group by candidate_id) c
+   from (select b.candidate_id,count(*) n from public.party_chair_ballots b
+    join public.game_members voter on voter.game_id=p.game_id and voter.user_id=b.voter_id
+     and voter.kind='student' and voter.team=p.name and voter.roster_archived_at is null
+    join public.game_members candidate on candidate.game_id=p.game_id and candidate.user_id=b.candidate_id
+     and candidate.kind='student' and candidate.team=p.name and candidate.roster_archived_at is null
+    where b.party_id=p.id group by b.candidate_id) c
    where c.n=v_max;
   if v_tied=1 then
    update public.game_parties set leader_user_id=v_winner where id=p.id;
