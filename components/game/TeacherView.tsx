@@ -94,15 +94,15 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    <div className="teacherCommandStage">
     <span className="teacherEyebrow">ПУЛЬТ ПРЕПОДАВАТЕЛЯ</span>
     <div className="teacherCommandStageLine">
-     <span className="teacherCommandStageNo">{String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</span>
+     <span className="teacherCommandStageNo">{String(clockStage?.stage_no||currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</span>
      <div>
       <small>ТЕКУЩИЙ ЭТАП</small>
-      <h1>{currentStage?.title||'Подготовка игры'}</h1>
+      <h1>{clockStage?.title||currentStage?.title||'Подготовка игры'}</h1>
      </div>
     </div>
    </div>
    <div className="teacherCommandClock">
-    <span className={game.turn_open?'teacherTurnBadge isOpen':'teacherTurnBadge isPaused'}>{game.turn_open?'ХОД ОТКРЫТ':currentStage?.status==='completed'?'ЭТАП ЗАВЕРШЁН':'ЭТАП НЕ ОТКРЫТ'}</span>
+    <span className={clockStage?'teacherTurnBadge isOpen':'teacherTurnBadge isPaused'}>{clockStage?'ХОД ОТКРЫТ':currentStage?.status==='completed'?'ЭТАП ЗАВЕРШЁН':'ЭТАП НЕ ОТКРЫТ'}</span>
     <button type="button" className="teacherClockSwitch" disabled={activeStageClocks.length<2} onClick={()=>setClockIndex(v=>(v+1)%activeStageClocks.length)} aria-label="Переключить таймеры открытых этапов" title={activeStageClocks.length>1?'Нажмите, чтобы увидеть срок следующего открытого этапа':'Таймер активного этапа'}>
       <strong>{clockStage?'Этап '+clockStage.stage_no+' · '+(clockStage.deadline?timerText(clockSeconds):'без срока'):'—'}</strong>
       {activeStageClocks.length>1&&<small>{clockIndex%activeStageClocks.length+1} / {activeStageClocks.length} · нажмите для следующего</small>}
@@ -112,9 +112,9 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     {onStartTutorial&&<button type="button" className="teacherQuick teacherTourButton" onClick={onStartTutorial} aria-label="Пройти интерактивное обучение" title="Просмотреть все подсказки без изменения игровых данных">
      <span><Compass size={18} strokeWidth={2} aria-hidden="true"/></span><b>Пройти обучение</b>
     </button>}
-    <button type="button" className={game.turn_open?'teacherQuick danger':'teacherQuick primary'} onClick={()=>{const target=currentStage?.stage_no||game.current_round;const action=game.turn_open?'close':'open';if(action==='close'||window.confirm('Открыть этап '+target+'?'))void g.manageStage(target,action,30)}}>
-     <span>{game.turn_open?<Pause size={18} strokeWidth={2} aria-hidden="true"/>:<Play size={18} strokeWidth={2} aria-hidden="true"/>}</span>
-     <b>{game.turn_open?'Завершить этап':'Открыть этап'}</b>
+    <button type="button" className={clockStage?'teacherQuick danger':'teacherQuick primary'} onClick={()=>{const target=clockStage?.stage_no||stages.find(s=>s.status==='locked')?.stage_no||currentStage?.stage_no||game.current_round;const action=clockStage?'close':'open';if(action==='close'||window.confirm('Открыть этап '+target+'?'))void g.manageStage(target,action,30)}}>
+     <span>{clockStage?<Pause size={18} strokeWidth={2} aria-hidden="true"/>:<Play size={18} strokeWidth={2} aria-hidden="true"/>}</span>
+     <b>{clockStage?'Завершить этап':'Открыть этап'}</b>
     </button>
     <button type="button" className="teacherQuick" onClick={onOpenProcesses}>
      <span><Radio size={18} strokeWidth={2} aria-hidden="true"/></span><b>Политический процесс</b>
