@@ -12,7 +12,10 @@ declare
  pending jsonb;
  answered jsonb;
 begin
- select user_id into uid from public.game_members where game_id=gid and kind='student' limit 1;
+ select m.user_id into uid from public.game_members m where m.game_id=gid and m.kind='student'
+  and not exists(select 1 from public.blitz_assignments a where a.game_id=gid and a.user_id=m.user_id
+   and a.answered_at is null and a.started_at is not null and a.started_at+interval '20 seconds'>clock_timestamp())
+ limit 1;
  if uid is null then raise exception 'No synthetic student'; end if;
  insert into public.blitz_assignments(id,game_id,user_id,question_id,stage_no,available_at)
  values(aid,gid,uid,1,1,clock_timestamp()-interval '1 minute');
