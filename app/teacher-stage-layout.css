@@ -28,11 +28,16 @@
  display:grid;align-content:start;gap:14px;min-width:0;
 }
 .teacherCommand .teacherStageSidebar .teacherStageList {
- max-height:min(42dvh,380px);
+ max-height:min(75dvh,820px);
  overflow:auto;overscroll-behavior:contain;
  padding:2px 4px 3px 0;
 }
+/* Keep the scrollable 16-stage catalogue tall enough to show multiple stages.
+   The deadline naturally follows it without a spacer or absolute positioning. */
 .teacherCommand .teacherStageSidebar>.deadlineControl { min-width:0;margin:0; }
+.simMain.chatOpen .teacherCommand .teacherStageSidebar .teacherStageList {
+ max-height:min(68dvh,700px);
+}
 .teacherCommand .teacherStageSidebar .deadlineControlTop,
 .teacherCommand .teacherStageSidebar .deadlineControlTop.hasAction,
 .teacherCommand .teacherStageSidebar .deadlineControlTop:not(.hasAction) {
@@ -134,7 +139,7 @@
  .teacherCommand .teacherStageSplit { grid-template-columns:minmax(0,1fr); }
  .teacherCommand .teacherStageSidebar { display:contents; }
  .teacherCommand .teacherStageSidebar .teacherStageList {
-  order:0;max-height:265px;
+  order:0;max-height:min(68dvh,700px);
   grid-template-columns:repeat(2,minmax(0,1fr));
  }
  .teacherCommand .teacherStageInspector { order:1; }
@@ -150,7 +155,7 @@
  .teacherCommand .teacherCommandStageLine { align-items:start; }
  .teacherCommand .teacherCommandStatus { justify-content:flex-start;margin-left:0; }
  .teacherCommand .teacherStageSidebar .teacherStageList {
-  grid-template-columns:minmax(0,1fr);max-height:240px;
+  grid-template-columns:minmax(0,1fr);max-height:min(64dvh,640px);
  }
  .teacherCommand .teacherStageInspector { padding:13px;gap:12px; }
  .teacherCommand .teacherStageInspectorActions { padding:10px;gap:9px; }
@@ -209,4 +214,38 @@
  .teacherStageInspector .stageReadinessCompactRefresh {
   grid-column:2;justify-self:start;white-space:normal;
  }
+}
+
+/* Stage titles and status badges occupy separate lines; tall cards push following rows. */
+.teacherCommand .teacherStageListItem {
+ box-sizing:border-box;
+ height:auto;
+ min-height:92px;
+ padding:14px 12px;
+}
+.teacherCommand .teacherStageListCopy {
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ gap:8px;
+ min-width:0;
+}
+.teacherCommand .teacherStageListCopy strong {
+ display:block;
+ line-height:1.45;
+}
+.teacherCommand .teacherStageListCopy small {
+ display:flex;
+ align-items:center;
+ gap:7px;
+ min-height:18px;
+ margin:0;
+ line-height:1.5;
+ overflow-wrap:anywhere;
+}
+.teacherCommand .teacherStageListCopy small>svg {
+ display:block;
+ flex:0 0 15px;
+ width:15px;
+ height:15px;
 }
