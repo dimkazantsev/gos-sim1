@@ -64,7 +64,7 @@ begin
   if v_total>0 then
    select count(*),min(deadline) into v_total,v_earliest from public.game_stages where game_id=g and status='open';
    select stage_no into v_next from public.game_stages where game_id=g and status='open' order by deadline nulls last,stage_no limit 1;
-   update public.games set current_round=coalesce(v_next,current_round),
+   update public.games set current_round=greatest(current_round,coalesce(v_next,current_round)),
     turn_open=v_total>0,turn_ends_at=case when v_total>0 then v_earliest else null end,
     status=case when v_total>0 then 'running' else 'paused' end where id=g;
   end if;
