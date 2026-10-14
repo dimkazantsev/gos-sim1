@@ -339,11 +339,12 @@ function AssessmentExplanation({assessment:a,paragraphs}:{assessment:Assessment;
    <h4>Дополнительные сведения о расчёте</h4>
    <p>Они помогают понять результат, но не добавляют новых критериев к трём перечисленным.</p>
    {otherRows.filter(item=>groups[item.key].length>0).map(item=>
-    <details key={item.key} className="gradeExplanationExtra">
-     <summary>{item.title}</summary>
-     <p>{item.description}</p>
-     {groups[item.key].map((part,j)=><p className="gradeExplanationRaw" key={j}>{assessmentRationaleDetail(part)}</p>)}
-    </details>
+    <div key={item.key} className="gradeExplanationExtra">
+     <h5>{item.title}</h5><p>{item.description}</p>
+     <details><summary>Показать показатели системы</summary>
+      {groups[item.key].map((part,j)=><p className="gradeExplanationRaw" key={j}>{assessmentRationaleDetail(part)}</p>)}
+     </details>
+    </div>
    )}
    {groups.other.length>0&&<details className="gradeExplanationExtra">
     <summary>Другие сведения, сохранённые системой</summary>
