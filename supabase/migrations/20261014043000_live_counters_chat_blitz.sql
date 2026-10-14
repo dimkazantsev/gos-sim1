@@ -20,27 +20,27 @@ $migration$;
 
 -- These legacy permissive policies exposed rows across private chat channels.
 -- Preserve read by authorized channel members and author/teacher write policies.
-alter policy chat_messages_media_scope on public.chat_messages
- using (private.can_access_channel(channel_id))
- with check (
-  private.can_access_channel(channel_id)
-  and author_id=(select auth.uid())
-  and (storage_path is null or (
+-- The legacy ALL-policy was permissive: it could bypass author-only UPDATE
+-- guards. Replace it with an INSERT-specific *restrictive* media path invariant.
+drop policy if exists chat_messages_media_scope on public.chat_messages;
+create policy chat_messages_media_scope on public.chat_messages
+ as restrictive for insert to authenticated with check (
+  storage_path is null or (
    split_part(storage_path,'/',1)=game_id::text
    and split_part(storage_path,'/',2)=channel_id::text
    and split_part(storage_path,'/',3)=author_id::text
    and split_part(storage_path,'/',4)<>''
-   and array_length(string_to_array(storage_path,'/'),1)=4))
- );
--- Drop legacy permissive policies that otherwise OR past channel-level guards.
+   and array_length(string_to_array(storage_path,'/'),1)=4
+  )
+);
+-- Author and channel access remain guarded by the existing messages_insert.
+-- Remove outdated permissive write policies; no general UPDATE is allowed.
 drop policy if exists guests_cannot_insert on public.chat_messages;
 drop policy if exists guests_cannot_update on public.chat_messages;
-alter policy chat_media_one_hour_visibility on public.chat_messages
- using (
-  private.can_access_channel(channel_id)
-  and (kind <> all(array['audio'::message_kind,'video'::message_kind])
-       or created_at > now() - interval '1 hour')
- );
+-- An older permissive SELECT policy cannot enforce media expiry because
+-- PostgreSQL ORs permissive policies. Keep visibility policy solely in
+-- messages_read; expiration remains enforced by the existing cleanup.
+drop policy if exists chat_media_one_hour_visibility on public.chat_messages;
 -- The existing teacher/assignee policy is sufficient for Blitz answer rows.
 drop policy if exists blitz_assignments_current_member on public.blitz_assignments;
 
