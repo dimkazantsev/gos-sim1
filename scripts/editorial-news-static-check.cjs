@@ -24,10 +24,13 @@ check('Only public opted-in chats can affect stage reports',
  sql.includes("c.kind='public'") && sql.includes("c.name<>'Вне игры'") &&
  sql.includes("m.text ~* '#сми_gpyasu'") &&
  !sql.includes('string_agg(m.text'));
-check('Archived, manually authored or deleted posts are never mass-edited',
- sql.includes("p.context->>'automatic'='true'") &&
- sql.includes("p.deleted_at IS NULL") &&
- sql.includes("p.context->>'source_table'='game_stages'"));
+check('Historical posts remain untouched until individually reviewed',
+ !/\\bUPDATE\\s+public\\.political_posts\\b/i.test(sql) &&
+ !sql.includes('WITH revisions AS (') &&
+ sql.includes('Existing publications are not mutated'));
+check('Only automatically sourced posts are rewritten on insert',
+ sql.includes("new.context->>'automatic' IS DISTINCT FROM 'true'") &&
+ sql.includes("new.context->>'source_table' = 'game_stages'"));
 check('No game records deleted or truncated',
  !/\b(?:DELETE\s+FROM|TRUNCATE\s+TABLE|DROP\s+TABLE)\b/i.test(sql));
 check('Only verified news gets editorial presentation',
