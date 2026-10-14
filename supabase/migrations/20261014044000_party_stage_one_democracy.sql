@@ -30,6 +30,7 @@ begin
  select * into v_m from public.game_members where game_id=p_game and user_id=v_uid for update;
  if not found or v_m.kind not in ('student','teacher') then raise exception 'Forbidden' using errcode='42501';end if;
  v_teacher:=v_m.kind='teacher' and private.is_game_teacher(p_game);
+ if private.has_open_duma_mandate_vote(p_game) then raise exception 'Party founding is frozen during a Duma mandate vote' using errcode='42501';end if;
  if not v_teacher and (
   v_m.kind<>'student' or v_m.team is not null or
   not exists(select 1 from public.game_stages s where s.game_id=p_game and s.stage_no=1 and s.status='open'
@@ -97,6 +98,7 @@ begin
   and (deadline is null or deadline>clock_timestamp())) then
   raise exception 'Chair election stage has ended' using errcode='42501';end if;
  if p.leader_user_id is not null then raise exception 'Chair election already completed' using errcode='23505';end if;
+ if private.has_open_duma_mandate_vote(p.game_id) then raise exception 'Chair election is frozen during a Duma mandate vote' using errcode='42501';end if;
  if not exists(select 1 from public.game_members where game_id=p.game_id and user_id=v_uid and kind='student' and team=p.name)
  or not exists(select 1 from public.game_members where game_id=p.game_id and user_id=p_candidate_id and kind='student' and team=p.name)
  then raise exception 'Both voter and candidate must be party members' using errcode='42501';end if;
