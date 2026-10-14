@@ -1,0 +1,67 @@
+/* Focused ГОС.ID repair: party chair, grade journal and stage status. */
+.civicChairElection{display:grid;gap:18px;min-width:0;padding:22px;border:1px solid #d6e2f3;border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(31,62,116,.045);color:#173253}
+.civicChairElection *{box-sizing:border-box}
+.civicChairHeading{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0;padding:0 0 18px;border-bottom:1px solid #e5ebf5}
+.civicChairHeading>div{flex:1 1 210px;min-width:0}
+.civicChairHeading small{display:block;color:#7189ac;font-size:11px;letter-spacing:.09em;font-weight:750}
+.civicChairHeading h3{margin:4px 0;font-size:clamp(19px,2vw,24px);line-height:1.25;letter-spacing:-.02em;color:#173253}
+.civicChairHeading p{margin:0;font-size:13px;line-height:1.55;color:#65809d}
+.civicChairSymbol{display:grid;place-items:center;flex:none;width:48px;height:48px;border:1px solid #d8e3fe;border-radius:14px;background:#edf2ff;color:#2453e6}
+.civicChairStatus{border-radius:999px;padding:8px 12px;background:#eef3fc;color:#365a92;font-size:12px;font-weight:750}
+.civicChairSteps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.civicChairSteps>span{display:flex;align-items:center;gap:9px;min-width:0;padding:12px;border:1px solid #dce5f3;background:#f7faff;border-radius:11px;color:#405e84;font-size:13px;font-weight:650}
+.civicChairSteps b{display:grid;place-items:center;flex:none;width:27px;height:27px;border-radius:9px;background:#e7edfb;color:#2351aa;font-size:13px}
+.civicChairStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.civicChairStats>div{display:grid;grid-template-columns:20px minmax(0,1fr);gap:5px 9px;align-items:center;min-width:0;border:1px solid #dce5f1;border-radius:12px;background:#f7f9fe;padding:13px}
+.civicChairStats svg{color:#3863a3}.civicChairStats small{font-size:12px;font-weight:650;color:#617a9a;line-height:1.4}
+.civicChairStats strong{grid-column:1/-1;color:#163962;font-size:24px;line-height:1.15;font-variant-numeric:tabular-nums}
+.civicChairNotice,.civicChairResult{display:flex;align-items:flex-start;gap:12px;margin:0;padding:16px;border:1px solid #dce5f1;border-radius:12px;background:#f6f8fd;color:#46617f;font-size:14px;line-height:1.6}
+.civicChairNotice>svg,.civicChairResult>svg{flex:none;color:#3b65a6}
+.civicChairResult{background:#ecf8f3;border-color:#cce7d9}.civicChairResult>svg{color:#24805a}
+.civicChairResult strong{display:block;font-size:15px;color:#225c46}.civicChairResult p{margin:4px 0 0}
+.civicChairCandidates{display:grid;gap:12px;min-width:0}
+.civicChairCandidates>h4{margin:0;color:#183b67;font-size:17px}
+.civicChairCandidates>p{margin:0;color:#67809e;font-size:13px}
+.civicChairCandidateGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px}
+.civicChairCandidate{display:flex;align-items:center;gap:12px;width:100%;min-height:74px;padding:12px;border:1px solid #d8e2f0;border-radius:12px;background:#fff;color:#21426a;text-align:left;cursor:pointer}
+.civicChairCandidate:hover:not(:disabled),.civicChairCandidate.selected{background:#f0f5ff;border-color:#6692ef}
+.civicChairCandidate:disabled{opacity:.75;cursor:default}
+.civicChairAvatar{display:grid;place-items:center;flex:none;width:39px;height:39px;border-radius:50%;background:#e8efff;color:#2b56b3;font-weight:800}
+.civicChairCandidate>span:nth-child(2){display:grid;gap:4px;flex:1;min-width:0}.civicChairCandidate b{font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+.civicChairCandidate small{color:#7184a0;font-size:11px}.civicChairRadio{width:17px;height:17px;border:1px solid #9ab0cc;border-radius:50%;flex:none}
+.civicChairCandidate.selected .civicChairRadio{border:5px solid #2453e6}
+.civicChairActions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-top:5px}
+.civicChairActions small{color:#657e9a;font-size:12px}.civicChairActions button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px}
+.civicChairFeedback{margin:0;padding:12px 14px;border-radius:10px;background:#edf5ff;color:#235095;font-size:13px}
+.civicPartyPaused{border:1px solid #e8d7aa;border-radius:12px;background:#fff9eb;color:#775929;padding:16px;font-size:14px;line-height:1.6}
+/* 1 name + 2 totals + 16 stages = 19 identical grid tracks for header and rows. */
+.gradesPage .gradesMatrix{min-width:0;max-width:100%;overflow-x:auto;overflow-y:hidden;border:1px solid #dde6f3;border-radius:15px}
+.gradesPage .gradesMatrixHead,.gradesPage .gradesMatrixRow{display:grid;grid-template-columns:minmax(220px,1fr) repeat(2,62px) repeat(16,54px);gap:5px;align-items:center;min-width:1248px;box-sizing:border-box;padding:9px 10px}
+.gradesPage .gradesMatrixHead{position:sticky;top:0;z-index:2;background:#f3f6fc;color:#577294;font-size:13px}
+.gradesPage .gradesMatrixHead>*,.gradesPage .gradesMatrixRow>*{min-width:0;text-align:center;box-sizing:border-box}
+.gradesPage .gradesMatrixHead>b{text-align:left}
+.gradesPage .gradesMatrixRow>div:first-child{text-align:left;overflow-wrap:anywhere}
+.gradesPage .gradesMatrixRow>button{display:grid;place-items:center;align-content:center;gap:2px;width:100%;min-width:0;min-height:46px;height:auto;padding:5px 1px;font-size:12px;font-variant-numeric:tabular-nums}
+.gradesPage .gradesMatrixRow>button b{font-size:13px;line-height:1.2}
+.gradesPage .gradesMatrixRow>button small{font-size:10px;line-height:1.2;letter-spacing:0;text-transform:none}
+.gradesPage .gradesMatrixRow>.gradeTotal{display:grid;place-items:center;width:100%;min-width:0;min-height:46px;padding:5px 1px;border-radius:9px;background:#eef3ff;color:#2453b7;font-size:13px;line-height:1.25;font-weight:800;font-variant-numeric:tabular-nums}
+.gradesPage .gradesMatrixRow>div:first-child button{max-width:100%;white-space:normal;text-align:left;overflow-wrap:anywhere}
+.gradesPage .gradesMatrixWrap{min-width:0;max-width:100%;overflow:hidden}
+/* Modal children must never force a width greater than the viewport. */
+.gradeModalBack .gradeModal{box-sizing:border-box;width:min(940px,calc(100vw - 36px));max-width:100%;max-height:calc(100dvh - 36px);overflow-x:hidden;overflow-y:auto;min-width:0}
+.gradeModalBack .gradeModal>header{display:flex;align-items:flex-start;gap:16px}
+.gradeModalBack .gradeModal>header>div{flex:1;min-width:0}
+.gradeModalBack .gradeScoreHero{display:flex;align-items:center;gap:16px;min-width:0;margin:18px 22px;padding:16px;border-radius:14px}
+.gradeModalBack .gradeScoreHero>strong{flex:none;display:grid;place-items:center;width:68px;height:68px;font-size:38px;line-height:1;border-radius:14px}
+.gradeModalBack .gradeScoreHero>div{display:grid;gap:5px;min-width:0}
+.gradeModalBack .gradeScoreHero b{font-size:17px}.gradeModalBack .gradeScoreHero span{font-size:13px}
+.gradeModalBack .gradeCriteria{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 22px;min-width:0}
+.gradeModalBack .gradeCriteria>span{display:flex;align-items:center;gap:10px;min-width:0;overflow-wrap:anywhere}
+.gradeModalBack .gradeRationale,.gradeModalBack .gradeTeacherNote,.gradeModalBack .gradeApproval,.gradeModalBack .gradeEvidence,.gradeModalBack .gradeRunHistory{box-sizing:border-box;max-width:calc(100% - 44px);min-width:0;margin:18px 22px;overflow-wrap:anywhere}
+.gradeModalBack .gradeRationale{padding:18px;border:1px solid #dde7f4;border-radius:13px;background:#f7f9fe}
+.gradeModalBack .gradeRationale p,.gradeModalBack .gradeTeacherNote p{margin:8px 0 0;max-width:100%;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal}
+.gradeModalBack .gradeRationale footer{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.gradeModalBack .gradeRationale footer>span{display:inline-flex;margin:0;padding:5px 9px;border-radius:7px;background:#edf2f9;color:#637b9b;font-size:11px}
+.gradeModalBack .gradeApproval textarea,.gradeModalBack .gradeApproval select{max-width:100%;box-sizing:border-box}
+@media(max-width:850px){.civicChairStats{grid-template-columns:repeat(2,minmax(0,1fr))}.gradeModalBack .gradeCriteria{grid-template-columns:1fr}}
+@media(max-width:600px){.civicChairElection{padding:14px;gap:14px}.civicChairSteps{grid-template-columns:1fr}.civicChairHeading{gap:10px}.civicChairHeading .civicChairStatus{margin-left:0}.gradeModalBack{padding:0}.gradeModalBack .gradeModal{width:100%;max-height:100dvh;border-radius:0}.gradeModalBack .gradeScoreHero,.gradeModalBack .gradeCriteria{margin:14px}.gradeModalBack .gradeRationale,.gradeModalBack .gradeTeacherNote,.gradeModalBack .gradeApproval,.gradeModalBack .gradeEvidence,.gradeModalBack .gradeRunHistory{max-width:calc(100% - 28px);margin:14px}.gradesPage .gradesMatrixHead,.gradesPage .gradesMatrixRow{grid-template-columns:minmax(180px,1fr) repeat(2,54px) repeat(16,50px);min-width:1108px}}
