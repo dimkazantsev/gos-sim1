@@ -171,53 +171,52 @@ export function useRepublicGame(gameId:string){
 
  useEffect(()=>{
   if(!me?.user_id||me.game_id!==gameId)return;
-  let disposed=false,running=false,again=false;
+  let disposed=false,scheduled=false;
   let dirtyCore=false,dirtyChat=false,dirtyPins=false,telegramWake=false;
   let timer:ReturnType<typeof setTimeout>|undefined;
-  async function flush(){
+  function flush(){
    if(disposed||document.visibilityState==='hidden')return;
-   if(running){again=true;return}
-   running=true;
    const core=dirtyCore,chat=dirtyChat,pins=dirtyPins,wake=telegramWake;
    dirtyCore=false;dirtyChat=false;dirtyPins=false;telegramWake=false;
-   try{
-    const jobs:Promise<unknown>[]=[];
-    if(core){jobs.push(hydrateActiveView());notifyGameDataRefresh(gameId)}
-    if(chat){jobs.push(loadChatOverview());if(channelRef.current)jobs.push(loadMessages(channelRef.current))}
-    if(pins&&channelRef.current)jobs.push(loadChatPins(channelRef.current));
-    await Promise.allSettled(jobs);
-    if(wake)void kickTelegramDispatch();
-   }finally{
-    running=false;
-    if(again||dirtyCore||dirtyChat||dirtyPins){again=false;queue(250)}
-   }
+   // Read tickets in the loaders guard overlapping requests: never serialize
+   // new events behind a stalled, older fetch.
+   if(core){void hydrateActiveView();notifyGameDataRefresh(gameId)}
+   if(chat){void loadChatOverview();if(channelRef.current)void loadMessages(channelRef.current)}
+   if(pins&&channelRef.current)void loadChatPins(channelRef.current);
+   if(wake)void kickTelegramDispatch();
   }
-  function queue(delay=180){if(disposed)return;clearTimeout(timer);timer=setTimeout(()=>void flush(),delay)}
+  function schedule(){
+   if(disposed||scheduled)return;
+   scheduled=true;
+   // Collapse bursts in the same JS turn without delaying the first update.
+   void Promise.resolve().then(()=>{scheduled=false;flush()});
+  }
   const channel=supabase.channel('gos-id-live:'+gameId+':'+me.user_id);
   for(const table of ['chat_messages','chat_mentions','chat_channel_state','chat_pins']){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
     if(table==='chat_pins')dirtyPins=true;
     else dirtyChat=true;
-    telegramWake=true;queue();
+    telegramWake=true;schedule();
    });
   }
   for(const table of ['game_stages','game_parties','party_invitations','party_documents','party_chair_ballots','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
-    dirtyCore=true;telegramWake=true;queue();
+    dirtyCore=true;telegramWake=true;schedule();
    });
   }
   liveRef.current=channel;
   setRealtimeState('connecting');
   channel.subscribe(status=>{if(!disposed)setRealtimeState(status==='SUBSCRIBED'?'connected':'disconnected')});
-  // Recovery if Realtime is unavailable: visible screens still update.
-  const poll=setInterval(()=>{if(document.visibilityState==='visible'){dirtyCore=true;dirtyChat=true;dirtyPins=true;queue(0)}},30000);
+  // Visible-tab recovery works even when a WebSocket cannot connect.
+  const poll=setInterval(()=>{
+   if(document.visibilityState==='visible'){dirtyCore=true;dirtyChat=true;dirtyPins=true;schedule()}
+  },30000);
   return()=>{
    disposed=true;clearTimeout(timer);clearInterval(poll);
    if(liveRef.current===channel)liveRef.current=null;
    void supabase.removeChannel(channel);
   };
  },[gameId,me?.user_id]);
-
 
  useEffect(()=>()=>{
   const rec=recorder.current;
