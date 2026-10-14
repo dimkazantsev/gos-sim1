@@ -4,9 +4,9 @@ const vm=require('node:vm');
 const ts=require('typescript');
 const source=fs.readFileSync('components/game/turnCountdown.ts','utf8');
 const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-const module={exports:{}};
-vm.runInNewContext(compiled,{module,exports:module.exports});
-const {turnCountdown}=module.exports;
+const compiledModule={exports:{}};
+vm.runInNewContext(compiled,{module:compiledModule,exports:compiledModule.exports});
+const {turnCountdown}=compiledModule.exports;
 function check(seconds,days,hours,minutes,fragment){
  const actual=turnCountdown(seconds);
  assert.equal(actual.days,days,'days for '+seconds);
