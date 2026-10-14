@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Activity,BookOpen,Camera,ChevronDown,Compass,FileSignature,Library,UserRound,UsersRound} from 'lucide-react';
+import {Activity,BookOpen,BookOpenCheck,Camera,ChevronDown,Compass,FileSignature,Library,UserRound,UsersRound} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {AwardShelf} from './Achievements';
@@ -147,6 +147,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
      <button type="button" className="profileComicButton" aria-label="Вводный комикс" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Пролог</button>
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
      {own&&onStartTutorial&&<button type="button" onClick={onStartTutorial} title="Повторить интерактивное обучение навигации"><Compass size={17}/> Пройти обучение</button>}
+     {own&&target.kind==='student'&&game&&<button type="button" onClick={()=>document.getElementById('profile-blitz-archive')?.scrollIntoView({behavior:'smooth',block:'start'})}><BookOpenCheck size={17}/> Блиц-вопросы</button>}
      {own&&target.kind!=='observer'&&<button type="button" onClick={()=>setTasksOpen(true)}><ListTodo size={17}/> Назначить задачу</button>}
 
      {!own&&<button type="button" onClick={onOwnProfile}><UserRound size={17}/> Мой профиль</button>}
