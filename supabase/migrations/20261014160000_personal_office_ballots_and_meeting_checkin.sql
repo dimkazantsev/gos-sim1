@@ -269,3 +269,21 @@ drop trigger if exists trg_capture_parliament_office_winner on public.office_ele
 create trigger trg_capture_parliament_office_winner
  after update of status,winner_candidate_id on public.office_elections
  for each row execute function private.capture_parliament_office_winner();
+
+-- These tables previously were not in the Realtime publication: keep all
+-- 30 participants' parliamentary choices and current mandate weights in sync.
+do $realtime$
+declare v_name text;
+begin
+ if exists(select 1 from pg_publication where pubname='supabase_realtime') then
+  foreach v_name in array array[
+   'office_elections','office_candidates','office_ballots','office_personal_ballots',
+   'party_member_mandates','institution_session_registrations'
+  ] loop
+   if not exists(select 1 from pg_publication_tables
+       where pubname='supabase_realtime' and schemaname='public' and tablename=v_name) then
+    execute format('alter publication supabase_realtime add table public.%I',v_name);
+   end if;
+  end loop;
+ end if;
+end $realtime$;
