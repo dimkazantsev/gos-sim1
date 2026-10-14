@@ -1,13 +1,13 @@
 'use client';
 import {useState} from 'react';
 import PartyJusticeReview from './PartyJusticeReview';
-import PartyMandateEditor from './PartyMandateEditor';
+import PartyChairFallback from './PartyChairFallback';
 import {FileText,Trash2,UsersRound,Landmark,ShieldAlert,X,ExternalLink,MessageCircle} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
 const docLabels:Record<string,string>={application:'Заявление',charter:'Устав',program:'Программа',fee:'Пошлина',symbol:'Символика',congress_minutes:'Учредительный съезд',other:'Дополнительный документ'};
 export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepublic;onOpenChat?:(channelId:string)=>void}){
- const {parties,members,partyDocuments,partyMandates,partyInvitations,politicalPosts,channels,teacher,deleteParty}=g;
+ const {parties,members,partyDocuments,partyInvitations,politicalPosts,channels,teacher,deleteParty}=g;
  const [selected,setSelected]=useState<string|null>(null);
  const [confirm,setConfirm]=useState('');
  const [busy,setBusy]=useState(false);
@@ -34,7 +34,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
  }
  if(!teacher)return null;
  return <section className="teacherPartyDossiers" aria-label="Расширенные партийные досье">
-  <header className="teacherPartyDossierHead"><div><small>ПОЛНОЕ ДОСЬЕ</small><h2>Фракции, состав и партийные документы</h2><p>Информация из раздела «Партии» собрана вместе с управлением мандатами и регистрацией.</p></div><span>{parties.length} партий · {parties.reduce((v,p)=>v+Number(p.mandates||0),0)}/450 мандатов</span></header>
+  <header className="teacherPartyDossierHead"><div><small>ПОЛНОЕ ДОСЬЕ</small><h2>Партии, руководство и регистрация</h2><p>Председателя избирают члены партии. Преподавателю доступно резервное переназначение и рассмотрение регистрационных документов.</p></div><span>{parties.length} партий</span></header>
   <div className="teacherPartyDossierGrid">{parties.length===0?<div className="journalEmpty">Партии пока не созданы.</div>:parties.map(p=>{
    const staff=members.filter(m=>m.kind==='student'&&m.team===p.name);
    const leader=members.find(m=>m.user_id===p.leader_user_id);
@@ -48,18 +48,19 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
  <MessageCircle size={18} aria-hidden="true"/></button></header>
     {p.description&&<p className="teacherPartyDescription">{p.description}</p>}
     <div className="teacherPartyKpis">
-     <span><strong>{p.mandates}</strong> мандатов</span><span><strong>{p.support}</strong> поддержка</span>
+     <span><strong>{p.support}</strong> поддержка</span>
      <span><strong>{p.regions}</strong> регионов</span><span><strong>{p.budget}</strong> бюджет</span>
-     <span><strong>{p.ghost_loss_current}</strong> потеряно голосов</span><span><strong>{invites.length}</strong> приглашений</span>
+     <span><strong>{invites.length}</strong> приглашений</span>
     </div>
     <div className="teacherPartySection"><h4><Landmark size={15} aria-hidden="true"/> Руководство и состав</h4>
      <p><b>Председатель:</b> {leader?.full_name||'Не назначен'}</p>
-     {staff.length?<ul>{staff.map(m=>{const alloc=partyMandates.find(a=>a.party_id===p.id&&a.user_id===m.user_id);return <li key={m.user_id}><span>{m.full_name}<small>{m.role_title||'Участник'}</small></span><b>{alloc?.effective_mandates||0} гол.</b></li>})}</ul>:<p className="teacherPartyMuted"><UsersRound size={15} aria-hidden="true"/> Участники пока не назначены</p>}
+     {staff.length?<ul>{staff.map(m=><li key={m.user_id}><span>{m.full_name}<small>{m.user_id===p.leader_user_id?'Председатель партии «'+p.name+'»':m.role_title||'Участник'}</small></span></li>)}</ul>:<p className="teacherPartyMuted"><UsersRound size={15} aria-hidden="true"/> Участники пока не вступили в партию</p>}
+     <PartyChairFallback g={g} party={p}/>
     </div>
     <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы ({docs.length})</h4>
      {docs.length?<ul>{docs.map(d=><li key={d.id}><span>{docLabels[d.doc_kind]||d.doc_kind}<small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {d.status==='accepted'?'Принят':d.status==='revision'?'На доработке':'Загружен'}</small></span>{d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title}><ExternalLink size={15}/></a>:<span>—</span>}<div className="civicDocReview"><button type="button" className={d.status==='accepted'?'primary':'secondary'} disabled={!!reviewingId||d.status==='accepted'} aria-disabled={d.status==='accepted'} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Рассматривается…':d.status==='accepted'?'Принято':'Принять'}</button><button type="button" className="secondary" disabled={!!reviewingId||d.status==='revision'} onClick={()=>void review(d.id,'revision')}>На доработку</button></div></li>)}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
     </div>
-    <PartyJusticeReview g={g} party={p}/><PartyMandateEditor g={g} party={p}/>
+    <PartyJusticeReview g={g} party={p}/>
     <footer><span>{posts.length} партийных публикаций · {staff.length} участников</span><button type="button" onClick={()=>{setSelected(p.id);setConfirm('');setNotice('')}}><Trash2 size={15} aria-hidden="true"/> Удалить партию</button></footer>
    </article>;
   })}</div>
