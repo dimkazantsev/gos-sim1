@@ -142,8 +142,12 @@ end $fn$;
 revoke all on function private.blitz_issue_offline_today() from public,anon,authenticated;
 do $job$
 begin
- if not exists(select 1 from cron.job where jobname='gos_blitz_issue_offline_today') then
-  perform cron.schedule('gos_blitz_issue_offline_today','45 5 * * *',
-   $call$select private.blitz_issue_offline_today()$call$);
+ if to_regclass('cron.job') is not null then
+  if not exists(select 1 from cron.job where jobname='gos_blitz_issue_offline_today') then
+   perform cron.schedule('gos_blitz_issue_offline_today','45 5 * * *',
+    $call$select private.blitz_issue_offline_today()$call$);
+  end if;
+ else
+  raise notice 'pg_cron is not installed in this environment; schedule offline Blitz after installation';
  end if;
 end $job$;
