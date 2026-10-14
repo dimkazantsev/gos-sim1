@@ -199,7 +199,10 @@ begin
  v_old:='from public.office_candidates c left join public.office_ballots b on b.candidate_id=c.id and b.election_id=e.id';
  if position(v_old in v_sql)=0 then raise exception 'Office winner query changed';end if;
  v_sql:=replace(v_sql,v_old,'from public.office_candidates c');
- v_old:='group by c.id,c.user_id';
+ v_old:='group by c.id,c.user_id,c.party_id';
+ if position(v_old in v_sql)=0 then raise exception 'Office runoff grouping changed';end if;
+ v_sql:=replace(v_sql,v_old,'');
+  v_old:='group by c.id,c.user_id';
  if position(v_old in v_sql)=0 then raise exception 'Office winner grouping changed';end if;
  v_sql:=replace(v_sql,v_old,'');
  v_old:='values(e.game_id,e.stage_no,e.office_key,e.office_title,2,e.vote_mode,''nomination'',e.id,(select auth.uid()))';
@@ -210,9 +213,6 @@ begin
  v_sql:=replace(v_sql,v_old,'(game_id,stage_no,office_key,office_title,round_no,vote_mode,status,parent_election_id,created_by,ballot_mode)');
  v_old:='left join public.office_ballots b on b.candidate_id=c.id and b.election_id=e.id';
  if position(v_old in v_sql)=0 then raise exception 'Office runoff join changed';end if;
- v_sql:=replace(v_sql,v_old,'');
- v_old:='group by c.id,c.user_id,c.party_id';
- if position(v_old in v_sql)=0 then raise exception 'Office runoff grouping changed';end if;
  v_sql:=replace(v_sql,v_old,'');
  v_old:='order by coalesce(sum(b.votes),0) desc,c.created_at';
  if position(v_old in v_sql)=0 then raise exception 'Office runoff sorting changed';end if;
