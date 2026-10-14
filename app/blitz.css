@@ -219,3 +219,8 @@
 
 /* Счётчик уникальных ожидающих ситуаций в заголовке Event. */
 .eventPendingBadge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;margin-left:6px;padding:0 6px;background:#e6edf9;border:1px solid #c6d8f0;border-radius:999px;font-size:11px;color:#2f5689;font-weight:800;font-variant-numeric:tabular-nums}
+
+.blitzArchiveModal .blitzPendingQuestion{display:block;text-align:left;width:100%;min-width:0;padding:0;border:0;background:transparent;color:#203756;font:inherit;font-weight:750;font-size:clamp(15px,1.6vw,17px);line-height:1.5;overflow-wrap:anywhere;cursor:pointer}
+.blitzArchiveModal .blitzPendingQuestion:hover:not(:disabled){color:#315fa8;text-decoration:underline;text-decoration-color:#b9cde9;text-underline-offset:3px}
+.blitzArchiveModal .blitzPendingQuestion:disabled{opacity:1;cursor:default}
+.blitzArchiveModal .blitzPendingQuestion:focus-visible{outline:2px solid #90b3e6;outline-offset:3px;border-radius:5px}
