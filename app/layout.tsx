@@ -38,6 +38,7 @@ import './profile-first-setup.css';
 import './onboarding-tour.css';
 import './journal-mobile-isolated.css';
 import './political-publishers.css';
+import './2026-party-grade-stage-repair.css';
 import type {Metadata} from 'next';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import '@fontsource-variable/manrope';
