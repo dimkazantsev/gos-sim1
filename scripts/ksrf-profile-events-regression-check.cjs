@@ -33,7 +33,9 @@ assert(staffing.includes('Договоритесь об этом в общем �
 assert(awards.includes("const earned=visibleItems.filter(x=>x.earned_at)"));
 const committee=file('components/game/CommitteeChairElectionPanel.tsx');
 const committeeSql=file('supabase/migrations/20261014121000_committee_chair_before_staffing.sql');
-assert(committee.includes("partyMandates.filter(a=>a.base_mandates>0)"),'Candidates must be deputies before committee assignment');
+assert(committee.includes("personalMandates.filter(a=>a.base_mandates>0)"),'Candidates must be deputies before committee assignment');
+assert(committee.includes("supabase.from('party_member_mandates')"),'Stage workspace must load current personal mandate assignments');
+assert(staffing.includes("supabase.from('party_member_mandates')"),'Staffing must not depend on unopened party workspace');
 assert(staffing.indexOf('<CommitteeChairElectionPanel g={g}/>')<staffing.indexOf('<section className="staffingSection">'),'Committee chair voting comes before membership allocation');
 assert(committeeSql.includes("create_committee_chair_election"),'Election must require GD chair');
 assert(committeeSql.includes("assign_institution_member"),'Committee appointments must require elected chair');
