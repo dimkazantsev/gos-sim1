@@ -2,6 +2,11 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),{chromium}=require('playwright-core');
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(p=>p&&fs.existsSync(p));
 if(!chrome)throw Error('Chrome or Chromium is required');
+const gradesViewSource=fs.readFileSync('components/game/GradesView.tsx','utf8');
+assert(gradesViewSource.includes('onScroll={event=>{const scrollLeft=event.currentTarget.scrollLeft;'),'Grade matrix must watch real horizontal scrolling');
+assert(gradesViewSource.includes('gradesMatrixScrolled'),'Grade matrix must toggle compact mode on scroll');
+assert(gradesViewSource.includes('aria-label={s.full_name} title={s.full_name}'),'Full name must remain accessible in compact mode');
+
 const css=['app/design-views.css','app/design-responsive.css','app/2026-civic-portal.css','app/2026-stage-party-grades-repair.css']
  .map(name=>fs.readFileSync(name,'utf8')).join('\n');
 const cells=n=>Array.from({length:n},(_,i)=>'<span class="align-check">'+(i+1)+'</span>').join('');
