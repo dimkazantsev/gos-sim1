@@ -57,6 +57,10 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
    .on('postgres_changes',{event:'*',schema:'public',table:'office_elections',filter:'game_id=eq.'+game.id},()=>void load())
    .on('postgres_changes',{event:'*',schema:'public',table:'office_candidates',filter:'game_id=eq.'+game.id},()=>void load())
    .on('postgres_changes',{event:'*',schema:'public',table:'office_ballots',filter:'game_id=eq.'+game.id},()=>void load())
+   .on('postgres_changes',{event:'*',schema:'public',table:'office_personal_ballots',filter:'game_id=eq.'+game.id},()=>void load())
+   .on('postgres_changes',{event:'*',schema:'public',table:'party_member_mandates',filter:'game_id=eq.'+game.id},()=>void load())
+   .on('postgres_changes',{event:'*',schema:'public',table:'game_votes',filter:'game_id=eq.'+game.id},()=>void load())
+   .on('postgres_changes',{event:'*',schema:'public',table:'institution_session_registrations',filter:'game_id=eq.'+game.id},()=>void load())
    .subscribe();
   return()=>{void supabase.removeChannel(ch)}
  },[game?.id]);
@@ -103,15 +107,18 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
  const sorted=useMemo(()=>[...elections].sort((a,b)=>a.office_key.localeCompare(b.office_key)||a.round_no-b.round_no),[elections]);
 
  return <section className="dumaElection">
-  <header className="dumaElectionHead"><div><small>ПАРЛАМЕНТСКАЯ ПРОЦЕДУРА · ЭТАП 4</small><h2>Руководство Государственной Думы</h2><p>Фракции выдвигают своих депутатов. Для избрания требуется более половины от общего числа депутатов — 226 голосов. При трёх и более кандидатах без победителя система автоматически создаёт второй тур для двух лидеров.</p></div><div className="dumaThreshold"><strong>226</strong><span>голосов для избрания</span><em>из 450</em></div></header>
+  <header className="dumaElectionHead"><div><small>ПАРЛАМЕНТСКАЯ ПРОЦЕДУРА · ЭТАП 4</small><h2>Руководство Государственной Думы</h2><p>Сначала депутаты регистрируются на заседание и утверждают процедуру голосованием. Затем фракции выдвигают кандидатов, проходит их обсуждение и персональное голосование депутатов. Каждый депутат голосует своими действующими мандатами с учётом GV; избрание требует 226 голосов из 450.</p></div><div className="dumaThreshold"><strong>226</strong><span>голосов для избрания</span><em>из 450</em></div></header>
 
-  {teacher&&<div className="dumaElectionCreator"><label>Должность<select value={office} onChange={e=>setOffice(e.target.value as typeof office)}>{offices.map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label><label>Форма голосования<select value={mode} onChange={e=>setMode(e.target.value as 'open'|'secret')}><option value="open">Открытое</option><option value="secret">Тайное</option></select></label><button className="primary" disabled={busy} onClick={()=>void createElection()}>Создать процедуру</button></div>}
+  <InstitutionRegistrationPanel g={g} stageNo={4} initialBody="gd" allowedBodies={['gd']} defaultOpen/>
+  <div className="dumaElectionProcedure"><b>Утверждение процедуры выборов депутатами</b><p>{procedureApproved?'Процедура утверждена: можно выдвигать кандидатов.':procedureOpen?'Голосование открыто в разделе «Голосование».':'До выдвижения кандидатур требуется голосование зарегистрированных депутатов.'}</p>
+  {teacher&&!procedureApproved&&!procedureOpen&&<button type="button" className="primary" disabled={busy} onClick={()=>void openProcedureVote()}>Открыть голосование о процедуре</button>}</div>
+  {teacher&&<div className="dumaElectionCreator"><label>Должность<select value={office} onChange={e=>setOffice(e.target.value as typeof office)}>{offices.map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label><label>Форма голосования<select value={mode} onChange={e=>setMode(e.target.value as 'open'|'secret')}><option value="open">Открытое</option><option value="secret">Тайное</option></select></label><button className="primary" disabled={busy} onClick={()=>void createElection()} disabled={busy||!procedureApproved}>Создать процедуру</button></div>}
 
   <div className="dumaElectionList">{sorted.length===0?<div className="emptyState">Процедуры выборов руководства ГД ещё не созданы.</div>:sorted.map(e=>{
    const ec=electionCandidates(e.id),eb=electionBallots(e.id),winner=ec.find(c=>c.id===e.winner_candidate_id);
    const myCapacity=ledParty?activeMandates(ledParty.id):0;
    const myUsed=ledParty?usedByParty(e.id,ledParty.id):0;
-   const eligibleNominees=ledParty?members.filter(m=>m.kind==='student'&&m.team===ledParty.name):members.filter(m=>m.kind==='student');
+   const eligibleNominees=(ledParty?members.filter(m=>m.kind==='student'&&m.team===ledParty.name):members.filter(m=>m.kind==='student')).filter(m=>personalMandates.some(a=>a.user_id===m.user_id&&a.base_mandates>0));
    return <article className={'dumaElectionCard '+e.status} key={e.id}>
     <header><div><small>{e.round_no===2?'ВТОРОЙ ТУР':'ПЕРВЫЙ ТУР'} · {e.vote_mode==='secret'?'ТАЙНОЕ':'ОТКРЫТОЕ'}</small><h3>{e.office_title}</h3></div><span>{e.status==='nomination'?'Выдвижение':e.status==='open'?'Голосование':e.status==='finished'?'Избран':'Завершено'}</span></header>
 
@@ -123,15 +130,18 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
     <div className="dumaCandidates">{ec.map(c=>{
      const person=member(c.user_id),p=party(c.party_id),total=totalFor(e.id,c.id);
      const own=ledParty?eb.find(b=>b.party_id===ledParty.id&&b.candidate_id===c.id)?.votes:undefined;
+     const myPersonalVote=personalBallots.some(b=>b.election_id===e.id&&b.voter_id===activeMe.user_id&&b.candidate_id===c.id);
      const visibleTotal=e.vote_mode==='open'||e.status==='closed'||e.status==='finished'||teacher;
      return <div className={'dumaCandidate '+(winner?.id===c.id?'winner':'')} key={c.id}>
       <div className="dumaCandidateIdentity"><span style={{background:p?.color||'#315efb'}}>{(person?.full_name||'?').split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</span><div><b>{person?.full_name||'Кандидат'}</b><small>{p?.name||'Фракция'}</small></div></div>
-      <div className="dumaCandidateScore"><strong>{visibleTotal?total:(own??'•')}</strong><span>{visibleTotal?'голосов':own!=null?'ваших голосов':'тайно'}</span></div>
-      {e.status==='open'&&ledParty&&<div className="dumaVoteAllocation"><input aria-label={'Мандаты за '+(person?.full_name||'кандидата')+' на должность '+e.office_title} type="number" min="0" max={myCapacity} value={voteDraft[e.id+'-'+c.id]??String(own??0)} onChange={x=>setVoteDraft(v=>({...v,[e.id+'-'+c.id]:x.target.value}))}/><button disabled={busy} onClick={()=>void vote(e.id,c.id)}>Записать</button></div>}
+      <div className="dumaCandidateScore"><strong>{visibleTotal?total:e.ballot_mode==='personal'?(myPersonalVote?Number(myMandates?.effective_mandates||0):'•'):(own??'•')}</strong><span>{visibleTotal?'голосов':myPersonalVote?'ваш голос учтён':'тайно'}</span></div>
+      {e.status==='open'&&e.ballot_mode==='personal'&&me.kind==='student'&&<div className="dumaVoteAllocation"><button type="button" className={myPersonalVote?'primary':''} disabled={busy||!myRegistered||Number(myMandates?.effective_mandates||0)<=0} onClick={()=>void personalVote(e.id,c.id)}>{myPersonalVote?'Вы проголосовали':'Отдать '+Number(myMandates?.effective_mandates||0)+' голосов'}</button></div>}
+      {e.status==='open'&&e.ballot_mode!=='personal'&&ledParty&&<div className="dumaVoteAllocation"><input aria-label={'Мандаты за '+(person?.full_name||'кандидата')+' на должность '+e.office_title} type="number" min="0" max={myCapacity} value={voteDraft[e.id+'-'+c.id]??String(own??0)} onChange={x=>setVoteDraft(v=>({...v,[e.id+'-'+c.id]:x.target.value}))}/><button disabled={busy} onClick={()=>void vote(e.id,c.id)}>Записать</button></div>}
      </div>
     })}</div>
 
-    {e.status==='open'&&ledParty&&<div className="dumaMandateBudget"><span>{ledParty.name}</span><b>{myUsed} / {myCapacity}</b><em>мандатов распределено</em></div>}
+    {e.status==='open'&&e.ballot_mode==='personal'&&me.kind==='student'&&<div className="dumaMandateBudget"><span>Ваши действующие мандаты</span><b>{Number(myMandates?.effective_mandates||0)}</b><em>{myRegistered?'Вы зарегистрированы на заседании':'Сначала зарегистрируйтесь на заседание ГД'}</em></div>}
+    {e.status==='open'&&e.ballot_mode!=='personal'&&ledParty&&<div className="dumaMandateBudget"><span>{ledParty.name}</span><b>{myUsed} / {myCapacity}</b><em>мандатов распределено</em></div>}
     {e.status==='open'&&teacher&&<div className="dumaCloseRow"><span>Закрытие фиксирует итог; если кандидатов больше двух и 226 не набрано, создаётся второй тур.</span><button className="primary" disabled={busy} onClick={()=>void close(e.id)}>Закрыть голосование</button></div>}
     {e.status==='finished'&&winner&&<div className="dumaWinner"><b>Избран</b><strong>{member(winner.user_id)?.full_name}</strong><span>{totalFor(e.id,winner.id)} голосов</span></div>}
    </article>
