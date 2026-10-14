@@ -148,7 +148,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
      {own&&onStartTutorial&&<button type="button" onClick={onStartTutorial} title="Повторить интерактивное обучение навигации"><Compass size={17}/> Пройти обучение</button>}
      {own&&target.kind!=='observer'&&<button type="button" onClick={()=>setTasksOpen(true)}><ListTodo size={17}/> Назначить задачу</button>}
-     {game&&target.kind==='student'&&!previewAchievementsUserId&&<BlitzArchive gameId={game.id} userId={target.user_id}/>}
+
      {!own&&<button type="button" onClick={onOwnProfile}><UserRound size={17}/> Мой профиль</button>}
 
     </div>
@@ -191,7 +191,8 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
    </section>}
   </>}
 
-  {game&&target.kind==='student'&&<AwardShelf gameId={game.id} userId={previewAchievementsUserId||target.user_id} showCatalog={own||teacher||!!previewAchievementsUserId} previewOnly={!!previewAchievementsUserId} defaultCollapsed/>}
+  {game&&target.kind==='student'&&!previewAchievementsUserId&&<BlitzArchive gameId={game.id} userId={target.user_id}/>}
+  {game&&target.kind==='student'&&<AwardShelf gameId={game.id} userId={previewAchievementsUserId||target.user_id} showCatalog={!!previewAchievementsUserId} previewOnly={!!previewAchievementsUserId} defaultCollapsed={!!previewAchievementsUserId}/>}
   {own&&target.kind==='student'&&<GradesView g={g} compact/>}
   {own&&<section className="profileJournalAccess">
    <div><Activity size={19} aria-hidden="true"/><div><b>{teacher?'Мой журнал действий':'Личный журнал действий'}</b><span>История ваших действий и переходов по разделам игры.</span></div></div>
