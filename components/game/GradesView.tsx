@@ -8,6 +8,7 @@ import StyledSelect from '../ui/StyledSelect';
 import ScoreFormula from './ScoreFormula';
 import BlitzKnowledgeScore from './BlitzKnowledgeScore';
 import {ChevronDown} from 'lucide-react';
+import {assessmentRationaleParagraphs,assessmentRunLabel} from './assessmentPresentation';
 
 type Assessment={
  id:string;game_id:string;stage_no:number;user_id:string;auto_score:number;final_score:number|null;
@@ -260,12 +261,12 @@ function AssessmentModal(p:any){
 <BlitzKnowledgeScore gameId={g.game?.id||''} userId={selected.userId} stageNo={selected.stageNo}/>
 {canSeeEvidence&&<>
    <div className="gradeCriteria"><span className={a.criterion_law?'ok':'miss'}><b>{a.criterion_law?'✓':'○'}</b> Право и правила</span><span className={a.criterion_strategy?'ok':'miss'}><b>{a.criterion_strategy?'✓':'○'}</b> Стратегия и интересы</span><span className={a.criterion_debrief?'ok':'miss'}><b>{a.criterion_debrief?'✓':'○'}</b> Анализ этапа</span></div>
-   <section className="gradeRationale"><small>ИНТЕРПРЕТАЦИЯ ДЕЙСТВИЙ</small><p>{a.public_rationale}</p><footer><span>Пересчёт: {when(a.last_auto_at)}</span><span>{a.last_run_type}</span><span>версия {a.revision_count}</span></footer></section>
+   <section className="gradeRationale"><small>ИНТЕРПРЕТАЦИЯ ДЕЙСТВИЙ</small><div className="gradeRationaleText">{assessmentRationaleParagraphs(a.public_rationale).map((text:string,i:number)=><p key={i}>{text}</p>)}</div><footer><span>Пересчёт: {when(a.last_auto_at)}</span><span>{assessmentRunLabel(a.last_run_type)}</span><span>Версия {a.revision_count}</span></footer></section>
    {a.teacher_note&&<section className="gradeTeacherNote"><small>КОММЕНТАРИЙ ПРЕПОДАВАТЕЛЯ</small><p>{a.teacher_note}</p></section>}
 </>}
    {teacher&&<section className="gradeApproval"><StyledSelect label="Итоговый балл" value={editScore===null?'':String(editScore)} onChange={v=>setEditScore(v===''?null:Number(v))} options={[{value:'',label:'Выберите итоговый балл'},...[0,1,2,3].map(n=>({value:String(n),label:n+' · '+level(n)}))]}/><label>Комментарий<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Почему вы подтверждаете или меняете автооценку"/></label><div>{a.status==='final'?<button onClick={()=>void reopen()} disabled={busy}>Переоткрыть оценку</button>:<><button onClick={()=>void recalc()} disabled={busy}>Пересчитать сейчас</button><button className="primary" onClick={()=>void finalize()} disabled={busy||!isFinalScore(editScore)}>Утвердить как итоговую</button></>}</div></section>}
   </>}
-  {a&&runs?.length>0&&<details className="gradeRunHistory"><summary>История автоматических пересчётов <span>{runs.length}</span></summary><div>{runs.map((r:Run)=><article key={r.id}><time>{when(r.created_at)}</time><b>{r.auto_score}/3 · {level(r.auto_score)}</b><span>{r.run_type}</span><em>{r.criterion_law?'Право ✓':'Право ○'} · {r.criterion_strategy?'Стратегия ✓':'Стратегия ○'} · {r.criterion_debrief?'Анализ ✓':'Анализ ○'}</em></article>)}</div></details>}
+  {a&&runs?.length>0&&<details className="gradeRunHistory"><summary>История автоматических пересчётов <span>{runs.length}</span></summary><div>{runs.map((r:Run)=><article key={r.id}><time className="gradeRunTime">{when(r.created_at)}</time><b className="gradeRunScore">{r.auto_score}/3 · {level(r.auto_score)}</b><span className="gradeRunTrigger">{assessmentRunLabel(r.run_type)}</span><em className="gradeRunCriteria">{r.criterion_law?'Право ✓':'Право ○'} · {r.criterion_strategy?'Стратегия ✓':'Стратегия ○'} · {r.criterion_debrief?'Анализ ✓':'Анализ ○'}</em></article>)}</div></details>}
   {canSeeEvidence&&<section className="gradeEvidence"><div className="gradeEvidenceHead"><div><small>ДОКАЗАТЕЛЬСТВА</small><h3>Все зафиксированные действия на этапе</h3></div></div>{loading?<div className="emptyState">Собираю данные…</div>:evidence?<Evidence evidence={evidence}/>:<div className="emptyState">Доказательства ещё не загружены.</div>}</section>}
   {!canSeeEvidence&&<div className="gradePrivacy">Подробные тексты и действия доступны только самому студенту и преподавателю.</div>}
  </article></div>;
