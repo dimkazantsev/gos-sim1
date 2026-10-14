@@ -128,6 +128,8 @@ grant execute on function public.blitz_archive_filtered(uuid,uuid,text,integer,i
 grant execute on function public.blitz_inbox_counts(uuid) to authenticated;
 
 -- План создаётся на стороне БД для всех активных игроков, включая вышедших.
+-- Проверка каждые 5 минут ловит открытие этапа/присоединение позднее утром;
+-- уникальный blitz_daily_plans и advisory lock исключают дубликаты за день.
 create or replace function private.blitz_issue_offline_today()
 returns integer language plpgsql security definer set search_path to 'public','pg_temp'
 as $fn$
@@ -148,7 +150,7 @@ do $job$
 begin
  if to_regclass('cron.job') is not null then
   if not exists(select 1 from cron.job where jobname='gos_blitz_issue_offline_today') then
-   perform cron.schedule('gos_blitz_issue_offline_today','45 5 * * *',
+   perform cron.schedule('gos_blitz_issue_offline_today','*/5 * * * *',
     $call$select private.blitz_issue_offline_today()$call$);
   end if;
  else
