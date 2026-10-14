@@ -34,6 +34,23 @@ const markup=[
  '<details class="gradeRunHistory" open><summary>История автоматических пересчётов <span>2</span></summary><div>',
  rows,'</div></details></article></div></body></html>'
 ].join('');
+
+// The stage debrief is a separate two-column form; check its actual stylesheet.
+assert(component.includes('Этот текст вы отправляете системе ИИ'), 'Explain that the debrief goes to the AI system');
+assert(component.includes('В чате «Вне игры»'), 'Explain the out-of-game discussion');
+assert(component.includes('Преподаватель может учесть содержательное обсуждение'), 'Keep teacher grading discretionary');
+const debriefCss=fs.readFileSync('app/2026-profile-grade-layout.css','utf8');
+const debriefMarkup=[
+ '<!doctype html><html lang="ru"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{font:14px Arial,sans-serif;margin:0;background:#eef3fb}',css,debriefCss,'</style><body>',
+ '<main class="gradesPage" style="width:100%;max-width:1350px;margin:auto;padding:12px"><section class="gradesDebrief gradesDebriefRefined"><header class="gradesDebriefHeading"><div><small>КРИТЕРИЙ 3 · ИТОГОВЫЙ РАЗБОР</small><h2>Анализ этапа</h2></div></header>',
+ '<div class="gradesDebriefFields"><div class="gradesDebriefContext"><div class="styledSelect"><span class="styledSelectLabel">Этап для итогового разбора</span><button type="button" class="styledSelectTrigger">1. Создание партий</button></div>',
+ '<div class="gradesDebriefPrompt"><b>Кому предназначен разбор</b><p>Этот текст вы отправляете системе ИИ для предварительного анализа этапа. Укажите причины и цели действий, интересы сторон, применённые правила, результаты и политические последствия.</p>',
+ '<p>В чате «Вне игры» можно подробнее обсуждать закономерности, аргументы и альтернативные решения. Преподаватель может учесть содержательное обсуждение и повысить итоговую оценку.</p>',
+ '<small>До утверждения итоговой оценки преподавателем разбор можно обновлять.</small></div></div>',
+ '<label class="gradesDebriefEditor"><span>Ваш итоговый разбор</span><textarea placeholder="Изложите содержательный анализ выбранного этапа…"></textarea></label></div>',
+ '</section></main></body></html>'
+].join('');
+
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
@@ -67,6 +84,31 @@ const markup=[
    assert(d.paragraphs.every(p=>p.right<=d.rationale.right+1),'Explanation wraps '+width);
    await page.close();
    console.log('PASS Russian labels, explanation and assessment modal at '+width+'px');
+  }
+
+  for(const width of [320,390,768,1024,1440]){
+   const page=await browser.newPage({viewport:{width,height:900}});
+   await page.setContent(debriefMarkup);
+   const form=await page.evaluate(()=>{
+    const rect=sel=>{const e=document.querySelector(sel),r=e.getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,height:r.height}};
+    return {viewport:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
+     fields:rect('.gradesDebriefFields'),leftLabel:rect('.gradesDebriefContext .styledSelectLabel'),
+     rightLabel:rect('.gradesDebriefEditor>span'),selector:rect('.gradesDebriefContext .styledSelectTrigger'),
+     textarea:rect('.gradesDebriefEditor textarea'),prompt:rect('.gradesDebriefPrompt')};
+   });
+   assert(form.scroll<=form.viewport+2,'Debrief has horizontal overflow at '+width+': '+JSON.stringify(form));
+   assert(form.textarea.left>=-1&&form.textarea.right<=width+2,'Debrief textarea outside viewport at '+width);
+   assert(form.selector.left>=-1&&form.selector.right<=width+2,'Debrief stage selector outside viewport at '+width);
+   assert(form.textarea.height>=195,'Debrief textarea too short at '+width);
+   if(width>760){
+    assert(Math.abs(form.leftLabel.top-form.rightLabel.top)<=2,'Debrief labels misaligned at '+width+': '+JSON.stringify(form));
+    assert(Math.abs(form.selector.top-form.textarea.top)<=3,'Debrief input tops misaligned at '+width+': '+JSON.stringify(form));
+    assert(Math.abs(form.prompt.bottom-form.textarea.bottom)<=3,'Debrief columns have unequal bottoms at '+width+': '+JSON.stringify(form));
+   }else{
+    assert(form.textarea.top>form.prompt.bottom,'Debrief fields must stack on mobile at '+width);
+   }
+   await page.close();
+   console.log('PASS debrief form and AI/out-of-game guidance at '+width+'px');
   }
  }finally{await browser.close()}
 })().catch(err=>{console.error(err);process.exitCode=1});
