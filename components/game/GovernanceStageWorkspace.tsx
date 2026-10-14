@@ -11,7 +11,7 @@ import {STAGE_OPERATIONS} from './stageOperations';
 import {gamePhaseForStage} from './stageSystem';
 import StageArtifacts from './StageArtifacts';
 import StageReadinessPanel from './StageReadinessPanel';
-import StagePolicyEditor from './StagePolicyEditor';
+import StagePolicyEditor,{CONSEQUENCE_OPTIONS} from './StagePolicyEditor';
 import {supabase} from '@/lib/supabase';
 import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import GovernmentFormationWorkspace from './GovernmentFormationWorkspace';
@@ -31,6 +31,21 @@ import GhostPolicyLab from './GhostPolicyLab';
 import PresidentialSystemDecisionPanel from './PresidentialSystemDecisionPanel';
 import PresidentialElectionLab from './PresidentialElectionLab';
 import PresidentialElectionStage7 from './PresidentialElectionStage7';
+
+// User-facing labels are separate from stable Supabase consequence identifiers.
+function formatStageConsequence(type:string,magnitude:number|null):string{
+ const label=CONSEQUENCE_OPTIONS.find(option=>option.value===type)?.label||'Иное последствие';
+ if(magnitude==null||!Number.isFinite(Number(magnitude)))return label;
+ const value=Number(magnitude),number=value.toLocaleString('ru-RU');
+ if(type==='representation_loss'||type==='regional_seat_loss'){
+  const abs=Math.abs(value);
+  const unit=!Number.isInteger(abs)?'места':abs%100>=11&&abs%100<=14?'мест':abs%10===1?'место':abs%10>=2&&abs%10<=4?'места':'мест';
+  return label+' — '+number+' '+unit;
+ }
+ if(type==='ghost_risk')return label+' — +'+number+' к весу риска';
+ if(type==='presidential_rating_loss')return label+' — на '+number+' п. п.';
+ return label+' — '+number;
+}
 
 type Tab='work'|'rules'|'materials'|'check'|'settings';
 type Props={g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;onBack:()=>void;onOpenStage?:(no:number)=>void;onOpenVotes:(id?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,no:number)=>void;onNavigate?:(view:View)=>void};
@@ -120,7 +135,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
 
   <section id={sectionId+'-rules'} className="stageOperationsPane" hidden={tab!=='rules'} aria-label="Маршрут и правила">
    <div className="stageOperationsRuleIntro"><h2>Порядок работы</h2><p>{detail.goal}</p><p><b>Участники: </b>{operation.participants}</p></div>
-   <section className="stageOperationsRuleIntro" aria-label="Действующие правила этапа"><h3>Установленные преподавателем сроки и последствия</h3><p><b>Статус:</b> {stageWorkLabel(g.game,stage)}</p><p><b>Срок:</b> {stage.deadline?formatDeadline(stage.deadline):'Преподаватель не установил'}</p>{liveRule&&<><p><b>Правило:</b> {liveRule.inclusive?'До указанного времени включительно':'Строго до указанного времени'}</p><p><b>Штраф:</b> {liveRule.penalty_points||0} баллов. {liveRule.penalty_description}</p>{liveRule.consequence_type!=='none'&&<p><b>Последствие:</b> {liveRule.consequence_type} — {liveRule.consequence_magnitude}</p>}</>}</section>
+   <section className="stageOperationsRuleIntro" aria-label="Действующие правила этапа"><h3>Установленные преподавателем сроки и последствия</h3><p><b>Статус:</b> {stageWorkLabel(g.game,stage)}</p><p><b>Срок:</b> {stage.deadline?formatDeadline(stage.deadline):'Преподаватель не установил'}</p>{liveRule&&<><p><b>Правило:</b> {liveRule.inclusive?'До указанного времени включительно':'Строго до указанного времени'}</p><p><b>Штраф:</b> {liveRule.penalty_points||0} баллов. {liveRule.penalty_description}</p>{liveRule.consequence_type!=='none'&&<p><b>Последствие:</b> {formatStageConsequence(liveRule.consequence_type,liveRule.consequence_magnitude)}</p>}</>}</section>
    <ol className="stageOperationsRoute">{detail.steps.map((step,i)=><li key={step}><span>{i+1}</span><p>{step}</p></li>)}</ol>
    <div className="stageOperationsRuleColumns"><section><h3>Процедура</h3><ul>{detail.procedure.map(text=><li key={text}>{text}</li>)}</ul></section><section><h3>Контрольные результаты</h3><ul className="stageOperationsOutputs">{detail.outputs.map(text=><li key={text}><CheckCircle2 size={17}/><span>{text}</span></li>)}</ul></section></div>
    <section className="stageOperationsLegal"><ScaleLabel/><p>{operation.legalNote}</p>{detail.notes.map(note=><p key={note}>{note}</p>)}</section>

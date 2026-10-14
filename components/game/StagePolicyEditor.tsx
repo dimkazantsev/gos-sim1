@@ -5,11 +5,11 @@ import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
 
-const CONSEQUENCE_OPTIONS=[
+export const CONSEQUENCE_OPTIONS=[
  {value:'none',label:'Без игрового последствия'},
  {value:'representation_loss',label:'Потеря представительства'},
  {value:'regional_seat_loss',label:'Потеря региональных мест'},
- {value:'ghost_risk',label:'Рост риска Ghost voting'},
+ {value:'ghost_risk',label:'Повышение риска отсутствия депутатов при голосовании'},
  {value:'presidential_rating_loss',label:'Снижение рейтинга кандидата'}
 ] as const;
 
