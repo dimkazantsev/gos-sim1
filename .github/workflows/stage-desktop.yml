@@ -96,6 +96,8 @@ jobs:
         run: node scripts/roster-leadership-browser-check.cjs
         env:
           CHROME_BIN: /usr/bin/google-chrome
+      - name: Compact stage readiness states and shared teacher refresh
+        run: node scripts/teacher-readiness-display-check.cjs
       - name: Design audit
         run: npm run design:check
       - name: Scoring guide and mobile geometry
