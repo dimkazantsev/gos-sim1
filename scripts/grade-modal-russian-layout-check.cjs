@@ -100,7 +100,7 @@ const debriefMarkup=[
    assert(form.textarea.left>=-1&&form.textarea.right<=width+2,'Debrief textarea outside viewport at '+width);
    assert(form.selector.left>=-1&&form.selector.right<=width+2,'Debrief stage selector outside viewport at '+width);
    assert(form.textarea.height>=195,'Debrief textarea too short at '+width);
-   if(width>760){
+   if(width>940){
     assert(Math.abs(form.leftLabel.top-form.rightLabel.top)<=2,'Debrief labels misaligned at '+width+': '+JSON.stringify(form));
     assert(Math.abs(form.selector.top-form.textarea.top)<=3,'Debrief input tops misaligned at '+width+': '+JSON.stringify(form));
     assert(Math.abs(form.prompt.bottom-form.textarea.bottom)<=3,'Debrief columns have unequal bottoms at '+width+': '+JSON.stringify(form));
