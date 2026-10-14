@@ -2,6 +2,7 @@
 import {type ReactNode,useEffect,useMemo,useRef,useState} from 'react';
 import {BarChart3,BookOpenText,ChevronDown,ChevronLeft,ChevronRight,ClipboardCheck,Table2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 type Assignment={id:string;question_id:number;user_id:string;chosen_index:number|null;is_correct:boolean|null;answered_at:string|null;stage_no:number};
 type ReviewStatus='pending'|'approved'|'rejected';
@@ -112,7 +113,10 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
    }
    if(live){setItems(results);setMatrixBusy(false)}
   }
-  void load();return ()=>{live=false};
+  const updated=(event:Event)=>{if((event as CustomEvent<{gameId:string}>).detail?.gameId===gameId)void load()};
+  window.addEventListener(GAME_DATA_REFRESH_EVENT,updated);
+  void load();
+  return ()=>{live=false;window.removeEventListener(GAME_DATA_REFRESH_EVENT,updated)};
  },[gameId,opened.matrix,students.length]);
  const answerMap=useMemo(()=>new Map(items.map(x=>[x.question_id+':'+x.user_id,x])),[items]);
  const statsMap=useMemo(()=>new Map(stats.map(x=>[x.user_id,x])),[stats]);
