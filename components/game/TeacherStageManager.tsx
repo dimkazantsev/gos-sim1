@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import StageReadinessPanel,{type StageReadiness} from './StageReadinessPanel';
 import {CheckCircle2,ChevronRight,CircleDot,LockKeyhole,RefreshCw,RotateCcw,Search,ShieldAlert,X} from 'lucide-react';
@@ -23,8 +23,12 @@ export default function TeacherStageManager({g,onOpenStage}:{
  g:ReturnTypeRepublic;onOpenStage:(stageNo:number)=>void
 }){
  const {stages,teacher,resetStageProgress,game}=g;
- const [readiness,setReadiness]=useState<StageReadiness[]>([]);
+ const [readinessSnapshot,setReadinessSnapshot]=useState<{gameId:string;rows:StageReadiness[]}|null>(null);
+ const [readinessFailure,setReadinessFailure]=useState<{gameId:string;message:string}|null>(null);
  const [readinessLoading,setReadinessLoading]=useState(false);
+ const readinessRequest=useRef(0);
+ const gameScope=useRef(game?.id);
+ gameScope.current=game?.id;
  const [expanded,setExpanded]=useState<number|null>(null);
  const [stageSort,setStageSort]=useState<'number'|'reverse'|'status'>('number');
  const [filter,setFilter]=useState<StageFilter>('all');
@@ -48,12 +52,26 @@ export default function TeacherStageManager({g,onOpenStage}:{
  }
  async function refreshReadiness(){
   if(!game)return;
+  const gameId=game.id;
+  const request=++readinessRequest.current;
   setReadinessLoading(true);
-  const r=await supabase.rpc('get_game_readiness',{p_game_id:game.id});
-  if(!r.error&&Array.isArray(r.data))setReadiness(r.data as StageReadiness[]);
-  setReadinessLoading(false);
+  setReadinessFailure(null);
+  try{
+   const r=await supabase.rpc('get_game_readiness',{p_game_id:gameId});
+   if(request!==readinessRequest.current||gameScope.current!==gameId)return;
+   if(r.error)throw r.error;
+   if(!Array.isArray(r.data))throw new Error('Сервер не вернул результаты проверки этапов.');
+   setReadinessSnapshot({gameId,rows:r.data as StageReadiness[]});
+  }catch(err){
+   if(request===readinessRequest.current&&gameScope.current===gameId){
+    setReadinessSnapshot(null);
+    setReadinessFailure({gameId,message:err instanceof Error?err.message:'Не удалось проверить готовность этапов.'});
+   }
+  }finally{
+   if(request===readinessRequest.current)setReadinessLoading(false);
+  }
  }
- useEffect(()=>{void refreshReadiness()},[game?.id]);
+ useEffect(()=>{void refreshReadiness();return()=>{readinessRequest.current++}},[game?.id]);
  useEffect(()=>{
   if(!game)return;
   const c=supabase.channel('teacher-stage-readiness:'+game.id)
@@ -63,6 +81,9 @@ export default function TeacherStageManager({g,onOpenStage}:{
  },[game?.id]);
  const closeDialog=()=>{if(busy)return;setResetTarget(null);setConfirmation('');setError('')};
  const dialogRef=useDialog(resetTarget!==null,closeDialog);
+ const readiness=readinessSnapshot?.gameId===game?.id?readinessSnapshot.rows:[];
+ const readinessChecked=readinessSnapshot?.gameId===game?.id;
+ const readinessError=readinessFailure?.gameId===game?.id?readinessFailure.message:'';
  const completed=stages.filter(s=>s.status==='completed').length;
  const active=stages.filter(s=>s.status==='open').length;
  const searchTerm=search.trim().toLocaleLowerCase('ru-RU');
@@ -150,7 +171,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
      </div>
      <button type="button" className="teacherStageInspectorReset" onClick={()=>askReset(selectedStage.stage_no)} title="Сбросить этот этап" aria-label={'Сбросить этап '+selectedStage.stage_no} disabled={busy}><RotateCcw size={17}/></button></header>
      {selectedStage.summary&&<p className="teacherStageInspectorSummary">{selectedStage.summary}</p>}
-     <StageReadinessPanel g={g} stageNo={selectedStage.stage_no} compact/>
+     <StageReadinessPanel g={g} stageNo={selectedStage.stage_no} compact compactReadiness={selectedReady} compactChecked={readinessChecked} compactLoading={readinessLoading} compactError={readinessError} onCompactRefresh={()=>void refreshReadiness()}/>
      <div className="teacherStageInspectorActions" aria-label="Действия с выбранным этапом">
       <div className="teacherStageFlowActions">
        {selectedStage.status!=='open'
