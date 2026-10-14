@@ -99,7 +99,7 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
  },[active?.deadline,!!activeFeedback]);
  useEffect(()=>{if(active&&activeSeconds===0&&Date.now()>=Date.parse(active.deadline||'')&&!activeFeedback&&!answerBusy)void answerSelected(-1)},[active?.id,activeSeconds,!!activeFeedback,answerBusy]);
  useEffect(()=>{if(!activeFeedback)return;const timer=window.setTimeout(()=>{setActive(null);setActiveFeedback(null);void refresh()},4800);return()=>window.clearTimeout(timer)},[activeFeedback]);
- useEffect(()=>{if(!open)return;window.dispatchEvent(new Event('blitz:archive-open'));return()=>window.dispatchEvent(new Event('blitz:archive-close'))},[open]);
+ useEffect(()=>{if(!open)return;window.dispatchEvent(new Event('blitz:archive-open'));return()=>{window.dispatchEvent(new Event('blitz:archive-close'))}},[open]);
 
  const request=useRef(0);
  const dialogRef=useDialog(open,onClose);
