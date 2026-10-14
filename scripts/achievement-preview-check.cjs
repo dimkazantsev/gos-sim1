@@ -23,4 +23,10 @@ assert(profile.includes('!previewAchievementsUserId&&<BlitzArchive'),'Generic pr
 assert(profile.includes('if(!game||!target||previewAchievementsUserId)return;'),'Generic preview cannot send fake UUID to public stats RPC');
 assert(shelf.includes("supabase.rpc('get_game_achievements'")&&shelf.includes('publicAchievementPreview((r.data||[]) as Achievement[])'),'Catalog fetched with existing authorized RPC and cleansed locally');
 assert(shelf.includes('Демонстрационный профиль:')&&shelf.includes("previewOnly?publicAchievementPreview"),'UI explains that progress is demonstration-only');
-console.log('PASS: 60 visible award previews, 40 secrets hidden, no earned/progress leakage, real-user RPC ID, ordinary student unchanged');
+assert(profile.includes('previewOnly={!!previewAchievementsUserId} defaultCollapsed/>'),'Every student profile starts with achievements collapsed, including generic preview');
+assert(shelf.includes('const [expanded,setExpanded]=useState(!defaultCollapsed)'),'Collapsed default state is controlled by an opt-in prop');
+assert(shelf.includes('useEffect(()=>setExpanded(!defaultCollapsed),[gameId,userId,defaultCollapsed])'),'Switching student profiles restores default collapsed state');
+assert(shelf.includes('aria-expanded={expanded}')&&shelf.includes('aria-controls={contentId}')&&shelf.includes('hidden={!expanded}'),'The catalog has an accessible toggle and hidden content while collapsed');
+assert(shelf.includes('showCatalog&&expanded')&&shelf.includes('setFilter(\'earned\')'),'Expanded mode retains the existing earned and available filters');
+assert(shelf.includes('className="awardCollectionSummary"'),'Progress and total earned remain visible while the catalog is collapsed');
+console.log('PASS: student catalog collapsed by default; accessible expansion preserves counters, filters and protected previews');
