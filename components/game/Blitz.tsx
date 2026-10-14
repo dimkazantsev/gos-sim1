@@ -36,7 +36,7 @@ export function BlitzArchive({gameId,userId}:{gameId:string;userId:string}){
   setLoading(false);
  }
  useEffect(()=>{setRows([]);setOffset(0);setHasMore(false);void load(0);return()=>{request.current++}},[gameId,userId]);
- return <section id="profile-blitz-archive" className="surface blitzArchive" aria-label="Личный раздел блиц-вопросов">
+ return <section className="surface blitzArchive" id="profile-blitz-archive" aria-label="Личный раздел блиц-вопросов">
   <header className="blitzArchiveHeader">
    <div><small>ПРАВОВЫЕ ЗНАНИЯ</small><h2>Блиц-вопросы</h2><p>История ответов по этапам: вопрос, правильный ответ и ваш выбор. На новый вопрос отводится 20 секунд.</p></div>
    <strong>{rows.length} записей{hasMore?' (есть ещё)':''}</strong>
