@@ -33,7 +33,7 @@ BEGIN
     RAISE EXCEPTION 'Unverified Duma committees asserted';
    END IF;
    SELECT count(*) INTO official_chair_total FROM public.office_elections
-   WHERE game_id=s.game_id AND stage_no=4 AND office_key='gd_chair'
+   WHERE game_id=s.game_id AND stage_no=4 AND office_key IN ('gd_chair','gd_deputy_1','gd_deputy_2')
     AND status='finished' AND winner_candidate_id IS NOT NULL;
    IF official_chair_total=0 AND bulletin->>'body' LIKE '%руководство палаты сформировано следующим образом%' THEN
     RAISE EXCEPTION 'Unverified Duma leadership asserted';
