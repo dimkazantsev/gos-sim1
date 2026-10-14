@@ -48,13 +48,13 @@ export default function TeacherGhostVotingPanel({g}:{g:ReturnTypeRepublic}){
   setNotice(ok?'Потери мандатов сохранены для '+values.length+' фракций.':'Не удалось применить изменения. Проверьте уведомления игры.');
  }
  async function clear(){
-  if(!window.confirm('Снять ограничения Ghost Voting со всех фракций?'))return;
+  if(!window.confirm('Снять ограничения теневого голосования со всех фракций?'))return;
   setBusy(true);const ok=await clearPartyGhostLoss();setBusy(false);
   setNotice(ok?'Полный состав фракций восстановлен.':'Не удалось восстановить мандаты.');
  }
  if(!teacher)return null;
- return <section className="teacherGhostPanel" aria-label="Настройка Ghost Voting">
-  <header><div><small>НАСТРОЙКА СЦЕНАРИЯ</small><h2>Ghost Voting · распределение потерь</h2><p>Настройте отдельно каждую фракцию или назначьте одинаковое число всем. Сумма для всех партий распределяется случайно; для одной партии назначается выбранное значение. Не более 50 для каждой.</p></div><ShieldAlert size={24} aria-hidden="true"/></header>
+ return <section className="teacherGhostPanel" aria-label="Настройка теневого голосования">
+  <header><div><small>НАСТРОЙКА СЦЕНАРИЯ</small><h2>Теневое голосование · распределение потерь</h2><p>Настройте отдельно каждую фракцию или назначьте одинаковое число всем. Сумма для всех партий распределяется случайно; для одной партии назначается выбранное значение. Не более 50 для каждой.</p></div><ShieldAlert size={24} aria-hidden="true"/></header>
   <div className="ghostBulk">
    <StyledSelect label="Применить к" value={scope} onChange={v=>setScope(v as typeof scope)}
     options={[{value:'selected',label:'Одной партии'},{value:'all',label:'Всем партиям'}]}/>

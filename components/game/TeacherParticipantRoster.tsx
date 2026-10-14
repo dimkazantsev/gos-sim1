@@ -41,11 +41,11 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
   setBusy(false);
  }
  if(!g.teacher||!gameId)return null;
- return <section className="surface" aria-label="Участники и доступ" style={{padding:20}}>
-  <div className="surfaceHead"><div><small>ДОСТУП К ИГРЕ</small><h2>Участники и доступ</h2>
-  <p>Все зарегистрированные пользователи текущей игры, включая исключённых. Исключение сохраняет историю; очистка профиля обезличивает запись, но не удаляет общую учётную запись Auth или исторические документы.</p></div><b>{entries.filter(e=>e.access_action!=='profile_erased').length}</b></div>
-  <div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:16}}>
-   <input aria-label="Поиск участника" placeholder="ФИО, должность, ID" value={search} onChange={e=>setSearch(e.target.value)}/>
+ return <section className="surface teacherParticipantRoster" aria-label="Участники и доступ">
+  <div className="surfaceHead teacherRosterHead"><div><small>ДОСТУП К ИГРЕ</small><h2>Участники и доступ</h2>
+  <p>Все зарегистрированные пользователи текущей игры, включая исключённых. Исключение сохраняет историю; очистка профиля обезличивает запись, но не удаляет общую учётную запись для входа или исторические документы.</p></div><b className="teacherRosterCount">{entries.filter(e=>e.access_action!=='profile_erased').length}</b></div>
+  <div className="teacherRosterToolbar">
+   <input type="search" aria-label="Поиск участника" placeholder="ФИО, должность, идентификатор" value={search} onChange={e=>setSearch(e.target.value)}/>
    <select aria-label="Фильтр роли" value={filter} onChange={e=>setFilter(e.target.value)}>
     <option value="current">Текущий реестр</option><option value="all">Все записи</option><option value="removed">Удалённые записи</option><option value="student">Участники</option><option value="guest">Гости</option><option value="teacher">Преподаватели</option><option value="blocked">Исключённые</option>
    </select>
@@ -53,23 +53,23 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
   </div>
   {status&&<p role="status">{status}</p>}
   {loading&&<p role="status">Обновление списка…</p>}
-  <div style={{display:'grid',gap:8}}>
-   {rows.map(e=>{const protectedUser=e.kind==='teacher'||e.user_id===g.me?.user_id;return <article key={e.user_id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,padding:12,border:'1px solid #d7dce3',borderRadius:12,flexWrap:'wrap'}}>
-    <div><b>{e.full_name}</b><div><small>{e.kind==='teacher'?'Преподаватель':e.kind==='observer'||e.kind==='guest'?'Гость':'Участник'} · {e.role_title||'Без должности'}</small></div>
+  <div className="teacherRosterList">
+   {rows.map(e=>{const protectedUser=e.kind==='teacher'||e.user_id===g.me?.user_id;return <article key={e.user_id} className="teacherRosterEntry">
+    <div className="teacherRosterIdentity"><b>{e.full_name}</b><div><small>{e.kind==='teacher'?'Преподаватель':e.kind==='observer'||e.kind==='guest'?'Гость':'Участник'} · {e.role_title||'Без должности'}</small></div>
     <small>{e.access_action?'Доступ закрыт':e.last_seen_at&&Date.now()-new Date(e.last_seen_at).getTime()<90000?'В сети':'Не в сети'}
     {' · '}Последняя активность: {e.last_seen_at?new Date(e.last_seen_at).toLocaleString('ru-RU'):'Не зафиксирована'}</small></div>
-    {!protectedUser&&<div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+    {!protectedUser&&<div className="teacherRosterActions">
      {!e.access_action&&<button type="button" className="secondary" disabled={busy} onClick={()=>{setSelected({entry:e,action:'exclude'});setConfirmation('')}}><UserX size={16}/> Исключить</button>}
      {e.access_action!=='profile_erased'&&<button type="button" className="danger" disabled={busy} onClick={()=>{setSelected({entry:e,action:'erase_profile'});setConfirmation('')}}><Trash2 size={16}/> Очистить профиль и доступ</button>}
     </div>}
    </article>})}
    {!loading&&rows.length===0&&<p>Совпадений нет.</p>}
   </div>
-  {selected&&<div role="dialog" aria-modal="true" aria-label="Подтверждение управления доступом" style={{marginTop:20,border:'2px solid #c97070',padding:16,borderRadius:12}}>
+  {selected&&<div role="dialog" aria-modal="true" aria-label="Подтверждение управления доступом" className="teacherRosterDialog">
    <h3><ShieldAlert size={20}/> {selected.action==='exclude'?'Исключить участника':'Очистить профиль участника'}</h3>
-   <p><b>{selected.entry.full_name}</b>. {selected.action==='exclude'?'Доступ к этой игре будет заблокирован; история и профиль сохранятся.':'Доступ будет заблокирован, имя и данные игрового профиля очищены. Исторические игровые записи и Auth-аккаунт сохранятся.'}</p>
-   <label>Введите ФИО в точности: {selected.entry.full_name}<input autoComplete="off" value={confirmation} onChange={e=>setConfirmation(e.target.value)}/></label>
-   <div style={{display:'flex',gap:10,marginTop:12}}>
+   <p><b>{selected.entry.full_name}</b>. {selected.action==='exclude'?'Доступ к этой игре будет заблокирован; история и профиль сохранятся.':'Доступ будет заблокирован, имя и данные игрового профиля очищены. Исторические игровые записи и учётная запись для входа сохранятся.'}</p>
+   <label className="teacherRosterConfirm">Введите ФИО в точности: {selected.entry.full_name}<input autoComplete="off" value={confirmation} onChange={e=>setConfirmation(e.target.value)}/></label>
+   <div className="teacherRosterDialogActions">
     <button className="danger" type="button" disabled={busy||confirmation!==selected.entry.full_name} onClick={()=>void submit()}>{busy?'Выполняется…':'Подтвердить'}</button>
     <button type="button" disabled={busy} onClick={()=>setSelected(null)}>Отмена</button>
    </div>

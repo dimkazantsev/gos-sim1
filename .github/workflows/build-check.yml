@@ -80,6 +80,11 @@ on:
       - 'scripts/budget-change-registry-check.cjs'
       - 'supabase/migrations/20261012210000_unified_budget_change_registry.sql'
       - 'components/game/TeacherView.tsx'
+      - 'components/game/TeacherParticipantRoster.tsx'
+      - 'components/game/TeacherGhostVotingPanel.tsx'
+      - 'components/game/EventWorkspace.tsx'
+      - 'app/teacher-ui-polish.css'
+      - 'scripts/teacher-russian-panels-check.cjs'
       - 'app/stage-map.css'
       - 'scripts/stage-readiness-manual-check.cjs'
       - 'app/2026-document-workflow-v2.css'
@@ -193,6 +198,7 @@ jobs:
       - run: node scripts/political-publisher-catalog-check.cjs
       - run: node scripts/access-codes-civic-actor-check.cjs
       - run: node scripts/all-invitations-layout-check.cjs
+      - run: node scripts/teacher-russian-panels-check.cjs
       - run: node scripts/saved-invitations-check.cjs
       - run: node scripts/crisis-baseline-check.cjs
 

@@ -154,3 +154,64 @@
  .gradesPage .gradesToolbar .gradesSortDir{grid-column:1;width:42px}
 }
 @media(prefers-reduced-motion:reduce){.teacherCommand *{scroll-behavior:auto}}
+
+
+/* Teacher participant roster and invitation inventory: predictable alignment at every width. */
+.teacherParticipantRoster{min-width:0;padding:20px;display:grid;align-content:start;gap:16px}
+.teacherParticipantRoster .teacherRosterHead{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;min-width:0}
+.teacherParticipantRoster .teacherRosterHead>div{min-width:0}
+.teacherParticipantRoster .teacherRosterHead p{overflow-wrap:anywhere}
+.teacherParticipantRoster .teacherRosterCount{display:grid;place-items:center;min-width:44px;min-height:44px;padding:6px 10px;font-variant-numeric:tabular-nums}
+.teacherParticipantRoster .teacherRosterToolbar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;min-width:0}
+.teacherParticipantRoster .teacherRosterToolbar input,.teacherParticipantRoster .teacherRosterToolbar select{
+ box-sizing:border-box;flex:1 1 190px;width:auto;min-width:0;max-width:100%;min-height:44px;height:44px;padding:0 12px;
+ border:1px solid #cbd6e6;border-radius:10px;background:#fff;color:#283e60;font-size:14px
+}
+.teacherParticipantRoster .teacherRosterToolbar button,.teacherParticipantRoster .teacherRosterActions button,
+.teacherParticipantRoster .teacherRosterDialogActions button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;max-width:100%;white-space:normal;text-align:center}
+.teacherParticipantRoster :is(.teacherRosterToolbar,.teacherRosterActions,.teacherRosterDialogActions) button svg{flex-shrink:0}
+.teacherParticipantRoster .teacherRosterList{display:grid;gap:8px;min-width:0}
+.teacherParticipantRoster .teacherRosterEntry{
+ display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;
+ min-width:0;padding:12px;border:1px solid #d7dce3;border-radius:12px
+}
+.teacherParticipantRoster .teacherRosterIdentity{min-width:0;overflow-wrap:anywhere;line-height:1.55}
+.teacherParticipantRoster .teacherRosterIdentity small{display:inline-block;max-width:100%}
+.teacherParticipantRoster .teacherRosterActions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;min-width:0}
+.teacherParticipantRoster .teacherRosterDialog{display:grid;gap:12px;margin-top:4px;padding:16px;border:2px solid #c97070;border-radius:12px;min-width:0}
+.teacherParticipantRoster .teacherRosterDialog h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0}
+.teacherParticipantRoster .teacherRosterDialog h3 svg{flex-shrink:0}
+.teacherParticipantRoster .teacherRosterDialog p{margin:0;overflow-wrap:anywhere}
+.teacherParticipantRoster .teacherRosterConfirm{display:grid;gap:8px;min-width:0;overflow-wrap:anywhere}
+.teacherParticipantRoster .teacherRosterConfirm input{box-sizing:border-box;width:100%;min-width:0;min-height:44px}
+.teacherParticipantRoster .teacherRosterDialogActions{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.teacherAccessCodes{min-width:0}
+.teacherAccessCodes .teacherAccessHead>div,.teacherAccessCodes .teacherCodeCreated>div{min-width:0}
+.teacherAccessCodes .teacherCodeGrid{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.teacherAccessCodes .teacherCodeActions>button{flex:1 1 150px;min-width:0;min-height:44px}
+.teacherAccessCodes .teacherCodeCreated button,.teacherAccessCodes .teacherAccessListHead button,
+.teacherAccessCodes .teacherCodeRow button{min-height:44px}
+.teacherAccessCodes .teacherCodeCreated>div{flex:1 1 240px;overflow-wrap:anywhere}
+.teacherAccessCodes .teacherCodeRows{min-width:0;container-type:inline-size}
+.teacherAccessCodes .teacherCodeRow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:center;gap:12px;min-width:0;padding:12px 0}
+.teacherAccessCodes .teacherCodeRow>*,.teacherAccessCodes .teacherInviteSecret{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.teacherAccessCodes .teacherCodeRow>:last-child{justify-self:end}
+.teacherAccessCodes .teacherCodeRow code{white-space:normal;overflow-wrap:anywhere}
+@container (max-width:650px){
+ .teacherAccessCodes .teacherCodeRow{grid-template-columns:minmax(0,1fr);gap:9px}
+ .teacherAccessCodes .teacherCodeRow>:last-child{justify-self:start}
+}
+@media(max-width:900px){
+ .teacherParticipantRoster .teacherRosterEntry{grid-template-columns:minmax(0,1fr)}
+ .teacherParticipantRoster .teacherRosterActions{justify-content:flex-start}
+}
+@media(max-width:520px){
+ .teacherParticipantRoster{padding:16px;gap:12px}
+ .teacherParticipantRoster .teacherRosterHead{align-items:start;gap:10px}
+ .teacherParticipantRoster .teacherRosterToolbar{display:grid;grid-template-columns:minmax(0,1fr)}
+ .teacherParticipantRoster .teacherRosterToolbar input,.teacherParticipantRoster .teacherRosterToolbar select,
+ .teacherParticipantRoster .teacherRosterToolbar button{width:100%;min-width:0}
+ .teacherParticipantRoster .teacherRosterActions,.teacherParticipantRoster .teacherRosterDialogActions{display:grid;grid-template-columns:minmax(0,1fr)}
+ .teacherParticipantRoster .teacherRosterActions button,.teacherParticipantRoster .teacherRosterDialogActions button{width:100%}
+ .teacherAccessCodes .teacherCodeCreated button{width:100%}
+}

@@ -22,5 +22,5 @@ assert.match(ui,/teacher_manage_participant/);
 assert.match(ui,/'exclude'\|'erase_profile'/);
 assert.match(ui,/confirmation!==selected\.entry\.full_name/);
 assert.match(ui,/protectedUser=e\.kind==='teacher'/);
-assert.match(ui,/не удаляет общую учётную запись Auth/);
+assert.match(ui,/не удаляет общую учётную запись для входа/);
 console.log('PASS participant access static authorization, rejoin, erasure and UI guards');
