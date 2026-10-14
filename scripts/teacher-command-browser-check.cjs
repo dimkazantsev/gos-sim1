@@ -37,7 +37,9 @@ async function check(){
      list:rect(list),inspector:rect(inspector),rows:entries.map(rect),
      deadline:deadline?rect(deadline):null,actions:actions?rect(actions):null,policy:policy?rect(policy):null,
      duplicateTimer:root.querySelectorAll('.teacherCommandClock,.teacherClockSwitch').length,
-     stageStatus:root.querySelectorAll('.teacherCommandStatus .teacherTurnBadge').length,
+     stageStatus:root.querySelectorAll('.teacherCommandBar .teacherTurnBadge').length,
+     readinessButton:root.querySelectorAll('.teacherStageInspector .stageReadinessCompactRefresh').length,
+     readinessButtonRect:root.querySelector('.teacherStageInspector .stageReadinessCompactRefresh')?rect(root.querySelector('.teacherStageInspector .stageReadinessCompactRefresh')):null,
      procedures:root.querySelectorAll('.teacherStageProcedures').length,
      extension:root.querySelectorAll('.teacherStageExtendField input').length,
      reset:root.querySelectorAll('.teacherStageInspectorReset').length,
@@ -49,7 +51,9 @@ async function check(){
    assert.equal(data.allReset,1,'Exactly one global stage reset');
    assert.equal(data.workspaceCount,12,'Twelve teacher workspaces');
    assert.equal(data.duplicateTimer,0,'Teacher command bar must not duplicate the global countdown');
-   assert.equal(data.stageStatus,1,'Stage status must remain visible without a second timer');
+   assert.equal(data.stageStatus,0,'Teacher command bar must not duplicate the status shown in the global header');
+   assert.equal(data.readinessButton,1,'The selected stage must have an actionable readiness refresh button');
+   assert(data.readinessButtonRect.right<=data.width+2,'Readiness refresh must fit the viewport at '+width+'px');
    assert.equal(data.procedures,1,'Procedures action must remain available');
    assert.equal(data.extension,1,'Stage extension input must remain accessible');
    assert(data.deadline&&data.actions&&data.policy,'Deadline, actions and policy must remain visible');
