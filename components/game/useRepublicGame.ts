@@ -594,6 +594,17 @@ export function useRepublicGame(gameId:string){
 
  async function manageStage(stageNo:number,action:'open'|'close'|'extend',minutes=30):Promise<boolean>{
   if(!teacher){setError('Только преподаватель может управлять этапами.');return false}
+  if(action==='close'){
+   const check=await supabase.rpc('get_stage_readiness',{p_game_id:gameId,p_stage_no:stageNo});
+   const data=check.data as {ready?:boolean;blockers?:unknown;warnings?:unknown}|null;
+   if(check.error||!data||typeof data.ready!=='boolean'||!Array.isArray(data.blockers)||!Array.isArray(data.warnings)){
+    setError(check.error?.message||'Не удалось проверить обязательные процедуры этапа перед завершением.');return false;
+   }
+   const blockers=data.blockers.filter((item):item is string=>typeof item==='string');
+   const warnings=data.warnings.filter((item):item is string=>typeof item==='string');
+   const notice=data.ready?'Обязательные процедуры выполнены.':'Не завершены обязательные процедуры:\n'+blockers.slice(0,7).join('\n');
+   if(!window.confirm('Этап '+stageNo+'. '+notice+(warnings.length?'\nЗамечаний: '+warnings.length+'.':'')+'\n\nЗавершить этап?'))return false;
+  }
   const r=await supabase.rpc('manage_game_stage',{p_game_id:gameId,p_stage_no:stageNo,p_action:action,p_minutes:minutes});
   if(r.error){setError(r.error.message);return false}
   await refresh();
