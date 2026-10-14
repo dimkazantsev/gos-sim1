@@ -338,6 +338,7 @@ export function useRepublicGame(gameId:string){
   }
   acceptedMember.current=member;setGame(g.data as Game);setMe(member);
   if(!mt.error&&readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
+  if(mt.error&&readCurrent(ticket,'metrics'))setError(mt.error);
   if(!ev.error)setEvents((ev.data||[]) as EventItem[]);
   if(!mb.error&&readCurrent(ticket,'members'))setMembers((mb.data||[]) as Member[]);
   if(!ch.error&&readCurrent(ticket,'overview'))setChannels((ch.data||[]) as Channel[]);
@@ -371,7 +372,7 @@ export function useRepublicGame(gameId:string){
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets());
   if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation());
   if(view==='documents')jobs.push(loadFormalRegistry());
-  if(view==='actions')jobs.push(loadPoliticalWall());
+  if(view==='actions'||view==='dashboard')jobs.push(loadPoliticalWall());
   if(view==='teacher')jobs.push(loadClassroomTelemetry(),loadImpactEngine());
   if(chatOpenRef.current)jobs.push(loadChatOverview());
   await Promise.allSettled(jobs);
