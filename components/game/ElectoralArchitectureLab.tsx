@@ -230,6 +230,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
    </div>
    <div className="electoralCalculatorSummary">
     {calculatorSystem!=='majoritarian'&&<span>Сумма поддержки <b>{calculatorSupportTotal.toLocaleString('ru-RU',{maximumFractionDigits:1})}%</b></span>}
+    {calculatorSystem!=='majoritarian'&&calculatorSupportTotal>0&&Math.abs(calculatorSupportTotal-100)>1e-6&&<span role="note">Внимание: поддержка нормализуется относительно суммы введённых значений.</span>}
     {calculatorSystem!=='proportional'&&<span>Округа <b>{districtTotal} / {districtPool}</b></span>}
     {calculatorSystem==='mixed'&&<span>Пропорционально <b>{proportionalPool}</b></span>}
     <span>Распределено <b>{calculatorAllocatedTotal} / 450</b></span>
