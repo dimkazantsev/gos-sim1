@@ -143,3 +143,41 @@
 .blitzArchiveResult p{display:block;overflow-wrap:anywhere;margin:0;line-height:1.6}
 .blitzArchiveMore{min-height:44px}
 @media(max-width:520px){.blitzArchiveToolbar{display:grid;grid-template-columns:minmax(0,1fr)}}
+
+/* Личный блиц: история «вопрос — правильный ответ — ваш ответ». */
+.blitzArchive{scroll-margin-top:24px}
+.blitzArchiveList{gap:12px}
+.blitzHistoryCard{display:grid;gap:12px;min-width:0;border:1px solid #dbe4f0;border-radius:16px;background:#fff;padding:clamp(14px,2vw,20px);box-shadow:0 2px 9px rgba(33,60,100,.035)}
+.blitzHistoryCard.isCorrect{border-left:4px solid #91ceb0}
+.blitzHistoryCard.isIncorrect{border-left:4px solid #e6aaa8}
+.blitzHistoryCard.isPending{border-left:4px solid #b9c8e3}
+.blitzHistoryMeta{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.blitzHistoryStage{font-size:12px;font-weight:700;color:#647791}
+.blitzHistoryStatus{display:inline-flex;align-items:center;min-height:27px;padding:4px 10px;border:1px solid #dce5f2;border-radius:999px;background:#f3f6fb;font-size:12px;font-weight:750;color:#506883}
+.blitzHistoryCard.isCorrect .blitzHistoryStatus{background:#eaf7f0;border-color:#c8e6d6;color:#24684c}
+.blitzHistoryCard.isIncorrect .blitzHistoryStatus{background:#fff0ef;border-color:#f0d1cf;color:#945353}
+.blitzArchive .blitzHistoryQuestion{display:block;margin:0;font-size:clamp(15px,1.5vw,17px);line-height:1.55;font-weight:700;color:#1b3054;overflow-wrap:anywhere}
+.blitzHistoryAnswers{display:grid;gap:8px}
+.blitzHistoryAnswer{display:grid;grid-template-columns:minmax(120px,168px) minmax(0,1fr);align-items:center;gap:8px 14px;padding:11px 13px;border:1px solid #dbe5ed;border-radius:11px;min-width:0}
+.blitzHistoryAnswer>span{font-size:12px;font-weight:700;color:#5a6d84}
+.blitzHistoryAnswer>strong{font-size:14px;line-height:1.5;overflow-wrap:anywhere;font-weight:650;color:#253b54}
+.blitzHistoryAnswerCorrect{background:#f0f8f4;border-color:#d2e9dc}
+.blitzHistoryAnswerCorrect>strong{color:#25644b}
+.blitzHistoryCard.isCorrect .blitzHistoryAnswerStudent{background:#eaf7f0;border-color:#c8e6d6}
+.blitzHistoryCard.isCorrect .blitzHistoryAnswerStudent>strong{color:#24684c}
+.blitzHistoryCard.isIncorrect .blitzHistoryAnswerStudent{background:#fff1f0;border-color:#f1d4d2}
+.blitzHistoryCard.isIncorrect .blitzHistoryAnswerStudent>strong{color:#945050}
+.blitzHistoryPending{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.blitzArchive .blitzHistoryPending p{display:block;margin:0;font-size:13px;line-height:1.5;color:#67768a}
+.blitzHistoryPending button{min-height:40px}
+.blitzArchive .blitzHistoryExplain{border:0;border-top:1px solid #e6ebf2;border-radius:0;margin:0;padding:10px 0 0;min-width:0}
+.blitzArchive .blitzHistoryExplain summary{display:list-item;font-size:12px;font-weight:700;color:#3b5f8d;cursor:pointer}
+.blitzArchive .blitzHistoryExplain p{display:block;margin:9px 0 0;font-size:13px;line-height:1.55}
+.blitzHistoryExplain a,.blitzHistoryExplain span{display:inline-block;margin-top:8px;font-size:12px;overflow-wrap:anywhere}
+@media(max-width:600px){
+ .blitzArchive{scroll-margin-top:12px}
+ .blitzHistoryCard{gap:10px}
+ .blitzHistoryAnswer{grid-template-columns:minmax(0,1fr);gap:4px;padding:10px 12px}
+ .blitzHistoryAnswer>strong{font-size:13px}
+ .blitzHistoryPending button{width:100%}
+}
