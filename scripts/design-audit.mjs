@@ -102,7 +102,7 @@ check('New stage cards render a unique status, detail button and optional vote b
  stagesView.includes('className="stageAtlasCardFooter"')&&
  stagesView.includes('className="stageAtlasVoteAction"')&&
  stagesView.includes('className="stageAtlasDetailAction"')&&
- stagesView.includes("className={'stageAtlasCardStatus is-'+s.status}")&&
+ stagesView.includes("className={'stageAtlasCardStatus is-'+effectiveStatus}")&&
  !stagesView.includes('className="stageTimeline"'));
 check('Atlas owns last-loaded card styles without old fixed-width buttons',
  stageSheet.includes('.stagesAtlas .stageAtlasGrid')&&
