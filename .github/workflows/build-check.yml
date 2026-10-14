@@ -198,6 +198,7 @@ jobs:
       - run: node scripts/stage-readiness-manual-check.cjs
       - run: node scripts/profile-setup-and-brand-check.cjs
       - run: node scripts/entry-qr-check.cjs
+      - run: node scripts/remembered-game-codes-check.cjs
       - run: node scripts/achievement-preview-check.cjs
       - run: node scripts/ksrf-profile-events-regression-check.cjs
       - run: node scripts/blitz-inbox-sync-check.cjs
