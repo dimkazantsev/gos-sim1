@@ -104,7 +104,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   let live=true;setMatrixBusy(true);
   async function load(){
    const results:Assignment[]=[];
-   for(let offset=0;offset<15000;offset+=1000){
+   for(let offset=0;offset<30000;offset+=1000){
     const {data,error:loadError}=await supabase.from('blitz_assignments').select('id,question_id,user_id,chosen_index,is_correct,answered_at,stage_no').eq('game_id',gameId).not('answered_at','is',null).order('answered_at',{ascending:false}).range(offset,offset+999);
     if(!live)return;
     if(loadError){setError(loadError.message);setMatrixBusy(false);return}
