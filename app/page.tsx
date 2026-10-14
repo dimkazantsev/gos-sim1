@@ -1,11 +1,12 @@
 'use client';
-import {FormEvent,useMemo,useState} from 'react';
+import {FormEvent,useEffect,useMemo,useState} from 'react';
 import {ArrowUpRight,ArrowRight,Eye,EyeOff,GraduationCap,Landmark,LockKeyhole,LoaderCircle} from 'lucide-react';
 import CivicArtwork from '@/components/ui/CivicArtwork';
 import GameEntryQr from '@/components/ui/GameEntryQr';
 import {BrandIdentity,BRAND_NAME,BRAND_TAGLINE} from '@/components/ui/BrandIdentity';
 import {useRouter} from 'next/navigation';
 import {createPasswordAuthClient,supabase} from '@/lib/supabase';
+import {forgetRememberedGameCode,readRememberedGameCodes,rememberGameCode} from '@/lib/rememberedGameCodes';
 
 function readableError(err:unknown){
  const raw=err&&typeof err==='object'&&'message' in err?String((err as {message?:unknown}).message??''):err instanceof Error?err.message:'';
@@ -24,6 +25,15 @@ export default function Home(){
  const [showCode,setShowCode]=useState(false);
  const [personalLogin,setPersonalLogin]=useState(false);
  const [loginEmail,setLoginEmail]=useState(''),[loginPassword,setLoginPassword]=useState(''),[loginGameCode,setLoginGameCode]=useState(''),[recoverySent,setRecoverySent]=useState(false);
+ const [savedGameCodes,setSavedGameCodes]=useState<string[]>([]);
+ useEffect(()=>{
+  const codes=readRememberedGameCodes();
+  setSavedGameCodes(codes);
+  setLoginGameCode(current=>current||codes[0]||'');
+ },[]);
+ function saveSuccessfulGameCode(code:string){
+  setSavedGameCodes(rememberGameCode(code));
+ }
  const heading=useMemo(()=>mode==='teacher'&&createMode?'Новое государство':mode==='teacher'?'Начнём занятие':mode==='guest'?'Гостевой просмотр':'Вход участника',[mode,createMode]);
 
  async function submit(e:FormEvent){
@@ -38,9 +48,9 @@ export default function Home(){
    const session=(await supabase.auth.getSession()).data.session;
    if(!session){const a=await supabase.auth.signInAnonymously({options:{data:{full_name:name}}});if(a.error)throw a.error}
    if(mode==='teacher'&&createMode){
-    const r=await supabase.rpc('create_game_session',{p_title:gameTitle.trim(),p_game_code:code,p_teacher_code:access,p_student_code:students,p_teacher_name:name});if(r.error)throw r.error;router.push('/game/'+r.data);
+    const r=await supabase.rpc('create_game_session',{p_title:gameTitle.trim(),p_game_code:code,p_teacher_code:access,p_student_code:students,p_teacher_name:name});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data);
    }else{
-    const r=await supabase.rpc('join_game_with_code',{p_game_code:code,p_invite_code:access,p_full_name:name,p_group_name:mode==='student'?group.trim():null});if(r.error)throw r.error;router.push('/game/'+r.data);
+    const r=await supabase.rpc('join_game_with_code',{p_game_code:code,p_invite_code:access,p_full_name:name,p_group_name:mode==='student'?group.trim():null});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data);
    }
   }catch(e){setError(readableError(e))}finally{setBusy(false)}
  }
@@ -87,7 +97,8 @@ export default function Home(){
     if(!retry||attempt===2)throw r.error;
     await new Promise(resolve=>setTimeout(resolve,800*(attempt+1)));
    }
-   router.push('/game/'+resumedGameId);
+   saveSuccessfulGameCode(loginGameCode);
+    router.push('/game/'+resumedGameId);
   }catch(e){
    const message=readableError(e);
    const transient=/Нет ответа от сервера|network|fetch|timeout|соединен|сеть|подключено к интернету/i.test(message);
@@ -135,7 +146,23 @@ export default function Home(){
      <button type="button" className="entryPersonalSwitch" onClick={()=>{setPersonalLogin(false);setError('')}}><LockKeyhole size={16}/> Вернуться ко входу по коду</button>
      <fieldset disabled={busy}>
       <legend className="srOnly">Данные личной учётной записи</legend>
-      <label className="entryField">Код игры<input required value={loginGameCode} onChange={e=>setLoginGameCode(e.target.value)} placeholder="Код вашей игры" autoCapitalize="characters"/></label>
+      <div className="entryField entryRememberedGameField">
+       <label htmlFor="personal-game-code">Код игры</label>
+       <input id="personal-game-code" name="gameCode" autoComplete="off" autoCapitalize="none" autoCorrect="off" spellCheck={false} required minLength={2} value={loginGameCode} onChange={e=>setLoginGameCode(e.target.value)} placeholder="Код Вашей игры"/>
+       {savedGameCodes.length>1&&<label className="entryRememberedGameSelect">Ранее открытые игры
+        <select aria-label="Выбрать сохранённый код игры" value={savedGameCodes.includes(loginGameCode)?loginGameCode:''} onChange={e=>setLoginGameCode(e.target.value)}>
+         <option value="">Выберите сохранённый код</option>
+         {savedGameCodes.map(code=><option key={code} value={code}>{code}</option>)}
+        </select>
+       </label>}
+       <div className="entryRememberedGameHint">
+        <small>Код автоматически сохраняется в этом браузере после успешного входа. На другом устройстве его нужно ввести один раз.</small>
+        {savedGameCodes.includes(loginGameCode)&&<button type="button" className="entryForgetGameCode" disabled={busy} onClick={()=>{
+         setSavedGameCodes(forgetRememberedGameCode(loginGameCode));
+         setLoginGameCode('');
+        }}>Забыть код</button>}
+       </div>
+      </div>
       <label className="entryField">Электронная почта<input required type="email" autoComplete="username" value={loginEmail} onChange={e=>setLoginEmail(e.target.value)} placeholder="Ваш адрес почты"/></label>
       <label className="entryField">Личный пароль<input required type="password" autoComplete="current-password" value={loginPassword} onChange={e=>setLoginPassword(e.target.value)} placeholder="Ваш личный пароль"/></label>
       {error&&<div className="errorBox" role="alert">{error}</div>}
