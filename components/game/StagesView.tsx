@@ -9,6 +9,7 @@ import {formatDeadline} from './constants';
 import {STAGE_DETAILS} from './stageDetails';
 import {GAME_PHASES,gamePhaseForStage} from './stageSystem';
 import StageWorkspace from './StageWorkspace';
+import {partyStageOpen} from './partyStageAccess';
 import {useSavedGameState} from './useSavedGameState';
 
 // A consistent icon language for the sixteen institutions and decisions.
@@ -87,7 +88,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
   return <StageWorkspace
    g={g}
    stage={selected}
-   readOnly={readOnly||(!teacher&&(selected.status!=='open'||!!selected.deadline&&Date.parse(selected.deadline)<=Date.now()))}
+   readOnly={readOnly||(!teacher&&!partyStageOpen(g.game,selected))}
    onBack={()=>setSelected(null)}
    onOpenStage={stageNo=>setSelected(stages.find(item=>item.stage_no===stageNo)||null)}
    onOpenVotes={onOpenVotes}
