@@ -8,7 +8,7 @@ moduleRef.filename=path;moduleRef.paths=module.paths;
 moduleRef._compile(ts.transpileModule(fs.readFileSync(path,'utf8'),{
  compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
 }).outputText,path);
-const {assessmentRationaleParagraphs,assessmentRationaleSections,assessmentRationaleDetail}=moduleRef.exports;
+const {assessmentRationaleParagraphs,assessmentRationaleSections,assessmentRationaleDetail,assessmentDisplaySentence}=moduleRef.exports;
 const original=[
  'Критерий 1 · право и правила: пока не подтверждён. НПА 0, процедурных действий 0, голосований по НПА 0, партийных документов 0, иных документов 0, правовых упоминаний 0.',
  'Критерий 2 · стратегия и интересы: пока не подтверждён. Публикаций 0, голосований 0, действий/решений 0, партийных инициатив 0, ответов на партийные приглашения 0.',
@@ -28,7 +28,13 @@ assert(sections.law[0].includes('НПА 0'),'Legal evidence retained');
 assert(sections.strategy[0].includes('публикаций'.replace('п','П')),'Strategy evidence retained');
 assert(sections.blitz[0].includes('0.08/1'),'Fractional legal knowledge remains verbatim');
 assert(sections.legal[0].includes('0.08 балла'),'Fractional right indicator remains verbatim');
-assert(assessmentRationaleDetail(sections.law[0]).startsWith('пока не подтверждён'),'Removes machine heading only');
+assert(assessmentRationaleDetail(sections.law[0]).startsWith('Пока не подтверждён'),'Capitalizes criterion after removing machine heading');
+assert.equal(assessmentRationaleDetail(sections.events[0]),'Правомерных решений в пределах полномочий 0, нарушений 0.','Events start with uppercase');
+assert.equal(assessmentRationaleDetail(sections.strategy[0]).slice(0,4),'Пока','Strategy detail starts with uppercase');
+assert.equal(assessmentDisplaySentence('правомерных решений'), 'Правомерных решений','Unclassified sentence is capitalized');
+assert.equal(assessmentDisplaySentence('  ёжик'), 'Ёжик','Russian Ё must be supported');
+assert.equal(assessmentDisplaySentence('0.08/1 — ответов 2'), '0.08/1 — ответов 2','Numbers and subsequent words are unchanged');
+assert.equal(sections.events[0],'События: правомерных решений в пределах полномочий 0, нарушений 0.','Saved evidence is not mutated');
 assert.equal(assessmentRationaleSections('Неизвестный формат пояснения').other[0],'Неизвестный формат пояснения','Unknown server material remains visible');
 const ui=fs.readFileSync('components/game/GradesView.tsx','utf8');
 const css=fs.readFileSync('app/2026-profile-grade-layout.css','utf8');
@@ -39,6 +45,7 @@ for(const title of ['Законность решений и соблюдение
  assert(ui.includes(title),'Missing plain-language heading: '+title);
 assert(ui.includes('Что зафиксировано системой'),'Original counts remain inspectable');
 assert(ui.includes('assessmentRationaleDetail(part)'),'Original details are rendered');
+assert(ui.includes('assessmentDisplaySentence(part)'),'Unknown rationale format also gets a capital initial');
 assert(css.includes('.gradeExplanationCriteria')&&css.includes('@media(max-width:600px)'),'Cards fit mobile');
 assert(ui.includes('setRows('),'Score query remains intact');
 console.log('PASS: all three criteria explained, extra metrics separated, evidence and scores preserved');

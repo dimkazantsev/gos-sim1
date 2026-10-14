@@ -8,7 +8,7 @@ import StyledSelect from '../ui/StyledSelect';
 import ScoreFormula from './ScoreFormula';
 import BlitzKnowledgeScore from './BlitzKnowledgeScore';
 import {ChevronDown} from 'lucide-react';
-import {assessmentRationaleParagraphs,assessmentRationaleSections,assessmentRationaleDetail,assessmentRunLabel} from './assessmentPresentation';
+import {assessmentRationaleParagraphs,assessmentRationaleSections,assessmentRationaleDetail,assessmentDisplaySentence,assessmentRunLabel} from './assessmentPresentation';
 
 type Assessment={
  id:string;game_id:string;stage_no:number;user_id:string;auto_score:number;final_score:number|null;
@@ -348,7 +348,7 @@ function AssessmentExplanation({assessment:a,paragraphs}:{assessment:Assessment;
    )}
    {groups.other.length>0&&<details className="gradeExplanationExtra">
     <summary>Другие сведения, сохранённые системой</summary>
-    {groups.other.map((part,j)=><p className="gradeExplanationRaw" key={j}>{part}</p>)}
+    {groups.other.map((part,j)=><p className="gradeExplanationRaw" key={j}>{assessmentDisplaySentence(part)}</p>)}
    </details>}
   </div>
  </div>;
