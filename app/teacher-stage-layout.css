@@ -256,3 +256,9 @@
 @media(min-width:1100px){
  .simMain.chatOpen .teacherCommand .teacherStageSplit{align-items:start}
 }
+
+/* Desktop: the parent stage manager is the visible left panel; its bottom
+   padding previously extended the outer border below the right inspector. */
+@media(min-width:1121px){
+ .teacherCommand .teacherStageManager{padding-bottom:0}
+}
