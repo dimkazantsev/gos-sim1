@@ -38,7 +38,9 @@ export default function PartyChairElection({g,party}:{g:ReturnTypeRepublic;party
   totals.set(vote.candidate_id,(totals.get(vote.candidate_id)||0)+1);
  const votesCast=votes.filter(v=>members.some(m=>m.user_id===v.voter_id&&members.some(c=>c.user_id===v.candidate_id))).length;
  const current=votes.find(v=>v.voter_id===me?.user_id)?.candidate_id;
- const status=party.leader_user_id?'Председатель избран':!votingOpen?'Этап не открыт':members.length<2?'Набор участников':pending.length?'Ожидаются ответы':'Идёт голосование';
+ const leaderVotes=party.leader_user_id?totals.get(party.leader_user_id)||0:0;
+ const votedWinner=!!party.leader_user_id&&votesCast===members.length&&leaderVotes>0&&[...totals.values()].filter(n=>n===leaderVotes).length===1&&[...totals.values()].every(n=>n<=leaderVotes);
+ const status=party.leader_user_id?(votedWinner?'Председатель избран голосованием':'Председатель определён'):!votingOpen?'Этап не открыт':members.length<2?'Набор участников':pending.length?'Ожидаются ответы':'Идёт голосование';
  async function cast(){
   if(!candidate||busy||!canVote)return;
   setBusy(true);setNotice('');
@@ -62,7 +64,7 @@ export default function PartyChairElection({g,party}:{g:ReturnTypeRepublic;party
    <div className="gosPartyElectionStep"><Clock3 size={18}/><span>Ожидают вступления</span><b>{pending.length}</b></div>
    <div className="gosPartyElectionStep"><Vote size={18}/><span>Подано голосов</span><b>{votesCast} / {members.length}</b></div>
   </div>
-  {party.leader_user_id?<div className="gosPartyElectionResult"><CheckCircle2 size={21}/><div><strong>Председатель избран</strong><p>{members.find(m=>m.user_id===party.leader_user_id)?.full_name||'Участник партии'}. Голосование завершено; можно готовить регистрационные документы.</p></div></div>:
+  {party.leader_user_id?<div className="gosPartyElectionResult"><CheckCircle2 size={21}/><div><strong>{votedWinner?'Председатель избран голосованием':'Председатель определён'}</strong><p>{members.find(m=>m.user_id===party.leader_user_id)?.full_name||'Участник партии'}. {votedWinner?'Выборы завершены; можно готовить регистрационные документы.':'Если студенческое голосование не завершилось, преподаватель вправе назначить председателя в резервном порядке.'}</p></div></div>:
    !votingOpen?<p className="gosPartyElectionNotice"><LockKeyhole size={18}/> Выборы недоступны до открытия первого этапа преподавателем.</p>:
    !ready?<p className="gosPartyElectionNotice"><Clock3 size={18}/> Сначала пригласите других студентов и дождитесь их согласия. Для выборов нужны минимум два вступивших участника и отсутствие приглашений без ответа.</p>:
    <p className="gosPartyElectionHint">Каждый участник голосует один раз; до подведения итогов выбор можно изменить. При равенстве голосов допускается переголосование.</p>}
