@@ -28,9 +28,18 @@ async function check(){
     const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
     const list=root.querySelector('.teacherStageList');
     const inspector=root.querySelector('.teacherStageInspector');
+    const sidebar=root.querySelector('.teacherStageSidebar');
+    const deadline=sidebar?.querySelector('.deadlineControl');
+    const actions=inspector.querySelector('.teacherStageInspectorActions');
+    const policy=inspector.querySelector('.stagePolicyEditor');
     const entries=[...list.querySelectorAll('.teacherStageListItem')];
     return {width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
      list:rect(list),inspector:rect(inspector),rows:entries.map(rect),
+     deadline:deadline?rect(deadline):null,actions:actions?rect(actions):null,policy:policy?rect(policy):null,
+     duplicateTimer:root.querySelectorAll('.teacherCommandClock,.teacherClockSwitch').length,
+     stageStatus:root.querySelectorAll('.teacherCommandStatus .teacherTurnBadge').length,
+     procedures:root.querySelectorAll('.teacherStageProcedures').length,
+     extension:root.querySelectorAll('.teacherStageExtendField input').length,
      reset:root.querySelectorAll('.teacherStageInspectorReset').length,
      allReset:root.querySelectorAll('.teacherResetAll').length,
      workspaceCount:root.querySelectorAll('.teacherWorkspaceNav [role=tab]').length};
@@ -39,6 +48,17 @@ async function check(){
    assert.equal(data.reset,1,'Exactly one contextual stage reset button');
    assert.equal(data.allReset,1,'Exactly one global stage reset');
    assert.equal(data.workspaceCount,12,'Twelve teacher workspaces');
+   assert.equal(data.duplicateTimer,0,'Teacher command bar must not duplicate the global countdown');
+   assert.equal(data.stageStatus,1,'Stage status must remain visible without a second timer');
+   assert.equal(data.procedures,1,'Procedures action must remain available');
+   assert.equal(data.extension,1,'Stage extension input must remain accessible');
+   assert(data.deadline&&data.actions&&data.policy,'Deadline, actions and policy must remain visible');
+   assert(data.actions.bottom<=data.policy.top+3,'Stage actions must precede the long policy form at '+width+'px');
+   if(width>=1280){
+    assert(data.deadline.right<=data.inspector.left+3,'Desktop deadline summary must occupy the left column at '+width+'px');
+   }else{
+    assert(data.deadline.top>=data.inspector.bottom-3,'Narrow screens must put deadline summary below stage settings at '+width+'px');
+   }
     assert.equal(await frame.locator('#teacher-tab-blitz').count(),1,'Blitz workspace must be navigable');
    assert(data.scroll<=data.width+3,'Stage management overflows at '+width+'px: '+JSON.stringify(data));
    for(const row of data.rows)assert(row.left>=data.list.left-2&&row.right<=data.list.right+2,'Stage row leaves list at '+width+'px');
