@@ -479,6 +479,10 @@
 }
 .gradeModalRefined .gradeTeacherNote p,
 .gradeModalRefined .gradeEvidence p{font-size:13px;line-height:1.7;color:#506982}
+@media(max-width:940px){
+ /* The guidance and editor need full-width rows before tablet columns become cramped. */
+ .gradesDebriefRefined .gradesDebriefFields{grid-template-columns:minmax(0,1fr)}
+}
 @media(max-width:760px){
  .gradesPage .gradesDebrief.gradesDebriefRefined{padding:18px}
  .gradesDebriefRefined .gradesDebriefFields{grid-template-columns:minmax(0,1fr);gap:16px;padding:18px 0}
