@@ -32,14 +32,23 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
 
  async function load(){
   if(!game)return;
-  const [e,c,b]=await Promise.all([
+  const [e,c,b,p,m,r,v]=await Promise.all([
    supabase.from('office_elections').select('*').eq('game_id',game.id).eq('stage_no',4).in('office_key',['gd_chair','gd_deputy_1','gd_deputy_2']).order('created_at',{ascending:true}),
    supabase.from('office_candidates').select('*').eq('game_id',game.id).order('created_at'),
-   supabase.from('office_ballots').select('*').eq('game_id',game.id)
+   supabase.from('office_ballots').select('*').eq('game_id',game.id),
+   supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id),
+   supabase.from('party_member_mandates').select('user_id,party_id,base_mandates,effective_mandates').eq('game_id',game.id),
+   supabase.from('institution_session_registrations').select('user_id,stage_no,institution_key').eq('game_id',game.id).eq('stage_no',4).eq('institution_key','gd'),
+   supabase.from('game_votes').select('id,status,result_code').eq('game_id',game.id).eq('stage_no',4).eq('procedure_key','gd_leadership_procedure')
   ]);
   if(!e.error)setElections((e.data||[]) as Election[]);
   if(!c.error)setCandidates((c.data||[]) as OfficeCandidate[]);
   if(!b.error)setBallots((b.data||[]) as OfficeBallot[]);
+  if(!p.error)setPersonalBallots(p.data||[]);
+  if(!m.error)setPersonalMandates(m.data||[]);
+  if(!r.error)setRegistrations(r.data||[]);
+  if(!v.error)setProcedureVotes(v.data||[]);
+  const failure=[e,c,b,p,m,r,v].find(x=>x.error);if(failure?.error)setError(failure.error.message);
  }
  useEffect(()=>{void load()},[game?.id]);
  useEffect(()=>{
@@ -57,12 +66,22 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
  const activeMe=me;
  const member=(id:string)=>members.find(m=>m.user_id===id);
  const party=(id:string)=>parties.find(p=>p.id===id);
- const activeMandates=(partyId:string)=>partyMandates.filter(x=>x.party_id===partyId).reduce((a,x)=>a+Number(x.effective_mandates||0),0);
+ const activeMandates=(partyId:string)=>personalMandates.filter(x=>x.party_id===partyId).reduce((a,x)=>a+Number(x.effective_mandates||0),0);
+ const myMandates=personalMandates.find(m=>m.user_id===activeMe.user_id);
+ const myRegistered=registrations.some(r=>r.user_id===activeMe.user_id&&r.stage_no===4&&r.institution_key==='gd');
+ const procedureApproved=procedureVotes.some(v=>v.status==='closed'&&v.result_code==='passed');
+ const procedureOpen=procedureVotes.some(v=>v.status==='open');
  const electionCandidates=(id:string)=>candidates.filter(c=>c.election_id===id);
  const electionBallots=(id:string)=>ballots.filter(b=>b.election_id===id);
- const totalFor=(eid:string,cid:string)=>electionBallots(eid).filter(b=>b.candidate_id===cid).reduce((a,b)=>a+Number(b.votes||0),0);
+ const totalFor=(eid:string,cid:string)=>{
+  const election=elections.find(e=>e.id===eid);
+  if(election?.ballot_mode==='personal')return personalBallots.filter(b=>b.election_id===eid&&b.candidate_id===cid)
+    .reduce((total,b)=>total+Number(personalMandates.find(m=>m.user_id===b.voter_id&&m.party_id===b.party_id)?.effective_mandates||0),0);
+  return electionBallots(eid).filter(b=>b.candidate_id===cid).reduce((a,b)=>a+Number(b.votes||0),0);
+ };
  const usedByParty=(eid:string,pid:string)=>electionBallots(eid).filter(b=>b.party_id===pid).reduce((a,b)=>a+Number(b.votes||0),0);
 
+ async function openProcedureVote(){setBusy(true);const r=await supabase.rpc('open_duma_leadership_procedure_vote',{p_game_id:activeGame.id});if(r.error)setError(r.error.message);else{await load();await g.refresh()}setBusy(false)}
  async function createElection(){
   setBusy(true);const r=await supabase.rpc('create_office_election',{p_game_id:activeGame.id,p_office_key:office,p_vote_mode:mode});
   if(r.error)setError(r.error.message);else await load();setBusy(false);
@@ -78,6 +97,7 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
   const r=await supabase.rpc('set_office_ballot',{p_election_id:electionId,p_candidate_id:candidateId,p_votes:value});
   if(r.error)setError(r.error.message);else await load();setBusy(false);
  }
+ async function personalVote(electionId:string,candidateId:string){setBusy(true);const r=await supabase.rpc('cast_personal_office_ballot',{p_election_id:electionId,p_candidate_id:candidateId});if(r.error)setError(r.error.message);else await load();setBusy(false)}
  async function close(electionId:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:electionId});if(r.error)setError(r.error.message);else await load();setBusy(false)}
 
  const sorted=useMemo(()=>[...elections].sort((a,b)=>a.office_key.localeCompare(b.office_key)||a.round_no-b.round_no),[elections]);
