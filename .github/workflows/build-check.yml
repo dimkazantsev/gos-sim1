@@ -111,6 +111,8 @@ on:
       - 'supabase/migrations/*crisis_baseline*'
       - 'components/game/CivicDiscussion.tsx'
       - 'components/game/useRepublicGame.ts'
+      - 'components/game/chatRealtime.ts'
+      - 'scripts/chat-realtime-check.cjs'
       - 'components/game/ChatPanel.tsx'
       - 'components/game/ChatChannelDropdown.tsx'
       - 'components/game/chatChannelSelection.ts'
@@ -158,6 +160,7 @@ jobs:
       - run: node scripts/electoral-math-check.cjs
       - run: node scripts/grade-fractional-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
+      - run: node scripts/chat-realtime-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
       - run: node scripts/telegram-onboarding-check.cjs
       - run: node scripts/telegram-activation-verification-check.cjs
