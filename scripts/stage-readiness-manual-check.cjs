@@ -38,6 +38,7 @@ const partySql=read('supabase/migrations/20261014044000_party_stage_one_democrac
 const guardSql=read('supabase/migrations/20261014045500_enforce_closed_stage_submissions.sql');
 assert(partySql.includes('drop policy if exists guests_cannot_delete on public.party_documents;'),
  'Obsolete guest document delete policy must not override owner-only access');
+assert(guardSql.includes("p.leader_user_id is not null"), 'Student document upload requires elected party chair');
 assert(guardSql.includes('before insert or delete on public.party_documents'),
  'Stage 1 completion must block deleting a party document as well as uploading it');
 assert(guardSql.includes("v_game uuid:=case when tg_op='DELETE' then old.game_id else new.game_id end;"),
