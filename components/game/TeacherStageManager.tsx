@@ -81,9 +81,9 @@ export default function TeacherStageManager({g,onOpenStage}:{
  },[game?.id]);
  const closeDialog=()=>{if(busy)return;setResetTarget(null);setConfirmation('');setError('')};
  const dialogRef=useDialog(resetTarget!==null,closeDialog);
- const readiness=readinessSnapshot?.gameId===game?.id?readinessSnapshot.rows:[];
- const readinessChecked=readinessSnapshot?.gameId===game?.id;
- const readinessError=readinessFailure?.gameId===game?.id?readinessFailure.message:'';
+ const readiness=readinessSnapshot&&readinessSnapshot.gameId===game?.id?readinessSnapshot.rows:[];
+ const readinessChecked=Boolean(readinessSnapshot&&readinessSnapshot.gameId===game?.id);
+ const readinessError=readinessFailure&&readinessFailure.gameId===game?.id?readinessFailure.message:'';
  const completed=stages.filter(s=>s.status==='completed').length;
  const active=stages.filter(s=>s.status==='open').length;
  const searchTerm=search.trim().toLocaleLowerCase('ru-RU');
