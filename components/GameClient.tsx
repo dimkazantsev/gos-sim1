@@ -476,12 +476,12 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    if(live&&!result.error)setPendingBlitz(Number(result.data?.pending||0));
   }
   void refresh();
-  const timer=window.setInterval(()=>{if(document.visibilityState==='visible')void refresh()},25000);
+  const timer=setInterval(()=>{if(document.visibilityState==='visible')void refresh()},25000);
   const changed=()=>void refresh();
   window.addEventListener('blitz:updated',changed);
   const channel=supabase.channel('blitz-count:'+game.id+':'+me.user_id)
    .on('postgres_changes',{event:'*',schema:'public',table:'blitz_assignments',filter:'user_id=eq.'+me.user_id},changed).subscribe();
-  return()=>{live=false;window.clearInterval(timer);window.removeEventListener('blitz:updated',changed);void supabase.removeChannel(channel)};
+  return()=>{live=false;clearInterval(timer);window.removeEventListener('blitz:updated',changed);void supabase.removeChannel(channel)};
  },[game?.id,me?.user_id,previewMode,me?.kind]);
 
  const backIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,-1,previewMode);
