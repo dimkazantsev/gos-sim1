@@ -19,11 +19,29 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const [clearing,setClearing]=useState(false);
  async function clearHistory(){if(!game||!teacher||clearing||!confirm('Очистить видимую историю журнала? Оценки и подтверждённые действия сохранятся.'))return;setClearing(true);setOlderError('');try{const r=await supabase.rpc('clear_classroom_journal',{p_game_id:game.id});if(r.error)setOlderError(userError(r.error));else{setOlder([]);await g.refresh()}}catch(e){setOlderError(userError(e))}finally{setClearing(false)}}
  const [older,setOlder]=useState<typeof activities>([]);
+ const [ownRows,setOwnRows]=useState<typeof activities>([]);
+ const [ownBusy,setOwnBusy]=useState(false);
+ const [ownError,setOwnError]=useState('');
+ useEffect(()=>{
+  if(!game||!me?.user_id||teacher){setOwnRows([]);return}
+  let active=true;
+  async function loadMine(){
+   setOwnBusy(true);
+   const r=await supabase.from('game_activity').select('*').eq('game_id',game!.id)
+    .eq('actor_id',me!.user_id).order('created_at',{ascending:false}).limit(250);
+   if(!active)return;
+   if(r.error)setOwnError(userError(r.error));else{setOwnRows((r.data||[]) as typeof activities);setOwnError('')}
+   setOwnBusy(false);
+  }
+  void loadMine();
+  const timer=setInterval(()=>{if(document.visibilityState==='visible')void loadMine()},30000);
+  return()=>{active=false;clearInterval(timer)};
+ },[game?.id,me?.user_id,teacher]);
  const [olderBusy,setOlderBusy]=useState(false);
  const [olderExhausted,setOlderExhausted]=useState(false);
  const [olderError,setOlderError]=useState('');
  useEffect(()=>{setOlder([]);setOlderExhausted(false);setOlderError('')},[game?.id,me?.user_id,cutoff]);
- const loaded=useMemo(()=>[...new Map<number,(typeof activities)[number]>([...activities,...older].map(a=>[a.id,a] as const)).values()],[activities,older]);
+ const loaded=useMemo(()=>[...new Map<number,(typeof activities)[number]>([...activities,...older,...ownRows].map(a=>[a.id,a] as const)).values()],[activities,older,ownRows]);
  async function loadOlder(){
   if(!game||olderBusy||olderExhausted)return;
   const earliest=loaded.reduce<string|null>((min,a)=>!min||a.created_at<min?a.created_at:min,null);
@@ -111,7 +129,8 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
    </button>})}
   </div>}
   <div className="journalFeed" role="region" aria-label="Записи журнала" tabIndex={0}>
-   {visible.length===0?<div className="journalEmpty">По выбранным фильтрам записей нет.</div>:visible.slice(0,showAll?visible.length:50).map(a=>{
+   {ownBusy&&!teacher&&<p role="status">Загрузка личного журнала…</p>}
+   {visible.length===0?<div className="journalEmpty">{!teacher?'Ваших действий пока нет. Переходы по разделам и совершённые действия будут отображаться здесь.':'По выбранным фильтрам записей нет.'}</div>:visible.slice(0,showAll?visible.length:50).map(a=>{
     const m=members.find(x=>x.user_id===a.actor_id);
     return <article key={a.id} className="gosJournalRecord">
      <time className="gosJournalRecordTime" dateTime={a.created_at}>{new Date(a.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</time>
@@ -126,6 +145,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   {visible.length>50&&<button type="button" className="journalMore" onClick={()=>setShowAll(!showAll)}>{showAll?'Показать первые 50':'Показать ещё ('+visible.length+' из '+visible.length+')'}</button>}
   {loaded.length>=250&&!olderExhausted&&<button type="button" className="journalMore" onClick={()=>void loadOlder()} disabled={olderBusy}>{olderBusy?'Загрузка…':'Загрузить предыдущие 250 событий'}</button>}
   {olderError&&<p className="journalError" role="alert">{olderError}</p>}
+  {ownError&&<p className="journalError" role="alert">{ownError}</p>}
   <p className="journalNote">{teacher?'Загружено '+loaded.length+' событий. Фильтры и экспорт действуют на загруженную историю.':'Вам доступны только собственные события. Действия других студентов и преподавателя скрыты.'}</p>
  </section>;
 }
