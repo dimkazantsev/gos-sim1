@@ -28,8 +28,8 @@ const noted=buildPartyJusticeLetter(p,[...docs.slice(0,1),{...docs[1],status:'re
 assert.match(noted,/Неполный порядок избрания руководящих органов/);
 assert.match(noted,/правовую достаточность необходимо подтвердить/);
 for(const text of [positive,negative]){
- assert(!text.includes('Иродову Илье')&&!text.includes('Чернышевой Дарье'),'Do not reuse case subjects from uploaded templates');
- assert(!text.includes('671434542')&&!text.includes('4712344552'),'Do not reuse reference numbers from sample letters');
+ assert(!/\\d{7,}\\s*№/.test(text),'Do not reuse sample outgoing reference numbers');
+ assert(!/Исх\\.\\s*№\\s*\\d/.test(text),'Do not invent an outgoing number in a draft');
 }
 const dossier=fs.readFileSync('components/game/TeacherPartyDossiers.tsx','utf8');
 const fallback=fs.readFileSync('components/game/PartyChairFallback.tsx','utf8');
