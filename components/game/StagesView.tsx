@@ -160,16 +160,17 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
    {visibleStages.length>0?<div className="stageAtlasGrid">
     {visibleStages.map(s=>{
      const StageIcon=STAGE_ICONS[s.stage_no-1]||BookOpenText;
-     const StatusIcon=s.status==='completed'?CheckCircle2:s.status==='open'?CircleDot:LockKeyhole;
+     const effectiveStatus=s.status==='completed'?'completed':isStageWorkOpen(g.game,s)?'open':'locked';
+     const StatusIcon=effectiveStatus==='completed'?CheckCircle2:effectiveStatus==='open'?CircleDot:LockKeyhole;
      const hasOpenVote=votingStageNos.has(s.stage_no);
      const openDetails=()=>setSelected(s);
-     return <article className={'stageAtlasCard is-'+s.status} key={s.id}>
+     return <article className={'stageAtlasCard is-'+effectiveStatus} key={s.id}>
       <div className="stageAtlasCardMain">
        <div className="stageAtlasCardGlyph" aria-hidden="true"><StageIcon size={22} strokeWidth={1.8}/><span>{String(s.stage_no).padStart(2,'0')}</span></div>
        <div className="stageAtlasCardContent">
         <div className="stageAtlasCardTopline">
          <span className="stageAtlasCardMode">{s.mode}</span>
-         <span className={'stageAtlasCardStatus is-'+s.status}><StatusIcon size={15} strokeWidth={2.1} aria-hidden="true"/>{isStageWorkOpen(g.game,s)?'Текущий этап':stageWorkLabel(g.game,s)}</span>
+         <span className={'stageAtlasCardStatus is-'+effectiveStatus}><StatusIcon size={15} strokeWidth={2.1} aria-hidden="true"/>{isStageWorkOpen(g.game,s)?'Текущий этап':stageWorkLabel(g.game,s)}</span>
         </div>
         <h3>{s.title}</h3>
         <p>{s.summary}</p>
