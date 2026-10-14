@@ -87,7 +87,7 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
  async function close(eid:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:eid});if(r.error)setError(r.error.message);else await load();setBusy(false)}
 
  return <section className="committeeElectionBoard">
-  <div className="committeeElectionHead"><div><small>ИЗБРАНИЕ ПРЕДСЕДАТЕЛЕЙ КОМИТЕТОВ</small><h3>Порог — 226 голосов Государственной Думы</h3><p>Фракции выдвигают своих депутатов до персонального распределения по комитетам. Голоса распределяются мандатами фракций; если в первом туре при трёх и более кандидатах никто не избран, система создаёт второй тур для двух лидеров.</p></div><strong>226+</strong></div>
+  <div className="committeeElectionHead"><div><small>ИЗБРАНИЕ ПРЕДСЕДАТЕЛЕЙ КОМИТЕТОВ</small><h3>Порог — 226 голосов Государственной Думы</h3><p>Фракции выдвигают своих депутатов до персонального распределения по комитетам. После обсуждения каждый зарегистрированный депутат лично голосует всеми своими действующими мандатами с учётом GV; если в первом туре при трёх и более кандидатах никто не избран, система создаёт второй тур для двух лидеров.</p></div><strong>226+</strong></div>
   <div className="committeeElectionGrid">{units.map(u=>{
    const e=activeElection(u.id);
    const last=[...history(u.id)].reverse()[0];
@@ -95,6 +95,7 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
    const cs=election?ec(election.id):[];
    const ownCandidates=election&&ledParty?personalMandates.filter(a=>a.party_id===ledParty.id&&a.base_mandates>0).map(a=>a.user_id):[];
    const myCapacity=ledParty?activeMandates(ledParty.id):0;
+   const myMandates=personalMandates.find(a=>a.user_id===me.user_id);
    const myUsed=election&&ledParty?used(election.id,ledParty.id):0;
    return <article key={u.id} className={'committeeElectionCard '+(election?.status||'idle')}>
     <header><div><small>КОМИТЕТ</small><b>{u.title}</b><span>Председатель: {name(u.head_user_id)}</span></div>{!e&&canCreate&&<div className="committeeElectionCreate"><select aria-label={'Форма выборов председателя: '+u.title} value={mode[u.id]||'open'} onChange={x=>setMode(v=>({...v,[u.id]:x.target.value as 'open'|'secret'}))}><option value="open">Открыто</option><option value="secret">Тайно</option></select><button disabled={busy} onClick={()=>void create(u.id)}>Начать выборы</button></div>}</header>
@@ -102,10 +103,14 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
     {election.status==='nomination'&&(teacher||ledParty)&&<div className="committeeNominate"><select aria-label={'Кандидат в председатели: '+u.title} value={nominee[election.id]||''} onChange={x=>setNominee(v=>({...v,[election.id]:x.target.value}))}><option value="">Кандидат от фракции…</option>{(teacher?personalMandates.filter(a=>a.base_mandates>0).map(a=>a.user_id):ownCandidates).filter(uid=>!cs.some(c=>c.user_id===uid)).map(uid=><option key={uid} value={uid}>{name(uid)}</option>)}</select><button disabled={busy||!nominee[election.id]} onClick={()=>void nominate(election.id)}>Выдвинуть</button>{teacher&&<button className="primary" disabled={busy||cs.length===0} onClick={()=>void open(election.id)}>Открыть голосование</button>}</div>}
     <div className="committeeCandidateList">{cs.map(c=>{
      const own=ledParty?eb(election.id).find(b=>b.party_id===ledParty.id&&b.candidate_id===c.id)?.votes:undefined;
+     const mine=personalBallots.some(b=>b.election_id===election.id&&b.voter_id===me.user_id&&b.candidate_id===c.id);
      const visible=election.vote_mode==='open'||!['nomination','open'].includes(election.status)||teacher;
-     return <div key={c.id}><span style={{background:party(c.party_id)?.color||'#315efb'}}>{name(c.user_id).split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</span><div><b>{name(c.user_id)}</b><small>{party(c.party_id)?.name||'Фракция'}</small></div><strong>{visible?totalFor(election.id,c.id):(own??'•')}</strong>{election.status==='open'&&ledParty&&<div className="committeeBallot"><input aria-label={'Мандаты за '+name(c.user_id)+' в комитете '+u.title} type="number" min="0" max={myCapacity} value={voteDraft[election.id+'-'+c.id]??String(own??0)} onChange={x=>setVoteDraft(v=>({...v,[election.id+'-'+c.id]:x.target.value}))}/><button disabled={busy} onClick={()=>void cast(election.id,c.id)}>Записать</button></div>}</div>
+     return <div key={c.id}><span style={{background:party(c.party_id)?.color||'#315efb'}}>{name(c.user_id).split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</span><div><b>{name(c.user_id)}</b><small>{party(c.party_id)?.name||'Фракция'}</small></div><strong>{visible?totalFor(election.id,c.id):election.ballot_mode==='personal'?(mine?Number(myMandates?.effective_mandates||0):'•'):(own??'•')}</strong>
+     {election.status==='open'&&election.ballot_mode==='personal'&&me.kind==='student'&&<div className="committeeBallot"><button type="button" className={mine?'primary':''} disabled={busy||!registered.includes(me.user_id)||Number(myMandates?.effective_mandates||0)<=0} onClick={()=>void personalCast(election.id,c.id)}>{mine?'Вы проголосовали':'Отдать '+Number(myMandates?.effective_mandates||0)+' голосов'}</button></div>}
+     {election.status==='open'&&election.ballot_mode!=='personal'&&ledParty&&<div className="committeeBallot"><input aria-label={'Мандаты за '+name(c.user_id)+' в комитете '+u.title} type="number" min="0" max={myCapacity} value={voteDraft[election.id+'-'+c.id]??String(own??0)} onChange={x=>setVoteDraft(v=>({...v,[election.id+'-'+c.id]:x.target.value}))}/><button disabled={busy} onClick={()=>void cast(election.id,c.id)}>Записать</button></div>}</div>
     })}</div>
-    {election.status==='open'&&ledParty&&<div className="committeeMandateUse">{ledParty.name}: <b>{myUsed}/{myCapacity}</b> мандатов распределено</div>}
+    {election.status==='open'&&election.ballot_mode==='personal'&&me.kind==='student'&&<div className="committeeMandateUse">Ваши мандаты: <b>{Number(myMandates?.effective_mandates||0)}</b> · {registered.includes(me.user_id)?'Вы зарегистрированы':'Сначала зарегистрируйтесь на заседание ГД'}</div>}
+    {election.status==='open'&&election.ballot_mode!=='personal'&&ledParty&&<div className="committeeMandateUse">{ledParty.name}: <b>{myUsed}/{myCapacity}</b> мандатов распределено</div>}
     {election.status==='open'&&teacher&&<button className="primary committeeCloseVote" disabled={busy} onClick={()=>void close(election.id)}>Закрыть голосование</button>}</>}
    </article>
   })}</div>
