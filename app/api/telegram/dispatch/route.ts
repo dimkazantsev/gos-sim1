@@ -19,7 +19,10 @@ export function OPTIONS(request:Request){
 
 export async function GET(request:Request){
  const cron=process.env.CRON_SECRET;
- if(!cron||request.headers.get('authorization')!=='Bearer '+cron)return new Response('Unauthorized',{status:401});
+ const dbWake=process.env.TELEGRAM_DISPATCH_SECRET;
+ const provided=request.headers.get('authorization');
+ if(!provided||!((cron&&provided==='Bearer '+cron)||(dbWake&&provided==='Bearer '+dbWake)))
+  return new Response('Unauthorized',{status:401});
  return dispatchOutbox();
 }
 export async function POST(request:Request){
