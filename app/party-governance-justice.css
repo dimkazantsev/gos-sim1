@@ -6,9 +6,9 @@
 .partyChairFallbackBody :is(label,.styledSelect){min-width:0;max-width:100%}
 .partyChairFallbackBody button{justify-self:start;max-width:100%;white-space:normal;min-height:42px}
 .partyJusticeDraftActions{display:grid;gap:10px;margin:10px 0}
-.partyJusticeDraftActions>button{justify-self:start;max-width:100%;min-height:42px;white-space:normal}
-.partyJusticeAutoActions{display:flex;align-items:stretch;flex-wrap:wrap;gap:9px}
-.partyJusticeAutoActions button{flex:1 1 155px;min-height:44px;white-space:normal;text-align:center}
+.partyJusticeDraftActions>button{justify-self:stretch;width:100%;min-width:0;box-sizing:border-box;min-height:44px;white-space:normal}
+.partyJusticeAutoActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;min-width:0}
+.partyJusticeAutoActions button{width:100%;min-width:0;box-sizing:border-box;min-height:44px;white-space:normal;text-align:center}
 .partyJusticeAutoActions button:disabled{opacity:.55;cursor:not-allowed}
 .partyJusticeDraftActions>small{font-size:12px;color:#6480a0;line-height:1.4}
 .partyJusticeDraftActions button:focus-visible,.partyChairFallback button:focus-visible{outline:3px solid #779be7;outline-offset:2px}
