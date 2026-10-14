@@ -1,6 +1,5 @@
 -- KSRF membership, one ballot per faction, mandatory registration, and additive GD rights.
 -- Fail closed if older functions differ: do not overwrite unknown newer implementations.
-begin;
 do $migration$
 declare
  v_sql text;
@@ -43,4 +42,3 @@ begin
  ') then raise exception ''Сначала зарегистрируйтесь на заседание КСРФ'';end if;'||chr(10)||' '||v_old);
  execute v_sql;
 end $migration$;
-commit;
