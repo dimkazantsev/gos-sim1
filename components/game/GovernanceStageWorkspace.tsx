@@ -2,6 +2,7 @@
 
 import {useEffect,useState,type CSSProperties} from 'react';
 import {ArrowLeft,BookOpenText,CalendarClock,CheckCircle2,ChevronLeft,ChevronRight,ClipboardCheck,FileText,Landmark,Link2,MessageCircle,Route,Settings2,Vote} from 'lucide-react';
+import {isStageWorkOpen,stageWorkLabel} from './stageWorkStatus';
 import type {Stage,View} from './types';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {formatDeadline} from './constants';
@@ -64,8 +65,8 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
  const publicChannel=g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры');
  const bodies=BODIES[stage.stage_no];
  const teacher=g.teacher&&!readOnly;
- const stageLocked=!teacher&&(stage.status!=='open'||!!stage.deadline&&Date.parse(stage.deadline)<=Date.now());
- const viewer=readOnly||g.me?.kind==='observer'||stageLocked;
+ const stageLocked=!isStageWorkOpen(g.game,stage);
+ const viewer=readOnly||g.me?.kind==='observer'||(stageLocked&&!teacher);
  useEffect(()=>{if(!teacher&&tab==='settings')setTab('work')},[teacher,tab]);
  const tabs:{id:Tab;title:string;icon:typeof Route;count?:number}[]=[
   {id:'work',title:'Работа',icon:Landmark},
@@ -78,7 +79,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
  const sectionId='governance-stage-'+stage.stage_no;
  return <div className="stageOperations" data-stage={stage.stage_no} style={{'--stage-phase-accent':phase.accent} as CSSProperties}>
   <header className="stageOperationsHeader">
-   <div className="stageOperationsBreadcrumb"><button type="button" onClick={onBack}><ArrowLeft size={18}/><span>Все этапы</span></button><span>{phase.short}</span><span className={'stageOperationsStatus is-'+stage.status}>{stage.status==='open'?'Этап открыт':stage.status==='completed'?'Завершён':'Этап закрыт'}</span></div>
+   <div className="stageOperationsBreadcrumb"><button type="button" onClick={onBack}><ArrowLeft size={18}/><span>Все этапы</span></button><span>{phase.short}</span><span className={'stageOperationsStatus is-'+stage.status}>{stageWorkLabel(g.game,stage)}</span></div>
    <div className="stageOperationsTitle"><span className="stageOperationsNumber">{String(stage.stage_no).padStart(2,'0')}</span><div><h1>{operation.title}</h1><p>{operation.action}</p></div></div>
    <div className="stageOperationsMeta">
     <span><CalendarClock size={17}/>{stage.deadline?'До '+formatDeadline(stage.deadline):'Срок не установлен'}</span>
@@ -119,7 +120,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
 
   <section id={sectionId+'-rules'} className="stageOperationsPane" hidden={tab!=='rules'} aria-label="Маршрут и правила">
    <div className="stageOperationsRuleIntro"><h2>Порядок работы</h2><p>{detail.goal}</p><p><b>Участники: </b>{operation.participants}</p></div>
-   <section className="stageOperationsRuleIntro" aria-label="Действующие правила этапа"><h3>Установленные преподавателем сроки и последствия</h3><p><b>Статус:</b> {stage.status==='open'?'Этап открыт':stage.status==='completed'?'Этап завершён':'Этап ещё не открыт'}</p><p><b>Срок:</b> {stage.deadline?formatDeadline(stage.deadline):'Преподаватель не установил'}</p>{liveRule&&<><p><b>Правило:</b> {liveRule.inclusive?'До указанного времени включительно':'Строго до указанного времени'}</p><p><b>Штраф:</b> {liveRule.penalty_points||0} баллов. {liveRule.penalty_description}</p>{liveRule.consequence_type!=='none'&&<p><b>Последствие:</b> {liveRule.consequence_type} — {liveRule.consequence_magnitude}</p>}</>}</section>
+   <section className="stageOperationsRuleIntro" aria-label="Действующие правила этапа"><h3>Установленные преподавателем сроки и последствия</h3><p><b>Статус:</b> {stageWorkLabel(g.game,stage)}</p><p><b>Срок:</b> {stage.deadline?formatDeadline(stage.deadline):'Преподаватель не установил'}</p>{liveRule&&<><p><b>Правило:</b> {liveRule.inclusive?'До указанного времени включительно':'Строго до указанного времени'}</p><p><b>Штраф:</b> {liveRule.penalty_points||0} баллов. {liveRule.penalty_description}</p>{liveRule.consequence_type!=='none'&&<p><b>Последствие:</b> {liveRule.consequence_type} — {liveRule.consequence_magnitude}</p>}</>}</section>
    <ol className="stageOperationsRoute">{detail.steps.map((step,i)=><li key={step}><span>{i+1}</span><p>{step}</p></li>)}</ol>
    <div className="stageOperationsRuleColumns"><section><h3>Процедура</h3><ul>{detail.procedure.map(text=><li key={text}>{text}</li>)}</ul></section><section><h3>Контрольные результаты</h3><ul className="stageOperationsOutputs">{detail.outputs.map(text=><li key={text}><CheckCircle2 size={17}/><span>{text}</span></li>)}</ul></section></div>
    <section className="stageOperationsLegal"><ScaleLabel/><p>{operation.legalNote}</p>{detail.notes.map(note=><p key={note}>{note}</p>)}</section>
