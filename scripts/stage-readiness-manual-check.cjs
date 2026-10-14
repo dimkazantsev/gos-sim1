@@ -39,6 +39,10 @@ const guardSql=read('supabase/migrations/20261014045500_enforce_closed_stage_sub
 assert(partySql.includes('drop policy if exists guests_cannot_delete on public.party_documents;'),
  'Obsolete guest document delete policy must not override owner-only access');
 assert(guardSql.includes("p.leader_user_id is not null"), 'Student document upload requires elected party chair');
+assert(partySql.includes("v_m.roster_archived_at is not null"), 'Archived users cannot found a new party');
+assert(partySql.includes("gm.roster_archived_at is not null"), 'Archived members cannot receive new party invitations');
+assert(partySql.includes("candidate.roster_archived_at is null"), 'Chair quorum and vote tally must exclude votes for archived candidates');
+assert(partySql.includes("voter.roster_archived_at is null"), 'Chair quorum and vote tally must exclude archived voter ballots');
 assert(guardSql.includes('before insert or delete on public.party_documents'),
  'Stage 1 completion must block deleting a party document as well as uploading it');
 assert(guardSql.includes("v_game uuid:=case when tg_op='DELETE' then old.game_id else new.game_id end;"),
