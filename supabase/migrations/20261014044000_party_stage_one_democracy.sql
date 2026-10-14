@@ -41,7 +41,7 @@ begin
  if exists(select 1 from public.game_parties where game_id=p_game and lower(name)=lower(v_name)) then
   raise exception 'A party with this name already exists' using errcode='23505';end if;
  insert into public.game_parties(game_id,name,ideology,color,created_by)
- values(p_game,v_name,btrim(p_ideology),'#6f7cff',v_uid) returning id into v_id;
+ values(p_game,v_name,btrim(p_ideology),(array['#6f7cff','#4dc9ff','#55d99b','#ff8d72','#c77dff'])[1+((select count(*) from public.game_parties where game_id=p_game)::integer%5)],v_uid) returning id into v_id;
  insert into public.chat_channels(game_id,name,kind,created_by)
  values(p_game,'Фракция · '||v_name,'team',v_uid);
  if not v_teacher then
