@@ -6,8 +6,8 @@
  box-shadow:0 8px 30px #17244708!important;
 }
 .awardShelfHeader{
- display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:18px 28px!important;
- align-items:end!important;padding-bottom:18px!important;border-bottom:1px solid var(--aw-line)!important
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:12px 28px!important;
+ align-items:center!important;padding-bottom:18px!important;border-bottom:1px solid var(--aw-line)!important
 }
 .awardShelfIntro small,.steamTeacherAwards>header small{
  color:var(--aw-blue)!important;font-size:11px!important;font-weight:800!important;letter-spacing:.10em!important
@@ -37,7 +37,6 @@
  background:#2453e6!important;border-color:#2453e6!important;color:#fff!important;box-shadow:0 4px 12px #2453e61b!important
 }
 .awardShelfTabs button[aria-pressed=true] b{color:#fff}
-.awardEarnedCount{background:#f4f6fc!important;border-color:#dce3f0!important;color:#344467!important}
 .awardError{margin:14px 0 0!important;padding:11px 13px!important;border:1px solid #e7acb7!important;border-radius:10px!important;background:#fff0f2!important;color:#922238!important}
 
 .awardGrid{
