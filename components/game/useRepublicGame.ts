@@ -209,7 +209,7 @@ export function useRepublicGame(gameId:string){
       void supabase.storage.from('game-media').createSignedUrl(row.storage_path,3600).then(({data})=>{
        if(!disposed&&channelRef.current===row.channel_id&&data?.signedUrl)
         setMessages(previous=>mergeChatMessages(previous,[{...row,url:data.signedUrl}]));
-      });
+      }).catch(()=>{/* A later media URL refresh can retry. */});
      }
     }
    }else if(payload.eventType==='DELETE'){
@@ -242,7 +242,7 @@ export function useRepublicGame(gameId:string){
   const chatRecovery=setInterval(()=>{
    if(document.visibilityState!=='visible')return;
    if(chatOpenRef.current&&channelRef.current)void loadRecentChatMessages(channelRef.current);
-   else void loadChatOverview();
+   void loadChatOverview();
   },6000);
   return()=>{
    disposed=true;clearTimeout(timer);clearInterval(poll);clearInterval(chatRecovery);
@@ -563,7 +563,7 @@ export function useRepublicGame(gameId:string){
    const rows=await Promise.all(((r.data||[]) as Message[]).map(async m=>{if(!m.storage_path)return m;const x=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);return {...m,url:x.data?.signedUrl||null}}));
    if(readCurrent(ticket)&&channelRef.current===cid){
     const ordered=rows.reverse(),latest=ordered.at(-1)?.created_at||'';
-    setMessages(previous=>mergeChatMessages(ordered,previous.filter(m=>m.channel_id===cid&&m.created_at>latest)));
+    setMessages(previous=>ordered.length?mergeChatMessages(ordered,previous.filter(m=>m.channel_id===cid&&m.created_at>latest)):[]);
    }
   }finally{if(readCurrent(ticket)&&channelRef.current===cid)setChatLoading(false)}
   });
@@ -581,7 +581,11 @@ export function useRepublicGame(gameId:string){
     if(!readCurrent(ticket)||channelRef.current!==cid)return;
     requireSuccessful([result]);
     if(!result.data?.length)return;
-    const rows=await Promise.all((result.data as Message[]).map(async m=>{
+    // The inclusive cursor prevents timestamp ties from being dropped; do
+    // not re-sign or re-render the existing last message at every poll.
+    const unseen=(result.data as Message[]).filter(m=>!messageRowsRef.current.some(old=>old.id===m.id));
+    if(!unseen.length)return;
+    const rows=await Promise.all(unseen.map(async m=>{
      if(!m.storage_path)return m;
      const signed=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);
      return {...m,url:signed.data?.signedUrl||null};
