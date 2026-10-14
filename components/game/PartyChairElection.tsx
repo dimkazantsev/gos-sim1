@@ -84,3 +84,4 @@ export default function PartyChairElection({g,party}:{g:ReturnTypeRepublic;party
   </div>}
   {notice&&<p className="gosPartyElectionFeedback" role="status">{notice}</p>}
  </section>;
+}
