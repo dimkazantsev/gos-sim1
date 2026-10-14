@@ -65,3 +65,44 @@ begin
    perform private.seed_republic_base_offices_for_game(g.game_id);
  end loop;
 end $backfill$;
+
+-- The chair's institutional authority is cumulative and does not depend on
+-- which office is currently selected in the student's profile.
+do $role_guard$
+begin
+ if position('private.game_role(p_game,p_user)' in pg_get_functiondef('private.can_manage_duma_session(uuid,uuid)'::regprocedure))=0
+ or position('private.game_role(p_game,p_user)' in pg_get_functiondef('private.can_manage_government_session(uuid,uuid)'::regprocedure))=0
+ then raise exception 'Parliament/Government permission definitions changed; review required';end if;
+end $role_guard$;
+
+create or replace function private.can_manage_duma_session(p_game uuid,p_user uuid)
+returns boolean language sql stable security definer
+set search_path to 'public','private','pg_temp'
+as $function$
+ select p_user is not null and private.is_game_member(p_game) and (
+  private.is_game_teacher(p_game)
+  or (private.role_is_available(p_game,p_user) and (
+   private.game_role(p_game,p_user) like '%председател%дум%'
+   or private.game_role(p_game,p_user) like '%совет%дум%'
+   or exists(select 1 from public.game_office_assignments a
+    where a.game_id=p_game and a.user_id=p_user and a.status='active'
+      and (lower(a.role_title) like '%председател%дум%' or lower(a.role_title) like '%совет%дум%'))
+  ))
+ );
+$function$;
+
+create or replace function private.can_manage_government_session(p_game uuid,p_user uuid)
+returns boolean language sql stable security definer
+set search_path to 'public','private','pg_temp'
+as $function$
+ select p_user is not null and private.is_game_member(p_game) and (
+  private.is_game_teacher(p_game)
+  or (private.role_is_available(p_game,p_user) and (
+   private.game_role(p_game,p_user) like '%председател%правительств%'
+   or private.game_role(p_game,p_user) like '%президент%'
+   or exists(select 1 from public.game_office_assignments a
+     where a.game_id=p_game and a.user_id=p_user and a.status='active'
+      and (lower(a.role_title) like '%председател%правительств%' or lower(a.role_title) like '%президент%'))
+  ))
+ );
+$function$;
