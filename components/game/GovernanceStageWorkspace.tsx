@@ -35,7 +35,7 @@ import PresidentialElectionStage7 from './PresidentialElectionStage7';
 type Tab='work'|'rules'|'materials'|'check'|'settings';
 type Props={g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;onBack:()=>void;onOpenStage?:(no:number)=>void;onOpenVotes:(id?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,no:number)=>void;onNavigate?:(view:View)=>void};
 const VIEW_NAMES:Partial<Record<View,string>>={parties:'Партии и фракции',votes:'Голосования',documents:'Реестр НПА',budget:'Бюджет',events:'События',grades:'Журнал оценок',actions:'Политический процесс',profile:'Профиль'};
-const BODIES:Partial<Record<number,string[]>>={1:['ksrf'],2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],6:['gd'],11:['government'],12:['gd','committee'],13:['gd','committee','sf'],14:['municipality']};
+const BODIES:Partial<Record<number,string[]>>={2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],6:['gd'],11:['government'],12:['gd','committee'],13:['gd','committee','sf'],14:['municipality']};
 
 export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,onOpenStage,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate}:Props){
  const [tab,setTab]=useState<Tab>('work');
