@@ -7,7 +7,7 @@ import {stageRoleTitles} from './stageRoles';
 
 type Unit={id:string;title:string;head_user_id:string|null};
 type Assignment={unit_id:string;user_id:string;party_id:string|null};
-type Election={id:string;office_key:string;office_title:string;round_no:1|2;vote_mode:'open'|'secret';status:'nomination'|'open'|'closed'|'finished';winner_candidate_id:string|null;created_at:string};
+type Election={id:string;office_key:string;office_title:string;round_no:1|2;vote_mode:'open'|'secret';ballot_mode?:'faction'|'personal';status:'nomination'|'open'|'closed'|'finished';winner_candidate_id:string|null;created_at:string};
 type Candidate={id:string;election_id:string;user_id:string;party_id:string;created_at:string};
 type Ballot={election_id:string;party_id:string;candidate_id:string;votes:number};
 
@@ -18,6 +18,8 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
  const [elections,setElections]=useState<Election[]>([]);
  const [candidates,setCandidates]=useState<Candidate[]>([]);
  const [ballots,setBallots]=useState<Ballot[]>([]);
+ const [personalBallots,setPersonalBallots]=useState<{election_id:string;voter_id:string;party_id:string;candidate_id:string}[]>([]);
+ const [registered,setRegistered]=useState<string[]>([]);
  const [personalMandates,setPersonalMandates]=useState<{party_id:string;user_id:string;base_mandates:number;effective_mandates:number}[]>([]);
  const [nominee,setNominee]=useState<Record<string,string>>({});
  const [voteDraft,setVoteDraft]=useState<Record<string,string>>({});
@@ -29,23 +31,27 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
 
  async function load(){
   if(!game)return;
-  const [u,a,e,c,b,m]=await Promise.all([
+  const [u,a,e,c,b,m,p,r]=await Promise.all([
    supabase.from('institution_units').select('id,title,head_user_id').eq('game_id',game.id).eq('unit_kind','committee').order('unit_key'),
    supabase.from('institution_assignments').select('unit_id,user_id,party_id').eq('game_id',game.id).eq('unit_kind','committee'),
    supabase.from('office_elections').select('*').eq('game_id',game.id).eq('stage_no',4).like('office_key','committee:%').order('created_at'),
    supabase.from('office_candidates').select('*').eq('game_id',game.id).order('created_at'),
    supabase.from('office_ballots').select('election_id,party_id,candidate_id,votes').eq('game_id',game.id),
-   supabase.from('party_member_mandates').select('party_id,user_id,base_mandates,effective_mandates').eq('game_id',game.id)
+   supabase.from('party_member_mandates').select('party_id,user_id,base_mandates,effective_mandates').eq('game_id',game.id),
+   supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id),
+   supabase.from('institution_session_registrations').select('user_id').eq('game_id',game.id).eq('stage_no',4).eq('institution_key','gd')
   ]);
-  const failure=[u,a,e,c,b,m].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
+  const failure=[u,a,e,c,b,m,p,r].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
   if(!u.error)setUnits((u.data||[]) as Unit[]);
   if(!a.error)setAssignments((a.data||[]) as Assignment[]);
   if(!e.error)setElections((e.data||[]) as Election[]);
   if(!c.error)setCandidates((c.data||[]) as Candidate[]);
   if(!b.error)setBallots((b.data||[]) as Ballot[]);
   if(!m.error)setPersonalMandates((m.data||[]) as typeof personalMandates);
+  if(!p.error)setPersonalBallots(p.data||[]);
+  if(!r.error)setRegistered((r.data||[]).map(x=>x.user_id));
  }
- useGameTableSync(game?.id,['office_elections','office_candidates','office_ballots','institution_units','institution_assignments','party_member_mandates'],load,me?.user_id||'');
+ useGameTableSync(game?.id,['office_elections','office_candidates','office_ballots','office_personal_ballots','institution_units','institution_assignments','party_member_mandates','institution_session_registrations'],load,me?.user_id||'');
 
  if(!game||!me)return null;
  const activeMandates=(partyId:string)=>personalMandates.filter(x=>x.party_id===partyId).reduce((a,x)=>a+Number(x.effective_mandates||0),0);
@@ -55,7 +61,12 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
  const history=(unitId:string)=>elections.filter(e=>e.office_key==='committee:'+unitId);
  const ec=(eid:string)=>candidates.filter(c=>c.election_id===eid);
  const eb=(eid:string)=>ballots.filter(b=>b.election_id===eid);
- const totalFor=(eid:string,cid:string)=>eb(eid).filter(b=>b.candidate_id===cid).reduce((a,b)=>a+Number(b.votes||0),0);
+ const totalFor=(eid:string,cid:string)=>{
+  const election=elections.find(x=>x.id===eid);
+  if(election?.ballot_mode==='personal')return personalBallots.filter(b=>b.election_id===eid&&b.candidate_id===cid)
+   .reduce((sum,b)=>sum+Number(personalMandates.find(m=>m.user_id===b.voter_id&&m.party_id===b.party_id)?.effective_mandates||0),0);
+  return eb(eid).filter(b=>b.candidate_id===cid).reduce((a,b)=>a+Number(b.votes||0),0);
+ };
  const used=(eid:string,pid:string)=>eb(eid).filter(b=>b.party_id===pid).reduce((a,b)=>a+Number(b.votes||0),0);
 
  async function create(unitId:string){
@@ -72,6 +83,7 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
   const r=await supabase.rpc('set_office_ballot',{p_election_id:eid,p_candidate_id:cid,p_votes:amount});
   if(r.error)setError(r.error.message);else await load();setBusy(false);
  }
+ async function personalCast(eid:string,cid:string){setBusy(true);const r=await supabase.rpc('cast_personal_office_ballot',{p_election_id:eid,p_candidate_id:cid});if(r.error)setError(r.error.message);else await load();setBusy(false)}
  async function close(eid:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:eid});if(r.error)setError(r.error.message);else await load();setBusy(false)}
 
  return <section className="committeeElectionBoard">
