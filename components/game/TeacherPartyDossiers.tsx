@@ -50,7 +50,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
     <div className="teacherPartyKpis">
      <span><strong>{p.mandates}</strong> мандатов</span><span><strong>{p.support}</strong> поддержка</span>
      <span><strong>{p.regions}</strong> регионов</span><span><strong>{p.budget}</strong> бюджет</span>
-     <span><strong>{p.ghost_loss_current}</strong> потеря GV</span><span><strong>{invites.length}</strong> приглашений</span>
+     <span><strong>{p.ghost_loss_current}</strong> потеряно голосов</span><span><strong>{invites.length}</strong> приглашений</span>
     </div>
     <div className="teacherPartySection"><h4><Landmark size={15} aria-hidden="true"/> Руководство и состав</h4>
      <p><b>Председатель:</b> {leader?.full_name||'Не назначен'}</p>
