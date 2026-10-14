@@ -81,6 +81,13 @@ function harness({effects=false}={}){
   if(name==='./useGameTableSync')return{notifyGameDataRefresh:()=>{}};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
+  if(name==='./chatChannelSelection'){
+   const source=fs.readFileSync(path.join(root,'components/game/chatChannelSelection.ts'),'utf8');
+   const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+   const child={exports:{}};
+   vm.runInNewContext('(function(require,module,exports){'+compiled+'\n})')(requireFor,child,child.exports);
+   return child.exports;
+  }
   if(name==='./recordingMedia')return{CHAT_MAX_FILE_BYTES:25*1024*1024,preferredRecordingMime:()=>'',inferChatMime:file=>file.type,uploadedChatKind:()=> 'audio'};
   if(name==='./chatMediaTransport')return{sendChatMedia:async input=>{input.onPhase?.('uploading');await mediaSend.promise;input.onPhase?.('saving');return{ok:false,stage:'message',error:'old media save failure',pending:{messageId:'old-pending',path:'game-a/channel-a/teacher-a/old.webm'}};}};
   return{};
