@@ -1,0 +1,183 @@
+/* ГОС.ID: compact teacher control bar and adaptive stage master/detail. */
+.teacherCommand .teacherCommandBar {
+ grid-template-columns:minmax(0,1fr) auto;
+ gap:14px;
+}
+.teacherCommand .teacherCommandStage { min-width:0; }
+.teacherCommand .teacherCommandStageLine {
+ flex-wrap:wrap;
+ column-gap:14px;
+ row-gap:9px;
+}
+.teacherCommand .teacherCommandStageText { flex:1 1 170px;min-width:0; }
+.teacherCommand .teacherCommandStatus {
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;
+ gap:7px;min-width:0;margin-left:auto;
+}
+.teacherCommand .teacherCommandStatus>small {
+ color:#7188a4;font-size:11px;font-weight:700;white-space:nowrap;
+}
+.teacherCommand .teacherQuickActions { min-width:0; }
+.teacherCommand .teacherQuick { min-height:44px; }
+
+.teacherCommand .teacherStageSplit {
+ grid-template-columns:minmax(268px,.8fr) minmax(0,1.6fr);
+ gap:16px;
+}
+.teacherCommand .teacherStageSidebar {
+ display:grid;align-content:start;gap:14px;min-width:0;
+}
+.teacherCommand .teacherStageSidebar .teacherStageList {
+ max-height:min(42dvh,380px);
+ overflow:auto;overscroll-behavior:contain;
+ padding:2px 4px 3px 0;
+}
+.teacherCommand .teacherStageSidebar>.deadlineControl { min-width:0;margin:0; }
+.teacherCommand .teacherStageSidebar .deadlineControlTop,
+.teacherCommand .teacherStageSidebar .deadlineControlTop.hasAction,
+.teacherCommand .teacherStageSidebar .deadlineControlTop:not(.hasAction) {
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) 84px!important;
+ grid-template-areas:"overview count" "action action";
+ align-items:stretch;gap:8px!important;
+}
+.teacherCommand .teacherStageSidebar .deadlineOverview {
+ grid-area:overview;
+ width:100%;min-height:0;padding:13px;
+}
+.teacherCommand .teacherStageSidebar .deadlineOverviewCopy>h3 {
+ font-size:clamp(17px,1.55vw,20px);
+}
+.teacherCommand .teacherStageSidebar .deadlineCount {
+ grid-area:count;
+ width:100%;min-width:0;min-height:0;padding:10px 6px;
+}
+.teacherCommand .teacherStageSidebar .deadlineCount span {
+ max-width:100%;font-size:10px;overflow-wrap:anywhere;
+}
+.teacherCommand .teacherStageSidebar .deadlineRuleMeta {
+ display:flex;flex-wrap:wrap;gap:5px;
+}
+.teacherCommand .teacherStageSidebar .deadlineRuleDescription {
+ display:grid;grid-template-columns:minmax(0,1fr);gap:3px;
+ overflow-wrap:anywhere;
+}
+.teacherCommand .teacherStageSidebar .deadlineActionCard {
+ grid-area:action;grid-column:1/-1;
+ width:100%;min-width:0;min-height:60px;
+ padding:10px 12px;text-align:left;
+}
+.teacherCommand .teacherStageSidebar .deadlineActionCopy { min-width:0; }
+.teacherCommand .teacherStageSidebar .deadlineActionCopy :is(b,small) {
+ overflow-wrap:anywhere;
+}
+.teacherCommand .teacherStageInspector {
+ gap:13px;padding:19px;container-type:inline-size;
+}
+.teacherCommand .teacherStageInspectorActions {
+ display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;
+ gap:10px;padding:13px;
+ border:1px solid #d9e5f6;border-radius:12px;
+ background:linear-gradient(135deg,#f7faff 0%,#fff 100%);
+}
+.teacherCommand .teacherStageFlowActions {
+ display:flex;flex:1 1 365px;align-items:end;
+ flex-wrap:wrap;gap:9px;min-width:0;
+}
+.teacherCommand .teacherStageInspectorActions button {
+ flex:0 1 auto;min-height:44px;padding:9px 13px;
+ line-height:1.3;
+}
+.teacherCommand .teacherStageInspectorActions button:focus-visible {
+ outline:3px solid #7196e8;outline-offset:2px;
+}
+.teacherCommand .teacherStageInspectorActions button:disabled { opacity:.6;cursor:wait; }
+.teacherCommand .teacherStageExtendField {
+ display:grid;flex:1 1 118px;max-width:165px;min-width:105px;
+ gap:5px;color:#536b8a;font-size:11px;font-weight:760;
+}
+.teacherCommand .teacherStageExtendField input {
+ box-sizing:border-box;width:100%;height:44px;min-width:0;
+ padding:0 12px;border:1px solid #bfd0ed;border-radius:9px;
+ background:#fff;color:#223e63;font-size:15px;font-weight:700;
+}
+.teacherCommand .teacherStageProcedures {
+ flex:0 1 auto;min-height:44px;white-space:normal;text-align:center;
+}
+.teacherCommand .teacherStageInspector>.stagePolicyEditor {
+ gap:14px;padding:17px;
+ border-color:#d8e5f4;
+ background:#fcfdff;
+}
+.teacherCommand .teacherStageInspector .stagePolicyQuick {
+ padding:12px;border:1px solid #e0e9f6;border-radius:11px;
+ background:#f3f7fe;
+ grid-template-columns:minmax(80px,105px) minmax(115px,150px) minmax(125px,1fr);
+}
+.teacherCommand .teacherStageInspector .stagePolicyQuick button { min-height:43px; }
+
+@container (max-width:590px) {
+ .teacherStageInspector .stagePolicyQuick {
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+ }
+ .teacherStageInspector .stagePolicyQuick>button { grid-column:1/-1; }
+ .teacherStageInspector .stagePolicyFields { grid-template-columns:minmax(0,1fr); }
+ .teacherStageInspector .stagePolicyDescription { grid-column:auto; }
+ .teacherStageInspector .teacherStageProcedures { flex:1 1 100%; }
+}
+@media(max-width:1450px) {
+ .teacherCommand .teacherCommandBar { grid-template-columns:minmax(0,1fr); }
+ .teacherCommand .teacherQuickActions { grid-column:1;flex-wrap:wrap;justify-content:flex-start; }
+ .teacherCommand .teacherQuickActions>.teacherQuick { flex:1 1 160px; }
+}
+@media(max-width:1120px) {
+ .teacherCommand .teacherStageSplit { grid-template-columns:minmax(0,1fr); }
+ .teacherCommand .teacherStageSidebar { display:contents; }
+ .teacherCommand .teacherStageSidebar .teacherStageList {
+  order:0;max-height:265px;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+ .teacherCommand .teacherStageInspector { order:1; }
+ .teacherCommand .teacherStageSidebar>.deadlineControl { order:2; }
+ .teacherCommand .teacherStageSidebar .deadlineControlTop,
+ .teacherCommand .teacherStageSidebar .deadlineControlTop.hasAction,
+ .teacherCommand .teacherStageSidebar .deadlineControlTop:not(.hasAction) {
+  grid-template-columns:minmax(0,1fr) 112px!important;
+ }
+}
+@media(max-width:650px) {
+ .teacherCommand .teacherCommandBar { padding:13px; }
+ .teacherCommand .teacherCommandStageLine { align-items:start; }
+ .teacherCommand .teacherCommandStatus { justify-content:flex-start;margin-left:0; }
+ .teacherCommand .teacherStageSidebar .teacherStageList {
+  grid-template-columns:minmax(0,1fr);max-height:240px;
+ }
+ .teacherCommand .teacherStageInspector { padding:13px;gap:12px; }
+ .teacherCommand .teacherStageInspectorActions { padding:10px;gap:9px; }
+ .teacherCommand .teacherStageFlowActions { flex-basis:100%;gap:8px; }
+ .teacherCommand .teacherStageFlowActions>button { flex:1 1 125px; }
+ .teacherCommand .teacherStageExtendField { flex:1 1 112px;max-width:none; }
+ .teacherCommand .teacherStageProcedures { width:100%; }
+ .teacherCommand .teacherStageInspector>.stagePolicyEditor { padding:12px; }
+ .teacherCommand .teacherStageInspector .stagePolicyQuick {
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  padding:9px;
+ }
+ .teacherCommand .teacherStageInspector .stagePolicyQuick>button { grid-column:1/-1; }
+ .teacherCommand .teacherStageInspector .stagePolicyFields { grid-template-columns:minmax(0,1fr); }
+ .teacherCommand .teacherStageInspector .stagePolicyDescription { grid-column:auto; }
+ .teacherCommand .teacherStageSidebar .deadlineControlTop,
+ .teacherCommand .teacherStageSidebar .deadlineControlTop.hasAction,
+ .teacherCommand .teacherStageSidebar .deadlineControlTop:not(.hasAction) {
+  grid-template-columns:minmax(0,1fr) 84px!important;
+ }
+}
+@media(max-width:380px) {
+ .teacherCommand .teacherStageFlowActions>button { flex:1 1 100%; }
+ .teacherCommand .teacherStageExtendField { flex:1 1 100%; }
+ .teacherCommand .teacherStageSidebar .deadlineControlTop,
+ .teacherCommand .teacherStageSidebar .deadlineControlTop.hasAction,
+ .teacherCommand .teacherStageSidebar .deadlineControlTop:not(.hasAction) {
+  grid-template-columns:minmax(0,1fr) 76px!important;
+ }
+}
