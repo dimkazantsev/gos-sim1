@@ -20,9 +20,11 @@
 .teacherCommand .teacherQuickActions { min-width:0; }
 .teacherCommand .teacherQuick { min-height:44px; }
 
+/* Match the bottoms of the two stage-management panels without adding spacers. */
 .teacherCommand .teacherStageSplit {
  grid-template-columns:minmax(268px,.8fr) minmax(0,1.6fr);
  gap:16px;
+ align-items:stretch;
 }
 .teacherCommand .teacherStageSidebar {
  display:grid;align-content:start;gap:14px;min-width:0;
@@ -136,7 +138,7 @@
  .teacherCommand .teacherQuickActions>.teacherQuick { flex:1 1 160px; }
 }
 @media(max-width:1120px) {
- .teacherCommand .teacherStageSplit { grid-template-columns:minmax(0,1fr); }
+ .teacherCommand .teacherStageSplit { grid-template-columns:minmax(0,1fr);align-items:start; }
  .teacherCommand .teacherStageSidebar { display:contents; }
  .teacherCommand .teacherStageSidebar .teacherStageList {
   order:0;max-height:min(68dvh,700px);
@@ -248,4 +250,9 @@
  flex:0 0 15px;
  width:15px;
  height:15px;
+}
+
+/* With the chat expanded, the inspector becomes one column; do not stretch it. */
+@media(min-width:1100px){
+ .simMain.chatOpen .teacherCommand .teacherStageSplit{align-items:start}
 }
