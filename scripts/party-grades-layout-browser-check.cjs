@@ -10,7 +10,7 @@ const markup=`<!doctype html><html><meta name="viewport" content="width=device-w
 *{box-sizing:border-box}body{margin:0;background:#eef3fb;font:14px Arial,sans-serif}.gradesPage{width:100%;padding:12px}.gradesMatrixWrap{width:100%;max-width:100%;padding:10px;background:#fff}.gradeModal{width:min(900px,100%);margin:20px auto;padding:10px;background:white}
 ${css}</style><body><div class="gradesPage"><section class="surface gradesMatrixWrap"><div class="gradesMatrix">
 <div class="gradesMatrixHead"><b>СТУДЕНТ</b><span>Σ</span><span>СР.</span>${cells(16)}</div>
-<div class="gradesMatrixRow"><div><b>Тестов Тест Тестович</b><small>МИР · участник</small></div><span class="gradeTotal">12</span><span class="gradeTotal">1.50</span>${scores}</div>
+<div class="gradesMatrixRow"><div class="gradesStudentCell"><b class="gradesStudentName" title="Тестов Тест Тестович"><span class="gradesNameFull">Тестов Тест Тестович</span><span class="gradesNameShort" aria-hidden="true">Тестов</span></b><small>МИР · участник</small></div><span class="gradeTotal">12</span><span class="gradeTotal">1.50</span>${scores}</div>
 </div></section></div>
 <div class="gradeModal"><section class="blitzVsnScore"><header><b>Знания и правоприменение</b><strong>0.50 / 1</strong></header><div class="blitzVsnBreakdown">${['Кейсы','Действия','Блиц','Полнота'].map(n=>'<span><small>'+n+'</small><b>0.25</b></span>').join('')}</div>
 <p>Решения кейсов: 2 из 3</p></section><section class="gradeRationale"><small>ИНТЕРПРЕТАЦИЯ ДЕЙСТВИЙ</small><p>${'Содержательный текст оценки. '.repeat(25)}</p></section></div>
@@ -18,7 +18,7 @@ ${css}</style><body><div class="gradesPage"><section class="surface gradesMatrix
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
-  for(const width of [390,768,1440]){
+  for(const width of [320,390,768,1024,1440]){
    const page=await browser.newPage({viewport:{width,height:900}});
    await page.setContent(markup);
    const info=await page.evaluate(()=>{
@@ -39,8 +39,45 @@ ${css}</style><body><div class="gradesPage"><section class="surface gradesMatrix
    assert(info.rationale.left>=info.grade.left-1&&info.rationale.right<=info.grade.right+1,'Rationale fits');
    assert(info.election.left>=-1&&info.election.right<=width+2,'Election card fits viewport');
    assert(info.criteria.length===4&&info.criteria.every(x=>x.right<=info.grade.right+1),'Breakdown values fit inside modal');
+   const sticky=await page.evaluate(()=>{
+    const table=document.querySelector('.gradesMatrix');
+    const name=document.querySelector('.gradesStudentCell');
+    const full=document.querySelector('.gradesNameFull'),short=document.querySelector('.gradesNameShort');
+    const firstCell=document.querySelector('.gradesMatrixRow>.gradeTotal');
+    const headName=document.querySelector('.gradesMatrixHead>b:first-child');
+    const natural={width:Math.round(name.getBoundingClientRect().width),fullVisible:getComputedStyle(full).display!=='none'};
+    table.scrollLeft=330;
+    table.classList.add('gradesMatrixScrolled');
+    const compact={
+      width:Math.round(name.getBoundingClientRect().width),
+      headWidth:Math.round(headName.getBoundingClientRect().width),
+      shortVisible:getComputedStyle(short).display!=='none',
+      fullHidden:getComputedStyle(full).display==='none',
+      noteHidden:getComputedStyle(name.querySelector('small')).display==='none',
+      visibleLabel:short.textContent,
+      nameRight:name.getBoundingClientRect().right,
+      firstCellRight:firstCell.getBoundingClientRect().right,
+      viewportRight:table.getBoundingClientRect().right,
+      scrollLeft:table.scrollLeft
+    };
+    table.scrollLeft=0;
+    table.classList.remove('gradesMatrixScrolled');
+    return {natural,compact,restored:Math.round(name.getBoundingClientRect().width)};
+   });
+   if(width<=1100){
+    assert.equal(sticky.natural.width,204,'Full pinned student column initially at '+width);
+    assert.equal(sticky.compact.width,124,'Surname column must shrink after horizontal scroll at '+width);
+    assert.equal(sticky.compact.headWidth,124,'Header and row sticky tracks align at '+width);
+    assert(sticky.compact.shortVisible&&sticky.compact.fullHidden&&sticky.compact.noteHidden,'Surname-only mode hides details at '+width);
+    assert.equal(sticky.compact.visibleLabel,'Тестов','Surname is displayed after scrolling');
+    assert(sticky.compact.nameRight<sticky.compact.viewportRight,'Sticky name must leave room for scores at '+width);
+    assert.equal(sticky.restored,204,'Full column returns when scrolled back at '+width);
+   }else{
+    assert.equal(sticky.compact.width,sticky.natural.width,'Desktop layout must not change while scrolling');
+    assert(!sticky.compact.shortVisible,'Desktop must retain full name');
+   }
    await page.close();
-   console.log('PASS '+width+'px: 19 aligned tracks, contained modal, election and knowledge grid');
+   console.log('PASS '+width+'px: 19 aligned tracks and mobile surname-only pinned column');
   }
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
