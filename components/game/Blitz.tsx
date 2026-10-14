@@ -36,15 +36,35 @@ export function BlitzArchive({gameId,userId}:{gameId:string;userId:string}){
   setLoading(false);
  }
  useEffect(()=>{setRows([]);setOffset(0);setHasMore(false);void load(0);return()=>{request.current++}},[gameId,userId]);
- return <section className="surface blitzArchive" aria-label="Личный раздел блиц-вопросов">
-  <header className="blitzArchiveHeader"><div><small>ПРАВОВЫЕ ЗНАНИЯ</small><h2>Блиц-вопросы</h2><p>Ваши назначенные вопросы и результаты. Для ответа на новый вопрос отводится 20 секунд.</p></div><strong>{rows.length} записей</strong></header>
+ return <section id="profile-blitz-archive" className="surface blitzArchive" aria-label="Личный раздел блиц-вопросов">
+  <header className="blitzArchiveHeader">
+   <div><small>ПРАВОВЫЕ ЗНАНИЯ</small><h2>Блиц-вопросы</h2><p>История ответов по этапам: вопрос, правильный ответ и ваш выбор. На новый вопрос отводится 20 секунд.</p></div>
+   <strong>{rows.length} записей{hasMore?' (есть ещё)':''}</strong>
+  </header>
   <div className="blitzArchiveToolbar"><button type="button" className="secondary" disabled={loading} onClick={()=>void load(0)}>Обновить историю</button><button type="button" className="primary" onClick={()=>window.dispatchEvent(new Event('blitz:open'))}>Перейти к доступному вопросу</button></div>
   {error&&<p role="alert">{error}</p>}
   {loading&&<p role="status">Загрузка блиц-вопросов…</p>}
   {!loading&&!error&&!rows.length&&<p className="blitzArchiveEmpty">Назначенных вопросов пока нет. Новые задания появятся здесь автоматически.</p>}
-  <div className="blitzArchiveList">{rows.map(r=><details key={r.id}><summary><span className="blitzArchiveStatus">{r.answered_at?(r.is_correct?'Верно':'Неверно'):'Ожидает ответа'}</span><span>Этап {r.stage_no} · {r.question||'Вопрос ожидает открытия'}</span></summary>
-   {r.answered_at?<div className="blitzArchiveResult"><div>{(r.options||[]).map((o,i)=><span key={i} className={'blitzOption '+(i===r.correct_index?'correct':i===r.chosen_index?'incorrect':'')}>{o}</span>)}</div><p>{r.explanation} {legal(r)}</p></div>:<button type="button" disabled={!!r.available_at&&Date.parse(r.available_at)>Date.now()} onClick={()=>window.dispatchEvent(new Event('blitz:open'))}>Ответить · 20 секунд</button>}
-  </details>)}</div>
+  <div className="blitzArchiveList">{rows.map(r=>{
+   const answered=Boolean(r.answered_at);
+   const correct=answered&&r.is_correct===true;
+   const unansweredChoice=r.chosen_index==null||r.chosen_index<0;
+   const chosenAnswer=unansweredChoice?'Ответ не дан (время истекло)':r.options?.[r.chosen_index!]||'Ответ не найден';
+   const correctAnswer=r.correct_index!=null&&r.correct_index>=0?r.options?.[r.correct_index]||'Ответ недоступен':'Ответ недоступен';
+   const available=!r.available_at||Date.parse(r.available_at)<=Date.now();
+   return <article key={r.id} className={'blitzHistoryCard '+(answered?(correct?'isCorrect':'isIncorrect'):'isPending')}>
+    <div className="blitzHistoryMeta"><span className="blitzHistoryStage">Этап {r.stage_no}</span><span className="blitzHistoryStatus">{answered?(correct?'Верно':'Неверно'):'Ожидает ответа'}</span></div>
+    <p className="blitzHistoryQuestion">{r.question||'Вопрос ожидает открытия'}</p>
+    {answered?<div className="blitzHistoryAnswers">
+     <div className="blitzHistoryAnswer blitzHistoryAnswerCorrect"><span>Правильный ответ</span><strong>{correctAnswer}</strong></div>
+     <div className="blitzHistoryAnswer blitzHistoryAnswerStudent"><span>Ваш ответ</span><strong>{chosenAnswer}</strong></div>
+    </div>:<div className="blitzHistoryPending">
+     <p>Правильный ответ будет показан после завершения попытки.</p>
+     <button type="button" className="secondary" disabled={!available} onClick={()=>window.dispatchEvent(new Event('blitz:open'))}>{available?'Ответить · 20 секунд':'Вопрос ещё не доступен'}</button>
+    </div>}
+    {answered&&(r.explanation||r.legal_act||r.source_url)&&<details className="blitzHistoryExplain"><summary>Пояснение и правовой источник</summary>{r.explanation&&<p>{r.explanation}</p>}{(r.legal_act||r.source_url)&&legal(r)}</details>}
+   </article>;
+  })}</div>
   {hasMore&&<button type="button" className="secondary blitzArchiveMore" disabled={loading} onClick={()=>void load(offset)}>Загрузить ещё 30</button>}
  </section>;
 }
