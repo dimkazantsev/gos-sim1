@@ -187,6 +187,7 @@ async function dispatchOutbox(gameId?:string){
   else if(job.category==='mention_actions')buttons=telegramSectionButtons('actions','Открыть обсуждение');
   else if(job.category==='mention_documents')buttons=telegramSectionButtons('documents','Открыть документы');
   else if(job.category==='chat'||job.category==='mention_chat')buttons=telegramChatButtons(job.channel_id||undefined);
+  else if(job.category==='party_invite'||job.category==='party_registration'||job.category==='party_document'||job.category==='party_review')buttons=telegramSectionButtons('parties','Открыть партии');
   else if(job.category==='stage')buttons=telegramSectionButtons('stages','Открыть этап');
   else if(job.category==='party_invite'||job.category==='party_registration'||job.category==='party_document'||job.category==='party_review')buttons=telegramSectionButtons('parties','Открыть партии');
   else if(job.category==='vote')buttons=telegramSectionButtons('votes','Открыть голосование');
