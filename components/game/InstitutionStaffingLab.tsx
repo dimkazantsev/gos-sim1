@@ -75,7 +75,7 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
 
  return <section className="staffingLab" data-staffing={mode}>
   <header className="staffingLabHead">
-   <div><h2>{mode==='committees'?'Комитеты Государственной Думы':'Команды министерств'}</h2><p>{mode==='committees'?'На первом заседании палата образует пять комитетов. Фракции распределяют депутатов, затем Государственная Дума избирает председателей.':'Министры, назначенные на этом этапе, набирают сотрудников своих ведомств. Участник может состоять только в одном министерстве; партийная принадлежность не определяет распределение.'}</p></div>
+   <div><h2>{mode==='committees'?'Комитеты Государственной Думы':'Команды министерств'}</h2><p>{mode==='committees'?'На первом заседании палата образует пять комитетов. После избрания Председателя Государственной Думы выдвигаются кандидатуры председателей комитетов. Депутаты обсуждают их, проводят голосование, после чего избранные председатели совместно с фракциями согласуют составы комитетов.':'Министры, назначенные на этом этапе, набирают сотрудников своих ведомств. Участник может состоять только в одном министерстве; партийная принадлежность не определяет распределение.'}</p></div>
    <div className="staffingBalance"><strong>{assignments.filter(a=>a.unit_kind===(mode==='committees'?'committee':'ministry')).length}</strong><span>{mode==='committees'?'в комитетах':'в министерствах'}</span></div>
   </header>
   {loadError&&<div className="stageOperationsNotice" role="alert"><p>{loadError}</p><button type="button" onClick={()=>void load()}>Повторить загрузку</button></div>}
@@ -84,7 +84,7 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
   {mode==='ministries'&&loaded&&!loadError&&!ministries.length&&<p className="stageOperationsNotice">Сначала утвердите структуру Правительства на этапе 8. После этого здесь появятся ведомства.</p>}
 
   {mode==='committees'&&committees.length>0&&<section className="staffingSection">
-   <div className="staffingSectionHead"><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>5 комитетов · пропорциональное представительство фракций</h3><p>Каждый комитет моделирует 90 депутатских мест. Квота партии автоматически пересчитывается из текущего распределения мандатов ГД; студенты внутри своей фракционной квоты представляют соответствующую долю депутатов.</p></div><span>1 студент → 1 комитет</span></div>
+   <div className="staffingSectionHead"><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>5 комитетов · пропорциональное представительство фракций</h3><p>Сначала депутаты выбирают Председателя Государственной Думы, затем выдвигают и обсуждают кандидатуры председателей комитетов и голосуют за них. После этого избранные председатели совместно с фракциями распределяют депутатов по комитетам. Договоритесь об этом в общем чате. Каждый комитет моделирует 90 мест, а квоты автоматически пересчитываются по мандатам. Один депутат состоит только в одном комитете.</p></div><span>1 студент → 1 комитет</span></div>
    <div className="committeeGrid">{committees.map(u=>{
     const aa=assignedTo(u.id),rows=committeeRows(u.id);
     return <article className="institutionUnit committeeUnit" key={u.id}>
