@@ -456,8 +456,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(!game||!me||previewMode)return;
   let live=true;
   async function count(){
-   const [r,i]=await Promise.all([supabase.from('event_assignments').select('id',{count:'exact',head:true}).eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending'),supabase.from('event_collaboration_invites').select('id',{count:'exact',head:true}).eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending')]);
-   if(live&&!r.error&&!i.error)setPendingEvents((r.count||0)+(i.count||0));
+   const [r,i]=await Promise.all([supabase.from('event_assignments').select('case_id').eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending'),supabase.from('event_collaboration_invites').select('case_id').eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending')]);
+   if(live&&!r.error&&!i.error)setPendingEvents(new Set([...(r.data||[]).map(x=>x.case_id),...(i.data||[]).map(x=>x.case_id)]).size);
   }
   void count();const poll=setInterval(()=>void count(),30000);
   const channel=supabase.channel('event-count:'+game.id+':'+me.user_id)
