@@ -6,6 +6,9 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
  const [status,setStatus]=useState<{linked:boolean;notifications_enabled:boolean}|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const username=process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME||'GosSimsGameBot';
  const [activated,setActivated]=useState('');
+ const [linkToken,setLinkToken]=useState(''),[linkIssuedAt,setLinkIssuedAt]=useState(0),[copied,setCopied]=useState(false);
+ const tgAppLink=linkToken?'tg://resolve?domain='+encodeURIComponent(username)+'&start='+encodeURIComponent(linkToken):'';
+ const tgWebLink=linkToken?'https://t.me/'+encodeURIComponent(username)+'?start='+encodeURIComponent(linkToken):'';
  async function activate(){
    setBusy(true);setError('');
    const {data,error:authError}=await supabase.auth.getSession();
@@ -52,7 +55,7 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
   finally{setBusy(false)}
  }
  async function refresh(){
-   try{const r=await supabase.rpc('telegram_status',{p_game_id:gameId});if(r.error)throw r.error;setStatus(r.data as typeof status)}
+   try{const r=await supabase.rpc('telegram_status',{p_game_id:gameId});if(r.error)throw r.error;setStatus(r.data as typeof status);if(r.data?.linked){setLinkToken('');setLinkIssuedAt(0)}}
    catch(e){setError(e instanceof Error?e.message:'Не удалось получить состояние Telegram')}
  }
  useEffect(()=>{
@@ -64,15 +67,17 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
   return()=>{window.removeEventListener('focus',focus);document.removeEventListener('visibilitychange',visible)};
  },[gameId]);
  async function link(){
-  setBusy(true);setError('');
-  const r=await supabase.rpc('telegram_generate_link',{p_game_id:gameId});
-  if(r.error)setError(r.error.message);
-  else if(!username)setError('Имя Telegram-бота пока не настроено на сервере.');
-  else {const link='https://t.me/'+username+'?start='+r.data;
-   const popup=window.open(link,'_blank','noopener,noreferrer');
-   if(!popup)setActivated('Если Telegram не открылся, воспользуйтесь ссылкой: '+link);
-  }
-  setBusy(false);
+  setBusy(true);setError('');setCopied(false);
+  // Open no browser window after await: async window.open was blocked by popup blockers.
+  // Instead render a user-clickable tg:// link and a fallback /start command.
+  try{
+   const r=await supabase.rpc('telegram_generate_link',{p_game_id:gameId});
+   if(r.error)throw r.error;
+   if(!/^[A-Za-z0-9_]{5,32}$/.test(username))throw new Error('Имя Telegram-бота настроено неверно.');
+   if(typeof r.data!=='string'||!/^[a-f0-9]{48}$/.test(r.data))throw new Error('Не удалось получить корректный код привязки.');
+   setLinkToken(r.data);setLinkIssuedAt(Date.now());
+  }catch(e){setLinkToken('');setError(e instanceof Error?e.message:'Не удалось создать ссылку привязки.')}
+  finally{setBusy(false)}
  }
  async function change(kind:'unlink'|'toggle'){
   setBusy(true);setError('');
@@ -85,14 +90,32 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
   {status?.linked&&!status.notifications_enabled&&<p role="status" className="telegramLinkWarning">Аккаунт привязан, но уведомления отключены. Включите их кнопкой ниже.</p>}
   <p style={{margin:'0 0 14px',opacity:.8}}>{status?.linked?'Telegram привязан к вашему игровому аккаунту.':'Откройте бота, нажмите «Начать» и пользуйтесь удобным меню. Уведомления о вашей игре доступны после привязки.'}</p>
   <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-   {!status?.linked?<button type="button" disabled={busy} onClick={()=>void link()}>Привязать Telegram</button>:<>
+   {!status?.linked?<button type="button" disabled={busy} onClick={()=>void link()}>{busy?'Подготавливаем ссылку…':linkToken?'Обновить код привязки':'Привязать Telegram'}</button>:<>
     <button type="button" disabled={busy} onClick={()=>void change('toggle')}>{status.notifications_enabled?'Отключить уведомления':'Включить уведомления'}</button>
     <button type="button" disabled={busy} onClick={()=>void change('unlink')}>Отвязать Telegram</button>
    </>}
    <button type="button" onClick={()=>void refresh()}>Обновить статус привязки</button>
    {teacher&&<><button type="button" disabled={busy} onClick={()=>void checkBot()}>Проверить Telegram</button><button type="button" disabled={busy} onClick={()=>void activate()}>Активировать бота</button></>}
   </div>
-  {activated&&<p role="status">{activated.startsWith('Если Telegram')?<a href={activated.split('ссылкой: ')[1]} target="_blank" rel="noopener noreferrer">Открыть Telegram для привязки</a>:activated}</p>}
+  {!status?.linked&&linkToken&&<div className="telegramLinkSteps" role="group" aria-label="Способы открытия Telegram">
+   <p><strong>Код создан.</strong> Он действует 10 минут. Выберите способ открытия Telegram:</p>
+   <div className="telegramLinkChoices">
+    <a className="primary" href={tgAppLink}>Открыть в приложении Telegram</a>
+    <a className="secondary" href={tgWebLink} target="_blank" rel="noopener noreferrer">Открыть страницу бота</a>
+    <a className="secondary" href="https://web.telegram.org/k/" target="_blank" rel="noopener noreferrer">Telegram Web</a>
+   </div>
+   <p>Если переход из браузера не срабатывает, найдите <strong>@{username}</strong> в Telegram и отправьте ему команду привязки:</p>
+   <div className="telegramLinkManual">
+    <code>{'/start '+linkToken}</code>
+    <button type="button" className="secondary" onClick={()=>{
+     if(!navigator.clipboard?.writeText){setCopied(false);return;}
+     void navigator.clipboard.writeText('/start '+linkToken).then(()=>setCopied(true)).catch(()=>setCopied(false));
+    }}>{copied?'Скопировано':'Скопировать команду'}</button>
+   </div>
+   <p className="telegramLinkDisclaimer">Нажмите START непосредственно в чате бота, если Telegram его покажет. Затем вернитесь сюда и обновите статус.</p>
+   {Date.now()-linkIssuedAt>=600000&&<p role="alert">Срок действия кода мог закончиться. Нажмите «Обновить код привязки».</p>}
+  </div>}
+  {activated&&<p role="status">{activated}</p>
   {error&&<p role="alert" style={{color:'var(--danger,#b73535)'}}>{error}</p>}
  </section>;
 }
