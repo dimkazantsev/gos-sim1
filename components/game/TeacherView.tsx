@@ -41,11 +41,11 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
  const navigationRef=useHorizontalWheel(game?.id);
- const pendingFactionCount=parties.filter(p=>p.registration_status==='submitted').length+g.partyDocuments.filter(d=>d.status==='submitted').length;
+ const pendingFactionCount=parties.filter(p=>p.registration_status==='submitted').length+(g.partyDocuments||[]).filter(d=>d.status==='submitted').length;
  const [clockIndex,setClockIndex]=useState(0);
  const [clockNow,setClockNow]=useState(0);
  useEffect(()=>{const interval=setInterval(()=>setClockNow(Date.now()),1000);return()=>clearInterval(interval)},[]);
- const activeStageClocks=stages.filter(s=>s.status==='open').sort((a,b)=>(a.deadline?Date.parse(a.deadline):Infinity)-(b.deadline?Date.parse(b.deadline):Infinity)||a.stage_no-b.stage_no);
+ const activeStageClocks=(stages||[]).filter(s=>s.status==='open').sort((a,b)=>(a.deadline?Date.parse(a.deadline):Infinity)-(b.deadline?Date.parse(b.deadline):Infinity)||a.stage_no-b.stage_no);
  const clockStage=activeStageClocks[clockIndex%Math.max(1,activeStageClocks.length)];
  const clockSeconds=clockStage?.deadline&&clockNow?Math.max(0,Math.ceil((Date.parse(clockStage.deadline)-clockNow)/1000)):0;
 
