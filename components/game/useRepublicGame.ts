@@ -52,7 +52,9 @@ export function useRepublicGame(gameId:string){
   try{
    const {data}=await supabase.auth.getSession();
    if(!data.session?.access_token)return;
-   await fetch('/api/telegram/dispatch',{
+   const origin=(process.env.NEXT_PUBLIC_GAME_API_ORIGIN||
+    (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':'')).replace(/[/]$/,'');
+   await fetch(origin+'/api/telegram/dispatch',{
     method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+data.session.access_token},
     body:JSON.stringify({gameId}),keepalive:true
    });
