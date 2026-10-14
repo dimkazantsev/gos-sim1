@@ -77,3 +77,24 @@ revoke all on function private.validate_document_acting_office() from public,ano
 drop trigger if exists validate_document_acting_office_on_create on public.formal_documents;
 create trigger validate_document_acting_office_on_create before insert on public.formal_documents
 for each row execute function private.validate_document_acting_office();
+
+-- Only a teacher may adjust a legacy representative role for compatibility.
+-- Ordinary participants keep the whole office portfolio and cannot switch.
+create or replace function public.select_game_office(p_id uuid)
+returns void language plpgsql security definer set search_path to 'public','private','pg_temp' as $$
+declare o public.game_office_assignments%rowtype;
+begin
+ select * into o from public.game_office_assignments where id=p_id;
+ if o.id is null or not private.is_game_teacher(o.game_id) then
+  raise exception 'Only the administrator can change the legacy representative role'
+    using errcode='42501';
+ end if;
+ perform 1 from public.game_members
+  where game_id=o.game_id and user_id=o.user_id for update;
+ select * into o from public.game_office_assignments where id=p_id for update;
+ if o.status<>'active' or position(' · ' in o.role_title)>0 then
+   raise exception 'The office must be active';
+ end if;
+ update public.game_members set role_title=o.role_title
+ where game_id=o.game_id and user_id=o.user_id and kind='student';
+end $$;
