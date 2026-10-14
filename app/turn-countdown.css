@@ -5,10 +5,10 @@
  grid-template-columns:repeat(3,minmax(0,1fr));
  align-items:center;
  justify-items:stretch;
- flex:0 0 148px;
- width:148px;
- min-width:148px;
- max-width:148px;
+ flex:0 0 176px;
+ width:176px;
+ min-width:176px;
+ max-width:176px;
  padding:4px 8px;
  gap:2px;
  border-color:#d9e4fb;
@@ -30,6 +30,10 @@
 }
 .simWorkspace .simTop .timerPillDuration .timerPillUnit+.timerPillUnit{
  border-left:1px solid #e3e9f7;
+}
+/* Keep the first letter of «МИНУТЫ» clear of the dividing line. */
+.simWorkspace .simTop .timerPillDuration .timerPillUnit:last-child{
+ padding-inline-start:6px;
 }
 .simWorkspace .simTop .timerPillDuration .timerPillUnit strong{
  display:block;
@@ -59,6 +63,7 @@
   gap:0;
   border-radius:10px;
  }
+ .simWorkspace .simTop .timerPillDuration .timerPillUnit:last-child{padding-inline-start:0}
  .simWorkspace .simTop .timerPillDuration .timerPillUnit strong{font-size:12px}
  .simWorkspace .simTop .timerPillDuration .timerPillUnitFull{display:none}
  .simWorkspace .simTop .timerPillDuration .timerPillUnitCompact{

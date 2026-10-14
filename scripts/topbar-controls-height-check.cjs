@@ -47,12 +47,22 @@ if(!browserPath)throw Error('Chromium required for top-bar geometry check');
     units:[...el.querySelectorAll('.timerPillUnit strong')].map(n=>n.textContent),
     title:el.getAttribute('aria-label'),
     width:el.getBoundingClientRect().width,
+    minuteLabelLeft:el.querySelector('.timerPillUnit:last-child .timerPillUnitFull').getBoundingClientRect().left,
+    minuteSeparatorLeft:el.querySelector('.timerPillUnit:last-child').getBoundingClientRect().left,
+    minuteLabelRight:el.querySelector('.timerPillUnit:last-child .timerPillUnitFull').getBoundingClientRect().right,
+    timerRight:el.getBoundingClientRect().right,
     labels:[...el.querySelectorAll('.timerPillUnitFull')].map(n=>getComputedStyle(n).display),
     size:el.scrollWidth-el.clientWidth
    }));
    assert.deepEqual(timerText.units,['16','14','42'],'Days, hours, minutes appear in correct order');
    assert(timerText.title.includes('16 дней, 14 часов, 42 минуты'),'Full Russian accessible reading');
-   assert.equal(timerText.width,width<=650?58:width<=900?80:148,'Compact footprint must fit at '+width);
+   assert.equal(timerText.width,width<=650?58:width<=900?80:176,'Compact footprint must fit at '+width);
+   if(width>900){
+    assert(timerText.minuteLabelLeft-timerText.minuteSeparatorLeft>=7,
+      'First letter of МИНУТЫ overlaps divider at '+width+'px: '+JSON.stringify(timerText));
+    assert(timerText.minuteLabelRight<=timerText.timerRight-3,
+      'Minutes label must remain inside timer at '+width+'px');
+   }
    assert(timerText.size<=2,'Timer internal text overflow at '+width+'px: '+JSON.stringify(timerText));
    assert.equal(timerText.labels.every(label=>label===(width<=900?'none':'block')),true,'Desktop/mobile unit labels differ at '+width);
    console.log('PASS top-bar equal-height three-unit timer '+width+'px');
