@@ -22,7 +22,7 @@ begin
  before_count:=public.blitz_inbox_counts(gid);
  if (before_count->>'pending')::int<1 then raise exception 'Pending inbox did not count open assignment'; end if;
  pending:=public.blitz_archive_filtered(gid,uid,'pending',0,30);
- if not exists(select 1 from jsonb_array_elements(pending) r where r->>'id'=aid::text and r->'correct_index'='null'::jsonb)
+ if not exists(select 1 from jsonb_array_elements(pending) r where r->>'id'=aid::text and r->>'question'='Question 1' and r->'options'='null'::jsonb and r->'correct_index'='null'::jsonb)
  then raise exception 'Pending archive disclosed answer or lost row'; end if;
  opened:=public.blitz_open_selected(aid);
  if opened->>'id' is distinct from aid::text or opened ? 'correct_index' then
