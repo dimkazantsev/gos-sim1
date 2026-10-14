@@ -5,6 +5,7 @@ import ChatToggleButton from './game/ChatToggleButton';
 import {useEffect,useRef,useState} from 'react';
 import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
+import {turnCountdown} from './game/turnCountdown';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
 import {initials} from './game/constants';
@@ -47,11 +48,6 @@ function adjacentScreen(entries:ScreenLocation[],index:number,direction:-1|1,ski
   if(!skipTeacher||entries[next].view!=='teacher')return next;
  }
  return -1;
-}
-
-function fmtTimer(seconds:number){
- const m=Math.floor(seconds/60),s=seconds%60;
- return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
 function actorsForStudent(m:Member){
@@ -591,7 +587,14 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      <div className="topIndicators">
       <span className={`livePill ${game.turn_open?'on':'off'}`} aria-label={game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'} title={game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'}><Radio aria-hidden="true"/><span className="livePillText">{game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'}</span></span>
       <button type="button" className="gameShareScreen" onClick={()=>void shareCurrentScreen()} title="Поделиться текущим разделом или документом" aria-label="Поделиться текущим разделом"><Share2 size={17} aria-hidden="true"/><span>Поделиться</span></button>
-      {game.turn_open&&game.turn_ends_at&&<span className="timerPill" aria-label="Время до конца хода">{fmtTimer(secondsLeft)}</span>}
+      {game.turn_open&&game.turn_ends_at&&(()=>{
+        const remaining=turnCountdown(secondsLeft);
+        return <span className="timerPill timerPillDuration" aria-label={remaining.ariaLabel} title={remaining.ariaLabel}>
+         <span className="timerPillUnit" aria-hidden="true"><strong>{remaining.days}</strong><span className="timerPillUnitFull">ДНИ</span><span className="timerPillUnitCompact">д</span></span>
+         <span className="timerPillUnit" aria-hidden="true"><strong>{remaining.hours}</strong><span className="timerPillUnitFull">ЧАСЫ</span><span className="timerPillUnitCompact">ч</span></span>
+         <span className="timerPillUnit" aria-hidden="true"><strong>{remaining.minutes}</strong><span className="timerPillUnitFull">МИНУТЫ</span><span className="timerPillUnitCompact">м</span></span>
+        </span>;
+       })()}
      </div>
     </div>
 
