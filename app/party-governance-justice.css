@@ -1,0 +1,20 @@
+/* ГОС.ID: teacher-only party governance fallback and Ministry of Justice drafts. */
+.partyChairFallback{display:grid;gap:10px;margin:12px 0 0;min-width:0}
+.partyChairFallbackToggle{justify-self:start;min-height:42px}
+.partyChairFallbackBody{display:grid;gap:10px;padding:13px;border:1px solid #dce7f6;border-radius:12px;background:#f8fbff;min-width:0}
+.partyChairFallbackBody p{margin:0;line-height:1.5;color:#4d6485;font-size:13px}
+.partyChairFallbackBody :is(label,.styledSelect){min-width:0;max-width:100%}
+.partyChairFallbackBody button{justify-self:start;max-width:100%;white-space:normal;min-height:42px}
+.partyJusticeDraftActions{display:grid;gap:10px;margin:10px 0}
+.partyJusticeDraftActions>button{justify-self:start;max-width:100%;min-height:42px;white-space:normal}
+.partyJusticeAutoActions{display:flex;align-items:stretch;flex-wrap:wrap;gap:9px}
+.partyJusticeAutoActions button{flex:1 1 155px;min-height:44px;white-space:normal;text-align:center}
+.partyJusticeAutoActions button:disabled{opacity:.55;cursor:not-allowed}
+.partyJusticeDraftActions>small{font-size:12px;color:#6480a0;line-height:1.4}
+.partyJusticeDraftActions button:focus-visible,.partyChairFallback button:focus-visible{outline:3px solid #779be7;outline-offset:2px}
+.justiceReview textarea{max-width:100%;box-sizing:border-box;line-height:1.55;min-width:0}
+@media(max-width:540px){
+ .partyJusticeDraftActions>button,.partyJusticeAutoActions button,.partyChairFallbackToggle,.partyChairFallbackBody button{width:100%}
+ .partyJusticeAutoActions{display:grid;grid-template-columns:minmax(0,1fr)}
+ .partyChairFallbackBody{padding:10px}
+}

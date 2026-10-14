@@ -44,6 +44,7 @@ import './turn-countdown.css';
 import './entry-qr.css';
 import './2026-profile-grade-layout.css';
 import './teacher-stage-layout.css';
+import './party-governance-justice.css';
 import type {Metadata} from 'next';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import '@fontsource-variable/manrope';

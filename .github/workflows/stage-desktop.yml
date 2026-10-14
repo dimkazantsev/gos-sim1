@@ -98,6 +98,8 @@ jobs:
           CHROME_BIN: /usr/bin/google-chrome
       - name: Compact stage readiness states and shared teacher refresh
         run: node scripts/teacher-readiness-display-check.cjs
+      - name: Party chair election priority and Minjust approval/refusal drafts
+        run: node scripts/party-chair-justice-letters-check.cjs
       - name: Design audit
         run: npm run design:check
       - name: Scoring guide and mobile geometry

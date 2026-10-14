@@ -49,9 +49,14 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    const frame=page.frameLocator('#preview');await frame.locator('.teacherPartyDossiers').waitFor();
    await frame.locator('.teacherPartySection').nth(1).scrollIntoViewIfNeeded();
    await page.locator('#preview').screenshot({path:path.join(screens,'teacher-documents-'+width+'.png')});
-   await frame.locator('.partyMandateEditor').first().evaluate(el=>el.open=true);
-   await frame.locator('.partyMandateEditor').first().scrollIntoViewIfNeeded();
-   await page.locator('#preview').screenshot({path:path.join(screens,'teacher-mandates-'+width+'.png')});
+   assert.equal(await frame.locator('.partyMandateEditor').count(),0,'Party dossiers must not expose early mandate allocation');
+   const fallback=frame.locator('.partyChairFallbackToggle').first();
+   await fallback.waitFor();await fallback.scrollIntoViewIfNeeded();
+   assert((await frame.getByRole('button',{name:/Авто-да · Проект одобрения/}).count())>0,'Positive Minjust draft action must be visible');
+   assert((await frame.getByRole('button',{name:/Авто-нет · Проект отказа/}).count())>0,'Negative Minjust draft action must be visible');
+   const view=await frame.locator('.teacherPartyDossiers').evaluate(el=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,right:el.getBoundingClientRect().right}));
+   assert(view.scroll<=view.width+2,'Teacher party dossier overflows '+width+'px: '+JSON.stringify(view));
+   await page.locator('#preview').screenshot({path:path.join(screens,'teacher-party-chair-justice-'+width+'.png')});
   }
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
