@@ -2,6 +2,7 @@
 import {FormEvent,useMemo,useState} from 'react';
 import {ArrowUpRight,ArrowRight,Eye,EyeOff,GraduationCap,Landmark,LockKeyhole,LoaderCircle} from 'lucide-react';
 import CivicArtwork from '@/components/ui/CivicArtwork';
+import GameEntryQr from '@/components/ui/GameEntryQr';
 import {BrandIdentity,BRAND_NAME,BRAND_TAGLINE} from '@/components/ui/BrandIdentity';
 import {useRouter} from 'next/navigation';
 import {createPasswordAuthClient,supabase} from '@/lib/supabase';
@@ -126,6 +127,7 @@ export default function Home(){
       {error&&<div className="errorBox" role="alert">{error}</div>}
       <button className="primary entrySubmit" disabled={busy}>{busy?<><LoaderCircle className="spin" aria-hidden="true"/>Подключаемся…</>:<>{mode==='teacher'&&createMode?'Создать игру':'Войти в игру'}<ArrowRight aria-hidden="true"/></>}</button>
      </fieldset>
+     <GameEntryQr/>
      <div className="entryPrivacy"><LockKeyhole aria-hidden="true"/><p>ФИО будет видно участникам и преподавателю. Ваши действия сохраняются в протоколе игры.</p></div>
     </form>}
     {personalLogin&&<form id="entry-form" className="entryForm" onSubmit={login} aria-busy={busy}>
@@ -141,6 +143,7 @@ export default function Home(){
       <button type="submit" className="primary entrySubmit" disabled={busy}>{busy?'Проверка…':'Войти в мою игру'}<ArrowRight size={18}/></button>
       <button type="button" className="entryForgot" disabled={busy} onClick={()=>void recover()}>Забыли пароль? Отправить ссылку для восстановления</button>
      </fieldset>
+     <GameEntryQr/>
     </form>}
     <div className="entryAccessNote"><span>01 — 16</span><p>Здесь каждое решение<br/>меняет ход игры.</p><ArrowUpRight aria-hidden="true"/></div>
    </section>
