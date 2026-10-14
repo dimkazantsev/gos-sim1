@@ -190,3 +190,24 @@ revoke all on function private.enforce_party_dossier_stage() from public,anon,au
 drop trigger if exists enforce_party_dossier_stage on public.party_documents;
 create trigger enforce_party_dossier_stage before insert on public.party_documents
  for each row execute function private.enforce_party_dossier_stage();
+
+
+-- Table-level guarantees also cover direct PostgREST writes by a teacher;
+-- RPC validation alone would not block an administrator inserting party rows.
+create or replace function private.enforce_party_stage_open()
+returns trigger language plpgsql security definer
+set search_path to ''
+as $guard$
+begin
+ if auth.uid() is not null and not private.stage_one_party_active(new.game_id) then
+  raise exception 'Первый этап ещё не открыт.' using errcode='42501';
+ end if;
+ return new;
+end $guard$;
+revoke all on function private.enforce_party_stage_open() from public,anon,authenticated;
+drop trigger if exists enforce_party_stage_open on public.game_parties;
+create trigger enforce_party_stage_open before insert on public.game_parties
+ for each row execute function private.enforce_party_stage_open();
+drop trigger if exists enforce_party_invitation_stage_open on public.party_invitations;
+create trigger enforce_party_invitation_stage_open before insert or update of status on public.party_invitations
+ for each row execute function private.enforce_party_stage_open();
