@@ -10,7 +10,7 @@ const events=file('components/game/EventChoicePanel.tsx');
 const workspace=file('components/game/EventWorkspace.tsx');
 const staffing=file('components/game/InstitutionStaffingLab.tsx');
 const migration=file('supabase/migrations/20261014120000_ksrf_electorate_registration_cumulative_deputies.sql');
-assert(profile.includes('showCatalog previewOnly={!!previewAchievementsUserId}'),'Students can open catalog while achievements still use their own profile');
+assert(profile.includes('showCatalog={own||teacher||!!previewAchievementsUserId}'),'Own and teacher profile can open catalog, visitor profiles stay earned-only');
 assert(profile.includes('previewOnly={!!previewAchievementsUserId} defaultCollapsed/>'),'Prior collapsed default preserved');
 assert(profile.includes('!previewAchievementsUserId&&<BlitzArchive'),'No bogus demo-user RPC');
 assert(blitz.includes('useEffect(()=>{setRows([])'),'Standalone Blitz archive must load on profile entry');
