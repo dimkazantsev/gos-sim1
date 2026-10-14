@@ -113,6 +113,9 @@ on:
       - 'scripts/topbar-controls-height-check.cjs'
       - 'app/icon.svg'
       - 'app/page.tsx'
+      - 'components/ui/GameEntryQr.tsx'
+      - 'app/entry-qr.css'
+      - 'scripts/entry-qr-check.cjs'
       - 'app/layout.tsx'
       - 'public/share/gos-id-preview.jpg'
       - 'scripts/brand-overview-check.cjs'
@@ -186,6 +189,7 @@ jobs:
       - run: node scripts/budget-change-registry-check.cjs
       - run: node scripts/stage-readiness-manual-check.cjs
       - run: node scripts/profile-setup-and-brand-check.cjs
+      - run: node scripts/entry-qr-check.cjs
       - run: node scripts/achievement-preview-check.cjs
       - run: node scripts/ksrf-profile-events-regression-check.cjs
       - run: node scripts/deputy-session-ballots-check.cjs
