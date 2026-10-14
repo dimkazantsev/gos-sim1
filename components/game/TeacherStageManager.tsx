@@ -38,7 +38,6 @@ export default function TeacherStageManager({g,onOpenStage}:{
  const [extensionMinutes,setExtensionMinutes]=useState(30);
  async function changeStage(stageNo:number,action:'open'|'close'|'extend'){
   if(stageActionBusy)return;
-  if(action==='close'&&!window.confirm('Завершить этап '+stageNo+' досрочно? Студенты не смогут изменять его результаты.'))return;
   if(action==='open'&&!window.confirm('Открыть этап '+stageNo+' независимо от остальных открытых этапов?'))return;
   setStageActionBusy(true);setError('');setNotice('');
   try{
