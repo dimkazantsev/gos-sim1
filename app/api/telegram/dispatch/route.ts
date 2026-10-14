@@ -4,12 +4,33 @@ import {telegramGroupNotices,telegramSystemNotice} from '@/lib/server/telegramNo
 import {runtimeConfig,telegramSend} from '@/lib/server/telegram';
 import {telegramSectionButtons,telegramDocumentButtons,telegramTaskButtons,telegramChatButtons} from '@/lib/server/telegramPresentation';
 export const runtime='nodejs';
+const ALLOWED_ORIGINS=new Set(['https://dimkazantsev.github.io','https://gos-sim1.vercel.app']);
+function cors(request:Request):Record<string,string>{
+ const origin=request.headers.get('origin');
+ return origin&&ALLOWED_ORIGINS.has(origin)
+  ?{'Access-Control-Allow-Origin':origin,'Vary':'Origin','Cache-Control':'no-store'}
+  :{'Vary':'Origin','Cache-Control':'no-store'};
+}
+export function OPTIONS(request:Request){
+ const origin=request.headers.get('origin');
+ if(origin&&!ALLOWED_ORIGINS.has(origin))return new Response('Forbidden',{status:403});
+ return new Response(null,{status:204,headers:{...cors(request),'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Authorization, Content-Type'}});
+}
+
 export async function GET(request:Request){
  const cron=process.env.CRON_SECRET;
  if(!cron||request.headers.get('authorization')!=='Bearer '+cron)return new Response('Unauthorized',{status:401});
  return dispatchOutbox();
 }
 export async function POST(request:Request){
+ const origin=request.headers.get('origin');
+ if(origin&&!ALLOWED_ORIGINS.has(origin))return new Response('Forbidden',{status:403});
+ const response=await authenticatedDispatch(request);
+ const headers=new Headers(response.headers);
+ for(const [key,value] of Object.entries(cors(request)))headers.set(key,value);
+ return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+}
+async function authenticatedDispatch(request:Request){
  // Signed-in game members can wake the dispatcher for their own game only.
  // No service-role or bot credentials are sent to the browser.
  let config:ReturnType<typeof runtimeConfig>;
