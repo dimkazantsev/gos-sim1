@@ -22,7 +22,29 @@ export function BlitzOverlay({gameId,enabled}:{gameId:string;enabled:boolean}){
  </section></div>;
 }
 export function BlitzArchive({gameId,userId}:{gameId:string;userId:string}){
- const [rows,setRows]=useState<Row[]>([]),[open,setOpen]=useState(false),[offset,setOffset]=useState(0),[error,setError]=useState('');
- async function load(next=0){const r=await supabase.rpc('blitz_archive',{p_game:gameId,p_student:userId,p_offset:next,p_limit:30});if(r.error){setError(r.error.message);return}setRows(prev=>next?[...prev,...(r.data as Row[])]:r.data as Row[]);setOffset(next+30)}
- return <div className="blitzArchiveWrap"><button type="button" onClick={()=>{setOpen(!open);if(!open)void load()}}>Блиц-вопросы</button>{open&&<section className="surface blitzArchive"><h2>Блиц-вопросы</h2>{error&&<p role="alert">{error}</p>}{!rows.length&&<p>Назначенных вопросов пока нет.</p>}{rows.map(r=><details key={r.id}><summary>{r.answered_at?(r.is_correct?'✓':'✕'):'◷'} · Этап {r.stage_no} · {r.question||'Вопрос ожидает открытия'}</summary>{r.answered_at?<><p>{(r.options||[]).map((o,i)=><span key={i} className={'blitzOption '+(i===r.correct_index?'correct':i===r.chosen_index?'incorrect':'')}>{o}</span>)}</p><p>{r.explanation} {legal(r)}</p></>:<button type="button" disabled={!!r.available_at&&Date.parse(r.available_at)>Date.now()} onClick={()=>{setOpen(false);window.dispatchEvent(new Event('blitz:open'))}}>Ответить · 20 секунд</button>}</details>)}{rows.length>=offset&&<button type="button" onClick={()=>void load(offset)}>Загрузить ещё</button>}</section>}</div>;
+ const [rows,setRows]=useState<Row[]>([]),[offset,setOffset]=useState(0),[hasMore,setHasMore]=useState(false),[loading,setLoading]=useState(false),[error,setError]=useState('');
+ const request=useRef(0);
+ async function load(next=0){
+  const token=++request.current;setLoading(true);setError('');
+  const r=await supabase.rpc('blitz_archive',{p_game:gameId,p_student:userId,p_offset:next,p_limit:30});
+  if(token!==request.current)return;
+  if(r.error)setError('Не удалось загрузить историю блиц-вопросов. Повторите запрос.');
+  else{
+   const page=Array.isArray(r.data)?r.data as Row[]:[];
+   setRows(old=>next?[...old,...page]:page);setOffset(next+page.length);setHasMore(page.length===30);
+  }
+  setLoading(false);
+ }
+ useEffect(()=>{setRows([]);setOffset(0);setHasMore(false);void load(0);return()=>{request.current++}},[gameId,userId]);
+ return <section className="surface blitzArchive" aria-label="Личный раздел блиц-вопросов">
+  <header className="blitzArchiveHeader"><div><small>ПРАВОВЫЕ ЗНАНИЯ</small><h2>Блиц-вопросы</h2><p>Ваши назначенные вопросы и результаты. Для ответа на новый вопрос отводится 20 секунд.</p></div><strong>{rows.length} записей</strong></header>
+  <div className="blitzArchiveToolbar"><button type="button" className="secondary" disabled={loading} onClick={()=>void load(0)}>Обновить историю</button><button type="button" className="primary" onClick={()=>window.dispatchEvent(new Event('blitz:open'))}>Перейти к доступному вопросу</button></div>
+  {error&&<p role="alert">{error}</p>}
+  {loading&&<p role="status">Загрузка блиц-вопросов…</p>}
+  {!loading&&!error&&!rows.length&&<p className="blitzArchiveEmpty">Назначенных вопросов пока нет. Новые задания появятся здесь автоматически.</p>}
+  <div className="blitzArchiveList">{rows.map(r=><details key={r.id}><summary><span className="blitzArchiveStatus">{r.answered_at?(r.is_correct?'Верно':'Неверно'):'Ожидает ответа'}</span><span>Этап {r.stage_no} · {r.question||'Вопрос ожидает открытия'}</span></summary>
+   {r.answered_at?<div className="blitzArchiveResult"><div>{(r.options||[]).map((o,i)=><span key={i} className={'blitzOption '+(i===r.correct_index?'correct':i===r.chosen_index?'incorrect':'')}>{o}</span>)}</div><p>{r.explanation} {legal(r)}</p></div>:<button type="button" disabled={!!r.available_at&&Date.parse(r.available_at)>Date.now()} onClick={()=>window.dispatchEvent(new Event('blitz:open'))}>Ответить · 20 секунд</button>}
+  </details>)}</div>
+  {hasMore&&<button type="button" className="secondary blitzArchiveMore" disabled={loading} onClick={()=>void load(offset)}>Загрузить ещё 30</button>}
+ </section>;
 }

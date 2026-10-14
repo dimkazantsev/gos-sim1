@@ -18,6 +18,7 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
  const [assignments,setAssignments]=useState<Assignment[]>([]);
  const [matrix,setMatrix]=useState<Matrix[]>([]);
  const [ministers,setMinisters]=useState<Minister[]>([]);
+ const [personalMandates,setPersonalMandates]=useState<{user_id:string;base_mandates:number}[]>([]);
  const [pick,setPick]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
  const role=stageRoleTitles(g);
@@ -33,17 +34,19 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
    const ready=await supabase.rpc('ensure_stage9_units',{p_game_id:game.id});
    if(ready.error){setLoadError(ready.error.message);setLoaded(true);return;}
   }
-  const [u,a,m,n]=await Promise.all([
+  const [u,a,m,n,pm]=await Promise.all([
    supabase.from('institution_units').select('*').eq('game_id',game.id).order('unit_kind').order('unit_key'),
    supabase.from('institution_assignments').select('*').eq('game_id',game.id).order('created_at'),
    mode==='committees'?supabase.rpc('get_committee_matrix',{p_game_id:game.id}):Promise.resolve({data:[],error:null}),
-   mode==='ministries'?supabase.from('government_nominations').select('office_key,candidate_name,candidate_user_id').eq('game_id',game.id).eq('stage_no',9).eq('status','appointed').order('created_at'):Promise.resolve({data:[],error:null})
+   mode==='ministries'?supabase.from('government_nominations').select('office_key,candidate_name,candidate_user_id').eq('game_id',game.id).eq('stage_no',9).eq('status','appointed').order('created_at'):Promise.resolve({data:[],error:null}),
+   mode==='committees'?supabase.from('party_member_mandates').select('user_id,base_mandates').eq('game_id',game.id):Promise.resolve({data:[],error:null})
   ]);
-  const failure=[u,a,m,n].find(x=>x.error);setLoaded(true);if(failure?.error){setLoadError(failure.error.message);return;}setLoadError('');
+  const failure=[u,a,m,n,pm].find(x=>x.error);setLoaded(true);if(failure?.error){setLoadError(failure.error.message);return;}setLoadError('');
   if(!u.error)setUnits((u.data||[]) as Unit[]);
   if(!a.error)setAssignments((a.data||[]) as Assignment[]);
   if(!m.error)setMatrix((m.data||[]) as Matrix[]);
   if(!n.error)setMinisters((n.data||[]) as Minister[]);
+  if(!pm.error)setPersonalMandates((pm.data||[]) as typeof personalMandates);
  }
  useGameTableSync(game?.id,['institution_units','institution_assignments','game_parties','party_member_mandates','government_nominations','government_structures'],load,(me?.user_id||'')+mode);
 
@@ -75,7 +78,7 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
 
  return <section className="staffingLab" data-staffing={mode}>
   <header className="staffingLabHead">
-   <div><h2>{mode==='committees'?'Комитеты Государственной Думы':'Команды министерств'}</h2><p>{mode==='committees'?'На первом заседании палата образует пять комитетов. Фракции распределяют депутатов, затем Государственная Дума избирает председателей.':'Министры, назначенные на этом этапе, набирают сотрудников своих ведомств. Участник может состоять только в одном министерстве; партийная принадлежность не определяет распределение.'}</p></div>
+   <div><h2>{mode==='committees'?'Комитеты Государственной Думы':'Команды министерств'}</h2><p>{mode==='committees'?'На первом заседании палата образует пять комитетов. После избрания Председателя Государственной Думы выдвигаются кандидатуры председателей комитетов. Депутаты обсуждают их, проводят голосование, после чего избранные председатели совместно с фракциями согласуют составы комитетов.':'Министры, назначенные на этом этапе, набирают сотрудников своих ведомств. Участник может состоять только в одном министерстве; партийная принадлежность не определяет распределение.'}</p></div>
    <div className="staffingBalance"><strong>{assignments.filter(a=>a.unit_kind===(mode==='committees'?'committee':'ministry')).length}</strong><span>{mode==='committees'?'в комитетах':'в министерствах'}</span></div>
   </header>
   {loadError&&<div className="stageOperationsNotice" role="alert"><p>{loadError}</p><button type="button" onClick={()=>void load()}>Повторить загрузку</button></div>}
@@ -83,21 +86,20 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
   {mode==='committees'&&loaded&&!loadError&&committees.length<5&&<div className="stageOperationsActionBar"><p>Создайте пять комитетов по направлениям, заданным правилами игры. Уже существующие составы и результаты выборов сохраняются.</p>{canCreateCommittees?<button type="button" className="primary" disabled={busy} onClick={()=>void createCommittees()}>Создать комитеты ГД</button>:<span>Создание доступно Председателю, Совету ГД и преподавателю.</span>}</div>}
   {mode==='ministries'&&loaded&&!loadError&&!ministries.length&&<p className="stageOperationsNotice">Сначала утвердите структуру Правительства на этапе 8. После этого здесь появятся ведомства.</p>}
 
+  {mode==='committees'&&committees.length>0&&<CommitteeChairElectionPanel g={g}/>}
   {mode==='committees'&&committees.length>0&&<section className="staffingSection">
-   <div className="staffingSectionHead"><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>5 комитетов · пропорциональное представительство фракций</h3><p>Каждый комитет моделирует 90 депутатских мест. Квота партии автоматически пересчитывается из текущего распределения мандатов ГД; студенты внутри своей фракционной квоты представляют соответствующую долю депутатов.</p></div><span>1 студент → 1 комитет</span></div>
+   <div className="staffingSectionHead"><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>5 комитетов · пропорциональное представительство фракций</h3><p>Сначала депутаты выбирают Председателя Государственной Думы, затем выдвигают и обсуждают кандидатуры председателей комитетов и голосуют за них. После этого избранные председатели совместно с фракциями распределяют депутатов по комитетам. Договоритесь об этом в общем чате. Каждый комитет моделирует 90 мест, а квоты автоматически пересчитываются по мандатам. Один депутат состоит только в одном комитете. Назначение доступно после избрания председателя соответствующего комитета.</p></div><span>1 студент → 1 комитет</span></div>
    <div className="committeeGrid">{committees.map(u=>{
     const aa=assignedTo(u.id),rows=committeeRows(u.id);
     return <article className="institutionUnit committeeUnit" key={u.id}>
      <header><div><small>КОМИТЕТ</small><h4>{u.title}</h4><p>{u.description}</p></div><span>{aa.length} студентов</span></header>
      <div className="committeeQuota">{rows.map(r=><div key={r.party_id}><i style={{background:r.color}}/><b>{r.party_name}</b><strong>{r.quota}</strong><span>{r.students} студент(а)</span></div>)}</div>
      <div className="unitHead"><small>ПРЕДСЕДАТЕЛЬ</small><b>{memberName(u.head_user_id)}</b><span className="unitHeadElectionHint">Избирается всей Государственной Думой ниже</span></div>
-     <div className="unitMembers">{aa.length===0?<div className="emptyState">Состав не сформирован.</div>:aa.map(a=>{const row=rows.find(r=>r.party_id===a.party_id);const partyStudents=Math.max(1,row?.students||1);const weight=(row?.quota||0)/partyStudents;return <div key={a.id}><span>{memberName(a.user_id)}</span><small>{partyName(a.party_id)}</small><b>≈ {weight.toFixed(1)} мандата</b>{canManageCommittee&&(!ledParty||a.party_id===ledParty.id||teacher)&&<IconAction variant="remove" onClick={()=>void remove(a.id)} label={'Исключить участника '+memberName(a.user_id)}/>}</div>})}</div>
-     {canManageCommittee&&<div className="unitAssign"><select aria-label={'Добавить депутата: '+u.title} value={pick[u.id]||''} onChange={e=>setPick(v=>({...v,[u.id]:e.target.value}))}><option value="">Добавить депутата…</option>{committeeCandidates.filter(s=>!assignmentFor(s.user_id,'committee')).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}{s.team?' · '+s.team:''}</option>)}</select><button disabled={busy||!pick[u.id]} onClick={()=>void assign(u.id)}>Добавить</button></div>}
+     <div className="unitMembers">{aa.length===0?<div className="emptyState">Состав не сформирован.</div>:aa.map(a=>{const row=rows.find(r=>r.party_id===a.party_id);const partyStudents=Math.max(1,row?.students||1);const weight=(row?.quota||0)/partyStudents;return <div key={a.id}><span>{memberName(a.user_id)}</span><small>{partyName(a.party_id)}</small><b>≈ {weight.toFixed(1)} мандата</b>{!!u.head_user_id&&(canManageCommittee||u.head_user_id===activeMe.user_id)&&(!ledParty||a.party_id===ledParty.id||teacher||u.head_user_id===activeMe.user_id)&&<IconAction variant="remove" onClick={()=>void remove(a.id)} label={'Исключить участника '+memberName(a.user_id)}/>}</div>})}</div>
+     {!!u.head_user_id&&(canManageCommittee||u.head_user_id===activeMe.user_id)&&<div className="unitAssign"><select aria-label={'Добавить депутата: '+u.title} value={pick[u.id]||''} onChange={e=>setPick(v=>({...v,[u.id]:e.target.value}))}><option value="">Добавить депутата…</option>{(u.head_user_id===activeMe.user_id?students:committeeCandidates).filter(s=>!assignmentFor(s.user_id,'committee')&&personalMandates.some(a=>a.user_id===s.user_id&&a.base_mandates>0)).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}{s.team?' · '+s.team:''}</option>)}</select><button disabled={busy||!pick[u.id]} onClick={()=>void assign(u.id)}>Добавить</button></div>}
     </article>
    })}</div>
   </section>}
-
-  {mode==='committees'&&committees.length>0&&<CommitteeChairElectionPanel g={g}/>}
 
   {mode==='ministries'&&ministries.length>0&&<section className="staffingSection ministrySection">
    <div className="staffingSectionHead"><div><small>ПРАВИТЕЛЬСТВО</small><h3>5 министерств · беспартийный кадровый принцип</h3><p>Министры набирают заместителей и участников своих ведомств. Партийная принадлежность здесь не используется как критерий распределения; система показывает дисбаланс численности между ведомствами.</p></div><span className={maxCount-minCount>1?'warn':''}>разброс {minCount}–{maxCount}</span></div>

@@ -168,11 +168,16 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    </div>
   </details>
 
-  <details className="teacherDetails">
-   <summary><div><b>Игровые роли</b><span>Назначение должностей участникам; ручная корректировка рейтингов находится в модели последствий</span></div><i>+</i></summary>
+  <details className="teacherDetails" open>
+   <summary><div><b>Действующие роли и полномочия</b><span>Назначение должностей участникам; ручная корректировка рейтингов находится в модели последствий</span></div><i>+</i></summary>
    <div className="teacherDetailsBody split">
     
-    <div><h3>Игровые роли</h3><div className="evaluationRows">{members.filter(m=>m.kind!=='teacher').map(m=><div key={m.user_id}><div className="studentIdentity"><b>{m.full_name}</b><input key={m.user_id+(m.role_title||'')} defaultValue={m.role_title||''} onBlur={e=>updateMember(m.user_id,{role_title:e.target.value})} aria-label="Игровая роль участника" placeholder="Игровая роль"/></div></div>)}</div></div>
+    <div><h3>Действующие полномочия участников</h3><p>Членство в КСРФ, депутатские мандаты и утверждённые должности дополняют друг друга.</p><div className="evaluationRows">{members.filter(m=>m.kind==='student').map(m=>{
+      const titles=[...new Set(['Член КСРФ',...(partyMandates.some(a=>a.user_id===m.user_id&&a.base_mandates>0)?['Депутат Государственной Думы']:[]),...g.officeAssignments.filter(o=>o.user_id===m.user_id&&o.status==='active').map(o=>o.role_title)])];
+      const mandates=partyMandates.find(a=>a.user_id===m.user_id);
+      return <article key={m.user_id} className="teacherActiveRoleEntry"><b>{m.full_name}</b><div className="teacherActiveRoleTags">{titles.map(title=><span key={title}>{title}</span>)}</div>{mandates&&<small>Голоса в ГД: {mandates.effective_mandates} из {mandates.base_mandates}</small>}
+       <label>Основная должность<input key={m.user_id+(m.role_title||'')} defaultValue={m.role_title||''} onBlur={e=>{if(e.target.value!==m.role_title)void updateMember(m.user_id,{role_title:e.target.value})}} aria-label={'Основная должность '+m.full_name} placeholder="Должность"/></label>
+      </article>})}</div></div>
    </div>
   </details>
     </>}

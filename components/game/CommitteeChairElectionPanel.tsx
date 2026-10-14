@@ -12,12 +12,13 @@ type Candidate={id:string;election_id:string;user_id:string;party_id:string;crea
 type Ballot={election_id:string;party_id:string;candidate_id:string;votes:number};
 
 export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
- const {game,me,teacher,members,parties,partyMandates,setError}=g;
+ const {game,me,teacher,members,parties,setError}=g;
  const [units,setUnits]=useState<Unit[]>([]);
  const [assignments,setAssignments]=useState<Assignment[]>([]);
  const [elections,setElections]=useState<Election[]>([]);
  const [candidates,setCandidates]=useState<Candidate[]>([]);
  const [ballots,setBallots]=useState<Ballot[]>([]);
+ const [personalMandates,setPersonalMandates]=useState<{party_id:string;user_id:string;base_mandates:number;effective_mandates:number}[]>([]);
  const [nominee,setNominee]=useState<Record<string,string>>({});
  const [voteDraft,setVoteDraft]=useState<Record<string,string>>({});
  const [mode,setMode]=useState<Record<string,'open'|'secret'>>({});
@@ -28,24 +29,26 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
 
  async function load(){
   if(!game)return;
-  const [u,a,e,c,b]=await Promise.all([
+  const [u,a,e,c,b,m]=await Promise.all([
    supabase.from('institution_units').select('id,title,head_user_id').eq('game_id',game.id).eq('unit_kind','committee').order('unit_key'),
    supabase.from('institution_assignments').select('unit_id,user_id,party_id').eq('game_id',game.id).eq('unit_kind','committee'),
    supabase.from('office_elections').select('*').eq('game_id',game.id).eq('stage_no',4).like('office_key','committee:%').order('created_at'),
    supabase.from('office_candidates').select('*').eq('game_id',game.id).order('created_at'),
-   supabase.from('office_ballots').select('election_id,party_id,candidate_id,votes').eq('game_id',game.id)
+   supabase.from('office_ballots').select('election_id,party_id,candidate_id,votes').eq('game_id',game.id),
+   supabase.from('party_member_mandates').select('party_id,user_id,base_mandates,effective_mandates').eq('game_id',game.id)
   ]);
-  const failure=[u,a,e,c,b].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
+  const failure=[u,a,e,c,b,m].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
   if(!u.error)setUnits((u.data||[]) as Unit[]);
   if(!a.error)setAssignments((a.data||[]) as Assignment[]);
   if(!e.error)setElections((e.data||[]) as Election[]);
   if(!c.error)setCandidates((c.data||[]) as Candidate[]);
   if(!b.error)setBallots((b.data||[]) as Ballot[]);
+  if(!m.error)setPersonalMandates((m.data||[]) as typeof personalMandates);
  }
- useGameTableSync(game?.id,['office_elections','office_candidates','office_ballots','institution_units','institution_assignments'],load,me?.user_id||'');
+ useGameTableSync(game?.id,['office_elections','office_candidates','office_ballots','institution_units','institution_assignments','party_member_mandates'],load,me?.user_id||'');
 
  if(!game||!me)return null;
- const activeMandates=(partyId:string)=>partyMandates.filter(x=>x.party_id===partyId).reduce((a,x)=>a+Number(x.effective_mandates||0),0);
+ const activeMandates=(partyId:string)=>personalMandates.filter(x=>x.party_id===partyId).reduce((a,x)=>a+Number(x.effective_mandates||0),0);
  const name=(id:string|null)=>members.find(m=>m.user_id===id)?.full_name||'—';
  const party=(id:string)=>parties.find(p=>p.id===id);
  const activeElection=(unitId:string)=>[...elections].reverse().find(e=>e.office_key==='committee:'+unitId&&['nomination','open'].includes(e.status));
@@ -72,19 +75,19 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
  async function close(eid:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:eid});if(r.error)setError(r.error.message);else await load();setBusy(false)}
 
  return <section className="committeeElectionBoard">
-  <div className="committeeElectionHead"><div><small>ИЗБРАНИЕ ПРЕДСЕДАТЕЛЕЙ КОМИТЕТОВ</small><h3>Порог — 226 голосов Государственной Думы</h3><p>Фракции выдвигают только членов соответствующего комитета. Голоса распределяются мандатами фракций; если в первом туре при трёх и более кандидатах никто не избран, система создаёт второй тур для двух лидеров.</p></div><strong>226+</strong></div>
+  <div className="committeeElectionHead"><div><small>ИЗБРАНИЕ ПРЕДСЕДАТЕЛЕЙ КОМИТЕТОВ</small><h3>Порог — 226 голосов Государственной Думы</h3><p>Фракции выдвигают своих депутатов до персонального распределения по комитетам. Голоса распределяются мандатами фракций; если в первом туре при трёх и более кандидатах никто не избран, система создаёт второй тур для двух лидеров.</p></div><strong>226+</strong></div>
   <div className="committeeElectionGrid">{units.map(u=>{
    const e=activeElection(u.id);
    const last=[...history(u.id)].reverse()[0];
    const election=e||last;
    const cs=election?ec(election.id):[];
-   const ownCandidates=election&&ledParty?assignments.filter(a=>a.unit_id===u.id&&a.party_id===ledParty.id).map(a=>a.user_id):[];
+   const ownCandidates=election&&ledParty?personalMandates.filter(a=>a.party_id===ledParty.id&&a.base_mandates>0).map(a=>a.user_id):[];
    const myCapacity=ledParty?activeMandates(ledParty.id):0;
    const myUsed=election&&ledParty?used(election.id,ledParty.id):0;
    return <article key={u.id} className={'committeeElectionCard '+(election?.status||'idle')}>
     <header><div><small>КОМИТЕТ</small><b>{u.title}</b><span>Председатель: {name(u.head_user_id)}</span></div>{!e&&canCreate&&<div className="committeeElectionCreate"><select aria-label={'Форма выборов председателя: '+u.title} value={mode[u.id]||'open'} onChange={x=>setMode(v=>({...v,[u.id]:x.target.value as 'open'|'secret'}))}><option value="open">Открыто</option><option value="secret">Тайно</option></select><button disabled={busy} onClick={()=>void create(u.id)}>Начать выборы</button></div>}</header>
     {election&&<><div className="committeeElectionState"><span>{election.round_no===2?'II тур':'I тур'}</span><b>{election.status==='nomination'?'Выдвижение':election.status==='open'?'Голосование':election.status==='finished'?'Завершено':'Тур закрыт'}</b><em>{election.vote_mode==='secret'?'тайное':'открытое'}</em></div>
-    {election.status==='nomination'&&(teacher||ledParty)&&<div className="committeeNominate"><select aria-label={'Кандидат в председатели: '+u.title} value={nominee[election.id]||''} onChange={x=>setNominee(v=>({...v,[election.id]:x.target.value}))}><option value="">Кандидат от фракции…</option>{(teacher?assignments.filter(a=>a.unit_id===u.id).map(a=>a.user_id):ownCandidates).filter(uid=>!cs.some(c=>c.user_id===uid)).map(uid=><option key={uid} value={uid}>{name(uid)}</option>)}</select><button disabled={busy||!nominee[election.id]} onClick={()=>void nominate(election.id)}>Выдвинуть</button>{teacher&&<button className="primary" disabled={busy||cs.length===0} onClick={()=>void open(election.id)}>Открыть голосование</button>}</div>}
+    {election.status==='nomination'&&(teacher||ledParty)&&<div className="committeeNominate"><select aria-label={'Кандидат в председатели: '+u.title} value={nominee[election.id]||''} onChange={x=>setNominee(v=>({...v,[election.id]:x.target.value}))}><option value="">Кандидат от фракции…</option>{(teacher?personalMandates.filter(a=>a.base_mandates>0).map(a=>a.user_id):ownCandidates).filter(uid=>!cs.some(c=>c.user_id===uid)).map(uid=><option key={uid} value={uid}>{name(uid)}</option>)}</select><button disabled={busy||!nominee[election.id]} onClick={()=>void nominate(election.id)}>Выдвинуть</button>{teacher&&<button className="primary" disabled={busy||cs.length===0} onClick={()=>void open(election.id)}>Открыть голосование</button>}</div>}
     <div className="committeeCandidateList">{cs.map(c=>{
      const own=ledParty?eb(election.id).find(b=>b.party_id===ledParty.id&&b.candidate_id===c.id)?.votes:undefined;
      const visible=election.vote_mode==='open'||!['nomination','open'].includes(election.status)||teacher;

@@ -80,6 +80,17 @@ on:
       - 'scripts/budget-change-registry-check.cjs'
       - 'supabase/migrations/20261012210000_unified_budget_change_registry.sql'
       - 'components/game/TeacherView.tsx'
+      - 'components/game/EventChoicePanel.tsx'
+      - 'components/game/EventCollaboration.tsx'
+      - 'components/game/EventWorkspace.tsx'
+      - 'components/game/ClassroomJournal.tsx'
+      - 'components/game/InstitutionRegistrationPanel.tsx'
+      - 'components/game/InstitutionStaffingLab.tsx'
+      - 'components/game/CommitteeChairElectionPanel.tsx'
+      - 'supabase/migrations/20261014121000_committee_chair_before_staffing.sql'
+      - 'app/blitz.css'
+      - 'supabase/migrations/20261014120000_ksrf_electorate_registration_cumulative_deputies.sql'
+      - 'scripts/ksrf-profile-events-regression-check.cjs'
       - 'components/game/TeacherParticipantRoster.tsx'
       - 'components/game/TeacherGhostVotingPanel.tsx'
       - 'components/game/EventWorkspace.tsx'
@@ -171,6 +182,7 @@ jobs:
       - run: node scripts/stage-readiness-manual-check.cjs
       - run: node scripts/profile-setup-and-brand-check.cjs
       - run: node scripts/achievement-preview-check.cjs
+      - run: node scripts/ksrf-profile-events-regression-check.cjs
       - run: node scripts/session-deletion-guard-check.cjs
       - run: node scripts/guided-tour-check.cjs
       - run: node scripts/document-input-check.cjs

@@ -219,3 +219,18 @@
  .situationSymbolBadge{width:38px;height:38px;left:calc(50% + 25px);top:calc(50% + 18px)}}
 
 .situationSymbolSerial{position:absolute;left:12px;bottom:10px;padding:3px 7px;border-radius:6px;background:#ffffffd9;color:var(--situation-ink);font:600 11px/1.2 monospace;letter-spacing:.025em}
+
+/* Inline event feedback is revealed only for an answered, finalized situation. */
+.eventAnswerPanel .eventAnswerOption{min-width:0;display:grid;gap:0}
+.eventAnswerPanel .eventAnswerOption>.eventAnswerChoice{min-width:0;width:100%}
+.eventAnswerPanel .eventAnswerChoice.correct{border-color:#3b9d70;background:#e8f8ef;color:#155b39}
+.eventAnswerPanel .eventAnswerChoice.incorrect{border-color:#d87979;background:#fff0f0;color:#8b2727}
+.eventAnswerInlineFeedback{padding:12px 14px;border:1px solid #dce6f0;border-top:0;border-radius:0 0 12px 12px;background:#fff;min-width:0;overflow-wrap:anywhere}
+.eventAnswerInlineFeedback .eventLegalFeedback{margin:0;padding:0;border:0;box-shadow:none;max-width:100%}
+.eventAnswerVerdict{display:block;margin-bottom:8px}
+.eventInviteExplanation{padding:12px 15px;border-radius:12px;border:1px solid #d8e5f4;background:#f5f8ff;color:#315070;font-size:13px;line-height:1.6}
+.teacherActiveRoleEntry{display:grid;gap:8px;min-width:0}
+.teacherActiveRoleEntry label{display:grid;gap:5px;min-width:0}
+.teacherActiveRoleEntry label input{max-width:100%;min-width:0}
+.teacherActiveRoleTags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.teacherActiveRoleTags>span{display:inline-flex;padding:6px 9px;border-radius:99px;background:#edf4ff;border:1px solid #cedef5;color:#31547f;font-size:12px}
