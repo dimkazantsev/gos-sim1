@@ -45,6 +45,6 @@ assert(home.includes('saveSuccessfulGameCode(loginGameCode);'),'Personal login r
 assert.equal((home.match(/saveSuccessfulGameCode\(code\);router\.push/g)||[]).length,2,'Creation and invitation paths also remember game');
 assert(home.includes('forgetRememberedGameCode(loginGameCode)'),'Shared devices can forget remembered code');
 assert(home.includes('savedGameCodes.map(code=>'),'A user with multiple games can choose remembered code');
-assert(!source.includes('loginPassword')&&!source.includes('invite'),'Never store personal password or invitation in utility');
+assert(!source.includes('loginPassword')&&!source.includes('inviteCode')&&!source.includes('refresh_token'),'Never store personal password, invitation code or auth token in utility');
 assert(css.includes('@media(max-width:420px)')&&css.includes('.entryRememberedGameField'),'Mobile input layout styled');
 console.log('PASS: game code persistence, multiple games, restricted storage and no stored secrets');
