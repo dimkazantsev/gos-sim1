@@ -21,6 +21,7 @@ export default function ProfileOffices({g,userId,readOnly=false}:{g:ReturnTypeRe
   if(r.error)setNotice(r.error.message);else setOffices((r.data||[]) as Office[]);
  }
  useEffect(()=>{setTargetId(initialTarget);setNotice('')},[userId,g.teacher]);
+ useEffect(()=>{setRoleChoice('');setCustomRole('')},[targetId]);
  useEffect(()=>{if(g.teacher&&!students.some(m=>m.user_id===targetId))setTargetId(students[0]?.user_id||'')},[g.members,targetId,g.teacher]);
  useEffect(()=>{setOffices([]);void load();return()=>{request.current++}},[g.game?.id,targetId,g.members]);
  async function appoint(){
