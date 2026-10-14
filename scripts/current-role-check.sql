@@ -12,16 +12,21 @@ do $$ declare g uuid:='541b6fde-16d5-4225-8f67-1fc2c7c15523';u uuid:='89de1d45-8
  update public.game_members set role_title='Министр транспорта' where game_id=g and user_id=u;
  if not exists(select 1 from public.game_office_assignments where game_id=g and user_id=u and role_title='Министр транспорта' and status='active') then raise exception 'FAIL ordinary assignment missing from portfolio';end if;
  c:=public.create_assigned_event(g,'Проверка текущей роли','Временный кейс для проверки роли, сохранённой на момент принятия решения.','Здравоохранение','serious','single','[{"label":"Проверить качество лекарств","trust":2,"description":"Безопасная партия направлена пациентам"},{"label":"Выдать непроверенные лекарства","trust":-2,"description":"Создан риск безопасности пациентов"}]',array[u],array['министр здравоохранения']);
+ perform public.select_game_office(minister); -- Administrator updates the legacy representative field.
  perform set_config('request.jwt.claim.sub',u::text,true);
- perform public.select_game_office(minister);
- if (select role_title from public.game_members where game_id=g and user_id=u)<>'Министр здравоохранения' then raise exception 'FAIL student cannot switch current role';end if;
+ begin perform public.select_game_office(minister);exception when others then blocked:=true;end;
+ if not blocked then raise exception 'FAIL student switched role without authorization';end if;
+ blocked:=false;
+ if (select role_title from public.game_members where game_id=g and user_id=u)<>'Министр здравоохранения' then raise exception 'FAIL legacy role changed after refused student switch';end if;
  update public.game_members set role_title='Президент Российской Федерации' where game_id=g and user_id=u;
  if (select role_title from public.game_members where game_id=g and user_id=u)<>'Министр здравоохранения' then raise exception 'FAIL student can promote through direct member update';end if;
  begin perform public.select_game_office(foreign_role);exception when others then blocked:=true;end;
  if not blocked then raise exception 'FAIL another student role selectable';end if;
  select id into a from public.event_assignments where case_id=c and recipient_id=u;
  perform public.submit_event_decision(a,'option_1',null);
+ perform set_config('request.jwt.claim.sub','9fdf732c-1a84-4435-979d-e0272c2b81db',true);
  perform public.select_game_office((select id from public.game_office_assignments where game_id=g and user_id=u and status='active' and role_title='Депутат Государственной Думы'));
+ perform set_config('request.jwt.claim.sub',u::text,true);
  if (select role_snapshot from public.event_decisions where case_id=c and actor_id=u)<>'Министр здравоохранения' then raise exception 'FAIL role snapshot changed with current role';end if;
  blocked:=false;
  begin perform public.appoint_game_office(g,u,'Президент Российской Федерации','Несанкционированное назначение студентом',true);exception when others then blocked:=true;end;
@@ -34,5 +39,5 @@ do $$ declare g uuid:='541b6fde-16d5-4225-8f67-1fc2c7c15523';u uuid:='89de1d45-8
  if not blocked then raise exception 'FAIL revoked role selectable';end if;
 end;$$;
 reset role;
-select jsonb_build_object('teacher_assignment','PASS','one_current_role','PASS','student_switch','PASS','foreign_role_guard','PASS','immutable_event_snapshot','PASS','revocation_guard','PASS','ordinary_assignment_handoff','PASS','self_promotion_guard','PASS') as checks;
+select jsonb_build_object('teacher_assignment','PASS','one_current_role','PASS' ,'student_switch_blocked','PASS','foreign_role_guard','PASS','immutable_event_snapshot','PASS','revocation_guard','PASS','ordinary_assignment_handoff','PASS','self_promotion_guard','PASS') as checks;
 rollback;
