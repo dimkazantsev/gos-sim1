@@ -34,6 +34,7 @@ async function check(){
     const policy=inspector.querySelector('.stagePolicyEditor');
     const entries=[...list.querySelectorAll('.teacherStageListItem')];
     return {width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
+     manager:rect(root.querySelector('.teacherStageManager')),
      list:rect(list),sidebar:rect(sidebar),inspector:rect(inspector),rows:entries.map(rect),
      frameHeight:window.innerHeight,
      listScrollHeight:list.scrollHeight,
@@ -92,6 +93,10 @@ async function check(){
     assert(Math.abs(data.sidebar.bottom-data.inspector.bottom)<=2,
      'Stage sidebar and inspector must have aligned bottom edges at '+width+'px: '+JSON.stringify({
       sidebar:data.sidebar,inspector:data.inspector
+     }));
+    assert(Math.abs(data.manager.bottom-data.inspector.bottom)<=2,
+     'Visible outer left panel border and right inspector border must end on the same line at '+width+'px: '+JSON.stringify({
+      manager:data.manager,inspector:data.inspector
      }));
    }else{
     assert(data.deadline.top>=data.inspector.bottom-3,'Narrow screens must put deadline summary below stage settings at '+width+'px');
