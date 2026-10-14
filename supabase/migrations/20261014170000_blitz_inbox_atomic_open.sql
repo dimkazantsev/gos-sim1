@@ -106,6 +106,10 @@ begin
  if uid is null or not exists(select 1 from public.game_members m
    where m.game_id=p_game and m.user_id=uid and m.kind='student' and m.roster_archived_at is null)
  then raise exception 'Forbidden' using errcode='42501'; end if;
+ -- Сверка счётчика фиксирует таймауты, оставшиеся после закрытия вкладки.
+ update public.blitz_assignments set answered_at=clock_timestamp(),chosen_index=null,is_correct=false
+ where game_id=p_game and user_id=uid and answered_at is null and started_at is not null
+  and started_at+interval '20 seconds'<clock_timestamp();
  return (select jsonb_build_object(
   'pending',count(*) filter(where answered_at is null and available_at<=now()),
   'scheduled',count(*) filter(where answered_at is null and available_at>now()),
