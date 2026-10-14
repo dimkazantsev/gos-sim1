@@ -53,7 +53,13 @@ export function assessmentRationaleSections(rationale:string|null|undefined):Rec
  return grouped;
 }
 
-/** Drop only the machine-generated heading; preserve evidence text as written by server. */
+/** Capitalize the first displayed word only. Never mutate the server's original rationale. */
+export function assessmentDisplaySentence(text:string):string{
+ return text.trim().replace(/^([^\\p{L}\\p{N}]*)(\\p{L})/u,(_,prefix:string,first:string)=>prefix+first.toLocaleUpperCase('ru-RU'));
+}
+
+/** Drop the machine-generated heading and display the remaining sentence naturally. */
 export function assessmentRationaleDetail(text:string):string{
- return text.replace(/^(?:Критерий\s+[123]\s*[·:—-][^:]*|Автооценка|События|Правовой критерий|Блиц и правовые знания)\s*:\s*/u,'').trim();
+ const detail=text.replace(/^(?:Критерий\\s+[123]\\s*[·:—-][^:]*|Автооценка|События|Правовой критерий|Блиц и правовые знания)\\s*:\\s*/u,'').trim();
+ return assessmentDisplaySentence(detail);
 }
