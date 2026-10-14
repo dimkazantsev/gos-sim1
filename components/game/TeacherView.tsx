@@ -91,10 +91,6 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
       <small>ТЕКУЩИЙ ЭТАП</small>
       <h1>{clockStage?.title||currentStage?.title||'Подготовка игры'}</h1>
      </div>
-     <div className="teacherCommandStatus">
-      <span className={clockStage?'teacherTurnBadge isOpen':'teacherTurnBadge isPaused'}>{clockStage?'ХОД ОТКРЫТ':currentStage?.status==='completed'?'ЭТАП ЗАВЕРШЁН':'ЭТАП НЕ ОТКРЫТ'}</span>
-      {activeStageClocks.length>1&&<small>Открыто этапов: {activeStageClocks.length}</small>}
-     </div>
     </div>
    </div>
    <div className="teacherQuickActions">

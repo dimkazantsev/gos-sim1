@@ -17,7 +17,7 @@ export type StageReadiness={
  original_blockers?:string[];
 };
 
-export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=false,rulesUrl,rulesLabel}:{g:ReturnTypeRepublic;stageNo:number;compact?:boolean;readOnly?:boolean;rulesUrl?:string;rulesLabel?:string}){
+export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=false,rulesUrl,rulesLabel,compactReadiness=null,compactChecked=false,compactLoading=false,compactError='',onCompactRefresh}:{g:ReturnTypeRepublic;stageNo:number;compact?:boolean;readOnly?:boolean;rulesUrl?:string;rulesLabel?:string;compactReadiness?:StageReadiness|null;compactChecked?:boolean;compactLoading?:boolean;compactError?:string;onCompactRefresh?:()=>void}){
  const {game,setError}=g;
  const teacher=g.teacher&&!readOnly;
  const [state,setState]=useState<StageReadiness|null>(null);
@@ -58,10 +58,18 @@ export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=fa
  const title=loading?'Проверка…':loadError?'Проверка недоступна':!checked?'Проверка ещё не выполнялась':state?.ready?(state.warnings?.length?'Основная процедура завершена':'Этап процедурно готов'):'Есть незавершённые процедуры';
  const card=STAGE_SYSTEM[stageNo];
 
- if(compact)return <div className={'stageReadinessCompact '+status}>
-  <span>{status==='ready'?'✓':status==='warning'?'!':status==='loading'?'…':status==='blocked'?'×':'—'}</span>
-  <div><b>{title}</b><small>{!checked&&!loadError?'Нажмите «Перепроверить» для проверки процедур':state?.blockers?.[0]||state?.warnings?.[0]||card?.institution||'Проверка состояния этапа'}</small></div>
- </div>;
+ if(compact){
+  // The teacher's bulk readiness RPC owns compact results; a separate local RPC would
+  // leave this card unchanged after the teacher clicks "Проверить готовность".
+  const compactStatus=compactLoading?'loading':compactError?'unavailable':!compactChecked?'unchecked':!compactReadiness?'unavailable':compactReadiness.ready?(compactReadiness.warnings?.length?'warning':'ready'):'blocked';
+  const compactTitle=compactLoading?'Проверяем готовность…':compactError?'Не удалось проверить готовность':!compactChecked?'Проверка ещё не выполнялась':!compactReadiness?'Нет данных о готовности этапа':compactReadiness.ready?(compactReadiness.warnings?.length?'Готово с замечаниями':'Этап процедурно готов'):'Есть незавершённые процедуры';
+  const compactDetails=compactError||(!compactChecked?'Нажмите «Перепроверить» для проверки процедур':!compactReadiness?'Повторите проверку или проверьте связь с сервером.':compactReadiness.blockers?.[0]||compactReadiness.warnings?.[0]||card?.institution||'Все обязательные процедуры выполнены');
+  return <div className={'stageReadinessCompact '+compactStatus} aria-live="polite">
+   <span aria-hidden="true">{compactStatus==='ready'?'✓':compactStatus==='warning'?'!':compactStatus==='loading'?'…':compactStatus==='blocked'?'×':'—'}</span>
+   <div><b>{compactTitle}</b><small role={compactError?'alert':undefined}>{compactDetails}</small></div>
+   {onCompactRefresh&&<button type="button" className="stageReadinessCompactRefresh" onClick={onCompactRefresh} disabled={compactLoading} aria-label={'Перепроверить готовность этапа '+stageNo}><RefreshCw size={16} aria-hidden="true"/>{compactLoading?'Проверка…':'Перепроверить'}</button>}
+  </div>;
+ }
 
  const blockerCount=state?.blockers?.length||0;
  const warningCount=state?.warnings?.length||0;
