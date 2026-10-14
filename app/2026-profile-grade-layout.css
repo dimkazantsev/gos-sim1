@@ -138,19 +138,34 @@
   flex-direction:column;
   gap:14px;
   min-width:0;
+  height:100%;
 }
-.gradesDebriefRefined .gradesDebriefContext .styledSelect{width:100%}
+.gradesDebriefRefined .gradesDebriefContext .styledSelect{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  width:100%;
+}
 .gradesDebriefRefined .gradesDebriefContext .styledSelectLabel{
+  display:flex;
+  align-items:center;
+  min-height:20px;
+  margin:0;
   color:#29486d;
   font-size:13px;
   font-weight:700;
+  line-height:20px;
 }
 .gradesDebriefRefined .gradesDebriefContext .styledSelectTrigger{
   width:100%;
   min-height:48px;
+  margin:0;
   border-radius:12px;
 }
 .gradesDebriefRefined .gradesDebriefPrompt{
+  display:flex;
+  flex-direction:column;
+  flex:1 1 auto;
   padding:16px 18px;
   border:1px solid #e0e9f5;
   border-radius:14px;
@@ -170,6 +185,7 @@
 }
 .gradesDebriefRefined .gradesDebriefPrompt small{
   display:block;
+  margin-top:auto;
   font-size:12px;
   font-weight:500;
   letter-spacing:normal;
@@ -185,6 +201,12 @@
   color:#29486d;
   font-weight:700;
   font-size:13px;
+}
+.gradesDebriefRefined .gradesDebriefEditor>span{
+  display:flex;
+  align-items:center;
+  min-height:20px;
+  line-height:20px;
 }
 .gradesDebriefRefined .gradesDebriefEditor textarea{
   display:block;
