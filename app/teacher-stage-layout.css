@@ -181,3 +181,32 @@
   grid-template-columns:minmax(0,1fr) 76px!important;
  }
 }
+
+/* The compact readiness indicator shares the teacher's bulk RPC result. */
+.teacherCommand .teacherStageInspector .stageReadinessCompact {
+ grid-template-columns:34px minmax(0,1fr) auto;
+ gap:10px;min-width:0;
+}
+.teacherCommand .stageReadinessCompact>div { min-width:0; }
+.teacherCommand .stageReadinessCompactRefresh {
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ min-height:40px;max-width:100%;padding:8px 12px;
+ border:1px solid #bfd0ed;border-radius:9px;
+ color:#315fbd;background:#fff;font-size:12px;font-weight:800;
+ cursor:pointer;white-space:nowrap;
+}
+.teacherCommand .stageReadinessCompactRefresh:hover:not(:disabled) {
+ background:#edf4ff;border-color:#9fbce9;
+}
+.teacherCommand .stageReadinessCompactRefresh:focus-visible {
+ outline:3px solid #7196e8;outline-offset:2px;
+}
+.teacherCommand .stageReadinessCompactRefresh:disabled {opacity:.65;cursor:wait}
+@container (max-width:540px) {
+ .teacherStageInspector .stageReadinessCompact {
+  grid-template-columns:34px minmax(0,1fr);
+ }
+ .teacherStageInspector .stageReadinessCompactRefresh {
+  grid-column:2;justify-self:start;white-space:normal;
+ }
+}
