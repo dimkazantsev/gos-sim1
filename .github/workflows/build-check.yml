@@ -7,6 +7,9 @@ on:
       - 'components/game/TeacherBlitz.tsx'
       - 'components/game/PoliticalWallView.tsx'
       - 'components/ui/BrandIdentity.tsx'
+      - 'components/ui/StyledSelect.tsx'
+      - 'components/ui/selectMenuPlacement.ts'
+      - 'scripts/styled-select-anchor-browser-check.cjs'
       - 'components/game/DashboardView.tsx'
       - 'components/game/StageReadinessPanel.tsx'
       - 'components/game/ProfileView.tsx'
@@ -233,6 +236,7 @@ jobs:
       - run: node scripts/fiscal-model-check.cjs
       - run: node scripts/event-card-browser-check.cjs
       - run: npm run design:preview
+      - run: node scripts/styled-select-anchor-browser-check.cjs
       - run: node scripts/party-grades-layout-browser-check.cjs
       - run: node scripts/grade-modal-russian-layout-check.cjs
       - run: node scripts/overview-budget-browser-check.cjs
