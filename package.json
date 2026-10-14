@@ -20,7 +20,7 @@
     "design:interactive": "node scripts/interactive-mobile-check.cjs",
     "design:stages": "node scripts/stage-desktop-browser-check.cjs",
     "design:teacher": "node scripts/teacher-command-browser-check.cjs",
-    "news:check": "node scripts/editorial-news-static-check.cjs"
+    "news:check": "node scripts/editorial-news-static-check.cjs && node scripts/news-ui-fallback-check.cjs"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",
