@@ -54,6 +54,14 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    await fallback.waitFor();await fallback.scrollIntoViewIfNeeded();
    assert((await frame.getByRole('button',{name:/Авто-да · Проект одобрения/}).count())>0,'Positive Minjust draft action must be visible');
    assert((await frame.getByRole('button',{name:/Авто-нет · Проект отказа/}).count())>0,'Negative Minjust draft action must be visible');
+   const aligned=await frame.locator('.partyJusticeDraftActions').first().evaluate(el=>{
+    const main=el.querySelector(':scope > button')?.getBoundingClientRect();
+    const pair=[...el.querySelectorAll('.partyJusticeAutoActions > button')].map(b=>b.getBoundingClientRect());
+    return main&&pair.length===2?{main:{left:main.left,right:main.right},pairLeft:pair[0].left,pairRight:pair[1].right}:null;
+   });
+   assert(aligned,'Minjust drafts must display one full-width action and two secondary actions');
+   assert(Math.abs(aligned.main.left-aligned.pairLeft)<=2&&Math.abs(aligned.main.right-aligned.pairRight)<=2,
+    'Main Minjust draft button must align with lower buttons at '+width+'px: '+JSON.stringify(aligned));
    const view=await frame.locator('.teacherPartyDossiers').evaluate(el=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,right:el.getBoundingClientRect().right}));
    assert(view.scroll<=view.width+2,'Teacher party dossier overflows '+width+'px: '+JSON.stringify(view));
    await page.locator('#preview').screenshot({path:path.join(screens,'teacher-party-chair-justice-'+width+'.png')});
