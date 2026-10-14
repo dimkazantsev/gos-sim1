@@ -239,6 +239,28 @@ begin
  v_sql:=replace(v_sql,v_old,
  'if p_institution_key not in (''all'',''factions'') and not private.is_game_teacher(p.game_id) then perform private.require_game_meeting_registration(p.game_id,(select auth.uid()),(select current_round from public.games where id=p.game_id),p_institution_key);end if;'||chr(10)||' '||v_old);
  execute v_sql;
+
+ -- A Government agenda is also a meeting proposal, never an unregistered action.
+ v_sql:=pg_get_functiondef('public.add_government_session_question(uuid,text,text,integer,uuid)'::regprocedure);
+ v_old:='if s.status<>''draft'' then raise exception ''Повестка закрыта для редактирования''; end if;';
+ if position(v_old in v_sql)=0 then raise exception 'Government agenda procedure changed';end if;
+ v_sql:=replace(v_sql,v_old,
+  'if not private.is_game_teacher(s.game_id) then perform private.require_game_meeting_registration(s.game_id,v_uid,s.stage_no,''government'');end if;'||chr(10)||' '||v_old);
+ execute v_sql;
+
+ v_sql:=pg_get_functiondef('public.update_government_session_question(uuid,text,text,integer)'::regprocedure);
+ v_old:='if length(btrim(coalesce(p_title,';
+ if position(v_old in v_sql)=0 then raise exception 'Government agenda update changed';end if;
+ v_sql:=replace(v_sql,v_old,
+  'if not private.is_game_teacher(q.game_id) then perform private.require_game_meeting_registration(q.game_id,(select auth.uid()),s.stage_no,''government'');end if;'||chr(10)||' '||v_old);
+ execute v_sql;
+
+ v_sql:=pg_get_functiondef('public.set_government_session_question_discussed(uuid)'::regprocedure);
+ v_old:='if q.program_agenda_id is not null then';
+ if position(v_old in v_sql)=0 then raise exception 'Government discussion changed';end if;
+ v_sql:=replace(v_sql,v_old,
+  'if not private.is_game_teacher(q.game_id) then perform private.require_game_meeting_registration(q.game_id,(select auth.uid()),s.stage_no,''government'');end if;'||chr(10)||' '||v_old);
+ execute v_sql;
 end $migration$;
 
 -- Assign additional office powers to elected leaders without changing their existing office.
