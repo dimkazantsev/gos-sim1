@@ -34,8 +34,8 @@ function targetElement(target:TourTarget){
  const mobile=window.matchMedia('(max-width:900px)').matches;
  const selectors=target==='chat'?
   (mobile?['.mobileMoreSheet [data-tour-view="chat"]','.mobileDockChat','.topChatButton']:['.topChatButton','.mobileDockChat']):
-  (mobile?[\`.mobileMoreSheet [data-tour-view="\${target}"]\`,\`.mobileDock [data-tour-view="\${target}"]\`,\`.focusNav [data-tour-view="\${target}"]\`]:
-   [\`.focusNav [data-tour-view="\${target}"]\`,\`.mobileDock [data-tour-view="\${target}"]\`]);
+  (mobile?[`.mobileMoreSheet [data-tour-view="${target}"]`,`.mobileDock [data-tour-view="${target}"]`,`.focusNav [data-tour-view="${target}"]`]:
+   [`.focusNav [data-tour-view="${target}"]`,`.mobileDock [data-tour-view="${target}"]`]);
  for(const selector of selectors){const found=[...document.querySelectorAll<HTMLElement>(selector)].find(visible);if(found)return found}
  return null;
 }
