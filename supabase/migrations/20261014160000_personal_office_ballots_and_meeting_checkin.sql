@@ -130,6 +130,7 @@ as $function$
 declare v_id uuid;
 begin
  if not private.is_game_teacher(p_game_id) then raise exception 'Только преподаватель открывает процедуру';end if;
+ perform 1 from public.games where id=p_game_id for update; -- serialize concurrent requests for the same preliminary vote
  select id into v_id from public.game_votes where game_id=p_game_id
   and stage_no=4 and procedure_key='gd_leadership_procedure'
   and status='open' order by opened_at desc limit 1;
