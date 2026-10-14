@@ -86,6 +86,8 @@ on:
       - 'components/game/ClassroomJournal.tsx'
       - 'components/game/InstitutionRegistrationPanel.tsx'
       - 'components/game/InstitutionStaffingLab.tsx'
+      - 'components/game/CommitteeChairElectionPanel.tsx'
+      - 'supabase/migrations/20261014121000_committee_chair_before_staffing.sql'
       - 'app/blitz.css'
       - 'supabase/migrations/20261014120000_ksrf_electorate_registration_cumulative_deputies.sql'
       - 'scripts/ksrf-profile-events-regression-check.cjs'
