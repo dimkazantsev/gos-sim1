@@ -88,13 +88,13 @@ async function main(){
     });
     assert(layout.status&&(width<=900||layout.chat),'Status and desktop chat must exist in '+screen);
     if(screen==='paused'){
-     assert.equal(layout.status.text,'Пауза');
+     assert.equal(layout.status.text,'Этап не открыт','An unopened stage must not be labelled as a pause');
      assert(!layout.countdown,'Timer must not occupy space during pause');
     }else if(screen==='student'){
      assert(!layout.role,'Students must not see teacher preview controls');
     }else if(screen==='offline'){
-     assert.equal(await page.frameLocator('#preview').locator('.connectionPill.polling').count(),1,'Disconnected realtime must be classified as scheduled polling, not browser network loss');
-     assert(!layout.connection||layout.connection.text.includes('По расписанию'),'Polling status is hidden on desktop or correctly labelled when mobile CSS displays it');
+     assert.equal(await page.frameLocator('#preview').locator('.connectionPill').count(),0,'A realtime fallback must not be presented as a network outage');
+     assert(!layout.connection,'A removed connection indicator must not reserve toolbar space');
     }
     if(layout.scroll>layout.width+2){
      const details=await page.frameLocator('#preview').locator('.simTop').evaluate(el=>({
