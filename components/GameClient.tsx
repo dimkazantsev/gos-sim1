@@ -247,8 +247,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
  const [pendingEvents,setPendingEvents]=useState(0);
+ const [pendingBlitz,setPendingBlitz]=useState(0);
  const sectionUpdates=useSectionUpdates(gameId,g.me?.user_id,view,!!viewAs);
- const sectionBadge=(key:string)=>Math.min(999,Math.max(sectionUpdates?.[key]||0,key==='events'?pendingEvents:0));
+ const sectionBadge=(key:string)=>Math.min(999,Math.max(sectionUpdates?.[key]||0,key==='events'?pendingEvents:key==='profile'?pendingBlitz:0));
  const [selectedProfileId,setSelectedProfileId]=useSavedGameState(gameId,g.me?.user_id,'profile-selected','',savedString);
  const [completingProfile,setCompletingProfile]=useState(false);
  const [onboardingNotice,setOnboardingNotice]=useState('');
@@ -460,10 +461,28 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   }
   void count();const poll=setInterval(()=>void count(),30000);
   const channel=supabase.channel('event-count:'+game.id+':'+me.user_id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>void count()).subscribe();
+   .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>void count())
+    .on('postgres_changes',{event:'*',schema:'public',table:'event_collaboration_invites',filter:'game_id=eq.'+game.id},()=>void count())
+    .on('postgres_changes',{event:'*',schema:'public',table:'event_decisions',filter:'game_id=eq.'+game.id},()=>void count()).subscribe();
   return()=>{live=false;clearInterval(poll);void supabase.removeChannel(channel)};
  },[game?.id,me?.user_id,previewMode,view]);
 
+
+ useEffect(()=>{
+  if(!game||!me||previewMode||me.kind!=='student'){setPendingBlitz(0);return}
+  let live=true;
+  async function refresh(){
+   const result=await supabase.rpc('blitz_inbox_counts',{p_game:game!.id});
+   if(live&&!result.error)setPendingBlitz(Number(result.data?.pending||0));
+  }
+  void refresh();
+  const timer=window.setInterval(()=>{if(document.visibilityState==='visible')void refresh()},25000);
+  const changed=()=>void refresh();
+  window.addEventListener('blitz:updated',changed);
+  const channel=supabase.channel('blitz-count:'+game.id+':'+me.user_id)
+   .on('postgres_changes',{event:'*',schema:'public',table:'blitz_assignments',filter:'user_id=eq.'+me.user_id},changed).subscribe();
+  return()=>{live=false;window.clearInterval(timer);window.removeEventListener('blitz:updated',changed);void supabase.removeChannel(channel)};
+ },[game?.id,me?.user_id,previewMode,me?.kind]);
 
  const backIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,-1,previewMode);
  const forwardIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,1,previewMode);
@@ -613,7 +632,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} createTemplate={currentScreen.templateKey} createStageNo={focusStage} onSelectDocument={rememberDocument} onOpenBudget={()=>navigate('budget')} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
      {view==='grades'&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
      {view==='actions'&&<PoliticalWallView g={vg} readOnly={previewMode||observer} focusPending={true} onOpenVotes={()=>navigate('votes')} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
-     {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onStartTutorial={beginTour} previewAchievementsUserId={teacher&&viewAs===GENERIC_STUDENT?me?.user_id:undefined} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}} setupStatus={setupStatus} setupNotice={onboardingNotice} setupFocusVersion={setupFocusVersion} onProfileChanged={()=>void loadProfileSetup()} onFinishSetup={()=>void completeOnboarding()}/>}
+     {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onStartTutorial={beginTour} previewAchievementsUserId={teacher&&viewAs===GENERIC_STUDENT?me?.user_id:undefined} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}} setupStatus={setupStatus} setupNotice={onboardingNotice} setupFocusVersion={setupFocusVersion} onProfileChanged={()=>void loadProfileSetup()} onFinishSetup={()=>void completeOnboarding()} pendingBlitz={pendingBlitz}/>}
      {view==='events'&&<EventWorkspace g={vg} readOnly={previewMode||observer}/>}
      {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onStartTutorial={beginTour} onNavigate={destination=>navigate(destination)} onOpenProcesses={()=>navigate('actions')} onOpenStages={stageNo=>navigate('stages',{stageNo})}
        onOpenChat={channelId=>{g.setChannelId(channelId);g.setChatOpen(true)}}/>}
