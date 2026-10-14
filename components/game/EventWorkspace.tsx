@@ -183,7 +183,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   if(!r.error)await Promise.all([reload(false),g.refresh()]);setBusyId(null);
  }
  if(!game||!me)return null;
- return <section className="eventWorkspace" aria-label="Event — ситуационные решения">
+ return <section className="eventWorkspace" aria-label="События — ситуационные решения">
   <header className="eventWorkspaceHeader"><div className="eventWorkspaceHeading"><small>EVENT · ИГРОВЫЕ СИТУАЦИИ</small><div className="eventWorkspaceTitleRow"><h2>События и решения</h2></div><p>Индивидуальные задания, совместные решения 2–3 участников и общее голосование. После решения здесь видны голоса по каждому варианту, последствия и итоговое изменение доверия.</p></div><div className="eventWorkspaceHeaderActions"><button type="button" className="eventRefreshButton secondary" onClick={()=>void reload(true)} aria-label="Обновить список событий и результаты"><RefreshCw size={16} aria-hidden="true"/><span>Обновить</span></button><span className="eventWorkspaceStatus"><CalendarDays size={17} aria-hidden="true"/>{teacher?'Назначенные ситуации':me.kind==='observer'?'Гостевой просмотр':'Ваши задания'}</span></div></header>
   {mode==='manage'&&teacher&&<div className="eventDecisionOverview" aria-label="Статистика решений по игровым событиям">
    <article><small>Назначено заданий</small><strong>{seenAssignments.length}</strong><span>{teacher?'Всем участникам':'Вам'}</span></article>

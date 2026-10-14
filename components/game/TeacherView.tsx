@@ -33,7 +33,7 @@ const WORKSPACES=[
  {key:'impact',title:'Модель последствий',icon:Network},
  {key:'parties',title:'Фракции',icon:UsersRound},
  {key:'tools',title:'Инструменты',icon:Wrench},
- {key:'event',title:'Event',icon:BookOpenText},
+ {key:'event',title:'События',icon:BookOpenText},
  {key:'awards',title:'Награды',icon:Award},
  {key:'blitz',title:'Блиц-вопросы',icon:BookOpenText}
 ] as const;
@@ -61,8 +61,8 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
 
  // The stage transition itself performs a fresh readiness check and asks for confirmation.
  function confirmNext(){void nextStage()}
- function confirmCrisis(){if(window.confirm('Разыграть случайный кризис для всей аудитории?'))void triggerCrisis()}
- function confirmGhost(){if(window.confirm('Запустить ghost voting?'))void ghostVoting()}
+ function confirmCrisis(){if(window.confirm('Разыграть случайный кризис для всех участников?'))void triggerCrisis()}
+ function confirmGhost(){if(window.confirm('Запустить теневое голосование?'))void ghostVoting()}
  function exportSession(){
   const rows=[['Время','Участник','Тип','Действие','Раздел']];
   for(const a of [...activities].reverse())rows.push([new Date(a.created_at).toLocaleString('ru-RU'),names[a.actor_id]||a.actor_id,a.event_type,a.label,a.view_key||'']);
@@ -134,13 +134,13 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     {workspace==='journal'&&<ClassroomJournal g={g}/>}
 
     {workspace==='analytics'&&<section className="teacherAnalytics surface">
-   <div className="surfaceHead"><div><small>АНАЛИТИКА ИГРЫ</small><h2>Общая статистика и вклад участников</h2></div><span>{members.filter(m=>m.kind==='student').length} студентов</span></div>
+   <div className="surfaceHead"><div><small>АНАЛИТИКА ИГРЫ</small><h2>Общая статистика и вклад участников</h2></div><span>{members.filter(m=>m.kind==='student').length} участников</span></div>
    <div className="teacherAnalyticsCards">
     <div><small>ПУБЛИКАЦИИ</small><strong>{politicalPosts.length}</strong><span>политических процессов</span></div>
     <div><small>ПАРТИИ</small><strong>{parties.length}</strong><span>политических организаций в игре</span></div>
     <div><small>НПА</small><strong>{formalDocuments.length}</strong><span>в реестре</span></div>
     <div><small>ГОЛОСОВАНИЯ</small><strong>{votes.length}</strong><span>{votes.filter(v=>v.status==='open').length} открыто</span></div>
-    <div><small>ИЗМЕНЕНИЯ KPI</small><strong>{metricHistory.filter(h=>h.source_type!=='baseline').length}</strong><span>зафиксированных изменений</span></div>
+    <div><small>ИЗМЕНЕНИЯ ПОКАЗАТЕЛЕЙ</small><strong>{metricHistory.filter(h=>h.source_type!=='baseline').length}</strong><span>зафиксированных изменений</span></div>
    </div>
    <ParticipantsAnalytics g={g}/>
   </section>}
@@ -154,13 +154,13 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
 
     {workspace==='tools'&&<>
     <details className="teacherDetails" open>
-   <summary><div><b>Быстрые инструменты</b><span>Таймер, кризис и Ghost Voting; публикации доступны в политических процессах</span></div><i>+</i></summary>
+   <summary><div><b>Быстрые инструменты</b><span>Таймер, кризис и теневое голосование; публикации доступны в политическом процессе</span></div><i>+</i></summary>
    <div className="teacherDetailsBody">
     <div className="directorButtons compact">
      {[10,20,30,60].map(n=><button key={n} onClick={()=>setTurnMinutes(n)}><span><Clock3 size={21} strokeWidth={1.8}/></span><b>Ход на {n} минут</b></button>)}
      <button className="dangerQuick" onClick={confirmCrisis}><span><AlertTriangle size={22} strokeWidth={1.8}/></span><b>Разыграть кризис</b></button>
-     <button onClick={confirmGhost}><span><Zap size={22} strokeWidth={1.8}/></span><b>Случайное Ghost Voting</b></button>
-     {parties.some(p=>p.ghost_active)&&<button onClick={()=>{if(confirm('Завершить ближайшее заседание ГД и восстановить полный состав всех фракций?'))void clearPartyGhostLoss()}}><span><RotateCcw size={22} strokeWidth={1.8}/></span><b>Завершить заседание ГД · снять GV</b></button>}
+     <button onClick={confirmGhost}><span><Zap size={22} strokeWidth={1.8}/></span><b>Случайное теневое голосование</b></button>
+     {parties.some(p=>p.ghost_active)&&<button onClick={()=>{if(confirm('Завершить ближайшее заседание ГД и восстановить полный состав всех фракций?'))void clearPartyGhostLoss()}}><span><RotateCcw size={22} strokeWidth={1.8}/></span><b>Завершить заседание ГД · снять ограничения</b></button>}
      <button onClick={exportSession}><span><Download size={22} strokeWidth={1.8}/></span><b>Экспорт журнала</b></button>
     </div>
     <TeacherGhostVotingPanel g={g}/>
