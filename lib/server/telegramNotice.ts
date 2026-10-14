@@ -6,7 +6,7 @@ export const NOTICE_TOPICS:Record<string,string>={
  task:'Поручения',task_done:'Поручения',stage:'Этапы',
  event:'События',vote:'Голосования',daily_brief:'Утренний доклад',
  appeal:'Приёмная',appeal_reply:'Приёмная',
- party_invite:'Партии',party_registration:'Минюст',party_document:'Минюст',party_review:'Партии
+ party_invite:'Партии',party_registration:'Минюст',party_document:'Минюст',party_review:'Партии'
 };
 export function telegramSystemNotice(category:string,body:string){
  const normalized=body.trim().replace(/\r\n?/g,'\n').replace(/\n{3,}/g,'\n\n');
