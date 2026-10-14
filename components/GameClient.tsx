@@ -32,6 +32,7 @@ import {BlitzOverlay} from './game/Blitz';
 import BudgetView from './game/BudgetView';
 import {useSectionUpdates} from './game/useSectionUpdates';
 import {supabase} from '@/lib/supabase';
+import {userError} from '@/lib/userError';
 import MobileDock from './game/MobileDock';
 import {useSavedGameState,savedString} from './game/useSavedGameState';
 
@@ -423,7 +424,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   // Record the FIRST display, not every login or each click. The dialog stays
   // open until the person explicitly proceeds to the missing profile fields.
   void supabase.rpc('mark_my_game_profile_setup_prompt_seen',{p_game:game.id}).then(r=>{
-   if(r.error){setOnboardingNotice('Не удалось сохранить первое знакомство: '+r.error.message);setupPromptScope.current='';return}
+   if(r.error){setOnboardingNotice('Не удалось сохранить первое знакомство: '+userError(r.error));setupPromptScope.current='';return}
    setSetupStatus(prev=>prev?{...prev,prompt_seen:true}:prev);
   });
  },[game?.id,me?.user_id,introSeen,introOpen,previewMode,tourMode,onboardingRequired,setupStatus?.completed,setupStatus?.prompt_seen,setupChecking]);
@@ -436,7 +437,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(!setupStatus?.prompt_seen){
    const r=await supabase.rpc('mark_my_game_profile_setup_prompt_seen',{p_game:game.id});
    if(r.error){
-    setOnboardingNotice('Не удалось сохранить первое знакомство: '+r.error.message);
+    setOnboardingNotice('Не удалось сохранить первое знакомство: '+userError(r.error));
     setSetupPromptBusy(false);return;
    }
    setSetupStatus(prev=>prev?{...prev,prompt_seen:true}:prev);
@@ -500,7 +501,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(!game||!me||completingProfile)return;
   setCompletingProfile(true);setOnboardingNotice('');
   const r=await supabase.rpc('complete_my_game_profile',{p_game:game.id});
-  if(r.error){setOnboardingNotice('Проверьте обязательные поля: '+r.error.message);await loadProfileSetup();setSetupFocusVersion(x=>x+1)}
+  if(r.error){setOnboardingNotice('Проверьте обязательные поля: '+userError(r.error));await loadProfileSetup();setSetupFocusVersion(x=>x+1)}
   else{setOnboardingNotice('Профиль заполнен. Добро пожаловать в игру!');setSetupStatus({completed:true,prompt_seen:true,missing:[]});await g.refresh();navigate('dashboard',undefined,true)}
   setCompletingProfile(false);
  }
