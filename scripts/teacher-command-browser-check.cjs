@@ -34,7 +34,7 @@ async function check(){
     const policy=inspector.querySelector('.stagePolicyEditor');
     const entries=[...list.querySelectorAll('.teacherStageListItem')];
     return {width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
-     list:rect(list),inspector:rect(inspector),rows:entries.map(rect),
+     list:rect(list),sidebar:rect(sidebar),inspector:rect(inspector),rows:entries.map(rect),
      frameHeight:window.innerHeight,
      listScrollHeight:list.scrollHeight,
      listClientHeight:list.clientHeight,
@@ -87,6 +87,12 @@ async function check(){
    assert(data.actions.bottom<=data.policy.top+3,'Stage actions must precede the long policy form at '+width+'px');
    if(width>=1280){
     assert(data.deadline.right<=data.inspector.left+3,'Desktop deadline summary must occupy the left column at '+width+'px');
+    assert(Math.abs(data.sidebar.top-data.inspector.top)<=2,
+     'Desktop panels must start on the same line at '+width+'px: '+JSON.stringify(data));
+    assert(Math.abs(data.sidebar.bottom-data.inspector.bottom)<=2,
+     'Stage sidebar and inspector must have aligned bottom edges at '+width+'px: '+JSON.stringify({
+      sidebar:data.sidebar,inspector:data.inspector
+     }));
    }else{
     assert(data.deadline.top>=data.inspector.bottom-3,'Narrow screens must put deadline summary below stage settings at '+width+'px');
    }
