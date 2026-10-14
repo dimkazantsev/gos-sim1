@@ -55,7 +55,14 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
    try{const r=await supabase.rpc('telegram_status',{p_game_id:gameId});if(r.error)throw r.error;setStatus(r.data as typeof status)}
    catch(e){setError(e instanceof Error?e.message:'Не удалось получить состояние Telegram')}
  }
- useEffect(()=>{void refresh()},[gameId]);
+ useEffect(()=>{
+  void refresh();
+  const focus=()=>void refresh();
+  const visible=()=>{if(document.visibilityState==='visible')void refresh()};
+  window.addEventListener('focus',focus);
+  document.addEventListener('visibilitychange',visible);
+  return()=>{window.removeEventListener('focus',focus);document.removeEventListener('visibilitychange',visible)};
+ },[gameId]);
  async function link(){
   setBusy(true);setError('');
   const r=await supabase.rpc('telegram_generate_link',{p_game_id:gameId});
@@ -74,6 +81,8 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
  }
  return <section className="surface" style={{padding:20,marginTop:20}}>
   <h2 style={{fontSize:19,margin:'0 0 8px'}}>Telegram — ГОС.ID</h2>
+  {status&&!status.linked&&<p className="telegramLinkWarning" role="status"><strong>Telegram не привязан к этому аккаунту.</strong> Уведомления о документах, упоминаниях, голосованиях и событиях не могут поступать, пока вы не завершите привязку через бота. После команды «Начать» вернитесь сюда: состояние обновится автоматически.</p>}
+  {status?.linked&&!status.notifications_enabled&&<p role="status" className="telegramLinkWarning">Аккаунт привязан, но уведомления отключены. Включите их кнопкой ниже.</p>}
   <p style={{margin:'0 0 14px',opacity:.8}}>{status?.linked?'Telegram привязан к вашему игровому аккаунту.':'Откройте бота, нажмите «Начать» и пользуйтесь удобным меню. Уведомления о вашей игре доступны после привязки.'}</p>
   <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
    {!status?.linked?<button type="button" disabled={busy} onClick={()=>void link()}>Привязать Telegram</button>:<>
