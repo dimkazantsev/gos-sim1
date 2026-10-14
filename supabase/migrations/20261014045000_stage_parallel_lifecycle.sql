@@ -37,7 +37,7 @@ begin
  select stage_no into v_next from public.game_stages
  where game_id=p_game_id and status='open' order by deadline nulls last,stage_no limit 1;
  update public.games set
-  current_round=coalesce(v_next,current_round),
+  current_round=greatest(current_round,coalesce(v_next,current_round)),
   turn_open=v_count>0,
   turn_ends_at=case when v_count>0 then v_earliest else null end,
   status=case when v_count>0 then 'running' else 'paused' end
