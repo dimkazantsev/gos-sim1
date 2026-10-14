@@ -15,6 +15,8 @@ for(const token of [
  'public.open_process_vote'
 ]) assert(sql.includes(token),'Missing security/vote contract: '+token);
 assert(sql.indexOf("v_old:='group by c.id,c.user_id,c.party_id'")<sql.indexOf("v_old:='group by c.id,c.user_id';"),'Runoff grouping must be removed before overlapping winner group');
+assert(offices.includes('create or replace function private.can_manage_duma_session'),'Chair can manage Duma without switching offices');
+assert(offices.includes('create or replace function private.can_manage_government_session'),'Prime Minister can manage government without switching offices');
 assert(offices.includes("new.current_round>=4"),'New deputies appear after stage 4 begins');
 assert(offices.includes("'Член КСРФ'"),'Every active student gains KSRF office');
 assert(offices.includes("'Депутат Государственной Думы'"),'GD deputy office is additive');
