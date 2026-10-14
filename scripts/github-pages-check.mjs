@@ -70,7 +70,7 @@ assert.ok(gameClient.includes("u.pathname='/gos-sim1/visit/'"),'Pages sharing mu
 assert.ok(gameClient.includes("u.searchParams.set('section',currentScreen.view)"),'Preserve section deep links');
 for(const parameter of ['stage','document','vote'])
  assert.ok(gameClient.includes("u.searchParams.set('"+parameter+"'"),'Preserve shared '+parameter+' context');
-assert.ok(gameClient.includes("title:'ГОС.ID — Цифровая платформа России'"),'Use the correct social share name');
+assert.ok(gameClient.includes('alt="QR-код ссылки на текущий раздел ГОС.ID"'),'Share dialog must contain a branded QR code');
 // Query strings do not select another HTML file on GitHub Pages; confirm the
 // entry for ?section=dashboard is the same index.html with a real OG image.
 assert.ok(html.includes('property="og:image"')&&html.includes(previewUrl),
