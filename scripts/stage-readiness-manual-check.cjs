@@ -46,4 +46,14 @@ assert(guardSql.includes("v_game uuid:=case when tg_op='DELETE' then old.game_id
 
 assert(css.includes('.stageReadinessWorkspace .stageReadinessGroup li p{font-size:14px'), 'Blockers must be readable');
 assert(css.includes('.stageReadinessWorkspace .stageReadinessGroup header small{font-size:12px'), 'Small explanatory labels must be readable');
+
+const workspace=read('components/game/GovernanceStageWorkspace.tsx');
+assert(workspace.includes("const stageLocked=!teacher&&(stage.status!=='open'"),
+ 'Closed/expired stages must be read-only to participants in the stage workspace');
+assert(workspace.includes('disabled={viewer}'),
+ 'Stage procedure controls must respect the derived read-only state');
+const command=read('components/game/TeacherView.tsx');
+assert(command.includes("const target=clockStage?.stage_no||stages.find(s=>s.status==='locked')?.stage_no"),
+ 'Teacher command must target the visible active stage, not an unrelated current_round');
+
 console.log('PASS manual stage readiness, neutral unverified state, confirmed stage transition and larger text');
