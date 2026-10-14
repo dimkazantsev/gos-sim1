@@ -154,7 +154,7 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
       <div className="blitzHistoryAnswers"><div className="blitzHistoryAnswer blitzHistoryAnswerCorrect"><span>Правильный ответ</span><strong>{correctAnswer}</strong></div>
        <div className="blitzHistoryAnswer blitzHistoryAnswerStudent"><span>Ваш ответ</span><strong>{choice}</strong></div></div>
       {(r.explanation||r.legal_act||r.source_url)&&<details className="blitzHistoryExplain"><summary>Пояснение и правовой источник</summary>{r.explanation&&<p>{r.explanation}</p>}{(r.legal_act||r.source_url)&&legal(r)}</details>}
-     </>:<div className="blitzHistoryPending"><p>Вопрос появится после открытия. Вы увидите варианты и таймер.</p>
+     </>:<div className="blitzHistoryPending"><button type="button" className="blitzPendingQuestion" disabled={!available||!!active} onClick={()=>void openSelected(r.id)}>{r.question||"Вопрос ожидает загрузки"}</button><p>Варианты станут доступны после открытия и запуска таймера на 20 секунд.</p>
       <button type="button" className="secondary" disabled={!available} onClick={()=>void openSelected(r.id)}>{available?'Открыть вопрос · 20 секунд':'Пока недоступен'}</button></div>}
 
      {active?.id===r.id&&<div className="blitzInlineQuiz" role="group" aria-label="Открытый блиц-вопрос">
