@@ -107,6 +107,8 @@ on:
       - 'app/political-publishers.css'
       - 'scripts/political-wall-status-browser-check.cjs'
       - 'components/game/GradesView.tsx'
+      - 'components/game/assessmentPresentation.ts'
+      - 'scripts/grade-modal-russian-layout-check.cjs'
       - 'supabase/migrations/*blitz*'
       - 'supabase/migrations/*crisis_baseline*'
       - 'components/game/CivicDiscussion.tsx'
@@ -198,6 +200,7 @@ jobs:
       - run: node scripts/event-card-browser-check.cjs
       - run: npm run design:preview
       - run: node scripts/party-grades-layout-browser-check.cjs
+      - run: node scripts/grade-modal-russian-layout-check.cjs
       - run: node scripts/overview-budget-browser-check.cjs
       - run: node scripts/political-wall-status-browser-check.cjs
       - run: node scripts/npa-toolbar-alignment-browser-check.cjs
