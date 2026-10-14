@@ -123,3 +123,23 @@
  .blitzTeacher .blitzMatrixTable th:first-child{min-width:210px;width:210px;max-width:210px}
 }
 @media(prefers-reduced-motion:reduce){.blitzSection,.blitzSectionChevron,.blitzQuestionChevron{transition:none}}
+
+/* The student archive is a full-width profile section, not a floating menu. */
+.blitzArchiveWrap{display:block;width:100%}
+.blitzArchive{position:static;inset:auto;left:auto;right:auto;z-index:auto;max-height:none;overflow:visible;min-width:0;padding:clamp(16px,3vw,24px);display:grid;gap:14px}
+.blitzArchiveHeader{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;min-width:0}
+.blitzArchiveHeader>div{min-width:0;flex:1 1 240px}
+.blitzArchiveHeader h2{margin:3px 0 6px}
+.blitzArchiveHeader p{margin:0;color:#61738c;line-height:1.5}
+.blitzArchiveHeader>strong{font-variant-numeric:tabular-nums}
+.blitzArchiveToolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.blitzArchiveToolbar button{min-height:44px;flex:1 1 170px;white-space:normal}
+.blitzArchiveList{display:grid;gap:8px;min-width:0}
+.blitzArchiveList details{min-width:0;overflow-wrap:anywhere;margin:0}
+.blitzArchiveList summary{display:flex;gap:12px;align-items:center;flex-wrap:wrap;cursor:pointer}
+.blitzArchiveStatus{font-weight:700;color:#244979}
+.blitzArchiveResult{display:grid;gap:12px;margin-top:12px}
+.blitzArchiveResult>div{display:grid;gap:8px}
+.blitzArchiveResult p{display:block;overflow-wrap:anywhere;margin:0;line-height:1.6}
+.blitzArchiveMore{min-height:44px}
+@media(max-width:520px){.blitzArchiveToolbar{display:grid;grid-template-columns:minmax(0,1fr)}}
