@@ -82,13 +82,14 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  function canClose(v:Vote){
   if(teacher)return true;if(!me)return false;if(units.some(u=>'unit:'+u.id===v.institution_key&&u.head_user_id===me.user_id))return true;
   if(['bill_amendments','budget_second_reading_amendment','budget_government_submission'].includes(v.procedure_key||'')&&v.created_by===me.user_id)return true;
-  const role=(me.role_title||'').toLowerCase();
-  if(v.procedure_key==='budget_government_submission')return me.kind==='student'&&(/^председатель\s+правительства(?:\s|$)/i.test(me.role_title||'')||g.officeAssignments.some(o=>o.user_id===me.user_id&&o.status==='active'&&/^председатель\s+правительства(?:\s|$)/i.test(o.role_title)));
-  if(v.institution_key==='gd')return (role.includes('председател')&&role.includes('дум'))||(role.includes('совет')&&role.includes('дум'));
-  if(v.institution_key==='government')return role.includes('председател')&&role.includes('правительств');
-  if(v.institution_key==='sf')return role.includes('председател')&&role.includes('совет')&&role.includes('федерац');
-  if(v.institution_key==='committee')return role.includes('председател')&&role.includes('комитет');
-  if(v.institution_key==='municipality')return role.includes('глава города')||role.includes('глава')&&role.includes('муницип');
+  const officeRoles=[me.role_title||'',...g.officeAssignments.filter(o=>o.user_id===me.user_id&&o.status==='active').map(o=>o.role_title)].map(r=>r.toLowerCase());
+  const hasOffice=(predicate:(role:string)=>boolean)=>officeRoles.some(predicate);
+  if(v.procedure_key==='budget_government_submission')return me.kind==='student'&&hasOffice(r=>/^председатель\s+правительства(?:\s|$)/i.test(r));
+  if(v.institution_key==='gd')return hasOffice(r=>(r.includes('председател')||r.includes('совет'))&&r.includes('дум'));
+  if(v.institution_key==='government')return hasOffice(r=>r.includes('председател')&&r.includes('правительств'));
+  if(v.institution_key==='sf')return hasOffice(r=>r.includes('председател')&&r.includes('совет')&&r.includes('федерац'));
+  if(v.institution_key==='committee')return hasOffice(r=>r.includes('председател')&&r.includes('комитет'));
+  if(v.institution_key==='municipality')return hasOffice(r=>r.includes('глава города')||(r.includes('глава')&&r.includes('муницип')));
   return false;
  }
 
