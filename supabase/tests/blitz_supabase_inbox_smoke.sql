@@ -13,8 +13,7 @@ declare
  answered jsonb;
 begin
  select m.user_id into uid from public.game_members m where m.game_id=gid and m.kind='student'
-  and not exists(select 1 from public.blitz_assignments a where a.game_id=gid and a.user_id=m.user_id
-   and a.answered_at is null and a.started_at is not null and a.started_at+interval '20 seconds'>clock_timestamp())
+  and not exists(select 1 from public.blitz_assignments a where a.game_id=gid and a.user_id=m.user_id and a.answered_at is null)
  limit 1;
  if uid is null then raise exception 'No synthetic student'; end if;
  insert into public.blitz_assignments(id,game_id,user_id,question_id,stage_no,available_at)
@@ -31,6 +30,8 @@ begin
  result:=public.blitz_answer(aid,0);
  if result->>'id' is distinct from aid::text then raise exception 'Answer not recorded'; end if;
  if public.blitz_open_selected(aid) is not null then raise exception 'Answered assignment reopened'; end if;
+ if public.blitz_open_recent(gid,clock_timestamp()-interval '1 minute') is not null then
+  raise exception 'Completed assignment returned to spontaneous Blitz'; end if;
  answered:=public.blitz_archive_filtered(gid,uid,'answered',0,30);
  if not exists(select 1 from jsonb_array_elements(answered) r where r->>'id'=aid::text and r->>'correct_index'='0')
  then raise exception 'Resolved answer missing from completed inbox'; end if;
