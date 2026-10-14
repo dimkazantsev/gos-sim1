@@ -31,9 +31,9 @@ export function actingOfficeOptions(g:ReturnTypeRepublic,subject:string):ActingO
  if(g.teacher){
   options.push({value:'admin',id:null,userId:null,role:FORMAL_SUBJECTS.find(s=>s.key===subject)?.label||'Администратор',label:'Административное оформление (преподаватель)'});
  }
- for(const o of g.officeAssignments){
+ for(const o of g.officeAssignments||[]){
   if(o.status!=='active'||(!g.teacher&&o.user_id!==me.user_id)||!officeSupportsSubject(o.role_title,subject))continue;
-  const name=g.members.find(m=>m.user_id===o.user_id)?.full_name||'Участник';
+  const name=(g.members||[]).find(m=>m.user_id===o.user_id)?.full_name||'Участник';
   options.push({value:o.id,id:o.id,userId:o.user_id,role:o.role_title,label:g.teacher?o.role_title+' — '+name:o.role_title});
  }
  if(!g.teacher&&!options.length&&officeSupportsSubject(me.role_title||'',subject)){
