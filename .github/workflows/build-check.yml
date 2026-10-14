@@ -7,6 +7,8 @@ on:
       - 'components/game/TeacherBlitz.tsx'
       - 'components/game/PoliticalWallView.tsx'
       - 'app/editorial-news.css'
+      - 'app/party-governance-justice.css'
+      - 'scripts/registry-browser-check.cjs'
       - 'supabase/migrations/*verified_editorial_automatic_news.sql'
       - 'scripts/editorial-news-*'
       - 'components/ui/BrandIdentity.tsx'
