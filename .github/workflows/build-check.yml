@@ -239,6 +239,7 @@ jobs:
       - run: node scripts/styled-select-anchor-browser-check.cjs
       - run: node scripts/party-grades-layout-browser-check.cjs
       - run: node scripts/grade-modal-russian-layout-check.cjs
+      - run: node scripts/stage-assessment-explanation-check.cjs
       - run: node scripts/profile-grades-layout-check.cjs
       - run: node scripts/overview-budget-browser-check.cjs
       - run: node scripts/political-wall-status-browser-check.cjs
