@@ -111,6 +111,16 @@ on:
       - 'supabase/migrations/*crisis_baseline*'
       - 'components/game/CivicDiscussion.tsx'
       - 'components/game/useRepublicGame.ts'
+      - 'components/game/PartyChairElection.tsx'
+      - 'components/game/PartiesView.tsx'
+      - 'components/game/GradesView.tsx'
+      - 'components/game/GovernanceStageWorkspace.tsx'
+      - 'components/game/StagesView.tsx'
+      - 'components/game/stageWorkStatus.ts'
+      - 'app/2026-stage-party-grades-repair.css'
+      - 'supabase/migrations/*stage_one_party_consent_and_gate.sql'
+      - 'scripts/party-grades-stage-consistency-check.cjs'
+      - 'scripts/party-grades-layout-browser-check.cjs'
       - 'components/game/chatRealtime.ts'
       - 'scripts/chat-realtime-check.cjs'
       - 'components/game/ChatPanel.tsx'
@@ -159,6 +169,7 @@ jobs:
       - run: node scripts/document-input-check.cjs
       - run: node scripts/electoral-math-check.cjs
       - run: node scripts/grade-fractional-check.cjs
+      - run: node scripts/party-grades-stage-consistency-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-realtime-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
@@ -186,6 +197,7 @@ jobs:
       - run: node scripts/fiscal-model-check.cjs
       - run: node scripts/event-card-browser-check.cjs
       - run: npm run design:preview
+      - run: node scripts/party-grades-layout-browser-check.cjs
       - run: node scripts/overview-budget-browser-check.cjs
       - run: node scripts/political-wall-status-browser-check.cjs
       - run: node scripts/npa-toolbar-alignment-browser-check.cjs
