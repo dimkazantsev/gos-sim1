@@ -43,4 +43,23 @@ for(const values of [[450,0],[270,135,45],[225,225],[150,150,150],[90,90,90,90,9
 for(const values of [[0,0],[NaN,10],[Infinity,10],[-1,10]])assert.deepEqual(allocateRegional(values),[0,0]);
 assert.deepEqual(allocateRegional([]),[]);
 for(const seats of [0,-1,1.5,Infinity,90])assert.deepEqual(allocateRegional([60,40],seats),[0,0]);
+// Two-party cases independently checked against the scientific quota/divisor definitions
+// and against private.allocate_electoral_seats in the live database.
+const twoPartyCases=[
+ {votes:[50,50],expected:{hare:[225,225],droop:[225,225],dhondt:[225,225],sainte_lague:[225,225],imperiali:[225,225]}},
+ {votes:[55,45],expected:{hare:[248,202],droop:[248,202],dhondt:[248,202],sainte_lague:[248,202],imperiali:[248,202]}},
+ {votes:[60.1,39.9],expected:{hare:[270,180],droop:[271,179],dhondt:[271,179],sainte_lague:[270,180],imperiali:[271,179]}},
+ {votes:[70,30],expected:{hare:[315,135],droop:[315,135],dhondt:[315,135],sainte_lague:[315,135],imperiali:[316,134]}},
+ {votes:[70.3,29.7],expected:{hare:[316,134],droop:[317,133],dhondt:[317,133],sainte_lague:[316,134],imperiali:[317,133]}}
+];
+for(const scenario of twoPartyCases){
+ for(const method of methods)assert.deepEqual(allocate(scenario.votes,450,method),scenario.expected[method],
+  method+' with '+scenario.votes.join('/')+' support');
+}
+for(const method of methods)assert.deepEqual(allocate([50,50],225,method),[113,112],
+ 'odd size ties resolved deterministically for '+method);
+const ui=fs.readFileSync(require('node:path').join(__dirname,'../components/game/ElectoralArchitectureLab.tsx'),'utf8');
+assert.ok(ui.includes('Империали (делители 2, 3, 4…)'),'Imperiali must be identified as a divisor method');
+assert.ok(ui.includes('поддержка нормализуется относительно суммы введённых значений'),'relative support normalization must be explicit');
+
 console.log('PASS: Droop model electorate, scale invariance, zero support, completed totals, stable ties, mixed 225 pool and five allocation methods; regional 89-seat Hare allocation.');
