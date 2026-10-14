@@ -216,3 +216,6 @@
 .blitzInlineQuiz .blitzAnswers button{min-width:0;min-height:52px;padding:11px 14px;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
 .blitzInlineFeedback{margin:0;line-height:1.6;color:#335075;font-size:13px}
 @media(max-width:660px){.blitzInlineQuiz .blitzAnswers{grid-template-columns:minmax(0,1fr)}}
+
+/* Счётчик уникальных ожидающих ситуаций в заголовке Event. */
+.eventPendingBadge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;margin-left:6px;padding:0 6px;background:#e6edf9;border:1px solid #c6d8f0;border-radius:999px;font-size:11px;color:#2f5689;font-weight:800;font-variant-numeric:tabular-nums}
