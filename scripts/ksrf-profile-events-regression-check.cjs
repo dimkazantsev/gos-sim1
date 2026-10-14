@@ -14,7 +14,8 @@ assert(profile.includes('showCatalog={!!previewAchievementsUserId}'),'Real stude
 assert(profile.includes('previewOnly={!!previewAchievementsUserId} defaultCollapsed/>'),'Prior collapsed default preserved');
 assert(profile.includes('!previewAchievementsUserId&&<BlitzArchive'),'No bogus demo-user RPC');
 assert(blitz.includes('useEffect(()=>{setRows([])'),'Standalone Blitz archive must load on profile entry');
-assert(blitz.includes('<section className="surface blitzArchive"'),'Blitz must not float as profile dropdown');
+assert(blitz.includes('className="surface blitzArchive blitzArchiveModal"') && blitz.includes('createPortal('),'Blitz must open as independent modal');
+assert(blitz.includes('blitz_open_selected') && blitz.includes('blitz_open_recent'),'Archive and spontaneous questions require distinct atomic open RPCs');
 assert(!blitz.includes('className="blitzArchiveWrap"'),'Floating archive removed');
 assert(journal.includes(".eq('actor_id',me!.user_id)"),'Own-only journal under RLS');
 assert(journal.includes('setOwnRows'),'Personal activity must be loaded separately');

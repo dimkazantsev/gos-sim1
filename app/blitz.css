@@ -181,3 +181,59 @@
  .blitzHistoryAnswer>strong{font-size:13px}
  .blitzHistoryPending button{width:100%}
 }
+
+
+/* Блиц: отдельная панель по образцу модального архива комиксов. */
+.blitzArchiveBackdrop{position:fixed;inset:0;z-index:4400;display:grid;place-items:center;background:rgba(19,36,66,.50);padding:clamp(8px,2.4vw,24px);overscroll-behavior:contain}
+.blitzArchive.blitzArchiveModal{position:relative;inset:auto;z-index:auto;width:min(100%,1080px);height:min(92dvh,900px);max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;display:block;padding:clamp(16px,2.6vw,26px);background:#fcfdff;border:1px solid #dce5f1;border-radius:20px;box-shadow:0 22px 72px rgba(20,38,70,.21)}
+.blitzArchiveModal>.blitzArchiveHeader{margin-bottom:16px}
+.blitzArchiveClose,.blitzArchiveRefresh{display:inline-grid;place-items:center;flex:none;width:40px;height:40px;padding:0;border:1px solid #d9e3f2;border-radius:12px;background:#f6f9fe;color:#3b5885}
+.blitzArchiveClose:hover,.blitzArchiveRefresh:hover{background:#ebf2fc}
+.blitzArchiveTabs{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.blitzArchiveTabs [role="tab"]{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:43px;border:1px solid #d7e3f2;border-radius:11px;padding:9px 16px;font-size:13px;font-weight:750;background:#f4f7fc;color:#526581}
+.blitzArchiveTabs [role="tab"].active{background:#eaf2ff;border-color:#b8cff9;color:#2452a5}
+.blitzArchiveTabs [role="tab"] span{font-variant-numeric:tabular-nums;font-size:12px;color:inherit}
+.blitzArchiveRefresh{margin-left:auto}
+.blitzArchiveModal .blitzArchiveList{gap:10px}
+.blitzArchiveModal .blitzHistoryCard{padding:15px}
+.blitzArchiveModal .blitzHistoryPending{align-items:center}
+.profileBlitzButtonBadge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 5px;border-radius:999px;background:#e6eefb;border:1px solid #c7d8f4;color:#1a4da4;font-size:11px;font-weight:800;font-variant-numeric:tabular-nums}
+@media(max-width:600px){
+ .blitzArchiveBackdrop{padding:0;align-items:end}
+ .blitzArchive.blitzArchiveModal{height:min(96dvh,100%);max-height:96dvh;border-radius:18px 18px 0 0;padding:16px}
+ .blitzArchiveTabs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px;gap:5px}
+ .blitzArchiveTabs [role="tab"]{padding:8px 5px;font-size:12px}
+ .blitzArchiveRefresh{margin:0}
+}
+
+
+/* Вопрос разворачивается внутри личного модального архива; сервер определяет 20 секунд. */
+.blitzInlineQuiz{display:grid;gap:12px;min-width:0;margin-top:5px;border-top:1px solid #dbe5f2;padding:15px 0 0}
+.blitzInlineQuiz h3{margin:0;color:#1f3555;font-size:clamp(15px,1.8vw,19px);line-height:1.5}
+.blitzInlineTimer{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;font-size:13px;color:#60748f}
+.blitzInlineTimer span{display:inline-flex;min-width:85px;justify-content:center;padding:6px 10px;background:#edf3fc;border-radius:10px;font-variant-numeric:tabular-nums;color:#274e91;font-weight:750}
+.blitzInlineQuiz .blitzAnswers{grid-template-columns:repeat(2,minmax(0,1fr))}
+.blitzInlineQuiz .blitzAnswers button{min-width:0;min-height:52px;padding:11px 14px;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+.blitzInlineFeedback{margin:0;line-height:1.6;color:#335075;font-size:13px}
+@media(max-width:660px){.blitzInlineQuiz .blitzAnswers{grid-template-columns:minmax(0,1fr)}}
+
+/* Счётчик уникальных ожидающих ситуаций в заголовке Event. */
+.eventPendingBadge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;margin-left:6px;padding:0 6px;background:#e6edf9;border:1px solid #c6d8f0;border-radius:999px;font-size:11px;color:#2f5689;font-weight:800;font-variant-numeric:tabular-nums}
+
+.blitzArchiveModal .blitzPendingQuestion{display:block;text-align:left;width:100%;min-width:0;padding:0;border:0;background:transparent;color:#203756;font:inherit;font-weight:750;font-size:clamp(15px,1.6vw,17px);line-height:1.5;overflow-wrap:anywhere;cursor:pointer}
+.blitzArchiveModal .blitzPendingQuestion:hover:not(:disabled){color:#315fa8;text-decoration:underline;text-decoration-color:#b9cde9;text-underline-offset:3px}
+.blitzArchiveModal .blitzPendingQuestion:disabled{opacity:1;cursor:default}
+.blitzArchiveModal .blitzPendingQuestion:focus-visible{outline:2px solid #90b3e6;outline-offset:3px;border-radius:5px}
+
+/* Telegram: direct deep-link and manual binding fallback without popup blockers. */
+.telegramLinkSteps{margin-top:14px;padding:14px 16px;border:1px solid #cfdded;border-radius:14px;background:#f6f9fe;color:#294266}
+.telegramLinkSteps p{font-size:13px;line-height:1.55;margin:0 0 10px}
+.telegramLinkChoices{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+.telegramLinkChoices a{display:inline-flex;justify-content:center;align-items:center;text-decoration:none;padding:10px 14px;border-radius:11px;min-height:42px;border:1px solid #c7d7ed;background:white;color:#2c5285;font-weight:700;font-size:13px}
+.telegramLinkChoices a.primary{background:#2b5de5;color:#fff;border-color:#2b5de5}
+.telegramLinkChoices a:hover{filter:brightness(.97)}
+.telegramLinkManual{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0 12px}
+.telegramLinkManual code{display:block;flex:1 1 230px;min-width:0;overflow-wrap:anywhere;padding:11px 12px;border-radius:9px;border:1px solid #d6e2f1;background:white;color:#25456d;font-size:12px}
+.telegramLinkManual button{min-height:41px;white-space:normal}
+.telegramLinkSteps .telegramLinkDisclaimer{font-size:12px;color:#657992}
+@media(max-width:540px){.telegramLinkChoices{display:grid;grid-template-columns:minmax(0,1fr)}.telegramLinkManual{display:grid;grid-template-columns:minmax(0,1fr)}}

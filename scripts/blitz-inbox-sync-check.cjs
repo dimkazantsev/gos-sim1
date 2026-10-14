@@ -1,0 +1,23 @@
+// Targeted contract regression: no full audit required.
+const fs=require('node:fs'),assert=require('node:assert/strict');
+const file=p=>fs.readFileSync(p,'utf8');
+const blitz=file('components/game/Blitz.tsx');
+const profile=file('components/game/ProfileView.tsx');
+const game=file('components/GameClient.tsx');
+const events=file('components/game/EventWorkspace.tsx');
+const sql=file('supabase/migrations/20261014170000_blitz_inbox_atomic_open.sql');
+const css=file('app/blitz.css');
+assert(profile.includes('setBlitzOpen(true)')&&profile.includes('open={blitzOpen}'),'Profile shortcut must open modal');
+const keys=['Пройти обучение</button>','Блиц-вопросы {pendingBlitz','Назначить задачу</button>'];
+assert(keys.every(k=>profile.includes(k))&&keys[0]&&profile.indexOf(keys[0])<profile.indexOf(keys[1])&&profile.indexOf(keys[1])<profile.indexOf(keys[2]),'Buttons keep agreed order');
+assert(blitz.includes('createPortal(')&&blitz.includes('role="tablist"')&&blitz.includes('blitzInlineQuiz'),'Separated modal and pending/answered tabs with inline opening');
+assert(blitz.includes("blitz_open_selected")&&blitz.includes("blitz_open_recent"),'Open exact assignment and skip old backlog on spontaneous display');
+assert(blitz.includes("supabase.rpc('blitz_answer'")&&blitz.includes("new Event('blitz:updated')"),'Single answer endpoint and refresh signal');
+assert(blitz.includes("!r.answered_at")||blitz.includes('answered?<><p className="blitzHistoryQuestion">'),'Unanswered correct key must not appear in archive');
+assert(sql.includes('pg_advisory_xact_lock')&&sql.includes('a.answered_at is not null'),'Atomic selected open prevents second answers');
+assert(sql.includes("p_state='pending' and a.answered_at is null")&&sql.includes("p_state='answered' and a.answered_at is not null"),'Filtered views disjoint by answered_at');
+assert(sql.includes("gos_blitz_issue_offline_today"),'Assignments must persist while offline via pg_cron');
+assert(game.includes("key==='profile'?pendingBlitz")&&game.includes("table:'event_collaboration_invites'"),'Profile and event badges respond to updated assignments');
+assert(css.includes('.blitzArchiveBackdrop')&&css.includes('.blitzInlineQuiz'),'Modal and inline layout styles exist');
+assert(game.includes('setPendingEvents(new Set(')&&events.includes('myPendingCases=new Set('),'Event notifications count unique cases, not duplicate invitations');
+console.log('PASS blitz inbox, atomic assignment, offline plan, profile and event badges');
