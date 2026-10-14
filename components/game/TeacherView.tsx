@@ -112,7 +112,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     {onStartTutorial&&<button type="button" className="teacherQuick teacherTourButton" onClick={onStartTutorial} aria-label="Пройти интерактивное обучение" title="Просмотреть все подсказки без изменения игровых данных">
      <span><Compass size={18} strokeWidth={2} aria-hidden="true"/></span><b>Пройти обучение</b>
     </button>}
-    <button type="button" className={game.turn_open?'teacherQuick danger':'teacherQuick primary'} onClick={()=>{const target=currentStage?.stage_no||game.current_round;const action=game.turn_open?'close':'open';if(window.confirm(action==='close'?'Завершить этап '+target+'?':'Открыть этап '+target+'?'))void g.manageStage(target,action,30)}}>
+    <button type="button" className={game.turn_open?'teacherQuick danger':'teacherQuick primary'} onClick={()=>{const target=currentStage?.stage_no||game.current_round;const action=game.turn_open?'close':'open';if(action==='close'||window.confirm('Открыть этап '+target+'?'))void g.manageStage(target,action,30)}}>
      <span>{game.turn_open?<Pause size={18} strokeWidth={2} aria-hidden="true"/>:<Play size={18} strokeWidth={2} aria-hidden="true"/>}</span>
      <b>{game.turn_open?'Завершить этап':'Открыть этап'}</b>
     </button>
