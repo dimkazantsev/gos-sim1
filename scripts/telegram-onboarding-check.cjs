@@ -45,6 +45,11 @@ assert.ok(message.endsWith('<a href="'+TELEGRAM_PROJECT_URL+'">ГОС.ID</a>'));
 const long=telegramMessageHtml('🔔 '+'&'.repeat(5000));
 assert.ok(long.length<4096&&long.endsWith('</a>'),'long messages keep complete HTML and footer');
 
+const telegramClient=fs.readFileSync('components/game/TelegramConnection.tsx','utf8');
+assert.ok(telegramClient.includes("tg://resolve?domain=")&&telegramClient.includes("&start="),'Telegram deep link uses documented tg://resolve?start= format');
+assert.ok(telegramClient.includes("navigator.clipboard.writeText('/start '+linkToken)"),'User can copy binding token for manual start');
+assert.ok(telegramClient.includes('telegramLinkSteps')&&telegramClient.includes('href={tgAppLink}'),'Telegram deep link is clicked directly by the user, not from async completion');
+assert.ok(!telegramClient.includes("window.open(link"),'No popup-blocked asynchronous window.open');
 const webhook=fs.readFileSync('app/api/telegram/webhook/route.ts','utf8');
 const register=fs.readFileSync('app/api/telegram/register/route.ts','utf8');
 const activation=fs.readFileSync('lib/server/telegramActivation.ts','utf8');
