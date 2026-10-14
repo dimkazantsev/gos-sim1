@@ -1,7 +1,8 @@
 'use client';
-import {useEffect,useId,useRef,useState} from 'react';
+import {useEffect,useId,useLayoutEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
 import {Check,ChevronDown} from 'lucide-react';
+import {placeSelectMenu} from './selectMenuPlacement';
 
 export type SelectOption={value:string;label:string;disabled?:boolean};
 export default function StyledSelect({label,value,options,onChange,disabled=false,wide=false,wrap=false,placeholder='Выберите…',className=''}:{
@@ -20,12 +21,13 @@ export default function StyledSelect({label,value,options,onChange,disabled=fals
   const r=trigger.current?.getBoundingClientRect();
   if(!r)return;
   if(r.bottom<=0||r.top>=window.innerHeight){setOpen(false);return;}
-  const spaceBelow=window.innerHeight-r.bottom-16,spaceAbove=r.top-16;
-  const above=spaceBelow<180&&spaceAbove>spaceBelow;
-  const height=Math.min(340,Math.max(128,above?spaceAbove:spaceBelow));
-  setAnchor({top:above?Math.max(10,r.top-8-height):r.bottom+6,left:Math.max(8,Math.min(r.left,window.innerWidth-r.width-8)),width:r.width,maxHeight:height});
+  // Use the actual row heights, not the space available for a potentially
+  // much taller list. Otherwise a short list appears detached above its field.
+  const next=placeSelectMenu(r,popup.current?.scrollHeight??0,{width:window.innerWidth,height:window.innerHeight});
+  setAnchor(prev=>prev.top===next.top&&prev.left===next.left&&prev.width===next.width&&prev.maxHeight===next.maxHeight?prev:next);
  }
- function show(){if(disabled)return;position();setCursor(Math.max(0,options.findIndex(o=>o.value===value)));setOpen(true);}
+ function show(){if(disabled)return;setCursor(Math.max(0,options.findIndex(o=>o.value===value)));setOpen(true);}
+ useLayoutEffect(()=>{if(open)position()},[open,options.length,wrap]);
  useEffect(()=>{
   if(!open)return;
   const off=(e:PointerEvent)=>{if(!ref.current?.contains(e.target as Node)&&!popup.current?.contains(e.target as Node))setOpen(false)};
@@ -35,7 +37,10 @@ export default function StyledSelect({label,value,options,onChange,disabled=fals
   document.addEventListener('keydown',escape);
   window.addEventListener('scroll',scroll,true);
   window.addEventListener('resize',position);
-  return()=>{document.removeEventListener('pointerdown',off);document.removeEventListener('keydown',escape);window.removeEventListener('scroll',scroll,true);window.removeEventListener('resize',position)};
+  const resizeObserver=typeof ResizeObserver!=='undefined'?new ResizeObserver(position):null;
+  if(trigger.current)resizeObserver?.observe(trigger.current);
+  if(popup.current)resizeObserver?.observe(popup.current);
+  return()=>{document.removeEventListener('pointerdown',off);document.removeEventListener('keydown',escape);window.removeEventListener('scroll',scroll,true);window.removeEventListener('resize',position);resizeObserver?.disconnect()};
  },[open]);
  useEffect(()=>{
   if(!open)return;
