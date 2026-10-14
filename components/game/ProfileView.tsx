@@ -25,7 +25,7 @@ import {currentGameMembers,currentGameProfiles} from './gameRoster';
 
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
 type PublicStats={accepted_actions:number;posts:number;votes_cast:number;documents_created:number;activity_entries:number;events_decided:number};
-export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,onStartTutorial,previewAchievementsUserId,readOnly=false,setupStatus=null,setupNotice='',setupFocusVersion=0,onProfileChanged,onFinishSetup}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;onStartTutorial?:()=>void;previewAchievementsUserId?:string;readOnly?:boolean;setupStatus?:ProfileSetupStatus|null;setupNotice?:string;setupFocusVersion?:number;onProfileChanged?:()=>void;onFinishSetup?:()=>void}){
+export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,onStartTutorial,previewAchievementsUserId,readOnly=false,setupStatus=null,setupNotice='',setupFocusVersion=0,onProfileChanged,onFinishSetup,pendingBlitz=0}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;onStartTutorial?:()=>void;previewAchievementsUserId?:string;readOnly?:boolean;setupStatus?:ProfileSetupStatus|null;setupNotice?:string;setupFocusVersion?:number;onProfileChanged?:()=>void;onFinishSetup?:()=>void;pendingBlitz?:number}){
  const {me,game,parties,partyInvitations,partyMandates,averageVsn,myEvaluations,politicalPosts,ballots,formalDocuments,activities,saveProfile,teacher}=g;
  const members=useMemo(()=>currentGameMembers(g.members,game?.id||''),[g.members,game?.id]);
  const profiles=useMemo(()=>currentGameProfiles(g.profiles,members,game?.id||''),[g.profiles,members,game?.id]);
@@ -36,6 +36,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  const allocation=party?partyMandates.find(x=>x.party_id===party.id&&x.user_id===target?.user_id):undefined;
  const pendingInvites=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  const [tasksOpen,setTasksOpen]=useState(false);
+ const [blitzOpen,setBlitzOpen]=useState(false);
  useEffect(()=>{if(typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('tasks')==='1')setTasksOpen(true)},[game?.id]);
  const [bio,setBio]=useState(targetProfile?.bio||'');
  const [fullName,setFullName]=useState(target?.full_name||'');
@@ -147,7 +148,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
      <button type="button" className="profileComicButton" aria-label="Вводный комикс" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Пролог</button>
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
      {own&&onStartTutorial&&<button type="button" onClick={onStartTutorial} title="Повторить интерактивное обучение навигации"><Compass size={17}/> Пройти обучение</button>}
-     {own&&target.kind==='student'&&game&&<button type="button" onClick={()=>document.getElementById('profile-blitz-archive')?.scrollIntoView({behavior:'smooth',block:'start'})}><BookOpenCheck size={17}/> Блиц-вопросы</button>}
+     {own&&target.kind==='student'&&game&&<button type="button" onClick={()=>setBlitzOpen(true)} aria-haspopup="dialog" aria-label={'Блиц-вопросы'+(pendingBlitz?' — ответ не дан: '+pendingBlitz:'')}><BookOpenCheck size={17}/> Блиц-вопросы {pendingBlitz>0&&<span className="profileBlitzButtonBadge" aria-hidden="true">{pendingBlitz>99?'99+':pendingBlitz}</span>}</button>}
      {own&&target.kind!=='observer'&&<button type="button" onClick={()=>setTasksOpen(true)}><ListTodo size={17}/> Назначить задачу</button>}
 
      {!own&&<button type="button" onClick={onOwnProfile}><UserRound size={17}/> Мой профиль</button>}
@@ -192,7 +193,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
    </section>}
   </>}
 
-  {game&&target.kind==='student'&&!previewAchievementsUserId&&<BlitzArchive gameId={game.id} userId={target.user_id}/>}
+  
   {game&&target.kind==='student'&&<AwardShelf gameId={game.id} userId={previewAchievementsUserId||target.user_id} showCatalog={!!previewAchievementsUserId} previewOnly={!!previewAchievementsUserId} defaultCollapsed/>}
   {own&&target.kind==='student'&&<GradesView g={g} compact/>}
   {own&&<section className="profileJournalAccess">
@@ -230,6 +231,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
   {own&&game&&<TelegramConnection gameId={game.id} teacher={teacher}/>}
   {own&&game&&<ProfileDocumentLinks gameId={game.id} userId={me.user_id}/>}
   {own&&teacher&&<SessionManager g={g}/>}
+  {own&&game&&target.kind==='student'&&!previewAchievementsUserId&&<BlitzArchive gameId={game.id} userId={target.user_id} open={blitzOpen} onClose={()=>setBlitzOpen(false)}/>}
   <RepublicComic gameId={game?.id} initialView={comicView} teacherPreview={Boolean(own&&teacher)} open={comicOpen} onClose={()=>setComicOpen(false)}/>
  </div>;
 }
