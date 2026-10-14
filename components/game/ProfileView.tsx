@@ -33,6 +33,8 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  const own=!readOnly&&target?.user_id===me?.user_id;
  const targetProfile=profiles.find(x=>x.user_id===target?.user_id);
  const party=parties.find(p=>p.name===target?.team);
+ const chairedParty=parties.find(p=>p.leader_user_id===target?.user_id&&p.name===target?.team);
+ const partyChairTitle=chairedParty?'Председатель партии «'+chairedParty.name+'»':'';
  const allocation=party?partyMandates.find(x=>x.party_id===party.id&&x.user_id===target?.user_id):undefined;
  const pendingInvites=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  const [tasksOpen,setTasksOpen]=useState(false);
@@ -137,11 +139,12 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
    <div className="profileIntro">
     <small>{own?'ЛИЧНЫЙ КАБИНЕТ':'ПУБЛИЧНЫЙ ПРОФИЛЬ ИГРОКА'}</small>
     <h1>{target.full_name}</h1>
-    <p>{target.role_title||'Участник деловой игры'}{party?' · '+party.name:''}</p>
+    <p>{partyChairTitle||target.role_title||'Участник'}{party?' · '+party.name:''}</p>
     <div className="profileChips">
      <span>{target.kind==='teacher'?'Преподаватель':target.kind==='observer'?'Гость':'Участник'}</span>
      {target.kind==='student'&&target.group_name&&<span>Группа: {target.group_name}</span>}
-     {target.kind==='student'&&<span>ВСН {avg!==null?avg.toFixed(2):'—'}</span>}
+     {partyChairTitle&&<span>{partyChairTitle}</span>}
+      {target.kind==='student'&&<span>ВСН {avg!==null?avg.toFixed(2):'—'}</span>}
      {allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}
     </div>
     <div className="profileHeroControls">
@@ -176,7 +179,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
   <div className="profilePublicStrip">
    <div><UsersRound size={19}/><div><b>Профили участников</b><span>Должности, фракции, публичные оценки и участие в игре.</span></div></div>
    <StyledSelect label="Открыть профиль игрока" value={target.user_id} onChange={v=>v===me.user_id?onOwnProfile?.():onOpenProfile?.(v)}
-    options={members.map(m=>({value:m.user_id,label:m.full_name+(m.role_title?' · '+m.role_title:'')}))}/>
+    options={members.map(m=>({value:m.user_id,label:m.full_name+(parties.some(p=>p.leader_user_id===m.user_id&&p.name===m.team)?' · Председатель партии':m.role_title?' · '+m.role_title:'')}))}/>
   </div>
 
   {!own&&<>
@@ -224,7 +227,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
      </div>:own&&pendingInvites.length?<div className="profileInviteNote"><b>У вас {pendingInvites.length} приглашение(я) в партию.</b><span>Откройте раздел «Партии», чтобы принять или отклонить.</span></div>:<div className="emptyState">Партия пока не указана.</div>}
     <div className="profilePositionDivider"/>
     <div className="surfaceHead"><div><small>ИГРОВАЯ ПОЗИЦИЯ</small><h2>Роль в Республике</h2></div></div>
-    <dl><div><dt>Партия</dt><dd>{target.team||'Не назначена'}</dd></div><div><dt>Должность</dt><dd>{target.role_title||'Не назначена'}</dd></div>{target.kind==='student'&&<div><dt>ВСН</dt><dd>{avg===null?'—':avg.toFixed(2)}</dd></div>}</dl>
+    <dl><div><dt>Партия</dt><dd>{target.team||'Не назначена'}</dd></div>{partyChairTitle&&<div><dt>Партийная должность</dt><dd>{partyChairTitle}</dd></div>}<div><dt>Должность</dt><dd>{target.role_title||'Не назначена'}</dd></div>{target.kind==='student'&&<div><dt>ВСН</dt><dd>{avg===null?'—':avg.toFixed(2)}</dd></div>}</dl>
     {targetProfile?.bio&&<div className="profileBioPreview"><small>Описание</small><p>{targetProfile.bio}</p></div>}
    </aside>
   </section>
