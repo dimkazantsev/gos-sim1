@@ -31,7 +31,8 @@ check('Archived, manually authored or deleted posts are never mass-edited',
 check('No game records deleted or truncated',
  !/\b(?:DELETE\s+FROM|TRUNCATE\s+TABLE|DROP\s+TABLE)\b/i.test(sql));
 check('Only verified news gets editorial presentation',
- wall.includes("auto&&p.context?.editorial_verified?' editorialStory':''"));
+ wall.includes("auto&&(p.context?.editorial_verified||editorialFallback)?' editorialStory':''") &&
+ wall.includes('publishedStageReport(p,formalDocuments,votes)'));
 check('Responsive scoped visual rules are loaded',
  layout.includes("import './editorial-news.css'") &&
  css.includes('.wallPost.editorialStory') &&

@@ -23,6 +23,7 @@ import CivicDiscussion from './CivicDiscussion';
 import PostInlineEditor from './PostInlineEditor';
 import NewsProposals from './NewsProposals';
 import {POLITICAL_POST_BATCH_SIZE,nextPoliticalPostCount,visiblePoliticalPostCount} from './politicalWallPaging';
+import {publishedStageReport} from './publishedStageReport';
 
 const PROCESS_TYPES=[
  ['statement','Заявление'],['initiative','Инициатива'],['event','Событие'],
@@ -276,17 +277,19 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     const links=postFormalLinks.filter(x=>x.post_id===p.id).flatMap(x=>formalDocuments.filter(d=>d.id===x.formal_document_id));
     const vote=votes.find(v=>v.source_post_id===p.id||v.id===p.context?.vote_id);
     const publicFiles=g.partyDocuments.filter(d=>p.context?.party_document_ids?.includes(d.id)&&d.url);
+    const editorialFallback=publishedStageReport(p,formalDocuments,votes);
+    const displayPost=editorialFallback?{...p,...editorialFallback}:p;
     const label=p.actor_key==='teacher'?BRAND_NAME:p.actor_label,kind=p.process_type==='decision'?'Инициатива':PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
     const auto=!!p.source_key||p.context?.automatic===true;
     const own=p.author_id===me.user_id,editable=!readOnly&&(teacher||own&&!auto);
     const canRequestVote=!readOnly&&(teacher||own&&!auto);
-    return <article className={'wallPost '+p.status+(bulkMode&&bulkAllowed?' bulkSelecting':'')+(selectedPostIds.has(p.id)&&bulkMode&&bulkAllowed?' bulkSelected':'')+(auto&&p.context?.editorial_verified?' editorialStory':'')} key={p.id} id={'process-'+p.id}>
+    return <article className={'wallPost '+p.status+(bulkMode&&bulkAllowed?' bulkSelecting':'')+(selectedPostIds.has(p.id)&&bulkMode&&bulkAllowed?' bulkSelected':'')+(auto&&(p.context?.editorial_verified||editorialFallback)?' editorialStory':'')} key={p.id} id={'process-'+p.id}>
      <header>{bulkMode&&bulkAllowed&&<label className="wallBulkPostSelect" title={'Выбрать публикацию: '+p.title}><input type="checkbox" aria-label={'Выбрать публикацию: '+p.title} checked={selectedPostIds.has(p.id)} disabled={busy} onChange={()=>toggleSelectedPost(p.id)}/></label>}<div className="wallPostAvatar"><PublisherAvatar actorKey={p.actor_key} label={label} partyLogo={party?.logo_url} avatar={pf?.avatar_url} gender={pf?.gender} name={names[p.author_id]}/></div><div className="wallPostWho"><b>{label}</b><small>{auto?'Автоматическая публикация':p.actor_key==='participant'?names[p.author_id]||'Участник':'Официальное сообщение'} · <time dateTime={p.created_at}>{new Date(p.created_at).toLocaleString('ru-RU')}</time></small></div><span className={'postStatus '+p.status}>{p.status==='accepted'?'Принято':p.status==='rejected'?'Отклонено':'Опубликовано'}</span></header>
      {editing?.id===p.id&&<PostInlineEditor key={p.id} post={p} g={g} onClose={()=>setEditing(null)} onSaved={()=>{setEditing(null);setNotice('Изменения сохранены.')}}/>}
-     <div className="wallPostBody"><div className="processPostMeta"><span>{kind}</span>{p.context?.stage_no&&<span>Этап {String(p.context.stage_no)}</span>}</div><h2>{p.title}</h2>
+     <div className="wallPostBody"><div className="processPostMeta"><span>{kind}</span>{p.context?.stage_no&&<span>Этап {String(p.context.stage_no)}</span>}</div><h2>{displayPost.title}</h2>
       {!!p.comic_scene&&<div className="wallPostComic"><EventComic silent title={p.comic_scene.title||p.title} category={p.comic_scene.category||'Событие'} caseKey={p.comic_scene.case_key||p.internal_ref_id||p.id} scene={p.comic_scene}/></div>}
       {p.actor_key==='media'&&Array.isArray(p.context?.rating_changes)?<RatingNewsVisual g={g} post={p}/>:!media.some(m=>m.media_kind==='image')&&!p.comic_scene&&<div className="processSourceVisual"><div><PublisherAvatar actorKey={party?'party':p.actor_key} label={party?.name||label} partyLogo={party?.logo_url} avatar={pf?.avatar_url} gender={pf?.gender}/></div><span><small>{links.length?'Связанные документы':kind}</small><b>{party?.name||label}</b>{!!p.context?.stage_title&&<small>{String(p.context.stage_title)}</small>}</span></div>}
-      <PostText post={p} onNavigate={onNavigate} onOpenDocument={onOpenDocument}/>
+      <PostText post={displayPost} onNavigate={onNavigate} onOpenDocument={onOpenDocument}/>
      </div>
      {media.length>0&&<div className="wallMedia">{media.map(m=>m.media_kind==='image'?<a className="processImageLink" key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer"><img src={m.url||''} alt={m.file_name} loading="lazy" decoding="async"/></a>:m.media_kind==='video'?<video key={m.id} src={m.url||''} controls preload="metadata"/>:m.media_kind==='audio'?<div className="processAudio" key={m.id}><b>{m.file_name}</b><audio src={m.url||''} controls preload="metadata"/></div>:<a className="processFileLink" key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer"><BookOpenText size={18}/><span>{m.file_name}</span></a>)}</div>}
      {publicFiles.length>0&&<div className="processPartyFiles"><h3>Документы партии</h3>{publicFiles.map(d=><a key={d.id} href={d.url!} target="_blank" rel="noreferrer"><BookOpenText size={18}/><span>{d.title}<small>{d.file_name}</small></span></a>)}</div>}
