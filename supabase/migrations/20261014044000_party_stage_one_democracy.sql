@@ -109,7 +109,7 @@ begin
  select count(*) into v_votes from public.party_chair_ballots where party_id=p.id;
  if v_votes>=v_members then
   select max(n) into v_max from (select count(*) n from public.party_chair_ballots where party_id=p.id group by candidate_id) c;
-  select count(*),min(candidate_id) into v_tied,v_winner
+  select count(*),(array_agg(candidate_id order by candidate_id))[1] into v_tied,v_winner
    from (select candidate_id,count(*) n from public.party_chair_ballots where party_id=p.id group by candidate_id) c
    where c.n=v_max;
   if v_tied=1 then
