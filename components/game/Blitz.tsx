@@ -9,12 +9,15 @@ const legal=(r:Row)=>r.source_url&&/^https:\/\//.test(r.source_url)?<a href={r.s
 export function BlitzOverlay({gameId,enabled}:{gameId:string;enabled:boolean}){
  const refreshBusy=useRef(false),answerBusy=useRef(false),selectedQueued=useRef('');
  const since=useRef(new Date().toISOString());
+ const archiveShowing=useRef(false);
+ useEffect(()=>{const opened=()=>{archiveShowing.current=true},closed=()=>{archiveShowing.current=false};window.addEventListener('blitz:archive-open',opened);window.addEventListener('blitz:archive-close',closed);return()=>{window.removeEventListener('blitz:archive-open',opened);window.removeEventListener('blitz:archive-close',closed)}},[]);
  const [card,setCard]=useState<Row|null>(null),[feedback,setFeedback]=useState<Row|null>(null),[time,setTime]=useState(20),[busy,setBusy]=useState(false),[error,setError]=useState('');
  useEffect(()=>{since.current=new Date().toISOString();setCard(null);setFeedback(null)},[gameId]);
  useEffect(()=>{
   if(!enabled||card||feedback)return;
   let stopped=false;
   async function refresh(selectedId=''){
+   if(archiveShowing.current&&!selectedId)return;
    if(refreshBusy.current){if(selectedId)selectedQueued.current=selectedId;return}
    refreshBusy.current=true;
    try{
@@ -62,6 +65,42 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
  const [rows,setRows]=useState<Row[]>([]),[filter,setFilter]=useState<'pending'|'answered'>('pending');
  const [offset,setOffset]=useState(0),[hasMore,setHasMore]=useState(false),[loading,setLoading]=useState(false),[error,setError]=useState('');
  const [counts,setCounts]=useState({pending:0,scheduled:0,answered:0});
+ const [active,setActive]=useState<Row|null>(null),[activeFeedback,setActiveFeedback]=useState<Row|null>(null);
+ const [activeSeconds,setActiveSeconds]=useState(20),[activeError,setActiveError]=useState('');
+ const [answerBusy,setAnswerBusy]=useState(false);
+ const activeLock=useRef(false);
+ async function openSelected(id:string){
+  if(active||activeLock.current)return;
+  activeLock.current=true;setActiveError('');
+  try{
+   const result=await supabase.rpc('blitz_open_selected',{p_id:id});
+   if(result.error){setActiveError(result.error.message);void refresh();return;}
+   if(!result.data){setActiveError('Вопрос уже закрыт или недоступен.');void refresh();return;}
+   const question=result.data as Row;
+   setActive(question);
+   setActiveSeconds(Math.max(0,Math.ceil((Date.parse(question.deadline||'')-Date.now())/1000)));
+  }catch(e){setActiveError(e instanceof Error?e.message:'Вопрос не открылся.')}
+  finally{activeLock.current=false;}
+ }
+ async function answerSelected(choice:number){
+  if(!active||activeFeedback||answerBusy||activeLock.current)return;
+  activeLock.current=true;setAnswerBusy(true);setActiveError('');
+  try{
+   const result=await supabase.rpc('blitz_answer',{p_id:active.id,p_choice:choice});
+   if(result.error)setActiveError('Ответ не сохранён: '+result.error.message);
+   else{setActiveFeedback({...active,...result.data});window.dispatchEvent(new Event('blitz:updated'));}
+  }catch(e){setActiveError(e instanceof Error?e.message:'Ответ не отправлен.')}
+  finally{activeLock.current=false;setAnswerBusy(false);}
+ }
+ useEffect(()=>{
+  if(!active?.deadline||activeFeedback)return;
+  const tick=()=>setActiveSeconds(Math.max(0,Math.ceil((Date.parse(active.deadline||'')-Date.now())/1000)));
+  tick();const timer=window.setInterval(tick,250);return()=>window.clearInterval(timer);
+ },[active?.deadline,!!activeFeedback]);
+ useEffect(()=>{if(active&&activeSeconds===0&&Date.now()>=Date.parse(active.deadline||'')&&!activeFeedback&&!answerBusy)void answerSelected(-1)},[active?.id,activeSeconds,!!activeFeedback,answerBusy]);
+ useEffect(()=>{if(!activeFeedback)return;const timer=window.setTimeout(()=>{setActive(null);setActiveFeedback(null);void refresh()},4800);return()=>window.clearTimeout(timer)},[activeFeedback]);
+ useEffect(()=>{if(!open)return;window.dispatchEvent(new Event('blitz:archive-open'));return()=>window.dispatchEvent(new Event('blitz:archive-close'))},[open]);
+
  const request=useRef(0);
  const dialogRef=useDialog(open,onClose);
  const load=useCallback(async(next=0)=>{
@@ -101,6 +140,7 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
     <button type="button" onClick={()=>void refresh()} disabled={loading} className="blitzArchiveRefresh" aria-label="Обновить историю"><RefreshCw size={17}/></button>
    </div>
    {error&&<p role="alert">{error}</p>}
+   {activeError&&<p role="alert">{activeError}</p>}
    {loading&&<p role="status">Обновление списка…</p>}
    {!loading&&!error&&!rows.length&&<p className="blitzArchiveEmpty">{filter==='pending'?'Неотвеченных вопросов нет.':'Ответов пока нет.'}</p>}
    <div className="blitzArchiveList">{rows.map(r=>{
@@ -115,7 +155,17 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
        <div className="blitzHistoryAnswer blitzHistoryAnswerStudent"><span>Ваш ответ</span><strong>{choice}</strong></div></div>
       {(r.explanation||r.legal_act||r.source_url)&&<details className="blitzHistoryExplain"><summary>Пояснение и правовой источник</summary>{r.explanation&&<p>{r.explanation}</p>}{(r.legal_act||r.source_url)&&legal(r)}</details>}
      </>:<div className="blitzHistoryPending"><p>Вопрос появится после открытия. Вы увидите варианты и таймер.</p>
-      <button type="button" className="secondary" disabled={!available} onClick={()=>window.dispatchEvent(new CustomEvent('blitz:open',{detail:{assignmentId:r.id}}))}>{available?'Открыть вопрос · 20 секунд':'Пока недоступен'}</button></div>}
+      <button type="button" className="secondary" disabled={!available} onClick={()=>void openSelected(r.id)}>{available?'Открыть вопрос · 20 секунд':'Пока недоступен'}</button></div>}
+
+     {active?.id===r.id&&<div className="blitzInlineQuiz" role="group" aria-label="Открытый блиц-вопрос">
+      <div className="blitzInlineTimer"><strong>Вопрос открыт</strong><span>{activeFeedback?'Ответ сохранён':activeSeconds+' секунд'}</span></div>
+      <h3>{active.question}</h3>
+      <div className="blitzAnswers">{(active.options||[]).map((option,i)=>
+       <button key={i} type="button" disabled={answerBusy||!!activeFeedback||activeSeconds===0} onClick={()=>void answerSelected(i)}
+        className={activeFeedback?(i===activeFeedback.correct_index?'correct':i===activeFeedback.chosen_index?'incorrect':''):''}>{option}</button>
+      )}</div>
+      {activeFeedback&&<p className="blitzInlineFeedback">{activeFeedback.is_correct?'Верно.':'Неверно или время истекло.'} {activeFeedback.explanation}</p>}
+     </div>}
     </article>;
    })}</div>
    {hasMore&&<button type="button" className="secondary blitzArchiveMore" disabled={loading} onClick={()=>void load(offset)}>Загрузить ещё 30</button>}
