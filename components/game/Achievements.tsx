@@ -81,7 +81,7 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
    {showCatalog&&expanded?<nav className="awardShelfTabs" aria-label="Показать награды">
     <button type="button" aria-pressed={filter==='earned'} onClick={()=>setFilter('earned')}>Полученные <b>{earned.length}</b></button>
     <button type="button" aria-pressed={filter==='open'} onClick={()=>setFilter('open')}>Все награды <b>{catalogCount}</b></button>
-   </nav>:!expanded?<span className="awardEarnedCount">{earned.length} получено</span>:null}
+   </nav>:null}
   </header>
 
   {error&&<p className="awardError" role="alert">{error}</p>}
