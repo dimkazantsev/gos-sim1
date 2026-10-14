@@ -30,8 +30,8 @@ export function buildPartyJusticeLetter(party:Pick<Party,'name'|'registration_su
   '',
   'Адресат: '+recipient,
   'Политическая партия «'+party.name+'»',
-  'Исх. № [Номер документа] от [Дата подписания]',
-  'На заявление от '+submitted,
+  'Реквизиты исходящего документа проставляются при подписании.',
+  'На заявление'+(party.registration_submitted_at?' от '+submitted:''),
   '',
   'О государственной регистрации политической партии',
   '',
@@ -43,7 +43,7 @@ export function buildPartyJusticeLetter(party:Pick<Party,'name'|'registration_su
   documents,
   ''
  ].join('\n');
- const footer='\n\nДиректор Департамента по делам некоммерческих организаций\n[ФИО и подпись уполномоченного лица при утверждении документа]';
+ const footer='\n\nДиректор Департамента по делам некоммерческих организаций\nПодписание и реквизиты подтверждаются системой при утверждении ответа.';
  if(decision==='registered'){
   const missing=PARTY_REQUIRED_DOCS.filter(req=>!docs.some(d=>d.doc_kind===req.kind&&d.status==='accepted'));
   return header+(missing.length
