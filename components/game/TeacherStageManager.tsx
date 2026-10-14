@@ -127,7 +127,8 @@ export default function TeacherStageManager({g,onOpenStage}:{
   {notice&&<div className="teacherStageNotice" role="status"><CheckCircle2 size={16} aria-hidden="true"/>{notice}
    <button type="button" aria-label="Скрыть уведомление" onClick={()=>setNotice('')}><X size={15}/></button></div>}
   <div className="teacherStageSplit">
-   <nav className="teacherStageList" aria-label="Выбор этапа">
+   <div className="teacherStageSidebar">
+    <nav className="teacherStageList" aria-label="Выбор этапа">
     {shown.length===0?<div className="teacherStageEmpty">Этапов по фильтру нет.</div>:shown.map(stage=>{
      const ready=readiness.find(r=>r.stage_no===stage.stage_no);
      const StatusIcon=stage.status==='completed'?CheckCircle2:stage.status==='open'?CircleDot:LockKeyhole;
@@ -139,7 +140,9 @@ export default function TeacherStageManager({g,onOpenStage}:{
        <ChevronRight size={17} aria-hidden="true"/>
      </button>;
     })}
-   </nav>
+    </nav>
+    {selectedStage&&<DeadlineControl g={g} stageNo={selectedStage.stage_no}/>}
+   </div>
    <div className="teacherStageInspector">
     {selectedStage?<><header className="teacherStageInspectorHead"><div className="teacherStageInspectorIdentity">
       <span className="teacherStageNumber">{String(selectedStage.stage_no).padStart(2,'0')}</span>
@@ -148,18 +151,21 @@ export default function TeacherStageManager({g,onOpenStage}:{
      <button type="button" className="teacherStageInspectorReset" onClick={()=>askReset(selectedStage.stage_no)} title="Сбросить этот этап" aria-label={'Сбросить этап '+selectedStage.stage_no} disabled={busy}><RotateCcw size={17}/></button></header>
      {selectedStage.summary&&<p className="teacherStageInspectorSummary">{selectedStage.summary}</p>}
      <StageReadinessPanel g={g} stageNo={selectedStage.stage_no} compact/>
-     <StagePolicyEditor key={selectedStage.id} g={g} stageNo={selectedStage.stage_no}/>
-     <DeadlineControl g={g} stageNo={selectedStage.stage_no}/>
-     <div className="teacherStageInspectorActions">
-      {selectedStage.status!=='open'
-       ?<button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'open')}>Открыть этап</button>
-       :<>
-        <button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'close')}>Завершить этап</button>
-        <label>Продление, минут <input type="number" min={1} max={43200} value={extensionMinutes} onChange={e=>setExtensionMinutes(Math.max(1,Math.min(43200,Number(e.target.value)||1)))}/></label>
-        <button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'extend')}>Продлить этап</button>
-       </>}
-      <button type="button" className="primary" onClick={()=>onOpenStage(selectedStage.stage_no)}>Открыть процедуры этапа <ChevronRight size={16}/></button>
+     <div className="teacherStageInspectorActions" aria-label="Действия с выбранным этапом">
+      <div className="teacherStageFlowActions">
+       {selectedStage.status!=='open'
+        ?<button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'open')}>Открыть этап</button>
+        :<>
+         <button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'close')}>Завершить этап</button>
+         <label className="teacherStageExtendField">Продление, минут
+          <input aria-label="Продление этапа в минутах" type="number" min={1} max={43200} value={extensionMinutes} onChange={e=>setExtensionMinutes(Math.max(1,Math.min(43200,Number(e.target.value)||1)))}/>
+         </label>
+         <button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'extend')}>Продлить этап</button>
+        </>}
+      </div>
+      <button type="button" className="primary teacherStageProcedures" onClick={()=>onOpenStage(selectedStage.stage_no)}>Открыть процедуры этапа <ChevronRight size={16}/></button>
      </div>
+     <StagePolicyEditor key={selectedStage.id} g={g} stageNo={selectedStage.stage_no}/>
     </>:<p>Выберите этап из списка.</p>}
    </div>
   </div>
