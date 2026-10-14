@@ -115,7 +115,7 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
    <p className="telegramLinkDisclaimer">Нажмите START непосредственно в чате бота, если Telegram его покажет. Затем вернитесь сюда и обновите статус.</p>
    {Date.now()-linkIssuedAt>=600000&&<p role="alert">Срок действия кода мог закончиться. Нажмите «Обновить код привязки».</p>}
   </div>}
-  {activated&&<p role="status">{activated}</p>
+  {activated&&<p role="status">{activated}</p>}
   {error&&<p role="alert" style={{color:'var(--danger,#b73535)'}}>{error}</p>}
  </section>;
 }
