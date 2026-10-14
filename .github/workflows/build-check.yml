@@ -91,6 +91,10 @@ on:
       - 'app/blitz.css'
       - 'supabase/migrations/20261014120000_ksrf_electorate_registration_cumulative_deputies.sql'
       - 'scripts/ksrf-profile-events-regression-check.cjs'
+      - 'scripts/deputy-session-ballots-check.cjs'
+      - 'components/game/DumaLeadershipElection.tsx'
+      - 'components/game/CommitteeChairElectionPanel.tsx'
+      - 'supabase/migrations/20261014160000_personal_office_ballots_and_meeting_checkin.sql'
       - 'components/game/TeacherParticipantRoster.tsx'
       - 'components/game/TeacherGhostVotingPanel.tsx'
       - 'components/game/EventWorkspace.tsx'
@@ -183,6 +187,7 @@ jobs:
       - run: node scripts/profile-setup-and-brand-check.cjs
       - run: node scripts/achievement-preview-check.cjs
       - run: node scripts/ksrf-profile-events-regression-check.cjs
+      - run: node scripts/deputy-session-ballots-check.cjs
       - run: node scripts/session-deletion-guard-check.cjs
       - run: node scripts/guided-tour-check.cjs
       - run: node scripts/document-input-check.cjs
