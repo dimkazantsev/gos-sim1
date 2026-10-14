@@ -82,7 +82,7 @@ begin
  if p_state not in ('pending','answered') then raise exception 'Invalid state' using errcode='22023'; end if;
  select coalesce(jsonb_agg(to_jsonb(t)),'[]'::jsonb) into payload from (
   select a.id,a.stage_no,a.available_at,a.started_at,a.answered_at,a.chosen_index,a.is_correct,
-   case when a.answered_at is not null or teacher then q.question else null end question,q.topic,
+   q.question,q.topic,
    case when a.answered_at is not null or teacher then q.options else null end options,
    case when a.answered_at is not null or teacher then q.correct_index else null end correct_index,
    case when a.answered_at is not null or teacher then q.explanation else null end explanation,
