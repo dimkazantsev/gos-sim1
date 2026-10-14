@@ -197,6 +197,7 @@ jobs:
       - run: node scripts/session-deletion-guard-check.cjs
       - run: node scripts/guided-tour-check.cjs
       - run: node scripts/document-input-check.cjs
+      - run: node scripts/contextual-offices-voting-check.cjs
       - run: node scripts/electoral-math-check.cjs
       - run: node scripts/grade-fractional-check.cjs
       - run: node scripts/party-grades-stage-consistency-check.cjs
