@@ -188,3 +188,44 @@
 .steamAwards .awardShelfToggle:focus-visible{outline:3px solid #b9caff!important;outline-offset:3px}
 .steamAwards .awardShelfToggle svg{transition:transform .18s ease}
 .steamAwards .awardShelfToggle svg.is-expanded{transform:rotate(180deg)}
+
+/* Student shelf: keep earned awards as the default, but never hide catalog access. */
+.steamAwards .awardShelfActions{
+ display:flex!important;
+ align-items:center!important;
+ flex-wrap:wrap!important;
+ column-gap:10px!important;
+ row-gap:0!important;
+ min-width:0;
+}
+.steamAwards .awardShelfCatalogButton{
+ display:inline-flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ gap:9px!important;
+ margin-top:13px!important;
+ padding:9px 13px!important;
+ min-height:44px!important;
+ border:1px solid #d6deec!important;
+ border-radius:10px!important;
+ background:#fff!important;
+ color:#2453e6!important;
+ font-size:12px!important;
+ font-weight:750!important;
+ box-shadow:none!important;
+ cursor:pointer;
+}
+.steamAwards .awardShelfCatalogButton:hover{
+ border-color:#a8bced!important;
+ background:#f4f7ff!important;
+}
+.steamAwards .awardShelfCatalogButton:focus-visible{
+ outline:3px solid #b9caff!important;
+ outline-offset:3px;
+}
+@media(max-width:420px){
+ .steamAwards .awardShelfActions>button{
+  min-width:0;
+  flex:1 1 auto;
+ }
+}
