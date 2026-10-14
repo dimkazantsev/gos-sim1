@@ -192,6 +192,7 @@ jobs:
       - run: node scripts/entry-qr-check.cjs
       - run: node scripts/achievement-preview-check.cjs
       - run: node scripts/ksrf-profile-events-regression-check.cjs
+          node scripts/blitz-inbox-sync-check.cjs
       - run: node scripts/deputy-session-ballots-check.cjs
       - run: node scripts/session-deletion-guard-check.cjs
       - run: node scripts/guided-tour-check.cjs
