@@ -29,4 +29,11 @@ assert(workspace.includes('revealResults={teacher||!!outcome||!!mineAnswer}'),'P
 assert(events.includes('showLegalFeedback&&caseId'),'No premature legal explanation');
 assert(staffing.includes('Договоритесь об этом в общем чате'),'Parliamentary committee instructions in place');
 assert(awards.includes("const earned=visibleItems.filter(x=>x.earned_at)"));
+const committee=file('components/game/CommitteeChairElectionPanel.tsx');
+const committeeSql=file('supabase/migrations/20261014121000_committee_chair_before_staffing.sql');
+assert(committee.includes("partyMandates.filter(a=>a.base_mandates>0)"),'Candidates must be deputies before committee assignment');
+assert(staffing.indexOf('<CommitteeChairElectionPanel g={g}/>')<staffing.indexOf('<section className="staffingSection">'),'Committee chair voting comes before membership allocation');
+assert(committeeSql.includes("create_committee_chair_election"),'Election must require GD chair');
+assert(committeeSql.includes("assign_institution_member"),'Committee appointments must require elected chair');
+assert(committeeSql.includes("nominate_office_candidate"),'Committee chair nomination cannot require earlier membership');
 console.log('PASS profile, KSRF, role, event and committee contracts');
