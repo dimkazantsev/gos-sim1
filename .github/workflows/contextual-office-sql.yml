@@ -1,0 +1,40 @@
+name: Contextual institutional office SQL
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/*contextual_document_office_validation.sql'
+      - 'supabase/tests/contextual_office_*.sql'
+      - '.github/workflows/contextual-office-sql.yml'
+  workflow_dispatch:
+jobs:
+  verify-office-signatures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create disposable institutional role schema
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/contextual_office_setup.sql
+      - name: Apply exactly the proposed migration
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261015010000_contextual_document_office_validation.sql
+      - name: Verify authentic context, rollback and no privilege leakage
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/contextual_office_assert.sql
