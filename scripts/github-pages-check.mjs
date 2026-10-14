@@ -70,7 +70,7 @@ assert.ok(gameClient.includes("u.pathname='/gos-sim1/visit/'"),'Pages sharing mu
 assert.ok(gameClient.includes("u.searchParams.set('section',currentScreen.view)"),'Preserve section deep links');
 for(const parameter of ['stage','document','vote'])
  assert.ok(gameClient.includes("u.searchParams.set('"+parameter+"'"),'Preserve shared '+parameter+' context');
-assert.ok(gameClient.includes("title:'ГОС.ID — Цифровая платформа России'"),'Use the correct social share name');
+assert.ok(gameClient.includes('alt="QR-код ссылки на текущий раздел ГОС.ID"'),'Share dialog must contain a branded QR code');
 // Query strings do not select another HTML file on GitHub Pages; confirm the
 // entry for ?section=dashboard is the same index.html with a real OG image.
 assert.ok(html.includes('property="og:image"')&&html.includes(previewUrl),
@@ -90,7 +90,9 @@ assert.ok(fallback.includes('^[0-9a-f]{8}'),'Only UUID game routes may redirect.
 for(const name of ['.nojekyll','models/facefinder.bin','portable/template.html','portable/engine.mjs','portable/server.mjs','event-comics/atlas-main.webp','event-comics/atlas-extra.webp','auth/update-password/index.html'])assert.ok(existsSync(join(out,name)),name);
 const scenes=readdirSync(join(root,'public/event-comics')).filter(x=>/^scene-.*\.svg$/.test(x));
 for(const name of scenes)assert.ok(existsSync(join(out,'event-comics',name)),name);
-for(const name of ['components/StaticLanding.tsx','components/game/ProfileSecurityPanel.tsx'])assert.ok(readFileSync(join(built,name),'utf8').includes(JSON.stringify(base+'/auth/update-password/')),'Recovery redirect: '+name);
+assert.ok(readFileSync(join(built,'components/StaticLanding.tsx'),'utf8').includes(JSON.stringify(base+'/auth/update-password/')),'Static landing recovery redirect must use Pages');
+const securityPanel=readFileSync(join(built,'components/game/ProfileSecurityPanel.tsx'),'utf8');
+assert.ok(securityPanel.includes('NEXT_PUBLIC_GAME_API_ORIGIN')&&securityPanel.includes("origin+'/auth/update-password'"),'Game profile email recovery must use the application server');
 assert.ok(readFileSync(join(built,'components/StaticLanding.tsx'),'utf8').includes(base+'/?game='),'Dynamic game entry must use the static route.');
 const documents=readFileSync(join(built,'components/game/DocumentsView.tsx'),'utf8');
 assert.ok(!documents.includes("fetch('/api/"),'A static host cannot serve document POST requests.');

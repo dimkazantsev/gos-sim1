@@ -56,7 +56,10 @@ for(const name of ['EventComic.tsx','ProfileAvatar.tsx','avatarCrop.ts','ComicSo
 // Document extraction/import uses the same authorised API as the live app.
 for(const name of ['components/GameClient.tsx','components/PublicScreen.tsx'])transform(name,'href="/"','href='+JSON.stringify(base+'/'));
 transform('components/game/SessionManager.tsx',"window.location.assign('/')",'window.location.assign('+JSON.stringify(base+'/')+')');
-for(const name of ['components/StaticLanding.tsx','components/game/ProfileSecurityPanel.tsx'])transform(name,"window.location.origin+'/auth/update-password'",'window.location.origin+'+JSON.stringify(base+'/auth/update-password/'));
+// StaticLanding has a static Pages recovery route; the security panel deliberately
+// uses the server-side recovery route configured by NEXT_PUBLIC_GAME_API_ORIGIN.
+// Rewriting the panel would break its Supabase email redirect on GitHub Pages.
+transform('components/StaticLanding.tsx',"window.location.origin+'/auth/update-password'",'window.location.origin+'+JSON.stringify(base+'/auth/update-password/'));
 writeFileSync(resolve(target,'public/.nojekyll'),'');
 const staticTsconfig=JSON.parse(readFileSync(resolve(target,'tsconfig.json'),'utf8'));
 staticTsconfig.exclude=['node_modules','production-app'];writeFileSync(resolve(target,'tsconfig.json'),JSON.stringify(staticTsconfig,null,2)+'\n');
