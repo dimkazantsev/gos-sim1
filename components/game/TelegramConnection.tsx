@@ -112,7 +112,7 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
      void navigator.clipboard.writeText('/start '+linkToken).then(()=>setCopied(true)).catch(()=>setCopied(false));
     }}>{copied?'Скопировано':'Скопировать команду'}</button>
    </div>
-   <p className="telegramLinkDisclaimer">Нажмите START непосредственно в чате бота, если Telegram его покажет. Затем вернитесь сюда и обновите статус.</p>
+   <p className="telegramLinkDisclaimer">Если Telegram сначала показывает кнопку «Начать» (START), нажмите её, а затем при необходимости отправьте скопированную команду /start с кодом. После этого вернитесь сюда и обновите статус.</p>
    {Date.now()-linkIssuedAt>=600000&&<p role="alert">Срок действия кода мог закончиться. Нажмите «Обновить код привязки».</p>}
   </div>}
   {activated&&<p role="status">{activated}</p>}
