@@ -644,6 +644,7 @@ export function useRepublicGame(gameId:string){
   if(teacher||role.includes('муницип')||role.includes('глава города'))x.push({key:'municipality',label:'Орган местного самоуправления'});
   if(teacher||role.includes('сми')||role.includes('журналист'))x.push({key:'media',label:'Средства массовой информации'});
   // The retired system publisher is intentionally absent; the server enumerates real actors.
+  if(teacher||me.kind==='student')x.push({key:'ksrf',label:'КСРФ'});
   if(teacher||role.includes('юстиц'))x.push({key:'minjust',label:'Министерство юстиции Российской Федерации'});
   if(teacher||role.includes('внутренн'))x.push({key:'interior',label:'Министерство внутренних дел Российской Федерации'});
   const offices=[['cec','Избирательная комиссия',/избирательн.*комисс|цик/i],['ks','Конституционный Суд Российской Федерации',/конституционн.*суд/i],['vs','Верховный Суд Российской Федерации',/верховн.*суд/i],['central_bank','Банк России',/центральн.*банк|банк.*россии/i],['accounts','Счётная палата Российской Федерации',/сч[её]тн.*палат/i]] as const;
@@ -863,7 +864,7 @@ export function useRepublicGame(gameId:string){
   const m=members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;
   const role=(m.role_title||'').trim();
   if(institution==='all'||institution==='factions')return m.kind==='student'||(m.kind==='teacher'&&!['','Руководитель симуляции','Преподаватель','Администратор'].includes(role));
-  if(institution==='ksrf'&&parties.some(p=>p.leader_user_id===uid))return true;
+  if(institution==='ksrf'&&m.kind==='student')return true;
   const body=VOTING_BODIES.find(b=>b.key===institution);
   return !!body&&(body.role.test(role)||(m.kind==='student'&&officeAssignments.some(o=>o.user_id===uid&&o.status==='active'&&body.role.test(o.role_title))));
  }
