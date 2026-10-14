@@ -98,3 +98,43 @@ begin
  update public.game_members set role_title=o.role_title
  where game_id=o.game_id and user_id=o.user_id and kind='student';
 end $$;
+
+-- Closing a vote consults the complete active office portfolio, not the legacy
+-- displayed representative role. Existing budget special gate is preserved.
+create or replace function private.can_close_procedural_vote(
+ p_game uuid,p_user uuid,p_institution text,p_formal uuid
+) returns boolean language plpgsql stable security definer
+set search_path to 'public','private','pg_temp' as $fn$
+declare d public.formal_documents%rowtype;
+begin
+ if p_user is distinct from auth.uid() then return false; end if;
+ if p_institution='government' and p_formal is not null then
+  select * into d from public.formal_documents
+  where id=p_formal and game_id=p_game;
+  if d.doc_type='federal_budget' and d.workflow_key='budget'
+    and (d.status_code='government' or
+      (d.status_code='revision' and d.current_owner_key='government' and d.current_step=1)) then
+   return private.active_budget_actor(p_game)
+    and (private.is_game_teacher(p_game) or exists(
+     select 1 from private.formal_user_roles(p_game,p_user) rr
+     where rr ~ '^председатель[[:space:]]+правительства([[:space:]]|$)'));
+  end if;
+ end if;
+ if private.is_game_teacher(p_game) then return true; end if;
+ if p_formal is not null then
+  select * into d from public.formal_documents where id=p_formal and game_id=p_game;
+  if d.id is null or not private.matches_formal_owner(p_game,p_user,d.current_owner_key,d.author_id) then return false; end if;
+ end if;
+ if p_institution='all' then return p_formal is not null; end if;
+ return exists(
+  select 1 from private.formal_user_roles(p_game,p_user) r
+  where case p_institution
+   when 'gd' then (r like '%председател%' or r like '%совет%') and r like '%дум%'
+   when 'government' then r like '%председател%' and r like '%правительств%'
+   when 'sf' then r like '%председател%' and r like '%совет%' and r like '%федерац%'
+   when 'committee' then r like '%председател%' and r like '%комитет%'
+   when 'municipality' then r like '%глава города%' or (r like '%глава%' and r like '%муницип%')
+   else false end
+ );
+end $fn$;
+revoke all on function private.can_close_procedural_vote(uuid,uuid,text,uuid) from public,anon,authenticated;
