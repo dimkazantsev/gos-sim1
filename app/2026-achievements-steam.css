@@ -174,3 +174,17 @@
 }
 @media(max-width:420px){.awardShelfTabs{grid-template-columns:1fr!important}}
 @media(prefers-reduced-motion:reduce){.awardItem,.steamAchievementToast{transition:none!important;animation:none!important}.awardItem.earned:hover{transform:none}}
+
+
+/* Student profile: the achievement collection starts as a compact summary. */
+.steamAwards .awardShelfToggle{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;
+ margin-top:13px!important;padding:9px 13px!important;min-height:42px!important;
+ border:1px solid #d6def4!important;border-radius:10px!important;
+ background:#edf2ff!important;color:#2453e6!important;font-size:12px!important;
+ font-weight:750!important;box-shadow:none!important;cursor:pointer
+}
+.steamAwards .awardShelfToggle:hover{background:#e3ebff!important;border-color:#adc4ff!important}
+.steamAwards .awardShelfToggle:focus-visible{outline:3px solid #b9caff!important;outline-offset:3px}
+.steamAwards .awardShelfToggle svg{transition:transform .18s ease}
+.steamAwards .awardShelfToggle svg.is-expanded{transform:rotate(180deg)}
