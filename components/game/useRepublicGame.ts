@@ -14,6 +14,7 @@ import {sendChatMedia} from './chatMediaTransport';
 import {analyseVoiceBlob} from './voiceWaveform';
 import {currentGameMembers,currentGameProfiles} from './gameRoster';
 import {resolveChatChannelId,visibleChatChannels} from './chatChannelSelection';
+import {mergeChatMessages} from './chatRealtime';
 import type {GameOfficeAssignment,ChatOverview} from './types';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
@@ -35,6 +36,8 @@ export function useRepublicGame(gameId:string){
  if(activeGameRef.current!==gameId){activeGameRef.current=gameId;readEpoch.current++}
  const members=useMemo(()=>currentGameMembers(memberRows,gameId),[memberRows,gameId]);
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]),[chatPins,setChatPins]=useState<ChatPin[]>([]),[pinnedMessages,setPinnedMessages]=useState<Message[]>([]),[chatOverview,setChatOverview]=useState<ChatOverview[]>([]),[chatLoading,setChatLoading]=useState(false);
+ const messageRowsRef=useRef<Message[]>([]),recentChatRecoveryRunning=useRef(false);
+ useEffect(()=>{messageRowsRef.current=messages},[messages]);
  const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profileRows,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[partyInvitations,setPartyInvitations]=useState<PartyInvitation[]>([]),[partyMandates,setPartyMandateRows]=useState<PartyMandateAllocation[]>([]),[partyAgreements,setPartyAgreements]=useState<PartyAgreement[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]),[politicalPosts,setPoliticalPosts]=useState<PoliticalPost[]>([]),[politicalMedia,setPoliticalMedia]=useState<PoliticalPostMedia[]>([]),[postFormalLinks,setPostFormalLinks]=useState<PoliticalPostFormalLink[]>([]),[metricHistory,setMetricHistory]=useState<MetricHistory[]>([]),[partySupportHistory,setPartySupportHistory]=useState<PartySupportHistory[]>([]),[impactRules,setImpactRules]=useState<ImpactRule[]>([]),[impactLedger,setImpactLedger]=useState<ImpactLedger[]>([]);
  const [loading,setLoading]=useState(true),[error,setErrorRaw]=useState(''),[chatOpen,setChatOpen]=useState(false),[secondsLeft,setSecondsLeft]=useState(0),[activeView,setActiveView]=useState<View>('dashboard');
  const [profileGameId,setProfileGameId]=useState('');
@@ -174,16 +177,17 @@ export function useRepublicGame(gameId:string){
  useEffect(()=>{
   if(!me?.user_id||me.game_id!==gameId)return;
   let disposed=false,scheduled=false;
-  let dirtyCore=false,dirtyChat=false,dirtyPins=false,telegramWake=false;
+  let dirtyCore=false,dirtyChat=false,dirtyPins=false,dirtyOverview=false,telegramWake=false;
   let timer:ReturnType<typeof setTimeout>|undefined;
   function flush(){
    if(disposed||document.visibilityState==='hidden')return;
-   const core=dirtyCore,chat=dirtyChat,pins=dirtyPins,wake=telegramWake;
-   dirtyCore=false;dirtyChat=false;dirtyPins=false;telegramWake=false;
+   const core=dirtyCore,chat=dirtyChat,pins=dirtyPins,overview=dirtyOverview,wake=telegramWake;
+   dirtyCore=false;dirtyChat=false;dirtyPins=false;dirtyOverview=false;telegramWake=false;
    // Read tickets in the loaders guard overlapping requests: never serialize
    // new events behind a stalled, older fetch.
    if(core){void hydrateActiveView();notifyGameDataRefresh(gameId)}
-   if(chat){void loadChatOverview();if(channelRef.current)void loadMessages(channelRef.current)}
+   if(overview||chat)void loadChatOverview();
+   if(chat&&channelRef.current)void loadMessages(channelRef.current);
    if(pins&&channelRef.current)void loadChatPins(channelRef.current);
    if(wake)void kickTelegramDispatch();
   }
@@ -194,10 +198,30 @@ export function useRepublicGame(gameId:string){
    void Promise.resolve().then(()=>{scheduled=false;flush()});
   }
   const channel=supabase.channel('gos-id-live:'+gameId+':'+me.user_id);
-  for(const table of ['chat_messages','chat_mentions','chat_channel_state','chat_pins']){
+  // Render the authorised INSERT payload immediately rather than waiting
+  // for another PostgREST query. RLS still governs Realtime visibility.
+  channel.on('postgres_changes',{event:'*',schema:'public',table:'chat_messages',filter:'game_id=eq.'+gameId},payload=>{
+   if(payload.eventType==='INSERT'){
+    const row=payload.new as unknown as Message;
+    if(row?.id&&row.game_id===gameId&&row.channel_id===channelRef.current){
+     setMessages(previous=>mergeChatMessages(previous,[row]));
+     if(row.storage_path){
+      void supabase.storage.from('game-media').createSignedUrl(row.storage_path,3600).then(({data})=>{
+       if(!disposed&&channelRef.current===row.channel_id&&data?.signedUrl)
+        setMessages(previous=>mergeChatMessages(previous,[{...row,url:data.signedUrl}]));
+      }).catch(()=>{/* A later media URL refresh can retry. */});
+     }
+    }
+   }else if(payload.eventType==='DELETE'){
+    const id=(payload.old as {id?:string}|null)?.id;
+    if(id)setMessages(previous=>previous.filter(m=>m.id!==id));
+   }else dirtyChat=true;
+   dirtyOverview=true;telegramWake=true;schedule();
+  });
+  for(const table of ['chat_mentions','chat_channel_state','chat_pins']){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
     if(table==='chat_pins')dirtyPins=true;
-    else dirtyChat=true;
+    else dirtyOverview=true;
     telegramWake=true;schedule();
    });
   }
@@ -211,10 +235,17 @@ export function useRepublicGame(gameId:string){
   channel.subscribe(status=>{if(!disposed)setRealtimeState(status==='SUBSCRIBED'?'connected':'disconnected')});
   // Visible-tab recovery works even when a WebSocket cannot connect.
   const poll=setInterval(()=>{
-   if(document.visibilityState==='visible'){dirtyCore=true;dirtyChat=true;dirtyPins=true;schedule()}
+   if(document.visibilityState==='visible'){dirtyCore=true;dirtyChat=true;dirtyPins=true;dirtyOverview=true;schedule()}
   },30000);
+  // Recover dropped frames without fetching the full game or re-signing the
+  // entire media history for every participant.
+  const chatRecovery=setInterval(()=>{
+   if(document.visibilityState!=='visible')return;
+   if(chatOpenRef.current&&channelRef.current)void loadRecentChatMessages(channelRef.current);
+   void loadChatOverview();
+  },6000);
   return()=>{
-   disposed=true;clearTimeout(timer);clearInterval(poll);
+   disposed=true;clearTimeout(timer);clearInterval(poll);clearInterval(chatRecovery);
    if(liveRef.current===channel)liveRef.current=null;
    void supabase.removeChannel(channel);
   };
@@ -230,7 +261,7 @@ export function useRepublicGame(gameId:string){
   if(previewRef.current)URL.revokeObjectURL(previewRef.current.url);
  },[]);
 
- useEffect(()=>{channelRef.current=channelId;setMessages([]);setChatPins([]);setPinnedMessages([]);if(channelId){void loadMessages(channelId,true);void loadChatPins(channelId);if(chatOpen)void markChatRead(channelId)}else setChatLoading(false)},[channelId]);
+ useEffect(()=>{channelRef.current=channelId;messageRowsRef.current=[];setMessages([]);setChatPins([]);setPinnedMessages([]);if(channelId){void loadMessages(channelId,true);void loadChatPins(channelId);if(chatOpen)void markChatRead(channelId)}else setChatLoading(false)},[channelId]);
  useEffect(()=>{if(chatOpen&&channelId)void markChatRead(channelId)},[chatOpen,channelId,messages.length]);
  useEffect(()=>{
   // The chat header and composer must reflect exactly the same selected ID.
@@ -530,9 +561,39 @@ export function useRepublicGame(gameId:string){
    if(!readCurrent(ticket)||channelRef.current!==cid)return;
    requireSuccessful([r]);
    const rows=await Promise.all(((r.data||[]) as Message[]).map(async m=>{if(!m.storage_path)return m;const x=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);return {...m,url:x.data?.signedUrl||null}}));
-   if(readCurrent(ticket)&&channelRef.current===cid)setMessages(rows.reverse());
+   if(readCurrent(ticket)&&channelRef.current===cid){
+    const ordered=rows.reverse(),latest=ordered.at(-1)?.created_at||'';
+    setMessages(previous=>ordered.length?mergeChatMessages(ordered,previous.filter(m=>m.channel_id===cid&&m.created_at>latest)):[]);
+   }
   }finally{if(readCurrent(ticket)&&channelRef.current===cid)setChatLoading(false)}
   });
+ }
+ async function loadRecentChatMessages(cid:string){
+  if(recentChatRecoveryRunning.current||channelRef.current!==cid)return;
+  // A recovery poll must not invalidate an in-flight initial history load.
+  const ticket:ReadTicket={gameId,epoch:readEpoch.current,versions:{}};
+  recentChatRecoveryRunning.current=true;
+  try{
+   const latest=messageRowsRef.current.filter(m=>m.channel_id===cid).at(-1)?.created_at;
+   let query=supabase.from('chat_messages').select('*').eq('channel_id',cid)
+    .order('created_at',{ascending:!!latest}).limit(75);
+   if(latest)query=query.gte('created_at',latest);
+   const result=await query;
+   if(!readActive(ticket)||channelRef.current!==cid||result.error||!result.data?.length)return;
+   // Inclusive cursor handles identical timestamps. Never re-sign the same
+   // media on every poll, particularly with 30 simultaneous participants.
+   const unseen=(result.data as Message[]).filter(m=>!messageRowsRef.current.some(old=>old.id===m.id));
+   if(!unseen.length)return;
+   const rows=await Promise.all(unseen.map(async m=>{
+    if(!m.storage_path)return m;
+    const signed=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);
+    return {...m,url:signed.data?.signedUrl||null};
+   }));
+   if(readActive(ticket)&&channelRef.current===cid)setMessages(previous=>mergeChatMessages(previous,rows));
+  }catch{
+   // Polling is a best-effort fallback; an intermittent request must not
+   // overwrite the chat with a global game error or break Realtime delivery.
+  }finally{recentChatRecoveryRunning.current=false}
  }
  async function refreshChatMediaUrl(messageId:string,storagePath:string):Promise<string|null>{
   const ticket:ReadTicket={gameId,epoch:readEpoch.current,versions:{}};
@@ -1083,7 +1144,7 @@ export function useRepublicGame(gameId:string){
   await loadFormalRegistry();return true;
  }
 
- async function sendText(text:string,targetChannel=channelId,mentionedUserIds:string[]=[]){if(!me||!targetChannel||!text.trim())return false;const r=await supabase.rpc('send_chat_text',{p_game:gameId,p_channel:targetChannel,p_text:text.trim(),p_mentioned_users:mentionedUserIds});if(r.error){setError(r.error.message);return false}rememberChatChannel(targetChannel,me.user_id);await Promise.all([loadMessages(targetChannel),loadChatOverview()]);return true}
+ async function sendText(text:string,targetChannel=channelId,mentionedUserIds:string[]=[]){if(!me||!targetChannel||!text.trim())return false;const r=await supabase.rpc('send_chat_text',{p_game:gameId,p_channel:targetChannel,p_text:text.trim(),p_mentioned_users:mentionedUserIds});if(r.error){setError(r.error.message);return false}rememberChatChannel(targetChannel,me.user_id);void Promise.allSettled([loadMessages(targetChannel),loadChatOverview()]);return true}
  async function storeChatAttachment(blob:Blob,fileName:string,mime:string,kind:'file'|ChatMediaKind,targetChannel:string,voiceMeta?:{duration?:number;waveform?:number[]}){
   if(!me||!targetChannel){setChatMediaError('Канал недоступен. Повторно откройте чат.');return false}
   const ticket:ReadTicket={gameId,epoch:readEpoch.current,versions:{}};
