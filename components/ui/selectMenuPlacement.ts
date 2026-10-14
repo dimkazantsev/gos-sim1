@@ -18,5 +18,5 @@ export function placeSelectMenu(
  const width=Math.max(0,Math.min(trigger.width,viewport.width-edge*2));
  const left=Math.max(edge,Math.min(trigger.left,viewport.width-edge-width));
  const top=openAbove?trigger.top-gap-shownHeight:trigger.bottom+gap;
- return {top:Math.max(edge,top),left,width,maxHeight:available};
+ return {top:Math.max(edge,top),left,width,maxHeight:Math.min(maxHeight,available)};
 }
