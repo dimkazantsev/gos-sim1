@@ -201,7 +201,7 @@ export default function RepublicComic({open,onClose,intro=false,gameId,initialVi
     <div ref={reader} role="region" aria-label="Сцена комикса" tabIndex={0} data-comic-kind={showingChapter?'chapter':'prologue'} data-comic-stage={showingChapter?chapter.stage_no:undefined} data-comic-slide={scene+1} data-cinematic-chapter={cinematicChapter||undefined} data-playing={playing} data-user-animation={motionRequested} onWheel={()=>{if(cinematicChapter)setPlaying(false)}} onTouchMove={()=>{if(cinematicChapter)setPlaying(false)}} className={'comicFrame '+styles.readerFrame+(!showingChapter||cinematicChapter?' '+styles.cinematicFrame:'')+(cinematicChapter?' '+styles.chapterFrame:'')} key={showingChapter?chapter.id+':'+scene:scene}>
      <div className={styles.illustration}>{showingChapter?<ChapterArtwork chapter={chapter} art={cinematicChapter?slide.art:undefined}/>:<Artwork scene={scene} backdrop/>}<SceneAtmosphere scene={showingChapter?chapterScene(chapter):scene}/></div>
      <div className={'comicOverlay '+styles.story}>
-      <span className="comicKicker">{item.kicker}</span><h2>{!showingChapter&&scene===0?<>Республика{' '}<br/>после бури</>:item.title}</h2><p>{item.body}</p>{cinematicChapter&&<ComicFacts facts={slide.facts}/>}{!showingChapter&&<strong>{item.stamp}</strong>}
+      <span className="comicKicker">{item.kicker}</span><h2>{!showingChapter&&scene===0?<>Республика{' '}<br/>после бури</>:item.title}</h2><p>{item.body}</p>{cinematicChapter&&<ComicFacts facts={slide.facts}/>}<strong>{showingChapter?'Глава комикса':item.stamp}</strong>
      </div>
     </div>
     <footer className={styles.footer}>
