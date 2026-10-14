@@ -26,7 +26,9 @@ assert(migration.includes("open_parliamentary_rule_vote"),'Registration enforced
 assert(migration.includes("party_member_mandates"),'Existing personal mandates grant additive GD authority');
 assert(events.includes('eventAnswerInlineFeedback'),'Event feedback displayed under selected answer');
 assert(workspace.includes('revealResults={teacher||!!outcome||!!mineAnswer}'),'Percentages visible after response');
-assert(events.includes('showLegalFeedback&&caseId'),'No premature legal explanation');
+assert(events.includes('showLegalFeedback&&caseId&&i===correctIndex'),'Explanation only under best answer');
+assert(events.includes("i===correctIndex?'correct':selected?'incorrect'"),'Green best answer and red erroneous choice');
+assert(workspace.includes('correctIndex={outcome&&'),'Never reveal best answer before final outcome');
 assert(staffing.includes('Договоритесь об этом в общем чате'),'Parliamentary committee instructions in place');
 assert(awards.includes("const earned=visibleItems.filter(x=>x.earned_at)"));
 const committee=file('components/game/CommitteeChairElectionPanel.tsx');
