@@ -3,6 +3,7 @@ import {ArrowRight,ArrowUpRight,BookOpenText,Building2,CalendarClock,ChartNoAxes
 import {useEffect,useState,type CSSProperties} from 'react';
 import {useDialog} from '../ui/useDialog';
 import {IconAction} from '../ui/IconAction';
+import {isStageWorkOpen,stageWorkLabel} from './stageWorkStatus';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage} from './types';
 import {formatDeadline} from './constants';
@@ -37,10 +38,10 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
  const [stageSearch,setStageSearch]=useState('');
  useEffect(()=>{if(focusStageNo)setSelected(stages.find(s=>s.stage_no===focusStageNo)||null,false)},[focusStageNo]);
  const detail=selected?STAGE_DETAILS[selected.stage_no]:null;
- const current=stages.find(s=>s.status==='open')||stages.find(s=>s.status!=='completed')||stages.at(-1);
+ const current=stages.find(s=>isStageWorkOpen(g.game,s))||stages.find(s=>s.status!=='completed')||stages.at(-1);
 
  const completedCount=stages.filter(s=>s.status==='completed').length;
- const openCount=stages.filter(s=>s.status==='open').length;
+ const openCount=stages.filter(s=>isStageWorkOpen(g.game,s)).length;
  const votingStageNos=new Set(votes.filter(v=>v.status==='open').map(v=>v.stage_no));
  const votingCount=stages.filter(s=>votingStageNos.has(s.stage_no)).length;
  const completionPercent=stages.length?Math.round(completedCount/stages.length*100):0;
@@ -87,7 +88,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
   return <StageWorkspace
    g={g}
    stage={selected}
-   readOnly={readOnly||(!teacher&&(selected.status!=='open'||!!selected.deadline&&Date.parse(selected.deadline)<=Date.now()))}
+   readOnly={readOnly||(!teacher&&!isStageWorkOpen(g.game,selected))}
    onBack={()=>setSelected(null)}
    onOpenStage={stageNo=>setSelected(stages.find(item=>item.stage_no===stageNo)||null)}
    onOpenVotes={onOpenVotes}
@@ -159,16 +160,17 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
    {visibleStages.length>0?<div className="stageAtlasGrid">
     {visibleStages.map(s=>{
      const StageIcon=STAGE_ICONS[s.stage_no-1]||BookOpenText;
-     const StatusIcon=s.status==='completed'?CheckCircle2:s.status==='open'?CircleDot:LockKeyhole;
+     const effectiveStatus=s.status==='completed'?'completed':isStageWorkOpen(g.game,s)?'open':'locked';
+     const StatusIcon=effectiveStatus==='completed'?CheckCircle2:effectiveStatus==='open'?CircleDot:LockKeyhole;
      const hasOpenVote=votingStageNos.has(s.stage_no);
      const openDetails=()=>setSelected(s);
-     return <article className={'stageAtlasCard is-'+s.status} key={s.id}>
+     return <article className={'stageAtlasCard is-'+effectiveStatus} key={s.id}>
       <div className="stageAtlasCardMain">
        <div className="stageAtlasCardGlyph" aria-hidden="true"><StageIcon size={22} strokeWidth={1.8}/><span>{String(s.stage_no).padStart(2,'0')}</span></div>
        <div className="stageAtlasCardContent">
         <div className="stageAtlasCardTopline">
          <span className="stageAtlasCardMode">{s.mode}</span>
-         <span className={'stageAtlasCardStatus is-'+s.status}><StatusIcon size={15} strokeWidth={2.1} aria-hidden="true"/>{s.status==='open'?'Текущий этап':s.status==='completed'?'Завершён':'Закрыт'}</span>
+         <span className={'stageAtlasCardStatus is-'+effectiveStatus}><StatusIcon size={15} strokeWidth={2.1} aria-hidden="true"/>{isStageWorkOpen(g.game,s)?'Текущий этап':stageWorkLabel(g.game,s)}</span>
         </div>
         <h3>{s.title}</h3>
         <p>{s.summary}</p>

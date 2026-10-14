@@ -53,7 +53,7 @@ assert(css.includes('.stageReadinessWorkspace .stageReadinessGroup li p{font-siz
 assert(css.includes('.stageReadinessWorkspace .stageReadinessGroup header small{font-size:12px'), 'Small explanatory labels must be readable');
 
 const workspace=read('components/game/GovernanceStageWorkspace.tsx');
-assert(workspace.includes("const stageLocked=!teacher&&(stage.status!=='open'"),
+assert(workspace.includes('const stageLocked=!isStageWorkOpen(g.game,stage);'),
  'Closed/expired stages must be read-only to participants in the stage workspace');
 assert(workspace.includes('disabled={viewer}'),
  'Stage procedure controls must respect the derived read-only state');

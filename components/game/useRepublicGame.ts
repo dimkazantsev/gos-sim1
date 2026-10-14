@@ -826,17 +826,17 @@ export function useRepublicGame(gameId:string){
  async function inviteToParty(partyId:string,userId:string){
   const r=await supabase.rpc('invite_to_party',{p_party_id:partyId,p_user_id:userId});
   if(r.error){setError(r.error.message);return false}
-  await loadPartyRepresentation();void kickTelegramDispatch();return true;
+  await loadPartyRepresentation();notifyGameDataRefresh(gameId);void kickTelegramDispatch();return true;
  }
  async function respondPartyInvitation(invitationId:string,accept:boolean){
   const r=await supabase.rpc('respond_party_invitation',{p_invitation_id:invitationId,p_accept:accept});
   if(r.error){setError(r.error.message);return false}
-  await loadPartyRepresentation();return true;
+  await refresh();notifyGameDataRefresh(gameId);return true;
  }
  async function cancelPartyInvitation(invitationId:string){
   const r=await supabase.rpc('cancel_party_invitation',{p_invitation_id:invitationId});
   if(r.error){setError(r.error.message);return false}
-  await loadPartyRepresentation();return true;
+  await loadPartyRepresentation();notifyGameDataRefresh(gameId);return true;
  }
  async function removePartyMember(partyId:string,userId:string){
   const r=await supabase.rpc('remove_party_member',{p_party_id:partyId,p_user_id:userId});

@@ -1,0 +1,93 @@
+/* ГОС.ID · targeted stage/party and assessment layout repairs */
+.civicParties .pageHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.gosPartyStageBadge,.gosPartyElectionStatus{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;border-radius:999px;padding:8px 12px;border:1px solid #dce5f4;background:#f4f7fd;color:#587293;font-size:12px;font-weight:750;line-height:1.3}
+.gosPartyStageBadge.isActive,.gosPartyElectionStatus.isActive{border-color:#b5decf;color:#18775b;background:#eaf9f2}
+.gosPartyStageBadge.isLocked,.gosPartyElectionStatus.isWaiting{border-color:#f2dab8;color:#95601a;background:#fff7e9}
+.gosPartyElectionStatus.isDone{border-color:#badfce;color:#136449;background:#edfaf3}
+.gosPartyStageWarning{border:1px solid #e8d7b7;background:#fffaed;color:#795b33;border-radius:14px;padding:14px 18px;font-size:13px;line-height:1.6}
+.gosPartyCount{display:inline-grid;place-items:center;min-width:25px;height:25px;padding:0 7px;box-sizing:border-box;border-radius:9px;background:#ebf1ff;color:#2753b9;font-size:13px;font-variant-numeric:tabular-nums}
+.gosPartyStageFieldset{padding:0;margin:0;min-width:0;border:0}
+.gosPartyStageFieldset:disabled{opacity:.64}
+.gosPartyElection{display:grid;gap:18px;min-width:0;padding:22px 24px;border:1px solid #d5e1f2;border-radius:20px;background:linear-gradient(160deg,#ffffff 70%,#f5f8ff);box-shadow:0 10px 28px rgba(21,53,103,.045);color:#183456}
+.gosPartyElectionHead{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;min-width:0}
+.gosPartyElectionIcon{display:grid;place-items:center;flex:0 0 48px;height:48px;border:1px solid #dce5fe;border-radius:14px;background:#eef3ff;color:#2a55e9}
+.gosPartyElectionHead>div{flex:1 1 230px;min-width:0}
+.gosPartyElectionHead small{font-size:11px;letter-spacing:.09em;font-weight:800;color:#7891b1}
+.gosPartyElectionHead h3{margin:4px 0 5px;color:#15365e;font-size:21px;line-height:1.25;letter-spacing:-.03em}
+.gosPartyElectionHead p{margin:0;color:#70829a;font-size:13px;line-height:1.5}
+.gosPartyElectionSteps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.gosPartyElectionStep{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;min-width:0;border:1px solid #e1e9f5;border-radius:12px;padding:12px;background:#f8faff;color:#657d9e;font-size:12px}
+.gosPartyElectionStep svg{color:#3a65d9}
+.gosPartyElectionStep span{overflow-wrap:anywhere}
+.gosPartyElectionStep b{color:#183f7f;font-size:16px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.gosPartyElectionNotice,.gosPartyElectionResult{display:flex;align-items:flex-start;gap:10px;margin:0;padding:13px 15px;border-radius:12px;background:#f5f8fe;border:1px solid #dbe5f3;color:#546b87;font-size:13px;line-height:1.65}
+.gosPartyElectionNotice svg,.gosPartyElectionResult svg{flex:0 0 auto;margin-top:2px;color:#6482ad}
+.gosPartyElectionResult{background:#edfaf5;border-color:#c6e7d9;color:#226448}
+.gosPartyElectionResult svg{color:#19855d}
+.gosPartyElectionResult strong{display:block;font-size:14px}
+.gosPartyElectionResult p{margin:3px 0 0;color:#436f5d;line-height:1.55}
+.gosPartyElectionHint{margin:0;color:#657d9a;font-size:13px;line-height:1.6}
+.gosPartyElectionCandidates{display:grid;gap:8px;min-width:0}
+.gosPartyElectionCandidate{display:flex;align-items:center;gap:12px;min-width:0;padding:10px 12px;border-radius:12px;background:white;border:1px solid #e5ebf5}
+.gosPartyElectionAvatar{display:block;flex:0 0 34px;width:34px;height:34px;border-radius:50%;overflow:hidden}
+.gosPartyElectionAvatar .profileAvatar,.gosPartyElectionAvatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.gosPartyElectionCandidateName{flex:1;min-width:0;overflow-wrap:anywhere;font-size:13px;font-weight:750;color:#244567}
+.gosPartyElectionCandidateName small{margin-left:8px;color:#718bb0;font-weight:500}
+.gosPartyElectionVotes{flex:0 0 auto;color:#43628b;font-size:12px;font-weight:750;font-variant-numeric:tabular-nums}
+.gosPartyElectionBallot{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:12px;padding-top:12px;border-top:1px solid #e0e9f4}
+.gosPartyElectionBallot label{display:grid;gap:7px;min-width:0;color:#506e93;font-size:12px;font-weight:700}
+.gosPartyElectionBallot select{width:100%;min-height:44px;box-sizing:border-box;padding:9px 12px;border:1px solid #d2dff0;border-radius:11px;background:#fff;color:#17385c;font-size:13px}
+.gosPartyElectionBallot button{min-height:44px;white-space:nowrap}
+.gosPartyElectionFeedback{margin:0;font-size:12px;line-height:1.6;color:#335f8b}
+.gradesPage,.gradesPage .surface,.gradeModal,.gradeModal>*{box-sizing:border-box;min-width:0}
+.gradesPage .gradesMatrixWrap{max-width:100%;overflow:hidden}
+.gradesPage .gradesMatrix{max-width:100%;width:100%;min-width:0;overflow-x:auto;overflow-y:auto;overscroll-behavior-inline:contain;border:1px solid #dce5f1;border-radius:16px;background:#fff}
+.gradesPage .gradesMatrixHead,.gradesPage .gradesMatrixRow{display:grid;box-sizing:border-box;width:max(1420px,100%);min-width:1420px;grid-template-columns:minmax(260px,1fr) 74px 80px repeat(16,56px);gap:6px;align-items:center;margin:0;padding:10px 12px}
+.gradesPage .gradesMatrixHead{position:sticky;top:0;z-index:3;background:#f5f8fd;color:#7187a4;font-size:12px;border-bottom:1px solid #dce5f1;min-height:49px}
+.gradesPage .gradesMatrixHead>*,.gradesPage .gradesMatrixRow>*{min-width:0;min-height:0;box-sizing:border-box;margin:0;text-align:center;justify-self:stretch}
+.gradesPage .gradesMatrixHead>b:first-child,.gradesPage .gradesMatrixRow>div:first-child{text-align:left;position:sticky;left:0;background:#f5f8fd;z-index:2;padding:7px 10px;border-radius:8px}
+.gradesPage .gradesMatrixRow>div:first-child{background:#fff;display:grid;gap:4px;align-content:center}
+.gradesPage .gradesMatrixRow{min-height:76px;border-bottom:1px solid #eaf0f8;background:#fff}
+.gradesPage .gradesMatrixRow:last-child{border-bottom:0}
+.gradesPage .gradesMatrixRow>button{display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%;height:48px;min-width:0;padding:3px 2px;border-radius:9px;font-variant-numeric:tabular-nums}
+.gradesPage .gradesMatrixRow>button b{display:block;font-size:13px;line-height:1.2}
+.gradesPage .gradesMatrixRow>button small{display:block;font-size:9px;line-height:1.2;letter-spacing:0}
+.gradesPage .gradesMatrixRow>.gradeTotal{display:grid;place-items:center;min-height:48px;width:100%;font-variant-numeric:tabular-nums}
+.gradesPage .gradesMatrixRow .gradesProfileLink{display:inline-block;max-width:100%;text-align:left;overflow-wrap:anywhere}
+.gradesPage .gradesMatrixRow>div:first-child small{display:block;overflow-wrap:anywhere;line-height:1.35}
+.gradeModalBack{overflow-y:auto;min-width:0}
+.gradeModal{max-width:min(1040px,calc(100vw - 24px));overflow-x:hidden}
+.gradeModal>header,.gradeScoreHero,.gradeCriteria,.gradeRationale,.gradeTeacherNote,.gradeApproval,.gradeEvidence,.gradeRunHistory{max-width:100%;box-sizing:border-box}
+.gradeModal .gradeScoreHero{display:flex;gap:16px;align-items:center;min-width:0}
+.gradeModal .gradeScoreHero strong{font-variant-numeric:tabular-nums;flex:0 0 auto;line-height:1.1}
+.gradeModal .gradeScoreHero>div{display:grid;gap:5px;min-width:0}
+.gradeModal .blitzVsnScore{box-sizing:border-box;min-width:0;margin:14px 28px;padding:18px 20px;border:1px solid #dce6f6;border-radius:16px;background:#f8faff}
+.gradeModal .blitzVsnScore>header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:0;border:0;background:none}
+.gradeModal .blitzVsnScore>header>b{font-size:14px;color:#183b64}
+.gradeModal .blitzVsnScore>header>strong{font-variant-numeric:tabular-nums;color:#1b56bc;font-size:18px;white-space:nowrap}
+.gradeModal .blitzVsnBreakdown{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.gradeModal .blitzVsnBreakdown>span{display:grid;gap:6px;padding:12px;border-radius:10px;background:white;border:1px solid #e2eaf5;min-width:0}
+.gradeModal .blitzVsnBreakdown small{font-size:11px;line-height:1.4;color:#7187a3;overflow-wrap:anywhere}
+.gradeModal .blitzVsnBreakdown b{font-size:17px;color:#1d477f;font-variant-numeric:tabular-nums}
+.gradeModal .blitzVsnScore>p{margin:12px 0 8px;font-size:12px;line-height:1.65;color:#516d8f;overflow-wrap:anywhere}
+.gradeModal .blitzVsnScore>small{display:block;color:#7086a2;font-size:11px;line-height:1.55}
+.gradeModal .gradeRationale{border:1px solid #dfe8f4;border-radius:14px;padding:18px 20px;background:#fbfdff}
+.gradeModal .gradeRationale p,.gradeModal .gradeTeacherNote p{max-width:100%;min-width:0;overflow-wrap:anywhere;word-break:normal;white-space:pre-wrap;line-height:1.65;margin:10px 0;font-size:13px}
+.gradeModal .gradeRationale footer{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.gradeModal .gradeRationale footer span{overflow-wrap:anywhere}
+.gradeModal .gradeCriteria{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.gradeModal .gradeCriteria>span{min-width:0;overflow-wrap:anywhere;display:flex;align-items:center;gap:8px}
+@media(max-width:900px){
+ .gosPartyElectionSteps{grid-template-columns:1fr}
+ .gosPartyElectionBallot{grid-template-columns:1fr}
+ .gradeModal .blitzVsnBreakdown{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:650px){
+ .gosPartyElection{padding:16px;gap:14px}
+ .gosPartyElectionHead>div{flex-basis:180px}
+ .gosPartyElectionStatus{flex-basis:auto;max-width:100%}
+ .gradeModal .blitzVsnScore{margin:12px 16px;padding:14px}
+ .gradeModal .gradeCriteria{grid-template-columns:1fr}
+ .gradeModal .gradeRationale{padding:14px}
+ .gradesPage .gradesMatrixHead,.gradesPage .gradesMatrixRow{width:1420px}
+}
