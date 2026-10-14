@@ -25,7 +25,7 @@ export const TELEGRAM_MENU_BUTTONS:TelegramMarkup={
  ]
 };
 /** Real public game deep links: no Vercel API URL or internal UUID-only path. */
-export function telegramSectionUrl(section:'dashboard'|'stages'|'votes'|'documents'|'actions'|'profile'|'budget'|'events',id?:string){
+export function telegramSectionUrl(section:'dashboard'|'stages'|'votes'|'documents'|'actions'|'profile'|'budget'|'events'|'parties',id?:string){
  const url=new URL(TELEGRAM_PROJECT_URL);
  url.searchParams.set('section',section);
  if(section==='documents'&&id)url.searchParams.set('document',id);
@@ -34,7 +34,7 @@ export function telegramSectionUrl(section:'dashboard'|'stages'|'votes'|'documen
  if(section==='votes'&&id)url.searchParams.set('vote',id);
  return url.toString();
 }
-export function telegramSectionButtons(section:'dashboard'|'stages'|'votes'|'documents'|'actions'|'profile'|'budget'|'events',label='Открыть раздел'):TelegramMarkup{
+export function telegramSectionButtons(section:'dashboard'|'stages'|'votes'|'documents'|'actions'|'profile'|'budget'|'events'|'parties',label='Открыть раздел'):TelegramMarkup{
  return {inline_keyboard:[
   [{text:'↗ '+label,url:telegramSectionUrl(section)}],
   [{text:'🏛 Меню',callback_data:'gos:menu'},{text:'🌐 ГОС.ID',url:TELEGRAM_PROJECT_URL}]
