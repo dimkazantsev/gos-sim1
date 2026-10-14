@@ -11,6 +11,7 @@ import StyledSelect from '../ui/StyledSelect';
 import DocumentPaper from './DocumentPaper';
 import BudgetDocumentAnnex from './BudgetDocumentAnnex';
 import {DOCUMENT_TEMPLATES} from './documentTemplates';
+import {actingOfficeOptions} from './contextualOffices';
 import {useSavedGameState,savedChoice,savedString,savedBoolean} from './useSavedGameState';
 import {DocumentTools,DocumentInbox,type DocumentAccess} from './DocumentTools';
 import CivicDiscussion from './CivicDiscussion';
@@ -45,7 +46,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const [detailReturn,setDetailReturn]=useState<'registry'|'create'>('registry');
  const [scrollOpenedDocument,setScrollOpenedDocument]=useState(false);
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[subjectKey,setSubjectKey]=useState('gd_deputy'),[docType,setDocType]=useState('fz_bill'),[file,setFile]=useState<File|null>(null),[extracting,setExtracting]=useState(false),[recognized,setRecognized]=useState(''),[busy,setBusy]=useState(false);
- const [templateKey,setTemplateKey]=useState('fz_bill'),[issuer,setIssuer]=useState(''),[place,setPlace]=useState('Москва');
+ const [templateKey,setTemplateKey]=useState('fz_bill'),[issuer,setIssuer]=useState(''),[place,setPlace]=useState('Москва'),[actingOfficeChoice,setActingOfficeChoice]=useState('');
  const [editing,setEditing]=useState(false),[editTitle,setEditTitle]=useState(''),[editBody,setEditBody]=useState('');
  const [documentAccess,setDocumentAccess]=useState<DocumentAccess|null>(null),[accessError,setAccessError]=useState(''),[editNote,setEditNote]=useState(''),[editRevision,setEditRevision]=useState(1);
  const [activeRoles,setActiveRoles]=useState<string[]>([]),[subjectPermissions,setSubjectPermissions]=useState<string[]|null>(null),[revisions,setRevisions]=useState<{id:string;revision:number;title:string;body_text:string|null;created_at:string}[]>([]);
@@ -69,10 +70,12 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  function changeTitle(value:string){draftVersions.current.title++;draftFields.current.title=value;setTitle(value)}
  function changeBody(value:string){draftVersions.current.body++;draftFields.current.body=value;setBody(value)}
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;extractionRequest.current++;extractionAbort.current?.abort()}},[]);
- useEffect(()=>{cancelExtraction();setBusy(false);setTitle('');setBody('');setFile(null);setRecognized('');setEditing(false);setEditTitle('');setEditBody('');setEditNote('');setIssuer('');setPlace('Москва');setSubjectKey('gd_deputy');setDocType('fz_bill');setDocumentAccess(null);setActiveRoles([]);setSubjectPermissions(null);setCommitteeUnits([]);resetPreparedBillPackage()},[editorScope]);
+ useEffect(()=>{cancelExtraction();setBusy(false);setTitle('');setBody('');setFile(null);setRecognized('');setEditing(false);setEditTitle('');setEditBody('');setEditNote('');setIssuer('');setActingOfficeChoice('');setPlace('Москва');setSubjectKey('gd_deputy');setDocType('fz_bill');setDocumentAccess(null);setActiveRoles([]);setSubjectPermissions(null);setCommitteeUnits([]);resetPreparedBillPackage()},[editorScope]);
 
  const role=[me?.role_title||'',...activeRoles].join(' ').toLowerCase();
  const availableSubjects=useMemo(()=>subjectPermissions?FORMAL_SUBJECTS.filter(s=>subjectPermissions.includes(s.key)):teacher?FORMAL_SUBJECTS:FORMAL_SUBJECTS.filter(s=>s.roleHints.some(h=>role.includes(h))),[teacher,role,subjectPermissions]);
+ const officeOptions=actingOfficeOptions(g,subjectKey);
+ const actingOffice=officeOptions.find(x=>x.value===actingOfficeChoice)||officeOptions[0];
  const createType=FORMAL_TYPES.find(x=>x.key===docType),creatingBill=createType?.workflow==='bill';
  const createBillRepresentativeRequired=['government','sf','region','ks','vs'].includes(subjectKey);
  const createBillRequiredKinds=['explanatory_note','affected_acts',...(createBillFinancial?['financial_economic']:[]),...(createBillGovernmentOpinion?['government_opinion']:[]),...(createBillRepresentativeRequired?['collegial_decision']:[])];
@@ -261,7 +264,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   const personalSigner=['gd_deputy','sf_member','region','ks','vs'].includes(s.key);
   const holder=personalSigner?me:(members.find(m=>s.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||me);const signatureMeta=formalSignature(s.key,holder?.full_name||me?.full_name||'');
   setBusy(true);
-  const id=await createFormalDocument({stageNo:createStageNo||currentStage?.stage_no||12,title:title.trim(),docType:t.key,subjectKey:s.key,subjectLabel:s.label,bodyText:body,workflowKey:t.workflow,metadata:{institution:s.label,issuer_name:issuer.trim()||s.label,place:place.trim()||'Москва',template_key:templateKey,recognized:recognized||null,created_in_editor:!file}},file||undefined);
+  const id=await createFormalDocument({stageNo:createStageNo||currentStage?.stage_no||12,title:title.trim(),docType:t.key,subjectKey:s.key,subjectLabel:s.label,bodyText:body,workflowKey:t.workflow,metadata:{institution:s.label,issuer_name:issuer.trim()||s.label,acting_office_id:actingOffice?.id||null,acting_office_title:actingOffice?.role||null,acting_user_id:actingOffice?.userId||null,place:place.trim()||'Москва',template_key:templateKey,recognized:recognized||null,created_in_editor:!file}},file||undefined);
   let packageErrors:string[]=[];
   if(id&&t.workflow==='bill')packageErrors=await savePreparedBillPackage(id);
   setBusy(false);
@@ -426,6 +429,8 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
     <section className="legalCreateSection"><header><span>2</span><div><small>Карточка НПА</small><h3>Реквизиты и маршрут</h3><p>Вид акта и субъект определяют официальный маршрут документа.</p></div></header>
      {recognized&&<div className="recognitionResult">{recognized}</div>}<div className="formalInputBlock"><label>Название документа</label><input aria-label="Название документа" value={title} onChange={e=>changeTitle(e.target.value)} placeholder="Например: О внесении изменений в Федеральный закон…"/></div>
      <div className="formalRecognitionGrid"><StyledSelect label="Субъект" value={subjectKey} onChange={chooseSubject} options={availableSubjects.map(x=>({value:x.key,label:x.label}))}/><StyledSelect label="Вид документа" value={docType} onChange={value=>{draftVersions.current.requisites++;setDocType(value)}} options={FORMAL_TYPES.map(x=>({value:x.key,label:x.label}))}/></div>
+     <div className="formalRecognitionGrid"><StyledSelect label="От чьего имени оформляется документ" value={actingOffice?.value||''} onChange={setActingOfficeChoice} options={officeOptions.map(x=>({value:x.value,label:x.label}))}/><p className="legalEditorNote">Выбор действует только для этого документа. Остальные государственные полномочия остаются активными.</p></div>
+     {!teacher&&!officeOptions.length&&<p role="status" className="legalEditorNote">Для выбранного субъекта нет действующего назначения. Проверьте должности в профиле.</p>}
      <div className="legalIssuerFields"><label>Наименование органа<input value={issuer} onChange={e=>setIssuer(e.target.value)} placeholder={FORMAL_SUBJECTS.find(x=>x.key===subjectKey)?.label}/></label><label>Место издания<input value={place} onChange={e=>setPlace(e.target.value)}/></label></div>
      <p className="legalEditorNote"><Route size={16}/> Номер и дата присваиваются при регистрации. После регистрации официальные переходы выполняются в блоке управления процедурой рядом с документом.</p>
     </section>
@@ -436,7 +441,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
      <div className="billCreateAttachments"><div className="billCreateAttachmentsHead"><div><Paperclip size={18}/><b>Обязательные приложения</b></div><span>{createBillPreparedCount} из {createBillRequiredKinds.length} выбрано</span></div>{createBillRequiredKinds.map(kind=>{const nextFile=createBillFiles[kind];return <label key={kind} className={nextFile?'has-file':''}><span><b>{billFileLabels[kind]||kind}</b><small>{nextFile?nextFile.name:'PDF, DOC/DOCX или TXT'}</small></span><input type="file" accept=".pdf,.doc,.docx,.txt" onChange={e=>setCreateBillFiles(v=>({...v,[kind]:e.target.files?.[0]||null}))}/><em>{nextFile?'Заменить':'Выбрать файл'}</em></label>})}</div>
      <p className="billCreateRule"><ClipboardList size={17}/> Зарегистрировать черновик можно и с неполным комплектом. Но официальный переход «Внести в Государственную Думу» будет доступен только после заполнения обязательных материалов.</p>
     </section>}
-    <div className="formalCreateFooter"><div className="legalStageValue"><span>Этап игры:</span><b>{createStageNo||currentStage?.stage_no||'—'}</b></div><button type="button" className="primary" disabled={readOnly||busy||extracting||title.trim().length<3||(!teacher&&!availableSubjects.length)} onClick={create}>{busy?'Регистрирую и сохраняю комплект…':'Зарегистрировать документ →'}</button></div>
+    <div className="formalCreateFooter"><div className="legalStageValue"><span>Этап игры:</span><b>{createStageNo||currentStage?.stage_no||'—'}</b></div><button type="button" className="primary" disabled={readOnly||busy||extracting||title.trim().length<3||(!teacher&&(!availableSubjects.length||!actingOffice))} onClick={create}>{busy?'Регистрирую и сохраняю комплект…':'Зарегистрировать документ →'}</button></div>
    </div>
   </section>}
 
