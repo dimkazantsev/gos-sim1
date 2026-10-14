@@ -2,8 +2,9 @@
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 
-type Election={id:string;game_id:string;office_key:'gd_chair'|'gd_deputy_1'|'gd_deputy_2';office_title:string;round_no:1|2;vote_mode:'open'|'secret';status:'nomination'|'open'|'closed'|'finished';winner_candidate_id:string|null;parent_election_id:string|null;created_at:string};
+type Election={id:string;game_id:string;office_key:'gd_chair'|'gd_deputy_1'|'gd_deputy_2';office_title:string;round_no:1|2;vote_mode:'open'|'secret';status:'nomination'|'open'|'closed'|'finished';ballot_mode?:'faction'|'personal';winner_candidate_id:string|null;parent_election_id:string|null;created_at:string};
 type OfficeCandidate={id:string;election_id:string;user_id:string;party_id:string;created_at:string};
 type OfficeBallot={id:string;election_id:string;party_id:string;candidate_id:string;votes:number;submitted_by:string;updated_at:string};
 
@@ -14,10 +15,14 @@ const offices=[
 ] as const;
 
 export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
- const {game,me,teacher,members,parties,partyMandates,setError}=g;
+ const {game,me,teacher,members,parties,setError}=g;
  const [elections,setElections]=useState<Election[]>([]);
  const [candidates,setCandidates]=useState<OfficeCandidate[]>([]);
  const [ballots,setBallots]=useState<OfficeBallot[]>([]);
+ const [personalBallots,setPersonalBallots]=useState<{election_id:string;voter_id:string;party_id:string;candidate_id:string}[]>([]);
+ const [personalMandates,setPersonalMandates]=useState<{user_id:string;party_id:string;base_mandates:number;effective_mandates:number}[]>([]);
+ const [registrations,setRegistrations]=useState<{user_id:string;stage_no:number;institution_key:string}[]>([]);
+ const [procedureVotes,setProcedureVotes]=useState<{id:string;status:string;result_code:string|null}[]>([]);
  const [office,setOffice]=useState<(typeof offices)[number][0]>('gd_chair');
  const [mode,setMode]=useState<'open'|'secret'>('open');
  const [nominee,setNominee]=useState<Record<string,string>>({});
