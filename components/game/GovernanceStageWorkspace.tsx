@@ -64,7 +64,8 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
  const publicChannel=g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры');
  const bodies=BODIES[stage.stage_no];
  const teacher=g.teacher&&!readOnly;
- const viewer=readOnly||g.me?.kind==='observer';
+ const stageLocked=!teacher&&(stage.status!=='open'||!!stage.deadline&&Date.parse(stage.deadline)<=Date.now());
+ const viewer=readOnly||g.me?.kind==='observer'||stageLocked;
  useEffect(()=>{if(!teacher&&tab==='settings')setTab('work')},[teacher,tab]);
  const tabs:{id:Tab;title:string;icon:typeof Route;count?:number}[]=[
   {id:'work',title:'Работа',icon:Landmark},
@@ -91,7 +92,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
 
   <section id={sectionId+'-work'} className="stageOperationsPane" hidden={tab!=='work'} aria-label="Рабочие процедуры">
    <div className="stageOperationsHandoff"><div><small>Основание</small><span>{operation.input}</span></div><ChevronRight size={18} aria-hidden="true"/><div><small>Результат этапа</small><span>{operation.output}</span></div></div>
-   {viewer&&<p className="stageOperationsNotice" role="status">{readOnly?'Просмотр участника. Изменение данных отключено.':'Гостевой просмотр. Рабочие действия доступны назначенным участникам.'}</p>}
+   {viewer&&<p className="stageOperationsNotice" role="status">{readOnly?'Просмотр участника. Изменение данных отключено.':g.me?.kind==='observer'?'Гостевой просмотр. Рабочие действия доступны назначенным участникам.':stageLocked?'Этап завершён или ещё не открыт. Изменение данных недоступно до решения преподавателя.':''}</p>}
    <fieldset className="stageOperationsControls" disabled={viewer}>
     <legend className="srOnly">Действия этапа {stage.stage_no}</legend>
     {bodies&&<div className="stageOperationsRegistration"><InstitutionRegistrationPanel g={g} readOnly={viewer} stageNo={stage.stage_no} initialBody={bodies[0]} allowedBodies={bodies}/></div>}
