@@ -13,7 +13,7 @@ export default function EventChoicePanel({labels,decisions,members,profiles,curr
  return <div className="eventAnswerPanel" role="group" aria-label="Варианты решения">{order.map(i=>{const label=labels[i];
   const voters=decisions.filter(d=>index(d.choice)===i),percent=decisions.length?Math.round(voters.length*100/decisions.length):0;
   const selected=!!currentChoice&&index(currentChoice)===i;
-  const verdict=showLegalFeedback&&Number.isInteger(correctIndex)&&correctIndex!>=0?(i===correctIndex?'correct':selected?'incorrect':''):'';
+  const verdict=showLegalFeedback&&typeof correctIndex==='number'&&Number.isInteger(correctIndex)&&correctIndex>=0?(i===correctIndex?'correct':selected?'incorrect':''):'';
   return <div className={'eventAnswerOption '+(verdict?'is-'+verdict:'')} key={i}>
    <button type="button" className={'eventAnswerChoice '+verdict} disabled={!canAnswer} aria-pressed={selected} onClick={()=>onAnswer('option_'+(i+1))}>
     <span className="eventAnswerHeading"><b>{label}</b>{revealResults&&<strong>{percent}%</strong>}</span>
