@@ -6,6 +6,9 @@ on:
       - 'components/game/Blitz*.tsx'
       - 'components/game/TeacherBlitz.tsx'
       - 'components/game/PoliticalWallView.tsx'
+      - 'app/editorial-news.css'
+      - 'supabase/migrations/*verified_editorial_automatic_news.sql'
+      - 'scripts/editorial-news-*'
       - 'components/ui/BrandIdentity.tsx'
       - 'components/ui/StyledSelect.tsx'
       - 'components/ui/selectMenuPlacement.ts'
@@ -185,6 +188,7 @@ jobs:
       - name: Dependency audit — high and critical
         run: npm audit --audit-level=high
       - run: npm run typecheck
+      - run: npm run news:check
       - run: node scripts/game-roster-check.cjs
       - run: node scripts/user-error-check.cjs
       - run: node scripts/intro-refresh-check.cjs
