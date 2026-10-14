@@ -181,7 +181,8 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const author=selected?members.find(m=>m.user_id===selected.author_id):undefined;
  const subject=selected?FORMAL_SUBJECTS.find(s=>s.key===selected.subject_key):undefined;
  const personalSigner=selected&&['gd_deputy','sf_member','region','ks','vs'].includes(selected.subject_key);
- const signatureHolder=selected?(personalSigner?author:(members.find(m=>subject?.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||author)):undefined;
+ const attributedUser=selected?.metadata?.acting_user_id?members.find(m=>m.user_id===String(selected.metadata.acting_user_id)):undefined;
+ const signatureHolder=selected?(attributedUser||(personalSigner?author:(members.find(m=>subject?.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||author))):undefined;
  const signature=selected?formalSignature(selected.subject_key,signatureHolder?.full_name||author?.full_name||'________________'):null;
 
  function canDeleteDocument(doc:FormalDocument){return !readOnly&&!!me&&(teacher||doc.author_id===me.user_id)}
