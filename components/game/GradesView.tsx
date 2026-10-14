@@ -239,11 +239,20 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
    </div>
   </section>
 
-  {!!me&&me.kind==='student'&&authId===me.user_id&&eligibleDebriefStages.length>0&&<section className="surface gradesDebrief">
-   <div><small>ИТОГОВЫЙ РАЗБОР · КРИТЕРИЙ 3</small><StyledSelect label="Этап для итогового разбора" value={String(targetDebriefStage??'')} onChange={v=>setDebriefStage(Number(v))} options={eligibleDebriefStages.map(stage=>({value:String(stage.stage_no),label:stage.stage_no+'. '+stage.title}))}/><p>Опишите причины, интересы участников, правила и институты, результат и политические последствия. До утверждения итоговой оценки разбор можно обновлять.</p></div>
-   <textarea rows={6} value={debrief} disabled={!canWriteDebrief} onChange={e=>setDebrief(e.target.value)} placeholder={targetAssessment?.status==='final'?'Оценка уже утверждена преподавателем':'Содержательный анализ выбранного этапа…'}/>
-   <div><span>{targetAssessment?.status==='final'?'Итоговая оценка зафиксирована':debrief.trim().length+' знаков'}</span><button className="primary" disabled={!canWriteDebrief||busy||debrief.trim().length<40} onClick={()=>void submitDebrief()}>Сдать / обновить разбор</button></div>
-  </section>}
+  {!!me&&me.kind==='student'&&authId===me.user_id&&eligibleDebriefStages.length>0&&<section className="surface gradesDebrief gradesDebriefRefined">
+    <header className="gradesDebriefHeading">
+     <div><small>КРИТЕРИЙ 3 · ИТОГОВЫЙ РАЗБОР</small><h2>Анализ этапа</h2><p>Зафиксируйте причины решений, интересы участников и их политические последствия.</p></div>
+     <span className="gradesDebriefCriterion">Критерий ВСН · 1 балл</span>
+    </header>
+    <div className="gradesDebriefFields">
+     <div className="gradesDebriefContext">
+      <StyledSelect label="Этап для итогового разбора" value={String(targetDebriefStage??'')} onChange={v=>setDebriefStage(Number(v))} options={eligibleDebriefStages.map(stage=>({value:String(stage.stage_no),label:stage.stage_no+'. '+stage.title}))}/>
+      <div className="gradesDebriefPrompt"><b>Что нужно отразить</b><p>Причины и цели действий, интересы сторон, применённые правила и институты, результат и политические последствия.</p><small>До утверждения итоговой оценки текст можно обновлять.</small></div>
+     </div>
+     <label className="gradesDebriefEditor"><span>Ваш итоговый разбор</span><textarea aria-label="Итоговый разбор этапа" rows={7} value={debrief} disabled={!canWriteDebrief} onChange={e=>setDebrief(e.target.value)} placeholder={targetAssessment?.status==='final'?'Оценка уже утверждена преподавателем':'Изложите содержательный анализ выбранного этапа…'}/></label>
+    </div>
+    <footer className="gradesDebriefFooter"><div aria-live="polite"><strong>{targetAssessment?.status==='final'?'Оценка утверждена':debrief.trim().length+' знаков'}</strong><span>Минимум 40 знаков для отправки</span></div><button type="button" className="primary" disabled={!canWriteDebrief||busy||debrief.trim().length<40} onClick={()=>void submitDebrief()}>{busy?'Сохранение…':'Сдать / обновить разбор'}</button></footer>
+   </section>}
 
   {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={teacher} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>{evidenceRequest.current++;setSelected(null)}} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
  </div>;
@@ -254,14 +263,14 @@ function AssessmentModal(p:any){
  const dialogRef=useDialog(true,close);
  const v=shownScore(a);
  const canSeeEvidence=teacher||(selected.userId===g.me?.user_id&&a?.id?.startsWith('public-')===false);
- return <div className="gradeModalBack" onMouseDown={e=>{if(e.target===e.currentTarget)close()}}><article ref={dialogRef} tabIndex={-1} className="gradeModal" role="dialog" aria-modal="true" aria-labelledby="assessment-title">
-  <header><div><small>ЭТАП {selected.stageNo}</small><h2 id="assessment-title">{student?.full_name||g.me?.full_name}</h2><p>{g.stages.find((s:any)=>s.stage_no===selected.stageNo)?.title}</p></div><IconAction onClick={close} label="Закрыть оценку"/></header>
+ return <div className="gradeModalBack" onMouseDown={e=>{if(e.target===e.currentTarget)close()}}><article ref={dialogRef} tabIndex={-1} className="gradeModal gradeModalRefined" role="dialog" aria-modal="true" aria-labelledby="assessment-title">
+  <header className="gradeModalHeading"><div><small>Этап {selected.stageNo} · Результат участника</small><h2 id="assessment-title">{student?.full_name||g.me?.full_name}</h2><p>{g.stages.find((s:any)=>s.stage_no===selected.stageNo)?.title}</p></div><IconAction onClick={close} label="Закрыть оценку"/></header>
   {!a?<div className="emptyState gradeEmpty">Черновик ещё не создан.{teacher&&<><br/><button className="primary" disabled={busy} onClick={()=>void ensureDraft()}>Рассчитать сейчас</button></>}</div>:<>
-   <div className={'gradeScoreHero '+a.status}><strong>{v}</strong><div><b>{level(v??0)}</b><span>{a.status==='final'?'Итоговая оценка преподавателя':'Автоматический черновик'}</span></div></div>
+   <div className={'gradeScoreHero '+a.status}><strong>{v}</strong><div><span className="gradeScoreCaption">Оценка за этап · из 3 баллов</span><b>{level(v??0)}</b><span>{a.status==='final'?'Итоговая оценка преподавателя':'Автоматический черновик'}</span></div></div>
 <BlitzKnowledgeScore gameId={g.game?.id||''} userId={selected.userId} stageNo={selected.stageNo}/>
 {canSeeEvidence&&<>
    <div className="gradeCriteria"><span className={a.criterion_law?'ok':'miss'}><b>{a.criterion_law?'✓':'○'}</b> Право и правила</span><span className={a.criterion_strategy?'ok':'miss'}><b>{a.criterion_strategy?'✓':'○'}</b> Стратегия и интересы</span><span className={a.criterion_debrief?'ok':'miss'}><b>{a.criterion_debrief?'✓':'○'}</b> Анализ этапа</span></div>
-   <section className="gradeRationale"><small>ИНТЕРПРЕТАЦИЯ ДЕЙСТВИЙ</small><div className="gradeRationaleText">{assessmentRationaleParagraphs(a.public_rationale).map((text:string,i:number)=><p key={i}>{text}</p>)}</div><footer><span>Пересчёт: {when(a.last_auto_at)}</span><span>{assessmentRunLabel(a.last_run_type)}</span><span>Версия {a.revision_count}</span></footer></section>
+   <section className="gradeRationale"><header className="gradeRationaleHeading"><small>ПОЯСНЕНИЕ ОЦЕНКИ</small><h3>Интерпретация действий</h3></header><div className="gradeRationaleText">{assessmentRationaleParagraphs(a.public_rationale).map((text:string,i:number)=><p key={i}>{text}</p>)}</div><footer><span>Пересчёт: {when(a.last_auto_at)}</span><span>{assessmentRunLabel(a.last_run_type)}</span><span>Версия {a.revision_count}</span></footer></section>
    {a.teacher_note&&<section className="gradeTeacherNote"><small>КОММЕНТАРИЙ ПРЕПОДАВАТЕЛЯ</small><p>{a.teacher_note}</p></section>}
 </>}
    {teacher&&<section className="gradeApproval"><StyledSelect label="Итоговый балл" value={editScore===null?'':String(editScore)} onChange={v=>setEditScore(v===''?null:Number(v))} options={[{value:'',label:'Выберите итоговый балл'},...[0,1,2,3].map(n=>({value:String(n),label:n+' · '+level(n)}))]}/><label>Комментарий<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Почему вы подтверждаете или меняете автооценку"/></label><div>{a.status==='final'?<button onClick={()=>void reopen()} disabled={busy}>Переоткрыть оценку</button>:<><button onClick={()=>void recalc()} disabled={busy}>Пересчитать сейчас</button><button className="primary" onClick={()=>void finalize()} disabled={busy||!isFinalScore(editScore)}>Утвердить как итоговую</button></>}</div></section>}

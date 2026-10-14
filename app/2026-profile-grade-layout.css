@@ -1,0 +1,484 @@
+/* ГОС.ID · точечная типографика профиля и оценивания.
+   Не изменяет механику ролей, критерии ВСН или расчёт баллов. */
+
+/* Выбор должности: нативный select надёжно раскрывается в браузере и на телефоне. */
+.profileOffices .officeAssignmentForm.officeAssignmentFormRefined{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+  gap:12px 16px;
+  padding-top:18px;
+  min-width:0;
+}
+.profileOffices .officeAssignmentFormRefined .officeAssignmentPicker{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:12px;
+  min-width:0;
+}
+.profileOffices .officeAssignmentFormRefined label{
+  display:grid;
+  gap:8px;
+  min-width:0;
+  color:#294568;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.4;
+}
+.profileOffices .officeAssignmentFormRefined select,
+.profileOffices .officeAssignmentFormRefined input{
+  display:block;
+  box-sizing:border-box;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  height:51px;
+  padding:0 14px;
+  border:1px solid #cbd9eb;
+  border-radius:12px;
+  background:#fff;
+  color:#173455;
+  font:inherit;
+  font-size:14px;
+  font-weight:600;
+  line-height:1.4;
+  transition:border-color .18s ease,box-shadow .18s ease;
+}
+.profileOffices .officeAssignmentFormRefined select{cursor:pointer;color-scheme:light}
+.profileOffices .officeAssignmentFormRefined select:focus-visible,
+.profileOffices .officeAssignmentFormRefined input:focus-visible{
+  outline:0;
+  border-color:#7197e6;
+  box-shadow:0 0 0 3px #4378e31a;
+}
+.profileOffices .officeAssignmentFormRefined button{
+  min-height:51px;
+  padding:0 18px;
+  white-space:nowrap;
+  border-radius:12px;
+}
+.profileOffices .officeAssignmentFormRefined>small{
+  grid-column:1/-1;
+  display:block;
+  margin:0;
+  color:#7387a2;
+  font-size:12px;
+  line-height:1.6;
+}
+
+/* Итоговый разбор: ясная иерархия, достаточная ширина текстового поля. */
+.gradesPage .gradesDebrief.gradesDebriefRefined{
+  display:block;
+  min-width:0;
+  padding:26px 28px;
+  border:1px solid #dce6f2;
+  border-radius:22px;
+  background:#fff;
+  box-shadow:0 10px 28px rgba(35,71,122,.045);
+  color:#183456;
+}
+.gradesDebriefRefined *, .gradeModalRefined *{box-sizing:border-box;min-width:0}
+.gradesDebriefRefined .gradesDebriefHeading{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:16px;
+  padding:0 0 21px;
+  border-bottom:1px solid #e8edf5;
+  background:transparent;
+}
+.gradesDebriefRefined .gradesDebriefHeading>div{max-width:720px}
+.gradesDebriefRefined .gradesDebriefHeading small,
+.gradeModalRefined .gradeModalHeading small,
+.gradeModalRefined .gradeRationaleHeading small{
+  display:block;
+  font-size:11px;
+  line-height:1.5;
+  font-weight:800;
+  letter-spacing:.09em;
+  color:#7791b3;
+}
+.gradesDebriefRefined .gradesDebriefHeading h2{
+  margin:5px 0 7px;
+  color:#173655;
+  font-size:clamp(20px,2vw,26px);
+  font-weight:800;
+  letter-spacing:-.025em;
+  line-height:1.2;
+}
+.gradesDebriefRefined .gradesDebriefHeading p{
+  margin:0;
+  font-size:14px;
+  font-weight:400;
+  line-height:1.65;
+  color:#607693;
+}
+.gradesDebriefRefined .gradesDebriefCriterion{
+  display:inline-flex;
+  align-items:center;
+  white-space:normal;
+  border:1px solid #d4e2f5;
+  background:#f3f7fd;
+  padding:9px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  color:#416495;
+}
+.gradesDebriefRefined .gradesDebriefFields{
+  display:grid;
+  grid-template-columns:minmax(230px,.8fr) minmax(0,1.7fr);
+  align-items:stretch;
+  gap:20px;
+  padding:23px 0 20px;
+}
+.gradesDebriefRefined .gradesDebriefContext{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-width:0;
+}
+.gradesDebriefRefined .gradesDebriefContext .styledSelect{width:100%}
+.gradesDebriefRefined .gradesDebriefContext .styledSelectLabel{
+  color:#29486d;
+  font-size:13px;
+  font-weight:700;
+}
+.gradesDebriefRefined .gradesDebriefContext .styledSelectTrigger{
+  width:100%;
+  min-height:48px;
+  border-radius:12px;
+}
+.gradesDebriefRefined .gradesDebriefPrompt{
+  padding:16px 18px;
+  border:1px solid #e0e9f5;
+  border-radius:14px;
+  background:#f7faff;
+}
+.gradesDebriefRefined .gradesDebriefPrompt b{
+  display:block;
+  font-size:13px;
+  line-height:1.4;
+  color:#254d7e;
+}
+.gradesDebriefRefined .gradesDebriefPrompt p{
+  margin:7px 0 8px;
+  font-size:13px;
+  line-height:1.7;
+  color:#617995;
+}
+.gradesDebriefRefined .gradesDebriefPrompt small{
+  display:block;
+  font-size:12px;
+  font-weight:500;
+  letter-spacing:normal;
+  line-height:1.55;
+  color:#7287a0;
+}
+.gradesDebriefRefined .gradesDebriefEditor{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  min-width:0;
+  height:100%;
+  color:#29486d;
+  font-weight:700;
+  font-size:13px;
+}
+.gradesDebriefRefined .gradesDebriefEditor textarea{
+  display:block;
+  width:100%;
+  min-width:0;
+  flex:1 1 auto;
+  min-height:213px;
+  resize:vertical;
+  padding:16px 17px;
+  border:1px solid #cfdded;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:none;
+  color:#183655;
+  font-family:inherit;
+  font-size:14px;
+  font-weight:400;
+  line-height:1.7;
+}
+.gradesDebriefRefined .gradesDebriefEditor textarea:focus{
+  border-color:#769be7;
+  outline:0;
+  box-shadow:0 0 0 3px #4779e51a;
+}
+.gradesDebriefRefined .gradesDebriefEditor textarea::placeholder{color:#91a3b8}
+.gradesDebriefRefined .gradesDebriefFooter{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:18px;
+  flex-wrap:wrap;
+  padding-top:17px;
+  border-top:1px solid #e8edf5;
+}
+.gradesDebriefRefined .gradesDebriefFooter>div{display:grid;gap:2px;text-align:right}
+.gradesDebriefRefined .gradesDebriefFooter strong{font-size:13px;color:#40638d}
+.gradesDebriefRefined .gradesDebriefFooter span{font-size:12px;color:#8092a8}
+.gradesDebriefRefined .gradesDebriefFooter button{
+  width:auto;
+  min-width:205px;
+  min-height:47px;
+  padding:11px 18px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:750;
+}
+
+/* Окно оценки: единые шрифты, акценты и ровные карточки. */
+.gradeModal.gradeModalRefined{
+  width:min(960px,calc(100vw - 24px));
+  max-width:min(960px,calc(100vw - 24px));
+  overflow-x:hidden;
+  border:1px solid #dbe5f2;
+  border-radius:24px;
+  background:#fff;
+  box-shadow:0 22px 80px rgba(21,52,91,.17);
+  color:#173655;
+  font-family:'Manrope Variable',Manrope,'Segoe UI',sans-serif;
+  font-size:14px;
+  letter-spacing:normal;
+}
+.gradeModal.gradeModalRefined .gradeModalHeading{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  min-height:0;
+  margin:0;
+  padding:23px 28px;
+  border-bottom:1px solid #e9eef6;
+  background:#fff;
+}
+.gradeModalRefined .gradeModalHeading h2{
+  margin:6px 0;
+  font-size:clamp(22px,2.5vw,29px);
+  line-height:1.2;
+  letter-spacing:-.025em;
+  font-weight:800;
+  color:#183757;
+}
+.gradeModalRefined .gradeModalHeading p{
+  margin:0;
+  font-size:14px;
+  line-height:1.5;
+  font-weight:500;
+  color:#6d819c;
+}
+.gradeModal.gradeModalRefined .gradeScoreHero{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  min-height:98px;
+  margin:22px 28px 12px;
+  padding:18px 20px;
+  border:1px solid #d7e5f5;
+  border-radius:18px;
+  background:linear-gradient(110deg,#f1f6ff 0%,#fafcff 100%);
+  box-shadow:none;
+}
+.gradeModal.gradeModalRefined .gradeScoreHero>strong{
+  display:grid;
+  place-items:center;
+  flex:0 0 76px;
+  width:76px;
+  height:76px;
+  padding:0;
+  margin:0;
+  border:1px solid #e1e9f5;
+  border-radius:16px;
+  background:#fff;
+  color:#24518a;
+  font-variant-numeric:tabular-nums;
+  font-size:34px;
+  line-height:1;
+  font-weight:800;
+}
+.gradeModalRefined .gradeScoreHero>div{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.gradeModalRefined .gradeScoreHero .gradeScoreCaption{
+  color:#7690af;
+  font-size:11px;
+  font-weight:750;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.gradeModalRefined .gradeScoreHero b{font-size:18px;line-height:1.3;font-weight:800;color:#24476f}
+.gradeModalRefined .gradeScoreHero span:not(.gradeScoreCaption){
+  font-size:13px;
+  font-weight:500;
+  color:#607997;
+  letter-spacing:normal;
+  text-transform:none;
+}
+.gradeModal.gradeModalRefined .blitzVsnScore{
+  margin:14px 28px;
+  padding:19px 20px;
+  border:1px solid #dfe8f4;
+  border-radius:17px;
+  background:#f9fbfe;
+  box-shadow:none;
+}
+.gradeModalRefined .blitzVsnScore>header{padding:0;margin:0 0 14px;background:transparent}
+.gradeModalRefined .blitzVsnScore>header>b{font-size:15px;line-height:1.4;color:#234468}
+.gradeModalRefined .blitzVsnScore>header>strong{
+  font-size:18px;
+  font-weight:800;
+  color:#315e99;
+}
+.gradeModalRefined .blitzVsnBreakdown{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.gradeModalRefined .blitzVsnBreakdown>span{
+  display:grid;
+  gap:5px;
+  min-width:0;
+  padding:13px 14px;
+  border:1px solid #e2eaf5;
+  border-radius:12px;
+  background:#fff;
+}
+.gradeModalRefined .blitzVsnBreakdown small{
+  font-size:12px;
+  font-weight:650;
+  line-height:1.4;
+  letter-spacing:normal;
+  text-transform:none;
+  color:#738ba7;
+}
+.gradeModalRefined .blitzVsnBreakdown b{font-size:17px;font-weight:800;color:#234b7c}
+.gradeModalRefined .blitzVsnScore>p{font-size:13px;line-height:1.65;color:#607693}
+.gradeModalRefined .blitzVsnScore>small{
+  color:#8090a8;
+  font-size:12px;
+  line-height:1.6;
+  font-weight:500;
+  letter-spacing:normal;
+  text-transform:none;
+}
+.gradeModal.gradeModalRefined .gradeCriteria{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin:16px 28px;
+  padding:0;
+}
+.gradeModalRefined .gradeCriteria>span{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  min-height:52px;
+  padding:12px 13px;
+  border-radius:13px;
+  border:1px solid #e0e8f3;
+  background:#f8fafd;
+  color:#56718f;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.4;
+}
+.gradeModalRefined .gradeCriteria>span.ok{border-color:#d4e8dc;background:#f1f8f3;color:#35694a}
+.gradeModalRefined .gradeCriteria>span.miss{border-color:#e0e7f2;background:#f8fafd;color:#6f8199}
+.gradeModalRefined .gradeCriteria>span b{
+  display:grid;
+  place-items:center;
+  flex:0 0 25px;
+  width:25px;
+  height:25px;
+  border-radius:50%;
+  border:1px solid currentColor;
+  font-size:14px;
+  font-weight:800;
+}
+.gradeModal.gradeModalRefined .gradeRationale{
+  max-width:calc(100% - 56px);
+  margin:16px 28px;
+  padding:20px 22px;
+  border:1px solid #dfe8f4;
+  border-radius:17px;
+  background:#fff;
+}
+.gradeModalRefined .gradeRationaleHeading{
+  display:block;
+  padding-bottom:11px;
+  border-bottom:1px solid #e9eef5;
+}
+.gradeModalRefined .gradeRationaleHeading h3{
+  margin:5px 0 0;
+  font-size:17px;
+  font-weight:800;
+  line-height:1.4;
+  color:#244467;
+}
+.gradeModalRefined .gradeRationaleText{display:grid;gap:0;margin-top:10px}
+.gradeModal.gradeModalRefined .gradeRationaleText>p{
+  margin:0;
+  padding:10px 0;
+  font-size:14px;
+  line-height:1.72;
+  font-weight:400;
+  color:#4c6581;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+.gradeModal.gradeModalRefined .gradeRationaleText>p+p{border-top:1px solid #eef2f7}
+.gradeModal.gradeModalRefined .gradeRationale footer{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top:12px;
+  padding-top:13px;
+  border-top:1px solid #edf1f6;
+}
+.gradeModal.gradeModalRefined .gradeRationale footer>span{
+  padding:6px 10px;
+  border:1px solid #e7ecf4;
+  border-radius:9px;
+  background:#f5f8fc;
+  color:#7085a0;
+  font-size:11px;
+  line-height:1.5;
+}
+.gradeModalRefined .gradeTeacherNote,
+.gradeModalRefined .gradeApproval,
+.gradeModalRefined .gradeEvidence,
+.gradeModalRefined .gradeRunHistory{
+  border-radius:16px;
+  border-color:#dfe8f4;
+}
+.gradeModalRefined .gradeTeacherNote p,
+.gradeModalRefined .gradeEvidence p{font-size:13px;line-height:1.7;color:#506982}
+@media(max-width:760px){
+ .gradesPage .gradesDebrief.gradesDebriefRefined{padding:18px}
+ .gradesDebriefRefined .gradesDebriefFields{grid-template-columns:minmax(0,1fr);gap:16px;padding:18px 0}
+ .gradesDebriefRefined .gradesDebriefPrompt{padding:13px 15px}
+ .gradesDebriefRefined .gradesDebriefEditor textarea{min-height:200px}
+ .gradesDebriefRefined .gradesDebriefFooter{justify-content:stretch}
+ .gradesDebriefRefined .gradesDebriefFooter>div{text-align:left;flex:1 1 140px}
+ .gradesDebriefRefined .gradesDebriefFooter button{flex:1 1 190px}
+ .gradeModal.gradeModalRefined .gradeModalHeading{padding:18px}
+ .gradeModal.gradeModalRefined .gradeScoreHero,
+ .gradeModal.gradeModalRefined .blitzVsnScore{margin:12px 16px;padding:15px}
+ .gradeModal.gradeModalRefined .gradeCriteria{grid-template-columns:repeat(2,minmax(0,1fr));margin:12px 16px}
+ .gradeModal.gradeModalRefined .gradeRationale{margin:12px 16px;max-width:calc(100% - 32px);padding:16px}
+ .gradeModalRefined .blitzVsnBreakdown{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+ .profileOffices .officeAssignmentForm.officeAssignmentFormRefined{grid-template-columns:minmax(0,1fr)}
+ .profileOffices .officeAssignmentFormRefined button{width:100%}
+ .gradeModal.gradeModalRefined{border-radius:17px}
+ .gradeModal.gradeModalRefined .gradeScoreHero>strong{flex-basis:60px;width:60px;height:60px;font-size:29px}
+ .gradeModal.gradeModalRefined .gradeScoreHero{gap:13px}
+ .gradeModalRefined .gradeCriteria{grid-template-columns:minmax(0,1fr)!important}
+ .gradeModalRefined .gradeModalHeading h2{font-size:21px}
+ .gradesDebriefRefined .gradesDebriefHeading h2{font-size:21px}
+}

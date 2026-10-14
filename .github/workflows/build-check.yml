@@ -235,6 +235,7 @@ jobs:
       - run: npm run design:preview
       - run: node scripts/party-grades-layout-browser-check.cjs
       - run: node scripts/grade-modal-russian-layout-check.cjs
+      - run: node scripts/profile-grades-layout-check.cjs
       - run: node scripts/overview-budget-browser-check.cjs
       - run: node scripts/political-wall-status-browser-check.cjs
       - run: node scripts/npa-toolbar-alignment-browser-check.cjs

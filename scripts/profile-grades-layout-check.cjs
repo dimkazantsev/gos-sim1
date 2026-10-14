@@ -1,0 +1,26 @@
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+const file=p=>fs.readFileSync(p,'utf8');
+const profile=file('components/game/ProfileOffices.tsx');
+const grades=file('components/game/GradesView.tsx');
+const styles=file('app/2026-profile-grade-layout.css');
+const layout=file('app/layout.tsx');
+
+assert(profile.includes('<select aria-label="Роль для назначения"'),'Teacher has an explicit, browser-native office dropdown');
+assert(profile.includes('<option value="__custom__">'),'Custom role is still available');
+assert(profile.includes('disabled={assigned}'),'Already-assigned roles cannot be assigned twice from the picker');
+assert(!profile.includes('<datalist'),'Unreliable datalist no longer used for roles');
+assert(profile.includes("supabase.rpc('appoint_game_office'"),'Existing role RPC is still used');
+assert(profile.includes("supabase.rpc('review_game_office'"),'Existing role review RPC is preserved');
+assert(grades.includes('gradesDebriefRefined')&&grades.includes('gradesDebriefFields'),'Debrief has explicit aligned field layout');
+assert(grades.includes('gradesDebriefEditor')&&grades.includes('gradesDebriefFooter'),'Editor and action footer remain visible');
+assert(grades.includes('debrief.trim().length<40'),'The minimum text length is unchanged');
+assert(grades.includes('targetAssessment?.status===\'final\''),'Approved score remains locked');
+assert(grades.includes('gradeModalRefined')&&grades.includes('gradeRationaleHeading'),'Assessment modal has a clear text hierarchy');
+assert(grades.includes('BlitzKnowledgeScore'),'Knowledge breakdown was retained');
+assert(grades.includes('gradeCriteria'),'Three scoring criteria still display');
+assert(grades.includes('assessmentRationaleParagraphs(a.public_rationale)'),'Existing explanation remains source-derived');
+assert(styles.includes('@media(max-width:760px)')&&styles.includes('@media(max-width:520px)'),'Responsive rules exist');
+assert(styles.includes('.gradesDebriefEditor textarea')&&styles.includes('.gradeModal.gradeModalRefined'),'Styles are scoped to requested components');
+assert(layout.includes("import './2026-profile-grade-layout.css';"),'New styles are loaded');
+console.log('PASS role selection, debrief form, stage results and responsive layout contract');
