@@ -108,6 +108,10 @@ on:
       - 'scripts/overview-live-posts-check.cjs'
       - 'scripts/npa-toolbar-alignment-browser-check.cjs'
       - 'components/GameClient.tsx'
+      - 'components/game/turnCountdown.ts'
+      - 'app/turn-countdown.css'
+      - 'scripts/turn-countdown-check.cjs'
+      - 'scripts/topbar-controls-height-check.cjs'
       - 'app/brand-identity.css'
       - 'app/topbar-controls-alignment.css'
       - 'scripts/topbar-controls-height-check.cjs'
@@ -234,6 +238,7 @@ jobs:
       - run: node scripts/political-wall-status-browser-check.cjs
       - run: node scripts/npa-toolbar-alignment-browser-check.cjs
       - run: node scripts/topbar-controls-height-check.cjs
+      - run: node scripts/turn-countdown-check.cjs
       - run: node scripts/registry-browser-check.cjs
       - run: node scripts/october-flow-browser-check.cjs
       - run: node scripts/october-budget-awards-browser-check.cjs

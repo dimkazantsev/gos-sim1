@@ -1,0 +1,82 @@
+/* Three compact calendar units in the same top-bar timer slot. */
+.simWorkspace .simTop .timerPillDuration{
+ box-sizing:border-box;
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ align-items:center;
+ justify-items:stretch;
+ flex:0 0 148px;
+ width:148px;
+ min-width:148px;
+ max-width:148px;
+ padding:4px 8px;
+ gap:2px;
+ border-color:#d9e4fb;
+ border-radius:12px;
+ background:#f8faff;
+ color:var(--gs-ink);
+ font-family:inherit;
+ font-variant-numeric:tabular-nums;
+ white-space:nowrap;
+}
+.simWorkspace .simTop .timerPillDuration .timerPillUnit{
+ display:grid;
+ min-width:0;
+ height:100%;
+ align-content:center;
+ justify-items:center;
+ gap:2px;
+ line-height:1.1;
+}
+.simWorkspace .simTop .timerPillDuration .timerPillUnit+.timerPillUnit{
+ border-left:1px solid #e3e9f7;
+}
+.simWorkspace .simTop .timerPillDuration .timerPillUnit strong{
+ display:block;
+ font-size:15px;
+ font-weight:800;
+ letter-spacing:-.02em;
+ color:#19366f;
+}
+.simWorkspace .simTop .timerPillDuration .timerPillUnitFull{
+ display:block;
+ font-size:9px;
+ letter-spacing:.03em;
+ font-weight:700;
+ color:#7182a0;
+}
+.simWorkspace .simTop .timerPillDuration .timerPillUnitCompact{display:none}
+@media(max-width:900px){
+ .simWorkspace .simTop .timerPillDuration{
+  flex:0 0 80px;
+  width:80px;
+  min-width:80px;
+  max-width:80px;
+  height:36px;
+  min-height:36px;
+  max-height:36px;
+  padding:3px 3px;
+  gap:0;
+  border-radius:10px;
+ }
+ .simWorkspace .simTop .timerPillDuration .timerPillUnit strong{font-size:12px}
+ .simWorkspace .simTop .timerPillDuration .timerPillUnitFull{display:none}
+ .simWorkspace .simTop .timerPillDuration .timerPillUnitCompact{
+  display:block;
+  font-size:9px;
+  font-weight:700;
+  color:#7182a0;
+ }
+}
+@media(max-width:650px){
+ /* Preserve the old 58px timer footprint in the narrow mobile header. */
+ .simWorkspace .simTop .timerPillDuration{
+  flex:0 0 58px;
+  width:58px;
+  min-width:58px;
+  max-width:58px;
+  padding:2px 1px;
+ }
+ .simWorkspace .simTop .timerPillDuration .timerPillUnit strong{font-size:11px}
+ .simWorkspace .simTop .timerPillDuration .timerPillUnitCompact{font-size:8px}
+}
