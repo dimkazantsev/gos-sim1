@@ -614,6 +614,17 @@
  padding:10px 0;
 }
 .gradeModalRefined .gradeExplanationExtra:last-child{padding-bottom:0}
+.gradeModalRefined .gradeExplanationExtra h5{
+ margin:0 0 2px;
+ color:#315473;
+ font-size:13px;
+ line-height:1.4;
+ font-weight:800;
+}
+.gradeModalRefined .gradeExplanationExtra details{
+ margin-top:8px;
+}
+
 .gradeModalRefined .gradeExplanationExtra .gradeExplanationRaw{
  padding:8px 10px;
  border:1px solid #e5ebf4;
