@@ -4,6 +4,7 @@ export type FormalSubject={
 export type FormalDocType={key:string;label:string;workflow:string;prefix:string};
 
 export const FORMAL_SUBJECTS:FormalSubject[]=[
+ {key:'ksrf',label:'КСРФ',short:'КСРФ',roleHints:['ксрф'],signatureTitle:'Представитель КСРФ',workflow:'generic',defaultType:'other'},
  {key:'president',label:'Президент Российской Федерации',short:'Президент РФ',roleHints:['президент'],signatureTitle:'Президент Российской Федерации',workflow:'president_act',defaultType:'president_decree'},
  {key:'gd_deputy',label:'Депутат Государственной Думы',short:'Депутат ГД',roleHints:['депутат'],signatureTitle:'Депутат Государственной Думы',workflow:'bill',defaultType:'fz_bill'},
  {key:'gd',label:'Государственная Дума Федерального Собрания РФ',short:'Государственная Дума',roleHints:['государственн','дум'],signatureTitle:'Председатель Государственной Думы',workflow:'gd_resolution',defaultType:'gd_resolution'},
