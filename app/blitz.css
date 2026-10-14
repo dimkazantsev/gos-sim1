@@ -224,3 +224,16 @@
 .blitzArchiveModal .blitzPendingQuestion:hover:not(:disabled){color:#315fa8;text-decoration:underline;text-decoration-color:#b9cde9;text-underline-offset:3px}
 .blitzArchiveModal .blitzPendingQuestion:disabled{opacity:1;cursor:default}
 .blitzArchiveModal .blitzPendingQuestion:focus-visible{outline:2px solid #90b3e6;outline-offset:3px;border-radius:5px}
+
+/* Telegram: direct deep-link and manual binding fallback without popup blockers. */
+.telegramLinkSteps{margin-top:14px;padding:14px 16px;border:1px solid #cfdded;border-radius:14px;background:#f6f9fe;color:#294266}
+.telegramLinkSteps p{font-size:13px;line-height:1.55;margin:0 0 10px}
+.telegramLinkChoices{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+.telegramLinkChoices a{display:inline-flex;justify-content:center;align-items:center;text-decoration:none;padding:10px 14px;border-radius:11px;min-height:42px;border:1px solid #c7d7ed;background:white;color:#2c5285;font-weight:700;font-size:13px}
+.telegramLinkChoices a.primary{background:#2b5de5;color:#fff;border-color:#2b5de5}
+.telegramLinkChoices a:hover{filter:brightness(.97)}
+.telegramLinkManual{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0 12px}
+.telegramLinkManual code{display:block;flex:1 1 230px;min-width:0;overflow-wrap:anywhere;padding:11px 12px;border-radius:9px;border:1px solid #d6e2f1;background:white;color:#25456d;font-size:12px}
+.telegramLinkManual button{min-height:41px;white-space:normal}
+.telegramLinkSteps .telegramLinkDisclaimer{font-size:12px;color:#657992}
+@media(max-width:540px){.telegramLinkChoices{display:grid;grid-template-columns:minmax(0,1fr)}.telegramLinkManual{display:grid;grid-template-columns:minmax(0,1fr)}}
