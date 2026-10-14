@@ -79,7 +79,11 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
  async function reset(targetEmail:string){
   if(busy)return;
   setBusy(true);setNotice('');
-  const r=await supabase.auth.resetPasswordForEmail(targetEmail,{redirectTo:window.location.origin+'/auth/update-password'});
+  // GitHub Pages cannot serve the Next.js recovery page: use the same
+  // application origin as the email-verification flow.
+  const origin=(process.env.NEXT_PUBLIC_GAME_API_ORIGIN||
+   (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':window.location.origin)).replace(/[/]$/,'');
+  const r=await supabase.auth.resetPasswordForEmail(targetEmail,{redirectTo:origin+'/auth/update-password'});
   setNotice(r.error?'Не удалось отправить ссылку: '+r.error.message:'Запрос на восстановление отправлен. Если адрес зарегистрирован, студент получит письмо со ссылкой.');
   setBusy(false);
  }
