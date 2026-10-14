@@ -21,7 +21,7 @@ async function check(){
   const frame=page.frameLocator('#preview');
   await page.locator('#screen').selectOption('teacher-stages');
   await frame.locator('.teacherStageManager').waitFor();
-  for(const width of [1600,1440,1280,1100,900,768,430,390,360,320]){
+  for(const width of [1600,1440,1280,1200,1100,900,768,430,390,360,320]){
    await page.locator('#preview').evaluate((el,n)=>{el.style.width=n+'px'},width);
    await frame.locator('.teacherStageManager').evaluate(el=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    const data=await frame.locator('.teacherCommand').evaluate(root=>{
@@ -76,23 +76,27 @@ async function check(){
    const ratio=width>=1121?.75:width>650?.68:.64;
    const cap=width>=1121?820:width>650?700:640;
    const expectedHeight=Math.min(data.frameHeight*ratio,cap);
-   assert(Math.abs(data.list.height-expectedHeight)<=5,
-    'Stage list must occupy its extended viewport height at '+width+'px: '+JSON.stringify({list:data.list,expectedHeight,frameHeight:data.frameHeight}));
+   assert(width>=1121 ? data.list.height>=expectedHeight-5 : Math.abs(data.list.height-expectedHeight)<=5,
+    'Stage list must be at least its responsive target height at '+width+'px: '+JSON.stringify({list:data.list,expectedHeight,frameHeight:data.frameHeight}));
    assert(data.listScrollHeight>data.listClientHeight+5,'Sixteen stages must remain scrollable at '+width+'px');
    const minVisible=width>=1121?5:width>650?6:3;
    assert(data.visibleStageRows>=minVisible,'Expanded list must show additional stages at '+width+'px: '+JSON.stringify({visible:data.visibleStageRows,minVisible}));
-   if(width>=1280){
+   if(width>=1200){
     const gap=data.deadline.top-data.list.bottom;
     assert(gap>=10&&gap<=30,'Deadline must follow list with consistent spacing at '+width+'px: '+JSON.stringify({gap,list:data.list,deadline:data.deadline}));
    }
    assert(data.actions.bottom<=data.policy.top+3,'Stage actions must precede the long policy form at '+width+'px');
-   if(width>=1280){
+   if(width>=1200){
     assert(data.deadline.right<=data.inspector.left+3,'Desktop deadline summary must occupy the left column at '+width+'px');
     assert(Math.abs(data.sidebar.top-data.inspector.top)<=2,
      'Desktop panels must start on the same line at '+width+'px: '+JSON.stringify(data));
     assert(Math.abs(data.sidebar.bottom-data.inspector.bottom)<=2,
      'Stage sidebar and inspector must have aligned bottom edges at '+width+'px: '+JSON.stringify({
       sidebar:data.sidebar,inspector:data.inspector
+     }));
+    assert(Math.abs(data.deadline.bottom-data.policy.bottom)<=2,
+     'ACTUAL deadline-and-consequences and late-rule editor bottoms must align at '+width+'px: '+JSON.stringify({
+      deadline:data.deadline,policy:data.policy,sidebar:data.sidebar,inspector:data.inspector
      }));
     assert(Math.abs(data.manager.bottom-data.inspector.bottom)<=2,
      'Visible outer left panel border and right inspector border must end on the same line at '+width+'px: '+JSON.stringify({

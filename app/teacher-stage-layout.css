@@ -262,3 +262,26 @@
 @media(min-width:1121px){
  .teacherCommand .teacherStageManager{padding-bottom:0}
 }
+
+/* Align the ACTUAL deadline summary and policy editor bottoms.
+   The stage list absorbs extra height so the deadline stays directly below it;
+   the policy editor moves down if the sidebar is the taller column. */
+@media (min-width:1121px) {
+ .simMain:not(.chatOpen) .teacherCommand .teacherStageSidebar {
+  display:flex;
+  flex-direction:column;
+  padding-bottom:19px;
+ }
+ .simMain:not(.chatOpen) .teacherCommand .teacherStageSidebar .teacherStageList {
+  height:min(75dvh,820px);
+  max-height:none;
+  flex:1 1 auto;
+ }
+ .simMain:not(.chatOpen) .teacherCommand .teacherStageInspector {
+  display:flex;
+  flex-direction:column;
+ }
+ .simMain:not(.chatOpen) .teacherCommand .teacherStageInspector>.stagePolicyEditor {
+  margin-top:auto;
+ }
+}
