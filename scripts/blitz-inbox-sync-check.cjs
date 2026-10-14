@@ -4,6 +4,7 @@ const file=p=>fs.readFileSync(p,'utf8');
 const blitz=file('components/game/Blitz.tsx');
 const profile=file('components/game/ProfileView.tsx');
 const game=file('components/GameClient.tsx');
+const events=file('components/game/EventWorkspace.tsx');
 const sql=file('supabase/migrations/20261014170000_blitz_inbox_atomic_open.sql');
 const css=file('app/blitz.css');
 assert(profile.includes('setBlitzOpen(true)')&&profile.includes('open={blitzOpen}'),'Profile shortcut must open modal');
@@ -18,4 +19,5 @@ assert(sql.includes("p_state='pending' and a.answered_at is null")&&sql.includes
 assert(sql.includes("gos_blitz_issue_offline_today"),'Assignments must persist while offline via pg_cron');
 assert(game.includes("key==='profile'?pendingBlitz")&&game.includes("table:'event_collaboration_invites'"),'Profile and event badges respond to updated assignments');
 assert(css.includes('.blitzArchiveBackdrop')&&css.includes('.blitzInlineQuiz'),'Modal and inline layout styles exist');
+assert(game.includes('setPendingEvents(new Set(')&&events.includes('myPendingCases=new Set('),'Event notifications count unique cases, not duplicate invitations');
 console.log('PASS blitz inbox, atomic assignment, offline plan, profile and event badges');
