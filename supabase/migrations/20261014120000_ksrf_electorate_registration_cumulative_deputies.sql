@@ -21,7 +21,7 @@ begin
  v_sql:=pg_get_functiondef('private.vote_member_matches(uuid,uuid,text)'::regprocedure);
  v_old:='p_institution=''ksrf'''||chr(10)||'        and ('||chr(10)||'          exists(';
  if position(v_old in v_sql)=0 then raise exception 'KSRF membership logic changed; review required';end if;
- v_sql:=replace(v_sql,v_old,'p_institution=''ksrf'''||chr(10)||'        and ('||chr(10)||'          gm.kind=''student'' or exists(');
+ v_sql:=replace(v_sql,v_old,'p_institution=''ksrf'''||chr(10)||'        and ('||chr(10)||'          (gm.kind=''student'' and gm.roster_archived_at is null) or exists(');
  execute v_sql;
 
  v_sql:=pg_get_functiondef('private.vote_member_has_office(uuid,uuid,text)'::regprocedure);
