@@ -2,6 +2,7 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const read=p=>fs.readFileSync(p,'utf8');
 const sql=read('supabase/migrations/20261014160000_personal_office_ballots_and_meeting_checkin.sql');
+const offices=read('supabase/migrations/20261014161500_cumulative_ksrf_duma_membership.sql');
 const duma=read('components/game/DumaLeadershipElection.tsx');
 const committees=read('components/game/CommitteeChairElectionPanel.tsx');
 for(const token of [
@@ -14,6 +15,10 @@ for(const token of [
  'public.open_process_vote'
 ]) assert(sql.includes(token),'Missing security/vote contract: '+token);
 assert(sql.indexOf("v_old:='group by c.id,c.user_id,c.party_id'")<sql.indexOf("v_old:='group by c.id,c.user_id';"),'Runoff grouping must be removed before overlapping winner group');
+assert(offices.includes("new.current_round>=4"),'New deputies appear after stage 4 begins');
+assert(offices.includes("'Член КСРФ'"),'Every active student gains KSRF office');
+assert(offices.includes("'Депутат Государственной Думы'"),'GD deputy office is additive');
+assert(offices.includes("on conflict(game_id,user_id,role_title) where status<>'ended' do nothing"),'Office grants are idempotent');
 assert(duma.includes('open_duma_leadership_procedure_vote'),'Approval precedes nomination');
 assert(duma.includes('<InstitutionRegistrationPanel'),'Duma registration visible at election');
 assert(duma.includes('cast_personal_office_ballot'),'Individual vote action exposed');
