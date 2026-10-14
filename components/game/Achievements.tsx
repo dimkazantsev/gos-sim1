@@ -60,6 +60,7 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
  const hiddenEarned=earned.filter(x=>x.hidden);
  const shown=filter==='earned'?earned:visibleItems.filter(x=>!x.hidden||!!x.earned_at);
  const collectionProgress=counts.total?Math.round(earned.length/counts.total*100):0;
+ const catalogCount=counts.open+hiddenEarned.length;
 
  return <section className="awardShelf steamAwards surface">
   <header className="awardShelfHeader">
@@ -79,7 +80,7 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
    </div>
    {showCatalog&&expanded?<nav className="awardShelfTabs" aria-label="Показать награды">
     <button type="button" aria-pressed={filter==='earned'} onClick={()=>setFilter('earned')}>Полученные <b>{earned.length}</b></button>
-    <button type="button" aria-pressed={filter==='open'} onClick={()=>setFilter('open')}>Все награды <b>{counts.open}</b></button>
+    <button type="button" aria-pressed={filter==='open'} onClick={()=>setFilter('open')}>Все награды <b>{catalogCount}</b></button>
    </nav>:!expanded?<span className="awardEarnedCount">{earned.length} получено</span>:null}
   </header>
 
