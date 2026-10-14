@@ -38,6 +38,7 @@ import './profile-first-setup.css';
 import './onboarding-tour.css';
 import './journal-mobile-isolated.css';
 import './political-publishers.css';
+import './editorial-news.css';
 import './2026-stage-party-grades-repair.css';
 import './turn-countdown.css';
 import './entry-qr.css';
