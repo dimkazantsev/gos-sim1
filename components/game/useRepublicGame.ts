@@ -570,28 +570,29 @@ export function useRepublicGame(gameId:string){
  }
  async function loadRecentChatMessages(cid:string){
   if(recentChatRecoveryRunning.current||channelRef.current!==cid)return;
+  // A recovery poll must not invalidate an in-flight initial history load.
+  const ticket:ReadTicket={gameId,epoch:readEpoch.current,versions:{}};
   recentChatRecoveryRunning.current=true;
   try{
-   await readSafely(['messages'],async ticket=>{
-    const latest=messageRowsRef.current.filter(m=>m.channel_id===cid).at(-1)?.created_at;
-    let query=supabase.from('chat_messages').select('*').eq('channel_id',cid)
-     .order('created_at',{ascending:!!latest}).limit(75);
-    if(latest)query=query.gte('created_at',latest);
-    const result=await query;
-    if(!readCurrent(ticket)||channelRef.current!==cid)return;
-    requireSuccessful([result]);
-    if(!result.data?.length)return;
-    // The inclusive cursor prevents timestamp ties from being dropped; do
-    // not re-sign or re-render the existing last message at every poll.
-    const unseen=(result.data as Message[]).filter(m=>!messageRowsRef.current.some(old=>old.id===m.id));
-    if(!unseen.length)return;
-    const rows=await Promise.all(unseen.map(async m=>{
-     if(!m.storage_path)return m;
-     const signed=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);
-     return {...m,url:signed.data?.signedUrl||null};
-    }));
-    if(readCurrent(ticket)&&channelRef.current===cid)setMessages(previous=>mergeChatMessages(previous,rows));
-   });
+   const latest=messageRowsRef.current.filter(m=>m.channel_id===cid).at(-1)?.created_at;
+   let query=supabase.from('chat_messages').select('*').eq('channel_id',cid)
+    .order('created_at',{ascending:!!latest}).limit(75);
+   if(latest)query=query.gte('created_at',latest);
+   const result=await query;
+   if(!readActive(ticket)||channelRef.current!==cid||result.error||!result.data?.length)return;
+   // Inclusive cursor handles identical timestamps. Never re-sign the same
+   // media on every poll, particularly with 30 simultaneous participants.
+   const unseen=(result.data as Message[]).filter(m=>!messageRowsRef.current.some(old=>old.id===m.id));
+   if(!unseen.length)return;
+   const rows=await Promise.all(unseen.map(async m=>{
+    if(!m.storage_path)return m;
+    const signed=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);
+    return {...m,url:signed.data?.signedUrl||null};
+   }));
+   if(readActive(ticket)&&channelRef.current===cid)setMessages(previous=>mergeChatMessages(previous,rows));
+  }catch{
+   // Polling is a best-effort fallback; an intermittent request must not
+   // overwrite the chat with a global game error or break Realtime delivery.
   }finally{recentChatRecoveryRunning.current=false}
  }
  async function refreshChatMediaUrl(messageId:string,storagePath:string):Promise<string|null>{
