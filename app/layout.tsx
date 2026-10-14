@@ -39,6 +39,7 @@ import './onboarding-tour.css';
 import './journal-mobile-isolated.css';
 import './political-publishers.css';
 import './2026-stage-party-grades-repair.css';
+import './turn-countdown.css';
 import './entry-qr.css';
 import type {Metadata} from 'next';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
