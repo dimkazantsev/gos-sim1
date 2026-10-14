@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
-import {useEffect,useRef,useState} from 'react';
-import {Award,CheckCircle2,LockKeyhole,Sparkles,Trophy,X} from 'lucide-react';
+import {useEffect,useId,useRef,useState} from 'react';
+import {Award,CheckCircle2,ChevronDown,LockKeyhole,Sparkles,Trophy,X} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import {publicAchievementPreview} from './achievementPreview';
@@ -25,13 +25,16 @@ function boundedProgress(value:number){
  return Math.max(0,Math.min(100,value));
 }
 
-export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false}:{gameId:string;userId:string;showCatalog?:boolean;previewOnly?:boolean}){
+export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,defaultCollapsed=false}:{gameId:string;userId:string;showCatalog?:boolean;previewOnly?:boolean;defaultCollapsed?:boolean}){
  const [items,setItems]=useState<Achievement[]>([]);
  const [filter,setFilter]=useState<'earned'|'open'>(showCatalog?'open':'earned');
  const [error,setError]=useState('');
+ const [expanded,setExpanded]=useState(!defaultCollapsed);
+ const contentId=useId();
  const [counts,setCounts]=useState({total:100,open:60,hidden:40});
 
  useEffect(()=>{if(!showCatalog)setFilter('earned')},[showCatalog]);
+ useEffect(()=>setExpanded(!defaultCollapsed),[gameId,userId,defaultCollapsed]);
  useEffect(()=>{
   let live=true;
   async function load(){
@@ -64,19 +67,21 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false}:{g
     <small>ДОСТИЖЕНИЯ ГОС.ID</small>
     <h2><Trophy size={24}/> Награды</h2>
     <p>Полученные достижения и доступные условия. Награды не изменяют ВСН.</p>
+    {defaultCollapsed&&<button type="button" className="awardShelfToggle" aria-expanded={expanded} aria-controls={contentId} onClick={()=>setExpanded(open=>!open)}>{expanded?'Свернуть награды':'Показать награды'}<ChevronDown size={16} className={expanded?'is-expanded':''} aria-hidden="true"/></button>}
     {previewOnly&&<p role="status">Демонстрационный профиль: показаны условия открытых наград. Начисления и прогресс появятся у реальных участников.</p>}
    </div>
    <div className="awardCollectionSummary">
     <div><strong>{earned.length}</strong><span>из {counts.total}</span><b>{collectionProgress}%</b></div>
     <div className="awardCollectionTrack" role="progressbar" aria-label="Прогресс коллекции" aria-valuemin={0} aria-valuemax={100} aria-valuenow={collectionProgress}><i style={{width:collectionProgress+'%'}}/></div>
    </div>
-   {showCatalog?<nav className="awardShelfTabs" aria-label="Показать награды">
+   {showCatalog&&expanded?<nav className="awardShelfTabs" aria-label="Показать награды">
     <button type="button" aria-pressed={filter==='earned'} onClick={()=>setFilter('earned')}>Полученные <b>{earned.length}</b></button>
     <button type="button" aria-pressed={filter==='open'} onClick={()=>setFilter('open')}>Все доступные <b>{counts.open}</b></button>
-   </nav>:<span className="awardEarnedCount">{earned.length} получено</span>}
+   </nav>:!showCatalog?<span className="awardEarnedCount">{earned.length} получено</span>:null}
   </header>
 
   {error&&<p className="awardError" role="alert">{error}</p>}
+  <div id={contentId} hidden={!expanded}>
   {!shown.length&&filter==='earned'&&<div className="awardEmpty"><Award size={28}/><div><b>Пока нет открытых достижений</b><span>Они появятся здесь после выполнения игровых условий.</span></div></div>}
 
   <div className="awardGrid">
@@ -104,6 +109,7 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false}:{g
   </div>
 
   {showCatalog&&<div className="awardSecrets"><LockKeyhole size={20}/><div><b>{Math.max(0,counts.hidden-hiddenEarned.length)} секретных достижений скрыто</b><span>Как в Steam: название и условие появятся только после открытия.</span></div></div>}
+  </div>
  </section>;
 }
 
