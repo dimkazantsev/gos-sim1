@@ -19,7 +19,13 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
  const {stages,votes,teacher,nextStage}=g;
  const [selectedStageNo,setSelectedStageNo]=useSavedGameState(g.game?.id,g.me?.user_id,'stage-selected',0,value=>Number.isInteger(value)&&Number(value)>=0&&Number(value)<=16);
  const selected=stages.find(s=>s.stage_no===selectedStageNo)||null;
- function setSelected(stage:Stage|null){setSelectedStageNo(stage?.stage_no||0)}
+ function setSelected(stage:Stage|null,scroll=true){
+  setSelectedStageNo(stage?.stage_no||0);
+  if(scroll&&typeof window!=='undefined')requestAnimationFrame(()=>{
+   document.querySelector?.<HTMLElement>('.simContentFlow')?.scrollTo?.({top:0});
+   window.scrollTo?.({top:0});
+  });
+ }
  const [resetTarget,setResetTarget]=useState<number|'all'|null>(null);
  const [resetConfirmation,setResetConfirmation]=useState('');
  const [resetBusy,setResetBusy]=useState(false);
@@ -29,7 +35,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
  const [stageFilter,setStageFilter]=useState<StageFilter>('all');
  const [phaseFilter,setPhaseFilter]=useState<string|null>(null);
  const [stageSearch,setStageSearch]=useState('');
- useEffect(()=>{if(focusStageNo)setSelected(stages.find(s=>s.stage_no===focusStageNo)||null)},[focusStageNo]);
+ useEffect(()=>{if(focusStageNo)setSelected(stages.find(s=>s.stage_no===focusStageNo)||null,false)},[focusStageNo]);
  const detail=selected?STAGE_DETAILS[selected.stage_no]:null;
  const current=stages.find(s=>s.status==='open')||stages.find(s=>s.status!=='completed')||stages.at(-1);
 
