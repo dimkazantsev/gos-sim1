@@ -243,13 +243,13 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
 
   {!!me&&me.kind==='student'&&authId===me.user_id&&eligibleDebriefStages.length>0&&<section className="surface gradesDebrief gradesDebriefRefined">
     <header className="gradesDebriefHeading">
-     <div><small>КРИТЕРИЙ 3 · ИТОГОВЫЙ РАЗБОР</small><h2>Анализ этапа</h2><p>Зафиксируйте причины решений, интересы участников и их политические последствия.</p></div>
+     <div><small>КРИТЕРИЙ 3 · ИТОГОВЫЙ РАЗБОР</small><h2>Анализ этапа</h2><p>Напишите разбор для автоматического анализа системой ИИ. Более подробную дискуссию можно вести в чате «Вне игры».</p></div>
      <span className="gradesDebriefCriterion">Критерий ВСН · 1 балл</span>
     </header>
     <div className="gradesDebriefFields">
      <div className="gradesDebriefContext">
       <StyledSelect label="Этап для итогового разбора" value={String(targetDebriefStage??'')} onChange={v=>setDebriefStage(Number(v))} options={eligibleDebriefStages.map(stage=>({value:String(stage.stage_no),label:stage.stage_no+'. '+stage.title}))}/>
-      <div className="gradesDebriefPrompt"><b>Что нужно отразить</b><p>Причины и цели действий, интересы сторон, применённые правила и институты, результат и политические последствия.</p><small>До утверждения итоговой оценки текст можно обновлять.</small></div>
+      <div className="gradesDebriefPrompt"><b>Кому предназначен разбор</b><p>Этот текст вы отправляете системе ИИ для предварительного анализа этапа. Укажите причины и цели действий, интересы сторон, применённые правила, результаты и политические последствия.</p><p>В чате «Вне игры» можно подробнее обсуждать закономерности, аргументы и альтернативные решения. Преподаватель может учесть содержательное обсуждение и повысить итоговую оценку.</p><small>До утверждения итоговой оценки преподавателем разбор можно обновлять.</small></div>
      </div>
      <label className="gradesDebriefEditor"><span>Ваш итоговый разбор</span><textarea aria-label="Итоговый разбор этапа" rows={7} value={debrief} disabled={!canWriteDebrief} onChange={e=>setDebrief(e.target.value)} placeholder={targetAssessment?.status==='final'?'Оценка уже утверждена преподавателем':'Изложите содержательный анализ выбранного этапа…'}/></label>
     </div>

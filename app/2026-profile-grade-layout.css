@@ -126,7 +126,7 @@
   font-weight:700;
   color:#416495;
 }
-.gradesDebriefRefined .gradesDebriefFields{
+.gradesDebrief.gradesDebriefRefined > .gradesDebriefFields{
   display:grid;
   grid-template-columns:minmax(230px,.8fr) minmax(0,1.7fr);
   align-items:stretch;
@@ -138,19 +138,34 @@
   flex-direction:column;
   gap:14px;
   min-width:0;
+  height:100%;
 }
-.gradesDebriefRefined .gradesDebriefContext .styledSelect{width:100%}
+.gradesDebriefRefined .gradesDebriefContext .styledSelect{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  width:100%;
+}
 .gradesDebriefRefined .gradesDebriefContext .styledSelectLabel{
+  display:flex;
+  align-items:center;
+  min-height:20px;
+  margin:0;
   color:#29486d;
   font-size:13px;
   font-weight:700;
+  line-height:20px;
 }
 .gradesDebriefRefined .gradesDebriefContext .styledSelectTrigger{
   width:100%;
   min-height:48px;
+  margin:0;
   border-radius:12px;
 }
 .gradesDebriefRefined .gradesDebriefPrompt{
+  display:flex;
+  flex-direction:column;
+  flex:1 1 auto;
   padding:16px 18px;
   border:1px solid #e0e9f5;
   border-radius:14px;
@@ -170,6 +185,7 @@
 }
 .gradesDebriefRefined .gradesDebriefPrompt small{
   display:block;
+  margin-top:auto;
   font-size:12px;
   font-weight:500;
   letter-spacing:normal;
@@ -185,6 +201,12 @@
   color:#29486d;
   font-weight:700;
   font-size:13px;
+}
+.gradesDebriefRefined .gradesDebriefEditor>span{
+  display:flex;
+  align-items:center;
+  min-height:20px;
+  line-height:20px;
 }
 .gradesDebriefRefined .gradesDebriefEditor textarea{
   display:block;
@@ -457,9 +479,13 @@
 }
 .gradeModalRefined .gradeTeacherNote p,
 .gradeModalRefined .gradeEvidence p{font-size:13px;line-height:1.7;color:#506982}
+@media(max-width:940px){
+ /* The guidance and editor need full-width rows before tablet columns become cramped. */
+ .gradesDebrief.gradesDebriefRefined > .gradesDebriefFields{grid-template-columns:minmax(0,1fr)}
+}
 @media(max-width:760px){
  .gradesPage .gradesDebrief.gradesDebriefRefined{padding:18px}
- .gradesDebriefRefined .gradesDebriefFields{grid-template-columns:minmax(0,1fr);gap:16px;padding:18px 0}
+ .gradesDebrief.gradesDebriefRefined > .gradesDebriefFields{grid-template-columns:minmax(0,1fr);gap:16px;padding:18px 0}
  .gradesDebriefRefined .gradesDebriefPrompt{padding:13px 15px}
  .gradesDebriefRefined .gradesDebriefEditor textarea{min-height:200px}
  .gradesDebriefRefined .gradesDebriefFooter{justify-content:stretch}
