@@ -124,19 +124,19 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
  useEffect(()=>{setRows([]);setOffset(0);setHasMore(false);if(open)void refresh();return()=>{request.current++}},[gameId,userId,filter,open,refresh]);
  useEffect(()=>{
   if(!open)return;
-  const update=()=>void refresh();
+  const update=()=>{if(!active)void refresh()};
   window.addEventListener('blitz:updated',update);
-  const timer=window.setInterval(()=>{if(document.visibilityState==='visible')void refresh()},20000);
+  const timer=window.setInterval(()=>{if(!active&&document.visibilityState==='visible')void refresh()},20000);
   return()=>{window.removeEventListener('blitz:updated',update);window.clearInterval(timer)};
- },[open,refresh]);
+ },[open,refresh,active?.id]);
  if(!open||typeof document==='undefined')return null;
  return createPortal(<div className="blitzArchiveBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)onClose()}}>
   <section ref={dialogRef} tabIndex={-1} className="surface blitzArchive blitzArchiveModal" role="dialog" aria-modal="true" aria-label="История блиц-вопросов">
    <header className="blitzArchiveHeader"><div><small>ПРАВОВЫЕ ЗНАНИЯ</small><h2>Блиц-вопросы</h2><p>Новые вопросы сохраняются, даже когда вы не в игре. При открытии начинается отсчёт 20 секунд.</p></div>
     <button type="button" onClick={onClose} className="blitzArchiveClose" aria-label="Закрыть блиц-вопросы"><X size={19}/></button></header>
    <div className="blitzArchiveTabs" role="tablist" aria-label="Статус блиц-вопросов">
-    <button type="button" role="tab" aria-selected={filter==='pending'} className={filter==='pending'?'active':''} onClick={()=>setFilter('pending')}>Ответ не дан <span>{counts.pending}{counts.scheduled?' +'+counts.scheduled+' позже':''}</span></button>
-    <button type="button" role="tab" aria-selected={filter==='answered'} className={filter==='answered'?'active':''} onClick={()=>setFilter('answered')}>Ответ дан <span>{counts.answered}</span></button>
+    <button type="button" role="tab" aria-selected={filter==='pending'} className={filter==='pending'?'active':''} onClick={()=>{if(!active)setFilter('pending')}}>Ответ не дан <span>{counts.pending}{counts.scheduled?' +'+counts.scheduled+' позже':''}</span></button>
+    <button type="button" role="tab" aria-selected={filter==='answered'} className={filter==='answered'?'active':''} onClick={()=>{if(!active)setFilter('answered')}}>Ответ дан <span>{counts.answered}</span></button>
     <button type="button" onClick={()=>void refresh()} disabled={loading} className="blitzArchiveRefresh" aria-label="Обновить историю"><RefreshCw size={17}/></button>
    </div>
    {error&&<p role="alert">{error}</p>}
