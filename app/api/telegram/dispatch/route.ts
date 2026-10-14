@@ -93,6 +93,29 @@ async function dispatchOutbox(gameId?:string){
    }
    if(!visible){await dismiss('Mention source no longer visible');continue}
   }
+  if(job.category==='party_invite'){
+   const {data:invite,error:inviteError}=await config.db.from('party_invitations')
+    .select('id,status,invited_user_id').eq('id',job.source_id)
+    .eq('game_id',job.game_id).maybeSingle();
+   if(inviteError){console.error('Telegram party invitation lookup failed',inviteError.code);continue}
+   if(!invite||invite.status!=='pending'||invite.invited_user_id!==job.user_id){await dismiss('Invitation no longer pending');continue}
+  }
+  if(job.category==='party_registration'){
+   const {data:party,error:partyError}=await config.db.from('game_parties')
+    .select('id,registration_status').eq('id',job.source_id)
+    .eq('game_id',job.game_id).maybeSingle();
+   if(partyError){console.error('Telegram party registration lookup failed',partyError.code);continue}
+   if(!party||party.registration_status!=='submitted'){await dismiss('Party registration no longer pending');continue}
+  }
+  if(job.category==='party_document'||job.category==='party_review'){
+   const {data:doc,error:docError}=await config.db.from('party_documents')
+    .select('id,status').eq('id',job.source_id)
+    .eq('game_id',job.game_id).maybeSingle();
+   if(docError){console.error('Telegram party document lookup failed',docError.code);continue}
+   if(!doc||job.category==='party_review'&&!['accepted','revision'].includes(doc.status)){
+    await dismiss('Party document no longer available');continue;
+   }
+  }
   if(job.category==='document'){
    const {data:document,error:docError}=await config.db.from('formal_documents')
     .select('id').eq('id',job.source_id).eq('game_id',job.game_id).maybeSingle();
