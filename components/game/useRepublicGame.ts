@@ -575,7 +575,7 @@ export function useRepublicGame(gameId:string){
    return true;
   }catch(e){setChatPins(original);setError(e instanceof Error?e.message:'Не удалось изменить закрепление');return false}
  }
- async function refresh(){await Promise.all([loadAll(false),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
+ async function refresh(){await loadAll(false);await Promise.all([loadCoreSections(),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
 
  async function logActivity(eventType:string,label:string,viewKey?:string,payload:Record<string,unknown>={}){
   const uid=me?.user_id;if(!uid||authUser.current!==uid)return;
