@@ -4,6 +4,7 @@ import {createPortal} from 'react-dom';
 import {ArrowUpRight,Compass,X} from 'lucide-react';
 import type {View} from './types';
 import styles from './GuidedTour.module.css';
+import {placeTourCard,type TourRect} from './tourPlacement';
 
 export type TourTarget=View|'chat';
 export type TourStep={target:TourTarget;title:string;body:string;hint:string};
@@ -24,34 +25,56 @@ const TEACHER_STEP:TourStep={target:'teacher',title:'Управление Рес
 export function getTourSteps(teacher:boolean):TourStep[]{
  return teacher?[...PARTICIPANT_STEPS.slice(0,-1),TEACHER_STEP,PARTICIPANT_STEPS[PARTICIPANT_STEPS.length-1]]:PARTICIPANT_STEPS;
 }
-type Rect={left:number;top:number;width:number;height:number;right:number;bottom:number};
-function visible(button:HTMLElement){const box=button.getBoundingClientRect(),style=getComputedStyle(button);return style.display!=='none'&&style.visibility!=='hidden'&&box.width>0&&box.height>0}
+type Rect=TourRect;
+function visible(button:HTMLElement){
+ const r=button.getBoundingClientRect(),style=getComputedStyle(button);
+ return style.display!=='none'&&style.visibility!=='hidden'&&r.width>0&&r.height>0;
+}
 function targetElement(target:TourTarget){
- const mobile=window.matchMedia('(max-width:1099px)').matches;
- const selectors=target==='chat'?(mobile?['.mobileDockChat','.topChatButton']:['.topChatButton','.mobileDockChat']):mobile?
-  [`.mobileDock [data-tour-view="${target}"]`,`.focusNav [data-tour-view="${target}"]`]:
-  [`.focusNav [data-tour-view="${target}"]`,`.mobileDock [data-tour-view="${target}"]`];
+ const mobile=window.matchMedia('(max-width:900px)').matches;
+ const selectors=target==='chat'?
+  (mobile?['.mobileMoreSheet [data-tour-view="chat"]','.mobileDockChat','.topChatButton']:['.topChatButton','.mobileDockChat']):
+  (mobile?[`.mobileMoreSheet [data-tour-view="${target}"]`,`.mobileDock [data-tour-view="${target}"]`,`.focusNav [data-tour-view="${target}"]`]:
+   [`.focusNav [data-tour-view="${target}"]`,`.mobileDock [data-tour-view="${target}"]`]);
  for(const selector of selectors){const found=[...document.querySelectorAll<HTMLElement>(selector)].find(visible);if(found)return found}
  return null;
 }
+function clippedRect(el:HTMLElement):Rect|null{
+ const r=el.getBoundingClientRect();
+ const clip=el.closest<HTMLElement>('.mobileDockScroll,.mobileDockPinned,.mobileAllGrid');
+ const c=clip?.getBoundingClientRect();
+ const left=Math.max(0,r.left,c?.left??0),right=Math.min(window.innerWidth,r.right,c?.right??window.innerWidth);
+ const top=Math.max(0,r.top,c?.top??0),bottom=Math.min(window.innerHeight,r.bottom,c?.bottom??window.innerHeight);
+ if(right-left<8||bottom-top<8)return null;
+ return {left,top,right,bottom,width:right-left,height:bottom-top};
+}
 export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:TourStep;index:number;total:number;onSkip:()=>void;onFallback:(target:TourTarget)=>void}){
  const [rect,setRect]=useState<Rect|null>(null);
+ const [viewport,setViewport]=useState(()=>({width:typeof window==='undefined'?1024:window.innerWidth,height:typeof window==='undefined'?768:window.innerHeight}));
  const cardRef=useRef<HTMLDivElement>(null);
  const [cardSize,setCardSize]=useState({width:400,height:240});
  useEffect(()=>{
   let timer:number|undefined,frame:number|undefined;
-  function update(){const el=targetElement(step.target);if(!el){setRect(null);return}const r=el.getBoundingClientRect();setRect({left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height})}
+  function update(){
+   const el=targetElement(step.target);
+   setRect(el?clippedRect(el):null);
+   setViewport(previous=>previous.width===window.innerWidth&&previous.height===window.innerHeight?previous:{width:window.innerWidth,height:window.innerHeight});
+  }
   const el=targetElement(step.target);
-  el?.scrollIntoView({block:'nearest',inline:'nearest',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  const dockScroller=el?.closest<HTMLElement>('.mobileDockScroll,.mobileDockPinned');
+  if(el&&dockScroller){
+   const r=el.getBoundingClientRect(),s=dockScroller.getBoundingClientRect();
+   dockScroller.scrollBy({left:(r.left+r.right-s.left-s.right)/2,behavior:'auto'});
+  }else el?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'});
   frame=requestAnimationFrame(update);
-  timer=window.setTimeout(update,420);
+  timer=window.setTimeout(update,100);
   window.addEventListener('resize',update);
   window.addEventListener('scroll',update,true);
   return()=>{if(frame)cancelAnimationFrame(frame);if(timer)clearTimeout(timer);window.removeEventListener('resize',update);window.removeEventListener('scroll',update,true)};
  },[step.target,index]);
  useEffect(()=>{
   const el=cardRef.current;if(!el)return;
-  const observer=new ResizeObserver(()=>setCardSize({width:el.offsetWidth,height:el.offsetHeight}));
+  const observer=new ResizeObserver(()=>setCardSize(previous=>previous.width===el.offsetWidth&&previous.height===el.offsetHeight?previous:{width:el.offsetWidth,height:el.offsetHeight}));
   observer.observe(el);
   return()=>observer.disconnect();
  },[index]);
@@ -60,15 +83,14 @@ export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:To
   window.addEventListener('keydown',handle);return()=>window.removeEventListener('keydown',handle);
  },[onSkip]);
  if(typeof document==='undefined')return null;
- const w=window.innerWidth,h=window.innerHeight,p=9;
+ const w=viewport.width,h=viewport.height,p=9;
  const spotlight=rect?{left:Math.max(0,rect.left-p),top:Math.max(0,rect.top-p),right:Math.min(w,rect.right+p),bottom:Math.min(h,rect.bottom+p)}:null;
- const cardWidth=Math.min(420,w-24);
- const below=rect?rect.bottom+cardSize.height+24<h: true;
- const cardTop=rect?Math.max(12,Math.min(h-cardSize.height-12,below?rect.bottom+24:rect.top-cardSize.height-24)):Math.max(12,(h-cardSize.height)/2);
- const cardLeft=rect?Math.max(12,Math.min(w-cardWidth-12,rect.left+rect.width/2-cardWidth/2)):Math.max(12,(w-cardWidth)/2);
- const startX=cardLeft+cardWidth/2,startY=below?cardTop:cardTop+cardSize.height;
- const endX=rect?Math.min(w,Math.max(0,rect.left+rect.width/2)):startX;
- const endY=rect?(below?rect.bottom+5:rect.top-5):startY;
+ const placement=placeTourCard(rect,viewport,cardSize);
+ const shownHeight=Math.min(cardSize.height,placement.maxHeight);
+ const startX=placement.side==='right'?placement.left:placement.side==='left'?placement.left+placement.width:placement.left+placement.width/2;
+ const startY=placement.side==='above'?placement.top+shownHeight:placement.side==='below'?placement.top:placement.top+shownHeight/2;
+ const endX=rect?(placement.side==='right'?rect.right+5:placement.side==='left'?rect.left-5:rect.left+rect.width/2):startX;
+ const endY=rect?(placement.side==='above'?rect.top-5:placement.side==='below'?rect.bottom+5:rect.top+rect.height/2):startY;
  return createPortal(<div className={styles.root} aria-label="Обучение навигации">
   {spotlight?<div className={styles.shades} aria-hidden="true">
    <div style={{left:0,top:0,width:w,height:spotlight.top}}/>
@@ -78,7 +100,7 @@ export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:To
   </div>:<div className={styles.fullShade}/>}
   {spotlight&&<div className={styles.ring} aria-hidden="true" style={{left:spotlight.left,top:spotlight.top,width:spotlight.right-spotlight.left,height:spotlight.bottom-spotlight.top}}/>}
   {rect&&<svg className={styles.connector} aria-hidden="true" width={w} height={h} viewBox={`0 0 ${w} ${h}`}><defs><marker id="tour-arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1 1 L7 4.5 L1 8" fill="none" stroke="#82d5ff" strokeWidth="1.8" strokeLinecap="round"/></marker></defs><path d={`M ${startX} ${startY} Q ${(startX+endX)/2} ${(startY+endY)/2} ${endX} ${endY}`} fill="none" stroke="#82d5ff" strokeWidth="2" strokeLinecap="round" strokeDasharray="5 5" markerEnd="url(#tour-arrowhead)"/></svg>}
-  <div ref={cardRef} className={styles.card} style={{left:cardLeft,top:cardTop,width:cardWidth}} role="status" aria-live="polite">
+  <div ref={cardRef} className={styles.card} style={{left:placement.left,top:placement.top,width:placement.width,maxHeight:placement.maxHeight}} role="status" aria-live="polite">
    <div className={styles.header}><span><Compass size={16} aria-hidden="true"/> ГОС.ID · ОБУЧЕНИЕ</span><button type="button" onClick={onSkip} aria-label="Пропустить обучение" title="Пропустить обучение"><X size={19}/></button></div>
    <div className={styles.progressLabel}>Шаг {index+1} из {total}</div>
    <div className={styles.progress}><span style={{width:`${(index+1)/total*100}%`}}/></div>

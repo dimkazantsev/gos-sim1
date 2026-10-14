@@ -626,7 +626,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
    <section ref={mobileDialogRef} tabIndex={-1} className="mobileMoreSheet" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
     <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><IconAction onClick={()=>setMobileMenuOpen(false)} label="Закрыть меню"/></header>
-    <div className="mobileAllGrid">{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} data-tour-view={k} onClick={()=>navigate(k,undefined,false,true)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" className={chatOpen?'active':''} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);setChatOpen(true)}}><span className="mobileMenuChatIcon"><MessageCircle aria-hidden="true"/>{g.chatUnreadCount>0&&<i className={g.chatMentionCount>0?'hasMention':''}>{g.chatUnreadCount>99?'99+':g.chatUnreadCount}</i>}</span><span>Чат</span></button></div>
+    <div className="mobileAllGrid">{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} data-tour-view={k} onClick={()=>navigate(k,undefined,false,true)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" data-tour-view="chat" className={chatOpen?'active':''} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);toggleTourChat()}}><span className="mobileMenuChatIcon"><MessageCircle aria-hidden="true"/>{g.chatUnreadCount>0&&<i className={g.chatMentionCount>0?'hasMention':''}>{g.chatUnreadCount>99?'99+':g.chatUnreadCount}</i>}</span><span>Чат</span></button></div>
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
@@ -651,7 +651,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      <span className="tourChoiceNote">Экскурсия не меняет игровые данные, оценки и решения.</span>
     </section>
    </div>}
-  {tourMode==='tour'&&!introOpen&&!previewMode&&<GuidedTour step={getTourSteps(!!teacher)[tourIndex]} index={tourIndex} total={getTourSteps(!!teacher).length} onSkip={skipTour} onFallback={(target:TourTarget)=>target==='chat'?toggleTourChat():navigate(target,undefined,true,true)}/>}
+  {tourMode==='tour'&&!introOpen&&!previewMode&&<GuidedTour key={mobileMenuOpen?'all-sections':'navigation'} step={getTourSteps(!!teacher)[tourIndex]} index={tourIndex} total={getTourSteps(!!teacher).length} onSkip={skipTour} onFallback={(target:TourTarget)=>target==='chat'?toggleTourChat():navigate(target,undefined,true,true)}/>}
   {showSetupWelcome&&setupStatus&&<div className="profileSetupBackdrop">
     <section ref={setupDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="profile-setup-title" aria-describedby="profile-setup-description" className="profileSetupWelcome">
      <div className="profileSetupWelcomeIcon"><UserRound size={26} aria-hidden="true"/></div>

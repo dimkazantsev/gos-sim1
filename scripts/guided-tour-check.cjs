@@ -32,4 +32,41 @@ assert(/\.header\{[^}]*padding-right:48px/.test(style),'Title must reserve room 
 assert(/@media\(max-width:600px\)[^\n]*\.header>button\{top:17px;right:18px\}/.test(style),'Mobile close button must match compact card padding');
 assert(layout.includes("import './onboarding-tour.css'"),'Initial tutorial choice stylesheet must load');
 assert(client.includes("tourMode==='idle'}"),'Time-sensitive blitz must not obscure the guided tour');
+
+assert(tour.includes('clippedRect(el)')&&tour.includes("'.mobileDockScroll,.mobileDockPinned,.mobileAllGrid'"),'Targets outside horizontally scrolling mobile navigation must not count as visible');
+assert(tour.includes('dockScroller.scrollBy({left:'),'Guided steps must reveal offscreen dock controls before spotlight placement');
+assert(tour.includes('placeTourCard(rect,viewport,cardSize)'),'Tour must position cards from target and viewport geometry');
+assert(client.includes("key={mobileMenuOpen?'all-sections':'navigation'}"),'Mobile all-sections sheet must refresh the active spotlight');
+assert(client.includes('data-tour-view="chat"')&&client.includes('toggleTourChat()'),'Chat in the mobile menu must advance the tour');
+const ts=require('typescript'),vm=require('node:vm');
+const compiled=ts.transpileModule(read('components/game/tourPlacement.ts'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
+const geometryModule={exports:{}};
+vm.runInNewContext(compiled,{module:geometryModule,exports:geometryModule.exports});
+const {placeTourCard}=geometryModule.exports;
+assert.equal(typeof placeTourCard,'function');
+function checkPlacement(viewport,target,expectedSide){
+ const card=placeTourCard(target,viewport,{width:420,height:420});
+ assert.equal(card.side,expectedSide,JSON.stringify({viewport,target,card}));
+ const cardHeight=Math.min(420,card.maxHeight);
+ assert(card.left>=0&&card.left+card.width<=viewport.width+.01,'Card overflows viewport width');
+ assert(card.top>=0&&card.top+cardHeight<=viewport.height+.01,'Card overflows viewport height');
+ if(target){
+  const overlapWidth=Math.min(card.left+card.width,target.right)-Math.max(card.left,target.left);
+  const overlapHeight=Math.min(card.top+cardHeight,target.bottom)-Math.max(card.top,target.top);
+  assert(overlapWidth<=0||overlapHeight<=0,'Card obscures active navigation target: '+JSON.stringify({viewport,target,card}));
+ }
+}
+const box=(left,top,width,height)=>({left,top,right:left+width,bottom:top+height,width,height});
+checkPlacement({width:1440,height:900},box(20,200,270,46),'right');
+checkPlacement({width:671,height:645},box(15,475,310,46),'right');
+for(const [width,height] of [[390,844],[430,932],[360,800]]){
+ // A horizontally scrolled dock can expose targets at either edge.
+ for(const left of [6,Math.round(width/2)-28,width-62])
+  checkPlacement({width,height},box(left,height-62,56,50),'above');
+ // All-sections dialog targets are above the dock and require a bounded panel.
+ checkPlacement({width,height},box(18,150,102,70),'below');
+}
+checkPlacement({width:360,height:320},box(15,155,56,48),'above');
+checkPlacement({width:390,height:844},null,'center');
+
 console.log('PASS guided route, comic choice, real navigation, replay, mobile, skip, profile gate and nonintrusive overlay');
