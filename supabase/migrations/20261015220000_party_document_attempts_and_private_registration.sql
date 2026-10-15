@@ -97,7 +97,7 @@ CREATE POLICY party_documents_read ON public.party_documents FOR SELECT TO authe
 -- policies for unregistered party documents; does not affect logos or other media.
 DROP POLICY IF EXISTS game_assets_party_documents_private ON storage.objects;
 CREATE POLICY game_assets_party_documents_private ON storage.objects
- AS RESTRICTIVE FOR SELECT TO authenticated USING (
+ AS RESTRICTIVE FOR SELECT TO public USING (
  bucket_id<>'game-assets'
  OR name NOT LIKE '%/parties/%/docs/%'
  OR private.is_game_teacher((split_part(name,'/',1))::uuid)
