@@ -15,7 +15,7 @@ assert.match(sql,/party\.registration_status='registered'/,'Backfill requires co
 assert.match(sql,/f\.doc_type='party_certificate'/,'Existing certificate mandatory for backfill');
 assert.match(sql,/d\.version_no=private\.latest_party_document_version/,'Only latest accepted party documents are linked');
 assert.match(sql,/bucket_id='game-assets' and split_part\(storage\.objects\.name,'\/',2\)='news'/,'News access cannot open other documents');
-assert.match(sql,/gp\.id=\(split_part\(storage\.objects\.name,'\/',3\)\)::uuid/,'Read policy uses Storage path, not the game party name');
+assert.match(sql,/where p\.id=\(split_part\(storage\.objects\.name,'\/',3\)\)::uuid/,'Read policy uses the Storage object path, not the game party name');
 assert.match(sql,/d\.status='accepted' and d\.doc_kind in \('charter','program','symbol','congress_minutes'\)/,'Public files must be accepted');
 assert.match(sql,/private\.is_game_member\(p\.game_id\)/,'Storage read scoped to game membership');
 assert.match(hook,/post\.source_key\?\.startsWith\('media-party-registration:'\)/,
