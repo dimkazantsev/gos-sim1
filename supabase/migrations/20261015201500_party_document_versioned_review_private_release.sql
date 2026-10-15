@@ -221,28 +221,4 @@ CREATE POLICY party_pending_justice_post_visibility ON public.political_posts
    AND private.party_registration_certified(p.id))
 );
 
--- Not even a summary publication about review results should expose dossiers
--- during examination; only final registration should create a public record.
-CREATE OR REPLACE FUNCTION private.hide_pending_party_justice_post()
-RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $body$
-BEGIN
- IF NEW.actor_key='minjust' AND NEW.internal_view='parties'
- AND NEW.context->>'party_id' IS NOT NULL
- AND NOT EXISTS(SELECT 1 FROM public.game_parties p WHERE p.id::text=NEW.context->>'party_id'
- AND p.registration_status='registered'
- AND EXISTS(SELECT 1 FROM public.formal_documents f WHERE f.game_id=p.game_id
-   AND f.doc_type='party_certificate' AND f.metadata->>'party_id'=p.id::text)) THEN
-    NEW.deleted_at:=clock_timestamp();
- END IF;
- RETURN NEW;
-END $body$;
-REVOKE ALL ON FUNCTION private.hide_pending_party_justice_post() FROM PUBLIC,anon,authenticated;
-DROP TRIGGER IF EXISTS hide_pending_party_justice_post ON public.political_posts;
-CREATE TRIGGER hide_pending_party_justice_post BEFORE INSERT ON public.political_posts
- FOR EACH ROW EXECUTE FUNCTION private.hide_pending_party_justice_post();
-
--- Previously published pre-registration Ministry decisions become private.
-UPDATE public.political_posts pp SET deleted_at=clock_timestamp()
-FROM public.game_parties p WHERE pp.actor_key='minjust'
- AND pp.internal_view='parties' AND pp.context->>'party_id'=p.id::text
- AND p.registration_status<>'registered' AND pp.deleted_at IS NULL;
+-- Private Ministry replies are retained as records for the party and teacher.\n-- The restrictive SELECT policy above prevents publication until certification.\n
