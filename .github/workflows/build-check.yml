@@ -168,6 +168,13 @@ on:
       - 'supabase/migrations/*game_identity_active_membership.sql'
       - 'components/game/PartyChairElection.tsx'
       - 'components/game/PartiesView.tsx'
+      - 'components/game/TeacherPartyDossiers.tsx'
+      - 'components/game/PartyJusticeReview.tsx'
+      - 'components/game/partyDocumentWorkflow.ts'
+      - 'components/game/types.ts'
+      - 'app/party-dossier-attempts.css'
+      - 'supabase/migrations/*party_document_versioned_review_private_release.sql'
+      - 'scripts/party-document-attempts-check.cjs'
       - 'components/game/PartyLogoEditor.tsx'
       - 'components/game/partyLogoCrop.ts'
       - 'app/2026-civic-portal.css'
@@ -241,6 +248,7 @@ jobs:
       - run: node scripts/electoral-math-check.cjs
       - run: node scripts/grade-fractional-check.cjs
       - run: node scripts/party-grades-stage-consistency-check.cjs
+      - run: node scripts/party-document-attempts-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-realtime-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
