@@ -131,6 +131,8 @@ on:
       - 'scripts/action-error-placement-check.cjs'
       - 'scripts/party-document-visibility-check.cjs'
       - 'scripts/party-registration-versions-check.cjs'
+      - 'scripts/party-program-news-check.cjs'
+      - 'supabase/migrations/20261016010000_registered_party_program_publication.sql'
       - 'components/game/partyDocumentVersions.ts'
       - 'app/party-registration-versions.css'
       - 'supabase/migrations/20261015211500_party_registration_versions_and_privacy.sql'
@@ -254,6 +256,7 @@ jobs:
       - run: node scripts/party-grades-stage-consistency-check.cjs
       - run: node scripts/party-document-visibility-check.cjs
       - run: node scripts/party-registration-versions-check.cjs
+      - run: node scripts/party-program-news-check.cjs
       - run: node scripts/action-error-placement-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-realtime-check.cjs
