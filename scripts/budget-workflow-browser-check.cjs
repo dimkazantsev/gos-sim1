@@ -236,7 +236,7 @@ async function main(){
     await sim.locator('[data-budget-kpi=income]').waitFor();
     assert.match(await sim.locator('[data-budget-plan-permissions]').innerText(),/Вам недоступно сохранение/,'Unauthorized users must understand the disabled save');
     const projectTabs=sim.getByRole('tablist',{name:'Сохранённые проекты бюджета'});
-    assert(await projectTabs.getByRole('tab',{name:/Создать вариант/}).isDisabled(),'Unauthorized users cannot create a shared budget variant');
+    assert.equal(await projectTabs.getByRole('tab',{name:/Создать вариант/}).count(),0,'Unauthorized users do not receive a shared variant creation action');
     assert(await sim.getByRole('button',{name:/Сохранить (вариант|новую версию)/}).isDisabled(),'Unauthorized users cannot save a shared budget variant');
     assert(await sim.getByLabel('Название расчета').isDisabled(),'Unauthorized users cannot rename the shared calculation');
     assert.equal(f.calls.filter(c=>c.rpc==='save_budget_simulator').length,previousSaves,'Unauthorized view triggers no new save RPC');
