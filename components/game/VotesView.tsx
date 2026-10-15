@@ -136,7 +136,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
      {majorityKind==='eligible_fraction'&&<StyledSelect label="Необходимая доля" value={String(majorityValue)}
        onChange={v=>setMajorityValue(Number(v))} options={[{value:String(2/3),label:'2/3'},{value:'0.75',label:'3/4'}]}/>}
      {selectedNpa?.workflow_key==='budget'&&<p className="civicVoteBase">Бюджет рассматривается установленным составом соответствующего органа.</p>}
-     <p className="civicVoteBase">{selectedNpa?.workflow_key==='budget'&&institution==='government'?'Состав Правительства и право голоса фиксируются при открытии процедуры. Учитываются действующие должности и регистрация на заседании.':institution==='gd'?'Общий состав: 450 мандатов. GV уменьшает доступные голоса, сохраняя базу расчёта кворума.':['government','municipality'].includes(institution)?'Общий состав: '+members.filter(m=>m.kind==='student').length+' участников (итоговый состав определяется полномочиями органа).':'Состав и право голоса фиксируются при открытии процедуры.'}</p><button className="primary" disabled={title.trim().length<3} onClick={create}>Открыть голосование</button>
+     <p className="civicVoteBase">{selectedNpa?.workflow_key==='budget'&&institution==='government'?'Состав Правительства и право голоса фиксируются при открытии процедуры. Учитываются действующие должности и регистрация на заседании.':institution==='gd'?'Общий состав: 450 мандатов. Goust Voting уменьшает доступные голоса, сохраняя базу расчёта кворума.':['government','municipality'].includes(institution)?'Общий состав: '+members.filter(m=>m.kind==='student').length+' участников (итоговый состав определяется полномочиями органа).':'Состав и право голоса фиксируются при открытии процедуры.'}</p><button className="primary" disabled={title.trim().length<3} onClick={create}>Открыть голосование</button>
     </div>
    </div>
   </details>}
@@ -165,7 +165,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
 
     {(doc||stage)&&<div className="voteRelations">
      {doc&&<button onClick={()=>onOpenDocument(doc.id)}><small>СВЯЗАННЫЙ НПА</small><b>{doc.registry_no}</b><span>{doc.title}</span></button>}
-     {stage&&<button onClick={onOpenStages}><small>ЭТАП ИГРЫ</small><b>{stage.stage_no}. {stage.title}</b><span>{v.formal_step_code?'Стадия НПА: '+v.formal_step_code:'Открыть описание этапа'}</span></button>}
+     {stage&&<button onClick={onOpenStages}><small>ЭТАП ИГРЫ</small><b>{stage.stage_no}. {stage.title}</b><span>{v.formal_step_code?'Стадия НПА: '+(doc?.workflow_steps.find(step=>step.code===v.formal_step_code)?.label||'Стадия процедуры'):'Открыть описание этапа'}</span></button>}
     </div>}
 
     {v.body&&<p className="voteBody">{v.body}</p>}
@@ -178,15 +178,15 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
 
     <div className="quorumMeter"><div><span>Присутствует: {q.present} из {q.eligible} · Подано: {q.cast}</span><b className={q.met?'ok':'wait'}>{q.met?'КВОРУМ ЕСТЬ':'НУЖНО '+Math.max(0,q.needed-q.present)}</b></div><i><em style={{width:Math.min(100,pct(q.present,q.eligible))+'%'}}/></i></div>
     {v.voting_mode==='mandate'&&<details className="deputyRegistration" open={v.status==='open'}>
-     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{partyMandates.filter(a=>v.procedure_key!=='registered_session'||checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)).reduce((a,x)=>a+x.effective_mandates,0)} / {parties.reduce((a,p)=>a+Number(p.mandates||0),0)} участвует · GV −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
+     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{partyMandates.filter(a=>v.procedure_key!=='registered_session'||checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)).reduce((a,x)=>a+x.effective_mandates,0)} / {parties.reduce((a,p)=>a+Number(p.mandates||0),0)} участвует · Goust Voting −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
      <div className="deputyRegistrationBody">
       {parties.filter(p=>p.mandates>0).map(p=>{
        const rows=partyMandates.filter(x=>x.party_id===p.id);
        const base=rows.reduce((a,x)=>a+x.base_mandates,0);
        const effective=rows.reduce((a,x)=>a+x.effective_mandates,0);
        return <article key={p.id}>
-        <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{base} мандатов · {effective} доступно{p.ghost_active?' · GV −'+p.ghost_loss_current:''}{p.representation_penalty?' · Потеря мест −'+p.representation_penalty:''}</small></div></header>
-        <div>{rows.map(a=>{const m=members.find(x=>x.user_id===a.user_id);return <div className="deputyStudentRow" key={a.user_id}><b>{m?.full_name||'Участник'}</b><span>{a.base_mandates} манд.</span><em>{[a.ghost_loss?'−'+a.ghost_loss+' GV':'',a.representation_loss?'−'+a.representation_loss+' мест':''].filter(Boolean).join(' · ')||'—'}</em><strong>{a.effective_mandates} голосов {v.procedure_key==='registered_session'?(checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)?'· На заседании':'· Не зарегистрирован'):''}</strong></div>})}</div>
+        <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{base} мандатов · {effective} доступно{p.ghost_active?' · Goust Voting −'+p.ghost_loss_current:''}{p.representation_penalty?' · Потеря мест −'+p.representation_penalty:''}</small></div></header>
+        <div>{rows.map(a=>{const m=members.find(x=>x.user_id===a.user_id);return <div className="deputyStudentRow" key={a.user_id}><b>{m?.full_name||'Участник'}</b><span>{a.base_mandates} манд.</span><em>{[a.ghost_loss?'−'+a.ghost_loss+' Goust Voting':'',a.representation_loss?'−'+a.representation_loss+' мест':''].filter(Boolean).join(' · ')||'—'}</em><strong>{a.effective_mandates} голосов {v.procedure_key==='registered_session'?(checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)?'· На заседании':'· Не зарегистрирован'):''}</strong></div>})}</div>
        </article>
       })}
      </div>

@@ -34,6 +34,17 @@ export const FORMAL_TYPES:FormalDocType[]=[
  {key:'other',label:'Иной формальный институт / документ',workflow:'generic',prefix:'Документ'}
 ];
 
+// System-generated documents are registered outside the editor's selectable FORMAL_TYPES.
+// Keep persistent doc_type codes unchanged; only their public captions are localized.
+const FORMAL_SYSTEM_TYPE_LABELS:Record<string,string>={
+ party_certificate:'Свидетельство о государственной регистрации политической партии',
+ justice_response:'Официальный ответ Министерства юстиции Российской Федерации'
+};
+
+export function formalDocumentTypeLabel(key:string){
+ return FORMAL_TYPES.find(x=>x.key===key)?.label||FORMAL_SYSTEM_TYPE_LABELS[key]||'Документ';
+}
+
 export function inferFormal(text:string,title:string,roleTitle?:string|null){
  const hay=(title+'\n'+text).toLowerCase();
  let type='other';
@@ -80,5 +91,5 @@ export function ownerLabel(key:string){
   gd_council:'Совет Государственной Думы',gd:'Государственная Дума',sf:'Совет Федерации',
   president:'Президент РФ',government:'Правительство РФ',ministry:'Министерство',municipality:'Муниципальный орган',conciliation:'Согласительная комиссия',
   teacher:'Преподаватель',system:'Завершено'
- }[key]||key;
+ }[key]||'Ответственный орган';
 }

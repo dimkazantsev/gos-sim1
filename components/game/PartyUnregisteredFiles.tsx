@@ -34,8 +34,7 @@ export default function PartyUnregisteredFiles({gameId,partyId,registered}:{game
  useEffect(()=>{void refresh();return ()=>{latestRequest.current++}},[refresh]);
  return <details aria-label="Технические загрузки без регистрации" className="teacherPartySection">
   <summary>Технические загрузки без записи в реестре {loaded?'('+files.length+')':''}</summary>
-  <p className="teacherPartyMuted">Эти файлы сохранились в Storage, но не были зарегистрированы как документы. Они не считаются поданными; виды и названия необходимо проверять отдельно. Оригиналы сохранены.</p>
-  <p className="teacherPartyMuted">Supabase Storage → game-assets → {gameId}/parties/{partyId}/docs/.</p>
+  <p className="teacherPartyMuted">Эти файлы сохранились в хранилище, но не были зарегистрированы как документы. Они не считаются поданными; виды и названия необходимо проверять отдельно. Оригиналы сохранены.</p>
   {!loaded&&<p className="teacherPartyMuted" role="status">Проверка файлов в хранилище…</p>}
   {loaded&&files.length>0?<ul>{files.map(f=><li key={f.path}><span>{f.name}<small>Файл загружен, запись документа отсутствует</small></span>{f.url&&<a href={f.url} target="_blank" rel="noreferrer" aria-label={'Открыть файл '+f.name}><ExternalLink size={16}/></a>}</li>)}</ul>:loaded?<p className="teacherPartyMuted">Незарегистрированные файлы не обнаружены.</p>:null}
   {error&&<p role="alert">{error}</p>}
