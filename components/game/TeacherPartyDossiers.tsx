@@ -7,6 +7,7 @@ import TeacherPartyStatistics from './TeacherPartyStatistics';
 import {FileText,Trash2,UsersRound,Landmark,ShieldAlert,X,ExternalLink,MessageCircle} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {partyDocumentLatest,partyDocVersion,partyDocumentLabel} from './partyDocumentWorkflow';
 const docLabels:Record<string,string>={application:'Заявление',charter:'Устав',program:'Программа',fee:'Пошлина',symbol:'Символика',congress_minutes:'Учредительный съезд',other:'Дополнительный документ'};
 export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepublic;onOpenChat?:(channelId:string)=>void}){
  const {parties,members,partyDocuments,partyInvitations,politicalPosts,channels,teacher,deleteParty}=g;
@@ -15,10 +16,16 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
  const [busy,setBusy]=useState(false);
  const [reviewingId,setReviewingId]=useState('');
  const [reviewNotice,setReviewNotice]=useState('');
+ const [reviewNotes,setReviewNotes]=useState<Record<string,string>>({});
  async function review(id:string,status:'accepted'|'revision'){
   if(reviewingId)return;
   setReviewingId(id);setReviewNotice('');
-  try{const ok=await g.reviewPartyDocument(id,status);setReviewNotice(ok?(status==='accepted'?'Документ принят Минюстом.':'Документ отправлен на доработку.'):'Изменение не подтверждено. Проверьте сообщение об ошибке.');}
+  try{
+   const note=reviewNotes[id]?.trim()||'';
+   if(status==='revision'&&note.length<5){setReviewNotice('Укажите причину доработки: не менее пяти символов.');return;}
+   const ok=await g.reviewPartyDocument(id,status,note);
+   setReviewNotice(ok?(status==='accepted'?'Актуальная версия принята Минюстом. Партия увидит результат.':'Версия отправлена на доработку. Партии доступны замечания и новая попытка загрузки.'):'Решение не подтверждено. Проверьте сообщение об ошибке.');
+  }
   finally{setReviewingId('')}
  }
  const [notice,setNotice]=useState('');
@@ -41,6 +48,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
    const staff=members.filter(m=>m.kind==='student'&&m.team===p.name);
    const leader=members.find(m=>m.user_id===p.leader_user_id);
    const docs=partyDocuments.filter(d=>d.party_id===p.id);
+   const currentByKind=partyDocumentLatest(docs);
    const posts=politicalPosts.filter(x=>x.actor_key==='party'&&x.actor_label===p.name);
    const invites=partyInvitations.filter(i=>i.party_id===p.id&&i.status==='pending');
    return <article key={p.id} className="teacherPartyDossier">
@@ -56,7 +64,28 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
      <PartyChairFallback g={g} party={p}/>
     </div>
     <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы ({docs.length})</h4>
-     {docs.length?<ul>{docs.map(d=><li key={d.id}><span>{docLabels[d.doc_kind]||d.doc_kind}<small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {d.status==='accepted'?'Принят':d.status==='revision'?'На доработке':'Загружен'}</small></span>{d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title}><ExternalLink size={15}/></a>:<span>—</span>}<div className="civicDocReview"><button type="button" className={d.status==='accepted'?'primary':'secondary'} disabled={!!reviewingId||d.status==='accepted'} aria-disabled={d.status==='accepted'} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Рассматривается…':d.status==='accepted'?'Принято':'Принять'}</button><button type="button" className="secondary" disabled={!!reviewingId||d.status==='revision'} onClick={()=>void review(d.id,'revision')}>На доработку</button></div></li>)}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
+     {docs.length?<ul>{[...docs].sort((a,b)=>a.doc_kind.localeCompare(b.doc_kind)||partyDocVersion(b)-partyDocVersion(a)).map(d=>{
+      const isCurrent=currentByKind.get(d.doc_kind)?.id===d.id;
+      const canReview=isCurrent&&p.registration_status!=='registered';
+      return <li key={d.id} data-doc-version={partyDocVersion(d)}>
+       <span><b>{partyDocumentLabel[d.doc_kind]||docLabels[d.doc_kind]||d.doc_kind} · В{partyDocVersion(d)}</b>
+        <small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {d.status==='accepted'?'Принят':d.status==='revision'?'На доработке':'Загружен'}{isCurrent?' · Актуальная версия':' · Архив'}</small>
+        {d.note&&<small>Заключение: {d.note}</small>}
+       </span>
+       {d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title+' В'+partyDocVersion(d)}><ExternalLink size={15}/></a>:<span>—</span>}
+       {canReview&&<div className="civicDocReview">
+        <label className="partyDossierTeacherNote">Основания решения
+         <textarea rows={2} value={reviewNotes[d.id]||''} onChange={e=>setReviewNotes(n=>({...n,[d.id]:e.target.value}))}
+          placeholder="Укажите замечания при возврате на доработку"/>
+        </label>
+        <button type="button" className={d.status==='accepted'?'primary':'secondary'} disabled={!!reviewingId||d.status==='accepted'}
+         onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Сохранение…':d.status==='accepted'?'Принято':'Принять В'+partyDocVersion(d)}</button>
+        <button type="button" className="secondary" disabled={!!reviewingId||d.status==='revision'}
+         onClick={()=>void review(d.id,'revision')}>На доработку · В{partyDocVersion(d)}</button>
+       </div>}
+      </li>;
+     })}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
+     {reviewNotice&&<p role="status">{reviewNotice}</p>}
     </div>
     {g.game?.id&&<PartyUnregisteredFiles gameId={g.game.id} partyId={p.id} registered={docs}/>}
     <PartyJusticeReview g={g} party={p}/>
