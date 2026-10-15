@@ -1,6 +1,7 @@
 'use client';
 import {useState} from 'react';
 import StyledSelect from '../ui/StyledSelect';
+import {partyDocumentsReady} from './partyDocumentAttempts';
 import JusticeDocuments from './JusticeDocuments';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
 import {institutionEmblem} from './institutionEmblems';
@@ -15,7 +16,7 @@ export default function PartyJusticeReview({g,party}:{g:ReturnTypeRepublic;party
  const [notice,setNotice]=useState('');
  const docs=g.partyDocuments.filter(d=>d.party_id===party.id);
  const leader=g.members.find(m=>m.user_id===party.leader_user_id);
- const ready=PARTY_REQUIRED_DOCS.every(req=>docs.some(d=>d.doc_kind===req.kind&&d.status==='accepted'));
+ const ready=partyDocumentsReady(docs,PARTY_REQUIRED_DOCS.map(req=>req.kind));
  const missingGrounds=decision==='rejected'&&note.includes('[Укажите');
  function draft(next:JusticeDraftDecision=decision){
   setDecision(next);
@@ -27,7 +28,7 @@ export default function PartyJusticeReview({g,party}:{g:ReturnTypeRepublic;party
   setBusy(true);setNotice('');
   try{
    const ok=await g.reviewPartyRegistration(party.id,decision,note);
-   setNotice(ok?'Решение подписано и направлено партии. Официальная публикация добавлена в политические процессы.':'Не удалось оформить решение. Проверьте системное сообщение.');
+   setNotice(ok?(decision==='registered'?'Решение подписано, свидетельство выдано и документы опубликованы.':'Решение направлено участникам партии приватно. До регистрации документы не публикуются.'):'Не удалось оформить решение. Проверьте системное сообщение.');
   }finally{setBusy(false)}
  }
  return <section className="justiceReview">
