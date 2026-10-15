@@ -41,6 +41,11 @@ assert(student.includes("const canUpload=selected.registration_status!=='registe
 assert(student.includes('void upload(selected.id,kind.kind,kind.title,file)'),'Chosen file must upload directly for its document kind');
 assert(student.includes('partyRegistrationHiddenInput')&&student.includes('uploadInFlight.current'),'Guard concurrent submissions');
 assert(student.includes('partyRegistrationRevisionNote')&&student.includes('Предыдущие версии ('),'Previous versions and revision grounds must remain accessible');
+assert(!student.includes('partyRegistrationOverview')&&!student.includes('partyRegistrationDecision')&&!student.includes('selected.registration_note'),
+ 'Formal Ministry decision and explanatory paragraphs must not be repeated in the party document list');
+assert(/partyRegistrationDocIdentity">\\s*<span className="partyRegistrationDocStatus"[\\s\\S]*?<\\/span>\\s*<b>\\{kind.title\\}<\\/b>/.test(student),
+ 'Document status must precede the left-aligned title');
+
 assert(student.includes('Документ возвращён на доработку.'),'Student must see explicit revision status and its grounds');
 assert(teacher.includes('latest?.id===d.id')&&teacher.includes('canReview&&'));
 assert(teacher.includes("reviewNotes[d.id]")&&teacher.includes("review(d.id,'revision')"));
@@ -73,6 +78,7 @@ assert(!sql.includes('LIMIT 10'),'No artificial maximum attempt count');
 const css=fs.readFileSync('app/party-registration-versions.css','utf8');
 assert(css.includes('@media(max-width:850px)')&&css.includes('@media(max-width:420px)')&&css.includes('.partyRegistrationDocActions'));
 assert(css.includes('.partyDossierDocRow')&&css.includes('.partyRegistrationDoc.isRevision'));
+assert(css.includes('grid-template-columns:174px minmax(0,1fr)')&&css.includes('grid-template-columns:142px minmax(0,1fr)'),'Statuses and titles must align on desktop and mobile');
 assert(css.includes('.partyRegistrationDocTop')&&css.includes('.partyRegistrationDocActions')&&css.includes('.partyRegistrationHiddenInput'));
 assert(!css.includes('.partyRegistrationUpdates'),'Obsolete duplicate feed CSS must be removed');
 assert(css.includes('@media(max-width:850px)'),'Compact teacher rows must support narrow screens');
