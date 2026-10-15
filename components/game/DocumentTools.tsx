@@ -4,7 +4,7 @@ import {Send,Signature} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import StyledSelect from '../ui/StyledSelect';
 import DisclosureSummary from '../ui/DisclosureSummary';
-import {ownerLabel} from './formalInstitutions';
+import {ownerLabel,formalDocumentTitle} from './formalInstitutions';
 import type {FormalDocument,Member} from './types';
 
 export type DocumentAccess={can_edit:boolean;can_manage:boolean;can_sign:boolean;can_copy:boolean;vote_required:boolean;open_vote:boolean;next_owner:string|null;next_action:string|null};
@@ -24,5 +24,5 @@ export function DocumentInbox({gameId,userId,members,documents,onOpen}:{gameId?:
  const [items,setItems]=useState<{id:string;document_id:string;sender_id:string;note:string|null;created_at:string}[]>([]),[error,setError]=useState('');
  useEffect(()=>{if(!gameId||!userId)return;let active=true;async function load(){const r=await supabase.from('formal_document_deliveries').select('id,document_id,sender_id,note,created_at').eq('game_id',gameId!).eq('recipient_id',userId!).order('created_at',{ascending:false}).limit(30);if(active){if(r.error)setError(r.error.message);else{setItems(r.data||[]);setError('')}}}void load();const timer=setInterval(()=>void load(),20000);return()=>{active=false;clearInterval(timer)}},[gameId,userId,documents]);
  if(!items.length&&!error)return null;
- return <details className="projectDisclosure documentInbox"><DisclosureSummary icon={Send} title={'Входящие документы · '+items.length} description="Документы, присланные вам для ознакомления"/><div className="civicDisclosureBody">{error&&<p className="error" role="alert">{error}</p>}{items.map(x=><button className="documentInboxRow" key={x.id} onClick={()=>onOpen(x.document_id)}><b>{documents.find(d=>d.id===x.document_id)?.title||'Документ'}</b><small>{members.find(m=>m.user_id===x.sender_id)?.full_name||'Участник'} · {new Date(x.created_at).toLocaleString('ru-RU')}</small>{x.note&&<span>{x.note}</span>}</button>)}</div></details>;
+ return <details className="projectDisclosure documentInbox"><DisclosureSummary icon={Send} title={'Входящие документы · '+items.length} description="Документы, присланные вам для ознакомления"/><div className="civicDisclosureBody">{error&&<p className="error" role="alert">{error}</p>}{items.map(x=><button className="documentInboxRow" key={x.id} onClick={()=>onOpen(x.document_id)}><b>{(()=>{const document=documents.find(d=>d.id===x.document_id);return document?formalDocumentTitle(document.title,document.doc_type):'Документ'})()}</b><small>{members.find(m=>m.user_id===x.sender_id)?.full_name||'Участник'} · {new Date(x.created_at).toLocaleString('ru-RU')}</small>{x.note&&<span>{x.note}</span>}</button>)}</div></details>;
 }
