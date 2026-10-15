@@ -24,7 +24,7 @@ export function localizeAutomaticNewsText(value:string):string{
    const label=DOCUMENT_STATE_LABELS[raw.toLowerCase()];
    return label?`Основание: документ «${title.trim()}» ${label}`:match;
   })
-  .replace(/(\bСтатус(?:\s+документа|\s+НПА)?\s*[:=]\s*)([a-z][a-z0-9_]*)\b/gi,(match,prefix:string,raw:string)=>{
+  .replace(/(Статус(?:\s+документа|\s+НПА)?\s*[:=]\s*)([a-z][a-z0-9_]*)\b/gi,(match,prefix:string,raw:string)=>{
    const label=STATE_LABELS[raw.toLowerCase()];
    return label?prefix+label:match;
   })
