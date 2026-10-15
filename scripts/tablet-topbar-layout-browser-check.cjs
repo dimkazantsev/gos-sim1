@@ -7,7 +7,7 @@ const paths=[
  'app/design-tokens.css','app/globals.css','app/design-shell.css',
  'app/design-responsive.css','app/design-readability.css',
  'app/mobile-nav-polish.css','app/topbar-controls-alignment.css',
- 'app/tablet-topbar-layout.css','app/turn-countdown.css'
+ 'app/turn-countdown.css','app/tablet-topbar-layout.css'
 ];
 const styles=paths.map(x=>fs.readFileSync(path.join(root,x),'utf8')).join('\n');
 const layout=fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8');
@@ -64,13 +64,24 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
    assert(!measures.overflow,`${width}px ${role}: horizontal document overflow ${JSON.stringify(measures)}`);
    for(const item of measures.buttons)if(!item.hidden)assert(item.hit,`${width}px ${role} button blocked ${JSON.stringify(item)}`);
    if(width>900&&width<1500){
-     assert(measures.title.display!=='none'&&measures.title.width>=130,`${width}px stage text squeezed: ${JSON.stringify(measures)}`);
-     assert(overlap(measures.title,measures.history)<1,`${width}px stage title overlaps history`);
-     assert(overlap(measures.title,measures.chat)<1,`${width}px stage title overlaps chat button`);
-     assert(overlap(measures.title,measures.indicators)<1,`${width}px stage title overlaps status controls`);
-     if(role==='teacher')assert(overlap(measures.indicators,measures.preview)<1,`${width}px indicators overlap preview switcher`);
-     assert(measures.token==='122px',`${width}px chat offset must follow resized header`);
-     assert(measures.top.height>=122,`${width}px rows must fit header height`);
+     assert(measures.top.height===84,`${width}px tablet header must be a single 84px row: ${JSON.stringify(measures)}`);
+     assert(measures.title.display!=='none'&&measures.title.width>=105,`${width}px stage title must remain readable: ${JSON.stringify(measures)}`);
+     for(const pair of [['history',measures.history],['title',measures.title],['indicators',measures.indicators],['preview',measures.preview],['chat',measures.chat]]){
+       const [name,item]=pair;
+       if(!item||item.display==='none')continue;
+       const topCenter=(item.top+item.bottom)/2;
+       const headerCenter=(measures.top.top+measures.top.bottom)/2;
+       assert(Math.abs(topCenter-headerCenter)<3,`${width}px ${role}: ${name} leaves the single row ${JSON.stringify(measures)}`);
+     }
+     assert(overlap(measures.title,measures.history)<1,`${width}px title overlaps history`);
+     assert(overlap(measures.title,measures.indicators)<1,`${width}px title overlaps statuses`);
+     assert(overlap(measures.title,measures.chat)<1,`${width}px title overlaps chat`);
+     if(role==='teacher'){
+       assert(overlap(measures.indicators,measures.preview)<1,`${width}px indicators overlap preview switcher`);
+       assert(measures.preview.width===48,`${width}px preview must be compact but clickable`);
+     }
+     assert(measures.statusWidth<=measures.statusClient+2,`${width}px toolbar has clipped actions`);
+     assert(measures.token==='84px',`${width}px chat must use restored 84px header offset`);
    }
    if(width<=900)assert(measures.title.display==='none',`${width}px compact phone/tablet topbar unexpectedly altered`);
    if(width>=1500)assert(measures.token!=='122px','Large desktop token must remain unchanged');

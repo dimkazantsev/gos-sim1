@@ -5,7 +5,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {chromium}=require('playwright-core');
 const root=path.resolve(__dirname,'..');
-const files=['app/globals.css','app/design-shell.css','app/design-responsive.css','app/mobile-nav-polish.css','app/topbar-controls-alignment.css','app/tablet-topbar-layout.css','app/turn-countdown.css'];
+const files=['app/globals.css','app/design-shell.css','app/design-responsive.css','app/mobile-nav-polish.css','app/topbar-controls-alignment.css','app/turn-countdown.css','app/tablet-topbar-layout.css'];
 const styles=files.map(file=>fs.readFileSync(path.join(root,file),'utf8')).join('\n');
 const layout=fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8');
 const client=fs.readFileSync(path.join(root,'components/GameClient.tsx'),'utf8');
@@ -56,15 +56,15 @@ if(!browserPath)throw Error('Chromium required for top-bar geometry check');
    }));
    assert.deepEqual(timerText.units,['16','14','42'],'Days, hours, minutes appear in correct order');
    assert(timerText.title.includes('16 дней, 14 часов, 42 минуты'),'Full Russian accessible reading');
-   assert.equal(timerText.width,width<=650?58:width<=900?80:176,'Compact footprint must fit at '+width);
-   if(width>900){
+   assert.equal(timerText.width,width<=650?58:width<1500?80:176,'Compact footprint must fit at '+width);
+   if(width>=1500){
     assert(timerText.minuteLabelLeft-timerText.minuteSeparatorLeft>=7,
       'First letter of МИНУТЫ overlaps divider at '+width+'px: '+JSON.stringify(timerText));
     assert(timerText.minuteLabelRight<=timerText.timerRight-3,
       'Minutes label must remain inside timer at '+width+'px');
    }
    assert(timerText.size<=2,'Timer internal text overflow at '+width+'px: '+JSON.stringify(timerText));
-   assert.equal(timerText.labels.every(label=>label===(width<=900?'none':'block')),true,'Desktop/mobile unit labels differ at '+width);
+   assert.equal(timerText.labels.every(label=>label===(width<1500?'none':'block')),true,'Desktop/mobile unit labels differ at '+width);
    console.log('PASS top-bar equal-height three-unit timer '+width+'px');
   }
  }finally{await browser.close()}
