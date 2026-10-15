@@ -8,13 +8,15 @@ import TeacherPartyStatistics from './TeacherPartyStatistics';
 import {FileText,Trash2,UsersRound,Landmark,ShieldAlert,X,ExternalLink,MessageCircle} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
-const docLabels:Record<string,string>={application:'Заявление',charter:'Устав',program:'Программа',fee:'Пошлина',symbol:'Символика',congress_minutes:'Учредительный съезд',other:'Дополнительный документ'};
+const docLabels:Record<string,string>={application:'Заявление о регистрации',charter:'Устав',program:'Программа',fee:'Госпошлина',symbol:'Символика',congress_minutes:'Протокол учредительного съезда',other:'Дополнительный документ'};
+function uploadTime(value:string){const date=new Date(value);return Number.isNaN(date.getTime())?'Время не указано':date.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
 export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepublic;onOpenChat?:(channelId:string)=>void}){
  const {parties,members,partyDocuments,partyInvitations,politicalPosts,channels,teacher,deleteParty}=g;
  const [selected,setSelected]=useState<string|null>(null);
  const [confirm,setConfirm]=useState('');
  const [busy,setBusy]=useState(false);
  const [reviewingId,setReviewingId]=useState('');
+ const [revisionFor,setRevisionFor]=useState<string|null>(null);
  const [reviewNotes,setReviewNotes]=useState<Record<string,string>>({});
  const [reviewNotice,setReviewNotice]=useState<{id:string;success:boolean;message:string}|null>(null);
  async function review(id:string,status:'accepted'|'revision'){
@@ -24,7 +26,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
   try{
    const ok=await g.reviewPartyDocument(id,status,status==='revision'?reviewNotes[id]:undefined);
    setReviewNotice({id,success:ok,message:ok?(status==='accepted'?'Документ принят Минюстом.':'Документ отправлен на доработку. Участник увидит статус и замечание.'):'Изменение не подтверждено. Проверьте сообщение об ошибке.'});
-   if(ok&&status==='revision')setReviewNotes(previous=>{const next={...previous};delete next[id];return next});
+   if(ok){setRevisionFor(null);setReviewNotes(previous=>{const next={...previous};delete next[id];return next})}
   }
   finally{setReviewingId('')}
  }
@@ -62,24 +64,32 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
      {staff.length?<ul>{staff.map(m=><li key={m.user_id}><span>{m.full_name}<small>{m.user_id===p.leader_user_id?'Председатель партии «'+p.name+'»':m.role_title||'Участник'}</small></span></li>)}</ul>:<p className="teacherPartyMuted"><UsersRound size={15} aria-hidden="true"/> Участники пока не вступили в партию</p>}
      <PartyChairFallback g={g} party={p}/>
     </div>
-    <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы ({docs.length})</h4>
+    <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы ({docs.length})</h4><p className="partyDossierDocHint">Принимайте документы по одному. При возврате укажите замечания; официальный ответ по регистрационному пакету оформляется ниже.</p>
      {docs.length?<ul>{[...docs].sort((a,b)=>a.doc_kind.localeCompare(b.doc_kind)||(b.version_no??1)-(a.version_no??1)).map(d=>{
       const latest=latestPartyDocument(docs,d.doc_kind);
       const canReview=latest?.id===d.id&&['submitted','draft'].includes(d.status)&&p.registration_status!=='registered';
-      return <li key={d.id}>
-       <span><b>{docLabels[d.doc_kind]||d.doc_kind} · {partyDocumentVersionLabel(d)}</b>
-        <small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {partyDocumentVerdict(d)}</small>
-        {latest?.id!==d.id&&<small>Архивная попытка. Предыдущее решение сохранено.</small>}
-        {d.note&&<small>Заключение Минюста: {d.note}</small>}
-       </span>
-       {d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title+' '+partyDocumentVersionLabel(d)}><ExternalLink size={15}/></a>:<span>—</span>}
-       {canReview&&<div className="civicDocReview">
-        <label className="civicPartyUploadField"><span>Замечания к версии {partyDocumentVersionLabel(d)}</span>
+      return <li key={d.id} className={'partyDossierDocRow'+(d.status==='revision'?' isRevision':'')}>
+       <div className="partyDossierDocMain">
+        <b>{docLabels[d.doc_kind]||d.doc_kind} <small>{partyDocumentVersionLabel(d)}</small></b>
+        <span>{members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · <time dateTime={d.created_at}>{uploadTime(d.created_at)}</time></span>
+       </div>
+       <div className="partyDossierDocControls">
+        {d.url?<a className="partyDossierDocOpen" href={d.url} target="_blank" rel="noreferrer" title={'Открыть '+(docLabels[d.doc_kind]||d.doc_kind)} aria-label={'Открыть '+(docLabels[d.doc_kind]||d.doc_kind)+' '+partyDocumentVersionLabel(d)}><ExternalLink size={16}/></a>:null}
+        {canReview?<div className="partyDossierDocButtons">
+         <button type="button" className="primary" disabled={!!reviewingId} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Проверка…':'Принять'}</button>
+         <button type="button" className="secondary" disabled={!!reviewingId} aria-expanded={revisionFor===d.id} onClick={()=>{setRevisionFor(previous=>previous===d.id?null:d.id);setReviewNotice(null)}}>На доработку</button>
+        </div>:<span className={'partyDossierDocState'+(d.status==='revision'?' isRevision':'')}>{partyDocumentVerdict(d)}</span>}
+       </div>
+       {revisionFor===d.id&&canReview&&<div className="partyDossierRevisionEditor">
+        <label>Что необходимо исправить в {partyDocumentVersionLabel(d)}?
          <textarea rows={2} value={reviewNotes[d.id]||''} onChange={e=>setReviewNotes(previous=>({...previous,[d.id]:e.target.value}))}
           placeholder="Укажите конкретные недостатки документа" disabled={!!reviewingId}/></label>
-        <button type="button" className="primary" disabled={!!reviewingId} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Рассматривается…':'Принять '+partyDocumentVersionLabel(d)}</button>
-        <button type="button" className="secondary" disabled={!!reviewingId||(reviewNotes[d.id]||'').trim().length<5} onClick={()=>void review(d.id,'revision')}>На доработку · {partyDocumentVersionLabel(d)}</button>
+        <div className="partyDossierRevisionActions">
+         <button type="button" className="secondary" disabled={!!reviewingId||(reviewNotes[d.id]||'').trim().length<5} onClick={()=>void review(d.id,'revision')}>Подтвердить доработку</button>
+         <button type="button" disabled={!!reviewingId} onClick={()=>setRevisionFor(null)}>Отмена</button>
+        </div>
        </div>}
+       {d.note&&<p className="partyDossierDocRemark">Замечание Минюста: {d.note}</p>}
        {reviewNotice?.id===d.id&&<p className={'civicPartyInviteFeedback '+(reviewNotice.success?'isSuccess':'isError')} role={reviewNotice.success?'status':'alert'}>{reviewNotice.message}</p>}
       </li>})}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
     </div>
