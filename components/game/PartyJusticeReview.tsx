@@ -1,7 +1,7 @@
 'use client';
 import {useState} from 'react';
 import StyledSelect from '../ui/StyledSelect';
-import {partyDocumentsReady} from './partyDocumentAttempts';
+import {partyDocumentLatest,partyDocumentsReady} from './partyDocumentAttempts';
 import JusticeDocuments from './JusticeDocuments';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
 import {institutionEmblem} from './institutionEmblems';
@@ -20,7 +20,7 @@ export default function PartyJusticeReview({g,party}:{g:ReturnTypeRepublic;party
  const missingGrounds=decision==='rejected'&&note.includes('[Укажите');
  function draft(next:JusticeDraftDecision=decision){
   setDecision(next);
-  setNote(buildPartyJusticeLetter(party,docs,leader?.full_name,next));
+  setNote(buildPartyJusticeLetter(party,partyDocumentLatest(docs),leader?.full_name,next));
   setNotice('Сформирован проект ответа. Проверьте данные и основания, затем подпишите его отдельно.');
  }
  async function send(){
