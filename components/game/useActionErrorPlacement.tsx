@@ -46,10 +46,11 @@ export function useActionErrorPlacement(error:string,view:string,clearError:()=>
  useEffect(()=>{
   if(!error){setInlineSlot(null);return}
   const action=lastAction.current;
-  if(!shouldLocalizeActionError(error,view,action?{
+  if(!action){setInlineSlot(null);return}
+  if(!shouldLocalizeActionError(error,view,{
    view:action.view,at:action.at,connected:action.element.isConnected,
    file:action.element instanceof HTMLInputElement&&action.element.type==='file'
-  }:null)){setInlineSlot(null);return}
+  })){setInlineSlot(null);return}
   const slot=document.createElement('div');
   slot.className='actionErrorSlot';
   const previous=action.element.getAttribute('aria-describedby');
