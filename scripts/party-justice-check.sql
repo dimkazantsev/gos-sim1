@@ -15,7 +15,23 @@ do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;p uuid:=current_set
 end;$$;
 reset role;
 insert into public.party_documents(game_id,party_id,doc_kind,title,storage_path,file_name,uploaded_by,status)
-select current_setting('qa.civic_game')::uuid,current_setting('qa.civic_party')::uuid,k,k,'qa/'||k,k||'.txt','89de1d45-8973-4f38-980d-26042af9e53e','accepted' from unnest(array['application','charter','program','fee','symbol','congress_minutes']) k;
+select current_setting('qa.civic_game')::uuid,current_setting('qa.civic_party')::uuid,k,k,'qa/'||k,k||'.txt','89de1d45-8973-4f38-980d-26042af9e53e','submitted' from unnest(array['application','charter','program','fee','symbol','congress_minutes']) k;
+-- Accept only the newest submitted versions, never fabricate accepted uploads.
+update public.party_documents set status='accepted' where party_id=current_setting('qa.civic_party')::uuid and status='submitted';
+-- A newer unaccepted fee document must block registration even if V1 was accepted.
+insert into public.party_documents(game_id,party_id,doc_kind,title,storage_path,file_name,uploaded_by,status)
+values(current_setting('qa.civic_game')::uuid,current_setting('qa.civic_party')::uuid,'fee','Новая квитанция','qa/fee-v2','fee-v2.txt','89de1d45-8973-4f38-980d-26042af9e53e','submitted');
+do $$ declare p uuid:=current_setting('qa.civic_party')::uuid;blocked boolean:=false;begin
+ if (select max(version_no) from public.party_documents where party_id=p and doc_kind='fee')<>2 then
+  raise exception 'FAIL version sequence';
+ end if;
+ begin
+  perform set_config('request.jwt.claim.sub','9fdf732c-1a84-4435-979d-e0272c2b81db',true);
+  perform public.review_party_registration(p,'registered','Недопустимое одобрение по старой версии.');
+ exception when others then blocked:=true;end;
+ if not blocked then raise exception 'FAIL registered with unreviewed latest fee';end if;
+ update public.party_documents set status='accepted' where party_id=p and doc_kind='fee' and version_no=2;
+end;$$;
 set local role authenticated;
 do $$ declare g uuid:=current_setting('qa.civic_game')::uuid;p uuid:=current_setting('qa.civic_party')::uuid;d uuid;cert uuid;official_post uuid;media_post uuid;blocked boolean:=false;begin
  d:=public.issue_party_justice_response(p,'registered','Министерство юстиции рассмотрело пакет. Принято решение о регистрации партии.');
