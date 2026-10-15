@@ -34,7 +34,7 @@ for(const needle of [
  "new.status:='submitted'",
  'new.note:=NULL',
  'party_documents_read ON public.party_documents FOR SELECT TO authenticated',
- 'AS RESTRICTIVE FOR SELECT TO authenticated',
+ 'AS RESTRICTIVE FOR SELECT TO public',
  "registration_status='registered' AND p_status='accepted'",
  'private.original_issue_party_justice_response',
  "IF p_status='registered' THEN",
