@@ -1,0 +1,71 @@
+/* ГОС.ID · The teacher tabs form a single opaque, sticky two-tier header.
+   Only the teacher workspace is affected; role, game state and tab handlers stay intact. */
+.simWorkspace:has(.teacherCommand) > .simTop {
+ background:#fff;
+ backdrop-filter:none;
+}
+.simWorkspace:has(.teacherCommand) .simContentFlow,
+.simWorkspace.chatOpen:has(.teacherCommand) .simContentFlow {
+ padding-top:0!important;
+ padding-inline:0!important;
+}
+.simWorkspace:has(.teacherCommand) .simMain {
+ width:100%;
+ max-width:none;
+ margin-inline:0;
+}
+.simWorkspace:has(.teacherCommand) .teacherCommand,
+.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspace {
+ gap:0;
+}
+.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspace {
+ border:0;
+ border-radius:0;
+ overflow:visible;
+ background:transparent;
+}
+.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav {
+ box-sizing:border-box;
+ position:sticky;
+ top:var(--gs-top-h,84px);
+ z-index:54; /* Immediately below .simTop (55), above scrolling sections. */
+ width:100%;
+ max-width:none;
+ min-width:0;
+ margin:0;
+ padding:8px clamp(16px,2.4vw,36px);
+ border:0;
+ border-bottom:1px solid #dce6f1;
+ border-radius:0;
+ background:#fff;
+ box-shadow:0 8px 16px -17px rgba(21,47,86,.38);
+}
+.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav > button {
+ min-height:44px;
+}
+.simWorkspace:has(.teacherCommand) .teacherCommand :is(.teacherCommandBar,.teacherWorkspacePanel) {
+ box-sizing:border-box;
+ width:100%;
+ max-width:calc(var(--gs-content-max,1440px) + 72px);
+ margin-inline:auto;
+}
+.simWorkspace:has(.teacherCommand) .teacherCommand .teacherCommandBar {
+ margin-block-start:20px;
+}
+.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspacePanel {
+ padding:20px clamp(16px,2.4vw,36px) 28px;
+}
+/* The current compact phone top bar is 56px, not --gs-top-h (74px).
+   At 761px and above the tablet/desktop top bar is 84px. */
+@media(max-width:760px) {
+ .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav {
+  top:56px;
+  padding:6px 12px;
+ }
+ .simWorkspace:has(.teacherCommand) .teacherCommand .teacherCommandBar {
+  margin-block-start:12px;
+ }
+ .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspacePanel {
+  padding:12px 12px 24px;
+ }
+}
