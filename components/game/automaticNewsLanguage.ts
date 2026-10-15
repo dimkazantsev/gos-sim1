@@ -22,7 +22,7 @@ export function localizeAutomaticNewsText(value:string):string{
  return value
   .replace(/Основание:\s*НПА:\s*([^\n]+?)\s*(?:→|->)\s*([a-z][a-z0-9_]*)\b/gi,(match,title:string,raw:string)=>{
    const label=DOCUMENT_STATE_LABELS[raw.toLowerCase()];
-   return label?`Основание: документ «${title.trim()}» ${label}`:match;
+   return label?`Основание: документ «${title.trim().replace(/«([^«»]+)»/g,'„$1“')}» ${label}`:match;
   })
   .replace(/(Статус(?:\s+документа|\s+НПА)?\s*[:=]\s*)([a-z][a-z0-9_]*)\b/gi,(match,prefix:string,raw:string)=>{
    const label=STATE_LABELS[raw.toLowerCase()];
