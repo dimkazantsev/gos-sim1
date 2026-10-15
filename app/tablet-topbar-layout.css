@@ -1,8 +1,8 @@
 /* ГОС.ID · One-row tablet toolbar.
-   History, stage title and all actions share ONE baseline at 901–1499px.
+   History, stage title and all actions share ONE baseline at 761–1499px.
    On narrower workspaces long titles truncate; actions remain real 48px targets.
-   Phone (<=900px) and wide desktop (>=1500px) retain their existing layouts. */
-@media (min-width:901px) and (max-width:1499px) {
+   Phone (<=760px) and wide desktop (>=1500px) retain their existing layouts. */
+@media (min-width:761px) and (max-width:1499px) {
  .simWorkspace {--gs-top-h:84px}
  .simWorkspace .simTop {
   display:flex;
@@ -67,6 +67,13 @@
   overflow:visible;
   flex-wrap:nowrap;
  }
+ .simWorkspace .simTop .topIndicators > :is(.livePill,.gameShareScreen,.timerPillDuration) {
+  box-sizing:border-box;
+  height:48px;
+  min-height:48px;
+  max-height:48px;
+  align-self:center;
+ }
  .simWorkspace .simTop .topIndicators > .livePill {
   display:inline-grid;
   place-items:center;
@@ -120,8 +127,13 @@
   margin:0;
  }
  .simWorkspace .simTop .viewAsSwitcher .viewAsTrigger {
-  display:grid;
-  place-items:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  align-content:center;
+  position:relative;
+  box-sizing:border-box;
+  flex:none;
   width:48px;
   min-width:48px;
   max-width:48px;
@@ -129,11 +141,24 @@
   min-height:48px;
   max-height:48px;
   padding:0;
+  margin:0;
+  line-height:0;
  }
+ /* Important here only to cancel the older absolute-positioned phone eye.
+    On tablet the icon belongs to the trigger's own flex centering. */
  .simWorkspace .simTop .viewAsMobileIcon {
-  display:block;
-  width:20px;
-  height:20px;
+  display:block!important;
+  position:static!important;
+  flex:0 0 20px;
+  align-self:center;
+  justify-self:center;
+  width:20px!important;
+  height:20px!important;
+  min-width:20px!important;
+  min-height:20px!important;
+  margin:0!important;
+  transform:none!important;
+  pointer-events:none;
  }
  .simWorkspace .simTop .viewAsTriggerText,
  .simWorkspace .simTop .viewAsChevron {display:none}
@@ -161,8 +186,49 @@
   max-width:calc(100vw - 24px);
  }
 }
-@media (min-width:901px) and (max-width:1080px) {
+@media (min-width:761px) and (max-width:1080px) {
  .simWorkspace .simTop {padding-inline:12px;gap:6px}
  .simWorkspace .simTop > .simTopCenter {gap:6px}
  .simWorkspace .simTop .topIndicators {gap:3px}
+}
+
+/* Medium tablet uses the existing mobile chat dock; keep its header in ONE row. */
+@media (min-width:761px) and (max-width:900px) {
+ .simWorkspace .simTop > .mobileBrand {
+  display:flex;
+  flex:0 0 36px;
+  order:0;
+  width:36px;
+  min-width:36px;
+  max-width:36px;
+  height:48px;
+  min-height:48px;
+  margin:0;
+  align-items:center;
+  justify-content:center;
+ }
+ .simWorkspace .simTop > .mobileBrand b {display:none}
+ .simWorkspace .simTop > .mobileBrand .brandMark {flex:0 0 32px;width:32px;height:32px}
+ /* On medium tablets the fixed chat sheet begins BELOW the taller 84px
+    single-line toolbar, and ends ABOVE the existing mobile dock. */
+ /* ChatPanel is fixed and may render in a sibling overlay context.
+    Scope the hard offset to medium tablets, irrespective of ancestry. */
+ /* The legacy phone rule in 2026-interface-repair.css used a 56px header
+    and a 72px dock with !important. Keep its dock but reserve our 84px header.
+    ChatPanel's visualViewport handler supersedes these fixed fallbacks on keyboards. */
+ .simWorkspace.chatOpen .simChat.gsChatV2,
+ .simWorkspace:has(.viewAsSwitcher) .simChat.gsChatV2,
+ .simWorkspace .simChat.gsChatV2,
+ .simChat.gsChatV2 {
+  position:fixed;
+  top:84px!important;
+  bottom:calc(72px + env(safe-area-inset-bottom,0px))!important;
+  height:calc(100dvh - 84px - 72px - env(safe-area-inset-bottom,0px))!important;
+  max-height:calc(100dvh - 84px - 72px - env(safe-area-inset-bottom,0px))!important;
+ }
+ /* The mobile dock already owns Chat below 901px; avoid duplicating its control. */
+ .simWorkspace .simTop > .topChatButton {display:none}
+ .simWorkspace .simTop > .simTopCenter {order:1}
+ .simWorkspace .simTop > .topScreenHistory {order:0}
+ .simWorkspace .simTop > .viewAsSwitcher {order:2}
 }

@@ -14,7 +14,7 @@ const layout=fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8');
 assert(layout.indexOf("import './tablet-topbar-layout.css'")>layout.indexOf("import './topbar-controls-alignment.css'"),'Tablet styles must follow the existing topbar baseline');
 const browserPath=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(x=>x&&fs.existsSync(x));
 if(!browserPath)throw Error('Chromium is required for tablet toolbar geometry');
-const teacher=`<div class="viewAsSwitcher"><button type="button" class="viewAsTrigger"><span class="viewAsTriggerText"><small>РЕЖИМ ПРОСМОТРА</small><strong>Преподаватель</strong></span></button></div>`;
+const teacher=`<div class="viewAsSwitcher"><button type="button" class="viewAsTrigger" aria-label="Режим просмотра: Преподаватель"><svg class="viewAsMobileIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span class="viewAsTriggerText"><small>РЕЖИМ ПРОСМОТРА</small><strong>Преподаватель</strong></span></button></div>`;
 const markup=role=>`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${styles}</style></head><body>
 <div class="simShell"><aside class="simSidebar"><div class="sidebarBrand">ГОС.ID</div></aside>
 <div class="simWorkspace"><header class="simTop">
@@ -39,10 +39,21 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:browserPath,args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
-  for(const role of ['teacher','student'])for(const chatOpen of [false,true])for(const width of [320,390,768,820,900,901,1024,1180,1280,1366,1499,1500,1600]){
+  for(const role of ['teacher','student'])for(const chatOpen of [false,true])for(const width of [320,390,760,761,768,820,900,901,1024,1180,1280,1366,1499,1500,1600]){
    const page=await browser.newPage({viewport:{width,height:850},deviceScaleFactor:1});
    await page.setContent(markup(role),{waitUntil:'load'});
-   if(chatOpen)await page.locator('.simWorkspace').evaluate(el=>el.classList.add('chatOpen'));
+   if(chatOpen)await page.locator('.simWorkspace').evaluate((el,w)=>{
+    el.classList.add('chatOpen');
+    if(w>760&&w<=900){
+     const sheet=document.createElement('aside');
+     sheet.className='simChat gsChatV2';
+     sheet.setAttribute('aria-label','Тестовый чат');
+     sheet.textContent='Чат';
+     el.appendChild(sheet);
+    }
+   },width);
+   if(chatOpen&&width>760&&width<=900)await page.locator('.simChat.gsChatV2')
+    .evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished.catch(()=>{}))));
    const measures=await page.evaluate(()=>{
     const sel=x=>{const el=document.querySelector(x);if(!el)return null;const r=el.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height,display:getComputedStyle(el).display,visibility:getComputedStyle(el).visibility}};
     const action=['.topScreenHistory','.topStageCopy','.topIndicators','.viewAsSwitcher','.topChatButton'];
@@ -55,7 +66,9 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
       const at=document.elementFromPoint(centerX,centerY);
       return {selector,rect:sel(selector),hit:at===el||el.contains(at)};
     });
-    return {top:sel('.simTop'),history:sel(action[0]),title:sel(action[1]),indicators:sel(action[2]),preview:sel(action[3]),chat:sel(action[4]),buttons,
+    return {top:sel('.simTop'),sheet:sel('.simChat.gsChatV2'),dockHeight:document.querySelector('.simChat.gsChatV2')?parseFloat(getComputedStyle(document.querySelector('.simChat.gsChatV2')).bottom)||0:0,viewportHeight:innerHeight,history:sel(action[0]),title:sel(action[1]),indicators:sel(action[2]),preview:sel(action[3]),chat:sel(action[4]),buttons,
+      roleButton:sel('.viewAsTrigger'),eye:sel('.viewAsMobileIcon'),
+      controls:['.topIndicators .livePill','.topIndicators .gameShareScreen','.topIndicators .timerPillDuration'].map(sel),
       overflow:document.documentElement.scrollWidth>innerWidth+2,
       statusWidth:document.querySelector('.topIndicators').scrollWidth,
       statusClient:document.querySelector('.topIndicators').clientWidth,
@@ -63,7 +76,7 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
    });
    assert(!measures.overflow,`${width}px ${role}: horizontal document overflow ${JSON.stringify(measures)}`);
    for(const item of measures.buttons)if(!item.hidden)assert(item.hit,`${width}px ${role} button blocked ${JSON.stringify(item)}`);
-   if(width>900&&width<1500){
+   if(width>760&&width<1500){
      assert(measures.top.height===84,`${width}px tablet header must be a single 84px row: ${JSON.stringify(measures)}`);
      assert(measures.title.display!=='none'&&measures.title.width>=105,`${width}px stage title must remain readable: ${JSON.stringify(measures)}`);
      for(const pair of [['history',measures.history],['title',measures.title],['indicators',measures.indicators],['preview',measures.preview],['chat',measures.chat]]){
@@ -79,11 +92,27 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
      if(role==='teacher'){
        assert(overlap(measures.indicators,measures.preview)<1,`${width}px indicators overlap preview switcher`);
        assert(measures.preview.width===48,`${width}px preview must be compact but clickable`);
+       assert(measures.roleButton.width===48&&measures.roleButton.height===48,`${width}px role control must be 48 × 48`);
+       assert(measures.eye?.display!=='none'&&measures.eye?.width===20&&measures.eye?.height===20,`${width}px eye icon must be visible at 20 × 20`);
+       const deltaX=Math.abs((measures.eye.left+measures.eye.right)/2-(measures.roleButton.left+measures.roleButton.right)/2);
+       const deltaY=Math.abs((measures.eye.top+measures.eye.bottom)/2-(measures.roleButton.top+measures.roleButton.bottom)/2);
+       assert(deltaX<=1&&deltaY<=1,`${width}px eye is off-center: ${JSON.stringify({deltaX,deltaY,measures})}`);
+     }
+     for(const action of measures.controls.filter(Boolean)){
+       assert(action.height===48,`${width}px action should align at 48px: ${JSON.stringify(action)}`);
+       assert(Math.abs((action.top+action.bottom)/2-(measures.top.top+measures.top.bottom)/2)<=3,
+        `${width}px status/share/timer off baseline: ${JSON.stringify(action)}`);
      }
      assert(measures.statusWidth<=measures.statusClient+2,`${width}px toolbar has clipped actions`);
      assert(measures.token==='84px',`${width}px chat must use restored 84px header offset`);
+     if(chatOpen&&width<=900){
+       assert(measures.sheet&&measures.sheet.top>=measures.top.bottom-1,
+        `${width}px chat overlaps tablet header: ${JSON.stringify(measures)}`);
+       assert(measures.sheet.bottom<=measures.viewportHeight-measures.dockHeight+2,
+        `${width}px chat overlaps mobile dock: ${JSON.stringify(measures)}`);
+     }
    }
-   if(width<=900)assert(measures.title.display==='none',`${width}px compact phone/tablet topbar unexpectedly altered`);
+   if(width<=760)assert(measures.title.display==='none',`${width}px compact phone/tablet topbar unexpectedly altered`);
    if(width>=1500)assert(measures.token!=='122px','Large desktop token must remain unchanged');
    await page.close();
    console.log('PASS '+width+'px '+role+' chat='+chatOpen);

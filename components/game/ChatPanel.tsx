@@ -211,9 +211,16 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');return;
    }
    const dockHeight=mobile.matches?(document.querySelector<HTMLElement>('.mobileDockV2')?.getBoundingClientRect().height||76):0;
-   node.style.height=Math.max(0,viewport.height-dockHeight)+'px';
-   node.style.top=viewport.offsetTop+'px';
-   if(mobile.matches)node.style.bottom='auto';else node.style.removeProperty('bottom');
+   // Reserve the actual 84px toolbar on medium tablets while allowing for visualViewport
+   // changes due to virtual keyboards and zoom. Phone behavior remains unchanged.
+   const mediumTablet=mobile.matches&&window.matchMedia('(min-width:761px) and (max-width:900px)').matches;
+   const headerHeight=mediumTablet?(document.querySelector<HTMLElement>('.simTop')?.getBoundingClientRect().height||0):0;
+   // Legacy mobile geometry uses !important; adapt the live sheet with the same
+   // priority only on tablets, preserving the normal phone and desktop styles.
+   const priority=mediumTablet?'important':'';
+   node.style.setProperty('height',Math.max(0,viewport.height-dockHeight-headerHeight)+'px',priority);
+   node.style.setProperty('top',(viewport.offsetTop+headerHeight)+'px',priority);
+   if(mobile.matches)node.style.setProperty('bottom','auto',priority);else node.style.removeProperty('bottom');
   };
   align();
   viewport.addEventListener('resize',align);viewport.addEventListener('scroll',align);

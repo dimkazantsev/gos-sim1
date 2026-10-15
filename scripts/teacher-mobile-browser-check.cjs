@@ -26,7 +26,14 @@ async function main(){
      const parts=[...el.querySelectorAll('.mobileBrand,.topScreenHistory,.simTopCenter,.viewAsSwitcher')].filter(x=>getComputedStyle(x).display!=='none').map(x=>{const a=x.getBoundingClientRect();return {name:x.className,left:a.left,right:a.right,top:a.top,bottom:a.bottom}});
      return {height:r.height,width:document.documentElement.clientWidth,parts,connection:!!el.querySelector('.connectionPill')};
     });
-    assert(header.height<=60,'Mobile header must fit one row at '+width+'px: '+JSON.stringify(header));
+    if(width<=760){
+     assert(header.height<=60,'Phone header must remain compact at '+width+'px: '+JSON.stringify(header));
+    }else{
+     assert(header.height>=82&&header.height<=85,'Tablet header must remain one 84px row at '+width+'px: '+JSON.stringify(header));
+     const centers=header.parts.map(part=>(part.top+part.bottom)/2);
+     assert(centers.every(center=>Math.abs(center-header.height/2)<=4),
+      'Tablet header parts must have the same vertical center at '+width+'px: '+JSON.stringify(header));
+    }
     assert(!header.connection,'Removed connection indicator must not remain in the mobile header');
     for(const part of header.parts)assert(part.left>=-2&&part.right<=header.width+2,'Header overflows at '+width+': '+JSON.stringify(header));
     await page.locator('#screen').selectOption('chat');
@@ -36,7 +43,10 @@ async function main(){
     });
     const chatGeometry=await frame.locator('.gsChatV2').evaluate(el=>{
      const a=el.getBoundingClientRect(),b=document.querySelector('.mobileDockV2').getBoundingClientRect();
-     return {chat:{top:a.top,bottom:a.bottom},dock:{top:b.top,bottom:b.bottom},headerBottom:document.querySelector('.simTop').getBoundingClientRect().bottom};
+     return {chat:{top:a.top,bottom:a.bottom},dock:{top:b.top,bottom:b.bottom},headerBottom:document.querySelector('.simTop').getBoundingClientRect().bottom,
+     debug:{computed:{top:getComputedStyle(el).top,bottom:getComputedStyle(el).bottom,height:getComputedStyle(el).height,transform:getComputedStyle(el).transform,position:getComputedStyle(el).position,animation:getComputedStyle(el).animationName},
+     parent:el.parentElement?.className,insideWorkspace:!!el.closest('.simWorkspace'),viewport:innerHeight,
+     ancestors:[...function*(node){for(let i=0;node&&i<5;i++,node=node.parentElement)yield {name:node.className,top:node.getBoundingClientRect().top,transform:getComputedStyle(node).transform,position:getComputedStyle(node).position}}(el)]}};
     });
     assert(chatGeometry.chat.top>=chatGeometry.headerBottom-2&&chatGeometry.chat.top<=chatGeometry.headerBottom+30,'Chat must remain below the header without overlapping it: '+JSON.stringify(chatGeometry));
     assert(chatGeometry.chat.bottom<=chatGeometry.dock.top+2&&chatGeometry.chat.bottom>=chatGeometry.dock.top-34,'Chat must end above dock with a small intentional gap: '+JSON.stringify(chatGeometry));
