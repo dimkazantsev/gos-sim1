@@ -43,8 +43,10 @@ assert(student.includes('partyRegistrationHiddenInput')&&student.includes('uploa
 assert(student.includes('partyRegistrationRevisionNote')&&student.includes('Предыдущие версии ('),'Previous versions and revision grounds must remain accessible');
 assert(!student.includes('partyRegistrationOverview')&&!student.includes('partyRegistrationDecision')&&!student.includes('selected.registration_note'),
  'Formal Ministry decision and explanatory paragraphs must not be repeated in the party document list');
-assert(/partyRegistrationDocIdentity">\\s*<span className="partyRegistrationDocStatus"[\\s\\S]*?<\\/span>\\s*<b>\\{kind.title\\}<\\/b>/.test(student),
- 'Document status must precede the left-aligned title');
+const rowStart=student.indexOf('<div className="partyRegistrationDocIdentity">');
+const statusAt=student.indexOf('<span className="partyRegistrationDocStatus"',rowStart);
+const titleAt=student.indexOf('<b>{kind.title}</b>',rowStart);
+assert(rowStart>=0&&statusAt>rowStart&&titleAt>statusAt,'Document status must precede the left-aligned title');
 
 assert(student.includes('Документ возвращён на доработку.'),'Student must see explicit revision status and its grounds');
 assert(teacher.includes('latest?.id===d.id')&&teacher.includes('canReview&&'));
