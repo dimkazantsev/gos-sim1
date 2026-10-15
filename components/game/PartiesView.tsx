@@ -18,11 +18,12 @@ function PartyDisclosureSummary({icon:Icon,title,meta}:{icon:ComponentType<{size
 }
 export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const {parties,members,profiles,partyDocuments,partyInvitations,partyMandates,me,teacher}=g;
- const [selectedId,setSelectedId]=useState(''),[query,setQuery]=useState(''),[description,setDescription]=useState(''),[busy,setBusy]=useState(false),[docKind,setDocKind]=useState<PartyDocument['doc_kind']>('application'),[docFile,setDocFile]=useState<File|null>(null),[docTitle,setDocTitle]=useState(''),[inviteUser,setInviteUser]=useState(''),[name,setName]=useState(''),[ideology,setIdeology]=useState('');
+ const [selectedId,setSelectedId]=useState(''),[query,setQuery]=useState(''),[description,setDescription]=useState(''),[busy,setBusy]=useState(false),[inviteUser,setInviteUser]=useState(''),[name,setName]=useState(''),[ideology,setIdeology]=useState('');
  const [deletingPartyId,setDeletingPartyId]=useState('');
- const uploadInput=useRef<HTMLInputElement>(null);
+ const uploadInputs=useRef<Partial<Record<PartyDocument['doc_kind'],HTMLInputElement|null>>>({});
+ const uploadInFlight=useRef(false);
  const registrationPackageRef=useRef<HTMLDetailsElement>(null);
- const [documentNotice,setDocumentNotice]=useState<{partyId:string;kind:'success'|'error';message:string}|null>(null);
+ const [documentNotice,setDocumentNotice]=useState<{partyId:string;docKind:PartyDocument['doc_kind'];kind:'success'|'error';message:string}|null>(null);
  const [inviteFeedback,setInviteFeedback]=useState<{partyId:string;kind:'success'|'error';message:string}|null>(null);
  const stageOne=g.stages.find(s=>s.stage_no===1);
  const partyFormationOpen=isStageWorkOpen(g.game,stageOne);
@@ -40,20 +41,17 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  useEffect(()=>{if(revisionVersions&&registrationPackageRef.current)registrationPackageRef.current.open=true;},[revisionVersions,selected?.id]);
  async function saveDescription(){if(!selected)return;setBusy(true);try{await g.savePartyIdentity(selected.id,description||selected.description||'')}finally{setBusy(false)}}
  async function saveLogo(file:File):Promise<boolean>{if(!selected)return false;setBusy(true);try{return await g.savePartyIdentity(selected.id,undefined,file)}finally{setBusy(false)}}
- async function upload(){
-  if(!selected||!docFile||busy||selected.registration_status==='registered')return;
-  const partyId=selected.id;
+ async function upload(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File){
+  if(!selected||selected.id!==partyId||!partyFormationOpen||!selected.leader_user_id||busy||uploadInFlight.current||selected.registration_status==='registered')return;
+  uploadInFlight.current=true;
   setBusy(true);setDocumentNotice(null);
   try{
-   const ok=await g.uploadPartyDocument(partyId,docKind,docTitle.trim()||DOCS.find(d=>d.kind===docKind)?.title||docFile.name,docFile);
-   if(ok){
-    setDocFile(null);setDocTitle('');
-    setDocumentNotice({partyId,kind:'success',message:'Новая версия документа направлена в Минюст. Она доступна вашей партии и преподавателю. Публичная публикация возможна только после регистрации партии.'});
-   }else setDocumentNotice({partyId,kind:'error',message:'Документ не зарегистрирован. Посмотрите сообщение об ошибке и повторите попытку после устранения причины.'});
+   const ok=await g.uploadPartyDocument(partyId,kind,title,file);
+   setDocumentNotice({partyId,docKind:kind,kind:ok?'success':'error',message:ok?'Версия документа направлена в Минюст на рассмотрение.':'Загрузку не удалось подтвердить. Проверьте сообщение об ошибке и повторите попытку.'});
   }catch(e){
    g.setError(e);
-   setDocumentNotice({partyId,kind:'error',message:'Не удалось завершить загрузку документа.'});
-  }finally{setBusy(false)}
+   setDocumentNotice({partyId,docKind:kind,kind:'error',message:'Не удалось загрузить документ. Повторите попытку.'});
+  }finally{uploadInFlight.current=false;setBusy(false)}
  }
  async function sendPartyInvite(){
   if(!selected||!inviteUser||busy||inviteClosed)return;
@@ -103,56 +101,54 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
    {(canEditDescription||canUploadLogo)&&<details className="civicPartyEditor"><PartyDisclosureSummary icon={PencilLine} title="Оформление партии" meta="Эмблема и публичное описание"/>{canEditDescription&&<><label>Описание<textarea rows={4} value={description||selected.description||''} onChange={e=>setDescription(e.target.value)}/></label><button className="secondary" disabled={busy} onClick={()=>void saveDescription()}>Сохранить описание</button></>}{canUploadLogo&&<PartyLogoEditor key={selected.id} partyName={selected.name} disabled={busy} onSave={saveLogo}/>}</details>}
    {(own||(selected.registration_status==='registered'&&certificateIssued))&&
     <fieldset className="gosPartyStageFieldset" disabled={!partyFormationOpen}><JusticeDocuments g={g} partyId={selected.id}/></fieldset>}
-   {own&&<details ref={registrationPackageRef} className={"civicPartyPackage"+(revisionVersions?" hasRevision":"")}><PartyDisclosureSummary icon={FileText} title="Документы и регистрация партии" meta={revisionVersions?"Требуется доработка: "+revisionVersions.split(",").length+" документ(ов)":latestDocs.length+" видов · "+docs.length+" попыток"}/><p>{selected.registration_note||'Подготовьте документы. Преподаватель увидит загруженные файлы в управлении фракциями.'}</p><div className="civicPartyFiles" aria-label="Загруженные документы партии">
-    <h4>История рассмотрения: {docs.length} попыток</h4>
-    <p>Каждая повторная загрузка сохраняется как отдельная версия. До выдачи свидетельства документы видят только члены партии и Минюст.</p>
-    <div className="partyRegistrationUpdates" role="status" aria-label="Уведомления о проверках Минюста">
-     {docs.filter(d=>['accepted','revision'].includes(d.status)).length===0&&<p>Заключения Минюста ещё не поступали.</p>}
-     {[...docs].filter(d=>['accepted','revision'].includes(d.status)).sort((a,b)=>b.created_at.localeCompare(a.created_at)).map(d=>
-       <article key={'review-'+d.id}><b>{partyDocumentVersionLabel(d)} · {DOCS.find(x=>x.kind===d.doc_kind)?.title||d.title}</b>
-        <span>{partyDocumentVerdict(d)}.</span>{d.note&&<p>Замечания Минюста: {d.note}</p>}
-       </article>)}
-    </div>
-    {DOCS.map(kind=>{
-     const current=latestPartyDocument(docs,kind.kind);
-     const history=docs.filter(d=>d.doc_kind===kind.kind).sort((a,b)=>(b.version_no??1)-(a.version_no??1)||b.created_at.localeCompare(a.created_at));
-     return <article className={"partyRegistrationDoc"+(current?.status==="revision"?" isRevision":"")} key={kind.kind}>
-      <header><b>{kind.title}</b><span role={current?.status==="revision"?"alert":undefined}>{current?partyDocumentVersionLabel(current)+" · "+partyDocumentVerdict(current):"Не загружен"}</span></header>
-      {current?.note&&<p className="partyRegistrationRevisionNote">Заключение Минюста: {current.note}</p>}
-      <div className="partyRegistrationDocActions">
-       {current?.url&&<a href={current.url} target="_blank" rel="noreferrer">Просмотреть {partyDocumentVersionLabel(current)}</a>}
-       {!!selected?.leader_user_id&&partyFormationOpen&&selected.registration_status!=='registered'&&
-        <button type="button" className="secondary" disabled={busy} onClick={()=>{
-         setDocKind(kind.kind);setDocTitle(kind.title);setDocFile(null);
-         uploadInput.current?.scrollIntoView({behavior:'smooth',block:'center'});
-         uploadInput.current?.click();
-        }}>Загрузить {current?'В'+((current.version_no??1)+1):'В1'}</button>}
-      </div>
-      {history.length>0&&<details><summary>История версий ({history.length})</summary>
-       {history.map(d=><p key={d.id}>{partyDocumentVersionLabel(d)} · {partyDocumentVerdict(d)} ·
-         {d.url?<a href={d.url} target="_blank" rel="noreferrer"> {d.file_name}</a>:' Файл недоступен'}
+   {own&&<details ref={registrationPackageRef} className={"civicPartyPackage"+(revisionVersions?" hasRevision":"")}><PartyDisclosureSummary icon={FileText} title="Документы и регистрация партии" meta={revisionVersions?"Требуется доработка: "+revisionVersions.split(",").length+" документ(ов)":latestDocs.length+" видов · "+docs.length+" попыток"}/>
+    <p>{selected.registration_note||'Подготовьте регистрационный пакет. Решения Минюста отражаются в карточках документов.'}</p>
+    <div className="civicPartyFiles" aria-label="Регистрационные документы партии">
+     <h4>Регистрационные документы</h4>
+     <p>По каждому документу показана последняя версия. Красным отмечена версия, возвращённая Минюстом на доработку. Предыдущие попытки доступны в истории этого же документа.</p>
+     {DOCS.map(kind=>{
+      const current=latestPartyDocument(docs,kind.kind);
+      const history=docs.filter(d=>d.doc_kind===kind.kind).sort((a,b)=>(b.version_no??1)-(a.version_no??1)||b.created_at.localeCompare(a.created_at));
+      const canUpload=!!selected.leader_user_id&&partyFormationOpen&&selected.registration_status!=='registered';
+      const nextVersion=(current?.version_no??0)+1;
+      return <article className={"partyRegistrationDoc"+(current?.status==="revision"?" isRevision":"")} key={kind.kind}>
+       <div className="partyRegistrationDocTop">
+        <div className="partyRegistrationDocIdentity"><b>{kind.title}</b>
+         <span className="partyRegistrationDocStatus" role={current?.status==="revision"?"alert":undefined}>{current?partyDocumentVersionLabel(current)+" · "+partyDocumentVerdict(current):"Не загружен"}</span>
+        </div>
+        <div className="partyRegistrationDocActions">
+         {current?.url&&<a href={current.url} target="_blank" rel="noreferrer" aria-label={"Открыть "+kind.title+" "+partyDocumentVersionLabel(current)}>Открыть</a>}
+         {canUpload&&<>
+          <input type="file" className="partyRegistrationHiddenInput" tabIndex={-1} aria-label={"Выбрать файл: "+kind.title}
+           accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp"
+           ref={node=>{uploadInputs.current[kind.kind]=node}}
+           onChange={event=>{const file=event.currentTarget.files?.[0];event.currentTarget.value='';if(file)void upload(selected.id,kind.kind,kind.title,file)}}/>
+          <button type="button" className="secondary" disabled={busy} onClick={()=>uploadInputs.current[kind.kind]?.click()}>
+           {busy?"Загрузка…":"Загрузить В"+nextVersion}
+          </button>
+         </>}
+        </div>
+       </div>
+       {current?.status==="revision"&&<p className="partyRegistrationRevisionNote"><b>Документ возвращён на доработку.</b> {current.note||"Ознакомьтесь с решением Минюста и загрузите исправленную версию."}</p>}
+       {current?.status!=="revision"&&current?.note&&<p className="partyRegistrationReviewNote">Заключение Минюста: {current.note}</p>}
+       {documentNotice?.partyId===selected.id&&documentNotice.docKind===kind.kind&&<p className={"civicPartyInviteFeedback "+(documentNotice.kind==="error"?"isError":"isSuccess")} role={documentNotice.kind==="error"?"alert":"status"}>{documentNotice.message}</p>}
+       {history.length>0&&<details className="partyRegistrationDocHistory"><summary>История версий ({history.length})</summary>
+        {history.map(d=><p key={d.id}>{partyDocumentVersionLabel(d)} · {partyDocumentVerdict(d)} ·
+         {d.url?<a href={d.url} target="_blank" rel="noreferrer">Открыть файл</a>:"Файл недоступен"}
          {d.note&&<small> · {d.note}</small>}</p>)}
-      </details>}
-     </article>
-    })}
-   </div>{!!selected.leader_user_id&&partyFormationOpen&&selected.registration_status!=='registered'&&<div className="civicPartyUpload" data-party-document-upload>
-     <div className="civicPartyUploadMain">
-      <StyledSelect label="Вид документа" value={docKind} onChange={v=>setDocKind(v as PartyDocument['doc_kind'])} options={DOCS.map(d=>({value:d.kind,label:d.title}))}/>
-      <label className="civicPartyUploadField"><span>Название</span><input value={docTitle} onChange={e=>setDocTitle(e.target.value)} placeholder="Введите название документа"/></label>
-      <label className="civicPartyUploadField civicPartyUploadFile"><span>Файл</span><input ref={uploadInput} type="file" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp" onChange={e=>setDocFile(e.target.files?.[0]||null)}/></label>
-      {documentNotice?.partyId===selected.id&&<p role={documentNotice.kind==='error'?'alert':'status'} className={'civicPartyInviteFeedback '+(documentNotice.kind==='error'?'isError':'isSuccess')}>{documentNotice.message}</p>}
-      <div className="civicPartyUploadActions">
-       <button type="button" className="primary" disabled={busy||!docFile} onClick={()=>void upload()}>{busy?'Загрузка…':'Загрузить документ'}</button>
-       <button type="button" className="secondary" disabled={busy||!DOCS.every(req=>latestDocs.some(d=>d.doc_kind===req.kind&&d.status!=='revision'))} onClick={()=>void g.submitPartyRegistration(selected.id)}>Направить на регистрацию</button>
-      </div>
-     </div>
-     <aside className="partyLegalRequirements" aria-label="Нормативные требования к документу">
-      <h4>Нормативные требования</h4>
-      <a className="secondary" href="https://pravo.gov.ru/proxy/ips/?docbody=&nd=102071991" target="_blank" rel="noreferrer">Требования к документу · Закон № 95-ФЗ</a>
-      <a href="https://minjust.gov.ru/ru/documents/7719/" target="_blank" rel="noreferrer">Официальные формы Минюста · Приказ № 333</a>
-      <small>{docKind==='charter'?'Статья 21: содержание устава.':docKind==='program'?'Статья 22: программа партии.':docKind==='symbol'?'Статья 7: символика партии.':docKind==='fee'?'Статья 16: документ об уплате госпошлины. Размер и льготы — статья 333.33 НК РФ.':docKind==='congress_minutes'?'Статьи 11 и 16: учредительный съезд и протокол.':'Статья 16: заявление и регистрационный пакет. Формы утверждены приказом Минюста от 12.11.2024 № 333.'}</small>
-     </aside>
-    </div>}</details>}
+       </details>}
+      </article>;
+     })}
+     {!!selected.leader_user_id&&partyFormationOpen&&selected.registration_status!=='registered'&&
+      <div className="partyRegistrationFooter">
+       <button type="button" className="primary" disabled={busy||!DOCS.every(req=>latestDocs.some(d=>d.doc_kind===req.kind&&d.status!=="revision"))} onClick={()=>void g.submitPartyRegistration(selected.id)}>Направить пакет на регистрацию</button>
+       <details className="partyRegistrationLegal"><summary>Нормативные требования к документам</summary>
+        <a href="https://pravo.gov.ru/proxy/ips/?docbody=&nd=102071991" target="_blank" rel="noreferrer">Федеральный закон № 95-ФЗ</a>
+        <a href="https://minjust.gov.ru/ru/documents/7719/" target="_blank" rel="noreferrer">Официальные формы Минюста · Приказ № 333</a>
+       </details>
+      </div>}
+    </div>
+   </details>}
 
   </section>}
   {canCreate&&<details open className="civicPartyEditor"><PartyDisclosureSummary icon={Plus} title="Создать партию" meta="Новая политическая организация"/><label>Название<input value={name} onChange={e=>setName(e.target.value)}/></label><label>Идеология<input value={ideology} onChange={e=>setIdeology(e.target.value)}/></label><button className="primary" disabled={busy||!name.trim()||!ideology.trim()} onClick={async()=>{if(await g.createParty(name,ideology)){setName('');setIdeology('')}}}>Создать</button></details>}
