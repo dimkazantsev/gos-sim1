@@ -5,7 +5,7 @@ using (private.is_game_member(game_id) and (
  private.is_game_teacher(game_id)
  or exists (select 1 from public.game_parties p join public.game_members gm on gm.game_id=p.game_id and gm.team=p.name where p.id=party_documents.party_id and gm.user_id=(select auth.uid()))
  or (doc_kind in ('charter','program','symbol','congress_minutes') and status='accepted'
-    and exists(select 1 from public.game_parties p where p.id=party_documents.party_id and p.registration_status='registered'))
+    and private.party_registration_published(party_id))
 ));
 
 CREATE OR REPLACE FUNCTION public.submit_party_registration(p_party_id uuid)
