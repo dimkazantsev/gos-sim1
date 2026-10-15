@@ -4,6 +4,7 @@ import {CheckCircle2,KeyRound,LockKeyhole,Mail,RefreshCw,ShieldCheck} from 'luci
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {ProfileSetupField} from './profileSetup';
+import {describeProfileEmailError,EMAIL_RESEND_GUARD_MS} from './profileEmailDelivery';
 type LoginEmail={user_id:string;email:string;verified_at:string};
 export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnTypeRepublic;missing?:ProfileSetupField[];onChanged?:()=>void}){
  const {game,me,teacher,members}=g;
@@ -15,6 +16,25 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
  const [mailRequested,setMailRequested]=useState(false);
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
+ const [emailRetryUntil,setEmailRetryUntil]=useState(0);
+ const [now,setNow]=useState(0);
+ const retryMinutes=Math.max(0,Math.ceil((emailRetryUntil-now)/60000));
+ useEffect(()=>{
+  if(!game?.id)return;
+  try{const value=Number(window.localStorage.getItem('gos-id:auth-email-retry:'+game.id)||0);setEmailRetryUntil(Number.isFinite(value)&&value>Date.now()?value:0)}catch{setEmailRetryUntil(0)}
+  setNow(Date.now());
+ },[game?.id]);
+ useEffect(()=>{
+  if(!emailRetryUntil||emailRetryUntil<=Date.now())return;
+  const interval=window.setInterval(()=>setNow(Date.now()),30_000);
+  return()=>window.clearInterval(interval);
+ },[emailRetryUntil]);
+ function deferEmailRequest(durationMs:number){
+  if(!game?.id)return;
+  const until=Date.now()+durationMs;
+  setEmailRetryUntil(until);setNow(Date.now());
+  try{window.localStorage.setItem('gos-id:auth-email-retry:'+game.id,String(until))}catch{}
+ }
  const mine=registered.find(x=>x.user_id===me?.user_id);
  async function load(){
   if(!game)return;
@@ -43,7 +63,7 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
  }
  useEffect(()=>{void load()},[game?.id,me?.user_id]);
  async function link(){
-  if(!email.trim()||busy)return;
+  if(!email.trim()||busy||Date.now()<emailRetryUntil)return;
   setBusy(true);setNotice('');
   // GitHub Pages is a static shell: it cannot serve /game/[id] dynamically.
   // Complete the verification on the application server and deep-link to the profile.
@@ -53,9 +73,15 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   redirect.searchParams.set('section','profile');
   const requestedEmail=email.trim().toLowerCase();
   const r=await supabase.auth.updateUser({email:requestedEmail},{emailRedirectTo:redirect.toString()});
-  if(r.error){setMailRequested(false);setNotice('Не удалось отправить письмо: '+r.error.message)}
+  if(r.error){
+   setMailRequested(false);
+   const issue=describeProfileEmailError(r.error);
+   setNotice(issue.notice);
+   if(issue.cooldownMs)deferEmailRequest(issue.cooldownMs);
+  }
   else{
    setMailRequested(true);
+   deferEmailRequest(EMAIL_RESEND_GUARD_MS);
    setNotice('Письмо отправлено на '+requestedEmail+'. Откройте ссылку в письме, затем вернитесь сюда и нажмите «Проверить подтверждение» — независимо от того, какая страница открылась по ссылке.');
   }
   setBusy(false);
@@ -101,10 +127,11 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   <p>1. Нажмите «Отправить письмо для подтверждения». 2. Откройте письмо и перейдите по ссылке. 3. Вернитесь в этот раздел и нажмите «Проверить подтверждение» — независимо от того, что открылось по ссылке. 4. После подтверждения сохраните личный пароль.</p>
   <div className="profileSecurityGrid">
    <label data-profile-setup-field="email" className={missing.includes('email')?'profileSetupInvalid':''}>Ваш адрес электронной почты<input aria-invalid={missing.includes('email')} type="email" autoComplete="email" value={email} onChange={e=>{setEmail(e.target.value);setMailRequested(false);setNotice('')}} placeholder="Имя@пример.рф" disabled={verified||busy}/></label>
-   <button type="button" disabled={busy||verified||!email.includes('@')} onClick={()=>void link()}><Mail size={17}/>{verified?'Почта подтверждена':mailRequested?'Отправить письмо повторно':'Отправить письмо для подтверждения'}</button>
+   <button type="button" disabled={busy||verified||!email.includes('@')||retryMinutes>0} onClick={()=>void link()}><Mail size={17}/>{verified?'Почта подтверждена':retryMinutes>0?'Повтор через '+retryMinutes+' мин.':mailRequested?'Отправить письмо повторно':'Отправить письмо для подтверждения'}</button>
    <button type="button" disabled={busy} onClick={()=>void check()}><RefreshCw size={17}/> Проверить подтверждение</button>
   </div>
   {notice&&<p className="profileSecurityNotice" role="status">{notice}</p>}
+  {retryMinutes>0&&!verified&&<p className="profileSecurityNotice" role="status">Письма временно не отправляются с этого устройства. Ожидание: примерно {retryMinutes} мин. Кнопка «Проверить подтверждение» работает независимо от этого ограничения.</p>}
   {verified&&<div className={'profilePasswordFields'+(missing.includes('password')?' profileSetupInvalid':'')} data-profile-setup-field="password">
    <label>Новый личный пароль<input type="password" autoComplete="new-password" minLength={10} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Не менее 10 символов"/></label>
    <label>Повторите пароль<input type="password" autoComplete="new-password" minLength={10} value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="Подтверждение пароля"/></label>
