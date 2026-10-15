@@ -37,3 +37,16 @@ function walk(dir){
 for(const dir of roots)walk(path.join(root,dir));
 for(const result of candidates.slice(0,60))console.log('RU-AUDIT '+result.path+':'+result.line+' — '+result.words);
 console.log('RU-AUDIT: Обнаружено '+candidates.length+' фрагментов с латиницей в статическом тексте интерфейса. Требуется содержательная проверка, включая допустимые имена и марки.');
+
+const blockingExamples=[
+ ['components/game/GhostPolicyLab.tsx',/Ghost voting/],
+ ['components/game/ParticipantsAnalytics.tsx',/Источник баллов: stage_assessments/],
+ ['components/game/SystemDebriefLab.tsx',/ИЗМЕНЕНИЯ KPI/],
+ ['components/game/ScoreFormula.tsx',/ВСН = max\(/],
+ ['components/game/DocumentPaper.tsx',/<h1>\{titleSlot\|\|d\.title\}<\/h1>/]
+];
+for(const [file,expression] of blockingExamples){
+ const content=fs.readFileSync(path.join(root,file),'utf8');
+ if(expression.test(content))throw new Error('Непереведённая подпись в '+file+': '+expression.source);
+}
+console.log('RU-AUDIT: Проверка известных утечек технических и английских названий пройдена.');
