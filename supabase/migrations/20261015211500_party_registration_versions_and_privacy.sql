@@ -86,6 +86,18 @@ create trigger party_registration_latest_guard before update of registration_sta
  for each row execute function private.party_registration_latest_guard();
 revoke all on function private.party_registration_latest_guard() from public,anon,authenticated;
 
+-- Legal release requires BOTH a registered decision and an issued certificate.
+create or replace function private.party_registration_published(p_party uuid)
+returns boolean language sql stable security definer set search_path to 'public','private','pg_temp'
+as $fn$
+ select exists(select 1 from public.game_parties p where p.id=p_party
+  and p.registration_status='registered'
+  and exists(select 1 from public.formal_documents f where f.game_id=p.game_id
+   and f.doc_type='party_certificate' and f.metadata->>'party_id'=p.id::text))
+$fn$;
+revoke all on function private.party_registration_published(uuid) from public,anon;
+grant execute on function private.party_registration_published(uuid) to authenticated;
+
 -- Every party member sees the attempt and the teacher's verdict in the party chat.
 create or replace function private.party_document_review_chat_notice()
 returns trigger language plpgsql security definer set search_path to 'public','private','pg_temp'
@@ -214,5 +226,41 @@ with check (
    select 1 from public.game_parties gp where gp.id=(split_part(name,'/',3))::uuid
     and gp.game_id=(split_part(name,'/',1))::uuid and gp.registration_status<>'registered'
   )
+ )
+);
+
+
+-- Signed Minjust correspondence is a private party notification until
+-- the actual registration certificate exists. The game-wide formal register
+-- and political wall must not leak preliminary refusal/revision letters.
+drop policy if exists formal_documents_read on public.formal_documents;
+create policy formal_documents_read on public.formal_documents for select to authenticated
+using (
+ private.is_game_member(game_id) and (
+  doc_type not in ('justice_response','party_certificate') or not (metadata ? 'party_id')
+  or private.is_game_teacher(game_id)
+  or exists(
+   select 1 from public.game_parties p
+   where p.game_id=formal_documents.game_id and p.id::text=formal_documents.metadata->>'party_id'
+    and (private.party_registration_published(p.id)
+     or exists(select 1 from public.game_members m where m.game_id=p.game_id
+      and m.user_id=(select auth.uid()) and m.kind='student'
+      and m.team=p.name and m.roster_archived_at is null))
+  )
+ )
+);
+drop policy if exists political_posts_read on public.political_posts;
+create policy political_posts_read on public.political_posts for select to authenticated
+using (
+ deleted_at is null and private.is_game_member(game_id)
+ and (
+  actor_key<>'minjust' or not (context ? 'party_id')
+  or private.is_game_teacher(game_id)
+  or exists(select 1 from public.game_parties p
+   where p.game_id=political_posts.game_id and p.id::text=political_posts.context->>'party_id'
+    and (private.party_registration_published(p.id)
+     or exists(select 1 from public.game_members m where m.game_id=p.game_id
+      and m.user_id=(select auth.uid()) and m.kind='student'
+      and m.team=p.name and m.roster_archived_at is null)))
  )
 );
