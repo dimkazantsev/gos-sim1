@@ -51,19 +51,19 @@ export default function GhostPolicyLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onO
  }
 
  return <section className="ghostPolicyLab">
-  <header className="ghostPolicyHead"><div><small>ПОСТАНОВЛЕНИЕ ГД · ЭТАП 5</small><h2>Режим Ghost voting</h2><p>Жеребьёвка 25–50 отсутствующих депутатов уже работает отдельно. Здесь Государственная Дума определяет политико-процедурный режим, в котором она применяется.</p></div><div className="ghostPolicyCurrent"><small>ДЕЙСТВУЮЩИЙ РЕЖИМ</small><strong>{adopted?labels[adopted.policy_mode]:'Не принят'}</strong><span>{adopted?cadence[adopted.policy_mode]:'Требуется постановление ГД'}</span></div></header>
+  <header className="ghostPolicyHead"><div><small>ПОСТАНОВЛЕНИЕ ГД · ЭТАП 5</small><h2>Режим Goust Voting</h2><p>Жеребьёвка 25–50 отсутствующих депутатов уже работает отдельно. Здесь Государственная Дума определяет политико-процедурный режим, в котором она применяется.</p></div><div className="ghostPolicyCurrent"><small>ДЕЙСТВУЮЩИЙ РЕЖИМ</small><strong>{adopted?labels[adopted.policy_mode]:'Не принят'}</strong><span>{adopted?cadence[adopted.policy_mode]:'Требуется постановление ГД'}</span></div></header>
 
   <div className="ghostCadenceNote"><b>Почему частота не автоматизирована жёстко</b><p>Фразы «через каждые 2 заседания» и «через одно заседание» допускают разные трактовки точки отсчёта. Поэтому система фиксирует выбранный режим и показывает авторскую формулировку дословно, а сам запуск конкретной жеребьёвки остаётся у преподавателя.</p></div>
 
   {canPropose&&<section className="ghostPolicyProposal">
    <div className="ghostPolicyProposalHead">
-    <div><small>ПРОЕКТ ПОСТАНОВЛЕНИЯ</small><h3>Выберите режим Ghost voting</h3><p>Один вариант станет предметом рассмотрения Государственной Думы.</p></div>
+    <div><small>ПРОЕКТ ПОСТАНОВЛЕНИЯ</small><h3>Выберите режим Goust Voting</h3><p>Один вариант станет предметом рассмотрения Государственной Думы.</p></div>
    </div>
    <div className="ghostPolicyModes" role="radiogroup" aria-label="Предлагаемый режим">
     {([
-     ['prohibited','Запрещено','Ghost voting не применяется'],
+     ['prohibited','Запрещено','Goust Voting не применяется'],
      ['justified','По уважительной причине','Допускается только при обоснованном отсутствии'],
-     ['allowed','Разрешено','Ghost voting применяется без дополнительного ограничения']
+     ['allowed','Разрешено','Goust Voting применяется без дополнительного ограничения']
     ] as const).map(([value,title,desc],index)=><button key={value} type="button" role="radio" aria-checked={mode===value} tabIndex={mode===value?0:-1} className={mode===value?'active':''} onClick={()=>setMode(value)} onKeyDown={e=>{
      const choices=['prohibited','justified','allowed'] as const;
      const next=e.key==='ArrowRight'||e.key==='ArrowDown'?(index+1)%3:e.key==='ArrowLeft'||e.key==='ArrowUp'?(index+2)%3:e.key==='Home'?0:e.key==='End'?2:null;
