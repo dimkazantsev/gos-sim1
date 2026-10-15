@@ -215,9 +215,9 @@
     Scope the hard offset to medium tablets, irrespective of ancestry. */
  .simChat.gsChatV2 {
   position:fixed;
-  top:84px!important;
-  bottom:var(--gs-mobile-dock-height)!important;
-  height:calc(100dvh - 84px - var(--gs-mobile-dock-height))!important;
+  top:84px;
+  bottom:var(--gs-mobile-dock-height);
+  height:calc(100dvh - 84px - var(--gs-mobile-dock-height));
   max-height:none;
  }
  /* The mobile dock already owns Chat below 901px; avoid duplicating its control. */
