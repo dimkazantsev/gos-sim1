@@ -99,7 +99,16 @@ const g=new Proxy(fixture,{get:(target,key)=>key in target?target[key]:noop});
 Object.assign(fixture,{profilesLoaded:true,introAccountSeen:true,chatMediaError:'',chatMediaPhase:'idle'});
 fixture.profiles=fixture.members.map(m=>({game_id:'design-preview',user_id:m.user_id,onboarding_completed_at:now,intro_seen_at:now,bio:'Участник учебной симуляции.',avatar_path:null,signature_path:null}));
 fixture.partyMandates=fixture.members.filter(m=>m.kind==='student').map(m=>{const p=fixture.parties.find(p=>p.name===m.team),staff=fixture.members.filter(x=>x.kind==='student'&&x.team===m.team),i=staff.indexOf(m),base=Math.floor(p.mandates/staff.length)+(i<p.mandates%staff.length?1:0);return {game_id:'design-preview',party_id:p.id,user_id:m.user_id,base_mandates:base,ghost_loss:0,effective_mandates:base}});
-fixture.partyDocuments=fixture.parties.flatMap(p=>['charter','program','fee'].map((kind,i)=>({id:p.id+'-'+kind,game_id:'design-preview',party_id:p.id,doc_kind:kind,title:kind==='charter'?'Устав политической партии':kind==='program'?'Программа общественного развития':'Сведения об уплате пошлины',file_name:'Документ партии «'+p.name+'» — редакция учредительного съезда.txt',status:'pending',uploaded_by:p.leader_user_id,created_at:now,url:'data:text/plain;charset=utf-8,Учебный образец'})));
+fixture.partyDocuments=fixture.parties.flatMap(p=>['charter','program','fee'].map((kind,i)=>({id:p.id+'-'+kind,game_id:'design-preview',party_id:p.id,doc_kind:kind,title:kind==='charter'?'Устав политической партии':kind==='program'?'Программа общественного развития':'Сведения об уплате пошлины',file_name:'Документ партии «'+p.name+'» — редакция учредительного съезда.txt',status:kind==='fee'?'submitted':'accepted',version_no:1,uploaded_by:p.leader_user_id,created_at:now,url:'data:text/plain;charset=utf-8,Демонстрационный образец'})));
+fixture.formalDocuments.push(...fixture.parties.map(p=>({
+ id:'cert-'+p.id,game_id:'design-preview',stage_no:1,registry_no:'МЮ-С-'+p.id,
+ title:'Свидетельство о регистрации партии «'+p.name+'»',doc_type:'party_certificate',
+ subject_key:'minjust',subject_label:'Министерство юстиции Российской Федерации',
+ author_id:'teacher-demo',body_text:'Демонстрационное свидетельство',workflow_key:'official_correspondence',
+ workflow_steps:[{code:'published',label:'Свидетельство выдано',owner:'system',action:null}],
+ status_code:'published',status_label:'Свидетельство выдано',current_owner_key:'system',
+ created_at:now,updated_at:now,metadata:{party_id:p.id}
+})));
 // Replace only this process's hook export. The application source remains unchanged.
 require('../components/game/useRepublicGame').useRepublicGame=()=>g;
 // Offline SSR has no effects or localStorage: emulate *only in this preview*
