@@ -36,8 +36,6 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  publicDocs=selected?.registration_status==='registered'&&certificateIssued?
   latestDocs.filter(d=>['charter','program','symbol','congress_minutes'].includes(d.doc_kind)&&d.status==='accepted'):[],free=members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&!m.team),pending=partyInvitations.filter(i=>i.party_id===selected?.id&&i.status==='pending'),inbox=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  const reviewedCount=DOCS.filter(kind=>latestDocs.some(d=>d.doc_kind===kind.kind&&d.status==='accepted')).length;
- const returnedCount=DOCS.filter(kind=>latestDocs.some(d=>d.doc_kind===kind.kind&&d.status==='revision')).length;
- const registrationSummary=selected?.registration_status==='registered'?'Регистрация завершена':selected?.registration_status==='rejected'?'В регистрации отказано':selected?.registration_status==='revision'||returnedCount>0?'Требуется доработка документов':selected?.registration_status==='submitted'?'Документы рассматриваются Минюстом':'Подготовка регистрационного пакета';
  const canInvite=partyFormationOpen&&!!selected&&!!me&&!me.roster_archived_at&&(teacher||me.kind==='student'&&me.team===selected.name);
  const inviteClosed=!!selected?.leader_user_id;
  const workflowCount=partyInvitations.filter(i=>i.game_id===g.game?.id&&i.status==='pending'&&i.invited_user_id===me?.user_id).length;
@@ -106,17 +104,6 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
     <fieldset className="gosPartyStageFieldset" disabled={!partyFormationOpen}><JusticeDocuments g={g} partyId={selected.id}/></fieldset>}
    {own&&<details ref={registrationPackageRef} className={"civicPartyPackage"+(revisionVersions?" hasRevision":"")}>
     <PartyDisclosureSummary icon={FileText} title="Документы и регистрация партии" meta={"Принято "+reviewedCount+" из "+DOCS.length+" · "+docs.length+" версий"}/>
-    <div className="partyRegistrationOverview" role="status">
-     <div className="partyRegistrationOverviewCopy">
-      <b>{registrationSummary}</b>
-      <small>{returnedCount>0?"На доработке: "+returnedCount+". Загрузите новые версии отмеченных документов.":selected.registration_status==='registered'?"Регистрационные документы приняты. Свидетельство доступно в документах Минюста.":"Статус каждого документа указан ниже. Предыдущие версии доступны в истории."}</small>
-     </div>
-     <span className={"partyRegistrationOverviewProgress"+(returnedCount>0?" isRevision":"")}>{reviewedCount} / {DOCS.length}</span>
-    </div>
-    {selected.registration_note&&<details className="partyRegistrationDecision">
-     <summary>Полный текст решения Минюста</summary>
-     <p>{selected.registration_note}</p>
-    </details>}
     <div className="civicPartyFiles" aria-label="Регистрационные документы партии">
      {DOCS.map(kind=>{
       const current=latestPartyDocument(docs,kind.kind);
@@ -125,8 +112,9 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
       const nextVersion=(current?.version_no??0)+1;
       return <article className={"partyRegistrationDoc"+(current?.status==="revision"?" isRevision":"")} key={kind.kind}>
        <div className="partyRegistrationDocTop">
-        <div className="partyRegistrationDocIdentity"><b>{kind.title}</b>
+        <div className="partyRegistrationDocIdentity">
          <span className="partyRegistrationDocStatus" role={current?.status==="revision"?"alert":undefined}>{current?partyDocumentVersionLabel(current)+" · "+partyDocumentVerdict(current):"Не загружен"}</span>
+         <b>{kind.title}</b>
         </div>
         <div className="partyRegistrationDocActions">
          {current?.url&&<a href={current.url} target="_blank" rel="noreferrer" aria-label={"Открыть "+kind.title+" "+partyDocumentVersionLabel(current)}>Открыть</a>}
