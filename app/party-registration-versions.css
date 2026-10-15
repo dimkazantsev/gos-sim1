@@ -76,3 +76,7 @@
 .partyDossierDocControls{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:nowrap}
 .partyDossierDocControls .partyDossierDocState,.partyDossierDocControls .partyDossierDocButtons{order:0}
 .partyDossierDocControls .partyDossierDocOpen{order:1;margin-left:2px;flex:none}
+
+/* Keep author name and version together on the document metadata line. */
+.partyDossierDocMain>span{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.partyDossierDocMain .partyDossierAuthorVersion{display:inline;flex:none;color:#5a7598;font-size:11px;font-weight:700;white-space:nowrap}
