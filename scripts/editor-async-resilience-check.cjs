@@ -59,7 +59,7 @@ function harness(component){
   if(name==='@/lib/userError')return{userError:error=>String(error?.message||error)};
   if(name==='./useGameTableSync')return{useGameTableSync(id,tables,load,scope){const latest=react.useRef(load);latest.current=load;latestTableLoad=()=>latest.current();react.useEffect(()=>{if(id)void latest.current();},[id,scope,tables.join('|')]);}};
   if(name==='./useSavedGameState')return{useSavedGameState:(id,user,section,initial)=>react.useState(initial),savedChoice:()=>()=>true,savedString:()=>true,savedBoolean:()=>true};
-  if(name==='./formalInstitutions')return{FORMAL_SUBJECTS:[subject],FORMAL_TYPES:types,inferFormal:()=>({subject,type:types[0]}),formalSignature:()=>null,ownerLabel:x=>x,formalDocumentTypeLabel:key=>types.find(t=>t.key===key)?.label||'Документ'};
+  if(name==='./formalInstitutions')return{FORMAL_SUBJECTS:[subject],FORMAL_TYPES:types,inferFormal:()=>({subject,type:types[0]}),formalSignature:()=>null,ownerLabel:x=>x,formalDocumentTypeLabel:key=>types.find(t=>t.key===key)?.label||'Документ',formalDocumentTitle:title=>title};
   if(name==='./contextualOffices')return{actingOfficeOptions:()=>[{value:'legacy',id:null,role:'Депутат Государственной Думы',userId:null,label:'Депутат Государственной Думы'}]};
   if(name==='./proceduralVoting')return{votePresetForDocument:()=>null};
   if(name==='./documentTemplates')return{DOCUMENT_TEMPLATES:[{key:'fz_bill',title:'Template title',body:'Template body with enough text',docType:'fz_bill',subject:'gd_deputy'}]};
