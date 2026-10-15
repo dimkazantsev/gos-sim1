@@ -31,4 +31,17 @@ assert.doesNotMatch(votes,/Стадия НПА: '\+v\.formal_step_code/);
 assert.doesNotMatch(votes,/GV уменьшает| GV −| GV'/);
 const events=fs.readFileSync(path.join(root,'components/game/EventWorkspace.tsx'),'utf8');
 assert.doesNotMatch(events,/EVENT · ИГРОВЫЕ СИТУАЦИИ/);
+const visibleTextChecks=[
+ ['components/game/GhostPolicyLab.tsx',/Ghost voting/],
+ ['components/game/ParticipantsAnalytics.tsx',/Источник баллов: stage_assessments/],
+ ['components/game/BudgetLab.tsx',/>max\(/],
+ ['components/game/FederalBudgetSimulator.tsx',/Дефицит = max\(/],
+ ['components/game/ScoreFormula.tsx',/>ВСН = max\(/],
+ ['components/game/SystemDebriefLab.tsx',/ИЗМЕНЕНИЯ KPI/],
+ ['components/game/PresidentialElectionLab.tsx',/<label>E-mail/]
+];
+for(const [file,pattern] of visibleTextChecks){
+ const sourceText=fs.readFileSync(path.join(root,file),'utf8');
+ assert.doesNotMatch(sourceText,pattern,'Английский текст интерфейса: '+file);
+}
 console.log('PASS: Русские названия системных документов и безопасные подписи неизвестных кодов.');
