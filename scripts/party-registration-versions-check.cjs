@@ -48,6 +48,9 @@ for(const expected of [
  'drop policy if exists game_assets_news_visibility',
  'drop policy if exists game_assets_read',
  'drop policy if exists game_assets_party_insert',
+ 'drop policy if exists formal_documents_read',
+ 'drop policy if exists political_posts_read',
+ 'private.party_registration_published',
  'create policy party_documents_delete on public.party_documents for delete to authenticated using(false)',
  'new.status=\'revision\' and length(btrim(coalesce(new.note,\'\')))<5'
 ])assert(sql.includes(expected),'Missing integrity or privacy guard: '+expected);
