@@ -19,7 +19,7 @@ export default function ScoreFormula({embedded=false}:{embedded?:boolean}){
  <p className="vsnFormulaIntro">Оценка рассчитывается для каждого студента отдельно за каждый этап. Учитываются действия в пределах времени этого этапа. Итог утверждает преподаватель после проверки доказательств.</p>
  <div className="scoreEquations vsnEquations">
   <section><h3>Без содержательного участия</h3><strong className="vsnEquation">ВСН = 0</strong><p>Присутствие в игре, переходы по меню и автоматические новости не дают баллов.</p></section>
-  <section><h3>При содержательном участии</h3><strong className="vsnEquation">ВСН = max(1; П + С + А)</strong><p>За участие — минимум 1 балл. Каждый подтверждённый критерий равен 1; итог — не более 3 баллов.</p></section>
+  <section><h3>При содержательном участии</h3><strong className="vsnEquation">ВСН = большее из 1 и (П + С + А)</strong><p>За участие — минимум 1 балл. Каждый подтверждённый критерий равен 1; итог — не более 3 баллов.</p></section>
  </div>
  <section className="vsnCriteriaDetail"><h3>Как подтверждаются критерии</h3><dl className="vsnTerms">
   <div><dt>П</dt><dd><strong>Право и правила</strong><p>Правовой сигнал не ниже 2 или есть законно решённый кейс в пределах полномочий. На этом этапе не должно быть неправомерного решения кейса.</p></dd></div>
