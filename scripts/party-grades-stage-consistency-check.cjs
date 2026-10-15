@@ -28,6 +28,13 @@ const css=fs.readFileSync('app/2026-stage-party-grades-repair.css','utf8');
 const layout=fs.readFileSync('app/layout.tsx','utf8');
 assert(party.includes('partyFormationOpen=isStageWorkOpen(g.game,stageOne)'), 'Party creation checks actual game and stage status');
 assert(party.includes('canInvite=partyFormationOpen'), 'Invitations must wait for open stage');
+const invitationMarker='data-party-invite-panel';
+const invitePosition=party.indexOf(invitationMarker);
+const rosterPosition=party.indexOf('className="civicPartyRoster"');
+assert(invitePosition!==-1&&rosterPosition!==-1&&invitePosition<rosterPosition,
+ 'Invitation panel must precede party roster in DOM order on all viewport sizes');
+assert(party.indexOf(invitationMarker,invitePosition+1)===-1,
+ 'Invitation panel must be rendered only once');
 assert(party.includes('inviteClosed=!!selected?.leader_user_id'), 'An elected party chair closes new invitations in the visible form');
 assert(party.includes('disabled={busy||inviteClosed}')&&party.includes('disabled={!inviteUser||busy||inviteClosed}'), 'Closed invitations disable both student selector and submit button');
 assert(party.includes('Приём приглашений завершён: председатель партии уже избран.'), 'Reason for disabled party invitation must be visible');
