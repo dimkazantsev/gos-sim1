@@ -311,6 +311,7 @@
 
 
 /* ГОС.ID · Party dossier: one current version per document and full attempt history. */
+.civicPartyPackage .civicPartyFiles {container-type:inline-size}
 .civicPartyPackage .civicPartyDocumentAttempt {
  display:grid;
  grid-template-columns:minmax(0,1fr) auto;
@@ -366,4 +367,9 @@
  .civicPartyPackage .civicPartyDocumentAttempt {grid-template-columns:minmax(0,1fr)}
  .civicPartyPackage .civicPartyResubmit {width:100%}
  .civicPartyPackage .civicPartyAttemptHistory {grid-column:1}
+}
+
+@container (max-width:540px){
+ .civicPartyPackage .civicPartyDocumentAttempt {grid-template-columns:minmax(0,1fr)}
+ .civicPartyPackage .civicPartyResubmit {width:100%}
 }
