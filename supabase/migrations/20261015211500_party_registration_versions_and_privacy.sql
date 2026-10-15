@@ -19,8 +19,10 @@ begin
   if new.status not in ('submitted','draft') then
    raise exception 'Новый документ должен поступить на рассмотрение' using errcode='23514';
   end if;
+  -- Serialize submissions against the registration decision, not just against
+  -- other uploads of the same kind: no version may sneak in after a certificate.
   select registration_status into v_registered from public.game_parties
-   where id=new.party_id and game_id=new.game_id;
+   where id=new.party_id and game_id=new.game_id for update;
   if v_registered is null or v_registered='registered' then
    raise exception 'После регистрации партии новый пакет не принимается' using errcode='42501';
   end if;
