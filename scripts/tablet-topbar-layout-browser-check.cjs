@@ -14,7 +14,7 @@ const layout=fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8');
 assert(layout.indexOf("import './tablet-topbar-layout.css'")>layout.indexOf("import './topbar-controls-alignment.css'"),'Tablet styles must follow the existing topbar baseline');
 const browserPath=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(x=>x&&fs.existsSync(x));
 if(!browserPath)throw Error('Chromium is required for tablet toolbar geometry');
-const teacher=`<div class="viewAsSwitcher"><button type="button" class="viewAsTrigger"><span class="viewAsTriggerText"><small>РЕЖИМ ПРОСМОТРА</small><strong>Преподаватель</strong></span></button></div>`;
+const teacher=`<div class="viewAsSwitcher"><button type="button" class="viewAsTrigger" aria-label="Режим просмотра: Преподаватель"><svg class="viewAsMobileIcon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" fill="none" stroke="currentColor"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor"/></svg><span class="viewAsTriggerText"><small>РЕЖИМ ПРОСМОТРА</small><strong>Преподаватель</strong></span><svg class="viewAsChevron" width="16" height="16" aria-hidden="true"></svg></button></div>`;
 const markup=role=>`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${styles}</style></head><body>
 <div class="simShell"><aside class="simSidebar"><div class="sidebarBrand">ГОС.ID</div></aside>
 <div class="simWorkspace"><header class="simTop">
@@ -55,7 +55,7 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
       const at=document.elementFromPoint(centerX,centerY);
       return {selector,rect:sel(selector),hit:at===el||el.contains(at)};
     });
-    return {top:sel('.simTop'),history:sel(action[0]),title:sel(action[1]),indicators:sel(action[2]),preview:sel(action[3]),chat:sel(action[4]),buttons,
+    return {top:sel('.simTop'),history:sel(action[0]),title:sel(action[1]),indicators:sel(action[2]),preview:sel(action[3]),previewButton:sel('.viewAsTrigger'),eye:sel('.viewAsMobileIcon'),chat:sel(action[4]),buttons,
       overflow:document.documentElement.scrollWidth>innerWidth+2,
       statusWidth:document.querySelector('.topIndicators').scrollWidth,
       statusClient:document.querySelector('.topIndicators').clientWidth,
@@ -77,11 +77,24 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
      assert(overlap(measures.title,measures.indicators)<1,`${width}px title overlaps statuses`);
      assert(overlap(measures.title,measures.chat)<1,`${width}px title overlaps chat`);
      if(role==='teacher'){
+       const eye=measures.eye,button=measures.previewButton;
+       assert(eye?.display==='block'&&eye.width>=18&&eye.height>=18,`${width}px eye must be visible`);
+       const dx=Math.abs((eye.left+eye.right)/2-(button.left+button.right)/2);
+       const dy=Math.abs((eye.top+eye.bottom)/2-(button.top+button.bottom)/2);
+       assert(dx<=1.2&&dy<=1.2,`${width}px eye must be exactly centered within its button: dx=${dx}, dy=${dy}`);
+       assert(button.height===48,`${width}px teacher eye button must keep a 48px hit target`);
        assert(overlap(measures.indicators,measures.preview)<1,`${width}px indicators overlap preview switcher`);
        assert(measures.preview.width===48,`${width}px preview must be compact but clickable`);
      }
      assert(measures.statusWidth<=measures.statusClient+2,`${width}px toolbar has clipped actions`);
      assert(measures.token==='84px',`${width}px chat must use restored 84px header offset`);
+   }
+   if(width<=900&&role==='teacher'){
+     const eye=measures.eye,button=measures.previewButton;
+     if(eye?.display!=='none'&&button?.display!=='none'){
+       assert(Math.abs((eye.left+eye.right)/2-(button.left+button.right)/2)<1.2,`${width}px mobile eye horizontal drift`);
+       assert(Math.abs((eye.top+eye.bottom)/2-(button.top+button.bottom)/2)<1.2,`${width}px mobile eye vertical drift`);
+     }
    }
    if(width<=900)assert(measures.title.display==='none',`${width}px compact phone/tablet topbar unexpectedly altered`);
    if(width>=1500)assert(measures.token!=='122px','Large desktop token must remain unchanged');
