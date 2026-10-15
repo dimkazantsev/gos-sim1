@@ -130,10 +130,48 @@
   max-height:48px;
   padding:0;
  }
- .simWorkspace .simTop .viewAsMobileIcon {
+ /* Keep the eye anchored to its own button, not to inherited inline SVG
+    alignment or the surrounding role-switcher layout. */
+ .simWorkspace .simTop .viewAsSwitcher .viewAsTrigger {
+  position:relative;
+  box-sizing:border-box;
+  display:grid;
+  place-items:center;
+  align-self:center;
+  justify-self:center;
+  line-height:0;
+  overflow:visible;
+ }
+ .simWorkspace .simTop .viewAsSwitcher .viewAsTrigger > .viewAsMobileIcon {
+  position:absolute;
   display:block;
   width:20px;
+  min-width:20px;
   height:20px;
+  min-height:20px;
+  top:50%;
+  left:50%;
+  right:auto;
+  bottom:auto;
+  margin:0;
+  transform:translate(-50%,-50%);
+  transform-origin:center;
+  pointer-events:none;
+ }
+ .simWorkspace .simTop > :is(.topScreenHistory,.simTopCenter,.viewAsSwitcher,.topChatButton) {
+  align-self:center;
+ }
+ .simWorkspace .simTop .topIndicators > :is(.livePill,.gameShareScreen,.timerPillDuration),
+ .simWorkspace .simTop .topScreenHistory .screenHistoryButton {
+  align-self:center;
+  box-sizing:border-box;
+ }
+ .simWorkspace .simTop .topIndicators > :is(.livePill,.gameShareScreen) > svg,
+ .simWorkspace .simTop > .topChatButton > svg {
+  display:block;
+  flex:none;
+  margin:0;
+  vertical-align:middle;
  }
  .simWorkspace .simTop .viewAsTriggerText,
  .simWorkspace .simTop .viewAsChevron {display:none}
