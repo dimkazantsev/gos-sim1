@@ -42,7 +42,16 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
   for(const role of ['teacher','student'])for(const chatOpen of [false,true])for(const width of [320,390,760,761,768,820,900,901,1024,1180,1280,1366,1499,1500,1600]){
    const page=await browser.newPage({viewport:{width,height:850},deviceScaleFactor:1});
    await page.setContent(markup(role),{waitUntil:'load'});
-   if(chatOpen)await page.locator('.simWorkspace').evaluate(el=>el.classList.add('chatOpen'));
+   if(chatOpen)await page.locator('.simWorkspace').evaluate((el,w)=>{
+    el.classList.add('chatOpen');
+    if(w>760&&w<=900){
+     const sheet=document.createElement('aside');
+     sheet.className='simChat gsChatV2';
+     sheet.setAttribute('aria-label','Тестовый чат');
+     sheet.textContent='Чат';
+     el.appendChild(sheet);
+    }
+   },width);
    const measures=await page.evaluate(()=>{
     const sel=x=>{const el=document.querySelector(x);if(!el)return null;const r=el.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height,display:getComputedStyle(el).display,visibility:getComputedStyle(el).visibility}};
     const action=['.topScreenHistory','.topStageCopy','.topIndicators','.viewAsSwitcher','.topChatButton'];
@@ -55,7 +64,7 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
       const at=document.elementFromPoint(centerX,centerY);
       return {selector,rect:sel(selector),hit:at===el||el.contains(at)};
     });
-    return {top:sel('.simTop'),history:sel(action[0]),title:sel(action[1]),indicators:sel(action[2]),preview:sel(action[3]),chat:sel(action[4]),buttons,
+    return {top:sel('.simTop'),sheet:sel('.simChat.gsChatV2'),dockHeight:parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gs-mobile-dock-height'))||0,viewportHeight:innerHeight,history:sel(action[0]),title:sel(action[1]),indicators:sel(action[2]),preview:sel(action[3]),chat:sel(action[4]),buttons,
       roleButton:sel('.viewAsTrigger'),eye:sel('.viewAsMobileIcon'),
       controls:['.topIndicators .livePill','.topIndicators .gameShareScreen','.topIndicators .timerPillDuration'].map(sel),
       overflow:document.documentElement.scrollWidth>innerWidth+2,
@@ -94,6 +103,12 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
      }
      assert(measures.statusWidth<=measures.statusClient+2,`${width}px toolbar has clipped actions`);
      assert(measures.token==='84px',`${width}px chat must use restored 84px header offset`);
+     if(chatOpen&&width<=900){
+       assert(measures.sheet&&measures.sheet.top>=measures.top.bottom-1,
+        `${width}px chat overlaps tablet header: ${JSON.stringify(measures)}`);
+       assert(measures.sheet.bottom<=measures.viewportHeight-measures.dockHeight+2,
+        `${width}px chat overlaps mobile dock: ${JSON.stringify(measures)}`);
+     }
    }
    if(width<=760)assert(measures.title.display==='none',`${width}px compact phone/tablet topbar unexpectedly altered`);
    if(width>=1500)assert(measures.token!=='122px','Large desktop token must remain unchanged');
