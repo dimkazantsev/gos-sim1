@@ -409,7 +409,7 @@ export function useRepublicGame(gameId:string){
   if(view==='teacher')jobs.push(loadPartyDocuments());
   if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation());
   if(view==='documents')jobs.push(loadFormalRegistry());
-  if(view==='actions'||view==='dashboard')jobs.push(loadPoliticalWall());
+  // News can link accepted registration documents only after party-level RLS releases them.\n   if(view==='actions'||view==='dashboard')jobs.push(loadPoliticalWall(),loadPartyDocuments());
   if(view==='teacher')jobs.push(loadClassroomTelemetry(),loadImpactEngine());
   if(chatOpenRef.current)jobs.push(loadChatOverview());
   await Promise.allSettled(jobs);
