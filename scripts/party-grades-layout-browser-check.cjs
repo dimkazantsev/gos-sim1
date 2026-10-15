@@ -10,6 +10,13 @@ assert(gradesViewSource.includes('aria-label={s.full_name} title={s.full_name}')
 const css=['app/design-views.css','app/design-responsive.css','app/2026-civic-portal.css','app/2026-stage-party-grades-repair.css']
  .map(name=>fs.readFileSync(name,'utf8')).join('\n');
 const cells=n=>Array.from({length:n},(_,i)=>'<span class="align-check">'+(i+1)+'</span>').join('');
+const partySource=fs.readFileSync('components/game/PartiesView.tsx','utf8');
+for(const name of ['civicPartyUploadMain','civicPartyUploadField','civicPartyUploadActions','partyLegalRequirements'])
+ assert(partySource.includes(name),'Registration form preserves '+name);
+assert(partySource.includes('disabled={busy||!docFile}')&&partySource.includes('onClick={()=>void upload()}'),'File upload authorization and handler are preserved');
+assert(partySource.includes('disabled={busy||!DOCS.every(req=>docs.some(d=>d.doc_kind===req.kind))}'),'Registration remains disabled until all required documents exist');
+assert(partySource.includes('onClick={()=>void g.submitPartyRegistration(selected.id)}'),'Registration workflow remains unchanged');
+
 const scores=Array.from({length:16},(_,i)=>'<button class="draft" type="button"><b>'+i+'</b><small>авто</small></button>').join('');
 const markup=`<!doctype html><html><meta name="viewport" content="width=device-width, initial-scale=1"><style>
 *{box-sizing:border-box}body{margin:0;background:#eef3fb;font:14px Arial,sans-serif}.gradesPage{width:100%;padding:12px}.gradesMatrixWrap{width:100%;max-width:100%;padding:10px;background:#fff}.gradeModal{width:min(900px,100%);margin:20px auto;padding:10px;background:white}
@@ -26,6 +33,43 @@ ${css}</style><body><div class="gradesPage"><section class="surface gradesMatrix
   for(const width of [320,390,768,1024,1440]){
    const page=await browser.newPage({viewport:{width,height:900}});
    await page.setContent(markup);
+   await page.evaluate(()=>{
+    const wrapper=document.createElement('details');
+    wrapper.className='civicPartyPackage';wrapper.open=true;
+    wrapper.style.cssText='margin:16px;width:min(1100px,calc(100% - 32px))';
+    wrapper.innerHTML='<summary>Документы и регистрация партии</summary>'+
+     '<div class="civicPartyUpload" data-party-document-upload>'+
+      '<div class="civicPartyUploadMain">'+
+       '<div class="styledSelect"><span class="styledSelectLabel">Вид документа</span><button class="styledSelectTrigger">Заявление о регистрации</button></div>'+
+       '<label class="civicPartyUploadField"><span>Название</span><input placeholder="Введите название документа"></label>'+
+       '<label class="civicPartyUploadField civicPartyUploadFile"><span>Файл</span><input type="file"></label>'+
+       '<div class="civicPartyUploadActions"><button class="primary">Загрузить документ</button><button class="secondary" disabled>Направить на регистрацию</button></div>'+
+      '</div>'+
+      '<aside class="partyLegalRequirements"><h4>Нормативные требования</h4>'+
+       '<a href="#">Требования к документу · Закон № 95-ФЗ</a>'+
+       '<a href="#">Официальные формы Минюста · Приказ № 333</a>'+
+       '<small>Статья 16: заявление и регистрационный пакет.</small></aside>'+
+     '</div>';
+    document.body.appendChild(wrapper);
+   });
+   const partyDoc=await page.evaluate(()=>{
+    const bounds=s=>{const r=document.querySelector(s).getBoundingClientRect();return{top:r.top,left:r.left,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};
+    const root=bounds('.civicPartyUpload'),main=bounds('.civicPartyUploadMain'),legal=bounds('.partyLegalRequirements');
+    const buttons=[...document.querySelectorAll('.civicPartyUploadActions>button')].map(x=>{const r=x.getBoundingClientRect();return{top:r.top,left:r.left,right:r.right,bottom:r.bottom,height:r.height}});
+    const fields=[...document.querySelectorAll('.civicPartyUploadField>input')].map(x=>{const r=x.getBoundingClientRect();return{width:r.width,height:r.height,left:r.left,right:r.right}});
+    const anchor=[...document.querySelectorAll('.partyLegalRequirements>a')].map(x=>{const r=x.getBoundingClientRect();return{left:r.left,right:r.right,height:r.height}});
+    return{root,main,legal,buttons,fields,anchor,bodyWidth:document.body.scrollWidth};
+   });
+   assert(partyDoc.main.width>=280&&partyDoc.legal.width>=280,'Both document panels remain readable at '+width);
+   assert(partyDoc.main.left>=partyDoc.root.left-1&&partyDoc.main.right<=partyDoc.root.right+1,'Document form stays inside its container at '+width);
+   assert(partyDoc.legal.left>=partyDoc.root.left-1&&partyDoc.legal.right<=partyDoc.root.right+1,'Legal references stay inside their container at '+width);
+   assert(partyDoc.fields.every(x=>x.width>100&&x.height>=44&&x.right<=partyDoc.main.right-8),'Document fields are fully visible at '+width);
+   assert(partyDoc.buttons.length===2&&partyDoc.buttons.every(x=>x.height>=46&&x.right<=partyDoc.main.right-8),'Document actions fit their panel at '+width);
+   assert(partyDoc.anchor.length===2&&partyDoc.anchor.every(x=>x.height>=50&&x.right<=partyDoc.legal.right-8),'Legal links are readable at '+width);
+   if(width>=1024)assert(partyDoc.main.right+10<=partyDoc.legal.left,'Desktop form and legal references sit side by side at '+width);
+   else assert(partyDoc.main.bottom+10<=partyDoc.legal.top,'Narrow document panels stack without overlap at '+width);
+   if(width<=390)assert(partyDoc.buttons[0].bottom+8<=partyDoc.buttons[1].top,'Mobile document actions stack vertically at '+width);
+   assert(partyDoc.bodyWidth<=width+2,'Document registration introduces no horizontal overflow at '+width);
    const info=await page.evaluate(()=>{
     const head=[...document.querySelectorAll('.gradesMatrixHead > *')].map(x=>x.getBoundingClientRect());
     const row=[...document.querySelectorAll('.gradesMatrixRow > *')].map(x=>x.getBoundingClientRect());
