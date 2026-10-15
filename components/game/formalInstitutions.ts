@@ -69,6 +69,21 @@ export function inferFormal(text:string,title:string,roleTitle?:string|null){
  return {type:t,subject:s};
 }
 
+// Technical account access is not a public office. A signature is attributed to
+// the institution named by its document, without changing the historical signer.
+const technicalSignerRole=/^(?:преподаватель|преподаватель-администратор|администратор(?: игры)?|teacher|admin)$/i;
+const justiceOffice='Директор Департамента по делам некоммерческих организаций Министерства юстиции Российской Федерации';
+export function formalSignerOffice(document:{subject_key:string;doc_type:string;metadata?:Record<string,unknown>},savedRole:unknown):string{
+ const role=typeof savedRole==='string'?savedRole.trim():'';
+ if(role&&!technicalSignerRole.test(role))return role;
+ const m=document.metadata||{};
+ const official=[m.signatory_title,m.acting_office_title].find(value=>
+  typeof value==='string'&&!!value.trim()&&!technicalSignerRole.test(value.trim()));
+ if(typeof official==='string')return official.trim();
+ if(document.subject_key==='minjust'||['justice_response','party_certificate'].includes(document.doc_type))return justiceOffice;
+ return FORMAL_SUBJECTS.find(subject=>subject.key===document.subject_key)?.signatureTitle||'Уполномоченное лицо';
+}
+
 export function formalSignature(subjectKey:string,fullName:string){
  const s=FORMAL_SUBJECTS.find(x=>x.key===subjectKey);
  return {title:s?.signatureTitle||'Уполномоченное лицо',name:fullName};
