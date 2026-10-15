@@ -25,7 +25,7 @@ export default function ProfileDocumentLinks({gameId,userId}:{gameId:string;user
  async function add(e:React.FormEvent){
   e.preventDefault();if(busy)return;
   const provider=documentProvider(url.trim());
-  if(!provider){setNotice('Вставьте HTTPS-ссылку на документ Google или Яндекса.');return}
+  if(!provider){setNotice('Вставьте HTTPS-ссылку на документ Гугл или Яндекса.');return}
   if(!title.trim()){setNotice('Укажите название документа.');return}
   setBusy(true);setNotice('');
   const r=await supabase.from('profile_document_links').insert({game_id:gameId,user_id:userId,title:title.trim(),url:url.trim(),provider}).select('id').single();
@@ -41,10 +41,10 @@ export default function ProfileDocumentLinks({gameId,userId}:{gameId:string;user
   setBusy(false);
  }
  return <section className="profileDocumentLinks surface">
-  <header><div><small>РАБОТА С ДОКУМЕНТАМИ</small><h2>Google И Яндекс Документы</h2><p>Сохраняйте ссылки на свои документы и открывайте их редакторы из личного кабинета. Доступ к содержимому задаётся в самом документе.</p></div><FileText aria-hidden="true"/></header>
-  <div className="profileDocumentProviders"><a href="https://docs.google.com/document/create" target="_blank" rel="noopener noreferrer">Создать Google Документ <ExternalLink size={16}/></a><a href="https://docs.yandex.ru/" target="_blank" rel="noopener noreferrer">Открыть Яндекс Документы <ExternalLink size={16}/></a></div>
+  <header><div><small>РАБОТА С ДОКУМЕНТАМИ</small><h2>Гугл И Яндекс Документы</h2><p>Сохраняйте ссылки на свои документы и открывайте их редакторы из личного кабинета. Доступ к содержимому задаётся в самом документе.</p></div><FileText aria-hidden="true"/></header>
+  <div className="profileDocumentProviders"><a href="https://docs.google.com/document/create" target="_blank" rel="noopener noreferrer">Создать Гугл Документ <ExternalLink size={16}/></a><a href="https://docs.yandex.ru/" target="_blank" rel="noopener noreferrer">Открыть Яндекс Документы <ExternalLink size={16}/></a></div>
   <form onSubmit={e=>void add(e)}><label>Название<input value={title} maxLength={160} required onChange={e=>setTitle(e.target.value)} placeholder="Проект постановления"/></label><label>Ссылка на документ<input type="url" value={url} maxLength={2048} required onChange={e=>setUrl(e.target.value)} placeholder="Https://docs.google.com/…"/></label><button className="primary" type="submit" disabled={busy}><Plus size={17}/> Добавить документ</button></form>
-  <div className="profileDocumentList">{links.map(link=><article key={link.id}><div><span>{link.provider==='google'?'Google Документы':'Яндекс Документы'}</span><b>{link.title}</b></div><a href={link.url} target="_blank" rel="noopener noreferrer">Открыть <ExternalLink size={16}/></a><button type="button" disabled={busy} onClick={()=>void remove(link.id)} aria-label={'Убрать ссылку: '+link.title}><Trash2 size={17}/></button></article>)}</div>
+  <div className="profileDocumentList">{links.map(link=><article key={link.id}><div><span>{link.provider==='google'?'Гугл Документы':'Яндекс Документы'}</span><b>{link.title}</b></div><a href={link.url} target="_blank" rel="noopener noreferrer">Открыть <ExternalLink size={16}/></a><button type="button" disabled={busy} onClick={()=>void remove(link.id)} aria-label={'Убрать ссылку: '+link.title}><Trash2 size={17}/></button></article>)}</div>
   {loaded&&!links.length&&<p className="profileHint">Добавленные документы появятся здесь.</p>}
   {notice&&<p role="status">{notice}</p>}
  </section>;
