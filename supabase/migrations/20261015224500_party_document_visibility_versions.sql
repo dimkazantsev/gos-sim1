@@ -1,4 +1,19 @@
 -- Party document visibility and latest-version registration (2026-10-15)
+drop policy if exists party_documents_insert on public.party_documents;
+create policy party_documents_insert on public.party_documents for insert to authenticated
+with check (
+ uploaded_by=(select auth.uid())
+ and not private.party_registration_published(party_id)
+ and (
+   private.is_game_teacher(game_id)
+   or exists (
+     select 1 from public.game_parties p
+     join public.game_members gm on gm.game_id=p.game_id and gm.team=p.name
+     where p.id=party_documents.party_id and gm.user_id=(select auth.uid())
+   )
+ )
+);
+
 drop policy if exists party_documents_read on public.party_documents;
 create policy party_documents_read on public.party_documents for select to authenticated
 using (private.is_game_member(game_id) and (
