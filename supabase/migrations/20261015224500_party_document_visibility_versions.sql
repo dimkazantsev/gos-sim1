@@ -33,6 +33,7 @@ declare p public.game_parties%rowtype;v_uid uuid:=(select auth.uid());v_missing 
 begin
  select * into p from public.game_parties where id=p_party_id for update;
  if p.id is null then raise exception 'Party not found'; end if;
+ if p.registration_status='registered' then raise exception 'Registered party cannot resubmit its founding package'; end if;
  if not private.is_game_teacher(p.game_id) and p.leader_user_id is distinct from v_uid then raise exception 'Party leader access required'; end if;
  if nullif(trim(coalesce(p.name,'')),'') is null or nullif(trim(coalesce(p.ideology,'')),'') is null then raise exception 'Party name and ideology are required'; end if;
  select string_agg(x.kind,', ') into v_missing
