@@ -34,6 +34,8 @@ on:
       - 'app/teacher-command.css'
       - 'app/teacher-operations.css'
       - 'app/teacher-ui-polish.css'
+      - 'app/teacher-unified-header.css'
+      - 'scripts/teacher-unified-header-browser-check.cjs'
       - 'app/teacher-extended.css'
       - 'app/2026-october-refinement.css'
       - 'app/layout.tsx'
@@ -108,6 +110,10 @@ jobs:
           CHROME_BIN: /usr/bin/google-chrome
       - name: Stage cards visual regression
         run: npm run design:stages
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+      - name: Unified teacher header and sticky navigation
+        run: node scripts/teacher-unified-header-browser-check.cjs
         env:
           CHROME_BIN: /usr/bin/google-chrome
       - name: Teacher command centre, journal, analytics and grades regression

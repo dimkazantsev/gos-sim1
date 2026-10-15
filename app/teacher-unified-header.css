@@ -1,45 +1,92 @@
-/* ГОС.ID · Teacher header correction.
-   Preserve the original inset workspace width, remove the vertical seam only. */
+/* ГОС.ID · One continuous white header and teacher navigation.
+   Preserve the established content width and its responsive side gutters. */
+.simWorkspace:has(.teacherCommand) {
+ --gs-teacher-tabs-height:74px;
+}
 .simWorkspace:has(.teacherCommand) > .simTop {
  background:#fff;
  backdrop-filter:none;
 }
+/* Paint the entire width behind the inset tabs, not an exposed grey stripe. */
 .simWorkspace:has(.teacherCommand) .simContentFlow {
  padding-top:0!important;
+ background:linear-gradient(
+  to bottom,
+  #fff 0,
+  #fff var(--gs-teacher-tabs-height),
+  transparent var(--gs-teacher-tabs-height)
+ );
 }
 .simWorkspace:has(.teacherCommand) .simMain {
  padding-top:0!important;
  margin-top:0!important;
 }
+/* Remove the old enclosing card and the legacy grid gap. */
 .simWorkspace:has(.teacherCommand) .teacherCommand,
 .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspace {
+ gap:0;
  margin-top:0;
  padding-top:0;
 }
-/* Keep the original bounded card and its side gutters. */
 .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspace {
- border:1px solid #dce6f1;
- border-radius:18px;
- background:#fff;
+ border:0;
+ border-radius:0;
+ background:transparent;
  overflow:visible;
 }
+/* One calm navigation tier: flat top, thin separator, no nested outline. */
 .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav {
  position:sticky;
  top:var(--gs-top-h,84px);
  z-index:54;
  box-sizing:border-box;
+ display:flex;
+ align-items:center;
  width:100%;
  min-width:0;
+ height:var(--gs-teacher-tabs-height);
+ min-height:var(--gs-teacher-tabs-height);
+ max-height:var(--gs-teacher-tabs-height);
  margin:0;
- border-bottom:1px solid #e8edf5;
- border-radius:17px 17px 0 0;
+ padding:8px 12px;
+ border:0;
+ border-bottom:1px solid #dce6f1;
+ border-radius:0;
  background:#fff;
- box-shadow:0 -1px 0 #fff;
+ box-shadow:none;
+ overflow-x:auto;
+ overflow-y:hidden;
  overscroll-behavior-x:contain;
+ scroll-snap-type:none;
+ scrollbar-width:thin;
+ scrollbar-color:#c6d4e7 transparent;
+}
+.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav::-webkit-scrollbar {
+ height:4px;
+}
+.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav::-webkit-scrollbar-thumb {
+ background:#c6d4e7;
+ border-radius:8px;
+}
+/* Cards below the navigation retain their own round corners and breathing room. */
+.simWorkspace:has(.teacherCommand) .teacherCommand .teacherCommandBar {
+ margin-top:14px;
+}
+.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspacePanel {
+ margin-top:16px;
 }
 @media(max-width:760px) {
+ .simWorkspace:has(.teacherCommand) {
+  --gs-teacher-tabs-height:66px;
+ }
  .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav {
   top:56px;
-  border-radius:17px 17px 0 0;
+  padding:6px 10px;
+ }
+ .simWorkspace:has(.teacherCommand) .teacherCommand .teacherCommandBar {
+  margin-top:10px;
+ }
+ .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspacePanel {
+  margin-top:12px;
  }
 }
