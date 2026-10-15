@@ -112,7 +112,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
       {documentNotice?.partyId===selected.id&&<p role={documentNotice.kind==='error'?'alert':'status'} className={'civicPartyInviteFeedback '+(documentNotice.kind==='error'?'isError':'isSuccess')}>{documentNotice.message}</p>}
       <div className="civicPartyUploadActions">
        <button type="button" className="primary" disabled={busy||!docFile} onClick={()=>void upload()}>{busy?'Загрузка…':'Загрузить документ'}</button>
-       <button type="button" className="secondary" disabled={busy||selected.registration_status==='registered'||!DOCS.every(req=>latestDocs.some(d=>d.doc_kind===req.kind))} onClick={()=>void g.submitPartyRegistration(selected.id)}>Направить на регистрацию</button>
+       <button type="button" className="secondary" disabled={busy||!DOCS.every(req=>latestDocs.some(d=>d.doc_kind===req.kind))} onClick={()=>void g.submitPartyRegistration(selected.id)}>Направить на регистрацию</button>
       </div>
      </div>
      <aside className="partyLegalRequirements" aria-label="Нормативные требования к документу">
