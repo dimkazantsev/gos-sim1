@@ -112,7 +112,7 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
    })}
   </div>
 
-  {showCatalog&&<div className="awardSecrets"><LockKeyhole size={20}/><div><b>{Math.max(0,counts.hidden-hiddenEarned.length)} секретных достижений скрыто</b><span>Как в Steam: название и условие появятся только после открытия.</span></div></div>}
+  {showCatalog&&<div className="awardSecrets"><LockKeyhole size={20}/><div><b>{Math.max(0,counts.hidden-hiddenEarned.length)} секретных достижений скрыто</b><span>По правилам скрытых достижений название и условие появятся после открытия.</span></div></div>}
   </div>
  </section>;
 }

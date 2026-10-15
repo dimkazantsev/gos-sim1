@@ -17,8 +17,8 @@ export default function CloudDocumentPicker({gameId,userId,disabled,onImport}:{g
    onImport(data.title,data.text,data.url);setMessage('Текст импортирован. Проверьте реквизиты, субъект и правовой маршрут перед регистрацией.');
   }catch(e){setMessage(e instanceof Error&&/[А-Яа-яЁё]/.test(e.message)?e.message:'Не удалось связаться с сервисом импорта.')}finally{setBusy(false)}
  }
- return <details className="cloudDocumentPicker"><summary><FolderOpen size={18}/> Импорт из Google или Яндекс Документов</summary><p>Выберите ссылку, сохранённую в профиле. Для извлечения текста нужен публичный экспорт; закрытый документ можно скачать у провайдера и загрузить сюда.</p>
- <div><StyledSelect label="Мой облачный документ" value={id} onChange={setId} options={[{value:'',label:'Выбрать документ'},...links.map(l=>({value:l.id,label:l.title+' · '+(l.provider==='google'?'Google':'Яндекс')}))]}/><button type="button" className="secondary" disabled={disabled||busy||!selected} onClick={()=>void importDocument()}><Download size={17}/>{busy?'Импорт…':'Импортировать текст'}</button>{selected&&<a href={selected.url} target="_blank" rel="noreferrer"><ExternalLink size={17}/> Открыть оригинал</a>}</div>
- {!links.length&&<p>Сначала сохраните ссылку в разделе «Мой профиль» → «Google и Яндекс Документы».</p>}{message&&<p role="status">{message}</p>}
+ return <details className="cloudDocumentPicker"><summary><FolderOpen size={18}/> Импорт из Гугл или Яндекс Документов</summary><p>Выберите ссылку, сохранённую в профиле. Для извлечения текста нужен публичный экспорт; закрытый документ можно скачать у провайдера и загрузить сюда.</p>
+ <div><StyledSelect label="Мой облачный документ" value={id} onChange={setId} options={[{value:'',label:'Выбрать документ'},...links.map(l=>({value:l.id,label:l.title+' · '+(l.provider==='google'?'Гугл':'Яндекс')}))]}/><button type="button" className="secondary" disabled={disabled||busy||!selected} onClick={()=>void importDocument()}><Download size={17}/>{busy?'Импорт…':'Импортировать текст'}</button>{selected&&<a href={selected.url} target="_blank" rel="noreferrer"><ExternalLink size={17}/> Открыть оригинал</a>}</div>
+ {!links.length&&<p>Сначала сохраните ссылку в разделе «Мой профиль» → «Гугл и Яндекс Документы».</p>}{message&&<p role="status">{message}</p>}
  </details>;
 }

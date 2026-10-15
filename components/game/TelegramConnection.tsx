@@ -30,7 +30,7 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
      }
      const result=await response.json() as {ok?:boolean;error?:string;logo?:boolean;warnings?:string[];webhook?:boolean;commands?:boolean;menu?:boolean};
      if(!response.ok||!result.ok)throw new Error(result.error||'Не удалось активировать бота.');
-     setActivated((result.warnings?.length?'Webhook, команды и меню подтверждены. Дополнительные настройки: '+result.warnings.join('; '):'Webhook, команды и меню подтверждены Telegram API.')+(result.logo?' Эмблема обновлена.':''));setError('');
+     setActivated((result.warnings?.length?'Webhook, команды и меню подтверждены. Дополнительные настройки: '+result.warnings.join('; '):'Webhook, команды и меню подтверждены Телеграм API.')+(result.logo?' Эмблема обновлена.':''));setError('');
    }catch(e){setError(e instanceof Error?e.name==='TimeoutError'?'Сервер не ответил за 20 секунд. Повторите попытку.':e.message:'Ошибка активации')}
    finally{setBusy(false)}
  }
@@ -46,17 +46,17 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
     signal:AbortSignal.timeout(17000)
    });
    const x=await response.json() as {ok?:boolean;error?:string;webhook?:boolean;commands?:boolean;menu?:boolean};
-   if(!response.ok||!x.ok)throw new Error(x.error||'Не удалось проверить Telegram.');
+   if(!response.ok||!x.ok)throw new Error(x.error||'Не удалось проверить Телеграм.');
    setActivated('Webhook: '+(x.webhook?'подтверждён':'не подтверждён')+
     '. Команды: '+(x.commands?'подтверждены':'не подтверждены')+
     '. Меню: '+(x.menu?'подтверждено':'не подтверждено')+'.');
    if(!x.webhook||!x.commands||!x.menu)setError('Настройка неполная. Выполните повторную активацию.');
-  }catch(e){setError(e instanceof Error?e.message:'Ошибка проверки Telegram.')}
+  }catch(e){setError(e instanceof Error?e.message:'Ошибка проверки Телеграм.')}
   finally{setBusy(false)}
  }
  async function refresh(){
    try{const r=await supabase.rpc('telegram_status',{p_game_id:gameId});if(r.error)throw r.error;setStatus(r.data as typeof status);if(r.data?.linked){setLinkToken('');setLinkIssuedAt(0)}}
-   catch(e){setError(e instanceof Error?e.message:'Не удалось получить состояние Telegram')}
+   catch(e){setError(e instanceof Error?e.message:'Не удалось получить состояние Телеграм')}
  }
  useEffect(()=>{
   void refresh();
@@ -73,7 +73,7 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
   try{
    const r=await supabase.rpc('telegram_generate_link',{p_game_id:gameId});
    if(r.error)throw r.error;
-   if(!/^[A-Za-z0-9_]{5,32}$/.test(username))throw new Error('Имя Telegram-бота настроено неверно.');
+   if(!/^[A-Za-z0-9_]{5,32}$/.test(username))throw new Error('Имя Телеграм-бота настроено неверно.');
    if(typeof r.data!=='string'||!/^[a-f0-9]{48}$/.test(r.data))throw new Error('Не удалось получить корректный код привязки.');
    setLinkToken(r.data);setLinkIssuedAt(Date.now());
   }catch(e){setLinkToken('');setError(e instanceof Error?e.message:'Не удалось создать ссылку привязки.')}
@@ -85,26 +85,26 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
   if(r.error)setError(r.error.message);else await refresh();setBusy(false);
  }
  return <section className="surface" style={{padding:20,marginTop:20}}>
-  <h2 style={{fontSize:19,margin:'0 0 8px'}}>Telegram — ГОС.ID</h2>
-  {status&&!status.linked&&<p className="telegramLinkWarning" role="status"><strong>Telegram не привязан к этому аккаунту.</strong> Уведомления о документах, упоминаниях, голосованиях и событиях не могут поступать, пока вы не завершите привязку через бота. После команды «Начать» вернитесь сюда: состояние обновится автоматически.</p>}
+  <h2 style={{fontSize:19,margin:'0 0 8px'}}>Телеграм — ГОС.ID</h2>
+  {status&&!status.linked&&<p className="telegramLinkWarning" role="status"><strong>Телеграм не привязан к этому аккаунту.</strong> Уведомления о документах, упоминаниях, голосованиях и событиях не могут поступать, пока вы не завершите привязку через бота. После команды «Начать» вернитесь сюда: состояние обновится автоматически.</p>}
   {status?.linked&&!status.notifications_enabled&&<p role="status" className="telegramLinkWarning">Аккаунт привязан, но уведомления отключены. Включите их кнопкой ниже.</p>}
-  <p style={{margin:'0 0 14px',opacity:.8}}>{status?.linked?'Telegram привязан к вашему игровому аккаунту.':'Откройте бота, нажмите «Начать» и пользуйтесь удобным меню. Уведомления о вашей игре доступны после привязки.'}</p>
+  <p style={{margin:'0 0 14px',opacity:.8}}>{status?.linked?'Телеграм привязан к вашему игровому аккаунту.':'Откройте бота, нажмите «Начать» и пользуйтесь удобным меню. Уведомления о вашей игре доступны после привязки.'}</p>
   <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-   {!status?.linked?<button type="button" disabled={busy} onClick={()=>void link()}>{busy?'Подготавливаем ссылку…':linkToken?'Обновить код привязки':'Привязать Telegram'}</button>:<>
+   {!status?.linked?<button type="button" disabled={busy} onClick={()=>void link()}>{busy?'Подготавливаем ссылку…':linkToken?'Обновить код привязки':'Привязать Телеграм'}</button>:<>
     <button type="button" disabled={busy} onClick={()=>void change('toggle')}>{status.notifications_enabled?'Отключить уведомления':'Включить уведомления'}</button>
-    <button type="button" disabled={busy} onClick={()=>void change('unlink')}>Отвязать Telegram</button>
+    <button type="button" disabled={busy} onClick={()=>void change('unlink')}>Отвязать Телеграм</button>
    </>}
    <button type="button" onClick={()=>void refresh()}>Обновить статус привязки</button>
-   {teacher&&<><button type="button" disabled={busy} onClick={()=>void checkBot()}>Проверить Telegram</button><button type="button" disabled={busy} onClick={()=>void activate()}>Активировать бота</button></>}
+   {teacher&&<><button type="button" disabled={busy} onClick={()=>void checkBot()}>Проверить Телеграм</button><button type="button" disabled={busy} onClick={()=>void activate()}>Активировать бота</button></>}
   </div>
-  {!status?.linked&&linkToken&&<div className="telegramLinkSteps" role="group" aria-label="Способы открытия Telegram">
-   <p><strong>Код создан.</strong> Он действует 10 минут. Выберите способ открытия Telegram:</p>
+  {!status?.linked&&linkToken&&<div className="telegramLinkSteps" role="group" aria-label="Способы открытия Телеграм">
+   <p><strong>Код создан.</strong> Он действует 10 минут. Выберите способ открытия Телеграм:</p>
    <div className="telegramLinkChoices">
-    <a className="primary" href={tgAppLink}>Открыть в приложении Telegram</a>
+    <a className="primary" href={tgAppLink}>Открыть в приложении Телеграм</a>
     <a className="secondary" href={tgWebLink} target="_blank" rel="noopener noreferrer">Открыть страницу бота</a>
-    <a className="secondary" href="https://web.telegram.org/k/" target="_blank" rel="noopener noreferrer">Telegram Web</a>
+    <a className="secondary" href="https://web.telegram.org/k/" target="_blank" rel="noopener noreferrer">Веб-версия Телеграма</a>
    </div>
-   <p>Если переход из браузера не срабатывает, найдите <strong>@{username}</strong> в Telegram и отправьте ему команду привязки:</p>
+   <p>Если переход из браузера не срабатывает, найдите <strong>@{username}</strong> в Телеграм и отправьте ему команду привязки:</p>
    <div className="telegramLinkManual">
     <code>{'/start '+linkToken}</code>
     <button type="button" className="secondary" onClick={()=>{
@@ -112,7 +112,7 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
      void navigator.clipboard.writeText('/start '+linkToken).then(()=>setCopied(true)).catch(()=>setCopied(false));
     }}>{copied?'Скопировано':'Скопировать команду'}</button>
    </div>
-   <p className="telegramLinkDisclaimer">Если Telegram сначала показывает кнопку «Начать» (START), нажмите её, а затем при необходимости отправьте скопированную команду /start с кодом. После этого вернитесь сюда и обновите статус.</p>
+   <p className="telegramLinkDisclaimer">Если Телеграм сначала показывает кнопку «Начать», нажмите её, а затем при необходимости отправьте скопированную команду /start с кодом. После этого вернитесь сюда и обновите статус.</p>
    {Date.now()-linkIssuedAt>=600000&&<p role="alert">Срок действия кода мог закончиться. Нажмите «Обновить код привязки».</p>}
   </div>}
   {activated&&<p role="status">{activated}</p>}

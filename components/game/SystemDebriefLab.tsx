@@ -73,7 +73,7 @@ export default function SystemDebriefLab({g}:{g:ReturnTypeRepublic}){
    <article><small>ГОЛОСОВАНИЯ</small><strong>{votes.length}</strong><span>{votes.filter(v=>v.status==='closed').length} завершено</span></article>
    <article><small>НПА</small><strong>{formalDocuments.length}</strong><span>в формальном реестре</span></article>
    <article><small>КРИЗИСЫ</small><strong>{crises.length}</strong><span>{crises.filter(c=>c.status==='resolved').length} завершено</span></article>
-   <article><small>ИЗМЕНЕНИЯ KPI</small><strong>{changedMetrics}</strong><span>после исходного состояния</span></article>
+   <article><small>ИЗМЕНЕНИЯ ПОКАЗАТЕЛЕЙ</small><strong>{changedMetrics}</strong><span>после исходного состояния</span></article>
    <article><small>СОГЛАШЕНИЯ</small><strong>{acceptedAgreements}</strong><span>принято / исполнено</span></article>
   </div>
 

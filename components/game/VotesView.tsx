@@ -6,6 +6,7 @@ import type {Vote} from './types';
 import StyledSelect from '../ui/StyledSelect';
 import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 import FormalDocumentPicker from './FormalDocumentPicker';
+import {formalDocumentTitle} from './formalInstitutions';
 import {votePresetForDocument,institutionLabel,majorityLabel} from './proceduralVoting';
 import VoteBallotControls from './VoteBallotControls';
 import {VOTING_BODIES,type VotingUnit} from './votingBodies';
@@ -70,7 +71,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  const openCount=votes.filter(v=>v.status==='open').length;
 
  async function openNpa(id:string){const d=formalDocuments.find(d=>d.id===id),preset=d?votePresetForDocument(d):null;if(!d||!preset)return;setBusy(id);try{await createVote({...preset,formalDocumentId:id,groupName:null})}finally{setBusy('')}}
- function chooseNpa(ids:string[]){setFormalId(ids[0]||'');const d=formalDocuments.find(d=>d.id===ids[0]);if(d){const preset=votePresetForDocument(d);setTitle(preset?.title||d.title);setBody(d.body_text||preset?.body||'');if(preset){setInstitution(preset.institutionKey);setMode(preset.mode);setQuorumValue(preset.quorumValue);setMajorityKind(preset.majorityKind);setMajorityValue(preset.majorityValue)}}}
+ function chooseNpa(ids:string[]){setFormalId(ids[0]||'');const d=formalDocuments.find(d=>d.id===ids[0]);if(d){const preset=votePresetForDocument(d);setTitle(preset?.title||formalDocumentTitle(d.title,d.doc_type));setBody(d.body_text||preset?.body||'');if(preset){setInstitution(preset.institutionKey);setMode(preset.mode);setQuorumValue(preset.quorumValue);setMajorityKind(preset.majorityKind);setMajorityValue(preset.majorityValue)}}}
  async function create(){
   if(selectedNpa){const preset=votePresetForDocument(selectedNpa);if(preset){const ok=await createVote({...preset,title:title||preset.title,body:body||preset.body,formalDocumentId:formalId,groupName:null});if(ok){setTitle('');setBody('');setFormalId('')}return}}
 
@@ -116,7 +117,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    />
    {focusedNeedsRegistration&&<p className="voteRegistrationHint">Сначала зарегистрируйтесь на заседание. После регистрации система автоматически переведёт вас к связанному голосованию.</p>}
   </div>
-  <section className="npaVoteQueue"><header><h2>НПА, ожидающие голосования</h2><span>{pendingNpas.length}</span></header><p>Документы появляются здесь автоматически при переходе на стадию голосования. Правила процедуры берутся из документа.</p>{pendingNpas.map(d=>{const preset=votePresetForDocument(d)!;return <article key={d.id}><div><small>{d.registry_no} · {d.status_label}</small><b>{d.title}</b><span>{institutionLabel(preset.institutionKey)}</span></div><button className="secondary" onClick={()=>onOpenDocument(d.id)}>Открыть НПА</button><button className="primary" disabled={busy===d.id} onClick={()=>void openNpa(d.id)}>{busy===d.id?'Открывается…':'Открыть голосование'}</button></article>})}{!pendingNpas.length&&<span>Сейчас нет документов на стадии голосования.</span>}</section>
+  <section className="npaVoteQueue"><header><h2>НПА, ожидающие голосования</h2><span>{pendingNpas.length}</span></header><p>Документы появляются здесь автоматически при переходе на стадию голосования. Правила процедуры берутся из документа.</p>{pendingNpas.map(d=>{const preset=votePresetForDocument(d)!;return <article key={d.id}><div><small>{d.registry_no} · {d.status_label}</small><b>{formalDocumentTitle(d.title,d.doc_type)}</b><span>{institutionLabel(preset.institutionKey)}</span></div><button className="secondary" onClick={()=>onOpenDocument(d.id)}>Открыть НПА</button><button className="primary" disabled={busy===d.id} onClick={()=>void openNpa(d.id)}>{busy===d.id?'Открывается…':'Открыть голосование'}</button></article>})}{!pendingNpas.length&&<span>Сейчас нет документов на стадии голосования.</span>}</section>
   {teacher&&<details className="teacherDetails voteManual projectDisclosure">
    <DisclosureSummary icon={VoteIcon} title="Открыть отдельное голосование" description="Самостоятельный вопрос или документ из реестра НПА"/>
    <div className="teacherDetailsBody">
@@ -164,7 +165,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
      </header>
 
     {(doc||stage)&&<div className="voteRelations">
-     {doc&&<button onClick={()=>onOpenDocument(doc.id)}><small>СВЯЗАННЫЙ НПА</small><b>{doc.registry_no}</b><span>{doc.title}</span></button>}
+     {doc&&<button onClick={()=>onOpenDocument(doc.id)}><small>СВЯЗАННЫЙ НПА</small><b>{doc.registry_no}</b><span>{formalDocumentTitle(doc.title,doc.doc_type)}</span></button>}
      {stage&&<button onClick={onOpenStages}><small>ЭТАП ИГРЫ</small><b>{stage.stage_no}. {stage.title}</b><span>{v.formal_step_code?'Стадия НПА: '+(doc?.workflow_steps.find(step=>step.code===v.formal_step_code)?.label||'Стадия процедуры'):'Открыть описание этапа'}</span></button>}
     </div>}
 

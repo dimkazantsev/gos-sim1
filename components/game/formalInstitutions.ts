@@ -45,6 +45,15 @@ export function formalDocumentTypeLabel(key:string){
  return FORMAL_TYPES.find(x=>x.key===key)?.label||FORMAL_SYSTEM_TYPE_LABELS[key]||'Документ';
 }
 
+// Persisted database keys are not public document titles. Preserve authored titles.
+export function formalDocumentTitle(title:string|null|undefined,docType:string){
+ const raw=String(title||'').trim();
+ const mapped=FORMAL_TYPES.find(type=>type.key===raw)?.label||FORMAL_SYSTEM_TYPE_LABELS[raw];
+ if(mapped)return mapped;
+ if(!raw||/^[a-z][a-z0-9]*(?:[_-][a-z0-9]+)+$/.test(raw))return formalDocumentTypeLabel(docType);
+ return raw;
+}
+
 export function inferFormal(text:string,title:string,roleTitle?:string|null){
  const hay=(title+'\n'+text).toLowerCase();
  let type='other';
