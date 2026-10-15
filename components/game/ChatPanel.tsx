@@ -211,8 +211,12 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');return;
    }
    const dockHeight=mobile.matches?(document.querySelector<HTMLElement>('.mobileDockV2')?.getBoundingClientRect().height||76):0;
-   node.style.height=Math.max(0,viewport.height-dockHeight)+'px';
-   node.style.top=viewport.offsetTop+'px';
+   // Reserve the actual 84px toolbar on medium tablets while allowing for visualViewport
+   // changes due to virtual keyboards and zoom. Phone behavior remains unchanged.
+   const headerHeight=mobile.matches&&window.matchMedia('(min-width:761px) and (max-width:900px)').matches
+    ?(document.querySelector<HTMLElement>('.simTop')?.getBoundingClientRect().height||0):0;
+   node.style.height=Math.max(0,viewport.height-dockHeight-headerHeight)+'px';
+   node.style.top=(viewport.offsetTop+headerHeight)+'px';
    if(mobile.matches)node.style.bottom='auto';else node.style.removeProperty('bottom');
   };
   align();
