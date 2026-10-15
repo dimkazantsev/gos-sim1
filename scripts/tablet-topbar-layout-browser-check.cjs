@@ -52,6 +52,8 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
      el.appendChild(sheet);
     }
    },width);
+   if(chatOpen&&width>760&&width<=900)await page.locator('.simChat.gsChatV2')
+    .evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished.catch(()=>{}))));
    const measures=await page.evaluate(()=>{
     const sel=x=>{const el=document.querySelector(x);if(!el)return null;const r=el.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height,display:getComputedStyle(el).display,visibility:getComputedStyle(el).visibility}};
     const action=['.topScreenHistory','.topStageCopy','.topIndicators','.viewAsSwitcher','.topChatButton'];
@@ -64,7 +66,7 @@ function overlap(a,b) {return Math.max(0,Math.min(a.right,b.right)-Math.max(a.le
       const at=document.elementFromPoint(centerX,centerY);
       return {selector,rect:sel(selector),hit:at===el||el.contains(at)};
     });
-    return {top:sel('.simTop'),sheet:sel('.simChat.gsChatV2'),dockHeight:parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gs-mobile-dock-height'))||0,viewportHeight:innerHeight,history:sel(action[0]),title:sel(action[1]),indicators:sel(action[2]),preview:sel(action[3]),chat:sel(action[4]),buttons,
+    return {top:sel('.simTop'),sheet:sel('.simChat.gsChatV2'),dockHeight:document.querySelector('.simChat.gsChatV2')?parseFloat(getComputedStyle(document.querySelector('.simChat.gsChatV2')).bottom)||0:0,viewportHeight:innerHeight,history:sel(action[0]),title:sel(action[1]),indicators:sel(action[2]),preview:sel(action[3]),chat:sel(action[4]),buttons,
       roleButton:sel('.viewAsTrigger'),eye:sel('.viewAsMobileIcon'),
       controls:['.topIndicators .livePill','.topIndicators .gameShareScreen','.topIndicators .timerPillDuration'].map(sel),
       overflow:document.documentElement.scrollWidth>innerWidth+2,
