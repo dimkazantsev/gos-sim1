@@ -201,7 +201,8 @@
  border-top:1px solid #edf0f5;background:#fcfdff
 }
 .stagesAtlas .stageAtlasCardDeadline{
- display:flex;align-items:center;gap:7px;min-width:0;color:#8899ac;
+ display:flex;align-items:center;gap:7px;flex:0 0 auto;min-width:max-content;
+ white-space:nowrap;color:#8899ac;
  font-size:11px;font-weight:730;line-height:1.25;font-variant-numeric:tabular-nums
 }
 .stagesAtlas .stageAtlasCardDeadline svg{flex:none}
@@ -229,6 +230,18 @@
 .stagesAtlas .stageAtlasTeacherAction{padding:0 11px;border-color:#d6e2fb;background:#fff;color:#285bbb}
 .stagesAtlas .stageAtlasTeacherAction:hover{border-color:#b6cdfb;background:#edf3ff}
 .stagesAtlas .stageAtlasTeacherAction:focus-visible{outline:3px solid #6b8cfc;outline-offset:2px}
+.stagesAtlas .stageAtlasActionShort{display:none}
+/* Preserve the full deadline before reducing optional teacher-control labels. */
+@container atlas-card (max-width:800px){
+ .stagesAtlas .stageAtlasActionFull{display:none}
+ .stagesAtlas .stageAtlasActionShort{display:inline}
+ .stagesAtlas .stageAtlasCardFooter{gap:8px}
+ .stagesAtlas .stageAtlasCardActions{gap:5px;flex-wrap:wrap;max-width:100%}
+}
+@container atlas-card (max-width:580px){
+ .stagesAtlas .stageAtlasCardFooter{flex-wrap:wrap}
+ .stagesAtlas .stageAtlasCardActions{flex:1 1 100%;justify-content:flex-end}
+}
 .stagesAtlas .stageAtlasVoteAction svg,.stagesAtlas .stageAtlasDetailAction svg{display:block;flex:none}
 .stagesAtlas .stageAtlasEmpty{
  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
@@ -273,7 +286,6 @@
 }
 @container atlas-card (max-width:375px){
  .stagesAtlas .stageAtlasCardStatus{min-height:24px}
- .stagesAtlas .stageAtlasCardDeadline{display:none}
  .stagesAtlas .stageAtlasCardFooter{justify-content:flex-end}
 }
 @media (max-width:1470px){
@@ -315,7 +327,6 @@
  .stagesAtlas .stageAtlasCardTopline{align-items:flex-start}
  .stagesAtlas .stageAtlasCardStatus{font-size:10px}
  .stagesAtlas .stageAtlasCardFooter{padding:9px 12px}
- .stagesAtlas .stageAtlasCardDeadline{display:none}
  .stagesAtlas .stageAtlasCardActions{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){
