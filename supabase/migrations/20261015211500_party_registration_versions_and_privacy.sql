@@ -170,7 +170,7 @@ using (
 drop policy if exists game_assets_news_visibility on storage.objects;
 create policy game_assets_news_visibility on storage.objects for select to authenticated
  using (
-  bucket_id='game-assets' and split_part(name,'/',2)='news' and (
+  bucket_id<>'game-assets' or split_part(name,'/',2)<>'news' or (
    split_part(name,'/',3)=(select auth.uid())::text
    or private.is_game_teacher((split_part(name,'/',1))::uuid)
    or exists(select 1 from public.political_post_media pm join public.political_posts pp on pp.id=pm.post_id
