@@ -18,10 +18,14 @@ assert.match(teacher,/g\.reviewPartyDocument\(id,status,status==='revision'\?rev
  'Review must forward the entered return note');
 assert.match(teacher,/reviewNotice\?\.id===d\.id/,
  'Review results should appear by the corresponding document');
-assert.match(student,/docs\.filter\(d=>\['accepted','revision'\]\.includes\(d\.status\)\)/,
- 'Students must see every teacher verdict in the review timeline');
-assert.match(student,/d\.note&&<p>Замечания Минюста: \{d\.note\}<\/p>/,
- 'Students must see specific teacher correction remarks');
+assert.match(student,/history\.map\(d=>[\s\S]*?partyDocumentVersionLabel\(d\) · \{partyDocumentVerdict\(d\)\}/,
+ 'Each document must expose every prior verdict and version inside its own history');
+assert.match(student,/d\.note&&<small> · \{d\.note\}<\/small>/,
+ 'Older teacher remarks must remain accessible in document history');
+assert.match(student,/current\?\.status==="revision"&&<p className="partyRegistrationRevisionNote"/,
+ 'Current returned document and correction grounds must be visually emphasized');
+assert.doesNotMatch(student,/partyRegistrationUpdates/,
+ 'Do not introduce a second parallel review timeline');
 assert.match(student,/partyDocumentVersionLabel\(d\)/,
  'Students must see the reviewed document version');
 assert.match(orphans,/<details aria-label="Технические загрузки без регистрации"/,
