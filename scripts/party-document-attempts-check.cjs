@@ -39,6 +39,9 @@ for(const needle of [
  'private.original_issue_party_justice_response',
  "IF p_status='registered' THEN",
  'REVOKE ALL ON FUNCTION public.review_party_registration(uuid,text,text) FROM public,anon,authenticated',
+ 'private.party_registration_authorizations',
+ 'guard_party_registration_certificate',
+ 'transaction_id=txid_current()',
  'Доработк'
 ]){
  if(!sql.includes(needle)&&needle!=='Доработк')assert.fail('Required migration guard missing: '+needle);
