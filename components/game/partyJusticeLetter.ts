@@ -1,4 +1,5 @@
 import type {Party,PartyDocument} from './types';
+import {latestPartyDocument,latestPartyDocuments,partyDocumentVersionLabel} from './partyDocumentVersions';
 
 export type JusticeDraftDecision='registered'|'rejected'|'revision';
 export const PARTY_REQUIRED_DOCS=[
@@ -18,9 +19,9 @@ export function buildPartyJusticeLetter(party:Pick<Party,'name'|'registration_su
   ?new Date(party.registration_submitted_at).toLocaleDateString('ru-RU')
   :'[Дата поступления заявления]';
  const documents=PARTY_REQUIRED_DOCS.map((req,i)=>{
-  const match=docs.find(d=>d.doc_kind===req.kind);
+  const match=latestPartyDocument(docs,req.kind);
   const status=!match?'не представлен':match.status==='accepted'?'принят к рассмотрению':match.status==='revision'?'возвращён на доработку':'не прошёл окончательную проверку';
-  return (i+1)+'. '+req.name+' — '+status+'.';
+  return (i+1)+'. '+req.name+(match?' ('+partyDocumentVersionLabel(match)+')':'')+' — '+status+'.';
  }).join('\n');
  const recipient=leaderName||'уполномоченному представителю политической партии';
  const header=[
@@ -44,14 +45,15 @@ export function buildPartyJusticeLetter(party:Pick<Party,'name'|'registration_su
  ].join('\n');
  const footer='\n\nДиректор Департамента по делам некоммерческих организаций';
  if(decision==='registered'){
-  const missing=PARTY_REQUIRED_DOCS.filter(req=>!docs.some(d=>d.doc_kind===req.kind&&d.status==='accepted'));
+  const latest=latestPartyDocuments(docs);
+  const missing=PARTY_REQUIRED_DOCS.filter(req=>!latest.some(d=>d.doc_kind===req.kind&&d.status==='accepted'));
   return header+(missing.length
    ?'Проект положительного решения не может быть подписан до принятия всех обязательных документов. Требуют завершения проверки: '+missing.map(d=>d.name).join('; ')+'.'
    :'По результатам рассмотрения документов принято решение о государственной регистрации политической партии «'+party.name+'». Основание решения — представленный и принятый регистрационный пакет документов.')
    +footer;
  }
  if(decision==='rejected'){
-  const revisions=docs.filter(d=>d.status==='revision'&&d.note?.trim());
+  const revisions=latestPartyDocuments(docs).filter(d=>d.status==='revision'&&d.note?.trim());
   const recorded=revisions.length
    ?'Замечания, зафиксированные при проверке документов (их правовую достаточность необходимо подтвердить):\n'+revisions.map((d,i)=>(i+1)+'. '+d.title+': '+d.note!.trim()).join('\n')+'\n\n'
    :'';
