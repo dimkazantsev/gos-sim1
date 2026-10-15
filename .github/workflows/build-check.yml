@@ -127,6 +127,8 @@ on:
       - 'scripts/overview-live-posts-check.cjs'
       - 'scripts/npa-toolbar-alignment-browser-check.cjs'
       - 'components/GameClient.tsx'
+      - 'components/game/useActionErrorPlacement.tsx'
+      - 'scripts/action-error-placement-check.cjs'
       - 'components/game/turnCountdown.ts'
       - 'app/turn-countdown.css'
       - 'scripts/turn-countdown-check.cjs'
@@ -249,6 +251,7 @@ jobs:
       - run: node scripts/grade-fractional-check.cjs
       - run: node scripts/party-grades-stage-consistency-check.cjs
       - run: node scripts/party-document-attempts-check.cjs
+      - run: node scripts/action-error-placement-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-realtime-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
