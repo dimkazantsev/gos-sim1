@@ -140,8 +140,9 @@ BEGIN
   VALUES(p.game_id,1,'Регистрация партии','notice','Партия зарегистрирована',p.name,v_uid);
  END IF;
 END $$;
-REVOKE ALL ON FUNCTION public.review_party_registration(uuid,text,text) FROM public,anon;
-GRANT EXECUTE ON FUNCTION public.review_party_registration(uuid,text,text) TO authenticated;
+-- Prevent a direct RPC from marking a party registered without the certificate.
+-- Only the definer of issue_party_justice_response calls this internal step.
+REVOKE ALL ON FUNCTION public.review_party_registration(uuid,text,text) FROM public,anon,authenticated;
 
 CREATE OR REPLACE FUNCTION public.submit_party_registration(p_party_id uuid)
 RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public','private','pg_temp' AS $$
