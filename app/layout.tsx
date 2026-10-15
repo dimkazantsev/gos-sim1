@@ -34,6 +34,7 @@ import './2026-stage-system.css';
 import './stage-operations.css';
 import './brand-identity.css';
 import './topbar-controls-alignment.css';
+import './tablet-topbar-layout.css';
 import './profile-first-setup.css';
 import './onboarding-tour.css';
 import './journal-mobile-isolated.css';
