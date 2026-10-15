@@ -70,7 +70,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
        <ol>{partyDocumentAttempts(docs,d.doc_kind).map(attempt=><li key={attempt.id}>
          <b>В{partyDocumentVersion(attempt)} · {partyDocumentStatus(attempt)}</b>
          <small>{new Date(attempt.created_at).toLocaleString('ru-RU')} · {attempt.file_name}</small>
-         {attempt.url&&<a href={attempt.url} target="_blank" rel="noreferrer">Открыть версию В{partyDocumentVersion(attempt)}</a>}
+         <button type="button" className="secondary" onClick={()=>void g.openPartyDocument(attempt)}>Открыть версию В{partyDocumentVersion(attempt)}</button>
          {attempt.note&&<p>{attempt.note}</p>}
         </li>)}</ol>
       </details>}</li>)}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
