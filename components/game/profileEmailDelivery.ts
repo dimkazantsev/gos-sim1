@@ -7,7 +7,7 @@ export const EMAIL_RESEND_GUARD_MS=60*1000;
 export function describeProfileEmailError(error:ProfileEmailAuthError):ProfileEmailFailure {
  const code=(error.code||'').toLowerCase();
  const message=(error.message||'').toLowerCase();
- if(code==='email_exists'||message.includes('already been registered')||message.includes('already registered')){
+ if(code==='email_exists'||code==='user_already_exists'||message.includes('already been registered')||message.includes('already registered')){
   return {kind:'email_exists',cooldownMs:0,
    notice:'Этот адрес уже зарегистрирован в системе авторизации. Повторная отправка не поможет. Используйте другой адрес либо восстановите доступ к существующей учётной записи. Не выходите из текущей игровой сессии, пока не определитесь со способом входа.'};
  }

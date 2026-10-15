@@ -1,7 +1,8 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {CheckCircle2,KeyRound,LockKeyhole,Mail,RefreshCw,ShieldCheck} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {ProfileSetupField} from './profileSetup';
 import {describeProfileEmailError,EMAIL_RESEND_GUARD_MS} from './profileEmailDelivery';
@@ -14,6 +15,9 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
  const [confirm,setConfirm]=useState('');
  const [verified,setVerified]=useState(false);
  const [mailRequested,setMailRequested]=useState(false);
+ const [pendingEmail,setPendingEmail]=useState('');
+ const [existingEmail,setExistingEmail]=useState('');
+ const mailInFlight=useRef(false);
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
  const [emailRetryUntil,setEmailRetryUntil]=useState(0);
@@ -44,6 +48,8 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   ]);
   if(!r.error)setRegistered((r.data||[]) as LoginEmail[]);
   const actor=u.data.user;
+  setPendingEmail(actor?.new_email?.toLowerCase()||'');
+  if(!actor?.email&&actor?.new_email)setEmail(actor.new_email);
   if(actor?.email){
    setEmail(actor.email);
    const confirmed=!actor.is_anonymous&&!!actor.email_confirmed_at;
@@ -63,7 +69,12 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
  }
  useEffect(()=>{void load()},[game?.id,me?.user_id]);
  async function link(){
-  if(!email.trim()||busy||Date.now()<emailRetryUntil)return;
+  if(!game||busy||mailInFlight.current||Date.now()<emailRetryUntil)return;
+  const requestedEmail=email.trim().toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(requestedEmail)){
+   setNotice('Укажите полный адрес электронной почты, например name@mail.ru.');return;
+  }
+  mailInFlight.current=true;
   setBusy(true);setNotice('');
   // GitHub Pages is a static shell: it cannot serve /game/[id] dynamically.
   // Complete the verification on the application server and deep-link to the profile.
@@ -71,20 +82,25 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
    (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':window.location.origin)).replace(/[/]$/,'');
   const redirect=new URL('/game/'+encodeURIComponent(game!.id),origin);
   redirect.searchParams.set('section','profile');
-  const requestedEmail=email.trim().toLowerCase();
-  const r=await supabase.auth.updateUser({email:requestedEmail},{emailRedirectTo:redirect.toString()});
-  if(r.error){
-   setMailRequested(false);
-   const issue=describeProfileEmailError(r.error);
-   setNotice(issue.notice);
-   if(issue.cooldownMs)deferEmailRequest(issue.cooldownMs);
+  try{
+   const r=pendingEmail===requestedEmail
+    ?await supabase.auth.resend({type:'email_change',email:requestedEmail,options:{emailRedirectTo:redirect.toString()}})
+    :await supabase.auth.updateUser({email:requestedEmail},{emailRedirectTo:redirect.toString()});
+   if(r.error){
+    setMailRequested(false);
+    const issue=describeProfileEmailError(r.error);
+    setExistingEmail(issue.kind==='email_exists'?requestedEmail:'');
+    if(issue.cooldownMs)deferEmailRequest(issue.cooldownMs);
+    setNotice(issue.notice);
+   }else{
+    setExistingEmail('');setPendingEmail(requestedEmail);setMailRequested(true);deferEmailRequest(EMAIL_RESEND_GUARD_MS);
+    setNotice('Письмо отправлено на '+requestedEmail+'. Откройте ссылку в письме, затем вернитесь сюда и нажмите «Проверить подтверждение» — независимо от того, какая страница открылась по ссылке.');
+   }
+  }catch(error){
+   setMailRequested(false);setNotice('Не удалось отправить письмо: '+userError(error));
+  }finally{
+   mailInFlight.current=false;setBusy(false);
   }
-  else{
-   setMailRequested(true);
-   deferEmailRequest(EMAIL_RESEND_GUARD_MS);
-   setNotice('Письмо отправлено на '+requestedEmail+'. Откройте ссылку в письме, затем вернитесь сюда и нажмите «Проверить подтверждение» — независимо от того, какая страница открылась по ссылке.');
-  }
-  setBusy(false);
  }
  async function check(){
   if(!game||busy)return;
@@ -109,16 +125,20 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   else{setPassword('');setConfirm('');await load();onChanged?.();setNotice('Личный пароль сохранён. Используйте почту и пароль при следующем входе.')}
   setBusy(false);
  }
- async function reset(targetEmail:string){
-  if(busy)return;
+ async function reset(targetEmail:string,personal=false){
+  if(busy||mailInFlight.current||(personal&&Date.now()<emailRetryUntil))return;
+  mailInFlight.current=true;
   setBusy(true);setNotice('');
   // GitHub Pages cannot serve the Next.js recovery page: use the same
   // application origin as the email-verification flow.
   const origin=(process.env.NEXT_PUBLIC_GAME_API_ORIGIN||
    (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':window.location.origin)).replace(/[/]$/,'');
-  const r=await supabase.auth.resetPasswordForEmail(targetEmail,{redirectTo:origin+'/auth/update-password'});
-  setNotice(r.error?'Не удалось отправить ссылку: '+r.error.message:'Запрос на восстановление отправлен. Если адрес зарегистрирован, студент получит письмо со ссылкой.');
-  setBusy(false);
+  try{
+   const r=await supabase.auth.resetPasswordForEmail(targetEmail,{redirectTo:origin+'/auth/update-password'});
+   if(r.error){const issue=describeProfileEmailError(r.error);setNotice(issue.notice);if(issue.cooldownMs)deferEmailRequest(issue.cooldownMs)}
+   else{setNotice('Запрос на восстановление отправлен. Если адрес зарегистрирован, на него придёт письмо со ссылкой для установки пароля. После этого войдите с почтой и личным паролем.');if(personal)deferEmailRequest(EMAIL_RESEND_GUARD_MS)}
+  }catch(error){setNotice('Не удалось отправить ссылку: '+userError(error))}
+  finally{mailInFlight.current=false;setBusy(false)}
  }
  if(!game||!me)return null;
  return <section className="profileSecurity" aria-label="Личный вход и восстановление доступа">
@@ -126,12 +146,16 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   <p>Для входа с другого устройства подтвердите почту и установите личный пароль. Преподаватель может отправить письмо для восстановления, но не может узнать ваш пароль.</p>
   <p>1. Нажмите «Отправить письмо для подтверждения». 2. Откройте письмо и перейдите по ссылке. 3. Вернитесь в этот раздел и нажмите «Проверить подтверждение» — независимо от того, что открылось по ссылке. 4. После подтверждения сохраните личный пароль.</p>
   <div className="profileSecurityGrid">
-   <label data-profile-setup-field="email" className={missing.includes('email')?'profileSetupInvalid':''}>Ваш адрес электронной почты<input aria-invalid={missing.includes('email')} type="email" autoComplete="email" value={email} onChange={e=>{setEmail(e.target.value);setMailRequested(false);setNotice('')}} placeholder="Имя@пример.рф" disabled={verified||busy}/></label>
+   <label data-profile-setup-field="email" className={missing.includes('email')?'profileSetupInvalid':''}>Ваш адрес электронной почты<input aria-invalid={missing.includes('email')} type="email" autoComplete="email" value={email} onChange={e=>{setEmail(e.target.value);setMailRequested(false);setExistingEmail('');setNotice('')}} placeholder="Имя@пример.рф" disabled={verified||busy}/></label>
    <button type="button" disabled={busy||verified||!email.includes('@')||retryMinutes>0} onClick={()=>void link()}><Mail size={17}/>{verified?'Почта подтверждена':retryMinutes>0?'Повтор через '+retryMinutes+' мин.':mailRequested?'Отправить письмо повторно':'Отправить письмо для подтверждения'}</button>
    <button type="button" disabled={busy} onClick={()=>void check()}><RefreshCw size={17}/> Проверить подтверждение</button>
   </div>
   {notice&&<p className="profileSecurityNotice" role="status">{notice}</p>}
   {retryMinutes>0&&!verified&&<p className="profileSecurityNotice" role="status">Письма временно не отправляются с этого устройства. Ожидание: примерно {retryMinutes} мин. Кнопка «Проверить подтверждение» работает независимо от этого ограничения.</p>}
+  {existingEmail&&<div className="profileSecurityExisting">
+   <p>Адрес уже связан с учётной записью. Восстановите доступ к ней или укажите другую почту для текущего профиля.</p>
+   <button type="button" disabled={busy||retryMinutes>0} onClick={()=>void reset(existingEmail,true)}><Mail size={17}/>{retryMinutes>0?'Повтор через '+retryMinutes+' мин.':'Отправить письмо для восстановления доступа'}</button>
+  </div>}
   {verified&&<div className={'profilePasswordFields'+(missing.includes('password')?' profileSetupInvalid':'')} data-profile-setup-field="password">
    <label>Новый личный пароль<input type="password" autoComplete="new-password" minLength={10} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Не менее 10 символов"/></label>
    <label>Повторите пароль<input type="password" autoComplete="new-password" minLength={10} value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="Подтверждение пароля"/></label>
