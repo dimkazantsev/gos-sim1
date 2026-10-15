@@ -81,6 +81,18 @@ DROP POLICY IF EXISTS party_documents_delete ON public.party_documents;
 CREATE POLICY party_documents_delete ON public.party_documents FOR DELETE TO authenticated
  USING (private.is_game_teacher(game_id));
 
+-- SECURITY DEFINER avoids circular RLS evaluation when file, document and
+-- certificate policies refer to one another; it returns only a boolean.
+CREATE OR REPLACE FUNCTION private.party_registration_certified(p_party_id uuid)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $function$
+ SELECT EXISTS(SELECT 1 FROM public.game_parties p
+  JOIN public.formal_documents cert ON cert.game_id=p.game_id
+     AND cert.doc_type='party_certificate' AND cert.metadata->>'party_id'=p.id::text
+  WHERE p.id=p_party_id AND p.registration_status='registered')
+$function$;
+REVOKE ALL ON FUNCTION private.party_registration_certified(uuid) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION private.party_registration_certified(uuid) TO authenticated;
+
 -- The existing permissive SELECT policy exposed approved files to everybody before
 -- the Ministry's decision. Keep teachers and same-party members private; outsiders
 -- get only the current accepted version AFTER registration AND certificate issuance.
@@ -91,10 +103,7 @@ CREATE POLICY party_documents_read ON public.party_documents FOR SELECT TO authe
      ON m.game_id=p.game_id AND m.team=p.name
      WHERE p.id=party_documents.party_id AND p.game_id=party_documents.game_id
        AND m.user_id=(SELECT auth.uid()) AND m.kind='student' AND m.roster_archived_at IS NULL)
- OR (EXISTS(SELECT 1 FROM public.game_parties p WHERE p.id=party_documents.party_id
-       AND p.registration_status='registered')
-     AND EXISTS(SELECT 1 FROM public.formal_documents fd WHERE fd.game_id=party_documents.game_id
-       AND fd.doc_type='party_certificate' AND fd.metadata->>'party_id'=party_documents.party_id::text)
+ OR (private.party_registration_certified(party_documents.party_id)
      AND status='accepted'
      AND doc_kind=ANY(ARRAY['charter','program','symbol','congress_minutes'])
      AND version_no=(SELECT max(d2.version_no) FROM public.party_documents d2
@@ -118,9 +127,7 @@ CREATE POLICY party_dossier_storage_release ON storage.objects
       WHERE p.id=d.party_id AND m.user_id=(SELECT auth.uid())
        AND m.kind='student' AND m.roster_archived_at IS NULL)
     OR (d.status='accepted'
-     AND EXISTS(SELECT 1 FROM public.game_parties p WHERE p.id=d.party_id AND p.registration_status='registered')
-     AND EXISTS(SELECT 1 FROM public.formal_documents fd WHERE fd.game_id=d.game_id
-      AND fd.doc_type='party_certificate' AND fd.metadata->>'party_id'=d.party_id::text)
+     AND private.party_registration_certified(d.party_id)
      AND d.version_no=(SELECT max(z.version_no) FROM public.party_documents z WHERE z.party_id=d.party_id AND z.doc_kind=d.doc_kind))
   ))
  )
@@ -138,10 +145,7 @@ CREATE POLICY party_justice_correspondence_visibility ON public.formal_documents
      ON m.game_id=p.game_id AND m.team=p.name
      WHERE p.id::text=formal_documents.metadata->>'party_id'
        AND m.user_id=(SELECT auth.uid()) AND m.kind='student' AND m.roster_archived_at IS NULL)
- OR EXISTS(SELECT 1 FROM public.game_parties p
-    WHERE p.id::text=formal_documents.metadata->>'party_id' AND p.registration_status='registered'
-     AND EXISTS(SELECT 1 FROM public.formal_documents cert WHERE cert.game_id=p.game_id
-       AND cert.doc_type='party_certificate' AND cert.metadata->>'party_id'=p.id::text))
+ OR private.party_registration_certified((formal_documents.metadata->>'party_id')::uuid)
 );
 
 -- Only the latest accepted Vn of each of the six required kinds qualifies.
