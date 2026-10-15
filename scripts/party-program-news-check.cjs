@@ -18,8 +18,9 @@ assert.match(sql,/bucket_id='game-assets' and split_part\(storage\.objects\.name
 assert.match(sql,/gp\.id=\(split_part\(storage\.objects\.name,'\/',3\)\)::uuid/,'Read policy uses Storage path, not the game party name');
 assert.match(sql,/d\.status='accepted' and d\.doc_kind in \('charter','program','symbol','congress_minutes'\)/,'Public files must be accepted');
 assert.match(sql,/private\.is_game_member\(p\.game_id\)/,'Storage read scoped to game membership');
-assert.match(hook,/if\(view==='actions'\|\|view==='dashboard'\)jobs\.push\(loadPoliticalWall\(\),loadPartyDocuments\(\)\)/,
- 'Political process loads signed party files as well as the posts');
+assert.match(hook,/post\.source_key\?\.startsWith\('media-party-registration:'\)/,
+ 'Load signed files only when an actual public party registration story is visible');
+assert.match(hook,/void loadPartyDocuments\(\)/,'Use existing RLS-protected party documents loader');
 assert.match(wall,/p\.context\?\.party_document_ids\?\.includes\(d\.id\)\&\&d\.url\&\&d\.status==='accepted'/,
  'Show only approved attachment IDs with authorized signed links');
 assert.match(wall,/registrationNews\&\&d\.doc_kind==='program'/,'Visually distinguish the linked programme');
