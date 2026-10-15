@@ -40,7 +40,7 @@ assert(student.includes('uploadInputs.current[kind.kind]?.click()'),'Each row ha
 assert(student.includes("const canUpload=selected.registration_status!=='registered'&&(teacher||me?.kind==='student'"),'Uploads remain possible for active party members before registration even without an elected chair');
 assert(student.includes('void upload(selected.id,kind.kind,kind.title,file)'),'Chosen file must upload directly for its document kind');
 assert(student.includes('partyRegistrationHiddenInput')&&student.includes('uploadInFlight.current'),'Guard concurrent submissions');
-assert(student.includes('partyRegistrationRevisionNote')&&student.includes('История версий'));
+assert(student.includes('partyRegistrationRevisionNote')&&student.includes('Предыдущие версии ('),'Previous versions and revision grounds must remain accessible');
 assert(student.includes('Документ возвращён на доработку.'),'Student must see explicit revision status and its grounds');
 assert(teacher.includes('latest?.id===d.id')&&teacher.includes('canReview&&'));
 assert(teacher.includes("reviewNotes[d.id]")&&teacher.includes("review(d.id,'revision')"));

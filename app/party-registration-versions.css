@@ -80,3 +80,55 @@
 .partyDossierDocMain>span{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
 .partyDossierDocMain .partyDossierAuthorIdentity{display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap;min-width:0;max-width:100%}
 .partyDossierDocMain .partyDossierAuthorVersion{color:#5a7598;font-size:11px;font-weight:700;white-space:nowrap}
+
+
+/* Compact registration overview. Keep official correspondence available without
+   flooding the dossier or causing horizontal overflow. */
+.civicParties .civicPartyPackage{min-width:0;max-width:100%;box-sizing:border-box;overflow-wrap:anywhere}
+.civicParties .civicPartyPackage>.partyRegistrationOverview{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ min-width:0;max-width:100%;box-sizing:border-box;
+ margin:12px 0;padding:12px 14px;border:1px solid #d9e5f4;
+ border-radius:12px;background:#f6f9fe
+}
+.partyRegistrationOverviewCopy{display:grid;gap:4px;min-width:0}
+.partyRegistrationOverviewCopy>b{font-size:13px;line-height:1.4;color:#173a62}
+.partyRegistrationOverviewCopy>small{font-size:12px;line-height:1.55;color:#5a718f;overflow-wrap:anywhere}
+.partyRegistrationOverviewProgress{
+ flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+ min-width:52px;padding:7px 9px;border-radius:9px;
+ background:#e4eefd;color:#275997;font-size:13px;font-weight:750;
+ font-variant-numeric:tabular-nums
+}
+.partyRegistrationOverviewProgress.isRevision{background:#ffe3e6;color:#a22436}
+.civicParties .civicPartyPackage>.partyRegistrationDecision{
+ box-sizing:border-box;min-width:0;max-width:100%;
+ margin:0 0 12px;padding:0;border:1px solid #dce6f3;border-radius:10px;
+ background:#fff;overflow:hidden
+}
+.partyRegistrationDecision>summary{
+ cursor:pointer;padding:10px 12px;color:#315e97;font-size:12px;
+ line-height:1.4;font-weight:700;overflow-wrap:anywhere
+}
+.partyRegistrationDecision[open]>summary{border-bottom:1px solid #e3ebf5;background:#f8faff}
+.partyRegistrationDecision>p{
+ display:block;max-width:100%;min-width:0;box-sizing:border-box;
+ padding:12px;margin:0;color:#405a78;font-size:12px;
+ line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word
+}
+.civicParties .civicPartyPackage .civicPartyFiles{
+ display:grid;gap:10px;min-width:0;max-width:100%;box-sizing:border-box
+}
+.civicPartyPackage .civicPartyFiles .partyRegistrationDoc{
+ margin:0;min-width:0;box-sizing:border-box
+}
+.civicPartyPackage .partyRegistrationDocTop{gap:8px 12px}
+.civicPartyPackage .partyRegistrationDocIdentity{min-width:0;flex:1 1 250px}
+.civicPartyPackage .partyRegistrationDocActions{flex:0 1 auto}
+.civicPartyPackage .partyRegistrationDocHistory{min-width:0}
+.civicPartyPackage .partyRegistrationDocHistory p{white-space:normal;overflow-wrap:anywhere}
+@media(max-width:650px){
+ .civicParties .civicPartyPackage>.partyRegistrationOverview{align-items:flex-start;padding:10px}
+ .partyRegistrationOverviewProgress{min-width:42px}
+ .civicPartyPackage .partyRegistrationDocActions{width:100%}
+}
