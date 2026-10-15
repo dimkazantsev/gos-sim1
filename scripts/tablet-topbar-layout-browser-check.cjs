@@ -7,7 +7,7 @@ const paths=[
  'app/design-tokens.css','app/globals.css','app/design-shell.css',
  'app/design-responsive.css','app/design-readability.css',
  'app/mobile-nav-polish.css','app/topbar-controls-alignment.css',
- 'app/tablet-topbar-layout.css','app/turn-countdown.css'
+ 'app/turn-countdown.css','app/tablet-topbar-layout.css'
 ];
 const styles=paths.map(x=>fs.readFileSync(path.join(root,x),'utf8')).join('\n');
 const layout=fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8');
