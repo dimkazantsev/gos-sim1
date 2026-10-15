@@ -127,6 +127,8 @@ on:
       - 'scripts/overview-live-posts-check.cjs'
       - 'scripts/npa-toolbar-alignment-browser-check.cjs'
       - 'components/GameClient.tsx'
+      - 'components/game/ContextualGameError.tsx'
+      - 'scripts/contextual-game-error-browser-check.cjs'
       - 'components/game/turnCountdown.ts'
       - 'app/turn-countdown.css'
       - 'scripts/turn-countdown-check.cjs'
@@ -272,6 +274,7 @@ jobs:
       - run: node scripts/styled-select-anchor-browser-check.cjs
       - run: node scripts/student-journal-layout-browser-check.cjs
       - run: node scripts/party-grades-layout-browser-check.cjs
+      - run: node scripts/contextual-game-error-browser-check.cjs
       - run: node scripts/party-logo-editor-check.cjs
       - run: node scripts/grade-modal-russian-layout-check.cjs
       - run: node scripts/stage-assessment-explanation-check.cjs
