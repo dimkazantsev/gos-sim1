@@ -50,6 +50,16 @@ create trigger party_documents_version_guard before insert or update on public.p
  for each row execute function private.party_document_version_guard();
 revoke all on function private.party_document_version_guard() from public,anon,authenticated;
 
+-- Resolve the latest version outside the caller's RLS expression to avoid
+-- recursive policy evaluation of party_documents.
+create or replace function private.latest_party_document_version(p_party uuid,p_kind text)
+returns integer language sql stable security definer set search_path to 'public','private','pg_temp'
+as $fn$
+ select max(version_no) from public.party_documents where party_id=p_party and doc_kind=p_kind
+$fn$;
+revoke all on function private.latest_party_document_version(uuid,text) from public,anon;
+grant execute on function private.latest_party_document_version(uuid,text) to authenticated;
+
 -- Guard ALL paths to the registered status, including older direct review RPCs.
 create or replace function private.party_registration_latest_guard()
 returns trigger language plpgsql security definer set search_path to 'public','private','pg_temp'
@@ -131,7 +141,7 @@ using (
     and m.user_id=(select auth.uid()) and m.kind='student' and m.roster_archived_at is null)
   or (
    status='accepted' and doc_kind in ('charter','program','symbol','congress_minutes')
-   and version_no=(select max(v.version_no) from public.party_documents v where v.party_id=party_documents.party_id and v.doc_kind=party_documents.doc_kind)
+   and version_no=private.latest_party_document_version(party_documents.party_id,party_documents.doc_kind)
    and exists(select 1 from public.game_parties p where p.id=party_id and p.game_id=party_documents.game_id
     and p.registration_status='registered' and exists(
      select 1 from public.formal_documents f where f.game_id=p.game_id
@@ -170,7 +180,7 @@ using (
    select 1 from public.party_documents d join public.game_parties p on p.id=d.party_id
    where d.storage_path=storage.objects.name and p.registration_status='registered'
     and d.status='accepted' and d.doc_kind in ('charter','program','symbol','congress_minutes')
-    and d.version_no=(select max(v.version_no) from public.party_documents v where v.party_id=d.party_id and v.doc_kind=d.doc_kind)
+    and d.version_no=private.latest_party_document_version(d.party_id,d.doc_kind)
     and exists(select 1 from public.formal_documents f where f.game_id=p.game_id
      and f.doc_type='party_certificate' and f.metadata->>'party_id'=p.id::text)
     and private.is_game_member(p.game_id)
