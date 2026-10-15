@@ -71,3 +71,8 @@
  .partyDossierDocButtons>button {min-width:0}
  .partyDossierRevisionActions>button {flex:1 1 auto}
 }
+
+/* Decision first, document link last. Consistent on desktop and mobile. */
+.partyDossierDocControls{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:nowrap}
+.partyDossierDocControls .partyDossierDocState,.partyDossierDocControls .partyDossierDocButtons{order:0}
+.partyDossierDocControls .partyDossierDocOpen{order:1;margin-left:2px;flex:none}

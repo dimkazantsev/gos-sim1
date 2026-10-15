@@ -8,7 +8,7 @@ const ruDate=(value:unknown,fallback:string)=>{
  const d=new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw)?raw+'T12:00:00+07:00':raw);
  return Number.isNaN(d.getTime())?'Дата не указана':new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Novosibirsk'}).format(d)+' г.';
 };
-export default function PartyCertificate({document:d}:{document:FormalDocument}){
+export default function PartyCertificate({document:d,signatureUrl}:{document:FormalDocument;signatureUrl?:string|null}){
  const m=d.metadata||{};
  const number=String(m.certificate_number||d.registry_no);
  const party=String(m.party_name||d.title.replace(/^Свидетельство о регистрации политической партии\s*/,''));
@@ -37,7 +37,7 @@ export default function PartyCertificate({document:d}:{document:FormalDocument})
     <p>{title}</p>
     <small>(должность уполномоченного лица органа, принявшего решение)</small>
    </section>
-   <div className="partyCertificateSignature"><span>Подпись __________________</span><b>{signer}</b></div>
+   <div className="partyCertificateSignature"><span>{signatureUrl?<img src={signatureUrl} alt="Подпись уполномоченного лица"/>:'Подпись __________________'}</span><b>{signer}</b></div>
    <footer>Дата выдачи: {issued}<small>Свидетельство выдано в рамках цифровой политико-административной симуляции ГОС.ID. Не является записью государственного реестра Российской Федерации.</small></footer>
   </article>;
 }
