@@ -99,6 +99,6 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
    </table>
    {!filtered.length&&<div className="journalEmpty">Нет участников по выбранным условиям.</div>}
   </div>
-  <p className="journalNote">Источник баллов: stage_assessments. {activityTotals===null?'Активность: последние 250 загруженных событий до получения полного итога.':'Активность: все зафиксированные события игры, подсчитанные сервером.'}</p>
+  <p className="journalNote">Источник баллов: журнал оценивания. {activityTotals===null?'Активность: последние 250 загруженных событий до получения полного итога.':'Активность: все зафиксированные события игры, подсчитанные сервером.'}</p>
  </section>;
 }
