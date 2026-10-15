@@ -129,6 +129,9 @@ on:
       - 'components/GameClient.tsx'
       - 'components/game/useActionErrorPlacement.tsx'
       - 'scripts/action-error-placement-check.cjs'
+      - 'scripts/party-document-visibility-check.cjs'
+      - 'components/game/TeacherPartyDossiers.tsx'
+      - 'components/game/PartyUnregisteredFiles.tsx'
       - 'components/game/turnCountdown.ts'
       - 'app/turn-countdown.css'
       - 'scripts/turn-countdown-check.cjs'
@@ -243,6 +246,7 @@ jobs:
       - run: node scripts/electoral-math-check.cjs
       - run: node scripts/grade-fractional-check.cjs
       - run: node scripts/party-grades-stage-consistency-check.cjs
+      - run: node scripts/party-document-visibility-check.cjs
       - run: node scripts/action-error-placement-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-realtime-check.cjs
