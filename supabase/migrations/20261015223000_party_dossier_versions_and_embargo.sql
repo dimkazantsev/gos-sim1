@@ -231,3 +231,27 @@ BEGIN
 END;$$;
 REVOKE ALL ON FUNCTION public.review_party_package_privately(uuid,text,text) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.review_party_package_privately(uuid,text,text) TO authenticated;
+
+
+-- Notify all opted-in members of the party, not only the original uploader.
+CREATE OR REPLACE FUNCTION private.notify_party_dossier_members()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
+SET search_path=public,private,pg_temp AS $$
+BEGIN
+ IF NEW.status IS NOT DISTINCT FROM OLD.status
+    OR NEW.status NOT IN ('accepted','revision') THEN RETURN NEW; END IF;
+ INSERT INTO public.telegram_outbox(game_id,user_id,category,source_id,body)
+ SELECT NEW.game_id,gm.user_id,'party_review',NEW.id,
+  'Минюст рассмотрел документ партии «'||p.name||'» · В'||NEW.version_no||
+  ': '||CASE WHEN NEW.status='accepted' THEN 'принят' ELSE 'возвращён на доработку' END||
+  '. Откройте раздел «Партии и фракции» для просмотра решения и замечаний.'
+ FROM public.game_parties p
+ JOIN public.game_members gm ON gm.game_id=p.game_id AND gm.team=p.name
+ JOIN public.telegram_links t ON t.game_id=gm.game_id AND t.user_id=gm.user_id AND t.notifications_enabled
+ WHERE p.id=NEW.party_id AND gm.kind='student' AND gm.roster_archived_at IS NULL
+ ON CONFLICT(game_id,user_id,category,source_id) DO NOTHING;
+ RETURN NEW;
+END;$$;
+DROP TRIGGER IF EXISTS notify_party_dossier_members ON public.party_documents;
+CREATE TRIGGER notify_party_dossier_members AFTER UPDATE OF status ON public.party_documents
+FOR EACH ROW EXECUTE FUNCTION private.notify_party_dossier_members();
