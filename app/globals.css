@@ -54,6 +54,15 @@ button,a{-webkit-tap-highlight-color:transparent}
 .secondary{border:1px solid var(--line);background:#fff;color:var(--text)}
 .secondary:hover:not(:disabled){background:#f4f7fb;border-color:var(--line-strong);transform:translateY(-1px)}
 .errorBox{padding:12px 14px;border:1px solid #ecc8d1;background:var(--danger-soft);color:#8f2940;border-radius:13px;font-size:13px;box-shadow:0 5px 18px rgba(181,61,85,.07)}
+
+/* Action-scoped errors stay in the same layout flow as the triggering control.
+   Unlike a floating toast they remain readable when the user scrolls a form. */
+.gameActionErrorSlot{display:block;box-sizing:border-box;width:100%;min-width:0;flex:1 0 100%;grid-column:1/-1;clear:both;margin:9px 0 12px}
+.gameActionError{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid #f1b6be;border-left:3px solid #e45d70;border-radius:12px;background:#fff5f6;color:#992d45;font-size:13px;line-height:1.55;overflow-wrap:anywhere}
+.gameActionErrorCopy{min-width:0;display:grid;gap:3px}
+.gameActionErrorCopy>strong{color:#77354a;font-size:12px;font-weight:800}
+.gameActionError>.gsIconAction{flex:0 0 auto}
+@media(max-width:650px){.gameActionError{padding:11px 12px;gap:8px}.gameActionErrorSlot{margin:8px 0 10px}}
 .closable{margin-bottom:14px;cursor:pointer}
 .loaderCard{display:flex;gap:12px;align-items:center;padding:20px 24px;border-radius:18px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}
 .spinner{width:28px;height:28px;border-radius:50%;border:3px solid #e3e9f2;border-top-color:var(--blue);animation:spin .8s linear infinite}
