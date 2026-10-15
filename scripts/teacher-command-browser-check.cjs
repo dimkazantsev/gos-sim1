@@ -21,7 +21,7 @@ async function check(){
   const frame=page.frameLocator('#preview');
   await page.locator('#screen').selectOption('teacher-stages');
   await frame.locator('.teacherStageManager').waitFor();
-  for(const width of [1600,1440,1280,1200,1100,900,768,430,390,360,320]){
+  for(const width of [1600,1440,1280,1200,1100,1024,912,900,820,768,430,390,360,320]){
    await page.locator('#preview').evaluate((el,n)=>{el.style.width=n+'px'},width);
    await frame.locator('.teacherStageManager').evaluate(el=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    const data=await frame.locator('.teacherCommand').evaluate(root=>{
@@ -31,6 +31,9 @@ async function check(){
     const sidebar=root.querySelector('.teacherStageSidebar');
     const deadline=sidebar?.querySelector('.deadlineControl');
     const actions=inspector.querySelector('.teacherStageInspectorActions');
+    const flow=actions.querySelector('.teacherStageFlowActions');
+    const flowControls=[...flow.querySelectorAll(':scope > button, :scope > label')];
+    const procedure=actions.querySelector('.teacherStageProcedures');
     const policy=inspector.querySelector('.stagePolicyEditor');
     const entries=[...list.querySelectorAll('.teacherStageListItem')];
     return {width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
@@ -52,6 +55,7 @@ async function check(){
       arrow:rect(entry.querySelector(':scope > svg'))
      })),
      deadline:deadline?rect(deadline):null,actions:actions?rect(actions):null,policy:policy?rect(policy):null,
+     flow:rect(flow),flowControls:flowControls.map(rect),procedureRect:rect(procedure),
      duplicateTimer:root.querySelectorAll('.teacherCommandClock,.teacherClockSwitch').length,
      stageStatus:root.querySelectorAll('.teacherCommandBar .teacherTurnBadge').length,
      readinessButton:root.querySelectorAll('.teacherStageInspector .stageReadinessCompactRefresh').length,
@@ -73,6 +77,22 @@ async function check(){
    assert.equal(data.procedures,1,'Procedures action must remain available');
    assert.equal(data.extension,1,'Stage extension input must remain accessible');
    assert(data.deadline&&data.actions&&data.policy,'Deadline, actions and policy must remain visible');
+   const overlap=(a,b)=>Math.min(a.right,b.right)-Math.max(a.left,b.left)>2
+    &&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>2;
+   for(const control of data.flowControls){
+    assert(control.left>=data.actions.left-3&&control.right<=data.actions.right+3,
+     'Stage action must fit its card at '+width+'px: '+JSON.stringify({control,actions:data.actions}));
+    assert(!overlap(control,data.procedureRect),
+     'Stage action must not overlap procedures at '+width+'px');
+   }
+   for(let i=0;i<data.flowControls.length;i++)
+    for(let k=i+1;k<data.flowControls.length;k++)
+     assert(!overlap(data.flowControls[i],data.flowControls[k]),
+      'Close/extend controls must not overlap at '+width+'px');
+   if(width<=820){
+    assert(data.procedureRect.top>=data.flow.bottom-2,
+     'Procedures button must occupy a separate row on compact tablet at '+width+'px');
+   }
    const ratio=width>=1121?.75:width>650?.68:.64;
    const cap=width>=1121?820:width>650?700:640;
    const expectedHeight=Math.min(data.frameHeight*ratio,cap);

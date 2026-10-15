@@ -285,3 +285,44 @@
   margin-top:auto;
  }
 }
+
+
+/* Tablet/compact inspector: one aligned control row and a separate full-width action.
+   Container queries follow the real inspector width, including when chat is open. */
+@container (max-width:900px) {
+ .teacherCommand .teacherStageInspectorActions {
+  display:grid;grid-template-columns:minmax(0,1fr);
+  gap:9px;padding:11px;align-items:stretch;
+ }
+ .teacherCommand .teacherStageFlowActions {
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(112px,145px) minmax(0,1fr);
+  align-items:end;gap:9px;width:100%;min-width:0;
+ }
+ .teacherCommand .teacherStageFlowActions>button,
+ .teacherCommand .teacherStageProcedures {
+  box-sizing:border-box;min-width:0;width:100%;min-height:42px;
+  padding:8px 10px;line-height:1.25;font-size:12px;
+  white-space:normal;overflow-wrap:break-word;
+ }
+ .teacherCommand .teacherStageExtendField {
+  flex:none;min-width:0;max-width:none;width:100%;font-size:11px;
+ }
+ .teacherCommand .teacherStageExtendField input {
+  min-width:0;height:42px;padding:0 10px;
+ }
+ .teacherCommand .teacherStageProcedures {
+  grid-column:1/-1;justify-self:stretch;min-height:44px;
+ }
+}
+@container (max-width:520px) {
+ .teacherCommand .teacherStageFlowActions {
+  grid-template-columns:minmax(0,1fr) minmax(100px,135px);
+ }
+ .teacherCommand .teacherStageFlowActions>button:last-child {
+  grid-column:1/-1;
+ }
+}
+@container (max-width:350px) {
+ .teacherCommand .teacherStageFlowActions {grid-template-columns:minmax(0,1fr);}
+ .teacherCommand .teacherStageFlowActions>button:last-child {grid-column:auto;}
+}

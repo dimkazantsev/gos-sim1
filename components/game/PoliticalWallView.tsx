@@ -25,6 +25,7 @@ import NewsProposals from './NewsProposals';
 import {POLITICAL_POST_BATCH_SIZE,nextPoliticalPostCount,visiblePoliticalPostCount} from './politicalWallPaging';
 import {publishedStageReport} from './publishedStageReport';
 import {formalDocumentTitle} from './formalInstitutions';
+import {localizeAutomaticNewsText,localizeAutomaticNewsTag} from './automaticNewsLanguage';
 
 const PROCESS_TYPES=[
  ['statement','Заявление'],['initiative','Инициатива'],['event','Событие'],
@@ -88,7 +89,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   // Unmount a deleted post and its discussion immediately to avoid stale retry messages.
   if(locallyRemovedIds.has(p.id))return false;
   const q=search.trim().replace(/^#/,'').toLowerCase();
-  if(q&&!([p.title,p.body,p.actor_label,...(p.tags||[])].join(' ').toLowerCase().includes(q)))return false;
+  if(q&&!([p.title,p.body,p.actor_label,...(p.tags||[]),...(p.source_key||p.context?.automatic===true||p.actor_key==='media'||p.process_type==='news'?[localizeAutomaticNewsText(p.title),localizeAutomaticNewsText(p.body),...(p.source_key||p.context?.automatic===true?(p.tags||[]).map(localizeAutomaticNewsTag):[])]:[])].join(' ').toLowerCase().includes(q)))return false;
   return (!filterActor||p.actor_key===filterActor)&&(!filterType||(filterType==='initiative'?['initiative','decision'].includes(p.process_type):p.process_type===filterType))&&(!filterStage||String(p.context?.stage_no)===filterStage);
  }).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||Date.parse(b.created_at)-Date.parse(a.created_at)),[politicalPosts,locallyRemovedIds,search,filterActor,filterType,filterStage]);
  // Reset the window when the feed criteria change. Older posts and their interactive
@@ -279,9 +280,11 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     const vote=votes.find(v=>v.source_post_id===p.id||v.id===p.context?.vote_id);
     const publicFiles=g.partyDocuments.filter(d=>p.context?.party_document_ids?.includes(d.id)&&d.url);
     const editorialFallback=publishedStageReport(p,formalDocuments,votes);
-    const displayPost=editorialFallback?{...p,...editorialFallback}:p;
-    const label=p.actor_key==='teacher'?BRAND_NAME:p.actor_label,kind=p.process_type==='decision'?'Инициатива':PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
     const auto=!!p.source_key||p.context?.automatic===true;
+    const editorialPost=editorialFallback?{...p,...editorialFallback}:p;
+    const newsPresentation=auto||p.actor_key==='media'||p.process_type==='news';
+    const displayPost=newsPresentation?{...editorialPost,title:localizeAutomaticNewsText(editorialPost.title),body:localizeAutomaticNewsText(editorialPost.body)}:editorialPost;
+    const label=p.actor_key==='teacher'?BRAND_NAME:p.actor_label,kind=p.process_type==='decision'?'Инициатива':PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
     const own=p.author_id===me.user_id,editable=!readOnly&&(teacher||own&&!auto);
     const canRequestVote=!readOnly&&(teacher||own&&!auto);
     return <article className={'wallPost '+p.status+(bulkMode&&bulkAllowed?' bulkSelecting':'')+(selectedPostIds.has(p.id)&&bulkMode&&bulkAllowed?' bulkSelected':'')+(auto&&(p.context?.editorial_verified||editorialFallback)?' editorialStory':'')} key={p.id} id={'process-'+p.id}>
@@ -296,7 +299,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
      {publicFiles.length>0&&<div className="processPartyFiles"><h3>Документы партии</h3>{publicFiles.map(d=><a key={d.id} href={d.url!} target="_blank" rel="noreferrer"><BookOpenText size={18}/><span>{d.title}<small>{d.file_name}</small></span></a>)}</div>}
      {links.length>0&&<div className="wallNpaLinks">{links.map(d=><button key={d.id} onClick={()=>onOpenDocument(d.id)}><BookOpenText size={19}/><span><small>{d.registry_no}</small><b>{formalDocumentTitle(d.title,d.doc_type)}</b></span><span className="processDocumentStatus">{d.status_label}</span></button>)}</div>}
      <PostChanges g={g} post={p}/>
-     {!!p.tags?.length&&<div className="wallTags">{p.tags.map(t=><button key={t} onClick={()=>setSearch('#'+t)}>#{t}</button>)}</div>}
+     {!!p.tags?.length&&<div className="wallTags">{p.tags.map(t=><button key={t} onClick={()=>setSearch('#'+t)}>#{auto?localizeAutomaticNewsTag(t):t}</button>)}</div>}
      {(p.external_url||p.internal_view)&&<div className="wallLinks">{p.external_url&&<a href={p.external_url} target="_blank" rel="noreferrer"><Link2 size={16}/>Внешний ресурс</a>}{p.internal_view&&RESOURCE_VIEWS.some(v=>v.value===p.internal_view)&&<button onClick={()=>p.internal_view==='documents'&&p.internal_ref_id?onOpenDocument(p.internal_ref_id):onNavigate(p.internal_view as View)}><Link2 size={16}/>{RESOURCE_VIEWS.find(v=>v.value===p.internal_view)?.label}</button>}</div>}
      {vote&&<button className={'processLinkedVote '+vote.status} onClick={onOpenVotes}><span className="processLinkedVoteIcon" aria-hidden="true"><Vote size={21}/></span><span className="processLinkedVoteCopy"><small className="processLinkedVoteStatus">{vote.status==='open'?'Идёт голосование':'Голосование завершено'}</small><b className="processLinkedVoteTitle">{vote.title}</b></span><strong className="processLinkedVoteResult">{vote.status==='closed'?vote.result_label:'Открыть'}</strong></button>}
      {!readOnly&&<div className="wallPostActions">
