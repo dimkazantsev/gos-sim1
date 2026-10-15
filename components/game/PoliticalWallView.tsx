@@ -89,7 +89,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   // Unmount a deleted post and its discussion immediately to avoid stale retry messages.
   if(locallyRemovedIds.has(p.id))return false;
   const q=search.trim().replace(/^#/,'').toLowerCase();
-  if(q&&!([p.title,p.body,p.actor_label,...(p.tags||[]),...(p.source_key||p.context?.automatic===true?[localizeAutomaticNewsText(p.title),localizeAutomaticNewsText(p.body),...(p.tags||[]).map(localizeAutomaticNewsTag)]:[])].join(' ').toLowerCase().includes(q)))return false;
+  if(q&&!([p.title,p.body,p.actor_label,...(p.tags||[]),...(p.source_key||p.context?.automatic===true||p.actor_key==='media'||p.process_type==='news'?[localizeAutomaticNewsText(p.title),localizeAutomaticNewsText(p.body),...(p.source_key||p.context?.automatic===true?(p.tags||[]).map(localizeAutomaticNewsTag):[])]:[])].join(' ').toLowerCase().includes(q)))return false;
   return (!filterActor||p.actor_key===filterActor)&&(!filterType||(filterType==='initiative'?['initiative','decision'].includes(p.process_type):p.process_type===filterType))&&(!filterStage||String(p.context?.stage_no)===filterStage);
  }).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||Date.parse(b.created_at)-Date.parse(a.created_at)),[politicalPosts,locallyRemovedIds,search,filterActor,filterType,filterStage]);
  // Reset the window when the feed criteria change. Older posts and their interactive
@@ -282,7 +282,8 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     const editorialFallback=publishedStageReport(p,formalDocuments,votes);
     const auto=!!p.source_key||p.context?.automatic===true;
     const editorialPost=editorialFallback?{...p,...editorialFallback}:p;
-    const displayPost=auto?{...editorialPost,title:localizeAutomaticNewsText(editorialPost.title),body:localizeAutomaticNewsText(editorialPost.body)}:editorialPost;
+    const newsPresentation=auto||p.actor_key==='media'||p.process_type==='news';
+    const displayPost=newsPresentation?{...editorialPost,title:localizeAutomaticNewsText(editorialPost.title),body:localizeAutomaticNewsText(editorialPost.body)}:editorialPost;
     const label=p.actor_key==='teacher'?BRAND_NAME:p.actor_label,kind=p.process_type==='decision'?'Инициатива':PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
     const own=p.author_id===me.user_id,editable=!readOnly&&(teacher||own&&!auto);
     const canRequestVote=!readOnly&&(teacher||own&&!auto);
