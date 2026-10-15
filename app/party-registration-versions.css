@@ -1,20 +1,32 @@
-/* ГОС.ID · Private party dossier, numbered attempts and review timeline. */
-.partyRegistrationUpdates {display:grid;gap:8px;padding:12px;border:1px solid #dae4f1;border-radius:14px;background:#f8faff;min-width:0}
-.civicPartyFiles .partyRegistrationUpdates>article {display:grid;gap:6px;padding:10px 12px;background:#fff;border:1px solid #e2e9f4;border-radius:10px;overflow-wrap:anywhere}
-.partyRegistrationUpdates article b {font-size:12px;color:#183962}
-.partyRegistrationUpdates article span {font-size:12px;font-weight:700;color:#3462a4}
-.partyRegistrationUpdates article p {margin:0;color:#657a97;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
-.civicPartyFiles .partyRegistrationDoc {display:grid;gap:10px;padding:15px;border:1px solid #dbe5f2;border-radius:14px;background:#fff;min-width:0}
-.partyRegistrationDoc>header {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.partyRegistrationDoc>header b {font-size:14px;color:#15365d}
-.partyRegistrationDoc>header span {display:inline-block;padding:5px 9px;border-radius:8px;background:#edf4ff;color:#315ca6;font-size:12px;font-weight:700}
-.partyRegistrationRevisionNote {margin:0;padding:10px 12px;background:#fff6ee;border-left:3px solid #e9a460;border-radius:7px;white-space:pre-wrap;overflow-wrap:anywhere}
-.partyRegistrationDocActions {display:flex;flex-wrap:wrap;align-items:center;gap:10px}
-.partyRegistrationDocActions>a,.partyRegistrationDocActions>button {min-height:42px;min-width:0;font-size:12px}
-.partyRegistrationDocActions>button {padding:10px 13px;white-space:normal}
-.partyRegistrationDoc>details {padding:10px;border:1px solid #e4eaf2;border-radius:10px;min-width:0}
-.partyRegistrationDoc>details summary {font-size:12px;font-weight:700;color:#365f96;cursor:pointer}
-.partyRegistrationDoc>details p {margin:10px 0 0;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+/* ГОС.ID — единый список регистрационных документов без дублирующей ленты. */
+.civicPartyFiles .partyRegistrationDoc {display:grid;gap:8px;min-width:0;padding:12px 14px;border:1px solid #dbe5f2;border-radius:12px;background:#fff}
+.partyRegistrationDocTop {display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.partyRegistrationDocIdentity {display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;min-width:0}
+.partyRegistrationDocIdentity>b {font-size:13px;color:#173a62;overflow-wrap:anywhere}
+.partyRegistrationDocStatus {display:inline-block;padding:5px 9px;border-radius:8px;background:#edf4ff;color:#315ca6;font-size:12px;font-weight:700;white-space:nowrap}
+.partyRegistrationDocActions {display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0}
+.partyRegistrationDocActions>a,.partyRegistrationDocActions>button {display:inline-flex;align-items:center;justify-content:center;min-height:36px;min-width:0;box-sizing:border-box;border-radius:9px;font-size:12px;line-height:1.25}
+.partyRegistrationDocActions>a {padding:7px 11px;border:1px solid #d7e3f4;background:#f7faff;color:#315b97;text-decoration:none}
+.partyRegistrationDocActions>button {padding:7px 12px;white-space:nowrap}
+.partyRegistrationHiddenInput {display:none}
+.partyRegistrationRevisionNote {margin:0;padding:10px 12px;background:#ffe7e9;border-left:3px solid #c93546;border-radius:8px;color:#902737;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.partyRegistrationReviewNote {margin:0;color:#617890;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.partyRegistrationDoc>details.partyRegistrationDocHistory {width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #e4eaf2;border-radius:9px;min-width:0}
+.partyRegistrationDocHistory>summary {font-size:12px;font-weight:700;color:#365f96;cursor:pointer}
+.partyRegistrationDocHistory p {margin:8px 0 0;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.partyRegistrationFooter {display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:8px}
+.partyRegistrationFooter>button {min-height:40px}
+.partyRegistrationLegal {min-width:0}
+.partyRegistrationLegal>summary {cursor:pointer;color:#35609a;font-size:12px;font-weight:700}
+.partyRegistrationLegal>a {display:block;margin-top:8px;font-size:12px;overflow-wrap:anywhere}
+@media(max-width:650px) {
+ .civicPartyFiles .partyRegistrationDoc {padding:11px}
+ .partyRegistrationDocTop {align-items:stretch}
+ .partyRegistrationDocIdentity {width:100%}
+ .partyRegistrationDocActions {width:100%}
+ .partyRegistrationDocActions>a,.partyRegistrationDocActions>button {flex:1 1 auto;min-width:105px}
+ .partyRegistrationFooter>button {width:100%}
+}
 /* Compact teacher review: one document and its actions on one row. */
 .teacherPartyDossiers .partyDossierDocHint {margin:5px 0 10px;color:#64768c;font-size:12px;line-height:1.5}
 .teacherPartyDossiers .teacherPartySection ul>li.partyDossierDocRow {
@@ -44,10 +56,9 @@
 .civicPartyPackage.hasRevision>.civicPartyDisclosureSummary {background:#fff2f3;border-color:#e7adb2}
 .civicPartyPackage.hasRevision .civicPartyDisclosureText small {color:#a52332;font-weight:700}
 .civicPartyFiles .partyRegistrationDoc.isRevision {border-color:#e5a4ac;background:#fff4f5;box-shadow:0 0 0 1px #f4d2d5 inset}
-.partyRegistrationDoc.isRevision>header>b {color:#992332}
-.partyRegistrationDoc.isRevision>header>span {background:#ffe1e5;color:#a92235}
+.partyRegistrationDoc.isRevision .partyRegistrationDocIdentity>b {color:#992332}
+.partyRegistrationDoc.isRevision .partyRegistrationDocStatus {background:#ffe1e5;color:#a92235}
 .partyRegistrationDoc.isRevision .partyRegistrationRevisionNote {background:#ffe7e9;border-left-color:#cd3645;color:#8e2430}
-.partyRegistrationUpdates article:has(span:first-of-type) {min-width:0}
 @media(max-width:850px) {
  .teacherPartyDossiers .teacherPartySection ul>li.partyDossierDocRow {grid-template-columns:minmax(0,1fr)}
  .partyDossierDocControls {justify-content:flex-start;flex-wrap:wrap}
