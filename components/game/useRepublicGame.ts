@@ -825,10 +825,15 @@ export function useRepublicGame(gameId:string){
   if(r.error){setError(r.error.message);return false}
   await loadPartyRepresentation();return true;
  }
- async function inviteToParty(partyId:string,userId:string){
-  const r=await supabase.rpc('invite_to_party',{p_party_id:partyId,p_user_id:userId});
-  if(r.error){setError(r.error.message);return false}
-  await loadPartyRepresentation();notifyGameDataRefresh(gameId);void kickTelegramDispatch();return true;
+ async function inviteToParty(partyId:string,userId:string,onFailure?:(message:string)=>void){
+  try{
+   const r=await supabase.rpc('invite_to_party',{p_party_id:partyId,p_user_id:userId});
+   if(r.error){setError(r.error.message);onFailure?.(r.error.message);return false}
+   await loadPartyRepresentation();notifyGameDataRefresh(gameId);void kickTelegramDispatch();return true;
+  }catch(e){
+   const message=e instanceof Error?e.message:'Не удалось отправить приглашение. Повторите попытку.';
+   setError(message);onFailure?.(message);return false;
+  }
  }
  async function respondPartyInvitation(invitationId:string,accept:boolean){
   const r=await supabase.rpc('respond_party_invitation',{p_invitation_id:invitationId,p_accept:accept});

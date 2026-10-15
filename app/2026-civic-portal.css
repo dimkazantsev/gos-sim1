@@ -197,6 +197,9 @@
 .civicPartyRoster small {color:#7388a3}
 .civicPartyEditor>label {display:grid;gap:8px;margin:14px 0;font-size:13px;min-width:0}
 .civicPartyEditor .styledSelect {margin:14px 0}
+.civicPartyInviteFeedback {margin-top:12px;margin-bottom:12px;padding:11px 13px;border:1px solid #dce5f4;border-radius:10px;background:#f5f8fe;color:#31547b;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.civicPartyInviteFeedback.isError {border-color:#edc6ce;background:#fff6f7;color:#a32d46}
+.civicPartyInviteFeedback.isSuccess {border-color:#bedfce;background:#f3fbf7;color:#206d4a}
 .civicPartyUpload {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px;align-items:end}
 .civicPartyUpload>label {display:grid;gap:8px;font-size:13px;min-width:0}
 .civicPartyUpload button {min-height:46px;white-space:normal}
