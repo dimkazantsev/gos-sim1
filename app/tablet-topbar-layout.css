@@ -211,12 +211,13 @@
  .simWorkspace .simTop > .mobileBrand .brandMark {flex:0 0 32px;width:32px;height:32px}
  /* On medium tablets the fixed chat sheet begins BELOW the taller 84px
     single-line toolbar, and ends ABOVE the existing mobile dock. */
- .simWorkspace .simChat.gsChatV2,
- .simWorkspace:has(.viewAsSwitcher) .simChat.gsChatV2 {
+ /* ChatPanel is fixed and may render in a sibling overlay context.
+    Scope the hard offset to medium tablets, irrespective of ancestry. */
+ .simChat.gsChatV2 {
   position:fixed;
-  top:84px;
-  bottom:var(--gs-mobile-dock-height);
-  height:calc(100dvh - 84px - var(--gs-mobile-dock-height));
+  top:84px!important;
+  bottom:var(--gs-mobile-dock-height)!important;
+  height:calc(100dvh - 84px - var(--gs-mobile-dock-height))!important;
   max-height:none;
  }
  /* The mobile dock already owns Chat below 901px; avoid duplicating its control. */
