@@ -1,0 +1,58 @@
+/* ГОС.ID · Responsive profile security fields when the chat reduces available width.
+   Container queries track the *actual card width*, not the screen viewport. */
+.profilePage .profileEditor,
+.profilePage .profileGrid,
+.profilePage .profileSecurity {min-width:0}
+.profilePage .profileSecurity {container-type:inline-size}
+.profilePage .profileSecurityGrid {
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ align-items:stretch;
+ gap:10px;
+ min-width:0;
+}
+.profilePage .profileSecurityGrid>label {
+ grid-column:1/-1;
+ min-width:0;
+ overflow-wrap:anywhere;
+}
+.profilePage .profileSecurityGrid>button {
+ display:inline-flex;
+ width:100%;
+ min-width:0;
+ min-height:48px;
+ align-items:center;
+ justify-content:center;
+ gap:8px;
+ padding:10px 12px;
+ line-height:1.35;
+ white-space:normal;
+ overflow-wrap:anywhere;
+}
+.profilePage .profileSecurityGrid>button svg {flex:none}
+.profilePage .profileSecurityGrid input,
+.profilePage .profilePasswordFields input {min-width:0;max-width:100%}
+.profilePage .profileSecurityNotice,
+.profilePage .profileSecurityVerified {overflow-wrap:anywhere}
+.profilePage .profilePasswordFields {min-width:0}
+.profilePage .profileSecurityRecovery article {min-width:0}
+.profilePage .profileSecurityRecovery article>button {min-width:0;white-space:normal}
+/* Under 540px of inner security-card space, stack controls vertically. */
+@container (max-width:540px) {
+ .profilePage .profileSecurityGrid,
+ .profilePage .profilePasswordFields {grid-template-columns:minmax(0,1fr)}
+ .profilePage .profileSecurityGrid>label,
+ .profilePage .profilePasswordFields>button {grid-column:1}
+ .profilePage .profileSecurityGrid>button {justify-self:stretch}
+ .profilePage .profilePasswordFields>button {width:100%;min-width:0;justify-self:stretch}
+ .profilePage .profileSecurityRecovery article {flex-wrap:wrap}
+ .profilePage .profileSecurityRecovery article>button {width:100%}
+}
+@media (max-width:650px) {
+ .profilePage .profileSecurityGrid,
+ .profilePage .profilePasswordFields {grid-template-columns:minmax(0,1fr)}
+ .profilePage .profileSecurityGrid>label,
+ .profilePage .profilePasswordFields>button {grid-column:1}
+ .profilePage .profileSecurityGrid>button,
+ .profilePage .profilePasswordFields>button {width:100%;min-width:0}
+}

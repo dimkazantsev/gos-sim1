@@ -88,6 +88,8 @@ on:
       - 'components/game/Achievements.tsx'
       - 'components/game/PresidentialElectionLab.tsx'
       - 'app/profile-first-setup.css'
+      - 'app/profile-chat-responsive.css'
+      - 'scripts/profile-chat-layout-check.cjs'
       - 'supabase/migrations/20261012230000_profile_setup_once_status.sql'
       - 'scripts/profile-setup-and-brand-check.cjs'
       - 'components/game/BudgetChangeRegistry.tsx'
@@ -219,6 +221,7 @@ jobs:
       - run: node scripts/stage-readiness-manual-check.cjs
       - run: node scripts/profile-setup-and-brand-check.cjs
       - run: node scripts/profile-email-layout-browser-check.cjs
+      - run: node scripts/profile-chat-layout-check.cjs
       - run: node scripts/entry-qr-check.cjs
       - run: node scripts/remembered-game-codes-check.cjs
       - run: node scripts/achievement-preview-check.cjs

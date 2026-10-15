@@ -22,7 +22,7 @@ function element(node){
   for(const width of [320,390,768,1024,1440]){
    const page=await browser.newPage({viewport:{width,height:1100}});await page.route('**/*',route=>route.abort());
    for(const [state,html] of [['conflict',conflict],['recovery',recovery]]){
-    await page.setContent('<!doctype html><html lang="ru"><meta name="viewport" content="width=device-width, initial-scale=1"><style>'+css+'\nbody{margin:0}main{width:100%;max-width:1100px;margin:auto;padding:12px;box-sizing:border-box}svg{width:17px;height:17px;flex:none}</style><body><main>'+html+'</main></body></html>');
+    await page.setContent('<!doctype html><html lang="ru"><meta name="viewport" content="width=device-width, initial-scale=1"><style>'+css+'\nbody{margin:0}main{width:100%;max-width:1100px;margin:auto;padding:12px;box-sizing:border-box}svg{width:17px;height:17px;flex:none}</style><body><main class="profilePage">'+html+'</main></body></html>');
     const layout=await page.evaluate(()=>{
      const panel=document.querySelector('.profileSecurity').getBoundingClientRect();
      return{viewport:innerWidth,width:document.documentElement.scrollWidth,controls:[...document.querySelectorAll('.profileSecurity input,.profileSecurity button')].map(el=>{const rect=el.getBoundingClientRect();return{label:el.textContent,left:rect.left,right:rect.right,height:rect.height,overflow:el.tagName==='BUTTON'&&el.scrollWidth>el.clientWidth+2};}),panel:{left:panel.left,right:panel.right}};
