@@ -5,6 +5,13 @@ import {createPortal} from 'react-dom';
 type ActionTarget={element:HTMLElement;view:string;at:number};
 type InlineSlot={element:HTMLElement;message:string};
 
+export function shouldLocalizeActionError(error:string,view:string,action:{view:string;at:number;connected:boolean;file:boolean}|null,now=Date.now()){
+ if(!error||!action||action.view!==view||!action.connected||now-action.at>(action.file?90000:30000))return false;
+ // Authentication, connection and app initialization errors are not form validation.
+ return !/^(Нет доступа к игре|Не удалось открыть игру|Ошибка подключения|Соединение потеряно)/i.test(error);
+}
+
+
 /** Shows action errors beside the control that initiated the request.
  * Background and navigation errors still use the page-level alert. */
 export function useActionErrorPlacement(error:string,view:string,clearError:()=>void){
@@ -39,13 +46,10 @@ export function useActionErrorPlacement(error:string,view:string,clearError:()=>
  useEffect(()=>{
   if(!error){setInlineSlot(null);return}
   const action=lastAction.current;
-  if(!action||action.view!==view||!action.element.isConnected||Date.now()-action.at>(action.element instanceof HTMLInputElement&&action.element.type==='file'?90000:30000)){
-   setInlineSlot(null);return;
-  }
-  // System-level failures are not tied to the last submitted form.
-  if(/^(Нет доступа к игре|Не удалось открыть игру|Ошибка подключения|Соединение потеряно)/i.test(error)){
-   setInlineSlot(null);return;
-  }
+  if(!shouldLocalizeActionError(error,view,action?{
+   view:action.view,at:action.at,connected:action.element.isConnected,
+   file:action.element instanceof HTMLInputElement&&action.element.type==='file'
+  }:null)){setInlineSlot(null);return}
   const slot=document.createElement('div');
   slot.className='actionErrorSlot';
   const previous=action.element.getAttribute('aria-describedby');
