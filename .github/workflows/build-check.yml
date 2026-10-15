@@ -135,6 +135,7 @@ on:
       - 'app/topbar-controls-alignment.css'
       - 'app/tablet-topbar-layout.css'
       - 'scripts/tablet-topbar-layout-browser-check.cjs'
+      - 'scripts/metric-modal-browser-check.cjs'
       - 'scripts/topbar-controls-height-check.cjs'
       - 'app/icon.svg'
       - 'app/page.tsx'
