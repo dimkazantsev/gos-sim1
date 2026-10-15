@@ -213,6 +213,8 @@
     single-line toolbar, and ends ABOVE the existing mobile dock. */
  /* ChatPanel is fixed and may render in a sibling overlay context.
     Scope the hard offset to medium tablets, irrespective of ancestry. */
+ .simWorkspace:has(.viewAsSwitcher) .simChat.gsChatV2,
+ .simWorkspace .simChat.gsChatV2,
  .simChat.gsChatV2 {
   position:fixed;
   top:84px;
