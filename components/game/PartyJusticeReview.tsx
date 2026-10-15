@@ -15,7 +15,8 @@ export default function PartyJusticeReview({g,party}:{g:ReturnTypeRepublic;party
  const [notice,setNotice]=useState('');
  const docs=g.partyDocuments.filter(d=>d.party_id===party.id);
  const leader=g.members.find(m=>m.user_id===party.leader_user_id);
- const ready=PARTY_REQUIRED_DOCS.every(req=>docs.some(d=>d.doc_kind===req.kind&&d.status==='accepted'));
+ const latestDocs=docs.filter(d=>!docs.some(next=>next.doc_kind===d.doc_kind&&(Date.parse(next.created_at)>Date.parse(d.created_at)||(next.created_at===d.created_at&&next.id>d.id))));
+ const ready=PARTY_REQUIRED_DOCS.every(req=>latestDocs.some(d=>d.doc_kind===req.kind&&d.status==='accepted'));
  const missingGrounds=decision==='rejected'&&note.includes('[Укажите');
  function draft(next:JusticeDraftDecision=decision){
   setDecision(next);
