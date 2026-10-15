@@ -2,6 +2,7 @@
 import {useState} from 'react';
 import PartyJusticeReview from './PartyJusticeReview';
 import PartyChairFallback from './PartyChairFallback';
+import PartyUnregisteredFiles from './PartyUnregisteredFiles';
 import TeacherPartyStatistics from './TeacherPartyStatistics';
 import {FileText,Trash2,UsersRound,Landmark,ShieldAlert,X,ExternalLink,MessageCircle} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
@@ -57,6 +58,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
     <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы ({docs.length})</h4>
      {docs.length?<ul>{docs.map(d=><li key={d.id}><span>{docLabels[d.doc_kind]||d.doc_kind}<small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {d.status==='accepted'?'Принят':d.status==='revision'?'На доработке':'Загружен'}</small></span>{d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title}><ExternalLink size={15}/></a>:<span>—</span>}<div className="civicDocReview"><button type="button" className={d.status==='accepted'?'primary':'secondary'} disabled={!!reviewingId||d.status==='accepted'} aria-disabled={d.status==='accepted'} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Рассматривается…':d.status==='accepted'?'Принято':'Принять'}</button><button type="button" className="secondary" disabled={!!reviewingId||d.status==='revision'} onClick={()=>void review(d.id,'revision')}>На доработку</button></div></li>)}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
     </div>
+    {g.game?.id&&<PartyUnregisteredFiles gameId={g.game.id} partyId={p.id} registered={docs}/>}
     <PartyJusticeReview g={g} party={p}/>
     <footer><span>{posts.length} партийных публикаций · {staff.length} участников</span><button type="button" onClick={()=>{setSelected(p.id);setConfirm('');setNotice('')}}><Trash2 size={15} aria-hidden="true"/> Удалить партию</button></footer>
    </article>;
