@@ -90,9 +90,9 @@ async function main(){
     assert(card.deadline.bottom<=card.actions.y+2||card.deadline.right<=card.actions.x+2,
      'Stage buttons overlap deadline at '+width+'px: '+JSON.stringify(card));
     if(card.teacherActions.length){
-     assert.equal(card.fullLabelDisplay==='none',width<=800,
+     assert.equal(card.fullLabelDisplay==='none',card.card.width<=800,
       'Full teacher label visibility must follow compact breakpoint at '+width+'px');
-     assert.equal(card.shortLabelDisplay!=='none',width<=800,
+     assert.equal(card.shortLabelDisplay!=='none',card.card.width<=800,
       'Short teacher label visibility must follow compact breakpoint at '+width+'px');
     }
     assert(card.teacherActions.length>=1,'Teacher stage actions must be present on card '+(index+1));
