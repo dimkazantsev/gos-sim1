@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef,useState,type PointerEvent as ReactPointerEvent} from 'react';
-import {partyLogoRect,preparePartyLogo,type PartyLogoPlacement} from './partyLogoCrop';
+import {preparePartyLogo,type PartyLogoPlacement} from './partyLogoCrop';
 
 type Props={onSave:(file:File)=>Promise<boolean>;disabled?:boolean;partyName:string};
 const defaultPlacement:PartyLogoPlacement={zoom:1,x:0,y:0};
