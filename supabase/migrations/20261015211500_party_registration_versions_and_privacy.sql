@@ -29,8 +29,8 @@ begin
    where party_id=new.party_id and doc_kind=new.doc_kind;
   return new;
  end if;
- if row(new.game_id,new.party_id,new.doc_kind,new.storage_path,new.file_name,new.file_size,new.uploaded_by,new.version_no,new.created_at)
-    is distinct from row(old.game_id,old.party_id,old.doc_kind,old.storage_path,old.file_name,old.file_size,old.uploaded_by,old.version_no,old.created_at)
+ if row(new.game_id,new.party_id,new.doc_kind,new.title,new.storage_path,new.file_name,new.mime_type,new.file_size,new.uploaded_by,new.version_no,new.created_at)
+    is distinct from row(old.game_id,old.party_id,old.doc_kind,old.title,old.storage_path,old.file_name,old.mime_type,old.file_size,old.uploaded_by,old.version_no,old.created_at)
  then raise exception 'История попыток неизменяема; загрузите новую версию' using errcode='42501';end if;
  if new.status is distinct from old.status then
   select id into v_last from public.party_documents
@@ -191,4 +191,28 @@ using (
    or exists(select 1 from public.formal_document_signatures fs where fs.signature_path=storage.objects.name and private.is_game_member(fs.game_id)))
  else private.is_game_member((split_part(name,'/',1))::uuid)
  end
+);
+
+
+-- Storage INSERT, like DB INSERT, must be impossible after registration;
+-- otherwise a client could leave orphan file versions behind.
+drop policy if exists game_assets_party_insert on storage.objects;
+create policy game_assets_party_insert on storage.objects for insert to authenticated
+with check (
+ bucket_id='game-assets' and split_part(name,'/',2)='parties'
+ and private.is_game_member((split_part(name,'/',1))::uuid)
+ and not private.is_game_observer((split_part(name,'/',1))::uuid)
+ and (
+  private.is_game_teacher((split_part(name,'/',1))::uuid)
+  or exists(select 1 from public.game_parties gp join public.game_members gm
+   on gm.game_id=gp.game_id and gm.team=gp.name
+   where gp.id=(split_part(name,'/',3))::uuid and gp.game_id=(split_part(name,'/',1))::uuid
+    and gm.user_id=(select auth.uid()) and gm.kind='student' and gm.roster_archived_at is null)
+ )
+ and (
+  split_part(name,'/',4)<>'docs' or exists(
+   select 1 from public.game_parties gp where gp.id=(split_part(name,'/',3))::uuid
+    and gp.game_id=(split_part(name,'/',1))::uuid and gp.registration_status<>'registered'
+  )
+ )
 );
