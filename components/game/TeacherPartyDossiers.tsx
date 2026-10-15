@@ -1,6 +1,7 @@
 'use client';
 import {useState} from 'react';
 import PartyJusticeReview from './PartyJusticeReview';
+import {partyDocumentLatest,partyDocumentAttempts,partyDocumentStatus,partyDocumentVersion} from './partyDocumentAttempts';
 import PartyChairFallback from './PartyChairFallback';
 import PartyUnregisteredFiles from './PartyUnregisteredFiles';
 import TeacherPartyStatistics from './TeacherPartyStatistics';
@@ -17,7 +18,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
  const [reviewNotes,setReviewNotes]=useState<Record<string,string>>({});
  const [reviewNotice,setReviewNotice]=useState<{id:string;success:boolean;message:string}|null>(null);
  async function review(id:string,status:'accepted'|'revision'){
-  if(reviewingId)return;
+  if(reviewingId||status==='revision'&&(reviewNotes[id]||'').trim().length<5)return;
   setReviewingId(id);setReviewNotice(null);
   try{
    const ok=await g.reviewPartyDocument(id,status,status==='revision'?reviewNotes[id]:undefined);
@@ -46,6 +47,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
    const staff=members.filter(m=>m.kind==='student'&&m.team===p.name);
    const leader=members.find(m=>m.user_id===p.leader_user_id);
    const docs=partyDocuments.filter(d=>d.party_id===p.id);
+   const currentDocs=partyDocumentLatest(docs);
    const posts=politicalPosts.filter(x=>x.actor_key==='party'&&x.actor_label===p.name);
    const invites=partyInvitations.filter(i=>i.party_id===p.id&&i.status==='pending');
    return <article key={p.id} className="teacherPartyDossier">
@@ -60,8 +62,18 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
      {staff.length?<ul>{staff.map(m=><li key={m.user_id}><span>{m.full_name}<small>{m.user_id===p.leader_user_id?'Председатель партии «'+p.name+'»':m.role_title||'Участник'}</small></span></li>)}</ul>:<p className="teacherPartyMuted"><UsersRound size={15} aria-hidden="true"/> Участники пока не вступили в партию</p>}
      <PartyChairFallback g={g} party={p}/>
     </div>
-    <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы ({docs.length})</h4>
-     {docs.length?<ul>{docs.map(d=><li key={d.id}><span>{docLabels[d.doc_kind]||d.doc_kind}<small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {d.status==='accepted'?'Принят':d.status==='revision'?'На доработке':'Загружен'}</small></span>{d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title}><ExternalLink size={15}/></a>:<span>—</span>}<div className="civicDocReview"><label className="civicPartyUploadField"><span>Замечание при возврате</span><input type="text" value={reviewNotes[d.id]||''} onChange={e=>setReviewNotes(previous=>({...previous,[d.id]:e.target.value}))} placeholder="Что необходимо исправить" aria-label={'Замечание к документу '+d.title} disabled={!!reviewingId}/></label><button type="button" className={d.status==='accepted'?'primary':'secondary'} disabled={!!reviewingId||d.status==='accepted'} aria-disabled={d.status==='accepted'} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Рассматривается…':d.status==='accepted'?'Принято':'Принять'}</button><button type="button" className="secondary" disabled={!!reviewingId||d.status==='revision'} onClick={()=>void review(d.id,'revision')}>На доработку</button></div>{reviewNotice?.id===d.id&&<p className={'civicPartyInviteFeedback '+(reviewNotice.success?'isSuccess':'isError')} role={reviewNotice.success?'status':'alert'}>{reviewNotice.message}</p>}</li>)}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
+    <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы: {currentDocs.length} видов · {docs.length} попыток</h4>
+     {docs.length?<ul>{currentDocs.map(d=><li key={d.id}><span><b>{docLabels[d.doc_kind]||d.doc_kind} · В{partyDocumentVersion(d)}</b><small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {partyDocumentStatus(d)}</small></span>{d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title}><ExternalLink size={15}/></a>:<span>—</span>}<div className="civicDocReview"><label className="civicPartyUploadField"><span>Замечание при возврате</span><input type="text" value={reviewNotes[d.id]||''} onChange={e=>setReviewNotes(previous=>({...previous,[d.id]:e.target.value}))} placeholder="Что необходимо исправить" aria-label={'Замечание к документу '+d.title} disabled={!!reviewingId}/></label><button type="button" className={d.status==='accepted'?'primary':'secondary'} disabled={!!reviewingId||d.status==='accepted'} aria-disabled={d.status==='accepted'} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Рассматривается…':d.status==='accepted'?'Принято':'Принять'}</button><button type="button" className="secondary" disabled={!!reviewingId||d.status==='revision'||(reviewNotes[d.id]||'').trim().length<5} onClick={()=>void review(d.id,'revision')}>На доработку</button></div>{reviewNotice?.id===d.id&&<p className={'civicPartyInviteFeedback '+(reviewNotice.success?'isSuccess':'isError')} role={reviewNotice.success?'status':'alert'}>{reviewNotice.message}</p>}
+      {d.note&&<p className="civicPartyInviteFeedback">{d.note}</p>}
+      {partyDocumentAttempts(docs,d.doc_kind).length>1&&<details className="civicPartyAttemptHistory">
+       <summary>История документа — {partyDocumentAttempts(docs,d.doc_kind).length} попытки</summary>
+       <ol>{partyDocumentAttempts(docs,d.doc_kind).map(attempt=><li key={attempt.id}>
+         <b>В{partyDocumentVersion(attempt)} · {partyDocumentStatus(attempt)}</b>
+         <small>{new Date(attempt.created_at).toLocaleString('ru-RU')} · {attempt.file_name}</small>
+         {attempt.url&&<a href={attempt.url} target="_blank" rel="noreferrer">Открыть версию В{partyDocumentVersion(attempt)}</a>}
+         {attempt.note&&<p>{attempt.note}</p>}
+        </li>)}</ol>
+      </details>}</li>)}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
     </div>
     {g.game?.id&&<PartyUnregisteredFiles gameId={g.game.id} partyId={p.id} registered={docs}/>}
     <PartyJusticeReview g={g} party={p}/>
