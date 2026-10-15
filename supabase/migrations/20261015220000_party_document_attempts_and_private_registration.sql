@@ -168,6 +168,35 @@ END $$;
 REVOKE ALL ON FUNCTION public.submit_party_registration(uuid) FROM public,anon;
 GRANT EXECUTE ON FUNCTION public.submit_party_registration(uuid) TO authenticated;
 
+-- Protect the registered status itself: a direct update to game_parties
+-- must not make a draft public without the signing/certificate transaction.
+CREATE TABLE IF NOT EXISTS private.party_registration_authorizations(
+ party_id uuid NOT NULL REFERENCES public.game_parties(id) ON DELETE CASCADE,
+ transaction_id bigint NOT NULL,
+ actor_id uuid NOT NULL,
+ PRIMARY KEY(party_id,transaction_id)
+);
+REVOKE ALL ON private.party_registration_authorizations FROM public,anon,authenticated;
+CREATE OR REPLACE FUNCTION private.guard_party_registration_certificate()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO '' AS $
+BEGIN
+ IF new.registration_status='registered'
+  AND old.registration_status IS DISTINCT FROM 'registered'
+  AND NOT EXISTS(
+   SELECT 1 FROM private.party_registration_authorizations a
+   WHERE a.party_id=new.id AND a.transaction_id=txid_current()
+    AND a.actor_id=(SELECT auth.uid())
+  ) THEN
+  RAISE EXCEPTION 'Регистрация возможна только через подписание решения и выдачу свидетельства' USING errcode='42501';
+ END IF;
+ RETURN new;
+END $;
+REVOKE ALL ON FUNCTION private.guard_party_registration_certificate() FROM public,anon,authenticated;
+DROP TRIGGER IF EXISTS guard_party_registration_certificate ON public.game_parties;
+CREATE TRIGGER guard_party_registration_certificate
+ BEFORE UPDATE OF registration_status ON public.game_parties
+ FOR EACH ROW EXECUTE FUNCTION private.guard_party_registration_certificate();
+
 -- Keep the existing officially signed response/certificate workflow for
 -- registration only. Returning packages for revision never publish signed
 -- documents or political process posts before certification.
@@ -182,7 +211,11 @@ BEGIN
  IF p.id IS NULL OR NOT private.is_game_teacher(p.game_id) THEN RAISE EXCEPTION 'Требуются права преподавателя' USING errcode='42501';END IF;
  IF length(btrim(coalesce(p_note,'')))<10 THEN RAISE EXCEPTION 'Подготовьте мотивированный ответ Минюста';END IF;
  IF p_status='registered' THEN
-  RETURN private.original_issue_party_justice_response(p_party_id,p_status,p_note);
+  INSERT INTO private.party_registration_authorizations(party_id,transaction_id,actor_id)
+  VALUES(p.id,txid_current(),auth.uid());
+  v_id:=private.original_issue_party_justice_response(p_party_id,p_status,p_note);
+  DELETE FROM private.party_registration_authorizations WHERE party_id=p.id AND transaction_id=txid_current();
+  RETURN v_id;
  END IF;
  IF p_status NOT IN ('revision','rejected') THEN RAISE EXCEPTION 'Недопустимое решение Минюста';END IF;
  PERFORM public.review_party_registration(p_party_id,p_status,p_note);
