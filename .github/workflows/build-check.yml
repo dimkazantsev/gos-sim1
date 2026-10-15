@@ -130,6 +130,9 @@ on:
       - 'components/game/useActionErrorPlacement.tsx'
       - 'scripts/action-error-placement-check.cjs'
       - 'scripts/party-document-visibility-check.cjs'
+      - 'scripts/party-document-attempts-check.cjs'
+      - 'components/game/partyDocumentAttempts.ts'
+      - 'supabase/migrations/20261015220000_party_document_attempts_and_private_registration.sql'
       - 'components/game/TeacherPartyDossiers.tsx'
       - 'components/game/PartyUnregisteredFiles.tsx'
       - 'components/game/turnCountdown.ts'
@@ -247,6 +250,7 @@ jobs:
       - run: node scripts/grade-fractional-check.cjs
       - run: node scripts/party-grades-stage-consistency-check.cjs
       - run: node scripts/party-document-visibility-check.cjs
+      - run: node scripts/party-document-attempts-check.cjs
       - run: node scripts/action-error-placement-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-realtime-check.cjs
