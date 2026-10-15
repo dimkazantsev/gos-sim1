@@ -1102,14 +1102,27 @@ export function useRepublicGame(gameId:string){
   await loadPartyAssets();return true;
  }
  async function uploadPartyDocument(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File){
-  if(!me)return false;
+  if(!me||!game||!parties.some(p=>p.id===partyId&&p.game_id===gameId)){
+   setError('Партия не найдена в текущей игре. Обновите страницу.');return false;
+  }
+  if(file.size===0){setError('Выбран пустой файл.');return false}
+  if(file.size>20*1024*1024){setError('Файл превышает 20 МБ. Уменьшите размер документа.');return false}
   const ext=(file.name.split('.').pop()||'bin').toLowerCase();
   const path=gameId+'/parties/'+partyId+'/docs/'+crypto.randomUUID()+'.'+ext;
-  const up=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type});
-  if(up.error){setError(up.error.message);return false}
-  const r=await supabase.from('party_documents').insert({game_id:gameId,party_id:partyId,doc_kind:kind,title:title.trim()||file.name,storage_path:path,file_name:file.name,mime_type:file.type||null,file_size:file.size,uploaded_by:me.user_id,status:'submitted'});
-  if(r.error){setError(r.error.message);return false}
-  await loadPartyAssets();void kickTelegramDispatch();return true;
+  const up=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'application/octet-stream',upsert:false});
+  if(up.error){setError('Ошибка отправки файла в хранилище: '+up.error.message);return false}
+  const r=await supabase.from('party_documents')
+   .insert({game_id:gameId,party_id:partyId,doc_kind:kind,title:title.trim()||file.name,storage_path:path,file_name:file.name,mime_type:file.type||null,file_size:file.size,uploaded_by:me.user_id,status:'submitted'})
+   .select('id,storage_path').single();
+  if(r.error||!r.data){
+   // Preserve the uploaded object for investigation/recovery instead of deleting user files.
+   setError('Файл отправлен в Supabase Storage, но не зарегистрирован в реестре партии: '+(r.error?.message||'Сервер не подтвердил запись')+'. Обратитесь к преподавателю. Путь: game-assets/'+path);
+   return false;
+  }
+  await loadPartyAssets();
+  notifyGameDataRefresh(gameId);
+  void kickTelegramDispatch();
+  return true;
  }
  async function reviewPartyDocument(id:string,status:'accepted'|'revision',note?:string):Promise<boolean>{
   if(!teacher){setError('Рассмотрение документов доступно только преподавателю.');return false}
