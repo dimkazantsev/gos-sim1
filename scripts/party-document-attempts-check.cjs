@@ -56,4 +56,12 @@ assert(view.includes('current.note'), 'Review explanation visible');
 assert(teacher.includes('currentDocs.map(d=><li'),'Teacher reviews only current attempt');
 assert(teacher.includes('partyDocumentAttempts(docs,d.doc_kind)'),'Teacher can inspect older attempts');
 assert(justice.includes('partyDocumentsReady(docs,'),'Certificate issuance uses current versions');
+const hook=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
+assert(hook.includes('const activeIds=new Set(partyDocumentLatest(documentRows).map(row=>row.id))'),
+ 'Storage signing must be limited to current versions under concurrent load');
+assert(hook.includes('async function openPartyDocument(document:PartyDocument)'),
+ 'Members must still be able to open archived attempts on demand');
+assert(view.includes('g.openPartyDocument(attempt)')&&teacher.includes('g.openPartyDocument(attempt)'),
+ 'Both members and teachers can inspect immutable historical attempts');
+
 console.log('PASS: immutable unlimited versions, latest-status gate, party isolation, private publication rules and both role interfaces');
