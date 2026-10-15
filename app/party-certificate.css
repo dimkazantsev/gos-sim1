@@ -1,0 +1,14 @@
+.partyOfficialCertificate{width:min(100%,780px);margin:0 auto;padding:clamp(16px,4vw,46px);color:#171d29;background:#fff;font-family:Georgia,'Times New Roman',serif;text-align:center;line-height:1.38;box-sizing:border-box}
+.partyCertificateHeader{display:flex;flex-direction:column;align-items:center;gap:10px}
+.partyCertificateHeader h2{font-size:clamp(13px,2vw,20px);margin:10px 0 16px;line-height:1.4}
+.partyCertificateHeader h3{font-size:clamp(25px,3.5vw,35px);margin:12px 0 0}
+.partyCertificateHeader strong{font-size:clamp(14px,2.3vw,21px)}
+.partyCertificateText p{margin:30px 0 8px;font-size:clamp(14px,2vw,19px)}
+.partyCertificateText small{display:block;font-size:clamp(11px,1.5vw,14px);font-style:italic;color:#525252}
+.partyCertificateParty{font-weight:600}
+.partyCertificateNumber{font-size:clamp(21px,4vw,33px);letter-spacing:.18em;font-weight:bold;margin:22px 0;overflow-wrap:anywhere}
+.partyCertificateSignature{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:55px 0 0;font-size:15px}
+.partyOfficialCertificate footer{margin:45px 0 0;text-align:right;font-size:15px}
+.partyOfficialCertificate footer small{display:block;text-align:left;font:11px/1.4 Arial,sans-serif;color:#69717c;margin-top:30px}
+@media(max-width:500px){.partyCertificateSignature{flex-direction:column;align-items:stretch}.partyOfficialCertificate footer{text-align:center}}
+@media print{.partyOfficialCertificate{width:210mm;min-height:297mm;padding:22mm;break-inside:avoid;color:#000}.partyCertificateHeader h2{font-size:18pt}.partyCertificateHeader h3{font-size:25pt}}

@@ -46,6 +46,7 @@ import './2026-profile-grade-layout.css';
 import './teacher-stage-layout.css';
 import './party-governance-justice.css';
 import './party-registration-versions.css';
+import './party-certificate.css';
 import './profile-chat-responsive.css';
 import './tablet-topbar-layout.css';
 import type {Metadata} from 'next';
