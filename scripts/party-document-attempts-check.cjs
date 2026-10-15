@@ -20,7 +20,7 @@ const sql=fs.readFileSync('supabase/migrations/20261015201500_party_document_ver
 for(const snippet of ['row_number() OVER (PARTITION BY party_id,doc_kind','FOR UPDATE',
  'party_documents_party_kind_version_unique','CREATE POLICY party_documents_read','AS RESTRICTIVE FOR SELECT',
  'party_dossier_storage_release','party_justice_correspondence_visibility','party_registration_certified',
- "NEW.status:='submitted'",'latest_version_idx', "hide_pending_party_justice_post"]){
+ "NEW.status:='submitted'",'latest_version_idx', "party_pending_justice_post_visibility"]){
  assert(sql.includes(snippet),'Missing SQL protection: '+snippet);
 }
 assert(!/LIMIT\s+\d+\s+ATTEMPTS/i.test(sql),'No fixed attempt quota');
