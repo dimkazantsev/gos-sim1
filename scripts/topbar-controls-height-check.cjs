@@ -5,7 +5,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {chromium}=require('playwright-core');
 const root=path.resolve(__dirname,'..');
-const files=['app/globals.css','app/design-shell.css','app/design-responsive.css','app/mobile-nav-polish.css','app/topbar-controls-alignment.css','app/tablet-topbar-layout.css','app/turn-countdown.css'];
+const files=['app/globals.css','app/design-shell.css','app/design-responsive.css','app/mobile-nav-polish.css','app/topbar-controls-alignment.css','app/turn-countdown.css','app/tablet-topbar-layout.css'];
 const styles=files.map(file=>fs.readFileSync(path.join(root,file),'utf8')).join('\n');
 const layout=fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8');
 const client=fs.readFileSync(path.join(root,'components/GameClient.tsx'),'utf8');
