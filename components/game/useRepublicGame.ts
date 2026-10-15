@@ -18,7 +18,7 @@ import {mergeChatMessages} from './chatRealtime';
 import type {GameOfficeAssignment,ChatOverview} from './types';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
-type ReadScope='all'|'core'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'offices'|'messages'|'pins';
+type ReadScope='all'|'core'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
 const BOOTSTRAP_TIMEOUT_MS=12000;
 async function within<T>(promise:PromiseLike<T>,ms=BOOTSTRAP_TIMEOUT_MS,label='Запрос к серверу'):Promise<T>{
@@ -339,7 +339,7 @@ export function useRepublicGame(gameId:string){
  async function loadCoreSections(){
   const uid=authUser.current;
   if(!uid)return;
-  const ticket=startRead('core','members','metrics','profiles','parties','formal','overview');
+  const ticket=startRead('core','members','metrics','profiles','parties','formal','channels');
   const [g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro]=await Promise.all([
    supabase.from('games').select('*').eq('id',gameId).maybeSingle(),
    supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle(),
@@ -374,7 +374,7 @@ export function useRepublicGame(gameId:string){
   if(mt.error&&readCurrent(ticket,'metrics'))setError(mt.error);
   if(!ev.error)setEvents((ev.data||[]) as EventItem[]);
   if(!mb.error&&readCurrent(ticket,'members'))setMembers((mb.data||[]) as Member[]);
-  if(!ch.error&&readCurrent(ticket,'overview'))setChannels((ch.data||[]) as Channel[]);
+  if(!ch.error&&readCurrent(ticket,'channels'))setChannels((ch.data||[]) as Channel[]);
   if(!st.error)setStages((st.data||[]) as Stage[]);
   if(!pa.error&&readCurrent(ticket,'parties'))setParties((pa.data||[]) as Party[]);
   if(!vo.error){
