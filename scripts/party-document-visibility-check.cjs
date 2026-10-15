@@ -22,7 +22,7 @@ assert.match(student,/partyDocumentAttempts\(docs,required\.kind\)/,
  'Participants see version histories per document and review notes');
 assert(student.includes('current.note&&<p')&&student.includes('{current.note}'),
  'Latest teacher review note appears in the party cabinet');
-assert.match(student,/selected\.registration_status==='registered'\?currentDocs\.filter/,
+assert(student.includes("selected?.registration_status==='registered'?currentDocs.filter"),
  'Public party documents are strictly gated until registration');
 assert.match(teacher,/currentDocs\.map\(d=><li/,
  'Teacher reviews only the most recent attempt of each kind');
