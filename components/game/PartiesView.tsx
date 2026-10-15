@@ -59,7 +59,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
    }
   }catch(e){
    const message=e instanceof Error?e.message:'Не удалось отправить приглашение. Повторите попытку.';
-   setInviteFeedback({partyId,kind:'error',message});g.setError(message);
+   setInviteFeedback({partyId,kind:'error',message});
   }finally{setBusy(false)}
  }
  function canDeleteParty(p:typeof parties[number]){return !!me&&(teacher||(p.created_by===me.user_id&&p.registration_status!=='registered'))}
