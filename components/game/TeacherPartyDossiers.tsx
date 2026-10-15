@@ -21,7 +21,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
   setReviewingId(id);setReviewNotice(null);
   try{
    const ok=await g.reviewPartyDocument(id,status,status==='revision'?reviewNotes[id]:undefined);
-   setReviewNotice({id,success:ok,message:ok?(status==='accepted'?'Документ принят Минюстом.':'Документ отправлен на доработку. Участник увидит статус и замечание.'):'Изменение не подтверждено. Проверьте сообщение об ошибке.'});
+   setReviewNotice({id,success:ok,message:ok?(status==='accepted'?'Документ принят Минюстом.':'Документ возвращён на доработку. Замечание и версия отображаются в партийном досье.'):'Изменение не подтверждено. Проверьте сообщение об ошибке.'});
    if(ok&&status==='revision')setReviewNotes(previous=>{const next={...previous};delete next[id];return next});
   }
   finally{setReviewingId('')}
@@ -45,7 +45,8 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
   <div className="teacherPartyDossierGrid">{parties.length===0?<div className="journalEmpty">Партии пока не созданы.</div>:parties.map(p=>{
    const staff=members.filter(m=>m.kind==='student'&&m.team===p.name);
    const leader=members.find(m=>m.user_id===p.leader_user_id);
-   const docs=partyDocuments.filter(d=>d.party_id===p.id);
+   const docs=partyDocuments.filter(d=>d.party_id===p.id).sort((a,b)=>Date.parse(a.created_at)-Date.parse(b.created_at));
+   const latestDocs=docs.filter(d=>!docs.some(next=>next.doc_kind===d.doc_kind&&(Date.parse(next.created_at)>Date.parse(d.created_at)||(next.created_at===d.created_at&&next.id>d.id))));
    const posts=politicalPosts.filter(x=>x.actor_key==='party'&&x.actor_label===p.name);
    const invites=partyInvitations.filter(i=>i.party_id===p.id&&i.status==='pending');
    return <article key={p.id} className="teacherPartyDossier">
@@ -61,7 +62,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
      <PartyChairFallback g={g} party={p}/>
     </div>
     <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы ({docs.length})</h4>
-     {docs.length?<ul>{docs.map(d=><li key={d.id}><span>{docLabels[d.doc_kind]||d.doc_kind}<small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {d.status==='accepted'?'Принят':d.status==='revision'?'На доработке':'Загружен'}</small></span>{d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title}><ExternalLink size={15}/></a>:<span>—</span>}<div className="civicDocReview"><label className="civicPartyUploadField"><span>Замечание при возврате</span><input type="text" value={reviewNotes[d.id]||''} onChange={e=>setReviewNotes(previous=>({...previous,[d.id]:e.target.value}))} placeholder="Что необходимо исправить" aria-label={'Замечание к документу '+d.title} disabled={!!reviewingId}/></label><button type="button" className={d.status==='accepted'?'primary':'secondary'} disabled={!!reviewingId||d.status==='accepted'} aria-disabled={d.status==='accepted'} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Рассматривается…':d.status==='accepted'?'Принято':'Принять'}</button><button type="button" className="secondary" disabled={!!reviewingId||d.status==='revision'} onClick={()=>void review(d.id,'revision')}>На доработку</button></div>{reviewNotice?.id===d.id&&<p className={'civicPartyInviteFeedback '+(reviewNotice.success?'isSuccess':'isError')} role={reviewNotice.success?'status':'alert'}>{reviewNotice.message}</p>}</li>)}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
+     {docs.length?<ul>{docs.map(d=><li key={d.id}><span>{docLabels[d.doc_kind]||d.doc_kind} · В{docs.filter(x=>x.doc_kind===d.doc_kind&&(Date.parse(x.created_at)<Date.parse(d.created_at)||(x.created_at===d.created_at&&x.id<=d.id))).length}{!latestDocs.some(x=>x.id===d.id)?' (архивная версия)':''}<small>{d.title} · {d.file_name} · {members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · {d.status==='accepted'?'Принят':d.status==='revision'?'На доработке':'Загружен'}</small></span>{d.url?<a href={d.url} target="_blank" rel="noreferrer" aria-label={'Открыть '+d.title}><ExternalLink size={15}/></a>:<span>—</span>}<div className="civicDocReview"><label className="civicPartyUploadField"><span>Замечание при возврате</span><input type="text" value={reviewNotes[d.id]||''} onChange={e=>setReviewNotes(previous=>({...previous,[d.id]:e.target.value}))} placeholder="Что необходимо исправить" aria-label={'Замечание к документу '+d.title} disabled={!!reviewingId}/></label><button type="button" className={d.status==='accepted'?'primary':'secondary'} disabled={!!reviewingId||d.status==='accepted'||!latestDocs.some(x=>x.id===d.id)} aria-disabled={d.status==='accepted'} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Рассматривается…':d.status==='accepted'?'Принято':'Принять'}</button><button type="button" className="secondary" disabled={!!reviewingId||d.status==='revision'||!latestDocs.some(x=>x.id===d.id)} onClick={()=>void review(d.id,'revision')}>На доработку</button></div>{reviewNotice?.id===d.id&&<p className={'civicPartyInviteFeedback '+(reviewNotice.success?'isSuccess':'isError')} role={reviewNotice.success?'status':'alert'}>{reviewNotice.message}</p>}</li>)}</ul>:<p className="teacherPartyMuted">Документы не загружены</p>}
     </div>
     {g.game?.id&&<PartyUnregisteredFiles gameId={g.game.id} partyId={p.id} registered={docs}/>}
     <PartyJusticeReview g={g} party={p}/>
