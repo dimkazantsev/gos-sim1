@@ -70,7 +70,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
       const canReview=latest?.id===d.id&&['submitted','draft'].includes(d.status)&&p.registration_status!=='registered';
       return <li key={d.id} className={'partyDossierDocRow'+(d.status==='revision'?' isRevision':'')}>
        <div className="partyDossierDocMain">
-        <b>{docLabels[d.doc_kind]||d.doc_kind} <small>{partyDocumentVersionLabel(d)}</small></b>
+        <b>{docLabels[d.doc_kind]||'Дополнительный документ'} <small>{partyDocumentVersionLabel(d)}</small></b>
         <span>{members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · <time dateTime={d.created_at}>{uploadTime(d.created_at)}</time></span>
        </div>
        <div className="partyDossierDocControls">
@@ -78,7 +78,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
          <button type="button" className="primary" disabled={!!reviewingId} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Проверка…':'Принять'}</button>
          <button type="button" className="secondary" disabled={!!reviewingId} aria-expanded={revisionFor===d.id} onClick={()=>{setRevisionFor(previous=>previous===d.id?null:d.id);setReviewNotice(null)}}>На доработку</button>
         </div>:<span className={'partyDossierDocState'+(d.status==='revision'?' isRevision':'')}>{partyDocumentVerdict(d)}</span>}
-        {d.url?<a className="partyDossierDocOpen" href={d.url} target="_blank" rel="noreferrer" title={'Открыть '+(docLabels[d.doc_kind]||d.doc_kind)} aria-label={'Открыть '+(docLabels[d.doc_kind]||d.doc_kind)+' '+partyDocumentVersionLabel(d)}><ExternalLink size={16}/></a>:null}
+        {d.url?<a className="partyDossierDocOpen" href={d.url} target="_blank" rel="noreferrer" title={'Открыть '+(docLabels[d.doc_kind]||'Дополнительный документ')} aria-label={'Открыть '+(docLabels[d.doc_kind]||'Дополнительный документ')+' '+partyDocumentVersionLabel(d)}><ExternalLink size={16}/></a>:null}
        </div>
        {revisionFor===d.id&&canReview&&<div className="partyDossierRevisionEditor">
         <label>Что необходимо исправить в {partyDocumentVersionLabel(d)}?

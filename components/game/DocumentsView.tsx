@@ -4,7 +4,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {FormalDocument} from './types';
-import {FORMAL_SUBJECTS,FORMAL_TYPES,inferFormal,formalSignature,ownerLabel} from './formalInstitutions';
+import {FORMAL_SUBJECTS,FORMAL_TYPES,inferFormal,formalSignature,ownerLabel,formalDocumentTypeLabel} from './formalInstitutions';
 import {votePresetForDocument} from './proceduralVoting';
 import {ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,CircleDot,Clock3,ClipboardList,FilePlus2,FileText,Paperclip,Plus,Printer,Route,Search,Trash2,Undo2,Upload,Vote,X,XCircle} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
@@ -19,7 +19,7 @@ import CloudDocumentPicker from './CloudDocumentPicker';
 import BillAmendmentsPanel,{type BillAmendmentGate} from './BillAmendmentsPanel';
 import BudgetLawAmendmentsPanel from './BudgetLawAmendmentsPanel';
 
-function typeLabel(key:string){return FORMAL_TYPES.find(x=>x.key===key)?.label||key}
+function typeLabel(key:string){return formalDocumentTypeLabel(key)}
 function shortDate(v:string){return new Date(v).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'})}
 function fmtDateTime(v:string){return new Date(v).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
 function statusTone(code:string){if(['published','signed','adopted'].includes(code))return 'ok';if(['rejected','revision'].includes(code))return 'bad';if(code==='draft')return 'draft';return 'progress'}
