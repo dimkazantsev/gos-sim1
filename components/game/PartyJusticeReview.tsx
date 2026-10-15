@@ -2,6 +2,7 @@
 import {useState} from 'react';
 import StyledSelect from '../ui/StyledSelect';
 import JusticeDocuments from './JusticeDocuments';
+import {latestPartyDocuments} from './partyDocumentVersions';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
 import {institutionEmblem} from './institutionEmblems';
 import {buildPartyJusticeLetter,PARTY_REQUIRED_DOCS,type JusticeDraftDecision} from './partyJusticeLetter';
@@ -15,7 +16,8 @@ export default function PartyJusticeReview({g,party}:{g:ReturnTypeRepublic;party
  const [notice,setNotice]=useState('');
  const docs=g.partyDocuments.filter(d=>d.party_id===party.id);
  const leader=g.members.find(m=>m.user_id===party.leader_user_id);
- const ready=PARTY_REQUIRED_DOCS.every(req=>docs.some(d=>d.doc_kind===req.kind&&d.status==='accepted'));
+ const latest=latestPartyDocuments(docs);
+ const ready=PARTY_REQUIRED_DOCS.every(req=>latest.some(d=>d.doc_kind===req.kind&&d.status==='accepted'));
  const missingGrounds=decision==='rejected'&&note.includes('[Укажите');
  function draft(next:JusticeDraftDecision=decision){
   setDecision(next);
@@ -46,7 +48,7 @@ export default function PartyJusticeReview({g,party}:{g:ReturnTypeRepublic;party
    <small>Кнопки заполняют черновик по образцам Минюста. Они не регистрируют партию и не направляют отказ без подписи.</small>
   </div>
   <label>Текст официального ответа<textarea rows={13} value={note} onChange={e=>setNote(e.target.value)} placeholder="Подготовьте ответ и укажите установленные основания решения"/></label>
-  {decision==='registered'&&!ready&&<p role="status">Одобрение недоступно до принятия всех шести обязательных документов.</p>}
+  {decision==='registered'&&!ready&&<p role="status">Одобрение недоступно, пока не приняты последние версии всех шести обязательных документов.</p>}
   {missingGrounds&&<p role="status">Для отказа укажите проверенные нарушения и соответствующие нормы права. Заполнение по шаблону не означает, что нарушения установлены.</p>}
   <button type="button" className="primary" disabled={busy||note.trim().length<10||note.includes('[Укажите')||(decision==='registered'&&!ready)} onClick={()=>void send()}>{busy?'Направляется…':'Подписать и направить от имени Минюста'}</button>
   {notice&&<p role="status">{notice}</p>}

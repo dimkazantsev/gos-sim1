@@ -1142,7 +1142,11 @@ export function useRepublicGame(gameId:string){
  }
  async function reviewPartyDocument(id:string,status:'accepted'|'revision',note?:string):Promise<boolean>{
   if(!teacher){setError('Рассмотрение документов доступно только преподавателю.');return false}
-  const r=await supabase.from('party_documents').update({status,note:note?.trim()||null}).eq('id',id).neq('status',status).select('id,status').maybeSingle();
+  if(status==='revision'&&(note||'').trim().length<5){setError('Укажите конкретные замечания к документу (не менее 5 символов).');return false}
+  const r=await supabase.from('party_documents')
+   .update({status,note:note?.trim()||null})
+   .eq('id',id).in('status',['submitted','draft'])
+   .select('id,status').maybeSingle();
   if(r.error){setError(r.error.message);return false}
   await loadPartyDocuments();
   if(r.data){notifyGameDataRefresh(gameId);void kickTelegramDispatch()}

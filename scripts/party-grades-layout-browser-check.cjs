@@ -14,7 +14,7 @@ const partySource=fs.readFileSync('components/game/PartiesView.tsx','utf8');
 for(const name of ['civicPartyUploadMain','civicPartyUploadField','civicPartyUploadActions','partyLegalRequirements'])
  assert(partySource.includes(name),'Registration form preserves '+name);
 assert(partySource.includes('disabled={busy||!docFile}')&&partySource.includes('onClick={()=>void upload()}'),'File upload authorization and handler are preserved');
-assert(partySource.includes('disabled={busy||!DOCS.every(req=>docs.some(d=>d.doc_kind===req.kind))}'),'Registration remains disabled until all required documents exist');
+assert(partySource.includes('disabled={busy||!DOCS.every(req=>latestDocs.some(d=>d.doc_kind===req.kind&&d.status!==\'revision\'))}'),'Registration remains disabled until latest required documents are present and not returned for revision');
 assert(partySource.includes('onClick={()=>void g.submitPartyRegistration(selected.id)}'),'Registration workflow remains unchanged');
 
 const scores=Array.from({length:16},(_,i)=>'<button class="draft" type="button"><b>'+i+'</b><small>авто</small></button>').join('');

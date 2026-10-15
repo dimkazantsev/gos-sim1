@@ -1,0 +1,28 @@
+/* ГОС.ID · Private party dossier, numbered attempts and review timeline. */
+.partyRegistrationUpdates {display:grid;gap:8px;padding:12px;border:1px solid #dae4f1;border-radius:14px;background:#f8faff;min-width:0}
+.civicPartyFiles .partyRegistrationUpdates>article {display:grid;gap:6px;padding:10px 12px;background:#fff;border:1px solid #e2e9f4;border-radius:10px;overflow-wrap:anywhere}
+.partyRegistrationUpdates article b {font-size:12px;color:#183962}
+.partyRegistrationUpdates article span {font-size:12px;font-weight:700;color:#3462a4}
+.partyRegistrationUpdates article p {margin:0;color:#657a97;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.civicPartyFiles .partyRegistrationDoc {display:grid;gap:10px;padding:15px;border:1px solid #dbe5f2;border-radius:14px;background:#fff;min-width:0}
+.partyRegistrationDoc>header {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.partyRegistrationDoc>header b {font-size:14px;color:#15365d}
+.partyRegistrationDoc>header span {display:inline-block;padding:5px 9px;border-radius:8px;background:#edf4ff;color:#315ca6;font-size:12px;font-weight:700}
+.partyRegistrationRevisionNote {margin:0;padding:10px 12px;background:#fff6ee;border-left:3px solid #e9a460;border-radius:7px;white-space:pre-wrap;overflow-wrap:anywhere}
+.partyRegistrationDocActions {display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.partyRegistrationDocActions>a,.partyRegistrationDocActions>button {min-height:42px;min-width:0;font-size:12px}
+.partyRegistrationDocActions>button {padding:10px 13px;white-space:normal}
+.partyRegistrationDoc>details {padding:10px;border:1px solid #e4eaf2;border-radius:10px;min-width:0}
+.partyRegistrationDoc>details summary {font-size:12px;font-weight:700;color:#365f96;cursor:pointer}
+.partyRegistrationDoc>details p {margin:10px 0 0;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.teacherPartySection .civicDocReview {display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;width:100%}
+.teacherPartySection .civicDocReview>label {flex:1 1 260px;min-width:0}
+.teacherPartySection .civicDocReview textarea {box-sizing:border-box;display:block;width:100%;min-width:0;max-width:100%;padding:10px;border:1px solid #c9d8ef;border-radius:9px;font:inherit}
+.teacherPartySection .civicDocReview button {flex:0 1 auto;min-height:44px;white-space:normal}
+@media(max-width:650px) {
+ .partyRegistrationDoc>header {align-items:flex-start}
+ .partyRegistrationDocActions {display:grid;grid-template-columns:minmax(0,1fr)}
+ .partyRegistrationDocActions>* {width:100%;box-sizing:border-box}
+ .teacherPartySection .civicDocReview {display:grid;grid-template-columns:minmax(0,1fr)}
+ .teacherPartySection .civicDocReview>label,.teacherPartySection .civicDocReview>button {width:100%;min-width:0}
+}
