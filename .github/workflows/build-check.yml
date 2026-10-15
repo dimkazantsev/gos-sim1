@@ -133,6 +133,8 @@ on:
       - 'scripts/topbar-controls-height-check.cjs'
       - 'app/brand-identity.css'
       - 'app/topbar-controls-alignment.css'
+      - 'app/tablet-topbar-layout.css'
+      - 'scripts/tablet-topbar-layout-browser-check.cjs'
       - 'scripts/topbar-controls-height-check.cjs'
       - 'app/icon.svg'
       - 'app/page.tsx'
@@ -277,6 +279,7 @@ jobs:
       - run: node scripts/political-wall-status-browser-check.cjs
       - run: node scripts/npa-toolbar-alignment-browser-check.cjs
       - run: node scripts/topbar-controls-height-check.cjs
+      - run: node scripts/tablet-topbar-layout-browser-check.cjs
       - run: node scripts/turn-countdown-check.cjs
       - run: node scripts/registry-browser-check.cjs
       - run: node scripts/october-flow-browser-check.cjs
