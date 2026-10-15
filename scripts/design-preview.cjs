@@ -100,15 +100,7 @@ Object.assign(fixture,{profilesLoaded:true,introAccountSeen:true,chatMediaError:
 fixture.profiles=fixture.members.map(m=>({game_id:'design-preview',user_id:m.user_id,onboarding_completed_at:now,intro_seen_at:now,bio:'Участник учебной симуляции.',avatar_path:null,signature_path:null}));
 fixture.partyMandates=fixture.members.filter(m=>m.kind==='student').map(m=>{const p=fixture.parties.find(p=>p.name===m.team),staff=fixture.members.filter(x=>x.kind==='student'&&x.team===m.team),i=staff.indexOf(m),base=Math.floor(p.mandates/staff.length)+(i<p.mandates%staff.length?1:0);return {game_id:'design-preview',party_id:p.id,user_id:m.user_id,base_mandates:base,ghost_loss:0,effective_mandates:base}});
 fixture.partyDocuments=fixture.parties.flatMap(p=>['charter','program','fee'].map((kind,i)=>({id:p.id+'-'+kind,game_id:'design-preview',party_id:p.id,doc_kind:kind,title:kind==='charter'?'Устав политической партии':kind==='program'?'Программа общественного развития':'Сведения об уплате пошлины',file_name:'Документ партии «'+p.name+'» — редакция учредительного съезда.txt',status:kind==='fee'?'submitted':'accepted',version_no:1,uploaded_by:p.leader_user_id,created_at:now,url:'data:text/plain;charset=utf-8,Демонстрационный образец'})));
-fixture.formalDocuments.push(...fixture.parties.map(p=>({
- id:'cert-'+p.id,game_id:'design-preview',stage_no:1,registry_no:'МЮ-С-'+p.id,
- title:'Свидетельство о регистрации партии «'+p.name+'»',doc_type:'party_certificate',
- subject_key:'minjust',subject_label:'Министерство юстиции Российской Федерации',
- author_id:'teacher-demo',body_text:'Демонстрационное свидетельство',workflow_key:'official_correspondence',
- workflow_steps:[{code:'published',label:'Свидетельство выдано',owner:'system',action:null}],
- status_code:'published',status_label:'Свидетельство выдано',current_owner_key:'system',
- created_at:now,updated_at:now,metadata:{party_id:p.id}
-})));
+
 // Replace only this process's hook export. The application source remains unchanged.
 require('../components/game/useRepublicGame').useRepublicGame=()=>g;
 // Offline SSR has no effects or localStorage: emulate *only in this preview*
@@ -188,6 +180,15 @@ fixture.politicalPosts=[
 ].map((p,i)=>({...p,game_id:'design-preview',author_id:'teacher-demo',process_type:'information',tags:['этап_gpyasu','ходигры_gpyasu'],external_url:null,internal_view:null,internal_ref_id:null,status:'published',impact_plan:{},effects_applied:false,pinned:false,created_at:new Date(Date.parse(now)-i*60000).toISOString(),updated_at:now}));
 fixture.metricHistory.push({id:40,game_id:'design-preview',metric_id:'metric-0',metric_key:'public_trust',previous_value:65,value:68,delta:3,source_type:'political_post',source_id:'post-demo',recorded_at:now,actor_id:'teacher-demo',note:'Решение по транспортной программе'});
 fixture.postFormalLinks=[{game_id:'design-preview',post_id:'post-demo',formal_document_id:'formal-demo',created_by:'teacher-demo',created_at:now}];
+fixture.formalDocuments.push(...fixture.parties.map(p=>({
+ id:'cert-'+p.id,game_id:'design-preview',stage_no:1,registry_no:'МЮ-С-'+p.id,
+ title:'Свидетельство о регистрации партии «'+p.name+'»',doc_type:'party_certificate',
+ subject_key:'minjust',subject_label:'Министерство юстиции Российской Федерации',
+ author_id:'teacher-demo',body_text:'Демонстрационное свидетельство',workflow_key:'official_correspondence',
+ workflow_steps:[{code:'published',label:'Свидетельство выдано',owner:'system',action:null}],
+ status_code:'published',status_label:'Свидетельство выдано',current_owner_key:'system',
+ created_at:now,updated_at:now,metadata:{party_id:p.id}
+})));
 const defs=[['stages','Этапы','StagesView'],['parties','Партии','PartiesView'],['votes','Голосования','VotesView'],['documents','Реестр НПА','DocumentsView'],['document-detail','Текст НПА','DocumentsView'],['document-procedure','Процедура НПА','DocumentsView'],['actions','Процессы','PoliticalWallView'],['grades','Оценки','GradesView'],['teacher','Управление','TeacherView'],['profile','Профиль','ProfileView']];
 for(const [id,label,file] of defs){const Component=require('../components/game/'+file).default;const content=renderToStaticMarkup(h(Component,{g,focusId:id.startsWith('document-')?fixture.formalDocuments[0].id:undefined,initialDetailTab:id==='document-procedure'?'procedure':'text',onNavigate:noop,onOpenVotes:noop,onOpenStages:noop,onOpenDocument:noop,onOpenProcesses:noop}));pages.push([id,label,base.replace(/(<main id="game-main"[^>]*>)[\s\S]*?(<\/main>)/,(_,start,end)=>start+content+end)]);}
 const StageWorkspacePreview=require('../components/game/StageWorkspace').default;
