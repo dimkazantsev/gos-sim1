@@ -122,7 +122,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
        <ol>{history.map(attempt=><li key={attempt.id}>
         <b>В{partyDocumentVersion(attempt)} · {partyDocumentStatus(attempt)}</b>
         <small>{new Date(attempt.created_at).toLocaleString('ru-RU')} · {attempt.file_name}</small>
-        {attempt.url&&<a href={attempt.url} target="_blank" rel="noreferrer">Открыть файл В{partyDocumentVersion(attempt)}</a>}
+        <button type="button" className="secondary" onClick={()=>void g.openPartyDocument(attempt)}>Открыть файл В{partyDocumentVersion(attempt)}</button>
         {attempt.note&&<p>Решение Минюста: {attempt.note}</p>}
        </li>)}</ol>
       </details>}
