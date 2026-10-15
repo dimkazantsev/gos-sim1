@@ -25,7 +25,7 @@ async function main(){
   page.on('pageerror',error=>errors.push(String(error)));
   await page.goto('file://'+preview,{waitUntil:'load'});
   // Toolbar regression at every layout switch, including the narrowest phones.
-  for(const width of [1440,1240,1060,1024,900,768,620,430,390,360,320]){
+  for(const width of [1440,1240,1060,1024,901,900,820,768,761,760,620,430,390,360,320]){
    await page.locator('#preview').evaluate((el,w)=>{el.style.width=w+'px'},width);
    await page.locator('#screen').selectOption('dashboard');
    const frame=page.frameLocator('#preview');
@@ -54,7 +54,7 @@ async function main(){
    assert.equal(layout.roleLabel,'РЕЖИМ ПРОСМОТРА','The view mode heading must remain complete');
    const controls=[layout.history,layout.status,layout.timer,layout.role,...(width>900?[layout.chat]:[])].filter(Boolean);
    for(const control of controls){
-    assert(Math.abs(control.h-(width<=900?36:48))<=1,'Top control height must match responsive layout at '+width+'px: '+JSON.stringify(layout));
+    assert(Math.abs(control.h-(width<=760?36:48))<=1,'Top control height must match responsive layout at '+width+'px: '+JSON.stringify(layout));
     assert(control.x>=layout.header.x-2&&control.right<=layout.header.right+2,
      'Top control escapes horizontal toolbar bounds at '+width+'px: '+JSON.stringify(layout));
    }
@@ -107,7 +107,7 @@ async function main(){
     assert(layout.scroll<=layout.width+2,'Top bar scrolls horizontally in '+screen+' at '+width+'px');
     const controls=[layout.previous,layout.status,layout.countdown,layout.connection,layout.role,layout.chat].filter(Boolean);
     for(const item of controls){
-     assert(Math.abs(item.height-(width<=900?36:48))<=1,'Potential top control height is inconsistent in '+screen+' at '+width+'px: '+JSON.stringify(layout));
+     assert(Math.abs(item.height-(width<=760?36:48))<=1,'Potential top control height is inconsistent in '+screen+' at '+width+'px: '+JSON.stringify(layout));
      assert(item.x>=layout.bounds.x-2&&item.right<=layout.bounds.right+2,
       'Control exceeds toolbar in '+screen+' at '+width+'px: '+JSON.stringify(layout));
     }
@@ -133,7 +133,7 @@ async function main(){
    if(width>900){
     assert.equal(await chat.count(),1,'Desktop toolbar must contain Chat');
     assert.equal((await chat.locator('span').innerText()).trim(),'Чат','Desktop top bar label is Chat');
-    assert(await chat.locator('span').isVisible(),'Desktop top bar must show the Chat label');
+    assert.equal(await chat.locator('span').isVisible(),width>=1500,'Only wide desktop has full Chat label; tablets keep an icon-only control');
    }else{
     assert.equal(await dashboard.locator('.mobileDockFixed .mobileDockChat').count(),0,'Chat must not be fixed at the right edge of the mobile dock');
      assert.equal(await dashboard.locator('.mobileDockScroll .mobileDockChat').count(),1,'Chat must scroll together with the ordinary sections');
