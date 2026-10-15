@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
 import type {FormalDocument,FormalHistory,Member} from './types';
-import {FORMAL_TYPES} from './formalInstitutions';
+import {FORMAL_TYPES,formalDocumentTitle} from './formalInstitutions';
 import {documentSignerTitle} from './documentSignerTitle';
 import {institutionEmblem} from './institutionEmblems';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
@@ -11,7 +11,7 @@ export default function DocumentPaper({document:d,history,members,signature,titl
  const registered=String(m.registered_on||d.created_at),number=String(m.act_number||d.registry_no),place=String(m.place||'Москва');
  return <article className="formalPaper legalDocumentPaper">
   <header className="legalMasthead">{emblem&&<InstitutionEmblemImage className="legalEmblem" src={emblem} alt={'Эмблема: '+issuer} width={80} height={80}/>}<div className="formalPaperInstitution">{issuer}</div>{!name&&<span className="legalDraftBadge">Проект</span>}<div className="formalPaperType">{type}</div></header>
-  <div className="formalPaperMeta"><time>{new Date(registered).toLocaleDateString('ru-RU',{timeZone:'Asia/Novosibirsk'})}</time><span>№ {number}</span><span>{place}</span></div><h1>{titleSlot||d.title}</h1>
+  <div className="formalPaperMeta"><time>{new Date(registered).toLocaleDateString('ru-RU',{timeZone:'Asia/Novosibirsk'})}</time><span>№ {number}</span><span>{place}</span></div><h1>{titleSlot||formalDocumentTitle(d.title,d.doc_type)}</h1>
   {children}
   <div className="formalSignature"><div>{name?<><span>{role||'Уполномоченное лицо'}</span><b>{name}</b>{date&&<small>Подписано {new Date(date).toLocaleDateString('ru-RU',{timeZone:'Asia/Novosibirsk'})}</small>}</>:<span>{Number.isFinite(revisionTime)?'Новая редакция ожидает подписания':'Ожидает подписания уполномоченным лицом'}</span>}</div>{validSignature?.url&&<figure className="formalSignatureImage"><img src={validSignature.url} alt={'Подпись: '+name}/></figure>}</div>
   <footer className="legalPaperFooterBar"><span>Учебный документ деловой игры ГОС.ID</span>{footerSlot}</footer>
