@@ -43,7 +43,10 @@ async function main(){
     });
     const chatGeometry=await frame.locator('.gsChatV2').evaluate(el=>{
      const a=el.getBoundingClientRect(),b=document.querySelector('.mobileDockV2').getBoundingClientRect();
-     return {chat:{top:a.top,bottom:a.bottom},dock:{top:b.top,bottom:b.bottom},headerBottom:document.querySelector('.simTop').getBoundingClientRect().bottom};
+     return {chat:{top:a.top,bottom:a.bottom},dock:{top:b.top,bottom:b.bottom},headerBottom:document.querySelector('.simTop').getBoundingClientRect().bottom,
+     debug:{computed:{top:getComputedStyle(el).top,bottom:getComputedStyle(el).bottom,height:getComputedStyle(el).height,transform:getComputedStyle(el).transform,position:getComputedStyle(el).position,animation:getComputedStyle(el).animationName},
+     parent:el.parentElement?.className,insideWorkspace:!!el.closest('.simWorkspace'),viewport:innerHeight,
+     ancestors:[...function*(node){for(let i=0;node&&i<5;i++,node=node.parentElement)yield {name:node.className,top:node.getBoundingClientRect().top,transform:getComputedStyle(node).transform,position:getComputedStyle(node).position}}(el)]}};
     });
     assert(chatGeometry.chat.top>=chatGeometry.headerBottom-2&&chatGeometry.chat.top<=chatGeometry.headerBottom+30,'Chat must remain below the header without overlapping it: '+JSON.stringify(chatGeometry));
     assert(chatGeometry.chat.bottom<=chatGeometry.dock.top+2&&chatGeometry.chat.bottom>=chatGeometry.dock.top-34,'Chat must end above dock with a small intentional gap: '+JSON.stringify(chatGeometry));
