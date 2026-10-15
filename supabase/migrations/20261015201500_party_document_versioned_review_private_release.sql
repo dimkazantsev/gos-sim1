@@ -86,7 +86,7 @@ CREATE OR REPLACE FUNCTION private.party_registration_certified(p_party_id uuid)
 RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $function$
  SELECT EXISTS(SELECT 1 FROM public.game_parties p
   JOIN public.formal_documents cert ON cert.game_id=p.game_id
-     AND cert.doc_type='party_certificate' AND cert.metadata->>'party_id'=p.id::text
+     AND cert.doc_type='party_certificate' AND cert.status_code='published' AND cert.metadata->>'party_id'=p.id::text
   WHERE p.id=p_party_id AND p.registration_status='registered')
 $function$;
 REVOKE ALL ON FUNCTION private.party_registration_certified(uuid) FROM PUBLIC,anon;
@@ -118,6 +118,7 @@ CREATE POLICY party_dossier_storage_release ON storage.objects
  bucket_id<>'game-assets'
  OR split_part(name,'/',2)<>'parties'
  OR split_part(name,'/',4)<>'docs'
+ OR private.is_game_teacher((split_part(name,'/',1))::uuid)
  OR (
   EXISTS(SELECT 1 FROM public.party_documents d WHERE d.storage_path=storage.objects.name
    AND (private.is_game_teacher(d.game_id)
@@ -191,16 +192,34 @@ BEGIN
   IF missing IS NOT NULL THEN RAISE EXCEPTION 'Не приняты последние версии: %',missing; END IF;
  END IF;
  UPDATE public.game_parties SET registration_status=p_status,
-   registration_note=nullif(btrim(coalesce(p_note,'')),''),
+   registration_note=CASE WHEN p_status='registered' THEN 'Партия зарегистрирована. Свидетельство выдано.' WHEN p_status='revision' THEN 'Пакет направлен на доработку. Заключение доступно членам партии.' ELSE 'В регистрации отказано. Заключение доступно членам партии.' END,
    registration_reviewed_at=clock_timestamp(),registration_reviewed_by=uid WHERE id=p.id;
  INSERT INTO public.game_events(game_id,round_no,category,severity,title,body,created_by)
  VALUES(p.game_id,1,'Регистрация партии',CASE WHEN p_status='registered' THEN 'notice' ELSE 'warning' END,
  CASE WHEN p_status='registered' THEN 'Партия зарегистрирована' WHEN p_status='revision'
  THEN 'Пакет партии возвращён на доработку' ELSE 'В регистрации партии отказано' END,
- p.name||coalesce(E'\n'||nullif(btrim(coalesce(p_note,'')),''),''),uid);
+ p.name,uid);
 END $body$;
 REVOKE ALL ON FUNCTION public.review_party_registration(uuid,text,text) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.review_party_registration(uuid,text,text) TO authenticated;
+
+-- Existing public-process policies may allow other parties to SELECT Minjust
+-- letters. Restrict private registration decisions at the row level as well.
+DROP POLICY IF EXISTS party_pending_justice_post_visibility ON public.political_posts;
+CREATE POLICY party_pending_justice_post_visibility ON public.political_posts
+ AS RESTRICTIVE FOR SELECT TO authenticated USING (
+ actor_key IS DISTINCT FROM 'minjust'
+ OR internal_view IS DISTINCT FROM 'parties'
+ OR context->>'party_id' IS NULL
+ OR private.is_game_teacher(game_id)
+ OR EXISTS(SELECT 1 FROM public.game_parties p JOIN public.game_members m
+   ON m.game_id=p.game_id AND m.team=p.name
+   WHERE p.id::text=political_posts.context->>'party_id'
+    AND m.user_id=(SELECT auth.uid()) AND m.kind='student' AND m.roster_archived_at IS NULL)
+ OR EXISTS(SELECT 1 FROM public.game_parties p
+   WHERE p.id::text=political_posts.context->>'party_id'
+   AND private.party_registration_certified(p.id))
+);
 
 -- Not even a summary publication about review results should expose dossiers
 -- during examination; only final registration should create a public record.
