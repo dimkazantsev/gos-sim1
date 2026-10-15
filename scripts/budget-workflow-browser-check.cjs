@@ -31,7 +31,7 @@ function fixtures(){
  const regional_events=[{id:'qa-event-54',title:'Строительство районной поликлиники',situation:'Жители удалённых муниципальных округов Новосибирской области добираются до врача более двух часов. Регион предлагает построить поликлинику и обеспечить её инженерной инфраструктурой. Необходимо обосновать расходы, результат и региональное софинансирование до включения федеральной помощи в проект бюджета.',status:'ready',region_code:'54',assigned:false,budget_request:{section_key:'09',kind:'subsidy',amount:1250,cofinancing:250,expected_result:'Поликлиника на 300 посещений в смену введена в эксплуатацию, время поездки сокращено до 30 минут.',indicator:{name:'Время поездки до поликлиники',baseline:120,target:30,unit:'минут'},estimate:[{name:'Строительство и оснащение',amount:1200},{name:'Инженерная инфраструктура',amount:300}],justification:'Доступность медицинской помощи и замена изношенной муниципальной инфраструктуры.'}},{id:'qa-event-22',title:'Восстановление моста после паводка',situation:'Паводок повредил мост и прервал транспортное сообщение с тремя населёнными пунктами. Восстановление требует проверки сметы и приоритетов транспортной инфраструктуры.',status:'ready',region_code:'22',assigned:false,budget_request:{section_key:'04',kind:'subsidy',amount:500,cofinancing:100,expected_result:'Мост восстановлен и сообщение с населёнными пунктами открыто.',indicator:{name:'Доступные населённые пункты',baseline:0,target:3,unit:'пунктов'},estimate:[{name:'Восстановление моста',amount:600}],justification:'Паводок нарушил доставку товаров и доступ жителей к публичным услугам.'}}];
  const programmes=[programme('qa-program-2026','approved',2026,'123456789.12'),programme('qa-program-2027','approved',2027,'900000000.00'),programme('qa-program-planned','planned',2026,'700000000.00')];
  const restoredDraft={...newBudgetDraft(),base_reallocations:{'04':-.00000001,'09':.00000001}};
- return {regions,rates:[],context,state,regional_events,programmes,plans:[{id:'qa-restored-budget',title:restoredDraft.title,draft:restoredDraft,revision:1,status:'draft',document_id:null,registry_no:null,updated_at:'2026-10-09T00:00:00Z'}],requests:[],contracts:[],calls:[],unknownRpcs:[],failSave:false};
+ return {regions,rates:[],context,state,regional_events,programmes,plans:[{id:'qa-restored-budget',title:restoredDraft.title,draft:restoredDraft,revision:1,status:'draft',document_id:null,registry_no:null,updated_at:'2026-10-09T00:00:00Z'}],requests:[],contracts:[],calls:[],unknownRpcs:[],failSave:false,canPrepare:true};
 }
 function filterRows(rows,url){
  return rows.filter(row=>[...url.searchParams].every(([key,value])=>{if(['select','order','limit','offset'].includes(key))return true;if(value.startsWith('eq.'))return String(row[key])===value.slice(3);if(value==='not.is.null')return row[key]!=null;if(value.startsWith('in.('))return value.slice(4,-1).split(',').includes(String(row[key]));return true;}));
@@ -47,7 +47,7 @@ async function mockTransport(context,page,f){
    case 'get_fiscal_legal_plans':response={plans:[],programs:[]};break;
    case 'list_regional_cases':response=f.regional_events.map(e=>({...e,comic_scene:{region_code:e.region_code}}));break;
    case 'delete_budget_simulator_draft':{const idx=f.plans.findIndex(x=>x.id===p.p_plan_id&&x.status==='draft'&&!x.document_id);assert(idx>=0,'Only a draft may be deleted');assert.equal(f.plans[idx].revision,p.p_revision);f.plans.splice(idx,1);response=true;break;}
-   case 'get_budget_simulator':response={state:f.state,plans:f.plans,requests:f.requests,contracts:f.contracts,ledger:[],can_prepare:true,can_request:true,event_count:f.regional_events.length,regional_events:f.regional_events};break;
+   case 'get_budget_simulator':response={state:f.state,plans:f.plans,requests:f.requests,contracts:f.contracts,ledger:[],can_prepare:f.canPrepare,can_request:true,event_count:f.regional_events.length,regional_events:f.regional_events};break;
    case 'get_signed_state_program_budget':response=f.programmes.map(x=>({...x.program,ministry:x.program.responsible_ministry,program_status:x.program.status,indicators:x.indicators,expense_breakdown:x.expense_breakdown,years:[{year:x.commitment.budget_year,amount:x.commitment.amount,status:x.commitment.status}]}));break;
    case 'get_budget_change_registry_page':{
     const samples=Array.from({length:12},(_,i)=>({entry_key:'income:'+(i+1),category:'Доходы',title:'Изменение доходов '+(i+1),status:'Сохранено',changed_at:'2026-10-12T12:00:00Z',actor_id:null,document_id:null,details:'Доходы федерального бюджета',amount:i+1}));
@@ -225,6 +225,22 @@ async function main(){
    await page.getByRole('button',{name:'Только просмотр',exact:true}).click();await openTab(page,'Доходы');assert(await sim.getByLabel('Название расчета').isDisabled(),'Readonly mode protects the shared title');
    await openTab(page,'Проект ФЗ');const save=sim.getByRole('button',{name:'Сохранить расчёт',exact:true}),create=sim.getByRole('button',{name:/(Создать проект ФЗ о бюджете|Открыть проект в реестре)/});assert(await save.isDisabled(),'Readonly cannot save a shared plan');assert(await create.isDisabled(),'Readonly cannot create a federal law');
    await nav.getByRole('tab').filter({hasText:'Регионы'}).focus();await page.keyboard.press('Enter');assert.equal(await nav.getByRole('tab').filter({hasText:'Регионы'}).getAttribute('aria-selected'),'true','The flow can be followed with the keyboard');await page.keyboard.press('ArrowRight');assert.equal(await nav.getByRole('tab').filter({hasText:'Расходы'}).getAttribute('aria-selected'),'true','Arrow-key navigation follows the sequential flow');await page.keyboard.press('Home');assert.equal(await nav.getByRole('tab').filter({hasText:'Доходы'}).getAttribute('aria-selected'),'true');await page.keyboard.press('End');assert.equal(await nav.getByRole('tab').filter({hasText:'Проект ФЗ'}).getAttribute('aria-selected'),'true');
+   const permissions=sim.locator('[data-budget-plan-permissions]');
+   assert.match(await permissions.innerText(),/Кто может создавать и сохранять варианты/,'Roles that may create plans must be explained');
+   assert.match(await permissions.innerText(),/Председатель Правительства/,'Government roles must be named');
+   assert.match(await permissions.innerText(),/Остальные участники/,'Restrictions for other participants must be visible');
+   if(width===390){
+    const previousSaves=f.calls.filter(c=>c.rpc==='save_budget_simulator').length;
+    f.canPrepare=false;
+    await page.reload();
+    await sim.locator('[data-budget-kpi=income]').waitFor();
+    assert.match(await sim.locator('[data-budget-plan-permissions]').innerText(),/Вам недоступно сохранение/,'Unauthorized users must understand the disabled save');
+    const projectTabs=sim.getByRole('tablist',{name:'Сохранённые проекты бюджета'});
+    assert.equal(await projectTabs.getByRole('tab',{name:/Создать вариант/}).count(),0,'Unauthorized users do not receive a shared variant creation action');
+    assert(await sim.getByRole('button',{name:/Сохранить (вариант|новую версию)/}).isDisabled(),'Unauthorized users cannot save a shared budget variant');
+    assert(await sim.getByLabel('Название расчета').isDisabled(),'Unauthorized users cannot rename the shared calculation');
+    assert.equal(f.calls.filter(c=>c.rpc==='save_budget_simulator').length,previousSaves,'Unauthorized view triggers no new save RPC');
+   }
    assert.equal(f.state.last_plan_id,null,'Browsing and editing do not enact a budget');assert.deepEqual(errors,[],'No uncaught browser runtime errors');assert.deepEqual(f.unknownRpcs,[],'Every mocked RPC must have an explicit fixture');
    results.push({width,result:'PASS',runtimeErrors:errors,transport:'simulated'});await context.unrouteAll({behavior:'ignoreErrors'});await context.close();console.log('PASS Budget workflow component layout '+width+'px');
   }
