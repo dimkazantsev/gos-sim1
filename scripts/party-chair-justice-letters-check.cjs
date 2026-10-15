@@ -3,6 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const ts=require('typescript');
 const Module=require('node:module');
+require.extensions['.ts']=(mod,file)=>mod._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,file);
 const path='components/game/partyJusticeLetter.ts';
 const mod=new Module(path,module);mod.filename=path;mod.paths=module.paths;
 mod._compile(ts.transpileModule(fs.readFileSync(path,'utf8'),{
@@ -22,6 +23,10 @@ assert.match(positive,/принято решение о государствен
 assert(!positive.includes('[Укажите'),'Complete accepted documents should yield a usable positive draft');
 assert.match(negative,/Основания отказа: \[Укажите/,'Refusal requires teacher-verified legal grounds');
 assert.match(negative,/положениями Федерального закона № 95-ФЗ/);
+const newestRevision={...docs[0],id:'application-v2',version_no:2,status:'revision',note:'Исправить подпись',created_at:'2026-10-14'};
+const stale=buildPartyJusticeLetter(p,[...docs,newestRevision],undefined,'registered');
+assert.match(stale,/не может быть подписан/,'Approved V1 cannot authorize registration after V2 revision');
+assert.match(stale,/В2/,'Official Minjust letter displays latest version number');
 const missing=buildPartyJusticeLetter(p,docs.slice(1),undefined,'registered');
 assert.match(missing,/не может быть подписан/,'Never approve incomplete document package');
 const noted=buildPartyJusticeLetter(p,[...docs.slice(0,1),{...docs[1],status:'revision',note:'Неполный порядок избрания руководящих органов'},...docs.slice(2)],undefined,'rejected');
