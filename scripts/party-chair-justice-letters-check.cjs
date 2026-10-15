@@ -3,6 +3,9 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const ts=require('typescript');
 const Module=require('node:module');
+require.extensions['.ts']=(tsModule,filename)=>tsModule._compile(ts.transpileModule(fs.readFileSync(filename,'utf8'),{
+ compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
+}).outputText,filename);
 const path='components/game/partyJusticeLetter.ts';
 const mod=new Module(path,module);mod.filename=path;mod.paths=module.paths;
 mod._compile(ts.transpileModule(fs.readFileSync(path,'utf8'),{
