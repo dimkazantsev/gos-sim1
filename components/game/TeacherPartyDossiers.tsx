@@ -2,6 +2,7 @@
 import {useState} from 'react';
 import PartyJusticeReview from './PartyJusticeReview';
 import PartyChairFallback from './PartyChairFallback';
+import TeacherPartyStatistics from './TeacherPartyStatistics';
 import {FileText,Trash2,UsersRound,Landmark,ShieldAlert,X,ExternalLink,MessageCircle} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -47,11 +48,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
  onClick={()=>{const c=channels.find(x=>x.name==='Фракция · '+p.name);if(c)onOpenChat?.(c.id)}}>
  <MessageCircle size={18} aria-hidden="true"/></button></header>
     {p.description&&<p className="teacherPartyDescription">{p.description}</p>}
-    <div className="teacherPartyKpis">
-     <span><strong>{p.support}</strong> поддержка</span>
-     <span><strong>{p.regions}</strong> регионов</span><span><strong>{p.budget}</strong> бюджет</span>
-     <span><strong>{invites.length}</strong> приглашений</span>
-    </div>
+    <TeacherPartyStatistics g={g} party={p} invitations={invites.length}/>
     <div className="teacherPartySection"><h4><Landmark size={15} aria-hidden="true"/> Руководство и состав</h4>
      <p><b>Председатель:</b> {leader?.full_name||'Не назначен'}</p>
      {staff.length?<ul>{staff.map(m=><li key={m.user_id}><span>{m.full_name}<small>{m.user_id===p.leader_user_id?'Председатель партии «'+p.name+'»':m.role_title||'Участник'}</small></span></li>)}</ul>:<p className="teacherPartyMuted"><UsersRound size={15} aria-hidden="true"/> Участники пока не вступили в партию</p>}
