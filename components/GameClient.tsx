@@ -33,6 +33,7 @@ import BudgetView from './game/BudgetView';
 import {useSectionUpdates} from './game/useSectionUpdates';
 import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
+import ContextualGameError,{findGameErrorAction,type GameErrorAction} from './game/ContextualGameError';
 import {useSavedGameState,savedString} from './game/useSavedGameState';
 
 const GENERIC_STUDENT='__generic_student_preview__';
@@ -338,6 +339,29 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   setScreenHistory(previous=>({entries:previous.entries.map((screen,index)=>index===previous.index&&screen.view==='votes'?{...screen,voteId:''}:screen),index:previous.index}));
  }
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
+ const lastErrorAction=useRef<GameErrorAction|null>(null);
+ function rememberErrorAction(element:HTMLElement|null){
+  if(!element)return;
+  lastErrorAction.current={element,view,at:Date.now()};
+  // Allow the same server error to be reported on a new attempt.
+  if(error)setError('');
+ }
+ function onGameActionClick(event:React.MouseEvent<HTMLElement>){
+  rememberErrorAction(findGameErrorAction(event.target,event.currentTarget));
+ }
+ function onGameFieldChange(event:React.FormEvent<HTMLElement>){
+  if(!(event.target instanceof HTMLElement))return;
+  const field=event.target.closest<HTMLElement>('input,textarea,select');
+  if(field&&event.currentTarget.contains(field)&&!field.closest('[data-game-error-surface]'))
+   rememberErrorAction(field);
+ }
+ function onGameFormSubmit(event:React.FormEvent<HTMLElement>){
+  const form=event.target;
+  if(!(form instanceof HTMLFormElement))return;
+  const candidate=(event.nativeEvent as SubmitEvent).submitter;
+  const button=candidate instanceof HTMLElement?candidate:form.querySelector<HTMLElement>('button[type="submit"],input[type="submit"]');
+  rememberErrorAction(button||form);
+ }
 
  const genericStudent:Member|undefined=teacher&&game?{
   game_id:game.id,user_id:GENERIC_STUDENT,full_name:'Студент · предпросмотр',group_name:null,
@@ -625,8 +649,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    <div className="simContentFlow">
     {!previewMode&&g.crises.some(c=>c.status==='active')&&<section className="crisisNotice"><div><b>В республике активен кризис</b><span>{g.crises.find(c=>c.status==='active')?.crisis_type}</span></div><button className="secondary" aria-expanded={crisisExpanded} onClick={()=>setCrisisExpanded(!crisisExpanded)}>{crisisExpanded?'Свернуть штаб':'Открыть кризисный штаб'}</button>{crisisExpanded&&<div className="crisisNoticeBody"><CrisisRoom g={g}/></div>}</section>}
 
-    <main id="game-main" tabIndex={-1} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
-     {error&&<div className="errorBox closable" role="alert"><span>{error}</span><IconAction onClick={()=>setError('')} label="Закрыть сообщение об ошибке"/></div>}
+    <main id="game-main" tabIndex={-1} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`} onClickCapture={onGameActionClick} onChangeCapture={onGameFieldChange} onSubmitCapture={onGameFormSubmit}>
+     <ContextualGameError error={error} onClose={()=>setError('')} origin={lastErrorAction} view={view}/>
      {view==='dashboard'&&<DashboardView g={vg} onOpenProfile={navigateProfile} onNavigate={v=>navigate(v,v==='stages'?{stageNo:currentStage?.stage_no||game.current_round}:undefined)}/>}
      {view==='stages'&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onOpenVotes={voteId=>navigate('votes',voteId?{voteId}:undefined)} onOpenDocument={id=>navigate('documents',{documentId:id})} onCreateDocument={(templateKey,stageNo)=>navigate('documents',{templateKey,stageNo})} onNavigate={v=>navigate(v)}/>}
      {view==='parties'&&<PartiesView g={vg}/>}
