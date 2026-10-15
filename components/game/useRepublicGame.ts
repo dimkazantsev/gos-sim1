@@ -844,11 +844,11 @@ export function useRepublicGame(gameId:string){
  async function inviteToParty(partyId:string,userId:string,onFailure?:(message:string)=>void){
   try{
    const r=await supabase.rpc('invite_to_party',{p_party_id:partyId,p_user_id:userId});
-   if(r.error){setError(r.error.message);onFailure?.(r.error.message);return false}
+   if(r.error){if(onFailure)onFailure(userError(r.error));else setError(r.error);return false}
    await loadPartyRepresentation();notifyGameDataRefresh(gameId);void kickTelegramDispatch();return true;
   }catch(e){
    const message=e instanceof Error?e.message:'Не удалось отправить приглашение. Повторите попытку.';
-   setError(message);onFailure?.(message);return false;
+   if(onFailure)onFailure(userError(message));else setError(message);return false;
   }
  }
  async function respondPartyInvitation(invitationId:string,accept:boolean){
