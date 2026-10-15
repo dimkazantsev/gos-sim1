@@ -18,8 +18,9 @@ assert.match(teacher,/g\.reviewPartyDocument\(id,status,status==='revision'\?rev
  'Review must forward the entered return note');
 assert.match(teacher,/reviewNotice\?\.id===d\.id/,
  'Review results should appear by the corresponding document');
-assert.ok(student.includes('{history.map(d=><p key={d.id}>{partyDocumentVersionLabel(d)} · {partyDocumentVerdict(d)}'),
- 'Each document must expose every prior verdict and version inside its own history');
+assert.ok(student.includes('{history.slice(1).map(d=><p key={d.id}>{partyDocumentVersionLabel(d)} · {partyDocumentVerdict(d)}'),
+ 'Each document must expose prior versions without duplicating the current document');
+assert.match(student,/history\.length>1&&<details className="partyRegistrationDocHistory"/, 'History controls are needed only when older versions exist');
 assert.match(student,/d\.note&&<small> · \{d\.note\}<\/small>/,
  'Older teacher remarks must remain accessible in document history');
 assert.match(student,/current\?\.status==="revision"&&<p className="partyRegistrationRevisionNote"/,
