@@ -1,86 +1,168 @@
-/* ГОС.ID · Tablet / narrow-desktop header.
-   Prevent fixed-width controls from squeezing the stage title between 901–1499px.
-   Keep phone header (<=900px) and wide desktop (>=1500px) untouched. */
+/* ГОС.ID · One-row tablet toolbar.
+   History, stage title and all actions share ONE baseline at 901–1499px.
+   On narrower workspaces long titles truncate; actions remain real 48px targets.
+   Phone (<=900px) and wide desktop (>=1500px) retain their existing layouts. */
 @media (min-width:901px) and (max-width:1499px) {
- .simWorkspace {--gs-top-h:122px}
+ .simWorkspace {--gs-top-h:84px}
  .simWorkspace .simTop {
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr) minmax(144px,auto);
-  grid-template-rows:48px 48px;
+  display:flex;
+  flex-flow:row nowrap;
   align-items:center;
-  column-gap:12px;
-  row-gap:6px;
-  min-height:122px;
-  height:auto;
-  max-height:none;
-  padding-block:10px;
+  justify-content:space-between;
+  gap:8px;
+  height:var(--gs-top-h);
+  min-height:var(--gs-top-h);
+  max-height:var(--gs-top-h);
+  padding:0 16px;
   overflow:visible;
  }
  .simWorkspace .simTop > .topScreenHistory {
-  grid-column:1;
-  grid-row:1;
-  justify-self:start;
+  display:flex;
+  flex:0 0 auto;
+  order:0;
+  gap:3px;
   min-width:0;
   margin:0;
  }
- /* Display contents promotes the two existing children to grid tracks
-    without changing keyboard order or their DOM relationships. */
- .simWorkspace .simTop > .simTopCenter {display:contents}
+ .simWorkspace .simTop .topScreenHistory .screenHistoryButton {
+  flex:0 0 42px;
+  width:42px;
+  min-width:42px;
+  height:48px;
+  min-height:48px;
+ }
+ .simWorkspace .simTop > .simTopCenter {
+  display:flex;
+  flex:1 1 auto;
+  order:1;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+  width:auto;
+  margin:0;
+ }
  .simWorkspace .simTop .topStageCopy {
   display:block;
-  grid-column:2;
-  grid-row:1;
-  align-self:center;
+  flex:1 1 auto;
   min-width:0;
   max-width:100%;
   overflow:hidden;
  }
  .simWorkspace .simTop .topStageCopy strong {
-  min-width:0;
-  max-width:100%;
-  white-space:nowrap;
+  display:block;
   overflow:hidden;
   text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:14px;
+  max-width:100%;
  }
  .simWorkspace .simTop .topIndicators {
-  grid-column:1 / 3;
-  grid-row:2;
-  justify-self:start;
-  justify-content:flex-start;
-  align-self:center;
+  display:flex;
+  flex:0 0 auto;
+  align-items:center;
+  gap:4px;
   min-width:0;
-  max-width:100%;
-  width:auto;
   margin:0;
-  gap:7px;
+  overflow:visible;
   flex-wrap:nowrap;
-  overflow-x:auto;
-  overflow-y:hidden;
-  scrollbar-width:thin;
+ }
+ .simWorkspace .simTop .topIndicators > .livePill {
+  display:inline-grid;
+  place-items:center;
+  flex:0 0 48px;
+  width:48px;
+  min-width:48px;
+  max-width:48px;
+  padding:0;
+ }
+ .simWorkspace .simTop .topIndicators > .livePill svg {display:block;width:18px;height:18px}
+ .simWorkspace .simTop .topIndicators .livePillText {display:none}
+ .simWorkspace .simTop .topIndicators > .gameShareScreen {
+  display:inline-grid;
+  place-items:center;
+  flex:0 0 48px;
+  width:48px;
+  min-width:48px;
+  max-width:48px;
+  padding:0;
+ }
+ .simWorkspace .simTop .topIndicators > .gameShareScreen span {display:none}
+ .simWorkspace .simTop .topIndicators > .timerPillDuration {
+  flex:0 0 80px;
+  width:80px;
+  min-width:80px;
+  max-width:80px;
+  padding:3px;
+  gap:0;
+ }
+ .simWorkspace .simTop .timerPillDuration .timerPillUnit:last-child {padding-inline-start:0}
+ .simWorkspace .simTop .timerPillDuration .timerPillUnit strong {font-size:12px}
+ .simWorkspace .simTop .timerPillDuration .timerPillUnitFull {display:none}
+ .simWorkspace .simTop .timerPillDuration .timerPillUnitCompact {
+  display:block;
+  font-size:9px;
+  font-weight:700;
+  color:#7182a0;
  }
  .simWorkspace .simTop > .viewAsSwitcher {
-  grid-column:3;
-  grid-row:2;
-  justify-self:end;
-  min-width:144px;
-  max-width:min(240px,100%);
-  width:100%;
+  display:block;
+  position:relative;
+  flex:0 0 48px;
+  order:2;
+  width:48px;
+  min-width:48px;
+  max-width:48px;
+  height:48px;
+  min-height:48px;
+  max-height:48px;
+  padding:0;
   margin:0;
  }
+ .simWorkspace .simTop .viewAsSwitcher .viewAsTrigger {
+  display:grid;
+  place-items:center;
+  width:48px;
+  min-width:48px;
+  max-width:48px;
+  height:48px;
+  min-height:48px;
+  max-height:48px;
+  padding:0;
+ }
+ .simWorkspace .simTop .viewAsMobileIcon {
+  display:block;
+  width:20px;
+  height:20px;
+ }
+ .simWorkspace .simTop .viewAsTriggerText,
+ .simWorkspace .simTop .viewAsChevron {display:none}
  .simWorkspace .simTop > .topChatButton {
-  grid-column:3;
-  grid-row:1;
-  justify-self:end;
-  align-self:center;
+  display:inline-flex;
+  flex:0 0 48px;
+  order:3;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  min-width:48px;
+  max-width:48px;
+  height:48px;
+  min-height:48px;
+  max-height:48px;
+  padding:0;
   margin:0;
  }
- .simWorkspace .simTop .topIndicators > :is(.livePill,.timerPill,.connectionPill,.gameShareScreen) {
-  flex-shrink:0;
+ .simWorkspace .simTop > .topChatButton > span {display:none}
+ .simWorkspace .simTop .viewAsMenu {
+  position:absolute;
+  top:calc(100% + 7px);
+  right:0;
+  width:260px;
+  max-width:calc(100vw - 24px);
  }
 }
-/* Narrow tablet: preserve readable text rather than a vanishing stage label. */
 @media (min-width:901px) and (max-width:1080px) {
- .simWorkspace .simTop {column-gap:9px;padding-inline:16px}
- .simWorkspace .simTop .topStageCopy strong {font-size:14px}
- .simWorkspace .simTop > .viewAsSwitcher {min-width:144px}
+ .simWorkspace .simTop {padding-inline:12px;gap:6px}
+ .simWorkspace .simTop > .simTopCenter {gap:6px}
+ .simWorkspace .simTop .topIndicators {gap:3px}
 }
