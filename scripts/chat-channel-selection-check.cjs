@@ -34,6 +34,12 @@ const game=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const panel=fs.readFileSync('components/game/ChatPanel.tsx','utf8');
 assert.ok(dropdown.includes('const current=visibleChannels.find(c=>c.id===value);'),'header must not display an unselected fallback');
 assert.ok(!dropdown.includes('||orderedChannels[0]'),'header must not silently show a different chat');
+// Concurrent overview RPC reads must not cancel channel-list hydration on chat open.
+assert.ok(game.includes("startRead('core','members','metrics','profiles','parties','formal','channels')"),'channel fetch must have its own read ticket');
+assert.ok(game.includes("if(!ch.error&&readCurrent(ticket,'channels'))setChannels"),'channel state must use the channel ticket');
+assert.ok(game.includes("readSafely(['overview'],async ticket=>"),'overview RPC must use a separate ticket');
+assert.ok(!game.includes("readCurrent(ticket,'overview'))setChannels"),'overview RPC cannot invalidate loaded channels');
+assert.ok(dropdown.includes('shortPreview(info?.last_message_text)'),'channel previews must be compact');
 assert.ok(game.includes('resolveChatChannelId(available,channelId,saved,chatOverview)'),'actual chat ID must be resolved from visible options');
 assert.ok(game.includes('recalledChatChannel(visibleMe.user_id,available)'),'persisted chat must be restored');
 assert.ok(game.includes('rememberChatChannel(next,visibleMe.user_id)'),'selected chat must be remembered even without sending');
