@@ -5,6 +5,7 @@ import JusticeDocuments from './JusticeDocuments';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
 import {institutionEmblem} from './institutionEmblems';
 import {buildPartyJusticeLetter,PARTY_REQUIRED_DOCS,type JusticeDraftDecision} from './partyJusticeLetter';
+import {partyLatestDocuments,partyLatestAccepted} from './partyDocumentVersions';
 import type {Party} from './types';
 import type {ReturnTypeRepublic} from './viewTypes';
 
@@ -13,9 +14,9 @@ export default function PartyJusticeReview({g,party}:{g:ReturnTypeRepublic;party
  const [note,setNote]=useState('');
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
- const docs=g.partyDocuments.filter(d=>d.party_id===party.id);
+ const docs=partyLatestDocuments(g.partyDocuments.filter(d=>d.party_id===party.id));
  const leader=g.members.find(m=>m.user_id===party.leader_user_id);
- const ready=PARTY_REQUIRED_DOCS.every(req=>docs.some(d=>d.doc_kind===req.kind&&d.status==='accepted'));
+ const ready=partyLatestAccepted(docs,PARTY_REQUIRED_DOCS.map(x=>x.kind));
  const missingGrounds=decision==='rejected'&&note.includes('[Укажите');
  function draft(next:JusticeDraftDecision=decision){
   setDecision(next);
@@ -27,7 +28,7 @@ export default function PartyJusticeReview({g,party}:{g:ReturnTypeRepublic;party
   setBusy(true);setNotice('');
   try{
    const ok=await g.reviewPartyRegistration(party.id,decision,note);
-   setNotice(ok?'Решение подписано и направлено партии. Официальная публикация добавлена в политические процессы.':'Не удалось оформить решение. Проверьте системное сообщение.');
+   setNotice(ok?(decision==='registered'?'Все текущие документы приняты, регистрация состоялась, свидетельство выдано и опубликовано.':'Решение направлено только членам партии. До регистрации документы остаются непубличными.'):'Не удалось оформить решение. Проверьте системное сообщение.');
   }finally{setBusy(false)}
  }
  return <section className="justiceReview">
