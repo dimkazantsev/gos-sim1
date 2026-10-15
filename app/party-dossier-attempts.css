@@ -21,3 +21,11 @@
  .civicParties .partyDossierReload {max-width:none;width:100%}
  .teacherPartyDossier .civicDocReview>button {flex:1 1 145px}
 }
+
+.civicParties .partyDossierUpdates {display:grid;gap:8px;margin:12px 0;padding:14px;border:1px solid #bed6f6;border-radius:14px;background:#f1f7ff;color:#294e7f;min-width:0}
+.civicParties .partyDossierUpdates>b {font-size:15px}
+.civicParties .partyDossierUpdates>p {margin:0;color:#4b678d;font-size:12px}
+.civicParties .partyDossierUpdates ul {margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.civicParties .partyDossierUpdates li {min-width:0;display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;padding:9px 10px;background:#fff;border-radius:10px;border:1px solid #e0eaf8}
+.civicParties .partyDossierUpdates li span {font-size:12px;font-weight:650}
+.civicParties .partyDossierUpdates li p {flex-basis:100%;margin:0;white-space:pre-wrap;overflow-wrap:anywhere;color:#785231}
