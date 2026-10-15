@@ -18,10 +18,14 @@ assert.match(teacher,/g\.reviewPartyDocument\(id,status,status==='revision'\?rev
  'Review must forward the entered return note');
 assert.match(teacher,/reviewNotice\?\.id===d\.id/,
  'Review results should appear by the corresponding document');
-assert.match(student,/docs\.map\(d=><article[\s\S]*?d\.status==='revision'\?'На доработке'/,
- 'Students must see documents returned for revision');
-assert.match(student,/\{d\.note&&<p>\{d\.note\}<\/p>\}/,
- 'Students must see the teacher return note');
+assert.match(student,/docs\.map\(d=>\{const version=[\s\S]*?d\.status==='revision'\?'На доработке'/,
+ 'Students must see numbered attempts and revisions');
+assert.match(student,/\{d\.note&&<p role="status">Замечание Минюста к версии В\{version\}: \{d\.note\}<\/p>\}/,
+ 'Students must see a return note for the matching version');
+assert.match(student,/registration_status==='registered'\?latestDocs\.filter/,
+ 'Public documents must be withheld until registration');
+assert.match(teacher,/latestDocs\.some\(x=>x\.id===d\.id\)/,
+ 'Teacher actions must use only the latest version');
 assert.match(orphans,/<details aria-label="Технические загрузки без регистрации"/,
  'Technical Storage objects must remain separate from submitted documents');
 console.log('PASS party documents: teacher hydration, party isolation, student revision notes, orphan separation.');
