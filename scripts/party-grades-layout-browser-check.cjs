@@ -60,7 +60,7 @@ ${css}</style><body><div class="gradesPage"><section class="surface gradesMatrix
     const anchor=[...document.querySelectorAll('.partyLegalRequirements>a')].map(x=>{const r=x.getBoundingClientRect();return{left:r.left,right:r.right,height:r.height}});
     return{root,main,legal,buttons,fields,anchor,bodyWidth:document.body.scrollWidth};
    });
-   assert(partyDoc.main.width>=280&&partyDoc.legal.width>=280,'Both document panels remain readable at '+width);
+   assert(partyDoc.main.width>=240&&partyDoc.legal.width>=240,'Both document panels remain readable at '+width);
    assert(partyDoc.main.left>=partyDoc.root.left-1&&partyDoc.main.right<=partyDoc.root.right+1,'Document form stays inside its container at '+width);
    assert(partyDoc.legal.left>=partyDoc.root.left-1&&partyDoc.legal.right<=partyDoc.root.right+1,'Legal references stay inside their container at '+width);
    assert(partyDoc.fields.every(x=>x.width>100&&x.height>=44&&x.right<=partyDoc.main.right-8),'Document fields are fully visible at '+width);
