@@ -23,6 +23,8 @@ assert.equal(role('government_resolution','government','Преподавател
 assert.equal(role('other','other','Преподаватель',{issuer_name:'Счётная палата Российской Федерации'}),'Уполномоченное лицо — Счётная палата Российской Федерации');
 assert.equal(role('justice_response','minjust','Министр юстиции Российской Федерации'),'Министр юстиции Российской Федерации');
 assert.equal(role('justice_response','minjust','Преподаватель',{signatory_title:'Начальник Управления Минюста'}),'Начальник Управления Минюста');
+assert.equal(role('government_resolution','government','Преподаватель',{acting_office_title:'Заместитель Председателя Правительства Российской Федерации'}),'Заместитель Председателя Правительства Российской Федерации');
+assert.equal(role('sf_resolution','sf','Преподаватель-администратор',{acting_office_title:'Администратор игры'}),'Председатель Совета Федерации');
 assert.equal(role('sf_resolution','sf','Председатель Совета Федерации'),'Председатель Совета Федерации');
 const paper=fs.readFileSync('components/game/DocumentPaper.tsx','utf8');
 assert(paper.includes('role=documentSignerTitle(d,metadataSigned?m.signed_role:null)'),'Signed paper must resolve a contextual game office');
