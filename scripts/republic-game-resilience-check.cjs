@@ -14,7 +14,7 @@ function deferred(){let resolve;const promise=new Promise(done=>resolve=done);re
 
 function harness({effects=false}={}){
  const slots=[],pendingEffects=[],channels=[],timers=new Map(),listeners=new Map(),counts=new Map(),holds=new Map(),failures=new Set(),failureCodes=new Map();
- let cursor=0,dirty=false,revision=1,user='teacher-a',memberKind='teacher',gameId='game-a',authCallback,authError=null,clock=0,requests=0,disposed=false,recorders=0,stoppedTracks=0;
+ let cursor=0,dirty=false,revision=1,user='teacher-a',memberKind='teacher',gameId='game-a',authCallback,authError=null,clock=0,requests=0,disposed=false,recorders=0,stoppedTracks=0,withBallots=false;
  const permission=deferred(),mediaSend=deferred();
  class Recorder{constructor(){recorders++;this.state='inactive';}static isTypeSupported(){return false;}start(){this.state='recording';}stop(){this.state='inactive';this.onstop?.();}}
  const redirects=[];
@@ -43,6 +43,11 @@ function harness({effects=false}={}){
      if(table==='games')data={id:this.eqs.id||snapshot.gameId,current_round:snapshot.revision,title:'revision-'+snapshot.revision};
      if(table==='game_members'){const member={game_id:id,user_id:snapshot.user,full_name:snapshot.user,kind:snapshot.user==='teacher-a'?snapshot.memberKind:'student'};data=this.singleRow?member:[member];}
      if(table==='state_metrics')data=[{id:'metric',game_id:id,value:snapshot.revision}];
+     if(withBallots&&table==='game_votes')data=[{id:'vote',game_id:id}];
+     if(withBallots&&table==='game_ballots')data=[{id:'ballot-'+snapshot.revision,user_id:snapshot.user}];
+     if(withBallots&&table==='game_evaluations')data=[{id:'evaluation-'+snapshot.revision,user_id:snapshot.user}];
+     if(withBallots&&table==='game_crises')data=[{id:'crisis-'+snapshot.revision,game_id:id}];
+     if(withBallots&&table==='game_documents')data=[{id:'document-'+snapshot.revision,game_id:id,created_by:snapshot.user}];
      if(table==='game_parties')data=[{id:'party-'+snapshot.revision,game_id:id,name:'party-'+snapshot.revision}];
      if(table==='political_posts')data=[{id:'post-'+snapshot.revision,game_id:id,title:'post-'+snapshot.revision}];
      if(table==='chat_channels')data=[{id:'channel-a',game_id:id,name:'Общий чат',kind:'public'}];
@@ -81,8 +86,8 @@ function harness({effects=false}={}){
   if(name==='./useGameTableSync')return{notifyGameDataRefresh:()=>{}};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
-  if(name==='./chatChannelSelection'){
-   const source=fs.readFileSync(path.join(root,'components/game/chatChannelSelection.ts'),'utf8');
+  if(name==='./chatChannelSelection'||name==='./chatRealtime'){
+   const source=fs.readFileSync(path.join(root,'components/game',name.slice(2)+'.ts'),'utf8');
    const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
    const child={exports:{}};
    vm.runInNewContext('(function(require,module,exports){'+compiled+'\n})')(requireFor,child,child.exports);
@@ -103,9 +108,10 @@ function harness({effects=false}={}){
  async function settle(){for(let i=0;i<8;i++){render();await tick();if(!dirty)break;}return render();}
  return{
   render,settle,redirects,
+  enableBallots(){withBallots=true;},readCount:table=>counts.get(table)||0,
   setRevision:value=>{revision=value;},setUser:value=>{user=value;},setMemberKind:value=>{memberKind=value;},failTable(table,code){failures.add(table);failureCodes.set(table,code);},setAuthError:value=>{authError=value;},
   hold(table,number=(counts.get(table)||0)+1){const pending=deferred();holds.set(table+':'+number,pending);return pending;},
-  emit(table){for(const channel of [...channels])for(const {filter,callback} of channel.handlers)if(filter.table===table&&filter.event!=='DELETE')callback({eventType:'INSERT',new:{game_id:gameId}});},
+  emit(table){for(const channel of [...channels])for(const {filter,callback} of channel.handlers)if(filter.table===table&&filter.event!=='DELETE')callback({eventType:table==='chat_messages'?'UPDATE':'INSERT',new:{game_id:gameId}});},
   auth(event,nextUser){user=nextUser;const before=requests;authCallback?.(event,nextUser?{user:{id:nextUser}}:null);assert.equal(requests,before,'Auth callback must schedule Supabase I/O outside its synchronous callback.');},
   runTimers(){for(const [id,fn] of [...timers]){timers.delete(id);fn();}},
   resolveMedia(){permission.resolve({getTracks:()=>[{stop(){stoppedTracks++;}}]});},mediaState:()=>({recorders,stoppedTracks}),
@@ -132,6 +138,30 @@ async function main(){
  await check('Auth events clear private state synchronously and reject pending reads',async()=>{
   const h=harness({effects:true});await h.settle();assert.equal(h.render().teacher,true);const old=h.hold('games');h.setRevision(2);const first=h.render().refresh();await tick();h.auth('SIGNED_OUT',null);assert.equal(h.render().me,null);assert.equal(h.render().game,null);old.resolve();await first;assert.equal(h.render().me,null);assert.equal(h.render().messages.length,0);h.runTimers();await h.settle();assert.equal(h.redirects.at(-1),'/');h.dispose();
  });
+ for(const transition of ['sign out','switch user','switch game','newer refresh']){
+  await check('Late ballot read cannot restore old data after '+transition,async()=>{
+   const h=harness({effects:true});h.enableBallots();await h.settle();
+   const count=h.readCount('game_ballots'),old=h.hold('game_ballots');
+   const first=h.render().refresh();await h.settle();
+   assert.equal(h.readCount('game_ballots'),count+1,'The original refresh must reach the delayed ballot request');
+   if(transition==='sign out')h.auth('SIGNED_OUT',null);
+   if(transition==='switch user'){h.auth('SIGNED_IN','student-b');h.runTimers();await h.settle();}
+   if(transition==='switch game'){h.render('game-b');await h.settle();}
+   if(transition==='newer refresh'){h.setRevision(2);await h.render().refresh();}
+   old.resolve();await first;await h.settle();
+   const current=h.render();
+   if(transition==='sign out'){
+    assert.equal(current.me,null);assert.equal(current.game,null);
+    for(const key of ['ballots','evaluations','crises','documents'])assert.equal(current[key].length,0,key+' must remain cleared');
+   }
+   if(transition==='switch user')assert.equal(current.evaluations[0].user_id,'student-b');
+   if(transition==='switch game')assert.equal(current.documents[0].game_id,'game-b');
+   if(transition==='newer refresh'){
+    assert.equal(current.ballots[0].id,'ballot-2');assert.equal(current.evaluations[0].id,'evaluation-2');
+   }
+   h.dispose();
+  });
+ }
  await check('Auth user switch reloads outside the callback without restoring teacher access',async()=>{
   const h=harness({effects:true});await h.settle();const old=h.hold('games');const first=h.render().refresh();await tick();h.auth('SIGNED_IN','student-b');assert.equal(h.render().teacher,false);assert.equal(h.render().me,null);h.runTimers();await h.settle();assert.equal(h.render().me.user_id,'student-b');old.resolve();await first;assert.equal(h.render().me.user_id,'student-b');h.dispose();
  });
@@ -170,8 +200,11 @@ async function main(){
   const h=harness({effects:true});await h.settle();h.render().setChatOpen(true);await h.settle();assert.equal(h.render().teacher,true);assert.equal(h.render().messages.length,1);h.setMemberKind('observer');h.failTable('state_metrics');await h.render().refresh();assert.equal(h.render().teacher,false);assert.equal(h.render().me.kind,'observer');assert.equal(h.render().messages.length,0);h.runTimers();await h.settle();assert.equal(h.render().teacher,false);assert.equal(h.render().metrics.length,0);assert.match(h.render().error,/simulated read outage/);h.dispose();
  });
  await check('Confirmed lost game membership removes the previous accepted game',async()=>{
-  const h=harness({effects:true});await h.settle();h.failTable('game_members','PGRST116');await h.render().refresh();assert.equal(h.render().me,null);assert.equal(h.render().game,null);assert.equal(h.render().teacher,false);assert.equal(h.render().messages.length,0);assert.equal(h.render().loading,false);assert.match(h.render().error,/simulated read outage/);h.dispose();
+  const h=harness({effects:true});await h.settle();h.failTable('game_members','PGRST116');const refreshing=h.render().refresh();await tick();h.runTimers();await refreshing;assert.equal(h.render().me,null);assert.equal(h.render().game,null);assert.equal(h.render().teacher,false);assert.equal(h.render().messages.length,0);assert.equal(h.render().loading,false);assert.equal(h.render().error,'Нет доступа к игре');h.dispose();
  });
  if(failures.length)process.exitCode=1;
 }
-main().catch(error=>{console.error(error);process.exitCode=1;});
+// Fake timers inside the hook must not let Node exit successfully while the
+// last asynchronous test is still unresolved.
+const watchdog=setTimeout(()=>{console.error('FAIL Hook regression suite did not complete');process.exitCode=1;},15000);
+main().then(()=>clearTimeout(watchdog),error=>{clearTimeout(watchdog);console.error(error);process.exitCode=1;});

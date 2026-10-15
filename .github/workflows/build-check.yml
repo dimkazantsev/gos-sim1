@@ -153,6 +153,9 @@ on:
       - 'supabase/migrations/*crisis_baseline*'
       - 'components/game/CivicDiscussion.tsx'
       - 'components/game/useRepublicGame.ts'
+      - 'scripts/republic-game-resilience-check.cjs'
+      - 'scripts/game-identity-access-check.cjs'
+      - 'supabase/migrations/*game_identity_active_membership.sql'
       - 'components/game/PartyChairElection.tsx'
       - 'components/game/PartiesView.tsx'
       - 'components/game/GradesView.tsx'
@@ -201,6 +204,7 @@ jobs:
       - run: node scripts/brand-overview-check.cjs
       - run: node scripts/overview-live-posts-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
+      - run: node scripts/game-identity-access-check.cjs
       - run: node scripts/editor-async-resilience-check.cjs
       - run: node scripts/readiness-matrix-check.cjs
       - run: node scripts/budget-change-registry-check.cjs
