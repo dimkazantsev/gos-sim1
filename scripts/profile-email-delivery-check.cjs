@@ -5,11 +5,12 @@ const root=path.resolve(__dirname,'..');
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 function compile(file){return ts.transpileModule(fs.readFileSync(path.join(root,file),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;}
 const errors={};new Function('exports',compile('lib/userError.ts'))(errors);
+const emailDelivery={};new Function('exports',compile('components/game/profileEmailDelivery.ts'))(emailDelivery);
 const text=node=>node==null||typeof node==='boolean'?'':typeof node==='object'?[node.props?.children].flat(Infinity).map(text).join(''):String(node);
 const nodes=(node,match)=>!node||typeof node!=='object'?[]:[...(match(node)?[node]:[]),...[node.props?.children].flat(Infinity).flatMap(child=>nodes(child,match))];
-function harness({actor={id:'current-user',is_anonymous:true},hostname='dimkazantsev.github.io',teacher=false}={}){
+function harness({actor={id:'current-user',is_anonymous:true},hostname='dimkazantsev.github.io',teacher=false,storage=new Map()}={}){
  const slots=[],effects=[],timers=new Map(),requests=[],writes=[];
- let cursor=0,dirty=false,tree,nextTimer=0,result={data:{},error:null},failure=null,hold=null;
+ let cursor=0,dirty=false,tree,nextTimer=0,result={data:{},error:null},failure=null,hold=null,clock=Date.parse('2026-10-15T03:00:00Z');
  const react={
   useState(initial){const i=cursor++;if(!slots[i])slots[i]={value:initial};return[slots[i].value,next=>{slots[i].value=typeof next==='function'?next(slots[i].value):next;dirty=true;}];},
   useRef(initial){const i=cursor++;return(slots[i]??={value:{current:initial}}).value;},
@@ -22,12 +23,13 @@ function harness({actor={id:'current-user',is_anonymous:true},hostname='dimkazan
  };
  const jsx=(type,props)=>({type,props:props||{}});
  const module={exports:{}};
- const context={console,Promise,URL,process:{env:{}},window:{location:{hostname,origin:'https://'+hostname}},setTimeout(fn){const id=++nextTimer;timers.set(id,fn);return id;},clearTimeout(id){timers.delete(id);}};
+ const context={console,Promise,URL,Date:class extends Date{static now(){return clock;}},process:{env:{}},window:{location:{hostname,origin:'https://'+hostname},localStorage:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value)},setInterval(fn){const id=++nextTimer;timers.set(id,fn);return id;},clearInterval(id){timers.delete(id);}}};
  const requireFor=name=>{
   if(name==='react')return react;
   if(name==='react/jsx-runtime')return{jsx,jsxs:jsx};
   if(name==='@/lib/supabase')return{supabase};
   if(name==='@/lib/userError')return errors;
+  if(name==='./profileEmailDelivery')return emailDelivery;
   if(name==='lucide-react')return new Proxy({},{get:()=> 'svg'});
   throw new Error('Unexpected import '+name);
  };
@@ -41,7 +43,7 @@ function harness({actor={id:'current-user',is_anonymous:true},hostname='dimkazan
   async enter(value){email().props.onChange({target:{value}});await settle();},
   async click(name){const node=button(name);assert(node,'Missing button '+name);assert(!node.props.disabled,'Disabled button '+name);node.props.onClick();await settle();},
   result(value){result=value;},failure(value){failure=value;},hold(value){hold=value;},
-  async advance(seconds){for(let i=0;i<seconds;i++){const pending=[...timers.values()];timers.clear();pending.forEach(fn=>fn());await settle();}},
+  async advance(seconds){clock+=seconds*1000;[...timers.values()].forEach(fn=>fn());await settle();},
   dispose(){slots.forEach(slot=>slot?.cleanup?.());}
  };
 }
@@ -61,17 +63,21 @@ async function main(){
   const h=harness();await h.settle();await h.enter('first@mail.ru');h.result({error:{code:'email_exists',message:'conflict'}});await h.click('Отправить письмо для подтверждения');await h.enter('second@mail.ru');assert.equal(h.button('Отправить письмо для восстановления доступа'),undefined);h.result({error:null});await h.click('Отправить письмо для подтверждения');assert.equal(h.requests.at(-1).args[0].email,'second@mail.ru');h.dispose();
  });
  await check('First request updates the same account; repeat uses email_change resend',async()=>{
-  const h=harness();await h.settle();await h.enter('new@mail.ru');await h.click('Отправить письмо для подтверждения');assert.equal(h.requests[0].method,'updateUser');assert.match(h.text(),/Письмо отправлено на new@mail.ru/);assert.equal(h.button('Сохранить пароль'),undefined);assert(h.button('Проверить подтверждение')&&!h.button('Проверить подтверждение').props.disabled);assert.equal(h.requests[0].args[1].emailRedirectTo,'https://gos-sim1.vercel.app/game/game-id?section=profile');assert(h.button('Повторная отправка через 60 с').props.disabled);
+  const h=harness();await h.settle();await h.enter('new@mail.ru');await h.click('Отправить письмо для подтверждения');assert.equal(h.requests[0].method,'updateUser');assert.match(h.text(),/Письмо отправлено на new@mail.ru/);assert.equal(h.button('Сохранить пароль'),undefined);assert(h.button('Проверить подтверждение')&&!h.button('Проверить подтверждение').props.disabled);assert.equal(h.requests[0].args[1].emailRedirectTo,'https://gos-sim1.vercel.app/game/game-id?section=profile');assert(h.button('Повтор через 1 мин.').props.disabled);
   await h.advance(60);await h.click('Отправить письмо повторно');assert.equal(h.requests[1].method,'resend');assert.equal(h.requests[1].args[0].type,'email_change');assert.equal(h.requests[1].args[0].email,'new@mail.ru');h.dispose();
  });
  await check('Pending email after a reload uses the resend endpoint',async()=>{
   const h=harness({actor:{id:'current-user',is_anonymous:true,new_email:'pending@mail.ru'}});await h.settle();await h.click('Отправить письмо для подтверждения');assert.equal(h.requests[0].method,'resend');assert.equal(h.requests[0].args[0].email,'pending@mail.ru');h.dispose();
  });
  await check('Rate limit explains the cause and prevents immediate repeats',async()=>{
-  const h=harness();await h.settle();await h.enter('person@mail.ru');h.result({error:{code:'over_email_send_rate_limit',message:'redacted'}});await h.click('Отправить письмо для подтверждения');assert.match(h.text(),/Слишком частая отправка писем/);assert(h.button('Повторная отправка через 60 с').props.disabled);assert.doesNotMatch(h.text(),/Письмо отправлено на/);assert.equal(h.button('Отправить письмо для восстановления доступа'),undefined);await h.advance(60);assert(!h.button('Отправить письмо для подтверждения').props.disabled);h.dispose();
+  const h=harness();await h.settle();await h.enter('person@mail.ru');h.result({error:{code:'over_email_send_rate_limit',message:'redacted'}});await h.click('Отправить письмо для подтверждения');assert.match(h.text(),/Сервис авторизации временно ограничил отправку писем/);assert(h.button('Повтор через 60 мин.').props.disabled);assert.doesNotMatch(h.text(),/Письмо отправлено на/);assert.equal(h.button('Отправить письмо для восстановления доступа'),undefined);await h.advance(3600);assert(!h.button('Отправить письмо для подтверждения').props.disabled);h.dispose();
+ });
+ await check('The existing rate-limit pause survives a profile reload',async()=>{
+  const storage=new Map(),first=harness({storage});await first.settle();await first.enter('person@mail.ru');first.result({error:{status:429,code:'over_email_send_rate_limit',message:'redacted'}});await first.click('Отправить письмо для подтверждения');first.dispose();
+  const next=harness({storage});await next.settle();await next.enter('person@mail.ru');assert(next.button('Повтор через 60 мин.').props.disabled);assert.equal(next.requests.length,0);assert(!next.button('Проверить подтверждение').props.disabled);await next.advance(3600);assert(!next.button('Отправить письмо для подтверждения').props.disabled);next.dispose();
  });
  await check('SMTP restriction is distinct from an account conflict',async()=>{
-  const h=harness();await h.settle();await h.enter('person@mail.ru');h.result({error:{code:'email_address_not_authorized',message:'redacted'}});await h.click('Отправить письмо для подтверждения');assert.match(h.text(),/настройка отправителя/);assert.equal(h.button('Отправить письмо для восстановления доступа'),undefined);h.dispose();
+  const h=harness();await h.settle();await h.enter('person@mail.ru');h.result({error:{code:'email_address_not_authorized',message:'redacted'}});await h.click('Отправить письмо для подтверждения');assert.match(h.text(),/SMTP/);assert.equal(h.button('Отправить письмо для восстановления доступа'),undefined);h.dispose();
  });
  await check('Incomplete addresses never trigger Auth',async()=>{
   const h=harness();await h.settle();for(const address of ['@mail.ru','user@','user @mail.ru']){await h.enter(address);await h.click('Отправить письмо для подтверждения');assert.match(h.text(),/Укажите полный адрес/);}assert.equal(h.requests.length,0);h.dispose();

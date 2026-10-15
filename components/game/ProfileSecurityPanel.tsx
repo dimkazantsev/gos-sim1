@@ -5,6 +5,7 @@ import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {ProfileSetupField} from './profileSetup';
+import {describeProfileEmailError,EMAIL_RESEND_GUARD_MS} from './profileEmailDelivery';
 type LoginEmail={user_id:string;email:string;verified_at:string};
 export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnTypeRepublic;missing?:ProfileSetupField[];onChanged?:()=>void}){
  const {game,me,teacher,members}=g;
@@ -16,10 +17,28 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
  const [mailRequested,setMailRequested]=useState(false);
  const [pendingEmail,setPendingEmail]=useState('');
  const [existingEmail,setExistingEmail]=useState('');
- const [mailWait,setMailWait]=useState(0);
  const mailInFlight=useRef(false);
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
+ const [emailRetryUntil,setEmailRetryUntil]=useState(0);
+ const [now,setNow]=useState(0);
+ const retryMinutes=Math.max(0,Math.ceil((emailRetryUntil-now)/60000));
+ useEffect(()=>{
+  if(!game?.id)return;
+  try{const value=Number(window.localStorage.getItem('gos-id:auth-email-retry:'+game.id)||0);setEmailRetryUntil(Number.isFinite(value)&&value>Date.now()?value:0)}catch{setEmailRetryUntil(0)}
+  setNow(Date.now());
+ },[game?.id]);
+ useEffect(()=>{
+  if(!emailRetryUntil||emailRetryUntil<=Date.now())return;
+  const interval=window.setInterval(()=>setNow(Date.now()),30_000);
+  return()=>window.clearInterval(interval);
+ },[emailRetryUntil]);
+ function deferEmailRequest(durationMs:number){
+  if(!game?.id)return;
+  const until=Date.now()+durationMs;
+  setEmailRetryUntil(until);setNow(Date.now());
+  try{window.localStorage.setItem('gos-id:auth-email-retry:'+game.id,String(until))}catch{}
+ }
  const mine=registered.find(x=>x.user_id===me?.user_id);
  async function load(){
   if(!game)return;
@@ -49,13 +68,8 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   }else setVerified(false);
  }
  useEffect(()=>{void load()},[game?.id,me?.user_id]);
- useEffect(()=>{
-  if(mailWait<=0)return;
-  const timer=setTimeout(()=>setMailWait(n=>Math.max(0,n-1)),1000);
-  return()=>clearTimeout(timer);
- },[mailWait]);
  async function link(){
-  if(!game||busy||mailInFlight.current||mailWait>0)return;
+  if(!game||busy||mailInFlight.current||Date.now()<emailRetryUntil)return;
   const requestedEmail=email.trim().toLowerCase();
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(requestedEmail)){
    setNotice('Укажите полный адрес электронной почты, например name@mail.ru.');return;
@@ -74,11 +88,12 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
     :await supabase.auth.updateUser({email:requestedEmail},{emailRedirectTo:redirect.toString()});
    if(r.error){
     setMailRequested(false);
-    setExistingEmail(r.error.code==='email_exists'||r.error.code==='user_already_exists'?requestedEmail:'');
-    if(r.error.code==='over_email_send_rate_limit')setMailWait(60);
-    setNotice('Не удалось отправить письмо: '+userError(r.error));
+    const issue=describeProfileEmailError(r.error);
+    setExistingEmail(issue.kind==='email_exists'?requestedEmail:'');
+    if(issue.cooldownMs)deferEmailRequest(issue.cooldownMs);
+    setNotice(issue.notice);
    }else{
-    setExistingEmail('');setPendingEmail(requestedEmail);setMailRequested(true);setMailWait(60);
+    setExistingEmail('');setPendingEmail(requestedEmail);setMailRequested(true);deferEmailRequest(EMAIL_RESEND_GUARD_MS);
     setNotice('Письмо отправлено на '+requestedEmail+'. Откройте ссылку в письме, затем вернитесь сюда и нажмите «Проверить подтверждение» — независимо от того, какая страница открылась по ссылке.');
    }
   }catch(error){
@@ -111,7 +126,7 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   setBusy(false);
  }
  async function reset(targetEmail:string,personal=false){
-  if(busy||mailInFlight.current||(personal&&mailWait>0))return;
+  if(busy||mailInFlight.current||(personal&&Date.now()<emailRetryUntil))return;
   mailInFlight.current=true;
   setBusy(true);setNotice('');
   // GitHub Pages cannot serve the Next.js recovery page: use the same
@@ -120,8 +135,8 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
    (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':window.location.origin)).replace(/[/]$/,'');
   try{
    const r=await supabase.auth.resetPasswordForEmail(targetEmail,{redirectTo:origin+'/auth/update-password'});
-   setNotice(r.error?'Не удалось отправить ссылку: '+userError(r.error):'Запрос на восстановление отправлен. Если адрес зарегистрирован, на него придёт письмо со ссылкой для установки пароля. После этого войдите с почтой и личным паролем.');
-   if(personal&&(!r.error||r.error.code==='over_email_send_rate_limit'))setMailWait(60);
+   if(r.error){const issue=describeProfileEmailError(r.error);setNotice(issue.notice);if(issue.cooldownMs)deferEmailRequest(issue.cooldownMs)}
+   else{setNotice('Запрос на восстановление отправлен. Если адрес зарегистрирован, на него придёт письмо со ссылкой для установки пароля. После этого войдите с почтой и личным паролем.');if(personal)deferEmailRequest(EMAIL_RESEND_GUARD_MS)}
   }catch(error){setNotice('Не удалось отправить ссылку: '+userError(error))}
   finally{mailInFlight.current=false;setBusy(false)}
  }
@@ -132,13 +147,14 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   <p>1. Нажмите «Отправить письмо для подтверждения». 2. Откройте письмо и перейдите по ссылке. 3. Вернитесь в этот раздел и нажмите «Проверить подтверждение» — независимо от того, что открылось по ссылке. 4. После подтверждения сохраните личный пароль.</p>
   <div className="profileSecurityGrid">
    <label data-profile-setup-field="email" className={missing.includes('email')?'profileSetupInvalid':''}>Ваш адрес электронной почты<input aria-invalid={missing.includes('email')} type="email" autoComplete="email" value={email} onChange={e=>{setEmail(e.target.value);setMailRequested(false);setExistingEmail('');setNotice('')}} placeholder="Имя@пример.рф" disabled={verified||busy}/></label>
-   <button type="button" disabled={busy||verified||mailWait>0||!email.includes('@')} onClick={()=>void link()}><Mail size={17}/>{verified?'Почта подтверждена':mailWait>0?'Повторная отправка через '+mailWait+' с':mailRequested?'Отправить письмо повторно':'Отправить письмо для подтверждения'}</button>
+   <button type="button" disabled={busy||verified||!email.includes('@')||retryMinutes>0} onClick={()=>void link()}><Mail size={17}/>{verified?'Почта подтверждена':retryMinutes>0?'Повтор через '+retryMinutes+' мин.':mailRequested?'Отправить письмо повторно':'Отправить письмо для подтверждения'}</button>
    <button type="button" disabled={busy} onClick={()=>void check()}><RefreshCw size={17}/> Проверить подтверждение</button>
   </div>
   {notice&&<p className="profileSecurityNotice" role="status">{notice}</p>}
+  {retryMinutes>0&&!verified&&<p className="profileSecurityNotice" role="status">Письма временно не отправляются с этого устройства. Ожидание: примерно {retryMinutes} мин. Кнопка «Проверить подтверждение» работает независимо от этого ограничения.</p>}
   {existingEmail&&<div className="profileSecurityExisting">
    <p>Адрес уже связан с учётной записью. Восстановите доступ к ней или укажите другую почту для текущего профиля.</p>
-   <button type="button" disabled={busy||mailWait>0} onClick={()=>void reset(existingEmail,true)}><Mail size={17}/>{mailWait>0?'Повторная отправка через '+mailWait+' с':'Отправить письмо для восстановления доступа'}</button>
+   <button type="button" disabled={busy||retryMinutes>0} onClick={()=>void reset(existingEmail,true)}><Mail size={17}/>{retryMinutes>0?'Повтор через '+retryMinutes+' мин.':'Отправить письмо для восстановления доступа'}</button>
   </div>}
   {verified&&<div className={'profilePasswordFields'+(missing.includes('password')?' profileSetupInvalid':'')} data-profile-setup-field="password">
    <label>Новый личный пароль<input type="password" autoComplete="new-password" minLength={10} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Не менее 10 символов"/></label>

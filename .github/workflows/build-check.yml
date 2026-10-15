@@ -39,6 +39,8 @@ on:
       - 'app/onboarding-tour.css'
       - 'scripts/guided-tour-check.cjs'
       - 'components/game/ProfileSecurityPanel.tsx'
+      - 'components/game/profileEmailDelivery.ts'
+      - 'scripts/profile-email-rate-limit-check.cjs'
       - 'scripts/profile-email-*-check.cjs'
       - 'lib/userError.ts'
       - 'lib/supabase.ts'
@@ -220,6 +222,7 @@ jobs:
       - run: node scripts/budget-change-registry-check.cjs
       - run: node scripts/stage-readiness-manual-check.cjs
       - run: node scripts/profile-setup-and-brand-check.cjs
+      - run: node scripts/profile-email-rate-limit-check.cjs
       - run: node scripts/profile-email-layout-browser-check.cjs
       - run: node scripts/profile-chat-layout-check.cjs
       - run: node scripts/entry-qr-check.cjs
