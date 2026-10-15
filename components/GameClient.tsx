@@ -5,6 +5,7 @@ import ChatToggleButton from './game/ChatToggleButton';
 import {useEffect,useRef,useState} from 'react';
 import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
+import {useActionErrorPlacement} from './game/useActionErrorPlacement';
 import {turnCountdown} from './game/turnCountdown';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
@@ -338,6 +339,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   setScreenHistory(previous=>({entries:previous.entries.map((screen,index)=>index===previous.index&&screen.view==='votes'?{...screen,voteId:''}:screen),index:previous.index}));
  }
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
+ const actionError=useActionErrorPlacement(error,view,()=>setError(''));
 
  const genericStudent:Member|undefined=teacher&&game?{
   game_id:game.id,user_id:GENERIC_STUDENT,full_name:'Студент · предпросмотр',group_name:null,
@@ -625,8 +627,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    <div className="simContentFlow">
     {!previewMode&&g.crises.some(c=>c.status==='active')&&<section className="crisisNotice"><div><b>В республике активен кризис</b><span>{g.crises.find(c=>c.status==='active')?.crisis_type}</span></div><button className="secondary" aria-expanded={crisisExpanded} onClick={()=>setCrisisExpanded(!crisisExpanded)}>{crisisExpanded?'Свернуть штаб':'Открыть кризисный штаб'}</button>{crisisExpanded&&<div className="crisisNoticeBody"><CrisisRoom g={g}/></div>}</section>}
 
-    <main id="game-main" tabIndex={-1} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
-     {error&&<div className="errorBox closable" role="alert"><span>{error}</span><IconAction onClick={()=>setError('')} label="Закрыть сообщение об ошибке"/></div>}
+    <main id="game-main" tabIndex={-1} onClickCapture={actionError.onClickCapture} onSubmitCapture={actionError.onSubmitCapture} onChangeCapture={actionError.onChangeCapture} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
+     {error&&!actionError.localized&&<div className="errorBox closable" role="alert"><span>{error}</span><IconAction onClick={()=>setError('')} label="Закрыть сообщение об ошибке"/></div>}
+      {actionError.notice}
      {view==='dashboard'&&<DashboardView g={vg} onOpenProfile={navigateProfile} onNavigate={v=>navigate(v,v==='stages'?{stageNo:currentStage?.stage_no||game.current_round}:undefined)}/>}
      {view==='stages'&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onOpenVotes={voteId=>navigate('votes',voteId?{voteId}:undefined)} onOpenDocument={id=>navigate('documents',{documentId:id})} onCreateDocument={(templateKey,stageNo)=>navigate('documents',{templateKey,stageNo})} onNavigate={v=>navigate(v)}/>}
      {view==='parties'&&<PartiesView g={vg}/>}

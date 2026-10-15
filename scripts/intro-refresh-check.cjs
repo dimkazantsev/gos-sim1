@@ -30,6 +30,7 @@ function harness(g,storage=new Map(),rpc=async()=>({error:null})){
   if(request==='react')return react;
   if(request==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};
   if(request==='./game/useRepublicGame')return{useRepublicGame:()=>g};
+  if(request==='./game/useActionErrorPlacement')return{useActionErrorPlacement:()=>({onClickCapture:noop,onSubmitCapture:noop,onChangeCapture:noop,localized:false,notice:null})};
   if(request==='@/lib/supabase')return{supabase};
   if(request==='./ui/useDialog')return{useDialog:()=>({current:null})};
   if(request==='./game/constants')return{initials:()=> 'ТУ'};
