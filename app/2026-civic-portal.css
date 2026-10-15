@@ -200,9 +200,31 @@
 .civicPartyInviteFeedback {margin-top:12px;margin-bottom:12px;padding:11px 13px;border:1px solid #dce5f4;border-radius:10px;background:#f5f8fe;color:#31547b;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
 .civicPartyInviteFeedback.isError {border-color:#edc6ce;background:#fff6f7;color:#a32d46}
 .civicPartyInviteFeedback.isSuccess {border-color:#bedfce;background:#f3fbf7;color:#206d4a}
-.civicPartyUpload {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px;align-items:end}
-.civicPartyUpload>label {display:grid;gap:8px;font-size:13px;min-width:0}
-.civicPartyUpload button {min-height:46px;white-space:normal}
+/* Registration documents: independent form and legislative reference cards.
+   Flex wrap responds to available panel width, not just the device viewport. */
+.civicPartyUpload{display:flex;flex-wrap:wrap;align-items:stretch;gap:16px;margin-top:18px;min-width:0}
+.civicPartyUploadMain,.civicPartyUpload .partyLegalRequirements{box-sizing:border-box;min-width:0;border:1px solid #d6e1f1;border-radius:16px;padding:18px;box-shadow:0 4px 16px rgba(25,52,91,.035)}
+.civicPartyUploadMain{display:grid;align-content:start;gap:15px;flex:1.15 1 430px;background:linear-gradient(180deg,#fbfdff 0%,#f5f8fd 100%)}
+.civicPartyUploadMain>.styledSelect{min-width:0;margin:0}
+.civicPartyUploadMain .styledSelectTrigger{width:100%;min-height:52px}
+.civicPartyUploadField{display:grid;gap:8px;min-width:0;font-size:13px;font-weight:700;color:#315174;line-height:1.4}
+.civicPartyUploadField>input{box-sizing:border-box;width:100%;min-width:0;min-height:52px;margin:0;padding:12px 14px;border:1px solid #cbd8ea;border-radius:12px;background:#fff;color:#173253;font:inherit;font-weight:500;outline:none}
+.civicPartyUploadField>input:focus-visible{border-color:#547de2;box-shadow:0 0 0 3px rgba(82,125,224,.15)}
+.civicPartyUploadFile>input[type=file]{padding:9px 12px;font-size:12px;line-height:1.5}
+.civicPartyUploadFile>input[type=file]::file-selector-button{margin-right:12px;padding:9px 12px;border:1px solid #cbd9f0;border-radius:9px;background:#f0f5ff;color:#2453a5;font:inherit;font-weight:750;cursor:pointer}
+.civicPartyUploadActions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px;margin-top:2px;min-width:0}
+.civicPartyUploadActions>button{min-width:0;min-height:52px;white-space:normal;line-height:1.35}
+.civicPartyUpload .partyLegalRequirements{display:grid;align-content:start;gap:12px;flex:.85 1 300px;background:#fff}
+.civicPartyUpload .partyLegalRequirements h4{margin:0;color:#173253;font-size:14px;font-weight:800;line-height:1.5}
+.civicPartyUpload .partyLegalRequirements>a{box-sizing:border-box;display:flex;align-items:center;justify-content:center;min-width:0;min-height:52px;padding:11px 14px;border:1px solid #d6e1f1;border-radius:12px;background:#f7faff;color:#2453c1;text-align:center;text-decoration:none;font-size:13px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
+.civicPartyUpload .partyLegalRequirements>a:hover{border-color:#afc6ef;background:#edf4ff}
+.civicPartyUpload .partyLegalRequirements>a:focus-visible{outline:3px solid #7aa0ee;outline-offset:2px}
+.civicPartyUpload .partyLegalRequirements>small{color:#657d9c;font-size:12px;line-height:1.65;overflow-wrap:anywhere}
+@media(max-width:650px){
+ .civicPartyUpload{gap:12px}
+ .civicPartyUploadMain,.civicPartyUpload .partyLegalRequirements{padding:14px;border-radius:14px}
+ .civicPartyUploadActions{grid-template-columns:minmax(0,1fr)}
+}
 .civicPartyFiles {display:grid;gap:12px}
 .civicPartyFiles article {padding:12px 0;border-bottom:1px solid #dae4f1;font-size:13px;min-width:0}
 .civicPartyFiles a {display:grid;gap:6px;line-height:1.6;overflow-wrap:anywhere}
@@ -223,7 +245,7 @@
 @media(max-width:1120px){.legalPortal .formalWorkspace{grid-template-columns:minmax(0,1fr)}.legalPortal .legalRegistryRows{grid-template-columns:repeat(2,minmax(0,1fr));max-height:480px}.legalPortal .formalFilters{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){
  .legalPortal .formalHero,.legalPortal .formalCreateForm,.civicRegistration,.civicVotes .proceduralVoteCard,.civicPartyPublic{padding:18px}
- .legalPortal .legalRegistryRows,.legalPortal .formalFilters,.legalIssuerFields,.legalTemplatePicker,.legalPortal .formalRecognitionGrid,.legalPortal .formalLawLinks,.civicRegistrationSelectors,.civicVotes .voteBuilderGrid,.civicPartyUpload{grid-template-columns:minmax(0,1fr)}
+ .legalPortal .legalRegistryRows,.legalPortal .formalFilters,.legalIssuerFields,.legalTemplatePicker,.legalPortal .formalRecognitionGrid,.legalPortal .formalLawLinks,.civicRegistrationSelectors,.civicVotes .voteBuilderGrid{grid-template-columns:minmax(0,1fr)}
  .legalPortal .formalDocHeader{padding:18px}.legalPortal .formalDocHeader h2{font-size:20px}.legalPortal .legalDocumentRow{min-height:150px}.legalPortal .formalHeroActions{display:grid;grid-template-columns:minmax(0,1fr);width:100%}
  .legalPortal .formalHeroActions>*{width:100%;box-sizing:border-box;white-space:normal}.legalPortal .formalPaper h1{font-size:18px}
  .civicVotes .voteRuleStrip{grid-template-columns:minmax(0,1fr);gap:12px}.civicVotes .voteRuleStrip>div{padding-bottom:10px;border-bottom:1px solid #e2e8f2}
