@@ -40,7 +40,7 @@ assert(party.includes('disabled={busy||inviteClosed}')&&party.includes('disabled
 assert(party.includes('Приём приглашений завершён: председатель партии уже избран.'), 'Reason for disabled party invitation must be visible');
 assert(party.includes('role={inviteFeedback.kind===\'error\'?\'alert\':\'status\'}'), 'Server errors and invitation success must appear in the form');
 assert(party.includes('Приглашение отправлено: ')&&party.includes('sendPartyInvite()'), 'Successful invitations give a visible confirmation');
-assert(hook.includes('onFailure?.(r.error.message)')&&hook.includes("supabase.rpc('invite_to_party'"), 'RPC failure is passed to the invitation form without bypassing authorization');
+assert(hook.includes('onFailure(userError(r.error))')&&hook.includes("supabase.rpc('invite_to_party'"), 'RPC failure is passed to the invitation form without bypassing authorization');
 assert(party.includes("m.kind==='student'&&!m.roster_archived_at&&!m.team"),'Invitations exclude teachers, guests and archived users');
 assert(election.includes('members.length>=2&&pending.length===0'), 'Only consenting members can vote');
 assert(election.includes('gosPartyElectionSteps')&&election.includes('votesCast'), 'Styled status and vote counters');
