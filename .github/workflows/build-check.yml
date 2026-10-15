@@ -177,6 +177,9 @@ on:
       - 'components/game/partyLogoCrop.ts'
       - 'app/2026-civic-portal.css'
       - 'scripts/party-logo-editor-check.cjs'
+      - 'scripts/party-dossier-versioning-check.cjs'
+      - 'components/game/partyDocumentVersions.ts'
+      - 'supabase/migrations/*party_dossier_versions_and_embargo.sql'
       - 'components/game/GradesView.tsx'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'components/game/StagesView.tsx'
@@ -247,6 +250,7 @@ jobs:
       - run: node scripts/grade-fractional-check.cjs
       - run: node scripts/party-grades-stage-consistency-check.cjs
       - run: node scripts/party-document-visibility-check.cjs
+      - run: node scripts/party-dossier-versioning-check.cjs
       - run: node scripts/action-error-placement-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-realtime-check.cjs
