@@ -67,6 +67,18 @@ DROP TRIGGER IF EXISTS guard_party_registration_versions ON public.game_parties;
 CREATE TRIGGER guard_party_registration_versions BEFORE INSERT OR UPDATE OF registration_status
  ON public.game_parties FOR EACH ROW EXECUTE FUNCTION private.guard_party_registration_versions();
 
+-- Security-definer helper avoids recursive RLS policy evaluation.
+CREATE OR REPLACE FUNCTION private.is_latest_party_doc_version(
+ p_party_id uuid,p_kind text,p_version integer
+) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path=public,private,pg_temp AS $
+ SELECT p_version=(SELECT max(version_no) FROM public.party_documents
+                   WHERE party_id=p_party_id AND doc_kind=p_kind)
+$;
+REVOKE ALL ON FUNCTION private.is_latest_party_doc_version(uuid,text,integer)
+ FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION private.is_latest_party_doc_version(uuid,text,integer) TO authenticated;
+
 -- Only current accepted documents of registered parties are public.
 DROP POLICY IF EXISTS party_documents_read ON public.party_documents;
 CREATE POLICY party_documents_read ON public.party_documents FOR SELECT TO authenticated
@@ -87,10 +99,7 @@ CREATE POLICY party_documents_read ON public.party_documents FOR SELECT TO authe
       SELECT 1 FROM public.game_parties p
       WHERE p.id=party_documents.party_id AND p.registration_status='registered'
      )
-     AND version_no=(
-      SELECT max(d2.version_no) FROM public.party_documents d2
-      WHERE d2.party_id=party_documents.party_id AND d2.doc_kind=party_documents.doc_kind
-     )
+     AND private.is_latest_party_doc_version(party_documents.party_id,party_documents.doc_kind,party_documents.version_no)
     )
   )
  );
