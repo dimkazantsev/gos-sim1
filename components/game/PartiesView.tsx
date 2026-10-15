@@ -35,6 +35,9 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  certificateIssued=!!selected&&g.formalDocuments.some(d=>d.doc_type==='party_certificate'&&d.metadata?.party_id===selected.id),
  publicDocs=selected?.registration_status==='registered'&&certificateIssued?
   latestDocs.filter(d=>['charter','program','symbol','congress_minutes'].includes(d.doc_kind)&&d.status==='accepted'):[],free=members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&!m.team),pending=partyInvitations.filter(i=>i.party_id===selected?.id&&i.status==='pending'),inbox=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
+ const reviewedCount=DOCS.filter(kind=>latestDocs.some(d=>d.doc_kind===kind.kind&&d.status==='accepted')).length;
+ const returnedCount=DOCS.filter(kind=>latestDocs.some(d=>d.doc_kind===kind.kind&&d.status==='revision')).length;
+ const registrationSummary=selected?.registration_status==='registered'?'Регистрация завершена':selected?.registration_status==='rejected'?'В регистрации отказано':selected?.registration_status==='revision'||returnedCount>0?'Требуется доработка документов':selected?.registration_status==='submitted'?'Документы рассматриваются Минюстом':'Подготовка регистрационного пакета';
  const canInvite=partyFormationOpen&&!!selected&&!!me&&!me.roster_archived_at&&(teacher||me.kind==='student'&&me.team===selected.name);
  const inviteClosed=!!selected?.leader_user_id;
  const workflowCount=partyInvitations.filter(i=>i.game_id===g.game?.id&&i.status==='pending'&&i.invited_user_id===me?.user_id).length;
@@ -101,11 +104,20 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
    {(canEditDescription||canUploadLogo)&&<details className="civicPartyEditor"><PartyDisclosureSummary icon={PencilLine} title="Оформление партии" meta="Эмблема и публичное описание"/>{canEditDescription&&<><label>Описание<textarea rows={4} value={description||selected.description||''} onChange={e=>setDescription(e.target.value)}/></label><button className="secondary" disabled={busy} onClick={()=>void saveDescription()}>Сохранить описание</button></>}{canUploadLogo&&<PartyLogoEditor key={selected.id} partyName={selected.name} disabled={busy} onSave={saveLogo}/>}</details>}
    {(own||(selected.registration_status==='registered'&&certificateIssued))&&
     <fieldset className="gosPartyStageFieldset" disabled={!partyFormationOpen}><JusticeDocuments g={g} partyId={selected.id}/></fieldset>}
-   {own&&<details ref={registrationPackageRef} className={"civicPartyPackage"+(revisionVersions?" hasRevision":"")}><PartyDisclosureSummary icon={FileText} title="Документы и регистрация партии" meta={revisionVersions?"Требуется доработка: "+revisionVersions.split(",").length+" документ(ов)":latestDocs.length+" видов · "+docs.length+" попыток"}/>
-    <p>{selected.registration_note||'Подготовьте регистрационный пакет. Решения Минюста отражаются в карточках документов.'}</p>
+   {own&&<details ref={registrationPackageRef} className={"civicPartyPackage"+(revisionVersions?" hasRevision":"")}>
+    <PartyDisclosureSummary icon={FileText} title="Документы и регистрация партии" meta={"Принято "+reviewedCount+" из "+DOCS.length+" · "+docs.length+" версий"}/>
+    <div className="partyRegistrationOverview" role="status">
+     <div className="partyRegistrationOverviewCopy">
+      <b>{registrationSummary}</b>
+      <small>{returnedCount>0?"На доработке: "+returnedCount+". Загрузите новые версии отмеченных документов.":selected.registration_status==='registered'?"Регистрационные документы приняты. Свидетельство доступно в документах Минюста.":"Статус каждого документа указан ниже. Предыдущие версии доступны в истории."}</small>
+     </div>
+     <span className={"partyRegistrationOverviewProgress"+(returnedCount>0?" isRevision":"")}>{reviewedCount} / {DOCS.length}</span>
+    </div>
+    {selected.registration_note&&<details className="partyRegistrationDecision">
+     <summary>Полный текст решения Минюста</summary>
+     <p>{selected.registration_note}</p>
+    </details>}
     <div className="civicPartyFiles" aria-label="Регистрационные документы партии">
-     <h4>Регистрационные документы</h4>
-     <p>По каждому документу показана последняя версия. Красным отмечена версия, возвращённая Минюстом на доработку. Предыдущие попытки доступны в истории этого же документа.</p>
      {DOCS.map(kind=>{
       const current=latestPartyDocument(docs,kind.kind);
       const history=docs.filter(d=>d.doc_kind===kind.kind).sort((a,b)=>(b.version_no??1)-(a.version_no??1)||b.created_at.localeCompare(a.created_at));
@@ -132,8 +144,8 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
        {current?.status==="revision"&&<p className="partyRegistrationRevisionNote"><b>Документ возвращён на доработку.</b> {current.note||"Ознакомьтесь с решением Минюста и загрузите исправленную версию."}</p>}
        {current?.status!=="revision"&&current?.note&&<p className="partyRegistrationReviewNote">Заключение Минюста: {current.note}</p>}
        {documentNotice?.partyId===selected.id&&documentNotice.docKind===kind.kind&&<p className={"civicPartyInviteFeedback "+(documentNotice.kind==="error"?"isError":"isSuccess")} role={documentNotice.kind==="error"?"alert":"status"}>{documentNotice.message}</p>}
-       {history.length>0&&<details className="partyRegistrationDocHistory"><summary>История версий ({history.length})</summary>
-        {history.map(d=><p key={d.id}>{partyDocumentVersionLabel(d)} · {partyDocumentVerdict(d)} ·
+       {history.length>1&&<details className="partyRegistrationDocHistory"><summary>Предыдущие версии ({history.length-1})</summary>
+        {history.slice(1).map(d=><p key={d.id}>{partyDocumentVersionLabel(d)} · {partyDocumentVerdict(d)} ·
          {d.url?<a href={d.url} target="_blank" rel="noreferrer">Открыть файл</a>:"Файл недоступен"}
          {d.note&&<small> · {d.note}</small>}</p>)}
        </details>}
