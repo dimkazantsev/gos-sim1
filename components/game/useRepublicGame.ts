@@ -1065,7 +1065,7 @@ export function useRepublicGame(gameId:string){
   if(r.error||!r.data){setError(r.error?.message||'Не удалось подтвердить сохранение подписи.');return false}
   await loadPartyAssets();return true;
  }
- async function savePartyIdentity(partyId:string,description:string,file?:File){
+ async function savePartyIdentity(partyId:string,description?:string,file?:File){
   let logoPath=parties.find(x=>x.id===partyId)?.logo_path||null;
   if(file){
     const ext=(file.name.split('.').pop()||'png').toLowerCase();
@@ -1074,7 +1074,7 @@ export function useRepublicGame(gameId:string){
     if(up.error){setError(up.error.message);return false}
     logoPath=path;
   }
-  const r=await supabase.rpc('update_my_party_identity',{p_party_id:partyId,p_description:description.trim()||null,p_logo_path:logoPath});
+  const r=await supabase.rpc('update_my_party_identity',{p_party_id:partyId,p_description:description?.trim()||null,p_logo_path:logoPath});
   if(r.error){setError(r.error.message);return false}
   await loadPartyAssets();return true;
  }
