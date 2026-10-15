@@ -18,7 +18,7 @@ import {mergeChatMessages} from './chatRealtime';
 import type {GameOfficeAssignment,ChatOverview} from './types';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
-type ReadScope='all'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'offices'|'messages'|'pins';
+type ReadScope='all'|'core'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
 const BOOTSTRAP_TIMEOUT_MS=12000;
 async function within<T>(promise:PromiseLike<T>,ms=BOOTSTRAP_TIMEOUT_MS,label='Запрос к серверу'):Promise<T>{
@@ -339,7 +339,7 @@ export function useRepublicGame(gameId:string){
  async function loadCoreSections(){
   const uid=authUser.current;
   if(!uid)return;
-  const ticket=startRead('members','metrics','profiles','parties','formal','overview');
+  const ticket=startRead('core','members','metrics','profiles','parties','formal','overview');
   const [g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro]=await Promise.all([
    supabase.from('games').select('*').eq('id',gameId).maybeSingle(),
    supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle(),
@@ -357,7 +357,7 @@ export function useRepublicGame(gameId:string){
    supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}),
    supabase.rpc('has_seen_my_intro')
   ]);
-  if(!readActive(ticket))return;
+  if(!readCurrent(ticket,'core'))return;
   if(g.error||m.error){
    const code=String((g.error as {code?:string}|null)?.code||(m.error as {code?:string}|null)?.code||'');
    if(code==='PGRST116'||code==='42501'){readEpoch.current++;clearGameData();setError('Нет доступа к игре');}
@@ -382,7 +382,9 @@ export function useRepublicGame(gameId:string){
    const ids=voteRows.map(v=>v.id);
    if(ids.length){
     const ba=await supabase.from('game_ballots').select('*').in('vote_id',ids);
-    if(readActive(ticket)&&!ba.error)setBallots((ba.data||[]) as Ballot[]);
+    // Session, game or a newer core refresh may have changed during this read.
+    if(!readCurrent(ticket,'core'))return;
+    if(!ba.error)setBallots((ba.data||[]) as Ballot[]);
    }else setBallots([]);
   }
   if(!ge.error)setEvaluations((ge.data||[]) as Evaluation[]);
