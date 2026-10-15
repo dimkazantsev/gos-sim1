@@ -276,7 +276,10 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     const media=politicalMedia.filter(x=>x.post_id===p.id);
     const links=postFormalLinks.filter(x=>x.post_id===p.id).flatMap(x=>formalDocuments.filter(d=>d.id===x.formal_document_id));
     const vote=votes.find(v=>v.source_post_id===p.id||v.id===p.context?.vote_id);
-    const publicFiles=g.partyDocuments.filter(d=>p.context?.party_document_ids?.includes(d.id)&&d.url);
+    const registrationNews=p.source_key?.startsWith('media-party-registration:')&&party?.registration_status==='registered';
+    const publicFiles=g.partyDocuments.filter(d=>p.context?.party_document_ids?.includes(d.id)&&d.url&&d.status==='accepted'&&
+      (!registrationNews||['charter','program','symbol','congress_minutes'].includes(d.doc_kind)))
+      .sort((a,b)=>Number(b.doc_kind==='program')-Number(a.doc_kind==='program')||a.doc_kind.localeCompare(b.doc_kind));
     const editorialFallback=publishedStageReport(p,formalDocuments,votes);
     const displayPost=editorialFallback?{...p,...editorialFallback}:p;
     const label=p.actor_key==='teacher'?BRAND_NAME:p.actor_label,kind=p.process_type==='decision'?'Инициатива':PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
@@ -292,7 +295,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
       <PostText post={displayPost} onNavigate={onNavigate} onOpenDocument={onOpenDocument}/>
      </div>
      {media.length>0&&<div className="wallMedia">{media.map(m=>m.media_kind==='image'?<a className="processImageLink" key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer"><img src={m.url||''} alt={m.file_name} loading="lazy" decoding="async"/></a>:m.media_kind==='video'?<video key={m.id} src={m.url||''} controls preload="metadata"/>:m.media_kind==='audio'?<div className="processAudio" key={m.id}><b>{m.file_name}</b><audio src={m.url||''} controls preload="metadata"/></div>:<a className="processFileLink" key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer"><BookOpenText size={18}/><span>{m.file_name}</span></a>)}</div>}
-     {publicFiles.length>0&&<div className="processPartyFiles"><h3>Документы партии</h3>{publicFiles.map(d=><a key={d.id} href={d.url!} target="_blank" rel="noreferrer"><BookOpenText size={18}/><span>{d.title}<small>{d.file_name}</small></span></a>)}</div>}
+     {publicFiles.length>0&&<div className="processPartyFiles"><h3>{registrationNews?'Опубликованные документы партии':'Документы партии'}</h3>{publicFiles.map(d=><a key={d.id} href={d.url!} target="_blank" rel="noopener noreferrer" className={registrationNews&&d.doc_kind==='program'?'processPartyProgram':''}><BookOpenText size={18}/><span><b>{registrationNews&&d.doc_kind==='program'?'Программа политической партии «'+party.name+'»':d.doc_kind==='charter'?'Устав партии':d.doc_kind==='symbol'?'Символика партии':d.doc_kind==='congress_minutes'?'Протокол учредительного съезда':d.title}</b><small>{'Версия В'+(d.version_no??1)+' · '+d.file_name}</small></span></a>)}</div>}
      {links.length>0&&<div className="wallNpaLinks">{links.map(d=><button key={d.id} onClick={()=>onOpenDocument(d.id)}><BookOpenText size={19}/><span><small>{d.registry_no}</small><b>{d.title}</b></span><span className="processDocumentStatus">{d.status_label}</span></button>)}</div>}
      <PostChanges g={g} post={p}/>
      {!!p.tags?.length&&<div className="wallTags">{p.tags.map(t=><button key={t} onClick={()=>setSearch('#'+t)}>#{t}</button>)}</div>}
