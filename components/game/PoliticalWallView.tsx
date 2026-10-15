@@ -24,6 +24,7 @@ import PostInlineEditor from './PostInlineEditor';
 import NewsProposals from './NewsProposals';
 import {POLITICAL_POST_BATCH_SIZE,nextPoliticalPostCount,visiblePoliticalPostCount} from './politicalWallPaging';
 import {publishedStageReport} from './publishedStageReport';
+import {formalDocumentTitle} from './formalInstitutions';
 
 const PROCESS_TYPES=[
  ['statement','Заявление'],['initiative','Инициатива'],['event','Событие'],
@@ -293,7 +294,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
      </div>
      {media.length>0&&<div className="wallMedia">{media.map(m=>m.media_kind==='image'?<a className="processImageLink" key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer"><img src={m.url||''} alt={m.file_name} loading="lazy" decoding="async"/></a>:m.media_kind==='video'?<video key={m.id} src={m.url||''} controls preload="metadata"/>:m.media_kind==='audio'?<div className="processAudio" key={m.id}><b>{m.file_name}</b><audio src={m.url||''} controls preload="metadata"/></div>:<a className="processFileLink" key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer"><BookOpenText size={18}/><span>{m.file_name}</span></a>)}</div>}
      {publicFiles.length>0&&<div className="processPartyFiles"><h3>Документы партии</h3>{publicFiles.map(d=><a key={d.id} href={d.url!} target="_blank" rel="noreferrer"><BookOpenText size={18}/><span>{d.title}<small>{d.file_name}</small></span></a>)}</div>}
-     {links.length>0&&<div className="wallNpaLinks">{links.map(d=><button key={d.id} onClick={()=>onOpenDocument(d.id)}><BookOpenText size={19}/><span><small>{d.registry_no}</small><b>{d.title}</b></span><span className="processDocumentStatus">{d.status_label}</span></button>)}</div>}
+     {links.length>0&&<div className="wallNpaLinks">{links.map(d=><button key={d.id} onClick={()=>onOpenDocument(d.id)}><BookOpenText size={19}/><span><small>{d.registry_no}</small><b>{formalDocumentTitle(d.title,d.doc_type)}</b></span><span className="processDocumentStatus">{d.status_label}</span></button>)}</div>}
      <PostChanges g={g} post={p}/>
      {!!p.tags?.length&&<div className="wallTags">{p.tags.map(t=><button key={t} onClick={()=>setSearch('#'+t)}>#{t}</button>)}</div>}
      {(p.external_url||p.internal_view)&&<div className="wallLinks">{p.external_url&&<a href={p.external_url} target="_blank" rel="noreferrer"><Link2 size={16}/>Внешний ресурс</a>}{p.internal_view&&RESOURCE_VIEWS.some(v=>v.value===p.internal_view)&&<button onClick={()=>p.internal_view==='documents'&&p.internal_ref_id?onOpenDocument(p.internal_ref_id):onNavigate(p.internal_view as View)}><Link2 size={16}/>{RESOURCE_VIEWS.find(v=>v.value===p.internal_view)?.label}</button>}</div>}
