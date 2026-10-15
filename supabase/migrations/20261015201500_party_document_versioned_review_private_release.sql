@@ -25,9 +25,8 @@ RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $body$
 DECLARE p public.game_parties%rowtype;
 BEGIN
  IF TG_OP='DELETE' THEN
-  IF EXISTS(SELECT 1 FROM public.game_parties WHERE id=OLD.party_id) THEN
-   RAISE EXCEPTION 'История версий документов не удаляется' USING errcode='42501';
-  END IF;
+  -- Direct document deletion is RLS-restricted to teachers. Cascading deletion
+  -- of a whole party (also permitted to its founder) must remain possible.
   RETURN OLD;
  END IF;
  SELECT * INTO p FROM public.game_parties WHERE id=NEW.party_id FOR UPDATE;
