@@ -201,3 +201,33 @@ CREATE POLICY game_assets_read ON storage.objects FOR SELECT TO authenticated US
   ELSE private.is_game_member((split_part(name,'/',1))::uuid)
  END
 );
+
+
+-- Draft package decisions stay in the party's private dossier.
+-- Only a successful registration is issued as a public official answer/certificate.
+CREATE OR REPLACE FUNCTION public.review_party_package_privately(
+ p_party_id uuid,p_status text,p_note text DEFAULT NULL
+) RETURNS void LANGUAGE plpgsql SECURITY DEFINER
+SET search_path=public,private,pg_temp AS $$
+DECLARE p public.game_parties%rowtype;
+BEGIN
+ SELECT * INTO p FROM public.game_parties WHERE id=p_party_id FOR UPDATE;
+ IF p.id IS NULL OR NOT private.is_game_teacher(p.game_id) THEN
+  RAISE EXCEPTION 'Only the teacher may review registration documents';
+ END IF;
+ IF p.registration_status='registered' THEN
+  RAISE EXCEPTION 'Registered party status is final';
+ END IF;
+ IF p_status NOT IN ('revision','rejected') THEN
+  RAISE EXCEPTION 'Only non-public revision or rejection decisions are supported';
+ END IF;
+ IF nullif(trim(coalesce(p_note,'')),'') IS NULL THEN
+  RAISE EXCEPTION 'State the grounds for the registration-package decision';
+ END IF;
+ UPDATE public.game_parties
+ SET registration_status=p_status,registration_note=trim(p_note),
+     registration_reviewed_at=now(),registration_reviewed_by=(SELECT auth.uid())
+ WHERE id=p_party_id;
+END;$$;
+REVOKE ALL ON FUNCTION public.review_party_package_privately(uuid,text,text) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.review_party_package_privately(uuid,text,text) TO authenticated;
