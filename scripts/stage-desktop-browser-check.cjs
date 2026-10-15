@@ -47,7 +47,14 @@ async function main(){
       const status=el.querySelector('.stageAtlasCardStatus'),details=el.querySelector('.stageAtlasDetailAction');
       const vote=el.querySelector('.stageAtlasVoteAction');
       const teacherActions=[...el.querySelectorAll('.stageAtlasTeacherAction')];
+      const deadline=el.querySelector('.stageAtlasCardDeadline');
+      const fullLabel=teacherActions[0]?.querySelector('.stageAtlasActionFull');
+      const shortLabel=teacherActions[0]?.querySelector('.stageAtlasActionShort');
       return {card:box(el),status:box(status),details:box(details),vote:vote?box(vote):null,
+       deadline:{...box(deadline),scrollWidth:deadline.scrollWidth,clientWidth:deadline.clientWidth,display:getComputedStyle(deadline).display,whiteSpace:getComputedStyle(deadline).whiteSpace},
+       actions:box(el.querySelector('.stageAtlasCardActions')),
+       fullLabelDisplay:fullLabel?getComputedStyle(fullLabel).display:null,
+       shortLabelDisplay:shortLabel?getComputedStyle(shortLabel).display:null,
        teacherActions:teacherActions.map(button=>({...box(button),label:button.textContent.trim(),whiteSpace:getComputedStyle(button).whiteSpace})),
        footer:box(el.querySelector('.stageAtlasCardFooter')),
        header:box(el.querySelector('.stageAtlasCardMain')),
@@ -74,6 +81,20 @@ async function main(){
      'Details button extends beyond footer on card '+(index+1)+' at '+width+'px');
     assert(card.detailsLabel?.includes('Подробнее об этапе'),
      'Missing accessible details label on card '+(index+1));
+    assert(card.deadline.display!=='none'&&card.deadline.width>0,
+     'Deadline/phase is hidden at '+width+'px on card '+(index+1));
+    assert(card.deadline.whiteSpace==='nowrap'&&card.deadline.scrollWidth<=card.deadline.clientWidth+2,
+     'Deadline must never compress or wrap at '+width+'px: '+JSON.stringify(card.deadline));
+    assert(card.deadline.x>=card.footer.x-2&&card.deadline.right<=card.footer.right+2,
+     'Deadline extends beyond footer at '+width+'px: '+JSON.stringify(card.deadline));
+    assert(card.deadline.bottom<=card.actions.y+2||card.deadline.right<=card.actions.x+2,
+     'Stage buttons overlap deadline at '+width+'px: '+JSON.stringify(card));
+    if(card.teacherActions.length){
+     assert.equal(card.fullLabelDisplay==='none',width<=800,
+      'Full teacher label visibility must follow compact breakpoint at '+width+'px');
+     assert.equal(card.shortLabelDisplay!=='none',width<=800,
+      'Short teacher label visibility must follow compact breakpoint at '+width+'px');
+    }
     assert(card.teacherActions.length>=1,'Teacher stage actions must be present on card '+(index+1));
     for(const action of card.teacherActions){
      assert.equal(action.whiteSpace,'nowrap','Teacher control text must stay on one line at '+width+'px');
