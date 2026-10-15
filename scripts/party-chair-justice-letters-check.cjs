@@ -52,4 +52,15 @@ assert(review.includes("draft('registered')")&&review.includes("draft('rejected'
 assert(review.includes("decision==='registered'&&!ready"),'Incomplete registration stays blocked');
 assert(review.includes("note.includes('[Укажите')"),'Unverified rejection grounds prevent sending');
 assert(review.includes('g.reviewPartyRegistration('),'Official responses still require signing action');
+const {formalSignerOffice}=require('../components/game/formalInstitutions.ts');
+const signedMinjust={subject_key:'minjust',doc_type:'justice_response',metadata:{}};
+const knownOffice='Директор Департамента по делам некоммерческих организаций Министерства юстиции Российской Федерации';
+assert.equal(formalSignerOffice(signedMinjust,'Преподаватель'),knownOffice,'Teacher signs Minjust responses as the relevant official, not their access role');
+assert.equal(formalSignerOffice({...signedMinjust,doc_type:'party_certificate',metadata:{signatory_title:knownOffice}},'Преподаватель'),knownOffice,'Certificates honor their approved signatory title');
+assert.equal(formalSignerOffice({subject_key:'sf',doc_type:'sf_resolution',metadata:{}},'Преподаватель'),'Председатель Совета Федерации','Different issuing institutions imply different signature offices');
+assert.equal(formalSignerOffice({subject_key:'government',doc_type:'government_resolution',metadata:{acting_office_title:'Заместитель Председателя Правительства Российской Федерации'}},'Преподаватель'),'Заместитель Председателя Правительства Российской Федерации','Recorded acting office takes precedence');
+assert.equal(formalSignerOffice(signedMinjust,'Министр юстиции Российской Федерации'),'Министр юстиции Российской Федерации','Do not override an already recorded real office');
+assert.equal(formalSignerOffice({subject_key:'unknown',doc_type:'other',metadata:{}},'Преподаватель'),'Уполномоченное лицо','Do not invent an unsupported office');
+const paperSource=fs.readFileSync('components/game/DocumentPaper.tsx','utf8');
+assert(paperSource.includes('role=formalSignerOffice(d,metadataSigned?m.signed_role:null)'), 'All official paper signatures must resolve technical roles using document context');
 console.log('PASS: voting priority, teacher fallback, profile chair status, Minjust positive/negative templates, document guards and manual signing.');
