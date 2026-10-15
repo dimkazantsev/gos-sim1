@@ -252,3 +252,34 @@
 .regionalFixedPartyMapList>div{display:flex;align-items:center;justify-content:space-between;gap:14px;border-top:1px solid #edf1f8;padding:10px 6px;font-size:13px;color:#405979}
 .regionalFixedPartyMapList>div>b{font-size:12px;color:#294e81}
 @media(max-width:540px){.regionalFixedPartyMapList>div{flex-direction:column;align-items:flex-start;gap:4px}}
+
+
+/* ГОС.ID · партийные эмблемы: читаемые миниатюры и кадрирование силами участников. */
+.civicParties .civicPartyTileSelect {grid-template-columns:72px minmax(0,1fr);align-items:center;gap:12px}
+.civicParties .civicPartyLogo {width:72px;height:72px;aspect-ratio:1;border-radius:14px;overflow:hidden}
+.civicParties .civicPartyLogo img {display:block;width:100%;height:100%;object-fit:cover;background:#fff}
+.civicParties .civicPartyPublic>header>.civicPartyLogo {width:96px;height:96px;border-radius:18px}
+.partyLogoEditor {display:grid;gap:12px;min-width:0;margin-top:18px}
+.partyLogoFileLabel {display:grid;gap:8px;min-width:0;font-size:13px;font-weight:700;color:#315174}
+.partyLogoFileLabel input {width:100%;max-width:100%;font:inherit;font-weight:400;overflow:hidden}
+.partyLogoEditorHelp {margin:0;color:#607a99;font-size:12px;line-height:1.6}
+.partyLogoEditorWorkspace {display:grid;grid-template-columns:minmax(0,240px) minmax(200px,1fr);align-items:start;gap:20px;min-width:0}
+.partyLogoCropViewport {width:100%;max-width:240px;aspect-ratio:1/1;border:1px solid #cfdbef;border-radius:14px;overflow:hidden;background:#fff;touch-action:none;cursor:grab;box-shadow:0 6px 18px rgba(38,68,112,.08)}
+.partyLogoCropViewport:active {cursor:grabbing}
+.partyLogoCropViewport img {display:block;width:100%;height:100%;object-fit:contain;user-select:none;pointer-events:none;transform-origin:center}
+.partyLogoCropControls {display:grid;gap:12px;min-width:0}
+.partyLogoCropControls label {display:grid;gap:6px;font-size:12px;color:#456588;font-weight:650}
+.partyLogoCropControls input[type="range"] {width:100%;min-height:30px;accent-color:#527de0}
+.partyLogoCropPresets {display:flex;flex-wrap:wrap;gap:8px}
+.partyLogoCropPresets button {flex:1 1 135px;min-height:42px;font-size:12px}
+.partyLogoCropControls>.primary {min-height:44px}
+.partyLogoCropError,.partyLogoCropNotice {margin:0;font-size:12px;line-height:1.5}
+.partyLogoCropError {color:#a33f55}
+.partyLogoCropNotice {color:#226e57}
+@media(max-width:700px) {
+ .civicParties .civicPartyTileSelect {grid-template-columns:64px minmax(0,1fr)}
+ .civicParties .civicPartyTile .civicPartyLogo {width:64px;height:64px}
+ .civicParties .civicPartyPublic>header>.civicPartyLogo {width:80px;height:80px}
+ .partyLogoEditorWorkspace {grid-template-columns:minmax(0,1fr)}
+ .partyLogoCropViewport {max-width:min(100%,320px);margin-inline:auto}
+}
