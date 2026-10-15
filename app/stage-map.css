@@ -210,9 +210,10 @@
  display:block;flex:none;width:6px;height:6px;border-radius:50%;background:#d68c27
 }
 .stagesAtlas .stageAtlasCardActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
-.stagesAtlas .stageAtlasVoteAction,.stagesAtlas .stageAtlasDetailAction{
+.stagesAtlas .stageAtlasVoteAction,.stagesAtlas .stageAtlasDetailAction,.stagesAtlas .stageAtlasTeacherAction{
  display:inline-flex;align-items:center;justify-content:center;gap:8px;
- min-height:36px;margin:0;padding:0 12px;border:1px solid #dce6f0;border-radius:9px;
+ box-sizing:border-box;flex:0 0 auto;height:36px;min-height:36px;margin:0;padding:0 12px;
+ border:1px solid #dce6f0;border-radius:9px;
  background:#fff;color:#365b88;font-size:12px;font-weight:800;line-height:1;
  white-space:nowrap;cursor:pointer;transition:background .16s,border-color .16s
 }
@@ -224,6 +225,10 @@
  border-color:#d6e2fb;background:#edf3ff;color:#285bbb
 }
 .stagesAtlas .stageAtlasDetailAction:hover{border-color:#b6cdfb;background:#deeaff}
+/* Teacher actions share the size of “Подробнее”; labels remain one line. */
+.stagesAtlas .stageAtlasTeacherAction{padding:0 11px;border-color:#d6e2fb;background:#fff;color:#285bbb}
+.stagesAtlas .stageAtlasTeacherAction:hover{border-color:#b6cdfb;background:#edf3ff}
+.stagesAtlas .stageAtlasTeacherAction:focus-visible{outline:3px solid #6b8cfc;outline-offset:2px}
 .stagesAtlas .stageAtlasVoteAction svg,.stagesAtlas .stageAtlasDetailAction svg{display:block;flex:none}
 .stagesAtlas .stageAtlasEmpty{
  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
