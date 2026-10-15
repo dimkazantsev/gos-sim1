@@ -32,12 +32,13 @@ export default function PartyUnregisteredFiles({gameId,partyId,registered}:{game
   finally{if(request===latestRequest.current){setBusy(false);setLoaded(true)}}
  },[gameId,partyId,registeredPaths]);
  useEffect(()=>{void refresh();return ()=>{latestRequest.current++}},[refresh]);
- return <section aria-label="Файлы без регистрации" className="teacherPartySection">
-  <h4>Файлы без записи в реестре {files.length>0?'('+files.length+')':''}</h4>
-  <p className="teacherPartyMuted">Supabase Storage → game-assets → {gameId}/parties/{partyId}/docs/. Эти файлы не считаются поданными документами до регистрации в реестре.</p>
+ return <details aria-label="Технические загрузки без регистрации" className="teacherPartySection">
+  <summary>Технические загрузки без записи в реестре {loaded?'('+files.length+')':''}</summary>
+  <p className="teacherPartyMuted">Эти файлы сохранились в Storage, но не были зарегистрированы как документы. Они не считаются поданными; виды и названия необходимо проверять отдельно. Оригиналы сохранены.</p>
+  <p className="teacherPartyMuted">Supabase Storage → game-assets → {gameId}/parties/{partyId}/docs/.</p>
   {!loaded&&<p className="teacherPartyMuted" role="status">Проверка файлов в хранилище…</p>}
   {loaded&&files.length>0?<ul>{files.map(f=><li key={f.path}><span>{f.name}<small>Файл загружен, запись документа отсутствует</small></span>{f.url&&<a href={f.url} target="_blank" rel="noreferrer" aria-label={'Открыть файл '+f.name}><ExternalLink size={16}/></a>}</li>)}</ul>:loaded?<p className="teacherPartyMuted">Незарегистрированные файлы не обнаружены.</p>:null}
   {error&&<p role="alert">{error}</p>}
   <button type="button" className="secondary" onClick={()=>void refresh()} disabled={busy} aria-busy={busy}><RefreshCw size={14} aria-hidden="true"/>Проверить хранилище</button>
- </section>;
+ </details>;
 }

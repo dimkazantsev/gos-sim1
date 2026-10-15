@@ -405,6 +405,8 @@ export function useRepublicGame(gameId:string){
   const jobs:Promise<unknown>[]=[loadCoreSections(),loadRepublicOffices()];
   const view=activeViewRef.current;
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets());
+  // Teacher dossiers must fetch document rows, not just party representation.
+  if(view==='teacher')jobs.push(loadPartyDocuments());
   if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation());
   if(view==='documents')jobs.push(loadFormalRegistry());
   if(view==='actions'||view==='dashboard')jobs.push(loadPoliticalWall());
@@ -431,6 +433,20 @@ export function useRepublicGame(gameId:string){
   if(!readCurrent(ticket))return;
   requireSuccessful([al,pr]);
   setActivities((al.data||[]) as Activity[]);setPresence((pr.data||[]) as Presence[]);
+  });
+ }
+
+ async function loadPartyDocuments(){
+  // Separate from party identity/profile reads so the teacher's 30-second
+  // refresh doesn't re-sign every participant avatar.
+  await readSafely(['partyDocuments'],async ticket=>{
+   const pd=await supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false});
+   if(!readCurrent(ticket,'partyDocuments'))return;
+   requireSuccessful([pd]);
+   const rows=await Promise.all(((pd.data||[]) as PartyDocument[]).map(async row=>({
+    ...row,url:(await supabase.storage.from('game-assets').createSignedUrl(row.storage_path,3600)).data?.signedUrl||null
+   })));
+   if(readCurrent(ticket,'partyDocuments'))setPartyDocuments(rows);
   });
  }
 
@@ -1128,7 +1144,9 @@ export function useRepublicGame(gameId:string){
   if(!teacher){setError('Рассмотрение документов доступно только преподавателю.');return false}
   const r=await supabase.from('party_documents').update({status,note:note?.trim()||null}).eq('id',id).neq('status',status).select('id,status').maybeSingle();
   if(r.error){setError(r.error.message);return false}
-  await loadPartyAssets();if(r.data)void kickTelegramDispatch();return !!r.data;
+  await loadPartyDocuments();
+  if(r.data){notifyGameDataRefresh(gameId);void kickTelegramDispatch()}
+  return !!r.data;
  }
 
  async function createFormalDocument(data:{stageNo:number;title:string;docType:string;subjectKey:string;subjectLabel:string;bodyText:string;workflowKey:string;metadata?:Record<string,unknown>},file?:File){
