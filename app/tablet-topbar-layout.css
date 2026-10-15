@@ -213,14 +213,18 @@
     single-line toolbar, and ends ABOVE the existing mobile dock. */
  /* ChatPanel is fixed and may render in a sibling overlay context.
     Scope the hard offset to medium tablets, irrespective of ancestry. */
+ /* The legacy phone rule in 2026-interface-repair.css used a 56px header
+    and a 72px dock with !important. Keep its dock but reserve our 84px header.
+    ChatPanel's visualViewport handler supersedes these fixed fallbacks on keyboards. */
+ .simWorkspace.chatOpen .simChat.gsChatV2,
  .simWorkspace:has(.viewAsSwitcher) .simChat.gsChatV2,
  .simWorkspace .simChat.gsChatV2,
  .simChat.gsChatV2 {
   position:fixed;
-  top:84px;
-  bottom:var(--gs-mobile-dock-height);
-  height:calc(100dvh - 84px - var(--gs-mobile-dock-height));
-  max-height:none;
+  top:84px!important;
+  bottom:calc(72px + env(safe-area-inset-bottom,0px))!important;
+  height:calc(100dvh - 84px - 72px - env(safe-area-inset-bottom,0px))!important;
+  max-height:calc(100dvh - 84px - 72px - env(safe-area-inset-bottom,0px))!important;
  }
  /* The mobile dock already owns Chat below 901px; avoid duplicating its control. */
  .simWorkspace .simTop > .topChatButton {display:none}
