@@ -42,7 +42,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  async function saveDescription(){if(!selected)return;setBusy(true);try{await g.savePartyIdentity(selected.id,description||selected.description||'')}finally{setBusy(false)}}
  async function saveLogo(file:File):Promise<boolean>{if(!selected)return false;setBusy(true);try{return await g.savePartyIdentity(selected.id,undefined,file)}finally{setBusy(false)}}
  async function upload(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File){
-  if(!selected||selected.id!==partyId||!partyFormationOpen||!selected.leader_user_id||busy||uploadInFlight.current||selected.registration_status==='registered')return;
+  if(!selected||selected.id!==partyId||busy||uploadInFlight.current||selected.registration_status==='registered'||!(teacher||me?.kind==='student'&&!me.roster_archived_at&&me.team===selected.name))return;
   uploadInFlight.current=true;
   setBusy(true);setDocumentNotice(null);
   try{
@@ -109,7 +109,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
      {DOCS.map(kind=>{
       const current=latestPartyDocument(docs,kind.kind);
       const history=docs.filter(d=>d.doc_kind===kind.kind).sort((a,b)=>(b.version_no??1)-(a.version_no??1)||b.created_at.localeCompare(a.created_at));
-      const canUpload=!!selected.leader_user_id&&partyFormationOpen&&selected.registration_status!=='registered';
+      const canUpload=selected.registration_status!=='registered'&&(teacher||me?.kind==='student'&&!me.roster_archived_at&&me.team===selected.name);
       const nextVersion=(current?.version_no??0)+1;
       return <article className={"partyRegistrationDoc"+(current?.status==="revision"?" isRevision":"")} key={kind.kind}>
        <div className="partyRegistrationDocTop">
