@@ -133,7 +133,9 @@ async function main(){
    if(width>900){
     assert.equal(await chat.count(),1,'Desktop toolbar must contain Chat');
     assert.equal((await chat.locator('span').innerText()).trim(),'Чат','Desktop top bar label is Chat');
-    assert.equal(await chat.locator('span').isVisible(),width>=1500,'Only wide desktop has full Chat label; tablets keep an icon-only control');
+    const actualViewportWidth=await dashboard.locator('body').evaluate(()=>innerWidth);
+    assert.equal(await chat.locator('span').isVisible(),actualViewportWidth>=1500,
+     'Chat label visibility follows the actual iframe viewport, not the preview preset name');
    }else{
     assert.equal(await dashboard.locator('.mobileDockFixed .mobileDockChat').count(),0,'Chat must not be fixed at the right edge of the mobile dock');
      assert.equal(await dashboard.locator('.mobileDockScroll .mobileDockChat').count(),1,'Chat must scroll together with the ordinary sections');
