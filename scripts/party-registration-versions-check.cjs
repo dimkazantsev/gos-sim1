@@ -39,7 +39,8 @@ assert(!student.includes('civicPartyUploadMain'),'Do not duplicate per-document 
 assert(student.includes('uploadInputs.current[kind.kind]?.click()'),'Each row has its own upload action');
 assert(student.includes('void upload(selected.id,kind.kind,kind.title,file)'),'Chosen file must upload directly for its document kind');
 assert(student.includes('partyRegistrationHiddenInput')&&student.includes('uploadInFlight.current'),'Guard concurrent submissions');
-assert(student.includes('Замечания Минюста:')&&student.includes('История версий'));
+assert(student.includes('partyRegistrationRevisionNote')&&student.includes('История версий'));
+assert(student.includes('Документ возвращён на доработку.'),'Student must see explicit revision status and its grounds');
 assert(teacher.includes('latest?.id===d.id')&&teacher.includes('canReview&&'));
 assert(teacher.includes("reviewNotes[d.id]")&&teacher.includes("review(d.id,'revision')"));
 // Only the latest actionable attempt can be reviewed; the teacher row stays concise.
