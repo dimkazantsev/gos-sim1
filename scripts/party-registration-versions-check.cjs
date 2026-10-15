@@ -64,7 +64,7 @@ for(const expected of [
 ])assert(sql.includes(expected),'Missing integrity or privacy guard: '+expected);
 assert(!sql.includes('LIMIT 10'),'No artificial maximum attempt count');
 const css=fs.readFileSync('app/party-registration-versions.css','utf8');
-assert(css.includes('@media(max-width:650px)')&&css.includes('.partyRegistrationDocActions'));
+assert(css.includes('@media(max-width:850px)')&&css.includes('@media(max-width:420px)')&&css.includes('.partyRegistrationDocActions'));
 assert(css.includes('.partyDossierDocRow')&&css.includes('.partyRegistrationDoc.isRevision'));
 assert(css.includes('@media(max-width:850px)'),'Compact teacher rows must support narrow screens');
 console.log('PASS: V1…V250, latest-only decisions, pre-certificate privacy, SQL access guards, teacher/student controls and mobile CSS');
