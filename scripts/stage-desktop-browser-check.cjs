@@ -31,7 +31,7 @@ async function main(){
   const frame=page.frameLocator('#preview');
   await page.locator('#screen').selectOption('stages');
   await frame.locator('.stagesAtlas .stageAtlasCard').first().waitFor();
-  const widths=[1600,1440,1280,1160,1024,960,900,768,430,390,360];
+  const widths=[1600,1440,1280,1160,1024,960,900,768,720,430,390,360];
   for(const width of widths){
    await page.locator('#preview').evaluate((el,w)=>{el.style.width=w+'px'},width);
    await frame.locator('.stageAtlasCard').first().evaluate(el=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
@@ -46,7 +46,9 @@ async function main(){
      cards:cards.map(el=>{
       const status=el.querySelector('.stageAtlasCardStatus'),details=el.querySelector('.stageAtlasDetailAction');
       const vote=el.querySelector('.stageAtlasVoteAction');
+      const teacherActions=[...el.querySelectorAll('.stageAtlasTeacherAction')];
       return {card:box(el),status:box(status),details:box(details),vote:vote?box(vote):null,
+       teacherActions:teacherActions.map(button=>({...box(button),label:button.textContent.trim(),whiteSpace:getComputedStyle(button).whiteSpace})),
        footer:box(el.querySelector('.stageAtlasCardFooter')),
        header:box(el.querySelector('.stageAtlasCardMain')),
        detailsLabel:details.getAttribute('aria-label'),
@@ -72,6 +74,18 @@ async function main(){
      'Details button extends beyond footer on card '+(index+1)+' at '+width+'px');
     assert(card.detailsLabel?.includes('Подробнее об этапе'),
      'Missing accessible details label on card '+(index+1));
+    assert(card.teacherActions.length>=1,'Teacher stage actions must be present on card '+(index+1));
+    for(const action of card.teacherActions){
+     assert.equal(action.whiteSpace,'nowrap','Teacher control text must stay on one line at '+width+'px');
+     assert(Math.abs(action.height-card.details.height)<=1,
+      'Teacher control height must match “Подробнее” at '+width+'px: '+JSON.stringify(action));
+     assert(action.x>=card.footer.x-2&&action.right<=card.footer.right+2,
+      'Teacher control extends beyond footer at '+width+'px: '+JSON.stringify(action));
+     if(width===720&&!card.vote){
+      assert(Math.abs(action.centerY-card.details.centerY)<=2,
+       'Teacher controls must share one row with “Подробнее” at 720px');
+     }
+    }
     if(card.vote){
      assert(Math.abs(card.vote.centerY-card.details.centerY)<=3,
       'Voting button is not centered alongside the details action on card '+(index+1)+' at '+width+'px');
