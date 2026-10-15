@@ -70,8 +70,8 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
       const canReview=latest?.id===d.id&&['submitted','draft'].includes(d.status)&&p.registration_status!=='registered';
       return <li key={d.id} className={'partyDossierDocRow'+(d.status==='revision'?' isRevision':'')}>
        <div className="partyDossierDocMain">
-        <b>{docLabels[d.doc_kind]||'Дополнительный документ'} <small>{partyDocumentVersionLabel(d)}</small></b>
-        <span>{members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} · <time dateTime={d.created_at}>{uploadTime(d.created_at)}</time></span>
+        <b>{docLabels[d.doc_kind]||'Дополнительный документ'}</b>
+        <span><span className="partyDossierAuthorIdentity">{members.find(m=>m.user_id===d.uploaded_by)?.full_name||'Участник'} <small className="partyDossierAuthorVersion">{partyDocumentVersionLabel(d)}</small></span> · <time dateTime={d.created_at}>{uploadTime(d.created_at)}</time></span>
        </div>
        <div className="partyDossierDocControls">
         {canReview?<div className="partyDossierDocButtons">
