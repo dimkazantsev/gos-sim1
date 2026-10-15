@@ -237,7 +237,7 @@ drop policy if exists formal_documents_read on public.formal_documents;
 create policy formal_documents_read on public.formal_documents for select to authenticated
 using (
  private.is_game_member(game_id) and (
-  doc_type not in ('justice_response','party_certificate') or not (metadata ? 'party_id')
+  doc_type not in ('justice_response','party_certificate') or not coalesce(metadata ? 'party_id',false)
   or private.is_game_teacher(game_id)
   or exists(
    select 1 from public.game_parties p
@@ -254,7 +254,7 @@ create policy political_posts_read on public.political_posts for select to authe
 using (
  deleted_at is null and private.is_game_member(game_id)
  and (
-  actor_key<>'minjust' or not (context ? 'party_id')
+  actor_key is distinct from 'minjust' or not coalesce(context ? 'party_id',false)
   or private.is_game_teacher(game_id)
   or exists(select 1 from public.game_parties p
    where p.game_id=political_posts.game_id and p.id::text=political_posts.context->>'party_id'
