@@ -26,7 +26,14 @@ async function main(){
      const parts=[...el.querySelectorAll('.mobileBrand,.topScreenHistory,.simTopCenter,.viewAsSwitcher')].filter(x=>getComputedStyle(x).display!=='none').map(x=>{const a=x.getBoundingClientRect();return {name:x.className,left:a.left,right:a.right,top:a.top,bottom:a.bottom}});
      return {height:r.height,width:document.documentElement.clientWidth,parts,connection:!!el.querySelector('.connectionPill')};
     });
-    assert(header.height<=60,'Mobile header must fit one row at '+width+'px: '+JSON.stringify(header));
+    if(width<=760){
+     assert(header.height<=60,'Phone header must remain compact at '+width+'px: '+JSON.stringify(header));
+    }else{
+     assert(header.height>=82&&header.height<=85,'Tablet header must remain one 84px row at '+width+'px: '+JSON.stringify(header));
+     const centers=header.parts.map(part=>(part.top+part.bottom)/2);
+     assert(centers.every(center=>Math.abs(center-header.height/2)<=4),
+      'Tablet header parts must have the same vertical center at '+width+'px: '+JSON.stringify(header));
+    }
     assert(!header.connection,'Removed connection indicator must not remain in the mobile header');
     for(const part of header.parts)assert(part.left>=-2&&part.right<=header.width+2,'Header overflows at '+width+': '+JSON.stringify(header));
     await page.locator('#screen').selectOption('chat');
