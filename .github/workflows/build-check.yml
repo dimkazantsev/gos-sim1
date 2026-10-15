@@ -155,6 +155,10 @@ on:
       - 'components/game/useRepublicGame.ts'
       - 'components/game/PartyChairElection.tsx'
       - 'components/game/PartiesView.tsx'
+      - 'components/game/PartyLogoEditor.tsx'
+      - 'components/game/partyLogoCrop.ts'
+      - 'app/2026-civic-portal.css'
+      - 'scripts/party-logo-editor-check.cjs'
       - 'components/game/GradesView.tsx'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'components/game/StagesView.tsx'
@@ -250,6 +254,7 @@ jobs:
       - run: node scripts/styled-select-anchor-browser-check.cjs
       - run: node scripts/student-journal-layout-browser-check.cjs
       - run: node scripts/party-grades-layout-browser-check.cjs
+      - run: node scripts/party-logo-editor-check.cjs
       - run: node scripts/grade-modal-russian-layout-check.cjs
       - run: node scripts/stage-assessment-explanation-check.cjs
       - run: node scripts/profile-grades-layout-check.cjs
