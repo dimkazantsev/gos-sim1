@@ -132,3 +132,72 @@ END;$$;
 DROP TRIGGER IF EXISTS guard_party_document_review ON public.party_documents;
 CREATE TRIGGER guard_party_document_review BEFORE UPDATE ON public.party_documents
  FOR EACH ROW EXECUTE FUNCTION private.guard_party_document_review();
+
+
+-- Storage must enforce the same embargo. Existing permissive game_assets_news_visibility
+-- covered *all* non-news paths, so narrow it to news before adding the per-party rule.
+CREATE OR REPLACE FUNCTION private.can_read_party_document_asset(
+ p_game_id uuid,p_party_id uuid,p_path text
+) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path=public,private,pg_temp AS $$
+ SELECT private.is_game_member(p_game_id) AND (
+  private.is_game_teacher(p_game_id)
+  OR EXISTS(
+   SELECT 1 FROM public.game_parties p
+   JOIN public.game_members gm ON gm.game_id=p.game_id AND gm.team=p.name
+   WHERE p.id=p_party_id AND p.game_id=p_game_id
+     AND gm.user_id=(SELECT auth.uid()) AND gm.roster_archived_at IS NULL
+  )
+  OR EXISTS(
+   SELECT 1 FROM public.party_documents d
+   JOIN public.game_parties p ON p.id=d.party_id AND p.game_id=d.game_id
+   WHERE d.game_id=p_game_id AND d.party_id=p_party_id
+    AND d.storage_path=p_path AND p.registration_status='registered'
+    AND d.status='accepted'
+    AND d.doc_kind=ANY(ARRAY['charter','program','symbol','congress_minutes'])
+    AND private.is_latest_party_doc_version(d.party_id,d.doc_kind,d.version_no)
+  )
+ );
+$$;
+REVOKE ALL ON FUNCTION private.can_read_party_document_asset(uuid,uuid,text) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION private.can_read_party_document_asset(uuid,uuid,text) TO authenticated;
+
+DROP POLICY IF EXISTS game_assets_news_visibility ON storage.objects;
+CREATE POLICY game_assets_news_visibility ON storage.objects FOR SELECT TO authenticated
+ USING (
+  bucket_id='game-assets'
+  AND split_part(name,'/',2)='news'
+  AND (
+   split_part(name,'/',3)=(SELECT auth.uid())::text
+   OR private.is_game_teacher((split_part(name,'/',1))::uuid)
+   OR EXISTS(
+    SELECT 1 FROM public.political_post_media pm
+    JOIN public.political_posts pp ON pp.id=pm.post_id
+    WHERE pm.storage_path=name AND pp.deleted_at IS NULL
+      AND private.is_game_member(pp.game_id)
+   )
+  )
+ );
+
+DROP POLICY IF EXISTS game_assets_read ON storage.objects;
+CREATE POLICY game_assets_read ON storage.objects FOR SELECT TO authenticated USING (
+ bucket_id='game-assets'
+ AND CASE
+  WHEN name ~ '^[^/]+/parties/[^/]+/docs/[^/]+$'
+  THEN private.can_read_party_document_asset(
+   (split_part(name,'/',1))::uuid,
+   (split_part(name,'/',3))::uuid,
+   name
+  )
+  WHEN name ~ '^[^/]+/profiles/[^/]+/signature-[^/]+[.]png$'
+  THEN (
+   split_part(name,'/',3)=(SELECT auth.uid())::text
+   OR private.is_game_teacher((split_part(name,'/',1))::uuid)
+   OR EXISTS(
+    SELECT 1 FROM public.formal_document_signatures fs
+    WHERE fs.signature_path=name AND private.is_game_member(fs.game_id)
+   )
+  )
+  ELSE private.is_game_member((split_part(name,'/',1))::uuid)
+ END
+);
