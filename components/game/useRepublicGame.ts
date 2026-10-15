@@ -16,6 +16,7 @@ import {currentGameMembers,currentGameProfiles} from './gameRoster';
 import {resolveChatChannelId,visibleChatChannels} from './chatChannelSelection';
 import {mergeChatMessages} from './chatRealtime';
 import type {GameOfficeAssignment,ChatOverview} from './types';
+import {partyDocumentLatest} from './partyDocumentAttempts';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
 type ReadScope='all'|'core'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'offices'|'messages'|'pins';
@@ -443,8 +444,10 @@ export function useRepublicGame(gameId:string){
    const pd=await supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false});
    if(!readCurrent(ticket,'partyDocuments'))return;
    requireSuccessful([pd]);
-   const rows=await Promise.all(((pd.data||[]) as PartyDocument[]).map(async row=>({
-    ...row,url:(await supabase.storage.from('game-assets').createSignedUrl(row.storage_path,3600)).data?.signedUrl||null
+   const documentRows=(pd.data||[]) as PartyDocument[];
+   const activeIds=new Set(partyDocumentLatest(documentRows).map(row=>row.id));
+   const rows=await Promise.all(documentRows.map(async row=>({
+    ...row,url:activeIds.has(row.id)?(await supabase.storage.from('game-assets').createSignedUrl(row.storage_path,3600)).data?.signedUrl||null:null
    })));
    if(readCurrent(ticket,'partyDocuments'))setPartyDocuments(rows);
   });
@@ -468,7 +471,9 @@ export function useRepublicGame(gameId:string){
    if(readCurrent(ticket,'profiles'))setProfiles(rows);
   }
   if(readCurrent(ticket,'partyDocuments')){
-   const rows=await Promise.all(((pd.data||[]) as PartyDocument[]).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
+   const documentRows=(pd.data||[]) as PartyDocument[];
+   const activeIds=new Set(partyDocumentLatest(documentRows).map(row=>row.id));
+   const rows=await Promise.all(documentRows.map(async x=>({...x,url:activeIds.has(x.id)?(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null:null})));
    if(readCurrent(ticket,'partyDocuments'))setPartyDocuments(rows);
   }
   });
@@ -1140,6 +1145,17 @@ export function useRepublicGame(gameId:string){
   void kickTelegramDispatch();
   return true;
  }
+ async function openPartyDocument(document:PartyDocument):Promise<void>{
+  // Historical attempts are signed only when explicitly opened. This keeps
+  // Storage calls bounded even after dozens of revisions by 40 participants.
+  const tab=window.open('about:blank','_blank');
+  const {data,error}=await supabase.storage.from('game-assets').createSignedUrl(document.storage_path,300);
+  if(error||!data?.signedUrl){
+   tab?.close();setError(error?.message||'Нет доступа к этой версии документа.');return;
+  }
+  if(tab)tab.location.replace(data.signedUrl);
+  else window.location.assign(data.signedUrl);
+ }
  async function reviewPartyDocument(id:string,status:'accepted'|'revision',note?:string):Promise<boolean>{
   if(!teacher){setError('Рассмотрение документов доступно только преподавателю.');return false}
   const r=await supabase.from('party_documents').update({status,note:note?.trim()||null}).eq('id',id).neq('status',status).select('id,status').maybeSingle();
@@ -1343,5 +1359,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
+  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,openPartyDocument,reviewPartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }
