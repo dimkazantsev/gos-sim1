@@ -33,7 +33,7 @@ const server=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const registrar=fs.readFileSync('components/game/PartyJusticeReview.tsx','utf8');
 assert(student.includes("publicDocs=selected?.registration_status==='registered'&&certificateIssued?"));
 assert(student.includes("latestDocs.filter(d=>")&&student.includes("d.status==='accepted'"));
-assert(student.includes('Регистрационные документы')&&student.includes('Загрузить В'+"\"+nextVersion}"));
+assert(student.includes('Регистрационные документы')&&student.includes('"Загрузить В"+nextVersion'));
 assert(!student.includes('partyRegistrationUpdates'),'Do not duplicate the document list in a second status feed');
 assert(!student.includes('civicPartyUploadMain'),'Do not duplicate per-document upload with another upload form');
 assert(student.includes('uploadInputs.current[kind.kind]?.click()'),'Each row has its own upload action');
