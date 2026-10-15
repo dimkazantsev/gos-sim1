@@ -15,14 +15,48 @@
 .partyRegistrationDoc>details {padding:10px;border:1px solid #e4eaf2;border-radius:10px;min-width:0}
 .partyRegistrationDoc>details summary {font-size:12px;font-weight:700;color:#365f96;cursor:pointer}
 .partyRegistrationDoc>details p {margin:10px 0 0;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
-.teacherPartySection .civicDocReview {display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;width:100%}
-.teacherPartySection .civicDocReview>label {flex:1 1 260px;min-width:0}
-.teacherPartySection .civicDocReview textarea {box-sizing:border-box;display:block;width:100%;min-width:0;max-width:100%;padding:10px;border:1px solid #c9d8ef;border-radius:9px;font:inherit}
-.teacherPartySection .civicDocReview button {flex:0 1 auto;min-height:44px;white-space:normal}
-@media(max-width:650px) {
- .partyRegistrationDoc>header {align-items:flex-start}
- .partyRegistrationDocActions {display:grid;grid-template-columns:minmax(0,1fr)}
- .partyRegistrationDocActions>* {width:100%;box-sizing:border-box}
- .teacherPartySection .civicDocReview {display:grid;grid-template-columns:minmax(0,1fr)}
- .teacherPartySection .civicDocReview>label,.teacherPartySection .civicDocReview>button {width:100%;min-width:0}
+/* Compact teacher review: one document and its actions on one row. */
+.teacherPartyDossiers .partyDossierDocHint {margin:5px 0 10px;color:#64768c;font-size:12px;line-height:1.5}
+.teacherPartyDossiers .teacherPartySection ul>li.partyDossierDocRow {
+ display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 12px;
+ min-width:0;padding:10px 12px;border:1px solid #e1e8f2;border-radius:11px;background:#fff
+}
+.teacherPartyDossiers .teacherPartySection ul>li.partyDossierDocRow.isRevision {border-color:#e8a9af;background:#fff6f6}
+.partyDossierDocMain {display:grid;gap:4px;min-width:0}
+.partyDossierDocMain>b {display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0;color:#193b64;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+.partyDossierDocMain>b>small {color:#5a7598;font-size:11px;font-weight:700;white-space:nowrap}
+.partyDossierDocMain>span {color:#61758f;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.partyDossierDocMain time {font-variant-numeric:tabular-nums}
+.partyDossierDocControls {display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
+.partyDossierDocOpen {display:grid;place-items:center;flex:none;width:36px;height:36px;border:1px solid #dbe5f4;border-radius:9px;color:#335e97;background:#f7faff}
+.partyDossierDocOpen:hover {background:#e9f1ff}
+.partyDossierDocButtons {display:flex;flex-wrap:wrap;gap:6px}
+.teacherPartyDossiers .partyDossierDocButtons>button {width:auto;min-height:36px;padding:7px 11px;border-radius:9px;font-size:12px;line-height:1.25}
+.partyDossierDocState {display:inline-block;padding:6px 9px;border-radius:8px;background:#eef4fc;color:#2c5d91;font-size:12px;font-weight:700;white-space:nowrap}
+.partyDossierDocState.isRevision {background:#ffeaec;color:#ab2736}
+.partyDossierRevisionEditor {grid-column:1/-1;display:grid;gap:8px;padding:11px;border:1px solid #f0c9cc;border-radius:10px;background:#fffafa;min-width:0}
+.partyDossierRevisionEditor label {display:grid;gap:6px;font-size:12px;font-weight:700;color:#842936}
+.partyDossierRevisionEditor textarea {box-sizing:border-box;display:block;width:100%;max-width:100%;min-width:0;min-height:65px;padding:9px;border:1px solid #d3a9ae;border-radius:8px;font:inherit;color:inherit;resize:vertical}
+.partyDossierRevisionActions {display:flex;flex-wrap:wrap;gap:8px}
+.teacherPartyDossiers .partyDossierRevisionActions button {min-height:36px;padding:7px 12px;font-size:12px}
+.partyDossierDocRemark {grid-column:1/-1;margin:0;color:#8b3440;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.teacherPartyDossiers .partyDossierDocRow>.civicPartyInviteFeedback {grid-column:1/-1;margin:0}
+.civicPartyPackage.hasRevision>.civicPartyDisclosureSummary {background:#fff2f3;border-color:#e7adb2}
+.civicPartyPackage.hasRevision .civicPartyDisclosureText small {color:#a52332;font-weight:700}
+.civicPartyFiles .partyRegistrationDoc.isRevision {border-color:#e5a4ac;background:#fff4f5;box-shadow:0 0 0 1px #f4d2d5 inset}
+.partyRegistrationDoc.isRevision>header>b {color:#992332}
+.partyRegistrationDoc.isRevision>header>span {background:#ffe1e5;color:#a92235}
+.partyRegistrationDoc.isRevision .partyRegistrationRevisionNote {background:#ffe7e9;border-left-color:#cd3645;color:#8e2430}
+.partyRegistrationUpdates article:has(span:first-of-type) {min-width:0}
+@media(max-width:850px) {
+ .teacherPartyDossiers .teacherPartySection ul>li.partyDossierDocRow {grid-template-columns:minmax(0,1fr)}
+ .partyDossierDocControls {justify-content:flex-start;flex-wrap:wrap}
+ .partyDossierDocButtons {flex:1 1 auto}
+ .teacherPartyDossiers .partyDossierDocButtons>button {flex:1 1 auto;min-width:105px}
+}
+@media(max-width:420px) {
+ .partyDossierDocControls {align-items:stretch}
+ .partyDossierDocButtons {width:100%}
+ .partyDossierDocButtons>button {min-width:0}
+ .partyDossierRevisionActions>button {flex:1 1 auto}
 }

@@ -2,7 +2,7 @@
 import JusticeDocuments from './JusticeDocuments';
 import PartyChairElection from './PartyChairElection';
 import {isStageWorkOpen} from './stageWorkStatus';
-import {useMemo,useRef,useState,type ComponentType} from 'react';
+import {useEffect,useMemo,useRef,useState,type ComponentType} from 'react';
 import {latestPartyDocuments,latestPartyDocument,partyDocumentVersionLabel,partyDocumentVerdict} from './partyDocumentVersions';
 import {IconAction} from '../ui/IconAction';
 import {ChevronDown,FileText,PencilLine,Plus,Trash2,UserPlus,UsersRound} from 'lucide-react';
@@ -21,6 +21,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const [selectedId,setSelectedId]=useState(''),[query,setQuery]=useState(''),[description,setDescription]=useState(''),[busy,setBusy]=useState(false),[docKind,setDocKind]=useState<PartyDocument['doc_kind']>('application'),[docFile,setDocFile]=useState<File|null>(null),[docTitle,setDocTitle]=useState(''),[inviteUser,setInviteUser]=useState(''),[name,setName]=useState(''),[ideology,setIdeology]=useState('');
  const [deletingPartyId,setDeletingPartyId]=useState('');
  const uploadInput=useRef<HTMLInputElement>(null);
+ const registrationPackageRef=useRef<HTMLDetailsElement>(null);
  const [documentNotice,setDocumentNotice]=useState<{partyId:string;kind:'success'|'error';message:string}|null>(null);
  const [inviteFeedback,setInviteFeedback]=useState<{partyId:string;kind:'success'|'error';message:string}|null>(null);
  const stageOne=g.stages.find(s=>s.stage_no===1);
@@ -29,12 +30,14 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const ranked=useMemo(()=>[...parties].filter(p=>!query.trim()||[p.name,p.ideology,p.description].join(' ').toLowerCase().includes(query.toLowerCase())).sort((a,b)=>b.support-a.support),[parties,query]);
  const selected=parties.find(p=>p.id===selectedId)||parties.find(p=>p.name===me?.team)||ranked[0],own=!!selected&&(teacher||selected.name===me?.team),canEditDescription=partyFormationOpen&&!!selected&&(teacher||selected.leader_user_id===me?.user_id),canUploadLogo=partyFormationOpen&&!!selected&&(teacher||me?.kind==='student'&&!me.roster_archived_at&&selected.name===me.team),staff=members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&m.team===selected?.name),leader=members.find(m=>m.user_id===selected?.leader_user_id),docs=partyDocuments.filter(d=>d.party_id===selected?.id),
  latestDocs=latestPartyDocuments(docs),
+ revisionVersions=latestDocs.filter(d=>d.status==='revision').map(d=>d.id).sort().join(','),
  certificateIssued=!!selected&&g.formalDocuments.some(d=>d.doc_type==='party_certificate'&&d.metadata?.party_id===selected.id),
  publicDocs=selected?.registration_status==='registered'&&certificateIssued?
   latestDocs.filter(d=>['charter','program','symbol','congress_minutes'].includes(d.doc_kind)&&d.status==='accepted'):[],free=members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&!m.team),pending=partyInvitations.filter(i=>i.party_id===selected?.id&&i.status==='pending'),inbox=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  const canInvite=partyFormationOpen&&!!selected&&!!me&&!me.roster_archived_at&&(teacher||me.kind==='student'&&me.team===selected.name);
  const inviteClosed=!!selected?.leader_user_id;
  const workflowCount=partyInvitations.filter(i=>i.game_id===g.game?.id&&i.status==='pending'&&i.invited_user_id===me?.user_id).length;
+ useEffect(()=>{if(revisionVersions&&registrationPackageRef.current)registrationPackageRef.current.open=true;},[revisionVersions,selected?.id]);
  async function saveDescription(){if(!selected)return;setBusy(true);try{await g.savePartyIdentity(selected.id,description||selected.description||'')}finally{setBusy(false)}}
  async function saveLogo(file:File):Promise<boolean>{if(!selected)return false;setBusy(true);try{return await g.savePartyIdentity(selected.id,undefined,file)}finally{setBusy(false)}}
  async function upload(){
@@ -100,7 +103,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
    {(canEditDescription||canUploadLogo)&&<details className="civicPartyEditor"><PartyDisclosureSummary icon={PencilLine} title="Оформление партии" meta="Эмблема и публичное описание"/>{canEditDescription&&<><label>Описание<textarea rows={4} value={description||selected.description||''} onChange={e=>setDescription(e.target.value)}/></label><button className="secondary" disabled={busy} onClick={()=>void saveDescription()}>Сохранить описание</button></>}{canUploadLogo&&<PartyLogoEditor key={selected.id} partyName={selected.name} disabled={busy} onSave={saveLogo}/>}</details>}
    {(own||(selected.registration_status==='registered'&&certificateIssued))&&
     <fieldset className="gosPartyStageFieldset" disabled={!partyFormationOpen}><JusticeDocuments g={g} partyId={selected.id}/></fieldset>}
-   {own&&<details className="civicPartyPackage"><PartyDisclosureSummary icon={FileText} title="Документы и регистрация партии" meta={latestDocs.length+' видов · '+docs.length+' попыток'}/><p>{selected.registration_note||'Подготовьте документы. Преподаватель увидит загруженные файлы в управлении фракциями.'}</p><div className="civicPartyFiles" aria-label="Загруженные документы партии">
+   {own&&<details ref={registrationPackageRef} className={"civicPartyPackage"+(revisionVersions?" hasRevision":"")}><PartyDisclosureSummary icon={FileText} title="Документы и регистрация партии" meta={revisionVersions?"Требуется доработка: "+revisionVersions.split(",").length+" документ(ов)":latestDocs.length+" видов · "+docs.length+" попыток"}/><p>{selected.registration_note||'Подготовьте документы. Преподаватель увидит загруженные файлы в управлении фракциями.'}</p><div className="civicPartyFiles" aria-label="Загруженные документы партии">
     <h4>История рассмотрения: {docs.length} попыток</h4>
     <p>Каждая повторная загрузка сохраняется как отдельная версия. До выдачи свидетельства документы видят только члены партии и Минюст.</p>
     <div className="partyRegistrationUpdates" role="status" aria-label="Уведомления о проверках Минюста">
@@ -113,8 +116,8 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
     {DOCS.map(kind=>{
      const current=latestPartyDocument(docs,kind.kind);
      const history=docs.filter(d=>d.doc_kind===kind.kind).sort((a,b)=>(b.version_no??1)-(a.version_no??1)||b.created_at.localeCompare(a.created_at));
-     return <article className="partyRegistrationDoc" key={kind.kind}>
-      <header><b>{kind.title}</b><span>{current?partyDocumentVersionLabel(current)+' · '+partyDocumentVerdict(current):'Не загружен'}</span></header>
+     return <article className={"partyRegistrationDoc"+(current?.status==="revision"?" isRevision":"")} key={kind.kind}>
+      <header><b>{kind.title}</b><span role={current?.status==="revision"?"alert":undefined}>{current?partyDocumentVersionLabel(current)+" · "+partyDocumentVerdict(current):"Не загружен"}</span></header>
       {current?.note&&<p className="partyRegistrationRevisionNote">Заключение Минюста: {current.note}</p>}
       <div className="partyRegistrationDocActions">
        {current?.url&&<a href={current.url} target="_blank" rel="noreferrer">Просмотреть {partyDocumentVersionLabel(current)}</a>}
