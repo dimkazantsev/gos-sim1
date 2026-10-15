@@ -37,6 +37,14 @@ assert(student.includes('История рассмотрения')&&student.incl
 assert(student.includes('Замечания Минюста:')&&student.includes('История версий'));
 assert(teacher.includes('latest?.id===d.id')&&teacher.includes('canReview&&'));
 assert(teacher.includes("reviewNotes[d.id]")&&teacher.includes("review(d.id,'revision')"));
+// Only the latest actionable attempt can be reviewed; the teacher row stays concise.
+assert(teacher.includes('partyDossierDocRow')&&teacher.includes('<time dateTime={d.created_at}>'));
+assert(teacher.includes("review(d.id,'accepted')")&&teacher.includes("review(d.id,'revision')"));
+assert(teacher.includes('revisionFor===d.id&&canReview&&'),'Notes must open on demand');
+assert(teacher.includes('partyDossierRevisionActions'),'An explicit confirmation is required');
+assert(!teacher.includes('{d.title} · {d.file_name}'),'No long upload filename in teacher row');
+assert(student.includes('partyRegistrationDoc"+(current?.status==="revision"?" isRevision":"")'),'Only the latest returned document highlights red');
+assert(student.includes('registrationPackageRef.current.open=true'),'Revision must reveal party dossier');
 assert(server.includes(".in('status',['submitted','draft'])"));
 assert(registrar.includes('latestPartyDocuments(docs)'));
 const sql=fs.readFileSync('supabase/migrations/20261015211500_party_registration_versions_and_privacy.sql','utf8');
@@ -57,4 +65,6 @@ for(const expected of [
 assert(!sql.includes('LIMIT 10'),'No artificial maximum attempt count');
 const css=fs.readFileSync('app/party-registration-versions.css','utf8');
 assert(css.includes('@media(max-width:650px)')&&css.includes('.partyRegistrationDocActions'));
+assert(css.includes('.partyDossierDocRow')&&css.includes('.partyRegistrationDoc.isRevision'));
+assert(css.includes('@media(max-width:850px)'),'Compact teacher rows must support narrow screens');
 console.log('PASS: V1…V250, latest-only decisions, pre-certificate privacy, SQL access guards, teacher/student controls and mobile CSS');
