@@ -1045,18 +1045,25 @@ export function useRepublicGame(gameId:string){
  async function updatePartyStatistics(
   partyId:string,
   values:{rating:number|null;support:number;mandates:number},
-  expected:{rating:number|null;support:number;mandates:number}
+  expected:{rating:number|null;support:number;mandates:number},
+  onFailure?:(message:string)=>void
  ){
-  if(!teacher){setError('Требуются права преподавателя.');return false}
-  const r=await supabase.rpc('teacher_update_party_statistics',{
-   p_party_id:partyId,
-   p_rating:values.rating,p_support:values.support,p_mandates:values.mandates,
-   p_expected_rating:expected.rating,p_expected_support:expected.support,p_expected_mandates:expected.mandates
-  });
-  if(r.error){setError(r.error.message);return false}
-  await loadPartyRepresentation();
-  notifyGameDataRefresh(gameId);
-  return true;
+  function report(message:string){if(onFailure)onFailure(message);else setError(message)}
+  if(!teacher){report('Изменять показатели партий может только преподаватель.');return false}
+  try{
+   const r=await supabase.rpc('teacher_update_party_statistics',{
+    p_party_id:partyId,
+    p_rating:values.rating,p_support:values.support,p_mandates:values.mandates,
+    p_expected_rating:expected.rating,p_expected_support:expected.support,p_expected_mandates:expected.mandates
+   });
+   if(r.error){report(r.error.message||'Не удалось сохранить показатели.');return false}
+   await loadPartyRepresentation();
+   notifyGameDataRefresh(gameId);
+   return true;
+  }catch(error){
+   report(error instanceof Error?error.message:'Сервер не ответил. Повторите попытку.');
+   return false;
+  }
  }
  async function inviteToParty(partyId:string,userId:string,onFailure?:(message:string)=>void){
   try{

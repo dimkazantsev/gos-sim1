@@ -149,6 +149,9 @@ on:
       - 'app/party-registration-versions.css'
       - 'supabase/migrations/20261015211500_party_registration_versions_and_privacy.sql'
       - 'components/game/TeacherPartyDossiers.tsx'
+      - 'components/game/TeacherPartyStatistics.tsx'
+      - 'scripts/teacher-party-statistics-write-check.cjs'
+      - 'supabase/migrations/20261016140400_party_rating_change_note_guard.sql'
       - 'components/game/PartyUnregisteredFiles.tsx'
       - 'components/game/turnCountdown.ts'
       - 'app/turn-countdown.css'
@@ -270,6 +273,8 @@ jobs:
       - run: node scripts/party-grades-stage-consistency-check.cjs
       - run: node scripts/party-document-visibility-check.cjs
       - run: node scripts/party-registration-versions-check.cjs
+      - name: Teacher party rating and support write regression
+        run: node scripts/teacher-party-statistics-write-check.cjs
       - name: Student and teacher document revision contract
         run: node scripts/party-document-revision-flow-check.cjs
       - name: Actual party Storage upload and replacement policies
