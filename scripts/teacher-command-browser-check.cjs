@@ -147,6 +147,19 @@ async function check(){
      path:path.join(screenshots,'teacher-stages-'+width+'.png'),animations:'disabled'
     });
    }
+   if([1440,900,390].includes(width)){
+    const closedStage=frame.locator('.teacherStageListItem.is-locked,.teacherStageListItem.is-completed').first();
+    assert(await closedStage.count()>0,'A closed or completed stage must be selectable for opening');
+    await closedStage.click();
+    const measure=await frame.locator('.teacherStageInspectorActions').evaluate(root=>{
+     const open=root.querySelector('.teacherStageOpenFull')?.getBoundingClientRect();
+     const procedures=root.querySelector('.teacherStageProcedures')?.getBoundingClientRect();
+     return open&&procedures?{openWidth:open.width,procedureWidth:procedures.width,openLeft:open.left,procedureLeft:procedures.left}:null;
+    });
+    assert(measure&&Math.abs(measure.openWidth-measure.procedureWidth)<=2&&Math.abs(measure.openLeft-measure.procedureLeft)<=2,
+     'Open stage and Open procedures must align at '+width+'px: '+JSON.stringify(measure));
+    await frame.locator('.teacherStageListItem.is-open').first().click();
+   }
    console.log('PASS '+width+'px: 16 stable list rows, contextual reset, twelve workspaces, no overflow');
   }
   for(const [screen,selector] of [
