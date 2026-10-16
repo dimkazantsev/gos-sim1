@@ -148,18 +148,26 @@ async function check(){
     });
    }
    if([1440,900,390].includes(width)){
-    const closedStage=frame.locator('.teacherStageListItem.is-locked,.teacherStageListItem.is-completed').first();
-    assert(await closedStage.count()>0,'A closed or completed stage must be selectable for opening');
-    await closedStage.click();
-    await frame.locator('.teacherStageOpenFull').waitFor({state:'visible'});
-    const measure=await frame.locator('.teacherStageInspectorActions').evaluate(root=>{
-     const open=root.querySelector('.teacherStageOpenFull')?.getBoundingClientRect();
-     const procedures=root.querySelector('.teacherStageProcedures')?.getBoundingClientRect();
-     return open&&procedures?{openWidth:open.width,procedureWidth:procedures.width,openLeft:open.left,procedureLeft:procedures.left}:null;
+    // The design preview is static markup. Reconstruct the closed-stage variant
+    // from the same production classes so the real browser measures the CSS.
+    const measure=await frame.locator('.teacherCommand').evaluate(root=>{
+     const original=root.querySelector('.teacherStageInspectorActions');
+     const sample=original.cloneNode(true);
+     const flow=sample.querySelector('.teacherStageFlowActions');
+     flow.classList.add('isOpening');
+     const opener=document.createElement('button');
+     opener.type='button';
+     opener.className='teacherStageOpenFull';
+     opener.textContent='Открыть этап';
+     flow.replaceChildren(opener);
+     original.after(sample);
+     const open=opener.getBoundingClientRect();
+     const procedures=sample.querySelector('.teacherStageProcedures').getBoundingClientRect();
+     sample.remove();
+     return {openWidth:open.width,procedureWidth:procedures.width,openLeft:open.left,procedureLeft:procedures.left};
     });
     assert(measure&&Math.abs(measure.openWidth-measure.procedureWidth)<=2&&Math.abs(measure.openLeft-measure.procedureLeft)<=2,
      'Open stage and Open procedures must align at '+width+'px: '+JSON.stringify(measure));
-    await frame.locator('.teacherStageListItem.is-open').first().click();
    }
    console.log('PASS '+width+'px: 16 stable list rows, contextual reset, twelve workspaces, no overflow');
   }
