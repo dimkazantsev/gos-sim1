@@ -1,21 +1,31 @@
 /* ГОС.ID · One continuous white header and teacher navigation.
    Preserve the established content width and its responsive side gutters. */
 .simWorkspace:has(.teacherCommand) {
- --gs-teacher-tabs-height:74px;
+ --gs-teacher-tabs-height:62px;
+}
+/* A fixed opaque rail covers the side gutters when the inset tabs stick.
+   Unlike a scrolling gradient, it does not expose moving cards on scroll. */
+.simWorkspace:has(.teacherCommand)::before {
+ content:"";
+ position:fixed;
+ top:var(--gs-top-h,84px);
+ left:var(--gs-sidebar-w,264px);
+ right:0;
+ height:var(--gs-teacher-tabs-height);
+ z-index:53;
+ background:#fff;
+ pointer-events:none;
 }
 .simWorkspace:has(.teacherCommand) > .simTop {
  background:#fff;
  backdrop-filter:none;
 }
-/* Paint the entire width behind the inset tabs, not an exposed grey stripe. */
+/* Reserve no space above the tabs; the fixed white rail hides moving content. */
 .simWorkspace:has(.teacherCommand) .simContentFlow {
  padding-top:0!important;
- background:linear-gradient(
-  to bottom,
-  #fff 0,
-  #fff var(--gs-teacher-tabs-height),
-  transparent var(--gs-teacher-tabs-height)
- );
+}
+.simWorkspace:has(.teacherCommand) .simMain > .teacherCommand {
+ animation:none;
 }
 .simWorkspace:has(.teacherCommand) .simMain {
  padding-top:0!important;
@@ -48,7 +58,7 @@
  min-height:var(--gs-teacher-tabs-height);
  max-height:var(--gs-teacher-tabs-height);
  margin:0;
- padding:8px 12px;
+ padding:6px 12px;
  border:0;
  border-bottom:1px solid #dce6f1;
  border-radius:0;
@@ -58,15 +68,10 @@
  overflow-y:hidden;
  overscroll-behavior-x:contain;
  scroll-snap-type:none;
- scrollbar-width:thin;
- scrollbar-color:#c6d4e7 transparent;
+ scrollbar-width:none;
 }
 .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav::-webkit-scrollbar {
- height:4px;
-}
-.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav::-webkit-scrollbar-thumb {
- background:#c6d4e7;
- border-radius:8px;
+ display:none;
 }
 /* Cards below the navigation retain their own round corners and breathing room. */
 .simWorkspace:has(.teacherCommand) .teacherCommand .teacherCommandBar {
@@ -77,11 +82,14 @@
 }
 @media(max-width:760px) {
  .simWorkspace:has(.teacherCommand) {
-  --gs-teacher-tabs-height:66px;
+  --gs-teacher-tabs-height:60px;
+ }
+ .simWorkspace:has(.teacherCommand)::before {
+  top:56px;
  }
  .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav {
   top:56px;
-  padding:6px 10px;
+  padding:5px 10px;
  }
  .simWorkspace:has(.teacherCommand) .teacherCommand .teacherCommandBar {
   margin-top:10px;
