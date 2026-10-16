@@ -13,6 +13,8 @@ create table if not exists public.institution_meeting_records(
  minutes_body text,
  minutes_prepared_by uuid,
  minutes_saved_at timestamptz,
+ minutes_approved_at timestamptz,
+ minutes_approved_by uuid,
  delegate_user_id uuid,
  updated_at timestamptz not null default now(),
  primary key(game_id,stage_no,institution_key)
@@ -123,13 +125,15 @@ begin
  else
   update public.institution_meeting_records set minutes_document_id=v_doc,
    minutes_body=btrim(p_body),minutes_prepared_by=uid,minutes_saved_at=now(),
-   updated_at=now() where game_id=p_game_id and stage_no=p_stage_no and institution_key=p_institution;
-  update public.formal_documents set status_code='published',status_label='Протокол заседания',
-   current_owner_key='system',updated_at=now() where id=v_doc;
+   minutes_approved_by=case when v_manager then uid else null end,
+   minutes_approved_at=case when v_manager then now() else null end,updated_at=now() where game_id=p_game_id and stage_no=p_stage_no and institution_key=p_institution;
+  update public.formal_documents set status_code=case when v_manager then 'published' else 'draft' end,
+   status_label=case when v_manager then 'Протокол утверждён' else 'Проект протокола' end,
+   current_owner_key=case when v_manager then 'system' else v_subject end,updated_at=now() where id=v_doc;
  end if;
  insert into public.formal_document_history(document_id,game_id,actor_id,action,to_status,to_owner,note)
  values(v_doc,p_game_id,uid,case when p_kind='agenda' then 'Подготовлена повестка заседания' else 'Составлен протокол заседания' end,
-  case when p_kind='agenda' and not v_manager then 'draft' else 'published' end,
+  case when not v_manager then 'draft' else 'published' end,
   case when v_manager then 'system' else v_subject end,'Этап '||p_stage_no||', орган '||p_institution);
  return v_doc;
 end;$$;
@@ -153,6 +157,43 @@ begin
 end;$$;
 revoke all on function public.approve_institution_meeting_agenda(uuid,integer,text) from public,anon;
 grant execute on function public.approve_institution_meeting_agenda(uuid,integer,text) to authenticated;
+
+-- A coordinator may entrust preparation to a member even after the agenda was approved.
+create or replace function public.assign_institution_meeting_secretary(p_game_id uuid,p_stage_no integer,p_institution text,p_delegate uuid)
+returns void language plpgsql security definer set search_path=public,private,pg_temp as $
+declare uid uuid:=auth.uid();
+begin
+ if uid is null or not private.can_coordinate_institution_meeting(p_game_id,p_institution,uid) then
+  raise exception 'Назначение исполнителя доступно только председателю';end if;
+ if p_delegate is not null and not private.vote_member_has_office(p_game_id,p_delegate,p_institution) then
+  raise exception 'Исполнитель не входит в состав органа';end if;
+ insert into public.institution_meeting_records(game_id,stage_no,institution_key,delegate_user_id)
+ values(p_game_id,p_stage_no,p_institution,p_delegate)
+ on conflict(game_id,stage_no,institution_key) do update set
+ delegate_user_id=excluded.delegate_user_id,updated_at=now();
+end;$;
+revoke all on function public.assign_institution_meeting_secretary(uuid,integer,text,uuid) from public,anon;
+grant execute on function public.assign_institution_meeting_secretary(uuid,integer,text,uuid) to authenticated;
+
+create or replace function public.approve_institution_meeting_minutes(p_game_id uuid,p_stage_no integer,p_institution text)
+returns void language plpgsql security definer set search_path=public,private,pg_temp as $
+declare uid uuid:=auth.uid();m public.institution_meeting_records%rowtype;
+begin
+ if uid is null or not private.can_coordinate_institution_meeting(p_game_id,p_institution,uid) then
+  raise exception 'Утвердить протокол может только председатель или преподаватель';end if;
+ select * into m from public.institution_meeting_records
+ where game_id=p_game_id and stage_no=p_stage_no and institution_key=p_institution for update;
+ if m.minutes_document_id is null or length(btrim(coalesce(m.minutes_body,'')))<30 then
+  raise exception 'Сначала подготовьте протокол заседания';end if;
+ if exists(select 1 from public.game_votes where game_id=p_game_id and stage_no=p_stage_no and institution_key=p_institution and status='open') then
+  raise exception 'Перед подписанием протокола закройте голосования';end if;
+ update public.institution_meeting_records set minutes_approved_by=uid,minutes_approved_at=now(),updated_at=now()
+ where game_id=p_game_id and stage_no=p_stage_no and institution_key=p_institution;
+ update public.formal_documents set status_code='published',status_label='Протокол утверждён',
+ current_owner_key='system',updated_at=now() where id=m.minutes_document_id;
+end;$;
+revoke all on function public.approve_institution_meeting_minutes(uuid,integer,text) from public,anon;
+grant execute on function public.approve_institution_meeting_minutes(uuid,integer,text) to authenticated;
 
 -- Keep registration role checks unchanged and add a server-side agenda gate.
 create or replace function public.register_institution_session_at_stage(p_game_id uuid,p_institution text,p_stage_no integer)
