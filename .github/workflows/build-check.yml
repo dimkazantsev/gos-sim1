@@ -245,6 +245,7 @@ jobs:
       - run: node scripts/profile-email-delivery-check.cjs
       - run: node scripts/intro-refresh-check.cjs
       - run: node scripts/stage-comic-check.cjs
+      - run: node scripts/ksrf-proposal-queue-check.cjs
       - run: node scripts/brand-overview-check.cjs
       - run: node scripts/overview-live-posts-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
