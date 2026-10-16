@@ -28,7 +28,8 @@ export function useBudgetPulse(gameId:string,enabled:boolean){
   alive.current=true;setPulse(null);setError('');
   if(!enabled)return()=>{alive.current=false;request.current++;};
   void refresh();
-  const timer=setInterval(()=>{if(document.visibilityState==='visible')void refresh();},20000);
+  // Realtime handles live changes; stagger the recovery poll for full classrooms.
+  const timer=setInterval(()=>{if(document.visibilityState==='visible')void refresh();},30000+Math.floor(Math.random()*10000));
   const resume=()=>{if(document.visibilityState==='visible')void refresh();};
   document.addEventListener('visibilitychange',resume);
   let pending:ReturnType<typeof setTimeout>|undefined;
