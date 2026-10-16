@@ -1197,3 +1197,26 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
    min-width:210px;
  }
 }
+
+.electoralQueueNotice{margin:12px 0;padding:12px 14px;border:1px solid #b5cef5;border-radius:12px;background:#f1f6ff;color:#244c83}
+.electoralRejectionReason{color:#9d3845;font-size:12px;line-height:1.55}
+.electoralCorrection{display:flex;flex-wrap:wrap;align-items:end;gap:10px;margin:12px 0;padding:14px;border:1px solid #dde6f7;border-radius:12px;background:#f8fbff}
+.electoralCorrection label{display:grid;flex:1 1 240px;gap:7px;min-width:0;color:#526985;font-size:13px}
+.electoralCorrection input{width:100%;min-width:0;box-sizing:border-box;min-height:44px}
+.electoralCorrection button{min-height:44px;flex:0 1 auto}
+@media(max-width:600px){.electoralCorrection button{width:100%}}
+
+/* Stage-level institutional agenda and minutes belong to the same registration flow. */
+.civicMeetingDocuments{display:grid;gap:12px;margin:14px 0;padding:15px;border:1px solid #d9e5f5;border-radius:14px;background:#f8fbff;min-width:0}
+.civicMeetingDocuments>header,.civicMeetingMinutes>header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:start}
+.civicMeetingDocuments>header>div{display:grid;gap:4px}
+.civicMeetingDocuments :is(header b,.civicMeetingMinutes header b){color:#193a69;font-size:15px}
+.civicMeetingDocuments :is(header span,header small){color:#5c7394;font-size:12px;line-height:1.5}
+.civicMeetingDocuments label{display:grid;gap:6px;min-width:0;color:#365476;font-size:13px;font-weight:600}
+.civicMeetingDocuments textarea{width:100%;min-width:0;box-sizing:border-box;border:1px solid #bccfea;border-radius:10px;padding:12px;resize:vertical;background:#fff;color:#203d66;line-height:1.5;font:inherit}
+.civicMeetingDocuments>button,.civicMeetingMinutes>button{justify-self:start;min-height:44px}
+.civicMeetingDelegate{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
+.civicMeetingDelegate>label,.civicMeetingDelegate>.styledSelect{flex:1 1 225px;min-width:0}
+.civicMeetingDelegate>button{min-height:44px}
+.civicMeetingMinutes{display:grid;gap:12px;padding-top:12px;border-top:1px solid #d9e5f5}
+@media(max-width:620px){.civicMeetingDocuments{padding:12px}.civicMeetingDocuments>button,.civicMeetingMinutes>button,.civicMeetingDelegate>button{width:100%}}
