@@ -26,8 +26,8 @@ const vk=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
    "create table institution_units(id uuid,game_id uuid,head_user_id uuid);"+
    "create table game_members(game_id uuid,user_id uuid,role_title text);"+
    "create table test_applied_transitions(vote_id uuid,actor uuid);"+
-   "create function private.is_budget_document(p_document uuid) returns boolean language sql stable as $select false$;"+
-   "create function private.is_game_member(p_game uuid) returns boolean language sql stable as $select auth.uid() is not null$;"+
+   "create function private.is_budget_document(p_document uuid) returns boolean language sql stable as $$select false$$;"+
+   "create function private.is_game_member(p_game uuid) returns boolean language sql stable as $$select auth.uid() is not null$$;"+
    "create function private.can_close_procedural_vote(g uuid,u uuid,i text,d uuid) returns boolean language sql stable as $$select u='"+teacher+"'::uuid$$;"+
    "create function private.vote_total_eligible_weight(v game_votes) returns numeric language sql stable as $$select (v.electorate_snapshot->>'eligible')::numeric$$;"+
    "create function private.vote_present_weight(v game_votes) returns numeric language sql stable as $$select coalesce((select sum((v.electorate_snapshot->'weights'->>r.user_id::text)::numeric) from institution_session_registrations r where r.game_id=v.game_id and r.stage_no=v.stage_no and r.institution_key=v.institution_key),0)$$;"+
