@@ -252,6 +252,11 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [completingProfile,setCompletingProfile]=useState(false);
  const [onboardingNotice,setOnboardingNotice]=useState('');
  const [setupStatus,setSetupStatus]=useState<ProfileSetupStatus|null>(null);
+ const [setupStatusScope,setSetupStatusScope]=useState('');
+ const [verifiedSetupScope,setVerifiedSetupScope]=useState('');
+ const autoFinalizeAttempt=useRef('');
+ const pendingProfileNavigation=useRef<{view:View;target?:{stageNo?:number;documentId?:string;voteId?:string;templateKey?:string}}|null>(null);
+ const profileScope=gameId+':'+(g.me?.user_id||'');
  const [setupChecking,setSetupChecking]=useState(false);
  const [setupPromptBusy,setSetupPromptBusy]=useState(false);
  const [setupWelcomeActive,setSetupWelcomeActive]=useState(false);
@@ -312,8 +317,18 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  function navigate(next:View,target?:{stageNo?:number;documentId?:string;voteId?:string;templateKey?:string},profileVerified=false,fromTourClick=false){
   const owner=g.me;
   const p=g.profiles.find(row=>row.user_id===owner?.user_id);
-  if(!profileVerified&&owner&&owner.kind!=='observer'&&navigationHydrated&&g.profilesLoaded&&!p?.onboarding_completed_at&&!introOpen&&next!=='profile'&&tourMode!=='tour'){
-   setOnboardingNotice('Сначала завершите оформление личного профиля.');
+  if(!profileVerified&&owner&&owner.kind!=='observer'&&navigationHydrated&&g.profilesLoaded&&!p?.onboarding_completed_at&&verifiedSetupScope!==profileScope&&!introOpen&&next!=='profile'&&tourMode!=='tour'){
+   // All fields can be ready while the server completion flag is still absent.
+   // Preserve the requested section until the existing secure RPC validates it.
+   if(setupStatusScope===profileScope&&setupStatus&&!setupStatus.completed&&setupStatus.missing.length===0){
+    pendingProfileNavigation.current={view:next,target};
+    setOnboardingNotice('Проверяем завершение профиля. После проверки откроется выбранный раздел.');
+    return;
+   }
+   pendingProfileNavigation.current=null;
+   const missing=setupStatusScope===profileScope&&setupStatus?.missing.length?setupStatus.missing.map(key=>PROFILE_SETUP_LABELS[key]).join(', '):'обязательные сведения';
+   setOnboardingNotice('Чтобы открыть разделы игры, завершите настройку профиля. Требуется: '+missing+'.');
+   setSelectedProfileId('');
    next='profile';
   }
   if(fromTourClick&&tourMode==='tour'){
@@ -364,7 +379,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    await g.refresh();
   }
  });
- const onboardingRequired=!!me&&!observer&&!myProfile?.onboarding_completed_at;
+ const onboardingRequired=!!me&&!observer&&!myProfile?.onboarding_completed_at&&verifiedSetupScope!==profileScope;
  function rememberTourChoice(choice:'accepted'|'skipped'|'completed'){
   if(!game||!me)return;
   try{window.localStorage.setItem('gos-id:tour-choice:v1:'+game.id+':'+me.user_id,choice)}catch{/* The tutorial is optional. */}
@@ -403,12 +418,16 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(token!==setupRequest.current)return;
   if(r.error||!validProfileSetupStatus(r.data)){
    setOnboardingNotice('Не удалось проверить полноту профиля. Повторите проверку в профиле.');
-  }else setSetupStatus(r.data);
+  }else{
+   setSetupStatus(r.data);
+   setSetupStatusScope(game.id+':'+me.user_id);
+   if(r.data.completed)setVerifiedSetupScope(game.id+':'+me.user_id);
+  }
   setSetupChecking(false);
  }
  useEffect(()=>{
   if(!game||!me||observer||g.loading||!g.profilesLoaded||!navigationHydrated||!introSeen||previewMode){
-   setupRequest.current++;setSetupStatus(null);return;
+   setupRequest.current++;setSetupStatus(null);setSetupStatusScope('');return;
   }
   void loadProfileSetup();
   return()=>{setupRequest.current++};
@@ -430,7 +449,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    setSetupStatus(prev=>prev?{...prev,prompt_seen:true}:prev);
   });
  },[game?.id,me?.user_id,introSeen,introOpen,previewMode,tourMode,onboardingRequired,setupStatus?.completed,setupStatus?.prompt_seen,setupChecking]);
- const showSetupWelcome=!!onboardingRequired&&setupWelcomeActive&&!!setupStatus&&!setupStatus.completed&&introSeen&&!introOpen&&!previewMode&&tourMode==='idle';
+ const showSetupWelcome=!!onboardingRequired&&setupWelcomeActive&&!!setupStatus&&setupStatusScope===profileScope&&!setupStatus.completed&&setupStatus.missing.length>0&&introSeen&&!introOpen&&!previewMode&&tourMode==='idle';
  const setupDialogRef=useDialog(showSetupWelcome,()=>{});
  const tourChoiceDialogRef=useDialog(tourMode==='choice'&&!introOpen,()=>{});
  async function goToIncompleteProfile(){
@@ -496,9 +515,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  useEffect(()=>{
   // Never interpret a temporarily missing profile row during initial loading
   // as an incomplete onboarding. Doing so overwrites the restored screen on F5.
-  if(!game||!me||g.loading||!g.profilesLoaded||!navigationHydrated||navigationRestored||me.kind==='observer'||introOpen||!introSeen||tourMode!=='idle'||myProfile?.onboarding_completed_at)return;
+  if(!game||!me||g.loading||!g.profilesLoaded||!navigationHydrated||navigationRestored||me.kind==='observer'||introOpen||!introSeen||tourMode!=='idle'||!onboardingRequired||setupStatusScope===profileScope&&setupStatus?.missing.length===0)return;
   if(view!=='profile')navigate('profile');
- },[game?.id,me?.user_id,g.loading,g.profilesLoaded,navigationHydrated,navigationRestored,introSeen,myProfile?.onboarding_completed_at,introOpen,tourMode,view]);
+ },[game?.id,me?.user_id,g.loading,g.profilesLoaded,navigationHydrated,navigationRestored,introSeen,onboardingRequired,setupStatusScope,setupStatus?.missing.length,introOpen,tourMode,view]);
  async function completeOnboarding(){
   if(!game||!me||completingProfile)return;
   setCompletingProfile(true);setOnboardingNotice('');
