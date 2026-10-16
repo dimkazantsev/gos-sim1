@@ -68,7 +68,7 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
    String(r.assessed),String(r.approved),String(r.posts),String(r.documents),String(r.votes),String(r.activity)])];
   const contents=values.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');
   const blob=new Blob(['\ufeff'+contents],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='gos-sims-participants.csv';a.click();URL.revokeObjectURL(url);
+  const a=document.createElement('a');a.href=url;a.download='gos-id-participants.csv';a.click();URL.revokeObjectURL(url);
  }
  if(!teacher)return null;
  return <section className="participantsAnalytics">
