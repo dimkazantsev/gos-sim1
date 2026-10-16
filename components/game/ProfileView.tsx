@@ -129,6 +129,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  }
  if(tasksOpen&&game&&me)return <AssignedTasks gameId={game.id} userId={me.user_id} teacher={teacher} members={members} onBack={()=>setTasksOpen(false)}/>;
  return <div className="profilePage">
+  {own&&setupNotice&&<p className="profileSetupFeedback" role="status">{setupNotice}</p>}
   <section className="profileHero">
    <div className="profilePhoto">
     <ProfileAvatar key={target.user_id} src={photoPreview||targetProfile?.avatar_url} name={target.full_name} gender={own?gender:targetProfile?.gender}/>
@@ -207,8 +208,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
 
   <section className="profileGrid">
    {own&&<article className="surface profileEditor" id="profile-setup-editor">
-    <div className="surfaceHead"><div><small>О СЕБЕ В ИГРЕ</small><h2>Игровая визитка</h2></div></div>{!targetProfile?.onboarding_completed_at&&<div className={'profileOnboardingHint'+(setupMissing.length?' isIncomplete':'')} role="status"><strong>{setupMissing.length?'Профиль заполнен не полностью':'Обязательная настройка профиля'}</strong><p>{setupMissing.length?'Заполните отмеченные красным поля. После сохранения нажмите «Закончить настройку» здесь.':'Проверьте ФИО, пол, описание, подпись, почту и личный пароль.'}</p>{setupMissing.length>0&&<div className="profileSetupMissingList">{setupMissing.map(k=><span key={k}>{PROFILE_SETUP_LABELS[k]}</span>)}</div>}</div>}
-    {setupNotice&&<p className="profileSetupFeedback" role="status">{setupNotice}</p>}
+    <div className="surfaceHead"><div><small>О СЕБЕ В ИГРЕ</small><h2>Игровая визитка</h2></div></div>{!targetProfile?.onboarding_completed_at&&<div className={'profileOnboardingHint'+(setupMissing.length?' isIncomplete':'')} role="status"><strong>{setupMissing.length?'Профиль заполнен не полностью':'Проверка завершения профиля'}</strong><p>{setupMissing.length?'Заполните отмеченные красным поля. После сохранения нажмите «Закончить настройку» здесь.':'Все обязательные сведения указаны. Система проверяет завершение настройки; при необходимости используйте кнопку «Закончить настройку».'}</p>{setupMissing.length>0&&<div className="profileSetupMissingList">{setupMissing.map(k=><span key={k}>{PROFILE_SETUP_LABELS[k]}</span>)}</div>}</div>}
     <label data-profile-setup-field="name" className={'profileFullNameField'+(needs('name')?' profileSetupInvalid':'')}>Фамилия, имя и отчество<input aria-invalid={needs('name')} autoComplete="name" value={fullName} onChange={e=>setFullName(e.target.value)} minLength={5} placeholder="Иванов Иван Иванович"/></label>
     <p className="profileHint">Опишите свою игровую должность, интересы и компетенции. Этот текст смогут прочитать другие участники.</p>
     <div data-profile-setup-field="gender" className={needs('gender')?'profileSetupInvalid':''}><StyledSelect label="Пол для оформления аватара" value={gender} onChange={v=>setGender(v as typeof gender)} options={[{value:"unspecified",label:"Выберите пол"},{value:"male",label:"Мужской"},{value:"female",label:"Женский"}]}/>{needs('gender')&&<small className="profileSetupFieldError">Обязательное поле</small>}</div>

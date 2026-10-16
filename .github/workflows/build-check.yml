@@ -142,6 +142,7 @@ on:
       - 'scripts/overview-live-posts-check.cjs'
       - 'scripts/npa-toolbar-alignment-browser-check.cjs'
       - 'components/GameClient.tsx'
+      - 'scripts/profile-navigation-auto-complete-check.cjs'
       - 'components/game/useActionErrorPlacement.tsx'
       - 'scripts/action-error-placement-check.cjs'
       - 'scripts/vote-office-grants-check.cjs'
@@ -269,6 +270,7 @@ jobs:
       - run: node scripts/stage-readiness-manual-check.cjs
       - run: node scripts/party-stage-status-copy-check.cjs
       - run: node scripts/profile-setup-and-brand-check.cjs
+      - run: node scripts/profile-navigation-auto-complete-check.cjs
       - run: node scripts/profile-email-rate-limit-check.cjs
       - run: node scripts/profile-email-layout-browser-check.cjs
       - run: node scripts/profile-chat-layout-check.cjs
