@@ -5,7 +5,7 @@ import {isStageWorkOpen} from './stageWorkStatus';
 import {useEffect,useMemo,useRef,useState,type ComponentType} from 'react';
 import {latestPartyDocuments,latestPartyDocument,partyDocumentVersionLabel,partyDocumentVerdict} from './partyDocumentVersions';
 import {IconAction} from '../ui/IconAction';
-import {ChevronDown,FileText,PencilLine,Plus,Trash2,UserPlus,UsersRound} from 'lucide-react';
+import {BookOpen,ChevronDown,ExternalLink,FileText,PencilLine,Plus,Trash2,Upload,UserPlus,UsersRound} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import ProfileAvatar from './ProfileAvatar';
 import PartyLogoEditor from './PartyLogoEditor';
@@ -43,7 +43,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  async function saveDescription(){if(!selected)return;setBusy(true);try{await g.savePartyIdentity(selected.id,description||selected.description||'')}finally{setBusy(false)}}
  async function saveLogo(file:File):Promise<boolean>{if(!selected)return false;setBusy(true);try{return await g.savePartyIdentity(selected.id,undefined,file)}finally{setBusy(false)}}
  async function upload(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File){
-  if(!selected||selected.id!==partyId||busy||uploadInFlight.current||selected.registration_status==='registered'||!(teacher||me?.kind==='student'&&!me.roster_archived_at&&me.team===selected.name))return;
+  if(!partyFormationOpen||!selected||selected.id!==partyId||busy||uploadInFlight.current||selected.registration_status==='registered'||!(teacher||me?.kind==='student'&&!me.roster_archived_at&&me.team===selected.name))return;
   uploadInFlight.current=true;
   setBusy(true);setDocumentNotice(null);
   try{
@@ -90,7 +90,18 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
   <section className="civicPartyTiles" aria-label="Публичные партии">{ranked.map(p=><article className={selected?.id===p.id?'civicPartyTile active':'civicPartyTile'} key={p.id}><button type="button" className="civicPartyTileSelect" onClick={()=>{setSelectedId(p.id);setDescription(p.description||'');setInviteUser('');setInviteFeedback(null)}}><span className="civicPartyLogo" style={{background:p.color}}>{p.logo_url?<img src={p.logo_url} alt=""/>:p.name.slice(0,1)}</span><span className="civicPartyTileCopy"><b>{p.name}</b><small>{p.ideology||'Идеология не указана'}</small><small>{statusLabel[p.registration_status]}</small></span><span className="civicPartyTileStats"><b>{p.support}%</b> поддержка · <b>{p.mandates}</b> мандатов</span></button>{canDeleteParty(p)&&<button type="button" className="civicPartyDelete" aria-label={'Удалить партию «'+p.name+'»'} title={teacher?'Удалить партию':'Удалить свою партию до регистрации'} disabled={deletingPartyId===p.id} onClick={()=>void removeParty(p)}>{deletingPartyId===p.id?<span aria-hidden="true">…</span>:<Trash2 size={17}/>}</button>}</article>)}{!ranked.length&&<p>Партии не найдены.</p>}</section>
   {selected&&<section className="civicPartyPublic"><header><span className="civicPartyLogo" style={{background:selected.color}}>{selected.logo_url?<img src={selected.logo_url} alt={'Эмблема: '+selected.name}/>:selected.name.slice(0,1)}</span><div><h2>{selected.name}</h2><p>{selected.ideology||'Идеология не указана'}</p></div><span>{statusLabel[selected.registration_status]}</span></header><p className="civicPartyDescription">{selected.description||'Публичное описание пока не опубликовано.'}</p><div className="civicPartyFacts"><span><b>{selected.support}%</b> поддержка</span><span><b>{selected.mandates}</b> мандатов</span><span><b>{staff.length}</b> участников</span></div>
    <div className="civicPartyLeader"><span className="eventVoter"><ProfileAvatar name={leader?.full_name||'Не назначен'} src={profiles.find(p=>p.user_id===leader?.user_id)?.avatar_url}/></span><div><small>Председатель партии</small><b>{leader?.full_name||'Не назначен'}</b></div></div>
-   <PartyChairElection g={g} party={selected}/><section className="civicPublicDocs"><h3>Публичные документы</h3>{publicDocs.find(d=>d.doc_kind==='program')&&<div className="civicPartyProgram"><h4>Программа политической партии</h4>{publicDocs.filter(d=>d.doc_kind==='program').map(d=><a key={d.id} href={d.url||undefined} target="_blank" rel="noreferrer"><div><b>{d.title}</b><small>{d.file_name}</small></div><span>Открыть программу</span></a>)}</div>}{publicDocs.length?publicDocs.filter(d=>d.doc_kind!=='program').map(d=><a key={d.id} href={d.url||undefined} target="_blank" rel="noreferrer"><div><b>{DOCS.find(x=>x.kind===d.doc_kind)?.title||d.title}</b><span>{d.title}</span><small>{d.file_name}</small></div><span>Открыть</span></a>):<p>Документы появятся после принятия последних версий всего регистрационного пакета, решения о регистрации и выдачи свидетельства.</p>}</section>
+   <PartyChairElection g={g} party={selected}/>
+   <section className="civicPublicDocs" aria-label="Публичные документы партии"><h3>Публичные документы</h3>
+    {publicDocs.length?[...publicDocs].sort((a,b)=>Number(b.doc_kind==='program')-Number(a.doc_kind==='program')).map(d=>{
+     const program=d.doc_kind==='program';
+     const title=program?'Программа политической партии':DOCS.find(kind=>kind.kind===d.doc_kind)?.title||d.title;
+     return <a key={d.id} className={'civicPublicDocument'+(program?' civicPartyProgram':'')+(!d.url?' isUnavailable':'')} href={d.url||undefined} aria-disabled={!d.url} target="_blank" rel="noreferrer">
+      <span className="civicPublicDocumentIcon" aria-hidden="true">{program?<BookOpen size={21}/>:<FileText size={21}/>}</span>
+      <span className="civicPublicDocumentCopy"><b>{title}</b>{d.title!==title&&<span>{d.title}</span>}<small>{partyDocumentVersionLabel(d)} · {d.file_name}</small></span>
+      <span className="civicPublicDocumentOpen">{d.url?<><span>{program?'Открыть программу':'Открыть'}</span><ExternalLink size={16} aria-hidden="true"/></>:<span>{d.url_loading?'Подготовка ссылки…':'Ссылка недоступна'}</span>}</span>
+     </a>;
+    }):<p>Документы появятся после принятия последних версий всего регистрационного пакета, решения о регистрации и выдачи свидетельства.</p>}
+   </section>
    {canInvite&&<details className="civicPartyEditor" data-party-invite-panel><PartyDisclosureSummary icon={UserPlus} title="Пригласить участника" meta={inviteClosed?'Приём закрыт. Председатель избран.':'Ожидают ответа: '+pending.length+' · приглашать можно только студентов'}/>
     {inviteClosed&&<p className="civicPartyInviteFeedback" role="status">Приём приглашений завершён: председатель партии уже избран. Новые приглашения запрещены правилами первого этапа.</p>}
     <StyledSelect label="Студент" value={inviteUser} onChange={value=>{setInviteUser(value);setInviteFeedback(null)}} disabled={busy||inviteClosed} options={[{value:'',label:'Выберите участника'},...free.map(m=>({value:m.user_id,label:m.full_name}))]}/>
@@ -123,19 +134,19 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
            accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp"
            ref={node=>{uploadInputs.current[kind.kind]=node}}
            onChange={event=>{const file=event.currentTarget.files?.[0];event.currentTarget.value='';if(file)void upload(selected.id,kind.kind,kind.title,file)}}/>
-          <button type="button" className="secondary" disabled={busy} onClick={()=>uploadInputs.current[kind.kind]?.click()}>
-           {busy?"Загрузка…":"Загрузить В"+nextVersion}
+          <button type="button" className="secondary" disabled={busy||!partyFormationOpen} aria-label={"Загрузить "+kind.title+" · версия В"+nextVersion} onClick={()=>uploadInputs.current[kind.kind]?.click()}>
+           <Upload size={16} aria-hidden="true"/>{busy?"Загрузка…":"Загрузить В"+nextVersion}
           </button>
          </>}
         </div>
        </div>
-       {current?.status==="revision"&&<p className="partyRegistrationRevisionNote"><b>Документ возвращён на доработку.</b> {current.note||"Ознакомьтесь с решением Минюста и загрузите исправленную версию."}</p>}
+       {current?.status==="revision"&&<p className="partyRegistrationRevisionNote"><b>Документ возвращён на доработку.</b><span>Замечания к {partyDocumentVersionLabel(current)}: {current.note||"Текст замечаний не сохранён. Уточните у преподавателя, что необходимо исправить."}</span></p>}
        {current?.status!=="revision"&&current?.note&&<p className="partyRegistrationReviewNote">Заключение Минюста: {current.note}</p>}
        {documentNotice?.partyId===selected.id&&documentNotice.docKind===kind.kind&&<p className={"civicPartyInviteFeedback "+(documentNotice.kind==="error"?"isError":"isSuccess")} role={documentNotice.kind==="error"?"alert":"status"}>{documentNotice.message}</p>}
        {history.length>1&&<details className="partyRegistrationDocHistory"><summary>Предыдущие версии ({history.length-1})</summary>
         {history.slice(1).map(d=><p key={d.id}>{partyDocumentVersionLabel(d)} · {partyDocumentVerdict(d)} ·
          {d.url?<a href={d.url} target="_blank" rel="noreferrer">Открыть файл</a>:"Файл недоступен"}
-         {d.note&&<small> · {d.note}</small>}</p>)}
+         {d.note&&<small> · {d.note}</small>}{d.status==='revision'&&!d.note&&<small> · Текст замечаний к этой версии не сохранён.</small>}</p>)}
        </details>}
       </article>;
      })}

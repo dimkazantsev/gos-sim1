@@ -121,3 +121,30 @@
  }
  .civicPartyPackage .partyRegistrationDocIdentity .partyRegistrationDocStatus{font-size:11px;padding:7px 8px}
 }
+
+/* Public files use the same document cards whether nested or featured. */
+.civicParties .civicPublicDocs>a.civicPublicDocument {
+ display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;
+ gap:14px;min-width:0;padding:16px;border:1px solid #dbe5f2;border-radius:12px;
+ background:#fff;color:#173a62;text-decoration:none;font-size:13px;line-height:1.5;
+}
+.civicParties .civicPublicDocs>a.civicPartyProgram {border-color:#cbdafa;background:#f6f9ff}
+.civicPublicDocumentIcon {display:grid;place-items:center;width:42px;height:42px;border-radius:10px;background:#edf3ff;color:#315ca6}
+.civicPublicDocumentCopy {display:grid;gap:4px;min-width:0;overflow-wrap:anywhere}
+.civicPublicDocumentCopy>b {font-size:14px;color:#173a62}
+.civicPublicDocumentCopy>span {color:#61758f;font-size:12px}
+.civicPublicDocumentCopy>small {color:#61758f;font-size:12px}
+.civicPublicDocumentOpen {display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:8px 12px;border:1px solid #d7e3f4;border-radius:9px;background:#fff;color:#315b97;font-size:12px;font-weight:700;white-space:nowrap}
+.civicPublicDocumentOpen svg {flex:none}
+.civicPublicDocument.isUnavailable .civicPublicDocumentOpen {color:#61758f;white-space:normal}
+.civicPublicDocument:focus-visible {outline:3px solid #7196e8;outline-offset:3px}
+.civicPublicDocument[href]:hover {border-color:#a9c2ed}
+.civicParties .partyRegistrationDocActions>a,
+.civicParties .partyRegistrationDocActions>button {min-height:44px;gap:7px}
+.partyRegistrationRevisionNote>span {display:block;margin-top:4px}
+@media(max-width:650px) {
+ .civicParties .civicPublicDocs>a.civicPublicDocument {grid-template-columns:36px minmax(0,1fr);gap:10px;padding:13px}
+ .civicPublicDocumentIcon {width:36px;height:36px}
+ .civicPublicDocumentOpen {grid-column:1/-1;white-space:normal}
+ .civicPublicDocumentCopy>b {font-size:13px}
+}

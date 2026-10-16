@@ -437,6 +437,30 @@ export function useRepublicGame(gameId:string){
   });
  }
 
+ function acceptPartyDocuments(rows:PartyDocument[],ticket:ReadTicket){
+  if(!readCurrent(ticket,'partyDocuments'))return;
+  // Review metadata must not wait for Storage. Keep only URLs belonging to
+  // exactly the same authorised row and object while new links are prepared.
+  setPartyDocuments(previous=>{
+   const oldRows=new Map(previous.map(row=>[row.id,row]));
+   return rows.map(row=>{
+    const old=oldRows.get(row.id),url=old&&old.storage_path===row.storage_path?old.url||null:null;
+    return {...row,url,url_loading:!url};
+   });
+  });
+  void Promise.all(rows.map(async row=>{
+   try{return {id:row.id,path:row.storage_path,url:(await supabase.storage.from('game-assets').createSignedUrl(row.storage_path,3600)).data?.signedUrl||null}}
+   catch{return {id:row.id,path:row.storage_path,url:null}}
+  })).then(links=>{
+   if(!readCurrent(ticket,'partyDocuments'))return;
+   const byId=new Map(links.map(link=>[link.id,link]));
+   setPartyDocuments(previous=>previous.map(row=>{
+    const link=byId.get(row.id);
+    return link&&link.path===row.storage_path?{...row,url:link.url||row.url||null,url_loading:false}:row;
+   }));
+  });
+ }
+
  async function loadPartyDocuments(){
   // Separate from party identity/profile reads so the teacher's 30-second
   // refresh doesn't re-sign every participant avatar.
@@ -444,10 +468,7 @@ export function useRepublicGame(gameId:string){
    const pd=await supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false});
    if(!readCurrent(ticket,'partyDocuments'))return;
    requireSuccessful([pd]);
-   const rows=await Promise.all(((pd.data||[]) as PartyDocument[]).map(async row=>({
-    ...row,url:(await supabase.storage.from('game-assets').createSignedUrl(row.storage_path,3600)).data?.signedUrl||null
-   })));
-   if(readCurrent(ticket,'partyDocuments'))setPartyDocuments(rows);
+   acceptPartyDocuments((pd.data||[]) as PartyDocument[],ticket);
   });
  }
 
@@ -460,6 +481,7 @@ export function useRepublicGame(gameId:string){
   ]);
   if(!readActive(ticket))return;
   requireSuccessful([pa,pf,pd]);
+  acceptPartyDocuments((pd.data||[]) as PartyDocument[],ticket);
   if(readCurrent(ticket,'parties')){
    const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
    if(readCurrent(ticket,'parties'))setParties(rows);
@@ -467,10 +489,6 @@ export function useRepublicGame(gameId:string){
   if(readCurrent(ticket,'profiles')){
    const rows=await Promise.all(((pf.data||[]) as GameProfile[]).map(async x=>({...x,avatar_url:x.avatar_path?(await supabase.storage.from('game-assets').createSignedUrl(x.avatar_path,3600)).data?.signedUrl||null:null,signature_url:x.signature_path?(await supabase.storage.from('game-assets').createSignedUrl(x.signature_path,3600)).data?.signedUrl||null:null})));
    if(readCurrent(ticket,'profiles'))setProfiles(rows);
-  }
-  if(readCurrent(ticket,'partyDocuments')){
-   const rows=await Promise.all(((pd.data||[]) as PartyDocument[]).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
-   if(readCurrent(ticket,'partyDocuments'))setPartyDocuments(rows);
   }
   });
  }
@@ -1140,7 +1158,7 @@ export function useRepublicGame(gameId:string){
    setError('Файл отправлен в Supabase Storage, но не зарегистрирован в реестре партии: '+(r.error?.message||'Сервер не подтвердил запись')+'. Обратитесь к преподавателю. Путь: game-assets/'+path);
    return false;
   }
-  await loadPartyAssets();
+  await loadPartyDocuments();
   notifyGameDataRefresh(gameId);
   void kickTelegramDispatch();
   return true;
@@ -1150,11 +1168,14 @@ export function useRepublicGame(gameId:string){
   if(status==='revision'&&(note||'').trim().length<5){setError('Укажите конкретные замечания к документу (не менее 5 символов).');return false}
   const r=await supabase.from('party_documents')
    .update({status,note:note?.trim()||null})
-   .eq('id',id).in('status',['submitted','draft'])
-   .select('id,status').maybeSingle();
+   .eq('id',id).eq('game_id',gameId).in('status',['submitted','draft'])
+   .select('id,status,note').maybeSingle();
   if(r.error){setError(r.error.message);return false}
+  const reviewed=r.data;
+  if(reviewed)setPartyDocuments(previous=>previous.map(row=>row.id===reviewed.id?{...row,status:reviewed.status,note:reviewed.note}:row));
   await loadPartyDocuments();
   if(r.data){notifyGameDataRefresh(gameId);void kickTelegramDispatch()}
+  else setError('Документ уже рассмотрен или недоступен. Список обновлён; проверьте последнюю версию.');
   return !!r.data;
  }
 

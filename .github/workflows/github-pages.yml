@@ -19,6 +19,10 @@ on:
       - 'components/GameClient.tsx'
       - 'components/game/GameHeader.tsx'
       - 'components/game/TeacherView.tsx'
+      - 'components/game/PartiesView.tsx'
+      - 'components/game/useRepublicGame.ts'
+      - 'components/game/types.ts'
+      - 'app/party-registration-versions.css'
       - 'app/teacher-unified-header.css'
       - '.github/workflows/github-pages.yml'
   workflow_dispatch:
