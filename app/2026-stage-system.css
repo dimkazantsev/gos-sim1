@@ -1197,3 +1197,11 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
    min-width:210px;
  }
 }
+
+.electoralQueueNotice{margin:12px 0;padding:12px 14px;border:1px solid #b5cef5;border-radius:12px;background:#f1f6ff;color:#244c83}
+.electoralRejectionReason{color:#9d3845;font-size:12px;line-height:1.55}
+.electoralCorrection{display:flex;flex-wrap:wrap;align-items:end;gap:10px;margin:12px 0;padding:14px;border:1px solid #dde6f7;border-radius:12px;background:#f8fbff}
+.electoralCorrection label{display:grid;flex:1 1 240px;gap:7px;min-width:0;color:#526985;font-size:13px}
+.electoralCorrection input{width:100%;min-width:0;box-sizing:border-box;min-height:44px}
+.electoralCorrection button{min-height:44px;flex:0 1 auto}
+@media(max-width:600px){.electoralCorrection button{width:100%}}
