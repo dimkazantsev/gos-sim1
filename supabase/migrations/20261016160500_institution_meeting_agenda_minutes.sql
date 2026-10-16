@@ -22,7 +22,7 @@ create table if not exists public.institution_meeting_records(
 create index if not exists meeting_records_game_stage on public.institution_meeting_records(game_id,stage_no);
 alter table public.institution_meeting_records enable row level security;
 do $publication$ begin
- if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='institution_meeting_records') then
+ if exists(select 1 from pg_publication where pubname='supabase_realtime') and not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='institution_meeting_records') then
   alter publication supabase_realtime add table public.institution_meeting_records;
  end if;
 end $publication$;
