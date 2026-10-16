@@ -136,6 +136,8 @@ on:
       - 'components/GameClient.tsx'
       - 'components/game/useActionErrorPlacement.tsx'
       - 'scripts/action-error-placement-check.cjs'
+      - 'scripts/vote-office-grants-check.cjs'
+      - 'supabase/migrations/*fix_vote_office_execute_for_authenticated.sql'
       - 'scripts/party-document-visibility-check.cjs'
       - 'scripts/party-registration-versions-check.cjs'
       - 'scripts/party-document-revision-flow-check.cjs'
@@ -287,6 +289,7 @@ jobs:
       - run: node scripts/party-program-news-check.cjs
       - run: node scripts/party-program-storage-rls-check.cjs
       - run: node scripts/action-error-placement-check.cjs
+      - run: node scripts/vote-office-grants-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-realtime-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
