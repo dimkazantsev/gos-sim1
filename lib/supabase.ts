@@ -1,4 +1,5 @@
 import {userError} from './userError';
+import {fetchWithBoundedSessionRefresh} from './boundedSessionRefresh';
 import { createClient } from '@supabase/supabase-js';
 
 const url =
@@ -11,7 +12,7 @@ const publishableKey =
 
 export const supabase = createClient(url, publishableKey, {
   global:{fetch:async(input,init)=>{
-   let response:Response;try{response=await fetch(input,init)}catch(error){throw new Error(userError(error))}
+   let response:Response;try{response=await fetchWithBoundedSessionRefresh(input,init)}catch(error){throw new Error(userError(error))}
    if(response.ok||!response.headers.get('content-type')?.includes('json'))return response;
    let body:Record<string,unknown>;try{body=await response.clone().json()}catch{return response}
    for(const key of ['message','error_description','msg'])if(typeof body[key]==='string')body[key]=userError({message:body[key],code:body.code||body.error_code});
