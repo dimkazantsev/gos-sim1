@@ -2264,3 +2264,6 @@ button,input,textarea,select{font-size:14px}
 @keyframes actionErrorAppear{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.actionErrorNotice{animation:none}}
 @media(max-width:480px){.actionErrorNotice{width:min(310px,calc(100vw - 24px));font-size:13px;padding:10px 9px 10px 11px}}
+
+/* A completed first stage is a result, not an unopened or locked stage. */
+.gosPartyStageBadge.isCompleted{background:#eaf7f1;border-color:#b7e3cf;color:#16754e}
