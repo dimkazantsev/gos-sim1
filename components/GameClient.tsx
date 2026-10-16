@@ -547,15 +547,15 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  useEffect(()=>{
   // Never interpret a temporarily missing profile row during initial loading
   // as an incomplete onboarding. Doing so overwrites the restored screen on F5.
-  if(!game||!me||g.loading||!g.profilesLoaded||!navigationHydrated||navigationRestored||me.kind==='observer'||introOpen||!introSeen||tourMode!=='idle'||!onboardingRequired||setupStatusScope===profileScope&&setupStatus?.missing.length===0)return;
+  if(!game||!me||g.loading||!g.profilesLoaded||!navigationHydrated||navigationRestored||me.kind==='observer'||introOpen||!introSeen||tourMode!=='idle'||!onboardingRequired||setupChecking||setupStatusScope!==profileScope||!setupStatus||setupStatus.completed||setupStatus.missing.length===0)return;
   if(view!=='profile')navigate('profile');
- },[game?.id,me?.user_id,g.loading,g.profilesLoaded,navigationHydrated,navigationRestored,introSeen,onboardingRequired,setupStatusScope,setupStatus?.missing.length,introOpen,tourMode,view]);
+ },[game?.id,me?.user_id,g.loading,g.profilesLoaded,navigationHydrated,navigationRestored,introSeen,onboardingRequired,setupChecking,setupStatusScope,setupStatus?.missing.length,setupStatus?.completed,introOpen,tourMode,view]);
  async function completeOnboarding(){
   if(!game||!me||completingProfile)return;
   setCompletingProfile(true);setOnboardingNotice('');
   const r=await supabase.rpc('complete_my_game_profile',{p_game:game.id});
   if(r.error){setOnboardingNotice('Проверьте обязательные поля: '+r.error.message);await loadProfileSetup();setSetupFocusVersion(x=>x+1)}
-  else{setOnboardingNotice('Профиль заполнен. Добро пожаловать в игру!');setSetupStatus({completed:true,prompt_seen:true,missing:[]});await g.refresh();navigate('dashboard',undefined,true)}
+  else{setOnboardingNotice('Профиль заполнен. Добро пожаловать в игру!');setVerifiedSetupScope(profileScope);setSetupStatus({completed:true,prompt_seen:true,missing:[]});pendingProfileNavigation.current=null;await g.refresh();navigate('dashboard',undefined,true)}
   setCompletingProfile(false);
  }
  function finishIntro(){
