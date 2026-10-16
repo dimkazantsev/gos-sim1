@@ -112,9 +112,14 @@ export default function Home(){
  async function recover(){
   if(!loginEmail.includes('@')){setError('Укажите почту, к которой привязана ваша учётная запись.');return}
   setBusy(true);setError('');setRecoverySent(false);
-  const r=await supabase.auth.resetPasswordForEmail(loginEmail.trim().toLowerCase(),{redirectTo:window.location.origin+'/auth/update-password'});
-  if(r.error)setError(readableError(r.error));else setRecoverySent(true);
-  setBusy(false);
+  try{
+   // On GitHub Pages the recovery route is served by the Next.js application, not the static shell.
+   const origin=(process.env.NEXT_PUBLIC_GAME_API_ORIGIN||
+    (window.location.hostname.endsWith('.github.io')?'https://gos-sim1.vercel.app':window.location.origin)).replace(/[/]$/,'');
+   const r=await supabase.auth.resetPasswordForEmail(loginEmail.trim().toLowerCase(),{redirectTo:origin+'/auth/update-password'});
+   if(r.error)setError(readableError(r.error));else setRecoverySent(true);
+  }catch(e){setError(readableError(e))}
+  finally{setBusy(false)}
  }
  return <main className="entryPage">
   <a className="skipLink" href="#entry-form">Перейти ко входу</a>
