@@ -21,9 +21,10 @@ export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:strin
 type ReadScope='all'|'core'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
 const BOOTSTRAP_TIMEOUT_MS=12000;
+const SESSION_BOOTSTRAP_TIMEOUT_MS=16000;
 async function within<T>(promise:PromiseLike<T>,ms=BOOTSTRAP_TIMEOUT_MS,label='Запрос к серверу'):Promise<T>{
  let timer:ReturnType<typeof setTimeout>|undefined;
- try{return await Promise.race([Promise.resolve(promise),new Promise<T>((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+' не завершился за '+Math.round(ms/1000)+' с. Сервер игровых данных не отвечает.')),ms)})])}
+ try{return await Promise.race([Promise.resolve(promise),new Promise<T>((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+' не завершился за '+Math.round(ms/1000)+' с. '+(label==='Проверка сессии'?'Сервер авторизации отвечает слишком долго. Повторите вход.':'Сервер игровых данных не отвечает.'))),ms)})])}
  finally{if(timer)clearTimeout(timer)}
 }
 
@@ -308,7 +309,7 @@ export function useRepublicGame(gameId:string){
   let ticket=startRead('all');
   if(show)setLoading(true);
   try{
-   const auth=await within(supabase.auth.getSession(),8000,'Проверка сессии');
+   const auth=await within(supabase.auth.getSession(),SESSION_BOOTSTRAP_TIMEOUT_MS,'Проверка сессии');
    if(!readCurrent(ticket,'all'))return;
    if(auth.error)throw auth.error;
    const u=auth.data.session?.user;

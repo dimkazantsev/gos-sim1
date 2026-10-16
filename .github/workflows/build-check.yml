@@ -46,6 +46,8 @@ on:
       - 'scripts/profile-email-*-check.cjs'
       - 'lib/userError.ts'
       - 'lib/supabase.ts'
+      - 'lib/boundedSessionRefresh.ts'
+      - 'scripts/supabase-session-refresh-check.cjs'
       - 'components/game/SignatureUpload.tsx'
       - 'components/game/profileSetup.ts'
       - 'components/game/TelegramConnection.tsx'
@@ -225,6 +227,7 @@ jobs:
       - run: npm run ui:ru-check
       - run: node scripts/game-roster-check.cjs
       - run: node scripts/user-error-check.cjs
+      - run: node scripts/supabase-session-refresh-check.cjs
       - run: node scripts/profile-email-delivery-check.cjs
       - run: node scripts/intro-refresh-check.cjs
       - run: node scripts/stage-comic-check.cjs
