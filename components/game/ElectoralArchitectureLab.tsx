@@ -6,8 +6,8 @@ import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {allocateElectoralSeats as allocate,allocateRegionalSeats} from './electoralMath';
 
-type PRule={id:string;system_type:'proportional'|'majoritarian'|'mixed';allocation_method:'hare'|'droop'|'dhondt'|'sainte_lague'|'imperiali'|null;majoritarian_method:'plurality'|'absolute_two_round'|null;proportional_share:number|null;rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'superseded';vote_id:string|null;proposed_by:string;created_at:string};
-type RRule={id:string;method:'random'|'proportional'|'agreement';rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'allocated'|'superseded';vote_id:string|null;proposed_by:string;created_at:string};
+type PRule={id:string;system_type:'proportional'|'majoritarian'|'mixed';allocation_method:'hare'|'droop'|'dhondt'|'sainte_lague'|'imperiali'|null;majoritarian_method:'plurality'|'absolute_two_round'|null;proportional_share:number|null;rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'superseded';vote_id:string|null;proposed_by:string;created_at:string;queued_at:string|null;rejection_reason:string|null};
+type RRule={id:string;method:'random'|'proportional'|'agreement';rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'allocated'|'superseded';vote_id:string|null;proposed_by:string;created_at:string;queued_at:string|null;rejection_reason:string|null};
 type RegionAllocation={id:string;rule_id:string;party_id:string;regions:number;source:'random'|'proportional'|'agreement'};
 type ElectoralCalcResult={id:string;system_type:PRule['system_type'];allocation_method:PRule['allocation_method'];proportional_share:number|null;support:Record<string,number>;district_seats:Record<string,number>;result:Record<string,number>;created_at:string};
 type RegionalCalcResult={id:string;method:RRule['method'];inputs:Record<string,unknown>;result:Record<string,number>;created_at:string};
@@ -44,6 +44,8 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const [regionDraft,setRegionDraft]=useState<Record<string,string>>({});
  const [support,setSupport]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
+ const [queueNotice,setQueueNotice]=useState('');
+ const [reopenReason,setReopenReason]=useState('');
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  const canPropose=teacher||!!ledParty;
 
@@ -151,7 +153,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   setBusy(true);const r=await supabase.rpc('propose_parliamentary_election_rule',{p_game_id:activeGame.id,p_system_type:system,p_allocation_method:system==='majoritarian'?null:method,p_majoritarian_method:system==='proportional'?null:majority,p_proportional_share:system==='mixed'?propShare:null,p_rationale:rationale.trim()||null});
   if(r.error)setError(r.error.message);else{setRationale('');await load()}setBusy(false);
  }
- async function voteP(id:string){setBusy(true);const r=await supabase.rpc('open_parliamentary_rule_vote',{p_rule_id:id});if(r.error)setError(r.error.message);else{await load();onOpenVotes()}setBusy(false)}
+ async function voteP(id:string){setBusy(true);const r=await supabase.rpc('open_parliamentary_rule_vote',{p_rule_id:id});if(r.error)setError(r.error.message);else{await load();if(r.data)onOpenVotes();else setQueueNotice('Предложение поставлено в очередь по вопросу об избирательной системе. После отклонения текущего решения оно откроется автоматически.')}setBusy(false)}
  async function publishCalculatorResult(){
   if(!teacher||!calculatorReady)return;
   setBusy(true);
@@ -187,7 +189,14 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   setBusy(true);const r=await supabase.rpc('propose_regional_election_rule',{p_game_id:activeGame.id,p_method:regionalMethod,p_rationale:regionalRationale.trim()||null});
   if(r.error)setError(r.error.message);else{setRegionalRationale('');await load()}setBusy(false);
  }
- async function voteR(id:string){setBusy(true);const r=await supabase.rpc('open_regional_rule_vote',{p_rule_id:id});if(r.error)setError(r.error.message);else{await load();onOpenVotes()}setBusy(false)}
+ async function voteR(id:string){setBusy(true);const r=await supabase.rpc('open_regional_rule_vote',{p_rule_id:id});if(r.error)setError(r.error.message);else{await load();if(r.data)onOpenVotes();else setQueueNotice('Предложение поставлено в очередь по вопросу о распределении регионов.')}setBusy(false)}
+ async function reopenQuestion(question:'electoral_system'|'regional_system'){
+  if(!teacher||reopenReason.trim().length<10||!window.confirm('Вернуть принятый вопрос КСРФ на повторное рассмотрение? Результаты прошлых голосований сохранятся.'))return;
+  setBusy(true);
+  const r=await supabase.rpc('reopen_ksrf_question',{p_game_id:activeGame.id,p_question:question,p_reason:reopenReason.trim()});
+  if(r.error)setError(r.error.message);else{setReopenReason('');setQueueNotice('Вопрос возвращён на рассмотрение. История решений сохранена.');await load()}
+  setBusy(false);
+ }
  async function setRegion(partyId:string){
   if(!adoptedR)return;setBusy(true);const r=await supabase.rpc('set_regional_agreement_allocation',{p_rule_id:adoptedR.id,p_party_id:partyId,p_regions:Math.max(0,Number(regionDraft[partyId])||0)});
   if(r.error)setError(r.error.message);else await load();setBusy(false);
@@ -199,7 +208,9 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
 
   {canPropose&&<div className="electoralProposal"><label>Система<select value={system} onChange={e=>setSystem(e.target.value as PRule['system_type'])}><option value="proportional">Пропорциональная</option><option value="majoritarian">Мажоритарная</option><option value="mixed">Смешанная</option></select></label>{system!=='majoritarian'&&<label>Квота / делители<select value={method} onChange={e=>setMethod(e.target.value as NonNullable<PRule['allocation_method']>)}><option value="hare">Квота Хэйра</option><option value="droop">Квота Друпа</option><option value="dhondt">Д’Ондт</option><option value="sainte_lague">Сент-Лагю</option><option value="imperiali">Империали (делители 2, 3, 4…)</option></select></label>}{system!=='proportional'&&<label>Мажоритарное правило<select value={majority} onChange={e=>setMajority(e.target.value as NonNullable<PRule['majoritarian_method']>)}><option value="plurality">Относительное большинство</option><option value="absolute_two_round">Абсолютное + 2-й тур</option></select></label>}{system==='mixed'&&<label>Пропорциональная часть, %<input type="number" min="1" max="99" value={propShare} onChange={e=>setPropShare(Math.max(1,Math.min(99,Number(e.target.value)||50)))}/></label>}<label className="wide">Аргументация фракции<textarea rows={3} value={rationale} onChange={e=>setRationale(e.target.value)} placeholder="Почему эта система выгодна и институционально оправдана?"/></label><button className="primary" disabled={busy} onClick={()=>void proposeP()}>Внести предложение в КСРФ</button></div>}
 
-  <div className="electoralRuleList">{activeP.length===0?<div className="emptyState">Предложений ещё нет.</div>:activeP.map(r=>{const v=voteStatus(r.vote_id);return <article key={r.id} className={r.status}><header><span>{sysLabel[r.system_type]}</span><b>{r.allocation_method?allocationLabel[r.allocation_method]:r.majoritarian_method?majLabel[r.majoritarian_method]:'Правило'}</b><em>{r.status==='adopted'?'Принято':r.status==='vote_open'?'На голосовании':r.status==='rejected'?'Отклонено':'Проект'}</em></header>{r.rationale&&<p>{r.rationale}</p>}<footer><span>{proposer(r.proposed_by)}</span>{r.system_type==='mixed'&&<span>{r.proportional_share}% пропорционально</span>}{v&&<span>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</span>}{canPropose&&r.status==='draft'&&<button disabled={busy} onClick={()=>void voteP(r.id)}>Вынести на голосование →</button>}</footer></article>})}</div>
+  {queueNotice&&<p role="status" className="electoralQueueNotice">{queueNotice}</p>}
+  {teacher&&adoptedP&&<div className="electoralCorrection"><label>Причина возврата вопроса<input aria-label="Причина возврата избирательной системы" value={reopenReason} onChange={e=>setReopenReason(e.target.value)} placeholder="Обоснование ошибки, не менее 10 символов"/></label><button type="button" disabled={busy||reopenReason.trim().length<10} onClick={()=>void reopenQuestion('electoral_system')}>Вернуть вопрос на голосование</button></div>}
+  <div className="electoralRuleList">{activeP.length===0?<div className="emptyState">Предложений ещё нет.</div>:activeP.map(r=>{const v=voteStatus(r.vote_id);return <article key={r.id} className={r.status}><header><span>{sysLabel[r.system_type]}</span><b>{r.allocation_method?allocationLabel[r.allocation_method]:r.majoritarian_method?majLabel[r.majoritarian_method]:'Правило'}</b><em>{r.status==='adopted'?'Принято':r.status==='vote_open'?'На голосовании':r.status==='rejected'?'Отклонено':r.queued_at?'В очереди':'Проект'}</em></header>{r.rationale&&<p>{r.rationale}</p>}{r.rejection_reason&&<p className="electoralRejectionReason">{r.rejection_reason}</p>}<footer><span>{proposer(r.proposed_by)}</span>{r.system_type==='mixed'&&<span>{r.proportional_share}% пропорционально</span>}{v&&<span>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</span>}{canPropose&&r.status==='draft'&&!r.queued_at&&!adoptedP&&<button disabled={busy} onClick={()=>void voteP(r.id)}>Вынести на голосование →</button>}</footer></article>})}</div>
 
   {latestSavedResult&&<section className="electoralPublishedResult">
    <div className="electoralPublishedHead">
@@ -244,7 +255,9 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
 
   {canPropose&&<div className="electoralProposal regionalProposal"><label>Метод<select value={regionalMethod} onChange={e=>setRegionalMethod(e.target.value as RRule['method'])}><option value="random">Демократический / случайный</option><option value="proportional">Пропорциональный</option><option value="agreement">Договорной</option></select></label><label className="wide">Аргументация<textarea rows={3} value={regionalRationale} onChange={e=>setRegionalRationale(e.target.value)}/></label><button className="primary" disabled={busy} onClick={()=>void proposeR()}>Внести предложение</button></div>}
 
-  <div className="electoralRuleList">{activeR.length===0?<div className="emptyState">Предложений ещё нет.</div>:activeR.map(r=>{const v=voteStatus(r.vote_id);return <article key={r.id} className={r.status}><header><span>МЕТОД</span><b>{regionalLabel[r.method]}</b><em>{r.status==='allocated'?'Распределено':r.status==='adopted'?'Принято':r.status==='vote_open'?'На голосовании':r.status==='rejected'?'Отклонено':'Проект'}</em></header>{r.rationale&&<p>{r.rationale}</p>}<footer><span>{proposer(r.proposed_by)}</span>{v&&<span>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</span>}{canPropose&&r.status==='draft'&&<button disabled={busy} onClick={()=>void voteR(r.id)}>Вынести на голосование →</button>}</footer></article>})}</div>
+  {teacher&&adoptedR&&<div className="electoralCorrection"><label>Причина возврата вопроса<input aria-label="Причина возврата распределения регионов" value={reopenReason} onChange={e=>setReopenReason(e.target.value)} placeholder="Обоснование ошибки, не менее 10 символов"/></label><button type="button" disabled={busy||reopenReason.trim().length<10} onClick={()=>void reopenQuestion('regional_system')}>Вернуть вопрос на голосование</button></div>}
+  {queueNotice&&<p role="status" className="electoralQueueNotice">{queueNotice}</p>}
+  <div className="electoralRuleList">{activeR.length===0?<div className="emptyState">Предложений ещё нет.</div>:activeR.map(r=>{const v=voteStatus(r.vote_id);return <article key={r.id} className={r.status}><header><span>МЕТОД</span><b>{regionalLabel[r.method]}</b><em>{r.status==='allocated'?'Распределено':r.status==='adopted'?'Принято':r.status==='vote_open'?'На голосовании':r.status==='rejected'?'Отклонено':r.queued_at?'В очереди':'Проект'}</em></header>{r.rationale&&<p>{r.rationale}</p>}{r.rejection_reason&&<p className="electoralRejectionReason">{r.rejection_reason}</p>}<footer><span>{proposer(r.proposed_by)}</span>{v&&<span>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</span>}{canPropose&&r.status==='draft'&&!r.queued_at&&!adoptedR&&<button disabled={busy} onClick={()=>void voteR(r.id)}>Вынести на голосование →</button>}</footer></article>})}</div>
 
   {latestRegionalSaved&&<section className="regionalPublishedResult">
    <div className="regionalPublishedHead"><div><small>ОПУБЛИКОВАННЫЙ РАСЧЁТ</small><h3>{regionalLabel[latestRegionalSaved.method]}</h3><p>Сохранён преподавателем · {new Date(latestRegionalSaved.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p></div><strong>89 субъектов</strong></div>
