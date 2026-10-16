@@ -51,7 +51,7 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
    }
   }
   void load();
-  const timer=setInterval(()=>void load(),30000);
+  const timer=setInterval(()=>{if(document.visibilityState==='visible')void load()},45000+Math.floor(Math.random()*15000));
   return()=>{live=false;clearInterval(timer)};
  },[gameId,userId,previewOnly]);
 
@@ -141,9 +141,11 @@ export function AchievementCelebration({gameId,userId,enabled}:{gameId:string;us
    }catch(e){if(live)setError(userError(e))}
    finally{running.current=false}
   }
-  void check();
-  const timer=setInterval(()=>void check(),15000);
-  return()=>{live=false;clearInterval(timer)};
+  // Award evaluation is expensive for PostgreSQL: spread first checks after login
+  // and preserve automatic delivery with a slower visible-tab recovery cadence.
+  const first=setTimeout(()=>void check(),3000+Math.floor(Math.random()*17000));
+  const timer=setInterval(()=>void check(),45000+Math.floor(Math.random()*15000));
+  return()=>{live=false;clearTimeout(first);clearInterval(timer)};
  },[gameId,userId,enabled]);
 
  function close(){active.current=false;setAward(null)}
