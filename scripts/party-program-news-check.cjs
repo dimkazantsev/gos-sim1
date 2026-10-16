@@ -1,0 +1,31 @@
+'use strict';
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+const root='supabase/migrations/20261016010000_registered_party_program_publication.sql';
+const sql=fs.readFileSync(root,'utf8');
+const wall=fs.readFileSync('components/game/PoliticalWallView.tsx','utf8');
+const hook=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
+const styles=fs.readFileSync('app/2026-political-process.css','utf8');
+assert.match(sql,/CREATE OR REPLACE FUNCTION public\.issue_party_justice_response\(/i,'Future registrations use updated official function');
+assert.match(sql,/Программа партии опубликована вместе с регистрационными документами/,'Registration story mentions programme');
+assert.doesNotMatch(sql,/\|\|E'\\nРегиональные отделения: '\|\|p\.regions/,'No regional-office field in future publication');
+assert.match(sql,/regexp_replace\(news\.body,E'\\nРегиональные отделения: /,'Previously published automatic stories cleaned');
+assert.match(sql,/news\.source_key LIKE 'media-party-registration:%'/,'Backfill limited to registration news');
+assert.match(sql,/party\.registration_status='registered'/,'Backfill requires completed registration');
+assert.match(sql,/f\.doc_type='party_certificate'/,'Existing certificate mandatory for backfill');
+assert.match(sql,/d\.version_no=private\.latest_party_document_version/,'Only latest accepted party documents are linked');
+assert.match(sql,/bucket_id='game-assets' and split_part\(storage\.objects\.name,'\/',2\)='news'/,'News access cannot open other documents');
+assert.match(sql,/where p\.id=\(split_part\(storage\.objects\.name,'\/',3\)\)::uuid/,'Read policy uses the Storage object path, not the game party name');
+assert.match(sql,/d\.status='accepted' and d\.doc_kind in \('charter','program','symbol','congress_minutes'\)/,'Public files must be accepted');
+assert.match(sql,/private\.is_game_member\(p\.game_id\)/,'Storage read scoped to game membership');
+assert.match(hook,/post\.source_key\?\.startsWith\('media-party-registration:'\)/,
+ 'Load signed files only when an actual public party registration story is visible');
+assert.match(hook,/void loadPartyDocuments\(\)/,'Use existing RLS-protected party documents loader');
+assert.match(wall,/p\.context\?\.party_document_ids\?\.includes\(d\.id\)\&\&d\.url\&\&d\.status==='accepted'/,
+ 'Show only approved attachment IDs with authorized signed links');
+assert.match(wall,/registrationNews\&\&d\.doc_kind==='program'/,'Visually distinguish the linked programme');
+assert.match(wall,/Программа политической партии/,'Programme accessible by its proper name, not arbitrary upload title');
+assert.match(wall,/Версия В/,'Published party programme displays version number');
+assert.match(styles,/processPartyFiles>a\.processPartyProgram/,'Programme link uses an established layout with a distinguishing treatment');
+console.log('PASS: registration programme appears only after certification; public news excludes regional offices');
+console.log('PASS: stage news loads actual accepted files; storage restrictions do not reveal provisional submissions');

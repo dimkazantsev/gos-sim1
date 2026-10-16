@@ -4,6 +4,11 @@ on:
     branches: [main]
   pull_request:
     paths:
+      - 'app/page.tsx'
+      - 'lib/supabase.ts'
+      - 'lib/authTransport.ts'
+      - 'lib/boundedSessionRefresh.ts'
+      - 'scripts/verify-supabase-auth-live.mjs'
       - 'scripts/prepare-github-pages.mjs'
       - 'scripts/github-pages-check.mjs'
       - 'scripts/finalize-github-pages-social.mjs'
@@ -65,3 +70,5 @@ jobs:
         uses: actions/deploy-pages@v4
       - name: Verify live link previews and JPEG
         run: node scripts/verify-github-pages-live.mjs
+      - name: Verify live Auth can check accounts
+        run: node scripts/verify-supabase-auth-live.mjs
