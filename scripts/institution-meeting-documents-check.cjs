@@ -35,7 +35,15 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  await db.exec("set request.jwt.claim.sub='"+teacher+"';");
  const agenda=(await q("select public.save_institution_meeting_document($1,2,'ksrf','agenda',$2,$3) as id",[game,'1. Рассмотрение избирательной системы и выбор правила распределения мандатов',student]))[0].id;
  assert(agenda,'Real formal document ID is returned');
- const docs=await q('select doc_type,registry_no,status_code from formal_documents where id=$1',[agenda]);
+ const ui=fs.readFileSync(path.join(root,'components/game/InstitutionRegistrationPanel.tsx'),'utf8');
+ assert(ui.includes('const canApproveAgenda=meetingCoordinator&&agendaDraft'), 'Approval unavailable without a prepared document');
+ assert(ui.includes('agendaTextLength<30'), 'Explain the minimum 30-character rule before saving');
+ assert(ui.includes('Сохранить и утвердить повестку'), 'Coordinator save action matches server auto-approval');
+ assert(ui.includes('Сохранить проект повестки в реестре НПА'), 'Delegate cannot publish the draft');
+ assert(ui.includes('После утверждения повестки можно зарегистрироваться'), 'Ordinary participants can see the next step');
+ assert(ui.includes('canPrepare&&!readOnly&&!agendaReady'), 'Do not expose editable fields in completed/locked stage views');
+ assert(!ui.includes("'Сначала подготовьте документ в реестре НПА'"), 'The form itself creates the agenda document');
+  const docs=await q('select doc_type,registry_no,status_code from formal_documents where id=$1',[agenda]);
  assert.equal(docs[0].doc_type,'meeting_agenda');assert(docs[0].registry_no);assert.equal(docs[0].status_code,'published');
  await db.exec("set request.jwt.claim.sub='"+student+"';");
  await register();
@@ -54,6 +62,17 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  const approved=await q('select minutes_approved_at is not null as ok from institution_meeting_records where game_id=$1',[game]);
  assert(approved[0].ok);
  assert.equal((await q('select status_code from formal_documents where id=$1',[minutes]))[0].status_code,'published');
- console.log('PASS meeting agenda gate, numbered documents, delegate draft, teacher approval, minutes-after-votes and preserved registration');
+ // Independent draft from a delegated student: only a coordinator may approve it.
+ const secondGame='00000000-0000-0000-0000-000000000051';
+ await db.exec("insert into games values('"+secondGame+"',2);insert into game_stages values('"+secondGame+"',2);");
+ await q("select public.assign_institution_meeting_secretary($1,2,'ksrf',$2)",[secondGame,student]);
+ await db.exec("set request.jwt.claim.sub='"+student+"';");
+ const delegatedAgenda=(await q("select public.save_institution_meeting_document($1,2,'ksrf','agenda',$2) as id",[secondGame,'1. Доклады о составе органа. 2. Рассмотрение подготовленного документа и голосование.']))[0].id;
+ assert.equal((await q('select status_code from formal_documents where id=$1',[delegatedAgenda]))[0].status_code,'draft');
+ await assert.rejects(()=>q("select public.approve_institution_meeting_agenda($1,2,'ksrf')",[secondGame]),/председател/);
+ await db.exec("set request.jwt.claim.sub='"+teacher+"';");
+ await q("select public.approve_institution_meeting_agenda($1,2,'ksrf')",[secondGame]);
+ assert.equal((await q('select status_code from formal_documents where id=$1',[delegatedAgenda]))[0].status_code,'published');
+ console.log('PASS meeting agenda gate, coordinator auto-approval, delegate draft then chair approval, role guidance, registration and minutes');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
