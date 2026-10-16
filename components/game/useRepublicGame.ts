@@ -240,14 +240,19 @@ export function useRepublicGame(gameId:string){
   setRealtimeState('connecting');
   channel.subscribe(status=>{if(!disposed)setRealtimeState(status==='SUBSCRIBED'?'connected':'disconnected')});
   // Visible-tab recovery works even when a WebSocket cannot connect.
+  // Deterministic jitter prevents 40 simultaneous clients from polling in lockstep.
+  const pollJitter=[...me.user_id].reduce((hash,char)=>(Math.imul(hash,31)+char.charCodeAt(0))>>>0,0)%10000;
   const poll=setInterval(()=>{
-   if(document.visibilityState==='visible'){dirtyCore=true;dirtyChat=true;dirtyPins=true;dirtyOverview=true;schedule()}
-  },30000);
-  // Recover dropped frames without fetching the full game or re-signing the
-  // entire media history for every participant.
-  const chatRecovery=setInterval(()=>{
    if(document.visibilityState!=='visible')return;
-   if(chatOpenRef.current&&channelRef.current)void loadRecentChatMessages(channelRef.current);
+   dirtyCore=true;dirtyOverview=true;
+   if(chatOpenRef.current){dirtyChat=true;dirtyPins=true}
+   schedule();
+  },30000+pollJitter);
+  // Realtime handles unread counters while chat is closed. Full chat recovery
+  // runs only for an actively open conversation.
+  const chatRecovery=setInterval(()=>{
+   if(document.visibilityState!=='visible'||!chatOpenRef.current)return;
+   if(channelRef.current)void loadRecentChatMessages(channelRef.current);
    void loadChatOverview();
   },6000);
   return()=>{
@@ -503,19 +508,23 @@ export function useRepublicGame(gameId:string){
 
  async function loadPartyAssets(){
   await readSafely(['parties','profiles','partyDocuments'],async ticket=>{
-   const [pa,pf,pd]=await Promise.all([
-    supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'),
-    supabase.from('game_profiles').select('*').eq('game_id',gameId),
-    supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
-   ]);
-   if(!readActive(ticket))return;
-   // Errors in one optional table must not suppress successful party results.
-   if(!pd.error)acceptPartyDocuments((pd.data||[]) as PartyDocument[],ticket);
-   else if(readCurrent(ticket,'partyDocuments'))setError(pd.error);
-   if(!pa.error)acceptPartyRows((pa.data||[]) as Party[],ticket);
-   else if(readCurrent(ticket,'parties'))setError(pa.error);
-   if(!pf.error&&readCurrent(ticket,'profiles')){
-    const rows=(pf.data||[]) as GameProfile[];
+   // Render each table as soon as its own query completes.
+   // An overloaded document service must not make parties disappear.
+   const partyRead=Promise.resolve(supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')).then(({data,error})=>{
+    if(!readCurrent(ticket,'parties'))return;
+    if(error)setError(error);
+    else acceptPartyRows((data||[]) as Party[],ticket);
+   });
+   const documentRead=Promise.resolve(supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})).then(({data,error})=>{
+    if(!readCurrent(ticket,'partyDocuments'))return;
+    if(error)setError(error);
+    else acceptPartyDocuments((data||[]) as PartyDocument[],ticket);
+   });
+   const profileRead=Promise.resolve(supabase.from('game_profiles').select('*').eq('game_id',gameId)).then(({data,error})=>{
+    if(!readCurrent(ticket,'profiles'))return;
+    if(error){setError(error);return}
+   if(readCurrent(ticket,'profiles')){
+    const rows=(data||[]) as GameProfile[];
     setProfiles(previous=>rows.map(row=>{
      const old=previous.find(p=>p.user_id===row.user_id);
      return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url||null:null,signature_url:old?.signature_path===row.signature_path?old?.signature_url||null:null};
@@ -537,7 +546,9 @@ export function useRepublicGame(gameId:string){
        {...row,avatar_url:link.avatar||row.avatar_url||null,signature_url:link.signature||row.signature_url||null}:row;
      }));
     }).catch(()=>{});
-   }else if(pf.error&&readCurrent(ticket,'profiles'))setError(pf.error);
+   }
+   });
+   await Promise.all([partyRead,documentRead,profileRead]);
   });
  }
 
