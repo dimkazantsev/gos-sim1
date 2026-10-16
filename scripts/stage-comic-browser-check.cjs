@@ -37,12 +37,12 @@ async function main(){
     await route.fulfill({contentType:'application/json',body:JSON.stringify(data)});
    });
    await page.goto(url);await page.getByRole('button',{name:'Открыть архив',exact:true}).click();
-   await page.getByRole('button',{name:/Итоги · Этап 1 · 3 слайда/}).waitFor();
+   await page.getByRole('button',{name:/Итоги · Этап 1 · 2 слайда/}).waitFor();
    assert.equal(await page.locator('.comicDialog .comicArtwork').count(),11,'Eleven themed archive covers');
    for(const chapter of fixture.chapters){
-    const label=chapter.stage_no===16?/Эпилог · 4 слайда/:chapter.stage_no===3?/Итоги · Этапы 2 и 3/:chapter.stage_no===5?/Итоги · Этапы 4 и 5/:new RegExp('Итоги · Этап '+chapter.stage_no+' · 3 слайда');
+    const label=chapter.stage_no===16?/Эпилог · 4 слайда/:chapter.stage_no===3?/Итоги · Этапы 2 и 3/:chapter.stage_no===5?/Итоги · Этапы 4 и 5/:new RegExp('Итоги · Этап '+chapter.stage_no+' · '+(chapter.stage_no===1?2:3)+' слайда');
     await page.getByRole('button',{name:label}).click();
-    const n=chapter.stage_no===16?4:3;
+    const n=chapter.stage_no===16?4:chapter.stage_no===1?2:3;
     for(let scene=1;scene<=n;scene++){
      const frame=page.locator('.comicFrame');await frame.locator('img').evaluate(img=>img.decode());
      assert.equal(await frame.getAttribute('data-comic-slide'),String(scene));assert.equal(await page.locator('.comicDot').count(),n);
