@@ -46,10 +46,14 @@ export function comicSlides(chapter:ComicChapter):ComicSlide[]{
  const slide=(title:string,body:string,facts:ComicFact[],art=theme.art):ComicSlide=>({title,body,facts,art});
  const procedures=[count('documents','Документов','document'),count('finished_documents','Завершённых документов','check'),count('votes','Голосований','vote'),count('passed_votes','Принятых решений','check')];
  switch(no){
- case 1:return [
+ case 1:{
+  const unregistered=s.parties?.filter(p=>p.status!=='registered')||[];
+  const hasRegistrationOutcome=unregistered.length>0||['documents','finished_documents','votes','passed_votes'].some(key=>(c[key]||0)>0);
+  return [
   slide('Новые участники политической жизни','Учредительный этап завершён. Здесь показаны партии, чья регистрация отражена в реестре игры.',[count('parties','Всего партий','party'),count('registered_parties','Зарегистрировано','check'),count('party_members','Участников в партиях','people')]),
   slide('Зарегистрированные партии','Названия и председатели сохранены из реестра при завершении этапа.',rows(s.parties?.filter(p=>p.status==='registered'),'party',p=>'Председатель: '+(p.leader||'Не назначен'))),
-  slide('Регистрационные итоги','Стадия подготовки и итог процедуры учитываются отдельно.',[...procedures,...rows(s.parties?.filter(p=>p.status!=='registered'),'party',p=>status(p.status))])];
+  ...(hasRegistrationOutcome?[slide('Регистрационные итоги','Стадия подготовки и итог процедуры учитываются отдельно.',[...procedures,...rows(unregistered,'party',p=>status(p.status))])]:[])];
+ }
  case 3:return [
   slide('Как проводятся выборы','Сохранены выбранные модели и их фактический статус. Проект решения ещё не означает его принятия.',[...rows(s.election_rules,'vote',r=>status(r.system)+(r.method?' · '+status(r.method):'')+' · '+status(r.status)),...rows(s.regional_rules,'regions',r=>status(r.method)+' · '+status(r.status))]),
   slide('Региональное представительство','Распределение контроля над субъектами РФ по данным игры.',rows(s.parties,'party',p=>fmt(p.regions||0)+' субъектов РФ')),
