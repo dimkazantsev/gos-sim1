@@ -77,7 +77,12 @@ async function main(){
   assert.equal((await chapter(11)).snapshot.counters.adopted_programs,1);assert.equal((await chapter(13)).snapshot.counters.approved_transfers,1);assert.equal((await chapter(13)).snapshot.budgets[0].status,'draft');
   assert.equal((await chapter(15)).snapshot.counters.resolved_crises,1);assert.equal((await chapter(15)).snapshot.metrics_detail.length,1);
   const end=await chapter(16);assert.equal(end.snapshot.counters.participants,30);assert.equal(end.snapshot.counters.ballots,1);assert.equal(end.snapshot.counters.documents,10);assert.equal(end.snapshot.counters.messages,1);assert.equal(end.snapshot.counters.completed_tasks,1);assert.equal(end.snapshot.counters.completed_stages,16);
-  for(const c of rows){assert.equal(comicSlides(c).length,c.stage_no===16?4:3);assert(!JSON.stringify(c.snapshot).match(/PRIVATE|SECRET|chosen_index|is_correct|electorate_snapshot/),'No private content in chapter '+c.stage_no)}
+  assert.equal(comicSlides(first).length,2,'Stage 1 with no procedures or pending registrations ends on the factual party scene');
+  const activeProcedures={...first,snapshot:{...first.snapshot,counters:{...first.snapshot.counters,documents:1}}};
+  assert.equal(comicSlides(activeProcedures).length,3,'Actual registration documents retain the third scene');
+  const pendingParty={...first,snapshot:{...first.snapshot,parties:[...first.snapshot.parties,{name:'Партия на рассмотрении',status:'submitted'}]}};
+  assert.equal(comicSlides(pendingParty).length,3,'Pending party registrations retain the third scene');
+  for(const c of rows){assert.equal(comicSlides(c).length,c.stage_no===16?4:c.stage_no===1?2:3);assert(!JSON.stringify(c.snapshot).match(/PRIVATE|SECRET|chosen_index|is_correct|electorate_snapshot/),'No private content in chapter '+c.stage_no)}
   const slides=comicSlides(end);assert(slides.flatMap(s=>s.facts).length>=54);assert(slides.flatMap(s=>s.facts).every(f=>f.value!=='Не зафиксировано'),'Every visible epilogue counter is supplied by SQL');
   fs.mkdirSync(path.join(root,'.design-review'),{recursive:true});fs.writeFileSync(path.join(root,'.design-review/stage-comic-results.json'),JSON.stringify({gameId:game,chapters:rows}));
   assert.equal((await db.query('select count(*)::int n from republic_comic_chapters where game_id=$1',[other])).rows[0].n,0);
