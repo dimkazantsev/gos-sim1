@@ -9,6 +9,7 @@ import FormalDocumentPicker from './FormalDocumentPicker';
 import {formalDocumentTitle} from './formalInstitutions';
 import {votePresetForDocument,institutionLabel,majorityLabel} from './proceduralVoting';
 import VoteBallotControls from './VoteBallotControls';
+import {formatKsrfVoteBody,uppercaseFirst} from './ksrfVoteText';
 import {VOTING_BODIES,type VotingUnit} from './votingBodies';
 import {useSavedGameState,savedChoice} from './useSavedGameState';
 import {Trash2,Vote as VoteIcon} from 'lucide-react';
@@ -151,7 +152,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    const doc=v.formal_document_id?formalDocuments.find(d=>d.id===v.formal_document_id):undefined;
    const stage=stages.find(s=>s.stage_no===v.stage_no);
    const denominator=Math.max(1,t.yes+t.no+t.abstain);
-   const rule=majorityLabel(v.majority_kind,Number(v.majority_value));
+   const rule=uppercaseFirst(majorityLabel(v.majority_kind,Number(v.majority_value)));
    return <article id={'vote-'+v.id} tabIndex={-1} className={'proceduralVoteCard '+v.status+(focusId===v.id?' isFocused':'')} key={v.id}>
      <header>
       <div className="voteInstitution"><span>✓</span><div><small>{v.electorate_snapshot?.institution_label||institutionLabel(v.institution_key)}</small><b>{v.title}</b></div></div>
@@ -169,12 +170,12 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
      {stage&&<button onClick={onOpenStages}><small>ЭТАП ИГРЫ</small><b>{stage.stage_no}. {stage.title}</b><span>{v.formal_step_code?'Стадия НПА: '+(doc?.workflow_steps.find(step=>step.code===v.formal_step_code)?.label||'Стадия процедуры'):'Открыть описание этапа'}</span></button>}
     </div>}
 
-    {v.body&&<p className="voteBody">{v.body}</p>}
+    {v.body&&<p className="voteBody">{formatKsrfVoteBody(v.procedure_key,v.body)}</p>}
 
     <div className="voteRuleStrip">
      <div><small>КВОРУМ</small><b>{v.quorum_kind==='none'?'Не требуется':q.needed+' из '+q.eligible}</b></div>
      <div><small>РЕШЕНИЕ</small><b>{rule}</b></div>
-     <div><small>ФОРМАТ</small><b>{v.voting_mode==='mandate'?'по числу мандатов':v.voting_mode==='faction'?'одна фракция — один голос':'персонально'}</b></div>
+     <div><small>ФОРМАТ</small><b>{v.voting_mode==='mandate'?'По числу мандатов':v.voting_mode==='faction'?'Одна фракция — один голос':'Персонально'}</b></div>
     </div>
 
     {v.status==='open'&&v.electorate_snapshot?.attendance_required&&!v.procedure_key?.startsWith('budget_')&&v.procedure_key!=='bill_amendments'&&doc?.workflow_key!=='budget'&&<p className="voteAutoClosureHint">Голосование автоматически закроется после последнего голоса зарегистрированного участника при наличии кворума. Председательствующий или преподаватель также может закрыть его вручную.</p>}
