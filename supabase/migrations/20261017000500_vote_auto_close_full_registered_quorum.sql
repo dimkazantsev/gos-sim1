@@ -72,7 +72,11 @@ begin
  select * into v from public.game_votes where id=new.vote_id for update;
  if v.id is null or v.status<>'open'
     or not coalesce((v.electorate_snapshot->>'attendance_required')::boolean,false)
-    or v.institution_key is null then
+    or v.institution_key is null
+    -- Dedicated budget and amendment RPCs have additional statutory thresholds
+    -- and actor-based controls; never bypass them from an ordinary ballot trigger.
+    or coalesce(v.procedure_key ~ '^(budget_|bill_amendments$)',false)
+    or coalesce(private.is_budget_document(v.formal_document_id),false) then
   return new;
  end if;
 
