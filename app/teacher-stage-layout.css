@@ -326,3 +326,7 @@
  .teacherCommand .teacherStageFlowActions {grid-template-columns:minmax(0,1fr);}
  .teacherCommand .teacherStageFlowActions>button:last-child {grid-column:auto;}
 }
+
+/* A single "Open stage" action fills the same inspector width as the procedures action. */
+.teacherCommand .teacherStageFlowActions.isSingleAction{display:block;flex:1 1 100%;width:100%;min-width:0}
+.teacherCommand .teacherStageFlowActions.isSingleAction>button{box-sizing:border-box;display:block;width:100%;min-width:0}
