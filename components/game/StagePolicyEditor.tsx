@@ -2,6 +2,7 @@
 import {useEffect,useState} from 'react';
 import {CalendarClock,Save} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
 
@@ -44,7 +45,7 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
   async function loadRule(){
    const {data,error}=await supabase.from('stage_deadline_rules').select('*').eq('game_id',gameId).eq('stage_no',stageNo).maybeSingle();
    if(!active)return;
-   if(error){setMessage(error.message);return}
+   if(error){setMessage(userError(error));return}
    setDeadline(localDate(data?.deadline_at??stageDeadline));
    setInclusive(data?.inclusive??true);
    setPenalty(String(data?.penalty_points??0));
