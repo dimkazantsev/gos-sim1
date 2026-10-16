@@ -27,6 +27,14 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const [inviteFeedback,setInviteFeedback]=useState<{partyId:string;kind:'success'|'error';message:string}|null>(null);
  const stageOne=g.stages.find(s=>s.stage_no===1);
  const partyFormationOpen=isStageWorkOpen(g.game,stageOne);
+ const partyStageCompleted=stageOne?.status==='completed';
+ const partyStagePaused=stageOne?.status==='open'&&!partyFormationOpen&&g.game?.status!=='lobby';
+ const partyStageBadge=partyStageCompleted?'Этап 01 завершён':partyFormationOpen?'Этап 01 открыт':partyStagePaused?'Этап 01 приостановлен':'Этап 01 ещё не открыт';
+ const partyStageNotice=partyStageCompleted
+  ?'Первый этап завершён. Формирование партий и работа с регистрационными документами в рамках этого этапа завершены. Сведения о партиях и результаты доступны для просмотра.'
+  :partyStagePaused
+   ?'Первый этап приостановлен. Изменения временно недоступны. Сведения о партиях и результаты можно просматривать.'
+   :'Первый этап ещё не открыт. Работа с партиями начнётся после его открытия преподавателем. Пока доступны сведения о партиях и результатах.';
  const canCreate=partyFormationOpen&&(!!teacher||(me?.kind==='student'&&!me.team&&!me.roster_archived_at));
  const ranked=useMemo(()=>[...parties].filter(p=>!query.trim()||[p.name,p.ideology,p.description].join(' ').toLowerCase().includes(query.toLowerCase())).sort((a,b)=>b.support-a.support),[parties,query]);
  const selected=parties.find(p=>p.id===selectedId)||parties.find(p=>p.name===me?.team)||ranked[0],own=!!selected&&(teacher||selected.name===me?.team),canEditDescription=partyFormationOpen&&!!selected&&(teacher||selected.leader_user_id===me?.user_id),canUploadLogo=partyFormationOpen&&!!selected&&(teacher||me?.kind==='student'&&!me.roster_archived_at&&selected.name===me.team),staff=members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&m.team===selected?.name),leader=members.find(m=>m.user_id===selected?.leader_user_id),docs=partyDocuments.filter(d=>d.party_id===selected?.id),
@@ -83,8 +91,8 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
   setDeletingPartyId('');
  }
 
- return <div className="partyPage civicParties"><header className="pageHeader"><div><h1>Партии и фракции</h1><p>Публичные программы, партийные документы, руководство и состав.</p></div><span className={'gosPartyStageBadge '+(partyFormationOpen?'isActive':'isLocked')}>{partyFormationOpen?'Этап 01 открыт':'Этап 01 не открыт'}</span></header>
-  {!partyFormationOpen&&<div className="gosPartyStageWarning" role="status">Работа с партиями откроется после запуска первого этапа преподавателем. Пока доступны только сведения о партиях и результатах.</div>}
+ return <div className="partyPage civicParties"><header className="pageHeader"><div><h1>Партии и фракции</h1><p>Публичные программы, партийные документы, руководство и состав.</p></div><span className={'gosPartyStageBadge '+(partyStageCompleted?'isCompleted':partyFormationOpen?'isActive':'isLocked')}>{partyStageBadge}</span></header>
+  {!partyFormationOpen&&<div className="gosPartyStageWarning" role="status">{partyStageNotice}</div>}
   {inbox.length>0&&<section className="civicPartyInbox"><h2>Приглашения в партии <span className="gosPartyCount">{workflowCount}</span></h2>{inbox.map(i=><article key={i.id}><b>{parties.find(p=>p.id===i.party_id)?.name||'Партия'}</b><button className="primary" disabled={!partyFormationOpen||me?.kind!=='student'||!!me.roster_archived_at} onClick={()=>void g.respondPartyInvitation(i.id,true)}>Принять</button><button className="secondary" disabled={!partyFormationOpen||me?.kind!=='student'} onClick={()=>void g.respondPartyInvitation(i.id,false)}>Отклонить</button></article>)}</section>}
   <input className="civicPartySearch" aria-label="Поиск партий" placeholder="Название, идеология или программа" value={query} onChange={e=>setQuery(e.target.value)}/>
   <section className="civicPartyTiles" aria-label="Публичные партии">{ranked.map(p=><article className={selected?.id===p.id?'civicPartyTile active':'civicPartyTile'} key={p.id}><button type="button" className="civicPartyTileSelect" onClick={()=>{setSelectedId(p.id);setDescription(p.description||'');setInviteUser('');setInviteFeedback(null)}}><span className="civicPartyLogo" style={{background:p.color}}>{p.logo_url?<img src={p.logo_url} alt=""/>:p.name.slice(0,1)}</span><span className="civicPartyTileCopy"><b>{p.name}</b><small>{p.ideology||'Идеология не указана'}</small><small>{statusLabel[p.registration_status]}</small></span><span className="civicPartyTileStats"><b>{p.support}%</b> поддержка · <b>{p.mandates}</b> мандатов</span></button>{canDeleteParty(p)&&<button type="button" className="civicPartyDelete" aria-label={'Удалить партию «'+p.name+'»'} title={teacher?'Удалить партию':'Удалить свою партию до регистрации'} disabled={deletingPartyId===p.id} onClick={()=>void removeParty(p)}>{deletingPartyId===p.id?<span aria-hidden="true">…</span>:<Trash2 size={17}/>}</button>}</article>)}{!ranked.length&&<p>Партии не найдены.</p>}</section>

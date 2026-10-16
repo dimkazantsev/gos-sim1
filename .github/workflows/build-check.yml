@@ -10,6 +10,9 @@ on:
       - 'components/game/PoliticalWallView.tsx'
       - 'components/game/ElectoralArchitectureLab.tsx'
       - 'components/game/VotesView.tsx'
+      - 'components/game/PartiesView.tsx'
+      - 'components/game/stageWorkStatus.ts'
+      - 'scripts/party-stage-status-copy-check.cjs'
       - 'components/game/ksrfVoteText.ts'
       - 'scripts/ksrf-vote-text-check.cjs'
       - 'scripts/ksrf-proposal-queue-check.cjs'
@@ -264,6 +267,7 @@ jobs:
       - run: node scripts/readiness-matrix-check.cjs
       - run: node scripts/budget-change-registry-check.cjs
       - run: node scripts/stage-readiness-manual-check.cjs
+      - run: node scripts/party-stage-status-copy-check.cjs
       - run: node scripts/profile-setup-and-brand-check.cjs
       - run: node scripts/profile-email-rate-limit-check.cjs
       - run: node scripts/profile-email-layout-browser-check.cjs
