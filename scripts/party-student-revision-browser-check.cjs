@@ -10,6 +10,7 @@ const source=String.raw`'use client';
 import {useState} from 'react';
 import PartiesView from '../../components/game/PartiesView';
 import TeacherPartyDossiers from '../../components/game/TeacherPartyDossiers';
+import {useActionErrorPlacement} from '../../components/game/useActionErrorPlacement';
 import fixture from '../../.design-review/fixture.json';
 import type {PartyDocument} from '../../components/game/types';
 import type {ReturnTypeRepublic} from '../../components/game/viewTypes';
@@ -20,16 +21,19 @@ const noop=()=>{};
 export default function PartyTest(){
  const [docs,setDocs]=useState<PartyDocument[]>(()=>kinds.map(kind=>({id:kind+'-v1',game_id:fixture.game.id,party_id:baseParty.id,doc_kind:kind,title:kind==='program'?'Программа развития':'Документ партии',storage_path:kind+'-v1.txt',file_name:kind+'-v1.txt',mime_type:'text/plain',file_size:50,uploaded_by:owner.user_id,version_no:1,status:kind==='program'?'submitted':'accepted',note:null,created_at:'2026-10-16T10:00:00Z',url:'data:text/plain,document'})));
  const [open,setOpen]=useState(true),[registered,setRegistered]=useState(false),[fail,setFail]=useState(false),[uploads,setUploads]=useState(0);
+ const [error,setError]=useState('');
+ const actionError=useActionErrorPlacement(error,'parties',()=>setError(''));
  const party={...baseParty,registration_status:registered?'registered':'submitted'};
  const game={...fixture.game,current_round:1,turn_open:open,turn_ends_at:null};
- const shared={...fixture,game,parties:[party],partyDocuments:docs,stages:fixture.stages.map(s=>({...s,deadline:null,status:s.stage_no===1?(open?'open':'completed'):'locked'})),formalDocuments:registered?[{id:'certificate',game_id:game.id,doc_type:'party_certificate',registry_no:'МЮ-ТЕСТ',title:'Свидетельство',metadata:{party_id:party.id},created_at:'2026-10-16T10:00:00Z'}]:[],
+ const shared={...fixture,game,setError,parties:[party],partyDocuments:docs,stages:fixture.stages.map(s=>({...s,deadline:null,status:s.stage_no===1?(open?'open':'completed'):'locked'})),formalDocuments:registered?[{id:'certificate',game_id:game.id,doc_type:'party_certificate',registry_no:'МЮ-ТЕСТ',title:'Свидетельство',metadata:{party_id:party.id},created_at:'2026-10-16T10:00:00Z'}]:[],
   reviewPartyDocument:async(id:string,status:'accepted'|'revision',note?:string)=>{setDocs(rows=>rows.map(d=>d.id===id?{...d,status,note:note?.trim()||null}:d));return true},
-  uploadPartyDocument:async(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File)=>{
-   setUploads(n=>n+1);if(fail){setFail(false);return false}
+  uploadPartyDocument:async(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File,onFailure?:(message:string)=>void)=>{
+   setUploads(n=>n+1);if(fail){setFail(false);const message='Не удалось загрузить файл. Повторите попытку.';if(onFailure)onFailure(message);else setError(message);return false}
    setDocs(rows=>{const version=1+Math.max(0,...rows.filter(d=>d.doc_kind===kind).map(d=>d.version_no||1));return [...rows,{id:kind+'-v'+version,game_id:game.id,party_id:partyId,doc_kind:kind,title,storage_path:file.name,file_name:file.name,mime_type:file.type,file_size:file.size,uploaded_by:owner.user_id,version_no:version,status:'submitted',note:null,created_at:new Date().toISOString(),url:'data:text/plain,updated-document'}]});return true
   }};
  function scope(teacher:boolean){return new Proxy({...shared,teacher,me:teacher?fixture.me:owner},{get:(t,k)=>k in t?t[k as keyof typeof t]:noop}) as unknown as ReturnTypeRepublic}
- return <div style={{maxWidth:1200,margin:'0 auto',padding:16}}>
+ return <div style={{maxWidth:1200,margin:'0 auto',padding:16}} onClickCapture={actionError.onClickCapture} onSubmitCapture={actionError.onSubmitCapture} onChangeCapture={actionError.onChangeCapture}>
+  {error&&!actionError.localized&&<p className="errorBox" role="alert">{error}</p>}{actionError.notice}
   <div><button id="stage-toggle" onClick={()=>setOpen(v=>!v)}>Изменить доступность этапа</button><button id="fail-upload" onClick={()=>setFail(true)}>Сбой следующей загрузки</button><button id="registered" onClick={()=>setRegistered(true)}>Показать зарегистрированную партию</button><output id="upload-count">{uploads}</output></div>
   <section data-cabinet="student"><PartiesView g={scope(false)}/></section>
   <section data-cabinet="teacher"><TeacherPartyDossiers g={scope(true)}/></section>
@@ -68,13 +72,19 @@ async function ready(){for(let n=0;n<60;n++){if(server.exitCode!==null)throw Err
    assert.equal(await page.locator('#upload-count').textContent(),'0');await page.locator('#stage-toggle').click();
    async function send(){const chosen=page.waitForEvent('filechooser');await upload().click();await(await chosen).setFiles({name:'programme-v2.txt',mimeType:'text/plain',buffer:Buffer.from('Исправленная программа')})}
    await page.locator('#fail-upload').click();await send();
-   await studentProgram.locator('.isError').waitFor();assert((await studentProgram.textContent()).includes(remark),'A failed upload preserves the return note');
+   const uploadError=studentProgram.locator('.partyDocumentNotice.isError');
+   await uploadError.waitFor();assert((await studentProgram.textContent()).includes(remark),'A failed upload preserves the return note');
+   assert.equal(await page.locator('.actionErrorNotice,.errorBox').count(),0,'One local upload notice, without an injected duplicate');
+   const errorStyle=await uploadError.evaluate(el=>({length:el.textContent.length,height:el.getBoundingClientRect().height,padding:getComputedStyle(el).padding,border:getComputedStyle(el).borderWidth}));
+   assert(errorStyle.length<80&&errorStyle.height<=40,'Upload error must stay compact: '+JSON.stringify(errorStyle));assert.equal(errorStyle.padding,'0px');assert.equal(errorStyle.border,'0px');
+   if([390,1600].includes(width))await studentProgram.screenshot({path:path.join(shots,'party-upload-error-'+width+'.png')});
    assert(await upload().isEnabled(),'Retry remains available');await send();
    await page.waitForFunction(()=>document.querySelector('[data-cabinet=student] .partyRegistrationDocHistory')!==null);
    assert.equal(await student.locator('.partyRegistrationDoc.isRevision').count(),0);
    const latest=teacherProgram().filter({has:page.getByText('В2',{exact:true})});
    await latest.getByRole('button',{name:'Принять',exact:true}).click();
    await page.waitForFunction(()=>[...document.querySelectorAll('[data-cabinet=student] .partyRegistrationDocStatus')].some(e=>e.textContent==='В2 · Принято'));
+   assert.equal(await studentProgram.locator('.partyDocumentNotice').count(),0,'Approval removes the obsolete upload confirmation');
    await studentProgram.locator('.partyRegistrationDocHistory>summary').click();
    assert((await studentProgram.locator('.partyRegistrationDocHistory').textContent()).includes(remark));
    assert.equal(await student.locator('.civicPublicDocument').count(),0,'No public files before certificate');

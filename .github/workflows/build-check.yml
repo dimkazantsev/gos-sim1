@@ -142,6 +142,8 @@ on:
       - 'scripts/party-student-revision-browser-check.cjs'
       - 'scripts/party-program-news-check.cjs'
       - 'scripts/party-program-storage-rls-check.cjs'
+      - 'scripts/party-storage-upload-check.cjs'
+      - 'supabase/migrations/20261016114029_party_asset_upload_path_scope.sql'
       - 'supabase/migrations/20261016010000_registered_party_program_publication.sql'
       - 'components/game/partyDocumentVersions.ts'
       - 'app/party-registration-versions.css'
@@ -270,6 +272,8 @@ jobs:
       - run: node scripts/party-registration-versions-check.cjs
       - name: Student and teacher document revision contract
         run: node scripts/party-document-revision-flow-check.cjs
+      - name: Actual party Storage upload and replacement policies
+        run: node scripts/party-storage-upload-check.cjs
       - name: Student party styling and teacher revision interactions
         run: node scripts/party-student-revision-browser-check.cjs
       - run: node scripts/party-program-news-check.cjs
