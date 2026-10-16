@@ -6,6 +6,7 @@ on:
     paths:
       - 'components/game/StagesView.tsx'
       - 'components/game/TeacherView.tsx'
+      - 'components/game/GameHeader.tsx'
       - 'components/game/TeacherStageManager.tsx'
       - 'components/game/StagePolicyEditor.tsx'
       - 'components/game/TeacherPartyDossiers.tsx'

@@ -16,6 +16,10 @@ on:
       - 'public/share/gos-id-preview.jpg'
       - 'public/visit/index.html'
       - 'app/layout.tsx'
+      - 'components/GameClient.tsx'
+      - 'components/game/GameHeader.tsx'
+      - 'components/game/TeacherView.tsx'
+      - 'app/teacher-unified-header.css'
       - '.github/workflows/github-pages.yml'
   workflow_dispatch:
 permissions:

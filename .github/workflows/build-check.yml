@@ -105,6 +105,7 @@ on:
       - 'scripts/budget-change-registry-check.cjs'
       - 'supabase/migrations/20261012210000_unified_budget_change_registry.sql'
       - 'components/game/TeacherView.tsx'
+      - 'components/game/GameHeader.tsx'
       - 'components/game/EventChoicePanel.tsx'
       - 'components/game/EventCollaboration.tsx'
       - 'components/game/EventWorkspace.tsx'
