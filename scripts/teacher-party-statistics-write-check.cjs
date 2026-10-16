@@ -32,11 +32,12 @@ async function run(){
   await db.query('insert into public.games(id,owner_id) values($1,$2)',[game,teacher]);
   await db.query('insert into public.game_members(game_id,user_id,kind) values($1,$2,$3),($1,$4,$5)',[game,teacher,'teacher',student,'student']);
   await db.query('insert into public.game_parties(id,game_id,name) values($1,$2,$3),($4,$2,$5)',[party,game,'Партия А',other,'Партия Б']);
-  async function asUser(uid,values,expected){
+  async function asUser(uid,values,expected,openVote=false){
    await db.exec('begin');
    try{
     await db.query("select set_config('request.jwt.claim.sub',$1,true)",[uid]);
     await db.exec('set local role authenticated');
+    if(openVote)await db.query("select set_config('app.open_duma_vote','on',true)");
     await db.query('select public.teacher_update_party_statistics($1::uuid,$2::numeric,$3::numeric,$4::integer,$5::numeric,$6::numeric,$7::integer)',[party,values.rating,values.support,values.mandates,expected.rating,expected.support,expected.mandates]);
     await db.exec('reset role');await db.exec('commit');
    }catch(error){await db.exec('rollback');throw error}
@@ -57,9 +58,7 @@ async function run(){
   await db.query('update public.game_parties set mandates=449 where id=$1',[other]);
   await assert.rejects(asUser(teacher,{rating:55,support:60,mandates:2},{rating:55,support:60,mandates:0}),/450 mandates maximum/);
   await db.query('update public.game_parties set mandates=0 where id=$1',[other]);
-  await db.exec('begin');await db.exec("select set_config('app.open_duma_vote','on',true)");
-  await assert.rejects(asUser(teacher,{rating:55,support:60,mandates:1},{rating:55,support:60,mandates:0}),/Mandates frozen/);
-  await db.exec('rollback');
+  await assert.rejects(asUser(teacher,{rating:55,support:60,mandates:1},{rating:55,support:60,mandates:0},true),/Mandates frozen/);
   await db.query("insert into public.state_metrics(id,game_id,is_public,metric_key,label,unit) values($1,$2,true,'economy','Экономика','%')",[id(6),game]);
   await db.query("insert into public.state_metric_history(game_id,metric_id,value,previous_value,delta,source_id,note) values($1,$2,80,70,10,'baseline','Принят экономический показатель')",[game,id(6)]);
   const noteNews=await db.query("select body from public.political_posts where source_key like 'rating-batch:%' and body like '%Основание:%' limit 1");
