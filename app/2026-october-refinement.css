@@ -974,3 +974,11 @@
  .eventCaseModal .situationSymbol.eventComic .situationSymbolMain svg{width:48px!important;height:48px!important}
  .eventCaseModal .situationSymbol.eventComic .situationSymbolBadge svg{width:20px!important;height:20px!important}
 }
+
+/* Keep numbered document headings readable in every viewport. */
+.stageDocumentForm .stageDocumentSectionHead{display:flex;align-items:flex-start;gap:12px;margin:21px 0 10px;min-width:0}
+.stageDocumentForm .stageDocumentSectionHead>small{flex:0 0 24px;padding-top:3px}
+.stageDocumentForm .stageDocumentSectionHead>div{display:grid;gap:5px;min-width:0}
+.stageDocumentForm .stageDocumentSectionHead b{display:block;font-size:16px;line-height:1.4;color:#173c70}
+.stageDocumentForm .stageDocumentSectionHead span{display:block;font-size:13px;line-height:1.55;color:#61758e}
+@media(max-width:600px){.stageDocumentForm .stageDocumentSectionHead{gap:9px}.stageDocumentForm .stageDocumentSectionHead b{font-size:15px}}
