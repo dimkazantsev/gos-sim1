@@ -44,7 +44,7 @@ async function run(){
   }
   const old={rating:null,support:0,mandates:0};
   await assert.rejects(asUser(student,{rating:30,support:60,mandates:0},old),/права преподавателя/);
-  assert.equal((await db.query('select support from public.game_parties where id=$1',[party])).rows[0].support,0);
+  assert.equal(Number((await db.query('select support from public.game_parties where id=$1',[party])).rows[0].support),0);
   await asUser(teacher,{rating:30,support:60,mandates:0},old);
   let partyRow=(await db.query('select rating,support,mandates from public.game_parties where id=$1',[party])).rows[0];
   assert.equal(Number(partyRow.rating),30);assert.equal(Number(partyRow.support),60);
