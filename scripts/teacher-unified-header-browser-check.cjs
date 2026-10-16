@@ -55,7 +55,8 @@ const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.r
        cardBorder:getComputedStyle(card).borderTopWidth,
        navBorder:getComputedStyle(nav).borderTopWidth,
        navRadius:getComputedStyle(nav).borderTopLeftRadius,
-       contentBackground:getComputedStyle(document.querySelector('.simContentFlow')).backgroundImage,
+       rail:{position:getComputedStyle(document.querySelector('.simWorkspace'),'::before').position,background:getComputedStyle(document.querySelector('.simWorkspace'),'::before').backgroundColor,top:parseFloat(getComputedStyle(document.querySelector('.simWorkspace'),'::before').top),height:parseFloat(getComputedStyle(document.querySelector('.simWorkspace'),'::before').height),left:parseFloat(getComputedStyle(document.querySelector('.simWorkspace'),'::before').left)},
+       scrollbar:getComputedStyle(nav).scrollbarWidth,
        client:nav.clientWidth,scroll:nav.scrollWidth,
        viewport:document.documentElement.clientWidth,scrollWidth:document.documentElement.scrollWidth};
     });
@@ -69,8 +70,11 @@ const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.r
       `${width}px: the two header tiers must have identical opaque backgrounds`);
     assert(m.cardBorder==='0px'&&m.navBorder==='0px'&&m.navRadius==='0px',
       `${width}px: legacy double card outline still shown: ${JSON.stringify(m)}`);
-    assert(m.contentBackground.includes('linear-gradient'),
-      `${width}px: header-to-tabs background bridge missing`);
+    assert(m.rail.position==='fixed'&&m.rail.background==='rgb(255, 255, 255)',
+      `${width}px: fixed white rail behind the tabs is missing: ${JSON.stringify(m.rail)}`);
+    assert(Math.abs(m.rail.top-m.top.bottom)<=2&&Math.abs(m.rail.height-m.nav.height)<=2,
+      `${width}px: rail must exactly cover the header-to-tabs join: ${JSON.stringify(m)}`);
+    assert(m.scrollbar==='none',`${width}px: obsolete visible scrollbar below teacher tabs`);
     assert(m.bar.top>=m.nav.bottom+8&&m.bar.top<=m.nav.bottom+25,
       `${width}px: command card spacing not intentional: ${JSON.stringify(m)}`);
     assert(m.scrollWidth<=m.viewport+2,`${width}px: page horizontal overflow`);
@@ -85,8 +89,11 @@ const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.r
     const sticky=await page.evaluate(()=>{
      const t=document.querySelector('.simTop').getBoundingClientRect();
      const n=document.querySelector('.teacherWorkspaceNav').getBoundingClientRect();
-     return {headerBottom:t.bottom,navTop:n.top};
+     const rail=getComputedStyle(document.querySelector('.simWorkspace'),'::before');
+     return {headerBottom:t.bottom,navTop:n.top,railTop:parseFloat(rail.top),railHeight:parseFloat(rail.height),navHeight:n.height};
     });
+    assert(Math.abs(sticky.headerBottom-sticky.railTop)<=2&&Math.abs(sticky.railHeight-sticky.navHeight)<=2,
+      `${width}px: opaque rail separates from header while scrolling: ${JSON.stringify(sticky)}`);
     assert(Math.abs(sticky.headerBottom-sticky.navTop)<=2,
       `${width}px: gap appears when scrolling: ${JSON.stringify(sticky)}`);
     await page.close();
