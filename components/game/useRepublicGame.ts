@@ -51,6 +51,18 @@ export function useRepublicGame(gameId:string){
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const lastTelegramDispatch=useRef(0);
  const lastCoreSuccessAt=useRef(0);
+ const overviewRealtimeTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const lastRealtimeOverviewAt=useRef(0);
+ function scheduleRealtimeChatOverview(){
+  if(overviewRealtimeTimer.current!==null)return;
+  const delay=Math.max(0,1500-(Date.now()-lastRealtimeOverviewAt.current));
+  overviewRealtimeTimer.current=setTimeout(()=>{
+   overviewRealtimeTimer.current=null;
+   if(!alive.current||!authUser.current||document.visibilityState==='hidden')return;
+   lastRealtimeOverviewAt.current=Date.now();
+   void loadChatOverview();
+  },delay);
+ }
  const assetSignatures=useRef(new Map<string,{expiresAt:number;promise:Promise<string|null>}>());
  const assetSignQueue=useRef({active:0,waiting:[] as Array<()=>void>});
  function signedAssetUrl(bucket:'game-assets'|'game-media',path:string,force=false):Promise<string|null>{
@@ -134,6 +146,8 @@ export function useRepublicGame(gameId:string){
  function clearGameData(){
   acceptedMember.current=null;
   assetSignatures.current.clear();lastCoreSuccessAt.current=0;
+  if(overviewRealtimeTimer.current!==null){clearTimeout(overviewRealtimeTimer.current);overviewRealtimeTimer.current=null}
+  lastRealtimeOverviewAt.current=0;
   setGame(null);setMe(null);setMetrics([]);setEvents([]);setMembers([]);setOfficeRows([]);
   setChannels([]);channelRef.current='';setChannelId('');setMessages([]);setChatPins([]);setPinnedMessages([]);setChatOverview([]);setChatLoading(false);setChatOpen(false);
   setStages([]);setParties([]);setVotes([]);setBallots([]);setEvaluations([]);setCrises([]);setDocuments([]);setActivities([]);setPresence([]);setProfiles([]);
@@ -228,7 +242,7 @@ export function useRepublicGame(gameId:string){
    if(core){void hydrateActiveView();notifyGameDataRefresh(gameId)}
    // A document version changes no core identity or party membership.
    if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments();
-   if(overview||chat)void loadChatOverview();
+   if(overview||chat)scheduleRealtimeChatOverview();
    if(chat&&channelRef.current)void loadMessages(channelRef.current);
    if(pins&&channelRef.current)void loadChatPins(channelRef.current);
    if(wake)void kickTelegramDispatch();
