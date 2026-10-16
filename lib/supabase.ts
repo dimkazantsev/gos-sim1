@@ -1,5 +1,6 @@
 import {userError} from './userError';
 import {fetchWithBoundedSessionRefresh} from './boundedSessionRefresh';
+import {fetchWithAuthTimeout,isAuthVerificationRequest} from './authTransport';
 import { createClient } from '@supabase/supabase-js';
 
 const url =
@@ -12,7 +13,7 @@ const publishableKey =
 
 export const supabase = createClient(url, publishableKey, {
   global:{fetch:async(input,init)=>{
-   let response:Response;try{response=await fetchWithBoundedSessionRefresh(input,init)}catch(error){throw new Error(userError(error))}
+   let response:Response;try{response=await (isAuthVerificationRequest(input,init)?fetchWithAuthTimeout(input,init):fetchWithBoundedSessionRefresh(input,init))}catch(error){throw new Error(userError(error))}
    if(response.ok||!response.headers.get('content-type')?.includes('json'))return response;
    let body:Record<string,unknown>;try{body=await response.clone().json()}catch{return response}
    for(const key of ['message','error_description','msg'])if(typeof body[key]==='string')body[key]=userError({message:body[key],code:body.code||body.error_code});
@@ -28,11 +29,8 @@ export const supabase = createClient(url, publishableKey, {
 export function createPasswordAuthClient(){
   return createClient(url, publishableKey, {
     global:{fetch:async(input,init)=>{
-      const controller=new AbortController();
-      const timer=setTimeout(()=>controller.abort(),12000);
-      try{return await fetch(input,{...init,signal:controller.signal})}
-      catch(error){throw new Error(error instanceof DOMException&&error.name==='AbortError'?'Сервер авторизации не ответил за 12 секунд.':userError(error))}
-      finally{clearTimeout(timer)}
+      try{return await fetchWithAuthTimeout(input,init)}
+      catch(error){throw new Error(userError(error))}
     }},
     auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
   });

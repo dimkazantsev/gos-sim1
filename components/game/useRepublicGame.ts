@@ -529,6 +529,10 @@ export function useRepublicGame(gameId:string){
    const visiblePostIds=new Set(((pp.data||[]) as PoliticalPost[]).map(p=>p.id));
    const rows=await Promise.all(((px.data||[]) as PoliticalPostMedia[]).filter(x=>visiblePostIds.has(x.post_id)).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
    if(readCurrent(ticket,'political')){setPoliticalPosts((pp.data||[]) as PoliticalPost[]);setPoliticalMedia(rows);setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);setMetricHistory((mh.data||[]) as MetricHistory[]);setPartySupportHistory((psh.data||[]) as PartySupportHistory[])}
+    // Only registration stories require programme files; avoid extra signed-URL
+    // requests and preserve the existing resilience tests for ordinary news.
+    if(readCurrent(ticket,'political')&&((pp.data||[]) as PoliticalPost[]).some(post=>post.source_key?.startsWith('media-party-registration:'))){void loadPartyDocuments()}
+
   }
   if(readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
   if(readCurrent(ticket,'parties')){

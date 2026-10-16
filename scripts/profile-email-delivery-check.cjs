@@ -94,7 +94,7 @@ async function main(){
  await check('Auth transport preserves status, code, and Russian error context',async()=>{
   let options;
   const module={exports:{}};
-  const requireFor=name=>name==='./userError'?errors:name==='./boundedSessionRefresh'?{fetchWithBoundedSessionRefresh:(input,init)=>context.fetch(input,init)}:{createClient:(url,key,input)=>{options=input;return{};}};
+  const requireFor=name=>name==='./userError'?errors:name==='./boundedSessionRefresh'?{fetchWithBoundedSessionRefresh:(input,init)=>context.fetch(input,init)}:name==='./authTransport'?{isAuthVerificationRequest:()=>false,fetchWithAuthTimeout:(input,init)=>context.fetch(input,init)}:{createClient:(url,key,input)=>{options=input;return{};}};
   const context={process:{env:{}},Response,Headers,AbortController,DOMException,setTimeout,clearTimeout,fetch:async()=>new Response(JSON.stringify({code:'email_exists',msg:'A user with this email address has already been registered'}),{status:422,headers:{'content-type':'application/json','content-length':'1000'}})};
   vm.runInNewContext('(function(require,module,exports){'+compile('lib/supabase.ts')+'\n})',context)(requireFor,module,module.exports);
   const response=await options.global.fetch('https://auth.example.invalid/user');const body=await response.json();assert.equal(response.status,422);assert.equal(body.code,'email_exists');assert.match(body.msg,/Этот адрес уже зарегистрирован/);assert.equal(response.headers.get('content-length'),null);

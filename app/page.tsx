@@ -6,6 +6,8 @@ import GameEntryQr from '@/components/ui/GameEntryQr';
 import {BrandIdentity,BRAND_NAME,BRAND_TAGLINE} from '@/components/ui/BrandIdentity';
 import {useRouter} from 'next/navigation';
 import {createPasswordAuthClient,supabase} from '@/lib/supabase';
+import {isTransientAuthError} from '@/lib/authTransport';
+import {userError} from '@/lib/userError';
 import {forgetRememberedGameCode,readRememberedGameCodes,rememberGameCode} from '@/lib/rememberedGameCodes';
 
 function readableError(err:unknown){
@@ -15,7 +17,7 @@ function readableError(err:unknown){
  if(raw.includes('Group required'))return 'Укажите свою группу либо используйте код группы, выданный преподавателем.';
  if(raw.includes('Invalid game or invite code'))return 'Неверный код игры или код приглашения.';
  if(raw.includes('duplicate key value')||raw.includes('games_game_code_key'))return 'Игра с таким кодом уже существует. Укажите другой код игры.';
- return raw||'Не удалось выполнить вход.';
+ return userError(err)||'Не удалось выполнить вход.';
 }
 
 export default function Home(){
@@ -57,7 +59,7 @@ export default function Home(){
 
  async function login(e:FormEvent){
   e.preventDefault();if(busy)return;setBusy(true);setError('');
-  let phase:'authentication'|'game'='authentication';
+  let phase:'authentication'|'session'|'game'='authentication';
   try{
    if(typeof navigator!=='undefined'&&!navigator.onLine)throw new Error('Устройство не подключено к интернету. Проверьте сеть.');
    // Explicit password login must not depend on a stored refresh token.
@@ -74,14 +76,17 @@ export default function Home(){
      break;
     }
     authError=auth.error||new Error('Сервер авторизации не вернул сессию.');
-    const detail=String(authError&&typeof authError==='object'&&'message' in authError?(authError as {message?:unknown}).message:authError||'');
-    const retry=/\b5\d\d\b|request_timeout|context deadline exceeded|timeout|temporarily unavailable|fetch failed|network|12 секунд/i.test(detail);
-    if(!retry||attempt===1)throw authError;
+    if(!isTransientAuthError(authError)||attempt===1)throw authError;
     await new Promise(resolve=>setTimeout(resolve,900));
    }
    if(authError||!session)throw authError||new Error('Сервер авторизации не вернул сессию.');
-   const adopted=await supabase.auth.setSession(session);
-   if(adopted.error)throw adopted.error;
+   phase='session';
+   for(let attempt=0;attempt<2;attempt++){
+    const adopted=await supabase.auth.setSession(session);
+    if(!adopted.error)break;
+    if(!isTransientAuthError(adopted.error)||attempt===1)throw adopted.error;
+    await new Promise(resolve=>setTimeout(resolve,900));
+   }
    phase='game';
    // PostgREST can temporarily return 503 while rebuilding its schema cache.
    // Resume is idempotent, unlike join_game_with_code which records an audit event.
@@ -101,8 +106,7 @@ export default function Home(){
     router.push('/game/'+resumedGameId);
   }catch(e){
    const message=readableError(e);
-   const transient=/Нет ответа от сервера|network|fetch|timeout|соединен|сеть|подключено к интернету/i.test(message);
-   setError((phase==='authentication'?'Проверка учётной записи: ':'Открытие игровой сессии: ')+message+(transient?' Если используете VPN, проверьте доступность Supabase без него и повторите вход.':''));
+   setError((phase==='authentication'?'Проверка учётной записи: ':phase==='session'?'Проверка сессии: ':'Открытие игровой сессии: ')+message);
   }finally{setBusy(false)}
  }
  async function recover(){
