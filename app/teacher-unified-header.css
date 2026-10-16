@@ -84,6 +84,9 @@
  .simWorkspace:has(.teacherCommand) {
   --gs-teacher-tabs-height:60px;
  }
+ .simWorkspace:has(.teacherCommand)::before {
+  top:56px;
+ }
  .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav {
   top:56px;
   padding:5px 10px;
