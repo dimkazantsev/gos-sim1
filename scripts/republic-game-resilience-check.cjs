@@ -150,6 +150,25 @@ async function main(){
   assert.equal(h.assetStats().signed,first.signed,'Unchanged Storage paths must reuse session-scoped signed URLs');
   h.dispose();
  });
+ await check('Initial game hydration caps its fifteen core requests at four parallel requests per client',async()=>{
+  const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
+  const start=source.indexOf('async function loadCoreSections()'),end=source.indexOf('async function hydrateActiveView(',start);
+  assert(start>=0&&end>start);
+  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,15);
+  assert(source.includes('coreReadQueue.current.active<4'));
+ });
+ await check('40 simulated simultaneous party panels survive the same document update',async()=>{
+  const clients=Array.from({length:40},()=>harness({effects:true}));
+  await Promise.all(clients.map(async h=>{await h.settle();h.render().setActiveView('parties');await h.settle();}));
+  const coreReads=clients.map(h=>h.readCount('games'));
+  for(const h of clients)h.emit('party_documents');
+  await Promise.all(clients.map(h=>h.settle()));
+  clients.forEach((h,index)=>{
+   assert.equal(h.readCount('games'),coreReads[index],'A version update must not fan out into a full reload');
+   assert.equal(h.render().parties.length,1);
+   h.dispose();
+  });
+ });
  await check('40 simulated clients keep their sections isolated during a document update',async()=>{
   const clients=Array.from({length:40},()=>harness({effects:true}));
   const views=['parties','stages','documents','teacher','budget','actions','votes','dashboard'];
