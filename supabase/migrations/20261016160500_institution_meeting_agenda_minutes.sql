@@ -189,7 +189,7 @@ grant execute on function public.approve_institution_meeting_agenda(uuid,integer
 
 -- A coordinator may entrust preparation to a member even after the agenda was approved.
 create or replace function public.assign_institution_meeting_secretary(p_game_id uuid,p_stage_no integer,p_institution text,p_delegate uuid)
-returns void language plpgsql security definer set search_path=public,private,pg_temp as $
+returns void language plpgsql security definer set search_path=public,private,pg_temp as $$
 declare uid uuid:=auth.uid();
 begin
  if uid is null or not private.can_coordinate_institution_meeting(p_game_id,p_institution,uid) then
@@ -200,12 +200,12 @@ begin
  values(p_game_id,p_stage_no,p_institution,p_delegate)
  on conflict(game_id,stage_no,institution_key) do update set
  delegate_user_id=excluded.delegate_user_id,updated_at=now();
-end;$;
+end;$$;
 revoke all on function public.assign_institution_meeting_secretary(uuid,integer,text,uuid) from public,anon;
 grant execute on function public.assign_institution_meeting_secretary(uuid,integer,text,uuid) to authenticated;
 
 create or replace function public.approve_institution_meeting_minutes(p_game_id uuid,p_stage_no integer,p_institution text)
-returns void language plpgsql security definer set search_path=public,private,pg_temp as $
+returns void language plpgsql security definer set search_path=public,private,pg_temp as $$
 declare uid uuid:=auth.uid();m public.institution_meeting_records%rowtype;
 begin
  if uid is null or not private.can_coordinate_institution_meeting(p_game_id,p_institution,uid) then
@@ -220,7 +220,7 @@ begin
  where game_id=p_game_id and stage_no=p_stage_no and institution_key=p_institution;
  update public.formal_documents set status_code='published',status_label='Протокол утверждён',
  current_owner_key='system',updated_at=now() where id=m.minutes_document_id;
-end;$;
+end;$$;
 revoke all on function public.approve_institution_meeting_minutes(uuid,integer,text) from public,anon;
 grant execute on function public.approve_institution_meeting_minutes(uuid,integer,text) to authenticated;
 
