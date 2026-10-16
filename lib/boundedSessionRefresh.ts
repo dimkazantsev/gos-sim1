@@ -25,7 +25,7 @@ export async function fetchWithBoundedSessionRefresh(
  try{
   return await transport(input,{...init,signal:controller.signal});
  }catch(error){
-  if(timedOut)throw new Error('Обновление сессии не получило ответ от сервера авторизации. Сеанс не удалён. Повторите вход.');
+  if(timedOut)throw new Error('Обновление сессии не получило ответ от сервера авторизации. Повторите вход.');
   throw error;
  }finally{
   clearTimeout(timer);
