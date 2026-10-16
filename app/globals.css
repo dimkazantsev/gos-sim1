@@ -2244,10 +2244,23 @@ button,input,textarea,select{font-size:14px}
  .budgetChangeRegistryToggle{gap:5px}
 }
 
-/* Contextual validation feedback: positioned in normal document flow right after
-   the originating control. Page-level alerts remain for non-interaction errors. */
-.actionErrorSlot{display:block;box-sizing:border-box;grid-column:1/-1;flex:1 0 100%;min-width:0;width:100%;max-width:100%;margin:8px 0 12px}
-.actionErrorNotice{box-sizing:border-box;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:11px 13px;border:1px solid #ebbbc7;border-radius:12px;background:#fff5f7;color:#9f2443;font-size:13px;line-height:1.55;overflow-wrap:anywhere}
+/* Compact error toast, fixed above the interface rather than an intrusive
+   full-width banner. Pointer and keyboard positions are clamped in the hook. */
+.actionErrorNotice{
+ box-sizing:border-box;position:fixed;z-index:3000;display:flex;align-items:flex-start;
+ gap:10px;width:min(340px,calc(100vw - 24px));max-height:min(270px,calc(100dvh - 24px));
+ overflow:auto;padding:11px 10px 11px 13px;border:1px solid #edbdc8;
+ border-left:3px solid #d84664;border-radius:12px;background:#fff9fa;
+ color:#992947;font-size:13px;line-height:1.45;overflow-wrap:anywhere;
+ box-shadow:0 12px 32px rgba(26,40,74,.17);animation:actionErrorAppear .12s ease-out;
+}
 .actionErrorNotice>span{min-width:0;flex:1}
-.actionErrorDismiss{display:grid;place-items:center;flex:none;width:28px;height:28px;min-height:28px;margin:-3px -4px -3px 0;padding:0;border:1px solid #e8c8d0;border-radius:8px;background:#fff;color:#863447;font-size:20px;cursor:pointer}
+.actionErrorDismiss{
+ display:grid;place-items:center;flex:none;width:28px;height:28px;min-height:28px;
+ margin:-3px -4px -3px 0;padding:0;border:1px solid #e8c8d0;border-radius:8px;
+ background:#fff;color:#863447;font-size:20px;cursor:pointer;
+}
 .actionErrorDismiss:focus-visible{outline:3px solid #6b8cfc;outline-offset:2px}
+@keyframes actionErrorAppear{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.actionErrorNotice{animation:none}}
+@media(max-width:480px){.actionErrorNotice{width:min(310px,calc(100vw - 24px));font-size:13px;padding:10px 9px 10px 11px}}
