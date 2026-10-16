@@ -622,48 +622,78 @@ export function useRepublicGame(gameId:string){
 
  async function loadFormalRegistry(){
   await readSafely(['formal'],async ticket=>{
-  const [fd,fh]=await Promise.all([
-   supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}),
-   supabase.from('formal_document_history').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
-  ]);
-  if(!readCurrent(ticket))return;
-  requireSuccessful([fd,fh]);
-  const rows=await Promise.all(((fd.data||[]) as FormalDocument[]).map(async x=>x.source_file_path?{...x,file_url:await signedAssetUrl('game-assets',x.source_file_path)}:x));
-  if(!readCurrent(ticket))return;
-  setFormalDocuments(rows);setFormalHistory((fh.data||[]) as FormalHistory[]);
-  if(fd.data?.some(d=>d.status_code==='published'&&d.metadata?.budget_simulator_plan_id))void syncBudget();
+   const [fd,fh]=await Promise.all([
+    supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}),
+    supabase.from('formal_document_history').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
+   ]);
+   if(!readCurrent(ticket))return;
+   requireSuccessful([fd,fh]);
+   const rows=(fd.data||[]) as FormalDocument[];
+   // Render the register independently from Storage availability.
+   setFormalDocuments(previous=>{
+    const cached=new Map(previous.map(row=>[row.id,row]));
+    return rows.map(row=>{
+     const old=cached.get(row.id);
+     return {...row,file_url:old?.source_file_path===row.source_file_path?old.file_url||null:null};
+    });
+   });
+   setFormalHistory((fh.data||[]) as FormalHistory[]);
+   void Promise.all(rows.filter(row=>row.source_file_path).map(async row=>({
+    id:row.id,path:row.source_file_path,url:await signedAssetUrl('game-assets',row.source_file_path!)
+   }))).then(links=>{
+    if(!readCurrent(ticket))return;
+    const byId=new Map(links.map(link=>[link.id,link]));
+    setFormalDocuments(previous=>previous.map(row=>{
+     const link=byId.get(row.id);
+     return link&&link.path===row.source_file_path?{...row,file_url:link.url||row.file_url||null}:row;
+    }));
+   });
+   if(fd.data?.some(doc=>doc.status_code==='published'&&doc.metadata?.budget_simulator_plan_id))void syncBudget();
   });
  }
-
  async function loadPoliticalWall(){
   await readSafely(['political','metrics','parties'],async ticket=>{
-  const [pp,px,pl,mh,psh,mt,pa]=await Promise.all([
-   supabase.from('political_posts').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
-   supabase.from('political_post_media').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   supabase.from('political_post_formal_links').select('*').eq('game_id',gameId),
-   supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
-   supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
-   supabase.from('state_metrics').select('*').eq('game_id',gameId).order('sort_order'),
-   supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')
-  ]);
-  if(!readActive(ticket))return;
-  requireSuccessful([pp,px,pl,mh,psh,mt,pa]);
-  if(readCurrent(ticket,'political')){
-   // Deleted posts are excluded by political_posts RLS. Do not sign orphaned
-   // attachments for them: they no longer have a rendered card.
-   const visiblePostIds=new Set(((pp.data||[]) as PoliticalPost[]).map(p=>p.id));
-   const rows=await Promise.all(((px.data||[]) as PoliticalPostMedia[]).filter(x=>visiblePostIds.has(x.post_id)).map(async x=>({...x,url:await signedAssetUrl('game-assets',x.storage_path)})));
-   if(readCurrent(ticket,'political')){setPoliticalPosts((pp.data||[]) as PoliticalPost[]);setPoliticalMedia(rows);setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);setMetricHistory((mh.data||[]) as MetricHistory[]);setPartySupportHistory((psh.data||[]) as PartySupportHistory[])}
-    // Only registration stories require programme files; avoid extra signed-URL
-    // requests and preserve the existing resilience tests for ordinary news.
-    if(readCurrent(ticket,'political')&&((pp.data||[]) as PoliticalPost[]).some(post=>post.source_key?.startsWith('media-party-registration:'))){void loadPartyDocuments()}
-
-  }
-  if(readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
-  if(readCurrent(ticket,'parties')){
-   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:await signedAssetUrl('game-assets',x.logo_path)}:x));
-   if(readCurrent(ticket,'parties'))setParties(rows);
-  }
+   const [pp,px,pl,mh,psh,mt,pa]=await Promise.all([
+    supabase.from('political_posts').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
+    supabase.from('political_post_media').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+    supabase.from('political_post_formal_links').select('*').eq('game_id',gameId),
+    supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
+    supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
+    supabase.from('state_metrics').select('*').eq('game_id',gameId).order('sort_order'),
+    supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')
+   ]);
+   if(!readActive(ticket))return;
+   requireSuccessful([pp,px,pl,mh,psh,mt,pa]);
+   if(readCurrent(ticket,'political')){
+    // Only sign files belonging to posts still visible under RLS.
+    const posts=(pp.data||[]) as PoliticalPost[];
+    const visiblePostIds=new Set(posts.map(post=>post.id));
+    const rows=((px.data||[]) as PoliticalPostMedia[]).filter(item=>visiblePostIds.has(item.post_id));
+    setPoliticalPosts(posts);
+    setPoliticalMedia(previous=>{
+     const cached=new Map(previous.map(row=>[row.id,row]));
+     return rows.map(row=>{
+      const old=cached.get(row.id);
+      return {...row,url:old?.storage_path===row.storage_path?old.url||null:null};
+     });
+    });
+    setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);
+    setMetricHistory((mh.data||[]) as MetricHistory[]);
+    setPartySupportHistory((psh.data||[]) as PartySupportHistory[]);
+    void Promise.all(rows.filter(row=>row.storage_path).map(async row=>({
+     id:row.id,path:row.storage_path,url:await signedAssetUrl('game-assets',row.storage_path)
+    }))).then(links=>{
+     if(!readCurrent(ticket,'political'))return;
+     const byId=new Map(links.map(link=>[link.id,link]));
+     setPoliticalMedia(previous=>previous.map(row=>{
+      const link=byId.get(row.id);
+      return link&&link.path===row.storage_path?{...row,url:link.url||row.url||null}:row;
+     }));
+    });
+    if(posts.some(post=>post.source_key?.startsWith('media-party-registration:')))void loadPartyDocuments();
+   }
+   if(readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
+   if(readCurrent(ticket,'parties'))acceptPartyRows((pa.data||[]) as Party[],ticket);
   });
  }
 
