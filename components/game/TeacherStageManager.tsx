@@ -175,7 +175,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
      <div className="teacherStageInspectorActions" aria-label="Действия с выбранным этапом">
       <div className="teacherStageFlowActions">
        {selectedStage.status!=='open'
-        ?<button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'open')}>Открыть этап</button>
+        ?<button type="button" className="teacherStageOpenFull" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'open')}>Открыть этап</button>
         :<>
          <button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'close')}>Завершить этап</button>
          <label className="teacherStageExtendField">Продление, минут
