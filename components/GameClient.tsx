@@ -432,6 +432,38 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   void loadProfileSetup();
   return()=>{setupRequest.current++};
  },[game?.id,me?.user_id,g.profilesLoaded,navigationHydrated,introSeen,observer,previewMode,myProfile?.onboarding_completed_at]);
+ // If all six mandatory fields have already been filled, the participant
+ // must not get trapped in Profile merely because they missed the final button.
+ // Only the existing server RPC can mark the profile completed.
+ useEffect(()=>{
+  if(!game||!me||observer||previewMode||introOpen||!introSeen||g.loading||!g.profilesLoaded||
+   !navigationHydrated||setupChecking||setupStatusScope!==profileScope||
+   !setupStatus||setupStatus.completed||setupStatus.missing.length!==0||
+   myProfile?.onboarding_completed_at||autoFinalizeAttempt.current===profileScope)return;
+  autoFinalizeAttempt.current=profileScope;
+  const gameAtRequest=game.id,userAtRequest=me.user_id;
+  void (async()=>{
+   let errorText='';
+   try{
+    const r=await supabase.rpc('complete_my_game_profile',{p_game:gameAtRequest});
+    if(r.error)errorText=r.error.message;
+   }catch(e){errorText=e instanceof Error?e.message:'Сетевая ошибка при проверке профиля';}
+   if(gameId!==gameAtRequest||g.me?.user_id!==userAtRequest)return;
+   if(errorText){
+    pendingProfileNavigation.current=null;
+    setOnboardingNotice('Не удалось подтвердить завершение профиля: '+errorText+'. Проверьте обязательные сведения и повторите попытку.');
+    navigate('profile',undefined,true);
+    return;
+   }
+   setVerifiedSetupScope(profileScope);
+   setSetupStatus({completed:true,prompt_seen:true,missing:[]});
+   setOnboardingNotice('');
+   const pending=pendingProfileNavigation.current;
+   pendingProfileNavigation.current=null;
+   if(pending)navigate(pending.view,pending.target,true);
+   void g.refresh();
+  })();
+ },[game?.id,me?.user_id,observer,previewMode,introOpen,introSeen,g.loading,g.profilesLoaded,navigationHydrated,setupChecking,setupStatusScope,setupStatus?.completed,setupStatus?.missing.length,myProfile?.onboarding_completed_at]);
  useEffect(()=>{
   setupWelcomeActive&&setSetupWelcomeActive(false);
   setupPromptScope.current='';
