@@ -99,7 +99,7 @@ const vk=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
   await register([a,b]);
   await vote(v6,a,'yes',226);assert.equal((await state(v6)).status,'open');
   await vote(v6,b,'no',224);assert.equal((await state(v6)).status,'closed');
-  assert.equal((await state(v6)).result_cast,450);
+  assert.equal(Number((await state(v6)).result_cast),450);
   // A question without a registration requirement remains under manual control.
   const v7=vk(107);
   await createVote({id:v7,attendance:false});
