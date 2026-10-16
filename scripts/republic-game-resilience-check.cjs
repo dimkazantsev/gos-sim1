@@ -14,7 +14,7 @@ function deferred(){let resolve;const promise=new Promise(done=>resolve=done);re
 
 function harness({effects=false}={}){
  const slots=[],pendingEffects=[],channels=[],timers=new Map(),listeners=new Map(),counts=new Map(),holds=new Map(),failures=new Set(),failureCodes=new Map();
- let cursor=0,dirty=false,revision=1,user='teacher-a',memberKind='teacher',gameId='game-a',authCallback,authError=null,clock=0,requests=0,disposed=false,recorders=0,stoppedTracks=0,withBallots=false;
+ let cursor=0,dirty=false,revision=1,user='teacher-a',memberKind='teacher',gameId='game-a',authCallback,authError=null,clock=0,requests=0,disposed=false,recorders=0,stoppedTracks=0,withBallots=false,assetPaths=false,signed=0,activeSigns=0,peakSigns=0;
  const permission=deferred(),mediaSend=deferred();
  class Recorder{constructor(){recorders++;this.state='inactive';}static isTypeSupported(){return false;}start(){this.state='recording';}stop(){this.state='inactive';this.onstop?.();}}
  const redirects=[];
@@ -48,7 +48,9 @@ function harness({effects=false}={}){
      if(withBallots&&table==='game_evaluations')data=[{id:'evaluation-'+snapshot.revision,user_id:snapshot.user}];
      if(withBallots&&table==='game_crises')data=[{id:'crisis-'+snapshot.revision,game_id:id}];
      if(withBallots&&table==='game_documents')data=[{id:'document-'+snapshot.revision,game_id:id,created_by:snapshot.user}];
-     if(table==='game_parties')data=[{id:'party-'+snapshot.revision,game_id:id,name:'party-'+snapshot.revision}];
+     if(table==='game_parties')data=[{id:'party-'+snapshot.revision,game_id:id,name:'party-'+snapshot.revision,...(assetPaths?{logo_path:id+'/parties/logo.png'}:{})}];
+      if(table==='party_documents'&&assetPaths)data=Array.from({length:12},(_,i)=>({id:'doc-'+i,game_id:id,party_id:'party-1',doc_kind:'program',storage_path:id+'/docs/doc-'+i+'.pdf',created_at:'2026-10-16T00:00:00Z'}));
+      if(table==='game_profiles'&&assetPaths)data=[{game_id:id,user_id:snapshot.user,avatar_path:id+'/profiles/avatar.png',signature_path:id+'/profiles/signature.png'}];
      if(table==='political_posts')data=[{id:'post-'+snapshot.revision,game_id:id,title:'post-'+snapshot.revision}];
      if(table==='chat_channels')data=[{id:'channel-a',game_id:id,name:'Общий чат',kind:'public'}];
      if(table==='chat_messages')data=[{id:'message-'+snapshot.revision,game_id:id,channel_id:this.eqs.channel_id||'channel-a',text:'message-'+snapshot.revision,created_at:'2026-10-08T10:00:00Z'}];
@@ -73,7 +75,7 @@ function harness({effects=false}={}){
    }
    return{data:name==='has_seen_my_intro'?true:name==='get_my_chat_overview'?[{channel_id:'channel-a',unread_count:0}]:[],error:null};
   },
-  storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/media'},error:null})})}
+  storage:{from:()=>({createSignedUrl:async()=>{signed++;activeSigns++;peakSigns=Math.max(peakSigns,activeSigns);await tick();activeSigns--;return{data:{signedUrl:'https://example.invalid/media'},error:null}}})}
  };
  const win={addEventListener:(key,fn)=>listeners.set(key,fn),removeEventListener:(key,fn)=>{if(listeners.get(key)===fn)listeners.delete(key);},localStorage:{getItem:()=>null,setItem:()=>{}}};
  const doc={visibilityState:'visible',addEventListener:()=>{},removeEventListener:()=>{}};
@@ -109,7 +111,7 @@ function harness({effects=false}={}){
  return{
   render,settle,redirects,
   enableBallots(){withBallots=true;},readCount:table=>counts.get(table)||0,
-  setRevision:value=>{revision=value;},setUser:value=>{user=value;},setMemberKind:value=>{memberKind=value;},failTable(table,code){failures.add(table);failureCodes.set(table,code);},setAuthError:value=>{authError=value;},
+  setRevision:value=>{revision=value;},setUser:value=>{user=value;},setMemberKind:value=>{memberKind=value;},setAssetPaths:value=>{assetPaths=value;},assetStats:()=>({signed,peakSigns}),failTable(table,code){failures.add(table);failureCodes.set(table,code);},setAuthError:value=>{authError=value;},
   hold(table,number=(counts.get(table)||0)+1){const pending=deferred();holds.set(table+':'+number,pending);return pending;},
   emit(table){for(const channel of [...channels])for(const {filter,callback} of channel.handlers)if(filter.table===table&&filter.event!=='DELETE')callback({eventType:table==='chat_messages'?'UPDATE':'INSERT',new:{game_id:gameId}});},
   auth(event,nextUser){user=nextUser;const before=requests;authCallback?.(event,nextUser?{user:{id:nextUser}}:null);assert.equal(requests,before,'Auth callback must schedule Supabase I/O outside its synchronous callback.');},
@@ -136,6 +138,32 @@ async function main(){
   await h.settle();
   assert(h.readCount('party_documents')>documentsBefore,'New document metadata must reach the party screen');
   assert.equal(h.readCount('games'),coreBefore,'Uploading one file must not reload the full game');
+ });
+ await check('Storage signatures are cached and never exceed four parallel requests per client',async()=>{
+  const h=harness({effects:true});h.setAssetPaths(true);
+  await h.settle();h.render().setActiveView('parties');await h.settle();
+  for(let i=0;i<15;i++)await tick();
+  const first=h.assetStats();
+  assert(first.signed>=12,'Asset fixture must exercise document, avatar and emblem signatures');
+  assert(first.peakSigns<=4,'Client must not launch more than four simultaneous Storage sign requests');
+  await h.render().refresh();await h.settle();
+  assert.equal(h.assetStats().signed,first.signed,'Unchanged Storage paths must reuse session-scoped signed URLs');
+  h.dispose();
+ });
+ await check('40 simulated clients keep their sections isolated during a document update',async()=>{
+  const clients=Array.from({length:40},()=>harness({effects:true}));
+  const views=['parties','stages','documents','teacher','budget','actions','votes','dashboard'];
+  await Promise.all(clients.map(async(h,i)=>{
+   await h.settle();h.render().setActiveView(views[i%views.length]);await h.settle();
+  }));
+  const before=clients.map(h=>h.readCount('games'));
+  for(const h of clients)h.emit('party_documents');
+  await Promise.all(clients.map(h=>h.settle()));
+  clients.forEach((h,i)=>{
+   assert.equal(h.readCount('games'),before[i],'A document update must not reload all core tables for any client');
+   assert.equal(h.render().parties.length,1,'The party list must remain available to each client');
+   h.dispose();
+  });
  });
  await check('Party records survive a document-table failure',async()=>{
   const h=harness({effects:true});
