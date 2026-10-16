@@ -21,6 +21,14 @@ for(const draft of teachingDrafts){
  assert(slides.every(slide=>slide.body.includes('Предварительный просмотр')&&slide.facts.every(fact=>fact.value==='Ожидает завершения')),'Teacher draft must not pretend to contain completed results');
 }
 assert.equal(teacherComicPreviews(game,[teachingDrafts[0]]).length,10,'Saved chapters must replace their previews without duplication');
+const stageOne={id:'empty-stage-one',stage_no:1,kind:'completed',title:'Итоги',body:'',snapshot:{version:2,counters:{documents:0,finished_documents:0,votes:0,passed_votes:0},parties:[]}};
+assert.equal(comicSlides(stageOne).length,2,'Do not show an empty third slide for stage one');
+assert.equal(comicSlides({...stageOne,snapshot:{...stageOne.snapshot,counters:{documents:1}}}).length,3,'Keep stage-one registration results when a document exists');
+assert.equal(comicSlides({...stageOne,snapshot:{...stageOne.snapshot,parties:[{name:'Партия',status:'revision'}]}}).length,3,'Keep registration results when a party is under review');
+const teacherStageSource=fs.readFileSync(path.join(root,'components/game/TeacherStageManager.tsx'),'utf8');
+const teacherStageCss=fs.readFileSync(path.join(root,'app/teacher-stage-layout.css'),'utf8');
+assert(teacherStageSource.includes('isSingleAction')&&teacherStageCss.includes('.teacherStageFlowActions.isSingleAction>button'),'The Open Stage action must fill the inspector width');
+
 
 async function main(){
  const db=new PGlite();
