@@ -331,3 +331,12 @@
  .teacherCommand .teacherStageFlowActions {grid-template-columns:minmax(0,1fr);}
  .teacherCommand .teacherStageFlowActions>button:last-child {grid-column:auto;}
 }
+
+/* A single stage-open action must occupy the whole inspector width even when
+   container queries switch the normal three-control flow into CSS Grid. */
+.teacherCommand .teacherStageFlowActions.isOpening {
+ grid-template-columns:minmax(0,1fr);
+}
+.teacherCommand .teacherStageFlowActions.isOpening>.teacherStageOpenFull {
+ grid-column:1/-1;justify-self:stretch;width:100%;
+}
