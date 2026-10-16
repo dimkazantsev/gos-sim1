@@ -1,4 +1,4 @@
-/* Action-local error routing keeps validation by the originating control. */
+/* Action-local errors preserve accessibility; all notices render above the layout. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const ts=require('typescript'),Module=require('node:module');
@@ -27,7 +27,12 @@ for(const fragment of ['useActionErrorPlacement(error,view','onClickCapture={act
 const code=fs.readFileSync(file,'utf8');
 assert(code.includes("role=\"alert\""),'Inline errors must announce to assistive technology');
 assert(code.includes("aria-describedby"),'Originating control must be associated with the notice');
-assert(code.includes("slot.remove()"),'Inline notices must clean up after errors/navigation');
+assert(code.includes("createPortal(")&&code.includes("document.body"),'All game errors must render above the layout, in the document portal');
+assert(code.includes("document.addEventListener('pointermove'")&&code.includes("document.addEventListener('pointerdown'"),'Mouse and touch positions must be tracked');
+assert(code.includes('document.activeElement')&&code.includes('getBoundingClientRect()'),'Keyboard focus fallback must be available');
+assert(code.includes('const localized=!!error;'),'A background error must not paint a full-width banner');
+assert(!code.includes('insertAdjacentElement'),'Errors must not shift the form or stage layout');
 const css=fs.readFileSync('app/globals.css','utf8');
-assert(css.includes('.actionErrorSlot')&&css.includes('.actionErrorNotice'),'Scoped error styles must be present');
-console.log('PASS contextual errors: inline RPC validation, system fallbacks, async expiry, file uploads, accessibility and integration.');
+assert(css.includes('.actionErrorNotice')&&css.includes('position:fixed')&&css.includes('z-index:3000'),'Scoped floating error styles must be present');
+assert(css.includes('calc(100vw - 24px)')&&css.includes('@media(max-width:480px)'),'Phone widths must be constrained');
+console.log('PASS contextual errors: cursor overlay, keyboard/touch placement, async actions, role=alert, focus and no layout shift.');
