@@ -50,6 +50,7 @@ export function useRepublicGame(gameId:string){
  const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const lastTelegramDispatch=useRef(0);
+ const lastCoreSuccessAt=useRef(0);
  const assetSignatures=useRef(new Map<string,{expiresAt:number;promise:Promise<string|null>}>());
  const assetSignQueue=useRef({active:0,waiting:[] as Array<()=>void>});
  function signedAssetUrl(bucket:'game-assets'|'game-media',path:string,force=false):Promise<string|null>{
@@ -132,7 +133,7 @@ export function useRepublicGame(gameId:string){
  }
  function clearGameData(){
   acceptedMember.current=null;
-  assetSignatures.current.clear();
+  assetSignatures.current.clear();lastCoreSuccessAt.current=0;
   setGame(null);setMe(null);setMetrics([]);setEvents([]);setMembers([]);setOfficeRows([]);
   setChannels([]);channelRef.current='';setChannelId('');setMessages([]);setChatPins([]);setPinnedMessages([]);setChatOverview([]);setChatLoading(false);setChatOpen(false);
   setStages([]);setParties([]);setVotes([]);setBallots([]);setEvaluations([]);setCrises([]);setDocuments([]);setActivities([]);setPresence([]);setProfiles([]);
@@ -324,7 +325,8 @@ export function useRepublicGame(gameId:string){
   if(next)rememberChatChannel(next,visibleMe.user_id);
  },[chatOpen,channels,chatOverview,channelId,visibleMe?.user_id,gameId]);
 
- useEffect(()=>{if(me?.user_id)void hydrateActiveView();},[activeView,me?.user_id,chatOpen,gameId]);
+ useEffect(()=>{if(me?.user_id)void hydrateActiveView(true);},[activeView,me?.user_id,gameId]);
+ useEffect(()=>{if(chatOpen&&me?.user_id)void loadChatOverview();},[chatOpen,me?.user_id,gameId]);
 
  useEffect(()=>{
   const tick=()=>{
@@ -418,7 +420,7 @@ export function useRepublicGame(gameId:string){
   if(previousMember&&(['kind','role_title','team','group_name','roster_archived_at'] as const).some(key=>previousMember[key]!==member[key])){
    readEpoch.current++;clearGameData();authUser.current=uid;acceptedMember.current=member;setGame(g.data as Game);setMe(member);void hydrateActiveView();return;
   }
-  acceptedMember.current=member;setGame(g.data as Game);setMe(member);
+  acceptedMember.current=member;lastCoreSuccessAt.current=Date.now();setGame(g.data as Game);setMe(member);
   if(!mt.error&&readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
   if(mt.error&&readCurrent(ticket,'metrics'))setError(mt.error);
   if(!ev.error)setEvents((ev.data||[]) as EventItem[]);
@@ -453,8 +455,11 @@ export function useRepublicGame(gameId:string){
   if(!intro.error)setIntroAccountSeen(!!intro.data);
  }
 
- async function hydrateActiveView(){
-  const jobs:Promise<unknown>[]=[loadCoreSections(),loadRepublicOffices()];
+ async function hydrateActiveView(allowFreshCore=false){
+  // Rapid view navigation can reuse recently updated common data.
+  // Realtime, recovery and explicit refresh still force the core read.
+  const jobs:Promise<unknown>[]=[loadRepublicOffices()];
+  if(!allowFreshCore||Date.now()-lastCoreSuccessAt.current>15000)jobs.unshift(loadCoreSections());
   const view=activeViewRef.current;
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets());
   // Teacher dossiers must fetch document rows, not just party representation.
@@ -699,16 +704,30 @@ export function useRepublicGame(gameId:string){
   if(channelRef.current!==cid)return;
   if(initial)setChatLoading(true);
   await readSafely(['messages'],async ticket=>{
-  try{
-   const r=await supabase.from('chat_messages').select('*').eq('channel_id',cid).order('created_at',{ascending:false}).limit(150);
-   if(!readCurrent(ticket)||channelRef.current!==cid)return;
-   requireSuccessful([r]);
-   const rows=await Promise.all(((r.data||[]) as Message[]).map(async m=>{if(!m.storage_path)return m;const url=await signedAssetUrl('game-media',m.storage_path);return {...m,url}}));
-   if(readCurrent(ticket)&&channelRef.current===cid){
-    const ordered=rows.reverse(),latest=ordered.at(-1)?.created_at||'';
+   try{
+    const r=await supabase.from('chat_messages').select('*').eq('channel_id',cid).order('created_at',{ascending:false}).limit(150);
+    if(!readCurrent(ticket)||channelRef.current!==cid)return;
+    requireSuccessful([r]);
+    // Render text before potentially slow private Storage signatures.
+    const cached=new Map(messageRowsRef.current.filter(m=>m.channel_id===cid).map(m=>[m.id,m]));
+    const rows=((r.data||[]) as Message[]).map(m=>{
+     const old=cached.get(m.id);
+     return {...m,url:m.storage_path&&old?.storage_path===m.storage_path?old.url||null:null};
+    });
+    const ordered=[...rows].reverse(),latest=ordered.at(-1)?.created_at||'';
     setMessages(previous=>ordered.length?mergeChatMessages(ordered,previous.filter(m=>m.channel_id===cid&&m.created_at>latest)):[]);
-   }
-  }finally{if(readCurrent(ticket)&&channelRef.current===cid)setChatLoading(false)}
+    const pending=rows.filter(m=>m.storage_path&&!m.url);
+    if(pending.length)void Promise.all(pending.map(async m=>({
+     id:m.id,path:m.storage_path,url:await signedAssetUrl('game-media',m.storage_path!)
+    }))).then(links=>{
+     if(!readCurrent(ticket)||channelRef.current!==cid)return;
+     const byId=new Map(links.map(link=>[link.id,link]));
+     setMessages(previous=>previous.map(m=>{
+      const link=byId.get(m.id);
+      return link&&link.path===m.storage_path?{...m,url:link.url||m.url||null}:m;
+     }));
+    });
+   }finally{if(readCurrent(ticket)&&channelRef.current===cid)setChatLoading(false)}
   });
  }
  async function loadRecentChatMessages(cid:string){
