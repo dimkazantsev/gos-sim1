@@ -246,6 +246,7 @@ jobs:
       - run: node scripts/intro-refresh-check.cjs
       - run: node scripts/stage-comic-check.cjs
       - run: node scripts/ksrf-proposal-queue-check.cjs
+      - run: node scripts/procedural-vote-auto-close-check.cjs
       - run: node scripts/institution-meeting-documents-check.cjs
       - run: node scripts/brand-overview-check.cjs
       - run: node scripts/overview-live-posts-check.cjs
