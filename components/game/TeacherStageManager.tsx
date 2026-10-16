@@ -173,7 +173,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
      {selectedStage.summary&&<p className="teacherStageInspectorSummary">{selectedStage.summary}</p>}
      <StageReadinessPanel g={g} stageNo={selectedStage.stage_no} compact compactReadiness={selectedReady} compactChecked={readinessChecked} compactLoading={readinessLoading} compactError={readinessError} onCompactRefresh={()=>void refreshReadiness()}/>
      <div className="teacherStageInspectorActions" aria-label="Действия с выбранным этапом">
-      <div className="teacherStageFlowActions">
+      <div className={"teacherStageFlowActions"+(selectedStage.status!=="open"?" isSingleAction":"")}>
        {selectedStage.status!=='open'
         ?<button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'open')}>Открыть этап</button>
         :<>
