@@ -474,22 +474,41 @@ export function useRepublicGame(gameId:string){
 
  async function loadPartyAssets(){
   await readSafely(['parties','profiles','partyDocuments'],async ticket=>{
-  const [pa,pf,pd]=await Promise.all([
-   supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'),
-   supabase.from('game_profiles').select('*').eq('game_id',gameId),
-   supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
-  ]);
-  if(!readActive(ticket))return;
-  requireSuccessful([pa,pf,pd]);
-  acceptPartyDocuments((pd.data||[]) as PartyDocument[],ticket);
-  if(readCurrent(ticket,'parties')){
-   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
-   if(readCurrent(ticket,'parties'))setParties(rows);
-  }
-  if(readCurrent(ticket,'profiles')){
-   const rows=await Promise.all(((pf.data||[]) as GameProfile[]).map(async x=>({...x,avatar_url:x.avatar_path?(await supabase.storage.from('game-assets').createSignedUrl(x.avatar_path,3600)).data?.signedUrl||null:null,signature_url:x.signature_path?(await supabase.storage.from('game-assets').createSignedUrl(x.signature_path,3600)).data?.signedUrl||null:null})));
-   if(readCurrent(ticket,'profiles'))setProfiles(rows);
-  }
+   const [pa,pf,pd]=await Promise.all([
+    supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'),
+    supabase.from('game_profiles').select('*').eq('game_id',gameId),
+    supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
+   ]);
+   if(!readActive(ticket))return;
+   requireSuccessful([pa,pf,pd]);
+   acceptPartyDocuments((pd.data||[]) as PartyDocument[],ticket);
+   if(readCurrent(ticket,'parties')){
+    const rows=(pa.data||[]) as Party[];
+    setParties(previous=>{
+     const cached=new Map(previous.map(row=>[row.id,row]));
+     return rows.map(row=>({...row,logo_url:cached.get(row.id)?.logo_path===row.logo_path?cached.get(row.id)?.logo_url||null:null}));
+    });
+    for(const row of rows){
+     if(!row.logo_path)continue;
+     void supabase.storage.from('game-assets').createSignedUrl(row.logo_path,3600).then(({data})=>{
+      if(!readCurrent(ticket,'parties'))return;
+      setParties(previous=>previous.map(current=>current.id===row.id&&current.logo_path===row.logo_path?{...current,logo_url:data?.signedUrl||current.logo_url||null}:current));
+     }).catch(()=>{});
+    }
+   }
+   if(readCurrent(ticket,'profiles')){
+    const rows=(pf.data||[]) as GameProfile[];
+    setProfiles(rows);
+    for(const row of rows){
+     for(const [path,key] of [[row.avatar_path,'avatar_url'],[row.signature_path,'signature_url']] as const){
+      if(!path)continue;
+      void supabase.storage.from('game-assets').createSignedUrl(path,3600).then(({data})=>{
+       if(!readCurrent(ticket,'profiles'))return;
+       setProfiles(previous=>previous.map(current=>current.user_id===row.user_id&&(key==='avatar_url'?current.avatar_path:current.signature_path)===path?{...current,[key]:data?.signedUrl||null}:current));
+      }).catch(()=>{});
+     }
+    }
+   }
   });
  }
 
