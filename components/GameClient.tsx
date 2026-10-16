@@ -34,6 +34,7 @@ import BudgetView from './game/BudgetView';
 import {useSectionUpdates} from './game/useSectionUpdates';
 import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
+import GameHeader,{TeacherNavigationProvider} from './game/GameHeader';
 import {useSavedGameState,savedString} from './game/useSavedGameState';
 
 const GENERIC_STUDENT='__generic_student_preview__';
@@ -577,7 +578,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    </div>
   </aside>
 
-  <div className={'simWorkspace '+(chatOpen?'chatOpen':'')}>
+  <TeacherNavigationProvider><div className={'simWorkspace '+(chatOpen?'chatOpen':'')}>
+   <GameHeader teacherNavigation={view==='teacher'&&teacher&&!previewMode}>
    <header className="simTop">
     <div className="mobileBrand"><BrandIdentity tagline/></div>
     <nav className="topScreenHistory" aria-label="История разделов">
@@ -618,6 +620,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
     <ChatToggleButton chatOpen={chatOpen} onToggle={toggleTourChat} unreadCount={g.chatUnreadCount} mentionCount={g.chatMentionCount}/>
    </header>
+   </GameHeader>
 
    {previewMode&&<div className="studentPreviewBanner">
     <div><Eye aria-hidden="true"/><p><b>Режим студента:</b> {shownMe.full_name}{shownMe.team?' · '+shownMe.team:''}{shownMe.role_title?' · '+shownMe.role_title:''}. <strong>Действия от его имени заблокированы.</strong></p></div>
@@ -646,7 +649,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    </div>
 
    {chatOpen&&<ChatPanel g={vg} readOnly={observer} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
-  </div>
+  </div></TeacherNavigationProvider>
 
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
    <section ref={mobileDialogRef} tabIndex={-1} className="mobileMoreSheet" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()} aria-label="Все разделы">

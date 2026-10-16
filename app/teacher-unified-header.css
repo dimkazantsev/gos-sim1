@@ -1,54 +1,35 @@
-/* ГОС.ID · One continuous white header and teacher navigation.
-   Preserve the established content width and its responsive side gutters. */
-.simWorkspace:has(.teacherCommand) {
- --gs-teacher-tabs-height:62px;
-}
-/* A fixed opaque rail covers the side gutters when the inset tabs stick.
-   Unlike a scrolling gradient, it does not expose moving cards on scroll. */
-.simWorkspace:has(.teacherCommand)::before {
- content:"";
- position:fixed;
- top:var(--gs-top-h,84px);
- left:var(--gs-sidebar-w,264px);
- right:0;
- height:var(--gs-teacher-tabs-height);
- z-index:53;
+/* The toolbar and teacher tabs belong to one sticky surface. */
+.simHeader {display:contents}
+.simHeader.unifiedTeacherHeader {
+ position:sticky;
+ top:0;
+ z-index:55;
+ display:block;
+ min-width:0;
  background:#fff;
- pointer-events:none;
+ border-bottom:1px solid #dce6f1;
 }
-.simWorkspace:has(.teacherCommand) > .simTop {
+.unifiedTeacherHeader > .simTop {
+ position:relative;
+ top:auto;
+ border-bottom:0;
  background:#fff;
  backdrop-filter:none;
 }
-/* Reserve no space above the tabs; the fixed white rail hides moving content. */
-.simWorkspace:has(.teacherCommand) .simContentFlow {
- padding-top:0!important;
+.teacherHeaderNavigation {
+ --gs-teacher-tabs-height:62px;
+ min-width:0;
+ padding:0 36px;
 }
-.simWorkspace:has(.teacherCommand) .simMain > .teacherCommand {
- animation:none;
+.teacherHeaderNavigation > .teacherCommand {
+ display:block;
+ width:min(100%,var(--gs-content-max));
+ min-height:var(--gs-teacher-tabs-height);
+ margin:0 auto;
 }
-.simWorkspace:has(.teacherCommand) .simMain {
- padding-top:0!important;
- margin-top:0!important;
-}
-/* Remove the old enclosing card and the legacy grid gap. */
-.simWorkspace:has(.teacherCommand) .teacherCommand,
-.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspace {
- gap:0;
- margin-top:0;
- padding-top:0;
-}
-.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspace {
- border:0;
- border-radius:0;
- background:transparent;
- overflow:visible;
-}
-/* One calm navigation tier: flat top, thin separator, no nested outline. */
-.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav {
- position:sticky;
- top:var(--gs-top-h,84px);
- z-index:54;
+.teacherHeaderNavigation .teacherCommand .teacherWorkspaceNav {
+ position:static;
+ top:auto;
  box-sizing:border-box;
  display:flex;
  align-items:center;
@@ -60,7 +41,6 @@
  margin:0;
  padding:6px 12px;
  border:0;
- border-bottom:1px solid #dce6f1;
  border-radius:0;
  background:#fff;
  box-shadow:none;
@@ -70,31 +50,35 @@
  scroll-snap-type:none;
  scrollbar-width:none;
 }
-.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav::-webkit-scrollbar {
- display:none;
+.teacherHeaderNavigation .teacherWorkspaceNav::-webkit-scrollbar {display:none}
+.simWorkspace:has(.unifiedTeacherHeader) .simContentFlow {padding-top:14px!important}
+.simWorkspace:has(.unifiedTeacherHeader) .simMain > .teacherCommand {animation:none}
+.simWorkspace:has(.unifiedTeacherHeader) .teacherWorkspace {
+ gap:0;
+ margin:0;
+ padding:0;
+ border:0;
+ border-radius:0;
+ background:transparent;
+ overflow:visible;
 }
-/* Cards below the navigation retain their own round corners and breathing room. */
-.simWorkspace:has(.teacherCommand) .teacherCommand .teacherCommandBar {
- margin-top:14px;
-}
-.simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspacePanel {
- margin-top:16px;
+.simWorkspace:has(.unifiedTeacherHeader) .teacherWorkspacePanel {margin-top:16px}
+@media(max-width:1280px) {
+ .teacherHeaderNavigation {padding-inline:24px}
 }
 @media(max-width:760px) {
- .simWorkspace:has(.teacherCommand) {
-  --gs-teacher-tabs-height:60px;
+ .teacherHeaderNavigation {--gs-teacher-tabs-height:60px}
+ .teacherHeaderNavigation .teacherCommand .teacherWorkspaceNav {padding:5px 10px}
+ .simWorkspace:has(.unifiedTeacherHeader) .simContentFlow {padding-top:10px!important}
+ .simWorkspace:has(.unifiedTeacherHeader) .teacherWorkspacePanel {margin-top:12px}
+}
+@media(max-width:650px) {
+ .teacherHeaderNavigation {padding-inline:16px}
+}
+@media(min-width:1100px) {
+ .simWorkspace.chatOpen .teacherHeaderNavigation {
+  width:calc(100% - var(--gs-chat-w) - 23px);
+  padding-inline:16px;
  }
- .simWorkspace:has(.teacherCommand)::before {
-  top:56px;
- }
- .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspaceNav {
-  top:56px;
-  padding:5px 10px;
- }
- .simWorkspace:has(.teacherCommand) .teacherCommand .teacherCommandBar {
-  margin-top:10px;
- }
- .simWorkspace:has(.teacherCommand) .teacherCommand .teacherWorkspacePanel {
-  margin-top:12px;
- }
+ .simWorkspace.chatOpen .teacherHeaderNavigation > .teacherCommand {width:100%;max-width:100%}
 }

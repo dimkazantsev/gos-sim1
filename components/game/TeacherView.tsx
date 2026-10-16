@@ -1,4 +1,5 @@
 'use client';
+import {createPortal} from 'react-dom';
 import {Award,Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Compass,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
 import ClassroomJournal from './ClassroomJournal';
 import ParticipantsAnalytics from './ParticipantsAnalytics';
@@ -15,6 +16,7 @@ import TeacherOverview from './TeacherOverview';
 import TeacherParticipantRoster from './TeacherParticipantRoster';
 import {useSavedGameState,savedChoice} from './useSavedGameState';
 import {useHorizontalWheel} from './useHorizontalWheel';
+import {useTeacherNavigationTarget} from './GameHeader';
 
 type Workspace='overview'|'stages'|'journal'|'analytics'|'grades'|'impact'|'parties'|'tools'|'event'|'awards'|'blitz'|'participants';
 const WORKSPACES=[
@@ -36,7 +38,8 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
  const {game,currentStage,stages,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,formalDocuments,votes,ballots,evaluations,activities,presence,names,secondsLeft,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
- const navigationRef=useHorizontalWheel(game?.id);
+ const navigationTarget=useTeacherNavigationTarget();
+ const navigationRef=useHorizontalWheel(navigationTarget===null?undefined:game?.id);
  const pendingFactionCount=parties.filter(p=>p.registration_status==='submitted').length+(g.partyDocuments||[]).filter(d=>d.status==='submitted').length;
  const activeStageClocks=stages.filter(s=>s.status==='open').sort((a,b)=>(a.deadline?Date.parse(a.deadline):Infinity)-(b.deadline?Date.parse(b.deadline):Infinity)||a.stage_no-b.stage_no);
  const clockStage=activeStageClocks[0];
@@ -61,9 +64,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='gos-id-activity-'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(url);
  }
 
- return <div className="teacherSimple teacherCommand">
-  <section className="teacherWorkspace" aria-label="Рабочие разделы управления">
-   <div ref={navigationRef} className="teacherWorkspaceNav" role="tablist" aria-label="Рабочие разделы преподавателя">
+ const navigation=<div ref={navigationRef} className="teacherWorkspaceNav" role="tablist" aria-label="Рабочие разделы преподавателя">
     {WORKSPACES.map(item=>{
      const Icon=item.icon;
      return <button key={item.key} type="button" role="tab" id={'teacher-tab-'+item.key}
@@ -81,7 +82,10 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
       <Icon size={18} strokeWidth={1.9} aria-hidden="true"/><span>{item.title}</span>{item.key==='parties'&&pendingFactionCount>0&&<span className="sectionUnreadBadge" aria-label={'Требуют рассмотрения: '+pendingFactionCount}>{pendingFactionCount}</span>}
      </button>
     })}
-   </div>
+   </div>;
+ return <div className="teacherSimple teacherCommand">
+  <section className="teacherWorkspace" aria-label="Рабочие разделы управления">
+   {navigationTarget===undefined?navigation:navigationTarget?createPortal(navigation,navigationTarget):null}
    <section className="teacherCommandBar" aria-label="Быстрое управление игрой">
    <div className="teacherCommandStage">
     <span className="teacherEyebrow">ПУЛЬТ ПРЕПОДАВАТЕЛЯ</span>
