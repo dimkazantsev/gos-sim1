@@ -384,7 +384,7 @@ export function useRepublicGame(gameId:string){
   if(!st.error)setStages((st.data||[]) as Stage[]);
   if(!pa.error&&readCurrent(ticket,'parties'))setParties(previous=>((pa.data||[]) as Party[]).map(row=>{
     const old=previous.find(p=>p.id===row.id);
-    return {...row,logo_url:old?.logo_path===row.logo_path?old.logo_url||null:null};
+    return {...row,logo_url:old?.logo_path===row.logo_path?old?.logo_url||null:null};
    }));
   if(!vo.error){
    const voteRows=(vo.data||[]) as Vote[];setVotes(voteRows);
@@ -486,7 +486,7 @@ export function useRepublicGame(gameId:string){
   // decoration and must never make a real party appear to be missing.
   setParties(previous=>rows.map(row=>{
    const old=previous.find(p=>p.id===row.id);
-   return {...row,logo_url:old?.logo_path===row.logo_path?old.logo_url||null:null};
+   return {...row,logo_url:old?.logo_path===row.logo_path?old?.logo_url||null:null};
   }));
   void Promise.all(rows.filter(row=>row.logo_path).map(async row=>{
    try{return {id:row.id,path:row.logo_path,url:(await supabase.storage.from('game-assets').createSignedUrl(row.logo_path!,3600)).data?.signedUrl||null}}
@@ -518,7 +518,7 @@ export function useRepublicGame(gameId:string){
     const rows=(pf.data||[]) as GameProfile[];
     setProfiles(previous=>rows.map(row=>{
      const old=previous.find(p=>p.user_id===row.user_id);
-     return {...row,avatar_url:old?.avatar_path===row.avatar_path?old.avatar_url||null:null,signature_url:old?.signature_path===row.signature_path?old.signature_url||null:null};
+     return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url||null:null,signature_url:old?.signature_path===row.signature_path?old?.signature_url||null:null};
     }));
     void Promise.all(rows.map(async row=>{
      try{
