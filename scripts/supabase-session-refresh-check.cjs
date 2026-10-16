@@ -70,6 +70,6 @@ const ordinaryUrl='https://example.supabase.co/rest/v1/game_members';
  assert.match(client,/fetchWithBoundedSessionRefresh\(input,init\)/);
  assert.match(hook,/supabase\.auth\.getSession\(\),SESSION_BOOTSTRAP_TIMEOUT_MS/);
  assert.match(hook,/const SESSION_BOOTSTRAP_TIMEOUT_MS=16000/);
- assert.doesNotMatch(client,/autoRefreshToken:\s*false/);
+ assert.match(client,/auth:\s*\{\s*persistSession:\s*true,\s*autoRefreshToken:\s*true\s*\}/);
  console.log('PASS: Only refresh_token requests bounded; caller abort preserved; login and other API requests unchanged.');
 })().catch(err=>{console.error(err);process.exitCode=1;});
