@@ -51,7 +51,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
   if(!g.game||busy)return;
   setBusy(true);
   const r=await supabase.rpc('save_institution_meeting_document',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_kind:kind,p_body:kind==='agenda'?agendaText:minutesText});
-  if(r.error)g.setError(r.error.message);else{await load();setNotice(kind==='agenda'?'Повестка сохранена в реестре НПА.':'Протокол сохранён в реестре НПА.')}
+  if(r.error)g.setError(r.error.message);else{await load();setNotice(kind==='agenda'?(meetingCoordinator?'Повестка сохранена в реестре НПА и утверждена.':'Проект повестки сохранён. Ожидается утверждение председателем.'):'Протокол сохранён в реестре НПА.')}
   setBusy(false);
  }
  async function approveMeeting(kind:'agenda'|'minutes'){
