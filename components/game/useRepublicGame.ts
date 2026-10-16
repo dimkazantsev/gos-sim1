@@ -1140,23 +1140,28 @@ export function useRepublicGame(gameId:string){
   if(r.error){setError(r.error.message);return false}
   await loadPartyAssets();return true;
  }
- async function uploadPartyDocument(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File){
+ async function uploadPartyDocument(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File,onFailure?:(message:string)=>void){
+  const fail=(message:string)=>{if(onFailure)onFailure(message);else setError(message);return false};
   if(!me||!game||!parties.some(p=>p.id===partyId&&p.game_id===gameId)){
-   setError('Партия не найдена в текущей игре. Обновите страницу.');return false;
+   return fail('Партия не найдена. Обновите страницу.');
   }
-  if(file.size===0){setError('Выбран пустой файл.');return false}
-  if(file.size>20*1024*1024){setError('Файл превышает 20 МБ. Уменьшите размер документа.');return false}
+  if(file.size===0)return fail('Выбран пустой файл.');
+  if(file.size>20*1024*1024)return fail('Файл больше 20 МБ.');
   const ext=(file.name.split('.').pop()||'bin').toLowerCase();
   const path=gameId+'/parties/'+partyId+'/docs/'+crypto.randomUUID()+'.'+ext;
   const up=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'application/octet-stream',upsert:false});
-  if(up.error){setError('Ошибка отправки файла в хранилище: '+up.error.message);return false}
+  if(up.error){
+   const message=up.error.message||'';
+   return fail(/row.level security|permission|unauthorized|forbidden/i.test(message)?'Загрузка в эту партию недоступна.':
+    /mime|content.type|file.type|invalidkey/i.test(message)?'Этот формат файла не поддерживается.':
+    /network|fetch|timeout|timed out/i.test(message)?'Нет связи с сервером. Повторите загрузку.':'Не удалось загрузить файл. Повторите попытку.');
+  }
   const r=await supabase.from('party_documents')
    .insert({game_id:gameId,party_id:partyId,doc_kind:kind,title:title.trim()||file.name,storage_path:path,file_name:file.name,mime_type:file.type||null,file_size:file.size,uploaded_by:me.user_id,status:'submitted'})
    .select('id,storage_path').single();
   if(r.error||!r.data){
    // Preserve the uploaded object for investigation/recovery instead of deleting user files.
-   setError('Файл отправлен в Supabase Storage, но не зарегистрирован в реестре партии: '+(r.error?.message||'Сервер не подтвердил запись')+'. Обратитесь к преподавателю. Путь: game-assets/'+path);
-   return false;
+   return fail('Файл загружен, но не отправлен. Повторите попытку.');
   }
   await loadPartyDocuments();
   notifyGameDataRefresh(gameId);

@@ -5,7 +5,7 @@ import {isStageWorkOpen} from './stageWorkStatus';
 import {useEffect,useMemo,useRef,useState,type ComponentType} from 'react';
 import {latestPartyDocuments,latestPartyDocument,partyDocumentVersionLabel,partyDocumentVerdict} from './partyDocumentVersions';
 import {IconAction} from '../ui/IconAction';
-import {BookOpen,ChevronDown,ExternalLink,FileText,PencilLine,Plus,Trash2,Upload,UserPlus,UsersRound} from 'lucide-react';
+import {BookOpen,ChevronDown,CircleAlert,ExternalLink,FileText,PencilLine,Plus,Trash2,Upload,UserPlus,UsersRound} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import ProfileAvatar from './ProfileAvatar';
 import PartyLogoEditor from './PartyLogoEditor';
@@ -47,11 +47,11 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
   uploadInFlight.current=true;
   setBusy(true);setDocumentNotice(null);
   try{
-   const ok=await g.uploadPartyDocument(partyId,kind,title,file);
-   setDocumentNotice({partyId,docKind:kind,kind:ok?'success':'error',message:ok?'Версия документа направлена в Минюст на рассмотрение.':'Загрузку не удалось подтвердить. Проверьте сообщение об ошибке и повторите попытку.'});
-  }catch(e){
-   g.setError(e);
-   setDocumentNotice({partyId,docKind:kind,kind:'error',message:'Не удалось загрузить документ. Повторите попытку.'});
+   let failureMessage='Не удалось загрузить файл. Повторите попытку.';
+   const ok=await g.uploadPartyDocument(partyId,kind,title,file,message=>{failureMessage=message});
+   setDocumentNotice({partyId,docKind:kind,kind:ok?'success':'error',message:ok?'Отправлено на рассмотрение.':failureMessage});
+  }catch{
+   setDocumentNotice({partyId,docKind:kind,kind:'error',message:'Не удалось загрузить файл. Повторите попытку.'});
   }finally{uploadInFlight.current=false;setBusy(false)}
  }
  async function sendPartyInvite(){
@@ -142,7 +142,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
        </div>
        {current?.status==="revision"&&<p className="partyRegistrationRevisionNote"><b>Документ возвращён на доработку.</b><span>Замечания к {partyDocumentVersionLabel(current)}: {current.note||"Текст замечаний не сохранён. Уточните у преподавателя, что необходимо исправить."}</span></p>}
        {current?.status!=="revision"&&current?.note&&<p className="partyRegistrationReviewNote">Заключение Минюста: {current.note}</p>}
-       {documentNotice?.partyId===selected.id&&documentNotice.docKind===kind.kind&&<p className={"civicPartyInviteFeedback "+(documentNotice.kind==="error"?"isError":"isSuccess")} role={documentNotice.kind==="error"?"alert":"status"}>{documentNotice.message}</p>}
+       {documentNotice?.partyId===selected.id&&documentNotice.docKind===kind.kind&&(documentNotice.kind==='error'||!current||['submitted','draft'].includes(current.status))&&<p className={"partyDocumentNotice "+(documentNotice.kind==="error"?"isError":"isSuccess")} role={documentNotice.kind==="error"?"alert":"status"}>{documentNotice.kind==='error'&&<CircleAlert size={15} aria-hidden="true"/>}<span>{documentNotice.message}</span></p>}
        {history.length>1&&<details className="partyRegistrationDocHistory"><summary>Предыдущие версии ({history.length-1})</summary>
         {history.slice(1).map(d=><p key={d.id}>{partyDocumentVersionLabel(d)} · {partyDocumentVerdict(d)} ·
          {d.url?<a href={d.url} target="_blank" rel="noreferrer">Открыть файл</a>:"Файл недоступен"}

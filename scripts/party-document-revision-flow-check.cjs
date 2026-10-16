@@ -12,14 +12,14 @@ const tick=()=>new Promise(r=>setImmediate(r));
 function gate(){let resolve;return{promise:new Promise(r=>resolve=r),resolve}}
 async function prompt(p){let timer;try{return await Promise.race([p,new Promise((_,reject)=>timer=setTimeout(()=>reject(Error('Review metadata is blocked by Storage')),1500))])}finally{clearTimeout(timer)}}
 async function actions(){
- const backend={docs:[{id:'v1',game_id:'game-a',party_id:'party-a',doc_kind:'program',title:'Программа',storage_path:'v1.pdf',version_no:1,status:'submitted',note:null}],writes:0};
+ const backend={docs:[{id:'v1',game_id:'game-a',party_id:'party-a',doc_kind:'program',title:'Программа',storage_path:'v1.pdf',version_no:1,status:'submitted',note:null}],writes:0,storageError:null};
  function client(teacher){
   let rows=[],version=0;const signing=gate(),errors=[],api={};
   const env={api,console,Promise,Map,crypto:require('node:crypto').webcrypto,teacher,gameId:'game-a',game:{id:'game-a'},me:{user_id:teacher?'teacher':'owner'},parties:[{id:'party-a',game_id:'game-a'}],
    setError:e=>errors.push(String(e)),setPartyDocuments:fn=>{rows=typeof fn==='function'?fn(rows):fn},
    readCurrent:t=>t.version===version,requireSuccessful:rs=>{const e=rs.find(r=>r.error)?.error;if(e)throw e},
    readSafely:async(_,fn)=>fn({version:++version}),notifyGameDataRefresh:()=>{},kickTelegramDispatch:async()=>{},
-   supabase:{storage:{from:()=>({upload:async()=>({error:null}),createSignedUrl:async path=>{await signing.promise;return{data:{signedUrl:'https://files.invalid/'+path}}}})},from:()=>{
+   supabase:{storage:{from:()=>({upload:async()=>({error:backend.storageError}),createSignedUrl:async path=>{await signing.promise;return{data:{signedUrl:'https://files.invalid/'+path}}}})},from:()=>{
     const q={eqs:{},select(){return this},order(){return this},eq(k,v){this.eqs[k]=v;return this},in(k,v){this.allowed={k,v};return this},update(v){this.updateValue=v;return this},insert(v){this.insertValue=v;return this},single(){this.singleRow=true;return this},maybeSingle(){this.singleRow=true;return this},then(resolve,reject){try{
      let data=structuredClone(backend.docs.filter(d=>Object.entries(this.eqs).every(([k,v])=>d[k]===v)));
      if(this.updateValue){assert(teacher,'student cannot review');const row=data.find(d=>!this.allowed||this.allowed.v.includes(d[this.allowed.k]));data=row?Object.assign(backend.docs.find(d=>d.id===row.id),this.updateValue):null;if(data)backend.writes++;}
@@ -32,6 +32,14 @@ async function actions(){
   return{...api,get rows(){return rows},errors,release:()=>signing.resolve()};
  }
  const teacher=client(true),student=client(false);
+ const failures=[],file={name:'application-v1.jpg',size:64,type:'image/jpeg'};
+ backend.storageError={message:'invalid input syntax for type uuid: ""'};
+ assert.equal(await student.uploadPartyDocument('party-a','application','Заявление',file,message=>failures.push(message)),false);
+ assert.equal(failures.length,1,'One local failure callback instead of duplicate global and document alerts');
+ assert(failures[0].length<80&&!/uuid|SQL|формат даты|хранилищ|game-assets\//i.test(failures[0]));
+ assert.deepEqual(student.errors,[],'A handled upload failure must not create a second global alert');
+ assert.equal(backend.writes,0,'A rejected Storage upload cannot create a document version');
+ backend.storageError=null;
  await prompt(teacher.loadPartyDocuments());await prompt(student.loadPartyDocuments());
  assert.equal(await prompt(teacher.reviewPartyDocument('v1','revision','Добавьте источники финансирования.')),true);
  await prompt(student.loadPartyDocuments());
