@@ -20,7 +20,7 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  "create function private.is_game_teacher(p_game uuid) returns boolean language sql stable as $$select auth.uid()='"+teacher+"'::uuid$$;"+
  "create function private.is_game_member(p_game uuid) returns boolean language sql stable as $$select auth.uid() in ('"+teacher+"'::uuid,'"+student+"'::uuid)$$;"+
  "create function private.can_manage_duma_session(p_game uuid,p_uid uuid) returns boolean language sql stable as $$select p_uid='"+teacher+"'::uuid$$;"+
- "create function private.party_led_by(p_game uuid,p_uid uuid) returns uuid language sql stable as $$select case when p_uid in ('"+teacher+"'::uuid,'"+student+"'::uuid) then p_uid else null::uuid end$$;"+
+ "create function private.party_led_by(p_game uuid,p_uid uuid) returns uuid language sql stable as $$select case when p_uid='"+teacher+"'::uuid then p_uid else null::uuid end$$;"+
  "create function private.vote_member_has_office(p_game uuid,p_uid uuid,p_body text) returns boolean language sql stable as $$select p_uid in ('"+teacher+"'::uuid,'"+student+"'::uuid) and p_body='ksrf'$$;"+
  "create function private.role_matches_voting_body(p_role text,p_body text) returns boolean language sql stable as $$select false$$;"+
  "create function private.formal_workflow(p_key text) returns jsonb language sql stable as $$select '[]'::jsonb$$;"+
