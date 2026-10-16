@@ -142,10 +142,34 @@ grant execute on function public.save_institution_meeting_document(uuid,integer,
 
 create or replace function public.approve_institution_meeting_agenda(p_game_id uuid,p_stage_no integer,p_institution text)
 returns void language plpgsql security definer set search_path=public,private,pg_temp as $$
-declare uid uuid:=auth.uid();m public.institution_meeting_records%rowtype;
+declare uid uuid:=auth.uid();m public.institution_meeting_records%rowtype;v_id uuid;v_body text;v_author uuid;
 begin
  if uid is null or not private.can_coordinate_institution_meeting(p_game_id,p_institution,uid) then
   raise exception 'Утвердить повестку может только председатель или преподаватель';end if;
+ -- Reuse established numbered agendas instead of duplicating Duma or Government documents.
+ if not exists(select 1 from public.institution_meeting_records where game_id=p_game_id
+   and stage_no=p_stage_no and institution_key=p_institution and agenda_document_id is not null) then
+  if p_institution='gd' and p_stage_no=12 then
+   select d.id,d.body_text,s.created_by into v_id,v_body,v_author
+   from public.duma_sessions s join public.formal_documents d on d.id=s.agenda_document_id
+   where s.game_id=p_game_id and exists(select 1 from public.duma_agenda_items a where a.session_id=s.id)
+   order by s.session_no desc limit 1;
+  elsif p_institution='government' and p_stage_no=11 then
+   select d.id,d.body_text,s.created_by into v_id,v_body,v_author
+   from public.government_sessions s join public.formal_documents d on d.id=s.agenda_document_id
+   where s.game_id=p_game_id and (exists(select 1 from public.government_session_questions q where q.session_id=s.id)
+    or exists(select 1 from public.government_program_agenda a where a.session_id=s.id))
+   order by s.session_no desc limit 1;
+  end if;
+  if v_id is not null then
+   insert into public.institution_meeting_records(game_id,stage_no,institution_key,agenda_document_id,agenda_body,agenda_prepared_by)
+   values(p_game_id,p_stage_no,p_institution,v_id,v_body,v_author)
+   on conflict(game_id,stage_no,institution_key) do update
+    set agenda_document_id=coalesce(public.institution_meeting_records.agenda_document_id,excluded.agenda_document_id),
+        agenda_body=coalesce(public.institution_meeting_records.agenda_body,excluded.agenda_body),
+        agenda_prepared_by=coalesce(public.institution_meeting_records.agenda_prepared_by,excluded.agenda_prepared_by),updated_at=now();
+  end if;
+ end if;
  select * into m from public.institution_meeting_records
  where game_id=p_game_id and stage_no=p_stage_no and institution_key=p_institution for update;
  if m.agenda_document_id is null or length(btrim(coalesce(m.agenda_body,'')))<30 then
