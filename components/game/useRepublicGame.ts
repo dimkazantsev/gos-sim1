@@ -63,6 +63,20 @@ export function useRepublicGame(gameId:string){
    void loadChatOverview();
   },delay);
  }
+ const coreReadQueue=useRef({active:0,waiting:[] as Array<()=>void>});
+ function limitedCoreRead<T>(query:PromiseLike<T>):Promise<T>{
+  return new Promise<T>((resolve,reject)=>{
+   const run=()=>{
+    coreReadQueue.current.active++;
+    void Promise.resolve(query).then(resolve,reject).finally(()=>{
+     coreReadQueue.current.active--;
+     coreReadQueue.current.waiting.shift()?.();
+    });
+   };
+   if(coreReadQueue.current.active<4)run();
+   else coreReadQueue.current.waiting.push(run);
+  });
+ }
  const assetSignatures=useRef(new Map<string,{expiresAt:number;promise:Promise<string|null>}>());
  const assetSignQueue=useRef({active:0,waiting:[] as Array<()=>void>});
  function signedAssetUrl(bucket:'game-assets'|'game-media',path:string,force=false):Promise<string|null>{
@@ -406,21 +420,21 @@ export function useRepublicGame(gameId:string){
   if(!uid)return;
   const ticket=startRead('core','members','metrics','profiles','parties','formal','channels');
   const [g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro]=await Promise.all([
-   supabase.from('games').select('*').eq('id',gameId).maybeSingle(),
-   supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle(),
-   supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label'),
-   supabase.from('game_events').select('*').eq('game_id',gameId).order('published_at',{ascending:false}).limit(100),
-   supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name'),
-   supabase.from('chat_channels').select('*').eq('game_id',gameId).order('name'),
-   supabase.from('game_stages').select('*').eq('game_id',gameId).order('stage_no'),
-   supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'),
-   supabase.from('game_votes').select('*').eq('game_id',gameId).order('opened_at',{ascending:false}),
-   supabase.from('game_evaluations').select('*').eq('game_id',gameId).order('stage_no'),
-   supabase.from('game_crises').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   supabase.from('game_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   supabase.from('game_profiles').select('*').eq('game_id',gameId),
-   supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}),
-   supabase.rpc('has_seen_my_intro')
+   limitedCoreRead(supabase.from('games').select('*').eq('id',gameId).maybeSingle()),
+   limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle()),
+   limitedCoreRead(supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label')),
+   limitedCoreRead(supabase.from('game_events').select('*').eq('game_id',gameId).order('published_at',{ascending:false}).limit(100)),
+   limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name')),
+   limitedCoreRead(supabase.from('chat_channels').select('*').eq('game_id',gameId).order('name')),
+   limitedCoreRead(supabase.from('game_stages').select('*').eq('game_id',gameId).order('stage_no')),
+   limitedCoreRead(supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')),
+   limitedCoreRead(supabase.from('game_votes').select('*').eq('game_id',gameId).order('opened_at',{ascending:false})),
+   limitedCoreRead(supabase.from('game_evaluations').select('*').eq('game_id',gameId).order('stage_no')),
+   limitedCoreRead(supabase.from('game_crises').select('*').eq('game_id',gameId).order('created_at',{ascending:false})),
+   limitedCoreRead(supabase.from('game_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})),
+   limitedCoreRead(supabase.from('game_profiles').select('*').eq('game_id',gameId)),
+   limitedCoreRead(supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false})),
+   limitedCoreRead(supabase.rpc('has_seen_my_intro'))
   ]);
   if(!readCurrent(ticket,'core'))return;
   if(g.error||m.error){
