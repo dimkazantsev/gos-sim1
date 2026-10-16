@@ -32,7 +32,8 @@ export function comicSlides(chapter:ComicChapter):ComicSlide[]{
  const s=chapter.snapshot||{},no=chapter.stage_no,theme=COMIC_THEMES[no];
  if(s.version!==2||!theme)return [{title:chapter.title,body:chapter.body,art:no===16?'epilogue':no>=9?'programs':'regions',facts:[]}];
  if(chapter.kind==='preview'){
-  const draft=comicSlides({...chapter,kind:'completed'});
+  // Teacher preview keeps all three illustrative layouts; completed chapters omit an empty result.
+  const draft=comicSlides({...chapter,kind:'completed',snapshot:no===1?{...s,counters:{...s.counters,documents:1}}:s});
   return draft.map(slide=>({...slide,
    body:'Предварительный просмотр для преподавателя. После завершения '+(comicStages(no).length===2?'обоих этапов':'этапа')+' вместо заглушек появятся сохранённые результаты игры. Это не фактический итог.',
    facts:slide.facts.map(fact=>({...fact,value:'Ожидает завершения',detail:undefined}))
