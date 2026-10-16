@@ -27,12 +27,12 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  const open=async id=>(await q('select public.open_parliamentary_rule_vote($1) as id',[id]))[0].id;
  const first=await open(a);
  assert(first);
- assert.match((await q('select body from game_votes where id=$1',[first]))[0].body,/Система: Пропорциональная\\. Метод распределения мандатов: Метод Д’Ондта\\./);assert.equal(await open(b),null);assert.equal(await open(c),null);
+ assert.match((await q('select body from game_votes where id=$1',[first]))[0].body,/Система: Пропорциональная\. Метод распределения мандатов: Метод Д’Ондта\./);assert.equal(await open(b),null);assert.equal(await open(c),null);
  await q("update game_votes set status='closed',result_code='rejected' where id=$1",[first]);
  let rows=await q('select id,status,vote_id from parliamentary_election_rules where game_id=$1',[game]);
  assert.equal(rows.find(r=>r.id===a).status,'rejected');
  assert.equal(rows.find(r=>r.id===b).status,'vote_open');
- assert.match((await q('select body from game_votes where id=$1',[rows.find(r=>r.id===b).vote_id]))[0].body,/Метод Сент-Лагю\\./);
+ assert.match((await q('select body from game_votes where id=$1',[rows.find(r=>r.id===b).vote_id]))[0].body,/Метод Сент-Лагю\./);
  assert.equal(rows.find(r=>r.id===c).status,'draft');
  await q("update game_votes set status='closed',result_code='passed' where id=$1",[rows.find(r=>r.id===b).vote_id]);
  rows=await q('select id,status from parliamentary_election_rules where game_id=$1',[game]);
@@ -48,7 +48,7 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  const ra=await insertR('random'),rb=await insertR('agreement');
  const openR=async id=>(await q('select public.open_regional_rule_vote($1) as id',[id]))[0].id;
  const rv=await openR(ra);assert(rv);
- assert.match((await q('select body from game_votes where id=$1',[rv]))[0].body,/Способ распределения субъектов Российской Федерации: Жеребьёвка\\./);assert.equal(await openR(rb),null);
+ assert.match((await q('select body from game_votes where id=$1',[rv]))[0].body,/Способ распределения субъектов Российской Федерации: Жеребьёвка\./);assert.equal(await openR(rb),null);
  await q("update game_votes set status='closed',result_code='no_quorum' where id=$1",[rv]);
  const retry=(await q('select status,vote_id from regional_election_rules where id=$1',[ra]))[0];
  assert.equal(retry.status,'vote_open');assert.notEqual(retry.vote_id,rv);
