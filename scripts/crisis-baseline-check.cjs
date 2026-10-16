@@ -51,5 +51,5 @@ assert(wall.includes("if(failed.length)setLocallyRemovedIds"),'Failed bulk delet
 assert(!wall.includes("setNotice('Публикация удалена из ленты.')"),'Successful deletion must not show a notice');
 assert(discussion.includes('/материал недоступен/i'),'Deleted discussions must not offer a pointless retry');
 assert(discussion.includes('missingPost.current=true;void refreshGame.current()'),'Stale requests must refresh only once');
-assert(game.includes('visiblePostIds.has(x.post_id)'),'No signed media URLs for deleted posts');
+assert(game.includes('visiblePostIds.has(x.post_id)')||game.includes('visiblePostIds.has(item.post_id)'),'No signed media URLs for deleted posts');
 console.log('PASS crisis baseline, hard metric cap, audit preservation and deleted-post UX');
