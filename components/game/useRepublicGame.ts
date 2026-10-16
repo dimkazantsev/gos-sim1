@@ -408,7 +408,7 @@ export function useRepublicGame(gameId:string){
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets());
   // Teacher dossiers must fetch document rows, not just party representation.
   if(view==='teacher')jobs.push(loadPartyDocuments());
-  if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation());
+  if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation(false));
   if(view==='documents')jobs.push(loadFormalRegistry());
   if(view==='actions'||view==='dashboard')jobs.push(loadPoliticalWall());
   if(view==='teacher')jobs.push(loadClassroomTelemetry(),loadImpactEngine());
@@ -474,15 +474,66 @@ export function useRepublicGame(gameId:string){
 
  async function loadPartyAssets(){
   await readSafely(['parties','profiles','partyDocuments'],async ticket=>{
-   const [pa,pf,pd]=await Promise.all([
-    supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'),
-    supabase.from('game_profiles').select('*').eq('game_id',gameId),
-    supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
+   // Each table is independent. A slow documents query must not hide parties.
+   const partyRead=Promise.resolve(supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')).then(({data,error})=>{
+    if(!readCurrent(ticket,'parties'))return;
+    if(error){setError(error);return}
+    const rows=(data||[]) as Party[];
+    setParties(previous=>{
+     const cached=new Map(previous.map(row=>[row.id,row]));
+     return rows.map(row=>({...row,logo_url:cached.get(row.id)?.logo_path===row.logo_path?cached.get(row.id)?.logo_url||null:null}));
+    });
+    for(const row of rows){
+     if(!row.logo_path)continue;
+     void supabase.storage.from('game-assets').createSignedUrl(row.logo_path,3600).then(({data:link})=>{
+      if(!readCurrent(ticket,'parties'))return;
+      setParties(previous=>previous.map(current=>current.id===row.id&&current.logo_path===row.logo_path?{...current,logo_url:link?.signedUrl||current.logo_url||null}:current));
+     }).catch(()=>{});
+    }
+   });
+   const profileRead=Promise.resolve(supabase.from('game_profiles').select('*').eq('game_id',gameId)).then(({data,error})=>{
+    if(!readCurrent(ticket,'profiles'))return;
+    if(error){setError(error);return}
+    const rows=(data||[]) as GameProfile[];
+    setProfiles(previous=>{
+     const cached=new Map(previous.map(row=>[row.user_id,row]));
+     return rows.map(row=>({...row,
+      avatar_url:cached.get(row.user_id)?.avatar_path===row.avatar_path?cached.get(row.user_id)?.avatar_url||null:null,
+      signature_url:cached.get(row.user_id)?.signature_path===row.signature_path?cached.get(row.user_id)?.signature_url||null:null}));
+    });
+    for(const row of rows){
+     for(const [path,key] of [[row.avatar_path,'avatar_url'],[row.signature_path,'signature_url']] as const){
+      if(!path)continue;
+      void supabase.storage.from('game-assets').createSignedUrl(path,3600).then(({data:link})=>{
+       if(!readCurrent(ticket,'profiles'))return;
+       setProfiles(previous=>previous.map(current=>current.user_id===row.user_id&&(key==='avatar_url'?current.avatar_path:current.signature_path)===path?{...current,[key]:link?.signedUrl||null}:current));
+      }).catch(()=>{});
+     }
+    }
+   });
+   const documentRead=Promise.resolve(supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})).then(({data,error})=>{
+    if(!readCurrent(ticket,'partyDocuments'))return;
+    if(error){setError(error);return}
+    acceptPartyDocuments((data||[]) as PartyDocument[],ticket);
+   });
+   await Promise.all([partyRead,profileRead,documentRead]);
+  });
+ }
+ async function loadPartyRepresentation(refreshParties=true){
+  const scopes:ReadScope[]=refreshParties?['partyRepresentation','members','parties']:['partyRepresentation','members'];
+  await readSafely(scopes,async ticket=>{
+   const [pi,pm,pa,mb,ag]=await Promise.all([
+    supabase.from('party_invitations').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+    supabase.from('party_member_mandates').select('*').eq('game_id',gameId),
+    refreshParties?supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'):Promise.resolve({data:[] as Party[],error:null}),
+    supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name'),
+    supabase.from('party_agreements').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
    ]);
    if(!readActive(ticket))return;
-   requireSuccessful([pa,pf,pd]);
-   acceptPartyDocuments((pd.data||[]) as PartyDocument[],ticket);
-   if(readCurrent(ticket,'parties')){
+   requireSuccessful([pi,pm,mb,ag,...(refreshParties?[pa]:[])]);
+   if(readCurrent(ticket,'partyRepresentation')){setPartyInvitations((pi.data||[]) as PartyInvitation[]);setPartyMandateRows((pm.data||[]) as PartyMandateAllocation[]);setPartyAgreements((ag.data||[]) as PartyAgreement[])}
+   if(readCurrent(ticket,'members'))setMembers((mb.data||[]) as Member[]);
+   if(refreshParties&&readCurrent(ticket,'parties')){
     const rows=(pa.data||[]) as Party[];
     setParties(previous=>{
      const cached=new Map(previous.map(row=>[row.id,row]));
@@ -496,39 +547,6 @@ export function useRepublicGame(gameId:string){
      }).catch(()=>{});
     }
    }
-   if(readCurrent(ticket,'profiles')){
-    const rows=(pf.data||[]) as GameProfile[];
-    setProfiles(rows);
-    for(const row of rows){
-     for(const [path,key] of [[row.avatar_path,'avatar_url'],[row.signature_path,'signature_url']] as const){
-      if(!path)continue;
-      void supabase.storage.from('game-assets').createSignedUrl(path,3600).then(({data})=>{
-       if(!readCurrent(ticket,'profiles'))return;
-       setProfiles(previous=>previous.map(current=>current.user_id===row.user_id&&(key==='avatar_url'?current.avatar_path:current.signature_path)===path?{...current,[key]:data?.signedUrl||null}:current));
-      }).catch(()=>{});
-     }
-    }
-   }
-  });
- }
-
- async function loadPartyRepresentation(){
-  await readSafely(['partyRepresentation','members','parties'],async ticket=>{
-  const [pi,pm,pa,mb,ag]=await Promise.all([
-   supabase.from('party_invitations').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   supabase.from('party_member_mandates').select('*').eq('game_id',gameId),
-   supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'),
-   supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name'),
-   supabase.from('party_agreements').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
-  ]);
-  if(!readActive(ticket))return;
-  requireSuccessful([pi,pm,pa,mb,ag]);
-  if(readCurrent(ticket,'partyRepresentation')){setPartyInvitations((pi.data||[]) as PartyInvitation[]);setPartyMandateRows((pm.data||[]) as PartyMandateAllocation[]);setPartyAgreements((ag.data||[]) as PartyAgreement[])}
-  if(readCurrent(ticket,'members'))setMembers((mb.data||[]) as Member[]);
-  if(readCurrent(ticket,'parties')){
-   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
-   if(readCurrent(ticket,'parties'))setParties(rows);
-  }
   });
  }
 
