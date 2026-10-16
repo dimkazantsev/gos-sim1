@@ -1220,3 +1220,7 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
 .civicMeetingDelegate>button{min-height:44px}
 .civicMeetingMinutes{display:grid;gap:12px;padding-top:12px;border-top:1px solid #d9e5f5}
 @media(max-width:620px){.civicMeetingDocuments{padding:12px}.civicMeetingDocuments>button,.civicMeetingMinutes>button,.civicMeetingDelegate>button{width:100%}}
+
+/* Procedural vote: unobtrusive notice about automatic closing at full registered turnout. */
+.voteAutoClosureHint{margin:11px 0;padding:10px 12px;border:1px solid #d2e2f5;border-radius:10px;background:#f6faff;color:#426085;font-size:13px;line-height:1.5}
+@media(max-width:600px){.voteAutoClosureHint{font-size:12px;padding:9px 11px}}
