@@ -61,7 +61,7 @@ export function useActionErrorPlacement(error:string,view:string,clearError:()=>
    file:action.element instanceof HTMLInputElement&&action.element.type==='file'
   });
   const focused=document.activeElement instanceof HTMLElement?document.activeElement:null;
-  const target=linked?action.element:focused;
+  const target=linked&&action?action.element:focused;
   const rect=target?.getBoundingClientRect();
   const recent=pointer.current&&Date.now()-pointer.current.at<120000?pointer.current:null;
   const x=recent?.x??(rect?rect.left+Math.min(rect.width/2,160):window.innerWidth-32);
@@ -71,7 +71,7 @@ export function useActionErrorPlacement(error:string,view:string,clearError:()=>
    left:Math.max(12,Math.min(x+14,window.innerWidth-noticeWidth-12)),
    top:Math.max(12,Math.min(y+14,Math.max(12,window.innerHeight-190)))
   });
-  if(!linked)return;
+  if(!linked||!action)return;
   const previous=action.element.getAttribute('aria-describedby');
   action.element.setAttribute('aria-describedby',[previous,errorId].filter(Boolean).join(' '));
   return()=>{
