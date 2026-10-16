@@ -37,7 +37,11 @@ transform('app/layout.tsx',
  "type:'website',locale:'ru_RU',url:'/',siteName:BRAND_NAME,",
  "type:'website',locale:'ru_RU',url:"+JSON.stringify(pagesUrl)+",siteName:BRAND_NAME,");
 let home=readFileSync(resolve(target,'app/page.tsx'),'utf8');
-home=home.replaceAll("router.push('/game/'+r.data)","window.location.assign("+JSON.stringify(base+'/?game=')+"+r.data)");
+for(const target of ['r.data','resumedGameId']){
+ const original="router.push('/game/'+"+target+")";
+ if(!home.includes(original))throw Error('Static game entry adapter is missing: '+original);
+ home=home.replaceAll(original,"window.location.assign("+JSON.stringify(base+'/?game=')+"+"+target+")");
+}
 home=home.replaceAll('href="/"','href='+JSON.stringify(base+'/'));
 writeFileSync(resolve(target,'components/StaticLanding.tsx'),home);
 writeFileSync(resolve(target,'components/StaticGame.tsx'),`'use client';

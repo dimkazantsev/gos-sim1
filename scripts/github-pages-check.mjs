@@ -93,7 +93,14 @@ for(const name of scenes)assert.ok(existsSync(join(out,'event-comics',name)),nam
 assert.ok(readFileSync(join(built,'components/StaticLanding.tsx'),'utf8').includes(JSON.stringify(base+'/auth/update-password/')),'Static landing recovery redirect must use Pages');
 const securityPanel=readFileSync(join(built,'components/game/ProfileSecurityPanel.tsx'),'utf8');
 assert.ok(securityPanel.includes('NEXT_PUBLIC_GAME_API_ORIGIN')&&securityPanel.includes("origin+'/auth/update-password'"),'Game profile email recovery must use the application server');
-assert.ok(readFileSync(join(built,'components/StaticLanding.tsx'),'utf8').includes(base+'/?game='),'Dynamic game entry must use the static route.');
+const staticLanding=readFileSync(join(built,'components/StaticLanding.tsx'),'utf8');
+assert.ok(staticLanding.includes(base+'/?game='),'Dynamic game entry must use the static route.');
+for(const variable of ['r.data','resumedGameId']){
+ assert.ok(staticLanding.includes('window.location.assign('+JSON.stringify(base+'/?game=')+'+'+variable+')'),
+  'Pages entry must navigate directly to the static game route: '+variable);
+ assert.ok(!staticLanding.includes("router.push('/game/'+"+variable+")"),
+  'Pages must not navigate to an unsupported dynamic game route: '+variable);
+}
 const documents=readFileSync(join(built,'components/game/DocumentsView.tsx'),'utf8');
 assert.ok(!documents.includes("fetch('/api/"),'A static host cannot serve document POST requests.');
 assert.ok(documents.includes('NEXT_PUBLIC_GAME_API_ORIGIN'),'Use the shared API for PDF/DOCX extraction.');
