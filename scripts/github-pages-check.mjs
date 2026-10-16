@@ -90,7 +90,7 @@ assert.ok(fallback.includes('^[0-9a-f]{8}'),'Only UUID game routes may redirect.
 for(const name of ['.nojekyll','models/facefinder.bin','portable/template.html','portable/engine.mjs','portable/server.mjs','event-comics/atlas-main.webp','event-comics/atlas-extra.webp','auth/update-password/index.html'])assert.ok(existsSync(join(out,name)),name);
 const scenes=readdirSync(join(root,'public/event-comics')).filter(x=>/^scene-.*\.svg$/.test(x));
 for(const name of scenes)assert.ok(existsSync(join(out,'event-comics',name)),name);
-assert.ok(readFileSync(join(built,'components/StaticLanding.tsx'),'utf8').includes(JSON.stringify(base+'/auth/update-password/')),'Static landing recovery redirect must use Pages');
+assert.ok(readFileSync(join(built,'components/StaticLanding.tsx'),'utf8').includes("origin+'/auth/update-password'")&&readFileSync(join(built,'components/StaticLanding.tsx'),'utf8').includes('NEXT_PUBLIC_GAME_API_ORIGIN'),'Static landing password recovery must use the application server');
 const securityPanel=readFileSync(join(built,'components/game/ProfileSecurityPanel.tsx'),'utf8');
 assert.ok(securityPanel.includes('NEXT_PUBLIC_GAME_API_ORIGIN')&&securityPanel.includes("origin+'/auth/update-password'"),'Game profile email recovery must use the application server');
 const staticLanding=readFileSync(join(built,'components/StaticLanding.tsx'),'utf8');
