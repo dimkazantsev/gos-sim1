@@ -21,8 +21,8 @@ export default function PartyTest(){
  const [docs,setDocs]=useState<PartyDocument[]>(()=>kinds.map(kind=>({id:kind+'-v1',game_id:fixture.game.id,party_id:baseParty.id,doc_kind:kind,title:kind==='program'?'Программа развития':'Документ партии',storage_path:kind+'-v1.txt',file_name:kind+'-v1.txt',mime_type:'text/plain',file_size:50,uploaded_by:owner.user_id,version_no:1,status:kind==='program'?'submitted':'accepted',note:null,created_at:'2026-10-16T10:00:00Z',url:'data:text/plain,document'})));
  const [open,setOpen]=useState(true),[registered,setRegistered]=useState(false),[fail,setFail]=useState(false),[uploads,setUploads]=useState(0);
  const party={...baseParty,registration_status:registered?'registered':'submitted'};
- const game={...fixture.game,current_round:1,turn_open:open};
- const shared={...fixture,game,parties:[party],partyDocuments:docs,stages:fixture.stages.map(s=>({...s,status:s.stage_no===1?(open?'open':'completed'):'locked'})),formalDocuments:registered?[{id:'certificate',game_id:game.id,doc_type:'party_certificate',registry_no:'МЮ-ТЕСТ',title:'Свидетельство',metadata:{party_id:party.id},created_at:'2026-10-16T10:00:00Z'}]:[],
+ const game={...fixture.game,current_round:1,turn_open:open,turn_ends_at:null};
+ const shared={...fixture,game,parties:[party],partyDocuments:docs,stages:fixture.stages.map(s=>({...s,deadline:null,status:s.stage_no===1?(open?'open':'completed'):'locked'})),formalDocuments:registered?[{id:'certificate',game_id:game.id,doc_type:'party_certificate',registry_no:'МЮ-ТЕСТ',title:'Свидетельство',metadata:{party_id:party.id},created_at:'2026-10-16T10:00:00Z'}]:[],
   reviewPartyDocument:async(id:string,status:'accepted'|'revision',note?:string)=>{setDocs(rows=>rows.map(d=>d.id===id?{...d,status,note:note?.trim()||null}:d));return true},
   uploadPartyDocument:async(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File)=>{
    setUploads(n=>n+1);if(fail){setFail(false);return false}
@@ -61,6 +61,8 @@ async function ready(){for(let n=0;n<60;n++){if(server.exitCode!==null)throw Err
    assert(await student.locator('.civicPartyPackage').getAttribute('open')!==null,'Returned document opens its own dossier');
    assert((await studentProgram.textContent()).includes('В1'));
    const upload=()=>studentProgram.getByRole('button',{name:'Загрузить Программа · версия В2',exact:true});
+   assert(await upload().isEnabled(),'The fictional first stage is open without an expired demo deadline');
+   if([390,1600].includes(width))await studentProgram.screenshot({path:path.join(shots,'party-student-returned-'+width+'.png')});
    await page.locator('#stage-toggle').click();assert(await upload().isDisabled(),'Closed stage cannot start a file upload');
    await studentProgram.locator('input[type=file]').setInputFiles({name:'closed.txt',mimeType:'text/plain',buffer:Buffer.from('closed')});
    assert.equal(await page.locator('#upload-count').textContent(),'0');await page.locator('#stage-toggle').click();
