@@ -2267,3 +2267,10 @@ button,input,textarea,select{font-size:14px}
 
 /* A completed first stage is a result, not an unopened or locked stage. */
 .gosPartyStageBadge.isCompleted{background:#eaf7f1;border-color:#b7e3cf;color:#16754e}
+
+/* Meeting agenda: concise role guidance and action states on every screen. */
+.civicMeetingHelp{margin:6px 0 12px;max-width:78ch;color:#526581;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.civicAgendaComposer{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0}
+.civicAgendaComposer small{color:#526581;font-size:13px;line-height:1.5}
+.civicAgendaComposer button{max-width:100%;white-space:normal;text-align:center}
+@media(max-width:600px){.civicAgendaComposer button{width:100%}}
