@@ -138,7 +138,7 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
    <label>Иное финансирование, {scenarioUnit(source)}<input type="number" value={financing} onChange={e=>setFinancing(e.target.value)}/></label>
    <label>Лимит дефицита, % ВВП<input type="number" value={deficitLimit} onChange={e=>setDeficitLimit(e.target.value)}/></label>
    <label>Лимит долга, % ВВП<input type="number" value={debtLimit} onChange={e=>setDebtLimit(e.target.value)}/></label>
-   <label className="budgetSource">Источник и допущения<textarea rows={3} value={source} onChange={e=>setSource(e.target.value)} placeholder="Дата данных, источник, единицы измерения, сценарные допущения. Не смешивайте реальные показатели и учебные числа без пометки."/></label>
+   <label className="budgetSource">Источник и допущения<textarea rows={3} value={source} onChange={e=>setSource(e.target.value)} placeholder="Дата данных, источник, единицы измерения, сценарные допущения. Не смешивайте реальные показатели и модельные расчёты без пояснения."/></label>
    <button className="primary" disabled={busy} onClick={()=>void save(!selected)}>Сохранить и пересчитать</button>
   </div>}
 
