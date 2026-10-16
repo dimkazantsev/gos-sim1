@@ -64,9 +64,11 @@ async function run(){
   const noteNews=await db.query("select body from public.political_posts where source_key like 'rating-batch:%' and body like '%Основание:%' limit 1");
   assert.equal(noteNews.rows.length,1,'State-metric news still preserves its note');
   const ui=fs.readFileSync('components/game/TeacherPartyStatistics.tsx','utf8');
-  assert(ui.includes('Рейтинг, %')&&ui.includes('onChange={e=>setRating(e.target.value)}'));
+  assert(!ui.includes('Рейтинг, %')&&!ui.includes('setRating('),'Removed rating must not reappear in the teacher editor');
+  assert(ui.includes('rating:base.rating'),'Legacy RPC argument must retain the existing rating without changing it');
+  assert(ui.includes('Изменить поддержку и мандаты'),'Only authorised indicators remain editable');
   assert(ui.includes('message=>{reason=message}'),'Inline error must contain RPC reason');
-  console.log('PASS teacher party edit: rating 30→55, support 0→60, history, automatic news, failed stale/student edits, mandate ceiling and open-vote guard, state-metric notes, UI controls');
+  console.log('PASS party support and mandates editor excludes obsolete rating; legacy RPC preserves history, news, stale/student rejection, 450-seat ceiling, vote freeze and state metric notes');
  }finally{await db.close()}
 }
 run().catch(e=>{console.error(e);process.exitCode=1});
