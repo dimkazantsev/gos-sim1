@@ -53,6 +53,8 @@ begin
    else r.method end)
    ||coalesce('. Обоснование: '||upper(left(btrim(r.rationale),1))||substr(btrim(r.rationale),2),'');
  end if;
+ -- Complete the final sentence without changing its substantive contents.
+ if right(btrim(v_body),1) not in ('.','!','?','…') then v_body:=v_body||'.';end if;
  insert into public.game_votes(game_id,stage_no,title,body,voting_mode,status,created_by,
    institution_key,procedure_key,quorum_kind,quorum_value,majority_kind,majority_value,
    allow_abstain,tie_breaker_chair,pass_transition,fail_transition)
