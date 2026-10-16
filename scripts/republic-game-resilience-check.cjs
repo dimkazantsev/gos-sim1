@@ -126,6 +126,33 @@ async function main(){
  await check('Newer full refresh survives a late response from the same game',async()=>{
   const h=harness(),old=h.hold('games');const first=h.render().refresh();await tick();h.setRevision(2);await h.render().refresh();assert.equal(h.render().game.current_round,2);old.resolve();await first;assert.equal(h.render().game.current_round,2);h.dispose();
  });
+ await check('Party documents realtime refreshes only documents, not every core table',async()=>{
+  const h=harness({effects:true});
+  await h.settle();
+  h.render().setActiveView('parties');
+  await h.settle();
+  const coreBefore=h.readCount('games'),documentsBefore=h.readCount('party_documents');
+  h.emit('party_documents');
+  await h.settle();
+  assert(h.readCount('party_documents')>documentsBefore,'New document metadata must reach the party screen');
+  assert.equal(h.readCount('games'),coreBefore,'Uploading one file must not reload the full game');
+ });
+ await check('Party records survive a document-table failure',async()=>{
+  const h=harness({effects:true});
+  h.failTable('party_documents');
+  await h.settle();
+  h.render().setActiveView('parties');
+  await h.settle();
+  assert.equal(h.render().parties.length,1,'A document outage must not erase the party list');
+ });
+ await check('Party records survive an optional representation failure',async()=>{
+  const h=harness({effects:true});
+  h.failTable('party_agreements');
+  await h.settle();
+  h.render().setActiveView('parties');
+  await h.settle();
+  assert.equal(h.render().parties.length,1,'Agreements must not block the party list');
+ });
  await check('User changes invalidate an older teacher response',async()=>{
   const h=harness(),old=h.hold('games');const first=h.render().refresh();await tick();h.setUser('student-b');h.setRevision(2);await h.render().refresh();assert.equal(h.render().me.user_id,'student-b');old.resolve();await first;assert.equal(h.render().me.user_id,'student-b');assert.equal(h.render().teacher,false);h.dispose();
  });
