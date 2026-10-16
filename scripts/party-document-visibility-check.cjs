@@ -8,7 +8,7 @@ const orphans=fs.readFileSync('components/game/PartyUnregisteredFiles.tsx','utf8
 
 assert.match(hook,/if\(view==='teacher'\)jobs\.push\(loadPartyDocuments\(\)\)/,
  'Teacher view must fetch the registered documents, not just party representation');
-assert.match(hook,/async function loadPartyDocuments\(\)[\s\S]*?from\('party_documents'\)\.select\('\*'\)\.eq\('game_id',gameId\)[\s\S]*?setPartyDocuments\(rows\)/,
+assert.match(hook,/async function loadPartyDocuments\(\)[\s\S]*?from\('party_documents'\)\.select\('\*'\)\.eq\('game_id',gameId\)[\s\S]*?acceptPartyDocuments\(\(pd\.data\|\|\[\]\)/,
  'Teacher document loader must read game-scoped rows and update document state');
 assert.match(hook,/async function reviewPartyDocument[\s\S]*?update\(\{status,note:note\?\.trim\(\)\|\|null\}\)[\s\S]*?await loadPartyDocuments\(\)/,
  'Review must persist status and note then refresh teacher documents');
