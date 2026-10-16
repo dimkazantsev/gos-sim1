@@ -14,30 +14,33 @@ export default function TeacherPartyStatistics({g,party,invitations}:{g:ReturnTy
  const [editing,setEditing]=useState(false);
  const [busy,setBusy]=useState(false);
  const [base,setBase]=useState<Values>(()=>valuesOf(party));
+ const [rating,setRating]=useState(party.rating===null||party.rating===undefined?'':String(party.rating));
  const [support,setSupport]=useState(String(party.support));
  const [mandates,setMandates]=useState(String(party.mandates));
  const [notice,setNotice]=useState('');
  const [failure,setFailure]=useState(false);
  useEffect(()=>{
   if(editing)return;
+  setRating(party.rating===null||party.rating===undefined?'':String(party.rating));
   setSupport(String(party.support));
   setMandates(String(party.mandates));
  },[editing,party.id,party.rating,party.support,party.mandates]);
  const next:Values={
-  // Preserve the legacy RPC value without exposing an unrelated rating control.
-  rating:base.rating,
+  rating:rating.trim()===''?null:Number(rating),
   support:Number(support),
   mandates:Number(mandates)
  };
  const valid=(
+  (next.rating===null||(Number.isFinite(next.rating)&&next.rating>=0&&next.rating<=100))&&
   support.trim()!==''&&Number.isFinite(next.support)&&next.support>=0&&next.support<=100&&
   mandates.trim()!==''&&Number.isInteger(next.mandates)&&next.mandates>=0&&next.mandates<=450
  );
- const changed=next.support!==base.support||next.mandates!==base.mandates;
+ const changed=next.rating!==base.rating||next.support!==base.support||next.mandates!==base.mandates;
  const outdated=editing&&(party.rating??null)!==base.rating||editing&&(party.support!==base.support||party.mandates!==base.mandates);
  function start(){
   const current=valuesOf(party);
   setBase(current);
+  setRating(current.rating===null?'':String(current.rating));
   setSupport(String(current.support));
   setMandates(String(current.mandates));
   setNotice('');setFailure(false);setEditing(true);
@@ -47,12 +50,13 @@ export default function TeacherPartyStatistics({g,party,invitations}:{g:ReturnTy
   if(!g.teacher||!valid||busy||!changed||outdated)return;
   setBusy(true);setNotice('');setFailure(false);
   try{
-   const ok=await g.updatePartyStatistics(party.id,next,base);
+   let reason='Не удалось сохранить показатели. Повторите попытку.';
+   const ok=await g.updatePartyStatistics(party.id,next,base,message=>{reason=message});
    if(ok){
     setNotice('Показатели партии сохранены.');
     setEditing(false);
    }else{
-    setNotice('Не удалось сохранить показатели. Подробности показаны в сообщении игры.');
+    setNotice(reason);
     setFailure(true);
    }
   }catch{
@@ -63,6 +67,11 @@ export default function TeacherPartyStatistics({g,party,invitations}:{g:ReturnTy
  if(!g.teacher)return null;
  return <div className={styles.wrap} aria-label={'Показатели партии '+party.name}>
   <div className={styles.grid}>
+   <label className={styles.metric}>
+    <span>Рейтинг, %</span>
+    {editing?<input type="number" min="0" max="100" step="0.1" value={rating} onChange={e=>setRating(e.target.value)} disabled={busy} placeholder="Не задан" aria-label={'Рейтинг партии '+party.name}/>:
+     <strong>{party.rating??'—'}</strong>}
+   </label>
    <label className={styles.metric}>
     <span>Поддержка, %</span>
     {editing?<input type="number" min="0" max="100" step="0.1" value={support} onChange={e=>setSupport(e.target.value)} disabled={busy} aria-label={'Поддержка партии '+party.name}/>:
@@ -84,7 +93,7 @@ export default function TeacherPartyStatistics({g,party,invitations}:{g:ReturnTy
     <button type="button" className="secondary" disabled={busy} onClick={cancel}><X size={15} aria-hidden="true"/>Отмена</button>
    </div>
    <small className={styles.hint}>Мандаты: не более 450 суммарно у всех фракций. Изменение недоступно во время открытого голосования Государственной Думы.</small>
-  </>:<div className={styles.actions}><button type="button" className="secondary" onClick={start}><PencilLine size={15} aria-hidden="true"/>Изменить поддержку и мандаты</button></div>}
+  </>:<div className={styles.actions}><button type="button" className="secondary" onClick={start}><PencilLine size={15} aria-hidden="true"/>Изменить рейтинг и показатели</button></div>}
   {notice&&<p role={failure?'alert':'status'} className={failure?styles.error:styles.success}>{notice}</p>}
  </div>;
 }
