@@ -151,6 +151,7 @@ async function check(){
     const closedStage=frame.locator('.teacherStageListItem.is-locked,.teacherStageListItem.is-completed').first();
     assert(await closedStage.count()>0,'A closed or completed stage must be selectable for opening');
     await closedStage.click();
+    await frame.locator('.teacherStageOpenFull').waitFor({state:'visible'});
     const measure=await frame.locator('.teacherStageInspectorActions').evaluate(root=>{
      const open=root.querySelector('.teacherStageOpenFull')?.getBoundingClientRect();
      const procedures=root.querySelector('.teacherStageProcedures')?.getBoundingClientRect();
