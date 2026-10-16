@@ -11,6 +11,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   setCounts({});
   if(!gameId||!userId||readOnly)return;
   let live=true,running=false,queued=false;
+  let pending:ReturnType<typeof setTimeout>|undefined;
   async function load(){
    if(running){queued=true;return}
    running=true;
@@ -20,14 +21,15 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
    }finally{running=false;if(queued&&live){queued=false;void load()}}
   }
   const invalidated=(e:Event)=>{
-   if((e as CustomEvent<{gameId:string}>).detail?.gameId===gameId)void load();
+   if((e as CustomEvent<{gameId:string}>).detail?.gameId!==gameId||pending!==undefined)return;
+   pending=setTimeout(()=>{pending=undefined;if(live)void load()},250);
   };
   const focused=()=>{if(document.visibilityState==='visible')void load()};
   void load();
-  const poll=setInterval(focused,30000);
+  const poll=setInterval(focused,30000+Math.floor(Math.random()*10000));
   window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidated);
   window.addEventListener('focus',focused);
-  return()=>{live=false;clearInterval(poll);window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidated);window.removeEventListener('focus',focused)};
+  return()=>{live=false;clearTimeout(pending);clearInterval(poll);window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidated);window.removeEventListener('focus',focused)};
  },[gameId,userId,readOnly]);
  useEffect(()=>{
   if(!gameId||!userId||readOnly||!READABLE_SECTIONS.has(view))return;

@@ -50,6 +50,70 @@ export function useRepublicGame(gameId:string){
  const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const lastTelegramDispatch=useRef(0);
+ const lastCoreSuccessAt=useRef(0);
+ const overviewRealtimeTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const lastRealtimeOverviewAt=useRef(0);
+ function scheduleRealtimeChatOverview(){
+  if(overviewRealtimeTimer.current!==null)return;
+  const delay=Math.max(0,1500-(Date.now()-lastRealtimeOverviewAt.current));
+  overviewRealtimeTimer.current=setTimeout(()=>{
+   overviewRealtimeTimer.current=null;
+   if(!alive.current||!authUser.current||document.visibilityState==='hidden')return;
+   lastRealtimeOverviewAt.current=Date.now();
+   void loadChatOverview();
+  },delay);
+ }
+ const coreReadQueue=useRef({active:0,waiting:[] as Array<()=>void>});
+ function limitedCoreRead<T>(query:PromiseLike<T>):Promise<T>{
+  return new Promise<T>((resolve,reject)=>{
+   const run=()=>{
+    coreReadQueue.current.active++;
+    void Promise.resolve(query).then(resolve,reject).finally(()=>{
+     coreReadQueue.current.active--;
+     coreReadQueue.current.waiting.shift()?.();
+    });
+   };
+   if(coreReadQueue.current.active<4)run();
+   else coreReadQueue.current.waiting.push(run);
+  });
+ }
+ const assetSignatures=useRef(new Map<string,{expiresAt:number;promise:Promise<string|null>}>());
+ const assetSignQueue=useRef({active:0,waiting:[] as Array<()=>void>});
+ function signedAssetUrl(bucket:'game-assets'|'game-media',path:string,force=false):Promise<string|null>{
+  if(!path)return Promise.resolve(null);
+  const key=bucket+':'+path,now=Date.now();
+  const old=assetSignatures.current.get(key);
+  if(!force&&old&&old.expiresAt>now)return old.promise;
+  // Links and in-flight requests are shared only inside the current authorised game session.
+  if(assetSignatures.current.size>=600){
+   const first=assetSignatures.current.keys().next().value;
+   if(first)assetSignatures.current.delete(first);
+  }
+  const epoch=readEpoch.current;
+  const promise=new Promise<string|null>(resolve=>{
+   const run=()=>{
+    assetSignQueue.current.active++;
+    const finish=(url:string|null)=>{
+     assetSignQueue.current.active--;
+     assetSignQueue.current.waiting.shift()?.();
+     resolve(url);
+    };
+    if(epoch!==readEpoch.current||!alive.current){finish(null);return}
+    void supabase.storage.from(bucket).createSignedUrl(path,3600).then(({data,error})=>{
+     const url=error?null:data?.signedUrl||null;
+     if(!url&&assetSignatures.current.get(key)?.promise===promise)assetSignatures.current.delete(key);
+     finish(url);
+    }).catch(()=>{
+     if(assetSignatures.current.get(key)?.promise===promise)assetSignatures.current.delete(key);
+     finish(null);
+    });
+   };
+   if(assetSignQueue.current.active<4)run();
+   else assetSignQueue.current.waiting.push(run);
+  });
+  assetSignatures.current.set(key,{expiresAt:now+45*60*1000,promise});
+  return promise;
+ }
  async function kickTelegramDispatch(){
   if(typeof window==='undefined'||!me?.user_id||Date.now()-lastTelegramDispatch.current<12000)return;
   lastTelegramDispatch.current=Date.now();
@@ -95,6 +159,9 @@ export function useRepublicGame(gameId:string){
  }
  function clearGameData(){
   acceptedMember.current=null;
+  assetSignatures.current.clear();lastCoreSuccessAt.current=0;
+  if(overviewRealtimeTimer.current!==null){clearTimeout(overviewRealtimeTimer.current);overviewRealtimeTimer.current=null}
+  lastRealtimeOverviewAt.current=0;
   setGame(null);setMe(null);setMetrics([]);setEvents([]);setMembers([]);setOfficeRows([]);
   setChannels([]);channelRef.current='';setChannelId('');setMessages([]);setChatPins([]);setPinnedMessages([]);setChatOverview([]);setChatLoading(false);setChatOpen(false);
   setStages([]);setParties([]);setVotes([]);setBallots([]);setEvaluations([]);setCrises([]);setDocuments([]);setActivities([]);setPresence([]);setProfiles([]);
@@ -189,7 +256,7 @@ export function useRepublicGame(gameId:string){
    if(core){void hydrateActiveView();notifyGameDataRefresh(gameId)}
    // A document version changes no core identity or party membership.
    if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments();
-   if(overview||chat)void loadChatOverview();
+   if(overview||chat)scheduleRealtimeChatOverview();
    if(chat&&channelRef.current)void loadMessages(channelRef.current);
    if(pins&&channelRef.current)void loadChatPins(channelRef.current);
    if(wake)void kickTelegramDispatch();
@@ -209,9 +276,9 @@ export function useRepublicGame(gameId:string){
     if(row?.id&&row.game_id===gameId&&row.channel_id===channelRef.current){
      setMessages(previous=>mergeChatMessages(previous,[row]));
      if(row.storage_path){
-      void supabase.storage.from('game-media').createSignedUrl(row.storage_path,3600).then(({data})=>{
-       if(!disposed&&channelRef.current===row.channel_id&&data?.signedUrl)
-        setMessages(previous=>mergeChatMessages(previous,[{...row,url:data.signedUrl}]));
+      void signedAssetUrl('game-media',row.storage_path).then(url=>{
+       if(!disposed&&channelRef.current===row.channel_id&&url)
+        setMessages(previous=>mergeChatMessages(previous,[{...row,url}]));
       }).catch(()=>{/* A later media URL refresh can retry. */});
      }
     }
@@ -286,7 +353,8 @@ export function useRepublicGame(gameId:string){
   if(next)rememberChatChannel(next,visibleMe.user_id);
  },[chatOpen,channels,chatOverview,channelId,visibleMe?.user_id,gameId]);
 
- useEffect(()=>{if(me?.user_id)void hydrateActiveView();},[activeView,me?.user_id,chatOpen,gameId]);
+ useEffect(()=>{if(me?.user_id)void hydrateActiveView(true);},[activeView,me?.user_id,gameId]);
+ useEffect(()=>{if(chatOpen&&me?.user_id)void loadChatOverview();},[chatOpen,me?.user_id,gameId]);
 
  useEffect(()=>{
   const tick=()=>{
@@ -352,21 +420,21 @@ export function useRepublicGame(gameId:string){
   if(!uid)return;
   const ticket=startRead('core','members','metrics','profiles','parties','formal','channels');
   const [g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro]=await Promise.all([
-   supabase.from('games').select('*').eq('id',gameId).maybeSingle(),
-   supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle(),
-   supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label'),
-   supabase.from('game_events').select('*').eq('game_id',gameId).order('published_at',{ascending:false}).limit(100),
-   supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name'),
-   supabase.from('chat_channels').select('*').eq('game_id',gameId).order('name'),
-   supabase.from('game_stages').select('*').eq('game_id',gameId).order('stage_no'),
-   supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'),
-   supabase.from('game_votes').select('*').eq('game_id',gameId).order('opened_at',{ascending:false}),
-   supabase.from('game_evaluations').select('*').eq('game_id',gameId).order('stage_no'),
-   supabase.from('game_crises').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   supabase.from('game_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   supabase.from('game_profiles').select('*').eq('game_id',gameId),
-   supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}),
-   supabase.rpc('has_seen_my_intro')
+   limitedCoreRead(supabase.from('games').select('*').eq('id',gameId).maybeSingle()),
+   limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle()),
+   limitedCoreRead(supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label')),
+   limitedCoreRead(supabase.from('game_events').select('*').eq('game_id',gameId).order('published_at',{ascending:false}).limit(100)),
+   limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name')),
+   limitedCoreRead(supabase.from('chat_channels').select('*').eq('game_id',gameId).order('name')),
+   limitedCoreRead(supabase.from('game_stages').select('*').eq('game_id',gameId).order('stage_no')),
+   limitedCoreRead(supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')),
+   limitedCoreRead(supabase.from('game_votes').select('*').eq('game_id',gameId).order('opened_at',{ascending:false})),
+   limitedCoreRead(supabase.from('game_evaluations').select('*').eq('game_id',gameId).order('stage_no')),
+   limitedCoreRead(supabase.from('game_crises').select('*').eq('game_id',gameId).order('created_at',{ascending:false})),
+   limitedCoreRead(supabase.from('game_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})),
+   limitedCoreRead(supabase.from('game_profiles').select('*').eq('game_id',gameId)),
+   limitedCoreRead(supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false})),
+   limitedCoreRead(supabase.rpc('has_seen_my_intro'))
   ]);
   if(!readCurrent(ticket,'core'))return;
   if(g.error||m.error){
@@ -380,7 +448,7 @@ export function useRepublicGame(gameId:string){
   if(previousMember&&(['kind','role_title','team','group_name','roster_archived_at'] as const).some(key=>previousMember[key]!==member[key])){
    readEpoch.current++;clearGameData();authUser.current=uid;acceptedMember.current=member;setGame(g.data as Game);setMe(member);void hydrateActiveView();return;
   }
-  acceptedMember.current=member;setGame(g.data as Game);setMe(member);
+  acceptedMember.current=member;lastCoreSuccessAt.current=Date.now();setGame(g.data as Game);setMe(member);
   if(!mt.error&&readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
   if(mt.error&&readCurrent(ticket,'metrics'))setError(mt.error);
   if(!ev.error)setEvents((ev.data||[]) as EventItem[]);
@@ -415,8 +483,11 @@ export function useRepublicGame(gameId:string){
   if(!intro.error)setIntroAccountSeen(!!intro.data);
  }
 
- async function hydrateActiveView(){
-  const jobs:Promise<unknown>[]=[loadCoreSections(),loadRepublicOffices()];
+ async function hydrateActiveView(allowFreshCore=false){
+  // Rapid view navigation can reuse recently updated common data.
+  // Realtime, recovery and explicit refresh still force the core read.
+  const jobs:Promise<unknown>[]=[loadRepublicOffices()];
+  if(!allowFreshCore||Date.now()-lastCoreSuccessAt.current>15000)jobs.unshift(loadCoreSections());
   const view=activeViewRef.current;
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets());
   // Teacher dossiers must fetch document rows, not just party representation.
@@ -462,7 +533,7 @@ export function useRepublicGame(gameId:string){
    });
   });
   void Promise.all(rows.map(async row=>{
-   try{return {id:row.id,path:row.storage_path,url:(await supabase.storage.from('game-assets').createSignedUrl(row.storage_path,3600)).data?.signedUrl||null}}
+   try{return {id:row.id,path:row.storage_path,url:await signedAssetUrl('game-assets',row.storage_path)}}
    catch{return {id:row.id,path:row.storage_path,url:null}}
   })).then(links=>{
    if(!readCurrent(ticket,'partyDocuments'))return;
@@ -494,7 +565,7 @@ export function useRepublicGame(gameId:string){
    return {...row,logo_url:old?.logo_path===row.logo_path?old?.logo_url||null:null};
   }));
   void Promise.all(rows.filter(row=>row.logo_path).map(async row=>{
-   try{return {id:row.id,path:row.logo_path,url:(await supabase.storage.from('game-assets').createSignedUrl(row.logo_path!,3600)).data?.signedUrl||null}}
+   try{return {id:row.id,path:row.logo_path,url:await signedAssetUrl('game-assets',row.logo_path!)}}
    catch{return {id:row.id,path:row.logo_path,url:null}}
   })).then(links=>{
    if(!readCurrent(ticket,'parties'))return;
@@ -532,10 +603,10 @@ export function useRepublicGame(gameId:string){
     void Promise.all(rows.map(async row=>{
      try{
       const [avatar,signature]=await Promise.all([
-       row.avatar_path?supabase.storage.from('game-assets').createSignedUrl(row.avatar_path,3600):Promise.resolve(null),
-       row.signature_path?supabase.storage.from('game-assets').createSignedUrl(row.signature_path,3600):Promise.resolve(null)
+       row.avatar_path?signedAssetUrl('game-assets',row.avatar_path):Promise.resolve(null),
+       row.signature_path?signedAssetUrl('game-assets',row.signature_path):Promise.resolve(null)
       ]);
-      return {id:row.user_id,avatarPath:row.avatar_path,signaturePath:row.signature_path,avatar:avatar?.data?.signedUrl||null,signature:signature?.data?.signedUrl||null};
+      return {id:row.user_id,avatarPath:row.avatar_path,signaturePath:row.signature_path,avatar:avatar||null,signature:signature||null};
      }catch{return {id:row.user_id,avatarPath:row.avatar_path,signaturePath:row.signature_path,avatar:null,signature:null}}
     })).then(links=>{
      if(!readCurrent(ticket,'profiles'))return;
@@ -579,48 +650,78 @@ export function useRepublicGame(gameId:string){
 
  async function loadFormalRegistry(){
   await readSafely(['formal'],async ticket=>{
-  const [fd,fh]=await Promise.all([
-   supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}),
-   supabase.from('formal_document_history').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
-  ]);
-  if(!readCurrent(ticket))return;
-  requireSuccessful([fd,fh]);
-  const rows=await Promise.all(((fd.data||[]) as FormalDocument[]).map(async x=>x.source_file_path?{...x,file_url:(await supabase.storage.from('game-assets').createSignedUrl(x.source_file_path,3600)).data?.signedUrl||null}:x));
-  if(!readCurrent(ticket))return;
-  setFormalDocuments(rows);setFormalHistory((fh.data||[]) as FormalHistory[]);
-  if(fd.data?.some(d=>d.status_code==='published'&&d.metadata?.budget_simulator_plan_id))void syncBudget();
+   const [fd,fh]=await Promise.all([
+    supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}),
+    supabase.from('formal_document_history').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
+   ]);
+   if(!readCurrent(ticket))return;
+   requireSuccessful([fd,fh]);
+   const rows=(fd.data||[]) as FormalDocument[];
+   // Render the register independently from Storage availability.
+   setFormalDocuments(previous=>{
+    const cached=new Map(previous.map(row=>[row.id,row]));
+    return rows.map(row=>{
+     const old=cached.get(row.id);
+     return {...row,file_url:old?.source_file_path===row.source_file_path?old.file_url||null:null};
+    });
+   });
+   setFormalHistory((fh.data||[]) as FormalHistory[]);
+   void Promise.all(rows.filter(row=>row.source_file_path).map(async row=>({
+    id:row.id,path:row.source_file_path,url:await signedAssetUrl('game-assets',row.source_file_path!)
+   }))).then(links=>{
+    if(!readCurrent(ticket))return;
+    const byId=new Map(links.map(link=>[link.id,link]));
+    setFormalDocuments(previous=>previous.map(row=>{
+     const link=byId.get(row.id);
+     return link&&link.path===row.source_file_path?{...row,file_url:link.url||row.file_url||null}:row;
+    }));
+   });
+   if(fd.data?.some(doc=>doc.status_code==='published'&&doc.metadata?.budget_simulator_plan_id))void syncBudget();
   });
  }
-
  async function loadPoliticalWall(){
   await readSafely(['political','metrics','parties'],async ticket=>{
-  const [pp,px,pl,mh,psh,mt,pa]=await Promise.all([
-   supabase.from('political_posts').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
-   supabase.from('political_post_media').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-   supabase.from('political_post_formal_links').select('*').eq('game_id',gameId),
-   supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
-   supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
-   supabase.from('state_metrics').select('*').eq('game_id',gameId).order('sort_order'),
-   supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')
-  ]);
-  if(!readActive(ticket))return;
-  requireSuccessful([pp,px,pl,mh,psh,mt,pa]);
-  if(readCurrent(ticket,'political')){
-   // Deleted posts are excluded by political_posts RLS. Do not sign orphaned
-   // attachments for them: they no longer have a rendered card.
-   const visiblePostIds=new Set(((pp.data||[]) as PoliticalPost[]).map(p=>p.id));
-   const rows=await Promise.all(((px.data||[]) as PoliticalPostMedia[]).filter(x=>visiblePostIds.has(x.post_id)).map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
-   if(readCurrent(ticket,'political')){setPoliticalPosts((pp.data||[]) as PoliticalPost[]);setPoliticalMedia(rows);setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);setMetricHistory((mh.data||[]) as MetricHistory[]);setPartySupportHistory((psh.data||[]) as PartySupportHistory[])}
-    // Only registration stories require programme files; avoid extra signed-URL
-    // requests and preserve the existing resilience tests for ordinary news.
-    if(readCurrent(ticket,'political')&&((pp.data||[]) as PoliticalPost[]).some(post=>post.source_key?.startsWith('media-party-registration:'))){void loadPartyDocuments()}
-
-  }
-  if(readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
-  if(readCurrent(ticket,'parties')){
-   const rows=await Promise.all(((pa.data||[]) as Party[]).map(async x=>x.logo_path?{...x,logo_url:(await supabase.storage.from('game-assets').createSignedUrl(x.logo_path,3600)).data?.signedUrl||null}:x));
-   if(readCurrent(ticket,'parties'))setParties(rows);
-  }
+   const [pp,px,pl,mh,psh,mt,pa]=await Promise.all([
+    supabase.from('political_posts').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
+    supabase.from('political_post_media').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+    supabase.from('political_post_formal_links').select('*').eq('game_id',gameId),
+    supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
+    supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
+    supabase.from('state_metrics').select('*').eq('game_id',gameId).order('sort_order'),
+    supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')
+   ]);
+   if(!readActive(ticket))return;
+   requireSuccessful([pp,px,pl,mh,psh,mt,pa]);
+   if(readCurrent(ticket,'political')){
+    // Only sign files belonging to posts still visible under RLS.
+    const posts=(pp.data||[]) as PoliticalPost[];
+    const visiblePostIds=new Set(posts.map(post=>post.id));
+    const rows=((px.data||[]) as PoliticalPostMedia[]).filter(item=>visiblePostIds.has(item.post_id));
+    setPoliticalPosts(posts);
+    setPoliticalMedia(previous=>{
+     const cached=new Map(previous.map(row=>[row.id,row]));
+     return rows.map(row=>{
+      const old=cached.get(row.id);
+      return {...row,url:old?.storage_path===row.storage_path?old.url||null:null};
+     });
+    });
+    setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);
+    setMetricHistory((mh.data||[]) as MetricHistory[]);
+    setPartySupportHistory((psh.data||[]) as PartySupportHistory[]);
+    void Promise.all(rows.filter(row=>row.storage_path).map(async row=>({
+     id:row.id,path:row.storage_path,url:await signedAssetUrl('game-assets',row.storage_path)
+    }))).then(links=>{
+     if(!readCurrent(ticket,'political'))return;
+     const byId=new Map(links.map(link=>[link.id,link]));
+     setPoliticalMedia(previous=>previous.map(row=>{
+      const link=byId.get(row.id);
+      return link&&link.path===row.storage_path?{...row,url:link.url||row.url||null}:row;
+     }));
+    });
+    if(posts.some(post=>post.source_key?.startsWith('media-party-registration:')))void loadPartyDocuments();
+   }
+   if(readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
+   if(readCurrent(ticket,'parties'))acceptPartyRows((pa.data||[]) as Party[],ticket);
   });
  }
 
@@ -661,16 +762,30 @@ export function useRepublicGame(gameId:string){
   if(channelRef.current!==cid)return;
   if(initial)setChatLoading(true);
   await readSafely(['messages'],async ticket=>{
-  try{
-   const r=await supabase.from('chat_messages').select('*').eq('channel_id',cid).order('created_at',{ascending:false}).limit(150);
-   if(!readCurrent(ticket)||channelRef.current!==cid)return;
-   requireSuccessful([r]);
-   const rows=await Promise.all(((r.data||[]) as Message[]).map(async m=>{if(!m.storage_path)return m;const x=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);return {...m,url:x.data?.signedUrl||null}}));
-   if(readCurrent(ticket)&&channelRef.current===cid){
-    const ordered=rows.reverse(),latest=ordered.at(-1)?.created_at||'';
+   try{
+    const r=await supabase.from('chat_messages').select('*').eq('channel_id',cid).order('created_at',{ascending:false}).limit(150);
+    if(!readCurrent(ticket)||channelRef.current!==cid)return;
+    requireSuccessful([r]);
+    // Render text before potentially slow private Storage signatures.
+    const cached=new Map(messageRowsRef.current.filter(m=>m.channel_id===cid).map(m=>[m.id,m]));
+    const rows=((r.data||[]) as Message[]).map(m=>{
+     const old=cached.get(m.id);
+     return {...m,url:m.storage_path&&old?.storage_path===m.storage_path?old.url||null:null};
+    });
+    const ordered=[...rows].reverse(),latest=ordered.at(-1)?.created_at||'';
     setMessages(previous=>ordered.length?mergeChatMessages(ordered,previous.filter(m=>m.channel_id===cid&&m.created_at>latest)):[]);
-   }
-  }finally{if(readCurrent(ticket)&&channelRef.current===cid)setChatLoading(false)}
+    const pending=rows.filter(m=>m.storage_path&&!m.url);
+    if(pending.length)void Promise.all(pending.map(async m=>({
+     id:m.id,path:m.storage_path,url:await signedAssetUrl('game-media',m.storage_path!)
+    }))).then(links=>{
+     if(!readCurrent(ticket)||channelRef.current!==cid)return;
+     const byId=new Map(links.map(link=>[link.id,link]));
+     setMessages(previous=>previous.map(m=>{
+      const link=byId.get(m.id);
+      return link&&link.path===m.storage_path?{...m,url:link.url||m.url||null}:m;
+     }));
+    });
+   }finally{if(readCurrent(ticket)&&channelRef.current===cid)setChatLoading(false)}
   });
  }
  async function loadRecentChatMessages(cid:string){
@@ -691,8 +806,8 @@ export function useRepublicGame(gameId:string){
    if(!unseen.length)return;
    const rows=await Promise.all(unseen.map(async m=>{
     if(!m.storage_path)return m;
-    const signed=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);
-    return {...m,url:signed.data?.signedUrl||null};
+    const url=await signedAssetUrl('game-media',m.storage_path);
+    return {...m,url};
    }));
    if(readActive(ticket)&&channelRef.current===cid)setMessages(previous=>mergeChatMessages(previous,rows));
   }catch{
@@ -705,10 +820,9 @@ export function useRepublicGame(gameId:string){
   if(!messageId||!storagePath)return null;
   if(!messages.some(m=>m.id===messageId&&m.storage_path===storagePath)&&
      !pinnedMessages.some(m=>m.id===messageId&&m.storage_path===storagePath))return null;
-  const r=await supabase.storage.from('game-media').createSignedUrl(storagePath,3600);
+  const url=await signedAssetUrl('game-media',storagePath,true);
   if(!readActive(ticket))return null;
-  if(r.error||!r.data?.signedUrl){setChatMediaError('Не удалось обновить ссылку на аудио: '+(r.error?.message||'Повторите попытку.'));return null}
-  const url=r.data.signedUrl;
+  if(!url){setChatMediaError('Не удалось обновить ссылку на аудио. Повторите попытку.');return null}
   setMessages(previous=>previous.map(m=>m.id===messageId&&m.storage_path===storagePath?{...m,url}:m));
   setPinnedMessages(previous=>previous.map(m=>m.id===messageId&&m.storage_path===storagePath?{...m,url}:m));
   return url;
@@ -727,8 +841,8 @@ export function useRepublicGame(gameId:string){
   requireSuccessful([linked]);
   const media=await Promise.all(((linked.data||[]) as Message[]).map(async m=>{
    if(!m.storage_path)return m;
-   const url=await supabase.storage.from('game-media').createSignedUrl(m.storage_path,3600);
-   return {...m,url:url.data?.signedUrl||null};
+   const url=await signedAssetUrl('game-media',m.storage_path);
+   return {...m,url};
   }));
   if(readCurrent(ticket)&&channelRef.current===cid){setChatPins(pins);setPinnedMessages(media)}
   });

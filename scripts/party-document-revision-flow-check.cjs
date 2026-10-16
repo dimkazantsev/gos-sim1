@@ -4,9 +4,9 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const {PGlite}=require('@electric-sql/pglite');
 const source=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const tree=ts.createSourceFile('hook.ts',source,ts.ScriptTarget.Latest,true);
-const wanted=new Set(['acceptPartyDocuments','loadPartyDocuments','uploadPartyDocument','reviewPartyDocument']);
+const wanted=new Set(['signedAssetUrl','acceptPartyDocuments','loadPartyDocuments','uploadPartyDocument','reviewPartyDocument']);
 const pieces=[];function visit(n){if(ts.isFunctionDeclaration(n)&&wanted.has(n.name?.text))pieces.push(n.getText(tree));ts.forEachChild(n,visit)}visit(tree);
-assert.equal(pieces.length,4);
+assert.equal(pieces.length,5);
 const code=ts.transpileModule(pieces.join('\n'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.None}}).outputText;
 const tick=()=>new Promise(r=>setImmediate(r));
 function gate(){let resolve;return{promise:new Promise(r=>resolve=r),resolve}}
@@ -16,6 +16,7 @@ async function actions(){
  function client(teacher){
   let rows=[],version=0;const signing=gate(),errors=[],api={};
   const env={api,console,Promise,Map,crypto:require('node:crypto').webcrypto,teacher,gameId:'game-a',game:{id:'game-a'},me:{user_id:teacher?'teacher':'owner'},parties:[{id:'party-a',game_id:'game-a'}],
+    assetSignatures:{current:new Map()},assetSignQueue:{current:{active:0,waiting:[]}},readEpoch:{current:0},alive:{current:true},
    setError:e=>errors.push(String(e)),setPartyDocuments:fn=>{rows=typeof fn==='function'?fn(rows):fn},
    readCurrent:t=>t.version===version,requireSuccessful:rs=>{const e=rs.find(r=>r.error)?.error;if(e)throw e},
    readSafely:async(_,fn)=>fn({version:++version}),notifyGameDataRefresh:()=>{},kickTelegramDispatch:async()=>{},

@@ -16,16 +16,18 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   let disposed=false,running=false,queued=false,timer:ReturnType<typeof setTimeout>|undefined;
   async function flush(){
    if(disposed)return;
+   timer=undefined;
    if(running){queued=true;return}
    running=true;
    try{await latest.current()}catch(error){console.error('Stage refresh failed',error)}
    finally{running=false;if(queued&&!disposed){queued=false;schedule(250)}}
   }
-  function schedule(delay=120){if(disposed)return;clearTimeout(timer);timer=setTimeout(()=>void flush(),delay)}
+  function schedule(delay=120){if(disposed||timer!==undefined)return;timer=setTimeout(()=>void flush(),delay)}
   function visible(){if(document.visibilityState==='visible')schedule()}
   function local(event:Event){if((event as CustomEvent<{gameId:string}>).detail?.gameId===gameId)schedule()}
   void flush();
-  const poll=setInterval(()=>{if(document.visibilityState==='visible')schedule(0)},20000);
+  // Fall back without aligning all classroom tabs and stage widgets on the same tick.
+   const poll=setInterval(()=>{if(document.visibilityState==='visible')schedule(0)},25000+Math.floor(Math.random()*10000));
   window.addEventListener('focus',visible);window.addEventListener('online',visible);
   window.addEventListener(GAME_DATA_REFRESH_EVENT,local);document.addEventListener('visibilitychange',visible);
   return()=>{disposed=true;clearTimeout(timer);clearInterval(poll);window.removeEventListener('focus',visible);window.removeEventListener('online',visible);window.removeEventListener(GAME_DATA_REFRESH_EVENT,local);document.removeEventListener('visibilitychange',visible)};
