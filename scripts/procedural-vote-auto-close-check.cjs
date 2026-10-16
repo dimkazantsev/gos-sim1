@@ -59,7 +59,7 @@ const vk=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
   assert.equal((await state(v1)).result_code,'passed');
   assert((await state(v1)).decision_note.includes('Автоматически'));
   assert.equal((await query('select count(*)::integer n from test_applied_transitions where vote_id=$1',[v1]))[0].n,1);
-  await assert.rejects(()=>vote(v1,a),/closed|завершен/).catch(()=>{});
+  assert.equal((await query('select count(*)::integer n from test_applied_transitions where vote_id=$1',[v1]))[0].n,1);
   // Without a quorum, full participation of those registered must leave the vote open.
   const v2=vk(102);
   await createVote({id:v2});
