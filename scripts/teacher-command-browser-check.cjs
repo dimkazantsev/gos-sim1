@@ -147,6 +147,28 @@ async function check(){
      path:path.join(screenshots,'teacher-stages-'+width+'.png'),animations:'disabled'
     });
    }
+   if([1440,900,390].includes(width)){
+    // The design preview is static markup. Reconstruct the closed-stage variant
+    // from the same production classes so the real browser measures the CSS.
+    const measure=await frame.locator('.teacherCommand').evaluate(root=>{
+     const original=root.querySelector('.teacherStageInspectorActions');
+     const sample=original.cloneNode(true);
+     const flow=sample.querySelector('.teacherStageFlowActions');
+     flow.classList.add('isOpening');
+     const opener=document.createElement('button');
+     opener.type='button';
+     opener.className='teacherStageOpenFull';
+     opener.textContent='Открыть этап';
+     flow.replaceChildren(opener);
+     original.after(sample);
+     const open=opener.getBoundingClientRect();
+     const procedures=sample.querySelector('.teacherStageProcedures').getBoundingClientRect();
+     sample.remove();
+     return {openWidth:open.width,procedureWidth:procedures.width,openLeft:open.left,procedureLeft:procedures.left};
+    });
+    assert(measure&&Math.abs(measure.openWidth-measure.procedureWidth)<=2&&Math.abs(measure.openLeft-measure.procedureLeft)<=2,
+     'Open stage and Open procedures must align at '+width+'px: '+JSON.stringify(measure));
+   }
    console.log('PASS '+width+'px: 16 stable list rows, contextual reset, twelve workspaces, no overflow');
   }
   for(const [screen,selector] of [

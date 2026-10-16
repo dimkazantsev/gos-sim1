@@ -108,8 +108,13 @@
  padding:0 12px;border:1px solid #bfd0ed;border-radius:9px;
  background:#fff;color:#223e63;font-size:15px;font-weight:700;
 }
+.teacherCommand .teacherStageFlowActions.isOpening {flex:1 1 100%;width:100%;}
+.teacherCommand .teacherStageFlowActions>.teacherStageOpenFull {
+ flex:1 1 100%;width:100%;min-width:0;box-sizing:border-box;
+}
 .teacherCommand .teacherStageProcedures {
- flex:0 1 auto;min-height:44px;white-space:normal;text-align:center;
+ flex:1 1 100%;width:100%;min-height:44px;box-sizing:border-box;
+ white-space:normal;text-align:center;
 }
 .teacherCommand .teacherStageInspector>.stagePolicyEditor {
  gap:14px;padding:17px;
@@ -325,4 +330,13 @@
 @container (max-width:350px) {
  .teacherCommand .teacherStageFlowActions {grid-template-columns:minmax(0,1fr);}
  .teacherCommand .teacherStageFlowActions>button:last-child {grid-column:auto;}
+}
+
+/* A single stage-open action must occupy the whole inspector width even when
+   container queries switch the normal three-control flow into CSS Grid. */
+.teacherCommand .teacherStageFlowActions.isOpening {
+ grid-template-columns:minmax(0,1fr);
+}
+.teacherCommand .teacherStageFlowActions.isOpening>.teacherStageOpenFull {
+ grid-column:1/-1;justify-self:stretch;width:100%;
 }

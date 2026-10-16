@@ -28,11 +28,11 @@ const fmt=(n:number)=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
 const ruleLabels:Record<string,string>={final:'Расчёт зафиксирован',allocated:'Распределено',vote_open:'На голосовании',superseded:'Заменено новым решением',granted:'Предоставлено',requested:'Запрошено',hare:'Квота Хэйра',droop:'Квота Друпа',dhondt:'Д’Ондт',sainte_lague:'Сент-Лагю',imperiali:'Империали',plurality:'Относительное большинство',absolute_two_round:'Абсолютное большинство · два тура'};
 const money=(n:number|string|undefined)=>n==null?'Не зафиксировано':Number(n).toLocaleString('ru-RU',{maximumFractionDigits:2})+' ₽';
 const status=(s:string|undefined)=>s?ruleLabels[s]||labels[s]||s:'Не зафиксировано';
-export function comicSlides(chapter:ComicChapter):ComicSlide[]{
+export function comicSlides(chapter:ComicChapter,includeEmptyPreviewSlide=false):ComicSlide[]{
  const s=chapter.snapshot||{},no=chapter.stage_no,theme=COMIC_THEMES[no];
  if(s.version!==2||!theme)return [{title:chapter.title,body:chapter.body,art:no===16?'epilogue':no>=9?'programs':'regions',facts:[]}];
  if(chapter.kind==='preview'){
-  const draft=comicSlides({...chapter,kind:'completed'});
+  const draft=comicSlides({...chapter,kind:'completed'},true);
   return draft.map(slide=>({...slide,
    body:'Предварительный просмотр для преподавателя. После завершения '+(comicStages(no).length===2?'обоих этапов':'этапа')+' вместо заглушек появятся сохранённые результаты игры. Это не фактический итог.',
    facts:slide.facts.map(fact=>({...fact,value:'Ожидает завершения',detail:undefined}))
@@ -46,10 +46,15 @@ export function comicSlides(chapter:ComicChapter):ComicSlide[]{
  const slide=(title:string,body:string,facts:ComicFact[],art=theme.art):ComicSlide=>({title,body,facts,art});
  const procedures=[count('documents','Документов','document'),count('finished_documents','Завершённых документов','check'),count('votes','Голосований','vote'),count('passed_votes','Принятых решений','check')];
  switch(no){
- case 1:return [
+ case 1:{
+  const unfinishedParties=s.parties?.filter(p=>p.status!=='registered')||[];
+  // A procedural recap without recorded actions is not a final comic scene.
+  const hasProceduralResults=unfinishedParties.length>0||['documents','finished_documents','votes','passed_votes'].some(key=>(c[key]??0)>0);
+  return [
   slide('Новые участники политической жизни','Учредительный этап завершён. Здесь показаны партии, чья регистрация отражена в реестре игры.',[count('parties','Всего партий','party'),count('registered_parties','Зарегистрировано','check'),count('party_members','Участников в партиях','people')]),
   slide('Зарегистрированные партии','Названия и председатели сохранены из реестра при завершении этапа.',rows(s.parties?.filter(p=>p.status==='registered'),'party',p=>'Председатель: '+(p.leader||'Не назначен'))),
-  slide('Регистрационные итоги','Стадия подготовки и итог процедуры учитываются отдельно.',[...procedures,...rows(s.parties?.filter(p=>p.status!=='registered'),'party',p=>status(p.status))])];
+  ...(hasProceduralResults||includeEmptyPreviewSlide?[slide('Регистрационные итоги','Стадия подготовки и итог процедуры учитываются отдельно.',[...procedures,...rows(unfinishedParties,'party',p=>status(p.status))])]:[])];
+ }
  case 3:return [
   slide('Как проводятся выборы','Сохранены выбранные модели и их фактический статус. Проект решения ещё не означает его принятия.',[...rows(s.election_rules,'vote',r=>status(r.system)+(r.method?' · '+status(r.method):'')+' · '+status(r.status)),...rows(s.regional_rules,'regions',r=>status(r.method)+' · '+status(r.status))]),
   slide('Региональное представительство','Распределение контроля над субъектами РФ по данным игры.',rows(s.parties,'party',p=>fmt(p.regions||0)+' субъектов РФ')),
