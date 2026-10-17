@@ -26,9 +26,9 @@ const uuid=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
    'create table office_candidates(id uuid primary key,election_id uuid);',
    'create table office_ballots(id uuid primary key default gen_random_uuid(),election_id uuid,game_id uuid,party_id uuid,candidate_id uuid,votes integer,submitted_by uuid,updated_at timestamptz,unique(election_id,party_id,candidate_id));',
    'create table finalized(election_id uuid);',
-   'create function private.finish_office_election_locked(p_election_id uuid) returns jsonb language plpgsql as $f$begin update office_elections set status=\\'finished\\' where id=p_election_id and status=\\'open\\';if found then insert into finalized values(p_election_id);end if;return jsonb_build_object(\\'status\\',\\'finished\\');end$f$;',
+   'create function private.finish_office_election_locked(p_election_id uuid) returns jsonb language plpgsql as $f$begin update office_elections set status=\'finished\' where id=p_election_id and status=\'open\';if found then insert into finalized values(p_election_id);end if;return jsonb_build_object(\'status\',\'finished\');end$f$;',
    'create function private.party_led_by(p_game uuid,p_user uuid) returns uuid language sql stable as $p$select id from game_parties where game_id=p_game and leader_user_id=p_user limit 1$p$;',
-   'create function private.require_game_meeting_registration(p_game uuid,p_user uuid,p_stage integer,p_body text) returns void language plpgsql as $p$begin if not exists(select 1 from institution_session_registrations where game_id=p_game and user_id=p_user and stage_no=p_stage and institution_key=p_body) then raise exception \\'Регистрация обязательна\\';end if;end$p$;'
+   'create function private.require_game_meeting_registration(p_game uuid,p_user uuid,p_stage integer,p_body text) returns void language plpgsql as $p$begin if not exists(select 1 from institution_session_registrations where game_id=p_game and user_id=p_user and stage_no=p_stage and institution_key=p_body) then raise exception \'Регистрация обязательна\';end if;end$p$;'
   ].join('\n'));
   await db.exec(source);
   const addParty=async(g,n,mandates,registered=true)=>{
