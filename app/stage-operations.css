@@ -241,6 +241,16 @@
  font-style:normal;
  color:#536580;
 }
+.stageOperationsModules .dumaElectionWorkflowHint{
+ margin:14px 18px 0;
+ padding:12px 14px;
+ border:1px solid #dce5f3;
+ border-radius:11px;
+ background:#f8fafc;
+ color:#526883;
+ font-size:13px;
+ line-height:1.55;
+}
 .stageOperationsModules .dumaElectionProcedure{
  display:flex;
  align-items:center;
