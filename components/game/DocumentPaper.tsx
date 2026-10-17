@@ -14,6 +14,6 @@ export default function DocumentPaper({document:d,history,members,signature,titl
   <div className="formalPaperMeta"><time>{new Date(registered).toLocaleDateString('ru-RU',{timeZone:'Asia/Novosibirsk'})}</time><span>№ {number}</span><span>{place}</span></div><h1>{titleSlot||formalDocumentTitle(d.title,d.doc_type)}</h1>
   {children}
   <div className="formalSignature"><div>{name?<><span>{role||'Уполномоченное лицо'}</span><b>{name}</b>{date&&<small>Подписано {new Date(date).toLocaleDateString('ru-RU',{timeZone:'Asia/Novosibirsk'})}</small>}</>:<span>{Number.isFinite(revisionTime)?'Новая редакция ожидает подписания':'Ожидает подписания уполномоченным лицом'}</span>}</div>{validSignature?.url&&<figure className="formalSignatureImage"><img src={validSignature.url} alt={'Подпись: '+name}/></figure>}</div>
-  <footer className="legalPaperFooterBar"><span>Учебный документ деловой игры ГОС.ID</span>{footerSlot}</footer>
+  <footer className="legalPaperFooterBar"><span>{issuer}</span>{footerSlot}</footer>
  </article>;
 }
