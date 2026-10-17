@@ -20,7 +20,7 @@
     "design:interactive": "node scripts/interactive-mobile-check.cjs",
     "design:stages": "node scripts/stage-desktop-browser-check.cjs",
     "design:teacher": "node scripts/teacher-command-browser-check.cjs",
-    "news:check": "node scripts/editorial-news-static-check.cjs && node scripts/news-ui-fallback-check.cjs && node scripts/automatic-news-language-check.cjs",
+    "news:check": "node scripts/editorial-news-static-check.cjs && node scripts/news-ui-fallback-check.cjs && node scripts/automatic-news-language-check.cjs && node scripts/stage-news-lifecycle-check.cjs",
     "ui:ru-check": "node scripts/formal-document-russian-labels-check.cjs && node scripts/interface-language-audit.cjs"
   },
   "dependencies": {
@@ -44,3 +44,4 @@
     "typescript": "^5.9.0"
   }
 }
+

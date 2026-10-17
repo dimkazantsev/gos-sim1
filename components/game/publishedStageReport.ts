@@ -11,7 +11,7 @@ export function publishedStageReport(
  votes:Vote[]
 ):{title:string;body:string}|null{
  const stage=Number(post.context?.stage_no);
- if(post.context?.automatic!==true||
+ if(post.context?.automatic!==true||post.context?.stage_notice||
     post.context?.source_table!=='game_stages'||
     post.context?.editorial_verified===true||
     !post.source_key?.startsWith('stage:')||
@@ -45,3 +45,4 @@ export function publishedStageReport(
  }
  return {title,body:body.join('\n\n')};
 }
+
