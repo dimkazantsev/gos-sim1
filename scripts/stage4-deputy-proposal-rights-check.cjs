@@ -13,7 +13,7 @@ assert(jsx.includes('isStageWorkOpen'),'Stage closure disables student proposal 
 const open=migration.split('CREATE OR REPLACE FUNCTION public.open_duma_leadership_procedure_vote')[1];
 assert(open&&open.includes('INSERT INTO public.game_votes(')&&open.includes('p_game_id,4,'),'A deputy can open a stage-scoped motion directly, without teacher-only generic RPC');
 assert(migration.includes("v_cast<226"),'Chair cannot close a ballot below 226 votes');
-assert(migration.includes("p_office_key IN ('gd_chair','gd_deputy_1','gd_deputy_2')"),'Ordinary deputy nominations are limited to GD leadership offices');
+assert(migration.includes("e.office_key IN ('gd_chair','gd_deputy_1','gd_deputy_2')"),'Ordinary deputy nominations are limited to GD leadership offices');
 assert(migration.includes('registration_status=')&&migration.includes("'registered'"),'Student nominations require a registered faction');
 (async()=>{
  const db=new PGlite();
