@@ -25,7 +25,7 @@ const id=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
    'create table games(id uuid primary key);',
    'create table game_stages(game_id uuid,stage_no integer,status text);',
    'create table game_members(game_id uuid,user_id uuid,team text,kind text,joined_at timestamptz,roster_archived_at timestamptz);',
-   'create table game_parties(id uuid primary key,game_id uuid,name text,registration_status text,leader_user_id uuid);',
+   'create table game_parties(id uuid primary key,game_id uuid,name text,registration_status text,leader_user_id uuid,color text);',
    'create table party_member_mandates(game_id uuid,user_id uuid,party_id uuid,base_mandates integer,effective_mandates integer);',
    'create table institution_units(id uuid primary key,game_id uuid,unit_kind text,unit_key text,title text,mandate_capacity integer,head_user_id uuid);',
    'create table institution_assignments(id uuid primary key default gen_random_uuid(),game_id uuid,unit_id uuid,unit_kind text,user_id uuid,party_id uuid,assignment_role text,created_by uuid,created_at timestamptz default now(),unique(game_id,user_id,unit_kind),unique(unit_id,user_id));',
