@@ -6,6 +6,8 @@ on:
       - 'components/game/documentSignerTitle.ts'
       - 'scripts/document-signer-title-check.cjs'
       - 'scripts/official-document-paper-check.cjs'
+      - 'scripts/official-document-a4-print-browser-check.cjs'
+      - 'components/game/officialDocumentPrint.ts'
       - 'supabase/migrations/20261017204000_official_meeting_document_titles.sql'
       - 'components/game/Blitz*.tsx'
       - 'scripts/blitz-pending-privacy-check.cjs'
@@ -133,6 +135,8 @@ on:
       - 'supabase/migrations/20261017143200_institution_meeting_permissions_read.sql'
       - 'scripts/institution-meeting-documents-check.cjs'
       - 'scripts/stage4-agenda-rights-check.cjs'
+      - 'scripts/stage4-deputy-proposal-rights-check.cjs'
+      - 'supabase/migrations/20261017235000_stage4_registered_deputy_motions.sql'
       - 'supabase/migrations/20261017230000_stage4_party_chair_agenda_bridge.sql'
       - 'components/game/InstitutionStaffingLab.tsx'
       - 'components/game/CommitteeChairElectionPanel.tsx'
@@ -285,6 +289,7 @@ jobs:
       - run: node scripts/procedural-vote-auto-close-check.cjs
       - run: node scripts/institution-meeting-documents-check.cjs
       - run: node scripts/stage4-agenda-rights-check.cjs
+      - run: node scripts/stage4-deputy-proposal-rights-check.cjs
       - run: node scripts/ksrf-meeting-stage-gate-check.cjs
       - run: node scripts/ksrf-trigger-field-isolation-check.cjs
       - run: node scripts/brand-overview-check.cjs
@@ -317,6 +322,7 @@ jobs:
       - run: node scripts/document-input-check.cjs
       - run: node scripts/document-signer-title-check.cjs
       - run: node scripts/official-document-paper-check.cjs
+      - run: node scripts/official-document-a4-print-browser-check.cjs
       - run: node scripts/contextual-offices-voting-check.cjs
       - run: node scripts/electoral-math-check.cjs
       - run: node scripts/grade-fractional-check.cjs
