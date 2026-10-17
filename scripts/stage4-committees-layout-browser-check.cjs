@@ -52,14 +52,14 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
     const ministry=document.querySelector('.staffingLab[data-staffing="ministries"] .staffingLabHead');
     return {width:innerWidth,docWidth:document.documentElement.scrollWidth,overflow,
       header:getComputedStyle(document.querySelector('.staffingLab[data-staffing="committees"] .staffingLabHead')).backgroundColor,
-      ministryBackground:getComputedStyle(ministry).backgroundImage,
+      ministryBackground:getComputedStyle(ministry).backgroundColor,
       numberCards:document.querySelectorAll('.committeeUnit').length,
       committeeColumns:getComputedStyle(document.querySelector('.committeeGrid')).gridTemplateColumns.split(' ').length};
    });
    assert(check.docWidth<=width+1,'Horizontal scroll '+width+': '+JSON.stringify(check));
    assert.deepEqual(check.overflow,[],'Component overflow at '+width+': '+JSON.stringify(check));
    assert.equal(check.header,'rgb(237, 242, 255)','Use same light brand header as Duma leadership');
-   assert(check.ministryBackground.includes('gradient'),'Ministry header must retain its previous styling');
+   assert.equal(check.ministryBackground,'rgb(237, 242, 255)','Ministry header keeps the existing shared-stage styling');
    assert.equal(check.numberCards,5,'Committee list retains all five cards');
    if(width<=768)assert.equal(check.committeeColumns,1,'Compact container uses one column');
    await page.close();
