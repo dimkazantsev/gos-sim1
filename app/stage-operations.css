@@ -982,3 +982,10 @@
  .stageOperationsModules .staffingLab[data-staffing="committees"] .unitAssign{grid-template-columns:minmax(0,1fr);padding:0 12px 12px}
  .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingRule{margin:12px 12px 12px}
 }
+
+/* Stage 4: compact system-status counters for second rounds and repeat elections.
+   Shared across leadership and committee cards on phones, tablets and desktops. */
+.stageOperationsModules .officeRoundNotice{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin:12px 14px;padding:12px 14px;border:1px solid #cbd8ef;border-radius:14px;background:#f3f7ff;color:#20385c;font-size:14px;line-height:1.5}
+.stageOperationsModules .officeRoundNotice>span{display:flex;align-items:center;gap:9px;min-width:0}
+.stageOperationsModules .officeRoundCount{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:27px;height:27px;padding:0 7px;border-radius:99px;background:#2a54d9;color:#fff;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+@media(max-width:700px){.stageOperationsModules .officeRoundNotice{margin:10px 10px;padding:10px 12px;font-size:13px}.stageOperationsModules .officeRoundNotice>span{align-items:flex-start}}
