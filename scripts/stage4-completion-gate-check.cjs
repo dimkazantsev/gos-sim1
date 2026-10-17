@@ -34,7 +34,7 @@ const ids=[
    'create table institution_assignments(unit_id uuid);',
    "create function auth.uid() returns uuid language sql stable as $$select '20000000-0000-0000-0000-000000000001'::uuid$$;",
    'create function private.is_game_teacher(uuid) returns boolean language sql stable as $$select true$$;',
-   'create function private.gd_member_capacity(uuid,uuid) returns integer language sql stable as $select 225$;',
+   'create function private.gd_member_capacity(uuid,uuid) returns integer language sql stable as $capacity$select 225$capacity$;',
   ].join('\n'));
   for(const id of ids){
    await db.query("insert into games values($1,'running',true,now()-interval '1 minute',4)",[id]);
