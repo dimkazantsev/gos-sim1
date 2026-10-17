@@ -62,6 +62,26 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
    assert.equal(check.ministryBackground,'rgb(237, 242, 255)','Ministry header keeps the existing shared-stage styling');
    assert.equal(check.numberCards,5,'Committee list retains all five cards');
    if(width<=768)assert.equal(check.committeeColumns,1,'Compact container uses one column');
+   // The actual screenshot case: no committee units yet, only the creation
+   // action and the rules card. Check the rendered vertical gap, not just CSS.
+   const cards=await page.evaluate(()=>{
+    const root=document.querySelector('.staffingLab[data-staffing="committees"]');
+    root.querySelector('.committeeElectionBoard')?.remove();
+    root.querySelector('.staffingSection')?.remove();
+    const action=root.querySelector('.stageOperationsActionBar');
+    const rules=root.querySelector('.staffingRule');
+    const a=action.getBoundingClientRect();
+    const b=rules.getBoundingClientRect();
+    return {gap:b.top-a.bottom,actionBottom:a.bottom,rulesTop:b.top,
+      actionRadius:getComputedStyle(action).borderRadius,
+      rulesRadius:getComputedStyle(rules).borderRadius,
+      overflow:document.documentElement.scrollWidth-innerWidth};
+   });
+   const expectedGap=width<=490?12:14;
+   assert(Math.abs(cards.gap-expectedGap)<0.6,
+     'Creation and rules cards must have a distinct '+expectedGap+'px gap at '+width+': '+JSON.stringify(cards));
+   assert(cards.overflow<=1,'Spacing must not cause horizontal overflow at '+width);
+   assert(cards.actionRadius!=='0px'&&cards.rulesRadius!=='0px','Both cards must retain their separate rounded borders');
    await page.close();
   }
   console.log('PASS committee composition: 320, 390, 768, 1024, 1440px; elections, quotas, staffing and ministry styles separated.');
