@@ -140,6 +140,8 @@ on:
       - 'scripts/stage4-office-vote-auto-close-check.cjs'
       - 'scripts/stage4-office-single-winner-runoff-check.cjs'
       - 'scripts/stage4-multi-committee-mandate-check.cjs'
+      - 'scripts/stage4-single-committee-mandate-ledger-check.cjs'
+      - 'supabase/migrations/20261018042000_disable_obsolete_committee_mandate_allocator.sql'
       - 'supabase/migrations/20261018031000_multi_committee_mandate_allocations.sql'
       - 'supabase/migrations/20261018024500_single_winner_office_guards.sql'
       - 'supabase/migrations/20261018024600_office_runoff_system_notice.sql'
@@ -310,6 +312,7 @@ jobs:
       - run: node scripts/stage4-office-vote-auto-close-check.cjs
       - run: node scripts/stage4-office-single-winner-runoff-check.cjs
       - run: node scripts/stage4-multi-committee-mandate-check.cjs
+      - run: node scripts/stage4-single-committee-mandate-ledger-check.cjs
       - run: node scripts/stage4-faction-mandates-auto-close-check.cjs
       - run: node scripts/municipal-mayor-auto-close-check.cjs
       - run: node scripts/stage4-party-chair-committee-nominations-check.cjs
