@@ -27,6 +27,8 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
    'create table game_parties(id uuid primary key,game_id uuid,name text,leader_user_id uuid,color text);',
    'create table party_member_mandates(game_id uuid,party_id uuid,user_id uuid,base_mandates integer,effective_mandates integer);',
    'create table games(id uuid primary key,owner_id uuid);',
+   'create table government_structures(id uuid,game_id uuid,status text,social_title text,economic_title text,defence_title text,foreign_title text,internal_title text);',
+   'create table government_nominations(game_id uuid,stage_no integer,office_key text,status text,candidate_user_id uuid,nominated_by uuid);',
    'create table office_elections(game_id uuid,office_key text,status text,winner_candidate_id uuid,created_by uuid,created_at timestamptz);',
    'create function private.member_party_id(p_game uuid,p_user uuid) returns uuid language sql stable as $x$select p.id from game_parties p join game_members m on m.game_id=p.game_id and m.team=p.name where m.game_id=p_game and m.user_id=p_user limit 1$x$;',
    'create function private.gd_member_capacity(p_game uuid,p_user uuid) returns integer language sql stable as $x$select coalesce((select effective_mandates from party_member_mandates where game_id=p_game and user_id=p_user),0)$x$;',
