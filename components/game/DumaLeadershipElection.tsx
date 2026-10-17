@@ -16,7 +16,7 @@ const offices=[
  ['gd_deputy_2','Заместитель №2']
 ] as const;
 
-export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
+export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes?:(id?:string)=>void}){
  const {game,me,teacher,members,parties,setError,gdMandateCapacity,gdEffectivePresence}=g;
  const [elections,setElections]=useState<Election[]>([]);
  const [candidates,setCandidates]=useState<OfficeCandidate[]>([]);
@@ -134,6 +134,7 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
    <span className="dumaElectionProcedureIcon" aria-hidden="true">{procedureApproved?<CheckCircle2 size={22}/>:<ClipboardList size={22}/>}</span>
    <div className="dumaElectionProcedureText"><b>Утверждение порядка выборов</b><p>{procedureApproved?'Порядок утверждён. Можно выдвигать кандидатов.':procedureOpen?'Голосование по порядку выборов открыто в разделе «Голосование».':'Сначала зарегистрированные депутаты должны проголосовать по порядку избрания руководства.'}</p></div>
    {(teacher||canPropose)&&!procedureApproved&&!procedureOpen&&<button type="button" className="primary" disabled={busy||!stageActive} onClick={()=>void openProcedureVote()}>{teacher?'Открыть голосование':'Предложить утверждение порядка'}</button>}
+    {procedureOpen&&onOpenVotes&&<button type="button" className="secondary" onClick={()=>onOpenVotes(procedureVotes.find(v=>v.status==='open')?.id)}>Перейти к голосованию</button>}
   </div>
   {canManage&&<div className="dumaElectionCreator"><label>Должность<select value={office} onChange={e=>setOffice(e.target.value as typeof office)}>{offices.map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label><label>Форма голосования<select value={mode} onChange={e=>setMode(e.target.value as 'open'|'secret')}><option value="open">Открытое</option><option value="secret">Тайное</option></select></label><button className="primary" disabled={busy||!procedureApproved||!stageActive} onClick={()=>void createElection()}>Создать процедуру</button></div>}
 
