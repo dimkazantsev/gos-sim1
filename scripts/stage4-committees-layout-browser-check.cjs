@@ -21,6 +21,8 @@ assert(ballot.includes("election.vote_mode==='open'")&&ballot.includes("!['nomin
 assert(ballot.includes('!registered.some(r=>r.user_id===me.user_id)')&&ballot.includes('myPresent<=0'),'Attendance registration and declared deputy count both guard voting');
 assert(component.includes("mode==='committees'?"),'Committee/ministry branch retained');
 assert(component.includes('Избирается депутатами Государственной Думы в блоке выше'),'Voting placement hint correct');
+assert(component.includes('<em>депутатов распределено</em>'),'Counter caption has no preceding decorative icon');
+assert(!component.includes('UsersRound'),'Unused caption icon import removed');
 assert(!ballot.includes('с учётом GV'),'Russian wording for ghost voting');
 assert(leadership.includes('226 <small>из 450</small>')&&ballot.includes('226 <small>из 450</small>'),'Aligned majority display');
 const cards=Array.from({length:5},(_,i)=>'<article class="institutionUnit committeeUnit"><header><div><small>КОМИТЕТ</small><h4>Комитет по государственному управлению, законодательству и конституционным вопросам №'+(i+1)+'</h4><p>Полномочия комитета</p></div><span>12 депутатов</span></header>'+
@@ -62,6 +64,8 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
       committeeCounterIsGrid:counterIsGrid,
       committeeCounterDistances:distances,
       committeeCounterText:badge.querySelector('strong').textContent,
+      committeeCaptionCentered:getComputedStyle(badge.querySelector('em')).textAlign==='center',
+      committeeCaptionHasIcon:!!badge.querySelector('em svg'),
       ministryCounterGridColumns:getComputedStyle(document.querySelector('.staffingLab[data-staffing="ministries"] .staffingBalance')).gridTemplateColumns.split(' ').length,
       numberCards:document.querySelectorAll('.committeeUnit').length,
       committeeColumns:getComputedStyle(document.querySelector('.committeeGrid')).gridTemplateColumns.split(' ').length};
@@ -72,6 +76,8 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
    assert.equal(check.ministryBackground,'rgb(237, 242, 255)','Ministry header keeps the existing shared-stage styling');
    assert.equal(check.numberCards,5,'Committee list retains all five cards');
    assert.equal(check.committeeCounterText,'0','Test empty committee count exactly as in reported screen');
+   assert(check.committeeCaptionCentered,'Counter caption is centered at '+width);
+   assert(!check.committeeCaptionHasIcon,'Counter caption has no decorative SVG at '+width);
    assert.equal(check.ministryCounterGridColumns,2,'Existing stage 9 ministry counter keeps its legacy layout');
    if(check.committeeCounterIsGrid){
      assert.equal(check.committeeCounterGridColumns,1,'Committee badge uses a single track, not inherited two-column staffing layout');
