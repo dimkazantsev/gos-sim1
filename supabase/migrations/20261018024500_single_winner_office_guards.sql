@@ -157,3 +157,184 @@ begin
  if v_id is null then select id into v_id from public.office_candidates where election_id=e.id and user_id=p_user_id; end if;
  return v_id;
 end;$function$;
+
+-- Defence in depth: obsolete live ballots and manual close cannot elect a second holder.
+CREATE OR REPLACE FUNCTION public.cast_personal_office_ballot(p_election_id uuid, p_candidate_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare
+ e public.office_elections%rowtype;
+ uid uuid:=(select auth.uid());
+ party uuid;
+ capacity integer;
+begin
+ if uid is null then raise exception 'Необходимо войти в игру';end if;
+ select * into e from public.office_elections where id=p_election_id for update;
+ if e.id is null or e.status<>'open' or e.ballot_mode<>'personal' then
+  raise exception 'Персональное голосование сейчас не открыто';
+ end if;
+ if private.office_has_confirmed_winner(e.game_id,e.office_key)
+ then raise exception 'Должность уже занята; голосование прекращено';end if;
+ perform private.require_game_meeting_registration(e.game_id,uid,e.stage_no,'gd');
+ select gp.id,private.gd_effective_present(e.game_id,uid,r.present_mandates)
+ into party,capacity
+ from public.game_members gm
+ join public.game_parties gp on gp.game_id=gm.game_id and gp.name=gm.team
+ join public.institution_session_registrations r on r.game_id=gm.game_id and r.user_id=gm.user_id
+  and r.stage_no=e.stage_no and r.institution_key='gd'
+ where gm.game_id=e.game_id and gm.user_id=uid and gm.kind='student'
+  and gm.roster_archived_at is null
+ limit 1;
+ if party is null or capacity<=0 then raise exception 'У вас нет действующих депутатских мандатов';end if;
+ if not exists(select 1 from public.office_candidates c where c.id=p_candidate_id and c.election_id=e.id and c.game_id=e.game_id)
+ then raise exception 'Кандидат не относится к этому голосованию';end if;
+ insert into public.office_personal_ballots(election_id,game_id,voter_id,party_id,candidate_id)
+ values(e.id,e.game_id,uid,party,p_candidate_id)
+ on conflict(election_id,voter_id) do update set
+   party_id=excluded.party_id,candidate_id=excluded.candidate_id,updated_at=now();
+ -- The election row is already locked; the final eligible ballot
+ -- closes this one election atomically and cannot race another ballot.
+ perform private.auto_finish_personal_office_election_locked(e.id);
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.set_office_ballot(p_election_id uuid, p_candidate_id uuid, p_votes integer)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare e public.office_elections%rowtype;v_uid uuid:=(select auth.uid());v_party uuid;v_capacity integer;v_other integer;
+begin
+ select * into e from public.office_elections where id=p_election_id for update;
+ if e.id is null then raise exception 'Election not found'; end if;
+ if e.status<>'open' then raise exception 'Election is not open'; end if;
+ if private.office_has_confirmed_winner(e.game_id,e.office_key)
+ then raise exception 'Должность уже занята; голосование прекращено';end if;
+ if e.ballot_mode<>'faction' then raise exception 'Используйте персональный бюллетень депутата';end if;
+ if p_votes<0 then raise exception 'Votes cannot be negative'; end if;
+ if not exists(select 1 from public.office_candidates where id=p_candidate_id and election_id=e.id)
+ then raise exception 'Candidate not found in this election'; end if;
+
+ v_party:=private.party_led_by(e.game_id,v_uid);
+ if v_party is null then raise exception 'Only faction leaders submit faction ballots'; end if;
+ if e.stage_no=4 then
+  -- Match the live mandate electorate rather than counting outsiders.
+  perform private.require_game_meeting_registration(e.game_id,v_uid,e.stage_no,'gd');
+  if not exists(
+    select 1 from public.game_parties gp
+    join public.game_members gm on gm.game_id=gp.game_id
+      and gm.user_id=gp.leader_user_id and gm.team=gp.name
+      and gm.kind='student' and gm.roster_archived_at is null
+    where gp.id=v_party and gp.game_id=e.game_id
+      and gp.registration_status='registered'
+  ) then raise exception 'Голосовать мандатами вправе руководитель зарегистрированной фракции';end if;
+ end if;
+ select coalesce(sum(effective_mandates),0)::integer into v_capacity
+ from public.party_member_mandates where game_id=e.game_id and party_id=v_party;
+ select coalesce(sum(votes),0)::integer into v_other
+ from public.office_ballots where election_id=e.id and party_id=v_party and candidate_id<>p_candidate_id;
+ if v_other+p_votes>v_capacity then raise exception 'Faction ballot exceeds current effective mandates'; end if;
+
+ insert into public.office_ballots(election_id,game_id,party_id,candidate_id,votes,submitted_by)
+ values(e.id,e.game_id,v_party,p_candidate_id,p_votes,v_uid)
+ on conflict(election_id,party_id,candidate_id)
+ do update set votes=excluded.votes,submitted_by=v_uid,updated_at=now();
+ if e.stage_no=4 then
+  perform private.auto_finish_faction_office_election_locked(e.id);
+ end if;
+end;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.close_office_election(p_election_id uuid)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare e public.office_elections%rowtype;winner record;c_count integer;v_runoff uuid;out_json jsonb;v_uid uuid:=(select auth.uid());v_cast integer;
+begin
+ select * into e from public.office_elections where id=p_election_id for update;
+ if e.id is null then raise exception 'Election not found'; end if;
+ if e.stage_no=4 THEN
+  IF NOT private.gd_stage4_can_manage(e.game_id,v_uid,e.office_key) THEN
+   raise exception 'Закрыть голосование вправе председатель заседания или преподаватель';END IF;
+  IF NOT private.is_game_teacher(e.game_id) AND e.ballot_mode='personal' THEN
+   SELECT coalesce(sum(private.gd_effective_present(e.game_id,b.voter_id,r.present_mandates)),0)::int
+   INTO v_cast FROM public.office_personal_ballots b
+    JOIN public.institution_session_registrations r ON r.game_id=e.game_id
+     AND r.user_id=b.voter_id AND r.stage_no=4 AND r.institution_key='gd'
+   WHERE b.election_id=e.id;
+   IF v_cast<226 THEN raise exception
+    'Для завершения голосования необходимо не менее 226 голосов депутатов';END IF;
+  END IF;
+ ELSIF NOT private.is_game_teacher(e.game_id) THEN
+  raise exception 'Teacher access required';
+ END IF;
+ if e.status<>'open' then raise exception 'Election is not open'; end if;
+ if private.office_has_confirmed_winner(e.game_id,e.office_key)
+ then raise exception 'Должность уже занята; голосование прекращено';end if;
+
+ return private.finish_office_election_locked(p_election_id);
+end;
+$function$;
+
+CREATE OR REPLACE FUNCTION private.finish_office_election_locked(p_election_id uuid)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare
+ e public.office_elections%rowtype;
+ winner record;
+ c_count integer;
+ v_runoff uuid;
+ out_json jsonb;
+begin
+ select * into e from public.office_elections where id=p_election_id for update;
+ if e.id is null or e.status<>'open' then
+  raise exception 'Election is not open';
+ end if;
+ if private.office_has_confirmed_winner(e.game_id,e.office_key)
+ then raise exception 'Должность уже занята; повторный результат запрещён';end if;
+ select c.id,c.user_id,private.office_candidate_vote_weight(e.id,c.id) votes
+ into winner
+ from public.office_candidates c
+ where c.election_id=e.id
+ 
+ order by votes desc,c.created_at
+ limit 1;
+ select count(*)::integer into c_count from public.office_candidates where election_id=e.id;
+
+ update public.office_elections set status='closed',closed_at=now() where id=e.id;
+
+ if winner.id is not null and winner.votes>225 then
+  update public.office_elections set status='finished',winner_candidate_id=winner.id where id=e.id;
+  out_json:=jsonb_build_object('status','finished','winner_candidate_id',winner.id,'winner_user_id',winner.user_id,'votes',winner.votes);
+  return out_json;
+ end if;
+
+ if e.round_no=1 and c_count>2 then
+  insert into public.office_elections(game_id,stage_no,office_key,office_title,round_no,vote_mode,status,parent_election_id,created_by,ballot_mode)
+  values(e.game_id,e.stage_no,e.office_key,e.office_title,2,e.vote_mode,'nomination',e.id,(select auth.uid()),e.ballot_mode)
+  returning id into v_runoff;
+
+  insert into public.office_candidates(election_id,game_id,user_id,party_id,nominated_by)
+  select v_runoff,e.game_id,c.user_id,c.party_id,(select auth.uid())
+  from public.office_candidates c
+  
+  where c.election_id=e.id
+  
+  order by private.office_candidate_vote_weight(e.id,c.id) desc,c.created_at
+  limit 2;
+
+  update public.office_elections set status='open',opened_at=now() where id=v_runoff;
+  out_json:=jsonb_build_object('status','runoff','runoff_election_id',v_runoff);
+ else
+  out_json:=jsonb_build_object('status','no_winner','leader_candidate_id',winner.id,'leader_votes',coalesce(winner.votes,0));
+ end if;
+ return out_json;
+end;
+$function$;
