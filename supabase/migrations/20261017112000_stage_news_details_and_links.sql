@@ -293,5 +293,5 @@ UPDATE public.political_posts p
      updated_at=now()
 FROM verified
 WHERE verified.id=p.id AND verified.news IS NOT NULL
- AND p.title IS DISTINCT FROM verified.news->>'title'
- OR (verified.id=p.id AND verified.news IS NOT NULL AND p.body IS DISTINCT FROM verified.news->>'body');
+ AND (p.title IS DISTINCT FROM verified.news->>'title'
+   OR p.body IS DISTINCT FROM verified.news->>'body');
