@@ -8,6 +8,7 @@ const read=name=>fs.readFileSync(require('node:path').join(root,name),'utf8');
 const component=read('components/game/InstitutionStaffingLab.tsx');
 assert(component.includes("set_committee_mandates"),'Committee distribution uses a numeric mandate RPC');
 assert(component.includes('committeeMandateEdit')&&component.includes('committeeMandateAssign'),'Deputies may edit mandates in several committees');
+assert(component.includes('className="committeeMandateMember"'),'Deputy mandate editor must use a dedicated responsive row');
 assert(component.includes('maxNewAllocation'),'Available personal capacity, party quota and 90-seat limit are all reflected in UI');
 const ballot=read('components/game/CommitteeChairElectionPanel.tsx');
 const leadership=read('components/game/DumaLeadershipElection.tsx');
@@ -40,7 +41,7 @@ assert(leadership.includes('226 <small>из 450</small>')&&ballot.includes('226 
 const cards=Array.from({length:5},(_,i)=>'<article class="institutionUnit committeeUnit"><header><div><small>КОМИТЕТ</small><h4>Комитет по государственному управлению, законодательству и конституционным вопросам №'+(i+1)+'</h4><p>Полномочия комитета</p></div><span>45 / 90 мандатов</span></header>'+
  '<div class="committeeQuota"><div><i></i><b>Длинное официальное название парламентской партии</b><strong>45 / 45</strong><span>1 представитель</span></div></div>'+
  '<div class="unitHead"><small>ПРЕДСЕДАТЕЛЬ</small><b>Александра Михайловна Константинова</b><span>Избирается депутатами Государственной Думы в блоке выше</span></div>'+
- '<div class="unitMembers"><div><span>Александра Михайловна Константинова</span><small>Фракция</small><b>45 манд.</b><div class="committeeMandateEdit"><input type="number" value="45"><button>Сохранить</button></div></div></div>'+
+ '<div class="unitMembers">'+[0,1].map(i=>'<div class="committeeMandateMember"><span>'+(i===0?'Тестов Тест Тестович':'Иванов Иван Иванович')+'</span><small>'+(i===0?'ЛДПР':'Рама')+'</small><b>1 манд.</b><div class="committeeMandateEdit"><input aria-label="Количество мандатов" type="number" value="1"><button type="button" disabled>Сохранить</button><button type="button" class="gsIconAction gsIconAction--remove" aria-label="Снять мандаты"><svg width="20" height="20"></svg></button></div></div>').join('')+'</div>'+
  '<div class="unitAssign committeeMandateAssign"><select><option>Выберите депутата…</option></select><input type="number" value="1"><button>Распределить</button></div></article>').join('');
 const activeVotes=Array.from({length:2},(_,i)=>'<article class="committeeElectionCard nomination"><header><div><small>КОМИТЕТ</small><b>Комитет по государственному управлению №'+(i+1)+'</b><span>Председатель: не избран</span></div><div class="committeeElectionCreate"><select><option>Открыто</option></select><button>Начать выборы</button></div></header><div class="committeeElectionState"><span>ПЕРВЫЙ ТУР</span><b>Выдвижение</b><em>Открытое</em></div><div class="committeeNominate"><select><option>Кандидат от фракции…</option></select><button>Выдвинуть</button><button class="primary">Открыть голосование</button></div>'+
  '<div class="committeeCandidateList"><div><span>АК</span><div><b>Александра Константинова</b><small>Фракция</small></div><strong>226</strong><div class="committeeBallot"><input placeholder="Голоса"><button>Записать</button></div></div></div></article>').join('');
@@ -103,6 +104,20 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
       committeeCaptionCentered:getComputedStyle(badge.querySelector('em')).textAlign==='center',
       committeeCaptionHasIcon:!!badge.querySelector('em svg'),
       cardLayout,
+      mandateEditors:[...document.querySelectorAll('.staffingLab[data-staffing="committees"] .committeeMandateMember')].map(member=>{
+       const person=member.querySelector(':scope > span');
+       const editor=member.querySelector('.committeeMandateEdit');
+       const input=editor.querySelector('input'),save=editor.querySelector('button:not(.gsIconAction)'),remove=editor.querySelector('.gsIconAction');
+       const memberRect=member.getBoundingClientRect(),personRect=person.getBoundingClientRect();
+       const editRect=editor.getBoundingClientRect(),inputRect=input.getBoundingClientRect();
+       const saveRect=save.getBoundingClientRect(),removeRect=remove.getBoundingClientRect();
+       return {memberRight:memberRect.right,memberLeft:memberRect.left,personBottom:personRect.bottom,
+        editorTop:editRect.top,editorRight:editRect.right,inputRight:inputRect.right,
+        saveLeft:saveRect.left,saveRight:saveRect.right,saveWidth:saveRect.width,saveHeight:saveRect.height,
+        saveTextSpace:getComputedStyle(save).whiteSpace,saveOverflow:save.scrollWidth-save.clientWidth,
+        removeLeft:removeRect.left,removeRight:removeRect.right,
+        editorIsGrid:getComputedStyle(editor).display==='grid'};
+      }),
       ministryCounterGridColumns:getComputedStyle(document.querySelector('.staffingLab[data-staffing="ministries"] .staffingBalance')).gridTemplateColumns.split(' ').length,
       numberCards:document.querySelectorAll('.committeeUnit').length,
       committeeColumns:getComputedStyle(document.querySelector('.committeeGrid')).gridTemplateColumns.split(' ').length};
@@ -112,6 +127,16 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
    assert.equal(check.header,'rgb(237, 242, 255)','Use same light brand header as Duma leadership');
    assert.equal(check.ministryBackground,'rgb(237, 242, 255)','Ministry header keeps the existing shared-stage styling');
    assert.equal(check.numberCards,5,'Committee list retains all five cards');
+   assert.equal(check.mandateEditors.length,10,'Two editable mandate rows in every committee');
+   for(const entry of check.mandateEditors){
+    assert(entry.editorIsGrid,'Mandate editor uses a separate grid row at '+width);
+    assert(entry.editorTop>=entry.personBottom-1,'Mandate controls must sit below deputy name at '+width+': '+JSON.stringify(entry));
+    assert(entry.saveWidth>=95&&entry.saveHeight<=60,'Save button must remain horizontal and usable at '+width+': '+JSON.stringify(entry));
+    assert.equal(entry.saveTextSpace,'nowrap','Save button text never breaks by letters at '+width);
+    assert(entry.saveOverflow<=2,'Save button label does not clip at '+width);
+    assert(entry.inputRight<=entry.saveLeft+1&&entry.saveRight<=entry.removeLeft+1,'Allocation controls never overlap at '+width);
+    assert(entry.editorRight<=entry.memberRight+1&&entry.removeRight<=entry.memberRight+1,'Allocation controls stay inside deputy row at '+width);
+   }
    assert.equal(check.cardLayout.length,5,'Five idle election panels rendered');
    for(const card of check.cardLayout){
     assert.equal(card.headerDisplay,'grid','Committee card has a fixed stacking layout at '+width);
@@ -151,6 +176,6 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
    assert(emptyState.actionRight<=width+1&&emptyState.rulesRight<=width+1&&emptyState.documentWidth<=width+1,'No mobile overflow in empty state at '+width);
    await page.close();
   }
-  console.log('PASS committee composition: 320, 390, 768, 1024, 1440px; elections, quotas, staffing and ministry styles separated.');
+  console.log('PASS committee composition: 320, 390, 768, 1024, 1440px; ten mandate editors have horizontal Save buttons without overlaps, elections and ministry styles separated.');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
