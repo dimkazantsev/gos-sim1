@@ -128,3 +128,335 @@
 .stageOperationsModules .presSystemDecision>header :is(h2,h3){color:var(--stage-ink)}.stageOperationsModules .presSystemDecision>header p{color:var(--stage-muted)}
 @media(max-width:1000px){.stageOperationsModules .committeeElectionGrid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:700px){.stageOperationsFoundation{padding:18px}.stageOperationsModules :is(.electoralLabHead,.dumaElectionHead,.ghostPolicyHead,.cecHead,.stage7Hero,.committeeElectionHead){flex-direction:column;gap:14px}.stageOperationsModules :is(.electoralProposal,.dumaElectionCreator,.presSystemProposal,.candidateCreate){grid-template-columns:minmax(0,1fr)}.stageOperationsModules :is(.electoralProposal,.presSystemProposal)>label{min-width:0}.stageOperationsModules .stage7Grid{grid-template-columns:minmax(0,1fr)}.stageOperationsModules .committeeElectionCard>header{flex-wrap:wrap;gap:12px}.stageOperationsModules .committeeElectionCreate{width:100%}.stageOperationsModules .committeeCandidateList>div{flex-wrap:wrap}.stageOperationsModules .committeeBallot{flex:1 1 100%;width:100%}.stageOperationsModules .cecHeadSide{align-self:stretch}}
+
+/* Stage 4 · Duma leadership. Scoped to the current ГОС.ID stage workspace,
+   overriding old standalone election styles without changing other stages. */
+.stageOperationsModules .dumaElection{
+ container-name:duma-leadership;
+ container-type:inline-size;
+ display:grid;
+ gap:0;
+ margin:0;
+ padding:0;
+ overflow:hidden;
+ border:1px solid var(--stage-line);
+ border-radius:18px;
+ background:#fff;
+ box-shadow:none;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .dumaElectionHead{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) minmax(172px,204px);
+ gap:24px;
+ align-items:center;
+ min-width:0;
+ margin:0;
+ padding:22px 24px;
+ border:0;
+ border-bottom:1px solid var(--stage-line);
+ border-radius:0;
+ background:#edf2ff;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .dumaElectionIntro{min-width:0}
+.stageOperationsModules .dumaElectionEyebrow{
+ display:flex;
+ align-items:center;
+ flex-wrap:wrap;
+ gap:9px;
+ margin:0 0 10px;
+ color:#2453e6;
+ font-size:12px;
+ font-weight:750;
+ line-height:1.45;
+}
+.stageOperationsModules .dumaElectionEyebrow svg{flex:none}
+.stageOperationsModules .dumaElectionStage{
+ margin-left:3px;
+ padding-left:12px;
+ border-left:1px solid #c6d5f4;
+ color:#536580;
+}
+.stageOperationsModules .dumaElectionHead h2{
+ margin:0 0 9px;
+ max-width:40ch;
+ font-size:clamp(20px,2vw,24px);
+ font-weight:800;
+ line-height:1.3;
+ letter-spacing:-.025em;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .dumaElectionHead p{
+ max-width:78ch;
+ margin:0;
+ font-size:14px;
+ line-height:1.65;
+ color:var(--stage-muted);
+ overflow-wrap:anywhere;
+}
+.stageOperationsModules .dumaThreshold{
+ display:grid;
+ align-content:center;
+ justify-items:center;
+ gap:5px;
+ min-width:0;
+ min-height:122px;
+ padding:16px;
+ border:1px solid #d4e0ff;
+ border-radius:14px;
+ background:#fff;
+ box-shadow:none;
+ text-align:center;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .dumaThreshold>span{
+ margin:0;
+ color:#536580;
+ font-size:12px;
+ font-weight:650;
+}
+.stageOperationsModules .dumaThreshold strong{
+ display:flex;
+ align-items:baseline;
+ justify-content:center;
+ gap:7px;
+ font-size:38px;
+ font-weight:850;
+ font-variant-numeric:tabular-nums;
+ letter-spacing:-.035em;
+ line-height:1.05;
+ color:#2453e6;
+}
+.stageOperationsModules .dumaThreshold strong small{
+ font-size:14px;
+ font-weight:700;
+ letter-spacing:0;
+ color:#536580;
+}
+.stageOperationsModules .dumaThreshold em{
+ margin:0;
+ font-size:12px;
+ font-weight:650;
+ font-style:normal;
+ color:#536580;
+}
+.stageOperationsModules .dumaElectionProcedure{
+ display:flex;
+ align-items:center;
+ gap:14px;
+ min-width:0;
+ margin:18px 20px 0;
+ padding:15px 16px;
+ border:1px solid #dce5f3;
+ border-radius:14px;
+ background:#f8fafc;
+}
+.stageOperationsModules .dumaElectionProcedureIcon{
+ display:grid;
+ place-items:center;
+ flex:0 0 42px;
+ width:42px;
+ height:42px;
+ border-radius:12px;
+ background:#eaf0ff;
+ color:#2453e6;
+}
+.stageOperationsModules .dumaElectionProcedureText{
+ flex:1 1 250px;
+ min-width:0;
+}
+.stageOperationsModules .dumaElectionProcedureText b{
+ display:block;
+ margin:0 0 3px;
+ font-size:15px;
+ font-weight:750;
+ line-height:1.45;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .dumaElectionProcedureText p{
+ margin:0;
+ font-size:14px;
+ line-height:1.55;
+ color:var(--stage-muted);
+}
+.stageOperationsModules .dumaElectionProcedure[data-procedure-status="approved"]{
+ border-color:#cce8d9;
+ background:#f4faf7;
+}
+.stageOperationsModules .dumaElectionProcedure[data-procedure-status="approved"] .dumaElectionProcedureIcon{
+ color:#16704f;
+ background:#def3e8;
+}
+.stageOperationsModules .dumaElectionProcedure>button{
+ flex:0 0 auto;
+ min-height:44px;
+ padding:10px 16px;
+ font-size:14px;
+}
+.stageOperationsModules .dumaElectionCreator{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;
+ gap:12px;
+ align-items:end;
+ min-width:0;
+ margin:16px 20px 0;
+ padding:16px;
+ border:1px solid var(--stage-line);
+ border-radius:14px;
+ background:#fff;
+}
+.stageOperationsModules .dumaElectionCreator label{
+ display:grid;
+ gap:7px;
+ min-width:0;
+ color:#536580;
+ font-size:13px;
+ font-weight:700;
+}
+.stageOperationsModules .dumaElectionCreator select{
+ width:100%;
+ min-width:0;
+ min-height:44px;
+ padding:9px 34px 9px 12px;
+ border:1px solid #d3ddeb;
+ border-radius:10px;
+ background:#fff;
+ color:var(--stage-ink);
+ font-size:14px;
+ font-weight:650;
+}
+.stageOperationsModules .dumaElectionCreator select:focus-visible{
+ outline:3px solid #91adff;
+ outline-offset:2px;
+}
+.stageOperationsModules .dumaElectionCreator>button{
+ min-height:44px;
+ padding:10px 18px;
+ font-size:14px;
+}
+.stageOperationsModules .dumaElectionList{
+ display:grid;
+ gap:12px;
+ min-width:0;
+ margin:0;
+ padding:16px 20px 20px;
+}
+.stageOperationsModules .dumaElectionEmpty{
+ display:flex;
+ align-items:center;
+ gap:14px;
+ min-height:90px;
+ padding:17px 18px;
+ border:1px solid var(--stage-line);
+ border-radius:14px;
+ background:#f8fafc;
+}
+.stageOperationsModules .dumaElectionEmpty>svg{
+ flex:0 0 auto;
+ color:#6480a7;
+}
+.stageOperationsModules .dumaElectionEmpty>div{min-width:0}
+.stageOperationsModules .dumaElectionEmpty strong{
+ display:block;
+ margin-bottom:4px;
+ font-size:15px;
+ line-height:1.4;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .dumaElectionEmpty p{
+ margin:0;
+ font-size:14px;
+ line-height:1.55;
+ color:var(--stage-muted);
+}
+.stageOperationsModules .dumaElectionCard{
+ border-color:var(--stage-line);
+ border-radius:14px;
+ background:#fff;
+ box-shadow:none;
+}
+.stageOperationsModules .dumaElectionCard>header{
+ padding:15px 17px;
+ background:#f8fafc;
+}
+.stageOperationsModules .dumaElectionCard header h3{
+ font-size:17px;
+ line-height:1.4;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .dumaElectionCard header small{
+ font-size:12px;
+ letter-spacing:.04em;
+ color:#536580;
+}
+.stageOperationsModules .dumaElectionCard>header>span{
+ font-size:12px;
+ border-radius:9px;
+}
+.stageOperationsModules .dumaNomination,
+.stageOperationsModules .dumaCloseRow{gap:10px;padding:14px 16px}
+.stageOperationsModules .dumaCandidates{
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:10px;
+ padding:16px;
+}
+.stageOperationsModules .dumaCandidate{
+ min-width:0;
+ padding:14px;
+ border-radius:12px;
+}
+.stageOperationsModules .dumaCandidateIdentity>div{min-width:0;overflow-wrap:anywhere}
+.stageOperationsModules .dumaCandidateIdentity b{font-size:14px;line-height:1.45}
+.stageOperationsModules .dumaCandidateIdentity small{font-size:12px}
+.stageOperationsModules .dumaVoteAllocation button{font-size:13px}
+.stageOperationsModules .dumaNomination select{min-width:0}
+.stageOperationsModules .dumaWinner,
+.stageOperationsModules .dumaMandateBudget{min-width:0}
+@container duma-leadership (max-width:740px){
+ .stageOperationsModules .dumaElectionHead{
+  grid-template-columns:minmax(0,1fr);
+  gap:16px;
+  padding:20px;
+ }
+ .stageOperationsModules .dumaThreshold{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px 14px;
+  min-height:0;
+  padding:12px 14px;
+  text-align:left;
+ }
+ .stageOperationsModules .dumaThreshold strong{font-size:30px}
+ .stageOperationsModules .dumaElectionCreator{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .stageOperationsModules .dumaElectionCreator>button{grid-column:1/-1}
+ .stageOperationsModules .dumaElectionProcedure{flex-wrap:wrap}
+ .stageOperationsModules .dumaElectionProcedure>button{margin-left:56px}
+ .stageOperationsModules .dumaCandidates{grid-template-columns:minmax(0,1fr)}
+}
+@container duma-leadership (max-width:480px){
+ .stageOperationsModules .dumaElectionHead{padding:16px}
+ .stageOperationsModules .dumaElectionHead h2{font-size:21px}
+ .stageOperationsModules .dumaElectionHead p{font-size:14px}
+ .stageOperationsModules .dumaElectionProcedure{gap:10px;margin:12px 12px 0;padding:13px}
+ .stageOperationsModules .dumaElectionProcedureIcon{width:38px;height:38px;flex-basis:38px}
+ .stageOperationsModules .dumaElectionProcedureText{flex-basis:calc(100% - 52px)}
+ .stageOperationsModules .dumaElectionProcedure>button{width:100%;margin-left:0}
+ .stageOperationsModules .dumaElectionCreator{
+  grid-template-columns:minmax(0,1fr);
+  gap:12px;
+  margin:12px 12px 0;
+  padding:13px;
+ }
+ .stageOperationsModules .dumaElectionCreator>button{grid-column:auto;width:100%}
+ .stageOperationsModules .dumaElectionList{padding:12px;gap:10px}
+ .stageOperationsModules .dumaElectionEmpty{align-items:flex-start;gap:10px;padding:14px}
+ .stageOperationsModules .dumaNomination,
+ .stageOperationsModules .dumaCloseRow{padding:12px;align-items:stretch}
+ .stageOperationsModules .dumaNomination{grid-template-columns:minmax(0,1fr)}
+ .stageOperationsModules .dumaCandidate{grid-template-columns:minmax(0,1fr)}
+ .stageOperationsModules .dumaCandidateScore{text-align:left}
+ .stageOperationsModules .dumaVoteAllocation{grid-template-columns:minmax(0,1fr)}
+}

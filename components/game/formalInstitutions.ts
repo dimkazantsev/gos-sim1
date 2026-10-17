@@ -46,10 +46,21 @@ export function formalDocumentTypeLabel(key:string){
 }
 
 // Persisted database keys are not public document titles. Preserve authored titles.
+/** Human-readable labels only: never rewrite persisted institutional keys. */
+export function formalSubjectDisplayLabel(key:string,label?:string|null){
+ const raw=String(label||'').trim();
+ if(key==='ksrf'&&(!raw||/^ksrf$/i.test(raw)))return 'Координационный Совет Российской Федерации';
+ if(raw&&raw.toLowerCase()!==key.toLowerCase())return raw;
+ return FORMAL_SUBJECTS.find(subject=>subject.key===key)?.label||raw||'Государственный орган';
+}
+
 export function formalDocumentTitle(title:string|null|undefined,docType:string){
  const raw=String(title||'').trim();
  const mapped=FORMAL_TYPES.find(type=>type.key===raw)?.label||FORMAL_SYSTEM_TYPE_LABELS[raw];
  if(mapped)return mapped;
+ const agenda=/^Повестка заседания\s*[·:—-]\s*ksrf\s*[·:—-]\s*этап\s*(\d+)$/i.exec(raw);
+ if(agenda)return 'Повестка заседания Координационного Совета Российской Федерации — этап '+agenda[1];
+ if(/\bksrf\b/i.test(raw))return raw.replace(/\bksrf\b/gi,'КСРФ');
  if(!raw||/^[a-z][a-z0-9]*(?:[_-][a-z0-9]+)+$/.test(raw))return formalDocumentTypeLabel(docType);
  return raw;
 }

@@ -23,6 +23,8 @@ DECLARE
  document_count integer;
  closed_votes integer;
  public_discussions integer;
+ vote_details text;
+ regional_rule_id uuid;
  details text;
  extra text;
 BEGIN
@@ -176,11 +178,12 @@ BEGIN
   SELECT string_agg('Утверждён способ распределения регионального представительства — '||
    CASE method WHEN 'random' THEN 'жеребьёвка' WHEN 'proportional' THEN 'пропорциональное распределение'
     WHEN 'agreement' THEN 'соглашение партий' END||'.',E'\n\n' ORDER BY created_at)
-  INTO details FROM public.regional_election_rules WHERE game_id=p_game AND status IN ('adopted','allocated');
-  IF EXISTS(SELECT 1 FROM public.regional_election_rules WHERE game_id=p_game AND status='allocated') THEN
-   SELECT string_agg(format('«%s» — %s',name,regions),'; ' ORDER BY name)
-   INTO extra FROM public.game_parties WHERE game_id=p_game AND registration_status='registered' AND regions IS NOT NULL;
-   IF extra IS NOT NULL THEN details:=concat_ws(E'\n\n',details,'Представительство партий в субъектах Российской Федерации: '||extra||'.');END IF;
+  INTO details FROM public.regional_election_rules WHERE game_id=p_game AND status='adopted';
+  SELECT id INTO regional_rule_id FROM public.regional_election_rules
+  WHERE game_id=p_game AND status='allocated' ORDER BY updated_at DESC LIMIT 1;
+  IF regional_rule_id IS NOT NULL THEN
+   extra:=private.gos_regional_allocation_report(regional_rule_id);
+   IF extra IS NOT NULL THEN details:=concat_ws(E'\n\n',details,extra);END IF;
   END IF;
  WHEN 5 THEN
   SELECT string_agg('Принято правило Ghost voting: '||CASE policy_mode WHEN 'prohibited' THEN 'запрет'
@@ -267,9 +270,9 @@ BEGIN
  IF nullif(details,'') IS NOT NULL THEN story:=story||E'\n\n'||details;facts:=facts+1;END IF;
 
 
- SELECT count(*),string_agg(title,'; ' ORDER BY title)
+ SELECT count(*),string_agg(format('«%s» — [Открыть документ](gos:documents?id=%s)',title,id::text),'; ' ORDER BY title)
  INTO document_count,document_names
- FROM (SELECT title FROM public.formal_documents
+ FROM (SELECT id,title FROM public.formal_documents
   WHERE game_id = p_game AND stage_no = p_stage
    AND coalesce(doc_type,'') NOT IN ('justice_response','party_certificate')
    AND status_code IN ('adopted','signed','published')
@@ -283,12 +286,23 @@ BEGIN
   facts := facts + 1;
  END IF;
 
- SELECT count(*) INTO closed_votes
- FROM public.game_votes WHERE game_id = p_game AND stage_no = p_stage AND status='closed';
+ SELECT count(*),string_agg(
+   format('«%s»: %s%s. [Открыть протокол](gos:votes?id=%s)',
+     v.title,
+     CASE v.result_code
+      WHEN 'passed' THEN 'решение принято'
+      WHEN 'rejected' THEN 'решение отклонено'
+      WHEN 'no_quorum' THEN 'кворум не достигнут'
+      ELSE 'процедура завершена, итог уточняется по протоколу' END,
+     CASE WHEN v.result_yes IS NOT NULL AND v.result_no IS NOT NULL AND v.result_abstain IS NOT NULL
+       THEN format(' («за» — %s, «против» — %s, воздержались — %s)',v.result_yes,v.result_no,v.result_abstain)
+       ELSE '' END,v.id::text),
+    E'\n' ORDER BY v.closed_at,v.title)
+ INTO closed_votes,vote_details
+ FROM public.game_votes v WHERE v.game_id=p_game AND v.stage_no=p_stage AND v.status='closed';
  IF closed_votes > 0 THEN
-  story := story || E'\n\n' ||
-   format('В реестре голосований этапа зафиксировано завершённых процедур: %s. Результаты каждого голосования доступны в его протоколе.',closed_votes);
-  facts := facts + 1;
+  story:=story||E'\n\n'||format('По %s голосованиям зафиксированы следующие решения:',closed_votes)||E'\n'||vote_details;
+  facts:=facts+1;
  END IF;
 
  -- Only an aggregate, not quotations. No access to private/group chats.
@@ -307,6 +321,9 @@ BEGIN
  IF facts = 0 AND p_stage <> 4 THEN
   story := story || E'\n\n' ||
    'Подтверждённые итоги процедур пока не отражены в связанных реестрах. Планы и задания этапа не выдаются за принятые решения.';
+ END IF;
+ IF position('gos:stages?stage=' in story)=0 THEN
+  story:=story||E'\n\n'||format('[Перейти к материалам этапа %s](gos:stages?stage=%s)',s.stage_no,s.stage_no);
  END IF;
  RETURN jsonb_build_object('title',heading,'body',story,'verified',true,
   'source_stage_no',s.stage_no,'facts_present',facts>0);

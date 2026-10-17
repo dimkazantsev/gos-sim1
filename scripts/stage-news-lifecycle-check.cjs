@@ -35,6 +35,9 @@ async function main(){
   await db.exec("create table public.chat_channels(id uuid,game_id uuid,name text,kind text);\ncreate table public.electoral_calculator_results(game_id uuid,published boolean);\ncreate table public.ghost_voting_policies(game_id uuid,policy_mode text,status text,created_at timestamp with time zone);\ncreate table public.ghost_voting_rounds(id uuid,game_id uuid,stage_no integer,total_loss integer,status text,created_at timestamp with time zone);\ncreate table public.institution_units(id uuid,game_id uuid,unit_kind text,unit_key text,title text,head_user_id uuid);\ncreate table public.office_candidates(id uuid,election_id uuid,game_id uuid,user_id uuid);\ncreate table public.office_elections(id uuid,game_id uuid,stage_no integer,office_key text,status text,winner_candidate_id uuid);");
   await db.exec("create function auth.uid() returns uuid language sql stable as $$select null::uuid$$;create function private.is_game_member(uuid) returns boolean language sql stable as $$select false$$;");
   await db.exec("alter table political_posts alter column id set default gen_random_uuid();alter table political_posts alter column created_at set default now();alter table political_posts alter column updated_at set default now();create unique index post_source_unique on political_posts(game_id,source_key) where source_key is not null;");
+  await db.exec('create table public.regional_allocations(id uuid,rule_id uuid,game_id uuid,party_id uuid,regions integer);');
+  const regional=read('supabase/migrations/20261017110000_regional_allocation_editorial_news.sql');
+  await db.exec(regional.slice(0,regional.indexOf('-- Изменяем только текст сообщения')));
   await db.exec(read('supabase/changes/20261002_stage_comic_archive.sql'));
   await db.exec(read('supabase/migrations/20261013045928_stage_result_comics.sql'));
   await db.exec(read('supabase/migrations/20261015060000_verified_editorial_automatic_news.sql'));
@@ -65,7 +68,8 @@ async function main(){
   await insert('parliamentary_election_rules',{game_id:game,system_type:'proportional',allocation_method:'dhondt',status:'adopted'});
   await insert('parliamentary_election_rules',{game_id:other,system_type:'majoritarian',status:'adopted'});
   await insert('electoral_calculator_results',{game_id:game,published:true});
-  await insert('regional_election_rules',{game_id:game,method:'agreement',status:'allocated'});
+  await insert('regional_election_rules',{id:uid(19),game_id:game,method:'agreement',status:'allocated',updated_at:'2026-10-16'});
+  await insert('regional_allocations',{rule_id:uid(19),game_id:game,party_id:uid(10),regions:89});
   await insert('ghost_voting_policies',{game_id:game,policy_mode:'justified',status:'adopted'});
   await insert('ghost_voting_rounds',{id:uid(20),game_id:game,stage_no:5,total_loss:30,status:'drawn',created_at:'2026-10-16'});
   await insert('presidential_candidates',{id:uid(30),game_id:game,user_id:person,party_id:uid(10),display_name:'Официальный кандидат',registration_status:'registered',cec_submitted_at:'2026-10-16'});
@@ -83,12 +87,13 @@ async function main(){
   await insert('game_crises',{id:uid(51),game_id:game,stage_no:15,description:'Незавершённая ситуация',status:'active'});
   for(let no=1;no<=16;no++)await insert('formal_documents',{id:uid(300+no),game_id:game,stage_no:no,title:'Оформленный акт '+no,status_code:'signed',status_label:'Подписан'});
   await insert('formal_documents',{id:uid(390),game_id:game,stage_no:1,title:'СЕКРЕТ РЕГИСТРАЦИОННОГО ДОСЬЕ',doc_type:'justice_response',metadata:{party_id:uid(12)},status_code:'signed'});
+  await insert('game_votes',{id:uid(80),game_id:game,stage_no:12,title:'Принятие закона',status:'closed',result_code:'passed',result_yes:10,result_no:2,result_abstain:1,closed_at:'2026-10-16'});
   await insert('budget_scenarios',{id:uid(60),game_id:game,title:'Подтверждённый бюджет',budget_year:2027,revenue:3.5,expenditure:3,balance:0.5,status:'final',formal_document_id:uid(313)});
   await insert('budget_scenarios',{id:uid(61),game_id:game,title:'СЕКРЕТ БЮДЖЕТНОГО ЧЕРНОВИКА',status:'draft'});
   await insert('institution_units',{id:uid(70),game_id:game,unit_kind:'committee',unit_key:'economy',title:'Комитет по экономике',head_user_id:person});
   await insert('office_elections',{id:uid(71),game_id:game,stage_no:4,office_key:'gd_chair',status:'finished',winner_candidate_id:uid(72)});
   await insert('office_candidates',{id:uid(72),game_id:game,election_id:uid(71),user_id:person});
-  const expected={1:'Открытая партия',2:'метод Д’Ондта',3:'соглашение партий',4:'Комитет по экономике',5:'30',6:'Официальный кандидат',7:'62.5%',8:'Министерство социальной политики',9:'Министр экономики',10:'Программа на согласовании',11:'Принятая программа',12:'Оформленный акт 12',13:'3,5 трлн ₽',14:'Обновление парка',15:'Подтверждённое урегулирование: 1',16:'завершено этапов: 16 из 16'};
+  const expected={1:'Открытая партия',2:'метод Д’Ондта',3:'Всего распределено 89',4:'Комитет по экономике',5:'30',6:'Официальный кандидат',7:'62.5%',8:'Министерство социальной политики',9:'Министр экономики',10:'Программа на согласовании',11:'Принятая программа',12:'Оформленный акт 12',13:'3,5 трлн ₽',14:'Обновление парка',15:'Подтверждённое урегулирование: 1',16:'завершено этапов: 16 из 16'};
   for(let no=1;no<=16;no++){
    await db.query("update game_stages set status='open',opened_at=clock_timestamp() where game_id=$1 and stage_no=$2",[game,no]);
    const opened=await rows("select * from political_posts where game_id=$1 and context->>'stage_no'=$2 and context->>'stage_notice'='opened'",[game,String(no)]);
@@ -101,6 +106,9 @@ async function main(){
    const news=await report(no);assert(news,'News for stage '+no);assert.equal(news.actor_key,'media');assert.equal(news.process_type,'news');
    assert.equal(news.context.editorial_verified,true);assert(news.context.stage_snapshot,'Comic/news snapshot link');
    assert(news.body.includes(expected[no]),'Confirmed stage '+no+' result: '+news.body);
+   assert(news.body.includes('gos:stages?stage='+no),'Stage navigation link preserved');
+   assert(news.body.includes('gos:documents?id='+uid(300+no)),'Document navigation link preserved');
+   if(no===12)assert(news.body.includes('gos:votes?id='+uid(80))&&news.body.includes('«за» — 10'),'Vote result and protocol link preserved');
    assert(news.body.split('\n\n').length>=3,'Complete prose for stage '+no);assert(!news.body.includes('СЕКРЕТ'));assert(!news.body.includes('НЕ ПУБЛИКОВАТЬ'));
    if(no===4){assert(!news.body.includes('оформлены пять комитетов'));assert(!news.body.includes('Комитет по экономике — Публичный руководитель'),'Committee chair needs its own finished election');}
    console.log('PASS PostgreSQL stage '+no+': system lifecycle, confirmed result, isolation and comic link');

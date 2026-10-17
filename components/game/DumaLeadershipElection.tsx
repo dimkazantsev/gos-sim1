@@ -2,7 +2,7 @@
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
-import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
+import {Landmark,ClipboardList,CheckCircle2,FileClock} from 'lucide-react';
 
 type Election={id:string;game_id:string;office_key:'gd_chair'|'gd_deputy_1'|'gd_deputy_2';office_title:string;round_no:1|2;vote_mode:'open'|'secret';status:'nomination'|'open'|'closed'|'finished';ballot_mode?:'faction'|'personal';winner_candidate_id:string|null;parent_election_id:string|null;created_at:string};
 type OfficeCandidate={id:string;election_id:string;user_id:string;party_id:string;created_at:string};
@@ -107,14 +107,25 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
  const sorted=useMemo(()=>[...elections].sort((a,b)=>a.office_key.localeCompare(b.office_key)||a.round_no-b.round_no),[elections]);
 
  return <section className="dumaElection">
-  <header className="dumaElectionHead"><div><small>ПАРЛАМЕНТСКАЯ ПРОЦЕДУРА · ЭТАП 4</small><h2>Руководство Государственной Думы</h2><p>Сначала депутаты регистрируются на заседание и утверждают процедуру голосованием. Затем фракции выдвигают кандидатов, проходит их обсуждение и персональное голосование депутатов. Каждый депутат голосует своими действующими мандатами с учётом GV; избрание требует 226 голосов из 450.</p></div><div className="dumaThreshold"><strong>226</strong><span>голосов для избрания</span><em>из 450</em></div></header>
+  <header className="dumaElectionHead">
+   <div className="dumaElectionIntro">
+    <div className="dumaElectionEyebrow"><Landmark size={17} aria-hidden="true"/><span>Государственная Дума</span><span className="dumaElectionStage">Этап 4</span></div>
+    <h2>Избрание руководства Государственной Думы</h2>
+    <p>После регистрации депутаты утверждают порядок выборов. Фракции выдвигают кандидатов, затем проводится голосование. Депутат распоряжается своими действующими мандатами с учётом гоствойтинга.</p>
+   </div>
+   <div className="dumaThreshold" aria-label="Для избрания необходимо 226 голосов из 450">
+    <span>Необходимое большинство</span><strong>226 <small>из 450</small></strong><em>голосов для избрания</em>
+   </div>
+  </header>
 
-  <InstitutionRegistrationPanel g={g} stageNo={4} initialBody="gd" allowedBodies={['gd']} defaultOpen/>
-  <div className="dumaElectionProcedure"><b>Утверждение процедуры выборов депутатами</b><p>{procedureApproved?'Процедура утверждена: можно выдвигать кандидатов.':procedureOpen?'Голосование открыто в разделе «Голосование».':'До выдвижения кандидатур требуется голосование зарегистрированных депутатов.'}</p>
-  {teacher&&!procedureApproved&&!procedureOpen&&<button type="button" className="primary" disabled={busy} onClick={()=>void openProcedureVote()}>Открыть голосование о процедуре</button>}</div>
+  <div className="dumaElectionProcedure" data-procedure-status={procedureApproved?'approved':procedureOpen?'in-progress':'pending'}>
+   <span className="dumaElectionProcedureIcon" aria-hidden="true">{procedureApproved?<CheckCircle2 size={22}/>:<ClipboardList size={22}/>}</span>
+   <div className="dumaElectionProcedureText"><b>Утверждение порядка выборов</b><p>{procedureApproved?'Порядок утверждён. Можно выдвигать кандидатов.':procedureOpen?'Голосование по порядку выборов открыто в разделе «Голосование».':'Сначала зарегистрированные депутаты должны проголосовать по порядку избрания руководства.'}</p></div>
+   {teacher&&!procedureApproved&&!procedureOpen&&<button type="button" className="primary" disabled={busy} onClick={()=>void openProcedureVote()}>Открыть голосование</button>}
+  </div>
   {teacher&&<div className="dumaElectionCreator"><label>Должность<select value={office} onChange={e=>setOffice(e.target.value as typeof office)}>{offices.map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label><label>Форма голосования<select value={mode} onChange={e=>setMode(e.target.value as 'open'|'secret')}><option value="open">Открытое</option><option value="secret">Тайное</option></select></label><button className="primary" disabled={busy||!procedureApproved} onClick={()=>void createElection()}>Создать процедуру</button></div>}
 
-  <div className="dumaElectionList">{sorted.length===0?<div className="emptyState">Процедуры выборов руководства ГД ещё не созданы.</div>:sorted.map(e=>{
+  <div className="dumaElectionList">{sorted.length===0?<div className="dumaElectionEmpty" role="status"><FileClock size={23} aria-hidden="true"/><div><strong>Выборы руководства ещё не начались</strong><p>{procedureApproved?'После создания процедуры здесь появятся кандидаты и результаты голосования.':'После утверждения порядка выборов здесь появятся процедуры избрания руководства Государственной Думы.'}</p></div></div>:sorted.map(e=>{
    const ec=electionCandidates(e.id),eb=electionBallots(e.id),winner=ec.find(c=>c.id===e.winner_candidate_id);
    const myCapacity=ledParty?activeMandates(ledParty.id):0;
    const myUsed=ledParty?usedByParty(e.id,ledParty.id):0;
