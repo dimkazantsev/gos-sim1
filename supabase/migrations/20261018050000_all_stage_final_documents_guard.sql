@@ -28,7 +28,9 @@ WITH policy(stage_no,template_key,label,doc_type,subject_key) AS (
  EXISTS(
  SELECT 1 FROM public.formal_documents d
  WHERE d.game_id=p_game AND d.stage_no=p_stage
-   AND d.status_code='published'
+   AND (d.status_code='published' OR
+       (p_stage=10 AND x.template_key IN ('state_program','financial_economic')
+        AND d.status_code IN ('draft','submitted','under_review','review')))
    AND (CASE WHEN x.doc_type='any'
       THEN d.doc_type IN ('president_decree','government_resolution','ministry_order','municipal_act')
       WHEN x.template_key='minutes'
@@ -45,7 +47,7 @@ WITH policy(stage_no,template_key,label,doc_type,subject_key) AS (
  FROM policy x WHERE x.stage_no=p_stage
 )
 SELECT coalesce(jsonb_agg(jsonb_build_object(
- 'template_key',template_key,'title',label,'subject_key',subject_key,'fulfilled',fulfilled)
+ 'template_key',template_key,'title',label,'subject_key',subject_key,'fulfilled',fulfilled,'evidence_state',case when stage_no=10 then 'prepared' else 'published' end)
  ORDER BY template_key),'[]'::jsonb)
 FROM matches;
 $finals$;
