@@ -83,7 +83,6 @@ begin
   join public.game_members gm on gm.game_id=r.game_id and gm.user_id=r.user_id
     and gm.kind='student' and gm.roster_archived_at is null
   join public.game_parties gp on gp.game_id=gm.game_id and gp.name=gm.team
-    and gp.registration_status='registered'
   where r.game_id=e.game_id and r.stage_no=e.stage_no and r.institution_key='gd'
     and private.role_is_available(e.game_id,r.user_id)
     and private.vote_member_has_office(e.game_id,r.user_id,'gd')
