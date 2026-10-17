@@ -48,5 +48,5 @@ begin
   end if;
  end if;
  return new;
-end $function$;
+end; $function$;
 
