@@ -72,8 +72,7 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
     const rules=root.querySelector('.staffingRule');
     const a=action.getBoundingClientRect(),b=rules.getBoundingClientRect();
     return {gap:b.top-a.bottom, marginTop:getComputedStyle(rules).marginTop,
-     actionRight:a.right,rulesRight:b.right,documentWidth:document.documentElement.scrollWidth,
-     ministryMargin:getComputedStyle(document.querySelector('.staffingLab[data-staffing="ministries"] .staffingRule')).marginTop};
+     actionRight:a.right,rulesRight:b.right,documentWidth:document.documentElement.scrollWidth};
    });
    assert(emptyState.gap>=11.9,'Creation and rules panels need visible separation at '+width+': '+JSON.stringify(emptyState));
    assert(emptyState.actionRight<=width+1&&emptyState.rulesRight<=width+1&&emptyState.documentWidth<=width+1,'No mobile overflow in empty state at '+width);
