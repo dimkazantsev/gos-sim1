@@ -4,6 +4,7 @@ const read=p=>fs.readFileSync(p,'utf8');
 const sql=read('supabase/migrations/20261014160000_personal_office_ballots_and_meeting_checkin.sql');
 const offices=read('supabase/migrations/20261014161500_cumulative_ksrf_duma_membership.sql');
 const duma=read('components/game/DumaLeadershipElection.tsx');
+const stage=read('components/game/GovernanceStageWorkspace.tsx');
 const committees=read('components/game/CommitteeChairElectionPanel.tsx');
 for(const token of [
  'primary key(election_id,voter_id)','for update','office_personal_ballots_read',
@@ -22,7 +23,8 @@ assert(offices.includes("'Член КСРФ'"),'Every active student gains KSRF 
 assert(offices.includes("'Депутат Государственной Думы'"),'GD deputy office is additive');
 assert(offices.includes("on conflict(game_id,user_id,role_title) where status<>'ended' do nothing"),'Office grants are idempotent');
 assert(duma.includes('open_duma_leadership_procedure_vote'),'Approval precedes nomination');
-assert(duma.includes('<InstitutionRegistrationPanel'),'Duma registration visible at election');
+assert(stage.includes('<InstitutionRegistrationPanel'),'Duma registration available at top of stage four');
+assert(!duma.includes('<InstitutionRegistrationPanel'),'Do not duplicate meeting registration inside the leadership election');
 assert(duma.includes('cast_personal_office_ballot'),'Individual vote action exposed');
 assert(committees.includes('cast_personal_office_ballot'),'Committee deputy vote action exposed');
 assert(!/disabled=\{busy\} onClick=\{\(\)=>void createElection\(\)\} disabled=/.test(duma),'Do not duplicate JSX attributes');
