@@ -2274,3 +2274,10 @@ button,input,textarea,select{font-size:14px}
 .civicAgendaComposer small{color:#526581;font-size:13px;line-height:1.5}
 .civicAgendaComposer button{max-width:100%;white-space:normal;text-align:center}
 @media(max-width:600px){.civicAgendaComposer button{width:100%}}
+
+/* Meeting roles: compact explanation directly above the agenda actions. */
+.civicMeetingSteps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
+.civicMeetingSteps>span{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border:1px solid #dce5f4;border-radius:11px;background:#f7f9fe;color:#4a5b79;font-size:12px;line-height:1.4}
+.civicMeetingSteps b{font-size:13px;color:#203d6f}
+.civicMeetingError{margin:10px 0;padding:10px 12px;border:1px solid #ecb7c5;border-left:3px solid #d94862;border-radius:10px;background:#fff7f9;color:#a02443;overflow-wrap:anywhere;font-size:13px;line-height:1.5}
+@media(max-width:720px){.civicMeetingSteps{grid-template-columns:1fr}.civicMeetingSteps>span{padding:8px 10px}}
