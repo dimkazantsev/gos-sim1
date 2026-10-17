@@ -73,6 +73,12 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
   return eb(eid).filter(b=>b.candidate_id===cid).reduce((a,b)=>a+Number(b.votes||0),0);
  };
  const used=(eid:string,pid:string)=>eb(eid).filter(b=>b.party_id===pid).reduce((a,b)=>a+Number(b.votes||0),0);
+ const unfinishedSecondRounds=elections.filter(e=>e.round_no===2&&(e.status==='open'||e.status==='nomination'));
+ const repeatRequired=units.filter(u=>{
+  const h=history(u.id);
+  return !u.head_user_id&&h.length>0&&!h.some(e=>e.status==='finished'&&e.winner_candidate_id)
+   &&h.every(e=>e.status==='closed');
+ });
 
  async function create(unitId:string){
   setBusy(true);const r=await supabase.rpc('create_committee_chair_election',{p_unit_id:unitId,p_vote_mode:mode[unitId]||'open'});
@@ -93,10 +99,16 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
 
  return <section className="committeeElectionBoard">
   <div className="committeeElectionHead"><div className="committeeElectionIntro"><small>Государственная Дума · Этап 4</small><h3>Выборы председателей комитетов</h3><p>Председатели зарегистрированных партий выдвигают кандидатов из состава своих фракций до распределения депутатов по комитетам. Зарегистрированные депутаты голосуют действующими мандатами с учётом гоствойтинга. При трёх и более кандидатах, если никто не избран в первом туре, назначается второй тур для двух лидеров.</p></div><div className="committeeElectionThreshold" aria-label="Для избрания требуется 226 голосов из 450"><span>Необходимое большинство</span><strong>226 <small>из 450</small></strong><em>голосов для избрания</em></div></div>
+  {(unfinishedSecondRounds.length>0||repeatRequired.length>0)&&<div className="officeRoundNotice" role="status" aria-live="polite">
+    {unfinishedSecondRounds.length>0&&<span><b className="officeRoundCount">{unfinishedSecondRounds.length}</b> Назначен второй тур выборов председателей комитетов. Зарегистрированные депутаты голосуют повторно.</span>}
+    {repeatRequired.length>0&&<span><b className="officeRoundCount">{repeatRequired.length}</b> По этим комитетам необходимы повторные выборы: большинство не достигнуто.</span>}
+   </div>}
   <div className="committeeElectionGrid">{units.map(u=>{
    const e=activeElection(u.id);
    const last=[...history(u.id)].reverse()[0];
+   const hasChair=!!u.head_user_id||history(u.id).some(x=>x.status==='finished'&&!!x.winner_candidate_id);
    const election=e||last;
+   const requiresRepeat=!!last&&!e&&!hasChair&&last.status==='closed';
    const cs=election?ec(election.id):[];
    const ownCandidates=election&&ledParty?members.filter(m=>m.kind==='student'&&m.team===ledParty.name&&gdMandateCapacity(m.user_id)>0).map(m=>m.user_id):[];
    const myCapacity=ledParty?activeMandates(ledParty.id):0;
@@ -104,7 +116,7 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
    const myPresent=registered.some(r=>r.user_id===me.user_id)?gdEffectivePresence(me.user_id,registered.find(r=>r.user_id===me.user_id)?.present_mandates):0;
    const myUsed=election&&ledParty?used(election.id,ledParty.id):0;
    return <article key={u.id} className={'committeeElectionCard '+(election?.status||'idle')}>
-    <header><div><small>КОМИТЕТ</small><b>{u.title}</b><span>Председатель: {name(u.head_user_id)}</span></div>{!e&&canCreate&&<div className="committeeElectionCreate"><select aria-label={'Форма выборов председателя: '+u.title} value={mode[u.id]||'open'} onChange={x=>setMode(v=>({...v,[u.id]:x.target.value as 'open'|'secret'}))}><option value="open">Открытое</option><option value="secret">Тайное</option></select><button disabled={busy} onClick={()=>void create(u.id)}>Начать выборы</button></div>}</header>
+    <header><div><small>КОМИТЕТ</small><b>{u.title}</b><span>Председатель: {name(u.head_user_id)}</span></div>{!e&&!hasChair&&canCreate&&<div className="committeeElectionCreate"><select aria-label={'Форма выборов председателя: '+u.title} value={mode[u.id]||'open'} onChange={x=>setMode(v=>({...v,[u.id]:x.target.value as 'open'|'secret'}))}><option value="open">Открытое</option><option value="secret">Тайное</option></select><button disabled={busy} onClick={()=>void create(u.id)}>{requiresRepeat?'Назначить повторные выборы':'Начать выборы'}</button></div>}</header>
     {election&&<><div className="committeeElectionState"><span>{election.round_no===2?'II тур':'I тур'}</span><b>{election.status==='nomination'?'Выдвижение':election.status==='open'?'Голосование':election.status==='finished'?'Завершено':'Тур закрыт'}</b><em>{election.vote_mode==='secret'?'Тайное':'Открытое'}</em></div>
     {election.status==='nomination'&&(teacher||ledParty||canManage)&&<div className="committeeNominate">{(teacher||ledParty)&&<><select aria-label={'Кандидат в председатели: '+u.title} value={nominee[election.id]||''} onChange={x=>setNominee(v=>({...v,[election.id]:x.target.value}))}><option value="">Кандидат от фракции…</option>{(teacher?members.filter(m=>m.kind==='student'&&gdMandateCapacity(m.user_id)>0).map(m=>m.user_id):ownCandidates).filter(uid=>!cs.some(c=>c.user_id===uid)).map(uid=><option key={uid} value={uid}>{name(uid)}</option>)}</select><button disabled={busy||!nominee[election.id]} onClick={()=>void nominate(election.id)}>Выдвинуть</button></>}{canManage&&<button className="primary" disabled={busy||cs.length===0} onClick={()=>void open(election.id)}>Открыть голосование</button>}</div>}
     {election.status==='nomination'&&!canManage&&<p className="committeeMandateUse" role="status">Голосование пока не открыто. После завершения выдвижения его откроет руководство Государственной Думы или преподаватель.</p>}
