@@ -42,7 +42,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
   let active=true;
   setPermission(null);
   setMeetingError('');
-  void supabase.rpc('get_my_institution_meeting_permissions',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body})
+  void Promise.resolve(supabase.rpc('get_my_institution_meeting_permissions',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body}))
    .then(({data,error})=>{
     if(!active)return;
     if(error){setMeetingError('Не удалось проверить полномочия. '+meetingErrorMessage(error.message));return;}
