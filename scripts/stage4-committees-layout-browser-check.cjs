@@ -37,11 +37,11 @@ assert(component.includes('<em>Мандатов распределено</em>'),
 assert(!component.includes('UsersRound'),'Unused caption icon import removed');
 assert(!ballot.includes('с учётом GV'),'Russian wording for ghost voting');
 assert(leadership.includes('226 <small>из 450</small>')&&ballot.includes('226 <small>из 450</small>'),'Aligned majority display');
-const cards=Array.from({length:5},(_,i)=>'<article class="institutionUnit committeeUnit"><header><div><small>КОМИТЕТ</small><h4>Комитет по государственному управлению, законодательству и конституционным вопросам №'+(i+1)+'</h4><p>Полномочия комитета</p></div><span>12 депутатов</span></header>'+
- '<div class="committeeQuota"><div><i></i><b>Длинное официальное название парламентской партии</b><strong>42</strong><span>2 депутата</span></div></div>'+
+const cards=Array.from({length:5},(_,i)=>'<article class="institutionUnit committeeUnit"><header><div><small>КОМИТЕТ</small><h4>Комитет по государственному управлению, законодательству и конституционным вопросам №'+(i+1)+'</h4><p>Полномочия комитета</p></div><span>45 / 90 мандатов</span></header>'+
+ '<div class="committeeQuota"><div><i></i><b>Длинное официальное название парламентской партии</b><strong>45 / 45</strong><span>1 представитель</span></div></div>'+
  '<div class="unitHead"><small>ПРЕДСЕДАТЕЛЬ</small><b>Александра Михайловна Константинова</b><span>Избирается депутатами Государственной Думы в блоке выше</span></div>'+
- '<div class="unitMembers"><div><span>Александра Михайловна Константинова</span><small>Фракция</small><b>≈ 11,2 мандата</b><button aria-label="Исключить">×</button></div></div>'+
- '<div class="unitAssign"><select><option>Добавить депутата…</option></select><button>Добавить</button></div></article>').join('');
+ '<div class="unitMembers"><div><span>Александра Михайловна Константинова</span><small>Фракция</small><b>45 манд.</b><div class="committeeMandateEdit"><input type="number" value="45"><button>Сохранить</button></div></div></div>'+
+ '<div class="unitAssign committeeMandateAssign"><select><option>Выберите депутата…</option></select><input type="number" value="1"><button>Распределить</button></div></article>').join('');
 const activeVotes=Array.from({length:2},(_,i)=>'<article class="committeeElectionCard nomination"><header><div><small>КОМИТЕТ</small><b>Комитет по государственному управлению №'+(i+1)+'</b><span>Председатель: не избран</span></div><div class="committeeElectionCreate"><select><option>Открыто</option></select><button>Начать выборы</button></div></header><div class="committeeElectionState"><span>ПЕРВЫЙ ТУР</span><b>Выдвижение</b><em>Открытое</em></div><div class="committeeNominate"><select><option>Кандидат от фракции…</option></select><button>Выдвинуть</button><button class="primary">Открыть голосование</button></div>'+
  '<div class="committeeCandidateList"><div><span>АК</span><div><b>Александра Константинова</b><small>Фракция</small></div><strong>226</strong><div class="committeeBallot"><input placeholder="Голоса"><button>Записать</button></div></div></div></article>').join('');
 const idleTitles=[
