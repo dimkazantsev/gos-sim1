@@ -6,6 +6,8 @@ on:
       - 'components/game/documentSignerTitle.ts'
       - 'scripts/document-signer-title-check.cjs'
       - 'components/game/Blitz*.tsx'
+      - 'scripts/blitz-pending-privacy-check.cjs'
+      - 'supabase/migrations/20261017183000_blitz_archive_pending_question_privacy.sql'
       - 'components/game/TeacherBlitz.tsx'
       - 'components/game/PoliticalWallView.tsx'
       - 'components/game/ElectoralArchitectureLab.tsx'
@@ -294,6 +296,7 @@ jobs:
       - run: node scripts/achievement-preview-check.cjs
       - run: node scripts/ksrf-profile-events-regression-check.cjs
       - run: node scripts/blitz-inbox-sync-check.cjs
+      - run: node scripts/blitz-pending-privacy-check.cjs
       - run: node scripts/deputy-session-ballots-check.cjs
       - run: node scripts/session-deletion-guard-check.cjs
       - run: node scripts/guided-tour-check.cjs
