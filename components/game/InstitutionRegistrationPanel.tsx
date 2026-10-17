@@ -73,9 +73,13 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  const agendaHasDocument=!!meetingRecord?.agenda_document_id;
  const agendaTextLength=agendaText.trim().length;
  const agendaDraft=agendaHasDocument&&!agendaReady;
+ // Earlier game versions permitted attendance before the first agenda existed.
+ // Never offer a second edit once anyone has registered.
+ const hasSessionRegistrations=rows.some(r=>r.institution_key===body);
+ const canWriteAgenda=!agendaHasDocument||!hasSessionRegistrations;
  const canApproveAgenda=meetingCoordinator&&agendaDraft&&(meetingRecord?.agenda_body?.trim().length||0)>=30;
  async function saveMeetingDocument(kind:'agenda'|'minutes'){
-  if(!g.game||busy||!canPrepare||readOnly)return;
+  if(!g.game||busy||!canPrepare||readOnly||(kind==='agenda'&&!canWriteAgenda))return;
   setMeetingError('');setNotice('');setBusy(true);
   const r=await supabase.rpc('save_institution_meeting_document',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_kind:kind,p_body:kind==='agenda'?agendaText:minutesText});
   if(r.error)setMeetingError(meetingErrorMessage(r.error.message));else{await load();setNotice(kind==='agenda'?(meetingCoordinator?'Повестка сохранена в реестре НПА и утверждена.':'Проект повестки сохранён. Ожидается утверждение председателем.'):'Протокол сохранён в реестре НПА.')}
@@ -107,8 +111,10 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
    <p className="civicMeetingHelp" role="status">{readOnly?'Этап доступен только для просмотра. Документы и результаты сохраняются.':!verifiedRights?'Проверяем ваши полномочия для этого органа…':meetingCoordinator?'Вы можете составить и утвердить повестку или назначить исполнителя. Документ автоматически создаётся в реестре НПА, отдельно загружать его не нужно.':canPrepare?'Вам поручена подготовка проекта повестки. Сохраните проект, затем председатель утвердит его.':canAttend?'Вы можете зарегистрироваться после утверждения повестки, участвовать в заседании и голосовать в пределах своих полномочий. Подготовку повестки поручает председатель.':'У вас нет назначения в этот орган. Готовить повестку, утверждать её и регистрироваться на это заседание могут только уполномоченные участники.'}</p>
    {agendaHasDocument&&onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(meetingRecord!.agenda_document_id!)}>Открыть повестку в реестре НПА</button>}
    {meetingError&&<p className="civicMeetingError" role="alert">{meetingError}</p>}
-   {canPrepare&&!readOnly&&!agendaReady&&<label>Содержание повестки<textarea aria-label="Текст повестки заседания" value={agendaText} rows={4} onChange={event=>setAgendaText(event.target.value)} placeholder="Вопросы заседания, порядок рассмотрения, выступающие и регламент"/></label>}
-   {canPrepare&&!readOnly&&!agendaReady&&<div className="civicAgendaComposer"><small>{agendaTextLength<30?'Для сохранения укажите ещё '+(30-agendaTextLength)+' символов.':'Повестка готова к сохранению в реестре НПА.'}</small><button type="button" className={meetingCoordinator?'primary':'secondary'} disabled={busy||readOnly||agendaTextLength<30} onClick={()=>void saveMeetingDocument('agenda')}>{meetingCoordinator?'Сохранить и утвердить повестку':'Сохранить проект повестки в реестре НПА'}</button></div>}
+   {hasSessionRegistrations&&!agendaHasDocument&&<p className="civicMeetingHelp" role="status">Участники были зарегистрированы до оформления повестки. Можно подготовить её впервые: существующие регистрации и голоса сохранятся. После сохранения повестка станет недоступна для редактирования.</p>}
+   {hasSessionRegistrations&&agendaHasDocument&&!agendaReady&&<p className="civicMeetingHelp" role="status">Регистрация уже началась. Изменять подготовленный проект нельзя; председатель может только утвердить существующую повестку.</p>}
+   {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<label>Содержание повестки<textarea aria-label="Текст повестки заседания" value={agendaText} rows={4} onChange={event=>setAgendaText(event.target.value)} placeholder="Вопросы заседания, порядок рассмотрения, выступающие и регламент"/></label>}
+   {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<div className="civicAgendaComposer"><small>{agendaTextLength<30?'Для сохранения укажите ещё '+(30-agendaTextLength)+' символов.':'Повестка готова к сохранению в реестре НПА.'}</small><button type="button" className={meetingCoordinator?'primary':'secondary'} disabled={busy||readOnly||agendaTextLength<30} onClick={()=>void saveMeetingDocument('agenda')}>{meetingCoordinator?'Сохранить и утвердить повестку':'Сохранить проект повестки в реестре НПА'}</button></div>}
    {canApproveAgenda&&!readOnly&&<button type="button" className="primary" disabled={busy||readOnly} onClick={()=>void approveMeeting('agenda')}>Утвердить подготовленный проект повестки</button>}
    {meetingCoordinator&&!readOnly&&<div className="civicMeetingDelegate"><StyledSelect label="Поручить заполнение повестки и протокола" value={delegateUser} onChange={setDelegateUser} options={[{value:'',label:'Без поручения'},...participants.map(p=>({value:p.user_id,label:p.full_name||'Участник'}))]}/><button type="button" disabled={busy} onClick={()=>void assignMeetingDelegate()}>Сохранить поручение</button></div>}
    {registered.length>0&&<div className="civicMeetingMinutes"><header><b>Протокол по итогам заседания</b><span>{meetingRecord?.minutes_approved_at?'Утверждён':meetingRecord?.minutes_document_id?'Проект на утверждении':'Не составлен'}</span></header>
