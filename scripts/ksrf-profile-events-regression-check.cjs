@@ -39,7 +39,7 @@ const committeeSql=file('supabase/migrations/20261014121000_committee_chair_befo
 assert(committee.includes("gdMandateCapacity(m.user_id)>0"),'Only deputies with a verified active GD mandate can be nominated');
 assert(committee.includes("myPresent"),'Only physically present deputy mandates can be used at committee elections');
 assert(committee.includes("supabase.from('party_member_mandates')"),'Stage workspace must load current personal mandate assignments');
-assert(staffing.includes("supabase.from('party_member_mandates')"),'Staffing must not depend on unopened party workspace');
+assert(staffing.includes("supabase.rpc('get_committee_deputy_capacity'")&&staffing.includes("supabase.from('committee_mandate_allocations')"),'Staffing loads the authoritative GD mandate capacity and allocations without depending on unopened party workspace');
 assert(staffing.indexOf('<CommitteeChairElectionPanel g={g}/>')<staffing.indexOf('<section className="staffingSection">'),'Committee chair voting comes before membership allocation');
 assert(committeeSql.includes("create_committee_chair_election"),'Election must require GD chair');
 assert(committeeSql.includes("assign_institution_member"),'Committee appointments must require elected chair');

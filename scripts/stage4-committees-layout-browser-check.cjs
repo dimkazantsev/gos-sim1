@@ -6,6 +6,9 @@ const {chromium}=require('playwright-core');
 const root=require('node:path').resolve(__dirname,'..');
 const read=name=>fs.readFileSync(require('node:path').join(root,name),'utf8');
 const component=read('components/game/InstitutionStaffingLab.tsx');
+assert(component.includes("set_committee_mandates"),'Committee distribution uses a numeric mandate RPC');
+assert(component.includes('committeeMandateEdit')&&component.includes('committeeMandateAssign'),'Deputies may edit mandates in several committees');
+assert(component.includes('maxNewAllocation'),'Available personal capacity, party quota and 90-seat limit are all reflected in UI');
 const ballot=read('components/game/CommitteeChairElectionPanel.tsx');
 const leadership=read('components/game/DumaLeadershipElection.tsx');
 const styles=read('app/design-tokens.css')+'\n'+read('app/globals.css')+'\n'+read('app/stage-operations.css');
@@ -30,15 +33,15 @@ assert(ballot.includes("election.status==='open'&&election.ballot_mode==='person
 assert(ballot.includes('!registered.some(r=>r.user_id===me.user_id)')&&ballot.includes('myPresent<=0'),'Attendance registration and declared deputy count both guard voting');
 assert(component.includes("mode==='committees'?"),'Committee/ministry branch retained');
 assert(component.includes('Избирается депутатами Государственной Думы в блоке выше'),'Voting placement hint correct');
-assert(component.includes('<em>депутатов распределено</em>'),'Counter caption has no preceding decorative icon');
+assert(component.includes('<em>Мандатов распределено</em>'),'Mandate allocation caption is centered and has no preceding decorative icon');
 assert(!component.includes('UsersRound'),'Unused caption icon import removed');
 assert(!ballot.includes('с учётом GV'),'Russian wording for ghost voting');
 assert(leadership.includes('226 <small>из 450</small>')&&ballot.includes('226 <small>из 450</small>'),'Aligned majority display');
-const cards=Array.from({length:5},(_,i)=>'<article class="institutionUnit committeeUnit"><header><div><small>КОМИТЕТ</small><h4>Комитет по государственному управлению, законодательству и конституционным вопросам №'+(i+1)+'</h4><p>Полномочия комитета</p></div><span>12 депутатов</span></header>'+
- '<div class="committeeQuota"><div><i></i><b>Длинное официальное название парламентской партии</b><strong>42</strong><span>2 депутата</span></div></div>'+
+const cards=Array.from({length:5},(_,i)=>'<article class="institutionUnit committeeUnit"><header><div><small>КОМИТЕТ</small><h4>Комитет по государственному управлению, законодательству и конституционным вопросам №'+(i+1)+'</h4><p>Полномочия комитета</p></div><span>45 / 90 мандатов</span></header>'+
+ '<div class="committeeQuota"><div><i></i><b>Длинное официальное название парламентской партии</b><strong>45 / 45</strong><span>1 представитель</span></div></div>'+
  '<div class="unitHead"><small>ПРЕДСЕДАТЕЛЬ</small><b>Александра Михайловна Константинова</b><span>Избирается депутатами Государственной Думы в блоке выше</span></div>'+
- '<div class="unitMembers"><div><span>Александра Михайловна Константинова</span><small>Фракция</small><b>≈ 11,2 мандата</b><button aria-label="Исключить">×</button></div></div>'+
- '<div class="unitAssign"><select><option>Добавить депутата…</option></select><button>Добавить</button></div></article>').join('');
+ '<div class="unitMembers"><div><span>Александра Михайловна Константинова</span><small>Фракция</small><b>45 манд.</b><div class="committeeMandateEdit"><input type="number" value="45"><button>Сохранить</button></div></div></div>'+
+ '<div class="unitAssign committeeMandateAssign"><select><option>Выберите депутата…</option></select><input type="number" value="1"><button>Распределить</button></div></article>').join('');
 const activeVotes=Array.from({length:2},(_,i)=>'<article class="committeeElectionCard nomination"><header><div><small>КОМИТЕТ</small><b>Комитет по государственному управлению №'+(i+1)+'</b><span>Председатель: не избран</span></div><div class="committeeElectionCreate"><select><option>Открыто</option></select><button>Начать выборы</button></div></header><div class="committeeElectionState"><span>ПЕРВЫЙ ТУР</span><b>Выдвижение</b><em>Открытое</em></div><div class="committeeNominate"><select><option>Кандидат от фракции…</option></select><button>Выдвинуть</button><button class="primary">Открыть голосование</button></div>'+
  '<div class="committeeCandidateList"><div><span>АК</span><div><b>Александра Константинова</b><small>Фракция</small></div><strong>226</strong><div class="committeeBallot"><input placeholder="Голоса"><button>Записать</button></div></div></div></article>').join('');
 const idleTitles=[
@@ -52,10 +55,10 @@ const idleVotes=idleTitles.map(title=>'<article class="committeeElectionCard idl
 const votes=idleVotes+activeVotes;
 const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=device-width, initial-scale=1"><style>'+
  '*{box-sizing:border-box}body{margin:0;font:14px Arial,sans-serif;background:#f4f7fb;color:#142644}main{min-width:0}'+styles+'</style>'+
- '<main class="stageOperations"><div class="stageOperationsModules"><section class="staffingLab" data-staffing="committees"><header class="staffingLabHead"><div class="staffingLabIntro"><div class="staffingLabEyebrow"><svg width="17" height="17"></svg><span>Государственная Дума</span><span class="staffingLabStage">Этап 4</span></div><h2>Формирование комитетов Государственной Думы</h2><p>Палата образует пять комитетов и избирает их председателей. После выборов депутаты распределяются по комитетам с учётом фракционных квот.</p></div><div class="staffingBalance"><span>Составы комитетов</span><strong>0</strong><em>депутатов распределено</em></div></header>'+
+ '<main class="stageOperations"><div class="stageOperationsModules"><section class="staffingLab" data-staffing="committees"><header class="staffingLabHead"><div class="staffingLabIntro"><div class="staffingLabEyebrow"><svg width="17" height="17"></svg><span>Государственная Дума</span><span class="staffingLabStage">Этап 4</span></div><h2>Формирование комитетов Государственной Думы</h2><p>Палата образует пять комитетов и избирает их председателей. После выборов депутаты распределяются по комитетам с учётом фракционных квот.</p></div><div class="staffingBalance"><span>Распределение мандатов</span><strong>0 / 450</strong><em>Мандатов распределено</em></div></header>'+
  '<div class="stageOperationsActionBar"><p>Создайте комитеты</p><button class="primary">Создать комитеты</button></div>'+
  '<section class="committeeElectionBoard"><div class="committeeElectionHead"><div class="committeeElectionIntro"><small>Государственная Дума · Этап 4</small><h3>Выборы председателей комитетов</h3><p>Фракции выдвигают кандидатов. Для избрания необходимо большинство голосов.</p></div><div class="committeeElectionThreshold"><span>Необходимое большинство</span><strong>226 <small>из 450</small></strong><em>голосов для избрания</em></div></div><div class="committeeElectionGrid">'+votes+'</div></section>'+
- '<section class="staffingSection"><div class="staffingSectionHead"><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>5 комитетов · пропорциональное представительство фракций</h3><p>Один депутат состоит только в одном комитете. Составы отражают квоты партий.</p></div><span>1 депутат — 1 комитет</span></div><div class="committeeGrid">'+cards+'</div></section><footer class="staffingRule"><b>Порядок формирования</b><p>Квоты по мандатам.</p></footer></section>'+
+ '<section class="staffingSection"><div class="staffingSectionHead"><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>5 комитетов · пропорциональное представительство фракций</h3><p>Депутат распределяет свои мандаты между несколькими комитетами. Составы отражают квоты партий.</p></div><span>90 мандатов в каждом комитете</span></div><div class="committeeGrid">'+cards+'</div></section><footer class="staffingRule"><b>Порядок формирования</b><p>Квоты по мандатам.</p></footer></section>'+
  '<section class="staffingLab" data-staffing="ministries"><header class="staffingLabHead"><div><h2>Команды министерств</h2><p>Назначение сотрудников министерств</p></div><div class="staffingBalance"><strong>6</strong><span>в министерствах</span></div></header></section></div></main>';
 (async()=>{
  const executable=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(p=>p&&fs.existsSync(p));
@@ -123,7 +126,7 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
    if(width>=1024){
     assert(Math.abs(check.cardLayout[0].controlsTop-check.cardLayout[1].controlsTop)<2,'Two desktop committee cards align action row at '+width);
    }
-   assert.equal(check.committeeCounterText,'0','Test empty committee count exactly as in reported screen');
+   assert.equal(check.committeeCounterText,'0 / 450','Mandate counter uses fraction of 450 allocated seats');
    assert(check.committeeCaptionCentered,'Counter caption is centered at '+width);
    assert(!check.committeeCaptionHasIcon,'Counter caption has no decorative SVG at '+width);
    assert.equal(check.ministryCounterGridColumns,2,'Existing stage 9 ministry counter keeps its legacy layout');

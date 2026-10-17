@@ -989,3 +989,32 @@
 .stageOperationsModules .officeRoundNotice>span{display:flex;align-items:center;gap:9px;min-width:0}
 .stageOperationsModules .officeRoundCount{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:27px;height:27px;padding:0 7px;border-radius:99px;background:#2a54d9;color:#fff;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
 @media(max-width:700px){.stageOperationsModules .officeRoundNotice{margin:10px 10px;padding:10px 12px;font-size:13px}.stageOperationsModules .officeRoundNotice>span{align-items:flex-start}}
+
+/* Mandate allocation belongs to committees, not ministry staffing. */
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateAssign{
+ grid-template-columns:minmax(0,1fr) 100px auto;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateAssign input,
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateEdit input{
+ min-width:0;min-height:42px;max-width:100%;padding:9px 10px;
+ border:1px solid #cfdaee;border-radius:10px;background:#fff;color:#102a54;
+ font:inherit;font-variant-numeric:tabular-nums;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateEdit{
+ display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateEdit input{width:72px}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateEdit button{
+ min-height:38px;padding:7px 9px;border:1px solid #d3dff3;
+ border-radius:9px;background:#fff;color:#244db5;font-weight:600;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateEdit button:disabled{opacity:.5;cursor:not-allowed}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateRemainder{
+ padding:0 16px 14px;margin:0;color:#546988;font-size:13px;
+}
+@container stage4-committees (max-width:490px){
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateAssign{grid-template-columns:minmax(0,1fr)}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateAssign input{width:100%}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateEdit{grid-column:1/-1;justify-content:flex-start}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateRemainder{padding:0 12px 12px}
+}
