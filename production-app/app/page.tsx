@@ -52,12 +52,12 @@ export default function Home(){
   return <main className="loginPage">
     <div className="gridGlow"/>
     <form className="loginCard" onSubmit={submit}>
-      <div className="logoRow"><div className="logo">ГОС.ID</div><div><small>ПОЛИТИЧЕСКАЯ & PUBLIC ADMINISTRATION LAB</small><h1>ГОС.ID</h1></div></div>
+      <div className="logoRow"><div className="logo">ГОС.ID</div><div><small>ЛАБОРАТОРИЯ ГОСУДАРСТВЕННОГО УПРАВЛЕНИЯ</small><h1>ГОС.ID</h1></div></div>
       <p className="muted">Вход в игровую сессию. ФИО сохраняется в профиле участника и протоколе игры.</p>
       <div className="seg"><button type="button" className={mode==='student'?'active':''} onClick={()=>{setMode('student');setCreateMode(false)}}>Студент</button><button type="button" className={mode==='teacher'?'active':''} onClick={()=>setMode('teacher')}>Преподаватель</button></div>{mode==='teacher'&&<div className="seg"><button type="button" className={!createMode?'active':''} onClick={()=>setCreateMode(false)}>Войти</button><button type="button" className={createMode?'active':''} onClick={()=>setCreateMode(true)}>Создать игру</button></div>}
       <label>ФИО<input value={fio} onChange={e=>setFio(e.target.value)} required /></label>
       {mode==='teacher'&&createMode&&<label>Название игры<input value={gameTitle} onChange={e=>setGameTitle(e.target.value)} required /></label>}
-      <label>Код игры<input value={gameCode} onChange={e=>setGameCode(e.target.value)} placeholder="GPU-2026" required /></label>
+      <label>Код игры<input value={gameCode} onChange={e=>setGameCode(e.target.value)} placeholder="GOS-2026" required /></label>
       {mode==='student'&&<label>Учебная группа<input value={group} onChange={e=>setGroup(e.target.value)} /></label>}
       <label>{mode==='teacher'?'Код преподавателя':'Код участника'}<input type="password" value={invite} onChange={e=>setInvite(e.target.value)} required /></label>{mode==='teacher'&&createMode&&<label>Код для студентов<input type="password" value={studentCode} onChange={e=>setStudentCode(e.target.value)} required /></label>}
       {error&&<div className="errorBox">{error}</div>}

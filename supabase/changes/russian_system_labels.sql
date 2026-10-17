@@ -129,3 +129,6 @@ where source_note='Млн рублей. Минфин России, первон�
 
 update private.achievement_catalog set title='Самый стойкий сигнал'
 where title='Самый стойкий Wi-Fi';
+
+update private.achievement_catalog set description='Побывали в игре в три разные календарные даты по всемирному координированному времени.'
+where description='Побывали в игре в три разные календарные даты UTC.';

@@ -24,8 +24,8 @@ create table budget_registry_hidden(game_id uuid,entry_key text);
 create table political_posts(actor_key text,actor_label text,deleted_at timestamptz);
 create table game_stages(stage_no integer,title text,summary text);
 create table budget_scenarios(source_note text);
-create table private.achievement_catalog(title text);
-insert into private.achievement_catalog values('Самый стойкий Wi-Fi');
+create table private.achievement_catalog(title text,description text);
+insert into private.achievement_catalog(title) values('Самый стойкий Wi-Fi');
 `;
 (async()=>{
  const db=new PGlite();

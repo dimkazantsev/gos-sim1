@@ -5,6 +5,7 @@ const attributes=new Set(['title','label','placeholder','aria-label','alt','unit
 const allowed=/Goust Voting|ГОС[./\u200B]*ID|\b(?:PDF|DOCX?|XLSX?|TXT|URL|HTTP|HTTPS|HTML|CSS|SVG|PNG|JPE?G|WEBP|CSV|API|QR|JSON|ZIP|XML|I|II|III|IV|V|VI|VII|VIII|IX|X|S1A1)\b/gi;
 function words(value){
  return String(value)
+  .replace(/\b(?:[a-z0-9-]+\.)+(?:com|org|net|io|ru)(?:\/[^\s'\"<>]*)?/gi,'')
   .replace(/node\s+server\.mjs|\bmedia\b|(?:docs|slides)\.google\.com(?:\/[^\s'\"<>]*)?/gi,'')
   .replace(/https?:\/\/[^\s'"<>]+|[\w.+-]+@[\w.-]+|(?:[\w-]+\/)*[\w.-]+\.(?:html|json|mjs|cjs|txt|pdf|docx?|csv|zip)\b/gi,'')
   .replace(/\/(?:start|game|games|status|stages|votes|docs|channels|chat|appeal|appeal_test|appeals|reply|menu|help)\b/g,'')
@@ -16,6 +17,7 @@ function inspect(file){
  const source=ts.createSourceFile(file,content,ts.ScriptTarget.Latest,true,file.endsWith('x')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  const relative=path.relative(root,file).replaceAll('\\','/');
  function report(node,value){
+  if(relative==='components/ui/BrandIdentity.tsx'&&String(value).trim()==='ID')return;
   if(/^#?[а-яё_]+_gpyasu$/i.test(value))return; // Stored routing tags; captions are localized at render.
   const found=words(value);if(!found)return;
   const line=source.getLineAndCharacterOfPosition(node.getStart(source)).line+1;
