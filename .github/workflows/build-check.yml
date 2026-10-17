@@ -128,6 +128,8 @@ on:
       - 'components/game/InstitutionRegistrationPanel.tsx'
       - 'supabase/migrations/20261017143200_institution_meeting_permissions_read.sql'
       - 'scripts/institution-meeting-documents-check.cjs'
+      - 'scripts/stage4-agenda-rights-check.cjs'
+      - 'supabase/migrations/20261017230000_stage4_party_chair_agenda_bridge.sql'
       - 'components/game/InstitutionStaffingLab.tsx'
       - 'components/game/CommitteeChairElectionPanel.tsx'
       - 'supabase/migrations/20261014121000_committee_chair_before_staffing.sql'
@@ -270,6 +272,7 @@ jobs:
       - run: node scripts/ksrf-vote-text-check.cjs
       - run: node scripts/procedural-vote-auto-close-check.cjs
       - run: node scripts/institution-meeting-documents-check.cjs
+      - run: node scripts/stage4-agenda-rights-check.cjs
       - run: node scripts/ksrf-meeting-stage-gate-check.cjs
       - run: node scripts/ksrf-trigger-field-isolation-check.cjs
       - run: node scripts/brand-overview-check.cjs
