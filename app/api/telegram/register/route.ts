@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
 import {runtimeConfig} from '@/lib/server/telegram';
-import {activateTelegramBot,TelegramSetupError} from '@/lib/server/telegramActivation';
+import {activateTelegramBot,TelegramSetupError,telegramSetupStepLabel} from '@/lib/server/telegramActivation';
 export const runtime='nodejs';
 export const maxDuration=60;
 // Only an authenticated active teacher may configure the production Telegram webhook.
@@ -27,11 +27,11 @@ export async function POST(request:Request){
   return NextResponse.json(result);
  }catch(e){
   const stage=e instanceof TelegramSetupError?e.step:'unknown';
-  const reason=e instanceof TelegramSetupError?e.message:'Не удалось завершить регистрацию Telegram.';
+  const reason=e instanceof TelegramSetupError?e.message:'Не удалось завершить регистрацию Телеграма.';
   console.error('Telegram activation failed at',stage);
   return NextResponse.json({
    ok:false,stage,reason,
-   error:'Настройка Telegram не завершена ('+stage+'): '+reason
+   error:'Настройка Телеграма не завершена ('+telegramSetupStepLabel(stage)+'): '+reason
   },{status:502});
  }
 }

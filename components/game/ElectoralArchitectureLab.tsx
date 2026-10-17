@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import StyledSelect from '../ui/StyledSelect';
 import {useEffect,useState} from 'react';
 import {MessageCircle,Save} from 'lucide-react';
@@ -98,7 +99,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
    supabase.from('fiscal_region_reference').select('code,name').order('code')
   ]);
   if(control.error||reference.error){
-   setError(control.error?.message||reference.error?.message||'Не удалось получить список регионов');
+   setError(userError(control.error)||userError(reference.error)||'Не удалось получить список регионов');
   }else{
    const names=new Map((reference.data||[]).map(x=>[x.code,x.name]));
    setFixedRegions((control.data||[]).map(x=>({code:x.region_code,name:names.get(x.region_code)||x.region_code,party_id:x.party_id})).sort((a,b)=>a.code.localeCompare(b.code)));
@@ -151,9 +152,9 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
 
  async function proposeP(){
   setBusy(true);const r=await supabase.rpc('propose_parliamentary_election_rule',{p_game_id:activeGame.id,p_system_type:system,p_allocation_method:system==='majoritarian'?null:method,p_majoritarian_method:system==='proportional'?null:majority,p_proportional_share:system==='mixed'?propShare:null,p_rationale:rationale.trim()||null});
-  if(r.error)setError(r.error.message);else{setRationale('');await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setRationale('');await load()}setBusy(false);
  }
- async function voteP(id:string){setBusy(true);const r=await supabase.rpc('open_parliamentary_rule_vote',{p_rule_id:id});if(r.error)setError(r.error.message);else{await load();if(r.data)onOpenVotes();else setQueueNotice('Предложение поставлено в очередь по вопросу об избирательной системе. После отклонения текущего решения оно откроется автоматически.')}setBusy(false)}
+ async function voteP(id:string){setBusy(true);const r=await supabase.rpc('open_parliamentary_rule_vote',{p_rule_id:id});if(r.error)setError(userError(r.error));else{await load();if(r.data)onOpenVotes();else setQueueNotice('Предложение поставлено в очередь по вопросу об избирательной системе. После отклонения текущего решения оно откроется автоматически.')}setBusy(false)}
  async function publishCalculatorResult(){
   if(!teacher||!calculatorReady)return;
   setBusy(true);
@@ -169,7 +170,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
    p_district_seats:districtPayload,
    p_result:resultPayload
   });
-  if(r.error)setError(r.error.message);else await load();
+  if(r.error)setError(userError(r.error));else await load();
   setBusy(false);
  }
  async function publishRegionalCalculatorResult(){
@@ -182,26 +183,26 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
     :{draw:'random'};
   const result=Object.fromEntries(regionalPreview.map(x=>[x.party.id,x.regions]));
   const r=await supabase.rpc('publish_regional_calculator_result',{p_game_id:activeGame.id,p_method:regionalCalculatorMethod,p_inputs:inputs,p_result:result});
-  if(r.error)setError(r.error.message);else await load();
+  if(r.error)setError(userError(r.error));else await load();
   setBusy(false);
  }
   async function proposeR(){
   setBusy(true);const r=await supabase.rpc('propose_regional_election_rule',{p_game_id:activeGame.id,p_method:regionalMethod,p_rationale:regionalRationale.trim()||null});
-  if(r.error)setError(r.error.message);else{setRegionalRationale('');await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setRegionalRationale('');await load()}setBusy(false);
  }
- async function voteR(id:string){setBusy(true);const r=await supabase.rpc('open_regional_rule_vote',{p_rule_id:id});if(r.error)setError(r.error.message);else{await load();if(r.data)onOpenVotes();else setQueueNotice('Предложение поставлено в очередь по вопросу о распределении регионов.')}setBusy(false)}
+ async function voteR(id:string){setBusy(true);const r=await supabase.rpc('open_regional_rule_vote',{p_rule_id:id});if(r.error)setError(userError(r.error));else{await load();if(r.data)onOpenVotes();else setQueueNotice('Предложение поставлено в очередь по вопросу о распределении регионов.')}setBusy(false)}
  async function reopenQuestion(question:'electoral_system'|'regional_system'){
   if(!teacher||reopenReason.trim().length<10||!window.confirm('Вернуть принятый вопрос КСРФ на повторное рассмотрение? Результаты прошлых голосований сохранятся.'))return;
   setBusy(true);
   const r=await supabase.rpc('reopen_ksrf_question',{p_game_id:activeGame.id,p_question:question,p_reason:reopenReason.trim()});
-  if(r.error)setError(r.error.message);else{setReopenReason('');setQueueNotice('Вопрос возвращён на рассмотрение. История решений сохранена.');await load()}
+  if(r.error)setError(userError(r.error));else{setReopenReason('');setQueueNotice('Вопрос возвращён на рассмотрение. История решений сохранена.');await load()}
   setBusy(false);
  }
  async function setRegion(partyId:string){
   if(!adoptedR)return;setBusy(true);const r=await supabase.rpc('set_regional_agreement_allocation',{p_rule_id:adoptedR.id,p_party_id:partyId,p_regions:Math.max(0,Number(regionDraft[partyId])||0)});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
- async function executeR(){if(!adoptedR)return;setBusy(true);const r=await supabase.rpc('execute_regional_allocation',{p_rule_id:adoptedR.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function executeR(){if(!adoptedR)return;setBusy(true);const r=await supabase.rpc('execute_regional_allocation',{p_rule_id:adoptedR.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  if(stageNo===2)return <section className="electoralLab">
   <header className="electoralLabHead"><div className="electoralLabIntro"><small>КСРФ · ЭТАП 2</small><h2>Архитектура парламентских выборов</h2><p>Фракции выбирают тип избирательной системы и формулу распределения. Решение принимается отдельным фракционным голосованием простым большинством.</p><div className="electoralLabActions"><button type="button" className="electoralDiscuss" onClick={openPublicPolicyChat}><MessageCircle size={17} aria-hidden="true"/><span><b>Обсудить решение</b><small>{publicPolicyChannel?.name||'Публичная политика'}</small></span></button></div></div><div className="electoralAdopted"><small>ПРИНЯТОЕ ПРАВИЛО</small><strong>{adoptedP?sysLabel[adoptedP.system_type]:'Не принято'}</strong><span>{adoptedP?.allocation_method?allocationLabel[adoptedP.allocation_method]:adoptedP?.majoritarian_method?majLabel[adoptedP.majoritarian_method]:''}</span></div></header>

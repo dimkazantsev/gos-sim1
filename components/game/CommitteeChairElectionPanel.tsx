@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -41,7 +42,7 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
    supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id),
    supabase.from('institution_session_registrations').select('user_id,present_mandates').eq('game_id',game.id).eq('stage_no',4).eq('institution_key','gd')
   ]);
-  const failure=[u,a,e,c,b,m,p,r].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
+  const failure=[u,a,e,c,b,m,p,r].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
   if(!u.error)setUnits((u.data||[]) as Unit[]);
   if(!a.error)setAssignments((a.data||[]) as Assignment[]);
   if(!e.error)setElections((e.data||[]) as Election[]);
@@ -71,20 +72,20 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
 
  async function create(unitId:string){
   setBusy(true);const r=await supabase.rpc('create_committee_chair_election',{p_unit_id:unitId,p_vote_mode:mode[unitId]||'open'});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
  async function nominate(eid:string){
   const uid=nominee[eid];if(!uid)return;setBusy(true);const r=await supabase.rpc('nominate_office_candidate',{p_election_id:eid,p_user_id:uid});
-  if(r.error)setError(r.error.message);else{setNominee(v=>({...v,[eid]:''}));await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setNominee(v=>({...v,[eid]:''}));await load()}setBusy(false);
  }
- async function open(eid:string){setBusy(true);const r=await supabase.rpc('open_office_election',{p_election_id:eid});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function open(eid:string){setBusy(true);const r=await supabase.rpc('open_office_election',{p_election_id:eid});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
  async function cast(eid:string,cid:string){
   const amount=Math.max(0,Number(voteDraft[eid+'-'+cid])||0);setBusy(true);
   const r=await supabase.rpc('set_office_ballot',{p_election_id:eid,p_candidate_id:cid,p_votes:amount});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
- async function personalCast(eid:string,cid:string){setBusy(true);const r=await supabase.rpc('cast_personal_office_ballot',{p_election_id:eid,p_candidate_id:cid});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function close(eid:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:eid});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function personalCast(eid:string,cid:string){setBusy(true);const r=await supabase.rpc('cast_personal_office_ballot',{p_election_id:eid,p_candidate_id:cid});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function close(eid:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:eid});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  return <section className="committeeElectionBoard">
   <div className="committeeElectionHead"><div className="committeeElectionIntro"><small>Государственная Дума · Этап 4</small><h3>Выборы председателей комитетов</h3><p>Фракции выдвигают кандидатов до распределения депутатов по комитетам. Зарегистрированные депутаты голосуют действующими мандатами с учётом гоствойтинга. При трёх и более кандидатах, если никто не избран в первом туре, назначается второй тур для двух лидеров.</p></div><div className="committeeElectionThreshold" aria-label="Для избрания требуется 226 голосов из 450"><span>Необходимое большинство</span><strong>226 <small>из 450</small></strong><em>голосов для избрания</em></div></div>

@@ -25,7 +25,7 @@ const {
 assert.equal(TELEGRAM_PROJECT_URL,'https://dimkazantsev.github.io/gos-sim1/');
 assert.ok(telegramWelcomeText().includes('Добро пожаловать')&&telegramWelcomeText().includes('Начать'));
 assert.ok(telegramWelcomeText(true).includes('подключён'));
-assert.ok(telegramMenuText(false).includes('привяжите Telegram'));
+assert.ok(telegramMenuText(false).includes('привяжите Телеграм'));
 assert.ok(telegramHelpText().includes('/chat текст'));
 assert.equal(telegramCallbackCommand('gos:begin'),'/menu');
 assert.equal(telegramCallbackCommand('gos:status'),'/status');

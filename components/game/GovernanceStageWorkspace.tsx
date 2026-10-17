@@ -151,7 +151,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
 
   <section id={sectionId+'-materials'} className="stageOperationsPane" hidden={tab!=='materials'} aria-label="Документы и голосования">
    <StageArtifacts g={g} stage={stage} readOnly={viewer} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>
-   <div className="stageOperationsRelated"><h3><Link2 size={18}/>Связанные разделы</h3><div>{operation.related.map(view=><button type="button" key={view} disabled={!onNavigate} onClick={()=>onNavigate?.(view)}>{VIEW_NAMES[view]||view}</button>)}</div></div>
+   <div className="stageOperationsRelated"><h3><Link2 size={18}/>Связанные разделы</h3><div>{operation.related.map(view=><button type="button" key={view} disabled={!onNavigate} onClick={()=>onNavigate?.(view)}>{VIEW_NAMES[view]||'Раздел игры'}</button>)}</div></div>
   </section>
 
   <section id={sectionId+'-check'} className="stageOperationsPane" hidden={tab!=='check'} aria-label="Проверка завершения">

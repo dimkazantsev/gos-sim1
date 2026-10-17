@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import {Check,ImageUp,Scissors,ShieldCheck} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -45,7 +46,7 @@ export default function SignatureUpload({g,onSaved}:{g:ReturnTypeRepublic;onSave
    if(!blob)throw new Error('Не удалось создать изображение PNG');
    setFile(new File([blob],'signature.png',{type:'image/png'}));
    setNotice('Фон удалён и подпись обрезана. Проверьте предпросмотр, затем сохраните.');
-  }catch(e){setNotice(e instanceof Error?e.message:'Не удалось обработать изображение.')}finally{setBusy(false)}
+  }catch(e){setNotice((userError(e)||'Не удалось обработать изображение.'))}finally{setBusy(false)}
  }
  async function save(){
   if(!file||busy)return;

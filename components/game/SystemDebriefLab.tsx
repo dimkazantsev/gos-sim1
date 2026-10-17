@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import StageModuleHeader from '../ui/StageModuleHeader';
 import {useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
@@ -29,7 +30,7 @@ export default function SystemDebriefLab({g}:{g:ReturnTypeRepublic}){
  async function load(){
   if(!game)return;
   const r=await supabase.from('game_reflections').select('*').eq('game_id',game.id).order('updated_at',{ascending:false});
-  if(r.error){setError(r.error.message);return;}
+  if(r.error){setError(userError(r.error));return;}
   if(!r.error){
    const data=(r.data||[]) as Reflection[];setRows(data);
    const mine=data.filter(x=>x.user_id===me?.user_id);
@@ -58,11 +59,11 @@ export default function SystemDebriefLab({g}:{g:ReturnTypeRepublic}){
  async function save(key:string,submit:boolean){
   const x=d(key);setBusy(true);
   const r=await supabase.rpc('save_game_reflection',{p_game_id:activeGame.id,p_phase_key:key,p_decision_memory:x.decision,p_causal_analysis:x.causal,p_effectiveness:x.effectiveness,p_improvement:x.improvement,p_submit:submit});
-  if(r.error)setError(r.error.message);else{dirtyPhases.current.delete(key);await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{dirtyPhases.current.delete(key);await load()}setBusy(false);
  }
  async function review(id:string){
   setBusy(true);const r=await supabase.rpc('review_game_reflection',{p_reflection_id:id,p_feedback:(feedback[id]??rows.find(row=>row.id===id)?.teacher_feedback??'').trim()||null});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
 
  return <section className="debriefLab">
@@ -94,7 +95,7 @@ export default function SystemDebriefLab({g}:{g:ReturnTypeRepublic}){
 
   {teacher&&<section className="debriefTeacher">
    <div className="debriefTeacherHead"><div><small>ПАНЕЛЬ ПРЕПОДАВАТЕЛЯ</small><h3>Готовность к итоговому обсуждению</h3></div><span>{studentProgress.filter(x=>x.submitted===6).length}/{studentProgress.length} завершили всё</span></div>
-   <div className="reflectionStudentList">{studentProgress.map(({m,submitted,reviewed})=><article key={m.user_id}><header><div><b>{m.full_name}</b><span>{m.role_title||m.team||'Участник'}</span></div><strong>{submitted}/6</strong><em>{reviewed} проверено</em></header>{rows.filter(x=>x.user_id===m.user_id&&x.status!=='draft').sort((a,b)=>GAME_PHASES.findIndex(p=>p.id===a.phase_key)-GAME_PHASES.findIndex(p=>p.id===b.phase_key)).map(r=><details key={r.id}><summary><b>{GAME_PHASES.find(p=>p.id===r.phase_key)?.title||r.phase_key}</b><span>{r.status==='reviewed'?'✓ проверено':'ожидает разбора'}</span></summary><div className="reflectionReviewBody"><section><small>РЕШЕНИЯ</small><p>{r.decision_memory}</p></section><section><small>ПРИЧИННАЯ ЦЕПОЧКА</small><p>{r.causal_analysis}</p></section><section><small>ЭФФЕКТИВНОСТЬ</small><p>{r.effectiveness}</p></section><section><small>УЛУЧШЕНИЕ</small><p>{r.improvement}</p></section><textarea rows={2} value={feedback[r.id]??r.teacher_feedback??''} onChange={e=>setFeedback(v=>({...v,[r.id]:e.target.value}))} placeholder="Комментарий к рефлексии"/><button disabled={busy} onClick={()=>void review(r.id)}>Зафиксировать разбор</button></div></details>)}</article>)}</div>
+   <div className="reflectionStudentList">{studentProgress.map(({m,submitted,reviewed})=><article key={m.user_id}><header><div><b>{m.full_name}</b><span>{m.role_title||m.team||'Участник'}</span></div><strong>{submitted}/6</strong><em>{reviewed} проверено</em></header>{rows.filter(x=>x.user_id===m.user_id&&x.status!=='draft').sort((a,b)=>GAME_PHASES.findIndex(p=>p.id===a.phase_key)-GAME_PHASES.findIndex(p=>p.id===b.phase_key)).map(r=><details key={r.id}><summary><b>{GAME_PHASES.find(p=>p.id===r.phase_key)?.title||'Часть итогового разбора'}</b><span>{r.status==='reviewed'?'✓ проверено':'ожидает разбора'}</span></summary><div className="reflectionReviewBody"><section><small>РЕШЕНИЯ</small><p>{r.decision_memory}</p></section><section><small>ПРИЧИННАЯ ЦЕПОЧКА</small><p>{r.causal_analysis}</p></section><section><small>ЭФФЕКТИВНОСТЬ</small><p>{r.effectiveness}</p></section><section><small>УЛУЧШЕНИЕ</small><p>{r.improvement}</p></section><textarea rows={2} value={feedback[r.id]??r.teacher_feedback??''} onChange={e=>setFeedback(v=>({...v,[r.id]:e.target.value}))} placeholder="Комментарий к рефлексии"/><button disabled={busy} onClick={()=>void review(r.id)}>Зафиксировать разбор</button></div></details>)}</article>)}</div>
   </section>}
  </section>;
 }

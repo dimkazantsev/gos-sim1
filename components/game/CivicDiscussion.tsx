@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {Eye,MessageCircle,Send,ThumbsDown,ThumbsUp,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -32,14 +33,14 @@ export default function CivicDiscussion({kind,targetId,g,readOnly=false}:{kind:'
     if(!missingPost.current){missingPost.current=true;void refreshGame.current()}
     return;
    }
-   setError(r.error.message);
+   setError(userError(r.error));
   }else{setData(r.data as Discussion);setError('')}
  },[kind,targetId,limit]);
  useEffect(()=>{setData(null);setOpen(false);setError('');setBody('');setLimit(30);seen.current='';missingPost.current=false;const element=ref.current?.closest('.wallPost,.formalDetail')||ref.current;if(!element)return;const observer=new IntersectionObserver(entries=>setVisible(entries.some(x=>x.isIntersecting)),{threshold:0.01});observer.observe(element);return()=>observer.disconnect()},[kind,targetId]);
  useEffect(()=>{if(!visible)return;let current=true;void(async()=>{if(!readOnly&&seen.current!==targetId){const r=await supabase.rpc('record_civic_view',{p_kind:kind,p_target:targetId});if(!r.error)seen.current=targetId}if(current)await load()})();const interval=setInterval(()=>void load(),open?15000:60000);return()=>{current=false;clearInterval(interval)}},[visible,load,open,readOnly,targetId,kind]);
- async function react(value:number){if(busy||!data)return;setBusy(true);const r=await supabase.rpc('react_to_civic_content',{p_kind:kind,p_target:targetId,p_value:data.mine===value?0:value});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function comment(){if(!body.trim()||busy)return;setBusy(true);const r=await supabase.rpc('comment_on_civic_content',{p_kind:kind,p_target:targetId,p_body:body});if(r.error)setError(r.error.message);else{setBody('');await load()}setBusy(false)}
- async function remove(id:string){setBusy(true);const r=await supabase.rpc('delete_civic_comment',{p_comment_id:id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function react(value:number){if(busy||!data)return;setBusy(true);const r=await supabase.rpc('react_to_civic_content',{p_kind:kind,p_target:targetId,p_value:data.mine===value?0:value});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function comment(){if(!body.trim()||busy)return;setBusy(true);const r=await supabase.rpc('comment_on_civic_content',{p_kind:kind,p_target:targetId,p_body:body});if(r.error)setError(userError(r.error));else{setBody('');await load()}setBusy(false)}
+ async function remove(id:string){setBusy(true);const r=await supabase.rpc('delete_civic_comment',{p_comment_id:id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
  return <div ref={ref} className="civicDiscussion">
   <div className="civicDiscussionStats"><button type="button" aria-label="Нравится" aria-pressed={data?.mine===1} disabled={readOnly||busy||!data} onClick={()=>void react(1)}><ThumbsUp size={18}/><span>{data?.likes??'—'}</span></button><button type="button" aria-label="Не нравится" aria-pressed={data?.mine===-1} disabled={readOnly||busy||!data} onClick={()=>void react(-1)}><ThumbsDown size={18}/><span>{data?.dislikes??'—'}</span></button><button type="button" aria-expanded={open} onClick={()=>setOpen(v=>!v)}><MessageCircle size={18}/>Комментарии <span>{data?.comment_count??'—'}</span></button><span className="civicViewCount" title="Уникальные просмотры участников"><Eye size={18}/>{data?.views??'—'}</span></div>
   {error&&<p className="error" role="alert">{error} <button type="button" onClick={()=>void load()}>Повторить</button></p>}

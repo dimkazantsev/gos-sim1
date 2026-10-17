@@ -62,7 +62,7 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
      game_id:game.id,user_id:actor.id,email:actor.email.toLowerCase(),
      verified_at:actor.email_confirmed_at
     },{onConflict:'game_id,user_id'});
-    if(saved.error)setNotice('Почта подтверждена, но профиль не обновился: '+saved.error.message);
+    if(saved.error)setNotice('Почта подтверждена, но профиль не обновился: '+userError(saved.error));
     else onChanged?.();
    }
   }else setVerified(false);
@@ -111,7 +111,7 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   }else{
    setVerified(true);setEmail(actor.email);
    const r=await supabase.from('member_login_emails').upsert({game_id:game.id,user_id:actor.id,email:actor.email.toLowerCase(),verified_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
-   setNotice(r.error?'Почта подтверждена, но запись профиля не обновлена: '+r.error.message:'Почта подтверждена. Теперь установите личный пароль и нажмите «Сохранить пароль».');
+   setNotice(r.error?'Почта подтверждена, но запись профиля не обновлена: '+userError(r.error):'Почта подтверждена. Теперь установите личный пароль и нажмите «Сохранить пароль».');
    if(!r.error)setMailRequested(false);
    await load();onChanged?.();
   }
@@ -121,7 +121,7 @@ export default function ProfileSecurityPanel({g,missing=[],onChanged}:{g:ReturnT
   if(!verified||password.length<10||password!==confirm||busy){setNotice('Пароль должен содержать не менее 10 символов и совпадать с подтверждением.');return}
   setBusy(true);setNotice('');
   const r=await supabase.auth.updateUser({password});
-  if(r.error)setNotice('Не удалось установить пароль: '+r.error.message);
+  if(r.error)setNotice('Не удалось установить пароль: '+userError(r.error));
   else{setPassword('');setConfirm('');await load();onChanged?.();setNotice('Личный пароль сохранён. Используйте почту и пароль при следующем входе.')}
   setBusy(false);
  }

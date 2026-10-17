@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {RefreshCw,ExternalLink} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -28,7 +29,7 @@ export default function PartyUnregisteredFiles({gameId,partyId,registered}:{game
     return result.error?null:{name:item.name,path,url:result.data?.signedUrl||''};
    }));
    if(request===latestRequest.current)setFiles(signed.filter((file):file is Unregistered=>!!file));
-  }catch(e){if(request===latestRequest.current)setError(e instanceof Error?e.message:'Не удалось прочитать хранилище файлов.')}
+  }catch(e){if(request===latestRequest.current)setError((userError(e)||'Не удалось прочитать хранилище файлов.'))}
   finally{if(request===latestRequest.current){setBusy(false);setLoaded(true)}}
  },[gameId,partyId,registeredPaths]);
  useEffect(()=>{void refresh();return ()=>{latestRequest.current++}},[refresh]);

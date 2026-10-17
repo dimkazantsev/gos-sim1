@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 
 import {useRef,useState} from 'react';
 import {useGameTableSync} from './useGameTableSync';
@@ -154,7 +155,7 @@ export default function GovernmentFormationWorkspace({
    supabase.from('government_structures').select('*').eq('game_id',game.id).maybeSingle(),
    supabase.from('institution_session_registrations').select('user_id').eq('game_id',game.id).eq('stage_no',stageNo).eq('institution_key','gd')
   ]);
-  const failure=[n,s,r].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
+  const failure=[n,s,r].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
   if(!n.error){
    const next=((n.data||[]) as Nomination[]).filter(x=>x.status!=='withdrawn');
    setRows(next);
@@ -217,7 +218,7 @@ export default function GovernmentFormationWorkspace({
    p_game_id:activeGame.id,p_office_key:officeKey,p_office_title:officeTitle,
    p_office_kind:officeKind,p_candidate_user_id:selected[slot]||null,p_candidate_name:name
   });
-  if(r.error)setError(r.error.message);
+  if(r.error)setError(userError(r.error));
   else{
    setSelected(v=>({...v,[slot]:''}));
    setManual(v=>({...v,[slot]:''}));
@@ -229,7 +230,7 @@ export default function GovernmentFormationWorkspace({
  async function openVote(id:string){
   setBusy('vote:'+id);
   const r=await supabase.rpc('open_government_nomination_vote',{p_nomination_id:id});
-  if(r.error)setError(r.error.message);
+  if(r.error)setError(userError(r.error));
   else{
    await g.refresh();await load();onOpenVotes(String(r.data));
   }
@@ -240,7 +241,7 @@ export default function GovernmentFormationWorkspace({
   if(!window.confirm('Снять кандидатуру «'+name+'» с повестки? Связанное голосование будет отменено, а проект НПА помечен как снятый.'))return;
   setBusy('withdraw:'+id);
   const r=await supabase.rpc('withdraw_government_nomination',{p_nomination_id:id});
-  if(r.error)setError(r.error.message);
+  if(r.error)setError(userError(r.error));
   else{await g.refresh();await load()}
   setBusy(null);
  }
@@ -248,21 +249,21 @@ export default function GovernmentFormationWorkspace({
  async function appoint(id:string){
   setBusy('appoint:'+id);
   const r=await supabase.rpc('appoint_government_nominee',{p_nomination_id:id});
-  if(r.error)setError(r.error.message);else{await g.refresh();await load()}
+  if(r.error)setError(userError(r.error));else{await g.refresh();await load()}
   setBusy(null);
  }
 
  async function appointAfterThree(id:string){
   setBusy('force-appoint:'+id);
   const r=await supabase.rpc('appoint_government_nominee_after_three_rejections',{p_nomination_id:id});
-  if(r.error)setError(r.error.message);else{await g.refresh();await load()}
+  if(r.error)setError(userError(r.error));else{await g.refresh();await load()}
   setBusy(null);
  }
 
  async function consult(id:string){
   setBusy('consult:'+id);
   const r=await supabase.rpc('record_sf_consultation',{p_nomination_id:id,p_note:(consultNotes[id]||'').trim()||null});
-  if(r.error)setError(r.error.message);else await load();
+  if(r.error)setError(userError(r.error));else await load();
   setBusy(null);
  }
 
@@ -273,7 +274,7 @@ export default function GovernmentFormationWorkspace({
    p_social_title:titles.social,p_economic_title:titles.economic,p_defence_title:titles.defence,
    p_foreign_title:titles.foreign,p_internal_title:titles.internal,p_submit:submit
   });
-  if(r.error)setError(r.error.message);else{structureDirty.current=false;await load()}
+  if(r.error)setError(userError(r.error));else{structureDirty.current=false;await load()}
   setBusy(null);
  }
 
@@ -282,7 +283,7 @@ export default function GovernmentFormationWorkspace({
   const r=await supabase.rpc('review_government_structure',{
    p_game_id:activeGame.id,p_action:action,p_note:structureNote.trim()||null
   });
-  if(r.error)setError(r.error.message);else{setStructureNote('');await load()}
+  if(r.error)setError(userError(r.error));else{setStructureNote('');await load()}
   setBusy(null);
  }
 

@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import PresidentialRulesCalculator from './PresidentialRulesCalculator';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useGameTableSync} from './useGameTableSync';
@@ -154,7 +155,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    await load();
   }catch(e){
    if(uploaded.length)await supabase.storage.from('game-assets').remove(uploaded);
-   setError(e instanceof Error?e.message:String(e));
+   setError(userError(e)||'Не удалось выполнить действие.');
   }finally{setBusy(false)}
  }
  async function reviewMaterial(id:string,approve:boolean){
@@ -170,21 +171,21 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    p_penalty_points:penalty,
    p_penalty_reason:(reviewPenaltyReasons[id]||'').trim()||null
   });
-  if(r.error)setError(r.error.message);
+  if(r.error)setError(userError(r.error));
   else{
    setNotice(approve?'ЦИК одобрил материал и опубликовал его в политическом процессе.':'ЦИК отклонил материал.');
    await load();
   }
   setBusy(false);
  }
- async function openPollDecision(){setBusy(true);const r=await supabase.rpc('open_presidential_poll_decision',{p_game_id:gameId});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function votePollDecision(choice:boolean){setBusy(true);const r=await supabase.rpc('vote_presidential_poll_decision',{p_game_id:gameId,p_choice:choice});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function closePollDecision(){setBusy(true);const r=await supabase.rpc('close_presidential_poll_decision',{p_game_id:gameId});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function openPollDecision(){setBusy(true);const r=await supabase.rpc('open_presidential_poll_decision',{p_game_id:gameId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function votePollDecision(choice:boolean){setBusy(true);const r=await supabase.rpc('vote_presidential_poll_decision',{p_game_id:gameId,p_choice:choice});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function closePollDecision(){setBusy(true);const r=await supabase.rpc('close_presidential_poll_decision',{p_game_id:gameId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
  async function createPublicPoll(){
   setBusy(true);const r=await supabase.rpc('create_presidential_public_poll',{p_game_id:gameId,p_round_no:activeRound,p_closes_at:pollClose?new Date(pollClose).toISOString():null});
-  if(r.error)setError(r.error.message);else{setNotice('Публичный опрос открыт. Ссылку можно распространять во внешних сетях.');await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setNotice('Публичный опрос открыт. Ссылку можно распространять во внешних сетях.');await load()}setBusy(false);
  }
- async function closePublicPoll(){if(!publicPoll)return;setBusy(true);const r=await supabase.rpc('close_presidential_public_poll',{p_game_id:gameId,p_round_no:publicPoll.round_no});if(r.error)setError(r.error.message);else{setNotice('Опрос закрыт; его проценты перенесены в калькулятор выборов.');await load()}setBusy(false)}
+ async function closePublicPoll(){if(!publicPoll)return;setBusy(true);const r=await supabase.rpc('close_presidential_public_poll',{p_game_id:gameId,p_round_no:publicPoll.round_no});if(r.error)setError(userError(r.error));else{setNotice('Опрос закрыт; его проценты перенесены в калькулятор выборов.');await load()}setBusy(false)}
  async function copyPoll(){if(!pollUrl)return;await navigator.clipboard.writeText(pollUrl);setNotice('Ссылка на опрос скопирована.')}
  function share(service:'vk'|'tg'){if(!pollUrl)return;const u=encodeURIComponent(pollUrl),t=encodeURIComponent('Социологический опрос: выборы Президента РФ');window.open(service==='vk'?'https://vk.com/share.php?url='+u+'&title='+t:'https://t.me/share/url?url='+u+'&text='+t,'_blank','noopener,noreferrer')}
 
@@ -196,7 +197,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    const r=await supabase.rpc('save_presidential_inauguration',{p_game_id:gameId,p_scheduled_at:ceremonyAt?new Date(ceremonyAt).toISOString():null,p_venue:venue.trim()||null,p_notes:ceremonyNotes.trim()||null,p_hymn_path:hymn,p_ceremonial_music_path:music});
    if(!activeScope())return;
    if(r.error)throw r.error;ceremonyDirty.current=false;setHymnFile(null);setMusicFile(null);setNotice('Параметры инаугурации сохранены.');await load();
-  }catch(e){if(activeScope())setError(e instanceof Error?e.message:String(e))}finally{if(activeScope())setBusy(false)}
+  }catch(e){if(activeScope())setError(userError(e)||'Не удалось выполнить действие.')}finally{if(activeScope())setBusy(false)}
  }
 
  return <section className="stage7Election">
@@ -216,7 +217,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    </section>
    <section className="stage7Panel"><div className="stage7PanelHead"><div><small>РЕЕСТР</small><h3>Материалы кампании</h3><p>{teacher?'Панель ЦИК: зафиксируйте ошибки и официальный ответ, при необходимости назначьте штраф. Одобрение публикует материал автоматически.':'Следите за статусом отправленных материалов.'}</p></div><Landmark size={24}/></div>
      <div className="campaignQueue">{materials.filter(m=>teacher||mine.some(c=>c.id===m.candidate_id)).map(m=>{const c=registered.find(x=>x.id===m.candidate_id);return <article key={m.id} className={'campaignCard '+m.status}>
-      <div className="campaignCardTop"><div className="candidateMini">{photoUrls[m.candidate_id]?<img src={photoUrls[m.candidate_id]} alt=""/>:<span>{(c?.display_name||'?').slice(0,1)}</span>}<div><small>{MATERIAL_LABELS[m.material_type]||m.material_type}</small><b>{c?.display_name||'Кандидат'}</b></div></div><em>{m.status==='pending'?'На проверке ЦИК':m.status==='approved'?'Одобрено ЦИК':'Отклонено ЦИК'}</em></div>
+      <div className="campaignCardTop"><div className="candidateMini">{photoUrls[m.candidate_id]?<img src={photoUrls[m.candidate_id]} alt=""/>:<span>{(c?.display_name||'?').slice(0,1)}</span>}<div><small>{MATERIAL_LABELS[m.material_type]||'Агитационный материал'}</small><b>{c?.display_name||'Кандидат'}</b></div></div><em>{m.status==='pending'?'На проверке ЦИК':m.status==='approved'?'Одобрено ЦИК':'Отклонено ЦИК'}</em></div>
       <h4>{m.title}</h4><p>{m.body}</p>
       {(m.print_run>0||m.imprint_text)&&<div className="campaignImprint">{m.print_run>0&&<span>Тираж: <b>{m.print_run.toLocaleString('ru-RU')}</b></span>}{m.imprint_text&&<span>{m.imprint_text}</span>}</div>}
       {(m.cec_errors||m.cec_response||m.review_note||Number(m.penalty_points)>0)&&<div className="cecDecisionSummary">

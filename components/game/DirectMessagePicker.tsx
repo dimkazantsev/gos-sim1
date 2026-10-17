@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useState} from 'react';
 import {MessageSquare,Search} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -8,7 +9,7 @@ export default function DirectMessagePicker({g}:{g:ReturnTypeRepublic}){
  async function start(user:string){
   if(!g.game||busy)return;setBusy(true);setError('');
   const result=await supabase.rpc('open_direct_conversation',{p_game:g.game.id,p_recipient:user});
-  if(result.error)setError(result.error.message);
+  if(result.error)setError(userError(result.error));
   else{await g.refresh();g.setChannelId(result.data as string);setOpen(false)}
   setBusy(false);
  }

@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useState} from 'react';
 import {metricQuantity} from '@/lib/formatQuantity';
 import {Activity,CheckCircle2,Newspaper,SlidersHorizontal} from 'lucide-react';
@@ -28,7 +29,7 @@ export default function TeacherMetricStudio({g,postId}:{g:ReturnTypeRepublic;pos
     p_publish:broadcast,p_title:title.trim()||null});
    if(r.error)throw r.error;
    await g.refresh();setNotice(postId?'Изменение сохранено и связано с этой публикацией.':'Значение обновлено в базе и журнале.'+(broadcast?' Публикация появилась в Политическом процессе.':''));setValue('');setReason('');setTitle('');
-  }catch(e){setNotice(e instanceof Error?e.message:'Не удалось изменить показатель.')}
+  }catch(e){setNotice((userError(e)||'Не удалось изменить показатель.'))}
   finally{setBusy(false)}
  }
  if(!teacher||!game)return null;

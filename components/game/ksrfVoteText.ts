@@ -19,6 +19,7 @@ const regions:Record<string,string>={
 export function uppercaseFirst(value:string):string{
  return value.replace(/^\s*([а-яёa-z])/i,(_,initial:string)=>initial.toLocaleUpperCase('ru-RU'));
 }
+const ruleCaption=(labels:Record<string,string>,key:string)=>Object.hasOwn(labels,key)?labels[key]:/[А-Яа-яЁё]/.test(key)?uppercaseFirst(key):'Параметр не определён';
 const period=(value:string)=>/[.!?…]$/.test(value)?value:value+'.';
 
 /** Also renders previously created votes containing enum codes in their body. */
@@ -34,17 +35,17 @@ export function formatKsrfVoteBody(procedureKey:string|undefined|null,body:strin
   const [,label,rawValue]=pair;
   const key=rawValue.trim();
   switch(label.trim().toLocaleLowerCase('ru-RU')){
-   case 'система':return 'Система: '+(systems[key]||uppercaseFirst(key));
+   case 'система':return 'Система: '+(ruleCaption(systems,key));
    case 'формула':
    case 'метод распределения':
    case 'метод распределения мандатов':
-    return 'Метод распределения мандатов: '+(allocations[key]||uppercaseFirst(key));
+    return 'Метод распределения мандатов: '+(ruleCaption(allocations,key));
    case 'мажоритарное правило':
-    return 'Правило определения победителя: '+(majorities[key]||uppercaseFirst(key));
+    return 'Правило определения победителя: '+(ruleCaption(majorities,key));
    case 'пропорциональная часть':
     return 'Доля пропорционального распределения: '+key;
    case 'метод распределения 89 субъектов':
-    return 'Способ распределения субъектов Российской Федерации: '+(regions[key]||uppercaseFirst(key));
+    return 'Способ распределения субъектов Российской Федерации: '+(ruleCaption(regions,key));
    default:return uppercaseFirst(fragment);
   }
  }).filter(Boolean);

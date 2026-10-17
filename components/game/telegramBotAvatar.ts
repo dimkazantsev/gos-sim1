@@ -18,7 +18,7 @@ export async function prepareTelegramBotAvatar():Promise<string>{
   const logo=new Image();
   await new Promise<void>((resolve,reject)=>{
    logo.onload=()=>resolve();
-   logo.onerror=()=>reject(new Error('Не удалось подготовить эмблему ID.'));
+   logo.onerror=()=>reject(new Error('Не удалось подготовить эмблему ГОС.ID.'));
    logo.src=objectUrl;
   });
   const canvas=document.createElement('canvas');
@@ -29,9 +29,9 @@ export async function prepareTelegramBotAvatar():Promise<string>{
   ctx.fillRect(0,0,1024,1024);
   ctx.drawImage(logo,0,0,1024,1024);
   const data=canvas.toDataURL('image/jpeg',0.93);
-  if(!data.startsWith('data:image/jpeg;base64,'))throw new Error('Не удалось создать JPEG-эмблему.');
+  if(!data.startsWith('data:image/jpeg;base64,'))throw new Error('Не удалось создать эмблему в формате JPEG.');
   const base64=data.slice('data:image/jpeg;base64,'.length);
-  if(base64.length<1000||base64.length>300000)throw new Error('Неподходящий размер эмблемы Telegram.');
+  if(base64.length<1000||base64.length>300000)throw new Error('Неподходящий размер эмблемы Телеграма.');
   return base64;
  }finally{URL.revokeObjectURL(objectUrl)}
 }

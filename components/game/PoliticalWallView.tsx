@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {BookOpenText,ChevronDown,FilePlus2,Link2,Newspaper,Pencil,Plus,SlidersHorizontal,Trash2,Vote,X} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -123,8 +124,8 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
    for(let index=0;index<ids.length;index+=3){
     const batch=ids.slice(index,index+3);
     const results=await Promise.all(batch.map(async id=>{
-     try{const {error}=await supabase.rpc('delete_process_post',{p_post_id:id});return {id,error:error?.message||''}}
-     catch(error){return {id,error:error instanceof Error?error.message:'Ошибка подключения'}}
+     try{const {error}=await supabase.rpc('delete_process_post',{p_post_id:id});return {id,error:userError(error)||''}}
+     catch(error){return {id,error:error instanceof Error?userError(error):'Ошибка подключения'}}
     }));
     for(const result of results){if(result.error)failed.push(result.id);else succeeded++}
     setBulkProgress(Math.min(index+batch.length,ids.length));
@@ -137,7 +138,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
    if(failed.length)setNotice('Не удалось удалить '+failed.length+' публикаций. Неудалённые записи снова показаны и оставлены выделенными.');
   }catch(error){
    setLocallyRemovedIds(previous=>{const next=new Set(previous);ids.forEach(id=>{if(failed.includes(id))next.delete(id)});return next});
-   setNotice('Не удалось обновить ленту. Для проверки результата обновите раздел: '+(error instanceof Error?error.message:'неизвестная ошибка'));
+   setNotice('Не удалось обновить ленту. Для проверки результата обновите раздел: '+(error instanceof Error?userError(error):'неизвестная ошибка'));
   }finally{setBulkProgress(0);setBusy(false)}
  }
 
@@ -190,9 +191,9 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  }
  async function submitNews(){
   if(!actor||busy||!game||!me)return;setBusy(true);setNotice('');
-  const uploadedPaths:string[]=[];let submitted=false;try{const attachments=[];for(const file of files){if(file.size>104857600){setNotice('Размер вложения превышает 100 МБ');return}const path=game.id+'/news/'+me.user_id+'/'+crypto.randomUUID()+'.'+(file.name.split('.').pop()||'bin');const r=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'application/octet-stream'});if(r.error){setNotice(r.error.message);return}uploadedPaths.push(path);attachments.push({storage_path:path,file_name:file.name,mime_type:file.type||null,file_size:file.size,media_kind:file.type.startsWith('image/')?'image':file.type.startsWith('audio/')?'audio':file.type.startsWith('video/')?'video':'file'})}
-   const r=await supabase.rpc('submit_media_news',{p_game_id:game.id,p_title:title,p_body:body,p_actor_key:actor.key,p_tags:Array.from(new Set([...selectedTags,...Array.from(body.matchAll(/#([а-яёa-z0-9_]+)/gi),m=>m[1])])),p_external_url:externalUrl.trim()||null,p_internal_view:internalView||null,p_formal_ids:formalIds,p_files:attachments});if(r.error){setNotice(r.error.message);return}submitted=true;setNotice('Новость направлена преподавателю на согласование.');setProposalRefresh(n=>n+1);clearDraft();composer.current?.removeAttribute('open');
-  }catch(e){setNotice(e instanceof Error?e.message:'Не удалось направить новость')}finally{if(!submitted&&uploadedPaths.length)await supabase.storage.from('game-assets').remove(uploadedPaths);setBusy(false)}
+  const uploadedPaths:string[]=[];let submitted=false;try{const attachments=[];for(const file of files){if(file.size>104857600){setNotice('Размер вложения превышает 100 МБ');return}const path=game.id+'/news/'+me.user_id+'/'+crypto.randomUUID()+'.'+(file.name.split('.').pop()||'bin');const r=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'application/octet-stream'});if(r.error){setNotice(userError(r.error));return}uploadedPaths.push(path);attachments.push({storage_path:path,file_name:file.name,mime_type:file.type||null,file_size:file.size,media_kind:file.type.startsWith('image/')?'image':file.type.startsWith('audio/')?'audio':file.type.startsWith('video/')?'video':'file'})}
+   const r=await supabase.rpc('submit_media_news',{p_game_id:game.id,p_title:title,p_body:body,p_actor_key:actor.key,p_tags:Array.from(new Set([...selectedTags,...Array.from(body.matchAll(/#([а-яёa-z0-9_]+)/gi),m=>m[1])])),p_external_url:externalUrl.trim()||null,p_internal_view:internalView||null,p_formal_ids:formalIds,p_files:attachments});if(r.error){setNotice(userError(r.error));return}submitted=true;setNotice('Новость направлена преподавателю на согласование.');setProposalRefresh(n=>n+1);clearDraft();composer.current?.removeAttribute('open');
+  }catch(e){setNotice((userError(e)||'Не удалось направить новость'))}finally{if(!submitted&&uploadedPaths.length)await supabase.storage.from('game-assets').remove(uploadedPaths);setBusy(false)}
  }
  async function deletePost(p:PoliticalPost){
   if(busy||!confirm('Удалить публикацию «'+p.title+'» из ленты? Зафиксированные изменения показателей сохранятся в истории.'))return;
@@ -205,7 +206,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
    await g.refresh();
   }catch(error){
    setLocallyRemovedIds(previous=>{const next=new Set(previous);next.delete(p.id);return next});
-   setNotice(error instanceof Error?error.message:'Не удалось удалить публикацию.');
+   setNotice(error instanceof Error?userError(error):'Не удалось удалить публикацию.');
   }finally{setBusy(false)}
  }
  async function startVote(postId:string){
@@ -288,7 +289,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     const publisherLabel=stageLifecycleNotice?BRAND_NAME:p.actor_key==='teacher'?BRAND_NAME:p.actor_label;
     const editorialPost=editorialFallback?{...p,...editorialFallback}:p;
     const newsPresentation=!stageLifecycleNotice&&(auto||p.actor_key==='media'||p.process_type==='news');
-    const displayPost=newsPresentation?{...editorialPost,title:localizeAutomaticNewsText(editorialPost.title),body:localizeAutomaticNewsText(editorialPost.body)}:editorialPost;
+    const displayPost=newsPresentation||stageLifecycleNotice?{...editorialPost,title:localizeAutomaticNewsText(editorialPost.title),body:localizeAutomaticNewsText(editorialPost.body)}:editorialPost;
     const label=publisherLabel,kind=stageLifecycleNotice?'Системное сообщение ГОС.ID':p.process_type==='decision'?'Инициатива':PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
     const own=p.author_id===me.user_id,editable=!readOnly&&(teacher||own&&!auto);
     const canRequestVote=!readOnly&&(teacher||own&&!auto);
@@ -306,7 +307,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
      {p.context?.source_table==='game_stages'&&!stageLifecycleNotice&&(p.context?.news_kind==='stage_result'||p.source_key?.includes(':completed:'))&&votes.filter(v=>v.game_id===p.game_id&&v.stage_no===Number(p.context?.stage_no)&&v.status==='closed').slice(0,5).map(v=><button type="button" className="processLinkedVote closed" key={v.id} onClick={()=>onOpenVotes(v.id)}><Vote size={19}/><span>{v.title}</span></button>)}
      {links.length>0&&<div className="wallNpaLinks">{links.map(d=><button key={d.id} onClick={()=>onOpenDocument(d.id)}><BookOpenText size={19}/><span><small>{d.registry_no}</small><b>{formalDocumentTitle(d.title,d.doc_type)}</b></span><span className="processDocumentStatus">{d.status_label}</span></button>)}</div>}
      <PostChanges g={g} post={p}/>
-     {!!p.tags?.length&&<div className="wallTags">{p.tags.map(t=><button key={t} onClick={()=>setSearch('#'+t)}>#{auto?localizeAutomaticNewsTag(t):t}</button>)}</div>}
+     {!!p.tags?.length&&<div className="wallTags">{p.tags.map(t=><button key={t} onClick={()=>setSearch('#'+t)}>#{localizeAutomaticNewsTag(t)}</button>)}</div>}
      {(p.external_url||p.internal_view)&&<div className="wallLinks">{p.external_url&&<a href={p.external_url} target="_blank" rel="noreferrer"><Link2 size={16}/>Внешний ресурс</a>}{p.internal_view&&RESOURCE_VIEWS.some(v=>v.value===p.internal_view)&&<button onClick={()=>p.internal_view==='documents'&&p.internal_ref_id?onOpenDocument(p.internal_ref_id):onNavigate(p.internal_view as View)}><Link2 size={16}/>{RESOURCE_VIEWS.find(v=>v.value===p.internal_view)?.label}</button>}</div>}
      {vote&&<button className={'processLinkedVote '+vote.status} onClick={()=>onOpenVotes(vote.id)}><span className="processLinkedVoteIcon" aria-hidden="true"><Vote size={21}/></span><span className="processLinkedVoteCopy"><small className="processLinkedVoteStatus">{vote.status==='open'?'Идёт голосование':'Голосование завершено'}</small><b className="processLinkedVoteTitle">{vote.title}</b></span><strong className="processLinkedVoteResult">{vote.status==='closed'?vote.result_label:'Открыть'}</strong></button>}
      {!readOnly&&<div className="wallPostActions">

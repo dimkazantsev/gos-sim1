@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {FormEvent,useEffect,useState} from 'react';
 import Link from 'next/link';
 import {CheckCircle2,KeyRound} from 'lucide-react';
@@ -19,7 +20,7 @@ export default function UpdatePassword(){
   if(newPassword.length<10||newPassword!==repeat){setMessage('Минимум 10 символов. Повторите новый пароль без ошибок.');return}
   setBusy(true);
   const r=await supabase.auth.updateUser({password:newPassword});
-  if(r.error)setMessage(r.error.message);
+  if(r.error)setMessage(userError(r.error));
   else{setDone(true);setNewPassword('');setRepeat('');setMessage('Личный пароль изменён. Теперь можно войти в игру с подтверждённой почтой.')}
   setBusy(false);
  }

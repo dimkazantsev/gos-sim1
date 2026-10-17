@@ -35,7 +35,7 @@ export async function GET(request:Request){
  if(!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(gameId))
   return NextResponse.json({error:'Неверный идентификатор игры.'},{status:400,headers:{...cors(request),...noStore}});
  let config:ReturnType<typeof runtimeConfig>;
- try{config=runtimeConfig()}catch{return NextResponse.json({error:'Telegram не настроен на сервере.'},{status:503,headers:{...cors(request),...noStore}})}
+ try{config=runtimeConfig()}catch{return NextResponse.json({error:'Телеграм не настроен на сервере.'},{status:503,headers:{...cors(request),...noStore}})}
  const auth=request.headers.get('authorization')||'';
  if(!auth.startsWith('Bearer '))return NextResponse.json({error:'Необходимо войти.'},{status:401,headers:{...cors(request),...noStore}});
  const {data:{user},error}=await config.db.auth.getUser(auth.slice(7));
@@ -48,7 +48,7 @@ export async function GET(request:Request){
   const result=await verifyTelegramBot(config.token);
   return NextResponse.json({ok:true,...result},{headers:{...cors(request),...noStore}});
  }catch{
-  return NextResponse.json({error:'Не удалось получить подтверждение Telegram API.'},{status:502,headers:{...cors(request),...noStore}});
+  return NextResponse.json({error:'Не удалось получить подтверждение сервиса Телеграм.'},{status:502,headers:{...cors(request),...noStore}});
  }
 }
 

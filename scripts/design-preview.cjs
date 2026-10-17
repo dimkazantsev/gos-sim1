@@ -12,7 +12,7 @@ for(const ext of ['.png','.jpg','.jpeg','.webp','.svg'])require.extensions[ext]=
 for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,file);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const h=React.createElement,noop=()=>{};
-const labels=['Учреждение политических партий','Архитектура выборов в Государственную Думу','Распределение субъектов Федерации','Парламентские выборы и руководство ГД','Режим Ghost voting','Выдвижение кандидатов в Президенты','Президентские выборы','Формирование Правительства','Комитеты и министерства','Государственные программы','Заседание Правительства','Законодательный процесс','Федеральный бюджет','Муниципальное управление','Кризисное управление','Итоговый разбор'];
+const labels=['Учреждение политических партий','Архитектура выборов в Государственную Думу','Распределение субъектов Федерации','Парламентские выборы и руководство ГД','Режим Goust Voting','Выдвижение кандидатов в Президенты','Президентские выборы','Формирование Правительства','Комитеты и министерства','Государственные программы','Заседание Правительства','Законодательный процесс','Федеральный бюджет','Муниципальное управление','Кризисное управление','Итоговый разбор'];
 const {STAGE_ACTIONS}=require('../components/game/stageActions');
 const now='2026-09-27T12:00:00.000Z';
 const fixture={};

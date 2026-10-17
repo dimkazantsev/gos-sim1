@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useState} from 'react';
 import {Activity,BookOpenText,CalendarClock,Check,ChevronDown,PauseCircle,PlayCircle,RefreshCw,Send,Settings2,ShieldCheck,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -51,7 +52,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
    supabase.from('budget_transfer_requests').select('event_case_id').eq('game_id',game.id).not('event_case_id','is',null)
   ]);
   const errors=[b,c0,d,decision,invites,discussion,authority,budget].filter(x=>x.error);
-  if(errors.length){setNotice('Ошибка загрузки банка: '+errors[0].error?.message);setBankLoaded(true);setLoadingBank(false);return}
+  if(errors.length){setNotice('Ошибка загрузки банка: '+userError(errors[0].error));setBankLoaded(true);setLoadingBank(false);return}
   const protectedSet=new Set([
    ...(c0.data||[]).map(x=>x.case_id),...(d.data||[]).map(x=>x.case_id),
    ...(decision.data||[]).map(x=>x.case_id),...(invites.data||[]).map(x=>x.case_id),
@@ -77,7 +78,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
   // Check the server-side RPC atomically: a case that acquired assignments
   // between selection and deletion must not be removed.
   const result=await supabase.rpc('delete_unused_event_cases',{p_game_id:game.id,p_case_ids:ids});
-  setNotice(result.error?'Ошибка: '+result.error.message:'Удалено ситуаций: '+String(result.data??0));
+  setNotice(result.error?'Ошибка: '+userError(result.error):'Удалено ситуаций: '+String(result.data??0));
   if(!result.error){await loadBank();await onChanged();}
   setBusy(false);
  }
@@ -89,7 +90,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
    p_activity_weight:next.activity_weight,p_max_daily:next.max_daily,
    p_trust_per_20:next.trust_per_20,p_backlog_penalty:next.backlog_penalty
   });
-  if(r.error){setNotice('Ошибка: '+r.error.message)}else{
+  if(r.error){setNotice('Ошибка: '+userError(r.error))}else{
    setSettings(next);setNotice(next.enabled?'Автоматическая отправка активирована.':'Настройки сохранены. Автоматическая отправка остановлена.');
    if(openBank)await loadBank();await onChanged();
   }
@@ -99,14 +100,14 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
   if(!game||busy)return;
   setBusy(true);setNotice('');
   const r=await supabase.rpc('seed_game_event_bank',{p_game_id:game.id});
-  setNotice(r.error?'Ошибка: '+r.error.message:'Банк проверен. Новых ситуаций: '+(r.data??0));
+  setNotice(r.error?'Ошибка: '+userError(r.error):'Банк проверен. Новых ситуаций: '+(r.data??0));
   if(openBank)await loadBank();await onChanged();setBusy(false);
  }
  async function run(){
   if(!game||busy)return;
   setBusy(true);setNotice('');
   const r=await supabase.rpc('run_game_event_autopilot',{p_game_id:game.id});
-  if(r.error)setNotice('Ошибка: '+r.error.message);
+  if(r.error)setNotice('Ошибка: '+userError(r.error));
   else setNotice('Назначено новых ситуаций: '+(r.data?.sent??0)+'. '+(r.data?.reason==='paused'?'Автоматическая отправка приостановлена.':r.data?.reason==='already_checked'?'Повторная проверка доступна через час.':''));
   if(openBank)await loadBank();await onChanged();setBusy(false);
  }
@@ -115,7 +116,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
   if(!game||!chosen||busy||!teacher||ids.some(id=>!eligible.some(m=>m.user_id===id))||(selected?.audience==='group'?ids.length<2||ids.length>3:!recipient))return;
   setBusy(true);setNotice('');
   const r=await supabase.rpc('assign_event_case',{p_case_id:chosen,p_recipients:ids});
-  setNotice(r.error?'Ошибка: '+r.error.message:'Назначено новых заданий: '+r.data+'.');
+  setNotice(r.error?'Ошибка: '+userError(r.error):'Назначено новых заданий: '+r.data+'.');
   if(openBank)await loadBank();await onChanged();setBusy(false);
  }
  async function assignAll(){
@@ -125,7 +126,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
   if(!window.confirm('Назначить ситуацию «'+selected.title+'» всем '+pending.length+' участникам?'))return;
   setBusy(true);setNotice('');
   const r=await supabase.rpc('assign_event_case',{p_case_id:chosen,p_recipients:students.map(m=>m.user_id)});
-  setNotice(r.error?'Ошибка: '+r.error.message:'Назначено новых заданий: '+r.data+'.');
+  setNotice(r.error?'Ошибка: '+userError(r.error):'Назначено новых заданий: '+r.data+'.');
   if(openBank)await loadBank();await onChanged();setBusy(false);
  }
  if(!teacher||!game)return null;

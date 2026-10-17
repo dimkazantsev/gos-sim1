@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {type ReactNode,useEffect,useMemo,useRef,useState} from 'react';
 import {BarChart3,BookOpenText,ChevronDown,ChevronLeft,ChevronRight,ClipboardCheck,Table2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -68,7 +69,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   void supabase.rpc('blitz_teacher_questions',{p_game:gameId}).then(({data,error:loadError})=>{
    if(currentGame.current!==gameId)return;
    requestCatalogFor.current='';
-   if(loadError){setError(loadError.message);setCatalogStatus('error');return}
+   if(loadError){setError(userError(loadError));setCatalogStatus('error');return}
    const rows=((data||[]) as Partial<Question>[]).map(row=>({...row,verified:row.verified!==false,legal_review_status:(row.legal_review_status||'pending') as ReviewStatus,legal_reviewed_at:row.legal_reviewed_at||null,legal_review_note:row.legal_review_note||null}) as Question);
    setQuestions(rows);setCatalogStatus('ready');loadedCatalogFor.current=gameId;setError('');
   });
@@ -79,7 +80,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   void supabase.from('blitz_check_notes').select('check_key,correction').eq('game_id',gameId).then(({data, error:loadError})=>{
    if(currentGame.current!==gameId)return;
    requestNotesFor.current='';
-   if(loadError){setError(loadError.message);return}
+   if(loadError){setError(userError(loadError));return}
    setNotes(Object.fromEntries((data||[]).map(x=>[x.check_key,x.correction])));
    loadedNotesFor.current=gameId;
   });
@@ -89,7 +90,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   let live=true;setStatsBusy(true);
   void supabase.rpc('blitz_teacher_stats',{p_game:gameId}).then(({data,error:loadError})=>{
    if(!live)return;setStatsBusy(false);
-   if(loadError){setError(loadError.message);return}
+   if(loadError){setError(userError(loadError));return}
    setStats((data||[]) as Stats[]);
   });
   return ()=>{live=false};
@@ -107,7 +108,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
    for(let offset=0;offset<30000;offset+=1000){
     const {data,error:loadError}=await supabase.from('blitz_assignments').select('id,question_id,user_id,chosen_index,is_correct,answered_at,stage_no').eq('game_id',gameId).not('answered_at','is',null).order('answered_at',{ascending:false}).range(offset,offset+999);
     if(!live)return;
-    if(loadError){setError(loadError.message);setMatrixBusy(false);return}
+    if(loadError){setError(userError(loadError));setMatrixBusy(false);return}
     results.push(...((data||[]) as Assignment[]));
     if(!data||data.length<1000)break;
    }
@@ -126,7 +127,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   if(!gameId||reviewBusy!==null)return;setReviewBusy(q.id);setSaved('');
   const note=notes['q:'+q.id]??q.legal_review_note??'';
   const {error:saveError}=await supabase.rpc('blitz_set_legal_review',{p_game:gameId,p_question:q.id,p_status:status,p_note:note||null});
-  if(saveError){setError(saveError.message)}else{
+  if(saveError){setError(userError(saveError))}else{
    setError('');setQuestions(prev=>prev.map(x=>x.id===q.id?{...x,legal_review_status:status,legal_reviewed_at:status==='pending'?null:new Date().toISOString(),legal_review_note:note||null}:x));
    setSaved(status==='approved'?'Вопрос допущен к выдаче.':status==='rejected'?'Вопрос отклонён.':'Вопрос возвращён на проверку.');
   }
@@ -135,7 +136,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
  async function saveNote(key:string){
   if(!g.me||!gameId)return;setSaved('');
   const {error:saveError}=await supabase.from('blitz_check_notes').upsert({game_id:gameId,check_key:key,teacher_id:g.me.user_id,correction:notes[key]||'',updated_at:new Date().toISOString()});
-  if(saveError)setError(saveError.message);else{setError('');setSaved('Корректировка сохранена.')}
+  if(saveError)setError(userError(saveError));else{setError('');setSaved('Корректировка сохранена.')}
  }
  const catalogLoading=catalogStatus==='loading'||catalogStatus==='idle';
  const filterBar=<div className="blitzFilters" role="search" aria-label="Фильтры блиц-вопросов">

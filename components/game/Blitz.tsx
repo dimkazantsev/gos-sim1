@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useState,useRef,useCallback} from 'react';
 import {createPortal} from 'react-dom';
 import {RefreshCw,X} from 'lucide-react';
@@ -28,7 +29,7 @@ export function BlitzOverlay({gameId,enabled}:{gameId:string;enabled:boolean}){
      ?await supabase.rpc('blitz_open_selected',{p_id:selectedId})
      :await supabase.rpc('blitz_open_recent',{p_game:gameId,p_not_before:since.current});
     if(stopped)return;
-    if(result.error){if(selectedId)setError(result.error.message);return}
+    if(result.error){if(selectedId)setError(userError(result.error));return}
     if(result.data){
      const question=result.data as Row;
      setCard(question);
@@ -48,7 +49,7 @@ export function BlitzOverlay({gameId,enabled}:{gameId:string;enabled:boolean}){
   return()=>{stopped=true;window.clearInterval(id);window.removeEventListener('blitz:open',request)}
  },[gameId,enabled,!!card,!!feedback]);
  useEffect(()=>{if(!card?.deadline)return;const f=()=>setTime(Math.max(0,Math.ceil((Date.parse(card.deadline!)-Date.now())/1000)));f();const id=setInterval(f,250);return()=>clearInterval(id)},[card?.deadline]);
- async function answer(choice:number){if(!card||answerBusy.current||busy||feedback)return;answerBusy.current=true;setBusy(true);try{const r=await supabase.rpc('blitz_answer',{p_id:card.id,p_choice:choice});if(r.error)setError(r.error.message);else{setError('');setFeedback({...card,...r.data});window.dispatchEvent(new Event('blitz:updated'))}}catch(e){setError(e instanceof Error?e.message:'Ответ не отправлен. Повторите попытку.')}finally{answerBusy.current=false;setBusy(false)}}
+ async function answer(choice:number){if(!card||answerBusy.current||busy||feedback)return;answerBusy.current=true;setBusy(true);try{const r=await supabase.rpc('blitz_answer',{p_id:card.id,p_choice:choice});if(r.error)setError(userError(r.error));else{setError('');setFeedback({...card,...r.data});window.dispatchEvent(new Event('blitz:updated'))}}catch(e){setError((userError(e)||'Ответ не отправлен. Повторите попытку.'))}finally{answerBusy.current=false;setBusy(false)}}
  useEffect(()=>{if(card?.deadline&&time===0&&Date.now()>=Date.parse(card.deadline)&&!feedback&&!busy)void answer(-1)},[card?.id,card?.deadline,time,!!feedback,busy]);
  useEffect(()=>{if(!feedback)return;const id=setTimeout(()=>{setCard(null);setFeedback(null);setError('')},4800);return()=>clearTimeout(id)},[feedback]);
  if(!enabled)return null;
@@ -74,12 +75,12 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
   activeLock.current=true;setActiveError('');
   try{
    const result=await supabase.rpc('blitz_open_selected',{p_id:id});
-   if(result.error){setActiveError(result.error.message);void refresh();return;}
+   if(result.error){setActiveError(userError(result.error));void refresh();return;}
    if(!result.data){setActiveError('Вопрос уже закрыт или недоступен.');void refresh();return;}
    const question=result.data as Row;
    setActive(question);
    setActiveSeconds(Math.max(0,Math.ceil((Date.parse(question.deadline||'')-Date.now())/1000)));
-  }catch(e){setActiveError(e instanceof Error?e.message:'Вопрос не открылся.')}
+  }catch(e){setActiveError((userError(e)||'Вопрос не открылся.'))}
   finally{activeLock.current=false;}
  }
  async function answerSelected(choice:number){
@@ -87,9 +88,9 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
   activeLock.current=true;setAnswerBusy(true);setActiveError('');
   try{
    const result=await supabase.rpc('blitz_answer',{p_id:active.id,p_choice:choice});
-   if(result.error)setActiveError('Ответ не сохранён: '+result.error.message);
+   if(result.error)setActiveError('Ответ не сохранён: '+userError(result.error));
    else{setActiveFeedback({...active,...result.data});window.dispatchEvent(new Event('blitz:updated'));}
-  }catch(e){setActiveError(e instanceof Error?e.message:'Ответ не отправлен.')}
+  }catch(e){setActiveError((userError(e)||'Ответ не отправлен.'))}
   finally{activeLock.current=false;setAnswerBusy(false);}
  }
  useEffect(()=>{

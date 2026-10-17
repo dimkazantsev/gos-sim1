@@ -31,3 +31,6 @@ assert(votesView.includes('formatKsrfVoteBody(v.procedure_key,v.body)'));
 assert(votesView.includes('uppercaseFirst(majorityLabel('));
 assert(votesView.includes('Одна фракция — один голос'));
 console.log('PASS: Russian election-system terms, majority format labels, legacy KSRF votes, unrelated votes unchanged');
+
+assert.doesNotMatch(formatKsrfVoteBody('electoral_system','Система: unknown_internal_system'),/[A-Za-z_]/);
+assert.doesNotMatch(formatKsrfVoteBody('electoral_system','Формула: toString'),/[A-Za-z_]/);

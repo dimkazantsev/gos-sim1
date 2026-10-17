@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useState} from 'react';
 import {Download,Search} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -27,8 +28,8 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
     supabase.rpc('teacher_game_activity_counts',{p_game_id:game.id})
    ]);
    if(!alive)return;
-   if(r.error)setError(r.error.message);else setAssessments((r.data||[]) as Assessment[]);
-   if(t.error){setActivityTotals(null);setError(t.error.message)}
+   if(r.error)setError(userError(r.error));else setAssessments((r.data||[]) as Assessment[]);
+   if(t.error){setActivityTotals(null);setError(userError(t.error))}
    else setActivityTotals(Object.fromEntries(((t.data||[]) as {user_id:string;activity_count:number|string}[]).map(item=>[item.user_id,Number(item.activity_count)])));
    if(!r.error&&!t.error)setError('')
   };

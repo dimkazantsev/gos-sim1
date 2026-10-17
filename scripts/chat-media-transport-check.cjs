@@ -5,6 +5,10 @@ const Module=require('node:module');
 const ts=require('typescript');
 const file='components/game/chatMediaTransport.ts';
 const mod=new Module(file,module);mod.filename=file;mod.paths=module.paths;
+const errorExports={};
+new Function('exports',ts.transpileModule(fs.readFileSync('lib/userError.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText)(errorExports);
+const requireOriginal=mod.require.bind(mod);
+mod.require=id=>id==='@/lib/userError'?errorExports:requireOriginal(id);
 mod._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{
  compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
 }).outputText,file);
@@ -39,6 +43,7 @@ async function run(){
  retry.transport.insert=async row=>{retry.calls.inserts.push(row);insertCount++;return{error:insertCount===1?{message:'temporary database error'}:null}};
  const first=await sendChatMedia(retry.args);
  assert(!first.ok&&first.stage==='message'&&first.pending);
+ assert.doesNotMatch(first.error,/[A-Za-z_]/);
  assert.equal(retry.calls.uploads.length,1);
  const second=await sendChatMedia({...retry.args,pending:first.pending});
  assert(second.ok);assert.equal(retry.calls.uploads.length,1);
@@ -61,6 +66,8 @@ async function run(){
  const rejected=input();rejected.transport.upload=async()=>({error:{message:'permission denied'}});
  const refused=await sendChatMedia(rejected.args);
  assert(!refused.ok&&refused.stage==='upload');
+ assert.match(refused.error,/недостаточно прав/);
+ assert.doesNotMatch(refused.error,/[A-Za-z_]/);
  assert.equal(rejected.calls.inserts.length,0);
  console.log('PASS upload permission failures cannot create broken chat messages');
  const video=input({mime:'video/webm;codecs=vp8,opus',kind:'video',fileName:'video.webm'});

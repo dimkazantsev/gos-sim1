@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import JusticeDocuments from './JusticeDocuments';
 import PartyChairElection from './PartyChairElection';
 import {isStageWorkOpen} from './stageWorkStatus';
@@ -74,7 +75,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
     setInviteFeedback({partyId,kind:'success',message:'Приглашение отправлено: '+recipientName+'. Ожидается ответ участника.'});
    }
   }catch(e){
-   const message=e instanceof Error?e.message:'Не удалось отправить приглашение. Повторите попытку.';
+   const message=(userError(e)||'Не удалось отправить приглашение. Повторите попытку.');
    setInviteFeedback({partyId,kind:'error',message});g.setError(message);
   }finally{setBusy(false)}
  }

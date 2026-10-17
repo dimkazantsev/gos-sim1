@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {IconAction} from '../ui/IconAction';
 import StageModuleHeader from '../ui/StageModuleHeader';
 import StyledSelect from '../ui/StyledSelect';
@@ -46,7 +47,7 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
   try{
   const ensured=await supabase.rpc('ensure_municipal_districts',{p_game_id:game.id});
   if(!current())return;
-  if(ensured.error){setError(ensured.error.message);return;}
+  if(ensured.error){setError(userError(ensured.error));return;}
   const [e,c,d,m]=await Promise.all([
    supabase.from('municipal_mayor_elections').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
    supabase.from('municipal_mayor_candidates').select('*').eq('game_id',game.id).order('created_at'),
@@ -54,18 +55,18 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
    supabase.from('municipal_district_members').select('*').eq('game_id',game.id).order('created_at')
   ]);
   if(!current())return;
-  const failure=[e,c,d,m].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
+  const failure=[e,c,d,m].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
    const rows=(e.data||[]) as Election[];
    const rr:Record<string,Result>={};
    await Promise.all(rows.slice(0,3).map(async x=>{
     const q=await supabase.rpc('get_municipal_mayor_results',{p_election_id:x.id});
-    if(q.error)throw new Error(q.error.message);
+    if(q.error)throw new Error(userError(q.error));
     if(q.data)rr[x.id]=q.data as Result;
    }));
    if(!current())return;
    setElections(rows);setResults(rr);setCandidates((c.data||[]) as Candidate[]);
    setDistricts((d.data||[]) as District[]);setDistrictMembers((m.data||[]) as DistrictMember[]);
-  }catch(error){if(current())setError(error instanceof Error?error.message:String(error));}
+  }catch(error){if(current())setError(userError(error)||'Не удалось выполнить действие.');}
  }
  useGameTableSync(game?.id,['municipal_mayor_elections','municipal_mayor_candidates','municipal_mayor_ballots','municipal_districts','municipal_district_members'],load,scopeKey);
  const latest=elections[0];
@@ -86,8 +87,8 @@ export default function MunicipalGovernancePanel({g}:{g:ReturnTypeRepublic}){
   const key=scopeKey,epoch=generation.current;
   const current=()=>scope.current===key&&generation.current===epoch;
   busyRef.current=true;setBusy(true);
-  try{const r=await supabase.rpc(name,args);if(!current())return;if(r.error){setError(r.error.message);if(name==='create_municipal_mayor_election')setElectionFeedback('Не удалось создать выборы: '+r.error.message);}else{after?.();if(name==='create_municipal_mayor_election')setElectionFeedback('Выборы созданы. Теперь можно выдвигать кандидатов.');await load();}}
-  catch(error){if(current())setError(error instanceof Error?error.message:String(error));}
+  try{const r=await supabase.rpc(name,args);if(!current())return;if(r.error){setError(userError(r.error));if(name==='create_municipal_mayor_election')setElectionFeedback('Не удалось создать выборы: '+userError(r.error));}else{after?.();if(name==='create_municipal_mayor_election')setElectionFeedback('Выборы созданы. Теперь можно выдвигать кандидатов.');await load();}}
+  catch(error){if(current())setError(userError(error)||'Не удалось выполнить действие.');}
   finally{if(current()){busyRef.current=false;setBusy(false);}}
  }
  async function createElection(){

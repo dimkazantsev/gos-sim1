@@ -1,3 +1,4 @@
+import {userError} from '../userError';
 import {telegramApi,telegramApiResult,telegramSetProfilePhoto} from './telegram';
 import {TELEGRAM_COMMANDS} from './telegramPresentation';
 
@@ -5,7 +6,7 @@ export const TELEGRAM_WEBHOOK_URL='https://gos-sim1.vercel.app/api/telegram/webh
 const PRIVATE_SCOPE={type:'all_private_chats'} as const;
 const BOT_NAME='ГОС.ID';
 const SHORT_DESCRIPTION='🏛 ГОС.ID — Цифровая платформа России. События, решения, этапы и голосования.';
-const DESCRIPTION='🏛 ГОС.ID — Цифровая платформа России.\n\nПолучайте уведомления о жизни республики, следите за государственными решениями, голосованиями, этапами и документами.\n\n🚀 Нажмите «Начать», чтобы открыть меню.\n🔐 Для игровых уведомлений привяжите Telegram в личном профиле ГОС.ID.';
+const DESCRIPTION='🏛 ГОС.ID — Цифровая платформа России.\n\nПолучайте уведомления о жизни республики, следите за государственными решениями, голосованиями, этапами и документами.\n\n🚀 Нажмите «Начать», чтобы открыть меню.\n🔐 Для игровых уведомлений привяжите Телеграм в личном профиле ГОС.ID.';
 
 type WebhookInfo={url:string;pending_update_count?:number;last_error_message?:string};
 type BotCommand={command:string;description:string};
@@ -20,13 +21,16 @@ export class TelegramSetupError extends Error{
  constructor(public readonly step:string,reason:string){super(reason)}
 }
 const safeError=(e:unknown)=>{
- const message=e instanceof Error?e.message:'Неизвестная ошибка Telegram API';
+ const message=userError(e)||'Не удалось получить подтверждение сервиса Телеграм.';
  // Never return a token, secret or URL containing credentials to a browser.
  return message.replace(/bot\d+:[A-Za-z0-9_-]+/g,'bot[hidden]')
   .replace(/https?:\/\/\S+/g,'[URL]').slice(0,220);
 };
 async function step<T>(label:string,run:()=>Promise<T>):Promise<T>{
  try{return await run()}catch(e){throw new TelegramSetupError(label,safeError(e))}
+}
+export function telegramSetupStepLabel(step:string):string{
+ return ({webhook:'подключение',commands:'команды',menu:'меню'} as Record<string,string>)[step.split(' ')[0]]||'настройка бота';
 }
 const commandsMatch=(saved:BotCommand[])=>saved.length===TELEGRAM_COMMANDS.length&&
  saved.every((cmd,i)=>cmd.command===TELEGRAM_COMMANDS[i].command&&cmd.description===TELEGRAM_COMMANDS[i].description);
@@ -54,7 +58,7 @@ export async function activateTelegramBot(token:string,secret:string,avatarJpegB
  }));
  const webhook=await step('webhook verification',()=>telegramApiResult<WebhookInfo>(token,'getWebhookInfo',{}));
  if(webhook.url!==TELEGRAM_WEBHOOK_URL)
-  throw new TelegramSetupError('webhook verification','Telegram вернул другой адрес webhook.');
+  throw new TelegramSetupError('webhook verification','Телеграм вернул другой адрес подключения.');
 
  const current=await step('commands read',()=>telegramApiResult<BotCommand[]>(token,'getMyCommands',{scope:PRIVATE_SCOPE}));
  if(!commandsMatch(current)){
@@ -68,7 +72,7 @@ export async function activateTelegramBot(token:string,secret:string,avatarJpegB
  if(menu.type!=='commands')await step('menu',()=>telegramApi(token,'setChatMenuButton',{menu_button:{type:'commands'}}));
  const confirmedMenu=await step('menu verification',()=>telegramApiResult<MenuButton>(token,'getChatMenuButton',{}));
  if(confirmedMenu.type!=='commands')
-  throw new TelegramSetupError('menu verification','Telegram не подтвердил кнопку команд.');
+  throw new TelegramSetupError('menu verification','Телеграм не подтвердил кнопку команд.');
 
  // Branding is not a prerequisite for the working webhook, commands and menu.
  // Repeated activation never fails because of an avatar or a localized name.

@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -23,7 +24,7 @@ export default function GameReadinessMatrix({g}:{g:ReturnTypeRepublic}){
   try{
    const r=await supabase.rpc('get_game_readiness',{p_game_id:gameId});
    if(!current())return;
-   if(r.error)throw new Error(r.error.message);
+   if(r.error)throw new Error(userError(r.error));
    const data=r.data;
    if(!Array.isArray(data)||data.length!==16||new Set(data.map(x=>x?.stage_no)).size!==16||data.some(x=>
     !x||!Number.isInteger(x.stage_no)||x.stage_no<1||x.stage_no>16||typeof x.ready!=='boolean'||
@@ -32,7 +33,7 @@ export default function GameReadinessMatrix({g}:{g:ReturnTypeRepublic}){
     throw new Error('Сервер не вернул полную проверку 16 этапов.');
    setResult({gameId,rows:data as StageReadiness[]});setFailure(null);
   }catch(error){
-   if(current()){setResult(null);setFailure({gameId,message:error instanceof Error?error.message:'Не удалось загрузить проверку.'});}
+   if(current()){setResult(null);setFailure({gameId,message:error instanceof Error?userError(error):'Не удалось загрузить проверку.'});}
   }finally{if(current())setPendingGame(null);}
  }
  useEffect(()=>()=>{request.current++},[game?.id]);

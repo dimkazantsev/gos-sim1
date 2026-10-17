@@ -20,7 +20,7 @@ function harness(){
   channel(){return{on(){return this;},subscribe(){return this;}};},removeChannel:async()=>{}
  };
  const jsx=(type,props)=>({type,props:props||{}}),tag=name=>Object.assign(()=>{},{displayName:name});
- function requireFor(name){if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};if(name==='@/lib/supabase')return{supabase};return new Proxy({__esModule:true,default:tag(path.basename(name))},{get:(object,key)=>key in object?object[key]:tag(String(key))});}
+ function requireFor(name){if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};if(name==='@/lib/supabase')return{supabase};if(name==='@/lib/userError')return{userError:error=>String(error?.message||error)};if(name==='../../lib/gameLabels')return{gameValueLabel:value=>String(value||'Не указано')};return new Proxy({__esModule:true,default:tag(path.basename(name))},{get:(object,key)=>key in object?object[key]:tag(String(key))});}
  const module={exports:{}};
  vm.runInNewContext('(function(require,module,exports){'+code+'\n})',{console,Date,Promise,Set,Object,Array,String,Number,Math,setInterval:()=>1,clearInterval:()=>{}})(requireFor,module,module.exports);
  function render(){cursor=0;dirty=false;tree=module.exports.default(props);while(effects.length)effects.shift()();return tree;}

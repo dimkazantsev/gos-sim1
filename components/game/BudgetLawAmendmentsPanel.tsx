@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import StyledSelect from '../ui/StyledSelect';
@@ -18,7 +19,7 @@ const tables=['budget_law_amendments','budget_law_amendment_packs','formal_docum
 const statusLabels:Record<Amendment['status'],string>={submitted:'Внесена',voting:'На голосовании',accepted:'Принята и включена в проект',rejected:'Отклонена',withdrawn:'Отозвана автором'};
 const money=(value:number)=>Number.isFinite(value)?kopecksMoney(BigInt(Math.round(value*1e8))):'—';
 function sectionLabel(c:BudgetCalculation|null,key:string){const line=c?.expense_lines.find(l=>l.key===key);return line?key+'. '+line.label:key;}
-function subjectLabel(key:string){return FORMAL_SUBJECTS.find(s=>s.key===key)?.label||key;}
+function subjectLabel(key:string){return FORMAL_SUBJECTS.find(s=>s.key===key)?.label||'Субъект законодательной инициативы';}
 
 export default function BudgetLawAmendmentsPanel({g,document,onOpenVotes,readOnly=false,onPendingChange}:{g:ReturnTypeRepublic;document:FormalDocument;onOpenVotes:(id?:string)=>void;readOnly?:boolean;onPendingChange?:(gate:BillAmendmentGate)=>void}){
  const [result,setResult]=useState<{scope:string;data:State}|null>(null),[failure,setFailure]=useState<{scope:string;message:string}|null>(null),[loading,setLoading]=useState(false),[busy,setBusy]=useState(false);
@@ -37,13 +38,13 @@ export default function BudgetLawAmendmentsPanel({g,document,onOpenVotes,readOnl
   try{
    if(!g.game||document.game_id!==g.game.id)throw new Error('Выберите проект бюджета текущей игры.');
    const r=await supabase.rpc('get_budget_law_amendments',{p_document_id:document.id});if(!current())return;
-   if(r.error)throw new Error(r.error.message);
+   if(r.error)throw new Error(userError(r.error));
    const value=r.data as State;
    if(!value||value.document_id!==document.id||typeof value.status_code!=='string'||!Number.isInteger(value.revision)||value.revision<1||typeof value.can_manage!=='boolean'||typeof value.can_submit!=='boolean'||typeof value.base_ready!=='boolean'||!Array.isArray(value.subjects)||value.subjects.some(s=>typeof s!=='string')||!Number.isInteger(value.pending_count)||value.pending_count<0||!Array.isArray(value.amendments)||!Array.isArray(value.packs)||(value.calculation&&!Array.isArray(value.calculation.expense_lines)))throw new Error('Не удалось проверить таблицу поправок и текущую редакцию бюджета.');
    setResult({scope,data:value});setFailure(null);
    setSubject(s=>value.subjects.includes(s)?s:value.subjects[0]||'');
    setSelected(ids=>ids.filter(id=>value.amendments.some(a=>a.id===id&&a.status==='submitted'&&!a.stale)));
-  }catch(e){if(current()){setResult(null);setFailure({scope,message:e instanceof Error?e.message:'Не удалось загрузить бюджетные поправки.'});}}
+  }catch(e){if(current()){setResult(null);setFailure({scope,message:(userError(e)||'Не удалось загрузить бюджетные поправки.')});}}
   finally{if(current())setLoading(false);}
  }
  useGameTableSync(g.game?.id,tables,load,'budget-law-amendments:'+document.id+':'+(g.me?.user_id||''));

@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useId,useMemo,useRef,useState} from 'react';
 import {BookOpen,Play,Shuffle} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -75,7 +76,7 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
    supabase.from('crisis_responses').select('*').eq('game_id',game.id).eq('crisis_id',active.id).order('created_at',{ascending:true}),
    supabase.from('game_role_consequences').select('*').eq('game_id',game.id).order('set_at',{ascending:false})
   ]);
-  const failure=[q,r,cs].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
+  const failure=[q,r,cs].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
   if(!q.error)setRequests((q.data||[]) as InfoRequest[]);
   if(!cs.error)setConsequences((cs.data||[]) as RoleConsequence[]);
   if(!r.error){
@@ -92,7 +93,7 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
  async function launch(choice?:CrisisChoice){
   if(busy||active)return;
   setBusy(true);
-  try{await triggerCrisis(choice)}catch(error){setError(error instanceof Error?error.message:'Не удалось запустить кризис. Повторите попытку.')}
+  try{await triggerCrisis(choice)}catch(error){setError(error instanceof Error?userError(error):'Не удалось запустить кризис. Повторите попытку.')}
   finally{setBusy(false)}
  }
 
@@ -113,25 +114,25 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
  async function ask(){
   if(question.trim().length<5)return;setBusy(true);
   const r=await supabase.rpc('ask_crisis_information',{p_crisis_id:active.id,p_question:question.trim()});
-  if(r.error)setError(r.error.message);else{setQuestion('');await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setQuestion('');await load()}setBusy(false);
  }
  async function answer(id:string){
   const x=(answerDraft[id]||'').trim();if(!x)return;setBusy(true);
   const r=await supabase.rpc('answer_crisis_information',{p_request_id:id,p_answer:x});
-  if(r.error)setError(r.error.message);else{setAnswerDraft(v=>({...v,[id]:''}));await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setAnswerDraft(v=>({...v,[id]:''}));await load()}setBusy(false);
  }
  async function submit(){
   if(plan.trim().length<20)return;setBusy(true);
   const r=await supabase.rpc('submit_crisis_response',{p_crisis_id:active.id,p_action_plan:plan.trim(),p_legal_basis:legal.trim()||null,p_resources:resources.trim()||null,p_public_message:message.trim()||null});
-  if(r.error)setError(r.error.message);else{responseDirty.current=false;await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{responseDirty.current=false;await load()}setBusy(false);
  }
  async function review(id:string){
   setBusy(true);const saved=responses.find(x=>x.id===id);const r=await supabase.rpc('review_crisis_response',{p_response_id:id,p_teacher_note:(reviewDraft[id]??saved?.teacher_note??'').trim()||null});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
  async function resolve(){
   setBusy(true);const r=await supabase.rpc('resolve_crisis',{p_crisis_id:active.id,p_resolution_note:resolution.trim()||null});
-  if(r.error)setError(r.error.message);setBusy(false);
+  if(r.error)setError(userError(r.error));setBusy(false);
  }
  async function applyRoleConsequence(){
   if(!consequenceUser)return;setBusy(true);
@@ -139,7 +140,7 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
    p_crisis_id:active.id,p_user_id:consequenceUser,p_status:consequenceStatus,
    p_reason:consequenceReason.trim()||null,p_until_at:consequenceUntil?new Date(consequenceUntil).toISOString():null
   });
-  if(r.error)setError(r.error.message);else{setConsequenceReason('');setConsequenceUntil('');await load()}
+  if(r.error)setError(userError(r.error));else{setConsequenceReason('');setConsequenceUntil('');await load()}
   setBusy(false);
  }
 

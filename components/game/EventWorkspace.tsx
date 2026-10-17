@@ -1,4 +1,6 @@
 'use client';
+import {gameValueLabel} from '../../lib/gameLabels';
+import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {CalendarDays,CheckCircle2,RefreshCw,Send,UsersRound} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -62,13 +64,13 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    supabase.from('event_authority_evidence').select('*').eq('game_id',game.id)
   ]);
   const error=[b,c,d,e,f].find(r=>r.error)?.error;
-  if(error){setNotice(error.message);return}
+  if(error){setNotice(userError(error));return}
   const assignedRows=(b.data||[]) as Assignment[];
   const invitedRows=(e.data||[]) as EventInvitation[];
   const caseIds=[...new Set([...assignedRows.map(a=>a.case_id),...invitedRows.map(v=>v.case_id)])];
   if(caseIds.length){
    const result=await supabase.from('event_cases').select('*').eq('game_id',game.id).in('id',caseIds);
-   if(result.error){setNotice(result.error.message);return}
+   if(result.error){setNotice(userError(result.error));return}
    setCases((result.data||[]) as CaseRow[]);
    const routing=await supabase.from('event_case_routing').select('case_id,region_code').eq('game_id',game.id).in('case_id',caseIds).not('region_code','is',null);
    if(!routing.error&&routing.data?.length){
@@ -134,7 +136,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    p_game_id:game.id,p_title:title.trim(),p_situation:situation.trim(),p_category:category,
    p_seriousness:seriousness,p_audience:audience,p_options:options.map(o=>({label:o.label,trust:o.trust,description:o.description,authorized_roles:authorizedRoles(o.authorizedRoles),lawful:o.lawful,legal_basis:o.legalBasis.trim(),protects_role_interest:o.protectsRoleInterest})),p_recipients:eligible,p_roles:roleFilter?[roleFilter]:[]
   });
-  if(r.error)setNotice(r.error.message);
+  if(r.error)setNotice(userError(r.error));
   else{setNotice('Событие направлено участникам: '+eligible.length);setTitle('');setSituation('');setSelected([]);setOptions(initialOptions());await reload()}
   setSaving(false);
  }
@@ -142,7 +144,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   if(busyId||readOnly||me?.kind!=='student')return;
   eventButtonSound();setBusyId(assignment.id);setNotice('');
   const r=await supabase.rpc('submit_event_decision',{p_assignment_id:assignment.id,p_choice:choice,p_rationale:null});
-  if(r.error)setNotice(r.error.message);else await Promise.all([reload(false),g.refresh()]);
+  if(r.error)setNotice(userError(r.error));else await Promise.all([reload(false),g.refresh()]);
   setBusyId(null);
  }
  const assignedCaseIds=new Set(assignments.map(a=>a.case_id));
@@ -180,7 +182,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  async function finalize(id:string){
   if(!teacher||busyId||!window.confirm('Подвести итог по текущим ответам и завершить голосование досрочно?'))return;
   setBusyId(id);const r=await supabase.rpc('finalize_event_case',{p_case_id:id});
-  setNotice(r.error?r.error.message:r.data?.reason==='no_answers'?'Пока нет голосов.':'Итог зафиксирован.');
+  setNotice(r.error?userError(r.error):r.data?.reason==='no_answers'?'Пока нет голосов.':'Итог зафиксирован.');
   if(!r.error)await Promise.all([reload(false),g.refresh()]);setBusyId(null);
  }
  if(!game||!me)return null;
@@ -246,9 +248,9 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     const invites=invitations.filter(i=>i.case_id===c.id);
     const pendingInvites=invites.some(i=>i.status==='pending');
     return <EventCaseModal key={c.id} title={c.title} onClose={()=>setExpanded('')}><div className="eventCaseBundle"><article className={'eventCaseCard eventStory '+(kind==='beneficial'?'eventStoryResolved ':kind==='harmful'?'eventStoryRejected ':outcome?'eventStoryNeutral ':'')}>
-     <div className="eventStoryVisual"><EventComic silent title={c.title} category={c.category} caseKey={c.case_key} scene={c.comic_scene} compact/></div>
+     <div className="eventStoryVisual"><EventComic silent title={c.title} category={gameValueLabel(c.category,'Ситуация')} caseKey={c.case_key} scene={c.comic_scene} compact/></div>
      <div className="eventStoryContent">
-      {teacher&&<div className="eventCaseTop"><span>{c.category}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {invites.some(i=>i.status==='accepted')?'Совместно':c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>}
+      {teacher&&<div className="eventCaseTop"><span>{gameValueLabel(c.category,'Ситуация')}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {invites.some(i=>i.status==='accepted')?'Совместно':c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>}
       <h4>{c.title}</h4>{caseRegions[c.id]&&<p className="eventRegionAssignmentNotice"><strong>Региональное отделение партии {caseRegions[c.id].party}</strong> · {caseRegions[c.id].name}. В данном субъекте победили губернатор и партия, получившая контроль над законодательным органом субъекта РФ. Поэтому вашей партийной команде необходимо решить эту ситуацию. При необходимости пригласите компетентных участников другого органа власти.</p>}{expandedCase&&<><p>{c.situation.replace(/\\n/g,'\n')}</p>
       <div className="eventStoryRecipients">{assigned.map(a=><span key={a.id}>{members.find(m=>m.user_id===a.recipient_id)?.full_name||'Участник'} · {members.find(m=>m.user_id===a.recipient_id)?.role_title||'Без должности'}</span>)}</div>
       <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили · {pct(responded.length,assigned.length)}%</span>

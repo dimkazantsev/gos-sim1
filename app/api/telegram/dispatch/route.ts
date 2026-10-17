@@ -37,7 +37,7 @@ async function authenticatedDispatch(request:Request){
  // Signed-in game members can wake the dispatcher for their own game only.
  // No service-role or bot credentials are sent to the browser.
  let config:ReturnType<typeof runtimeConfig>;
- try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
+ try{config=runtimeConfig()}catch{return NextResponse.json({error:'Сервис не настроен'},{status:503})}
  const authorization=request.headers.get('authorization')||'';
  if(!authorization.startsWith('Bearer '))return new Response('Unauthorized',{status:401});
  const token=authorization.slice('Bearer '.length);
@@ -47,9 +47,9 @@ async function authenticatedDispatch(request:Request){
  try{
   const json=(await request.json()) as {gameId?:string};
   gameId=String(json.gameId||'');
- }catch{return NextResponse.json({error:'Invalid request'},{status:400})}
+ }catch{return NextResponse.json({error:'Некорректный запрос'},{status:400})}
  if(!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(gameId))
-  return NextResponse.json({error:'Invalid game'},{status:400});
+  return NextResponse.json({error:'Игра не найдена'},{status:400});
  const {data:member,error:memberError}=await config.db.from('game_members')
   .select('user_id').eq('game_id',gameId).eq('user_id',identity.user.id)
   .is('roster_archived_at',null).maybeSingle();
@@ -57,11 +57,11 @@ async function authenticatedDispatch(request:Request){
  return dispatchOutbox(gameId);
 }
 async function dispatchOutbox(gameId?:string){
- let config:ReturnType<typeof runtimeConfig>;try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
+ let config:ReturnType<typeof runtimeConfig>;try{config=runtimeConfig()}catch{return NextResponse.json({error:'Сервис не настроен'},{status:503})}
  let queue=config.db.from('telegram_outbox').select('id,game_id,user_id,body,attempts,category,channel_id,source_id').is('sent_at',null).lt('attempts',5).lte('next_attempt_at',new Date().toISOString());
  if(gameId)queue=queue.eq('game_id',gameId);
  const {data:jobs,error}=await queue.order('id').limit(40);
- if(error)return NextResponse.json({error:'Queue query failed'},{status:500});
+ if(error)return NextResponse.json({error:'Не удалось получить очередь'},{status:500});
  let sent=0;
  for(const job of jobs||[]){
   const {data:claimed}=await config.db.from('telegram_outbox').update({attempts:job.attempts+1,next_attempt_at:new Date(Date.now()+120000).toISOString()}).eq('id',job.id).eq('attempts',job.attempts).is('sent_at',null).select('id').maybeSingle();

@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import {Landmark,ShieldCheck,Clock3} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -18,7 +19,7 @@ export default function ProfileOffices({g,userId,readOnly=false}:{g:ReturnTypeRe
   if(!g.game||!targetId){setOffices([]);return}
   const r=await supabase.from('game_office_assignments').select('*').eq('game_id',g.game.id).eq('user_id',targetId).neq('status','ended').order('created_at');
   if(token!==request.current)return;
-  if(r.error)setNotice(r.error.message);else setOffices((r.data||[]) as Office[]);
+  if(r.error)setNotice(userError(r.error));else setOffices((r.data||[]) as Office[]);
  }
  useEffect(()=>{setTargetId(initialTarget);setNotice('')},[userId,g.teacher]);
  useEffect(()=>{setRoleChoice('');setCustomRole('')},[targetId]);
@@ -28,13 +29,13 @@ export default function ProfileOffices({g,userId,readOnly=false}:{g:ReturnTypeRe
   if(readOnly||!g.game||busy||!target||target.kind!=='student'||role.length<2||offices.some(o=>o.role_title.toLocaleLowerCase('ru-RU')===role.toLocaleLowerCase('ru-RU')))return;
   setBusy(true);setNotice('');
   const r=await supabase.rpc('appoint_game_office',{p_game:g.game.id,p_user:targetId,p_role:role.trim(),p_basis:g.teacher?'Назначение должности в органе публичной власти':'Представление о назначении должностного лица',p_exception:g.teacher});
-  setNotice(r.error?r.error.message:g.teacher?'Должность назначена. Полномочия доступны автоматически.':'Представление направлено преподавателю.');
+  setNotice(r.error?userError(r.error):g.teacher?'Должность назначена. Полномочия доступны автоматически.':'Представление направлено преподавателю.');
   if(!r.error){setRoleChoice('');setCustomRole('');await Promise.all([load(),g.refresh()])}setBusy(false);
  }
  async function review(id:string,approve:boolean){
   if(readOnly||busy)return;setBusy(true);
   const r=await supabase.rpc('review_game_office',{p_id:id,p_approve:approve});
-  setNotice(r.error?r.error.message:approve?'Роль назначена.':'Роль снята.');
+  setNotice(r.error?userError(r.error):approve?'Роль назначена.':'Роль снята.');
   if(!r.error)await Promise.all([load(),g.refresh()]);setBusy(false);
  }
  return <section className="profileOffices"><header><div><small>Полномочия участника</small><h2>Государственные должности</h2></div><Landmark size={24}/></header>

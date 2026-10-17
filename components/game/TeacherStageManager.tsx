@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import StageReadinessPanel,{type StageReadiness} from './StageReadinessPanel';
@@ -65,7 +66,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
   }catch(err){
    if(request===readinessRequest.current&&gameScope.current===gameId){
     setReadinessSnapshot(null);
-    setReadinessFailure({gameId,message:err instanceof Error?err.message:'Не удалось проверить готовность этапов.'});
+    setReadinessFailure({gameId,message:(userError(err)||'Не удалось проверить готовность этапов.')});
    }
   }finally{
    if(request===readinessRequest.current)setReadinessLoading(false);
@@ -111,7 +112,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
    void refreshReadiness();
    setResetTarget(null);setConfirmation('');
   }catch(err){
-   setError(err instanceof Error?err.message:'Не удалось сбросить этапы.');
+   setError((userError(err)||'Не удалось сбросить этапы.'));
   }finally{setBusy(false)}
  }
  if(!teacher)return null;

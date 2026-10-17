@@ -39,7 +39,7 @@ export async function POST(request:Request){
   const url=new URL(link.url),deadline=Date.now()+25000;let payload;
   if(link.provider==='google'){
    const id=url.hostname==='docs.google.com'?url.pathname.match(/\/document\/d\/([\w-]+)/)?.[1]:null;
-   if(!id)throw new DocumentInputError('Выберите ссылку Google Документа формата docs.google.com/document/d/… или загрузите экспортированный файл.');
+   if(!id)throw new DocumentInputError('Выберите ссылку Гугл Документа формата docs.google.com/document/d/… или загрузите экспортированный файл.');
    payload=await boundedFetch('https://docs.google.com/document/d/'+id+'/export?format=txt',deadline);
   }else if(link.provider==='yandex'){
    const response=await boundedFetch('https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key='+encodeURIComponent(link.url),deadline);

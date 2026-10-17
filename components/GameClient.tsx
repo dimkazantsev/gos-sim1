@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {IconAction} from './ui/IconAction';
 import {BrandIdentity,BrandName} from './ui/BrandIdentity';
 import ChatToggleButton from './game/ChatToggleButton';
@@ -446,8 +447,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    let errorText='';
    try{
     const r=await supabase.rpc('complete_my_game_profile',{p_game:gameAtRequest});
-    if(r.error)errorText=r.error.message;
-   }catch(e){errorText=e instanceof Error?e.message:'Сетевая ошибка при проверке профиля';}
+    if(r.error)errorText=userError(r.error);
+   }catch(e){errorText=(userError(e)||'Сетевая ошибка при проверке профиля');}
    if(gameId!==gameAtRequest||g.me?.user_id!==userAtRequest)return;
    if(errorText){
     pendingProfileNavigation.current=null;
@@ -477,7 +478,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   // Record the FIRST display, not every login or each click. The dialog stays
   // open until the person explicitly proceeds to the missing profile fields.
   void supabase.rpc('mark_my_game_profile_setup_prompt_seen',{p_game:game.id}).then(r=>{
-   if(r.error){setOnboardingNotice('Не удалось сохранить первое знакомство: '+r.error.message);setupPromptScope.current='';return}
+   if(r.error){setOnboardingNotice('Не удалось сохранить первое знакомство: '+userError(r.error));setupPromptScope.current='';return}
    setSetupStatus(prev=>prev?{...prev,prompt_seen:true}:prev);
   });
  },[game?.id,me?.user_id,introSeen,introOpen,previewMode,tourMode,onboardingRequired,setupStatus?.completed,setupStatus?.prompt_seen,setupChecking]);
@@ -490,7 +491,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(!setupStatus?.prompt_seen){
    const r=await supabase.rpc('mark_my_game_profile_setup_prompt_seen',{p_game:game.id});
    if(r.error){
-    setOnboardingNotice('Не удалось сохранить первое знакомство: '+r.error.message);
+    setOnboardingNotice('Не удалось сохранить первое знакомство: '+userError(r.error));
     setSetupPromptBusy(false);return;
    }
    setSetupStatus(prev=>prev?{...prev,prompt_seen:true}:prev);
@@ -554,7 +555,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(!game||!me||completingProfile)return;
   setCompletingProfile(true);setOnboardingNotice('');
   const r=await supabase.rpc('complete_my_game_profile',{p_game:game.id});
-  if(r.error){setOnboardingNotice('Проверьте обязательные поля: '+r.error.message);await loadProfileSetup();setSetupFocusVersion(x=>x+1)}
+  if(r.error){setOnboardingNotice('Проверьте обязательные поля: '+userError(r.error));await loadProfileSetup();setSetupFocusVersion(x=>x+1)}
   else{setOnboardingNotice('Профиль заполнен. Добро пожаловать в игру!');setVerifiedSetupScope(profileScope);setSetupStatus({completed:true,prompt_seen:true,missing:[]});pendingProfileNavigation.current=null;await g.refresh();navigate('dashboard',undefined,true)}
   setCompletingProfile(false);
  }
@@ -565,7 +566,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
  useEffect(()=>{
   if(!me||previewMode||me.kind==='observer')return;
-  const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политический процесс',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Event · ситуации',budget:'Бюджет'};
+  const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политический процесс',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Ситуационные решения',budget:'Бюджет'};
   void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
   const id=setInterval(()=>void touchPresence(view),30000);
   return()=>clearInterval(id);

@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {AlertTriangle,CheckCircle2,ChevronDown,ExternalLink,History,RefreshCw,ShieldCheck,XCircle} from 'lucide-react';
@@ -35,8 +36,8 @@ export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=fa
   try{
    const r=await supabase.rpc('get_stage_readiness',{p_game_id:game.id,p_stage_no:stageNo});
    if(version!==request.current)return;
-   if(r.error){setState(null);setLoadError(r.error.message)}else if(r.data){setState(r.data as StageReadiness);setLoadError('')}else{setState(null);setLoadError('Сервер не вернул результат проверки.')}setChecked(true)
-  }catch(error){if(version===request.current){setState(null);setLoadError(error instanceof Error?error.message:'Не удалось загрузить проверку.');setChecked(true)}}
+   if(r.error){setState(null);setLoadError(userError(r.error))}else if(r.data){setState(r.data as StageReadiness);setLoadError('')}else{setState(null);setLoadError('Сервер не вернул результат проверки.')}setChecked(true)
+  }catch(error){if(version===request.current){setState(null);setLoadError(error instanceof Error?userError(error):'Не удалось загрузить проверку.');setChecked(true)}}
   finally{if(version===request.current)setLoading(false)}
  }
 
@@ -44,13 +45,13 @@ export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=fa
   if(!game||!teacher||overrideReason.trim().length<10)return;
   setLoading(true);
   const r=await supabase.rpc('set_stage_readiness_override',{p_game_id:game.id,p_stage_no:stageNo,p_reason:overrideReason.trim()});
-  if(r.error)setError(r.error.message);else{setOverrideReason('');await load()}
+  if(r.error)setError(userError(r.error));else{setOverrideReason('');await load()}
   setLoading(false);
  }
  async function clearOverride(){
   if(!game||!teacher)return;setLoading(true);
   const r=await supabase.rpc('clear_stage_readiness_override',{p_game_id:game.id,p_stage_no:stageNo});
-  if(r.error)setError(r.error.message);else await load();
+  if(r.error)setError(userError(r.error));else await load();
   setLoading(false);
  }
 

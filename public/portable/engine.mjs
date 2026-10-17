@@ -1,3 +1,8 @@
+export function portableErrorMessage(error){
+ const text=typeof error==='string'?error:typeof error?.message==='string'?error.message:'';
+ return /^[А-Яа-яЁё]/.test(text)&&!/[A-Za-z_]/.test(text)?text:'Не удалось выполнить запрос. Проверьте данные и подключение.';
+}
+
 /** Core event simulation used by both the standalone HTML and the LAN server. */
 export function applyPortableAction(state, user, action, data) {
   const tables = state.tables;

@@ -11,21 +11,21 @@ const json = (data: unknown, status = 200) =>
   });
 
 Deno.serve(async (request: Request) => {
-  if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+  if (request.method !== "POST") return json({ error:"Способ запроса не поддерживается" }, 405);
   const token = request.headers.get("x-chat-cleanup-token");
-  if (!token || token.length < 32) return json({ error: "Unauthorized" }, 401);
+  if (!token || token.length < 32) return json({ error:"Требуется вход в систему" }, 401);
   const url = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!url || !serviceKey) return json({ error: "Server configuration missing" }, 503);
+  if (!url || !serviceKey) return json({ error:"Сервер не настроен" }, 503);
 
   const db = createClient(url, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const authorization = await db.rpc("chat_media_cleanup_token_valid", { p_token: token });
-  if (authorization.error || authorization.data !== true) return json({ error: "Unauthorized" }, 401);
+  if (authorization.error || authorization.data !== true) return json({ error:"Требуется вход в систему" }, 401);
 
   const candidates = await db.rpc("chat_media_expired_candidates", { p_limit: 100 });
-  if (candidates.error) return json({ error: "Cannot list expired media" }, 500);
+  if (candidates.error) return json({ error:"Не удалось получить список устаревших файлов" }, 500);
   const rows = (candidates.data ?? []) as Candidate[];
   let deleted = 0;
   let failed = 0;
@@ -47,7 +47,7 @@ Deno.serve(async (request: Request) => {
 
   // Only records with no remaining Storage object may be removed.
   const finalized = await db.rpc("chat_media_finalize_expired");
-  if (finalized.error) return json({ error: "Media removed; message cleanup failed", deleted, failed }, 500);
+  if (finalized.error) return json({ error:"Файлы удалены, но не удалось очистить сообщения", deleted, failed }, 500);
 
   return json({ deleted, failed, finalized: Number(finalized.data ?? 0) }, failed ? 207 : 200);
 });

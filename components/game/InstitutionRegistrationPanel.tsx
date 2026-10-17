@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
@@ -34,7 +35,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  const stage=stageNo||g.game?.current_round||1,students=g.members.filter(m=>m.kind==='student');
  async function load(){if(!g.game)return;const [r,u,a,b,o,meeting]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active'),
   supabase.from('institution_meeting_records').select('game_id,stage_no,institution_key,agenda_document_id,agenda_body,agenda_approved_at,minutes_document_id,minutes_body,minutes_approved_at,delegate_user_id').eq('game_id',g.game.id).eq('stage_no',stage)]);
-  const failure=[r,u,a,b,o,meeting].find(x=>x.error);if(failure?.error){setMeetingError('Не удалось загрузить сведения о заседании. '+meetingErrorMessage(failure.error.message));return;}
+  const failure=[r,u,a,b,o,meeting].find(x=>x.error);if(failure?.error){setMeetingError('Не удалось загрузить сведения о заседании. '+meetingErrorMessage(userError(failure.error)));return;}
   if(!r.error)setRows(r.data||[]);if(!u.error){setUnits(u.data||[]);onUnitsChange?.(u.data||[])}setAssignments([...(a.data||[]),...(b.data||[])]);if(!o.error)setOffices(o.data||[]);if(!meeting.error)setMeetingRows((meeting.data||[]) as MeetingRecord[]);setRightsVersion(v=>v+1);
  }
  useEffect(()=>{if(initialBody)setBody(initialBody)},[initialBody]);
@@ -46,7 +47,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
   void Promise.resolve(supabase.rpc('get_gd_session_attendance',{p_game_id:g.game.id,p_stage_no:stage}))
    .then(({data,error})=>{
     if(!active)return;
-    if(error){setMeetingError('Не удалось получить сведения о явке депутатов. '+meetingErrorMessage(error.message));return}
+    if(error){setMeetingError('Не удалось получить сведения о явке депутатов. '+meetingErrorMessage(userError(error)));return}
     const state=data as {my_capacity:number;registered:GdPresence[]};
     if(!state||!Array.isArray(state.registered)){setMeetingError('Сведения о депутатской явке недоступны.');return}
     setGdPresence(state);
@@ -66,7 +67,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
   void Promise.resolve(supabase.rpc('get_my_institution_meeting_permissions',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body}))
    .then(({data,error})=>{
     if(!active)return;
-    if(error){setMeetingError('Не удалось проверить полномочия. '+meetingErrorMessage(error.message));return;}
+    if(error){setMeetingError('Не удалось проверить полномочия. '+meetingErrorMessage(userError(error)));return;}
     if(!data||typeof data.can_coordinate!=='boolean'||typeof data.can_prepare!=='boolean'||typeof data.can_attend!=='boolean'){
      setMeetingError('Сервер не подтвердил полномочия для этого заседания. Повторите попытку после обновления страницы.');return;
     }
@@ -116,22 +117,22 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
   if(!g.game||busy||!canPrepare||readOnly||meetingActionsLocked||(kind==='agenda'&&!canWriteAgenda))return;
   setMeetingError('');setNotice('');setBusy(true);
   const r=await supabase.rpc('save_institution_meeting_document',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_kind:kind,p_body:kind==='agenda'?agendaText:minutesText});
-  if(r.error)setMeetingError(meetingErrorMessage(r.error.message));else{await load();setNotice(kind==='agenda'?(meetingCoordinator?'Повестка сохранена в реестре НПА и утверждена.':'Проект повестки сохранён. Ожидается утверждение председателем.'):'Протокол сохранён в реестре НПА.')}
+  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();setNotice(kind==='agenda'?(meetingCoordinator?'Повестка сохранена в реестре НПА и утверждена.':'Проект повестки сохранён. Ожидается утверждение председателем.'):'Протокол сохранён в реестре НПА.')}
   setBusy(false);
  }
  async function approveMeeting(kind:'agenda'|'minutes'){
   if(!g.game||busy||!meetingCoordinator||readOnly||meetingActionsLocked)return;setMeetingError('');setNotice('');setBusy(true);
   const r=await supabase.rpc(kind==='agenda'?'approve_institution_meeting_agenda':'approve_institution_meeting_minutes',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body});
-  if(r.error)setMeetingError(meetingErrorMessage(r.error.message));else{await load();setNotice(kind==='agenda'?'Повестка утверждена. Регистрация доступна.':'Протокол утверждён.')}
+  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();setNotice(kind==='agenda'?'Повестка утверждена. Регистрация доступна.':'Протокол утверждён.')}
   setBusy(false);
  }
  async function assignMeetingDelegate(){
   if(!g.game||!meetingCoordinator||readOnly||meetingActionsLocked||busy)return;setMeetingError('');setNotice('');setBusy(true);
   const r=await supabase.rpc('assign_institution_meeting_secretary',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_delegate:delegateUser||null});
-  if(r.error)setMeetingError(meetingErrorMessage(r.error.message));else{await load();setNotice('Ответственный исполнитель сохранён.')}
+  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();setNotice('Ответственный исполнитель сохранён.')}
   setBusy(false);
  }
- async function register(){if(!g.game||!canAttend||!agendaReady||readOnly||meetingActionsLocked||busy)return;setMeetingError('');setNotice('');setBusy(true);const r=await supabase.rpc('register_institution_session_at_stage',{p_game_id:g.game.id,p_institution:body,p_stage_no:stage});if(r.error)setMeetingError(meetingErrorMessage(r.error.message));else{await load();setNotice('Вы зарегистрированы на заседание.')}setBusy(false)}
+ async function register(){if(!g.game||!canAttend||!agendaReady||readOnly||meetingActionsLocked||busy)return;setMeetingError('');setNotice('');setBusy(true);const r=await supabase.rpc('register_institution_session_at_stage',{p_game_id:g.game.id,p_institution:body,p_stage_no:stage});if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();setNotice('Вы зарегистрированы на заседание.')}setBusy(false)}
  async function saveGdPresence(){
   if(!g.game||busy||readOnly||meetingActionsLocked||!agendaReady||!canAttend||!gdPresence)return;
   const number=Number(presenceDraft),capacity=Number(gdPresence.my_capacity||0);
@@ -146,7 +147,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
   else{await load();setNotice('Явка депутатов сохранена. Кворум пересчитан.')}
   setBusy(false);
  }
- async function createBody(){if(!g.game)return;setBusy(true);const r=await supabase.rpc('save_civic_voting_body',{p_game_id:g.game.id,p_title:newTitle.trim(),p_seats:Number(seats),p_users:users,p_head:head||null,p_unit:editing});if(r.error)g.setError(r.error.message);else{await load();setBody('unit:'+r.data);setNewTitle('');setUsers([]);setHead('');setSeats('1');setEditing(null);setNotice('Состав органа сохранён. Его можно выбрать при открытии голосования.')}setBusy(false)}
+ async function createBody(){if(!g.game)return;setBusy(true);const r=await supabase.rpc('save_civic_voting_body',{p_game_id:g.game.id,p_title:newTitle.trim(),p_seats:Number(seats),p_users:users,p_head:head||null,p_unit:editing});if(r.error)g.setError(userError(r.error));else{await load();setBody('unit:'+r.data);setNewTitle('');setUsers([]);setHead('');setSeats('1');setEditing(null);setNotice('Состав органа сохранён. Его можно выбрать при открытии голосования.')}setBusy(false)}
  return <details ref={detailsRef} className="institutionRegistrationPanel civicRegistration civicDisclosure projectDisclosure" aria-label="Регистрация на заседания"><DisclosureSummary icon={ClipboardCheck} title="Регистрация на заседание" description={'Этап '+stage+' · Регистрация в органе власти'}/><div className="civicDisclosureBody"><p>{body==='ksrf'?'До внесения предложений и голосования необходимо зарегистрироваться на заседание КСРФ. Участвовать могут все участники, но один голос от фракции подаёт её избранный представитель.':body==='gd'&&stage===4?'До формирования руководства Государственной Думы повестку готовят председатели зарегистрированных политических партий. После избрания Председателя Думы и формирования Совета Думы полномочия переходят руководству палаты. Для участия в заседании после утверждения повестки необходима регистрация.':'Перед участием в заседании и голосовании необходимо зарегистрироваться в соответствующем органе после утверждения повестки.'}</p>
   <div className="civicRegistrationSelectors"><StyledSelect label="Орган" value={body} onChange={setBody} options={[...availableBodies.map(b=>({value:b.key,label:b.title})),...units.filter(u=>!allowedBodies||allowedBodies.includes('unit:'+u.id)).map(u=>({value:'unit:'+u.id,label:u.title}))]}/></div>
   <section className="civicMeetingDocuments" aria-label="Документы заседания" data-agenda-state={agendaReady?'approved':agendaDraft?'draft':'pending'}>

@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {ExternalLink,FileText,Plus,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -18,25 +19,25 @@ export default function ProfileDocumentLinks({gameId,userId}:{gameId:string;user
  const [busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[loaded,setLoaded]=useState(false);
  async function load(){
   const r=await supabase.from('profile_document_links').select('id,title,provider,url').eq('game_id',gameId).eq('user_id',userId).order('created_at',{ascending:false});
-  if(r.error){setNotice('Не удалось открыть список документов: '+r.error.message);return}
+  if(r.error){setNotice('Не удалось открыть список документов: '+userError(r.error));return}
   setLinks((r.data||[]) as Link[]);setLoaded(true);
  }
  useEffect(()=>{void load()},[gameId,userId]);
  async function add(e:React.FormEvent){
   e.preventDefault();if(busy)return;
   const provider=documentProvider(url.trim());
-  if(!provider){setNotice('Вставьте HTTPS-ссылку на документ Гугл или Яндекса.');return}
+  if(!provider){setNotice('Вставьте защищённую ссылку на документ Гугл или Яндекса.');return}
   if(!title.trim()){setNotice('Укажите название документа.');return}
   setBusy(true);setNotice('');
   const r=await supabase.from('profile_document_links').insert({game_id:gameId,user_id:userId,title:title.trim(),url:url.trim(),provider}).select('id').single();
-  if(r.error)setNotice(r.error.code==='23505'?'Этот документ уже добавлен.':'Не удалось сохранить документ: '+r.error.message);
+  if(r.error)setNotice(r.error.code==='23505'?'Этот документ уже добавлен.':'Не удалось сохранить документ: '+userError(r.error));
   else{setTitle('');setUrl('');await load();setNotice('Документ добавлен в личный кабинет.')}
   setBusy(false);
  }
  async function remove(id:string){
   if(busy)return;setBusy(true);setNotice('');
   const r=await supabase.from('profile_document_links').delete().eq('id',id).eq('user_id',userId).select('id').single();
-  if(r.error)setNotice('Не удалось убрать ссылку: '+r.error.message);
+  if(r.error)setNotice('Не удалось убрать ссылку: '+userError(r.error));
   else{setLinks(old=>old.filter(x=>x.id!==id));setNotice('Ссылка удалена. Сам документ сохранён у провайдера.')}
   setBusy(false);
  }

@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import {ArrowLeft,CalendarDays,CheckCheck,ClipboardList,Send,UserRoundCheck} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -10,17 +11,17 @@ export default function AssignedTasks({gameId,userId,teacher,members,onBack}:{ga
  const [tasks,setTasks]=useState<Task[]>([]),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const [author,setAuthor]=useState(userId),[recipient,setRecipient]=useState(''),[title,setTitle]=useState(''),[description,setDescription]=useState(''),[dueAt,setDueAt]=useState(dateInputValue),[confirmation,setConfirmation]=useState(true);
  const name=(id:string)=>eligible.find(m=>m.user_id===id)?.full_name||'Участник';
- const load=useCallback(async()=>{const r=await supabase.from('game_assigned_tasks').select('id,game_id,assigned_by,author_id,recipient_id,title,description,due_at,requires_confirmation,status,created_at,completed_at,confirmed_at').eq('game_id',gameId).order('created_at',{ascending:false}).limit(200);if(r.error)setError(r.error.message);else{setTasks((r.data||[]) as Task[]);setError('')}setLoading(false)},[gameId]);
+ const load=useCallback(async()=>{const r=await supabase.from('game_assigned_tasks').select('id,game_id,assigned_by,author_id,recipient_id,title,description,due_at,requires_confirmation,status,created_at,completed_at,confirmed_at').eq('game_id',gameId).order('created_at',{ascending:false}).limit(200);if(r.error)setError(userError(r.error));else{setTasks((r.data||[]) as Task[]);setError('')}setLoading(false)},[gameId]);
  useEffect(()=>{void load()},[load]);
  useEffect(()=>{setAuthor(userId)},[userId]);
  async function create(event:React.FormEvent){event.preventDefault();if(busy||!recipient||!title.trim()||!description.trim()||!dueAt)return;setBusy(true);setError('');setNotice('');
   try{const r=await supabase.rpc('create_game_assigned_task',{p_game_id:gameId,p_author_id:teacher?author:userId,p_recipient_id:recipient,p_title:title.trim(),p_description:description.trim(),p_due_at:new Date(dueAt).toISOString(),p_requires_confirmation:confirmation});
-   if(r.error)throw r.error;setNotice('Поручение назначено. Адресату с подключённым Telegram будет отправлено уведомление.');setTitle('');setDescription('');setRecipient('');await load();
-  }catch(e){setError(e instanceof Error?e.message:'Не удалось сохранить поручение')}finally{setBusy(false)}
+   if(r.error)throw r.error;setNotice('Поручение назначено. Адресату с подключённым Телеграмом будет отправлено уведомление.');setTitle('');setDescription('');setRecipient('');await load();
+  }catch(e){setError((userError(e)||'Не удалось сохранить поручение'))}finally{setBusy(false)}
  }
  async function transition(id:string,mode:'complete'|'confirm'){if(busy)return;setBusy(true);setError('');setNotice('');
   try{const r=await supabase.rpc(mode==='complete'?'complete_game_assigned_task':'confirm_game_assigned_task',{p_task_id:id});if(r.error)throw r.error;setNotice(mode==='complete'?'Выполнение отмечено.':'Выполнение подтверждено.');await load()}
-  catch(e){setError(e instanceof Error?e.message:'Не удалось обновить поручение')}finally{setBusy(false)}
+  catch(e){setError((userError(e)||'Не удалось обновить поручение'))}finally{setBusy(false)}
  }
  return <section className="assignedTaskPage" aria-label="Поручения ГОС.ID">
   <header className="assignedTaskHero"><button type="button" onClick={onBack} className="assignedTaskBack"><ArrowLeft size={18}/> Вернуться в профиль</button><small>ГОС.ID · ПОРУЧЕНИЯ</small><h1>Назначить задачу</h1><p>Постановка, сроки и подтверждение выполнения поручений участниками республики.</p></header>

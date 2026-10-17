@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 type Score={score:number;cases:number;actions:number;blitz:number;completion:number;cases_total:number;cases_right:number;actions_right:number;quiz_total:number;quiz_right:number;quiz_answered:number};
@@ -12,7 +13,7 @@ export default function BlitzKnowledgeScore({gameId,userId,stageNo}:{gameId:stri
    const token=++request;
    const result=await supabase.rpc('blitz_vsn',{p_game:gameId,p_student:userId,p_stage:stageNo});
    if(!current||token!==request)return;
-   if(result.error)setError(result.error.message);
+   if(result.error)setError(userError(result.error));
    else{setScore(result.data as Score);setError('')}
   };
   void go();

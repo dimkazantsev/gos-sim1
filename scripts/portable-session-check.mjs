@@ -3,7 +3,10 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
-import {applyPortableAction} from '../public/portable/engine.mjs';
+import {applyPortableAction,portableErrorMessage} from '../public/portable/engine.mjs';
+
+assert.equal(portableErrorMessage(new Error('Нет доступа к игре.')),'Нет доступа к игре.');
+for(const error of [new SyntaxError('Unexpected token in JSON'),new Error('Failed to fetch'),null])assert.doesNotMatch(portableErrorMessage(error),/[A-Za-z_]/);
 
 const fixture = () => ({format:'GOS-SIMS',schema:2,game:{id:'test-game',owner_id:'teacher',game_code:'TEST',title:'Проверка'},tables:{
  game_members:[{user_id:'teacher',kind:'teacher',full_name:'Тестовый Преподаватель'},
@@ -54,6 +57,8 @@ try{
   return {status:res.status,data:await res.json(),cookie:res.headers.get('set-cookie')?.split(';')[0]};
  };
  await start();
+ const invalid=await fetch('http://127.0.0.1:'+port+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:'{' });
+ assert.equal(invalid.status,400);assert.doesNotMatch((await invalid.json()).error,/[A-Za-z_]/);
  const publicState=await request('state');
  assert.equal(publicState.data.state.tables.event_cases.length,0,'Guest cannot read unassigned bank');
  const html=await (await fetch('http://127.0.0.1:'+port+'/')).text();
