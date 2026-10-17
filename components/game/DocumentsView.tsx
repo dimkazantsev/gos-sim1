@@ -442,13 +442,13 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
      <div className="billCreateAttachments"><div className="billCreateAttachmentsHead"><div><Paperclip size={18}/><b>Обязательные приложения</b></div><span>{createBillPreparedCount} из {createBillRequiredKinds.length} выбрано</span></div>{createBillRequiredKinds.map(kind=>{const nextFile=createBillFiles[kind];return <label key={kind} className={nextFile?'has-file':''}><span><b>{billFileLabels[kind]||kind}</b><small>{nextFile?nextFile.name:'PDF, DOC/DOCX или TXT'}</small></span><input type="file" accept=".pdf,.doc,.docx,.txt" onChange={e=>setCreateBillFiles(v=>({...v,[kind]:e.target.files?.[0]||null}))}/><em>{nextFile?'Заменить':'Выбрать файл'}</em></label>})}</div>
      <p className="billCreateRule"><ClipboardList size={17}/> Зарегистрировать черновик можно и с неполным комплектом. Но официальный переход «Внести в Государственную Думу» будет доступен только после заполнения обязательных материалов.</p>
     </section>}
-    <div className="formalCreateFooter"><div className="legalStageValue"><span>Этап игры:</span><b>{createStageNo||currentStage?.stage_no||'—'}</b></div><button type="button" className="primary" disabled={readOnly||busy||extracting||title.trim().length<3||(!teacher&&(!availableSubjects.length||!actingOffice))} onClick={create}>{busy?'Регистрирую и сохраняю комплект…':'Зарегистрировать документ →'}</button></div>
+    <div className="formalCreateFooter"><div className="legalStageValue"><span>Регистрация в Реестре НПА</span></div><button type="button" className="primary" disabled={readOnly||busy||extracting||title.trim().length<3||(!teacher&&(!availableSubjects.length||!actingOffice))} onClick={create}>{busy?'Регистрирую и сохраняю комплект…':'Зарегистрировать документ →'}</button></div>
    </div>
   </section>}
 
   {mode==='registry'&&<section className="formalWorkspace"><aside className="formalRegistry registryDashboard" hidden={detailOpen}>
     <header className="formalRegistryHead registryDashboardHead">
-     <div><small>Реестр НПА</small><h2>Документы игры</h2><p>Единое рабочее пространство для поиска, контроля стадии и открытия нормативных документов.</p></div>
+     <div><small>Реестр НПА</small><h2>Реестр нормативных правовых актов</h2><p>Единое рабочее пространство для поиска, контроля стадии и открытия нормативных документов.</p></div>
      <button type="button" className="primary legalNewDocumentButton" onClick={()=>setMode('create')}><Plus size={17}/> Новый документ</button>
     </header>
 
