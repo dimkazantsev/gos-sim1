@@ -60,10 +60,26 @@ export function formalDocumentTitle(title:string|null|undefined,docType:string){
  if(mapped)return mapped;
  // Earlier automatic meeting titles exposed an internal institution key and stage.
  // Keep stage_no in metadata and links; the official document title has no stage.
- const meeting=/^(Повестка|Протокол) заседания\s*[·:—-]\s*ksrf(?:\s*[·:—-]\s*этап\s*\d+)?$/i.exec(raw);
- if(meeting)return meeting[1]+' заседания Координационного Совета Российской Федерации';
+ const meeting=/^(Повестка|Протокол) заседания\s*[·:—-]\s*(ksrf|gd|sf|government|municipality|committee|region|cec|ks|vs|central_bank|accounts)(?:\s*[·:—-]\s*этап\s*\d+)?$/i.exec(raw);
+ if(meeting){
+  const issuer:Record<string,string>={
+   ksrf:'Координационного Совета Российской Федерации',
+   gd:'Государственной Думы Федерального Собрания Российской Федерации',
+   sf:'Совета Федерации Федерального Собрания Российской Федерации',
+   government:'Правительства Российской Федерации',
+   municipality:'органа местного самоуправления',
+   committee:'комитета Государственной Думы',
+   region:'законодательного органа субъекта Российской Федерации',
+   cec:'избирательной комиссии',
+   ks:'Конституционного Суда Российской Федерации',
+   vs:'Верховного Суда Российской Федерации',
+   central_bank:'Совета директоров Банка России',
+   accounts:'Коллегии Счётной палаты Российской Федерации'
+  };
+  return meeting[1]+' заседания '+issuer[meeting[2].toLowerCase()];
+ }
  const official=raw.replace(/\s*[·:—-]\s*этап\s*\d+\s*$/i,'').trim();
- if(/\bksrf\b/i.test(official))return official.replace(/\bksrf\b/gi,'Координационного Совета Российской Федерации');
+ if(/\bksrf\b/i.test(official))return official.replace(/\bksrf\b/gi,'КСРФ');
  if(official!==raw)return official;
  if(!raw||/^[a-z][a-z0-9]*(?:[_-][a-z0-9]+)+$/.test(raw))return formalDocumentTypeLabel(docType);
  return raw;
