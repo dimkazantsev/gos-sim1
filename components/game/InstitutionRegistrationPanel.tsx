@@ -26,16 +26,17 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  const [agendaText,setAgendaText]=useState(''),[minutesText,setMinutesText]=useState(''),[delegateUser,setDelegateUser]=useState('');
  const [meetingError,setMeetingError]=useState('');
  const [permission,setPermission]=useState<{key:string;rights:MeetingPermissions}|null>(null);
+ const [rightsVersion,setRightsVersion]=useState(0);
  const detailsRef=useRef<HTMLDetailsElement>(null);
  const stage=stageNo||g.game?.current_round||1,students=g.members.filter(m=>m.kind==='student');
  async function load(){if(!g.game)return;const [r,u,a,b,o,meeting]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active'),
   supabase.from('institution_meeting_records').select('game_id,stage_no,institution_key,agenda_document_id,agenda_body,agenda_approved_at,minutes_document_id,minutes_body,minutes_approved_at,delegate_user_id').eq('game_id',g.game.id).eq('stage_no',stage)]);
   const failure=[r,u,a,b,o,meeting].find(x=>x.error);if(failure?.error){setMeetingError('Не удалось загрузить сведения о заседании. '+meetingErrorMessage(failure.error.message));return;}
-  if(!r.error)setRows(r.data||[]);if(!u.error){setUnits(u.data||[]);onUnitsChange?.(u.data||[])}setAssignments([...(a.data||[]),...(b.data||[])]);if(!o.error)setOffices(o.data||[]);if(!meeting.error)setMeetingRows((meeting.data||[]) as MeetingRecord[]);
+  if(!r.error)setRows(r.data||[]);if(!u.error){setUnits(u.data||[]);onUnitsChange?.(u.data||[])}setAssignments([...(a.data||[]),...(b.data||[])]);if(!o.error)setOffices(o.data||[]);if(!meeting.error)setMeetingRows((meeting.data||[]) as MeetingRecord[]);setRightsVersion(v=>v+1);
  }
  useEffect(()=>{if(initialBody)setBody(initialBody)},[initialBody]);
  useEffect(()=>{if(defaultOpen&&detailsRef.current)detailsRef.current.open=true},[defaultOpen,stage,initialBody]);
- useGameTableSync(g.game?.id,['institution_session_registrations','institution_units','institution_assignments','game_voting_body_members','game_office_assignments','institution_meeting_records','formal_documents'],load,String(stage));
+ useGameTableSync(g.game?.id,['institution_session_registrations','institution_units','institution_assignments','game_voting_body_members','game_office_assignments','institution_meeting_records','formal_documents','office_elections','office_candidates'],load,String(stage));
  useEffect(()=>{const row=meetingRows.find(m=>m.institution_key===body);setAgendaText(row?.agenda_body||'');setMinutesText(row?.minutes_body||'');setDelegateUser(row?.delegate_user_id||'')},[meetingRows,body]);
  const permissionKey=[g.game?.id,g.me?.user_id,stage,body].join(':');
  const currentDelegate=meetingRows.find(m=>m.institution_key===body)?.delegate_user_id;
@@ -54,7 +55,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
     setPermission({key:permissionKey,rights:{can_coordinate:data.can_coordinate,can_prepare:data.can_prepare,can_attend:data.can_attend}});
    }).catch(()=>{if(active)setMeetingError('Не удалось проверить полномочия. Проверьте соединение и повторите попытку.')});
   return()=>{active=false};
- },[permissionKey,currentDelegate]);
+ },[permissionKey,currentDelegate,rightsVersion]);
  useEffect(()=>{
   if(body!=='ksrf'||(stage!==2&&stage!==3))return;
   const ready=!!meetingRows.find(m=>m.institution_key==='ksrf')?.agenda_approved_at
@@ -114,12 +115,12 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  }
  async function register(){if(!g.game||!canAttend||!agendaReady||readOnly||meetingActionsLocked||busy)return;setMeetingError('');setNotice('');setBusy(true);const r=await supabase.rpc('register_institution_session_at_stage',{p_game_id:g.game.id,p_institution:body,p_stage_no:stage});if(r.error)setMeetingError(meetingErrorMessage(r.error.message));else{await load();setNotice('Вы зарегистрированы на заседание.')}setBusy(false)}
  async function createBody(){if(!g.game)return;setBusy(true);const r=await supabase.rpc('save_civic_voting_body',{p_game_id:g.game.id,p_title:newTitle.trim(),p_seats:Number(seats),p_users:users,p_head:head||null,p_unit:editing});if(r.error)g.setError(r.error.message);else{await load();setBody('unit:'+r.data);setNewTitle('');setUsers([]);setHead('');setSeats('1');setEditing(null);setNotice('Состав органа сохранён. Его можно выбрать при открытии голосования.')}setBusy(false)}
- return <details ref={detailsRef} className="institutionRegistrationPanel civicRegistration civicDisclosure projectDisclosure" aria-label="Регистрация на заседания"><DisclosureSummary icon={ClipboardCheck} title="Регистрация на заседание" description={'Этап '+stage+' · Регистрация в органе власти'}/><div className="civicDisclosureBody"><p>До внесения предложений и голосования зарегистрируйтесь на заседание нужного органа. В КСРФ участвуют все студенты, но право подать один голос от фракции принадлежит её избранному представителю.</p>
+ return <details ref={detailsRef} className="institutionRegistrationPanel civicRegistration civicDisclosure projectDisclosure" aria-label="Регистрация на заседания"><DisclosureSummary icon={ClipboardCheck} title="Регистрация на заседание" description={'Этап '+stage+' · Регистрация в органе власти'}/><div className="civicDisclosureBody"><p>{body==='ksrf'?'До внесения предложений и голосования необходимо зарегистрироваться на заседание КСРФ. Участвовать могут все участники, но один голос от фракции подаёт её избранный представитель.':body==='gd'&&stage===4?'До формирования руководства Государственной Думы повестку готовят председатели зарегистрированных политических партий. После избрания Председателя Думы и формирования Совета Думы полномочия переходят руководству палаты. Для участия в заседании после утверждения повестки необходима регистрация.':'Перед участием в заседании и голосовании необходимо зарегистрироваться в соответствующем органе после утверждения повестки.'}</p>
   <div className="civicRegistrationSelectors"><StyledSelect label="Орган" value={body} onChange={setBody} options={[...availableBodies.map(b=>({value:b.key,label:b.title})),...units.filter(u=>!allowedBodies||allowedBodies.includes('unit:'+u.id)).map(u=>({value:'unit:'+u.id,label:u.title}))]}/></div>
   <section className="civicMeetingDocuments" aria-label="Документы заседания">
    <header><div><b>Повестка заседания</b><small>{agendaReady?'Утверждена · регистрация разрешена':agendaDraft?'Проект в реестре · требуется утверждение':verifiedRights&&!canAttend?'Повестка доступна уполномоченным участникам':'Повестка ещё не составлена'}</small></div><span>{agendaHasDocument?'В реестре НПА':'Не оформлена'}</span></header>
    <div className="civicMeetingSteps" aria-label="Порядок заседания">
-    <span><b>1. Подготовка</b>Председатель или назначенный исполнитель</span>
+    <span><b>1. Подготовка</b>{body==='gd'&&stage===4?'Руководители партий, затем руководство Думы':'Председатель или назначенный исполнитель'}</span>
     <span><b>2. Утверждение</b>Председатель или преподаватель</span>
     <span><b>3. Регистрация</b>Участники соответствующего органа</span>
    </div>

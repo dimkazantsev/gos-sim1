@@ -2,7 +2,6 @@
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
-import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 
 type Election={id:string;game_id:string;office_key:'gd_chair'|'gd_deputy_1'|'gd_deputy_2';office_title:string;round_no:1|2;vote_mode:'open'|'secret';status:'nomination'|'open'|'closed'|'finished';ballot_mode?:'faction'|'personal';winner_candidate_id:string|null;parent_election_id:string|null;created_at:string};
 type OfficeCandidate={id:string;election_id:string;user_id:string;party_id:string;created_at:string};
@@ -109,7 +108,6 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
  return <section className="dumaElection">
   <header className="dumaElectionHead"><div><small>ПАРЛАМЕНТСКАЯ ПРОЦЕДУРА · ЭТАП 4</small><h2>Руководство Государственной Думы</h2><p>Сначала депутаты регистрируются на заседание и утверждают процедуру голосованием. Затем фракции выдвигают кандидатов, проходит их обсуждение и персональное голосование депутатов. Каждый депутат голосует своими действующими мандатами с учётом GV; избрание требует 226 голосов из 450.</p></div><div className="dumaThreshold"><strong>226</strong><span>голосов для избрания</span><em>из 450</em></div></header>
 
-  <InstitutionRegistrationPanel g={g} stageNo={4} initialBody="gd" allowedBodies={['gd']} defaultOpen/>
   <div className="dumaElectionProcedure"><b>Утверждение процедуры выборов депутатами</b><p>{procedureApproved?'Процедура утверждена: можно выдвигать кандидатов.':procedureOpen?'Голосование открыто в разделе «Голосование».':'До выдвижения кандидатур требуется голосование зарегистрированных депутатов.'}</p>
   {teacher&&!procedureApproved&&!procedureOpen&&<button type="button" className="primary" disabled={busy} onClick={()=>void openProcedureVote()}>Открыть голосование о процедуре</button>}</div>
   {teacher&&<div className="dumaElectionCreator"><label>Должность<select value={office} onChange={e=>setOffice(e.target.value as typeof office)}>{offices.map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label><label>Форма голосования<select value={mode} onChange={e=>setMode(e.target.value as 'open'|'secret')}><option value="open">Открытое</option><option value="secret">Тайное</option></select></label><button className="primary" disabled={busy||!procedureApproved} onClick={()=>void createElection()}>Создать процедуру</button></div>}
