@@ -32,9 +32,13 @@ party='00000000-0000-0000-0000-000000000099';
   await db.query(`insert into party_documents values($1,$2,'Устав зарегистрированной партии')`,[game,party]);
   await assert.rejects(()=>db.query(`insert into party_documents values($1,'00000000-0000-0000-0000-000000000088','Без председателя')`,[game]),/Сначала изберите председателя партии/);
   await assert.rejects(()=>db.query(`insert into formal_documents values($1,2,'gd_resolution','{}'::jsonb)`,[game]),/Этап завершён|ещё не открыт/);
+  await db.exec('begin');
   await db.query(`select set_config('app.gos_meeting_document_scope',$1,true)`,[game+':2:ksrf:agenda']);
+  await db.exec('savepoint not_agenda');
   await assert.rejects(()=>db.query(`insert into formal_documents values($1,2,'gd_resolution','{}'::jsonb)`,[game]),/Этап завершён|ещё не открыт/);
+  await db.exec('rollback to savepoint not_agenda');
   await db.query(`insert into formal_documents values($1,2,'meeting_agenda',$2::jsonb)`,[game,JSON.stringify({document_kind:'institution_meeting_agenda',institution_key:'ksrf'})]);
+  await db.exec('commit');
   assert.equal((await db.query(`select count(*)::integer n from formal_documents where doc_type='meeting_agenda'`)).rows[0].n,1);
   console.log('PASS: parties require elected chair, no cross-record field errors, only scoped agenda bypasses completed stage.');
  }finally{await db.close()}
