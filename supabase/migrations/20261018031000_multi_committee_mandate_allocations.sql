@@ -440,3 +440,24 @@ begin
  return jsonb_build_object('stage_no',p_stage,'ready',jsonb_array_length(b)=0,'blockers',b,'warnings',w,'metrics',m);
 end;
 $function$;
+
+-- Exact deputy capacities for the authenticated game dashboard; do not infer
+-- them from missing base_mandates rows on the client.
+CREATE OR REPLACE FUNCTION public.get_committee_deputy_capacity(p_game_id uuid)
+RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path TO 'public','private','pg_temp'
+AS $capacity$
+DECLARE v_out jsonb;
+BEGIN
+ IF auth.uid() IS NULL OR NOT private.is_game_member(p_game_id)
+ THEN RAISE EXCEPTION 'Game access required'; END IF;
+ SELECT coalesce(jsonb_agg(jsonb_build_object(
+   'user_id',gm.user_id,'mandates',private.gd_member_capacity(gm.game_id,gm.user_id))
+   ORDER BY gm.joined_at,gm.user_id),'[]'::jsonb) INTO v_out
+ FROM public.game_members gm
+ WHERE gm.game_id=p_game_id AND gm.kind='student' AND gm.roster_archived_at IS NULL;
+ RETURN v_out;
+END;
+$capacity$;
+REVOKE ALL ON FUNCTION public.get_committee_deputy_capacity(uuid) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.get_committee_deputy_capacity(uuid) TO authenticated;
