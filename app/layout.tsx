@@ -50,6 +50,7 @@ import './party-certificate.css';
 import './profile-chat-responsive.css';
 import './tablet-topbar-layout.css';
 import './teacher-unified-header.css';
+import './meeting-agenda-canonical.css';
 import type {Metadata} from 'next';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import '@fontsource-variable/manrope';
