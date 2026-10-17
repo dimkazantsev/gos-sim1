@@ -14,7 +14,7 @@ begin
    left join public.municipal_mayor_ballots b on b.candidate_id=c.id
    where c.election_id=e.id group by c.id
  ) q;
- select count(*)::integer,min(id) into v_count,v_winner_candidate from (
+ select count(*)::integer,min(id::text)::uuid into v_count,v_winner_candidate from (
    select c.id,count(b.id)::integer votes from public.municipal_mayor_candidates c
    left join public.municipal_mayor_ballots b on b.candidate_id=c.id
    where c.election_id=e.id group by c.id
@@ -31,9 +31,13 @@ begin
   'winner_user_id',v_winner_user,
   'turnout',(select count(*) from public.municipal_mayor_ballots where election_id=e.id),
   'results',coalesce((
-    select jsonb_agg(jsonb_build_object('candidate_id',c.id,'user_id',c.user_id,'votes',count(b.id)) order by count(b.id) desc)
-    from public.municipal_mayor_candidates c left join public.municipal_mayor_ballots b on b.candidate_id=c.id
-    where c.election_id=e.id group by c.election_id
+    select jsonb_agg(jsonb_build_object('candidate_id',z.id,'user_id',z.user_id,'votes',z.votes) order by z.votes desc,z.id)
+    from (
+      select c.id,c.user_id,count(b.id)::integer votes
+      from public.municipal_mayor_candidates c
+      left join public.municipal_mayor_ballots b on b.candidate_id=c.id
+      where c.election_id=e.id group by c.id,c.user_id
+    ) z
   ),'[]'::jsonb)
  ) into v_result;
  return v_result;
