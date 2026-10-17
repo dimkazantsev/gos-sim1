@@ -119,6 +119,8 @@ on:
       - 'components/game/EventWorkspace.tsx'
       - 'components/game/ClassroomJournal.tsx'
       - 'components/game/InstitutionRegistrationPanel.tsx'
+      - 'supabase/migrations/20261017143200_institution_meeting_permissions_read.sql'
+      - 'scripts/institution-meeting-documents-check.cjs'
       - 'components/game/InstitutionStaffingLab.tsx'
       - 'components/game/CommitteeChairElectionPanel.tsx'
       - 'supabase/migrations/20261014121000_committee_chair_before_staffing.sql'
