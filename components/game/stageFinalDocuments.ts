@@ -5,6 +5,7 @@ export type StageFinalDocument={
  title:string;
  subject_key:string;
  fulfilled:boolean;
+ evidence_state?:'prepared'|'published';
 };
 export function stageDocumentSubject(stageNo:number,templateKey:string,original:string){
  if(templateKey==='minutes'){
