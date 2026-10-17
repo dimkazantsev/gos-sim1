@@ -25,6 +25,19 @@ assert.equal(formalDocumentTitle('unknown_internal_key','party_certificate'),'С
 assert.equal(formalDocumentTitle('','other'),'Иной формальный институт / документ');
 assert.equal(formalDocumentTitle('Goust Voting','other'),'Goust Voting');
 assert.equal(formalDocumentTitle('Название, указанное автором','other'),'Название, указанное автором');
+for(const [stored,expected] of [
+ ['Повестка заседания · ksrf · этап 3','Повестка заседания Координационного Совета Российской Федерации'],
+ ['Повестка заседания Государственной Думы — этап 4','Повестка заседания Государственной Думы'],
+ ['Протокол заседания · gd · этап 4','Протокол заседания Государственной Думы Федерального Собрания Российской Федерации'],
+ ['Указ Президента Российской Федерации — этап 7','Указ Президента Российской Федерации'],
+ ['Постановление Государственной Думы','Постановление Государственной Думы'],
+]){
+ assert.equal(formalDocumentTitle(stored,'other'),expected,'Official document titles must not carry stage markers');
+}
+const paper=fs.readFileSync(path.join(root,'components/game/DocumentPaper.tsx'),'utf8');
+assert(!paper.includes('Учебный документ деловой игры'),'No instructional footer on official papers');
+assert(paper.includes('<span>{officialInstitution}</span>{footerSlot}'),'Printed footer must identify the issuing authority and preserve print controls');
+assert(paper.includes('legalMasthead')&&paper.includes('legalPaperFooterBar'),'Existing legal document layout is retained');
 const view=fs.readFileSync(path.join(root,'components/game/DocumentsView.tsx'),'utf8');
 assert.match(view,/function typeLabel\(key:string\)\{return formalDocumentTypeLabel\(key\)\}/);
 assert.match(view,/typeLabel\(selected\.doc_type\)/);
