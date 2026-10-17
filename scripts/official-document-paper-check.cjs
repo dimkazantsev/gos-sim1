@@ -30,7 +30,7 @@ assert(paper.includes('className="formalPaperInstitution">{issuer}'),'The same a
 const view=read('components/game/DocumentsView.tsx');
 assert(!view.includes('Этап игры:')&&!view.includes('Документы игры'),'The document workspace must not advertise simulation metadata');
 assert(view.includes('<DocumentPaper document={selected}'),'Central paper used in main document viewer');
-assert(view.includes('onClick={()=>window.print()}'),'Printing uses the same paper markup');
+assert(view.includes('printOfficialDocument()'),'Printing isolates the same approved paper markup on A4, not dashboard panels');
 assert(!view.includes('{selected.registry_no} · Этап {selected.stage_no}'),'Internal stage not shown in paper heading');
 const sql=read('supabase/migrations/20261017204000_official_meeting_document_titles.sql');
 assert(sql.includes("v_title:=case when v_org_gen is null"),'Future meeting titles from official institution');
