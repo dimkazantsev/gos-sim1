@@ -58,7 +58,7 @@ const uuid=n=>'00000000-0000-0000-0000-'+n.toString(16).padStart(12,'0');
    await db.query("insert into office_elections(id,game_id,stage_no,office_key,office_title,round_no,vote_mode,status,created_by,ballot_mode) values($1,$2,4,$3,'Председатель комитета',1,'open','open',$4,'personal')",[id,game,officeKey,owner]);
    const candidates=[];
    for(let i=0;i<nomineeCount;i++){
-    const candidate=uuid(number+100+i);
+    const candidate=uuid(number*100+i);
     candidates.push(candidate);
     await db.query('insert into office_candidates(id,election_id,game_id,user_id,party_id,nominated_by) values($1,$2,$3,$4,$5,$6)',[candidate,id,game,voters[i%voters.length],partyId,owner]);
    }
