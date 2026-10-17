@@ -99,7 +99,8 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
 
  async function openProcedureVote(){setBusy(true);const r=await supabase.rpc('open_duma_leadership_procedure_vote',{p_game_id:activeGame.id});if(r.error)setError(userError(r.error));else{await load();await g.refresh()}setBusy(false)}
  async function createElection(){
-  setBusy(true);const r=await supabase.rpc('create_office_election',{p_game_id:activeGame.id,p_office_key:office,p_vote_mode:mode});
+  if(!selectedOffice||electedKeys.has(selectedOffice)||activeKeys.has(selectedOffice))return;
+  setBusy(true);const r=await supabase.rpc('create_office_election',{p_game_id:activeGame.id,p_office_key:selectedOffice,p_vote_mode:mode});
   if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
  async function nominate(electionId:string){
@@ -117,6 +118,16 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
  async function close(electionId:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:electionId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  const sorted=useMemo(()=>[...elections].sort((a,b)=>a.office_key.localeCompare(b.office_key)||a.round_no-b.round_no),[elections]);
+ const electedKeys=new Set(elections.filter(e=>e.status==='finished'&&e.winner_candidate_id).map(e=>e.office_key));
+ const activeKeys=new Set(elections.filter(e=>e.status==='nomination'||e.status==='open').map(e=>e.office_key));
+ const availableOffices=offices.filter(([key])=>!electedKeys.has(key)&&!activeKeys.has(key));
+ const selectedOffice=availableOffices.some(([key])=>key===office)?office:availableOffices[0]?.[0];
+ const pendingSecondRounds=elections.filter(e=>e.round_no===2&&(e.status==='nomination'||e.status==='open'));
+ const repeatNeeded=elections.filter(e=>e.status==='closed'&&!e.winner_candidate_id
+  &&!electedKeys.has(e.office_key)&&!activeKeys.has(e.office_key)
+  &&elections.filter(t=>t.office_key===e.office_key).every(t=>t.status==='closed'));
+ const displayedElections=sorted.filter(e=>!(e.status==='nomination'&&electionCandidates(e.id).length===0&&electedKeys.has(e.office_key)));
+
 
  return <section className="dumaElection">
   <header className="dumaElectionHead">
@@ -136,12 +147,17 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
    {(teacher||canPropose)&&!procedureApproved&&!procedureOpen&&<button type="button" className="primary" disabled={busy||!stageActive} onClick={()=>void openProcedureVote()}>{teacher?'Открыть голосование':'Предложить утверждение порядка'}</button>}
     {procedureOpen&&onOpenVotes&&<button type="button" className="secondary" onClick={()=>onOpenVotes(procedureVotes.find(v=>v.status==='open')?.id)}>Перейти к голосованию</button>}
   </div>
-  {canManage&&<div className="dumaElectionCreator"><label>Должность<select value={office} onChange={e=>setOffice(e.target.value as typeof office)}>{offices.map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label><label>Форма голосования<select value={mode} onChange={e=>setMode(e.target.value as 'open'|'secret')}><option value="open">Открытое</option><option value="secret">Тайное</option></select></label><button className="primary" disabled={busy||!procedureApproved||!stageActive} onClick={()=>void createElection()}>Создать процедуру</button></div>}
+  {(pendingSecondRounds.length>0||repeatNeeded.length>0)&&<div className="officeRoundNotice" role="status" aria-live="polite">
+    {pendingSecondRounds.length>0&&<span><b className="officeRoundCount">{pendingSecondRounds.length}</b> Второй тур назначен. Зарегистрированные депутаты должны проголосовать повторно.</span>}
+    {repeatNeeded.length>0&&<span><b className="officeRoundCount">{repeatNeeded.length}</b> Требуются повторные выборы: ни один кандидат не получил большинства.</span>}
+   </div>}
+  {canManage&&availableOffices.length>0&&<div className="dumaElectionCreator"><label>Должность<select value={selectedOffice} onChange={e=>setOffice(e.target.value as typeof office)}>{availableOffices.map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label><label>Форма голосования<select value={mode} onChange={e=>setMode(e.target.value as 'open'|'secret')}><option value="open">Открытое</option><option value="secret">Тайное</option></select></label><button className="primary" disabled={busy||!procedureApproved||!stageActive||!selectedOffice} onClick={()=>void createElection()}>{repeatNeeded.some(e=>e.office_key===selectedOffice)?'Назначить повторные выборы':'Создать процедуру'}</button></div>}
+  {canManage&&availableOffices.length===0&&<p className="dumaElectionWorkflowHint" role="status">Все должности уже замещены либо по ним проводится голосование. Повторное создание выборов недоступно.</p>}
 
   {!stageActive&&<p className="dumaElectionWorkflowHint" role="status">Работа по этапу приостановлена или завершена. Новые предложения станут доступны после открытия этапа преподавателем.</p>}
   {stageActive&&!teacher&&!myRegistered&&<p className="dumaElectionWorkflowHint" role="status">Сначала зарегистрируйтесь на заседание Государственной Думы в блоке регистрации выше.</p>}
   {canPropose&&!canCoordinate&&procedureApproved&&sorted.length===0&&<p className="dumaElectionWorkflowHint" role="status">Порядок выборов утверждён. Создание процедуры выполняет председатель партии либо руководство Государственной Думы; зарегистрированные депутаты смогут предложить кандидатуры.</p>}
-  <div className="dumaElectionList">{sorted.length===0?<div className="dumaElectionEmpty" role="status"><FileClock size={23} aria-hidden="true"/><div><strong>Выборы руководства ещё не начались</strong><p>{procedureApproved?'После создания процедуры здесь появятся кандидаты и результаты голосования.':'После утверждения порядка выборов здесь появятся процедуры избрания руководства Государственной Думы.'}</p></div></div>:sorted.map(e=>{
+  <div className="dumaElectionList">{displayedElections.length===0?<div className="dumaElectionEmpty" role="status"><FileClock size={23} aria-hidden="true"/><div><strong>Выборы руководства ещё не начались</strong><p>{procedureApproved?'После создания процедуры здесь появятся кандидаты и результаты голосования.':'После утверждения порядка выборов здесь появятся процедуры избрания руководства Государственной Думы.'}</p></div></div>:displayedElections.map(e=>{
    const ec=electionCandidates(e.id),eb=electionBallots(e.id),winner=ec.find(c=>c.id===e.winner_candidate_id);
    const myCapacity=ledParty?activeMandates(ledParty.id):0;
    const myUsed=ledParty?usedByParty(e.id,ledParty.id):0;
