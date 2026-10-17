@@ -284,7 +284,15 @@ begin
  v_final_documents:=private.stage_required_final_documents(p_game,p_stage);
  for v_doc in select value from jsonb_array_elements(v_final_documents) loop
    if not (v_doc->>'fulfilled')::boolean then
-     b:=b||jsonb_build_array(case when v_doc->>'evidence_state'='prepared' then 'Не подготовлен итоговый документ: ' else 'Не опубликован итоговый документ: ' end||(v_doc->>'title'));
+     if exists(select 1 from public.game_stages st
+        where st.game_id=p_game and st.stage_no=p_stage and st.status='completed') then
+       -- The new evidence policy is not retroactive to previously completed runs.
+       w:=w||jsonb_build_array('Исторический этап: '||(v_doc->>'title')||
+         ' не оформлен по новым требованиям');
+     else
+       b:=b||jsonb_build_array(case when v_doc->>'evidence_state'='prepared'
+        then 'Не подготовлен итоговый документ: ' else 'Не опубликован итоговый документ: ' end||(v_doc->>'title'));
+     end if;
    end if;
  end loop;
  m:=m||jsonb_build_object('required_documents',v_final_documents);
