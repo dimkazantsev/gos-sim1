@@ -10,6 +10,7 @@ import {STAGE_DETAILS} from './stageDetails';
 import {STAGE_OPERATIONS} from './stageOperations';
 import {gamePhaseForStage} from './stageSystem';
 import StageArtifacts from './StageArtifacts';
+import {canPrepareStageFinalDocument,type StageFinalDocument} from './stageFinalDocuments';
 import StageReadinessPanel from './StageReadinessPanel';
 import StagePolicyEditor,{CONSEQUENCE_OPTIONS} from './StagePolicyEditor';
 import {supabase} from '@/lib/supabase';
@@ -79,6 +80,24 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
  },[g.game?.id,stage.stage_no,stage.deadline]);
  const operation=STAGE_OPERATIONS[stage.stage_no],detail=STAGE_DETAILS[stage.stage_no],phase=gamePhaseForStage(stage.stage_no);
  const docs=g.formalDocuments.filter(d=>d.stage_no===stage.stage_no);
+ const [requiredDocuments,setRequiredDocuments]=useState<StageFinalDocument[]>([]);
+ const [formalSubjects,setFormalSubjects]=useState<string[]>([]);
+ const documentSignature=docs.map(d=>d.id+':'+d.status_code).sort().join('|');
+ const refreshFinalDocuments=useCallback(async()=>{
+  if(!g.game)return;
+  const [readiness,subjects]=await Promise.all([
+   supabase.rpc('get_stage_readiness',{p_game_id:g.game.id,p_stage_no:stage.stage_no}),
+   supabase.rpc('get_formal_subjects',{p_game_id:g.game.id})
+  ]);
+  if(!readiness.error){
+   const items=(readiness.data as {metrics?:{required_documents?:StageFinalDocument[]}}|null)?.metrics?.required_documents;
+   setRequiredDocuments(Array.isArray(items)?items:[]);
+  }
+  if(!subjects.error&&Array.isArray(subjects.data))setFormalSubjects(subjects.data as string[]);
+ },[g.game?.id,stage.stage_no]);
+ useEffect(()=>{void refreshFinalDocuments()},[refreshFinalDocuments,documentSignature]);
+ const awaitingFinalDocuments=requiredDocuments.filter(d=>!d.fulfilled);
+ const actionableFinalDocuments=awaitingFinalDocuments.filter(d=>canPrepareStageFinalDocument(d,formalSubjects,g.teacher));
  const votes=g.votes.filter(v=>v.stage_no===stage.stage_no);
  const openVotes=votes.filter(v=>v.status==='open');
  const publicChannel=g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры');
@@ -137,7 +156,13 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
      {stage.stage_no===16&&<SystemDebriefLab g={g}/>}
     </div>
    </fieldset>
-   <footer className="stageOperationsWorkFooter"><span><ClipboardCheck size={18}/>Проверка учитывает сохранённые результаты процедур</span><button type="button" className="secondary" onClick={()=>setTab('check')}>Проверить завершение</button></footer>
+   {stage.status==='open'&&awaitingFinalDocuments.length>0&&<section className="stageFinalWorkPrompt" aria-live="polite">
+      <div><FileText size={19} aria-hidden="true"/><span><b>Итоговые документы ещё не оформлены</b>
+       <small>Без публикации {awaitingFinalDocuments.length} обязательных документов этап завершить нельзя.</small></span></div>
+      {!viewer&&actionableFinalDocuments.length>0&&<button type="button" className="primary"
+        onClick={()=>setTab('materials')}>Подготовить итоговые документы <ArrowLeft size={16} aria-hidden="true"/></button>}
+     </section>}
+    <footer className="stageOperationsWorkFooter"><span><ClipboardCheck size={18}/>Проверка учитывает процедуры и опубликованные итоговые документы</span><button type="button" className="secondary" onClick={()=>setTab('check')}>Проверить завершение</button></footer>
   </section>
 
   <section id={sectionId+'-rules'} className="stageOperationsPane" hidden={tab!=='rules'} aria-label="Маршрут и правила">
@@ -150,13 +175,14 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
   </section>
 
   <section id={sectionId+'-materials'} className="stageOperationsPane" hidden={tab!=='materials'} aria-label="Документы и голосования">
-   <StageArtifacts g={g} stage={stage} readOnly={viewer} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}/>
+   <StageArtifacts g={g} stage={stage} readOnly={viewer} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}
+     finalDocuments={requiredDocuments} formalSubjects={formalSubjects} onRefreshFinalDocuments={()=>void refreshFinalDocuments()}/>
    <div className="stageOperationsRelated"><h3><Link2 size={18}/>Связанные разделы</h3><div>{operation.related.map(view=><button type="button" key={view} disabled={!onNavigate} onClick={()=>onNavigate?.(view)}>{VIEW_NAMES[view]||'Раздел игры'}</button>)}</div></div>
   </section>
 
   <section id={sectionId+'-check'} className="stageOperationsPane" hidden={tab!=='check'} aria-label="Проверка завершения">
    <div className="stageOperationsCheckSummary"><span><FileText size={18}/>{docs.length} документов</span><span><Vote size={18}/>{openVotes.length} открытых голосований</span></div>
-   <StageReadinessPanel g={g} stageNo={stage.stage_no} readOnly={viewer} rulesUrl={detail.rulesUrl} rulesLabel="Правила этапа"/>
+   <StageReadinessPanel g={g} stageNo={stage.stage_no} readOnly={viewer} rulesUrl={detail.rulesUrl} rulesLabel="Правила этапа" onOpenMaterials={()=>setTab('materials')}/>
    {teacher&&<button type="button" className="secondary stageOperationsSettingsLink" onClick={()=>setTab('settings')}>Настроить сроки и оценивание</button>}
   </section>
 
