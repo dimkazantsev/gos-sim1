@@ -87,7 +87,7 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
  async function close(eid:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:eid});if(r.error)setError(r.error.message);else await load();setBusy(false)}
 
  return <section className="committeeElectionBoard">
-  <div className="committeeElectionHead"><div><small>ИЗБРАНИЕ ПРЕДСЕДАТЕЛЕЙ КОМИТЕТОВ</small><h3>Порог — 226 голосов Государственной Думы</h3><p>Фракции выдвигают своих депутатов до персонального распределения по комитетам. После обсуждения каждый зарегистрированный депутат лично голосует всеми своими действующими мандатами с учётом GV; если в первом туре при трёх и более кандидатах никто не избран, система создаёт второй тур для двух лидеров.</p></div><strong>226+</strong></div>
+  <div className="committeeElectionHead"><div className="committeeElectionIntro"><small>Государственная Дума · Этап 4</small><h3>Выборы председателей комитетов</h3><p>Фракции выдвигают кандидатов до распределения депутатов по комитетам. Зарегистрированные депутаты голосуют действующими мандатами с учётом гоствойтинга. При трёх и более кандидатах, если никто не избран в первом туре, назначается второй тур для двух лидеров.</p></div><div className="committeeElectionThreshold" aria-label="Для избрания требуется 226 голосов из 450"><span>Необходимое большинство</span><strong>226 <small>из 450</small></strong><em>голосов для избрания</em></div></div>
   <div className="committeeElectionGrid">{units.map(u=>{
    const e=activeElection(u.id);
    const last=[...history(u.id)].reverse()[0];
