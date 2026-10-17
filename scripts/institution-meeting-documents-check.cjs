@@ -29,6 +29,7 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  "set request.jwt.claim.sub='"+teacher+"';");
  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261016160500_institution_meeting_agenda_minutes.sql'),'utf8'));
  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261017143200_institution_meeting_permissions_read.sql'),'utf8'));
+ await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261017155200_allow_initial_agenda_after_legacy_registration.sql'),'utf8'));
  const q=async(sql,args=[])=> (await db.query(sql,args)).rows;
  const register=()=>q("select public.register_institution_session_at_stage($1,'ksrf',2)",[game]);
  const permissions=async target=>(await q("select public.get_my_institution_meeting_permissions($1,2,'ksrf') as role",[target]))[0].role;
@@ -85,6 +86,24 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  await db.exec("set request.jwt.claim.sub='"+teacher+"';");
  await q("select public.approve_institution_meeting_agenda($1,2,'ksrf')",[secondGame]);
  assert.equal((await q('select status_code from formal_documents where id=$1',[delegatedAgenda]))[0].status_code,'published');
- console.log('PASS meeting agenda gate, coordinator auto-approval, delegate draft then chair approval, role guidance, registration and minutes');
+ // Historical bug: registered attendees existed before any agenda was prepared.
+ // Preserve those rows and allow only the FIRST agenda; later edits are frozen.
+ const legacyGame='00000000-0000-0000-0000-000000000052';
+ await db.exec("insert into games values('"+legacyGame+"',2);insert into game_stages values('"+legacyGame+"',2);");
+ await q("insert into institution_meeting_records(game_id,stage_no,institution_key) values($1,2,'ksrf')",[legacyGame]);
+ await q("insert into institution_session_registrations(game_id,stage_no,institution_key,user_id) values($1,2,'ksrf',$2)",[legacyGame,student]);
+ assert.equal((await q("select count(*)::int as n from institution_session_registrations where game_id=$1",[legacyGame]))[0].n,1);
+ await db.exec("set request.jwt.claim.sub='"+student+"';");
+ await assert.rejects(()=>q("select public.save_institution_meeting_document($1,2,'ksrf','agenda',$2)",[legacyGame,'Попытка обычного студента создать повестку без поручения']),/председател/);
+ await db.exec("set request.jwt.claim.sub='"+teacher+"';");
+ const firstAgenda=(await q("select public.save_institution_meeting_document($1,2,'ksrf','agenda',$2) as id",[legacyGame,'1. Проверка полномочий участников заседания. 2. Рассмотрение проекта решения и обсуждение.']))[0].id;
+ assert(firstAgenda);
+ assert.equal((await q("select count(*)::int as n from institution_session_registrations where game_id=$1",[legacyGame]))[0].n,1,'Historical registration remains intact');
+ assert.equal((await q("select status_code from formal_documents where id=$1",[firstAgenda]))[0].status_code,'published','Initial agenda is approved');
+ await assert.rejects(()=>q("select public.save_institution_meeting_document($1,2,'ksrf','agenda',$2)",[legacyGame,'Поменять повестку после регистрации должно быть невозможно']),/После начала регистрации повестку менять нельзя/);
+ assert.equal((await q("select agenda_document_id from institution_meeting_records where game_id=$1",[legacyGame]))[0].agenda_document_id,firstAgenda);
+ assert(ui.includes('const canWriteAgenda=!agendaHasDocument||!hasSessionRegistrations'),'Client prevents subsequent editing');
+ assert(ui.includes('Участники были зарегистрированы до оформления повестки'),'Explain why legacy agenda creation is allowed');
+ console.log('PASS meeting agenda: normal permissions, legacy attendance preserved, initial approval succeeds, later edits locked');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
