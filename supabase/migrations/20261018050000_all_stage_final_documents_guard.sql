@@ -358,3 +358,84 @@ DROP TRIGGER IF EXISTS stage_final_document_readiness_guard ON public.game_stage
 CREATE TRIGGER stage_final_document_readiness_guard
  BEFORE UPDATE OF status ON public.game_stages
  FOR EACH ROW EXECUTE FUNCTION private.guard_stage_finalization();
+
+-- Teacher historical confirmation cannot turn absent final documents into 'ready'.
+CREATE OR REPLACE FUNCTION public.get_game_readiness(p_game_id uuid)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare v_uid uuid:=(select auth.uid());v jsonb:='[]'::jsonb;i integer;v_stage jsonb;v_reason text;v_at timestamptz;v_original jsonb;
+v_required_missing jsonb;
+begin
+ if v_uid is null or not private.is_game_member(p_game_id) then raise exception 'Game access required'; end if;
+ for i in 1..16 loop
+  v_stage:=private.stage_readiness_json(p_game_id,i);
+  v_reason:=null;v_at:=null;
+  select reason,created_at into v_reason,v_at from public.stage_readiness_overrides
+   where game_id=p_game_id and stage_no=i and is_active order by created_at desc limit 1;
+  if v_reason is not null then
+   -- Historical overrides can accept legacy procedural records, never absent
+   -- final documents required for new completion.
+   select coalesce(jsonb_agg('Не опубликован итоговый документ: '||(x->>'title')),'[]'::jsonb)
+     into v_required_missing
+   from jsonb_array_elements(coalesce(v_stage->'metrics'->'required_documents','[]'::jsonb)) x
+   where coalesce((x->>'fulfilled')::boolean,false)=false;
+   v_original:=coalesce(v_stage->'blockers','[]'::jsonb);
+   v_stage:=jsonb_set(jsonb_set(v_stage,'{ready}',to_jsonb(jsonb_array_length(v_required_missing)=0)),'{blockers}',v_required_missing)
+     ||jsonb_build_object(
+       'overridden',true,'override_reason',v_reason,'override_at',v_at,'original_blockers',v_original,
+       'warnings',(v_stage->'warnings')||jsonb_build_array('Историческое прохождение подтверждено преподавателем; структурированные данные этого этапа могут отсутствовать')
+     );
+  else v_stage:=v_stage||jsonb_build_object('overridden',false,'original_blockers','[]'::jsonb); end if;
+  v:=v||jsonb_build_array(v_stage);
+ end loop;
+ return v;
+end;$function$;
+
+CREATE OR REPLACE FUNCTION public.get_stage_readiness(p_game_id uuid, p_stage_no integer)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare
+ v_uid uuid:=(select auth.uid());
+ v jsonb;
+ v_reason text;
+ v_at timestamptz;
+ v_original jsonb;
+v_required_missing jsonb;
+begin
+ if v_uid is null or not private.is_game_member(p_game_id) then raise exception 'Game access required'; end if;
+ if p_stage_no<1 or p_stage_no>16 then raise exception 'Stage number must be 1-16'; end if;
+
+ v:=private.stage_readiness_json(p_game_id,p_stage_no);
+
+
+ select reason,created_at into v_reason,v_at
+ from public.stage_readiness_overrides
+ where game_id=p_game_id and stage_no=p_stage_no and is_active
+ order by created_at desc limit 1;
+
+ if v_reason is not null then
+   -- Historical overrides can accept legacy procedural records, never absent
+   -- final documents required for new completion.
+   select coalesce(jsonb_agg('Не опубликован итоговый документ: '||(x->>'title')),'[]'::jsonb)
+     into v_required_missing
+   from jsonb_array_elements(coalesce(v->'metrics'->'required_documents','[]'::jsonb)) x
+   where coalesce((x->>'fulfilled')::boolean,false)=false;
+  v_original:=coalesce(v->'blockers','[]'::jsonb);
+  v:=jsonb_set(jsonb_set(v,'{ready}',to_jsonb(jsonb_array_length(v_required_missing)=0)),'{blockers}',v_required_missing)
+    ||jsonb_build_object(
+      'overridden',true,'override_reason',v_reason,'override_at',v_at,'original_blockers',v_original,
+      'warnings',(v->'warnings')||jsonb_build_array('Историческое прохождение подтверждено преподавателем; структурированные данные этого этапа могут отсутствовать')
+    );
+ else
+  v:=v||jsonb_build_object('overridden',false,'original_blockers','[]'::jsonb);
+ end if;
+ return v;
+end;
+$function$;
+
