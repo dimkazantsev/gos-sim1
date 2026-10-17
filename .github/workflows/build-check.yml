@@ -131,6 +131,7 @@ on:
       - 'components/game/DumaLeadershipElection.tsx'
       - 'components/game/CommitteeChairElectionPanel.tsx'
       - 'supabase/migrations/20261014160000_personal_office_ballots_and_meeting_checkin.sql'
+      - 'supabase/migrations/20261017155200_allow_initial_agenda_after_legacy_registration.sql'
       - 'supabase/migrations/20261014161500_cumulative_ksrf_duma_membership.sql'
       - 'components/game/TeacherParticipantRoster.tsx'
       - 'components/game/TeacherGhostVotingPanel.tsx'
