@@ -82,6 +82,7 @@ async function main(){
   await insert('game_crises',{id:uid(50),game_id:game,stage_no:15,description:'Стабилизация энергоснабжения',status:'resolved'});
   await insert('game_crises',{id:uid(51),game_id:game,stage_no:15,description:'Незавершённая ситуация',status:'active'});
   for(let no=1;no<=16;no++)await insert('formal_documents',{id:uid(300+no),game_id:game,stage_no:no,title:'Оформленный акт '+no,status_code:'signed',status_label:'Подписан'});
+  await insert('formal_documents',{id:uid(390),game_id:game,stage_no:1,title:'СЕКРЕТ РЕГИСТРАЦИОННОГО ДОСЬЕ',doc_type:'justice_response',metadata:{party_id:uid(12)},status_code:'signed'});
   await insert('budget_scenarios',{id:uid(60),game_id:game,title:'Подтверждённый бюджет',budget_year:2027,revenue:3.5,expenditure:3,balance:0.5,status:'final',formal_document_id:uid(313)});
   await insert('budget_scenarios',{id:uid(61),game_id:game,title:'СЕКРЕТ БЮДЖЕТНОГО ЧЕРНОВИКА',status:'draft'});
   await insert('institution_units',{id:uid(70),game_id:game,unit_kind:'committee',unit_key:'economy',title:'Комитет по экономике',head_user_id:person});

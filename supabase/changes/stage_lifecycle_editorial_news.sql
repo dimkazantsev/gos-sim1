@@ -230,7 +230,8 @@ BEGIN
  WHEN 12 THEN
   SELECT string_agg(format('«%s» — %s',title,status_label),'; ' ORDER BY title)
   INTO extra FROM (SELECT title,status_label FROM public.formal_documents
-   WHERE game_id=p_game AND stage_no=12 AND status_code NOT IN ('draft','rejected') ORDER BY title LIMIT 8) d;
+   WHERE game_id=p_game AND stage_no=12 AND status_code NOT IN ('draft','rejected')
+    AND coalesce(doc_type,'') NOT IN ('justice_response','party_certificate') ORDER BY title LIMIT 8) d;
   IF extra IS NOT NULL THEN details:='В реестре законодательной работы отражены документы: '||extra||'.';END IF;
  WHEN 13 THEN
   SELECT string_agg(format('Бюджет «%s» на %s год: доходы — %s трлн ₽, расходы — %s трлн ₽, баланс — %s трлн ₽.',
@@ -256,7 +257,8 @@ BEGIN
    (SELECT count(*) FROM public.game_members WHERE game_id=p_game AND roster_archived_at IS NULL),
    (SELECT count(*) FROM public.game_parties WHERE game_id=p_game AND registration_status='registered'))||
    E'\n\n'||format('Оформлено принятых, подписанных и опубликованных актов: %s. Завершено голосований: %s. Принято государственных программ: %s. Сохранено итоговых обсуждений: %s.',
-   (SELECT count(*) FROM public.formal_documents WHERE game_id=p_game AND status_code IN ('adopted','signed','published')),
+   (SELECT count(*) FROM public.formal_documents WHERE game_id=p_game AND status_code IN ('adopted','signed','published')
+    AND coalesce(doc_type,'') NOT IN ('justice_response','party_certificate')),
    (SELECT count(*) FROM public.game_votes WHERE game_id=p_game AND status='closed'),
    (SELECT count(*) FROM public.state_programs WHERE game_id=p_game AND status='adopted'),
    (SELECT count(*) FROM public.stage_debriefs WHERE game_id=p_game));
@@ -269,12 +271,14 @@ BEGIN
  INTO document_count,document_names
  FROM (SELECT title FROM public.formal_documents
   WHERE game_id = p_game AND stage_no = p_stage
+   AND coalesce(doc_type,'') NOT IN ('justice_response','party_certificate')
    AND status_code IN ('adopted','signed','published')
   ORDER BY title LIMIT 5) d;
  IF document_count > 0 THEN
   story := story || E'\n\n' ||
    'Среди оформленных актов этапа: ' || document_names ||
-   CASE WHEN (SELECT count(*) FROM public.formal_documents WHERE game_id=p_game AND stage_no=p_stage AND status_code IN ('adopted','signed','published')) > 5
+   CASE WHEN (SELECT count(*) FROM public.formal_documents WHERE game_id=p_game AND stage_no=p_stage AND status_code IN ('adopted','signed','published')
+     AND coalesce(doc_type,'') NOT IN ('justice_response','party_certificate')) > 5
     THEN '; перечень остальных документов доступен в реестре.' ELSE '.' END;
   facts := facts + 1;
  END IF;
