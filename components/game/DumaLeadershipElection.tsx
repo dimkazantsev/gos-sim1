@@ -84,7 +84,7 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
  const canPropose=stageActive&&activeMe.kind==='student'&&myRegistered&&myPresent>0;
  const canManage=stageActive&&(teacher||(canPropose&&canCoordinate));
  const myFaction=parties.find(p=>p.name===activeMe.team&&p.registration_status==='registered');
- const canNominate=stageActive&&(teacher||!!ledParty||!!(canPropose&&myFaction));
+ const canNominate=stageActive&&(teacher||!!(canPropose&&(ledParty||myFaction)));
  const procedureApproved=procedureVotes.some(v=>v.status==='closed'&&v.result_code==='passed');
  const procedureOpen=procedureVotes.some(v=>v.status==='open');
  const electionCandidates=(id:string)=>candidates.filter(c=>c.election_id===id);
