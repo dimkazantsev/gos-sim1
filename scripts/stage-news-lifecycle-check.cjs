@@ -94,7 +94,7 @@ async function main(){
    assert.equal(opened.filter(x=>x.actor_key==='media').length,0,'Opened stage must not be media');
    assert(opened.some(x=>x.actor_key==='system'&&x.actor_label==='ГОС.ID'));
    await db.query("update game_stages set status='completed',completed_at=clock_timestamp() where game_id=$1 and stage_no=$2",[game,no]);
-   const closed=await rows("select * from political_posts where game_id=$1 and source_key like $2", [game,'stage:'+uid(100+no)+':completed:%']);
+   const closed=await rows("select * from political_posts where game_id=$1 and source_key like $2 and context->>'stage_notice'='closed'", [game,'stage:'+uid(100+no)+':completed:%']);
    assert.equal(closed.length,1);assert.equal(closed[0].actor_key,'system','Comic capture must preserve the system publisher');
    assert.equal(closed[0].context.editorial_verified,false);
    const news=await report(no);assert(news,'News for stage '+no);assert.equal(news.actor_key,'media');assert.equal(news.process_type,'news');
@@ -102,6 +102,7 @@ async function main(){
    assert(news.body.includes(expected[no]),'Confirmed stage '+no+' result: '+news.body);
    assert(news.body.split('\n\n').length>=3,'Complete prose for stage '+no);assert(!news.body.includes('СЕКРЕТ'));assert(!news.body.includes('НЕ ПУБЛИКОВАТЬ'));
    if(no===4){assert(!news.body.includes('оформлены пять комитетов'));assert(!news.body.includes('Комитет по экономике — Публичный руководитель'),'Committee chair needs its own finished election');}
+   console.log('PASS PostgreSQL stage '+no+': system lifecycle, confirmed result, isolation and comic link');
   }
   const before=await report(2);
   await db.query("update game_stages set status='completed' where game_id=$1 and stage_no=2",[game]);
