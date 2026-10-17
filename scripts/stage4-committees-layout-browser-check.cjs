@@ -33,7 +33,7 @@ assert(ballot.includes("election.status==='open'&&election.ballot_mode==='person
 assert(ballot.includes('!registered.some(r=>r.user_id===me.user_id)')&&ballot.includes('myPresent<=0'),'Attendance registration and declared deputy count both guard voting');
 assert(component.includes("mode==='committees'?"),'Committee/ministry branch retained');
 assert(component.includes('Избирается депутатами Государственной Думы в блоке выше'),'Voting placement hint correct');
-assert(component.includes('<em>депутатов распределено</em>'),'Counter caption has no preceding decorative icon');
+assert(component.includes('<em>Мандатов распределено</em>'),'Mandate allocation caption is centered and has no preceding decorative icon');
 assert(!component.includes('UsersRound'),'Unused caption icon import removed');
 assert(!ballot.includes('с учётом GV'),'Russian wording for ghost voting');
 assert(leadership.includes('226 <small>из 450</small>')&&ballot.includes('226 <small>из 450</small>'),'Aligned majority display');
