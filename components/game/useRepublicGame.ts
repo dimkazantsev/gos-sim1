@@ -1181,6 +1181,17 @@ export function useRepublicGame(gameId:string){
   });
   if(r.error){setError(r.error.message);return false}await refresh();return true;
  }
+ // Parliamentary representation before a party allocation is entered is shared
+ // equally across current students; after allocation all GV/penalty reductions
+ // come from the verified party mandate records.
+ function gdMandateCapacity(uid:string){
+  const totalBase=partyMandates.reduce((n,a)=>n+Math.max(0,Number(a.base_mandates)||0),0);
+  if(totalBase>0)return partyMandates.filter(a=>a.user_id===uid).reduce((n,a)=>n+Math.max(0,Number(a.effective_mandates)||0),0);
+  const roster=members.filter(m=>m.kind==='student'&&!m.roster_archived_at)
+   .sort((a,b)=>String(a.joined_at||'').localeCompare(String(b.joined_at||''))||a.user_id.localeCompare(b.user_id));
+  const rank=roster.findIndex(m=>m.user_id===uid);
+  return rank<0?0:Math.floor(450/roster.length)+(rank<450%roster.length?1:0);
+ }
  function partyForUser(uid:string){const m=members.find(x=>x.user_id===uid);return parties.find(p=>p.name===m?.team)}
  function memberMatchesInstitution(uid:string,institution:string){
   const m=members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;
@@ -1192,7 +1203,8 @@ export function useRepublicGame(gameId:string){
  }
  function canVote(v:Vote){
   if(!me||me.kind==='observer'||v.status!=='open')return false;
-  if(v.electorate_snapshot?.weights){return Number(v.electorate_snapshot.weights[me.user_id]||0)>0&&(v.institution_key.startsWith('unit:')||memberMatchesInstitution(me.user_id,v.institution_key))}
+  if(v.electorate_snapshot?.weights){return Number(v.electorate_snapshot.weights[me.user_id]||0)>0&&(v.institution_key==='gd'?gdMandateCapacity(me.user_id)>0:v.institution_key.startsWith('unit:')||memberMatchesInstitution(me.user_id,v.institution_key))}
+  if(v.institution_key==='gd')return gdMandateCapacity(me.user_id)>0;
   if(!memberMatchesInstitution(me.user_id,v.institution_key||'all'))return false;
   if(v.voting_mode==='member')return true;
   const p=partyForUser(me.user_id);if(!p)return false;
@@ -1203,7 +1215,7 @@ export function useRepublicGame(gameId:string){
   if(!canVote(v)||!me)return 0;
   if(v.electorate_snapshot?.weights)return Number(v.electorate_snapshot.weights[me.user_id]||0);
   if(v.voting_mode==='member'||v.voting_mode==='faction')return 1;
-  return partyMandates.find(x=>x.user_id===me.user_id)?.effective_mandates||0;
+  return v.institution_key==='gd'?gdMandateCapacity(me.user_id):partyMandates.find(x=>x.user_id===me.user_id)?.effective_mandates||0;
  }
  function eligibleWeight(v:Vote){
   if(v.status==='closed'&&v.result_eligible!=null)return Number(v.result_eligible);
@@ -1215,10 +1227,10 @@ export function useRepublicGame(gameId:string){
   if(v.voting_mode==='mandate')return parties.reduce((a,p)=>a+Math.max(0,Number(p.mandates)||0),0);
   return members.filter(m=>memberMatchesInstitution(m.user_id,v.institution_key||'all')).length;
  }
- function quorum(v:Vote,registrations:{user_id:string;institution_key:string;stage_no:number}[]=[]){
+ function quorum(v:Vote,registrations:{user_id:string;institution_key:string;stage_no:number;present_mandates?:number|null}[]=[]){
   const eligible=eligibleWeight(v),cast=ballots.filter(b=>b.vote_id===v.id).reduce((n,b)=>n+Number(b.weight),0);
   const attendance=v.electorate_snapshot?.attendance_required||v.procedure_key==='registered_session';
-  const present=v.status==='closed'&&v.result_present!=null?Number(v.result_present):attendance?registrations.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no).reduce((n,r)=>n+(v.electorate_snapshot?Number(v.electorate_snapshot.weights[r.user_id]||0):v.voting_mode==='mandate'?(partyMandates.find(a=>a.user_id===r.user_id)?.effective_mandates||0):memberMatchesInstitution(r.user_id,v.institution_key)?1:0),0):cast;
+  const present=v.status==='closed'&&v.result_present!=null?Number(v.result_present):attendance?registrations.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no).reduce((n,r)=>n+(v.institution_key==='gd'?Math.min(gdMandateCapacity(r.user_id),v.electorate_snapshot?Number(v.electorate_snapshot.weights[r.user_id]||0):gdMandateCapacity(r.user_id),Math.max(0,Number(r.present_mandates)||0)):v.electorate_snapshot?Number(v.electorate_snapshot.weights[r.user_id]||0):v.voting_mode==='mandate'?(partyMandates.find(a=>a.user_id===r.user_id)?.effective_mandates||0):memberMatchesInstitution(r.user_id,v.institution_key)?1:0),0):cast;
   const needed=v.quorum_kind==='none'?0:bodyQuorum(v.institution_key,eligible,Number(v.quorum_value));
   return {eligible,cast,present,needed,met:v.quorum_kind==='none'||eligible>0&&present>=needed};
  }
@@ -1562,6 +1574,6 @@ export function useRepublicGame(gameId:string){
   finally{mediaOperationRef.current=false;setRecordingSaving(false)}
  }
 
- return {game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
+ return {gdMandateCapacity,game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
   refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }

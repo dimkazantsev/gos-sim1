@@ -8,7 +8,8 @@ import StyledSelect from '../ui/StyledSelect';
 import {VOTING_BODIES,bodyQuorum,type VotingUnit} from './votingBodies';
 import {ClipboardCheck} from 'lucide-react';
 import DisclosureSummary from '../ui/DisclosureSummary';
-type Entry={user_id:string;institution_key:string;stage_no:number};
+type Entry={user_id:string;institution_key:string;stage_no:number;present_mandates:number|null};
+type GdPresence={user_id:string;capacity:number;declared:number|null;present:number};
 type Assignment={unit_id:string;user_id:string};
 type Office={user_id:string;role_title:string};
 type MeetingRecord={game_id:string;stage_no:number;institution_key:string;agenda_document_id:string|null;agenda_body:string|null;agenda_approved_at:string|null;minutes_document_id:string|null;minutes_body:string|null;minutes_approved_at:string|null;delegate_user_id:string|null};
@@ -27,16 +28,33 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  const [meetingError,setMeetingError]=useState('');
  const [permission,setPermission]=useState<{key:string;rights:MeetingPermissions}|null>(null);
  const [rightsVersion,setRightsVersion]=useState(0);
+ const [gdPresence,setGdPresence]=useState<{my_capacity:number;registered:GdPresence[]}|null>(null);
+ const [presenceDraft,setPresenceDraft]=useState('');
  const detailsRef=useRef<HTMLDetailsElement>(null);
  const stage=stageNo||g.game?.current_round||1,students=g.members.filter(m=>m.kind==='student');
- async function load(){if(!g.game)return;const [r,u,a,b,o,meeting]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active'),
+ async function load(){if(!g.game)return;const [r,u,a,b,o,meeting]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active'),
   supabase.from('institution_meeting_records').select('game_id,stage_no,institution_key,agenda_document_id,agenda_body,agenda_approved_at,minutes_document_id,minutes_body,minutes_approved_at,delegate_user_id').eq('game_id',g.game.id).eq('stage_no',stage)]);
   const failure=[r,u,a,b,o,meeting].find(x=>x.error);if(failure?.error){setMeetingError('Не удалось загрузить сведения о заседании. '+meetingErrorMessage(failure.error.message));return;}
   if(!r.error)setRows(r.data||[]);if(!u.error){setUnits(u.data||[]);onUnitsChange?.(u.data||[])}setAssignments([...(a.data||[]),...(b.data||[])]);if(!o.error)setOffices(o.data||[]);if(!meeting.error)setMeetingRows((meeting.data||[]) as MeetingRecord[]);setRightsVersion(v=>v+1);
  }
  useEffect(()=>{if(initialBody)setBody(initialBody)},[initialBody]);
  useEffect(()=>{if(defaultOpen&&detailsRef.current)detailsRef.current.open=true},[defaultOpen,stage,initialBody]);
- useGameTableSync(g.game?.id,['institution_session_registrations','institution_units','institution_assignments','game_voting_body_members','game_office_assignments','institution_meeting_records','formal_documents','office_elections','office_candidates'],load,String(stage));
+ useGameTableSync(g.game?.id,['institution_session_registrations','institution_units','institution_assignments','game_voting_body_members','game_office_assignments','institution_meeting_records','formal_documents','office_elections','office_candidates','party_member_mandates','game_members'],load,String(stage));
+ useEffect(()=>{
+  if(body!=='gd'||!g.game){setGdPresence(null);return}
+  let active=true;
+  void Promise.resolve(supabase.rpc('get_gd_session_attendance',{p_game_id:g.game.id,p_stage_no:stage}))
+   .then(({data,error})=>{
+    if(!active)return;
+    if(error){setMeetingError('Не удалось получить сведения о явке депутатов. '+meetingErrorMessage(error.message));return}
+    const state=data as {my_capacity:number;registered:GdPresence[]};
+    if(!state||!Array.isArray(state.registered)){setMeetingError('Сведения о депутатской явке недоступны.');return}
+    setGdPresence(state);
+    const mine=state.registered.find(row=>row.user_id===g.me?.user_id);
+    setPresenceDraft(mine?.declared==null?'':String(mine.declared));
+   }).catch(()=>{if(active)setMeetingError('Не удалось загрузить данные о явке депутатов.')});
+  return()=>{active=false};
+ },[g.game?.id,g.me?.user_id,stage,body,rightsVersion]);
  useEffect(()=>{const row=meetingRows.find(m=>m.institution_key===body);setAgendaText(row?.agenda_body||'');setMinutesText(row?.minutes_body||'');setDelegateUser(row?.delegate_user_id||'')},[meetingRows,body]);
  const permissionKey=[g.game?.id,g.me?.user_id,stage,body].join(':');
  const currentDelegate=meetingRows.find(m=>m.institution_key===body)?.delegate_user_id;
@@ -65,13 +83,13 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  if(!g.game||!g.me)return null;
  const availableBodies=VOTING_BODIES.filter(item=>!allowedBodies||allowedBodies.includes(item.key));
  const config=VOTING_BODIES.find(b=>b.key===body),unit=units.find(u=>'unit:'+u.id===body);
- function eligible(uid:string){const m=g.members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;if(unit)return assignments.some(a=>a.unit_id===unit.id&&a.user_id===uid);if(body==='ksrf')return m.kind==='student'||g.parties.some(p=>p.leader_user_id===uid);return !!config&&(config.role.test(m.role_title||'')||(m.kind==='student'&&offices.some(o=>o.user_id===uid&&config.role.test(o.role_title))))}
+ function eligible(uid:string){const m=g.members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;if(unit)return assignments.some(a=>a.unit_id===unit.id&&a.user_id===uid);if(body==='ksrf')return m.kind==='student'||g.parties.some(p=>p.leader_user_id===uid);if(body==='gd'&&m.kind==='student')return !m.roster_archived_at;return !!config&&(config.role.test(m.role_title||'')||(m.kind==='student'&&offices.some(o=>o.user_id===uid&&config.role.test(o.role_title))))}
  const participants=g.members.filter(m=>eligible(m.user_id));
  const registered=rows.filter(r=>r.institution_key===body&&participants.some(m=>m.user_id===r.user_id));
  const mine=rows.some(r=>r.institution_key===body&&r.user_id===g.me?.user_id);
  const factionCount=body==='ksrf'?g.parties.length:0;
  const total=body==='ksrf'?factionCount:body==='gd'?450:body==='government'?participants.length:body==='municipality'?participants.length:unit?.mandate_capacity??participants.length;
- const present=body==='ksrf'?new Set(registered.map(r=>g.parties.find(p=>p.leader_user_id===r.user_id)?.id).filter(Boolean)).size:body==='gd'?registered.reduce((n,r)=>n+(g.partyMandates.find(a=>a.user_id===r.user_id)?.effective_mandates||0),0):registered.length;
+ const present=body==='ksrf'?new Set(registered.map(r=>g.parties.find(p=>p.leader_user_id===r.user_id)?.id).filter(Boolean)).size:body==='gd'?registered.reduce((n,r)=>n+(gdPresence?.registered.find(x=>x.user_id===r.user_id)?.present||0),0):registered.length;
  const needed=bodyQuorum(body,total);
  const meetingRecord=meetingRows.find(m=>m.institution_key===body);
  const agendaReady=!!meetingRecord?.agenda_approved_at;
@@ -114,14 +132,28 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
   setBusy(false);
  }
  async function register(){if(!g.game||!canAttend||!agendaReady||readOnly||meetingActionsLocked||busy)return;setMeetingError('');setNotice('');setBusy(true);const r=await supabase.rpc('register_institution_session_at_stage',{p_game_id:g.game.id,p_institution:body,p_stage_no:stage});if(r.error)setMeetingError(meetingErrorMessage(r.error.message));else{await load();setNotice('Вы зарегистрированы на заседание.')}setBusy(false)}
+ async function saveGdPresence(){
+  if(!g.game||busy||readOnly||meetingActionsLocked||!agendaReady||!canAttend||!gdPresence)return;
+  const number=Number(presenceDraft),capacity=Number(gdPresence.my_capacity||0);
+  if(presenceDraft.trim()===''||!Number.isInteger(number)||number<0||number>capacity){
+   setMeetingError('Укажите целое количество присутствующих депутатов от 0 до '+capacity+'.');return;
+  }
+  setBusy(true);setMeetingError('');setNotice('');
+  const {error}=await supabase.rpc('set_gd_session_attendance',{
+   p_game_id:g.game.id,p_stage_no:stage,p_present:number
+  });
+  if(error)setMeetingError(meetingErrorMessage(error.message));
+  else{await load();setNotice('Явка депутатов сохранена. Кворум пересчитан.')}
+  setBusy(false);
+ }
  async function createBody(){if(!g.game)return;setBusy(true);const r=await supabase.rpc('save_civic_voting_body',{p_game_id:g.game.id,p_title:newTitle.trim(),p_seats:Number(seats),p_users:users,p_head:head||null,p_unit:editing});if(r.error)g.setError(r.error.message);else{await load();setBody('unit:'+r.data);setNewTitle('');setUsers([]);setHead('');setSeats('1');setEditing(null);setNotice('Состав органа сохранён. Его можно выбрать при открытии голосования.')}setBusy(false)}
  return <details ref={detailsRef} className="institutionRegistrationPanel civicRegistration civicDisclosure projectDisclosure" aria-label="Регистрация на заседания"><DisclosureSummary icon={ClipboardCheck} title="Регистрация на заседание" description={'Этап '+stage+' · Регистрация в органе власти'}/><div className="civicDisclosureBody"><p>{body==='ksrf'?'До внесения предложений и голосования необходимо зарегистрироваться на заседание КСРФ. Участвовать могут все участники, но один голос от фракции подаёт её избранный представитель.':body==='gd'&&stage===4?'До формирования руководства Государственной Думы повестку готовят председатели зарегистрированных политических партий. После избрания Председателя Думы и формирования Совета Думы полномочия переходят руководству палаты. Для участия в заседании после утверждения повестки необходима регистрация.':'Перед участием в заседании и голосовании необходимо зарегистрироваться в соответствующем органе после утверждения повестки.'}</p>
   <div className="civicRegistrationSelectors"><StyledSelect label="Орган" value={body} onChange={setBody} options={[...availableBodies.map(b=>({value:b.key,label:b.title})),...units.filter(u=>!allowedBodies||allowedBodies.includes('unit:'+u.id)).map(u=>({value:'unit:'+u.id,label:u.title}))]}/></div>
-  <section className="civicMeetingDocuments" aria-label="Документы заседания">
+  <section className="civicMeetingDocuments" aria-label="Документы заседания" data-agenda-state={agendaReady?'approved':agendaDraft?'draft':'pending'}>
    <header><div><b>Повестка заседания</b><small>{agendaReady?'Утверждена · регистрация разрешена':agendaDraft?'Проект в реестре · требуется утверждение':verifiedRights&&!canAttend?'Повестка доступна уполномоченным участникам':'Повестка ещё не составлена'}</small></div><span>{agendaHasDocument?'В реестре НПА':'Не оформлена'}</span></header>
    <div className="civicMeetingSteps" aria-label="Порядок заседания">
     <span><b>1. Подготовка</b>{body==='gd'&&stage===4?'Руководители партий, затем руководство Думы':'Председатель или назначенный исполнитель'}</span>
-    <span><b>2. Утверждение</b>Председатель или преподаватель</span>
+    <span><b>2. Утверждение</b>{body==='gd'&&stage===4?'Председатель партии, затем руководство Думы':'Председатель или преподаватель'}</span>
     <span><b>3. Регистрация</b>Участники соответствующего органа</span>
    </div>
    <p className="civicMeetingHelp" role="status">{readOnly?'Режим просмотра. Подготовка и регистрация недоступны.':meetingActionsLocked?'Этап закрыт. Изменения и регистрация недоступны.':!verifiedRights?'Проверяем ваши полномочия для этого органа…':meetingCoordinator?'Вы можете составить и утвердить повестку или назначить исполнителя. Документ автоматически создаётся в реестре НПА, отдельно загружать его не нужно.':canPrepare?'Вам поручена подготовка проекта повестки. Сохраните проект, затем председатель утвердит его.':canAttend?'Вы можете зарегистрироваться после утверждения повестки, участвовать в заседании и голосовать в пределах своих полномочий. Подготовку повестки поручает председатель.':'У вас нет назначения в этот орган. Готовить повестку, утверждать её и регистрироваться на это заседание могут только уполномоченные участники.'}</p>
@@ -139,7 +171,14 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
     {meetingCoordinator&&meetingRecord?.minutes_document_id&&!meetingRecord?.minutes_approved_at&&<button type="button" className="primary" disabled={busy} onClick={()=>void approveMeeting('minutes')}>Утвердить протокол</button>}
    </div>}
   </section>
-  <div className="civicAttendance"><div><h3>{config?.title||unit?.title}</h3><p>{config?.basis||'Состав зарегистрированного в игре органа. Порог задаётся в голосовании.'}</p></div><div className="civicAttendanceNumbers"><span>Присутствует <b>{present} / {total}</b></span><span>Для кворума <b>{needed}</b></span><span>{present>=needed&&total>0?'Кворум есть':'Ожидаем участников'}</span></div><ul className="civicAttendees">{registered.map(r=>{const faction=body==='ksrf'?g.parties.find(p=>p.leader_user_id===r.user_id):null;return <li key={r.user_id}>{body==='ksrf'?(faction?.name||'Участник КСРФ')+' · '+(g.names[r.user_id]||'Участник'):g.names[r.user_id]||'Участник'}<b>{body==='gd'?(g.partyMandates.find(a=>a.user_id===r.user_id)?.effective_mandates||0)+' голосов':body==='ksrf'?(faction?'1 голос фракции':'Без голоса фракции'):'1 голос'}</b></li>})}</ul><button type="button" className="primary" disabled={mine||!agendaReady||!canAttend||busy||readOnly||meetingActionsLocked} onClick={()=>void register()}>{mine?'Вы зарегистрированы':meetingActionsLocked?'Этап закрыт':!agendaReady?'Ожидается повестка':!verifiedRights?'Проверяем полномочия':canAttend?'Зарегистрироваться':'Нет назначения в этот орган'}</button></div>
+  <div className="civicAttendance"><div><h3>{config?.title||unit?.title}</h3><p>{config?.basis||'Состав зарегистрированного в игре органа. Порог задаётся в голосовании.'}</p></div><div className="civicAttendanceNumbers"><span>Присутствует <b>{present} / {total}</b></span><span>Для кворума <b>{needed}</b></span><span>{present>=needed&&total>0?'Кворум есть':'Ожидаем участников'}</span></div><ul className="civicAttendees">{registered.map(r=>{const faction=body==='ksrf'?g.parties.find(p=>p.leader_user_id===r.user_id):null;const presence=gdPresence?.registered.find(x=>x.user_id===r.user_id);return <li key={r.user_id}>{body==='ksrf'?(faction?.name||'Участник КСРФ')+' · '+(g.names[r.user_id]||'Участник'):g.names[r.user_id]||'Участник'}<b>{body==='gd'?presence?(presence.declared==null?'Явка не указана':presence.present+' из '+presence.capacity+' депутатов'):'Проверяем явку':body==='ksrf'?(faction?'1 голос фракции':'Без голоса фракции'):'1 голос'}</b></li>})}</ul>
+  {body==='gd'?<div className="civicGdPresenceForm">
+   <div><strong>Фактическая явка депутатов</strong><p>Вы можете представлять до <b>{gdPresence?.my_capacity??'…'}</b> депутатов. Укажите число действительно присутствующих. Остальные считаются отсутствующими. Гоствойтинг и ограничения мандатов учтены.</p></div>
+   <label>Присутствуют депутаты
+    <input type="number" min={0} max={gdPresence?.my_capacity??0} step={1} inputMode="numeric" value={presenceDraft} onChange={e=>setPresenceDraft(e.target.value)} disabled={!canAttend||!agendaReady||busy||readOnly||meetingActionsLocked||!gdPresence} aria-label="Количество присутствующих депутатов"/>
+   </label>
+   <button type="button" className="primary" disabled={!agendaReady||!canAttend||busy||readOnly||meetingActionsLocked||!gdPresence||presenceDraft.trim()===''||!Number.isInteger(Number(presenceDraft))||Number(presenceDraft)<0||Number(presenceDraft)>(gdPresence.my_capacity||0)} onClick={()=>void saveGdPresence()}>{mine?'Обновить явку':'Зарегистрироваться и указать явку'}</button>
+  </div>:<button type="button" className="primary" disabled={mine||!agendaReady||!canAttend||busy||readOnly||meetingActionsLocked} onClick={()=>void register()}>{mine?'Вы зарегистрированы':meetingActionsLocked?'Этап закрыт':!agendaReady?'Ожидается повестка':!verifiedRights?'Проверяем полномочия':canAttend?'Зарегистрироваться':'Нет назначения в этот орган'}</button>}</div>
   {g.teacher&&unit?.unit_kind==='public_body'&&<button className="secondary" onClick={()=>{setEditing(unit.id);setNewTitle(unit.title);setSeats(String(unit.mandate_capacity||1));setUsers(assignments.filter(a=>a.unit_id===unit.id).map(a=>a.user_id));setHead(unit.head_user_id||'');document.getElementById('civic-body-editor')?.setAttribute('open','')}}>Изменить состав выбранного органа</button>}
   {g.teacher&&<details id="civic-body-editor" className="civicCustomBody"><summary>Добавить другой орган или комиссию</summary><div className="civicBodyEditor"><label>Название органа<input value={newTitle} onChange={e=>setNewTitle(e.target.value)}/></label><label>Установленный состав органа, мест<input type="number" aria-label="Установленный состав органа" min={1} max={10000} step={1} inputMode="numeric" value={seats} onChange={e=>setSeats(e.target.value)}/></label><p>Назначено {users.length} из {seats||0} мест. Свободные места учитываются в общем составе при расчёте кворума.</p><fieldset><legend>Назначенные участники · {users.length}</legend>{students.map(m=><label className="civicCheckbox" key={m.user_id}><input type="checkbox" checked={users.includes(m.user_id)} onChange={e=>{setUsers(old=>e.target.checked?[...old,m.user_id]:old.filter(id=>id!==m.user_id));if(head===m.user_id&&!e.target.checked)setHead('')}}/>{m.full_name}</label>)}</fieldset><StyledSelect label="Председатель" value={head} onChange={setHead} options={[{value:'',label:'Не назначен'},...students.filter(m=>users.includes(m.user_id)).map(m=>({value:m.user_id,label:m.full_name}))]}/><button type="button" className="primary" disabled={busy||readOnly||newTitle.trim().length<3||!Number.isInteger(Number(seats))||Number(seats)<Math.max(1,users.length)||Number(seats)>10000} onClick={()=>void createBody()}>{editing?'Сохранить состав':'Создать орган'}</button></div></details>}
   {notice&&<p role="status">{notice}</p>}

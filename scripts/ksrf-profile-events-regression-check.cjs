@@ -36,7 +36,8 @@ assert(awards.includes("const shown=filter==='earned'?earned:visibleItems.filter
 assert(awards.includes('className="awardShelfCatalogButton"')&&awards.includes("setFilter('open');setExpanded(true)"),'The all-awards button must open the full visible catalog');
 const committee=file('components/game/CommitteeChairElectionPanel.tsx');
 const committeeSql=file('supabase/migrations/20261014121000_committee_chair_before_staffing.sql');
-assert(committee.includes("personalMandates.filter(a=>a.base_mandates>0)"),'Candidates must be deputies before committee assignment');
+assert(committee.includes("gdMandateCapacity(m.user_id)>0"),'Only deputies with a verified active GD mandate can be nominated');
+assert(committee.includes("myPresent"),'Only physically present deputy mandates can be used at committee elections');
 assert(committee.includes("supabase.from('party_member_mandates')"),'Stage workspace must load current personal mandate assignments');
 assert(staffing.includes("supabase.from('party_member_mandates')"),'Staffing must not depend on unopened party workspace');
 assert(staffing.indexOf('<CommitteeChairElectionPanel g={g}/>')<staffing.indexOf('<section className="staffingSection">'),'Committee chair voting comes before membership allocation');
