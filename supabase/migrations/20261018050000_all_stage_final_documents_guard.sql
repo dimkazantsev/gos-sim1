@@ -391,7 +391,9 @@ begin
    select coalesce(jsonb_agg((case when x->>'evidence_state'='prepared' then 'Не подготовлен итоговый документ: ' else 'Не опубликован итоговый документ: ' end)||(x->>'title')),'[]'::jsonb)
      into v_required_missing
    from jsonb_array_elements(coalesce(v_stage->'metrics'->'required_documents','[]'::jsonb)) x
-   where coalesce((x->>'fulfilled')::boolean,false)=false;
+   where coalesce((x->>'fulfilled')::boolean,false)=false
+     and not exists(select 1 from public.game_stages st
+       where st.game_id=p_game_id and st.stage_no=i and st.status='completed');
    v_original:=coalesce(v_stage->'blockers','[]'::jsonb);
    v_stage:=jsonb_set(jsonb_set(v_stage,'{ready}',to_jsonb(jsonb_array_length(v_required_missing)=0)),'{blockers}',v_required_missing)
      ||jsonb_build_object(
@@ -435,7 +437,9 @@ begin
    select coalesce(jsonb_agg((case when x->>'evidence_state'='prepared' then 'Не подготовлен итоговый документ: ' else 'Не опубликован итоговый документ: ' end)||(x->>'title')),'[]'::jsonb)
      into v_required_missing
    from jsonb_array_elements(coalesce(v->'metrics'->'required_documents','[]'::jsonb)) x
-   where coalesce((x->>'fulfilled')::boolean,false)=false;
+   where coalesce((x->>'fulfilled')::boolean,false)=false
+     and not exists(select 1 from public.game_stages st
+       where st.game_id=p_game_id and st.stage_no=p_stage_no and st.status='completed');
   v_original:=coalesce(v->'blockers','[]'::jsonb);
   v:=jsonb_set(jsonb_set(v,'{ready}',to_jsonb(jsonb_array_length(v_required_missing)=0)),'{blockers}',v_required_missing)
     ||jsonb_build_object(
