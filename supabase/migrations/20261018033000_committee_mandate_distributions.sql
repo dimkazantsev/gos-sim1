@@ -160,6 +160,8 @@ begin
  select * into u from public.institution_units where id=p_unit_id;
  if u.id is null then raise exception 'Подразделение не найдено';end if;
  if u.unit_kind='committee' then
+   if uid is null or not private.is_game_member(u.game_id) or private.is_game_observer(u.game_id)
+   then raise exception 'Необходим доступ участника игры';end if;
    select id into v_id from public.institution_assignments where unit_id=p_unit_id and user_id=p_user_id;
    if v_id is not null then return v_id;end if;
    return public.allocate_committee_mandates(p_unit_id,p_user_id,1);
@@ -207,6 +209,9 @@ begin
    v_role:=private.game_role(a.game_id,v_uid);
    if not private.is_game_teacher(a.game_id) and v_uid is distinct from u.head_user_id and v_role not like '%председател%правительств%'
    then raise exception 'Minister / Prime Minister / teacher access required'; end if;
+ end if;
+ if a.unit_kind='committee' then
+   perform pg_advisory_xact_lock(hashtextextended('committee-mandates:'||a.game_id::text,0));
  end if;
  delete from public.institution_assignments where id=a.id;
 end;$function$;
@@ -427,3 +432,104 @@ begin
  return jsonb_build_object('stage_no',p_stage,'ready',jsonb_array_length(b)=0,'blockers',b,'warnings',w,'metrics',m);
 end;
 $function$;
+
+-- Connected head and ministry paths must use the new unique indexes.
+CREATE OR REPLACE FUNCTION private.committee_chair_election_trigger()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare v_unit uuid;v_user uuid;
+begin
+ if new.status='finished'
+    and new.winner_candidate_id is not null
+    and new.office_key like 'committee:%'
+    and (old.status is distinct from new.status or old.winner_candidate_id is distinct from new.winner_candidate_id)
+ then
+   v_unit:=substring(new.office_key from 11)::uuid;
+   select user_id into v_user from public.office_candidates where id=new.winner_candidate_id;
+   update public.institution_units set head_user_id=v_user where id=v_unit and game_id=new.game_id and unit_kind='committee';
+   if v_user is not null then
+     insert into public.institution_assignments(game_id,unit_id,unit_kind,user_id,party_id,assignment_role,created_by)
+     values(new.game_id,v_unit,'committee',v_user,private.member_party_id(new.game_id,v_user),'head',new.created_by)
+     on conflict(unit_id,user_id) do update
+     set unit_id=excluded.unit_id,party_id=excluded.party_id,assignment_role='head',created_by=excluded.created_by,created_at=now();
+   end if;
+ end if;
+ return new;
+end;$function$;
+
+CREATE OR REPLACE FUNCTION public.ensure_stage9_units(p_game_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare s public.government_structures%rowtype;
+begin
+ if (select auth.uid()) is null or not private.is_game_member(p_game_id) then raise exception 'Game access required';end if;
+ select * into s from public.government_structures where game_id=p_game_id and status='approved';
+ if not found then return;end if;
+ insert into public.institution_units(game_id,unit_kind,unit_key,title,description,capacity_min,capacity_max)
+ values
+ (p_game_id,'ministry','social',s.social_title,'Труд, демография, культура, образование, здравоохранение и смежные вопросы',3,5),
+ (p_game_id,'ministry','economic',s.economic_title,'Финансы, налоги, транспорт, энергетика и смежные вопросы',3,5),
+ (p_game_id,'ministry','defence',s.defence_title,'Оборона и внутренняя безопасность',3,5),
+ (p_game_id,'ministry','foreign',s.foreign_title,'Внешняя политика',3,5),
+ (p_game_id,'ministry','internal',s.internal_title,'ОГВ, ОМС, национальности, гражданское общество, НКО и смежные вопросы',3,5)
+ on conflict(game_id,unit_kind,unit_key) do update set title=excluded.title
+ where public.institution_units.title is distinct from excluded.title;
+ update public.institution_units set capacity_min=3,capacity_max=5
+ where game_id=p_game_id and unit_kind='ministry' and capacity_min is null;
+ update public.institution_units u set head_user_id=n.candidate_user_id
+ from public.government_nominations n
+ where u.game_id=p_game_id and u.unit_kind='ministry' and n.game_id=p_game_id
+  and n.stage_no=9 and n.status='appointed' and n.office_key='ministry_'||u.unit_key
+  and n.candidate_user_id is not null and u.head_user_id is distinct from n.candidate_user_id;
+ insert into public.institution_assignments(game_id,unit_id,unit_kind,user_id,party_id,assignment_role,created_by)
+ select u.game_id,u.id,'ministry',n.candidate_user_id,null,'head',n.nominated_by
+ from public.institution_units u join public.government_nominations n
+  on n.game_id=u.game_id and n.office_key='ministry_'||u.unit_key and n.stage_no=9 and n.status='appointed'
+ where u.game_id=p_game_id and u.unit_kind='ministry' and n.candidate_user_id is not null
+ on conflict(game_id,user_id) where unit_kind='ministry' do update
+ set unit_id=excluded.unit_id,assignment_role='head',party_id=null
+ where public.institution_assignments.unit_id is distinct from excluded.unit_id
+    or public.institution_assignments.assignment_role is distinct from 'head'
+    or public.institution_assignments.party_id is not null;
+end;$function$;
+
+CREATE OR REPLACE FUNCTION public.set_institution_head(p_unit_id uuid, p_user_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare u public.institution_units%rowtype;v_uid uuid:=(select auth.uid());v_role text;
+begin
+ select * into u from public.institution_units where id=p_unit_id for update;
+ if u.id is null then raise exception 'Institution unit not found'; end if;
+ if not exists(select 1 from public.game_members where game_id=u.game_id and user_id=p_user_id and kind='student') then raise exception 'Student not found'; end if;
+ if v_uid is null or not private.is_game_member(u.game_id) then raise exception 'Game access required';end if;
+ v_role:=coalesce(private.game_role(u.game_id,v_uid),'');
+ if u.unit_kind='committee' then
+   if not private.is_game_teacher(u.game_id) then raise exception 'Committee chair must be recorded after the Duma election by the teacher'; end if;
+ else
+   if not exists(select 1 from public.government_nominations n
+     where n.game_id=u.game_id and n.stage_no=9 and n.office_key='ministry_'||u.unit_key
+       and n.status='appointed' and n.candidate_user_id=p_user_id)
+   then raise exception 'Minister must already be appointed through stage 9';end if;
+   if not private.is_game_teacher(u.game_id) and v_role not like '%председател%правительств%' and v_role not like '%президент%'
+   then raise exception 'Prime Minister / President / teacher access required'; end if;
+ end if;
+ update public.institution_units set head_user_id=p_user_id where id=u.id;
+ if u.unit_kind='ministry' then
+   insert into public.institution_assignments(game_id,unit_id,unit_kind,user_id,party_id,assignment_role,created_by)
+   values(u.game_id,u.id,'ministry',p_user_id,null,'head',v_uid)
+   on conflict(game_id,user_id) where unit_kind='ministry' do update set unit_id=excluded.unit_id,assignment_role='head',created_by=v_uid,created_at=now();
+ else
+   insert into public.institution_assignments(game_id,unit_id,unit_kind,user_id,party_id,assignment_role,created_by)
+   values(u.game_id,u.id,'committee',p_user_id,private.member_party_id(u.game_id,p_user_id),'head',v_uid)
+   on conflict(unit_id,user_id) do update set unit_id=excluded.unit_id,party_id=excluded.party_id,assignment_role='head',created_by=v_uid,created_at=now();
+ end if;
+end;$function$;
