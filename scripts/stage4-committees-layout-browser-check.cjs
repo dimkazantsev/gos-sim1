@@ -62,6 +62,21 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
    assert.equal(check.ministryBackground,'rgb(237, 242, 255)','Ministry header keeps the existing shared-stage styling');
    assert.equal(check.numberCards,5,'Committee list retains all five cards');
    if(width<=768)assert.equal(check.committeeColumns,1,'Compact container uses one column');
+   // Before the committees are created, the action card sits directly above
+   // the rules card. Guard against their borders touching again.
+   const emptyState=await page.evaluate(()=>{
+    document.querySelector('.staffingLab[data-staffing="committees"] .committeeElectionBoard').remove();
+    document.querySelector('.staffingLab[data-staffing="committees"] .staffingSection').remove();
+    const root=document.querySelector('.staffingLab[data-staffing="committees"]');
+    const action=root.querySelector('.stageOperationsActionBar');
+    const rules=root.querySelector('.staffingRule');
+    const a=action.getBoundingClientRect(),b=rules.getBoundingClientRect();
+    return {gap:b.top-a.bottom, marginTop:getComputedStyle(rules).marginTop,
+     actionRight:a.right,rulesRight:b.right,documentWidth:document.documentElement.scrollWidth,
+     ministryMargin:getComputedStyle(document.querySelector('.staffingLab[data-staffing="ministries"] .staffingRule')).marginTop};
+   });
+   assert(emptyState.gap>=11.9,'Creation and rules panels need visible separation at '+width+': '+JSON.stringify(emptyState));
+   assert(emptyState.actionRight<=width+1&&emptyState.rulesRight<=width+1&&emptyState.documentWidth<=width+1,'No mobile overflow in empty state at '+width);
    await page.close();
   }
   console.log('PASS committee composition: 320, 390, 768, 1024, 1440px; elections, quotas, staffing and ministry styles separated.');
