@@ -20,6 +20,25 @@ function readableError(err:unknown){
  return userError(err)||'Не удалось выполнить вход.';
 }
 
+/** Only allow known in-app destinations through the public entry page. */
+function incomingSectionSuffix(){
+ if(typeof window==='undefined')return '';
+ const source=new URLSearchParams(window.location.search);
+ const section=source.get('section');
+ if(!section||!['dashboard','stages','votes','documents','actions','parties','profile','events','budget','grades'].includes(section))return '';
+ const clean=new URLSearchParams({section});
+ const id=source.get('document'),vote=source.get('vote');
+ const stage=Number(source.get('stage')||0);
+ if(id&&/^[a-f0-9-]{36}$/i.test(id))clean.set('document',id);
+ if(vote&&/^[a-f0-9-]{36}$/i.test(vote))clean.set('vote',vote);
+ if(Number.isInteger(stage)&&stage>=1&&stage<=16)clean.set('stage',String(stage));
+ if(source.get('openChat')==='1')clean.set('openChat','1');
+ const channel=source.get('channel');
+ if(channel&&/^[a-f0-9-]{36}$/i.test(channel))clean.set('channel',channel);
+ if(source.get('tasks')==='1')clean.set('tasks','1');
+ return '?'+clean.toString();
+}
+
 export default function Home(){
  const router=useRouter();
  const [mode,setMode]=useState<'student'|'teacher'|'guest'>('student'),[createMode,setCreateMode]=useState(false);
@@ -36,6 +55,29 @@ export default function Home(){
  function saveSuccessfulGameCode(code:string){
   setSavedGameCodes(rememberGameCode(code));
  }
+ // Telegram links arrive at the public entry page. Reuse a session that
+ // already exists IN THIS BROWSER; never put bearer tokens in Telegram URLs.
+ useEffect(()=>{
+  if(!incomingSectionSuffix())return;
+  let active=true;
+  void (async()=>{
+   try{
+    const {data:auth,error:authError}=await supabase.auth.getSession();
+    if(!active||authError||!auth.session?.user?.id)return;
+    const userId=auth.session.user.id;
+    const rows=await supabase.from('game_members').select('game_id')
+     .eq('user_id',userId).is('roster_archived_at',null).limit(2);
+    if(!active||rows.error)return;
+    if(rows.data?.length===1){router.replace('/game/'+rows.data[0].game_id+incomingSectionSuffix());return}
+    // Multiple games require a game selection; do not open a random game.
+    const saved=readRememberedGameCodes();
+    if(saved.length!==1)return;
+    const resume=await supabase.rpc('resume_member_game',{p_game_code:saved[0]});
+    if(active&&!resume.error&&resume.data)router.replace('/game/'+String(resume.data)+incomingSectionSuffix());
+   }catch{/* A missing session or unavailable server must preserve normal login. */}
+  })();
+  return()=>{active=false};
+ },[router]);
  const heading=useMemo(()=>mode==='teacher'&&createMode?'Новое государство':mode==='teacher'?'Начнём занятие':mode==='guest'?'Гостевой просмотр':'Вход участника',[mode,createMode]);
 
  async function submit(e:FormEvent){
@@ -50,9 +92,9 @@ export default function Home(){
    const session=(await supabase.auth.getSession()).data.session;
    if(!session){const a=await supabase.auth.signInAnonymously({options:{data:{full_name:name}}});if(a.error)throw a.error}
    if(mode==='teacher'&&createMode){
-    const r=await supabase.rpc('create_game_session',{p_title:gameTitle.trim(),p_game_code:code,p_teacher_code:access,p_student_code:students,p_teacher_name:name});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data);
+    const r=await supabase.rpc('create_game_session',{p_title:gameTitle.trim(),p_game_code:code,p_teacher_code:access,p_student_code:students,p_teacher_name:name});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data+incomingSectionSuffix());
    }else{
-    const r=await supabase.rpc('join_game_with_code',{p_game_code:code,p_invite_code:access,p_full_name:name,p_group_name:mode==='student'?group.trim():null});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data);
+    const r=await supabase.rpc('join_game_with_code',{p_game_code:code,p_invite_code:access,p_full_name:name,p_group_name:mode==='student'?group.trim():null});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data+incomingSectionSuffix());
    }
   }catch(e){setError(readableError(e))}finally{setBusy(false)}
  }
@@ -103,7 +145,7 @@ export default function Home(){
     await new Promise(resolve=>setTimeout(resolve,800*(attempt+1)));
    }
    saveSuccessfulGameCode(loginGameCode);
-    router.push('/game/'+resumedGameId);
+    router.push('/game/'+resumedGameId+incomingSectionSuffix());
   }catch(e){
    const message=readableError(e);
    setError((phase==='authentication'?'Проверка учётной записи: ':phase==='session'?'Проверка сессии: ':'Открытие игровой сессии: ')+message);
@@ -150,6 +192,7 @@ export default function Home(){
      <GameEntryQr/>
      <div className="entryPrivacy"><LockKeyhole aria-hidden="true"/><p>ФИО будет видно участникам и преподавателю. Ваши действия сохраняются в протоколе игры.</p></div>
     </form>}
+    {typeof window!=='undefined'&&incomingSectionSuffix()&&<p className="entryLinkAdvice">Ссылка из Telegram открывает нужный раздел без повторного входа только в браузере, где Вы уже авторизованы. Если Telegram открыл отдельное окно, выберите в его меню «Открыть в браузере» и используйте ссылку там. Данные для входа по ссылке не передаются.</p>}
     {personalLogin&&<form id="entry-form" className="entryForm" onSubmit={login} aria-busy={busy}>
      <div className="entryFormIntro"><span className="overline">ЛИЧНАЯ УЧЁТНАЯ ЗАПИСЬ</span><h2>Вход по паролю</h2><p>Используйте подтверждённую почту и пароль, указанные в игровом профиле. Ваши мандаты и действия сохранятся.</p></div>
      <button type="button" className="entryPersonalSwitch" onClick={()=>{setPersonalLogin(false);setError('')}}><LockKeyhole size={16}/> Вернуться ко входу по коду</button>
