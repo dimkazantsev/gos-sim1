@@ -30,10 +30,15 @@ for(const section of ['civicMeetingDocuments','civicMeetingSteps','civicAttendan
    "create table game_stages(game_id uuid,stage_no integer,status text);"+
    "create table party_member_mandates(game_id uuid,party_id uuid,user_id uuid,base_mandates integer,effective_mandates integer);"+
    "create table institution_session_registrations(game_id uuid,stage_no integer,institution_key text,user_id uuid,registered_at timestamptz default now(), primary key(game_id,stage_no,institution_key,user_id));"+
+   "create table formal_documents(id uuid,game_id uuid,status_code text);"+
+   "create table institution_meeting_records(game_id uuid,stage_no integer,institution_key text,agenda_document_id uuid,agenda_approved_at timestamptz,agenda_body text);"+
    "create function private.is_game_member(p_game uuid) returns boolean language sql stable as $$select exists(select 1 from game_members where game_id=p_game and user_id=auth.uid())$$;"+
    "create function private.vote_member_has_office(p_game uuid,p_user uuid,p_body text) returns boolean language sql stable as $$select exists(select 1 from game_members where game_id=p_game and user_id=p_user and kind='student' and roster_archived_at is null) and p_body='gd'$$;"+
    "create function public.register_institution_session_at_stage(p_game uuid,p_body text,p_stage integer) returns void language plpgsql as $$begin insert into institution_session_registrations(game_id,stage_no,institution_key,user_id) values(p_game,p_stage,p_body,auth.uid()) on conflict do nothing;end$$;");
   await db.query("insert into game_stages values($1,4,'open')",[gameId]);
+  const agendaId='40000000-0000-0000-0000-000000000001';
+  await db.query("insert into formal_documents values($1,$2,'published')",[agendaId,gameId]);
+  await db.query("insert into institution_meeting_records values($1,4,'gd',$2,now(),$3)",[gameId,agendaId,'Регламент заседания Государственной Думы утверждён и опубликован в реестре НПА.']);
   for(const [i,id] of ids.entries())if(i<2)await db.query("insert into game_members values($1,$2,'student',null,$3)",[gameId,id,new Date(Date.UTC(2026,0,1,i)).toISOString()]);
   const core=sql.slice(0,sql.indexOf('CREATE OR REPLACE FUNCTION private.vote_member_has_office'));
   assert(core.includes("CREATE OR REPLACE FUNCTION public.set_gd_session_attendance"));
