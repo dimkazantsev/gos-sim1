@@ -3,16 +3,24 @@
 -- institution_assignments.mandates_allocated and is not part of the published UI.
 -- Keep the existing data and code for recovery/forensics, but forbid clients
 -- to mutate the stale ledger. The canonical set_committee_mandates remains granted.
-REVOKE ALL ON FUNCTION public.allocate_committee_mandates(uuid,uuid,integer)
-  FROM PUBLIC, anon, authenticated;
-
 DO $safety$
 BEGIN
   IF to_regprocedure('public.set_committee_mandates(uuid,uuid,integer)') IS NULL THEN
     RAISE EXCEPTION 'Canonical committee mandate RPC missing; refusing safety migration';
   END IF;
+  -- Clean installations never had the experimental allocator.
+  IF to_regprocedure('public.allocate_committee_mandates(uuid,uuid,integer)') IS NOT NULL THEN
+    REVOKE ALL ON FUNCTION public.allocate_committee_mandates(uuid,uuid,integer)
+      FROM PUBLIC, anon, authenticated;
+  END IF;
 END;
 $safety$;
+
+-- A fresh installation may still have the original (game,user,kind) unique
+-- constraint; the experimental branch dropped it. Both cases need an explicit
+-- ministry-only arbiter for its UPSERT. This does not affect committee ballots.
+CREATE UNIQUE INDEX IF NOT EXISTS institution_assignments_single_ministry_per_student
+  ON public.institution_assignments(game_id,user_id) WHERE unit_kind='ministry';
 
 -- The experimental schema also replaced the all-kind UNIQUE constraint with a
 -- ministry-only partial unique index. Keep existing one-ministry semantics for
