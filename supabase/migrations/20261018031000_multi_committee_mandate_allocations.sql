@@ -45,22 +45,24 @@ BEGIN
      AND gm.kind='student' AND gm.roster_archived_at IS NULL
    WHERE p.game_id=p_game_id AND p.registration_status='registered'
    GROUP BY p.id,p.name,p.color
- ), active_parties AS (
-   SELECT *,seats::numeric/nullif(sum(seats) OVER(),0) AS share FROM representation WHERE seats>0
- ), raw AS (
-   SELECT u.id unit_id,u.title,p.party_id,p.party_name,p.color,p.seats,
-      (coalesce(u.mandate_capacity,90)*p.share) AS raw_quota,
-      floor(coalesce(u.mandate_capacity,90)*p.share)::integer AS base,
-      coalesce(u.mandate_capacity,90) AS capacity
-   FROM public.institution_units u CROSS JOIN active_parties p
+ ), party_parts AS (
+   -- Each faction receives its exact total seats over five committees.
+   -- Remainders circulate across committees instead of rounding each
+   -- committee independently (which can invent or lose faction mandates).
+   SELECT p.*,p.seats/5 AS base,p.seats%5 AS extra,
+      coalesce(sum(p.seats%5) OVER(
+        ORDER BY p.party_id ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),0)::integer AS start_extra
+   FROM representation p WHERE p.seats>0
+ ), units AS (
+   SELECT u.id unit_id,u.title,
+     (row_number() OVER (ORDER BY u.unit_key,u.id)-1)::integer AS pos
+   FROM public.institution_units u
    WHERE u.game_id=p_game_id AND u.unit_kind='committee'
- ), ranked AS (
-   SELECT r.*,(r.raw_quota-r.base) AS remainder,
-     r.capacity-sum(r.base) OVER (PARTITION BY r.unit_id) AS spare,
-     row_number() OVER (PARTITION BY r.unit_id ORDER BY r.raw_quota-r.base DESC,r.party_id) AS rank
-   FROM raw r
  ), quotas AS (
-   SELECT *,base+CASE WHEN rank<=spare THEN 1 ELSE 0 END AS quota FROM ranked
+   SELECT u.unit_id,u.title,p.party_id,p.party_name,p.color,p.seats,
+      p.base+CASE WHEN ((u.pos-p.start_extra%5+5)%5)<p.extra
+          THEN 1 ELSE 0 END AS quota
+   FROM units u CROSS JOIN party_parts p
  ), assigned AS (
    SELECT unit_id,party_id,sum(mandates)::integer assigned_mandates,count(*)::integer students
    FROM public.committee_mandate_allocations WHERE game_id=p_game_id
