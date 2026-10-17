@@ -27,7 +27,7 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
  const [mode,setMode]=useState<Record<string,'open'|'secret'>>({});
  const [busy,setBusy]=useState(false);
  const role=stageRoleTitles(g);
- const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
+ const ledParty=parties.find(p=>p.leader_user_id===me?.user_id&&p.registration_status==='registered');
  const canCreate=teacher||(role.includes('председател')&&role.includes('дум'))||(role.includes('совет')&&role.includes('дум'));
 
  async function load(){
@@ -88,7 +88,7 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
  async function close(eid:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:eid});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  return <section className="committeeElectionBoard">
-  <div className="committeeElectionHead"><div className="committeeElectionIntro"><small>Государственная Дума · Этап 4</small><h3>Выборы председателей комитетов</h3><p>Фракции выдвигают кандидатов до распределения депутатов по комитетам. Зарегистрированные депутаты голосуют действующими мандатами с учётом гоствойтинга. При трёх и более кандидатах, если никто не избран в первом туре, назначается второй тур для двух лидеров.</p></div><div className="committeeElectionThreshold" aria-label="Для избрания требуется 226 голосов из 450"><span>Необходимое большинство</span><strong>226 <small>из 450</small></strong><em>голосов для избрания</em></div></div>
+  <div className="committeeElectionHead"><div className="committeeElectionIntro"><small>Государственная Дума · Этап 4</small><h3>Выборы председателей комитетов</h3><p>Председатели зарегистрированных партий выдвигают кандидатов из состава своих фракций до распределения депутатов по комитетам. Зарегистрированные депутаты голосуют действующими мандатами с учётом гоствойтинга. При трёх и более кандидатах, если никто не избран в первом туре, назначается второй тур для двух лидеров.</p></div><div className="committeeElectionThreshold" aria-label="Для избрания требуется 226 голосов из 450"><span>Необходимое большинство</span><strong>226 <small>из 450</small></strong><em>голосов для избрания</em></div></div>
   <div className="committeeElectionGrid">{units.map(u=>{
    const e=activeElection(u.id);
    const last=[...history(u.id)].reverse()[0];
