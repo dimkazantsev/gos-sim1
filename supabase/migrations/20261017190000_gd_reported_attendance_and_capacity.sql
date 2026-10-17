@@ -85,6 +85,15 @@ BEGIN
   WHERE game_id=p_game_id AND stage_no=p_stage_no AND status='open') THEN
   RAISE EXCEPTION 'Этап не открыт';
  END IF;
+ IF NOT EXISTS (
+  SELECT 1 FROM public.institution_meeting_records m
+  JOIN public.formal_documents d ON d.id=m.agenda_document_id AND d.game_id=m.game_id
+  WHERE m.game_id=p_game_id AND m.stage_no=p_stage_no AND m.institution_key='gd'
+    AND m.agenda_approved_at IS NOT NULL AND d.status_code='published'
+    AND length(btrim(coalesce(m.agenda_body,'')))>=30
+ ) THEN
+  RAISE EXCEPTION 'Сначала необходимо утвердить повестку заседания';
+ END IF;
  -- Serialise simultaneous requests from the same participant.
  PERFORM 1 FROM public.game_members WHERE game_id=p_game_id
   AND user_id=v_uid AND kind='student' AND roster_archived_at IS NULL FOR UPDATE;
