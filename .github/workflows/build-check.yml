@@ -140,6 +140,7 @@ on:
       - 'scripts/ksrf-profile-events-regression-check.cjs'
       - 'scripts/deputy-session-ballots-check.cjs'
       - 'components/game/DumaLeadershipElection.tsx'
+      - 'scripts/duma-stage4-layout-browser-check.cjs'
       - 'components/game/CommitteeChairElectionPanel.tsx'
       - 'supabase/migrations/20261014160000_personal_office_ballots_and_meeting_checkin.sql'
       - 'supabase/migrations/20261017155200_allow_initial_agenda_after_legacy_registration.sql'
@@ -298,6 +299,7 @@ jobs:
       - run: node scripts/blitz-inbox-sync-check.cjs
       - run: node scripts/blitz-pending-privacy-check.cjs
       - run: node scripts/deputy-session-ballots-check.cjs
+      - run: node scripts/duma-stage4-layout-browser-check.cjs
       - run: node scripts/session-deletion-guard-check.cjs
       - run: node scripts/guided-tour-check.cjs
       - run: node scripts/document-input-check.cjs
