@@ -124,7 +124,7 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
    if(width>=1024){
     assert(Math.abs(check.cardLayout[0].controlsTop-check.cardLayout[1].controlsTop)<2,'Two desktop committee cards align action row at '+width);
    }
-   assert.equal(check.committeeCounterText,'0','Test empty committee count exactly as in reported screen');
+   assert.equal(check.committeeCounterText,'0 / 450','Counter starts at zero of 450 undistributed mandates');
    assert(check.committeeCaptionCentered,'Counter caption is centered at '+width);
    assert(!check.committeeCaptionHasIcon,'Counter caption has no decorative SVG at '+width);
    assert.equal(check.ministryCounterGridColumns,2,'Existing stage 9 ministry counter keeps its legacy layout');
