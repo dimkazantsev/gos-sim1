@@ -31,7 +31,7 @@ const output=ts.transpileModule(handler,{compilerOptions:{target:ts.ScriptTarget
    return {paperWidth:a.width,bodyWidth:document.body.scrollWidth,viewport:innerWidth,
      paragraphs:paper.querySelectorAll('.formalPaperBody p').length,
      title:document.title,printButtons:paper.querySelectorAll('button').length,
-     marginRule:[...document.styleSheets].some(sheet=>[...sheet.cssRules].some(rule=>rule.cssText.includes('@page')&&rule.cssText.includes('A4')))};
+     marginRule:[...document.styleSheets].some(sheet=>[...sheet.cssRules].some(rule=>rule.cssText.includes('@page')&&rule.cssText.toLowerCase().includes('a4')))};
   });
   assert(result.paperWidth>500&&result.paperWidth<900,'A4 paper must never be narrow: '+JSON.stringify(result));
   assert(result.paperWidth<result.viewport+1,'Print paper fits window');
