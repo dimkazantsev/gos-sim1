@@ -2,6 +2,8 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 const sql=fs.readFileSync('supabase/migrations/20261017190000_gd_reported_attendance_and_capacity.sql','utf8');
+const nominees=fs.readFileSync('supabase/migrations/20261017193000_gd_committee_nomination_capacity.sql','utf8');
+assert(nominees.includes('private.gd_member_capacity(e.game_id,p_user_id)'),'Committee nominees use current verified GD representation');
 const panel=fs.readFileSync('components/game/InstitutionRegistrationPanel.tsx','utf8');
 const votes=fs.readFileSync('components/game/VotesView.tsx','utf8');
 const game=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
