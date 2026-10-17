@@ -137,6 +137,8 @@ on:
       - 'scripts/stage4-agenda-rights-check.cjs'
       - 'scripts/stage4-deputy-proposal-rights-check.cjs'
       - 'scripts/stage4-completion-gate-check.cjs'
+      - 'scripts/stage4-office-vote-auto-close-check.cjs'
+      - 'supabase/migrations/20261018012000_stage4_auto_close_personal_office_elections.sql'
       - 'supabase/migrations/20261018000500_stage4_readiness_before_completion.sql'
       - 'scripts/stage4-party-chair-committee-nominations-check.cjs'
       - 'supabase/migrations/20261017235500_stage4_party_chair_committee_nominations.sql'
@@ -295,6 +297,7 @@ jobs:
       - run: node scripts/stage4-agenda-rights-check.cjs
       - run: node scripts/stage4-deputy-proposal-rights-check.cjs
       - run: node scripts/stage4-completion-gate-check.cjs
+      - run: node scripts/stage4-office-vote-auto-close-check.cjs
       - run: node scripts/stage4-party-chair-committee-nominations-check.cjs
       - run: node scripts/ksrf-meeting-stage-gate-check.cjs
       - run: node scripts/ksrf-trigger-field-isolation-check.cjs
