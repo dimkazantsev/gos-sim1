@@ -772,14 +772,34 @@
  color:#536580;
  letter-spacing:.035em;
 }
+/* Keep election cards aligned when committee names have different lengths. */
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCard>header{
+ display:grid;
+ grid-template-columns:minmax(0,1fr);
+ align-content:start;
+ gap:12px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCard>header>div:first-child{
+ min-width:0;
+ min-height:88px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCard.idle{
+ background:#f8fafc;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCard.idle>header{
+ border-bottom:0;
+}
 .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCreate{
  display:flex;
- flex-wrap:wrap;
+ flex-direction:column;
+ align-items:flex-start;
+ width:100%;
  min-width:0;
  gap:8px;
 }
 .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCreate select{
- flex:1 1 120px;
+ flex:0 1 auto;
+ width:min(100%,320px);
  min-height:42px;
  min-width:0;
  padding:8px 10px;
