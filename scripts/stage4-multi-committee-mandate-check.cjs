@@ -36,7 +36,7 @@ const id=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
   await db.query('insert into auth.users values($1),($2),($3)',[a,b,teacher]);
   await db.query('insert into games values($1)',[game]);
   await db.query("insert into game_stages values($1,4,'open')",[game]);
-  await db.query('insert into game_parties values($1,$2,$3,$4,$5),($6,$2,$7,$4,$8)',[partyA,game,'ЛДПР','registered',a,partyB,'Рама',b]);
+  await db.query('insert into game_parties(id,game_id,name,registration_status,leader_user_id) values($1,$2,$3,$4,$5),($6,$2,$7,$4,$8)',[partyA,game,'ЛДПР','registered',a,partyB,'Рама',b]);
   for(const [user,name] of [[a,'ЛДПР'],[b,'Рама']])await db.query("insert into game_members values($1,$2,$3,'student',now(),null)",[game,user,name]);
   const units=[];
   for(let n=0;n<5;n++){
