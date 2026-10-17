@@ -12,7 +12,7 @@ assert(sql.includes("on conflict(unit_id,user_id) do update"));
 const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
 (async()=>{
  const db=new PGlite();
- const game=uuid(1),partyA=uuid(2),partyB=uuid(3),head=uuid(100),leaderA=uuid(101),leaderB=uuid(102);
+ const game=uuid(1),partyA=uuid(2),partyB=uuid(3),head=uuid(100),leaderA=uuid(101),leaderB=uuid(120);
  try{
   await db.exec([
    'create schema auth;create schema private;create role anon;create role authenticated;',
@@ -22,28 +22,28 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
    'create function private.is_game_member(uuid) returns boolean language sql stable as $x$select actor is not null from identity$x$;',
    'create function private.is_game_observer(uuid) returns boolean language sql stable as $x$select false$x$;',
    'create function private.is_game_teacher(uuid) returns boolean language sql stable as $x$select teacher from identity$x$;',
-   'create function private.game_role(uuid,uuid) returns text language sql stable as $x$select \\'\\'::text$x$;',
+   'create function private.game_role(uuid,uuid) returns text language sql stable as $x$select \'\'::text$x$;',
    'create table game_members(game_id uuid,user_id uuid,kind text,team text,joined_at timestamptz,roster_archived_at timestamptz);',
    'create table game_parties(id uuid primary key,game_id uuid,name text,leader_user_id uuid,color text);',
    'create table party_member_mandates(game_id uuid,party_id uuid,user_id uuid,base_mandates integer,effective_mandates integer);',
    'create function private.member_party_id(p_game uuid,p_user uuid) returns uuid language sql stable as $x$select p.id from game_parties p join game_members m on m.game_id=p.game_id and m.team=p.name where m.game_id=p_game and m.user_id=p_user limit 1$x$;',
    'create function private.gd_member_capacity(p_game uuid,p_user uuid) returns integer language sql stable as $x$select coalesce((select effective_mandates from party_member_mandates where game_id=p_game and user_id=p_user),0)$x$;',
    'create table institution_units(id uuid primary key,game_id uuid,unit_kind text,unit_key text,title text,description text,mandate_capacity integer,head_user_id uuid,capacity_min int,capacity_max int);',
-   'create table institution_assignments(id uuid primary key default gen_random_uuid(),game_id uuid,unit_id uuid,unit_kind text,user_id uuid,party_id uuid,assignment_role text default \\'member\\',created_by uuid,created_at timestamptz default now(),constraint institution_assignments_unit_id_user_id_key unique(unit_id,user_id),constraint institution_assignments_game_id_user_id_unit_kind_key unique(game_id,user_id,unit_kind));'
+   'create table institution_assignments(id uuid primary key default gen_random_uuid(),game_id uuid,unit_id uuid,unit_kind text,user_id uuid,party_id uuid,assignment_role text default \'member\',created_by uuid,created_at timestamptz default now(),constraint institution_assignments_unit_id_user_id_key unique(unit_id,user_id),constraint institution_assignments_game_id_user_id_unit_kind_key unique(game_id,user_id,unit_kind));'
   ].join('\n'));
   const who=async(uid,teacher=false)=>db.query('update identity set actor=$1,teacher=$2',[uid,teacher]);
-  await db.query('insert into game_parties values($1,$2,\\'Альфа\\',$3,\\'#3366aa\\'),($4,$2,\\'Бета\\',$5,\\'#339966\\')',[partyA,game,leaderA,partyB,leaderB]);
+  await db.query('insert into game_parties values($1,$2,\'Альфа\',$3,\'#3366aa\'),($4,$2,\'Бета\',$5,\'#339966\')',[partyA,game,leaderA,partyB,leaderB]);
   const citizens=[];
   for(let i=0;i<40;i++){
    const user=uuid(100+i),p=i<20?partyA:partyB,team=i<20?'Альфа':'Бета',seats=i%20<5?12:11;
    citizens.push({user,party:p,seats});
-   await db.query('insert into game_members values($1,$2,\\'student\\',$3,now(),null)',[game,user,team]);
+   await db.query('insert into game_members values($1,$2,\'student\',$3,now(),null)',[game,user,team]);
    await db.query('insert into party_member_mandates values($1,$2,$3,$4,$4)',[game,p,user,seats]);
   }
   const units=[];
   for(let i=0;i<5;i++){
    const id=uuid(200+i);units.push(id);
-   await db.query('insert into institution_units(id,game_id,unit_kind,unit_key,title,mandate_capacity,head_user_id) values($1,$2,\\'committee\\',$3,$4,90,$5)',[id,game,'committee-'+i,'Комитет '+i,head]);
+   await db.query('insert into institution_units(id,game_id,unit_kind,unit_key,title,mandate_capacity,head_user_id) values($1,$2,\'committee\',$3,$4,90,$5)',[id,game,'committee-'+i,'Комитет '+i,head]);
   }
   const minister=uuid(500),minister2=uuid(501);
   for(const uid of [minister,minister2]){
@@ -60,11 +60,10 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
   const alloc=async(u,person,n)=>db.query('select public.allocate_committee_mandates($1,$2,$3)',[u,person,n]);
   // Split the entire personal mandate package among all five committees.
   for(const person of citizens){
-    let left=person.seats;
+    const j=(Number(person.user.slice(-12)) - 100)%20;
     for(let i=0;i<5;i++){
-      const allocate=i===4?left:(person.seats===12?(i<2?3:2):(i===0?3:2));
-      if(i<4)left-=allocate;
-      await alloc(units[i],person.user,allocate);
+      const extra=j<5?(i===j%5||i===(j+1)%5?1:0):(i===j%5?1:0);
+      await alloc(units[i],person.user,2+extra);
     }
   }
   const totals=(await db.query("select unit_id,sum(mandates_allocated)::int as total from institution_assignments where unit_kind='committee' group by unit_id order by unit_id")).rows;
