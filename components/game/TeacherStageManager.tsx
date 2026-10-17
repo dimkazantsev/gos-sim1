@@ -75,10 +75,13 @@ export default function TeacherStageManager({g,onOpenStage}:{
  useEffect(()=>{void refreshReadiness();return()=>{readinessRequest.current++}},[game?.id]);
  useEffect(()=>{
   if(!game)return;
+  let timer:ReturnType<typeof setTimeout>|undefined;
+  const update=()=>{if(timer)clearTimeout(timer);timer=setTimeout(()=>void refreshReadiness(),400)};
   const c=supabase.channel('teacher-stage-readiness:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'stage_readiness_overrides',filter:'game_id=eq.'+game.id},()=>void refreshReadiness())
+   .on('postgres_changes',{event:'*',schema:'public',table:'stage_readiness_overrides',filter:'game_id=eq.'+game.id},update)
+   .on('postgres_changes',{event:'*',schema:'public',table:'formal_documents',filter:'game_id=eq.'+game.id},update)
    .subscribe();
-  return()=>{void supabase.removeChannel(c)};
+  return()=>{if(timer)clearTimeout(timer);void supabase.removeChannel(c)};
  },[game?.id]);
  const closeDialog=()=>{if(busy)return;setResetTarget(null);setConfirmation('');setError('')};
  const dialogRef=useDialog(resetTarget!==null,closeDialog);
@@ -178,7 +181,9 @@ export default function TeacherStageManager({g,onOpenStage}:{
        {selectedStage.status!=='open'
         ?<button type="button" className="teacherStageOpenFull" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'open')}>Открыть этап</button>
         :<>
-         <button type="button" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'close')}>Завершить этап</button>
+         <button type="button" disabled={stageActionBusy||readinessLoading||!selectedReady?.ready||Boolean(selectedReady?.overridden&&selectedReady.original_blockers?.length)}
+    title={!selectedReady?.ready?'Сначала выполните обязательные процедуры и оформите итоговые документы':'Завершить проверенный этап'}
+    onClick={()=>void changeStage(selectedStage.stage_no,'close')}>Завершить этап</button>
          <label className="teacherStageExtendField">Продление, минут
           <input aria-label="Продление этапа в минутах" type="number" min={1} max={43200} value={extensionMinutes} onChange={e=>setExtensionMinutes(Math.max(1,Math.min(43200,Number(e.target.value)||1)))}/>
          </label>
