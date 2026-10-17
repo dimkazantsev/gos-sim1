@@ -111,6 +111,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    <InstitutionRegistrationPanel
     g={g}
     onUnitsChange={setUnits}
+    onOpenDocument={onOpenDocument}
     stageNo={focusedVote?.stage_no}
     initialBody={focusedVote&&!['all','factions'].includes(focusedVote.institution_key)?focusedVote.institution_key:undefined}
     allowedBodies={focusedVote&&!['all','factions'].includes(focusedVote.institution_key)?[focusedVote.institution_key]:undefined}
