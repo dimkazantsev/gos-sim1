@@ -13,6 +13,7 @@ export function userError(value:unknown):string{
  if(Object.hasOwn(authErrors,code))return authErrors[code];
  if(!s)return '';
  const rules:[RegExp,string][]=[
+ [/\bstage\b.*\bclosed\b|\bstage\b.*\bnot open\b/i,'Этап завершён или ещё не открыт.'],
  [/a user with this email address has already been registered|user already registered|email_exists|user_already_exists/i,authErrors.email_exists],
  [/email address not authorized/i,authErrors.email_address_not_authorized],
  [/over_email_send_rate_limit|for security purposes.*only request this after/i,authErrors.over_email_send_rate_limit],

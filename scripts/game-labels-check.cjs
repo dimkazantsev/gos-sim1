@@ -29,6 +29,8 @@ const userErrors={};
 new Function('exports',ts.transpileModule(fs.readFileSync(path.join(root,'lib/userError.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText)(userErrors);
 for(const error of ['Не найден internal_document_key','Candidate dossier is incomplete: consent, passport','Unknown server failure'])assert.doesNotMatch(userErrors.userError(error),/[A-Za-z_]/);
 assert.equal(userErrors.userError('Проверьте обязательное поле.'),'Проверьте обязательное поле.');
+assert.match(userErrors.userError(new Error('Stage 4 is closed')),/Этап завершён/);
+assert.match(userErrors.userError(new Error('Stage is not open')),/ещё не открыт/);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const Module=require('node:module'),m=new Module(path.join(root,'components/game/RichPostText.tsx'),module);m.paths=module.paths;
 m._compile(ts.transpileModule(fs.readFileSync(path.join(root,'components/game/RichPostText.tsx'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText,'RichPostText.js');
