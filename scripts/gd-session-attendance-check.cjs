@@ -3,6 +3,13 @@ const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 const sql=fs.readFileSync('supabase/migrations/20261017190000_gd_reported_attendance_and_capacity.sql','utf8');
 const nominees=fs.readFileSync('supabase/migrations/20261017193000_gd_committee_nomination_capacity.sql','utf8');
+const defaultAttendance=fs.readFileSync('supabase/migrations/20261017220000_gd_default_full_attendance.sql','utf8');
+assert(defaultAttendance.includes('coalesce(p_declared,private.gd_member_capacity(p_game,p_user))'),'NULL means full default representation');
+assert(defaultAttendance.includes('private.gd_effective_present'),'All server voting paths must reuse the default attendance rule');
+for(const fn of ['vote_eligible_weight','vote_present_weight','office_candidate_vote_weight','cast_personal_office_ballot']){
+ const part=defaultAttendance.split('CREATE OR REPLACE FUNCTION '+(fn==='cast_personal_office_ballot'?'public.':'private.')+fn)[1];
+ assert(part&&part.split('CREATE OR REPLACE FUNCTION')[0].includes('private.gd_effective_present'),'Server function '+fn+' must use shared attendance');
+}
 assert(nominees.includes('private.gd_member_capacity(e.game_id,p_user_id)'),'Committee nominees use current verified GD representation');
 const panel=fs.readFileSync('components/game/InstitutionRegistrationPanel.tsx','utf8');
 const votes=fs.readFileSync('components/game/VotesView.tsx','utf8');
@@ -12,8 +19,8 @@ const committee=fs.readFileSync('components/game/CommitteeChairElectionPanel.tsx
 const css=fs.readFileSync('app/meeting-agenda-canonical.css','utf8');
 for(const rpc of ['get_gd_session_attendance','set_gd_session_attendance'])assert(panel.includes("'"+rpc+"'"));
 assert(votes.includes('present_mandates')&&votes.includes('gdPresentWeight(v)'),'Vote UI caps weight to declared presence');
-assert(game.includes("gdMandateCapacity")&&game.includes('present_mandates'),'Quorum and ballot share the capacity');
-assert(duma.includes('myPresent')&&committee.includes('myPresent'),'Leadership and committee elections use reported presence');
+assert(game.includes('gdEffectivePresence(r.user_id,r.present_mandates)'),'Quorum uses the same default attendance as the server');
+assert(duma.includes('gdEffectivePresence')&&committee.includes('gdEffectivePresence'),'Leadership and committee elections use the shared default');
 assert(!css.includes('!important'),'Canonical agenda has no forced layout overrides');
 for(const section of ['civicMeetingDocuments','civicMeetingSteps','civicAttendanceNumbers','civicGdPresenceForm'])
  assert(css.includes('.'+section),'Canonical style missing '+section);
@@ -47,6 +54,23 @@ for(const section of ['civicMeetingDocuments','civicMeetingSteps','civicAttendan
   await db.exec(core);
   assert.equal(await cap(ids[0]),225);
   assert.equal(await cap(ids[1]),225);
+  // Migrate only function logic; the existing registration rows remain NULL
+  // until a student explicitly submits a different attendance.
+  await db.exec(defaultAttendance.slice(0,defaultAttendance.indexOf('CREATE OR REPLACE FUNCTION private.vote_eligible_weight')));
+  await setUser(ids[0]);
+  await db.query("select public.register_institution_session_at_stage($1,'gd',4)",[gameId]);
+  let automatic=await report();
+  assert.equal(automatic.registered[0].present,225,'One registered student gets all their seats by default');
+  assert.equal(automatic.registered[0].declared,null,'Automatic attendance does not create a manual override');
+  await setUser(ids[1]);
+  await db.query("select public.register_institution_session_at_stage($1,'gd',4)",[gameId]);
+  automatic=await report();
+  assert.equal(automatic.registered.reduce((a,r)=>a+r.present,0),450,'2 registered students supply 225+225');
+  await save(0);
+  automatic=await report();
+  assert.equal(automatic.registered.find(r=>r.user_id===ids[1]).present,0,'Explicit zero means absence');
+  assert.equal(automatic.registered.reduce((a,r)=>a+r.present,0),225,'225 is insufficient for GD quorum');
+  await db.query('delete from institution_session_registrations where game_id=$1',[gameId]);
   await setUser(ids[0]);
   await assert.rejects(()=>save(226),/от 0 до 225/);
   await save(180);
@@ -85,6 +109,6 @@ for(const section of ['civicMeetingDocuments','civicMeetingSteps','civicAttendan
   assert.equal(weights.filter(x=>x===11).length,30);
   await setUser('99999999-0000-0000-0000-000000000001');
   await assert.rejects(()=>save(1),/Нет доступа/);
-  console.log('PASS GD: 2 × 225; 3 × 150; 40 players 450; factual 180+46 quorum; saved updates; GV penalties; forged claim and foreign account denied.');
+  console.log('PASS GD: automatic 225+225; manual 0; 3 × 150; 40 players 450; factual 180+46 quorum; GV penalties and forged attendance denied.');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

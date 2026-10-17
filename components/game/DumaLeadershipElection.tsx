@@ -16,7 +16,7 @@ const offices=[
 ] as const;
 
 export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
- const {game,me,teacher,members,parties,setError,gdMandateCapacity}=g;
+ const {game,me,teacher,members,parties,setError,gdMandateCapacity,gdEffectivePresence}=g;
  const [elections,setElections]=useState<Election[]>([]);
  const [candidates,setCandidates]=useState<OfficeCandidate[]>([]);
  const [ballots,setBallots]=useState<OfficeBallot[]>([]);
@@ -74,7 +74,7 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
  const activeMandates=(partyId:string)=>personalMandates.filter(x=>x.party_id===partyId).reduce((a,x)=>a+Number(x.effective_mandates||0),0);
  const myMandates=personalMandates.find(m=>m.user_id===activeMe.user_id);
  const myAttendance=registrations.find(r=>r.user_id===activeMe.user_id)?.present_mandates;
- const myPresent=Math.min(gdMandateCapacity(activeMe.user_id),Math.max(0,Number(myAttendance)||0));
+ const myPresent=registrations.some(r=>r.user_id===activeMe.user_id)?gdEffectivePresence(activeMe.user_id,myAttendance):0;
  const myRegistered=registrations.some(r=>r.user_id===activeMe.user_id&&r.stage_no===4&&r.institution_key==='gd');
  const procedureApproved=procedureVotes.some(v=>v.status==='closed'&&v.result_code==='passed');
  const procedureOpen=procedureVotes.some(v=>v.status==='open');
@@ -83,7 +83,7 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
  const totalFor=(eid:string,cid:string)=>{
   const election=elections.find(e=>e.id===eid);
   if(election?.ballot_mode==='personal')return personalBallots.filter(b=>b.election_id===eid&&b.candidate_id===cid)
-    .reduce((total,b)=>total+Math.min(gdMandateCapacity(b.voter_id),Math.max(0,Number(registrations.find(r=>r.user_id===b.voter_id)?.present_mandates)||0)),0);
+    .reduce((total,b)=>total+gdEffectivePresence(b.voter_id,registrations.find(r=>r.user_id===b.voter_id)?.present_mandates),0);
   return electionBallots(eid).filter(b=>b.candidate_id===cid).reduce((a,b)=>a+Number(b.votes||0),0);
  };
  const usedByParty=(eid:string,pid:string)=>electionBallots(eid).filter(b=>b.party_id===pid).reduce((a,b)=>a+Number(b.votes||0),0);

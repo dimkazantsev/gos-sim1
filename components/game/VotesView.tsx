@@ -19,7 +19,7 @@ function pct(n:number,d:number){return d>0?Math.round(n/d*100):0}
 function time(v:string){return new Date(v).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
 
 export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClearFocus}:{g:ReturnTypeRepublic;onOpenDocument:(id:string)=>void;onOpenStages:()=>void;focusId?:string;onClearFocus?:()=>void}){
- const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,gdMandateCapacity,createVote,canVote,castVote,closeVote,deleteVote,tally,quorum}=g;
+ const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,gdMandateCapacity,gdEffectivePresence,createVote,canVote,castVote,closeVote,deleteVote,tally,quorum}=g;
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[mode,setMode]=useState<'member'|'faction'|'mandate'>('member');
  const [institution,setInstitution]=useState('all'),[quorumValue,setQuorumValue]=useState(0.5),[majorityKind,setMajorityKind]=useState<'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction'>('present_majority'),[majorityValue,setMajorityValue]=useState(0.5);
  const [tab,setTab]=useSavedGameState<'open'|'closed'|'all'>(g.game?.id,g.me?.user_id,'votes-tab','open',savedChoice('open','closed','all')),[busy,setBusy]=useState('');
@@ -52,7 +52,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    checkedIn.some(row=>row.user_id===me?.user_id&&row.institution_key===v.institution_key&&row.stage_no===v.stage_no);
  }
  function canCast(v:Vote){return canVote(v)&&isRegisteredForVote(v)&&(v.institution_key!=='gd'||gdPresentWeight(v)>0)}
- function gdPresentWeight(v:Vote){const mine=checkedIn.find(r=>r.user_id===me?.user_id&&r.institution_key==='gd'&&r.stage_no===v.stage_no);return Math.min(Math.max(0,Number(mine?.present_mandates)||0),Number(v.electorate_snapshot?.weights?.[me?.user_id||'']||0),gdMandateCapacity(me?.user_id||''));}
+ function gdPresentWeight(v:Vote){const mine=checkedIn.find(r=>r.user_id===me?.user_id&&r.institution_key==='gd'&&r.stage_no===v.stage_no);return mine?Math.min(gdEffectivePresence(me?.user_id||'',mine.present_mandates),Number(v.electorate_snapshot?.weights?.[me?.user_id||'']||0)):0;}
  const focusedVote=focusId?votes.find(v=>v.id===focusId):undefined;
  const focusedNeedsRegistration=!!focusedVote&&voteNeedsRegistration(focusedVote)&&!isRegisteredForVote(focusedVote);
  useEffect(()=>{
@@ -183,7 +183,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
     {v.status==='open'&&v.electorate_snapshot?.attendance_required&&!v.procedure_key?.startsWith('budget_')&&v.procedure_key!=='bill_amendments'&&doc?.workflow_key!=='budget'&&<p className="voteAutoClosureHint">Голосование автоматически закроется после последнего голоса зарегистрированного участника при наличии кворума. Председательствующий или преподаватель также может закрыть его вручную.</p>}
     <div className="quorumMeter"><div><span>Присутствует: {q.present} из {q.eligible} · Подано: {q.cast}</span><b className={q.met?'ok':'wait'}>{q.met?'КВОРУМ ЕСТЬ':'НУЖНО '+Math.max(0,q.needed-q.present)}</b></div><i><em style={{width:Math.min(100,pct(q.present,q.eligible))+'%'}}/></i></div>
     {v.voting_mode==='mandate'&&<details className="deputyRegistration" open={v.status==='open'}>
-     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{checkedIn.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no).reduce((a,x)=>a+Math.min(gdMandateCapacity(x.user_id),Math.max(0,Number(x.present_mandates)||0)),0)} / 450 присутствует · Гоствойтинг −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
+     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{checkedIn.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no).reduce((a,x)=>a+gdEffectivePresence(x.user_id,x.present_mandates),0)} / 450 присутствует · Гоствойтинг −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
      <div className="deputyRegistrationBody">
       {parties.filter(p=>p.mandates>0).map(p=>{
        const rows=partyMandates.filter(x=>x.party_id===p.id);

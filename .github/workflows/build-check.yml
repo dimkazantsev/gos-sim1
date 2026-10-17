@@ -147,6 +147,7 @@ on:
       - 'scripts/meeting-agenda-layout-browser-check.cjs'
       - 'app/meeting-agenda-canonical.css'
       - 'supabase/migrations/20261017190000_gd_reported_attendance_and_capacity.sql'
+      - 'supabase/migrations/20261017220000_gd_default_full_attendance.sql'
       - 'supabase/migrations/20261017193000_gd_committee_nomination_capacity.sql'
       - 'scripts/stage4-committees-layout-browser-check.cjs'
       - 'components/game/CommitteeChairElectionPanel.tsx'
