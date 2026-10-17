@@ -51,7 +51,7 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  assert(ui.includes('agendaTextLength<30'), 'Explain the minimum 30-character rule before saving');
  assert(ui.includes('Сохранить и утвердить повестку'), 'Coordinator save action matches server auto-approval');
  assert(ui.includes('Сохранить проект повестки в реестре НПА'), 'Delegate cannot publish the draft');
- assert(ui.includes('После утверждения повестки можно зарегистрироваться'), 'Ordinary participants can see the next step');
+ assert(ui.includes('Вы можете зарегистрироваться после утверждения повестки'), 'Ordinary participants can see the next step');
  assert(ui.includes('canPrepare&&!readOnly&&!agendaReady'), 'Do not expose editable fields in completed/locked stage views');
  assert(!ui.includes("'Сначала подготовьте документ в реестре НПА'"), 'The form itself creates the agenda document');
   const docs=await q('select doc_type,registry_no,status_code from formal_documents where id=$1',[agenda]);
