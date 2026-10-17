@@ -58,9 +58,13 @@ export function formalDocumentTitle(title:string|null|undefined,docType:string){
  const raw=String(title||'').trim();
  const mapped=FORMAL_TYPES.find(type=>type.key===raw)?.label||FORMAL_SYSTEM_TYPE_LABELS[raw];
  if(mapped)return mapped;
- const agenda=/^Повестка заседания\s*[·:—-]\s*ksrf\s*[·:—-]\s*этап\s*(\d+)$/i.exec(raw);
- if(agenda)return 'Повестка заседания Координационного Совета Российской Федерации — этап '+agenda[1];
- if(/\bksrf\b/i.test(raw))return raw.replace(/\bksrf\b/gi,'КСРФ');
+ // Earlier automatic meeting titles exposed an internal institution key and stage.
+ // Keep stage_no in metadata and links; the official document title has no stage.
+ const meeting=/^(Повестка|Протокол) заседания\s*[·:—-]\s*ksrf(?:\s*[·:—-]\s*этап\s*\d+)?$/i.exec(raw);
+ if(meeting)return meeting[1]+' заседания Координационного Совета Российской Федерации';
+ const official=raw.replace(/\s*[·:—-]\s*этап\s*\d+\s*$/i,'').trim();
+ if(/\bksrf\b/i.test(official))return official.replace(/\bksrf\b/gi,'Координационного Совета Российской Федерации');
+ if(official!==raw)return official;
  if(!raw||/^[a-z][a-z0-9]*(?:[_-][a-z0-9]+)+$/.test(raw))return formalDocumentTypeLabel(docType);
  return raw;
 }
