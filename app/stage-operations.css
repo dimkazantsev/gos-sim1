@@ -460,3 +460,495 @@
  .stageOperationsModules .dumaCandidateScore{text-align:left}
  .stageOperationsModules .dumaVoteAllocation{grid-template-columns:minmax(0,1fr)}
 }
+
+
+/* Stage 4 — committees share the Duma leadership composition.
+   The same staffing component also handles stage 9 ministries; every selector
+   below stays within data-staffing="committees" so ministries are unchanged. */
+.stageOperationsModules .staffingLab[data-staffing="committees"]{
+ container-type:inline-size;
+ container-name:stage4-committees;
+ display:grid;
+ gap:0;
+ margin:0;
+ padding:0;
+ min-width:0;
+ overflow:hidden;
+ border:1px solid var(--stage-line);
+ border-radius:18px;
+ background:#fff;
+ box-shadow:none;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingLabHead{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) minmax(172px,204px);
+ gap:24px;
+ align-items:center;
+ margin:0;
+ padding:22px 24px;
+ border:0;
+ border-bottom:1px solid var(--stage-line);
+ border-radius:0;
+ background:#edf2ff;
+ color:var(--stage-ink);
+ box-shadow:none;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingLabIntro{min-width:0}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingLabEyebrow{
+ display:flex;
+ align-items:center;
+ flex-wrap:wrap;
+ gap:9px;
+ margin-bottom:10px;
+ color:#2453e6;
+ font-size:12px;
+ font-weight:750;
+ line-height:1.45;
+ letter-spacing:0;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingLabEyebrow svg{flex:none}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingLabStage{
+ padding-left:12px;
+ border-left:1px solid #c6d5f4;
+ color:#536580;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingLabHead h2{
+ margin:0 0 9px;
+ max-width:42ch;
+ font-size:clamp(20px,2vw,24px);
+ line-height:1.3;
+ font-weight:800;
+ letter-spacing:-.025em;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingLabHead p{
+ max-width:78ch;
+ margin:0;
+ font-size:14px;
+ line-height:1.65;
+ color:var(--stage-muted);
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingBalance{
+ display:grid;
+ align-content:center;
+ justify-items:center;
+ gap:5px;
+ min-width:0;
+ min-height:122px;
+ padding:16px;
+ border:1px solid #d4e0ff;
+ border-radius:14px;
+ background:#fff;
+ box-shadow:none;
+ text-align:center;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingBalance>span{
+ align-self:auto;
+ margin:0;
+ font-size:12px;
+ font-weight:650;
+ color:#536580;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingBalance strong{
+ font-size:38px;
+ font-weight:850;
+ line-height:1.05;
+ letter-spacing:-.035em;
+ font-variant-numeric:tabular-nums;
+ text-align:center;
+ color:#2453e6;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingBalance em{
+ display:flex;
+ align-items:center;
+ gap:5px;
+ font-size:12px;
+ font-weight:650;
+ font-style:normal;
+ color:#536580;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .stageOperationsActionBar{
+ margin:18px 20px 0;
+ padding:15px 16px;
+ border-color:#dce5f3;
+ border-radius:14px;
+ background:#f8fafc;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .stageOperationsActionBar p{
+ color:var(--stage-muted);
+ line-height:1.55;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingSection{
+ display:grid;
+ gap:14px;
+ min-width:0;
+ margin:0;
+ padding:16px 20px 20px;
+ background:#fff;
+ box-shadow:none;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingSectionHead{
+ display:flex;
+ flex-wrap:wrap;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:12px;
+ min-width:0;
+ margin:0;
+ padding:16px 18px;
+ border:1px solid var(--stage-line);
+ border-radius:14px;
+ background:#f8fafc;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingSectionHead>div{flex:1 1 250px;min-width:0}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingSectionHead small{
+ color:#2453e6;
+ font-size:12px;
+ font-weight:750;
+ letter-spacing:.035em;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingSectionHead h3{
+ margin:6px 0 8px;
+ color:var(--stage-ink);
+ font-size:18px;
+ line-height:1.4;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingSectionHead p{
+ font-size:14px;
+ line-height:1.6;
+ color:var(--stage-muted);
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingSectionHead>span{
+ flex:none;
+ padding:8px 11px;
+ border:1px solid #d4e0ff;
+ border-radius:10px;
+ background:#fff;
+ color:#2453e6;
+ font-size:12px;
+ font-weight:750;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionBoard{
+ display:grid;
+ gap:0;
+ min-width:0;
+ margin:16px 20px 0;
+ padding:0;
+ overflow:hidden;
+ border:1px solid var(--stage-line);
+ border-radius:14px;
+ background:#fff;
+ box-shadow:none;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionHead{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) minmax(172px,204px);
+ gap:20px;
+ align-items:center;
+ min-width:0;
+ padding:18px 20px;
+ border:0;
+ border-bottom:1px solid var(--stage-line);
+ border-radius:0;
+ background:#f0f4ff;
+ box-shadow:none;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionIntro{min-width:0}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionHead small{
+ color:#2453e6;
+ font-size:12px;
+ font-weight:750;
+ letter-spacing:.035em;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionHead h3{
+ margin:6px 0 9px;
+ color:var(--stage-ink);
+ font-size:19px;
+ font-weight:750;
+ line-height:1.35;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionHead p{
+ max-width:76ch;
+ margin:0;
+ color:var(--stage-muted);
+ font-size:14px;
+ line-height:1.65;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionThreshold{
+ display:grid;
+ justify-items:center;
+ align-content:center;
+ gap:4px;
+ min-width:0;
+ min-height:110px;
+ padding:14px;
+ border:1px solid #d4e0ff;
+ border-radius:14px;
+ background:#fff;
+ text-align:center;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionThreshold>span{
+ color:#536580;
+ font-size:12px;
+ font-weight:650;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionThreshold strong{
+ display:flex;
+ align-items:baseline;
+ gap:7px;
+ color:#2453e6;
+ font-size:34px;
+ font-weight:850;
+ font-variant-numeric:tabular-nums;
+ line-height:1.1;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionThreshold small{
+ color:#536580;
+ font-size:14px;
+ font-weight:700;
+ letter-spacing:0;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionThreshold em{
+ color:#536580;
+ font-size:12px;
+ font-weight:650;
+ font-style:normal;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionGrid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:12px;
+ min-width:0;
+ margin:0;
+ padding:16px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCard,
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeUnit{
+ min-width:0;
+ overflow:hidden;
+ border:1px solid var(--stage-line);
+ border-radius:14px;
+ background:#fff;
+ box-shadow:none;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCard>header,
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeUnit>header{
+ display:flex;
+ flex-wrap:wrap;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:12px;
+ padding:15px 16px;
+ border-bottom:1px solid var(--stage-line);
+ background:#f8fafc;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCard header b,
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeUnit header h4{
+ display:block;
+ margin:4px 0;
+ font-size:15px;
+ line-height:1.4;
+ color:var(--stage-ink);
+ overflow-wrap:anywhere;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCard header small,
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeUnit header small{
+ font-size:12px;
+ font-weight:750;
+ color:#536580;
+ letter-spacing:.035em;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCreate{
+ display:flex;
+ flex-wrap:wrap;
+ min-width:0;
+ gap:8px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCreate select{
+ flex:1 1 120px;
+ min-height:42px;
+ min-width:0;
+ padding:8px 10px;
+ border:1px solid #d3ddeb;
+ border-radius:10px;
+ font-size:14px;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCreate button{
+ min-height:42px;
+ border-radius:10px;
+ padding:9px 13px;
+ font-size:14px;
+ font-weight:750;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionState{
+ flex-wrap:wrap;
+ gap:8px;
+ padding:12px 15px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionState :is(span,b,em){font-size:12px}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeNominate{
+ grid-template-columns:minmax(0,1fr) auto auto;
+ gap:8px;
+ padding:12px 15px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeNominate select,
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeNominate button{
+ min-width:0;
+ min-height:42px;
+ padding:9px 12px;
+ border-radius:10px;
+ font-size:14px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeCandidateList{
+ gap:9px;
+ padding:15px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeCandidateList>div{
+ min-width:0;
+ gap:10px;
+ padding:10px;
+ border-radius:11px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeCandidateList>div>div{
+ min-width:0;
+ overflow-wrap:anywhere;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeCandidateList b{font-size:14px;line-height:1.4}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeBallot{
+ grid-template-columns:minmax(0,1fr) auto;
+ gap:8px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeBallot input,
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeBallot button{
+ min-width:0;
+ min-height:42px;
+ padding:8px 11px;
+ border-radius:10px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeGrid{
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:12px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeQuota,
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitHead,
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitMembers{
+ padding:14px 16px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeQuota{gap:7px}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeQuota>div{
+ min-width:0;
+ grid-template-columns:8px minmax(0,1fr) auto auto;
+ gap:8px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeQuota b{
+ min-width:0;
+ overflow-wrap:anywhere;
+ white-space:normal;
+ line-height:1.4;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitHead{
+ border-bottom:1px solid var(--stage-line);
+ background:#f8fafc;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitHead>b{
+ font-size:14px;
+ color:var(--stage-ink);
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitMembers{gap:8px}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitMembers>div:not(.emptyState){
+ min-width:0;
+ gap:8px;
+ padding:10px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitMembers>div>span{
+ min-width:0;
+ overflow-wrap:anywhere;
+ white-space:normal;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitAssign{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) auto;
+ gap:8px;
+ padding:0 16px 16px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitAssign select,
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitAssign button{
+ min-width:0;
+ min-height:42px;
+ padding:9px 11px;
+ border-radius:10px;
+ font-size:14px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingRule{
+ margin:0 20px 20px;
+ padding:14px 16px;
+ border:1px solid #d4e0ff;
+ border-radius:14px;
+ background:#f8fafc;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingRule b{
+ color:var(--stage-ink);
+ font-size:14px;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .staffingRule p{
+ color:var(--stage-muted);
+ font-size:14px;
+ line-height:1.6;
+}
+@container stage4-committees (max-width:860px){
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeGrid,
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionGrid{grid-template-columns:minmax(0,1fr)}
+}
+@container stage4-committees (max-width:740px){
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingLabHead,
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionHead{
+  grid-template-columns:minmax(0,1fr);
+  gap:16px;
+  padding:20px;
+ }
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingBalance,
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionThreshold{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px 14px;
+  min-height:0;
+  padding:12px 14px;
+  text-align:left;
+ }
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingBalance strong,
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionThreshold strong{font-size:30px}
+}
+@container stage4-committees (max-width:490px){
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingLabHead{padding:16px}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingLabHead h2{font-size:21px}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .stageOperationsActionBar{margin:12px 12px 0}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .stageOperationsActionBar>button{width:100%}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionBoard{margin:12px 12px 0}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionHead{padding:14px}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionGrid{padding:12px;gap:10px}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCreate{width:100%}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCreate select,
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeElectionCreate button{width:100%}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeNominate{grid-template-columns:minmax(0,1fr)}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeBallot{grid-template-columns:minmax(0,1fr)}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeCandidateList>div{grid-template-columns:32px minmax(0,1fr) auto}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingSection{padding:12px;gap:12px}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingSectionHead{padding:14px}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingSectionHead>span{width:100%;text-align:center}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeUnit>header{padding:14px}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeQuota,
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .unitHead,
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .unitMembers{padding:12px}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeQuota>div{grid-template-columns:8px minmax(0,1fr) auto}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeQuota>div>span{grid-column:2/-1}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .unitMembers>div:not(.emptyState){grid-template-columns:minmax(0,1fr) auto}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .unitAssign{grid-template-columns:minmax(0,1fr);padding:0 12px 12px}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingRule{margin:0 12px 12px}
+}
