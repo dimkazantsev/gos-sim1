@@ -30,8 +30,17 @@ const cards=Array.from({length:5},(_,i)=>'<article class="institutionUnit commit
  '<div class="unitHead"><small>ПРЕДСЕДАТЕЛЬ</small><b>Александра Михайловна Константинова</b><span>Избирается депутатами Государственной Думы в блоке выше</span></div>'+
  '<div class="unitMembers"><div><span>Александра Михайловна Константинова</span><small>Фракция</small><b>≈ 11,2 мандата</b><button aria-label="Исключить">×</button></div></div>'+
  '<div class="unitAssign"><select><option>Добавить депутата…</option></select><button>Добавить</button></div></article>').join('');
-const votes=Array.from({length:2},(_,i)=>'<article class="committeeElectionCard"><header><div><small>КОМИТЕТ</small><b>Комитет по государственному управлению №'+(i+1)+'</b><span>Председатель: не избран</span></div><div class="committeeElectionCreate"><select><option>Открыто</option></select><button>Начать выборы</button></div></header><div class="committeeElectionState"><span>ПЕРВЫЙ ТУР</span><b>Выдвижение</b><em>Открытое</em></div><div class="committeeNominate"><select><option>Кандидат от фракции…</option></select><button>Выдвинуть</button><button class="primary">Открыть голосование</button></div>'+
+const activeVotes=Array.from({length:2},(_,i)=>'<article class="committeeElectionCard nomination"><header><div><small>КОМИТЕТ</small><b>Комитет по государственному управлению №'+(i+1)+'</b><span>Председатель: не избран</span></div><div class="committeeElectionCreate"><select><option>Открыто</option></select><button>Начать выборы</button></div></header><div class="committeeElectionState"><span>ПЕРВЫЙ ТУР</span><b>Выдвижение</b><em>Открытое</em></div><div class="committeeNominate"><select><option>Кандидат от фракции…</option></select><button>Выдвинуть</button><button class="primary">Открыть голосование</button></div>'+
  '<div class="committeeCandidateList"><div><span>АК</span><div><b>Александра Константинова</b><small>Фракция</small></div><strong>226</strong><div class="committeeBallot"><input placeholder="Голоса"><button>Записать</button></div></div></div></article>').join('');
+const idleTitles=[
+ 'Комитет по обороне и безопасности',
+ 'Комитет по экономической политике',
+ 'Комитет по внешней политике',
+ 'Комитет по внутренней политике и государственному устройству',
+ 'Комитет по социальной политике'
+];
+const idleVotes=idleTitles.map(title=>'<article class="committeeElectionCard idle"><header><div><small>КОМИТЕТ</small><b>'+title+'</b><span>Председатель: —</span></div><div class="committeeElectionCreate"><select aria-label="Форма выборов председателя: '+title+'"><option>Открыто</option></select><button>Начать выборы</button></div></header></article>').join('');
+const votes=idleVotes+activeVotes;
 const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=device-width, initial-scale=1"><style>'+
  '*{box-sizing:border-box}body{margin:0;font:14px Arial,sans-serif;background:#f4f7fb;color:#142644}main{min-width:0}'+styles+'</style>'+
  '<main class="stageOperations"><div class="stageOperationsModules"><section class="staffingLab" data-staffing="committees"><header class="staffingLabHead"><div class="staffingLabIntro"><div class="staffingLabEyebrow"><svg width="17" height="17"></svg><span>Государственная Дума</span><span class="staffingLabStage">Этап 4</span></div><h2>Формирование комитетов Государственной Думы</h2><p>Палата образует пять комитетов и избирает их председателей. После выборов депутаты распределяются по комитетам с учётом фракционных квот.</p></div><div class="staffingBalance"><span>Составы комитетов</span><strong>0</strong><em>депутатов распределено</em></div></header>'+
@@ -51,6 +60,21 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
     const selectors=['.staffingLab[data-staffing="committees"]','.staffingLabHead','.staffingBalance','.committeeElectionBoard','.committeeElectionHead','.committeeElectionThreshold','.committeeElectionGrid','.committeeElectionCard','.committeeNominate','.committeeCandidateList','.staffingSection','.committeeGrid','.committeeUnit','.committeeQuota','.unitMembers','.unitAssign'];
     const visible=e=>!!e&&getComputedStyle(e).display!=='none';
     const overflow=selectors.flatMap(sel=>{const e=document.querySelector(sel);if(!visible(e))return [{selector:sel,error:'missing/hidden'}];const r=e.getBoundingClientRect();return r.left<-1||r.right>innerWidth+2||e.scrollWidth>e.clientWidth+2?[{selector:sel,left:r.left,right:r.right,scroll:e.scrollWidth,client:e.clientWidth}]:[]});
+    const idleCards=[...document.querySelectorAll('.staffingLab[data-staffing="committees"] .committeeElectionCard.idle')];
+    const cardLayout=idleCards.map(card=>{
+     const info=card.querySelector('header>div:first-child');
+     const form=card.querySelector('.committeeElectionCreate');
+     const select=form.querySelector('select');
+     const button=form.querySelector('button');
+     const r=card.getBoundingClientRect(),t=info.getBoundingClientRect(),f=form.getBoundingClientRect(),sel=select.getBoundingClientRect(),b=button.getBoundingClientRect();
+     return {cardLeft:r.left,cardRight:r.right,infoLeft:t.left,infoBottom:t.bottom,
+      controlsLeft:f.left,controlsTop:f.top,selectBottom:sel.bottom,buttonTop:b.top,buttonRight:b.right,
+      headerDisplay:getComputedStyle(card.querySelector('header')).display,
+      selectFlex:getComputedStyle(select).flexGrow,
+      headerBackground:getComputedStyle(card.querySelector('header')).backgroundColor,
+      cardBackground:getComputedStyle(card).backgroundColor,
+      borderBottom:getComputedStyle(card.querySelector('header')).borderBottomWidth};
+    });
     const ministry=document.querySelector('.staffingLab[data-staffing="ministries"] .staffingLabHead');
     const badge=document.querySelector('.staffingLab[data-staffing="committees"] .staffingBalance');
     const rect=badge.getBoundingClientRect(), center=(rect.left+rect.right)/2;
@@ -66,6 +90,7 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
       committeeCounterText:badge.querySelector('strong').textContent,
       committeeCaptionCentered:getComputedStyle(badge.querySelector('em')).textAlign==='center',
       committeeCaptionHasIcon:!!badge.querySelector('em svg'),
+      cardLayout,
       ministryCounterGridColumns:getComputedStyle(document.querySelector('.staffingLab[data-staffing="ministries"] .staffingBalance')).gridTemplateColumns.split(' ').length,
       numberCards:document.querySelectorAll('.committeeUnit').length,
       committeeColumns:getComputedStyle(document.querySelector('.committeeGrid')).gridTemplateColumns.split(' ').length};
@@ -75,6 +100,20 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
    assert.equal(check.header,'rgb(237, 242, 255)','Use same light brand header as Duma leadership');
    assert.equal(check.ministryBackground,'rgb(237, 242, 255)','Ministry header keeps the existing shared-stage styling');
    assert.equal(check.numberCards,5,'Committee list retains all five cards');
+   assert.equal(check.cardLayout.length,5,'Five idle election panels rendered');
+   for(const card of check.cardLayout){
+    assert.equal(card.headerDisplay,'grid','Committee card has a fixed stacking layout at '+width);
+    assert.equal(card.selectFlex,'0','Select does not stretch or shift its button at '+width);
+    assert(card.controlsTop>=card.infoBottom-1,'Controls follow the committee name at '+width+': '+JSON.stringify(card));
+    assert(Math.abs(card.infoLeft-card.controlsLeft)<2,'Title and form have the same left alignment at '+width);
+    assert(card.buttonTop>=card.selectBottom+5,'Button appears below select at '+width);
+    assert(card.buttonRight<=card.cardRight+1,'Controls do not overflow card at '+width);
+    assert.equal(card.cardBackground,card.headerBackground,'Idle panels have no detached white blank region at '+width);
+    assert.equal(card.borderBottom,'0px','Idle panels have no unnecessary divider at '+width);
+   }
+   if(width>=1024){
+    assert(Math.abs(check.cardLayout[0].controlsTop-check.cardLayout[1].controlsTop)<2,'Two desktop committee cards align action row at '+width);
+   }
    assert.equal(check.committeeCounterText,'0','Test empty committee count exactly as in reported screen');
    assert(check.committeeCaptionCentered,'Counter caption is centered at '+width);
    assert(!check.committeeCaptionHasIcon,'Counter caption has no decorative SVG at '+width);
