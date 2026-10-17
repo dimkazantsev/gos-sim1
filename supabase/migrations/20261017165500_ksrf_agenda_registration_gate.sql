@@ -34,7 +34,7 @@ begin
  ) then
    raise exception 'Сначала зарегистрируйтесь на заседание органа: %',p_institution;
  end if;
-end $function$
+end $function$;
 
 CREATE OR REPLACE FUNCTION public.propose_parliamentary_election_rule(p_game_id uuid, p_system_type text, p_allocation_method text DEFAULT NULL::text, p_majoritarian_method text DEFAULT NULL::text, p_proportional_share integer DEFAULT NULL::integer, p_rationale text DEFAULT NULL::text)
  RETURNS uuid
@@ -56,7 +56,7 @@ begin
  values(p_game_id,p_system_type,p_allocation_method,p_majoritarian_method,p_proportional_share,nullif(trim(coalesce(p_rationale,'')),''),v_uid)
  returning id into v_id;
  return v_id;
-end;$function$
+end;$function$;
 
 CREATE OR REPLACE FUNCTION public.propose_regional_election_rule(p_game_id uuid, p_method text, p_rationale text DEFAULT NULL::text)
  RETURNS uuid
@@ -74,7 +74,7 @@ begin
  insert into public.regional_election_rules(game_id,method,rationale,proposed_by)
  values(p_game_id,p_method,nullif(trim(coalesce(p_rationale,'')),''),v_uid) returning id into v_id;
  return v_id;
-end;$function$
+end;$function$;
 
 CREATE OR REPLACE FUNCTION public.open_parliamentary_rule_vote(p_rule_id uuid)
  RETURNS uuid
@@ -106,7 +106,7 @@ begin
   return null;
  end if;
  return private.activate_ksrf_proposal(p.game_id,'electoral_system',p.id);
-end;$function$
+end;$function$;
 
 CREATE OR REPLACE FUNCTION public.open_regional_rule_vote(p_rule_id uuid)
  RETURNS uuid
@@ -138,5 +138,5 @@ begin
   return null;
  end if;
  return private.activate_ksrf_proposal(p.game_id,'regional_system',p.id);
-end;$function$
+end;$function$;
 
