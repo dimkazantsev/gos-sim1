@@ -465,7 +465,7 @@ begin
  update political_posts set context=context||jsonb_build_object('stage_snapshot',news_snap)
   where game_id=new.game_id and source_key='stage-result:'||new.id::text||':'||new.completed_at::text;
  return new;
-end$function$
+end$function$;
 
 REVOKE ALL ON FUNCTION private.capture_completed_stage_comic() FROM public,anon,authenticated;
 
