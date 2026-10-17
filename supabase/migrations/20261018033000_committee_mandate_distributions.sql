@@ -533,3 +533,22 @@ begin
    on conflict(unit_id,user_id) do update set unit_id=excluded.unit_id,party_id=excluded.party_id,assignment_role='head',created_by=v_uid,created_at=now();
  end if;
 end;$function$;
+-- Repair old elections that set a committee head but did not persist their
+-- membership, without assigning any fictional mandates or changing winners.
+INSERT INTO public.institution_assignments(
+ game_id,unit_id,unit_kind,user_id,party_id,assignment_role,created_by,mandates_allocated)
+SELECT u.game_id,u.id,'committee',u.head_user_id,
+ private.member_party_id(u.game_id,u.head_user_id),'head',
+ coalesce((
+   SELECT e.created_by FROM public.office_elections e
+   WHERE e.game_id=u.game_id AND e.office_key='committee:'||u.id::text
+     AND e.status='finished' AND e.winner_candidate_id IS NOT NULL
+   ORDER BY e.created_at DESC LIMIT 1
+ ),g.owner_id),0
+FROM public.institution_units u
+JOIN public.games g ON g.id=u.game_id
+WHERE u.unit_kind='committee' AND u.head_user_id IS NOT NULL
+ AND EXISTS(SELECT 1 FROM public.game_members gm WHERE gm.game_id=u.game_id
+  AND gm.user_id=u.head_user_id AND gm.kind='student'
+  AND gm.roster_archived_at IS NULL)
+ON CONFLICT(unit_id,user_id) DO UPDATE SET assignment_role='head';
