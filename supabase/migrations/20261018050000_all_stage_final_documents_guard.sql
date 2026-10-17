@@ -284,7 +284,7 @@ begin
  v_final_documents:=private.stage_required_final_documents(p_game,p_stage);
  for v_doc in select value from jsonb_array_elements(v_final_documents) loop
    if not (v_doc->>'fulfilled')::boolean then
-     b:=b||jsonb_build_array('Не опубликован итоговый документ: '||(v_doc->>'title'));
+     b:=b||jsonb_build_array(case when v_doc->>'evidence_state'='prepared' then 'Не подготовлен итоговый документ: ' else 'Не опубликован итоговый документ: ' end||(v_doc->>'title'));
    end if;
  end loop;
  m:=m||jsonb_build_object('required_documents',v_final_documents);
@@ -380,7 +380,7 @@ begin
   if v_reason is not null then
    -- Historical overrides can accept legacy procedural records, never absent
    -- final documents required for new completion.
-   select coalesce(jsonb_agg('Не опубликован итоговый документ: '||(x->>'title')),'[]'::jsonb)
+   select coalesce(jsonb_agg((case when x->>'evidence_state'='prepared' then 'Не подготовлен итоговый документ: ' else 'Не опубликован итоговый документ: ' end)||(x->>'title')),'[]'::jsonb)
      into v_required_missing
    from jsonb_array_elements(coalesce(v_stage->'metrics'->'required_documents','[]'::jsonb)) x
    where coalesce((x->>'fulfilled')::boolean,false)=false;
@@ -424,7 +424,7 @@ begin
  if v_reason is not null then
    -- Historical overrides can accept legacy procedural records, never absent
    -- final documents required for new completion.
-   select coalesce(jsonb_agg('Не опубликован итоговый документ: '||(x->>'title')),'[]'::jsonb)
+   select coalesce(jsonb_agg((case when x->>'evidence_state'='prepared' then 'Не подготовлен итоговый документ: ' else 'Не опубликован итоговый документ: ' end)||(x->>'title')),'[]'::jsonb)
      into v_required_missing
    from jsonb_array_elements(coalesce(v->'metrics'->'required_documents','[]'::jsonb)) x
    where coalesce((x->>'fulfilled')::boolean,false)=false;
