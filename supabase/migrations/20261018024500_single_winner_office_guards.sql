@@ -338,3 +338,8 @@ begin
  return out_json;
 end;
 $function$;
+-- Last-resort database invariant: no second finalized winner for the same
+-- stage-4 office even if a caller bypasses a public RPC.
+CREATE UNIQUE INDEX IF NOT EXISTS stage4_single_finished_winner_by_office
+ON public.office_elections(game_id,office_key)
+WHERE stage_no=4 AND status='finished' AND winner_candidate_id IS NOT NULL;
