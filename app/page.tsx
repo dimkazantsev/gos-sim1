@@ -47,6 +47,8 @@ export default function Home(){
  const [personalLogin,setPersonalLogin]=useState(false);
  const [loginEmail,setLoginEmail]=useState(''),[loginPassword,setLoginPassword]=useState(''),[loginGameCode,setLoginGameCode]=useState(''),[recoverySent,setRecoverySent]=useState(false);
  const [savedGameCodes,setSavedGameCodes]=useState<string[]>([]);
+ const [fromSharedLink,setFromSharedLink]=useState(false);
+ useEffect(()=>setFromSharedLink(!!incomingSectionSuffix()),[]);
  useEffect(()=>{
   const codes=readRememberedGameCodes();
   setSavedGameCodes(codes);
@@ -192,7 +194,7 @@ export default function Home(){
      <GameEntryQr/>
      <div className="entryPrivacy"><LockKeyhole aria-hidden="true"/><p>ФИО будет видно участникам и преподавателю. Ваши действия сохраняются в протоколе игры.</p></div>
     </form>}
-    {typeof window!=='undefined'&&incomingSectionSuffix()&&<p className="entryLinkAdvice">Ссылка из Телеграма открывает нужный раздел без повторного входа только в браузере, где Вы уже авторизованы. Если Телеграм открыл отдельное окно, выберите в его меню «Открыть в браузере» и используйте ссылку там. Данные для входа по ссылке не передаются.</p>}
+    {fromSharedLink&&<p className="entryLinkAdvice">Ссылка из Телеграма открывает нужный раздел без повторного входа только в браузере, где Вы уже авторизованы. Если Телеграм открыл отдельное окно, выберите в его меню «Открыть в браузере» и используйте ссылку там. Данные для входа по ссылке не передаются.</p>}
     {personalLogin&&<form id="entry-form" className="entryForm" onSubmit={login} aria-busy={busy}>
      <div className="entryFormIntro"><span className="overline">ЛИЧНАЯ УЧЁТНАЯ ЗАПИСЬ</span><h2>Вход по паролю</h2><p>Используйте подтверждённую почту и пароль, указанные в игровом профиле. Ваши мандаты и действия сохранятся.</p></div>
      <button type="button" className="entryPersonalSwitch" onClick={()=>{setPersonalLogin(false);setError('')}}><LockKeyhole size={16}/> Вернуться ко входу по коду</button>
