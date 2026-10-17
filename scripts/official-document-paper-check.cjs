@@ -23,10 +23,12 @@ for(const [original,kind,expected] of examples){
 }
 const paper=read('components/game/DocumentPaper.tsx');
 assert(paper.includes('formalDocumentTitle(d.title,d.doc_type)'),'Existing paper title helper preserved');
-assert(paper.includes('<span>{issuer}</span>{footerSlot}'),'Paper and print footer must name issuer');
+assert(paper.includes('<span>{footerInstitution}</span>{footerSlot}'),'Paper and print footer must name an issuing public authority');
+assert(paper.includes("d.subject_key==='gd_deputy'")&&paper.includes("d.subject_key==='sf_member'"),'Bills cite the relevant chamber rather than the country in their footer');
 assert(!paper.includes('Учебный документ'),'Paper must not present itself as educational');
 assert(paper.includes('className="formalPaperInstitution">{issuer}'),'The same authority remains in masthead');
 const view=read('components/game/DocumentsView.tsx');
+assert(!view.includes('Этап игры:')&&!view.includes('Документы игры'),'The document workspace must not advertise simulation metadata');
 assert(view.includes('<DocumentPaper document={selected}'),'Central paper used in main document viewer');
 assert(view.includes('onClick={()=>window.print()}'),'Printing uses the same paper markup');
 assert(!view.includes('{selected.registry_no} · Этап {selected.stage_no}'),'Internal stage not shown in paper heading');
