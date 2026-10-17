@@ -54,7 +54,7 @@ begin
  end if;
  if tg_op='DELETE' then return old;end if;
  return new;
-end $function$;
+end; $function$;
 
 CREATE OR REPLACE FUNCTION public.save_institution_meeting_document(p_game_id uuid, p_stage_no integer, p_institution text, p_kind text, p_body text, p_delegate_user_id uuid DEFAULT NULL::uuid)
  RETURNS uuid
