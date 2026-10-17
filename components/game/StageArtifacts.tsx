@@ -5,6 +5,7 @@ import {ArrowUpRight,CheckCircle2,FilePlus2,FileText,Link2,PartyPopper,Vote} fro
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage,View} from './types';
 import {DOCUMENT_TEMPLATES} from './documentTemplates';
+import {canPrepareStageFinalDocument,crisisDocumentTemplate,stageDocumentSubject,type StageFinalDocument} from './stageFinalDocuments';
 type Task={title:string;help:string;templates:string[];target?:View};
 export const STAGE_FORMS:Record<number,Task>={
  1:{title:'Регистрационный пакет партии',help:'Создайте партию, заполните её программу и устав, прикрепите заявление, символику, сведения о пошлине и протокол съезда. Отправьте пакет на проверку Минюсту в разделе «Партии».',templates:[],target:'parties'},
@@ -24,11 +25,19 @@ export const STAGE_FORMS:Record<number,Task>={
  15:{title:'Правовое реагирование на кризис',help:'Изучите кризис в рабочей форме, определите компетентный орган и пригласите его представителя. Оформите решение того уровня власти, который действует в ситуации.',templates:['president_decree','government_resolution','ministry_order','municipal_act'],target:'events'},
  16:{title:'Итоговый разбор',help:'Заполните аналитический разбор в форме этапа ниже. Сопоставьте документы, голоса, бюджет и последствия; отделите свои предположения от подтверждённых результатов.',templates:[],target:'grades'}
 };
-export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreateDocument,onNavigate,onOpenVotes}:{g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:View)=>void;onOpenVotes:(id?:string)=>void}){
+export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreateDocument,onNavigate,onOpenVotes,finalDocuments=[],formalSubjects=[],onRefreshFinalDocuments}:{g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:View)=>void;onOpenVotes:(id?:string)=>void;finalDocuments?:StageFinalDocument[];formalSubjects?:string[];onRefreshFinalDocuments?:()=>void}){
  const [form,setForm]=useState(''),[saved,setSaved]=useState('');
  const task=STAGE_FORMS[stage.stage_no];if(!task)return null;
  const docs=g.formalDocuments.filter(d=>d.stage_no===stage.stage_no),votes=g.votes.filter(v=>v.stage_no===stage.stage_no);
  const completed=stage.status==='completed';
+ const missingFinalDocuments=finalDocuments.filter(item=>!item.fulfilled);
+ const canPrepareTemplate=(key:string)=>g.teacher||formalSubjects.includes(stageDocumentSubject(
+  stage.stage_no,key,DOCUMENT_TEMPLATES.find(t=>t.key===key)?.subject||''));
+ const prepareFinal=(item:StageFinalDocument)=>{
+  const key=item.template_key==='crisis_act'?crisisDocumentTemplate(formalSubjects,g.teacher):item.template_key;
+  if(!key||readOnly||!canPrepareStageFinalDocument(item,formalSubjects,g.teacher))return;
+  setForm(key);setSaved('');
+ };
  const partySync=stage.stage_no===1?g.parties.map(p=>({
   ...p,
   documents:g.partyDocuments.filter(d=>d.party_id===p.id)
@@ -38,8 +47,19 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
   <div className="stageProfileSyncHead"><div><Link2 size={18}/><span><small>Данные партий обновляются автоматически</small><b>Регистрационные пакеты</b></span></div>{onNavigate&&<button type="button" onClick={()=>onNavigate('parties')}>Открыть партии <ArrowUpRight size={15}/></button>}</div>
   {partySync.length?<div className="stagePartySyncGrid">{partySync.map(p=><article key={p.id}><div><PartyPopper size={17}/><span><b>{p.name}</b><small>{p.ideology||'Идеология не указана'}</small></span></div><div className="stagePartySyncMeta"><span className={'is-'+p.registration_status}>{p.registration_status==='registered'?'Зарегистрирована':p.registration_status==='submitted'?'На проверке':p.registration_status==='revision'?'Нужна доработка':p.registration_status==='rejected'?'Отклонена':'Черновик'}</span><span>{p.documents.length} док.</span></div></article>)}</div>:<div className="stageProfileSyncEmpty">Партии ещё не созданы. Создайте партию в профильном разделе — она автоматически появится здесь.</div>}
  </section>}
- <div className="stageArtifactActions">{task.templates.map(key=>{const t=DOCUMENT_TEMPLATES.find(x=>x.key===key);return t&&<button type="button" key={key} disabled={readOnly} aria-expanded={form===key} onClick={()=>{setForm(form===key?'':key);setSaved('')}}><FilePlus2 size={18}/><span>{t.title}</span></button>})}{stage.stage_no!==1&&task.target&&onNavigate&&<button type="button" onClick={()=>onNavigate(task.target!)}><ArrowUpRight size={18}/><span>Открыть {({parties:'партии',votes:'голосования',budget:'бюджет',events:'события',grades:'журнал оценок'} as Partial<Record<View,string>>)[task.target]||'раздел'}</span></button>}</div>
- {form&&!readOnly&&<StageDocumentForm key={form} g={g} templateKey={form} stageNo={stage.stage_no} onCancel={()=>setForm('')} onSaved={()=>{setSaved('Черновик сохранён в реестре НПА и связан с этапом.');setForm('')}}/>}
+ {finalDocuments.length>0&&<section className="stageFinalDocuments" aria-label="Обязательные итоговые документы">
+   <header><div><small>ИТОГОВЫЕ ДОКУМЕНТЫ · ЭТАП {stage.stage_no}</small><h4>Перед завершением этапа</h4></div><b>{finalDocuments.filter(x=>x.fulfilled).length} / {finalDocuments.length}</b></header>
+   <p>Необходимо подготовить итоговые документы этапа. Нормативные акты должны быть официально опубликованы; проекты государственных программ на этапе 10 должны быть оформлены и сохранены в Реестре НПА. Сохранённый черновик не означает завершения оформления.</p>
+   <div className="stageFinalDocumentsList">{finalDocuments.map(item=><div key={item.template_key} className={item.fulfilled?'isReady':'isMissing'}>
+     <span aria-hidden="true">{item.fulfilled?'✓':'!'}</span><strong>{item.title}</strong>
+     <small>{item.fulfilled?(item.evidence_state==='prepared'?'Подготовлен':'Опубликован'):(item.evidence_state==='prepared'?'Не подготовлен':'Не опубликован')}</small>
+     {!item.fulfilled&&!readOnly&&canPrepareStageFinalDocument(item,formalSubjects,g.teacher)&&
+       <button type="button" onClick={()=>prepareFinal(item)}>Подготовить документ</button>}
+   </div>)}</div>
+   {!!missingFinalDocuments.length&&<p>После заполнения проведите предусмотренное согласование. Постановления, протоколы и правовые акты должны получить статус «Опубликован». Затем нажмите «Перепроверить» на вкладке «Проверка».</p>}
+  </section>}
+ <div className="stageArtifactActions">{task.templates.map(key=>{const t=DOCUMENT_TEMPLATES.find(x=>x.key===key);return t&&canPrepareTemplate(key)&&<button type="button" key={key} disabled={readOnly} aria-expanded={form===key} onClick={()=>{setForm(form===key?'':key);setSaved('')}}><FilePlus2 size={18}/><span>{t.title}</span></button>})}{stage.stage_no!==1&&task.target&&onNavigate&&<button type="button" onClick={()=>onNavigate(task.target!)}><ArrowUpRight size={18}/><span>Открыть {({parties:'партии',votes:'голосования',budget:'бюджет',events:'события',grades:'журнал оценок'} as Partial<Record<View,string>>)[task.target]||'раздел'}</span></button>}</div>
+ {form&&!readOnly&&<StageDocumentForm key={form} g={g} templateKey={form} stageNo={stage.stage_no} onCancel={()=>setForm('')} onSaved={()=>{setSaved(stage.stage_no===10?'Документ создан и связан с этапом. После оформления программы проверьте готовность этапа.':'Документ зарегистрирован в Реестре НПА. Для завершения этапа требуется его официальная публикация.');setForm('');onRefreshFinalDocuments?.()}}/>}
  {saved&&<p className="stageDocumentSaved" role="status">{saved}</p>}
  <div className="stageArtifactResults"><div><b>Документы этапа · {docs.length}</b>{docs.length?docs.map(d=><button key={d.id} type="button" disabled={!onOpenDocument} onClick={()=>onOpenDocument?.(d.id)}><FileText size={18}/><span><strong>{d.title}</strong><small>{d.registry_no} · {d.status_label}</small></span><ArrowUpRight size={16}/></button>):<p>Документов пока нет. После создания в правовом портале они появятся здесь.</p>}</div><div><b>Голосования этапа · {votes.length}</b>{votes.length?votes.map(v=><button type="button" key={v.id} onClick={()=>onOpenVotes(v.id)}><Vote size={18}/><span><strong>{v.title}</strong><small>{v.status==='open'?'Идёт голосование':(v.result_label||'Завершено')} · За: {v.result_yes??0} · Против: {v.result_no??0} · Воздержались: {v.result_abstain??0}</small></span></button>):<p>Процедурные голосования отображаются после открытия заседания.</p>}</div></div>
  {completed&&<p className="stageArtifactCompletion">Этап завершён {stage.completed_at?new Date(stage.completed_at).toLocaleString('ru-RU'):''}. Результат каждого документа и голосования отражён выше; оценки доступны в журнале.</p>}

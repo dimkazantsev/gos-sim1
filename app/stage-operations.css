@@ -1086,3 +1086,71 @@
   width:42px;min-width:42px;height:44px;
  }
 }
+
+/* Stage completion: mandatory final documents, shared with the Materials tab. */
+.stageOperations .stageFinalWorkPrompt,
+.stageOperations .stageReadinessMaterialActions,
+.stageOperations .stageFinalDocuments{
+ border:1px solid #d0dcf4;
+ border-radius:16px;
+ background:#f5f8ff;
+ padding:16px;
+ color:#17305a;
+}
+.stageOperations .stageFinalWorkPrompt{
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;
+}
+.stageOperations .stageFinalWorkPrompt>div{
+ display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 250px;
+}
+.stageOperations .stageFinalWorkPrompt>div>svg{flex:0 0 auto;color:#315ed2}
+.stageOperations .stageFinalWorkPrompt>div>span{display:grid;gap:4px;min-width:0}
+.stageOperations .stageFinalWorkPrompt b,
+.stageOperations .stageReadinessMaterialActions b,
+.stageOperations .stageFinalDocuments h4{font-size:15px;line-height:1.4}
+.stageOperations .stageFinalWorkPrompt small,
+.stageOperations .stageReadinessMaterialActions span{color:#647795;line-height:1.55}
+.stageOperations .stageFinalWorkPrompt>button,
+.stageOperations .stageReadinessMaterialActions>button{
+ display:inline-flex;align-items:center;justify-content:center;min-height:42px;
+ gap:8px;max-width:100%;white-space:normal;text-align:center;
+}
+.stageOperations .stageFinalWorkPrompt>button svg{transform:rotate(180deg)}
+.stageOperations .stageReadinessMaterialActions{display:grid;gap:9px;margin-top:12px}
+.stageOperations .stageFinalDocuments{display:grid;gap:12px}
+.stageOperations .stageFinalDocuments>header{
+ display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.stageOperations .stageFinalDocuments>header>div{display:grid;gap:4px}
+.stageOperations .stageFinalDocuments>header small{font-size:12px;color:#5977ac;font-weight:700}
+.stageOperations .stageFinalDocuments>header b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.stageOperations .stageFinalDocuments>p{margin:0;color:#60718c;font-size:13px;line-height:1.6}
+.stageOperations .stageFinalDocumentsList{display:grid;gap:8px}
+.stageOperations .stageFinalDocumentsList>div{
+ display:grid;grid-template-columns:26px minmax(0,1fr) auto auto;
+ align-items:center;gap:9px;padding:10px 12px;border:1px solid #dce5f6;
+ border-radius:12px;background:#fff;min-width:0;
+}
+.stageOperations .stageFinalDocumentsList>div>span{
+ display:flex;align-items:center;justify-content:center;width:26px;height:26px;
+ border-radius:50%;color:#9a6519;background:#fff0d6;font-weight:700;
+}
+.stageOperations .stageFinalDocumentsList>div.isReady>span{background:#e1f5e9;color:#17824b}
+.stageOperations .stageFinalDocumentsList strong{min-width:0;overflow-wrap:anywhere;font-size:13px}
+.stageOperations .stageFinalDocumentsList small{color:#70819b;white-space:nowrap}
+.stageOperations .stageFinalDocumentsList button{
+ min-height:40px;padding:8px 12px;border:1px solid #b9cafa;
+ border-radius:10px;color:#2657c7;background:#f8faff;font-weight:700;
+ white-space:normal;
+}
+@media(max-width:700px){
+ .stageOperations .stageFinalWorkPrompt,
+ .stageOperations .stageReadinessMaterialActions,
+ .stageOperations .stageFinalDocuments{padding:12px}
+ .stageOperations .stageFinalWorkPrompt>button{width:100%}
+ .stageOperations .stageFinalDocumentsList>div{
+  grid-template-columns:26px minmax(0,1fr);
+ }
+ .stageOperations .stageFinalDocumentsList small{grid-column:2}
+ .stageOperations .stageFinalDocumentsList button{grid-column:1/-1;width:100%}
+}
