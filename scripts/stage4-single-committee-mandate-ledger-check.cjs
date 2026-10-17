@@ -20,6 +20,7 @@ try{
  create schema private;
  create function auth.uid() returns uuid language sql stable as 'select ''00000000-0000-0000-0000-000000000010''::uuid';
  create function private.is_game_member(uuid) returns boolean language sql as 'select true';
+ create function private.is_game_teacher(uuid) returns boolean language sql as 'select true';
  create function private.is_game_observer(uuid) returns boolean language sql as 'select false';
  create function private.game_role(uuid,uuid) returns text language sql as 'select ''председатель правительства''::text';
  create table institution_units(id uuid primary key,game_id uuid,unit_kind text,head_user_id uuid);
