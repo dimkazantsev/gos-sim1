@@ -39,12 +39,15 @@ begin
  -- Meeting preparation is separate from stage work. Only an authorized
  -- save_institution_meeting_document RPC sets the transaction-local scope.
  if tg_table_name='formal_documents' and tg_op<>'DELETE' then
-  if new.doc_type in ('meeting_agenda','minutes')
-     and coalesce(new.metadata->>'document_kind','')='institution_meeting_'||
-       case when new.doc_type='meeting_agenda' then 'agenda' else 'minutes' end
+  if new.doc_type='meeting_agenda'
+     and new.metadata->>'document_kind'='institution_meeting_agenda'
      and current_setting('app.gos_meeting_document_scope',true)
-       =new.game_id::text||':'||new.stage_no||':'||coalesce(new.metadata->>'institution_key','')
-        ||':'||case when new.doc_type='meeting_agenda' then 'agenda' else 'minutes' end
+       =concat(new.game_id,':',new.stage_no,':',new.metadata->>'institution_key',':agenda')
+  then return new;end if;
+  if new.doc_type='minutes'
+     and new.metadata->>'document_kind'='institution_meeting_minutes'
+     and current_setting('app.gos_meeting_document_scope',true)
+       =concat(new.game_id,':',new.stage_no,':',new.metadata->>'institution_key',':minutes')
   then return new;end if;
  end if;
  if not exists(select 1 from public.game_stages st
