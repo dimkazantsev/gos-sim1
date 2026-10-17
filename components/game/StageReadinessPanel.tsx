@@ -18,7 +18,7 @@ export type StageReadiness={
  original_blockers?:string[];
 };
 
-export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=false,rulesUrl,rulesLabel,compactReadiness=null,compactChecked=false,compactLoading=false,compactError='',onCompactRefresh}:{g:ReturnTypeRepublic;stageNo:number;compact?:boolean;readOnly?:boolean;rulesUrl?:string;rulesLabel?:string;compactReadiness?:StageReadiness|null;compactChecked?:boolean;compactLoading?:boolean;compactError?:string;onCompactRefresh?:()=>void}){
+export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=false,rulesUrl,rulesLabel,compactReadiness=null,compactChecked=false,compactLoading=false,compactError='',onCompactRefresh,onOpenMaterials}:{g:ReturnTypeRepublic;stageNo:number;compact?:boolean;readOnly?:boolean;rulesUrl?:string;rulesLabel?:string;compactReadiness?:StageReadiness|null;compactChecked?:boolean;compactLoading?:boolean;compactError?:string;onCompactRefresh?:()=>void;onOpenMaterials?:()=>void}){
  const {game,setError}=g;
  const teacher=g.teacher&&!readOnly;
  const [state,setState]=useState<StageReadiness|null>(null);
@@ -72,6 +72,8 @@ export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=fa
   </div>;
  }
 
+ const missingMaterials=Array.isArray(state?.metrics?.required_documents)?
+  (state!.metrics.required_documents as {fulfilled:boolean}[]).filter(x=>!x.fulfilled).length:0;
  const blockerCount=state?.blockers?.length||0;
  const warningCount=state?.warnings?.length||0;
  const StatusIcon=status==='ready'?CheckCircle2:status==='warning'||status==='unavailable'?AlertTriangle:status==='blocked'?XCircle:RefreshCw;
@@ -113,6 +115,11 @@ export default function StageReadinessPanel({g,stageNo,compact=false,readOnly=fa
    </section>}
   </div>}
 
+  {missingMaterials>0&&onOpenMaterials&&<div className="stageReadinessMaterialActions">
+   <b>Не хватает итоговых документов: {missingMaterials}</b>
+   <span>Перейдите в «Материалы» и подготовьте документы. Уполномоченные участники увидят кнопки оформления.</span>
+   <button type="button" className="primary" onClick={onOpenMaterials}>Открыть материалы этапа</button>
+  </div>}
   {state?.ready&&!warningCount&&<div className="stageReadinessOk"><CheckCircle2 size={19}/><div><b>Все обязательные процедуры зафиксированы</b><span>Этап может быть завершён или использован как основание для перехода к следующему.</span></div></div>}
 
   {state?.overridden&&<section className="stageReadinessOverrideNotice"><header><History size={18}/><div><b>Историческое прохождение подтверждено</b><small>Ручное подтверждение преподавателя</small></div></header><p>{state.override_reason}</p>{state.original_blockers&&state.original_blockers.length>0&&<details><summary>Какие структурированные записи отсутствуют <ChevronDown size={15}/></summary><ul>{state.original_blockers.map(x=><li key={x}>{x}</li>)}</ul></details>}{state.override_at&&<time>{new Date(state.override_at).toLocaleString('ru-RU')}</time>}{teacher&&<button type="button" className="stageReadinessClearOverride" disabled={loading} onClick={()=>void clearOverride()}>Отменить подтверждение</button>}</section>}
