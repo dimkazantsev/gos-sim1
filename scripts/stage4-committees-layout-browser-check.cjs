@@ -18,7 +18,7 @@ for(const roleRpc of ["ensure_duma_committees","get_committee_matrix","assign_in
 for(const electionRpc of ["create_committee_chair_election","nominate_office_candidate","open_office_election","cast_personal_office_ballot","close_office_election"])
  assert(ballot.includes("'"+electionRpc+"'"),'Election RPC retained: '+electionRpc);
 assert(ballot.includes("election.vote_mode==='open'")&&ballot.includes("!['nomination','open'].includes(election.status)"),'Secrecy rule remains');
-assert(ballot.includes('!registered.includes(me.user_id)'),'Attendance guard remains');
+assert(ballot.includes('!registered.some(r=>r.user_id===me.user_id)')&&ballot.includes('myPresent<=0'),'Attendance registration and declared deputy count both guard voting');
 assert(component.includes("mode==='committees'?"),'Committee/ministry branch retained');
 assert(component.includes('Избирается депутатами Государственной Думы в блоке выше'),'Voting placement hint correct');
 assert(!ballot.includes('с учётом GV'),'Russian wording for ghost voting');
