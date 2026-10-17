@@ -43,7 +43,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  useEffect(()=>{
   if(body!=='gd'||!g.game){setGdPresence(null);return}
   let active=true;
-  void supabase.rpc('get_gd_session_attendance',{p_game_id:g.game.id,p_stage_no:stage})
+  void Promise.resolve(supabase.rpc('get_gd_session_attendance',{p_game_id:g.game.id,p_stage_no:stage}))
    .then(({data,error})=>{
     if(!active)return;
     if(error){setMeetingError('Не удалось получить сведения о явке депутатов. '+meetingErrorMessage(error.message));return}
