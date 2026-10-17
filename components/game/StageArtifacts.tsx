@@ -49,14 +49,14 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
  </section>}
  {finalDocuments.length>0&&<section className="stageFinalDocuments" aria-label="Обязательные итоговые документы">
    <header><div><small>ИТОГОВЫЕ ДОКУМЕНТЫ · ЭТАП {stage.stage_no}</small><h4>Перед завершением этапа</h4></div><b>{finalDocuments.filter(x=>x.fulfilled).length} / {finalDocuments.length}</b></header>
-   <p>Необходимо подготовить и опубликовать в Реестре НПА обязательные документы. Сохранённый черновик не означает завершения оформления.</p>
+   <p>Необходимо подготовить итоговые документы этапа. Нормативные акты должны быть официально опубликованы; проекты государственных программ на этапе 10 должны быть оформлены и сохранены в Реестре НПА. Сохранённый черновик не означает завершения оформления.</p>
    <div className="stageFinalDocumentsList">{finalDocuments.map(item=><div key={item.template_key} className={item.fulfilled?'isReady':'isMissing'}>
      <span aria-hidden="true">{item.fulfilled?'✓':'!'}</span><strong>{item.title}</strong>
-     <small>{item.fulfilled?'Опубликован':'Не опубликован'}</small>
+     <small>{item.fulfilled?(item.evidence_state==='prepared'?'Подготовлен':'Опубликован'):(item.evidence_state==='prepared'?'Не подготовлен':'Не опубликован')}</small>
      {!item.fulfilled&&!readOnly&&canPrepareStageFinalDocument(item,formalSubjects,g.teacher)&&
        <button type="button" onClick={()=>prepareFinal(item)}>Подготовить документ</button>}
    </div>)}</div>
-   {!!missingFinalDocuments.length&&<p>После заполнения отправьте документ на предусмотренное согласование и публикацию. Затем нажмите «Перепроверить» на вкладке «Проверка».</p>}
+   {!!missingFinalDocuments.length&&<p>После заполнения проведите предусмотренное согласование. Постановления, протоколы и правовые акты должны получить статус «Опубликован». Затем нажмите «Перепроверить» на вкладке «Проверка».</p>}
   </section>}
  <div className="stageArtifactActions">{task.templates.map(key=>{const t=DOCUMENT_TEMPLATES.find(x=>x.key===key);return t&&canPrepareTemplate(key)&&<button type="button" key={key} disabled={readOnly} aria-expanded={form===key} onClick={()=>{setForm(form===key?'':key);setSaved('')}}><FilePlus2 size={18}/><span>{t.title}</span></button>})}{stage.stage_no!==1&&task.target&&onNavigate&&<button type="button" onClick={()=>onNavigate(task.target!)}><ArrowUpRight size={18}/><span>Открыть {({parties:'партии',votes:'голосования',budget:'бюджет',events:'события',grades:'журнал оценок'} as Partial<Record<View,string>>)[task.target]||'раздел'}</span></button>}</div>
  {form&&!readOnly&&<StageDocumentForm key={form} g={g} templateKey={form} stageNo={stage.stage_no} onCancel={()=>setForm('')} onSaved={()=>{setSaved('Документ зарегистрирован в Реестре НПА. Для завершения этапа требуется его официальная публикация.');setForm('');onRefreshFinalDocuments?.()}}/>}
