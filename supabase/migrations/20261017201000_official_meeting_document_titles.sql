@@ -29,6 +29,35 @@ $issuer$;
 REVOKE ALL ON FUNCTION private.formal_meeting_institution_name(uuid,text)
  FROM PUBLIC,anon,authenticated;
 
+-- Nominative names belong in the issuing authority line and footer.
+CREATE OR REPLACE FUNCTION private.formal_meeting_institution_label(
+ p_game uuid,p_institution text)
+RETURNS text LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path=public,private,pg_temp
+AS $issuer$
+ SELECT CASE p_institution
+  WHEN 'ksrf' THEN 'Координационный Совет Российской Федерации'
+  WHEN 'gd' THEN 'Государственная Дума Федерального Собрания Российской Федерации'
+  WHEN 'sf' THEN 'Совет Федерации Федерального Собрания Российской Федерации'
+  WHEN 'government' THEN 'Правительство Российской Федерации'
+  WHEN 'municipality' THEN 'Орган местного самоуправления'
+  WHEN 'committee' THEN 'Комитет Государственной Думы'
+  WHEN 'region' THEN 'Законодательный орган субъекта Российской Федерации'
+  WHEN 'cec' THEN 'Избирательная комиссия'
+  WHEN 'ks' THEN 'Конституционный Суд Российской Федерации'
+  WHEN 'vs' THEN 'Верховный Суд Российской Федерации'
+  WHEN 'central_bank' THEN 'Совет директоров Банка России'
+  WHEN 'accounts' THEN 'Коллегия Счётной палаты Российской Федерации'
+  ELSE coalesce(
+   (SELECT title FROM public.institution_units
+    WHERE game_id=p_game AND 'unit:'||id::text=p_institution LIMIT 1),
+   'Орган публичной власти')
+ END;
+$issuer$;
+REVOKE ALL ON FUNCTION private.formal_meeting_institution_label(uuid,text)
+ FROM PUBLIC,anon,authenticated;
+
+
 CREATE OR REPLACE FUNCTION public.save_institution_meeting_document(p_game_id uuid, p_stage_no integer, p_institution text, p_kind text, p_body text, p_delegate_user_id uuid DEFAULT NULL::uuid)
  RETURNS uuid
  LANGUAGE plpgsql
@@ -74,7 +103,7 @@ begin
   ) then
    raise exception 'После начала регистрации повестку менять нельзя';end if;
   v_doc:=m.agenda_document_id;
-  v_title:='Повестка заседания '||v_official_issuer;
+  v_title:='Повестка заседания '||CASE WHEN p_institution LIKE 'unit:%' THEN '«'||v_official_issuer||'»' ELSE v_official_issuer END;
  else
   if not exists(select 1 from public.institution_session_registrations where game_id=p_game_id
     and stage_no=p_stage_no and institution_key=p_institution) then
@@ -83,7 +112,7 @@ begin
     and institution_key=p_institution and status='open') then
    raise exception 'Сначала завершите все голосования заседания';end if;
   v_doc:=m.minutes_document_id;
-  v_title:='Протокол заседания '||v_official_issuer;
+  v_title:='Протокол заседания '||CASE WHEN p_institution LIKE 'unit:%' THEN '«'||v_official_issuer||'»' ELSE v_official_issuer END;
  end if;
  v_subject:=case when p_institution='government' then 'government'
                  when p_institution like 'unit:%' then 'gd' else p_institution end;
@@ -96,7 +125,7 @@ begin
    current_step,status_code,status_label,current_owner_key,metadata)
   values(v_doc,p_game_id,p_stage_no,v_reg,v_title,
     case when p_kind='agenda' then 'meeting_agenda' else 'minutes' end,
-    v_subject,CASE WHEN p_institution='ksrf' THEN 'Координационный Совет Российской Федерации' WHEN p_institution='gd' THEN 'Государственная Дума Федерального Собрания Российской Федерации' WHEN p_institution='sf' THEN 'Совет Федерации Федерального Собрания Российской Федерации' WHEN p_institution='government' THEN 'Правительство Российской Федерации' ELSE CASE WHEN p_institution LIKE 'unit:%' THEN (SELECT title FROM public.institution_units WHERE game_id=p_game_id AND 'unit:'||id::text=p_institution LIMIT 1) ELSE p_institution END END,uid,btrim(p_body),
+    v_subject,private.formal_meeting_institution_label(p_game_id,p_institution),uid,btrim(p_body),
     case when p_institution='government' then 'government_act' else 'gd_resolution' end,
     v_steps,0,'draft',
     case when p_kind='agenda' then 'Проект повестки' else 'Протокол подготовлен' end,
@@ -139,13 +168,8 @@ end;$function$;
 UPDATE public.formal_documents d
 SET title=CASE WHEN d.doc_type='meeting_agenda' THEN 'Повестка заседания '
                ELSE 'Протокол заседания ' END
-          ||private.formal_meeting_institution_name(d.game_id,m.institution_key),
- subject_label=CASE m.institution_key
-  WHEN 'ksrf' THEN 'Координационный Совет Российской Федерации'
-  WHEN 'gd' THEN 'Государственная Дума Федерального Собрания Российской Федерации'
-  WHEN 'sf' THEN 'Совет Федерации Федерального Собрания Российской Федерации'
-  WHEN 'government' THEN 'Правительство Российской Федерации'
-  ELSE d.subject_label END
+          ||CASE WHEN m.institution_key LIKE 'unit:%' THEN '«'||private.formal_meeting_institution_name(d.game_id,m.institution_key)||'»' ELSE private.formal_meeting_institution_name(d.game_id,m.institution_key) END,
+ subject_label=private.formal_meeting_institution_label(d.game_id,m.institution_key)
 FROM public.institution_meeting_records m
 WHERE m.game_id=d.game_id
  AND (
