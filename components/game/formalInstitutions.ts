@@ -51,7 +51,7 @@ export function formalSubjectDisplayLabel(key:string,label?:string|null){
  const raw=String(label||'').trim();
  if(key==='ksrf'&&(!raw||/^ksrf$/i.test(raw)))return 'Координационный Совет Российской Федерации';
  if(raw&&raw.toLowerCase()!==key.toLowerCase())return raw;
- return FORMAL_SUBJECTS.find(subject=>subject.key===key)?.label||raw||'Государственный орган';
+ return FORMAL_SUBJECTS.find(subject=>subject.key===key)?.label||(/[А-Яа-яЁё]/.test(raw)?raw:'Государственный орган');
 }
 
 export function formalDocumentTitle(title:string|null|undefined,docType:string){

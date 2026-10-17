@@ -9,7 +9,7 @@ const source=fs.readFileSync(path.join(root,'components/game/formalInstitutions.
 const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 const sandboxModule={exports:{}};
 vm.runInNewContext(compiled,{module:sandboxModule,exports:sandboxModule.exports});
-const {formalDocumentTypeLabel,formalDocumentTitle,ownerLabel,FORMAL_TYPES}=sandboxModule.exports;
+const {formalDocumentTypeLabel,formalDocumentTitle,formalSubjectDisplayLabel,ownerLabel,FORMAL_TYPES}=sandboxModule.exports;
 for(const [code,label] of Object.entries({
  party_certificate:'Свидетельство о государственной регистрации политической партии',
  justice_response:'Официальный ответ Министерства юстиции Российской Федерации',
@@ -52,3 +52,5 @@ assert.doesNotMatch(votes,/GV уменьшает| GV −| GV'/);
 const events=fs.readFileSync(path.join(root,'components/game/EventWorkspace.tsx'),'utf8');
 assert.doesNotMatch(events,/EVENT · ИГРОВЫЕ СИТУАЦИИ/);
 console.log('PASS: Русские заголовки документов в НПА, голосованиях, СМИ, политическом процессе и входящих.');
+
+assert.equal(formalSubjectDisplayLabel('unknown_subject_key','unknown_subject_key'),'Государственный орган');

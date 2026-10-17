@@ -126,3 +126,6 @@ where stage_no=5 and lower(title)='ghost voting';
 
 update public.budget_scenarios set source_note='Млн рублей. Минфин России, первоначальный план 2026; расчёт по игровым допущениям.'
 where source_note='Млн рублей. Минфин России, первоначальный план 2026; расчет по игровым допущениям. minfin-approved-2026-v1';
+
+update private.achievement_catalog set title='Самый стойкий сигнал'
+where title='Самый стойкий Wi-Fi';

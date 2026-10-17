@@ -23,7 +23,7 @@ export function userError(value:unknown):string{
  if(/^Candidate dossier is incomplete:\s*/i.test(s))return 'Пакет кандидата не готов к регистрации. '+userError(s.replace(/^Candidate dossier is incomplete:\s*/i,''));
  // A Cyrillic role name inside an English database exception must not bypass
  // localisation. Preserve messages written in Russian, not arbitrary mixtures.
- const visible=s.replace(/https?:\/\/\S+|[\w.+-]+@[\w.-]+/gi,'').replace(/Goust Voting|ГОС\.ID|\b(?:PDF|DOCX?|TXT|XLSX|CSV|PNG|JPE?G|WEBP|ZIP|QR|HTTP|HTTPS)\b/gi,'');
+ const visible=s.replace(/https?:\/\/\S+|[\w.+-]+@[\w.-]+/gi,'').replace(/Goust Voting|ГОС\.ID|\b(?:PDF|DOCX?|TXT|XLSX|CSV|PNG|JPE?G|WEBP|ZIP|QR|HTTP|HTTPS|I|II|III|IV|V|VI|VII|VIII|IX|X)\b/gi,'');
  if(/^[\s«“"'\[\](\d:—-]*[а-яё]/i.test(s)&&!/(stack|SQLSTATE|syntax error|constraint)/i.test(s)&&!/[A-Za-z_]/.test(visible))return s;
  return 'Не удалось выполнить действие. Обновите данные и повторите попытку.';
 }

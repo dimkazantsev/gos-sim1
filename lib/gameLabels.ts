@@ -74,6 +74,6 @@ function conditionValue(value:unknown):string{
 }
 export function impactConditionText(conditions:Record<string,unknown>):string{
  return Object.entries(conditions).map(([key,value])=>
-  (CONDITION_LABELS[key]||'Дополнительное условие')+': '+conditionValue(value)
+  (Object.hasOwn(CONDITION_LABELS,key)?CONDITION_LABELS[key]:'Дополнительное условие')+': '+conditionValue(value)
  ).join('\n');
 }

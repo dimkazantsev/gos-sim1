@@ -18,6 +18,7 @@ const rules=[
  {result_code:'no_quorum'},
  {stage_no:0,unknown_condition:false}
 ];
+rules.push(JSON.parse('{"toString":"unknown_value"}'));
 const original=JSON.stringify(rules);
 for(const rule of rules)assert.doesNotMatch(conditions(rule),/[A-Za-z_]/);
 assert.equal(conditions(rules[0]),'Интенсивность: Высокая');

@@ -24,6 +24,8 @@ create table budget_registry_hidden(game_id uuid,entry_key text);
 create table political_posts(actor_key text,actor_label text,deleted_at timestamptz);
 create table game_stages(stage_no integer,title text,summary text);
 create table budget_scenarios(source_note text);
+create table private.achievement_catalog(title text);
+insert into private.achievement_catalog values('Самый стойкий Wi-Fi');
 `;
 (async()=>{
  const db=new PGlite();
@@ -37,6 +39,7 @@ create table budget_scenarios(source_note text);
   assert.equal((await db.query("select actor_label from political_posts where actor_key='participant'")).rows[0].actor_label,'GOS//SIMS','Do not rewrite participant identity');
   assert.equal((await db.query("select actor_label from political_posts where deleted_at is not null")).rows[0].actor_label,'GOS//SIMS','Do not revive or modify deleted posts');
   assert.equal((await db.query("select title from game_stages where stage_no=5")).rows[0].title,'Goust Voting');
+  assert.equal((await db.query('select title from private.achievement_catalog')).rows[0].title,'Самый стойкий сигнал');
   const id=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
   await db.query("insert into fiscal_tax_catalog values('vat','Налог на добавленную стоимость')");
   await db.query("insert into fiscal_rate_proposals values($1,$2,'vat','submitted',now(),$3,null,22,'54')",[id(10),game,member]);

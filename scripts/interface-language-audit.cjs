@@ -46,6 +46,25 @@ function walk(dir){
  }
 }
 for(const dir of ['app','components','lib','production-app','supabase/functions'])walk(path.join(root,dir));
+function scanAssets(dir){
+ if(!fs.existsSync(dir))return;
+ for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
+  const file=path.join(dir,entry.name);
+  if(entry.isDirectory()){scanAssets(file);continue;}
+  if(!/\.(?:svg|html)$/.test(file))continue;
+  const content=fs.readFileSync(file,'utf8'),svg=file.endsWith('.svg');
+  const values=svg?[...content.matchAll(/<(text|title|desc)\b[^>]*>([\s\S]*?)<\/\1>/gi)].map(m=>m[2].replace(/<[^>]+>/g,'')):
+   [...content.replace(/<script\b[^>]*>[\s\S]*?<\/script>|<style\b[^>]*>[\s\S]*?<\/style>|<code\b[^>]*>[\s\S]*?<\/code>/gi,'').matchAll(/>([^<>]+)</g)].map(m=>m[1]);
+  for(const value of values){
+   if(file.endsWith(path.join('app','icon.svg'))&&value==='ID')continue;
+   const text=value.replace(/&[a-zA-Z#0-9]+;|\b[A-Z][A-Z0-9-]*\d[A-Z0-9-]*\b/g,'');
+   const found=words(text);if(found)findings.push(path.relative(root,file)+' — '+found.join(', '));
+  }
+ }
+}
+scanAssets(path.join(root,'public'));scanAssets(path.join(root,'demo'));
+const achievementNames=fs.readFileSync(path.join(root,'content/achievements.tsv'),'utf8').split('\n').map(line=>line.split('|').slice(0,2).join(' '));
+for(const name of achievementNames)if(words(name))findings.push('content/achievements.tsv — '+name);
 const leaks=[
  ['components/game/ImpactRulesPanel.tsx',/rule\.event_type\.replaceAll|JSON\.stringify\(rule\.conditions|\|\|entry\.rule_key/],
  ['components/game/stageComicModel.ts',/ruleLabels\[s\]\|\|labels\[s\]\|\|s/],
