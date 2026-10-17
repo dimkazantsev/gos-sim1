@@ -16,7 +16,7 @@ const guard=scope.slice(guardStart,guardEnd);
 assert(guard.includes("if tg_table_name='party_documents' then"),'Party-specific record field is nested under party table');
 assert(guard.indexOf("if tg_table_name='party_documents' then")<guard.indexOf('new.party_id'));
 assert(guard.includes("current_setting('app.gos_meeting_document_scope',true)"),'Authorized RPC flags only its meeting document');
-assert(guard.includes("new.doc_type in ('meeting_agenda','minutes')"),'Other formal docs never bypass stage guard');
+assert(guard.includes("new.doc_type='meeting_agenda'")&&guard.includes("new.doc_type='minutes'"),'Only explicitly scoped meeting document types bypass the stage guard');
 assert(guard.includes("if tg_table_name='formal_documents' and tg_op<>'DELETE' then"),'Never read NEW.doc_type from a party document');
 assert(guard.includes("raise exception 'Этап завершён или ещё не открыт"),'Student stage window still enforced');
 assert(scope.includes("perform set_config('app.gos_meeting_document_scope'"),'Meeting RPC binds scope after authorization');
