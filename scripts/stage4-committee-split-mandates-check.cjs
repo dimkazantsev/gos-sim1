@@ -26,12 +26,15 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
    'create table game_members(game_id uuid,user_id uuid,kind text,team text,joined_at timestamptz,roster_archived_at timestamptz);',
    'create table game_parties(id uuid primary key,game_id uuid,name text,leader_user_id uuid,color text);',
    'create table party_member_mandates(game_id uuid,party_id uuid,user_id uuid,base_mandates integer,effective_mandates integer);',
+   'create table games(id uuid primary key,owner_id uuid);',
+   'create table office_elections(game_id uuid,office_key text,status text,winner_candidate_id uuid,created_by uuid,created_at timestamptz);',
    'create function private.member_party_id(p_game uuid,p_user uuid) returns uuid language sql stable as $x$select p.id from game_parties p join game_members m on m.game_id=p.game_id and m.team=p.name where m.game_id=p_game and m.user_id=p_user limit 1$x$;',
    'create function private.gd_member_capacity(p_game uuid,p_user uuid) returns integer language sql stable as $x$select coalesce((select effective_mandates from party_member_mandates where game_id=p_game and user_id=p_user),0)$x$;',
    'create table institution_units(id uuid primary key,game_id uuid,unit_kind text,unit_key text,title text,description text,mandate_capacity integer,head_user_id uuid,capacity_min int,capacity_max int);',
    'create table institution_assignments(id uuid primary key default gen_random_uuid(),game_id uuid,unit_id uuid,unit_kind text,user_id uuid,party_id uuid,assignment_role text default \'member\',created_by uuid,created_at timestamptz default now(),constraint institution_assignments_unit_id_user_id_key unique(unit_id,user_id),constraint institution_assignments_game_id_user_id_unit_kind_key unique(game_id,user_id,unit_kind));'
   ].join('\n'));
   const who=async(uid,teacher=false)=>db.query('update identity set actor=$1,teacher=$2',[uid,teacher]);
+  await db.query('insert into games(id,owner_id) values($1,$2)',[game,head]);
   await db.query('insert into game_parties values($1,$2,\'Альфа\',$3,\'#3366aa\'),($4,$2,\'Бета\',$5,\'#339966\')',[partyA,game,leaderA,partyB,leaderB]);
   const citizens=[];
   for(let i=0;i<40;i++){
@@ -51,6 +54,7 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
   }
   await db.query("insert into institution_assignments(game_id,unit_id,unit_kind,user_id,party_id,assignment_role,created_by) values($1,$2,'committee',$3,$4,'head',$3)",[game,units[0],head,partyA]);
   await db.exec(sql);
+  assert.equal((await db.query("select count(*)::int n from institution_assignments where game_id=$1 and unit_kind='committee' and assignment_role='head'",[game])).rows[0].n,5,'All five existing elected chairs are restored without fictional mandates');
   await who(head,true);
   const matrix=(await db.query('select public.get_committee_matrix($1) as m',[game])).rows[0].m;
   assert.equal(matrix.filter(r=>r.quota===45).length,10,'Five committees have 45 seats for each faction');
