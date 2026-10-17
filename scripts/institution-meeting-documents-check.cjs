@@ -103,10 +103,11 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  await assert.rejects(()=>q("select public.save_institution_meeting_document($1,2,'ksrf','agenda',$2)",[legacyGame,'Поменять повестку после регистрации должно быть невозможно']),/После начала регистрации повестку менять нельзя/);
  assert.equal((await q("select agenda_document_id from institution_meeting_records where game_id=$1",[legacyGame]))[0].agenda_document_id,firstAgenda);
  assert(ui.includes('const canWriteAgenda=!agendaHasDocument||!hasSessionRegistrations'),'Client prevents subsequent editing');
- assert(ui.includes("const stageReadOnly=!g.teacher&&!isStageWorkOpen("),'Closed and paused stages prevent student edits, including the Votes section');
- assert(ui.includes("readOnly||stageReadOnly"),'All editing actions honour stage restrictions');
- assert(ui.includes("stageReadOnly?'Этап закрыт'"),'Student registration explains why a past stage is unavailable');
+ assert(ui.includes("const preStageKsrf=body==='ksrf'&&(stage===2||stage===3)"),'KSRF leaders can prepare and register before work starts');
+ assert(ui.includes('meetingActionsLocked'),'Meeting controls preserve closed-stage rules outside KSRF 2/3');
+ assert(ui.includes("meetingActionsLocked?'Этап закрыт'"),'Other closed-stage attendance remains unavailable');
  assert(ui.includes('Участники были зарегистрированы до оформления повестки'),'Explain why legacy agenda creation is allowed');
+ assert(ui.includes('onMeetingReadyChange?.(ready)'),'Session gate updates after approved agenda and personal registration');
  console.log('PASS meeting agenda: normal permissions, legacy attendance preserved, initial approval succeeds, later edits locked');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

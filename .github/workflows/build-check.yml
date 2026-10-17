@@ -16,6 +16,13 @@ on:
       - 'components/game/ksrfVoteText.ts'
       - 'scripts/ksrf-vote-text-check.cjs'
       - 'scripts/ksrf-proposal-queue-check.cjs'
+      - 'scripts/ksrf-meeting-stage-gate-check.cjs'
+      - 'scripts/ksrf-trigger-field-isolation-check.cjs'
+      - 'supabase/migrations/20261017165000_ksrf_meeting_stage_guard_scope.sql'
+      - 'supabase/migrations/20261017165500_ksrf_agenda_registration_gate.sql'
+      - 'supabase/migrations/20261017170000_ksrf_ballot_stage_session_gate.sql'
+      - 'supabase/migrations/20261017170500_ksrf_regional_agreement_session_gate.sql'
+      - 'supabase/migrations/20261017171000_ksrf_stage_window_after_registration.sql'
       - 'supabase/migrations/20261017195600_ksrf_vote_description_russian.sql'
       - 'components/game/electoralMath.ts'
       - 'scripts/electoral-math-check.cjs'
@@ -263,6 +270,8 @@ jobs:
       - run: node scripts/ksrf-vote-text-check.cjs
       - run: node scripts/procedural-vote-auto-close-check.cjs
       - run: node scripts/institution-meeting-documents-check.cjs
+      - run: node scripts/ksrf-meeting-stage-gate-check.cjs
+      - run: node scripts/ksrf-trigger-field-isolation-check.cjs
       - run: node scripts/brand-overview-check.cjs
       - run: node scripts/overview-live-posts-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
