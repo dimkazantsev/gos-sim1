@@ -1,0 +1,77 @@
+/* Execute the production patch with synthetic rows; preserve financial data and ACLs. */
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const {PGlite}=require('@electric-sql/pglite');
+const game='00000000-0000-0000-0000-000000000001',other='00000000-0000-0000-0000-000000000002',member='00000000-0000-0000-0000-000000000003';
+const schema=String.raw`
+create schema auth;create schema private;create role anon;create role authenticated;
+create function auth.uid() returns uuid language sql as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+create function private.is_game_member(p uuid) returns boolean language sql as $$select p='00000000-0000-0000-0000-000000000001'::uuid and auth.uid()='00000000-0000-0000-0000-000000000003'::uuid$$;
+create function private.prepare_political_context() returns text language sql as $$select 'GOS//SIMS'::text$$;
+revoke all on function private.prepare_political_context() from public,anon,authenticated;
+create function public.create_game_session() returns text language sql as $$select 'Ghost voting'::text$$;
+create table fiscal_tax_catalog(tax_key text,label text);
+create table fiscal_rate_proposals(id uuid,game_id uuid,tax_key text,status text,created_at timestamptz,author_id uuid,document_id uuid,new_rate numeric,region_code text);
+create table fiscal_change_ledger(id uuid,game_id uuid,source_type text,note text,created_at timestamptz,actor_id uuid,region_code text);
+create table budget_simulator_ledger(id uuid,game_id uuid,note text,kind text,created_at timestamptz,amount numeric);
+create table budget_income_history(id uuid,game_id uuid,note text,recorded_at timestamptz,previous_value numeric,value numeric);
+create table budget_simulator_plans(id uuid,game_id uuid,title text,status text,updated_at timestamptz,created_by uuid,document_id uuid);
+create table budget_transfer_requests(id uuid,game_id uuid,purpose text,status text,created_at timestamptz,created_by uuid,document_id uuid,region_code text,kind text,amount numeric);
+create table budget_faction_amendments(id uuid,game_id uuid,title text,status text,created_at timestamptz,created_by uuid,amount numeric);
+create table budget_law_amendments(id uuid,game_id uuid,title text,status text,created_at timestamptz,author_id uuid,document_id uuid,amount numeric);
+create table budget_finance_contracts(id uuid,game_id uuid,source_key text,status text,created_at timestamptz,maturity_month integer,principal numeric);
+create table state_program_budget_commitments(program_id uuid,game_id uuid,status text,signed_at timestamptz,signed_by uuid,budget_year integer,amount numeric);
+create table budget_registry_hidden(game_id uuid,entry_key text);
+create table political_posts(actor_key text,actor_label text,deleted_at timestamptz);
+create table game_stages(stage_no integer,title text,summary text);
+create table budget_scenarios(source_note text);
+`;
+(async()=>{
+ const db=new PGlite();
+ try{
+  await db.exec(schema);
+  await db.exec("insert into political_posts values('system','GOS//SIMS',null),('participant','GOS//SIMS',null),('teacher','GOS//SIMS',now());insert into game_stages values(5,'Ghost voting','Правило ghost voting'),(1,'Авторский этап','Описание');");
+  await db.query("select set_config('request.jwt.claim.sub',$1,false)",[member]);
+  const beforeACL=(await db.query("select proacl::text as acl from pg_proc where oid='private.prepare_political_context()'::regprocedure")).rows[0].acl;
+  await db.exec(fs.readFileSync('supabase/changes/russian_system_labels.sql','utf8'));
+  assert.equal((await db.query("select actor_label from political_posts where actor_key='system'")).rows[0].actor_label,'ГОС.ID');
+  assert.equal((await db.query("select actor_label from political_posts where actor_key='participant'")).rows[0].actor_label,'GOS//SIMS','Do not rewrite participant identity');
+  assert.equal((await db.query("select actor_label from political_posts where deleted_at is not null")).rows[0].actor_label,'GOS//SIMS','Do not revive or modify deleted posts');
+  assert.equal((await db.query("select title from game_stages where stage_no=5")).rows[0].title,'Goust Voting');
+  const id=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
+  await db.query("insert into fiscal_tax_catalog values('vat','Налог на добавленную стоимость')");
+  await db.query("insert into fiscal_rate_proposals values($1,$2,'vat','submitted',now(),$3,null,22,'54')",[id(10),game,member]);
+  await db.query("insert into fiscal_rate_proposals values($1,$2,'vat','submitted',now(),$3,null,99,'54')",[id(11),other,member]);
+  await db.query("insert into fiscal_change_ledger values($1,$2,'act','Изменён налог',now(),$3,'54')",[id(12),game,member]);
+  await db.query("insert into budget_simulator_ledger values($1,$2,'Начислены проценты','interest',now(),12.5)",[id(13),game]);
+  await db.query("insert into budget_simulator_plans values($1,$2,'Авторский бюджет','draft',now(),$3,null)",[id(14),game,member]);
+  await db.query("insert into budget_transfer_requests values($1,$2,'Авторское назначение','requested',now(),$3,null,'54','subsidy',150)",[id(15),game,member]);
+  await db.query("insert into budget_finance_contracts values($1,$2,'ofz_fixed','active',now(),12,700)",[id(16),game]);
+  await db.query("insert into state_program_budget_commitments values($1,$2,'approved',now(),$3,2026,5)",[id(17),game,member]);
+  await db.query("insert into budget_simulator_plans values($1,$2,'Скрытая запись','draft',now(),$3,null)",[id(18),game,member]);
+  await db.query("insert into budget_registry_hidden values($1,$2)",[game,'plan:'+id(18)]);
+  const financialTables=['fiscal_rate_proposals','fiscal_change_ledger','budget_simulator_ledger','budget_simulator_plans','budget_transfer_requests','budget_finance_contracts','state_program_budget_commitments'];
+  async function snapshot(){return Promise.all(financialTables.map(async table=>(await db.query('select to_jsonb(t) as row from '+table+' t')).rows));}
+  const before=JSON.stringify(await snapshot());
+  const rows=(await db.query("select public.get_budget_change_registry($1::uuid) as entries",[game])).rows[0].entries;
+  assert.equal(rows.length,7,'Exclude other game and hidden entries');
+  const tax=rows.find(e=>e.entry_key.startsWith('tax:'));
+  assert.equal(tax.title,'Налоговая инициатива: Налог на добавленную стоимость');
+  assert.equal(tax.status,'На рассмотрении');
+  assert.equal(rows.find(e=>e.entry_key.startsWith('execution:')).status,'Начисление процентов');
+  assert(rows.find(e=>e.entry_key.startsWith('transfer:')).details.includes('Субсидия'));
+  assert(rows.find(e=>e.entry_key.startsWith('financing:')).title.includes('ОФЗ с постоянным купоном'));
+  assert(rows.find(e=>e.entry_key.startsWith('fiscal:')).details.includes('Нормативный акт'));
+  for(const e of rows)assert.doesNotMatch([e.title,e.details,e.status,e.category].join(' '),/[A-Za-z_]/);
+  assert.equal(JSON.stringify(await snapshot()),before,'Reading captions must not change amounts, statuses or sources');
+  await assert.rejects(()=>db.query("select public.get_budget_change_registry($1::uuid)",[other]),/Доступ к игре запрещён/);
+  await db.query("select set_config('request.jwt.claim.sub','',false)");
+  await assert.rejects(()=>db.query("select public.get_budget_change_registry($1::uuid)",[game]),/Доступ к игре запрещён/);
+  const afterACL=(await db.query("select proacl::text as acl from pg_proc where oid='private.prepare_political_context()'::regprocedure")).rows[0].acl;
+  assert.equal(afterACL,beforeACL,'Branding must preserve function grants');
+  assert.equal((await db.query('select private.prepare_political_context() as title')).rows[0].title,'ГОС.ID');
+  assert.equal((await db.query('select public.create_game_session() as title')).rows[0].title,'Goust Voting');
+  await db.exec(fs.readFileSync('supabase/changes/russian_system_labels.sql','utf8'));
+  assert.equal((await db.query('select private.prepare_political_context() as title')).rows[0].title,'ГОС.ID');
+  console.log('PASS: PostgreSQL Russian budget captions, unchanged financial rows, game isolation, hidden rows, anonymous denial, retained ACLs and idempotency.');
+ }finally{await db.close()}
+})().catch(e=>{console.error(e);process.exitCode=1});

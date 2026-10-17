@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {Check,Newspaper,X} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -15,8 +16,8 @@ function ProposalFiles({files}:{files:Proposal['files']}){
 }
 export default function NewsProposals({g,refreshKey,onOpenDocument,onNavigate,onPublished}:{g:ReturnTypeRepublic;refreshKey:number;onOpenDocument:(id:string)=>void;onNavigate:(v:View)=>void;onPublished:(title:string)=>void}){
  const [items,setItems]=useState<Proposal[]>([]),[error,setError]=useState(''),[openId,setOpenId]=useState(''),[note,setNote]=useState<Record<string,string>>({}),[busy,setBusy]=useState(''),[refresh,setRefresh]=useState(0);
- useEffect(()=>{if(!g.game?.id)return;let active=true;async function load(){let query=supabase.from('media_news_proposals').select('*').eq('game_id',g.game!.id).order('created_at',{ascending:false}).limit(50);if(g.teacher)query=query.eq('status','pending');const r=await query;if(active){if(r.error)setError(r.error.message);else{setItems(r.data||[]);setError('')}}}void load();const interval=setInterval(()=>void load(),20000);return()=>{active=false;clearInterval(interval)}},[g.game?.id,g.teacher,refreshKey,refresh]);
- async function review(p:Proposal,approve:boolean){setBusy(p.id);setError('');const r=await supabase.rpc('review_media_news',{p_proposal_id:p.id,p_approve:approve,p_note:note[p.id]||null});if(r.error)setError(r.error.message);else{setRefresh(n=>n+1);await g.refresh();if(approve)onPublished(p.title)}setBusy('')}
+ useEffect(()=>{if(!g.game?.id)return;let active=true;async function load(){let query=supabase.from('media_news_proposals').select('*').eq('game_id',g.game!.id).order('created_at',{ascending:false}).limit(50);if(g.teacher)query=query.eq('status','pending');const r=await query;if(active){if(r.error)setError(userError(r.error));else{setItems(r.data||[]);setError('')}}}void load();const interval=setInterval(()=>void load(),20000);return()=>{active=false;clearInterval(interval)}},[g.game?.id,g.teacher,refreshKey,refresh]);
+ async function review(p:Proposal,approve:boolean){setBusy(p.id);setError('');const r=await supabase.rpc('review_media_news',{p_proposal_id:p.id,p_approve:approve,p_note:note[p.id]||null});if(r.error)setError(userError(r.error));else{setRefresh(n=>n+1);await g.refresh();if(approve)onPublished(p.title)}setBusy('')}
  if(!items.length&&!error)return null;
  return <details className="projectDisclosure mediaProposalQueue"><DisclosureSummary icon={Newspaper} title={g.teacher?'Новости для согласования · '+items.length:'Мои предложения в СМИ · '+items.length} description={g.teacher?'Предложения студентов. Публикация появляется в ленте после одобрения.':'Статус рассмотрения и ответ преподавателя'}/><div className="civicDisclosureBody">
   {error&&<p className="error" role="alert">{error}</p>}

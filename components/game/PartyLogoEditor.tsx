@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState,type PointerEvent as ReactPointerEvent} from 'react';
 import {preparePartyLogo,type PartyLogoPlacement} from './partyLogoCrop';
 
@@ -52,7 +53,7 @@ export default function PartyLogoEditor({onSave,disabled=false,partyName}:Props)
    const ok=await onSave(processed);
    if(ok){setFile(null);setNotice('Эмблема сохранена и будет показана в карточке партии.')}
    else setError('Не удалось загрузить эмблему. Проверьте сообщение об ошибке и повторите попытку.');
-  }catch(cause){setError(cause instanceof Error?cause.message:'Не удалось обработать изображение.');}
+  }catch(cause){setError((userError(cause)||'Не удалось обработать изображение.'));}
   finally{setSaving(false)}
  }
  const isBusy=disabled||saving;

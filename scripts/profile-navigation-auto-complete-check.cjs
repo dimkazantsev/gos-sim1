@@ -14,7 +14,7 @@ assert(setup.includes("['name','gender','bio','signature','email','password']"),
 assert(client.includes("setupStatusScope===profileScope&&setupStatus&&!setupStatus.completed&&setupStatus.missing.length===0"),'Queue navigation only with a verified full checklist');
 assert(client.includes('pendingProfileNavigation.current={view:next,target}'),'Never throw away requested section');
 assert(client.includes("supabase.rpc('complete_my_game_profile',{p_game:gameAtRequest})"),'Only protected RPC may finalize a profile');
-assert(client.includes("if(r.error)errorText=r.error.message"),'Do not claim success on RPC error');
+assert(client.includes("if(r.error)errorText=userError(r.error)"),'Do not claim success on RPC error');
 assert(client.includes("if(pending)navigate(pending.view,pending.target,true)"),'Resume requested section after confirmed server completion');
 assert(client.includes("setVerifiedSetupScope(profileScope)"),'Treat a confirmed RPC success as completed while the profile cache catches up');
 assert(client.includes("if(r.data.completed)setVerifiedSetupScope("),'Use server-confirmed state after reload even when the profile row is stale');

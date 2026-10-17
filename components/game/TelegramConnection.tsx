@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {prepareTelegramBotAvatar} from './telegramBotAvatar';
@@ -25,13 +26,13 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
      const response=await fetch(endpoint,{method:'POST',headers,body:payload,cache:'no-store',signal:AbortSignal.timeout(55000)});
      const contentType=response.headers.get('content-type')||'';
      if(!contentType.toLowerCase().includes('application/json')){
-       if(response.status===405)throw new Error('HTTP 405: серверный API не принимает POST. Используйте обновлённую версию сайта и проверьте адрес API.');
-       throw new Error('Сервер активации не вернул JSON (HTTP '+response.status+').');
+       if(response.status===405)throw new Error('Сервер не принимает запрос активации. Обновите страницу и повторите попытку.');
+       throw new Error('Сервер активации вернул некорректный ответ (код '+response.status+').');
      }
      const result=await response.json() as {ok?:boolean;error?:string;logo?:boolean;warnings?:string[];webhook?:boolean;commands?:boolean;menu?:boolean};
      if(!response.ok||!result.ok)throw new Error(result.error||'Не удалось активировать бота.');
-     setActivated((result.warnings?.length?'Webhook, команды и меню подтверждены. Дополнительные настройки: '+result.warnings.join('; '):'Webhook, команды и меню подтверждены Телеграм API.')+(result.logo?' Эмблема обновлена.':''));setError('');
-   }catch(e){setError(e instanceof Error?e.name==='TimeoutError'?'Сервер не ответил за 20 секунд. Повторите попытку.':e.message:'Ошибка активации')}
+     setActivated((result.warnings?.length?'Подключение, команды и меню подтверждены. Дополнительные настройки: '+result.warnings.map(warning=>userError(warning)).join('; '):'Подключение, команды и меню подтверждены Телеграмом.')+(result.logo?' Эмблема обновлена.':''));setError('');
+   }catch(e){setError(e instanceof Error&&e.name==='TimeoutError'?'Сервер не ответил вовремя. Повторите попытку.':userError(e)||'Ошибка активации')}
    finally{setBusy(false)}
  }
  async function checkBot(){
@@ -47,16 +48,16 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
    });
    const x=await response.json() as {ok?:boolean;error?:string;webhook?:boolean;commands?:boolean;menu?:boolean};
    if(!response.ok||!x.ok)throw new Error(x.error||'Не удалось проверить Телеграм.');
-   setActivated('Webhook: '+(x.webhook?'подтверждён':'не подтверждён')+
+   setActivated('Подключение: '+(x.webhook?'подтверждён':'не подтверждён')+
     '. Команды: '+(x.commands?'подтверждены':'не подтверждены')+
     '. Меню: '+(x.menu?'подтверждено':'не подтверждено')+'.');
    if(!x.webhook||!x.commands||!x.menu)setError('Настройка неполная. Выполните повторную активацию.');
-  }catch(e){setError(e instanceof Error?e.message:'Ошибка проверки Телеграм.')}
+  }catch(e){setError((userError(e)||'Ошибка проверки Телеграм.'))}
   finally{setBusy(false)}
  }
  async function refresh(){
    try{const r=await supabase.rpc('telegram_status',{p_game_id:gameId});if(r.error)throw r.error;setStatus(r.data as typeof status);if(r.data?.linked){setLinkToken('');setLinkIssuedAt(0)}}
-   catch(e){setError(e instanceof Error?e.message:'Не удалось получить состояние Телеграм')}
+   catch(e){setError((userError(e)||'Не удалось получить состояние Телеграм'))}
  }
  useEffect(()=>{
   void refresh();
@@ -76,13 +77,13 @@ export default function TelegramConnection({gameId,teacher=false}:{gameId:string
    if(!/^[A-Za-z0-9_]{5,32}$/.test(username))throw new Error('Имя Телеграм-бота настроено неверно.');
    if(typeof r.data!=='string'||!/^[a-f0-9]{48}$/.test(r.data))throw new Error('Не удалось получить корректный код привязки.');
    setLinkToken(r.data);setLinkIssuedAt(Date.now());
-  }catch(e){setLinkToken('');setError(e instanceof Error?e.message:'Не удалось создать ссылку привязки.')}
+  }catch(e){setLinkToken('');setError((userError(e)||'Не удалось создать ссылку привязки.'))}
   finally{setBusy(false)}
  }
  async function change(kind:'unlink'|'toggle'){
   setBusy(true);setError('');
   const r=kind==='unlink'?await supabase.rpc('telegram_unlink',{p_game_id:gameId}):await supabase.rpc('telegram_configure',{p_game_id:gameId,p_enabled:!status?.notifications_enabled});
-  if(r.error)setError(r.error.message);else await refresh();setBusy(false);
+  if(r.error)setError(userError(r.error));else await refresh();setBusy(false);
  }
  return <section className="surface" style={{padding:20,marginTop:20}}>
   <h2 style={{fontSize:19,margin:'0 0 8px'}}>Телеграм — ГОС.ID</h2>

@@ -115,7 +115,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
   const next=pinnedKeys.includes(key)?pinnedKeys.filter(k=>k!==key):[...pinnedKeys,key];
   setPinned(next);
   try{localStorage.setItem(storageKey+':pinned',JSON.stringify(next))}catch{}
-  setAnnouncement((next.includes(key)?'Закреплён: ':'Откреплён: ')+(items.find(i=>i.key===key)?.label||key));
+  setAnnouncement((next.includes(key)?'Закреплён: ':'Откреплён: ')+(items.find(i=>i.key===key)?.label||'Раздел игры'));
   suppressClickUntil.current=Date.now()+700;
   try{navigator.vibrate?.(next.includes(key)?[28,30,28]:18)}catch{}
  }

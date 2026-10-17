@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -44,14 +45,14 @@ export default function Home(){
         if(joinError) throw joinError;
         router.push(`/game/${gameId}`);
       }
-    }catch(err){setError(err instanceof Error?err.message:'Не удалось войти');}
+    }catch(err){setError((userError(err)||'Не удалось войти'));}
     finally{setBusy(false);}
   }
 
   return <main className="loginPage">
     <div className="gridGlow"/>
     <form className="loginCard" onSubmit={submit}>
-      <div className="logoRow"><div className="logo">G//SS</div><div><small>POLITICAL & PUBLIC ADMINISTRATION LAB</small><h1>GOS//SIMS</h1></div></div>
+      <div className="logoRow"><div className="logo">ГОС.ID</div><div><small>ПОЛИТИЧЕСКАЯ & PUBLIC ADMINISTRATION LAB</small><h1>ГОС.ID</h1></div></div>
       <p className="muted">Вход в игровую сессию. ФИО сохраняется в профиле участника и протоколе игры.</p>
       <div className="seg"><button type="button" className={mode==='student'?'active':''} onClick={()=>{setMode('student');setCreateMode(false)}}>Студент</button><button type="button" className={mode==='teacher'?'active':''} onClick={()=>setMode('teacher')}>Преподаватель</button></div>{mode==='teacher'&&<div className="seg"><button type="button" className={!createMode?'active':''} onClick={()=>setCreateMode(false)}>Войти</button><button type="button" className={createMode?'active':''} onClick={()=>setCreateMode(true)}>Создать игру</button></div>}
       <label>ФИО<input value={fio} onChange={e=>setFio(e.target.value)} required /></label>

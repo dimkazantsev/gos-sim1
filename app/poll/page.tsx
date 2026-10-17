@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import InstitutionEmblemImage from '@/components/game/InstitutionEmblemImage';
@@ -25,7 +26,7 @@ export default function PublicPresidentialPoll(){
  async function load(currentSlug:string){
   setLoading(true);setError('');
   const r=await supabase.rpc('get_public_presidential_poll',{p_slug:currentSlug});
-  if(r.error){setError(r.error.message);setLoading(false);return}
+  if(r.error){setError(userError(r.error));setLoading(false);return}
   const data=r.data as PollData|null;
   if(data){
    const candidates=await Promise.all((data.candidates||[]).map(async c=>{
@@ -43,7 +44,7 @@ export default function PublicPresidentialPoll(){
   let token=localStorage.getItem('gos-sims-public-voter');
   if(!token){token=crypto.randomUUID()+crypto.randomUUID();localStorage.setItem('gos-sims-public-voter',token)}
   const r=await supabase.rpc('cast_public_presidential_poll',{p_slug:slug,p_candidate_id:selected,p_voter_token:token});
-  if(r.error){setError(r.error.message);return}
+  if(r.error){setError(userError(r.error));return}
   setSent(true);
  }
 

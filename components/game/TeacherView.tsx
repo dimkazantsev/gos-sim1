@@ -1,4 +1,5 @@
 'use client';
+import {gameValueLabel,gameViewLabel} from '../../lib/gameLabels';
 import {createPortal} from 'react-dom';
 import {Award,Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Compass,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
 import ClassroomJournal from './ClassroomJournal';
@@ -58,7 +59,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
  function confirmGhost(){if(window.confirm('Запустить теневое голосование?'))void ghostVoting()}
  function exportSession(){
   const rows=[['Время','Участник','Тип','Действие','Раздел']];
-  for(const a of [...activities].reverse())rows.push([new Date(a.created_at).toLocaleString('ru-RU'),names[a.actor_id]||a.actor_id,a.event_type,a.label,a.view_key||'']);
+  for(const a of [...activities].reverse())rows.push([new Date(a.created_at).toLocaleString('ru-RU'),names[a.actor_id]||'Участник',gameValueLabel(a.event_type,'Игровое действие'),a.label,gameViewLabel(a.view_key)]);
   const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\n');
   const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='gos-id-activity-'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(url);

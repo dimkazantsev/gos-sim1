@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -11,7 +12,7 @@ export default function EventCollaboration({g,caseId,invitations,assignedIds,clo
  const canChat=(assigned||g.teacher)&&!readOnly&&g.me?.kind!=='observer';
  async function load(){if(!assigned&&!g.teacher)return;const r=await supabase.from('event_discussion_messages').select('*').eq('case_id',caseId).order('created_at',{ascending:false}).limit(100);if(!r.error)setEntries(((r.data||[]) as Entry[]).reverse())}
  useEffect(()=>{if(!assigned&&!g.teacher)return;void load();const id=setInterval(()=>{if(document.visibilityState==='visible')void load()},30000);return()=>clearInterval(id)},[caseId,assigned,g.teacher]);
- async function act(name:string,params:Record<string,unknown>){if(busy)return;setBusy(true);const r=await supabase.rpc(name,params);setNotice(r.error?r.error.message:'');if(!r.error){setText('');await Promise.all([onChanged(),load()])}setBusy(false)}
+ async function act(name:string,params:Record<string,unknown>){if(busy)return;setBusy(true);const r=await supabase.rpc(name,params);setNotice(r.error?userError(r.error):'');if(!r.error){setText('');await Promise.all([onChanged(),load()])}setBusy(false)}
  return <section className="eventCollaboration">
  {assigned&&!closed&&!votingStarted&&<p className="eventInviteExplanation">Кнопка «Пригласить» позволяет привлечь участника с необходимыми полномочиями — например, руководителя профильного ведомства. Приглашённый должен принять приглашение; только после этого он участвует в совместном решении. Это особенно важно, если ваша должность не даёт права самостоятельно принять решение.</p>}
  {myInvite&&!readOnly&&<div className="eventInvitation"><strong>{g.names[myInvite.inviter_id]||'Участник'} приглашает вас к совместному решению</strong><div><button disabled={busy} onClick={()=>void act('respond_event_invitation',{p_id:myInvite.id,p_accept:true})}>Принять приглашение</button><button disabled={busy} onClick={()=>void act('respond_event_invitation',{p_id:myInvite.id,p_accept:false})}>Отклонить</button></div></div>}

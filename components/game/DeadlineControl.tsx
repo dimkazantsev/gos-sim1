@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -102,7 +103,7 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
    p_user_id:targetUser||null,
    p_note:note.trim()||null
   });
-  if(r.error)setError(r.error.message);
+  if(r.error)setError(userError(r.error));
   else{
    setPartyId('');setUserId('');setNote('');
    await load();setApplyOpen(false);
@@ -111,7 +112,7 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  }
  async function revert(id:string){
   setBusy(true);const r=await supabase.rpc('revert_deadline_consequence',{p_incident_id:id});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
 
  if(!game||!stage)return null;

@@ -25,7 +25,7 @@ export async function extractCandidateDocumentText(file:File):Promise<{text:stri
    return {text,status:text.length>=20?'extracted':'no_text',note:text.length>=20?'Текст извлечён из PDF.':'PDF не содержит достаточного текстового слоя. Вставьте текст вручную или загрузите текстовый PDF.'};
   }
   if(name.endsWith('.doc'))return {text:'',status:'unsupported',note:'Старый формат DOC не разбирается автоматически. Сохраните документ как DOCX/PDF или вставьте текст вручную.'};
-  if(file.type.startsWith('image/'))return {text:'',status:'unsupported',note:'Для изображения автоматическое OCR в этой версии не выполняется. Вставьте распознанный текст вручную для проверки.'};
+  if(file.type.startsWith('image/'))return {text:'',status:'unsupported',note:'Для изображения автоматическое распознавание текста в этой версии не выполняется. Вставьте распознанный текст вручную для проверки.'};
   return {text:'',status:'unsupported',note:'Формат не поддерживает автоматическое извлечение текста. Вставьте текст документа вручную.'};
  }catch{
   return {text:'',status:'error',note:'Не удалось извлечь текст автоматически. Файл сохранён; текст можно вставить вручную.'};

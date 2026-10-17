@@ -1,3 +1,4 @@
+import {userError} from '@/lib/userError';
 /** Idempotent two-stage chat media transport.
  * A recording is never discarded when either Storage or message insertion fails.
  * Retrying after a successful upload reuses the same object and message UUID. */
@@ -44,9 +45,9 @@ export async function sendChatMedia(input:MediaSendInput):Promise<MediaSendResul
    // Storage content type is a bare MIME. The full codec string is retained
    // in the chat_messages row so playback metadata is not lost.
    const result=await transport.upload(pending.path,blob,mime.split(';')[0].trim()||'application/octet-stream');
-   if(result.error)return{ok:false,stage:'upload',error:'Не удалось загрузить медиа: '+result.error.message};
+   if(result.error)return{ok:false,stage:'upload',error:'Не удалось загрузить медиа: '+userError(result.error)};
   }catch(e){
-   return{ok:false,stage:'upload',error:'Соединение при загрузке прервалось: '+(e instanceof Error?e.message:'повторите попытку.')};
+   return{ok:false,stage:'upload',error:'Соединение при загрузке прервалось: '+((userError(e)||'повторите попытку.'))};
   }
  }
  input.onPhase?.('saving');
@@ -61,11 +62,11 @@ export async function sendChatMedia(input:MediaSendInput):Promise<MediaSendResul
    // uncertain whether it was saved. UUID + SELECT prevents duplicates.
    if(result.error.code==='23505'&&await transport.exists(pending.messageId))
     return{ok:true,pending};
-   return{ok:false,stage:'message',error:'Файл загружен, но сообщение не опубликовано: '+result.error.message,pending};
+   return{ok:false,stage:'message',error:'Файл загружен, но сообщение не опубликовано: '+userError(result.error),pending};
   }
   return{ok:true,pending};
  }catch(e){
   try{if(await transport.exists(pending.messageId))return{ok:true,pending}}catch{}
-  return{ok:false,stage:'message',error:'Сбой публикации после загрузки. Повторите отправку: '+(e instanceof Error?e.message:'ошибка сети.'),pending};
+  return{ok:false,stage:'message',error:'Сбой публикации после загрузки. Повторите отправку: '+((userError(e)||'ошибка сети.')),pending};
  }
 }

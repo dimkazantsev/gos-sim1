@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {MessageCircle,ClipboardCheck,Vote,LibraryBig} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -80,7 +81,7 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  async function propose(){
   setBusy(true);
   const r=await supabase.rpc('propose_presidential_system',{p_game_id:activeGame.id,p_system_type:system,p_threshold_pct:system==='qualified'?threshold:null,p_rationale:rationale.trim()||null});
-  if(r.error)setError(r.error.message);
+  if(r.error)setError(userError(r.error));
   else{
    setRationale('');
    await g.refresh();
@@ -92,7 +93,7 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
   if(!teacher||!electionDate)return;
   setBusy(true);
   const r=await supabase.rpc('set_presidential_election_date',{p_game_id:activeGame.id,p_election_date:electionDate});
-  if(r.error)setError(r.error.message);
+  if(r.error)setError(userError(r.error));
   else{
    await g.refresh();
    await load();

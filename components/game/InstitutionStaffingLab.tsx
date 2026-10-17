@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {IconAction} from '../ui/IconAction';
 import {useState} from 'react';
 import {supabase} from '@/lib/supabase';
@@ -33,7 +34,7 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
   if(!game)return;
   if(mode==='ministries'){
    const ready=await supabase.rpc('ensure_stage9_units',{p_game_id:game.id});
-   if(ready.error){setLoadError(ready.error.message);setLoaded(true);return;}
+   if(ready.error){setLoadError(userError(ready.error));setLoaded(true);return;}
   }
   const [u,a,m,n,pm]=await Promise.all([
    supabase.from('institution_units').select('*').eq('game_id',game.id).order('unit_kind').order('unit_key'),
@@ -42,7 +43,7 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
    mode==='ministries'?supabase.from('government_nominations').select('office_key,candidate_name,candidate_user_id').eq('game_id',game.id).eq('stage_no',9).eq('status','appointed').order('created_at'):Promise.resolve({data:[],error:null}),
    mode==='committees'?supabase.from('party_member_mandates').select('user_id,base_mandates').eq('game_id',game.id):Promise.resolve({data:[],error:null})
   ]);
-  const failure=[u,a,m,n,pm].find(x=>x.error);setLoaded(true);if(failure?.error){setLoadError(failure.error.message);return;}setLoadError('');
+  const failure=[u,a,m,n,pm].find(x=>x.error);setLoaded(true);if(failure?.error){setLoadError(userError(failure.error));return;}setLoadError('');
   if(!u.error)setUnits((u.data||[]) as Unit[]);
   if(!a.error)setAssignments((a.data||[]) as Assignment[]);
   if(!m.error)setMatrix((m.data||[]) as Matrix[]);
@@ -68,10 +69,10 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
  async function assign(unitId:string){
   const uid=pick[unitId];if(!uid)return;setBusy(true);
   const r=await supabase.rpc('assign_institution_member',{p_unit_id:unitId,p_user_id:uid});
-  if(r.error)setError(r.error.message);else{setPick(v=>({...v,[unitId]:''}));await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setPick(v=>({...v,[unitId]:''}));await load()}setBusy(false);
  }
- async function remove(id:string){setBusy(true);const r=await supabase.rpc('remove_institution_member',{p_assignment_id:id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function createCommittees(){setBusy(true);const r=await supabase.rpc('ensure_duma_committees',{p_game_id:game!.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function remove(id:string){setBusy(true);const r=await supabase.rpc('remove_institution_member',{p_assignment_id:id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function createCommittees(){setBusy(true);const r=await supabase.rpc('ensure_duma_committees',{p_game_id:game!.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  const ministryCounts=ministries.map(u=>assignedTo(u.id).length);
  const minCount=ministryCounts.length?Math.min(...ministryCounts):0;

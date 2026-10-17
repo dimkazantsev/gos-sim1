@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -43,11 +44,11 @@ export default function GhostPolicyLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onO
 
  async function propose(){
   setBusy(true);const r=await supabase.rpc('propose_ghost_voting_policy',{p_game_id:activeGame.id,p_policy_mode:mode,p_rationale:rationale.trim()||null});
-  if(r.error)setError(r.error.message);else{setRationale('');await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setRationale('');await load()}setBusy(false);
  }
  async function openVote(id:string){
   setBusy(true);const r=await supabase.rpc('open_ghost_voting_policy_vote',{p_policy_id:id});
-  if(r.error)setError(r.error.message);else{await load();onOpenVotes()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{await load();onOpenVotes()}setBusy(false);
  }
 
  return <section className="ghostPolicyLab">

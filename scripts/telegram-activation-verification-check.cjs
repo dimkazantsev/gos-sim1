@@ -24,7 +24,9 @@ const api={
 };
 const m=new Module(p,module);m.filename=p;m.paths=module.paths;
 const requireOriginal=m.require.bind(m);
-m.require=id=>id==='./telegram'?api:id==='./telegramPresentation'?present.exports:requireOriginal(id);
+const errorExports={};
+new Function('exports',ts.transpileModule(fs.readFileSync('lib/userError.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText)(errorExports);
+m.require=id=>id==='./telegram'?api:id==='./telegramPresentation'?present.exports:id==='../userError'?errorExports:requireOriginal(id);
 m._compile(ts.transpileModule(fs.readFileSync(p,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,p);
 (async()=>{
  const good=await m.exports.activateTelegramBot('fake','secret','image');
@@ -35,7 +37,7 @@ m._compile(ts.transpileModule(fs.readFileSync(p,'utf8'),{compilerOptions:{module
  assert.ok(status.webhook&&status.commands&&status.menu);
  calls=[];fail='setWebhook';
  await assert.rejects(()=>m.exports.activateTelegramBot('fake','secret',''),e=>
-  e instanceof m.exports.TelegramSetupError&&e.step==='webhook'&&e.message.includes('setWebhook'));
+  e instanceof m.exports.TelegramSetupError&&e.step==='webhook'&&/[А-Яа-яЁё]/.test(e.message)&&!/[A-Za-z]/.test(e.message));
  assert.deepEqual(calls,['setWebhook']);
  const register=fs.readFileSync('app/api/telegram/register/route.ts','utf8');
  assert.ok(register.includes('TelegramSetupError')&&register.includes('stage,reason'));

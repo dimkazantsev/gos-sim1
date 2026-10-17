@@ -1,4 +1,5 @@
 'use client';
+import {gameValueLabel,gameViewLabel} from '../../lib/gameLabels';
 import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
@@ -77,7 +78,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
    if(teacher&&memberFilter&&a.actor_id!==memberFilter)return false;
    if(teacher&&onlyOnline&&!isOnline(a.actor_id))return false;
    if(viewFilter&&a.view_key!==viewFilter)return false;
-   return !q||[member?.full_name||'',a.label,a.event_type,a.view_key||''].some(s=>s.toLocaleLowerCase('ru').includes(q));
+   return !q||[member?.full_name||'',a.label,a.event_type,gameValueLabel(a.event_type,'Игровое действие'),gameViewLabel(a.view_key)].some(s=>s.toLocaleLowerCase('ru').includes(q));
   });
   return xs.sort((a,b)=>{
    if(sort==='recent')return new Date(b.created_at).getTime()-new Date(a.created_at).getTime();
@@ -93,7 +94,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const uniqueViews=[...new Set(allowed.map(a=>a.view_key).filter((s):s is string=>!!s))].sort();
  function exportCsv(){
   const header=['Время','Участник','Раздел','Тип','Событие'];
-  const rows=visible.map(a=>[new Date(a.created_at).toLocaleString('ru-RU'),members.find(m=>m.user_id===a.actor_id)?.full_name||'Участник',VIEW_NAMES[a.view_key||'']||a.view_key||'',a.event_type,a.label]);
+  const rows=visible.map(a=>[new Date(a.created_at).toLocaleString('ru-RU'),members.find(m=>m.user_id===a.actor_id)?.full_name||'Участник',gameViewLabel(a.view_key),gameValueLabel(a.event_type,'Игровое действие'),a.label]);
   const contents=[header,...rows].map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');
   const blob=new Blob(['\ufeff'+contents],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
@@ -116,7 +117,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
    {teacher&&<StyledSelect label="Участник" value={memberFilter} onChange={setMemberFilter}
     options={[{value:'',label:'Все участники'},...studentMembers.map(m=>({value:m.user_id,label:m.full_name}))]}/>}
    <StyledSelect label="Раздел" value={viewFilter} onChange={setViewFilter}
-    options={[{value:'',label:'Все разделы'},...uniqueViews.map(v=>({value:v,label:VIEW_NAMES[v]||v}))]}/>
+    options={[{value:'',label:'Все разделы'},...uniqueViews.map(v=>({value:v,label:gameViewLabel(v)}))]}/>
    <StyledSelect label="Сортировка" value={sort} onChange={v=>setSort(v as Sort)}
     options={[{value:'recent',label:'Новые сначала'},{value:'oldest',label:'Старые сначала'},...(teacher?[
      {value:'surname',label:'По фамилии'},{value:'name',label:'По имени'},{value:'online',label:'Онлайн сначала'}]:[])]}/>
@@ -125,7 +126,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   </div>
   {teacher&&<div className="journalPresence" aria-label="Присутствие студентов">
    {studentMembers.map(m=>{const p=lastMap.get(m.user_id);const online=isOnline(m.user_id);return <button type="button" key={m.user_id} className={memberFilter===m.user_id?'selected':''} onClick={()=>setMemberFilter(memberFilter===m.user_id?'':m.user_id)}>
-    <span className={online?'journalOnline':'journalOffline'}/><strong>{m.full_name}</strong><small>{p?(VIEW_NAMES[p.current_view]||p.current_view):'Нет данных'}</small>
+    <span className={online?'journalOnline':'journalOffline'}/><strong>{m.full_name}</strong><small>{p?(gameViewLabel(p.current_view)):'Нет данных'}</small>
    </button>})}
   </div>}
   <div className="journalFeed" role="region" aria-label="Записи журнала" tabIndex={0}>
@@ -136,7 +137,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
      <time className="gosJournalRecordTime" dateTime={a.created_at}>{new Date(a.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</time>
      <div className="gosJournalRecordBody">
       <strong className="gosJournalRecordAuthor">{m?.full_name||'Участник'}</strong>
-      <span className="gosJournalRecordSection">{VIEW_NAMES[a.view_key||'']||a.view_key||'Игра'}</span>
+      <span className="gosJournalRecordSection">{gameViewLabel(a.view_key)}</span>
       <p className="gosJournalRecordAction">{a.label}</p>
      </div>
     </article>;

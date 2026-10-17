@@ -1125,7 +1125,7 @@ export function useRepublicGame(gameId:string){
   return r.data as {round_id:string;total_loss:number;result:{party_id:string;party_name:string;loss:number}[]};
  }
  async function applyGhostVotingBatch(losses:{party_id:string;loss:number}[]){
-  if(!teacher){setError('Ghost Voting доступен только преподавателю.');return false}
+  if(!teacher){setError('Goust Voting доступен только преподавателю.');return false}
   const r=await supabase.rpc('apply_ghost_voting_batch',{p_game_id:gameId,p_losses:losses});
   if(r.error){setError(r.error.message);return false}
   await refresh();return true;

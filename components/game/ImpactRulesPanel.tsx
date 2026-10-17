@@ -1,4 +1,5 @@
 'use client';
+import {gameValueLabel,impactConditionText} from '../../lib/gameLabels';
 
 import {useEffect,useId,useMemo,useState} from 'react';
 import {Activity,ArrowDownRight,ChevronDown,ChevronUp,History,RotateCcw,Search,SlidersHorizontal} from 'lucide-react';
@@ -38,7 +39,7 @@ function impactEntries(g:ReturnTypeRepublic,effects:ImpactRule['effects']){
  const metrics=effects?.metrics||{};
  const entries=Object.entries(metrics).filter(([,value])=>Number(value)!==0).map(([key,value])=>{
   const metric=g.metrics.find(x=>x.metric_key===key);
-  return {key,label:metric?.label||key,value:Number(value),unit:metric?.unit||''};
+  return {key,label:metric?.label||gameValueLabel(key,'Показатель'),value:Number(value),unit:metric?.unit||''};
  });
  const support=Number(effects?.actor_party_support||0);
  if(support)entries.push({key:'actor_party_support',label:'Поддержка партии автора',value:support,unit:'п.п.'});
@@ -80,7 +81,7 @@ function RuleCard({g,rule,expanded,onToggle}:{g:ReturnTypeRepublic;rule:ImpactRu
  return <article className={'impactRuleCard impactRuleRow '+(!rule.enabled?'disabled':'')+(expanded?' expanded':'')} aria-label={rule.label}>
   <div className="impactRuleSummary">
    <div className="impactRuleTitleBlock">
-    <small className="impactRuleEvent">{rule.event_type.replaceAll('_',' ')}</small>
+    <small className="impactRuleEvent">{gameValueLabel(rule.event_type,'Игровое событие')}</small>
     <h3>{rule.label}</h3>
     <div className="impactRuleMeta">
      <span className={'impactStatus '+(rule.enabled?(rule.auto_apply?'automatic':'manual'):'off')}>{ruleState(rule)}</span>
@@ -131,7 +132,7 @@ function RuleCard({g,rule,expanded,onToggle}:{g:ReturnTypeRepublic;rule:ImpactRu
     </div>
     {rule.conditions&&Object.keys(rule.conditions).length>0?
      <details className="impactConditions"><summary>Условия применения <ChevronDown aria-hidden="true"/></summary>
-      <pre>{JSON.stringify(rule.conditions,null,2)}</pre></details>:
+      <pre>{impactConditionText(rule.conditions)}</pre></details>:
      <p className="impactConditionsEmpty">Дополнительные условия не заданы.</p>}
     <footer className="impactRuleFooter">
      <span role="status" className={dirty?'impactUnsaved':saved?'impactSaved':''}>
@@ -158,7 +159,7 @@ function LedgerRow({g,entry,rule}:{g:ReturnTypeRepublic;entry:ImpactLedger;rule?
  return <article className={'impactHistoryRow impactJournalEntry '+(reverted?'reverted':'')}>
   <div className="impactHistoryTop">
    <div className="impactHistoryIdentity"><small><time dateTime={entry.created_at}>{new Date(entry.created_at).toLocaleString('ru-RU')}</time> · {sourceLabels[entry.source_type]||'Игровое действие'}</small>
-    <div className="impactHistoryHeading"><span className={'impactHistoryIcon '+(reverted?'reverted':'')}><ArrowDownRight aria-hidden="true"/></span><b>{rule?.label||entry.rule_key}</b></div>
+    <div className="impactHistoryHeading"><span className={'impactHistoryIcon '+(reverted?'reverted':'')}><ArrowDownRight aria-hidden="true"/></span><b>{rule?.label||'Применённое правило'}</b></div>
     {entry.note&&<p>{entry.note}</p>}
     {name&&<span>{name}</span>}
    </div>

@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import StageModuleHeader from '../ui/StageModuleHeader';
 import {useState} from 'react';
 import {supabase} from '@/lib/supabase';
@@ -41,7 +42,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
    supabase.from('government_session_questions').select('*').eq('game_id',game.id).order('created_at'),
    supabase.from('state_program_review_proposals').select('*').eq('game_id',game.id).order('created_at',{ascending:false})
   ]);
-  const failure=[s,i,p,q,r].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
+  const failure=[s,i,p,q,r].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
   if(!s.error){const rows=(s.data||[]) as Session[];setSessions(rows);if(!rows.some(row=>row.id===selectedId)&&rows[0])setSelectedId(rows[0].id)}
   if(!i.error)setItems((i.data||[]) as Item[]);
   if(!p.error)setPrograms((p.data||[]) as Program[]);
@@ -102,12 +103,12 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  }
  async function add(){
   if(!selected||!programId)return;setBusy(true);const r=await supabase.rpc('add_program_to_government_agenda',{p_session_id:selected.id,p_program_id:programId,p_report_minutes:reportMinutes});
-  if(r.error)setError(r.error.message);else{setProgramId('');await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setProgramId('');await load()}setBusy(false);
  }
- async function open(){if(!selected)return;setBusy(true);const r=await supabase.rpc('open_government_session',{p_session_id:selected.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function start(id:string){setBusy(true);const r=await supabase.rpc('start_government_program_report',{p_item_id:id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function decision(id:string){setBusy(true);const r=await supabase.rpc('open_program_vote_from_agenda',{p_item_id:id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function close(){if(!selected)return;setBusy(true);const r=await supabase.rpc('close_government_session',{p_session_id:selected.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function open(){if(!selected)return;setBusy(true);const r=await supabase.rpc('open_government_session',{p_session_id:selected.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function start(id:string){setBusy(true);const r=await supabase.rpc('start_government_program_report',{p_item_id:id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function decision(id:string){setBusy(true);const r=await supabase.rpc('open_program_vote_from_agenda',{p_item_id:id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function close(){if(!selected)return;setBusy(true);const r=await supabase.rpc('close_government_session',{p_session_id:selected.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  return <section className="govSessionLab">
   <StageModuleHeader variant="government" eyebrow="Этап 11 · Правительство" title="Заседание Правительства" description="Председатель формирует повестку и регламент. Министры представляют программы, члены Правительства регистрируются на заседание и голосуют; принятое решение оформляется постановлением." stats={[{label:"Заседание",value:selected?"№ "+selected.session_no:"Не создано",detail:selected?.status==="open"?"Идёт":selected?.status==="closed"?"Закрыто":"Подготовка повестки"},{label:"Регламент",value:selected?selected.time_limit_minutes+" мин.":"Не задан"}]}/>

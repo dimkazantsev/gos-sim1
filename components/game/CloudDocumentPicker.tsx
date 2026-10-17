@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {Download,ExternalLink,FolderOpen} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -15,7 +16,7 @@ export default function CloudDocumentPicker({gameId,userId,disabled,onImport}:{g
    const r=await fetch(origin+'/api/import-cloud-document',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+auth.data.session.access_token},body:JSON.stringify({linkId:id})});const data=await r.json();
    if(!r.ok)throw Error(data.error||'Не удалось импортировать документ.');
    onImport(data.title,data.text,data.url);setMessage('Текст импортирован. Проверьте реквизиты, субъект и правовой маршрут перед регистрацией.');
-  }catch(e){setMessage(e instanceof Error&&/[А-Яа-яЁё]/.test(e.message)?e.message:'Не удалось связаться с сервисом импорта.')}finally{setBusy(false)}
+  }catch(e){setMessage(userError(e)||'Не удалось связаться с сервисом импорта.')}finally{setBusy(false)}
  }
  return <details className="cloudDocumentPicker"><summary><FolderOpen size={18}/> Импорт из Гугл или Яндекс Документов</summary><p>Выберите ссылку, сохранённую в профиле. Для извлечения текста нужен публичный экспорт; закрытый документ можно скачать у провайдера и загрузить сюда.</p>
  <div><StyledSelect label="Мой облачный документ" value={id} onChange={setId} options={[{value:'',label:'Выбрать документ'},...links.map(l=>({value:l.id,label:l.title+' · '+(l.provider==='google'?'Гугл':'Яндекс')}))]}/><button type="button" className="secondary" disabled={disabled||busy||!selected} onClick={()=>void importDocument()}><Download size={17}/>{busy?'Импорт…':'Импортировать текст'}</button>{selected&&<a href={selected.url} target="_blank" rel="noreferrer"><ExternalLink size={17}/> Открыть оригинал</a>}</div>

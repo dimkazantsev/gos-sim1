@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {Archive,Download,ShieldAlert,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -56,7 +57,7 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
     try{window.sessionStorage.setItem(key,timestamp)}catch{/* In-memory receipt remains usable until the page is closed. */}
    }
    setNotice('Архив сформирован и передан браузеру. Проверьте, что файл действительно сохранился перед удалением.');
-  }catch(e){setNotice('Ошибка экспорта: '+(e instanceof Error?e.message:'Неизвестная ошибка'))}
+  }catch(e){setNotice('Ошибка экспорта: '+((userError(e)||'Неизвестная ошибка')))}
   finally{setBusy(false);setProgress('')}
  }
  async function deleteOne(){
@@ -78,11 +79,11 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
    setProgress('Удаление игровых записей и связей…');
    const last=await supabase.rpc('delete_game_permanently',{p_game:s.id,p_code:typed});
    if(last.error)throw last.error;
-   setNotice('Сеанс «'+s.title+'» и все его файлы удалены. Принадлежащие человеку аккаунты Auth других игр не затронуты.');
+   setNotice('Сеанс «'+s.title+'» и все его файлы удалены. Принадлежащие человеку учётные записи других игр не затронуты.');
    if(receiptKey){try{window.sessionStorage.removeItem(receiptKey)}catch{};setBackedUp(old=>{const next={...old};delete next[receiptKey];return next})}
    setSelected('');setTyped('');setConfirmed(false);await refresh();
    if(s.id===game?.id)window.location.assign('/');
-  }catch(e){setNotice('Операция остановлена: '+(e instanceof Error?e.message:'Неизвестная ошибка')+'. Сеанс сохраняется в архивном состоянии, пока очистка не завершена.')}
+  }catch(e){setNotice('Операция остановлена: '+((userError(e)||'Неизвестная ошибка'))+'. Сеанс сохраняется в архивном состоянии, пока очистка не завершена.')}
   finally{setBusy(false);setProgress('')}
  }
  if(!teacher||!me)return null;

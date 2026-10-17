@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -48,7 +49,7 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
   if(!m.error)setPersonalMandates(m.data||[]);
   if(!r.error)setRegistrations(r.data||[]);
   if(!v.error)setProcedureVotes(v.data||[]);
-  const failure=[e,c,b,p,m,r,v].find(x=>x.error);if(failure?.error)setError(failure.error.message);
+  const failure=[e,c,b,p,m,r,v].find(x=>x.error);if(failure?.error)setError(userError(failure.error));
  }
  useEffect(()=>{void load()},[game?.id]);
  useEffect(()=>{
@@ -87,24 +88,24 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
  };
  const usedByParty=(eid:string,pid:string)=>electionBallots(eid).filter(b=>b.party_id===pid).reduce((a,b)=>a+Number(b.votes||0),0);
 
- async function openProcedureVote(){setBusy(true);const r=await supabase.rpc('open_duma_leadership_procedure_vote',{p_game_id:activeGame.id});if(r.error)setError(r.error.message);else{await load();await g.refresh()}setBusy(false)}
+ async function openProcedureVote(){setBusy(true);const r=await supabase.rpc('open_duma_leadership_procedure_vote',{p_game_id:activeGame.id});if(r.error)setError(userError(r.error));else{await load();await g.refresh()}setBusy(false)}
  async function createElection(){
   setBusy(true);const r=await supabase.rpc('create_office_election',{p_game_id:activeGame.id,p_office_key:office,p_vote_mode:mode});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
  async function nominate(electionId:string){
   const userId=nominee[electionId];if(!userId)return;setBusy(true);
   const r=await supabase.rpc('nominate_office_candidate',{p_election_id:electionId,p_user_id:userId});
-  if(r.error)setError(r.error.message);else{setNominee(v=>({...v,[electionId]:''}));await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setNominee(v=>({...v,[electionId]:''}));await load()}setBusy(false);
  }
- async function open(electionId:string){setBusy(true);const r=await supabase.rpc('open_office_election',{p_election_id:electionId});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function open(electionId:string){setBusy(true);const r=await supabase.rpc('open_office_election',{p_election_id:electionId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
  async function vote(electionId:string,candidateId:string){
   const value=Math.max(0,Number(voteDraft[electionId+'-'+candidateId])||0);setBusy(true);
   const r=await supabase.rpc('set_office_ballot',{p_election_id:electionId,p_candidate_id:candidateId,p_votes:value});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
- async function personalVote(electionId:string,candidateId:string){setBusy(true);const r=await supabase.rpc('cast_personal_office_ballot',{p_election_id:electionId,p_candidate_id:candidateId});if(r.error)setError(r.error.message);else await load();setBusy(false)}
- async function close(electionId:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:electionId});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function personalVote(electionId:string,candidateId:string){setBusy(true);const r=await supabase.rpc('cast_personal_office_ballot',{p_election_id:electionId,p_candidate_id:candidateId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function close(electionId:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:electionId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  const sorted=useMemo(()=>[...elections].sort((a,b)=>a.office_key.localeCompare(b.office_key)||a.round_no-b.round_no),[elections]);
 

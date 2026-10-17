@@ -1,3 +1,4 @@
+import {gameValueLabel} from '../../lib/gameLabels';
 /** Public results saved by the stage-completion trigger. Never derive a winner or a legal status from a draft. */
 export const COMIC_STAGES=[1,3,5,7,8,11,12,13,14,15,16] as const;
 export type ComicIcon='people'|'party'|'person'|'regions'|'parliament'|'vote'|'document'|'check'|'money'|'program'|'city'|'shield'|'message'|'award'|'clock';
@@ -27,7 +28,7 @@ const labels:Record<string,string>={draft:'Черновик',submitted:'На р�
 const fmt=(n:number)=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
 const ruleLabels:Record<string,string>={final:'Расчёт зафиксирован',allocated:'Распределено',vote_open:'На голосовании',superseded:'Заменено новым решением',granted:'Предоставлено',requested:'Запрошено',hare:'Квота Хэйра',droop:'Квота Друпа',dhondt:'Д’Ондт',sainte_lague:'Сент-Лагю',imperiali:'Империали',plurality:'Относительное большинство',absolute_two_round:'Абсолютное большинство · два тура'};
 const money=(n:number|string|undefined)=>n==null?'Не зафиксировано':Number(n).toLocaleString('ru-RU',{maximumFractionDigits:2})+' ₽';
-const status=(s:string|undefined)=>s?ruleLabels[s]||labels[s]||s:'Не зафиксировано';
+const status=(s:string|undefined)=>s?ruleLabels[s]||labels[s]||gameValueLabel(s,'Не зафиксировано'):'Не зафиксировано';
 export function comicSlides(chapter:ComicChapter,includeEmptyPreviewSlide=false):ComicSlide[]{
  const s=chapter.snapshot||{},no=chapter.stage_no,theme=COMIC_THEMES[no];
  if(s.version!==2||!theme)return [{title:chapter.title,body:chapter.body,art:no===16?'epilogue':no>=9?'programs':'regions',facts:[]}];
@@ -62,7 +63,7 @@ export function comicSlides(chapter:ComicChapter,includeEmptyPreviewSlide=false)
  case 5:return [
   slide('Состав Государственной Думы','Мандаты фракций зафиксированы вместе с итогами первого заседания.',rows(s.parties,'parliament',p=>fmt(p.mandates||0)+' мандатов')),
   slide('Руководство палаты','Действующие назначения и избранные руководители по данным игры.',offices(/дум|комитет|совет гд/i)),
-  slide('Голоса и участие в заседаниях','Результаты этапов 4 и 5: представительство, доступные голоса и принятые решения.',[count('mandates','Мандатов','parliament'),count('ghost_loss','Потери голосов GV','vote'),...rows(s.parties,'party',p=>fmt(Math.max(0,(p.mandates||0)-(p.ghost_loss||0)))+' доступных голосов'),...procedures])];
+  slide('Голоса и участие в заседаниях','Результаты этапов 4 и 5: представительство, доступные голоса и принятые решения.',[count('mandates','Мандатов','parliament'),count('ghost_loss','Потери голосов из-за отсутствия депутатов','vote'),...rows(s.parties,'party',p=>fmt(Math.max(0,(p.mandates||0)-(p.ghost_loss||0)))+' доступных голосов'),...procedures])];
  case 7:return [
   slide('Результат президентских выборов',s.president?'Победитель указан в завершённом расчёте выборов.':'В данных этапа пока нет подтверждённого победителя.',s.president?[{icon:'person',label:'Избранный Президент',value:s.president.name||'Не зафиксирован',detail:s.president.party||'Самовыдвижение'},{icon:'vote',label:'Итоговый результат',value:s.president.score==null?'Не зафиксировано':fmt(s.president.score)+'%'},{icon:'vote',label:'Избирательная система',value:status(s.president.system)}]:[{icon:'person',label:'Избранный Президент',value:'Результат не зафиксирован'}]),
   slide('Кандидаты и регистрация','Итоги регистрации кандидатов и принятые документы сохранены без приватных материалов ЦИК.',[count('candidates','Кандидатов','people'),count('registered_candidates','Зарегистрировано','check'),...decisions]),

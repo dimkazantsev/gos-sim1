@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import StyledSelect from '../ui/StyledSelect';
@@ -33,7 +34,7 @@ export default function BillAmendmentsPanel({g,document,onOpenVotes,readOnly=fal
   try{
    if(!g.game||document.game_id!==g.game.id)throw new Error('Выберите законопроект текущей игры.');
    const r=await supabase.rpc('get_bill_amendments',{p_document_id:document.id});if(!current())return;
-   if(r.error)throw new Error(r.error.message);
+   if(r.error)throw new Error(userError(r.error));
    const value=r.data as AmendmentState;
    if(!value||value.document_id!==document.id||typeof value.body_text!=='string'||typeof value.status_code!=='string'||
     typeof value.can_manage!=='boolean'||typeof value.can_submit!=='boolean'||!Array.isArray(value.amendments)||
@@ -42,7 +43,7 @@ export default function BillAmendmentsPanel({g,document,onOpenVotes,readOnly=fal
    setResult({scope,data:value});setFailure(null);
    setSelected(ids=>ids.filter(id=>value.amendments.some(a=>a.id===id&&a.status==='submitted'&&!a.stale)));
    setSubject(currentSubject=>value.subjects.includes(currentSubject)?currentSubject:value.subjects[0]||'');
-  }catch(e){if(current()){setResult(null);setFailure({scope,message:e instanceof Error?e.message:'Не удалось загрузить поправки.'});}}
+  }catch(e){if(current()){setResult(null);setFailure({scope,message:(userError(e)||'Не удалось загрузить поправки.')});}}
   finally{if(current())setLoading(false);}
  }
  useGameTableSync(g.game?.id,tables,load,'bill-amendments:'+document.id+':'+(g.me?.user_id||''));
@@ -72,7 +73,7 @@ export default function BillAmendmentsPanel({g,document,onOpenVotes,readOnly=fal
    <p className={styles.notice} role="status">{data.pending_count?`Ожидают решения: ${data.pending_count}. Сначала рассмотрите или отзовите эти поправки, затем продолжайте чтения законопроекта.`:phase?'Нерассмотренных поправок нет. Законопроект может продолжить установленный маршрут.':'Внести новую поправку можно при подготовке и проведении II чтения.'}</p>
    {openVote&&<div className={styles.actions}><button type="button" className="primary" onClick={()=>onOpenVotes(openVote)}>Открыть голосование по пакету</button>{canManage&&<button type="button" disabled={busy} onClick={()=>void mutate('close_bill_amendment_vote',{p_vote_id:openVote,p_note:'Итог пакета поправок ко II чтению'})}>Завершить голосование по пакету</button>}</div>}
    {phase&&data.can_submit&&!readOnly&&<form className={styles.form} onSubmit={e=>{e.preventDefault();if(canSubmit)void mutate('submit_bill_amendment',{p_document_id:document.id,p_subject_key:subject,p_old_text:oldText,p_new_text:newText,p_rationale:rationale.trim(),p_competence_note:court?competence.trim():null},()=>{setOldText('');setNewText('');setRationale('');setCompetence('')});}}>
-    <StyledSelect wrap label="Субъект законодательной инициативы" value={subject} onChange={setSubject} options={data.subjects.map(key=>({value:key,label:FORMAL_SUBJECTS.find(s=>s.key===key)?.label||key}))} disabled={busy}/>
+    <StyledSelect wrap label="Субъект законодательной инициативы" value={subject} onChange={setSubject} options={data.subjects.map(key=>({value:key,label:FORMAL_SUBJECTS.find(s=>s.key===key)?.label||'Субъект законодательной инициативы'}))} disabled={busy}/>
     <div className={styles.grid}><label className={styles.field}>Действующий фрагмент<textarea rows={4} maxLength={120000} value={oldText} onChange={e=>setOldText(e.target.value)} placeholder="Скопируйте точную уникальную цитату из текста законопроекта" disabled={busy}/></label><label className={styles.field}>Предлагаемая редакция<textarea rows={4} maxLength={120000} value={newText} onChange={e=>setNewText(e.target.value)} placeholder="Новый текст; пустое поле означает удаление фрагмента" disabled={busy}/></label></div>
     {oldText&&!uniqueQuote&&<p role="status">Цитата должна точно встречаться в действующем тексте один раз.</p>}
     <label className={styles.field}>Обоснование поправки<textarea rows={3} maxLength={4000} value={rationale} onChange={e=>setRationale(e.target.value)} disabled={busy}/></label>
@@ -82,7 +83,7 @@ export default function BillAmendmentsPanel({g,document,onOpenVotes,readOnly=fal
    </form>}
    <div className={styles.section}><header className={styles.sectionHead}><h3>Таблица поправок</h3><span>{data.amendments.length}</span></header>
     {!data.amendments.length?<p>Поправки ещё не внесены.</p>:data.amendments.map(a=><article key={a.id} className={styles.amendment} data-status={a.status}>
-     <header><label>{canManage&&phase&&a.status==='submitted'&&<input type="checkbox" aria-label={'Включить поправку '+a.id+' в пакет'} checked={selected.includes(a.id)} disabled={busy||!!openVote||a.stale} onChange={e=>setSelected(ids=>e.target.checked?[...ids,a.id]:ids.filter(id=>id!==a.id))}/>}<span><b>{g.members.find(m=>m.user_id===a.author_id)?.full_name||'Участник'}</b><br/>{FORMAL_SUBJECTS.find(s=>s.key===a.subject_key)?.short||a.subject_key}</span></label><span className={styles.pill}>{labels[a.status]}</span></header>
+     <header><label>{canManage&&phase&&a.status==='submitted'&&<input type="checkbox" aria-label={'Включить поправку '+a.id+' в пакет'} checked={selected.includes(a.id)} disabled={busy||!!openVote||a.stale} onChange={e=>setSelected(ids=>e.target.checked?[...ids,a.id]:ids.filter(id=>id!==a.id))}/>}<span><b>{g.members.find(m=>m.user_id===a.author_id)?.full_name||'Участник'}</b><br/>{FORMAL_SUBJECTS.find(s=>s.key===a.subject_key)?.short||'Субъект законодательной инициативы'}</span></label><span className={styles.pill}>{labels[a.status]}</span></header>
      {a.stale&&a.status==='submitted'&&<p role="status">Текст изменился после внесения. Автор может отозвать поправку и внести её заново; комитет может мотивированно не включить её.</p>}
      <small>ДЕЙСТВУЮЩАЯ РЕДАКЦИЯ НА МОМЕНТ ВНЕСЕНИЯ</small><del>{a.old_text}</del><small>ПРЕДЛАГАЕМАЯ РЕДАКЦИЯ</small><ins>{a.new_text||'Удалить фрагмент'}</ins><p>{a.rationale}</p>{a.competence_note&&<p>Вопросы ведения суда: {a.competence_note}</p>}{a.review_note&&<p>Решение комитета: {a.review_note}</p>}
      <div className={styles.actions}>{a.vote_id&&<button type="button" className="secondary" onClick={()=>onOpenVotes(a.vote_id!)}>Голосование</button>}{a.can_withdraw&&!readOnly&&<button type="button" disabled={busy} onClick={()=>void mutate('withdraw_bill_amendment',{p_amendment_id:a.id})}>Отозвать поправку</button>}</div>

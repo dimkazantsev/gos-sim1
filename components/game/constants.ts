@@ -21,9 +21,9 @@ export const CRISES=[
  {id:'project-cost',source:'additional',type:'Удорожание инфраструктурного проекта',levels:{low:'В условном муниципалитете стоимость проекта выросла на 5 %; срок ввода сохраняется. Нужно проверить смету и найти источник покрытия.',medium:'В условном муниципалитете стоимость проекта выросла на 15 %, срок сдвигается на месяц. Нужно выбрать между корректировкой объёма и дополнительным финансированием.',high:'В условном регионе стоимость проекта выросла на 30 %; подрядчик приостановил работы. Нужно проверить причины, пересмотреть договор и бюджетные приоритеты.',ultra:'В условном регионе стоимость проекта выросла на 60 %; выделенных средств не хватает для завершения. Нужно сопоставить продолжение, изменение и остановку проекта, оценить последствия и согласовать решение.'}}
 ] as const;
 
-export function initials(name:string){return name.split(' ').filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'GS'}
+export function initials(name:string){return name.split(' ').filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'ГС'}
 export function gameStatus(status:string){return status==='running'?'Ход активен':status==='paused'?'Пауза':status==='finished'?'Завершено':'Лобби'}
-export function actionStatus(status:string){return status==='submitted'?'На рассмотрении':status==='accepted'?'Принято':status==='rejected'?'Отклонено':status}
+export function actionStatus(status:string){return status==='submitted'?'На рассмотрении':status==='accepted'?'Принято':status==='rejected'?'Отклонено':'Статус не определён'}
 export function stageIcon(n:number){return ['◉','⌁','⌖','▦','⚡','♙','★','◆','▤','▧','▣','§','₽','⌂','!','◎'][n-1]||'•'}
 export function metricIcon(m:Metric){const x=(m.metric_key+' '+m.label).toLowerCase();if(x.includes('безопас')||x.includes('security'))return '🛡';if(x.includes('бюдж')||x.includes('budget'))return '₽';if(x.includes('легит'))return '🏛';if(x.includes('соц'))return '⚡';if(x.includes('экон'))return '↗';return '◎'}
 export function formatDeadline(x:string|null){if(!x)return '';return new Date(x).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}

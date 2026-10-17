@@ -3,7 +3,7 @@ import type {View} from './types';
 const views=new Set(['dashboard','stages','parties','votes','documents','actions','grades','profile','teacher','events']);
 export default function RichPostText({text,onNavigate,onOpenDocument,onOpenVotes}:{text:string;onNavigate:(view:View,target?:{stageNo?:number})=>void;onOpenDocument:(id:string)=>void;onOpenVotes?:(id?:string)=>void}){
  const nodes:ReactNode[]=[];let last=0;
- const pattern=/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+|gos:[a-z]+(?:\?id=[a-zA-Z0-9_-]+)?)\)|https?:\/\/[^\s<>]+/g;
+ const pattern=/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+|gos:[a-z]+(?:\?(?:id=[a-zA-Z0-9_-]+|stage=\d{1,2}))?)\)|https?:\/\/[^\s<>]+/g;
  for(const m of text.replace(/\\n/g,'\n').matchAll(pattern)){
   if(m.index!>last)nodes.push(text.replace(/\\n/g,'\n').slice(last,m.index));
   const href=m[2]||m[0],label=m[1]||href;

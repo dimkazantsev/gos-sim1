@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import StageModuleHeader from '../ui/StageModuleHeader';
 import StyledSelect from '../ui/StyledSelect';
@@ -25,7 +26,7 @@ export function validGooglePresentationUrl(value:string){
  if(!/^https:\/\/(?:(?:docs|slides)\.google\.com\/presentation\/d\/|slides\.google\.com\/d\/)(?:e\/)?[A-Za-z0-9_-]+(?:\/(?:edit|view|present|preview|embed|copy|pub|pubembed))?\/?(?:[?#][^\s<>]*)?$/.test(url))return false;
  try{const parsed=new URL(url);return parsed.protocol==='https:'&&!parsed.username&&!parsed.password&&!parsed.port&&(parsed.hostname==='docs.google.com'||parsed.hostname==='slides.google.com');}catch{return false;}
 }
-const presentationIssue=(link:PresentationLink)=>!link.name.trim()||link.name.trim().length>120||/[\u0000-\u001f\u007f]/.test(link.name)?'Укажите название презентации (до 120 символов).':!validGooglePresentationUrl(link.url)?'Нужна HTTPS-ссылка на презентацию Google: docs.google.com/presentation/d/… или slides.google.com.':'';
+const presentationIssue=(link:PresentationLink)=>!link.name.trim()||link.name.trim().length>120||/[\u0000-\u001f\u007f]/.test(link.name)?'Укажите название презентации (до 120 символов).':!validGooglePresentationUrl(link.url)?'Нужна HTTPS-ссылка на презентацию Гугл: docs.google.com/presentation/d/… или slides.google.com.':'';
 
 export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,votes,setError}=g;
@@ -71,7 +72,7 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
    supabase.from('municipal_districts').select('id,district_key,title').eq('game_id',game.id).order('title')
   ]);
   if(!current())return;
-  const failure=[p,m,e,d].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
+  const failure=[p,m,e,d].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
    const rows=(e.data||[]) as Evidence[];
    const next:Record<string,string>={};
    await Promise.all(rows.map(async x=>{const s=await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600);if(!s.error&&s.data?.signedUrl)next[x.id]=s.data.signedUrl}));
@@ -81,7 +82,7 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
    setDrafts(old=>{const next={...old};for(const project of projectRows)if(!dirtyDrafts.current.has(project.id))next[project.id]=projectDraft(project);return next;});
    if(selectedRef.current&&!projectRows.some(project=>project.id===selectedRef.current))pickProject('');
    else if(!selectedRef.current&&!selectionTouched.current&&projectRows[0]){selectedRef.current=projectRows[0].id;setSelectedId(projectRows[0].id);}
-  }catch(error){if(current())setError(error instanceof Error?error.message:String(error));}
+  }catch(error){if(current())setError(userError(error)||'Не удалось выполнить действие.');}
  }
  useGameTableSync(game?.id,['municipal_projects','municipal_project_members','municipal_project_evidence','municipal_districts','game_votes'],load,scopeKey);
 
@@ -109,11 +110,11 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
   if(busyRef.current||scope.current!==scopeKey||generation.current!==renderGeneration)return;
   const key=scopeKey,epoch=generation.current,current=()=>scope.current===key&&generation.current===epoch;
   busyRef.current=true;setBusy(true);
-  try{await action(current);}catch(error){if(current())setError(error instanceof Error?error.message:String(error));}
+  try{await action(current);}catch(error){if(current())setError(userError(error)||'Не удалось выполнить действие.');}
   finally{if(current()){busyRef.current=false;setBusy(false);}}
  }
  async function act(name:string,args:Record<string,unknown>,after?:(data:unknown)=>void){
-  await withBusy(async current=>{const r=await supabase.rpc(name,args);if(!current())return;if(r.error)throw new Error(r.error.message);after?.(r.data);await load();});
+  await withBusy(async current=>{const r=await supabase.rpc(name,args);if(!current())return;if(r.error)throw new Error(userError(r.error));after?.(r.data);await load();});
  }
 
  async function save(newProject=false){
@@ -147,11 +148,11 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
    const path=activeGame.id+'/municipal/'+id+'/'+crypto.randomUUID()+ext;
    const up=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||undefined,upsert:false});
    if(!current())return;
-   if(up.error){setError(up.error.message);failed.push(file);continue}
+   if(up.error){setError(userError(up.error));failed.push(file);continue}
    const kind=file.type.startsWith('image/')?'image':file.type.startsWith('video/')?'video':file.type.startsWith('audio/')?'audio':'file';
    const reg=await supabase.rpc('register_municipal_evidence',{p_project_id:id,p_media_kind:kind,p_storage_path:path,p_file_name:file.name,p_mime_type:file.type||null,p_file_size:file.size,p_note:evidenceNote.trim()||null});
    if(!current())return;
-   if(reg.error){setError(reg.error.message);failed.push(file);}
+   if(reg.error){setError(userError(reg.error));failed.push(file);}
   }
   if(selectedRef.current===id&&fileVersion.current===version){setFiles(failed);if(!failed.length)setEvidenceNote('');}
   await load();});
@@ -189,7 +190,7 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
 
   {selected&&<>
    <div className="municipalProjectSummary">
-    <header><div><small>{selected.team_name||'Муниципальная администрация'}</small><h3>{selected.problem_title}</h3><p>{selected.location_text}{selected.district_key?' · '+(districts.find(d=>d.district_key===selected.district_key)?.title||selected.district_key):''}</p></div><span className={'municipalStatus '+selected.status}>{statusLabel[selected.status]}</span></header>
+    <header><div><small>{selected.team_name||'Муниципальная администрация'}</small><h3>{selected.problem_title}</h3><p>{selected.location_text}{selected.district_key?' · '+(districts.find(d=>d.district_key===selected.district_key)?.title||'Территория проекта'):''}</p></div><span className={'municipalStatus '+selected.status}>{statusLabel[selected.status]}</span></header>
     <div className="municipalSummaryGrid"><article><small>ПРОБЛЕМА</small><p>{selected.problem_description}</p></article><article><small>КОМПЕТЕНЦИЯ</small><p>{selected.legal_competence}</p></article><article><small>РЕШЕНИЕ</small><p>{selected.proposed_solution}</p></article><article><small>ЭФФЕКТ И СТОИМОСТЬ</small><p>{selected.expected_effect}</p><strong>{Number(selected.estimated_cost).toLocaleString('ru-RU')}</strong></article></div>
    </div>
 

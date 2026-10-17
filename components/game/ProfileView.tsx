@@ -223,7 +223,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
     <div className="surfaceHead"><div><small>ПРЕДСТАВИТЕЛЬСТВО</small><h2>Фракция и мандаты</h2></div></div>
     {party&&allocation?<div className="profileMandateCard">
       <div className="profilePartyLine"><span className="profilePartyDot" style={{background:party.color}}/><div><small>ПАРТИЯ / ФРАКЦИЯ</small><b>{party.name}</b></div></div>
-      <div className="profileMandateStats"><div><strong>{allocation.base_mandates}</strong><span>Мандатов</span></div><div className={allocation.ghost_loss?'affected':''}><strong>{allocation.effective_mandates}</strong><span>Доступно голосов</span></div><div><strong>{allocation.ghost_loss}</strong><span>Потеря GV</span></div></div>
+      <div className="profileMandateStats"><div><strong>{allocation.base_mandates}</strong><span>Мандатов</span></div><div className={allocation.ghost_loss?'affected':''}><strong>{allocation.effective_mandates}</strong><span>Доступно голосов</span></div><div><strong>{allocation.ghost_loss}</strong><span>Отсутствующие депутаты</span></div></div>
      </div>:own&&pendingInvites.length?<div className="profileInviteNote"><b>У вас {pendingInvites.length} приглашение(я) в партию.</b><span>Откройте раздел «Партии», чтобы принять или отклонить.</span></div>:<div className="emptyState">Партия пока не указана.</div>}
     <div className="profilePositionDivider"/>
     <div className="surfaceHead"><div><small>ИГРОВАЯ ПОЗИЦИЯ</small><h2>Роль в Республике</h2></div></div>

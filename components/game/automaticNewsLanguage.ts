@@ -20,6 +20,8 @@ const DOCUMENT_STATE_LABELS:Record<string,string>={
 
 export function localizeAutomaticNewsText(value:string):string{
  return value
+  .replace(/GOS\/\/SIMS/g,'ГОС.ID')
+  .replace(/Ghost voting/gi,'Goust Voting')
   .replace(/Основание:\s*НПА:\s*([^\n]+?)\s*(?:→|->)\s*([a-z][a-z0-9_]*)\b/gi,(match,title:string,raw:string)=>{
    const label=DOCUMENT_STATE_LABELS[raw.toLowerCase()];
    return label?`Основание: документ «${title.trim().replace(/«([^«»]+)»/g,'„$1“')}» ${label}`:match;
@@ -36,6 +38,6 @@ export function localizeAutomaticNewsText(value:string):string{
 
 /** The suffix is a technical scope identifier; keep it in stored tag/search. */
 export function localizeAutomaticNewsTag(tag:string):string{
- const match=/^(этап|ходигры|сми)_gpyasu$/i.exec(tag);
- return match?({этап:'этап',ходигры:'ход_игры',сми:'СМИ'}[match[1].toLowerCase()]||tag):tag;
+ const match=/^(этап|ходигры|правила|партии|президент|гд|сф|правительство|министерства|минюст|цик|цб|регионы|муниципалитет|выборы|мандаты|голосование|законопроект|нпа|госпрограмма|бюджет|налоги|контроль|кризис|сми|итоги|рефлексия)_gpyasu$/i.exec(tag);
+ return match?({этап:'этап',ходигры:'ход_игры',сми:'СМИ'}[match[1].toLowerCase()]||match[1].toLowerCase()):tag;
 }

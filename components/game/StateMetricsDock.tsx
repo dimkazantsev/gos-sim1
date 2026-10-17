@@ -1,4 +1,5 @@
 'use client';
+import {gameValueLabel} from '../../lib/gameLabels';
 import {metricQuantity} from '@/lib/formatQuantity';
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useMemo,useRef,useState} from 'react';
@@ -176,7 +177,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
      <div className="metricHistoryHead"><b>Журнал показателя</b><span>{hist.length} записей</span></div>
      {[...hist].reverse().slice(0,showFullHistory?30:HISTORY_PREVIEW_COUNT).map(h=>{const p=h.source_id?politicalPosts.find(x=>x.id===h.source_id):undefined;return <article key={h.id}>
       <time>{new Date(h.recorded_at).toLocaleString('ru-RU')}</time>
-      <div><b>{Number(h.previous_value??h.value).toLocaleString('ru-RU')} → {Number(h.value).toLocaleString('ru-RU')} {chosen.unit||''}</b><p>{h.note||p?.title||h.source_type}</p>{h.actor_id&&<small>{names[h.actor_id]||'Участник'}</small>}</div>
+      <div><b>{Number(h.previous_value??h.value).toLocaleString('ru-RU')} → {Number(h.value).toLocaleString('ru-RU')} {chosen.unit||''}</b><p>{h.note||p?.title||gameValueLabel(h.source_type,'Изменение показателя')}</p>{h.actor_id&&<small>{names[h.actor_id]||'Участник'}</small>}</div>
       <strong className={Number(h.delta)>=0?'up':'down'}>{Number(h.delta)>0?'+':''}{Number(h.delta||0).toFixed(1)}</strong>
      </article>})}
      {hist.length>HISTORY_PREVIEW_COUNT&&<button type="button" className="metricHistoryMore" onClick={()=>setShowFullHistory(v=>!v)}>{showFullHistory?'Свернуть журнал':`Показать ещё ${Math.min(hist.length,30)-HISTORY_PREVIEW_COUNT} записей`}</button>}

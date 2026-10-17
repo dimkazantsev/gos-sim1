@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import {useCallback,useEffect,useState} from 'react';
 import {Copy,KeyRound,RotateCw,ShieldCheck,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
@@ -48,7 +49,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
     supabase.from('games').select('game_code').eq('id',gameId).single()
    ]);
    if(!alive)return;
-   if(c.error||r.error){setNotice('Не удалось загрузить коды доступа: '+(c.error?.message||r.error?.message));return;}
+   if(c.error||r.error){setNotice('Не удалось загрузить коды доступа: '+(userError(c.error)||userError(r.error)));return;}
    setCurrentGameCode(c.data?.game_code||'');
    setRows(Array.isArray(r.data)?r.data as CodeRow[]:[]);
   }
@@ -68,7 +69,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
    if(r.error)throw r.error;
    setCurrentGameCode(String(r.data));setNewGameCode('');
    setNotice('Код игры изменён. Сообщите его участникам.');
-  }catch(e){setNotice('Код игры не изменён: '+(e instanceof Error?e.message:'Ошибка сервера'))}
+  }catch(e){setNotice('Код игры не изменён: '+((userError(e)||'Ошибка сервера')))}
   finally{setBusy(false)}
  }
  async function addCode(){
@@ -81,7 +82,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
    setCreated(secret);setCreatedKind(scope);setNewInvite('');
    await refresh();
    setNotice('Приглашение создано. Код можно копировать из списка.');
-  }catch(e){setNotice('Не удалось создать приглашение: '+(e instanceof Error?e.message:'Ошибка сервера'))}
+  }catch(e){setNotice('Не удалось создать приглашение: '+((userError(e)||'Ошибка сервера')))}
   finally{setBusy(false)}
  }
  async function revoke(row:CodeRow){
@@ -91,7 +92,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
    const r=await supabase.rpc('teacher_revoke_access_code',{p_game_id:gameId,p_invite_id:row.id});
    if(r.error)throw r.error;
    await refresh();setNotice('Приглашение отключено для новых подключений.');
-  }catch(e){setNotice('Не удалось отключить приглашение: '+(e instanceof Error?e.message:'Ошибка сервера'))}
+  }catch(e){setNotice('Не удалось отключить приглашение: '+((userError(e)||'Ошибка сервера')))}
   finally{setBusy(false)}
  }
  async function remove(row:CodeRow){
@@ -101,7 +102,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
    const r=await supabase.rpc('teacher_delete_access_code',{p_game_id:gameId,p_invite_id:row.id});
    if(r.error)throw r.error;
    await refresh();setNotice('Отключённое приглашение удалено.');
-  }catch(e){setNotice('Не удалось удалить приглашение: '+(e instanceof Error?e.message:'Ошибка сервера'))}
+  }catch(e){setNotice('Не удалось удалить приглашение: '+((userError(e)||'Ошибка сервера')))}
   finally{setBusy(false)}
  }
  return <section className="teacherAccessCodes" aria-label="Коды доступа к игре">

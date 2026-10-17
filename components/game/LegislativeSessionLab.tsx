@@ -1,4 +1,5 @@
 'use client';
+import {userError} from '@/lib/userError';
 import StageModuleHeader from '../ui/StageModuleHeader';
 import StyledSelect from '../ui/StyledSelect';
 import styles from './StageForms.module.css';
@@ -34,7 +35,7 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument}:{g:
    supabase.from('duma_sessions').select('*').eq('game_id',game.id).order('session_no',{ascending:false}),
    supabase.from('duma_agenda_items').select('*').eq('game_id',game.id).order('agenda_no')
   ]);
-  const failure=[s,a].find(x=>x.error);if(failure?.error){setError(failure.error.message);return;}
+  const failure=[s,a].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
   if(!s.error){
    const rows=(s.data||[]) as Session[];setSessions(rows);
    if(!rows.some(x=>x.id===selectedId)&&rows[0])setSelectedId(rows[0].id);
@@ -59,22 +60,22 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument}:{g:
  async function create(){
   setBusy(true);setFeedback('');
   const r=await supabase.rpc('create_duma_session',{p_game_id:activeGame.id,p_title:title.trim()||'Заседание Государственной Думы',p_scheduled_start:start?new Date(start).toISOString():null,p_scheduled_end:end?new Date(end).toISOString():null});
-  if(r.error)setError(r.error.message);else{setTitle('');setStart('');setEnd('');if(r.data)setSelectedId(String(r.data));await load();setFeedback('Заседание создано. Повестка зарегистрирована в реестре НПА.')}
+  if(r.error)setError(userError(r.error));else{setTitle('');setStart('');setEnd('');if(r.data)setSelectedId(String(r.data));await load();setFeedback('Заседание создано. Повестка зарегистрирована в реестре НПА.')}
   setBusy(false);
  }
  async function add(){
   if(!selected||!docId)return;setBusy(true);
   const r=await supabase.rpc('add_duma_agenda_item',{p_session_id:selected.id,p_document_id:docId});
-  if(r.error)setError(r.error.message);else{setDocId('');await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{setDocId('');await load()}setBusy(false);
  }
- async function open(){if(!selected)return;setBusy(true);const r=await supabase.rpc('open_duma_session',{p_session_id:selected.id});if(r.error)setError(r.error.message);else await load();setBusy(false)}
+ async function open(){if(!selected)return;setBusy(true);const r=await supabase.rpc('open_duma_session',{p_session_id:selected.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
  async function setStatus(id:string,status:'in_progress'|'completed'|'withdrawn'){
   setBusy(true);const r=await supabase.rpc('set_duma_agenda_item_status',{p_item_id:id,p_status:status,p_note:(note[id]||'').trim()||null});
-  if(r.error)setError(r.error.message);else await load();setBusy(false);
+  if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
  async function close(){
   if(!selected)return;setBusy(true);const r=await supabase.rpc('close_duma_session',{p_session_id:selected.id,p_create_next:true});
-  if(r.error)setError(r.error.message);else{if(r.data?.next_session_id)setSelectedId(String(r.data.next_session_id));await load()}setBusy(false);
+  if(r.error)setError(userError(r.error));else{if(r.data?.next_session_id)setSelectedId(String(r.data.next_session_id));await load()}setBusy(false);
  }
 
  return <section className="legislativeLab">

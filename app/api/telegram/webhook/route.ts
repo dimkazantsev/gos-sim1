@@ -10,7 +10,7 @@ type PrivateMessage={chat:{id:number;type:string};from?:{id:number};message_id:n
 type TelegramUpdate={message?:PrivateMessage;callback_query?:{id:string;from:{id:number};data?:string;message?:PrivateMessage}};
 export async function POST(request:Request){
  let config:ReturnType<typeof runtimeConfig>;
- try{config=runtimeConfig()}catch{return NextResponse.json({error:'Not configured'},{status:503})}
+ try{config=runtimeConfig()}catch{return NextResponse.json({error:'Сервис не настроен'},{status:503})}
  if(request.headers.get('x-telegram-bot-api-secret-token')!==config.secret)return new Response('Unauthorized',{status:401});
  let update:TelegramUpdate;try{update=await request.json() as TelegramUpdate}catch{return new Response('Bad payload',{status:400})}
  const callback=update.callback_query;
@@ -76,7 +76,7 @@ export async function POST(request:Request){
   }
   const requested=command==='/game'?args[1]:!command.startsWith('/appeal_')&&args[1]&&/^[0-9a-f-]{36}$/.test(args[1])?args[1]:undefined;
   const game=valid.find(l=>l.game_id===requested)|| (valid.length===1?valid[0]:undefined);
-  if(!game){await reply('Выберите игру командой /game UUID. Список: /games');return NextResponse.json({ok:true})}
+  if(!game){await reply('Выберите игру командой /game ИДЕНТИФИКАТОР. Список: /games');return NextResponse.json({ok:true})}
   if(command==='/game'){await reply('🏛 ГОС.ID · Игра выбрана\n\nИспользуйте кнопки бота для просмотра информации.',telegramSectionButtons('dashboard','Открыть игру'));return NextResponse.json({ok:true})}
   const prefMap:Record<string,string>={
    '/settings_brief':'daily_brief','/settings_tasks':'task_reminders',

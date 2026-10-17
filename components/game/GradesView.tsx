@@ -1,4 +1,5 @@
 'use client';
+import {gameValueLabel} from '../../lib/gameLabels';
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useDialog} from '../ui/useDialog';
@@ -358,5 +359,5 @@ function AssessmentExplanation({assessment:a,paragraphs}:{assessment:Assessment;
 
 function Evidence({evidence}:{evidence:Evidence}){
  const defs:[string,string,string][]=[['Чат и медиа','chat','text'],['Политический процесс','political_posts','body'],['Голосования','ballots','choice'],['НПА','formal_documents','body_text'],['Действия с НПА','formal_actions','note'],['Игровые документы','game_documents','body'],['Партийные документы','party_documents','note'],['Партийные действия','party_actions','status'],['Итоговый разбор','debrief','body'],['Активность','activity','label']];
- return <div className="gradeEvidenceGroups">{defs.map(([title,key,textKey])=>{const arr=(evidence[key]||[]) as any[];if(!arr.length)return null;return <details key={key} open={key==='debrief'||key==='formal_documents'}><summary>{title}<span>{arr.length}</span></summary><div>{arr.map((x,i)=><article key={x.id||i}><small>{when(x.created_at||x.submitted_at||x.updated_at)}</small><b>{x.title||x.channel||x.action||x.action_type||x.event_type||title}</b><p>{String(x[textKey]||x.text||x.label||x.file_name||x.kind||'').slice(0,3000)}</p>{x.weight!=null&&<em>Вес голоса: {x.weight}</em>}</article>)}</div></details>})}</div>;
+ return <div className="gradeEvidenceGroups">{defs.map(([title,key,textKey])=>{const arr=(evidence[key]||[]) as any[];if(!arr.length)return null;return <details key={key} open={key==='debrief'||key==='formal_documents'}><summary>{title}<span>{arr.length}</span></summary><div>{arr.map((x,i)=><article key={x.id||i}><small>{when(x.created_at||x.submitted_at||x.updated_at)}</small><b>{x.title||x.channel||gameValueLabel(x.action||x.action_type||x.event_type,title)}</b><p>{(['choice','status'].includes(textKey)?gameValueLabel(x[textKey]):String(x[textKey]||x.text||x.label||x.file_name||gameValueLabel(x.kind,''))).slice(0,3000)}</p>{x.weight!=null&&<em>Вес голоса: {x.weight}</em>}</article>)}</div></details>})}</div>;
 }

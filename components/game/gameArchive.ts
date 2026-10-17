@@ -1,3 +1,4 @@
+import {userError} from '@/lib/userError';
 import {supabase} from '@/lib/supabase';
 import {preparePortableSession,type SessionArchive} from './portableSession';
 type ArchiveFile={path:string;data:Uint8Array};
@@ -28,7 +29,7 @@ export async function enumerateGameAssets(gameId:string,bucket:'game-assets'|'ga
  const found:string[]=[];
  for(let offset=0;;offset+=100){
   const r=await supabase.storage.from(bucket).list(prefix,{limit:100,offset,sortBy:{column:'name',order:'asc'}});
-  if(r.error)throw Error('Не удалось получить список файлов '+bucket+': '+r.error.message);
+  if(r.error)throw Error('Не удалось получить список файлов '+bucket+': '+userError(r.error));
   const items=r.data||[];
   for(const item of items){
    const path=prefix+'/'+item.name;
@@ -41,7 +42,7 @@ export async function enumerateGameAssets(gameId:string,bucket:'game-assets'|'ga
 }
 export async function downloadFullGameArchive(gameId:string,onProgress?:(done:number,total:number)=>void):Promise<Blob>{
  const data=await supabase.rpc('export_game_data',{p_game:gameId});
- if(data.error||!data.data)throw Error('Не удалось экспортировать сеанс: '+(data.error?.message||'Нет данных'));
+ if(data.error||!data.data)throw Error('Не удалось экспортировать сеанс: '+(userError(data.error)||'Нет данных'));
  const portable=await preparePortableSession(data.data as SessionArchive);
  const encode=(text:string)=>new TextEncoder().encode(text);
  const entries:ArchiveFile[]=[
@@ -55,7 +56,7 @@ export async function downloadFullGameArchive(gameId:string,onProgress?:(done:nu
  const total=paths.reduce((n,x)=>n+x.paths.length,0);let done=0;
  for(const group of paths)for(const path of group.paths){
   const fetched=await supabase.storage.from(group.bucket).download(path);
-  if(fetched.error||!fetched.data)throw Error('Не удалось включить файл '+path+' в архив: '+(fetched.error?.message||'Файл недоступен'));
+  if(fetched.error||!fetched.data)throw Error('Не удалось включить файл '+path+' в архив: '+(userError(fetched.error)||'Файл недоступен'));
   entries.push({path:'media/'+group.bucket+'/'+path,data:new Uint8Array(await fetched.data.arrayBuffer())});
   onProgress?.(++done,total);
  }
@@ -68,7 +69,7 @@ export async function purgeGameAssets(gameId:string,onProgress?:(done:number,tot
   for(let i=0;i<group.paths.length;i+=100){
    const current=group.paths.slice(i,i+100);
    const r=await supabase.storage.from(group.bucket).remove(current);
-   if(r.error)throw Error('Не удалось удалить файлы '+group.bucket+': '+r.error.message);
+   if(r.error)throw Error('Не удалось удалить файлы '+group.bucket+': '+userError(r.error));
    done+=current.length;onProgress?.(done,total);
   }
  }

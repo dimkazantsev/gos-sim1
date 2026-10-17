@@ -1,4 +1,5 @@
 'use client';
+import {gameValueLabel} from '../lib/gameLabels';
 import {useRepublicGame} from './game/useRepublicGame';
 
 function fmt(seconds:number){
@@ -34,7 +35,7 @@ export default function PublicScreen({gameId}:{gameId:string}){
   <section className="publicGrid">
    <article className="publicMainCard">
     <small>{latest?'ПОСЛЕДНЕЕ СОБЫТИЕ':'ИНФОРМАЦИОННЫЙ ЦЕНТР'}</small>
-    {latest?<><div className={`publicEventType ${latest.severity}`}>{latest.category}</div><h2>{latest.title}</h2><p>{latest.body}</p><time>{new Date(latest.published_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</time></>:<><h2>Игра началась</h2><p>Новые события преподавателя будут появляться здесь автоматически.</p></>}
+    {latest?<><div className={`publicEventType ${latest.severity}`}>{gameValueLabel(latest.category,'Событие')}</div><h2>{latest.title}</h2><p>{latest.body}</p><time>{new Date(latest.published_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</time></>:<><h2>Игра началась</h2><p>Новые события преподавателя будут появляться здесь автоматически.</p></>}
    </article>
 
    <article className="publicVoteCard">
