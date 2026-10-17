@@ -54,7 +54,7 @@ begin
  if not private.is_game_teacher(e.game_id) then raise exception 'Teacher access required'; end if;
  if e.status<>'open' then raise exception 'Election is not open'; end if;
  return private.finish_municipal_mayor_election_locked(p_election_id);
-end;$function$
+end;$function$;
 
 CREATE OR REPLACE FUNCTION public.cast_municipal_mayor_ballot(p_election_id uuid, p_candidate_id uuid)
  RETURNS void
@@ -86,5 +86,5 @@ begin
        )
    )
  then perform private.finish_municipal_mayor_election_locked(e.id);end if;
-end;$function$
+end;$function$;
 
