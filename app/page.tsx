@@ -22,7 +22,7 @@ function readableError(err:unknown){
 
 /** Only allow known in-app destinations through the public entry page. */
 function incomingSectionSuffix(){
- if(typeof window==='undefined')return '';
+ if(typeof window==='undefined'||typeof URLSearchParams==='undefined')return '';
  const source=new URLSearchParams(window.location.search);
  const section=source.get('section');
  if(!section||!['dashboard','stages','votes','documents','actions','parties','profile','events','budget','grades'].includes(section))return '';
@@ -192,7 +192,7 @@ export default function Home(){
      <GameEntryQr/>
      <div className="entryPrivacy"><LockKeyhole aria-hidden="true"/><p>ФИО будет видно участникам и преподавателю. Ваши действия сохраняются в протоколе игры.</p></div>
     </form>}
-    {typeof window!=='undefined'&&incomingSectionSuffix()&&<p className="entryLinkAdvice">Ссылка из Telegram открывает нужный раздел без повторного входа только в браузере, где Вы уже авторизованы. Если Telegram открыл отдельное окно, выберите в его меню «Открыть в браузере» и используйте ссылку там. Данные для входа по ссылке не передаются.</p>}
+    {typeof window!=='undefined'&&incomingSectionSuffix()&&<p className="entryLinkAdvice">Ссылка из Телеграма открывает нужный раздел без повторного входа только в браузере, где Вы уже авторизованы. Если Телеграм открыл отдельное окно, выберите в его меню «Открыть в браузере» и используйте ссылку там. Данные для входа по ссылке не передаются.</p>}
     {personalLogin&&<form id="entry-form" className="entryForm" onSubmit={login} aria-busy={busy}>
      <div className="entryFormIntro"><span className="overline">ЛИЧНАЯ УЧЁТНАЯ ЗАПИСЬ</span><h2>Вход по паролю</h2><p>Используйте подтверждённую почту и пароль, указанные в игровом профиле. Ваши мандаты и действия сохранятся.</p></div>
      <button type="button" className="entryPersonalSwitch" onClick={()=>{setPersonalLogin(false);setError('')}}><LockKeyhole size={16}/> Вернуться ко входу по коду</button>
