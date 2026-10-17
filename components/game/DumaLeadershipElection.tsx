@@ -4,6 +4,7 @@ import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {Landmark,ClipboardList,CheckCircle2,FileClock} from 'lucide-react';
+import {isStageWorkOpen} from './stageWorkStatus';
 
 type Election={id:string;game_id:string;office_key:'gd_chair'|'gd_deputy_1'|'gd_deputy_2';office_title:string;round_no:1|2;vote_mode:'open'|'secret';status:'nomination'|'open'|'closed'|'finished';ballot_mode?:'faction'|'personal';winner_candidate_id:string|null;parent_election_id:string|null;created_at:string};
 type OfficeCandidate={id:string;election_id:string;user_id:string;party_id:string;created_at:string};
@@ -24,6 +25,7 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
  const [personalMandates,setPersonalMandates]=useState<{user_id:string;party_id:string;base_mandates:number;effective_mandates:number}[]>([]);
  const [registrations,setRegistrations]=useState<{user_id:string;stage_no:number;institution_key:string;present_mandates:number|null}[]>([]);
  const [procedureVotes,setProcedureVotes]=useState<{id:string;status:string;result_code:string|null}[]>([]);
+ const [canCoordinate,setCanCoordinate]=useState(false);
  const [office,setOffice]=useState<(typeof offices)[number][0]>('gd_chair');
  const [mode,setMode]=useState<'open'|'secret'>('open');
  const [nominee,setNominee]=useState<Record<string,string>>({});
@@ -33,14 +35,15 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
 
  async function load(){
   if(!game)return;
-  const [e,c,b,p,m,r,v]=await Promise.all([
+  const [e,c,b,p,m,r,v,permissions]=await Promise.all([
    supabase.from('office_elections').select('*').eq('game_id',game.id).eq('stage_no',4).in('office_key',['gd_chair','gd_deputy_1','gd_deputy_2']).order('created_at',{ascending:true}),
    supabase.from('office_candidates').select('*').eq('game_id',game.id).order('created_at'),
    supabase.from('office_ballots').select('*').eq('game_id',game.id),
    supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id),
    supabase.from('party_member_mandates').select('user_id,party_id,base_mandates,effective_mandates').eq('game_id',game.id),
    supabase.from('institution_session_registrations').select('user_id,stage_no,institution_key,present_mandates').eq('game_id',game.id).eq('stage_no',4).eq('institution_key','gd'),
-   supabase.from('game_votes').select('id,status,result_code').eq('game_id',game.id).eq('stage_no',4).eq('procedure_key','gd_leadership_procedure')
+   supabase.from('game_votes').select('id,status,result_code').eq('game_id',game.id).eq('stage_no',4).eq('procedure_key','gd_leadership_procedure'),
+   supabase.rpc('get_my_institution_meeting_permissions',{p_game_id:game.id,p_stage_no:4,p_institution:'gd'})
   ]);
   if(!e.error)setElections((e.data||[]) as Election[]);
   if(!c.error)setCandidates((c.data||[]) as OfficeCandidate[]);
@@ -49,7 +52,8 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
   if(!m.error)setPersonalMandates(m.data||[]);
   if(!r.error)setRegistrations(r.data||[]);
   if(!v.error)setProcedureVotes(v.data||[]);
-  const failure=[e,c,b,p,m,r,v].find(x=>x.error);if(failure?.error)setError(userError(failure.error));
+  if(!permissions.error)setCanCoordinate(!!permissions.data?.can_coordinate);
+  const failure=[e,c,b,p,m,r,v,permissions].find(x=>x.error);if(failure?.error)setError(userError(failure.error));
  }
  useEffect(()=>{void load()},[game?.id]);
  useEffect(()=>{
@@ -76,6 +80,11 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
  const myAttendance=registrations.find(r=>r.user_id===activeMe.user_id)?.present_mandates;
  const myPresent=registrations.some(r=>r.user_id===activeMe.user_id)?gdEffectivePresence(activeMe.user_id,myAttendance):0;
  const myRegistered=registrations.some(r=>r.user_id===activeMe.user_id&&r.stage_no===4&&r.institution_key==='gd');
+ const stageActive=isStageWorkOpen(activeGame,g.stages.find(st=>st.stage_no===4));
+ const canPropose=stageActive&&activeMe.kind==='student'&&myRegistered&&myPresent>0;
+ const canManage=stageActive&&(teacher||(canPropose&&canCoordinate));
+ const myFaction=parties.find(p=>p.name===activeMe.team&&p.registration_status==='registered');
+ const canNominate=stageActive&&(teacher||!!ledParty||!!(canPropose&&myFaction));
  const procedureApproved=procedureVotes.some(v=>v.status==='closed'&&v.result_code==='passed');
  const procedureOpen=procedureVotes.some(v=>v.status==='open');
  const electionCandidates=(id:string)=>candidates.filter(c=>c.election_id===id);
@@ -124,21 +133,24 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
   <div className="dumaElectionProcedure" data-procedure-status={procedureApproved?'approved':procedureOpen?'in-progress':'pending'}>
    <span className="dumaElectionProcedureIcon" aria-hidden="true">{procedureApproved?<CheckCircle2 size={22}/>:<ClipboardList size={22}/>}</span>
    <div className="dumaElectionProcedureText"><b>Утверждение порядка выборов</b><p>{procedureApproved?'Порядок утверждён. Можно выдвигать кандидатов.':procedureOpen?'Голосование по порядку выборов открыто в разделе «Голосование».':'Сначала зарегистрированные депутаты должны проголосовать по порядку избрания руководства.'}</p></div>
-   {teacher&&!procedureApproved&&!procedureOpen&&<button type="button" className="primary" disabled={busy} onClick={()=>void openProcedureVote()}>Открыть голосование</button>}
+   {(teacher||canPropose)&&!procedureApproved&&!procedureOpen&&<button type="button" className="primary" disabled={busy||!stageActive} onClick={()=>void openProcedureVote()}>{teacher?'Открыть голосование':'Предложить утверждение порядка'}</button>}
   </div>
-  {teacher&&<div className="dumaElectionCreator"><label>Должность<select value={office} onChange={e=>setOffice(e.target.value as typeof office)}>{offices.map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label><label>Форма голосования<select value={mode} onChange={e=>setMode(e.target.value as 'open'|'secret')}><option value="open">Открытое</option><option value="secret">Тайное</option></select></label><button className="primary" disabled={busy||!procedureApproved} onClick={()=>void createElection()}>Создать процедуру</button></div>}
+  {canManage&&<div className="dumaElectionCreator"><label>Должность<select value={office} onChange={e=>setOffice(e.target.value as typeof office)}>{offices.map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label><label>Форма голосования<select value={mode} onChange={e=>setMode(e.target.value as 'open'|'secret')}><option value="open">Открытое</option><option value="secret">Тайное</option></select></label><button className="primary" disabled={busy||!procedureApproved||!stageActive} onClick={()=>void createElection()}>Создать процедуру</button></div>}
 
+  {!stageActive&&<p className="dumaElectionWorkflowHint" role="status">Работа по этапу приостановлена или завершена. Новые предложения станут доступны после открытия этапа преподавателем.</p>}
+  {stageActive&&!teacher&&!myRegistered&&<p className="dumaElectionWorkflowHint" role="status">Сначала зарегистрируйтесь на заседание Государственной Думы в блоке регистрации выше.</p>}
+  {canPropose&&!canCoordinate&&procedureApproved&&sorted.length===0&&<p className="dumaElectionWorkflowHint" role="status">Порядок выборов утверждён. Создание процедуры выполняет председатель партии либо руководство Государственной Думы; зарегистрированные депутаты смогут предложить кандидатуры.</p>}
   <div className="dumaElectionList">{sorted.length===0?<div className="dumaElectionEmpty" role="status"><FileClock size={23} aria-hidden="true"/><div><strong>Выборы руководства ещё не начались</strong><p>{procedureApproved?'После создания процедуры здесь появятся кандидаты и результаты голосования.':'После утверждения порядка выборов здесь появятся процедуры избрания руководства Государственной Думы.'}</p></div></div>:sorted.map(e=>{
    const ec=electionCandidates(e.id),eb=electionBallots(e.id),winner=ec.find(c=>c.id===e.winner_candidate_id);
    const myCapacity=ledParty?activeMandates(ledParty.id):0;
    const myUsed=ledParty?usedByParty(e.id,ledParty.id):0;
-   const eligibleNominees=(ledParty?members.filter(m=>m.kind==='student'&&m.team===ledParty.name):members.filter(m=>m.kind==='student')).filter(m=>gdMandateCapacity(m.user_id)>0);
+   const eligibleNominees=(ledParty?members.filter(m=>m.kind==='student'&&m.team===ledParty.name):myFaction&&!teacher?members.filter(m=>m.kind==='student'&&m.team===myFaction.name):members.filter(m=>m.kind==='student')).filter(m=>gdMandateCapacity(m.user_id)>0);
    return <article className={'dumaElectionCard '+e.status} key={e.id}>
     <header><div><small>{e.round_no===2?'ВТОРОЙ ТУР':'ПЕРВЫЙ ТУР'} · {e.vote_mode==='secret'?'ТАЙНОЕ':'ОТКРЫТОЕ'}</small><h3>{e.office_title}</h3></div><span>{e.status==='nomination'?'Выдвижение':e.status==='open'?'Голосование':e.status==='finished'?'Избран':'Завершено'}</span></header>
 
     {e.status==='nomination'&&<div className="dumaNomination">
-     {(teacher||ledParty)&&<><select aria-label={'Кандидат: '+e.office_title} value={nominee[e.id]||''} onChange={x=>setNominee(v=>({...v,[e.id]:x.target.value}))}><option value="">Выберите кандидата…</option>{eligibleNominees.filter(m=>!ec.some(c=>c.user_id===m.user_id)).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select><button disabled={busy||!nominee[e.id]} onClick={()=>void nominate(e.id)}>Выдвинуть</button></>}
-     {teacher&&<button className="primary" disabled={busy||ec.length===0} onClick={()=>void open(e.id)}>Открыть голосование</button>}
+     {canNominate&&<><select aria-label={'Кандидат: '+e.office_title} value={nominee[e.id]||''} onChange={x=>setNominee(v=>({...v,[e.id]:x.target.value}))}><option value="">Выберите кандидата…</option>{eligibleNominees.filter(m=>!ec.some(c=>c.user_id===m.user_id)).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select><button disabled={busy||!nominee[e.id]} onClick={()=>void nominate(e.id)}>Выдвинуть</button></>}
+     {canManage&&<button className="primary" disabled={busy||ec.length===0} onClick={()=>void open(e.id)}>Открыть голосование</button>}
     </div>}
 
     <div className="dumaCandidates">{ec.map(c=>{
@@ -156,7 +168,7 @@ export default function DumaLeadershipElection({g}:{g:ReturnTypeRepublic}){
 
     {e.status==='open'&&e.ballot_mode==='personal'&&me.kind==='student'&&<div className="dumaMandateBudget"><span>Присутствуют представляемые Вами депутаты</span><b>{myPresent}</b><em>{myRegistered?'Вы зарегистрированы на заседании':'Сначала зарегистрируйтесь на заседание ГД'}</em></div>}
     {e.status==='open'&&e.ballot_mode!=='personal'&&ledParty&&<div className="dumaMandateBudget"><span>{ledParty.name}</span><b>{myUsed} / {myCapacity}</b><em>мандатов распределено</em></div>}
-    {e.status==='open'&&teacher&&<div className="dumaCloseRow"><span>Закрытие фиксирует итог; если кандидатов больше двух и 226 не набрано, создаётся второй тур.</span><button className="primary" disabled={busy} onClick={()=>void close(e.id)}>Закрыть голосование</button></div>}
+    {e.status==='open'&&canManage&&<div className="dumaCloseRow"><span>Закрытие фиксирует итог; если кандидатов больше двух и 226 не набрано, создаётся второй тур.</span><button className="primary" disabled={busy} onClick={()=>void close(e.id)}>Закрыть голосование</button></div>}
     {e.status==='finished'&&winner&&<div className="dumaWinner"><b>Избран</b><strong>{member(winner.user_id)?.full_name}</strong><span>{totalFor(e.id,winner.id)} голосов</span></div>}
    </article>
   })}</div>
