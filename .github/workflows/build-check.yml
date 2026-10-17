@@ -21,6 +21,7 @@ on:
       - 'supabase/migrations/20261017165000_ksrf_meeting_stage_guard_scope.sql'
       - 'supabase/migrations/20261017165500_ksrf_agenda_registration_gate.sql'
       - 'supabase/migrations/20261017170000_ksrf_ballot_stage_session_gate.sql'
+      - 'supabase/migrations/20261017170500_ksrf_regional_agreement_session_gate.sql'
       - 'supabase/migrations/20261017195600_ksrf_vote_description_russian.sql'
       - 'components/game/electoralMath.ts'
       - 'scripts/electoral-math-check.cjs'
