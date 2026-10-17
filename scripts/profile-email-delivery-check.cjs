@@ -77,7 +77,7 @@ async function main(){
   const next=harness({storage});await next.settle();await next.enter('person@mail.ru');assert(next.button('Повтор через 60 мин.').props.disabled);assert.equal(next.requests.length,0);assert(!next.button('Проверить подтверждение').props.disabled);await next.advance(3600);assert(!next.button('Отправить письмо для подтверждения').props.disabled);next.dispose();
  });
  await check('SMTP restriction is distinct from an account conflict',async()=>{
-  const h=harness();await h.settle();await h.enter('person@mail.ru');h.result({error:{code:'email_address_not_authorized',message:'redacted'}});await h.click('Отправить письмо для подтверждения');assert.match(h.text(),/SMTP/);assert.equal(h.button('Отправить письмо для восстановления доступа'),undefined);h.dispose();
+  const h=harness();await h.settle();await h.enter('person@mail.ru');h.result({error:{code:'email_address_not_authorized',message:'redacted'}});await h.click('Отправить письмо для подтверждения');assert.match(h.text(),/почтовый сервер/);assert.equal(h.button('Отправить письмо для восстановления доступа'),undefined);h.dispose();
  });
  await check('Incomplete addresses never trigger Auth',async()=>{
   const h=harness();await h.settle();for(const address of ['@mail.ru','user@','user @mail.ru']){await h.enter(address);await h.click('Отправить письмо для подтверждения');assert.match(h.text(),/Укажите полный адрес/);}assert.equal(h.requests.length,0);h.dispose();
