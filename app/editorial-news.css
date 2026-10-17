@@ -61,3 +61,9 @@
     gap:12px;padding:12px;margin-bottom:18px;
   }
 }
+
+.wallPost.systemNotice .processSourceVisual{display:none}
+.wallPost.systemNotice .wallPostAvatar>.gosIdMark{width:40px;height:40px;min-width:40px;font-size:20px}
+@media(max-width:650px){
+ .wallPost.systemNotice .wallPostAvatar>.gosIdMark{width:36px;height:36px;min-width:36px;font-size:18px;border-radius:10px}
+}

@@ -101,6 +101,34 @@ async function run(){
     console.log('PASS political post header '+mode+' '+width+'px: statuses, long labels, no overlap');
    }
   }
+
+  for(const width of [1440,768,390,320]){
+   await page.locator('#screen').selectOption('actions');
+   await page.locator('#preview').evaluate((el,value)=>{el.style.width=value+'px'},width);
+   const post=frame.locator('.wallFeed > .wallPost').first();
+   await post.evaluate(el=>{
+    el.classList.remove('bulkSelecting');el.classList.add('systemNotice');
+    el.querySelector('.wallBulkPostSelect')?.remove();
+    el.querySelector('.wallPostWho b').textContent='ГОС.ID';
+    el.querySelector('.wallPostWho small').textContent='Системное уведомление · 17.10.2026, 14:10';
+    el.querySelector('.wallPostAvatar').innerHTML='<span class="brandMark gosIdMark gosIdMark--blue-pink" aria-hidden="true">ID</span>';
+    el.querySelector('h2').textContent='Открыт этап 3: Выборы в субъектах Российской Федерации';
+   });
+   const measured=await post.evaluate(el=>{
+    const avatar=el.querySelector('.wallPostAvatar').getBoundingClientRect(),logo=el.querySelector('.gosIdMark').getBoundingClientRect();
+    const source=el.querySelector('.processSourceVisual');
+    return {overflow:el.scrollWidth-el.clientWidth,avatar:{left:avatar.left,right:avatar.right},logo:{left:logo.left,right:logo.right,width:logo.width,height:logo.height},
+     sourceVisible:source?getComputedStyle(source).display!=='none':false};
+   });
+   assert(measured.overflow<=2,'System notice overflow '+width+'px '+JSON.stringify(measured));
+   assert.equal(measured.logo.width,measured.logo.height,'Square brand mark');
+   assert(measured.logo.left>=measured.avatar.left-1&&measured.logo.right<=measured.avatar.right+2,'Brand mark fits avatar '+width+'px '+JSON.stringify(measured));
+   assert(!measured.sourceVisible,'System notices have compact content without a media source banner');
+   await post.screenshot({path:path.join(screenshots,'gos-id-stage-notice-'+width+'.png'),animations:'disabled'});
+   console.log('PASS ГОС.ID stage notice '+width+'px: approved ID mark, compact card, no overflow');
+  }
+
  }finally{await browser.close()}
 }
 run().catch(e=>{console.error(e);process.exitCode=1});
+
