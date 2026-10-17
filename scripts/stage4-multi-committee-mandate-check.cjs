@@ -33,6 +33,7 @@ const id=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
    'create function private.member_party_id(g uuid,u uuid) returns uuid language sql stable as $p$select p.id from game_parties p join game_members gm on gm.game_id=p.game_id and gm.team=p.name where p.game_id=g and gm.user_id=u limit 1$p$;',
    "create function private.gd_member_capacity(g uuid,u uuid) returns integer language sql stable as $c$select case when exists(select 1 from game_members where game_id=g and user_id=u and kind='student' and roster_archived_at is null) then 225 else 0 end$c$;"
   ].join('\n'));
+  await db.query('insert into auth.users values($1),($2),($3)',[a,b,teacher]);
   await db.query('insert into games values($1)',[game]);
   await db.query("insert into game_stages values($1,4,'open')",[game]);
   await db.query('insert into game_parties values($1,$2,$3,$4,$5),($6,$2,$7,$4,$8)',[partyA,game,'ЛДПР','registered',a,partyB,'Рама',b]);
