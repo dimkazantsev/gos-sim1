@@ -15,6 +15,7 @@ function harness(){
   if(request==='react')return react;
   if(request==='react/jsx-runtime')return require(request);
   if(request==='@/lib/supabase')return{supabase};
+  if(request==='@/lib/userError')return {userError:error=>String(error?.message||error)};
   if(['./useGameTableSync','./stageSystem','./stageRealtimeTables'].includes(request)){
    if(!loaded.has(request)){const module={exports:{}};const code=transpile(fs.readFileSync(path.join(root,'components/game',request.slice(2)+'.ts'),'utf8'));vm.runInContext('(function(require,module,exports){'+code+'\n})',context)(requireFor,module,module.exports);loaded.set(request,module.exports);}return loaded.get(request);
   }

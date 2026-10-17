@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {fileURLToPath} from 'node:url';
-import {applyPortableAction} from './engine.mjs';
+import {applyPortableAction,portableErrorMessage} from './engine.mjs';
 const root=path.dirname(fileURLToPath(import.meta.url));
 const original=JSON.parse(fs.readFileSync(path.join(root,'game.json'),'utf8'));
 if(original.format!=='GOS-SIMS'||![1,2].includes(original.schema))throw Error('Некорректный Архив Сеанса');
@@ -90,6 +90,6 @@ const server=http.createServer(async(req,res)=>{
    res.writeHead(200,{'Content-Type':type,'X-Content-Type-Options':'nosniff'});fs.createReadStream(file).pipe(res);return;
   }
   json(res,404,{error:'Страница Не Найдена'});
- }catch(error){json(res,400,{error:error.message||'Ошибка Сеанса'})}
+ }catch(error){json(res,400,{error:portableErrorMessage(error)})}
 });
-server.listen(port,host,()=>{console.log('GOS//SIMS: http://localhost:'+port);console.log('Код Преподавателя: '+teacherCode);console.log('Код Участников: '+studentCode);console.log('Гость Не Требует Кода. Прогресс Сохраняется В Progress.json.');});
+server.listen(port,host,()=>{console.log('ГОС.ID: http://localhost:'+port);console.log('Код Преподавателя: '+teacherCode);console.log('Код Участников: '+studentCode);console.log('Гость Не Требует Кода. Прогресс Сохраняется В progress.json.');});

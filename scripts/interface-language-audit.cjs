@@ -5,15 +5,15 @@ const attributes=new Set(['title','label','placeholder','aria-label','alt','unit
 const allowed=/Goust Voting|ГОС[./\u200B]*ID|\b(?:PDF|DOCX?|XLSX?|TXT|URL|HTTP|HTTPS|HTML|CSS|SVG|PNG|JPE?G|WEBP|CSV|API|QR|JSON|ZIP|XML|I|II|III|IV|V|VI|VII|VIII|IX|X|S1A1)\b/gi;
 function words(value){
  return String(value)
+  .replace(/<[^>]+>|&[A-Za-z#0-9]+;/g,'')
   .replace(/\b(?:[a-z0-9-]+\.)+(?:com|org|net|io|ru)(?:\/[^\s'\"<>]*)?/gi,'')
   .replace(/node\s+server\.mjs|\bmedia\b|(?:docs|slides)\.google\.com(?:\/[^\s'\"<>]*)?/gi,'')
   .replace(/https?:\/\/[^\s'"<>]+|[\w.+-]+@[\w.-]+|(?:[\w-]+\/)*[\w.-]+\.(?:html|json|mjs|cjs|txt|pdf|docx?|csv|zip)\b/gi,'')
   .replace(/\/(?:start|game|games|status|stages|votes|docs|channels|chat|appeal|appeal_test|appeals|reply|menu|help)\b/g,'')
-  .replace(/node\s+server\.mjs|Node\.js|GOS_(?:TEACHER|STUDENT)_CODE|\bGOS-2026\b/g,'')
+  .replace(/node\s+server\.mjs|Node\.js|GOS_(?:TEACHER|STUDENT)_CODE|\bGOS-2026\b|\bPREPOD2026\b/g,'')
   .replace(allowed,'').match(/[A-Za-z][A-Za-z_]{1,}/g);
 }
-function inspect(file){
- const content=fs.readFileSync(file,'utf8');
+function inspect(file,content=fs.readFileSync(file,'utf8')){
  const source=ts.createSourceFile(file,content,ts.ScriptTarget.Latest,true,file.endsWith('x')?ts.ScriptKind.TSX:ts.ScriptKind.TS);
  const relative=path.relative(root,file).replaceAll('\\','/');
  function report(node,value){
@@ -47,7 +47,7 @@ function walk(dir){
   else if(/\.(?:ts|tsx|js|mjs)$/.test(file))inspect(file);
  }
 }
-for(const dir of ['app','components','lib','production-app','supabase/functions'])walk(path.join(root,dir));
+for(const dir of ['app','components','lib','production-app','supabase/functions','public/portable','demo'])walk(path.join(root,dir));
 function scanAssets(dir){
  if(!fs.existsSync(dir))return;
  for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
@@ -55,6 +55,7 @@ function scanAssets(dir){
   if(entry.isDirectory()){scanAssets(file);continue;}
   if(!/\.(?:svg|html)$/.test(file))continue;
   const content=fs.readFileSync(file,'utf8'),svg=file.endsWith('.svg');
+  if(!svg)for(const script of content.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi))inspect(file,script[1]);
   const values=svg?[...content.matchAll(/<(text|title|desc)\b[^>]*>([\s\S]*?)<\/\1>/gi)].map(m=>m[2].replace(/<[^>]+>/g,'')):
    [...content.replace(/<script\b[^>]*>[\s\S]*?<\/script>|<style\b[^>]*>[\s\S]*?<\/style>|<code\b[^>]*>[\s\S]*?<\/code>/gi,'').matchAll(/>([^<>]+)</g)].map(m=>m[1]);
   for(const value of values){
