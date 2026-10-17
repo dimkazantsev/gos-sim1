@@ -1018,3 +1018,71 @@
  .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateEdit{grid-column:1/-1;justify-content:flex-start}
  .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateRemainder{padding:0 12px 12px}
 }
+
+/* Stage 4: an editable deputy is two rows, never five squeezed columns.
+   Keep the role, mandate ledger and stage 9 ministry styling untouched. */
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitMembers > .committeeMandateMember{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) auto auto;
+ align-items:center;
+ gap:8px 10px;
+ min-width:0;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateMember > :is(span,small,b){
+ min-width:0;
+ line-height:1.45;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateMember > b{
+ white-space:nowrap;
+ font-variant-numeric:tabular-nums;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateMember > .committeeMandateEdit{
+ grid-column:1 / -1;
+ display:grid;
+ grid-template-columns:minmax(62px,88px) minmax(100px,114px) 44px;
+ align-items:center;
+ justify-content:end;
+ gap:8px;
+ min-width:0;
+ width:100%;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateMember .committeeMandateEdit input{
+ width:100%;
+ min-width:0;
+ min-height:44px;
+ text-align:center;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateMember .committeeMandateEdit button:not(.gsIconAction){
+ width:100%;
+ min-width:100px;
+ min-height:44px;
+ flex-shrink:0;
+ white-space:nowrap;
+ overflow-wrap:normal;
+ word-break:keep-all;
+ text-align:center;
+}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateMember .committeeMandateEdit > .gsIconAction{
+ width:44px;
+ min-width:44px;
+ height:44px;
+ min-height:44px;
+ padding:0;
+ flex-shrink:0;
+ justify-self:end;
+}
+@container stage4-committees (max-width:490px){
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .unitMembers > .committeeMandateMember{
+  grid-template-columns:minmax(0,1fr) auto;
+ }
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateMember > span{
+  grid-column:1 / -1;
+ }
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateMember > .committeeMandateEdit{
+  grid-template-columns:minmax(58px,80px) minmax(98px,1fr) 42px;
+  gap:6px;
+ }
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateMember .committeeMandateEdit > .gsIconAction{
+  width:42px;min-width:42px;height:44px;
+ }
+}
