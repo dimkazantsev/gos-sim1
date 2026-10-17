@@ -143,19 +143,19 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
    {activeError&&<p role="alert">{activeError}</p>}
    {loading&&<p role="status">Обновление списка…</p>}
    {!loading&&!error&&!rows.length&&<p className="blitzArchiveEmpty">{filter==='pending'?'Неотвеченных вопросов нет.':'Ответов пока нет.'}</p>}
-   <div className="blitzArchiveList">{rows.map(r=>{
+   <div className="blitzArchiveList">{rows.map((r,index)=>{
     const answered=Boolean(r.answered_at),correct=answered&&r.is_correct===true;
     const available=!r.available_at||Date.parse(r.available_at)<=Date.now();
     const choice=r.chosen_index==null||r.chosen_index<0?'Ответ не дан (время истекло)':r.options?.[r.chosen_index]||'Ответ не найден';
     const correctAnswer=r.correct_index!=null&&r.correct_index>=0?r.options?.[r.correct_index]||'Ответ недоступен':'Ответ недоступен';
     return <article key={r.id} className={'blitzHistoryCard '+(answered?(correct?'isCorrect':'isIncorrect'):'isPending')}>
-     <div className="blitzHistoryMeta"><span className="blitzHistoryStage">Этап {r.stage_no} · {r.topic}</span><span className="blitzHistoryStatus">{answered?(correct?'Верно':'Неверно'):available?'Ожидает ответа':'Запланирован'}</span></div>
+     <div className="blitzHistoryMeta"><span className="blitzHistoryStage">Этап {r.stage_no}{answered&&r.topic?' · '+r.topic:''}</span><span className="blitzHistoryStatus">{answered?(correct?'Верно':'Неверно'):available?'Ожидает ответа':'Запланирован'}</span></div>
      {answered?<><p className="blitzHistoryQuestion">{r.question}</p>
       <div className="blitzHistoryAnswers"><div className="blitzHistoryAnswer blitzHistoryAnswerCorrect"><span>Правильный ответ</span><strong>{correctAnswer}</strong></div>
        <div className="blitzHistoryAnswer blitzHistoryAnswerStudent"><span>Ваш ответ</span><strong>{choice}</strong></div></div>
       {(r.explanation||r.legal_act||r.source_url)&&<details className="blitzHistoryExplain"><summary>Пояснение и правовой источник</summary>{r.explanation&&<p>{r.explanation}</p>}{(r.legal_act||r.source_url)&&legal(r)}</details>}
-     </>:<div className="blitzHistoryPending"><button type="button" className="blitzPendingQuestion" disabled={!available||!!active} onClick={()=>void openSelected(r.id)}>{r.question||"Вопрос ожидает загрузки"}</button><p>Варианты станут доступны после открытия и запуска таймера на 20 секунд.</p>
-      <button type="button" className="secondary" disabled={!available} onClick={()=>void openSelected(r.id)}>{available?'Открыть вопрос · 20 секунд':'Пока недоступен'}</button></div>}
+     </>:<div className="blitzHistoryPending"><button type="button" className="blitzPendingQuestion" disabled={!available||!!active} onClick={()=>void openSelected(r.id)}>Блиц-вопрос № {index+1}</button><p>Текст и варианты появятся только после начала попытки. С этого момента даётся 20 секунд на ответ.</p>
+      <button type="button" className="secondary" disabled={!available||!!active} onClick={()=>void openSelected(r.id)}>{available?'Начать · 20 секунд':'Пока недоступен'}</button></div>}
 
      {active?.id===r.id&&<div className="blitzInlineQuiz" role="group" aria-label="Открытый блиц-вопрос">
       <div className="blitzInlineTimer"><strong>Вопрос открыт</strong><span>{activeFeedback?'Ответ сохранён':activeSeconds+' секунд'}</span></div>
