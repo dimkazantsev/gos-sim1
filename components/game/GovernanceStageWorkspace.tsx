@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect,useState,type CSSProperties} from 'react';
+import {useCallback,useEffect,useState,type CSSProperties} from 'react';
 import {ArrowLeft,BookOpenText,CalendarClock,CheckCircle2,ChevronLeft,ChevronRight,ClipboardCheck,FileText,Landmark,Link2,MessageCircle,Route,Settings2,Vote} from 'lucide-react';
 import {isStageWorkOpen,stageWorkLabel} from './stageWorkStatus';
 import type {Stage,View} from './types';
@@ -54,6 +54,10 @@ const BODIES:Partial<Record<number,string[]>>={2:['ksrf'],3:['ksrf'],4:['gd'],5:
 
 export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,onOpenStage,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate}:Props){
  const [tab,setTab]=useState<Tab>('work');
+ const [sessionGate,setSessionGate]=useState<{stage:number;ready:boolean}|null>(null);
+ const onMeetingReadyChange=useCallback((ready:boolean)=>{
+  setSessionGate(old=>old?.stage===stage.stage_no&&old.ready===ready?old:{stage:stage.stage_no,ready});
+ },[stage.stage_no]);
  const [liveRule,setLiveRule]=useState<{deadline_at:string|null;inclusive:boolean;penalty_points:number;penalty_description:string;consequence_type:string;consequence_magnitude:number|null}|null>(null);
  useEffect(()=>{
   if(!g.game)return;
@@ -82,6 +86,8 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
  const teacher=g.teacher&&!readOnly;
  const stageLocked=!isStageWorkOpen(g.game,stage);
  const viewer=readOnly||g.me?.kind==='observer'||(stageLocked&&!teacher);
+ const ksrfSessionBlocked=(stage.stage_no===2||stage.stage_no===3)&&!teacher&&
+  !(sessionGate?.stage===stage.stage_no&&sessionGate.ready);
  useEffect(()=>{if(!teacher&&tab==='settings')setTab('work')},[teacher,tab]);
  const tabs:{id:Tab;title:string;icon:typeof Route;count?:number}[]=[
   {id:'work',title:'Работа',icon:Landmark},
@@ -109,9 +115,10 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
   <section id={sectionId+'-work'} className="stageOperationsPane" hidden={tab!=='work'} aria-label="Рабочие процедуры">
    <div className="stageOperationsHandoff"><div><small>Основание</small><span>{operation.input}</span></div><ChevronRight size={18} aria-hidden="true"/><div><small>Результат этапа</small><span>{operation.output}</span></div></div>
    {viewer&&<p className="stageOperationsNotice" role="status">{readOnly?'Просмотр участника. Изменение данных отключено.':g.me?.kind==='observer'?'Гостевой просмотр. Рабочие действия доступны назначенным участникам.':stageLocked?'Этап завершён или ещё не открыт. Изменение данных недоступно до решения преподавателя.':''}</p>}
-   <fieldset className="stageOperationsControls" disabled={viewer}>
+   {bodies&&<div className="stageOperationsRegistration"><InstitutionRegistrationPanel g={g} readOnly={stage.stage_no===2||stage.stage_no===3?readOnly||g.me?.kind==='observer':viewer} stageNo={stage.stage_no} initialBody={bodies[0]} allowedBodies={bodies} onOpenDocument={onOpenDocument} onMeetingReadyChange={onMeetingReadyChange}/></div>}
+   {ksrfSessionBlocked&&!viewer&&<p className="stageOperationsNotice" role="status">Действия КСРФ станут доступны после утверждения повестки и вашей регистрации на заседание. Сначала выполните эти действия в блоке выше.</p>}
+   <fieldset className="stageOperationsControls" disabled={viewer||ksrfSessionBlocked}>
     <legend className="srOnly">Действия этапа {stage.stage_no}</legend>
-    {bodies&&<div className="stageOperationsRegistration"><InstitutionRegistrationPanel g={g} readOnly={viewer} stageNo={stage.stage_no} initialBody={bodies[0]} allowedBodies={bodies} onOpenDocument={onOpenDocument}/></div>}
     <div className="stageOperationsModules">
      {stage.stage_no===1&&<section className="stageOperationsFoundation"><h2>Создание и регистрация партии</h2><p>Название, идеология, программа, устав, символика и регистрационные документы заполняются в разделе «Партии и фракции». Минюст проверяет пакет; замечания и итог регистрации доступны участникам.</p><div className="stageOperationsPartyList">{g.parties.map(p=><article key={p.id}><strong>{p.name}</strong><span>{p.registration_status==='registered'?'Зарегистрирована':p.registration_status==='submitted'?'На проверке':p.registration_status==='revision'?'Нужна доработка':p.registration_status==='rejected'?'Отклонена':'Черновик'}</span></article>)}</div>{!g.parties.length&&<p>Партии пока не созданы.</p>}<button type="button" className="primary" disabled={!onNavigate} onClick={()=>onNavigate?.('parties')}>Открыть партии и регистрационные пакеты</button></section>}
      {(stage.stage_no===2||stage.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={stage.stage_no as 2|3} onOpenVotes={onOpenVotes}/>}
