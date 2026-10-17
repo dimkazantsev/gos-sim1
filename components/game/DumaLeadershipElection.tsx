@@ -126,7 +126,7 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
  const repeatNeeded=elections.filter(e=>e.status==='closed'&&!e.winner_candidate_id
   &&!electedKeys.has(e.office_key)&&!activeKeys.has(e.office_key)
   &&elections.filter(t=>t.office_key===e.office_key).every(t=>t.status==='closed'));
- const displayedElections=sorted.filter(e=>!(e.status==='nomination'&&electionCandidates(e.id).length===0&&electedKeys.has(e.office_key)));
+ const displayedElections=sorted.filter(e=>!(['nomination','closed'].includes(e.status)&&electionCandidates(e.id).length===0&&electedKeys.has(e.office_key)));
 
 
  return <section className="dumaElection">
