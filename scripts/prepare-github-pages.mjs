@@ -37,10 +37,17 @@ transform('app/layout.tsx',
  "type:'website',locale:'ru_RU',url:'/',siteName:BRAND_NAME,",
  "type:'website',locale:'ru_RU',url:"+JSON.stringify(pagesUrl)+",siteName:BRAND_NAME,");
 let home=readFileSync(resolve(target,'app/page.tsx'),'utf8');
-for(const target of ['r.data','resumedGameId']){
- const original="router.push('/game/'+"+target+")";
+// Static Pages uses ?game=... instead of Vercel's /game/:id route.
+// Preserve validated Telegram section/deep-link parameters on every transition.
+for(const [method,target] of [
+ ['push','r.data'],['push','resumedGameId'],
+ ['replace','rows.data[0].game_id'],['replace','String(resume.data)']
+]){
+ const original="router."+method+"('/game/'+"+target+"+incomingSectionSuffix())";
  if(!home.includes(original))throw Error('Static game entry adapter is missing: '+original);
- home=home.replaceAll(original,"window.location.assign("+JSON.stringify(base+'/?game=')+"+"+target+")");
+ home=home.replaceAll(original,
+  "window.location.assign("+JSON.stringify(base+'/?game=')+"+"+target+
+  "+(incomingSectionSuffix()?'&'+incomingSectionSuffix().slice(1):''))");
 }
 home=home.replaceAll('href="/"','href='+JSON.stringify(base+'/'));
 writeFileSync(resolve(target,'components/StaticLanding.tsx'),home);

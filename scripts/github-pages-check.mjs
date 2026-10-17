@@ -96,7 +96,7 @@ assert.ok(securityPanel.includes('NEXT_PUBLIC_GAME_API_ORIGIN')&&securityPanel.i
 const staticLanding=readFileSync(join(built,'components/StaticLanding.tsx'),'utf8');
 assert.ok(staticLanding.includes(base+'/?game='),'Dynamic game entry must use the static route.');
 for(const variable of ['r.data','resumedGameId']){
- assert.ok(staticLanding.includes('window.location.assign('+JSON.stringify(base+'/?game=')+'+'+variable+')'),
+ assert.ok(staticLanding.includes('window.location.assign('+JSON.stringify(base+'/?game=')+'+'+variable+"+(incomingSectionSuffix()?'&'+incomingSectionSuffix().slice(1):''))"),
   'Pages entry must navigate directly to the static game route: '+variable);
  assert.ok(!staticLanding.includes("router.push('/game/'+"+variable+")"),
   'Pages must not navigate to an unsupported dynamic game route: '+variable);
