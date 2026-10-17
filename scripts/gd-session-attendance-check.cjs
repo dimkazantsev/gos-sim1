@@ -20,7 +20,7 @@ for(const section of ['civicMeetingDocuments','civicMeetingSteps','civicAttendan
  const gameId='10000000-0000-0000-0000-000000000001';
  const ids=Array.from({length:40},(_,i)=>'20000000-0000-0000-0000-'+String(i+1).padStart(12,'0'));
  const setUser=async id=>db.query("select set_config('request.jwt.claim.sub',$1,false)",[id]);
- const cap=async id=ids[0]=>(await db.query('select private.gd_member_capacity($1,$2) value',[gameId,id])).rows[0].value;
+ const cap=async (id=ids[0])=>(await db.query('select private.gd_member_capacity($1,$2) value',[gameId,id])).rows[0].value;
  const report=async()=>(await db.query('select public.get_gd_session_attendance($1,4) value',[gameId])).rows[0].value;
  const save=async value=>(await db.query('select public.set_gd_session_attendance($1,4,$2)',[gameId,value]));
  try{
