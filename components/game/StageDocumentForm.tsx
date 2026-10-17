@@ -17,8 +17,8 @@ export default function StageDocumentForm({g,templateKey,stageNo,onSaved,onCance
  const officeOptions=actingOfficeOptions(g,subject),actingOffice=officeOptions.find(x=>x.value===actingOfficeChoice)||officeOptions[0];
  async function save(){if(busy||!subject||(!g.teacher&&!actingOffice)||title.trim().length<3||body.trim().length<10||!issueDate||issuePlace.trim().length<2)return;const s=FORMAL_SUBJECTS.find(x=>x.key===subject)!,type=FORMAL_TYPES.find(x=>x.key===t.docType)!;if(file&&file.size>25*1024*1024){setError('Размер файла не должен превышать 25 МБ.');return}setBusy(true);try{const id=await g.createFormalDocument({stageNo,title:title.trim(),bodyText:body.trim(),docType:t.docType,subjectKey:subject,subjectLabel:s.label,workflowKey:type.workflow,metadata:{template_key:t.key,stage_form:true,issue_date:issueDate,issue_place:issuePlace.trim(),issuer:issuer.trim()||s.label,acting_office_id:actingOffice?.id||null,acting_office_title:actingOffice?.role||null,acting_user_id:actingOffice?.userId||null,basis:basis.trim()||null}},file||undefined);if(id){setError('');onSaved(id)}}catch(e){setError(userError(e))}finally{setBusy(false)}}
  return <form className="stageDocumentForm stageDocumentFormFull" onSubmit={e=>{e.preventDefault();void save()}}>
- <header><div><small>Документ этапа {stageNo}</small><h4>{t.title}</h4></div><FileUp size={24}/></header>
- <p>Можно заполнить документ прямо здесь или приложить готовый файл. Система присвоит реестровый номер и свяжет документ с этапом; все реквизиты сохраняются вместе с НПА.</p>
+ <header><div><small>Официальный документ</small><h4>{t.title}</h4></div><FileUp size={24}/></header>
+ <p>Можно заполнить документ прямо здесь или приложить готовый файл. Документу будет присвоен регистрационный номер; все реквизиты сохранятся в Реестре НПА.</p>
  <section className="stageDocumentSection"><div className="stageDocumentSectionHead"><small>01</small><div><b>Реквизиты</b><span>Кто, где и когда оформляет документ</span></div></div>
   <div className="stageDocumentFields">
    <label>Название документа<input aria-label="Название документа" value={title} onChange={e=>setTitle(e.target.value)} required minLength={3}/></label>
@@ -41,6 +41,6 @@ export default function StageDocumentForm({g,templateKey,stageNo,onSaved,onCance
  {!subjects.length&&<p role="status">Для создания документа требуется соответствующее действующее назначение.</p>}
  {error&&<p role="alert" className="error">{error}</p>}
  <footer><button type="button" className="secondary" onClick={onCancel} disabled={busy}>Отмена</button><button type="submit" className="primary" disabled={busy||(!g.teacher&&!actingOffice)||!subject||!subjects.some(s=>s.key===subject)||title.trim().length<3||body.trim().length<10||!issueDate||issuePlace.trim().length<2}><Save size={18}/>{busy?'Сохранение…':'Сохранить документ в реестр'}</button></footer>
- <p className="stageDocumentHint"><CheckCircle2 size={17}/> После сохранения документ появится в результатах этапа и в Реестре НПА.</p>
+ <p className="stageDocumentHint"><CheckCircle2 size={17}/> После регистрации документ появится в Реестре НПА.</p>
  </form>;
 }
