@@ -19,7 +19,7 @@ function pct(n:number,d:number){return d>0?Math.round(n/d*100):0}
 function time(v:string){return new Date(v).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
 
 export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClearFocus}:{g:ReturnTypeRepublic;onOpenDocument:(id:string)=>void;onOpenStages:()=>void;focusId?:string;onClearFocus?:()=>void}){
- const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,createVote,canVote,castVote,closeVote,deleteVote,tally,quorum}=g;
+ const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,gdMandateCapacity,createVote,canVote,castVote,closeVote,deleteVote,tally,quorum}=g;
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[mode,setMode]=useState<'member'|'faction'|'mandate'>('member');
  const [institution,setInstitution]=useState('all'),[quorumValue,setQuorumValue]=useState(0.5),[majorityKind,setMajorityKind]=useState<'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction'>('present_majority'),[majorityValue,setMajorityValue]=useState(0.5);
  const [tab,setTab]=useSavedGameState<'open'|'closed'|'all'>(g.game?.id,g.me?.user_id,'votes-tab','open',savedChoice('open','closed','all')),[busy,setBusy]=useState('');
@@ -29,14 +29,14 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  const pendingNpas=formalDocuments.filter(d=>votePresetForDocument(d)&&!votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open'));
  const focused=useRef('');
  useEffect(()=>{if(focusId)setTab('all')},[focusId]);
- const [checkedIn,setCheckedIn]=useState<{user_id:string;institution_key:string;stage_no:number}[]>([]);
+ const [checkedIn,setCheckedIn]=useState<{user_id:string;institution_key:string;stage_no:number;present_mandates:number|null}[]>([]);
  const [checkinLoaded,setCheckinLoaded]=useState(false);
  useEffect(()=>{
   if(!g.game)return;
   let live=true;
   async function reload(){
    const game=g.game;if(!game)return;
-   const r=await supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no').eq('game_id',game.id);
+   const r=await supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates').eq('game_id',game.id);
    if(live&&!r.error){setCheckedIn(r.data||[]);setCheckinLoaded(true)}
   }
   void reload();
@@ -51,7 +51,8 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   return !voteNeedsRegistration(v)||
    checkedIn.some(row=>row.user_id===me?.user_id&&row.institution_key===v.institution_key&&row.stage_no===v.stage_no);
  }
- function canCast(v:Vote){return canVote(v)&&isRegisteredForVote(v)}
+ function canCast(v:Vote){return canVote(v)&&isRegisteredForVote(v)&&(v.institution_key!=='gd'||gdPresentWeight(v)>0)}
+ function gdPresentWeight(v:Vote){const mine=checkedIn.find(r=>r.user_id===me?.user_id&&r.institution_key==='gd'&&r.stage_no===v.stage_no);return Math.min(Math.max(0,Number(mine?.present_mandates)||0),Number(v.electorate_snapshot?.weights?.[me?.user_id||'']||0),gdMandateCapacity(me?.user_id||''));}
  const focusedVote=focusId?votes.find(v=>v.id===focusId):undefined;
  const focusedNeedsRegistration=!!focusedVote&&voteNeedsRegistration(focusedVote)&&!isRegisteredForVote(focusedVote);
  useEffect(()=>{
@@ -182,15 +183,15 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
     {v.status==='open'&&v.electorate_snapshot?.attendance_required&&!v.procedure_key?.startsWith('budget_')&&v.procedure_key!=='bill_amendments'&&doc?.workflow_key!=='budget'&&<p className="voteAutoClosureHint">Голосование автоматически закроется после последнего голоса зарегистрированного участника при наличии кворума. Председательствующий или преподаватель также может закрыть его вручную.</p>}
     <div className="quorumMeter"><div><span>Присутствует: {q.present} из {q.eligible} · Подано: {q.cast}</span><b className={q.met?'ok':'wait'}>{q.met?'КВОРУМ ЕСТЬ':'НУЖНО '+Math.max(0,q.needed-q.present)}</b></div><i><em style={{width:Math.min(100,pct(q.present,q.eligible))+'%'}}/></i></div>
     {v.voting_mode==='mandate'&&<details className="deputyRegistration" open={v.status==='open'}>
-     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{partyMandates.filter(a=>v.procedure_key!=='registered_session'||checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)).reduce((a,x)=>a+x.effective_mandates,0)} / {parties.reduce((a,p)=>a+Number(p.mandates||0),0)} участвует · Goust Voting −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
+     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{checkedIn.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no).reduce((a,x)=>a+Math.min(gdMandateCapacity(x.user_id),Math.max(0,Number(x.present_mandates)||0)),0)} / 450 присутствует · Гоствойтинг −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
      <div className="deputyRegistrationBody">
       {parties.filter(p=>p.mandates>0).map(p=>{
        const rows=partyMandates.filter(x=>x.party_id===p.id);
        const base=rows.reduce((a,x)=>a+x.base_mandates,0);
        const effective=rows.reduce((a,x)=>a+x.effective_mandates,0);
        return <article key={p.id}>
-        <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{base} мандатов · {effective} доступно{p.ghost_active?' · Goust Voting −'+p.ghost_loss_current:''}{p.representation_penalty?' · Потеря мест −'+p.representation_penalty:''}</small></div></header>
-        <div>{rows.map(a=>{const m=members.find(x=>x.user_id===a.user_id);return <div className="deputyStudentRow" key={a.user_id}><b>{m?.full_name||'Участник'}</b><span>{a.base_mandates} манд.</span><em>{[a.ghost_loss?'−'+a.ghost_loss+' Goust Voting':'',a.representation_loss?'−'+a.representation_loss+' мест':''].filter(Boolean).join(' · ')||'—'}</em><strong>{a.effective_mandates} голосов {v.procedure_key==='registered_session'?(checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)?'· На заседании':'· Не зарегистрирован'):''}</strong></div>})}</div>
+        <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{base} мандатов · {effective} доступно{p.ghost_active?' · гоствойтинг −'+p.ghost_loss_current:''}{p.representation_penalty?' · Потеря мест −'+p.representation_penalty:''}</small></div></header>
+        <div>{rows.map(a=>{const m=members.find(x=>x.user_id===a.user_id);return <div className="deputyStudentRow" key={a.user_id}><b>{m?.full_name||'Участник'}</b><span>{a.base_mandates} манд.</span><em>{[a.ghost_loss?'−'+a.ghost_loss+' гоствойтинг':'',a.representation_loss?'−'+a.representation_loss+' мест':''].filter(Boolean).join(' · ')||'—'}</em><strong>{a.effective_mandates} мандатов {v.procedure_key==='registered_session'?(checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)?'· На заседании':'· Не зарегистрирован'):''}</strong></div>})}</div>
        </article>
       })}
      </div>
@@ -204,10 +205,10 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
     </div>
 
     {v.status==='open'?<div className="proceduralVoteActions">
-     <VoteBallotControls vote={v} maxWeight={g.ballotWeight(v)} canCast={canCast(v)} ballot={my} onSubmit={(yes,no,abstain)=>g.castVoteAllocation(v,yes,no,abstain)}/>
+     <VoteBallotControls vote={v} maxWeight={v.institution_key==='gd'?gdPresentWeight(v):g.ballotWeight(v)} canCast={canCast(v)} ballot={my} onSubmit={(yes,no,abstain)=>g.castVoteAllocation(v,yes,no,abstain)}/>
      {!canVote(v)&&<small className="voteNotEligible">Вашей игровой роли не предоставлено право голоса в этой процедуре.</small>}
      {canVote(v)&&!isRegisteredForVote(v)&&<small className="voteNotEligible">Сначала отметьте присутствие в панели регистрации выше, затем голосуйте.</small>}
-     {v.voting_mode==='mandate'&&canVote(v)&&<small className="myMandateWeight">Ваш вес в этом голосовании: <b>{partyMandates.find(x=>x.user_id===me?.user_id)?.effective_mandates||0}</b> депутатских голосов.</small>}
+     {v.voting_mode==='mandate'&&canVote(v)&&<small className="myMandateWeight">Ваш вес в этом голосовании: <b>{v.institution_key==='gd'?gdPresentWeight(v):partyMandates.find(x=>x.user_id===me?.user_id)?.effective_mandates||0}</b> присутствующих депутатских голосов.</small>}
      {canClose(v)&&<button className="primary closeProceduralVote" disabled={busy===v.id} onClick={async()=>{if(!confirm('Закрыть голосование и зафиксировать результат?'))return;setBusy(v.id);await closeVote(v.id);setBusy('')}}>{busy===v.id?'Подсчитываю…':'Закрыть и применить результат →'}</button>}
     </div>:<div className={'finalVoteDecision '+(v.result_code||'')}>
      <div><small>ИТОГОВОЕ РЕШЕНИЕ</small><strong>{v.result_label||'Голосование завершено'}</strong>{v.decision_note&&<p>{v.decision_note}</p>}</div>
