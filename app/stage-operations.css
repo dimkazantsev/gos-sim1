@@ -885,7 +885,7 @@
  font-size:14px;
 }
 .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingRule{
- margin:0 20px 20px;
+ margin:14px 20px 20px;
  padding:14px 16px;
  border:1px solid #d4e0ff;
  border-radius:14px;
@@ -950,5 +950,5 @@
  .stageOperationsModules .staffingLab[data-staffing="committees"] .committeeQuota>div>span{grid-column:2/-1}
  .stageOperationsModules .staffingLab[data-staffing="committees"] .unitMembers>div:not(.emptyState){grid-template-columns:minmax(0,1fr) auto}
  .stageOperationsModules .staffingLab[data-staffing="committees"] .unitAssign{grid-template-columns:minmax(0,1fr);padding:0 12px 12px}
- .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingRule{margin:0 12px 12px}
+ .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingRule{margin:12px 12px 12px}
 }
