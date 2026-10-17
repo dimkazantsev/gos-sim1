@@ -989,3 +989,14 @@
 .stageOperationsModules .officeRoundNotice>span{display:flex;align-items:center;gap:9px;min-width:0}
 .stageOperationsModules .officeRoundCount{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:27px;height:27px;padding:0 7px;border-radius:99px;background:#2a54d9;color:#fff;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
 @media(max-width:700px){.stageOperationsModules .officeRoundNotice{margin:10px 10px;padding:10px 12px;font-size:13px}.stageOperationsModules .officeRoundNotice>span{align-items:flex-start}}
+
+/* Stage 4 split-mandate committee allocations: compact numeric controls and safe wrapping. */
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateEdit{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0}
+.stageOperationsModules .staffingLab[data-staffing="committees"] :is(.committeeMandateAmount,.committeeMandateEdit input){width:96px;min-width:80px;max-width:120px;padding:10px 8px;min-height:42px;border-radius:11px;border:1px solid #cbd8ef;background:#fff;color:#162945;text-align:center;font-variant-numeric:tabular-nums}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateHint{flex-basis:100%;color:#667d9b;font-size:12px;line-height:1.4}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMemberAllocation{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-width:0}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMemberAllocation>span{min-width:0;flex:1 1 150px;overflow-wrap:anywhere}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMemberAllocation>b{white-space:nowrap;font-variant-numeric:tabular-nums}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeQuota>div strong{font-variant-numeric:tabular-nums;white-space:normal;text-align:right}
+.stageOperationsModules .staffingLab[data-staffing="committees"] .unitAssign :is(select,button,input){min-height:42px}
+@media(max-width:700px){.stageOperationsModules .staffingLab[data-staffing="committees"] .committeeMandateEdit{width:100%}.stageOperationsModules .staffingLab[data-staffing="committees"] .unitAssign{display:flex;flex-wrap:wrap}.stageOperationsModules .staffingLab[data-staffing="committees"] .unitAssign select{flex:1 1 100%}.stageOperationsModules .staffingLab[data-staffing="committees"] .unitAssign button{flex:1 1 120px}}
