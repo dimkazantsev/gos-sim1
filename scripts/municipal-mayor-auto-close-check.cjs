@@ -24,7 +24,7 @@ const id=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
   await db.exec(sql);
   const actor=async(uid,teacher=false)=>db.query('update actor set user_id=$1,is_teacher=$2',[uid,teacher]);
   const init=async(n,members)=>{
-   const game=id(n),vote=id(n+200),one=id(n+400),two=id(n+401);
+   const game=id(n),vote=id(n+200),one=id(n*1000+400),two=id(n*1000+401);
    await db.query("insert into municipal_mayor_elections(id,game_id,status) values($1,$2,'open')",[vote,game]);
    await db.query('insert into municipal_mayor_candidates values($1,$2,$3),($4,$2,$5)',[one,vote,members[0],two,members[1]||members[0]]);
    for(const user of members)await db.query("insert into game_members values($1,$2,'student',null,null)",[game,user]);
