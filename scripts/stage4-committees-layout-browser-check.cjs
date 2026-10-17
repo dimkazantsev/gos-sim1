@@ -18,6 +18,15 @@ for(const roleRpc of ["ensure_duma_committees","get_committee_matrix","assign_in
 for(const electionRpc of ["create_committee_chair_election","nominate_office_candidate","open_office_election","cast_personal_office_ballot","close_office_election"])
  assert(ballot.includes("'"+electionRpc+"'"),'Election RPC retained: '+electionRpc);
 assert(ballot.includes("election.vote_mode==='open'")&&ballot.includes("!['nomination','open'].includes(election.status)"),'Secrecy rule remains');
+assert(ballot.includes("election.vote_mode==='secret'?'Тайное':'Открытое'"),'Both committee vote modes have initial capitals');
+assert(ballot.includes('<option value="open">Открытое</option><option value="secret">Тайное</option>'),'Election creation options are correctly capitalized');
+assert(ballot.includes("const canManage=teacher||(canCreate&&me.kind==='student'"),'GD leadership can see election controls when eligible');
+assert(ballot.includes('registered.some(r=>r.user_id===me.user_id)')&&ballot.includes('gdMandateCapacity(me.user_id)>0'),'Chair authority still requires meeting registration and mandates');
+assert(ballot.includes('teacher||ledParty||canManage')&&ballot.includes('cs.length===0')&&ballot.includes('canManage&&<button className="primary"'),'Authorized chair can open a nominated election');
+assert(ballot.includes("election.status==='open'&&canManage"),'Authorized GD chair can also close open election');
+assert(ballot.includes("election.status==='nomination'&&!canManage"),'Ordinary students see why voting has not started');
+assert(ballot.includes("election.status==='open'&&election.ballot_mode==='personal'&&me.kind==='student'"),'Registered student ballot appears after opening');
+
 assert(ballot.includes('!registered.some(r=>r.user_id===me.user_id)')&&ballot.includes('myPresent<=0'),'Attendance registration and declared deputy count both guard voting');
 assert(component.includes("mode==='committees'?"),'Committee/ministry branch retained');
 assert(component.includes('Избирается депутатами Государственной Думы в блоке выше'),'Voting placement hint correct');
