@@ -32,7 +32,7 @@ const votes=Array.from({length:2},(_,i)=>'<article class="committeeElectionCard"
  '<div class="committeeCandidateList"><div><span>АК</span><div><b>Александра Константинова</b><small>Фракция</small></div><strong>226</strong><div class="committeeBallot"><input placeholder="Голоса"><button>Записать</button></div></div></div></article>').join('');
 const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=device-width, initial-scale=1"><style>'+
  '*{box-sizing:border-box}body{margin:0;font:14px Arial,sans-serif;background:#f4f7fb;color:#142644}main{min-width:0}'+styles+'</style>'+
- '<main class="stageOperations"><div class="stageOperationsModules"><section class="staffingLab" data-staffing="committees"><header class="staffingLabHead"><div class="staffingLabIntro"><div class="staffingLabEyebrow"><svg width="17" height="17"></svg><span>Государственная Дума</span><span class="staffingLabStage">Этап 4</span></div><h2>Формирование комитетов Государственной Думы</h2><p>Палата образует пять комитетов и избирает их председателей. После выборов депутаты распределяются по комитетам с учётом фракционных квот.</p></div><div class="staffingBalance"><span>Составы комитетов</span><strong>12</strong><em>депутатов распределено</em></div></header>'+
+ '<main class="stageOperations"><div class="stageOperationsModules"><section class="staffingLab" data-staffing="committees"><header class="staffingLabHead"><div class="staffingLabIntro"><div class="staffingLabEyebrow"><svg width="17" height="17"></svg><span>Государственная Дума</span><span class="staffingLabStage">Этап 4</span></div><h2>Формирование комитетов Государственной Думы</h2><p>Палата образует пять комитетов и избирает их председателей. После выборов депутаты распределяются по комитетам с учётом фракционных квот.</p></div><div class="staffingBalance"><span>Составы комитетов</span><strong>0</strong><em>депутатов распределено</em></div></header>'+
  '<div class="stageOperationsActionBar"><p>Создайте комитеты</p><button class="primary">Создать комитеты</button></div>'+
  '<section class="committeeElectionBoard"><div class="committeeElectionHead"><div class="committeeElectionIntro"><small>Государственная Дума · Этап 4</small><h3>Выборы председателей комитетов</h3><p>Фракции выдвигают кандидатов. Для избрания необходимо большинство голосов.</p></div><div class="committeeElectionThreshold"><span>Необходимое большинство</span><strong>226 <small>из 450</small></strong><em>голосов для избрания</em></div></div><div class="committeeElectionGrid">'+votes+'</div></section>'+
  '<section class="staffingSection"><div class="staffingSectionHead"><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>5 комитетов · пропорциональное представительство фракций</h3><p>Один депутат состоит только в одном комитете. Составы отражают квоты партий.</p></div><span>1 депутат — 1 комитет</span></div><div class="committeeGrid">'+cards+'</div></section><footer class="staffingRule"><b>Порядок формирования</b><p>Квоты по мандатам.</p></footer></section>'+
@@ -50,9 +50,19 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
     const visible=e=>!!e&&getComputedStyle(e).display!=='none';
     const overflow=selectors.flatMap(sel=>{const e=document.querySelector(sel);if(!visible(e))return [{selector:sel,error:'missing/hidden'}];const r=e.getBoundingClientRect();return r.left<-1||r.right>innerWidth+2||e.scrollWidth>e.clientWidth+2?[{selector:sel,left:r.left,right:r.right,scroll:e.scrollWidth,client:e.clientWidth}]:[]});
     const ministry=document.querySelector('.staffingLab[data-staffing="ministries"] .staffingLabHead');
+    const badge=document.querySelector('.staffingLab[data-staffing="committees"] .staffingBalance');
+    const rect=badge.getBoundingClientRect(), center=(rect.left+rect.right)/2;
+    const children=[...badge.children];
+    const distances=children.map(e=>{const r=e.getBoundingClientRect();return Math.abs((r.left+r.right)/2-center)});
+    const counterIsGrid=getComputedStyle(badge).display==='grid';
     return {width:innerWidth,docWidth:document.documentElement.scrollWidth,overflow,
       header:getComputedStyle(document.querySelector('.staffingLab[data-staffing="committees"] .staffingLabHead')).backgroundColor,
       ministryBackground:getComputedStyle(ministry).backgroundColor,
+      committeeCounterGridColumns:getComputedStyle(badge).gridTemplateColumns.split(' ').length,
+      committeeCounterIsGrid:counterIsGrid,
+      committeeCounterDistances:distances,
+      committeeCounterText:badge.querySelector('strong').textContent,
+      ministryCounterGridColumns:getComputedStyle(document.querySelector('.staffingLab[data-staffing="ministries"] .staffingBalance')).gridTemplateColumns.split(' ').length,
       numberCards:document.querySelectorAll('.committeeUnit').length,
       committeeColumns:getComputedStyle(document.querySelector('.committeeGrid')).gridTemplateColumns.split(' ').length};
    });
@@ -61,6 +71,12 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
    assert.equal(check.header,'rgb(237, 242, 255)','Use same light brand header as Duma leadership');
    assert.equal(check.ministryBackground,'rgb(237, 242, 255)','Ministry header keeps the existing shared-stage styling');
    assert.equal(check.numberCards,5,'Committee list retains all five cards');
+   assert.equal(check.committeeCounterText,'0','Test empty committee count exactly as in reported screen');
+   assert.equal(check.ministryCounterGridColumns,2,'Existing stage 9 ministry counter keeps its legacy layout');
+   if(check.committeeCounterIsGrid){
+     assert.equal(check.committeeCounterGridColumns,1,'Committee badge uses a single track, not inherited two-column staffing layout');
+     assert(check.committeeCounterDistances.every(d=>d<2),'Committee counter label, number and subtitle align centrally at '+width+': '+JSON.stringify(check));
+   }
    if(width<=768)assert.equal(check.committeeColumns,1,'Compact container uses one column');
    // Before the committees are created, the action card sits directly above
    // the rules card. Guard against their borders touching again.
