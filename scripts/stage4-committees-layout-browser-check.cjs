@@ -6,6 +6,9 @@ const {chromium}=require('playwright-core');
 const root=require('node:path').resolve(__dirname,'..');
 const read=name=>fs.readFileSync(require('node:path').join(root,name),'utf8');
 const component=read('components/game/InstitutionStaffingLab.tsx');
+assert(component.includes("set_committee_mandates"),'Committee distribution uses a numeric mandate RPC');
+assert(component.includes('committeeMandateEdit')&&component.includes('committeeMandateAssign'),'Deputies may edit mandates in several committees');
+assert(component.includes('maxNewAllocation'),'Available personal capacity, party quota and 90-seat limit are all reflected in UI');
 const ballot=read('components/game/CommitteeChairElectionPanel.tsx');
 const leadership=read('components/game/DumaLeadershipElection.tsx');
 const styles=read('app/design-tokens.css')+'\n'+read('app/globals.css')+'\n'+read('app/stage-operations.css');
@@ -52,10 +55,10 @@ const idleVotes=idleTitles.map(title=>'<article class="committeeElectionCard idl
 const votes=idleVotes+activeVotes;
 const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=device-width, initial-scale=1"><style>'+
  '*{box-sizing:border-box}body{margin:0;font:14px Arial,sans-serif;background:#f4f7fb;color:#142644}main{min-width:0}'+styles+'</style>'+
- '<main class="stageOperations"><div class="stageOperationsModules"><section class="staffingLab" data-staffing="committees"><header class="staffingLabHead"><div class="staffingLabIntro"><div class="staffingLabEyebrow"><svg width="17" height="17"></svg><span>Государственная Дума</span><span class="staffingLabStage">Этап 4</span></div><h2>Формирование комитетов Государственной Думы</h2><p>Палата образует пять комитетов и избирает их председателей. После выборов депутаты распределяются по комитетам с учётом фракционных квот.</p></div><div class="staffingBalance"><span>Составы комитетов</span><strong>0</strong><em>депутатов распределено</em></div></header>'+
+ '<main class="stageOperations"><div class="stageOperationsModules"><section class="staffingLab" data-staffing="committees"><header class="staffingLabHead"><div class="staffingLabIntro"><div class="staffingLabEyebrow"><svg width="17" height="17"></svg><span>Государственная Дума</span><span class="staffingLabStage">Этап 4</span></div><h2>Формирование комитетов Государственной Думы</h2><p>Палата образует пять комитетов и избирает их председателей. После выборов депутаты распределяются по комитетам с учётом фракционных квот.</p></div><div class="staffingBalance"><span>Распределение мандатов</span><strong>0 / 450</strong><em>Мандатов распределено</em></div></header>'+
  '<div class="stageOperationsActionBar"><p>Создайте комитеты</p><button class="primary">Создать комитеты</button></div>'+
  '<section class="committeeElectionBoard"><div class="committeeElectionHead"><div class="committeeElectionIntro"><small>Государственная Дума · Этап 4</small><h3>Выборы председателей комитетов</h3><p>Фракции выдвигают кандидатов. Для избрания необходимо большинство голосов.</p></div><div class="committeeElectionThreshold"><span>Необходимое большинство</span><strong>226 <small>из 450</small></strong><em>голосов для избрания</em></div></div><div class="committeeElectionGrid">'+votes+'</div></section>'+
- '<section class="staffingSection"><div class="staffingSectionHead"><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>5 комитетов · пропорциональное представительство фракций</h3><p>Один депутат состоит только в одном комитете. Составы отражают квоты партий.</p></div><span>1 депутат — 1 комитет</span></div><div class="committeeGrid">'+cards+'</div></section><footer class="staffingRule"><b>Порядок формирования</b><p>Квоты по мандатам.</p></footer></section>'+
+ '<section class="staffingSection"><div class="staffingSectionHead"><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>5 комитетов · пропорциональное представительство фракций</h3><p>Депутат распределяет свои мандаты между несколькими комитетами. Составы отражают квоты партий.</p></div><span>90 мандатов в каждом комитете</span></div><div class="committeeGrid">'+cards+'</div></section><footer class="staffingRule"><b>Порядок формирования</b><p>Квоты по мандатам.</p></footer></section>'+
  '<section class="staffingLab" data-staffing="ministries"><header class="staffingLabHead"><div><h2>Команды министерств</h2><p>Назначение сотрудников министерств</p></div><div class="staffingBalance"><strong>6</strong><span>в министерствах</span></div></header></section></div></main>';
 (async()=>{
  const executable=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(p=>p&&fs.existsSync(p));
@@ -123,7 +126,7 @@ const html='<!doctype html><html lang="ru"><meta name="viewport" content="width=
    if(width>=1024){
     assert(Math.abs(check.cardLayout[0].controlsTop-check.cardLayout[1].controlsTop)<2,'Two desktop committee cards align action row at '+width);
    }
-   assert.equal(check.committeeCounterText,'0','Test empty committee count exactly as in reported screen');
+   assert.equal(check.committeeCounterText,'0 / 450','Mandate counter uses fraction of 450 allocated seats');
    assert(check.committeeCaptionCentered,'Counter caption is centered at '+width);
    assert(!check.committeeCaptionHasIcon,'Counter caption has no decorative SVG at '+width);
    assert.equal(check.ministryCounterGridColumns,2,'Existing stage 9 ministry counter keeps its legacy layout');
