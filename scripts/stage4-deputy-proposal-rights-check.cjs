@@ -10,6 +10,7 @@ assert(jsx.includes('get_my_institution_meeting_permissions'),'UI checks server-
 assert(jsx.includes('canPropose')&&jsx.includes('Предложить утверждение порядка'),'Any registered deputy has procedural proposal control');
 assert(jsx.includes('canNominate')&&jsx.includes('canManage'),'Nomination and election management have distinct permissions');
 assert(jsx.includes('isStageWorkOpen'),'Stage closure disables student proposal UI');
+assert(jsx.includes('onOpenVotes(procedureVotes.find(v=>v.status===\'open\')?.id)'),'An opened proposal can be reached from the stage without manual navigation');
 const open=migration.split('CREATE OR REPLACE FUNCTION public.open_duma_leadership_procedure_vote')[1];
 assert(open&&open.includes('INSERT INTO public.game_votes(')&&open.includes('p_game_id,4,'),'A deputy can open a stage-scoped motion directly, without teacher-only generic RPC');
 assert(migration.includes("v_cast<226"),'Chair cannot close a ballot below 226 votes');
