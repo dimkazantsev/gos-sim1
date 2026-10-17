@@ -13,7 +13,7 @@ type Candidate={id:string;election_id:string;user_id:string;party_id:string;crea
 type Ballot={election_id:string;party_id:string;candidate_id:string;votes:number};
 
 export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
- const {game,me,teacher,members,parties,setError,gdMandateCapacity}=g;
+ const {game,me,teacher,members,parties,setError,gdMandateCapacity,gdEffectivePresence}=g;
  const [units,setUnits]=useState<Unit[]>([]);
  const [assignments,setAssignments]=useState<Assignment[]>([]);
  const [elections,setElections]=useState<Election[]>([]);
@@ -65,7 +65,7 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
  const totalFor=(eid:string,cid:string)=>{
   const election=elections.find(x=>x.id===eid);
   if(election?.ballot_mode==='personal')return personalBallots.filter(b=>b.election_id===eid&&b.candidate_id===cid)
-   .reduce((sum,b)=>sum+Math.min(gdMandateCapacity(b.voter_id),Math.max(0,Number(registered.find(r=>r.user_id===b.voter_id)?.present_mandates)||0)),0);
+   .reduce((sum,b)=>sum+gdEffectivePresence(b.voter_id,registered.find(r=>r.user_id===b.voter_id)?.present_mandates),0);
   return eb(eid).filter(b=>b.candidate_id===cid).reduce((a,b)=>a+Number(b.votes||0),0);
  };
  const used=(eid:string,pid:string)=>eb(eid).filter(b=>b.party_id===pid).reduce((a,b)=>a+Number(b.votes||0),0);
@@ -97,7 +97,7 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
    const ownCandidates=election&&ledParty?members.filter(m=>m.kind==='student'&&m.team===ledParty.name&&gdMandateCapacity(m.user_id)>0).map(m=>m.user_id):[];
    const myCapacity=ledParty?activeMandates(ledParty.id):0;
    const myMandates=personalMandates.find(a=>a.user_id===me.user_id);
-   const myPresent=Math.min(gdMandateCapacity(me.user_id),Math.max(0,Number(registered.find(r=>r.user_id===me.user_id)?.present_mandates)||0));
+   const myPresent=registered.some(r=>r.user_id===me.user_id)?gdEffectivePresence(me.user_id,registered.find(r=>r.user_id===me.user_id)?.present_mandates):0;
    const myUsed=election&&ledParty?used(election.id,ledParty.id):0;
    return <article key={u.id} className={'committeeElectionCard '+(election?.status||'idle')}>
     <header><div><small>КОМИТЕТ</small><b>{u.title}</b><span>Председатель: {name(u.head_user_id)}</span></div>{!e&&canCreate&&<div className="committeeElectionCreate"><select aria-label={'Форма выборов председателя: '+u.title} value={mode[u.id]||'open'} onChange={x=>setMode(v=>({...v,[u.id]:x.target.value as 'open'|'secret'}))}><option value="open">Открыто</option><option value="secret">Тайно</option></select><button disabled={busy} onClick={()=>void create(u.id)}>Начать выборы</button></div>}</header>
