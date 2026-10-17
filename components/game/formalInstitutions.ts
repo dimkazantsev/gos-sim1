@@ -58,11 +58,30 @@ export function formalDocumentTitle(title:string|null|undefined,docType:string){
  const raw=String(title||'').trim();
  const mapped=FORMAL_TYPES.find(type=>type.key===raw)?.label||FORMAL_SYSTEM_TYPE_LABELS[raw];
  if(mapped)return mapped;
- const agenda=/^Повестка заседания\s*[·:—-]\s*ksrf\s*[·:—-]\s*этап\s*(\d+)$/i.exec(raw);
- if(agenda)return 'Повестка заседания Координационного Совета Российской Федерации — этап '+agenda[1];
- if(/\bksrf\b/i.test(raw))return raw.replace(/\bksrf\b/gi,'КСРФ');
- if(!raw||/^[a-z][a-z0-9]*(?:[_-][a-z0-9]+)+$/.test(raw))return formalDocumentTypeLabel(docType);
- return raw;
+ // The stage is internal workflow metadata, never part of an official title.
+ const official=raw.replace(/\s*[·—–-]\s*этап\s*№?\s*\d+\s*$/iu,'').trim();
+ // Legacy meeting titles stored the institutional key instead of its name.
+ const meeting=/^(Повестка|Протокол) заседания\s*[·:—–-]\s*(ksrf|gd|government|sf|ks|vs|region|municipality|cec|central_bank|accounts|committee)$/iu.exec(official);
+ if(meeting){
+  const names:Record<string,string>={
+   ksrf:'Координационного Совета Российской Федерации',
+   gd:'Государственной Думы Федерального Собрания Российской Федерации',
+   government:'Правительства Российской Федерации',
+   sf:'Совета Федерации Федерального Собрания Российской Федерации',
+   ks:'Конституционного Суда Российской Федерации',
+   vs:'Верховного Суда Российской Федерации',
+   region:'законодательного органа субъекта Российской Федерации',
+   municipality:'органа местного самоуправления',
+   cec:'Центральной избирательной комиссии Российской Федерации',
+   central_bank:'Совета директоров Банка России',
+   accounts:'Коллегии Счётной палаты Российской Федерации',
+   committee:'комитета Государственной Думы'
+  };
+  return meeting[1]+' заседания '+names[meeting[2].toLowerCase()];
+ }
+ if(/\bksrf\b/i.test(official))return official.replace(/\bksrf\b/gi,'КСРФ');
+ if(!official||/^[a-z][a-z0-9]*(?:[_-][a-z0-9]+)+$/.test(official))return formalDocumentTypeLabel(docType);
+ return official;
 }
 
 export function inferFormal(text:string,title:string,roleTitle?:string|null){
