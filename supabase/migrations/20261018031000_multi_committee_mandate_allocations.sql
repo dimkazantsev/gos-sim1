@@ -31,14 +31,12 @@ END $publication$;
 -- Compute faction quotas from actually held deputy mandates. When individual
 -- party mandates have not yet been assigned, use existing 450-seat fallback.
 -- Largest remainder yields EXACTLY 90 seats per committee without rounding loss.
-CREATE OR REPLACE FUNCTION public.get_committee_matrix(p_game_id uuid)
+CREATE OR REPLACE FUNCTION private.committee_quota_matrix(p_game_id uuid)
 RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER
 SET search_path TO 'public','private','pg_temp'
 AS $matrix$
 DECLARE v_result jsonb;
 BEGIN
- IF auth.uid() IS NULL OR NOT private.is_game_member(p_game_id)
- THEN RAISE EXCEPTION 'Game access required'; END IF;
  WITH representation AS (
    SELECT p.id AS party_id,p.name AS party_name,p.color,
           coalesce(sum(private.gd_member_capacity(gm.game_id,gm.user_id)),0)::integer AS seats
@@ -79,6 +77,22 @@ BEGIN
  RETURN v_result;
 END;
 $matrix$;
+REVOKE ALL ON FUNCTION private.committee_quota_matrix(uuid) FROM PUBLIC,anon,authenticated;
+
+-- User-facing matrix remains protected. Server-side stage readiness and
+-- capacity checks use private.committee_quota_matrix without session identity.
+CREATE OR REPLACE FUNCTION public.get_committee_matrix(p_game_id uuid)
+RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path TO 'public','private','pg_temp'
+AS $publicmatrix$
+BEGIN
+ IF auth.uid() IS NULL OR NOT private.is_game_member(p_game_id)
+ THEN RAISE EXCEPTION 'Game access required'; END IF;
+ RETURN private.committee_quota_matrix(p_game_id);
+END;
+$publicmatrix$;
+REVOKE ALL ON FUNCTION public.get_committee_matrix(uuid) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.get_committee_matrix(uuid) TO authenticated;
 
 -- Single lock per game prevents two simultaneous appointments oversubscribing
 -- a member, faction or committee. Snapshot is authoritative under the lock.
@@ -289,6 +303,17 @@ begin
     and coalesce((select sum(a.mandates) from public.committee_mandate_allocations a
       where a.unit_id=u.id),0)<>coalesce(u.mandate_capacity,90))
   then b:=b||jsonb_build_array('Не во всех пяти комитетах распределены ровно 90 мандатов');end if;
+  -- Quotas and personal capacity may change after a deputy leaves or mandate
+  -- losses are applied. Do not accept a full-looking but now invalid matrix.
+  if exists(
+    select 1 from public.committee_mandate_allocations a
+    where a.game_id=p_game
+    group by a.user_id
+    having sum(a.mandates)>private.gd_member_capacity(p_game,a.user_id))
+  then b:=b||jsonb_build_array('Распределение превышает действующие личные мандаты депутатов');end if;
+  if exists(select 1 from jsonb_array_elements(private.committee_quota_matrix(p_game)) row
+      where (row->>'assigned_mandates')::integer>(row->>'quota')::integer)
+  then b:=b||jsonb_build_array('Превышены действующие квоты фракций в комитетах');end if;
  elsif p_stage=5 then
   select count(*) into c from public.ghost_voting_policies where game_id=p_game and status='adopted';
   m:=jsonb_build_object('policy_adopted',c);
