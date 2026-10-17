@@ -7,7 +7,7 @@ import {useGameTableSync} from './useGameTableSync';
 import {stageRoleTitles} from './stageRoles';
 import type {ReturnTypeRepublic} from './viewTypes';
 import CommitteeChairElectionPanel from './CommitteeChairElectionPanel';
-import {Landmark,UsersRound} from 'lucide-react';
+import {Landmark} from 'lucide-react';
 
 type Unit={id:string;game_id:string;unit_kind:'committee'|'ministry';unit_key:string;title:string;description:string|null;capacity_min:number|null;capacity_max:number|null;mandate_capacity:number|null;head_user_id:string|null};
 type Assignment={id:string;game_id:string;unit_id:string;unit_kind:'committee'|'ministry';user_id:string;party_id:string|null;assignment_role:'member'|'deputy'|'head';created_at:string};
@@ -86,7 +86,7 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
     <p>Палата образует пять комитетов и избирает их председателей. После выборов депутаты распределяются по комитетам с учётом фракционных квот.</p>
    </div>:<div><h2>Команды министерств</h2><p>Министры, назначенные на этом этапе, набирают сотрудников своих ведомств. Участник может состоять только в одном министерстве; партийная принадлежность не определяет распределение.</p></div>}
    {mode==='committees'?<div className="staffingBalance" aria-label={'Распределено депутатов по комитетам: '+assignments.filter(a=>a.unit_kind==='committee').length}>
-    <span>Составы комитетов</span><strong>{assignments.filter(a=>a.unit_kind==='committee').length}</strong><em><UsersRound size={14} aria-hidden="true"/> депутатов распределено</em>
+    <span>Составы комитетов</span><strong>{assignments.filter(a=>a.unit_kind==='committee').length}</strong><em>депутатов распределено</em>
    </div>:<div className="staffingBalance"><strong>{assignments.filter(a=>a.unit_kind==='ministry').length}</strong><span>в министерствах</span></div>}
   </header>
   {loadError&&<div className="stageOperationsNotice" role="alert"><p>{loadError}</p><button type="button" onClick={()=>void load()}>Повторить загрузку</button></div>}
