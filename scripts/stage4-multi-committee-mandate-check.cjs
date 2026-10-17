@@ -13,6 +13,7 @@ const id=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
  try{
   await db.exec([
    'create schema auth; create schema private; create role anon; create role authenticated;',
+   'create table auth.users(id uuid primary key);',
    'create publication supabase_realtime;',
    'create table acting(user_id uuid,teacher boolean);',
    'insert into acting values(null,false);',
