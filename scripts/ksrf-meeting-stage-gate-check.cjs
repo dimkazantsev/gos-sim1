@@ -6,6 +6,7 @@ const file=p=>fs.readFileSync(p,'utf8');
 const scope=file('supabase/migrations/20261017165000_ksrf_meeting_stage_guard_scope.sql');
 const rules=file('supabase/migrations/20261017165500_ksrf_agenda_registration_gate.sql');
 const ballots=file('supabase/migrations/20261017170000_ksrf_ballot_stage_session_gate.sql');
+const agreement=file('supabase/migrations/20261017170500_ksrf_regional_agreement_session_gate.sql');
 const ui=file('components/game/InstitutionRegistrationPanel.tsx');
 const stage=file('components/game/GovernanceStageWorkspace.tsx');
 const guardStart=scope.indexOf('CREATE OR REPLACE FUNCTION private.guard_stage_submission()');
@@ -31,6 +32,7 @@ for(const name of ['propose_parliamentary_election_rule','propose_regional_elect
 }
 assert(ballots.includes("tg_table_name='game_votes'")&&ballots.includes("tg_table_name='game_ballots'"),'Both votes and ballots guarded');
 assert(ballots.includes('private.require_game_meeting_registration('));
+assert(agreement.includes("perform private.require_game_meeting_registration(r.game_id,v_uid,3,'ksrf')"),'Stage 3 regional agreements require registration');
 assert(ui.includes('const preStageKsrf=body===\'ksrf\'&&(stage===2||stage===3)'),'Meeting preparation enabled before stage opening');
 assert(ui.includes('onMeetingReadyChange?.(ready)'),'Attendee readiness sent to work pane');
 assert(stage.includes('disabled={viewer||ksrfSessionBlocked}'),'Actual stage forms locked before session readiness');
