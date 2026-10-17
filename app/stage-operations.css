@@ -1122,7 +1122,7 @@
  display:flex;justify-content:space-between;align-items:center;gap:12px;
 }
 .stageOperations .stageFinalDocuments>header>div{display:grid;gap:4px}
-.stageOperations .stageFinalDocuments>header small{font-size:11px;color:#5977ac;font-weight:700}
+.stageOperations .stageFinalDocuments>header small{font-size:12px;color:#5977ac;font-weight:700}
 .stageOperations .stageFinalDocuments>header b{font-variant-numeric:tabular-nums;white-space:nowrap}
 .stageOperations .stageFinalDocuments>p{margin:0;color:#60718c;font-size:13px;line-height:1.6}
 .stageOperations .stageFinalDocumentsList{display:grid;gap:8px}
