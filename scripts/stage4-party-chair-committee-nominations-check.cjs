@@ -47,7 +47,8 @@ const FOREIGN='40000000-0000-0000-0000-000000000003';
    'create table meeting_registrations(game_id uuid,user_id uuid,stage_no int,institution_key text);',
    "create function private.is_game_teacher(uuid) returns boolean language sql stable as $$select teacher from test_context where id=1$$;",
    "create function private.gd_stage4_meeting_active(uuid) returns boolean language sql stable as $$select active from test_context where id=1$$;",
-   "create function private.party_led_by(p_game uuid,p_user uuid) returns uuid language sql stable as $$select id from game_parties where game_id=p_game and leader_user_id=p_user limit 1$$;",
+   "create function private.party_led_by(p_game uuid,p_user uuid) returns uuid language sql stable as $select id from game_parties where game_id=p_game and leader_user_id=p_user limit 1$;",
+   "create function private.gd_stage4_deputy_can_propose(uuid,uuid) returns boolean language sql stable as $select false$;",
    "create function private.gd_member_capacity(p_game uuid,p_user uuid) returns integer language sql stable as $$select coalesce((select seats from seat_counts where game_id=p_game and user_id=p_user),0)$$;",
    "create function private.require_game_meeting_registration(p_game uuid,p_user uuid,p_stage integer,p_institution text) returns void language plpgsql as $$begin if not exists(select 1 from meeting_registrations where game_id=p_game and user_id=p_user and stage_no=p_stage and institution_key=p_institution) then raise exception 'No meeting registration';end if;end$$;",
    "insert into game_parties values('"+PARTY+"','"+GAME+"','Партия А','"+LEADER+"','registered'),"+
