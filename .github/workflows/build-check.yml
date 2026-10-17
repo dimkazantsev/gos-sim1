@@ -5,6 +5,8 @@ on:
     paths:
       - 'components/game/documentSignerTitle.ts'
       - 'scripts/document-signer-title-check.cjs'
+      - 'scripts/official-document-print-contract-check.cjs'
+      - 'supabase/migrations/20261017201000_official_meeting_document_titles.sql'
       - 'components/game/Blitz*.tsx'
       - 'scripts/blitz-pending-privacy-check.cjs'
       - 'supabase/migrations/20261017183000_blitz_archive_pending_question_privacy.sql'
@@ -313,6 +315,7 @@ jobs:
       - run: node scripts/guided-tour-check.cjs
       - run: node scripts/document-input-check.cjs
       - run: node scripts/document-signer-title-check.cjs
+      - run: node scripts/official-document-print-contract-check.cjs
       - run: node scripts/contextual-offices-voting-check.cjs
       - run: node scripts/electoral-math-check.cjs
       - run: node scripts/grade-fractional-check.cjs
