@@ -572,9 +572,8 @@
  color:#2453e6;
 }
 .stageOperationsModules .staffingLab[data-staffing="committees"] .staffingBalance em{
- display:flex;
- align-items:center;
- gap:5px;
+ display:block;
+ text-align:center;
  font-size:12px;
  font-weight:650;
  font-style:normal;
