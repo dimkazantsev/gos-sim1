@@ -38,7 +38,7 @@ export function printOfficialDocument():boolean{
   '.legalPaperFooterBar{display:block;margin-top:25px;padding-top:12px;border-top:1px solid #cdd5e0;font-size:9pt;color:#4b607e;break-inside:avoid}',
   '.legalPaperFooterBar button{display:none!important}',
   'svg{max-width:100%;height:auto}',
-  '@media screen{body{padding:24px;background:#e8edf4}.legalDocumentPaper{max-width:176mm!important;margin:0 auto!important;padding:16mm 18mm!important;box-shadow:0 3px 20px #2222!important}}',
+  '@media screen{body{padding:24px;background:#e8edf4} .formalPaper.legalDocumentPaper{max-width:176mm!important;margin:0 auto!important;padding:16mm 18mm!important;box-shadow:0 3px 20px #2222!important}}',
   '@media print{html,body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.legalDocumentPaper{break-inside:auto!important}}'
  ].join('\n');
  const doc=tab.document;
