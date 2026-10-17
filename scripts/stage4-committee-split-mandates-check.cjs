@@ -50,7 +50,7 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
   }
   const minister=uuid(500),minister2=uuid(501);
   for(const uid of [minister,minister2]){
-    await db.query("insert into institution_units(id,game_id,unit_kind,unit_key,title,head_user_id) values($1,$2,'ministry','m-'+$3,$4,$5)",[uid,game,uid,'Министерство',head]);
+    await db.query("insert into institution_units(id,game_id,unit_kind,unit_key,title,head_user_id) values($1,$2,'ministry','m-'||$3::text,$4,$5)",[uid,game,uid,'Министерство',head]);
   }
   await db.query("insert into institution_assignments(game_id,unit_id,unit_kind,user_id,party_id,assignment_role,created_by) values($1,$2,'committee',$3,$4,'head',$3)",[game,units[0],head,partyA]);
   await db.exec(sql);
