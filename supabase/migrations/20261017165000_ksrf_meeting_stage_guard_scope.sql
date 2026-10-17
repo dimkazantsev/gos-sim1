@@ -38,14 +38,15 @@ begin
  end if;
  -- Meeting preparation is separate from stage work. Only an authorized
  -- save_institution_meeting_document RPC sets the transaction-local scope.
- if tg_table_name='formal_documents' and tg_op<>'DELETE'
-    and new.doc_type in ('meeting_agenda','minutes')
-    and coalesce(new.metadata->>'document_kind','')='institution_meeting_'||
-      case when new.doc_type='meeting_agenda' then 'agenda' else 'minutes' end
-    and current_setting('app.gos_meeting_document_scope',true)
-      =new.game_id::text||':'||new.stage_no||':'||coalesce(new.metadata->>'institution_key','')
-       ||':'||case when new.doc_type='meeting_agenda' then 'agenda' else 'minutes' end
- then return new;end if;
+ if tg_table_name='formal_documents' and tg_op<>'DELETE' then
+  if new.doc_type in ('meeting_agenda','minutes')
+     and coalesce(new.metadata->>'document_kind','')='institution_meeting_'||
+       case when new.doc_type='meeting_agenda' then 'agenda' else 'minutes' end
+     and current_setting('app.gos_meeting_document_scope',true)
+       =new.game_id::text||':'||new.stage_no||':'||coalesce(new.metadata->>'institution_key','')
+        ||':'||case when new.doc_type='meeting_agenda' then 'agenda' else 'minutes' end
+  then return new;end if;
+ end if;
  if not exists(select 1 from public.game_stages st
    where st.game_id=v_game and st.stage_no=v_stage and st.status='open'
     and (st.deadline is null or st.deadline>clock_timestamp())) then
