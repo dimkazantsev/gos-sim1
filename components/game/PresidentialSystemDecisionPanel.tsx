@@ -121,8 +121,9 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  </section>;
 
  return <section className="presSystemDecision">
-  <header><div><small>ГОСУДАРСТВЕННАЯ ДУМА ФС РФ · ЭТАП 6</small><h3>Поправка к ФЗ № 19-ФЗ о системе выборов Президента</h3><p>Фракция создаёт проект поправки. Система сразу добавляет законопроект в реестр НПА и создаёт связанное голосование ГД. Участники регистрируются на заседание, обсуждают проект и голосуют. Принятое решение автоматически синхронизирует модель выборов и открывает процедуру ЦИК ниже.</p></div><button type="button" className={'presSystemAdopted '+(adopted?'isReady':'')} disabled={!adopted} onClick={()=>document.getElementById('stage6-cec')?.scrollIntoView({behavior:'smooth',block:'start'})}><small>ДЕЙСТВУЕТ</small><strong>{adopted?labels[adopted.system_type]:'Решение не принято'}</strong>{adopted?.system_type==='qualified'&&<span>{adopted.threshold_pct}%</span>}{adopted&&<em>Перейти к ЦИК ↓</em>}</button></header>
+  <header><div><small>ГОСУДАРСТВЕННАЯ ДУМА ФС РФ · ЭТАП 6</small><h3>Поправка к ФЗ № 19-ФЗ о системе выборов Президента</h3><p>Фракция создаёт проект поправки. Система сразу добавляет законопроект в реестр НПА и создаёт связанное голосование ГД. Участники регистрируются на заседание, обсуждают проект и голосуют. Принятое решение автоматически синхронизирует модель выборов и открывает процедуру ЦИК ниже.</p></div><button type="button" className={'presSystemAdopted '+(adopted?'isReady':'')} disabled={!adopted} onClick={()=>document.getElementById('stage6-cec')?.scrollIntoView({behavior:'smooth',block:'start'})}><small>ВЫБРАННАЯ МОДЕЛЬ</small><strong>{adopted?labels[adopted.system_type]:'Решение не принято'}</strong>{adopted?.system_type==='qualified'&&<span>{adopted.threshold_pct}%</span>}{adopted&&<em>Перейти к ЦИК ↓</em>}</button></header>
 
+  {adopted&&<p className="presSystemLegalNotice">Модель выбрана для расчёта президентских выборов. Одобрение Государственной Думой проекта поправки ещё не означает вступления федерального закона в силу: необходимо завершить рассмотрение в Совете Федерации и получить подпись вступившего в должность Президента Российской Федерации.</p>}
   {procedureHub}
   {canPropose&&<div id="stage6-proposal-form" className="presSystemProposal"><label>Система<select value={system} onChange={e=>setSystem(e.target.value as Proposal['system_type'])}><option value="relative">Относительное большинство</option><option value="absolute">Абсолютное большинство</option><option value="qualified">Квалифицированное большинство</option><option value="preferential">Преференциальное большинство</option></select></label>{system==='qualified'&&<label>Порог, %<input type="number" min="51" max="100" value={threshold} onChange={e=>setThreshold(Math.max(51,Math.min(100,Number(e.target.value)||60)))}/></label>}<label className="wide">Позиция фракции<textarea rows={2} value={rationale} onChange={e=>setRationale(e.target.value)} placeholder="Почему именно эта модель должна применяться на выборах Президента?"/></label><button className="primary" disabled={busy} onClick={()=>void propose()}>Создать проект поправки</button></div>}
 
@@ -131,12 +132,13 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
     <span className="done">1 · Проект создан</span>
     <span className={p.bill_document_id?'done':''}>2 · НПА в реестре</span>
     <span className={p.vote_id?'done':''}>3 · Голосование создано</span>
-    <span className={p.resolution_document_id?'done':''}>4 · Решение ГД</span>
+    <span className={p.resolution_document_id?'done':''}>4 · Итог голосования ГД</span>
    </div>
    {bill&&<p className="presSystemDocumentRef">Законопроект: <b>{bill.registry_no||'зарегистрирован'}</b> {bill.status_label}</p>}
+   {p.status==='rejected'&&<p className="presSystemDocumentRef">Законопроект отклонён. Дальнейшее рассмотрение и подписание не проводятся.</p>}
    {resolution&&<p className="presSystemDocumentRef">Постановление: <b>{resolution.registry_no||'оформлено'}</b> {resolution.status_label}</p>}
    </div>
-   <div className="presSystemProposalActions"><span>{p.status==='adopted'?'Принято':p.status==='vote_open'?'На голосовании':p.status==='registered'?'Зарегистрировано':p.status==='rejected'?'Отклонено':'Проект'}</span>{p.system_type==='qualified'&&<em>{p.threshold_pct}%</em>}{v&&<em>{v.status==='open'?'Голосование открыто':(v.result_label?String(v.result_label).replace(/^./u,ch=>ch.toLocaleUpperCase('ru-RU')):'Закрыто')}</em>}
+   <div className="presSystemProposalActions"><span>{p.status==='adopted'?'Одобрено ГД':p.status==='vote_open'?'На голосовании':p.status==='registered'?'Зарегистрировано':p.status==='rejected'?'Отклонено':'Проект'}</span>{p.system_type==='qualified'&&<em>{p.threshold_pct}%</em>}{v&&<em>{v.status==='open'?'Голосование открыто':(v.result_label?String(v.result_label).replace(/^./u,ch=>ch.toLocaleUpperCase('ru-RU')):'Закрыто')}</em>}
     {bill&&<button onClick={()=>onOpenDocument?.(bill.id)}>Открыть проект НПА →</button>}
     {v?.status==='open'&&<button className="primary" onClick={()=>onOpenVotes(v.id)}>Перейти к голосованию →</button>}
    </div>
