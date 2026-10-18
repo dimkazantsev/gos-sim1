@@ -44,7 +44,7 @@ function harness(component){
    if(name==='save_bill_submission_profile')profileNotes.set(args.p_document_id,args.p_note);
    if(name==='save_bill_committee_conclusion')committeeLegal.set(args.p_document_id,args.p_legal_compliance);
    if(name==='save_budget_preliminary_review')budgetConclusions.set(args.p_document_id,args.p_committee_conclusion);
-   return{data:name==='get_formal_subjects'?['gd_deputy']:name==='get_bill_dossier_readiness'?{issues:[],review_issues:[],required_files:[],submission_ready:false,committee_ready:false}:null,error:null};
+   return{data:name==='get_presidential_student_system_vote'?{closed:true,result:{system_type:'relative',votes_total:40}}:name==='get_formal_subjects'?['gd_deputy']:name==='get_bill_dossier_readiness'?{issues:[],review_issues:[],required_files:[],submission_ready:false,committee_ready:false}:null,error:null};
   },
   storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/media'},error:null})})},
   channel(){const handlers=[];const channel={on(kind,filter,callback){handlers.push({filter,callback});return this;},subscribe(){return this;},handlers};channels.push(channel);return channel;},removeChannel:async()=>{}
