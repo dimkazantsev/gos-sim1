@@ -189,7 +189,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  function canDeleteDocument(doc:FormalDocument){return !readOnly&&!!me&&(teacher||doc.author_id===me.user_id)}
  function canManage(doc:FormalDocument){
   if(doc.id===selected?.id&&documentAccess)return !readOnly&&documentAccess.can_manage;
-  if(readOnly)return false;if(teacher)return true;if(!me)return false;if(doc.current_owner_key==='author')return doc.author_id===me.user_id;
+  if(readOnly||!me)return false;if(doc.current_owner_key==='author')return doc.author_id===me.user_id;if(teacher)return false;
   const rt=role;
   if(doc.current_owner_key==='president')return rt.includes('президент');
   if(doc.current_owner_key==='gd')return rt.includes('депутат')||(rt.includes('государственн')&&rt.includes('дум'));
