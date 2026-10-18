@@ -163,7 +163,7 @@ begin
     party_action_count*0.75+party_response_count*0.35+least(strategy_hits,8)*0.4;
 
   select count(*) filter(where authority_ok and lawful),count(*) filter(where not authority_ok or not lawful),count(*) filter(where strategy_point)
-  into event_law,event_invalid,event_strategy from public.event_authority_evidence where game_id=p_game and actor_id=p_user and stage_no=p_stage;
+  into event_law,event_invalid,event_strategy from public.event_authority_evidence where game_id=p_game and actor_id=p_user and stage_no=p_stage and created_at>=v_start and created_at<=v_end;
   participation:=participation+event_law+event_invalid;
   c1:=(law_signal>=2 or event_law>0) and event_invalid=0;
   c2:=strategy_signal>=2 or event_strategy>0;
@@ -248,6 +248,30 @@ begin
   return v_id;
 end;
 $function$;
+
+CREATE OR REPLACE FUNCTION private.blitz_vsn_components(p_game uuid, p_student uuid, p_stage integer)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'pg_temp'
+AS $function$
+declare v_deadline timestamptz;total_q int; correct_q int; answered_q int; cases_n int; correct_cases numeric; acts int; c numeric; a numeric; b numeric; completion numeric;
+begin
+ select case when s.score_closed_at is not null or s.status='open' then coalesce(s.score_closed_at,s.deadline,clock_timestamp()) else coalesce(s.completed_at,clock_timestamp()) end into v_deadline from public.game_stages s where s.game_id=p_game and s.stage_no=p_stage;
+ v_deadline:=least(coalesce(v_deadline,clock_timestamp()),clock_timestamp());
+ select count(*),count(*) filter(where is_correct and answered_at<=v_deadline),count(*) filter(where chosen_index is not null and answered_at<=v_deadline)
+ into total_q,correct_q,answered_q from public.blitz_assignments where game_id=p_game and user_id=p_student and stage_no=p_stage and available_at<=v_deadline;
+ select count(*)::integer,coalesce(sum(e.score_share) filter(where e.best_option and e.authority_ok and e.lawful),0)
+ into cases_n,correct_cases from public.event_authority_evidence e
+ where e.game_id=p_game and e.actor_id=p_student and e.stage_no=p_stage and e.created_at<=v_deadline;
+ select count(*) into acts from public.player_actions where game_id=p_game and author_id=p_student and round_no=p_stage and status='accepted' and submitted_at<=v_deadline;
+ c:=case when cases_n>0 then 0.30*least(1,correct_cases::numeric/cases_n) else 0 end;
+ a:=0.30*least(1,acts::numeric/3);
+ b:=case when total_q>0 then 0.30*correct_q::numeric/total_q else 0 end;
+ completion:=case when total_q>0 then 0.10*answered_q::numeric/total_q else 0 end;
+ return jsonb_build_object('score',round(c+a+b+completion,2),'cases',round(c,2),'actions',round(a,2),'blitz',round(b,2),'completion',round(completion,2),'cases_total',cases_n,'cases_right',correct_cases,'actions_right',acts,'quiz_total',total_q,'quiz_right',correct_q,'quiz_answered',answered_q);
+end $function$;
+
 
 CREATE OR REPLACE FUNCTION private.stage_assessment_deadline_penalty()
  RETURNS trigger
