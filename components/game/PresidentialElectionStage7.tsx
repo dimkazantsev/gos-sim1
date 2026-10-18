@@ -31,6 +31,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const [decision,setDecision]=useState<PollDecision|null>(null);
  const [publicPolls,setPublicPolls]=useState<PublicPoll[]>([]);
  const [settings,setSettings]=useState<Settings|null>(null);
+ const [stage6Ready,setStage6Ready]=useState(false);
  const [scores,setScores]=useState<Score[]>([]);
 
  const [inauguration,setInauguration]=useState<Inauguration|null>(null);
@@ -67,7 +68,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{
   request.current++;ceremonyDirty.current=false;
-  setCandidates([]);setMaterials([]);setDecision(null);setPublicPolls([]);setSettings(null);setScores([]);setInauguration(null);setPhotoUrls({});setAudioUrls({});
+  setCandidates([]);setMaterials([]);setDecision(null);setPublicPolls([]);setSettings(null);setStage6Ready(false);setScores([]);setInauguration(null);setPhotoUrls({});setAudioUrls({});
   setCandidateId('');setCeremonyAt('');setVenue('');setCeremonyNotes('');setHymnFile(null);setMusicFile(null);setBusy(false);setNotice('');
   setTitle('');setBody('');setPrintRun('');setPublisher('');setProductionDate('');setImprint('');setExternalUrl('');setFiles([]);
   setMaterialType('poster');setPollClose('');setReviewNotes({});setReviewErrors({});setReviewResponses({});setReviewPenalties({});setReviewPenaltyReasons({});
@@ -97,17 +98,19 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   if(!gameId)return;
   const version=++request.current,current=()=>activeScope()&&version===request.current;
   try{
-  const [cr,mr,dr,pr,sr,sc,ir]=await Promise.all([
+  const [cr,mr,dr,pr,sr,sc,ir,stageDecision]=await Promise.all([
    supabase.from('presidential_candidates').select('id,user_id,party_id,created_by,display_name,registration_status,photo_path,program_summary,campaign_statement,rating_penalty').eq('game_id',gameId).is('archived_at',null).order('display_name'),
    supabase.from('presidential_campaign_materials').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
    supabase.from('presidential_poll_decision').select('*').eq('game_id',gameId).maybeSingle(),
    supabase.from('presidential_public_polls').select('*').eq('game_id',gameId).order('round_no'),
    supabase.from('presidential_election_settings').select('*').eq('game_id',gameId).maybeSingle(),
    supabase.from('presidential_scorecards').select('*').eq('game_id',gameId),
-   supabase.from('presidential_inauguration').select('*').eq('game_id',gameId).maybeSingle()
+   supabase.from('presidential_inauguration').select('*').eq('game_id',gameId).maybeSingle(),
+   supabase.rpc('get_presidential_student_system_vote',{p_game_id:gameId})
   ]);
   if(!current())return;
-  const failure=[cr,mr,dr,pr,sr,sc,ir].find(result=>result.error);if(failure?.error)throw failure.error;
+  const failure=[cr,mr,dr,pr,sr,sc,ir,stageDecision].find(result=>result.error);if(failure?.error)throw failure.error;
+  setStage6Ready(Boolean(stageDecision.data?.closed));
   const rows=(cr.data||[]) as Candidate[],scoreRows=(sc.data||[]) as Score[],ceremony=ir.data as Inauguration|null;
   const [pairs,hymn,music]=await Promise.all([
    Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,await signed(x.photo_path)] as const)),
@@ -196,6 +199,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   }catch(e){if(activeScope())setError(userError(e)||'Не удалось выполнить действие.')}finally{if(activeScope())setBusy(false)}
  }
 
+ if(!stage6Ready)return <section className="stage7Election"><div className="stage7Empty">Выборы Президента Российской Федерации ещё не начались. Сначала Совет Федерации назначает три дня выборов, а студенты на этапе 6 лично утверждают избирательную систему и необходимость социологического опроса.</div></section>;
  return <section className="stage7Election">
   <header className="stage7Hero"><div><small>ЦИК РФ · ЭТАП 7</small><h2>Выборы Президента Российской Федерации</h2><p>Агитационная кампания, утверждённый студентами социологический опрос, подсчёт результатов по полной формуле ЦИК и инаугурация — в одном контуре.</p></div><div className="stage7HeroMark"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" width={74} height={74}/><span>Центральная избирательная комиссия</span></div></header>
   <nav className="stage7Tabs" aria-label="Разделы этапа 7"><button className={tab==='campaign'?'active':''} onClick={()=>setTab('campaign')}><span>01</span>Кампания</button><button className={tab==='poll'?'active':''} onClick={()=>setTab('poll')}><span>02</span>Соцопрос избирателей</button><button className={tab==='results'?'active':''} onClick={()=>setTab('results')}><span>03</span>Итоги и инаугурация</button></nav>
