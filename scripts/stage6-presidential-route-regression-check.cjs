@@ -97,3 +97,6 @@ assert(!election.includes("</b> · {bill.status_label}</p>"),'Legacy uncondition
   console.log('PASS: routes 1–16; GD session agenda stage 6/12; stage 7 locked; 40 presidential bill ballots linked; fake routes denied; ordinary bill reading guard preserved.');
  } finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
+
+// Related candidate document and exclusive adoption invariants.
+require('./presidential-exclusive-party-document-check.cjs');
