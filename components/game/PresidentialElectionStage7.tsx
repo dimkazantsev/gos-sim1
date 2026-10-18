@@ -14,7 +14,6 @@ import MediaUploadButton from './MediaUploadButton';
 type Candidate={id:string;user_id:string|null;party_id:string|null;created_by:string;display_name:string;registration_status:string;photo_path:string|null;program_summary:string|null;campaign_statement:string|null;rating_penalty:number};
 type Material={id:string;candidate_id:string;author_id:string;title:string;body:string;material_type:string;print_run:number;publisher_name:string|null;production_date:string|null;imprint_text:string|null;external_url:string|null;files:Array<{storage_path:string;file_name:string;mime_type?:string|null;file_size?:number;media_kind?:string}>;status:'pending'|'approved'|'rejected';review_note:string|null;cec_errors:string|null;cec_response:string|null;penalty_points:number;penalty_reason:string|null;post_id:string|null;created_at:string};
 type PollDecision={game_id:string;status:'open'|'closed';result:boolean|null;opened_at:string;closed_at:string|null};
-type PollDecisionVote={user_id:string;choice:boolean};
 type PublicPoll={id:string;game_id:string;round_no:number;slug:string;title:string;status:'draft'|'open'|'closed';opened_at:string|null;closes_at:string|null;closed_at:string|null};
 type Settings={game_id:string;system_type:'relative'|'absolute'|'qualified'|'preferential';threshold_pct:number;poll_enabled:boolean;status:'setup'|'round1'|'runoff'|'finished'|'manual_required';result:Record<string,any>};
 type Score={candidate_id:string;round_no:1|2;teacher_program_pct:number|null;teacher_campaign_pct:number|null;game_rating_pct:number|null;poll_pct:number|null;teacher_runoff_pct:number|null;computed_pct:number|null};
@@ -30,7 +29,6 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const [candidates,setCandidates]=useState<Candidate[]>([]);
  const [materials,setMaterials]=useState<Material[]>([]);
  const [decision,setDecision]=useState<PollDecision|null>(null);
- const [decisionVotes,setDecisionVotes]=useState<PollDecisionVote[]>([]);
  const [publicPolls,setPublicPolls]=useState<PublicPoll[]>([]);
  const [settings,setSettings]=useState<Settings|null>(null);
  const [scores,setScores]=useState<Score[]>([]);
@@ -69,7 +67,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{
   request.current++;ceremonyDirty.current=false;
-  setCandidates([]);setMaterials([]);setDecision(null);setDecisionVotes([]);setPublicPolls([]);setSettings(null);setScores([]);setInauguration(null);setPhotoUrls({});setAudioUrls({});
+  setCandidates([]);setMaterials([]);setDecision(null);setPublicPolls([]);setSettings(null);setScores([]);setInauguration(null);setPhotoUrls({});setAudioUrls({});
   setCandidateId('');setCeremonyAt('');setVenue('');setCeremonyNotes('');setHymnFile(null);setMusicFile(null);setBusy(false);setNotice('');
   setTitle('');setBody('');setPrintRun('');setPublisher('');setProductionDate('');setImprint('');setExternalUrl('');setFiles([]);
   setMaterialType('poster');setPollClose('');setReviewNotes({});setReviewErrors({});setReviewResponses({});setReviewPenalties({});setReviewPenaltyReasons({});
@@ -82,8 +80,6 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const mine=registered.filter(canManage);
  const selectedCandidate=registered.find(c=>c.id===candidateId)||mine[0]||null;
  const isStudent=members.some(m=>m.user_id===me?.user_id&&m.kind==='student');
- const myDecisionVote=decisionVotes.find(v=>v.user_id===me?.user_id)?.choice;
- const yesVotes=decisionVotes.filter(v=>v.choice).length,noVotes=decisionVotes.length-yesVotes;
  const activeRound=settings?.status==='runoff'?2:1;
  const publicPoll=publicPolls.find(p=>p.round_no===1)||null;
  const resultRows=useMemo(()=>registered.map(c=>({
@@ -101,18 +97,17 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   if(!gameId)return;
   const version=++request.current,current=()=>activeScope()&&version===request.current;
   try{
-  const [cr,mr,dr,dvr,pr,sr,sc,ir]=await Promise.all([
+  const [cr,mr,dr,pr,sr,sc,ir]=await Promise.all([
    supabase.from('presidential_candidates').select('id,user_id,party_id,created_by,display_name,registration_status,photo_path,program_summary,campaign_statement,rating_penalty').eq('game_id',gameId).is('archived_at',null).order('display_name'),
    supabase.from('presidential_campaign_materials').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
    supabase.from('presidential_poll_decision').select('*').eq('game_id',gameId).maybeSingle(),
-   supabase.from('presidential_poll_decision_votes').select('*').eq('game_id',gameId),
    supabase.from('presidential_public_polls').select('*').eq('game_id',gameId).order('round_no'),
    supabase.from('presidential_election_settings').select('*').eq('game_id',gameId).maybeSingle(),
    supabase.from('presidential_scorecards').select('*').eq('game_id',gameId),
    supabase.from('presidential_inauguration').select('*').eq('game_id',gameId).maybeSingle()
   ]);
   if(!current())return;
-  const failure=[cr,mr,dr,dvr,pr,sr,sc,ir].find(result=>result.error);if(failure?.error)throw failure.error;
+  const failure=[cr,mr,dr,pr,sr,sc,ir].find(result=>result.error);if(failure?.error)throw failure.error;
   const rows=(cr.data||[]) as Candidate[],scoreRows=(sc.data||[]) as Score[],ceremony=ir.data as Inauguration|null;
   const [pairs,hymn,music]=await Promise.all([
    Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,await signed(x.photo_path)] as const)),
@@ -122,14 +117,14 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   setCandidates(rows);setPhotoUrls(Object.fromEntries(pairs.filter(x=>x[1])));
   const preferred=rows.find(x=>x.registration_status==='registered'&&canManage(x));
   setCandidateId(previous=>rows.some(x=>x.id===previous&&x.registration_status==='registered'&&canManage(x))?previous:preferred?.id||'');
-  setMaterials((mr.data||[]) as Material[]);setDecision(dr.data as PollDecision|null);setDecisionVotes((dvr.data||[]) as PollDecisionVote[]);setPublicPolls((pr.data||[]) as PublicPoll[]);setSettings(sr.data as Settings|null);
+  setMaterials((mr.data||[]) as Material[]);setDecision(dr.data as PollDecision|null);setPublicPolls((pr.data||[]) as PublicPoll[]);setSettings(sr.data as Settings|null);
   setScores(scoreRows);
 
   setInauguration(ceremony);setAudioUrls({hymn,music});
   if(!ceremonyDirty.current){setCeremonyAt(ceremony?.scheduled_at?new Date(ceremony.scheduled_at).toISOString().slice(0,16):'');setVenue(ceremony?.venue||'');setCeremonyNotes(ceremony?.notes||'')}
   }catch(error){if(current())setError(error)}
  }
- useGameTableSync(gameId,['presidential_candidates','presidential_campaign_materials','presidential_poll_decision','presidential_poll_decision_votes','presidential_public_polls','presidential_scorecards','presidential_election_settings','presidential_inauguration','game_parties'],load,viewScope);
+ useGameTableSync(gameId,['presidential_candidates','presidential_campaign_materials','presidential_poll_decision','presidential_public_polls','presidential_scorecards','presidential_election_settings','presidential_inauguration','game_parties'],load,viewScope);
 
  if(!game||!me)return null;
  const baseUrl=typeof window!=='undefined'?window.location.origin:'';
@@ -179,9 +174,9 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   }
   setBusy(false);
  }
- async function openPollDecision(){setBusy(true);const r=await supabase.rpc('open_presidential_poll_decision',{p_game_id:gameId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
- async function votePollDecision(choice:boolean){setBusy(true);const r=await supabase.rpc('vote_presidential_poll_decision',{p_game_id:gameId,p_choice:choice});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
- async function closePollDecision(){setBusy(true);const r=await supabase.rpc('close_presidential_poll_decision',{p_game_id:gameId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+
+
+
  async function createPublicPoll(){
   setBusy(true);const r=await supabase.rpc('create_presidential_public_poll',{p_game_id:gameId,p_round_no:activeRound,p_closes_at:pollClose?new Date(pollClose).toISOString():null});
   if(r.error)setError(userError(r.error));else{setNotice('Публичный опрос открыт. Ссылку можно распространять во внешних сетях.');await load()}setBusy(false);
