@@ -16,6 +16,7 @@ assert(sql.includes("d.doc_type NOT IN ('fz_bill','fkz_bill','bill','federal_bud
 assert(page.includes('isTerminal')&&page.includes('Процедура прекращена')&&page.includes('waitingForParliament'));
 assert(paper.includes("Документ отклонён. Подписание и дальнейшее рассмотрение не предусмотрены."));
 assert(election.includes('ВЫБРАННАЯ МОДЕЛЬ')&&election.includes('ещё не означает вступления федерального закона в силу'));
+assert(election.includes("!rows.some(proposal=>proposal.status==='adopted')"),'No competing proposal button after one model is adopted');
 (async()=>{
  const db=new PGlite();
  try{
