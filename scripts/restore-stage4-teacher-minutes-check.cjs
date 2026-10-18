@@ -68,6 +68,10 @@ try{
  assert.equal((await db.query('select private.matches_formal_owner($1,$2,$3,$4) allowed',[game,teacher,'gd_staff',author])).rows[0].allowed,false);
  const attempts=await Promise.allSettled(Array.from({length:40},()=>db.query("select public.advance_formal_document($1,'advance',null)",[existing[0].id])));
  assert.equal(attempts.filter(x=>x.status==='rejected').length,40,'40 teacher attempts must fail');
+ await assert.rejects(
+  db.query("update formal_documents set status_code='published',current_step=2,status_label='Принят',current_owner_key='system' where id=$1",[existing[0].id]),
+  /повторно принимает только уполномоченное/,'Teacher cannot bypass RPC with direct table update');
+
  await db.query('update auth.session set user_id=$1',[student]);
  await assert.rejects(db.query("select public.advance_formal_document($1,'advance',null)",[existing[1].id]),/another institution/);
  await db.query('update auth.session set user_id=$1',[chair]);
