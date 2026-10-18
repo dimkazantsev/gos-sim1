@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const view=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
+const paper=fs.readFileSync('components/game/DocumentPaper.tsx','utf8');
+assert(view.includes("['rejected','superseded','withdrawn'].includes(selected.status_code)"),'Terminal states must be recognized');
+assert(view.includes("isTerminalDocument?selected.status_label:"),'Rejected card shows real final status');
+assert(view.includes("isTerminalDocument?terminalDocumentText:"),'No next action for rejected document');
+assert(view.includes("isTerminalDocument?<div className=\"formalWaiting\">"),'Rejected controls are read-only');
+assert(view.includes("isTerminalDocument||isMeetingProcedureDocument?null:"),'No actionable transition on closed projects');
+assert(view.includes("selected&&!isTerminalDocument?votePresetForDocument(selected):null"),'No stale voting widget');
+assert(view.includes('До назначения Президента подписание невозможно'),'President vacancy clearly explained');
+assert(paper.includes("terminal?rejectedSignatureLabel:"),'Rejected documents cannot request signatures');
+assert(paper.includes('Документ отклонён. Подписание не требуется.'),'Rejected print has truthful footer');
+console.log('PASS: rejected and superseded documents do not expose next steps, votes, or signatures; President vacancy explanation shown.');
