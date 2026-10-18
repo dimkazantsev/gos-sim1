@@ -75,7 +75,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   &&parties.some(p=>p.id===candidate.party_id&&p.registration_status==='registered'
    &&members.some(m=>m.user_id===me?.user_id&&m.kind==='student'&&!m.roster_archived_at&&m.team===p.name));
  const systemReady=!!settings&&systemDecisionComplete;
- const canNominate=!!me&&systemReady&&(teacher||currentStage?.stage_no===7);
+ const canNominate=!!me&&(teacher||currentStage?.stage_no===6);
 
  async function load(){
   if(!game)return;
@@ -134,38 +134,6 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  },[game?.id]);
 
  if(!game||!me)return null;
- if(!systemReady)return <section id="stage6-cec" className="electionLab cecWorkspace cecWorkspaceLocked" aria-disabled="true">
-  <header className="electionLabHead cecHead">
-   <div>
-    <small>ЦИК РФ · ЭТАП 7 · СЛЕДУЮЩИЙ ШАГ</small>
-    <h2>Регистрация кандидатов в Президенты</h2>
-    <p>Рабочее место ЦИК уже сформировано, но станет активным только после того, как Государственная Дума утвердит тип избирательной системы.</p>
-   </div>
-   <div className="cecHeadSide cecHeadSideLocked">
-    <InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" className="cecEmblem" width={72} height={72}/>
-    <div><b>Центральная избирательная комиссия</b><span>Ожидает решения Государственной Думы</span></div>
-   </div>
-  </header>
-  <nav className="cecTabs cecTabsLocked" aria-label="Разделы ЦИК — временно недоступны">
-   <button disabled>Моё досье</button>
-   <button disabled>Подача в ЦИК <b>0</b></button>
-   <button disabled>Кандидаты <b>0</b></button>
-   <button disabled>Решения ЦИК <b>0</b></button>
-  </nav>
-  <section className="cecLockedPreview">
-   <div className="cecLockedIcon"><LockKeyhole size={26}/></div>
-   <div className="cecLockedCopy">
-    <small>ДОСТУП К ЦИК ЗАКРЫТ</small>
-    <h3>Сначала Государственная Дума определяет систему выборов</h3>
-    <p>После утверждения личного голосования студентов за избирательную систему и социологический опрос этот блок разблокируется автоматически. Здесь появятся выдвижение кандидатов, досье, подача документов и решения ЦИК.</p>
-   </div>
-   <div className="cecLockedSequence" aria-label="Последовательность процедуры">
-    <span className="done">1 · Проект поправки</span>
-    <span className="current">2 · Решение ГД</span>
-    <span>7 · ЦИК</span>
-   </div>
-  </section>
- </section>;
  const activeGame=game;
  const activeMe=me;
  const partyUsers=(partyId:string)=>{const p=parties.find(x=>x.id===partyId);return p?members.filter(m=>m.kind==='student'&&m.team===p.name):[]};
@@ -272,27 +240,32 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  }
 
  return <section id="stage6-cec" className="electionLab cecWorkspace">
-  <header className="electionLabHead cecHead"><div><small>ЦИК РФ · ЭТАП 7</small><h2>Регистрация кандидатов в Президенты</h2><p>После решения студентов об избирательной системе и назначения выборов Советом Федерации кандидаты формируют досье и направляют документы в ЦИК. Агитация и подсчёт результатов проводятся на 7-м этапе.</p></div><div className="cecHeadSide"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" className="cecEmblem" width={72} height={72}/><div><b>Центральная избирательная комиссия</b><span>Регистрация кандидатов</span></div></div></header>
+  <header className="electionLabHead cecHead"><div><small>ЦИК РФ · ЭТАП 6</small><h2>Выдвижение и регистрация кандидатов</h2><p>Кандидаты готовят программу, фотографию, документы для ЦИК и подают регистрационные пакеты на шестом этапе. ЦИК проверяет материалы, принимает решение о регистрации или возвращает их на доработку. Агитация и выборы проходят на этапе 7.</p></div><div className="cecHeadSide"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" className="cecEmblem" width={72} height={72}/><div><b>Центральная избирательная комиссия</b><span>Регистрация кандидатов</span></div></div></header>
   <nav className="cecTabs" aria-label="Разделы президентских выборов"><button className={panelView==='dossier'?'active':''} onClick={()=>setPanelView('dossier')}>Моё досье</button><button className={panelView==='application'?'active':''} onClick={()=>setPanelView('application')}>Подача в ЦИК <b>{candidates.filter(x=>x.cec_submitted_at&&x.registration_status==='submitted').length}</b></button><button className={panelView==='candidates'?'active':''} onClick={()=>setPanelView('candidates')}>Кандидаты <b>{candidates.filter(x=>x.cec_submitted_at).length}</b></button><button className={panelView==='decisions'?'active':''} onClick={()=>setPanelView('decisions')}>Решения ЦИК <b>{decisions.length}</b></button></nav>
 
-  <section className="electionSystemStatusCard" aria-label="Действующая система выборов Президента">
+  {systemReady?(
+{systemReady&&settings&&<section className="electionSystemStatusCard" aria-label="Действующая система выборов Президента">
    <div className="electionSystemStatusMain">
     <span className="electionSystemStatusBadge">Выбрано личным голосованием студентов</span>
     <small>ДЕЙСТВУЮЩАЯ СИСТЕМА</small>
     <strong>{systemNames[settings.system_type]}</strong>
-    <p>{settings.system_type==='qualified'?'Порог квалифицированного большинства — '+settings.threshold_pct+'%.':settings.system_type==='preferential'?'Подсчёт проводится по преференциальной модели, утверждённой Государственной Думой.':settings.poll_enabled===false?'Социологический опрос не включён в модель результата.':'Система синхронизирована с моделью выборов Президента.'}</p>
+    <p>{settings.system_type==='qualified'?'Порог квалифицированного большинства — '+settings.threshold_pct+'%.':settings.system_type==='preferential'?'Подсчёт проводится по системе, выбранной участниками.':settings.poll_enabled===false?'Социологический опрос не включён в модель результата.':'Система синхронизирована с моделью выборов Президента.'}</p>
    </div>
    <div className="electionSystemStatusMeta">
-    <div><small>ОСНОВАНИЕ</small><b>Решение Государственной Думы</b></div>
-    <div><small>ПРОЦЕДУРА</small><span>Поправка к ФЗ № 19-ФЗ</span></div>
+    <div><small>ОСНОВАНИЕ</small><b>Личное голосование участников</b></div>
+    <div><small>ПРОЦЕДУРА</small><span>Этап 6 · Результат голосования</span></div>
    </div>
   </section>
+
+  ):(
+   <div className="cecSystemGate" role="status"><b>Избирательная система пока выбирается студентами.</b><span>Выдвижение кандидатов, подготовка досье и подача документов в ЦИК доступны на этапе 6 независимо от завершения голосования.</span></div>
+  )}
 
   {panelView==='dossier'&&canNominate&&candidates.filter(c=>c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id)).length===0&&<details className="candidateNomination" open><summary><div><b>Выдвинуть кандидата</b><span>Партия может иметь одного активного кандидата.</span></div><i>+</i></summary><div className="candidateNominationBody">{teacher&&<label>Партия<select value={candidateParty} onChange={e=>{setCandidateParty(e.target.value);setCandidateUser('')}}><option value="">Самовыдвижение / сценарный кандидат</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>}<label>Участник<select value={candidateUser} onChange={e=>setCandidateUser(e.target.value)}><option value="">{teacher?'Не привязывать к участнику':ledParty?'Выберите члена партии':'Я сам'}</option>{(teacher?(candidateParty?partyUsers(candidateParty):members.filter(m=>m.kind==='student')):ledParty?partyUsers(ledParty.id):[]).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label>{teacher&&<label>Имя в бюллетене<input value={candidateName} onChange={e=>setCandidateName(e.target.value)} placeholder="Для вымышленного кандидата обязательно"/></label>}<label className="candidateProgram">Программа кандидата · один пункт с новой строки<textarea rows={7} value={program} onChange={e=>setProgram(e.target.value)} placeholder={"1. Положение программы\n2. Положение программы\n…\n10. Положение программы"}/></label><label className="candidateProgram">Публичный агитационный тезис<textarea rows={3} value={campaign} onChange={e=>setCampaign(e.target.value)} placeholder="Короткий публичный тезис кандидата"/></label><button className="primary" disabled={busy||(!teacher&&!!ledParty&&!candidateUser)} onClick={()=>void nominate()} >Создать черновик досье</button></div></details>}
 
   {panelView==='decisions'&&<section className="cecDecisionRegistry"><header><div><small>ПУБЛИЧНЫЙ РЕЕСТР</small><h3>Решения ЦИК РФ</h3></div><span>{decisions.length} решений</span></header>{decisions.length===0?<div className="emptyState">Решения ещё не принимались.</div>:decisions.map(x=>{const c=candidates.find(v=>v.id===x.candidate_id);const note=privateNotes.find(v=>v.decision_id===x.id);return <article key={x.id} className={'cecDecision '+x.decision_type}><div><small>{x.decision_number} · {new Date(x.created_at).toLocaleString('ru-RU')}</small><h4>{c?.display_name||'Кандидат'}</h4><p>{x.public_summary}</p>{x.reasoning?.items?.length&&<div className="cecDecisionChecks"><span>Проверено документов: <b>{x.reasoning.items.length}</b></span><span>Замечаний: <b>{x.reasoning.error_count||0}</b></span></div>}{note?.private_summary&&<details><summary>Служебное примечание ЦИК</summary><p>{note.private_summary}</p></details>}<button className="cecDocumentOpen" onClick={()=>setDocumentPreview({kind:'decision',candidateId:x.candidate_id,decisionId:x.id})}>Открыть решение ЦИК</button></div><strong>{candidateStatus[x.decision_type]}</strong></article>})}</section>}
 
-  {systemReady&&(panelView==='candidates'||panelView==='dossier'||panelView==='application')&&<div className="candidateGrid">{candidates.length===0?<div className="emptyState">Кандидаты ещё не выдвинуты.</div>:candidates.filter(c=>panelView==='candidates'?!!c.cec_submitted_at:panelView==='application'?(teacher?!!c.cec_submitted_at:(c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id))):(c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id)||canUploadForCandidate(c))).map(c=>{
+  {(panelView==='candidates'||panelView==='dossier'||panelView==='application')&&<div className="candidateGrid">{candidates.length===0?<div className="emptyState">Кандидаты ещё не выдвинуты.</div>:candidates.filter(c=>panelView==='candidates'?!!c.cec_submitted_at:panelView==='application'?(teacher?!!c.cec_submitted_at:(c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id))):(c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id)||canUploadForCandidate(c))).map(c=>{
     const party=parties.find(p=>p.id===c.party_id);
    const candidatePoints=points.filter(x=>x.candidate_id===c.id).sort((a,b)=>a.point_no-b.point_no);
    const docs=candidateDocs.filter(x=>x.candidate_id===c.id);
