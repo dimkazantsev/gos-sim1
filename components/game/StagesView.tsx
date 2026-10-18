@@ -20,12 +20,14 @@ type StageFilter='all'|'open'|'voting'|'completed'|'locked';
 
 export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:(voteId?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:import('./types').View)=>void;focusStageNo?:number;readOnly?:boolean}){
  const {stages,votes,teacher,nextStage}=g;
+ const [openMaterialsForStage,setOpenMaterialsForStage]=useState(0);
  const [documentHolds,setDocumentHolds]=useState<{source_stage:number;blocked_stage:number;missing_documents:{title:string}[];penalty_points:number}[]>([]);
  const [holdError,setHoldError]=useState('');
  const [selectedStageNo,setSelectedStageNo]=useSavedGameState(g.game?.id,g.me?.user_id,'stage-selected',0,value=>Number.isInteger(value)&&Number(value)>=0&&Number(value)<=16);
  const selected=stages.find(s=>s.stage_no===selectedStageNo)||null;
  function setSelected(stage:Stage|null,scroll=true){
   setSelectedStageNo(stage?.stage_no||0);
+  setOpenMaterialsForStage(0);
   if(scroll&&typeof window!=='undefined')requestAnimationFrame(()=>{
    document.querySelector?.<HTMLElement>('.simContentFlow')?.scrollTo?.({top:0});
    window.scrollTo?.({top:0});
@@ -112,12 +114,13 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
     <strong>Этап {selected.stage_no} временно недоступен</strong>
     <p>После завершения этапа {selectedHold.source_stage} остались обязательные итоговые документы. Пока они не оформлены, работа на следующих этапах заблокирована, даже если они открыты для других участников.</p>
     <p>Необходимо оформить: {selectedHold.missing_documents.map(d=>d.title).join('; ')}. Снижение предварительной оценки за отсутствие итогового документа — до 1 балла по правовому критерию.</p>
-    <button type="button" className="primary" onClick={()=>setSelected(stages.find(x=>x.stage_no===selectedHold.source_stage)||null)}>Перейти к документам этапа {selectedHold.source_stage}</button>
+    <button type="button" className="primary" onClick={()=>{setSelected(stages.find(x=>x.stage_no===selectedHold.source_stage)||null);setOpenMaterialsForStage(selectedHold.source_stage)}}>Перейти к документам этапа {selectedHold.source_stage}</button>
    </section>}
    {holdError&&!teacher&&<p className="stageOperationsNotice" role="alert">{holdError}</p>}
    <StageWorkspace
    g={g}
    stage={selected}
+   initialTab={openMaterialsForStage===selected.stage_no?'materials':'work'}
    readOnly={readOnly||Boolean(selectedHold)||(!teacher&&!isStageWorkOpen(g.game,selected)&&!(selected.status==='completed'&&documentHolds.some(h=>h.source_stage===selected.stage_no)))}
    onBack={()=>setSelected(null)}
    onOpenStage={stageNo=>setSelected(stages.find(item=>item.stage_no===stageNo)||null)}
