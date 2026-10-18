@@ -154,6 +154,37 @@ BEGIN
  RETURN new;
 END;$function$;
 
+-- The pre-existing UPDATE RLS policy permits teacher updates. For the
+-- two specifically returned minutes, a direct PostgREST UPDATE must not
+-- bypass the institutional approval RPC/role and closed-stage rules.
+CREATE OR REPLACE FUNCTION private.guard_returned_gd_minutes_write()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
+SET search_path TO public,private,pg_temp
+AS $guard$
+BEGIN
+ IF OLD.stage_no=4 AND OLD.doc_type='other'
+   AND OLD.subject_key='gd' AND OLD.workflow_key='generic'
+   AND OLD.metadata->>'template_key'='minutes'
+   AND EXISTS(
+      SELECT 1 FROM public.formal_document_history h
+      WHERE h.document_id=OLD.id
+        AND h.action='Отменено ошибочное принятие преподавателем'
+        AND h.from_status='published' AND h.to_status='review'
+   )
+   AND auth.uid() IS NOT NULL
+   AND NOT private.can_reapprove_returned_gd_minutes(OLD,NEW,auth.uid())
+ THEN
+   RAISE EXCEPTION 'Протокол Государственной Думы повторно принимает только уполномоченное должностное лицо'
+     USING ERRCODE='42501';
+ END IF;
+ RETURN NEW;
+END;$guard$;
+REVOKE ALL ON FUNCTION private.guard_returned_gd_minutes_write() FROM PUBLIC,anon,authenticated;
+DROP TRIGGER IF EXISTS zzz_guard_returned_gd_minutes_write ON public.formal_documents;
+CREATE TRIGGER zzz_guard_returned_gd_minutes_write
+BEFORE UPDATE ON public.formal_documents FOR EACH ROW
+EXECUTE FUNCTION private.guard_returned_gd_minutes_write();
+
 -- The criteria are evidence-based, not hard-coded document UUIDs.
 -- Abort the entire migration if anything other than exactly two incorrect
 -- teacher publications matches. All history rows are retained.
