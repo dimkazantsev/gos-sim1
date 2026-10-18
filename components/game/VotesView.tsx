@@ -26,7 +26,11 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  const [query,setQuery]=useState(''),[units,setUnits]=useState<VotingUnit[]>([]);
  const [formalId,setFormalId]=useState('');
  const selectedNpa=formalDocuments.find(d=>d.id===formalId);
- const pendingNpas=formalDocuments.filter(d=>votePresetForDocument(d)&&!votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open'));
+ const scheduledBills=formalDocuments.filter(d=>d.workflow_key==='bill'
+  && !['published','rejected'].includes(d.status_code)
+  && !votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open'));
+ const pendingNpas=formalDocuments.filter(d=>d.workflow_key!=='bill'&&votePresetForDocument(d)
+  &&!votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open'));
  const focused=useRef('');
  useEffect(()=>{if(focusId)setTab('all')},[focusId]);
  const [checkedIn,setCheckedIn]=useState<{user_id:string;institution_key:string;stage_no:number;present_mandates:number|null}[]>([]);
@@ -120,6 +124,18 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    />
    {focusedNeedsRegistration&&<p className="voteRegistrationHint">Сначала зарегистрируйтесь на заседание. После регистрации система автоматически переведёт вас к связанному голосованию.</p>}
   </div>
+  {scheduledBills.length>0&&<section className="npaVoteQueue" aria-label="Планируемые голосования по законопроектам">
+   <header><h2>Законопроекты · ожидают заседания</h2><span>{scheduledBills.length}</span></header>
+   <p>Законопроект автоматически включён в очередь рассмотрения. Это не открытое голосование: бюллетени станут доступны только после включения документа в повестку, открытия заседания Государственной Думы и начала соответствующего вопроса. Кворум и большинство определяются типом закона.</p>
+   {scheduledBills.map(d=><article key={d.id}>
+    <div><small>{d.registry_no} · {d.status_label}</small>
+     <b>{formalDocumentTitle(d.title,d.doc_type)}</b>
+     <span>{d.status_code==='draft'?'Проект готовится к внесению':votePresetForDocument(d)?'Ожидает рассмотрения вопроса на заседании':'На предварительной процедурной стадии'}</span>
+    </div>
+    <button type="button" className="secondary" onClick={()=>onOpenDocument(d.id)}>Открыть законопроект</button>
+    <span aria-label="Голосование пока недоступно">Ожидает заседания</span>
+   </article>)}
+  </section>}
   <section className="npaVoteQueue"><header><h2>НПА, ожидающие голосования</h2><span>{pendingNpas.length}</span></header><p>Документы появляются здесь автоматически при переходе на стадию голосования. Правила процедуры берутся из документа.</p>{pendingNpas.map(d=>{const preset=votePresetForDocument(d)!;return <article key={d.id}><div><small>{d.registry_no} · {d.status_label}</small><b>{formalDocumentTitle(d.title,d.doc_type)}</b><span>{institutionLabel(preset.institutionKey)}</span></div><button className="secondary" onClick={()=>onOpenDocument(d.id)}>Открыть НПА</button><button className="primary" disabled={busy===d.id} onClick={()=>void openNpa(d.id)}>{busy===d.id?'Открывается…':'Открыть голосование'}</button></article>})}{!pendingNpas.length&&<span>Сейчас нет документов на стадии голосования.</span>}</section>
   {teacher&&<details className="teacherDetails voteManual projectDisclosure">
    <DisclosureSummary icon={VoteIcon} title="Открыть отдельное голосование" description="Самостоятельный вопрос или документ из реестра НПА"/>
