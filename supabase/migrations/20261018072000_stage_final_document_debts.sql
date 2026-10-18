@@ -92,11 +92,12 @@ REVOKE ALL ON FUNCTION private.stage_document_penalty_points(uuid,uuid,integer)
 CREATE OR REPLACE FUNCTION private.has_prior_stage_document_hold(p_game uuid,p_user uuid,p_target_stage integer)
 RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER
 SET search_path TO public,private,pg_temp AS $fn$
- SELECT p_target_stage BETWEEN 2 AND 16
- AND EXISTS(SELECT 1 FROM public.game_stages s
-    WHERE s.game_id=p_game AND s.stage_no=p_target_stage-1
-      AND s.status='completed')
- AND jsonb_array_length(private.stage_document_debts(p_game,p_user,p_target_stage-1))>0;
+ SELECT p_target_stage BETWEEN 2 AND 16 AND EXISTS(
+  SELECT 1 FROM public.game_stages s
+  WHERE s.game_id=p_game AND s.stage_no<p_target_stage
+    AND s.status='completed'
+    AND jsonb_array_length(private.stage_document_debts(p_game,p_user,s.stage_no))>0
+ );
 $fn$;
 REVOKE ALL ON FUNCTION private.has_prior_stage_document_hold(uuid,uuid,integer)
  FROM PUBLIC,anon,authenticated;
