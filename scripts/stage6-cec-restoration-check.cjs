@@ -8,6 +8,7 @@ const details=fs.readFileSync('components/game/stageDetails.ts','utf8');
 const operations=fs.readFileSync('components/game/stageOperations.ts','utf8');
 const css=fs.readFileSync('app/stage6-election-workspace.css','utf8');
 const layout=fs.readFileSync('app/layout.tsx','utf8');
+const sql=fs.readFileSync('supabase/migrations/20261019195000_stage6_candidate_cec_and_stage7_election_readiness.sql','utf8');
 const part=ws.match(/const BODIES:[^\n]+/);
 assert(part,'Institution registration configuration remains explicit');
 assert(!/6:\s*\[/.test(part[0]),'Stage 6 must never request parliamentary meeting registration');
@@ -32,4 +33,8 @@ assert(css.includes('grid-template-columns:repeat(2,minmax(0,1fr))'),'Desktop co
 assert(css.includes('@container (max-width:750px)'),'Narrow chat/tablet cards stack regardless of device viewport');
 assert(css.includes('max-width:100%')&&css.includes('white-space:normal'),'Date and action controls wrap without overflow');
 assert(layout.includes("import './stage6-election-workspace.css'"),'Stage 6 styles are loaded in production');
+assert(sql.includes('private.stage_readiness_json')&&sql.includes('presidential_student_system_result'),'Stage 6 completion follows students rather than legacy GD bill');
+assert(sql.includes('private.stage_required_final_documents')&&sql.includes("(6,''sf_resolution''"),'Senate appointment final document belongs to stage 6');
+assert(sql.includes('cec-presidential-inauguration')&&sql.includes('private.office_family'),'Stage 7 completion requires CEC and inaugurated President');
+assert(!sql.includes('INSERT INTO public.presidential_candidates'),'Migration never rewrites candidate records');
 console.log('PASS: Stage 6 candidate nomination / document upload / CEC review restored; no meeting registration; stage 7 counts votes; responsive layouts 320–wide.');
