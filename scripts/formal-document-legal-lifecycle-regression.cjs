@@ -2,6 +2,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 const sql=fs.readFileSync('supabase/migrations/20261019011000_formal_legal_routes_and_presidential_amendment.sql','utf8');
+const directGuard=fs.readFileSync('supabase/migrations/20261019011200_guard_direct_formal_document_legal_route.sql','utf8');
 const page=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
 const paper=fs.readFileSync('components/game/DocumentPaper.tsx','utf8');
 const election=fs.readFileSync('components/game/PresidentialSystemDecisionPanel.tsx','utf8');
@@ -86,6 +87,18 @@ assert(election.includes('ВЫБРАННАЯ МОДЕЛЬ')&&election.includes('
   assert.equal((await db.query('SELECT status_code FROM formal_documents WHERE id=$1',[rejected])).rows[0].status_code,'rejected');
   const counts=(await db.query("SELECT doc_type,workflow_key,count(*)::int n FROM formal_documents WHERE id NOT IN ($1,$2) GROUP BY 1,2 ORDER BY 1",[accepted,rejected])).rows;
   assert.equal(counts.reduce((n,x)=>n+x.n,0),12,'All 12 approved client document types retain their dedicated routes');
-  console.log('PASS: historical 2 amendments, authentic SF wait, 7 invalid route combinations rejected, 12 valid kinds, terminal RPCs and signed-law role isolation.');
+  await db.exec(directGuard);
+  await assert.rejects(
+    ()=>db.query("INSERT INTO formal_documents(id,game_id,doc_type,workflow_key,metadata,status_code) VALUES($1,$2,'gd_resolution','bill','{}','draft')",[uid(1100),game]),
+    /не соответствует/,'Direct SQL cannot give a GD resolution the federal-law procedure');
+  await assert.rejects(
+    ()=>db.query("INSERT INTO formal_documents(id,game_id,doc_type,workflow_key,metadata,status_code) VALUES($1,$2,'bill','bill','{}','draft')",[uid(1101),game]),
+    /только для ФЗ и ФКЗ/,'Technical bill type cannot be used to create legal acts');
+  await assert.rejects(
+    ()=>db.query("UPDATE formal_documents SET current_step=1,current_owner_key='author',status_code='draft' WHERE id=$1",[rejected]),
+    /Отклонённый документ окончателен/,'Direct SQL cannot reactivate a rejected bill');
+  await db.query("INSERT INTO formal_documents(id,game_id,doc_type,workflow_key,metadata,status_code) VALUES($1,$2,'government_resolution','government_act','{}','draft')",[uid(1102),game]);
+  assert.equal((await db.query("SELECT workflow_key FROM formal_documents WHERE id=$1",[uid(1102)])).rows[0].workflow_key,'government_act');
+  console.log('PASS: historical 2 amendments, authentic SF wait, 7 invalid route combinations rejected, 12 valid kinds, terminal and direct SQL enforcement, lawful government acts, signed-law role isolation.');
  }finally{await db.close()}
 })().catch(err=>{console.error(err);process.exitCode=1});
