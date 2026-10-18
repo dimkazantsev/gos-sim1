@@ -35,6 +35,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const [scores,setScores]=useState<Score[]>([]);
 
  const [inauguration,setInauguration]=useState<Inauguration|null>(null);
+ const [inaugurationConfirmed,setInaugurationConfirmed]=useState(false);
  const [photoUrls,setPhotoUrls]=useState<Record<string,string>>({});
  const [audioUrls,setAudioUrls]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
@@ -68,7 +69,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{
   request.current++;ceremonyDirty.current=false;
-  setCandidates([]);setMaterials([]);setDecision(null);setPublicPolls([]);setSettings(null);setStage6Ready(false);setScores([]);setInauguration(null);setPhotoUrls({});setAudioUrls({});
+  setCandidates([]);setMaterials([]);setDecision(null);setPublicPolls([]);setSettings(null);setStage6Ready(false);setScores([]);setInauguration(null);setInaugurationConfirmed(false);setPhotoUrls({});setAudioUrls({});
   setCandidateId('');setCeremonyAt('');setVenue('');setCeremonyNotes('');setHymnFile(null);setMusicFile(null);setBusy(false);setNotice('');
   setTitle('');setBody('');setPrintRun('');setPublisher('');setProductionDate('');setImprint('');setExternalUrl('');setFiles([]);
   setMaterialType('poster');setPollClose('');setReviewNotes({});setReviewErrors({});setReviewResponses({});setReviewPenalties({});setReviewPenaltyReasons({});
@@ -98,7 +99,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   if(!gameId)return;
   const version=++request.current,current=()=>activeScope()&&version===request.current;
   try{
-  const [cr,mr,dr,pr,sr,sc,ir,stageDecision]=await Promise.all([
+  const [cr,mr,dr,pr,sr,sc,ir,stageDecision,ceremonyPost]=await Promise.all([
    supabase.from('presidential_candidates').select('id,user_id,party_id,created_by,display_name,registration_status,photo_path,program_summary,campaign_statement,rating_penalty').eq('game_id',gameId).is('archived_at',null).order('display_name'),
    supabase.from('presidential_campaign_materials').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
    supabase.from('presidential_poll_decision').select('*').eq('game_id',gameId).maybeSingle(),
@@ -106,11 +107,12 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    supabase.from('presidential_election_settings').select('*').eq('game_id',gameId).maybeSingle(),
    supabase.from('presidential_scorecards').select('*').eq('game_id',gameId),
    supabase.from('presidential_inauguration').select('*').eq('game_id',gameId).maybeSingle(),
-   supabase.rpc('get_presidential_student_system_vote',{p_game_id:gameId})
+   supabase.rpc('get_presidential_student_system_vote',{p_game_id:gameId}),
+   supabase.from('political_posts').select('id').eq('game_id',gameId).eq('source_key','cec-presidential-inauguration:'+gameId).maybeSingle()
   ]);
   if(!current())return;
-  const failure=[cr,mr,dr,pr,sr,sc,ir,stageDecision].find(result=>result.error);if(failure?.error)throw failure.error;
-  setStage6Ready(Boolean(stageDecision.data?.closed));
+  const failure=[cr,mr,dr,pr,sr,sc,ir,stageDecision,ceremonyPost].find(result=>result.error);if(failure?.error)throw failure.error;
+  setStage6Ready(Boolean(stageDecision.data?.closed));setInaugurationConfirmed(Boolean(ceremonyPost.data?.id));
   const rows=(cr.data||[]) as Candidate[],scoreRows=(sc.data||[]) as Score[],ceremony=ir.data as Inauguration|null;
   const [pairs,hymn,music]=await Promise.all([
    Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,await signed(x.photo_path)] as const)),
@@ -127,7 +129,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   if(!ceremonyDirty.current){setCeremonyAt(ceremony?.scheduled_at?new Date(ceremony.scheduled_at).toISOString().slice(0,16):'');setVenue(ceremony?.venue||'');setCeremonyNotes(ceremony?.notes||'')}
   }catch(error){if(current())setError(error)}
  }
- useGameTableSync(gameId,['presidential_candidates','presidential_campaign_materials','presidential_poll_decision','presidential_public_polls','presidential_scorecards','presidential_election_settings','presidential_inauguration','game_parties'],load,viewScope);
+ useGameTableSync(gameId,['presidential_candidates','presidential_campaign_materials','presidential_poll_decision','presidential_public_polls','presidential_scorecards','presidential_election_settings','presidential_inauguration','game_parties','political_posts'],load,viewScope);
 
  if(!game||!me)return null;
  const baseUrl=typeof window!=='undefined'?window.location.origin:'';
@@ -189,6 +191,16 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  function share(service:'vk'|'tg'){if(!pollUrl)return;const u=encodeURIComponent(pollUrl),t=encodeURIComponent('Социологический опрос: выборы Президента РФ');window.open(service==='vk'?'https://vk.com/share.php?url='+u+'&title='+t:'https://t.me/share/url?url='+u+'&text='+t,'_blank','noopener,noreferrer')}
 
  async function uploadAudio(file:File,kind:'hymn'|'music'){const path=gameId+'/presidential/inauguration/'+kind+'-'+crypto.randomUUID()+'.'+(file.name.split('.').pop()||'audio');const r=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'audio/mpeg'});if(r.error)throw r.error;return path}
+ async function confirmCeremony(){
+  if(!teacher||!gameId||busy)return;
+  setBusy(true);
+  try{
+   const r=await supabase.rpc('confirm_presidential_inauguration',{p_game_id:gameId});
+   if(r.error)throw r.error;
+   setNotice('Инаугурация подтверждена. Победитель вступил в должность и получил полномочия Президента.');
+   await load();await g.refresh();
+  }catch(error){setError(userError(error))}finally{setBusy(false)}
+ }
  async function saveCeremony(){
   setBusy(true);try{
    let hymn=inauguration?.hymn_path||null,music=inauguration?.ceremonial_music_path||null;
@@ -259,7 +271,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
     <div className="resultBars">{resultRows.map((row,index)=><div key={row.candidate.id} className="resultBarRow"><div><span>{index+1}</span><b>{row.candidate.display_name}</b><strong>{row.score!=null?Number(row.score).toFixed(2)+'%':'—'}</strong></div><div className="resultBar"><i style={{width:Math.max(0,Math.min(100,Number(row.score)||0))+'%'}}/></div>{row.poll!=null&&<small>Соцопрос: {Number(row.poll).toFixed(2)}%</small>}</div>)}</div>
    </section>
    <section className="stage7Panel inaugurationPanel"><div className="stage7PanelHead"><div><small>ИНАУГУРАЦИЯ</small><h3>Вступление избранного Президента в должность</h3><p>После фиксации итогов преподаватель задаёт дату, место и аудиосопровождение церемонии.</p></div><Landmark size={24}/></div>
-    {teacher?<div className="inaugurationForm"><label>Дата и время<input type="datetime-local" disabled={busy} value={ceremonyAt} onChange={e=>{ceremonyDirty.current=true;setCeremonyAt(e.target.value)}}/></label><label>Место<input disabled={busy} value={venue} onChange={e=>{ceremonyDirty.current=true;setVenue(e.target.value)}} placeholder="Место проведения"/></label><label className="wide">Сценарий / примечания<textarea rows={4} disabled={busy} value={ceremonyNotes} onChange={e=>{ceremonyDirty.current=true;setCeremonyNotes(e.target.value)}} placeholder="Краткий порядок церемонии"/></label><label>Гимн России<input type="file" accept="audio/*" disabled={busy} onChange={e=>{ceremonyDirty.current=true;setHymnFile(e.target.files?.[0]||null)}}/></label><label>Церемониальная музыка<input type="file" accept="audio/*" disabled={busy} onChange={e=>{ceremonyDirty.current=true;setMusicFile(e.target.files?.[0]||null)}}/></label><button className="primary wide" disabled={busy} onClick={()=>void saveCeremony()}>Сохранить инаугурацию</button></div>:inauguration?<div className="ceremonyPublic"><b>{inauguration.scheduled_at?new Date(inauguration.scheduled_at).toLocaleString('ru-RU'):'Дата уточняется'}</b><span>{inauguration.venue||'Место уточняется'}</span>{inauguration.notes&&<p>{inauguration.notes}</p>}</div>:<div className="stage7Empty">Параметры инаугурации ещё не опубликованы.</div>}
+    {teacher?<div className="inaugurationForm"><label>Дата и время<input type="datetime-local" disabled={busy} value={ceremonyAt} onChange={e=>{ceremonyDirty.current=true;setCeremonyAt(e.target.value)}}/></label><label>Место<input disabled={busy} value={venue} onChange={e=>{ceremonyDirty.current=true;setVenue(e.target.value)}} placeholder="Место проведения"/></label><label className="wide">Сценарий / примечания<textarea rows={4} disabled={busy} value={ceremonyNotes} onChange={e=>{ceremonyDirty.current=true;setCeremonyNotes(e.target.value)}} placeholder="Краткий порядок церемонии"/></label><label>Гимн России<input type="file" accept="audio/*" disabled={busy} onChange={e=>{ceremonyDirty.current=true;setHymnFile(e.target.files?.[0]||null)}}/></label><label>Церемониальная музыка<input type="file" accept="audio/*" disabled={busy} onChange={e=>{ceremonyDirty.current=true;setMusicFile(e.target.files?.[0]||null)}}/></label><button className="primary wide" disabled={busy} onClick={()=>void saveCeremony()}>Сохранить инаугурацию</button>{inaugurationConfirmed?<p className="wide stage7Notice">Инаугурация подтверждена. Полномочия Президента Российской Федерации действуют.</p>:<button className="secondary wide" disabled={busy||settings?.status!=='finished'||!inauguration?.scheduled_at||new Date(inauguration.scheduled_at).getTime()>Date.now()} onClick={()=>void confirmCeremony()}>Подтвердить инаугурацию и передать полномочия Президента</button>}</div>:inauguration?<div className="ceremonyPublic"><b>{inauguration.scheduled_at?new Date(inauguration.scheduled_at).toLocaleString('ru-RU'):'Дата уточняется'}</b><span>{inauguration.venue||'Место уточняется'}</span>{inauguration.notes&&<p>{inauguration.notes}</p>}</div>:<div className="stage7Empty">Параметры инаугурации ещё не опубликованы.</div>}
     {(audioUrls.hymn||audioUrls.music)&&<div className="ceremonyAudio">{audioUrls.hymn&&<label>Гимн России<audio controls src={audioUrls.hymn}/></label>}{audioUrls.music&&<label>Церемониальная музыка<audio controls src={audioUrls.music}/></label>}</div>}
    </section>
   </div>}
