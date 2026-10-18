@@ -213,5 +213,5 @@ begin
   values(new.document_id,new.game_id,new.id,new.actor_id,sig,signed_time) on conflict(history_id) do nothing;
  end if;
  return new;
-end;$function$
+end;$function$;
 
