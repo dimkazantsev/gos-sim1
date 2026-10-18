@@ -99,12 +99,37 @@ $fn$;
 REVOKE ALL ON FUNCTION private.finalize_alternative_presidential_proposals(uuid,uuid)
  FROM PUBLIC,anon,authenticated;
 
+-- No new competing bill may appear after the election system was accepted.
+-- Share the same advisory lock as vote closure to avoid a create/accept race.
+CREATE OR REPLACE FUNCTION private.guard_new_presidential_system_proposal()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
+SET search_path TO public,private,pg_temp AS $fn$
+BEGIN
+ IF NEW.status NOT IN ('draft','registered','vote_open','adopted')
+ THEN RETURN NEW; END IF;
+ PERFORM pg_advisory_xact_lock(hashtextextended('presidential-system-decision:'||NEW.game_id::text,0));
+ IF EXISTS(
+  SELECT 1 FROM public.presidential_system_proposals p
+  WHERE p.game_id=NEW.game_id AND p.id IS DISTINCT FROM NEW.id AND p.status='adopted'
+ ) THEN
+  RAISE EXCEPTION 'Избирательная система уже утверждена. Альтернативный проект отклонён'
+   USING ERRCODE='42501';
+ END IF;
+ RETURN NEW;
+END;$fn$;
+REVOKE ALL ON FUNCTION private.guard_new_presidential_system_proposal()
+ FROM PUBLIC,anon,authenticated;
+DROP TRIGGER IF EXISTS presidential_single_new_proposal ON public.presidential_system_proposals;
+CREATE TRIGGER presidential_single_new_proposal
+ BEFORE INSERT OR UPDATE OF status ON public.presidential_system_proposals
+ FOR EACH ROW EXECUTE FUNCTION private.guard_new_presidential_system_proposal();
+
 -- A late vote cannot replace the earlier adopted election system.
 CREATE OR REPLACE FUNCTION private.guard_exclusive_presidential_system_decision()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
 SET search_path TO public,private,pg_temp AS $fn$
 BEGIN
- IF NEW.procedure_key<>'presidential_system'
+ IF NEW.procedure_key IS DISTINCT FROM 'presidential_system'
     OR NEW.status<>'closed' OR NEW.result_code<>'passed'
     OR (OLD.status='closed' AND OLD.result_code='passed')
  THEN RETURN NEW; END IF;
