@@ -9,7 +9,9 @@ const db=new PGlite();
 try{
 await db.exec([
  'CREATE SCHEMA private;CREATE SCHEMA auth;CREATE ROLE anon;CREATE ROLE authenticated;',
- "CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $x$ SELECT '"+official+"'::uuid $x$;",
+ 'CREATE TABLE auth.test_identity(id uuid);',
+ "INSERT INTO auth.test_identity(id) VALUES('10000000-0000-0000-0000-000000000002');",
+ "CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $x$ SELECT id FROM auth.test_identity LIMIT 1 $x$;",
  "CREATE FUNCTION private.formal_workflow(text) RETURNS jsonb LANGUAGE sql IMMUTABLE AS $x$ SELECT '[{\"code\":\"draft\",\"owner\":\"author\"},{\"code\":\"agenda\",\"owner\":\"gd_council\"},{\"code\":\"adopted\",\"owner\":\"gd_staff\"},{\"code\":\"published\",\"owner\":\"system\"}]'::jsonb $x$;",
  'CREATE SEQUENCE formal_registry_seq;',
  'CREATE TABLE game_votes(id uuid PRIMARY KEY,game_id uuid,stage_no integer,procedure_key text,institution_key text,status text,result_code text,title text,body text,created_by uuid,formal_document_id uuid,result_yes numeric,result_no numeric,result_abstain numeric);',
@@ -46,7 +48,9 @@ const rejected=uid(501);
 await db.query("insert into game_votes(id,game_id,stage_no,procedure_key,institution_key,status,title,created_by) values($1,$2,5,'ghost_policy','gd','open','Отклонённый режим',$3)",[rejected,game,official]);
 await db.query("update game_votes set status='closed',result_code='rejected' where id=$1",[rejected]);
 assert.equal(Number((await db.query('select count(*) n from formal_documents')).rows[0].n),4,'Rejected vote cannot create act');
+await db.exec('UPDATE auth.test_identity SET id=NULL;');
 await Promise.all(Array.from({length:40},()=>db.query('select private.sync_verified_vote_decision_act($1)',[votes[0]])));
+await db.query('UPDATE auth.test_identity SET id=$1',[official]);
 assert.equal(Number((await db.query('select count(*) n from formal_documents')).rows[0].n),4,'Forty duplicate calls create no duplicates');
 await assert.rejects(db.query("insert into formal_documents(game_id,metadata) values($1,jsonb_build_object('document_kind','verified_vote_decision_act'))",[game]),/только по подтверждённому/);
 await assert.rejects(db.query("update formal_documents set metadata=metadata||jsonb_build_object('source_vote_id','overwritten') where stage_no=2"),/подменить подтверждённый источник/);
