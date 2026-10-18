@@ -1,0 +1,17 @@
+name: Formal Document Terminal Routes
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node scripts/formal-document-terminal-route-check.cjs
+      - run: npm run typecheck
