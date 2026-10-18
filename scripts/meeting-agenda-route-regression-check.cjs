@@ -56,7 +56,7 @@ const uid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
   for(let i=0;i<40;i++){
    const draft=i%2===0;
    await db.query(
-    "INSERT INTO formal_documents VALUES($1,$2,'meeting_agenda','gd',$3,'gd_resolution',$4,0,$5,$6,$7,'Текст '+$8,$9)",
+    "INSERT INTO formal_documents VALUES($1,$2,'meeting_agenda','gd',$3,'gd_resolution',$4,0,$5,$6,$7,'Текст '||$8::text,$9)",
     [uid(200+i),game,JSON.stringify({document_kind:'institution_meeting_agenda'}),legacy,draft?'draft':'published',draft?'Проект повестки':'Повестка утверждена',draft?'gd':'system',i,'ГОС.ID-'+(200+i)]);
   }
   rows=(await db.query("SELECT status_code,current_step,workflow_steps FROM formal_documents WHERE doc_type='meeting_agenda'")).rows;
