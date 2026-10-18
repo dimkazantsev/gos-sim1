@@ -8,6 +8,7 @@ export default function StageWorkspace(props:{
  g:ReturnTypeRepublic;
  stage:Stage;
  readOnly?:boolean;
+ initialTab?:'materials'|'work';
  onBack:()=>void;
  onOpenStage?:(stageNo:number)=>void;
  onOpenVotes:(voteId?:string)=>void;

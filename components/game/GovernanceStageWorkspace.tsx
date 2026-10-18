@@ -49,12 +49,12 @@ function formatStageConsequence(type:string,magnitude:number|null):string{
 }
 
 type Tab='work'|'rules'|'materials'|'check'|'settings';
-type Props={g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;onBack:()=>void;onOpenStage?:(no:number)=>void;onOpenVotes:(id?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,no:number)=>void;onNavigate?:(view:View)=>void};
+type Props={g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;initialTab?:'materials'|'work';onBack:()=>void;onOpenStage?:(no:number)=>void;onOpenVotes:(id?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,no:number)=>void;onNavigate?:(view:View)=>void};
 const VIEW_NAMES:Partial<Record<View,string>>={parties:'Партии и фракции',votes:'Голосования',documents:'Реестр НПА',budget:'Бюджет',events:'События',grades:'Журнал оценок',actions:'Политический процесс',profile:'Профиль'};
 const BODIES:Partial<Record<number,string[]>>={2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],6:['gd'],11:['government'],12:['gd','committee'],13:['gd','committee','sf'],14:['municipality']};
 
-export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,onOpenStage,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate}:Props){
- const [tab,setTab]=useState<Tab>('work');
+export default function GovernanceStageWorkspace({g,stage,readOnly=false,initialTab='work',onBack,onOpenStage,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate}:Props){
+ const [tab,setTab]=useState<Tab>(initialTab);
  const [sessionGate,setSessionGate]=useState<{stage:number;ready:boolean}|null>(null);
  const onMeetingReadyChange=useCallback((ready:boolean)=>{
   setSessionGate(old=>old?.stage===stage.stage_no&&old.ready===ready?old:{stage:stage.stage_no,ready});
@@ -105,6 +105,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
  const teacher=g.teacher&&!readOnly;
  const stageLocked=!isStageWorkOpen(g.game,stage);
  const viewer=readOnly||g.me?.kind==='observer'||(stageLocked&&!teacher);
+ const canRemediateCompleted=stage.status==='completed'&&!readOnly&&g.me?.kind!=='observer'&&awaitingFinalDocuments.length>0&&actionableFinalDocuments.length>0;
  const ksrfSessionBlocked=(stage.stage_no===2||stage.stage_no===3)&&!teacher&&
   !(sessionGate?.stage===stage.stage_no&&sessionGate.ready);
  useEffect(()=>{if(!teacher&&tab==='settings')setTab('work')},[teacher,tab]);
@@ -156,10 +157,10 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
      {stage.stage_no===16&&<SystemDebriefLab g={g}/>}
     </div>
    </fieldset>
-   {stage.status==='open'&&awaitingFinalDocuments.length>0&&<section className="stageFinalWorkPrompt" aria-live="polite">
+   {(stage.status==='open'||canRemediateCompleted)&&awaitingFinalDocuments.length>0&&<section className="stageFinalWorkPrompt" aria-live="polite">
       <div><FileText size={19} aria-hidden="true"/><span><b>Итоговые документы ещё не оформлены</b>
        <small>Осталось оформить обязательные документы ({awaitingFinalDocuments.length}). До этого этап завершить нельзя.</small></span></div>
-      {!viewer&&actionableFinalDocuments.length>0&&<button type="button" className="primary"
+      {(!viewer||canRemediateCompleted)&&actionableFinalDocuments.length>0&&<button type="button" className="primary"
         onClick={()=>setTab('materials')}>Подготовить итоговые документы <ArrowLeft size={16} aria-hidden="true"/></button>}
      </section>}
     <footer className="stageOperationsWorkFooter"><span><ClipboardCheck size={18}/>Проверка учитывает процедуры и опубликованные итоговые документы</span><button type="button" className="secondary" onClick={()=>setTab('check')}>Проверить завершение</button></footer>
@@ -175,7 +176,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,onBack,
   </section>
 
   <section id={sectionId+'-materials'} className="stageOperationsPane" hidden={tab!=='materials'} aria-label="Документы и голосования">
-   <StageArtifacts g={g} stage={stage} readOnly={viewer} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}
+   <StageArtifacts g={g} stage={stage} readOnly={viewer&&!canRemediateCompleted} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes}
      finalDocuments={requiredDocuments} formalSubjects={formalSubjects} onRefreshFinalDocuments={()=>void refreshFinalDocuments()}/>
    <div className="stageOperationsRelated"><h3><Link2 size={18}/>Связанные разделы</h3><div>{operation.related.map(view=><button type="button" key={view} disabled={!onNavigate} onClick={()=>onNavigate?.(view)}>{VIEW_NAMES[view]||'Раздел игры'}</button>)}</div></div>
   </section>

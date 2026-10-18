@@ -4,6 +4,8 @@ import {useEffect,useState,type CSSProperties} from 'react';
 import {useDialog} from '../ui/useDialog';
 import {IconAction} from '../ui/IconAction';
 import {isStageWorkOpen,stageWorkLabel} from './stageWorkStatus';
+import {supabase} from '@/lib/supabase';
+import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage} from './types';
 import {formatDeadline} from './constants';
@@ -18,10 +20,14 @@ type StageFilter='all'|'open'|'voting'|'completed'|'locked';
 
 export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:(voteId?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:import('./types').View)=>void;focusStageNo?:number;readOnly?:boolean}){
  const {stages,votes,teacher,nextStage}=g;
+ const [openMaterialsForStage,setOpenMaterialsForStage]=useState(0);
+ const [documentHolds,setDocumentHolds]=useState<{source_stage:number;blocked_stage:number;missing_documents:{title:string}[];penalty_points:number}[]>([]);
+ const [holdError,setHoldError]=useState('');
  const [selectedStageNo,setSelectedStageNo]=useSavedGameState(g.game?.id,g.me?.user_id,'stage-selected',0,value=>Number.isInteger(value)&&Number(value)>=0&&Number(value)<=16);
  const selected=stages.find(s=>s.stage_no===selectedStageNo)||null;
  function setSelected(stage:Stage|null,scroll=true){
   setSelectedStageNo(stage?.stage_no||0);
+  setOpenMaterialsForStage(0);
   if(scroll&&typeof window!=='undefined')requestAnimationFrame(()=>{
    document.querySelector?.<HTMLElement>('.simContentFlow')?.scrollTo?.({top:0});
    window.scrollTo?.({top:0});
@@ -38,6 +44,24 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
  const [stageSearch,setStageSearch]=useState('');
  useEffect(()=>{if(focusStageNo)setSelected(stages.find(s=>s.stage_no===focusStageNo)||null,false)},[focusStageNo]);
  const detail=selected?STAGE_DETAILS[selected.stage_no]:null;
+ const stageStatuses=stages.map(s=>s.stage_no+':'+s.status).join('|');
+ const documentStates=g.formalDocuments.map(d=>d.id+':'+d.status_code).sort().join('|');
+ useEffect(()=>{
+  if(!g.game||teacher||readOnly||g.me?.kind!=='student'){setDocumentHolds([]);return}
+  const gameId=g.game.id;let live=true;
+  const refresh=async()=>{
+   const result=await supabase.rpc('get_my_stage_document_holds',{p_game_id:gameId});
+   if(!live)return;
+   if(result.error){setHoldError('Не удалось проверить задолженности по итоговым документам.');return}
+   setHoldError('');
+   setDocumentHolds(Array.isArray(result.data)?result.data:[]);
+  };
+  void refresh();
+  const onRefresh=()=>void refresh();
+  window.addEventListener(GAME_DATA_REFRESH_EVENT,onRefresh);
+  return()=>{live=false;window.removeEventListener(GAME_DATA_REFRESH_EVENT,onRefresh)}
+ },[g.game?.id,g.me?.user_id,g.me?.kind,teacher,readOnly,stageStatuses,documentStates]);
+ const selectedHold=selected&&!teacher?documentHolds.find(h=>h.blocked_stage<=selected.stage_no):null;
  const current=stages.find(s=>isStageWorkOpen(g.game,s))||stages.find(s=>s.status!=='completed')||stages.at(-1);
 
  const completedCount=stages.filter(s=>s.status==='completed').length;
@@ -85,17 +109,27 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
   (!normalizedSearch||[String(s.stage_no),String(s.stage_no).padStart(2,'0'),s.title,s.summary,s.mode].some(part=>part.toLocaleLowerCase('ru-RU').includes(normalizedSearch)))
  );
  if(selected&&detail){
-  return <StageWorkspace
+  return <>
+   {selectedHold&&<section className="stageDocumentDebtBanner" role="alert">
+    <strong>Этап {selected.stage_no} временно недоступен</strong>
+    <p>После завершения этапа {selectedHold.source_stage} остались обязательные итоговые документы. Пока они не оформлены, работа на следующих этапах заблокирована, даже если они открыты для других участников.</p>
+    <p>Необходимо оформить: {selectedHold.missing_documents.map(d=>d.title).join('; ')}. Снижение предварительной оценки за отсутствие итогового документа — до 1 балла по правовому критерию.</p>
+    <button type="button" className="primary" onClick={()=>{setSelected(stages.find(x=>x.stage_no===selectedHold.source_stage)||null);setOpenMaterialsForStage(selectedHold.source_stage)}}>Перейти к документам этапа {selectedHold.source_stage}</button>
+   </section>}
+   {holdError&&!teacher&&<p className="stageOperationsNotice" role="alert">{holdError}</p>}
+   <StageWorkspace
    g={g}
    stage={selected}
-   readOnly={readOnly||(!teacher&&!isStageWorkOpen(g.game,selected))}
+   initialTab={openMaterialsForStage===selected.stage_no?'materials':'work'}
+   readOnly={readOnly||Boolean(selectedHold)||(!teacher&&!isStageWorkOpen(g.game,selected)&&!(selected.status==='completed'&&documentHolds.some(h=>h.source_stage===selected.stage_no)))}
    onBack={()=>setSelected(null)}
    onOpenStage={stageNo=>setSelected(stages.find(item=>item.stage_no===stageNo)||null)}
    onOpenVotes={onOpenVotes}
    onOpenDocument={onOpenDocument}
    onCreateDocument={onCreateDocument}
    onNavigate={onNavigate}
-  />;
+  />
+  </>;
  }
  return <div className="stagesPage stagesAtlas">
   <section className="stageAtlasHero" aria-labelledby="stage-atlas-title">
