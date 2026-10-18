@@ -3,6 +3,7 @@ const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 const sql4=fs.readFileSync('supabase/migrations/20261018150000_stage4_verified_election_resolutions.sql','utf8');
 const sql12=fs.readFileSync('supabase/migrations/20261018151000_bill_ballots_only_during_active_duma_agenda.sql','utf8');
+const sqlPolicy=fs.readFileSync('supabase/migrations/20261018152000_three_distinct_gd_resolutions_and_publication_rights.sql','utf8');
 const uid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
 const game=uid(1),creator=uid(2),winner=uid(3);
 (async()=>{
@@ -63,6 +64,33 @@ const game=uid(1),creator=uid(2),winner=uid(3);
   assert(acts.every(x=>x.body_text.includes('Иванов Иван Иванович')),'Only actual saved winner names');
   assert(acts.every(x=>x.status_code==='adopted'&&x.metadata.auto_generated),'Adopted election decisions are not auto-published or signed');
   assert.equal(Number((await db.query('select count(*) n from formal_document_history')).rows[0].n),3,'Provenance history on creation');
+  await db.exec([
+   "ALTER TABLE game_members ADD COLUMN kind text NOT NULL DEFAULT 'student';",
+   'ALTER TABLE game_members ADD COLUMN roster_archived_at timestamptz;',
+   "CREATE TABLE game_stages(game_id uuid,stage_no integer,status text,deadline timestamptz);",
+   "INSERT INTO game_stages VALUES('"+game+"',4,'completed',null);",
+   "CREATE TABLE stage_final_document_obligations(game_id uuid,stage_no integer,template_key text,user_id uuid);",
+   "CREATE FUNCTION private.is_game_teacher(uuid) RETURNS boolean LANGUAGE sql AS $q$ SELECT false $q$;",
+   "CREATE FUNCTION private.has_prior_stage_document_hold(uuid,uuid,integer) RETURNS boolean LANGUAGE sql AS $q$ SELECT true $q$;",
+   "CREATE FUNCTION private.matches_formal_owner(uuid,uuid,text,uuid) RETURNS boolean LANGUAGE sql AS $q$ SELECT $3='gd_staff' $q$;",
+   "CREATE FUNCTION private.can_remediate_stage_final_document(uuid,integer,uuid,text,text,jsonb) RETURNS boolean LANGUAGE sql AS $q$ SELECT false $q$;",
+   "CREATE FUNCTION private.capture_stage_document_obligations(uuid,integer) RETURNS void LANGUAGE plpgsql AS $q$ BEGIN INSERT INTO stage_final_document_obligations SELECT $1,$2,'gd_chair_resolution',user_id FROM game_members WHERE game_id=$1; END $q$;"
+  ].join('\n'));
+  await db.exec(sqlPolicy);
+  await db.exec("CREATE TRIGGER guard_formal_documents_stage BEFORE INSERT OR UPDATE OR DELETE ON formal_documents FOR EACH ROW EXECUTE FUNCTION private.guard_stage_submission();");
+  await db.exec("CREATE TRIGGER stage_document_member_progress_guard BEFORE INSERT OR UPDATE ON formal_documents FOR EACH ROW EXECUTE FUNCTION private.guard_stage_document_hold_write();");
+  const obligations=(await db.query('select private.stage_required_final_documents($1,4) rows',[game])).rows[0].rows;
+  assert.equal(obligations.length,4,'Three election acts plus minutes required');
+  assert.equal(obligations.filter(x=>x.fulfilled).length,0,'Unpublished acts never satisfy stage completion');
+  await db.query("update formal_documents set status_code='published' where metadata->>'source_result_key'='gd_chair'");
+  const afterFirst=(await db.query('select private.stage_required_final_documents($1,4) rows',[game])).rows[0].rows;
+  assert.equal(afterFirst.filter(x=>x.fulfilled).length,1,'First resolution cannot close other obligations');
+  await db.query("update formal_documents set status_code='published' where metadata->>'source_result_key'='gd_deputies'");
+  await db.query("update formal_documents set status_code='published' where metadata->>'source_result_key'='gd_committees'");
+  const afterAll=(await db.query('select private.stage_required_final_documents($1,4) rows',[game])).rows[0].rows;
+  assert.equal(afterAll.filter(x=>x.fulfilled).length,3,'All three separate official acts published');
+  await assert.rejects(db.query("update formal_documents set metadata=jsonb_set(metadata,'{source_result_key}','\"tampered\"') where metadata->>'source_result_key'='gd_chair'"),/Нельзя изменить источник/,'Provenance immutable');
+  
 
   const ordinary=uid(500),constitutional=uid(501),session=uid(502),item=uid(503);
   await db.query("insert into formal_documents(id,game_id,stage_no,title,doc_type,workflow_key,status_code) values($1,$2,12,$3,'fz_bill','bill','reading1')",[ordinary,game,'Проект федерального закона']);
