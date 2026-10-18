@@ -60,7 +60,23 @@ END;$fn$;
 
 -- The Senate date RPC is an implementation detail: only the three-day wrapper
 -- may issue or revise the underlying stage 6 document.
-REVOKE ALL ON FUNCTION public.set_presidential_election_date(uuid,date) FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON FUNCTION public.set_presidential_election_date(uuid,date),
+ public.create_presidential_election_appointment_resolution(uuid,text),
+ public.configure_presidential_election(uuid,text,numeric,boolean)
+ FROM PUBLIC,anon,authenticated;
+
+-- Student system voting only starts after the Senate approved all election dates.
+DO $student_vote$
+DECLARE v_def text;v_old text:='IF NOT EXISTS(SELECT 1 FROM public.game_stages WHERE game_id=p_game_id AND stage_no=6 AND status=''open'')';
+BEGIN
+ SELECT pg_get_functiondef('public.cast_presidential_student_system_vote(uuid,text,numeric)'::regprocedure) INTO v_def;
+ IF v_def IS NULL OR position(v_old IN v_def)=0 THEN RAISE EXCEPTION 'Personal student vote changed: review schedule guard';END IF;
+ v_def:=replace(v_def,v_old,
+ 'IF NOT EXISTS(SELECT 1 FROM public.presidential_election_schedule WHERE game_id=p_game_id)
+ THEN RAISE EXCEPTION ''Совет Федерации ещё не назначил даты выборов'';END IF;
+ '||v_old);
+ EXECUTE v_def;
+END;$student_vote$;
 
 DO $patch$
 DECLARE v_def text;v_old text:='IF p_first_day IS NULL OR p_first_day<current_date THEN';
