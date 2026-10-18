@@ -19,7 +19,7 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  const [registrations,setRegistrations]=useState<Array<{user_id:string;institution_key:string;stage_no:number}>>([]);
  const [busy,setBusy]=useState(false);
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
- const canPropose=teacher||!!ledParty;
+ const canPropose=stageNo===6&&(teacher||!!ledParty)&&!rows.some(proposal=>proposal.status==='adopted');
  const sessionBody=stageNo===6?'gd':'sf';
  const sfResolution=formalDocuments.find(d=>d.stage_no===7&&d.doc_type==='sf_resolution'&&d.metadata?.purpose==='presidential_election_appointment');
  const storedElectionDate=typeof sfResolution?.metadata?.election_date==='string'?String(sfResolution.metadata.election_date):'';
