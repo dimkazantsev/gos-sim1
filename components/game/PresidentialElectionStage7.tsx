@@ -1,6 +1,7 @@
 'use client';
 import {userError} from '@/lib/userError';
 import PresidentialRulesCalculator from './PresidentialRulesCalculator';
+import PresidentialCecPublicationPanel from './PresidentialCecPublicationPanel';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useGameTableSync} from './useGameTableSync';
 import {BarChart3,Check,Copy,ExternalLink,FileUp,Landmark,Send,Share2,Vote,X} from 'lucide-react';
@@ -253,8 +254,9 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
 
   {tab==='results'&&<div className="stage7Results">
     <PresidentialRulesCalculator g={g} candidates={registered} settings={settings} onSaved={load}/>
+    <PresidentialCecPublicationPanel g={g} status={settings?.status} onSaved={load}/>
    <section className="stage7Panel officialResults"><div className="stage7PanelHead"><div><small>ОФИЦИАЛЬНЫЕ ИТОГИ</small><h3>{settings?.status==='finished'?'Выборы завершены':settings?.status==='runoff'?'Назначен второй тур':'Ожидается расчёт ЦИК'}</h3></div><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" width={52} height={52}/></div>
-    {settings?.status==='finished'&&<div className="winnerCard">{(()=>{const winner=registered.find(c=>c.id===settings.result?.winner_id)||resultRows[0]?.candidate;return winner?<><div className="winnerPhoto">{photoUrls[winner.id]?<img src={photoUrls[winner.id]} alt={winner.display_name}/>:<span>{winner.display_name.slice(0,1)}</span>}</div><div><small>ИЗБРАННЫЙ ПРЕЗИДЕНТ</small><h2>{winner.display_name}</h2><p>{settings.result?.score!=null?Number(settings.result.score).toFixed(2)+'% · ':''}{SYSTEM_NAMES[settings.system_type]}</p></div></>:null})()}</div>}
+    {settings?.status==='finished'&&<div className="winnerCard">{(()=>{const winner=registered.find(c=>c.id===settings.result?.winner_id)||resultRows[0]?.candidate;return winner?<><div className="winnerPhoto">{photoUrls[winner.id]?<img src={photoUrls[winner.id]} alt={winner.display_name}/>:<span>{winner.display_name.slice(0,1)}</span>}</div><div><small>ПОБЕДИТЕЛЬ ПО РАСЧЁТУ ЦИК</small><h2>{winner.display_name}</h2><p>{settings.result?.score!=null?Number(settings.result.score).toFixed(2)+'% · ':''}{SYSTEM_NAMES[settings.system_type]}</p></div></>:null})()}</div>}
     <div className="resultBars">{resultRows.map((row,index)=><div key={row.candidate.id} className="resultBarRow"><div><span>{index+1}</span><b>{row.candidate.display_name}</b><strong>{row.score!=null?Number(row.score).toFixed(2)+'%':'—'}</strong></div><div className="resultBar"><i style={{width:Math.max(0,Math.min(100,Number(row.score)||0))+'%'}}/></div>{row.poll!=null&&<small>Соцопрос: {Number(row.poll).toFixed(2)}%</small>}</div>)}</div>
    </section>
    <section className="stage7Panel inaugurationPanel"><div className="stage7PanelHead"><div><small>ИНАУГУРАЦИЯ</small><h3>Вступление избранного Президента в должность</h3><p>После фиксации итогов преподаватель задаёт дату, место и аудиосопровождение церемонии.</p></div><Landmark size={24}/></div>
