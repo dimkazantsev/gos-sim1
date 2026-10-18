@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'supabase/migrations/20261019011000_formal_legal_routes_and_presidential_amendment.sql'
+      - 'supabase/migrations/20261019011200_guard_direct_formal_document_legal_route.sql'
       - 'components/game/DocumentsView.tsx'
       - 'components/game/DocumentPaper.tsx'
       - 'components/game/PresidentialSystemDecisionPanel.tsx'
@@ -13,6 +14,7 @@ on:
     branches: [main]
     paths:
       - 'supabase/migrations/20261019011000_formal_legal_routes_and_presidential_amendment.sql'
+      - 'supabase/migrations/20261019011200_guard_direct_formal_document_legal_route.sql'
       - 'components/game/DocumentsView.tsx'
       - 'components/game/DocumentPaper.tsx'
       - 'components/game/PresidentialSystemDecisionPanel.tsx'
