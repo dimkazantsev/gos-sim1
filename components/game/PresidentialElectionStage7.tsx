@@ -1,6 +1,7 @@
 'use client';
 import {userError} from '@/lib/userError';
 import PresidentialRulesCalculator from './PresidentialRulesCalculator';
+import PresidentialCecPublicationPanel from './PresidentialCecPublicationPanel';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useGameTableSync} from './useGameTableSync';
 import {BarChart3,Check,Copy,ExternalLink,FileUp,Landmark,Send,Share2,Vote,X} from 'lucide-react';
@@ -13,7 +14,6 @@ import MediaUploadButton from './MediaUploadButton';
 type Candidate={id:string;user_id:string|null;party_id:string|null;created_by:string;display_name:string;registration_status:string;photo_path:string|null;program_summary:string|null;campaign_statement:string|null;rating_penalty:number};
 type Material={id:string;candidate_id:string;author_id:string;title:string;body:string;material_type:string;print_run:number;publisher_name:string|null;production_date:string|null;imprint_text:string|null;external_url:string|null;files:Array<{storage_path:string;file_name:string;mime_type?:string|null;file_size?:number;media_kind?:string}>;status:'pending'|'approved'|'rejected';review_note:string|null;cec_errors:string|null;cec_response:string|null;penalty_points:number;penalty_reason:string|null;post_id:string|null;created_at:string};
 type PollDecision={game_id:string;status:'open'|'closed';result:boolean|null;opened_at:string;closed_at:string|null};
-type PollDecisionVote={user_id:string;choice:boolean};
 type PublicPoll={id:string;game_id:string;round_no:number;slug:string;title:string;status:'draft'|'open'|'closed';opened_at:string|null;closes_at:string|null;closed_at:string|null};
 type Settings={game_id:string;system_type:'relative'|'absolute'|'qualified'|'preferential';threshold_pct:number;poll_enabled:boolean;status:'setup'|'round1'|'runoff'|'finished'|'manual_required';result:Record<string,any>};
 type Score={candidate_id:string;round_no:1|2;teacher_program_pct:number|null;teacher_campaign_pct:number|null;game_rating_pct:number|null;poll_pct:number|null;teacher_runoff_pct:number|null;computed_pct:number|null};
@@ -29,12 +29,13 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const [candidates,setCandidates]=useState<Candidate[]>([]);
  const [materials,setMaterials]=useState<Material[]>([]);
  const [decision,setDecision]=useState<PollDecision|null>(null);
- const [decisionVotes,setDecisionVotes]=useState<PollDecisionVote[]>([]);
  const [publicPolls,setPublicPolls]=useState<PublicPoll[]>([]);
  const [settings,setSettings]=useState<Settings|null>(null);
+ const [stage6Ready,setStage6Ready]=useState(false);
  const [scores,setScores]=useState<Score[]>([]);
 
  const [inauguration,setInauguration]=useState<Inauguration|null>(null);
+ const [inaugurationConfirmed,setInaugurationConfirmed]=useState(false);
  const [photoUrls,setPhotoUrls]=useState<Record<string,string>>({});
  const [audioUrls,setAudioUrls]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
@@ -68,7 +69,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{
   request.current++;ceremonyDirty.current=false;
-  setCandidates([]);setMaterials([]);setDecision(null);setDecisionVotes([]);setPublicPolls([]);setSettings(null);setScores([]);setInauguration(null);setPhotoUrls({});setAudioUrls({});
+  setCandidates([]);setMaterials([]);setDecision(null);setPublicPolls([]);setSettings(null);setStage6Ready(false);setScores([]);setInauguration(null);setInaugurationConfirmed(false);setPhotoUrls({});setAudioUrls({});
   setCandidateId('');setCeremonyAt('');setVenue('');setCeremonyNotes('');setHymnFile(null);setMusicFile(null);setBusy(false);setNotice('');
   setTitle('');setBody('');setPrintRun('');setPublisher('');setProductionDate('');setImprint('');setExternalUrl('');setFiles([]);
   setMaterialType('poster');setPollClose('');setReviewNotes({});setReviewErrors({});setReviewResponses({});setReviewPenalties({});setReviewPenaltyReasons({});
@@ -81,8 +82,6 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const mine=registered.filter(canManage);
  const selectedCandidate=registered.find(c=>c.id===candidateId)||mine[0]||null;
  const isStudent=members.some(m=>m.user_id===me?.user_id&&m.kind==='student');
- const myDecisionVote=decisionVotes.find(v=>v.user_id===me?.user_id)?.choice;
- const yesVotes=decisionVotes.filter(v=>v.choice).length,noVotes=decisionVotes.length-yesVotes;
  const activeRound=settings?.status==='runoff'?2:1;
  const publicPoll=publicPolls.find(p=>p.round_no===1)||null;
  const resultRows=useMemo(()=>registered.map(c=>({
@@ -100,18 +99,20 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   if(!gameId)return;
   const version=++request.current,current=()=>activeScope()&&version===request.current;
   try{
-  const [cr,mr,dr,dvr,pr,sr,sc,ir]=await Promise.all([
+  const [cr,mr,dr,pr,sr,sc,ir,stageDecision,ceremonyPost]=await Promise.all([
    supabase.from('presidential_candidates').select('id,user_id,party_id,created_by,display_name,registration_status,photo_path,program_summary,campaign_statement,rating_penalty').eq('game_id',gameId).is('archived_at',null).order('display_name'),
    supabase.from('presidential_campaign_materials').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
    supabase.from('presidential_poll_decision').select('*').eq('game_id',gameId).maybeSingle(),
-   supabase.from('presidential_poll_decision_votes').select('*').eq('game_id',gameId),
    supabase.from('presidential_public_polls').select('*').eq('game_id',gameId).order('round_no'),
    supabase.from('presidential_election_settings').select('*').eq('game_id',gameId).maybeSingle(),
    supabase.from('presidential_scorecards').select('*').eq('game_id',gameId),
-   supabase.from('presidential_inauguration').select('*').eq('game_id',gameId).maybeSingle()
+   supabase.from('presidential_inauguration').select('*').eq('game_id',gameId).maybeSingle(),
+   supabase.rpc('get_presidential_student_system_vote',{p_game_id:gameId}),
+   supabase.from('political_posts').select('id').eq('game_id',gameId).eq('source_key','cec-presidential-inauguration:'+gameId).maybeSingle()
   ]);
   if(!current())return;
-  const failure=[cr,mr,dr,dvr,pr,sr,sc,ir].find(result=>result.error);if(failure?.error)throw failure.error;
+  const failure=[cr,mr,dr,pr,sr,sc,ir,stageDecision,ceremonyPost].find(result=>result.error);if(failure?.error)throw failure.error;
+  setStage6Ready(Boolean(stageDecision.data?.closed));setInaugurationConfirmed(Boolean(ceremonyPost.data?.id));
   const rows=(cr.data||[]) as Candidate[],scoreRows=(sc.data||[]) as Score[],ceremony=ir.data as Inauguration|null;
   const [pairs,hymn,music]=await Promise.all([
    Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,await signed(x.photo_path)] as const)),
@@ -121,14 +122,14 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   setCandidates(rows);setPhotoUrls(Object.fromEntries(pairs.filter(x=>x[1])));
   const preferred=rows.find(x=>x.registration_status==='registered'&&canManage(x));
   setCandidateId(previous=>rows.some(x=>x.id===previous&&x.registration_status==='registered'&&canManage(x))?previous:preferred?.id||'');
-  setMaterials((mr.data||[]) as Material[]);setDecision(dr.data as PollDecision|null);setDecisionVotes((dvr.data||[]) as PollDecisionVote[]);setPublicPolls((pr.data||[]) as PublicPoll[]);setSettings(sr.data as Settings|null);
+  setMaterials((mr.data||[]) as Material[]);setDecision(dr.data as PollDecision|null);setPublicPolls((pr.data||[]) as PublicPoll[]);setSettings(sr.data as Settings|null);
   setScores(scoreRows);
 
   setInauguration(ceremony);setAudioUrls({hymn,music});
   if(!ceremonyDirty.current){setCeremonyAt(ceremony?.scheduled_at?new Date(ceremony.scheduled_at).toISOString().slice(0,16):'');setVenue(ceremony?.venue||'');setCeremonyNotes(ceremony?.notes||'')}
   }catch(error){if(current())setError(error)}
  }
- useGameTableSync(gameId,['presidential_candidates','presidential_campaign_materials','presidential_poll_decision','presidential_poll_decision_votes','presidential_public_polls','presidential_scorecards','presidential_election_settings','presidential_inauguration','game_parties'],load,viewScope);
+ useGameTableSync(gameId,['presidential_candidates','presidential_campaign_materials','presidential_poll_decision','presidential_public_polls','presidential_scorecards','presidential_election_settings','presidential_inauguration','game_parties','political_posts'],load,viewScope);
 
  if(!game||!me)return null;
  const baseUrl=typeof window!=='undefined'?window.location.origin:'';
@@ -178,9 +179,9 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   }
   setBusy(false);
  }
- async function openPollDecision(){setBusy(true);const r=await supabase.rpc('open_presidential_poll_decision',{p_game_id:gameId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
- async function votePollDecision(choice:boolean){setBusy(true);const r=await supabase.rpc('vote_presidential_poll_decision',{p_game_id:gameId,p_choice:choice});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
- async function closePollDecision(){setBusy(true);const r=await supabase.rpc('close_presidential_poll_decision',{p_game_id:gameId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+
+
+
  async function createPublicPoll(){
   setBusy(true);const r=await supabase.rpc('create_presidential_public_poll',{p_game_id:gameId,p_round_no:activeRound,p_closes_at:pollClose?new Date(pollClose).toISOString():null});
   if(r.error)setError(userError(r.error));else{setNotice('Публичный опрос открыт. Ссылку можно распространять во внешних сетях.');await load()}setBusy(false);
@@ -190,6 +191,16 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  function share(service:'vk'|'tg'){if(!pollUrl)return;const u=encodeURIComponent(pollUrl),t=encodeURIComponent('Социологический опрос: выборы Президента РФ');window.open(service==='vk'?'https://vk.com/share.php?url='+u+'&title='+t:'https://t.me/share/url?url='+u+'&text='+t,'_blank','noopener,noreferrer')}
 
  async function uploadAudio(file:File,kind:'hymn'|'music'){const path=gameId+'/presidential/inauguration/'+kind+'-'+crypto.randomUUID()+'.'+(file.name.split('.').pop()||'audio');const r=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'audio/mpeg'});if(r.error)throw r.error;return path}
+ async function confirmCeremony(){
+  if(!teacher||!gameId||busy)return;
+  setBusy(true);
+  try{
+   const r=await supabase.rpc('confirm_presidential_inauguration',{p_game_id:gameId});
+   if(r.error)throw r.error;
+   setNotice('Инаугурация подтверждена. Победитель вступил в должность и получил полномочия Президента.');
+   await load();await g.refresh();
+  }catch(error){setError(userError(error))}finally{setBusy(false)}
+ }
  async function saveCeremony(){
   setBusy(true);try{
    let hymn=inauguration?.hymn_path||null,music=inauguration?.ceremonial_music_path||null;
@@ -200,9 +211,10 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   }catch(e){if(activeScope())setError(userError(e)||'Не удалось выполнить действие.')}finally{if(activeScope())setBusy(false)}
  }
 
+ if(!stage6Ready)return <section className="stage7Election"><div className="stage7Empty">Выборы Президента Российской Федерации ещё не начались. Сначала Совет Федерации назначает три дня выборов, а студенты на этапе 6 лично утверждают избирательную систему и необходимость социологического опроса.</div></section>;
  return <section className="stage7Election">
-  <header className="stage7Hero"><div><small>ЦИК РФ · ЭТАП 7</small><h2>Выборы Президента Российской Федерации</h2><p>Агитационная кампания, решение о социологическом опросе, публичный опрос, расчёт результатов и инаугурация — в одном последовательном контуре.</p></div><div className="stage7HeroMark"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" width={74} height={74}/><span>Центральная избирательная комиссия</span></div></header>
-  <nav className="stage7Tabs" aria-label="Разделы этапа 7"><button className={tab==='campaign'?'active':''} onClick={()=>setTab('campaign')}><span>01</span>Кампания</button><button className={tab==='poll'?'active':''} onClick={()=>setTab('poll')}><span>02</span>Голосование и соцопрос</button><button className={tab==='results'?'active':''} onClick={()=>setTab('results')}><span>03</span>Итоги и инаугурация</button></nav>
+  <header className="stage7Hero"><div><small>ЦИК РФ · ЭТАП 7</small><h2>Выборы Президента Российской Федерации</h2><p>Агитационная кампания, утверждённый студентами социологический опрос, подсчёт результатов по полной формуле ЦИК и инаугурация — в одном контуре.</p></div><div className="stage7HeroMark"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" width={74} height={74}/><span>Центральная избирательная комиссия</span></div></header>
+  <nav className="stage7Tabs" aria-label="Разделы этапа 7"><button className={tab==='campaign'?'active':''} onClick={()=>setTab('campaign')}><span>01</span>Кампания</button><button className={tab==='poll'?'active':''} onClick={()=>setTab('poll')}><span>02</span>Соцопрос избирателей</button><button className={tab==='results'?'active':''} onClick={()=>setTab('results')}><span>03</span>Итоги и инаугурация</button></nav>
   {notice&&<div className="stage7Notice">{notice}</div>}
 
   {tab==='campaign'&&<div className="stage7Grid">
@@ -243,10 +255,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
 
   {tab==='poll'&&activeRound===2&&<div className="stage7Empty">Во втором туре проводится новое голосование преподавателей. Внесите его во вкладке итогов ЦИК; публичный соцопрос в формулу второго тура не входит.</div>}
   {tab==='poll'&&activeRound===1&&<div className="stage7Grid pollGrid">
-   <section className="stage7Panel"><div className="stage7PanelHead"><div><small>РЕШЕНИЕ УЧАСТНИКОВ</small><h3>Нужен ли социологический опрос?</h3><p>Сначала студенты голосуют «за» или «против». После закрытия определяется, входит ли опрос в формулу выборов.</p></div><Vote size={24}/></div>
-    {!decision&&teacher&&<button className="primary stage7MainAction" disabled={busy} onClick={()=>void openPollDecision()}>Открыть голосование студентов</button>}
-    {decision&&<div className="pollDecision"><div className="pollDecisionStatus"><b>{decision.status==='open'?'Голосование открыто':decision.result?'Опрос включён в модель':'Опрос исключён из модели'}</b><span>За — {yesVotes} · Против — {noVotes}</span></div><div className="pollDecisionBar"><i style={{width:(decisionVotes.length?yesVotes/decisionVotes.length*100:50)+'%'}}/></div>{decision.status==='open'&&isStudent&&<div className="pollChoice"><button className={myDecisionVote===true?'active yes':''} disabled={busy} onClick={()=>void votePollDecision(true)}>За соцопрос</button><button className={myDecisionVote===false?'active no':''} disabled={busy} onClick={()=>void votePollDecision(false)}>Против соцопроса</button></div>}{decision.status==='open'&&teacher&&<button className="secondary stage7MainAction" disabled={busy} onClick={()=>void closePollDecision()}>Закрыть голосование и зафиксировать решение</button>}</div>}
-   </section>
+   <section className="stage7Panel"><div className="stage7PanelHead"><div><small>РЕШЕНИЕ ШЕСТОГО ЭТАПА</small><h3>Социологический опрос</h3><p>Нужен ли опрос, решили студенты личным голосованием на этапе 6. ЦИК не меняет их решение.</p></div><Vote size={24}/></div><div className="stage7Notice"><b>{decision?.status==='closed'?(decision.result?'Социологический опрос включён':'Социологический опрос исключён'):'Решение ещё не завершено на этапе 6'}</b></div></section>
    <section className="stage7Panel"><div className="stage7PanelHead"><div><small>ПУБЛИЧНЫЙ ОПРОС</small><h3>Опрос избирателей</h3><p>Открытая форма доступна по внешней ссылке без входа в игру.</p></div><Share2 size={24}/></div>
     {!pollCanOpen&&<div className="stage7Empty">{decision?.status==='open'?'Сначала завершите голосование студентов.':decision?.result===false?'Студенты решили не использовать соцопрос в формуле выборов.':'Решение о соцопросе ещё не принято.'}</div>}
     {pollCanOpen&&!publicPoll&&teacher&&<div className="pollCreate"><label>Закрыть опрос<input type="datetime-local" value={pollClose} onChange={e=>setPollClose(e.target.value)}/></label><button className="primary" disabled={busy} onClick={()=>void createPublicPoll()}>Создать публичный опрос</button></div>}
@@ -256,12 +265,13 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
 
   {tab==='results'&&<div className="stage7Results">
     <PresidentialRulesCalculator g={g} candidates={registered} settings={settings} onSaved={load}/>
+    <PresidentialCecPublicationPanel g={g} status={settings?.status} onSaved={load}/>
    <section className="stage7Panel officialResults"><div className="stage7PanelHead"><div><small>ОФИЦИАЛЬНЫЕ ИТОГИ</small><h3>{settings?.status==='finished'?'Выборы завершены':settings?.status==='runoff'?'Назначен второй тур':'Ожидается расчёт ЦИК'}</h3></div><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" width={52} height={52}/></div>
-    {settings?.status==='finished'&&<div className="winnerCard">{(()=>{const winner=registered.find(c=>c.id===settings.result?.winner_id)||resultRows[0]?.candidate;return winner?<><div className="winnerPhoto">{photoUrls[winner.id]?<img src={photoUrls[winner.id]} alt={winner.display_name}/>:<span>{winner.display_name.slice(0,1)}</span>}</div><div><small>ИЗБРАННЫЙ ПРЕЗИДЕНТ</small><h2>{winner.display_name}</h2><p>{settings.result?.score!=null?Number(settings.result.score).toFixed(2)+'% · ':''}{SYSTEM_NAMES[settings.system_type]}</p></div></>:null})()}</div>}
+    {settings?.status==='finished'&&<div className="winnerCard">{(()=>{const winner=registered.find(c=>c.id===settings.result?.winner_id)||resultRows[0]?.candidate;return winner?<><div className="winnerPhoto">{photoUrls[winner.id]?<img src={photoUrls[winner.id]} alt={winner.display_name}/>:<span>{winner.display_name.slice(0,1)}</span>}</div><div><small>ПОБЕДИТЕЛЬ ПО РАСЧЁТУ ЦИК</small><h2>{winner.display_name}</h2><p>{settings.result?.score!=null?Number(settings.result.score).toFixed(2)+'% · ':''}{SYSTEM_NAMES[settings.system_type]}</p></div></>:null})()}</div>}
     <div className="resultBars">{resultRows.map((row,index)=><div key={row.candidate.id} className="resultBarRow"><div><span>{index+1}</span><b>{row.candidate.display_name}</b><strong>{row.score!=null?Number(row.score).toFixed(2)+'%':'—'}</strong></div><div className="resultBar"><i style={{width:Math.max(0,Math.min(100,Number(row.score)||0))+'%'}}/></div>{row.poll!=null&&<small>Соцопрос: {Number(row.poll).toFixed(2)}%</small>}</div>)}</div>
    </section>
    <section className="stage7Panel inaugurationPanel"><div className="stage7PanelHead"><div><small>ИНАУГУРАЦИЯ</small><h3>Вступление избранного Президента в должность</h3><p>После фиксации итогов преподаватель задаёт дату, место и аудиосопровождение церемонии.</p></div><Landmark size={24}/></div>
-    {teacher?<div className="inaugurationForm"><label>Дата и время<input type="datetime-local" disabled={busy} value={ceremonyAt} onChange={e=>{ceremonyDirty.current=true;setCeremonyAt(e.target.value)}}/></label><label>Место<input disabled={busy} value={venue} onChange={e=>{ceremonyDirty.current=true;setVenue(e.target.value)}} placeholder="Место проведения"/></label><label className="wide">Сценарий / примечания<textarea rows={4} disabled={busy} value={ceremonyNotes} onChange={e=>{ceremonyDirty.current=true;setCeremonyNotes(e.target.value)}} placeholder="Краткий порядок церемонии"/></label><label>Гимн России<input type="file" accept="audio/*" disabled={busy} onChange={e=>{ceremonyDirty.current=true;setHymnFile(e.target.files?.[0]||null)}}/></label><label>Церемониальная музыка<input type="file" accept="audio/*" disabled={busy} onChange={e=>{ceremonyDirty.current=true;setMusicFile(e.target.files?.[0]||null)}}/></label><button className="primary wide" disabled={busy} onClick={()=>void saveCeremony()}>Сохранить инаугурацию</button></div>:inauguration?<div className="ceremonyPublic"><b>{inauguration.scheduled_at?new Date(inauguration.scheduled_at).toLocaleString('ru-RU'):'Дата уточняется'}</b><span>{inauguration.venue||'Место уточняется'}</span>{inauguration.notes&&<p>{inauguration.notes}</p>}</div>:<div className="stage7Empty">Параметры инаугурации ещё не опубликованы.</div>}
+    {teacher?<div className="inaugurationForm"><label>Дата и время<input type="datetime-local" disabled={busy} value={ceremonyAt} onChange={e=>{ceremonyDirty.current=true;setCeremonyAt(e.target.value)}}/></label><label>Место<input disabled={busy} value={venue} onChange={e=>{ceremonyDirty.current=true;setVenue(e.target.value)}} placeholder="Место проведения"/></label><label className="wide">Сценарий / примечания<textarea rows={4} disabled={busy} value={ceremonyNotes} onChange={e=>{ceremonyDirty.current=true;setCeremonyNotes(e.target.value)}} placeholder="Краткий порядок церемонии"/></label><label>Гимн России<input type="file" accept="audio/*" disabled={busy} onChange={e=>{ceremonyDirty.current=true;setHymnFile(e.target.files?.[0]||null)}}/></label><label>Церемониальная музыка<input type="file" accept="audio/*" disabled={busy} onChange={e=>{ceremonyDirty.current=true;setMusicFile(e.target.files?.[0]||null)}}/></label><button className="primary wide" disabled={busy} onClick={()=>void saveCeremony()}>Сохранить инаугурацию</button>{inaugurationConfirmed?<p className="wide stage7Notice">Инаугурация подтверждена. Полномочия Президента Российской Федерации действуют.</p>:<button className="secondary wide" disabled={busy||settings?.status!=='finished'||!inauguration?.scheduled_at||new Date(inauguration.scheduled_at).getTime()>Date.now()} onClick={()=>void confirmCeremony()}>Подтвердить инаугурацию и передать полномочия Президента</button>}</div>:inauguration?<div className="ceremonyPublic"><b>{inauguration.scheduled_at?new Date(inauguration.scheduled_at).toLocaleString('ru-RU'):'Дата уточняется'}</b><span>{inauguration.venue||'Место уточняется'}</span>{inauguration.notes&&<p>{inauguration.notes}</p>}</div>:<div className="stage7Empty">Параметры инаугурации ещё не опубликованы.</div>}
     {(audioUrls.hymn||audioUrls.music)&&<div className="ceremonyAudio">{audioUrls.hymn&&<label>Гимн России<audio controls src={audioUrls.hymn}/></label>}{audioUrls.music&&<label>Церемониальная музыка<audio controls src={audioUrls.music}/></label>}</div>}
    </section>
   </div>}

@@ -41,6 +41,7 @@ const selfDocs=['group_petition','signature_sheets','consent','passport','income
 export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,parties,currentStage,setError}=g;
  const [settings,setSettings]=useState<Settings|null>(null);
+ const [systemDecisionComplete,setSystemDecisionComplete]=useState(false);
  const [candidates,setCandidates]=useState<Candidate[]>([]);
  const [points,setPoints]=useState<ProgramPoint[]>([]);
  const [candidateDocs,setCandidateDocs]=useState<CandidateDoc[]>([]);
@@ -73,12 +74,12 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const canUploadForCandidate=(candidate:Candidate)=>candidate.nomination_type==='party'&&!!candidate.party_id
   &&parties.some(p=>p.id===candidate.party_id&&p.registration_status==='registered'
    &&members.some(m=>m.user_id===me?.user_id&&m.kind==='student'&&!m.roster_archived_at&&m.team===p.name));
- const systemReady=!!settings;
- const canNominate=!!me&&systemReady&&(teacher||currentStage?.stage_no===6);
+ const systemReady=!!settings&&systemDecisionComplete;
+ const canNominate=!!me&&systemReady&&(teacher||currentStage?.stage_no===7);
 
  async function load(){
   if(!game)return;
-  const [a,b,p,d,sg,sb,cd,cn,pp]=await Promise.all([
+  const [a,b,p,d,sg,sb,cd,cn,pp,sd]=await Promise.all([
    supabase.from('presidential_election_settings').select('*').eq('game_id',game.id).maybeSingle(),
    supabase.from('presidential_candidates').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at'),
    supabase.from('presidential_candidate_program_points').select('*').eq('game_id',game.id).order('point_no'),
@@ -87,9 +88,11 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    supabase.from('presidential_signature_batches').select('*').eq('game_id',game.id).order('direction_label'),
    supabase.from('presidential_cec_decisions').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
    supabase.from('presidential_cec_private_notes').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
-   supabase.from('presidential_candidate_private_profiles').select('*').eq('game_id',game.id)
+   supabase.from('presidential_candidate_private_profiles').select('*').eq('game_id',game.id),
+   supabase.rpc('get_presidential_student_system_vote',{p_game_id:game.id})
   ]);
-  if(!a.error&&a.data)setSettings(a.data as Settings)
+  if(!a.error&&a.data)setSettings(a.data as Settings);
+  if(!sd.error)setSystemDecisionComplete(Boolean(sd.data?.closed));
   if(!b.error){const rows=(b.data||[]) as Candidate[];setCandidates(rows);setReview(Object.fromEntries(rows.map(x=>[x.id,{status:x.registration_status==='registered'?'registered':x.registration_status==='rejected'?'rejected':x.registration_status==='withdrawn'?'withdrawn':'revision',errors:String(x.legal_error_count),penalty:String(x.rating_penalty),publicSummary:x.registration_public_summary||'',privateSummary:''}])));const pairs=await Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,(await supabase.storage.from('game-assets').createSignedUrl(x.photo_path!,3600)).data?.signedUrl||''] as const));setPhotoUrls(Object.fromEntries(pairs.filter(x=>x[1])))}
   if(!p.error)setPoints((p.data||[]) as ProgramPoint[]);
   if(!d.error){
@@ -134,7 +137,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  if(!systemReady)return <section id="stage6-cec" className="electionLab cecWorkspace cecWorkspaceLocked" aria-disabled="true">
   <header className="electionLabHead cecHead">
    <div>
-    <small>ЦИК РФ · ЭТАП 6 · СЛЕДУЮЩИЙ ШАГ</small>
+    <small>ЦИК РФ · ЭТАП 7 · СЛЕДУЮЩИЙ ШАГ</small>
     <h2>Регистрация кандидатов в Президенты</h2>
     <p>Рабочее место ЦИК уже сформировано, но станет активным только после того, как Государственная Дума утвердит тип избирательной системы.</p>
    </div>
@@ -154,12 +157,12 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    <div className="cecLockedCopy">
     <small>ДОСТУП К ЦИК ЗАКРЫТ</small>
     <h3>Сначала Государственная Дума определяет систему выборов</h3>
-    <p>После принятия связанного проекта поправки к ФЗ № 19-ФЗ этот блок разблокируется автоматически. Здесь появятся выдвижение кандидатов, досье, подача документов и решения ЦИК.</p>
+    <p>После утверждения личного голосования студентов за избирательную систему и социологический опрос этот блок разблокируется автоматически. Здесь появятся выдвижение кандидатов, досье, подача документов и решения ЦИК.</p>
    </div>
    <div className="cecLockedSequence" aria-label="Последовательность процедуры">
     <span className="done">1 · Проект поправки</span>
     <span className="current">2 · Решение ГД</span>
-    <span>3 · ЦИК</span>
+    <span>7 · ЦИК</span>
    </div>
   </section>
  </section>;
@@ -269,12 +272,12 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  }
 
  return <section id="stage6-cec" className="electionLab cecWorkspace">
-  <header className="electionLabHead cecHead"><div><small>ЦИК РФ · ЭТАП 6</small><h2>Регистрация кандидатов в Президенты</h2><p>После определения Государственной Думой типа избирательной системы кандидаты формируют досье и подают документы в ЦИК. Агитация, голосование и подсчёт результатов начинаются на 7-м этапе.</p></div><div className="cecHeadSide"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" className="cecEmblem" width={72} height={72}/><div><b>Центральная избирательная комиссия</b><span>Регистрация кандидатов</span></div></div></header>
+  <header className="electionLabHead cecHead"><div><small>ЦИК РФ · ЭТАП 7</small><h2>Регистрация кандидатов в Президенты</h2><p>После решения студентов об избирательной системе и назначения выборов Советом Федерации кандидаты формируют досье и направляют документы в ЦИК. Агитация и подсчёт результатов проводятся на 7-м этапе.</p></div><div className="cecHeadSide"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" className="cecEmblem" width={72} height={72}/><div><b>Центральная избирательная комиссия</b><span>Регистрация кандидатов</span></div></div></header>
   <nav className="cecTabs" aria-label="Разделы президентских выборов"><button className={panelView==='dossier'?'active':''} onClick={()=>setPanelView('dossier')}>Моё досье</button><button className={panelView==='application'?'active':''} onClick={()=>setPanelView('application')}>Подача в ЦИК <b>{candidates.filter(x=>x.cec_submitted_at&&x.registration_status==='submitted').length}</b></button><button className={panelView==='candidates'?'active':''} onClick={()=>setPanelView('candidates')}>Кандидаты <b>{candidates.filter(x=>x.cec_submitted_at).length}</b></button><button className={panelView==='decisions'?'active':''} onClick={()=>setPanelView('decisions')}>Решения ЦИК <b>{decisions.length}</b></button></nav>
 
   <section className="electionSystemStatusCard" aria-label="Действующая система выборов Президента">
    <div className="electionSystemStatusMain">
-    <span className="electionSystemStatusBadge">Утверждено Государственной Думой</span>
+    <span className="electionSystemStatusBadge">Выбрано личным голосованием студентов</span>
     <small>ДЕЙСТВУЮЩАЯ СИСТЕМА</small>
     <strong>{systemNames[settings.system_type]}</strong>
     <p>{settings.system_type==='qualified'?'Порог квалифицированного большинства — '+settings.threshold_pct+'%.':settings.system_type==='preferential'?'Подсчёт проводится по преференциальной модели, утверждённой Государственной Думой.':settings.poll_enabled===false?'Социологический опрос не включён в модель результата.':'Система синхронизирована с моделью выборов Президента.'}</p>

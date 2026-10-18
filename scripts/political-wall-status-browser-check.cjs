@@ -121,7 +121,7 @@ async function run(){
      sourceVisible:source?getComputedStyle(source).display!=='none':false};
    });
    assert(measured.overflow<=2,'System notice overflow '+width+'px '+JSON.stringify(measured));
-   assert.equal(measured.logo.width,measured.logo.height,'Square brand mark');
+   assert(Math.abs(measured.logo.width-measured.logo.height)<0.01,'Square brand mark within subpixel browser measurement tolerance');
    assert(measured.logo.left>=measured.avatar.left-1&&measured.logo.right<=measured.avatar.right+2,'Brand mark fits avatar '+width+'px '+JSON.stringify(measured));
    assert(!measured.sourceVisible,'System notices have compact content without a media source banner');
    await post.screenshot({path:path.join(screenshots,'gos-id-stage-notice-'+width+'.png'),animations:'disabled'});

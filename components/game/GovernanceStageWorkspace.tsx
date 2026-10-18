@@ -29,7 +29,7 @@ import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 import ElectoralArchitectureLab from './ElectoralArchitectureLab';
 import DumaLeadershipElection from './DumaLeadershipElection';
 import GhostPolicyLab from './GhostPolicyLab';
-import PresidentialSystemDecisionPanel from './PresidentialSystemDecisionPanel';
+import PresidentialStage6CivicVote from './PresidentialStage6CivicVote';
 import PresidentialElectionLab from './PresidentialElectionLab';
 import PresidentialElectionStage7 from './PresidentialElectionStage7';
 
@@ -149,8 +149,8 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
      {(stage.stage_no===2||stage.stage_no===3)&&<ElectoralArchitectureLab g={g} stageNo={stage.stage_no as 2|3} onOpenVotes={onOpenVotes}/>}
      {stage.stage_no===4&&<><DumaLeadershipElection g={g} onOpenVotes={onOpenVotes}/><InstitutionStaffingLab g={g} mode="committees"/></>}
      {stage.stage_no===5&&<GhostPolicyLab g={g} onOpenVotes={onOpenVotes}/>}
-     {stage.stage_no===6&&<><PresidentialSystemDecisionPanel g={g} stageNo={6} onOpenVotes={onOpenVotes} onNavigate={onNavigate} onOpenDocument={onOpenDocument}/><PresidentialElectionLab g={g}/></>}
-     {stage.stage_no===7&&<><PresidentialSystemDecisionPanel g={g} stageNo={7} onOpenVotes={onOpenVotes} onNavigate={onNavigate} onOpenDocument={onOpenDocument}/><PresidentialElectionStage7 g={g}/></>}
+     {stage.stage_no===6&&<PresidentialStage6CivicVote g={g}/> }
+     {stage.stage_no===7&&<><PresidentialElectionLab g={g}/><PresidentialElectionStage7 g={g}/></>}
      {stage.stage_no===8&&<GovernmentFormationWorkspace g={g} stageNo={8} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onOpenDocument={onOpenDocument} onNavigate={onNavigate}/>}
      {stage.stage_no===9&&<><GovernmentFormationWorkspace g={g} stageNo={9} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onOpenDocument={onOpenDocument} onNavigate={onNavigate}/><section id="ministry-teams" className="stageOperationsMinistryTeams"><InstitutionStaffingLab g={g} mode="ministries"/></section></>}
      {stage.stage_no===10&&<StateProgramLab g={g}/>}
