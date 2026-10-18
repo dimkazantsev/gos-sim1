@@ -125,12 +125,14 @@ BEFORE INSERT OR UPDATE ON public.formal_documents
 FOR EACH ROW EXECUTE FUNCTION private.guard_crisis_legal_act_origin();
 
 DO $backfill$
-DECLARE r record;
+DECLARE item record;
 BEGIN
- FOR r IN SELECT r.id FROM public.crisis_responses r
- JOIN public.game_crises c ON c.id=r.crisis_id AND c.game_id=r.game_id
- WHERE r.status='reviewed' AND r.reviewed_by IS NOT NULL AND c.stage_no=15
+ FOR item IN SELECT response.id FROM public.crisis_responses response
+ JOIN public.game_crises crisis ON crisis.id=response.crisis_id
+   AND crisis.game_id=response.game_id
+ WHERE response.status='reviewed' AND response.reviewed_by IS NOT NULL
+   AND crisis.stage_no=15
  LOOP
-  PERFORM private.sync_reviewed_crisis_legal_act(r.id);
+  PERFORM private.sync_reviewed_crisis_legal_act(item.id);
  END LOOP;
 END;$backfill$;
