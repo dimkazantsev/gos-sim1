@@ -43,7 +43,7 @@ try{
  const current=(await db.query('select public.get_my_stage_document_holds($1) h',[game])).rows[0].h;
  assert.equal(current.length,1);assert.equal(current[0].blocked_stage,5);
  await db.exec("create trigger stage_document_member_progress_guard before insert on stage_debriefs for each row execute function private.guard_stage_document_hold_write()");
- const add=(user)=>db.query('insert into stage_debriefs values($1,5,$2,\\'test\\')',[game,user]);
+ const add=(user)=>db.query('insert into stage_debriefs values($1,5,$2,$3)',[game,user,'test']);
  const tasks=await Promise.allSettled(Array.from({length:40},()=>add(chair)));
  assert.equal(tasks.filter(t=>t.status==='rejected').length,40,'No writes during held next stage');
  await db.query('update identity set id=$1',[other]);
