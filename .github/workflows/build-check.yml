@@ -144,6 +144,7 @@ on:
       - 'scripts/stage-decision-vote-document-chain-check.cjs'
       - 'supabase/migrations/20261018150000_stage4_verified_election_resolutions.sql'
       - 'supabase/migrations/20261018151000_bill_ballots_only_during_active_duma_agenda.sql'
+      - 'supabase/migrations/20261018152000_three_distinct_gd_resolutions_and_publication_rights.sql'
       - 'supabase/migrations/20261018103000_automatic_document_extension_fixed_scoring.sql'
       - 'supabase/migrations/20261018090000_completed_stage_final_document_remediation_refund.sql'
       - 'supabase/migrations/20261018072000_stage_final_document_debts.sql'
