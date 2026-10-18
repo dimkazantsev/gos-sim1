@@ -16,6 +16,17 @@ BEGIN
      OR OLD.author_id IS DISTINCT FROM NEW.author_id
    THEN RAISE EXCEPTION 'Нельзя изменить источник подтверждённого результата выборов ГД'
      USING ERRCODE='42501'; END IF;
+   IF OLD.metadata->>'document_kind'='stage4_office_result' THEN
+     IF auth.uid() IS NOT NULL AND
+        NOT private.matches_formal_owner(OLD.game_id,auth.uid(),OLD.current_owner_key,OLD.author_id)
+     THEN RAISE EXCEPTION 'Оформить постановление вправе уполномоченный представитель Государственной Думы'
+       USING ERRCODE='42501'; END IF;
+     IF NEW.status_code IS DISTINCT FROM OLD.status_code AND NOT (
+       OLD.status_code='adopted' AND NEW.status_code='published'
+       AND NEW.current_owner_key='system' AND NEW.current_step=3)
+     THEN RAISE EXCEPTION 'Постановление уже принято голосованием; допускается только оформление и публикация'
+       USING ERRCODE='42501'; END IF;
+   END IF;
  END IF;
  RETURN NEW;
 END;$provenance$;
@@ -32,7 +43,10 @@ SET search_path TO public,private,pg_temp AS $finalize$
  AND p_old.id=p_new.id AND p_old.game_id=p_new.game_id AND p_old.stage_no=4
  AND p_old.doc_type='gd_resolution' AND p_old.subject_key='gd'
  AND p_old.workflow_key='gd_resolution' AND p_old.status_code='adopted'
- AND p_new.status_code IN ('adopted','published')
+ AND (p_new.status_code='adopted' AND p_new.current_step=p_old.current_step
+   AND p_new.current_owner_key=p_old.current_owner_key
+   OR p_new.status_code='published' AND p_new.current_step=3
+     AND p_new.current_owner_key='system')
  AND p_new.doc_type=p_old.doc_type AND p_new.subject_key=p_old.subject_key
  AND p_new.metadata->>'document_kind'='stage4_office_result'
  AND p_old.metadata->>'document_kind'='stage4_office_result'
