@@ -22,6 +22,9 @@ assert(election.includes('await g.refresh()')&&election.includes('await load()')
 assert(election.includes('Проект НПА → регистрация → обсуждение → голосование'),'UI depicts genuine proposal-first route');
 assert(election.indexOf('<small>ПРОЕКТ НПА</small>')<election.indexOf('<small>ПРИСУТСТВИЕ</small>'),'Document precedes registration in stage 6');
 assert(election.includes('stage6-proposal-form')&&election.includes('scrollIntoView'),'First route card opens the actual existing proposal form');
+assert(election.includes("v.status==='open'?'Голосование открыто'"),'Voting status starts with uppercase Г');
+assert(election.includes("bill.status_label==='Черновик'?' ':' · '"),'Draft status has no leading middle dot');
+assert(!election.includes("</b> · {bill.status_label}</p>"),'Legacy unconditional draft separator is removed');
 
 (async()=>{
  const db=new PGlite();
