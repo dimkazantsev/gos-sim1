@@ -1,0 +1,25 @@
+name: Stage 5 Registration and GD Council Chat
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/20261018145500_stage5_registration_and_gd_council_chat.sql'
+      - 'scripts/gd-council-stage5-regression-check.cjs'
+      - '.github/workflows/gd-council-stage5.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/20261018145500_stage5_registration_and_gd_council_chat.sql'
+      - 'scripts/gd-council-stage5-regression-check.cjs'
+      - '.github/workflows/gd-council-stage5.yml'
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: node scripts/gd-council-stage5-regression-check.cjs
