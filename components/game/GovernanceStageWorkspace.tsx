@@ -159,7 +159,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
    </fieldset>
    {(stage.status==='open'||canRemediateCompleted)&&awaitingFinalDocuments.length>0&&<section className="stageFinalWorkPrompt" aria-live="polite">
       <div><FileText size={19} aria-hidden="true"/><span><b>Итоговые документы ещё не оформлены</b>
-       <small>Осталось оформить обязательные документы ({awaitingFinalDocuments.length}). До этого этап завершить нельзя.</small></span></div>
+       <small>{stage.status==='completed'?'Осталось погасить задолженность по итоговым документам ('+awaitingFinalDocuments.length+'). После опубликования доступ и предварительный балл будут восстановлены.':'Осталось оформить обязательные документы ('+awaitingFinalDocuments.length+'). До этого этап завершить нельзя.'}</small></span></div>
       {(!viewer||canRemediateCompleted)&&actionableFinalDocuments.length>0&&<button type="button" className="primary"
         onClick={()=>setTab('materials')}>Подготовить итоговые документы <ArrowLeft size={16} aria-hidden="true"/></button>}
      </section>}

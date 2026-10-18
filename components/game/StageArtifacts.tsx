@@ -31,8 +31,8 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
  const docs=g.formalDocuments.filter(d=>d.stage_no===stage.stage_no),votes=g.votes.filter(v=>v.stage_no===stage.stage_no);
  const completed=stage.status==='completed';
  const missingFinalDocuments=finalDocuments.filter(item=>!item.fulfilled);
- const canPrepareTemplate=(key:string)=>g.teacher||formalSubjects.includes(stageDocumentSubject(
-  stage.stage_no,key,DOCUMENT_TEMPLATES.find(t=>t.key===key)?.subject||''));
+ const canPrepareTemplate=(key:string)=>(!completed||missingFinalDocuments.some(item=>item.template_key===key))&&(g.teacher||formalSubjects.includes(stageDocumentSubject(
+  stage.stage_no,key,DOCUMENT_TEMPLATES.find(t=>t.key===key)?.subject||'')));
  const prepareFinal=(item:StageFinalDocument)=>{
   const key=item.template_key==='crisis_act'?crisisDocumentTemplate(formalSubjects,g.teacher):item.template_key;
   if(!key||readOnly||!canPrepareStageFinalDocument(item,formalSubjects,g.teacher))return;
@@ -48,7 +48,7 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
   {partySync.length?<div className="stagePartySyncGrid">{partySync.map(p=><article key={p.id}><div><PartyPopper size={17}/><span><b>{p.name}</b><small>{p.ideology||'Идеология не указана'}</small></span></div><div className="stagePartySyncMeta"><span className={'is-'+p.registration_status}>{p.registration_status==='registered'?'Зарегистрирована':p.registration_status==='submitted'?'На проверке':p.registration_status==='revision'?'Нужна доработка':p.registration_status==='rejected'?'Отклонена':'Черновик'}</span><span>{p.documents.length} док.</span></div></article>)}</div>:<div className="stageProfileSyncEmpty">Партии ещё не созданы. Создайте партию в профильном разделе — она автоматически появится здесь.</div>}
  </section>}
  {finalDocuments.length>0&&<section className="stageFinalDocuments" aria-label="Обязательные итоговые документы">
-   <header><div><small>ИТОГОВЫЕ ДОКУМЕНТЫ · ЭТАП {stage.stage_no}</small><h4>Перед завершением этапа</h4></div><b>{finalDocuments.filter(x=>x.fulfilled).length} / {finalDocuments.length}</b></header>
+   <header><div><small>ИТОГОВЫЕ ДОКУМЕНТЫ · ЭТАП {stage.stage_no}</small><h4>{completed?'Документы завершённого этапа':'Перед завершением этапа'}</h4></div><b>{finalDocuments.filter(x=>x.fulfilled).length} / {finalDocuments.length}</b></header>
    <p>Необходимо подготовить итоговые документы этапа. Нормативные акты должны быть официально опубликованы; проекты государственных программ на этапе 10 должны быть оформлены и сохранены в Реестре НПА. Сохранённый черновик не означает завершения оформления.</p>
    <div className="stageFinalDocumentsList">{finalDocuments.map(item=><div key={item.template_key} className={item.fulfilled?'isReady':'isMissing'}>
      <span aria-hidden="true">{item.fulfilled?'✓':'!'}</span><strong>{item.title}</strong>
@@ -56,6 +56,7 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
      {!item.fulfilled&&!readOnly&&canPrepareStageFinalDocument(item,formalSubjects,g.teacher)&&
        <button type="button" onClick={()=>prepareFinal(item)}>Подготовить документ</button>}
    </div>)}</div>
+   {completed&&!!missingFinalDocuments.length&&<p>Этап уже завершён. Уполномоченные участники могут оформить недостающие документы здесь. После официального опубликования всех обязательных актов блокировка следующих этапов снимется, а предварительный балл будет пересчитан.</p>}
    {!!missingFinalDocuments.length&&<p>После заполнения проведите предусмотренное согласование. Постановления, протоколы и правовые акты должны получить статус «Опубликован». Затем нажмите «Перепроверить» на вкладке «Проверка».</p>}
   </section>}
  <div className="stageArtifactActions">{task.templates.map(key=>{const t=DOCUMENT_TEMPLATES.find(x=>x.key===key);return t&&canPrepareTemplate(key)&&<button type="button" key={key} disabled={readOnly} aria-expanded={form===key} onClick={()=>{setForm(form===key?'':key);setSaved('')}}><FilePlus2 size={18}/><span>{t.title}</span></button>})}{stage.stage_no!==1&&task.target&&onNavigate&&<button type="button" onClick={()=>onNavigate(task.target!)}><ArrowUpRight size={18}/><span>Открыть {({parties:'партии',votes:'голосования',budget:'бюджет',events:'события',grades:'журнал оценок'} as Partial<Record<View,string>>)[task.target]||'раздел'}</span></button>}</div>
