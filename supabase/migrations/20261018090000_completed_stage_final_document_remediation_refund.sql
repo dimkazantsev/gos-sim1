@@ -96,7 +96,7 @@ begin
  end if;
  if tg_op='DELETE' then return old;end if;
  return new;
-end; $function$
+end; $function$;
 
 CREATE OR REPLACE FUNCTION private.guard_stage_document_hold_write()
  RETURNS trigger
@@ -121,7 +121,7 @@ BEGIN
       USING ERRCODE='42501';
  END IF;
  RETURN new;
-END;$function$
+END;$function$;
 
 -- Once the *last* missing document is officially registered/published, restore
 -- the draft assessment from current evidence. Do not mutate teacher-final grades.
