@@ -16,7 +16,7 @@ const fn=(text,name)=>{
  const re=new RegExp('CREATE OR REPLACE FUNCTION public\\.'+name+'\\([\\s\\S]*?\\$fn\\$;');
  const m=text.match(re);assert(m,'Missing SQL function '+name);return m[0];
 };
-assert(stage.includes('stage.stage_no===6&&<PresidentialStage6CivicVote')&&!stage.includes('stageNo={6} onOpenVotes'),'Stage 6 moves from parliamentary amendment to personal vote');
+assert(stage.includes('stage.stage_no===6&&<><PresidentialStage6CivicVote')&&!stage.includes('stageNo={6} onOpenVotes'),'Stage 6 still uses individual voting without a GD session');
 assert(stage.includes('stage.stage_no===6&&<><PresidentialStage6CivicVote g={g}/><PresidentialElectionLab g={g}/>'),'Candidate registration is restored to Stage 6');
 assert(stage.includes('stage.stage_no===7&&<PresidentialElectionStage7 g={g}/>'),'Only campaign and CEC results remain in Stage 7');
 assert(lab.includes('currentStage?.stage_no===6')&&!lab.includes('if(!systemReady)return'),'CEC nominations are possible in Stage 6 without waiting for student voting');
