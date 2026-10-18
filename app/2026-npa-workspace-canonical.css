@@ -1871,3 +1871,12 @@
     margin-top:16px!important;
   }
 }
+
+/* Подписи уполномоченных лиц ГД и КСРФ. Отдельная строка на каждого подписанта. */
+.formalSignatureList{display:grid;gap:12px;margin-top:22px}
+.formalSignatureList .formalSignature{margin-top:0;min-width:0}
+.formalInstitutionSigning{display:grid;gap:7px;margin:12px 0;padding:13px 14px;border:1px solid #d5e0ee;border-radius:12px;background:#f7f9fd;color:#28415f}
+.formalInstitutionSigning>b{font-size:14px}
+.formalInstitutionSigning>span{font-size:13px;line-height:1.5;color:#59708e}
+.formalInstitutionSigning>.primary{justify-self:start;min-height:40px}
+@media(max-width:560px){.formalSignatureList .formalSignature{flex-wrap:wrap}.formalSignatureList .formalSignatureImage{max-width:100%}.formalInstitutionSigning>.primary{justify-self:stretch}}
