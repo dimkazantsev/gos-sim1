@@ -2256,9 +2256,22 @@ button,input,textarea,select{font-size:14px}
 }
 .actionErrorNotice>span{min-width:0;flex:1}
 .actionErrorDismiss{
- display:grid;place-items:center;flex:none;width:28px;height:28px;min-height:28px;
+ display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+ flex:0 0 28px;width:28px;height:28px;min-height:28px;
  margin:-3px -4px -3px 0;padding:0;border:1px solid #e8c8d0;border-radius:8px;
- background:#fff;color:#863447;font-size:20px;cursor:pointer;
+ background:#fff;color:#863447;line-height:0;cursor:pointer;
+}
+.actionErrorDismiss svg{display:block;flex:none;width:18px;height:18px;margin:0;transform:none}
+/* The shared 46px icon-button rule must not enlarge the close control of a red alert. */
+.errorBox.closable .gsIconAction{
+ display:grid!important;place-items:center!important;box-sizing:border-box!important;
+ flex:0 0 32px!important;width:32px!important;min-width:32px!important;
+ height:32px!important;min-height:32px!important;padding:0!important;
+ line-height:0!important;align-self:center;
+}
+.errorBox.closable .gsIconAction svg{
+ display:block!important;width:18px!important;height:18px!important;
+ margin:0!important;transform:none!important;
 }
 .actionErrorDismiss:focus-visible{outline:3px solid #6b8cfc;outline-offset:2px}
 @keyframes actionErrorAppear{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}

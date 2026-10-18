@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useRef,useState,type ChangeEvent,type FormEvent,type MouseEvent} from 'react';
 import {createPortal} from 'react-dom';
+import {X} from 'lucide-react';
 
 type ActionTarget={element:HTMLElement;view:string;at:number};
 type PointerLocation={x:number;y:number;at:number};
@@ -89,7 +90,7 @@ export function useActionErrorPlacement(error:string,view:string,clearError:()=>
   <div id={errorId} className="actionErrorNotice" role="alert"
    style={position?{left:position.left,top:position.top}:{right:12,bottom:12}}>
    <span>{error}</span>
-   <button type="button" className="actionErrorDismiss" aria-label="Закрыть сообщение об ошибке" onClick={clearError}>×</button>
+   <button type="button" className="actionErrorDismiss" aria-label="Закрыть сообщение об ошибке" onClick={clearError}><X aria-hidden="true" focusable="false" size={18} strokeWidth={2}/></button>
   </div>,document.body
  ):null;
  return {onClickCapture,onSubmitCapture,onChangeCapture,localized,notice};
