@@ -79,6 +79,7 @@ const game=uid(1),creator=uid(2),winner=uid(3);
   await db.exec(sqlPolicy);
   await db.exec("CREATE TRIGGER guard_formal_documents_stage BEFORE INSERT OR UPDATE OR DELETE ON formal_documents FOR EACH ROW EXECUTE FUNCTION private.guard_stage_submission();");
   await db.exec("CREATE TRIGGER stage_document_member_progress_guard BEFORE INSERT OR UPDATE ON formal_documents FOR EACH ROW EXECUTE FUNCTION private.guard_stage_document_hold_write();");
+  await db.query("update game_stages set status='open',deadline=now()+interval '1 day' where game_id=$1 and stage_no=4",[game]);
   let forgedError=null;
   try{
     await db.query(
@@ -88,6 +89,7 @@ const game=uid(1),creator=uid(2),winner=uid(3);
   assert(forgedError,'Direct forged automatic act must be refused');
   console.log('FORGED_DOCUMENT_REJECTION:',String(forgedError.message||forgedError).slice(0,240));
   assert.match(String(forgedError.message||forgedError),/создаётся только из подтверждённого результата/,'Only server-confirmed outcomes may create election acts');
+  await db.query("update game_stages set status='completed' where game_id=$1 and stage_no=4",[game]);
   const obligations=(await db.query('select private.stage_required_final_documents($1,4) rows',[game])).rows[0].rows;
   assert.equal(obligations.length,4,'Three election acts plus minutes required');
   assert.equal(obligations.filter(x=>x.fulfilled).length,0,'Unpublished acts never satisfy stage completion');
