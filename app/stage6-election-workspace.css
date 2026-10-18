@@ -1,0 +1,46 @@
+/* ГОС.ID — presidential election preparation on stage 6.
+   All rules are scoped to this workspace; stage 7 and institutional UI stay unchanged. */
+.presStage6{display:grid;gap:16px;min-width:0;container-type:inline-size;color:var(--text)}
+.presStage6 .stage6Intro{margin:0;padding:22px 24px;border:1px solid #d7e2f5;border-radius:20px;background:linear-gradient(120deg,#f4f7ff 0%,#fff 92%);box-shadow:none}
+.presStage6 .stage6Intro small{display:block;font-size:11px;font-weight:850;letter-spacing:.09em;color:#5272b3;margin-bottom:6px}
+.presStage6 .stage6Intro h3{margin:0 0 8px;color:var(--navy);font-size:clamp(20px,2.3vw,25px);line-height:1.25;letter-spacing:-.025em}
+.presStage6 .stage6Intro p{margin:0;max-width:90ch;font-size:14px;line-height:1.6;color:var(--body)}
+.presStage6 .stage6ElectionGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;min-width:0}
+.presStage6 .stage6VoteCard{display:flex;flex-direction:column;gap:14px;min-width:0;border:1px solid #d9e3f2;border-radius:18px;background:#fff;padding:19px 20px;box-shadow:0 4px 18px rgba(14,40,82,.035)}
+.presStage6 .stage6CardHead{margin:0;display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.presStage6 .stage6CardHead>div{min-width:0;flex:1}
+.presStage6 .stage6CardHead small{display:block;font-size:10px;line-height:1.35;font-weight:850;letter-spacing:.09em;color:#406ce4}
+.presStage6 .stage6CardHead h3{margin:5px 0 7px;font-size:18px;line-height:1.3;font-weight:800;letter-spacing:-.018em;color:var(--navy)}
+.presStage6 .stage6CardHead p{margin:0;font-size:13px;line-height:1.55;color:var(--muted)}
+.presStage6 .stage6CardIcon{flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:#ecf2ff;color:#315df0}
+.presStage6 .pollCreate{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:11px;min-width:0;margin-top:auto}
+.presStage6 .pollCreate label{display:grid;gap:6px;min-width:0;font-size:12px;font-weight:750;color:var(--body)}
+.presStage6 :is(.pollCreate input,.pollCreate select){min-width:0;width:100%;height:46px;padding:9px 13px;font-size:14px;font-weight:650;border:1px solid #c9d7ee;border-radius:12px;background:#fff;color:var(--text)}
+.presStage6 :is(.pollCreate input,.pollCreate select):focus-visible{outline:3px solid #adc4ff;outline-offset:1px}
+.presStage6 :is(.pollCreate button,.stage6VoteCard>button){display:inline-flex;align-items:center;justify-content:center;min-width:0;width:100%;min-height:46px;max-width:100%;padding:11px 14px;border-radius:12px;font-size:13px;font-weight:800;line-height:1.35;text-align:center;white-space:normal;overflow-wrap:anywhere}
+.presStage6 :is(.pollCreate button,.stage6VoteCard>button):disabled{cursor:not-allowed;opacity:.65}
+.presStage6 .stage7Notice{font-size:13px;font-weight:500;line-height:1.5;padding:11px 12px;margin:0}
+.presStage6 .stage6CardFootnote{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+.presStage6 .stage6CardFootnote b{font-weight:850;color:var(--navy)}
+.presStage6 .pollDecision{margin-top:auto}
+.presStage6 .pollDecision p{margin:0;font-size:13px;color:var(--muted)}
+.presStage6 .pollChoice{gap:10px}
+.presStage6 .pollChoice button{min-height:45px;border-radius:12px}
+.stageOperations[data-stage="6"] .cecWorkspace{min-width:0;border-radius:20px;overflow:hidden}
+.stageOperations[data-stage="6"] .cecHead{min-width:0;gap:16px}
+.stageOperations[data-stage="6"] .cecHead>div:first-child{min-width:0}
+.stageOperations[data-stage="6"] .cecHead p{line-height:1.55;max-width:85ch}
+.stageOperations[data-stage="6"] .cecTabs{max-width:100%;min-width:0}
+.stageOperations[data-stage="6"] .cecSystemGate{gap:12px}
+.stageOperations[data-stage="6"] .cecSystemGate span{text-align:left}
+@container (max-width:750px){
+ .presStage6 .stage6ElectionGrid{grid-template-columns:minmax(0,1fr)}
+ .presStage6 .stage6Intro{padding:18px}
+ .presStage6 .stage6VoteCard{padding:17px}
+}
+@media (max-width:680px){
+ .presStage6 .stage6Intro h3{font-size:20px}
+ .presStage6 .stage6CardHead h3{font-size:17px}
+ .presStage6 .stage6CardIcon{width:40px;height:40px;border-radius:12px}
+ .stageOperations[data-stage="6"] .cecHeadSide{min-width:0}
+}
