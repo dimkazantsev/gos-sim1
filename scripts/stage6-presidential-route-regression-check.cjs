@@ -19,6 +19,9 @@ assert(ballotSQL.includes("NEW.formal_step_code NOT IN ('reading1','reading2','r
 for(let no=1;no<=16;no++)assert(stage.includes('stage.stage_no==='+no),'Stage '+no+' retains its established module');
 assert(election.includes("supabase.rpc('propose_presidential_system'"),'Student proposal must call protected RPC');
 assert(election.includes('await g.refresh()')&&election.includes('await load()'),'Live UI must refresh linked proposals, documents and votes');
+assert(election.includes('Проект НПА → регистрация → обсуждение → голосование'),'UI depicts genuine proposal-first route');
+assert(election.indexOf('<small>ПРОЕКТ НПА</small>')<election.indexOf('<small>ПРИСУТСТВИЕ</small>'),'Document precedes registration in stage 6');
+assert(election.includes('stage6-proposal-form')&&election.includes('scrollIntoView'),'First route card opens the actual existing proposal form');
 
 (async()=>{
  const db=new PGlite();
