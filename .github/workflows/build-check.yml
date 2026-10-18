@@ -143,6 +143,8 @@ on:
       - 'scripts/stage-auto-document-extension-score-check.cjs'
       - 'scripts/stage-decision-vote-document-chain-check.cjs'
       - 'scripts/verified-decision-acts-check.cjs'
+      - 'scripts/stage15-crisis-linked-document-check.cjs'
+      - 'supabase/migrations/20261018180000_stage15_reviewed_crisis_linked_act.sql'
       - 'supabase/migrations/20261018160000_verified_results_stage2_3_5_14.sql'
       - 'supabase/migrations/20261018150000_stage4_verified_election_resolutions.sql'
       - 'supabase/migrations/20261018151000_bill_ballots_only_during_active_duma_agenda.sql'
@@ -330,6 +332,7 @@ jobs:
       - run: node scripts/stage-auto-document-extension-score-check.cjs
       - run: node scripts/stage-decision-vote-document-chain-check.cjs
       - run: node scripts/verified-decision-acts-check.cjs
+      - run: node scripts/stage15-crisis-linked-document-check.cjs
       - run: node scripts/stage4-office-vote-auto-close-check.cjs
       - run: node scripts/stage4-office-single-winner-runoff-check.cjs
       - run: node scripts/stage4-multi-committee-mandate-check.cjs
