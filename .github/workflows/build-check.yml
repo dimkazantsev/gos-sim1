@@ -141,6 +141,9 @@ on:
       - 'scripts/stage-final-document-debt-check.cjs'
       - 'scripts/stage-final-document-remediation-check.cjs'
       - 'scripts/stage-auto-document-extension-score-check.cjs'
+      - 'scripts/stage-decision-vote-document-chain-check.cjs'
+      - 'supabase/migrations/20261018150000_stage4_verified_election_resolutions.sql'
+      - 'supabase/migrations/20261018151000_bill_ballots_only_during_active_duma_agenda.sql'
       - 'supabase/migrations/20261018103000_automatic_document_extension_fixed_scoring.sql'
       - 'supabase/migrations/20261018090000_completed_stage_final_document_remediation_refund.sql'
       - 'supabase/migrations/20261018072000_stage_final_document_debts.sql'
@@ -322,6 +325,7 @@ jobs:
       - run: node scripts/stage-final-document-debt-check.cjs
       - run: node scripts/stage-final-document-remediation-check.cjs
       - run: node scripts/stage-auto-document-extension-score-check.cjs
+      - run: node scripts/stage-decision-vote-document-chain-check.cjs
       - run: node scripts/stage4-office-vote-auto-close-check.cjs
       - run: node scripts/stage4-office-single-winner-runoff-check.cjs
       - run: node scripts/stage4-multi-committee-mandate-check.cjs
