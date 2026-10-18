@@ -4,6 +4,7 @@ on:
     paths:
       - 'supabase/migrations/20261018164000_duma_agenda_actual_session_stage.sql'
       - 'supabase/migrations/20261018164500_presidential_stage6_bill_ballot_scope.sql'
+      - 'supabase/migrations/20261018165200_stage6_proposal_concurrency_and_vote_scope.sql'
       - 'scripts/stage6-presidential-route-regression-check.cjs'
       - '.github/workflows/stage6-presidential-routing.yml'
   push:
@@ -11,6 +12,7 @@ on:
     paths:
       - 'supabase/migrations/20261018164000_duma_agenda_actual_session_stage.sql'
       - 'supabase/migrations/20261018164500_presidential_stage6_bill_ballot_scope.sql'
+      - 'supabase/migrations/20261018165200_stage6_proposal_concurrency_and_vote_scope.sql'
       - 'scripts/stage6-presidential-route-regression-check.cjs'
       - '.github/workflows/stage6-presidential-routing.yml'
 jobs:
