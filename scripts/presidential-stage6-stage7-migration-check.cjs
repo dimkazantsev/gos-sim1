@@ -4,6 +4,7 @@ const {PGlite}=require('@electric-sql/pglite');
 const migration=fs.readFileSync('supabase/migrations/20261019085000_presidential_stage6_personal_vote_three_day_schedule.sql','utf8');
 const cec=fs.readFileSync('supabase/migrations/20261019090000_presidential_cec_protocol_office_and_time.sql','utf8');
 const pollGuards=fs.readFileSync('supabase/migrations/20261019092000_presidential_stage6_vote_integrity.sql','utf8');
+const inauguration=fs.readFileSync('supabase/migrations/20261019094000_presidential_inauguration_activates_office.sql','utf8');
 const stage=fs.readFileSync('components/game/GovernanceStageWorkspace.tsx','utf8');
 const stage6=fs.readFileSync('components/game/PresidentialStage6CivicVote.tsx','utf8');
 const stage7=fs.readFileSync('components/game/PresidentialElectionStage7.tsx','utf8');
@@ -25,6 +26,9 @@ assert(cec.includes('Asia/Barnaul')&&cec.includes("interval '20 hours'"),'Local 
 assert(cec.includes('private.sync_current_game_office')&&cec.includes('source_key'),'Grant elected President powers and publish once');
 assert(pollGuards.includes('Голоса поровну')&&pollGuards.includes('Голосование уже закрыто')&&pollGuards.includes('REVOKE ALL ON FUNCTION public.set_presidential_election_date'),'Poll tie, immutable closure and Senate single entry');
 assert(preview.includes('publish_presidential_cec_protocol')&&preview.includes('preview_presidential_cec_protocol'),'CEC preview and publication');
+assert(inauguration.includes('confirm_presidential_inauguration')&&inauguration.includes('scheduled_at>now()')&&inauguration.includes('private.sync_current_game_office'),'Presidential powers only after confirmed inauguration');
+assert(stage7.includes('Подтвердить инаугурацию и передать полномочия Президента'),'Teacher can confirm office handover');
+assert(preview.includes('вступит в должность после подтверждённой инаугурации'),'CEC must not claim premature powers');
 assert(calc.includes('set_presidential_teacher_ballot')&&calc.includes('set_presidential_jury_size'),'Reuse editable teacher ballots');
 (async()=>{
  const db=new PGlite();const game=uid(1),teacher=uid(2),outsider=uid(3);
