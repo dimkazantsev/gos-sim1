@@ -1,0 +1,31 @@
+name: Stage 6 Presidential Routing
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/20261018164000_duma_agenda_actual_session_stage.sql'
+      - 'supabase/migrations/20261018164500_presidential_stage6_bill_ballot_scope.sql'
+      - 'supabase/migrations/20261018165200_stage6_proposal_concurrency_and_vote_scope.sql'
+      - 'scripts/stage6-presidential-route-regression-check.cjs'
+      - 'components/game/PresidentialSystemDecisionPanel.tsx'
+      - '.github/workflows/stage6-presidential-routing.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/20261018164000_duma_agenda_actual_session_stage.sql'
+      - 'supabase/migrations/20261018164500_presidential_stage6_bill_ballot_scope.sql'
+      - 'supabase/migrations/20261018165200_stage6_proposal_concurrency_and_vote_scope.sql'
+      - 'scripts/stage6-presidential-route-regression-check.cjs'
+      - 'components/game/PresidentialSystemDecisionPanel.tsx'
+      - '.github/workflows/stage6-presidential-routing.yml'
+jobs:
+  stage6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: node scripts/stage6-presidential-route-regression-check.cjs
