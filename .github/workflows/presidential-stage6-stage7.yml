@@ -13,6 +13,8 @@ on:
       - 'supabase/migrations/20261019094000_presidential_inauguration_activates_office.sql'
       - 'scripts/presidential-stage6-stage7-migration-check.cjs'
       - 'scripts/stage6-cec-restoration-check.cjs'
+      - 'scripts/stage6-responsive-browser-check.cjs'
+      - 'supabase/migrations/20261019195000_stage6_candidate_cec_and_stage7_election_readiness.sql'
       - 'app/stage6-election-workspace.css'
       - 'app/layout.tsx'
       - 'components/game/stageOperations.ts'
@@ -32,6 +34,8 @@ on:
       - 'supabase/migrations/20261019094000_presidential_inauguration_activates_office.sql'
       - 'scripts/presidential-stage6-stage7-migration-check.cjs'
       - 'scripts/stage6-cec-restoration-check.cjs'
+      - 'scripts/stage6-responsive-browser-check.cjs'
+      - 'supabase/migrations/20261019195000_stage6_candidate_cec_and_stage7_election_readiness.sql'
       - 'app/stage6-election-workspace.css'
       - 'app/layout.tsx'
       - 'components/game/stageOperations.ts'
@@ -50,4 +54,5 @@ jobs:
       - run: npm ci
       - run: node scripts/presidential-stage6-stage7-migration-check.cjs
       - run: node scripts/stage6-cec-restoration-check.cjs
+      - run: node scripts/stage6-responsive-browser-check.cjs
       - run: npm run typecheck
