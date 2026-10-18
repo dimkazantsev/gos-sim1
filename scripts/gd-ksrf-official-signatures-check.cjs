@@ -19,7 +19,7 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
   'CREATE TABLE institution_session_registrations(game_id uuid,stage_no int,institution_key text,user_id uuid,present_mandates int);',
   "CREATE TABLE formal_documents(id uuid PRIMARY KEY,game_id uuid,stage_no int,subject_key text,status_code text,metadata jsonb DEFAULT '{}'::jsonb,current_owner_key text);",
   'CREATE TABLE formal_document_history(id bigint GENERATED ALWAYS AS IDENTITY,document_id uuid,game_id uuid,actor_id uuid,action text,from_status text,to_status text,from_owner text,to_owner text,note text);',
-  'CREATE TABLE formal_document_signatures(document_id uuid,game_id uuid,history_id bigint UNIQUE,signer_id uuid,signature_path text,signed_at timestamptz DEFAULT clock_timestamp());',
+  'CREATE TABLE formal_document_signatures(id uuid DEFAULT gen_random_uuid(),document_id uuid,game_id uuid,history_id bigint UNIQUE,signer_id uuid,signature_path text,signed_at timestamptz DEFAULT clock_timestamp());',
   'CREATE TABLE game_profiles(game_id uuid,user_id uuid,signature_path text);',
   'CREATE FUNCTION private.is_game_member(p uuid) RETURNS boolean LANGUAGE sql STABLE AS $f$SELECT EXISTS(SELECT 1 FROM game_members WHERE game_id=p AND user_id=auth.uid())$f$;',
   'CREATE FUNCTION private.is_game_teacher(p uuid) RETURNS boolean LANGUAGE sql STABLE AS $f$SELECT false$f$;',
@@ -36,7 +36,7 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
  for(const uid of [chair,dep1,dep2,ks1,ks2,ks3,outsider]){await db.query("INSERT INTO game_members VALUES($1,$2,'student',NULL)",[game,uid]);await db.query("INSERT INTO game_profiles VALUES($1,$2,'signatures/test.png')",[game,uid]);}
  for(const [u,role] of [[chair,'Председатель Государственной Думы'],[dep1,'Заместитель Председателя Государственной Думы №1'],[dep2,'Заместитель Председателя Государственной Думы №2']])await db.query("INSERT INTO game_office_assignments(game_id,user_id,role_title,status) VALUES($1,$2,$3,'active')",[game,u,role]);
  for(const [u,n] of [[ks1,1],[ks2,2],[ks3,3]])await db.query("INSERT INTO game_parties(name,game_id,leader_user_id,registration_status) VALUES($1,$2,$3,'registered')",['Фракция '+n,game,u]);
- const gd=uuid(201),ks=uuid(202),draft=uuid(203);
+ const gd=uuid(201),ks=uuid(202),draft=uuid(203),gdDeputy=uuid(204);
  await db.query("INSERT INTO formal_documents(id,game_id,stage_no,subject_key,status_code,current_owner_key) VALUES($1,$2,5,'gd','published','system'),($3,$2,2,'ksrf','published','system'),($4,$2,5,'gd','draft','author')",[gd,game,ks,draft]);
  let preside=async()=>(await db.query('SELECT private.gd_presiding_officer($1,5) as id',[game])).rows[0].id;
  assert.equal(await preside(),chair,'Before a meeting, its chair coordinates');
@@ -48,12 +48,18 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
  assert.equal(await preside(),dep2,'A present second deputy substitutes absent chair');
  await db.query("INSERT INTO institution_session_registrations VALUES($1,5,'gd',$2,225)",[game,dep1]);
  assert.equal(await preside(),dep1,'Present deputy No 1 has precedence');
- await as(dep1);await db.query('SELECT public.sign_institution_document($1)',[gd]);
+ await as(dep1);await assert.rejects(()=>db.query('SELECT public.sign_institution_document($1)',[gd]),/другому/,'Deputy cannot replace an existing chair signature');
+  await db.query("INSERT INTO formal_documents(id,game_id,stage_no,subject_key,status_code,current_owner_key) VALUES($1,$2,5,'gd','published','system')",[gdDeputy,game]);
+  await db.query('SELECT public.sign_institution_document($1)',[gdDeputy]);
+  assert.equal((await db.query('SELECT count(*)::int n FROM formal_document_signatures WHERE document_id=$1',[gdDeputy])).rows[0].n,1,'Absent chair represented by deputy, not by forged chair signature');
  await db.query("INSERT INTO institution_session_registrations VALUES($1,5,'gd',$2,0)",[game,chair]);
  assert.equal(await preside(),dep1,'Zero actual chair turnout retains deputy');
  await db.query('UPDATE institution_session_registrations SET present_mandates=225 WHERE user_id=$1',[chair]);
  assert.equal(await preside(),chair,'Chair return restores chair authority');
- await as(dep2);await assert.rejects(()=>db.query('SELECT public.sign_institution_document($1)',[gd]),/другому/);
+ await as(dep2);await assert.rejects(()=>db.query('SELECT public.sign_institution_document($1)',[gdDeputy]),/другому/);
+  const gdSigner=(await db.query('SELECT public.get_institution_document_signers($1) data',[gdDeputy])).rows[0].data;
+  assert.equal(gdSigner.required.length,1,'GD needs one personal signature');
+  assert.equal(gdSigner.required[0].user_id,dep1,'Signed act keeps its deputy signature after chair returns');
  await as(chair);await assert.rejects(()=>db.query('SELECT public.sign_institution_document($1)',[draft]),/ещё не принят/);
  await as(ks1);await db.query('SELECT public.sign_institution_document($1)',[ks]);
  await as(ks2);await db.query('SELECT public.sign_institution_document($1)',[ks]);
