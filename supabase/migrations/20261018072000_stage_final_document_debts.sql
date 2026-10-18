@@ -160,6 +160,42 @@ BEGIN
  END LOOP;
 END;$install$;
 
+
+-- Ballots do not have their own stage_no: inherit it from the referenced vote.
+CREATE OR REPLACE FUNCTION private.guard_stage_document_hold_ballot()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO public,private,pg_temp AS $fn$
+DECLARE v_game uuid;v_stage integer;uid uuid:=auth.uid();
+BEGIN
+ IF uid IS NULL THEN RETURN new;END IF;
+ SELECT game_id,stage_no INTO v_game,v_stage
+ FROM public.game_votes WHERE id=new.vote_id;
+ IF v_game IS NOT NULL AND NOT private.is_game_teacher(v_game)
+    AND private.has_prior_stage_document_hold(v_game,uid,v_stage) THEN
+    RAISE EXCEPTION 'Голосование следующего этапа недоступно: завершите итоговые документы предыдущего этапа' USING ERRCODE='42501';
+ END IF;
+ RETURN new;
+END;$fn$;
+REVOKE ALL ON FUNCTION private.guard_stage_document_hold_ballot() FROM PUBLIC,anon,authenticated;
+DROP TRIGGER IF EXISTS stage_document_member_progress_guard ON public.game_ballots;
+CREATE TRIGGER stage_document_member_progress_guard BEFORE INSERT OR UPDATE ON public.game_ballots
+FOR EACH ROW EXECUTE FUNCTION private.guard_stage_document_hold_ballot();
+
+-- Player actions use round_no as their stable stage identifier.
+CREATE OR REPLACE FUNCTION private.guard_stage_document_hold_player_action()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO public,private,pg_temp AS $fn$
+DECLARE uid uuid:=auth.uid();
+BEGIN
+ IF uid IS NOT NULL AND NOT private.is_game_teacher(new.game_id)
+    AND private.has_prior_stage_document_hold(new.game_id,uid,new.round_no) THEN
+    RAISE EXCEPTION 'Следующий этап недоступен: оформите итоговые документы предыдущего этапа' USING ERRCODE='42501';
+ END IF;
+ RETURN new;
+END;$fn$;
+REVOKE ALL ON FUNCTION private.guard_stage_document_hold_player_action() FROM PUBLIC,anon,authenticated;
+DROP TRIGGER IF EXISTS stage_document_member_progress_guard ON public.player_actions;
+CREATE TRIGGER stage_document_member_progress_guard BEFORE INSERT OR UPDATE ON public.player_actions
+FOR EACH ROW EXECUTE FUNCTION private.guard_stage_document_hold_player_action();
+
 -- Missing final material removes one legal/procedural point from an unapproved
 -- automatic grade. Approved teacher grades stay unchanged.
 CREATE OR REPLACE FUNCTION private.stage_assessment_deadline_penalty()
