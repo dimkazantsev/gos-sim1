@@ -79,3 +79,31 @@ DROP TRIGGER IF EXISTS zzz_start_bill_ballot_at_agenda ON public.duma_agenda_ite
 CREATE TRIGGER zzz_start_bill_ballot_at_agenda
 AFTER UPDATE OF status ON public.duma_agenda_items
 FOR EACH ROW EXECUTE FUNCTION private.start_bill_ballot_at_agenda();
+
+-- A previously opened ballot also stops accepting votes when its
+-- meeting/question is closed or carried over. It resumes only during
+-- another actual hearing of the same bill and document step.
+CREATE OR REPLACE FUNCTION private.guard_bill_ballot_cast_session()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
+SET search_path TO public,private,pg_temp AS $cast$
+DECLARE v public.game_votes%rowtype;d public.formal_documents%rowtype;
+BEGIN
+ SELECT * INTO v FROM public.game_votes WHERE id=NEW.vote_id;
+ IF v.id IS NULL OR v.formal_document_id IS NULL OR v.status<>'open' THEN RETURN NEW; END IF;
+ SELECT * INTO d FROM public.formal_documents WHERE id=v.formal_document_id;
+ IF d.workflow_key<>'bill' OR v.formal_step_code NOT IN ('reading1','reading2','reading3') THEN RETURN NEW; END IF;
+ IF NOT EXISTS (
+  SELECT 1 FROM public.duma_agenda_items i JOIN public.duma_sessions s
+    ON s.id=i.session_id AND s.game_id=i.game_id
+  WHERE i.game_id=v.game_id AND i.formal_document_id=d.id
+   AND i.status='in_progress' AND s.status='open' AND s.stage_no=v.stage_no
+ ) THEN
+  RAISE EXCEPTION 'Голосование по законопроекту недоступно вне рассмотрения вопроса на открытом заседании ГД'
+    USING ERRCODE='42501';
+ END IF;
+ RETURN NEW;
+END;$cast$;
+REVOKE ALL ON FUNCTION private.guard_bill_ballot_cast_session() FROM PUBLIC,anon,authenticated;
+DROP TRIGGER IF EXISTS guard_bill_ballot_cast_session ON public.game_ballots;
+CREATE TRIGGER guard_bill_ballot_cast_session BEFORE INSERT OR UPDATE ON public.game_ballots
+FOR EACH ROW EXECUTE FUNCTION private.guard_bill_ballot_cast_session();
