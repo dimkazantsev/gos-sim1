@@ -20,7 +20,7 @@ assert(lab.includes('systemDecisionComplete')&&lab.includes('currentStage?.stage
 assert(stage7.includes('РЕШЕНИЕ ШЕСТОГО ЭТАПА')&&!stage7.includes('<button className="primary stage7MainAction" disabled={busy} onClick={()=>void openPollDecision()}'),'Decision not re-opened in Stage 7');
 assert(stage6.includes('Один студент — один голос'),'Individual vote, not an institutional vote');
 assert(migration.includes('first_day+2')&&migration.includes('20:00')&&migration.includes('2,5 суток'),'Three days and 2.5-day campaigning');
-assert(cec.includes('Asia/Barnaul')&&cec.includes('23:59')===false?true:cec.includes('Asia/Barnaul'),'Local election clock enforced');
+assert(cec.includes('Asia/Barnaul')&&cec.includes("interval '20 hours'"),'Local election clock enforced');
 assert(cec.includes('private.sync_current_game_office')&&cec.includes('source_key'),'Grant elected President powers and publish once');
 assert(preview.includes('publish_presidential_cec_protocol')&&preview.includes('preview_presidential_cec_protocol'),'CEC preview and publication');
 assert(calc.includes('set_presidential_teacher_ballot')&&calc.includes('set_presidential_jury_size'),'Reuse editable teacher ballots');
@@ -66,7 +66,7 @@ assert(calc.includes('set_presidential_teacher_ballot')&&calc.includes('set_pres
   assert.equal(result.system_type,'absolute');
   assert.equal(result.poll_enabled,false);
   assert.equal(result.votes_total,40);
-  assert.equal(result.tally.absolute,29);
+  assert.equal(result.tally.absolute,30,'Edited ballot replaces a previous vote; no duplicate user entry');
   assert.equal((await db.query('SELECT system_type FROM presidential_election_settings WHERE game_id=$1',[game])).rows[0].system_type,'absolute');
   await assert.rejects(()=>cast(uid(102),'relative'),/Решение студентов уже утверждено|Голосование закрыто/,'Cannot change results after closure');
   await db.query("SELECT set_config('request.jwt.claim.sub',$1,false)",[teacher]);
