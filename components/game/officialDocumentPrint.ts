@@ -32,6 +32,7 @@ export function printOfficialDocument():boolean{
   '.formalPaperBody :is(table,figure){max-width:100%;break-inside:avoid}',
   '.formalPaperBody img,.formalSignature img{max-width:100%;height:auto}',
   '.formalSignature{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-top:29px;padding-top:15px;border-top:1px solid #cdd5e0;break-inside:avoid}',
+  '.formalSignatureList{display:grid;gap:12pt;margin-top:20pt}.formalSignatureList .formalSignature{margin-top:0}',
   '.formalSignature>div{display:grid;gap:4px;font-size:10pt;min-width:0}',
   '.formalSignature b{font-weight:700}.formalSignature small{font-size:9pt}',
   '.formalSignatureImage{max-width:50%;margin:0}',
