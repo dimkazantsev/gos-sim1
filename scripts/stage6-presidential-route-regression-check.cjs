@@ -100,3 +100,6 @@ assert(!election.includes("</b> · {bill.status_label}</p>"),'Legacy uncondition
 
 // Related candidate document and exclusive adoption invariants.
 require('./presidential-exclusive-party-document-check.cjs');
+
+// Related GD agenda document route invariants (published and draft).
+require('./meeting-agenda-route-regression-check.cjs');
