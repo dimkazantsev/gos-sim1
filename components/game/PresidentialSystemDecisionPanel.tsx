@@ -133,10 +133,10 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
     <span className={p.vote_id?'done':''}>3 · Голосование создано</span>
     <span className={p.resolution_document_id?'done':''}>4 · Решение ГД</span>
    </div>
-   {bill&&<p className="presSystemDocumentRef">Законопроект: <b>{bill.registry_no||'зарегистрирован'}</b> · {bill.status_label}</p>}
+   {bill&&<p className="presSystemDocumentRef">Законопроект: <b>{bill.registry_no||'зарегистрирован'}</b>{bill.status_label==='Черновик'?' ':' · '}{bill.status_label}</p>}
    {resolution&&<p className="presSystemDocumentRef">Постановление: <b>{resolution.registry_no||'оформлено'}</b> · {resolution.status_label}</p>}
    </div>
-   <div className="presSystemProposalActions"><span>{p.status==='adopted'?'Принято':p.status==='vote_open'?'На голосовании':p.status==='registered'?'Зарегистрировано':p.status==='rejected'?'Отклонено':'Проект'}</span>{p.system_type==='qualified'&&<em>{p.threshold_pct}%</em>}{v&&<em>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</em>}
+   <div className="presSystemProposalActions"><span>{p.status==='adopted'?'Принято':p.status==='vote_open'?'На голосовании':p.status==='registered'?'Зарегистрировано':p.status==='rejected'?'Отклонено':'Проект'}</span>{p.system_type==='qualified'&&<em>{p.threshold_pct}%</em>}{v&&<em>{v.status==='open'?'Голосование открыто':v.result_label||'закрыто'}</em>}
     {bill&&<button onClick={()=>onOpenDocument?.(bill.id)}>Открыть проект НПА →</button>}
     {v?.status==='open'&&<button className="primary" onClick={()=>onOpenVotes(v.id)}>Перейти к голосованию →</button>}
    </div>
