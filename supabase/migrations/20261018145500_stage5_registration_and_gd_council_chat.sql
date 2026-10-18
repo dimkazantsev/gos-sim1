@@ -142,6 +142,8 @@ CREATE TABLE IF NOT EXISTS private.gd_council_chat_document_delivery (
  last_arrival_at timestamptz NOT NULL DEFAULT now(),
  PRIMARY KEY(game_id,document_id)
 );
+CREATE INDEX IF NOT EXISTS gd_council_delivery_document_idx ON private.gd_council_chat_document_delivery(document_id);
+CREATE INDEX IF NOT EXISTS gd_council_delivery_message_idx ON private.gd_council_chat_document_delivery(message_id);
 ALTER TABLE private.gd_council_chat_document_delivery ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON private.gd_council_chat_document_delivery FROM PUBLIC,anon,authenticated;
 
