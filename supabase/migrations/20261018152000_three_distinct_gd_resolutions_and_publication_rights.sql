@@ -6,6 +6,14 @@ CREATE OR REPLACE FUNCTION private.guard_stage4_act_provenance()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
 SET search_path TO public,private,pg_temp AS $provenance$
 BEGIN
+ IF TG_OP='INSERT' THEN
+   IF NEW.metadata->>'document_kind'='stage4_office_result'
+      AND auth.uid() IS NOT NULL AND pg_trigger_depth()<=1 THEN
+     RAISE EXCEPTION 'Постановление по итогам выборов создаётся только из подтверждённого результата'
+       USING ERRCODE='42501';
+   END IF;
+   RETURN NEW;
+ END IF;
  IF COALESCE(OLD.metadata->>'document_kind','')='stage4_office_result'
  OR COALESCE(NEW.metadata->>'document_kind','')='stage4_office_result' THEN
    IF OLD.metadata->>'document_kind' IS DISTINCT FROM NEW.metadata->>'document_kind'
@@ -32,7 +40,7 @@ BEGIN
 END;$provenance$;
 REVOKE ALL ON FUNCTION private.guard_stage4_act_provenance() FROM PUBLIC,anon,authenticated;
 DROP TRIGGER IF EXISTS guard_stage4_act_provenance ON public.formal_documents;
-CREATE TRIGGER guard_stage4_act_provenance BEFORE UPDATE ON public.formal_documents
+CREATE TRIGGER guard_stage4_act_provenance BEFORE INSERT OR UPDATE ON public.formal_documents
 FOR EACH ROW EXECUTE FUNCTION private.guard_stage4_act_provenance();
 
 CREATE OR REPLACE FUNCTION private.stage4_legal_act_can_finalize(
