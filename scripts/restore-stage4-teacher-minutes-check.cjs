@@ -50,7 +50,7 @@ try{
  }
  await db.query("insert into game_office_assignments values($1,$2,'active','Председатель Государственной Думы')",[game,chair]);
  for(const x of existing){
-  await db.query("insert into formal_documents(id,game_id,stage_no,registry_no,title,doc_type,subject_key,subject_label,author_id,body_text,workflow_key,workflow_steps,current_step,status_code,status_label,current_owner_key,metadata) values($1,$2,4,$3,'Протокол заседания Государственной Думы','other','gd',$4,'Исходный текст протокола','generic',$5,2,'published','Принят','system',$6)",[x.id,game,'ИГРА-НПА-'+x.no,author,JSON.stringify(workflow),JSON.stringify({template_key:'minutes'})]);
+  await db.query("insert into formal_documents(id,game_id,stage_no,registry_no,title,doc_type,subject_key,subject_label,author_id,body_text,workflow_key,workflow_steps,current_step,status_code,status_label,current_owner_key,metadata) values($1,$2,4,$3,'Протокол заседания Государственной Думы','other','gd','Государственная Дума Федерального Собрания РФ',$4,'Исходный текст протокола','generic',$5,2,'published','Принят','system',$6)",[x.id,game,'ИГРА-НПА-'+x.no,author,JSON.stringify(workflow),JSON.stringify({template_key:'minutes'})]);
   await db.query("insert into formal_document_history(document_id,game_id,actor_id,action,from_status,to_status,from_owner,to_owner) values($1,$2,$3,'Принять','review','published','teacher','system')",[x.id,game,x.historyActor]);
  }
  const before=(await db.query('select count(*) n from formal_document_history')).rows[0].n;
