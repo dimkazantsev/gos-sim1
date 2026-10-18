@@ -23,7 +23,7 @@ assert(election.includes('Проект НПА → регистрация → о�
 assert(election.indexOf('<small>ПРОЕКТ НПА</small>')<election.indexOf('<small>ПРИСУТСТВИЕ</small>'),'Document precedes registration in stage 6');
 assert(election.includes('stage6-proposal-form')&&election.includes('scrollIntoView'),'First route card opens the actual existing proposal form');
 assert(election.includes("v.status==='open'?'Голосование открыто'"),'Voting status starts with uppercase Г');
-assert(election.includes("bill.status_label==='Черновик'?' ':' · '"),'Draft status has no leading middle dot');
+assert(election.includes('</b> {bill.status_label}</p>'),'Every bill status is separated by whitespace, without a leading middle dot');
 assert(!election.includes("</b> · {bill.status_label}</p>"),'Legacy unconditional draft separator is removed');
 
 (async()=>{
@@ -97,3 +97,6 @@ assert(!election.includes("</b> · {bill.status_label}</p>"),'Legacy uncondition
   console.log('PASS: routes 1–16; GD session agenda stage 6/12; stage 7 locked; 40 presidential bill ballots linked; fake routes denied; ordinary bill reading guard preserved.');
  } finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
+
+// Related candidate document and exclusive adoption invariants.
+require('./presidential-exclusive-party-document-check.cjs');
