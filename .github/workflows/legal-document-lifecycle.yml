@@ -1,0 +1,37 @@
+name: Legal Document Lifecycle
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/20261019011000_formal_legal_routes_and_presidential_amendment.sql'
+      - 'supabase/migrations/20261019011200_guard_direct_formal_document_legal_route.sql'
+      - 'supabase/migrations/20261019011400_presidential_veto_authority_and_fkz.sql'
+      - 'components/game/DocumentsView.tsx'
+      - 'components/game/DocumentPaper.tsx'
+      - 'components/game/PresidentialSystemDecisionPanel.tsx'
+      - 'scripts/formal-document-legal-lifecycle-regression.cjs'
+      - 'docs/FORMAL_DOCUMENT_LIFECYCLE_AUDIT_2026-10-19.md'
+      - '.github/workflows/legal-document-lifecycle.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/20261019011000_formal_legal_routes_and_presidential_amendment.sql'
+      - 'supabase/migrations/20261019011200_guard_direct_formal_document_legal_route.sql'
+      - 'supabase/migrations/20261019011400_presidential_veto_authority_and_fkz.sql'
+      - 'components/game/DocumentsView.tsx'
+      - 'components/game/DocumentPaper.tsx'
+      - 'components/game/PresidentialSystemDecisionPanel.tsx'
+      - 'scripts/formal-document-legal-lifecycle-regression.cjs'
+      - '.github/workflows/legal-document-lifecycle.yml'
+jobs:
+  lifecycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: node scripts/formal-document-legal-lifecycle-regression.cjs
+      - run: npm run typecheck
