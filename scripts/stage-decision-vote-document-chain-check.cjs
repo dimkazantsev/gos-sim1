@@ -80,7 +80,7 @@ const game=uid(1),creator=uid(2),winner=uid(3);
   await db.exec("CREATE TRIGGER guard_formal_documents_stage BEFORE INSERT OR UPDATE OR DELETE ON formal_documents FOR EACH ROW EXECUTE FUNCTION private.guard_stage_submission();");
   await db.exec("CREATE TRIGGER stage_document_member_progress_guard BEFORE INSERT OR UPDATE ON formal_documents FOR EACH ROW EXECUTE FUNCTION private.guard_stage_document_hold_write();");
   await assert.rejects(db.query(
-   "insert into formal_documents(game_id,stage_no,metadata) values($1,4,'{\\\"document_kind\\\":\\\"stage4_office_result\\\"}'::jsonb)",[game]
+   "insert into formal_documents(game_id,stage_no,metadata) values($1,4,jsonb_build_object('document_kind','stage4_office_result'))",[game]
   ),/создаётся только из подтверждённого результата/,'Direct forged automatic act must be refused');
   const obligations=(await db.query('select private.stage_required_final_documents($1,4) rows',[game])).rows[0].rows;
   assert.equal(obligations.length,4,'Three election acts plus minutes required');
