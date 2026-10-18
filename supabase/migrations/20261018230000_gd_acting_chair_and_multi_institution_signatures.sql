@@ -96,11 +96,17 @@ BEGIN
     AND gm.kind='student' AND gm.roster_archived_at IS NULL
   ORDER BY 1,2;
  ELSIF d.subject_key='gd' THEN
-  v_signer:=private.gd_presiding_officer(d.game_id,d.stage_no);
+  -- A signed GD act has exactly one authentic signatory. A later attendance
+  -- change cannot replace the signature already attached to the act.
+  SELECT s.signer_id INTO v_signer FROM public.formal_document_signatures s
+   WHERE s.document_id=d.id
+    AND s.signed_at>=coalesce(nullif(d.metadata->>'revision_changed_at','')::timestamptz,'-infinity'::timestamptz)
+   ORDER BY s.signed_at,s.id LIMIT 1;
+  IF v_signer IS NULL THEN v_signer:=private.gd_presiding_officer(d.game_id,d.stage_no); END IF;
   IF v_signer IS NULL THEN RETURN; END IF;
   RETURN QUERY SELECT v_signer,
    CASE WHEN EXISTS(SELECT 1 FROM public.game_office_assignments a
-    WHERE a.game_id=d.game_id AND a.user_id=v_signer AND a.status='active'
+    WHERE a.game_id=d.game_id AND a.user_id=v_signer
       AND lower(btrim(a.role_title))='председатель государственной думы')
    THEN 'Председатель Государственной Думы Федерального Собрания Российской Федерации'::text
    ELSE 'Исполняющий обязанности Председателя Государственной Думы Федерального Собрания Российской Федерации'::text END;
@@ -152,9 +158,10 @@ BEGIN
  WHERE s.user_id=v_uid LIMIT 1;
  IF v_office IS NULL THEN RAISE EXCEPTION 'Подписание поручено другому уполномоченному лицу' USING ERRCODE='42501'; END IF;
  IF EXISTS(SELECT 1 FROM public.formal_document_signatures s
-   WHERE s.document_id=d.id AND s.signer_id=v_uid
+   WHERE s.document_id=d.id
+     AND (s.signer_id=v_uid OR d.subject_key='gd')
      AND s.signed_at>=coalesce(nullif(d.metadata->>'revision_changed_at','')::timestamptz,'-infinity'::timestamptz))
- THEN RAISE EXCEPTION 'Эта редакция уже подписана Вами' USING ERRCODE='23505'; END IF;
+ THEN RAISE EXCEPTION 'Эта редакция уже подписана уполномоченным лицом' USING ERRCODE='23505'; END IF;
  SELECT signature_path INTO v_signature FROM public.game_profiles
   WHERE game_id=d.game_id AND user_id=v_uid;
  IF nullif(v_signature,'') IS NULL
