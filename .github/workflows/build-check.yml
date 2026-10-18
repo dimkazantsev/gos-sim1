@@ -146,6 +146,8 @@ on:
       - 'scripts/stage15-crisis-linked-document-check.cjs'
       - 'scripts/formal-institutional-approval-rights-check.cjs'
       - 'scripts/restore-stage4-teacher-minutes-check.cjs'
+      - 'scripts/new-formal-document-brand-check.cjs'
+      - 'supabase/migrations/20261018195000_new_formal_document_gos_id_brand.sql'
       - 'supabase/migrations/20261018194000_restore_teacher_approved_gd_minutes.sql'
       - 'supabase/migrations/20261018193000_formal_institutional_approval_owners.sql'
       - 'supabase/migrations/20261018180000_stage15_reviewed_crisis_linked_act.sql'
@@ -339,6 +341,7 @@ jobs:
       - run: node scripts/stage15-crisis-linked-document-check.cjs
       - run: node scripts/formal-institutional-approval-rights-check.cjs
       - run: node scripts/restore-stage4-teacher-minutes-check.cjs
+      - run: node scripts/new-formal-document-brand-check.cjs
       - run: node scripts/stage4-office-vote-auto-close-check.cjs
       - run: node scripts/stage4-office-single-winner-runoff-check.cjs
       - run: node scripts/stage4-multi-committee-mandate-check.cjs
