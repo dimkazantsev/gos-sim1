@@ -1,0 +1,33 @@
+name: GD and KSRF Official Signatures
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/20261018230000_gd_acting_chair_and_multi_institution_signatures.sql'
+      - 'scripts/gd-ksrf-official-signatures-check.cjs'
+      - 'components/game/DocumentPaper.tsx'
+      - 'components/game/DocumentsView.tsx'
+      - 'components/game/officialDocumentPrint.ts'
+      - 'app/2026-npa-workspace-canonical.css'
+      - '.github/workflows/gd-ksrf-signatures.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/20261018230000_gd_acting_chair_and_multi_institution_signatures.sql'
+      - 'scripts/gd-ksrf-official-signatures-check.cjs'
+      - 'components/game/DocumentPaper.tsx'
+      - 'components/game/DocumentsView.tsx'
+      - 'components/game/officialDocumentPrint.ts'
+      - 'app/2026-npa-workspace-canonical.css'
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: node scripts/gd-ksrf-official-signatures-check.cjs
+      - run: npm run typecheck
