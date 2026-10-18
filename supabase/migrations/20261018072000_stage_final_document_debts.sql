@@ -187,3 +187,13 @@ begin
   return new;
 end;
 $function$;
+
+-- Update outstanding draft calculations once without revising teacher-final scores.
+-- Restore the already-accounted-for deadline part before the BEFORE UPDATE
+-- trigger applies both existing deadline and new document penalties.
+UPDATE public.stage_assessments a
+SET auto_score=least(3,a.auto_score+
+ coalesce((a.evidence_summary->>'deadline_penalty_points')::numeric,0))
+WHERE a.status<>'final'
+ AND private.stage_document_penalty_points(a.game_id,a.user_id,a.stage_no)>0
+ AND coalesce((a.evidence_summary->>'final_document_penalty_points')::numeric,0)=0;
