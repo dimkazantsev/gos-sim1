@@ -12,6 +12,11 @@ on:
       - 'supabase/migrations/20261019092000_presidential_stage6_vote_integrity.sql'
       - 'supabase/migrations/20261019094000_presidential_inauguration_activates_office.sql'
       - 'scripts/presidential-stage6-stage7-migration-check.cjs'
+      - 'scripts/stage6-cec-restoration-check.cjs'
+      - 'app/stage6-election-workspace.css'
+      - 'app/layout.tsx'
+      - 'components/game/stageOperations.ts'
+      - 'components/game/stageDetails.ts'
       - '.github/workflows/presidential-stage6-stage7.yml'
   push:
     branches: [main]
@@ -26,6 +31,11 @@ on:
       - 'supabase/migrations/20261019092000_presidential_stage6_vote_integrity.sql'
       - 'supabase/migrations/20261019094000_presidential_inauguration_activates_office.sql'
       - 'scripts/presidential-stage6-stage7-migration-check.cjs'
+      - 'scripts/stage6-cec-restoration-check.cjs'
+      - 'app/stage6-election-workspace.css'
+      - 'app/layout.tsx'
+      - 'components/game/stageOperations.ts'
+      - 'components/game/stageDetails.ts'
       - '.github/workflows/presidential-stage6-stage7.yml'
 jobs:
   contract:
@@ -39,4 +49,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node scripts/presidential-stage6-stage7-migration-check.cjs
+      - run: node scripts/stage6-cec-restoration-check.cjs
       - run: npm run typecheck
