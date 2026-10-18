@@ -100,7 +100,9 @@ const game=uid(1),creator=uid(2),winner=uid(3);
   await db.query("update formal_documents set status_code='published',current_step=3,current_owner_key='system' where metadata->>'source_result_key'='gd_committees'");
   const afterAll=(await db.query('select private.stage_required_final_documents($1,4) rows',[game])).rows[0].rows;
   assert.equal(afterAll.filter(x=>x.fulfilled).length,3,'All three separate official acts published');
+  await db.query("update game_stages set status='open',deadline=now()+interval '1 day' where game_id=$1 and stage_no=4",[game]);
   await assert.rejects(db.query("update formal_documents set metadata=jsonb_set(metadata,'{source_result_key}','\"tampered\"') where metadata->>'source_result_key'='gd_chair'"),/Нельзя изменить источник/,'Provenance immutable');
+  await db.query("update game_stages set status='completed' where game_id=$1 and stage_no=4",[game]);
   
 
   const ordinary=uid(500),constitutional=uid(501),session=uid(502),item=uid(503);
