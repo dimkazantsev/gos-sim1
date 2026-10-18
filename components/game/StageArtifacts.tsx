@@ -37,7 +37,10 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
   return source?docs.find(d=>d.metadata?.document_kind==='stage4_office_result'
     &&d.metadata?.source_result_key===source):undefined;
  };
- const canPrepareTemplate=(key:string)=>!(stage.stage_no===4&&key==='gd_resolution')&&(!completed||missingFinalDocuments.some(item=>item.template_key===key))&&(g.teacher||formalSubjects.includes(stageDocumentSubject(
+ const linkedVerifiedAct=(key:string)=>docs.find(d=>d.metadata?.document_kind==='verified_vote_decision_act'
+   &&d.metadata?.template_key===key&&d.status_code!=='rejected');
+ const linkedFinalAct=(key:string)=>linkedElectionAct(key)||linkedVerifiedAct(key);
+ const canPrepareTemplate=(key:string)=>!(stage.stage_no===4&&key==='gd_resolution')&&!linkedVerifiedAct(key)&&(!completed||missingFinalDocuments.some(item=>item.template_key===key))&&(g.teacher||formalSubjects.includes(stageDocumentSubject(
   stage.stage_no,key,DOCUMENT_TEMPLATES.find(t=>t.key===key)?.subject||'')));
  const prepareFinal=(item:StageFinalDocument)=>{
   const key=item.template_key==='crisis_act'?crisisDocumentTemplate(formalSubjects,g.teacher):item.template_key;
@@ -59,8 +62,8 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
    <div className="stageFinalDocumentsList">{finalDocuments.map(item=><div key={item.template_key} className={item.fulfilled?'isReady':'isMissing'}>
      <span aria-hidden="true">{item.fulfilled?'✓':'!'}</span><strong>{item.title}</strong>
      <small>{item.fulfilled?(item.evidence_state==='prepared'?'Подготовлен':'Опубликован'):(item.evidence_state==='prepared'?'Не подготовлен':'Не опубликован')}</small>
-     {!item.fulfilled&&!readOnly&&linkedElectionAct(item.template_key)&&onOpenDocument&&canPrepareStageFinalDocument(item,formalSubjects,g.teacher)?
-       <button type="button" onClick={()=>onOpenDocument(linkedElectionAct(item.template_key)!.id)}>Оформить и опубликовать</button>:
+     {!item.fulfilled&&!readOnly&&linkedFinalAct(item.template_key)&&onOpenDocument&&canPrepareStageFinalDocument(item,formalSubjects,g.teacher)?
+       <button type="button" onClick={()=>onOpenDocument(linkedFinalAct(item.template_key)!.id)}>Оформить и опубликовать</button>:
        !item.fulfilled&&!readOnly&&item.template_key.startsWith('gd_')&&item.template_key.endsWith('_resolution')&&stage.stage_no===4?
         <small>Ожидается завершение соответствующих выборов</small>:
        !item.fulfilled&&!readOnly&&canPrepareStageFinalDocument(item,formalSubjects,g.teacher)&&
