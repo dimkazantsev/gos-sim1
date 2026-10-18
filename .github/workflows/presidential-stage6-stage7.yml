@@ -10,6 +10,7 @@ on:
       - 'supabase/migrations/20261019085000_presidential_stage6_personal_vote_three_day_schedule.sql'
       - 'supabase/migrations/20261019090000_presidential_cec_protocol_office_and_time.sql'
       - 'supabase/migrations/20261019092000_presidential_stage6_vote_integrity.sql'
+      - 'supabase/migrations/20261019094000_presidential_inauguration_activates_office.sql'
       - 'scripts/presidential-stage6-stage7-migration-check.cjs'
       - '.github/workflows/presidential-stage6-stage7.yml'
   push:
@@ -23,6 +24,7 @@ on:
       - 'supabase/migrations/20261019085000_presidential_stage6_personal_vote_three_day_schedule.sql'
       - 'supabase/migrations/20261019090000_presidential_cec_protocol_office_and_time.sql'
       - 'supabase/migrations/20261019092000_presidential_stage6_vote_integrity.sql'
+      - 'supabase/migrations/20261019094000_presidential_inauguration_activates_office.sql'
       - 'scripts/presidential-stage6-stage7-migration-check.cjs'
       - '.github/workflows/presidential-stage6-stage7.yml'
 jobs:
