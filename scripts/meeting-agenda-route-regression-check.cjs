@@ -9,7 +9,7 @@ const tr=migration.match(/DROP TRIGGER IF EXISTS zzy_normalize_institution_meeti
 assert(tr,'Normalizer trigger must be in migration');
 assert(migration.includes('public.advance_formal_document(uuid,text,text)'),'Generic advancement explicitly guarded');
 assert(migration.includes('Повестка или протокол утверждается в разделе заседания'),'Legacy action blocked server-side');
-assert(ui.includes('isMeetingProcedureDocument?null:')&&ui.includes('Документ утверждается в разделе заседания'),'UI does not show inaccessible Council action');
+assert(ui.includes('(isTerminal||isMeetingProcedureDocument)?null:')&&ui.includes('Документ утверждается в разделе заседания'),'UI does not show inaccessible Council action');
 const uid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
 
 (async()=>{
