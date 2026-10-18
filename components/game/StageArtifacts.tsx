@@ -31,7 +31,13 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
  const docs=g.formalDocuments.filter(d=>d.stage_no===stage.stage_no),votes=g.votes.filter(v=>v.stage_no===stage.stage_no);
  const completed=stage.status==='completed';
  const missingFinalDocuments=finalDocuments.filter(item=>!item.fulfilled);
- const canPrepareTemplate=(key:string)=>(!completed||missingFinalDocuments.some(item=>item.template_key===key))&&(g.teacher||formalSubjects.includes(stageDocumentSubject(
+ const linkedElectionAct=(key:string)=>{
+  const source=key==='gd_chair_resolution'?'gd_chair':key==='gd_deputies_resolution'?'gd_deputies':
+   key==='gd_committees_resolution'?'gd_committees':null;
+  return source?docs.find(d=>d.metadata?.document_kind==='stage4_office_result'
+    &&d.metadata?.source_result_key===source):undefined;
+ };
+ const canPrepareTemplate=(key:string)=>!(stage.stage_no===4&&key==='gd_resolution')&&(!completed||missingFinalDocuments.some(item=>item.template_key===key))&&(g.teacher||formalSubjects.includes(stageDocumentSubject(
   stage.stage_no,key,DOCUMENT_TEMPLATES.find(t=>t.key===key)?.subject||'')));
  const prepareFinal=(item:StageFinalDocument)=>{
   const key=item.template_key==='crisis_act'?crisisDocumentTemplate(formalSubjects,g.teacher):item.template_key;
@@ -53,7 +59,11 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
    <div className="stageFinalDocumentsList">{finalDocuments.map(item=><div key={item.template_key} className={item.fulfilled?'isReady':'isMissing'}>
      <span aria-hidden="true">{item.fulfilled?'✓':'!'}</span><strong>{item.title}</strong>
      <small>{item.fulfilled?(item.evidence_state==='prepared'?'Подготовлен':'Опубликован'):(item.evidence_state==='prepared'?'Не подготовлен':'Не опубликован')}</small>
-     {!item.fulfilled&&!readOnly&&canPrepareStageFinalDocument(item,formalSubjects,g.teacher)&&
+     {!item.fulfilled&&!readOnly&&linkedElectionAct(item.template_key)&&onOpenDocument&&canPrepareStageFinalDocument(item,formalSubjects,g.teacher)?
+       <button type="button" onClick={()=>onOpenDocument(linkedElectionAct(item.template_key)!.id)}>Оформить и опубликовать</button>:
+       !item.fulfilled&&!readOnly&&item.template_key.startsWith('gd_')&&item.template_key.endsWith('_resolution')&&stage.stage_no===4?
+        <small>Ожидается завершение соответствующих выборов</small>:
+       !item.fulfilled&&!readOnly&&canPrepareStageFinalDocument(item,formalSubjects,g.teacher)&&
        <button type="button" onClick={()=>prepareFinal(item)}>Подготовить документ</button>}
    </div>)}</div>
    {completed&&!!missingFinalDocuments.length&&<p>Этап уже завершён. Уполномоченные участники могут оформить недостающие документы здесь. После официального опубликования всех обязательных актов блокировка следующих этапов снимется, а предварительный балл будет пересчитан.</p>}
