@@ -4,7 +4,7 @@ import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {useGameTableSync} from './useGameTableSync';
-import {Landmark,Vote,BarChart3,CheckCircle2,CalendarDays} from 'lucide-react';
+import {Landmark,Vote,BarChart3,CheckCircle2} from 'lucide-react';
 
 type System='relative'|'absolute'|'qualified'|'preferential';
 type MyChoice={my_system:System|null;my_threshold:number|null;votes_count:number;closed:boolean;result:{system_type:System;threshold_pct:number|null;votes_total:number;tally:Record<string,number>}|null};
