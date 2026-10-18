@@ -2,7 +2,6 @@
 import {userError} from '@/lib/userError';
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useState} from 'react';
-import {LockKeyhole} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
