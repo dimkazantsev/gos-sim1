@@ -1154,3 +1154,10 @@
  .stageOperations .stageFinalDocumentsList small{grid-column:2}
  .stageOperations .stageFinalDocumentsList button{grid-column:1/-1;width:100%}
 }
+
+/* Completed stage paperwork debt: consistent with the main light GOС.ID controls. */
+.stageDocumentDebtBanner{display:grid;gap:10px;margin:8px 0 16px;padding:16px;border:1px solid #cfdbf2;background:#f4f7ff;border-radius:16px;color:#173357}
+.stageDocumentDebtBanner strong{font-size:16px;line-height:1.45}
+.stageDocumentDebtBanner p{margin:0;font-size:14px;color:#546d94;line-height:1.6;overflow-wrap:anywhere}
+.stageDocumentDebtBanner button{justify-self:start;min-height:44px;max-width:100%;white-space:normal;text-align:center}
+@media(max-width:650px){.stageDocumentDebtBanner{padding:12px}.stageDocumentDebtBanner button{width:100%}}
