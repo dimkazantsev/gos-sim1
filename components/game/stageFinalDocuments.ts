@@ -22,7 +22,7 @@ export function canPrepareStageFinalDocument(
  subjects:readonly string[],
  teacher:boolean
 ){
- if(requirement.template_key==='financial_economic'&&requirement.subject_key==='ministry')
+ if(requirement.template_key==='financial_economic'&&['ministry','government'].includes(requirement.subject_key))
   return teacher||subjects.includes('ministry')||subjects.includes('government');
  if(requirement.subject_key==='any'){
   return teacher||['president','government','ministry','municipality'].some(s=>subjects.includes(s));
