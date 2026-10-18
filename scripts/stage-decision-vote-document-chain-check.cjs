@@ -24,6 +24,7 @@ const game=uid(1),creator=uid(2),winner=uid(3);
    'CREATE TABLE formal_document_history(id uuid primary key default gen_random_uuid(),document_id uuid,game_id uuid,actor_id uuid,action text,to_status text,to_owner text,note text);',
    'CREATE TABLE duma_sessions(id uuid primary key,game_id uuid,stage_no integer,status text,chair_user_id uuid,created_by uuid);',
    'CREATE TABLE duma_agenda_items(id uuid primary key,game_id uuid,session_id uuid,formal_document_id uuid,status text);',
+   'CREATE TABLE game_ballots(vote_id uuid, voter_id uuid);',
    "CREATE TABLE game_votes(id uuid primary key default gen_random_uuid(),game_id uuid,stage_no integer,title text,body text,voting_mode text,status text DEFAULT 'open',created_by uuid,formal_document_id uuid,formal_step_code text,institution_key text,procedure_key text,quorum_kind text,quorum_value numeric,majority_kind text,majority_value numeric,allow_abstain boolean,tie_breaker_chair boolean,pass_transition text,fail_transition text);"
   ].join('\n'));
   await db.exec(sql4);
@@ -76,6 +77,11 @@ const game=uid(1),creator=uid(2),winner=uid(3);
   let votes=(await db.query("select * from game_votes where formal_document_id=$1",[ordinary])).rows;
   assert.equal(votes.length,1,'Active agenda automatically creates live ballot');
   assert.equal(votes[0].procedure_key,'bill_reading1');
+  await db.query('insert into game_ballots values($1,$2)',[votes[0].id,creator]);
+  await db.query("update duma_sessions set status='closed' where id=$1",[session]);
+  await assert.rejects(db.query('insert into game_ballots values($1,$2)',[votes[0].id,winner]),/вне рассмотрения/,'Closed Duma session cannot accept late ballots');
+  await db.query("update duma_sessions set status='open' where id=$1",[session]);
+  await db.query('insert into game_ballots values($1,$2)',[votes[0].id,winner]);
   await db.query("update duma_agenda_items set status='in_progress' where id=$1",[item]);
   assert.equal(Number((await db.query("select count(*) n from game_votes where formal_document_id=$1",[ordinary])).rows[0].n),1,'Idempotent reopened agenda');
   const secondItem=uid(504);
