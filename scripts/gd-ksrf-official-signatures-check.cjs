@@ -29,8 +29,12 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
   'CREATE FUNCTION private.formal_user_roles(p uuid,u uuid) RETURNS SETOF text LANGUAGE sql STABLE AS $f$SELECT lower(role_title) FROM game_office_assignments WHERE game_id=p AND user_id=u AND status=\'active\'$f$;',
   'CREATE FUNCTION private.role_matches_voting_body(text,text) RETURNS boolean LANGUAGE sql STABLE AS $f$SELECT false$f$;'
  ].join('\n'));
- await db.exec("CREATE FUNCTION public.capture_sign_test() RETURNS trigger LANGUAGE plpgsql AS $f$ DECLARE s text; BEGIN SELECT signature_path INTO s FROM game_profiles WHERE game_id=NEW.game_id AND user_id=NEW.actor_id;INSERT INTO formal_document_signatures(document_id,game_id,history_id,signer_id,signature_path) VALUES(NEW.document_id,NEW.game_id,NEW.id,NEW.actor_id,s);RETURN NEW;END$f$;");
- await db.exec('CREATE TRIGGER capture AFTER INSERT ON formal_document_history FOR EACH ROW EXECUTE FUNCTION capture_sign_test()');
+ const capture=migration.match(/CREATE OR REPLACE FUNCTION private\\.capture_formal_document_signature\\([\\s\\S]*?\\$function\\$;/);
+ assert(capture,'Official history trigger is included in migration');
+ await db.exec(capture[0]);
+ await db.exec('CREATE TRIGGER capture AFTER INSERT ON formal_document_history FOR EACH ROW EXECUTE FUNCTION private.capture_formal_document_signature()');
+ await db.exec("CREATE FUNCTION private.reject_document_update_test() RETURNS trigger LANGUAGE plpgsql AS $f$BEGIN RAISE EXCEPTION 'Closed stage document cannot be changed';END$f$;");
+ await db.exec('CREATE TRIGGER guard_closed_stage BEFORE UPDATE ON formal_documents FOR EACH ROW EXECUTE FUNCTION private.reject_document_update_test()');
  for(const n of ['private.gd_presiding_officer','private.can_coordinate_institution_meeting','private.institution_document_signers','public.get_institution_document_signers','public.sign_institution_document'])await db.exec(source(n));
  await db.query("INSERT INTO game_stages VALUES($1,5,'open')",[game]);
  for(const uid of [chair,dep1,dep2,ks1,ks2,ks3,outsider]){await db.query("INSERT INTO game_members VALUES($1,$2,'student',NULL)",[game,uid]);await db.query("INSERT INTO game_profiles VALUES($1,$2,'signatures/test.png')",[game,uid]);}
