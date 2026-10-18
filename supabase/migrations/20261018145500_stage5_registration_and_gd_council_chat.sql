@@ -231,7 +231,7 @@ AS $function$
    s.pinned_rank nulls last,
    lm.created_at desc nulls last,
    a.created_at desc;
-$function$
+$function$;
 
 
 -- Сохранённые игры: Совет ГД появляется после уже завершённого этапа 4,
