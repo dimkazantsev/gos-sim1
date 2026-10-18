@@ -3,6 +3,7 @@ const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 const sql=fs.readFileSync('supabase/migrations/20261019011000_formal_legal_routes_and_presidential_amendment.sql','utf8');
 const directGuard=fs.readFileSync('supabase/migrations/20261019011200_guard_direct_formal_document_legal_route.sql','utf8');
+const vetoSQL=fs.readFileSync('supabase/migrations/20261019011400_presidential_veto_authority_and_fkz.sql','utf8');
 const page=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
 const paper=fs.readFileSync('components/game/DocumentPaper.tsx','utf8');
 const election=fs.readFileSync('components/game/PresidentialSystemDecisionPanel.tsx','utf8');
@@ -14,6 +15,8 @@ assert(sql.includes("p_workflow_key IS DISTINCT FROM"),'Server enforces document
 assert(sql.includes("current_step=8"),'Accepted amendment must not appear fully published');
 assert(sql.includes("d.doc_type NOT IN ('fz_bill','fkz_bill','bill','federal_budget')"),'GD signature cannot be substituted for federal law');
 assert(page.includes('isTerminal')&&page.includes('Процедура прекращена')&&page.includes('waitingForParliament'));
+assert(vetoSQL.includes("d.doc_type='fkz_bill'")&&!vetoSQL.includes('private.is_game_teacher(d.game_id)'),'FKZ cannot be vetoed and teacher cannot impersonate President');
+assert(page.includes("selected.doc_type!=='fkz_bill'&&<button className=\"vetoButton\""),'Veto button hidden for FKZ');
 assert(paper.includes("Документ отклонён. Подписание и дальнейшее рассмотрение не предусмотрены."));
 assert(election.includes('ВЫБРАННАЯ МОДЕЛЬ')&&election.includes('ещё не означает вступления федерального закона в силу'));
 assert(election.includes("!rows.some(proposal=>proposal.status==='adopted')"),'No competing proposal button after one model is adopted');
