@@ -137,7 +137,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  useEffect(()=>{
   if(!selected?.id||!['gd','ksrf'].includes(selected.subject_key)){setInstitutionSigners(null);return}
   let alive=true;
-  void supabase.rpc('get_institution_document_signers',{p_document_id:selected.id})
+  void Promise.resolve(supabase.rpc('get_institution_document_signers',{p_document_id:selected.id}))
    .then(({data,error})=>{if(alive)setInstitutionSigners(!error&&data&&Array.isArray(data.required)?data as {required:{user_id:string;office:string;signed:boolean}[];can_sign:boolean}:null)})
    .catch(()=>{if(alive)setInstitutionSigners(null)});
   return()=>{alive=false};
