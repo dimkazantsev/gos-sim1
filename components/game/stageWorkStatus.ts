@@ -11,5 +11,6 @@ export function isStageWorkOpen(game:Game|null|undefined,stage:Stage|undefined){
 export function stageWorkLabel(game:Game|null|undefined,stage:Stage){
  if(stage.status==='completed')return 'Этап завершён';
  if(stage.status!=='open'||!game||game.status==='lobby')return 'Этап ещё не открыт';
+ if(stage.score_closed_at)return 'Оформление документов · без начисления баллов';
  return isStageWorkOpen(game,stage)?'Этап открыт':'Этап приостановлен';
 }

@@ -104,6 +104,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
  const bodies=BODIES[stage.stage_no];
  const teacher=g.teacher&&!readOnly;
  const stageLocked=!isStageWorkOpen(g.game,stage);
+ const scoringClosed=stage.status==='open'&&Boolean(stage.score_closed_at);
  const viewer=readOnly||g.me?.kind==='observer'||(stageLocked&&!teacher);
  const canRemediateCompleted=stage.status==='completed'&&!readOnly&&g.me?.kind!=='observer'&&awaitingFinalDocuments.length>0&&actionableFinalDocuments.length>0;
  const ksrfSessionBlocked=(stage.stage_no===2||stage.stage_no===3)&&!teacher&&
@@ -123,7 +124,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
    <div className="stageOperationsBreadcrumb"><button type="button" onClick={onBack}><ArrowLeft size={18}/><span>Все этапы</span></button><span>{phase.short}</span><span className={'stageOperationsStatus is-'+stage.status}>{stageWorkLabel(g.game,stage)}</span></div>
    <div className="stageOperationsTitle"><span className="stageOperationsNumber">{String(stage.stage_no).padStart(2,'0')}</span><div><h1>{operation.title}</h1><p>{operation.action}</p></div></div>
    <div className="stageOperationsMeta">
-    <span><CalendarClock size={17}/>{stage.deadline?'До '+formatDeadline(stage.deadline):'Срок не установлен'}</span>
+    <span><CalendarClock size={17}/>{stage.score_closed_at?'Начисление баллов завершено '+formatDeadline(stage.score_closed_at):stage.deadline?'До '+formatDeadline(stage.deadline):'Срок не установлен'}</span>
     {publicChannel&&<button type="button" onClick={chat}><MessageCircle size={17}/>Обсудить</button>}
    </div>
   </header>
@@ -134,6 +135,10 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
 
   <section id={sectionId+'-work'} className="stageOperationsPane" hidden={tab!=='work'} aria-label="Рабочие процедуры">
    <div className="stageOperationsHandoff"><div><small>Основание</small><span>{operation.input}</span></div><ChevronRight size={18} aria-hidden="true"/><div><small>Результат этапа</small><span>{operation.output}</span></div></div>
+   {scoringClosed&&<section className="stageFinalWorkPrompt" role="alert" aria-label="Оценочный срок завершён">
+    <div><FileText size={19} aria-hidden="true"/><span><b>Оценочный срок завершён. Этап продлён автоматически</b><small>Новые баллы ВСН больше не начисляются. Оформите обязательные итоговые документы — это необходимо для завершения этапа. {awaitingFinalDocuments.length?'Осталось: '+awaitingFinalDocuments.length+'.':'Все итоговые документы подготовлены, проверьте оставшиеся процедуры.'}</small></span></div>
+    <button type="button" className="primary" onClick={()=>setTab('materials')}>Оформить документы <ChevronRight size={16}/></button>
+   </section>}
    {viewer&&<p className="stageOperationsNotice" role="status">{readOnly?'Просмотр участника. Изменение данных отключено.':g.me?.kind==='observer'?'Гостевой просмотр. Рабочие действия доступны назначенным участникам.':stageLocked?'Этап завершён или ещё не открыт. Изменение данных недоступно до решения преподавателя.':''}</p>}
    {bodies&&<div className="stageOperationsRegistration"><InstitutionRegistrationPanel g={g} readOnly={stage.stage_no===2||stage.stage_no===3?readOnly||g.me?.kind==='observer':viewer} stageNo={stage.stage_no} initialBody={bodies[0]} allowedBodies={bodies} onOpenDocument={onOpenDocument} onMeetingReadyChange={onMeetingReadyChange}/></div>}
    {ksrfSessionBlocked&&!viewer&&<p className="stageOperationsNotice" role="status">Действия КСРФ станут доступны после утверждения повестки и вашей регистрации на заседание. Сначала выполните эти действия в блоке выше.</p>}
@@ -157,7 +162,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
      {stage.stage_no===16&&<SystemDebriefLab g={g}/>}
     </div>
    </fieldset>
-   {(stage.status==='open'||canRemediateCompleted)&&awaitingFinalDocuments.length>0&&<section className="stageFinalWorkPrompt" aria-live="polite">
+   {!scoringClosed&&(stage.status==='open'||canRemediateCompleted)&&awaitingFinalDocuments.length>0&&<section className="stageFinalWorkPrompt" aria-live="polite">
       <div><FileText size={19} aria-hidden="true"/><span><b>Итоговые документы ещё не оформлены</b>
        <small>{stage.status==='completed'?'Осталось погасить задолженность по итоговым документам ('+awaitingFinalDocuments.length+'). После опубликования доступ и предварительный балл будут восстановлены.':'Осталось оформить обязательные документы ('+awaitingFinalDocuments.length+'). До этого этап завершить нельзя.'}</small></span></div>
       {(!viewer||canRemediateCompleted)&&actionableFinalDocuments.length>0&&<button type="button" className="primary"

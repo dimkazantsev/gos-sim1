@@ -113,7 +113,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
    {selectedHold&&<section className="stageDocumentDebtBanner" role="alert">
     <strong>Этап {selected.stage_no} временно недоступен</strong>
     <p>После завершения этапа {selectedHold.source_stage} остались обязательные итоговые документы. Пока они не оформлены, работа на следующих этапах заблокирована, даже если они открыты для других участников.</p>
-    <p>Необходимо оформить: {selectedHold.missing_documents.map(d=>d.title).join('; ')}. Снижение предварительной оценки за отсутствие итогового документа — до 1 балла по правовому критерию.</p>
+    <p>Необходимо оформить: {selectedHold.missing_documents.map(d=>d.title).join('; ')}. {selectedHold.penalty_points>0?'Предварительная оценка снижена на 1 балл до устранения задолженности.':'Оценочный срок закончился, и новые баллы за действия на этом этапе не начисляются.'}</p>
     <button type="button" className="primary" onClick={()=>{setSelected(stages.find(x=>x.stage_no===selectedHold.source_stage)||null);setOpenMaterialsForStage(selectedHold.source_stage)}}>Перейти к документам этапа {selectedHold.source_stage}</button>
    </section>}
    {holdError&&!teacher&&<p className="stageOperationsNotice" role="alert">{holdError}</p>}
@@ -195,6 +195,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
     {visibleStages.map(s=>{
      const StageIcon=STAGE_ICONS[s.stage_no-1]||BookOpenText;
      const effectiveStatus=s.status==='completed'?'completed':isStageWorkOpen(g.game,s)?'open':'locked';
+     const documentExtension=s.status==='open'&&Boolean(s.score_closed_at);
      const StatusIcon=effectiveStatus==='completed'?CheckCircle2:effectiveStatus==='open'?CircleDot:LockKeyhole;
      const hasOpenVote=votingStageNos.has(s.stage_no);
      const openDetails=()=>setSelected(s);
@@ -211,8 +212,9 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
        </div>
       </div>
       <div className="stageAtlasCardFooter">
-       <div className="stageAtlasCardDeadline">{s.deadline?<><CalendarClock size={15} aria-hidden="true"/>До {formatDeadline(s.deadline)}</>:hasOpenVote?<span className="stageAtlasVoteIndicator"><span/>Требует внимания</span>:<span className="stageAtlasCardStageName">Этап {String(s.stage_no).padStart(2,'0')}</span>}</div>
+       <div className="stageAtlasCardDeadline">{documentExtension?<><CalendarClock size={15} aria-hidden="true"/>Баллы закрыты · оформление документов</>:s.deadline?<><CalendarClock size={15} aria-hidden="true"/>До {formatDeadline(s.deadline)}</>:hasOpenVote?<span className="stageAtlasVoteIndicator"><span/>Требует внимания</span>:<span className="stageAtlasCardStageName">Этап {String(s.stage_no).padStart(2,'0')}</span>}</div>
        <div className="stageAtlasCardActions">
+        {documentExtension&&<button type="button" className="stageAtlasVoteAction" onClick={()=>{setSelected(s);setOpenMaterialsForStage(s.stage_no)}} aria-label={'Оформить итоговые документы этапа '+s.stage_no}><ClipboardList size={16} aria-hidden="true"/>Оформить документы</button>}
         {hasOpenVote&&<button type="button" className="stageAtlasVoteAction" onClick={()=>onOpenVotes()} aria-label={'Открыть голосования этапа '+s.stage_no}><Vote size={16} aria-hidden="true"/>Голосование</button>}
         <button type="button" className="stageAtlasDetailAction" onClick={openDetails} aria-label={'Подробнее об этапе '+s.stage_no+': '+s.title}>Подробнее <ArrowUpRight size={16} strokeWidth={2} aria-hidden="true"/></button>
         {teacher&&!readOnly&&<button type="button" className="stageAtlasTeacherAction" aria-label={s.status==='open'?'Завершить этап '+s.stage_no:'Открыть этап '+s.stage_no} onClick={()=>void g.manageStage(s.stage_no,s.status==='open'?'close':'open',30)}><span className="stageAtlasActionFull" aria-hidden="true">{s.status==='open'?'Завершить этап':'Открыть этап'}</span><span className="stageAtlasActionShort" aria-hidden="true">{s.status==='open'?'Завершить':'Открыть'}</span></button>}
