@@ -105,6 +105,9 @@ const game=uid(1),creator=uid(2),winner=uid(3);
   await db.query("update game_stages set status='completed' where game_id=$1 and stage_no=4",[game]);
   
 
+  // The bill workflow belongs to the open twelfth stage; the fourth stage above
+  // remains completed so these tests do not bypass the publication guard.
+  await db.query("insert into game_stages(game_id,stage_no,status,deadline) values($1,12,'open',now()+interval '1 day')",[game]);
   const ordinary=uid(500),constitutional=uid(501),session=uid(502),item=uid(503);
   await db.query("insert into formal_documents(id,game_id,stage_no,title,doc_type,workflow_key,status_code) values($1,$2,12,$3,'fz_bill','bill','reading1')",[ordinary,game,'Проект федерального закона']);
   await db.query("insert into formal_documents(id,game_id,stage_no,title,doc_type,workflow_key,status_code) values($1,$2,12,$3,'fkz_bill','bill','reading1')",[constitutional,game,'Проект федерального конституционного закона']);
