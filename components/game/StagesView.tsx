@@ -113,7 +113,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
    {selectedHold&&<section className="stageDocumentDebtBanner" role="alert">
     <strong>Этап {selected.stage_no} временно недоступен</strong>
     <p>После завершения этапа {selectedHold.source_stage} остались обязательные итоговые документы. Пока они не оформлены, работа на следующих этапах заблокирована, даже если они открыты для других участников.</p>
-    <p>Необходимо оформить: {selectedHold.missing_documents.map(d=>d.title).join('; ')}. Снижение предварительной оценки за отсутствие итогового документа — до 1 балла по правовому критерию.</p>
+    <p>Необходимо оформить: {selectedHold.missing_documents.map(d=>d.title).join('; ')}. {selectedHold.penalty_points>0?'Предварительная оценка снижена на 1 балл до устранения задолженности.':'Оценочный срок закончился, и новые баллы за действия на этом этапе не начисляются.'}</p>
     <button type="button" className="primary" onClick={()=>{setSelected(stages.find(x=>x.stage_no===selectedHold.source_stage)||null);setOpenMaterialsForStage(selectedHold.source_stage)}}>Перейти к документам этапа {selectedHold.source_stage}</button>
    </section>}
    {holdError&&!teacher&&<p className="stageOperationsNotice" role="alert">{holdError}</p>}
