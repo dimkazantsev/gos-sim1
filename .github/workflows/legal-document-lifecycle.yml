@@ -4,6 +4,7 @@ on:
     paths:
       - 'supabase/migrations/20261019011000_formal_legal_routes_and_presidential_amendment.sql'
       - 'supabase/migrations/20261019011200_guard_direct_formal_document_legal_route.sql'
+      - 'supabase/migrations/20261019011400_presidential_veto_authority_and_fkz.sql'
       - 'components/game/DocumentsView.tsx'
       - 'components/game/DocumentPaper.tsx'
       - 'components/game/PresidentialSystemDecisionPanel.tsx'
@@ -15,6 +16,7 @@ on:
     paths:
       - 'supabase/migrations/20261019011000_formal_legal_routes_and_presidential_amendment.sql'
       - 'supabase/migrations/20261019011200_guard_direct_formal_document_legal_route.sql'
+      - 'supabase/migrations/20261019011400_presidential_veto_authority_and_fkz.sql'
       - 'components/game/DocumentsView.tsx'
       - 'components/game/DocumentPaper.tsx'
       - 'components/game/PresidentialSystemDecisionPanel.tsx'
