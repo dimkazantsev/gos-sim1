@@ -71,7 +71,7 @@ const game=uid(1),creator=uid(2),winner=uid(3);
    "INSERT INTO game_stages VALUES('"+game+"',4,'completed',null);",
    "CREATE TABLE stage_final_document_obligations(game_id uuid,stage_no integer,template_key text,user_id uuid);",
    "CREATE FUNCTION private.is_game_teacher(uuid) RETURNS boolean LANGUAGE sql AS $q$ SELECT false $q$;",
-   "CREATE FUNCTION private.has_prior_stage_document_hold(uuid,uuid,integer) RETURNS boolean LANGUAGE sql AS $q$ SELECT true $q$;",
+   "CREATE FUNCTION private.has_prior_stage_document_hold(uuid,uuid,integer) RETURNS boolean LANGUAGE sql AS $q$ SELECT $3=4 $q$;",
    "CREATE FUNCTION private.matches_formal_owner(uuid,uuid,text,uuid) RETURNS boolean LANGUAGE sql AS $q$ SELECT $3='gd_staff' $q$;",
    "CREATE FUNCTION private.can_remediate_stage_final_document(uuid,integer,uuid,text,text,jsonb) RETURNS boolean LANGUAGE sql AS $q$ SELECT false $q$;",
    "CREATE FUNCTION private.capture_stage_document_obligations(uuid,integer) RETURNS void LANGUAGE plpgsql AS $q$ BEGIN INSERT INTO stage_final_document_obligations SELECT $1,$2,'gd_chair_resolution',user_id FROM game_members WHERE game_id=$1; END $q$;"
