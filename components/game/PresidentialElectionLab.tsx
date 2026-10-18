@@ -243,8 +243,8 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   <header className="electionLabHead cecHead"><div><small>ЦИК РФ · ЭТАП 6</small><h2>Выдвижение и регистрация кандидатов</h2><p>Кандидаты готовят программу, фотографию, документы для ЦИК и подают регистрационные пакеты на шестом этапе. ЦИК проверяет материалы, принимает решение о регистрации или возвращает их на доработку. Агитация и выборы проходят на этапе 7.</p></div><div className="cecHeadSide"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" className="cecEmblem" width={72} height={72}/><div><b>Центральная избирательная комиссия</b><span>Регистрация кандидатов</span></div></div></header>
   <nav className="cecTabs" aria-label="Разделы президентских выборов"><button className={panelView==='dossier'?'active':''} onClick={()=>setPanelView('dossier')}>Моё досье</button><button className={panelView==='application'?'active':''} onClick={()=>setPanelView('application')}>Подача в ЦИК <b>{candidates.filter(x=>x.cec_submitted_at&&x.registration_status==='submitted').length}</b></button><button className={panelView==='candidates'?'active':''} onClick={()=>setPanelView('candidates')}>Кандидаты <b>{candidates.filter(x=>x.cec_submitted_at).length}</b></button><button className={panelView==='decisions'?'active':''} onClick={()=>setPanelView('decisions')}>Решения ЦИК <b>{decisions.length}</b></button></nav>
 
-  {systemReady?(
-{systemReady&&settings&&<section className="electionSystemStatusCard" aria-label="Действующая система выборов Президента">
+  {systemReady&&settings?(
+  <section className="electionSystemStatusCard" aria-label="Действующая система выборов Президента">
    <div className="electionSystemStatusMain">
     <span className="electionSystemStatusBadge">Выбрано личным голосованием студентов</span>
     <small>ДЕЙСТВУЮЩАЯ СИСТЕМА</small>
@@ -256,7 +256,6 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
     <div><small>ПРОЦЕДУРА</small><span>Этап 6 · Результат голосования</span></div>
    </div>
   </section>
-
   ):(
    <div className="cecSystemGate" role="status"><b>Избирательная система пока выбирается студентами.</b><span>Выдвижение кандидатов, подготовка досье и подача документов в ЦИК доступны на этапе 6 независимо от завершения голосования.</span></div>
   )}
