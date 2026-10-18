@@ -37,7 +37,7 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
   return source?docs.find(d=>d.metadata?.document_kind==='stage4_office_result'
     &&d.metadata?.source_result_key===source):undefined;
  };
- const canPrepareTemplate=(key:string)=>(!completed||missingFinalDocuments.some(item=>item.template_key===key))&&(g.teacher||formalSubjects.includes(stageDocumentSubject(
+ const canPrepareTemplate=(key:string)=>!(stage.stage_no===4&&key==='gd_resolution')&&(!completed||missingFinalDocuments.some(item=>item.template_key===key))&&(g.teacher||formalSubjects.includes(stageDocumentSubject(
   stage.stage_no,key,DOCUMENT_TEMPLATES.find(t=>t.key===key)?.subject||'')));
  const prepareFinal=(item:StageFinalDocument)=>{
   const key=item.template_key==='crisis_act'?crisisDocumentTemplate(formalSubjects,g.teacher):item.template_key;
