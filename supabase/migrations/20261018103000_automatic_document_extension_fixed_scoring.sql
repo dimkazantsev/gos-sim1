@@ -366,6 +366,7 @@ begin
     update public.game_stages set score_closed_at=v_stage.deadline
       where game_id=g and stage_no=v_stage.stage_no and status='open'
         and score_closed_at is null;
+    perform private.capture_stage_document_obligations(g,v_stage.stage_no);
   end loop;
   -- Any unready stage (1-16) stays open for authorised document preparation.
   -- The transaction holds the same game-level advisory lock as manage_game_stage.
@@ -499,6 +500,7 @@ begin
     end loop;
     update public.game_stages set score_closed_at=s.deadline where id=s.id
       and score_closed_at is null;
+    perform private.capture_stage_document_obligations(p_game_id,p_stage_no);
   end if;
   v_deadline:=greatest(coalesce(s.deadline,clock_timestamp()),clock_timestamp())+make_interval(mins=>p_minutes);
   update public.game_stages set deadline=v_deadline where id=s.id;
@@ -521,3 +523,71 @@ begin
  values(p_game_id,auth.uid(),'manage_game_stage','game_stages',
   jsonb_build_object('stage_no',p_stage_no,'operation',p_action,'minutes',p_minutes,'deadline',v_deadline));
 end $function$;
+
+
+CREATE OR REPLACE FUNCTION private.capture_stage_document_obligations(p_game uuid, p_stage integer)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+DECLARE d jsonb;
+BEGIN
+ IF NOT EXISTS(SELECT 1 FROM public.game_stages s
+   WHERE s.game_id=p_game AND s.stage_no=p_stage AND (s.status='completed' OR s.score_closed_at IS NOT NULL)) THEN RETURN; END IF;
+ FOR d IN SELECT value FROM jsonb_array_elements(private.stage_required_final_documents(p_game,p_stage)) LOOP
+   INSERT INTO public.stage_final_document_obligations(game_id,stage_no,template_key,user_id)
+   SELECT p_game,p_stage,d->>'template_key',m.user_id
+   FROM public.game_members m WHERE m.game_id=p_game AND m.kind='student'
+    AND m.roster_archived_at IS NULL
+    AND (CASE
+      WHEN d->>'subject_key'='ksrf'
+       THEN private.can_coordinate_institution_meeting(p_game,'ksrf',m.user_id)
+      WHEN d->>'subject_key'='any'
+       THEN (private.can_create_formal_subject(p_game,m.user_id,'president')
+        OR private.can_create_formal_subject(p_game,m.user_id,'government')
+        OR private.can_create_formal_subject(p_game,m.user_id,'ministry')
+        OR private.can_create_formal_subject(p_game,m.user_id,'municipality'))
+      ELSE private.can_create_formal_subject(p_game,m.user_id,d->>'subject_key')
+    END)
+   ON CONFLICT DO NOTHING;
+ END LOOP;
+END;$function$;
+
+CREATE OR REPLACE FUNCTION private.has_prior_stage_document_hold(p_game uuid, p_user uuid, p_target_stage integer)
+ RETURNS boolean
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+ SELECT p_target_stage BETWEEN 2 AND 16 AND EXISTS(
+  SELECT 1 FROM public.game_stages s
+  WHERE s.game_id=p_game AND s.stage_no<p_target_stage
+    AND (s.status='completed' OR s.score_closed_at IS NOT NULL)
+    AND jsonb_array_length(private.stage_document_debts(p_game,p_user,s.stage_no))>0
+ );
+$function$;
+
+CREATE OR REPLACE FUNCTION public.get_my_stage_document_holds(p_game_id uuid)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+DECLARE uid uuid:=auth.uid();s record;result jsonb:='[]'::jsonb;d jsonb;
+BEGIN
+ IF uid IS NULL OR NOT private.is_game_member(p_game_id) THEN
+  RAISE EXCEPTION 'Нет доступа к игре' USING ERRCODE='42501';
+ END IF;
+ FOR s IN SELECT stage_no,status FROM public.game_stages
+   WHERE game_id=p_game_id AND (status='completed' OR score_closed_at IS NOT NULL) AND stage_no<16
+   ORDER BY stage_no LOOP
+   d:=private.stage_document_debts(p_game_id,uid,s.stage_no);
+   IF jsonb_array_length(d)>0 THEN
+    result:=result||jsonb_build_array(jsonb_build_object(
+     'source_stage',s.stage_no,'blocked_stage',s.stage_no+1,
+     'missing_documents',d,'penalty_points',CASE WHEN s.status='completed' THEN 1 ELSE 0 END));
+   END IF;
+ END LOOP;
+ RETURN result;
+END;$function$;
