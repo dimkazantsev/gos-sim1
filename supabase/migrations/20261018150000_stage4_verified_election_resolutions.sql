@@ -18,16 +18,16 @@ BEGIN
  status_label,current_owner_key,metadata)
  VALUES(p_game,4,'ИГРА-ПГД-'||lpad(nextval('public.formal_registry_seq')::text,5,'0'),
  p_title,'gd_resolution','gd','Государственная Дума Федерального Собрания Российской Федерации',
- p_author,p_body,'gd_resolution',v_steps,0,'draft','Подготовлено по итогам выборов',
- 'author',jsonb_build_object('document_kind','stage4_office_result',
+ p_author,p_body,'gd_resolution',v_steps,2,'adopted','Принято по итогам выборов · ожидает опубликования',
+ 'gd_staff',jsonb_build_object('document_kind','stage4_office_result',
  'template_key','gd_resolution','source_result_key',p_key,'source_elections',
  to_jsonb(p_source),'auto_generated',true,'source_type','office_elections'))
  ON CONFLICT DO NOTHING RETURNING id INTO v_doc;
  IF v_doc IS NOT NULL THEN
    INSERT INTO public.formal_document_history(document_id,game_id,actor_id,
     action,to_status,to_owner,note)
-   VALUES(v_doc,p_game,NULL,'Автоматически подготовлен проект постановления',
-     'draft','author','Основание: завершённые выборы. Итоговые имена и органы взяты из протокола результатов; публикация и подпись не имитируются.');
+   VALUES(v_doc,p_game,NULL,'Автоматически оформлено принятое постановление',
+     'adopted','gd_staff','Основание: завершённые выборы. Результат принят голосованием; для официального опубликования требуется действие уполномоченного лица, подпись не имитируется.');
  END IF;
 END;$result$;
 REVOKE ALL ON FUNCTION private.stage4_result_act(uuid,text,text,text,uuid[],uuid) FROM PUBLIC,anon,authenticated;
@@ -130,7 +130,7 @@ CREATE TRIGGER zzz_sync_stage4_election_results
 AFTER UPDATE OF status,winner_candidate_id ON public.office_elections
 FOR EACH ROW EXECUTE FUNCTION private.stage4_election_result_trigger();
 
--- Existing completed elections are genuine historical sources. Create drafts,
+-- Existing completed elections are genuine historical sources. Create adopted acts,
 -- never forge signatures, rewrite the original results or auto-publish an act.
 DO $backfill$
 DECLARE rec record;
