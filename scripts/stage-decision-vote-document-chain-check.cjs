@@ -61,7 +61,7 @@ const game=uid(1),creator=uid(2),winner=uid(3);
   assert.equal(await countDocs(),3,'Repeated synchronisation never duplicates 3 resolutions');
   const acts=(await db.query("select title,body_text,status_code,metadata from formal_documents where metadata->>'document_kind'='stage4_office_result' order by title")).rows;
   assert(acts.every(x=>x.body_text.includes('Иванов Иван Иванович')),'Only actual saved winner names');
-  assert(acts.every(x=>x.status_code==='draft'&&x.metadata.auto_generated),'Drafts never pretend to be signed');
+  assert(acts.every(x=>x.status_code==='adopted'&&x.metadata.auto_generated),'Adopted election decisions are not auto-published or signed');
   assert.equal(Number((await db.query('select count(*) n from formal_document_history')).rows[0].n),3,'Provenance history on creation');
 
   const ordinary=uid(500),constitutional=uid(501),session=uid(502),item=uid(503);
@@ -90,6 +90,6 @@ const game=uid(1),creator=uid(2),winner=uid(3);
   const fkz=(await db.query('select * from game_votes where formal_document_id=$1',[constitutional])).rows[0];
   assert.equal(fkz.majority_kind,'eligible_fraction');
   assert(Math.abs(Number(fkz.majority_value)-2/3)<.0001,'Constitutional law keeps its two-thirds threshold');
-  console.log('PASS: 3 evidenced act drafts, five committees, 40 repeat syncs, no forged publications, delayed Duma ballot, agenda activation, FKZ threshold.');
+  console.log('PASS: 3 evidenced adopted act records, five committees, 40 repeat syncs, no forged publications, delayed Duma ballot, agenda activation, FKZ threshold.');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
