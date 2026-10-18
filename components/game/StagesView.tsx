@@ -118,7 +118,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
    <StageWorkspace
    g={g}
    stage={selected}
-   readOnly={readOnly||Boolean(selectedHold)||(!teacher&&!isStageWorkOpen(g.game,selected))}
+   readOnly={readOnly||Boolean(selectedHold)||(!teacher&&!isStageWorkOpen(g.game,selected)&&!(selected.status==='completed'&&documentHolds.some(h=>h.source_stage===selected.stage_no)))}
    onBack={()=>setSelected(null)}
    onOpenStage={stageNo=>setSelected(stages.find(item=>item.stage_no===stageNo)||null)}
    onOpenVotes={onOpenVotes}
