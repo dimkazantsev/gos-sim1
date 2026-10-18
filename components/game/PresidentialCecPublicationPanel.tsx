@@ -35,7 +35,7 @@ export default function PresidentialCecPublicationPanel({g,status,onSaved}:Props
   const r=await supabase.rpc('publish_presidential_cec_protocol',{p_game_id:gameId,
    p_turnout_pct:Number(turnout),p_voter_count:Number(voters),
    p_major_violations:violations==='yes',p_note:note.trim()||null});
-  if(r.error)g.setError(userError(r.error));else{setPostId(r.data||null);setNotice('Результаты официально опубликованы от имени ЦИК. Победителю назначены полномочия Президента.');await onSaved();await g.refresh()}
+  if(r.error)g.setError(userError(r.error));else{setPostId(r.data||null);setNotice('Итоги опубликованы от имени ЦИК. Победитель вступит в должность после подтверждённой инаугурации.');await onSaved();await g.refresh()}
   setBusy(false);
  }
  const valid=turnout.trim()!==''&&Number.isFinite(Number(turnout))&&Number(turnout)>=0&&Number(turnout)<=100
@@ -45,7 +45,7 @@ export default function PresidentialCecPublicationPanel({g,status,onSaved}:Props
   <div className="stage7PanelHead"><div><small>ЦЕНТРАЛЬНАЯ ИЗБИРАТЕЛЬНАЯ КОМИССИЯ</small><h3>Официальный протокол и публикация результатов</h3>
    <p>Данные автоматически берутся из калькулятора: отдельные голоса преподавателей за программы и агитацию, рейтинги, утверждённый соцопрос, штрафы, второй тур и победитель. Изменяйте исходные значения в калькуляторе выше; итоговые цифры в протоколе защищены от ручной подмены.</p>
   </div><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" width={56} height={56}/></div>
-  {postId?<div className="stage7Notice"><b>Итоги опубликованы в политическом процессе.</b> Президент назначен по подтверждённым результатам. Повторная публикация блокируется.</div>:
+  {postId?<div className="stage7Notice"><b>Итоги опубликованы в политическом процессе.</b> Победитель объявлен. Полномочия Президента предоставляются после инаугурации; повторная публикация заблокирована.</div>:
    status!=='finished'?<div className="stage7Notice">Протокол станет доступен после завершения подсчёта ЦИК. Для первого тура используйте полную формулу, для второго — отдельную формулу повторного голосования.</div>:
    <>
     <div className="stage7Grid">
