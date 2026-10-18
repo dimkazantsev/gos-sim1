@@ -139,6 +139,8 @@ on:
       - 'scripts/stage4-completion-gate-check.cjs'
       - 'scripts/stage-final-documents-gate-check.cjs'
       - 'scripts/stage-final-document-debt-check.cjs'
+      - 'scripts/stage-final-document-remediation-check.cjs'
+      - 'supabase/migrations/20261018090000_completed_stage_final_document_remediation_refund.sql'
       - 'supabase/migrations/20261018072000_stage_final_document_debts.sql'
       - 'supabase/migrations/20261018050000_all_stage_final_documents_guard.sql'
       - 'components/game/stageFinalDocuments.ts'
@@ -316,6 +318,7 @@ jobs:
       - run: node scripts/stage4-completion-gate-check.cjs
       - run: node scripts/stage-final-documents-gate-check.cjs
       - run: node scripts/stage-final-document-debt-check.cjs
+      - run: node scripts/stage-final-document-remediation-check.cjs
       - run: node scripts/stage4-office-vote-auto-close-check.cjs
       - run: node scripts/stage4-office-single-winner-runoff-check.cjs
       - run: node scripts/stage4-multi-committee-mandate-check.cjs
