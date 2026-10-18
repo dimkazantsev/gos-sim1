@@ -175,3 +175,43 @@ BEGIN
 END;$fn$;
 REVOKE ALL ON FUNCTION public.sign_institution_document(uuid) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.sign_institution_document(uuid) TO authenticated;
+
+-- Сохранение подписей завершённых этапов без обхода блокировок редактирования.
+CREATE OR REPLACE FUNCTION private.capture_formal_document_signature()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare sig text;person text;office text;snapshot jsonb;signed_time timestamptz:=clock_timestamp();
+begin
+ if new.action like 'Сохранена редакция %' then return new;end if;
+ if new.action='Подписан документ уполномоченным лицом' then
+  -- Separate immutable signature: no metadata UPDATE of a completed-stage document.
+  -- The signer is authenticated and verified by sign_institution_document RPC.
+  select p.signature_path into sig from public.game_profiles p
+   where p.game_id=new.game_id and p.user_id=new.actor_id;
+  if nullif(sig,'') is null then raise exception 'Личная подпись не загружена';end if;
+  insert into public.formal_document_signatures(document_id,game_id,history_id,signer_id,signature_path,signed_at)
+  values(new.document_id,new.game_id,new.id,new.actor_id,sig,signed_time)
+  on conflict(history_id) do nothing;
+  return new;
+ end if;
+
+ if new.actor_id is null then return new;end if;
+ if coalesce(new.to_status,'')<>'signed' and coalesce(trim(new.action),'') !~* '^подпис'
+  and coalesce(trim(new.note),'') !~* '^подписан(о|а)' then return new;end if;
+ select gm.full_name,gm.role_title into person,office from public.game_members gm where gm.game_id=new.game_id and gm.user_id=new.actor_id;
+ select coalesce((select a.role_title from public.game_office_assignments a where a.game_id=new.game_id and a.user_id=new.actor_id and a.status='active' and case new.from_owner when 'president' then lower(a.role_title) like '%президент%' when 'ministry' then lower(a.role_title) like '%министр%' when 'government' then lower(a.role_title) like '%правительств%' when 'municipality' then lower(a.role_title) like '%муницип%' when 'gd' then lower(a.role_title) like '%дум%' else false end order by a.created_at desc limit 1),office) into office;
+ snapshot:=jsonb_build_object('signed_name',person,'signed_role',office,'signed_on',signed_time,'signed_by',new.actor_id);
+ perform set_config('app.formal_signature_snapshot',snapshot::text,true);
+ update public.formal_documents set metadata=coalesce(metadata,'{}'::jsonb)||snapshot where id=new.document_id;
+ perform set_config('app.formal_signature_snapshot','{}',true);
+ select p.signature_path into sig from public.game_profiles p where p.game_id=new.game_id and p.user_id=new.actor_id;
+ if sig is not null then
+  insert into public.formal_document_signatures(document_id,game_id,history_id,signer_id,signature_path,signed_at)
+  values(new.document_id,new.game_id,new.id,new.actor_id,sig,signed_time) on conflict(history_id) do nothing;
+ end if;
+ return new;
+end;$function$
+
