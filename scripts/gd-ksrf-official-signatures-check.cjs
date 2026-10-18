@@ -29,7 +29,7 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
   'CREATE FUNCTION private.formal_user_roles(p uuid,u uuid) RETURNS SETOF text LANGUAGE sql STABLE AS $f$SELECT lower(role_title) FROM game_office_assignments WHERE game_id=p AND user_id=u AND status=\'active\'$f$;',
   'CREATE FUNCTION private.role_matches_voting_body(text,text) RETURNS boolean LANGUAGE sql STABLE AS $f$SELECT false$f$;'
  ].join('\n'));
- const capture=migration.match(/CREATE OR REPLACE FUNCTION private\\.capture_formal_document_signature\\([\\s\\S]*?\\$function\\$;/);
+ const capture=migration.match(/CREATE OR REPLACE FUNCTION private\.capture_formal_document_signature\([\s\S]*?\$function\$;/);
  assert(capture,'Official history trigger is included in migration');
  await db.exec(capture[0]);
  await db.exec('CREATE TRIGGER capture AFTER INSERT ON formal_document_history FOR EACH ROW EXECUTE FUNCTION private.capture_formal_document_signature()');
