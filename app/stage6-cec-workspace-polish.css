@@ -368,6 +368,18 @@
   #stage6-cec .cecDocumentUploadTarget>strong{grid-column:2;justify-self:start;padding:7px 10px}
   #stage6-cec .cecDecision{margin:8px;padding:11px;flex-direction:column}
 }
+
+/* Пересдача только возвращённых документов: сохранённые файлы остаются видимыми. */
+#stage6-cec .cecDocumentLocked .cecDocumentUploadTarget{cursor:default;background:#f8fbff}
+#stage6-cec .cecDocumentLocked .cecDocumentUploadTarget>strong{color:#66809f;background:#edf2f9;border-color:#e1e8f3}
+#stage6-cec .cecDocumentLocked:hover .cecDocumentUploadTarget>strong{background:#edf2f9}
+#stage6-cec .cecResubmitOne{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:11px 0 3px;padding:12px;border:1px solid #cad9f4;border-radius:11px;background:#f1f6ff}
+#stage6-cec .cecResubmitOne span{flex:1;min-width:140px;font-size:12px;line-height:1.5;color:#47618a}
+#stage6-cec .cecResubmitOne button{min-height:42px;max-width:100%;padding:9px 14px;border:1px solid #315ee9;border-radius:10px;background:#315ee9;color:white;font-size:12px;font-weight:800;line-height:1.35;white-space:normal;text-align:center}
+@container cec-stage6 (max-width:490px){
+ #stage6-cec .cecResubmitOne button{width:100%}
+}
+
 @media(prefers-reduced-motion:reduce){
   #stage6-cec .cecTabs button,
   #stage6-cec .candidateNominationToggle::before,#stage6-cec .candidateNominationToggle::after{transition:none}

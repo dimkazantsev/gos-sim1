@@ -8,6 +8,8 @@ on:
       - 'components/game/PresidentialElectionLab.tsx'
       - 'supabase/migrations/20261019230000_preserve_cec_candidate_document_review.sql'
       - 'scripts/cec-document-review-actions-check.cjs'
+      - 'scripts/cec-targeted-document-revision-check.cjs'
+      - 'supabase/migrations/20261019233000_resubmit_only_returned_cec_documents.sql'
       - 'supabase/migrations/20261019210000_party_candidate_photo_upload.sql'
       - 'supabase/migrations/20261019220000_presidential_candidate_storage_helper_execute.sql'
       - 'scripts/presidential-party-photo-upload-check.cjs'
@@ -36,6 +38,8 @@ on:
       - 'components/game/PresidentialElectionLab.tsx'
       - 'supabase/migrations/20261019230000_preserve_cec_candidate_document_review.sql'
       - 'scripts/cec-document-review-actions-check.cjs'
+      - 'scripts/cec-targeted-document-revision-check.cjs'
+      - 'supabase/migrations/20261019233000_resubmit_only_returned_cec_documents.sql'
       - 'supabase/migrations/20261019210000_party_candidate_photo_upload.sql'
       - 'supabase/migrations/20261019220000_presidential_candidate_storage_helper_execute.sql'
       - 'scripts/presidential-party-photo-upload-check.cjs'
@@ -70,6 +74,7 @@ jobs:
       - run: node scripts/stage6-cec-restoration-check.cjs
       - run: node scripts/presidential-party-photo-upload-check.cjs
       - run: node scripts/cec-document-review-actions-check.cjs
+      - run: node scripts/cec-targeted-document-revision-check.cjs
       - run: node scripts/stage6-responsive-browser-check.cjs
       - run: node scripts/stage6-cec-visual-browser-check.cjs
       - run: npm run typecheck
