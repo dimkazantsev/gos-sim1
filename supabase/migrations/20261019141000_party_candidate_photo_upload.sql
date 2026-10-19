@@ -18,7 +18,7 @@ CREATE POLICY gos_party_presidential_candidate_read ON public.presidential_candi
     AND gm.kind='student'
     AND gm.roster_archived_at IS NULL
     AND gm.team=p.name
-   WHERE p.id=party_id AND p.game_id=game_id
+   WHERE p.id=presidential_candidates.party_id AND p.game_id=presidential_candidates.game_id
     AND p.registration_status='registered'
   )
  );
@@ -28,7 +28,7 @@ CREATE POLICY gos_party_presidential_documents_read ON public.presidential_candi
  FOR SELECT TO authenticated USING (
   EXISTS (
    SELECT 1 FROM public.presidential_candidates c
-    WHERE c.id=candidate_id AND c.game_id=game_id
+    WHERE c.id=presidential_candidate_documents.candidate_id AND c.game_id=presidential_candidate_documents.game_id
       AND c.nomination_type='party' AND c.archived_at IS NULL
       AND private.can_upload_presidential_candidate_document(c.id,auth.uid())
   )
