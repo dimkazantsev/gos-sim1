@@ -53,6 +53,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const [readiness,setReadiness]=useState<Record<string,CandidateReadiness>>({});
  const [autoReviews,setAutoReviews]=useState<Record<string,AutoReview>>({});
  const [docTextDraft,setDocTextDraft]=useState<Record<string,string>>({});
+ const [docReviewNotes,setDocReviewNotes]=useState<Record<string,string>>({});
  const [photoUrls,setPhotoUrls]=useState<Record<string,string>>({});
  const [candidateUser,setCandidateUser]=useState('');
  const [candidateParty,setCandidateParty]=useState('');
@@ -223,9 +224,29 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    :'В представленном комплекте выявлены замечания. Документы подлежат доработке либо дополнительной ручной проверке до принятия окончательного решения ЦИК.';
   setReview(v=>({...v,[id]:{...(v[id]||{errors:'0',penalty:'0',publicSummary:'',privateSummary:''}),status,errors:String(audit.error_count),publicSummary:resolution,privateSummary:listed}}));
  }
- async function reviewCandidateDoc(id:string,status:'accepted'|'revision'){
-  setBusy(true);const r=await supabase.rpc('review_presidential_candidate_document',{p_document_id:id,p_status:status,p_note:null});
-  if(r.error)setError(userError(r.error));else await load();setBusy(false);
+ async function reviewCandidateDoc(doc:CandidateDoc,status:'accepted'|'revision'){
+  if(!teacher||!doc.is_submitted||busy)return;
+  const note=(docReviewNotes[doc.id]??doc.note??'').trim();
+  if(status==='revision'&&!note){setError('Укажите замечания к документу перед возвратом на доработку.');return}
+  setBusy(true);
+  const r=await supabase.rpc('review_presidential_candidate_document',{p_document_id:doc.id,p_status:status,p_note:status==='revision'?note:null});
+  if(r.error)setError(userError(r.error));
+  else {setDocReviewNotes(v=>{const next={...v};delete next[doc.id];return next});await load()}
+  setBusy(false);
+ }
+ async function downloadCandidateDoc(doc:CandidateDoc){
+  if(!teacher||!doc.is_submitted||busy)return;
+  setBusy(true);
+  try{
+   const {data,error}=await supabase.storage.from('game-assets').download(doc.storage_path);
+   if(error||!data){setError(userError(error||new Error('Файл недоступен для скачивания.')));return}
+   const url=URL.createObjectURL(data);
+   const link=document.createElement('a');
+   link.href=url;link.download=doc.file_name||'Документ кандидата';
+   document.body.appendChild(link);link.click();link.remove();
+   window.setTimeout(()=>URL.revokeObjectURL(url),2000);
+  }catch(err){setError(userError(err))}
+  finally{setBusy(false)}
  }
  async function addSupporter(candidateId:string){
   const uid=supporterDraft[candidateId];if(!uid)return;setBusy(true);const r=await supabase.rpc('add_presidential_supporter',{p_candidate_id:candidateId,p_supporter_user_id:uid});
@@ -279,10 +300,31 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
     <header><div><small>ПАКЕТ К РАССМОТРЕНИЮ</small><h4>{c.display_name}</h4></div><span className={c.cec_submitted_at?'submitted':'draft'}>{c.cec_submitted_at?'Подан в ЦИК':'Не подан'}</span></header>
     <div className="cecSubmissionProgress"><span><b>{docs.filter(x=>requiredKinds.includes(x.doc_kind)).length}</b> / {requiredKinds.length} документов</span><span><b>{candidatePoints.length}</b> / 10 пунктов программы</span>{c.nomination_type==='self'&&<><span><b>{group.length}</b> / 5 группа</span><span><b>{sigs.reduce((a,x)=>a+Number(x.signatures),0)}</b> / 15 подписей</span></>}</div>
     {autoReviews[c.id]&&<div className="cecAutoReview"><div className="cecAutoReviewHead"><div><b>Автоматическая предварительная проверка</b><small>ФЗ № 19-ФЗ · формы ЦИК · правила этапа 6</small></div><strong className={autoReviews[c.id].error_count?'issues':'ok'}>{autoReviews[c.id].error_count?autoReviews[c.id].error_count+' замечаний':'Комплект без явных ошибок'}</strong></div><ol>{autoReviews[c.id].items.map(item=><li key={item.kind} className={item.verdict}><span>{item.verdict==='ok'?'✓':item.verdict==='issues'?'!':'○'}</span><div><b>{item.title}</b><small>{item.summary||'Нет результата проверки.'}</small>{!!item.issues?.length&&<p>{item.issues.join(' · ')}</p>}</div></li>)}</ol></div>}
-    {!teacher&&!c.cec_submitted_at&&<button type="button" className="primary cecSubmitPackage" disabled={busy||!c.photo_path||docs.filter(x=>requiredKinds.includes(x.doc_kind)).length<requiredKinds.length||candidatePoints.length<10||(c.nomination_type==='self'&&(group.length<5||sigs.reduce((a,x)=>a+Number(x.signatures),0)<15))} onClick={()=>void submitToCec(c.id)}>Подать пакет в ЦИК</button>}
+    <div className="cecSubmissionActions">{!teacher&&!c.cec_submitted_at&&<button type="button" className="primary cecSubmitPackage" disabled={busy||!c.photo_path||docs.filter(x=>requiredKinds.includes(x.doc_kind)).length<requiredKinds.length||candidatePoints.length<10||(c.nomination_type==='self'&&(group.length<5||sigs.reduce((a,x)=>a+Number(x.signatures),0)<15))} onClick={()=>void submitToCec(c.id)}>Подать пакет в ЦИК</button>}
     {!teacher&&c.cec_submitted_at&&c.registration_status==='revision'&&<button type="button" className="primary cecSubmitPackage" disabled={busy||!c.photo_path||docs.filter(x=>requiredKinds.includes(x.doc_kind)).length<requiredKinds.length} onClick={()=>void submitToCec(c.id)}>Подать исправленный пакет повторно</button>}
-    {!teacher&&c.cec_submitted_at&&<p className="cecSubmittedNote">Версия подачи № {c.cec_submission_version} · {new Date(c.cec_submitted_at).toLocaleString('ru-RU')}</p>}
-    {teacher&&autoReviews[c.id]&&<button type="button" className="secondary cecUseAutoReview" onClick={()=>fillSuggestedDecision(c.id)}>Сформировать проект решения по проверке</button>}
+    </div>{!teacher&&c.cec_submitted_at&&<p className="cecSubmittedNote">Версия подачи № {c.cec_submission_version} · {new Date(c.cec_submitted_at).toLocaleString('ru-RU')}</p>}
+    {teacher&&c.cec_submitted_at&&<section className="cecSubmittedDocuments" aria-label={'Документы кандидата '+c.display_name}>
+      <header><div><b>Документы для проверки ЦИК</b><small>Откройте оригинал, скачайте файл или укажите замечания к конкретному документу.</small></div><span>{docs.filter(d=>d.is_submitted).length} файлов</span></header>
+      {docs.filter(d=>d.is_submitted).length===0?<p className="cecDocumentAccessNote">В поданном пакете отсутствуют доступные документы. Проверьте состав подачи.</p>:
+       <div className="cecSubmittedDocumentList">{docs.filter(d=>d.is_submitted).map(doc=><article className="cecSubmittedDocument" key={doc.id}>
+        <div className="cecSubmittedDocumentTop">
+         <div><b>{docLabels[doc.doc_kind]||doc.title}</b><small>{doc.file_name} · {doc.status==='accepted'?'Принят ЦИК':doc.status==='revision'?'Возвращён на доработку':'Ожидает проверки'}</small></div>
+         <div className="cecSubmittedDocumentLinks">
+          {doc.url?<a href={doc.url} target="_blank" rel="noopener noreferrer" aria-label={'Посмотреть документ '+doc.file_name}>Посмотреть</a>:<span role="status">Ссылка недоступна</span>}
+          <button type="button" disabled={busy} onClick={()=>void downloadCandidateDoc(doc)}>Скачать</button>
+         </div>
+        </div>
+        <label className="cecDocumentReviewerNote">Замечания к документу
+         <textarea rows={2} maxLength={4000} value={docReviewNotes[doc.id]??doc.note??''} onChange={e=>setDocReviewNotes(v=>({...v,[doc.id]:e.target.value}))} placeholder="Укажите, какие сведения необходимо исправить или дополнить"/>
+        </label>
+        <div className="cecDocumentReviewerActions">
+         <button type="button" disabled={busy} onClick={()=>void reviewCandidateDoc(doc,'accepted')}>Принять документ</button>
+         <button type="button" className="returnForRevision" disabled={busy||!(docReviewNotes[doc.id]??doc.note??'').trim()} onClick={()=>void reviewCandidateDoc(doc,'revision')}>Вернуть документ на доработку</button>
+        </div>
+       </article>)}</div>}
+      <p className="cecDocumentAccessNote">Статусы и замечания к документам сохраняются в досье партии. Для официального возврата всего пакета выпустите решение ЦИК «На доработку» ниже.</p>
+    </section>}
+    {teacher&&autoReviews[c.id]&&<div className="cecSubmissionActions"><button type="button" className="secondary cecUseAutoReview" onClick={()=>fillSuggestedDecision(c.id)}>Сформировать проект решения по проверке</button></div>}
    </section>}
    {panelView==='dossier'&&canUploadDocuments&&c.nomination_type!=='fictional'&&<details className="candidateDossier" open>
     <summary><div><b>{canManage?'Моё досье':'Досье кандидата'}</b><span>{c.photo_path&&autoReviews[c.id]?.error_count===0&&docs.length>=requiredKinds.length&&candidatePoints.length>=10?'✓ Черновик готов к подаче':'Заполните фото, документы и проверьте замечания'}</span></div><strong>{candidatePoints.length}/10 · {docs.filter(x=>requiredKinds.includes(x.doc_kind)).length}/{requiredKinds.length}</strong></summary>
@@ -298,6 +340,8 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
         <strong>{!doc?'Загрузить':'Заменить'}</strong>
        </label>
        {doc&&<div className="cecDocumentDetails">
+        {doc.status==='revision'&&<p className="cecDocumentRevisionNotice"><b>Возвращено на доработку.</b> {doc.note||'ЦИК запросила исправление документа.'} Загрузите исправленный файл и повторно отправьте пакет.</p>}
+        {doc.status==='accepted'&&<p className="cecDocumentAcceptedNotice">Документ принят ЦИК.</p>}
         <div className="cecDocumentFileLine"><a href={doc.url||'#'} target="_blank" rel="noreferrer">{doc.file_name}</a><span>{doc.is_submitted?'Передан в ЦИК':'Черновик'}</span>{teacher&&<IconAction variant="remove" onClick={()=>void archiveCandidateDocument(doc)} label={'Удалить документ '+doc.file_name}/>}</div>
         {doc.auto_check?.summary&&<p className={'cecAutoSummary '+state}>{doc.auto_check.summary}</p>}
         {!!doc.auto_check?.issues?.length&&<ul>{doc.auto_check.issues.map(issue=><li key={issue}>{issue}</li>)}</ul>}
