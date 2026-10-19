@@ -52,6 +52,7 @@ import './tablet-topbar-layout.css';
 import './teacher-unified-header.css';
 import './meeting-agenda-canonical.css';
 import './stage6-election-workspace.css';
+import './stage6-cec-workspace-polish.css';
 import type {Metadata} from 'next';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import '@fontsource-variable/manrope';
