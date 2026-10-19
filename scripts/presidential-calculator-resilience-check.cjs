@@ -52,6 +52,7 @@ function harness(){
   if(name==='./useGameTableSync')return{useGameTableSync(game,tables,load,scope){const latest=react.useRef(load);latest.current=load;latestLoad=()=>latest.current();react.useEffect(()=>{if(game)void latest.current();},[game,scope,tables.join('|')]);}};
   if(name.endsWith('.module.css'))return{__esModule:true,default:new Proxy({},{get:(_,key)=>String(key)})};
   if(name==='../ui/StyledSelect')return{__esModule:true,default:tag('StyledSelect')};
+  if(name==='./PresidentialEarlyFinishDialog')return{__esModule:true,default:tag('PresidentialEarlyFinishDialog')};
   throw new Error('Unexpected calculator import '+name);
  }
  const module={exports:{}};
@@ -101,6 +102,28 @@ async function runChecks(check){
   const saved=h.calls.find(x=>x.name==='set_presidential_rules_percentage');
   assert.equal(saved.args.p_game_pct,76);
   assert.equal(saved.args.p_poll_pct,null);
+  h.dispose();
+ });
+ await check('Teacher confirmation opens before early finalization and calls the privileged RPC only on Yes',async()=>{
+  const h=harness();await h.settle();
+  h.button('Зафиксировать итог первого тура').props.onClick();await h.settle();
+  assert.equal(h.calls.filter(x=>x.name==='finalize_presidential_round_early').length,0);
+  const first=nodes(h.render(),node=>node.type?.displayName==='PresidentialEarlyFinishDialog')[0];
+  assert.ok(first);
+  assert.equal(first.props.round,1);
+  first.props.onCancel();await h.settle();
+  assert.equal(nodes(h.render(),node=>node.type?.displayName==='PresidentialEarlyFinishDialog').length,0);
+  h.button('Зафиксировать итог первого тура').props.onClick();await h.settle();
+  const yes=nodes(h.render(),node=>node.type?.displayName==='PresidentialEarlyFinishDialog')[0];
+  yes.props.onConfirm();await h.settle();
+  const calls=h.calls.filter(x=>x.name==='finalize_presidential_round_early');
+  assert.equal(calls.length,1);
+  assert.equal(calls[0].args.p_round_no,1);
+  h.round(2);await h.settle();
+  h.button('Зафиксировать итог второго тура').props.onClick();await h.settle();
+  nodes(h.render(),node=>node.type?.displayName==='PresidentialEarlyFinishDialog')[0].props.onConfirm();
+  await h.settle();
+  assert.equal(h.calls.filter(x=>x.name==='finalize_presidential_round_early'&&x.args.p_round_no===2).length,1);
   h.dispose();
  });
  await check('Actual calculator ballot selects save the checked round, criterion, slot and candidate',async()=>{
