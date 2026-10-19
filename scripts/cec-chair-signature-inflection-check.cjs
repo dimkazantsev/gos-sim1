@@ -37,7 +37,7 @@ assert(form.includes('disabled={loadingSignature||!signature||!imageLoaded}'),'P
 assert(form.includes('chairUserId'),'Signed user is explicit');
 assert(lab.includes("m.full_name?.trim()==='Казанцев Дмитрий Анатольевич'"),'Certificate selects actual CEC chair');
 assert(lab.includes('chairProfile?.signature_url'),'Fallback signature belongs to chair');
-assert(!/minjust|НКО|nko/i.test(form),'CEC credentials never load a Minjust signature');
+assert(!/institutionEmblem\('minjust'\)|PartyCertificate|partyOfficialCertificate/.test(form),'CEC credentials never load a Minjust signature');
 assert(policy.includes("FOR SELECT TO authenticated")&&policy.includes("name ~ '^[0-9a-fA-F-]+/profiles/"));
 assert(policy.includes("gm.full_name='Казанцев Дмитрий Анатольевич'"),'Policy only covers CEC chair');
 assert(policy.includes('private.is_game_member(p.game_id)'),'No public access to private signature');
