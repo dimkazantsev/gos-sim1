@@ -32,3 +32,52 @@
 @media(max-width:650px){.autoEventBankList>button{flex-basis:min(300px,calc(100% - 20px))}.eventCardsRail>.eventCaseBundle{flex-basis:calc(100% - 16px)}.eventComicPlayer .eventPanelIllustration>svg{height:180px!important}.autoEventBankList .eventPanelIllustration>svg{height:150px!important}.autoEventCaseDetails>.eventComicPlayer{margin-left:0;margin-right:0;width:100%}}
 
 .eventRailControls{display:flex;align-items:center;gap:8px;width:100%;color:#456182;font-size:13px}.eventRailControls>span{margin-right:auto}.eventRailControls button{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid #b9cdec;border-radius:10px;background:#f4f8ff;color:#315987;cursor:pointer}
+
+
+/* Итоги событий: верное решение однозначно выделяется зелёным только после раскрытия результата. */
+.eventAnswerPanel .eventAnswerOption.is-correct{
+  border:1px solid #83c6a3!important;
+  background:#f0faf4!important;
+  border-radius:14px!important;
+  overflow:hidden;
+}
+.eventAnswerPanel .eventAnswerOption.is-correct>.eventAnswerChoice{
+  background:#eaf8ef!important;
+  border:1px solid #83c6a3!important;
+  color:#17643d!important;
+  opacity:1!important;
+  box-shadow:inset 4px 0 0 #27945a!important;
+}
+.eventAnswerPanel .eventAnswerOption.is-correct>.eventAnswerChoice .eventAnswerHeading b,
+.eventAnswerPanel .eventAnswerOption.is-correct>.eventAnswerChoice .eventAnswerHeading strong{
+  color:#17643d!important;
+}
+.eventAnswerPanel .eventAnswerOption.is-correct .eventAnswerProgress i{
+  background:#27945a!important;
+}
+.eventAnswerPanel .eventAnswerBestLabel{
+  display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
+  max-width:100%;margin:8px 0 0;padding:5px 10px;
+  border:1px solid #83c6a3;border-radius:8px;
+  background:#dff3e7;color:#17643d;
+  font-size:12px;font-weight:850;line-height:1.45;white-space:normal;
+}
+.eventAnswerPanel .eventAnswerOption.is-correct .eventAnswerInlineFeedback{
+  border-top:1px solid #b8ddc6;padding:16px;background:#f5fbf7;
+}
+
+/* Выбор приглашённого: отдельное обновление списка и честное пустое состояние. */
+.eventInviteControls{grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:end;min-width:0}
+.eventInviteControls>label{min-width:0}
+.eventInviteControls>.eventInviteRefresh{white-space:normal;background:#fff;color:#315da7}
+.eventInviteControls>.eventInviteEmpty{
+  grid-column:1/-1;margin:3px 0 0;padding:12px 14px;
+  border:1px solid #d1def4;border-radius:12px;
+  background:#f4f7fd;color:#3c587c;
+  font-size:12px;font-weight:550;line-height:1.55;overflow-wrap:anywhere;
+}
+@media(max-width:650px){
+ .eventInviteControls{grid-template-columns:minmax(0,1fr);align-items:stretch}
+ .eventInviteControls>button{width:100%}
+ .eventAnswerPanel .eventAnswerBestLabel{font-size:11px}
+}
