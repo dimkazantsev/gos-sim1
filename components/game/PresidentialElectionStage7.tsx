@@ -77,11 +77,14 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  },[viewScope]);
  const activeScope=()=>alive.current&&scope.current===viewScope;
 
- const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  const registered=candidates.filter(c=>c.registration_status==='registered');
- const canManage=(c:Candidate)=>teacher||c.user_id===me?.user_id||c.created_by===me?.user_id||!!(ledParty&&c.party_id===ledParty.id);
+ // Полномочия на агитацию имеют все действующие члены выдвинувшей партии,
+ // а не только кандидат или председатель партии. Совпадает с серверным правилом ЦИК.
+ const canManage=(c:Candidate)=>teacher||c.user_id===me?.user_id||c.created_by===me?.user_id||
+  (me?.kind==='student'&&!me.roster_archived_at&&!!c.party_id&&parties.some(p=>
+    p.id===c.party_id&&p.game_id===gameId&&p.registration_status==='registered'&&p.name===me.team));
  const mine=registered.filter(canManage);
- const selectedCandidate=registered.find(c=>c.id===candidateId)||mine[0]||null;
+ const selectedCandidate=mine.find(c=>c.id===candidateId)||mine[0]||null;
  const isStudent=members.some(m=>m.user_id===me?.user_id&&m.kind==='student');
  const activeRound=settings?.status==='runoff'?2:1;
  const publicPoll=publicPolls.find(p=>p.round_no===1)||null;
