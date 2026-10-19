@@ -13,10 +13,11 @@ export default function EventChoicePanel({labels,decisions,members,profiles,curr
  return <div className="eventAnswerPanel" role="group" aria-label="Варианты решения">{order.map(i=>{const label=labels[i];
   const voters=decisions.filter(d=>index(d.choice)===i),percent=decisions.length?Math.round(voters.length*100/decisions.length):0;
   const selected=!!currentChoice&&index(currentChoice)===i;
-  const verdict=showLegalFeedback&&typeof correctIndex==='number'&&Number.isInteger(correctIndex)&&correctIndex>=0?(i===correctIndex?'correct':selected?'incorrect':''):'';
-  return <div className={'eventAnswerOption '+(verdict?'is-'+verdict:'')} key={i}>
+  const verdict=revealResults&&typeof correctIndex==='number'&&Number.isInteger(correctIndex)&&correctIndex>=0&&correctIndex<labels.length?(i===correctIndex?'correct':selected?'incorrect':''):'';
+  return <div className={'eventAnswerOption '+(verdict?'is-'+verdict:'')} data-best-option={verdict==='correct'?'true':undefined} key={i}>
    <button type="button" className={'eventAnswerChoice '+verdict} disabled={!canAnswer} aria-pressed={selected} onClick={()=>onAnswer('option_'+(i+1))}>
     <span className="eventAnswerHeading"><b>{label}</b>{revealResults&&<strong>{percent}%</strong>}</span>
+    {verdict==='correct'&&<span className="eventAnswerBestLabel">Наиболее обоснованный вариант <span aria-hidden="true">✓</span></span>}
     {revealResults&&<span className="eventAnswerProgress" aria-hidden="true"><i style={{width:percent+'%'}}/></span>}
     {revealResults&&<span className="eventAnswerPeople"><span className="eventAnswerAvatars">{voters.slice(0,8).map(d=>{const member=members.find(m=>m.user_id===d.actor_id),profile=profiles.find(p=>p.user_id===d.actor_id);return <span className="eventVoter" key={d.actor_id} title={member?.full_name||'Участник'}><ProfileAvatar src={profile?.avatar_url} name={member?.full_name||'Участник'} gender={profile?.gender}/></span>})}{voters.length>8&&<span className="eventVoterMore">+{voters.length-8}</span>}</span><span>Голосов: {voters.length}</span></span>}
    </button>
