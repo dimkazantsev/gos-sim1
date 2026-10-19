@@ -6,6 +6,13 @@ on:
       - 'components/game/PresidentialCecPublicationPanel.tsx'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'components/game/PresidentialElectionLab.tsx'
+      - 'components/game/PresidentialCecComplaints.tsx'
+      - 'components/game/PresidentialElectionStage7.tsx'
+      - 'app/stage7-election.css'
+      - 'supabase/migrations/20261019235000_cec_manual_document_decisions.sql'
+      - 'supabase/migrations/20261019235500_stage7_candidate_cec_complaints.sql'
+      - 'supabase/migrations/20261019235800_cec_public_complaint_decisions.sql'
+      - 'scripts/cec-registration-and-complaints-check.cjs'
       - 'supabase/migrations/20261019230000_preserve_cec_candidate_document_review.sql'
       - 'scripts/cec-document-review-actions-check.cjs'
       - 'scripts/cec-targeted-document-revision-check.cjs'
@@ -36,6 +43,13 @@ on:
       - 'components/game/PresidentialCecPublicationPanel.tsx'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'components/game/PresidentialElectionLab.tsx'
+      - 'components/game/PresidentialCecComplaints.tsx'
+      - 'components/game/PresidentialElectionStage7.tsx'
+      - 'app/stage7-election.css'
+      - 'supabase/migrations/20261019235000_cec_manual_document_decisions.sql'
+      - 'supabase/migrations/20261019235500_stage7_candidate_cec_complaints.sql'
+      - 'supabase/migrations/20261019235800_cec_public_complaint_decisions.sql'
+      - 'scripts/cec-registration-and-complaints-check.cjs'
       - 'supabase/migrations/20261019230000_preserve_cec_candidate_document_review.sql'
       - 'scripts/cec-document-review-actions-check.cjs'
       - 'scripts/cec-targeted-document-revision-check.cjs'
@@ -75,6 +89,7 @@ jobs:
       - run: node scripts/presidential-party-photo-upload-check.cjs
       - run: node scripts/cec-document-review-actions-check.cjs
       - run: node scripts/cec-targeted-document-revision-check.cjs
+      - run: node scripts/cec-registration-and-complaints-check.cjs
       - run: node scripts/stage6-responsive-browser-check.cjs
       - run: node scripts/stage6-cec-visual-browser-check.cjs
       - run: npm run typecheck

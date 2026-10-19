@@ -62,7 +62,8 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const [campaign,setCampaign]=useState('');
  const [panelView,setPanelView]=useState<'application'|'decisions'|'candidates'|'dossier'>('dossier');
  const [documentPreview,setDocumentPreview]=useState<{kind:'decision'|'credential';candidateId:string;decisionId?:string}|null>(null);
- const [review,setReview]=useState<Record<string,{status:'registered'|'revision'|'rejected'|'withdrawn';errors:string;penalty:string;publicSummary:string;privateSummary:string}>>({});
+ const [review,setReview]=useState<Record<string,{status:'registered'|'revision'|'rejected';errors:string;penalty:string;publicSummary:string;privateSummary:string}>>({});
+ const [refusalBasis,setRefusalBasis]=useState<Record<string,string>>({});
  const [pointDraft,setPointDraft]=useState<Record<string,string>>({});
  const [supporterDraft,setSupporterDraft]=useState<Record<string,string>>({});
  const [directionDraft,setDirectionDraft]=useState<Record<string,string>>({});
@@ -93,7 +94,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   ]);
   if(!a.error&&a.data)setSettings(a.data as Settings);
   if(!sd.error)setSystemDecisionComplete(Boolean(sd.data?.closed));
-  if(!b.error){const rows=(b.data||[]) as Candidate[];setCandidates(rows);setReview(Object.fromEntries(rows.map(x=>[x.id,{status:x.registration_status==='registered'?'registered':x.registration_status==='rejected'?'rejected':x.registration_status==='withdrawn'?'withdrawn':'revision',errors:String(x.legal_error_count),penalty:String(x.rating_penalty),publicSummary:x.registration_public_summary||'',privateSummary:''}])));const pairs=await Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,(await supabase.storage.from('game-assets').createSignedUrl(x.photo_path!,3600)).data?.signedUrl||''] as const));setPhotoUrls(Object.fromEntries(pairs.filter(x=>x[1])))}
+  if(!b.error){const rows=(b.data||[]) as Candidate[];setCandidates(rows);setReview(Object.fromEntries(rows.map(x=>[x.id,{status:x.registration_status==='registered'?'registered':x.registration_status==='rejected'?'rejected':'revision',errors:String(x.legal_error_count),penalty:String(x.rating_penalty),publicSummary:x.registration_public_summary||'',privateSummary:''}])));const pairs=await Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,(await supabase.storage.from('game-assets').createSignedUrl(x.photo_path!,3600)).data?.signedUrl||''] as const));setPhotoUrls(Object.fromEntries(pairs.filter(x=>x[1])))}
   if(!p.error)setPoints((p.data||[]) as ProgramPoint[]);
   if(!d.error){
    const docs=(d.data||[]) as CandidateDoc[];
@@ -153,7 +154,24 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    setCandidateName('');setCandidateUser('');setProgram('');setCampaign('');setPanelView('dossier');await load()
   }setBusy(false)
  }
- async function reviewCandidate(id:string){const x=review[id];if(!x)return;setBusy(true);const r=await supabase.rpc('record_presidential_cec_decision',{p_candidate_id:id,p_status:x.status,p_legal_errors:Number(x.errors)||0,p_rating_penalty:Number(x.penalty)||0,p_public_summary:x.publicSummary.trim()||null,p_private_summary:x.privateSummary.trim()||null});if(r.error)setError(userError(r.error));else{setPanelView('decisions');await load()}setBusy(false)}
+ async function reviewCandidate(id:string){
+  const x=review[id],candidate=candidates.find(c=>c.id===id);if(!x||!candidate||busy||!teacher)return;
+  const required=candidate.nomination_type==='party'?partyDocs:candidate.nomination_type==='self'?selfDocs:[];
+  const docs=candidateDocs.filter(d=>d.candidate_id===id&&d.is_submitted&&!d.archived_at);
+  if(x.status==='registered'&&required.some(kind=>!docs.some(d=>d.doc_kind===kind&&d.status==='accepted'))){
+   setError('Для регистрации сначала вручную примите каждый обязательный документ.');return;
+  }
+  if(x.status==='revision'&&!docs.some(d=>d.status==='revision')){
+   setError('Для возврата на доработку сначала укажите замечания и верните конкретный документ.');return;
+  }
+  const reason=[refusalBasis[id],x.privateSummary.trim()].filter(Boolean).join(' — ');
+  if(x.status==='rejected'&&(x.privateSummary.trim().length<30||!refusalBasis[id])){
+   setError('Для отказа выберите правовое основание и внесите мотивировку со ссылкой на обстоятельства.');return;
+  }
+  setBusy(true);
+  const r=await supabase.rpc('record_presidential_cec_decision',{p_candidate_id:id,p_status:x.status,p_legal_errors:Number(x.errors)||0,p_rating_penalty:Number(x.penalty)||0,p_public_summary:x.status==='rejected'?'Отказать в регистрации кандидата. Правовое основание: '+refusalBasis[id]+'.':x.publicSummary.trim()||null,p_private_summary:reason||null});
+  if(r.error)setError(userError(r.error));else{setPanelView('decisions');await load()}setBusy(false);
+ }
  async function savePrivateProfile(candidateId:string){const x=privateDrafts[candidateId]||{candidate_id:candidateId,birth_date:null,birth_place:null,contact_phone:null,contact_email:null,address_text:null,passport_note:null};setBusy(true);const r=await supabase.rpc('save_presidential_private_profile',{p_candidate_id:candidateId,p_birth_date:x.birth_date||null,p_birth_place:x.birth_place||null,p_contact_phone:x.contact_phone||null,p_contact_email:x.contact_email||null,p_address_text:x.address_text||null,p_passport_note:x.passport_note||null});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
  async function addProgramPoint(candidateId:string){
   const body=(pointDraft[candidateId]||'').trim();if(body.length<5)return;
@@ -216,15 +234,23 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   if(r.error)setError(userError(r.error));else{setPanelView('application');await load()}setBusy(false);
  }
  function fillSuggestedDecision(id:string){
-  const audit=autoReviews[id];if(!audit)return;
-  const returned=candidateDocs.filter(d=>d.candidate_id===id&&d.is_submitted&&d.status==='revision');
-  const status:'registered'|'revision'=audit.error_count>0||returned.length>0?'revision':'registered';
-  const listed=audit.items.map((item,i)=>String(i+1)+'. '+item.title+' — '+(item.verdict==='ok'?'предварительно соответствует':item.verdict==='manual'?'требует ручной проверки':'есть замечания')+(item.issues?.length?': '+item.issues.join('; '):'')+'.').join('\n')
-   +(returned.length?'\nЗамечания преподавателя по возвращённым документам:\n'+returned.map(d=>'• '+(docLabels[d.doc_kind]||d.title)+': '+(d.note||'Требуется доработка')).join('\n'):'');
-  const resolution=status==='registered'
-   ?'Представленный комплект документов проверен. По результатам автоматической предварительной проверки существенные несоответствия не выявлены. Окончательное решение принимает ЦИК.'
-   :'В представленном комплекте выявлены замечания. Документы подлежат доработке либо дополнительной ручной проверке до принятия окончательного решения ЦИК.';
-  setReview(v=>({...v,[id]:{...(v[id]||{errors:'0',penalty:'0',publicSummary:'',privateSummary:''}),status,errors:String(audit.error_count),publicSummary:resolution,privateSummary:listed}}));
+  const candidate=candidates.find(c=>c.id===id);if(!candidate)return;
+  const required=candidate.nomination_type==='party'?partyDocs:candidate.nomination_type==='self'?selfDocs:[];
+  const docs=candidateDocs.filter(d=>d.candidate_id===id&&d.is_submitted&&!d.archived_at);
+  const accepted=required.filter(kind=>docs.some(d=>d.doc_kind===kind&&d.status==='accepted'));
+  const returned=docs.filter(d=>d.status==='revision');
+  const pending=required.filter(kind=>!docs.some(d=>d.doc_kind===kind&&d.status==='accepted'));
+  const allAccepted=accepted.length===required.length&&!returned.length;
+  const status:'registered'|'revision'=allAccepted?'registered':'revision';
+  const summary=allAccepted?'Все обязательные документы проверены и приняты ЦИК. Предлагается зарегистрировать кандидата.':'Не все обязательные документы приняты ЦИК. Регистрация не предлагается до завершения индивидуальной проверки.';
+  const manual=required.map((kind,i)=>{
+   const doc=docs.find(d=>d.doc_kind===kind);
+   return (i+1)+'. '+docLabels[kind]+': '+(!doc?'не представлен':doc.status==='accepted'?'принят ЦИК':doc.status==='revision'?'возвращён на доработку — '+(doc.note||'укажите замечание'):'ожидает ручной проверки')+'.';
+  }).join('\n');
+  const hint=autoReviews[id];
+  const advisory=hint?.issues?.length?'\nАвтоматические подсказки (не основание для регистрации или отказа):\n'+hint.issues.join('\n'):'';
+  setReview(v=>({...v,[id]:{...(v[id]||{errors:'0',penalty:'0',publicSummary:'',privateSummary:''}),status,errors:String(returned.length),publicSummary:summary,privateSummary:manual+advisory}}));
+
  }
  async function reviewCandidateDoc(doc:CandidateDoc,status:'accepted'|'revision'){
   if(!teacher||!doc.is_submitted||busy)return;
@@ -326,7 +352,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
        </article>)}</div>}
       <p className="cecDocumentAccessNote">Возврат одного документа не отменяет ранее принятые документы. Исправлению подлежит только файл с замечанием ЦИК; повторная подача не сбрасывает результаты проверки остальных файлов.</p>
     </section>}
-    {teacher&&autoReviews[c.id]&&<div className="cecSubmissionActions"><button type="button" className="secondary cecUseAutoReview" onClick={()=>fillSuggestedDecision(c.id)}>Сформировать проект решения по проверке</button></div>}
+    {teacher&&c.cec_submitted_at&&<div className="cecSubmissionActions"><button type="button" className="secondary cecUseAutoReview" onClick={()=>fillSuggestedDecision(c.id)}>Сформировать проект решения по ручной проверке</button></div>}
    </section>}
    {panelView==='dossier'&&canUploadDocuments&&c.nomination_type!=='fictional'&&<details className="candidateDossier" open>
     <summary><div><b>{canManage?'Моё досье':'Досье кандидата'}</b><span>{c.photo_path&&autoReviews[c.id]?.error_count===0&&docs.length>=requiredKinds.length&&candidatePoints.length>=10?'✓ Черновик готов к подаче':'Заполните фото, документы и проверьте замечания'}</span></div><strong>{candidatePoints.length}/10 · {docs.filter(x=>requiredKinds.includes(x.doc_kind)).length}/{requiredKinds.length}</strong></summary>
@@ -360,7 +386,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
      {autoReviews[c.id]&&<div className={'cecDraftAudit '+(autoReviews[c.id].error_count?'hasIssues':'isReady')}><b>{autoReviews[c.id].error_count?'Предварительная проверка нашла замечания':'Предварительная проверка комплекта пройдена'}</b><span>{autoReviews[c.id].error_count} замечаний · {autoReviews[c.id].manual_count} пунктов требуют ручной проверки ЦИК</span>{!!autoReviews[c.id].issues?.length&&<ul>{autoReviews[c.id].issues.map(x=><li key={x}>{x}</li>)}</ul>}<small>Автоматическая проверка — учебная подсказка, а не юридическое заключение. Окончательное решение принимает преподаватель в роли ЦИК.</small></div>}
     </div>
    </details>}
-   {panelView==='application'&&teacher&&c.cec_submitted_at&&<div className="candidateReview cecReview"><select aria-label={'Решение ЦИК: '+c.display_name} value={review[c.id]?.status||'revision'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{errors:'0',penalty:'0',publicSummary:'',privateSummary:''}),status:e.target.value as 'registered'|'revision'|'rejected'|'withdrawn'}}))}><option value="registered">Зарегистрировать</option><option value="revision">На доработку</option><option value="rejected">Отказать</option><option value="withdrawn">Снять</option></select><label>Число юридических ошибок<input type="number" min="0" value={review[c.id]?.errors||'0'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',penalty:'0',publicSummary:'',privateSummary:''}),errors:e.target.value}}))}/></label><label>Штраф к рейтингу, п.п.<input type="number" min="0" step="0.1" value={review[c.id]?.penalty||'0'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',publicSummary:'',privateSummary:''}),penalty:e.target.value}}))}/></label><label className="cecReviewPublic">Резолютивная часть<textarea rows={2} value={review[c.id]?.publicSummary||''} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',penalty:'0',privateSummary:''}),publicSummary:e.target.value}}))}/></label><label className="cecReviewPrivate">Мотивировка и замечания<textarea rows={2} value={review[c.id]?.privateSummary||''} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',penalty:'0',publicSummary:''}),privateSummary:e.target.value}}))}/></label><button disabled={busy} onClick={()=>void reviewCandidate(c.id)}>Выпустить решение ЦИК</button></div>}
+   {panelView==='application'&&teacher&&c.cec_submitted_at&&<div className="candidateReview cecReview"><select aria-label={'Решение ЦИК: '+c.display_name} value={review[c.id]?.status||'revision'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{errors:'0',penalty:'0',publicSummary:'',privateSummary:''}),status:e.target.value as 'registered'|'revision'|'rejected'}}))}><option value="registered">Зарегистрировать</option><option value="revision">На доработку</option><option value="rejected">Отказать</option></select>{review[c.id]?.status==='rejected'&&<label className="cecReviewBasis">Основание отказа<select value={refusalBasis[c.id]||''} onChange={e=>setRefusalBasis(v=>({...v,[c.id]:e.target.value}))}><option value="">Выберите правовое основание</option><option value="Конституция РФ, статья 81: возраст не менее 35 лет">Возрастной ценз — статья 81 Конституции РФ</option><option value="Конституция РФ, статья 81: требование постоянного проживания в России не менее 25 лет">Ценз оседлости — статья 81 Конституции РФ</option><option value="Конституция РФ, статья 81: требования к гражданству и иностранному виду на жительство">Гражданство / вид на жительство — статья 81 Конституции РФ</option><option value="Федеральный закон № 19-ФЗ, статья 39: законные основания отказа в регистрации">Иные основания — статья 39 Федерального закона № 19-ФЗ</option></select><small>Подтвердите обстоятельства по оригиналам документов. Автоматическая проверка не является доказательством.</small></label>}<label>Число юридических ошибок<input type="number" min="0" value={review[c.id]?.errors||'0'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',penalty:'0',publicSummary:'',privateSummary:''}),errors:e.target.value}}))}/></label><label>Штраф к рейтингу, п.п.<input type="number" min="0" step="0.1" value={review[c.id]?.penalty||'0'} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',publicSummary:'',privateSummary:''}),penalty:e.target.value}}))}/></label><label className="cecReviewPublic">Резолютивная часть<textarea rows={2} value={review[c.id]?.publicSummary||''} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',penalty:'0',privateSummary:''}),publicSummary:e.target.value}}))}/></label><label className="cecReviewPrivate">Мотивировка и замечания<textarea rows={2} value={review[c.id]?.privateSummary||''} onChange={e=>setReview(v=>({...v,[c.id]:{...(v[c.id]||{status:'revision',errors:'0',penalty:'0',publicSummary:''}),privateSummary:e.target.value}}))}/></label><div className="cecIssueDecision"><button disabled={busy||(['registered','rejected','withdrawn'].includes(c.registration_status))} onClick={()=>void reviewCandidate(c.id)}>Выпустить решение ЦИК</button></div></div>}
    </article>
   })}</div>}
 

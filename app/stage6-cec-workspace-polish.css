@@ -384,3 +384,13 @@
   #stage6-cec .cecTabs button,
   #stage6-cec .candidateNominationToggle::before,#stage6-cec .candidateNominationToggle::after{transition:none}
 }
+
+
+/* Registration decision is separated from the written reasoning and review checklist. */
+#stage6-cec .cecReview{display:grid;gap:14px;min-width:0}
+#stage6-cec .cecReviewBasis{display:grid;gap:6px}
+#stage6-cec .cecReviewBasis select{width:100%;min-height:44px;border:1px solid #cbd9ec;border-radius:11px;background:#fff;padding:9px 12px;color:#24416e}
+#stage6-cec .cecReviewBasis small{line-height:1.5;color:#607695}
+#stage6-cec .cecIssueDecision{display:flex;justify-content:flex-end;align-items:center;padding-top:17px;margin-top:8px;border-top:1px solid #dce5f3}
+#stage6-cec .cecIssueDecision button{min-height:46px;margin:0;padding:11px 18px;border-radius:11px}
+@container cec-stage6 (max-width:490px){#stage6-cec .cecIssueDecision button{width:100%}}

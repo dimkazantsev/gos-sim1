@@ -2,6 +2,7 @@
 import {userError} from '@/lib/userError';
 import PresidentialRulesCalculator from './PresidentialRulesCalculator';
 import PresidentialCecPublicationPanel from './PresidentialCecPublicationPanel';
+import PresidentialCecComplaints from './PresidentialCecComplaints';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useGameTableSync} from './useGameTableSync';
 import {BarChart3,Check,Copy,ExternalLink,FileUp,Landmark,Send,Share2,Vote,X} from 'lucide-react';
@@ -25,7 +26,7 @@ const SYSTEM_NAMES={relative:'Относительное большинство'
 export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,parties,setError}=g;
  const gameId=game?.id||'';
- const [tab,setTab]=useState<'campaign'|'poll'|'results'>('campaign');
+ const [tab,setTab]=useState<'campaign'|'poll'|'complaints'|'results'>('campaign');
  const [candidates,setCandidates]=useState<Candidate[]>([]);
  const [materials,setMaterials]=useState<Material[]>([]);
  const [decision,setDecision]=useState<PollDecision|null>(null);
@@ -214,7 +215,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  if(!stage6Ready)return <section className="stage7Election"><div className="stage7Empty">Выборы Президента Российской Федерации ещё не начались. Сначала Совет Федерации назначает три дня выборов, а студенты на этапе 6 лично утверждают избирательную систему и необходимость социологического опроса.</div></section>;
  return <section className="stage7Election">
   <header className="stage7Hero"><div><small>ЦИК РФ · ЭТАП 7</small><h2>Выборы Президента Российской Федерации</h2><p>Агитационная кампания, утверждённый студентами социологический опрос, подсчёт результатов по полной формуле ЦИК и инаугурация — в одном контуре.</p></div><div className="stage7HeroMark"><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" width={74} height={74}/><span>Центральная избирательная комиссия</span></div></header>
-  <nav className="stage7Tabs" aria-label="Разделы этапа 7"><button className={tab==='campaign'?'active':''} onClick={()=>setTab('campaign')}><span>01</span>Кампания</button><button className={tab==='poll'?'active':''} onClick={()=>setTab('poll')}><span>02</span>Соцопрос избирателей</button><button className={tab==='results'?'active':''} onClick={()=>setTab('results')}><span>03</span>Итоги и инаугурация</button></nav>
+  <nav className="stage7Tabs" aria-label="Разделы этапа 7"><button className={tab==='campaign'?'active':''} onClick={()=>setTab('campaign')}><span>01</span>Кампания</button><button className={tab==='poll'?'active':''} onClick={()=>setTab('poll')}><span>02</span>Соцопрос избирателей</button><button className={tab==='complaints'?'active':''} onClick={()=>setTab('complaints')}><span>03</span>Жалобы в ЦИК</button><button className={tab==='results'?'active':''} onClick={()=>setTab('results')}><span>04</span>Итоги и инаугурация</button></nav>
   {notice&&<div className="stage7Notice">{notice}</div>}
 
   {tab==='campaign'&&<div className="stage7Grid">
@@ -252,6 +253,8 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
      </article>})}{!materials.length&&<div className="stage7Empty">Агитационные материалы ещё не поданы.</div>}</div>
    </section>
   </div>}
+
+  {tab==='complaints'&&<PresidentialCecComplaints g={g} candidates={candidates}/>}
 
   {tab==='poll'&&activeRound===2&&<div className="stage7Empty">Во втором туре проводится новое голосование преподавателей. Внесите его во вкладке итогов ЦИК; публичный соцопрос в формулу второго тура не входит.</div>}
   {tab==='poll'&&activeRound===1&&<div className="stage7Grid pollGrid">
