@@ -77,7 +77,7 @@ function harness(component){
  const byClass=(name,from=tree)=>nodes(from,node=>node.props?.className?.split(' ').includes(name))[0];
  const all=(type,from=tree)=>nodes(from,node=>node.type===type);
  const byLabel=name=>nodes(tree,node=>node.props?.['aria-label']===name)[0];
- const clickResults=()=>all('button',byClass('stage7Tabs'))[2].props.onClick();
+ const clickResults=()=>all('button',byClass('stage7Tabs'))[3].props.onClick();
  return{
   g,render,settle,errors,fetches,byClass,all,byLabel,clickResults,setProps:value=>Object.assign(props,value),
   venueInput:()=>all('input',byClass('inaugurationForm'))[1],
