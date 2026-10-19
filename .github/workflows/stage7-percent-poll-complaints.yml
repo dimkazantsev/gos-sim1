@@ -1,0 +1,37 @@
+name: Этап 7 — права, проценты, соцопрос и интерфейс
+on:
+  pull_request:
+    paths:
+      - 'components/game/PresidentialElectionStage7.tsx'
+      - 'components/game/PresidentialCecComplaints.tsx'
+      - 'components/game/PresidentialRulesCalculator.tsx'
+      - 'app/stage7-election.css'
+      - 'scripts/stage7-percent-poll-complaints-ui-check.cjs'
+      - 'supabase/migrations/20261020041000_presidential_manual_rating_pct_and_poll_stage6.sql'
+      - '.github/workflows/stage7-percent-poll-complaints.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'components/game/PresidentialElectionStage7.tsx'
+      - 'components/game/PresidentialCecComplaints.tsx'
+      - 'components/game/PresidentialRulesCalculator.tsx'
+      - 'app/stage7-election.css'
+      - 'scripts/stage7-percent-poll-complaints-ui-check.cjs'
+      - 'supabase/migrations/20261020041000_presidential_manual_rating_pct_and_poll_stage6.sql'
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node scripts/stage7-percent-poll-complaints-ui-check.cjs
+      - run: node scripts/stage7-party-campaign-rights-check.cjs
+      - run: node scripts/cec-registration-and-complaints-check.cjs
+      - run: node scripts/presidential-calculator-resilience-check.cjs
+      - run: npm run typecheck
