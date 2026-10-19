@@ -2,6 +2,7 @@
 import {useCallback,useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
+import {useSavedGameState,savedString} from './useSavedGameState';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type Candidate={id:string;display_name:string;registration_status:string};
@@ -20,7 +21,7 @@ export default function PresidentialCecComplaints({g,candidates}:{g:ReturnTypeRe
  const [records,setRecords]=useState<Complaint[]>([]);
  const [published,setPublished]=useState<PublicDecision[]>([]);
  const [referrals,setReferrals]=useState<CourtReferral[]>([]);
- const [candidateId,setCandidateId]=useState('');
+ const [candidateId,setCandidateId]=useSavedGameState(gameId,me?.user_id,'cec-complaint-candidate','',savedString);
  const [subject,setSubject]=useState('');
  const [allegation,setAllegation]=useState('');
  const [legalBasis,setLegalBasis]=useState('');
@@ -35,12 +36,13 @@ export default function PresidentialCecComplaints({g,candidates}:{g:ReturnTypeRe
   if(court.error)setError(userError(court.error));else setReferrals((court.data||[]) as CourtReferral[]);
   if(publicResults.error)setError(userError(publicResults.error));else setPublished((publicResults.data||[]) as PublicDecision[]);
  },[gameId,setError]);
- useEffect(()=>{setRecords([]);setReferrals([]);setPublished([]);setCandidateId('');setMessage('');void reload()},[reload]);
+ useEffect(()=>{setRecords([]);setReferrals([]);setPublished([]);setMessage('');void reload()},[gameId,me?.user_id]);
  const registered=candidates.filter(c=>c.registration_status==='registered');
+ const selectedCandidateId=registered.some(c=>c.id===candidateId)?candidateId:'';
  async function submit(){
-  if(busy||!candidateId||subject.trim().length<8||allegation.trim().length<30)return;
+  if(busy||!selectedCandidateId||subject.trim().length<8||allegation.trim().length<30)return;
   setBusy(true);
-  const r=await supabase.rpc('submit_presidential_cec_complaint',{p_candidate_id:candidateId,p_subject:subject.trim(),p_allegation:allegation.trim(),p_legal_basis:legalBasis.trim()||null});
+  const r=await supabase.rpc('submit_presidential_cec_complaint',{p_candidate_id:selectedCandidateId,p_subject:subject.trim(),p_allegation:allegation.trim(),p_legal_basis:legalBasis.trim()||null});
   if(r.error)setError(userError(r.error));else{setSubject('');setAllegation('');setLegalBasis('');setMessage('Жалоба зарегистрирована и передана ЦИК.');await reload()}
   setBusy(false);
  }
@@ -56,11 +58,11 @@ export default function PresidentialCecComplaints({g,candidates}:{g:ReturnTypeRe
   <section className="stage7Panel cecComplaintForm">
    <div className="stage7PanelHead"><div><small>ЦЕНТРАЛЬНАЯ ИЗБИРАТЕЛЬНАЯ КОМИССИЯ</small><h3>Жалобы на кандидатов</h3><p>На этапе 7 участники могут обратиться в ЦИК по поводу возможных нарушений. Жалоба сама по себе не означает снятия кандидата.</p></div></div>
    {!teacher&&<div className="cecComplaintFields">
-    <label>На кого подаётся жалоба<select value={candidateId} onChange={e=>setCandidateId(e.target.value)}><option value="">Выберите зарегистрированного кандидата</option>{registered.map(c=><option key={c.id} value={c.id}>{c.display_name}</option>)}</select></label>
+    <label>На кого подаётся жалоба<select value={selectedCandidateId} onChange={e=>setCandidateId(e.target.value)}><option value="">Выберите зарегистрированного кандидата</option>{registered.map(c=><option key={c.id} value={c.id}>{c.display_name}</option>)}</select></label>
     <label>Предмет жалобы<input maxLength={180} value={subject} onChange={e=>setSubject(e.target.value)} placeholder="Кратко укажите предполагаемое нарушение"/></label>
     <label>Обстоятельства и подтверждающие сведения<textarea rows={5} maxLength={6000} value={allegation} onChange={e=>setAllegation(e.target.value)} placeholder="Что произошло, когда, какие имеются доказательства или ссылки"/></label>
     <label>Правовое основание (если известно)<input maxLength={500} value={legalBasis} onChange={e=>setLegalBasis(e.target.value)} placeholder="Например, статья 84 Федерального закона № 19-ФЗ"/></label>
-    <div className="cecComplaintActions"><span>Проверку фактов и принятие решения осуществляет ЦИК.</span><button type="button" className="primary" disabled={busy||!candidateId||subject.trim().length<8||allegation.trim().length<30} onClick={()=>void submit()}>Направить жалобу в ЦИК</button></div>
+    <div className="cecComplaintActions"><span>Проверку фактов и принятие решения осуществляет ЦИК.</span><button type="button" className="primary" disabled={busy||!selectedCandidateId||subject.trim().length<8||allegation.trim().length<30} onClick={()=>void submit()}>Направить жалобу в ЦИК</button></div>
    </div>}
    {teacher&&<p className="stage7Notice">Рассмотрите жалобы, зафиксируйте мотивированное решение. Направление материалов в Верховный Суд не отменяет регистрацию автоматически.</p>}
    {message&&<p role="status" className="stage7Notice">{message}</p>}
