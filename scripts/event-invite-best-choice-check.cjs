@@ -4,7 +4,7 @@ const root=path.join(__dirname,'..');
 const original=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return original.call(this,request.startsWith('@/')?path.join(root,request.slice(2)):request,...args)};
 require.extensions['.css']=module=>{module.exports={}};
-for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJS,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,file);
+for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJS,esModuleInterop:true,target:ts.ScriptTarget.ES2022},fileName:file}).outputText,file);
 const React=require('react');
 const {renderToStaticMarkup}=require('react-dom/server');
 const Choice=require('../components/game/EventChoicePanel').default;
