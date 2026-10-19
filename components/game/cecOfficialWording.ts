@@ -1,4 +1,4 @@
-export type CecDecisionStatus='registered'|'revision'|'rejected'|'withdrawn';
+export type CecDecisionStatus='registered'|'revision'|'rejected'|'withdrawn'|'submitted';
 export function cecOfficialResolution(status:CecDecisionStatus,name:string,original?:string|null){
  if(status==='registered')return 'Зарегистрирован кандидат '+name+' на должность Президента Российской Федерации.';
  if(status==='revision')return 'Документы кандидата '+name+' возвращены на доработку по замечаниям Центральной избирательной комиссии Российской Федерации.';
