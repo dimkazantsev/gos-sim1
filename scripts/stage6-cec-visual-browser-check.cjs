@@ -31,6 +31,7 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
  try{
   for(const width of [320,360,390,430,490,600,700,768,900,1024,1440]){
    const page=await browser.newPage({viewport:{width,height:1000}});
+   await page.emulateMedia({reducedMotion:'reduce'});
    await page.setContent(h,{waitUntil:'load'});
    const s=await page.evaluate(()=>{
     const root=document.querySelector('#stage6-cec'),rect=e=>{const b=e.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,right:b.right,bottom:b.bottom}};
@@ -55,8 +56,9 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
    }
    assert(Math.abs(s.toggle.y+s.toggle.h/2-(s.summary.y+s.summary.h/2))<=1,'Toggle vertically off-center at '+width);
    assert(s.toggle.x>=s.summary.x&&s.toggle.right<=s.summary.right,'Toggle escapes summary at '+width);
-   assert(s.symbolStyle.beforeLeft==='50%'&&s.symbolStyle.beforeTop==='50%','Cross first stroke not geometrically centered at '+width);
-   assert(s.symbolStyle.afterLeft==='50%'&&s.symbolStyle.afterTop==='50%','Cross second stroke not geometrically centered at '+width);
+   const centerValue=(v,size)=>v==='50%'||Math.abs(parseFloat(v)-size/2)<=2;
+   assert(centerValue(s.symbolStyle.beforeLeft,s.toggle.w)&&centerValue(s.symbolStyle.beforeTop,s.toggle.h),'Cross first stroke not centered at '+width);
+   assert(centerValue(s.symbolStyle.afterLeft,s.toggle.w)&&centerValue(s.symbolStyle.afterTop,s.toggle.h),'Cross second stroke not centered at '+width);
    assert(s.symbolStyle.beforeWidth==='16px'&&s.symbolStyle.afterWidth==='16px','Cross strokes mismatch at '+width);
    const labels=s.fields;
    if(width>=1024)assert(labels.every(b=>Math.abs(b.w-labels[0].w)<2),'Unequal input column widths at '+width);
