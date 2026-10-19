@@ -324,7 +324,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
          <button type="button" className="returnForRevision" disabled={busy||c.registration_status==='registered'||c.registration_status==='rejected'||c.registration_status==='withdrawn'||!(docReviewNotes[doc.id]??doc.note??'').trim()} onClick={()=>void reviewCandidateDoc(doc,'revision')}>Вернуть документ на доработку</button>
         </div>
        </article>)}</div>}
-      <p className="cecDocumentAccessNote">Статусы и замечания к документам сохраняются в досье партии. Для официального возврата всего пакета выпустите решение ЦИК «На доработку» ниже.</p>
+      <p className="cecDocumentAccessNote">Возврат одного документа не отменяет ранее принятые документы. Исправлению подлежит только файл с замечанием ЦИК; повторная подача не сбрасывает результаты проверки остальных файлов.</p>
     </section>}
     {teacher&&autoReviews[c.id]&&<div className="cecSubmissionActions"><button type="button" className="secondary cecUseAutoReview" onClick={()=>fillSuggestedDecision(c.id)}>Сформировать проект решения по проверке</button></div>}
    </section>}
