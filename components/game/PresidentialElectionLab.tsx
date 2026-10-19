@@ -169,7 +169,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    setError('Для отказа выберите правовое основание и внесите мотивировку со ссылкой на обстоятельства.');return;
   }
   setBusy(true);
-  const r=await supabase.rpc('record_presidential_cec_decision',{p_candidate_id:id,p_status:x.status,p_legal_errors:Number(x.errors)||0,p_rating_penalty:Number(x.penalty)||0,p_public_summary:x.publicSummary.trim()||null,p_private_summary:reason||null});
+  const r=await supabase.rpc('record_presidential_cec_decision',{p_candidate_id:id,p_status:x.status,p_legal_errors:Number(x.errors)||0,p_rating_penalty:Number(x.penalty)||0,p_public_summary:x.status==='rejected'?'Отказать в регистрации кандидата. Правовое основание: '+refusalBasis[id]+'.':x.publicSummary.trim()||null,p_private_summary:reason||null});
   if(r.error)setError(userError(r.error));else{setPanelView('decisions');await load()}setBusy(false);
  }
  async function savePrivateProfile(candidateId:string){const x=privateDrafts[candidateId]||{candidate_id:candidateId,birth_date:null,birth_place:null,contact_phone:null,contact_email:null,address_text:null,passport_note:null};setBusy(true);const r=await supabase.rpc('save_presidential_private_profile',{p_candidate_id:candidateId,p_birth_date:x.birth_date||null,p_birth_place:x.birth_place||null,p_contact_phone:x.contact_phone||null,p_contact_email:x.contact_email||null,p_address_text:x.address_text||null,p_passport_note:x.passport_note||null});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
