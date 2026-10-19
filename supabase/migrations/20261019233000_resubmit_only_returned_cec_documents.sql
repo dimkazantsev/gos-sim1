@@ -7,7 +7,7 @@ DECLARE
   new_text text;
 BEGIN
   source_sql := pg_get_functiondef('public.add_presidential_candidate_document(uuid,text,text,text,text,text,bigint)'::regprocedure);
-  old_text := ' insert into public.presidential_candidate_documents(game_id,candidate_id,doc_kind,title,storage_path,file_name,mime_type,file_size,uploaded_by,status,note,reviewed_by,is_submitted,submitted_at,extracted_text,extraction_status,auto_check,archived_at)';
+  old_text := 'insert into public.presidential_candidate_documents(game_id,candidate_id,doc_kind,title,storage_path,file_name,mime_type,file_size,uploaded_by,status,note,reviewed_by,is_submitted,submitted_at,extracted_text,extraction_status,auto_check,archived_at)';
   new_text := $guard$
  -- После первой подачи исправлять разрешено только документы,
  -- возвращённые ЦИК, и ещё не отправленные исправленные версии.
