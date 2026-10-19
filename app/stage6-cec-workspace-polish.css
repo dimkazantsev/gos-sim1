@@ -9,12 +9,22 @@
   --cec-soft:#f5f8fe;
   display:grid;
   gap:14px;
-  min-width:0;
+  width:100%;max-width:100%;min-width:0;
+  box-sizing:border-box;
   container:cec-stage6/inline-size;
-  padding:0;
+  /* The old padding:0 overrode .electionLab's safe gutters, placing cards
+     against the enclosing border. Keep a real gutter at all widths. */
+  padding:clamp(12px,1.8vw,20px);
   color:var(--cec-ink);
 }
 #stage6-cec.cecWorkspace *,#stage6-cec.cecWorkspace *::before,#stage6-cec.cecWorkspace *::after{box-sizing:border-box}
+#stage6-cec.cecWorkspace > :is(header,nav,section,details,div){
+  min-width:0;max-width:100%;
+}
+#stage6-cec .candidateNominationBody > :is(label,button),
+#stage6-cec .candidateNominationBody :is(input,select,textarea){
+  min-width:0;max-width:100%;
+}
 #stage6-cec .cecHead{
   min-width:0;display:flex;align-items:center;justify-content:space-between;gap:18px;
   padding:20px 22px;border:1px solid var(--cec-line);border-radius:20px;
