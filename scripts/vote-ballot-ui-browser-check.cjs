@@ -7,7 +7,7 @@ const {renderToStaticMarkup}=require('react-dom/server');
 const {chromium}=require('playwright-core');
 const root=path.resolve(__dirname,'..');
 require.extensions['.tsx']=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{
- compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true},
+ compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.React,target:ts.ScriptTarget.ES2022,esModuleInterop:true},
  fileName:file
 }).outputText,file);
 const Ballot=require('../components/game/VoteBallotControls.tsx').default;
