@@ -9,7 +9,7 @@ assert(lab.includes("appointedColleague"));
 assert(lab.includes("selected.responsible_minister_id"));
 assert(editor.includes("expected_updated_at:program.updated_at"));
 assert(migration.includes("p_payload ? ''expected_updated_at''"));
-assert(migration.includes("for update"));
+assert(migration.includes("FOR UPDATE"));
 const id=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
 
 (async()=>{
