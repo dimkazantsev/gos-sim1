@@ -56,7 +56,7 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
   [uuid(14),secondGame,8,'Председатель Правительства','Егоров','president_to_duma','submitted',president]
  ];
  for(const n of nominations)await db.query('INSERT INTO government_nominations(id,game_id,stage_no,office_title,candidate_name,route,status,nominated_by) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',n);
- const create=async id=uuid(10)=>(await db.query('SELECT private.ensure_government_nomination_vote($1) id',[id])).rows[0].id;
+ const create=async (id=uuid(10))=>(await db.query('SELECT private.ensure_government_nomination_vote($1) id',[id])).rows[0].id;
  const first=await create(),again=await create();
  assert.equal(first,again,'Repeated opening does not create another vote');
  const next=await create(uuid(11));
