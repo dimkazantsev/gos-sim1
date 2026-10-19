@@ -193,3 +193,10 @@
 .stage7Election .ceremonyAudioCard a{display:inline-flex;gap:6px;align-items:center;justify-content:flex-start;color:#315efb;font-size:13px;font-weight:750;text-decoration:none;overflow-wrap:anywhere}
 .stage7Election .ceremonyAudioCard a:hover{text-decoration:underline}
 @media(max-width:700px){.stage7Election .ceremonyAudio{grid-template-columns:1fr}.stage7Election .inaugurationForm .ceremonyAudioLinkField{grid-column:1/-1}}
+
+
+/* Инаугурация: действие доступно для проверки условий, причина ожидания видна без всплывающей ошибки. */
+.stage7Election .ceremonyConfirmSection{display:grid;gap:12px;min-width:0;margin-top:2px}
+.stage7Election .ceremonyConfirmSection button{min-height:52px;width:100%;border-radius:13px;white-space:normal;text-align:center}
+.stage7Election .ceremonyConfirmHint{margin:0;padding:13px 15px;border:1px solid #c8d8fa;border-radius:12px;background:#f2f6ff;color:#284570;font-size:13px;font-weight:600;line-height:1.55;overflow-wrap:anywhere}
+@media(max-width:620px){.stage7Election .ceremonyConfirmSection button{min-height:50px}.stage7Election .ceremonyConfirmHint{padding:12px}}
