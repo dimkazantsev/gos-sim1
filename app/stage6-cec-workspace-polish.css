@@ -394,3 +394,44 @@
 #stage6-cec .cecIssueDecision{display:flex;justify-content:flex-end;align-items:center;padding-top:17px;margin-top:8px;border-top:1px solid #dce5f3}
 #stage6-cec .cecIssueDecision button{min-height:46px;margin:0;padding:11px 18px;border-radius:11px}
 @container cec-stage6 (max-width:490px){#stage6-cec .cecIssueDecision button{width:100%}}
+
+
+/* Кнопка решения ЦИК выровнена с остальными элементами карточки. */
+#stage6-cec .cecReview .cecIssueDecision{
+ width:100%;min-width:0;justify-self:stretch;justify-content:flex-start;
+ padding-top:18px;margin-top:10px;
+}
+#stage6-cec .cecReview .cecIssueDecision button{
+ width:auto;max-width:100%;align-self:flex-start;margin:0;
+}
+#stage6-cec .cecChairSignature{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ width:100%;min-width:0;flex-wrap:wrap;
+ font-size:12px;line-height:1.4;color:#233653;
+}
+#stage6-cec .cecChairSignatureTitle{flex:1 1 180px;max-width:55%;font-weight:650}
+#stage6-cec .cecChairSignatureMark{display:flex;align-items:center;justify-content:center;min-width:120px;min-height:45px}
+#stage6-cec .cecChairSignatureMark img{
+ display:block;max-width:180px;max-height:78px;width:auto;height:auto;object-fit:contain;
+}
+#stage6-cec .cecChairSignatureMark>span{font-size:11px;color:#667792}
+#stage6-cec .cecChairSignature>strong{font-size:12px;line-height:1.4;text-align:right}
+#stage6-cec .cecDecisionSheet .cecDecisionReasoning li b,
+#stage6-cec .cecDecisionSheet .cecDecisionReasoning li span{display:block}
+#stage6-cec .cecDecisionSheet .cecDecisionReasoning li span{font-size:12px;font-weight:700}
+#stage6-cec .cecDecisionSheet .cecDecisionReasoning li p{white-space:pre-wrap;overflow-wrap:anywhere}
+#stage6-cec .cecCredentialSheet .cecChairSignature{
+ justify-content:flex-start;gap:8px;padding-top:8px;border-top:1px solid #d9e1ee;
+}
+#stage6-cec .cecCredentialSheet .cecChairSignatureTitle{max-width:none;flex-basis:100%}
+#stage6-cec .cecCredentialSheet .cecChairSignatureMark{min-width:95px}
+@container cec-stage6 (max-width:490px){
+ #stage6-cec .cecReview .cecIssueDecision button{width:100%}
+ #stage6-cec .cecChairSignature{align-items:flex-start;flex-direction:column}
+ #stage6-cec .cecChairSignatureTitle{max-width:none}
+ #stage6-cec .cecChairSignature>strong{text-align:left}
+}
+@media print {
+ #stage6-cec .cecChairSignature{break-inside:avoid;page-break-inside:avoid}
+ #stage6-cec .cecChairSignatureMark img{max-height:60px}
+}
