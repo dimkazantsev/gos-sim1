@@ -24,6 +24,7 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
 '<div class="cecDocumentChecklist"><article class="cecDocumentItem missing"><label class="cecDocumentUploadTarget"><span class="cecDocumentState">1</span><span class="cecDocumentCopy"><b>Заявление о согласии баллотироваться</b><small>Файл ещё не загружен</small></span><strong>Загрузить</strong></label></article>',
 '<article class="cecDocumentItem ok"><label class="cecDocumentUploadTarget"><span class="cecDocumentState">✓</span><span class="cecDocumentCopy"><b>Сведения о доходах</b><small>Предварительная проверка пройдена</small></span><strong>Заменить</strong></label></article></div></section></div></details></article></div>',
 '<section class="cecDecisionRegistry"><header><div><small>ПУБЛИЧНЫЙ РЕЕСТР</small><h3>Решения ЦИК РФ</h3></div><span>1 решение</span></header><article class="cecDecision registered"><div><small>№ 001</small><h4>Иванов Иван Иванович</h4><p>Кандидат зарегистрирован.</p><button class="cecDocumentOpen">Открыть решение ЦИК</button></div><strong>Зарегистрирован</strong></article></section>',
+'<section class="cecSubmissionPanel" aria-label="Пример подачи"><div class="cecAutoReview"><ol><li><span>✓</span><div><b>Сведения о расходах</b></div></li></ol></div><div class="cecSubmissionActions" id="cecStudentActions"><button class="primary cecSubmitPackage">Подать пакет в ЦИК</button></div><section class="cecSubmittedDocuments"><header><div><b>Документы для проверки ЦИК</b></div></header><div class="cecSubmittedDocumentList"><article class="cecSubmittedDocument"><div class="cecSubmittedDocumentTop"><div><b>Заявление о согласии баллотироваться</b><small>Очень длинное название загруженного документа.pdf</small></div><div class="cecSubmittedDocumentLinks"><a href="#">Посмотреть</a><button>Скачать</button></div></div><label class="cecDocumentReviewerNote">Замечания<textarea rows="2"></textarea></label><div class="cecDocumentReviewerActions"><button>Принять документ</button><button class="returnForRevision">Вернуть на доработку</button></div></article></div></section><div class="cecSubmissionActions" id="cecTeacherActions"><button class="secondary">Сформировать проект решения по проверке</button></div></section>',
 '</section></main></body></html>'
 ].join('');
 (async()=>{
@@ -44,6 +45,12 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
      fields:[...root.querySelectorAll('.candidateNominationBody>label')].slice(0,3).map(rect),
      uploads:[...root.querySelectorAll('.cecDocumentUploadTarget')].map(rect),
      action:rect(root.querySelector('.candidateNominationBody>.primary')),
+     reviewElements:[...root.querySelectorAll('.cecSubmittedDocuments,.cecSubmittedDocument,.cecSubmittedDocumentLinks,.cecDocumentReviewerActions,.cecDocumentReviewerNote')].map(rect),
+     reviewControls:[...root.querySelectorAll('.cecSubmittedDocumentLinks :is(a,button),.cecDocumentReviewerActions button,.cecDocumentReviewerNote textarea,.cecSubmissionActions button')].map(rect),
+     studentAction:rect(root.querySelector('#cecStudentActions button')),
+     teacherAction:rect(root.querySelector('#cecTeacherActions button')),
+     audit:rect(root.querySelector('.cecSubmissionPanel .cecAutoReview')),
+     submittedDocs:rect(root.querySelector('.cecSubmittedDocuments')),
      toggle:rect(root.querySelector('.candidateNominationToggle')),
      summary:rect(root.querySelector('.candidateNomination>summary')),
      symbolStyle:(()=>{
@@ -61,6 +68,12 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
    }
    for(const area of s.textarea){
     assert(area.x>=s.root.x+s.safePadding.left+7&&area.right<=s.root.right-s.safePadding.right-7,'Textarea touches outer border at '+width);
+   }
+   assert(s.studentAction.y>=s.audit.bottom+11,'Submit button overlaps audit at '+width);
+   assert(s.teacherAction.y>=s.submittedDocs.bottom+11,'Teacher button overlaps documents at '+width);
+   for(const b of [...s.reviewElements,...s.reviewControls]){
+    assert(b.x>=s.root.x-2&&b.right<=s.root.right+2,'CEC document review overflows at '+width);
+    assert(b.w>35,'CEC review action collapsed at '+width);
    }
    for(const b of [...s.tabs,...s.fields,...s.uploads,s.action]){
     assert(b.x>=s.root.x-2&&b.right<=s.root.right+2,'Control overflow at '+width);
