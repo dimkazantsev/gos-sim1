@@ -195,14 +195,14 @@ export default function GovernmentFormationWorkspace({
 
  const dumaRows=rows.filter(x=>x.stage_no===stageNo&&(x.route==='president_to_duma'||x.route==='pm_to_duma'));
  const openDumaVotes=dumaRows.map(n=>n.vote_id?votes.find(v=>v.id===n.vote_id):undefined).filter(v=>v?.status==='open');
- const activeVoteId=openDumaVotes[0]?.id||undefined;
+ const activeVoteId=openDumaVotes[0]?.id||dumaRows.find(n=>n.status==='vote_open'&&n.vote_id)?.vote_id||undefined;
  const publicChannel=g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры'&&['Публичная политика','Общая беседа','Общий штаб','Общий чат'].includes(c.name))
   ||g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры');
 
  const nextAction=stageNo===9
   ?(!pmAppointed||!structureApproved?'Завершить назначение Председателя Правительства и утверждение структуры на этапе 8':allMinistersAppointed?'Министрам набрать сотрудников в разделе «Команды ведомств» ниже':'Внести кандидатуры пяти министров, провести решения ГД и консультации СФ, затем оформить назначения Президентом')
   :phase===1
-  ?(!pm?'Президенту необходимо внести кандидатуру Председателя Правительства':pm.status==='submitted'?'Открыть голосование Государственной Думы':pm.status==='vote_open'?'Провести голосование по кандидатуре Председателя Правительства':pm.status==='approved'?'Президенту необходимо назначить утверждённого Председателя Правительства':pm.status==='rejected'&&pm.attempt_no<3?'Внести кандидатуру повторно':'Разрешить последствия трёх отклонений')
+  ?(!pm?'Президенту необходимо внести кандидатуру Председателя Правительства':pm.status==='submitted'?'Кандидатура внесена; голосование открывается автоматически':pm.status==='vote_open'?'Провести голосование по кандидатуре Председателя Правительства':pm.status==='approved'?'Президенту необходимо назначить утверждённого Председателя Правительства':pm.status==='rejected'&&pm.attempt_no<3?'Внести кандидатуру повторно':'Разрешить последствия трёх отклонений')
   :phase===2
    ?(!structure?'Председателю Правительства необходимо предложить структуру из пяти министерств':structure.status==='submitted'?'Президенту необходимо рассмотреть структуру Правительства':structure.status==='revision'?'Председателю Правительства необходимо переименовать министерства и представить структуру повторно':'Завершить утверждение структуры Правительства')
    :'Перейти к этапу 9: назначить министров и сформировать команды ведомств';
@@ -223,16 +223,6 @@ export default function GovernmentFormationWorkspace({
    setSelected(v=>({...v,[slot]:''}));
    setManual(v=>({...v,[slot]:''}));
    await load();
-  }
-  setBusy(null);
- }
-
- async function openVote(id:string){
-  setBusy('vote:'+id);
-  const r=await supabase.rpc('open_government_nomination_vote',{p_nomination_id:id});
-  if(r.error)setError(userError(r.error));
-  else{
-   await g.refresh();await load();onOpenVotes(String(r.data));
   }
   setBusy(null);
  }
@@ -318,16 +308,13 @@ export default function GovernmentFormationWorkspace({
   let actionDisabled=true;
   let actionHandler:(()=>void)|null=null;
 
-  if(teacher&&n.status==='submitted'){
-   actionLabel='Открыть голосование';
-   actionKind='primary';
-   actionDisabled=false;
-   actionHandler=()=>void openVote(n.id);
-  }else if(vote?.status==='open'){
+  if(n.vote_id&&(n.status==='vote_open'||vote?.status==='open')){
    actionLabel='Перейти к голосованию';
    actionKind='primary';
    actionDisabled=false;
-   actionHandler=()=>openVoting(vote.id);
+   actionHandler=()=>openVoting(n.vote_id);
+  }else if(n.status==='submitted'){
+   actionLabel='Голосование подготавливается';
   }else if(n.status==='approved'&&canPresident&&n.office_kind!=='central_bank_chair'){
    actionLabel='Назначить';
    actionKind='primary';
@@ -352,7 +339,7 @@ export default function GovernmentFormationWorkspace({
    <span className="gov8AgendaIndex">{String(index+1).padStart(2,'0')}</span>
    <div className="gov8AgendaMain">
     <small>{n.office_title}</small>
-    <div className="gov8AgendaNameRow"><b>{n.candidate_name}</b>{teacher&&n.status!=='appointed'&&<button className="gov8RemoveNomination" title="Снять кандидатуру" aria-label={'Снять кандидатуру '+n.candidate_name} disabled={!!busy} onClick={()=>void withdrawNomination(n.id,n.candidate_name)}><Trash2 size={15}/></button>}</div>
+    <div className="gov8AgendaNameRow"><b>{n.candidate_name}</b></div>
     <span>Попытка {n.attempt_no}/3 · {STATUS[n.status]}{rejects?' · отклонений: '+rejects:''}</span>
    </div>
    <div className="gov8AgendaActions">
@@ -362,11 +349,19 @@ export default function GovernmentFormationWorkspace({
      <button className="gov8LinkButton" disabled={!n.vote_id} onClick={()=>n.vote_id&&openVoting(n.vote_id)}>Голосование</button>
      <button className="gov8LinkButton" onClick={()=>onNavigate?.('actions')}>Политический процесс</button>
     </div>
-    <button
-     className={actionKind+' gov8AgendaCta'}
-     disabled={actionDisabled||!!busy}
-     onClick={()=>actionHandler?.()}
-    >{actionLabel}</button>
+    <div className="gov8AgendaControls">
+     <button type="button"
+      className={actionKind+' gov8AgendaCta'}
+      disabled={actionDisabled||!!busy}
+      onClick={()=>actionHandler?.()}
+     >{actionLabel}</button>
+     {teacher&&n.status!=='appointed'&&<button type="button"
+      className="gov8RemoveNomination"
+      title="Снять кандидатуру с повестки"
+      aria-label={'Снять кандидатуру '+n.candidate_name}
+      disabled={!!busy} onClick={()=>void withdrawNomination(n.id,n.candidate_name)}
+     ><Trash2 size={17} aria-hidden="true"/><span>Снять</span></button>}
+    </div>
    </div>
   </article>;
  }
@@ -399,7 +394,7 @@ export default function GovernmentFormationWorkspace({
 
   <section className="gov8Duma">
    <header className="gov8SectionHead">
-    <div><span className="gov8SectionIcon"><Landmark size={20}/></span><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>{stageNo===8?'Назначение Председателя Правительства и главы Банка России':'Утверждение кандидатур министров'}</h3><p>{stageNo===8?'Внесите кандидатуры в повестку, зарегистрируйте депутатов и проведите голосование.':'Кандидатуры думского блока появятся в повестке после внесения. Депутаты регистрируются на заседание этапа 9, затем преподаватель открывает голосование.'}</p></div></div>
+    <div><span className="gov8SectionIcon"><Landmark size={20}/></span><div><small>ГОСУДАРСТВЕННАЯ ДУМА</small><h3>{stageNo===8?'Назначение Председателя Правительства и главы Банка России':'Утверждение кандидатур министров'}</h3><p>{stageNo===8?'Внесите кандидатуры в повестку, зарегистрируйте депутатов и проведите голосование.':'Кандидатуры думского блока автоматически открывают голосование после внесения. Депутаты регистрируются на заседание этапа 9 и голосуют сами.'}</p></div></div>
     <div className="gov8SessionFacts"><span><b>{registrations.length}</b> зарегистрировано</span><span><b>{dumaRows.length}</b> вопросов</span><span><b>{openDumaVotes.length}</b> открыто</span></div>
    </header>
 
@@ -407,7 +402,7 @@ export default function GovernmentFormationWorkspace({
     <button onClick={()=>setRegistrationOpen(v=>!v)} className={registrations.some(x=>x.user_id===me.user_id)?'isDone':'isCurrent'}><span>01</span><ClipboardCheck size={18}/><div><small>ПРИСУТСТВИЕ</small><b>Регистрация</b><em>{registrations.some(x=>x.user_id===me.user_id)?'Вы зарегистрированы':'Развернуть регистрацию ГД'}</em></div></button>
     <button disabled={!publicChannel} onClick={openChat}><span>02</span><MessageCircle size={18}/><div><small>ОБСУЖДЕНИЕ</small><b>Публичный чат</b><em>{publicChannel?'Обсудить кандидатуры':'Нет публичного канала'}</em></div></button>
     <button onClick={()=>document.getElementById('government-agenda-'+stageNo)?.scrollIntoView({behavior:'smooth',block:'center'})}><span>03</span><UsersRound size={18}/><div><small>ПОВЕСТКА</small><b>Кандидатуры</b><em>{dumaRows.length?dumaRows.length+' вопросов':'Сформируйте первый вопрос'}</em></div></button>
-    <button disabled={!activeVoteId} onClick={()=>openVoting(activeVoteId)} className={openDumaVotes.length?'isLive':''}><span>04</span><Vote size={18}/><div><small>РЕШЕНИЕ</small><b>Голосование</b><em>{openDumaVotes.length?'Открыто: '+openDumaVotes.length:'Ожидает открытия'}</em></div></button>
+    <button disabled={!activeVoteId} onClick={()=>openVoting(activeVoteId)} className={openDumaVotes.length?'isLive':''}><span>04</span><Vote size={18}/><div><small>РЕШЕНИЕ</small><b>Голосование</b><em>{openDumaVotes.length?'Открыто: '+openDumaVotes.length:activeVoteId?'Перейти к голосованию':'Ожидает кандидатуру'}</em></div></button>
    </div>
 
    {registrationOpen&&<div className="gov8InlineRegistration"><InstitutionRegistrationPanel g={g} stageNo={stageNo} initialBody="gd" allowedBodies={['gd']} defaultOpen/></div>}
