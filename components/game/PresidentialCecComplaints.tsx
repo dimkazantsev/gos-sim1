@@ -5,6 +5,7 @@ import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type Candidate={id:string;display_name:string;registration_status:string};
+type PublicDecision={id:string;candidate_id:string;status:string;resolution:string;resolved_at:string;case_number:string|null};
 type CourtReferral={complaint_id:string;case_number:string;case_status:string;referred_at:string};
 type Complaint={id:string;candidate_id:string;submitted_by:string;subject:string;allegation:string;legal_basis:string|null;status:'pending'|'maintained'|'dismissed'|'removed'|'referred_court';resolution:string|null;created_at:string;resolved_at:string|null};
 const outcomes=[
@@ -17,6 +18,7 @@ export default function PresidentialCecComplaints({g,candidates}:{g:ReturnTypeRe
  const {game,me,teacher,setError}=g;
  const gameId=game?.id||'';
  const [records,setRecords]=useState<Complaint[]>([]);
+ const [published,setPublished]=useState<PublicDecision[]>([]);
  const [referrals,setReferrals]=useState<CourtReferral[]>([]);
  const [candidateId,setCandidateId]=useState('');
  const [subject,setSubject]=useState('');
@@ -28,11 +30,12 @@ export default function PresidentialCecComplaints({g,candidates}:{g:ReturnTypeRe
  const [message,setMessage]=useState('');
  const reload=useCallback(async()=>{
   if(!gameId)return;
-  const [r,court]=await Promise.all([supabase.from('presidential_cec_complaints').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),supabase.from('presidential_cec_court_referrals').select('complaint_id,case_number,case_status,referred_at').eq('game_id',gameId)]);
+  const [r,court,publicResults]=await Promise.all([supabase.from('presidential_cec_complaints').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),supabase.from('presidential_cec_court_referrals').select('complaint_id,case_number,case_status,referred_at').eq('game_id',gameId),supabase.rpc('list_presidential_cec_complaint_decisions',{p_game_id:gameId})]);
   if(r.error)setError(userError(r.error));else setRecords((r.data||[]) as Complaint[]);
   if(court.error)setError(userError(court.error));else setReferrals((court.data||[]) as CourtReferral[]);
+  if(publicResults.error)setError(userError(publicResults.error));else setPublished((publicResults.data||[]) as PublicDecision[]);
  },[gameId,setError]);
- useEffect(()=>{setRecords([]);setReferrals([]);setCandidateId('');setMessage('');void reload()},[reload]);
+ useEffect(()=>{setRecords([]);setReferrals([]);setPublished([]);setCandidateId('');setMessage('');void reload()},[reload]);
  const registered=candidates.filter(c=>c.registration_status==='registered');
  async function submit(){
   if(busy||!candidateId||subject.trim().length<8||allegation.trim().length<30)return;
@@ -76,6 +79,13 @@ export default function PresidentialCecComplaints({g,candidates}:{g:ReturnTypeRe
      <div className="cecComplaintActions"><button type="button" className="primary" disabled={busy||!outcome[x.id]||(reason[x.id]||'').trim().length<30} onClick={()=>void decide(x.id)}>Принять решение по жалобе</button></div>
     </div>}
    </article>)}</div>
+  </section>
+  <section className="stage7Panel cecPublishedDecisions">
+   <div className="stage7PanelHead"><div><small>ОФИЦИАЛЬНЫЕ РЕЗУЛЬТАТЫ РАССМОТРЕНИЯ</small><h3>Публичные решения ЦИК по жалобам</h3><p>Официальные результаты доступны участникам ГОС.ID. Личные данные заявителей и текст неподтверждённых обвинений не публикуются.</p></div></div>
+   {published.length===0?<p className="stage7Empty">Решений по жалобам пока нет.</p>:<div className="cecComplaintList">{published.map(x=><article key={x.id} className="cecComplaintItem">
+    <header><div><b>{candidates.find(c=>c.id===x.candidate_id)?.display_name||'Кандидат'}</b><small>{new Date(x.resolved_at).toLocaleString('ru-RU')}</small></div><span>{outcomes.find(v=>v.value===x.status)?.label||x.status}</span></header>
+    <p>{x.resolution}</p>{x.case_number&&<small>Направление в судебный реестр ГОС.ID: {x.case_number}</small>}
+   </article>)}</div>}
   </section>
  </div>;
 }
