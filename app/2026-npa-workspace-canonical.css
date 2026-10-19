@@ -1880,3 +1880,7 @@
 .formalInstitutionSigning>span{font-size:13px;line-height:1.5;color:#59708e}
 .formalInstitutionSigning>.primary{justify-self:start;min-height:40px}
 @media(max-width:560px){.formalSignatureList .formalSignature{flex-wrap:wrap}.formalSignatureList .formalSignatureImage{max-width:100%}.formalInstitutionSigning>.primary{justify-self:stretch}}
+
+/* Hidden attribute must win over the legacy !important grid layout.
+   Otherwise the «Реестр НПА» back button changes state without hiding detail. */
+.legalPortal .formalWorkspace > .formalDetail[hidden]{display:none!important}
