@@ -19,6 +19,23 @@ type PublicPoll={id:string;game_id:string;round_no:number;slug:string;title:stri
 type Settings={game_id:string;system_type:'relative'|'absolute'|'qualified'|'preferential';threshold_pct:number;poll_enabled:boolean;status:'setup'|'round1'|'runoff'|'finished'|'manual_required';result:Record<string,any>};
 type Score={candidate_id:string;round_no:1|2;teacher_program_pct:number|null;teacher_campaign_pct:number|null;game_rating_pct:number|null;poll_pct:number|null;teacher_runoff_pct:number|null;computed_pct:number|null};
 type Inauguration={game_id:string;scheduled_at:string|null;venue:string|null;notes:string|null;hymn_path:string|null;ceremonial_music_path:string|null;updated_at:string};
+// ГОС.ID моделирует события по барнаульскому времени (UTC+07:00),
+// независимо от часового пояса браузера преподавателя.
+const BARNAUL_OFFSET_MS=7*60*60*1000;
+function inaugurationDateInput(value:string|null|undefined){
+ const timestamp=value?Date.parse(value):NaN;
+ return Number.isFinite(timestamp)?new Date(timestamp+BARNAUL_OFFSET_MS).toISOString().slice(0,16):'';
+}
+function inaugurationDateUtc(value:string){
+ if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value))throw new Error('Укажите корректную дату и время инаугурации.');
+ const timestamp=Date.parse(value+':00+07:00');
+ if(!Number.isFinite(timestamp))throw new Error('Не удалось определить время инаугурации.');
+ return new Date(timestamp).toISOString();
+}
+function inaugurationDateLabel(value:string){
+ const d=new Date(value);
+ return Number.isFinite(d.getTime())?d.toLocaleString('ru-RU',{timeZone:'Asia/Barnaul',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+}
 
 const MATERIAL_LABELS:Record<string,string>={poster:'Плакат',leaflet:'Листовка',video:'Видео',audio:'Аудио',news:'Новость',other:'Другое'};
 const SYSTEM_NAMES={relative:'Относительное большинство',absolute:'Абсолютное большинство',qualified:'Квалифицированное большинство',preferential:'Преференциальная система'} as const;
@@ -37,6 +54,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
 
  const [inauguration,setInauguration]=useState<Inauguration|null>(null);
  const [inaugurationConfirmed,setInaugurationConfirmed]=useState(false);
+ const [ceremonyFeedback,setCeremonyFeedback]=useState('');
  const [photoUrls,setPhotoUrls]=useState<Record<string,string>>({});
  const [audioUrls,setAudioUrls]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
@@ -71,7 +89,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  useEffect(()=>{
   request.current++;ceremonyDirty.current=false;
   setCandidates([]);setMaterials([]);setDecision(null);setPublicPolls([]);setSettings(null);setStage6Ready(false);setScores([]);setInauguration(null);setInaugurationConfirmed(false);setPhotoUrls({});setAudioUrls({});
-  setCandidateId('');setCeremonyAt('');setVenue('');setCeremonyNotes('');setHymnLink('');setMusicLink('');setBusy(false);setNotice('');
+  setCandidateId('');setCeremonyAt('');setVenue('');setCeremonyNotes('');setHymnLink('');setMusicLink('');setCeremonyFeedback('');setBusy(false);setNotice('');
   setTitle('');setBody('');setPrintRun('');setPublisher('');setProductionDate('');setImprint('');setExternalUrl('');setFiles([]);
   setMaterialType('poster');setPollClose('');setReviewNotes({});setReviewErrors({});setReviewResponses({});setReviewPenalties({});setReviewPenaltyReasons({});
  },[viewScope]);
@@ -140,7 +158,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   setScores(scoreRows);
 
   setInauguration(ceremony);setAudioUrls({hymn,music});
-  if(!ceremonyDirty.current){setCeremonyAt(ceremony?.scheduled_at?new Date(ceremony.scheduled_at).toISOString().slice(0,16):'');setVenue(ceremony?.venue||'');setCeremonyNotes(ceremony?.notes||'');setHymnLink(isExternalAudioLink(ceremony?.hymn_path)?ceremony!.hymn_path!:'');setMusicLink(isExternalAudioLink(ceremony?.ceremonial_music_path)?ceremony!.ceremonial_music_path!:'')}
+  if(!ceremonyDirty.current){setCeremonyAt(inaugurationDateInput(ceremony?.scheduled_at));setVenue(ceremony?.venue||'');setCeremonyNotes(ceremony?.notes||'');setHymnLink(isExternalAudioLink(ceremony?.hymn_path)?ceremony!.hymn_path!:'');setMusicLink(isExternalAudioLink(ceremony?.ceremonial_music_path)?ceremony!.ceremonial_music_path!:'')}
   }catch(error){if(current())setError(error)}
  }
  useGameTableSync(gameId,['presidential_candidates','presidential_campaign_materials','presidential_poll_decision','presidential_public_polls','presidential_scorecards','presidential_election_settings','presidential_inauguration','game_parties','political_posts'],load,viewScope);
@@ -204,24 +222,37 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  async function copyPoll(){if(!pollUrl)return;await navigator.clipboard.writeText(pollUrl);setNotice('Ссылка на опрос скопирована.')}
  function share(service:'vk'|'tg'){if(!pollUrl)return;const u=encodeURIComponent(pollUrl),t=encodeURIComponent('Социологический опрос: выборы Президента РФ');window.open(service==='vk'?'https://vk.com/share.php?url='+u+'&title='+t:'https://t.me/share/url?url='+u+'&text='+t,'_blank','noopener,noreferrer')}
 
+ const ceremonyDate=inauguration?.scheduled_at?Date.parse(inauguration.scheduled_at):NaN;
+ const ceremonyHasPassed=Number.isFinite(ceremonyDate)&&ceremonyDate<=Date.now();
+ const ceremonyNeedsDate=!Number.isFinite(ceremonyDate);
+ function ceremonyBlockReason(){
+  if(settings?.status!=='finished')return 'Для передачи полномочий необходимо сначала завершить подсчёт выборов.';
+  if(ceremonyNeedsDate)return 'Сначала назначьте дату и время инаугурации и сохраните изменения.';
+  if(!ceremonyHasPassed)return 'Инаугурация назначена на '+inaugurationDateLabel(inauguration!.scheduled_at!)+' (Барнаул). Передача полномочий возможна после её проведения. Если церемония уже состоялась, укажите фактические дату и время и сохраните.';
+  if(ceremonyDirty.current)return 'Сначала сохраните изменения в параметрах инаугурации.';
+  return '';
+ }
  async function confirmCeremony(){
   if(!teacher||!gameId||busy)return;
+  const reason=ceremonyBlockReason();
+  if(reason){setCeremonyFeedback(reason);return}
+  setCeremonyFeedback('');
   setBusy(true);
   try{
    const r=await supabase.rpc('confirm_presidential_inauguration',{p_game_id:gameId});
    if(r.error)throw r.error;
-   setNotice('Инаугурация подтверждена. Победитель вступил в должность и получил полномочия Президента.');
+   setCeremonyFeedback('Инаугурация подтверждена. Победитель вступил в должность и получил полномочия Президента.');
    await load();await g.refresh();
   }catch(error){setError(userError(error))}finally{setBusy(false)}
  }
  async function saveCeremony(){
   if(!validCeremonyAudioLink(hymnLink)||!validCeremonyAudioLink(musicLink)){setError('Укажите корректные HTTPS-ссылки на аудио без пробелов и данных для входа.');return}
-  setBusy(true);try{
+  setCeremonyFeedback('');setBusy(true);try{
    const hymn=hymnLink.trim()||(inauguration?.hymn_path&&!isExternalAudioLink(inauguration.hymn_path)?inauguration.hymn_path:null);
    const music=musicLink.trim()||(inauguration?.ceremonial_music_path&&!isExternalAudioLink(inauguration.ceremonial_music_path)?inauguration.ceremonial_music_path:null);
-   const r=await supabase.rpc('save_presidential_inauguration',{p_game_id:gameId,p_scheduled_at:ceremonyAt?new Date(ceremonyAt).toISOString():null,p_venue:venue.trim()||null,p_notes:ceremonyNotes.trim()||null,p_hymn_path:hymn,p_ceremonial_music_path:music});
+   const r=await supabase.rpc('save_presidential_inauguration',{p_game_id:gameId,p_scheduled_at:ceremonyAt?inaugurationDateUtc(ceremonyAt):null,p_venue:venue.trim()||null,p_notes:ceremonyNotes.trim()||null,p_hymn_path:hymn,p_ceremonial_music_path:music});
    if(!activeScope())return;
-   if(r.error)throw r.error;ceremonyDirty.current=false;setNotice('Параметры инаугурации и ссылки на аудио сохранены.');await load();
+   if(r.error)throw r.error;ceremonyDirty.current=false;setCeremonyFeedback('Параметры инаугурации сохранены.');setNotice('Параметры инаугурации и ссылки на аудио сохранены.');await load();
   }catch(e){if(activeScope())setError(userError(e)||'Не удалось выполнить действие.')}finally{if(activeScope())setBusy(false)}
  }
 
@@ -287,7 +318,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
     <div className="resultBars">{resultRows.map((row,index)=><div key={row.candidate.id} className="resultBarRow"><div><span>{index+1}</span><b>{row.candidate.display_name}</b><strong>{row.score!=null?Number(row.score).toFixed(2)+'%':'—'}</strong></div><div className="resultBar"><i style={{width:Math.max(0,Math.min(100,Number(row.score)||0))+'%'}}/></div>{pollApproved&&row.poll!=null&&<small>Соцопрос: {Number(row.poll).toFixed(2)}%</small>}</div>)}</div>
    </section>
    <section className="stage7Panel inaugurationPanel"><div className="stage7PanelHead"><div><small>ИНАУГУРАЦИЯ</small><h3>Вступление избранного Президента в должность</h3><p>После фиксации итогов преподаватель задаёт дату, место и аудиосопровождение церемонии.</p></div><Landmark size={24}/></div>
-    {teacher?<div className="inaugurationForm"><label>Дата и время<input type="datetime-local" disabled={busy} value={ceremonyAt} onChange={e=>{ceremonyDirty.current=true;setCeremonyAt(e.target.value)}}/></label><label>Место<input disabled={busy} value={venue} onChange={e=>{ceremonyDirty.current=true;setVenue(e.target.value)}} placeholder="Место проведения"/></label><label className="wide">Сценарий / примечания<textarea rows={4} disabled={busy} value={ceremonyNotes} onChange={e=>{ceremonyDirty.current=true;setCeremonyNotes(e.target.value)}} placeholder="Краткий порядок церемонии"/></label><label className="ceremonyAudioLinkField">Гимн России · Ссылка<input type="url" inputMode="url" disabled={busy} value={hymnLink} aria-invalid={!validCeremonyAudioLink(hymnLink)} onChange={e=>{ceremonyDirty.current=true;setHymnLink(e.target.value)}} placeholder="https://example.ru/gimn.mp3"/><small>Прямая HTTPS-ссылка на аудио. Файл загружать не нужно.</small>{inauguration?.hymn_path&&!isExternalAudioLink(inauguration.hymn_path)&&<small>Ранее загруженный гимн сохранится, пока вы не укажете новую ссылку.</small>}</label><label className="ceremonyAudioLinkField">Церемониальная музыка · Ссылка<input type="url" inputMode="url" disabled={busy} value={musicLink} aria-invalid={!validCeremonyAudioLink(musicLink)} onChange={e=>{ceremonyDirty.current=true;setMusicLink(e.target.value)}} placeholder="https://example.ru/muzyka.mp3"/><small>Можно добавить HTTPS-ссылку на аудио или страницу музыкального сервиса.</small>{inauguration?.ceremonial_music_path&&!isExternalAudioLink(inauguration.ceremonial_music_path)&&<small>Ранее загруженная музыка сохранится, пока вы не укажете новую ссылку.</small>}</label><button className="primary wide" disabled={busy||!validCeremonyAudioLink(hymnLink)||!validCeremonyAudioLink(musicLink)} onClick={()=>void saveCeremony()}>Сохранить инаугурацию</button>{inaugurationConfirmed?<p className="wide stage7Notice">Инаугурация подтверждена. Полномочия Президента Российской Федерации действуют.</p>:<button className="secondary wide" disabled={busy||settings?.status!=='finished'||!inauguration?.scheduled_at||new Date(inauguration.scheduled_at).getTime()>Date.now()} onClick={()=>void confirmCeremony()}>Подтвердить инаугурацию и передать полномочия Президента</button>}</div>:inauguration?<div className="ceremonyPublic"><b>{inauguration.scheduled_at?new Date(inauguration.scheduled_at).toLocaleString('ru-RU'):'Дата уточняется'}</b><span>{inauguration.venue||'Место уточняется'}</span>{inauguration.notes&&<p>{inauguration.notes}</p>}</div>:<div className="stage7Empty">Параметры инаугурации ещё не опубликованы.</div>}
+    {teacher?<div className="inaugurationForm"><label>Дата и время<input type="datetime-local" disabled={busy} value={ceremonyAt} onChange={e=>{ceremonyDirty.current=true;setCeremonyFeedback('');setCeremonyAt(e.target.value)}}/></label><label>Место<input disabled={busy} value={venue} onChange={e=>{ceremonyDirty.current=true;setVenue(e.target.value)}} placeholder="Место проведения"/></label><label className="wide">Сценарий / примечания<textarea rows={4} disabled={busy} value={ceremonyNotes} onChange={e=>{ceremonyDirty.current=true;setCeremonyNotes(e.target.value)}} placeholder="Краткий порядок церемонии"/></label><label className="ceremonyAudioLinkField">Гимн России · Ссылка<input type="url" inputMode="url" disabled={busy} value={hymnLink} aria-invalid={!validCeremonyAudioLink(hymnLink)} onChange={e=>{ceremonyDirty.current=true;setHymnLink(e.target.value)}} placeholder="https://example.ru/gimn.mp3"/><small>Прямая HTTPS-ссылка на аудио. Файл загружать не нужно.</small>{inauguration?.hymn_path&&!isExternalAudioLink(inauguration.hymn_path)&&<small>Ранее загруженный гимн сохранится, пока вы не укажете новую ссылку.</small>}</label><label className="ceremonyAudioLinkField">Церемониальная музыка · Ссылка<input type="url" inputMode="url" disabled={busy} value={musicLink} aria-invalid={!validCeremonyAudioLink(musicLink)} onChange={e=>{ceremonyDirty.current=true;setMusicLink(e.target.value)}} placeholder="https://example.ru/muzyka.mp3"/><small>Можно добавить HTTPS-ссылку на аудио или страницу музыкального сервиса.</small>{inauguration?.ceremonial_music_path&&!isExternalAudioLink(inauguration.ceremonial_music_path)&&<small>Ранее загруженная музыка сохранится, пока вы не укажете новую ссылку.</small>}</label><button className="primary wide" disabled={busy||!validCeremonyAudioLink(hymnLink)||!validCeremonyAudioLink(musicLink)} onClick={()=>void saveCeremony()}>Сохранить инаугурацию</button>{inaugurationConfirmed?<p className="wide stage7Notice">Инаугурация подтверждена. Полномочия Президента Российской Федерации действуют.</p>:<div className="wide ceremonyConfirmSection"><button type="button" className="secondary" disabled={busy} onClick={()=>void confirmCeremony()}>Подтвердить инаугурацию и передать полномочия Президента</button>{(ceremonyFeedback||ceremonyBlockReason())&&<p className="ceremonyConfirmHint" role="status">{ceremonyFeedback||ceremonyBlockReason()}</p>}</div>}</div>:inauguration?<div className="ceremonyPublic"><b>{inauguration.scheduled_at?new Date(inauguration.scheduled_at).toLocaleString('ru-RU'):'Дата уточняется'}</b><span>{inauguration.venue||'Место уточняется'}</span>{inauguration.notes&&<p>{inauguration.notes}</p>}</div>:<div className="stage7Empty">Параметры инаугурации ещё не опубликованы.</div>}
     {(audioUrls.hymn||audioUrls.music)&&<div className="ceremonyAudio">{audioUrls.hymn&&<div className="ceremonyAudioCard"><b>Гимн России</b>{(!isExternalAudioLink(inauguration?.hymn_path)||isDirectAudioLink(audioUrls.hymn))&&<audio controls preload="none" src={audioUrls.hymn}/>} {isExternalAudioLink(inauguration?.hymn_path)&&<a href={audioUrls.hymn} target="_blank" rel="noopener noreferrer">Открыть ссылку на гимн ↗</a>}</div>}{audioUrls.music&&<div className="ceremonyAudioCard"><b>Церемониальная музыка</b>{(!isExternalAudioLink(inauguration?.ceremonial_music_path)||isDirectAudioLink(audioUrls.music))&&<audio controls preload="none" src={audioUrls.music}/>} {isExternalAudioLink(inauguration?.ceremonial_music_path)&&<a href={audioUrls.music} target="_blank" rel="noopener noreferrer">Открыть ссылку на музыку ↗</a>}</div>}</div>}
    </section>
   </div>}

@@ -14,7 +14,7 @@ function harness(component){
  const file=path.join(root,'components/game',component+'.tsx');
  const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const slots=[],pendingEffects=[],channels=[],counts=new Map(),holds=new Map(),errors=[],fetches=[],failures=new Set(),profileNotes=new Map(),committeeLegal=new Map(),budgetConclusions=new Map();
- let cursor=0,dirty=false,tree,latestTableLoad,revision=1,serverVenue='Saved venue',serverPollApproved=false,serverHymn=null,serverMusic=null,ceremonySaveCount=0,clock=0,sessionUser='teacher-a',props;
+ let cursor=0,dirty=false,tree,latestTableLoad,revision=1,serverVenue='Saved venue',serverPollApproved=false,serverHymn=null,serverMusic=null,serverCeremonyAt='2026-10-08T12:00:00Z',serverSettingsStatus='round1',ceremonySaveCount=0,ceremonyConfirmCount=0,clock=0,sessionUser='teacher-a',props;
  const g={game:{id:'game-a'},me:{game_id:'game-a',user_id:'teacher-a',kind:'teacher',full_name:'Teacher A'},teacher:true,currentStage:{stage_no:7},formalDocuments:[],formalHistory:[],votes:[],members:[],parties:[],setError:error=>errors.push(String(error?.message||error))};
  for(const name of ['createFormalDocument','deleteFormalDocument','advanceFormalDocument','updateFormalDraft','vetoFormalDocument','resolveBudgetConciliation','startBudgetRejectionBranch','createVote'])g[name]=async()=>null;
  g.refresh=async()=>{};
@@ -31,17 +31,18 @@ function harness(component){
    await holds.get(table+':'+number)?.promise;
    let data=[];
    if(table==='presidential_candidates')data=['a','b'].map(letter=>({id:'candidate-'+letter,user_id:snapshot.user,created_by:snapshot.user,registration_status:'registered',display_name:'Candidate '+letter+' revision '+snapshot.revision,photo_path:null,party_id:null,rating_penalty:0}));
-   if(table==='presidential_election_settings')data={game_id:snapshot.game,system_type:'relative',status:'round1',poll_enabled:true,result:{}};
+   if(table==='presidential_election_settings')data={game_id:snapshot.game,system_type:'relative',status:serverSettingsStatus,poll_enabled:true,result:{}};
    if(table==='presidential_scorecards')data=['a','b'].map(letter=>({candidate_id:'candidate-'+letter,round_no:1,poll_pct:20,computed_pct:snapshot.revision}));
    if(table==='presidential_poll_decision')data={game_id:snapshot.game,status:'closed',result:serverPollApproved};
-   if(table==='presidential_inauguration')data={game_id:snapshot.game,scheduled_at:'2026-10-08T12:00:00Z',venue:snapshot.serverVenue,notes:'Saved notes',hymn_path:serverHymn,ceremonial_music_path:serverMusic};
+   if(table==='presidential_inauguration')data={game_id:snapshot.game,scheduled_at:serverCeremonyAt,venue:snapshot.serverVenue,notes:'Saved notes',hymn_path:serverHymn,ceremonial_music_path:serverMusic};
    if(table==='bill_submission_profiles')data={document_id:filters.document_id,committee_key:'committee-1',requires_financial_justification:false,requires_government_opinion:false,note:profileNotes.get(filters.document_id)||'Saved profile '+filters.document_id+' revision '+snapshot.revision};
    if(table==='bill_committee_conclusions')data={document_id:filters.document_id,legal_compliance:committeeLegal.get(filters.document_id)||'Saved legal '+filters.document_id+' revision '+snapshot.revision,internal_logic:'Saved logic',affected_acts_completeness:'Saved acts',recommendation:'draft',finalized:false};
    if(table==='budget_preliminary_reviews')data={document_id:filters.document_id,documents_compliant:true,sent_to_all_committees:false,accounts_chamber_reviewed:false,committee_conclusion:budgetConclusions.get(filters.document_id)||'Saved budget '+filters.document_id+' revision '+snapshot.revision,decision:'draft',note:'Saved budget note'};
    resolve(failures.has(table)?{data:null,error:{message:'simulated table failure'}}:{data,error:null});
   }catch(error){reject(error);}}};return query;},
   rpc:async(name,args)=>{
-   if(name==='save_presidential_inauguration'){serverVenue=args.p_venue;serverHymn=args.p_hymn_path;serverMusic=args.p_ceremonial_music_path;ceremonySaveCount++;}
+   if(name==='save_presidential_inauguration'){serverVenue=args.p_venue;serverHymn=args.p_hymn_path;serverMusic=args.p_ceremonial_music_path;serverCeremonyAt=args.p_scheduled_at;ceremonySaveCount++;}
+   if(name==='confirm_presidential_inauguration')ceremonyConfirmCount++;
    if(name==='save_bill_submission_profile')profileNotes.set(args.p_document_id,args.p_note);
    if(name==='save_bill_committee_conclusion')committeeLegal.set(args.p_document_id,args.p_legal_compliance);
    if(name==='save_budget_preliminary_review')budgetConclusions.set(args.p_document_id,args.p_committee_conclusion);
@@ -88,7 +89,7 @@ function harness(component){
   refreshDocument(){return nodes(tree,node=>node.type?.displayName==='DocumentTools')[0].props.onRefresh();},
   remoteProfile(value,id='doc-a'){profileNotes.set(id,value);},remoteLegal(value,id='doc-a'){committeeLegal.set(id,value);},remoteBudget(value,id='doc-a'){budgetConclusions.set(id,value);},
   resolveFetch(index,data,ok=true){fetches[index].response.resolve({ok,json:async()=>data});},
-  setRevision:value=>{revision=value;},setVenue:value=>{serverVenue=value;},setSessionUser:value=>{sessionUser=value;},setPollApproved:value=>{serverPollApproved=value;},setAudioPaths:(hymn,music)=>{serverHymn=hymn;serverMusic=music;},savedAudio:()=>({hymn:serverHymn,music:serverMusic,count:ceremonySaveCount}),
+  setRevision:value=>{revision=value;},setVenue:value=>{serverVenue=value;},setSessionUser:value=>{sessionUser=value;},setPollApproved:value=>{serverPollApproved=value;},setAudioPaths:(hymn,music)=>{serverHymn=hymn;serverMusic=music;},setCeremonyDate:value=>{serverCeremonyAt=value;},setElectionStatus:value=>{serverSettingsStatus=value;},ceremonyConfirmedCalls:()=>ceremonyConfirmCount,savedAudio:()=>({hymn:serverHymn,music:serverMusic,date:serverCeremonyAt,count:ceremonySaveCount}),
   fail:table=>failures.add(table),
   hold(table){const pending=deferred();holds.set(table+':'+((counts.get(table)||0)+1),pending);return pending;},
   refresh(){if(latestTableLoad)return latestTableLoad();for(const channel of channels)for(const {filter,callback} of channel.handlers)if(filter.table==='presidential_scorecards')callback();},
@@ -99,6 +100,42 @@ function harness(component){
 async function main(){
  const failures=[];
  async function check(name,fn){try{await fn();console.log('PASS '+name);}catch(error){failures.push(name);console.error('FAIL '+name+': '+error.message);}}
+ await check('Stage7 inauguration confirmation explains a future date without appointing the President',async()=>{
+  const h=harness('PresidentialElectionStage7');
+  h.setElectionStatus('finished');h.setCeremonyDate('2030-10-23T14:50:00Z');
+  await h.settle();h.clickResults();h.render();
+  const form=h.byClass('inaugurationForm');
+  const dateInput=h.all('input',form).find(x=>x.props.type==='datetime-local');
+  assert.equal(dateInput.props.value,'2030-10-23T21:50','Barnaul UTC+7 is shown to the teacher rather than UTC');
+  const button=h.all('button',form).find(x=>text(x)==='Подтвердить инаугурацию и передать полномочия Президента');
+  assert.ok(button);
+  assert.equal(button.props.disabled,false,'button should explain waiting rather than be inert');
+  assert.match(text(h.byClass('ceremonyConfirmSection')),/2030|21:50/);
+  button.props.onClick();await h.settle();
+  assert.match(text(h.byClass('ceremonyConfirmSection')),/после её проведения/);
+  assert.equal(h.ceremonyConfirmedCalls(),0,'future ceremony cannot appoint president');
+  h.dispose();
+ });
+ await check('Stage7 inauguration confirmation works after ceremony and timestamps use Barnaul time',async()=>{
+  const h=harness('PresidentialElectionStage7');
+  h.setElectionStatus('finished');h.setCeremonyDate('2026-01-10T12:00:00Z');
+  await h.settle();h.clickResults();h.render();
+  const form=()=>h.byClass('inaugurationForm');
+  const dateInput=h.all('input',form()).find(x=>x.props.type==='datetime-local');
+  assert.equal(dateInput.props.value,'2026-01-10T19:00');
+  dateInput.props.onChange({target:{value:'2026-01-10T18:30'}});
+  h.render();
+  h.all('button',form()).find(x=>text(x)==='Подтвердить инаугурацию и передать полномочия Президента').props.onClick();
+  await h.settle();
+  assert.equal(h.ceremonyConfirmedCalls(),0,'unsaved ceremony changes cannot cause premature confirmation');
+  h.all('button',form()).find(x=>text(x)==='Сохранить инаугурацию').props.onClick();
+  await h.settle();
+  assert.equal(h.savedAudio().date,'2026-01-10T11:30:00.000Z','datetime-local input must be saved as +07:00');
+  h.all('button',form()).find(x=>text(x)==='Подтвердить инаугурацию и передать полномочия Президента').props.onClick();
+  await h.settle();
+  assert.equal(h.ceremonyConfirmedCalls(),1);
+  h.dispose();
+ });
  await check('Stage7 inauguration accepts HTTPS audio links without uploading files and restores them',async()=>{
   const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();
   const form=()=>h.byClass('inaugurationForm');
