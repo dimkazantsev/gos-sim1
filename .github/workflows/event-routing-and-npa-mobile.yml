@@ -1,0 +1,38 @@
+name: ГОС.ID · События после выборов ГД и адаптивный реестр НПА
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/20261020083000_restore_approved_event_330_routing_after_duma.sql'
+      - 'supabase/migrations/20261020083100_event_collective_active_students_dispatch.sql'
+      - 'app/2026-npa-registry-canonical.css'
+      - 'scripts/event-330-routing-after-duma-check.cjs'
+      - 'scripts/npa-card-header-mobile-browser-check.cjs'
+      - '.github/workflows/event-routing-and-npa-mobile.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/20261020083000_restore_approved_event_330_routing_after_duma.sql'
+      - 'supabase/migrations/20261020083100_event_collective_active_students_dispatch.sql'
+      - 'app/2026-npa-registry-canonical.css'
+      - 'scripts/event-330-routing-after-duma-check.cjs'
+      - 'scripts/npa-card-header-mobile-browser-check.cjs'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: build-placeholder-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/event-330-routing-after-duma-check.cjs
+      - run: node scripts/event-regional-matrix-contract-check.cjs
+      - run: node scripts/event-option-legality-check.cjs
+      - run: npm run design:preview
+      - run: node scripts/npa-card-header-mobile-browser-check.cjs
+      - run: npm run typecheck
