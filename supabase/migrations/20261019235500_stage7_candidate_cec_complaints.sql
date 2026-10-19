@@ -20,6 +20,31 @@ CREATE TABLE IF NOT EXISTS public.presidential_cec_complaints (
 );
 CREATE INDEX IF NOT EXISTS presidential_cec_complaints_queue ON public.presidential_cec_complaints(game_id,status,created_at DESC);
 CREATE INDEX IF NOT EXISTS presidential_cec_complaints_subject ON public.presidential_cec_complaints(candidate_id,created_at DESC);
+
+-- A formal in-game referral docket, separate from the CEC complaint registry.
+CREATE TABLE IF NOT EXISTS public.presidential_cec_court_referrals (
+ complaint_id uuid PRIMARY KEY REFERENCES public.presidential_cec_complaints(id),
+ game_id uuid NOT NULL REFERENCES public.games(id),
+ candidate_id uuid NOT NULL REFERENCES public.presidential_candidates(id),
+ case_number text NOT NULL UNIQUE,
+ referred_by uuid NOT NULL REFERENCES auth.users(id),
+ referred_at timestamptz NOT NULL DEFAULT now(),
+ case_status text NOT NULL DEFAULT 'awaiting_court' CHECK (case_status IN ('awaiting_court','under_review','resolved'))
+);
+CREATE INDEX IF NOT EXISTS cec_court_referrals_queue ON public.presidential_cec_court_referrals(game_id,case_status,referred_at DESC);
+ALTER TABLE public.presidential_cec_court_referrals ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.presidential_cec_court_referrals FROM PUBLIC,anon;
+GRANT SELECT ON public.presidential_cec_court_referrals TO authenticated;
+DROP POLICY IF EXISTS cec_court_referrals_read ON public.presidential_cec_court_referrals;
+CREATE POLICY cec_court_referrals_read ON public.presidential_cec_court_referrals FOR SELECT TO authenticated USING (
+ private.is_game_member(game_id)
+ AND (private.is_game_teacher(game_id)
+ OR EXISTS (SELECT 1 FROM public.presidential_cec_complaints a
+     WHERE a.id=complaint_id AND (a.submitted_by=auth.uid()
+       OR EXISTS (SELECT 1 FROM public.presidential_candidates c WHERE c.id=candidate_id
+          AND (c.user_id=auth.uid() OR c.created_by=auth.uid())))))
+);
+
 ALTER TABLE public.presidential_cec_complaints ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.presidential_cec_complaints FROM PUBLIC,anon;
 GRANT SELECT ON public.presidential_cec_complaints TO authenticated;
@@ -88,6 +113,11 @@ BEGIN
   END IF;
   UPDATE public.presidential_candidates SET registration_status='withdrawn',updated_at=now()
    WHERE id=c.id;
+ END IF;
+ IF p_outcome='referred_court' THEN
+  INSERT INTO public.presidential_cec_court_referrals(complaint_id,game_id,candidate_id,case_number,referred_by)
+  VALUES(v_row.id,v_row.game_id,v_row.candidate_id,
+   'ВС-'||to_char(current_date,'YYYYMMDD')||'-'||substr(v_row.id::text,1,8),auth.uid());
  END IF;
  UPDATE public.presidential_cec_complaints SET status=p_outcome,resolution=btrim(p_reason),
   resolved_by=auth.uid(),resolved_at=now()
