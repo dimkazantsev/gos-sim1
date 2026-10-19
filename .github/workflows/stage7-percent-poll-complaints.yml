@@ -7,6 +7,7 @@ on:
       - 'components/game/PresidentialRulesCalculator.tsx'
       - 'components/game/PresidentialEarlyFinishDialog.tsx'
       - 'scripts/stage7-early-finalization-roles-check.cjs'
+      - 'scripts/editor-async-resilience-check.cjs'
       - 'supabase/migrations/20261020060000_presidential_early_teacher_finalization.sql'
       - 'app/stage7-election.css'
       - 'scripts/stage7-percent-poll-complaints-ui-check.cjs'
@@ -20,6 +21,7 @@ on:
       - 'components/game/PresidentialRulesCalculator.tsx'
       - 'components/game/PresidentialEarlyFinishDialog.tsx'
       - 'scripts/stage7-early-finalization-roles-check.cjs'
+      - 'scripts/editor-async-resilience-check.cjs'
       - 'supabase/migrations/20261020060000_presidential_early_teacher_finalization.sql'
       - 'app/stage7-election.css'
       - 'scripts/stage7-percent-poll-complaints-ui-check.cjs'
@@ -41,4 +43,5 @@ jobs:
       - run: node scripts/stage7-party-campaign-rights-check.cjs
       - run: node scripts/cec-registration-and-complaints-check.cjs
       - run: node scripts/presidential-calculator-resilience-check.cjs
+      - run: node scripts/editor-async-resilience-check.cjs
       - run: npm run typecheck
