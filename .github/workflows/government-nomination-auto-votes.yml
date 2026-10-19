@@ -1,0 +1,37 @@
+name: ГОС.ID · Автоматическое голосование по кандидатурам ГД
+on:
+  pull_request:
+    paths:
+      - 'components/game/GovernmentFormationWorkspace.tsx'
+      - 'app/stage-operations.css'
+      - 'supabase/migrations/20261020094000_government_nomination_auto_duma_vote.sql'
+      - 'scripts/government-nomination-auto-votes-check.cjs'
+      - '.github/workflows/government-nomination-auto-votes.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'components/game/GovernmentFormationWorkspace.tsx'
+      - 'app/stage-operations.css'
+      - 'supabase/migrations/20261020094000_government_nomination_auto_duma_vote.sql'
+      - 'scripts/government-nomination-auto-votes-check.cjs'
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: build-placeholder-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/government-nomination-auto-votes-check.cjs
+      - run: node scripts/gd-session-attendance-check.cjs
+      - run: node scripts/stage4-office-vote-auto-close-check.cjs
+      - run: node scripts/vote-office-grants-check.cjs
+      - run: node scripts/stage-decision-vote-document-chain-check.cjs
+      - run: node scripts/procedural-vote-auto-close-check.cjs
+      - run: npm run typecheck
