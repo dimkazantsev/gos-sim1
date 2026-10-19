@@ -295,3 +295,54 @@
   .legalPortal .registryCard{transition:none!important}
   .legalPortal .registryCard:hover{transform:none!important}
 }
+
+
+/* НПА: реквизиты и длинный статус не должны сталкиваться на планшетах и телефонах. */
+.legalPortal .registryCardHead{
+  display:flex!important;
+  align-items:flex-start!important;
+  flex-wrap:wrap!important;
+  column-gap:14px!important;
+  row-gap:10px!important;
+  min-width:0!important
+}
+.legalPortal .registryCardIdentity{
+  flex:1 1 150px!important;
+  min-width:0!important;
+  overflow-wrap:anywhere!important
+}
+.legalPortal .registryCardIdentity>span,
+.legalPortal .registryCardIdentity>small{
+  display:block!important;
+  max-width:100%!important;
+  overflow-wrap:anywhere!important;
+  white-space:normal!important
+}
+.legalPortal .registryCardHead>.formalStatus{
+  flex:0 1 auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+  text-align:left!important
+}
+@media(max-width:850px){
+ .legalPortal .registryCardHead{
+   display:grid!important;
+   grid-template-columns:minmax(0,1fr)!important;
+   gap:9px!important
+ }
+ .legalPortal .registryCardIdentity{flex:none!important}
+ .legalPortal .registryCardHead>.formalStatus{
+   justify-self:start!important;
+   width:auto!important;
+   max-width:100%!important;
+   line-height:1.45!important
+ }
+}
+@media(max-width:480px){
+ .legalPortal .registryCardHead{gap:8px!important}
+ .legalPortal .registryCardIdentity>span{font-size:11px!important}
+ .legalPortal .registryCardHead>.formalStatus{font-size:10px!important;padding:7px 9px!important}
+}
