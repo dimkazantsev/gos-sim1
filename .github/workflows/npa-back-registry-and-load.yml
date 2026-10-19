@@ -1,0 +1,33 @@
+name: ГОС.ID · Возврат к реестру НПА и загрузка карточки
+on:
+  pull_request:
+    paths:
+      - 'components/game/DocumentsView.tsx'
+      - 'app/2026-npa-workspace-canonical.css'
+      - 'scripts/npa-back-navigation-load-browser-check.cjs'
+      - '.github/workflows/npa-back-registry-and-load.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'components/game/DocumentsView.tsx'
+      - 'app/2026-npa-workspace-canonical.css'
+      - 'scripts/npa-back-navigation-load-browser-check.cjs'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: build-placeholder-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/npa-back-navigation-load-browser-check.cjs
+      - run: npm run design:preview
+      - run: node scripts/npa-toolbar-alignment-browser-check.cjs
+      - run: node scripts/npa-card-header-mobile-browser-check.cjs
+      - run: npm run typecheck
