@@ -64,6 +64,8 @@ const setup=[
   assert.equal(accepted.status,'accepted');assert.equal(accepted.note,'Принят ранее');assert.equal(accepted.file_name,'consent.pdf');
   assert.equal(other.status,'submitted');assert.equal(other.note,'Без замечаний');assert.equal(other.file_name,'income.pdf');
   assert.equal(fixed.status,'submitted');assert.equal(fixed.is_submitted,true);assert(fixed.file_name.startsWith('corrected-'));
+  await assert.rejects(()=>db.query('SELECT public.submit_presidential_candidate_to_cec($1)',[candidate]),/Candidate dossier owner access required/);
+  await login(owner);
   await assert.rejects(()=>db.query('SELECT public.submit_presidential_candidate_to_cec($1)',[candidate]),/Нет исправленных документов/);
   const version=(await db.query('SELECT cec_submission_version FROM presidential_candidates WHERE id=$1',[candidate])).rows[0].cec_submission_version;
   assert.equal(version,2);
