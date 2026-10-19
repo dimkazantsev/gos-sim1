@@ -10,6 +10,7 @@ assert(memberFn&&photoFn,'Both candidate authorization and photo RPC required');
 assert(sql.includes('CREATE POLICY gos_party_candidate_photo_upload'),'Storage insertion policy required');
 assert(sql.includes('CREATE POLICY gos_party_presidential_candidate_read'),'Same-party candidate drafts must be visible');
 assert(sql.includes('CREATE POLICY gos_party_presidential_documents_read'),'Same-party documents must be readable');
+assert(sql.includes('CREATE POLICY gos_party_presidential_program_read'),'Programme completeness is visible only to the nominating party');
 assert(sql.includes('presidential_candidates.party_id')&&sql.includes('presidential_candidate_documents.game_id'),'RLS scoped to the exact party, candidate and game');
 assert(sql.includes("c.registration_status<>'registered'"),'Registered candidate files are immutable');
 assert(sql.includes("split_part(name,'/',3)"),'Storage upload is bound to candidate');
