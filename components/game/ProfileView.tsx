@@ -54,6 +54,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  const [saving,setSaving]=useState(false),[saved,setSaved]=useState(false),[showMyJournal,setShowMyJournal]=useState(false),[comicOpen,setComicOpen]=useState(false);
  const [comicView,setComicView]=useState<'intro'|'archive'>('intro');
  const [publicScores,setPublicScores]=useState<PublicAssessment[]>([]);
+ const [scoresLoaded,setScoresLoaded]=useState(false);
  const [publicStats,setPublicStats]=useState<PublicStats|null>(null);
  const photoInput=useRef<HTMLInputElement>(null);
  const initials=useMemo(()=>target?.full_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()||'Я',[target?.full_name]);
@@ -74,11 +75,24 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
 
 
  useEffect(()=>{
-  if(!game||!target)return;
-  let valid=true;
-  void supabase.rpc('get_public_stage_scores',{p_game_id:game.id})
-   .then(r=>{if(valid)setPublicScores(((r.data||[]) as (PublicAssessment & {user_id:string})[]).filter(a=>a.user_id===target.user_id))});
-  return()=>{valid=false};
+  const gameId=game?.id,userId=target?.user_id;
+  if(!gameId||!userId){setPublicScores([]);setScoresLoaded(false);return}
+  let active=true,request=0;
+  setPublicScores([]);setScoresLoaded(false);
+  async function updatePublicScores(){
+   const current=++request;
+   const r=await supabase.rpc('get_public_stage_scores',{p_game_id:gameId});
+   if(!active||current!==request)return;
+   if(!r.error){
+    setPublicScores(((r.data||[]) as (PublicAssessment & {user_id:string})[]).filter(a=>a.user_id===userId));
+    setScoresLoaded(true);
+   }
+  }
+  void updatePublicScores();
+  const channel=supabase.channel('profile-scores:'+gameId+':'+userId)
+   .on('postgres_changes',{event:'*',schema:'public',table:'stage_assessments',filter:'user_id=eq.'+userId},()=>void updatePublicScores())
+   .subscribe();
+  return()=>{active=false;void supabase.removeChannel(channel)};
  },[game?.id,target?.user_id]);
  useEffect(()=>{
   if(!game||!target||previewAchievementsUserId)return;
@@ -88,8 +102,11 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
   return()=>{active=false};
  },[game?.id,target?.user_id,previewAchievementsUserId]);
  if(!me||!target)return null;
- const counted=publicScores.map(s=>s.status==='final'?(s.final_score??s.auto_score):s.auto_score);
- const avg=counted.length?counted.reduce((a,b)=>a+b,0)/counted.length:null;
+ // Exactly the same stage scores used by the journal's Σ column:
+ // one score per stage; the approved teacher score replaces its draft.
+ const counted=publicScores.map(s=>Number(s.status==='final'?(s.final_score??s.auto_score):s.auto_score)).filter(Number.isFinite);
+ const scoreTotal=counted.reduce((sum,score)=>sum+score,0);
+ const scoreTotalLabel=scoresLoaded?new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(scoreTotal):'—';
  const numberOfPosts=politicalPosts.filter(p=>p.author_id===target.user_id).length;
  const numberOfVotes=ballots.filter(b=>b.voter_id===target.user_id).length;
  const numberOfDocuments=formalDocuments.filter(d=>d.author_id===target.user_id).length;
@@ -145,7 +162,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
      <span>{target.kind==='teacher'?'Преподаватель':target.kind==='observer'?'Гость':'Участник'}</span>
      {target.kind==='student'&&target.group_name&&<span>Группа: {target.group_name}</span>}
      {partyChairTitle&&<span>{partyChairTitle}</span>}
-      {target.kind==='student'&&<span>ВСН {avg!==null?avg.toFixed(2):'—'}</span>}
+      {target.kind==='student'&&<span title="Сумма оценок по этапам: утверждённые преподавателем и текущие черновые">Всего баллов: {scoreTotalLabel}</span>}
      {allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}
     </div>
     <div className="profileHeroControls">
@@ -191,7 +208,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
     ].map(([label,value])=><article key={label}><strong>{value??'—'}</strong><span>{label}</span></article>)}
    </section>
    <section className="profilePublicBiography surface"><h2>Игровая визитка</h2><p>{targetProfile?.bio||'Игрок пока не добавил описание.'}</p></section>
-   {target.kind==='student'&&<section className="surface profilePublicScores"><header><h2>Публичные баллы по этапам</h2><strong>{avg===null?'—':avg.toFixed(2)}</strong></header>
+   {target.kind==='student'&&<section className="surface profilePublicScores"><header><h2>Публичные баллы по этапам</h2><strong aria-label={'Сумма баллов: '+scoreTotalLabel}>{scoreTotalLabel}</strong></header>
     <div className="profileScoreCells">{Array.from({length:16},(_,i)=>{const row=publicScores.find(s=>s.stage_no===i+1);return <div key={i} className={row?.status||'empty'}><small>{i+1}</small><b>{row?(row.status==='final'?row.final_score??row.auto_score:row.auto_score):'—'}</b></div>})}</div>
     <p>Показаны только публичные результаты. Тексты, личные обоснования и внутренние материалы оценки не раскрываются.</p>
    </section>}
@@ -227,7 +244,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
      </div>:own&&pendingInvites.length?<div className="profileInviteNote"><b>У вас {pendingInvites.length} приглашение(я) в партию.</b><span>Откройте раздел «Партии», чтобы принять или отклонить.</span></div>:<div className="emptyState">Партия пока не указана.</div>}
     <div className="profilePositionDivider"/>
     <div className="surfaceHead"><div><small>ИГРОВАЯ ПОЗИЦИЯ</small><h2>Роль в Республике</h2></div></div>
-    <dl><div><dt>Партия</dt><dd>{target.team||'Не назначена'}</dd></div>{partyChairTitle&&<div><dt>Партийная должность</dt><dd>{partyChairTitle}</dd></div>}<div><dt>Должность</dt><dd>{target.role_title||'Не назначена'}</dd></div>{target.kind==='student'&&<div><dt>ВСН</dt><dd>{avg===null?'—':avg.toFixed(2)}</dd></div>}</dl>
+    <dl><div><dt>Партия</dt><dd>{target.team||'Не назначена'}</dd></div>{partyChairTitle&&<div><dt>Партийная должность</dt><dd>{partyChairTitle}</dd></div>}<div><dt>Должность</dt><dd>{target.role_title||'Не назначена'}</dd></div>{target.kind==='student'&&<div><dt>Сумма баллов</dt><dd>{scoreTotalLabel}</dd></div>}</dl>
     {targetProfile?.bio&&<div className="profileBioPreview"><small>Описание</small><p>{targetProfile.bio}</p></div>}
    </aside>
   </section>
