@@ -3,6 +3,10 @@ const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 const sql=fs.readFileSync('supabase/migrations/20261020083000_restore_approved_event_330_routing_after_duma.sql','utf8');
 const css=fs.readFileSync('app/2026-npa-registry-canonical.css','utf8');
+const collective=fs.readFileSync('supabase/migrations/20261020083100_event_collective_active_students_dispatch.sql','utf8');
+assert(collective.includes("c.destination=''federal_collective'' or"));
+assert(collective.includes('gm.roster_archived_at is null'));
+assert(collective.includes("if c.destination=''federal_collective'' and n<2"));
 assert(sql.includes('duma_not_elected'));
 assert(sql.includes("e.status=''adopted''"));
 assert(sql.includes("status=''active''"));
@@ -22,6 +26,7 @@ try{
  CREATE SCHEMA private;
  CREATE TABLE private.authored_event_catalog(case_key text PRIMARY KEY);
  CREATE TABLE public.games(id uuid PRIMARY KEY);
+ CREATE TABLE public.game_members(user_id uuid PRIMARY KEY,game_id uuid,kind text,role_title text,roster_archived_at timestamptz);
  CREATE TABLE public.event_cases(id uuid PRIMARY KEY,game_id uuid,case_key text,audience text,status text);
  CREATE TABLE public.fiscal_region_reference(code text PRIMARY KEY);
  CREATE TABLE public.event_case_routing(game_id uuid,case_id uuid,earliest_stage integer,latest_stage integer,region_code text,destination text,requires_office boolean,competent_org text,PRIMARY KEY(game_id,case_id));
@@ -48,6 +53,13 @@ try{
  assert.equal((await db.query('SELECT private.ensure_event_case_routing($1) added',[game])).rows[0].added,0,'Second execution must be idempotent');
  assert.equal((await db.query('SELECT private.ensure_event_case_routing($1) added',[other])).rows[0].added,0,'Unknown game must not be seeded');
  assert.equal((await db.query('SELECT count(*)::int n FROM public.event_case_routing')).rows[0].n,330);
- console.log('PASS: 330 signed routes, 113 region-specific, competencies, stage >=6, isolation, idempotency, NPA responsive style');
+ const members=Array.from({length:41},(_,i)=>[id(2000+i),game,'student',i===0?'Депутат Государственной Думы':'Без назначения',i===40?'2026-10-18T00:00:00Z':null]);
+ for(const member of members)await db.query('INSERT INTO game_members VALUES($1,$2,$3,$4,$5)',member);
+ const collectiveRecipients=(await db.query("SELECT count(*)::int n FROM game_members WHERE game_id=$1 AND kind='student' AND roster_archived_at IS NULL AND ($2='federal_collective' OR role_title ILIKE '%депутат%')",[game,'federal_collective'])).rows[0].n;
+ const directRecipients=(await db.query("SELECT count(*)::int n FROM game_members WHERE game_id=$1 AND kind='student' AND roster_archived_at IS NULL AND ($2='federal_collective' OR role_title ILIKE '%депутат%')",[game,'individual'])).rows[0].n;
+ assert.equal(collectiveRecipients,40,'whole active audience includes all 40');
+ assert.equal(directRecipients,1,'individual legal duty only for competent deputy');
+
+ console.log('PASS: 330 signed routes, 113 region-specific, competencies, stage >=6, 40 active collective / 1 competent direct, isolation, idempotency, NPA responsive style');
 }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
