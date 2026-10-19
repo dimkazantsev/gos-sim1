@@ -320,8 +320,8 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
          <textarea rows={2} maxLength={4000} value={docReviewNotes[doc.id]??doc.note??''} onChange={e=>setDocReviewNotes(v=>({...v,[doc.id]:e.target.value}))} placeholder="Укажите, какие сведения необходимо исправить или дополнить"/>
         </label>
         <div className="cecDocumentReviewerActions">
-         <button type="button" disabled={busy} onClick={()=>void reviewCandidateDoc(doc,'accepted')}>Принять документ</button>
-         <button type="button" className="returnForRevision" disabled={busy||!(docReviewNotes[doc.id]??doc.note??'').trim()} onClick={()=>void reviewCandidateDoc(doc,'revision')}>Вернуть документ на доработку</button>
+         <button type="button" disabled={busy||c.registration_status==='registered'||c.registration_status==='rejected'||c.registration_status==='withdrawn'} onClick={()=>void reviewCandidateDoc(doc,'accepted')}>Принять документ</button>
+         <button type="button" className="returnForRevision" disabled={busy||c.registration_status==='registered'||c.registration_status==='rejected'||c.registration_status==='withdrawn'||!(docReviewNotes[doc.id]??doc.note??'').trim()} onClick={()=>void reviewCandidateDoc(doc,'revision')}>Вернуть документ на доработку</button>
         </div>
        </article>)}</div>}
       <p className="cecDocumentAccessNote">Статусы и замечания к документам сохраняются в досье партии. Для официального возврата всего пакета выпустите решение ЦИК «На доработку» ниже.</p>
