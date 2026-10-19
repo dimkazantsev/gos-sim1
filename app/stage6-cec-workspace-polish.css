@@ -1,0 +1,300 @@
+/* ГОС.ID — Stage 6, CEC: nominations, dossiers, document checks, decisions.
+   Scoped to #stage6-cec so election results and other institutions are unchanged. */
+#stage6-cec.cecWorkspace{
+  --cec-ink:#102b54;
+  --cec-muted:#647996;
+  --cec-line:#dbe5f4;
+  --cec-blue:#315ee9;
+  --cec-surface:#fff;
+  --cec-soft:#f5f8fe;
+  display:grid;
+  gap:14px;
+  min-width:0;
+  container:cec-stage6/inline-size;
+  padding:0;
+  color:var(--cec-ink);
+}
+#stage6-cec.cecWorkspace *,#stage6-cec.cecWorkspace *::before,#stage6-cec.cecWorkspace *::after{box-sizing:border-box}
+#stage6-cec .cecHead{
+  min-width:0;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:20px 22px;border:1px solid var(--cec-line);border-radius:20px;
+  background:linear-gradient(112deg,#fff 0%,#f4f7ff 100%);
+  box-shadow:0 5px 22px rgba(20,50,100,.04);
+}
+#stage6-cec .cecHead>div:first-child{min-width:0;flex:1}
+#stage6-cec .cecHead small{font-size:10px;font-weight:850;letter-spacing:.1em;color:#3d62b2}
+#stage6-cec .cecHead h2{margin:4px 0 8px;color:var(--cec-ink);font-size:clamp(19px,2vw,23px);line-height:1.27;letter-spacing:-.025em}
+#stage6-cec .cecHead p{font-size:13px;line-height:1.58;color:var(--cec-muted);max-width:88ch}
+#stage6-cec .cecHeadSide{flex:none;display:flex;align-items:center;gap:10px;min-width:0}
+#stage6-cec .cecHeadSide img{width:54px;height:54px;object-fit:contain;flex:none}
+#stage6-cec .cecHeadSide div{max-width:175px}
+#stage6-cec .cecHeadSide b{font-size:12px;line-height:1.4;font-weight:800}
+#stage6-cec .cecHeadSide span{font-size:11px;color:var(--cec-muted)}
+
+#stage6-cec .cecTabs{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;
+  min-width:0;margin:0;padding:7px;
+  border:1px solid var(--cec-line);border-radius:17px;
+  background:#f2f5fb;box-shadow:none;
+}
+#stage6-cec .cecTabs button{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;min-width:0;min-height:46px;
+  padding:9px 12px;margin:0;border:1px solid transparent;border-radius:12px;
+  background:transparent;color:#546c91;font-size:13px;font-weight:750;
+  line-height:1.3;white-space:normal;text-align:center;box-shadow:none;
+  transition:background-color .16s,border-color .16s,color .16s;
+}
+#stage6-cec .cecTabs button:hover{background:#fff;color:#244eaa}
+#stage6-cec .cecTabs button.active{
+  background:#fff;border-color:#e7edf9;color:#163c83;
+  box-shadow:0 3px 13px rgba(37,68,117,.075);
+}
+#stage6-cec .cecTabs button b{
+  display:inline-flex;align-items:center;justify-content:center;flex:none;
+  min-width:24px;height:24px;padding:0 6px;border-radius:99px;
+  background:#e6edf9;color:#5575a8;font-size:11px;font-weight:850;
+}
+#stage6-cec .cecTabs button.active b{background:#e5edff;color:#315ee9}
+#stage6-cec :is(button,input,select,textarea,summary,a):focus-visible{
+  outline:3px solid #a8c1fa;outline-offset:2px;
+}
+#stage6-cec .cecSystemGate{
+  display:flex;align-items:center;gap:9px;justify-content:flex-start;min-width:0;
+  padding:11px 14px;border:1px solid #cbdaf3;border-radius:14px;
+  background:#f3f7ff;color:#375b91;box-shadow:none;
+}
+#stage6-cec .cecSystemGate::before{content:"i";display:grid;place-items:center;flex:none;width:21px;height:21px;border-radius:50%;background:#e0eaff;color:#4168bc;font-size:12px;font-weight:900;font-style:normal}
+#stage6-cec .cecSystemGate b{font-size:12px;font-weight:800;line-height:1.5;color:#294f8b}
+#stage6-cec .cecSystemGate span{max-width:none;text-align:left;color:#5b7295;font-size:12px;line-height:1.5}
+#stage6-cec .electionSystemStatusCard{
+  min-width:0;border:1px solid #d2e0f5;border-radius:16px;
+  background:#f5f9ff;box-shadow:none;overflow:hidden;
+}
+
+/* Nomination: one elegant card, compact title and consistent controls. */
+#stage6-cec details.candidateNomination{
+  min-width:0;margin:0;border:1px solid var(--cec-line);border-radius:18px;
+  background:var(--cec-surface);box-shadow:0 6px 22px rgba(16,49,96,.045);
+  overflow:hidden;
+}
+#stage6-cec details.candidateNomination>summary{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:16px 19px;min-height:72px;cursor:pointer;list-style:none;
+  background:linear-gradient(180deg,#fff,#fafcff);
+  border-bottom:1px solid transparent;
+}
+#stage6-cec details.candidateNomination>summary::-webkit-details-marker{display:none}
+#stage6-cec details.candidateNomination[open]>summary{border-bottom-color:#e6edf8}
+#stage6-cec details.candidateNomination>summary>div{min-width:0;display:grid;gap:4px}
+#stage6-cec details.candidateNomination>summary b{font-size:15px;color:var(--cec-ink);font-weight:820;line-height:1.3}
+#stage6-cec details.candidateNomination>summary span{font-size:12px;color:var(--cec-muted);line-height:1.5}
+#stage6-cec details.candidateNomination>summary i{
+  display:grid;place-items:center;flex:none;width:36px;height:36px;
+  background:#eff4ff;border:1px solid #d9e5fa;border-radius:11px;
+  color:var(--cec-blue);font:600 22px/1 system-ui;font-style:normal;
+  transform:rotate(0deg);transition:transform .16s,background-color .16s;
+}
+#stage6-cec details.candidateNomination[open]>summary i{transform:rotate(45deg)}
+#stage6-cec .candidateNominationBody{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;
+  padding:18px 19px 20px;min-width:0;
+}
+#stage6-cec .candidateNominationBody>label{
+  display:grid;align-content:start;gap:7px;min-width:0;
+  font-size:12px;line-height:1.45;font-weight:780;color:#526b90;
+}
+#stage6-cec .candidateNominationBody>label.candidateProgram{grid-column:1/-1}
+#stage6-cec .candidateNominationBody :is(input,select,textarea),
+#stage6-cec .candidateDossierBody :is(input:not([type=file]),select,textarea),
+#stage6-cec .candidateReview :is(input,select,textarea){
+  display:block;max-width:100%;width:100%;min-width:0;
+  border:1px solid #cbd9ee;border-radius:12px;
+  padding:11px 13px;background:#fff;color:var(--cec-ink);
+  font-size:14px;font-weight:560;line-height:1.45;box-shadow:none;
+}
+#stage6-cec .candidateNominationBody :is(input,select){min-height:45px;height:45px}
+#stage6-cec .candidateNominationBody textarea{
+  min-height:104px;height:auto;resize:vertical;line-height:1.56;font-weight:500;
+}
+#stage6-cec .candidateNominationBody .candidateProgram:first-of-type textarea{min-height:152px}
+#stage6-cec :is(input,select,textarea)::placeholder{color:#91a1b9;opacity:1;font-weight:480}
+#stage6-cec .candidateNominationBody>.primary{
+  grid-column:1/-1;justify-self:end;width:auto;min-width:216px;
+  min-height:44px;padding:10px 19px;border-radius:11px;
+  font-size:13px;font-weight:800;
+}
+#stage6-cec button.primary,
+#stage6-cec button.cecSubmitPackage{
+  background:linear-gradient(180deg,#3d6df8 0%,#315ee9 100%);
+  color:#fff;border:1px solid #305de9;box-shadow:0 5px 14px rgba(49,94,233,.13);
+}
+#stage6-cec button.primary:hover:not(:disabled){filter:brightness(1.04)}
+#stage6-cec button:disabled{cursor:not-allowed;opacity:.56}
+
+/* Dossiers, submitted candidates and CEC decisions: one design language. */
+#stage6-cec .candidateGrid{display:grid;grid-template-columns:minmax(0,1fr);gap:13px;min-width:0}
+#stage6-cec .candidateGrid>.emptyState,
+#stage6-cec .cecDecisionRegistry>.emptyState{
+  padding:22px;border:1px dashed #ccdaec;border-radius:15px;
+  background:#f8fbff;color:#6c7f9c;text-align:center;font-size:13px;
+}
+#stage6-cec .candidateCard{
+  min-width:0;padding:0;border:1px solid var(--cec-line);border-radius:18px;
+  background:#fff;box-shadow:0 5px 22px rgba(16,49,96,.045);overflow:hidden;
+}
+#stage6-cec .candidateCard>header{
+  display:flex;gap:12px;align-items:center;justify-content:space-between;
+  padding:16px 18px;background:#f8faff;border-bottom:1px solid #e7edf7;
+  min-width:0;
+}
+#stage6-cec .candidateCard>header>div:nth-child(2){min-width:0;flex:1}
+#stage6-cec .candidateCard>header h3{font-size:16px;margin:2px 0;line-height:1.35;overflow-wrap:anywhere;color:var(--cec-ink)}
+#stage6-cec .candidateCard>header small{font-size:11px;color:var(--cec-muted)}
+#stage6-cec .candidateAvatar{
+  width:45px;height:45px;flex:none;display:grid;place-items:center;
+  border-radius:14px;border:1px solid #d7e4fa;background:#edf3ff;
+  color:#345fb5;font-size:13px;font-weight:850;
+}
+#stage6-cec .candidateHeaderActions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+#stage6-cec .candidateHeaderActions>span{border-radius:99px;padding:6px 10px;background:#e9f0fc;color:#416594;font-size:11px;font-weight:800}
+#stage6-cec :is(.candidateProgramText,.candidateCampaignText){
+  margin:12px 18px 0;padding:12px 14px;border:1px solid #e2eaf6;border-radius:12px;
+  background:#fafcff;font-size:13px;line-height:1.6;overflow-wrap:anywhere;
+}
+#stage6-cec .candidateCampaignText b{display:block;margin-bottom:4px;color:#214c87}
+#stage6-cec .candidateAudit{
+  display:flex;flex-wrap:wrap;gap:8px;padding:13px 18px;margin:0;
+  color:var(--cec-muted);font-size:12px;
+}
+#stage6-cec .candidateAudit>span{
+  padding:7px 10px;background:#f5f8fd;border:1px solid #e7edf6;border-radius:10px;
+}
+#stage6-cec .candidateAudit b{color:var(--cec-ink)}
+#stage6-cec .cecCandidateDecision{margin:12px 18px 0;border-radius:12px;border:1px solid #d3e7df;padding:13px;background:#f3fbf8;min-width:0}
+#stage6-cec :is(.candidateDossier,.cecSubmissionPanel,.candidateReview){
+  display:block;min-width:0;margin:0 18px 16px;border:1px solid #dce5f3;
+  border-radius:15px;background:#fff;overflow:hidden;
+}
+#stage6-cec .candidateDossier>summary{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:62px;padding:13px 16px;background:#f5f8fd;cursor:pointer;list-style:none;
+}
+#stage6-cec .candidateDossier>summary::-webkit-details-marker{display:none}
+#stage6-cec .candidateDossier>summary>div{min-width:0}
+#stage6-cec .candidateDossier>summary b{font-size:13px;font-weight:850;color:#244b85}
+#stage6-cec .candidateDossier>summary span{font-size:11px;line-height:1.4;color:var(--cec-muted)}
+#stage6-cec .candidateDossier>summary>strong{
+  flex:none;font-size:12px;color:#325cb1;padding:6px 8px;background:#e8efff;border-radius:8px;
+}
+#stage6-cec .candidateDossierBody{display:grid;gap:13px;padding:14px;min-width:0}
+#stage6-cec :is(.candidatePhotoBlock,.candidateProgramPoints,.candidateDocPack,.candidatePrivateProfile,.candidateSelfSupport){
+  min-width:0;margin:0;border:1px solid #e0e8f3;border-radius:14px;
+  background:#fcfdff;padding:14px;box-shadow:none;
+}
+#stage6-cec .candidateDossierBody :is(header,header>div){min-width:0}
+#stage6-cec .candidateDossierBody header small{font-size:10px;letter-spacing:.08em;color:#4671b8;font-weight:850}
+#stage6-cec .candidateDossierBody header h4{margin:3px 0;font-size:14px;line-height:1.35;color:#173a70}
+#stage6-cec .candidateDossierBody header p{font-size:12px;line-height:1.55;color:var(--cec-muted)}
+#stage6-cec :is(.candidatePointComposer,.candidatePrivateGrid){min-width:0}
+#stage6-cec .cecDocumentChecklist{display:grid;gap:9px}
+#stage6-cec .cecDocumentItem{
+  min-width:0;margin:0;border:1px solid #dfe8f3;border-radius:12px;
+  background:#fff;overflow:hidden;
+}
+#stage6-cec .cecDocumentUploadTarget{
+  display:grid;grid-template-columns:36px minmax(0,1fr) auto;
+  gap:11px;align-items:center;min-width:0;cursor:pointer;
+  padding:11px 12px;
+}
+#stage6-cec .cecDocumentState{
+  display:grid;place-items:center;width:35px;height:35px;border-radius:10px;
+  background:#eef3fb;color:#5c769d;font-size:13px;font-weight:850;
+}
+#stage6-cec .cecDocumentItem.ok .cecDocumentState{background:#e9f6f0;color:#13805a}
+#stage6-cec .cecDocumentItem.issues .cecDocumentState{background:#fff0ef;color:#b64b40}
+#stage6-cec .cecDocumentCopy{min-width:0}
+#stage6-cec .cecDocumentCopy b{display:block;font-size:12px;color:var(--cec-ink);line-height:1.5;overflow-wrap:anywhere}
+#stage6-cec .cecDocumentCopy small{display:block;font-size:11px;color:var(--cec-muted);line-height:1.4}
+#stage6-cec .cecDocumentUploadTarget>strong{
+  border:1px solid #d5e1f4;border-radius:10px;background:#fff;color:#315da5;
+  padding:9px 12px;font-size:12px;font-weight:800;white-space:nowrap;
+}
+#stage6-cec .cecDocumentItem:hover .cecDocumentUploadTarget>strong{background:#edf3ff}
+#stage6-cec .cecDocumentDetails{padding:11px 13px;border-top:1px solid #e6edf7;min-width:0}
+#stage6-cec :is(.cecDocumentFileLine,.cecDocumentDetails a){overflow-wrap:anywhere;min-width:0}
+#stage6-cec :is(.cecSubmissionPanel,.candidateReview){padding:14px}
+#stage6-cec .cecSubmissionPanel>header{display:flex;gap:9px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+#stage6-cec .cecSubmissionProgress{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+#stage6-cec .cecSubmissionProgress>span{font-size:11px;border-radius:9px;background:#f1f5fc;border:1px solid #e0e8f5;padding:7px 9px}
+#stage6-cec .cecSubmitPackage{min-height:43px;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:800}
+#stage6-cec .cecAutoReview{margin-top:11px;border-radius:12px;min-width:0;overflow:hidden}
+#stage6-cec .candidateReview button{min-height:40px;border-radius:10px}
+#stage6-cec .cecDecisionRegistry{
+  min-width:0;padding:0;margin:0;border:1px solid var(--cec-line);
+  border-radius:18px;background:#fff;overflow:hidden;
+}
+#stage6-cec .cecDecisionRegistry>header{
+  display:flex;gap:12px;justify-content:space-between;align-items:center;
+  padding:16px 18px;background:#f7faff;border-bottom:1px solid #e6edf7;
+}
+#stage6-cec .cecDecisionRegistry>header small{font-size:10px;color:#426db3;letter-spacing:.08em;font-weight:850}
+#stage6-cec .cecDecisionRegistry>header h3{margin:3px 0;font-size:16px;color:var(--cec-ink)}
+#stage6-cec .cecDecisionRegistry>header>span{font-size:11px;color:#58749a}
+#stage6-cec .cecDecisionRegistry>.emptyState{margin:13px}
+#stage6-cec .cecDecision{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:15px;min-width:0;
+  margin:11px 14px;padding:14px;border:1px solid #e0e8f3;border-radius:13px;
+  background:#fff;
+}
+#stage6-cec .cecDecision>div{min-width:0}
+#stage6-cec .cecDecision h4{margin:5px 0;font-size:14px;color:var(--cec-ink)}
+#stage6-cec .cecDecision p{margin:5px 0;font-size:12px;color:#536b8e;line-height:1.5;overflow-wrap:anywhere}
+#stage6-cec .cecDecision>strong{
+  flex:none;padding:6px 9px;border-radius:9px;background:#eef3fc;
+  font-size:11px;color:#3d619b;
+}
+#stage6-cec .cecDecision.rejected>strong{background:#ffedf0;color:#ac3e55}
+#stage6-cec .cecDecision.registered>strong{background:#e8f6ee;color:#177a52}
+#stage6-cec .cecDocumentOpen,#stage6-cec .cecCredentialOpen{
+  min-height:38px;padding:8px 12px;border:1px solid #d5e1f4;border-radius:10px;
+  background:#fff;color:#315ca6;font-size:12px;font-weight:780;
+}
+#stage6-cec .cecDocumentOpen:hover,#stage6-cec .cecCredentialOpen:hover{background:#f0f5ff}
+
+@container cec-stage6 (max-width:920px){
+  #stage6-cec .candidateNominationBody{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #stage6-cec .cecHeadSide>div{display:none}
+}
+@container cec-stage6 (max-width:700px){
+  #stage6-cec .cecTabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #stage6-cec .candidateNominationBody{grid-template-columns:minmax(0,1fr)}
+  #stage6-cec .cecHead{padding:17px}
+  #stage6-cec .cecDecisionRegistry>header{flex-wrap:wrap}
+}
+@container cec-stage6 (max-width:490px){
+  #stage6-cec.cecWorkspace{gap:10px}
+  #stage6-cec .cecHead{padding:15px}
+  #stage6-cec .cecHeadSide{display:none}
+  #stage6-cec .cecTabs{gap:5px;padding:5px;border-radius:14px}
+  #stage6-cec .cecTabs button{min-height:42px;padding:7px 6px;font-size:12px;gap:5px}
+  #stage6-cec .cecTabs button b{min-width:21px;height:21px;padding:0 5px;font-size:10px}
+  #stage6-cec .cecSystemGate{align-items:flex-start;flex-wrap:wrap;padding:10px 12px}
+  #stage6-cec .cecSystemGate span{width:100%;padding-left:30px}
+  #stage6-cec details.candidateNomination>summary{padding:14px 15px}
+  #stage6-cec .candidateNominationBody{padding:14px;gap:12px}
+  #stage6-cec .candidateNominationBody>.primary{justify-self:stretch;width:100%;min-width:0}
+  #stage6-cec .candidateCard>header{padding:12px;gap:9px;flex-wrap:wrap}
+  #stage6-cec .candidateHeaderActions{width:100%;justify-content:flex-start}
+  #stage6-cec .candidateAudit{padding:10px 12px}
+  #stage6-cec :is(.candidateDossier,.cecSubmissionPanel,.candidateReview){margin:0 10px 11px}
+  #stage6-cec .candidateDossierBody{padding:10px}
+  #stage6-cec :is(.candidatePhotoBlock,.candidateProgramPoints,.candidateDocPack,.candidatePrivateProfile,.candidateSelfSupport){padding:10px}
+  #stage6-cec .cecDocumentUploadTarget{grid-template-columns:30px minmax(0,1fr);gap:9px;padding:9px}
+  #stage6-cec .cecDocumentState{width:29px;height:29px}
+  #stage6-cec .cecDocumentUploadTarget>strong{grid-column:2;justify-self:start;padding:7px 10px}
+  #stage6-cec .cecDecision{margin:8px;padding:11px;flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){
+  #stage6-cec .cecTabs button,#stage6-cec details.candidateNomination>summary i{transition:none}
+}
