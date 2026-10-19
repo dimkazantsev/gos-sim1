@@ -12,7 +12,7 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
 '<header class="electionLabHead cecHead"><div><small>ЦИК РФ · ЭТАП 6</small><h2>Выдвижение и регистрация кандидатов</h2><p>Кандидаты готовят программу, документы для ЦИК и подают регистрационные пакеты на шестом этапе.</p></div><div class="cecHeadSide">Центральная избирательная комиссия</div></header>',
 '<nav class="cecTabs" aria-label="Разделы работы ЦИК"><button class="active" aria-pressed="true">Моё досье</button><button aria-pressed="false">Подача в ЦИК <b>0</b></button><button aria-pressed="false">Кандидаты <b>0</b></button><button aria-pressed="false">Решения ЦИК <b>0</b></button></nav>',
 '<div class="cecSystemGate" role="status"><b>Избирательная система выбирается студентами.</b><span>Выдвижение и подача документов в ЦИК доступны независимо от итогов голосования.</span></div>',
-'<details class="candidateNomination" open><summary><div><b>Выдвинуть кандидата</b><span>Партия может иметь одного активного кандидата.</span></div><i>+</i></summary><div class="candidateNominationBody">',
+'<details class="candidateNomination" open><summary><div><b>Выдвинуть кандидата</b><span>Партия может иметь одного активного кандидата.</span></div><span class="candidateNominationToggle" aria-hidden="true"></span></summary><div class="candidateNominationBody">',
 '<label>Партия<select><option>Самовыдвижение / сценарный кандидат</option></select></label>',
 '<label>Участник<select><option>Не привязывать к участнику</option></select></label>',
 '<label>Имя в бюллетене<input placeholder="Имя кандидата"></label>',
@@ -31,30 +31,50 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
  try{
   for(const width of [320,360,390,430,490,600,700,768,900,1024,1440]){
    const page=await browser.newPage({viewport:{width,height:1000}});
+   await page.emulateMedia({reducedMotion:'reduce'});
    await page.setContent(h,{waitUntil:'load'});
    const s=await page.evaluate(()=>{
-    const root=document.querySelector('#stage6-cec'),rect=e=>{const b=e.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,right:b.right,bottom:b.bottom}};
+    const root=document.querySelector('#stage6-cec'),rect=e=>{const b=e.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,h:b.height,right:b.right,bottom:b.bottom}};
     return {screen:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
      root:rect(root),tabs:[...root.querySelectorAll('.cecTabs button')].map(rect),
      fields:[...root.querySelectorAll('.candidateNominationBody>label')].slice(0,3).map(rect),
      uploads:[...root.querySelectorAll('.cecDocumentUploadTarget')].map(rect),
-     action:rect(root.querySelector('.candidateNominationBody>.primary'))};
+     action:rect(root.querySelector('.candidateNominationBody>.primary')),
+     toggle:rect(root.querySelector('.candidateNominationToggle')),
+     summary:rect(root.querySelector('.candidateNomination>summary')),
+     symbolStyle:(()=>{
+       const e=root.querySelector('.candidateNominationToggle');
+       const before=getComputedStyle(e,'::before'),after=getComputedStyle(e,'::after');
+       return {beforeLeft:before.left,beforeTop:before.top,afterLeft:after.left,afterTop:after.top,
+         beforeWidth:before.width,afterWidth:after.width,beforeTransform:before.transform,afterTransform:after.transform};
+     })()};
    });
    assert(s.scroll<=s.screen+2,'Horizontal overflow at '+width);
    for(const b of [...s.tabs,...s.fields,...s.uploads,s.action]){
     assert(b.x>=s.root.x-2&&b.right<=s.root.right+2,'Control overflow at '+width);
     assert(b.w>25,'Collapsed control at '+width);
    }
+   assert(Math.abs(s.toggle.y+s.toggle.h/2-(s.summary.y+s.summary.h/2))<=1,'Toggle vertically off-center at '+width);
+   assert(s.toggle.x>=s.summary.x&&s.toggle.right<=s.summary.right,'Toggle escapes summary at '+width);
+   const centerValue=(v,size)=>v==='50%'||Math.abs(parseFloat(v)-size/2)<=2;
+   assert(centerValue(s.symbolStyle.beforeLeft,s.toggle.w)&&centerValue(s.symbolStyle.beforeTop,s.toggle.h),'Cross first stroke not centered at '+width);
+   assert(centerValue(s.symbolStyle.afterLeft,s.toggle.w)&&centerValue(s.symbolStyle.afterTop,s.toggle.h),'Cross second stroke not centered at '+width);
+   assert(s.symbolStyle.beforeWidth==='16px'&&s.symbolStyle.afterWidth==='16px','Cross strokes mismatch at '+width);
+   const labels=s.fields;
+   if(width>=1024)assert(labels.every(b=>Math.abs(b.w-labels[0].w)<2),'Unequal input column widths at '+width);
    if(width<=700)assert(s.tabs[2].y>s.tabs[0].y,'Tabs not stacked at '+width);
    if(width>=900)assert(Math.abs(s.tabs[3].y-s.tabs[0].y)<2,'Desktop tabs not in one row at '+width);
    if(width<=700)assert(s.fields[1].y>s.fields[0].y,'Fields do not stack at '+width);
    if(width>=1024)assert(Math.abs(s.fields[2].y-s.fields[0].y)<2,'Desktop inputs not aligned at '+width);
    await page.locator('.candidateNomination>summary').click();
    assert.equal(await page.locator('.candidateNomination').evaluate(x=>x.open),false,'Details did not close at '+width);
+   const closedStrokes=await page.locator('.candidateNominationToggle').evaluate(e=>({before:getComputedStyle(e,'::before').transform,after:getComputedStyle(e,'::after').transform}));
+   assert.notEqual(closedStrokes.before,closedStrokes.after,'Collapsed state must show a plus at '+width);
+   assert.notEqual(s.symbolStyle.beforeTransform,closedStrokes.before,'Symbol failed to change between cross and plus at '+width);
    await page.locator('.candidateNomination>summary').click();
    assert.equal(await page.locator('.candidateNomination').evaluate(x=>x.open),true,'Details did not reopen at '+width);
    await page.close();
   }
-  console.log('PASS: 11 screen widths (320–1440), navigation tabs, nomination form, document uploads, CEC decisions and details toggle.');
+  console.log('PASS: 11 widths (320–1440), centered SVG-free CSS cross/plus, input widths, tabs, nomination form, document uploads and CEC decisions.');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
