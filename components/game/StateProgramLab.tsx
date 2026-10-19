@@ -13,10 +13,13 @@ import styles from './StageForms.module.css';
 type Address={id:string;title:string;body_text:string;video_url:string|null;status:'draft'|'published';updated_at:string};
 type Readiness={ready:boolean;issues:string[];goals:number;directions:number;components:number;budget_years?:number;expected_budget_years?:number};
 type BudgetYear={id:string;program_id:string;budget_year:number;amount:number|string};
+type MinistryAssignment={unit_id:string;user_id:string};
+type MinistryUnit={id:string;head_user_id:string|null};
 export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,votes,setError}=g;
  const [programs,setPrograms]=useState<StateProgram[]>([]),[addresses,setAddresses]=useState<Address[]>([]),[priorities,setPriorities]=useState<ProgramPriority[]>([]),[readiness,setReadiness]=useState<Record<string,Readiness>>({});
  const [goals,setGoals]=useState<ProgramGoal[]>([]),[components,setComponents]=useState<ProgramComponent[]>([]),[expenses,setExpenses]=useState<ProgramExpense[]>([]),[years,setYears]=useState<BudgetYear[]>([]);
+ const [ministryAssignments,setMinistryAssignments]=useState<MinistryAssignment[]>([]),[ministryUnits,setMinistryUnits]=useState<MinistryUnit[]>([]);
  const [selectedId,setSelectedId]=useState(''),[creating,setCreating]=useState(false),[busy,setBusy]=useState(false);
  const [addressTitle,setAddressTitle]=useState('Послание Президента Российской Федерации Федеральному Собранию'),[addressBody,setAddressBody]=useState(''),[addressVideo,setAddressVideo]=useState('');
  const [priorityNo,setPriorityNo]=useState(1),[priorityTitle,setPriorityTitle]=useState(''),[priorityDescription,setPriorityDescription]=useState(''),[priorityNationalGoal,setPriorityNationalGoal]=useState('');
@@ -25,7 +28,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  const viewScope=[game?.id,me?.user_id,teacher].join('|'),scope=useRef(viewScope);scope.current=viewScope;
  const active=()=>alive.current&&scope.current===viewScope;
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
- useEffect(()=>{request.current++;addressDirty.current=false;addressVersion.current=0;priorityVersion.current=0;busyRef.current=false;setPrograms([]);setAddresses([]);setPriorities([]);setReadiness({});setGoals([]);setComponents([]);setExpenses([]);setYears([]);setSelectedId('');setCreating(false);creatingRef.current=false;selectedRef.current='';setBusy(false);setAddressTitle('Послание Президента Российской Федерации Федеральному Собранию');setAddressBody('');setAddressVideo('');setPriorityNo(1);setPriorityTitle('');setPriorityDescription('');setPriorityNationalGoal('')},[viewScope]);
+ useEffect(()=>{request.current++;addressDirty.current=false;addressVersion.current=0;priorityVersion.current=0;busyRef.current=false;setPrograms([]);setAddresses([]);setPriorities([]);setReadiness({});setGoals([]);setComponents([]);setExpenses([]);setYears([]);setMinistryAssignments([]);setMinistryUnits([]);setSelectedId('');setCreating(false);creatingRef.current=false;selectedRef.current='';setBusy(false);setAddressTitle('Послание Президента Российской Федерации Федеральному Собранию');setAddressBody('');setAddressVideo('');setPriorityNo(1);setPriorityTitle('');setPriorityDescription('');setPriorityNationalGoal('')},[viewScope]);
  const role=stageRoleTitles(g),isPM=role.split(' | ').some(title=>/^председатель\s+правительства(?:\s|$)/u.test(title)),isMinister=role.includes('министр'),isPresident=role.includes('президент');
  async function load(){
   if(!active()||!game)return;const version=++request.current,current=()=>active()&&version===request.current;
@@ -36,10 +39,12 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
    supabase.from('state_program_expenses').select('*,amount_text:amount::text').eq('game_id',game.id).order('position'),
    supabase.from('presidential_addresses').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
    supabase.from('presidential_priorities').select('*').eq('game_id',game.id).order('priority_no'),
-   supabase.from('state_program_budget_years').select('*,amount_text:amount::text').eq('game_id',game.id).order('budget_year')
+   supabase.from('state_program_budget_years').select('*,amount_text:amount::text').eq('game_id',game.id).order('budget_year'),
+   supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',game.id).eq('unit_kind','ministry'),
+   supabase.from('institution_units').select('id,head_user_id').eq('game_id',game.id).eq('unit_kind','ministry')
   ]);
   if(!current())return;const failed=results.find(x=>x.error);if(failed?.error){setError(failed.error);return;}
-  const [p,gl,c,e,a,pr,by]=results;
+  const [p,gl,c,e,a,pr,by,assigned,units]=results;
   const rows=((p.data||[]) as (StateProgram&{total_budget_text?:string})[]).map(x=>({...x,total_budget:x.total_budget_text??x.total_budget}));
   const checks=await Promise.all(rows.map(async x=>({id:x.id,response:await supabase.rpc('get_state_program_readiness',{p_program_id:x.id})})));
   if(!current())return;const failure=checks.find(x=>x.response.error);if(failure?.response.error){setError(failure.response.error);return;}
@@ -49,15 +54,18 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
   setPriorities((pr.data||[]) as ProgramPriority[]);
   setYears(((by.data||[]) as (BudgetYear&{amount_text?:string})[]).map(x=>({...x,amount:x.amount_text??x.amount})));
   setReadiness(Object.fromEntries(checks.map(x=>[x.id,x.response.data as Readiness])));
+  setMinistryAssignments((assigned.data||[]) as MinistryAssignment[]);
+  setMinistryUnits((units.data||[]) as MinistryUnit[]);
   if(!creatingRef.current&&!selectedRef.current&&rows[0])setSelectedId(rows[0].id);
   const addressRows=(a.data||[]) as Address[];setAddresses(addressRows);
   const draft=addressRows.find(x=>x.status==='draft')||addressRows[0];if(draft&&!addressDirty.current){setAddressTitle(draft.title);setAddressBody(draft.body_text);setAddressVideo(draft.video_url||'')}
  }
- useGameTableSync(game?.id,['state_programs','state_program_goals','state_program_components','state_program_expenses','state_program_budget_commitments','presidential_addresses','presidential_priorities','state_program_budget_years'],load,viewScope);
+ useGameTableSync(game?.id,['state_programs','state_program_goals','state_program_components','state_program_expenses','state_program_budget_commitments','presidential_addresses','presidential_priorities','state_program_budget_years','institution_assignments','institution_units'],load,viewScope);
  if(!game||!me)return null;
  const selected=creating?undefined:programs.find(p=>p.id===selectedId),publishedAddress=addresses.find(x=>x.status==='published'),activeAddress=addresses.find(x=>x.status==='draft')||publishedAddress;
  const publishedPriorities=publishedAddress?priorities.filter(x=>x.address_id===publishedAddress.id):[],check=selected?readiness[selected.id]:undefined;
- const editable=selected?(teacher||selected.created_by===me.user_id||selected.responsible_minister_id===me.user_id)&&['draft','revision'].includes(selected.status)&&!selected.signed_at:teacher||isMinister||isPM;
+ const appointedColleague=!!selected?.responsible_minister_id&&!me.roster_archived_at&&ministryAssignments.some(a=>a.user_id===me.user_id&&ministryUnits.some(u=>u.id===a.unit_id&&u.head_user_id===selected.responsible_minister_id));
+ const editable=selected?(teacher||selected.created_by===me.user_id||selected.responsible_minister_id===me.user_id||appointedColleague)&&['draft','revision'].includes(selected.status)&&!selected.signed_at:teacher||isMinister||isPM;
  const vote=votes.find(v=>v.id===selected?.government_vote_id);
  async function run(name:string,args:Record<string,unknown>){
   if(!active()||busyRef.current)return false;busyRef.current=true;setBusy(true);
