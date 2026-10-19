@@ -5,6 +5,10 @@ on:
       - 'components/game/PresidentialElectionStage7.tsx'
       - 'components/game/PresidentialCecComplaints.tsx'
       - 'components/game/PresidentialRulesCalculator.tsx'
+      - 'components/game/PresidentialCecPublicationPanel.tsx'
+      - 'supabase/migrations/20261020072000_stage7_cec_publish_after_finalization.sql'
+      - 'scripts/stage7-cec-early-publication-check.cjs'
+      - 'scripts/fixtures/stage7-cec-protocol-source-20261020.sql'
       - 'components/game/PresidentialEarlyFinishDialog.tsx'
       - 'scripts/stage7-early-finalization-roles-check.cjs'
       - 'scripts/editor-async-resilience-check.cjs'
@@ -19,6 +23,10 @@ on:
       - 'components/game/PresidentialElectionStage7.tsx'
       - 'components/game/PresidentialCecComplaints.tsx'
       - 'components/game/PresidentialRulesCalculator.tsx'
+      - 'components/game/PresidentialCecPublicationPanel.tsx'
+      - 'supabase/migrations/20261020072000_stage7_cec_publish_after_finalization.sql'
+      - 'scripts/stage7-cec-early-publication-check.cjs'
+      - 'scripts/fixtures/stage7-cec-protocol-source-20261020.sql'
       - 'components/game/PresidentialEarlyFinishDialog.tsx'
       - 'scripts/stage7-early-finalization-roles-check.cjs'
       - 'scripts/editor-async-resilience-check.cjs'
@@ -40,6 +48,7 @@ jobs:
       - run: npm ci
       - run: node scripts/stage7-percent-poll-complaints-ui-check.cjs
       - run: node scripts/stage7-early-finalization-roles-check.cjs
+      - run: node scripts/stage7-cec-early-publication-check.cjs
       - run: node scripts/stage7-party-campaign-rights-check.cjs
       - run: node scripts/cec-registration-and-complaints-check.cjs
       - run: node scripts/presidential-calculator-resilience-check.cjs
