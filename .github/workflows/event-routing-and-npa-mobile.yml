@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'supabase/migrations/20261020083000_restore_approved_event_330_routing_after_duma.sql'
+      - 'supabase/migrations/20261020083100_event_collective_active_students_dispatch.sql'
       - 'app/2026-npa-registry-canonical.css'
       - 'scripts/event-330-routing-after-duma-check.cjs'
       - 'scripts/npa-card-header-mobile-browser-check.cjs'
@@ -11,6 +12,7 @@ on:
     branches: [main]
     paths:
       - 'supabase/migrations/20261020083000_restore_approved_event_330_routing_after_duma.sql'
+      - 'supabase/migrations/20261020083100_event_collective_active_students_dispatch.sql'
       - 'app/2026-npa-registry-canonical.css'
       - 'scripts/event-330-routing-after-duma-check.cjs'
       - 'scripts/npa-card-header-mobile-browser-check.cjs'
