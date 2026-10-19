@@ -5,11 +5,6 @@
  */
 type PersonGender='male'|'female';
 const maleExceptions:Record<string,string>={Павел:'Павла',Лев:'Льва',Пётр:'Петра',Петр:'Петра'};
-function preserveCase(original:string,next:string){
- if(original===original.toUpperCase())return next.toUpperCase();
- if(original[0]===original[0].toLowerCase())return next[0].toLowerCase()+next.slice(1);
- return next;
-}
 function inflectGivenName(name:string,gender:PersonGender){
  if(gender==='male'&&maleExceptions[name])return maleExceptions[name];
  if(gender==='female'&&/ь$/iu.test(name))return name;
