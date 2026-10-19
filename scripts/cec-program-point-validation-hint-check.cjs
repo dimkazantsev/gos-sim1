@@ -2,7 +2,6 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const app=fs.readFileSync('components/game/PresidentialElectionLab.tsx','utf8');
 const style=fs.readFileSync('app/stage6-cec-workspace-polish.css','utf8');
-const source=fs.readFileSync('supabase/migrations/058_presidential_candidate_dossier.sql','utf8');
 assert(app.includes("const body=(pointDraft[candidateId]||'').trim();if(body.length<5)return;"),'Handler must reject empty or short program points');
 assert(app.includes("disabled={busy||(pointDraft[c.id]||'').trim().length<5}"),'Button must follow 5-char constraint');
 assert(app.includes("aria-describedby={'cec-program-hint-'+c.id}"),'Input must link to hint');
