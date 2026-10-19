@@ -4,6 +4,7 @@ import {supabase} from '@/lib/supabase';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
 import {institutionEmblem} from './institutionEmblems';
 import {cecOfficialResolution,type CecDecisionStatus} from './cecOfficialWording';
+import {cecRegistrationDirective} from './cecNameDeclension';
 
 type Candidate={
  display_name:string;registration_number:string|null;
@@ -17,33 +18,50 @@ type Decision={
  reasoning?:{manual_remarks?:ManualRemark[];chair_signature_path?:string|null;chair_name?:string|null}|null;
 };
 export default function CecOfficialDocument({
- kind,candidate,decision,signerName,signatureFallbackUrl,onClose
+ kind,candidate,decision,gameId,chairUserId,signerName,signatureFallbackUrl,onClose
 }:{
  kind:'decision'|'credential';candidate:Candidate;decision?:Decision;
- signerName?:string|null;signatureFallbackUrl?:string|null;onClose:()=>void;
+ gameId:string;chairUserId:string|null;signerName?:string|null;signatureFallbackUrl?:string|null;onClose:()=>void;
 }){
  const [signedUrl,setSignedUrl]=useState<string|null>(null);
- const [loadingSignature,setLoadingSignature]=useState(false);
+ const [loadingSignature,setLoadingSignature]=useState(true);
+ const [imageLoaded,setImageLoaded]=useState(false);
  const fixedPath=decision?.reasoning?.chair_signature_path;
  useEffect(()=>{
   let alive=true;
-  setSignedUrl(null);
-  if(!fixedPath){setLoadingSignature(false);return}
-  setLoadingSignature(true);
-  void supabase.storage.from('game-assets').createSignedUrl(fixedPath,3600).then(({data})=>{
-   if(alive){setSignedUrl(data?.signedUrl||null);setLoadingSignature(false)}
-  },()=>{if(alive)setLoadingSignature(false)});
+  setSignedUrl(null);setImageLoaded(false);setLoadingSignature(true);
+  async function loadChairSignature(){
+   // Always resolve the elected CEC chair from his own game profile.
+   // The NKO/Minjust certificate does not provide or authorize this signature.
+   let currentPath:string|null=null;
+   if(chairUserId&&gameId){
+    const {data,error}=await supabase.from('game_profiles').select('signature_path')
+     .eq('game_id',gameId).eq('user_id',chairUserId).maybeSingle();
+    if(!error)currentPath=data?.signature_path||null;
+   }
+   const path=kind==='decision'&&fixedPath?fixedPath:(currentPath||fixedPath||null);
+   if(path){
+    const {data,error}=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
+    if(alive&&!error&&data?.signedUrl)setSignedUrl(data.signedUrl);
+   }
+   if(alive)setLoadingSignature(false);
+  }
+  void loadChairSignature();
   return()=>{alive=false};
- },[fixedPath]);
- const signature=fixedPath?(signedUrl||null):(signatureFallbackUrl||null);
- const signatory=decision?.reasoning?.chair_name||signerName||'Председатель ЦИК РФ';
+ },[chairUserId,gameId,kind,fixedPath]);
+ // A fallback URL from the current CEC chair's profile is safe only for that same user.
+ const signature=signedUrl||(!loadingSignature?signatureFallbackUrl:null);
+ const signatory=signerName||decision?.reasoning?.chair_name||'Председатель ЦИК РФ';
  const remarks=(decision?.reasoning?.manual_remarks||[]).filter(item=>item.note&&item.note.trim());
  const status=decision?.decision_type||'registered';
- const resolution=cecOfficialResolution(status,candidate.display_name,decision?.public_summary||candidate.registration_public_summary);
+ const resolution=status==='registered'?cecRegistrationDirective(candidate.display_name):
+  cecOfficialResolution(status,candidate.display_name,decision?.public_summary||candidate.registration_public_summary);
  const signatureElement=<div className="cecChairSignature">
   <span className="cecChairSignatureTitle">Председатель Центральной избирательной комиссии Российской Федерации</span>
   <span className="cecChairSignatureMark">
-   {signature?<img src={signature} alt={'Подпись председателя ЦИК РФ — '+signatory}/>:<span>{loadingSignature?'Подпись загружается':'Подпись не загружена'}</span>}
+   {signature?<img src={signature} alt={'Подпись председателя ЦИК РФ — '+signatory}
+    onLoad={()=>setImageLoaded(true)} onError={()=>{setImageLoaded(false);setSignedUrl(null)}}/>:
+    <span>{loadingSignature?'Подпись загружается':'Подпись председателя ЦИК недоступна'}</span>}
   </span>
   <strong>{signatory}</strong>
  </div>;
@@ -52,7 +70,9 @@ export default function CecOfficialDocument({
   <div className="cecDocumentBackdrop" onClick={onClose}/>
   <div className="cecDocumentShell">
    <div className="cecDocumentTools"><b>{kind==='decision'?'Решение ЦИК РФ':'Удостоверение кандидата'}</b><span/>
-    <button type="button" onClick={()=>window.print()}>Печать / PDF</button>
+    <button type="button" disabled={loadingSignature||!signature||!imageLoaded}
+     title={!signature?'Подпись председателя должна быть загружена до печати':undefined}
+     onClick={()=>window.print()}>Печать / PDF</button>
     <button type="button" onClick={onClose}>Закрыть</button>
    </div>
    {kind==='decision'?<article className="cecPrintableDocument cecDecisionSheet">
@@ -76,7 +96,7 @@ export default function CecOfficialDocument({
        <span>{item.status==='revision'?'Требует доработки.':item.status==='rejected'?'Не соответствует.':'Замечание ЦИК.'}</span>
        <p>{item.note}</p></li>)}</ol>
     </section>}
-    <div className="cecResolution"><small>ПОСТАНОВИЛА</small><strong>{resolution}</strong></div>
+    <div className="cecResolution"><small>ПОСТАНОВЛЯЕТ:</small><strong>{resolution}</strong></div>
     <footer>{signatureElement}</footer>
    </article>:<article className="cecPrintableDocument cecCredentialSheet">
     <div className="cecCredentialCover">

@@ -393,11 +393,11 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    if(!candidate)return null;
    const decision=documentPreview.decisionId?decisions.find(x=>x.id===documentPreview.decisionId):
     decisions.find(x=>x.candidate_id===candidate.id&&x.decision_type==='registered');
-   const signer=members.find(m=>m.user_id===decision?.created_by&&m.kind==='teacher')||
-    members.find(m=>m.kind==='teacher'&&m.full_name?.includes('Казанцев'));
-   const signerProfile=g.profiles.find(p=>p.user_id===(decision?.created_by||signer?.user_id));
+   const chair=members.find(m=>m.kind==='teacher'&&m.full_name?.trim()==='Казанцев Дмитрий Анатольевич');
+   const chairProfile=chair?g.profiles.find(p=>p.user_id===chair.user_id):null;
    return <CecOfficialDocument kind={documentPreview.kind} candidate={candidate} decision={decision}
-    signerName={signer?.full_name||null} signatureFallbackUrl={signerProfile?.signature_url||null}
+    gameId={game?.id||''} chairUserId={chair?.user_id||null}
+    signerName={chair?.full_name||null} signatureFallbackUrl={chairProfile?.signature_url||null}
     onClose={()=>setDocumentPreview(null)}/>;
   })()}
   </section>;
