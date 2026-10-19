@@ -4,7 +4,7 @@ const {chromium}=require('playwright-core');
 const root=path.resolve(__dirname,'..');
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser','/opt/google/chrome/chrome'].find(x=>x&&fs.existsSync(x));
 if(!chrome)throw Error('Chrome or Chromium required');
-const css=fs.readFileSync(path.join(root,'app/stage6-cec-workspace-polish.css'),'utf8')+'\n'+fs.readFileSync(path.join(root,'app/stage6-election-workspace.css'),'utf8');
+const css=fs.readFileSync(path.join(root,'app/stage6-election-workspace.css'),'utf8')+'\n'+fs.readFileSync(path.join(root,'app/stage6-cec-workspace-polish.css'),'utf8');
 const h=[
 '<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>',
 ':root{--navy:#102b54;--text:#173457;--muted:#657c9d;--body:#506589;--line:#dbe4f0}*{box-sizing:border-box}body{font-family:system-ui,Arial,sans-serif;font-size:14px;margin:0;padding:12px;background:#f4f7fc}button,input,select,textarea{font:inherit}button{cursor:pointer}',
