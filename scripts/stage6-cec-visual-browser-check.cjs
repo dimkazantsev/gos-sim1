@@ -34,7 +34,7 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
    await page.emulateMedia({reducedMotion:'reduce'});
    await page.setContent(h,{waitUntil:'load'});
    const s=await page.evaluate(()=>{
-    const root=document.querySelector('#stage6-cec'),rect=e=>{const b=e.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,right:b.right,bottom:b.bottom}};
+    const root=document.querySelector('#stage6-cec'),rect=e=>{const b=e.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,h:b.height,right:b.right,bottom:b.bottom}};
     return {screen:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
      root:rect(root),tabs:[...root.querySelectorAll('.cecTabs button')].map(rect),
      fields:[...root.querySelectorAll('.candidateNominationBody>label')].slice(0,3).map(rect),
