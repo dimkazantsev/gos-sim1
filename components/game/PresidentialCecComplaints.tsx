@@ -5,6 +5,7 @@ import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type Candidate={id:string;display_name:string;registration_status:string};
+type CourtReferral={complaint_id:string;case_number:string;case_status:string;referred_at:string};
 type Complaint={id:string;candidate_id:string;submitted_by:string;subject:string;allegation:string;legal_basis:string|null;status:'pending'|'maintained'|'dismissed'|'removed'|'referred_court';resolution:string|null;created_at:string;resolved_at:string|null};
 const outcomes=[
  {value:'maintained',label:'Оставить кандидата на выборах'},
@@ -16,6 +17,7 @@ export default function PresidentialCecComplaints({g,candidates}:{g:ReturnTypeRe
  const {game,me,teacher,setError}=g;
  const gameId=game?.id||'';
  const [records,setRecords]=useState<Complaint[]>([]);
+ const [referrals,setReferrals]=useState<CourtReferral[]>([]);
  const [candidateId,setCandidateId]=useState('');
  const [subject,setSubject]=useState('');
  const [allegation,setAllegation]=useState('');
@@ -26,10 +28,11 @@ export default function PresidentialCecComplaints({g,candidates}:{g:ReturnTypeRe
  const [message,setMessage]=useState('');
  const reload=useCallback(async()=>{
   if(!gameId)return;
-  const r=await supabase.from('presidential_cec_complaints').select('*').eq('game_id',gameId).order('created_at',{ascending:false});
+  const [r,court]=await Promise.all([supabase.from('presidential_cec_complaints').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),supabase.from('presidential_cec_court_referrals').select('complaint_id,case_number,case_status,referred_at').eq('game_id',gameId)]);
   if(r.error)setError(userError(r.error));else setRecords((r.data||[]) as Complaint[]);
+  if(court.error)setError(userError(court.error));else setReferrals((court.data||[]) as CourtReferral[]);
  },[gameId,setError]);
- useEffect(()=>{setRecords([]);setCandidateId('');setMessage('');void reload()},[reload]);
+ useEffect(()=>{setRecords([]);setReferrals([]);setCandidateId('');setMessage('');void reload()},[reload]);
  const registered=candidates.filter(c=>c.registration_status==='registered');
  async function submit(){
   if(busy||!candidateId||subject.trim().length<8||allegation.trim().length<30)return;
@@ -65,6 +68,7 @@ export default function PresidentialCecComplaints({g,candidates}:{g:ReturnTypeRe
     <header><div><b>{x.subject}</b><small>{candidates.find(c=>c.id===x.candidate_id)?.display_name||'Кандидат'} · {new Date(x.created_at).toLocaleString('ru-RU')}</small></div><span>{x.status==='pending'?'На рассмотрении':outcomes.find(o=>o.value===x.status)?.label||x.status}</span></header>
     <p>{x.allegation}</p>{x.legal_basis&&<small>Указанное заявителем основание: {x.legal_basis}</small>}
     {x.resolution&&<div className="cecComplaintResolution"><b>Решение ЦИК</b><p>{x.resolution}</p></div>}
+    {referrals.find(r=>r.complaint_id===x.id)&&<p className="cecCourtReferral"><b>Судебное дело {referrals.find(r=>r.complaint_id===x.id)?.case_number}</b> · Передано в судебный реестр ГОС.ID; ожидает рассмотрения Верховным Судом Российской Федерации.</p>}
     {teacher&&x.status==='pending'&&<div className="cecComplaintModeration">
      <label>Результат рассмотрения<select value={outcome[x.id]||''} onChange={e=>setOutcome(v=>({...v,[x.id]:e.target.value}))}><option value="">Выберите решение</option>{outcomes.map(v=><option key={v.value} value={v.value}>{v.label}</option>)}</select></label>
      <label>Мотивированное решение<textarea rows={4} maxLength={6000} value={reason[x.id]||''} onChange={e=>setReason(v=>({...v,[x.id]:e.target.value}))} placeholder="Факты, доказательства, применимые нормы. Для снятия укажите статью федерального закона."/></label>
