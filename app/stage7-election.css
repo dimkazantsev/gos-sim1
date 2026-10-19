@@ -117,3 +117,40 @@
 .stage7Election .stage7Tabs.withoutPoll{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:900px){.stage7Election .stage7Tabs.withoutPoll{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.stage7Election .stage7Tabs.withoutPoll{grid-template-columns:1fr}}
+
+
+/* Этап 7: самостоятельные карточки вкладок с постоянными промежутками. */
+.stage7Election .stage7Tabs{gap:12px;padding:8px}
+.stage7Election .stage7Tabs button{min-width:0;border:1px solid var(--line);border-radius:13px;background:#fff;padding:12px;transition:border-color .16s,background .16s}
+.stage7Election .stage7Tabs button.active{background:#eef3ff;border-color:#b9caff}
+.stage7Election .stage7Tabs button:focus-visible{outline:2px solid #315efb;outline-offset:2px}
+@media(max-width:620px){.stage7Election .stage7Tabs{gap:10px;padding:7px}}
+
+/* Жалоба: подтверждение отправки не должно прилегать к кнопке. */
+.stage7CecComplaints .cecComplaintForm .cecComplaintActions{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;margin:16px 0 0;padding-top:18px}
+.stage7CecComplaints .cecComplaintForm .cecComplaintActions button{min-width:220px}
+.stage7CecComplaints .cecComplaintForm>.stage7Notice{position:static;display:block;clear:both;margin:22px 0 0;padding:13px 16px}
+@media(max-width:700px){.stage7CecComplaints .cecComplaintForm .cecComplaintActions{grid-template-columns:1fr;gap:12px}.stage7CecComplaints .cecComplaintForm .cecComplaintActions button{width:100%;min-width:0}}
+
+/* Отделяем итоговое действие от расчётных карточек и системных уведомлений. */
+.stage7Results .stage7FinalizeActions{justify-content:flex-start;align-items:center;margin:22px 0 30px;padding-top:15px;border-top:1px solid var(--line)}
+.stage7Results .stage7FinalizeActions button{min-height:48px;max-width:100%;white-space:normal}
+.stage7Results .cecUnsavedPercent{color:#8a681f;font-size:11px;font-weight:750}
+.stage7Results .cecPercentWarning{margin:8px 0;color:#8a681f;font-size:12px}
+@media(max-width:700px){.stage7Results .stage7FinalizeActions{margin-bottom:32px}.stage7Results .stage7FinalizeActions button{width:100%}}
+
+/* Фирменная подтверждающая модалка ЦИК с мобильной компоновкой. */
+.cecEarlyBackdrop{position:fixed;inset:0;z-index:10000;background:rgba(13,29,54,.55);display:grid;place-items:center;overflow-y:auto;padding:24px}
+.cecEarlyDialog{box-sizing:border-box;width:min(520px,100%);max-height:min(92dvh,840px);overflow-y:auto;background:#fff;border:1px solid #dce4f1;border-radius:22px;box-shadow:0 28px 80px rgba(13,29,54,.23);padding:24px;color:var(--text,#172447)}
+.cecEarlyHeading{display:flex;gap:14px;align-items:flex-start}
+.cecEarlyHeading>div{flex:1;min-width:0}
+.cecEarlyHeading small{display:block;font-size:11px;font-weight:900;letter-spacing:.09em;color:#315efb;margin-bottom:6px}
+.cecEarlyHeading h3{font-size:19px;line-height:1.3;margin:0;overflow-wrap:anywhere;color:var(--text,#172447)}
+.cecEarlyIcon{flex:none;display:grid;place-items:center;width:44px;height:44px;border:1px solid #f2d9a0;border-radius:14px;background:#fff7e8;color:#b37a1b}
+.cecEarlyClose{flex:none;width:36px;height:36px;padding:0;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--body)}
+.cecEarlyDialog>p{line-height:1.6;overflow-wrap:anywhere}
+.cecEarlyDialog #cecEarlyText{font-weight:850;font-size:16px;margin:20px 0 8px}
+.cecEarlyExplanation{font-size:13px;color:var(--muted)}
+.cecEarlyActions{display:flex;justify-content:flex-end;gap:12px;margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}
+.cecEarlyActions button{min-height:46px;padding:10px 16px;border-radius:12px}
+@media(max-width:600px){.cecEarlyBackdrop{padding:12px;align-items:center}.cecEarlyDialog{padding:18px;border-radius:18px}.cecEarlyHeading{gap:10px}.cecEarlyHeading h3{font-size:17px}.cecEarlyIcon{width:38px;height:38px}.cecEarlyActions{display:grid;grid-template-columns:1fr}.cecEarlyActions button{width:100%}}
