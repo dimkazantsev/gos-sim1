@@ -352,7 +352,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
        </article>)}</div>}
       <p className="cecDocumentAccessNote">Возврат одного документа не отменяет ранее принятые документы. Исправлению подлежит только файл с замечанием ЦИК; повторная подача не сбрасывает результаты проверки остальных файлов.</p>
     </section>}
-    {teacher&&autoReviews[c.id]&&<div className="cecSubmissionActions"><button type="button" className="secondary cecUseAutoReview" onClick={()=>fillSuggestedDecision(c.id)}>Сформировать проект решения по ручной проверке</button></div>}
+    {teacher&&c.cec_submitted_at&&<div className="cecSubmissionActions"><button type="button" className="secondary cecUseAutoReview" onClick={()=>fillSuggestedDecision(c.id)}>Сформировать проект решения по ручной проверке</button></div>}
    </section>}
    {panelView==='dossier'&&canUploadDocuments&&c.nomination_type!=='fictional'&&<details className="candidateDossier" open>
     <summary><div><b>{canManage?'Моё досье':'Досье кандидата'}</b><span>{c.photo_path&&autoReviews[c.id]?.error_count===0&&docs.length>=requiredKinds.length&&candidatePoints.length>=10?'✓ Черновик готов к подаче':'Заполните фото, документы и проверьте замечания'}</span></div><strong>{candidatePoints.length}/10 · {docs.filter(x=>requiredKinds.includes(x.doc_kind)).length}/{requiredKinds.length}</strong></summary>
