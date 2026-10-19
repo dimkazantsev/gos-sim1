@@ -217,8 +217,10 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  }
  function fillSuggestedDecision(id:string){
   const audit=autoReviews[id];if(!audit)return;
-  const status:'registered'|'revision'=audit.error_count>0?'revision':'registered';
-  const listed=audit.items.map((item,i)=>String(i+1)+'. '+item.title+' — '+(item.verdict==='ok'?'предварительно соответствует':item.verdict==='manual'?'требует ручной проверки':'есть замечания')+(item.issues?.length?': '+item.issues.join('; '):'')+'.').join('\n');
+  const returned=candidateDocs.filter(d=>d.candidate_id===id&&d.is_submitted&&d.status==='revision');
+  const status:'registered'|'revision'=audit.error_count>0||returned.length>0?'revision':'registered';
+  const listed=audit.items.map((item,i)=>String(i+1)+'. '+item.title+' — '+(item.verdict==='ok'?'предварительно соответствует':item.verdict==='manual'?'требует ручной проверки':'есть замечания')+(item.issues?.length?': '+item.issues.join('; '):'')+'.').join('\n')
+   +(returned.length?'\nЗамечания преподавателя по возвращённым документам:\n'+returned.map(d=>'• '+(docLabels[d.doc_kind]||d.title)+': '+(d.note||'Требуется доработка')).join('\n'):'');
   const resolution=status==='registered'
    ?'Представленный комплект документов проверен. По результатам автоматической предварительной проверки существенные несоответствия не выявлены. Окончательное решение принимает ЦИК.'
    :'В представленном комплекте выявлены замечания. Документы подлежат доработке либо дополнительной ручной проверке до принятия окончательного решения ЦИК.';
