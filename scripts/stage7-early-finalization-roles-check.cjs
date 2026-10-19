@@ -49,7 +49,7 @@ const id=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
     if not exists(select 1 from public.presidential_student_system_result where game_id=p_game_id)
     then raise exception 'Этап 6 не завершён';end if;
     if not exists(select 1 from public.presidential_election_schedule where game_id=p_game_id
-    and now() at time zone 'Asia/Barnaul' >= voting_day::timestamp+interval '20 hours')
+ and now() at time zone 'Asia/Barnaul' >= voting_day::timestamp+interval '20 hours')
     then raise exception 'Расчёт итогов возможен не ранее 20:00 третьего дня выборов';end if;
     perform private.require_active_presidential_teacher(p_game_id);
     if auth.uid() is null or not private.is_game_teacher(p_game_id) then raise exception 'Teacher access required';end if;
