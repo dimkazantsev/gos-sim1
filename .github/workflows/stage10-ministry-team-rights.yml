@@ -1,0 +1,30 @@
+name: Проверка прав команд министерств — Этап 10
+on:
+  pull_request:
+    paths:
+      - 'components/game/StateProgramLab.tsx'
+      - 'components/game/StateProgramEditor.tsx'
+      - 'scripts/stage10-ministry-team-rights-check.cjs'
+      - 'supabase/migrations/20261020001000_stage10_ministry_collaboration_and_version_guard.sql'
+      - '.github/workflows/stage10-ministry-team-rights.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'components/game/StateProgramLab.tsx'
+      - 'components/game/StateProgramEditor.tsx'
+      - 'scripts/stage10-ministry-team-rights-check.cjs'
+      - 'supabase/migrations/20261020001000_stage10_ministry_collaboration_and_version_guard.sql'
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node scripts/stage10-ministry-team-rights-check.cjs
+      - run: npm run typecheck

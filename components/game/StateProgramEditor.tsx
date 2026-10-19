@@ -82,7 +82,7 @@ export default function StateProgramEditor({g,program,goals,components,expenses,
    }
   busyRef.current=true;setBusy(true);setNotice('');
   try{
-   const r=await supabase.rpc('save_state_program_draft',{p_game_id:g.game.id,p_program_id:program?.id||null,p_payload:{...passport,goals:activeGoals.map(({key,...x})=>x),components:activeComponents.map(({key,goal_key,...x})=>({...x,goal_no:goal_key?activeGoals.findIndex(goal=>goal.key===goal_key)+1:null})),expenses:activeExpenses.map(({key,component_key,...x})=>({...x,component_no:activeComponents.findIndex(c=>c.key===component_key)+1,amount:x.amount.trim().replace(',','.')}))},p_confirm:confirm});
+   const r=await supabase.rpc('save_state_program_draft',{p_game_id:g.game.id,p_program_id:program?.id||null,p_payload:{...passport,...(program?.updated_at?{expected_updated_at:program.updated_at}:{}),goals:activeGoals.map(({key,...x})=>x),components:activeComponents.map(({key,goal_key,...x})=>({...x,goal_no:goal_key?activeGoals.findIndex(goal=>goal.key===goal_key)+1:null})),expenses:activeExpenses.map(({key,component_key,...x})=>({...x,component_no:activeComponents.findIndex(c=>c.key===component_key)+1,amount:x.amount.trim().replace(',','.')}))},p_confirm:confirm});
    if(!active())return;
    if(r.error){g.setError(r.error);return;}
    if(editVersion.current===savedVersion)dirty.current=false;
