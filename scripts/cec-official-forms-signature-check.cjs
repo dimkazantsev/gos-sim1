@@ -19,4 +19,5 @@ assert(sheet.includes('Требует доработки.'),'Official status sta
 assert(migration.includes("'manual_remarks'")&&migration.includes("'chair_signature_path'"));
 assert(migration.includes("d.reviewed_by IS NOT NULL")&&migration.includes("v_public:='Зарегистрирован кандидат "));
 assert(migration.includes('Не удалось исключить автоматические замечания'));
+assert(migration.includes("'if not private.is_game_teacher(c.game_id)'"),'Only teacher may invoke automated review RPC');
 console.log('PASS: Public CEC forms omit training/OCR, registered wording, teacher signature, manual remarks and left-aligned button.');
