@@ -165,7 +165,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    setError('Для возврата на доработку сначала укажите замечания и верните конкретный документ.');return;
   }
   const reason=[refusalBasis[id],x.privateSummary.trim()].filter(Boolean).join(' — ');
-  if(x.status==='rejected'&&(reason.length<30||!refusalBasis[id])){
+  if(x.status==='rejected'&&(x.privateSummary.trim().length<30||!refusalBasis[id])){
    setError('Для отказа выберите правовое основание и внесите мотивировку со ссылкой на обстоятельства.');return;
   }
   setBusy(true);
@@ -240,7 +240,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   const accepted=required.filter(kind=>docs.some(d=>d.doc_kind===kind&&d.status==='accepted'));
   const returned=docs.filter(d=>d.status==='revision');
   const pending=required.filter(kind=>!docs.some(d=>d.doc_kind===kind&&d.status==='accepted'));
-  const allAccepted=required.length>0&&accepted.length===required.length&&!returned.length;
+  const allAccepted=accepted.length===required.length&&!returned.length;
   const status:'registered'|'revision'=allAccepted?'registered':'revision';
   const summary=allAccepted?'Все обязательные документы проверены и приняты ЦИК. Предлагается зарегистрировать кандидата.':'Не все обязательные документы приняты ЦИК. Регистрация не предлагается до завершения индивидуальной проверки.';
   const manual=required.map((kind,i)=>{
@@ -250,7 +250,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   const hint=autoReviews[id];
   const advisory=hint?.issues?.length?'\nАвтоматические подсказки (не основание для регистрации или отказа):\n'+hint.issues.join('\n'):'';
   setReview(v=>({...v,[id]:{...(v[id]||{errors:'0',penalty:'0',publicSummary:'',privateSummary:''}),status,errors:String(returned.length),publicSummary:summary,privateSummary:manual+advisory}}));
-  if(!allAccepted&&pending.length>0)setError('Проект «На доработку»: сначала завершите ручную проверку; для официального возврата необходим хотя бы один документ со статусом «На доработку».');
+
  }
  async function reviewCandidateDoc(doc:CandidateDoc,status:'accepted'|'revision'){
   if(!teacher||!doc.is_submitted||busy)return;
