@@ -7,7 +7,7 @@ function deferred(){let resolve;const promise=new Promise(done=>resolve=done);re
 function text(node){if(node==null||typeof node==='boolean')return'';if(typeof node!=='object')return String(node);return[node.props?.children].flat(Infinity).map(text).join('');}
 function nodes(node,match){if(!node||typeof node!=='object')return[];return[...(match(node)?[node]:[]),...[node.props?.children].flat(Infinity).flatMap(child=>nodes(child,match))];}
 function calculation(game='game-a',round=1){
- return{ready:true,issues:[],round,jury_size:2,total_points:100,poll_enabled:true,rows:['a','b'].map((letter,index)=>({candidate_id:game+'-candidate-'+letter,name:game+' candidate '+letter,points:game==='game-a'?50:80,program_pct:50,campaign_pct:50,game_pct:50,poll_pct:20,penalty:0,modifier:0,first_pct:round===2?30+index*10:null,teacher_runoff_pct:50,result_pct:round===2?40+index*5:35}))};
+ return{ready:true,issues:[],round,jury_size:2,total_points:100,poll_enabled:true,rows:['a','b'].map((letter,index)=>({candidate_id:game+'-candidate-'+letter,name:game+' candidate '+letter,points:game==='game-a'?50:80,program_pct:50,campaign_pct:50,game_pct:game==='game-a'?50:80,poll_pct:20,penalty:0,modifier:0,first_pct:round===2?30+index*10:null,teacher_runoff_pct:50,result_pct:round===2?40+index*5:35}))};
 }
 function harness(){
  const relative='components/game/PresidentialRulesCalculator.tsx';
@@ -90,6 +90,18 @@ async function runChecks(check){
  await check('Actual calculator ignores late reads from an older refresh and another game',async()=>{
   const h=harness();await h.settle();h.points(60);const old=h.hold('get_presidential_rules_calculation'),first=h.refresh();await tick();h.points(70);await h.refresh();await h.settle();assert.equal(h.field('Баллы в игре, %',h.firstId).props.value,'70');old.resolve();await first;await h.settle();assert.equal(h.field('Баллы в игре, %',h.firstId).props.value,'70');
   const other=h.hold('get_presidential_rules_calculation'),pending=h.refresh();await tick();h.scope('game-b','teacher-b');await h.settle();other.resolve();await pending;await h.settle();assert.equal(h.field('Баллы в игре, %',h.firstId).props.value,'80');assert.doesNotMatch(h.text(),/game-a candidate/);h.dispose();
+ });
+ await check('Actual calculator omits poll fields and poll input when Stage 6 voted against the poll',async()=>{
+  const h=harness();await h.settle();
+  h.setProps({pollApproved:false});await h.settle();
+  assert.match(h.text(),/Рейтинг игры\) \/ 3/);
+  assert.equal(h.all('label').some(x=>text(x).startsWith('Доля соцопроса, %')),false);
+  h.change('Баллы в игре, %','76',h.firstId);
+  h.button('Сохранить проценты',h.firstId).props.onClick();await h.settle();
+  const saved=h.calls.find(x=>x.name==='set_presidential_rules_percentage');
+  assert.equal(saved.args.p_game_pct,76);
+  assert.equal(saved.args.p_poll_pct,null);
+  h.dispose();
  });
  await check('Actual calculator ballot selects save the checked round, criterion, slot and candidate',async()=>{
   const h=harness();await h.settle();h.select('Программа и документы').props.onChange(h.firstId.replace(/a$/,'b'));await h.settle();const call=h.calls.find(x=>x.name==='set_presidential_teacher_ballot');assert.equal(call.args.p_game_id,'game-a');assert.equal(call.args.p_round_no,1);assert.equal(call.args.p_criterion,'program');assert.equal(call.args.p_slot_no,1);assert.equal(call.args.p_candidate_id,'game-a-candidate-b');assert.equal(h.select('Программа и документы').props.value,'game-a-candidate-b');h.change('Число голосующих преподавателей','4');h.button('Сохранить состав ППС').props.onClick();await h.settle();h.server({jury_size:3});await h.refresh();await h.settle();assert.equal(h.field('Число голосующих преподавателей').props.value,'3');assert.equal(nodes(h.render(),node=>node.type?.displayName==='StyledSelect').length,6);h.dispose();
