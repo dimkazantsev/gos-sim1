@@ -8,7 +8,7 @@ CREATE POLICY gos_party_candidate_photo_upload ON storage.objects
  WITH CHECK (
   bucket_id='game-assets'
   AND split_part(name,'/',2)='presidential'
-  AND split_part(name,'/',4) ~ '^photo-[0-9a-fA-F-]{36}\\.(jpg|jpeg|png|webp)$'
+  AND split_part(name,'/',4) ~ '^photo-[0-9a-fA-F-]{36}\.(jpg|jpeg|png|webp)$'
   AND EXISTS (
    SELECT 1 FROM public.presidential_candidates c
    WHERE c.id::text=split_part(name,'/',3)
@@ -40,7 +40,7 @@ BEGIN
  v_prefix:=c.game_id::text||'/presidential/'||c.id::text||'/';
  IF p_storage_path IS NULL OR left(p_storage_path,length(v_prefix))<>v_prefix
     OR substring(p_storage_path FROM length(v_prefix)+1)
-        !~ '^photo-[0-9a-fA-F-]{36}\\.(jpg|jpeg|png|webp)$' THEN
+        !~ '^photo-[0-9a-fA-F-]{36}\.(jpg|jpeg|png|webp)$' THEN
   RAISE EXCEPTION 'Некорректный путь фотографии кандидата' USING ERRCODE='22023';
  END IF;
  IF NOT EXISTS(
