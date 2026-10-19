@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const sql=fs.readFileSync('supabase/migrations/20261019141000_party_candidate_photo_upload.sql','utf8');
+const sql=fs.readFileSync('supabase/migrations/20261019210000_party_candidate_photo_upload.sql','utf8');
 const previous=fs.readFileSync('supabase/migrations/20261019101000_exclusive_presidential_decision_party_candidate_upload.sql','utf8');
 const ui=fs.readFileSync('components/game/PresidentialElectionLab.tsx','utf8');
 const memberFn=previous.match(/CREATE OR REPLACE FUNCTION private\.can_upload_presidential_candidate_document\([\s\S]*?\$fn\$;/);
