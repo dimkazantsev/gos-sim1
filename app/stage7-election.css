@@ -109,3 +109,11 @@
 .stage7CecComplaints .cecComplaintModeration{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
 @media(max-width:900px){.stage7Election .stage7Tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.stage7CecComplaints .cecComplaintActions{display:grid}.stage7CecComplaints .cecComplaintActions button{width:100%}}
+
+/* Этап 7: кнопка отправки всегда располагается под пояснением во всю ширину. */
+.stage7Election .campaignForm .campaignSubmit{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-items:stretch;width:100%;padding-top:8px}
+.stage7Election .campaignForm .campaignSubmit span{display:block;max-width:none;line-height:1.5}
+.stage7Election .campaignForm .campaignSubmit button{display:flex;justify-content:center;align-items:center;width:100%;min-width:0;min-height:49px;white-space:normal;text-align:center;border-radius:12px}
+.stage7Election .stage7Tabs.withoutPoll{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:900px){.stage7Election .stage7Tabs.withoutPoll{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.stage7Election .stage7Tabs.withoutPoll{grid-template-columns:1fr}}
