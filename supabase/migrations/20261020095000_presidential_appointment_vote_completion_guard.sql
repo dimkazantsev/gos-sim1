@@ -4,15 +4,15 @@ DO $patch$
 DECLARE v_def text;
 BEGIN
  v_def:=pg_get_functiondef('private.stage8_create_appointment_decree(uuid)'::regprocedure);
- IF position("v_body,'president_act',2," in v_def)>0 THEN RETURN; END IF;
- IF position("v_body,'president_decree',2," in v_def)=0
+ IF position('v_body,''president_act'',2,' in v_def)>0 THEN RETURN; END IF;
+ IF position('v_body,''president_decree'',2,' in v_def)=0
    OR position("n.office_kind='central_bank_chair' then return null" in lower(v_def))=0
    OR position("n.appointment_document_id is not null" in lower(v_def))=0
    OR jsonb_array_length(private.formal_workflow('president_act'))<3
    OR private.formal_workflow('president_act')->2->>'code' IS DISTINCT FROM 'signed'
  THEN RAISE EXCEPTION 'Текущая процедура указа или утверждённый маршрут изменились'; END IF;
- v_def:=replace(v_def,"v_body,'president_decree',2,","v_body,'president_act',2,");
- IF position("v_body,'president_act',2," in v_def)=0 THEN
+ v_def:=replace(v_def,'v_body,''president_decree'',2,','v_body,''president_act'',2,');
+ IF position('v_body,''president_act'',2,' in v_def)=0 THEN
   RAISE EXCEPTION 'Замена маршрута указа Президента не выполнена'; END IF;
  EXECUTE v_def;
 END;
