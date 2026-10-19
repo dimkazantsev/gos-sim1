@@ -7,7 +7,7 @@ assert(sql.includes('duma_not_elected'));
 assert(sql.includes("e.status=''adopted''"));
 assert(sql.includes("status=''active''"));
 assert(sql.includes('private.ensure_event_case_routing(p_game)'));
-assert(sql.includes('ea.status=''pending'''));
+assert(sql.includes("ea.status=''pending''"));
 assert(sql.includes('routing_not_configured'));
 assert(sql.includes('for update skip locked'));
 assert(css.includes('.legalPortal .registryCardHead>.formalStatus'));
