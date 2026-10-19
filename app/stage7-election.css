@@ -179,3 +179,17 @@
 .stage7Election .cecProtocolError{background:#fff3f4;border:1px solid #edbac5;color:#b52c48}
 @media(max-width:900px){.stage7Election .cecProtocolPanel>.stage7Grid{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){.stage7Election .cecProtocolPanel>.stage7Grid,.stage7Election .cecProtocolActions{grid-template-columns:1fr;gap:12px}.stage7Election .cecProtocolActions{padding-top:14px}.stage7Election .cecProtocolActions button{min-height:50px}.stage7Election .cecProtocolPreview{padding:15px}}
+
+
+/* Инаугурация: прямые ссылки на аудио вместо нативного поля загрузки файлов. */
+.stage7Election .inaugurationForm .ceremonyAudioLinkField{align-content:start;min-width:0;gap:8px}
+.stage7Election .inaugurationForm .ceremonyAudioLinkField input[type="url"]{width:100%;min-width:0;box-sizing:border-box;min-height:46px;border:1px solid var(--line);border-radius:12px;background:#fbfcff;padding:11px 13px;color:var(--text);font-size:14px;font-weight:500}
+.stage7Election .inaugurationForm .ceremonyAudioLinkField input[type="url"]:focus-visible{outline:2px solid #315efb;outline-offset:2px}
+.stage7Election .inaugurationForm .ceremonyAudioLinkField input[aria-invalid="true"]{border-color:#c84058;background:#fff8f9}
+.stage7Election .inaugurationForm .ceremonyAudioLinkField small{display:block;color:var(--muted);font-size:12px;font-weight:500;line-height:1.45}
+.stage7Election .ceremonyAudioCard{display:grid;align-content:start;gap:10px;min-width:0;padding:14px;border:1px solid var(--line);border-radius:14px;background:#f8faff}
+.stage7Election .ceremonyAudioCard b{font-size:13px;color:var(--body)}
+.stage7Election .ceremonyAudioCard audio{display:block;width:100%;max-width:100%}
+.stage7Election .ceremonyAudioCard a{display:inline-flex;gap:6px;align-items:center;justify-content:flex-start;color:#315efb;font-size:13px;font-weight:750;text-decoration:none;overflow-wrap:anywhere}
+.stage7Election .ceremonyAudioCard a:hover{text-decoration:underline}
+@media(max-width:700px){.stage7Election .ceremonyAudio{grid-template-columns:1fr}.stage7Election .inaugurationForm .ceremonyAudioLinkField{grid-column:1/-1}}
