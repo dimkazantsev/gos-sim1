@@ -4,11 +4,11 @@ const {chromium}=require('playwright-core');
 const root=path.resolve(__dirname,'..');
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser','/opt/google/chrome/chrome'].find(x=>x&&fs.existsSync(x));
 if(!chrome)throw Error('Chrome or Chromium required');
-const css=fs.readFileSync(path.join(root,'app/stage6-election-workspace.css'),'utf8')+'\n'+fs.readFileSync(path.join(root,'app/stage6-cec-workspace-polish.css'),'utf8');
+const css=fs.readFileSync(path.join(root,'app/stage-operations.css'),'utf8')+'\n'+fs.readFileSync(path.join(root,'app/stage6-election-workspace.css'),'utf8')+'\n'+fs.readFileSync(path.join(root,'app/stage6-cec-workspace-polish.css'),'utf8');
 const h=[
 '<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>',
 ':root{--navy:#102b54;--text:#173457;--muted:#657c9d;--body:#506589;--line:#dbe4f0}*{box-sizing:border-box}body{font-family:system-ui,Arial,sans-serif;font-size:14px;margin:0;padding:12px;background:#f4f7fc}button,input,select,textarea{font:inherit}button{cursor:pointer}',
-css,'</style></head><body><main class="stageOperations" data-stage="6"><section id="stage6-cec" class="electionLab cecWorkspace">',
+css,'</style></head><body><main class="stageOperations" data-stage="6"><div class="stageOperationsPane"><fieldset class="stageOperationsControls"><div class="stageOperationsModules"><section id="stage6-cec" class="electionLab cecWorkspace">',
 '<header class="electionLabHead cecHead"><div><small>ЦИК РФ · ЭТАП 6</small><h2>Выдвижение и регистрация кандидатов</h2><p>Кандидаты готовят программу, документы для ЦИК и подают регистрационные пакеты на шестом этапе.</p></div><div class="cecHeadSide">Центральная избирательная комиссия</div></header>',
 '<nav class="cecTabs" aria-label="Разделы работы ЦИК"><button class="active" aria-pressed="true">Моё досье</button><button aria-pressed="false">Подача в ЦИК <b>0</b></button><button aria-pressed="false">Кандидаты <b>0</b></button><button aria-pressed="false">Решения ЦИК <b>0</b></button></nav>',
 '<div class="cecSystemGate" role="status"><b>Избирательная система выбирается студентами.</b><span>Выдвижение и подача документов в ЦИК доступны независимо от итогов голосования.</span></div>',
@@ -24,7 +24,7 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
 '<div class="cecDocumentChecklist"><article class="cecDocumentItem missing"><label class="cecDocumentUploadTarget"><span class="cecDocumentState">1</span><span class="cecDocumentCopy"><b>Заявление о согласии баллотироваться</b><small>Файл ещё не загружен</small></span><strong>Загрузить</strong></label></article>',
 '<article class="cecDocumentItem ok"><label class="cecDocumentUploadTarget"><span class="cecDocumentState">✓</span><span class="cecDocumentCopy"><b>Сведения о доходах</b><small>Предварительная проверка пройдена</small></span><strong>Заменить</strong></label></article></div></section></div></details></article></div>',
 '<section class="cecDecisionRegistry"><header><div><small>ПУБЛИЧНЫЙ РЕЕСТР</small><h3>Решения ЦИК РФ</h3></div><span>1 решение</span></header><article class="cecDecision registered"><div><small>№ 001</small><h4>Иванов Иван Иванович</h4><p>Кандидат зарегистрирован.</p><button class="cecDocumentOpen">Открыть решение ЦИК</button></div><strong>Зарегистрирован</strong></article></section>',
-'</section></main></body></html>'
+'</section></div></fieldset></div></main></body></html>'
 ].join('');
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
@@ -35,8 +35,11 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
    await page.setContent(h,{waitUntil:'load'});
    const s=await page.evaluate(()=>{
     const root=document.querySelector('#stage6-cec'),rect=e=>{const b=e.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,h:b.height,right:b.right,bottom:b.bottom}};
+    const wrappers=[...document.querySelectorAll('.stageOperationsPane,.stageOperationsControls,.stageOperationsModules')].map(rect);
+    const nestedPanels=[...root.querySelectorAll(':scope>.cecHead,:scope>.cecTabs,:scope>.cecSystemGate,:scope>.candidateNomination,:scope>.candidateGrid,:scope>.cecDecisionRegistry')].map(rect);
     return {screen:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
-     root:rect(root),tabs:[...root.querySelectorAll('.cecTabs button')].map(rect),
+     root:rect(root),wrappers,nestedPanels,cssPadding:getComputedStyle(root).paddingLeft,
+     tabs:[...root.querySelectorAll('.cecTabs button')].map(rect),
      fields:[...root.querySelectorAll('.candidateNominationBody>label')].slice(0,3).map(rect),
      uploads:[...root.querySelectorAll('.cecDocumentUploadTarget')].map(rect),
      action:rect(root.querySelector('.candidateNominationBody>.primary')),
@@ -50,6 +53,18 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
      })()};
    });
    assert(s.scroll<=s.screen+2,'Horizontal overflow at '+width);
+   const gutter=width<=560?11:width>=1000?14:11;
+   assert(s.nestedPanels.length===6,'Expected all Stage 6 panels at '+width);
+   assert(parseFloat(s.cssPadding)>=gutter,'Outer safe inset lost at '+width);
+   for(const p of s.nestedPanels){
+    const leftInset=p.x-s.root.x,rightInset=s.root.right-p.right;
+    assert(leftInset>=gutter-1&&rightInset>=gutter-1,
+      'Panel touches/clips outer CEC border at '+width+': '+JSON.stringify({leftInset,rightInset}));
+   }
+   for(const w of s.wrappers){
+    assert(w.w<=s.screen+2,'Ancestor stage-workspace overflow at '+width);
+    assert(s.root.x>=w.x-1&&s.root.right<=w.right+1,'CEC escapes ancestor grid at '+width);
+   }
    for(const b of [...s.tabs,...s.fields,...s.uploads,s.action]){
     assert(b.x>=s.root.x-2&&b.right<=s.root.right+2,'Control overflow at '+width);
     assert(b.w>25,'Collapsed control at '+width);
@@ -75,6 +90,6 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
    assert.equal(await page.locator('.candidateNomination').evaluate(x=>x.open),true,'Details did not reopen at '+width);
    await page.close();
   }
-  console.log('PASS: 11 widths (320–1440), centered SVG-free CSS cross/plus, input widths, tabs, nomination form, document uploads and CEC decisions.');
+  console.log('PASS: nested work-panel Chrome regression at 11 widths 320–1440; safe left/right gutters, no clipped content, aligned forms and centered cross.');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
