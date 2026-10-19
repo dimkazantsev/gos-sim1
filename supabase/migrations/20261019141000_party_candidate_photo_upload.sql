@@ -34,6 +34,20 @@ CREATE POLICY gos_party_presidential_documents_read ON public.presidential_candi
   )
  );
 
+-- Пункты программы видны сопартийцам, чтобы правильно отображалась комплектность
+-- документов в досье. Изменение текста программы по-прежнему ограничено.
+DROP POLICY IF EXISTS gos_party_presidential_program_read ON public.presidential_candidate_program_points;
+CREATE POLICY gos_party_presidential_program_read ON public.presidential_candidate_program_points
+ FOR SELECT TO authenticated USING (
+  EXISTS (
+   SELECT 1 FROM public.presidential_candidates c
+    WHERE c.id=presidential_candidate_program_points.candidate_id
+      AND c.game_id=presidential_candidate_program_points.game_id
+      AND c.nomination_type='party' AND c.archived_at IS NULL
+      AND private.can_upload_presidential_candidate_document(c.id,auth.uid())
+  )
+ );
+
 DROP POLICY IF EXISTS gos_party_candidate_photo_upload ON storage.objects;
 CREATE POLICY gos_party_candidate_photo_upload ON storage.objects
  FOR INSERT TO authenticated
