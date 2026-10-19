@@ -14,7 +14,7 @@ function harness(component){
  const file=path.join(root,'components/game',component+'.tsx');
  const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const slots=[],pendingEffects=[],channels=[],counts=new Map(),holds=new Map(),errors=[],fetches=[],failures=new Set(),profileNotes=new Map(),committeeLegal=new Map(),budgetConclusions=new Map();
- let cursor=0,dirty=false,tree,latestTableLoad,revision=1,serverVenue='Saved venue',clock=0,sessionUser='teacher-a',props;
+ let cursor=0,dirty=false,tree,latestTableLoad,revision=1,serverVenue='Saved venue',serverPollApproved=false,clock=0,sessionUser='teacher-a',props;
  const g={game:{id:'game-a'},me:{game_id:'game-a',user_id:'teacher-a',kind:'teacher',full_name:'Teacher A'},teacher:true,currentStage:{stage_no:7},formalDocuments:[],formalHistory:[],votes:[],members:[],parties:[],setError:error=>errors.push(String(error?.message||error))};
  for(const name of ['createFormalDocument','deleteFormalDocument','advanceFormalDocument','updateFormalDraft','vetoFormalDocument','resolveBudgetConciliation','startBudgetRejectionBranch','createVote'])g[name]=async()=>null;
  g.refresh=async()=>{};
@@ -33,6 +33,7 @@ function harness(component){
    if(table==='presidential_candidates')data=['a','b'].map(letter=>({id:'candidate-'+letter,user_id:snapshot.user,created_by:snapshot.user,registration_status:'registered',display_name:'Candidate '+letter+' revision '+snapshot.revision,photo_path:null,party_id:null,rating_penalty:0}));
    if(table==='presidential_election_settings')data={game_id:snapshot.game,system_type:'relative',status:'round1',poll_enabled:true,result:{}};
    if(table==='presidential_scorecards')data=['a','b'].map(letter=>({candidate_id:'candidate-'+letter,round_no:1,poll_pct:20,computed_pct:snapshot.revision}));
+   if(table==='presidential_poll_decision')data={game_id:snapshot.game,status:'closed',result:serverPollApproved};
    if(table==='presidential_inauguration')data={game_id:snapshot.game,scheduled_at:'2026-10-08T12:00:00Z',venue:snapshot.serverVenue,notes:'Saved notes',hymn_path:null,ceremonial_music_path:null};
    if(table==='bill_submission_profiles')data={document_id:filters.document_id,committee_key:'committee-1',requires_financial_justification:false,requires_government_opinion:false,note:profileNotes.get(filters.document_id)||'Saved profile '+filters.document_id+' revision '+snapshot.revision};
    if(table==='bill_committee_conclusions')data={document_id:filters.document_id,legal_compliance:committeeLegal.get(filters.document_id)||'Saved legal '+filters.document_id+' revision '+snapshot.revision,internal_logic:'Saved logic',affected_acts_completeness:'Saved acts',recommendation:'draft',finalized:false};
@@ -77,7 +78,7 @@ function harness(component){
  const byClass=(name,from=tree)=>nodes(from,node=>node.props?.className?.split(' ').includes(name))[0];
  const all=(type,from=tree)=>nodes(from,node=>node.type===type);
  const byLabel=name=>nodes(tree,node=>node.props?.['aria-label']===name)[0];
- const clickResults=()=>all('button',byClass('stage7Tabs'))[3].props.onClick();
+ const clickResults=()=>{const button=all('button',byClass('stage7Tabs')).find(node=>text(node).includes('Итоги и инаугурация'));assert.ok(button,'Results tab must exist even when Stage 6 removed the poll');button.props.onClick();};
  return{
   g,render,settle,errors,fetches,byClass,all,byLabel,clickResults,setProps:value=>Object.assign(props,value),
   venueInput:()=>all('input',byClass('inaugurationForm'))[1],
@@ -87,7 +88,7 @@ function harness(component){
   refreshDocument(){return nodes(tree,node=>node.type?.displayName==='DocumentTools')[0].props.onRefresh();},
   remoteProfile(value,id='doc-a'){profileNotes.set(id,value);},remoteLegal(value,id='doc-a'){committeeLegal.set(id,value);},remoteBudget(value,id='doc-a'){budgetConclusions.set(id,value);},
   resolveFetch(index,data,ok=true){fetches[index].response.resolve({ok,json:async()=>data});},
-  setRevision:value=>{revision=value;},setVenue:value=>{serverVenue=value;},setSessionUser:value=>{sessionUser=value;},
+  setRevision:value=>{revision=value;},setVenue:value=>{serverVenue=value;},setSessionUser:value=>{sessionUser=value;},setPollApproved:value=>{serverPollApproved=value;},
   fail:table=>failures.add(table),
   hold(table){const pending=deferred();holds.set(table+':'+((counts.get(table)||0)+1),pending);return pending;},
   refresh(){if(latestTableLoad)return latestTableLoad();for(const channel of channels)for(const {filter,callback} of channel.handlers)if(filter.table==='presidential_scorecards')callback();},
@@ -98,6 +99,18 @@ function harness(component){
 async function main(){
  const failures=[];
  async function check(name,fn){try{await fn();console.log('PASS '+name);}catch(error){failures.push(name);console.error('FAIL '+name+': '+error.message);}}
+ await check('Stage7 tabs re-number after Stage 6 decides whether to use a poll',async()=>{
+  const h=harness('PresidentialElectionStage7');await h.settle();
+  let tabs=h.all('button',h.byClass('stage7Tabs'));
+  assert.equal(tabs.length,3);
+  assert.deepEqual(tabs.map(x=>text(x)),['01Кампания','02Жалобы в ЦИК','03Итоги и инаугурация']);
+  h.clickResults();h.render();assert.ok(h.byClass('resultBars'));
+  h.setPollApproved(true);await h.refresh();await h.settle();
+  tabs=h.all('button',h.byClass('stage7Tabs'));
+  assert.equal(tabs.length,4);
+  assert.deepEqual(tabs.map(x=>text(x)),['01Кампания','02Соцопрос избирателей','03Жалобы в ЦИК','04Итоги и инаугурация']);
+  h.clickResults();h.render();assert.ok(h.byClass('resultBars'));h.dispose();
+ });
  await check('Stage7 refresh preserves inauguration edits and delegates calculator controls',async()=>{
   const h=harness('PresidentialElectionStage7');await h.settle();h.clickResults();h.render();h.venueInput().props.onChange({target:{value:'Unsaved venue'}});h.render();h.setVenue('Other saved venue');await h.refresh();await h.settle();assert.equal(h.venueInput().props.value,'Unsaved venue');const calculator=nodes(h.render(),node=>node.type?.displayName==='PresidentialRulesCalculator')[0];assert.ok(calculator,'The actual calculator is mounted as a separate component');assert.equal(calculator.props.g,h.g);assert.equal(calculator.props.settings.status,'round1');assert.equal(calculator.props.candidates.length,2);assert.equal(h.byClass('scoreMetricsRow'),undefined);h.dispose();
  });
