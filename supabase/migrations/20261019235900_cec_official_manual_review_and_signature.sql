@@ -61,3 +61,21 @@ BEGIN
  EXECUTE source_sql;
 END
 $migration$;
+
+
+-- Техническая предварительная проверка — только для роли преподавателя.
+-- Результат не выдаётся студентам даже через прямой вызов RPC.
+DO $scope$
+DECLARE source_sql text;
+BEGIN
+ source_sql:=pg_get_functiondef('public.get_presidential_cec_auto_review(uuid)'::regprocedure);
+ IF strpos(source_sql,'if not private.can_manage_presidential_candidate(c.id,v_uid) and not (c.cec_submitted_at is not null and private.is_game_teacher(c.game_id))')=0 THEN
+  RAISE EXCEPTION 'Полномочия RPC предварительной проверки ЦИК изменены';
+ END IF;
+ source_sql:=replace(source_sql,
+  'if not private.can_manage_presidential_candidate(c.id,v_uid) and not (c.cec_submitted_at is not null and private.is_game_teacher(c.game_id))',
+  'if not private.is_game_teacher(c.game_id)'
+ );
+ EXECUTE source_sql;
+END
+$scope$;
