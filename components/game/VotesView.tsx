@@ -87,7 +87,18 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
 
  function canDelete(v:Vote){return !!me&&(teacher||v.created_by===me.user_id)}
  function canClose(v:Vote){
-  if(teacher)return true;if(!me)return false;if(units.some(u=>'unit:'+u.id===v.institution_key&&u.head_user_id===me.user_id))return true;
+  if(teacher)return true;
+  if(!me)return false;
+  // Registration-based votes close automatically on the last registered ballot.
+  // Even a chairman must not manually finalize while another eligible attendee
+  // has not yet cast their vote. Server RPC applies the same safeguard.
+  if(voteNeedsRegistration(v)){
+   if(!checkinLoaded)return false;
+   const registered=checkedIn.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no
+    &&Number(v.electorate_snapshot?.weights?.[r.user_id]||0)>0);
+   if(registered.length===0||registered.some(r=>!ballots.some(b=>b.vote_id===v.id&&b.voter_id===r.user_id)))return false;
+  }
+  if(units.some(u=>'unit:'+u.id===v.institution_key&&u.head_user_id===me.user_id))return true;
   if(['bill_amendments','budget_second_reading_amendment','budget_government_submission'].includes(v.procedure_key||'')&&v.created_by===me.user_id)return true;
   const officeRoles=[me.role_title||'',...g.officeAssignments.filter(o=>o.user_id===me.user_id&&o.status==='active').map(o=>o.role_title)].map(r=>r.toLowerCase());
   const hasOffice=(predicate:(role:string)=>boolean)=>officeRoles.some(predicate);
