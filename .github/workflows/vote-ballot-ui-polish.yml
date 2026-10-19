@@ -1,0 +1,35 @@
+name: ГОС.ID · Единый стиль панели голосования
+on:
+  pull_request:
+    paths:
+      - 'components/game/VoteBallotControls.tsx'
+      - 'app/vote-ballot-panel.css'
+      - 'app/layout.tsx'
+      - 'scripts/vote-ballot-ui-browser-check.cjs'
+      - '.github/workflows/vote-ballot-ui-polish.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'components/game/VoteBallotControls.tsx'
+      - 'app/vote-ballot-panel.css'
+      - 'app/layout.tsx'
+      - 'scripts/vote-ballot-ui-browser-check.cjs'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: build-placeholder-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/vote-ballot-ui-browser-check.cjs
+      - run: node scripts/gd-session-attendance-check.cjs
+      - run: node scripts/vote-office-grants-check.cjs
+      - run: node scripts/procedural-vote-auto-close-check.cjs
+      - run: npm run typecheck
