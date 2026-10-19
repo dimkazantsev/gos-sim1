@@ -36,7 +36,11 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
    const s=await page.evaluate(()=>{
     const root=document.querySelector('#stage6-cec'),rect=e=>{const b=e.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,h:b.height,right:b.right,bottom:b.bottom}};
     return {screen:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
-     root:rect(root),tabs:[...root.querySelectorAll('.cecTabs button')].map(rect),
+     root:rect(root),
+     safePadding:{left:parseFloat(getComputedStyle(root).paddingLeft),right:parseFloat(getComputedStyle(root).paddingRight)},
+     panels:[...root.children].filter(e=>e.matches('header,nav,section,details,div')).map(rect),
+     textarea:[...root.querySelectorAll('.candidateNominationBody textarea')].map(rect),
+     tabs:[...root.querySelectorAll('.cecTabs button')].map(rect),
      fields:[...root.querySelectorAll('.candidateNominationBody>label')].slice(0,3).map(rect),
      uploads:[...root.querySelectorAll('.cecDocumentUploadTarget')].map(rect),
      action:rect(root.querySelector('.candidateNominationBody>.primary')),
@@ -50,6 +54,14 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
      })()};
    });
    assert(s.scroll<=s.screen+2,'Horizontal overflow at '+width);
+   assert(s.safePadding.left>=10&&s.safePadding.right>=10,'Safe side padding removed at '+width+': '+JSON.stringify(s.safePadding));
+   for(const panel of s.panels){
+    assert(panel.x>=s.root.x+s.safePadding.left-2,'Panel touches left border at '+width);
+    assert(panel.right<=s.root.right-s.safePadding.right+2,'Panel touches right border at '+width);
+   }
+   for(const area of s.textarea){
+    assert(area.x>=s.root.x+s.safePadding.left+7&&area.right<=s.root.right-s.safePadding.right-7,'Textarea touches outer border at '+width);
+   }
    for(const b of [...s.tabs,...s.fields,...s.uploads,s.action]){
     assert(b.x>=s.root.x-2&&b.right<=s.root.right+2,'Control overflow at '+width);
     assert(b.w>25,'Collapsed control at '+width);
@@ -75,6 +87,6 @@ css,'</style></head><body><main class="stageOperations" data-stage="6"><section 
    assert.equal(await page.locator('.candidateNomination').evaluate(x=>x.open),true,'Details did not reopen at '+width);
    await page.close();
   }
-  console.log('PASS: 11 widths (320–1440), centered SVG-free CSS cross/plus, input widths, tabs, nomination form, document uploads and CEC decisions.');
+  console.log('PASS: 11 widths (320–1440), 10px+ safe gutters around all cards, separated textarea, centered cross/plus, inputs, tabs and uploads.');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
