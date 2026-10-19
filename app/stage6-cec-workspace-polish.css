@@ -7,14 +7,24 @@
   --cec-blue:#315ee9;
   --cec-surface:#fff;
   --cec-soft:#f5f8fe;
+  box-sizing:border-box;
   display:grid;
+  grid-template-columns:minmax(0,1fr);
   gap:14px;
-  min-width:0;
+  width:100%;max-width:100%;min-width:0;
+  /* The old padding:0 cancelled the native .electionLab inner gutters. */
+  padding:14px clamp(12px,1.25vw,18px) 18px;
   container:cec-stage6/inline-size;
-  padding:0;
   color:var(--cec-ink);
 }
 #stage6-cec.cecWorkspace *,#stage6-cec.cecWorkspace *::before,#stage6-cec.cecWorkspace *::after{box-sizing:border-box}
+/* Every module shares the same inset and may shrink inside the work-pane grid. */
+#stage6-cec.cecWorkspace>*{min-width:0;max-width:100%}
+#stage6-cec :is(.cecTabs,.cecSystemGate,.candidateNomination,.candidateGrid,
+  .candidateCard,.cecDecisionRegistry,.candidateNominationBody,
+  .candidateDossier,.candidateDossierBody,.candidateDocPack){
+  box-sizing:border-box;min-width:0;max-width:100%;
+}
 #stage6-cec .cecHead{
   min-width:0;display:flex;align-items:center;justify-content:space-between;gap:18px;
   padding:20px 22px;border:1px solid var(--cec-line);border-radius:20px;
@@ -60,13 +70,14 @@
   outline:3px solid #a8c1fa;outline-offset:2px;
 }
 #stage6-cec .cecSystemGate{
-  display:flex;align-items:center;gap:9px;justify-content:flex-start;min-width:0;
+  display:flex;flex-wrap:wrap;align-items:center;gap:9px;justify-content:flex-start;
+  width:100%;min-width:0;max-width:100%;
   padding:11px 14px;border:1px solid #cbdaf3;border-radius:14px;
   background:#f3f7ff;color:#375b91;box-shadow:none;
 }
 #stage6-cec .cecSystemGate::before{content:"i";display:grid;place-items:center;flex:none;width:21px;height:21px;border-radius:50%;background:#e0eaff;color:#4168bc;font-size:12px;font-weight:900;font-style:normal}
-#stage6-cec .cecSystemGate b{font-size:12px;font-weight:800;line-height:1.5;color:#294f8b}
-#stage6-cec .cecSystemGate span{max-width:none;text-align:left;color:#5b7295;font-size:12px;line-height:1.5}
+#stage6-cec .cecSystemGate b{min-width:0;max-width:100%;overflow-wrap:anywhere;font-size:12px;font-weight:800;line-height:1.5;color:#294f8b}
+#stage6-cec .cecSystemGate span{flex:1 1 260px;min-width:0;max-width:100%;text-align:left;color:#5b7295;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
 #stage6-cec .electionSystemStatusCard{
   min-width:0;border:1px solid #d2e0f5;border-radius:16px;
   background:#f5f9ff;box-shadow:none;overflow:hidden;
@@ -292,7 +303,7 @@
   #stage6-cec .cecDecisionRegistry>header{flex-wrap:wrap}
 }
 @container cec-stage6 (max-width:490px){
-  #stage6-cec.cecWorkspace{gap:10px}
+  #stage6-cec.cecWorkspace>*{min-width:0;max-width:100%}
   #stage6-cec .cecHead{padding:15px}
   #stage6-cec .cecHeadSide{display:none}
   #stage6-cec .cecTabs{gap:5px;padding:5px;border-radius:14px}
@@ -320,4 +331,8 @@
 @media(prefers-reduced-motion:reduce){
   #stage6-cec .cecTabs button,
   #stage6-cec .candidateNominationToggle::before,#stage6-cec .candidateNominationToggle::after{transition:none}
+}
+
+@media (max-width:560px){
+  #stage6-cec.cecWorkspace{gap:11px;padding:12px}
 }
