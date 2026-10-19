@@ -2,6 +2,38 @@
 -- Права на закрытую анкету, программу, решения ЦИК и чужие партии не расширяются.
 -- Загрузка прочих документов уже регулируется can_upload_presidential_candidate_document.
 
+-- Черновик выдвижения и список файлов должны быть видны сопартийцам
+-- до подачи в ЦИК. Не раскрывать досье других партий и персональную анкету.
+DROP POLICY IF EXISTS gos_party_presidential_candidate_read ON public.presidential_candidates;
+CREATE POLICY gos_party_presidential_candidate_read ON public.presidential_candidates
+ FOR SELECT TO authenticated USING (
+  private.is_game_member(game_id)
+  AND nomination_type='party'
+  AND party_id IS NOT NULL
+  AND archived_at IS NULL
+  AND EXISTS(
+   SELECT 1 FROM public.game_parties p
+   JOIN public.game_members gm ON gm.game_id=p.game_id
+    AND gm.user_id=auth.uid()
+    AND gm.kind='student'
+    AND gm.roster_archived_at IS NULL
+    AND gm.team=p.name
+   WHERE p.id=party_id AND p.game_id=game_id
+    AND p.registration_status='registered'
+  )
+ );
+
+DROP POLICY IF EXISTS gos_party_presidential_documents_read ON public.presidential_candidate_documents;
+CREATE POLICY gos_party_presidential_documents_read ON public.presidential_candidate_documents
+ FOR SELECT TO authenticated USING (
+  EXISTS (
+   SELECT 1 FROM public.presidential_candidates c
+    WHERE c.id=candidate_id AND c.game_id=game_id
+      AND c.nomination_type='party' AND c.archived_at IS NULL
+      AND private.can_upload_presidential_candidate_document(c.id,auth.uid())
+  )
+ );
+
 DROP POLICY IF EXISTS gos_party_candidate_photo_upload ON storage.objects;
 CREATE POLICY gos_party_candidate_photo_upload ON storage.objects
  FOR INSERT TO authenticated
