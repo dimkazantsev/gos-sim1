@@ -13,6 +13,7 @@ on:
       - 'components/game/cecNameDeclension.ts'
       - 'supabase/migrations/20261019235930_cec_chair_signature_issued_forms_read.sql'
       - 'scripts/cec-chair-signature-inflection-check.cjs'
+      - 'scripts/cec-program-point-validation-hint-check.cjs'
       - 'components/game/PresidentialCecComplaints.tsx'
       - 'components/game/PresidentialElectionStage7.tsx'
       - 'app/stage7-election.css'
@@ -57,6 +58,7 @@ on:
       - 'components/game/cecNameDeclension.ts'
       - 'supabase/migrations/20261019235930_cec_chair_signature_issued_forms_read.sql'
       - 'scripts/cec-chair-signature-inflection-check.cjs'
+      - 'scripts/cec-program-point-validation-hint-check.cjs'
       - 'components/game/PresidentialCecComplaints.tsx'
       - 'components/game/PresidentialElectionStage7.tsx'
       - 'app/stage7-election.css'
@@ -106,6 +108,7 @@ jobs:
       - run: node scripts/cec-registration-and-complaints-check.cjs
       - run: node scripts/cec-official-forms-signature-check.cjs
       - run: node scripts/cec-chair-signature-inflection-check.cjs
+      - run: node scripts/cec-program-point-validation-hint-check.cjs
       - run: node scripts/stage6-responsive-browser-check.cjs
       - run: node scripts/stage6-cec-visual-browser-check.cjs
       - run: npm run typecheck
