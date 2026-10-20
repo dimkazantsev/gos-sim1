@@ -14,7 +14,7 @@ for(let i=0;i<files.length;i++){
  assert.equal(sf.parseDiagnostics.length,0,files[i]+' syntax regression');
 }
 const [sync,game,client]=contents;
-assert(sync.includes('if(gameRealtimeConnected(gameId)&&now-lastFallbackAt<180000)return'));
+assert(sync.includes('if(hasPushCoverage&&gameRealtimeConnected(gameId)&&now-lastFallbackAt<180000)return'));
 assert(game.includes('setGameRealtimeConnection(gameId,liveConnected)'));
 assert(game.includes('setGameRealtimeConnection(gameId,false)'));
 assert(game.includes('if(liveConnected&&now-lastChatRecoveryAt<60000)return'));
@@ -26,7 +26,7 @@ assert(client.includes('setTimeout(()=>{pendingTimer=undefined;if(live)void coun
 
 const js=ts.transpileModule(sync,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 let now=1_000_000;
-function browserSession(index,widgets=3){
+function browserSession(index,widgets=3,table='game_stages'){
  const listeners={window:new Map(),document:new Map()};
  const counts={loads:0};
  const intervals=[],timeouts=[];
@@ -58,7 +58,7 @@ function browserSession(index,widgets=3){
  const mod={exports:{}};
  const requireMock=name=>{assert.equal(name,'react');return react};
  vm.runInNewContext('(function(require,module,exports){'+js+'})',env)(requireMock,mod,mod.exports);
- for(let w=0;w<widgets;w++)mod.exports.useGameTableSync('test-game',['game_stages'],async()=>{counts.loads++},'widget-'+w);
+ for(let w=0;w<widgets;w++)mod.exports.useGameTableSync('test-game',[table],async()=>{counts.loads++},'widget-'+w);
  const settle=async()=>{for(let i=0;i<6;i++)await Promise.resolve()};
  return {
   counts,intervals,settle,
@@ -98,6 +98,14 @@ function browserSession(index,widgets=3){
  const disconnected=sessions.reduce((sum,c)=>sum+c.counts.loads,0);
  assert(disconnected>=afterEvent+120,'Every disconnected client resumes its fallback within 40 seconds');
  sessions.forEach(c=>c.dispose());
+ // Unsupported per-widget tables must not lose their original refresh rate:
+ // the shared WebSocket does not subscribe to their changes.
+ const uncovered=browserSession(99,1,'unlisted_stage_table');
+ await uncovered.settle();
+ uncovered.connect(true);
+ for(let elapsed=0;elapsed<40000;elapsed+=5000){now+=5000;await uncovered.tick()}
+ assert(uncovered.counts.loads>=2,'Table without push invalidation retains normal 25–35s visible poll');
+ uncovered.dispose();
  console.log('PASS: 40 independent browser sessions, 3 widgets each; 120 initial reads, '+reads120+' at 2m, '+reads240+' at 4m, '+afterEvent+' after direct event, '+disconnected+' after 40s offline recovery');
  console.log('NOTE: simulated REST load budget, not a live 40-user production stress test; actual Supabase API is currently 402 restricted');
 })().catch(e=>{console.error(e);process.exitCode=1});
