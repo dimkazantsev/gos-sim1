@@ -1,6 +1,6 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {notifyGameDataRefresh} from './useGameTableSync';
+import {notifyGameDataRefresh,setGameRealtimeConnection} from './useGameTableSync';
 import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
 import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {useEffect,useMemo,useRef,useState} from 'react';
@@ -309,6 +309,7 @@ export function useRepublicGame(gameId:string){
   channel.subscribe(status=>{
    if(disposed)return;
    liveConnected=status==='SUBSCRIBED';
+   setGameRealtimeConnection(gameId,liveConnected);
    if(liveConnected)lastPollAt=Date.now();
    setRealtimeState(liveConnected?'connected':'disconnected');
   });
@@ -330,13 +331,21 @@ export function useRepublicGame(gameId:string){
   },30000+pollJitter);
   // Realtime handles unread counters while chat is closed. Full chat recovery
   // runs only for an actively open conversation.
+  let lastChatRecoveryAt=Date.now();
   const chatRecovery=setInterval(()=>{
    if(document.visibilityState!=='visible'||!chatOpenRef.current)return;
+   const now=Date.now();
+   // Incoming messages update from the existing authorised Realtime payload.
+   // When that socket is healthy, a full chat recovery once per minute is
+   // sufficient; when disconnected, preserve the 6s recovery cadence.
+   if(liveConnected&&now-lastChatRecoveryAt<60000)return;
+   lastChatRecoveryAt=now;
    if(channelRef.current)void loadRecentChatMessages(channelRef.current);
    void loadChatOverview();
   },6000);
   return()=>{
    disposed=true;clearTimeout(timer);clearInterval(poll);clearInterval(chatRecovery);
+   setGameRealtimeConnection(gameId,false);
    if(liveRef.current===channel)liveRef.current=null;
    void supabase.removeChannel(channel);
   };
