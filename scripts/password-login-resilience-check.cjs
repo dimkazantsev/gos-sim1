@@ -56,7 +56,7 @@ async function main(){
   assert.equal(h.calls.adopt,0);
   assert.equal(h.calls.resume,0);
   assert.equal(h.calls.navigation.length,0);
-  assert.match(h.error(),/Supabase \(HTTP 402\)/);
+  assert.match(h.error(),/код 402/);
   assert.match(h.error(),/Пароль менять не нужно/);
  });
  await check('Transient session verification retries without authenticating twice',async()=>{
