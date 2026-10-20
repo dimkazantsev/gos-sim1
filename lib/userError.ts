@@ -2,6 +2,11 @@
 export function userError(value:unknown):string{
  const s=typeof value==='string'?value:value&&typeof value==='object'&&'message' in value?String(value.message):'';
  const code=value&&typeof value==='object'&&'code' in value?String(value.code):'';
+ const status=value&&typeof value==='object'&&'status' in value?Number(value.status):undefined;
+ // HTTP 402 is a project/organization service restriction, not an invalid
+ // password. Do not advise password resets or credential retries.
+ if(status===402||/^exceed(?:ed)?_[a-z_]+$/i.test(code)||code==='overdue_payment')
+  return 'Сервис ГОС.ID временно ограничен (код 402). Пароль менять не нужно. Преподавателю необходимо проверить квоты и ограничения серверного проекта.';
  const authErrors:Record<string,string>={
   email_exists:'Этот адрес уже зарегистрирован. Войдите с личным паролем или восстановите доступ к этому адресу. Для текущего профиля можно указать другую почту.',
   user_already_exists:'Этот адрес уже зарегистрирован. Войдите с личным паролем или восстановите доступ к этому адресу. Для текущего профиля можно указать другую почту.',

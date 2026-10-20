@@ -1,0 +1,35 @@
+name: ГОС.ID · Вход HTTP 402 и нагрузка Realtime
+on:
+  pull_request:
+    paths:
+      - 'lib/userError.ts'
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/password-login-resilience-check.cjs'
+      - 'scripts/auth-402-realtime-quota-check.cjs'
+      - '.github/workflows/auth-402-realtime-quota.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'lib/userError.ts'
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/password-login-resilience-check.cjs'
+      - 'scripts/auth-402-realtime-quota-check.cjs'
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: build-placeholder-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/auth-402-realtime-quota-check.cjs
+      - run: node scripts/password-login-resilience-check.cjs
+      - run: node scripts/supabase-session-refresh-check.cjs
+      - run: node scripts/chat-realtime-check.cjs
+      - run: npm run typecheck

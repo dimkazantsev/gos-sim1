@@ -245,6 +245,7 @@ export function useRepublicGame(gameId:string){
  useEffect(()=>{
   if(!me?.user_id||me.game_id!==gameId)return;
   let disposed=false,scheduled=false;
+  let liveConnected=false,lastPollAt=0;
   let dirtyCore=false,dirtyPartyDocuments=false,dirtyChat=false,dirtyPins=false,dirtyOverview=false,telegramWake=false;
   let timer:ReturnType<typeof setTimeout>|undefined;
   function flush(){
@@ -305,12 +306,24 @@ export function useRepublicGame(gameId:string){
   });
   liveRef.current=channel;
   setRealtimeState('connecting');
-  channel.subscribe(status=>{if(!disposed)setRealtimeState(status==='SUBSCRIBED'?'connected':'disconnected')});
+  channel.subscribe(status=>{
+   if(disposed)return;
+   liveConnected=status==='SUBSCRIBED';
+   if(liveConnected)lastPollAt=Date.now();
+   setRealtimeState(liveConnected?'connected':'disconnected');
+  });
   // Visible-tab recovery works even when a WebSocket cannot connect.
   // Deterministic jitter prevents 40 simultaneous clients from polling in lockstep.
   const pollJitter=[...me.user_id].reduce((hash,char)=>(Math.imul(hash,31)+char.charCodeAt(0))>>>0,0)%10000;
   const poll=setInterval(()=>{
    if(document.visibilityState!=='visible')return;
+   // Realtime already dispatches targeted refreshes. A backup full read is
+   // necessary only occasionally while connected; polling every 30s even
+   // on healthy subscriptions multiplied database requests and egress.
+   // When disconnected, retain the existing prompt 30–40s recovery.
+   const now=Date.now();
+   if(liveConnected&&now-lastPollAt<180000)return;
+   lastPollAt=now;
    dirtyCore=true;dirtyOverview=true;
    if(chatOpenRef.current){dirtyChat=true;dirtyPins=true}
    schedule();

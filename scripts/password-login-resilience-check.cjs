@@ -49,6 +49,16 @@ async function main(){
  await check('Wrong password is not retried and never opens or alters membership',async()=>{
   const h=harness({responses:[{data:{session:null},error:{message:'Invalid login credentials',code:'invalid_credentials',status:400}}]});await h.submit();assert.equal(h.calls.password,1);assert.equal(h.calls.adopt,0);assert.equal(h.calls.resume,0);assert.match(h.error(),/Неверный адрес почты или пароль/);
  });
+ await check('Supabase HTTP 402 identifies service restriction and never retries password',async()=>{
+  const h=harness({responses:[{data:{session:null},error:{message:'Payment Required',code:'exceed_egress_quota',status:402}}]});
+  await h.submit();
+  assert.equal(h.calls.password,1);
+  assert.equal(h.calls.adopt,0);
+  assert.equal(h.calls.resume,0);
+  assert.equal(h.calls.navigation.length,0);
+  assert.match(h.error(),/код 402/);
+  assert.match(h.error(),/Пароль менять не нужно/);
+ });
  await check('Transient session verification retries without authenticating twice',async()=>{
   const h=harness({adoption:[{error:{message:'Нет ответа от сервера.',status:0}},{error:null}]});await h.submit();assert.equal(h.calls.password,1);assert.equal(h.calls.adopt,2);assert.equal(h.calls.resume,1);
  });
