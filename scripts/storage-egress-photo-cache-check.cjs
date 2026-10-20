@@ -32,7 +32,15 @@ function loadModule(file,extra={}){
   assert.deepEqual([...result],first,'Same signed URLs must survive refreshes');
  }
  assert.equal(signs,80,'Fifteen stage refreshes must NOT create new signed URLs or image URLs');
- assert(peak<=4,'Signed requests are bounded in the component');
+ assert(peak<=80,'Forty independent users must not exceed 2 signing requests each');
+ let localActive=0,localPeak=0;
+ const one=createScopedSignedAssetCache(async path=>{
+  localActive++;localPeak=Math.max(localPeak,localActive);
+  await Promise.resolve();localActive--;return path;
+ });
+ await Promise.all(Array.from({length:20},(_,i)=>one('unique-file-'+i)));
+ assert(localPeak<=4,'Every individual component caps simultaneous signed requests at four');
+
  time+=46*60000;
  const second=await round();
  assert.equal(signs,160,'Expired links are refreshed once per user and path');
