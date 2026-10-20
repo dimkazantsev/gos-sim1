@@ -1,6 +1,7 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {useCallback,useEffect,useRef,useState} from 'react';
+import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
+import {createScopedSignedAssetCache} from './scopedSignedAssetCache';
 import {RefreshCw,ExternalLink} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {PartyDocument} from './types';
@@ -12,6 +13,10 @@ export default function PartyUnregisteredFiles({gameId,partyId,registered}:{game
  const [busy,setBusy]=useState(false);
  const [loaded,setLoaded]=useState(false);
  const latestRequest=useRef(0);
+ const signedAsset=useMemo(()=>createScopedSignedAssetCache(async path=>{
+  const {data,error}=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
+  return error?null:data?.signedUrl||null;
+ }),[gameId,partyId]);
  // Compare document paths, not the new array created on every parent render.
  const registeredPaths=registered.map(d=>d.storage_path).sort().join('\n');
  const refresh=useCallback(async()=>{
@@ -25,13 +30,13 @@ export default function PartyUnregisteredFiles({gameId,partyId,registered}:{game
    const missing=(data||[]).filter(item=>item.name&&!known.has(prefix+'/'+item.name));
    const signed=await Promise.all(missing.map(async item=>{
     const path=prefix+'/'+item.name;
-    const result=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
-    return result.error?null:{name:item.name,path,url:result.data?.signedUrl||''};
+    const url=await signedAsset(path);
+    return url?{name:item.name,path,url}:null;
    }));
    if(request===latestRequest.current)setFiles(signed.filter((file):file is Unregistered=>!!file));
   }catch(e){if(request===latestRequest.current)setError((userError(e)||'Не удалось прочитать хранилище файлов.'))}
   finally{if(request===latestRequest.current){setBusy(false);setLoaded(true)}}
- },[gameId,partyId,registeredPaths]);
+ },[gameId,partyId,registeredPaths,signedAsset]);
  useEffect(()=>{void refresh();return ()=>{latestRequest.current++}},[refresh]);
  return <details aria-label="Технические загрузки без регистрации" className="teacherPartySection">
   <summary>Технические загрузки без записи в реестре {loaded?'('+files.length+')':''}</summary>
