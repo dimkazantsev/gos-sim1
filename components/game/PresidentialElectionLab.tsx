@@ -1,7 +1,8 @@
 'use client';
 import {userError} from '@/lib/userError';
 import {IconAction} from '../ui/IconAction';
-import {useEffect,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
+import {createScopedSignedAssetCache} from './scopedSignedAssetCache';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
@@ -41,6 +42,10 @@ const selfDocs=['group_petition','signature_sheets','consent','passport','income
 
 export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,parties,currentStage,setError}=g;
+ const signedAsset=useMemo(()=>createScopedSignedAssetCache(async path=>{
+  const {data,error}=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
+  return error?null:data?.signedUrl||null;
+ }),[game?.id,me?.user_id]);
  const [settings,setSettings]=useState<Settings|null>(null);
  const [systemDecisionComplete,setSystemDecisionComplete]=useState(false);
  const [candidates,setCandidates]=useState<Candidate[]>([]);
@@ -97,11 +102,11 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   ]);
   if(!a.error&&a.data)setSettings(a.data as Settings);
   if(!sd.error)setSystemDecisionComplete(Boolean(sd.data?.closed));
-  if(!b.error){const rows=(b.data||[]) as Candidate[];setCandidates(rows);setReview(Object.fromEntries(rows.map(x=>[x.id,{status:x.registration_status==='registered'?'registered':x.registration_status==='rejected'?'rejected':'revision',errors:String(x.legal_error_count),penalty:String(x.rating_penalty),publicSummary:x.registration_public_summary||'',privateSummary:''}])));const pairs=await Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,(await supabase.storage.from('game-assets').createSignedUrl(x.photo_path!,3600)).data?.signedUrl||''] as const));setPhotoUrls(Object.fromEntries(pairs.filter(x=>x[1])))}
+  if(!b.error){const rows=(b.data||[]) as Candidate[];setCandidates(rows);setReview(Object.fromEntries(rows.map(x=>[x.id,{status:x.registration_status==='registered'?'registered':x.registration_status==='rejected'?'rejected':'revision',errors:String(x.legal_error_count),penalty:String(x.rating_penalty),publicSummary:x.registration_public_summary||'',privateSummary:''}])));const pairs=await Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,(await signedAsset(x.photo_path!))||''] as const));setPhotoUrls(Object.fromEntries(pairs.filter(x=>x[1])))}
   if(!p.error)setPoints((p.data||[]) as ProgramPoint[]);
   if(!d.error){
    const docs=(d.data||[]) as CandidateDoc[];
-   const withUrls=await Promise.all(docs.map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
+   const withUrls=await Promise.all(docs.map(async x=>({...x,url:await signedAsset(x.storage_path)})));
    setCandidateDocs(withUrls);setDocTextDraft(v=>({...v,...Object.fromEntries(withUrls.map(x=>[x.id,x.extracted_text||'']))}));
   }
   if(!sg.error)setSupporters((sg.data||[]) as Supporter[]);
@@ -365,7 +370,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    {panelView==='dossier'&&canUploadDocuments&&c.nomination_type!=='fictional'&&<details className="candidateDossier" open>
     <summary><div><b>{canManage?'Моё досье':'Досье кандидата'}</b><span>{c.photo_path&&docs.length>=requiredKinds.length&&candidatePoints.length>=10?'✓ Черновик готов к подаче':'Заполните фото, документы и проверьте замечания'}</span></div><strong>{candidatePoints.length}/10 · {docs.filter(x=>requiredKinds.includes(x.doc_kind)).length}/{requiredKinds.length}</strong></summary>
     <div className="candidateDossierBody">
-      {canUploadDocuments&&<section className="candidatePhotoBlock"><header><div><small>ФОТО КАНДИДАТА</small><h4>Обязательное фото для бюллетеня и результатов</h4></div><span>{c.photo_path?'✓ Загружено':'Не загружено'}</span></header><div className="candidatePhotoUpload">{photoUrls[c.id]?<img src={photoUrls[c.id]} alt={c.display_name}/>:<div className="candidatePhotoFallback">{c.display_name.slice(0,1)}</div>}<label><input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy||c.registration_status==='registered'} onChange={e=>{const file=e.target.files?.[0];if(file)void uploadCandidatePhoto(c.id,file);e.target.value=''}}/><b>{c.photo_path?'Заменить фото':'Загрузить фото'}</b><span>JPG, PNG или WEBP. Фотографию может загрузить любой действующий член партии кандидата. Без неё пакет нельзя передать в ЦИК.</span></label></div></section>}
+      {canUploadDocuments&&<section className="candidatePhotoBlock"><header><div><small>ФОТО КАНДИДАТА</small><h4>Обязательное фото для бюллетеня и результатов</h4></div><span>{c.photo_path?'✓ Загружено':'Не загружено'}</span></header><div className="candidatePhotoUpload">{photoUrls[c.id]?<img src={photoUrls[c.id]} alt={c.display_name} loading="lazy" decoding="async"/>:<div className="candidatePhotoFallback">{c.display_name.slice(0,1)}</div>}<label><input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy||c.registration_status==='registered'} onChange={e=>{const file=e.target.files?.[0];if(file)void uploadCandidatePhoto(c.id,file);e.target.value=''}}/><b>{c.photo_path?'Заменить фото':'Загрузить фото'}</b><span>JPG, PNG или WEBP. Фотографию может загрузить любой действующий член партии кандидата. Без неё пакет нельзя передать в ЦИК.</span></label></div></section>}
       {canManage&&<section className="candidateProgramPoints"><header><div><small>ПРОГРАММА</small><h4>Минимум 10 положений</h4></div><span>{candidatePoints.length}/10</span></header><div>{candidatePoints.map(x=><p key={x.id}><b>{x.point_no}.</b><span>{x.body}</span>{canManage&&c.registration_status!=='registered'&&<IconAction variant="remove" onClick={()=>void deleteProgramPoint(x.id)} label={'Удалить положение программы № '+x.point_no}/>}</p>)}</div>{canManage&&c.registration_status!=='registered'&&<div className="candidatePointComposer"><input id={'cec-program-input-'+c.id} value={pointDraft[c.id]||''} onChange={e=>{setPointDraft(v=>({...v,[c.id]:e.target.value}));setPointFeedback(v=>({...v,[c.id]:''}));}} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();void addProgramPoint(c.id)}}} placeholder="Следующее положение программы (не менее 5 символов)" aria-label="Новое положение программы" aria-describedby={'cec-program-hint-'+c.id}/><button type="button" disabled={busy} onClick={()=>void addProgramPoint(c.id)}>＋ Добавить</button><small id={'cec-program-hint-'+c.id} className="candidatePointHint" aria-live="polite">{pointFeedback[c.id]||((pointDraft[c.id]||'').trim().length===0?'Введите положение программы — минимум 5 символов. Нажмите «Добавить» для проверки.':(pointDraft[c.id]||'').trim().length<5?'Недостаточно символов. Добавьте ещё '+(5-(pointDraft[c.id]||'').trim().length)+'.':'Положение готово к добавлению.')}</small></div>}</section>}
      <section className="candidateDocPack cecDraftDocuments"><header><div><small>ДОКУМЕНТЫ ДЕЛА</small><h4>{c.nomination_type==='party'?'Партийное выдвижение':'Самовыдвижение'}</h4><p>{c.cec_submitted_at?'Заменяйте только документы, которые ЦИК вернула на доработку. Принятые и ожидающие проверки файлы остаются без изменений.':'Нажмите на нужный пункт, чтобы загрузить файл. После загрузки система извлечёт текст и выполнит предварительную проверку.'}</p></div><span>{docs.filter(x=>requiredKinds.includes(x.doc_kind)).length}/{requiredKinds.length}</span></header>
       <div className="candidateDocRows cecDocumentChecklist">{requiredKinds.map((kind,index)=>{const doc=docs.find(x=>x.doc_kind===kind);const state=!doc?'missing':doc.status==='accepted'?'ok':doc.status==='revision'?'issues':'manual';const canReplace=!c.cec_submitted_at||Boolean(doc&&(doc.status==='revision'||!doc.is_submitted));return <article key={kind} className={'cecDocumentItem '+state+(canReplace?'':' cecDocumentLocked')}>
