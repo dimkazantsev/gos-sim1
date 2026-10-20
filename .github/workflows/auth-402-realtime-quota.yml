@@ -4,6 +4,9 @@ on:
     paths:
       - 'lib/userError.ts'
       - 'components/game/useRepublicGame.ts'
+      - 'components/game/useGameTableSync.ts'
+      - 'components/GameClient.tsx'
+      - 'scripts/forty-sessions-realtime-budget-check.cjs'
       - 'scripts/password-login-resilience-check.cjs'
       - 'scripts/auth-402-realtime-quota-check.cjs'
       - '.github/workflows/auth-402-realtime-quota.yml'
@@ -12,6 +15,9 @@ on:
     paths:
       - 'lib/userError.ts'
       - 'components/game/useRepublicGame.ts'
+      - 'components/game/useGameTableSync.ts'
+      - 'components/GameClient.tsx'
+      - 'scripts/forty-sessions-realtime-budget-check.cjs'
       - 'scripts/password-login-resilience-check.cjs'
       - 'scripts/auth-402-realtime-quota-check.cjs'
 jobs:
@@ -29,6 +35,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/auth-402-realtime-quota-check.cjs
+      - run: node scripts/forty-sessions-realtime-budget-check.cjs
       - run: node scripts/password-login-resilience-check.cjs
       - run: node scripts/supabase-session-refresh-check.cjs
       - run: node scripts/chat-realtime-check.cjs
