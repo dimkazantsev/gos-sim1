@@ -85,7 +85,7 @@ function harness({effects=false}={}){
   if(name==='next/navigation')return{useRouter:()=>({replace:target=>redirects.push(target)})};
   if(name==='@/lib/supabase')return{supabase};
   if(name==='@/lib/userError')return{userError:error=>String(error?.message||error)};
-  if(name==='./useGameTableSync')return{notifyGameDataRefresh:()=>{}};
+  if(name==='./useGameTableSync')return{notifyGameDataRefresh:()=>{},setGameRealtimeConnection:()=>{}};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
   if(name==='./chatChannelSelection'||name==='./chatRealtime'){
