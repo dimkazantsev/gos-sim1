@@ -3,6 +3,7 @@ import {userError} from '@/lib/userError';
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useMemo,useState} from 'react';
 import {createScopedSignedAssetCache} from './scopedSignedAssetCache';
+import {prepareCandidatePhoto} from './prepareCandidatePhoto';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
@@ -236,10 +237,11 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  }
  async function uploadCandidatePhoto(candidateId:string,file:File){
   if(!file.type.startsWith('image/')){setError('Нужно выбрать изображение кандидата.');return}
-  const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
-  const storagePath=activeGame.id+'/presidential/'+candidateId+'/photo-'+crypto.randomUUID()+'.'+ext;
   setBusy(true);
-  const up=await supabase.storage.from('game-assets').upload(storagePath,file,{contentType:file.type||'image/jpeg'});
+  const prepared=await prepareCandidatePhoto(file);
+  const ext=(prepared.name.split('.').pop()||'jpg').toLowerCase();
+  const storagePath=activeGame.id+'/presidential/'+candidateId+'/photo-'+crypto.randomUUID()+'.'+ext;
+  const up=await supabase.storage.from('game-assets').upload(storagePath,prepared,{contentType:prepared.type||'image/jpeg',cacheControl:'3600'});
   if(up.error){setError(userError(up.error));setBusy(false);return}
   const r=await supabase.rpc('set_presidential_candidate_photo',{p_candidate_id:candidateId,p_storage_path:storagePath});
   if(r.error){setError(userError(r.error));await supabase.storage.from('game-assets').remove([storagePath])}else await load();
