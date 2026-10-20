@@ -10,6 +10,14 @@ export function setGameRealtimeConnection(gameId:string,connected:boolean){
  else connectedGames.delete(gameId);
 }
 export function gameRealtimeConnected(gameId:string){return connectedGames.has(gameId)}
+// Only these game tables trigger notifyGameDataRefresh() from the shared
+// game channel. Other stage data must keep its existing 25–35s poll until
+// it has an equivalent push invalidation, otherwise student updates lag.
+const pushedStageTables=new Set([
+ 'game_stages','game_parties','party_invitations','party_chair_ballots',
+ 'formal_documents','political_posts','game_votes','blitz_assignments',
+ 'stage_deadline_rules'
+]);
 export const GAME_DATA_REFRESH_EVENT='gos-sims:refresh';
 export function notifyGameDataRefresh(gameId:string){window.dispatchEvent(new CustomEvent(GAME_DATA_REFRESH_EVENT,{detail:{gameId}}))}
 
@@ -26,6 +34,7 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   // Keep last fallback per mounted widget; direct mutations and Realtime
   // invalidation still refresh immediately through GAME_DATA_REFRESH_EVENT.
   let lastFallbackAt=Date.now();
+  const hasPushCoverage=_tables.length>0&&_tables.every(table=>pushedStageTables.has(table));
   async function flush(){
    if(disposed)return;
    timer=undefined;
@@ -44,7 +53,7 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
     const now=Date.now();
     // A healthy shared Realtime connection makes 25–35s whole-widget polling
     // redundant. Retain 3-minute reconciliation for missed changes.
-    if(gameRealtimeConnected(gameId)&&now-lastFallbackAt<180000)return;
+    if(hasPushCoverage&&gameRealtimeConnected(gameId)&&now-lastFallbackAt<180000)return;
     lastFallbackAt=now;
     schedule(0);
   },25000+Math.floor(Math.random()*10000));
