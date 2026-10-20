@@ -6,7 +6,7 @@ export function userError(value:unknown):string{
  // HTTP 402 is a project/organization service restriction, not an invalid
  // password. Do not advise password resets or credential retries.
  if(status===402||/^exceed(?:ed)?_[a-z_]+$/i.test(code)||code==='overdue_payment')
-  return 'Сервис ГОС.ID временно ограничен на стороне Supabase (HTTP 402). Пароль менять не нужно. Преподавателю необходимо проверить лимиты и ограничения проекта Supabase.';
+  return 'Сервис ГОС.ID временно ограничен (код 402). Пароль менять не нужно. Преподавателю необходимо проверить квоты и ограничения серверного проекта.';
  const authErrors:Record<string,string>={
   email_exists:'Этот адрес уже зарегистрирован. Войдите с личным паролем или восстановите доступ к этому адресу. Для текущего профиля можно указать другую почту.',
   user_already_exists:'Этот адрес уже зарегистрирован. Войдите с личным паролем или восстановите доступ к этому адресу. Для текущего профиля можно указать другую почту.',
