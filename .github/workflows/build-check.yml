@@ -3,6 +3,7 @@ name: Build Check
 on:
   pull_request:
     paths:
+      - 'scripts/interactive-mobile-check.cjs'
       - 'components/game/documentSignerTitle.ts'
       - 'scripts/document-signer-title-check.cjs'
       - 'scripts/official-document-paper-check.cjs'

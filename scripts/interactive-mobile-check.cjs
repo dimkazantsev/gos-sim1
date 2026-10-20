@@ -140,8 +140,8 @@ async function main(){
   assert.equal(await desktop.locator('.eventCaseTile').first().evaluate(el=>document.activeElement===el),true,'Closing returns focus to its tile');
  }
  await desktop.getByRole('checkbox',{name:'Указать количество голосов'}).check();
- await desktop.locator('.civicQuantity input').fill('100');await desktop.getByRole('button',{name:'За · 100',exact:true}).click();await desktop.waitForFunction(()=>document.querySelector('#ballot-result')?.textContent==='100/0/0');
- await desktop.getByRole('checkbox',{name:'Распределить голоса между вариантами'}).check();assert.equal(await desktop.locator('.civicQuantity input').count(),0,'Only fields for the selected ballot mode remain visible');
+ await desktop.locator('.civicBallotAmount input').fill('100');assert.equal(await desktop.locator('.civicBallotChoice.is-yes b').textContent(),'100','Partial ballot displays selected weight');await desktop.locator('.civicBallotChoice.is-yes').click();await desktop.waitForFunction(()=>document.querySelector('#ballot-result')?.textContent==='100/0/0');
+ await desktop.getByRole('checkbox',{name:'Распределить голоса между вариантами'}).check();assert.equal(await desktop.locator('.civicBallotAmount input').count(),0,'Only fields for the selected ballot mode remain visible');
  const splitInputs=desktop.locator('.civicSplitInputs input');await splitInputs.nth(0).fill('');assert.equal(await splitInputs.nth(0).inputValue(),'','Empty numeric fields stay empty');assert.equal(await desktop.getByRole('button',{name:/Подать голоса/}).isDisabled(),true,'Incomplete distribution cannot be submitted');await splitInputs.nth(0).fill('180');await splitInputs.nth(1).fill('20');await splitInputs.nth(2).fill('10');
  await desktop.getByRole('button',{name:'Подать голоса · 210',exact:true}).click();await desktop.waitForFunction(()=>document.querySelector('#ballot-result')?.textContent==='180/20/10');
  await splitInputs.nth(0).fill('200');assert.equal(await desktop.getByRole('button',{name:'Подать голоса · 230',exact:true}).isDisabled(),true,'An over-allocation cannot be submitted');await splitInputs.nth(0).fill('180');
