@@ -57,6 +57,8 @@ function harness(component){
  function requireFor(name){
   if(name==='react')return react;
   if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};
+  if(name==='./scopedSignedAssetCache')return{createScopedSignedAssetCache:sign=>sign};
+  if(name==='./prepareCandidatePhoto')return{prepareCandidatePhoto:async file=>file};
   if(name==='@/lib/supabase')return{supabase};
   if(name==='@/lib/userError')return{userError:error=>String(error?.message||error)};
   if(name==='./useGameTableSync')return{useGameTableSync(id,tables,load,scope){const latest=react.useRef(load);latest.current=load;latestTableLoad=()=>latest.current();react.useEffect(()=>{if(id)void latest.current();},[id,scope,tables.join('|')]);}};
