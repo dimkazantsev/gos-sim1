@@ -24,6 +24,7 @@ const env={
  setInterval(fn){tick=fn;return 1},
  chatOpenRef:{current:false},
  me:{user_id:'regression-student'},
+ gameId:'simulation',
  schedule(){changed++},
  liveConnected:false,lastPollAt:0,disposed:false,dirtyCore:false,dirtyOverview:false,dirtyChat:false,dirtyPins:false,
  console
