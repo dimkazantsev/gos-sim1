@@ -22,7 +22,7 @@ const env={
  setRealtimeState(){},
  setInterval(fn){tick=fn;return 1},
  chatOpenRef:{current:false},
- pollJitter:0,
+ me:{user_id:'regression-student'},
  schedule(){changed++},
  liveConnected:false,lastPollAt:0,disposed:false,dirtyCore:false,dirtyOverview:false,dirtyChat:false,dirtyPins:false,
  console
