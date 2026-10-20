@@ -2,6 +2,7 @@
 import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {createScopedSignedAssetCache} from './scopedSignedAssetCache';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {FormalDocument} from './types';
 import {FORMAL_SUBJECTS,FORMAL_TYPES,inferFormal,formalSignature,ownerLabel,formalDocumentTypeLabel,formalDocumentTitle,formalSubjectDisplayLabel} from './formalInstitutions';
@@ -42,6 +43,10 @@ function readableBillIssue(issue:string){
 
 export default function DocumentsView({g,focusId,createTemplate,createStageNo,onOpenVotes,onSelectDocument,onOpenBudget,readOnly=false,initialDetailTab='text'}:{g:ReturnTypeRepublic;initialDetailTab?:'text'|'procedure';focusId?:string;createTemplate?:string;createStageNo?:number;onOpenVotes:(voteId?:string)=>void;onSelectDocument?:(id?:string)=>void;onOpenBudget?:()=>void;readOnly?:boolean}){
  const {formalDocuments,formalHistory,votes,members,me,teacher,currentStage,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,createVote}=g;
+ const signedAsset=useMemo(()=>createScopedSignedAssetCache(async path=>{
+  const {data,error}=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
+  return error?null:data?.signedUrl||null;
+ }),[g.game?.id,me?.user_id]);
  const [mode,setMode]=useSavedGameState<'registry'|'create'>(g.game?.id,g.me?.user_id,'documents-mode','registry',savedChoice('registry','create')),[selectedId,setSelectedId]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-selected','',savedString),[query,setQuery]=useState(''),[filterSubject,setFilterSubject]=useState(''),[filterStatus,setFilterStatus]=useState(''),[sortOrder,setSortOrder]=useState('updated');
  const [detailOpen,setDetailOpen]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-detail',!!focusId,savedBoolean),[detailTab,setDetailTab]=useSavedGameState<'text'|'procedure'|'package'>(g.game?.id,g.me?.user_id,'documents-tab',initialDetailTab,savedChoice('text','procedure','package'));
  const [detailReturn,setDetailReturn]=useState<'registry'|'create'>('registry');
@@ -118,7 +123,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
     .select('id,signer_id,signed_at,history_id,signature_path').eq('document_id',selected.id).order('signed_at',{ascending:false});
    if(res.error||!current)return;
    const items=await Promise.all((res.data||[]).map(async row=>({
-    ...row,url:(await supabase.storage.from('game-assets').createSignedUrl(row.signature_path,3600)).data?.signedUrl||null
+    ...row,url:await signedAsset(row.signature_path)
    })));
    if(current)setDocumentSignatures(items);
   })();
@@ -130,7 +135,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   void (async()=>{
    const r=await supabase.from('formal_support_documents').select('*').eq('document_id',selected.id).order('created_at',{ascending:true});
    if(r.error||!active)return;
-   const items=await Promise.all(((r.data||[]) as SupportDocument[]).map(async row=>({...row,url:row.storage_path?(await supabase.storage.from('game-assets').createSignedUrl(row.storage_path,3600)).data?.signedUrl||null:null})));
+   const items=await Promise.all(((r.data||[]) as SupportDocument[]).map(async row=>({...row,url:row.storage_path?await signedAsset(row.storage_path):null})));
    if(active)setSupportDocuments(items);
   })();
   return()=>{active=false};
@@ -164,7 +169,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
    if(dossierDirty.current.profile===dossierSaved.current.profile){setBillFinancial(!!bp?.requires_financial_justification);setBillGovernmentOpinion(!!bp?.requires_government_opinion);setBillCommittee(bp?.committee_key||'');setBillRepresentative(bp?.representative_user_id||'');setBillNote(bp?.note||'')}
    if(!f.error){
     const rows=(f.data||[]) as BillFile[];
-    const withUrls=await Promise.all(rows.map(async x=>({...x,url:(await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600)).data?.signedUrl||null})));
+    const withUrls=await Promise.all(rows.map(async x=>({...x,url:await signedAsset(x.storage_path)})));
     if(!current())return;
     setBillFiles(withUrls);
    }

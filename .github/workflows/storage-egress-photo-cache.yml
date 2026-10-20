@@ -1,0 +1,41 @@
+name: ГОС.ID · Контроль исходящего трафика изображений
+on:
+  pull_request:
+    paths:
+      - 'components/game/scopedSignedAssetCache.ts'
+      - 'components/game/prepareCandidatePhoto.ts'
+      - 'components/game/PresidentialElectionStage7.tsx'
+      - 'components/game/PresidentialElectionLab.tsx'
+      - 'components/game/DocumentsView.tsx'
+      - 'components/game/PartyUnregisteredFiles.tsx'
+      - 'scripts/storage-egress-photo-cache-check.cjs'
+      - '.github/workflows/storage-egress-photo-cache.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'components/game/scopedSignedAssetCache.ts'
+      - 'components/game/prepareCandidatePhoto.ts'
+      - 'components/game/PresidentialElectionStage7.tsx'
+      - 'components/game/PresidentialElectionLab.tsx'
+      - 'components/game/DocumentsView.tsx'
+      - 'components/game/PartyUnregisteredFiles.tsx'
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: build-placeholder-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/storage-egress-photo-cache-check.cjs
+      - run: node scripts/presidential-party-photo-upload-check.cjs
+      - run: node scripts/presidential-exclusive-party-document-check.cjs
+      - run: node scripts/npa-back-navigation-load-browser-check.cjs
+      - run: node scripts/forty-sessions-realtime-budget-check.cjs
+      - run: npm run typecheck

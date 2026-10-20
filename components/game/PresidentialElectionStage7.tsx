@@ -7,6 +7,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {useGameTableSync} from './useGameTableSync';
 import {BarChart3,Check,Copy,ExternalLink,FileUp,Landmark,Send,Share2,Vote,X} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {createScopedSignedAssetCache} from './scopedSignedAssetCache';
 import type {ReturnTypeRepublic} from './viewTypes';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
 import {institutionEmblem} from './institutionEmblems';
@@ -85,6 +86,10 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const viewScope=JSON.stringify([gameId,me?.user_id,me?.kind,teacher]);
  const scope=useRef(viewScope),request=useRef(0),alive=useRef(true),ceremonyDirty=useRef(false);
  scope.current=viewScope;
+ const signedAsset=useMemo(()=>createScopedSignedAssetCache(async path=>{
+  const {data,error}=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
+  return error?null:data?.signedUrl||null;
+ }),[gameId,me?.user_id]);
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{
   request.current++;ceremonyDirty.current=false;
@@ -124,8 +129,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  async function signed(path:string|null){
   if(!path)return '';
   if(isExternalAudioLink(path))return validCeremonyAudioLink(path)?path:'';
-  const r=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
-  return r.data?.signedUrl||'';
+  return await signedAsset(path)||'';
  }
  async function load(){
   if(!gameId)return;
@@ -274,7 +278,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    </section>
    <section className="stage7Panel"><div className="stage7PanelHead"><div><small>РЕЕСТР</small><h3>Материалы кампании</h3><p>{teacher?'Панель ЦИК: зафиксируйте ошибки и официальный ответ, при необходимости назначьте штраф. Одобрение публикует материал автоматически.':'Следите за статусом отправленных материалов.'}</p></div><Landmark size={24}/></div>
      <div className="campaignQueue">{materials.filter(m=>teacher||mine.some(c=>c.id===m.candidate_id)).map(m=>{const c=registered.find(x=>x.id===m.candidate_id);return <article key={m.id} className={'campaignCard '+m.status}>
-      <div className="campaignCardTop"><div className="candidateMini">{photoUrls[m.candidate_id]?<img src={photoUrls[m.candidate_id]} alt=""/>:<span>{(c?.display_name||'?').slice(0,1)}</span>}<div><small>{MATERIAL_LABELS[m.material_type]||'Агитационный материал'}</small><b>{c?.display_name||'Кандидат'}</b></div></div><em>{m.status==='pending'?'На проверке ЦИК':m.status==='approved'?'Одобрено ЦИК':'Отклонено ЦИК'}</em></div>
+      <div className="campaignCardTop"><div className="candidateMini">{photoUrls[m.candidate_id]?<img src={photoUrls[m.candidate_id]} alt="" loading="lazy" decoding="async"/>:<span>{(c?.display_name||'?').slice(0,1)}</span>}<div><small>{MATERIAL_LABELS[m.material_type]||'Агитационный материал'}</small><b>{c?.display_name||'Кандидат'}</b></div></div><em>{m.status==='pending'?'На проверке ЦИК':m.status==='approved'?'Одобрено ЦИК':'Отклонено ЦИК'}</em></div>
       <h4>{m.title}</h4><p>{m.body}</p>
       {(m.print_run>0||m.imprint_text)&&<div className="campaignImprint">{m.print_run>0&&<span>Тираж: <b>{m.print_run.toLocaleString('ru-RU')}</b></span>}{m.imprint_text&&<span>{m.imprint_text}</span>}</div>}
       {(m.cec_errors||m.cec_response||m.review_note||Number(m.penalty_points)>0)&&<div className="cecDecisionSummary">
@@ -314,7 +318,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
     <PresidentialRulesCalculator g={g} candidates={registered} settings={settings} pollApproved={pollApproved} onSaved={load}/>
     <PresidentialCecPublicationPanel g={g} status={settings?.status} onSaved={load}/>
    <section className="stage7Panel officialResults"><div className="stage7PanelHead"><div><small>ОФИЦИАЛЬНЫЕ ИТОГИ</small><h3>{settings?.status==='finished'?'Выборы завершены':settings?.status==='runoff'?'Назначен второй тур':'Ожидается расчёт ЦИК'}</h3></div><InstitutionEmblemImage src={institutionEmblem('cec','ЦИК РФ')} alt="ЦИК РФ" width={52} height={52}/></div>
-    {settings?.status==='finished'&&<div className="winnerCard">{(()=>{const winner=registered.find(c=>c.id===settings.result?.winner_id)||resultRows[0]?.candidate;return winner?<><div className="winnerPhoto">{photoUrls[winner.id]?<img src={photoUrls[winner.id]} alt={winner.display_name}/>:<span>{winner.display_name.slice(0,1)}</span>}</div><div><small>ПОБЕДИТЕЛЬ ПО РАСЧЁТУ ЦИК</small><h2>{winner.display_name}</h2><p>{settings.result?.score!=null?Number(settings.result.score).toFixed(2)+'% · ':''}{SYSTEM_NAMES[settings.system_type]}</p></div></>:null})()}</div>}
+    {settings?.status==='finished'&&<div className="winnerCard">{(()=>{const winner=registered.find(c=>c.id===settings.result?.winner_id)||resultRows[0]?.candidate;return winner?<><div className="winnerPhoto">{photoUrls[winner.id]?<img src={photoUrls[winner.id]} alt={winner.display_name} loading="lazy" decoding="async"/>:<span>{winner.display_name.slice(0,1)}</span>}</div><div><small>ПОБЕДИТЕЛЬ ПО РАСЧЁТУ ЦИК</small><h2>{winner.display_name}</h2><p>{settings.result?.score!=null?Number(settings.result.score).toFixed(2)+'% · ':''}{SYSTEM_NAMES[settings.system_type]}</p></div></>:null})()}</div>}
     <div className="resultBars">{resultRows.map((row,index)=><div key={row.candidate.id} className="resultBarRow"><div><span>{index+1}</span><b>{row.candidate.display_name}</b><strong>{row.score!=null?Number(row.score).toFixed(2)+'%':'—'}</strong></div><div className="resultBar"><i style={{width:Math.max(0,Math.min(100,Number(row.score)||0))+'%'}}/></div>{pollApproved&&row.poll!=null&&<small>Соцопрос: {Number(row.poll).toFixed(2)}%</small>}</div>)}</div>
    </section>
    <section className="stage7Panel inaugurationPanel"><div className="stage7PanelHead"><div><small>ИНАУГУРАЦИЯ</small><h3>Вступление избранного Президента в должность</h3><p>После фиксации итогов преподаватель задаёт дату, место и аудиосопровождение церемонии.</p></div><Landmark size={24}/></div>
