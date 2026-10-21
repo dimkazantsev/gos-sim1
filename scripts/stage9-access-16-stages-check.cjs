@@ -19,9 +19,9 @@ assert(!sql.includes("stage_no IN (9,10,11"),'Do not unlock other future stages'
 const gameId='52297def-d24d-4ba9-8049-5078b1b3bd45';
 const deadline=new Date(Date.now()+60*60*1000).toISOString();
 const game={id:gameId,status:'running',turn_open:true,turn_ends_at:deadline};
-const stage=n=>({game_id:gameId,stage_no:n,status:n<8?'completed':n===8||n===9?'open':'locked',deadline:n===8||n===9?deadline:null});
+const stage=n=>({game_id:gameId,stage_no:n,status:n<=8?'completed':n===9?'open':'locked',deadline:n===8||n===9?deadline:null});
 for(let n=1;n<=16;n++){
- const s=stage(n),expected=n===8||n===9;
+ const s=stage(n),expected=n===9;
  assert.equal(isStageWorkOpen(game,s),expected,'Stage '+n+' unexpectedly enabled/disabled');
  if(n===9){
   assert(!isStageWorkOpen({...game,turn_open:false},s),'Paused game is not unlocked');
@@ -41,9 +41,9 @@ for(let n=1;n<=16;n++){
  'CREATE TABLE public.audit_log(game_id uuid,actor_id uuid,action text,entity_type text,payload jsonb)'
  ].join(';')+';');
  const uid=n=>'10000000-0000-4000-8000-'+String(n).padStart(12,'0');
- await db.query("INSERT INTO public.games VALUES($1,'running',true,$2,8)",[gameId,deadline]);
+ await db.query("INSERT INTO public.games VALUES($1,'paused',false,null,8)",[gameId]);
  for(let i=1;i<=16;i++)
-   await db.query('INSERT INTO public.game_stages(id,game_id,stage_no,status,deadline) VALUES($1,$2,$3,$4,$5)',[uid(i),gameId,i,i<8?'completed':i===8?'open':'locked',i===8?deadline:null]);
+   await db.query('INSERT INTO public.game_stages(id,game_id,stage_no,status,deadline) VALUES($1,$2,$3,$4,$5)',[uid(i),gameId,i,i<=8?'completed':'locked',i===8?deadline:null]);
  await db.query('INSERT INTO public.stage_deadline_rules(game_id,stage_no) VALUES($1,9)',[gameId]);
  await assert.rejects(()=>db.exec(sql),/Prime Minister and approved formal structure required/);
  let nine=(await db.query('SELECT status FROM public.game_stages WHERE stage_no=9')).rows[0];
@@ -53,7 +53,8 @@ for(let n=1;n<=16;n++){
  await db.exec(sql);
  let stages=(await db.query('SELECT stage_no,status,deadline,opened_at FROM public.game_stages ORDER BY stage_no')).rows;
  assert.equal(stages.length,16);
- for(const s of stages)assert.equal(s.status,s.stage_no<8?'completed':s.stage_no===8||s.stage_no===9?'open':'locked','Unexpected unlock of stage '+s.stage_no);
+ for(const s of stages)assert.equal(s.status,s.stage_no<=8?'completed':s.stage_no===9?'open':'locked','Unexpected unlock of stage '+s.stage_no);
+ assert.equal(stages[7].status,'completed','Stage 8 must remain completed');
  assert(stages[8].opened_at,'Activation date recorded');
  assert.equal(stages[8].deadline.toISOString(),deadline);
  let g=(await db.query('SELECT current_round,status,turn_open,turn_ends_at FROM public.games WHERE id=$1',[gameId])).rows[0];
