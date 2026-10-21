@@ -70,7 +70,7 @@ assert(sectionSource.includes('window.addEventListener(SECTION_UPDATES_REFRESH_E
  'Section count hook consumes the targeted event');
 assert(sectionSource.includes('window.removeEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated)'),
  'Section count hook releases the event listener on unmount');
-assert(gameShell.includes('notifySectionUpdates(game.id)'),
+assert(gameShell.includes('notifySectionUpdates(game!.id)'),
  'Event assignment/invitation changes invalidate the section counter');
 assert(source.includes('if(partyDocs)notifySectionUpdates(gameId)'),
  'Party document changes invalidate teacher section counters');
