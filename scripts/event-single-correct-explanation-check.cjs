@@ -57,6 +57,6 @@ const educational=markup({...props,bestLegalBasis:'Авторская учебн
 assert(!educational.includes('Авторская учебная модель')&&!educational.includes('Правовое основание:'),
  'Invented or educational descriptions must never be shown as legal citations');
 const deduplicated=markup({...props,bestDescription:'Объяснение только правильного решения. Федеральный закон № 323-ФЗ, статья 10.'});
-assert.equal(deduplicated.match(/Проверенное правовое основание правильного решения/g)?.length||0,1,
+assert.equal(deduplicated.match(/Федеральный закон № 323-ФЗ, статья 10\./g)?.length||0,1,
  'Repeated legal basis must not be printed twice');
 console.log('PASS: canonical answer and explanation visible only after resolution; no other-choice feedback, duplicate heading, RPC or premature disclosure.');
