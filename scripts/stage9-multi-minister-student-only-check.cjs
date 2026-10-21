@@ -11,8 +11,9 @@ assert(code.includes('institution_assignments_one_staff_ministry_per_student'),'
 assert((code.match(/on conflict\(unit_id,user_id\)/g)||[]).length>=3);
 assert(code.includes('Minister must be a registered active student'));
 assert(code.includes('Candidate name must match the selected registered student'));
+assert((code.match(/private\.is_appointed_pm\(n\.game_id,n\.candidate_user_id\)/g)||[]).length===2,'Preserve PM office in both minister appointment paths');
 assert(ui.includes('registeredOnly')&&ui.includes('!selected[slot]'));
-assert(ui.includes("registeredOnly?'Нет активных студентов игры'"),'Stage 9 must require an actual student');
+assert(ui.includes('Нет активных студентов игры'),'Stage 9 must show that active students are required');
 const game='10000000-0000-4000-8000-000000000001',
  p='30000000-0000-4000-8000-000000000001',
  a='30000000-0000-4000-8000-000000000001',
