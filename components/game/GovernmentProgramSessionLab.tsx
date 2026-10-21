@@ -9,7 +9,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 
 type Session={id:string;game_id:string;session_no:number;title:string;time_limit_minutes:number;agenda_document_id:string|null;status:'draft'|'open'|'closed';chair_user_id:string|null;created_at:string;opened_at:string|null;closed_at:string|null};
 type Item={id:string;session_id:string;program_id:string;agenda_no:number;report_minutes:number;status:'pending'|'presenting'|'decision'|'completed'|'withdrawn';vote_id:string|null;result_note:string|null;started_at:string|null;completed_at:string|null};
-type Program={id:string;title:string;responsible_ministry:string;status:string;responsible_minister_id:string|null};
+type Program={id:string;title:string;responsible_ministry:string;status:string;responsible_minister_id:string|null;signed_at:string|null;government_vote_id:string|null};
 type Question={id:string;session_id:string;title:string;description:string;duration_minutes:number;program_agenda_id:string|null;status:'pending'|'discussed';created_at:string};
 type Proposal={id:string;session_id:string|null;program_id:string;section_key:string;original_text:string;proposed_text:string;justification:string;status:'submitted'|'accepted'|'rejected';review_note:string|null;created_by:string;created_at:string};
 
@@ -31,14 +31,16 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const [reportMinutes,setReportMinutes]=useState(7);
  const [busy,setBusy]=useState(false);
  const role=stageRoleTitles(g);
- const canManage=teacher||(role.includes('председател')&&role.includes('правительств'))||role.includes('президент');
+ const isPM=role.split(' | ').some(t=>/^председатель\s+правительства(?:\s|$)/u.test(t));
+ const canManage=teacher||isPM||role.includes('президент');
+ const canSign=teacher||isPM;
 
  async function load(){
   if(!game)return;
   const [s,i,p,q,r]=await Promise.all([
    supabase.from('government_sessions').select('*').eq('game_id',game.id).order('session_no',{ascending:false}),
    supabase.from('government_program_agenda').select('*').eq('game_id',game.id).order('agenda_no'),
-   supabase.from('state_programs').select('id,title,responsible_ministry,status,responsible_minister_id').eq('game_id',game.id).order('title'),
+   supabase.from('state_programs').select('id,title,responsible_ministry,status,responsible_minister_id,signed_at,government_vote_id').eq('game_id',game.id).order('title'),
    supabase.from('government_session_questions').select('*').eq('game_id',game.id).order('created_at'),
    supabase.from('state_program_review_proposals').select('*').eq('game_id',game.id).order('created_at',{ascending:false})
   ]);
@@ -108,10 +110,15 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  async function open(){if(!selected)return;setBusy(true);const r=await supabase.rpc('open_government_session',{p_session_id:selected.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
  async function start(id:string){setBusy(true);const r=await supabase.rpc('start_government_program_report',{p_item_id:id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
  async function decision(id:string){setBusy(true);const r=await supabase.rpc('open_program_vote_from_agenda',{p_item_id:id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function sign(programId:string){
+  if(!canSign||busy)return;setBusy(true);
+  try{const r=await supabase.rpc('sign_adopted_state_program',{p_program_id:programId});if(r.error)throw r.error;await load();setNotice('Государственная программа подписана и опубликована.');}
+  catch(e){setError(userError(e))}finally{setBusy(false)}
+ }
  async function close(){if(!selected)return;setBusy(true);const r=await supabase.rpc('close_government_session',{p_session_id:selected.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  return <section className="govSessionLab">
-  <StageModuleHeader variant="government" eyebrow="Этап 11 · Правительство" title="Заседание Правительства" description="Председатель формирует повестку и регламент. Министры представляют программы, члены Правительства регистрируются на заседание и голосуют; принятое решение оформляется постановлением." stats={[{label:"Заседание",value:selected?"№ "+selected.session_no:"Не создано",detail:selected?.status==="open"?"Идёт":selected?.status==="closed"?"Закрыто":"Подготовка повестки"},{label:"Регламент",value:selected?selected.time_limit_minutes+" мин.":"Не задан"}]}/>
+  <StageModuleHeader variant="government" eyebrow="Этап 11 · Правительство" title="Заседание Правительства" description="Председатель формирует повестку и регламент. Министры представляют программы, участники Правительства регистрируются и голосуют; принятую программу Председатель подписывает и публикует." stats={[{label:"Заседание",value:selected?"№ "+selected.session_no:"Не создано",detail:selected?.status==="open"?"Идёт":selected?.status==="closed"?"Закрыто":"Подготовка повестки"},{label:"Регламент",value:selected?selected.time_limit_minutes+" мин.":"Не задан"}]}/>
 
   <div className="govSessionTabs govSessionTabsFull">
    <div>{sessions.map(s=><button type="button" key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'Идёт':s.status==='closed'?'Завершено':'Проект'}</em></button>)}</div>
@@ -161,11 +168,11 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
      <button type="button" disabled={busy||questionTitle.trim().length<3||questionMinutes<1||questionMinutes>60} onClick={()=>void addQuestion()}>Добавить вопрос</button>
     </div>}
    </section>
-   {canManage&&selected.status==='draft'&&<div className="govAgendaBuilder"><select value={programId} onChange={e=>setProgramId(e.target.value)}><option value="">Выберите подписанную госпрограмму…</option>{readyPrograms.filter(p=>!agenda.some(i=>i.program_id===p.id)).map(p=><option key={p.id} value={p.id}>{p.title} · {p.responsible_ministry}</option>)}</select><label>Доклад, мин.<input type="number" min="1" max="60" value={reportMinutes} onChange={e=>setReportMinutes(Number(e.target.value)||7)}/></label><button disabled={busy||!programId} onClick={()=>void add()}>Добавить в повестку</button></div>}
+   {canManage&&selected.status==='draft'&&<div className="govAgendaBuilder"><select value={programId} onChange={e=>setProgramId(e.target.value)}><option value="">Выберите согласованную государственную программу…</option>{readyPrograms.filter(p=>!agenda.some(i=>i.program_id===p.id)).map(p=><option key={p.id} value={p.id}>{p.title} · {p.responsible_ministry}</option>)}</select><label>Доклад, мин.<input type="number" min="1" max="60" value={reportMinutes} onChange={e=>setReportMinutes(Number(e.target.value)||7)}/></label><button disabled={busy||!programId} onClick={()=>void add()}>Добавить в повестку</button></div>}
 
    <div className="govAgenda">
     {agenda.length===0?<div className="emptyState">В повестке пока нет государственных программ.</div>:agenda.map(i=>{const p=program(i.program_id),v=vote(i.vote_id);return <article className={'govAgendaItem '+i.status} key={i.id}><div className="govAgendaNo">{String(i.agenda_no).padStart(2,'0')}</div><div><small>{p?.responsible_ministry||'Ответственный исполнитель'}</small><h3>{p?.title||'Государственная программа'}</h3><p>Доклад: {i.report_minutes} мин. · ответственный министр: {name(p?.responsible_minister_id||null)}</p><div className="govAgendaTags"><span>{i.status==='pending'?'Ожидает':i.status==='presenting'?'Доклад':i.status==='decision'?'Решение Правительства':i.status==='completed'?'Рассмотрено':'Снято'}</span>{v&&<span className={v.status==='open'?'live':''}>{v.status==='open'?'● Голосование открыто':v.result_label||'Голосование закрыто'}</span>}</div>{i.result_note&&<blockquote>{i.result_note}</blockquote>}</div>
-     {canManage&&selected.status==='open'&&<div className="govAgendaActions">{i.status==='pending'&&<button disabled={busy||!!current} onClick={()=>void start(i.id)}>Начать доклад</button>}{i.status==='presenting'&&<button className="primary" disabled={busy} onClick={()=>void decision(i.id)}>Перейти к решению →</button>}{i.status==='decision'&&<button onClick={()=>onOpenVotes(i.vote_id||undefined)}>Открыть голосование →</button>}</div>}
+     {(selected.status==='open'||!!i.vote_id||p?.status==='adopted')&&<div className="govAgendaActions">{canManage&&i.status==='pending'&&<button disabled={busy||!!current} onClick={()=>void start(i.id)}>Начать доклад</button>}{canManage&&i.status==='presenting'&&<button className="primary" disabled={busy} onClick={()=>void decision(i.id)}>Перейти к решению →</button>}{i.vote_id&&<button type="button" className={i.status==='decision'?'primary':'secondary'} onClick={()=>onOpenVotes(i.vote_id!)}>{i.status==='decision'?'Участвовать в голосовании →':'Посмотреть голосование →'}</button>}{p?.status==='adopted'&&canSign&&!g.formalDocuments.some(d=>d.game_id===game!.id&&d.stage_no===11&&d.doc_type==='government_resolution'&&d.metadata?.state_program_id===p.id&&d.status_code==='published')&&<button type="button" className="primary" disabled={busy} onClick={()=>void sign(p.id)}>{p.signed_at?'Опубликовать постановление →':'Подписать и опубликовать →'}</button>}</div>}
     </article>})}
    </div>
 
@@ -173,7 +180,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
    <div className="govProgramReviewHeader"><div><h3>Государственные программы на рассмотрении</h3><p>Программы этапа 10 рассматриваются только после включения в повестку выбранного заседания.</p></div><span>{reviewablePrograms.length} программ</span></div>
    <div className="govProgramReviewGrid">{reviewablePrograms.length?reviewablePrograms.map(p=><article key={p.id}>
     <small>{p.responsible_ministry}</small><h4>{p.title}</h4>
-    <span>{p.status==='ready'?'Готова к заседанию':p.status==='adopted'?'Принята':p.status==='rejected'?'Отклонена':p.status==='government_vote'?'На голосовании':'В подготовке и согласовании'}</span>
+    <span>{p.status==='ready'?'Готова к заседанию':p.status==='adopted'?(p.signed_at?'Подписана и опубликована':'Ожидает подписи Председателя Правительства'):p.status==='rejected'?'Отклонена':p.status==='government_vote'?'На голосовании':'В подготовке и согласовании'}</span>
     <p>{meetingProposals.filter(q=>q.program_id===p.id).length} предложений по изменению</p>
     <button type="button" onClick={()=>{setReviewProgram(p.id);document.getElementById('gov-review-form')?.scrollIntoView({block:'nearest',behavior:'smooth'})}}>Рассмотреть и предложить правку</button>
    </article>):<p>Сначала включите программу из этапа 10 в повестку заседания.</p>}</div>

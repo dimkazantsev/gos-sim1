@@ -14,6 +14,10 @@ on:
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'supabase/migrations/*stage10_one_state_program_no_separate_feo.sql'
       - 'supabase/migrations/*stage10_accept_synchronized_ministry_programme.sql'
+      - 'supabase/migrations/*government_program_vote_then_pm_signature.sql'
+      - 'components/game/GovernmentProgramSessionLab.tsx'
+      - 'components/game/stateProgramModel.ts'
+      - 'scripts/government-program-vote-before-sign-check.cjs'
       - '.github/workflows/stage10-president-goals-documents.yml'
   push:
     branches: [main]
@@ -30,6 +34,10 @@ on:
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'supabase/migrations/*stage10_one_state_program_no_separate_feo.sql'
       - 'supabase/migrations/*stage10_accept_synchronized_ministry_programme.sql'
+      - 'supabase/migrations/*government_program_vote_then_pm_signature.sql'
+      - 'components/game/GovernmentProgramSessionLab.tsx'
+      - 'components/game/stateProgramModel.ts'
+      - 'scripts/government-program-vote-before-sign-check.cjs'
       - '.github/workflows/stage10-president-goals-documents.yml'
 permissions:
   contents: read
@@ -46,6 +54,7 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: node scripts/stage10-president-goals-document-sync-check.cjs
       - run: node scripts/stage10-single-program-work-links-check.cjs
+      - run: node scripts/government-program-vote-before-sign-check.cjs
       - run: node scripts/stage10-ministry-team-rights-check.cjs
       - run: node scripts/stage-final-documents-gate-check.cjs
       - run: npm run typecheck
