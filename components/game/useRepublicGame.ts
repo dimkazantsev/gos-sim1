@@ -1,6 +1,6 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {notifyGameDataRefresh,setGameRealtimeConnection} from './useGameTableSync';
+import {notifyGameDataRefresh,notifySectionUpdates,setGameRealtimeConnection} from './useGameTableSync';
 import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
 import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {useEffect,useMemo,useRef,useState} from 'react';
@@ -220,7 +220,7 @@ export function useRepublicGame(gameId:string){
  useEffect(()=>{
   alive.current=true;
   clearGameData();setLoading(true);setRealtimeState('disconnected');
-  let disposed=false,authReloadTimer:ReturnType<typeof setTimeout>|undefined;
+  let disposed=false,authReloadTimer:ReturnType<typeof setTimeout>|undefined,lastRecoveryAt=0;
   const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
    if(disposed)return;
    const nextUser=session?.user.id||null;
@@ -236,7 +236,15 @@ export function useRepublicGame(gameId:string){
   });
   setProfileGameId('');
   void loadAll();
-  const recover=()=>{if(authUser.current&&acceptedMember.current){void hydrateActiveView();notifyGameDataRefresh(gameId);if(activeViewRef.current==='budget')void refreshBudgetPulse()}};
+  const recover=()=>{
+    if(disposed||document.visibilityState==='hidden'||!authUser.current||!acceptedMember.current)return;
+    // Focus + visibilitychange arrive together on some browsers. One recovery
+    // suffices; explicit mutations and subscribed Realtime events bypass this guard.
+    const now=Date.now();if(now-lastRecoveryAt<1500)return;
+    lastRecoveryAt=now;
+    void hydrateActiveView();notifyGameDataRefresh(gameId);
+    if(activeViewRef.current==='budget')void refreshBudgetPulse();
+   };
   const visible=()=>{if(document.visibilityState==='visible')recover()};
   window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
   return()=>{disposed=true;alive.current=false;readEpoch.current++;subscription.unsubscribe();clearTimeout(authReloadTimer);window.removeEventListener('focus',recover);window.removeEventListener('online',recover);document.removeEventListener('visibilitychange',visible);if(realtimeReloadTimer.current){clearTimeout(realtimeReloadTimer.current);realtimeReloadTimer.current=null}realtimeReloadVersion.current++;realtimeReloadRunning.current=false;realtimeReloadQueued.current=false;};
@@ -257,6 +265,7 @@ export function useRepublicGame(gameId:string){
    if(core){void hydrateActiveView();notifyGameDataRefresh(gameId)}
    // A document version changes no core identity or party membership.
    if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments();
+    if(partyDocs)notifySectionUpdates(gameId);
    if(overview||chat)scheduleRealtimeChatOverview();
    if(chat&&channelRef.current)void loadMessages(channelRef.current);
    if(pins&&channelRef.current)void loadChatPins(channelRef.current);
