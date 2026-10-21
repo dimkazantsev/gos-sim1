@@ -1,7 +1,7 @@
 /* Guard the entire repository's client-facing case SELECT contract. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
-const migration=fs.readFileSync('supabase/migrations/20261021113000_hide_event_effect_plan_until_outcome.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20261021104919_prepare_visible_event_cases_outcome_rpc.sql','utf8');
 const privilegeLock=fs.readFileSync('supabase/migrations/20261021113100_lock_event_effect_plan_column.sql','utf8');
 const workspace=fs.readFileSync('components/game/EventWorkspace.tsx','utf8');
 assert(workspace.includes("supabase.rpc('list_visible_event_cases'"),
