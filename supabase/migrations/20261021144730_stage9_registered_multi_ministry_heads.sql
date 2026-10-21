@@ -156,7 +156,10 @@ begin
     where a.game_id=n.game_id and a.user_id=n.candidate_user_id
       and a.status='active'
       and lower(trim(a.role_title))='президент российской федерации'
-  ) then 'Президент Российской Федерации' else n.office_title end
+  ) then 'Президент Российской Федерации'
+    when private.is_appointed_pm(n.game_id,n.candidate_user_id)
+      then 'Председатель Правительства Российской Федерации'
+    else n.office_title end
   where m.game_id=n.game_id and m.user_id=n.candidate_user_id;
   if n.office_key like 'ministry_%' then
    v_unit_key:=substring(n.office_key from 10);
@@ -220,7 +223,10 @@ begin
     where a.game_id=n.game_id and a.user_id=n.candidate_user_id
       and a.status='active'
       and lower(trim(a.role_title))='президент российской федерации'
-  ) then 'Президент Российской Федерации' else n.office_title end
+  ) then 'Президент Российской Федерации'
+    when private.is_appointed_pm(n.game_id,n.candidate_user_id)
+      then 'Председатель Правительства Российской Федерации'
+    else n.office_title end
   where m.game_id=n.game_id and m.user_id=n.candidate_user_id;
   if n.office_key like 'ministry_%' then
    v_unit_key:=substring(n.office_key from 10);
