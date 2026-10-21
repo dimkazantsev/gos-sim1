@@ -40,7 +40,7 @@ const game='10000000-0000-4000-8000-000000000001',
    "CREATE FUNCTION private.is_appointed_pm(g uuid, actor uuid) RETURNS boolean LANGUAGE sql STABLE AS $$ SELECT actor=auth.uid() $$",
    "CREATE FUNCTION private.game_role(g uuid,actor uuid) RETURNS text LANGUAGE sql STABLE AS $$ SELECT lower(coalesce((select role_title from public.game_members where game_id=g and user_id=actor limit 1),'')) $$",
    "CREATE FUNCTION private.stage8_create_formal_document(g uuid,title text,typ text,subj text,issuer text,body text,route text,step int,meta jsonb) RETURNS uuid LANGUAGE sql AS $$ SELECT gen_random_uuid() $$",
-   "CREATE FUNCTION private.ensure_government_nomination_vote(n uuid) RETURNS void LANGUAGE sql AS $ SELECT NULL::void $",
+   "CREATE FUNCTION private.ensure_government_nomination_vote(n uuid) RETURNS void LANGUAGE sql AS $$ SELECT NULL::void $$",
    "CREATE FUNCTION private.member_party_id(g uuid,u uuid) RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT null::uuid $$",
    "CREATE FUNCTION private.stage8_create_appointment_decree(n uuid) RETURNS uuid LANGUAGE sql AS $$ SELECT gen_random_uuid() $$"
   ].join(';\n')+';');
