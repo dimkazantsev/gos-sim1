@@ -216,3 +216,110 @@ end
 $sign$;
 REVOKE ALL ON FUNCTION public.sign_adopted_state_program(uuid) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.sign_adopted_state_program(uuid) TO authenticated;
+
+-- Synced programme prepared in Work counts toward Stage 10 BEFORE any Stage 11 signature.
+CREATE OR REPLACE FUNCTION private.stage_required_final_documents(p_game uuid, p_stage integer)
+ RETURNS jsonb
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+WITH policy(stage_no,template_key,label,doc_type,subject_key) AS (
+ VALUES
+ (2,'minutes','Протокол заседания КСРФ','other','ksrf'),
+ (3,'minutes','Протокол заседания КСРФ','other','ksrf'),
+ (4,'gd_chair_resolution','Постановление об избрании Председателя Государственной Думы','gd_resolution','gd'),
+ (4,'gd_deputies_resolution','Постановление об избрании заместителей Председателя ГД','gd_resolution','gd'),
+ (4,'gd_committees_resolution','Постановление об избрании председателей пяти комитетов ГД','gd_resolution','gd'),
+ (4,'minutes','Протокол заседания Государственной Думы','other','gd'),
+ (5,'gd_resolution','Постановление Государственной Думы','gd_resolution','gd'),
+ (5,'minutes','Протокол заседания Государственной Думы','other','gd'),
+ (6,'sf_resolution','Постановление Совета Федерации о назначении выборов','sf_resolution','sf'),
+ (8,'president_decree','Указ Президента Российской Федерации','president_decree','president'),
+ (8,'gd_resolution','Постановление Государственной Думы','gd_resolution','gd'),
+ (9,'president_decree','Указ Президента о назначении','president_decree','president'),
+ (9,'gd_resolution','Постановление Государственной Думы','gd_resolution','gd'),
+ (10,'state_program','Государственная программа в реестре','state_program','government'),
+ 
+ (11,'minutes','Протокол заседания Правительства','other','government'),
+ (14,'municipal_act','Муниципальный правовой акт','municipal_act','municipality'),
+ (15,'crisis_act','Правовой акт о реагировании на кризис','any','any')
+), matches AS (
+ SELECT x.*,
+ EXISTS(
+ SELECT 1 FROM public.formal_documents d
+ WHERE d.game_id=p_game AND d.stage_no=p_stage
+   AND (d.status_code='published' OR
+       (p_stage=10 AND x.template_key = 'state_program'
+        AND d.status_code IN ('draft','submitted','under_review','review')))
+   AND (CASE WHEN x.doc_type='any'
+      THEN d.doc_type IN ('president_decree','government_resolution','ministry_order','municipal_act')
+      WHEN x.template_key IN ('gd_chair_resolution','gd_deputies_resolution','gd_committees_resolution')
+      THEN d.doc_type='gd_resolution' AND d.subject_key='gd'
+        AND d.metadata->>'document_kind'='stage4_office_result'
+        AND d.metadata->>'source_result_key'=CASE x.template_key
+         WHEN 'gd_chair_resolution' THEN 'gd_chair'
+         WHEN 'gd_deputies_resolution' THEN 'gd_deputies'
+         ELSE 'gd_committees' END
+      WHEN x.template_key='minutes'
+      THEN ((d.doc_type IN ('meeting_minutes','minutes')
+          OR d.metadata->>'template_key'='minutes'
+          OR (d.doc_type='other' AND d.title ILIKE 'Протокол заседания%'))
+          AND (d.subject_key=x.subject_key OR d.subject_key IS NULL))
+      WHEN x.template_key='state_program' THEN d.doc_type='state_program' AND d.metadata->>'auto_synced'='true' AND EXISTS (SELECT 1 FROM public.state_programs p WHERE p.game_id=d.game_id AND p.id::text=d.metadata->>'state_program_id' AND p.status IN ('ready','government_vote','adopted') AND p.status IN ('ready','government_vote','adopted')) WHEN x.template_key='financial_economic'
+      THEN d.metadata->>'template_key'='financial_economic'
+      ELSE d.doc_type=x.doc_type AND
+        (d.subject_key=x.subject_key OR d.subject_key IS NULL)
+   END)
+ ) AS fulfilled
+ FROM policy x WHERE x.stage_no=p_stage
+)
+SELECT coalesce(jsonb_agg(jsonb_build_object(
+ 'template_key',template_key,'title',label,'subject_key',subject_key,'fulfilled',fulfilled,'evidence_state',case when stage_no=10 then 'prepared' else 'published' end)
+ ORDER BY template_key),'[]'::jsonb)
+FROM matches;
+$function$
+;
+
+-- Approve one agenda and open registration atomically with the real Government session.
+CREATE OR REPLACE FUNCTION public.open_government_session(p_session_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare s public.government_sessions%rowtype;v_uid uuid:=(select auth.uid());
+begin
+ select * into s from public.government_sessions where id=p_session_id for update;
+ if s.id is null then raise exception 'Заседание не найдено'; end if;
+ if not private.can_manage_government_session(s.game_id,v_uid) then raise exception 'Недостаточно прав на открытие заседания'; end if;
+ if s.status<>'draft' then raise exception 'Заседание уже открыто или завершено'; end if;
+ if not exists(select 1 from public.government_session_questions where session_id=s.id)
+    and not exists(select 1 from public.government_program_agenda where session_id=s.id) then
+    raise exception 'Добавьте хотя бы один вопрос повестки';
+ end if;
+ if not exists(select 1 from public.game_stages st where st.game_id=s.game_id and st.stage_no=11 and st.status='open') then
+  raise exception 'Сначала преподаватель должен открыть Этап 11';end if;
+ update public.government_sessions set status='open',opened_at=now(),chair_user_id=v_uid where id=s.id;
+ -- The Government session agenda is the ONE official agenda used by voting registration.
+ insert into public.institution_meeting_records(
+  game_id,stage_no,institution_key,agenda_document_id,agenda_body,
+  agenda_prepared_by,agenda_approved_by,agenda_approved_at)
+ select s.game_id,11,'government',d.id,d.body_text,v_uid,v_uid,now()
+ from public.government_sessions gs
+ join public.formal_documents d on d.id=gs.agenda_document_id and d.game_id=gs.game_id
+ where gs.id=s.id and d.status_code='published' and length(btrim(d.body_text))>=30
+ on conflict(game_id,stage_no,institution_key) do update
+ set agenda_document_id=excluded.agenda_document_id, agenda_body=excluded.agenda_body,
+  agenda_prepared_by=excluded.agenda_prepared_by,agenda_approved_by=excluded.agenda_approved_by,
+  agenda_approved_at=excluded.agenda_approved_at,updated_at=now()
+ where public.institution_meeting_records.agenda_approved_at is null
+  and not exists(select 1 from public.institution_session_registrations r
+    where r.game_id=s.game_id and r.stage_no=11 and r.institution_key='government');
+ if not exists(select 1 from public.institution_meeting_records r
+    join public.formal_documents d on d.id=r.agenda_document_id and d.game_id=r.game_id
+    where r.game_id=s.game_id and r.stage_no=11 and r.institution_key='government'
+    and r.agenda_approved_at is not null and d.status_code='published' and length(btrim(r.agenda_body))>=30) then
+  raise exception 'Открытие заседания требует утверждённой повестки';end if;
+end;$function$
+;
