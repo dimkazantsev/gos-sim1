@@ -15,3 +15,115 @@
 .addGoalAction{display:flex;align-items:center;justify-content:flex-start;gap:12px;margin-top:20px;padding-top:4px;min-width:0}
 .addGoalAction>button{min-height:46px;max-width:100%;margin:0;white-space:normal}
 @media(max-width:520px){.addGoalAction>button{width:100%}}
+
+
+/* Stages 10–11: align program documents with the established ГОС.ID command
+   header and form language. Scoped so that other stage forms stay unchanged. */
+.programWorkspace{min-width:0}
+.programWorkspace :global([data-stage-module-head]){
+ display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,.8fr);
+ align-items:center;gap:22px;margin:0 0 16px;padding:22px 24px;
+ border:1px solid rgba(255,255,255,.1);border-radius:18px;
+ background:linear-gradient(125deg,var(--command,#101f36),#213b61);
+ box-shadow:var(--shadow,0 10px 32px rgba(13,31,58,.07));color:#fff;
+}
+.programWorkspace :global([data-stage-module-head]) h2{color:#fff;margin:7px 0 9px;font-size:clamp(22px,2.15vw,29px)}
+.programWorkspace :global([data-stage-module-head]) p{color:#d1dbea;line-height:1.55;max-width:700px}
+.programWorkspace :global([data-stage-module-head]) :global([class*="eyebrow"]){color:var(--cyan,#7ce8d8)}
+.programWorkspace :global([data-stage-module-head]) dl{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+ width:100%;max-width:none;min-width:0;margin:0
+}
+.programWorkspace :global([data-stage-module-head]) dl>div{
+ min-width:0;max-width:none;padding:12px;
+ border:1px solid rgba(255,255,255,.14);border-radius:13px;
+ background:rgba(255,255,255,.07);
+}
+.programWorkspace :global([data-stage-module-head]) dt{color:#cfdaee}
+.programWorkspace :global([data-stage-module-head]) dd{font-size:clamp(16px,1.7vw,20px);color:#fff;line-height:1.3}
+.programWorkspace :global([data-stage-module-head]) dl span{color:#d1dbea;line-height:1.4}
+.programWorkspace .panel{margin:0 0 14px;padding:20px;
+ border-color:var(--line,#dce4ef);border-radius:18px;
+ background:#fff;box-shadow:var(--shadow,0 10px 32px rgba(13,31,58,.07))}
+.programWorkspace .sectionHead{margin-bottom:16px}
+.programWorkspace .sectionHead h3{color:var(--text,#10213c);font-size:19px;line-height:1.35;letter-spacing:-.018em}
+.programWorkspace .sectionHead p{margin:5px 0 0;color:var(--body,#354a67);line-height:1.5}
+.addressPanel{border-top:3px solid var(--blue,#315efb)!important}
+.programEditorPanel{border-top:3px solid var(--blue,#315efb)!important}
+.programWorkspace .programIntro{padding-bottom:15px;border-bottom:1px solid var(--line,#dce4ef)}
+.programWorkspace .form{gap:18px}
+.programWorkspace .form legend{
+ padding:0 0 5px;color:var(--text,#10213c);
+ font-size:17px;font-weight:800;letter-spacing:-.015em
+}
+.programWorkspace .grid{column-gap:16px;row-gap:14px}
+.programWorkspace .field{gap:7px;font-size:13px;color:var(--body,#354a67);font-weight:750}
+.programWorkspace .field input,.programWorkspace .field textarea{
+ width:100%;min-width:0;max-width:100%;margin:0;
+ padding:12px 13px;border:1px solid var(--line-strong,#c7d3e2);
+ border-radius:12px;background:#fbfcff;color:var(--text,#10213c);
+ font-size:14px;line-height:1.45;box-shadow:inset 0 1px 2px rgba(13,31,58,.025)
+}
+.programWorkspace .field input{min-height:46px}
+.programWorkspace .field textarea{min-height:86px;resize:vertical}
+.programWorkspace .field input:focus-visible,.programWorkspace .field textarea:focus-visible{
+ border-color:var(--blue,#315efb);outline:3px solid rgba(49,94,251,.15);outline-offset:0;background:#fff
+}
+.programWorkspace .addressForm textarea{min-height:124px}
+.addressForm{align-items:end}
+.addressActions{display:flex;justify-content:flex-end;align-items:center;margin-top:0;min-width:0}
+.addressActions button{width:auto;min-width:190px;min-height:46px;max-width:100%;margin:0}
+.programWorkspace :global(.styledSelect){min-width:0}
+.programWorkspace :global(.styledSelectTrigger){
+ min-height:46px;border-color:var(--line-strong,#c7d3e2);
+ background:#fbfcff;border-radius:12px
+}
+.programWorkspace :global(.styledSelectTrigger):focus-visible{
+ border-color:var(--blue,#315efb);outline:3px solid rgba(49,94,251,.15);outline-offset:0
+}
+.programWorkspace .row{
+ border-color:var(--line,#dce4ef);border-radius:13px;background:#f8faff
+}
+.programWorkspace .section{margin-top:4px}
+.programWorkspace .actions button,.addressActions button{min-height:46px;border-radius:12px}
+.programWorkspace .pill{border-color:var(--line,#dce4ef);background:#f5f8ff;color:var(--body,#354a67)}
+.programWorkspace :global(.programPicker){
+ display:flex;align-items:center;gap:12px;
+ margin:0 0 14px;padding:12px;
+ border:1px solid var(--line,#dce4ef);border-radius:16px;background:#fff
+}
+.programWorkspace :global(.programTabs){min-width:0;flex:1;gap:8px}
+.programWorkspace :global(.programTabs) button{
+ min-height:46px;border-color:var(--line,#dce4ef);
+ border-radius:12px;background:#f8faff
+}
+.programWorkspace :global(.programTabs) button[aria-pressed="true"]{
+ border-color:var(--blue,#315efb);background:var(--blue-soft,#edf2ff)
+}
+.programWorkspace :global(.programNew){
+ min-height:46px;border:1px solid var(--blue,#315efb);
+ border-radius:12px;background:var(--blue-soft,#edf2ff);
+ color:var(--blue,#315efb);font-size:13px;font-weight:800
+}
+.programWorkspace :global(.programNew):hover:not(:disabled){background:#e3ebff}
+
+@media(max-width:1000px){
+ .programWorkspace :global([data-stage-module-head]){grid-template-columns:minmax(0,1fr);gap:16px}
+ .programWorkspace :global([data-stage-module-head]) dl{max-width:none}
+}
+@media(max-width:700px){
+ .programWorkspace :global([data-stage-module-head]){padding:17px;margin-bottom:12px}
+ .programWorkspace .panel{padding:15px;margin-bottom:12px}
+ .programWorkspace .grid{grid-template-columns:minmax(0,1fr);gap:12px}
+ .programWorkspace .sectionHead{margin-bottom:12px}
+ .programWorkspace .sectionHead h3{font-size:17px}
+ .addressActions{justify-content:stretch}
+ .addressActions button{width:100%;min-width:0}
+ .programWorkspace :global(.programPicker){flex-direction:column;align-items:stretch;padding:10px}
+ .programWorkspace :global(.programNew){width:100%}
+}
+@media(max-width:420px){
+ .programWorkspace :global([data-stage-module-head]) dl{grid-template-columns:minmax(0,1fr)}
+ .programWorkspace :global([data-stage-module-head]) dl>div{padding:11px 12px}
+ .programWorkspace .panel{padding:13px}
+}
