@@ -11,13 +11,16 @@ assert(!source.includes('telegramWake'),'Realtime updates must not wake dispatch
 assert.equal((source.match(/kickTelegramDispatch\(/g)||[]).length,4,
  'Only 3 explicit party mutation paths may wake Telegram, plus the helper definition');
 const migration=fs.readFileSync('supabase/migrations/20261021080000_telegram_dispatch_skip_empty_outbox.sql','utf8');
-const dueCheck=migration.indexOf('if not exists (');
-const outgoingRequest=migration.indexOf('perform net.http_get(');
-assert(dueCheck>=0&&dueCheck<outgoingRequest,'Due-job guard must prevent empty HTTP wake');
+const guardedCall=migration.indexOf('select private.request_telegram_dispatch()');
+const dueCheck=migration.indexOf('where exists (');
+assert(guardedCall>=0&&dueCheck>guardedCall,
+ 'Cron must skip dispatcher HTTP call when no due job exists');
+assert(migration.includes('cron.alter_job')&&migration.includes('telegram_outbox_ready_idx'),
+ 'Patch only the existing scheduled job using the indexed queue check');
 assert(migration.includes('where sent_at is null and attempts < 5 and next_attempt_at <= now()'),
  'Queue guard matches dispatcher eligibility');
-assert(migration.includes('security definer')&&migration.includes('revoke all on function'),
- 'Server-only dispatch function and access restrictions remain');
+assert(!migration.includes('create or replace function private.request_telegram_dispatch'),
+ 'Immediate INSERT-trigger function must remain unchanged');
 
 assert(source.includes("if(liveConnected&&now-lastPollAt<180000)return"),'Connected polling is reduced to once per 3 minutes');
 assert(source.includes('},30000+pollJitter)'), 'Disconnected recovery remains on 30–40s timer');
