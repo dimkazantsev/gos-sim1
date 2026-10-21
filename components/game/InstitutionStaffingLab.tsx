@@ -120,7 +120,7 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
    </div>:<div><h2>Команды министерств</h2><p>Министры, назначенные на этом этапе, набирают сотрудников своих ведомств. Участник может состоять только в одном министерстве как сотрудник; министры вправе руководить несколькими ведомствами. Партийная принадлежность не определяет распределение.</p></div>}
    {mode==='committees'?<div className="staffingBalance" aria-label={'Распределено депутатских мандатов по комитетам: '+assignedSeats+' из 450'}>
     <span>Распределение мандатов</span><strong>{assignedSeats} / 450</strong><em>Мандатов распределено</em>
-   </div>:<div className="staffingBalance"><strong>{assignments.filter(a=>a.unit_kind==='ministry').length}</strong><span>в министерствах</span></div>}
+   </div>:<div className="staffingBalance"><strong>{assignments.filter(a=>a.unit_kind==='ministry').length}</strong><span>В министерствах</span></div>}
   </header>
   {loadError&&<div className="stageOperationsNotice" role="alert"><p>{loadError}</p><button type="button" onClick={()=>void load()}>Повторить загрузку</button></div>}
   {!loaded&&<p role="status">Загрузка состава…</p>}
@@ -155,14 +155,14 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
   </section>}
 
   {mode==='ministries'&&ministries.length>0&&<section className="staffingSection ministrySection">
-   <div className="staffingSectionHead"><div><small>ПРАВИТЕЛЬСТВО</small><h3>5 министерств · беспартийный кадровый принцип</h3><p>Министры набирают заместителей и участников своих ведомств. Партийная принадлежность здесь не используется как критерий распределения; система показывает дисбаланс численности между ведомствами.</p></div><span className={maxCount-minCount>1?'warn':''}>разброс {minCount}–{maxCount}</span></div>
+   <div className="staffingSectionHead"><div><small>ПРАВИТЕЛЬСТВО</small><h3>5 министерств · беспартийный кадровый принцип</h3><p>Министры набирают заместителей и участников своих ведомств. Партийная принадлежность здесь не используется как критерий распределения; система показывает дисбаланс численности между ведомствами.</p></div><span className={maxCount-minCount>1?'warn':''}>Разброс {minCount}–{maxCount}</span></div>
    <div className="ministryGrid">{ministries.map(u=>{
     const minister=ministers.find(n=>n.office_key==='ministry_'+u.unit_key);
     const aa=assignedTo(u.id),count=aa.length,balanced=count>=Number(u.capacity_min||3)&&count<=Number(u.capacity_max||5);
     return <article className={'institutionUnit ministryUnit '+(balanced?'balanced':'')} key={u.id}>
      <header><div><small>МИНИСТЕРСТВО</small><h4>{u.title}</h4><p>{u.description}</p></div><span>{count} / {u.capacity_min||3}–{u.capacity_max||5}</span></header>
      <div className="unitHead"><small>Министр · назначение этапа 9</small><b>{minister?.candidate_name||'Ещё не назначен'}</b>{!minister&&<span>Кандидатура и назначение находятся выше</span>}</div>
-     <div className="unitMembers">{aa.length===0?<div className="emptyState">Ведомство пока не укомплектовано.</div>:aa.map(a=><div key={a.id}><span>{memberName(a.user_id)}</span><small>{a.assignment_role==='head'?'министр':'член министерства'}</small>{canManageMinistry(u)&&a.assignment_role!=='head'&&<IconAction variant="remove" onClick={()=>void remove(a.id)} label={'Исключить участника '+memberName(a.user_id)}/>}</div>)}</div>
+     <div className="unitMembers">{aa.length===0?<div className="emptyState">Ведомство пока не укомплектовано.</div>:aa.map(a=><div key={a.id}><span>{memberName(a.user_id)}</span><small>{a.assignment_role==='head'?'Министр':'Член министерства'}</small>{canManageMinistry(u)&&a.assignment_role!=='head'&&<IconAction variant="remove" onClick={()=>void remove(a.id)} label={'Исключить участника '+memberName(a.user_id)}/>}</div>)}</div>
      {canManageMinistry(u)&&minister&&<div className="unitAssign"><select aria-label={'Добавить сотрудника: '+u.title} value={pick[u.id]||''} onChange={e=>setPick(v=>({...v,[u.id]:e.target.value}))}><option value="">Добавить участника…</option>{students.filter(s=>!ministryStaff.has(s.user_id)&&!aa.some(a=>a.user_id===s.user_id)).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}</option>)}</select><button disabled={busy||!pick[u.id]} onClick={()=>void assign(u.id)}>Добавить</button></div>}
     </article>
    })}</div>
