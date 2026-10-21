@@ -426,7 +426,7 @@ export default function GovernmentFormationWorkspace({
    </div>
   </section>
 
-  <section className={'gov8Ministries '+(!pmAppointed?'isLocked':'')}>
+  <section className={'gov8Ministries '+(stageNo===8?'isStructureStage ':'')+(!pmAppointed?'isLocked':'')}>
    <header className="gov8SectionHead">
     <div><span className="gov8SectionIcon"><Building2 size={20}/></span><div><small>{stageNo===8?'Структура Правительства':'Кандидатуры министров'}</small><h3>{stageNo===8?'Названия пяти министерств':'Выдвижение и назначение по портфелям'}</h3><p>{stageNo===8?'Функции закреплены правилами игры. Председатель Правительства предлагает названия; Президент одобряет структуру или возвращает её на переименование.':'Для каждого портфеля выберите участника или укажите кандидатуру вручную. Три кандидатуры вносит Председатель Правительства, две — Президент. Система сохраняет согласование и указ о назначении.'}</p></div></div>
     <span className={'gov8StatusPill is-'+(structure?.status||'preview')}>{!pmAppointed?'Предпросмотр':structure?.status==='approved'?(stageNo===9?'Структура одобрена':'Одобрено'):structure?.status==='submitted'?'На рассмотрении':structure?.status==='revision'?'На доработке':'Черновик'}</span>
@@ -445,9 +445,9 @@ export default function GovernmentFormationWorkspace({
       const officeTitle=isDeputy?'Заместитель Председателя Правительства РФ — '+titles[p.key]:titles[p.key];
       const slot='ministry_'+p.key;
       return <article key={p.key} className={'gov8MinistryCard route-'+p.route+' '+(nomination?'hasNomination':'')}>
-       <header><span>{String(index+1).padStart(2,'0')}</span><div><small>{p.label}</small><b>{titles[p.key]}</b></div><em>{stageNo===8?'Функциональный блок':p.route==='duma'?'Утверждение ГД':'Консультация СФ'}</em></header>
+       <header><span>{String(index+1).padStart(2,'0')}</span><div><small>{p.label}</small>{stageNo===9&&<b>{titles[p.key]}</b>}</div>{stageNo===9&&<em>{p.route==='duma'?'Утверждение ГД':'Консультация СФ'}</em>}</header>
        <p>{p.scope}</p>
-       {stageNo===8&&<label className="gov8MinistryTitle">Название<input disabled={!editable} value={titles[p.key]} onChange={e=>{structureDirty.current=true;setTitles(v=>({...v,[p.key]:e.target.value}))}}/></label>}
+       {stageNo===8&&<label className="gov8MinistryTitle">Название министерства<textarea rows={2} disabled={!editable} value={titles[p.key]} onChange={e=>{structureDirty.current=true;setTitles(v=>({...v,[p.key]:e.target.value}))}}/></label>}
 
        {stageNo===9&&p.route==='duma'&&!activeDeputy&&<label className={'gov8DeputyChoice '+(!structureApproved?'isDisabled':'')}><input type="radio" name="gov8-deputy" disabled={!structureApproved} checked={deputyPortfolio===p.key} onChange={()=>setDeputyPortfolio(p.key)}/><span>Этот министр одновременно является заместителем Председателя Правительства</span></label>}
        {stageNo===9&&activeDeputy?.office_key===slot&&<div className="gov8DeputyFlag">Заместитель Председателя Правительства</div>}
