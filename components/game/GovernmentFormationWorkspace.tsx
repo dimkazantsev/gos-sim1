@@ -99,7 +99,7 @@ function NomineeFields({
     value={selectedUserId}
     onChange={e=>onSelect(slot,e.target.value)}
    >
-    <option value="">{students.length?'Выберите участника':'Нет активных студентов игры'}</option>
+    <option value="">{students.length?'Выберите участника':registeredOnly?'Нет активных студентов игры':'Нет активных участников — используйте Ф.И.О.'}</option>
     {students.map(m=><option key={m.user_id} value={m.user_id}>{m.full_name} · {m.role_title||'участник'}</option>)}
    </select>
   </label>
