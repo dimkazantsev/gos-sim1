@@ -148,7 +148,6 @@ export default function GovernmentFormationWorkspace({
  const isPresident=role.includes('президент');
  const isPM=role.includes('председател')&&role.includes('правительств');
  const canPresident=teacher||isPresident;
- const canPM=teacher||isPM;
  const students=members.filter(m=>m.kind==='student');
 
  async function load(){
@@ -187,6 +186,7 @@ export default function GovernmentFormationWorkspace({
  const latest=(officeKey:string)=>[...rows].reverse().find(x=>x.office_key===officeKey);
  const rejections=(officeKey:string)=>rows.filter(x=>x.office_key===officeKey&&x.status==='rejected').length;
  const pm=latest('prime_minister');
+ const canPM=teacher||isPM||!!rows.find(x=>x.office_kind==='prime_minister'&&x.status==='appointed'&&x.candidate_user_id===me.user_id);
  const cbr=latest('central_bank_chair');
  const pmAppointed=rows.some(x=>x.office_kind==='prime_minister'&&x.status==='appointed');
  const structureApproved=structure?.status==='approved';
