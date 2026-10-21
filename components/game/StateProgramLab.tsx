@@ -1,7 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
-import StyledSelect from '../ui/StyledSelect';
 import StageModuleHeader from '../ui/StageModuleHeader';
 import {useGameTableSync} from './useGameTableSync';
 import {stageRoleTitles} from './stageRoles';
@@ -22,13 +21,13 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  const [ministryAssignments,setMinistryAssignments]=useState<MinistryAssignment[]>([]),[ministryUnits,setMinistryUnits]=useState<MinistryUnit[]>([]);
  const [selectedId,setSelectedId]=useState(''),[creating,setCreating]=useState(false),[busy,setBusy]=useState(false);
  const [addressTitle,setAddressTitle]=useState('Послание Президента Российской Федерации Федеральному Собранию'),[addressBody,setAddressBody]=useState(''),[addressVideo,setAddressVideo]=useState('');
- const [priorityNo,setPriorityNo]=useState(1),[priorityTitle,setPriorityTitle]=useState(''),[priorityDescription,setPriorityDescription]=useState(''),[priorityNationalGoal,setPriorityNationalGoal]=useState('');
- const addressDirty=useRef(false),addressVersion=useRef(0),priorityVersion=useRef(0),busyRef=useRef(false),request=useRef(0),alive=useRef(true),creatingRef=useRef(creating),selectedRef=useRef(selectedId);
+ const [selectedGoals,setSelectedGoals]=useState<string[]>([]),[goalsDirty,setGoalsDirty]=useState(false);
+ const addressDirty=useRef(false),addressVersion=useRef(0),busyRef=useRef(false),request=useRef(0),alive=useRef(true),creatingRef=useRef(creating),selectedRef=useRef(selectedId);
  creatingRef.current=creating;selectedRef.current=selectedId;
  const viewScope=[game?.id,me?.user_id,teacher].join('|'),scope=useRef(viewScope);scope.current=viewScope;
  const active=()=>alive.current&&scope.current===viewScope;
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
- useEffect(()=>{request.current++;addressDirty.current=false;addressVersion.current=0;priorityVersion.current=0;busyRef.current=false;setPrograms([]);setAddresses([]);setPriorities([]);setReadiness({});setGoals([]);setComponents([]);setExpenses([]);setYears([]);setMinistryAssignments([]);setMinistryUnits([]);setSelectedId('');setCreating(false);creatingRef.current=false;selectedRef.current='';setBusy(false);setAddressTitle('Послание Президента Российской Федерации Федеральному Собранию');setAddressBody('');setAddressVideo('');setPriorityNo(1);setPriorityTitle('');setPriorityDescription('');setPriorityNationalGoal('')},[viewScope]);
+ useEffect(()=>{request.current++;addressDirty.current=false;addressVersion.current=0;setGoalsDirty(false);setSelectedGoals([]);busyRef.current=false;setPrograms([]);setAddresses([]);setPriorities([]);setReadiness({});setGoals([]);setComponents([]);setExpenses([]);setYears([]);setMinistryAssignments([]);setMinistryUnits([]);setSelectedId('');setCreating(false);creatingRef.current=false;selectedRef.current='';setBusy(false);setAddressTitle('Послание Президента Российской Федерации Федеральному Собранию');setAddressBody('');setAddressVideo('');},[viewScope]);
  const role=stageRoleTitles(g),isPM=role.split(' | ').some(title=>/^председатель\s+правительства(?:\s|$)/u.test(title)),isMinister=role.includes('министр'),isPresident=role.includes('президент');
  async function load(){
   if(!active()||!game)return;const version=++request.current,current=()=>active()&&version===request.current;
@@ -59,6 +58,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
   if(!creatingRef.current&&!selectedRef.current&&rows[0])setSelectedId(rows[0].id);
   const addressRows=(a.data||[]) as Address[];setAddresses(addressRows);
   const draft=addressRows.find(x=>x.status==='draft')||addressRows[0];if(draft&&!addressDirty.current){setAddressTitle(draft.title);setAddressBody(draft.body_text);setAddressVideo(draft.video_url||'')}
+  if(!goalsDirty){setSelectedGoals(draft?((pr.data||[]) as ProgramPriority[]).filter(x=>x.address_id===draft.id&&x.national_goal&&nationalGoals.includes(x.national_goal)).map(x=>x.national_goal!):[])}
  }
  useGameTableSync(game?.id,['state_programs','state_program_goals','state_program_components','state_program_expenses','state_program_budget_commitments','presidential_addresses','presidential_priorities','state_program_budget_years','institution_assignments','institution_units'],load,viewScope);
  if(!game||!me)return null;
@@ -77,10 +77,15 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
   try{const r=await supabase.rpc('save_presidential_address',{p_game_id:game!.id,p_address_id:addresses.find(x=>x.status==='draft')?.id||null,p_title:addressTitle.trim(),p_body:addressBody.trim(),p_video_url:addressVideo.trim()||null});if(!active())return;if(r.error){setError(r.error);return;}if(addressVersion.current===version)addressDirty.current=false;await load()}
   catch(error){if(active())setError(error)}finally{if(active()){busyRef.current=false;setBusy(false)}}
  }
- async function addPriority(){
-  if(!active()||!activeAddress||activeAddress.status!=='draft')return;const version=priorityVersion.current;
-  const ok=await run('add_presidential_priority',{p_address_id:activeAddress.id,p_priority_no:priorityNo,p_title:priorityTitle.trim(),p_description:priorityDescription.trim()||null,p_national_goal:priorityNationalGoal||null});
-  if(ok&&active()&&version===priorityVersion.current){setPriorityNo(x=>x+1);setPriorityTitle('');setPriorityDescription('');setPriorityNationalGoal('')}
+ async function saveGoals(){
+  if(!activeAddress||activeAddress.status!=='draft'||selectedGoals.length<5||selectedGoals.length>6)return;
+  const chosen=[...selectedGoals];setGoalsDirty(false);
+  const ok=await run('set_presidential_address_goals',{p_address_id:activeAddress.id,p_goals:chosen});
+  if(!ok)setGoalsDirty(true);
+ }
+ function toggleGoal(value:string,checked:boolean){
+  setGoalsDirty(true);
+  setSelectedGoals(current=>checked?current.includes(value)?current:[...current,value]:current.filter(x=>x!==value));
  }
  return <section className={'programLab '+styles.programWorkspace}>
   <StageModuleHeader eyebrow="Управление по целям · Этапы 10–11" title="Государственные программы" description="Национальная цель, измеримые показатели, мероприятия и обоснованные расходы. Подтверждение автора → проверка министра → подпись Председателя Правительства → заседание Правительства." stats={[{label:'ПП РФ №786',value:'Госпрограммы',detail:'Актуальная система управления государственными программами'},{label:'Указ №309',value:'Национальные цели',detail:'Национальные цели до 2030 и 2036 годов'}]}/>
@@ -91,14 +96,22 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
     <label className={styles.field+' '+styles.wide}>Текст послания<textarea disabled={busy} rows={4} value={addressBody} onChange={e=>{addressDirty.current=true;addressVersion.current++;setAddressBody(e.target.value)}}/></label>
     <div className={`${styles.addressActions} ${styles.wide}`}><button type="button" className="primary" disabled={busy||addressBody.trim().length<20} onClick={()=>void saveAddress()}>Сохранить послание</button></div>
    </div>}
-   {activeAddress&&<><div className={styles.rows}>{priorities.filter(x=>x.address_id===activeAddress.id).map(x=><article key={x.id} className={styles.row}><b>{x.priority_no}. {x.title}</b>{x.national_goal&&<p>{x.national_goal}</p>}{x.description&&<p>{x.description}</p>}</article>)}</div>
-    {(teacher||isPresident)&&activeAddress.status==='draft'&&<section className={styles.section}><div className={styles.grid}>
-     <label className={styles.field}>Номер приоритета<input disabled={busy} type="number" min="1" max="50" value={priorityNo} onChange={e=>setPriorityNo(Number(e.target.value)||1)}/></label>
-     <label className={styles.field}>Название приоритета<input disabled={busy} value={priorityTitle} onChange={e=>{priorityVersion.current++;setPriorityTitle(e.target.value)}}/></label>
-     <div className={styles.wide}><StyledSelect wrap disabled={busy} label="Национальная цель приоритета" value={priorityNationalGoal} onChange={value=>{priorityVersion.current++;setPriorityNationalGoal(value)}} options={[{value:'',label:'Не привязывать'},...nationalGoals.map(x=>({value:x,label:x}))]}/></div>
-     <label className={styles.field+' '+styles.wide}>Содержание приоритета<textarea disabled={busy} rows={2} value={priorityDescription} onChange={e=>{priorityVersion.current++;setPriorityDescription(e.target.value)}}/></label>
-    </div><div className={styles.actions}><button type="button" disabled={busy||priorityTitle.trim().length<3} onClick={()=>void addPriority()}>Добавить приоритет</button><button type="button" className="primary" disabled={busy||addressDirty.current||priorities.filter(x=>x.address_id===activeAddress.id).length===0} onClick={()=>void run('publish_presidential_address',{p_address_id:activeAddress.id})}>Опубликовать послание</button></div></section>}
-   </>}
+   <section className={styles.section} aria-label="Национальные цели Послания Президента">
+    <div className={styles.sectionHead}><div><h3>Национальные цели Послания Президента</h3>
+     <p>Президент выбирает от пяти до шести целей из семи национальных целей Российской Федерации. До публикации послания они остаются проектом; после публикации становятся обязательным выбором для государственных программ.</p></div>
+     <span className={styles.pill}>{publishedAddress?'Утверждены':selectedGoals.length+' / 5–6'}</span></div>
+    {(teacher||isPresident)&&activeAddress?.status==='draft'&&<div className={styles.programGoalChoices}>
+     {nationalGoals.map(goal=><label key={goal} className={styles.programGoalChoice}>
+      <input type="checkbox" checked={selectedGoals.includes(goal)} disabled={busy||!selectedGoals.includes(goal)&&selectedGoals.length>=6} onChange={e=>toggleGoal(goal,e.target.checked)}/>
+      <span>{goal}</span>
+     </label>)}
+     <div className={styles.actions}><button type="button" disabled={busy||selectedGoals.length<5||selectedGoals.length>6||!goalsDirty} onClick={()=>void saveGoals()}>Сохранить выбранные цели</button>
+      <button type="button" className="primary" disabled={busy||addressDirty.current||goalsDirty||selectedGoals.length<5||selectedGoals.length>6||priorities.filter(x=>x.address_id===activeAddress.id).length!==selectedGoals.length} onClick={()=>void run('publish_presidential_address',{p_address_id:activeAddress.id})}>Утвердить цели и опубликовать послание</button></div>
+    </div>}
+    {(teacher||isPresident)&&!activeAddress&&<p className={styles.notice}>Сначала заполните и сохраните текст послания. После этого можно выбрать 5–6 целей и утвердить их.</p>}
+    {activeAddress?.status==='published'&&<ol className={styles.approvedGoalList}>{publishedPriorities.map(x=><li key={x.id}>{x.national_goal||x.title}</li>)}</ol>}
+    {activeAddress?.status==='draft'&&!(teacher||isPresident)&&<p className={styles.notice}>Президент ещё не утвердил цели. Можно просматривать раздел, но выбирать национальные цели программ до публикации послания нельзя.</p>}
+   </section>
   </section>
   <div className="programPicker" aria-label="Выбор государственной программы"><div className="programTabs">{programs.map(p=><button type="button" key={p.id} aria-pressed={!creating&&p.id===selectedId} className={!creating&&p.id===selectedId?'active':''} onClick={()=>{creatingRef.current=false;setCreating(false);setSelectedId(p.id)}}><b>{p.title}</b><span>{programStatusLabel[p.status]}</span></button>)}</div>{(teacher||isMinister||isPM)&&<button type="button" className="programNew" onClick={()=>{creatingRef.current=true;setCreating(true);setSelectedId('')}}>Новая программа</button>}</div>
   {(selected||editable)&&<StateProgramEditor key={viewScope+'|'+(selected?.id||'new')} g={g} program={selected||null} goals={goals.filter(x=>x.program_id===selected?.id)} components={components.filter(x=>x.program_id===selected?.id)} expenses={expenses.filter(x=>x.program_id===selected?.id)} priorities={publishedPriorities} editable={editable} onSaved={async id=>{if(!active())return;creatingRef.current=false;setCreating(false);setSelectedId(id);await load()}}/>}
