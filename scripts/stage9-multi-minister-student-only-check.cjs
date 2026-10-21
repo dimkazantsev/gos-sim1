@@ -7,6 +7,7 @@ const code=fs.readFileSync('supabase/migrations/20261021170000_multi_ministry_st
 const ui=fs.readFileSync('components/game/GovernmentFormationWorkspace.tsx','utf8');
 assert(code.includes('DROP INDEX IF EXISTS public.government_nominations_one_ministry_candidate_idx'));
 assert(code.includes('DROP INDEX IF EXISTS public.institution_assignments_single_ministry_per_student'));
+assert(code.includes('institution_assignments_one_staff_ministry_per_student'),'Preserve a single ministry for ordinary employees while allowing multiple heads');
 assert((code.match(/on conflict\(unit_id,user_id\)/g)||[]).length>=3);
 assert(code.includes('Minister must be a registered active student'));
 assert(code.includes('Candidate name must match the selected registered student'));
@@ -77,6 +78,8 @@ const game='10000000-0000-4000-8000-000000000001',
   const counts=(await db.query("SELECT unit_key,count(a.id)::int n FROM public.institution_units u JOIN public.institution_assignments a ON a.unit_id=u.id GROUP BY unit_key ORDER BY unit_key")).rows;
   assert.equal(counts.length,5);
   assert.equal(counts.find(x=>x.unit_key==='social').n,2);
-  console.log('PASS: 2 registered students, 5 ministries, repeated appointments, single record per ministry, no unregistered/spoofed names, independent staffing');
+  const other=(await db.query("SELECT id FROM public.institution_units WHERE unit_key='economic'")).rows[0].id;
+  await assert.rejects(()=>db.query("INSERT INTO public.institution_assignments(game_id,unit_id,unit_kind,user_id,created_by) VALUES($1,$2,'ministry',$3,$4)",[game,other,b,p]),/duplicate key/,'Ordinary staffing remains limited to one ministry');
+  console.log('PASS: 2 registered students, 5 ministries, repeated appointments, single record per ministry, no unregistered/spoofed names, independent minister heads and staff membership limit');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
