@@ -202,3 +202,18 @@ BEGIN
    END IF;
  END LOOP;
 END $realtime$;
+
+-- Не раскрываем незавершённое послание и выбор целей обычным студентам/гостям.
+-- Президент и преподаватель видят черновик; остальные — только опубликованную редакцию.
+DROP POLICY IF EXISTS presidential_addresses_read ON public.presidential_addresses;
+CREATE POLICY presidential_addresses_read ON public.presidential_addresses FOR SELECT TO authenticated
+USING(private.is_game_member(game_id) AND (
+  status='published' OR private.can_manage_presidential_policy(game_id,(SELECT auth.uid()))
+));
+DROP POLICY IF EXISTS presidential_priorities_read ON public.presidential_priorities;
+CREATE POLICY presidential_priorities_read ON public.presidential_priorities FOR SELECT TO authenticated
+USING(private.is_game_member(game_id) AND (
+  EXISTS(SELECT 1 FROM public.presidential_addresses a
+    WHERE a.id=address_id AND a.game_id=presidential_priorities.game_id AND a.status='published')
+  OR private.can_manage_presidential_policy(game_id,(SELECT auth.uid()))
+));
