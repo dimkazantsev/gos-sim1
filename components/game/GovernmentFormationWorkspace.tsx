@@ -460,6 +460,7 @@ export default function GovernmentFormationWorkspace({
         <div className="gov8MinistryLinks">
          {nomination.formal_document_id&&<button onClick={()=>onOpenDocument?.(nomination.formal_document_id!)}>Постановление ГД</button>}
          {nomination.appointment_document_id&&<button onClick={()=>onOpenDocument?.(nomination.appointment_document_id!)}>Указ Президента</button>}
+          {nomination.status==='appointed'&&!nomination.candidate_user_id&&<p className="gov8FormGate" role="status">Руководитель пока не связан с зарегистрированным студентом. Полномочия ведомства будут доступны после подтверждения личности назначенного министра.</p>}
          {nomination.vote_id&&<button onClick={()=>openVoting(nomination.vote_id)}>Голосование</button>}
         </div>
         {nomination.status==='consultation_pending'&&teacher&&<div className="gov8Consult"><textarea rows={2} value={consultNotes[nomination.id]||''} onChange={e=>setConsultNotes(v=>({...v,[nomination.id]:e.target.value}))} placeholder="Итог консультации с Советом Федерации"/><button className="secondary" disabled={!!busy} onClick={()=>void consult(nomination.id)}>Зафиксировать консультацию</button></div>}
