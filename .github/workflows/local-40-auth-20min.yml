@@ -1,0 +1,74 @@
+name: ГОС.ID · 40 независимых Auth-сессий (локальный Supabase, 20 минут)
+on:
+  push:
+    branches: [chore/sync-event-privacy-migration-version-20261021]
+    paths:
+      - 'supabase/tests/gos_40_authenticated_20min.cjs'
+      - '.github/workflows/local-40-auth-20min.yml'
+  workflow_dispatch:
+jobs:
+  isolated-40-auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    env:
+      QA_DURATION_SECONDS: '1200'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Check test source and local-only boundaries
+        run: |
+          node --check supabase/tests/gos_40_authenticated_20min.cjs
+          node -e "const fs=require('fs');const s=fs.readFileSync('supabase/tests/gos_40_authenticated_20min.cjs','utf8'); if(!s.includes('Refusing to run against a non-local project')||!s.includes('duration<1200'))process.exit(1)"
+      - run: npm ci --no-audit --no-fund
+      - uses: supabase/setup-cli@v3
+        with:
+          version: latest
+      - name: Create disposable local Supabase project
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gos-id-40-load
+          cd /tmp/gos-id-40-load
+          supabase init
+      - name: Start local Auth, PostgREST, Realtime and PostgreSQL
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-id-40-load
+          supabase start -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Get ephemeral local service credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-id-40-load
+          while IFS='=' read -r key value; do
+            value="${value#\"}"
+            value="${value%\"}"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(
+            supabase status -o env \
+              --override-name api.url=SUPABASE_URL \
+              --override-name auth.anon_key=SUPABASE_ANON_KEY \
+              --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY
+          )
+      - name: Install real Blitz RPCs into disposable project
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-id-40-load
+          DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\(.*\)"$/\1/p')"
+          test -n "$DB_URL"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_setup.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261012100100_blitz_attempt_lock_hardening.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
+          sleep 2
+      - name: Run 40 real local Auth sessions and Realtime for 20 minutes
+        run: node supabase/tests/gos_40_authenticated_20min.cjs
+      - name: Stop isolated Supabase without backups
+        if: always()
+        run: |
+          cd /tmp/gos-id-40-load || exit 0
+          supabase stop --no-backup
