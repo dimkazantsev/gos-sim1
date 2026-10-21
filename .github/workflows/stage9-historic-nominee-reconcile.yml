@@ -1,0 +1,35 @@
+name: ГОС.ID · Сверка исторических министров Этапа 9
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/*_stage9_reconcile_confirmed_historical_minister_identities.sql'
+      - 'scripts/stage9-historic-nominee-reconcile-check.cjs'
+      - '.github/workflows/stage9-historic-nominee-reconcile.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/*_stage9_reconcile_confirmed_historical_minister_identities.sql'
+      - 'scripts/stage9-historic-nominee-reconcile-check.cjs'
+      - '.github/workflows/stage9-historic-nominee-reconcile.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: build-placeholder-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/stage9-historic-nominee-reconcile-check.cjs
+      - run: node scripts/stage9-multi-minister-student-only-check.cjs
+      - run: node scripts/government-nomination-auto-votes-check.cjs
+      - run: node scripts/government-nomination-actions-responsive-browser-check.cjs
+      - run: node scripts/government-structure-responsive-browser-check.cjs
+      - run: npm run typecheck
