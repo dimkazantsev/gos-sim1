@@ -64,5 +64,11 @@ for(const statement of [
 ])assert(editor.includes(statement),'Editor link lost: '+statement);
 assert(!editor.includes('...nationalGoals.map(x=>({value:x,label:x}))'),'Must not allow unapproved goals');
 assert(css.includes('.programWorkspace .programGoalChoice'),'Scoped branded goal choice');
+assert(lab.includes('className={styles.goalProgress}'),'Goal progress must be inline, not a boxed counter');
+assert(!lab.includes("selectedGoals.length+' / 5–6'"),'Do not render the awkward multi-line goal badge');
+assert(css.includes('.programWorkspace .goalProgress'),'Use scoped ГОС.ID metadata styling');
+assert(lab.includes('(programs.length>0||teacher||isMinister||isPM)&&<div className="programPicker"'),'Hide the picker only when empty and creation is not permitted');
+assert(lab.includes('programs.map(p=>'),'Continue to show existing programme tabs');
+assert(lab.includes('(teacher||isMinister||isPM)&&<button type="button" className="programNew"'),'Preserve authorised programme creation');
 assert(css.includes('@media(max-width:700px)'),'Responsive mobile style');
 console.log('PASS: Presidential RLS helper EXECUTE is granted only to authenticated; 5–6 independently authored goals, RPC argument names, exact President roles, published-goal program filter, formal-document history and responsive design');

@@ -108,8 +108,8 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
    </div>}
    <section className={styles.section} aria-label="Национальные цели Послания Президента">
     <div className={styles.sectionHead}><div><h3>Национальные цели Послания Президента</h3>
-     <p>Президент самостоятельно формулирует пять или шесть целей в своём послании Федеральному Собранию. После утверждения они становятся основанием для государственных программ.</p></div>
-     <span className={styles.pill}>{publishedAddress?'Утверждены':selectedGoals.length+' / 5–6'}</span></div>
+     <p>Президент самостоятельно формулирует пять или шесть целей в своём послании Федеральному Собранию. После утверждения они становятся основанием для государственных программ.</p>
+     <span className={styles.goalProgress}>{publishedAddress?'Цели утверждены':`Заполнено: ${formulatedGoals.filter(x=>x.length>=12).length} из ${selectedGoals.length}`}</span></div></div>
     {(teacher||isPresident)&&activeAddress?.status==='draft'&&<div className={styles.programGoalChoices}>
      {selectedGoals.map((goal,index)=><label key={index} className={styles.programGoalChoice}>
       <span className={styles.goalOrdinal}>{index+1}.</span>
@@ -129,7 +129,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
     {activeAddress?.status==='draft'&&!(teacher||isPresident)&&<p className={styles.notice}>Президент ещё не утвердил цели. Можно просматривать раздел, но использовать президентские цели в программах до публикации послания нельзя.</p>}
    </section>
   </section>
-  <div className="programPicker" aria-label="Выбор государственной программы"><div className="programTabs">{programs.map(p=><button type="button" key={p.id} aria-pressed={!creating&&p.id===selectedId} className={!creating&&p.id===selectedId?'active':''} onClick={()=>{creatingRef.current=false;setCreating(false);setSelectedId(p.id)}}><b>{p.title}</b><span>{programStatusLabel[p.status]}</span></button>)}</div>{(teacher||isMinister||isPM)&&<button type="button" className="programNew" onClick={()=>{creatingRef.current=true;setCreating(true);setSelectedId('')}}>Новая программа</button>}</div>
+  {(programs.length>0||teacher||isMinister||isPM)&&<div className="programPicker" aria-label="Выбор государственной программы"><div className="programTabs">{programs.map(p=><button type="button" key={p.id} aria-pressed={!creating&&p.id===selectedId} className={!creating&&p.id===selectedId?'active':''} onClick={()=>{creatingRef.current=false;setCreating(false);setSelectedId(p.id)}}><b>{p.title}</b><span>{programStatusLabel[p.status]}</span></button>)}</div>{(teacher||isMinister||isPM)&&<button type="button" className="programNew" onClick={()=>{creatingRef.current=true;setCreating(true);setSelectedId('')}}>Новая программа</button>}</div>}
   {(selected||editable)&&<StateProgramEditor key={viewScope+'|'+(selected?.id||'new')} g={g} program={selected||null} goals={goals.filter(x=>x.program_id===selected?.id)} components={components.filter(x=>x.program_id===selected?.id)} expenses={expenses.filter(x=>x.program_id===selected?.id)} priorities={publishedPriorities} editable={editable} onSaved={async id=>{if(!active())return;creatingRef.current=false;setCreating(false);setSelectedId(id);await load()}}/>}
   {selected&&<>
    {selected.signed_at&&<p className={styles.notice}>Подписал Председатель Правительства: {members.find(m=>m.user_id===selected.signed_by)?.full_name||'Уполномоченный участник'} · {new Date(selected.signed_at).toLocaleString('ru-RU')}. Программа опубликована в политическом процессе и добавлена в бюджет.</p>}

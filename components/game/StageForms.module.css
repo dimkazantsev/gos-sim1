@@ -87,6 +87,10 @@
 .programWorkspace .section{margin-top:4px}
 .programWorkspace .actions button,.addressActions button{min-height:46px;border-radius:12px}
 .programWorkspace .pill{border-color:var(--line,#dce4ef);background:#f5f8ff;color:var(--body,#354a67)}
+.programWorkspace .goalProgress{
+ display:inline-block;margin-top:7px;
+ color:var(--muted,#6b7e99);font-size:12px;font-weight:650;line-height:1.5;
+}
 .programWorkspace :global(.programPicker){
  display:flex;align-items:center;gap:12px;
  margin:0 0 14px;padding:12px;
