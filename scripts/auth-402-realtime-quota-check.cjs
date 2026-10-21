@@ -24,6 +24,43 @@ assert(!migration.includes('create or replace function private.request_telegram_
 
 assert(source.includes("if(liveConnected&&now-lastPollAt<180000)return"),'Connected polling is reduced to once per 3 minutes');
 assert(source.includes('},30000+pollJitter)'), 'Disconnected recovery remains on 30–40s timer');
+
+const focusStart=source.indexOf('   const recover=()=>{');
+const focusEnd=source.indexOf('   const visible=()=>{',focusStart);
+assert(focusStart>=0&&focusEnd>focusStart,'Focus recovery function is available');
+let focusClock=1_000_000,recoveryReads=0,widgetInvalidations=0;
+const focusEnv={
+ disposed:false,document:{visibilityState:'visible'},
+ authUser:{current:'user-one'},acceptedMember:{current:{user_id:'user-one'}},
+ Date:{now:()=>focusClock},lastRecoveryAt:0,
+ hydrateActiveView(){recoveryReads++;return Promise.resolve()},
+ notifyGameDataRefresh(){widgetInvalidations++},
+ activeViewRef:{current:'stages'},refreshBudgetPulse(){},
+ gameId:'game-one'
+};
+vm.runInNewContext(source.slice(focusStart,focusEnd)+
+ 'recover();recover();document.visibilityState="hidden";recover();',focusEnv);
+assert.equal(recoveryReads,1,'Focus and visibility event burst causes one recovery');
+assert.equal(widgetInvalidations,1,'Only one stage invalidation per focus burst');
+focusEnv.document.visibilityState='visible';
+focusClock+=1501;
+vm.runInNewContext(source.slice(focusStart,focusEnd)+'recover()',focusEnv);
+assert.equal(recoveryReads,2,'Recovery resumes after debounce interval');
+
+const cleanupSql=fs.readFileSync('supabase/migrations/20261021090000_chat_media_cleanup_skip_empty.sql','utf8');
+const operationalSql=fs.readFileSync('supabase/ops/chat_media_cleanup_schedule.sql','utf8');
+for(const sql of [cleanupSql,operationalSql]){
+ assert(sql.includes("exists (select 1 from public.chat_media_expired_candidates(1))"),
+  'Cleanup only wakes for due Storage objects');
+ assert(sql.includes("and not exists (")&&sql.includes("from storage.objects o"),
+  'Orphaned chat rows still trigger eventual finalization');
+ assert(sql.includes("interval '1 hour'"),'One-hour media retention is unchanged');
+ assert(sql.includes("gos_chat_media_cleanup_token"),'Vault-based function authorization is retained');
+ assert(sql.includes("net.http_post("),'Preserve Edge Function invocation for due cleanup');
+}
+assert(cleanupSql.includes('cron.alter_job'),'Production migration only updates existing cron job');
+assert(!cleanupSql.includes('cron.unschedule'),'Scheduled cleanup cannot be disabled');
+
 const from=source.indexOf('  channel.subscribe(status=>{');
 const to=source.indexOf('  return()=>{',from);
 assert(from>=0&&to>from,'Live subscribe and fallback polling located');
