@@ -517,7 +517,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    if(pendingTimer!==undefined)return;
    // One count refresh per event burst rather than one per incoming row.
    pendingTimer=setTimeout(()=>{pendingTimer=undefined;if(live)void count()},450);
-    notifySectionUpdates(game.id);
+    notifySectionUpdates(game!.id);
   }
   void count();
   const poll=setInterval(()=>{
