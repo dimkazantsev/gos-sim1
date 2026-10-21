@@ -1037,6 +1037,86 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
 }
 
 
+/* Stage 8 only: use the established government-card visual language,
+   without changing Stage 9 nomination/appointment cards or their procedures. */
+.gov8Ministries.isStructureStage .gov8MinistryGrid{
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:12px!important;
+}
+.gov8Ministries.isStructureStage .gov8MinistryCard,
+.gov8Ministries.isStructureStage .gov8MinistryCard:nth-child(4),
+.gov8Ministries.isStructureStage .gov8MinistryCard:nth-child(5){
+ grid-column:auto;
+ display:flex;
+ flex-direction:column;
+ gap:12px;
+ min-width:0;
+ min-height:100%;
+ padding:16px;
+ border:1px solid #dce4f1;
+ border-radius:14px;
+ background:#fff;
+ box-shadow:none;
+}
+.gov8Ministries.isStructureStage .gov8MinistryCard>header{display:flex;gap:10px;align-items:center;min-width:0}
+.gov8Ministries.isStructureStage .gov8MinistryCard>header>span{width:34px;height:34px;flex:0 0 34px;border-radius:10px;font-size:13px}
+.gov8Ministries.isStructureStage .gov8MinistryCard>header small{
+ display:block;
+ font-size:13px;
+ line-height:1.45;
+ font-weight:750;
+ color:#315477;
+ letter-spacing:0;
+ overflow-wrap:anywhere;
+}
+.gov8Ministries.isStructureStage .gov8MinistryCard>p{
+ margin:0;
+ font-size:13px;
+ line-height:1.55;
+ color:#60758d;
+ overflow-wrap:anywhere;
+}
+.gov8Ministries.isStructureStage .gov8MinistryTitle{display:grid;gap:7px;margin-top:auto;color:#526983;font-size:13px;font-weight:750}
+.gov8Ministries.isStructureStage .gov8MinistryTitle textarea{
+ width:100%;
+ min-width:0;
+ min-height:66px;
+ padding:10px 12px;
+ border:1px solid #cfdcf0;
+ border-radius:11px;
+ background:#fff;
+ box-shadow:none;
+ color:#183f65;
+ font-family:inherit;
+ font-size:15px;
+ font-weight:650;
+ line-height:1.4;
+ resize:vertical;
+ overflow-wrap:anywhere;
+}
+.gov8Ministries.isStructureStage .gov8MinistryTitle textarea:disabled{
+ background:#f7f9fd;
+ color:#4f637b;
+ opacity:1;
+ cursor:default;
+}
+.gov8Ministries.isStructureStage .gov8MinistryTitle textarea:focus-visible{
+ outline:3px solid #91adff;
+ outline-offset:2px;
+}
+.gov8Ministries.isStructureStage .gov8StructureActions{display:flex;justify-content:flex-end;align-items:center;flex-wrap:wrap;gap:10px;padding-top:4px}
+.gov8Ministries.isStructureStage .gov8StructureActions>button{min-height:44px;padding:10px 16px;border-radius:11px;font-size:14px;font-weight:750;white-space:normal;line-height:1.4}
+@media(max-width:1180px){
+ .gov8Ministries.isStructureStage .gov8MinistryGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:700px){
+ .gov8Ministries.isStructureStage .gov8MinistryGrid{grid-template-columns:minmax(0,1fr)!important}
+ .gov8Ministries.isStructureStage .gov8MinistryCard{padding:14px}
+ .gov8Ministries.isStructureStage .gov8MinistryTitle textarea{font-size:16px;min-height:86px}
+ .gov8Ministries.isStructureStage .gov8StructureActions{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+ .gov8Ministries.isStructureStage .gov8StructureActions>button{width:100%}
+}
+
 /* Stage 8 nomination row geometry fix */
 .gov8SubmissionCard{
   grid-template-columns:minmax(280px,.78fr) minmax(520px,1.45fr) 250px!important;
