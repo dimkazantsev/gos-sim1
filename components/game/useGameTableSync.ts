@@ -19,6 +19,8 @@ const pushedStageTables=new Set([
  'stage_deadline_rules'
 ]);
 export const GAME_DATA_REFRESH_EVENT='gos-sims:refresh';
+export const SECTION_UPDATES_REFRESH_EVENT='gos-sims:section-updates';
+export function notifySectionUpdates(gameId:string){window.dispatchEvent(new CustomEvent(SECTION_UPDATES_REFRESH_EVENT,{detail:{gameId}}))}
 export function notifyGameDataRefresh(gameId:string){window.dispatchEvent(new CustomEvent(GAME_DATA_REFRESH_EVENT,{detail:{gameId}}))}
 
 // Stage workspaces do not open Postgres Changes subscriptions themselves.
