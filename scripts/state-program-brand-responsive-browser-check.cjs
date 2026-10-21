@@ -61,7 +61,7 @@ const html=`<!doctype html><html lang="ru"><head><meta name="viewport" content="
    }
    assert(m.save.top>=m.body.bottom-1,'Save overlaps address content at '+width);
    assert(m.save.height>=42&&m.newButton.height>=42&&m.minister.height>=42,'Touch target is too small at '+width);
-   assert(m.bg.includes('gradient'),'Expected existing dark command-header styling at '+width);
+   assert(m.bg==='none','Program header should reuse the light Work/Documents panel at '+width);
    if(width<=700)assert(m.save.width>=m.body.width-2,'Mobile save button should be full width at '+width);
    if(width>1000)assert(m.stats.left>=m.title.left,'Header information columns should remain aligned at '+width);
    await page.close();
