@@ -4,6 +4,11 @@
 -- Avoid additional queries/subscriptions or unsafe role privilege broadening.
 DROP INDEX IF EXISTS public.government_nominations_one_ministry_candidate_idx;
 DROP INDEX IF EXISTS public.institution_assignments_single_ministry_per_student;
+-- Existing staffing rule remains: an ordinary employee works in one ministry;
+-- heads may simultaneously run several ministries.
+CREATE UNIQUE INDEX IF NOT EXISTS institution_assignments_one_staff_ministry_per_student
+  ON public.institution_assignments(game_id,user_id)
+  WHERE unit_kind='ministry' AND assignment_role<>'head';
 
 CREATE OR REPLACE FUNCTION public.submit_government_nomination(p_game_id uuid, p_office_key text, p_office_title text, p_office_kind text, p_candidate_user_id uuid, p_candidate_name text)
  RETURNS uuid
