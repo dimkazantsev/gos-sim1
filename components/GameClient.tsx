@@ -33,6 +33,7 @@ import {AchievementCelebration} from './game/Achievements';
 import {BlitzOverlay} from './game/Blitz';
 import BudgetView from './game/BudgetView';
 import {useSectionUpdates} from './game/useSectionUpdates';
+import {notifySectionUpdates} from './game/useGameTableSync';
 import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
 import GameHeader,{TeacherNavigationProvider} from './game/GameHeader';
@@ -516,6 +517,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    if(pendingTimer!==undefined)return;
    // One count refresh per event burst rather than one per incoming row.
    pendingTimer=setTimeout(()=>{pendingTimer=undefined;if(live)void count()},450);
+    notifySectionUpdates(game.id);
   }
   void count();
   const poll=setInterval(()=>{
