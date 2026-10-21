@@ -129,6 +129,7 @@ on:
       - 'components/game/TeacherView.tsx'
       - 'components/game/GameHeader.tsx'
       - 'components/game/EventChoicePanel.tsx'
+      - 'scripts/event-single-correct-explanation-check.cjs'
       - 'components/game/EventCollaboration.tsx'
       - 'components/game/EventWorkspace.tsx'
       - 'components/game/ClassroomJournal.tsx'
@@ -416,6 +417,7 @@ jobs:
       - run: node scripts/telegram-reception-journal-check.cjs
       - run: node scripts/telegram-bot-avatar-check.cjs
       - run: node scripts/event-option-legality-check.cjs
+      - run: node scripts/event-single-correct-explanation-check.cjs
       - run: npm run design:check
       - run: node scripts/interface-contract-check.cjs
       - run: node scripts/political-wall-feed-check.cjs
