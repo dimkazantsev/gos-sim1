@@ -1,6 +1,6 @@
 'use strict';
 const fs=require('node:fs');const assert=require('node:assert/strict');
-const migration=fs.readFileSync('supabase/migrations/20261022110500_stage10_president_approved_goals_and_registry_sync.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20261021175329_stage10_president_approved_goals_and_registry_sync.sql','utf8');
 const lab=fs.readFileSync('components/game/StateProgramLab.tsx','utf8');
 const editor=fs.readFileSync('components/game/StateProgramEditor.tsx','utf8');
 const css=fs.readFileSync('components/game/StageForms.module.css','utf8');
