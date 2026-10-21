@@ -1,32 +1,19 @@
--- Skip the minute-by-minute HTTP wake while no Telegram notice is due.
--- The existing insert trigger still wakes immediately for new notices;
--- pg_cron keeps its one-minute retry cadence for delayed notices.
--- Covers all games; no RLS, delivery status or user data is modified.
-create or replace function private.request_telegram_dispatch()
-returns boolean language plpgsql security definer
-set search_path to 'pg_catalog','public','vault','net','pg_temp'
-as $fn$
-declare v_secret text;
+-- Avoid one Vercel HTTP invocation every minute when the Telegram queue is idle.
+-- Scope: the existing pg_cron FALLBACK only. Preserve the INSERT trigger and its
+-- immediate wake for new notifications, including mixed scheduled/due batches.
+-- Existing partial index telegram_outbox_ready_idx covers the due-job lookup.
+do $migration$
+declare v_job_id bigint;
 begin
- -- The existing partial index telegram_outbox_ready_idx supports this
- -- indexable existence check. Do not wake Vercel for an empty/paused queue.
- if not exists (
-  select 1 from public.telegram_outbox
-  where sent_at is null and attempts < 5 and next_attempt_at <= now()
- ) then return false; end if;
- if not exists(select 1 from pg_extension where extname='pg_net') then return false; end if;
- select decrypted_secret into v_secret from vault.decrypted_secrets
- where name='gos_id_telegram_dispatch_secret' limit 1;
- if v_secret is null or length(v_secret)<24 then return false;end if;
- perform net.http_get(
-  url:='https://gos-sim1.vercel.app/api/telegram/dispatch',
-  headers:=jsonb_build_object('Authorization','Bearer '||v_secret),
-  timeout_milliseconds:=5000
- );
- return true;
-exception when others then
- -- Delivery problems must never roll back a player's in-game operation.
- raise warning 'Telegram wake request failed: SQLSTATE %',sqlstate;
- return false;
-end $fn$;
-revoke all on function private.request_telegram_dispatch() from public,anon,authenticated;
+ if not exists(select 1 from pg_extension where extname='pg_cron') then return; end if;
+ select jobid into v_job_id from cron.job
+ where jobname='gos_id_telegram_dispatch' limit 1;
+ if v_job_id is null then return; end if;
+ perform cron.alter_job(v_job_id,command=>$sql$
+  select private.request_telegram_dispatch()
+  where exists (
+   select 1 from public.telegram_outbox
+   where sent_at is null and attempts < 5 and next_attempt_at <= now()
+  )
+ $sql$);
+end $migration$;
