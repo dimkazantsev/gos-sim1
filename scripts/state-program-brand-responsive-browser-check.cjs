@@ -43,7 +43,7 @@ ${Array.from({length:5},(_,i)=>'<label class="programGoalChoice"><span class="go
  <td data-label="Обоснование"><textarea rows="2" aria-label="Обоснование расхода" placeholder="Почему требуется эта сумма?"></textarea></td>
  <td data-label="Год"><input type="number" aria-label="Год расхода" value="2026"></td>
  <td data-label="Сумма, ₽"><input aria-label="Сумма расхода" placeholder="0,00"></td>
- <td data-label="Удалить" class="treeExpenseRemove"><button type="button" aria-label="Удалить расход">×</button></td>
+ <td data-label="Удалить" class="treeExpenseRemove"><button type="button" class="gsIconAction gsIconAction--remove" aria-label="Удалить расход">×</button></td>
  </tr></tbody></table></div>
  <button class="treeAddExpense" type="button">Добавить расход к элементу 1.1</button>
  </section>

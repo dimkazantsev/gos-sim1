@@ -260,7 +260,7 @@
 .programWorkspace .treeExpenseTable input:focus-visible,.programWorkspace .treeExpenseTable textarea:focus-visible{
  border-color:var(--blue,#315efb);outline:2px solid rgba(49,94,251,.2);outline-offset:1px;
 }
-.programWorkspace .treeExpenseRemove :global(.gsIconAction){
+.programWorkspace .treeExpenseRemove button{
  min-width:42px;min-height:42px;
  border-radius:10px;
 }
