@@ -299,3 +299,25 @@
  .programWorkspace .treeExpenseTable td{grid-column:1/-1}
  .programWorkspace .treeAddExpense{width:100%;justify-self:stretch}
 }
+
+/* Согласование ГП в едином стиле документов ГОС.ID, без новых глобальных тем. */
+.programWorkspace .programApproval{display:grid;gap:15px;padding:20px 22px;margin:16px 0;border:1px solid var(--line,#dce4ef);border-radius:16px;background:var(--surface,#fff);box-shadow:var(--shadow,0 10px 32px rgba(13,31,58,.07))}
+.programWorkspace .programApprovalHeading{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.programWorkspace .programApprovalHeading>div{min-width:0}
+.programWorkspace .programApprovalHeading h3{margin:0 0 7px;color:var(--text,#10213c);font-size:18px;font-weight:750;line-height:1.3}
+.programWorkspace .programApprovalHeading p{margin:0;color:var(--body,#354a67);font-size:13px;line-height:1.65}
+.programWorkspace .programApprovalState{flex:none;max-width:220px;color:var(--blue,#315efb);font-size:12px;font-weight:750;overflow-wrap:anywhere;text-align:right;line-height:1.45}
+.programWorkspace .programApprovalSteps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0;padding:0;list-style:none;counter-reset:approvalStep}
+.programWorkspace .programApprovalSteps li{min-width:0;padding:10px 12px;border-radius:10px;border:1px solid var(--line,#dce4ef);background:var(--surface-2,#f8fafc);color:var(--body,#354a67);font-size:12px;font-weight:700;line-height:1.45;counter-increment:approvalStep}
+.programWorkspace .programApprovalSteps li:before{content:counter(approvalStep,decimal-leading-zero);margin-right:8px;color:var(--blue,#315efb);font-weight:800}
+.programWorkspace .programApprovalNotice{margin:0;color:var(--body,#354a67);font-size:13px;line-height:1.6}
+.programWorkspace .programApprovalActions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.programWorkspace .programApprovalActions button{min-height:42px;white-space:normal}
+@media(max-width:700px){
+ .programWorkspace .programApproval{padding:15px}
+ .programWorkspace .programApprovalHeading{flex-direction:column;gap:8px}
+ .programWorkspace .programApprovalState{max-width:none;text-align:left}
+ .programWorkspace .programApprovalSteps{grid-template-columns:minmax(0,1fr)}
+ .programWorkspace .programApprovalActions{display:grid;grid-template-columns:minmax(0,1fr)}
+ .programWorkspace .programApprovalActions button{width:100%}
+}

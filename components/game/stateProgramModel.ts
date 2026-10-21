@@ -3,7 +3,7 @@ export type ProgramGoal={id:string;program_id:string;goal_text:string;indicator_
 export type ProgramComponent={id:string;program_id:string;direction_no:number;direction_title:string;component_kind:'project'|'target_program'|'measure';title:string;goal_text:string;start_date:string|null;end_date:string|null;budget:number|string;target_goal_id?:string|null};
 export type ProgramExpense={id:string;program_id:string;component_id:string;indicator_name:string;justification:string;budget_year:number;amount:number|string;position:number};
 export type ProgramPriority={id:string;address_id:string;game_id:string;priority_no:number;title:string;description:string|null;national_goal:string|null;created_at:string};
-export const programStatusLabel:Record<StateProgram['status'],string>={draft:'Черновик',minister_review:'У министра',revision:'Доработка',pm_review:'На подписи Председателя Правительства',ready:'Подписана · Готова к заседанию',government_vote:'Голосование Правительства',adopted:'Принята Правительством',rejected:'Отклонена'};
+export const programStatusLabel:Record<StateProgram['status'],string>={draft:'Черновик',minister_review:'У министра',revision:'Доработка',pm_review:'На предварительном согласовании Председателя Правительства',ready:'Готова к представлению на заседании',government_vote:'Голосование Правительства',adopted:'Принята · Ожидает подписи',rejected:'Отклонена'};
 export const nationalGoals=[
  'Сохранение населения, укрепление здоровья и повышение благополучия людей, поддержка семьи',
  'Реализация потенциала каждого человека, развитие его талантов, воспитание патриотичной и социально ответственной личности',
