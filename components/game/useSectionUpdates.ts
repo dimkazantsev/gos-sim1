@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
-import {GAME_DATA_REFRESH_EVENT,gameRealtimeConnected} from './useGameTableSync';
+import {GAME_DATA_REFRESH_EVENT,SECTION_UPDATES_REFRESH_EVENT,gameRealtimeConnected} from './useGameTableSync';
 import type {View} from './types';
 
 const READABLE_SECTIONS=new Set<View>(['dashboard','stages','parties','votes','documents','actions','events','teacher']);
@@ -40,8 +40,9 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
    lastFallbackAt=now;void load();
   },30000+Math.floor(Math.random()*10000));
   window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidated);
+  window.addEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated);
   window.addEventListener('focus',focused);
-  return()=>{live=false;clearTimeout(pending);clearInterval(poll);window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidated);window.removeEventListener('focus',focused)};
+  return()=>{live=false;clearTimeout(pending);clearInterval(poll);window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidated);window.removeEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated);window.removeEventListener('focus',focused)};
  },[gameId,userId,readOnly]);
  useEffect(()=>{
   if(!gameId||!userId||readOnly||!READABLE_SECTIONS.has(view))return;
