@@ -63,6 +63,7 @@ function browserSession(index,widgets=3,table='game_stages'){
  return {
   counts,intervals,settle,
   connect:on=>mod.exports.setGameRealtimeConnection('test-game',on),
+  setVisible:on=>{document.visibilityState=on?'visible':'hidden';(listeners.document.get('visibilitychange')||[]).forEach(fn=>fn())},
   tick:async()=>{
    for(const timer of intervals){if(!timer.cancelled&&now>=timer.next){timer.next+=timer.period;timer.fn()}}
    for(const timer of timeouts.splice(0)){if(!timer.cancelled)timer.fn()}
@@ -97,6 +98,31 @@ function browserSession(index,widgets=3,table='game_stages'){
  for(let i=0;i<8;i++){now+=5000;await Promise.all(sessions.map(c=>c.tick()))}
  const disconnected=sessions.reduce((sum,c)=>sum+c.counts.loads,0);
  assert(disconnected>=afterEvent+120,'Every disconnected client resumes its fallback within 40 seconds');
+ // Extend the same 40 independent virtual browser sessions to 20 minutes.
+ // No real users, credentials, network traffic or production writes are involved.
+ sessions.forEach(c=>c.connect(true));
+ for(let elapsed=0;elapsed<320_000;elapsed+=5_000){
+  now+=5_000;await Promise.all(sessions.map(c=>c.tick()));
+ }
+ const hidden=sessions.slice(0,20);
+ hidden.forEach(c=>c.setVisible(false));
+ const beforeHidden=hidden.reduce((sum,c)=>sum+c.counts.loads,0);
+ for(let elapsed=0;elapsed<180_000;elapsed+=5_000){
+  now+=5_000;await Promise.all(sessions.map(c=>c.tick()));
+ }
+ assert.equal(hidden.reduce((sum,c)=>sum+c.counts.loads,0),beforeHidden,
+  'Twenty hidden sessions must not read Supabase during three virtual minutes');
+ hidden.forEach(c=>c.setVisible(true));
+ await Promise.all(sessions.map(c=>c.tick()));
+ assert(hidden.reduce((sum,c)=>sum+c.counts.loads,0)>=beforeHidden+60,
+  'Visible sessions must reconcile their three widgets promptly');
+ for(let elapsed=0;elapsed<420_000;elapsed+=5_000){
+  now+=5_000;await Promise.all(sessions.map(c=>c.tick()));
+ }
+ const reads20m=sessions.reduce((sum,c)=>sum+c.counts.loads,0);
+ assert(reads20m>disconnected,'Reconnected sessions continue bounded reconciliation');
+ assert(sessions.every(c=>c.counts.loads<=45),
+  'Any 20-minute simulated session exceeded the upper bound of 45 widget reads');
  sessions.forEach(c=>c.dispose());
  // Unsupported per-widget tables must not lose their original refresh rate:
  // the shared WebSocket does not subscribe to their changes.
@@ -107,5 +133,6 @@ function browserSession(index,widgets=3,table='game_stages'){
  assert(uncovered.counts.loads>=2,'Table without push invalidation retains normal 25–35s visible poll');
  uncovered.dispose();
  console.log('PASS: 40 independent browser sessions, 3 widgets each; 120 initial reads, '+reads120+' at 2m, '+reads240+' at 4m, '+afterEvent+' after direct event, '+disconnected+' after 40s offline recovery');
- console.log('NOTE: simulated REST load budget, not a live 40-user production stress test; actual Supabase API is currently 402 restricted');
+ console.log('PASS: 20 virtual minutes, 40 sessions x 3 widgets, '+reads20m+' total widget loads; hidden-tab pause, reconnect and visibility recovery verified');
+ console.log('NOTE: virtual-time simulation only; NOT a real 20-minute test with 40 independently authenticated users. No external requests or writes.');
 })().catch(e=>{console.error(e);process.exitCode=1});
