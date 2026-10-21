@@ -5,6 +5,8 @@ on:
       - 'components/game/VotesView.tsx'
       - 'supabase/migrations/20261020095000_presidential_appointment_vote_completion_guard.sql'
       - 'scripts/stage8-appointment-vote-completion-check.cjs'
+      - 'supabase/migrations/20261021130500_activate_stage9_after_government_structure.sql'
+      - 'scripts/stage9-access-16-stages-check.cjs'
       - 'supabase/migrations/20261021123915_stage8_government_structure_presidential_act_route.sql'
       - 'scripts/stage8-government-structure-decree-route-check.cjs'
       - '.github/workflows/stage8-appointment-vote-close.yml'
@@ -14,6 +16,8 @@ on:
       - 'components/game/VotesView.tsx'
       - 'supabase/migrations/20261020095000_presidential_appointment_vote_completion_guard.sql'
       - 'scripts/stage8-appointment-vote-completion-check.cjs'
+      - 'supabase/migrations/20261021130500_activate_stage9_after_government_structure.sql'
+      - 'scripts/stage9-access-16-stages-check.cjs'
       - 'supabase/migrations/20261021123915_stage8_government_structure_presidential_act_route.sql'
       - 'scripts/stage8-government-structure-decree-route-check.cjs'
 jobs:
@@ -31,6 +35,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/stage8-appointment-vote-completion-check.cjs
+      - run: node scripts/stage9-access-16-stages-check.cjs
       - run: node scripts/stage8-government-structure-decree-route-check.cjs
       - run: node scripts/government-nomination-auto-votes-check.cjs
       - run: node scripts/gd-session-attendance-check.cjs
