@@ -17,7 +17,7 @@ assert.match(editor,/onClick=\{\(\)=>void save\(false\)\}/,'Keep draft saving');
 assert.match(editor,/onClick=\{\(\)=>void save\(true\)\}/,'Keep program confirmation');
 assert.match(ui,/data-stage-module-head/,'Use the existing stage heading component');
 assert.match(css,/\.programWorkspace\s+:global\(\[data-stage-module-head\]\)/,'Scoped official stage header');
-assert.match(css,/var\(--command,#101f36\)/,'Use the existing command-header design token');
+assert.match(css,/background:var\(--surface,#fff\);color:var\(--text,#10213c\)/,'Match the approved light Work/Documents form surface');
 assert.match(css,/var\(--line,#dce4ef\)/,'Use the existing divider design token');
 assert.match(css,/\.programWorkspace\s+\.field\s+input/,'Program fields only');
 assert.match(css,/\.programWorkspace\s+:global\(\.styledSelectTrigger\)/,'Consistent existing selector styling');
