@@ -14,9 +14,9 @@ for(const [office,previous,confirmed] of expected){
  assert.equal(sql.split(row).length-1,2,'Exact source and target in each preflight/mutation pass: '+office);
 }
 assert.match(sql,/v_games<>1/,'Only one unambiguous target game allowed');
-assert.doesNotMatch(sql,/min\\((?:game_id|user_id)\\)/,'UUID min() is not a PostgreSQL aggregate');
-assert.match(sql,/min\\(game_id::text\\)::uuid/,'Cast game UUID before min');
-assert.match(sql,/min\\(user_id::text\\)::uuid/,'Cast student UUID before min');
+assert.ok(!sql.includes('min(game_id)')&&!sql.includes('min(user_id)'),'Do not use min(uuid)');
+assert.ok(sql.includes('min(game_id::text)::uuid'),'Expected valid game ID lookup');
+assert.ok(sql.includes('min(user_id::text)::uuid'),'Expected valid student ID lookup');
 assert.match(sql,/candidate_user_id IS NULL/,'Prevent rewriting linked existing appointments');
 assert.match(sql,/kind='student' AND roster_archived_at IS NULL/,'Use active registered students only');
 assert.match(sql,/FOR UPDATE/,'Concurrent edits must serialize');
