@@ -1,0 +1,36 @@
+name: ГОС.ID · Президентские цели и документы Этапа 10
+on:
+  pull_request:
+    paths:
+      - 'components/game/StateProgramLab.tsx'
+      - 'components/game/StateProgramEditor.tsx'
+      - 'components/game/StageForms.module.css'
+      - 'supabase/migrations/*stage10_president_approved_goals_and_registry_sync.sql'
+      - 'scripts/stage10-president-goals-document-sync-check.cjs'
+      - '.github/workflows/stage10-president-goals-documents.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'components/game/StateProgramLab.tsx'
+      - 'components/game/StateProgramEditor.tsx'
+      - 'components/game/StageForms.module.css'
+      - 'supabase/migrations/*stage10_president_approved_goals_and_registry_sync.sql'
+      - 'scripts/stage10-president-goals-document-sync-check.cjs'
+      - '.github/workflows/stage10-president-goals-documents.yml'
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/stage10-president-goals-document-sync-check.cjs
+      - run: node scripts/stage10-ministry-team-rights-check.cjs
+      - run: node scripts/stage-final-documents-gate-check.cjs
+      - run: npm run typecheck
