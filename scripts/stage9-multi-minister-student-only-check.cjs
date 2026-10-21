@@ -3,7 +3,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const code=fs.readFileSync('supabase/migrations/20261021170000_multi_ministry_student_only.sql','utf8');
+const code=fs.readFileSync('supabase/migrations/20261021144730_stage9_registered_multi_ministry_heads.sql','utf8');
 const ui=fs.readFileSync('components/game/GovernmentFormationWorkspace.tsx','utf8');
 assert(code.includes('DROP INDEX IF EXISTS public.government_nominations_one_ministry_candidate_idx'));
 assert(code.includes('DROP INDEX IF EXISTS public.institution_assignments_single_ministry_per_student'));
