@@ -13,6 +13,7 @@ on:
       - 'components/game/StageArtifacts.tsx'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'supabase/migrations/*stage10_one_state_program_no_separate_feo.sql'
+      - 'supabase/migrations/*stage10_accept_synchronized_ministry_programme.sql'
       - '.github/workflows/stage10-president-goals-documents.yml'
   push:
     branches: [main]
@@ -28,6 +29,7 @@ on:
       - 'components/game/StageArtifacts.tsx'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'supabase/migrations/*stage10_one_state_program_no_separate_feo.sql'
+      - 'supabase/migrations/*stage10_accept_synchronized_ministry_programme.sql'
       - '.github/workflows/stage10-president-goals-documents.yml'
 permissions:
   contents: read

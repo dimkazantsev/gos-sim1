@@ -17,6 +17,22 @@ for(const [,description] of entries){
 for(const fragment of ['NOT EXISTS (SELECT 1 FROM public.event_assignments','NOT EXISTS (SELECT 1 FROM public.event_decisions','source_url=','source_note=']){
  assert(migration.includes(fragment),'Missing preservation/source guard: '+fragment);
 }
+const secondBatch=fs.readFileSync('supabase/migrations/20261021194700_event_four_official_cases_20261022.sql','utf8');
+for(const key of ['bank-bus','bank-curated-serious-03','bank-curated-serious-06','bank-curated-serious-23']) {
+ assert(secondBatch.includes("c.case_key='"+key+"'"),'Missing official event '+key);
+}
+const fourDescriptions=[...secondBatch.matchAll(/situation='((?:''|[^'])*)'/g)];
+assert.equal(fourDescriptions.length,4,'Four event texts must be present');
+for(const [,body] of fourDescriptions){
+ assert(body.trim().split(/\s+/u).length>=200,'Official case must have at least 200 meaningful words');
+ assert(!/учебная модель|срок учебного задания|GOS\/\/SIMS/iu.test(body),'No fabricated provenance');
+}
+for(const law of ['№ 220-ФЗ','№ 181-ФЗ','№ 35-ФЗ','№ 323-ФЗ'])assert(secondBatch.includes(law),'Missing law '+law);
+for(const guard of ['event_assignments','event_decisions','event_case_outcomes','event_collaboration_invites','event_discussion_messages','event_authority_evidence','budget_transfer_requests'])assert(secondBatch.includes(guard),'Missing assigned-case protection '+guard);
+assert(secondBatch.includes('WITH ORDINALITY'),'Preserve option order and scores');
+assert(secondBatch.includes("effect_plan->>'best_option_key'"),'Do not change correct answer key');
+assert(!/DELETE FROM public.event_cases/i.test(secondBatch),'Do not delete any cases');
+assert(!/SET\s+status\s*=|UPDATE\s+public\.event_decisions/i.test(secondBatch),'Do not change decisions or status');
 assert(!/DELETE FROM public.event_cases/i.test(migration),'Do not delete events');
 for(const clause of ['Федеральный закон от 08.11.2007 № 257-ФЗ','Федеральный закон от 21.11.2011 № 323-ФЗ','Федеральный закон от 29.12.2012 № 273-ФЗ'])assert(legal.includes(clause),'Missing actual statutory basis');
 assert(legal.includes("o.item->>'key'=c.effect_plan->>'best_option_key'"),'Only best-option explanation changes');
