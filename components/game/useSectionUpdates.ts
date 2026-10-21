@@ -22,7 +22,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
    }finally{running=false;if(queued&&live){queued=false;void load()}}
   }
   const invalidated=(e:Event)=>{
-   if((e as CustomEvent<{gameId:string}>).detail?.gameId!==gameId||pending!==undefined)return;
+   if(document.visibilityState!=='visible'||(e as CustomEvent<{gameId:string}>).detail?.gameId!==gameId||pending!==undefined)return;
    pending=setTimeout(()=>{pending=undefined;if(live)void load()},250);
   };
   const focused=()=>{
@@ -42,7 +42,8 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidated);
   window.addEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated);
   window.addEventListener('focus',focused);
-  return()=>{live=false;clearTimeout(pending);clearInterval(poll);window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidated);window.removeEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated);window.removeEventListener('focus',focused)};
+  document.addEventListener('visibilitychange',focused);
+  return()=>{live=false;clearTimeout(pending);clearInterval(poll);window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidated);window.removeEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated);window.removeEventListener('focus',focused);document.removeEventListener('visibilitychange',focused)};
  },[gameId,userId,readOnly]);
  useEffect(()=>{
   if(!gameId||!userId||readOnly||!READABLE_SECTIONS.has(view))return;
