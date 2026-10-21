@@ -234,3 +234,68 @@
  .programWorkspace .addressHint{min-width:0;flex-basis:100%}
  .programWorkspace .addressActions button{width:100%}
 }
+
+/* Этап 10: Строки расходов используют документную поверхность и существующие токены ГОС.ID.
+   Отступы и адаптивность ограничены панелью госпрограммы; расчёт и данные не затрагиваются. */
+.programWorkspace .treeExpenses .tableWrap{border-color:var(--line,#dce4ef);border-radius:12px}
+.programWorkspace .treeExpenseTable{width:100%;border-collapse:separate;border-spacing:0}
+.programWorkspace .treeExpenseTable th{
+ padding:11px 12px;background:var(--surface-2,#f8fafc);
+ color:var(--body,#354a67);font-size:12px;font-weight:700;
+ border-bottom:1px solid var(--line,#dce4ef);white-space:normal;
+}
+.programWorkspace .treeExpenseTable td{
+ box-sizing:border-box;padding:12px;vertical-align:middle;
+ border-bottom:1px solid var(--line,#dce4ef);background:var(--surface,#fff);
+}
+.programWorkspace .treeExpenseTable tr:last-child td{border-bottom:0}
+.programWorkspace .treeExpenseTable input,.programWorkspace .treeExpenseTable textarea{
+ display:block;box-sizing:border-box;width:100%;min-width:0;
+ min-height:44px;margin:0;padding:10px 12px;
+ border:1px solid var(--line-strong,#c7d3e2);border-radius:10px;
+ background:var(--surface,#fff);color:var(--text,#10213c);
+ font:inherit;font-size:14px;font-weight:500;line-height:1.45;
+}
+.programWorkspace .treeExpenseTable textarea{min-height:84px;resize:vertical}
+.programWorkspace .treeExpenseTable input:focus-visible,.programWorkspace .treeExpenseTable textarea:focus-visible{
+ border-color:var(--blue,#315efb);outline:2px solid rgba(49,94,251,.2);outline-offset:1px;
+}
+.programWorkspace .treeExpenseRemove :global(.gsIconAction){
+ min-width:42px;min-height:42px;
+ border-radius:10px;
+}
+.programWorkspace .treeAddExpense{
+ justify-self:start;min-height:42px;max-width:100%;padding:9px 14px;
+ border:1px solid var(--line-strong,#c7d3e2);border-radius:11px;
+ background:var(--surface-2,#f8fafc);color:var(--blue,#315efb);
+ font-size:13px;font-weight:700;white-space:normal;text-align:left;
+}
+.programWorkspace .treeAddExpense:hover:not(:disabled){background:var(--blue-soft,#edf2ff)}
+@media(max-width:850px){
+ .programWorkspace .treeExpenses .tableWrap{border:0;overflow:visible}
+ .programWorkspace .treeExpenseTable{display:block;min-width:0;width:100%}
+ .programWorkspace .treeExpenseTable thead{display:none}
+ .programWorkspace .treeExpenseTable tbody{display:grid;gap:12px}
+ .programWorkspace .treeExpenseTable tr{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;
+  padding:13px;border:1px solid var(--line,#dce4ef);border-radius:13px;
+  background:var(--surface,#fff);min-width:0;
+ }
+ .programWorkspace .treeExpenseTable td{min-width:0!important;padding:0;border:0!important}
+ .programWorkspace .treeExpenseTable td::before{
+  content:attr(data-label);display:block;margin-bottom:6px;
+  font-size:12px;font-weight:700;color:var(--body,#354a67);
+ }
+ .programWorkspace .treeExpenseTable td:nth-child(1),.programWorkspace .treeExpenseTable td:nth-child(2){grid-column:1/-1}
+ .programWorkspace .treeExpenseTable td.treeExpenseRemove{
+  grid-column:1/-1;display:flex;justify-content:flex-end;align-items:center;
+  border-top:1px solid var(--line,#dce4ef)!important;padding-top:9px;
+ }
+ .programWorkspace .treeExpenseTable td.treeExpenseRemove::before{display:none}
+ .programWorkspace .treeExpenseRemove :global(.gsIconAction){margin:0}
+}
+@media(max-width:520px){
+ .programWorkspace .treeExpenseTable tr{grid-template-columns:minmax(0,1fr);gap:10px;padding:11px}
+ .programWorkspace .treeExpenseTable td{grid-column:1/-1}
+ .programWorkspace .treeAddExpense{width:100%;justify-self:stretch}
+}
