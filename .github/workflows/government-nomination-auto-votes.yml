@@ -11,6 +11,7 @@ on:
       - 'components/game/InstitutionStaffingLab.tsx'
       - 'scripts/stage9-multi-minister-student-check.cjs'
       - 'scripts/stage9-multi-minister-student-only-check.cjs'
+      - 'scripts/stage9-ministry-staff-picker-check.cjs'
       - 'scripts/government-nomination-actions-responsive-browser-check.cjs'
       - 'components/game/GovernmentFormationWorkspace.tsx'
       - 'app/2026-stage-system.css'
@@ -28,6 +29,7 @@ on:
       - 'components/game/InstitutionStaffingLab.tsx'
       - 'scripts/stage9-multi-minister-student-check.cjs'
       - 'scripts/stage9-multi-minister-student-only-check.cjs'
+      - 'scripts/stage9-ministry-staff-picker-check.cjs'
       - 'scripts/government-nomination-actions-responsive-browser-check.cjs'
       - 'components/game/GovernmentFormationWorkspace.tsx'
       - 'app/2026-stage-system.css'
@@ -49,6 +51,7 @@ jobs:
       - run: node scripts/government-nomination-auto-votes-check.cjs
       - run: node scripts/stage9-multi-minister-student-check.cjs
       - run: node scripts/stage9-multi-minister-student-only-check.cjs
+      - run: node scripts/stage9-ministry-staff-picker-check.cjs
       - run: node scripts/government-nomination-actions-responsive-browser-check.cjs
       - run: node scripts/government-structure-responsive-browser-check.cjs
       - run: node scripts/gd-session-attendance-check.cjs

@@ -64,7 +64,8 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
  const committees=units.filter(x=>x.unit_kind==='committee');
  const ministries=units.filter(x=>x.unit_kind==='ministry');
  const students=members.filter(m=>m.kind==='student');
- const assignmentFor=(uid:string,kind:'committee'|'ministry')=>assignments.find(a=>a.user_id===uid&&a.unit_kind===kind);
+ // Leadership in other ministries does not occupy the single ordinary staff position.
+ const ministryStaff=new Set(assignments.filter(a=>a.unit_kind==='ministry'&&a.assignment_role!=='head').map(a=>a.user_id));
  const memberName=(id:string|null)=>members.find(m=>m.user_id===id)?.full_name||'—';
  const partyName=(id:string|null)=>parties.find(p=>p.id===id)?.name||'Без фракции';
  const committeeRows=(unitId:string)=>matrix.filter(x=>x.unit_id===unitId);
@@ -162,7 +163,7 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
      <header><div><small>МИНИСТЕРСТВО</small><h4>{u.title}</h4><p>{u.description}</p></div><span>{count} / {u.capacity_min||3}–{u.capacity_max||5}</span></header>
      <div className="unitHead"><small>Министр · назначение этапа 9</small><b>{minister?.candidate_name||'Ещё не назначен'}</b>{!minister&&<span>Кандидатура и назначение находятся выше</span>}</div>
      <div className="unitMembers">{aa.length===0?<div className="emptyState">Ведомство пока не укомплектовано.</div>:aa.map(a=><div key={a.id}><span>{memberName(a.user_id)}</span><small>{a.assignment_role==='head'?'министр':'член министерства'}</small>{canManageMinistry(u)&&a.assignment_role!=='head'&&<IconAction variant="remove" onClick={()=>void remove(a.id)} label={'Исключить участника '+memberName(a.user_id)}/>}</div>)}</div>
-     {canManageMinistry(u)&&minister&&<div className="unitAssign"><select aria-label={'Добавить сотрудника: '+u.title} value={pick[u.id]||''} onChange={e=>setPick(v=>({...v,[u.id]:e.target.value}))}><option value="">Добавить участника…</option>{students.filter(s=>!assignmentFor(s.user_id,'ministry')).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}</option>)}</select><button disabled={busy||!pick[u.id]} onClick={()=>void assign(u.id)}>Добавить</button></div>}
+     {canManageMinistry(u)&&minister&&<div className="unitAssign"><select aria-label={'Добавить сотрудника: '+u.title} value={pick[u.id]||''} onChange={e=>setPick(v=>({...v,[u.id]:e.target.value}))}><option value="">Добавить участника…</option>{students.filter(s=>!ministryStaff.has(s.user_id)&&!aa.some(a=>a.user_id===s.user_id)).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}</option>)}</select><button disabled={busy||!pick[u.id]} onClick={()=>void assign(u.id)}>Добавить</button></div>}
     </article>
    })}</div>
   </section>}

@@ -19,7 +19,8 @@ assert((sql.match(/on conflict\(unit_id,user_id\) do update/g)||[]).length>=3,'M
 assert(ui.includes('readOnly={registeredOnly}'),'Require selection rather than manual text');
 assert(ui.includes('!selected[slot]||candidateName(slot).length<3'),'Stage 9 nomination cannot submit free-text name');
 assert(ui.includes('registeredOnly onSelect={handleNomineeSelect}'),'Stage 9 nominee selector is restricted');
-assert(staff.includes("!assignmentFor(s.user_id,'ministry')"),'Existing one-ministry ordinary-staff rule stays in UI');
+assert(staff.includes("a.unit_kind==='ministry'&&a.assignment_role!=='head'"),'Only ordinary ministry assignments consume a staff slot');
+assert(staff.includes("!ministryStaff.has(s.user_id)&&!aa.some(a=>a.user_id===s.user_id)"),'Allow heads of other ministries, not existing staff or current-unit members');
 assert(sql.includes('institution_assignments_one_staff_ministry_per_student'),'New partial index protects ordinary staff while permitting multiple heads');
 
 (async()=>{
