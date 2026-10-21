@@ -57,7 +57,12 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const activeGame=game;
  const selected=sessions.find(x=>x.id===selectedId)||sessions[0];
  const agenda=selected?items.filter(x=>x.session_id===selected.id).sort((a,b)=>a.agenda_no-b.agenda_no):[];
- const readyPrograms=programs.filter(p=>p.status==='ready');
+ const readyPrograms=programs.filter(p=>p.status==='ready'||(
+  p.status==='government_vote'&&!!p.signed_at&&!!p.government_vote_id
+  &&votes.some(v=>v.id===p.government_vote_id&&v.status==='open'&&v.procedure_key==='state_program')
+  &&!g.ballots.some(b=>b.vote_id===p.government_vote_id)
+  &&!items.some(a=>a.program_id===p.id)
+ ));
  const meetingQuestions=selected?questions.filter(q=>q.session_id===selected.id):[];
  const reviewablePrograms=selected?programs.filter(p=>agenda.some(a=>a.program_id===p.id)):[];
  const meetingProposals=selected?proposals.filter(p=>p.session_id===selected.id):[];
@@ -168,7 +173,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
      <button type="button" disabled={busy||questionTitle.trim().length<3||questionMinutes<1||questionMinutes>60} onClick={()=>void addQuestion()}>Добавить вопрос</button>
     </div>}
    </section>
-   {canManage&&selected.status==='draft'&&<div className="govAgendaBuilder"><select value={programId} onChange={e=>setProgramId(e.target.value)}><option value="">Выберите согласованную государственную программу…</option>{readyPrograms.filter(p=>!agenda.some(i=>i.program_id===p.id)).map(p=><option key={p.id} value={p.id}>{p.title} · {p.responsible_ministry}</option>)}</select><label>Доклад, мин.<input type="number" min="1" max="60" value={reportMinutes} onChange={e=>setReportMinutes(Number(e.target.value)||7)}/></label><button disabled={busy||!programId} onClick={()=>void add()}>Добавить в повестку</button></div>}
+   {canManage&&selected.status==='draft'&&<div className="govAgendaBuilder"><select value={programId} onChange={e=>setProgramId(e.target.value)}><option value="">Выберите согласованную государственную программу…</option>{readyPrograms.filter(p=>!agenda.some(i=>i.program_id===p.id)).map(p=><option key={p.id} value={p.id}>{p.title} · {p.status==='government_vote'?'Ранее открытое голосование — без поданных голосов':p.responsible_ministry}</option>)}</select><label>Доклад, мин.<input type="number" min="1" max="60" value={reportMinutes} onChange={e=>setReportMinutes(Number(e.target.value)||7)}/></label><button disabled={busy||!programId} onClick={()=>void add()}>Добавить в повестку</button></div>}
 
    <div className="govAgenda">
     {agenda.length===0?<div className="emptyState">В повестке пока нет государственных программ.</div>:agenda.map(i=>{const p=program(i.program_id),v=vote(i.vote_id);return <article className={'govAgendaItem '+i.status} key={i.id}><div className="govAgendaNo">{String(i.agenda_no).padStart(2,'0')}</div><div><small>{p?.responsible_ministry||'Ответственный исполнитель'}</small><h3>{p?.title||'Государственная программа'}</h3><p>Доклад: {i.report_minutes} мин. · ответственный министр: {name(p?.responsible_minister_id||null)}</p><div className="govAgendaTags"><span>{i.status==='pending'?'Ожидает':i.status==='presenting'?'Доклад':i.status==='decision'?'Решение Правительства':i.status==='completed'?'Рассмотрено':'Снято'}</span>{v&&<span className={v.status==='open'?'live':''}>{v.status==='open'?'● Голосование открыто':v.result_label||'Голосование закрыто'}</span>}</div>{i.result_note&&<blockquote>{i.result_note}</blockquote>}</div>
@@ -177,7 +182,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
    </div>
 
   <section className="govProgramReview">
-   <div className="govProgramReviewHeader"><div><h3>Государственные программы на рассмотрении</h3><p>Программы этапа 10 рассматриваются только после включения в повестку выбранного заседания.</p></div><span>{reviewablePrograms.length} программ</span></div>
+   <div className="govProgramReviewHeader"><div><h3>Государственные программы на рассмотрении</h3><p>Программы Этапа 10 рассматриваются после включения в повестку. Ранее открытое голосование без поданных голосов можно связать с докладом, не создавая дубликата.</p></div><span>{reviewablePrograms.length} программ</span></div>
    <div className="govProgramReviewGrid">{reviewablePrograms.length?reviewablePrograms.map(p=><article key={p.id}>
     <small>{p.responsible_ministry}</small><h4>{p.title}</h4>
     <span>{p.status==='ready'?'Готова к заседанию':p.status==='adopted'?(p.signed_at?'Подписана и опубликована':'Ожидает подписи Председателя Правительства'):p.status==='rejected'?'Отклонена':p.status==='government_vote'?'На голосовании':'В подготовке и согласовании'}</span>

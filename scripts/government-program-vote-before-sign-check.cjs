@@ -35,4 +35,19 @@ assert(session.includes("!!i.vote_id||p?.status==='adopted'"),'Result remains re
 assert(model.includes("Принята · Ожидает подписи"),'Adoption does not mean publication');
 assert(css.includes('.programWorkspace .programApprovalSteps'),'Uses scoped ГОС.ID styling');
 assert(migration.includes('REVOKE ALL ON FUNCTION public.sign_adopted_state_program(uuid) FROM PUBLIC,anon;'),'No anonymous signature permission');
-console.log('PASS: teacher/PM permissions, three-step presentation-vote-sign sequence, no premature publication, session registration and existing routes');
+const compat=fs.readFileSync('supabase/migrations/20261021210700_legacy_signed_program_agenda_ballot_compatibility.sql','utf8');
+for(const guard of [
+ "p.status='government_vote'",
+ "p.signed_at is not null",
+ "v.status='open'",
+ "v.procedure_key='state_program'",
+ "not exists(select 1 from public.game_ballots",
+ "not exists(select 1 from public.government_program_agenda",
+ "a.vote_id=v.id and a.status='decision'",
+ "s.status='open' and s.stage_no=11",
+ "government_vote_id",
+])assert(compat.includes(guard),'Historical one-vote pathway guard missing: '+guard);
+assert(session.includes("p.status==='government_vote'")&&session.includes("!g.ballots.some"),'Signed legacy programme shown only with empty open vote');
+assert(compat.includes("v_vote:=p.government_vote_id")===false,'Preserve locked original ballot through verified SELECT');
+assert(compat.includes("for update;"),'Legacy ballot is locked during reuse');
+console.log('PASS: current and historical Government programme votes, agenda, no duplicate ballots, 3-step PM signature and role checks');
