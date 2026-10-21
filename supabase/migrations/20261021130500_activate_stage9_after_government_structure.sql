@@ -1,6 +1,8 @@
 -- Owner-requested activation of Stage 9 after the five-ministry structure was approved.
 -- Do not unlock Stages 10-16 or waive individual final-document holds.
 -- Keep the Stage 8 deadline; no arbitrary new deadline or score extension.
+-- Stage 8 can be completed by the teacher while Stage 9 still awaits activation.
+-- In that case opening Stage 9 also resumes the paused game, without reopening Stage 8.
 -- Guard the exact active game and approved prerequisites. Idempotent for one rollout.
 DO $open$
 DECLARE
@@ -19,7 +21,7 @@ BEGIN
   RAISE EXCEPTION 'Stage 8 or 9 missing: no changes made';
  END IF;
  IF v_nine.status='open' THEN RETURN; END IF;
- IF v_nine.status<>'locked' OR v_eight.status<>'open'
+ IF v_nine.status<>'locked' OR v_eight.status NOT IN ('open','completed')
     OR v_eight.deadline IS NULL OR v_eight.deadline<=clock_timestamp() THEN
   RAISE EXCEPTION 'Unsafe Stage 9 activation: check stage state/deadline';
  END IF;
@@ -32,8 +34,8 @@ BEGIN
   RAISE EXCEPTION 'Prime Minister and approved formal structure required';
  END IF;
  IF NOT EXISTS(SELECT 1 FROM public.games g
-    WHERE g.id=v_game AND g.status='running' AND g.turn_open) THEN
-  RAISE EXCEPTION 'Game must already be running';
+    WHERE g.id=v_game AND g.status IN ('running','paused')) THEN
+  RAISE EXCEPTION 'Game must be running or paused by completion of Stage 8';
  END IF;
 
  UPDATE public.game_stages SET status='open',
