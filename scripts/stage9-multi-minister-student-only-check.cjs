@@ -11,7 +11,7 @@ assert((code.match(/on conflict\(unit_id,user_id\)/g)||[]).length>=3);
 assert(code.includes('Minister must be a registered active student'));
 assert(code.includes('Candidate name must match the selected registered student'));
 assert(ui.includes('registeredOnly')&&ui.includes('!selected[slot]'));
-assert(!ui.includes('Нет активных участников — используйте Ф.И.О.'));
+assert(ui.includes("registeredOnly?'Нет активных студентов игры'"),'Stage 9 must require an actual student');
 const game='10000000-0000-4000-8000-000000000001',
  p='30000000-0000-4000-8000-000000000001',
  a='30000000-0000-4000-8000-000000000001',
