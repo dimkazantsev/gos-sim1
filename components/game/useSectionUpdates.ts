@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
-import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
+import {GAME_DATA_REFRESH_EVENT,gameRealtimeConnected} from './useGameTableSync';
 import type {View} from './types';
 
 const READABLE_SECTIONS=new Set<View>(['dashboard','stages','parties','votes','documents','actions','events','teacher']);
@@ -11,6 +11,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   setCounts({});
   if(!gameId||!userId||readOnly)return;
   let live=true,running=false,queued=false;
+  let lastFallbackAt=Date.now(),lastFocusAt=0;
   let pending:ReturnType<typeof setTimeout>|undefined;
   async function load(){
    if(running){queued=true;return}
@@ -24,9 +25,20 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
    if((e as CustomEvent<{gameId:string}>).detail?.gameId!==gameId||pending!==undefined)return;
    pending=setTimeout(()=>{pending=undefined;if(live)void load()},250);
   };
-  const focused=()=>{if(document.visibilityState==='visible')void load()};
+  const focused=()=>{
+   if(document.visibilityState!=='visible')return;
+   const now=Date.now();if(now-lastFocusAt<1500)return;
+   lastFocusAt=now;void load();
+  };
   void load();
-  const poll=setInterval(focused,30000+Math.floor(Math.random()*10000));
+  const poll=setInterval(()=>{
+   if(document.visibilityState!=='visible')return;
+   const now=Date.now();
+   // The shared game WebSocket delivers invalidation events immediately.
+   // Poll rarely while subscribed, but retain 30-40s recovery offline.
+   if(gameRealtimeConnected(gameId)&&now-lastFallbackAt<180000)return;
+   lastFallbackAt=now;void load();
+  },30000+Math.floor(Math.random()*10000));
   window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidated);
   window.addEventListener('focus',focused);
   return()=>{live=false;clearTimeout(pending);clearInterval(poll);window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidated);window.removeEventListener('focus',focused)};
