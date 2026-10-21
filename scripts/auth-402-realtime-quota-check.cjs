@@ -8,7 +8,7 @@ assert.equal(ast.parseDiagnostics.length,0,'useRepublicGame.ts must parse');
 assert(userError.includes('status===402'),'Explicit service restriction error');
 assert(source.includes("for(const table of ['game_stages'"),'Realtime targeted refresh is retained');
 assert(!source.includes('telegramWake'),'Realtime updates must not wake dispatcher in every connected client');
-assert.equal((source.match(/kickTelegramDispatch\\(/g)||[]).length,4,
+assert.equal((source.match(/kickTelegramDispatch\(/g)||[]).length,4,
  'Only 3 explicit party mutation paths may wake Telegram, plus the helper definition');
 const migration=fs.readFileSync('supabase/migrations/20261021080000_telegram_dispatch_skip_empty_outbox.sql','utf8');
 const dueCheck=migration.indexOf('if not exists (');
