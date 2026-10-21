@@ -11,7 +11,7 @@ assert(code.includes('institution_assignments_one_staff_ministry_per_student'),'
 assert((code.match(/on conflict\(unit_id,user_id\)/g)||[]).length>=3);
 assert(code.includes('Minister must be a registered active student'));
 assert(code.includes('Candidate name must match the selected registered student'));
-const pmPatch=fs.readFileSync('supabase/migrations/20261021182500_keep_prime_minister_title_on_multiple_portfolios.sql','utf8');
+const pmPatch=fs.readFileSync('supabase/migrations/20261021150054_stage9_preserve_pm_primary_role_on_multiple_ministries.sql','utf8');
 assert((pmPatch.match(/private\.is_appointed_pm\(n\.game_id,n\.candidate_user_id\)/g)||[]).length===2,'Preserve PM office in both minister appointment paths');
 assert(ui.includes('registeredOnly')&&ui.includes('!selected[slot]'));
 assert(ui.includes('Нет активных студентов игры'),'Stage 9 must show that active students are required');
