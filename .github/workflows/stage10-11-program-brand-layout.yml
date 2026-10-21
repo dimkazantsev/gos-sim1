@@ -1,0 +1,34 @@
+name: ГОС.ID · Оформление государственных программ
+on:
+  pull_request:
+    paths:
+      - 'components/game/StateProgramLab.tsx'
+      - 'components/game/StateProgramEditor.tsx'
+      - 'components/game/StageForms.module.css'
+      - 'scripts/state-program-brand-layout-check.cjs'
+      - '.github/workflows/stage10-11-program-brand-layout.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'components/game/StateProgramLab.tsx'
+      - 'components/game/StateProgramEditor.tsx'
+      - 'components/game/StageForms.module.css'
+      - 'scripts/state-program-brand-layout-check.cjs'
+      - '.github/workflows/stage10-11-program-brand-layout.yml'
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/state-program-brand-layout-check.cjs
+      - run: node scripts/state-program-editor-resilience-check.cjs
+      - run: node scripts/stage10-ministry-team-rights-check.cjs
+      - run: npm run typecheck
