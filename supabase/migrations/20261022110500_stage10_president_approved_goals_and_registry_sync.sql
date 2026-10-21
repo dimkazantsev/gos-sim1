@@ -64,7 +64,7 @@ BEGIN
   a.body_text||E'\n\nУтверждённые национальные цели:\n'||coalesce(v_list,''),
   'generic',v_steps,jsonb_array_length(v_steps)-1,'published','Опубликовано','system',
   jsonb_build_object('document_kind','presidential_address','presidential_address_id',a.id,
-    'auto_synced',true,'approved_goals',coalesce(v_list,''))
+    'auto_synced',true,'approved_by',p_actor,'approved_goals',coalesce(v_list,''))
  );
  INSERT INTO public.formal_document_history(document_id,game_id,actor_id,action,from_status,to_status,note)
  VALUES(v_doc_id,a.game_id,p_actor,'Зарегистрировано послание Президента','draft','published',
@@ -122,6 +122,9 @@ BEGIN
  v_body:='ПАСПОРТ ГОСУДАРСТВЕННОЙ ПРОГРАММЫ'||E'\n'||
  'Наименование: '||p.title||E'\n'||
  'Ответственный исполнитель: '||p.responsible_ministry||E'\n'||
+ 'Ответственный министр: '||coalesce((SELECT full_name FROM public.game_members WHERE game_id=p.game_id AND user_id=p.responsible_minister_id LIMIT 1),'Не назначен')||E'\n'||
+ 'Куратор: '||coalesce((SELECT full_name FROM public.game_members WHERE game_id=p.game_id AND user_id=p.curator_id LIMIT 1),'Не назначен')||E'\n'||
+ 'Участники: '||coalesce(p.participants,'Не определены')||E'\n'||
  'Национальная цель: '||coalesce(p.national_goal,'Не выбрана')||E'\n'||
  'Срок реализации: '||coalesce(p.start_date::text,'Не указан')||' — '||coalesce(p.end_date::text,'Не указан')||E'\n'||
  'Ожидаемые результаты: '||coalesce(p.expected_results,'Не определены')||E'\n\n'||
@@ -147,6 +150,9 @@ BEGIN
    INSERT INTO public.formal_document_history(document_id,game_id,actor_id,action,to_status,note)
    VALUES(v_id,p.game_id,v_uid,'Синхронизирована государственная программа','draft',
     'Черновик автоматически зарегистрирован из раздела «Работа».');
+ ELSIF d.status_code NOT IN ('draft','revision')
+   AND (d.title IS DISTINCT FROM v_title OR d.body_text IS DISTINCT FROM v_body) THEN
+   RAISE EXCEPTION 'Документ государственной программы уже передан на рассмотрение; верните его на доработку перед редактированием программы';
  ELSIF d.metadata->>'auto_synced'='true' AND d.status_code IN ('draft','revision')
    AND (d.title IS DISTINCT FROM v_title OR d.body_text IS DISTINCT FROM v_body) THEN
    -- Все прежние версии сохраняются. Если документ передан на рассмотрение, не переписываем его.
@@ -183,3 +189,16 @@ BEGIN
    ||v_needle);
  EXECUTE v_sql;
 END $patch$;
+
+-- Состояния послания и программы должны своевременно поступать участникам иных устройств.
+-- Публикация ограничена четырьмя связанными таблицами, без широких подписок на другие разделы.
+DO $realtime$
+DECLARE v_table text;
+BEGIN
+ FOREACH v_table IN ARRAY ARRAY['presidential_addresses','presidential_priorities','state_programs'] LOOP
+   IF NOT EXISTS(SELECT 1 FROM pg_publication_tables
+     WHERE pubname='supabase_realtime' AND schemaname='public' AND tablename=v_table)
+   THEN EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE public.%I',v_table);
+   END IF;
+ END LOOP;
+END $realtime$;
