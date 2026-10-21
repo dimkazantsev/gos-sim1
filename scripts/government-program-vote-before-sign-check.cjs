@@ -16,7 +16,7 @@ for(const required of [
  "app.gos_program_agenda_item",
  "a.status='presenting'",
  "s.status='open' and s.stage_no=11",
- "p.stage_no=11",
+ "d.stage_no=11",
  "institution_meeting_records",
  "agenda_approved_at",
  "stage_required_final_documents",
