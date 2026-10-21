@@ -1,6 +1,6 @@
 -- Event outcomes are the only moment students may receive the correct answer.
 -- Do not change event grades, votes, teacher permissions or stored case data.
--- The RPC returns the same case fields, with the confidential effect_plan redacted.
+-- Deploy the safe RPC before revoking direct table access.
 create or replace function public.list_visible_event_cases(
  p_game_id uuid,
  p_case_ids uuid[]
@@ -80,10 +80,3 @@ begin
  return jsonb_build_object('role',d.role_snapshot,'authority_ok',coalesce(e.authority_ok,false),'delegated_ok',coalesce(e.delegated_ok,false),'best_option',coalesce(e.best_option,false),'score_share',coalesce(e.score_share,0),'lawful',coalesce(e.lawful,(o->>'lawful')::boolean,false),'legal_basis',coalesce(e.legal_basis,o->>'legal_basis'),'chosen_consequence',o->>'description','lawful_choices',answers);
 end $body$;
 
--- Column-level privilege: the original table's RLS still filters rows;
--- non-privileged clients cannot select effect_plan even by direct REST query.
-revoke select on public.event_cases from anon,authenticated;
-revoke select(effect_plan) on public.event_cases from anon,authenticated;
-grant select (id,game_id,case_key,title,situation,category,seriousness,audience,
- allowed_roles,decision_options,source_url,source_note,verified,status,created_by,
- created_at,comic_scene) on public.event_cases to authenticated,anon;
