@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const migration=fs.readFileSync('supabase/migrations/20261021152000_preserve_president_permissions_on_minister_appointment.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20261021133935_preserve_president_rights_on_minister_appointment.sql','utf8');
 const [funcs,repair]=migration.split('-- Correct only a current Presidential primary profile backed by the active office register.');
 assert(funcs.includes("a.status='active'"),'Only active offices may protect incumbent presidential role');
 assert((funcs.match(/update public\.game_members m/g)||[]).length===2,'Both normal and 3-rejection appointments must preserve presidential office');
