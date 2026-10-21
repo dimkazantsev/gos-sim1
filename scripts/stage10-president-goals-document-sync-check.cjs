@@ -4,7 +4,7 @@ const migration=fs.readFileSync('supabase/migrations/20261021175329_stage10_pres
 const lab=fs.readFileSync('components/game/StateProgramLab.tsx','utf8');
 const editor=fs.readFileSync('components/game/StateProgramEditor.tsx','utf8');
 const css=fs.readFileSync('components/game/StageForms.module.css','utf8');
-const rights=fs.readFileSync('supabase/migrations/20261021183500_stage10_president_authored_goals_and_office_rights.sql','utf8');
+const rights=fs.readFileSync('supabase/migrations/20261021181110_stage10_president_authored_goals_and_office_rights.sql','utf8');
 assert(!lab.includes('nationalGoals.map('),'Presidential goals must be authored, not selected from a preset list');
 assert(lab.includes('p_body_text:addressBody.trim()'),'RPC argument must match save_presidential_address signature');
 assert(rights.includes("private.can_manage_presidential_policy(p_game uuid,p_user uuid)"),'Correct authorized RPC scope');
