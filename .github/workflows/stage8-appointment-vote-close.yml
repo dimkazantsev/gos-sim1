@@ -5,7 +5,7 @@ on:
       - 'components/game/VotesView.tsx'
       - 'supabase/migrations/20261020095000_presidential_appointment_vote_completion_guard.sql'
       - 'scripts/stage8-appointment-vote-completion-check.cjs'
-      - 'supabase/migrations/20261021123500_stage8_government_structure_presidential_act_route.sql'
+      - 'supabase/migrations/20261021123915_stage8_government_structure_presidential_act_route.sql'
       - 'scripts/stage8-government-structure-decree-route-check.cjs'
       - '.github/workflows/stage8-appointment-vote-close.yml'
   push:
@@ -14,7 +14,7 @@ on:
       - 'components/game/VotesView.tsx'
       - 'supabase/migrations/20261020095000_presidential_appointment_vote_completion_guard.sql'
       - 'scripts/stage8-appointment-vote-completion-check.cjs'
-      - 'supabase/migrations/20261021123500_stage8_government_structure_presidential_act_route.sql'
+      - 'supabase/migrations/20261021123915_stage8_government_structure_presidential_act_route.sql'
       - 'scripts/stage8-government-structure-decree-route-check.cjs'
 jobs:
   check:
