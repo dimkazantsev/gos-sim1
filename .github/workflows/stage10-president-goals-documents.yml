@@ -9,6 +9,10 @@ on:
       - 'supabase/migrations/*stage10_president_authored_goals_and_office_rights.sql'
       - 'supabase/migrations/*stage10_presidential_rls_function_execute_grant.sql'
       - 'scripts/stage10-president-goals-document-sync-check.cjs'
+      - 'scripts/stage10-single-program-work-links-check.cjs'
+      - 'components/game/StageArtifacts.tsx'
+      - 'components/game/GovernanceStageWorkspace.tsx'
+      - 'supabase/migrations/*stage10_one_state_program_no_separate_feo.sql'
       - '.github/workflows/stage10-president-goals-documents.yml'
   push:
     branches: [main]
@@ -20,6 +24,10 @@ on:
       - 'supabase/migrations/*stage10_president_authored_goals_and_office_rights.sql'
       - 'supabase/migrations/*stage10_presidential_rls_function_execute_grant.sql'
       - 'scripts/stage10-president-goals-document-sync-check.cjs'
+      - 'scripts/stage10-single-program-work-links-check.cjs'
+      - 'components/game/StageArtifacts.tsx'
+      - 'components/game/GovernanceStageWorkspace.tsx'
+      - 'supabase/migrations/*stage10_one_state_program_no_separate_feo.sql'
       - '.github/workflows/stage10-president-goals-documents.yml'
 permissions:
   contents: read
@@ -35,6 +43,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/stage10-president-goals-document-sync-check.cjs
+      - run: node scripts/stage10-single-program-work-links-check.cjs
       - run: node scripts/stage10-ministry-team-rights-check.cjs
       - run: node scripts/stage-final-documents-gate-check.cjs
       - run: npm run typecheck
