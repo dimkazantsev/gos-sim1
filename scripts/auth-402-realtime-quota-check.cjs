@@ -7,6 +7,21 @@ const ast=ts.createSourceFile('useRepublicGame.ts',source,ts.ScriptTarget.ES2022
 assert.equal(ast.parseDiagnostics.length,0,'useRepublicGame.ts must parse');
 assert(userError.includes('status===402'),'Explicit service restriction error');
 assert(source.includes("for(const table of ['game_stages'"),'Realtime targeted refresh is retained');
+assert(!source.includes('telegramWake'),'Realtime updates must not wake dispatcher in every connected client');
+assert.equal((source.match(/kickTelegramDispatch\(/g)||[]).length,4,
+ 'Only 3 explicit party mutation paths may wake Telegram, plus the helper definition');
+const migration=fs.readFileSync('supabase/migrations/20261021080433_telegram_dispatch_skip_empty_outbox.sql','utf8');
+const guardedCall=migration.indexOf('select private.request_telegram_dispatch()');
+const dueCheck=migration.indexOf('where exists (');
+assert(guardedCall>=0&&dueCheck>guardedCall,
+ 'Cron must skip dispatcher HTTP call when no due job exists');
+assert(migration.includes('cron.alter_job')&&migration.includes('telegram_outbox_ready_idx'),
+ 'Patch only the existing scheduled job using the indexed queue check');
+assert(migration.includes('where sent_at is null and attempts < 5 and next_attempt_at <= now()'),
+ 'Queue guard matches dispatcher eligibility');
+assert(!migration.includes('create or replace function private.request_telegram_dispatch'),
+ 'Immediate INSERT-trigger function must remain unchanged');
+
 assert(source.includes("if(liveConnected&&now-lastPollAt<180000)return"),'Connected polling is reduced to once per 3 minutes');
 assert(source.includes('},30000+pollJitter)'), 'Disconnected recovery remains on 30–40s timer');
 const from=source.indexOf('  channel.subscribe(status=>{');
