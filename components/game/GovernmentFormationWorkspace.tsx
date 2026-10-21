@@ -447,7 +447,7 @@ export default function GovernmentFormationWorkspace({
       return <article key={p.key} className={'gov8MinistryCard route-'+p.route+' '+(nomination?'hasNomination':'')}>
        <header><span>{String(index+1).padStart(2,'0')}</span><div><small>{p.label}</small>{stageNo===9&&<b>{titles[p.key]}</b>}</div>{stageNo===9&&<em>{p.route==='duma'?'Утверждение ГД':'Консультация СФ'}</em>}</header>
        <p>{p.scope}</p>
-       {stageNo===8&&<label className="gov8MinistryTitle">Название министерства<textarea rows={2} disabled={!editable} value={titles[p.key]} onChange={e=>{structureDirty.current=true;setTitles(v=>({...v,[p.key]:e.target.value}))}}/></label>}
+       {stageNo===8&&<label className="gov8MinistryTitle">Название министерства<textarea rows={2} disabled={!editable} value={titles[p.key]} onKeyDown={e=>{if(e.key==='Enter')e.preventDefault()}} onChange={e=>{structureDirty.current=true;setTitles(v=>({...v,[p.key]:e.target.value.replace(/\s*[\r\n]+\s*/g,' ')}))}}/></label>}
 
        {stageNo===9&&p.route==='duma'&&!activeDeputy&&<label className={'gov8DeputyChoice '+(!structureApproved?'isDisabled':'')}><input type="radio" name="gov8-deputy" disabled={!structureApproved} checked={deputyPortfolio===p.key} onChange={()=>setDeputyPortfolio(p.key)}/><span>Этот министр одновременно является заместителем Председателя Правительства</span></label>}
        {stageNo===9&&activeDeputy?.office_key===slot&&<div className="gov8DeputyFlag">Заместитель Председателя Правительства</div>}
