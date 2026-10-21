@@ -10,7 +10,7 @@ assert(source.includes("for(const table of ['game_stages'"),'Realtime targeted r
 assert(!source.includes('telegramWake'),'Realtime updates must not wake dispatcher in every connected client');
 assert.equal((source.match(/kickTelegramDispatch\(/g)||[]).length,4,
  'Only 3 explicit party mutation paths may wake Telegram, plus the helper definition');
-const migration=fs.readFileSync('supabase/migrations/20261021080000_telegram_dispatch_skip_empty_outbox.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20261021080433_telegram_dispatch_skip_empty_outbox.sql','utf8');
 const guardedCall=migration.indexOf('select private.request_telegram_dispatch()');
 const dueCheck=migration.indexOf('where exists (');
 assert(guardedCall>=0&&dueCheck>guardedCall,
