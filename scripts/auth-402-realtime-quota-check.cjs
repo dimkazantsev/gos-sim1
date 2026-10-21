@@ -47,7 +47,7 @@ focusClock+=1501;
 vm.runInNewContext('recover()',focusEnv);
 assert.equal(recoveryReads,2,'Recovery resumes after debounce interval');
 
-const cleanupSql=fs.readFileSync('supabase/migrations/20261021090000_chat_media_cleanup_skip_empty.sql','utf8');
+const cleanupSql=fs.readFileSync('supabase/migrations/20261021085946_chat_media_cleanup_skip_empty.sql','utf8');
 const operationalSql=fs.readFileSync('supabase/ops/chat_media_cleanup_schedule.sql','utf8');
 for(const sql of [cleanupSql,operationalSql]){
  assert(sql.includes("exists (select 1 from public.chat_media_expired_candidates(1))"),
