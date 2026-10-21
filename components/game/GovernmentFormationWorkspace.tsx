@@ -80,17 +80,18 @@ type NomineeOption={
 };
 
 function NomineeFields({
- slot,disabled=false,students,selectedUserId,value,onSelect,onNameChange
+ slot,disabled=false,registeredOnly=false,students,selectedUserId,value,onSelect,onNameChange
 }:{
  slot:string;
  disabled?:boolean;
+ registeredOnly?:boolean;
  students:NomineeOption[];
  selectedUserId:string;
  value:string;
  onSelect:(slot:string,userId:string)=>void;
  onNameChange:(slot:string,name:string)=>void;
 }){
- const invalid=value.trim().length>0&&value.trim().length<3;
+ const invalid=!registeredOnly&&value.trim().length>0&&value.trim().length<3;
  return <div className="gov8NomineeFields">
   <label>Участник игры
    <select
@@ -98,22 +99,24 @@ function NomineeFields({
     value={selectedUserId}
     onChange={e=>onSelect(slot,e.target.value)}
    >
-    <option value="">{students.length?'Выберите участника':'Нет активных участников — используйте Ф.И.О.'}</option>
+    <option value="">{students.length?'Выберите участника':'Нет активных студентов игры'}</option>
     {students.map(m=><option key={m.user_id} value={m.user_id}>{m.full_name} · {m.role_title||'участник'}</option>)}
    </select>
   </label>
   <label>Ф.И.О. кандидатуры
    <input
     disabled={disabled}
+    readOnly={registeredOnly}
     value={value}
     onChange={e=>onNameChange(slot,e.target.value)}
-    placeholder="Введите Ф.И.О. вручную"
+    placeholder={registeredOnly?"Выберите участника выше":"Введите Ф.И.О. вручную"}
     autoComplete="off"
    />
   </label>
   <small className={'gov8FieldError '+(invalid?'isVisible':'isHidden')} aria-live="polite" aria-hidden={!invalid}>
    Введите не менее 3 символов.
   </small>
+   {registeredOnly&&<small>Кандидаты — только зарегистрированные студенты игры. Один студент может возглавлять несколько министерств.</small>}
  </div>;
 }
 
@@ -212,7 +215,8 @@ export default function GovernmentFormationWorkspace({
 
  async function submitNomination(slot:string,officeKey:string,officeTitle:string,officeKind:Nomination['office_kind']){
   const name=candidateName(slot);
-  if(name.length<3)return;
+   if(stageNo===9&&!selected[slot]){setError('Выберите зарегистрированного студента игры. Ф.И.О. вручную не допускается.');return;}
+   if(name.length<3)return;
   setBusy('submit:'+slot);
   const r=await supabase.rpc('submit_government_nomination',{
    p_game_id:activeGame.id,p_office_key:officeKey,p_office_title:officeTitle,
@@ -463,7 +467,7 @@ export default function GovernmentFormationWorkspace({
         {nomination.status==='approved'&&canPresident&&<button className="primary" disabled={!!busy} onClick={()=>void appoint(nomination.id)}>Назначить после решения ГД</button>}
         {nomination.status==='rejected'&&rejections(slot)>=3&&canPresident&&p.route==='duma'&&<button className="primary" disabled={!!busy} onClick={()=>void appointAfterThree(nomination.id)}>Назначить после 3 отклонений</button>}
         {nomination.vote_id&&votes.find(v=>v.id===nomination.vote_id)?.status==='open'&&<button className="secondary" onClick={()=>openVoting(nomination.vote_id)}>Регистрация и голосование</button>}
-       </div>:<div className={'gov8MinistryNomination '+(!structureApproved||!canNominate?'isPreview':'')}><NomineeFields slot={slot} disabled={!structureApproved||!canNominate} students={students} selectedUserId={selected[slot]||''} value={manual[slot]||''} onSelect={handleNomineeSelect} onNameChange={handleNomineeNameChange}/><button className="secondary" disabled={!structureApproved||!canNominate||rejections(slot)>=3||!!busy||candidateName(slot).length<3} onClick={()=>void submitNomination(slot,slot,officeTitle,officeKind)}>{nomination?.status==='rejected'?'Внести новую кандидатуру':'Внести кандидатуру'}</button><small className="gov8FormGate">{!structureApproved?(!pmAppointed?'Активируется после назначения Председателя Правительства и утверждения структуры':'Активируется после утверждения структуры Президентом'):!canNominate?(p.route==='duma'?'Кандидатуру вносит Председатель Правительства':'Кандидатуру вносит Президент'):rejections(slot)>=3?'После трёх отклонений используется специальное назначение по правилам этапа':'Можно внести кандидатуру'}</small></div>)}
+       </div>:<div className={'gov8MinistryNomination '+(!structureApproved||!canNominate?'isPreview':'')}><NomineeFields slot={slot} disabled={!structureApproved||!canNominate} students={students} selectedUserId={selected[slot]||''} value={manual[slot]||''} registeredOnly onSelect={handleNomineeSelect} onNameChange={handleNomineeNameChange}/><button className="secondary" disabled={!structureApproved||!canNominate||rejections(slot)>=3||!!busy||!selected[slot]||candidateName(slot).length<3} onClick={()=>void submitNomination(slot,slot,officeTitle,officeKind)}>{nomination?.status==='rejected'?'Внести новую кандидатуру':'Внести кандидатуру'}</button><small className="gov8FormGate">{!structureApproved?(!pmAppointed?'Активируется после назначения Председателя Правительства и утверждения структуры':'Активируется после утверждения структуры Президентом'):!canNominate?(p.route==='duma'?'Кандидатуру вносит Председатель Правительства':'Кандидатуру вносит Президент'):rejections(slot)>=3?'После трёх отклонений используется специальное назначение по правилам этапа':'Можно внести кандидатуру'}</small></div>)}
       </article>
      })}
     </div>
