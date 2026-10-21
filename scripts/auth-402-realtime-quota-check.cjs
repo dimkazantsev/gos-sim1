@@ -25,8 +25,8 @@ assert(!migration.includes('create or replace function private.request_telegram_
 assert(source.includes("if(liveConnected&&now-lastPollAt<180000)return"),'Connected polling is reduced to once per 3 minutes');
 assert(source.includes('},30000+pollJitter)'), 'Disconnected recovery remains on 30–40s timer');
 
-const focusStart=source.indexOf('   const recover=()=>{');
-const focusEnd=source.indexOf('   const visible=()=>{',focusStart);
+const focusStart=source.indexOf('  const recover=()=>{');
+const focusEnd=source.indexOf('  const visible=()=>{',focusStart);
 assert(focusStart>=0&&focusEnd>focusStart,'Focus recovery function is available');
 let focusClock=1_000_000,recoveryReads=0,widgetInvalidations=0;
 const focusEnv={
