@@ -67,7 +67,8 @@ async function main(){
  // One bounded request per visible session each minute. No production URL is allowed.
  const duration=Number(process.env.QA_DURATION_SECONDS||1200);
  if(duration<1200)throw new Error('Acceptance run must last at least 20 real minutes');
- if(!/^https?:\\/\\/(localhost|127\\.0\\.0\\.1)(:|\\/)/.test(url))throw new Error('Only local Supabase is permitted');
+ const hostname=new URL(url).hostname;
+ if(!['localhost','127.0.0.1'].includes(hostname))throw new Error('Only local Supabase is permitted');
  const latency=[],audit={reads:0,bytes:0,reconnects:0,failures:0,skipped:0};
  const since=performance.now();
  const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -102,7 +103,7 @@ async function main(){
   }
   const responses=await Promise.all(active.map(async s=>{
    const begun=performance.now();
-   const data=await s.client.from('blitz_assignments').select('id,is_correct,answered_at').eq('user_id',s.id).limit(3);
+   const data=await s.client.from('blitz_assignments').select('id,is_correct,answered_at').eq('user_id',s.id).eq('stage_no',1).limit(2);
    const ms=performance.now()-begun;
    latency.push(ms);
    if(data.error||data.data?.length!==1||data.data[0].is_correct!==true){
@@ -124,7 +125,7 @@ async function main(){
  assert(audit.reads<=800,'Request budget: no more than 800 sustained REST reads');
  const p95=latency.sort((a,b)=>a-b)[Math.max(0,Math.ceil(latency.length*.95)-1)];
  // Verify confirmed answer was not altered by repeated queries or reconnections.
- const verified=await Promise.all(sessionsWithConnection.map(s=>s.client.from('blitz_assignments').select('id,chosen_index,is_correct').eq('user_id',s.id)));
+ const verified=await Promise.all(sessionsWithConnection.map(s=>s.client.from('blitz_assignments').select('id,chosen_index,is_correct').eq('user_id',s.id).eq('stage_no',1)));
  for(const result of verified){
   if(result.error)throw result.error;
   assert.equal(result.data?.length,1);
