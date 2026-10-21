@@ -64,7 +64,6 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
  const committees=units.filter(x=>x.unit_kind==='committee');
  const ministries=units.filter(x=>x.unit_kind==='ministry');
  const students=members.filter(m=>m.kind==='student');
- const assignmentFor=(uid:string,kind:'committee'|'ministry')=>assignments.find(a=>a.user_id===uid&&a.unit_kind===kind);
  const memberName=(id:string|null)=>members.find(m=>m.user_id===id)?.full_name||'—';
  const partyName=(id:string|null)=>parties.find(p=>p.id===id)?.name||'Без фракции';
  const committeeRows=(unitId:string)=>matrix.filter(x=>x.unit_id===unitId);
@@ -116,7 +115,7 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
     <div className="staffingLabEyebrow"><Landmark size={17} aria-hidden="true"/><span>Государственная Дума</span><span className="staffingLabStage">Этап 4</span></div>
     <h2>Формирование комитетов Государственной Думы</h2>
     <p>Палата образует пять комитетов и избирает их председателей. После выборов депутаты распределяются по комитетам с учётом фракционных квот.</p>
-   </div>:<div><h2>Команды министерств</h2><p>Министры, назначенные на этом этапе, набирают сотрудников своих ведомств. Участник может состоять только в одном министерстве; партийная принадлежность не определяет распределение.</p></div>}
+   </div>:<div><h2>Команды министерств</h2><p>Министры, назначенные на этом этапе, набирают сотрудников своих ведомств. Участник может работать в нескольких министерствах; партийная принадлежность не определяет распределение.</p></div>}
    {mode==='committees'?<div className="staffingBalance" aria-label={'Распределено депутатских мандатов по комитетам: '+assignedSeats+' из 450'}>
     <span>Распределение мандатов</span><strong>{assignedSeats} / 450</strong><em>Мандатов распределено</em>
    </div>:<div className="staffingBalance"><strong>{assignments.filter(a=>a.unit_kind==='ministry').length}</strong><span>в министерствах</span></div>}
@@ -162,11 +161,11 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
      <header><div><small>МИНИСТЕРСТВО</small><h4>{u.title}</h4><p>{u.description}</p></div><span>{count} / {u.capacity_min||3}–{u.capacity_max||5}</span></header>
      <div className="unitHead"><small>Министр · назначение этапа 9</small><b>{minister?.candidate_name||'Ещё не назначен'}</b>{!minister&&<span>Кандидатура и назначение находятся выше</span>}</div>
      <div className="unitMembers">{aa.length===0?<div className="emptyState">Ведомство пока не укомплектовано.</div>:aa.map(a=><div key={a.id}><span>{memberName(a.user_id)}</span><small>{a.assignment_role==='head'?'министр':'член министерства'}</small>{canManageMinistry(u)&&a.assignment_role!=='head'&&<IconAction variant="remove" onClick={()=>void remove(a.id)} label={'Исключить участника '+memberName(a.user_id)}/>}</div>)}</div>
-     {canManageMinistry(u)&&minister&&<div className="unitAssign"><select aria-label={'Добавить сотрудника: '+u.title} value={pick[u.id]||''} onChange={e=>setPick(v=>({...v,[u.id]:e.target.value}))}><option value="">Добавить участника…</option>{students.filter(s=>!assignmentFor(s.user_id,'ministry')).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}</option>)}</select><button disabled={busy||!pick[u.id]} onClick={()=>void assign(u.id)}>Добавить</button></div>}
+     {canManageMinistry(u)&&minister&&<div className="unitAssign"><select aria-label={'Добавить сотрудника: '+u.title} value={pick[u.id]||''} onChange={e=>setPick(v=>({...v,[u.id]:e.target.value}))}><option value="">Добавить участника…</option>{students.filter(s=>!assignedTo(u.id).some(a=>a.user_id===s.user_id)).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}</option>)}</select><button disabled={busy||!pick[u.id]} onClick={()=>void assign(u.id)}>Добавить</button></div>}
     </article>
    })}</div>
   </section>}
 
-  <footer className="staffingRule"><b>Правила модели</b><p>{mode==='committees'?'Пять комитетов по 90 мандатов. Депутат вправе представлять фракцию в нескольких комитетах, но сумма его распределённых мандатов ограничена личным пакетом. Сервер проверяет квоты фракций и состав.':'Пять ведомств с ориентиром 3–5 человек. Один участник состоит в одном министерстве и может отдельно быть депутатом комитета ГД.'}</p></footer>
+  <footer className="staffingRule"><b>Правила модели</b><p>{mode==='committees'?'Пять комитетов по 90 мандатов. Депутат вправе представлять фракцию в нескольких комитетах, но сумма его распределённых мандатов ограничена личным пакетом. Сервер проверяет квоты фракций и состав.':'Пять ведомств с ориентиром 3–5 человек. Один участник может работать в нескольких министерствах и отдельно быть депутатом комитета Государственной Думы.'}</p></footer>
  </section>;
 }
