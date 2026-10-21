@@ -5,6 +5,7 @@ const url=process.env.SUPABASE_URL;
 const anon=process.env.SUPABASE_ANON_KEY;
 const service=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!url||!anon||!service)throw new Error('Local Supabase environment is incomplete');
+if(!['localhost','127.0.0.1'].includes(new URL(url).hostname))throw new Error('Refusing to run against a non-local project');
 
 const admin=createClient(url,service,{auth:{persistSession:false,autoRefreshToken:false}});
 const password='Blitz-QA-2026!strong';
@@ -91,6 +92,24 @@ async function main(){
   const disconnectedWindow=minute>=8&&minute<10;
   const active=disconnectedWindow?sessionsWithConnection.slice(0,20):sessionsWithConnection;
   audit.skipped+=sessionsWithConnection.length-active.length;
+  if(minute===12){
+   // Second round of actual concurrent writes without modifying the original
+   // 40 completed answers. The first participant already has a test assignment.
+   const second=students.slice(1).map(u=>({
+    id:'40000000-0000-4000-8000-'+String(u.i).padStart(12,'0'),
+    game_id:gameId,user_id:u.id,question_id:u.i,stage_no:2,
+    available_at:new Date(Date.now()-60_000).toISOString()
+   }));
+   const assigned=await admin.from('blitz_assignments').insert(second);
+   if(assigned.error)throw assigned.error;
+   const openedAgain=await Promise.all(sessionsWithConnection.map(s=>s.client.rpc('blitz_open',{p_game:gameId})));
+   openedAgain.forEach((x,i)=>{if(x.error||!x.data?.id)throw new Error('Round 2 open failed: '+i)});
+   const submittedAgain=await Promise.all(sessionsWithConnection.map((s,i)=>s.client.rpc('blitz_answer',{p_id:openedAgain[i].data.id,p_choice:0})));
+   submittedAgain.forEach((x,i)=>{if(x.error||x.data?.is_correct!==true)throw new Error('Round 2 lost confirmed action: '+i)});
+   const retry=await Promise.all(Array.from({length:4},()=>sessionsWithConnection[0].client.rpc('blitz_answer',{p_id:openedAgain[0].data.id,p_choice:0})));
+   retry.forEach(x=>{if(x.error||x.data?.is_correct!==true)throw new Error('Idempotent answer retry failed')});
+   audit.gameplayWrites=40;
+  }
   if(minute===10){
    // Restore real auth sessions after simulated outage of the other 20 clients.
    const resumed=await Promise.all(sessionsWithConnection.slice(20).map(async s=>{
@@ -122,6 +141,7 @@ async function main(){
  assert(elapsedMs>=1200000,'Sustained test must run at least 20 real minutes');
  assert.equal(audit.failures,0,'No failed or lost authenticated reads allowed');
  assert.equal(audit.reconnects,20,'All temporarily offline users must reauthenticate');
+ assert.equal(audit.gameplayWrites,40,'Second concurrent Blitz round completed');
  assert(audit.reads<=800,'Request budget: no more than 800 sustained REST reads');
  const p95=latency.sort((a,b)=>a-b)[Math.max(0,Math.ceil(latency.length*.95)-1)];
  // Verify confirmed answer was not altered by repeated queries or reconnections.
@@ -134,7 +154,7 @@ async function main(){
  }
  await Promise.all(sessionsWithConnection.map(s=>s.client.removeChannel(s.channel)));
  console.log('PASS: 20 REAL minutes, 40 distinct authenticated local clients; 40 Realtime subscriptions, 20 auth reconnections, '+audit.reads+' bounded REST reads; zero lost results');
- console.log(JSON.stringify({environment:'isolated local Supabase',duration_seconds:Math.round(elapsedMs/1000),clients:40,subscriptions:40,reconnects:audit.reconnects,reads:audit.reads,skipped_inactive_reads:audit.skipped,response_bytes:audit.bytes,p95_ms:Math.round(p95),failures:audit.failures}));
+ console.log(JSON.stringify({environment:'isolated local Supabase',duration_seconds:Math.round(elapsedMs/1000),clients:40,subscriptions:40,reconnects:audit.reconnects,reads:audit.reads,second_round_writes:audit.gameplayWrites,skipped_inactive_reads:audit.skipped,response_bytes:audit.bytes,p95_ms:Math.round(p95),failures:audit.failures}));
 
  console.log('PASS: 40 independent local Supabase Auth sessions, persisted Blitz answers, RLS isolation and serialized repeated opens');
 }
