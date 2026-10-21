@@ -1112,7 +1112,7 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
 @media(max-width:700px){
  .gov8Ministries.isStructureStage .gov8MinistryGrid{grid-template-columns:minmax(0,1fr)!important}
  .gov8Ministries.isStructureStage .gov8MinistryCard{padding:14px}
- .gov8Ministries.isStructureStage .gov8MinistryTitle textarea{font-size:16px}
+ .gov8Ministries.isStructureStage .gov8MinistryTitle textarea{font-size:16px;min-height:86px}
  .gov8Ministries.isStructureStage .gov8StructureActions{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
  .gov8Ministries.isStructureStage .gov8StructureActions>button{width:100%}
 }
