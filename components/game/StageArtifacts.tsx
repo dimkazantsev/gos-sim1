@@ -51,6 +51,15 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
   ...p,
   documents:g.partyDocuments.filter(d=>d.party_id===p.id)
  })):[];
+ if(stage.stage_no===10){
+  const programDocs=docs.filter(d=>d.doc_type==='state_program');
+  return <section className="stageArtifacts surface" aria-label="Государственные программы Этапа 10">
+   <div className="stageArtifactActions">
+    {onOpenWork&&<button type="button" onClick={onOpenWork}><FileText size={18}/><span>Государственные программы · Работа</span><ArrowUpRight size={16}/></button>}
+    {programDocs.map(d=><button key={d.id} type="button" disabled={!onOpenDocument} onClick={()=>onOpenDocument?.(d.id)}><FileText size={18}/><span>{d.title}</span><ArrowUpRight size={16}/></button>)}
+   </div>
+  </section>;
+ }
  return <section className="stageArtifacts surface"><header><div><small>Материалы этапа {stage.stage_no}</small><h3>{task.title}</h3></div>{completed&&<span><CheckCircle2 size={18}/> Завершён</span>}</header><p>{task.help}</p>
  {stage.stage_no===1&&<section className="stageProfileSync">
   <div className="stageProfileSyncHead"><div><Link2 size={18}/><span><small>Данные партий обновляются автоматически</small><b>Регистрационные пакеты</b></span></div>{onNavigate&&<button type="button" onClick={()=>onNavigate('parties')}>Открыть партии <ArrowUpRight size={15}/></button>}</div>
