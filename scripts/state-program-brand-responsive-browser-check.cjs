@@ -35,6 +35,18 @@ ${Array.from({length:5},(_,i)=>'<label class="programGoalChoice"><span class="go
 </div></section></section>
 <div class="programPicker"><div class="programTabs"><button type="button" aria-pressed="true"><b>Государственная программа</b><span>Черновик</span></button></div><button class="programNew" type="button">Новая программа</button></div>
 <section class="panel programEditorPanel"><div class="sectionHead programIntro"><div><h3>Новая государственная программа</h3><p>Паспорт, цели, мероприятия и расходы заполняются вместе. Суммы указаны в рублях.</p></div></div>
+<section class="treeExpenses" aria-label="Расходы элемента">
+ <div class="tableWrap"><table class="table treeExpenseTable">
+ <thead><tr><th>Что финансируется</th><th>Обоснование</th><th>Год</th><th>Сумма, ₽</th><th>Удалить</th></tr></thead>
+ <tbody><tr>
+ <td data-label="Что финансируется"><input aria-label="Предмет расхода" placeholder="Например: строительство двух поликлиник"></td>
+ <td data-label="Обоснование"><textarea rows="2" aria-label="Обоснование расхода" placeholder="Почему требуется эта сумма?"></textarea></td>
+ <td data-label="Год"><input type="number" aria-label="Год расхода" value="2026"></td>
+ <td data-label="Сумма, ₽"><input aria-label="Сумма расхода" placeholder="0,00"></td>
+ <td data-label="Удалить" class="treeExpenseRemove"><button type="button" class="gsIconAction gsIconAction--remove" aria-label="Удалить расход">×</button></td>
+ </tr></tbody></table></div>
+ <button class="treeAddExpense" type="button">Добавить расход к элементу 1.1</button>
+ </section>
 <fieldset class="form"><legend>Паспорт программы</legend><div class="grid">
 <label class="field">Название программы<input aria-label="Название программы"></label>
 <label class="field">Ответственное министерство<input aria-label="Ответственное министерство"></label>
@@ -59,15 +71,18 @@ ${Array.from({length:5},(_,i)=>'<label class="programGoalChoice"><span class="go
       body:box('.addressForm textarea'),save:box('.addressActions button'),
       progress:box('.goalProgress'),progressBorder:getComputedStyle(document.querySelector('.goalProgress')).borderTopWidth,
       picker:box('.programPicker'),newButton:box('.programNew'),
-      editor:box('.programEditorPanel'),minister:box('.styledSelectTrigger'),goal:box('.programGoalChoice textarea'),goalAction:box('.programGoalControls button'),
+      editor:box('.programEditorPanel'),expense:box('.treeExpenses'),expenseYear:box('.treeExpenseTable input[type=number]'),expenseRemove:box('.treeExpenseRemove button'),expenseThead:getComputedStyle(document.querySelector('.treeExpenseTable thead')).display,minister:box('.styledSelectTrigger'),goal:box('.programGoalChoice textarea'),goalAction:box('.programGoalControls button'),
       bg:getComputedStyle(document.querySelector('[data-stage-module-head]')).backgroundImage};
    });
    assert(m.scroll<=width+2,'Horizontal page overflow at '+width+': '+m.scroll);
-   for(const key of ['header','title','stats','address','body','save','progress','picker','newButton','editor','minister','goal','goalAction']){
+   for(const key of ['header','title','stats','address','body','save','progress','picker','newButton','editor','expense','expenseYear','expenseRemove','minister','goal','goalAction']){
     assert(m[key].left>=-1 && m[key].right<=width+1,key+' exits viewport '+width);
    }
    assert(m.progressBorder==='0px','Goal progress must not render as a badge/strip at '+width);
    assert(m.progress.top>=m.save.bottom-1,'Goal progress overlaps address actions at '+width);
+   assert(m.expenseYear.height>=42&&m.expenseRemove.height>=32,'Expense inputs or remove control too small at '+width);
+   if(width<=850)assert(m.expenseThead==='none','Compact expense rows must use accessible field labels at '+width);
+   else assert(m.expenseThead!=='none','Wide screen retains semantic table header at '+width);
    assert(m.goal.top>=m.save.bottom-1,'Goal form overlaps address save action at '+width);
    assert(m.save.top>=m.body.bottom-1,'Save overlaps address content at '+width);
    assert(m.save.height>=42&&m.newButton.height>=42&&m.minister.height>=42&&m.goalAction.height>=42,'Touch target is too small at '+width);
