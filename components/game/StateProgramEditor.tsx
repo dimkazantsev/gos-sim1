@@ -4,7 +4,7 @@ import {supabase} from '@/lib/supabase';
 import StyledSelect from '../ui/StyledSelect';
 import {IconAction} from '../ui/IconAction';
 import type {ReturnTypeRepublic} from './viewTypes';
-import {expenseKopecks,kopecksMoney,nationalGoals,programMoney,type StateProgram,type ProgramGoal,type ProgramComponent,type ProgramExpense,type ProgramPriority} from './stateProgramModel';
+import {expenseKopecks,kopecksMoney,programMoney,type StateProgram,type ProgramGoal,type ProgramComponent,type ProgramExpense,type ProgramPriority} from './stateProgramModel';
 import styles from './StageForms.module.css';
 import ProgramStructureTree from './ProgramStructureTree';
 
@@ -66,6 +66,7 @@ export default function StateProgramEditor({g,program,goals,components,expenses,
  const total=expenseRows.reduce((sum,x)=>sum+(expenseKopecks(x.amount)||0n),0n);
  const yearly=expenseRows.reduce<Record<string,bigint>>((years,x)=>{if(x.budget_year)years[x.budget_year]=(years[x.budget_year]||0n)+(expenseKopecks(x.amount)||0n);return years},{});
  const memberOptions=[{value:'',label:'Выберите участника'},...g.members.filter(x=>x.kind==='student'&&!x.roster_archived_at).map(x=>({value:x.user_id,label:x.full_name}))];
+ const approvedGoals=priorities.filter(x=>!!x.national_goal).map(x=>({value:x.national_goal!,label:x.national_goal!,priorityId:x.id}));
  async function save(confirm:boolean){
   if(!active()||busyRef.current||!g.game||!editable)return;
   const savedVersion=editVersion.current;
@@ -102,11 +103,11 @@ export default function StateProgramEditor({g,program,goals,components,expenses,
     <label className={styles.field}>Ответственное министерство<input value={passport.responsible_ministry} maxLength={250} onChange={e=>changePassport('responsible_ministry',e.target.value)}/></label>
     <StyledSelect wrap label="Ответственный министр" disabled={!editable||busy} value={passport.responsible_minister_id} options={memberOptions} onChange={v=>changePassport('responsible_minister_id',v)}/>
     <StyledSelect wrap label="Куратор" disabled={!editable||busy} value={passport.curator_id} options={memberOptions} onChange={v=>changePassport('curator_id',v)}/>
-    <div className={styles.wide}><StyledSelect wrap label="Национальная цель" disabled={!editable||busy} value={passport.national_goal} options={[{value:'',label:'Выберите национальную цель'},...nationalGoals.map(x=>({value:x,label:x}))]} onChange={v=>changePassport('national_goal',v)}/></div>
+    <div className={styles.wide}><StyledSelect wrap label="Национальная цель, утверждённая Президентом" disabled={!editable||busy||!approvedGoals.length} value={passport.national_goal} options={[{value:'',label:approvedGoals.length?'Выберите утверждённую национальную цель':'Ожидается опубликованное послание Президента'},...approvedGoals.map(({value,label})=>({value,label}))]} onChange={v=>{changePassport('national_goal',v);changePassport('presidential_priority_id',approvedGoals.find(x=>x.value===v)?.priorityId||'')}}/>{!approvedGoals.length&&<p className={styles.notice}>Выбор цели откроется после утверждения Президентом 5–6 целей и публикации Послания Федеральному Собранию.</p>}</div>
     <label className={styles.field}>Начало реализации<input type="date" min="2000-01-01" max="2100-12-31" value={passport.start_date} onChange={e=>changePassport('start_date',e.target.value)}/></label>
     <label className={styles.field}>Завершение реализации<input type="date" min={passport.start_date||'2000-01-01'} max="2100-12-31" value={passport.end_date} onChange={e=>changePassport('end_date',e.target.value)}/></label>
     <label className={`${styles.field} ${styles.wide}`}>Участники программы<textarea rows={2} maxLength={4000} value={passport.participants} onChange={e=>changePassport('participants',e.target.value)} placeholder="Органы, организации и участники реализации"/></label>
-    {priorities.length>0&&<div className={styles.wide}><StyledSelect wrap label="Приоритет опубликованного послания Президента" disabled={!editable||busy} value={passport.presidential_priority_id} options={[{value:'',label:'Выберите приоритет'},...priorities.map(x=>({value:x.id,label:x.priority_no+'. '+x.title}))]} onChange={v=>changePassport('presidential_priority_id',v)}/></div>}
+    
     <label className={`${styles.field} ${styles.wide}`}>Ожидаемые результаты<textarea rows={3} maxLength={8000} value={passport.expected_results} onChange={e=>changePassport('expected_results',e.target.value)}/></label>
    </div>
    <section className={styles.section} aria-label="Цели программы и связанные элементы"><div className={styles.sectionHead}><div><h3>Цели программы: какого результата добиться</h3><p>Задайте результат и способ его измерить. Ниже свяжите с этой целью проекты и мероприятия, которые обеспечат результат.</p></div><span>{goalRows.length} / 50</span></div><div className={styles.rows}>{goalRows.map((x,i)=><article className={styles.row} key={x.key} id={formId+'-goal-'+x.key}><h3>Цель {i+1} и её показатель</h3><div className={styles.grid}>
