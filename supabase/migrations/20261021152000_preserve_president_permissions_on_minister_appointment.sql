@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION public.appoint_government_nominee(p_nomination_id uui
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public', 'private', 'pg_temp'
-AS $function$
+AS $function$;
 declare
  n public.government_nominations%rowtype;
  v_uid uuid:=(select auth.uid());
@@ -44,7 +44,7 @@ begin
  insert into public.game_events(game_id,round_no,category,severity,title,body,created_by)
  values(n.game_id,n.stage_no,'Формирование Правительства','notice','Назначение · '||n.office_title,n.candidate_name,v_uid);
 end;
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.appoint_government_nominee_after_three_rejections(p_nomination_id uuid)
@@ -52,7 +52,7 @@ CREATE OR REPLACE FUNCTION public.appoint_government_nominee_after_three_rejecti
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public', 'private', 'pg_temp'
-AS $function$
+AS $function$;
 declare
  n public.government_nominations%rowtype;
  v_uid uuid:=(select auth.uid());
@@ -101,7 +101,7 @@ begin
  insert into public.game_events(game_id,round_no,category,severity,title,body,created_by)
  values(n.game_id,n.stage_no,'Формирование Правительства','notice','Назначение после трёх отклонений · '||n.office_title,n.candidate_name,v_uid);
 end;
-$function$
+$function$;
 
 
 
