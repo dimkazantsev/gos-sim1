@@ -170,3 +170,20 @@
  .programWorkspace .programGoalChoices .actions{align-items:stretch}
  .programWorkspace .programGoalChoices .actions button{flex:1 1 100%;max-width:100%}
 }
+
+
+/* Единая белая документная поверхность ГОС.ID для вкладок «Работа» и «Документы».
+   Вместо отдельной тёмной шапки государственных программ используем общий набор цветов. */
+.programWorkspace :global([data-stage-module-head]){
+ background:var(--surface,#fff);color:var(--text,#10213c);
+ border:1px solid var(--line,#dce4ef);box-shadow:var(--shadow,0 10px 32px rgba(13,31,58,.07));
+}
+.programWorkspace :global([data-stage-module-head]) h2{color:var(--text,#10213c)}
+.programWorkspace :global([data-stage-module-head]) p{color:var(--body,#354a67)}
+.programWorkspace :global([data-stage-module-head]) :global([class*="eyebrow"]){color:var(--blue,#315efb)}
+.programWorkspace :global([data-stage-module-head]) dl>div{
+ background:var(--surface-2,#f8fafc);border:1px solid var(--line,#dce4ef);
+}
+.programWorkspace :global([data-stage-module-head]) dt,
+.programWorkspace :global([data-stage-module-head]) dl span{color:var(--body,#354a67)}
+.programWorkspace :global([data-stage-module-head]) dd{color:var(--blue,#315efb)}
