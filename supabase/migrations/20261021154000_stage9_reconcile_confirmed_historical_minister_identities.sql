@@ -15,7 +15,7 @@ DECLARE
   v_old_name text;
   v_note text;
 BEGIN
-  SELECT count(*), min(game_id) INTO v_games, v_game
+  SELECT count(*), min(game_id::text)::uuid INTO v_games, v_game
   FROM (
     SELECT game_id
     FROM public.government_nominations
@@ -45,7 +45,7 @@ BEGIN
       AND candidate_name=v_target.old_name
     FOR UPDATE;
 
-    SELECT count(*), min(user_id) INTO v_members,v_member_id
+    SELECT count(*), min(user_id::text)::uuid INTO v_members,v_member_id
     FROM public.game_members
     WHERE game_id=v_game AND kind='student' AND roster_archived_at IS NULL
       AND full_name=v_target.new_name;
