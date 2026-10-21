@@ -4,10 +4,16 @@ const migration=fs.readFileSync('supabase/migrations/20261021175329_stage10_pres
 const lab=fs.readFileSync('components/game/StateProgramLab.tsx','utf8');
 const editor=fs.readFileSync('components/game/StateProgramEditor.tsx','utf8');
 const css=fs.readFileSync('components/game/StageForms.module.css','utf8');
-const model=fs.readFileSync('components/game/stateProgramModel.ts','utf8');
-const match=model.match(/export const nationalGoals=\[([\s\S]*?)\];/);
-assert(match,'National goal source list must remain available');
-const count=(match[1].match(/^ '/gm)||[]).length;assert.equal(count,7,'Only the seven approved national goal labels may be listed');
+const rights=fs.readFileSync('supabase/migrations/20261021181110_stage10_president_authored_goals_and_office_rights.sql','utf8');
+assert(!lab.includes('nationalGoals.map('),'Presidential goals must be authored, not selected from a preset list');
+assert(lab.includes('p_body_text:addressBody.trim()'),'RPC argument must match save_presidential_address signature');
+assert(rights.includes("private.can_manage_presidential_policy(p_game uuid,p_user uuid)"),'Correct authorized RPC scope');
+assert(rights.includes("public.game_office_assignments"),'President in active offices retains authority');
+assert(rights.includes("m.roster_archived_at IS NULL"),'Archived students cannot approve');
+assert(rights.includes("lower(trim(o.role_title))='президент российской федерации'"),'Office title must match President exactly');
+assert(rights.includes("length(btrim(g)) NOT BETWEEN 12 AND 500"),'Prevent empty or unbounded authored goals');
+assert(rights.includes("count(DISTINCT lower(btrim(g)))"),'Reject duplicate authored goals');
+assert(rights.includes("v_n NOT BETWEEN 5 AND 6"),'Five to six authored goals');
 for(const statement of [
 'CREATE OR REPLACE FUNCTION public.set_presidential_address_goals',
 'v_uid IS NULL OR NOT private.can_manage_presidential_policy',
@@ -31,15 +37,18 @@ for(const statement of [
 assert(!migration.includes('DROP TABLE'),'Never remove historical documents or votes');
 assert(!migration.includes('DELETE FROM public.formal_documents'),'No destructive document removal');
 for(const statement of [
-'selectedGoals.length<5','selectedGoals.length>6',
+'formulatedGoals.every(x=>x.length>=12&&x.length<=500)',
 "onClick={()=>void saveGoals()}",
 "set_presidential_address_goals",
 "publish_presidential_address",
-'nationalGoals.map(goal=>',
-'type="checkbox"',
+'selectedGoals.map((goal,index)=>',
+'textarea rows={2} maxLength={500}',
 'goalsDirty',
 'activeAddress?.status===\'published\'',
-'styles.programGoalChoices'
+'styles.programGoalChoices',
+'styles.goalInputGroup',
+'Добавить шестую цель',
+'Убрать шестую цель'
 ])assert(lab.includes(statement),'Goal approval form missing: '+statement);
 for(const statement of [
 'approvedGoals=priorities.filter',
@@ -52,4 +61,4 @@ for(const statement of [
 assert(!editor.includes('...nationalGoals.map(x=>({value:x,label:x}))'),'Must not allow unapproved goals');
 assert(css.includes('.programWorkspace .programGoalChoice'),'Scoped branded goal choice');
 assert(css.includes('@media(max-width:700px)'),'Responsive mobile style');
-console.log('PASS: 5–6 goals, president-only publication, published-goal program filter, identity authorization, linked formal-document history and responsive design');
+console.log('PASS: 5–6 independently authored goals, RPC argument names, exact President roles, published-goal program filter, formal-document history and responsive design');

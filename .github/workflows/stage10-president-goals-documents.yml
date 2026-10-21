@@ -6,6 +6,7 @@ on:
       - 'components/game/StateProgramEditor.tsx'
       - 'components/game/StageForms.module.css'
       - 'supabase/migrations/*stage10_president_approved_goals_and_registry_sync.sql'
+      - 'supabase/migrations/*stage10_president_authored_goals_and_office_rights.sql'
       - 'scripts/stage10-president-goals-document-sync-check.cjs'
       - '.github/workflows/stage10-president-goals-documents.yml'
   push:
@@ -15,6 +16,7 @@ on:
       - 'components/game/StateProgramEditor.tsx'
       - 'components/game/StageForms.module.css'
       - 'supabase/migrations/*stage10_president_approved_goals_and_registry_sync.sql'
+      - 'supabase/migrations/*stage10_president_authored_goals_and_office_rights.sql'
       - 'scripts/stage10-president-goals-document-sync-check.cjs'
       - '.github/workflows/stage10-president-goals-documents.yml'
 permissions:

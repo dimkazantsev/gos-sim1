@@ -187,3 +187,46 @@
 .programWorkspace :global([data-stage-module-head]) dt,
 .programWorkspace :global([data-stage-module-head]) dl span{color:var(--body,#354a67)}
 .programWorkspace :global([data-stage-module-head]) dd{color:var(--blue,#315efb)}
+
+
+/* Президент самостоятельно формулирует национальные цели. Используем только
+   утверждённую типографику и токены ГОС.ID, не затрагивая остальные экраны. */
+.programWorkspace .programGoalChoice{display:flex;align-items:flex-start;gap:10px;min-height:108px;cursor:default}
+.programWorkspace .goalOrdinal{flex:none;color:var(--blue,#315efb);font-weight:850;font-size:15px;line-height:1.8}
+.programWorkspace .goalInputGroup{display:flex;flex-direction:column;gap:7px;flex:1;min-width:0;color:var(--body,#354a67);font-size:13px;font-weight:750}
+.programWorkspace .goalInputGroup textarea{
+ box-sizing:border-box;width:100%;min-width:0;min-height:74px;max-width:100%;padding:11px 13px;
+ color:var(--text,#10213c);background:var(--surface,#fff);
+ border:1px solid var(--line-strong,#c7d3e2);border-radius:12px;
+ font:inherit;font-size:14px;font-weight:500;line-height:1.45;
+ resize:vertical;
+}
+.programWorkspace .goalInputGroup textarea:focus-visible{
+ outline:3px solid rgba(49,94,251,.18);outline-offset:0;border-color:var(--blue,#315efb)
+}
+.programWorkspace .programGoalControls{grid-column:1/-1;display:flex;justify-content:flex-start}
+.programWorkspace .programGoalControls button{
+ min-height:44px;padding:9px 15px;border:1px solid var(--line-strong,#c7d3e2);
+ border-radius:12px;background:var(--surface-2,#f8fafc);
+ color:var(--blue,#315efb);font-size:13px;font-weight:750;
+}
+.programWorkspace .addressActions{gap:12px;flex-wrap:wrap}
+.programWorkspace .addressHint{font-size:12px;color:var(--muted,#6b7e99);flex:1;min-width:190px}
+.programWorkspace .addressActions .primary{
+ background:var(--blue,#315efb);border:2px solid var(--blue,#315efb);
+ color:#fff;font-weight:800;box-shadow:0 7px 18px rgba(49,94,251,.18);
+}
+.programWorkspace .addressActions .primary:hover:not(:disabled){
+ background:#244fe7;box-shadow:0 9px 22px rgba(49,94,251,.26)
+}
+.programWorkspace .addressActions .primary:disabled{
+ opacity:1;background:var(--surface-3,#eef3f8);
+ border:2px solid var(--line-strong,#c7d3e2);color:var(--muted,#6b7e99);
+ box-shadow:none;cursor:not-allowed;
+}
+@media(max-width:700px){
+ .programWorkspace .programGoalChoice{min-height:0}
+ .programWorkspace .addressActions{align-items:stretch}
+ .programWorkspace .addressHint{min-width:0;flex-basis:100%}
+ .programWorkspace .addressActions button{width:100%}
+}
