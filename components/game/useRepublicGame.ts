@@ -1,6 +1,6 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {notifyGameDataRefresh,setGameRealtimeConnection} from './useGameTableSync';
+import {notifyGameDataRefresh,notifySectionUpdates,setGameRealtimeConnection} from './useGameTableSync';
 import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
 import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {useEffect,useMemo,useRef,useState} from 'react';
@@ -265,6 +265,7 @@ export function useRepublicGame(gameId:string){
    if(core){void hydrateActiveView();notifyGameDataRefresh(gameId)}
    // A document version changes no core identity or party membership.
    if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments();
+    if(partyDocs)notifySectionUpdates(gameId);
    if(overview||chat)scheduleRealtimeChatOverview();
    if(chat&&channelRef.current)void loadMessages(channelRef.current);
    if(pins&&channelRef.current)void loadChatPins(channelRef.current);
