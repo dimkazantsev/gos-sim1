@@ -2,16 +2,17 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const migration=fs.readFileSync('supabase/migrations/20261021113000_hide_event_effect_plan_until_outcome.sql','utf8');
+const privilegeLock=fs.readFileSync('supabase/migrations/20261021113100_lock_event_effect_plan_column.sql','utf8');
 const workspace=fs.readFileSync('components/game/EventWorkspace.tsx','utf8');
 assert(workspace.includes("supabase.rpc('list_visible_event_cases'"),
  'Case details must come through a permission-aware server RPC');
 assert(!workspace.includes("from('event_cases').select('*')"),
  'A wildcard request leaks the effect_plan after column permissions are reduced');
-assert(migration.includes('revoke select on public.event_cases from anon,authenticated'),
+assert(privilegeLock.includes('revoke select on public.event_cases from anon,authenticated'),
  'Table-level SELECT must be revoked before column privileges matter');
-assert(migration.includes('revoke select(effect_plan) on public.event_cases from anon,authenticated'),
+assert(privilegeLock.includes('revoke select(effect_plan) on public.event_cases from anon,authenticated'),
  'Remove residual per-column grants for the confidential effect_plan');
-assert(migration.includes('grant select (id,game_id,case_key'),
+assert(privilegeLock.includes('grant select (id,game_id,case_key'),
  'Other safe fields stay accessible under the current RLS policies');
 assert(migration.includes("when private.is_game_teacher(c.game_id) then c.effect_plan"),
  'Teachers retain authorized access to complete plan details');
