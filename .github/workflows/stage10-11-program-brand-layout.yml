@@ -6,6 +6,7 @@ on:
       - 'components/game/StateProgramEditor.tsx'
       - 'components/game/StageForms.module.css'
       - 'scripts/state-program-brand-layout-check.cjs'
+      - 'scripts/state-program-brand-responsive-browser-check.cjs'
       - '.github/workflows/stage10-11-program-brand-layout.yml'
   push:
     branches: [main]
@@ -29,6 +30,13 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/state-program-brand-layout-check.cjs
-      - run: node scripts/state-program-editor-resilience-check.cjs
+      - name: Find Chrome
+        run: |
+          for binary in /usr/bin/google-chrome /usr/bin/google-chrome-stable /usr/bin/chromium; do
+            if test -x "$binary"; then echo "CHROME_BIN=$binary" >> "$GITHUB_ENV"; exit 0; fi
+          done
+          echo "Chrome is required for stages 10–11 layout checks" >&2
+          exit 1
+      - run: node scripts/state-program-brand-responsive-browser-check.cjs
       - run: node scripts/stage10-ministry-team-rights-check.cjs
       - run: npm run typecheck
