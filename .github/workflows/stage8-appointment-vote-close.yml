@@ -7,6 +7,10 @@ on:
       - 'scripts/stage8-appointment-vote-completion-check.cjs'
       - 'supabase/migrations/20261021152000_preserve_president_permissions_on_minister_appointment.sql'
       - 'scripts/stage9-president-incumbent-rights-check.cjs'
+      - 'supabase/migrations/20261021170000_multi_ministry_student_only.sql'
+      - 'scripts/stage9-multi-minister-student-only-check.cjs'
+      - 'components/game/GovernmentFormationWorkspace.tsx'
+      - 'components/game/InstitutionStaffingLab.tsx'
       - 'supabase/migrations/20261021130140_activate_stage9_after_approved_structure.sql'
       - 'scripts/stage9-access-16-stages-check.cjs'
       - 'supabase/migrations/20261021123915_stage8_government_structure_presidential_act_route.sql'
@@ -20,6 +24,10 @@ on:
       - 'scripts/stage8-appointment-vote-completion-check.cjs'
       - 'supabase/migrations/20261021152000_preserve_president_permissions_on_minister_appointment.sql'
       - 'scripts/stage9-president-incumbent-rights-check.cjs'
+      - 'supabase/migrations/20261021170000_multi_ministry_student_only.sql'
+      - 'scripts/stage9-multi-minister-student-only-check.cjs'
+      - 'components/game/GovernmentFormationWorkspace.tsx'
+      - 'components/game/InstitutionStaffingLab.tsx'
       - 'supabase/migrations/20261021130140_activate_stage9_after_approved_structure.sql'
       - 'scripts/stage9-access-16-stages-check.cjs'
       - 'supabase/migrations/20261021123915_stage8_government_structure_presidential_act_route.sql'
@@ -40,6 +48,7 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: node scripts/stage8-appointment-vote-completion-check.cjs
       - run: node scripts/stage9-president-incumbent-rights-check.cjs
+      - run: node scripts/stage9-multi-minister-student-only-check.cjs
       - run: node scripts/stage9-access-16-stages-check.cjs
       - run: node scripts/stage8-government-structure-decree-route-check.cjs
       - run: node scripts/government-nomination-auto-votes-check.cjs
