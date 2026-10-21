@@ -61,6 +61,36 @@ for(const sql of [cleanupSql,operationalSql]){
 assert(cleanupSql.includes('cron.alter_job'),'Production migration only updates existing cron job');
 assert(!cleanupSql.includes('cron.unschedule'),'Scheduled cleanup cannot be disabled');
 
+const sectionSource=fs.readFileSync('components/game/useSectionUpdates.ts','utf8');
+assert(sectionSource.includes('gameRealtimeConnected(gameId)'),
+ 'Section badges must reuse shared WebSocket health instead of always polling');
+assert(sectionSource.includes("window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidated)"),
+ 'Section badges still respond to pushed changes');
+const sectionPollStart=sectionSource.indexOf('  const poll=setInterval(()=>{');
+const sectionPollEnd=sectionSource.indexOf('  window.addEventListener(GAME_DATA_REFRESH_EVENT',sectionPollStart);
+assert(sectionPollStart>=0&&sectionPollEnd>sectionPollStart);
+let pollClock=1_000_000,sectionReads=0,connected=true,sectionTick=null;
+const sectionEnv={
+ document:{visibilityState:'visible'},Date:{now:()=>pollClock},
+ gameRealtimeConnected:()=>connected,gameId:'game-one',
+ lastFallbackAt:pollClock,
+ load:()=>{sectionReads++;return Promise.resolve()},
+ setInterval:fn=>{sectionTick=fn;return 1},
+ Math:Object.assign(Object.create(Math),{random:()=>0})
+};
+vm.runInNewContext(sectionSource.slice(sectionPollStart,sectionPollEnd),sectionEnv);
+pollClock+=120_000;sectionTick();
+assert.equal(sectionReads,0,'Connected badges must not poll within 2 minutes');
+pollClock+=60_000;sectionTick();
+assert.equal(sectionReads,1,'Connected badges reconcile once after 3 minutes');
+pollClock+=30_000;sectionTick();
+assert.equal(sectionReads,1,'No 30-second polling on a healthy WebSocket');
+connected=false;pollClock+=30_000;sectionTick();
+assert.equal(sectionReads,2,'Disconnected badges recover on the regular timer');
+sectionEnv.document.visibilityState='hidden';pollClock+=60_000;sectionTick();
+assert.equal(sectionReads,2,'Hidden tabs do not poll');
+
+
 const from=source.indexOf('  channel.subscribe(status=>{');
 const to=source.indexOf('  return()=>{',from);
 assert(from>=0&&to>from,'Live subscribe and fallback polling located');
