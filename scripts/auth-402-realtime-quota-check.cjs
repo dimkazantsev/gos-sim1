@@ -44,7 +44,7 @@ assert.equal(recoveryReads,1,'Focus and visibility event burst causes one recove
 assert.equal(widgetInvalidations,1,'Only one stage invalidation per focus burst');
 focusEnv.document.visibilityState='visible';
 focusClock+=1501;
-vm.runInNewContext(source.slice(focusStart,focusEnd)+'recover()',focusEnv);
+vm.runInNewContext('recover()',focusEnv);
 assert.equal(recoveryReads,2,'Recovery resumes after debounce interval');
 
 const cleanupSql=fs.readFileSync('supabase/migrations/20261021090000_chat_media_cleanup_skip_empty.sql','utf8');
