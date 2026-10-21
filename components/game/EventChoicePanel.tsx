@@ -5,7 +5,8 @@ type Decision={actor_id:string;choice:string};
 function index(choice:string){return choice==='accept'?0:choice==='reject'?1:Number(choice.replace('option_',''))-1}
 function publishedExplanation(value?:string){
  return value?.replaceAll('При отсутствии нужной игровой должности необходимо было пригласить уполномоченного участника до голосования.','Если решение выходит за пределы полномочий адресата, следует привлечь компетентное должностное лицо.')
-  .replaceAll('В учебной модели устранён конкретный правовой риск.','Устранён выявленный правовой риск.').trim()||'';
+  .replaceAll('В учебной модели устранён конкретный правовой риск.','Устранён выявленный правовой риск.')
+  .replaceAll('Указанные в досье сведения и доступный ресурс позволяют выполнить ближайший этап без ожидания полного изменения программы.','').trim()||'';
 }
 function publishedLegalBasis(value?:string){
  if(!value||/учебн|вымышлен|авторская|игровой|модель/iu.test(value))return '';
