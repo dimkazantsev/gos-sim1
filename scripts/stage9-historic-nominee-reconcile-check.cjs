@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
-const sql=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20261021154000_stage9_reconcile_confirmed_historical_minister_identities.sql'),'utf8');
+const sql=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20261021155754_stage9_reconcile_confirmed_historical_minister_identities.sql'),'utf8');
 
 const expected=[
  ['ministry_foreign','Иванов Иван Ивановича','Иванов Иван Иванович'],
