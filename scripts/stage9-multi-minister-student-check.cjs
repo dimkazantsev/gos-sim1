@@ -2,7 +2,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 
-const sql=fs.readFileSync('supabase/migrations/20261021170000_multi_ministry_student_only.sql','utf8');
+const sql=fs.readFileSync('supabase/migrations/20261021144730_stage9_registered_multi_ministry_heads.sql','utf8');
 const ui=fs.readFileSync('components/game/GovernmentFormationWorkspace.tsx','utf8');
 const staff=fs.readFileSync('components/game/InstitutionStaffingLab.tsx','utf8');
 const roleCount=(sql.match(/CREATE OR REPLACE FUNCTION public\./g)||[]).length;
@@ -19,8 +19,8 @@ assert((sql.match(/on conflict\(unit_id,user_id\) do update/g)||[]).length>=3,'M
 assert(ui.includes('readOnly={registeredOnly}'),'Require selection rather than manual text');
 assert(ui.includes('!selected[slot]||candidateName(slot).length<3'),'Stage 9 nomination cannot submit free-text name');
 assert(ui.includes('registeredOnly onSelect={handleNomineeSelect}'),'Stage 9 nominee selector is restricted');
-assert(staff.includes("!assignedTo(u.id).some(a=>a.user_id===s.user_id)"),'Staffing candidates checked per ministry rather than globally');
-assert(!staff.includes("!assignmentFor(s.user_id,'ministry')"),'Global ministry membership filter prohibited');
+assert(staff.includes("!assignmentFor(s.user_id,'ministry')"),'Existing one-ministry ordinary-staff rule stays in UI');
+assert(sql.includes('institution_assignments_one_staff_ministry_per_student'),'New partial index protects ordinary staff while permitting multiple heads');
 
 (async()=>{
 const db=new PGlite();
@@ -39,12 +39,16 @@ try{
  await db.query("INSERT INTO public.institution_assignments(game_id,unit_id,user_id,unit_kind,assignment_role) VALUES($1,$2,$3,'ministry','head')",[game,unitOne,student]);
  await assert.rejects(()=>db.query("INSERT INTO public.institution_assignments(game_id,unit_id,user_id,unit_kind,assignment_role) VALUES($1,$2,$3,'ministry','head')",[game,unitTwo,student]),/duplicate key/);
  await db.exec("DROP INDEX IF EXISTS public.government_nominations_one_ministry_candidate_idx; DROP INDEX IF EXISTS public.institution_assignments_single_ministry_per_student;");
+ await db.exec("CREATE UNIQUE INDEX institution_assignments_one_staff_ministry_per_student ON public.institution_assignments(game_id,user_id) WHERE unit_kind='ministry' AND assignment_role<>'head'");
  await db.query("INSERT INTO public.government_nominations(game_id,candidate_user_id,office_kind,status,office_key) VALUES($1,$2,'security_minister','consulted','ministry_internal')",[game,student]);
  await db.query("INSERT INTO public.institution_assignments(game_id,unit_id,user_id,unit_kind,assignment_role) VALUES($1,$2,$3,'ministry','head')",[game,unitTwo,student]);
  const pair=(await db.query("SELECT count(*)::int AS n FROM public.institution_assignments WHERE user_id=$1",[student])).rows[0].n;
  assert.equal(pair,2,'Independent minister head positions persisted');
  await db.query("INSERT INTO public.institution_assignments(game_id,unit_id,user_id,unit_kind,assignment_role) VALUES($1,$2,$3,'ministry','head') ON CONFLICT(unit_id,user_id) DO UPDATE SET assignment_role='head'",[game,unitOne,student]);
  assert.equal((await db.query("SELECT count(*)::int AS n FROM public.institution_assignments WHERE user_id=$1",[student])).rows[0].n,2,'Idempotence per ministry');
- console.log('PASS: repeated nominations for one student; separate ministry membership; per-unit duplicate protection; registered-only client and server guards; 6 affected RPCs');
+ const staffMember='20000000-0000-4000-8000-000000000002';
+ await db.query("INSERT INTO public.institution_assignments(game_id,unit_id,user_id,unit_kind,assignment_role) VALUES($1,$2,$3,'ministry','member')",[game,unitOne,staffMember]);
+ await assert.rejects(()=>db.query("INSERT INTO public.institution_assignments(game_id,unit_id,user_id,unit_kind,assignment_role) VALUES($1,$2,$3,'ministry','member')",[game,unitTwo,staffMember]),/duplicate key/,'One ordinary staff ministry per student');
+ console.log('PASS: repeated nominations for one student; separate minister heads; one ordinary staff ministry; per-unit duplicate protection; registered-only client and server guards; 6 affected RPCs');
 }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
