@@ -6,6 +6,9 @@ on:
       - 'app/stage-operations.css'
       - 'supabase/migrations/20261020094000_government_nomination_auto_duma_vote.sql'
       - 'scripts/government-nomination-auto-votes-check.cjs'
+      - 'supabase/migrations/20261021170000_multi_ministry_student_only.sql'
+      - 'components/game/InstitutionStaffingLab.tsx'
+      - 'scripts/stage9-multi-minister-student-check.cjs'
       - 'scripts/government-nomination-actions-responsive-browser-check.cjs'
       - 'components/game/GovernmentFormationWorkspace.tsx'
       - 'app/2026-stage-system.css'
@@ -18,6 +21,9 @@ on:
       - 'app/stage-operations.css'
       - 'supabase/migrations/20261020094000_government_nomination_auto_duma_vote.sql'
       - 'scripts/government-nomination-auto-votes-check.cjs'
+      - 'supabase/migrations/20261021170000_multi_ministry_student_only.sql'
+      - 'components/game/InstitutionStaffingLab.tsx'
+      - 'scripts/stage9-multi-minister-student-check.cjs'
       - 'scripts/government-nomination-actions-responsive-browser-check.cjs'
       - 'components/game/GovernmentFormationWorkspace.tsx'
       - 'app/2026-stage-system.css'
@@ -37,6 +43,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/government-nomination-auto-votes-check.cjs
+      - run: node scripts/stage9-multi-minister-student-check.cjs
       - run: node scripts/government-nomination-actions-responsive-browser-check.cjs
       - run: node scripts/government-structure-responsive-browser-check.cjs
       - run: node scripts/gd-session-attendance-check.cjs
