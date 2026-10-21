@@ -3,6 +3,11 @@ on:
   pull_request:
     paths:
       - 'components/game/EventChoicePanel.tsx'
+      - 'components/game/EventAutopilotPanel.tsx'
+      - 'supabase/migrations/*event_case_three_verified_real_incidents.sql'
+      - 'supabase/migrations/*event_three_best_options_federal_law_basis.sql'
+      - 'scripts/event-real-sources-quality-check.cjs'
+      - 'scripts/event-single-correct-explanation-check.cjs'
       - 'components/game/EventWorkspace.tsx'
       - 'supabase/migrations/20261021113000_hide_event_effect_plan_until_outcome.sql'
       - 'scripts/event-answer-api-privacy-check.cjs'
@@ -15,6 +20,11 @@ on:
     branches: [main]
     paths:
       - 'components/game/EventChoicePanel.tsx'
+      - 'components/game/EventAutopilotPanel.tsx'
+      - 'supabase/migrations/*event_case_three_verified_real_incidents.sql'
+      - 'supabase/migrations/*event_three_best_options_federal_law_basis.sql'
+      - 'scripts/event-real-sources-quality-check.cjs'
+      - 'scripts/event-single-correct-explanation-check.cjs'
       - 'components/game/EventWorkspace.tsx'
       - 'supabase/migrations/20261021113000_hide_event_effect_plan_until_outcome.sql'
       - 'scripts/event-answer-api-privacy-check.cjs'
@@ -36,6 +46,8 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - run: node scripts/event-real-sources-quality-check.cjs
+      - run: node scripts/event-single-correct-explanation-check.cjs
       - run: node scripts/event-invite-best-choice-check.cjs
       - run: node scripts/event-delegation-scoring-check.cjs
       - run: node scripts/event-option-legality-check.cjs

@@ -33,7 +33,7 @@ const props={
  canAnswer:false,onAnswer:()=>{},revealResults:true,
  shuffleSeed:'regression',correctIndex:0,showCorrectExplanation:true,
  bestDescription:'Объяснение только правильного решения.',
- bestLegalBasis:'Проверенное правовое основание правильного решения.'
+ bestLegalBasis:'Федеральный закон № 323-ФЗ, статья 10.'
 };
 function markup(p){return renderToStaticMarkup(React.createElement(Panel,p))}
 const html=markup(props);
@@ -42,7 +42,7 @@ assert(html.includes('Неверный вариант A')&&html.includes('Нев
  'Original selectable answers remain visible without explanations');
 assert(html.includes('Объяснение только правильного решения.'),
  'The correct choice keeps its explanation');
-assert(html.includes('Проверенное правовое основание правильного решения.'),
+assert(html.includes('Федеральный закон № 323-ФЗ, статья 10.'),
  'The correct choice keeps its legal basis');
 assert.equal(html.match(/eventAnswerInlineFeedback/g)?.length||0,1,
  'Exactly one explanation, next to the best option');
@@ -53,7 +53,10 @@ assert(!html.includes('Как следовало действовать')&&!html
 const hidden=markup({...props,correctIndex:null,showCorrectExplanation:false,revealResults:false});
 assert(!hidden.includes('Объяснение только правильного решения.')&&!hidden.includes('Проверенное правовое основание'),
  'Do not reveal correct answers or their explanation before the outcome');
-const deduplicated=markup({...props,bestDescription:'Объяснение только правильного решения. Проверенное правовое основание правильного решения.'});
-assert.equal(deduplicated.match(/Проверенное правовое основание правильного решения/g)?.length||0,1,
+const educational=markup({...props,bestLegalBasis:'Авторская учебная модель: полномочия заданы досье.'});
+assert(!educational.includes('Авторская учебная модель')&&!educational.includes('Правовое основание:'),
+ 'Invented or educational descriptions must never be shown as legal citations');
+const deduplicated=markup({...props,bestDescription:'Объяснение только правильного решения. Федеральный закон № 323-ФЗ, статья 10.'});
+assert.equal(deduplicated.match(/Федеральный закон № 323-ФЗ, статья 10\./g)?.length||0,1,
  'Repeated legal basis must not be printed twice');
 console.log('PASS: canonical answer and explanation visible only after resolution; no other-choice feedback, duplicate heading, RPC or premature disclosure.');

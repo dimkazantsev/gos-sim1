@@ -8,7 +8,7 @@ import type {EventComicScene} from './types';
 import StyledSelect from '../ui/StyledSelect';
 import type {ReturnTypeRepublic} from './viewTypes';
 type Settings={enabled:boolean;interval_hours:number;activity_weight:number;max_daily:number;trust_per_20:number;backlog_penalty:number;last_run_at:string|null};
-type BankCase={comic_scene?:EventComicScene|null;id:string;case_key:string;title:string;situation:string;category:string;seriousness:string;allowed_roles:string[];audience:'single'|'all'|'group';status:string;source_note:string|null};
+type BankCase={comic_scene?:EventComicScene|null;id:string;case_key:string;title:string;situation:string;category:string;seriousness:string;allowed_roles:string[];audience:'single'|'all'|'group';status:string;source_note:string|null;source_url:string|null};
 const DEFAULT:Settings={enabled:false,interval_hours:12,activity_weight:1,max_daily:2,trust_per_20:2,backlog_penalty:1,last_run_at:null};
 export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMode='settings',readOnly=false}:{g:ReturnTypeRepublic;onChanged:()=>Promise<void>;readyCaseCount:number|null;panelMode?:'settings'|'bank';readOnly?:boolean}){
  const {game,members,teacher}=g;
@@ -42,7 +42,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
   if(!game||loadingBank)return;
   setLoadingBank(true);
   const [b,c0,d,decision,invites,discussion,authority,budget]=await Promise.all([
-   supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,audience,status,source_note,comic_scene').eq('game_id',game.id).eq('status','ready').order('category').order('title'),
+   supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,audience,status,source_note,source_url,comic_scene').eq('game_id',game.id).eq('status','ready').order('category').order('title'),
    supabase.from('event_assignments').select('case_id,recipient_id').eq('game_id',game.id),
    supabase.from('event_case_outcomes').select('case_id').eq('game_id',game.id),
    supabase.from('event_decisions').select('case_id').eq('game_id',game.id),
@@ -169,7 +169,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
      <button type="button" className="eventBankDeleteButton" disabled={busy||readOnly||!selectedForDelete.length} onClick={()=>void removeSelected()}><Trash2 size={16}/>Удалить выбранные</button>
     </div>
     {loadingBank?<p role="status">Загрузка банка ситуаций…</p>:<div className="eventBankWorkspace"><div className="eventBankTiles" role="group" aria-label="Выбор ситуации">{visible.slice(0,shown).map(c=><div key={c.id} className="eventBankSelectableTile"><label className="eventBankSelection"><input type="checkbox" aria-label={'Выделить для удаления: '+c.title} checked={selectedForDelete.includes(c.id)} disabled={busy||readOnly||protectedIds.includes(c.id)} onChange={e=>setSelectedForDelete(old=>e.target.checked?[...old,c.id]:old.filter(id=>id!==c.id))}/>{protectedIds.includes(c.id)?'Назначено / используется':'Выделить'}</label><EventCaseTile item={c} selected={chosen===c.id} summary meta={c.category+' · '+(c.seriousness==='light'?'Повседневное':'Серьёзное')} onClick={()=>{setChosen(c.id);setRecipient('');setGroupRecipients([])}}/></div>)}{!visible.length&&<p className="eventGridEmpty">Ситуации по вашему запросу не найдены.</p>}{visible.length>shown&&<button type="button" className="eventBankShowMore" onClick={()=>setShown(n=>n+30)}>Показать ещё 30 · {visible.length-shown} осталось</button>}</div>
-     <article className="eventBankDetail">{selected?<><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}{selected.audience==='all'?' · Вся аудитория':''}</small><h4>{selected.title}</h4><p>{selected.situation}</p><em>{selected.source_note||'Авторский учебный кейс'}</em>
+     <article className="eventBankDetail">{selected?<><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}{selected.audience==='all'?' · Вся аудитория':''}</small><h4>{selected.title}</h4><p>{selected.situation}</p><small>{selected.source_url?<a href={selected.source_url} target="_blank" rel="noopener noreferrer">Официальный источник события ↗</a>:'Документальный источник события не подтверждён'}</small>
        {selected.audience==='all'?<div className="autoEventCaseAssign">
         <p>Ситуация для всей аудитории. При назначении каждый участник получает личное задание, а результаты объединяются в статистике.</p>
         <button type="button" disabled={busy||!students.length||students.every(m=>assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id))}

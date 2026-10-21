@@ -17,7 +17,7 @@ export const STAGE_FORMS:Record<number,Task>={
  7:{title:'Назначение и итоги выборов',help:'Используйте систему выборов, утверждённую на этапе 6. Проведите кампанию и голосование, зафиксируйте численные результаты. Полномочия избранного лица назначаются по результатам процедуры.',templates:['sf_resolution','minutes'],target:'votes'},
  8:{title:'Руководство и структура Правительства',help:'Кандидатуры Председателя Правительства и главы Банка России, а также структура кабинета оформляются в рабочей вкладке этапа 8. Назначения министров относятся к этапу 9.',templates:['president_decree','gd_resolution'],target:'votes'},
  9:{title:'Назначения министров и состав ведомств',help:'В рабочей вкладке внесите кандидатуры министров и проведите согласования. Постановления ГД и указы о назначении сохраняются автоматически; приказы оформляют работу команд. Комитеты находятся на этапе 4.',templates:['president_decree','gd_resolution','ministry_order'],target:'votes'},
- 10:{title:'Проект государственной программы',help:'Заполните паспорт, показатели, мероприятия и финансовое обеспечение в форме программы. Создайте её текст в правовом портале и ФЭО. Черновик отобразится здесь сразу после регистрации.',templates:['state_program','financial_economic'],target:'budget'},
+ 10:{title:'Проект государственной программы',help:'Заполните паспорт, показатели, мероприятия и финансовое обеспечение в форме программы. Создайте программу в разделе «Работа». Паспорт и финансирование связаны с Реестром НПА; отдельное ФЭО не требуется.',templates:[]},
  11:{title:'Рассмотрение государственной программы',help:'Откройте заседание Правительства в форме ниже. Приложите программу к повестке, проверьте кворум, проведите рассмотрение и оформите постановление с утверждённым текстом.',templates:['government_resolution','minutes'],target:'votes'},
  12:{title:'Пакет законодательной инициативы',help:'Создайте проект закона, пояснительную записку и перечень затрагиваемых актов. Добавьте ФЭО и заключение Правительства, если они нужны. Досье и чтения доступны внутри документа.',templates:['fz_bill','explanatory_note','affected_acts','financial_economic','government_opinion'],target:'votes'},
  13:{title:'Проект федерального бюджета',help:'Откройте бюджетный калькулятор: проверьте семь групп доходов, распределите расходы по 14 разделам и покройте дефицит. Рассмотрите запросы регионов, сохраните общий расчет и создайте из него проект с числовыми приложениями. Пройдите чтения, Совет Федерации и подпись Президента в правовом портале.',templates:['financial_economic'],target:'budget'},
@@ -25,7 +25,7 @@ export const STAGE_FORMS:Record<number,Task>={
  15:{title:'Правовое реагирование на кризис',help:'Изучите кризис, определите компетентный орган и подготовьте обоснованный ответ. После проверки ответа преподавателем проект правового акта автоматически появится в материалах этапа и в Реестре НПА. Представитель компетентного органа должен оформить и опубликовать его самостоятельно: проверка ответа не равна подписанию акта.',templates:['president_decree','government_resolution','ministry_order','municipal_act'],target:'events'},
  16:{title:'Итоговый разбор',help:'Заполните аналитический разбор в форме этапа ниже. Сопоставьте документы, голоса, бюджет и последствия; отделите свои предположения от подтверждённых результатов.',templates:[],target:'grades'}
 };
-export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreateDocument,onNavigate,onOpenVotes,finalDocuments=[],formalSubjects=[],onRefreshFinalDocuments}:{g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:View)=>void;onOpenVotes:(id?:string)=>void;finalDocuments?:StageFinalDocument[];formalSubjects?:string[];onRefreshFinalDocuments?:()=>void}){
+export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreateDocument,onNavigate,onOpenVotes,onOpenWork,finalDocuments=[],formalSubjects=[],onRefreshFinalDocuments}:{g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:View)=>void;onOpenVotes:(id?:string)=>void;onOpenWork?:()=>void;finalDocuments?:StageFinalDocument[];formalSubjects?:string[];onRefreshFinalDocuments?:()=>void}){
  const [form,setForm]=useState(''),[saved,setSaved]=useState('');
  const task=STAGE_FORMS[stage.stage_no];if(!task)return null;
  const docs=g.formalDocuments.filter(d=>d.stage_no===stage.stage_no),votes=g.votes.filter(v=>v.stage_no===stage.stage_no);
@@ -51,6 +51,15 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
   ...p,
   documents:g.partyDocuments.filter(d=>d.party_id===p.id)
  })):[];
+ if(stage.stage_no===10){
+  const programDocs=docs.filter(d=>d.doc_type==='state_program');
+  return <section className="stageArtifacts surface" aria-label="Государственные программы Этапа 10">
+   <div className="stageArtifactActions">
+    {onOpenWork&&<button type="button" onClick={onOpenWork}><FileText size={18}/><span>Государственные программы · Работа</span><ArrowUpRight size={16}/></button>}
+    {programDocs.map(d=><button key={d.id} type="button" disabled={!onOpenDocument} onClick={()=>onOpenDocument?.(d.id)}><FileText size={18}/><span>{d.title}</span><ArrowUpRight size={16}/></button>)}
+   </div>
+  </section>;
+ }
  return <section className="stageArtifacts surface"><header><div><small>Материалы этапа {stage.stage_no}</small><h3>{task.title}</h3></div>{completed&&<span><CheckCircle2 size={18}/> Завершён</span>}</header><p>{task.help}</p>
  {stage.stage_no===1&&<section className="stageProfileSync">
   <div className="stageProfileSyncHead"><div><Link2 size={18}/><span><small>Данные партий обновляются автоматически</small><b>Регистрационные пакеты</b></span></div>{onNavigate&&<button type="button" onClick={()=>onNavigate('parties')}>Открыть партии <ArrowUpRight size={15}/></button>}</div>
