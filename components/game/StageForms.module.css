@@ -127,3 +127,63 @@
  .programWorkspace :global([data-stage-module-head]) dl>div{padding:11px 12px}
  .programWorkspace .panel{padding:13px}
 }
+
+
+/* Этапы 10–11: те же типографика и дизайн-токены, что в разделах «Работа» и «Документы».
+   Цели редактируются только в рамках послания, без общих глобальных переопределений. */
+.programWorkspace,.programWorkspace button,.programWorkspace input,.programWorkspace textarea{
+ font-family:inherit;font-variant-numeric:inherit;
+}
+.programWorkspace .programGoalChoices{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+ margin:12px 0 0;min-width:0;
+}
+.programWorkspace .programGoalChoice{
+ display:flex;align-items:flex-start;gap:10px;min-width:0;
+ padding:13px 14px;border:1px solid var(--line,#dce4ef);border-radius:13px;
+ background:var(--surface-2,#f8fafc);font-size:13px;font-weight:650;line-height:1.5;
+ color:var(--text,#10213c);cursor:pointer;overflow-wrap:anywhere;
+}
+.programWorkspace .programGoalChoice:has(input:checked){
+ border-color:var(--blue,#315efb);background:var(--blue-soft,#edf2ff);
+}
+.programWorkspace .programGoalChoice input{
+ margin:2px 0 0;min-width:18px;width:18px;height:18px;accent-color:var(--blue,#315efb);
+ flex:none;cursor:pointer;
+}
+.programWorkspace .programGoalChoice input:disabled{cursor:not-allowed}
+.programWorkspace .programGoalChoice span{min-width:0}
+.programWorkspace .programGoalChoices .actions{
+ grid-column:1/-1;display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:5px;
+}
+.programWorkspace .approvedGoalList{
+ display:grid;gap:8px;margin:14px 0 0;padding:0 0 0 22px;color:var(--text,#10213c);
+}
+.programWorkspace .approvedGoalList li{
+ padding:8px 10px;border-bottom:1px solid var(--line,#dce4ef);
+ font-size:13px;line-height:1.55;
+}
+.programWorkspace .notice{overflow-wrap:anywhere}
+@media(max-width:700px){
+ .programWorkspace .programGoalChoices{grid-template-columns:minmax(0,1fr);gap:8px}
+ .programWorkspace .programGoalChoice{padding:12px}
+ .programWorkspace .programGoalChoices .actions{align-items:stretch}
+ .programWorkspace .programGoalChoices .actions button{flex:1 1 100%;max-width:100%}
+}
+
+
+/* Единая белая документная поверхность ГОС.ID для вкладок «Работа» и «Документы».
+   Вместо отдельной тёмной шапки государственных программ используем общий набор цветов. */
+.programWorkspace :global([data-stage-module-head]){
+ background:var(--surface,#fff);color:var(--text,#10213c);
+ border:1px solid var(--line,#dce4ef);box-shadow:var(--shadow,0 10px 32px rgba(13,31,58,.07));
+}
+.programWorkspace :global([data-stage-module-head]) h2{color:var(--text,#10213c)}
+.programWorkspace :global([data-stage-module-head]) p{color:var(--body,#354a67)}
+.programWorkspace :global([data-stage-module-head]) :global([class*="eyebrow"]){color:var(--blue,#315efb)}
+.programWorkspace :global([data-stage-module-head]) dl>div{
+ background:var(--surface-2,#f8fafc);border:1px solid var(--line,#dce4ef);
+}
+.programWorkspace :global([data-stage-module-head]) dt,
+.programWorkspace :global([data-stage-module-head]) dl span{color:var(--body,#354a67)}
+.programWorkspace :global([data-stage-module-head]) dd{color:var(--blue,#315efb)}
