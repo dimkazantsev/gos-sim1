@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION public.appoint_government_nominee(p_nomination_id uui
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public', 'private', 'pg_temp'
-AS $function$;
+AS $function$
 declare
  n public.government_nominations%rowtype;
  v_uid uuid:=(select auth.uid());
@@ -52,7 +52,7 @@ CREATE OR REPLACE FUNCTION public.appoint_government_nominee_after_three_rejecti
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public', 'private', 'pg_temp'
-AS $function$;
+AS $function$
 declare
  n public.government_nominations%rowtype;
  v_uid uuid:=(select auth.uid());
