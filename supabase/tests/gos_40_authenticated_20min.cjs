@@ -62,6 +62,10 @@ async function main(){
  const same=await Promise.all(Array.from({length:5},()=>first.client.rpc('blitz_open',{p_game:gameId})));
  same.forEach(x=>{if(x.error)throw x.error});
  assert.equal(new Set(same.map(x=>x.data.id)).size,1,'Concurrent opens returned different assignments');
+ // Complete the existing extra attempt now. Otherwise its 20-second timer would
+ // expire before the deliberate second wave 12 minutes later.
+ const consumed=await first.client.rpc('blitz_answer',{p_id:same[0].data.id,p_choice:0});
+ if(consumed.error||consumed.data?.is_correct!==true)throw new Error('Fixture preflight attempt not completed');
 
 
  // Sustained, wall-clock 20-minute authenticated run against disposable local Supabase.
