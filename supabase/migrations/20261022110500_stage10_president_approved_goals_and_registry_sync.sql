@@ -38,6 +38,40 @@ END $fn$;
 REVOKE ALL ON FUNCTION public.set_presidential_address_goals(uuid,text[]) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.set_presidential_address_goals(uuid,text[]) TO authenticated;
 
+-- Синхронизация опубликованного послания со вкладкой «Документы» без повторных публикаций.
+CREATE UNIQUE INDEX IF NOT EXISTS formal_presidential_address_source_uq
+ON public.formal_documents(game_id,(metadata->>'presidential_address_id'))
+WHERE metadata ? 'presidential_address_id' AND stage_no=10;
+
+CREATE OR REPLACE FUNCTION private.sync_presidential_address_registry(p_address_id uuid,p_actor uuid)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path TO public,private,pg_temp AS $fn$
+DECLARE a public.presidential_addresses%ROWTYPE;v_steps jsonb;v_list text;v_doc_id uuid;
+BEGIN
+ SELECT * INTO a FROM public.presidential_addresses WHERE id=p_address_id;
+ IF a.id IS NULL OR a.status<>'published' THEN RAISE EXCEPTION 'Для реестра требуется опубликованное послание';END IF;
+ IF EXISTS(SELECT 1 FROM public.formal_documents WHERE game_id=a.game_id AND stage_no=10
+  AND metadata->>'presidential_address_id'=a.id::text) THEN RETURN;END IF;
+ SELECT string_agg(priority_no::text||'. '||national_goal,E'\n' ORDER BY priority_no)
+ INTO v_list FROM public.presidential_priorities WHERE address_id=a.id;
+ v_steps:=private.formal_workflow('generic');
+ v_doc_id:=gen_random_uuid();
+ INSERT INTO public.formal_documents(
+  id,game_id,stage_no,registry_no,title,doc_type,subject_key,subject_label,author_id,body_text,
+  workflow_key,workflow_steps,current_step,status_code,status_label,current_owner_key,metadata
+ ) VALUES(
+  v_doc_id,a.game_id,10,'ГОС.ID-НПА-'||lpad(nextval('public.formal_registry_seq')::text,4,'0'),
+  a.title,'other','president','Президент Российской Федерации',p_actor,
+  a.body_text||E'\n\nУтверждённые национальные цели:\n'||coalesce(v_list,''),
+  'generic',v_steps,jsonb_array_length(v_steps)-1,'published','Опубликовано','system',
+  jsonb_build_object('document_kind','presidential_address','presidential_address_id',a.id,
+    'auto_synced',true,'approved_goals',coalesce(v_list,''))
+ );
+ INSERT INTO public.formal_document_history(document_id,game_id,actor_id,action,from_status,to_status,note)
+ VALUES(v_doc_id,a.game_id,p_actor,'Зарегистрировано послание Президента','draft','published',
+  'Послание и 5–6 целей опубликованы Президентом; источник — раздел «Работа».');
+END $fn$;
+REVOKE ALL ON FUNCTION private.sync_presidential_address_registry(uuid,uuid) FROM PUBLIC,anon,authenticated;
+
 CREATE OR REPLACE FUNCTION public.publish_presidential_address(p_address_id uuid)
 RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path TO public,private,pg_temp AS $fn$
 DECLARE a public.presidential_addresses%ROWTYPE;v_uid uuid:=auth.uid();v_count integer;
@@ -54,6 +88,8 @@ BEGIN
  UPDATE public.presidential_addresses SET status='published',published_at=now(),updated_at=now() WHERE id=a.id;
  INSERT INTO public.game_events(game_id,round_no,category,severity,title,body,created_by)
  VALUES(a.game_id,10,'Послание Президента','notice','Опубликовано послание Президента Федеральному Собранию',a.title,v_uid);
+ -- Послание и официальный список целей доступны в том же Реестре НПА.
+ PERFORM private.sync_presidential_address_registry(a.id,v_uid);
 END $fn$;
 REVOKE ALL ON FUNCTION public.publish_presidential_address(uuid) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.publish_presidential_address(uuid) TO authenticated;
