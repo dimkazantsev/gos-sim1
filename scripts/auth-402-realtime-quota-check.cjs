@@ -62,6 +62,18 @@ assert(cleanupSql.includes('cron.alter_job'),'Production migration only updates 
 assert(!cleanupSql.includes('cron.unschedule'),'Scheduled cleanup cannot be disabled');
 
 const sectionSource=fs.readFileSync('components/game/useSectionUpdates.ts','utf8');
+const gameTableSync=fs.readFileSync('components/game/useGameTableSync.ts','utf8');
+const gameShell=fs.readFileSync('components/GameClient.tsx','utf8');
+assert(gameTableSync.includes("export const SECTION_UPDATES_REFRESH_EVENT='gos-sims:section-updates'"),
+ 'A separate section invalidation must not refetch unrelated stage widgets');
+assert(sectionSource.includes('window.addEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated)'),
+ 'Section count hook consumes the targeted event');
+assert(sectionSource.includes('window.removeEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated)'),
+ 'Section count hook releases the event listener on unmount');
+assert(gameShell.includes('notifySectionUpdates(game.id)'),
+ 'Event assignment/invitation changes invalidate the section counter');
+assert(source.includes('if(partyDocs)notifySectionUpdates(gameId)'),
+ 'Party document changes invalidate teacher section counters');
 assert(sectionSource.includes('gameRealtimeConnected(gameId)'),
  'Section badges must reuse shared WebSocket health instead of always polling');
 assert(sectionSource.includes("window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidated)"),
