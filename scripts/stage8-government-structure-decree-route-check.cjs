@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const sql=fs.readFileSync('supabase/migrations/20261021123500_stage8_government_structure_presidential_act_route.sql','utf8');
+const sql=fs.readFileSync('supabase/migrations/20261021123915_stage8_government_structure_presidential_act_route.sql','utf8');
 const ui=fs.readFileSync('components/game/GovernmentFormationWorkspace.tsx','utf8');
 assert(sql.includes('CREATE OR REPLACE FUNCTION public.review_government_structure'));
 assert(sql.includes("v_body,'president_act',2,"),'Correct presidential document route');
