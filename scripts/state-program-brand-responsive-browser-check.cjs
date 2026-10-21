@@ -27,7 +27,7 @@ const html=`<!doctype html><html lang="ru"><head><meta name="viewport" content="
 <label class="field">Видео или ссылка<input aria-label="Видео или ссылка" value=""></label>
 <label class="field wide">Текст послания<textarea aria-label="Текст послания" rows="4"></textarea></label>
 <div class="addressActions wide"><span class="addressHint">Введите текст послания</span><button class="primary" type="button">Сохранить послание</button></div></div>
-<section class="section"><div class="sectionHead"><h3>Национальные цели Послания Президента</h3></div>
+<section class="section"><div class="sectionHead"><div><h3>Национальные цели Послания Президента</h3><p>Президент самостоятельно формулирует пять или шесть целей.</p><span class="goalProgress">Заполнено: 6 из 6</span></div></div>
 <div class="programGoalChoices">
 ${Array.from({length:5},(_,i)=>'<label class="programGoalChoice"><span class="goalOrdinal">'+(i+1)+'.</span><span class="goalInputGroup">Цель '+(i+1)+'<textarea rows="2" placeholder="Сформулируйте собственную цель Президента"></textarea></span></label>').join('')}
 <div class="programGoalControls"><button type="button">Добавить шестую цель</button></div>
@@ -57,14 +57,17 @@ ${Array.from({length:5},(_,i)=>'<label class="programGoalChoice"><span class="go
       main:box('.programWorkspace'),title:box('.programWorkspace h2'),
       stats:box('[data-stage-module-head] dl'),address:box('.addressPanel'),
       body:box('.addressForm textarea'),save:box('.addressActions button'),
+      progress:box('.goalProgress'),progressBorder:getComputedStyle(document.querySelector('.goalProgress')).borderTopWidth,
       picker:box('.programPicker'),newButton:box('.programNew'),
       editor:box('.programEditorPanel'),minister:box('.styledSelectTrigger'),goal:box('.programGoalChoice textarea'),goalAction:box('.programGoalControls button'),
       bg:getComputedStyle(document.querySelector('[data-stage-module-head]')).backgroundImage};
    });
    assert(m.scroll<=width+2,'Horizontal page overflow at '+width+': '+m.scroll);
-   for(const key of ['header','title','stats','address','body','save','picker','newButton','editor','minister','goal','goalAction']){
+   for(const key of ['header','title','stats','address','body','save','progress','picker','newButton','editor','minister','goal','goalAction']){
     assert(m[key].left>=-1 && m[key].right<=width+1,key+' exits viewport '+width);
    }
+   assert(m.progressBorder==='0px','Goal progress must not render as a badge/strip at '+width);
+   assert(m.progress.top>=m.save.bottom-1,'Goal progress overlaps address actions at '+width);
    assert(m.goal.top>=m.save.bottom-1,'Goal form overlaps address save action at '+width);
    assert(m.save.top>=m.body.bottom-1,'Save overlaps address content at '+width);
    assert(m.save.height>=42&&m.newButton.height>=42&&m.minister.height>=42&&m.goalAction.height>=42,'Touch target is too small at '+width);
