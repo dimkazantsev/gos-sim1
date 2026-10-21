@@ -69,7 +69,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   const invitedRows=(e.data||[]) as EventInvitation[];
   const caseIds=[...new Set([...assignedRows.map(a=>a.case_id),...invitedRows.map(v=>v.case_id)])];
   if(caseIds.length){
-   const result=await supabase.from('event_cases').select('*').eq('game_id',game.id).in('id',caseIds);
+   const result=await supabase.rpc('list_visible_event_cases',{p_game_id:game.id,p_case_ids:caseIds});
    if(result.error){setNotice(userError(result.error));return}
    setCases((result.data||[]) as CaseRow[]);
    const routing=await supabase.from('event_case_routing').select('case_id,region_code').eq('game_id',game.id).in('case_id',caseIds).not('region_code','is',null);

@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - 'components/game/EventChoicePanel.tsx'
+      - 'components/game/EventWorkspace.tsx'
+      - 'supabase/migrations/20261021113000_hide_event_effect_plan_until_outcome.sql'
+      - 'scripts/event-answer-api-privacy-check.cjs'
       - 'components/game/EventCollaboration.tsx'
       - 'app/2026-collaboration.css'
       - 'scripts/event-invite-best-choice-check.cjs'
@@ -12,6 +15,9 @@ on:
     branches: [main]
     paths:
       - 'components/game/EventChoicePanel.tsx'
+      - 'components/game/EventWorkspace.tsx'
+      - 'supabase/migrations/20261021113000_hide_event_effect_plan_until_outcome.sql'
+      - 'scripts/event-answer-api-privacy-check.cjs'
       - 'components/game/EventCollaboration.tsx'
       - 'app/2026-collaboration.css'
       - 'scripts/event-invite-best-choice-check.cjs'
@@ -33,4 +39,5 @@ jobs:
       - run: node scripts/event-invite-best-choice-check.cjs
       - run: node scripts/event-delegation-scoring-check.cjs
       - run: node scripts/event-option-legality-check.cjs
+      - run: node scripts/event-answer-api-privacy-check.cjs
       - run: npm run typecheck
