@@ -16,7 +16,7 @@ import EventChoicePanel from './EventChoicePanel';
 import EventCaseTile from './EventCaseTile';
 import EventCaseModal from './EventCaseModal';
 import type {EventComicScene} from './types';
-type CaseRow={id:string;game_id:string;case_key:string;title:string;situation:string;category:string;seriousness:'serious'|'light';audience:'single'|'group'|'all';allowed_roles:string[];status:string;source_url:string|null;decision_options?:string[];effect_plan?:{best_option_key?:string;options?:{key:string;trust:number;description?:string}[]};comic_scene?:EventComicScene};
+type CaseRow={id:string;game_id:string;case_key:string;title:string;situation:string;category:string;seriousness:'serious'|'light';audience:'single'|'group'|'all';allowed_roles:string[];status:string;source_url:string|null;decision_options?:string[];effect_plan?:{best_option_key?:string;options?:{key:string;trust:number;description?:string;legal_basis?:string}[]};comic_scene?:EventComicScene};
 type Assignment={id:string;case_id:string;game_id:string;recipient_id:string;status:string;created_at:string};
 type Decision={id:string;case_id:string;actor_id:string;choice:string;role_snapshot?:string};
 type Authority={decision_id:string;case_id:string;actor_id:string;authority_ok:boolean;lawful:boolean;strategy_point:boolean;role_snapshot:string;legal_basis:string};
@@ -243,6 +243,8 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     const pct=(n:number,d:number)=>d?Math.round(n*100/d):0;
     const winnerIndex=outcome?.winner==='accept'?0:outcome?.winner==='reject'?1:Number(outcome?.winner.replace('option_',''))-1;
     const chosenEffect=outcome&&winnerIndex>=0?c.effect_plan?.options?.[winnerIndex]:null;
+    const bestIndex=outcome&&c.effect_plan?.best_option_key?Number(c.effect_plan.best_option_key.replace('option_',''))-1:null;
+    const bestOption=bestIndex!==null&&Number.isInteger(bestIndex)&&bestIndex>=0?c.effect_plan?.options?.[bestIndex]:undefined;
     const kind=outcome?.resolution_kind||(outcome?(Number(chosenEffect?.trust)>0?'beneficial':Number(chosenEffect?.trust)<0?'harmful':'neutral'):'pending');
     const expandedCase=true;
     const invites=invitations.filter(i=>i.case_id===c.id);
@@ -255,7 +257,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
       <div className="eventStoryRecipients">{assigned.map(a=><span key={a.id}>{members.find(m=>m.user_id===a.recipient_id)?.full_name||'Участник'} · {members.find(m=>m.user_id===a.recipient_id)?.role_title||'Без должности'}</span>)}</div>
       <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили · {pct(responded.length,assigned.length)}%</span>
       </div>
-      <EventChoicePanel labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,choice)}} revealResults={teacher||!!outcome||!!mineAnswer} caseId={c.id} showLegalFeedback={!!mineAnswer&&!!outcome&&me.kind==='student'} correctIndex={outcome&&c.effect_plan?.best_option_key?Number(c.effect_plan.best_option_key.replace('option_',''))-1:null} bestDescription={outcome&&c.effect_plan?.best_option_key?c.effect_plan.options?.[Number(c.effect_plan.best_option_key.replace('option_',''))-1]?.description:undefined} shuffleSeed={c.id+':'+me.user_id} notice={pendingInvites?'Ожидаем ответа на приглашения.':undefined}/>
+      <EventChoicePanel labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,choice)}} revealResults={teacher||!!outcome||!!mineAnswer} showCorrectExplanation={!!mineAnswer&&!!outcome&&me.kind==='student'} correctIndex={bestIndex} bestDescription={bestOption?.description} bestLegalBasis={bestOption?.legal_basis} shuffleSeed={c.id+':'+me.user_id} notice={pendingInvites?'Ожидаем ответа на приглашения.':undefined}/>
 
       {mineAnswer&&!teacher&&<div className="eventOutcomeNote">Ваш голос: {labels[mineAnswer.choice==='accept'?0:mineAnswer.choice==='reject'?1:Math.max(0,Number(mineAnswer.choice.replace('option_',''))-1)]||'Учтён'}</div>}
       {outcome&&<div className="eventOutcomeNote final"><strong>Итог голосования: {outcome.winner==='tie'?'Большинство участников не поддержало единый вариант — решение не принято':labels[winnerIndex]}</strong>
