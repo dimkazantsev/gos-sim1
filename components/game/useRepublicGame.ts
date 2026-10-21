@@ -220,7 +220,7 @@ export function useRepublicGame(gameId:string){
  useEffect(()=>{
   alive.current=true;
   clearGameData();setLoading(true);setRealtimeState('disconnected');
-  let disposed=false,authReloadTimer:ReturnType<typeof setTimeout>|undefined;
+  let disposed=false,authReloadTimer:ReturnType<typeof setTimeout>|undefined,lastRecoveryAt=0;
   const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
    if(disposed)return;
    const nextUser=session?.user.id||null;
@@ -236,7 +236,15 @@ export function useRepublicGame(gameId:string){
   });
   setProfileGameId('');
   void loadAll();
-  const recover=()=>{if(authUser.current&&acceptedMember.current){void hydrateActiveView();notifyGameDataRefresh(gameId);if(activeViewRef.current==='budget')void refreshBudgetPulse()}};
+  const recover=()=>{
+    if(disposed||document.visibilityState==='hidden'||!authUser.current||!acceptedMember.current)return;
+    // Focus + visibilitychange arrive together on some browsers. One recovery
+    // suffices; explicit mutations and subscribed Realtime events bypass this guard.
+    const now=Date.now();if(now-lastRecoveryAt<1500)return;
+    lastRecoveryAt=now;
+    void hydrateActiveView();notifyGameDataRefresh(gameId);
+    if(activeViewRef.current==='budget')void refreshBudgetPulse();
+   };
   const visible=()=>{if(document.visibilityState==='visible')recover()};
   window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
   return()=>{disposed=true;alive.current=false;readEpoch.current++;subscription.unsubscribe();clearTimeout(authReloadTimer);window.removeEventListener('focus',recover);window.removeEventListener('online',recover);document.removeEventListener('visibilitychange',visible);if(realtimeReloadTimer.current){clearTimeout(realtimeReloadTimer.current);realtimeReloadTimer.current=null}realtimeReloadVersion.current++;realtimeReloadRunning.current=false;realtimeReloadQueued.current=false;};
