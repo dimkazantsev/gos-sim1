@@ -26,7 +26,13 @@ const html=`<!doctype html><html lang="ru"><head><meta name="viewport" content="
 <label class="field">Название послания<input aria-label="Название послания" value="Послание Президента Российской Федерации"></label>
 <label class="field">Видео или ссылка<input aria-label="Видео или ссылка" value=""></label>
 <label class="field wide">Текст послания<textarea aria-label="Текст послания" rows="4"></textarea></label>
-<div class="addressActions wide"><button class="primary" type="button">Сохранить послание</button></div></div></section>
+<div class="addressActions wide"><span class="addressHint">Введите текст послания</span><button class="primary" type="button">Сохранить послание</button></div></div>
+<section class="section"><div class="sectionHead"><h3>Национальные цели Послания Президента</h3></div>
+<div class="programGoalChoices">
+${Array.from({length:5},(_,i)=>'<label class="programGoalChoice"><span class="goalOrdinal">'+(i+1)+'.</span><span class="goalInputGroup">Цель '+(i+1)+'<textarea rows="2" placeholder="Сформулируйте собственную цель Президента"></textarea></span></label>').join('')}
+<div class="programGoalControls"><button type="button">Добавить шестую цель</button></div>
+<div class="actions"><button type="button">Сохранить выбранные цели</button><button type="button" class="primary">Утвердить цели и опубликовать послание</button></div>
+</div></section></section>
 <div class="programPicker"><div class="programTabs"><button type="button" aria-pressed="true"><b>Государственная программа</b><span>Черновик</span></button></div><button class="programNew" type="button">Новая программа</button></div>
 <section class="panel programEditorPanel"><div class="sectionHead programIntro"><div><h3>Новая государственная программа</h3><p>Паспорт, цели, мероприятия и расходы заполняются вместе. Суммы указаны в рублях.</p></div></div>
 <fieldset class="form"><legend>Паспорт программы</legend><div class="grid">
@@ -52,15 +58,16 @@ const html=`<!doctype html><html lang="ru"><head><meta name="viewport" content="
       stats:box('[data-stage-module-head] dl'),address:box('.addressPanel'),
       body:box('.addressForm textarea'),save:box('.addressActions button'),
       picker:box('.programPicker'),newButton:box('.programNew'),
-      editor:box('.programEditorPanel'),minister:box('.styledSelectTrigger'),
+      editor:box('.programEditorPanel'),minister:box('.styledSelectTrigger'),goal:box('.programGoalChoice textarea'),goalAction:box('.programGoalControls button'),
       bg:getComputedStyle(document.querySelector('[data-stage-module-head]')).backgroundImage};
    });
    assert(m.scroll<=width+2,'Horizontal page overflow at '+width+': '+m.scroll);
-   for(const key of ['header','title','stats','address','body','save','picker','newButton','editor','minister']){
+   for(const key of ['header','title','stats','address','body','save','picker','newButton','editor','minister','goal','goalAction']){
     assert(m[key].left>=-1 && m[key].right<=width+1,key+' exits viewport '+width);
    }
+   assert(m.goal.top>=m.save.bottom-1,'Goal form overlaps address save action at '+width);
    assert(m.save.top>=m.body.bottom-1,'Save overlaps address content at '+width);
-   assert(m.save.height>=42&&m.newButton.height>=42&&m.minister.height>=42,'Touch target is too small at '+width);
+   assert(m.save.height>=42&&m.newButton.height>=42&&m.minister.height>=42&&m.goalAction.height>=42,'Touch target is too small at '+width);
    assert(m.bg==='none','Program header should reuse the light Work/Documents panel at '+width);
    if(width<=700)assert(m.save.width>=m.body.width-2,'Mobile save button should be full width at '+width);
    if(width>1000)assert(m.stats.left>=m.title.left,'Header information columns should remain aligned at '+width);
