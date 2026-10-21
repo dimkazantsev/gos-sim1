@@ -68,6 +68,10 @@ assert(gameTableSync.includes("export const SECTION_UPDATES_REFRESH_EVENT='gos-s
  'A separate section invalidation must not refetch unrelated stage widgets');
 assert(sectionSource.includes('window.addEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated)'),
  'Section count hook consumes the targeted event');
+assert(sectionSource.includes("document.visibilityState!=='visible'||(e as CustomEvent"),
+ 'Hidden tabs cannot launch section counter RPCs on pushed events');
+assert(sectionSource.includes("document.addEventListener('visibilitychange',focused)"),
+ 'Resuming a hidden tab refreshes section counts without waiting for the 3-minute fallback');
 assert(sectionSource.includes('window.removeEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated)'),
  'Section count hook releases the event listener on unmount');
 assert(gameShell.includes('notifySectionUpdates(game!.id)'),
