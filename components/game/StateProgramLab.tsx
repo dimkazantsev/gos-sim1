@@ -145,12 +145,12 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
     </ol>
     {vote&&<p className={styles.programApprovalNotice} role="status">Голосование Правительства: {vote.status==='open'?'Идёт · голосуют зарегистрированные участники':vote.result_label||'Завершено'}.</p>}
     {selected.status==='ready'&&<p className={styles.programApprovalNotice}>Программа подготовлена. Включите её в повестку Этапа 11. Голосование открывается только после доклада.</p>}
-    {selected.status==='adopted'&&!selected.signed_at&&<p className={styles.programApprovalNotice}>Правительство поддержало программу. Ожидается подпись и официальная публикация.</p>}
+    {selected.status==='adopted'&&<p className={styles.programApprovalNotice}>Правительство поддержало программу. Ожидается оформление подписи и публикация постановления по результатам голосования.</p>}
     {selected.status==='rejected'&&<p className={styles.programApprovalNotice}>Программа отклонена. Подписание и публикация по данному голосованию недоступны.</p>}
     <div className={styles.programApprovalActions}>
      {(teacher||selected.responsible_minister_id===me.user_id)&&selected.status==='minister_review'&&<><button type="button" disabled={busy} onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'minister_revision'})}>Вернуть автору на доработку</button><button type="button" disabled={busy} className="primary" onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'minister_approve'})}>Одобрить и передать Председателю Правительства</button></>}
      {(teacher||isPM)&&selected.status==='pm_review'&&<><button type="button" disabled={busy} onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'pm_revision'})}>Вернуть на доработку</button><button type="button" disabled={busy} className="primary" onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'pm_ready'})}>Согласовать для включения в повестку</button></>}
-     {(teacher||isPM)&&selected.status==='adopted'&&!selected.signed_at&&<button type="button" disabled={busy} className="primary" onClick={()=>void run('sign_adopted_state_program',{p_program_id:selected.id})}>Подписать и опубликовать принятую программу</button>}
+     {(teacher||isPM)&&selected.status==='adopted'&&!g.formalDocuments.some(d=>d.game_id===game!.id&&d.stage_no===11&&d.doc_type==='government_resolution'&&d.metadata?.state_program_id===selected.id&&d.status_code==='published')&&<button type="button" disabled={busy} className="primary" onClick={()=>void run('sign_adopted_state_program',{p_program_id:selected.id})}>Подписать и опубликовать принятую программу</button>}
     </div>
    </section>
   </>}
