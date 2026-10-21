@@ -32,6 +32,22 @@ for(const guard of ['event_assignments','event_decisions','event_case_outcomes',
 assert(secondBatch.includes('WITH ORDINALITY'),'Preserve option order and scores');
 assert(secondBatch.includes("effect_plan->>'best_option_key'"),'Do not change correct answer key');
 assert(!/DELETE FROM public.event_cases/i.test(secondBatch),'Do not delete any cases');
+const thirdBatch=fs.readFileSync('supabase/migrations/20261021200838_event_six_real_official_incidents_20261022.sql','utf8');
+const sixKeys=['bank-expanded-serious-05-01','bank-expanded-serious-22-01','bank-curated-serious-02','bank-expanded-serious-07-01','bank-curated-serious-18','bank-expanded-serious-01-01'];
+const storyMatches=[...thirdBatch.matchAll(/situation='((?:''|[^'])*)'/g)];
+assert.equal(storyMatches.length,6,'Six source-backed situations must be stored in the migration');
+for(const [,body] of storyMatches){
+ assert(body.trim().split(/\s+/u).length>=200,'Each grounded situation must have >=200 words');
+ assert(!/учебная модель|игровое досье|срок учебного задания|GOS\/\/SIMS/iu.test(body),'Do not claim fictional provenance');
+}
+for(const key of sixKeys)assert(thirdBatch.includes("c.case_key='"+key+"'"),'Missing revised case '+key);
+for(const guard of ['event_assignments','event_decisions','event_case_outcomes','event_collaboration_invites','event_discussion_messages','event_authority_evidence','budget_transfer_requests'])
+ assert(thirdBatch.includes(guard),'Do not mutate past assignments or results: '+guard);
+for(const law of ['№ 273-ФЗ','№ 52-ФЗ','№ 68-ФЗ','№ 257-ФЗ','Жилищный кодекс'])assert(thirdBatch.includes(law),'Missing checked legal authority '+law);
+assert(thirdBatch.includes('WITH ORDINALITY'),'Keep existing order and best answer key');
+assert(thirdBatch.includes("effect_plan->>'best_option_key'"),'Require pre-existing answer key');
+assert(!/DELETE FROM public.event_cases|UPDATE\s+public\.event_decisions|SET\s+verified\s*=\s*true/i.test(thirdBatch),'Do not erase games or bypass editorial acceptance');
+
 assert(!/SET\s+status\s*=|UPDATE\s+public\.event_decisions/i.test(secondBatch),'Do not change decisions or status');
 assert(!/DELETE FROM public.event_cases/i.test(migration),'Do not delete events');
 for(const clause of ['Федеральный закон от 08.11.2007 № 257-ФЗ','Федеральный закон от 21.11.2011 № 323-ФЗ','Федеральный закон от 29.12.2012 № 273-ФЗ'])assert(legal.includes(clause),'Missing actual statutory basis');
