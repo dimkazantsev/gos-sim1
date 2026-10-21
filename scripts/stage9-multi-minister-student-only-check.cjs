@@ -13,7 +13,7 @@ assert(code.includes('Candidate name must match the selected registered student'
 assert(ui.includes('registeredOnly')&&ui.includes('!selected[slot]'));
 assert(!ui.includes('Нет активных участников — используйте Ф.И.О.'));
 const game='10000000-0000-4000-8000-000000000001',
- p='20000000-0000-4000-8000-000000000001',
+ p='30000000-0000-4000-8000-000000000001',
  a='30000000-0000-4000-8000-000000000001',
  b='30000000-0000-4000-8000-000000000002';
 (async()=>{
@@ -45,8 +45,8 @@ const game='10000000-0000-4000-8000-000000000001',
   ].join(';\n')+';');
   await db.exec(code);
   await db.query('INSERT INTO public.games(id) VALUES($1)',[game]);
-  await db.query('INSERT INTO public.game_members VALUES($1,$2,$3,$4,$5,NULL),($1,$6,$3,$7,$8,NULL),($1,$9,$3,$10,$11,NULL)',
-    [game,p,'student','Председатель Правительства','Председатель Правительства',a,'Иванов Иван Иванович','Министр',b,'Тестов Тест Тестович','Министр']);
+  await db.query('INSERT INTO public.game_members VALUES($1,$2,$3,$4,$5,NULL),($1,$6,$3,$7,$8,NULL)',
+    [game,a,'student','Иванов Иван Иванович','Председатель Правительства',b,'Тестов Тест Тестович','Президент Российской Федерации']);
   await db.query("INSERT INTO public.government_nominations(game_id,stage_no,office_key,office_title,office_kind,route,candidate_user_id,candidate_name,attempt_no,status,nominated_by) VALUES($1,8,'prime_minister','Председатель Правительства','prime_minister','president_to_duma',$2,'Председатель Правительства',1,'appointed',$2)",[game,p]);
   await db.query("INSERT INTO public.government_structures(game_id,status,social_title,economic_title,foreign_title,defence_title,internal_title) VALUES($1,'approved','Социальное','Экономическое','Внешнее','Обороны','Внутреннее')",[game]);
   await db.query("SELECT set_config('app.test_uid',$1,false)",[p]);
@@ -59,9 +59,11 @@ const game='10000000-0000-4000-8000-000000000001',
   const one=(await nominate('social',a,'Иванов Иван Иванович')).rows[0].id;
   const two=(await nominate('economic',a,'Иванов Иван Иванович')).rows[0].id;
   const three=(await nominate('foreign',a,'Иванов Иван Иванович')).rows[0].id;
+  await db.query("SELECT set_config('app.test_uid',$1,false)",[b]);
   const four=(await nominate('defence',b,'Тестов Тест Тестович','security_minister')).rows[0].id;
   const five=(await nominate('internal',b,'Тестов Тест Тестович','security_minister')).rows[0].id;
   assert.equal(new Set([one,two,three,four,five]).size,5,'Five distinct minister nominations');
+  await db.query("SELECT set_config('app.test_uid',$1,false)",[a]);
   await assert.rejects(()=>nominate('social',b,'Тестов Тест Тестович'),/already has an active nomination/);
   await db.query("UPDATE public.government_nominations SET status='appointed' WHERE stage_no=9");
   for(const [unit,head] of [['social',a],['economic',a],['foreign',a],['defence',b],['internal',b]]){
