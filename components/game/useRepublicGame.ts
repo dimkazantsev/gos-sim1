@@ -246,12 +246,12 @@ export function useRepublicGame(gameId:string){
   if(!me?.user_id||me.game_id!==gameId)return;
   let disposed=false,scheduled=false;
   let liveConnected=false,lastPollAt=0;
-  let dirtyCore=false,dirtyPartyDocuments=false,dirtyChat=false,dirtyPins=false,dirtyOverview=false,telegramWake=false;
+  let dirtyCore=false,dirtyPartyDocuments=false,dirtyChat=false,dirtyPins=false,dirtyOverview=false;
   let timer:ReturnType<typeof setTimeout>|undefined;
   function flush(){
    if(disposed||document.visibilityState==='hidden')return;
-   const core=dirtyCore,partyDocs=dirtyPartyDocuments,chat=dirtyChat,pins=dirtyPins,overview=dirtyOverview,wake=telegramWake;
-   dirtyCore=false;dirtyPartyDocuments=false;dirtyChat=false;dirtyPins=false;dirtyOverview=false;telegramWake=false;
+   const core=dirtyCore,partyDocs=dirtyPartyDocuments,chat=dirtyChat,pins=dirtyPins,overview=dirtyOverview;
+   dirtyCore=false;dirtyPartyDocuments=false;dirtyChat=false;dirtyPins=false;dirtyOverview=false;
    // Read tickets in the loaders guard overlapping requests: never serialize
    // new events behind a stalled, older fetch.
    if(core){void hydrateActiveView();notifyGameDataRefresh(gameId)}
@@ -260,7 +260,7 @@ export function useRepublicGame(gameId:string){
    if(overview||chat)scheduleRealtimeChatOverview();
    if(chat&&channelRef.current)void loadMessages(channelRef.current);
    if(pins&&channelRef.current)void loadChatPins(channelRef.current);
-   if(wake)void kickTelegramDispatch();
+   
   }
   function schedule(){
    if(disposed||scheduled)return;
@@ -287,22 +287,22 @@ export function useRepublicGame(gameId:string){
     const id=(payload.old as {id?:string}|null)?.id;
     if(id)setMessages(previous=>previous.filter(m=>m.id!==id));
    }else dirtyChat=true;
-   dirtyOverview=true;telegramWake=true;schedule();
+   dirtyOverview=true;schedule();
   });
   for(const table of ['chat_mentions','chat_channel_state','chat_pins']){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
     if(table==='chat_pins')dirtyPins=true;
     else dirtyOverview=true;
-    telegramWake=true;schedule();
+    schedule();
    });
   }
   for(const table of ['game_stages','game_parties','party_invitations','party_chair_ballots','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
-    dirtyCore=true;telegramWake=true;schedule();
+    dirtyCore=true;schedule();
    });
   }
   channel.on('postgres_changes',{event:'*',schema:'public',table:'party_documents',filter:'game_id=eq.'+gameId},()=>{
-   dirtyPartyDocuments=true;telegramWake=true;schedule();
+   dirtyPartyDocuments=true;schedule();
   });
   liveRef.current=channel;
   setRealtimeState('connecting');
