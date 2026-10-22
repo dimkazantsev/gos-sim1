@@ -4,11 +4,14 @@
 @media(max-width:850px){.header{flex-direction:column;gap:16px;padding:18px}.stats{max-width:100%;width:100%}.stats>div{flex:1;min-width:120px;max-width:none}.stats dd{font-size:20px}}
 @media(max-width:420px){.header{padding:14px}.stats{gap:8px}.stats>div{padding:10px 12px}.stats>div:has(dd:not([data-numeric])){flex-basis:100%}}
 
-/* Government meeting: intrinsic module grid, never target CSS-module classes from global files. */
-.government{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,390px);align-items:center;gap:24px}
+/* Government meeting: align both summary tiles by their label/value rows.
+   The previous fixed 20px label track overlapped two-line labels and values. */
+.government{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,430px);align-items:center;gap:24px}
 .government .copy{min-width:0;max-width:none}
 .government .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;max-width:none;min-width:0;gap:12px;align-items:stretch;flex-wrap:nowrap}
-.government .stats>div{box-sizing:border-box;display:grid;grid-template-rows:20px minmax(32px,auto) minmax(20px,auto);align-content:center;gap:6px;width:100%;min-width:0;max-width:none;min-height:128px;padding:14px}
-.government .stats dt{line-height:20px}.government .stats dd{font-size:20px;line-height:1.4;margin:0;white-space:normal;overflow-wrap:normal}.government .stats span{line-height:1.5}
-@media(max-width:1000px){.government{grid-template-columns:minmax(0,1fr)}.government .stats{max-width:390px}}
-@media(max-width:430px){.government .stats{max-width:none}.government .stats>div{padding:12px;min-height:116px}.government .stats dd{font-size:17px}}
+.government .stats>div{box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(40px,auto) minmax(32px,auto) 1fr;align-content:stretch;align-items:start;gap:8px;width:100%;min-width:0;max-width:none;min-height:158px;padding:16px;text-align:left}
+.government .stats dt{min-width:0;font-size:13px;line-height:20px;overflow-wrap:break-word}
+.government .stats dd{min-width:0;margin:0;font-size:20px;line-height:1.4;white-space:normal;overflow-wrap:break-word}
+.government .stats span{min-width:0;line-height:1.5;overflow-wrap:break-word}
+@media(max-width:1080px){.government{grid-template-columns:minmax(0,1fr)}.government .stats{max-width:430px}}
+@media(max-width:560px){.government .stats{max-width:none;grid-template-columns:minmax(0,1fr)}.government .stats>div{min-height:114px;padding:14px;grid-template-rows:minmax(24px,auto) minmax(29px,auto) auto}.government .stats dd{font-size:19px}}
