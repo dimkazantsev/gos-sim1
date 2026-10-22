@@ -85,7 +85,7 @@ BEGIN
   THEN RAISE EXCEPTION 'После преодоления вето закон подписывает действующий Президент своей электронной подписью' USING ERRCODE='42501';END IF;
  END IF;
  RETURN NEW;
-END;$;
+END;$$;
 REVOKE ALL ON FUNCTION private.stage12_veto_not_published_before_sf() FROM PUBLIC,anon,authenticated;
 DROP TRIGGER IF EXISTS stage12_veto_not_published_before_sf ON public.formal_documents;
 CREATE TRIGGER stage12_veto_not_published_before_sf
