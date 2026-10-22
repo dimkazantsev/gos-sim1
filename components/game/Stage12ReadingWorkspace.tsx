@@ -22,13 +22,16 @@ const tabs=[
  {id:3 as const,title:'Третье чтение',detail:'Принятие закона и опубликование'}
 ];
 
-export default function Stage12ReadingWorkspace({g,stage,subjects,readOnly,onOpenVotes,onOpenDocument}:{
- g:ReturnTypeRepublic;stage:Stage;subjects:string[];readOnly:boolean;onOpenVotes:(id?:string)=>void;
+export default function Stage12ReadingWorkspace({g,stage,subjects,filingRequest=0,readOnly,onOpenVotes,onOpenDocument}:{
+ g:ReturnTypeRepublic;stage:Stage;subjects:string[];filingRequest?:number;readOnly:boolean;onOpenVotes:(id?:string)=>void;
  onOpenDocument?:(id:string)=>void;
 }){
  const [reading,setReading]=useState<Reading>(1),[selectedBill,setSelectedBill]=useState('');
  const [packagesOpen,setPackagesOpen]=useState(false);
  const [wasAutoExpanded,setWasAutoExpanded]=useState(false);
+ useEffect(()=>{
+  if(filingRequest>0){setReading(1);setPackagesOpen(true);}
+ },[filingRequest]);
  const bills=g.formalDocuments.filter(d=>d.stage_no===12&&d.workflow_key==='bill');
  useEffect(()=>{
   if(!wasAutoExpanded&&bills.length>0){setPackagesOpen(true);setWasAutoExpanded(true);}
