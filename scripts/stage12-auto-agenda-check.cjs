@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const migration=fs.readFileSync('supabase/migrations/20261022135900_stage12_auto_duma_draft_agenda.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20261022132438_stage12_auto_duma_draft_agenda.sql','utf8');
 const component=fs.readFileSync('components/game/LegislativeSessionLab.tsx','utf8');
 for(const name of ['private.sync_stage12_draft_bill_agenda','private.stage12_new_bill_to_duma_agenda','private.stage12_new_duma_session_autofill','public.correct_duma_agenda_after_open'])assert(migration.includes(name),'Required function '+name);
 for(const name of ['zzz_stage12_bill_autofill_duma_agenda','zzz_stage12_new_session_autofill','FOR UPDATE','ON CONFLICT (session_id,formal_document_id) DO NOTHING'])assert(migration.includes(name),'Required guard '+name);
