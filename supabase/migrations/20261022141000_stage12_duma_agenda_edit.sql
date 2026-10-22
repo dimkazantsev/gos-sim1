@@ -104,7 +104,9 @@ BEGIN
   RAISE EXCEPTION 'Нет полномочий на корректировку повестки' USING ERRCODE='42501';
  END IF;
  PERFORM private.require_duma_stage_open(v_session.game_id,12);
- IF NOT private.is_game_teacher(v_session.game_id) THEN
+ -- Before first approval, the chair cannot register for the meeting yet.
+ -- Meeting attendance is required only once the session has opened.
+ IF v_session.status='open' AND NOT private.is_game_teacher(v_session.game_id) THEN
   PERFORM private.require_game_meeting_registration(v_session.game_id,v_uid,12,'gd');
  END IF;
  IF char_length(v_notes)>2000 THEN

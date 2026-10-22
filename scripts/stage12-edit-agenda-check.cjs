@@ -57,12 +57,17 @@ async function dbCheck(){
   assert.deepEqual(ordered,[item(2),item(1)]);
   await db.exec('UPDATE private.caller SET permitted=false');
   await assert.rejects(()=>db.query('SELECT public.update_stage12_duma_agenda($1,$2,NULL,NULL)',[session,'Другое уточнение']),/полномочий/i);
+  // Before the first approval the chair is not yet registered, but may
+  // still prepare the agenda. Registration becomes mandatory once opened.
   await db.exec('UPDATE private.caller SET permitted=true,teacher=false,attended=false');
-  await assert.rejects(()=>db.query('SELECT public.update_stage12_duma_agenda($1,$2,NULL,NULL)',[session,'Другое уточнение']),/registration required/);
+  await db.query('SELECT public.update_stage12_duma_agenda($1,$2,NULL,NULL)',[session,'Уточнение председателя до регистрации']);
   await db.exec('UPDATE private.caller SET teacher=true,attended=true');
   await assert.rejects(()=>db.query('SELECT public.update_stage12_duma_agenda($1,$2,$3,NULL)',[session,'Другое уточнение',[item(1),item(1)]]),/список вопросов/i,'Reject repeated IDs');
   await db.query("UPDATE public.duma_sessions SET status='open' WHERE id=$1",[session]);
   await db.query("UPDATE public.institution_meeting_records SET agenda_approved_at=now() WHERE game_id=$1",[game]);
+  await db.exec('UPDATE private.caller SET teacher=false,attended=false');
+  await assert.rejects(()=>db.query('SELECT public.update_stage12_duma_agenda($1,$2,NULL,$3)',[session,'Корректировка без явки','Основание корректировки председателя']),/registration required/);
+  await db.exec('UPDATE private.caller SET teacher=true,attended=true');
   await assert.rejects(()=>db.query('SELECT public.update_stage12_duma_agenda($1,$2,$3,$4)',[session,'Изменённый регламент',[item(1),item(2)],'Согласованное изменение порядка']),/порядок вопросов/i);
   await assert.rejects(()=>db.query('SELECT public.update_stage12_duma_agenda($1,$2,NULL,$3)',[session,'Изменённый регламент','']),/основание/i);
   await db.query('SELECT public.update_stage12_duma_agenda($1,$2,NULL,$3)',[session,'Уточнён регламент выступающих','Корректировка по решению председателя']);
