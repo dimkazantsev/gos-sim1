@@ -7,10 +7,14 @@ import {userError} from '@/lib/userError';
 import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import {FORMAL_SUBJECTS} from './formalInstitutions';
 import {isStageWorkOpen} from './stageWorkStatus';
+import {stageRoleTitles} from './stageRoles';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage} from './types';
 import styles from './Stage12BillPackages.module.css';
 
+type BillProfile={document_id:string;committee_key:string|null;requires_financial_justification:boolean;requires_government_opinion:boolean;representative_user_id:string|null;note:string|null};
+type BillConclusion={document_id:string;legal_compliance:string;internal_logic:string;affected_acts_completeness:string;recommendation:string;finalized:boolean};
+type ReviewDraft={legal:string;logic:string;acts:string;recommendation:'proceed'|'return'|'reject'};
 type BillFile={id:string;document_id:string;file_kind:string;title:string;file_name:string;storage_path:string;status:string;note:string|null};
 const KINDS=[
  {key:'explanatory_note',label:'Пояснительная записка',required:true},
@@ -47,6 +51,16 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  const [subject,setSubject]=useState('');
  const [committee,setCommittee]=useState('');
  const [committees,setCommittees]=useState<{id:string;unit_key:string;title:string;head_user_id:string|null}[]>([]);
+ const [profiles,setProfiles]=useState<BillProfile[]>([]);
+ const [conclusions,setConclusions]=useState<BillConclusion[]>([]);
+ const [myCommitteeUnits,setMyCommitteeUnits]=useState<string[]>([]);
+ const [assignedCommittee,setAssignedCommittee]=useState<Record<string,string>>({});
+ const [reviewId,setReviewId]=useState('');
+ const [reviewDraft,setReviewDraft]=useState<ReviewDraft>({legal:'',logic:'',acts:'',recommendation:'proceed'});
+ const role=stageRoleTitles(g);
+ const canAssignCommittee=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&(role.includes('председател')||role.includes('совет'))));
+ const canReferCommittee=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&role.includes('председател')));
+ const canCouncilApprove=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&(role.includes('совет')||role.includes('председател'))));
  const [mainFile,setMainFile]=useState<File|null>(null);
  const [attachments,setAttachments]=useState<Record<string,File|null>>({});
  const [financial,setFinancial]=useState(false);
