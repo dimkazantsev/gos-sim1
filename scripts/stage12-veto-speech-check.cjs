@@ -7,6 +7,7 @@ const documentView=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
 const discussion=fs.readFileSync('components/game/DumaReadingDiscussion.tsx','utf8');
 const preset=fs.readFileSync('components/game/proceduralVoting.ts','utf8');
 assert(documentView.includes("confirm_fz_veto_sf_review")&&documentView.includes("veto_overridden"));
+assert(documentView.includes("selected.status_code!=='president_veto'"),'Council can open a veto override ballot outside reading discussion');
 assert(documentView.includes("selected.doc_type!=='fkz_bill'"),'No FKZ veto button');
 assert(discussion.includes("adjust_duma_speech_time")&&discussion.includes("p_expected_end:item.speech_ends_at"),'Optimistic update uses last visible timer version');
 assert(preset.includes("решение Совета Федерации отдельно подтверждает преподаватель"),'No false automatic Senate approval');
