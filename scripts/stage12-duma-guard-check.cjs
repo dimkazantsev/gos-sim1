@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const sql=fs.readFileSync('supabase/migrations/20261022120000_stage12_duma_rpc_active_window_guard.sql','utf8');
+const sql=fs.readFileSync('supabase/migrations/20261022110644_stage12_duma_rpc_active_window_guard.sql','utf8');
 const ui=fs.readFileSync('components/game/LegislativeSessionLab.tsx','utf8');
 const workspace=fs.readFileSync('components/game/GovernanceStageWorkspace.tsx','utf8');
 const game='10000000-0000-0000-0000-000000000001';
