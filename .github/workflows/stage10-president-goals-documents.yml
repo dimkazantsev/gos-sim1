@@ -18,6 +18,8 @@ on:
       - 'components/game/GovernmentProgramSessionLab.tsx'
       - 'components/game/stateProgramModel.ts'
       - 'scripts/government-program-vote-before-sign-check.cjs'
+      - 'supabase/migrations/*government_ministry_appointment_electorate.sql'
+      - 'scripts/government-ministry-electorate-check.cjs'
       - '.github/workflows/stage10-president-goals-documents.yml'
   push:
     branches: [main]
@@ -38,6 +40,8 @@ on:
       - 'components/game/GovernmentProgramSessionLab.tsx'
       - 'components/game/stateProgramModel.ts'
       - 'scripts/government-program-vote-before-sign-check.cjs'
+      - 'supabase/migrations/*government_ministry_appointment_electorate.sql'
+      - 'scripts/government-ministry-electorate-check.cjs'
       - '.github/workflows/stage10-president-goals-documents.yml'
 permissions:
   contents: read
@@ -55,6 +59,7 @@ jobs:
       - run: node scripts/stage10-president-goals-document-sync-check.cjs
       - run: node scripts/stage10-single-program-work-links-check.cjs
       - run: node scripts/government-program-vote-before-sign-check.cjs
+      - run: node scripts/government-ministry-electorate-check.cjs
       - run: node scripts/stage10-ministry-team-rights-check.cjs
       - run: node scripts/stage-final-documents-gate-check.cjs
       - run: npm run typecheck

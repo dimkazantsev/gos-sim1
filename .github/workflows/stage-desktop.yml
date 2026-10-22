@@ -81,6 +81,10 @@ jobs:
         run: npm run typecheck
       - name: Build real component preview
         run: npm run design:preview
+      - name: Stage 10 linked programme and award/browser regression
+        run: node scripts/october-budget-awards-browser-check.cjs
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - name: Intro persistence and restored comic library
         run: |
           node scripts/intro-refresh-check.cjs
