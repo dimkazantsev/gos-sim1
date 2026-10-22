@@ -45,3 +45,28 @@
  .tabs>div>button{min-width:0;flex:1 1 165px}
 }
 @media(prefers-reduced-motion:reduce){.card *{transition:none}}
+
+/* Stage 12 work: bill packages are a register, not unapproved agenda items. */
+.packageRegister{min-width:0;margin:16px 0;border:1px solid var(--gs-border);border-radius:var(--gs-radius-md);background:var(--gs-surface);box-shadow:var(--gs-shadow-xs);overflow:hidden}
+.packageRegisterHead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid var(--gs-border)}
+.packageRegisterHead>div{min-width:0}
+.packageRegisterHead small{display:block;font-size:11px;font-weight:750;color:var(--gs-muted);letter-spacing:.025em}
+.packageRegisterHead h3{margin:4px 0 6px;color:var(--gs-ink);font-size:18px;font-weight:800;line-height:1.35}
+.packageRegisterHead p{margin:0;max-width:78ch;font-size:13px;line-height:1.55;color:var(--gs-muted)}
+.packageRegisterCount{flex:none;white-space:nowrap;padding:6px 10px;border-radius:9px;background:var(--gs-accent-soft);color:var(--gs-accent-strong);font-size:12px;font-weight:750}
+.packageRegisterList{display:grid;gap:0}
+.packageRegisterItem{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px;min-width:0;border-bottom:1px solid var(--gs-border)}
+.packageRegisterItem:last-child{border-bottom:0}
+.packageRegisterDescription{display:grid;gap:5px;min-width:0}
+.packageRegisterDescription small{font-size:12px;line-height:1.4;color:var(--gs-muted);overflow-wrap:anywhere}
+.packageRegisterDescription h4{margin:0;color:var(--gs-ink);font-size:15px;line-height:1.4;font-weight:750;overflow-wrap:anywhere}
+.packageRegisterDescription>span{justify-self:start;max-width:100%;padding:5px 9px;border-radius:8px;font-size:11px;font-weight:750;line-height:1.35}
+.packageInAgenda{color:var(--gs-green);background:var(--gs-green-soft)}
+.packageAwaitingAgenda{color:var(--gs-amber);background:var(--gs-amber-soft)}
+.packageRegisterItem>button{flex:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 14px;font-size:13px}
+.packageRegisterEmpty{margin:0;padding:18px 20px;color:var(--gs-muted);font-size:13px}
+@media(max-width:700px){
+ .packageRegisterHead,.packageRegisterItem{flex-direction:column;align-items:stretch;gap:12px;padding:15px}
+ .packageRegisterCount{align-self:start;white-space:normal}
+ .packageRegisterItem>button{width:100%}
+}

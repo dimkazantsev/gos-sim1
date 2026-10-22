@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'components/game/LegislativeSessionLab.tsx'
+      - 'scripts/stage12-work-packages-check.cjs'
       - 'components/game/Stage12BillPackages.tsx'
       - 'components/game/Stage12BillPackages.module.css'
       - 'components/game/StageArtifacts.tsx'
@@ -21,6 +22,7 @@ on:
     branches: [main]
     paths:
       - 'components/game/LegislativeSessionLab.tsx'
+      - 'scripts/stage12-work-packages-check.cjs'
       - 'components/game/Stage12BillPackages.tsx'
       - 'components/game/Stage12BillPackages.module.css'
       - 'components/game/StageArtifacts.tsx'
@@ -59,5 +61,6 @@ jobs:
           echo "Chrome not found" >&2
           exit 1
       - run: node scripts/stage12-duma-layout-check.cjs
+      - run: node scripts/stage12-work-packages-check.cjs
       - run: node scripts/stage12-package-layout-check.cjs
       - run: node scripts/stage12-bill-dossier-design-check.cjs
