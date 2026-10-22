@@ -50,6 +50,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  const [type,setType]=useState<'fz_bill'|'fkz_bill'>('fz_bill');
  const [subject,setSubject]=useState('');
  const [committee,setCommittee]=useState('');
+ const [representative,setRepresentative]=useState('');
  const [committees,setCommittees]=useState<{id:string;unit_key:string;title:string;head_user_id:string|null}[]>([]);
  const [profiles,setProfiles]=useState<BillProfile[]>([]);
  const [conclusions,setConclusions]=useState<BillConclusion[]>([]);
@@ -72,6 +73,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  const [uploadFile,setUploadFile]=useState<File|null>(null);
  const allowed=FORMAL_SUBJECTS.filter(s=>ALLOWED_SUBJECTS.includes(s.key)&&(g.teacher||subjects.includes(s.key)));
  const activeSubject=allowed.some(s=>s.key===subject)?subject:(allowed[0]?.key||'');
+ const collegial=['government','sf','region','ks','vs'].includes(activeSubject);
  const canCreate=mode==='work'&&!readOnly&&!!g.game&&!!g.me&&g.me.kind!=='observer'&&
    (g.teacher||isStageWorkOpen(g.game,stage))&&allowed.length>0;
  const ownerCanEdit=(document:{author_id:string;status_code:string})=>
@@ -171,7 +173,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
    const profile=await supabase.rpc('save_bill_submission_profile',{
     p_document_id:id,p_requires_financial_justification:financial,
     p_requires_government_opinion:opinion,p_committee_key:committee||null,
-    p_representative_user_id:null,p_note:null
+    p_representative_user_id:representative||null,p_note:null
    });
    if(profile.error)issues.push('Карточка внесения: '+profile.error.message);
    for(const [kind,file] of Object.entries(attachments)){
@@ -180,7 +182,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
     if(problem)issues.push(labelFor(kind)+': '+problem);
    }
    setCreateOpen(false);setTitle('');setBody('');setMainFile(null);setAttachments({});
-   setFinancial(false);setOpinion(false);setCommittee('');setRefresh(v=>v+1);notifyRefresh();
+   setFinancial(false);setOpinion(false);setCommittee('');setRepresentative('');setRefresh(v=>v+1);notifyRefresh();
    setMessage(issues.length?'Черновик создан, но некоторые материалы не сохранены: '+issues.join(' · '):
     'Черновик пакета сохранён. Для официального внесения воспользуйтесь кнопкой «Внести законопроект в Государственную Думу» в его карточке ниже.');
   }catch(error){g.setError(error)}
@@ -281,7 +283,12 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
     <label className={styles.full}>Файл проекта закона (вместо текста или вместе с ним)
      <input type="file" accept={fileAccept} onChange={e=>setMainFile(e.target.files?.[0]||null)}/></label>
    </div>
-   <div className={styles.fields}><label className={styles.full}>Предлагаемый профильный комитет
+   <div className={styles.fields}>{collegial&&<label className={styles.full}>Представитель субъекта законодательной инициативы в Государственной Думе
+    <select value={representative} onChange={e=>setRepresentative(e.target.value)}>
+     <option value="">Выберите уполномоченного представителя</option>
+     {g.members.filter(m=>m.kind==='student'&&!m.roster_archived_at).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}
+    </select>
+   </label>}<label className={styles.full}>Предлагаемый профильный комитет
     <select value={committee} onChange={e=>setCommittee(e.target.value)}>
      <option value="">Определит руководство Государственной Думы</option>
      {committees.map(c=><option key={c.id} value={c.unit_key}>{c.title}</option>)}
@@ -292,7 +299,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
     <label><input type="checkbox" checked={opinion} onChange={e=>setOpinion(e.target.checked)}/> Требуется заключение Правительства</label>
    </div>
    <h4>Файлы пакета</h4>
-   <div className={styles.attachGrid}>{KINDS.filter(x=>x.required||(x.key==='financial_economic'&&financial)||(x.key==='government_opinion'&&opinion)).map(kind=>
+   <div className={styles.attachGrid}>{KINDS.filter(x=>x.required||(x.key==='collegial_decision'&&collegial)||(x.key==='financial_economic'&&financial)||(x.key==='government_opinion'&&opinion)).map(kind=>
     <label key={kind.key} className={styles.attachment}><span>{kind.label}{kind.required?' · Обязательно':''}</span>
      <input type="file" accept={fileAccept} onChange={e=>setAttachments(old=>({...old,[kind.key]:e.target.files?.[0]||null}))}/></label>
    )}</div>
