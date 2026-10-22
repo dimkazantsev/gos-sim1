@@ -27,7 +27,7 @@ async function database(){
   await db.exec("CREATE SCHEMA private; CREATE SCHEMA auth;");
   await db.exec("CREATE TABLE public.duma_sessions(id uuid PRIMARY KEY,game_id uuid,stage_no integer,session_no integer,title text,scheduled_start timestamptz,scheduled_end timestamptz,status text,agenda_document_id uuid,created_by uuid,opened_at timestamptz,chair_user_id uuid);");
   await db.exec("CREATE TABLE public.formal_documents(id uuid PRIMARY KEY,game_id uuid,title text,registry_no text,body_text text,status_code text,status_label text,current_owner_key text,updated_at timestamptz DEFAULT now());");
-  await db.exec("CREATE TABLE public.duma_agenda_items(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),session_id uuid,agenda_no integer,formal_document_id uuid);");
+  await db.exec("CREATE TABLE public.duma_agenda_items(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),session_id uuid,agenda_no integer,formal_document_id uuid,status text NOT NULL DEFAULT 'pending');");
   await db.exec("CREATE TABLE public.institution_meeting_records(game_id uuid,stage_no integer,institution_key text,agenda_document_id uuid,agenda_body text,agenda_prepared_by uuid,agenda_approved_at timestamptz,agenda_approved_by uuid,updated_at timestamptz DEFAULT now(),PRIMARY KEY(game_id,stage_no,institution_key));");
   await db.exec("CREATE TABLE public.game_stages(game_id uuid,stage_no integer);");
   await db.exec("CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql AS $$ SELECT '30000000-0000-0000-0000-000000000001'::uuid $$;");
