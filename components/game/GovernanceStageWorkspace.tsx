@@ -55,6 +55,8 @@ const BODIES:Partial<Record<number,string[]>>={2:['ksrf'],3:['ksrf'],4:['gd'],5:
 
 export default function GovernanceStageWorkspace({g,stage,readOnly=false,initialTab='work',onBack,onOpenStage,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate}:Props){
  const [tab,setTab]=useState<Tab>(initialTab);
+ const [filingRequest,setFilingRequest]=useState(0);
+ const openStage12Filing=()=>{setFilingRequest(n=>n+1);setTab('work')};
  const [sessionGate,setSessionGate]=useState<{stage:number;ready:boolean}|null>(null);
  const onMeetingReadyChange=useCallback((ready:boolean)=>{
   setSessionGate(old=>old?.stage===stage.stage_no&&old.ready===ready?old:{stage:stage.stage_no,ready});
@@ -155,7 +157,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
      {stage.stage_no===9&&<><GovernmentFormationWorkspace g={g} stageNo={9} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onOpenDocument={onOpenDocument} onNavigate={onNavigate}/><section id="ministry-teams" className="stageOperationsMinistryTeams"><InstitutionStaffingLab g={g} mode="ministries"/></section></>}
      {stage.stage_no===10&&<StateProgramLab g={g}/>}
      {stage.stage_no===11&&<GovernmentProgramSessionLab g={g} onOpenVotes={onOpenVotes} onOpenDocument={onOpenDocument}/>}
-     {stage.stage_no===12&&<Stage12ReadingWorkspace g={g} readOnly={viewer} onOpenVotes={onOpenVotes} onOpenDocument={onOpenDocument} onPrepare={()=>setTab('materials')}/>}
+     {stage.stage_no===12&&<Stage12ReadingWorkspace g={g} readOnly={viewer} stage={stage} subjects={formalSubjects} filingRequest={filingRequest} onOpenVotes={onOpenVotes} onOpenDocument={onOpenDocument}/>}
      {stage.stage_no===13&&<BudgetView g={g} readOnly={viewer} onOpenDocument={id=>onOpenDocument?.(id)} onOpenEvents={()=>onNavigate?.('events')} onOpenVotes={onOpenVotes}/>}
      {stage.stage_no===14&&<><MunicipalGovernancePanel g={g}/><MunicipalProjectLab g={g}/></>}
      {stage.stage_no===15&&<CrisisRoom g={g}/>}
@@ -181,8 +183,8 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
   </section>
 
   <section id={sectionId+'-materials'} className="stageOperationsPane" hidden={tab!=='materials'} aria-label="Документы и голосования">
-   <StageArtifacts g={g} stage={stage} readOnly={viewer&&!canRemediateCompleted} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes} onOpenWork={()=>setTab('work')}
-     finalDocuments={requiredDocuments} formalSubjects={formalSubjects} onRefreshFinalDocuments={()=>void refreshFinalDocuments()}/>
+   {(stage.stage_no!==12||tab==='materials')&&<StageArtifacts g={g} stage={stage} readOnly={viewer&&!canRemediateCompleted} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes} onOpenWork={()=>setTab('work')} onOpenFiling={openStage12Filing}
+     finalDocuments={requiredDocuments} formalSubjects={formalSubjects} onRefreshFinalDocuments={()=>void refreshFinalDocuments()}/>}
    <div className="stageOperationsRelated"><h3><Link2 size={18}/>Связанные разделы</h3><div>{operation.related.map(view=><button type="button" key={view} disabled={!onNavigate} onClick={()=>onNavigate?.(view)}>{VIEW_NAMES[view]||'Раздел игры'}</button>)}</div></div>
   </section>
 

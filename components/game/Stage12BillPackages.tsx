@@ -3,12 +3,18 @@
 import {useEffect,useMemo,useState} from 'react';
 import {ArrowUpRight,FileCheck2,FilePlus2,FileText,FolderOpen,Paperclip,RefreshCcw,UploadCloud} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {userError} from '@/lib/userError';
+import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import {FORMAL_SUBJECTS} from './formalInstitutions';
 import {isStageWorkOpen} from './stageWorkStatus';
+import {stageRoleTitles} from './stageRoles';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage} from './types';
 import styles from './Stage12BillPackages.module.css';
 
+type BillProfile={document_id:string;committee_key:string|null;requires_financial_justification:boolean;requires_government_opinion:boolean;representative_user_id:string|null;note:string|null};
+type BillConclusion={document_id:string;legal_compliance:string;internal_logic:string;affected_acts_completeness:string;recommendation:string;finalized:boolean};
+type ReviewDraft={legal:string;logic:string;acts:string;recommendation:'proceed'|'return'|'reject'};
 type BillFile={id:string;document_id:string;file_kind:string;title:string;file_name:string;storage_path:string;status:string;note:string|null};
 const KINDS=[
  {key:'explanatory_note',label:'Пояснительная записка',required:true},
@@ -27,9 +33,9 @@ function validateFile(file:File){
  const extension=file.name.split('.').pop()?.toLowerCase()||'';
  return file.size>0&&file.size<=MAX_FILE_BYTES&&['pdf','doc','docx','odt','txt','rtf'].includes(extension);
 }
-export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],onOpenDocument,onOpenVotes}:{
- g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;subjects?:string[];
- onOpenDocument?:(id:string)=>void;onOpenVotes:(id?:string)=>void;
+export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],mode='work',onOpenDocument,onOpenVotes,onOpenWork}:{
+ g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;subjects?:string[];mode?:'work'|'register';
+ onOpenDocument?:(id:string)=>void;onOpenVotes:(id?:string)=>void;onOpenWork?:()=>void;
 }){
  const bills=useMemo(()=>g.formalDocuments.filter(d=>d.stage_no===12&&d.workflow_key==='bill').sort((a,b)=>b.created_at.localeCompare(a.created_at)),[g.formalDocuments]);
  const [visible,setVisible]=useState(12);
@@ -43,6 +49,19 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  const [body,setBody]=useState('');
  const [type,setType]=useState<'fz_bill'|'fkz_bill'>('fz_bill');
  const [subject,setSubject]=useState('');
+ const [committee,setCommittee]=useState('');
+ const [representative,setRepresentative]=useState('');
+ const [committees,setCommittees]=useState<{id:string;unit_key:string;title:string;head_user_id:string|null}[]>([]);
+ const [profiles,setProfiles]=useState<BillProfile[]>([]);
+ const [conclusions,setConclusions]=useState<BillConclusion[]>([]);
+ const [myCommitteeUnits,setMyCommitteeUnits]=useState<string[]>([]);
+ const [assignedCommittee,setAssignedCommittee]=useState<Record<string,string>>({});
+ const [reviewId,setReviewId]=useState('');
+ const [reviewDraft,setReviewDraft]=useState<ReviewDraft>({legal:'',logic:'',acts:'',recommendation:'proceed'});
+ const role=stageRoleTitles(g);
+ const canAssignCommittee=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&(role.includes('председател')||role.includes('совет'))));
+ const canReferCommittee=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&role.includes('председател')));
+ const canCouncilApprove=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&(role.includes('совет')||role.includes('председател'))));
  const [mainFile,setMainFile]=useState<File|null>(null);
  const [attachments,setAttachments]=useState<Record<string,File|null>>({});
  const [financial,setFinancial]=useState(false);
@@ -54,26 +73,67 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  const [uploadFile,setUploadFile]=useState<File|null>(null);
  const allowed=FORMAL_SUBJECTS.filter(s=>ALLOWED_SUBJECTS.includes(s.key)&&(g.teacher||subjects.includes(s.key)));
  const activeSubject=allowed.some(s=>s.key===subject)?subject:(allowed[0]?.key||'');
- const canCreate=!readOnly&&!!g.game&&!!g.me&&g.me.kind!=='observer'&&
+ const collegial=['government','sf','region','ks','vs'].includes(activeSubject);
+ const canCreate=mode==='work'&&!readOnly&&!!g.game&&!!g.me&&g.me.kind!=='observer'&&
    (g.teacher||isStageWorkOpen(g.game,stage))&&allowed.length>0;
  const ownerCanEdit=(document:{author_id:string;status_code:string})=>
-  !readOnly&&!!g.me&&g.me.kind!=='observer'&&
+  mode==='work'&&!readOnly&&!!g.me&&g.me.kind!=='observer'&&
   (g.teacher||g.me.user_id===document.author_id)&&editable(document.status_code)&&
   (g.teacher||isStageWorkOpen(g.game,stage));
 
  useEffect(()=>{
+  if(mode!=='work'||!g.game)return;
+  const gameId=g.game.id;let active=true;
+  void (async()=>{
+   const [units,membership]=await Promise.all([
+    supabase.from('institution_units').select('id,unit_key,title,head_user_id').eq('game_id',gameId).eq('unit_kind','committee').limit(40),
+    supabase.from('institution_assignments').select('unit_id').eq('game_id',gameId).eq('user_id',g.me?.user_id||'').limit(80)
+   ]);
+   if(!active)return;
+   if(units.error)g.setError(units.error);
+   else setCommittees((units.data||[]).filter(c=>!!c.unit_key));
+   if(membership.error)g.setError(membership.error);
+   else setMyCommitteeUnits((membership.data||[]).map(a=>a.unit_id));
+  })();
+  return()=>{active=false};
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ },[g.game?.id,mode]);
+ function notifyRefresh(){
+  if(!g.game)return;
+  window.dispatchEvent(new CustomEvent(GAME_DATA_REFRESH_EVENT,{detail:{gameId:g.game.id,stageNo:12}}));
+ }
+ async function advanceBill(id:string,action:'advance'|'return'='advance'){
+  if(readOnly||busy||!g.game)return;
+  setBusy(true);setMessage('');
+  try{
+   const {error}=await supabase.rpc('advance_formal_document',{
+    p_document_id:id,p_action:action,p_note:action==='return'?'Возвращён на доработку в порядке Этапа 12':'Законопроект передан по установленному маршруту'
+   });
+   if(error)throw error;
+   setMessage(action==='return'?'Законопроект возвращён на доработку.':'Действие зафиксировано в Реестре НПА и истории законопроекта.');
+   notifyRefresh();setRefresh(v=>v+1);
+  }catch(error){setMessage('Не удалось выполнить действие: '+userError(error))}
+  finally{setBusy(false)}
+ }
+ useEffect(()=>{
   let live=true;
-  if(!g.game||!billIds){setFiles([]);setLoading(false);return;}
+  if(!g.game||!billIds){setFiles([]);setProfiles([]);setConclusions([]);setLoading(false);return;}
   setLoading(true);
   const ids=billIds.split(',');
   void (async()=>{
-   const response=await supabase.from('bill_package_files')
-     .select('id,document_id,file_kind,title,file_name,storage_path,status,note')
-     .eq('game_id',g.game!.id).in('document_id',ids)
-     .order('created_at',{ascending:false}).limit(160);
+   const [fileResult,profileResult,reviewResult]=await Promise.all([
+    supabase.from('bill_package_files').select('id,document_id,file_kind,title,file_name,storage_path,status,note')
+      .eq('game_id',g.game!.id).in('document_id',ids).order('created_at',{ascending:false}).limit(160),
+    supabase.from('bill_submission_profiles').select('document_id,committee_key,requires_financial_justification,requires_government_opinion,representative_user_id,note')
+      .eq('game_id',g.game!.id).in('document_id',ids).limit(160),
+    supabase.from('bill_committee_conclusions').select('document_id,legal_compliance,internal_logic,affected_acts_completeness,recommendation,finalized')
+      .eq('game_id',g.game!.id).in('document_id',ids).limit(160)
+   ]);
    if(!live)return;
-   if(response.error)g.setError(response.error);
-   else setFiles((response.data||[]) as BillFile[]);
+   for(const result of [fileResult,profileResult,reviewResult])if(result.error)g.setError(result.error);
+   if(!fileResult.error)setFiles((fileResult.data||[]) as BillFile[]);
+   if(!profileResult.error)setProfiles((profileResult.data||[]) as BillProfile[]);
+   if(!reviewResult.error)setConclusions((reviewResult.data||[]) as BillConclusion[]);
    setLoading(false);
   })();
   return()=>{live=false};
@@ -112,8 +172,8 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
    const issues:string[]=[];
    const profile=await supabase.rpc('save_bill_submission_profile',{
     p_document_id:id,p_requires_financial_justification:financial,
-    p_requires_government_opinion:opinion,p_committee_key:null,
-    p_representative_user_id:null,p_note:null
+    p_requires_government_opinion:opinion,p_committee_key:committee||null,
+    p_representative_user_id:representative||null,p_note:null
    });
    if(profile.error)issues.push('Карточка внесения: '+profile.error.message);
    for(const [kind,file] of Object.entries(attachments)){
@@ -122,10 +182,9 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
     if(problem)issues.push(labelFor(kind)+': '+problem);
    }
    setCreateOpen(false);setTitle('');setBody('');setMainFile(null);setAttachments({});
-   setFinancial(false);setOpinion(false);setRefresh(v=>v+1);
-   setMessage(issues.length?'Законопроект создан, но некоторые материалы не сохранены: '+issues.join(' · '):
-    'Пакет зарегистрирован в Реестре НПА. Документы прикреплены к законопроекту и будут следовать его маршруту.');
-   onOpenDocument?.(id);
+   setFinancial(false);setOpinion(false);setCommittee('');setRepresentative('');setRefresh(v=>v+1);notifyRefresh();
+   setMessage(issues.length?'Черновик создан, но некоторые материалы не сохранены: '+issues.join(' · '):
+    'Черновик пакета сохранён. Для официального внесения воспользуйтесь кнопкой «Внести законопроект в Государственную Думу» в его карточке ниже.');
   }catch(error){g.setError(error)}
   finally{setBusy(false)}
  }
@@ -137,10 +196,52 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
    const problem=await addAttachment(id,uploadKind,uploadFile);
    if(problem){setMessage('Материал не прикреплён: '+problem);return}
    setUploadFile(null);setUploadId('');setRefresh(x=>x+1);
-   setMessage('Материал добавлен к пакету. Он будет доступен другим участникам игры в досье НПА.');
+   setMessage('Материал добавлен к пакету. Он сохранён в досье НПА.');notifyRefresh();
   }finally{setBusy(false)}
  }
 
+
+ async function saveCommittee(id:string,profile?:BillProfile){
+  if(!canAssignCommittee||busy)return;
+  const value=assignedCommittee[id]??profile?.committee_key??'';
+  if(!value){setMessage('Выберите профильный комитет.');return;}
+  setBusy(true);setMessage('');
+  try{
+   const {error}=await supabase.rpc('save_bill_submission_profile',{
+    p_document_id:id,p_committee_key:value,
+    p_requires_financial_justification:profile?.requires_financial_justification||false,
+    p_requires_government_opinion:profile?.requires_government_opinion||false,
+    p_representative_user_id:profile?.representative_user_id||null,
+    p_note:profile?.note||null
+   });
+   if(error)throw error;
+   setMessage('Профильный комитет назначен. Руководство Думы может передать ему законопроект.');
+   setRefresh(x=>x+1);notifyRefresh();
+  }catch(error){setMessage('Не удалось назначить комитет: '+userError(error))}
+  finally{setBusy(false)}
+ }
+ async function saveConclusion(id:string){
+  if(busy||!reviewDraft.legal.trim()||!reviewDraft.logic.trim()||!reviewDraft.acts.trim())return;
+  setBusy(true);setMessage('');
+  try{
+   const {error}=await supabase.rpc('save_bill_committee_conclusion',{
+    p_document_id:id,p_rapporteur_user_id:g.me?.user_id||null,
+    p_legal_compliance:reviewDraft.legal.trim(),p_internal_logic:reviewDraft.logic.trim(),
+    p_affected_acts_completeness:reviewDraft.acts.trim(),
+    p_recommendation:reviewDraft.recommendation,p_finalize:true
+   });
+   if(error)throw error;
+   setReviewId('');
+   setMessage(reviewDraft.recommendation==='proceed'?'Заключение передано в Совет Государственной Думы.':reviewDraft.recommendation==='return'?'Законопроект возвращён субъекту на доработку.':'Мотивированное заключение зафиксировано.');
+   setRefresh(x=>x+1);notifyRefresh();
+  }catch(error){setMessage('Не удалось сохранить заключение: '+userError(error))}
+  finally{setBusy(false)}
+ }
+ function editConclusion(id:string,conclusion?:BillConclusion){
+  if(reviewId===id){setReviewId('');return}
+  setReviewId(id);
+  setReviewDraft({legal:conclusion?.legal_compliance||'',logic:conclusion?.internal_logic||'',acts:conclusion?.affected_acts_completeness||'',recommendation:conclusion?.recommendation==='return'?'return':conclusion?.recommendation==='reject'?'reject':'proceed'});
+ }
  async function openFile(file:BillFile){
   if(!g.game)return;
   // Reserve the user-initiated tab before the signed-URL request. Creating a
@@ -157,12 +258,14 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
 
  return <section className={styles.section} aria-label="Пакеты законодательных инициатив">
   <header className={styles.heading}>
-   <div><small>Материалы Этапа 12 · Законодательная инициатива</small>
+   <div><small>{mode==='work'?'Этап 12 · Подготовка и внесение':'Материалы Этапа 12 · Реестр пакетов'}</small>
     <h3>Пакеты законопроектов</h3>
     <p>Каждый законопроект создаётся одним пакетом: текст закона, пояснительная записка, перечень актов и необходимые заключения. Другие участники видят его состав и могут подготовить собственный пакет.</p>
    </div>
-   {canCreate&&<button className="primary" type="button" onClick={()=>setCreateOpen(x=>!x)} aria-expanded={createOpen}>
-    <FilePlus2 size={18}/>{createOpen?'Свернуть форму':'Создать пакет'}
+   {mode==='register'?<button type="button" className="primary" disabled={!onOpenWork} onClick={onOpenWork}>
+    <FilePlus2 size={18}/>Создать пакет документов · Работа
+   </button>:canCreate&&<button className="primary" type="button" onClick={()=>setCreateOpen(x=>!x)} aria-expanded={createOpen}>
+    <FilePlus2 size={18}/>{createOpen?'Свернуть форму':'Создать пакет документов'}
    </button>}
   </header>
   {message&&<p className={styles.notice} role="status">{message}</p>}
@@ -180,19 +283,31 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
     <label className={styles.full}>Файл проекта закона (вместо текста или вместе с ним)
      <input type="file" accept={fileAccept} onChange={e=>setMainFile(e.target.files?.[0]||null)}/></label>
    </div>
+   <div className={styles.fields}>{collegial&&<label className={styles.full}>Представитель субъекта законодательной инициативы в Государственной Думе
+    <select value={representative} onChange={e=>setRepresentative(e.target.value)}>
+     <option value="">Выберите уполномоченного представителя</option>
+     {g.members.filter(m=>m.kind==='student'&&!m.roster_archived_at).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}
+    </select>
+   </label>}<label className={styles.full}>Предлагаемый профильный комитет
+    <select value={committee} onChange={e=>setCommittee(e.target.value)}>
+     <option value="">Определит руководство Государственной Думы</option>
+     {committees.map(c=><option key={c.id} value={c.unit_key}>{c.title}</option>)}
+    </select>
+   </label></div>
    <div className={styles.checks}>
     <label><input type="checkbox" checked={financial} onChange={e=>setFinancial(e.target.checked)}/> Требуется финансово-экономическое обоснование</label>
     <label><input type="checkbox" checked={opinion} onChange={e=>setOpinion(e.target.checked)}/> Требуется заключение Правительства</label>
    </div>
    <h4>Файлы пакета</h4>
-   <div className={styles.attachGrid}>{KINDS.filter(x=>x.required||(x.key==='financial_economic'&&financial)||(x.key==='government_opinion'&&opinion)).map(kind=>
+   <div className={styles.attachGrid}>{KINDS.filter(x=>x.required||(x.key==='collegial_decision'&&collegial)||(x.key==='financial_economic'&&financial)||(x.key==='government_opinion'&&opinion)).map(kind=>
     <label key={kind.key} className={styles.attachment}><span>{kind.label}{kind.required?' · Обязательно':''}</span>
      <input type="file" accept={fileAccept} onChange={e=>setAttachments(old=>({...old,[kind.key]:e.target.files?.[0]||null}))}/></label>
    )}</div>
-   <p className={styles.hint}>Профильный комитет, представитель и дальнейшие согласования заполняются в открытом досье пакета. Документы связываются с одним номером НПА. Разрешённые форматы указаны в поле выбора файла. Размер — не более 10 МБ.</p>
+   <p className={styles.hint}>Предложенный комитет можно изменить в досье пакета; направление осуществляет уполномоченное руководство Государственной Думы. Представитель и дальнейшие согласования заполняются в досье.  Документы связываются с одним номером НПА. Разрешённые форматы указаны в поле выбора файла. Размер — не более 10 МБ.</p>
    <button type="button" className="primary" disabled={busy||title.trim().length<5||(!body.trim()&&!mainFile)} onClick={()=>void create()}>
-    <UploadCloud size={18}/>{busy?'Сохранение пакета…':'Создать и загрузить пакет'}
+    <UploadCloud size={18}/>{busy?'Сохранение пакета…':'Сохранить комплект документов'}
    </button>
+   <p className={styles.hint}>Сохранение создаёт черновик, но не означает внесения законопроекта в Государственную Думу. После проверки приложений внесение подтверждается отдельной кнопкой в карточке пакета.</p>
   </div>}
   {!canCreate&&!readOnly&&<p className={styles.hint}>Создавать пакет может участник с полномочиями субъекта законодательной инициативы во время открытого этапа. Просмотр доступен всем участникам игры.</p>}
   <div className={styles.listTitle}><h4>Реестр пакетов · {bills.length}</h4>
@@ -204,12 +319,22 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
     const required=KINDS.filter(k=>k.required);
     const attached=required.filter(k=>billFiles.some(f=>f.file_kind===k.key)).length;
     const isOwner=ownerCanEdit(d);
+    const profile=profiles.find(p=>p.document_id===d.id);
+    const conclusion=conclusions.find(c=>c.document_id===d.id);
+    const assigned=committees.find(c=>c.unit_key===profile?.committee_key);
+    const canCommitteeReview=mode==='work'&&!readOnly&&(g.teacher||!!assigned&&(assigned.head_user_id===g.me?.user_id||myCommitteeUnits.includes(assigned.id)));
     const openVotes=g.votes.filter(v=>v.formal_document_id===d.id&&v.status==='open');
     return <article key={d.id} className={styles.card}>
      <div className={styles.cardHeader}>
       <div className={styles.cardTitle}><FolderOpen size={20}/><div><small>{d.registry_no} · {d.status_label}</small><h4>{d.title}</h4></div></div>
       <span className={styles.count}>{attached}/{required.length} основных приложений</span>
      </div>
+     {mode==='work'&&<div className={styles.stageStatus}><b>Движение законопроекта</b>
+      <span>Подготовка → Внесение → Комитет → Совет ГД → I чтение → II чтение → III чтение → СФ → Президент</span>
+      <strong>Текущая стадия: {d.status_label}</strong>
+      {profile?.committee_key&&<small>Профильный комитет: {assigned?.title||profile.committee_key}</small>}
+      {conclusion?.finalized&&<small>Рекомендация комитета: {conclusion.recommendation==='proceed'?'Направить на рассмотрение':conclusion.recommendation==='return'?'Вернуть на доработку':'Отклонить'}</small>}
+     </div>}
      <div className={styles.fileList}>{billFiles.length?billFiles.map(f=>
       <button type="button" key={f.id} className={styles.file} onClick={()=>void openFile(f)} title="Открыть файл">
        <Paperclip size={16}/><span><b>{labelFor(f.file_kind)}</b><small>{f.file_name} · {f.status==='accepted'?'Принят':f.status==='revision'?'Нужна доработка':'На рассмотрении'}</small></span><ArrowUpRight size={16}/>
@@ -219,7 +344,40 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
        <FileText size={17}/>Открыть пакет, маршрут и поправки</button>
       {openVotes.length>0&&<button type="button" className="secondary" onClick={()=>onOpenVotes(openVotes[0].id)}>Открыть голосование</button>}
       {isOwner&&<button type="button" className="secondary" onClick={()=>setUploadId(old=>old===d.id?'':d.id)} aria-expanded={uploadId===d.id}><FileCheck2 size={17}/>Дополнить пакет</button>}
+      {mode==='work'&&!readOnly&&isOwner&&['draft','revision'].includes(d.status_code)&&<button type="button" className={styles.filingSubmit} disabled={busy} onClick={()=>void advanceBill(d.id)}>
+       <UploadCloud size={17}/>{busy?'Передача…':'Внести законопроект в Государственную Думу'}
+      </button>}
      </div>
+     {mode==='work'&&d.status_code==='registered'&&canAssignCommittee&&<div className={styles.forwardPanel}>
+      <strong>Направление в профильный комитет</strong>
+      <p>Если автор указал комитет, предложение сохранено. Назначение подтверждает уполномоченное руководство Государственной Думы.</p>
+      <label>Ответственный комитет
+       <select value={assignedCommittee[d.id]??profile?.committee_key??''} onChange={e=>setAssignedCommittee(v=>({...v,[d.id]:e.target.value}))}>
+        <option value="">Выберите комитет</option>{committees.map(c=><option value={c.unit_key} key={c.id}>{c.title}</option>)}
+       </select></label>
+      <div className={styles.forwardActions}>
+       <button type="button" className="secondary" disabled={busy||!(assignedCommittee[d.id]??profile?.committee_key??'')} onClick={()=>void saveCommittee(d.id,profile)}>Сохранить назначение</button>
+       {canReferCommittee&&<button type="button" className={styles.filingSubmit} disabled={busy||!profile?.committee_key} onClick={()=>void advanceBill(d.id)}>Направить законопроект в комитет</button>}
+      </div>
+     </div>}
+     {mode==='work'&&d.status_code==='committee'&&<div className={styles.forwardPanel}>
+      <strong>Заключение профильного комитета</strong>
+      {conclusion?.finalized?<p>Заключение зафиксировано в досье. Следующая стадия отражена в реестре НПА.</p>:canCommitteeReview?<button type="button" className="secondary" aria-expanded={reviewId===d.id} onClick={()=>editConclusion(d.id,conclusion)}>{reviewId===d.id?'Свернуть заключение':'Заполнить отзыв и решение комитета'}</button>:<p>Отзыв оформляют члены назначенного профильного комитета.</p>}
+      {canCommitteeReview&&reviewId===d.id&&!conclusion?.finalized&&<div className={styles.reviewForm}>
+       <label>Соответствие законодательству<textarea rows={3} value={reviewDraft.legal} onChange={e=>setReviewDraft(v=>({...v,legal:e.target.value}))}/></label>
+       <label>Обоснование и внутренняя логика<textarea rows={3} value={reviewDraft.logic} onChange={e=>setReviewDraft(v=>({...v,logic:e.target.value}))}/></label>
+       <label>Полнота перечня затрагиваемых НПА<textarea rows={3} value={reviewDraft.acts} onChange={e=>setReviewDraft(v=>({...v,acts:e.target.value}))}/></label>
+       <label>Рекомендация<select value={reviewDraft.recommendation} onChange={e=>setReviewDraft(v=>({...v,recommendation:e.target.value as ReviewDraft['recommendation']}))}>
+        <option value="proceed">Направить в Совет ГД</option><option value="return">Вернуть на доработку</option><option value="reject">Рекомендовать отклонить</option>
+       </select></label>
+       <button type="button" className={styles.filingSubmit} disabled={busy||!reviewDraft.legal.trim()||!reviewDraft.logic.trim()||!reviewDraft.acts.trim()} onClick={()=>void saveConclusion(d.id)}>Зафиксировать заключение и передать решение</button>
+      </div>}
+     </div>}
+     {mode==='work'&&d.status_code==='council'&&canCouncilApprove&&<div className={styles.forwardPanel}>
+      <strong>Решение Совета Государственной Думы</strong>
+      <p>После заключения профильного комитета передайте пакет на первое чтение. Он появится в проекте повестки заседания.</p>
+      <button type="button" className={styles.filingSubmit} disabled={busy} onClick={()=>void advanceBill(d.id)}>Передать на первое чтение</button>
+     </div>}
      {isOwner&&uploadId===d.id&&<div className={styles.inlineUpload}>
       <label>Вид приложения<select value={uploadKind} onChange={e=>setUploadKind(e.target.value)}>{KINDS.map(k=><option value={k.key} key={k.key}>{k.label}</option>)}</select></label>
       <label>Файл<input type="file" accept={fileAccept} onChange={e=>setUploadFile(e.target.files?.[0]||null)}/></label>

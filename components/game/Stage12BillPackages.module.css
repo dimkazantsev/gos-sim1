@@ -43,3 +43,24 @@
 .inlineUpload>button{min-height:46px}
 @media(max-width:760px){.heading,.cardHeader{flex-direction:column}.heading>button{align-self:stretch}.count{flex:auto}.fileList,.attachGrid,.fields{grid-template-columns:minmax(0,1fr)}.inlineUpload{grid-template-columns:minmax(0,1fr)}.inlineUpload>button{width:100%}}
 @media(max-width:430px){.form,.card{padding:14px}.cardActions{display:grid}.cardActions button{width:100%}.listTitle{align-items:stretch;flex-direction:column}.listTitle button{width:100%}}
+
+.filingSubmit{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:46px;padding:10px 15px;border:1px solid var(--gs-accent);border-radius:var(--gs-radius-sm);background:var(--gs-accent);color:#fff;font-size:13px;font-weight:800}
+.filingSubmit:disabled{opacity:.5;cursor:not-allowed}
+.filingSubmit:hover:not(:disabled){filter:brightness(.94)}
+@media(max-width:430px){.filingSubmit{width:100%}}
+
+
+.stageStatus{display:grid;gap:6px;margin:15px 0;padding:13px 15px;border:1px solid var(--gs-border);background:var(--gs-surface-soft);border-radius:var(--gs-radius-sm);min-width:0}
+.stageStatus>b,.stageStatus>strong{color:var(--gs-ink);font-size:13px}
+.stageStatus>span,.stageStatus>small{color:var(--gs-muted);font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.forwardPanel{display:grid;gap:11px;margin-top:14px;padding:15px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);background:var(--gs-surface-soft)}
+.forwardPanel>strong{font-size:15px;color:var(--gs-ink)}
+.forwardPanel>p{font-size:13px;line-height:1.55;color:var(--gs-muted);margin:0}
+.forwardPanel label,.reviewForm label{display:grid;gap:7px;font-size:13px;color:var(--gs-ink);font-weight:650;min-width:0}
+.forwardPanel select,.reviewForm textarea{min-width:0;width:100%}
+.forwardActions{display:flex;flex-wrap:wrap;gap:10px}
+.forwardActions button{min-height:44px}
+.reviewForm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.reviewForm label:nth-child(3){grid-column:1/-1}
+.reviewForm button{justify-self:start;min-height:44px}
+@media(max-width:650px){.forwardPanel{padding:12px}.forwardActions,.reviewForm{display:grid;grid-template-columns:1fr}.reviewForm label:nth-child(3){grid-column:auto}.forwardActions button,.reviewForm button{width:100%}}

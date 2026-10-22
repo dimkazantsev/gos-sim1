@@ -32,3 +32,20 @@ footer.help{display:flex;gap:10px;align-items:start;max-width:none;padding:0 4px
 .help>svg{flex:none;margin-top:2px}
 @media(max-width:1000px){.steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.tabs small{display:none}.tabs button{min-height:70px}.sectionHeading{flex-wrap:wrap}}
 @media(max-width:600px){.workspace,.panel{gap:16px}.heading h2{font-size:21px}.tabs{grid-template-columns:1fr;gap:4px}.tabs button{min-height:52px;padding:9px 10px}.tabs strong{font-size:13px}.tabs small{display:none}.preparation{padding:16px}.steps{grid-template-columns:1fr;gap:16px}.steps p{font-size:13px}.sectionHeading{gap:12px}.sectionHeading button,.actions button{width:100%}.reviews{padding:15px;gap:10px}.compactSteps{display:grid;gap:6px}}
+
+
+/* Stage 12 filing shares the approved project tokens and stays in the first reading. */
+.billFiling{display:grid;min-width:0;border:1px solid var(--gs-border);border-radius:var(--gs-radius-md);background:var(--gs-surface);overflow:hidden}
+.filingToggle{display:flex!important;align-items:center;gap:12px;justify-content:flex-start;width:100%;min-height:66px;padding:16px 20px!important;border:0!important;border-radius:0!important;background:var(--gs-accent)!important;color:#fff!important;font-size:16px!important;font-weight:800!important;text-align:left;box-shadow:none}
+.filingToggle>span{flex:1;min-width:0;line-height:1.45}
+.filingToggle>svg{flex:none}
+.filingToggle>svg:last-child{transition:transform .18s ease}
+.toggleExpanded{transform:rotate(90deg)}
+.filingToggle:focus-visible{outline:3px solid var(--gs-ink);outline-offset:-5px}
+.filingBody{display:grid;gap:24px;min-width:0;padding:20px}
+.inlineReview{display:flex;align-items:flex-start;gap:12px;min-width:0;padding:16px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);background:var(--gs-surface-soft)}
+.inlineReview>svg{flex:none;color:var(--gs-accent);margin-top:3px}
+.inlineReview>div{min-width:0;width:100%}
+.inlineReview h3{font-size:15px;color:var(--gs-ink);margin:0 0 6px}
+.inlineReview p{font-size:13px;line-height:1.6;color:var(--gs-muted);margin:0 0 12px}
+@media(max-width:600px){.filingToggle{font-size:14px!important;padding:14px!important}.filingBody{padding:12px}.inlineReview{padding:12px}}

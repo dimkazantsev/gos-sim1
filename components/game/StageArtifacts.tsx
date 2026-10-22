@@ -26,7 +26,7 @@ export const STAGE_FORMS:Record<number,Task>={
  15:{title:'Правовое реагирование на кризис',help:'Изучите кризис, определите компетентный орган и подготовьте обоснованный ответ. После проверки ответа преподавателем проект правового акта автоматически появится в материалах этапа и в Реестре НПА. Представитель компетентного органа должен оформить и опубликовать его самостоятельно: проверка ответа не равна подписанию акта.',templates:['president_decree','government_resolution','ministry_order','municipal_act'],target:'events'},
  16:{title:'Итоговый разбор',help:'Заполните аналитический разбор в форме этапа ниже. Сопоставьте документы, голоса, бюджет и последствия; отделите свои предположения от подтверждённых результатов.',templates:[],target:'grades'}
 };
-export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreateDocument,onNavigate,onOpenVotes,onOpenWork,finalDocuments=[],formalSubjects=[],onRefreshFinalDocuments}:{g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:View)=>void;onOpenVotes:(id?:string)=>void;onOpenWork?:()=>void;finalDocuments?:StageFinalDocument[];formalSubjects?:string[];onRefreshFinalDocuments?:()=>void}){
+export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreateDocument,onNavigate,onOpenVotes,onOpenWork,onOpenFiling,finalDocuments=[],formalSubjects=[],onRefreshFinalDocuments}:{g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:View)=>void;onOpenVotes:(id?:string)=>void;onOpenWork?:()=>void;onOpenFiling?:()=>void;finalDocuments?:StageFinalDocument[];formalSubjects?:string[];onRefreshFinalDocuments?:()=>void}){
  const [form,setForm]=useState(''),[saved,setSaved]=useState('');
  const task=STAGE_FORMS[stage.stage_no];if(!task)return null;
  const docs=g.formalDocuments.filter(d=>d.stage_no===stage.stage_no),votes=g.votes.filter(v=>v.stage_no===stage.stage_no);
@@ -54,7 +54,7 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
  })):[];
  if(stage.stage_no===12){
   return <section className="stageArtifacts surface">
-   <Stage12BillPackages g={g} stage={stage} readOnly={readOnly} subjects={formalSubjects} onOpenDocument={onOpenDocument} onOpenVotes={onOpenVotes}/>
+   <Stage12BillPackages g={g} stage={stage} mode="register" readOnly={readOnly} subjects={formalSubjects} onOpenDocument={onOpenDocument} onOpenVotes={onOpenVotes} onOpenWork={onOpenFiling||onOpenWork}/>
   </section>;
  }
  if(stage.stage_no===10){
