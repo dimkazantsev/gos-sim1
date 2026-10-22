@@ -2,7 +2,7 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const read=path=>fs.readFileSync(path,'utf8');
 const code=read('components/game/GovernmentProgramSessionLab.tsx');
-const migration=read('supabase/migrations/20261022103500_government_auto_agenda_chair_questions_vote.sql');
+const migration=read('supabase/migrations/20261022022951_government_auto_agenda_chair_questions_vote.sql');
 const details=read('components/game/stageDetails.ts');
 const css=read('app/2026-october-refinement.css');
 for(const s of [
