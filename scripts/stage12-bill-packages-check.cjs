@@ -17,6 +17,6 @@ assert(hub.includes('g.me.user_id===document.author_id'),'Unrelated student cann
 assert(hub.includes('createSignedUrl(file.storage_path,60)'),'Signed URLs generated only when a member opens a file');
 assert(documents.includes("advanceFormalDocument(selected.id,'advance'"),'Existing workflow advances the central NPA using the shared game method');
 assert(documents.includes("supabase.rpc('add_bill_package_file'"),'Document editor and stage hub share attachments');
-assert(amend.includes("supabase.rpc('submit_bill_amendment'"),'Amendments remain linked to one bill');
+assert(amend.includes("mutate('submit_bill_amendment'")&&amend.includes('p_document_id:document.id'),'Amendments remain linked to one bill via the shared mutation helper');
 assert(styles.includes('var(--gs-border)')&&styles.includes('var(--gs-surface)'),'Use approved design tokens');
 console.log('PASS: Stage 12 package creation, visibility, document-bound files, access, and amendment workflow.');
