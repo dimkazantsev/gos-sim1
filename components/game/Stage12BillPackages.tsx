@@ -82,12 +82,17 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  useEffect(()=>{
   if(mode!=='work'||!g.game)return;
   const gameId=g.game.id;let active=true;
-  void supabase.from('institution_units').select('id,unit_key,title,head_user_id').eq('game_id',gameId)
-   .eq('unit_kind','committee').limit(40).then(({data,error})=>{
-    if(!active)return;
-    if(error)g.setError(error);
-    else setCommittees((data||[]).filter(c=>!!c.unit_key));
-   });
+  void (async()=>{
+   const [units,membership]=await Promise.all([
+    supabase.from('institution_units').select('id,unit_key,title,head_user_id').eq('game_id',gameId).eq('unit_kind','committee').limit(40),
+    supabase.from('institution_assignments').select('unit_id').eq('game_id',gameId).eq('user_id',g.me?.user_id||'').limit(80)
+   ]);
+   if(!active)return;
+   if(units.error)g.setError(units.error);
+   else setCommittees((units.data||[]).filter(c=>!!c.unit_key));
+   if(membership.error)g.setError(membership.error);
+   else setMyCommitteeUnits((membership.data||[]).map(a=>a.unit_id));
+  })();
   return()=>{active=false};
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[g.game?.id,mode]);
@@ -110,17 +115,23 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  }
  useEffect(()=>{
   let live=true;
-  if(!g.game||!billIds){setFiles([]);setLoading(false);return;}
+  if(!g.game||!billIds){setFiles([]);setProfiles([]);setConclusions([]);setLoading(false);return;}
   setLoading(true);
   const ids=billIds.split(',');
   void (async()=>{
-   const response=await supabase.from('bill_package_files')
-     .select('id,document_id,file_kind,title,file_name,storage_path,status,note')
-     .eq('game_id',g.game!.id).in('document_id',ids)
-     .order('created_at',{ascending:false}).limit(160);
+   const [fileResult,profileResult,reviewResult]=await Promise.all([
+    supabase.from('bill_package_files').select('id,document_id,file_kind,title,file_name,storage_path,status,note')
+      .eq('game_id',g.game!.id).in('document_id',ids).order('created_at',{ascending:false}).limit(160),
+    supabase.from('bill_submission_profiles').select('document_id,committee_key,requires_financial_justification,requires_government_opinion,representative_user_id,note')
+      .eq('game_id',g.game!.id).in('document_id',ids).limit(160),
+    supabase.from('bill_committee_conclusions').select('document_id,legal_compliance,internal_logic,affected_acts_completeness,recommendation,finalized')
+      .eq('game_id',g.game!.id).in('document_id',ids).limit(160)
+   ]);
    if(!live)return;
-   if(response.error)g.setError(response.error);
-   else setFiles((response.data||[]) as BillFile[]);
+   for(const result of [fileResult,profileResult,reviewResult])if(result.error)g.setError(result.error);
+   if(!fileResult.error)setFiles((fileResult.data||[]) as BillFile[]);
+   if(!profileResult.error)setProfiles((profileResult.data||[]) as BillProfile[]);
+   if(!reviewResult.error)setConclusions((reviewResult.data||[]) as BillConclusion[]);
    setLoading(false);
   })();
   return()=>{live=false};
