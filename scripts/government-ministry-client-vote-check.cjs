@@ -38,10 +38,14 @@ function check({base='Президент Российской Федерации
 const ministry=[['Министерство по экономической политике','active']];
 assert.equal(check({appointments:ministry}).allowed,true,'President with active Ministry seat and frozen vote must vote');
 assert.equal(check({appointments:ministry}).role,true,'Ministry seat qualifies for Government membership');
-assert.equal(check({}).allowed,false,'President without Ministry is not a Government voter');
-assert.equal(check({appointments:[['Депутат Государственной Думы','active']]}).allowed,false,'Duma appointment grants no Government vote');
-assert.equal(check({appointments:[['Министерство по экономической политике','inactive']]}).allowed,false,'Inactive Ministry appointment grants no vote');
+assert.equal(check({included:false}).allowed,false,'President without Ministry is excluded by the frozen electorate');
+assert.equal(check({appointments:[['Депутат Государственной Думы','active']],included:false}).allowed,false,'Duma appointment grants no Government vote');
+assert.equal(check({appointments:[['Министерство по экономической политике','inactive']],included:false}).allowed,false,'Inactive Ministry appointment grants no vote');
 assert.equal(check({appointments:ministry,included:false}).allowed,false,'Missing snapshot authorization prevents voting');
+// The UI snapshot is server-issued when the vote opens. Live PostgreSQL RPC
+// separately verifies active office and attendance when submitting the ballot.
+assert.equal(check({appointments:[],included:true}).allowed,true,'A captured voter is not blocked by stale client office data');
+assert(game.includes("supabase.rpc('cast_vote_allocation'"),'Server RPC remains the final authorization boundary');
 assert.equal(check({appointments:ministry,kind:'observer'}).allowed,false,'Guest/observer cannot vote');
 assert.equal(check({appointments:ministry,archived:true,included:false}).allowed,false,'Archived non-member cannot bypass frozen roster');
 assert.equal(check({base:'Председатель Правительства Российской Федерации'}).allowed,true,'Prime Minister retains Government vote');

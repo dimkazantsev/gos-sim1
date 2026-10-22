@@ -1238,7 +1238,13 @@ export function useRepublicGame(gameId:string){
  }
  function canVote(v:Vote){
   if(!me||me.kind==='observer'||v.status!=='open')return false;
-  if(v.electorate_snapshot?.weights){return Number(v.electorate_snapshot.weights[me.user_id]||0)>0&&(v.institution_key==='gd'?gdMandateCapacity(me.user_id)>0:v.institution_key.startsWith('unit:')||memberMatchesInstitution(me.user_id,v.institution_key))}
+  if(v.electorate_snapshot?.weights){
+   // PostgreSQL verifies current membership, meeting registration and office
+   // authority. Do not reject a voter captured in the electorate snapshot
+   // solely because the current role title has not been updated in the UI.
+   return Number(v.electorate_snapshot.weights[me.user_id]||0)>0
+    &&(v.institution_key!=='gd'||gdMandateCapacity(me.user_id)>0);
+  }
   if(v.institution_key==='gd')return gdMandateCapacity(me.user_id)>0;
   if(!memberMatchesInstitution(me.user_id,v.institution_key||'all'))return false;
   if(v.voting_mode==='member')return true;

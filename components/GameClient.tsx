@@ -92,6 +92,10 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
  const visiblePartyDocs=party?g.partyDocuments.filter(d=>d.party_id===party.id):[];
 
  function canVote(v:Vote){
+  if(v.electorate_snapshot?.weights){
+   return Number(v.electorate_snapshot.weights[student.user_id]||0)>0
+    &&(v.institution_key!=='gd'||g.gdMandateCapacity(student.user_id)>0);
+  }
   if(v.voting_mode==='member')return memberMatchesInstitution(student,v.institution_key||'all');
   if(!party)return false;
   if(v.voting_mode==='faction')return party.leader_user_id===student.user_id;
