@@ -75,7 +75,7 @@ begin
          then now() else public.institution_meeting_records.updated_at end;
  end if;
  return v_doc;
-end;$function$
+end;$function$;
 
 CREATE OR REPLACE FUNCTION public.update_stage12_duma_agenda(
  p_session_id uuid,
