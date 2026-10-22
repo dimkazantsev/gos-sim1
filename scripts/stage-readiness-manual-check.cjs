@@ -55,7 +55,7 @@ assert(css.includes('.stageReadinessWorkspace .stageReadinessGroup header small{
 const workspace=read('components/game/GovernanceStageWorkspace.tsx');
 assert(workspace.includes('const stageLocked=!isStageWorkOpen(g.game,stage);'),
  'Closed/expired stages must be read-only to participants in the stage workspace');
-assert(workspace.includes('disabled={viewer||ksrfSessionBlocked}'),
+assert(workspace.includes('disabled={stage.stage_no!==12&&(viewer||ksrfSessionBlocked)}'),
  'Stage controls remain read-only for closed stages and also require approved KSRF meeting check-in');
 const command=read('components/game/TeacherView.tsx');
 assert(command.includes("const target=clockStage?.stage_no||stages.find(s=>s.status==='locked')?.stage_no"),

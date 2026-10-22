@@ -37,7 +37,7 @@ assert(stageWindow.includes("s.status='open'")&&stageWindow.includes('g.turn_ope
 assert(agreement.includes("perform private.require_game_meeting_registration(r.game_id,v_uid,3,'ksrf')"),'Stage 3 regional agreements require registration');
 assert(ui.includes('const preStageKsrf=body===\'ksrf\'&&(stage===2||stage===3)'),'Meeting preparation enabled before stage opening');
 assert(ui.includes('onMeetingReadyChange?.(ready)'),'Attendee readiness sent to work pane');
-assert(stage.includes('disabled={viewer||ksrfSessionBlocked}'),'Actual stage forms locked before session readiness');
+assert(stage.includes('disabled={stage.stage_no!==12&&(viewer||ksrfSessionBlocked)}'),'Stages 2/3 remain locked before session readiness; stage 12 keeps read-only navigation interactive');
 assert(stage.includes('sessionGate.ready'),'Registration unlocks stage work individually');
 assert(stage.includes('readOnly={stage.stage_no===2||stage.stage_no===3?'),'Meeting setup remains outside disabled work fieldset');
 for(const path of ['components/game/InstitutionRegistrationPanel.tsx','components/game/GovernanceStageWorkspace.tsx']){

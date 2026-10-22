@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const migration=fs.readFileSync('supabase/migrations/20261022162416_stage12_reading_discussion_sequence.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20261022181704_stage12_reading_discussion_sequence.sql','utf8');
 const old=fs.readFileSync('supabase/migrations/20261022132438_stage12_auto_duma_draft_agenda.sql','utf8');
 const extract=(text,name)=>{const start=text.toLowerCase().indexOf('create or replace function '+name+'(');assert(start>=0,name);const rest=text.slice(start),tag=rest.match(/\bAS\s+(\$[\w]*\$)/i);return rest.slice(0,rest.indexOf(tag[1],tag.index+tag[0].length)+tag[1].length+1)};
 const id=n=>'20000000-0000-0000-0000-'+String(n).padStart(12,'0'),game=id(1),chair=id(10),bill=id(2),other=id(3);
