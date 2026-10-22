@@ -313,6 +313,9 @@ export function useRepublicGame(gameId:string){
   channel.on('postgres_changes',{event:'*',schema:'public',table:'party_documents',filter:'game_id=eq.'+gameId},()=>{
    dirtyPartyDocuments=true;schedule();
   });
+  for(const table of ['duma_sessions','duma_agenda_items','institution_session_registrations','bill_amendments','bill_amendment_packs']){
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>notifyGameDataRefresh(gameId));
+  }
   liveRef.current=channel;
   setRealtimeState('connecting');
   channel.subscribe(status=>{
