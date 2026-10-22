@@ -7,6 +7,7 @@ on:
       - 'components/game/Stage12BillPackages.module.css'
       - 'components/game/StageArtifacts.tsx'
       - 'scripts/stage12-bill-packages-check.cjs'
+      - 'scripts/stage12-package-layout-check.cjs'
       - 'components/game/LegislativeSessionLab.module.css'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'supabase/migrations/*stage12_duma_rpc_active_window_guard.sql'
@@ -21,6 +22,7 @@ on:
       - 'components/game/Stage12BillPackages.module.css'
       - 'components/game/StageArtifacts.tsx'
       - 'scripts/stage12-bill-packages-check.cjs'
+      - 'scripts/stage12-package-layout-check.cjs'
       - 'components/game/LegislativeSessionLab.module.css'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'supabase/migrations/*stage12_duma_rpc_active_window_guard.sql'
@@ -51,3 +53,4 @@ jobs:
           echo "Chrome not found" >&2
           exit 1
       - run: node scripts/stage12-duma-layout-check.cjs
+      - run: node scripts/stage12-package-layout-check.cjs
