@@ -54,7 +54,7 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
  })):[];
  if(stage.stage_no===12){
   return <section className="stageArtifacts surface">
-   <Stage12BillPackages g={g} stage={stage} readOnly={readOnly} subjects={formalSubjects} onOpenDocument={onOpenDocument} onOpenVotes={onOpenVotes}/>
+   <Stage12BillPackages g={g} stage={stage} mode="register" readOnly={readOnly} subjects={formalSubjects} onOpenDocument={onOpenDocument} onOpenVotes={onOpenVotes} onOpenWork={onOpenWork}/>
   </section>;
  }
  if(stage.stage_no===10){
