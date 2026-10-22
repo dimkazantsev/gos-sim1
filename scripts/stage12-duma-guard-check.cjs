@@ -7,6 +7,7 @@ const ui=fs.readFileSync('components/game/LegislativeSessionLab.tsx','utf8');
 const workspace=fs.readFileSync('components/game/GovernanceStageWorkspace.tsx','utf8');
 const game='10000000-0000-0000-0000-000000000001';
 const names=['create_duma_session','add_duma_agenda_item','open_duma_session','close_duma_session','set_duma_agenda_item_status'];
+assert.equal((sql.match(/end;\$function\$;/g)||[]).length,5,'All restored RPC definitions must be terminated by semicolons');
 for(const name of names){
  const pos=sql.indexOf('CREATE OR REPLACE FUNCTION public.'+name+'(');
  assert(pos>=0,name+' RPC preserved');

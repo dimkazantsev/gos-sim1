@@ -48,7 +48,7 @@ begin
  insert into public.duma_agenda_items(session_id,game_id,formal_document_id,agenda_no)
  values(s.id,s.game_id,d.id,v_no) returning id into v_id;
  return v_id;
-end;$function$
+end;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.close_duma_session(p_session_id uuid, p_create_next boolean DEFAULT true)
@@ -88,7 +88,7 @@ begin
    '; перенесено: '||v_carried,v_uid);
 
  return jsonb_build_object('carried_over',v_carried,'next_session_id',v_next);
-end;$function$
+end;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.create_duma_session(p_game_id uuid, p_title text, p_scheduled_start timestamp with time zone DEFAULT NULL::timestamp with time zone, p_scheduled_end timestamp with time zone DEFAULT NULL::timestamp with time zone)
@@ -116,7 +116,7 @@ begin
  values(p_game_id,v_no,coalesce(nullif(trim(p_title),''),'Заседание Государственной Думы №'||v_no),v_start,v_end,v_uid,v_uid)
  returning id into v_id;
  return v_id;
-end;$function$
+end;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.open_duma_session(p_session_id uuid)
@@ -135,7 +135,7 @@ begin
  if not exists(select 1 from public.duma_agenda_items where session_id=s.id and status='pending')
  then raise exception 'The Duma does not meet without an agenda'; end if;
  update public.duma_sessions set status='open',opened_at=now(),chair_user_id=v_uid where id=s.id;
-end;$function$
+end;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.set_duma_agenda_item_status(p_item_id uuid, p_status text, p_note text DEFAULT NULL::text)
@@ -178,5 +178,5 @@ begin
   update public.duma_agenda_items set status='withdrawn',completed_at=now(),
     result_note=nullif(btrim(coalesce(p_note,'')),'') where id=i.id;
  end if;
-end;$function$
+end;$function$;
 
