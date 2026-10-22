@@ -1,6 +1,7 @@
 'use client';
 import {useState} from 'react';
 import StageDocumentForm from './StageDocumentForm';
+import Stage12BillPackages from './Stage12BillPackages';
 import {ArrowUpRight,CheckCircle2,FilePlus2,FileText,Link2,PartyPopper,Vote} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Stage,View} from './types';
@@ -19,7 +20,7 @@ export const STAGE_FORMS:Record<number,Task>={
  9:{title:'Назначения министров и состав ведомств',help:'В рабочей вкладке внесите кандидатуры министров и проведите согласования. Постановления ГД и указы о назначении сохраняются автоматически; приказы оформляют работу команд. Комитеты находятся на этапе 4.',templates:['president_decree','gd_resolution','ministry_order'],target:'votes'},
  10:{title:'Проект государственной программы',help:'Заполните паспорт, показатели, мероприятия и финансовое обеспечение в форме программы. Создайте программу в разделе «Работа». Паспорт и финансирование связаны с Реестром НПА; отдельное ФЭО не требуется.',templates:[]},
  11:{title:'Рассмотрение государственной программы',help:'Откройте заседание Правительства в форме ниже. Приложите программу к повестке, проверьте кворум, проведите рассмотрение и оформите постановление с утверждённым текстом.',templates:['government_resolution','minutes'],target:'votes'},
- 12:{title:'Пакет законодательной инициативы',help:'Создайте проект закона, пояснительную записку и перечень затрагиваемых актов. Добавьте ФЭО и заключение Правительства, если они нужны. Досье и чтения доступны внутри документа.',templates:['fz_bill','explanatory_note','affected_acts','financial_economic','government_opinion'],target:'votes'},
+ 12:{title:'Пакеты законодательных инициатив',help:'Каждый пакет включает проект закона и сопроводительные документы. Он рассматривается, дополняется и изменяется как единое досье.',templates:[],target:'votes'},
  13:{title:'Проект федерального бюджета',help:'Откройте бюджетный калькулятор: проверьте семь групп доходов, распределите расходы по 14 разделам и покройте дефицит. Рассмотрите запросы регионов, сохраните общий расчет и создайте из него проект с числовыми приложениями. Пройдите чтения, Совет Федерации и подпись Президента в правовом портале.',templates:['financial_economic'],target:'budget'},
  14:{title:'Муниципальный проект',help:'Зафиксируйте наблюдаемую местную проблему и доказательства в форме проекта ниже. Подготовьте муниципальный акт с расходами, источником средств, сроком и исполнителями.',templates:['municipal_act','financial_economic'],target:'budget'},
  15:{title:'Правовое реагирование на кризис',help:'Изучите кризис, определите компетентный орган и подготовьте обоснованный ответ. После проверки ответа преподавателем проект правового акта автоматически появится в материалах этапа и в Реестре НПА. Представитель компетентного органа должен оформить и опубликовать его самостоятельно: проверка ответа не равна подписанию акта.',templates:['president_decree','government_resolution','ministry_order','municipal_act'],target:'events'},
@@ -51,6 +52,11 @@ export default function StageArtifacts({g,stage,readOnly,onOpenDocument,onCreate
   ...p,
   documents:g.partyDocuments.filter(d=>d.party_id===p.id)
  })):[];
+ if(stage.stage_no===12){
+  return <section className="stageArtifacts surface">
+   <Stage12BillPackages g={g} stage={stage} readOnly={readOnly} subjects={formalSubjects} onOpenDocument={onOpenDocument} onOpenVotes={onOpenVotes}/>
+  </section>;
+ }
  if(stage.stage_no===10){
   const programDocs=docs.filter(d=>d.doc_type==='state_program');
   return <section className="stageArtifacts surface" aria-label="Государственные программы Этапа 10">
