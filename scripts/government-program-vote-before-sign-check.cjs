@@ -29,9 +29,9 @@ assert(!lab.includes("onClick={()=>void run('open_state_program_government_vote'
 assert(lab.includes("p_action:'pm_ready'")&&lab.includes("Согласовать для включения в повестку"),'PM only pre-approves agenda entry');
 assert(lab.includes("sign_adopted_state_program"),'Signed publication available after positive vote');
 assert(session.includes("open_program_vote_from_agenda"),'Vote from presented agenda only');
-assert(session.includes("i.vote_id&&<button"),'Every eligible member can open the ballot from Government session');
+assert(session.includes("item.vote_id&&<button")&&session.includes("onOpenVotes(item.vote_id!)"),'Every eligible member can open the ballot from Government session');
 assert(session.includes("sign_adopted_state_program"),'PM can sign after vote even if session is closed');
-assert(session.includes("!!i.vote_id||p?.status==='adopted'"),'Result remains reachable after session closing');
+assert(session.includes("item.vote_id&&<button")&&session.includes("Открыть результаты голосования"),'Result remains reachable after session closing');
 assert(model.includes("Принята · Ожидает подписи"),'Adoption does not mean publication');
 assert(css.includes('.programWorkspace .programApprovalSteps'),'Uses scoped ГОС.ID styling');
 assert(migration.includes('REVOKE ALL ON FUNCTION public.sign_adopted_state_program(uuid) FROM PUBLIC,anon;'),'No anonymous signature permission');
