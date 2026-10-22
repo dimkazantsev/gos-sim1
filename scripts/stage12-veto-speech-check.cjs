@@ -24,7 +24,7 @@ const game=id(1),bill=id(2),teacher=id(3),chair=id(4),vote=id(5),session=id(6),i
    CREATE FUNCTION private.is_game_teacher(uuid) RETURNS boolean LANGUAGE sql STABLE AS $$SELECT teacher FROM private.actor$$;
    CREATE FUNCTION private.can_manage_duma_session(uuid,uuid) RETURNS boolean LANGUAGE sql STABLE AS $$SELECT manage FROM private.actor$$;
    CREATE FUNCTION private.matches_formal_owner(uuid,uuid,text,uuid) RETURNS boolean LANGUAGE sql STABLE AS $$SELECT president FROM private.actor$$;
-   CREATE FUNCTION private.require_duma_stage_open(uuid,integer) RETURNS void LANGUAGE plpgsql AS $BEGIN RETURN; END;$;
+   CREATE FUNCTION private.require_duma_stage_open(uuid,integer) RETURNS void LANGUAGE plpgsql AS $$BEGIN RETURN; END;$$;
    CREATE FUNCTION private.require_game_meeting_registration(uuid,uuid,integer,text) RETURNS void LANGUAGE plpgsql AS $$BEGIN IF NOT (SELECT registered FROM private.actor) THEN RAISE EXCEPTION 'Registration required';END IF;END;$$;
    CREATE TABLE public.formal_documents(
     id uuid PRIMARY KEY,game_id uuid,author_id uuid,doc_type text,workflow_key text,
