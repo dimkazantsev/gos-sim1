@@ -198,6 +198,48 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
   }finally{setBusy(false)}
  }
 
+
+ async function saveCommittee(id:string,profile?:BillProfile){
+  if(!canAssignCommittee||busy)return;
+  const value=assignedCommittee[id]??profile?.committee_key??'';
+  if(!value){setMessage('Выберите профильный комитет.');return;}
+  setBusy(true);setMessage('');
+  try{
+   const {error}=await supabase.rpc('save_bill_submission_profile',{
+    p_document_id:id,p_committee_key:value,
+    p_requires_financial_justification:profile?.requires_financial_justification||false,
+    p_requires_government_opinion:profile?.requires_government_opinion||false,
+    p_representative_user_id:profile?.representative_user_id||null,
+    p_note:profile?.note||null
+   });
+   if(error)throw error;
+   setMessage('Профильный комитет назначен. Руководство Думы может передать ему законопроект.');
+   setRefresh(x=>x+1);notifyRefresh();
+  }catch(error){setMessage('Не удалось назначить комитет: '+userError(error))}
+  finally{setBusy(false)}
+ }
+ async function saveConclusion(id:string){
+  if(busy||!reviewDraft.legal.trim()||!reviewDraft.logic.trim()||!reviewDraft.acts.trim())return;
+  setBusy(true);setMessage('');
+  try{
+   const {error}=await supabase.rpc('save_bill_committee_conclusion',{
+    p_document_id:id,p_rapporteur_user_id:g.me?.user_id||null,
+    p_legal_compliance:reviewDraft.legal.trim(),p_internal_logic:reviewDraft.logic.trim(),
+    p_affected_acts_completeness:reviewDraft.acts.trim(),
+    p_recommendation:reviewDraft.recommendation,p_finalize:true
+   });
+   if(error)throw error;
+   setReviewId('');
+   setMessage(reviewDraft.recommendation==='proceed'?'Заключение передано в Совет Государственной Думы.':reviewDraft.recommendation==='return'?'Законопроект возвращён субъекту на доработку.':'Мотивированное заключение зафиксировано.');
+   setRefresh(x=>x+1);notifyRefresh();
+  }catch(error){setMessage('Не удалось сохранить заключение: '+userError(error))}
+  finally{setBusy(false)}
+ }
+ function editConclusion(id:string,conclusion?:BillConclusion){
+  if(reviewId===id){setReviewId('');return}
+  setReviewId(id);
+  setReviewDraft({legal:conclusion?.legal_compliance||'',logic:conclusion?.internal_logic||'',acts:conclusion?.affected_acts_completeness||'',recommendation:conclusion?.recommendation==='return'?'return':conclusion?.recommendation==='reject'?'reject':'proceed'});
+ }
  async function openFile(file:BillFile){
   if(!g.game)return;
   // Reserve the user-initiated tab before the signed-URL request. Creating a
