@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const migration=fs.readFileSync('supabase/migrations/20261023041500_stage12_veto_sf_confirmation_and_speech_control.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20261022213530_stage12_veto_sf_confirmation_and_speech_control.sql','utf8');
 const documentView=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
 const discussion=fs.readFileSync('components/game/DumaReadingDiscussion.tsx','utf8');
 const preset=fs.readFileSync('components/game/proceduralVoting.ts','utf8');
