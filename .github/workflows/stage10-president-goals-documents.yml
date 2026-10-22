@@ -20,6 +20,13 @@ on:
       - 'scripts/government-program-vote-before-sign-check.cjs'
       - 'supabase/migrations/*government_ministry_appointment_electorate.sql'
       - 'scripts/government-ministry-electorate-check.cjs'
+      - 'supabase/migrations/*government_auto_agenda_chair_questions_vote.sql'
+      - 'components/game/stageDetails.ts'
+      - 'components/game/stageOperations.ts'
+      - 'components/game/stageSystem.ts'
+      - 'app/2026-october-refinement.css'
+      - 'scripts/government-stage11-agenda-procedure-check.cjs'
+      - 'scripts/government-stage11-responsive-browser-check.cjs'
       - '.github/workflows/stage10-president-goals-documents.yml'
   push:
     branches: [main]
@@ -42,6 +49,13 @@ on:
       - 'scripts/government-program-vote-before-sign-check.cjs'
       - 'supabase/migrations/*government_ministry_appointment_electorate.sql'
       - 'scripts/government-ministry-electorate-check.cjs'
+      - 'supabase/migrations/*government_auto_agenda_chair_questions_vote.sql'
+      - 'components/game/stageDetails.ts'
+      - 'components/game/stageOperations.ts'
+      - 'components/game/stageSystem.ts'
+      - 'app/2026-october-refinement.css'
+      - 'scripts/government-stage11-agenda-procedure-check.cjs'
+      - 'scripts/government-stage11-responsive-browser-check.cjs'
       - '.github/workflows/stage10-president-goals-documents.yml'
 permissions:
   contents: read
@@ -60,6 +74,14 @@ jobs:
       - run: node scripts/stage10-single-program-work-links-check.cjs
       - run: node scripts/government-program-vote-before-sign-check.cjs
       - run: node scripts/government-ministry-electorate-check.cjs
+      - run: node scripts/government-stage11-agenda-procedure-check.cjs
+      - name: Find Chrome for Stage 11 responsive check
+        run: |
+          for binary in /usr/bin/google-chrome /usr/bin/google-chrome-stable /usr/bin/chromium; do
+            if test -x "$binary"; then echo "CHROME_BIN=$binary" >> "$GITHUB_ENV"; exit 0; fi
+          done
+          exit 1
+      - run: node scripts/government-stage11-responsive-browser-check.cjs
       - run: node scripts/stage10-ministry-team-rights-check.cjs
       - run: node scripts/stage-final-documents-gate-check.cjs
       - run: npm run typecheck
