@@ -15,7 +15,7 @@ assert(hub.includes("d.stage_no===12&&d.workflow_key==='bill'"),'Stage 12 packag
 assert(hub.includes('readOnly&&')||hub.includes('!readOnly&&'),'Read-only mode preserved');
 assert(hub.includes('g.me.user_id===document.author_id'),'Unrelated student cannot change another package');
 assert(hub.includes('createSignedUrl(file.storage_path,60)'),'Signed URLs generated only when a member opens a file');
-assert(documents.includes("supabase.rpc('advance_formal_document'"),'Existing workflow advances central NPA');
+assert(documents.includes("advanceFormalDocument(selected.id,'advance'"),'Existing workflow advances the central NPA using the shared game method');
 assert(documents.includes("supabase.rpc('add_bill_package_file'"),'Document editor and stage hub share attachments');
 assert(amend.includes("supabase.rpc('submit_bill_amendment'"),'Amendments remain linked to one bill');
 assert(styles.includes('var(--gs-border)')&&styles.includes('var(--gs-surface)'),'Use approved design tokens');

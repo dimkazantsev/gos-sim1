@@ -143,9 +143,16 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
 
  async function openFile(file:BillFile){
   if(!g.game)return;
+  // Reserve the user-initiated tab before the signed-URL request. Creating a
+  // window after an awaited network request is blocked by many phone browsers.
+  const tab=window.open('about:blank','_blank');
+  if(tab)tab.opener=null;
   const signed=await supabase.storage.from('game-assets').createSignedUrl(file.storage_path,60);
-  if(signed.error||!signed.data?.signedUrl){g.setError(signed.error||'Не удалось открыть файл');return}
-  window.open(signed.data.signedUrl,'_blank','noopener,noreferrer');
+  if(signed.error||!signed.data?.signedUrl){
+   tab?.close();g.setError(signed.error||'Не удалось открыть файл');return;
+  }
+  if(tab)tab.location.replace(signed.data.signedUrl);
+  else setMessage('Браузер заблокировал открытие файла. Разрешите всплывающие окна для ГОС.ID.');
  }
 
  return <section className={styles.section} aria-label="Пакеты законодательных инициатив">
