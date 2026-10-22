@@ -115,8 +115,14 @@ begin
  select id into i from government_program_agenda where session_id=s and program_id=p;
  perform pg_temp.sp_assert((select count(*)=1 from government_program_agenda where session_id=s),'Automatic programme agenda');
  perform pg_temp.sp_assert((select status_code='draft' from formal_documents d join government_sessions gs on gs.agenda_document_id=d.id where gs.id=s),'Agenda starts as draft');
+ perform pg_temp.sp_expect_rejection(format('select public.open_government_session(%L::uuid)',s),'Chair approval required before session');
+ perform pg_temp.sp_as_user((u->>'creator')::uuid);
+ perform pg_temp.sp_expect_rejection(format('select public.approve_government_session_agenda(%L::uuid)',s),'Only PM may approve agenda');
+ perform pg_temp.sp_as_user((u->>'pm')::uuid);
  perform public.approve_government_session_agenda(s);
  perform pg_temp.sp_assert((select agenda_approved_at is not null from government_sessions where id=s),'PM approved agenda');
+ perform pg_temp.sp_assert((select count(*)=1 from government_program_agenda where session_id=s),'No duplicate programme agenda');
+ perform pg_temp.sp_expect_rejection(format('select public.sync_government_session_programmes(%L::uuid)',s),'No agenda changes after approval');
  perform pg_temp.sp_assert((select status_code='published' from formal_documents d join government_sessions gs on gs.agenda_document_id=d.id where gs.id=s),'One official approved agenda');
  perform public.open_government_session(s);
  perform pg_temp.sp_assert(exists(select 1 from institution_meeting_records r join formal_documents fd on fd.id=r.agenda_document_id where r.game_id=g and r.stage_no=11 and r.institution_key='government' and r.agenda_approved_at is not null and fd.status_code='published'),'Agenda and meeting registration ready');
@@ -129,6 +135,8 @@ begin
  perform public.start_government_program_report(i);
  perform pg_temp.sp_as_user((u->>'creator')::uuid);
  q:=public.ask_government_program_speaker(i,'Какие измеримые показатели результата должны быть достигнуты?');
+ perform pg_temp.sp_as_user((u->>'pm')::uuid);
+ perform pg_temp.sp_expect_rejection(format('select public.close_government_program_questions(%L::uuid)',i),'Unanswered speaker question blocks voting');
  perform pg_temp.sp_expect_rejection(format('select public.open_program_vote_from_agenda(%L::uuid)',i),'Cannot vote before Q&A');
  perform pg_temp.sp_as_user((u->>'minister')::uuid);
  perform public.answer_government_program_speaker(q,'Целевые показатели установлены в паспорте программы.');
