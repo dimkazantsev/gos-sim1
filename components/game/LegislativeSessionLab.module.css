@@ -1,0 +1,47 @@
+/* Stage 12 uses the existing ГОС.ID design tokens; no separate palette. */
+.tabs{margin:12px 0 16px}
+.tabs>div>button{min-height:52px;background:var(--gs-surface);border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);box-shadow:none;padding:12px 16px}
+.tabs>div>button.active{background:var(--gs-accent-soft);border-color:var(--gs-accent)}
+.sessionBar,.documentBridge,.routeGuide,.empty{background:var(--gs-surface);border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);box-shadow:var(--gs-shadow-xs)}
+.empty{padding:20px;margin:12px 0;color:var(--gs-ink)}
+.empty>b{font-size:16px;font-weight:750}
+.empty>p{margin:7px 0 0;color:var(--gs-muted);font-size:14px;line-height:1.55}
+.routeGuide{padding:16px;margin-top:16px}
+.routeGuide :where(h3){color:var(--gs-ink)}
+.agenda{display:grid;gap:12px;margin-top:16px;min-width:0}
+.card{box-sizing:border-box;display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;align-items:start;padding:18px 20px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-md);background:var(--gs-surface);box-shadow:var(--gs-shadow-xs);min-width:0}
+.card.currentCard{border-color:var(--gs-accent);background:var(--gs-surface)}
+.card.rejectedCard{border-color:var(--gs-border);background:var(--gs-surface)}
+.number{width:44px;height:44px;display:grid;place-items:center;border-radius:var(--gs-radius-sm);background:var(--gs-accent-soft);color:var(--gs-accent-strong);font-size:14px;font-weight:800;letter-spacing:0}
+.document{display:flex;flex-direction:column;align-items:flex-start;gap:0;min-width:0}
+.document .registry{display:block;color:var(--gs-muted);font-size:12px;line-height:1.5;font-weight:650;overflow-wrap:anywhere}
+.document .headline{margin:5px 0 12px;color:var(--gs-ink);font-size:clamp(15px,1.45vw,18px);line-height:1.45;letter-spacing:-.02em;font-weight:750;overflow-wrap:anywhere}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center;min-width:0}
+.meta span{display:inline-flex;align-items:center;padding:4px 10px;min-height:28px;border-radius:8px;font-size:12px;font-weight:700;line-height:1.35;overflow-wrap:anywhere}
+.meta .agendaStatus{background:var(--gs-surface-soft);color:var(--gs-muted)}
+.meta .documentStatus{background:var(--gs-accent-soft);color:var(--gs-accent-strong)}
+.meta .rejectedBadge{background:var(--gs-red-soft);color:var(--gs-red)}
+.meta .openVote{background:var(--gs-green-soft);color:var(--gs-green)}
+.progress{display:flex;flex-wrap:wrap;gap:6px;width:100%;padding:10px 0 12px;border-top:1px solid var(--gs-border);border-bottom:1px solid var(--gs-border);margin:3px 0 10px}
+.progress>span{display:inline-flex;align-items:center;min-height:30px;padding:5px 9px;border:1px solid var(--gs-border);border-radius:8px;background:var(--gs-surface);color:var(--gs-muted);font-size:11px;font-weight:650;line-height:1.35}
+.progress .progressDone{background:var(--gs-surface-soft);border-color:var(--gs-border);color:var(--gs-ink-2)}
+.progress .progressCurrent{background:var(--gs-accent-soft);border-color:var(--gs-accent);color:var(--gs-accent-strong);font-weight:800}
+.progress .progressPending{background:var(--gs-surface);color:var(--gs-muted)}
+.rejectedExplanation{color:var(--gs-red)!important;font-size:13px!important;line-height:1.55!important;margin:0 0 12px!important}
+.documentActions{display:flex;flex-wrap:wrap;gap:9px;margin-top:4px}
+.documentActions>button{min-height:44px;font-size:13px}
+.document .resultNote{margin:12px 0 0;padding:11px 13px;border-left:3px solid var(--gs-border-strong);background:var(--gs-surface-soft);border-radius:0 8px 8px 0;color:var(--gs-ink-2);font-size:13px;line-height:1.55;max-width:100%;overflow-wrap:anywhere}
+.rule{margin-top:16px;padding:15px 18px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);background:var(--gs-surface-soft)}
+.rule b{color:var(--gs-ink);font-size:13px;font-weight:750}
+.rule p{margin:6px 0 0;color:var(--gs-muted);font-size:13px;line-height:1.55}
+@media(max-width:650px){
+ .card{grid-template-columns:34px minmax(0,1fr);gap:10px;padding:14px 12px;border-radius:var(--gs-radius-sm)}
+ .number{height:34px;width:34px;font-size:12px}
+ .document .headline{font-size:15px;line-height:1.45}
+ .progress{gap:5px}
+ .progress>span{font-size:11px;padding:5px 8px}
+ .documentActions{width:100%}
+ .documentActions>button{width:100%}
+ .tabs>div>button{min-width:0;flex:1 1 165px}
+}
+@media(prefers-reduced-motion:reduce){.card *{transition:none}}
