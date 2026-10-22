@@ -9,3 +9,5 @@ npm-debug.log*
 .design-review/
 .pages-build/
 *.tsbuildinfo
+.impeccable/review/
+supabase/.temp/

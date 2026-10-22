@@ -13,7 +13,7 @@ const {isStageWorkOpen}=moduleObject.exports;
 assert.equal(typeof isStageWorkOpen,'function');
 assert(stagesView.includes("get_my_stage_document_holds"),'Individual final-document debt remains enforced');
 assert(stagesView.includes('Boolean(selectedHold)'), 'Opening a stage does not circumvent student document debt');
-assert(governance.includes('disabled={viewer||ksrfSessionBlocked}'),'Existing stage workflow guard stays in place');
+assert(governance.includes('disabled={stage.stage_no!==12&&(viewer||ksrfSessionBlocked)}'),'Existing workflow guards remain outside stage 12; reading tabs retain read-only navigation');
 assert(sql.includes("stage_no=9")&&sql.includes("stage_no=8"),'Only Stage 9 opened following approved Stage 8');
 assert(!sql.includes("stage_no IN (9,10,11"),'Do not unlock other future stages');
 const gameId='52297def-d24d-4ba9-8049-5078b1b3bd45';

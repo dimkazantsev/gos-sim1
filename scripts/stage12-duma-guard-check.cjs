@@ -21,7 +21,7 @@ assert(ui.includes(".eq('stage_no',12)"),'Stage 12 excludes historical Stage 6 s
 assert(ui.includes(".in('session_id',sessionIds)"),'Agenda reads only Stage 12 session IDs');
 assert(ui.includes("v.stage_no===12"),'Vote links are stage-scoped');
 assert(ui.includes('!readOnly&&'),'Read-only viewer has no chairman controls');
-assert(workspace.includes('<LegislativeSessionLab g={g} readOnly={viewer}'),'Student guest view passes read-only flag');
+assert(workspace.includes('<Stage12ReadingWorkspace g={g} readOnly={viewer}')&&fs.readFileSync('components/game/Stage12ReadingWorkspace.tsx','utf8').includes('reading={reading} readOnly={readOnly}'),'Student guest view passes read-only flag through the reading workspace');
 const helper=sql.match(/CREATE OR REPLACE FUNCTION private\.require_duma_stage_open[\s\S]*?\$duma_stage\$;/)?.[0];
 assert(helper,'SQL helper must exist');
 (async()=>{

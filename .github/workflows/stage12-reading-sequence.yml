@@ -1,0 +1,43 @@
+name: Stage 12 reading sequence
+on:
+  pull_request:
+    paths:
+      - 'components/game/*Reading*'
+      - 'components/game/BillSubjectReview.tsx'
+      - 'components/game/BillAmendmentsPanel.tsx'
+      - 'components/game/InstitutionRegistrationPanel.tsx'
+      - 'components/game/LegislativeSessionLab*'
+      - 'components/game/GovernanceStageWorkspace.tsx'
+      - 'scripts/stage12-reading-*'
+      - 'scripts/stage12-second-reading-*'
+      - 'supabase/migrations/*stage12_reading_discussion_sequence.sql'
+      - 'supabase/migrations/*stage12_prepare_second_reading_with_amendments.sql'
+      - '.github/workflows/stage12-reading-sequence.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: stage12-reading-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/stage12-reading-sequence-check.cjs
+      - run: node scripts/stage12-second-reading-transition-check.cjs
+      - run: node scripts/bill-amendments-component-check.cjs
+      - run: node scripts/stage12-duma-guard-check.cjs
+      - run: node scripts/stage12-reading-browser-check.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage12-reading-evidence
+          path: .impeccable/review/
+          retention-days: 7

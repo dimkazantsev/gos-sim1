@@ -9,7 +9,7 @@ import StyledSelect from '../ui/StyledSelect';
 import {VOTING_BODIES,bodyQuorum,type VotingUnit} from './votingBodies';
 import {ClipboardCheck} from 'lucide-react';
 import DisclosureSummary from '../ui/DisclosureSummary';
-type Entry={user_id:string;institution_key:string;stage_no:number;present_mandates:number|null};
+type Entry={user_id:string;institution_key:string;stage_no:number;present_mandates:number|null;presence_updated_at?:string|null};
 type GdPresence={user_id:string;capacity:number;declared:number|null;present:number};
 type Assignment={unit_id:string;user_id:string};
 type Office={user_id:string;role_title:string};
@@ -20,7 +20,7 @@ function meetingErrorMessage(message:string):string{
  if(/permission denied|недостаточно прав|42501|403/i.test(message))return 'Нет полномочий для этого действия. Повестку утверждает председатель или преподаватель; подготовку может выполнить назначенный участник.';
  return message.length<=250?message:'Не удалось выполнить действие. Обновите данные заседания и повторите попытку.';
 }
-export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsChange,stageNo,initialBody,allowedBodies,defaultOpen=false,onOpenDocument,onMeetingReadyChange}:{g:ReturnTypeRepublic;readOnly?:boolean;onUnitsChange?:(units:VotingUnit[])=>void;stageNo?:number;initialBody?:string;allowedBodies?:string[];defaultOpen?:boolean;onOpenDocument?:(id:string)=>void;onMeetingReadyChange?:(ready:boolean)=>void}){
+export default function InstitutionRegistrationPanel({g,readOnly=false,freshAttendance=false,onUnitsChange,stageNo,initialBody,allowedBodies,defaultOpen=false,onOpenDocument,onMeetingReadyChange}:{g:ReturnTypeRepublic;readOnly?:boolean;freshAttendance?:boolean;onUnitsChange?:(units:VotingUnit[])=>void;stageNo?:number;initialBody?:string;allowedBodies?:string[];defaultOpen?:boolean;onOpenDocument?:(id:string)=>void;onMeetingReadyChange?:(ready:boolean)=>void}){
  const [rows,setRows]=useState<Entry[]>([]),[units,setUnits]=useState<VotingUnit[]>([]),[assignments,setAssignments]=useState<Assignment[]>([]),[offices,setOffices]=useState<Office[]>([]);
  const [body,setBody]=useState(initialBody||'gd'),[busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[newTitle,setNewTitle]=useState(''),[users,setUsers]=useState<string[]>([]),[head,setHead]=useState('');
  const [seats,setSeats]=useState('1'),[editing,setEditing]=useState<string|null>(null);
@@ -75,7 +75,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  const detailsRef=useRef<HTMLDetailsElement>(null);
  const lastMeetingDraftRef=useRef<{scope:string;agenda:string;minutes:string;delegate:string}|null>(null);
  const stage=stageNo||g.game?.current_round||1,students=g.members.filter(m=>m.kind==='student');
- async function load(){if(!g.game)return;const [r,u,a,b,o,meeting]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active'),
+ async function load(){if(!g.game)return;const [r,u,a,b,o,meeting]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates,presence_updated_at').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active'),
   supabase.from('institution_meeting_records').select('game_id,stage_no,institution_key,agenda_document_id,agenda_body,agenda_approved_at,minutes_document_id,minutes_body,minutes_approved_at,delegate_user_id').eq('game_id',g.game.id).eq('stage_no',stage)]);
   const failure=[r,u,a,b,o,meeting].find(x=>x.error);if(failure?.error){setMeetingError('Не удалось загрузить сведения о заседании. '+meetingErrorMessage(userError(failure.error)));return;}
   if(!r.error)setRows(r.data||[]);if(!u.error){setUnits(u.data||[]);onUnitsChange?.(u.data||[])}setAssignments([...(a.data||[]),...(b.data||[])]);if(!o.error)setOffices(o.data||[]);if(!meeting.error)setMeetingRows((meeting.data||[]) as MeetingRecord[]);setRightsVersion(v=>v+1);
@@ -138,8 +138,9 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  const config=VOTING_BODIES.find(b=>b.key===body),unit=units.find(u=>'unit:'+u.id===body);
  function eligible(uid:string){const m=g.members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;if(unit)return assignments.some(a=>a.unit_id===unit.id&&a.user_id===uid);if(body==='ksrf')return m.kind==='student'||g.parties.some(p=>p.leader_user_id===uid);if(body==='gd'&&m.kind==='student')return !m.roster_archived_at;return !!config&&(config.role.test(m.role_title||'')||(m.kind==='student'&&offices.some(o=>o.user_id===uid&&config.role.test(o.role_title))))}
  const participants=g.members.filter(m=>eligible(m.user_id));
- const registered=rows.filter(r=>r.institution_key===body&&participants.some(m=>m.user_id===r.user_id));
- const mine=rows.some(r=>r.institution_key===body&&r.user_id===g.me?.user_id);
+ const freshRegistration=(r:Entry)=>!freshAttendance||body!=='gd'||stage!==12||!!r.presence_updated_at&&r.presence_updated_at>=(meetingRows.find(m=>m.institution_key===body)?.agenda_approved_at||'~');
+ const registered=rows.filter(r=>r.institution_key===body&&freshRegistration(r)&&participants.some(m=>m.user_id===r.user_id));
+ const mine=registered.some(r=>r.user_id===g.me?.user_id);
  const factionCount=body==='ksrf'?g.parties.length:0;
  const total=body==='ksrf'?factionCount:body==='gd'?450:body==='government'?participants.length:body==='municipality'?participants.length:unit?.mandate_capacity??participants.length;
  const present=body==='ksrf'?new Set(registered.map(r=>g.parties.find(p=>p.leader_user_id===r.user_id)?.id).filter(Boolean)).size:body==='gd'?registered.reduce((n,r)=>n+(gdPresence?.registered.find(x=>x.user_id===r.user_id)?.present||0),0):registered.length;
