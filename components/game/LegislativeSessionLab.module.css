@@ -70,3 +70,13 @@
  .packageRegisterCount{align-self:start;white-space:normal}
  .packageRegisterItem>button{width:100%}
 }
+
+.correctionPanel{margin:14px 0;padding:15px 18px;background:var(--gs-surface);border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm)}
+.correctionPanel>summary{cursor:pointer;color:var(--gs-ink);font-size:13px;font-weight:750;line-height:1.5}
+.correctionPanel[open]>summary{margin-bottom:13px}
+.correctionFields{display:grid;gap:12px}
+.correctionFields>p{margin:0;color:var(--gs-muted);font-size:13px;line-height:1.55}
+.correctionFields>label{display:grid;gap:6px;color:var(--gs-ink);font-size:13px;font-weight:650}
+.correctionFields textarea{display:block;min-width:0;width:100%;min-height:92px;padding:10px 12px;border:1px solid var(--gs-border-strong);border-radius:10px;background:var(--gs-surface);font-size:13px;line-height:1.55;resize:vertical}
+.correctionFields button{justify-self:start;min-height:44px;padding:10px 16px}
+@media(max-width:650px){.correctionPanel{padding:14px}.correctionFields button{width:100%}}
