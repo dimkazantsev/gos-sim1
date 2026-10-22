@@ -66,20 +66,20 @@ END $sync$;
 CREATE OR REPLACE FUNCTION public.create_government_session_from_programmes(p_game_id uuid,p_time_limit_minutes integer DEFAULT 60)
  RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public','private','pg_temp'
 AS $create$
-DECLARE session_id uuid; v_no integer;
+DECLARE v_session_id uuid; v_no integer;
 BEGIN
  IF NOT private.can_approve_government_agenda(p_game_id,auth.uid()) THEN
   RAISE EXCEPTION 'Подготовить заседание может Председатель Правительства';END IF;
- SELECT id INTO session_id FROM public.government_sessions
+ SELECT id INTO v_session_id FROM public.government_sessions
  WHERE game_id=p_game_id AND status='draft' AND agenda_approved_at IS NULL
  ORDER BY created_at DESC LIMIT 1;
- IF session_id IS NULL THEN
-  session_id:=public.create_government_session(p_game_id,'Заседание Правительства Российской Федерации',greatest(5,least(240,p_time_limit_minutes)));
+ IF v_session_id IS NULL THEN
+  v_session_id:=public.create_government_session(p_game_id,'Заседание Правительства Российской Федерации',greatest(5,least(240,p_time_limit_minutes)));
  END IF;
- PERFORM public.sync_government_session_programmes(session_id);
- IF NOT EXISTS(SELECT 1 FROM public.government_program_agenda WHERE session_id=session_id) THEN
+ PERFORM public.sync_government_session_programmes(v_session_id);
+ IF NOT EXISTS(SELECT 1 FROM public.government_program_agenda WHERE v_session_id=v_session_id) THEN
   RAISE EXCEPTION 'Нет согласованных государственных программ. Завершите их подготовку на Этапе 10';END IF;
- RETURN session_id;
+ RETURN v_session_id;
 END $create$;
 
 CREATE OR REPLACE FUNCTION public.approve_government_session_agenda(p_session_id uuid)
