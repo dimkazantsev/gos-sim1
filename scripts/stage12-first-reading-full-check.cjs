@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const sql=fs.readFileSync('supabase/migrations/20261023050000_stage12_first_reading_full_adoption.sql','utf8');
+const sql=fs.readFileSync('supabase/migrations/20261022214628_stage12_first_reading_full_adoption.sql','utf8');
 const ui=fs.readFileSync('components/game/DumaReadingDiscussion.tsx','utf8');
 assert(ui.includes("set_duma_first_reading_route")&&ui.includes("Подтверждаю, что проект не регулирует предметы совместного ведения"));
 const id=n=>'40000000-0000-0000-0000-'+String(n).padStart(12,'0');
