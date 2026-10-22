@@ -312,12 +312,22 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
     const required=KINDS.filter(k=>k.required);
     const attached=required.filter(k=>billFiles.some(f=>f.file_kind===k.key)).length;
     const isOwner=ownerCanEdit(d);
+    const profile=profiles.find(p=>p.document_id===d.id);
+    const conclusion=conclusions.find(c=>c.document_id===d.id);
+    const assigned=committees.find(c=>c.unit_key===profile?.committee_key);
+    const canCommitteeReview=mode==='work'&&!readOnly&&(g.teacher||!!assigned&&(assigned.head_user_id===g.me?.user_id||myCommitteeUnits.includes(assigned.id)));
     const openVotes=g.votes.filter(v=>v.formal_document_id===d.id&&v.status==='open');
     return <article key={d.id} className={styles.card}>
      <div className={styles.cardHeader}>
       <div className={styles.cardTitle}><FolderOpen size={20}/><div><small>{d.registry_no} · {d.status_label}</small><h4>{d.title}</h4></div></div>
       <span className={styles.count}>{attached}/{required.length} основных приложений</span>
      </div>
+     {mode==='work'&&<div className={styles.stageStatus}><b>Движение законопроекта</b>
+      <span>Подготовка → Внесение → Комитет → Совет ГД → I чтение → II чтение → III чтение → СФ → Президент</span>
+      <strong>Текущая стадия: {d.status_label}</strong>
+      {profile?.committee_key&&<small>Профильный комитет: {assigned?.title||profile.committee_key}</small>}
+      {conclusion?.finalized&&<small>Рекомендация комитета: {conclusion.recommendation==='proceed'?'Направить на рассмотрение':conclusion.recommendation==='return'?'Вернуть на доработку':'Отклонить'}</small>}
+     </div>}
      <div className={styles.fileList}>{billFiles.length?billFiles.map(f=>
       <button type="button" key={f.id} className={styles.file} onClick={()=>void openFile(f)} title="Открыть файл">
        <Paperclip size={16}/><span><b>{labelFor(f.file_kind)}</b><small>{f.file_name} · {f.status==='accepted'?'Принят':f.status==='revision'?'Нужна доработка':'На рассмотрении'}</small></span><ArrowUpRight size={16}/>
@@ -331,6 +341,36 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
        <UploadCloud size={17}/>{busy?'Передача…':'Внести законопроект в Государственную Думу'}
       </button>}
      </div>
+     {mode==='work'&&d.status_code==='registered'&&canAssignCommittee&&<div className={styles.forwardPanel}>
+      <strong>Направление в профильный комитет</strong>
+      <p>Если автор указал комитет, предложение сохранено. Назначение подтверждает уполномоченное руководство Государственной Думы.</p>
+      <label>Ответственный комитет
+       <select value={assignedCommittee[d.id]??profile?.committee_key??''} onChange={e=>setAssignedCommittee(v=>({...v,[d.id]:e.target.value}))}>
+        <option value="">Выберите комитет</option>{committees.map(c=><option value={c.unit_key} key={c.id}>{c.title}</option>)}
+       </select></label>
+      <div className={styles.forwardActions}>
+       <button type="button" className="secondary" disabled={busy||!(assignedCommittee[d.id]??profile?.committee_key??'')} onClick={()=>void saveCommittee(d.id,profile)}>Сохранить назначение</button>
+       {canReferCommittee&&<button type="button" className={styles.filingSubmit} disabled={busy||!profile?.committee_key} onClick={()=>void advanceBill(d.id)}>Направить законопроект в комитет</button>}
+      </div>
+     </div>}
+     {mode==='work'&&d.status_code==='committee'&&<div className={styles.forwardPanel}>
+      <strong>Заключение профильного комитета</strong>
+      {conclusion?.finalized?<p>Заключение зафиксировано в досье. Следующая стадия отражена в реестре НПА.</p>:canCommitteeReview?<button type="button" className="secondary" aria-expanded={reviewId===d.id} onClick={()=>editConclusion(d.id,conclusion)}>{reviewId===d.id?'Свернуть заключение':'Заполнить отзыв и решение комитета'}</button>:<p>Отзыв оформляют члены назначенного профильного комитета.</p>}
+      {canCommitteeReview&&reviewId===d.id&&!conclusion?.finalized&&<div className={styles.reviewForm}>
+       <label>Соответствие законодательству<textarea rows={3} value={reviewDraft.legal} onChange={e=>setReviewDraft(v=>({...v,legal:e.target.value}))}/></label>
+       <label>Обоснование и внутренняя логика<textarea rows={3} value={reviewDraft.logic} onChange={e=>setReviewDraft(v=>({...v,logic:e.target.value}))}/></label>
+       <label>Полнота перечня затрагиваемых НПА<textarea rows={3} value={reviewDraft.acts} onChange={e=>setReviewDraft(v=>({...v,acts:e.target.value}))}/></label>
+       <label>Рекомендация<select value={reviewDraft.recommendation} onChange={e=>setReviewDraft(v=>({...v,recommendation:e.target.value as ReviewDraft['recommendation']}))}>
+        <option value="proceed">Направить в Совет ГД</option><option value="return">Вернуть на доработку</option><option value="reject">Рекомендовать отклонить</option>
+       </select></label>
+       <button type="button" className={styles.filingSubmit} disabled={busy||!reviewDraft.legal.trim()||!reviewDraft.logic.trim()||!reviewDraft.acts.trim()} onClick={()=>void saveConclusion(d.id)}>Зафиксировать заключение и передать решение</button>
+      </div>}
+     </div>}
+     {mode==='work'&&d.status_code==='council'&&canCouncilApprove&&<div className={styles.forwardPanel}>
+      <strong>Решение Совета Государственной Думы</strong>
+      <p>После заключения профильного комитета передайте пакет на первое чтение. Он появится в проекте повестки заседания.</p>
+      <button type="button" className={styles.filingSubmit} disabled={busy} onClick={()=>void advanceBill(d.id)}>Передать на первое чтение</button>
+     </div>}
      {isOwner&&uploadId===d.id&&<div className={styles.inlineUpload}>
       <label>Вид приложения<select value={uploadKind} onChange={e=>setUploadKind(e.target.value)}>{KINDS.map(k=><option value={k.key} key={k.key}>{k.label}</option>)}</select></label>
       <label>Файл<input type="file" accept={fileAccept} onChange={e=>setUploadFile(e.target.files?.[0]||null)}/></label>
