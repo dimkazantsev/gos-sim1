@@ -102,7 +102,7 @@ perform set_config('qa.gov.priority',pr::text,true);end $seed$;
 set local role authenticated;
 do $verify$ declare g uuid:=current_setting('qa.gov.game')::uuid;u jsonb:=current_setting('qa.gov.users')::jsonb;
  pl jsonb:=current_setting('qa.gov.payload')::jsonb||jsonb_build_object('presidential_priority_id',current_setting('qa.gov.priority'));
- p uuid;s uuid;i uuid;v uuid;d uuid;actor text;signed timestamptz;
+ p uuid;s uuid;i uuid;v uuid;d uuid;q uuid;actor text;signed timestamptz;
 begin
  perform pg_temp.sp_as_user((u->>'creator')::uuid);
  p:=public.save_state_program_draft(g,null,pl,false);
@@ -111,9 +111,13 @@ begin
  perform pg_temp.sp_as_user((u->>'pm')::uuid); perform public.advance_state_program(p,'pm_ready');
  perform pg_temp.sp_assert((select signed_at is null and status='ready' from state_programs where id=p),'Unsigned after preliminary PM review');
  perform pg_temp.sp_expect_rejection(format('select public.open_state_program_government_vote(%L::uuid)',p),'Vote requires presentation');
- s:=public.create_government_session_with_questions(g,'QA Government Meeting',60,'[{"title":"QA Program presentation","minutes":10}]'::jsonb);
- perform public.add_program_to_government_agenda(s,p,7);
+ s:=public.create_government_session_from_programmes(g,60);
  select id into i from government_program_agenda where session_id=s and program_id=p;
+ perform pg_temp.sp_assert((select count(*)=1 from government_program_agenda where session_id=s),'Automatic programme agenda');
+ perform pg_temp.sp_assert((select status_code='draft' from formal_documents d join government_sessions gs on gs.agenda_document_id=d.id where gs.id=s),'Agenda starts as draft');
+ perform public.approve_government_session_agenda(s);
+ perform pg_temp.sp_assert((select agenda_approved_at is not null from government_sessions where id=s),'PM approved agenda');
+ perform pg_temp.sp_assert((select status_code='published' from formal_documents d join government_sessions gs on gs.agenda_document_id=d.id where gs.id=s),'One official approved agenda');
  perform public.open_government_session(s);
  perform pg_temp.sp_assert(exists(select 1 from institution_meeting_records r join formal_documents fd on fd.id=r.agenda_document_id where r.game_id=g and r.stage_no=11 and r.institution_key='government' and r.agenda_approved_at is not null and fd.status_code='published'),'Agenda and meeting registration ready');
  -- All three register before voting, so quorum cannot prematurely close the meeting.
@@ -123,7 +127,15 @@ begin
  end loop;
  perform pg_temp.sp_as_user((u->>'pm')::uuid);
  perform public.start_government_program_report(i);
+ perform pg_temp.sp_as_user((u->>'creator')::uuid);
+ q:=public.ask_government_program_speaker(i,'Какие измеримые показатели результата должны быть достигнуты?');
+ perform pg_temp.sp_expect_rejection(format('select public.open_program_vote_from_agenda(%L::uuid)',i),'Cannot vote before Q&A');
+ perform pg_temp.sp_as_user((u->>'minister')::uuid);
+ perform public.answer_government_program_speaker(q,'Целевые показатели установлены в паспорте программы.');
+ perform pg_temp.sp_as_user((u->>'pm')::uuid);
+ perform public.close_government_program_questions(i);
  v:=public.open_program_vote_from_agenda(i);
+ perform pg_temp.sp_assert((select qa_closed_at is not null from government_program_agenda where id=i),'Speaker Q&A is completed before decision');
  perform pg_temp.sp_expect_rejection(format('select public.sign_adopted_state_program(%L::uuid)',p),'Cannot sign before passed vote');
  foreach actor in array array['creator','minister','pm'] loop
   perform pg_temp.sp_as_user((u->>actor)::uuid);
