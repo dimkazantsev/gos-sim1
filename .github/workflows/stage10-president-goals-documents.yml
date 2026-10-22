@@ -26,6 +26,7 @@ on:
       - 'components/game/stageSystem.ts'
       - 'app/2026-october-refinement.css'
       - 'scripts/government-stage11-agenda-procedure-check.cjs'
+      - 'components/ui/StageModuleHeader.module.css'
       - 'scripts/government-stage11-responsive-browser-check.cjs'
       - '.github/workflows/stage10-president-goals-documents.yml'
   push:
@@ -55,6 +56,7 @@ on:
       - 'components/game/stageSystem.ts'
       - 'app/2026-october-refinement.css'
       - 'scripts/government-stage11-agenda-procedure-check.cjs'
+      - 'components/ui/StageModuleHeader.module.css'
       - 'scripts/government-stage11-responsive-browser-check.cjs'
       - '.github/workflows/stage10-president-goals-documents.yml'
 permissions:
