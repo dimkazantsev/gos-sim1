@@ -183,7 +183,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
   </section>
 
   <section id={sectionId+'-materials'} className="stageOperationsPane" hidden={tab!=='materials'} aria-label="Документы и голосования">
-   <StageArtifacts g={g} stage={stage} readOnly={viewer&&!canRemediateCompleted} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes} onOpenWork={stage.stage_no===12?openStage12Filing:()=>setTab('work')}
+   <StageArtifacts g={g} stage={stage} readOnly={viewer&&!canRemediateCompleted} onOpenDocument={onOpenDocument} onCreateDocument={onCreateDocument} onNavigate={onNavigate} onOpenVotes={onOpenVotes} onOpenWork={()=>setTab('work')} onOpenFiling={openStage12Filing}
      finalDocuments={requiredDocuments} formalSubjects={formalSubjects} onRefreshFinalDocuments={()=>void refreshFinalDocuments()}/>
    <div className="stageOperationsRelated"><h3><Link2 size={18}/>Связанные разделы</h3><div>{operation.related.map(view=><button type="button" key={view} disabled={!onNavigate} onClick={()=>onNavigate?.(view)}>{VIEW_NAMES[view]||'Раздел игры'}</button>)}</div></div>
   </section>
