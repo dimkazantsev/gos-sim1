@@ -7,9 +7,14 @@ on:
       - 'components/game/BillAmendmentsPanel.tsx'
       - 'components/game/InstitutionRegistrationPanel.tsx'
       - 'components/game/LegislativeSessionLab*'
+      - 'components/game/DumaReadingDiscussion.tsx'
+      - 'components/game/DocumentsView.tsx'
+      - 'components/game/proceduralVoting.ts'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'scripts/stage12-reading-*'
       - 'scripts/stage12-second-reading-*'
+      - 'scripts/stage12-veto-speech-check.cjs'
+      - 'supabase/migrations/*stage12_veto_sf_confirmation_and_speech_control.sql'
       - 'supabase/migrations/*stage12_reading_discussion_sequence.sql'
       - 'supabase/migrations/*stage12_prepare_second_reading_with_amendments.sql'
       - '.github/workflows/stage12-reading-sequence.yml'
@@ -30,6 +35,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - run: node scripts/stage12-veto-speech-check.cjs
       - run: node scripts/stage12-reading-sequence-check.cjs
       - run: node scripts/stage12-second-reading-transition-check.cjs
       - run: node scripts/bill-amendments-component-check.cjs

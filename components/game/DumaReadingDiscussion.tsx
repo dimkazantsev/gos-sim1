@@ -21,11 +21,28 @@ export default function DumaReadingDiscussion({g,item,canManage,onRefresh}:{g:Re
   try{const result=await supabase.rpc('set_duma_discussion_phase',{p_item_id:item.id,p_phase:next,p_speaker:start?speaker:null,p_seconds:start?seconds:null});if(result.error)throw result.error;await onRefresh()}
   catch(error){g.setError(userError(error))}finally{setBusy(false)}
  }
+ async function adjustTime(delta:number){
+  if(busy||!canManage||!item.speech_ends_at)return;
+  setBusy(true);
+  try{
+   const {error}=await supabase.rpc('adjust_duma_speech_time',{
+    p_item_id:item.id,p_expected_end:item.speech_ends_at,p_delta_seconds:delta
+   });
+   if(error)throw error;
+   await onRefresh();
+  }catch(error){g.setError(userError(error))}
+  finally{setBusy(false)}
+ }
  const next=phases[phases.indexOf(phase)+1];
  return <section className={styles.discussion} aria-label="Выступления и обсуждение">
   <ol className={styles.discussionSteps}>{phases.map((code,index)=><li key={code} aria-current={phase===code?'step':undefined} data-done={index<phases.indexOf(phase)}>{labels[code]}</li>)}</ol>
   {phase!=='vote'&&phase!=='amendments'&&<><header className={styles.speakerHead}><div><Mic2 size={18}/><b>{labels[phase]}</b></div><span className={styles.timer} role="timer" aria-label="Оставшееся время выступления"><Clock3 size={17}/>{left===null?'Таймер не запущен':left===0?'Время истекло':String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0')}</span></header>
    <p>{item.speaker_user_id?g.members.find(m=>m.user_id===item.speaker_user_id)?.full_name||'Выступающий участник':'Председатель предоставляет слово участнику.'} {maximum===86400?'Время выступления определяет председатель.':'Максимум для этого выступления: '+Math.floor(maximum/60)+' мин.'}</p>
+   {canManage&&item.speech_ends_at&&<div className={styles.speechAdjust} aria-label="Управление временем выступления">
+    <span>Изменить оставшееся время:</span>
+    <button type="button" className="secondary" disabled={busy||left===0} onClick={()=>void adjustTime(-30)} aria-label="Сократить выступление на 30 секунд">−30 сек.</button>
+    <button type="button" className="secondary" disabled={busy} onClick={()=>void adjustTime(30)} aria-label="Продлить выступление на 30 секунд">+30 сек.</button>
+   </div>}
    {canManage&&<div className={styles.speakerControls}><label>Выступающий<select aria-label="Выступающий" value={speaker} onChange={e=>setSpeaker(e.target.value)} disabled={busy}><option value="">Выберите участника</option>{g.members.filter(m=>m.kind!=='observer'&&!m.roster_archived_at).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label><label>Время, секунд<input aria-label="Время выступления, секунд" type="number" min={1} max={maximum} value={seconds} onChange={e=>setSeconds(Number(e.target.value))} disabled={busy}/></label><button type="button" className="secondary" disabled={busy||!speaker||!Number.isInteger(seconds)||seconds<1||seconds>maximum||left!==null&&left>0} onClick={()=>void act(phase,true)}>Предоставить слово</button></div>}
   </>}
   {phase==='amendments'&&<p>Рассмотрите внесённые поправки в таблице выше. После голосования по каждой поправке можно открыть итоговое голосование второго чтения.</p>}
