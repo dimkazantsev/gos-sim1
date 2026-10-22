@@ -14,6 +14,8 @@ on:
       - 'scripts/stage12-reading-*'
       - 'scripts/stage12-second-reading-*'
       - 'scripts/stage12-veto-speech-check.cjs'
+      - 'scripts/stage12-first-reading-full-check.cjs'
+      - 'supabase/migrations/*stage12_first_reading_full_adoption.sql'
       - 'supabase/migrations/*stage12_veto_sf_confirmation_and_speech_control.sql'
       - 'supabase/migrations/*stage12_reading_discussion_sequence.sql'
       - 'supabase/migrations/*stage12_prepare_second_reading_with_amendments.sql'
@@ -36,6 +38,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/stage12-veto-speech-check.cjs
+      - run: node scripts/stage12-first-reading-full-check.cjs
       - run: node scripts/stage12-reading-sequence-check.cjs
       - run: node scripts/stage12-second-reading-transition-check.cjs
       - run: node scripts/bill-amendments-component-check.cjs
