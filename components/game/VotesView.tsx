@@ -234,7 +234,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
     {v.status==='open'?<div className="proceduralVoteActions">
      <VoteBallotControls vote={v} maxWeight={v.institution_key==='gd'?gdPresentWeight(v):g.ballotWeight(v)} canCast={canCast(v)} ballot={my} onSubmit={(yes,no,abstain)=>g.castVoteAllocation(v,yes,no,abstain)}/>
      {!canVote(v)&&<small className="voteNotEligible">Вашей игровой роли не предоставлено право голоса в этой процедуре.</small>}
-     {canVote(v)&&!isRegisteredForVote(v)&&<small className="voteNotEligible">Сначала отметьте присутствие в панели регистрации выше, затем голосуйте.</small>}
+     {canVote(v)&&!isRegisteredForVote(v)&&<small className="voteNotEligible">{v.procedure_key==='state_program'&&stages.some(stage=>stage.stage_no===v.stage_no&&stage.status==='locked')?'Этап 11 пока закрыт преподавателем. После его открытия и утверждения повестки зарегистрируйтесь на заседание Правительства, затем голосуйте.':'Сначала отметьте присутствие в панели регистрации выше, затем голосуйте.'}</small>}
      {v.voting_mode==='mandate'&&canVote(v)&&<small className="myMandateWeight">Ваш вес в этом голосовании: <b>{v.institution_key==='gd'?gdPresentWeight(v):partyMandates.find(x=>x.user_id===me?.user_id)?.effective_mandates||0}</b> присутствующих депутатских голосов.</small>}
      {canClose(v)&&<button className="primary closeProceduralVote" disabled={busy===v.id} onClick={async()=>{if(!confirm('Закрыть голосование и зафиксировать результат?'))return;setBusy(v.id);await closeVote(v.id);setBusy('')}}>{busy===v.id?'Подсчитываю…':'Закрыть и применить результат →'}</button>}
     </div>:<div className={'finalVoteDecision '+(v.result_code||'')}>
