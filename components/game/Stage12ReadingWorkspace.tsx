@@ -45,23 +45,23 @@ export default function Stage12ReadingWorkspace({g,readOnly,onOpenVotes,onOpenDo
   </div>
   <section role="tabpanel" id={'reading-panel-'+reading} aria-labelledby={'reading-tab-'+reading} className={styles.panel}>
    {reading===1&&<section className={styles.preparation} aria-label="Подготовка к первому чтению">
-    <div className={styles.sectionHeading}><div><h3>До открытия заседания</h3><p>Заседание ждёт готовности всех законопроектов повестки.</p></div><button type="button" className="secondary" onClick={onPrepare}><FileText size={17}/>Подготовить документы</button></div>
+    <div className={styles.sectionHeading}><div><h3>До открытия заседания</h3><p>Сначала подготовьте пакеты, заключения и проект повестки. Только затем председатель утверждает её и начинается регистрация на заседание.</p></div><button type="button" className="secondary" onClick={onPrepare}><FileText size={17}/>Подготовить документы</button></div>
     <ol className={styles.steps}>{preparation.map((step,index)=><li key={step.title} data-complete={step.done}><span>{step.done?<Check size={17}/>:index+1}</span><div><b>{step.title}</b><p>{step.body}</p></div></li>)}</ol>
    </section>}
    {reading===2&&<section className={styles.preparation} aria-label="Подготовка ко второму чтению">
-    <div className={styles.sectionHeading}><div><h3>Сначала — поправки к законопроекту</h3><p>После принятия в первом чтении субъекты инициативы вносят поправки. Комитет готовит таблицу и заключение, Совет ГД назначает второе чтение.</p></div></div>
+    <div className={styles.sectionHeading}><div><h3>Сначала — поправки к законопроекту</h3><p>После первого чтения подготовьте поправки, таблицы и заключение комитета. Затем утвердите повестку второго чтения, зарегистрируйтесь на заседание, обсудите и проголосуйте каждую поправку и законопроект.</p></div></div>
     <ol className={styles.compactSteps}><li>Внести поправки</li><li>Подготовить таблицу</li><li>Обсудить на заседании</li><li>Проголосовать по поправкам</li></ol>
     {second.length>0?<><label className={styles.billSelect}>Законопроект для работы с поправками<select value={amendmentBill?.id||''} onChange={event=>setSelectedBill(event.target.value)}>{second.map(d=><option key={d.id} value={d.id}>{d.registry_no} · {d.title}</option>)}</select></label>
      {amendmentBill&&<><div className={styles.actions}>{onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(amendmentBill.id)}>Досье, отзывы и передача ко II чтению <ArrowRight size={16}/></button>}</div><BillAmendmentsPanel key={amendmentBill.id} g={g} document={amendmentBill} readOnly={readOnly} onOpenVotes={onOpenVotes}/></>}
     </>:<p className={styles.waiting}>Поправки откроются после принятия законопроекта в первом чтении. Подготовленные материалы и решения сохранятся в его досье.</p>}
    </section>}
    {reading===3&&<section className={styles.preparation} aria-label="Принятие и опубликование закона">
-    <div className={styles.sectionHeading}><div><h3>Окончательный текст и принятие закона</h3><p>Комитет готовит окончательную редакцию. В третьем чтении поправки не вносятся: после доклада и выступлений по мотивам голосования закон голосуется в целом.</p></div></div>
+    <div className={styles.sectionHeading}><div><h3>Окончательный текст и принятие закона</h3><p>Подготовьте окончательный текст и повестку третьего чтения. После регистрации и открытия заседания проходят доклад, выступления по мотивам, затем голосование за законопроект в целом. Новые поправки недопустимы.</p></div></div>
     <ol className={styles.compactSteps}><li>III чтение в ГД</li><li>Совет Федерации</li><li>Подпись Президента</li><li>Опубликование</li></ol>
     <p className={styles.help}>В игре Совет Федерации одобряет закон автоматически. Президент может подписать или отклонить его; решение и дальнейший маршрут фиксируются в НПА.</p>
    </section>}
-   <aside className={styles.reviews}><MessagesSquare size={20}/><div><b>Отзывы субъектов — в досье законопроекта</b><p>Отзывы, заключения и замечания доступны при подготовке и между чтениями. Действующий субъект инициативы может направить позицию по законопроекту; она сохранится в его сопровождении.</p><BillSubjectReview key={(g.game?.id||'')+':'+g.me?.user_id} g={g} readOnly={readOnly} onOpenDocument={onOpenDocument}/></div></aside>
    <LegislativeSessionLab g={g} reading={reading} readOnly={readOnly} onOpenVotes={onOpenVotes} onOpenDocument={onOpenDocument}/>
+   <aside className={styles.reviews}><MessagesSquare size={20}/><div><b>Отзывы субъектов — в досье законопроекта</b><p>Отзывы, заключения и замечания доступны при подготовке и между чтениями. Действующий субъект инициативы может направить позицию по законопроекту; она сохранится в его сопровождении.</p><BillSubjectReview key={(g.game?.id||'')+':'+g.me?.user_id} g={g} readOnly={readOnly} onOpenDocument={onOpenDocument}/></div></aside>
    <footer className={styles.help}><Vote size={17}/><span>Результаты голосований определяют дальнейшее движение: следующее чтение, предусмотренное правилами принятие закона или отклонение. Переходы доступны в связанном НПА.</span></footer>
   </section>
  </div>;

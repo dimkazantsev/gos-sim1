@@ -28,7 +28,7 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  const [start,setStart]=useState('');
  const [end,setEnd]=useState('');
  const [docId,setDocId]=useState('');
- const [correctionReason,setCorrectionReason]=useState('');
+ const [meeting,setMeeting]=useState<{agenda_document_id:string|null;agenda_approved_at:string|null}|null>(null);
  const [note,setNote]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
  const [feedback,setFeedback]=useState('');
@@ -49,17 +49,22 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
   if(sessionsResponse.error){setError(userError(sessionsResponse.error));return;}
   const rows=((sessionsResponse.data||[]) as Session[]).filter(s=>(s.reading_no||1)===reading);
   const sessionIds=rows.map(row=>row.id);
-  const agendaResponse=sessionIds.length
-   ?await supabase.from('duma_agenda_items').select('*').eq('game_id',game.id)
-     .in('session_id',sessionIds).order('agenda_no')
-   :null;
+  const [agendaResponse,meetingResponse]=await Promise.all([
+   sessionIds.length
+    ?supabase.from('duma_agenda_items').select('*').eq('game_id',game.id).in('session_id',sessionIds).order('agenda_no')
+    :Promise.resolve(null),
+   supabase.from('institution_meeting_records').select('agenda_document_id,agenda_approved_at')
+    .eq('game_id',game.id).eq('stage_no',12).eq('institution_key','gd').maybeSingle()
+  ]);
   if(activeReading.current!==requestReading)return;
   if(agendaResponse?.error){setError(userError(agendaResponse.error));return;}
+  if(meetingResponse.error){setError(userError(meetingResponse.error));return;}
+  setMeeting(meetingResponse.data);
   setSessions(rows);
   setSelectedId(previous=>rows.some(row=>row.id===previous)?previous:rows[0]?.id||'');
   setAgenda((agendaResponse?.data||[]) as AgendaItem[]);
  }
- useGameTableSync(game?.id,['duma_sessions','duma_agenda_items','formal_documents','game_votes','game_ballots','bill_committee_conclusions'],load,(me?.user_id||'')+':'+reading);
+ useGameTableSync(game?.id,['duma_sessions','duma_agenda_items','institution_meeting_records','formal_documents','game_votes','game_ballots','bill_committee_conclusions'],load,(me?.user_id||'')+':'+reading);
 
  if(!game||!me)return null;
  const activeGame=game;
@@ -71,7 +76,11 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  const stageBills=formalDocuments.filter(d=>d.stage_no===12&&d.workflow_key==='bill')
   .sort((a,b)=>b.created_at.localeCompare(a.created_at));
  const agendaBillIds=new Set(items.map(item=>item.formal_document_id));
- const awaitingAgenda=stageBills.filter(d=>!agendaBillIds.has(d.id)).length;
+ const candidateBills=stageBills.filter(d=>agendaBillIds.has(d.id)||
+  (reading===1&&!['amendments','reading2','reading3','sf','president','published','rejected'].includes(d.status_code))||
+  (reading===2&&['amendments','reading2'].includes(d.status_code))||
+  (reading===3&&d.status_code==='reading3'));
+ const awaitingAgenda=candidateBills.filter(d=>!agendaBillIds.has(d.id)).length;
  const docs=formalDocuments.filter(d=>['bill','budget','gd_resolution'].includes(d.workflow_key)&&d.doc_type!=='meeting_agenda'&&d.status_code!=='rejected'&&d.status_code!=='published'&&d.current_owner_key!=='system');
  const doc=(id:string)=>formalDocuments.find(d=>d.id===id);
  const voteFor=(id:string)=>votes.find(v=>v.formal_document_id===id&&v.status==='open'&&v.stage_no===12);
@@ -79,6 +88,12 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  const current=items.find(x=>x.status==='in_progress');
  const unready=items.filter(i=>['pending','in_progress'].includes(i.status)&&doc(i.formal_document_id)?.workflow_key==='bill'&&doc(i.formal_document_id)?.status_code!=='reading'+reading);
  const routed=items.filter(x=>{const d=formalDocuments.find(doc=>doc.id===x.formal_document_id);return d&&['bill','budget'].includes(d.workflow_key)});
+ const isCurrentAgenda=!!selected?.agenda_document_id&&meeting?.agenda_document_id===selected.agenda_document_id;
+ const agendaApproved=isCurrentAgenda&&!!meeting?.agenda_approved_at;
+ const livePhase=!selected?0:selected.status==='closed'?5:selected.status==='draft'
+  ?(unready.length||items.length===0?0:agendaApproved?2:1)
+  :current?(current.discussion_phase==='vote'?4:3):unfinished?3:4;
+ const flowSteps=[['Подготовка','Пакеты и заключения'],['Повестка','Документ и утверждение'],['Регистрация','Кворум 226 из 450'],['Обсуждение','Доклады и вопросы'],['Голосование','Решения по вопросам'],['Завершение','Протокол и итог']];
  const readings=['reading1','amendments','reading2','reading3','sf','president','published'];
  const readingText:Record<string,string>={draft:'Подготовка законопроекта',registered:'Регистрация в Государственной Думе',committee:'Профильный комитет',council:'Совет Государственной Думы',reading1:'I чтение',amendments:'Поправки ко II чтению',reading2:'II чтение',reading3:'III чтение',sf:'Совет Федерации',president:'Президент Российской Федерации',published:'Опубликован',rejected:'Отклонён'};
 
@@ -93,19 +108,6 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
   const r=await supabase.rpc('add_duma_agenda_item',{p_session_id:selected.id,p_document_id:docId});
   if(r.error)setError(userError(r.error));else{setDocId('');await load()}setBusy(false);
  }
- async function correct(){
-  if(!selected||!docId||busy||correctionReason.trim().length<10)return;
-  setBusy(true);setFeedback('');
-  const r=await supabase.rpc('correct_duma_agenda_after_open',{
-   p_session_id:selected.id,p_document_id:docId,p_reason:correctionReason.trim()
-  });
-  if(r.error)setError(userError(r.error));
-  else{
-   setDocId('');setCorrectionReason('');await load();
-   setFeedback('Корректировка повестки зафиксирована с основанием.');
-  }
-  setBusy(false);
- }
  async function open(){if(!selected)return;setBusy(true);const r=await supabase.rpc('open_duma_session',{p_session_id:selected.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
  async function setStatus(id:string,status:'in_progress'|'completed'|'withdrawn'){
   setBusy(true);const r=await supabase.rpc('set_duma_agenda_item_status',{p_item_id:id,p_status:status,p_note:(note[id]||'').trim()||null});
@@ -119,7 +121,14 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  return <section className="legislativeLab">
   <StageModuleHeader variant="government" eyebrow={'Этап 12 · '+reading+' чтение'} title="Заседание Государственной Думы" description="Повестка → утверждение председателем → регистрация и кворум → выступления → голосование. Заседание открывается автоматически после выполнения всех условий." stats={[{label:"Заседание",value:selected?"№ "+selected.session_no:"Не создано",detail:selected?.status==="open"?"Идёт":selected?.status==="closed"?"Закрыто":"Подготовка повестки"},{label:"Пакетов Этапа 12",value:stageBills.length,detail:"В реестре НПА"},{label:"В повестке",value:items.length,detail:"Вопросов выбранного заседания"}]}/>
 
-  {canManage&&<details className="legislativeCreate legislativeCreateWide">
+  <nav className={layout.readingFlow} aria-label={'Последовательность '+reading+' чтения'}>
+   <ol>{flowSteps.map(([label,detail],index)=><li key={label} data-state={index<livePhase?'complete':index===livePhase?'current':'upcoming'}>
+    <span className={layout.flowNumber}>{index<livePhase?'✓':index+1}</span>
+    <div><strong>{label}</strong><small>{detail}</small></div>
+   </li>)}</ol>
+   <p role="status">{!selected?'Для этого чтения сначала подготовьте законопроекты и создайте заседание.':selected.status==='closed'?'Заседание завершено. Итоги доступны для просмотра.':selected.status==='draft'?'Сейчас готовится повестка, её утверждение и регистрация депутатов.':'Заседание идёт. Каждый вопрос последовательно проходит выступления, обсуждение и голосование.'}</p>
+  </nav>
+  {canManage&&(!selected||selected.status==='closed')&&<details className="legislativeCreate legislativeCreateWide">
    <summary>＋ Подготовить заседание Государственной Думы</summary>
    <div className="legislativeCreateGrid">
     <label>Название заседания<input aria-label="Название заседания" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Очередное заседание Государственной Думы"/></label>
@@ -129,35 +138,11 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
     <button type="button" className="primary" disabled={busy||!!(start&&end&&new Date(end)<=new Date(start))} onClick={()=>void create()}>{busy?'Создание…':'Создать заседание и документ повестки'}</button>
    </div>
   </details>}
-  <div className={'legislativeSessionTabs legislativeSessionTabsFull '+layout.tabs}>
-   <div>{sessions.map(s=><button type="button" key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'Идёт':s.status==='closed'?'Завершено':'Подготовка'}</em></button>)}</div>
-  </div>
-
+  {sessions.length>0&&<details className={layout.sessionArchive}>
+   <summary>Заседания выбранного чтения · {sessions.length}{selected?' · выбрано № '+selected.session_no:''}</summary>
+   <div className={'legislativeSessionTabs legislativeSessionTabsFull '+layout.tabs}><div>{sessions.map(s=><button type="button" key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'Идёт':s.status==='closed'?'Завершено':'Подготовка'}</em></button>)}</div></div>
+  </details>}
   {feedback&&<p role="status" className="legislativeFeedback">{feedback}</p>}
-  <details className={layout.packageRegister} aria-label="Все пакеты законопроектов Этапа 12">
-   <summary className={layout.packageSummary}>Все пакеты законопроектов <span>{stageBills.length} в реестре · {items.length} в выбранной повестке</span></summary>
-   <header className={layout.packageRegisterHead}>
-    <div><small>Реестр законодательных инициатив</small><h3>Пакеты Этапа 12 · {stageBills.length}</h3>
-     <p>Все созданные законопроекты, независимо от включения в повестку. До открытия заседания новые пакеты автоматически включаются в проект повестки. После открытия возможна только обоснованная корректировка уполномоченным председателем.</p></div>
-    <span className={layout.packageRegisterCount}>{stageBills.length} в реестре · {stageBills.length-awaitingAgenda} в повестке</span>
-   </header>
-   {stageBills.length===0?<p className={layout.packageRegisterEmpty}>Законопроекты Этапа 12 пока не созданы. Подготовьте пакет на вкладке «Материалы».</p>:
-    <div className={layout.packageRegisterList}>
-     {stageBills.map(bill=>{
-      const inAgenda=agendaBillIds.has(bill.id);
-      return <article className={layout.packageRegisterItem} key={bill.id} data-in-agenda={inAgenda?'true':'false'}>
-       <div className={layout.packageRegisterDescription}>
-        <small>{bill.registry_no} · {bill.status_label}</small>
-        <h4>{bill.title}</h4>
-        <span className={inAgenda?layout.packageInAgenda:layout.packageAwaitingAgenda}>
-         {inAgenda?'В повестке заседания № '+selected?.session_no:'Не включён в повестку'}
-        </span>
-       </div>
-       {onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(bill.id)}>Открыть пакет</button>}
-      </article>;
-     })}
-    </div>}
-  </details>
   {!selected&&<div className={layout.empty}><b>Заседание Этапа 12 ещё не создано</b><p>Повестка Этапа 12 пока пуста. Завершённые заседания предыдущих этапов сохраняются в реестре НПА и не переносятся сюда автоматически.</p></div>}
   {selected&&<>
    <div className={'legislativeSessionBar '+layout.sessionBar}>
@@ -168,20 +153,12 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
    </div>
 
    {!selected.reading_protocol&&selected.status!=='closed'&&<p className={layout.openingGate}>Заседание подготовлено по прежнему регламенту. Его голосования, регистрация и перенос незавершённых вопросов сохраняются. Новая последовательность применяется к новым заседаниям чтений после завершения этих вопросов.</p>}
-   {selected.status!=='closed'&&<InstitutionRegistrationPanel key={selected.id} g={g} stageNo={12} initialBody="gd" allowedBodies={['gd']} freshAttendance={!!selected.reading_protocol} readOnly={readOnly} defaultOpen={selected.status==='draft'&&unready.length===0} onOpenDocument={onOpenDocument}/>}
 
    <section className={'legislativeDocBridge '+layout.documentBridge}><div><b>Реестр НПА · повестка заседания № {selected.session_no}</b><p>До открытия заседания повестка пополняется автоматически. Председатель утверждает её и открывает регистрацию. После кворума начинается заседание; голосование доступно после выступлений и обсуждения.</p></div>{selected.agenda_document_id&&<button type="button" disabled={!onOpenDocument} onClick={()=>onOpenDocument?.(selected.agenda_document_id!)}>Открыть документ повестки →</button>}</section>
-   {canManage&&selected.status==='draft'&&<div className={styles.grid}><StyledSelect wrap label="Дополнительный документ для повестки" value={docId} onChange={setDocId} options={[{value:'',label:'Выберите документ из реестра НПА…'},...docs.filter(d=>!items.some(i=>i.formal_document_id===d.id)).map(d=>({value:d.id,label:d.registry_no+' · '+d.title+' · '+d.status_label}))]}/><div className={styles.actions}><button disabled={busy||!docId} onClick={()=>void add()}>Добавить другой документ</button></div></div>}
-   {canManage&&selected.status==='open'&&<details className={layout.correctionPanel}>
-    <summary>Корректировка повестки после открытия заседания</summary>
-    <div className={layout.correctionFields}>
-     <p>Новые законопроекты больше не включаются автоматически. Председатель может добавить вопрос только по отдельному решению с указанием основания. Корректировка сохраняется в истории игры.</p>
-     <StyledSelect wrap label="Пакет для корректировки" value={docId} onChange={setDocId} options={[{value:'',label:'Выберите законопроект Этапа 12…'},...stageBills.filter(d=>!items.some(i=>i.formal_document_id===d.id)&&d.status_code!=='rejected'&&d.status_code!=='published'&&d.current_owner_key!=='system').map(d=>({value:d.id,label:d.registry_no+' · '+d.title}))]}/>
-     <label>Основание корректировки<textarea rows={3} maxLength={500} value={correctionReason} onChange={e=>setCorrectionReason(e.target.value)} placeholder="Укажите причину внесения вопроса после открытия заседания (не менее 10 символов)"/></label>
-     <button type="button" className="primary" disabled={busy||!docId||correctionReason.trim().length<10} onClick={()=>void correct()}>Зафиксировать корректировку</button>
-    </div>
-   </details>}
-
+   {selected.status!=='closed'&&isCurrentAgenda&&<InstitutionRegistrationPanel key={selected.id} sessionId={selected.id} g={g} stageNo={12} initialBody="gd" allowedBodies={['gd']} freshAttendance={!!selected.reading_protocol} readOnly={readOnly} defaultOpen={selected.status==='draft'&&unready.length===0} onOpenDocument={onOpenDocument}/>}
+   {selected.status!=='closed'&&!isCurrentAgenda&&<p className={layout.openingGate} role="status">Повестка выбранного заседания не совпадает с повесткой текущей регистрации. Чтобы не изменить другое чтение, регистрация и утверждение здесь отключены.</p>}
+   {canManage&&!selected.reading_protocol&&selected.status==='draft'&&<div className={styles.grid}><StyledSelect wrap label="Дополнительный документ для повестки" value={docId} onChange={setDocId} options={[{value:'',label:'Выберите документ из реестра НПА…'},...docs.filter(d=>!items.some(i=>i.formal_document_id===d.id)).map(d=>({value:d.id,label:d.registry_no+' · '+d.title+' · '+d.status_label}))]}/><div className={styles.actions}><button disabled={busy||!docId} onClick={()=>void add()}>Добавить другой документ</button></div></div>}
+   {selected.status==='open'&&isCurrentAgenda&&<p className={layout.openingGate}>Корректировка после открытия изменяет только текст документа повестки. Откройте «Регистрация на заседание» → «Корректировать повестку». Состав законопроектов и голосований остаётся прежним.</p>}
    <details className={'legislativeRouteGuide '+layout.routeGuide}><summary>Полный маршрут законопроекта</summary><div>{['Регистрация','Комитет','Совет ГД','I чтение','Поправки','II чтение','III чтение','Совет Федерации','Президент'].map((x,i)=><span key={x}><small>{i+1}</small>{x}</span>)}</div><p>Поправки принимаются во время подготовки ко II чтению. Успешное голосование переводит законопроект на следующую стадию в реестре. Закон, принятый в III чтении, направляется в Совет Федерации, затем Президенту.</p></details>
    <div className={'legislativeAgenda '+layout.agenda}>
     {items.length===0?<div className="emptyState">Повестка пуста. По правилам игры без повестки заседание не проводится.</div>:items.map(i=>{
@@ -220,5 +197,29 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
 
    <footer className={'legislativeSessionRule '+layout.rule}><b>Логика переноса и голосований</b><p>При закрытии заседания все пункты со статусом «ожидает» или «рассматривается» автоматически становятся перенесёнными и создаются в повестке следующего заседания. Сам документ при этом не меняет стадий движения без отдельного процедурного решения в реестре НПА.</p></footer>
   </>}
+  <details className={layout.packageRegister} aria-label="Все пакеты законопроектов Этапа 12">
+   <summary className={layout.packageSummary}>Реестр пакетов (справочно) <span>{stageBills.length} всего · {candidateBills.length} относится к чтению · {items.length} в повестке</span></summary>
+   <header className={layout.packageRegisterHead}>
+    <div><small>Реестр законодательных инициатив</small><h3>Пакеты Этапа 12 · {stageBills.length}</h3>
+     <p>Все созданные законопроекты, независимо от включения в повестку. До открытия заседания новые пакеты автоматически включаются в проект повестки. После открытия возможна только обоснованная корректировка уполномоченным председателем.</p></div>
+    <span className={layout.packageRegisterCount}>{stageBills.length} в реестре · {candidateBills.length-awaitingAgenda} в повестке чтения</span>
+   </header>
+   {stageBills.length===0?<p className={layout.packageRegisterEmpty}>Законопроекты Этапа 12 пока не созданы. Подготовьте пакет на вкладке «Материалы».</p>:
+    <div className={layout.packageRegisterList}>
+     {stageBills.map(bill=>{
+      const inAgenda=agendaBillIds.has(bill.id);
+      return <article className={layout.packageRegisterItem} key={bill.id} data-in-agenda={inAgenda?'true':'false'}>
+       <div className={layout.packageRegisterDescription}>
+        <small>{bill.registry_no} · {bill.status_label}</small>
+        <h4>{bill.title}</h4>
+        <span className={inAgenda?layout.packageInAgenda:layout.packageAwaitingAgenda}>
+         {inAgenda?'В повестке заседания № '+selected?.session_no:candidateBills.some(d=>d.id===bill.id)?'Ожидает включения в повестку':'На другом этапе рассмотрения'}
+        </span>
+       </div>
+       {onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(bill.id)}>Открыть пакет</button>}
+      </article>;
+     })}
+    </div>}
+  </details>
  </section>;
 }
