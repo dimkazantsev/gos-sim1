@@ -3,10 +3,13 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
 const {chromium}=require('playwright-core');
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium'].find(p=>p&&fs.existsSync(p));
 if(!chrome)throw Error('Chrome is required for government meeting layout verification');
-const css=['app/design-tokens.css','app/globals.css','app/2026-october-refinement.css'].map(p=>fs.readFileSync(p,'utf8')).join('\n');
+const css=['app/design-tokens.css','app/globals.css','app/2026-october-refinement.css','components/ui/StageModuleHeader.module.css'].map(p=>fs.readFileSync(p,'utf8')).join('\n');
 const html=`<!doctype html><html lang="ru"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body>
 <main style="max-width:1480px;margin:auto;padding:12px">
-<section class="govSessionLab"><div class="govMeetingFlow">
+<section class="govSessionLab"><header class="header government" data-stage-module-head>
+<div class="copy"><span class="eyebrow">Этап 11 · Правительство Российской Федерации</span><h2>Рассмотрение государственных программ</h2><p>Проекты Этапа 10 автоматически включаются в повестку.</p></div>
+<dl class="stats"><div><dt>Государственные программы</dt><dd data-numeric="true">1</dd><span>Представляются после согласования на Этапе 10</span></div><div><dt>Повестка</dt><dd>Не создана</dd></div></dl>
+</header><div class="govMeetingFlow">
 <div><span>01</span><strong>Подготовка повестки</strong><small>Из согласованных ГП</small></div>
 <div><span>02</span><strong>Утверждение</strong><small>Председателем Правительства</small></div>
 <div><span>03</span><strong>Доклад и вопросы</strong><small>На заседании</small></div>
@@ -25,10 +28,15 @@ for(const width of [320,375,430,768,1024,1440]){
  const m=await page.evaluate(()=>({
  scroll:document.documentElement.scrollWidth,viewport:innerWidth,
  box:[...document.querySelectorAll('.govMeetingFlow,.govMeetingAgendaCard,.govMeetingProgramme,.govMeetingSpeakerQuestions')].map(el=>({left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right})),
- buttons:[...document.querySelectorAll('.govSessionLab button')].map(el=>({height:el.getBoundingClientRect().height,right:el.getBoundingClientRect().right,left:el.getBoundingClientRect().left}))
+ buttons:[...document.querySelectorAll('.govSessionLab button')].map(el=>({height:el.getBoundingClientRect().height,right:el.getBoundingClientRect().right,left:el.getBoundingClientRect().left})),
+ metrics:[...document.querySelectorAll('[data-stage-module-head] .stats>div')].map(card=>{const label=card.querySelector('dt'),value=card.querySelector('dd');const l=label.getBoundingClientRect(),v=value.getBoundingClientRect(),c=card.getBoundingClientRect();return {labelBottom:l.bottom,valueTop:v.top,labelLeft:l.left,valueLeft:v.left,cardLeft:c.left,cardRight:c.right,cardHeight:c.height,labelFits:label.scrollHeight<=label.clientHeight+2&&label.scrollWidth<=label.clientWidth+2,valueFits:value.scrollHeight<=value.clientHeight+2&&value.scrollWidth<=value.clientWidth+2};})
  }));
  assert(m.scroll<=m.viewport+2,'Horizontal overflow at '+width+': '+JSON.stringify(m));
  assert(m.box.every(b=>b.left>=-1&&b.right<=width+1),'Panels outside viewport at '+width);
  assert(m.buttons.every(b=>b.height>=42&&b.left>=-1&&b.right<=width+1),'Unsafe controls at '+width);
+ assert(m.metrics.length===2,'Two Stage 11 header metrics expected at '+width);
+ assert(m.metrics.every(v=>v.labelBottom+4<=v.valueTop),'Metric label overlaps its value at '+width+': '+JSON.stringify(m.metrics));
+ assert(m.metrics.every(v=>Math.abs(v.labelLeft-v.valueLeft)<=2),'Metrics must be left-aligned at '+width);
+ assert(m.metrics.every(v=>v.cardLeft>=-1&&v.cardRight<=width+1&&v.labelFits&&v.valueFits),'Stage 11 metric clipped at '+width+': '+JSON.stringify(m.metrics));
  await page.close();console.log('PASS: government-stage11 responsive '+width+'px');
 }}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});
