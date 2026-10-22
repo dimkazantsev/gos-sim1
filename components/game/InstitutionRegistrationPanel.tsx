@@ -20,7 +20,7 @@ function meetingErrorMessage(message:string):string{
  if(/permission denied|недостаточно прав|42501|403/i.test(message))return 'Нет полномочий для этого действия. Повестку утверждает председатель или преподаватель; подготовку может выполнить назначенный участник.';
  return message.length<=250?message:'Не удалось выполнить действие. Обновите данные заседания и повторите попытку.';
 }
-export default function InstitutionRegistrationPanel({g,readOnly=false,freshAttendance=false,onUnitsChange,stageNo,initialBody,allowedBodies,defaultOpen=false,onOpenDocument,onMeetingReadyChange}:{g:ReturnTypeRepublic;readOnly?:boolean;freshAttendance?:boolean;onUnitsChange?:(units:VotingUnit[])=>void;stageNo?:number;initialBody?:string;allowedBodies?:string[];defaultOpen?:boolean;onOpenDocument?:(id:string)=>void;onMeetingReadyChange?:(ready:boolean)=>void}){
+export default function InstitutionRegistrationPanel({g,readOnly=false,freshAttendance=false,onUnitsChange,stageNo,initialBody,allowedBodies,defaultOpen=false,sessionId,onOpenDocument,onMeetingReadyChange}:{g:ReturnTypeRepublic;readOnly?:boolean;freshAttendance?:boolean;onUnitsChange?:(units:VotingUnit[])=>void;stageNo?:number;initialBody?:string;allowedBodies?:string[];defaultOpen?:boolean;sessionId?:string;onOpenDocument?:(id:string)=>void;onMeetingReadyChange?:(ready:boolean)=>void}){
  const [rows,setRows]=useState<Entry[]>([]),[units,setUnits]=useState<VotingUnit[]>([]),[assignments,setAssignments]=useState<Assignment[]>([]),[offices,setOffices]=useState<Office[]>([]);
  const [body,setBody]=useState(initialBody||'gd'),[busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[newTitle,setNewTitle]=useState(''),[users,setUsers]=useState<string[]>([]),[head,setHead]=useState('');
  const [seats,setSeats]=useState('1'),[editing,setEditing]=useState<string|null>(null);
@@ -40,9 +40,10 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  async function loadStage12Editor(){
   if(!g.game)return;
   setMeetingError('');
-  const s=await supabase.from('duma_sessions').select('id,status,agenda_document_id')
-   .eq('game_id',g.game.id).eq('stage_no',12)
-   .order('session_no',{ascending:false}).limit(1).maybeSingle();
+  let sessionQuery=supabase.from('duma_sessions').select('id,status,agenda_document_id')
+    .eq('game_id',g.game.id).eq('stage_no',12);
+   sessionQuery=sessionId?sessionQuery.eq('id',sessionId):sessionQuery.order('session_no',{ascending:false}).limit(1);
+   const s=await sessionQuery.maybeSingle();
   if(s.error){setMeetingError(meetingErrorMessage(userError(s.error)));return;}
   if(!s.data?.agenda_document_id){setStage12Session(null);return;}
   const doc=await supabase.from('formal_documents').select('body_text')
