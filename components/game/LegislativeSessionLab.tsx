@@ -58,6 +58,13 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  const activeGame=game;
  const selected=sessions.find(x=>x.id===selectedId)||sessions[0];
  const items=selected?agenda.filter(x=>x.session_id===selected.id).sort((a,b)=>a.agenda_no-b.agenda_no):[];
+ // The package register and the chairman-approved meeting agenda are different
+ // sources of truth. Never hide a prepared package simply because the chairman
+ // has not placed it on the selected agenda.
+ const stageBills=formalDocuments.filter(d=>d.stage_no===12&&d.workflow_key==='bill')
+  .sort((a,b)=>b.created_at.localeCompare(a.created_at));
+ const agendaBillIds=new Set(items.map(item=>item.formal_document_id));
+ const awaitingAgenda=stageBills.filter(d=>!agendaBillIds.has(d.id)).length;
  const docs=formalDocuments.filter(d=>['bill','budget','gd_resolution'].includes(d.workflow_key)&&d.doc_type!=='meeting_agenda'&&d.status_code!=='rejected'&&d.status_code!=='published'&&d.current_owner_key!=='system');
  const doc=(id:string)=>formalDocuments.find(d=>d.id===id);
  const voteFor=(id:string)=>votes.find(v=>v.formal_document_id===id&&v.status==='open'&&v.stage_no===12);
@@ -89,7 +96,7 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  }
 
  return <section className="legislativeLab">
-  <StageModuleHeader variant="government" eyebrow="Этап 12 · Государственная Дума" title="Заседание Государственной Думы" description="Регистрация депутатов, повестка и рассмотрение законопроектов по чтениям. Откройте НПА из повестки, рассмотрите поправки ко второму чтению и проведите связанное голосование." stats={[{label:"Заседание",value:selected?"№ "+selected.session_no:"Не создано",detail:selected?.status==="open"?"Идёт":selected?.status==="closed"?"Закрыто":"Подготовка повестки"},{label:"Ожидают рассмотрения",value:unfinished}]}/>
+  <StageModuleHeader variant="government" eyebrow="Этап 12 · Государственная Дума" title="Заседание Государственной Думы" description="Регистрация депутатов, повестка и рассмотрение законопроектов по чтениям. Откройте НПА из повестки, рассмотрите поправки ко второму чтению и проведите связанное голосование." stats={[{label:"Заседание",value:selected?"№ "+selected.session_no:"Не создано",detail:selected?.status==="open"?"Идёт":selected?.status==="closed"?"Закрыто":"Подготовка повестки"},{label:"Пакетов Этапа 12",value:stageBills.length,detail:"В реестре НПА"},{label:"В повестке",value:items.length,detail:"Вопросов выбранного заседания"}]}/>
 
   <div className={'legislativeSessionTabs legislativeSessionTabsFull '+layout.tabs}>
    <div>{sessions.map(s=><button type="button" key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'Идёт':s.status==='closed'?'Завершено':'Подготовка'}</em></button>)}</div>
@@ -106,6 +113,29 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
   </details>}
 
   {feedback&&<p role="status" className="legislativeFeedback">{feedback}</p>}
+  <section className={layout.packageRegister} aria-label="Все пакеты законопроектов Этапа 12">
+   <header className={layout.packageRegisterHead}>
+    <div><small>Реестр законодательных инициатив</small><h3>Пакеты Этапа 12 · {stageBills.length}</h3>
+     <p>Все созданные законопроекты, независимо от включения в повестку. Добавление вопроса в повестку оформляет председатель заседания.</p></div>
+    <span className={layout.packageRegisterCount}>{stageBills.length} в реестре · {stageBills.length-awaitingAgenda} в повестке</span>
+   </header>
+   {stageBills.length===0?<p className={layout.packageRegisterEmpty}>Законопроекты Этапа 12 пока не созданы. Подготовьте пакет на вкладке «Материалы».</p>:
+    <div className={layout.packageRegisterList}>
+     {stageBills.map(bill=>{
+      const inAgenda=agendaBillIds.has(bill.id);
+      return <article className={layout.packageRegisterItem} key={bill.id} data-in-agenda={inAgenda?'true':'false'}>
+       <div className={layout.packageRegisterDescription}>
+        <small>{bill.registry_no} · {bill.status_label}</small>
+        <h4>{bill.title}</h4>
+        <span className={inAgenda?layout.packageInAgenda:layout.packageAwaitingAgenda}>
+         {inAgenda?'В повестке заседания № '+selected?.session_no:'Не включён в повестку'}
+        </span>
+       </div>
+       {onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(bill.id)}>Открыть пакет</button>}
+      </article>;
+     })}
+    </div>}
+  </section>
   {!selected&&<div className={layout.empty}><b>Заседание Этапа 12 ещё не создано</b><p>Повестка Этапа 12 пока пуста. Завершённые заседания предыдущих этапов сохраняются в реестре НПА и не переносятся сюда автоматически.</p></div>}
   {selected&&<>
    <div className={'legislativeSessionBar '+layout.sessionBar}>
