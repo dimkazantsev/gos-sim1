@@ -77,7 +77,7 @@ BEGIN
   v_session_id:=public.create_government_session(p_game_id,'Заседание Правительства Российской Федерации',greatest(5,least(240,p_time_limit_minutes)));
  END IF;
  PERFORM public.sync_government_session_programmes(v_session_id);
- IF NOT EXISTS(SELECT 1 FROM public.government_program_agenda WHERE v_session_id=v_session_id) THEN
+ IF NOT EXISTS(SELECT 1 FROM public.government_program_agenda a WHERE a.session_id=v_session_id) THEN
   RAISE EXCEPTION 'Нет согласованных государственных программ. Завершите их подготовку на Этапе 10';END IF;
  RETURN v_session_id;
 END $create$;
