@@ -38,23 +38,33 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
 
  async function load(){
   if(!game)return;
-  const [s,i,p,q,r,speaker]=await Promise.all([
-   supabase.from('government_sessions').select('*').eq('game_id',game.id).order('session_no',{ascending:false}),
-   supabase.from('government_program_agenda').select('*').eq('game_id',game.id).order('agenda_no'),
-   supabase.from('state_programs').select('id,title,responsible_ministry,status,responsible_minister_id,signed_at,government_vote_id').eq('game_id',game.id).order('title'),
-   supabase.from('government_session_questions').select('*').eq('game_id',game.id).order('created_at'),
-   supabase.from('state_program_review_proposals').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
-   supabase.from('government_program_speaker_questions').select('*').eq('game_id',game.id).order('created_at',{ascending:true}).limit(300)
+  const [s,i,p,q,r]=await Promise.all([
+   supabase.from('government_sessions').select('*').eq('game_id',game.id).order('session_no',{ascending:false}).limit(20),
+   supabase.from('government_program_agenda').select('*').eq('game_id',game.id).order('agenda_no').limit(150),
+   supabase.from('state_programs').select('id,title,responsible_ministry,status,responsible_minister_id,signed_at,government_vote_id').eq('game_id',game.id).order('title').limit(100),
+   supabase.from('government_session_questions').select('*').eq('game_id',game.id).order('created_at').limit(120),
+   supabase.from('state_program_review_proposals').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).limit(100)
   ]);
-  const failure=[s,i,p,q,r,speaker].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
-  if(!s.error){const rows=(s.data||[]) as Session[];setSessions(rows);if(!rows.some(row=>row.id===selectedId)&&rows[0])setSelectedId(rows[0].id)}
+  const failure=[s,i,p,q,r].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
+  const sessionRows=(s.data||[]) as Session[];
+  const activeSession=sessionRows.find(x=>x.id===selectedId)||sessionRows[0];
+  const activeItem=((i.data||[]) as Item[]).find(x=>x.session_id===activeSession?.id&&x.status==='presenting');
+  // At most one programme presentation is active. Fetch its questions only.
+  // Each user can ask two questions; 40 attendees means at most 80 rows per report.
+  if(activeItem){
+   const speaker=await supabase.from('government_program_speaker_questions').select('*')
+     .eq('game_id',game.id).eq('agenda_item_id',activeItem.id)
+     .order('created_at',{ascending:true}).limit(80);
+   if(speaker.error){setError(userError(speaker.error));return;}
+   setSpeakerQuestions((speaker.data||[]) as SpeakerQuestion[]);
+  }else setSpeakerQuestions([]);
+  if(!s.error){setSessions(sessionRows);if(!sessionRows.some(row=>row.id===selectedId)&&sessionRows[0])setSelectedId(sessionRows[0].id)}
   if(!i.error)setItems((i.data||[]) as Item[]);
   if(!p.error)setPrograms((p.data||[]) as Program[]);
   if(!q.error)setQuestions((q.data||[]) as Question[]);
   if(!r.error)setProposals((r.data||[]) as Proposal[]);
-  if(!speaker.error)setSpeakerQuestions((speaker.data||[]) as SpeakerQuestion[]);
  }
- useGameTableSync(game?.id,['government_sessions','government_program_agenda','government_session_questions','formal_documents','state_program_review_proposals','state_programs','game_votes','game_ballots','institution_session_registrations','government_program_speaker_questions'],load,me?.user_id||'');
+ useGameTableSync(game?.id,['government_sessions','government_program_agenda','government_session_questions','formal_documents','state_program_review_proposals','state_programs','game_votes','game_ballots','institution_session_registrations','government_program_speaker_questions'],load,(me?.user_id||'')+':'+selectedId);
 
  if(!game||!me)return null;
  const activeGame=game;
