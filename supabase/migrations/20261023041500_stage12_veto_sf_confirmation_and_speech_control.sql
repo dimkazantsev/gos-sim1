@@ -56,6 +56,20 @@ BEGIN
     AND NEW.status_code NOT IN ('veto_sf_pending','rejected') THEN
   RAISE EXCEPTION 'Вето преодолевается только повторным голосованием, решением Совета Федерации и последующей подписью' USING ERRCODE='42501';
  END IF;
+ IF OLD.workflow_key='bill' AND OLD.doc_type='fz_bill' AND OLD.status_code='president_veto'
+    AND NEW.status_code='veto_sf_pending'
+    AND NOT EXISTS(SELECT 1 FROM public.game_votes v WHERE v.game_id=OLD.game_id
+     AND v.formal_document_id=OLD.id AND v.formal_step_code='president_veto'
+     AND v.procedure_key='presidential_veto_override' AND v.status='closed'
+     AND v.result_code='passed' AND v.result_quorum_met AND v.result_yes>=300)
+ THEN RAISE EXCEPTION 'Нет принятого решения Государственной Думы о преодолении вето' USING ERRCODE='23514';END IF;
+ IF OLD.workflow_key='bill' AND OLD.doc_type='fz_bill' AND OLD.status_code='president_veto'
+    AND NEW.status_code='rejected'
+    AND NOT EXISTS(SELECT 1 FROM public.game_votes v WHERE v.game_id=OLD.game_id
+     AND v.formal_document_id=OLD.id AND v.formal_step_code='president_veto'
+     AND v.procedure_key='presidential_veto_override' AND v.status='closed'
+     AND v.result_quorum_met AND (v.result_code='rejected' OR coalesce(v.result_yes,0)<300))
+ THEN RAISE EXCEPTION 'Отклонение после вето должно следовать результату повторного голосования' USING ERRCODE='23514';END IF;
  IF OLD.status_code='veto_sf_pending' AND NEW.status_code IS DISTINCT FROM OLD.status_code
   AND (NOT private.is_game_teacher(OLD.game_id)
    OR NEW.status_code NOT IN ('veto_overridden','rejected')) THEN
