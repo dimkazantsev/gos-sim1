@@ -111,6 +111,11 @@ begin
  perform pg_temp.sp_as_user((u->>'pm')::uuid); perform public.advance_state_program(p,'pm_ready');
  perform pg_temp.sp_assert((select signed_at is null and status='ready' from state_programs where id=p),'Unsigned after preliminary PM review');
  perform pg_temp.sp_expect_rejection(format('select public.open_state_program_government_vote(%L::uuid)',p),'Vote requires presentation');
+ perform pg_temp.sp_as_user((u->>'teacher')::uuid);
+ perform pg_temp.sp_expect_rejection(format('select public.create_government_session_from_programmes(%L::uuid,60)',g),'Teacher cannot approve a Government agenda');
+ perform pg_temp.sp_as_user((u->>'creator')::uuid);
+ perform pg_temp.sp_expect_rejection(format('select public.create_government_session_from_programmes(%L::uuid,60)',g),'Minister cannot approve Government agenda');
+ perform pg_temp.sp_as_user((u->>'pm')::uuid);
  s:=public.create_government_session_from_programmes(g,60);
  select id into i from government_program_agenda where session_id=s and program_id=p;
  perform pg_temp.sp_assert((select count(*)=1 from government_program_agenda where session_id=s),'Automatic programme agenda');
