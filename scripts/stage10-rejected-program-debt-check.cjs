@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const migration=fs.readFileSync('supabase/migrations/20261022172500_stage10_programme_rejected_stage11_preserve_preparation.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20261022101354_stage10_programme_rejected_stage11_preserve_preparation.sql','utf8');
 const source=migration.slice(migration.indexOf('CREATE OR REPLACE FUNCTION'));
 assert(source.startsWith('CREATE OR REPLACE FUNCTION private.stage_required_final_documents'),'Migration must replace only readiness calculation');
 assert(source.includes("p.status='rejected'"),'Stage 11 rejection must keep earlier preparation');
