@@ -279,7 +279,7 @@ begin
  select * into i from public.government_program_agenda where id=p_item_id for update;
  if i.id is null then raise exception 'Agenda item not found'; end if;
  select * into s from public.government_sessions where id=i.session_id;
- if not private.can_manage_government_session(i.game_id,v_uid) then raise exception 'Government session management access required'; end if;
+ if not private.can_approve_government_agenda(i.game_id,v_uid) then raise exception 'Government session management access required'; end if;
  if s.status<>'open' or i.status<>'presenting' then raise exception 'Сначала необходимо представить программу'; end if;
  if i.qa_closed_at is null then raise exception 'Завершите ответы на вопросы к докладчику перед голосованием';end if;
  if exists(select 1 from public.government_program_speaker_questions q where q.agenda_item_id=i.id and q.answer_text is null) then raise exception 'Вопросы к докладчику должны получить ответы';end if;
@@ -375,7 +375,7 @@ begin
  select * into q from public.government_session_questions where id=p_question_id for update;
  if q.id is null then return;end if;
  select * into s from public.government_sessions where id=q.session_id;
- if not private.can_manage_government_session(q.game_id,(select auth.uid())) or s.status<>'draft' then raise exception 'Удаление недоступно';end if;
+ if s.agenda_approved_at is not null or not private.can_manage_government_session(q.game_id,(select auth.uid())) or s.status<>'draft' then raise exception 'Удаление недоступно';end if;
  delete from public.government_session_questions where id=q.id;
  if q.program_agenda_id is not null then delete from public.government_program_agenda where id=q.program_agenda_id;end if;
 end;$function$;
@@ -391,11 +391,48 @@ begin
  select * into q from public.government_session_questions where id=p_question_id for update;
  if q.id is null then raise exception 'Вопрос не найден';end if;
  select * into s from public.government_sessions where id=q.session_id;
- if not private.can_manage_government_session(q.game_id,(select auth.uid())) or s.status<>'draft' then raise exception 'Редактирование недоступно';end if;
+ if s.agenda_approved_at is not null or not private.can_manage_government_session(q.game_id,(select auth.uid())) or s.status<>'draft' then raise exception 'Редактирование недоступно';end if;
  if not private.is_game_teacher(q.game_id) then perform private.require_game_meeting_registration(q.game_id,(select auth.uid()),s.stage_no,'government');end if;
  if length(btrim(coalesce(p_title,''))) not between 3 and 500 or p_duration_minutes not between 1 and 60 then raise exception 'Проверьте название и время доклада';end if;
  update public.government_session_questions set title=btrim(p_title),description=left(coalesce(p_description,''),6000),duration_minutes=p_duration_minutes where id=q.id;
  if q.program_agenda_id is not null then update public.government_program_agenda set report_minutes=p_duration_minutes where id=q.program_agenda_id;end if;
+end;$function$;
+
+CREATE OR REPLACE FUNCTION public.close_government_session(p_session_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare s public.government_sessions%rowtype;v_uid uuid:=(select auth.uid());
+begin
+ select * into s from public.government_sessions where id=p_session_id for update;
+ if s.id is null then raise exception 'Government session not found'; end if;
+ if not private.can_approve_government_agenda(s.game_id,v_uid) then raise exception 'Government session management access required'; end if;
+ if s.status<>'open' then raise exception 'Government session is not open'; end if;
+ if exists(select 1 from public.government_program_agenda where session_id=s.id and status in ('presenting','decision')) then raise exception 'Finish the active agenda item before closing the session'; end if;
+ update public.government_sessions set status='closed',closed_at=now() where id=s.id;
+ insert into public.game_events(game_id,round_no,category,severity,title,body,created_by)
+ values(s.game_id,11,'Заседание Правительства','notice','Заседание Правительства закрыто',
+        'Рассмотрено программ: '||(select count(*) from public.government_program_agenda where session_id=s.id and status='completed'),v_uid);
+end;$function$;
+
+CREATE OR REPLACE FUNCTION public.start_government_program_report(p_item_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare i public.government_program_agenda%rowtype;s public.government_sessions%rowtype;v_uid uuid:=(select auth.uid());
+begin
+ select * into i from public.government_program_agenda where id=p_item_id for update;
+ if i.id is null then raise exception 'Agenda item not found'; end if;
+ select * into s from public.government_sessions where id=i.session_id;
+ if not private.can_approve_government_agenda(i.game_id,v_uid) then raise exception 'Government session management access required'; end if;
+ if s.status<>'open' or i.status<>'pending' then raise exception 'Agenda item cannot start'; end if;
+ if exists(select 1 from public.government_program_agenda where session_id=s.id and status in ('presenting','decision'))
+ then raise exception 'Finish the current agenda item first'; end if;
+ update public.government_program_agenda set status='presenting',started_at=now() where id=i.id;
 end;$function$;
 
 REVOKE ALL ON FUNCTION public.create_government_session_from_programmes(uuid,integer) FROM PUBLIC,anon;
