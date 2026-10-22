@@ -29,14 +29,32 @@ for(const width of [320,375,430,768,1024,1440]){
  scroll:document.documentElement.scrollWidth,viewport:innerWidth,
  box:[...document.querySelectorAll('.govMeetingFlow,.govMeetingAgendaCard,.govMeetingProgramme,.govMeetingSpeakerQuestions')].map(el=>({left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right})),
  buttons:[...document.querySelectorAll('.govSessionLab button')].map(el=>({height:el.getBoundingClientRect().height,right:el.getBoundingClientRect().right,left:el.getBoundingClientRect().left})),
- metrics:[...document.querySelectorAll('[data-stage-module-head] .stats>div')].map(card=>{const label=card.querySelector('dt'),value=card.querySelector('dd');const l=label.getBoundingClientRect(),v=value.getBoundingClientRect(),c=card.getBoundingClientRect();return {labelBottom:l.bottom,valueTop:v.top,labelLeft:l.left,valueLeft:v.left,cardLeft:c.left,cardRight:c.right,cardHeight:c.height,labelFits:label.scrollHeight<=label.clientHeight+2&&label.scrollWidth<=label.clientWidth+2,valueFits:value.scrollHeight<=value.clientHeight+2&&value.scrollWidth<=value.clientWidth+2};})
+ metrics:[...document.querySelectorAll('[data-stage-module-head] .stats>div')].map(card=>{
+   const label=card.querySelector('dt'),value=card.querySelector('dd'),detail=card.querySelector('span');
+   const l=label.getBoundingClientRect(),v=value.getBoundingClientRect(),c=card.getBoundingClientRect(),d=detail?.getBoundingClientRect();
+   const fits=el=>el.scrollWidth<=el.clientWidth+2&&el.scrollHeight<=el.clientHeight+2;
+   return {labelRight:l.right,valueLeft:v.left,labelTop:l.top,labelBottom:l.bottom,valueTop:v.top,valueBottom:v.bottom,cardLeft:c.left,cardRight:c.right,cardHeight:c.height,detailTop:d?.top??null,detailFits:detail?fits(detail):true,labelFits:fits(label),valueFits:fits(value)};
+ }),
+ summary:(()=>{const el=document.querySelector('[data-stage-module-head] .stats');const r=el.getBoundingClientRect();return {height:r.height,left:r.left,right:r.right}})()
  }));
  assert(m.scroll<=m.viewport+2,'Horizontal overflow at '+width+': '+JSON.stringify(m));
  assert(m.box.every(b=>b.left>=-1&&b.right<=width+1),'Panels outside viewport at '+width);
  assert(m.buttons.every(b=>b.height>=42&&b.left>=-1&&b.right<=width+1),'Unsafe controls at '+width);
- assert(m.metrics.length===2,'Two Stage 11 header metrics expected at '+width);
- assert(m.metrics.every(v=>v.labelBottom+4<=v.valueTop),'Metric label overlaps its value at '+width+': '+JSON.stringify(m.metrics));
- assert(m.metrics.every(v=>Math.abs(v.labelLeft-v.valueLeft)<=2),'Metrics must be left-aligned at '+width);
- assert(m.metrics.every(v=>v.cardLeft>=-1&&v.cardRight<=width+1&&v.labelFits&&v.valueFits),'Stage 11 metric clipped at '+width+': '+JSON.stringify(m.metrics));
+ assert(m.metrics.length===2,'Two Stage 11 summary rows expected at '+width);
+ assert(m.metrics.every(v=>v.labelRight+6<=v.valueLeft),'Summary label overlaps value at '+width+': '+JSON.stringify(m.metrics));
+ assert(m.metrics.every(v=>v.cardLeft>=-1&&v.cardRight<=width+1&&v.labelFits&&v.valueFits&&v.detailFits),'Summary row clipped at '+width+': '+JSON.stringify(m.metrics));
+ assert(m.metrics.every(v=>v.detailTop===null||v.detailTop>=Math.max(v.labelBottom,v.valueBottom)),'Summary supporting text overlaps at '+width);
+ assert(m.metrics.every(v=>v.cardHeight<=110),'Oversized empty summary row at '+width+': '+JSON.stringify(m.metrics));
+ assert(m.summary.height<=185,'Stage 11 summary consumes too much space at '+width+': '+JSON.stringify(m.summary));
+ assert(m.summary.left>=-1&&m.summary.right<=width+1,'Stage 11 summary outside viewport at '+width);
+ for(const status of ['На согласовании','Утверждена']){
+   await page.locator('[data-stage-module-head] .stats>div:last-child dd').evaluate((el,text)=>{el.textContent=text},status);
+   const layout=await page.evaluate(()=>{
+     const parent=document.querySelector('[data-stage-module-head] .stats>div:last-child'),l=parent.querySelector('dt'),v=parent.querySelector('dd');
+     const lr=l.getBoundingClientRect(),vr=v.getBoundingClientRect(),cr=parent.getBoundingClientRect();
+     return {labelRight:lr.right,valueLeft:vr.left,right:vr.right,cardRight:cr.right,valueFits:v.scrollWidth<=v.clientWidth+2};
+   });
+   assert(layout.labelRight+6<=layout.valueLeft&&layout.right<=layout.cardRight+1&&layout.valueFits,'Agenda status collides/clips at '+width+'px / '+status+': '+JSON.stringify(layout));
+ }
  await page.close();console.log('PASS: government-stage11 responsive '+width+'px');
 }}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});
