@@ -83,7 +83,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
 
  async function addAttachment(documentId:string,kind:string,file:File){
   if(!g.game)return 'Игра не найдена';
-  if(!validateFile(file))return 'Недопустимый файл (PDF, DOC, DOCX, ODT, TXT, RTF; не более 10 МБ)';
+  if(!validateFile(file))return 'Недопустимый формат файла или размер более 10 МБ.';
   const ext=file.name.split('.').pop()?.toLowerCase()||'bin';
   const path=g.game.id+'/formal/'+documentId+'/package/'+crypto.randomUUID()+'.'+ext;
   const uploaded=await supabase.storage.from('game-assets').upload(path,file,{contentType:file.type||'application/octet-stream'});
@@ -98,7 +98,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  async function create(){
   if(!canCreate||busy||!activeSubject)return;
   if(title.trim().length<5||(!body.trim()&&!mainFile)){setMessage('Укажите название и текст законопроекта либо прикрепите его файл.');return;}
-  if(mainFile&&!validateFile(mainFile)){setMessage('Файл законопроекта должен быть PDF, DOC, DOCX, ODT, TXT или RTF размером до 10 МБ.');return;}
+  if(mainFile&&!validateFile(mainFile)){setMessage('Файл законопроекта должен иметь поддерживаемый формат и размер до 10 МБ.');return;}
   const selectedSubject=allowed.find(s=>s.key===activeSubject);
   if(!selectedSubject)return;
   setBusy(true);setMessage('');
@@ -189,7 +189,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
     <label key={kind.key} className={styles.attachment}><span>{kind.label}{kind.required?' · Обязательно':''}</span>
      <input type="file" accept={fileAccept} onChange={e=>setAttachments(old=>({...old,[kind.key]:e.target.files?.[0]||null}))}/></label>
    )}</div>
-   <p className={styles.hint}>Профильный комитет, представитель и дальнейшие согласования заполняются в открытом досье пакета. Документы связываются с одним номером НПА. Файлы — не более 10 МБ каждый.</p>
+   <p className={styles.hint}>Профильный комитет, представитель и дальнейшие согласования заполняются в открытом досье пакета. Документы связываются с одним номером НПА. Разрешённые форматы указаны в поле выбора файла. Размер — не более 10 МБ.</p>
    <button type="button" className="primary" disabled={busy||title.trim().length<5||(!body.trim()&&!mainFile)} onClick={()=>void create()}>
     <UploadCloud size={18}/>{busy?'Сохранение пакета…':'Создать и загрузить пакет'}
    </button>
