@@ -27,13 +27,12 @@ CREATE POLICY government_speaker_questions_member_read ON public.government_prog
 CREATE OR REPLACE FUNCTION private.can_approve_government_agenda(p_game uuid,p_user uuid)
  RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO 'public','private','pg_temp'
 AS $can$ SELECT p_user IS NOT NULL AND private.is_game_member(p_game) AND
- (private.is_game_teacher(p_game) OR (
-  private.role_is_available(p_game,p_user) AND
-  (private.game_role(p_game,p_user) ~* 'председател.*правительств'
+ private.role_is_available(p_game,p_user) AND
+ (private.game_role(p_game,p_user) ~* 'председател.*правительств'
     OR EXISTS(SELECT 1 FROM public.game_office_assignments a
       WHERE a.game_id=p_game AND a.user_id=p_user AND a.status='active'
-       AND a.role_title ~* 'председател.*правительств'))
- )); $can$;
+       AND a.role_title ~* 'председател.*правительств'));
+ $can$;
 
 CREATE OR REPLACE FUNCTION public.sync_government_session_programmes(p_session_id uuid)
  RETURNS integer LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public','private','pg_temp'
