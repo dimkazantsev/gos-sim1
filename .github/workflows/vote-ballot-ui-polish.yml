@@ -3,6 +3,10 @@ on:
   pull_request:
     paths:
       - 'components/game/VoteBallotControls.tsx'
+      - 'components/game/votingBodies.ts'
+      - 'components/game/useRepublicGame.ts'
+      - 'components/game/VotesView.tsx'
+      - 'scripts/government-ministry-client-vote-check.cjs'
       - 'app/vote-ballot-panel.css'
       - 'app/layout.tsx'
       - 'scripts/vote-ballot-ui-browser-check.cjs'
@@ -11,6 +15,10 @@ on:
     branches: [main]
     paths:
       - 'components/game/VoteBallotControls.tsx'
+      - 'components/game/votingBodies.ts'
+      - 'components/game/useRepublicGame.ts'
+      - 'components/game/VotesView.tsx'
+      - 'scripts/government-ministry-client-vote-check.cjs'
       - 'app/vote-ballot-panel.css'
       - 'app/layout.tsx'
       - 'scripts/vote-ballot-ui-browser-check.cjs'
@@ -28,6 +36,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - run: node scripts/government-ministry-client-vote-check.cjs
       - run: node scripts/vote-ballot-ui-browser-check.cjs
       - run: node scripts/gd-session-attendance-check.cjs
       - run: node scripts/vote-office-grants-check.cjs
