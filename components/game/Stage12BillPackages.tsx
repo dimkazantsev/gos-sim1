@@ -3,6 +3,8 @@
 import {useEffect,useMemo,useState} from 'react';
 import {ArrowUpRight,FileCheck2,FilePlus2,FileText,FolderOpen,Paperclip,RefreshCcw,UploadCloud} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {userError} from '@/lib/userError';
+import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import {FORMAL_SUBJECTS} from './formalInstitutions';
 import {isStageWorkOpen} from './stageWorkStatus';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -27,9 +29,9 @@ function validateFile(file:File){
  const extension=file.name.split('.').pop()?.toLowerCase()||'';
  return file.size>0&&file.size<=MAX_FILE_BYTES&&['pdf','doc','docx','odt','txt','rtf'].includes(extension);
 }
-export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],onOpenDocument,onOpenVotes}:{
- g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;subjects?:string[];
- onOpenDocument?:(id:string)=>void;onOpenVotes:(id?:string)=>void;
+export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],mode='work',onOpenDocument,onOpenVotes,onOpenWork}:{
+ g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;subjects?:string[];mode?:'work'|'register';
+ onOpenDocument?:(id:string)=>void;onOpenVotes:(id?:string)=>void;onOpenWork?:()=>void;
 }){
  const bills=useMemo(()=>g.formalDocuments.filter(d=>d.stage_no===12&&d.workflow_key==='bill').sort((a,b)=>b.created_at.localeCompare(a.created_at)),[g.formalDocuments]);
  const [visible,setVisible]=useState(12);
@@ -43,6 +45,8 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  const [body,setBody]=useState('');
  const [type,setType]=useState<'fz_bill'|'fkz_bill'>('fz_bill');
  const [subject,setSubject]=useState('');
+ const [committee,setCommittee]=useState('');
+ const [committees,setCommittees]=useState<{id:string;unit_key:string;title:string;head_user_id:string|null}[]>([]);
  const [mainFile,setMainFile]=useState<File|null>(null);
  const [attachments,setAttachments]=useState<Record<string,File|null>>({});
  const [financial,setFinancial]=useState(false);
@@ -54,13 +58,42 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  const [uploadFile,setUploadFile]=useState<File|null>(null);
  const allowed=FORMAL_SUBJECTS.filter(s=>ALLOWED_SUBJECTS.includes(s.key)&&(g.teacher||subjects.includes(s.key)));
  const activeSubject=allowed.some(s=>s.key===subject)?subject:(allowed[0]?.key||'');
- const canCreate=!readOnly&&!!g.game&&!!g.me&&g.me.kind!=='observer'&&
+ const canCreate=mode==='work'&&!readOnly&&!!g.game&&!!g.me&&g.me.kind!=='observer'&&
    (g.teacher||isStageWorkOpen(g.game,stage))&&allowed.length>0;
  const ownerCanEdit=(document:{author_id:string;status_code:string})=>
-  !readOnly&&!!g.me&&g.me.kind!=='observer'&&
+  mode==='work'&&!readOnly&&!!g.me&&g.me.kind!=='observer'&&
   (g.teacher||g.me.user_id===document.author_id)&&editable(document.status_code)&&
   (g.teacher||isStageWorkOpen(g.game,stage));
 
+ useEffect(()=>{
+  if(mode!=='work'||!g.game)return;
+  const gameId=g.game.id;let active=true;
+  void supabase.from('institution_units').select('id,unit_key,title,head_user_id').eq('game_id',gameId)
+   .eq('unit_kind','committee').limit(40).then(({data,error})=>{
+    if(!active)return;
+    if(error)g.setError(error);
+    else setCommittees((data||[]).filter(c=>!!c.unit_key));
+   });
+  return()=>{active=false};
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ },[g.game?.id,mode]);
+ function notifyRefresh(){
+  if(!g.game)return;
+  window.dispatchEvent(new CustomEvent(GAME_DATA_REFRESH_EVENT,{detail:{gameId:g.game.id,stageNo:12}}));
+ }
+ async function advanceBill(id:string,action:'advance'|'return'='advance'){
+  if(readOnly||busy||!g.game)return;
+  setBusy(true);setMessage('');
+  try{
+   const {error}=await supabase.rpc('advance_formal_document',{
+    p_document_id:id,p_action:action,p_note:action==='return'?'Возвращён на доработку в порядке Этапа 12':'Законопроект передан по установленному маршруту'
+   });
+   if(error)throw error;
+   setMessage(action==='return'?'Законопроект возвращён на доработку.':'Действие зафиксировано в Реестре НПА и истории законопроекта.');
+   notifyRefresh();setRefresh(v=>v+1);
+  }catch(error){setMessage('Не удалось выполнить действие: '+userError(error))}
+  finally{setBusy(false)}
+ }
  useEffect(()=>{
   let live=true;
   if(!g.game||!billIds){setFiles([]);setLoading(false);return;}
@@ -112,7 +145,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
    const issues:string[]=[];
    const profile=await supabase.rpc('save_bill_submission_profile',{
     p_document_id:id,p_requires_financial_justification:financial,
-    p_requires_government_opinion:opinion,p_committee_key:null,
+    p_requires_government_opinion:opinion,p_committee_key:committee||null,
     p_representative_user_id:null,p_note:null
    });
    if(profile.error)issues.push('Карточка внесения: '+profile.error.message);
@@ -122,10 +155,9 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
     if(problem)issues.push(labelFor(kind)+': '+problem);
    }
    setCreateOpen(false);setTitle('');setBody('');setMainFile(null);setAttachments({});
-   setFinancial(false);setOpinion(false);setRefresh(v=>v+1);
-   setMessage(issues.length?'Законопроект создан, но некоторые материалы не сохранены: '+issues.join(' · '):
-    'Пакет зарегистрирован в Реестре НПА. Документы прикреплены к законопроекту и будут следовать его маршруту.');
-   onOpenDocument?.(id);
+   setFinancial(false);setOpinion(false);setCommittee('');setRefresh(v=>v+1);notifyRefresh();
+   setMessage(issues.length?'Черновик создан, но некоторые материалы не сохранены: '+issues.join(' · '):
+    'Черновик пакета сохранён. Для официального внесения воспользуйтесь кнопкой «Внести законопроект в Государственную Думу» в его карточке ниже.');
   }catch(error){g.setError(error)}
   finally{setBusy(false)}
  }
@@ -137,7 +169,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
    const problem=await addAttachment(id,uploadKind,uploadFile);
    if(problem){setMessage('Материал не прикреплён: '+problem);return}
    setUploadFile(null);setUploadId('');setRefresh(x=>x+1);
-   setMessage('Материал добавлен к пакету. Он будет доступен другим участникам игры в досье НПА.');
+   setMessage('Материал добавлен к пакету. Он сохранён в досье НПА.');notifyRefresh();
   }finally{setBusy(false)}
  }
 
@@ -157,12 +189,14 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
 
  return <section className={styles.section} aria-label="Пакеты законодательных инициатив">
   <header className={styles.heading}>
-   <div><small>Материалы Этапа 12 · Законодательная инициатива</small>
+   <div><small>{mode==='work'?'Этап 12 · Подготовка и внесение':'Материалы Этапа 12 · Реестр пакетов'}</small>
     <h3>Пакеты законопроектов</h3>
     <p>Каждый законопроект создаётся одним пакетом: текст закона, пояснительная записка, перечень актов и необходимые заключения. Другие участники видят его состав и могут подготовить собственный пакет.</p>
    </div>
-   {canCreate&&<button className="primary" type="button" onClick={()=>setCreateOpen(x=>!x)} aria-expanded={createOpen}>
-    <FilePlus2 size={18}/>{createOpen?'Свернуть форму':'Создать пакет'}
+   {mode==='register'?<button type="button" className="primary" disabled={!onOpenWork} onClick={onOpenWork}>
+    <FilePlus2 size={18}/>Создать пакет документов · Работа
+   </button>:canCreate&&<button className="primary" type="button" onClick={()=>setCreateOpen(x=>!x)} aria-expanded={createOpen}>
+    <FilePlus2 size={18}/>{createOpen?'Свернуть форму':'Создать пакет документов'}
    </button>}
   </header>
   {message&&<p className={styles.notice} role="status">{message}</p>}
@@ -180,6 +214,12 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
     <label className={styles.full}>Файл проекта закона (вместо текста или вместе с ним)
      <input type="file" accept={fileAccept} onChange={e=>setMainFile(e.target.files?.[0]||null)}/></label>
    </div>
+   <div className={styles.fields}><label className={styles.full}>Предлагаемый профильный комитет
+    <select value={committee} onChange={e=>setCommittee(e.target.value)}>
+     <option value="">Определит руководство Государственной Думы</option>
+     {committees.map(c=><option key={c.id} value={c.unit_key}>{c.title}</option>)}
+    </select>
+   </label></div>
    <div className={styles.checks}>
     <label><input type="checkbox" checked={financial} onChange={e=>setFinancial(e.target.checked)}/> Требуется финансово-экономическое обоснование</label>
     <label><input type="checkbox" checked={opinion} onChange={e=>setOpinion(e.target.checked)}/> Требуется заключение Правительства</label>
@@ -189,10 +229,11 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
     <label key={kind.key} className={styles.attachment}><span>{kind.label}{kind.required?' · Обязательно':''}</span>
      <input type="file" accept={fileAccept} onChange={e=>setAttachments(old=>({...old,[kind.key]:e.target.files?.[0]||null}))}/></label>
    )}</div>
-   <p className={styles.hint}>Профильный комитет, представитель и дальнейшие согласования заполняются в открытом досье пакета. Документы связываются с одним номером НПА. Разрешённые форматы указаны в поле выбора файла. Размер — не более 10 МБ.</p>
+   <p className={styles.hint}>Предложенный комитет можно изменить в досье пакета; направление осуществляет уполномоченное руководство Государственной Думы. Представитель и дальнейшие согласования заполняются в досье.  Документы связываются с одним номером НПА. Разрешённые форматы указаны в поле выбора файла. Размер — не более 10 МБ.</p>
    <button type="button" className="primary" disabled={busy||title.trim().length<5||(!body.trim()&&!mainFile)} onClick={()=>void create()}>
-    <UploadCloud size={18}/>{busy?'Сохранение пакета…':'Создать и загрузить пакет'}
+    <UploadCloud size={18}/>{busy?'Сохранение пакета…':'Сохранить комплект документов'}
    </button>
+   <p className={styles.hint}>Сохранение создаёт черновик, но не означает внесения законопроекта в Государственную Думу. После проверки приложений внесение подтверждается отдельной кнопкой в карточке пакета.</p>
   </div>}
   {!canCreate&&!readOnly&&<p className={styles.hint}>Создавать пакет может участник с полномочиями субъекта законодательной инициативы во время открытого этапа. Просмотр доступен всем участникам игры.</p>}
   <div className={styles.listTitle}><h4>Реестр пакетов · {bills.length}</h4>
@@ -219,6 +260,9 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
        <FileText size={17}/>Открыть пакет, маршрут и поправки</button>
       {openVotes.length>0&&<button type="button" className="secondary" onClick={()=>onOpenVotes(openVotes[0].id)}>Открыть голосование</button>}
       {isOwner&&<button type="button" className="secondary" onClick={()=>setUploadId(old=>old===d.id?'':d.id)} aria-expanded={uploadId===d.id}><FileCheck2 size={17}/>Дополнить пакет</button>}
+      {mode==='work'&&!readOnly&&isOwner&&['draft','revision'].includes(d.status_code)&&<button type="button" className={styles.filingSubmit} disabled={busy} onClick={()=>void advanceBill(d.id)}>
+       <UploadCloud size={17}/>{busy?'Передача…':'Внести законопроект в Государственную Думу'}
+      </button>}
      </div>
      {isOwner&&uploadId===d.id&&<div className={styles.inlineUpload}>
       <label>Вид приложения<select value={uploadKind} onChange={e=>setUploadKind(e.target.value)}>{KINDS.map(k=><option value={k.key} key={k.key}>{k.label}</option>)}</select></label>
