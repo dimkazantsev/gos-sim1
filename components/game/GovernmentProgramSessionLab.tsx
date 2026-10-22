@@ -34,7 +34,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const isPM=role.split(' | ').some(t=>/^председатель\s+правительства(?:\s|$)/u.test(t));
  const canManage=teacher||isPM||role.includes('президент');
  const canSign=teacher||isPM;
- const canApprove=teacher||isPM;
+ const canApprove=isPM;
 
  async function load(){
   if(!game)return;
