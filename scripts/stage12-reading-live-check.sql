@@ -1,14 +1,15 @@
 -- Fictional fixture only. All writes are rolled back, including auth identities.
 BEGIN;
 DO $$
-DECLARE g uuid:=gen_random_uuid();t uuid:=gen_random_uuid();a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();party uuid:=gen_random_uuid();unit uuid:=gen_random_uuid();d uuid:=gen_random_uuid();d2 uuid:=gen_random_uuid();steps jsonb;s uuid;bad boolean:=false;
+DECLARE g uuid:=gen_random_uuid();t uuid:=gen_random_uuid();p uuid:=gen_random_uuid();a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();party uuid:=gen_random_uuid();unit uuid:=gen_random_uuid();d uuid:=gen_random_uuid();d2 uuid:=gen_random_uuid();steps jsonb;s uuid;bad boolean:=false;
 BEGIN
- INSERT INTO auth.users(id,aud,role) VALUES(t,'authenticated','authenticated'),(a,'authenticated','authenticated'),(b,'authenticated','authenticated');
+ INSERT INTO auth.users(id,aud,role) VALUES(t,'authenticated','authenticated'),(a,'authenticated','authenticated'),(b,'authenticated','authenticated'),(p,'authenticated','authenticated');
  INSERT INTO public.games(id,title,game_code,owner_id,status,current_round,turn_open) VALUES(g,'QA Stage12 release','QA'||substr(replace(g::text,'-',''),1,12),t,'running',12,true);
  INSERT INTO public.game_stages(game_id,stage_no,title,mode,summary,status) SELECT g,n,'QA stage '||n,'Учебная процедура','QA',CASE WHEN n=12 THEN 'open' ELSE 'locked' END FROM generate_series(1,16)n;
- INSERT INTO public.game_members(game_id,user_id,full_name,kind,role_title,team) VALUES(g,t,'QA teacher','teacher','Преподаватель',NULL),(g,a,'QA chair','student','Депутат Государственной Думы · Председатель Государственной Думы','QA release party'),(g,b,'QA deputy','student','Депутат Государственной Думы','QA release party');
+ INSERT INTO public.game_members(game_id,user_id,full_name,kind,role_title,team) VALUES(g,t,'QA teacher','teacher','Преподаватель',NULL),(g,a,'QA chair','student','Депутат Государственной Думы · Председатель Государственной Думы','QA release party'),(g,b,'QA deputy','student','Депутат Государственной Думы','QA release party'),(g,p,'QA president','student','Президент Российской Федерации',NULL);
  INSERT INTO public.game_parties(id,game_id,name,mandates,leader_user_id) VALUES(party,g,'QA release party',450,a);
  INSERT INTO public.institution_units(id,game_id,unit_kind,unit_key,title,head_user_id) VALUES(unit,g,'committee','qa-release-committee','QA release committee',a);
+ INSERT INTO public.game_profiles(game_id,user_id,signature_path) VALUES(g,p,'qa/release/signature.png');
  steps:=private.formal_workflow('bill');
  INSERT INTO public.formal_documents(id,game_id,stage_no,registry_no,title,doc_type,subject_key,subject_label,author_id,body_text,workflow_key,workflow_steps,current_step,status_code,status_label,current_owner_key)
  SELECT x,g,12,'QA-'||substr(x::text,1,8),'QA release bill','fz_bill','gd_deputy','Депутат ГД',a,'Статья 1. Срок составляет десять дней.','bill',steps,(SELECT ordinality::integer-1 FROM jsonb_array_elements(steps) WITH ORDINALITY st WHERE st.value->>'code'='reading1'),'reading1','I чтение','gd' FROM unnest(array[d,d2])x;
@@ -21,6 +22,7 @@ BEGIN
  BEGIN PERFORM public.approve_institution_meeting_agenda(g,12,'gd'); EXCEPTION WHEN OTHERS THEN IF sqlerrm NOT LIKE '%передать все пакеты%' THEN RAISE;END IF;bad:=true;END;
  IF NOT bad THEN RAISE EXCEPTION 'FAIL incomplete package approved';END IF;
  UPDATE public.bill_committee_conclusions SET finalized=true WHERE document_id=d2;
+ PERFORM set_config('qa.release.president',p::text,true);
  PERFORM set_config('qa.release.game',g::text,true);PERFORM set_config('qa.release.teacher',t::text,true);PERFORM set_config('qa.release.a',a::text,true);PERFORM set_config('qa.release.b',b::text,true);PERFORM set_config('qa.release.document',d::text,true);PERFORM set_config('qa.release.session',s::text,true);
 END;$$;
 SET LOCAL ROLE authenticated;
@@ -57,6 +59,66 @@ BEGIN
  PERFORM public.close_duma_session(s,false);
  IF (SELECT status FROM public.duma_agenda_items WHERE id=item)<>'completed' THEN RAISE EXCEPTION 'FAIL decided reading carried';END IF;
 END;$$;
+
+RESET ROLE;
+UPDATE public.institution_session_registrations SET presence_updated_at=now()-interval '1 second' WHERE game_id=current_setting('qa.release.game')::uuid;
+SET LOCAL ROLE authenticated;
+DO $full$
+DECLARE g uuid:=current_setting('qa.release.game')::uuid;t uuid:=current_setting('qa.release.teacher')::uuid;a uuid:=current_setting('qa.release.a')::uuid;b uuid:=current_setting('qa.release.b')::uuid;d uuid:=current_setting('qa.release.document')::uuid;s uuid;item uuid;am1 uuid;am2 uuid;v uuid;result jsonb;
+BEGIN
+ PERFORM set_config('request.jwt.claim.sub',a::text,true);
+ am1:=public.submit_bill_amendment(d,'gd_deputy','десять дней','двадцать дней','QA: уточнить срок исполнения нормы.',NULL);
+ am2:=public.submit_bill_amendment(d,'gd_deputy','Срок составляет','Предельный срок составляет','QA: уточнить характер срока исполнения.',NULL);
+ PERFORM set_config('request.jwt.claim.sub',t::text,true);
+ s:=public.create_duma_reading_session(g,2,'QA release second reading',now(),now()+interval '1 day');
+ PERFORM set_config('request.jwt.claim.sub',a::text,true);
+ PERFORM public.advance_formal_document(d,'advance','QA: подготовить второе чтение');
+ PERFORM public.approve_institution_meeting_agenda(g,12,'gd');
+ IF (SELECT status FROM public.duma_sessions WHERE id=s)<>'draft' THEN RAISE EXCEPTION 'FAIL old presence opened second reading';END IF;
+ PERFORM set_config('request.jwt.claim.sub',a::text,true);PERFORM public.set_gd_session_attendance(g,12,225);
+ PERFORM set_config('request.jwt.claim.sub',b::text,true);PERFORM public.set_gd_session_attendance(g,12,225);
+ SELECT id INTO item FROM public.duma_agenda_items WHERE session_id=s AND formal_document_id=d;
+ PERFORM set_config('request.jwt.claim.sub',a::text,true);PERFORM public.set_duma_agenda_item_status(item,'in_progress',NULL);
+ PERFORM public.set_duma_discussion_phase(item,'report',a,60);PERFORM public.set_duma_discussion_phase(item,'debate',NULL,NULL);
+ PERFORM public.set_duma_discussion_phase(item,'debate',b,60);PERFORM public.set_duma_discussion_phase(item,'amendments',NULL,NULL);
+ v:=public.open_bill_amendment_vote(d,array[am1]);
+ PERFORM public.cast_vote_allocation(v,225,0,0);PERFORM set_config('request.jwt.claim.sub',b::text,true);PERFORM public.cast_vote_allocation(v,225,0,0);
+ PERFORM set_config('request.jwt.claim.sub',a::text,true);PERFORM public.close_bill_amendment_vote(v,'QA first amendment accepted');
+ v:=public.open_bill_amendment_vote(d,array[am2]);
+ PERFORM public.cast_vote_allocation(v,225,0,0);PERFORM set_config('request.jwt.claim.sub',b::text,true);PERFORM public.cast_vote_allocation(v,225,0,0);
+ PERFORM set_config('request.jwt.claim.sub',a::text,true);PERFORM public.close_bill_amendment_vote(v,'QA second amendment accepted');
+ IF (SELECT count(*) FROM public.bill_amendments WHERE id IN(am1,am2) AND status='accepted')<>2 THEN RAISE EXCEPTION 'FAIL individual amendments';END IF;
+ PERFORM public.set_duma_discussion_phase(item,'vote',NULL,NULL);
+ SELECT id INTO v FROM public.game_votes WHERE formal_document_id=d AND status='open';
+ PERFORM public.cast_vote_allocation(v,225,0,0);PERFORM set_config('request.jwt.claim.sub',b::text,true);PERFORM public.cast_vote_allocation(v,225,0,0);
+ PERFORM set_config('request.jwt.claim.sub',t::text,true);PERFORM public.close_procedural_vote(v,'QA second reading');
+ IF (SELECT status_code FROM public.formal_documents WHERE id=d)<>'reading3' THEN RAISE EXCEPTION 'FAIL second reading route';END IF;
+ PERFORM public.close_duma_session(s,false);
+END;$full$;
+RESET ROLE;
+UPDATE public.institution_session_registrations SET presence_updated_at=now()-interval '1 second' WHERE game_id=current_setting('qa.release.game')::uuid;
+SET LOCAL ROLE authenticated;
+DO $third$
+DECLARE g uuid:=current_setting('qa.release.game')::uuid;t uuid:=current_setting('qa.release.teacher')::uuid;a uuid:=current_setting('qa.release.a')::uuid;b uuid:=current_setting('qa.release.b')::uuid;d uuid:=current_setting('qa.release.document')::uuid;s uuid;item uuid;v uuid;
+BEGIN
+ PERFORM set_config('request.jwt.claim.sub',t::text,true);s:=public.create_duma_reading_session(g,3,'QA third reading',now(),now()+interval '1 day');
+ PERFORM public.approve_institution_meeting_agenda(g,12,'gd');
+ IF (SELECT status FROM public.duma_sessions WHERE id=s)<>'draft' THEN RAISE EXCEPTION 'FAIL old presence opened third reading';END IF;
+ PERFORM set_config('request.jwt.claim.sub',a::text,true);PERFORM public.set_gd_session_attendance(g,12,225);
+ PERFORM set_config('request.jwt.claim.sub',b::text,true);PERFORM public.set_gd_session_attendance(g,12,225);
+ SELECT id INTO item FROM public.duma_agenda_items WHERE session_id=s AND formal_document_id=d;
+ PERFORM set_config('request.jwt.claim.sub',a::text,true);PERFORM public.set_duma_agenda_item_status(item,'in_progress',NULL);
+ PERFORM public.set_duma_discussion_phase(item,'report',a,60);PERFORM public.set_duma_discussion_phase(item,'debate',NULL,NULL);
+ PERFORM public.set_duma_discussion_phase(item,'debate',b,60);PERFORM public.set_duma_discussion_phase(item,'vote',NULL,NULL);
+ SELECT id INTO v FROM public.game_votes WHERE formal_document_id=d AND status='open';
+ PERFORM public.cast_vote_allocation(v,225,0,0);PERFORM set_config('request.jwt.claim.sub',b::text,true);PERFORM public.cast_vote_allocation(v,225,0,0);
+ PERFORM set_config('request.jwt.claim.sub',t::text,true);PERFORM public.close_procedural_vote(v,'QA third reading');
+ IF (SELECT status_code FROM public.formal_documents WHERE id=d)<>'president' THEN RAISE EXCEPTION 'FAIL third reading/SF route';END IF;
+ PERFORM public.close_duma_session(s,false);
+ PERFORM set_config('request.jwt.claim.sub',current_setting('qa.release.president'),true);
+ PERFORM public.advance_formal_document(d,'advance','QA presidential signing');
+ IF (SELECT status_code FROM public.formal_documents WHERE id=d)<>'published' THEN RAISE EXCEPTION 'FAIL publication';END IF;
+END;$third$;
 RESET ROLE;
 ROLLBACK;
-SELECT 'PASS: full-schema RPC integration, automatic two-bill agenda, all-ready guard, approval, 225/450 block, quorum opening, repeated attendance, subject review, ordered discussion, automatic ballot, 450 votes, first-reading transition and completed-question close. Fictional writes rolled back.' AS result;
+SELECT 'PASS: full schema all three readings, fresh registration for each, two individual accepted amendments with automatic rebase, second/third reading votes, game SF approval, presidential signing and publication. Fictional transaction rolled back.' result;

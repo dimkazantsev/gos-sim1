@@ -9,7 +9,9 @@ on:
       - 'components/game/LegislativeSessionLab*'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'scripts/stage12-reading-*'
+      - 'scripts/stage12-second-reading-*'
       - 'supabase/migrations/*stage12_reading_discussion_sequence.sql'
+      - 'supabase/migrations/*stage12_prepare_second_reading_with_amendments.sql'
       - '.github/workflows/stage12-reading-sequence.yml'
   workflow_dispatch:
 permissions:
@@ -29,6 +31,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/stage12-reading-sequence-check.cjs
+      - run: node scripts/stage12-second-reading-transition-check.cjs
       - run: node scripts/bill-amendments-component-check.cjs
       - run: node scripts/stage12-duma-guard-check.cjs
       - run: node scripts/stage12-reading-browser-check.cjs
