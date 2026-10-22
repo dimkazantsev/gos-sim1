@@ -69,6 +69,7 @@ async function database(){
   assert.equal(withThird.split('ГОС.ID-ЗП-ФЗ-03').length,2,'New package not duplicated');
   await db.query("UPDATE public.duma_sessions SET status='open' WHERE id=$1",[session]);
   await db.query('UPDATE public.institution_meeting_records SET agenda_approved_at=now() WHERE game_id=$1',[game]);
+  await db.exec('UPDATE private.actor SET registered=true');
   await assert.rejects(()=>db.query('SELECT public.edit_stage12_duma_agenda_text($1,$2,$3,NULL)',[session,withThird+'\nЕщё текст.',withThird]),/основание/i);
   await db.exec('UPDATE private.actor SET registered=false');
   await assert.rejects(()=>db.query('SELECT public.edit_stage12_duma_agenda_text($1,$2,$3,$4)',[session,withThird+'\nЕщё текст.',withThird,'Уточнение председателя']),/registration required/);
