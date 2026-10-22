@@ -3,3 +3,34 @@
 .institutionRegistrationPanel .civicAgendaSyncedPreview>strong{display:block;margin-bottom:9px;font-size:13px;line-height:1.4;font-weight:750;color:var(--gs-ink)}
 .institutionRegistrationPanel .civicAgendaSyncedPreview>pre{margin:0;max-height:340px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;font-size:13px;line-height:1.6;color:var(--gs-ink-2)}
 @media(max-width:640px){.institutionRegistrationPanel .civicAgendaSyncedPreview{padding:12px}.institutionRegistrationPanel .civicAgendaSyncedPreview>pre{max-height:260px}}
+
+/* Shared column edges, consistent with the rest of the meeting form. */
+.civicRegistration .civicMeetingDocuments>.civicAgendaSyncedPreview,
+.civicRegistration .civicMeetingDocuments>.civicAgendaEdit{
+ box-sizing:border-box;
+ min-width:0;
+ width:auto;
+ margin:0 20px;
+ border-radius:12px;
+}
+.civicRegistration .civicAgendaEdit{display:grid;gap:12px}
+.civicRegistration .civicAgendaEdit>button{justify-self:start;min-height:44px}
+.civicRegistration .civicAgendaEditBody{display:grid;gap:12px;padding:14px;border:1px solid var(--gs-border);border-radius:12px;background:var(--gs-surface-soft)}
+.civicRegistration .civicAgendaEditBody p{margin:0;color:var(--gs-muted);font-size:13px;line-height:1.55}
+.civicRegistration .civicAgendaEditBody>label{display:grid;gap:7px;min-width:0;color:var(--gs-ink);font-size:13px;font-weight:700}
+.civicRegistration .civicAgendaEditBody>label textarea{box-sizing:border-box;min-height:100px;max-width:100%;margin:0}
+.civicRegistration .civicAgendaEditBody>button{justify-self:start;min-height:44px}
+.civicRegistration .civicAgendaOrder{display:grid;gap:8px}
+.civicRegistration .civicAgendaOrderItem{display:flex;align-items:center;gap:10px;min-width:0;padding:9px 11px;border:1px solid var(--gs-border);border-radius:10px;background:var(--gs-surface)}
+.civicRegistration .civicAgendaPosition{display:grid;place-items:center;flex:0 0 32px;height:32px;border-radius:8px;background:var(--gs-accent-soft);color:var(--gs-accent);font-size:12px;font-weight:800}
+.civicRegistration .civicAgendaOrderTitle{display:grid;gap:3px;flex:1;min-width:0;color:var(--gs-ink);font-size:13px;line-height:1.45;overflow-wrap:anywhere}
+.civicRegistration .civicAgendaOrderTitle small{font-size:11px;color:var(--gs-muted)}
+.civicRegistration .civicAgendaOrderActions{display:flex;gap:5px;flex:none}
+.civicRegistration .civicAgendaOrderActions button{display:grid;place-items:center;width:44px;height:44px;border-radius:9px;border:1px solid var(--gs-border-strong);background:var(--gs-surface);color:var(--gs-accent-strong);font-weight:800}
+.civicRegistration .civicAgendaOrderActions button:disabled{opacity:.38;cursor:default}
+@media(max-width:600px){
+ .civicRegistration .civicMeetingDocuments>.civicAgendaSyncedPreview,
+ .civicRegistration .civicMeetingDocuments>.civicAgendaEdit{margin-left:14px;margin-right:14px}
+ .civicRegistration .civicAgendaEditBody{padding:12px}
+ .civicRegistration .civicAgendaEditBody>button{width:100%}
+}

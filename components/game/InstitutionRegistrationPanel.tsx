@@ -31,6 +31,47 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  const [rightsVersion,setRightsVersion]=useState(0);
  const [gdPresence,setGdPresence]=useState<{my_capacity:number;registered:GdPresence[]}|null>(null);
  const [presenceDraft,setPresenceDraft]=useState('');
+ const [agendaEditorOpen,setAgendaEditorOpen]=useState(false);
+ const [stage12Session,setStage12Session]=useState<{id:string;status:string}|null>(null);
+ const [stage12Order,setStage12Order]=useState<{id:string;formal_document_id:string;agenda_no:number;status:string}[]>([]);
+ const [stage12Notes,setStage12Notes]=useState('');
+ const [stage12Reason,setStage12Reason]=useState('');
+ const [stage12Saving,setStage12Saving]=useState(false);
+ async function loadStage12Editor(){
+  if(!g.game)return;
+  const s=await supabase.from('duma_sessions').select('id,status,agenda_notes').eq('game_id',g.game.id).eq('stage_no',12)
+   .order('session_no',{ascending:false}).limit(1).maybeSingle();
+  if(s.error){setMeetingError(meetingErrorMessage(userError(s.error)));return;}
+  if(!s.data){setStage12Session(null);setStage12Order([]);return;}
+  const items=await supabase.from('duma_agenda_items').select('id,formal_document_id,agenda_no,status')
+    .eq('session_id',s.data.id).order('agenda_no',{ascending:true}).limit(120);
+  if(items.error){setMeetingError(meetingErrorMessage(userError(items.error)));return;}
+  setStage12Session({id:s.data.id,status:s.data.status});
+  setStage12Order(items.data||[]);
+  setStage12Notes(s.data.agenda_notes||'');
+ }
+ async function saveStage12Editor(){
+  if(!g.game||!stage12Session||!verifiedRights?.can_coordinate||readOnly||stage12Saving)return;
+  if(stage12Session.status==='open'&&stage12Reason.trim().length<10)return;
+  setStage12Saving(true);setMeetingError('');
+  const result=await supabase.rpc('update_stage12_duma_agenda',{
+   p_session_id:stage12Session.id,p_notes:stage12Notes,
+   p_order:stage12Session.status==='draft'?stage12Order.map(item=>item.id):null,
+   p_reason:stage12Session.status==='open'?stage12Reason.trim():null
+  });
+  if(result.error){setMeetingError(meetingErrorMessage(userError(result.error)));await loadStage12Editor();}
+  else{setAgendaEditorOpen(false);setStage12Reason('');setNotice('Корректировка повестки сохранена в общем документе НПА.');await load();}
+  setStage12Saving(false);
+ }
+ function moveAgendaQuestion(index:number,delta:number){
+  setStage12Order(old=>{
+   const next=[...old],target=index+delta;
+   if(target<0||target>=next.length)return old;
+   [next[index],next[target]]=[next[target],next[index]];
+   return next;
+  });
+ }
+
  const detailsRef=useRef<HTMLDetailsElement>(null);
  const lastMeetingDraftRef=useRef<{scope:string;agenda:string;minutes:string;delegate:string}|null>(null);
  const stage=stageNo||g.game?.current_round||1,students=g.members.filter(m=>m.kind==='student');
@@ -176,6 +217,32 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
    {hasSessionRegistrations&&!agendaHasDocument&&<p className="civicMeetingHelp" role="status">Участники были зарегистрированы до оформления повестки. Можно подготовить её впервые: существующие регистрации и голоса сохранятся. После сохранения повестка станет недоступна для редактирования.</p>}
    {hasSessionRegistrations&&agendaHasDocument&&!agendaReady&&!gdStage12CanonicalAgenda&&<p className="civicMeetingHelp" role="status">Регистрация уже началась. Изменять подготовленный проект нельзя; председатель может только утвердить существующую повестку.</p>}
    {gdStage12CanonicalAgenda&&agendaHasDocument&&<section className="civicAgendaSyncedPreview" aria-label="Автоматически сформированная повестка Государственной Думы"><strong>Содержание повестки · Реестр НПА</strong><pre>{meetingRecord?.agenda_body||'Вопросы повестки загружаются…'}</pre></section>}
+   {gdStage12CanonicalAgenda&&meetingCoordinator&&!readOnly&&agendaHasDocument&&<section className="civicAgendaEdit" aria-label="Корректировка повестки Государственной Думы">
+    <button type="button" className="secondary" aria-expanded={agendaEditorOpen} onClick={()=>{setAgendaEditorOpen(v=>!v);if(!agendaEditorOpen)void loadStage12Editor();}}>Корректировать повестку</button>
+    {agendaEditorOpen&&<div className="civicAgendaEditBody">
+     <p>Обязательные вопросы формируются из пакетов законопроектов. Здесь можно уточнить регламент и изменить порядок рассмотрения до открытия заседания, не нарушая связи с НПА.</p>
+     {stage12Session?.status==='draft'&&<div className="civicAgendaOrder" aria-label="Порядок рассмотрения вопросов">
+      {stage12Order.map((item,index)=>{
+       const document=g.formalDocuments.find(d=>d.id===item.formal_document_id);
+       return <div className="civicAgendaOrderItem" key={item.id}>
+        <span className="civicAgendaPosition">{index+1}</span>
+        <span className="civicAgendaOrderTitle">{document?.title||'Законопроект'}<small>{document?.registry_no||'Документ НПА'}</small></span>
+        <div className="civicAgendaOrderActions">
+         <button type="button" aria-label={'Поднять вопрос '+(index+1)} title="Выше" disabled={index===0||stage12Saving} onClick={()=>moveAgendaQuestion(index,-1)}>↑</button>
+         <button type="button" aria-label={'Опустить вопрос '+(index+1)} title="Ниже" disabled={index===stage12Order.length-1||stage12Saving} onClick={()=>moveAgendaQuestion(index,1)}>↓</button>
+        </div>
+       </div>;
+      })}
+     </div>}
+     <label>Регламент и уточнения председателя
+      <textarea rows={4} maxLength={2000} value={stage12Notes} onChange={e=>setStage12Notes(e.target.value)} placeholder="Очередность выступлений, регламент обсуждения, дополнительные организационные вопросы"/>
+     </label>
+     {stage12Session?.status==='open'&&<label>Основание корректировки после открытия
+      <textarea rows={3} maxLength={500} value={stage12Reason} onChange={e=>setStage12Reason(e.target.value)} placeholder="Основание решения председателя (не менее 10 символов)"/>
+     </label>}
+     <button type="button" className="primary" disabled={!stage12Session||stage12Saving||stage12Session.status==='closed'||(stage12Session.status==='open'&&stage12Reason.trim().length<10)} onClick={()=>void saveStage12Editor()}>{stage12Saving?'Сохранение…':'Сохранить корректировку'}</button>
+    </div>}
+   </section>}
    {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<label>Содержание повестки<textarea aria-label="Текст повестки заседания" value={agendaText} rows={4} onChange={event=>setAgendaText(event.target.value)} placeholder="Вопросы заседания, порядок рассмотрения, выступающие и регламент"/></label>}
    {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<div className="civicAgendaComposer"><small>{agendaTextLength<30?'Для сохранения укажите ещё '+(30-agendaTextLength)+' символов.':'Повестка готова к сохранению в реестре НПА.'}</small><button type="button" className={meetingCoordinator?'primary':'secondary'} disabled={busy||readOnly||agendaTextLength<30} onClick={()=>void saveMeetingDocument('agenda')}>{meetingCoordinator?'Сохранить и утвердить повестку':'Сохранить проект повестки в реестре НПА'}</button></div>}
    {canApproveAgenda&&!readOnly&&<button type="button" className="primary" disabled={busy||readOnly} onClick={()=>void approveMeeting('agenda')}>Утвердить подготовленный проект повестки</button>}

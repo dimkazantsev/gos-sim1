@@ -112,9 +112,6 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  return <section className="legislativeLab">
   <StageModuleHeader variant="government" eyebrow="Этап 12 · Государственная Дума" title="Заседание Государственной Думы" description="Регистрация депутатов, повестка и рассмотрение законопроектов по чтениям. Откройте НПА из повестки, рассмотрите поправки ко второму чтению и проведите связанное голосование." stats={[{label:"Заседание",value:selected?"№ "+selected.session_no:"Не создано",detail:selected?.status==="open"?"Идёт":selected?.status==="closed"?"Закрыто":"Подготовка повестки"},{label:"Пакетов Этапа 12",value:stageBills.length,detail:"В реестре НПА"},{label:"В повестке",value:items.length,detail:"Вопросов выбранного заседания"}]}/>
 
-  <div className={'legislativeSessionTabs legislativeSessionTabsFull '+layout.tabs}>
-   <div>{sessions.map(s=><button type="button" key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'Идёт':s.status==='closed'?'Завершено':'Подготовка'}</em></button>)}</div>
-  </div>
   {canManage&&<details className="legislativeCreate legislativeCreateWide">
    <summary>＋ Подготовить заседание Государственной Думы</summary>
    <div className="legislativeCreateGrid">
@@ -125,6 +122,9 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
     <button type="button" className="primary" disabled={busy||!!(start&&end&&new Date(end)<=new Date(start))} onClick={()=>void create()}>{busy?'Создание…':'Создать заседание и документ повестки'}</button>
    </div>
   </details>}
+  <div className={'legislativeSessionTabs legislativeSessionTabsFull '+layout.tabs}>
+   <div>{sessions.map(s=><button type="button" key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'Идёт':s.status==='closed'?'Завершено':'Подготовка'}</em></button>)}</div>
+  </div>
 
   {feedback&&<p role="status" className="legislativeFeedback">{feedback}</p>}
   <section className={layout.packageRegister} aria-label="Все пакеты законопроектов Этапа 12">
