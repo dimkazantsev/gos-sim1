@@ -1,0 +1,44 @@
+name: ГОС.ID · Этап 12 и заседания Государственной Думы
+on:
+  pull_request:
+    paths:
+      - 'components/game/LegislativeSessionLab.tsx'
+      - 'components/game/LegislativeSessionLab.module.css'
+      - 'components/game/GovernanceStageWorkspace.tsx'
+      - 'supabase/migrations/*stage12_duma_rpc_active_window_guard.sql'
+      - 'scripts/stage12-duma-guard-check.cjs'
+      - 'scripts/stage12-duma-layout-check.cjs'
+      - '.github/workflows/stage12-duma-legislation.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'components/game/LegislativeSessionLab.tsx'
+      - 'components/game/LegislativeSessionLab.module.css'
+      - 'components/game/GovernanceStageWorkspace.tsx'
+      - 'supabase/migrations/*stage12_duma_rpc_active_window_guard.sql'
+      - 'scripts/stage12-duma-guard-check.cjs'
+      - 'scripts/stage12-duma-layout-check.cjs'
+      - '.github/workflows/stage12-duma-legislation.yml'
+permissions:
+  contents: read
+jobs:
+  stage12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/stage12-duma-guard-check.cjs
+      - run: npm run typecheck
+      - name: Stage 12 responsive layout (Chrome)
+        run: |
+          for browser in /usr/bin/google-chrome /usr/bin/chromium /usr/bin/chromium-browser; do
+            if [ -x "$browser" ]; then echo "CHROME_BIN=$browser" >> "$GITHUB_ENV"; exit 0; fi
+          done
+          echo "Chrome not found" >&2
+          exit 1
+      - run: node scripts/stage12-duma-layout-check.cjs
