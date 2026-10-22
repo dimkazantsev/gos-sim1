@@ -151,7 +151,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  async function close(){if(!selected)return;setBusy(true);const r=await supabase.rpc('close_government_session',{p_session_id:selected.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  return <section className="govSessionLab">
-  <StageModuleHeader variant="government" eyebrow="Этап 11 · Правительство Российской Федерации" title="Рассмотрение государственных программ" description="Проекты Этапа 10 автоматически включаются в повестку. После утверждения Председателем Правительства проводятся доклады, вопросы и голосование; принятые программы подписываются и публикуются." stats={[{label:'Государственные программы',value:String(programs.length),detail:'Представляются после согласования на Этапе 10'},{label:'Повестка',value:selected?.agenda_approved_at?'Утверждена':selected?'На согласовании':'Не создана'}]}/>
+  <StageModuleHeader variant="government" eyebrow="Этап 11 · Правительство Российской Федерации" title="Рассмотрение государственных программ" description="Проекты Этапа 10 автоматически включаются в повестку. После утверждения Председателем Правительства проводятся доклады, вопросы и голосование; принятые программы подписываются и публикуются." stats={[{label:'Государственные программы',value:String(programs.length)},{label:'Повестка',value:selected?.agenda_approved_at?'Утверждена':selected?'На согласовании':'Не создана'}]}/>
   <div className="govMeetingFlow" aria-label="Порядок рассмотрения">
    <div><span>01</span><strong>Подготовка повестки</strong><small>Из согласованных ГП</small></div>
    <div><span>02</span><strong>Утверждение</strong><small>Председателем Правительства</small></div>

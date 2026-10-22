@@ -8,7 +8,7 @@ const html=`<!doctype html><html lang="ru"><head><meta name="viewport" content="
 <main style="max-width:1480px;margin:auto;padding:12px">
 <section class="govSessionLab"><header class="header government" data-stage-module-head>
 <div class="copy"><span class="eyebrow">Этап 11 · Правительство Российской Федерации</span><h2>Рассмотрение государственных программ</h2><p>Проекты Этапа 10 автоматически включаются в повестку.</p></div>
-<dl class="stats"><div><dt>Государственные программы</dt><dd data-numeric="true">1</dd><span>Представляются после согласования на Этапе 10</span></div><div><dt>Повестка</dt><dd>Не создана</dd></div></dl>
+<dl class="stats"><div><dt>Государственные программы</dt><dd data-numeric="true">1</dd></div><div><dt>Повестка</dt><dd>Не создана</dd></div></dl>
 </header><div class="govMeetingFlow">
 <div><span>01</span><strong>Подготовка повестки</strong><small>Из согласованных ГП</small></div>
 <div><span>02</span><strong>Утверждение</strong><small>Председателем Правительства</small></div>
