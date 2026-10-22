@@ -1,8 +1,10 @@
 'use client';
 
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import {ArrowRight,Check,FileText,MessagesSquare,Vote} from 'lucide-react';
 import LegislativeSessionLab from './LegislativeSessionLab';
+import Stage12BillPackages from './Stage12BillPackages';
+import type {Stage} from './types';
 import BillAmendmentsPanel from './BillAmendmentsPanel';
 import BillSubjectReview from './BillSubjectReview';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -20,12 +22,17 @@ const tabs=[
  {id:3 as const,title:'Третье чтение',detail:'Принятие закона и опубликование'}
 ];
 
-export default function Stage12ReadingWorkspace({g,readOnly,onOpenVotes,onOpenDocument,onPrepare}:{
- g:ReturnTypeRepublic;readOnly:boolean;onOpenVotes:(id?:string)=>void;
- onOpenDocument?:(id:string)=>void;onPrepare:()=>void;
+export default function Stage12ReadingWorkspace({g,stage,subjects,readOnly,onOpenVotes,onOpenDocument}:{
+ g:ReturnTypeRepublic;stage:Stage;subjects:string[];readOnly:boolean;onOpenVotes:(id?:string)=>void;
+ onOpenDocument?:(id:string)=>void;
 }){
  const [reading,setReading]=useState<Reading>(1),[selectedBill,setSelectedBill]=useState('');
+ const [packagesOpen,setPackagesOpen]=useState(false);
+ const [wasAutoExpanded,setWasAutoExpanded]=useState(false);
  const bills=g.formalDocuments.filter(d=>d.stage_no===12&&d.workflow_key==='bill');
+ useEffect(()=>{
+  if(!wasAutoExpanded&&bills.length>0){setPackagesOpen(true);setWasAutoExpanded(true);}
+ },[bills.length,wasAutoExpanded]);
  const second=bills.filter(d=>billReading(d.status_code)===2);
  const amendmentBill=second.find(d=>d.id===selectedBill)||second[0];
  const firstReady=bills.filter(d=>['reading1','amendments','reading2','reading3','sf','president','published'].includes(d.status_code)).length;
@@ -45,7 +52,7 @@ export default function Stage12ReadingWorkspace({g,readOnly,onOpenVotes,onOpenDo
   </div>
   <section role="tabpanel" id={'reading-panel-'+reading} aria-labelledby={'reading-tab-'+reading} className={styles.panel}>
    {reading===1&&<section className={styles.preparation} aria-label="Подготовка к первому чтению">
-    <div className={styles.sectionHeading}><div><h3>До открытия заседания</h3><p>Сначала подготовьте пакеты, заключения и проект повестки. Только затем председатель утверждает её и начинается регистрация на заседание.</p></div><button type="button" className="secondary" onClick={onPrepare}><FileText size={17}/>Подготовить документы</button></div>
+    <div className={styles.sectionHeading}><div><h3>До открытия заседания</h3><p>Подготовьте пакет, внесите законопроект в Государственную Думу, получите заключение комитета и решение Совета ГД. Только затем утверждаются повестка и дата заседания.</p></div></div>
     <ol className={styles.steps}>{preparation.map((step,index)=><li key={step.title} data-complete={step.done}><span>{step.done?<Check size={17}/>:index+1}</span><div><b>{step.title}</b><p>{step.body}</p></div></li>)}</ol>
    </section>}
    {reading===2&&<section className={styles.preparation} aria-label="Подготовка ко второму чтению">
@@ -60,8 +67,19 @@ export default function Stage12ReadingWorkspace({g,readOnly,onOpenVotes,onOpenDo
     <ol className={styles.compactSteps}><li>III чтение в ГД</li><li>Совет Федерации</li><li>Подпись Президента</li><li>Опубликование</li></ol>
     <p className={styles.help}>В игре Совет Федерации одобряет закон автоматически. Президент может подписать или отклонить его; решение и дальнейший маршрут фиксируются в НПА.</p>
    </section>}
+   {reading===1&&<section className={styles.billFiling} aria-label="Подготовка и внесение законопроектов">
+    <button type="button" className={styles.filingToggle} aria-expanded={packagesOpen}
+      aria-controls="stage12-filing-content" onClick={()=>setPackagesOpen(v=>!v)}>
+     <FileText size={21}/><span>{packagesOpen?'Свернуть подготовку пакетов':'Подготовить документы и внести законопроект в Государственную Думу'}</span>
+     <ArrowRight size={21} className={packagesOpen?styles.toggleExpanded:''}/>
+    </button>
+    {packagesOpen&&<div id="stage12-filing-content" className={styles.filingBody}>
+     <Stage12BillPackages g={g} stage={stage} subjects={subjects} mode="work" readOnly={readOnly} onOpenDocument={onOpenDocument} onOpenVotes={onOpenVotes}/>
+     <div className={styles.inlineReview}><MessagesSquare size={19}/><div><h3>Отзывы субъектов законодательной инициативы</h3><p>Оставить отзыв можно на любой доступной стадии рассмотрения законопроекта. Отзыв сохраняется в связанном досье.</p><BillSubjectReview g={g} readOnly={readOnly} onOpenDocument={onOpenDocument}/></div></div>
+    </div>}
+   </section>}
    <LegislativeSessionLab g={g} reading={reading} readOnly={readOnly} onOpenVotes={onOpenVotes} onOpenDocument={onOpenDocument}/>
-   <aside className={styles.reviews}><MessagesSquare size={20}/><div><b>Отзывы субъектов — в досье законопроекта</b><p>Отзывы, заключения и замечания доступны при подготовке и между чтениями. Действующий субъект инициативы может направить позицию по законопроекту; она сохранится в его сопровождении.</p><BillSubjectReview key={(g.game?.id||'')+':'+g.me?.user_id} g={g} readOnly={readOnly} onOpenDocument={onOpenDocument}/></div></aside>
+   {reading!==1&&<aside className={styles.reviews}><MessagesSquare size={20}/><div><b>Отзывы субъектов законодательной инициативы</b><p>Оставить отзыв можно во время подготовки и между чтениями. Он сохраняется в досье соответствующего законопроекта.</p><BillSubjectReview key={(g.game?.id||'')+':'+g.me?.user_id} g={g} readOnly={readOnly} onOpenDocument={onOpenDocument}/></div></aside>}
    <footer className={styles.help}><Vote size={17}/><span>Результаты голосований определяют дальнейшее движение: следующее чтение, предусмотренное правилами принятие закона или отклонение. Переходы доступны в связанном НПА.</span></footer>
   </section>
  </div>;
