@@ -4,6 +4,7 @@
 .civicRegistration .civicDisclosureBody{min-width:0}
 .civicRegistration .civicMeetingDocuments{
  display:grid;gap:16px;min-width:0;margin:16px 0;padding:0;
+ align-content:start;grid-auto-rows:max-content;
  border:1px solid var(--meeting-border);border-radius:17px;
  background:#fff;box-shadow:none;overflow:hidden;
 }
@@ -71,8 +72,9 @@
  outline:3px solid #9bb4f6;outline-offset:2px;
 }
 .civicRegistration .civicAgendaComposer{
- display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;
- padding:13px 14px;border:1px solid var(--meeting-border);
+ display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;
+ justify-content:space-between;align-self:start;gap:12px;
+ min-height:0;height:auto;padding:13px 14px;border:1px solid var(--meeting-border);
  border-radius:12px;background:#f8fafc;
 }
 .civicRegistration .civicAgendaComposer small{
@@ -177,6 +179,8 @@
  .civicRegistration .civicMeetingDocuments>.civicMeetingDelegate,
  .civicRegistration .civicMeetingDocuments>.civicMeetingMinutes{margin-left:14px;margin-right:14px}
  .civicRegistration .civicMeetingDocuments>button{margin:0 14px}
+ .civicRegistration .civicAgendaComposer{flex-direction:column;align-items:stretch}
+ .civicRegistration .civicAgendaComposer>small{flex:auto}
  .civicRegistration .civicAgendaComposer>button,
  .civicRegistration .civicMeetingDelegate>button{width:100%}
  .civicRegistration .civicAttendance{padding:14px}
