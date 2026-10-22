@@ -47,7 +47,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
   setStageActionBusy(true);setError('');setNotice('');
   try{
    const ok=await g.manageStage(stageNo,action,action==='extend'?extensionMinutes:30);
-   if(ok){setNotice(action==='open'?'Этап '+stageNo+' открыт.':action==='close'?'Этап '+stageNo+' завершён.':'Срок этапа '+stageNo+' продлён на '+extensionMinutes+' минут.');void refreshReadiness();}
+   if(ok){setNotice(action==='open'?'Этап '+stageNo+' открыт.':action==='close'?'Этап '+stageNo+' завершён.':'Срок этапа '+stageNo+' продлён на '+extensionMinutes+' минут. Продление не открывает завершённые голосования и не снимает задолженности по итоговым документам. Проверяйте личные ограничения в кабинете участника.');void refreshReadiness();}
    else setError('Не удалось изменить статус этапа. Проверьте сообщение системы.');
   }finally{setStageActionBusy(false)}
  }

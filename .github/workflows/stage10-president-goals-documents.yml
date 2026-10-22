@@ -20,6 +20,7 @@ on:
       - 'scripts/government-program-vote-before-sign-check.cjs'
       - 'supabase/migrations/*government_ministry_appointment_electorate.sql'
       - 'scripts/government-ministry-electorate-check.cjs'
+      - 'scripts/stage10-rejected-program-debt-check.cjs'
       - 'supabase/migrations/*government_auto_agenda_chair_questions_vote.sql'
       - 'components/game/stageDetails.ts'
       - 'components/game/stageOperations.ts'
@@ -50,6 +51,7 @@ on:
       - 'scripts/government-program-vote-before-sign-check.cjs'
       - 'supabase/migrations/*government_ministry_appointment_electorate.sql'
       - 'scripts/government-ministry-electorate-check.cjs'
+      - 'scripts/stage10-rejected-program-debt-check.cjs'
       - 'supabase/migrations/*government_auto_agenda_chair_questions_vote.sql'
       - 'components/game/stageDetails.ts'
       - 'components/game/stageOperations.ts'
@@ -76,6 +78,7 @@ jobs:
       - run: node scripts/stage10-single-program-work-links-check.cjs
       - run: node scripts/government-program-vote-before-sign-check.cjs
       - run: node scripts/government-ministry-electorate-check.cjs
+      - run: node scripts/stage10-rejected-program-debt-check.cjs
       - run: node scripts/government-stage11-agenda-procedure-check.cjs
       - name: Find Chrome for Stage 11 responsive check
         run: |
