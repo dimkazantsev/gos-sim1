@@ -16,9 +16,9 @@ BEGIN
     OR NEW.institution_key IS DISTINCT FROM 'gd'
     OR NEW.voting_mode IS DISTINCT FROM 'mandate'
     OR NEW.majority_kind IS DISTINCT FROM 'eligible_fraction'
-    OR NEW.majority_value < (2.0/3.0 - 0.000001)
+    OR coalesce(NEW.majority_value,0) < (2.0/3.0 - 0.000001)
     OR NEW.quorum_kind IS DISTINCT FROM 'fraction'
-    OR NEW.quorum_value < 0.5
+    OR coalesce(NEW.quorum_value,0) < 0.5
     OR NEW.pass_transition IS DISTINCT FROM 'advance'
     OR NEW.fail_transition IS DISTINCT FROM 'reject'
  THEN RAISE EXCEPTION 'Для преодоления вето предусмотрено голосование не менее чем 2/3 от полного состава Государственной Думы' USING ERRCODE='23514';
@@ -52,8 +52,26 @@ BEGIN
       NEW.current_step:=OLD.current_step;
    END IF;
  END IF;
+ IF OLD.workflow_key='bill' AND OLD.doc_type='fz_bill' AND OLD.status_code='president_veto'
+    AND NEW.status_code NOT IN ('veto_sf_pending','rejected') THEN
+  RAISE EXCEPTION 'Вето преодолевается только повторным голосованием, решением Совета Федерации и последующей подписью' USING ERRCODE='42501';
+ END IF;
+ IF OLD.status_code='veto_sf_pending' AND NEW.status_code IS DISTINCT FROM OLD.status_code
+  AND (NOT private.is_game_teacher(OLD.game_id)
+   OR NEW.status_code NOT IN ('veto_overridden','rejected')) THEN
+  RAISE EXCEPTION 'Решение Совета Федерации фиксирует только преподаватель' USING ERRCODE='42501';
+ END IF;
+ IF OLD.status_code='veto_overridden' AND NEW.status_code IS DISTINCT FROM OLD.status_code THEN
+  IF NEW.status_code<>'published'
+   OR NEW.current_step<>OLD.current_step+1
+   OR NEW.current_owner_key<>'system'
+   OR NOT private.matches_formal_owner(OLD.game_id,auth.uid(),'president',OLD.author_id)
+   OR NOT EXISTS(SELECT 1 FROM public.game_profiles gp WHERE gp.game_id=OLD.game_id
+    AND gp.user_id=auth.uid() AND nullif(gp.signature_path,'') IS NOT NULL)
+  THEN RAISE EXCEPTION 'После преодоления вето закон подписывает действующий Президент своей электронной подписью' USING ERRCODE='42501';END IF;
+ END IF;
  RETURN NEW;
-END;$$;
+END;$;
 REVOKE ALL ON FUNCTION private.stage12_veto_not_published_before_sf() FROM PUBLIC,anon,authenticated;
 DROP TRIGGER IF EXISTS stage12_veto_not_published_before_sf ON public.formal_documents;
 CREATE TRIGGER stage12_veto_not_published_before_sf
