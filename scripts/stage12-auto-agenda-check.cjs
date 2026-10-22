@@ -4,10 +4,12 @@ const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 const migration=fs.readFileSync('supabase/migrations/20261022132438_stage12_auto_duma_draft_agenda.sql','utf8');
 const component=fs.readFileSync('components/game/LegislativeSessionLab.tsx','utf8');
+const registrationUi=fs.readFileSync('components/game/InstitutionRegistrationPanel.tsx','utf8');
 for(const name of ['private.sync_stage12_draft_bill_agenda','private.stage12_new_bill_to_duma_agenda','private.stage12_new_duma_session_autofill','public.correct_duma_agenda_after_open'])assert(migration.includes(name),'Required function '+name);
 for(const name of ['zzz_stage12_bill_autofill_duma_agenda','zzz_stage12_new_session_autofill','FOR UPDATE','ON CONFLICT (session_id,formal_document_id) DO NOTHING'])assert(migration.includes(name),'Required guard '+name);
 assert(migration.includes('private.can_manage_duma_session')&&migration.includes('private.require_game_meeting_registration'),'Correction has server role and attendance checks');
-assert(component.includes("supabase.rpc('correct_duma_agenda_after_open'")&&component.includes('correctionReason.trim().length<10'),'UI enforces justified corrections');
+assert(!component.includes("supabase.rpc('correct_duma_agenda_after_open'"),'Old bill-composition correction must not be exposed in Stage 12');
+assert(registrationUi.includes("supabase.rpc('edit_stage12_duma_agenda_text'")&&registrationUi.includes('stage12Reason.trim().length<10'),'Text-only agenda corrections require justification after opening');
 const extract=(name,tag)=>{
  const start=migration.indexOf('CREATE OR REPLACE FUNCTION '+name+'(');
  const end=migration.indexOf('$'+tag+'$;',start);
