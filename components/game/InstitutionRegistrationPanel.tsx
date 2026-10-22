@@ -32,6 +32,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
  const [gdPresence,setGdPresence]=useState<{my_capacity:number;registered:GdPresence[]}|null>(null);
  const [presenceDraft,setPresenceDraft]=useState('');
  const detailsRef=useRef<HTMLDetailsElement>(null);
+ const lastMeetingDraftRef=useRef<{scope:string;agenda:string;minutes:string;delegate:string}|null>(null);
  const stage=stageNo||g.game?.current_round||1,students=g.members.filter(m=>m.kind==='student');
  async function load(){if(!g.game)return;const [r,u,a,b,o,meeting]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active'),
   supabase.from('institution_meeting_records').select('game_id,stage_no,institution_key,agenda_document_id,agenda_body,agenda_approved_at,minutes_document_id,minutes_body,minutes_approved_at,delegate_user_id').eq('game_id',g.game.id).eq('stage_no',stage)]);
@@ -56,7 +57,17 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,onUnitsCh
    }).catch(()=>{if(active)setMeetingError('Не удалось загрузить данные о явке депутатов.')});
   return()=>{active=false};
  },[g.game?.id,g.me?.user_id,stage,body,rightsVersion]);
- useEffect(()=>{const row=meetingRows.find(m=>m.institution_key===body);setAgendaText(row?.agenda_body||'');setMinutesText(row?.minutes_body||'');setDelegateUser(row?.delegate_user_id||'')},[meetingRows,body]);
+ // Refresh only when the persisted meeting document or selected scope really changes.
+ // Unrelated table subscriptions must not overwrite a participant's unsaved draft.
+ useEffect(()=>{
+  const row=meetingRows.find(m=>m.institution_key===body);
+  const snapshot={scope:[g.game?.id||'',stage,body].join(':'),agenda:row?.agenda_body||'',minutes:row?.minutes_body||'',delegate:row?.delegate_user_id||''};
+  const previous=lastMeetingDraftRef.current;
+  if(previous?.scope!==snapshot.scope||previous.agenda!==snapshot.agenda)setAgendaText(snapshot.agenda);
+  if(previous?.scope!==snapshot.scope||previous.minutes!==snapshot.minutes)setMinutesText(snapshot.minutes);
+  if(previous?.scope!==snapshot.scope||previous.delegate!==snapshot.delegate)setDelegateUser(snapshot.delegate);
+  lastMeetingDraftRef.current=snapshot;
+ },[meetingRows,body,g.game?.id,stage]);
  const permissionKey=[g.game?.id,g.me?.user_id,stage,body].join(':');
  const currentDelegate=meetingRows.find(m=>m.institution_key===body)?.delegate_user_id;
  useEffect(()=>{
