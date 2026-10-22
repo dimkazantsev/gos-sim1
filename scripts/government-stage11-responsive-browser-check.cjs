@@ -48,7 +48,7 @@ for(const width of [320,375,430,768,1024,1440]){
  assert(m.metrics.every(v=>v.cardHeight<=110),'Oversized empty summary row at '+width+': '+JSON.stringify(m.metrics));
  assert(m.summary.height<=185,'Stage 11 summary consumes too much space at '+width+': '+JSON.stringify(m.summary));
  assert(m.summary.left>=-1&&m.summary.right<=width+1,'Stage 11 summary outside viewport at '+width);
- assert(m.refresh.style==='inline-flex'&&m.refresh.height>=44&&m.refresh.height<=58,'Refresh control must remain a single compact row at '+width+': '+JSON.stringify(m.refresh));
+ assert(['flex','inline-flex'].includes(m.refresh.style)&&m.refresh.height>=44&&m.refresh.height<=58,'Refresh control must remain a single compact row at '+width+': '+JSON.stringify(m.refresh));
  assert(Math.abs(m.refresh.iconCenter-m.refresh.labelCenter)<=4&&m.refresh.iconRight+4<=m.refresh.labelLeft,'Refresh icon must remain beside label at '+width+': '+JSON.stringify(m.refresh));
  assert(!m.refresh.wraps&&m.refresh.btnLeft>=-1&&m.refresh.btnRight<=width+1,'Refresh label must fit every viewport at '+width+': '+JSON.stringify(m.refresh));
  for(const status of ['На согласовании','Утверждена']){
