@@ -123,3 +123,15 @@
 .speechAdjust span{font-size:12px;font-weight:700;color:var(--gs-ink);margin-right:auto}
 .speechAdjust button{min-height:44px;min-width:88px}
 @media(max-width:430px){.speechAdjust span{flex-basis:100%}.speechAdjust button{flex:1}}
+
+
+.firstReadingDecision{display:grid;gap:10px;padding:14px 16px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);background:var(--gs-surface-soft)}
+.firstReadingDecision>b{color:var(--gs-ink);font-size:14px}
+.firstReadingDecision>p{margin:0;color:var(--gs-muted);line-height:1.55;font-size:13px}
+.firstReadingDecisionControls{display:grid;gap:12px;min-width:0}
+.firstReadingDecisionControls label{display:grid;gap:8px;font-weight:700;font-size:12px;color:var(--gs-ink);min-width:0}
+.firstReadingDecisionControls select,.firstReadingDecisionControls textarea{width:100%;min-width:0}
+.firstReadingDecisionControls .firstReadingConfirm{display:flex;align-items:flex-start;gap:10px;line-height:1.5;font-size:12px}
+.firstReadingConfirm input{flex:none;margin-top:3px}
+.firstReadingDecisionControls button{justify-self:start;min-height:44px}
+@media(max-width:600px){.firstReadingDecision{padding:12px}.firstReadingDecisionControls button{justify-self:stretch}}
