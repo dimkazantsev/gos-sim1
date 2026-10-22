@@ -3,6 +3,10 @@ on:
   pull_request:
     paths:
       - 'components/game/LegislativeSessionLab.tsx'
+      - 'components/game/Stage12BillPackages.tsx'
+      - 'components/game/Stage12BillPackages.module.css'
+      - 'components/game/StageArtifacts.tsx'
+      - 'scripts/stage12-bill-packages-check.cjs'
       - 'components/game/LegislativeSessionLab.module.css'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'supabase/migrations/*stage12_duma_rpc_active_window_guard.sql'
@@ -13,6 +17,10 @@ on:
     branches: [main]
     paths:
       - 'components/game/LegislativeSessionLab.tsx'
+      - 'components/game/Stage12BillPackages.tsx'
+      - 'components/game/Stage12BillPackages.module.css'
+      - 'components/game/StageArtifacts.tsx'
+      - 'scripts/stage12-bill-packages-check.cjs'
       - 'components/game/LegislativeSessionLab.module.css'
       - 'components/game/GovernanceStageWorkspace.tsx'
       - 'supabase/migrations/*stage12_duma_rpc_active_window_guard.sql'
@@ -33,6 +41,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/stage12-duma-guard-check.cjs
+      - run: node scripts/stage12-bill-packages-check.cjs
       - run: npm run typecheck
       - name: Stage 12 responsive layout (Chrome)
         run: |
