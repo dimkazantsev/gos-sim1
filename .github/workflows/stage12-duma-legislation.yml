@@ -5,6 +5,10 @@ on:
       - 'components/game/LegislativeSessionLab.tsx'
       - 'scripts/stage12-work-packages-check.cjs'
       - 'scripts/stage12-auto-agenda-check.cjs'
+      - 'scripts/stage12-canonical-duma-agenda-check.cjs'
+      - 'components/game/InstitutionRegistrationPanel.tsx'
+      - 'app/2026-stage12-synced-agenda.css'
+      - 'supabase/migrations/*stage12_canonical_duma_agenda.sql'
       - 'supabase/migrations/*stage12_auto_duma_draft_agenda.sql'
       - 'components/game/Stage12BillPackages.tsx'
       - 'components/game/Stage12BillPackages.module.css'
@@ -26,6 +30,10 @@ on:
       - 'components/game/LegislativeSessionLab.tsx'
       - 'scripts/stage12-work-packages-check.cjs'
       - 'scripts/stage12-auto-agenda-check.cjs'
+      - 'scripts/stage12-canonical-duma-agenda-check.cjs'
+      - 'components/game/InstitutionRegistrationPanel.tsx'
+      - 'app/2026-stage12-synced-agenda.css'
+      - 'supabase/migrations/*stage12_canonical_duma_agenda.sql'
       - 'supabase/migrations/*stage12_auto_duma_draft_agenda.sql'
       - 'components/game/Stage12BillPackages.tsx'
       - 'components/game/Stage12BillPackages.module.css'
@@ -67,5 +75,6 @@ jobs:
       - run: node scripts/stage12-duma-layout-check.cjs
       - run: node scripts/stage12-work-packages-check.cjs
       - run: node scripts/stage12-auto-agenda-check.cjs
+      - run: node scripts/stage12-canonical-duma-agenda-check.cjs
       - run: node scripts/stage12-package-layout-check.cjs
       - run: node scripts/stage12-bill-dossier-design-check.cjs

@@ -1,0 +1,5 @@
+/* The meeting registration panel previews the canonical Stage 12 Duma agenda. */
+.institutionRegistrationPanel .civicAgendaSyncedPreview{min-width:0;margin:12px 0;padding:15px 16px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);background:var(--gs-surface-soft)}
+.institutionRegistrationPanel .civicAgendaSyncedPreview>strong{display:block;margin-bottom:9px;font-size:13px;line-height:1.4;font-weight:750;color:var(--gs-ink)}
+.institutionRegistrationPanel .civicAgendaSyncedPreview>pre{margin:0;max-height:340px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;font-size:13px;line-height:1.6;color:var(--gs-ink-2)}
+@media(max-width:640px){.institutionRegistrationPanel .civicAgendaSyncedPreview{padding:12px}.institutionRegistrationPanel .civicAgendaSyncedPreview>pre{max-height:260px}}
