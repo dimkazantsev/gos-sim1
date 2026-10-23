@@ -1,6 +1,5 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {useRouter} from 'next/navigation';
 import {Activity,BookOpen,BookOpenCheck,Camera,ChevronDown,Compass,FileSignature,Landmark,Library,UserRound,UsersRound} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -27,7 +26,6 @@ import {currentGameMembers,currentGameProfiles} from './gameRoster';
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
 type PublicStats={accepted_actions:number;posts:number;votes_cast:number;documents_created:number;activity_entries:number;events_decided:number};
 export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,onStartTutorial,previewAchievementsUserId,readOnly=false,setupStatus=null,setupNotice='',setupFocusVersion=0,onProfileChanged,onFinishSetup,pendingBlitz=0}:{g:ReturnTypeRepublic;targetUserId?:string|null;onOpenProfile?:(id:string)=>void;onOwnProfile?:()=>void;onStartTutorial?:()=>void;previewAchievementsUserId?:string;readOnly?:boolean;setupStatus?:ProfileSetupStatus|null;setupNotice?:string;setupFocusVersion?:number;onProfileChanged?:()=>void;onFinishSetup?:()=>void;pendingBlitz?:number}){
- const router=useRouter();
  const {me,game,parties,partyInvitations,partyMandates,averageVsn,myEvaluations,politicalPosts,ballots,formalDocuments,activities,saveProfile,teacher}=g;
  const members=useMemo(()=>currentGameMembers(g.members,game?.id||''),[g.members,game?.id]);
  const profiles=useMemo(()=>currentGameProfiles(g.profiles,members,game?.id||''),[g.profiles,members,game?.id]);
@@ -170,7 +168,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
     <div className="profileHeroControls">
      <button type="button" className="profileComicButton" aria-label="Вводный комикс" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Пролог</button>
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
-     {own&&teacher&&<button type="button" onClick={()=>router.push('/cabinet')}><Landmark size={17}/> Мои игры · Создать игру</button>}
+     {own&&teacher&&<button type="button" onClick={()=>window.location.assign((process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'').replace(/\/$/,'')+'/cabinet/')}><Landmark size={17}/> Мои игры · Создать игру</button>}
      {own&&onStartTutorial&&<button type="button" onClick={onStartTutorial} title="Повторить интерактивное обучение навигации"><Compass size={17}/> Пройти обучение</button>}
      {own&&target.kind==='student'&&game&&<button type="button" onClick={()=>setBlitzOpen(true)} aria-haspopup="dialog" aria-label={'Блиц-вопросы'+(pendingBlitz?' — ответ не дан: '+pendingBlitz:'')}><BookOpenCheck size={17}/> Блиц-вопросы {pendingBlitz>0&&<span className="profileBlitzButtonBadge" aria-hidden="true">{pendingBlitz>99?'99+':pendingBlitz}</span>}</button>}
      {own&&target.kind!=='observer'&&<button type="button" onClick={()=>setTasksOpen(true)}><ListTodo size={17}/> Назначить задачу</button>}
