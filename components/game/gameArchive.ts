@@ -40,10 +40,41 @@ export async function enumerateGameAssets(gameId:string,bucket:'game-assets'|'ga
  }
  return found;
 }
+/** Export a bounded number of tables and rows per request (no global database timeout changes). */
+export async function readFullGameData(gameId:string,onProgress?:(done:number,total:number)=>void):Promise<SessionArchive>{
+ const manifest=await supabase.rpc('export_game_manifest',{p_game:gameId});
+ if(manifest.error||!manifest.data)throw Error('Не удалось начать экспорт: '+(userError(manifest.error)||'Нет данных'));
+ const data=manifest.data as Omit<SessionArchive,'tables'>&{tables:string[]};
+ if(data.format!=='GOS-SIMS'||data.schema!==2||!Array.isArray(data.tables))throw Error('Сервер вернул некорректное описание архива.');
+ const names=data.tables;
+ const tables:SessionArchive['tables']={};
+ const pageSize=100;
+ let complete=0;
+ for(let i=0;i<names.length;i+=5){
+  const group=names.slice(i,i+5);
+  const first=await supabase.rpc('export_game_data_batch',{p_game:gameId,p_tables:group,p_offset:0,p_limit:pageSize});
+  if(first.error||!first.data)throw Error('Не удалось выгрузить таблицы '+group.join(', ')+': '+(userError(first.error)||'Нет данных'));
+  for(const name of group){
+   const page=(first.data as Record<string,unknown>)[name];
+   if(!Array.isArray(page))throw Error('Неполный ответ сервера для таблицы '+name);
+   const rows=[...page];
+   while(rows.length>0&&rows.length%pageSize===0){
+    const next=await supabase.rpc('export_game_data_batch',{p_game:gameId,p_tables:[name],p_offset:rows.length,p_limit:pageSize});
+    if(next.error||!next.data)throw Error('Не удалось продолжить выгрузку '+name+': '+(userError(next.error)||'Нет данных'));
+    const nextPage=(next.data as Record<string,unknown>)[name];
+    if(!Array.isArray(nextPage))throw Error('Неполный ответ сервера для таблицы '+name);
+    rows.push(...nextPage);
+    if(nextPage.length<pageSize)break;
+   }
+   tables[name]=rows;
+   onProgress?.(++complete,names.length);
+  }
+ }
+ return {...data,tables} as SessionArchive;
+}
 export async function downloadFullGameArchive(gameId:string,onProgress?:(done:number,total:number)=>void):Promise<Blob>{
- const data=await supabase.rpc('export_game_data',{p_game:gameId});
- if(data.error||!data.data)throw Error('Не удалось экспортировать сеанс: '+(userError(data.error)||'Нет данных'));
- const portable=await preparePortableSession(data.data as SessionArchive);
+ const data=await readFullGameData(gameId,onProgress);
+ const portable=await preparePortableSession(data);
  const encode=(text:string)=>new TextEncoder().encode(text);
  const entries:ArchiveFile[]=[
   {path:'game.json',data:encode(JSON.stringify(portable.data,null,2))},
