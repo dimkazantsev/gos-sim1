@@ -1,6 +1,7 @@
 'use client';
 import {useCallback,useEffect,useState} from 'react';
 import {useRouter} from 'next/navigation';
+import Link from 'next/link';
 import {ArrowRight,BookOpenText,LogOut,PlusCircle,RefreshCcw,ShieldCheck} from 'lucide-react';
 import {BRAND_NAME,BrandIdentity} from '@/components/ui/BrandIdentity';
 import {supabase} from '@/lib/supabase';
@@ -38,7 +39,10 @@ export default function TeacherPortal(){
    // trust local UI state or the selected game ID as an access grant.
    const r=await supabase.rpc('ensure_my_game_access',{p_game:id});
    if(r.error)throw r.error;
-   router.push('/game/'+encodeURIComponent(id));
+   if(window.location.hostname.endsWith('.github.io')){
+    // Static GitHub Pages uses ?game=UUID instead of the Next.js dynamic route.
+    window.location.assign('/gos-sim1/?game='+encodeURIComponent(id));
+   }else router.push('/game/'+encodeURIComponent(id));
   }catch(e){setError(userError(e)||'Нет доступа к выбранной игре.');setOpening(null)}
  }
  async function signOut(){
@@ -49,7 +53,7 @@ export default function TeacherPortal(){
  }
  return <main className="teacherPortal">
   <header className="teacherPortalHeader">
-   <a href="/" className="teacherPortalWordmark" aria-label={BRAND_NAME+' — главная'}><BrandIdentity tagline/></a>
+   <Link href="/" className="teacherPortalWordmark" aria-label={BRAND_NAME+' — главная'}><BrandIdentity tagline/></Link>
    <button type="button" onClick={()=>void signOut()} disabled={!!opening} className="teacherPortalLogout"><LogOut size={17}/> Выйти</button>
   </header>
   <div className="teacherPortalContent">
@@ -58,7 +62,7 @@ export default function TeacherPortal(){
    <p className="teacherPortalIntro">Вход по личной почте и паролю. Коды игр и приглашения для доступа к кабинету не требуются.</p>
    <div className="teacherPortalActions">
     <button type="button" onClick={()=>void refresh()} disabled={loading||!!opening}><RefreshCcw size={17}/> Обновить список</button>
-    <a className="teacherPortalPrimary" href="/?teacher=create"><PlusCircle size={18}/> Создать игру</a>
+    <Link className="teacherPortalPrimary" href="/?teacher=create"><PlusCircle size={18}/> Создать игру</Link>
    </div>
    {error&&<p className="teacherPortalError" role="alert">{error}</p>}
    {loading&&<p role="status" className="teacherPortalMessage">Загружаем доступные игры…</p>}
@@ -69,7 +73,7 @@ export default function TeacherPortal(){
     </div>
     {!index.games.length&&<div className="teacherPortalEmpty"><BookOpenText size={34}/><h3>Игр пока нет</h3>
      <p>Кабинет доступен независимо от запущенных сеансов. Создайте новую учебную игру, когда она понадобится.</p>
-     <a href="/?teacher=create">Создать первую игру <ArrowRight size={17}/></a>
+     <Link href="/?teacher=create">Создать первую игру <ArrowRight size={17}/></Link>
     </div>}
     {!!index.games.length&&<div className="teacherPortalGames">
      {index.games.map(game=><article key={game.id} className="teacherPortalGame">
@@ -82,7 +86,7 @@ export default function TeacherPortal(){
      </article>)}
     </div>}
    </>}
-   {!loading&&!index&&<a className="teacherPortalBack" href="/?teacher=1">Вернуться ко входу преподавателя</a>}
+   {!loading&&!index&&<Link className="teacherPortalBack" href="/?teacher=1">Вернуться ко входу преподавателя</Link>}
   </div>
  </main>;
 }
