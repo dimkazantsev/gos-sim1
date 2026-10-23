@@ -4,7 +4,7 @@ import StyledSelect from '../ui/StyledSelect';
 import styles from './StageForms.module.css';
 import layout from './LegislativeSessionLab.module.css';
 import {isStageWorkOpen} from './stageWorkStatus';
-import {useRef,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
 import {stageRoleTitles} from './stageRoles';
@@ -34,6 +34,7 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  const [registrationVisible,setRegistrationVisible]=useState(false);
  const [agendaVisible,setAgendaVisible]=useState(false);
  const activeReading=useRef(reading);activeReading.current=reading;
+ useEffect(()=>{setAgendaVisible(false);setRegistrationVisible(false)},[reading]);
  const role=stageRoleTitles(g);
  const stageOpen=isStageWorkOpen(game,g.stages.find(s=>s.stage_no===12));
  const canManage=!readOnly&&(teacher||(stageOpen&&
