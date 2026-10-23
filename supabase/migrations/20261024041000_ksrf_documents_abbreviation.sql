@@ -127,6 +127,22 @@ REVOKE ALL ON FUNCTION public.publish_institution_meeting_minutes_automatically(
 GRANT EXECUTE ON FUNCTION public.publish_institution_meeting_minutes_automatically(uuid,integer,text) TO authenticated;
 
 
+-- Preserve every current meeting RPC rule while removing the obsolete KSRF expansion.
+-- Updating the existing function definition avoids reverting newer security guards.
+DO $ksrf_label$
+DECLARE v_source text; v_corrected text;
+BEGIN
+ SELECT pg_get_functiondef(
+  'public.save_institution_meeting_document(uuid,integer,text,text,text,uuid)'::regprocedure
+ ) INTO v_source;
+ IF v_source IS NULL THEN RAISE EXCEPTION 'Не найдена процедура документов заседаний'; END IF;
+ v_corrected:=replace(replace(replace(v_source,
+  'Координационный Совет Российской Федерации','КСРФ'),
+  'Координационного Совета Российской Федерации','КСРФ'),
+  'Координационного совета регионов и фракций','КСРФ');
+ IF v_corrected IS DISTINCT FROM v_source THEN EXECUTE v_corrected; END IF;
+END $ksrf_label$;
+
 -- Correct only the institutional name of already existing KSRF meeting papers.
 -- Do not change ballot outcomes, document status, signatures, or authored agenda body.
 UPDATE public.formal_documents d SET
