@@ -111,32 +111,36 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
   if(r.error)setError(userError(r.error));else{if(r.data?.next_session_id)setSelectedId(String(r.data.next_session_id));await load()}setBusy(false);
  }
 
+ const creationFields=canManage&&<div className="legislativeCreateGrid" aria-label="Назначить заседание">
+  <label>Название заседания<input aria-label="Название заседания" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Очередное заседание Государственной Думы"/></label>
+  <label>Дата и время начала<input type="datetime-local" value={start} onChange={e=>setStart(e.target.value)}/></label>
+  <label>Дата и время окончания<input type="datetime-local" min={start||undefined} value={end} onChange={e=>setEnd(e.target.value)}/></label>
+  <p>При назначении заседания повестка автоматически формируется из подготовленных законопроектов соответствующего чтения. Если время не указано, используется установленный игровой регламент.</p>
+  <button type="button" className="primary" disabled={busy||!!(start&&end&&new Date(end)<=new Date(start))} onClick={()=>void create()}>
+   {busy?'Назначение…':'Назначить заседание'}
+  </button>
+ </div>;
  return <section className="legislativeLab" aria-label={'Управление заседанием Государственной Думы · '+reading+' чтение'}>
-  {canManage&&(!selected||selected.status==='closed')&&<details className="legislativeCreate legislativeCreateWide">
-   <summary>＋ Подготовить заседание Государственной Думы</summary>
-   <div className="legislativeCreateGrid">
-    <label>Название заседания<input aria-label="Название заседания" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Очередное заседание Государственной Думы"/></label>
-    <label>Начало заседания<input type="datetime-local" value={start} onChange={e=>setStart(e.target.value)}/></label>
-    <label>Окончание заседания<input type="datetime-local" min={start||undefined} value={end} onChange={e=>setEnd(e.target.value)}/></label>
-    <p>Создаётся отдельное заседание для {reading}-го чтения. Если время не задано, действует регламент 20:00–00:00 по часовому поясу игры. Повестка автоматически собирается из пакетов соответствующего чтения.</p>
-    <button type="button" className="primary" disabled={busy||!!(start&&end&&new Date(end)<=new Date(start))} onClick={()=>void create()}>{busy?'Создание…':'Создать заседание и документ повестки'}</button>
-   </div>
-  </details>}
-  {feedback&&<p role="status" className="legislativeFeedback">{feedback}</p>}
-  {!selected&&<div className={layout.empty}><b>Заседание Этапа 12 ещё не создано</b><p>Повестка Этапа 12 пока пуста. Завершённые заседания предыдущих этапов сохраняются в реестре НПА и не переносятся сюда автоматически.</p></div>}
+  {!selected&&<div className={layout.preparationSequence}>
+   <section className={layout.preparationStep} aria-label="Повестка заседания">
+    <h3>1. Повестка заседания</h3>
+    <p>Повестка автоматически формируется из подготовленных к этому чтению законопроектов при назначении заседания. После этого её текст можно редактировать.</p>
+   </section>
+   <section className={layout.preparationStep} aria-label="Очерёдность выступающих">
+    <h3>2. Очерёдность выступающих</h3>
+    <p>Порядок докладов, вопросов и прений определяется правилами чтения. После формирования повестки председательствующий назначает участников.</p>
+   </section>
+   <section className={layout.preparationStep} aria-label="Регистрация на заседание">
+    <h3>3. Регистрация и утверждение повестки</h3>
+    <p>После назначения заседания уполномоченные лица утверждают повестку, депутаты регистрируются, а система проверяет кворум.</p>
+   </section>
+   <section className={layout.preparationStep} aria-label="Открытие заседания">
+    <h3>4. Назначение и открытие заседания</h3>
+    {creationFields||<p>Назначение заседания доступно председательствующему и другим уполномоченным лицам.</p>}
+    {feedback&&<p role="status">{feedback}</p>}
+   </section>
+  </div>}
   {selected&&<>
-   <div className={layout.meetingToolbar} aria-label="Управление выбранным заседанием">
-    <div className={layout.toolbarIdentity}>
-     <strong>Заседание № {selected.session_no}</strong>
-     <span data-status={selected.status}>{selected.status==='draft'?'Подготовка':selected.status==='open'?'Идёт':'Завершено'}</span>
-    </div>
-    {sessions.length>1&&<label className={layout.meetingPicker}><span className={layout.visuallyHidden}>Выбрать заседание чтения</span>
-     <select aria-label="Выбрать заседание чтения" value={selected.id}
-      onChange={event=>setSelectedId(event.target.value)}>
-      {sessions.map(session=><option key={session.id} value={session.id}>Заседание № {session.session_no}</option>)}
-     </select>
-    </label>}
-   </div>
    <div className={layout.preparationSequence}>
     <section className={layout.preparationStep} aria-label="Повестка заседания">
      <h3>1. Повестка заседания</h3>
@@ -170,6 +174,9 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
     </section>
     <section className={layout.preparationStep} aria-label="Открытие заседания">
      <h3>4. Открытие и проведение заседания</h3>
+     <p role="status">Состояние: {selected.status==='draft'?'Подготовка':selected.status==='open'?'Идёт':'Завершено'}</p>
+     {feedback&&<p role="status">{feedback}</p>}
+     {selected.status==='closed'&&creationFields}
      {selected.status==='draft'&&selected.reading_protocol&&<p role="status">
       {unready.length?'Не готовы к данному чтению: '+unready.length+' вопрос(ов).':
        'После утверждения повестки, наступления назначенного времени и регистрации 226 мандатов заседание откроется автоматически.'}
