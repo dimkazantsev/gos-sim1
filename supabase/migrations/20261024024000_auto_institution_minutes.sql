@@ -32,7 +32,15 @@ BEGIN
  IF v_m.minutes_approved_at IS NOT NULL AND v_m.minutes_document_id IS NOT NULL THEN
   RETURN v_m.minutes_document_id;
  END IF;
+ -- Never rewrite any previously published protocol, including historical approvals.
+ IF v_m.minutes_document_id IS NOT NULL AND EXISTS(
+  SELECT 1 FROM public.formal_documents d
+  WHERE d.id=v_m.minutes_document_id AND d.game_id=p_game_id AND d.status_code='published'
+ ) THEN RETURN v_m.minutes_document_id; END IF;
  v_doc:=coalesce(v_m.minutes_document_id,gen_random_uuid());
+ -- Match the approved document-creation scope enforced by server triggers.
+ PERFORM set_config('app.gos_meeting_document_scope',
+  concat(p_game_id,':',p_stage_no,':',p_institution,':minutes'),true);
  SELECT coalesce(string_agg(
    row_numbered.n::text||'. '||row_numbered.title||
    E'\nГолосование: за — '||coalesce(row_numbered.result_yes,0)::text
