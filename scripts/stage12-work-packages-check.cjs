@@ -12,7 +12,7 @@ assert(packages.includes('Реестр пакетов · {bills.length}')&&packa
 assert(workspace.includes('<Stage12BillPackages g={g}')&&workspace.includes('<LegislativeSessionLab g={g}'),'Preparation and unique meeting actions stay in one reading workspace');
 assert(meeting.includes("const items=selected?agenda.filter("),'Meeting agenda remains distinct from the package register');
 assert(meeting.includes('InstitutionRegistrationPanel')&&meeting.includes('DumaReadingDiscussion')&&meeting.includes('onOpenVotes(v.id)'),'Meeting registration, speeches and ballots are never removed');
-assert(meeting.includes('close_duma_session')&&meeting.includes('Открыть документ повестки'),'Meeting close and agenda document actions remain available');
+assert(meeting.includes('close_duma_session')&&meeting.includes('Stage12AgendaText')&&meeting.includes('Stage12SpeakerOrder'),'Meeting close and agenda document actions remain available');
 assert(!meeting.includes('StageModuleHeader')&&!meeting.includes('readingFlow')&&!meeting.includes('packageRegister'),'No duplicate meeting hero, stage strip or secondary bill register');
 assert(css.includes('var(--gs-border)')&&css.includes('var(--gs-surface)'),'Approved brand tokens remain in use');
 const html=`<!doctype html><html lang="ru"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>
