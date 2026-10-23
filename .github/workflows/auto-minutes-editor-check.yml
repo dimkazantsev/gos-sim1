@@ -1,0 +1,28 @@
+name: Protocols and Agenda Editors
+on:
+  pull_request:
+    paths:
+      - 'components/game/Stage12AgendaText.tsx'
+      - 'components/game/InstitutionRegistrationPanel.tsx'
+      - 'components/game/LegislativeSessionLab.tsx'
+      - 'components/game/GovernmentProgramSessionLab.tsx'
+      - 'supabase/migrations/20261024023000_auto_signed_session_minutes.sql'
+      - 'supabase/migrations/20261024024000_auto_institution_minutes.sql'
+      - 'scripts/auto-minutes-editor-check.cjs'
+      - '.github/workflows/auto-minutes-editor-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  focused-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run typecheck
+      - run: node scripts/auto-minutes-editor-check.cjs
