@@ -84,7 +84,7 @@ export default function DumaReadingDiscussion({g,item,canManage,onRefresh}:{g:Re
    </div>}
    {canManage&&<div className={styles.speakerControls}><label>Выступающий<select aria-label="Выступающий" value={speaker} onChange={e=>setSpeaker(e.target.value)} disabled={busy}><option value="">Выберите участника</option>{g.members.filter(m=>m.kind!=='observer'&&!m.roster_archived_at).sort((a,b)=>{
   const ai=planned.indexOf(a.user_id),bi=planned.indexOf(b.user_id);
-  return (ai<0?999:ai)-(bi<0?999);
+  return (ai<0?999:ai)-(bi<0?999:bi);
  }).map(m=><option key={m.user_id} value={m.user_id}>{planned.includes(m.user_id)?(planned.indexOf(m.user_id)+1)+'. ':''}{m.full_name}</option>)}</select></label><label>Время, секунд<input aria-label="Время выступления, секунд" type="number" min={1} max={maximum} value={seconds} onChange={e=>setSeconds(Number(e.target.value))} disabled={busy}/></label><button type="button" className="secondary" disabled={busy||!speaker||!Number.isInteger(seconds)||seconds<1||seconds>maximum||left!==null&&left>0} onClick={()=>void act(phase,true)}>Предоставить слово</button></div>}
   </>}
   {phase==='amendments'&&<p>Рассмотрите внесённые поправки в таблице выше. После голосования по каждой поправке можно открыть итоговое голосование второго чтения.</p>}
