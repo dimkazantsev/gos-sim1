@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const migration=fs.readFileSync('supabase/migrations/20261023090000_stage12_bill_source_completion.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20261023052135_stage12_bill_source_completion.sql','utf8');
 const ui=fs.readFileSync('components/game/Stage12BillPackages.tsx','utf8');
 assert(ui.includes("supabase.rpc('get_bill_dossier_readiness'"),'Student submission checks actual server readiness');
 assert(ui.includes("supabase.rpc('advance_formal_document'"),'Existing NPA workflow handles filing');
