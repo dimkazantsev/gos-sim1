@@ -14,6 +14,8 @@ on:
       - 'supabase/migrations/*stage12_canonical_duma_agenda.sql'
       - 'supabase/migrations/*stage12_auto_duma_draft_agenda.sql'
       - 'components/game/Stage12BillPackages.tsx'
+      - 'supabase/migrations/*stage12_bill_source_completion.sql'
+      - 'scripts/stage12-bill-submission-readiness-check.cjs'
       - 'components/game/Stage12BillPackages.module.css'
       - 'components/game/StageArtifacts.tsx'
       - 'scripts/stage12-bill-packages-check.cjs'
@@ -42,6 +44,8 @@ on:
       - 'supabase/migrations/*stage12_canonical_duma_agenda.sql'
       - 'supabase/migrations/*stage12_auto_duma_draft_agenda.sql'
       - 'components/game/Stage12BillPackages.tsx'
+      - 'supabase/migrations/*stage12_bill_source_completion.sql'
+      - 'scripts/stage12-bill-submission-readiness-check.cjs'
       - 'components/game/Stage12BillPackages.module.css'
       - 'components/game/StageArtifacts.tsx'
       - 'scripts/stage12-bill-packages-check.cjs'
@@ -70,6 +74,7 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: node scripts/stage12-duma-guard-check.cjs
       - run: node scripts/stage12-bill-packages-check.cjs
+      - run: node scripts/stage12-bill-submission-readiness-check.cjs
       - run: npm run typecheck
       - name: Stage 12 responsive layout (Chrome)
         run: |

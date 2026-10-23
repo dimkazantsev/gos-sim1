@@ -60,7 +60,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  const [reviewDraft,setReviewDraft]=useState<ReviewDraft>({legal:'',logic:'',acts:'',recommendation:'proceed'});
  const role=stageRoleTitles(g);
  const canAssignCommittee=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&(role.includes('председател')||role.includes('совет'))));
- const canReferCommittee=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&role.includes('председател')));
+ const canReferCommittee=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&(role.includes('председател')||role.includes('совет'))));
  const canCouncilApprove=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&(role.includes('совет')||role.includes('председател'))));
  const [mainFile,setMainFile]=useState<File|null>(null);
  const [attachments,setAttachments]=useState<Record<string,File|null>>({});
@@ -68,6 +68,10 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  const [opinion,setOpinion]=useState(false);
  const [busy,setBusy]=useState(false);
  const [message,setMessage]=useState('');
+ const [submissionIssues,setSubmissionIssues]=useState<Record<string,string[]>>({});
+ const [sourceEditorId,setSourceEditorId]=useState('');
+ const [sourceText,setSourceText]=useState('');
+ const [sourceFile,setSourceFile]=useState<File|null>(null);
  const [uploadId,setUploadId]=useState('');
  const [uploadKind,setUploadKind]=useState('explanatory_note');
  const [uploadFile,setUploadFile]=useState<File|null>(null);
@@ -141,6 +145,74 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[g.game?.id,billIds,refresh]);
 
+
+ async function submitBill(id:string){
+  if(busy||readOnly||!g.game)return;
+  setBusy(true);setMessage('');
+  try{
+   const check=await supabase.rpc('get_bill_dossier_readiness',{p_document_id:id});
+   if(check.error)throw check.error;
+   const ready=check.data as {submission_ready?:boolean;issues?:string[]}|null;
+   if(!ready?.submission_ready){
+    const issues=(ready?.issues||['Не удалось проверить комплект законопроекта']).map(issue=>
+     issue.replace('Отсутствует текст законопроекта','Добавьте основной текст или файл законопроекта: приложения не заменяют закон')
+     .replace('explanatory_note','пояснительная записка').replace('affected_acts','перечень затрагиваемых актов')
+     .replace('financial_economic','финансово-экономическое обоснование')
+     .replace('government_opinion','заключение Правительства')
+     .replace('collegial_decision','решение коллегиального субъекта'));
+    setSubmissionIssues(old=>({...old,[id]:issues}));
+    if(issues.some(issue=>issue.includes('Добавьте основной текст')))setSourceEditorId(id);
+    setMessage('Пакет пока не внесён. Устраните перечисленные в карточке замечания.');
+    return;
+   }
+   const result=await supabase.rpc('advance_formal_document',{
+    p_document_id:id,p_action:'advance',p_note:'Официальное внесение законопроекта в Государственную Думу'
+   });
+   if(result.error)throw result.error;
+   setSubmissionIssues(old=>({...old,[id]:[]}));
+   setSourceEditorId('');
+   setMessage('Законопроект внесён в Государственную Думу. Он передан в Реестр НПА и Совет ГД.');
+   setRefresh(n=>n+1);notifyRefresh();await g.refresh();
+  }catch(error){setMessage('Внесение не выполнено: '+userError(error))}
+  finally{setBusy(false)}
+ }
+ async function saveSourceText(id:string,title:string,revision:number){
+  if(busy||sourceText.trim().length<10)return;
+  setBusy(true);setMessage('');
+  try{
+   const ok=await g.updateFormalDraft(id,title,sourceText.trim(),{
+    expected_revision:revision,edit_note:'Основной текст законопроекта перед внесением в Государственную Думу'
+   });
+   if(!ok){setMessage('Текст не сохранён. Проверьте права автора и версию документа.');return}
+   setSourceEditorId('');setSourceText('');setSourceFile(null);
+   setSubmissionIssues(old=>({...old,[id]:[]}));
+   setMessage('Основной текст сохранён. Теперь можно проверить комплект и внести законопроект.');
+   setRefresh(n=>n+1);notifyRefresh();
+  }catch(error){setMessage('Не удалось сохранить текст: '+userError(error))}
+  finally{setBusy(false)}
+ }
+ async function saveSourceFile(id:string){
+  if(!g.game||!g.me||busy||!sourceFile||!validateFile(sourceFile))return;
+  const ext=sourceFile.name.split('.').pop()?.toLowerCase()||'';
+  const path=g.game.id+'/formal/'+g.me.user_id+'/'+crypto.randomUUID()+'.'+ext;
+  setBusy(true);setMessage('');
+  try{
+   const up=await supabase.storage.from('game-assets').upload(path,sourceFile,{
+    contentType:sourceFile.type||'application/octet-stream'
+   });
+   if(up.error)throw up.error;
+   const linked=await supabase.rpc('attach_stage12_bill_source',{
+    p_document_id:id,p_storage_path:path,p_file_name:sourceFile.name,
+    p_mime_type:sourceFile.type||'application/octet-stream',p_file_size:sourceFile.size
+   });
+   if(linked.error){await supabase.storage.from('game-assets').remove([path]);throw linked.error;}
+   setSourceEditorId('');setSourceText('');setSourceFile(null);
+   setSubmissionIssues(old=>({...old,[id]:[]}));
+   setMessage('Основной файл сохранён в досье. Проверьте комплект перед официальным внесением.');
+   setRefresh(n=>n+1);notifyRefresh();await g.refresh();
+  }catch(error){setMessage('Не удалось прикрепить основной файл: '+userError(error))}
+  finally{setBusy(false)}
+ }
  async function addAttachment(documentId:string,kind:string,file:File){
   if(!g.game)return 'Игра не найдена';
   if(!validateFile(file))return 'Недопустимый формат файла или размер более 10 МБ.';
@@ -201,6 +273,17 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  }
 
 
+ async function referToCommittee(id:string){
+  if(busy||!canReferCommittee)return;
+  setBusy(true);setMessage('');
+  try{
+   const {error}=await supabase.rpc('refer_stage12_registered_bill',{p_document_id:id});
+   if(error)throw error;
+   setMessage('Законопроект направлен в назначенный профильный комитет; стадия отражена в досье и реестре НПА.');
+   setRefresh(v=>v+1);notifyRefresh();await g.refresh();
+  }catch(error){setMessage('Направление в комитет не выполнено: '+userError(error))}
+  finally{setBusy(false)}
+ }
  async function saveCommittee(id:string,profile?:BillProfile){
   if(!canAssignCommittee||busy)return;
   const value=assignedCommittee[id]??profile?.committee_key??'';
@@ -344,10 +427,28 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
        <FileText size={17}/>Открыть пакет, маршрут и поправки</button>
       {openVotes.length>0&&<button type="button" className="secondary" onClick={()=>onOpenVotes(openVotes[0].id)}>Открыть голосование</button>}
       {isOwner&&<button type="button" className="secondary" onClick={()=>setUploadId(old=>old===d.id?'':d.id)} aria-expanded={uploadId===d.id}><FileCheck2 size={17}/>Дополнить пакет</button>}
-      {mode==='work'&&!readOnly&&isOwner&&['draft','revision'].includes(d.status_code)&&<button type="button" className={styles.filingSubmit} disabled={busy} onClick={()=>void advanceBill(d.id)}>
-       <UploadCloud size={17}/>{busy?'Передача…':'Внести законопроект в Государственную Думу'}
+      {mode==='work'&&!readOnly&&isOwner&&['draft','revision'].includes(d.status_code)&&<button type="button" className={styles.filingSubmit} disabled={busy} onClick={()=>void submitBill(d.id)}>
+       <UploadCloud size={17}/>{busy?'Проверка…':'Внести законопроект в Государственную Думу'}
       </button>}
      </div>
+     {mode==='work'&&['draft','revision'].includes(d.status_code)&&isOwner&&<div className={styles.sourcePanel}>
+      {!(d.body_text?.trim()||d.source_file_path)&&<p className={styles.sourceWarning} role="status">Отсутствует основной текст законопроекта. Приложения не заменяют текст закона.</p>}
+      {!!submissionIssues[d.id]?.length&&<div className={styles.submissionProblems} role="alert"><strong>Для внесения исправьте:</strong>
+       <ul>{submissionIssues[d.id].map((issue,i)=><li key={i}>{issue}</li>)}</ul></div>}
+      <button type="button" className="secondary" aria-expanded={sourceEditorId===d.id}
+       onClick={()=>{setSourceEditorId(old=>old===d.id?'':d.id);setSourceText(d.body_text||'');setSourceFile(null)}}>
+       {sourceEditorId===d.id?'Свернуть редактирование':'Добавить основной текст или файл законопроекта'}</button>
+      {sourceEditorId===d.id&&<div className={styles.sourceEditor}>
+       <label>Основной текст законопроекта<textarea rows={7} value={sourceText} maxLength={1000000}
+        placeholder="Нормативные статьи законопроекта (не пояснительная записка)" onChange={e=>setSourceText(e.target.value)}/></label>
+       <button type="button" className="secondary" disabled={busy||sourceText.trim().length<10}
+        onClick={()=>void saveSourceText(d.id,d.title,Number(d.metadata?.revision||1))}>Сохранить текст законопроекта</button>
+       <label>Или основной файл законопроекта (до 10 МБ)
+        <input type="file" accept={fileAccept} onChange={e=>setSourceFile(e.target.files?.[0]||null)}/></label>
+       <button type="button" className="secondary" disabled={busy||!sourceFile||!validateFile(sourceFile)}
+        onClick={()=>void saveSourceFile(d.id)}>Сохранить основной файл законопроекта</button>
+      </div>}
+     </div>}
      {mode==='work'&&d.status_code==='registered'&&canAssignCommittee&&<div className={styles.forwardPanel}>
       <strong>Направление в профильный комитет</strong>
       <p>Если автор указал комитет, предложение сохранено. Назначение подтверждает уполномоченное руководство Государственной Думы.</p>
@@ -357,7 +458,8 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
        </select></label>
       <div className={styles.forwardActions}>
        <button type="button" className="secondary" disabled={busy||!(assignedCommittee[d.id]??profile?.committee_key??'')} onClick={()=>void saveCommittee(d.id,profile)}>Сохранить назначение</button>
-       {canReferCommittee&&<button type="button" className={styles.filingSubmit} disabled={busy||!profile?.committee_key} onClick={()=>void advanceBill(d.id)}>Направить законопроект в комитет</button>}
+       {canReferCommittee&&<button type="button" className={styles.filingSubmit} disabled={busy||!profile?.committee_key}
+        onClick={()=>void referToCommittee(d.id)}>Направить законопроект в комитет</button>}
       </div>
      </div>}
      {mode==='work'&&d.status_code==='committee'&&<div className={styles.forwardPanel}>

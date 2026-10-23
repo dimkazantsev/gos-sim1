@@ -13,7 +13,7 @@ import styles from './Stage12ReadingWorkspace.module.css';
 export type Reading=1|2|3;
 export function billReading(status:string):Reading{
  if(['amendments','reading2'].includes(status))return 2;
- if(['reading3','sf','president','published','veto','conciliation','override'].includes(status))return 3;
+ if(['reading3','sf','president','published','president_veto','veto_sf_pending','veto_overridden','veto','conciliation','override'].includes(status))return 3;
  return 1;
 }
 const tabs=[
@@ -81,7 +81,7 @@ export default function Stage12ReadingWorkspace({g,stage,subjects,filingRequest=
     <div className={styles.sectionHeading}><div><h3>Окончательный текст и принятие закона</h3><p>Подготовьте окончательный текст и повестку третьего чтения. После регистрации и открытия заседания проходят доклад, выступления по мотивам, затем голосование за законопроект в целом. Новые поправки недопустимы.</p></div>{meetingButton}</div>
     <ol className={styles.compactSteps}><li>III чтение в ГД</li><li>Совет Федерации</li><li>Подпись Президента</li><li>Опубликование</li></ol>
     {meetingPanel}
-    <p className={styles.help}>В игре Совет Федерации одобряет закон автоматически. Президент может подписать или отклонить его; решение и дальнейший маршрут фиксируются в НПА.</p>
+    <p className={styles.help}>В игре решение Совета Федерации после обычного принятия подтверждается установленной процедурой. Президент вправе отклонить ФЗ с последующим преодолением вето по статье 107 Конституции РФ. Для ФКЗ применяется статья 108: требуется не менее 3/4 сенаторов и 2/3 депутатов; президентское вето в обычном порядке не предусмотрено.</p>
    </section>}
    {reading===1&&<section className={styles.billFiling} aria-label="Подготовка и внесение законопроектов">
     <button type="button" className={styles.filingToggle} aria-expanded={packagesOpen}
