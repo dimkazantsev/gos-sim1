@@ -4,7 +4,7 @@ import StyledSelect from '../ui/StyledSelect';
 import styles from './StageForms.module.css';
 import layout from './LegislativeSessionLab.module.css';
 import {isStageWorkOpen} from './stageWorkStatus';
-import {useRef,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
 import {stageRoleTitles} from './stageRoles';
@@ -32,7 +32,9 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  const [busy,setBusy]=useState(false);
  const [feedback,setFeedback]=useState('');
  const [registrationVisible,setRegistrationVisible]=useState(false);
+ const [agendaVisible,setAgendaVisible]=useState(false);
  const activeReading=useRef(reading);activeReading.current=reading;
+ useEffect(()=>{setAgendaVisible(false);setRegistrationVisible(false)},[reading]);
  const role=stageRoleTitles(g);
  const stageOpen=isStageWorkOpen(game,g.stages.find(s=>s.stage_no===12));
  const canManage=!readOnly&&(teacher||(stageOpen&&
@@ -124,14 +126,16 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
     </div>
     <div className={layout.toolbarActions}>
      {sessions.length>1&&<label className={layout.meetingPicker}>Заседание
-      <select aria-label="Выбрать заседание чтения" value={selected.id} onChange={event=>{setSelectedId(event.target.value);setRegistrationVisible(false)}}>
+      <select aria-label="Выбрать заседание чтения" value={selected.id} onChange={event=>{setSelectedId(event.target.value);setRegistrationVisible(false);setAgendaVisible(false)}}>
        {sessions.map(session=><option key={session.id} value={session.id}>№ {session.session_no} · {session.status==='open'?'Идёт':session.status==='closed'?'Завершено':'Подготовка'}</option>)}
       </select>
      </label>}
-     {selected.agenda_document_id&&<button type="button" className="secondary" disabled={!onOpenDocument}
-       aria-label="Открыть документ повестки" onClick={()=>onOpenDocument?.(selected.agenda_document_id!)}>Повестка</button>}
+     <button type="button" className="secondary" aria-expanded={agendaVisible}
+       aria-controls={'duma-meeting-agenda-'+selected.id} onClick={()=>{setAgendaVisible(v=>!v);setRegistrationVisible(false)}}>
+       {agendaVisible?'Свернуть повестку':'Повестка'}
+     </button>
      {selected.status!=='closed'&&<button type="button" className="secondary" aria-expanded={registrationVisible}
-       aria-controls={'duma-meeting-registration-'+selected.id} onClick={()=>setRegistrationVisible(v=>!v)}>
+       aria-controls={'duma-meeting-registration-'+selected.id} onClick={()=>{setRegistrationVisible(v=>!v);setAgendaVisible(false)}}>
        {registrationVisible?'Свернуть регистрацию':'Регистрация и повестка'}
      </button>}
      {!selected.reading_protocol&&selected.status==='draft'&&canManage&&
@@ -147,10 +151,15 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
       freshAttendance={!!selected.reading_protocol} readOnly={readOnly} defaultOpen onOpenDocument={onOpenDocument}/>:
      <p className={layout.openingGate} role="status">Повестка выбранного заседания не совпадает с повесткой текущей регистрации. Изменения отключены, чтобы не затронуть другое чтение.</p>}
     {!selected.reading_protocol&&<p className={layout.legacyNote}>Для заседания, начатого по прежнему регламенту, сохраняются его порядок регистрации, голосования и переноса вопросов.</p>}
-    {selected.status==='open'&&isCurrentAgenda&&<p className={layout.toolbarNote}>После открытия корректируется только текст документа повестки — через действие «Корректировать повестку» внутри регистрации.</p>}
+    {selected.status==='open'&&isCurrentAgenda&&<p className={layout.toolbarNote}>После открытия можно скорректировать только текст документа повестки — через действие «Корректировать повестку» внутри регистрации.</p>}
    </div>}
+   {agendaVisible&&<div id={'duma-meeting-agenda-'+selected.id} className={layout.agendaDisclosure} aria-label="Вопросы повестки заседания">
+    <div className={layout.agendaDisclosureHeading}>
+     <strong>Вопросы повестки заседания № {selected.session_no}</strong>
+     {selected.agenda_document_id&&onOpenDocument&&<button type="button" className="secondary"
+       aria-label="Открыть документ повестки" onClick={()=>onOpenDocument(selected.agenda_document_id!)}>Открыть документ повестки</button>}
+    </div>
    {canManage&&!selected.reading_protocol&&selected.status==='draft'&&<div className={styles.grid}><StyledSelect wrap label="Дополнительный документ для повестки" value={docId} onChange={setDocId} options={[{value:'',label:'Выберите документ из реестра НПА…'},...docs.filter(d=>!items.some(i=>i.formal_document_id===d.id)).map(d=>({value:d.id,label:d.registry_no+' · '+d.title+' · '+d.status_label}))]}/><div className={styles.actions}><button disabled={busy||!docId} onClick={()=>void add()}>Добавить другой документ</button></div></div>}
-   {selected.status==='open'&&isCurrentAgenda&&<p className={layout.openingGate}>Корректировка после открытия изменяет только текст документа повестки. Откройте «Регистрация на заседание» → «Корректировать повестку». Состав законопроектов и голосований остаётся прежним.</p>}
    <div className={'legislativeAgenda '+layout.agenda}>
     {items.length===0?<div className="emptyState">Повестка пуста. По правилам игры без повестки заседание не проводится.</div>:items.map(i=>{
      const d=doc(i.formal_document_id),v=voteFor(i.formal_document_id);
@@ -187,6 +196,7 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
    </div>
 
    <footer className={'legislativeSessionRule '+layout.rule}><b>Логика переноса и голосований</b><p>При закрытии заседания все пункты со статусом «ожидает» или «рассматривается» автоматически становятся перенесёнными и создаются в повестке следующего заседания. Сам документ при этом не меняет стадий движения без отдельного процедурного решения в реестре НПА.</p></footer>
+   </div>}
   </>}
  </section>;
 }

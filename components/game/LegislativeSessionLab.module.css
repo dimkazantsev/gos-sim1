@@ -151,3 +151,19 @@
 .registrationBody{margin:0 0 16px;min-width:0}
 .legacyNote{margin:8px 0;padding:9px 12px;color:var(--gs-muted);font-size:12px;line-height:1.5;background:var(--gs-surface-soft);border-radius:var(--gs-radius-sm)}
 @media(max-width:650px){.meetingToolbar{padding:12px;align-items:stretch}.toolbarIdentity{width:100%}.toolbarActions{width:100%}.toolbarActions button{flex:1 1 140px}.meetingPicker{width:100%;justify-content:space-between}.meetingPicker select{max-width:70%;flex:1;min-width:0}}
+
+
+/* Keep the first-reading screen short; full questions open from the top agenda action only. */
+.agendaDisclosure{display:grid;gap:12px;min-width:0;margin:8px 0 16px;padding:12px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-md);background:var(--gs-surface)}
+.agendaDisclosureHeading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;min-width:0}
+.agendaDisclosureHeading strong{color:var(--gs-ink);font-size:14px;font-weight:750}
+.agendaDisclosureHeading button{min-height:44px;padding:9px 14px}
+.agendaDisclosure .agenda{margin:0}
+.agendaDisclosure .rule{margin-top:2px}
+@media(max-width:600px){.agendaDisclosure{padding:10px}.agendaDisclosureHeading button{width:100%}}
+
+/* Agenda actions occupy a full document column, never the narrow agenda-number column. */
+.agendaDisclosure :global(.agendaActions){grid-column:2;display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px;min-width:0;max-width:100%}
+.agendaDisclosure :global(.agendaActions) button{min-height:44px;white-space:normal;overflow-wrap:normal;word-break:normal;text-align:center}
+.agendaDisclosure :global(.agendaActions) textarea{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+@media(max-width:650px){.agendaDisclosure :global(.agendaActions){grid-column:2}.agendaDisclosure :global(.agendaActions) button{width:100%}}
