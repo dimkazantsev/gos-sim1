@@ -1,0 +1,35 @@
+name: Party mobile layout and personal chair ballot
+on:
+  pull_request:
+    paths:
+      - 'app/party-mobile-header-compact.css'
+      - 'app/layout.tsx'
+      - 'components/game/PartyChairElection.tsx'
+      - 'supabase/migrations/20261024011500_party_chair_early_self_vote.sql'
+      - 'scripts/party-mobile-header-self-vote-check.cjs'
+      - '.github/workflows/party-mobile-self-vote.yml'
+  push:
+    paths:
+      - 'app/party-mobile-header-compact.css'
+      - 'app/layout.tsx'
+      - 'components/game/PartyChairElection.tsx'
+      - 'supabase/migrations/20261024011500_party_chair_early_self_vote.sql'
+      - 'scripts/party-mobile-header-self-vote-check.cjs'
+      - '.github/workflows/party-mobile-self-vote.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ui-and-rules:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check updated chair panel TSX
+        run: npm run typecheck
+      - name: Check real Chromium viewport sizes and self-vote protections
+        run: node scripts/party-mobile-header-self-vote-check.cjs
