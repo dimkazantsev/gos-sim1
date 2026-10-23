@@ -13,7 +13,7 @@ import styles from './Stage12ReadingWorkspace.module.css';
 export type Reading=1|2|3;
 export function billReading(status:string):Reading{
  if(['amendments','reading2'].includes(status))return 2;
- if(['reading3','sf','president','published','president_veto','veto_sf_pending','veto_overridden','rejected','veto','conciliation','override'].includes(status))return 3;
+ if(['reading3','sf','president','published','president_veto','veto_sf_pending','veto_overridden','veto','conciliation','override'].includes(status))return 3;
  return 1;
 }
 const tabs=[
