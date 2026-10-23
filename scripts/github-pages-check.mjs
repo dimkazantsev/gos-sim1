@@ -4,6 +4,10 @@ import {resolve,join} from 'node:path';
 const root=resolve(import.meta.dirname,'..'),built=join(root,'.pages-build'),out=join(built,'out');
 const base=process.env.PAGES_BASE_PATH||'/gos-sim1';
 function files(path){return readdirSync(path,{withFileTypes:true}).flatMap(x=>x.isDirectory()?files(join(path,x.name)):[join(path,x.name)])}
+// Teacher sign-in must have its own permanent static route on GitHub Pages.
+assert.ok(existsSync(join(out,'teacher/index.html')),'Permanent teacher cabinet must be exported at /teacher/');
+const teacherHtml=readFileSync(join(out,'teacher/index.html'),'utf8');
+assert.ok(teacherHtml.includes('Кабинет преподавателя'),'Teacher HTML should clearly identify its purpose');
 const refs=new Set();
 for(const file of files(out).filter(x=>x.endsWith('.html'))){
  for(const match of readFileSync(file,'utf8').matchAll(/(?:src|href)="([^"]+)"/g)){
