@@ -42,7 +42,7 @@ export async function enumerateGameAssets(gameId:string,bucket:'game-assets'|'ga
  return found;
 }
 export async function downloadSessionArchive(gameId:string,onProgress?:(done:number,total:number)=>void){
- try{return await fetchGameArchiveBatched(gameId,(name,args)=>supabase.rpc(name,args),onProgress)}
+ try{return await fetchGameArchiveBatched(gameId,async(name,args)=>supabase.rpc(name,args),onProgress)}
  catch(error){throw Error('Не удалось экспортировать сеанс: '+(userError(error)||'Нет данных'))}
 }
 export async function downloadFullGameArchive(gameId:string,onProgress?:(done:number,total:number,phase:'data'|'files')=>void):Promise<Blob>{
