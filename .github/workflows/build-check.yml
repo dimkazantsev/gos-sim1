@@ -379,6 +379,7 @@ jobs:
       - run: node scripts/meeting-agenda-layout-browser-check.cjs
       - run: node scripts/stage4-committees-layout-browser-check.cjs
       - run: node scripts/session-deletion-guard-check.cjs
+      - run: node --experimental-strip-types scripts/session-export-batches-check.mjs
       - run: node scripts/guided-tour-check.cjs
       - run: node scripts/document-input-check.cjs
       - run: node scripts/document-signer-title-check.cjs
