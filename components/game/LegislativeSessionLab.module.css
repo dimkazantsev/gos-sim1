@@ -135,3 +135,19 @@
 .firstReadingConfirm input{flex:none;margin-top:3px}
 .firstReadingDecisionControls button{justify-self:start;min-height:44px}
 @media(max-width:600px){.firstReadingDecision{padding:12px}.firstReadingDecisionControls button{justify-self:stretch}}
+
+
+/* Stage 12: one compact command row, without repeating the reading header or meeting dossier. */
+.meetingToolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:11px 14px;min-width:0;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);background:var(--gs-surface)}
+.toolbarIdentity{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-width:0}
+.toolbarIdentity strong{font-size:14px;font-weight:800;color:var(--gs-ink)}
+.toolbarIdentity span{font-size:12px;font-weight:750;padding:5px 9px;border-radius:8px;background:var(--gs-accent-soft);color:var(--gs-accent-strong)}
+.toolbarIdentity small{font-size:11px;color:var(--gs-muted)}
+.toolbarActions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.toolbarActions button{min-height:44px;padding:9px 13px;font-size:13px}
+.meetingPicker{display:flex;align-items:center;gap:8px;color:var(--gs-muted);font-size:12px;font-weight:650}
+.meetingPicker select{max-width:210px;min-height:44px}
+.toolbarNote{flex-basis:100%;margin:0;color:var(--gs-muted);font-size:12px;line-height:1.55}
+.registrationBody{margin:0 0 16px;min-width:0}
+.legacyNote{margin:8px 0;padding:9px 12px;color:var(--gs-muted);font-size:12px;line-height:1.5;background:var(--gs-surface-soft);border-radius:var(--gs-radius-sm)}
+@media(max-width:650px){.meetingToolbar{padding:12px;align-items:stretch}.toolbarIdentity{width:100%}.toolbarActions{width:100%}.toolbarActions button{flex:1 1 140px}.meetingPicker{width:100%;justify-content:space-between}.meetingPicker select{max-width:70%;flex:1;min-width:0}}
