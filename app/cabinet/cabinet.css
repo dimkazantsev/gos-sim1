@@ -1,0 +1,29 @@
+.teacherCabinetPage{min-height:100dvh;display:flex;flex-direction:column;overflow:visible}
+.teacherCabinetPage>.entryHeader,.teacherCabinetPage>.entryFooter{width:100%}
+.teacherCabinetMain{width:100%;max-width:1200px;margin:0 auto;padding:clamp(28px,5vw,64px) 0;flex:1}
+.teacherCabinetHeading{margin-bottom:28px}
+.teacherCabinetHeading h1{font-size:clamp(30px,4vw,46px);font-weight:800;letter-spacing:-.045em;margin:8px 0 10px;color:var(--gs-ink)}
+.teacherCabinetHeading p{font-size:15px;line-height:1.6;color:var(--gs-muted);max-width:680px}
+.teacherCabinetLayout{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}
+.teacherCabinetPage .entryForm{max-width:none;min-width:0}
+.teacherCabinetSectionHead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px}
+.teacherCabinetSectionHead h2{font-size:25px;letter-spacing:-.035em;margin:7px 0 0}
+.teacherCabinetAdd{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-radius:11px;padding:10px 16px;font-size:14px}
+.teacherCabinetExit{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:10px 14px;background:#f3f7ff;color:var(--gs-accent);border:1px solid var(--gs-border);border-radius:11px;font-weight:750}
+.teacherCabinetEmpty{text-align:center;padding:30px 15px;border:1px dashed var(--gs-border);border-radius:14px;background:var(--gs-surface-soft);color:var(--gs-muted)}
+.teacherCabinetEmpty svg{color:var(--gs-accent)}
+.teacherCabinetEmpty h3{margin:10px 0 4px;color:var(--gs-ink);font-size:19px}
+.teacherCabinetEmpty p{margin:0 auto;max-width:440px;line-height:1.6;font-size:14px}
+.teacherCabinetList{display:grid;gap:11px}
+.teacherCabinetGame{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:17px;border:1px solid var(--gs-border);border-radius:13px;background:var(--gs-surface-soft);min-width:0}
+.teacherCabinetGame>div{min-width:0}
+.teacherCabinetGame h3{margin:0 0 5px;font-size:17px;overflow-wrap:anywhere}
+.teacherCabinetGame span{font-size:13px;color:var(--gs-muted);overflow-wrap:anywhere}
+.teacherCabinetGame button{display:inline-flex;gap:7px;align-items:center;justify-content:center;border-radius:10px;border:1px solid var(--gs-border);background:#fff;color:var(--gs-accent);min-height:42px;padding:10px 14px;white-space:nowrap;font-weight:750}
+.teacherCabinetNewGame{max-width:720px!important}
+.teacherCabinetNewGame .entryFormIntro{margin-bottom:14px}
+.teacherCabinetSecurity{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.6;color:var(--gs-muted);margin:0}
+.teacherCabinetSecurity svg{flex-shrink:0;margin-top:2px}
+.teacherCabinetNotice{color:var(--gs-muted)}
+@media(max-width:720px){.teacherCabinetMain{padding:30px 0}.teacherCabinetPage .entryForm{padding:22px}.teacherCabinetGame{flex-direction:column;align-items:stretch}.teacherCabinetGame button{width:100%}.teacherCabinetHeading h1{font-size:30px}.teacherCabinetPage .entryHeader{flex-wrap:wrap}.teacherCabinetSectionHead{align-items:stretch}.teacherCabinetAdd{width:100%}}
+@media(max-width:390px){.teacherCabinetPage .entryForm{padding:20px 16px}.teacherCabinetPage .entryHeader{padding:18px 0}.teacherCabinetHeading p{font-size:14px}}
