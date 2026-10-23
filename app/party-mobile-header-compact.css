@@ -1,5 +1,6 @@
 /* Party section should size its rows to their content on narrow viewports.
    Prevent the shared grid shell from stretching the page hero to viewport height. */
+.gosPartyElectionBallot>.gosPartyElectionSelfVote{grid-column:1/-1;justify-self:start;min-height:44px}
 @media (max-width:700px){
   .partyPage.civicParties {
     display:grid;
