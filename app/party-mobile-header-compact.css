@@ -1,0 +1,46 @@
+/* Party section should size its rows to their content on narrow viewports.
+   Prevent the shared grid shell from stretching the page hero to viewport height. */
+@media (max-width:700px){
+  .partyPage.civicParties {
+    display:grid;
+    align-content:start;
+    grid-auto-rows:max-content;
+    gap:14px;
+    min-height:0;
+  }
+  .partyPage.civicParties>.pageHeader{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:flex-start;
+    align-content:flex-start;
+    gap:12px;
+    width:100%;
+    height:auto;
+    min-height:0;
+    max-height:none;
+    box-sizing:border-box;
+    margin:0;
+    padding:22px 19px;
+    align-self:start;
+  }
+  .partyPage.civicParties>.pageHeader>div{
+    flex:0 1 auto;
+    min-width:0;
+    width:100%;
+  }
+  .partyPage.civicParties>.pageHeader h1{margin:0 0 12px;line-height:1.15}
+  .partyPage.civicParties>.pageHeader p{margin:0;line-height:1.6}
+  .partyPage.civicParties>.pageHeader>.gosPartyStageBadge{
+    position:static;
+    display:inline-flex;
+    align-self:flex-start;
+    margin:0;
+    flex:0 0 auto;
+  }
+  .partyPage.civicParties>.civicPartyTiles,
+  .partyPage.civicParties>.civicPartyPublic{min-width:0;align-self:start}
+  .gosPartyElectionBallot{grid-template-columns:minmax(0,1fr)}
+  .gosPartyElectionBallot button{width:100%;white-space:normal}
+  .gosPartyElectionSelfVote{width:100%}
+}
