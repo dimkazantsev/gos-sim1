@@ -49,7 +49,7 @@ export function formalDocumentTypeLabel(key:string){
 /** Human-readable labels only: never rewrite persisted institutional keys. */
 export function formalSubjectDisplayLabel(key:string,label?:string|null){
  const raw=String(label||'').trim();
- if(key==='ksrf'&&(!raw||/^ksrf$/i.test(raw)))return 'Координационный Совет Российской Федерации';
+ if(key==='ksrf')return 'КСРФ';
  if(raw&&raw.toLowerCase()!==key.toLowerCase())return raw;
  return FORMAL_SUBJECTS.find(subject=>subject.key===key)?.label||(/[А-Яа-яЁё]/.test(raw)?raw:'Государственный орган');
 }
@@ -64,7 +64,7 @@ export function formalDocumentTitle(title:string|null|undefined,docType:string){
  const meeting=/^(Повестка|Протокол) заседания\s*[·:—–-]\s*(ksrf|gd|government|sf|ks|vs|region|municipality|cec|central_bank|accounts|committee)$/iu.exec(official);
  if(meeting){
   const names:Record<string,string>={
-   ksrf:'Координационного Совета Российской Федерации',
+   ksrf:'КСРФ',
    gd:'Государственной Думы Федерального Собрания Российской Федерации',
    government:'Правительства Российской Федерации',
    sf:'Совета Федерации Федерального Собрания Российской Федерации',
@@ -79,7 +79,11 @@ export function formalDocumentTitle(title:string|null|undefined,docType:string){
   };
   return meeting[1]+' заседания '+names[meeting[2].toLowerCase()];
  }
- if(/\bksrf\b/i.test(official))return official.replace(/\bksrf\b/gi,'КСРФ');
+ // Within ГОС.ID the institution is always «КСРФ».
+ const ksrfTitle=official
+  .replace(/Координационн(?:ый|ого)\s+Совет(?:а)?\s+(?:Российской\s+Федерации|регионов\s+и\s+фракций)/giu,'КСРФ')
+  .replace(/\bksrf\b/gi,'КСРФ');
+ if(ksrfTitle!==official)return ksrfTitle;
  if(!official||/^[a-z][a-z0-9]*(?:[_-][a-z0-9]+)+$/.test(official))return formalDocumentTypeLabel(docType);
  return official;
 }
