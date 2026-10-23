@@ -19,7 +19,7 @@ export default function PartyChairElection({g,party}:{g:ReturnTypeRepublic;party
  const eligible=me?.kind==='student'&&!me.roster_archived_at&&me.team===party.name;
  const stageOne=g.stages.find(s=>s.stage_no===1);
  const votingOpen=isStageWorkOpen(g.game,stageOne);
- const ready=members.length>=2&&pending.length===0;
+ const ready=members.length>=1; // Votes may be cast before the quorum; election finalizes only with >=2 members and no pending invites.
  const canVote=!party.leader_user_id&&eligible&&votingOpen&&ready;
  useEffect(()=>{
   let active=true;
@@ -40,13 +40,13 @@ export default function PartyChairElection({g,party}:{g:ReturnTypeRepublic;party
  const current=votes.find(v=>v.voter_id===me?.user_id)?.candidate_id;
  const leaderVotes=party.leader_user_id?totals.get(party.leader_user_id)||0:0;
  const votedWinner=!!party.leader_user_id&&votesCast===members.length&&leaderVotes>0&&[...totals.values()].filter(n=>n===leaderVotes).length===1&&[...totals.values()].every(n=>n<=leaderVotes);
- const status=party.leader_user_id?(votedWinner?'Председатель избран голосованием':'Председатель определён'):!votingOpen?'Этап не открыт':members.length<2?'Набор участников':pending.length?'Ожидаются ответы':'Идёт голосование';
- async function cast(){
-  if(!candidate||busy||!canVote)return;
+ const status=party.leader_user_id?(votedWinner?'Председатель избран голосованием':'Председатель определён'):!votingOpen?'Этап не открыт':members.length<2?'Голосование · ожидается состав':pending.length?'Голосование · ожидаются приглашённые':'Идёт голосование';
+ async function cast(choice=candidate){
+  if(!choice||busy||!canVote)return;
   setBusy(true);setNotice('');
   try{
-   const success=await g.voteForPartyChair(party.id,candidate);
-   setNotice(success?'Голос учтён. После голосования всех действующих членов определяется председатель.':'Голос не сохранён. Проверьте сообщение об ошибке.');
+   const success=await g.voteForPartyChair(party.id,choice);
+   setNotice(success?members.length<2?'Ваш голос сохранён. Председатель будет определён после вступления второго участника и завершения выборов.':pending.length?'Голос сохранён. Итоги будут подведены после ответа всех приглашённых участников.':'Голос учтён. После голосования всех действующих членов определяется председатель.':'Голос не сохранён. Проверьте сообщение об ошибке.');
    if(success){
     const r=await supabase.from('party_chair_ballots').select('voter_id,candidate_id').eq('party_id',party.id);
     if(!r.error)setVotes((r.data||[]) as Ballot[]);
@@ -66,7 +66,9 @@ export default function PartyChairElection({g,party}:{g:ReturnTypeRepublic;party
   </div>
   {party.leader_user_id?<div className="gosPartyElectionResult"><CheckCircle2 size={21}/><div><strong>{votedWinner?'Председатель избран голосованием':'Председатель определён'}</strong><p>{members.find(m=>m.user_id===party.leader_user_id)?.full_name||'Участник партии'}. {votedWinner?'Выборы завершены; можно готовить регистрационные документы.':'Если студенческое голосование не завершилось, преподаватель вправе назначить председателя в резервном порядке.'}</p></div></div>:
    !votingOpen?<p className="gosPartyElectionNotice"><LockKeyhole size={18}/> Выборы недоступны до открытия первого этапа преподавателем.</p>:
-   !ready?<p className="gosPartyElectionNotice"><Clock3 size={18}/> Сначала пригласите других студентов и дождитесь их согласия. Для выборов нужны минимум два вступивших участника и отсутствие приглашений без ответа.</p>:
+   !ready?<p className="gosPartyElectionNotice"><Clock3 size={18}/> Для голосования необходимо вступить в партию.</p>:
+   members.length<2?<p className="gosPartyElectionNotice"><Clock3 size={18}/> Вы можете проголосовать за себя уже сейчас. Для избрания Председателя всё равно нужны минимум два действующих члена партии и завершение голосования.</p>:
+   pending.length>0?<p className="gosPartyElectionNotice"><Clock3 size={18}/> Голосование доступно. Итоги будут подведены, когда все приглашённые ответят и проголосуют действующие члены партии.</p>:
    <p className="gosPartyElectionHint">Каждый участник голосует один раз; до подведения итогов выбор можно изменить. При равенстве голосов допускается переголосование.</p>}
   {members.length>0&&<div className="gosPartyElectionCandidates" aria-label="Кандидаты и голоса">
    {members.map(member=><div className="gosPartyElectionCandidate" key={member.user_id}>
@@ -79,10 +81,11 @@ export default function PartyChairElection({g,party}:{g:ReturnTypeRepublic;party
    <label>Выберите кандидата
     <select value={candidate} onChange={e=>setCandidate(e.target.value)}>
      <option value="">Кандидат на должность председателя</option>
-     {members.map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}
+     {members.map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}{m.user_id===me?.user_id?' (Вы — голос за себя)':''}</option>)}
     </select>
    </label>
    <button type="button" className="primary" disabled={busy||!candidate} onClick={()=>void cast()}>{busy?'Сохранение…':current?'Изменить голос':'Проголосовать'}</button>
+   {me?.user_id&&<button type="button" className="secondary gosPartyElectionSelfVote" disabled={busy} onClick={()=>{setCandidate(me.user_id);void cast(me.user_id)}}>{busy?'Сохранение…':'Проголосовать за себя'}</button>}
   </div>}
   {notice&&<p className="gosPartyElectionFeedback" role="status">{notice}</p>}
  </section>;
