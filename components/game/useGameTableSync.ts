@@ -19,9 +19,16 @@ const pushedStageTables=new Set([
  'stage_deadline_rules','parliamentary_election_rules','regional_election_rules'
 ]);
 export const GAME_DATA_REFRESH_EVENT='gos-sims:refresh';
+export const KSRF_PROPOSAL_REFRESH_EVENT='gos-sims:ksrf-proposals';
 export const SECTION_UPDATES_REFRESH_EVENT='gos-sims:section-updates';
 export function notifySectionUpdates(gameId:string){window.dispatchEvent(new CustomEvent(SECTION_UPDATES_REFRESH_EVENT,{detail:{gameId}}))}
-export function notifyGameDataRefresh(gameId:string,table?:string){window.dispatchEvent(new CustomEvent(GAME_DATA_REFRESH_EVENT,{detail:{gameId,table}}))}
+export function notifyGameDataRefresh(gameId:string,table?:string){
+ // KSRF proposals only invalidate their own small list. Broadcasting through
+ // the generic event caused unrelated stage widgets to query on every proposal.
+ const eventName=table==='parliamentary_election_rules'||table==='regional_election_rules'
+  ?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT;
+ window.dispatchEvent(new CustomEvent(eventName,{detail:{gameId,table}}));
+}
 
 // Stage workspaces do not open Postgres Changes subscriptions themselves.
 // A classroom can have 30+ clients and several stage widgets per screen; a
@@ -60,7 +67,8 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
     schedule(0);
   },25000+Math.floor(Math.random()*10000));
   window.addEventListener('focus',visible);window.addEventListener('online',visible);
-  window.addEventListener(GAME_DATA_REFRESH_EVENT,local);document.addEventListener('visibilitychange',visible);
-  return()=>{disposed=true;clearTimeout(timer);clearInterval(poll);window.removeEventListener('focus',visible);window.removeEventListener('online',visible);window.removeEventListener(GAME_DATA_REFRESH_EVENT,local);document.removeEventListener('visibilitychange',visible)};
+  const eventName=onlyTable?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT;
+  window.addEventListener(eventName,local);document.addEventListener('visibilitychange',visible);
+  return()=>{disposed=true;clearTimeout(timer);clearInterval(poll);window.removeEventListener('focus',visible);window.removeEventListener('online',visible);window.removeEventListener(eventName,local);document.removeEventListener('visibilitychange',visible)};
  },[gameId,scope,onlyTable]);
 }
