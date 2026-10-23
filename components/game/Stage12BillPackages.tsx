@@ -68,6 +68,10 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  const [opinion,setOpinion]=useState(false);
  const [busy,setBusy]=useState(false);
  const [message,setMessage]=useState('');
+ const [submissionIssues,setSubmissionIssues]=useState<Record<string,string[]>>({});
+ const [sourceEditorId,setSourceEditorId]=useState('');
+ const [sourceText,setSourceText]=useState('');
+ const [sourceFile,setSourceFile]=useState<File|null>(null);
  const [uploadId,setUploadId]=useState('');
  const [uploadKind,setUploadKind]=useState('explanatory_note');
  const [uploadFile,setUploadFile]=useState<File|null>(null);
@@ -141,6 +145,74 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[g.game?.id,billIds,refresh]);
 
+
+ async function submitBill(id:string){
+  if(busy||readOnly||!g.game)return;
+  setBusy(true);setMessage('');
+  try{
+   const check=await supabase.rpc('get_bill_dossier_readiness',{p_document_id:id});
+   if(check.error)throw check.error;
+   const ready=check.data as {submission_ready?:boolean;issues?:string[]}|null;
+   if(!ready?.submission_ready){
+    const issues=(ready?.issues||['Не удалось проверить комплект законопроекта']).map(issue=>
+     issue.replace('Отсутствует текст законопроекта','Добавьте основной текст или файл законопроекта: приложения не заменяют закон')
+     .replace('explanatory_note','пояснительная записка').replace('affected_acts','перечень затрагиваемых актов')
+     .replace('financial_economic','финансово-экономическое обоснование')
+     .replace('government_opinion','заключение Правительства')
+     .replace('collegial_decision','решение коллегиального субъекта'));
+    setSubmissionIssues(old=>({...old,[id]:issues}));
+    if(issues.some(issue=>issue.includes('Добавьте основной текст')))setSourceEditorId(id);
+    setMessage('Пакет пока не внесён. Устраните перечисленные в карточке замечания.');
+    return;
+   }
+   const result=await supabase.rpc('advance_formal_document',{
+    p_document_id:id,p_action:'advance',p_note:'Официальное внесение законопроекта в Государственную Думу'
+   });
+   if(result.error)throw result.error;
+   setSubmissionIssues(old=>({...old,[id]:[]}));
+   setSourceEditorId('');
+   setMessage('Законопроект внесён в Государственную Думу. Он передан в Реестр НПА и Совет ГД.');
+   setRefresh(n=>n+1);notifyRefresh();await g.refresh();
+  }catch(error){setMessage('Внесение не выполнено: '+userError(error))}
+  finally{setBusy(false)}
+ }
+ async function saveSourceText(id:string,title:string,revision:number){
+  if(busy||sourceText.trim().length<10)return;
+  setBusy(true);setMessage('');
+  try{
+   const ok=await g.updateFormalDraft(id,title,sourceText.trim(),{
+    expected_revision:revision,edit_note:'Основной текст законопроекта перед внесением в Государственную Думу'
+   });
+   if(!ok){setMessage('Текст не сохранён. Проверьте права автора и версию документа.');return}
+   setSourceEditorId('');setSourceText('');setSourceFile(null);
+   setSubmissionIssues(old=>({...old,[id]:[]}));
+   setMessage('Основной текст сохранён. Теперь можно проверить комплект и внести законопроект.');
+   setRefresh(n=>n+1);notifyRefresh();
+  }catch(error){setMessage('Не удалось сохранить текст: '+userError(error))}
+  finally{setBusy(false)}
+ }
+ async function saveSourceFile(id:string){
+  if(!g.game||!g.me||busy||!sourceFile||!validateFile(sourceFile))return;
+  const ext=sourceFile.name.split('.').pop()?.toLowerCase()||'';
+  const path=g.game.id+'/formal/'+g.me.user_id+'/'+crypto.randomUUID()+'.'+ext;
+  setBusy(true);setMessage('');
+  try{
+   const up=await supabase.storage.from('game-assets').upload(path,sourceFile,{
+    contentType:sourceFile.type||'application/octet-stream'
+   });
+   if(up.error)throw up.error;
+   const linked=await supabase.rpc('attach_stage12_bill_source',{
+    p_document_id:id,p_storage_path:path,p_file_name:sourceFile.name,
+    p_mime_type:sourceFile.type||'application/octet-stream',p_file_size:sourceFile.size
+   });
+   if(linked.error){await supabase.storage.from('game-assets').remove([path]);throw linked.error;}
+   setSourceEditorId('');setSourceText('');setSourceFile(null);
+   setSubmissionIssues(old=>({...old,[id]:[]}));
+   setMessage('Основной файл сохранён в досье. Проверьте комплект перед официальным внесением.');
+   setRefresh(n=>n+1);notifyRefresh();await g.refresh();
+  }catch(error){setMessage('Не удалось прикрепить основной файл: '+userError(error))}
+  finally{setBusy(false)}
+ }
  async function addAttachment(documentId:string,kind:string,file:File){
   if(!g.game)return 'Игра не найдена';
   if(!validateFile(file))return 'Недопустимый формат файла или размер более 10 МБ.';
@@ -344,8 +416,8 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
        <FileText size={17}/>Открыть пакет, маршрут и поправки</button>
       {openVotes.length>0&&<button type="button" className="secondary" onClick={()=>onOpenVotes(openVotes[0].id)}>Открыть голосование</button>}
       {isOwner&&<button type="button" className="secondary" onClick={()=>setUploadId(old=>old===d.id?'':d.id)} aria-expanded={uploadId===d.id}><FileCheck2 size={17}/>Дополнить пакет</button>}
-      {mode==='work'&&!readOnly&&isOwner&&['draft','revision'].includes(d.status_code)&&<button type="button" className={styles.filingSubmit} disabled={busy} onClick={()=>void advanceBill(d.id)}>
-       <UploadCloud size={17}/>{busy?'Передача…':'Внести законопроект в Государственную Думу'}
+      {mode==='work'&&!readOnly&&isOwner&&['draft','revision'].includes(d.status_code)&&<button type="button" className={styles.filingSubmit} disabled={busy} onClick={()=>void submitBill(d.id)}>
+       <UploadCloud size={17}/>{busy?'Проверка…':'Внести законопроект в Государственную Думу'}
       </button>}
      </div>
      {mode==='work'&&d.status_code==='registered'&&canAssignCommittee&&<div className={styles.forwardPanel}>
