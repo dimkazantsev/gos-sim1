@@ -10,7 +10,8 @@ const m={exports:{}};
 vm.runInNewContext(compiled,{module:m,exports:m.exports});
 const title=m.exports.formalDocumentTitle;
 const examples=[
- ['Повестка заседания · ksrf · этап 3','meeting_agenda','Повестка заседания Координационного Совета Российской Федерации'],
+ ['Повестка заседания · ksrf · этап 3','meeting_agenda','Повестка заседания КСРФ'],
+ ['Протокол заседания Координационного совета регионов и фракций','minutes','Протокол заседания КСРФ'],
  ['Повестка заседания Государственной Думы — этап 4','meeting_agenda','Повестка заседания Государственной Думы'],
  ['Протокол заседания · government · этап 9','minutes','Протокол заседания Правительства Российской Федерации'],
  ['Повестка заседания · sf · этап 8','meeting_agenda','Повестка заседания Совета Федерации Федерального Собрания Российской Федерации'],
@@ -36,5 +37,9 @@ const sql=read('supabase/migrations/20261017204000_official_meeting_document_tit
 assert(sql.includes("v_title:=case when v_org_gen is null"),'Future meeting titles from official institution');
 assert(!/v_title\s*:=.*этап/i.test(sql),'Stage not included in future title');
 assert(sql.includes("d.metadata->>'document_kind' IN ('institution_meeting_agenda','institution_meeting_minutes')"),'Legacy backfill limited to system documents');
-assert(sql.includes("WHEN 'ksrf' THEN 'Координационный Совет Российской Федерации'"),'Legacy KSRF footer issuer corrected');
+assert(sql.includes("WHEN 'ksrf' THEN 'Координационный Совет Российской Федерации'"),'Historical migration is not rewritten');
+const correction=read('supabase/migrations/20261024041000_ksrf_documents_abbreviation.sql');
+assert(correction.includes("WHEN 'ksrf' THEN 'КСРФ'"),'Current protocol generator uses only КСРФ');
+assert(correction.includes("'Координационного совета регионов и фракций','КСРФ'"),'Existing protocols corrected without re-signing');
+assert.equal(m.exports.formalSubjectDisplayLabel('ksrf','Координационного совета регионов и фракций'),'КСРФ');
 console.log('PASS official papers: no stage captions or educational footer; issuer, metadata, editor and printing preserved.');
