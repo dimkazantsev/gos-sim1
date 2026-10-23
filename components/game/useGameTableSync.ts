@@ -16,7 +16,7 @@ export function gameRealtimeConnected(gameId:string){return connectedGames.has(g
 const pushedStageTables=new Set([
  'game_stages','game_parties','party_invitations','party_chair_ballots',
  'formal_documents','political_posts','game_votes','blitz_assignments',
- 'stage_deadline_rules'
+ 'stage_deadline_rules','parliamentary_election_rules','regional_election_rules'
 ]);
 export const GAME_DATA_REFRESH_EVENT='gos-sims:refresh';
 export const SECTION_UPDATES_REFRESH_EVENT='gos-sims:section-updates';
