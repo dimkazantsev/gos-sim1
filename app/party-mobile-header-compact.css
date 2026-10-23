@@ -22,7 +22,9 @@
     max-height:none;
     box-sizing:border-box;
     margin:0;
-    padding:22px 19px;
+    /* Leave the same text inset as the shared reading surface: the accent
+       is positioned at 16px, so 19px put the title against the stripe. */
+    padding:22px 19px 22px 42px;
     align-self:start;
   }
   .partyPage.civicParties>.pageHeader>div{
@@ -44,4 +46,8 @@
   .gosPartyElectionBallot{grid-template-columns:minmax(0,1fr)}
   .gosPartyElectionBallot button{width:100%;white-space:normal}
   .gosPartyElectionSelfVote{width:100%}
+}
+
+@media (max-width:390px){
+  .partyPage.civicParties>.pageHeader{padding-left:36px}
 }

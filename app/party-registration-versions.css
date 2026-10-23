@@ -153,3 +153,16 @@
  .civicPublicDocumentOpen {grid-column:1/-1;white-space:normal}
  .civicPublicDocumentCopy>b {font-size:13px}
 }
+
+/* Preparing a party dossier is permitted before the chair election concludes. */
+.civicParties .partyRegistrationEarlyHint{
+ margin:12px 14px 16px;
+ padding:12px 14px;
+ border:1px solid #c8d8f1;
+ border-radius:12px;
+ background:#f1f6ff;
+ color:#31547e;
+ font-size:13px;
+ line-height:1.6;
+}
+@media(max-width:420px){.civicParties .partyRegistrationEarlyHint{margin:10px 8px 14px;padding:11px 12px}}

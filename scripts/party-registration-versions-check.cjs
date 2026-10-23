@@ -59,6 +59,14 @@ assert(teacher.includes('partyDossierRevisionActions'),'An explicit confirmation
 assert(!teacher.includes('{d.title} · {d.file_name}'),'No long upload filename in teacher row');
 assert(student.includes('partyRegistrationDoc"+(current?.status==="revision"?" isRevision":"")'),'Only the latest returned document highlights red');
 assert(student.includes('registrationPackageRef.current.open=true'),'Revision must reveal party dossier');
+assert(student.includes("if(partyFormationOpen&&selected&&!selected.leader_user_id&&selected.registration_status!=='registered'"),
+ 'Unregistered party document section must open while members elect a chair');
+assert(student.includes('Документы партии можно загружать во время выборов председателя.'),
+ 'Members must see that documents can be uploaded before chair election ends');
+assert(student.includes('!!selected.leader_user_id&&partyFormationOpen'),
+ 'Submitting the full registration package must still wait for a chair');
+assert(student.includes('disabled={busy||!partyFormationOpen}'),
+ 'Uploads must remain blocked when stage one is unavailable');
 assert(server.includes(".in('status',['submitted','draft'])"));
 assert(registrar.includes('latestPartyDocuments(docs)'));
 const sql=fs.readFileSync('supabase/migrations/20261015211500_party_registration_versions_and_privacy.sql','utf8');
