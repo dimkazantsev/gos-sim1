@@ -420,6 +420,24 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
        <UploadCloud size={17}/>{busy?'Проверка…':'Внести законопроект в Государственную Думу'}
       </button>}
      </div>
+     {mode==='work'&&['draft','revision'].includes(d.status_code)&&isOwner&&<div className={styles.sourcePanel}>
+      {!(d.body_text?.trim()||d.source_file_path)&&<p className={styles.sourceWarning} role="status">Отсутствует основной текст законопроекта. Приложения не заменяют текст закона.</p>}
+      {!!submissionIssues[d.id]?.length&&<div className={styles.submissionProblems} role="alert"><strong>Для внесения исправьте:</strong>
+       <ul>{submissionIssues[d.id].map((issue,i)=><li key={i}>{issue}</li>)}</ul></div>}
+      <button type="button" className="secondary" aria-expanded={sourceEditorId===d.id}
+       onClick={()=>{setSourceEditorId(old=>old===d.id?'':d.id);setSourceText(d.body_text||'');setSourceFile(null)}}>
+       {sourceEditorId===d.id?'Свернуть редактирование':'Добавить основной текст или файл законопроекта'}</button>
+      {sourceEditorId===d.id&&<div className={styles.sourceEditor}>
+       <label>Основной текст законопроекта<textarea rows={7} value={sourceText} maxLength={1000000}
+        placeholder="Нормативные статьи законопроекта (не пояснительная записка)" onChange={e=>setSourceText(e.target.value)}/></label>
+       <button type="button" className="secondary" disabled={busy||sourceText.trim().length<10}
+        onClick={()=>void saveSourceText(d.id,d.title,Number(d.metadata?.revision||1))}>Сохранить текст законопроекта</button>
+       <label>Или основной файл законопроекта (до 10 МБ)
+        <input type="file" accept={fileAccept} onChange={e=>setSourceFile(e.target.files?.[0]||null)}/></label>
+       <button type="button" className="secondary" disabled={busy||!sourceFile||!validateFile(sourceFile)}
+        onClick={()=>void saveSourceFile(d.id)}>Сохранить основной файл законопроекта</button>
+      </div>}
+     </div>}
      {mode==='work'&&d.status_code==='registered'&&canAssignCommittee&&<div className={styles.forwardPanel}>
       <strong>Направление в профильный комитет</strong>
       <p>Если автор указал комитет, предложение сохранено. Назначение подтверждает уполномоченное руководство Государственной Думы.</p>
