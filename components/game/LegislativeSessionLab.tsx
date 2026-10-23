@@ -121,10 +121,10 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
    <div className={layout.meetingToolbar} aria-label="Управление выбранным заседанием">
     <div className={layout.toolbarIdentity}>
      {sessions.length===1&&<strong>Заседание № {selected.session_no}</strong>}
-     <span>{selected.status==='open'?'Идёт':selected.status==='closed'?'Завершено':'Подготовка'}</span>
+     <span data-status={selected.status}>{selected.status==='open'?'Идёт':selected.status==='closed'?'Завершено':'Подготовка'}</span>
     </div>
     <div className={layout.toolbarActions}>
-     {sessions.length>1&&<label className={layout.meetingPicker}>Заседание
+     {sessions.length>1&&<label className={layout.meetingPicker}><span className={layout.visuallyHidden}>Выбрать заседание чтения</span>
       <select aria-label="Выбрать заседание чтения" value={selected.id} onChange={event=>{setSelectedId(event.target.value);setRegistrationVisible(false);setAgendaVisible(false)}}>
        {sessions.map(session=><option key={session.id} value={session.id}>Заседание № {session.session_no}</option>)}
       </select>

@@ -137,21 +137,33 @@
 @media(max-width:600px){.firstReadingDecision{padding:12px}.firstReadingDecisionControls button{justify-self:stretch}}
 
 
-/* Stage 12: one compact command row, without repeating the reading header or meeting dossier. */
-.meetingToolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:11px 14px;min-width:0;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);background:var(--gs-surface)}
+/* Meeting controls sit directly inside the approved reading card; no second card or palette. */
+.meetingToolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;min-width:0;margin:0;padding:0;border:0;background:transparent}
 .toolbarIdentity{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-width:0}
-.toolbarIdentity strong{font-size:14px;font-weight:800;color:var(--gs-ink)}
-.toolbarIdentity span{font-size:12px;font-weight:750;padding:5px 9px;border-radius:8px;background:var(--gs-accent-soft);color:var(--gs-accent-strong)}
-.toolbarIdentity small{font-size:11px;color:var(--gs-muted)}
-.toolbarActions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
-.toolbarActions button{min-height:44px;padding:9px 13px;font-size:13px}
-.meetingPicker{display:flex;align-items:center;gap:8px;color:var(--gs-muted);font-size:12px;font-weight:650}
-.meetingPicker select{max-width:210px;min-height:44px}
+.toolbarIdentity strong{font-size:13px;font-weight:750;color:var(--gs-ink)}
+.toolbarIdentity span{display:inline-flex;align-items:center;min-height:28px;padding:5px 10px;border-radius:8px;background:var(--gs-surface-soft);color:var(--gs-ink-2);font-size:12px;font-weight:750;line-height:1.4}
+.toolbarIdentity span[data-status=open]{background:var(--gs-green-soft);color:var(--gs-green)}
+.toolbarIdentity span[data-status=closed]{background:var(--gs-surface-strong);color:var(--gs-muted)}
+.toolbarActions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;min-width:0;margin-left:auto}
+.toolbarActions button{min-height:46px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:750;line-height:1.4;white-space:normal;text-align:center}
+.meetingPicker{display:block;flex:none;min-width:0}
+.toolbarActions .meetingPicker select{display:block;width:190px;max-width:100%;min-height:46px;padding:10px 34px 10px 12px;border:1px solid var(--gs-border-strong);border-radius:10px;background-color:var(--gs-surface);color:var(--gs-ink);font-size:13px;font-weight:750;line-height:1.4;box-shadow:none}
+.toolbarActions .meetingPicker select:focus-visible{outline:2px solid var(--gs-accent);outline-offset:2px}
+.visuallyHidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .toolbarNote{flex-basis:100%;margin:0;color:var(--gs-muted);font-size:12px;line-height:1.55}
-.registrationBody{margin:0 0 16px;min-width:0}
+.registrationBody{margin:12px 0 16px;min-width:0}
 .legacyNote{margin:8px 0;padding:9px 12px;color:var(--gs-muted);font-size:12px;line-height:1.5;background:var(--gs-surface-soft);border-radius:var(--gs-radius-sm)}
-@media(max-width:650px){.meetingToolbar{padding:12px;align-items:stretch}.toolbarIdentity{width:100%}.toolbarActions{width:100%}.toolbarActions button{flex:1 1 140px}.meetingPicker{width:100%;justify-content:space-between}.meetingPicker select{max-width:70%;flex:1;min-width:0}}
-
+@media(max-width:1000px){
+ .meetingToolbar{align-items:flex-start}
+ .toolbarActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;margin-left:0}
+ .meetingPicker{grid-column:1/-1;width:100%}
+ .toolbarActions .meetingPicker select{width:100%;max-width:100%}
+ .toolbarActions button{width:100%}
+}
+@media(max-width:520px){
+ .toolbarActions{grid-template-columns:minmax(0,1fr)}
+ .meetingPicker{grid-column:auto}
+}
 
 /* Keep the first-reading screen short; full questions open from the top agenda action only. */
 .agendaDisclosure{display:grid;gap:12px;min-width:0;margin:8px 0 16px;padding:12px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-md);background:var(--gs-surface)}

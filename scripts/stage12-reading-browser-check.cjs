@@ -9,6 +9,7 @@ const base={game_id:game,stage_no:12,workflow_key:'bill',doc_type:'fz_bill',curr
 const bills=['committee','reading1','reading2','reading3','published'].map((status,i)=>({...base,id:id(i+2),status_code:status,status_label:{committee:'Профильный комитет',reading1:'Первое чтение',reading2:'Второе чтение',reading3:'Третье чтение',published:'Опубликован'}[status],registry_no:'ГОС.ID-ЗП-'+String(i+1).padStart(4,'0'),title:'О совершенствовании порядка взаимодействия органов государственной власти и местного самоуправления · '+(i+1)}));
 const sessions=[1,2,3].map(n=>({id:id(20+n),game_id:game,stage_no:12,reading_no:n,reading_protocol:true,session_no:n,title:n+' чтение · Очередное заседание Государственной Думы',status:n===1?'draft':'open',scheduled_start:'2026-10-22T13:00:00Z',scheduled_end:'2099-01-01T00:00:00Z',agenda_document_id:id(30+n),created_at:'2026-10-22T10:00:00Z'}));
 const agenda=sessions.map((s,i)=>({id:id(40+i),game_id:game,session_id:s.id,formal_document_id:bills[i===0?0:i+1].id,agenda_no:1,status:i===0?'pending':'in_progress',opened_document_step:'reading'+(i+1),discussion_phase:i===1?'amendments':'report',speech_ends_at:null,speaker_user_id:null}));
+sessions.push({...sessions[0],id:id(29),session_no:0,status:'closed',created_at:'2026-10-21T10:00:00Z'});
 let phase='report',ends=null,role='chair',openFirst=false,requests=0;const calls=[];
 const routeCode=`'use client';
 import {useEffect,useState} from 'react';import Stage12ReadingWorkspace from '@/components/game/Stage12ReadingWorkspace';import type {ReturnTypeRepublic} from '@/components/game/viewTypes';
@@ -37,6 +38,23 @@ export default function Preview(){const [g,setG]=useState(()=>{const role='chair
    assert.equal(await page.getByText('Прежний регламент',{exact:true}).count(),0,'No redundant historical badge');
    await page.getByRole('button',{name:'Управление заседанием',exact:true}).click();
    await page.getByRole('region',{name:/Управление заседанием Государственной Думы · 1 чтение/}).waitFor();
+   const sessionToolbar=page.locator('[aria-label="Управление выбранным заседанием"]');
+   const toolbarGeometry=await sessionToolbar.evaluate(element=>{
+    const rect=element.getBoundingClientRect(),style=getComputedStyle(element);
+    const controls=[...element.querySelectorAll('button,select')].map(control=>{
+     const bounds=control.getBoundingClientRect();
+     return {height:bounds.height,left:bounds.left,right:bounds.right,width:bounds.width};
+    });
+    return {border:style.borderTopWidth,background:style.backgroundColor,width:rect.width,
+     controls,viewport:window.innerWidth};
+   });
+   assert.equal(toolbarGeometry.border,'0px','Toolbar must not add a second nested border');
+   assert.equal(toolbarGeometry.background,'rgba(0, 0, 0, 0)','Toolbar belongs to reading card, not a second panel');
+   assert(toolbarGeometry.controls.length>=3,'Selector, agenda and registration remain available');
+   assert(toolbarGeometry.controls.every(control=>control.height>=44&&control.left>=-1&&control.right<=toolbarGeometry.viewport+1),
+    'Accessible meeting controls must fit '+width+': '+JSON.stringify(toolbarGeometry));
+   assert.equal(await sessionToolbar.getByRole('combobox',{name:'Выбрать заседание чтения'}).count(),1,'Meeting selector stays accessible without a redundant visual label');
+   if([390,768,1440].includes(width))await page.screenshot({path:path.join(out,'meeting-toolbar-'+width+'.png'),fullPage:false});
    assert.equal(await page.getByRole('button',{name:'Свернуть заседание',exact:true}).getAttribute('aria-expanded'),'true','Upper preparation button owns meeting state');
    assert.equal(await page.locator('.legislativeLab [class*="readingFlow"]').count(),0,'Duplicate six-step meeting strip removed');
    assert.equal(await page.getByText('Пакетов Этапа 12',{exact:true}).count(),0,'Duplicate package counter removed');
