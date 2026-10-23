@@ -50,7 +50,7 @@ export default function Stage12SpeakerOrder({g,item,documentAuthor,reading,canCh
     </select>
    </label>
    <button type="button" className="secondary" disabled={!candidate||busy||order.length>=40} onClick={()=>{setOrder(v=>[...v,candidate]);setCandidate('')}}>Добавить</button>
-   <button type="button" className="primary" disabled={busy||order.join(',')===(persisted.length?persisted:suggested).join(',')} onClick={()=>void save()}>Сохранить очерёдность</button>
+   <button type="button" className="primary" disabled={busy||order.join(',')===persisted.join(',')} onClick={()=>void save()}>Сохранить очерёдность</button>
   </div>}
   {message&&<p role="status">{message}</p>}
  </div>;
