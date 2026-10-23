@@ -49,6 +49,7 @@ export default function Home(){
  const [savedGameCodes,setSavedGameCodes]=useState<string[]>([]);
  const [fromSharedLink,setFromSharedLink]=useState(false);
  useEffect(()=>setFromSharedLink(!!incomingSectionSuffix()),[]);
+ useEffect(()=>{if(new URLSearchParams(window.location.search).get('teacher')==='1'){setMode('teacher');setPersonalLogin(true)}},[]);
  useEffect(()=>{
   const codes=readRememberedGameCodes();
   setSavedGameCodes(codes);
@@ -103,7 +104,7 @@ export default function Home(){
 
  async function login(e:FormEvent){
   e.preventDefault();if(busy)return;setBusy(true);setError('');
-  let phase:'authentication'|'session'|'game'='authentication';
+  let phase:'authentication'|'session'|'game'|'cabinet'='authentication';
   try{
    if(typeof navigator!=='undefined'&&!navigator.onLine)throw new Error('Устройство не подключено к интернету. Проверьте сеть.');
    // Explicit password login must not depend on a stored refresh token.
@@ -131,6 +132,13 @@ export default function Home(){
     if(!isTransientAuthError(adopted.error)||attempt===1)throw adopted.error;
     await new Promise(resolve=>setTimeout(resolve,900));
    }
+   if(mode==='teacher'){
+    phase='cabinet';
+    const access=await supabase.rpc('get_my_teacher_games');
+    if(access.error)throw access.error;
+    if(!access.data?.allowed)throw new Error('Учётная запись не имеет прав преподавателя.');
+    router.push('/cabinet');return;
+   }
    phase='game';
    // PostgREST can temporarily return 503 while rebuilding its schema cache.
    // Resume is idempotent, unlike join_game_with_code which records an audit event.
@@ -150,7 +158,7 @@ export default function Home(){
     router.push('/game/'+resumedGameId+incomingSectionSuffix());
   }catch(e){
    const message=readableError(e);
-   setError((phase==='authentication'?'Проверка учётной записи: ':phase==='session'?'Проверка сессии: ':'Открытие игровой сессии: ')+message);
+   setError((phase==='authentication'?'Проверка учётной записи: ':phase==='session'?'Проверка сессии: ':phase==='cabinet'?'Открытие кабинета: ':'Открытие игровой сессии: ')+message);
   }finally{setBusy(false)}
  }
  async function recover(){
@@ -182,6 +190,7 @@ export default function Home(){
      <fieldset disabled={busy}>
       <legend className="srOnly">Роль и данные для входа</legend>
       <div className="entryRoles" aria-label="Ваша роль"><button type="button" aria-pressed={mode==='student'} className={mode==='student'?'active':''} onClick={()=>{setMode('student');setCreateMode(false);setError('')}}><GraduationCap aria-hidden="true"/>Участник</button><button type="button" aria-pressed={mode==='teacher'} className={mode==='teacher'?'active':''} onClick={()=>{setMode('teacher');setError('')}}><Landmark aria-hidden="true"/>Преподаватель</button><button type="button" aria-pressed={mode==='guest'} className={mode==='guest'?'active':''} onClick={()=>{setMode('guest');setCreateMode(false);setError('')}}><Eye aria-hidden="true"/>Гость</button><button type="button" onClick={()=>{setPersonalLogin(true);setError('')}}><LockKeyhole aria-hidden="true"/>Войти с личным паролем</button></div>
+      {mode==='teacher'&&<button type="button" className="entryPersonalSwitch" onClick={()=>{setPersonalLogin(true);setError('')}}><LockKeyhole size={17}/> Войти в кабинет без кода игры</button>}
       {mode==='teacher'&&<div className="entryMode"><button type="button" aria-pressed={!createMode} className={!createMode?'active':''} onClick={()=>{setCreateMode(false);setError('')}}>Войти в игру</button><button type="button" aria-pressed={createMode} className={createMode?'active':''} onClick={()=>{setCreateMode(true);setError('')}}>Создать игру</button></div>}
       <label className="entryField">Ваше ФИО<input name="fullName" autoComplete="name" value={fio} onChange={e=>setFio(e.target.value)} placeholder="Иванов Иван Иванович" minLength={2} required/></label>
       {mode==='teacher'&&createMode&&<label className="entryField">Название игры<input name="gameTitle" value={gameTitle} onChange={e=>setGameTitle(e.target.value)} required/></label>}
@@ -200,7 +209,11 @@ export default function Home(){
      <button type="button" className="entryPersonalSwitch" onClick={()=>{setPersonalLogin(false);setError('')}}><LockKeyhole size={16}/> Вернуться ко входу по коду</button>
      <fieldset disabled={busy}>
       <legend className="srOnly">Данные личной учётной записи</legend>
-      <div className="entryField entryRememberedGameField">
+      <div className="entryMode" aria-label="Способ входа">
+       <button type="button" className={mode==='teacher'?'active':''} aria-pressed={mode==='teacher'} onClick={()=>{setMode('teacher');setError('')}}>Преподаватель / модератор</button>
+       <button type="button" className={mode!=='teacher'?'active':''} aria-pressed={mode!=='teacher'} onClick={()=>{setMode('student');setError('')}}>Участник</button>
+      </div>
+      {mode!=='teacher'&&<div className="entryField entryRememberedGameField">
        <label htmlFor="personal-game-code">Код игры</label>
        <input id="personal-game-code" name="gameCode" autoComplete="off" autoCapitalize="none" autoCorrect="off" spellCheck={false} required minLength={2} value={loginGameCode} onChange={e=>setLoginGameCode(e.target.value)} placeholder="Код Вашей игры"/>
        {savedGameCodes.length>1&&<label className="entryRememberedGameSelect">Ранее открытые игры
@@ -216,12 +229,12 @@ export default function Home(){
          setLoginGameCode('');
         }}>Забыть код</button>}
        </div>
-      </div>
+      </div>}
       <label className="entryField">Электронная почта<input required type="email" autoComplete="username" value={loginEmail} onChange={e=>setLoginEmail(e.target.value)} placeholder="Ваш адрес почты"/></label>
       <label className="entryField">Личный пароль<input required type="password" autoComplete="current-password" value={loginPassword} onChange={e=>setLoginPassword(e.target.value)} placeholder="Ваш личный пароль"/></label>
       {error&&<div className="errorBox" role="alert">{error}</div>}
       {recoverySent&&<div className="entryRecoveryNotice" role="status">Если этот адрес привязан к игре, письмо со ссылкой для смены пароля будет отправлено.</div>}
-      <button type="submit" className="primary entrySubmit" disabled={busy}>{busy?'Проверка…':'Войти в мою игру'}<ArrowRight size={18}/></button>
+      <button type="submit" className="primary entrySubmit" disabled={busy}>{busy?'Проверка…':mode==='teacher'?'Открыть кабинет':'Войти в мою игру'}<ArrowRight size={18}/></button>
       <button type="button" className="entryForgot" disabled={busy} onClick={()=>void recover()}>Забыли пароль? Отправить ссылку для восстановления</button>
      </fieldset>
      <GameEntryQr/>
