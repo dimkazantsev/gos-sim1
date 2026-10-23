@@ -42,7 +42,8 @@ assert(party.includes('role={inviteFeedback.kind===\'error\'?\'alert\':\'status\
 assert(party.includes('Приглашение отправлено: ')&&party.includes('sendPartyInvite()'), 'Successful invitations give a visible confirmation');
 assert(hook.includes('onFailure?.(r.error.message)')&&hook.includes("supabase.rpc('invite_to_party'"), 'RPC failure is passed to the invitation form without bypassing authorization');
 assert(party.includes("m.kind==='student'&&!m.roster_archived_at&&!m.team"),'Invitations exclude teachers, guests and archived users');
-assert(election.includes('members.length>=2&&pending.length===0'), 'Only consenting members can vote');
+assert(election.includes('const ready=members.length>=1')&&election.includes('const canVote=!party.leader_user_id&&eligible&&votingOpen&&ready'),
+ 'Only an active party member may vote during the open first stage; quorum still controls election result');
 assert(election.includes('gosPartyElectionSteps')&&election.includes('votesCast'), 'Styled status and vote counters');
 assert(workspace.includes('stageWorkLabel(g.game,stage)')&&stages.includes('stageWorkLabel(g.game,s)'), 'Unified status in workspace and atlas');
 assert(sql.includes("private.stage_one_party_active(p.game_id)"),'Server-side stage guard');
