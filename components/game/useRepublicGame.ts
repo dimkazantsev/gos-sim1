@@ -313,6 +313,11 @@ export function useRepublicGame(gameId:string){
   channel.on('postgres_changes',{event:'*',schema:'public',table:'party_documents',filter:'game_id=eq.'+gameId},()=>{
    dirtyPartyDocuments=true;schedule();
   });
+  // KSRF proposals use this existing authorised game socket, not five widget channels.
+  // Only interested stage views refresh their proposal lists.
+  for(const table of ['parliamentary_election_rules','regional_election_rules']){
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>notifyGameDataRefresh(gameId));
+  }
   for(const table of ['duma_sessions','duma_agenda_items','institution_session_registrations','bill_amendments','bill_amendment_packs']){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>notifyGameDataRefresh(gameId));
   }
