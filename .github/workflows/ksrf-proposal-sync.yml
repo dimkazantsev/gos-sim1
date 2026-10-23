@@ -1,0 +1,27 @@
+name: KSRF Proposal Sync
+on:
+  pull_request:
+    paths:
+      - 'components/game/ElectoralArchitectureLab.tsx'
+      - 'components/game/useRepublicGame.ts'
+      - 'components/game/useGameTableSync.ts'
+      - 'supabase/migrations/20261024053000_ksrf_proposals_shared_realtime.sql'
+      - 'scripts/ksrf-proposal-instant-sync-check.cjs'
+      - '.github/workflows/ksrf-proposal-sync.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run typecheck
+      - run: node scripts/ksrf-proposal-instant-sync-check.cjs
+      - run: node scripts/ksrf-proposal-queue-check.cjs
