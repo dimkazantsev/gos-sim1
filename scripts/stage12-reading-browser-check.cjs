@@ -10,7 +10,7 @@ const bills=['committee','reading1','reading2','reading3','published'].map((stat
 const sessions=[1,2,3].map(n=>({id:id(20+n),game_id:game,stage_no:12,reading_no:n,reading_protocol:true,session_no:n,title:n+' чтение · Очередное заседание Государственной Думы',status:n===1?'draft':'open',scheduled_start:'2026-10-22T13:00:00Z',scheduled_end:'2099-01-01T00:00:00Z',agenda_document_id:id(30+n),created_at:'2026-10-22T10:00:00Z'}));
 const agenda=sessions.map((s,i)=>({id:id(40+i),game_id:game,session_id:s.id,formal_document_id:bills[i===0?0:i+1].id,agenda_no:1,status:i===0?'pending':'in_progress',opened_document_step:'reading'+(i+1),discussion_phase:i===1?'amendments':'report',speech_ends_at:null,speaker_user_id:null}));
 sessions.push({...sessions[0],id:id(29),session_no:0,status:'closed',created_at:'2026-10-21T10:00:00Z'});
-let phase='report',ends=null,role='chair',openFirst=false,requests=0;const calls=[];
+let phase='report',ends=null,role='chair',openFirst=false,emptySessions=false,requests=0;const calls=[];
 const routeCode=`'use client';
 import {useEffect,useState} from 'react';import Stage12ReadingWorkspace from '@/components/game/Stage12ReadingWorkspace';import type {ReturnTypeRepublic} from '@/components/game/viewTypes';
 export default function Preview(){const [g,setG]=useState(()=>{const role='chair';const value:any={};for(const key of ['officeAssignments','members','parties','votes','ballots','stages','formalDocuments','formalHistory','channels','documents','partyMandates','activities','profiles','evaluations','actions','events'])value[key]=[];Object.assign(value,{game:{id:'${game}',title:'Республика Политология',status:'running',current_round:12,turn_open:true,settings:{}},me:{user_id:'${user}',game_id:'${game}',kind:role==='guest'?'observer':role==='teacher'?'teacher':'student',full_name:'Участник проверочного стенда',role_title:role==='chair'?'Председатель Государственной Думы':'Участник'},teacher:role==='teacher',stages:[{game_id:'20000000-0000-0000-0000-000000000001',stage_no:12,status:'open'}],formalDocuments:${JSON.stringify(bills)},refresh:async()=>{},setError:(error:any)=>{document.body.dataset.testError=String(error)}});value.members=[value.me,{user_id:'${id(101)}',game_id:'${game}',kind:'student',full_name:'Докладчик проверочного стенда',role_title:'Депутат Государственной Думы'}];return value});useEffect(()=>{const role=new URLSearchParams(window.location.search).get('role')||'chair';setG((value:any)=>({...value,teacher:role==='teacher',me:{...value.me,kind:role==='guest'?'observer':role==='teacher'?'teacher':'student',role_title:role==='chair'?'Председатель Государственной Думы':'Участник'}}))},[]);return <main style={{maxWidth:1180,margin:'auto',padding:16}}><p style={{fontSize:12}}>Проверочный стенд · Вымышленные данные</p><Stage12ReadingWorkspace g={g as ReturnTypeRepublic} readOnly={g.me.kind==='observer'} stage={g.stages[0]} subjects={['gd_deputy']} onOpenDocument={id=>document.body.dataset.document=id} onOpenVotes={id=>document.body.dataset.vote=id||'all'}/></main>}
@@ -21,7 +21,7 @@ export default function Preview(){const [g,setG]=useState(()=>{const role='chair
   const limit=Date.now()+90000;while(Date.now()<limit){try{const response=await fetch(url+'/stage12-test-preview',{signal:AbortSignal.timeout(10000)});if(response.ok)break}catch{}await new Promise(resolve=>setTimeout(resolve,500))}assert(Date.now()<limit,'Preview did not start: '+log.slice(-2000));
   const executable=process.env.CHROME_BIN||['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','/usr/bin/google-chrome','/usr/bin/chromium'].find(p=>fs.existsSync(p));assert(executable,'Chromium required');browser=await chromium.launch({headless:true,executablePath:executable,args:['--no-sandbox']});
   const context=await browser.newContext();await context.route('https://**/*',async route=>{const req=route.request(),u=new URL(req.url());requests++;let data=[];if(!u.pathname.includes('/rest/v1/'))return route.abort();if(req.method()==='OPTIONS')return route.fulfill({status:200,body:'',headers:{'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'GET, POST, PATCH, OPTIONS'}});const table=u.pathname.split('/').pop();
-   if(table==='duma_sessions')data=sessions.map(s=>s.reading_no===1&&openFirst?{...s,status:'open'}:s);
+   if(table==='duma_sessions')data=emptySessions?[]:sessions.map(s=>s.reading_no===1&&openFirst?{...s,status:'open'}:s);
    if(table==='duma_agenda_items')data=agenda.map(a=>a.id===agenda[0].id&&openFirst?{...a,status:'in_progress',opened_document_step:'reading1',discussion_phase:phase,speech_ends_at:ends,speaker_user_id:user}:a);
    if(table==='institution_meeting_records')data=[{game_id:game,stage_no:12,institution_key:'gd',agenda_document_id:id(31),agenda_body:'ПОВЕСТКА ЗАСЕДАНИЯ ГОСУДАРСТВЕННОЙ ДУМЫ\n1. Учебный законопроект',agenda_approved_at:null}];
    if(table==='get_gd_session_attendance')data={my_capacity:role==='guest'?0:225,registered:[]};
@@ -38,16 +38,10 @@ export default function Preview(){const [g,setG]=useState(()=>{const role='chair
    assert.equal(await page.getByText('Прежний регламент',{exact:true}).count(),0,'No redundant historical badge');
    await page.getByRole('button',{name:'Управление заседанием',exact:true}).click();
    await page.getByRole('region',{name:/Управление заседанием Государственной Думы · 1 чтение/}).waitFor();
-   const sessionToolbar=page.locator('[aria-label="Управление выбранным заседанием"]');
-   const geometry=await sessionToolbar.evaluate(element=>{
-    const style=getComputedStyle(element);
-    const controls=[...element.querySelectorAll('button,select')].map(c=>{const r=c.getBoundingClientRect();return {height:r.height,left:r.left,right:r.right}});
-    return {border:style.borderTopWidth,background:style.backgroundColor,controls,viewport:window.innerWidth};
-   });
-   assert.equal(geometry.border,'0px','No nested meeting card border');
-   assert.equal(geometry.background,'rgba(0, 0, 0, 0)','Meeting toolbar shares reading preparation background');
-   assert(geometry.controls.every(c=>c.height>=44&&c.left>=-1&&c.right<=geometry.viewport+1),'Meeting selection fits screen');
-   assert.equal(await sessionToolbar.getByRole('combobox',{name:'Выбрать заседание чтения'}).count(),1);
+   assert.equal(await page.getByText(/Заседание № [0-9]+/).count(),0,'Meeting numbers are not shown anywhere inside preparation');
+   assert.equal(await page.getByRole('combobox',{name:'Выбрать заседание чтения'}).count(),0,'Unrequested meeting selector is absent');
+   assert.equal(await page.getByText('＋ Подготовить заседание Государственной Думы',{exact:true}).count(),0,'Extra creation panel is removed');
+   assert.equal(await page.getByText('Заседание Этапа 12 ещё не создано',{exact:true}).count(),0,'Extra empty-state card is removed');
    assert.equal(await page.getByRole('button',{name:'Свернуть заседание',exact:true}).getAttribute('aria-expanded'),'true');
    const agendaStep=page.getByRole('region',{name:'Повестка заседания',exact:true});
    const speakerStep=page.getByRole('region',{name:'Очерёдность выступающих',exact:true});
@@ -75,6 +69,26 @@ export default function Preview(){const [g,setG]=useState(()=>{const role='chair
   role='chair';await page.getByRole('tab',{name:/Второе чтение и поправки/}).click();await page.getByRole('button',{name:'Голосовать по поправке',exact:true}).waitFor();await page.getByRole('button',{name:'Голосовать по поправке',exact:true}).click();for(let attempt=0;attempt<50&&!calls.some(v=>Array.isArray(v?.p_amendment_ids));attempt++)await page.waitForTimeout(100);assert.deepEqual(calls.findLast(v=>Array.isArray(v?.p_amendment_ids))?.p_amendment_ids,[id(500)],'Individual amendment ballot uses one amendment');
   for(const who of ['guest','student','teacher']){role=who;await page.goto(url+'/stage12-test-preview?role='+who);await page.getByRole('tab',{name:/Третье чтение/}).click();assert.equal(await page.getByRole('tab',{name:/Третье чтение/}).getAttribute('aria-selected'),'true','All roles can navigate');if(who==='guest')assert.equal(await page.getByRole('button',{name:/Создать заседание/}).count(),0,'Guest has no chairman mutations');}
   role='chair';await page.goto(url+'/stage12-test-preview');await page.getByRole('button',{name:'Оставить отзыв на законопроект',exact:true}).click();await page.getByLabel('Отзыв, предложения и замечания',{exact:true}).fill('Обоснованный отзыв субъекта инициативы с предложениями по содержанию учебного законопроекта.');await page.getByRole('button',{name:'Направить отзыв в досье',exact:true}).click();await page.getByText('Отзыв сохранён в сопровождении законопроекта.',{exact:false}).waitFor();assert.equal(calls.at(-1).p_subject_key,'gd_deputy');await page.screenshot({path:path.join(out,'desktop-review.png'),fullPage:true});role='chair';openFirst=true;await page.goto(url+'/stage12-test-preview');await page.getByRole('button',{name:'Управление заседанием',exact:true}).click();await page.getByRole('region',{name:'Выступления и обсуждение'}).waitFor();await page.getByLabel('Выступающий',{exact:true}).selectOption(user);await page.getByRole('button',{name:'Предоставить слово',exact:true}).click();await page.getByRole('timer').getByText('03:00').waitFor();const before=requests;await page.waitForTimeout(2200);assert.equal(requests,before,'Shared timer performs no requests per second');await page.screenshot({path:path.join(out,'desktop-discussion.png'),fullPage:true});
+  // Without a session, display exactly the four agreed steps; the creation action stays in the fourth.
+  emptySessions=true;openFirst=false;role='chair';
+  await page.goto(url+'/stage12-test-preview?empty=1');
+  await page.getByRole('button',{name:'Управление заседанием',exact:true}).click();
+  const noSession=page.getByRole('region',{name:/Управление заседанием Государственной Думы · 1 чтение/});
+  const emptyAgenda=noSession.getByRole('region',{name:'Повестка заседания'});
+  const emptySpeakers=noSession.getByRole('region',{name:'Очерёдность выступающих'});
+  const emptyRegistration=noSession.getByRole('region',{name:'Регистрация на заседание'});
+  const emptyOpening=noSession.getByRole('region',{name:'Открытие заседания'});
+  await emptyOpening.waitFor();
+  for(const step of [emptyAgenda,emptySpeakers,emptyRegistration,emptyOpening])assert.equal(await step.count(),1);
+  assert.equal(await noSession.getByText(/Заседание №/).count(),0,'No numbers in empty state');
+  assert.equal(await noSession.getByRole('combobox',{name:'Выбрать заседание чтения'}).count(),0,'No meeting picker in empty state');
+  assert.equal(await noSession.getByText(/Заседание Этапа 12 ещё не создано/).count(),0,'No redundant empty-state card');
+  assert.equal(await noSession.getByText(/Подготовить заседание Государственной Думы/).count(),0,'No duplicate standalone creation block');
+  assert.equal(await emptyOpening.getByRole('button',{name:'Назначить заседание'}).count(),1,'Required creation action inside fourth step');
+  role='guest';await page.goto(url+'/stage12-test-preview?role=guest&empty=1');
+  await page.getByRole('button',{name:'Управление заседанием',exact:true}).click();
+  assert.equal(await page.getByRole('button',{name:'Назначить заседание'}).count(),0,'Guest has no create access');
+  emptySessions=false;
   assert.deepEqual(errors,[],'No browser exceptions');assert.equal(await page.locator('body').getAttribute('data-test-error'),null,'No component error');
   fs.writeFileSync(path.join(out,'stage12-browser-results.json'),JSON.stringify({widths:[320,390,768,1440],roles:['chair','student','teacher','guest'],tabs:3,externalRequestsIntercepted:requests,timerRequests:0,errors},null,2));
   console.log('PASS: real React tabs, document navigation, individual amendment vote, role visibility, 320/390/768/1440px, shared countdown without network polling. Screenshots: '+out);
