@@ -65,21 +65,24 @@ export default function Stage12ReadingWorkspace({g,stage,subjects,filingRequest=
   </div>
   <section role="tabpanel" id={'reading-panel-'+reading} aria-labelledby={'reading-tab-'+reading} className={styles.panel}>
    {reading===1&&<section className={styles.preparation} aria-label="Подготовка к первому чтению">
-    <div className={styles.sectionHeading}><div><h3>До открытия заседания</h3><p>Подготовьте пакет, внесите законопроект в Государственную Думу, получите заключение комитета и решение Совета ГД. Только затем утверждаются повестка и дата заседания.</p></div>{meetingButton}</div>
+    <div className={styles.sectionHeading}><div><h3>До открытия заседания</h3><p>Подготовьте пакет, внесите законопроект в Государственную Думу, получите заключение комитета и решение Совета ГД. Только затем утверждаются повестка и дата заседания.</p></div></div>
     <ol className={styles.steps}>{preparation.map((step,index)=><li key={step.title} data-complete={step.done}><span>{step.done?<Check size={17}/>:index+1}</span><div><b>{step.title}</b><p>{step.body}</p></div></li>)}</ol>
+    {meetingButton}
     {meetingPanel}
    </section>}
    {reading===2&&<section className={styles.preparation} aria-label="Подготовка ко второму чтению">
-    <div className={styles.sectionHeading}><div><h3>Сначала — поправки к законопроекту</h3><p>После первого чтения подготовьте поправки, таблицы и заключение комитета. Затем утвердите повестку второго чтения, зарегистрируйтесь на заседание, обсудите и проголосуйте каждую поправку и законопроект.</p></div>{meetingButton}</div>
+    <div className={styles.sectionHeading}><div><h3>Сначала — поправки к законопроекту</h3><p>После первого чтения подготовьте поправки, таблицы и заключение комитета. Затем утвердите повестку второго чтения, зарегистрируйтесь на заседание, обсудите и проголосуйте каждую поправку и законопроект.</p></div></div>
     <ol className={styles.compactSteps}><li>Внести поправки</li><li>Подготовить таблицу</li><li>Обсудить на заседании</li><li>Проголосовать по поправкам</li></ol>
+    {meetingButton}
     {meetingPanel}
     {second.length>0?<><label className={styles.billSelect}>Законопроект для работы с поправками<select value={amendmentBill?.id||''} onChange={event=>setSelectedBill(event.target.value)}>{second.map(d=><option key={d.id} value={d.id}>{d.registry_no} · {d.title}</option>)}</select></label>
      {amendmentBill&&<><div className={styles.actions}>{onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(amendmentBill.id)}>Досье, отзывы и передача ко II чтению <ArrowRight size={16}/></button>}</div><BillAmendmentsPanel key={amendmentBill.id} g={g} document={amendmentBill} readOnly={readOnly} onOpenVotes={onOpenVotes}/></>}
     </>:<p className={styles.waiting}>Поправки откроются после принятия законопроекта в первом чтении. Подготовленные материалы и решения сохранятся в его досье.</p>}
    </section>}
    {reading===3&&<section className={styles.preparation} aria-label="Принятие и опубликование закона">
-    <div className={styles.sectionHeading}><div><h3>Окончательный текст и принятие закона</h3><p>Подготовьте окончательный текст и повестку третьего чтения. После регистрации и открытия заседания проходят доклад, выступления по мотивам, затем голосование за законопроект в целом. Новые поправки недопустимы.</p></div>{meetingButton}</div>
+    <div className={styles.sectionHeading}><div><h3>Окончательный текст и принятие закона</h3><p>Подготовьте окончательный текст и повестку третьего чтения. После регистрации и открытия заседания проходят доклад, выступления по мотивам, затем голосование за законопроект в целом. Новые поправки недопустимы.</p></div></div>
     <ol className={styles.compactSteps}><li>III чтение в ГД</li><li>Совет Федерации</li><li>Подпись Президента</li><li>Опубликование</li></ol>
+    {meetingButton}
     {meetingPanel}
     <p className={styles.help}>В игре решение Совета Федерации после обычного принятия подтверждается установленной процедурой. Президент вправе отклонить ФЗ с последующим преодолением вето по статье 107 Конституции РФ. Для ФКЗ применяется статья 108: требуется не менее 3/4 сенаторов и 2/3 депутатов; президентское вето в обычном порядке не предусмотрено.</p>
    </section>}
