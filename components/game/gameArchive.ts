@@ -1,6 +1,7 @@
 import {userError} from '@/lib/userError';
 import {supabase} from '@/lib/supabase';
-import {preparePortableSession,type SessionArchive} from './portableSession';
+import {preparePortableSession} from './portableSession';
+import {fetchGameArchiveBatched} from './sessionExportBatches';
 type ArchiveFile={path:string;data:Uint8Array};
 function crc32(bytes:Uint8Array){let c=0xffffffff;for(const b of bytes){c^=b;for(let j=0;j<8;j++)c=c&1?(c>>>1)^0xedb88320:c>>>1}return (c^0xffffffff)>>>0}
 function uint16(v:number){return [v&255,(v>>>8)&255]}
@@ -40,10 +41,13 @@ export async function enumerateGameAssets(gameId:string,bucket:'game-assets'|'ga
  }
  return found;
 }
-export async function downloadFullGameArchive(gameId:string,onProgress?:(done:number,total:number)=>void):Promise<Blob>{
- const data=await supabase.rpc('export_game_data',{p_game:gameId});
- if(data.error||!data.data)throw Error('Не удалось экспортировать сеанс: '+(userError(data.error)||'Нет данных'));
- const portable=await preparePortableSession(data.data as SessionArchive);
+export async function downloadSessionArchive(gameId:string,onProgress?:(done:number,total:number)=>void){
+ try{return await fetchGameArchiveBatched(gameId,(name,args)=>supabase.rpc(name,args),onProgress)}
+ catch(error){throw Error('Не удалось экспортировать сеанс: '+(userError(error)||'Нет данных'))}
+}
+export async function downloadFullGameArchive(gameId:string,onProgress?:(done:number,total:number,phase:'data'|'files')=>void):Promise<Blob>{
+ const data=await downloadSessionArchive(gameId,(done,total)=>onProgress?.(done,total,'data'));
+ const portable=await preparePortableSession(data);
  const encode=(text:string)=>new TextEncoder().encode(text);
  const entries:ArchiveFile[]=[
   {path:'game.json',data:encode(JSON.stringify(portable.data,null,2))},
@@ -58,7 +62,7 @@ export async function downloadFullGameArchive(gameId:string,onProgress?:(done:nu
   const fetched=await supabase.storage.from(group.bucket).download(path);
   if(fetched.error||!fetched.data)throw Error('Не удалось включить файл '+path+' в архив: '+(userError(fetched.error)||'Файл недоступен'));
   entries.push({path:'media/'+group.bucket+'/'+path,data:new Uint8Array(await fetched.data.arrayBuffer())});
-  onProgress?.(++done,total);
+  onProgress?.(++done,total,'files');
  }
  return zip(entries);
 }
