@@ -122,8 +122,9 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
    {(canEditDescription||canUploadLogo)&&<details className="civicPartyEditor"><PartyDisclosureSummary icon={PencilLine} title="Оформление партии" meta="Эмблема и публичное описание"/>{canEditDescription&&<><label>Описание<textarea rows={4} value={description||selected.description||''} onChange={e=>setDescription(e.target.value)}/></label><button className="secondary" disabled={busy} onClick={()=>void saveDescription()}>Сохранить описание</button></>}{canUploadLogo&&<PartyLogoEditor key={selected.id} partyName={selected.name} disabled={busy} onSave={saveLogo}/>}</details>}
    {(own||(selected.registration_status==='registered'&&certificateIssued))&&
     <fieldset className="gosPartyStageFieldset" disabled={!partyFormationOpen}><JusticeDocuments g={g} partyId={selected.id}/></fieldset>}
-   {own&&<details ref={registrationPackageRef} className={"civicPartyPackage"+(revisionVersions?" hasRevision":"")}>
+   {own&&<details key={selected.id} ref={registrationPackageRef} defaultOpen={partyFormationOpen&&!selected.leader_user_id&&selected.registration_status!=='registered'} className={"civicPartyPackage"+(revisionVersions?" hasRevision":"")}>
     <PartyDisclosureSummary icon={FileText} title="Документы и регистрация партии" meta={"Принято "+reviewedCount+" из "+DOCS.length+" · "+docs.length+" версий"}/>
+     {partyFormationOpen&&!selected.leader_user_id&&selected.registration_status!=='registered'&&<p className="partyRegistrationEarlyHint">Документы партии можно загружать во время выборов председателя. Подготовка файлов не зависит от итогов голосования. Направить регистрационный пакет на рассмотрение можно после избрания председателя.</p>}
     <div className="civicPartyFiles" aria-label="Регистрационные документы партии">
      {DOCS.map(kind=>{
       const current=latestPartyDocument(docs,kind.kind);
