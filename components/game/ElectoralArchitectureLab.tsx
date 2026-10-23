@@ -1,9 +1,10 @@
 'use client';
 import {userError} from '@/lib/userError';
 import StyledSelect from '../ui/StyledSelect';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {MessageCircle,Save} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {allocateElectoralSeats as allocate,allocateRegionalSeats} from './electoralMath';
 
@@ -46,12 +47,15 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const [support,setSupport]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
  const [queueNotice,setQueueNotice]=useState('');
+ const proposalLoadVersion=useRef(0);
+ const proposalSubmitLock=useRef(false);
  const [reopenReason,setReopenReason]=useState('');
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  const canPropose=teacher||!!ledParty;
 
  async function load(){
   if(!game)return;
+  const version=++proposalLoadVersion.current;
   const [p,r,a,calc,regionalCalc]=await Promise.all([
    supabase.from('parliamentary_election_rules').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
    supabase.from('regional_election_rules').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
@@ -59,8 +63,10 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
    supabase.from('electoral_calculator_results').select('*').eq('game_id',game.id).eq('published',true).order('created_at',{ascending:false}).limit(20),
    supabase.from('regional_calculator_results').select('*').eq('game_id',game.id).eq('published',true).order('created_at',{ascending:false}).limit(20)
   ]);
-  if(!p.error)setPRules((p.data||[]) as PRule[]);
-  if(!r.error)setRRules((r.data||[]) as RRule[]);
+  if(version===proposalLoadVersion.current){
+   if(!p.error)setPRules((p.data||[]) as PRule[]);
+   if(!r.error)setRRules((r.data||[]) as RRule[]);
+  }
   if(!a.error)setAllocations((a.data||[]) as RegionAllocation[]);
   if(!calc.error)setSavedResults((calc.data||[]) as ElectoralCalcResult[]);
   if(!regionalCalc.error)setRegionalSavedResults((regionalCalc.data||[]) as RegionalCalcResult[]);
@@ -68,19 +74,24 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   setDistrictSeats(v=>{const n={...v};for(const x of parties)if(n[x.id]===undefined)n[x.id]='0';return n});
   setRegionalCalculatorDraft(v=>{const n={...v};for(const x of parties)if(n[x.id]===undefined)n[x.id]='0';return n});
  }
+ async function loadProposalRules(){
+  if(!game)return;
+  const version=++proposalLoadVersion.current;
+  if(stageNo===2){
+   const {data,error}=await supabase.from('parliamentary_election_rules').select('*')
+    .eq('game_id',game.id).order('created_at',{ascending:false}).limit(100);
+   if(version===proposalLoadVersion.current&&!error)setPRules((data||[]) as PRule[]);
+  }else{
+   const {data,error}=await supabase.from('regional_election_rules').select('*')
+    .eq('game_id',game.id).order('created_at',{ascending:false}).limit(100);
+   if(version===proposalLoadVersion.current&&!error)setRRules((data||[]) as RRule[]);
+  }
+ }
  useEffect(()=>{void load()},[game?.id,parties.length]);
  useEffect(()=>{setFixedRegions([]);setRegionMapLoaded(false)},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('electoral-architecture:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'parliamentary_election_rules',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'regional_election_rules',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'regional_allocations',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'electoral_calculator_results',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'regional_calculator_results',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ // Use the shared game channel, not a separate channel for every stage panel.
+ useGameTableSync(game?.id,[stageNo===2?'parliamentary_election_rules':'regional_election_rules'],
+  loadProposalRules,String(stageNo),stageNo===2?'parliamentary_election_rules':'regional_election_rules');
 
  if(!game||!me)return null;
  const activeGame=game;
@@ -151,8 +162,32 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  }
 
  async function proposeP(){
-  setBusy(true);const r=await supabase.rpc('propose_parliamentary_election_rule',{p_game_id:activeGame.id,p_system_type:system,p_allocation_method:system==='majoritarian'?null:method,p_majoritarian_method:system==='proportional'?null:majority,p_proportional_share:system==='mixed'?propShare:null,p_rationale:rationale.trim()||null});
-  if(r.error)setError(userError(r.error));else{setRationale('');await load()}setBusy(false);
+  if(busy||proposalSubmitLock.current||!me)return;
+  proposalSubmitLock.current=true;setBusy(true);
+  const text=rationale.trim();
+  try{
+   const {data,error}=await supabase.rpc('propose_parliamentary_election_rule',{
+    p_game_id:activeGame.id,p_system_type:system,
+    p_allocation_method:system==='majoritarian'?null:method,
+    p_majoritarian_method:system==='proportional'?null:majority,
+    p_proportional_share:system==='mixed'?propShare:null,p_rationale:text||null
+   });
+   if(error){setError(userError(error));return;}
+   if(data){
+    ++proposalLoadVersion.current;
+    const row:PRule={id:String(data),system_type:system,
+     allocation_method:system==='majoritarian'?null:method,
+     majoritarian_method:system==='proportional'?null:majority,
+     proportional_share:system==='mixed'?propShare:null,rationale:text||null,
+     status:'draft',vote_id:null,proposed_by:me.user_id,
+     created_at:new Date().toISOString(),queued_at:null,rejection_reason:null};
+    setPRules(previous=>previous.some(item=>item.id===row.id)?previous:[row,...previous]);
+   }
+   setRationale('');
+   setQueueNotice('Предложение сохранено и доступно участникам КСРФ.');
+   void loadProposalRules();
+  }catch(error){setError(userError(error));}
+  finally{proposalSubmitLock.current=false;setBusy(false);}
  }
  async function voteP(id:string){setBusy(true);const r=await supabase.rpc('open_parliamentary_rule_vote',{p_rule_id:id});if(r.error)setError(userError(r.error));else{await load();if(r.data)onOpenVotes();else setQueueNotice('Предложение поставлено в очередь по вопросу об избирательной системе. После отклонения текущего решения оно откроется автоматически.')}setBusy(false)}
  async function publishCalculatorResult(){
@@ -187,10 +222,28 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   setBusy(false);
  }
   async function proposeR(){
-  setBusy(true);const r=await supabase.rpc('propose_regional_election_rule',{p_game_id:activeGame.id,p_method:regionalMethod,p_rationale:regionalRationale.trim()||null});
-  if(r.error)setError(userError(r.error));else{setRegionalRationale('');await load()}setBusy(false);
+  if(busy||proposalSubmitLock.current||!me)return;
+  proposalSubmitLock.current=true;setBusy(true);
+  const text=regionalRationale.trim();
+  try{
+   const {data,error}=await supabase.rpc('propose_regional_election_rule',{
+    p_game_id:activeGame.id,p_method:regionalMethod,p_rationale:text||null
+   });
+   if(error){setError(userError(error));return;}
+   if(data){
+    ++proposalLoadVersion.current;
+    const row:RRule={id:String(data),method:regionalMethod,rationale:text||null,
+     status:'draft',vote_id:null,proposed_by:me.user_id,
+     created_at:new Date().toISOString(),queued_at:null,rejection_reason:null};
+    setRRules(previous=>previous.some(item=>item.id===row.id)?previous:[row,...previous]);
+   }
+   setRegionalRationale('');
+   setQueueNotice('Предложение сохранено и доступно участникам КСРФ.');
+   void loadProposalRules();
+  }catch(error){setError(userError(error));}
+  finally{proposalSubmitLock.current=false;setBusy(false);}
  }
- async function voteR(id:string){setBusy(true);const r=await supabase.rpc('open_regional_rule_vote',{p_rule_id:id});if(r.error)setError(userError(r.error));else{await load();if(r.data)onOpenVotes();else setQueueNotice('Предложение поставлено в очередь по вопросу о распределении регионов.')}setBusy(false)}
+  async function voteR(id:string){setBusy(true);const r=await supabase.rpc('open_regional_rule_vote',{p_rule_id:id});if(r.error)setError(userError(r.error));else{await load();if(r.data)onOpenVotes();else setQueueNotice('Предложение поставлено в очередь по вопросу о распределении регионов.')}setBusy(false)}
  async function reopenQuestion(question:'electoral_system'|'regional_system'){
   if(!teacher||reopenReason.trim().length<10||!window.confirm('Вернуть принятый вопрос КСРФ на повторное рассмотрение? Результаты прошлых голосований сохранятся.'))return;
   setBusy(true);

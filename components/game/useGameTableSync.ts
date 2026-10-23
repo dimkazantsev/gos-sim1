@@ -16,19 +16,19 @@ export function gameRealtimeConnected(gameId:string){return connectedGames.has(g
 const pushedStageTables=new Set([
  'game_stages','game_parties','party_invitations','party_chair_ballots',
  'formal_documents','political_posts','game_votes','blitz_assignments',
- 'stage_deadline_rules'
+ 'stage_deadline_rules','parliamentary_election_rules','regional_election_rules'
 ]);
 export const GAME_DATA_REFRESH_EVENT='gos-sims:refresh';
 export const SECTION_UPDATES_REFRESH_EVENT='gos-sims:section-updates';
 export function notifySectionUpdates(gameId:string){window.dispatchEvent(new CustomEvent(SECTION_UPDATES_REFRESH_EVENT,{detail:{gameId}}))}
-export function notifyGameDataRefresh(gameId:string){window.dispatchEvent(new CustomEvent(GAME_DATA_REFRESH_EVENT,{detail:{gameId}}))}
+export function notifyGameDataRefresh(gameId:string,table?:string){window.dispatchEvent(new CustomEvent(GAME_DATA_REFRESH_EVENT,{detail:{gameId,table}}))}
 
 // Stage workspaces do not open Postgres Changes subscriptions themselves.
 // A classroom can have 30+ clients and several stage widgets per screen; a
 // subscription per widget multiplies catalog work in Realtime. Keep these
 // views eventually consistent through local invalidation, focus/online
 // recovery and a low-frequency visible-tab poll.
-export function useGameTableSync(gameId:string|undefined,_tables:readonly string[],load:()=>Promise<unknown>,scope=''){
+export function useGameTableSync(gameId:string|undefined,_tables:readonly string[],load:()=>Promise<unknown>,scope='',onlyTable?:string){
  const latest=useRef(load);latest.current=load;
  useEffect(()=>{
   if(!gameId)return;
@@ -47,7 +47,7 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   }
   function schedule(delay=120){if(disposed||timer!==undefined)return;timer=setTimeout(()=>void flush(),delay)}
   function visible(){if(document.visibilityState==='visible')schedule()}
-  function local(event:Event){if((event as CustomEvent<{gameId:string}>).detail?.gameId===gameId)schedule()}
+  function local(event:Event){const detail=(event as CustomEvent<{gameId:string;table?:string}>).detail;if(detail?.gameId===gameId&&(!onlyTable||detail.table===onlyTable))schedule()}
   void flush();
   // Fall back without aligning all classroom tabs and stage widgets on the same tick.
   const poll=setInterval(()=>{
@@ -62,5 +62,5 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   window.addEventListener('focus',visible);window.addEventListener('online',visible);
   window.addEventListener(GAME_DATA_REFRESH_EVENT,local);document.addEventListener('visibilitychange',visible);
   return()=>{disposed=true;clearTimeout(timer);clearInterval(poll);window.removeEventListener('focus',visible);window.removeEventListener('online',visible);window.removeEventListener(GAME_DATA_REFRESH_EVENT,local);document.removeEventListener('visibilitychange',visible)};
- },[gameId,scope]);
+ },[gameId,scope,onlyTable]);
 }
