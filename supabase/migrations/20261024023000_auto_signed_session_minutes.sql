@@ -2,7 +2,7 @@
 -- The platform attests the generated record; it does NOT imitate a personal or qualified e-signature.
 CREATE UNIQUE INDEX IF NOT EXISTS formal_automatic_session_minutes_unique
  ON public.formal_documents(game_id, (metadata->>'automatic_session_id'))
- WHERE doc_type='minutes' AND metadata->>'document_kind'='automatic_session_minutes';
+ WHERE doc_type='minutes' AND metadata->>'automatic_session_id' IS NOT NULL;
 
 CREATE OR REPLACE FUNCTION private.publish_closed_session_minutes()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
@@ -16,7 +16,7 @@ BEGIN
  -- A deferred trigger observes the final carried-over questions in that transaction.
  IF EXISTS(
    SELECT 1 FROM public.formal_documents d WHERE d.game_id=NEW.game_id
-    AND d.doc_type='minutes' AND d.metadata->>'document_kind'='automatic_session_minutes'
+    AND d.doc_type='minutes'
     AND d.metadata->>'automatic_session_id'=NEW.id::text
  ) THEN RETURN NEW; END IF;
  v_actor:=coalesce(NEW.chair_user_id,NEW.created_by);
@@ -84,6 +84,9 @@ BEGIN
   ||coalesce(nullif(v_questions,''),'Вопросы в повестку не включены.')
   ||E'\n\nДокумент сформирован и удостоверен системой ГОС.ID по сохранённым данным заседания. Личная электронная подпись должностного лица не применялась.';
  v_steps:=private.formal_workflow(v_workflow);
+ -- Match the existing protected meeting-document RPC scope, never broaden RLS.
+ PERFORM set_config('app.gos_meeting_document_scope',
+   concat(NEW.game_id,':',v_stage,':',v_subject,':minutes'),true);
  v_id:=gen_random_uuid();
  INSERT INTO public.formal_documents
   (id,game_id,stage_no,registry_no,title,doc_type,subject_key,subject_label,author_id,
@@ -92,7 +95,8 @@ BEGIN
   (v_id,NEW.game_id,v_stage,'ИГРА-ПР-'||lpad(nextval('public.formal_registry_seq')::text,6,'0'),
    'Протокол заседания '||v_label,'minutes',v_subject,v_label,v_actor,
    v_text,v_workflow,v_steps,0,'draft','Протокол подготовлен',v_subject,
-   jsonb_build_object('document_kind','automatic_session_minutes',
+   jsonb_build_object('document_kind','institution_meeting_minutes',
+    'institution_key',v_subject,'stage_no',v_stage,
     'automatic_session_id',NEW.id::text,'session_no',NEW.session_no,
     'automatic_attestation',true,'signed_name','Система ГОС.ID',
     'signed_role','Автоматическое удостоверение игровой записи','signed_on',now()));
