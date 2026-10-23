@@ -221,6 +221,8 @@ on:
       - 'scripts/party-document-visibility-check.cjs'
       - 'scripts/party-registration-versions-check.cjs'
       - 'scripts/party-document-revision-flow-check.cjs'
+      - 'scripts/party-document-stage-trigger-check.cjs'
+      - 'supabase/migrations/*_party_document_stage_trigger_composite_scope.sql'
       - 'scripts/party-student-revision-browser-check.cjs'
       - 'scripts/party-program-news-check.cjs'
       - 'scripts/party-program-storage-rls-check.cjs'
@@ -395,6 +397,8 @@ jobs:
         run: node scripts/teacher-party-statistics-write-check.cjs
       - name: Student and teacher document revision contract
         run: node scripts/party-document-revision-flow-check.cjs
+      - name: Shared party document stage trigger and typed formal helpers
+        run: node scripts/party-document-stage-trigger-check.cjs
       - name: Actual party Storage upload and replacement policies
         run: node scripts/party-storage-upload-check.cjs
       - name: Student party styling and teacher revision interactions
