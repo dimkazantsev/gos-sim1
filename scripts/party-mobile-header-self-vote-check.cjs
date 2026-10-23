@@ -17,7 +17,7 @@ assert(sql.includes('candidate_id=excluded.candidate_id'),'Changing votes remain
 assert(!sql.includes("if (select count(*) from public.game_members gm where gm.game_id=p.game_id and gm.kind='student' and gm.team=p.name and gm.roster_archived_at is null)<2 then"),'No solo vote submission rejection');
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(p=>p&&fs.existsSync(p));
 if(!chrome)throw Error('Chrome/Chromium required');
-const styles=['app/globals.css','app/design-views.css','app/2026-civic-portal.css','app/2026-stage-party-grades-repair.css',cssPath]
+const styles=['app/globals.css','app/design-views.css','app/2026-civic-portal.css','app/2026-stage-party-grades-repair.css','app/design-readability.css',cssPath]
  .map(p=>fs.readFileSync(p,'utf8')).join('\n');
 const markup='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+
  '*{box-sizing:border-box}body{margin:0;background:#f5f7fc}.partyPage{min-height:690px;width:100%;padding:10px}'+styles+
@@ -34,11 +34,13 @@ const markup='<!doctype html><html><head><meta name="viewport" content="width=de
    await page.setContent(markup);
    const m=await page.evaluate(()=>{
     const r=sel=>{const q=document.querySelector(sel).getBoundingClientRect();return{top:q.top,bottom:q.bottom,left:q.left,right:q.right,height:q.height}};
-    return {header:r('.pageHeader'),heading:r('.pageHeader h1'),paragraph:r('.pageHeader p'),badge:r('.gosPartyStageBadge'),search:r('.civicPartySearch'),tiles:r('.civicPartyTiles'),overflow:document.documentElement.scrollWidth-innerWidth};
+    const header=document.querySelector('.pageHeader');const mark=getComputedStyle(header,'::before');
+    return {header:r('.pageHeader'),heading:r('.pageHeader h1'),paragraph:r('.pageHeader p'),badge:r('.gosPartyStageBadge'),search:r('.civicPartySearch'),tiles:r('.civicPartyTiles'),accentRight:header.getBoundingClientRect().left+parseFloat(mark.left)+parseFloat(mark.width),overflow:document.documentElement.scrollWidth-innerWidth};
    });
    assert(m.overflow<=2,'No horizontal overflow at '+width+': '+JSON.stringify(m));
    if(width<=700){
     assert(m.header.height<275,'Oversized header at '+width+': '+m.header.height);
+    assert(m.heading.left-m.accentRight>=14,'Party heading must clear decorative accent at '+width+': '+JSON.stringify(m));
     assert(m.badge.top>=m.paragraph.bottom-1,'Stage badge must follow heading at '+width);
     assert(m.header.bottom-m.badge.bottom<32,'No gap under badge at '+width);
     assert(m.search.top-m.header.bottom<44,'Search stays near header at '+width);
@@ -47,6 +49,6 @@ const markup='<!doctype html><html><head><meta name="viewport" content="width=de
    if(width===390)await page.screenshot({path:'/tmp/gos-party-hero-mobile.png',fullPage:true});
    await page.close();
   }
-  console.log('PASS Party responsive hero 320-1280px + safe early self-voting gate');
+  console.log('PASS Party responsive hero 320-1280px, readable accent inset + safe early self-voting gate');
  }finally{await browser.close()}
 })().catch(error=>{console.error(error);process.exitCode=1});
