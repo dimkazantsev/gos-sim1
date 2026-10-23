@@ -39,42 +39,33 @@ export default function Preview(){const [g,setG]=useState(()=>{const role='chair
    await page.getByRole('button',{name:'Управление заседанием',exact:true}).click();
    await page.getByRole('region',{name:/Управление заседанием Государственной Думы · 1 чтение/}).waitFor();
    const sessionToolbar=page.locator('[aria-label="Управление выбранным заседанием"]');
-   const toolbarGeometry=await sessionToolbar.evaluate(element=>{
-    const rect=element.getBoundingClientRect(),style=getComputedStyle(element);
-    const controls=[...element.querySelectorAll('button,select')].map(control=>{
-     const bounds=control.getBoundingClientRect();
-     return {height:bounds.height,left:bounds.left,right:bounds.right,width:bounds.width};
-    });
-    return {border:style.borderTopWidth,background:style.backgroundColor,width:rect.width,
-     controls,viewport:window.innerWidth};
+   const geometry=await sessionToolbar.evaluate(element=>{
+    const style=getComputedStyle(element);
+    const controls=[...element.querySelectorAll('button,select')].map(c=>{const r=c.getBoundingClientRect();return {height:r.height,left:r.left,right:r.right}});
+    return {border:style.borderTopWidth,background:style.backgroundColor,controls,viewport:window.innerWidth};
    });
-   assert.equal(toolbarGeometry.border,'0px','Toolbar must not add a second nested border');
-   assert.equal(toolbarGeometry.background,'rgba(0, 0, 0, 0)','Toolbar belongs to reading card, not a second panel');
-   assert(toolbarGeometry.controls.length>=3,'Selector, agenda and registration remain available');
-   assert(toolbarGeometry.controls.every(control=>control.height>=44&&control.left>=-1&&control.right<=toolbarGeometry.viewport+1),
-    'Accessible meeting controls must fit '+width+': '+JSON.stringify(toolbarGeometry));
-   assert.equal(await sessionToolbar.getByRole('combobox',{name:'Выбрать заседание чтения'}).count(),1,'Meeting selector stays accessible without a redundant visual label');
-   if([390,768,1440].includes(width))await page.screenshot({path:path.join(out,'meeting-toolbar-'+width+'.png'),fullPage:false});
-   assert.equal(await page.getByRole('button',{name:'Свернуть заседание',exact:true}).getAttribute('aria-expanded'),'true','Upper preparation button owns meeting state');
-   assert.equal(await page.locator('.legislativeLab [class*="readingFlow"]').count(),0,'Duplicate six-step meeting strip removed');
-   assert.equal(await page.getByText('Пакетов Этапа 12',{exact:true}).count(),0,'Duplicate package counter removed');
-   assert.equal(await page.getByRole('button',{name:/Открыть документ повестки/}).count(),0,'Agenda document action is hidden with the lower details');
-   assert.equal(await page.locator('.legislativeLab .legislativeAgendaItem').count(),0,'Question cards are absent from the default screen');
-   assert.equal(await page.getByRole('button',{name:'Начать вопрос',exact:true}).count(),0,'Meeting actions are not visible below the compact bar');
-   await page.getByRole('button',{name:'Повестка',exact:true}).click();
-   assert.equal(await page.getByRole('button',{name:/Открыть документ повестки/}).count(),1,'Agenda opens document and live question actions on demand');
-   assert(await page.locator('.legislativeLab .legislativeAgendaItem').count()>0,'The original questions are preserved inside agenda');
-   assert.equal(await page.getByRole('button',{name:'Свернуть повестку'}).getAttribute('aria-expanded'),'true','Agenda trigger exposes expanded state');
-   await page.getByRole('button',{name:'Свернуть повестку'}).click();
-   assert.equal(await page.locator('.legislativeLab .legislativeAgendaItem').count(),0,'Collapsing agenda restores the clean screen');
-   assert.equal(await page.locator('.legislativeSessionBar').count(),0,'Duplicated full-size meeting card removed');
-   assert.equal(await page.locator('.legislativeDocBridge').count(),0,'Duplicated agenda description card removed');
-   assert.equal(await page.locator('.legislativeLab .institutionRegistrationPanel').count(),0,'Registration details do not occupy space until requested');
-   await page.getByRole('button',{name:'Регистрация и повестка',exact:true}).click();
-   await page.locator('.legislativeLab .institutionRegistrationPanel').waitFor();
-   assert.equal(await page.getByRole('button',{name:'Свернуть регистрацию',exact:true}).getAttribute('aria-expanded'),'true','Explicit registration toggle is accessible');
-   await page.getByRole('button',{name:'Свернуть регистрацию',exact:true}).click();
-   assert.equal(await page.locator('.legislativeLab .institutionRegistrationPanel').count(),0,'Expanded registration closes without deleting any meeting data');
+   assert.equal(geometry.border,'0px','No nested meeting card border');
+   assert.equal(geometry.background,'rgba(0, 0, 0, 0)','Meeting toolbar shares reading preparation background');
+   assert(geometry.controls.every(c=>c.height>=44&&c.left>=-1&&c.right<=geometry.viewport+1),'Meeting selection fits screen');
+   assert.equal(await sessionToolbar.getByRole('combobox',{name:'Выбрать заседание чтения'}).count(),1);
+   assert.equal(await page.getByRole('button',{name:'Свернуть заседание',exact:true}).getAttribute('aria-expanded'),'true');
+   const agendaStep=page.getByRole('region',{name:'Повестка заседания',exact:true});
+   const speakerStep=page.getByRole('region',{name:'Очерёдность выступающих',exact:true});
+   const registerStep=page.getByRole('region',{name:'Регистрация на заседание',exact:true});
+   const openStep=page.getByRole('region',{name:'Открытие заседания',exact:true});
+   await agendaStep.waitFor();
+   await speakerStep.waitFor();
+   await registerStep.waitFor();
+   await openStep.waitFor();
+   const positions=await Promise.all([agendaStep,speakerStep,registerStep,openStep].map(async part=>(await part.boundingBox()).y));
+   assert(positions.every((v,i)=>i===0||v>positions[i-1]),'Agenda → speaking order → registration → opening');
+   assert.equal(await agendaStep.getByRole('button',{name:'Редактировать текст'}).count(),1,'Council editor in the agenda step');
+   assert.equal(await speakerStep.getByRole('button',{name:'Сохранить очерёдность'}).count(),1,'Chair has ordered speaker list');
+   assert.equal(await page.locator('.legislativeLab .legislativeAgendaItem').count(),0,'Draft session has no active debate controls');
+   assert.equal(await page.getByRole('button',{name:'Начать вопрос',exact:true}).count(),0,'No premature start');
+   assert.equal(await page.locator('.legislativeSessionBar').count(),0);
+   assert.equal(await page.locator('.legislativeDocBridge').count(),0);
+   if([390,768,1440].includes(width))await page.screenshot({path:path.join(out,'integrated-meeting-'+width+'.png'),fullPage:false});
    assert.equal(await page.locator('.legislativeLab [aria-label="Все пакеты законопроектов Этапа 12"]').count(),0,'No duplicate package register below preparation');
    assert.equal(await page.locator('section[aria-label="Пакеты законодательных инициатив"]').count(),1,'First-reading filing form is inside Work');
    await page.getByRole('button',{name:'Свернуть заседание',exact:true}).click();
@@ -83,7 +74,7 @@ export default function Preview(){const [g,setG]=useState(()=>{const role='chair
   }
   role='chair';await page.getByRole('tab',{name:/Второе чтение и поправки/}).click();await page.getByRole('button',{name:'Голосовать по поправке',exact:true}).waitFor();await page.getByRole('button',{name:'Голосовать по поправке',exact:true}).click();for(let attempt=0;attempt<50&&!calls.some(v=>Array.isArray(v?.p_amendment_ids));attempt++)await page.waitForTimeout(100);assert.deepEqual(calls.findLast(v=>Array.isArray(v?.p_amendment_ids))?.p_amendment_ids,[id(500)],'Individual amendment ballot uses one amendment');
   for(const who of ['guest','student','teacher']){role=who;await page.goto(url+'/stage12-test-preview?role='+who);await page.getByRole('tab',{name:/Третье чтение/}).click();assert.equal(await page.getByRole('tab',{name:/Третье чтение/}).getAttribute('aria-selected'),'true','All roles can navigate');if(who==='guest')assert.equal(await page.getByRole('button',{name:/Создать заседание/}).count(),0,'Guest has no chairman mutations');}
-  role='chair';await page.goto(url+'/stage12-test-preview');await page.getByRole('button',{name:'Оставить отзыв на законопроект',exact:true}).click();await page.getByLabel('Отзыв, предложения и замечания',{exact:true}).fill('Обоснованный отзыв субъекта инициативы с предложениями по содержанию учебного законопроекта.');await page.getByRole('button',{name:'Направить отзыв в досье',exact:true}).click();await page.getByText('Отзыв сохранён в сопровождении законопроекта.',{exact:false}).waitFor();assert.equal(calls.at(-1).p_subject_key,'gd_deputy');await page.screenshot({path:path.join(out,'desktop-review.png'),fullPage:true});role='chair';openFirst=true;await page.goto(url+'/stage12-test-preview');await page.getByRole('button',{name:'Управление заседанием',exact:true}).click();await page.getByRole('button',{name:'Повестка',exact:true}).click();await page.getByRole('region',{name:'Выступления и обсуждение'}).waitFor();await page.getByLabel('Выступающий',{exact:true}).selectOption(user);await page.getByRole('button',{name:'Предоставить слово',exact:true}).click();await page.getByRole('timer').getByText('03:00').waitFor();const before=requests;await page.waitForTimeout(2200);assert.equal(requests,before,'Shared timer performs no requests per second');await page.screenshot({path:path.join(out,'desktop-discussion.png'),fullPage:true});
+  role='chair';await page.goto(url+'/stage12-test-preview');await page.getByRole('button',{name:'Оставить отзыв на законопроект',exact:true}).click();await page.getByLabel('Отзыв, предложения и замечания',{exact:true}).fill('Обоснованный отзыв субъекта инициативы с предложениями по содержанию учебного законопроекта.');await page.getByRole('button',{name:'Направить отзыв в досье',exact:true}).click();await page.getByText('Отзыв сохранён в сопровождении законопроекта.',{exact:false}).waitFor();assert.equal(calls.at(-1).p_subject_key,'gd_deputy');await page.screenshot({path:path.join(out,'desktop-review.png'),fullPage:true});role='chair';openFirst=true;await page.goto(url+'/stage12-test-preview');await page.getByRole('button',{name:'Управление заседанием',exact:true}).click();await page.getByRole('region',{name:'Выступления и обсуждение'}).waitFor();await page.getByLabel('Выступающий',{exact:true}).selectOption(user);await page.getByRole('button',{name:'Предоставить слово',exact:true}).click();await page.getByRole('timer').getByText('03:00').waitFor();const before=requests;await page.waitForTimeout(2200);assert.equal(requests,before,'Shared timer performs no requests per second');await page.screenshot({path:path.join(out,'desktop-discussion.png'),fullPage:true});
   assert.deepEqual(errors,[],'No browser exceptions');assert.equal(await page.locator('body').getAttribute('data-test-error'),null,'No component error');
   fs.writeFileSync(path.join(out,'stage12-browser-results.json'),JSON.stringify({widths:[320,390,768,1440],roles:['chair','student','teacher','guest'],tabs:3,externalRequestsIntercepted:requests,timerRequests:0,errors},null,2));
   console.log('PASS: real React tabs, document navigation, individual amendment vote, role visibility, 320/390/768/1440px, shared countdown without network polling. Screenshots: '+out);
