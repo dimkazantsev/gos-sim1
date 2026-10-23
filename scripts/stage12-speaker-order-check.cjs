@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),{PGlite}=require('@electric-sql/pglite');
-const sql=fs.readFileSync('supabase/migrations/20261023203000_stage12_speaker_order.sql','utf8');
+const sql=fs.readFileSync('supabase/migrations/20261023135956_stage12_speaker_order.sql','utf8');
 const ui=fs.readFileSync('components/game/Stage12ReadingWorkspace.tsx','utf8');
 const order=fs.readFileSync('components/game/Stage12SpeakerOrder.tsx','utf8');
 assert(ui.indexOf('<ol className={styles.steps}')<ui.indexOf('{meetingButton}')&&ui.indexOf('{meetingButton}')<ui.indexOf('<section className={styles.billFiling}'),'Meeting disclosure must precede the blue filing action');
