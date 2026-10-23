@@ -31,6 +31,7 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  const [note,setNote]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
  const [feedback,setFeedback]=useState('');
+ const [registrationVisible,setRegistrationVisible]=useState(false);
  const activeReading=useRef(reading);activeReading.current=reading;
  const role=stageRoleTitles(g);
  const stageOpen=isStageWorkOpen(game,g.stages.find(s=>s.stage_no===12));
@@ -112,25 +113,42 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
     <button type="button" className="primary" disabled={busy||!!(start&&end&&new Date(end)<=new Date(start))} onClick={()=>void create()}>{busy?'Создание…':'Создать заседание и документ повестки'}</button>
    </div>
   </details>}
-  {sessions.length>0&&<details className={layout.sessionArchive}>
-   <summary>Заседания выбранного чтения · {sessions.length}{selected?' · выбрано № '+selected.session_no:''}</summary>
-   <div className={'legislativeSessionTabs legislativeSessionTabsFull '+layout.tabs}><div>{sessions.map(s=><button type="button" key={s.id} className={s.id===selected?.id?'active':''} onClick={()=>setSelectedId(s.id)}><b>№ {s.session_no}</b><span>{s.title}</span><em>{s.status==='open'?'Идёт':s.status==='closed'?'Завершено':'Подготовка'}</em></button>)}</div></div>
-  </details>}
   {feedback&&<p role="status" className="legislativeFeedback">{feedback}</p>}
   {!selected&&<div className={layout.empty}><b>Заседание Этапа 12 ещё не создано</b><p>Повестка Этапа 12 пока пуста. Завершённые заседания предыдущих этапов сохраняются в реестре НПА и не переносятся сюда автоматически.</p></div>}
   {selected&&<>
-   <div className={'legislativeSessionBar '+layout.sessionBar}>
-    <div><small>Заседание № {selected.session_no} · {selected.status==='open'?'Идёт':selected.status==='draft'?'Подготовка':'Завершено'}</small><h3>{selected.title}</h3><p>{selected.scheduled_start?new Date(selected.scheduled_start).toLocaleString('ru-RU'):'Начало не задано'}{selected.scheduled_end?' → '+new Date(selected.scheduled_end).toLocaleString('ru-RU'):''}</p></div>
-    {selected.reading_protocol&&selected.status==='draft'&&<p className={layout.openingGate} role="status">{unready.length?'Ожидается передача всех пакетов на '+reading+' чтение. Не готовы: '+unready.length+'.':'Пакеты переданы на чтение. После утверждения повестки и достижения кворума 226 из 450 заседание откроется автоматически.'}</p>}
-    {!selected.reading_protocol&&selected.status==='draft'&&canManage&&<button type="button" className="primary" disabled={busy||!items.length} onClick={()=>void open()}>Открыть перенесённое заседание прежнего регламента</button>}
-    {canManage&&selected.status==='open'&&<button className="primary" disabled={busy} onClick={()=>void close()}>Закрыть и перенести остаток</button>}
+   <div className={layout.meetingToolbar} aria-label="Управление выбранным заседанием">
+    <div className={layout.toolbarIdentity}>
+     <strong>Заседание № {selected.session_no}</strong>
+     <span>{selected.status==='open'?'Идёт':selected.status==='closed'?'Завершено':'Подготовка'}</span>
+     {!selected.reading_protocol&&<small title="Заседание использует прежний регламент, пока не завершится.">Прежний регламент</small>}
+    </div>
+    <div className={layout.toolbarActions}>
+     {sessions.length>1&&<label className={layout.meetingPicker}>Заседание
+      <select aria-label="Выбрать заседание чтения" value={selected.id} onChange={event=>{setSelectedId(event.target.value);setRegistrationVisible(false)}}>
+       {sessions.map(session=><option key={session.id} value={session.id}>№ {session.session_no} · {session.status==='open'?'Идёт':session.status==='closed'?'Завершено':'Подготовка'}</option>)}
+      </select>
+     </label>}
+     {selected.agenda_document_id&&<button type="button" className="secondary" disabled={!onOpenDocument}
+       aria-label="Открыть документ повестки" onClick={()=>onOpenDocument?.(selected.agenda_document_id!)}>Повестка</button>}
+     {selected.status!=='closed'&&<button type="button" className="secondary" aria-expanded={registrationVisible}
+       aria-controls={'duma-meeting-registration-'+selected.id} onClick={()=>setRegistrationVisible(v=>!v)}>
+       {registrationVisible?'Свернуть регистрацию':'Регистрация и повестка'}
+     </button>}
+     {!selected.reading_protocol&&selected.status==='draft'&&canManage&&
+      <button type="button" className="primary" disabled={busy||!items.length} onClick={()=>void open()}>Открыть заседание</button>}
+     {canManage&&selected.status==='open'&&<button type="button" className="primary" disabled={busy} onClick={()=>void close()}>Закрыть заседание</button>}
+    </div>
+    {selected.reading_protocol&&selected.status==='draft'&&<p className={layout.toolbarNote} role="status">
+     {unready.length?'Не готовы к '+reading+' чтению: '+unready.length+'.':'После утверждения повестки и достижения кворума заседание откроется автоматически.'}
+    </p>}
    </div>
-
-   {!selected.reading_protocol&&selected.status!=='closed'&&<p className={layout.openingGate}>Заседание подготовлено по прежнему регламенту. Его голосования, регистрация и перенос незавершённых вопросов сохраняются. Новая последовательность применяется к новым заседаниям чтений после завершения этих вопросов.</p>}
-
-   <section className={'legislativeDocBridge '+layout.documentBridge}><div><b>Реестр НПА · повестка заседания № {selected.session_no}</b><p>До открытия заседания повестка пополняется автоматически. Председатель утверждает её и открывает регистрацию. После кворума начинается заседание; голосование доступно после выступлений и обсуждения.</p></div>{selected.agenda_document_id&&<button type="button" disabled={!onOpenDocument} onClick={()=>onOpenDocument?.(selected.agenda_document_id!)}>Открыть документ повестки →</button>}</section>
-   {selected.status!=='closed'&&isCurrentAgenda&&<InstitutionRegistrationPanel key={selected.id} sessionId={selected.id} g={g} stageNo={12} initialBody="gd" allowedBodies={['gd']} freshAttendance={!!selected.reading_protocol} readOnly={readOnly} defaultOpen={selected.status==='draft'&&unready.length===0} onOpenDocument={onOpenDocument}/>}
-   {selected.status!=='closed'&&!isCurrentAgenda&&<p className={layout.openingGate} role="status">Повестка выбранного заседания не совпадает с повесткой текущей регистрации. Чтобы не изменить другое чтение, регистрация и утверждение здесь отключены.</p>}
+   {registrationVisible&&selected.status!=='closed'&&<div id={'duma-meeting-registration-'+selected.id} className={layout.registrationBody}>
+    {isCurrentAgenda?<InstitutionRegistrationPanel key={selected.id} sessionId={selected.id} g={g} stageNo={12} initialBody="gd" allowedBodies={['gd']}
+      freshAttendance={!!selected.reading_protocol} readOnly={readOnly} defaultOpen onOpenDocument={onOpenDocument}/>:
+     <p className={layout.openingGate} role="status">Повестка выбранного заседания не совпадает с повесткой текущей регистрации. Изменения отключены, чтобы не затронуть другое чтение.</p>}
+    {!selected.reading_protocol&&<p className={layout.legacyNote}>Для заседания, начатого по прежнему регламенту, сохраняются его порядок регистрации, голосования и переноса вопросов.</p>}
+    {selected.status==='open'&&isCurrentAgenda&&<p className={layout.toolbarNote}>После открытия корректируется только текст документа повестки — через действие «Корректировать повестку» внутри регистрации.</p>}
+   </div>}
    {canManage&&!selected.reading_protocol&&selected.status==='draft'&&<div className={styles.grid}><StyledSelect wrap label="Дополнительный документ для повестки" value={docId} onChange={setDocId} options={[{value:'',label:'Выберите документ из реестра НПА…'},...docs.filter(d=>!items.some(i=>i.formal_document_id===d.id)).map(d=>({value:d.id,label:d.registry_no+' · '+d.title+' · '+d.status_label}))]}/><div className={styles.actions}><button disabled={busy||!docId} onClick={()=>void add()}>Добавить другой документ</button></div></div>}
    {selected.status==='open'&&isCurrentAgenda&&<p className={layout.openingGate}>Корректировка после открытия изменяет только текст документа повестки. Откройте «Регистрация на заседание» → «Корректировать повестку». Состав законопроектов и голосований остаётся прежним.</p>}
    <div className={'legislativeAgenda '+layout.agenda}>
