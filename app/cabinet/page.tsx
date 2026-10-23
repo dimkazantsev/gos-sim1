@@ -98,7 +98,7 @@ export default function TeacherCabinet(){
      <div className="entryFormIntro"><span className="overline">НОВЫЙ СЕАНС</span><h2>Создать игру</h2><p>Коды нужны для приглашения участников, а не для входа в кабинет.</p></div>
      <fieldset disabled={saving}>
       <label className="entryField">Название игры<input value={title} onChange={e=>setTitle(e.target.value)} minLength={2} maxLength={160} required placeholder="Название учебной игры"/></label>
-      <label className="entryField">Код игры<input value={gameCode} onChange={e=>setGameCode(e.target.value)} minLength={2} maxLength={40} required autoCapitalize="characters" autoComplete="off" placeholder="Например, PAU-2026"/></label>
+      <label className="entryField">Код игры<input value={gameCode} onChange={e=>setGameCode(e.target.value)} minLength={2} maxLength={40} required autoCapitalize="characters" autoComplete="off" placeholder="Например, ИГРА-2026"/></label>
       <label className="entryField">ФИО преподавателя<input value={fullName} onChange={e=>setFullName(e.target.value)} minLength={2} required autoComplete="name" placeholder="Фамилия Имя Отчество"/></label>
       <label className="entryField">Приглашение преподавателя<input type="password" value={teacherCode} onChange={e=>setTeacherCode(e.target.value)} minLength={4} required autoComplete="new-password" placeholder="Код доступа преподавателя"/></label>
       <label className="entryField">Приглашение участников<input type="password" value={studentCode} onChange={e=>setStudentCode(e.target.value)} minLength={4} required autoComplete="new-password" placeholder="Код доступа участников"/></label>
