@@ -1,0 +1,31 @@
+name: Safe session deletion FK regression
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/20261023165000_game_deletion_cec_dependencies.sql'
+      - 'scripts/session-deletion-guard-check.cjs'
+      - 'scripts/session-deletion-relations-check.mjs'
+      - '.github/workflows/session-delete-guard.yml'
+  push:
+    paths:
+      - 'supabase/migrations/20261023165000_game_deletion_cec_dependencies.sql'
+      - 'scripts/session-deletion-guard-check.cjs'
+      - 'scripts/session-deletion-relations-check.mjs'
+      - '.github/workflows/session-delete-guard.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  guarded-deletion:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Check authorization, ZIP receipt and dependent row cleanup
+        run: node scripts/session-deletion-guard-check.cjs
+      - name: Reproduce and fix FK conflict on disposable in-memory PostgreSQL
+        run: node scripts/session-deletion-relations-check.mjs
