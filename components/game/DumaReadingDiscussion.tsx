@@ -6,7 +6,7 @@ import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
 import styles from './LegislativeSessionLab.module.css';
 
-export type Discussion={id:string;discussion_phase?:string;speaker_user_id?:string|null;speech_ends_at?:string|null;opened_document_step:string|null;first_reading_route?:'continue'|'adopt_in_full';first_reading_legal_note?:string|null};
+export type Discussion={id:string;discussion_phase?:string;speaker_user_id?:string|null;speech_ends_at?:string|null;opened_document_step:string|null;first_reading_route?:'continue'|'adopt_in_full';first_reading_legal_note?:string|null;speaker_order?:string[]|null};
 const labels:Record<string,string>={report:'Доклад',committee:'Позиция профильного комитета',questions:'Вопросы и ответы',debate:'Обсуждение',amendments:'Голосования по поправкам',vote:'Голосование по законопроекту'};
 export default function DumaReadingDiscussion({g,item,canManage,onRefresh}:{g:ReturnTypeRepublic;item:Discussion;canManage:boolean;onRefresh:()=>Promise<void>}){
  const [now,setNow]=useState(()=>Date.now()),[speaker,setSpeaker]=useState(''),[seconds,setSeconds]=useState(180),[busy,setBusy]=useState(false);
@@ -17,7 +17,10 @@ export default function DumaReadingDiscussion({g,item,canManage,onRefresh}:{g:Re
  const phases=item.opened_document_step==='reading2'?['report','debate','amendments','vote']:item.opened_document_step==='reading3'?['report','debate','vote']:['report','committee','questions','debate','vote'];
  const maximum=phase==='questions'?1200:phase==='report'&&item.opened_document_step==='reading2'?420:phase==='report'?180:86400;
  const left=item.speech_ends_at?Math.max(0,Math.ceil((new Date(item.speech_ends_at).getTime()-now)/1000)):null;
- useEffect(()=>{setSpeaker('');setSeconds(Math.min(180,maximum))},[item.id,phase,maximum]);
+ const planned=item.speaker_order||[];
+ const activeIndex=item.speaker_user_id?planned.indexOf(item.speaker_user_id):-1;
+ const suggested=planned.length?planned[(activeIndex+1)%planned.length]:'';
+ useEffect(()=>{setSpeaker(suggested);setSeconds(Math.min(180,maximum))},[item.id,phase,maximum,suggested]);
  useEffect(()=>{setFirstRoute(item.first_reading_route||'continue');setRouteNote(item.first_reading_legal_note||'')},[item.id,item.first_reading_route,item.first_reading_legal_note]);
  useEffect(()=>{if(!item.speech_ends_at)return;setNow(Date.now());const timer=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(timer)},[item.speech_ends_at]);
  async function act(next:string,start=false){
@@ -79,7 +82,10 @@ export default function DumaReadingDiscussion({g,item,canManage,onRefresh}:{g:Re
     <button type="button" className="secondary" disabled={busy||left===0} onClick={()=>void adjustTime(-30)} aria-label="Сократить выступление на 30 секунд">−30 сек.</button>
     <button type="button" className="secondary" disabled={busy} onClick={()=>void adjustTime(30)} aria-label="Продлить выступление на 30 секунд">+30 сек.</button>
    </div>}
-   {canManage&&<div className={styles.speakerControls}><label>Выступающий<select aria-label="Выступающий" value={speaker} onChange={e=>setSpeaker(e.target.value)} disabled={busy}><option value="">Выберите участника</option>{g.members.filter(m=>m.kind!=='observer'&&!m.roster_archived_at).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name}</option>)}</select></label><label>Время, секунд<input aria-label="Время выступления, секунд" type="number" min={1} max={maximum} value={seconds} onChange={e=>setSeconds(Number(e.target.value))} disabled={busy}/></label><button type="button" className="secondary" disabled={busy||!speaker||!Number.isInteger(seconds)||seconds<1||seconds>maximum||left!==null&&left>0} onClick={()=>void act(phase,true)}>Предоставить слово</button></div>}
+   {canManage&&<div className={styles.speakerControls}><label>Выступающий<select aria-label="Выступающий" value={speaker} onChange={e=>setSpeaker(e.target.value)} disabled={busy}><option value="">Выберите участника</option>{g.members.filter(m=>m.kind!=='observer'&&!m.roster_archived_at).sort((a,b)=>{
+  const ai=planned.indexOf(a.user_id),bi=planned.indexOf(b.user_id);
+  return (ai<0?999:ai)-(bi<0?999:bi);
+ }).map(m=><option key={m.user_id} value={m.user_id}>{planned.includes(m.user_id)?(planned.indexOf(m.user_id)+1)+'. ':''}{m.full_name}</option>)}</select></label><label>Время, секунд<input aria-label="Время выступления, секунд" type="number" min={1} max={maximum} value={seconds} onChange={e=>setSeconds(Number(e.target.value))} disabled={busy}/></label><button type="button" className="secondary" disabled={busy||!speaker||!Number.isInteger(seconds)||seconds<1||seconds>maximum||left!==null&&left>0} onClick={()=>void act(phase,true)}>Предоставить слово</button></div>}
   </>}
   {phase==='amendments'&&<p>Рассмотрите внесённые поправки в таблице выше. После голосования по каждой поправке можно открыть итоговое голосование второго чтения.</p>}
   {phase==='vote'?<p>Обсуждение завершено. Открыто связанное голосование по законопроекту.</p>:canManage&&next&&<button type="button" className="primary" disabled={busy||phase!=='amendments'&&!item.speech_ends_at} onClick={()=>void act(next)}>{busy?'Сохранение…':next==='vote'?'Завершить обсуждение и открыть голосование':next==='amendments'?'Завершить обсуждение и перейти к поправкам':'Завершить: '+labels[phase].toLocaleLowerCase('ru-RU')}</button>}

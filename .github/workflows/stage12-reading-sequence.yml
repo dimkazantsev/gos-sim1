@@ -8,6 +8,10 @@ on:
       - 'components/game/InstitutionRegistrationPanel.tsx'
       - 'components/game/LegislativeSessionLab*'
       - 'components/game/DumaReadingDiscussion.tsx'
+      - 'components/game/Stage12SpeakerOrder.tsx'
+      - 'components/game/Stage12AgendaText.tsx'
+      - 'supabase/migrations/*stage12_speaker_order.sql'
+      - 'scripts/stage12-speaker-order-check.cjs'
       - 'components/game/DocumentsView.tsx'
       - 'components/game/proceduralVoting.ts'
       - 'components/game/GovernanceStageWorkspace.tsx'
@@ -39,6 +43,7 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: node scripts/stage12-veto-speech-check.cjs
       - run: node scripts/stage12-first-reading-full-check.cjs
+      - run: node scripts/stage12-speaker-order-check.cjs
       - run: node scripts/stage12-reading-sequence-check.cjs
       - run: node scripts/stage12-second-reading-transition-check.cjs
       - run: node scripts/bill-amendments-component-check.cjs

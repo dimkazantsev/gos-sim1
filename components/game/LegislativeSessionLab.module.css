@@ -179,3 +179,37 @@
 .agendaDisclosure :global(.agendaActions) button{min-height:44px;white-space:normal;overflow-wrap:normal;word-break:normal;text-align:center}
 .agendaDisclosure :global(.agendaActions) textarea{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
 @media(max-width:650px){.agendaDisclosure :global(.agendaActions){grid-column:2}.agendaDisclosure :global(.agendaActions) button{width:100%}}
+
+
+/* One numbered procedure inside the already approved reading-preparation card. */
+.preparationSequence{display:grid;gap:12px;margin-top:14px;min-width:0}
+.preparationStep{display:grid;gap:10px;min-width:0;padding:14px 16px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);background:var(--gs-surface)}
+.preparationStep>h3{margin:0;color:var(--gs-ink);font-size:15px;line-height:1.45;font-weight:800}
+.preparationStep>p,.agendaTextPanel p,.speakerOrderItem p{margin:0;color:var(--gs-muted);font-size:13px;line-height:1.55}
+.agendaTextPanel{display:grid;gap:12px;min-width:0}
+.agendaTextHeading{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.agendaTextHeading>div{flex:1 1 220px;min-width:0}
+.agendaTextHeading b{font-size:13px;color:var(--gs-ink)}
+.agendaTextHeading button{min-height:44px}
+.agendaTextPreview{padding:12px;max-height:280px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);background:var(--gs-surface-soft)}
+.agendaTextEditor{display:grid;gap:10px;min-width:0}
+.agendaTextEditor label,.speakerOrderEditor label{display:grid;gap:8px;font-size:13px;color:var(--gs-ink);font-weight:700;min-width:0}
+.agendaTextEditor textarea,.speakerOrderEditor select{min-width:0;width:100%}
+.agendaTextEditor button{justify-self:start;min-height:44px}
+.agendaSummary{display:grid;gap:6px;list-style:none;margin:0;padding:0}
+.agendaSummary li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--gs-border)}
+.agendaSummary li>span{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:8px;background:var(--gs-surface-soft);color:var(--gs-accent-strong);font-size:12px;font-weight:800}
+.agendaSummary li>div{min-width:0}
+.agendaSummary strong{font-size:13px;color:var(--gs-ink);line-height:1.45}
+.agendaSummary small{display:block;font-size:12px;color:var(--gs-muted);line-height:1.5}
+.speakerOrderItem{display:grid;gap:10px;padding:12px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm)}
+.speakerOrderItem>b{font-size:13px;color:var(--gs-ink)}
+.speakerOrderList{list-style:none;display:grid;gap:6px;margin:0;padding:0}
+.speakerOrderList li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--gs-border)}
+.speakerOrderList li>span{min-width:0;font-size:13px;overflow-wrap:anywhere}
+.speakerOrderButtons{display:flex;gap:5px;flex:none}
+.speakerOrderButtons button{min-width:44px;min-height:44px;padding:7px 9px}
+.speakerOrderEditor{display:flex;align-items:end;flex-wrap:wrap;gap:8px}
+.speakerOrderEditor label{flex:1 1 200px}
+.speakerOrderEditor button{min-height:44px}
+@media(max-width:600px){.preparationStep{padding:12px}.agendaTextHeading>button,.agendaTextEditor button,.speakerOrderEditor button{width:100%}.speakerOrderEditor label{flex-basis:100%}.speakerOrderList li{flex-wrap:wrap}.speakerOrderButtons{margin-left:auto}}
