@@ -28,7 +28,7 @@ assert(ui.includes('Первый этап завершён. Формирован
 assert(ui.includes('{partyStageNotice}'),'The explanatory paragraph must use the stage state.');
 assert(!ui.includes('Работа с партиями откроется после запуска первого этапа преподавателем'),'Unconditional opening text must not remain.');
 assert(ui.includes("const canCreate=partyFormationOpen"),'Do not grant creation rights after completion.');
-assert(ui.includes("disabled={!partyFormationOpen}"),'Party documents stay gated by the existing work window.');
+assert(ui.includes("disabled={busy||!partyFormationOpen}"),'Party document uploads stay gated by the existing work window.');
 const css=fs.readFileSync('app/globals.css','utf8');
 assert(css.includes('.gosPartyStageBadge.isCompleted'),'Completed status receives its own appearance.');
 console.log('PASS parties: completed, active, paused and unopened labels; access and uploads unchanged.');
