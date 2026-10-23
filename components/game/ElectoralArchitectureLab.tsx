@@ -91,7 +91,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  useEffect(()=>{setFixedRegions([]);setRegionMapLoaded(false)},[game?.id]);
  // Use the shared game channel, not a separate channel for every stage panel.
  useGameTableSync(game?.id,[stageNo===2?'parliamentary_election_rules':'regional_election_rules'],
-  loadProposalRules,String(stageNo));
+  loadProposalRules,String(stageNo),stageNo===2?'parliamentary_election_rules':'regional_election_rules');
 
  if(!game||!me)return null;
  const activeGame=game;
