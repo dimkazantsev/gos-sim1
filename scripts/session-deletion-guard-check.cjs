@@ -23,4 +23,25 @@ assert(ui.includes("if(format==='zip'&&me)")&&ui.includes('saveGameBlob(blob,'),
 assert(ui.includes('disabled={!deleteAllowed}')&&ui.includes('if(!s||!teacher||!deleteAllowed)return'),'UI and handler share the same guard');
 assert(ui.includes('Для разблокировки удаления')&&ui.includes('ZIP · Локальная Игра'),'User sees why deletion is disabled');
 assert(ui.includes("s.owner_id!==me?.user_id&&!admin")&&ui.includes("supabase.rpc('prepare_game_deletion'")&&ui.includes("supabase.rpc('delete_game_permanently'"),'Owner/admin checks and server deletion workflow remain intact');
+const migration=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20261023165000_game_deletion_cec_dependencies.sql'),'utf8');
+for(const needle of ["select * into target from public.games where id=p_game for update","target.owner_id<>auth.uid()","upper(trim(p_code))<>target.game_code","target.status<>'archived'","storage.objects","remaining>0","delete from public.presidential_cec_court_referrals where game_id=p_game","delete from public.presidential_cec_complaints where game_id=p_game","delete from public.games where id=p_game"]){
+ assert(migration.includes(needle),'Missing guarded game deletion clause: '+needle);
+}
+const order=[
+ "select * into target from public.games",
+ "target.owner_id<>auth.uid()",
+ "upper(trim(p_code))<>target.game_code",
+ "target.status<>'archived'",
+ "if remaining>0 then",
+ "delete from public.presidential_cec_court_referrals where game_id=p_game",
+ "delete from public.presidential_cec_complaints where game_id=p_game",
+ "delete from public.member_login_emails where game_id=p_game",
+ "delete from public.retired_event_cases where game_id=p_game",
+ "delete from public.games where id=p_game",
+];
+for(let i=1;i<order.length;i++)assert(migration.indexOf(order[i])>migration.indexOf(order[i-1]),'Delete guard and FK dependency order was changed: '+order[i]);
+assert(!/delete\s+from\s+auth\./i.test(migration),'Game deletion must never destroy global Auth users');
+assert(migration.includes("revoke all on function public.delete_game_permanently(uuid,text) from public,anon"),'No anonymous delete rights');
+console.log('PASS safe CEC removal: permission, code, archive, media guards and child-first FK cleanup');
+
 console.log('PASS game-session deletion: scoped ZIP receipt, expiry, strict confirmation, UI explanation, owner and RPC protections');
