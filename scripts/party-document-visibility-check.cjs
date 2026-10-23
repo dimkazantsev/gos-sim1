@@ -31,4 +31,14 @@ assert.match(student,/partyDocumentVersionLabel\(d\)/,
  'Students must see the reviewed document version');
 assert.match(orphans,/<details aria-label="Технические загрузки без регистрации"/,
  'Technical Storage objects must remain separate from submitted documents');
+// A closed stage is read-only: keep Minjust documents viewable.
+assert.ok(student.includes('<div className="gosPartyStageFieldset"><JusticeDocuments g={g} partyId={selected.id}/></div>'),
+ 'Minjust documents remain clickable for party members after Stage 1 closes');
+assert.ok(!student.includes('<fieldset className="gosPartyStageFieldset" disabled={!partyFormationOpen}>'),
+ 'A disabled ancestor must not prevent opening previously issued documents');
+assert.ok(student.includes('if(!partyFormationOpen||!selected||selected.id!==partyId'),
+ 'Uploading still requires the active party formation stage');
+assert.ok(student.includes('disabled={busy||!partyFormationOpen}'),
+ 'Upload buttons remain disabled outside the stage work window');
+
 console.log('PASS party documents: teacher hydration, party isolation, student revision notes, orphan separation.');
