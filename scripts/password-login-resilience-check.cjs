@@ -11,7 +11,7 @@ function loadTransport(){if(transport)return transport;const exports={};vm.runIn
 const nodes=(node,match)=>!node||typeof node!=='object'?[]:[...(match(node)?[node]:[]),...[node.props?.children].flat(Infinity).flatMap(child=>nodes(child,match))];
 const text=node=>node==null||typeof node==='boolean'?'':typeof node==='object'?[node.props?.children].flat(Infinity).map(text).join(''):String(node);
 const ok={data:{session:{access_token:'fixture-access',refresh_token:'fixture-refresh'}},error:null};
-function harness({responses=[ok],adoption=[{error:null}],rpc=[{data:'fixture-game',error:null}],online=true}={}){
+function harness({responses=[ok],adoption=[{error:null}],rpc=[{data:'fixture-game',error:null}],online=true,teacher=false}={}){
  const slots=[],calls={password:0,adopt:0,resume:0,navigation:[],saved:[]};let cursor=0,tree;
  const react={
   useState(initial){const i=cursor++;if(!slots[i])slots[i]={value:initial};return[slots[i].value,value=>{slots[i].value=typeof value==='function'?value(slots[i].value):value;}];},
@@ -33,8 +33,10 @@ function harness({responses=[ok],adoption=[{error:null}],rpc=[{data:'fixture-gam
  const mod={exports:{}};
  vm.runInNewContext('(function(require,module,exports){'+entryCode+'})',{console,navigator:{onLine:online},window:{location:{origin:'https://fixture.example'}},setTimeout:fn=>{queueMicrotask(fn);return 1;},clearTimeout(){}})(requireFor,mod,mod.exports);
  function render(){cursor=0;tree=mod.exports.default();return tree;}
- render();nodes(tree,n=>n.type==='button'&&text(n)==='Войти с личным паролем')[0].props.onClick();render();
- for(const [match,value] of [[n=>n.props?.id==='personal-game-code','FIXTURE'],[n=>n.type==='input'&&n.props.type==='email',' Probe@Example.com '],[n=>n.type==='input'&&n.props.type==='password','fixture-password']]){nodes(tree,match)[0].props.onChange({target:{value}});render();}
+ render();if(teacher){nodes(tree,n=>n.type==='button'&&text(n)==='Преподаватель')[0].props.onClick();render();}
+ nodes(tree,n=>n.type==='button'&&text(n)==='Войти с личным паролем')[0].props.onClick();render();
+ if(teacher)assert.equal(nodes(tree,n=>n.props?.id==='personal-game-code').length,0,'Teachers must not be asked to enter a game code');
+ for(const [match,value] of [[n=>n.props?.id==='personal-game-code','FIXTURE'],[n=>n.type==='input'&&n.props.type==='email',' Probe@Example.com '],[n=>n.type==='input'&&n.props.type==='password','fixture-password']]){if(teacher&&value==='FIXTURE')continue;nodes(tree,match)[0].props.onChange({target:{value}});render();}
  return{calls,async submit(){await nodes(tree,n=>n.type==='form')[0].props.onSubmit({preventDefault(){}});render();},error:()=>text(nodes(tree,n=>n.props?.role==='alert')[0])};
 }
 async function main(){
@@ -45,6 +47,22 @@ async function main(){
  });
  await check('Auth 504 retries using its status even when the text was translated',async()=>{
   const h=harness({responses:[{data:{session:null},error:{message:'Сервер временно не отвечает. Повторите попытку.',status:504}},ok]});await h.submit();assert.equal(h.calls.password,2);assert.equal(h.calls.navigation.length,1);
+ });
+ await check('Teacher password login enters permanent teacher cabinet with NO game code',async()=>{
+  const h=harness({teacher:true});await h.submit();
+  assert.equal(h.calls.password,1);
+  assert.equal(h.calls.adopt,1);
+  assert.equal(h.calls.resume,0,'Teacher must not call membership/code resume RPC');
+  assert.equal(h.calls.saved.length,0,'Teacher must not remember a fabricated game code');
+  assert.deepEqual(h.calls.navigation,['/teacher']);
+  assert.equal(h.error(),'');
+ });
+ await check('Incorrect teacher password never opens the cabinet',async()=>{
+  const h=harness({teacher:true,responses:[{data:{session:null},error:{message:'Invalid login credentials',code:'invalid_credentials',status:400}}]});
+  await h.submit();
+  assert.equal(h.calls.resume,0);
+  assert.equal(h.calls.navigation.length,0);
+  assert.match(h.error(),/Неверный адрес почты или пароль/);
  });
  await check('Wrong password is not retried and never opens or alters membership',async()=>{
   const h=harness({responses:[{data:{session:null},error:{message:'Invalid login credentials',code:'invalid_credentials',status:400}}]});await h.submit();assert.equal(h.calls.password,1);assert.equal(h.calls.adopt,0);assert.equal(h.calls.resume,0);assert.match(h.error(),/Неверный адрес почты или пароль/);
