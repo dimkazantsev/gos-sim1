@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -11,11 +11,20 @@ export default function Stage12AgendaText({g,sessionId,documentId,status,canEdit
  const [current,setCurrent]=useState(''),[text,setText]=useState(''),[reason,setReason]=useState('');
  const [editing,setEditing]=useState(false),[busy,setBusy]=useState(false),[loading,setLoading]=useState(false);
  const [error,setError]=useState('');
+ const editingRef=useRef(false);
+ const loadedDocumentRef=useRef<string|null>(null);
  useEffect(()=>{
-  if(!g.game||!documentId){setCurrent('');setText('');return;}
-  let active=true;setLoading(true);
+  if(!g.game||!documentId){loadedDocumentRef.current=null;setCurrent('');if(!editingRef.current)setText('');setLoading(false);return;}
+  let active=true;
+  // Refresh silently. Never unmount an active textarea or reset unsaved typing.
+  if(loadedDocumentRef.current!==documentId){loadedDocumentRef.current=documentId;setLoading(true)}
   void supabase.from('formal_documents').select('body_text').eq('game_id',g.game.id).eq('id',documentId).maybeSingle()
-   .then(result=>{if(!active)return;if(result.error)setError(userError(result.error));else{const next=result.data?.body_text||'';setCurrent(next);setText(next)}setLoading(false)});
+   .then(result=>{
+    if(!active)return;
+    if(result.error)setError(userError(result.error));
+    else{const next=result.data?.body_text||'';setCurrent(next);if(!editingRef.current)setText(next)}
+    setLoading(false);
+   });
   return()=>{active=false};
  },[g.game?.id,documentId,sessionId,questions]);
  async function save(){
@@ -27,7 +36,7 @@ export default function Stage12AgendaText({g,sessionId,documentId,status,canEdit
    p_reason:status==='open'?reason.trim():null
   });
   if(r.error)setError(userError(r.error));
-  else{setCurrent(text.trim());setEditing(false);setReason('')}
+  else{setCurrent(text.trim());editingRef.current=false;setEditing(false);setReason('')}
   setBusy(false);
  }
  return <section className={styles.agendaTextPanel} aria-label="Автоматическая повестка заседания">
@@ -37,7 +46,7 @@ export default function Stage12AgendaText({g,sessionId,documentId,status,canEdit
       'После открытия разрешена корректировка только текста, без изменения состава вопросов.'}</p></div>
    {documentId&&onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(documentId)}>Документ повестки</button>}
    {canEdit&&status!=='closed'&&documentId&&<button type="button" className="secondary" aria-expanded={editing}
-    onClick={()=>{setEditing(value=>!value);setText(current)}}>{editing?'Отменить правку':'Редактировать текст'}</button>}
+    onClick={()=>{const next=!editingRef.current;editingRef.current=next;setEditing(next);setText(current)}}>{editing?'Отменить правку':'Редактировать текст'}</button>}
   </div>
   {!documentId?<p role="status">Документ повестки появится после создания заседания.</p>:
    loading?<p role="status">Загрузка повестки…</p>:
