@@ -60,7 +60,7 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  const [reviewDraft,setReviewDraft]=useState<ReviewDraft>({legal:'',logic:'',acts:'',recommendation:'proceed'});
  const role=stageRoleTitles(g);
  const canAssignCommittee=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&(role.includes('председател')||role.includes('совет'))));
- const canReferCommittee=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&role.includes('председател')));
+ const canReferCommittee=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&(role.includes('председател')||role.includes('совет'))));
  const canCouncilApprove=!readOnly&&mode==='work'&&(g.teacher||(role.includes('дум')&&(role.includes('совет')||role.includes('председател'))));
  const [mainFile,setMainFile]=useState<File|null>(null);
  const [attachments,setAttachments]=useState<Record<string,File|null>>({});
@@ -273,6 +273,17 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
  }
 
 
+ async function referToCommittee(id:string){
+  if(busy||!canReferCommittee)return;
+  setBusy(true);setMessage('');
+  try{
+   const {error}=await supabase.rpc('refer_stage12_registered_bill',{p_document_id:id});
+   if(error)throw error;
+   setMessage('Законопроект направлен в назначенный профильный комитет; стадия отражена в досье и реестре НПА.');
+   setRefresh(v=>v+1);notifyRefresh();await g.refresh();
+  }catch(error){setMessage('Направление в комитет не выполнено: '+userError(error))}
+  finally{setBusy(false)}
+ }
  async function saveCommittee(id:string,profile?:BillProfile){
   if(!canAssignCommittee||busy)return;
   const value=assignedCommittee[id]??profile?.committee_key??'';
@@ -447,7 +458,8 @@ export default function Stage12BillPackages({g,stage,readOnly=false,subjects=[],
        </select></label>
       <div className={styles.forwardActions}>
        <button type="button" className="secondary" disabled={busy||!(assignedCommittee[d.id]??profile?.committee_key??'')} onClick={()=>void saveCommittee(d.id,profile)}>Сохранить назначение</button>
-       {canReferCommittee&&<button type="button" className={styles.filingSubmit} disabled={busy||!profile?.committee_key} onClick={()=>void advanceBill(d.id)}>Направить законопроект в комитет</button>}
+       {canReferCommittee&&<button type="button" className={styles.filingSubmit} disabled={busy||!profile?.committee_key}
+        onClick={()=>void referToCommittee(d.id)}>Направить законопроект в комитет</button>}
       </div>
      </div>}
      {mode==='work'&&d.status_code==='committee'&&<div className={styles.forwardPanel}>
