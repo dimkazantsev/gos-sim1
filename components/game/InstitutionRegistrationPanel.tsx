@@ -37,6 +37,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  const [stage12InitialText,setStage12InitialText]=useState('');
  const [stage12Reason,setStage12Reason]=useState('');
  const [stage12Saving,setStage12Saving]=useState(false);
+ const dirtyMeetingDraftRef=useRef({agenda:false,minutes:false,stage12:false});
  async function loadStage12Editor(){
   if(!g.game)return;
   setMeetingError('');
@@ -51,8 +52,8 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   if(doc.error){setMeetingError(meetingErrorMessage(userError(doc.error)));return;}
   if(!doc.data)return;
   setStage12Session({id:s.data.id,status:s.data.status});
-  setStage12InitialText(doc.data.body_text||'');
-  setStage12Text(doc.data.body_text||'');
+  // Keep keystrokes when the read began before the user started typing.
+  if(!dirtyMeetingDraftRef.current.stage12){setStage12InitialText(doc.data.body_text||'');setStage12Text(doc.data.body_text||'');}
  }
  async function saveStage12Editor(){
   if(!g.game||!stage12Session||!verifiedRights?.can_coordinate||readOnly||stage12Saving
@@ -67,6 +68,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   });
   if(result.error){setMeetingError(meetingErrorMessage(userError(result.error)));}
   else{
+   dirtyMeetingDraftRef.current.stage12=false;
    setAgendaEditorOpen(false);setStage12Reason('');
    setNotice('Текст повестки обновлён в едином документе НПА.');
    await load();
@@ -105,8 +107,9 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   const row=meetingRows.find(m=>m.institution_key===body);
   const snapshot={scope:[g.game?.id||'',stage,body].join(':'),agenda:row?.agenda_body||'',minutes:row?.minutes_body||'',delegate:row?.delegate_user_id||''};
   const previous=lastMeetingDraftRef.current;
-  if(previous?.scope!==snapshot.scope||previous.agenda!==snapshot.agenda)setAgendaText(snapshot.agenda);
-  if(previous?.scope!==snapshot.scope||previous.minutes!==snapshot.minutes)setMinutesText(snapshot.minutes);
+  if(previous?.scope!==snapshot.scope){dirtyMeetingDraftRef.current.agenda=false;dirtyMeetingDraftRef.current.minutes=false;dirtyMeetingDraftRef.current.stage12=false;}
+  if(previous?.scope!==snapshot.scope||previous.agenda!==snapshot.agenda&&!dirtyMeetingDraftRef.current.agenda)setAgendaText(snapshot.agenda);
+  if(previous?.scope!==snapshot.scope||previous.minutes!==snapshot.minutes&&!dirtyMeetingDraftRef.current.minutes)setMinutesText(snapshot.minutes);
   if(previous?.scope!==snapshot.scope||previous.delegate!==snapshot.delegate)setDelegateUser(snapshot.delegate);
   lastMeetingDraftRef.current=snapshot;
  },[meetingRows,body,g.game?.id,stage]);
@@ -172,7 +175,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   if(!g.game||busy||!canPrepare||readOnly||meetingActionsLocked||(kind==='agenda'&&!canWriteAgenda))return;
   setMeetingError('');setNotice('');setBusy(true);
   const r=await supabase.rpc('save_institution_meeting_document',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_kind:kind,p_body:kind==='agenda'?agendaText:minutesText});
-  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();setNotice(kind==='agenda'?(meetingCoordinator?'Повестка сохранена в реестре НПА и утверждена.':'Проект повестки сохранён. Ожидается утверждение председателем.'):'Протокол сохранён в реестре НПА.')}
+  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{dirtyMeetingDraftRef.current[kind]=false;await load();setNotice(kind==='agenda'?(meetingCoordinator?'Повестка сохранена в реестре НПА и утверждена.':'Проект повестки сохранён. Ожидается утверждение председателем.'):'Протокол сохранён в реестре НПА.')}
   setBusy(false);
  }
  async function approveMeeting(kind:'agenda'|'minutes'){
@@ -220,12 +223,12 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
    {hasSessionRegistrations&&agendaHasDocument&&!agendaReady&&!gdStage12CanonicalAgenda&&<p className="civicMeetingHelp" role="status">Регистрация уже началась. Изменять подготовленный проект нельзя; председатель может только утвердить существующую повестку.</p>}
    {gdStage12CanonicalAgenda&&agendaHasDocument&&<section className="civicAgendaSyncedPreview" aria-label="Автоматически сформированная повестка Государственной Думы"><strong>Содержание повестки · Реестр НПА</strong><pre>{meetingRecord?.agenda_body||'Вопросы повестки загружаются…'}</pre></section>}
    {gdStage12CanonicalAgenda&&meetingCoordinator&&!readOnly&&agendaHasDocument&&<section className="civicAgendaEdit" aria-label="Корректировка повестки Государственной Думы">
-    <button type="button" className="secondary" aria-expanded={agendaEditorOpen} onClick={()=>{setAgendaEditorOpen(v=>!v);if(!agendaEditorOpen)void loadStage12Editor();}}>Корректировать повестку</button>
+    <button type="button" className="secondary" aria-expanded={agendaEditorOpen} onClick={()=>{setAgendaEditorOpen(v=>!v);if(!agendaEditorOpen){dirtyMeetingDraftRef.current.stage12=false;void loadStage12Editor();}}}>Корректировать повестку</button>
     {agendaEditorOpen&&<div className="civicAgendaEditBody">
      <p>Измените непосредственно текст повестки заседания Государственной Думы. Состав законопроектов и голосования остаются прежними. Реестровые номера документов необходимо сохранить.</p>
      <label>Полный текст повестки
       <textarea className="civicAgendaTextEditor" rows={15} maxLength={20000}
-       value={stage12Text} onChange={e=>setStage12Text(e.target.value)}
+       value={stage12Text} onChange={e=>{dirtyMeetingDraftRef.current.stage12=true;setStage12Text(e.target.value)}}
        placeholder="Текст повестки заседания Государственной Думы"/>
      </label>
      {stage12Session?.status==='open'&&<label>Основание корректировки после открытия
@@ -241,12 +244,12 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
       onClick={()=>void saveStage12Editor()}>{stage12Saving?'Сохранение…':'Сохранить текст повестки'}</button>
     </div>}
    </section>}
-   {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<label>Содержание повестки<textarea aria-label="Текст повестки заседания" value={agendaText} rows={4} onChange={event=>setAgendaText(event.target.value)} placeholder="Вопросы заседания, порядок рассмотрения, выступающие и регламент"/></label>}
+   {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<label>Содержание повестки<textarea aria-label="Текст повестки заседания" value={agendaText} rows={4} onChange={event=>{dirtyMeetingDraftRef.current.agenda=true;setAgendaText(event.target.value)}} placeholder="Вопросы заседания, порядок рассмотрения, выступающие и регламент"/></label>}
    {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<div className="civicAgendaComposer"><small>{agendaTextLength<30?'Для сохранения укажите ещё '+(30-agendaTextLength)+' символов.':'Повестка готова к сохранению в реестре НПА.'}</small><button type="button" className={meetingCoordinator?'primary':'secondary'} disabled={busy||readOnly||agendaTextLength<30} onClick={()=>void saveMeetingDocument('agenda')}>{meetingCoordinator?'Сохранить и утвердить повестку':'Сохранить проект повестки в реестре НПА'}</button></div>}
    {canApproveAgenda&&!readOnly&&<button type="button" className="primary" disabled={busy||readOnly} onClick={()=>void approveMeeting('agenda')}>Утвердить подготовленный проект повестки</button>}
    {meetingCoordinator&&!readOnly&&<div className="civicMeetingDelegate"><StyledSelect label={gdStage12CanonicalAgenda?'Поручить оформление протокола':'Поручить заполнение повестки и протокола'} value={delegateUser} onChange={setDelegateUser} options={[{value:'',label:'Без поручения'},...participants.map(p=>({value:p.user_id,label:p.full_name||'Участник'}))]}/><button type="button" disabled={busy} onClick={()=>void assignMeetingDelegate()}>Сохранить поручение</button></div>}
    {registered.length>0&&<div className="civicMeetingMinutes"><header><b>Протокол по итогам заседания</b><span>{meetingRecord?.minutes_approved_at?'Утверждён':meetingRecord?.minutes_document_id?'Проект на утверждении':'Не составлен'}</span></header>
-    {canPrepare&&!meetingRecord?.minutes_approved_at&&<><label>Содержание протокола<textarea aria-label="Текст протокола заседания" rows={5} value={minutesText} onChange={event=>setMinutesText(event.target.value)} placeholder="Присутствовали, кворум, вопросы, результаты голосований и постановления"/></label><button type="button" className="secondary" disabled={busy||minutesText.trim().length<30} onClick={()=>void saveMeetingDocument('minutes')}>Сохранить протокол как документ</button></>}
+    {canPrepare&&!meetingRecord?.minutes_approved_at&&<><label>Содержание протокола<textarea aria-label="Текст протокола заседания" rows={5} value={minutesText} onChange={event=>{dirtyMeetingDraftRef.current.minutes=true;setMinutesText(event.target.value)}} placeholder="Присутствовали, кворум, вопросы, результаты голосований и постановления"/></label><button type="button" className="secondary" disabled={busy||minutesText.trim().length<30} onClick={()=>void saveMeetingDocument('minutes')}>Сохранить протокол как документ</button></>}
     {meetingCoordinator&&meetingRecord?.minutes_document_id&&!meetingRecord?.minutes_approved_at&&<button type="button" className="primary" disabled={busy} onClick={()=>void approveMeeting('minutes')}>Утвердить протокол</button>}
    </div>}
   </section>
