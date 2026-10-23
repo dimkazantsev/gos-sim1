@@ -161,3 +161,9 @@
 .agendaDisclosure .agenda{margin:0}
 .agendaDisclosure .rule{margin-top:2px}
 @media(max-width:600px){.agendaDisclosure{padding:10px}.agendaDisclosureHeading button{width:100%}}
+
+/* Agenda actions occupy a full document column, never the narrow agenda-number column. */
+.agendaDisclosure :global(.agendaActions){grid-column:2;display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px;min-width:0;max-width:100%}
+.agendaDisclosure :global(.agendaActions) button{min-height:44px;white-space:normal;overflow-wrap:normal;word-break:normal;text-align:center}
+.agendaDisclosure :global(.agendaActions) textarea{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+@media(max-width:650px){.agendaDisclosure :global(.agendaActions){grid-column:2}.agendaDisclosure :global(.agendaActions) button{width:100%}}
