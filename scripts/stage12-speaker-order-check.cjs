@@ -6,6 +6,8 @@ const order=fs.readFileSync('components/game/Stage12SpeakerOrder.tsx','utf8');
 assert(ui.indexOf('<ol className={styles.steps}')<ui.indexOf('{meetingButton}')&&ui.indexOf('{meetingButton}')<ui.indexOf('<section className={styles.billFiling}'),'Meeting disclosure must precede the blue filing action');
 assert(ui.includes('const [meetingOpen,setMeetingOpen]=useState(false)'),'Meeting collapsed initially');
 assert(order.includes("set_stage12_speaker_order")&&order.includes('move(index,-1)')&&order.includes('move(index,1)'),'Speaker order saved and reordable');
+const live=fs.readFileSync('components/game/DumaReadingDiscussion.tsx','utf8');
+assert(live.includes('const suggested=planned.length?planned[(activeIndex+1)%planned.length]')&&live.includes('setSpeaker(suggested)'),'The next speaking action must follow the saved order rather than being cosmetic');
 const id=n=>'70000000-0000-0000-0000-'+String(n).padStart(12,'0');
 (async()=>{
  const db=new PGlite();try{
