@@ -83,6 +83,7 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  const doc=(id:string)=>formalDocuments.find(d=>d.id===id);
  const voteFor=(id:string)=>votes.find(v=>v.formal_document_id===id&&v.status==='open'&&v.stage_no===12);
  const current=items.find(x=>x.status==='in_progress');
+ const autoMinutes=selected?formalDocuments.find(x=>x.doc_type==='minutes'&&x.metadata?.automatic_session_id===selected.id):undefined;
  const unready=items.filter(i=>['pending','in_progress'].includes(i.status)&&doc(i.formal_document_id)?.workflow_key==='bill'&&doc(i.formal_document_id)?.status_code!=='reading'+reading);
  const routed=items.filter(x=>{const d=formalDocuments.find(doc=>doc.id===x.formal_document_id);return d&&['bill','budget'].includes(d.workflow_key)});
  const isCurrentAgenda=!!selected?.agenda_document_id&&meeting?.agenda_document_id===selected.agenda_document_id;
@@ -185,7 +186,10 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
       <button type="button" className="primary" disabled={busy||!items.length} onClick={()=>void open()}>Открыть заседание</button>}
      {selected.status==='open'&&<><p>Заседание идёт. Голосование доступно после выступлений и обсуждения вопросов.</p>
       {canManage&&<button type="button" className="secondary" disabled={busy} onClick={()=>void close()}>Завершить заседание</button>}</>}
-     {selected.status==='closed'&&<p>Заседание завершено. Протокол и результаты сохранены.</p>}
+     {selected.status==='closed'&&<div>
+      <p>Заседание завершено. Протокол автоматически удостоверяется системой ГОС.ID и публикуется в реестре НПА.</p>
+      {autoMinutes&&onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(autoMinutes.id)}>Открыть опубликованный протокол</button>}
+     </div>}
     </section>
     {selected.status==='open'&&<section className={layout.preparationStep} aria-label="Ход заседания">
      <h3>Ход заседания: выступления и голосование</h3>

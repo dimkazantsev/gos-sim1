@@ -80,6 +80,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const reviewablePrograms=selected?programs.filter(p=>agenda.some(a=>a.program_id===p.id)):[];
  const meetingProposals=selected?proposals.filter(p=>p.session_id===selected.id):[];
  const current=agenda.find(x=>x.status==='presenting'||x.status==='decision');
+ const autoMinutes=selected?g.formalDocuments.find(x=>x.doc_type==='minutes'&&x.metadata?.automatic_session_id===selected.id):undefined;
  const name=(id:string|null)=>members.find(m=>m.user_id===id)?.full_name||'—';
  const program=(id:string)=>programs.find(p=>p.id===id);
  const vote=(id:string|null)=>id?votes.find(v=>v.id===id):undefined;
@@ -176,6 +177,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
      {canApprove&&selected.status==='draft'&&!selected.agenda_approved_at&&<><button type="button" className="govMeetingRefreshPrograms secondary" aria-label="Обновить список государственных программ" disabled={busy} onClick={()=>void sync()}><RefreshCcw size={17} aria-hidden="true"/><span>Обновить список ГП</span></button><button type="button" className="primary" disabled={busy||agenda.length===0} onClick={()=>void approve()}><ClipboardCheck size={17}/>Утвердить повестку</button></>}
      {canApprove&&selected.status==='draft'&&!!selected.agenda_approved_at&&<button type="button" className="primary" disabled={busy} onClick={()=>void open()}><Mic2 size={17}/>Открыть заседание</button>}
      {canApprove&&selected.status==='open'&&<button type="button" disabled={busy||!!current} onClick={()=>void close()}>Закрыть заседание</button>}
+     {selected.status==='closed'&&autoMinutes&&onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(autoMinutes.id)}><FileText size={17}/>Опубликованный протокол</button>}
     </div>
    </section>
    <section className="govMeetingProgrammeList" aria-label="Представление государственных программ">
