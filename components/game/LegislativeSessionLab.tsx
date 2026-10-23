@@ -120,14 +120,13 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
   {selected&&<>
    <div className={layout.meetingToolbar} aria-label="Управление выбранным заседанием">
     <div className={layout.toolbarIdentity}>
-     <strong>Заседание № {selected.session_no}</strong>
+     {sessions.length===1&&<strong>Заседание № {selected.session_no}</strong>}
      <span>{selected.status==='open'?'Идёт':selected.status==='closed'?'Завершено':'Подготовка'}</span>
-     {!selected.reading_protocol&&<small title="Заседание использует прежний регламент, пока не завершится.">Прежний регламент</small>}
     </div>
     <div className={layout.toolbarActions}>
      {sessions.length>1&&<label className={layout.meetingPicker}>Заседание
       <select aria-label="Выбрать заседание чтения" value={selected.id} onChange={event=>{setSelectedId(event.target.value);setRegistrationVisible(false);setAgendaVisible(false)}}>
-       {sessions.map(session=><option key={session.id} value={session.id}>№ {session.session_no} · {session.status==='open'?'Идёт':session.status==='closed'?'Завершено':'Подготовка'}</option>)}
+       {sessions.map(session=><option key={session.id} value={session.id}>Заседание № {session.session_no}</option>)}
       </select>
      </label>}
      <button type="button" className="secondary" aria-expanded={agendaVisible}
