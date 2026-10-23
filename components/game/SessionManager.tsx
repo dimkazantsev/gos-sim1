@@ -4,9 +4,9 @@ import {useEffect,useState} from 'react';
 import {Archive,Download,ShieldAlert,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
-import {downloadFullGameArchive,enumerateGameAssets,purgeGameAssets,saveGameBlob} from './gameArchive';
+import {downloadFullGameArchive,downloadSessionArchive,enumerateGameAssets,purgeGameAssets,saveGameBlob} from './gameArchive';
 import TeacherAccessCodes from './TeacherAccessCodes';
-import {preparePortableSession,type SessionArchive} from './portableSession';
+import {preparePortableSession} from './portableSession';
 import {canPermanentlyDeleteGame,freshGameBackupReceipt,gameBackupReceiptKey} from './sessionDeletionGuard';
 type Session={id:string;title:string;game_code:string;owner_id:string;status:string;created_at:string};
 export default function SessionManager({g}:{g:ReturnTypeRepublic}){
@@ -41,15 +41,14 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
   try{
    const suffix=s.game_code.replace(/[^a-zA-Zа-яА-Я0-9-]/g,'_');
    if(format==='zip'){
-    const blob=await downloadFullGameArchive(s.id,(done,total)=>setProgress('Файлов включено: '+done+' из '+total));
+    const blob=await downloadFullGameArchive(s.id,(done,total,phase)=>setProgress((phase==='data'?'Таблиц выгружено: ':'Файлов включено: ')+done+' из '+total));
     saveGameBlob(blob,'GOS-ID-'+suffix+'-full.zip');
    }else{
-    const r=await supabase.rpc('export_game_data',{p_game:s.id});
-    if(r.error)throw r.error;
+    const archive=await downloadSessionArchive(s.id,(done,total)=>setProgress('Таблиц выгружено: '+done+' из '+total));
     if(format==='html'){
-     const portable=await preparePortableSession(r.data as SessionArchive);
+     const portable=await preparePortableSession(archive);
      saveGameBlob(new Blob([portable.html],{type:'text/html'}),'GOS-ID-'+suffix+'.html');
-    }else saveGameBlob(new Blob([JSON.stringify(r.data,null,2)],{type:'application/json'}),'GOS-ID-'+suffix+'.json');
+    }else saveGameBlob(new Blob([JSON.stringify(archive,null,2)],{type:'application/json'}),'GOS-ID-'+suffix+'.json');
    }
    if(format==='zip'&&me){
     const key=gameBackupReceiptKey(me.user_id,s.id),timestamp=String(Date.now());
