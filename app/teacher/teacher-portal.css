@@ -1,0 +1,26 @@
+.teacherPortal{min-height:100dvh;background:#f6f8ff;color:#0b234a;font-family:Manrope,Arial,sans-serif;padding:0 clamp(16px,4vw,54px) 70px}
+.teacherPortalHeader{width:min(1260px,100%);margin:auto;min-height:90px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #dfe6f4}
+.teacherPortalWordmark{text-decoration:none;color:inherit}.teacherPortalLogout,.teacherPortalActions>button{display:inline-flex;align-items:center;gap:9px;justify-content:center;min-height:44px;border:1px solid #d1ddf0;border-radius:12px;padding:8px 15px;background:#fff;color:#24569c;font-weight:750;cursor:pointer}
+.teacherPortalContent{width:min(1000px,100%);margin:clamp(36px,6vw,78px) auto}
+.teacherPortalEyebrow{color:#3866b1;font-size:12px;font-weight:850;letter-spacing:.11em;display:flex;align-items:center;gap:8px}
+.teacherPortal h1{font-size:clamp(32px,5vw,58px);line-height:1.13;letter-spacing:-.045em;margin:17px 0 16px}
+.teacherPortalIntro{color:#596c88;max-width:690px;font-size:clamp(15px,2vw,19px);line-height:1.65;margin:0 0 28px}
+.teacherPortalActions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:36px}
+.teacherPortalPrimary{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;border-radius:12px;padding:10px 17px;background:#2353e5;color:white!important;font-weight:800;text-decoration:none}
+.teacherPortalSectionHead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;gap:15px}
+.teacherPortalSectionHead h2{font-size:22px;font-weight:850;margin:0}.teacherPortalSectionHead span{color:#71809a;font-size:13px}
+.teacherPortalGames{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(265px,100%),1fr));gap:15px}
+.teacherPortalGame,.teacherPortalEmpty{background:#fff;border:1px solid #dce5f2;border-radius:20px;padding:24px;box-shadow:0 9px 25px #152d5710}
+.teacherPortalGameTop{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#697c95;font-size:12px}
+.teacherPortalGameStatus{border-radius:30px;background:#eaf1ff;color:#285abd;padding:6px 12px;font-weight:800}
+.teacherPortalGame h3{font-size:19px;line-height:1.4;overflow-wrap:anywhere;margin:20px 0 22px}
+.teacherPortalGameOpen{min-height:43px;display:inline-flex;align-items:center;justify-content:center;gap:10px;background:#2353e5;color:#fff;font-weight:850;border:0;border-radius:11px;padding:10px 15px;cursor:pointer}
+.teacherPortalEmpty{display:grid;justify-items:start;gap:8px;color:#60728c}
+.teacherPortalEmpty h3{font-size:22px;color:#10284e;margin:10px 0 0}
+.teacherPortalEmpty p{line-height:1.6;margin:0 0 12px;max-width:590px}
+.teacherPortalEmpty a{display:inline-flex;align-items:center;gap:8px;color:#2353e5;font-weight:850}
+.teacherPortalError{border:1px solid #eaa7ab;background:#fff3f3;border-radius:12px;padding:14px;color:#9e2634}
+.teacherPortalMessage{padding:20px;background:#fff;border-radius:15px;color:#677e99}
+.teacherPortalBack{font-weight:800;color:#2353e5}
+.teacherPortal button:disabled{opacity:.6;cursor:wait}
+@media(max-width:520px){.teacherPortalHeader{min-height:76px}.teacherPortalLogout{padding:8px 11px}.teacherPortalContent{margin:32px auto}.teacherPortalActions{display:grid;grid-template-columns:1fr}.teacherPortalActions>*{width:100%}}
