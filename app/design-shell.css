@@ -85,3 +85,18 @@
 .teacherInviteSecret{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:100%}
 .teacherInviteSecret code{font-size:12px;padding:7px 9px;border:1px solid #d7e1ee;border-radius:8px;background:#f5f8fc;overflow-wrap:anywhere;user-select:all}
 .teacherCodeRow .teacherInviteSecret button{white-space:nowrap}
+
+/* Permanent code inventory: same ГОС.ID cards, one strictly separated role
+   per row; every active secret remains readable to the authenticated owner. */
+.teacherAccessCodes .teacherCodeSeparated{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}
+.teacherAccessCodes .teacherRoleCodeCard{display:grid;grid-template-rows:auto auto 1fr;gap:12px;min-width:0;padding:14px;border:1px solid var(--gs-border,#d9e1ed);border-radius:13px;background:var(--gs-surface-soft,#f6f8ff)}
+.teacherAccessCodes .teacherRoleCodeIntro{min-width:0}
+.teacherAccessCodes .teacherRoleCodeIntro small{font-size:10px;letter-spacing:.05em;font-weight:800;color:var(--gs-muted,#63758e)}
+.teacherAccessCodes .teacherRoleCodeIntro h4{margin:5px 0;color:var(--gs-ink,#142d50);font-size:14px}
+.teacherAccessCodes .teacherRoleCodeIntro p{margin:5px 0 0;color:var(--gs-muted,#63758e);font-size:12px;line-height:1.5}
+.teacherAccessCodes .teacherRoleCodeValue{display:grid;gap:9px;min-width:0}
+.teacherAccessCodes .teacherRoleCodeValue code{padding:10px;border:1px solid var(--gs-border,#d9e1ed);border-radius:9px;background:#fff;color:#143d90;white-space:normal;overflow-wrap:anywhere;font-size:12px;user-select:all}
+.teacherAccessCodes .teacherRoleCodeValue button,.teacherAccessCodes .teacherRoleCodeRotate{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:43px;border-radius:10px;border:1px solid #b9cae5;background:#fff;color:#1b48a7;font-weight:750;cursor:pointer}
+.teacherAccessCodes .teacherRoleCodeRotate{align-self:end;margin-top:auto;background:#2453e6;color:#fff;border-color:#2453e6}
+.teacherAccessCodes .teacherRoleCodeRotate:disabled,.teacherAccessCodes .teacherRoleCodeValue button:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:1100px){.teacherAccessCodes .teacherCodeSeparated{grid-template-columns:minmax(0,1fr)}}
