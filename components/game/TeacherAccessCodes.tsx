@@ -4,7 +4,7 @@ import {useCallback,useEffect,useState} from 'react';
 import {Copy,KeyRound,RotateCw,ShieldCheck,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 
-type Scope='participant'|'group'|'guest';
+type Scope='participant'|'group'|'guest'|'teacher';
 type InventoryScope=Scope|'teacher';
 type CodeRow={id:string;scope:InventoryScope;group_name:string|null;active:boolean;created_at:string;code:string|null};
 const LETTERS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -16,13 +16,15 @@ function generateCode(prefix:string){
 const labels:Record<Scope,string>={
  participant:'Приглашение участника',
  group:'Приглашение группы',
- guest:'Приглашение гостя'
+ guest:'Приглашение гостя',
+ teacher:'Приглашение дополнительного преподавателя'
 };
-const inventoryLabels:Record<InventoryScope,string>={...labels,teacher:'Приглашение преподавателя'};
+const inventoryLabels:Record<InventoryScope,string>={...labels};
 const hints:Record<Scope,string>={
  participant:'Позволяет участнику присоединиться к игре. При входе нужно указать группу.',
  group:'Привязывает нового участника к указанной группе автоматически.',
- guest:'Предоставляет только просмотр разрешённых разделов без участия в решениях.'
+ guest:'Предоставляет только просмотр разрешённых разделов без участия в решениях.',
+ teacher:'Доступ для другого преподавателя. Не заменяет вход владельца по паролю и требует отдельной подтверждённой учётной записи.'
 };
 export default function TeacherAccessCodes({gameId}:{gameId:string}){
  const [currentGameCode,setCurrentGameCode]=useState('');
@@ -32,6 +34,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
  const [newInvite,setNewInvite]=useState('');
  const [created,setCreated]=useState('');
  const [createdKind,setCreatedKind]=useState<Scope>('participant');
+ const [rotating,setRotating]=useState('');
  const [rows,setRows]=useState<CodeRow[]>([]);
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
@@ -85,6 +88,18 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
   }catch(e){setNotice('Не удалось создать приглашение: '+((userError(e)||'Ошибка сервера')))}
   finally{setBusy(false)}
  }
+ async function rotate(kind:'student'|'teacher'|'observer'){
+  if(busy)return;
+  if(!window.confirm('Обновить '+(kind==='student'?'приглашение участников':kind==='teacher'?'код дополнительного преподавателя':'приглашение гостя')+'? Старый код перестанет работать для новых входов.'))return;
+  setBusy(true);setRotating(kind);setNotice('');
+  try{
+   const r=await supabase.rpc('owner_rotate_invitation',{p_game_id:gameId,p_kind:kind});
+   if(r.error)throw r.error;
+   await refresh();
+   setNotice('Код обновлён, сохранён и доступен в таблице ниже.');
+  }catch(e){setNotice('Не удалось обновить: '+userError(e))}
+  finally{setBusy(false);setRotating('')}
+ }
  async function revoke(row:CodeRow){
   if(busy||!row.active||!window.confirm('Отключить приглашение? Новые подключения по нему станут недоступны. Ранее присоединившиеся сохранят доступ.'))return;
   setBusy(true);setNotice('');
@@ -107,6 +122,24 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
  }
  return <section className="teacherAccessCodes" aria-label="Коды доступа к игре">
   <div className="teacherAccessHead"><KeyRound size={20} aria-hidden="true"/><div><h3>Доступ к игре</h3><p>Код игры и приглашения для участников, групп и гостей. Приглашение преподавателя также указано в списке и защищено от отключения. Личный пароль задаётся в профиле.</p></div></div>
+  <section className="teacherCodeRoleSections" aria-label="Сохранённые коды владельца">
+   <h4>Коды для подключения участников</h4>
+   <p>Код игры и приглашение участника — разные значения. Оба всегда доступны владельцу игры.</p>
+   <div className="teacherCodeActiveRoles">
+    {(['participant','teacher','guest'] as InventoryScope[]).map(kind=>{
+     const active=rows.find(x=>x.scope===kind&&x.active);
+     return <article key={kind} className="teacherCodeActiveRole">
+      <b>{inventoryLabels[kind]}</b>
+      <code>{active?.code||'Не создано'}</code>
+      <div className="teacherCodeActions">
+       {active?.code&&<button type="button" disabled={busy} onClick={()=>void copy(active.code!)}><Copy size={16}/>Копировать</button>}
+       <button type="button" disabled={busy} onClick={()=>void rotate(kind==='participant'?'student':kind==='guest'?'observer':'teacher')}><RotateCw size={16}/>{rotating===(kind==='participant'?'student':kind==='guest'?'observer':'teacher')?'Обновление…':active?'Обновить код':'Сгенерировать код'}</button>
+      </div>
+     </article>
+    })}
+   </div>
+   <p className="teacherCodeScopeInfo">Приглашение преподавателя предназначено только для дополнительного преподавателя, а не для входа владельца. Гость получает только доступ к разрешённому просмотру.</p>
+  </section>
   <div className="teacherCodeGrid">
    <div className="teacherCodeEditor">
     <h4>Код игры</h4>
@@ -130,6 +163,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
       <option value="participant">{labels.participant}</option>
       <option value="group">{labels.group}</option>
       <option value="guest">{labels.guest}</option>
+      <option value="teacher">{labels.teacher}</option>
      </select>
     </label>
     <p className="teacherAccessExplanation">{hints[scope]}</p>
@@ -140,7 +174,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
      <input autoComplete="off" value={newInvite} minLength={scope==='guest'?6:8} maxLength={80} onChange={e=>setNewInvite(e.target.value)} placeholder={scope==='guest'?'Не менее 6 символов':'Не менее 8 символов'}/>
     </label>
     <div className="teacherCodeActions">
-     <button type="button" disabled={busy} onClick={()=>setNewInvite(generateCode(scope==='group'?'GRP':scope==='guest'?'GST':'STD'))}><RotateCw size={16}/> Сгенерировать</button>
+     <button type="button" disabled={busy} onClick={()=>setNewInvite(generateCode(scope==='group'?'GRP':scope==='guest'?'GST':scope==='teacher'?'TCH':'STD'))}><RotateCw size={16}/> Сгенерировать</button>
      <button type="button" disabled={busy||newInvite.trim().length<(scope==='guest'?6:8)||scope==='group'&&!groupName.trim()} onClick={()=>void addCode()}>Создать приглашение</button>
     </div>
    </div>
@@ -151,7 +185,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
    {rows.length===0&&<p>Приглашений пока нет. Коды, созданные при запуске игры, также отображаются здесь без раскрытия секретного значения.</p>}
    {rows.map(row=><div key={row.id} className="teacherCodeRow">
     <div><b>{inventoryLabels[row.scope]}{row.scope==='group'&&row.group_name?': '+row.group_name:''}</b><small>{row.active?'Активно':'Отключено'} · {new Date(row.created_at).toLocaleDateString('ru-RU')} · Код защищён хешированием</small></div>
-    {row.code?<span className="teacherInviteSecret"><code>{row.code}</code><button type="button" onClick={()=>void copy(row.code!)}><Copy size={15}/> Копировать</button></span>:<small>Старый код нельзя восстановить из хеша</small>}{row.scope==='teacher'?<span className="teacherCodeProtected">Защищённый доступ</span>:row.active?<button type="button" disabled={busy} onClick={()=>void revoke(row)}>Отключить</button>:
+    {row.code?<span className="teacherInviteSecret"><code>{row.code}</code><button type="button" onClick={()=>void copy(row.code!)}><Copy size={15}/> Копировать</button></span>:<small>Старый код нельзя восстановить из хеша</small>}{row.active?<button type="button" disabled={busy} onClick={()=>void revoke(row)}>Отключить</button>:
      <button type="button" disabled={busy} onClick={()=>void remove(row)}><Trash2 size={15}/> Удалить</button>}
    </div>)}
   </div>
