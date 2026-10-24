@@ -59,7 +59,7 @@ assert(permanent.includes("JOIN storage.objects o ON o.bucket_id='game-assets'")
 assert(permanent.includes("pg_trigger_depth()>1"),'Profile propagation must avoid recursive writes');
 assert(saver.includes("supabase.storage.from('teacher-assets').upload")&&saver.includes("supabase.from('teacher_profiles').update"),
  'Legacy assets must be copied before profile path is switched');
-assert(saver.includes('if(status===404)continue'),'Missing legacy files do not trigger permanent deletion failure');
+assert(saver.includes('if(status===404)')&&saver.includes('.update({[field]:null'), 'Missing legacy files clear stale teacher profile paths safely');
 assert(resolver.includes("storedPath.startsWith(marker)")&&resolver.includes("bucket:'teacher-assets'"),
  'Account asset links use a private, game-independent bucket');
 assert(gameHook.includes("me.kind==='teacher'?'teacher-assets/'"),
