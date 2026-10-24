@@ -10,6 +10,8 @@ on:
       - 'components/game/StageMeetingProcedureFlow*'
       - 'supabase/migrations/20261024160000_permanent_teacher_profile.sql'
       - 'supabase/migrations/20261024161000_regional_agreement_from_published.sql'
+      - 'supabase/migrations/20261024234000_teacher_account_signature_onboarding.sql'
+      - 'scripts/teacher-signature-onboarding-check.cjs'
       - 'scripts/permanent-teacher-flow-check.cjs'
       - '.github/workflows/permanent-teacher-flow.yml'
   workflow_dispatch:
@@ -28,4 +30,5 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm run typecheck
       - run: node scripts/permanent-teacher-flow-check.cjs
+      - run: node scripts/teacher-signature-onboarding-check.cjs
       - run: node scripts/ksrf-proposal-queue-check.cjs
