@@ -93,6 +93,12 @@ const query=async(db,sql,args=[]) =>(await db.query(sql,args)).rows;
   await db.exec(creationGuard);
   const direct=await query(db,"SELECT has_function_privilege('anon','public.create_game_session(text,text,text,text,text)','EXECUTE') anon, has_function_privilege('authenticated','public.create_game_session(text,text,text,text,text)','EXECUTE') authenticated, has_function_privilege('authenticated','public.create_teacher_game_session(text,text,text,text,text)','EXECUTE') teacher");
   assert.deepEqual(direct[0],{anon:false,authenticated:false,teacher:true},'Only checked teacher wrapper is public API');
+  assert(creationGuard.includes('teacher_profiles t WHERE t.user_id=auth.uid()'),'A persistent teacher profile allows new games after archiving');
+  // The existing verified profile is sufficient, but an unrelated account is rejected.
+  await query(db,"SELECT public.create_teacher_game_session('Новая игра','NEW','TEACH','STUD','Преподаватель')");
+  await db.exec("SET request.jwt.claim.sub='00000000-0000-0000-0000-0000000000f1';");
+  await assert.rejects(()=>query(db,"SELECT public.create_teacher_game_session('Другая игра','OTHER','TEACH','STUD','Чужой')"),/только преподаватель или администратор/i);
+  await db.exec("SET request.jwt.claim.sub='"+u+"';");
   console.log('PASS permanent teacher profile, archive, protected avatar, next-game restoration, 89 subject agreement and meeting guide');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
