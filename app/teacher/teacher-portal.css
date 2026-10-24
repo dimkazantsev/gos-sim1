@@ -24,3 +24,14 @@
 .teacherPortalBack{font-weight:800;color:#2353e5}
 .teacherPortal button:disabled{opacity:.6;cursor:wait}
 @media(max-width:520px){.teacherPortalHeader{min-height:76px}.teacherPortalLogout{padding:8px 11px}.teacherPortalContent{margin:32px auto}.teacherPortalActions{display:grid;grid-template-columns:1fr}.teacherPortalActions>*{width:100%}}
+
+.teacherPermanentStages,.teacherPermanentProfile{margin-top:28px;padding:22px;background:#fff;border:1px solid #dce5f2;border-radius:18px}
+.teacherPermanentStages h2,.teacherPermanentProfile h2{font-size:19px;margin:0 0 16px;color:#10284e}
+.teacherPermanentStageGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:9px}
+.teacherPermanentStageGrid>div{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:#f6f8ff;font-size:13px}
+.teacherPermanentStageGrid>div span{color:#2555df;font-weight:850}
+.teacherPermanentProfile{display:grid;gap:12px}.teacherPermanentProfile p{color:#596c88;margin:0}
+.teacherPermanentProfile label{display:grid;gap:6px;font-size:14px;font-weight:700}
+.teacherPermanentProfile input,.teacherPermanentProfile textarea{border:1px solid #bdcbed;border-radius:10px;min-width:0;width:100%;padding:10px 12px;color:#142b51;background:#fff}
+.teacherPermanentProfile button{background:#2353e5;color:#fff;border:0;border-radius:10px;padding:12px 18px;font-weight:800;justify-self:start}
+@media(max-width:520px){.teacherPermanentStages,.teacherPermanentProfile{padding:16px}.teacherPermanentStageGrid{grid-template-columns:1fr}}
