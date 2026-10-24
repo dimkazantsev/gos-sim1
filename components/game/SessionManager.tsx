@@ -71,6 +71,8 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
    if(first.error)throw first.error;
    setProgress('Сохраняем личные файлы преподавателя отдельно от игры…');
    if(me?.user_id)await preserveOwnTeacherAssets(s.id,me.user_id);
+   const assetGuard=await supabase.rpc('assert_game_teacher_assets_safe_to_purge',{p_game:s.id,p_code:typed});
+   if(assetGuard.error)throw assetGuard.error;
    setProgress('Удаление загруженных файлов…');
    await purgeGameAssets(s.id,(done,total)=>setProgress('Удалено файлов: '+done+' из '+total));
    // Race protection: the server refuses to drop a game while even one object remains.
