@@ -3,6 +3,7 @@ import {useCallback,useEffect,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {BookOpenText,Camera,ChevronLeft,ChevronRight,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,Radio,Settings2,UserRound,Vote as VoteIcon,Wallet} from 'lucide-react';
 import {BrandIdentity} from '@/components/ui/BrandIdentity';
+import StyledSelect from '@/components/ui/StyledSelect';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import TeacherGameSessions from '@/components/game/TeacherGameSessions';
@@ -159,7 +160,7 @@ export default function TeacherPortal(){
        <div className="surfaceHead"><div><small>О СЕБЕ</small><h2>Игровая визитка</h2></div></div>
        <label className="profileFullNameField">Фамилия, имя и отчество<input autoComplete="name" maxLength={180} value={name} onChange={e=>setName(e.target.value)}/></label>
        <p className="profileHint">Эти данные и личные файлы сохраняются за учётной записью и используются во всех играх.</p>
-       <label className="teacherZeroGender">Пол для оформления аватара<select value={gender} onChange={e=>setGender(e.target.value as typeof gender)}><option value="unspecified">Не указан</option><option value="male">Мужской</option><option value="female">Женский</option></select></label>
+       <StyledSelect label="Пол для оформления аватара" value={gender} onChange={value=>setGender(value as typeof gender)} options={[{value:'unspecified',label:'Не указан'},{value:'male',label:'Мужской'},{value:'female',label:'Женский'}]}/>
        <textarea aria-label="О себе" rows={3} maxLength={350} value={bio} onChange={e=>setBio(e.target.value)}/>
        <div className="profileSaveRow"><button type="button" className="primary" disabled={saveBusy||name.trim().length<4} onClick={()=>void saveProfile()}>{saveBusy?'Сохраняем…':'Сохранить визитку'}</button><span>{bio.length}/350</span></div>
        <SignatureUpload account={{signatureUrl,saveSignature}}/>
