@@ -438,3 +438,31 @@
  }
  .mobileDockV2 .mobileDockScroll>.mobileDockChat .mobileDockIcon svg{display:block;width:16px;height:16px}
 }
+
+/* Counters must fit within the clipped horizontal scroll port: old negative
+   offsets (-7px) placed them above the 50px cells. Keep the optical baseline
+   common for regular, pinned and fixed controls on phones/tablets. */
+@media(max-width:900px){
+ .mobileDock.mobileDockV2 .mobileDockScroll{
+  box-sizing:border-box;padding-top:3px;padding-bottom:1px;
+ }
+ .mobileDockV2 .mobileDockItem,
+ .mobileDockV2 .mobileDockPinnedItem,
+ .mobileDockV2 .mobileDockFixed>button{
+  box-sizing:border-box;grid-template-rows:18px 20px;
+  align-content:center;justify-items:center;row-gap:2px;
+  height:50px;min-height:50px;max-height:50px;
+  padding:6px 2px 2px;
+ }
+ .mobileDockV2 .mobileDockIcon{position:relative;transform:translateY(2px)}
+ .mobileDockV2 .mobileDockIcon .eventDockIcon{position:relative;display:grid;place-items:center;width:20px;height:20px}
+ .mobileDockV2 .mobileDockIcon .eventDockBadge{
+  position:absolute;top:0;right:-8px;min-width:15px;height:15px;
+  padding:0 3px;line-height:14px;font-size:9px;
+ }
+ .mobileDockV2 .mobileChatUnread{
+  top:0;right:-8px;min-width:15px;height:15px;line-height:14px;
+ }
+ .mobileDockV2 .mobileDockLabel{align-items:center}
+ .mobileDockV2 .mobileDockFixed>button>svg{transform:translateY(2px)}
+}
