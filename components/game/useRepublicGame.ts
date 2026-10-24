@@ -6,6 +6,7 @@ import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
+import {resolveStoredAsset} from '@/lib/resolveStoredAsset';
 import type {Activity,Ballot,Channel,ChatPin,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,ImpactLedger,ImpactRule,Member,Message,Metric,MetricHistory,Party,PartyAgreement,PartyDocument,PartyInvitation,PartyMandateAllocation,PartySupportHistory,PoliticalPost,PoliticalPostFormalLink,PoliticalPostMedia,Presence,Stage,Vote,View} from './types';
 import {CRISES} from './constants';
 import {CHAT_MAX_FILE_BYTES,preferredRecordingMime,recordingFileName,uploadedChatKind,inferChatMime} from './recordingMedia';
@@ -81,7 +82,8 @@ export function useRepublicGame(gameId:string){
  const assetSignQueue=useRef({active:0,waiting:[] as Array<()=>void>});
  function signedAssetUrl(bucket:'game-assets'|'game-media',path:string,force=false):Promise<string|null>{
   if(!path)return Promise.resolve(null);
-  const key=bucket+':'+path,now=Date.now();
+  const storage=resolveStoredAsset(bucket,path);
+  const key=storage.bucket+':'+storage.path,now=Date.now();
   const old=assetSignatures.current.get(key);
   if(!force&&old&&old.expiresAt>now)return old.promise;
   // Links and in-flight requests are shared only inside the current authorised game session.
@@ -99,7 +101,7 @@ export function useRepublicGame(gameId:string){
      resolve(url);
     };
     if(epoch!==readEpoch.current||!alive.current){finish(null);return}
-    void supabase.storage.from(bucket).createSignedUrl(path,3600).then(({data,error})=>{
+    void supabase.storage.from(storage.bucket).createSignedUrl(storage.path,3600).then(({data,error})=>{
      const url=error?null:data?.signedUrl||null;
      if(!url&&assetSignatures.current.get(key)?.promise===promise)assetSignatures.current.delete(key);
      finish(url);
@@ -1367,8 +1369,9 @@ export function useRepublicGame(gameId:string){
   const oldPath=prior?.avatar_path||null;
   let avatarPath=oldPath;
   if(file){
-    const path=gameId+'/profiles/'+me.user_id+'/avatar-'+crypto.randomUUID()+'.webp';
-    const up=await supabase.storage.from('game-assets').upload(path,file,{upsert:false,contentType:file.type});
+    const path=(me.kind==='teacher'?'teacher-assets/'+me.user_id:gameId+'/profiles/'+me.user_id)+'/avatar-'+crypto.randomUUID()+'.webp';
+    const location=resolveStoredAsset('game-assets',path);
+    const up=await supabase.storage.from(location.bucket).upload(location.path,file,{upsert:false,contentType:file.type});
     if(up.error){setError(up.error.message);return false}
     avatarPath=path;
   }
@@ -1376,17 +1379,18 @@ export function useRepublicGame(gameId:string){
   const r=prior?await supabase.from('game_profiles').update(changes).eq('game_id',gameId).eq('user_id',me.user_id).select('user_id,avatar_path').single():
    await supabase.from('game_profiles').insert({game_id:gameId,user_id:me.user_id,...changes}).select('user_id,avatar_path').single();
   if(r.error||!r.data){
-   if(file&&avatarPath)await supabase.storage.from('game-assets').remove([avatarPath]);
+   if(file&&avatarPath){const location=resolveStoredAsset('game-assets',avatarPath);await supabase.storage.from(location.bucket).remove([location.path]);}
    setError(r.error?.message||'Не удалось подтвердить сохранение профиля.');return false;
   }
-  if(file&&oldPath&&oldPath!==avatarPath)await supabase.storage.from('game-assets').remove([oldPath]);
+  if(file&&oldPath&&oldPath!==avatarPath&&me.kind!=='teacher')await supabase.storage.from('game-assets').remove([oldPath]);
   await loadPartyAssets();return true;
  }
 
  async function saveSignature(file:File){
   if(!me||me.kind==='observer'||file.type!=='image/png'||file.size>2*1024*1024){setError('Загрузите PNG-подпись размером до 2 МБ.');return false}
-  const path=gameId+'/profiles/'+me.user_id+'/signature-'+Date.now()+'.png';
-  const up=await supabase.storage.from('game-assets').upload(path,file,{contentType:'image/png',upsert:false});
+  const path=(me.kind==='teacher'?'teacher-assets/'+me.user_id:gameId+'/profiles/'+me.user_id)+'/signature-'+crypto.randomUUID()+'.png';
+  const location=resolveStoredAsset('game-assets',path);
+  const up=await supabase.storage.from(location.bucket).upload(location.path,file,{contentType:'image/png',upsert:false});
   if(up.error){setError(up.error.message);return false}
   const row=profiles.find(p=>p.user_id===me.user_id);
   const r=row?await supabase.from('game_profiles').update({signature_path:path,updated_at:new Date().toISOString()})

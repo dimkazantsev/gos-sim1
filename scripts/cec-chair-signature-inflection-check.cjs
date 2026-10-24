@@ -32,7 +32,7 @@ const wording=read('components/game/cecOfficialWording.ts');
 assert(form.includes('cecRegistrationDirective(candidate.display_name)'),'Final document uses accusative name');
 assert(form.includes('ПОСТАНОВЛЯЕТ:'),'Official decision uses correct resolution label');
 assert(form.includes("supabase.from('game_profiles').select('signature_path')"),'Chair signature resolved from game profile');
-assert(form.includes("supabase.storage.from('game-assets').createSignedUrl(path,3600)"),'Photo resolved through signed storage access');
+assert(form.includes("resolveStoredAsset('game-assets',path)")&&form.includes('supabase.storage.from(location.bucket).createSignedUrl(location.path,3600)'),'Photo resolved through signed storage access including the permanent teacher bucket');
 assert(form.includes('disabled={loadingSignature||!signature||!imageLoaded}'),'Printing waits for real signature');
 assert(form.includes('chairUserId'),'Signed user is explicit');
 assert(lab.includes("m.full_name?.trim()==='Казанцев Дмитрий Анатольевич'"),'Certificate selects actual CEC chair');
