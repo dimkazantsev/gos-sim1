@@ -1,0 +1,33 @@
+/* ГОС.ID · verified responsive geometry repairs.
+   These rules only address measured overlaps (320px metrics and party card actions).
+   They do not alter game state, permissions or the approved visual tokens. */
+
+/* A party tile's delete action must not physically overlap its select button. */
+.civicParties .civicPartyTile:has(> .civicPartyDelete){
+ display:grid;
+ grid-template-columns:minmax(0,1fr) 56px;
+ align-items:stretch;
+}
+.civicParties .civicPartyTile:has(> .civicPartyDelete) > .civicPartyTileSelect{
+ grid-column:1;grid-row:1;min-width:0;width:100%;
+ padding-right:4px;
+}
+.civicParties .civicPartyTile:has(> .civicPartyDelete) > .civicPartyDelete{
+ position:static;grid-column:2;grid-row:1;
+ align-self:start;justify-self:center;
+ box-sizing:border-box;width:44px;min-width:44px;height:44px;min-height:44px;
+ margin:8px 0 0;padding:0;
+}
+
+/* At the 320px breakpoint the legacy 184px metric minimum overrides the
+   available 2-column track width. Let a metric fit its actual grid cell. */
+@media(max-width:390px){
+ .statePulseDock > .statePulseGrid > .statePulseMetric{
+  box-sizing:border-box;min-width:0;max-width:100%;width:100%;
+  overflow-wrap:anywhere;
+ }
+ .statePulseDock > .statePulseGrid > .statePulseMetric .statePulseCopy b,
+ .statePulseDock > .statePulseGrid > .statePulseMetric .statePulseValue strong{
+  white-space:normal;overflow-wrap:anywhere;
+ }
+}
