@@ -88,8 +88,8 @@ const query=async(db,sql,args=[]) =>(await db.query(sql,args)).rows;
   await assert.rejects(()=>query(db,'SELECT public.prepare_regional_agreement_from_calculation($1,$2)',[rule,calc]),/уже введены/i);
   assert.equal((await query(db,'SELECT status FROM public.regional_election_rules WHERE id=$1',[rule]))[0].status,'adopted');
   // Privilege regression: legacy game creation is not a client RPC.
-  await db.exec("CREATE FUNCTION public.create_game_session(text,text,text,text,text) RETURNS uuid LANGUAGE sql AS $SELECT null::uuid$;");
-  await db.exec("CREATE FUNCTION public.create_teacher_game_session(text,text,text,text,text) RETURNS uuid LANGUAGE sql SECURITY DEFINER AS $SELECT public.create_game_session($1,$2,$3,$4,$5)$;");
+  await db.exec("CREATE FUNCTION public.create_game_session(text,text,text,text,text) RETURNS uuid LANGUAGE sql AS 'SELECT null::uuid';");
+  await db.exec("CREATE FUNCTION public.create_teacher_game_session(text,text,text,text,text) RETURNS uuid LANGUAGE sql SECURITY DEFINER AS 'SELECT public.create_game_session($1,$2,$3,$4,$5)';");
   await db.exec(creationGuard);
   const direct=await query(db,"SELECT has_function_privilege('anon','public.create_game_session(text,text,text,text,text)','EXECUTE') anon, has_function_privilege('authenticated','public.create_game_session(text,text,text,text,text)','EXECUTE') authenticated, has_function_privilege('authenticated','public.create_teacher_game_session(text,text,text,text,text)','EXECUTE') teacher");
   assert.deepEqual(direct[0],{anon:false,authenticated:false,teacher:true},'Only checked teacher wrapper is public API');
