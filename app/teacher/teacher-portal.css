@@ -42,3 +42,46 @@
 .teacherEmptyQuickStats strong{font-size:26px;color:var(--gs-accent,#2453e6);font-variant-numeric:tabular-nums}.teacherEmptyQuickStats span{color:var(--gs-muted,#657992);font-size:12px}
 @media(max-width:960px){.teacherEmptyShell{grid-template-columns:minmax(0,1fr)}.teacherEmptySidebar{display:none}.teacherEmptyMobileBrand{display:block;margin-right:auto}.teacherEmptyTopText{display:none}.teacherEmptyMobileMenu{display:grid;place-items:center;order:1;width:43px;height:43px;border:1px solid var(--gs-border,#dce5f2);border-radius:10px;background:#fff}.teacherEmptyState{margin-left:auto}.teacherEmptyMobileNavigation{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:14px;border-bottom:1px solid var(--gs-border,#dce5f2);background:white}.teacherEmptyMobileNavigation button{display:flex;align-items:center;gap:8px;padding:11px;border:1px solid var(--gs-border,#dce5f2);border-radius:9px;background:var(--gs-surface-soft,#f6f8ff);font-size:12px;text-align:left}}
 @media(max-width:500px){.teacherEmptyTop{padding:0 12px;height:65px}.teacherEmptyState{font-size:0;padding:8px}.teacherEmptyState svg{width:19px;height:19px}.teacherEmptyQuickStats{grid-template-columns:repeat(2,minmax(0,1fr))}.teacherEmptyMain{padding:16px}.teacherEmptyMobileNavigation{grid-template-columns:1fr 1fr}.teacherEmptyMobileNavigation button{min-height:43px}}
+
+/* The zero-game reuses the real game's simShell, sidebar, header and profile.
+   These styles only cover empty-state content and compact-screen navigation. */
+.teacherZeroShell .teacherZeroStage{min-height:114px}
+.teacherZeroShell .teacherZeroStage .paused{white-space:nowrap}
+.teacherZeroShell .teacherZeroProfileGrid{display:grid;grid-template-columns:minmax(0,1fr);max-width:960px}
+.teacherZeroShell .teacherZeroProfileGrid .profileEditor{width:100%;min-width:0}
+.teacherZeroShell .profileHero,.teacherZeroShell .profileEditor{box-sizing:border-box}
+.teacherZeroShell .profileSignature{max-width:100%}
+.teacherZeroShell .profileSignaturePreview img{max-width:100%;object-fit:contain}
+.teacherZeroShell .teacherZeroGender{display:grid;gap:8px;margin:12px 0;font-size:13px;font-weight:750}
+.teacherZeroShell .teacherZeroGender select{min-width:0;max-width:100%;width:100%;border:1px solid var(--gs-border,#dce5f2);border-radius:10px;background:#fff;color:inherit;padding:12px}
+.teacherZeroShell .profileEditor>textarea{max-width:100%;width:100%;box-sizing:border-box}
+.teacherZeroPanel{padding:clamp(18px,3vw,30px);min-width:0}
+.teacherZeroPanel>small{font-size:11px;font-weight:800;letter-spacing:.07em;color:var(--gs-muted,#657992)}
+.teacherZeroPanel>h1{font-size:clamp(22px,3vw,30px);margin:10px 0;color:var(--gs-ink,#10284e)}
+.teacherZeroPanel>p{max-width:75ch;margin:8px 0 22px;color:var(--gs-muted,#657992);line-height:1.65}
+.teacherZeroPanel>.teacherEmptyQuickStats{margin-top:24px}
+.teacherZeroPanel .teacherEmptyStageGrid{margin-top:18px}
+.teacherZeroError,.teacherZeroNotice{padding:12px 16px;border-radius:12px;margin:0 0 16px;font-size:13px;line-height:1.5;border:1px solid var(--gs-border,#dce5f2)}
+.teacherZeroError{color:#b3334c;background:#fff6f8;border-color:#edc4cf}
+.teacherZeroNotice{color:#24557c;background:var(--gs-surface-soft,#f6f8ff)}
+.teacherZeroMobileMenu,.teacherZeroMobileNavigation{display:none}
+@media(max-width:1100px){
+ .teacherZeroShell .profileHero{gap:18px}
+ .teacherZeroShell .profileIntro h1{overflow-wrap:anywhere}
+}
+@media(max-width:960px){
+ .teacherZeroMobileMenu{display:grid;place-items:center;width:42px;height:42px;flex:none;border:1px solid var(--gs-border,#dce5f2);background:#fff;border-radius:10px;color:var(--gs-ink,#10284e)}
+ .teacherZeroMobileNavigation{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px 16px;border-bottom:1px solid var(--gs-border,#dce5f2);background:#fff}
+ .teacherZeroMobileNavigation button{min-height:42px;display:flex;align-items:center;gap:8px;text-align:left;padding:9px 12px;border:1px solid var(--gs-border,#dce5f2);border-radius:10px;background:var(--gs-surface-soft,#f6f8ff);color:var(--gs-ink,#10284e);font-weight:700;font-size:12px}
+ .teacherZeroMobileNavigation button[aria-current=page]{border-color:var(--gs-accent,#2453e6);color:var(--gs-accent,#2453e6)}
+ .teacherZeroShell .simTopCenter{min-width:0}
+}
+@media(max-width:600px){
+ .teacherZeroMobileNavigation{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:10px}
+ .teacherZeroMobileNavigation button{font-size:11px;min-width:0;padding:8px}
+ .teacherZeroMobileNavigation button svg{flex-shrink:0}
+ .teacherZeroShell .profileHero{min-width:0}
+ .teacherZeroShell .profileIntro{min-width:0}
+ .teacherZeroShell .profileHeroControls button{max-width:100%}
+ .teacherZeroShell .profileSignatureActions{flex-wrap:wrap}
+}
