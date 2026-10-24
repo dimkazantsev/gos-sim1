@@ -50,7 +50,7 @@ function harness({effects=false}={}){
      if(withBallots&&table==='game_documents')data=[{id:'document-'+snapshot.revision,game_id:id,created_by:snapshot.user}];
      if(table==='game_parties')data=[{id:'party-'+snapshot.revision,game_id:id,name:'party-'+snapshot.revision,...(assetPaths?{logo_path:id+'/parties/logo.png'}:{})}];
       if(table==='party_documents'&&assetPaths)data=Array.from({length:12},(_,i)=>({id:'doc-'+i,game_id:id,party_id:'party-1',doc_kind:'program',storage_path:id+'/docs/doc-'+i+'.pdf',created_at:'2026-10-16T00:00:00Z'}));
-      if(table==='game_profiles'&&assetPaths)data=[{game_id:id,user_id:snapshot.user,avatar_path:id+'/profiles/avatar.png',signature_path:id+'/profiles/signature.png'}];
+      if(table==='game_profiles'&&assetPaths)data=[{game_id:id,user_id:snapshot.user,avatar_path:'teacher-assets/'+snapshot.user+'/avatar-fixture.webp',signature_path:'teacher-assets/'+snapshot.user+'/signature-fixture.png'}];
      if(table==='political_posts')data=[{id:'post-'+snapshot.revision,game_id:id,title:'post-'+snapshot.revision}];
      if(table==='chat_channels')data=[{id:'channel-a',game_id:id,name:'Общий чат',kind:'public'}];
      if(table==='chat_messages')data=[{id:'message-'+snapshot.revision,game_id:id,channel_id:this.eqs.channel_id||'channel-a',text:'message-'+snapshot.revision,created_at:'2026-10-08T10:00:00Z'}];
@@ -85,6 +85,13 @@ function harness({effects=false}={}){
   if(name==='next/navigation')return{useRouter:()=>({replace:target=>redirects.push(target)})};
   if(name==='@/lib/supabase')return{supabase};
   if(name==='@/lib/userError')return{userError:error=>String(error?.message||error)};
+  if(name==='@/lib/resolveStoredAsset'){
+   const raw=fs.readFileSync(path.join(root,'lib/resolveStoredAsset.ts'),'utf8');
+   const compiled=ts.transpileModule(raw,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+   const child={exports:{}};
+   vm.runInNewContext('(function(require,module,exports){'+compiled+'\n})')(requireFor,child,child.exports);
+   return child.exports;
+  }
   if(name==='./useGameTableSync')return{notifyGameDataRefresh:()=>{},notifySectionUpdates:()=>{},setGameRealtimeConnection:()=>{}};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
