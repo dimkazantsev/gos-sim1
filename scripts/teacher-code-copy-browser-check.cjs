@@ -43,6 +43,22 @@ async function main(){
    assert.equal(await last(),'Название игры: Тестовая сохранённая игра\n\nКод игры: GOS-SAVED-TEST\n\nПриглашение участника: STD-SAVED-TEST','Saved-game copy contains exactly the current owner-visible participant access data');
    assert(!(await last()).includes('TCH-')&&!(await last()).includes('GST-'),'Never copy teacher or guest access');
    assert.equal(requests.length,count,'Bulk copy does not fetch or mutate anything');
+   const inviteRows=page.locator('.teacherCodeRow');
+   assert.equal(await inviteRows.count(),3,'Owner invitation inventory has three fixture rows');
+   for(const [scope,expected] of [['guest','GST-DO-NOT-COPY'],['teacher','TCH-DO-NOT-COPY'],['participant','STD-SAVED-TEST']]){
+    const row=inviteRows.filter({has:page.locator('code', {hasText:expected})});
+    const action=row.locator('.teacherCodeRowActions');
+    const icon=action.getByRole('button',{name:'Копировать код: '+({guest:'Приглашение гостя',teacher:'Приглашение дополнительного преподавателя',participant:'Приглашение участника'}[scope]),exact:true});
+    assert.equal(await icon.count(),1,'One accessible row copy icon for '+scope);
+    assert.equal((await icon.innerText()).trim(),'','Copy is icon-only in inventory '+scope);
+    assert.equal(await row.getByRole('button',{name:'Копировать',exact:true}).count(),0,'No full-size copy button remains in inventory');
+    const revoke=action.getByRole('button',{name:'Отключить',exact:true});
+    const iconBox=await icon.boundingBox(),revokeBox=await revoke.boundingBox();
+    assert(iconBox&&revokeBox&&Math.abs(iconBox.y-revokeBox.y)<2&&revokeBox.x-iconBox.x-iconBox.width>=0&&revokeBox.x-iconBox.x-iconBox.width<=12,'Copy icon stays adjacent and aligned with revoke at '+width);
+    assert(iconBox.width>=44&&iconBox.height>=44,'Icon copy target is at least 44px square');
+    await icon.click();assert.equal(await last(),expected,'Row copy uses the matching invitation only');
+   }
+   assert.equal(requests.length,count,'Copying invitation rows must not call Supabase');
    await savedBulk.focus();await page.keyboard.press('Enter');
    assert.equal(await last(),'Название игры: Тестовая сохранённая игра\n\nКод игры: GOS-SAVED-TEST\n\nПриглашение участника: STD-SAVED-TEST');
    const generators=[form.getByRole('button',{name:'Сгенерировать код игры',exact:true}),...await form.getByRole('button',{name:'Сгенерировать код',exact:true}).all()];
