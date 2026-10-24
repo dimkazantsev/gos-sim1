@@ -655,7 +655,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    <div className="sidebarFooter">
     <div className={'sidebarUser'+(teacher&&!previewMode?' sidebarUserTeacher':'')}>
      <div className="simAvatar">{initials(shownMe.full_name)}</div>
-     <div className="simUserText"><b>{shownMe.full_name}</b><span>{previewMode?'Просмотр · '+(shownMe.role_title||'Участник'):shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
+     <div className="simUserText"><b title={shownMe.full_name}>{shownMe.full_name}</b><span>{previewMode?'Просмотр · '+(shownMe.role_title||'Участник'):shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
      {teacher&&!previewMode&&<button type="button" aria-label="Управление играми в профиле" title="Мои игры · Профиль" className="sidebarIconButton" onClick={openTeacherGameChooser}><Landmark aria-hidden="true"/></button>}
      {previewMode?<button aria-label="Вернуться к преподавателю" className="sidebarIconButton" onClick={()=>setViewAs('')}><ChevronLeft/></button>:<button aria-label="Выйти" className="sidebarIconButton" onClick={logout}><LogOut/></button>}
     </div>
