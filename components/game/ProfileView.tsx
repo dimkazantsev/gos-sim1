@@ -17,6 +17,8 @@ import {cropPortrait,decodePortrait,preparePortraitDetector} from './avatarCrop'
 import ProfileAvatar from './ProfileAvatar';
 import ProfileDocumentLinks from './ProfileDocumentLinks';
 import ProfileOffices from './ProfileOffices';
+import {useGameOfficeCatalog} from './useGameOfficeCatalog';
+import {gameOfficeRoleList} from './gameOfficeCatalog';
 import TelegramConnection from './TelegramConnection';
 import AssignedTasks from './AssignedTasks';
 import {ListTodo} from 'lucide-react';
@@ -38,6 +40,9 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  const partyChairTitle=chairedParty?'Председатель партии «'+chairedParty.name+'»':'';
  const allocation=party?partyMandates.find(x=>x.party_id===party.id&&x.user_id===target?.user_id):undefined;
  const pendingInvites=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
+ const canEditOffices=!readOnly&&(teacher||/президент|председатель.*правительств|глава/i.test(me?.role_title||''));
+ const officeCatalog=useGameOfficeCatalog(game?.id,canEditOffices);
+ const officeRoleNames=gameOfficeRoleList(officeCatalog.groups);
  const [tasksOpen,setTasksOpen]=useState(false);
  const [blitzOpen,setBlitzOpen]=useState(false);
  useEffect(()=>{if(typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('tasks')==='1')setTasksOpen(true)},[game?.id]);
@@ -46,8 +51,6 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  const [gender,setGender]=useState<'male'|'female'|'unspecified'>(targetProfile?.gender||'unspecified');
  const [photoBusy,setPhotoBusy]=useState(false);
  const [photoPreview,setPhotoPreview]=useState('');
- const [customRole,setCustomRole]=useState('');
- const [roleSaving,setRoleSaving]=useState(false);
  const previewRef=useRef('');
  const mounted=useRef(true);
  useEffect(()=>{mounted.current=true;void preparePortraitDetector().catch(()=>{});return()=>{mounted.current=false;if(previewRef.current)URL.revokeObjectURL(previewRef.current)}},[]);
@@ -180,21 +183,15 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
    </div>
   </section>
 
-  <ProfileOffices g={g} userId={target.user_id} readOnly={readOnly}/>
+  <ProfileOffices g={g} userId={target.user_id} readOnly={readOnly} roleGroups={officeCatalog.groups} catalogReady={officeCatalog.ready} catalogError={officeCatalog.error}/>
   {own&&teacher&&<section className="profileRoleSwitcher">
    <div><small>Права администратора сохраняются</small><h2>Игровая должность преподавателя</h2><p>По умолчанию вы нейтральный преподаватель. При желании можете занять любую игровую должность. Это не меняет полномочия преподавателя.</p></div>
    <StyledSelect label="Действовать в игре как" value={me.role_title||'Преподаватель'}
-    onChange={v=>void g.updateMember(me.user_id,{role_title:v})}
-    options={[...new Set(['Преподаватель','Президент Российской Федерации','Председатель Правительства Российской Федерации',
-     'Депутат Государственной Думы','Председатель Государственной Думы','Министр финансов','Министр экономики',
-     'Министр здравоохранения','Министр образования','Министр культуры','Председатель Банка России',
-     'Глава муниципального образования','Глава городской администрации','Сенатор Совета Федерации',
-     'Руководитель регионального органа власти','Редактор средств массовой информации',
-     ...members.map(m=>m.role_title||'')].filter(Boolean))].map(v=>({value:v,label:v}))}/>
-   <form className="profileCustomRole" onSubmit={async e=>{e.preventDefault();if(roleSaving||!customRole.trim())return;setRoleSaving(true);const ok=await g.updateMember(me.user_id,{role_title:customRole.trim()});if(ok)setCustomRole('');setRoleSaving(false)}}>
-    <label>Другая игровая должность<input value={customRole} onChange={e=>setCustomRole(e.target.value)} maxLength={180} placeholder="Укажите любую должность из правил игры"/></label>
-    <button type="submit" disabled={roleSaving||!customRole.trim()}>Принять должность</button>
-   </form>
+    disabled={!officeCatalog.ready}
+    onChange={v=>{if(v==='Преподаватель'||officeRoleNames.includes(v))void g.updateMember(me.user_id,{role_title:v})}}
+    options={[...[...new Set(['Преподаватель',...officeRoleNames])].map(v=>({value:v,label:v})),...(me.role_title&&!officeRoleNames.includes(me.role_title)&&me.role_title!=='Преподаватель'?[{value:me.role_title,label:'Ранее назначенная должность: '+me.role_title,disabled:true}]:[])]}/>
+   {officeCatalog.error&&<p role="alert">{officeCatalog.error}</p>}
+   <p className="profileHint">Доступные роли соответствуют пяти министерствам, пяти комитетам и другим должностям ГОС.ID. Принятое назначение в игровых процедурах сохраняется отдельно от выбора роли преподавателя.</p>
   </section>}
   <div className="profilePublicStrip">
    <div><UsersRound size={19}/><div><b>Профили участников</b><span>Должности, фракции, публичные оценки и участие в игре.</span></div></div>
