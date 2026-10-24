@@ -4,10 +4,16 @@ import {Archive,ArrowRight,Plus,RefreshCcw} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import './teacher-game-sessions.css';
+import TeacherAccessCodes from './TeacherAccessCodes';
 
 type Game={id:string;title:string;status:string;created_at:string};
 type Index={games:Game[];is_admin:boolean};
 const LAST='gos-id:teacher-last-game';
+const CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function generated(prefix:string){
+ const bytes=new Uint8Array(16);crypto.getRandomValues(bytes);
+ return prefix+'-'+Array.from(bytes,n=>CHARS[n%CHARS.length]).join('');
+}
 function openGame(id:string){
  try{window.localStorage.setItem(LAST,id)}catch{}
  if(window.location.hostname.endsWith('.github.io'))window.location.assign('/gos-sim1/?game='+encodeURIComponent(id));
@@ -19,6 +25,7 @@ export default function TeacherGameSessions({displayName='Преподавате
  const [index,setIndex]=useState<Index|null>(null);
  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const [formOpen,setFormOpen]=useState(false);
+ const [codesFor,setCodesFor]=useState('');
  const [title,setTitle]=useState('Новая республика');
  const [gameCode,setGameCode]=useState(''),[teacherCode,setTeacherCode]=useState(''),[studentCode,setStudentCode]=useState('');
  const refresh=useCallback(async()=>{
@@ -44,7 +51,9 @@ export default function TeacherGameSessions({displayName='Преподавате
     p_teacher_name:displayName.trim()||'Преподаватель'
    });
    if(r.error)throw r.error;
-   openGame(String(r.data));
+   setCodesFor(String(r.data));setFormOpen(false);
+   setGameCode('');setTeacherCode('');setStudentCode('');
+   await refresh();setNotice('Игра создана. Все коды доступны ниже в любое время.');setBusy(false);
   }catch(e){setError(userError(e)||'Не удалось создать игру.');setBusy(false)}
  }
  async function enter(id:string){
@@ -79,10 +88,10 @@ export default function TeacherGameSessions({displayName='Преподавате
   {formOpen&&<form className="gosTeacherCreateForm" onSubmit={e=>void create(e)}>
    <h3>Новая игровая сессия</h3>
    <label>Название игры<input required maxLength={150} value={title} onChange={e=>setTitle(e.target.value)}/></label>
-   <label>Код игры<input required autoComplete="off" maxLength={30} value={gameCode} onChange={e=>setGameCode(e.target.value.toUpperCase())} placeholder="Например, ПАУ2026"/></label>
+   <label>Код игры<input required autoComplete="off" maxLength={30} value={gameCode} onChange={e=>setGameCode(e.target.value.toUpperCase())} placeholder="GOS-2026"/><button type="button" className="secondary" onClick={()=>setGameCode(generated('GOS'))}>Сгенерировать код игры</button></label>
    <div className="gosTeacherCreateCodes">
-    <label>Код преподавателя<input type="password" required minLength={4} maxLength={80} autoComplete="new-password" value={teacherCode} onChange={e=>setTeacherCode(e.target.value)}/></label>
-    <label>Код участников<input type="password" required minLength={4} maxLength={80} autoComplete="new-password" value={studentCode} onChange={e=>setStudentCode(e.target.value)}/></label>
+    <label>Приглашение дополнительного преподавателя<input type="text" required minLength={4} maxLength={80} autoComplete="off" value={teacherCode} onChange={e=>setTeacherCode(e.target.value)}/><button type="button" className="secondary" onClick={()=>setTeacherCode(generated('TCH'))}>Сгенерировать отдельно</button><small>Это не пароль владельца. Дополнительному преподавателю потребуется подтверждённая учётная запись.</small></label>
+    <label>Приглашение участника<input type="text" required minLength={4} maxLength={80} autoComplete="off" value={studentCode} onChange={e=>setStudentCode(e.target.value)}/><button type="button" className="secondary" onClick={()=>setStudentCode(generated('STD'))}>Сгенерировать отдельно</button></label>
    </div>
    <button type="submit" className="primary" disabled={busy}>{busy?'Создание…':'Создать и открыть игру'}</button>
   </form>}
@@ -95,6 +104,8 @@ export default function TeacherGameSessions({displayName='Преподавате
      <button type="button" className="secondary" disabled={busy} onClick={()=>void enter(game.id)}>Открыть <ArrowRight size={16}/></button>
      {game.status!=='archived'&&<button type="button" className="secondary" disabled={busy} onClick={()=>void archive(game)}><Archive size={16}/>В архив</button>}
     </div>
+    <button type="button" className="secondary gosTeacherAccessToggle" aria-expanded={codesFor===game.id} onClick={()=>setCodesFor(v=>v===game.id?'':game.id)}>{codesFor===game.id?'Свернуть коды':'Все коды и приглашения'}</button>
+    {codesFor===game.id&&<TeacherAccessCodes gameId={game.id}/>}
    </article>)}
   </div>}
  </section>;
