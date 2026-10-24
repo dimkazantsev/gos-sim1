@@ -20,6 +20,7 @@ on:
       - 'supabase/migrations/20261025114000_owner_only_code_management.sql'
       - 'supabase/migrations/20261025115000_protect_owner_name_and_teacher_profiles.sql'
       - 'scripts/strict-role-and-owner-codes-check.cjs'
+      - 'scripts/remembered-game-codes-check.cjs'
       - 'scripts/participant-test-login-check.cjs'
       - 'scripts/participant-mobile-signature-check.cjs'
       - 'components/game/GuidedTour.tsx'
@@ -48,6 +49,7 @@ jobs:
       - run: node scripts/participant-test-login-check.cjs
       - run: node scripts/strict-role-and-owner-codes-check.cjs
       - run: node scripts/password-login-resilience-check.cjs
+      - run: node scripts/remembered-game-codes-check.cjs
       - run: node scripts/participant-mobile-signature-check.cjs
       - run: node scripts/teacher-entry-navigation-check.cjs
       - run: node scripts/teacher-signature-onboarding-check.cjs
