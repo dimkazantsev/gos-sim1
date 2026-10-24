@@ -157,7 +157,7 @@ begin
   );
   return jsonb_build_object('is_admin',v_admin,'games',v_games);
 end;
-$function$
+$function$;
 
 REVOKE ALL ON FUNCTION public.list_my_teacher_games() FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.list_my_teacher_games() TO authenticated;
