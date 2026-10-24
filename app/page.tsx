@@ -117,7 +117,8 @@ export default function Home(){
      .eq('user_id',session.user.id).maybeSingle();
     if(check.error)throw check.error;
     switchIdentity=!!check.data
-      ||!!session.user.is_anonymous&&session.user.user_metadata?.full_name!==name;
+      ||!!session.user.is_anonymous&&(session.user.user_metadata?.full_name!==name
+        ||window.sessionStorage.getItem('gos-id:last-entry-role')!==null&&window.sessionStorage.getItem('gos-id:last-entry-role')!==mode);
    }
    if(switchIdentity){
     const result=await supabase.auth.signOut({scope:'local'});
@@ -130,7 +131,7 @@ export default function Home(){
    if(mode==='teacher'&&createMode){
     const r=await supabase.rpc('create_teacher_game_session',{p_title:gameTitle.trim(),p_game_code:code,p_teacher_code:access,p_student_code:students,p_teacher_name:name});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data+incomingSectionSuffix());
    }else{
-    const r=await supabase.rpc('join_game_as_role',{p_game_code:code,p_invite_code:access,p_full_name:name,p_group_name:mode==='student'?group.trim():null,p_expected_kind:mode==='guest'?'observer':mode});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data+incomingSectionSuffix());
+    const r=await supabase.rpc('join_game_as_role',{p_game_code:code,p_invite_code:access,p_full_name:name,p_group_name:mode==='student'?group.trim():null,p_expected_kind:mode==='guest'?'observer':mode});if(r.error)throw r.error;saveSuccessfulGameCode(code);window.sessionStorage.setItem('gos-id:last-entry-role',mode);router.push('/game/'+r.data+incomingSectionSuffix());
    }
   }catch(e){setError(readableError(e))}finally{setBusy(false)}
  }
