@@ -29,6 +29,7 @@ const hints:Record<Scope,string>={
 export default function TeacherAccessCodes({gameId}:{gameId:string}){
  const [currentGameCode,setCurrentGameCode]=useState('');
  const [newGameCode,setNewGameCode]=useState('');
+ const [editingGameCode,setEditingGameCode]=useState(false);
  const [scope,setScope]=useState<Scope>('participant');
  const [groupName,setGroupName]=useState('');
  const [newInvite,setNewInvite]=useState('');
@@ -45,7 +46,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
  },[gameId]);
  useEffect(()=>{
   let alive=true;
-  setCurrentGameCode('');setNewGameCode('');setCreated('');setRows([]);setNotice('');
+  setCurrentGameCode('');setNewGameCode('');setEditingGameCode(false);setCreated('');setRows([]);setNotice('');
   async function load(){
    const [r,c]=await Promise.all([
     supabase.rpc('teacher_saved_invitation_list',{p_game_id:gameId}),
@@ -70,7 +71,7 @@ async function copy(value:string){
   try{
    const r=await supabase.rpc('teacher_update_game_code',{p_game_id:gameId,p_new_code:code});
    if(r.error)throw r.error;
-   setCurrentGameCode(String(r.data));setNewGameCode('');
+   setCurrentGameCode(String(r.data));setNewGameCode('');setEditingGameCode(false);
    setNotice('Код игры изменён. Сообщите его участникам.');
   }catch(e){setNotice('Код игры не изменён: '+((userError(e)||'Ошибка сервера')))}
   finally{setBusy(false)}
@@ -121,6 +122,27 @@ async function copy(value:string){
   finally{setBusy(false)}
  }
 
+
+   function gameCodeCard(){
+    return <article className="teacherCodeActiveRole teacherCodeGame">
+     <b>Код игры</b>
+     <code>{currentGameCode||'Загрузка…'}</code>
+     <div className="teacherCodeActions">
+      <button type="button" disabled={busy||!currentGameCode} onClick={()=>void copy(currentGameCode)}><Copy size={16}/>Копировать</button>
+      <button type="button" disabled={busy} aria-expanded={editingGameCode} onClick={()=>setEditingGameCode(value=>!value)}>{editingGameCode?'Отмена':'Изменить код'}</button>
+     </div>
+     {editingGameCode&&<div className="teacherCodeInlineEditor">
+      <label>Новый код игры
+       <input autoComplete="off" maxLength={32} value={newGameCode} onChange={e=>setNewGameCode(e.target.value.toUpperCase())} placeholder="Например, GOS-2026"/>
+      </label>
+      <div className="teacherCodeActions">
+       <button type="button" disabled={busy} onClick={()=>setNewGameCode(generateCode('GOS'))}><RotateCw size={16}/>Сгенерировать</button>
+       <button type="button" disabled={busy||!newGameCode.trim()} aria-label="Копировать новый код игры" onClick={()=>void copy(newGameCode.trim().toUpperCase())}><Copy size={16}/>Копировать</button>
+       <button type="button" disabled={busy||!/^[A-Z0-9-]{4,32}$/.test(newGameCode)} onClick={()=>void saveGameCode()}>Сохранить</button>
+      </div>
+     </div>}
+    </article>;
+   }
    function codeCard(kind:InventoryScope){
 
      const active=rows.find(x=>x.scope===kind&&x.active);
@@ -137,8 +159,9 @@ async function copy(value:string){
   <div className="teacherAccessHead"><KeyRound size={20} aria-hidden="true"/><div><h3>Доступ к игре</h3><p>Код игры и приглашения для участников, групп и гостей. Коды доступны только владельцу игры, их можно обновить отдельно. Личный пароль задаётся в профиле.</p></div></div>
   <section className="teacherCodeRoleSections" aria-label="Сохранённые коды владельца">
    <h4>Коды для подключения участников</h4>
-   <p>Код игры и приглашение участника — разные значения. Оба всегда доступны владельцу игры.</p>
+   <p>Для первого входа участник использует код игры и своё приглашение. При повторном входе используется личный пароль.</p>
    <div className="teacherCodeActiveRoles">
+    {gameCodeCard()}
     {(['participant'] as InventoryScope[]).map(codeCard)}
    </div>
    <h4>Дополнительный преподаватель и гость</h4>
@@ -148,48 +171,34 @@ async function copy(value:string){
 
    </div>
    <p className="teacherCodeScopeInfo">Приглашение преподавателя предназначено только для дополнительного преподавателя, а не для входа владельца. Гость получает только доступ к разрешённому просмотру.</p>
+
+   <details className="teacherCodeAdditional">
+    <summary>Создать дополнительное приглашение</summary>
+    <div className="teacherCodeAdditionalFields">
+     <label>Кому предназначено
+      <select value={scope} onChange={e=>{setScope(e.target.value as Scope);setNewInvite('');setCreated('')}}>
+       <option value="participant">{labels.participant}</option>
+       <option value="group">{labels.group}</option>
+       <option value="guest">{labels.guest}</option>
+       <option value="teacher">{labels.teacher}</option>
+      </select>
+     </label>
+     <p className="teacherAccessExplanation">{hints[scope]} Дополнительное приглашение появится в реестре ниже и не заменит основной код в карточке.</p>
+     {scope==='group'&&<label>Название группы
+      <input autoComplete="off" maxLength={80} value={groupName} onChange={e=>setGroupName(e.target.value)} placeholder="Например, 8.414"/>
+     </label>}
+     <label>Код приглашения
+      <input autoComplete="off" value={newInvite} minLength={scope==='guest'?6:8} maxLength={80} onChange={e=>setNewInvite(e.target.value)} placeholder={scope==='guest'?'Не менее 6 символов':'Не менее 8 символов'}/>
+     </label>
+     <div className="teacherCodeActions">
+      <button type="button" disabled={busy} onClick={()=>setNewInvite(generateCode(scope==='group'?'GRP':scope==='guest'?'GST':scope==='teacher'?'TCH':'STD'))}><RotateCw size={16}/>Сгенерировать</button>
+      <button type="button" disabled={busy||!newInvite.trim()} aria-label="Копировать новое приглашение" onClick={()=>void copy(newInvite.trim())}><Copy size={16}/>Копировать</button>
+      <button type="button" disabled={busy||newInvite.trim().length<(scope==='guest'?6:8)||scope==='group'&&!groupName.trim()} onClick={()=>void addCode()}>Создать приглашение</button>
+     </div>
+    </div>
+   </details>
+
   </section>
-  <div className="teacherCodeGrid">
-   <div className="teacherCodeEditor">
-    <h4>Код игры</h4>
-    <p className="teacherAccessExplanation">Определяет конкретную игру. Для первого входа вместе с ним требуется приглашение; для повторного входа — личный пароль.</p>
-    <label>Действующий код игры
-     <span className="teacherCodeValue">{currentGameCode||'Загрузка…'}</span>
-    </label>
-    <button type="button" disabled={busy||!currentGameCode} onClick={()=>void copy(currentGameCode)}><Copy size={16}/> Копировать</button>
-    <label>Новый код игры
-     <input autoComplete="off" maxLength={32} value={newGameCode} onChange={e=>setNewGameCode(e.target.value.toUpperCase())} placeholder="Например, GOS-2026"/>
-    </label>
-    <div className="teacherCodeActions">
-     <button type="button" disabled={busy} onClick={()=>setNewGameCode(generateCode('GOS'))}><RotateCw size={16}/> Сгенерировать</button>
-     <button type="button" disabled={busy||!newGameCode.trim()} aria-label="Копировать новый код игры" onClick={()=>void copy(newGameCode.trim().toUpperCase())}><Copy size={16} aria-hidden="true"/>Копировать</button>
-     <button type="button" disabled={busy||!/^[A-Z0-9-]{4,32}$/.test(newGameCode)} onClick={()=>void saveGameCode()}>Сохранить</button>
-    </div>
-   </div>
-   <div className="teacherCodeEditor">
-    <h4>Новое приглашение</h4>
-    <label>Кому предназначено
-     <select value={scope} onChange={e=>{setScope(e.target.value as Scope);setNewInvite('');setCreated('')}}>
-      <option value="participant">{labels.participant}</option>
-      <option value="group">{labels.group}</option>
-      <option value="guest">{labels.guest}</option>
-      <option value="teacher">{labels.teacher}</option>
-     </select>
-    </label>
-    <p className="teacherAccessExplanation">{hints[scope]}</p>
-    {scope==='group'&&<label>Название группы
-     <input autoComplete="off" maxLength={80} value={groupName} onChange={e=>setGroupName(e.target.value)} placeholder="Например, 8.414"/>
-    </label>}
-    <label>Код приглашения
-     <input autoComplete="off" value={newInvite} minLength={scope==='guest'?6:8} maxLength={80} onChange={e=>setNewInvite(e.target.value)} placeholder={scope==='guest'?'Не менее 6 символов':'Не менее 8 символов'}/>
-    </label>
-    <div className="teacherCodeActions">
-     <button type="button" disabled={busy} onClick={()=>setNewInvite(generateCode(scope==='group'?'GRP':scope==='guest'?'GST':scope==='teacher'?'TCH':'STD'))}><RotateCw size={16}/> Сгенерировать</button>
-     <button type="button" disabled={busy||!newInvite.trim()} aria-label="Копировать новое приглашение" onClick={()=>void copy(newInvite.trim())}><Copy size={16} aria-hidden="true"/>Копировать</button>
-     <button type="button" disabled={busy||newInvite.trim().length<(scope==='guest'?6:8)||scope==='group'&&!groupName.trim()} onClick={()=>void addCode()}>Создать приглашение</button>
-    </div>
-   </div>
-  </div>
   {created&&<div className="teacherCodeCreated" role="status"><ShieldCheck size={18}/><div><b>Сохраните: {labels[createdKind].toLowerCase()}</b> <code>{created}</code><p>Код сохранён для преподавателя.</p></div><button type="button" onClick={()=>void copy(created)}><Copy size={16}/> Копировать</button></div>}
   <div className="teacherCodeRows">
    <div className="teacherAccessListHead"><h4>Все приглашения ({rows.length})</h4><button type="button" disabled={busy} onClick={()=>void refresh().catch(e=>setNotice(String(e)))}><RotateCw size={15}/> Обновить</button></div>
