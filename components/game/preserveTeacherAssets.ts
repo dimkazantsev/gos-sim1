@@ -17,7 +17,15 @@ export async function preserveOwnTeacherAssets(gameId:string,userId:string){
   const result=await supabase.storage.from('game-assets').download(oldPath);
   if(result.error){
    const status=Number((result.error as {statusCode?:string|number}).statusCode);
-   if(status===404)continue; // No physical file exists; DB guard independently checks this.
+   if(status===404){
+    // A stale game-scoped path must not survive inside a permanent profile.
+    // Clearing metadata never deletes a physical object.
+    const clear=await supabase.from('teacher_profiles')
+     .update({[field]:null,updated_at:new Date().toISOString()})
+     .eq('user_id',userId).eq(field,oldPath).select(field).single();
+    if(clear.error||!clear.data)throw Error('Не удалось очистить отсутствующий личный файл: '+userError(clear.error));
+    continue;
+   }
    throw Error('Не удалось сохранить '+(kind==='avatar'?'фотографию':'подпись')+': '+userError(result.error));
   }
   if(!result.data)throw Error('Файл личного профиля недоступен: '+oldPath);
