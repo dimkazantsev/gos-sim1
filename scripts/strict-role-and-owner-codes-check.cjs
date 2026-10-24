@@ -21,8 +21,8 @@ assert(names.includes("защищённой учётной записи")&&names
 assert(sessions.includes('TeacherAccessCodes gameId={game.id}')&&sessions.includes('game.is_owner&&')&&!sessions.includes('codesFor===game.id'),'Owner sees all invitation codes continuously without a collapsible gate');
 assert(sessions.includes("generated('STD')")&&sessions.includes("generated('TCH')")&&sessions.includes("generated('GOS')"),'Three distinct generator buttons');
 assert(!sessions.includes("openGame(String(r.data))"),'Creating a game stays in owner profile and displays codes');
-assert(access.includes("owner_rotate_invitation")&&access.includes('teacherRoleCodeCard')&&access.includes('entry?.code'),'Separate cards keep active codes visible and rotatable');
-assert(access.includes("p_kind:kind==='participant'?'student'")&&access.includes("kind==='teacher'")&&access.includes("kind==='guest'"),'Participant, extra teacher and guest invitation functions use distinct roles');
+assert(access.includes("owner_rotate_invitation")&&access.includes('teacherCodeActiveRole')&&access.includes('active?.code'),'Existing role-specific panels display active codes and support rotation');
+assert(access.includes("onClick={()=>void rotate(kind==='participant'?'student':kind==='guest'?'observer':'teacher')}")&&access.includes("(['teacher','guest'] as InventoryScope[])")&&access.includes("(['participant'] as InventoryScope[])") ,'Participant, extra teacher and guest cards use distinct invite scopes');
 assert(m.includes("vault.create_secret")&&m.includes("private.game_invitation_secrets"),'Initial secrets persist in Vault, not only in short-lived UI');
 assert(m.includes("private.is_game_code_owner")&&harden.includes("private.is_game_code_owner"),'Non-owner teachers cannot view or generate private codes');
 console.log('PASS strict game roles, owner-only persistent codes, safe fresh participant identity and no role-switch checkbox.');
