@@ -153,6 +153,11 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const regionalPreviewTotal=regionalPreview.reduce((a,x)=>a+x.regions,0);
  const regionalCalculatorReady=regionalCalculatorMethod==='proportional'?regionalMandateTotal>0:regionalCalculatorMethod==='agreement'?agreementRegionalTotal===89:regionalPreviewTotal===89;
  const latestRegionalSaved=regionalSavedResults[0];
+ const publishedAgreementReady=!!adoptedR&&adoptedR.method==='agreement'&&latestRegionalSaved?.method==='agreement'
+  &&parties.length>0&&parties.every(p=>Number.isInteger(Number(latestRegionalSaved.result?.[p.id]))&&Number(latestRegionalSaved.result?.[p.id])>=0)
+  &&parties.reduce((total,p)=>total+Number(latestRegionalSaved.result?.[p.id]||0),0)===89;
+ const agreementHasConflicts=publishedAgreementReady&&regionRows.some(row=>Number(row.regions||0)!==Number(latestRegionalSaved?.result?.[row.party_id]||0));
+ const compactAgreement=publishedAgreementReady&&!agreementHasConflicts;
 
  function drawRegionalLottery(){
   if(!parties.length)return;
@@ -273,6 +278,22 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   }catch(error){setError(userError(error))}
   finally{setBusy(false)}
  }
+ async function finalizePublishedAgreement(){
+  if(!teacher||busy||!adoptedR||adoptedR.method!=='agreement'||adoptedR.status!=='adopted'||!latestRegionalSaved||!publishedAgreementReady)return;
+  if(agreementHasConflicts){setError('Уже внесённые договорённости расходятся с опубликованными данными. Они сохранены; проверьте значения.');return;}
+  if(!window.confirm('Утвердить распределение 89 субъектов? После подтверждения результат будет зафиксирован в игровой системе.'))return;
+  setBusy(true);setError('');
+  try{
+   if(totalAgreement===0){
+    const draft=await supabase.rpc('prepare_regional_agreement_from_calculation',{p_rule_id:adoptedR.id,p_calculation_id:latestRegionalSaved.id});
+    if(draft.error)throw draft.error;
+   }else if(totalAgreement!==89)throw Error('Договор частично подготовлен. Обновите раздел и проверьте записи.');
+   const finalized=await supabase.rpc('execute_regional_allocation',{p_rule_id:adoptedR.id});
+   if(finalized.error)throw finalized.error;
+   await load();setQueueNotice('Итоговое распределение 89 субъектов зафиксировано.');
+  }catch(e){setError(userError(e));await load()}
+  finally{setBusy(false)}
+ }
  async function executeR(){if(!adoptedR)return;setBusy(true);const r=await supabase.rpc('execute_regional_allocation',{p_rule_id:adoptedR.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  if(stageNo===2)return <section className="electoralLab">
@@ -286,7 +307,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
 
   {latestSavedResult&&<section className="electoralPublishedResult">
    <div className="electoralPublishedHead">
-    <div><small>ОПУБЛИКОВАННЫЙ РАСЧЁТ</small><h3>{sysLabel[latestSavedResult.system_type]}</h3><p>Сохранён преподавателем · {new Date(latestSavedResult.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p></div>
+    <div><small>ОПУБЛИКОВАННОЕ РАСПРЕДЕЛЕНИЕ</small><h3>{sysLabel[latestSavedResult.system_type]}</h3><p>Обновлено · {new Date(latestSavedResult.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p></div>
     <strong>450 мест</strong>
    </div>
    <div className="electoralPublishedGrid">
@@ -332,9 +353,13 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   <div className="electoralRuleList">{activeR.length===0?<div className="emptyState">Предложений ещё нет.</div>:activeR.map(r=>{const v=voteStatus(r.vote_id);return <article key={r.id} className={r.status}><header><span>МЕТОД</span><b>{regionalLabel[r.method]}</b><em>{r.status==='allocated'?'Распределено':r.status==='adopted'?'Принято':r.status==='vote_open'?'На голосовании':r.status==='rejected'?'Отклонено':r.queued_at?'В очереди':'Проект'}</em></header>{r.rationale&&<p>{r.rationale}</p>}{r.rejection_reason&&<p className="electoralRejectionReason">{r.rejection_reason}</p>}<footer><span>{proposer(r.proposed_by)}</span>{v&&<span>{v.status==='open'?'Голосование открыто':v.result_label||'Закрыто'}</span>}{canPropose&&r.status==='draft'&&!r.queued_at&&!adoptedR&&<button disabled={busy} onClick={()=>void voteR(r.id)}>Вынести на голосование →</button>}</footer></article>})}</div>
 
   {latestRegionalSaved&&<section className="regionalPublishedResult">
-    <p className="regionalResultExplanation">{adoptedR?.status==='allocated'?'Справочный опубликованный расчёт. Решение уже зафиксировано в распределении ниже.':'Опубликованный расчёт преподавателя — это предложение распределения, а не утверждённый договор и не распределённые субъектам мандаты.'}</p>
+    {adoptedR?.status==='allocated'&&<p className="regionalResultExplanation">Итоги распределения зафиксированы.</p>}
    <div className="regionalPublishedHead"><div><small>ОПУБЛИКОВАННЫЙ РАСЧЁТ</small><h3>{regionalLabel[latestRegionalSaved.method]}</h3><p>Сохранён преподавателем · {new Date(latestRegionalSaved.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p></div><strong>89 субъектов</strong></div>
    <div className="regionalPublishedGrid">{parties.map(p=><div key={p.id}><span><i style={{background:p.color}}/><b>{p.name}</b></span><strong>{Number(latestRegionalSaved.result?.[p.id]||0)}</strong><small>субъектов</small></div>)}</div>
+   {teacher&&compactAgreement&&adoptedR?.status==='adopted'&&<div className="regionalPublishedActions">
+    <button type="button" className="primary" disabled={busy} onClick={()=>void finalizePublishedAgreement()}>{busy?'Сохранение…':'Зафиксировать итоговое распределение'}</button>
+    <small>Голосование и принятое правило КСРФ не изменяются.</small>
+   </div>}
   </section>}
 
   {teacher&&<section className="regionalCalculator">
@@ -358,7 +383,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
    </div>
   </section>}
 
-  {adoptedR&&<section className="regionalAllocation"><div className="regionalAllocationHead"><div><small>{adoptedR.method==='agreement'&&adoptedR.status==='adopted'?'ПРОЕКТ ДОГОВОРНОГО РАСПРЕДЕЛЕНИЯ':'УТВЕРЖДЁННОЕ РАСПРЕДЕЛЕНИЕ КОНТРОЛЯ'}</small><h3>{regionalLabel[adoptedR.method]}</h3></div><strong>{regionRows.reduce((a,x)=>a+Number(x.regions||0),0)} / 89</strong></div>
+  {adoptedR&&!compactAgreement&&<section className="regionalAllocation"><div className="regionalAllocationHead"><div><small>{adoptedR.method==='agreement'&&adoptedR.status==='adopted'?'ПРОЕКТ ДОГОВОРНОГО РАСПРЕДЕЛЕНИЯ':'УТВЕРЖДЁННОЕ РАСПРЕДЕЛЕНИЕ КОНТРОЛЯ'}</small><h3>{regionalLabel[adoptedR.method]}</h3></div><strong>{regionRows.reduce((a,x)=>a+Number(x.regions||0),0)} / 89</strong></div>
     {adoptedR.method==='agreement'&&adoptedR.status==='adopted'&&<p className="regionalResultExplanation">
       Это проект договора, который утверждается отдельно от расчёта преподавателя. Пока не зафиксирован итог, число субъектов здесь может быть нулевым.
     </p>}
