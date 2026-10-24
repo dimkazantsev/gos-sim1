@@ -47,11 +47,12 @@ export default function FederalBudgetSimulator({g,context,regions,rates,programs
  useEffect(()=>{initialized.current='';draftSessions.current.clear();},[g.game?.id,g.me?.user_id]);
  useGameTableSync(g.game?.id,['budget_simulator_plans','budget_simulator_state','budget_transfer_requests','budget_finance_contracts','budget_simulator_ledger','formal_documents','budget_faction_amendments','event_cases','event_assignments'],load,g.me?.user_id||'');
  function changeBudgetTab(next:string){
+  if(next===tab)return;
   setTab(next);
+  // Keep both the game panel and browser scroll positions when switching steps.
+  // Keyboard focus must not implicitly scroll the viewport.
   window.requestAnimationFrame(()=>{
-   window.document.querySelector<HTMLElement>('.simContentFlow')?.scrollTo({top:0});
    window.document.getElementById(tabId+'-'+next)?.focus({preventScroll:true});
-   window.scrollTo({top:0});
   });
  }
  function rememberCurrent(){draftSessions.current.set(selectedId||'new',{draft,dirty,revision});}
@@ -109,7 +110,7 @@ export default function FederalBudgetSimulator({g,context,regions,rates,programs
       {selected?.document_id&&<button type="button" className={'secondary '+styles.projectDocumentButton} onClick={()=>onOpenDocument(selected.document_id!)}><FileText size={17}/> Открыть связанный документ{selected.registry_no?' · '+selected.registry_no:''}</button>}
     </div>
    </section>
-   <nav className={styles.tabs} role="tablist" aria-label="Разделы бюджетного расчёта">{tabs.map(([key,label,Icon],i)=><button key={key} type="button" role="tab" id={tabId+'-'+key} aria-controls={tabId+'-panel'} aria-selected={tab===key} tabIndex={tab===key?0:-1} onClick={()=>changeBudgetTab(key)} onKeyDown={e=>{const index=e.key==='Home'?0:e.key==='End'?tabs.length-1:e.key==='ArrowRight'?(i+1)%tabs.length:e.key==='ArrowLeft'?(i-1+tabs.length)%tabs.length:-1;if(index>=0){e.preventDefault();changeBudgetTab(tabs[index][0]);window.document.getElementById(tabId+'-'+tabs[index][0])?.focus();}}}><span className={styles.stepNumber}>{i+1}</span><Icon size={18}/><span>{label}</span></button>)}</nav>
+   <nav className={styles.tabs} role="tablist" aria-label="Разделы бюджетного расчёта">{tabs.map(([key,label,Icon],i)=><button key={key} type="button" role="tab" id={tabId+'-'+key} aria-controls={tabId+'-panel'} aria-selected={tab===key} tabIndex={tab===key?0:-1} onClick={()=>changeBudgetTab(key)} onKeyDown={e=>{const index=e.key==='Home'?0:e.key==='End'?tabs.length-1:e.key==='ArrowRight'?(i+1)%tabs.length:e.key==='ArrowLeft'?(i-1+tabs.length)%tabs.length:-1;if(index>=0){e.preventDefault();changeBudgetTab(tabs[index][0]);window.document.getElementById(tabId+'-'+tabs[index][0])?.focus({preventScroll:true});}}}><span className={styles.stepNumber}>{i+1}</span><Icon size={18}/><span>{label}</span></button>)}</nav>
    <div role="tabpanel" id={tabId+'-panel'} aria-labelledby={tabId+'-'+tab} tabIndex={0}>
    {tab==='revenue'&&<BudgetIncomeTable calculation={calc} draft={draft} state={state} readOnly={readOnly} onEdit={edit}/>}
    {tab==='regions'&&g.game&&<BudgetRegionWorkspace key={g.game.id} gameId={g.game.id} regions={regions} rates={rates} context={context} events={regionalEvents} requests={requests} draft={draft} readOnly={readOnly} canRequest={canRequest} onSaved={async()=>{await Promise.all([load(),onSaved()]);}} onOpenEvents={onOpenEvents} onOpenExpenses={()=>changeBudgetTab('expense')} onReturnCredit={returnCredit}/>}
