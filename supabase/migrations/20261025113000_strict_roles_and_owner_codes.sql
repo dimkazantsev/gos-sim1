@@ -89,7 +89,7 @@ AS $function$
  SELECT auth.uid() IS NOT NULL
   AND NOT coalesce((auth.jwt()->>'is_anonymous')::boolean,true)
   AND EXISTS(SELECT 1 FROM public.games g WHERE g.id=p_game AND
-    (g.owner_id=auth.uid() OR private.is_platform_admin()));
+    g.owner_id=auth.uid());
 $function$;
 REVOKE ALL ON FUNCTION private.is_game_code_owner(uuid) FROM PUBLIC,anon,authenticated;
 
@@ -173,3 +173,7 @@ BEGIN
  WHERE i.game_id=p_game_id;
  RETURN result;
 END;$function$;
+
+-- Direct creation bypassed teacher authentication; the owner-only wrapper
+-- still calls this function with SECURITY DEFINER, preserving existing flow.
+REVOKE ALL ON FUNCTION public.create_game_session(text,text,text,text,text) FROM PUBLIC,anon,authenticated;
