@@ -6,6 +6,7 @@ import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {downloadFullGameArchive,downloadSessionArchive,enumerateGameAssets,purgeGameAssets,saveGameBlob} from './gameArchive';
 import TeacherAccessCodes from './TeacherAccessCodes';
+import {preserveOwnTeacherAssets} from './preserveTeacherAssets';
 import {preparePortableSession} from './portableSession';
 import {canPermanentlyDeleteGame,freshGameBackupReceipt,gameBackupReceiptKey} from './sessionDeletionGuard';
 type Session={id:string;title:string;game_code:string;owner_id:string;status:string;created_at:string};
@@ -63,11 +64,13 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
   const s=candidate;if(!s||!teacher||!deleteAllowed)return;
   if(s.owner_id!==me?.user_id&&!admin){setNotice('Удалять сеансы может только их владелец или подтверждённый глобальный администратор.');return}
   if(!backupReady){setNotice('Сначала сформируйте свежий полный ZIP-архив этого сеанса и проверьте, что файл сохранён.');return}
-  if(!window.confirm('Вы действительно хотите безвозвратно удалить игру «'+s.title+'»? Будут удалены все записи, участники, события, оценки, сообщения, НПА и файлы.'))return;
+  if(!window.confirm('Вы действительно хотите безвозвратно удалить игру «'+s.title+'»? Будут удалены игровые записи, участники, события, оценки, сообщения, НПА и файлы игры. Личный профиль преподавателя, фотография и подпись сохраняются отдельно.'))return;
   setBusy(true);setNotice('');
   try{
    const first=await supabase.rpc('prepare_game_deletion',{p_game:s.id,p_code:typed});
    if(first.error)throw first.error;
+   setProgress('Сохраняем личные файлы преподавателя отдельно от игры…');
+   if(me?.user_id)await preserveOwnTeacherAssets(s.id,me.user_id);
    setProgress('Удаление загруженных файлов…');
    await purgeGameAssets(s.id,(done,total)=>setProgress('Удалено файлов: '+done+' из '+total));
    // Race protection: the server refuses to drop a game while even one object remains.
@@ -100,7 +103,7 @@ export default function SessionManager({g}:{g:ReturnTypeRepublic}){
   </article>)}</div>
   {candidate&&<div className="profileSessionDelete">
    <h3><ShieldAlert size={20}/> Безвозвратное удаление: {candidate.title}</h3>
-   <p>После удаления восстановление возможно только из резервной копии. Останутся лишь самостоятельные аккаунты пользователей и сведения, относящиеся к другим играм. Отдельные файлы должны быть удалены до удаления базы.</p>
+   <p>После удаления восстановление возможно только из резервной копии. Самостоятельные аккаунты и личные файлы преподавателей сохраняются отдельно от игровых сеансов. Отдельные файлы должны быть удалены до удаления базы.</p>
    <label>Введите точный код сеанса: {candidate.game_code}<input autoComplete="off" value={typed} onChange={e=>setTyped(e.target.value.toUpperCase())} placeholder="Код сеанса"/></label>
    <label className="profileSessionConfirm"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/> Я сохранил(а) резервную копию и понимаю, что действие необратимо.</label>
    <p role="status" className="profileSessionNotice">{backupReady?'Полный ZIP подготовлен в этом сеансе браузера. Убедитесь, что файл действительно сохранился. После проверки кода и подтверждения можно удалить игру.':'Для разблокировки удаления сначала нажмите «ZIP · Локальная Игра» у этого сеанса и дождитесь завершения экспорта. Затем проверьте, что ZIP сохранился. Отметка экспорта сохраняется при обновлении страницы в этой вкладке в течение одного часа.'}</p>
