@@ -1,127 +1,182 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {BookOpenText,FileText,Landmark,LayoutDashboard,LogOut,Menu,Settings2,ShieldCheck,UserRound,Users,Vote as VoteIcon,Wallet,Radio} from 'lucide-react';
+import {BookOpenText,Camera,ChevronLeft,ChevronRight,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,Radio,Settings2,UserRound,Vote as VoteIcon,Wallet} from 'lucide-react';
 import {BrandIdentity} from '@/components/ui/BrandIdentity';
+import StyledSelect from '@/components/ui/StyledSelect';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import TeacherGameSessions from '@/components/game/TeacherGameSessions';
+import SignatureUpload from '@/components/game/SignatureUpload';
+import ProfileAvatar from '@/components/game/ProfileAvatar';
+import {cropPortrait} from '@/components/game/avatarCrop';
+import {savePermanentTeacherAsset,teacherAssetUrl} from '@/components/game/teacherAccountAssets';
 import {STAGE_OPERATIONS} from '@/components/game/stageOperations';
 import './teacher-portal.css';
 
-type Game={id:string;title:string;status:string;created_at:string};
-type TeacherIndex={games:Game[];is_admin:boolean};
-type Profile={full_name:string;bio:string|null;last_game_id:string|null};
-const LAST_GAME_KEY='gos-id:teacher-last-game';
-type Section='dashboard'|'stages'|'votes'|'documents'|'parties'|'budget'|'teacher'|'profile';
+type Profile={full_name:string;bio:string|null;gender:'male'|'female'|'unspecified'|null;avatar_path:string|null;signature_path:string|null};
+type Section='dashboard'|'stages'|'actions'|'parties'|'votes'|'documents'|'budget'|'teacher'|'profile';
 const SECTIONS:{id:Section;label:string;icon:typeof LayoutDashboard}[]=[
  {id:'dashboard',label:'Обзор игры',icon:LayoutDashboard},
  {id:'stages',label:'Этапы и задачи',icon:BookOpenText},
- {id:'parties',label:'Партии и фракции',icon:Landmark},
+ {id:'actions',label:'Политический процесс',icon:Radio},
+ {id:'parties',label:'Партии',icon:Landmark},
  {id:'votes',label:'Голосования',icon:VoteIcon},
  {id:'documents',label:'Реестр НПА',icon:FileText},
  {id:'budget',label:'Бюджет',icon:Wallet},
  {id:'teacher',label:'Управление',icon:Settings2},
  {id:'profile',label:'Мой профиль',icon:UserRound}
 ];
+function initials(name:string){return name.trim().split(/\s+/).slice(0,2).map(s=>s[0]).join('').toUpperCase()||'П'}
 export default function TeacherPortal(){
- const router=useRouter(),redirecting=useRef(false);
- const [loading,setLoading]=useState(true),[error,setError]=useState('');
- const [profile,setProfile]=useState<Profile|null>(null);
- const [name,setName]=useState(''),[bio,setBio]=useState('');
- const [saving,setSaving]=useState(false),[mobileOpen,setMobileOpen]=useState(false);
- const [section,setSection]=useState<Section>('stages');
+ const router=useRouter();
+ const [userId,setUserId]=useState(''),[loading,setLoading]=useState(true),[error,setError]=useState('');
+ const [profile,setProfile]=useState<Profile|null>(null),[name,setName]=useState(''),[bio,setBio]=useState('');
+ const [gender,setGender]=useState<'male'|'female'|'unspecified'>('unspecified');
+ const [avatarUrl,setAvatarUrl]=useState<string|null>(null),[signatureUrl,setSignatureUrl]=useState<string|null>(null);
+ const [saveBusy,setSaveBusy]=useState(false),[photoBusy,setPhotoBusy]=useState(false),[notice,setNotice]=useState('');
+ const [mobileOpen,setMobileOpen]=useState(false),[section,setSection]=useState<Section>('profile');
  const [stageNo,setStageNo]=useState<number|null>(null);
- function openGame(id:string){
-  if(redirecting.current)return;
-  redirecting.current=true;
-  try{window.localStorage.setItem(LAST_GAME_KEY,id)}catch{}
-  if(window.location.hostname.endsWith('.github.io'))window.location.replace('/gos-sim1/?game='+encodeURIComponent(id));
-  else router.replace('/game/'+encodeURIComponent(id));
- }
- const refresh=useCallback(async()=>{
-  setError('');setLoading(true);
+ const photoInput=useRef<HTMLInputElement>(null);
+ const authorized=!!userId&&!!profile;
+ const load=useCallback(async()=>{
+  setLoading(true);setError('');
   try{
    const auth=await supabase.auth.getSession();
    if(auth.error)throw auth.error;
-   if(!auth.data.session?.user){router.replace('/?teacher=1');return}
-   const response=await supabase.rpc('list_my_teacher_games');
-   if(response.error)throw response.error;
-   const value=response.data as TeacherIndex;
-   if(!value||!Array.isArray(value.games))throw Error('Не удалось проверить права преподавателя.');
-   const info=await supabase.from('teacher_profiles').select('full_name,bio,last_game_id')
-    .eq('user_id',auth.data.session.user.id).maybeSingle();
-   if(info.error)throw info.error;
-   const p=info.data as Profile|null;
-   if(p){setProfile(p);setName(p.full_name||'');setBio(p.bio||'')}
-   if(value.games.length){
-    let last='';try{last=window.localStorage.getItem(LAST_GAME_KEY)||''}catch{}
-    const selected=value.games.find(g=>g.id===last)||value.games.find(g=>g.id===p?.last_game_id)
-      ||value.games.find(g=>g.status!=='archived')||value.games[0];
-    const access=await supabase.rpc('ensure_my_game_access',{p_game:selected.id});
-    if(access.error)throw access.error;
-    openGame(selected.id);return;
+   const uid=auth.data.session?.user?.id;
+   if(!uid||auth.data.session?.user.is_anonymous){router.replace('/?teacher=1');return}
+   // All permissions come from the server; never infer a teacher from an email or user metadata.
+   const permitted=await supabase.rpc('list_my_teacher_games');
+   if(permitted.error)throw permitted.error;
+   const data=permitted.data as {games?:unknown[]}|null;
+   if(!Array.isArray(data?.games))throw Error('Доступ подтверждается только для преподавателя.');
+   let result=await supabase.from('teacher_profiles').select('full_name,bio,gender,avatar_path,signature_path')
+    .eq('user_id',uid).maybeSingle();
+   if(result.error)throw result.error;
+   if(!result.data){
+    const created=await supabase.from('teacher_profiles').insert({user_id:uid,full_name:'Преподаватель'})
+     .select('full_name,bio,gender,avatar_path,signature_path').single();
+    if(created.error)throw created.error;
+    result={...result,data:created.data};
    }
-  }catch(e){setError(userError(e)||'Не удалось открыть постоянную игровую среду.')}
+   const p=result.data as Profile;
+   setUserId(uid);setProfile(p);setName(p.full_name);setBio(p.bio||'');setGender(p.gender||'unspecified');
+   const [avatar,signature]=await Promise.all([teacherAssetUrl(p.avatar_path),teacherAssetUrl(p.signature_path)]);
+   setAvatarUrl(avatar);setSignatureUrl(signature);
+  }catch(e){setError(userError(e)||'Не удалось открыть постоянный профиль преподавателя.')}
   finally{setLoading(false)}
  },[router]);
- useEffect(()=>{void refresh()},[refresh]);
+ useEffect(()=>{void load()},[load]);
  async function saveProfile(){
-  if(!profile||saving||name.trim().length<4)return;
-  setSaving(true);setError('');
+  if(!authorized||saveBusy||name.trim().length<4)return;
+  setSaveBusy(true);setNotice('');setError('');
   try{
-   const auth=await supabase.auth.getSession();
-   if(!auth.data.session?.user)throw Error('Требуется личный вход.');
-   const data=await supabase.from('teacher_profiles')
-    .update({full_name:name.trim(),bio:bio.trim()||null,updated_at:new Date().toISOString()})
-    .eq('user_id',auth.data.session.user.id).select('full_name,bio,last_game_id').single();
-   if(data.error)throw data.error;setProfile(data.data as Profile);
+   const update=await supabase.from('teacher_profiles')
+    .update({full_name:name.trim(),bio:bio.trim()||null,gender,updated_at:new Date().toISOString()})
+    .eq('user_id',userId).select('full_name,bio,gender,avatar_path,signature_path').single();
+   if(update.error)throw update.error;
+   setProfile(update.data as Profile);setNotice('Личные данные преподавателя сохранены.');
   }catch(e){setError(userError(e))}
-  finally{setSaving(false)}
+  finally{setSaveBusy(false)}
+ }
+ async function saveSignature(file:File){
+  if(!authorized)return false;
+  setNotice('');setError('');
+  try{
+   const saved=await savePermanentTeacherAsset(userId,file,'signature');
+   setSignatureUrl(saved.url);setProfile(p=>p?{...p,signature_path:saved.path}:p);
+   setNotice('Подпись сохранена в постоянном профиле и доступна во всех играх.');
+   return true;
+  }catch(e){setError(userError(e));return false}
+ }
+ async function uploadPhoto(file:File|undefined){
+  if(!file||!authorized||photoBusy)return;
+  if(file.size>5*1024*1024||!['image/jpeg','image/png','image/webp'].includes(file.type)){
+   setError('Фотография должна быть PNG, JPEG или WebP не более 5 МБ.');return;
+  }
+  setPhotoBusy(true);setError('');setNotice('');
+  try{
+   const cropped=await cropPortrait(file);
+   const saved=await savePermanentTeacherAsset(userId,cropped,'avatar');
+   setAvatarUrl(saved.url);setProfile(p=>p?{...p,avatar_path:saved.path}:p);
+   setNotice('Фотография сохранена в постоянном профиле и доступна во всех играх.');
+  }catch(e){setError(userError(e))}
+  finally{setPhotoBusy(false)}
  }
  async function logout(){await supabase.auth.signOut();router.replace('/?teacher=1')}
  function choose(id:Section){setSection(id);setStageNo(null);setMobileOpen(false)}
- if(loading)return <main className="connectionPage"><section className="connectionCard" role="status"><BrandIdentity tagline/><h1>Открываем игровую среду ГОС.ID</h1><p>Проверяем личный вход и доступные игры.</p></section></main>;
- if(error&&!profile)return <main className="connectionPage"><section className="connectionCard" role="alert"><BrandIdentity tagline/><h1>Не удалось открыть игру</h1><p>{error}</p><button className="primary" onClick={()=>void refresh()}>Повторить</button></section></main>;
+ if(loading)return <main className="connectionPage"><section className="connectionCard" role="status"><BrandIdentity tagline/><h1>Открываем ГОС.ID</h1><p>Загружаем постоянный профиль преподавателя.</p></section></main>;
+ if(!authorized)return <main className="connectionPage"><section className="connectionCard" role="alert"><BrandIdentity tagline/><h1>Не удалось открыть профиль преподавателя</h1><p>{error||'Не удалось подтвердить доступ.'}</p><button type="button" className="primary" onClick={()=>void load()}>Повторить</button></section></main>;
  const stages=Array.from({length:16},(_,i)=>({no:i+1,...STAGE_OPERATIONS[i+1]}));
- return <div className="teacherEmptyShell">
-  <aside className="teacherEmptySidebar" aria-label="Разделы ГОС.ID">
+ const label=SECTIONS.find(s=>s.id===section)?.label||'Мой профиль';
+ return <div className="simShell teacherZeroShell">
+  <a className="skipLink" href="#game-main">Перейти к содержимому</a>
+  <aside className="simSidebar">
    <div className="sidebarBrand"><BrandIdentity tagline/></div>
-   <div className="teacherEmptyScope"><small>ТЕКУЩАЯ ИГРА</small><b>Игровая среда</b><span>Сеанс не создан</span></div>
-   <nav className="teacherEmptyNav">{SECTIONS.map(item=><button type="button" key={item.id} className={section===item.id?'active':''} onClick={()=>choose(item.id)} aria-current={section===item.id?'page':undefined}>
-    <item.icon size={19} aria-hidden="true"/>{item.label}
-   </button>)}</nav>
-   <div className="teacherEmptyAccount"><div className="simAvatar">{(name||'П').slice(0,1)}</div><div><b title={name}>{name||'Преподаватель'}</b><small>Преподаватель</small></div><button type="button" onClick={()=>choose('profile')} title="Открыть профиль" aria-label="Открыть профиль"><UserRound size={17}/></button><button type="button" onClick={()=>void logout()} title="Выйти" aria-label="Выйти"><LogOut size={17}/></button></div>
+   <section className="sidebarStage teacherZeroStage">
+    <div className="sidebarStageNumber">00</div>
+    <div><small>ПОСТОЯННАЯ СРЕДА</small><b>Нулевая игра</b></div>
+    <span className="paused">Без сеанса</span>
+   </section>
+   <nav className="focusNav" aria-label="Разделы ГОС.ID"><div className="focusNavInner">
+    {SECTIONS.map(item=><button type="button" key={item.id} className={section===item.id?'active':''} onClick={()=>choose(item.id)} aria-current={section===item.id?'page':undefined}>
+     <span className="sidebarDragHandle" aria-hidden="true"><GripVertical size={15}/></span>
+     <item.icon aria-hidden="true"/><span className="sidebarRouteLabel">{item.label}</span>
+    </button>)}
+   </div></nav>
+   <div className="sidebarFooter"><div className="sidebarUser sidebarUserTeacher">
+    <div className="simAvatar">{initials(name)}</div>
+    <div className="simUserText"><b title={name}>{name}</b><span>Преподаватель</span></div>
+    <button type="button" className="sidebarIconButton" title="Мои игры · Профиль" aria-label="Мои игры и профиль" onClick={()=>choose('profile')}><Landmark/></button>
+    <button type="button" className="sidebarIconButton" aria-label="Выйти" onClick={()=>void logout()}><LogOut/></button>
+   </div></div>
   </aside>
-  <div className="teacherEmptyWorkspace">
-   <header className="teacherEmptyTop">
-    <div className="teacherEmptyMobileBrand"><BrandIdentity tagline/></div>
-    <button type="button" className="teacherEmptyMobileMenu" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(v=>!v)} aria-label="Открыть разделы"><Menu size={20}/></button>
-    <div className="teacherEmptyTopText"><small>ГОС.ID · ПОСТОЯННЫЙ КАБИНЕТ</small><b>{SECTIONS.find(x=>x.id===section)?.label}</b></div>
-    <span className="teacherEmptyState"><ShieldCheck size={16}/>Профиль сохранён</span>
+  <div className="simWorkspace">
+   <header className="simTop">
+    <div className="mobileBrand"><BrandIdentity tagline/></div>
+    <nav className="topScreenHistory" aria-label="История разделов"><button className="screenHistoryButton" type="button" aria-label="Вернуться к профилю" disabled={section==='profile'} onClick={()=>choose('profile')}><ChevronLeft/></button><button className="screenHistoryButton" type="button" disabled aria-label="Следующий раздел"><ChevronRight/></button></nav>
+    <div className="simTopCenter"><div className="topStageCopy"><small>ПОСТОЯННЫЙ КАБИНЕТ</small><strong>{label}</strong></div><div className="topIndicators"><span className="livePill off"><Radio aria-hidden="true"/><span className="livePillText">Игра не создана</span></span></div></div>
+    <button type="button" className="teacherZeroMobileMenu" aria-expanded={mobileOpen} aria-label="Разделы" onClick={()=>setMobileOpen(v=>!v)}><Menu size={21}/></button>
    </header>
-   {mobileOpen&&<nav className="teacherEmptyMobileNavigation" aria-label="Мобильная навигация">{SECTIONS.map(item=><button type="button" key={item.id} onClick={()=>choose(item.id)}><item.icon size={17}/>{item.label}</button>)}</nav>}
-   <main className="teacherEmptyMain">
-    {error&&<p className="teacherEmptyError" role="alert">{error}</p>}
-    {section==='profile'?<section className="teacherEmptyProfile">
-     <div className="teacherEmptyIntro"><small>ЛИЧНАЯ УЧЁТНАЯ ЗАПИСЬ</small><h1>Мой профиль</h1><p>Постоянные данные преподавателя сохраняются даже без созданных игр. Новые игры и сессии создаются здесь.</p></div>
-     <div className="teacherEmptyProfileFields">
-      <label>Фамилия, имя и отчество<input value={name} onChange={e=>setName(e.target.value)} maxLength={180}/></label>
-      <label>О себе<textarea rows={4} value={bio} onChange={e=>setBio(e.target.value)} maxLength={5000}/></label>
-      <button type="button" className="primary" disabled={saving||name.trim().length<4} onClick={()=>void saveProfile()}>{saving?'Сохранение…':'Сохранить постоянный профиль'}</button>
+   {mobileOpen&&<nav className="teacherZeroMobileNavigation" aria-label="Разделы ГОС.ID">{SECTIONS.map(item=><button type="button" key={item.id} onClick={()=>choose(item.id)} aria-current={section===item.id?'page':undefined}><item.icon size={19}/>{item.label}</button>)}</nav>}
+   <div className="simContentFlow"><main id="game-main" tabIndex={-1} className="simMain">
+    {error&&<p className="teacherZeroError" role="alert">{error}</p>}
+    {notice&&<p className="teacherZeroNotice" role="status">{notice}</p>}
+    {section==='profile'?<div className="profilePage">
+     <section className="profileHero">
+      <div className="profilePhoto">
+       <ProfileAvatar src={avatarUrl} name={profile.full_name} gender={gender}/>
+       <input hidden type="file" accept="image/png,image/jpeg,image/webp" ref={photoInput} aria-label="Загрузить фотографию профиля" onChange={e=>{void uploadPhoto(e.target.files?.[0]);e.target.value=''}}/>
+       <button type="button" className="profileCameraButton" aria-label="Изменить фотографию" title="Изменить фотографию" disabled={photoBusy} onClick={()=>photoInput.current?.click()}><Camera size={20}/></button>
+      </div>
+      <div className="profileIntro"><small>ЛИЧНЫЙ КАБИНЕТ</small><h1>{profile.full_name}</h1><p>Преподаватель</p>
+       <div className="profileChips"><span>Преподаватель</span></div>
+       <div className="profileHeroControls"><button type="button" onClick={()=>document.getElementById('teacher-game-sessions')?.scrollIntoView({behavior:'smooth',block:'start'})}><Landmark size={17}/>Мои игры · Создать игру</button></div>
+      </div>
+     </section>
+     <div className="profileGrid teacherZeroProfileGrid">
+      <article className="surface profileEditor" id="profile-setup-editor">
+       <div className="surfaceHead"><div><small>О СЕБЕ</small><h2>Игровая визитка</h2></div></div>
+       <label className="profileFullNameField">Фамилия, имя и отчество<input autoComplete="name" maxLength={180} value={name} onChange={e=>setName(e.target.value)}/></label>
+       <p className="profileHint">Эти данные и личные файлы сохраняются за учётной записью и используются во всех играх.</p>
+       <StyledSelect label="Пол для оформления аватара" value={gender} onChange={value=>setGender(value as typeof gender)} options={[{value:'unspecified',label:'Не указан'},{value:'male',label:'Мужской'},{value:'female',label:'Женский'}]}/>
+       <textarea aria-label="О себе" rows={3} maxLength={350} value={bio} onChange={e=>setBio(e.target.value)}/>
+       <div className="profileSaveRow"><button type="button" className="primary" disabled={saveBusy||name.trim().length<4} onClick={()=>void saveProfile()}>{saveBusy?'Сохраняем…':'Сохранить визитку'}</button><span>{bio.length}/350</span></div>
+       <SignatureUpload account={{signatureUrl,saveSignature}}/>
+      </article>
      </div>
-     <TeacherGameSessions displayName={name}/>
-    </section>:section==='stages'?<section className="teacherEmptyStages">
-     <div className="teacherEmptyIntro"><small>ЭТАПЫ И ЗАДАЧИ</small><h1>Все 16 этапов</h1><p>Игровые этапы доступны для ознакомления. После создания сессии они откроются в рабочем режиме с участниками, документами и голосованиями.</p></div>
-     <div className="teacherEmptyStageGrid">{stages.map(item=><button type="button" key={item.no} className={stageNo===item.no?'selected':''} onClick={()=>setStageNo(stageNo===item.no?null:item.no)}>
-      <span>{String(item.no).padStart(2,'0')}</span><b>{item.title}</b><small>{stageNo===item.no?item.action:'Не запущен'}</small>
-     </button>)}</div>
-    </section>:<section className="teacherEmptyOverview">
-     <div className="teacherEmptyIntro"><small>ГОС.ID · ИГРОВАЯ СРЕДА</small><h1>{SECTIONS.find(x=>x.id===section)?.label}</h1><p>Игровых данных пока нет. Постоянный кабинет и структура всех 16 этапов доступны независимо от создания учебной игры.</p></div>
-     <div className="teacherEmptyOverviewActions"><button type="button" className="primary" onClick={()=>choose('stages')}><BookOpenText size={18}/>Все этапы</button><button type="button" className="secondary" onClick={()=>choose('profile')}><Users size={18}/>Создать игру в профиле</button></div>
-     <div className="teacherEmptyQuickStats"><article><strong>16</strong><span>Этапов</span></article><article><strong>0</strong><span>Участников</span></article><article><strong>0</strong><span>Голосований</span></article><article><strong>0</strong><span>Документов</span></article></div>
+     <TeacherGameSessions displayName={profile.full_name}/>
+    </div>:section==='stages'?<section className="teacherZeroPanel surface">
+     <small>ЭТАПЫ И ЗАДАЧИ</small><h1>Все 16 этапов</h1><p>Этапы доступны для просмотра. До создания игровой сессии участники, решения и результаты отсутствуют.</p>
+     <div className="teacherEmptyStageGrid">{stages.map(item=><button type="button" key={item.no} className={stageNo===item.no?'selected':''} onClick={()=>setStageNo(v=>v===item.no?null:item.no)}><span>{String(item.no).padStart(2,'0')}</span><b>{item.title}</b><small>{stageNo===item.no?item.action:'Не запущен'}</small></button>)}</div>
+    </section>:<section className="teacherZeroPanel surface">
+      <small>ПОСТОЯННАЯ СРЕДА ГОС.ID</small><h1>{label}</h1>
+      <p>Игровых данных нет: сеанс не создан или не выбран. Сведения о других играх сюда не переносятся.</p>
+      <button type="button" className="primary" onClick={()=>choose('profile')}>Мои игры · Создать игру</button>
+      {section==='dashboard'&&<div className="teacherEmptyQuickStats">{[['0','Участников'],['0','Документов'],['0','Голосований'],['0','Игровых событий']].map(([value,title])=><article key={title}><strong>{value}</strong><span>{title}</span></article>)}</div>}
     </section>}
-   </main>
+   </main></div>
   </div>
  </div>;
 }

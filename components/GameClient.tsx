@@ -621,9 +621,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
  function openTeacherGameChooser(){
   if(!teacher||previewMode)return;
-  setSelectedProfileId('');
-  navigate('profile',undefined,false,true);
-  window.setTimeout(()=>document.getElementById('teacher-game-sessions')?.scrollIntoView({behavior:'smooth',block:'start'}),150);
+  if(window.location.hostname.endsWith('.github.io'))window.location.assign('/gos-sim1/teacher/');
+  else window.location.assign('/teacher');
  }
  function sidebarKeys(){return [...sidebarOrder,...nav.map(x=>x[0]).filter(x=>!sidebarOrder.includes(x))].filter(x=>nav.some(n=>n[0]===x))}
  function reorderSidebar(from:string,to:string){
@@ -657,7 +656,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <div className={'sidebarUser'+(teacher&&!previewMode?' sidebarUserTeacher':'')}>
      <div className="simAvatar">{initials(shownMe.full_name)}</div>
      <div className="simUserText"><b title={shownMe.full_name}>{shownMe.full_name}</b><span>{previewMode?'Просмотр · '+(shownMe.role_title||'Участник'):shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
-     {teacher&&!previewMode&&<button type="button" aria-label="Управление играми в профиле" title="Мои игры · Профиль" className="sidebarIconButton" onClick={openTeacherGameChooser}><Landmark aria-hidden="true"/></button>}
+     {teacher&&!previewMode&&<button type="button" aria-label="Открыть постоянную нулевую игру" title="Нулевая игра · Постоянный кабинет" className="sidebarIconButton" onClick={openTeacherGameChooser}><Landmark aria-hidden="true"/></button>}
      {previewMode?<button aria-label="Вернуться к преподавателю" className="sidebarIconButton" onClick={()=>setViewAs('')}><ChevronLeft/></button>:<button aria-label="Выйти" className="sidebarIconButton" onClick={logout}><LogOut/></button>}
     </div>
    </div>
