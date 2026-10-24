@@ -23,3 +23,15 @@
 @keyframes tour-breathe{50%{box-shadow:0 0 0 5px rgba(95,192,255,.28),0 0 30px 10px rgba(80,175,245,.52)}}
 @media(max-width:600px){.card{padding:17px 18px 12px;border-radius:17px}.header>button{top:17px;right:18px}.card h2{font-size:21px;margin-top:12px}.card p{font-size:12.5px}.action{margin-top:10px;padding:9px 10px;font-size:12px}.progressLabel{margin-top:10px}}
 @media(prefers-reduced-motion:reduce){.ring{animation:none;transition:none}.card{transition:none}.progress>span{transition:none}}
+
+/* Tour completion is actionable on mobile: participants need not guess that the
+   highlighted control under the overlay is the next step. */
+@media(max-width:900px){
+ .action{gap:9px;align-items:center;font-size:12px;line-height:1.4}
+ .action svg{width:21px;height:21px;color:#2369c3}
+ .fallback{display:flex;align-items:center;justify-content:space-between;gap:12px;
+   min-height:45px;padding:11px 13px;background:#2453e6;color:#fff;border:1px solid #2453e6;
+   border-radius:11px;font-size:12px;line-height:1.25;text-align:left}
+ .fallback span{min-width:0;overflow-wrap:anywhere}
+ .fallback svg{flex-shrink:0}
+}
