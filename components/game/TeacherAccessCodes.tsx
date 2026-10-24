@@ -28,6 +28,7 @@ const hints:Record<Scope,string>={
 };
 export default function TeacherAccessCodes({gameId}:{gameId:string}){
  const [currentGameCode,setCurrentGameCode]=useState('');
+ const [gameTitle,setGameTitle]=useState('');
  const [newGameCode,setNewGameCode]=useState('');
  const [editingGameCode,setEditingGameCode]=useState(false);
  const [scope,setScope]=useState<Scope>('participant');
@@ -39,6 +40,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
  const [rows,setRows]=useState<CodeRow[]>([]);
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
+ const activeParticipantCode=rows.find(row=>row.scope==='participant'&&row.active)?.code||'';
  const refresh=useCallback(async()=>{
   const r=await supabase.rpc('teacher_saved_invitation_list',{p_game_id:gameId});
   if(r.error)throw r.error;
@@ -46,15 +48,16 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
  },[gameId]);
  useEffect(()=>{
   let alive=true;
-  setCurrentGameCode('');setNewGameCode('');setEditingGameCode(false);setCreated('');setRows([]);setNotice('');
+  setCurrentGameCode('');setGameTitle('');setNewGameCode('');setEditingGameCode(false);setCreated('');setRows([]);setNotice('');
   async function load(){
    const [r,c]=await Promise.all([
     supabase.rpc('teacher_saved_invitation_list',{p_game_id:gameId}),
-    supabase.from('games').select('game_code').eq('id',gameId).single()
+    supabase.from('games').select('game_code,title').eq('id',gameId).single()
    ]);
    if(!alive)return;
    if(c.error||r.error){setNotice('Не удалось загрузить коды доступа: '+(userError(c.error)||userError(r.error)));return;}
    setCurrentGameCode(c.data?.game_code||'');
+   setGameTitle(c.data?.title||'');
    setRows(Array.isArray(r.data)?r.data as CodeRow[]:[]);
   }
   void load();return()=>{alive=false};
@@ -62,6 +65,17 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
 async function copy(value:string){
   try{await navigator.clipboard.writeText(value);setNotice('Код скопирован. Передавайте его только адресатам.');}
   catch{setNotice('Копирование недоступно. Выделите код и скопируйте вручную.')}
+ }
+ async function copyParticipantAccess(){
+  const title=gameTitle.trim(),code=currentGameCode.trim(),invitation=activeParticipantCode.trim();
+  if(busy||!title||!code||!invitation)return;
+  const message='Название игры: '+title+'\n\nКод игры: '+code+'\n\nПриглашение участника: '+invitation;
+  try{
+   await navigator.clipboard.writeText(message);
+   setNotice('Название игры, код игры и приглашение участника скопированы.');
+  }catch{
+   setNotice('Не удалось скопировать данные участника. Разрешите доступ к буферу обмена.');
+  }
  }
  async function saveGameCode(){
   const code=newGameCode.trim().toUpperCase();
@@ -163,6 +177,9 @@ async function copy(value:string){
    <div className="teacherCodeActiveRoles">
     {gameCodeCard()}
     {(['participant'] as InventoryScope[]).map(codeCard)}
+   </div>
+   <div className="teacherCodeParticipantCopy">
+    <button type="button" disabled={busy||!gameTitle.trim()||!currentGameCode||!activeParticipantCode} onClick={()=>void copyParticipantAccess()}><Copy size={17} aria-hidden="true"/>Копировать название игры, код и приглашение участника</button>
    </div>
    <h4>Дополнительный преподаватель и гость</h4>
    <p>Отдельные приглашения для других преподавателей и гостей. Они не дают доступа к учётной записи владельца.</p>
