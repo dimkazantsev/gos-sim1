@@ -26,6 +26,7 @@ import MunicipalProjectLab from './MunicipalProjectLab';
 import CrisisRoom from './CrisisRoom';
 import SystemDebriefLab from './SystemDebriefLab';
 import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
+import StageMeetingProcedureFlow from './StageMeetingProcedureFlow';
 import ElectoralArchitectureLab from './ElectoralArchitectureLab';
 import DumaLeadershipElection from './DumaLeadershipElection';
 import GhostPolicyLab from './GhostPolicyLab';
@@ -137,6 +138,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
 
   <section id={sectionId+'-work'} className="stageOperationsPane" hidden={tab!=='work'} aria-label="Рабочие процедуры">
    <div className="stageOperationsHandoff"><div><small>Основание</small><span>{operation.input}</span></div><ChevronRight size={18} aria-hidden="true"/><div><small>Результат этапа</small><span>{operation.output}</span></div></div>
+   <StageMeetingProcedureFlow stage={stage} votesCount={votes.length} onOpenVotes={()=>onOpenVotes()} onOpenDocuments={()=>setTab('materials')}/>
    {scoringClosed&&<section className="stageFinalWorkPrompt" role="alert" aria-label="Оценочный срок завершён">
     <div><FileText size={19} aria-hidden="true"/><span><b>Оценочный срок завершён. Этап продлён автоматически</b><small>Новые баллы ВСН больше не начисляются. Оформите обязательные итоговые документы — это необходимо для завершения этапа. {awaitingFinalDocuments.length?'Осталось: '+awaitingFinalDocuments.length+'.':'Все итоговые документы подготовлены, проверьте оставшиеся процедуры.'}</small></span></div>
     <button type="button" className="primary" onClick={()=>setTab('materials')}>Оформить документы <ChevronRight size={16}/></button>
@@ -164,6 +166,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
      {stage.stage_no===16&&<SystemDebriefLab g={g}/>}
     </div>
    </fieldset>
+   {bodies&&stage.stage_no!==12&&<div id={'stage-meeting-minutes-'+g.game?.id+'-'+stage.stage_no} className="stageMeetingFinalDocuments" aria-label="Итоговые документы заседания"/>}
    {!scoringClosed&&(stage.status==='open'||canRemediateCompleted)&&awaitingFinalDocuments.length>0&&<section className="stageFinalWorkPrompt" aria-live="polite">
       <div><FileText size={19} aria-hidden="true"/><span><b>Итоговые документы ещё не оформлены</b>
        <small>{stage.status==='completed'?'Осталось погасить задолженность по итоговым документам ('+awaitingFinalDocuments.length+'). После опубликования доступ и предварительный балл будут восстановлены.':'Осталось оформить обязательные документы ('+awaitingFinalDocuments.length+'). До этого этап завершить нельзя.'}</small></span></div>

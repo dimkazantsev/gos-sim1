@@ -1,4 +1,5 @@
 'use client';
+import {createPortal} from 'react-dom';
 import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
@@ -38,6 +39,10 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  const [stage12Reason,setStage12Reason]=useState('');
  const [stage12Saving,setStage12Saving]=useState(false);
  const dirtyMeetingDraftRef=useRef({agenda:false,minutes:false,stage12:false});
+ const [minutesTarget,setMinutesTarget]=useState<HTMLElement|null>(null);
+ useEffect(()=>{
+  setMinutesTarget(document.getElementById('stage-meeting-minutes-'+g.game?.id+'-'+(stageNo||g.game?.current_round||1)));
+ },[g.game?.id,stageNo,g.game?.current_round]);
  async function loadStage12Editor(){
   if(!g.game)return;
   setMeetingError('');
@@ -220,7 +225,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   setBusy(false);
  }
  async function createBody(){if(!g.game)return;setBusy(true);const r=await supabase.rpc('save_civic_voting_body',{p_game_id:g.game.id,p_title:newTitle.trim(),p_seats:Number(seats),p_users:users,p_head:head||null,p_unit:editing});if(r.error)g.setError(userError(r.error));else{await load();setBody('unit:'+r.data);setNewTitle('');setUsers([]);setHead('');setSeats('1');setEditing(null);setNotice('Состав органа сохранён. Его можно выбрать при открытии голосования.')}setBusy(false)}
- return <details ref={detailsRef} className="institutionRegistrationPanel civicRegistration civicDisclosure projectDisclosure" aria-label="Регистрация на заседания"><DisclosureSummary icon={ClipboardCheck} title="Регистрация на заседание" description={'Этап '+stage+' · Регистрация в органе власти'}/><div className="civicDisclosureBody"><p>{body==='ksrf'?'До внесения предложений и голосования необходимо зарегистрироваться на заседание КСРФ. Участвовать могут все участники, но один голос от фракции подаёт её избранный представитель.':body==='gd'&&stage===4?'До формирования руководства Государственной Думы повестку готовят председатели зарегистрированных политических партий. После избрания Председателя Думы и формирования Совета Думы полномочия переходят руководству палаты. Для участия в заседании после утверждения повестки необходима регистрация.':'Перед участием в заседании и голосовании необходимо зарегистрироваться в соответствующем органе после утверждения повестки.'}</p>
+ return <><details ref={detailsRef} className="institutionRegistrationPanel civicRegistration civicDisclosure projectDisclosure" aria-label="Регистрация на заседания"><DisclosureSummary icon={ClipboardCheck} title="Регистрация на заседание" description={'Этап '+stage+' · Регистрация в органе власти'}/><div className="civicDisclosureBody"><p>{body==='ksrf'?'До внесения предложений и голосования необходимо зарегистрироваться на заседание КСРФ. Участвовать могут все участники, но один голос от фракции подаёт её избранный представитель.':body==='gd'&&stage===4?'До формирования руководства Государственной Думы повестку готовят председатели зарегистрированных политических партий. После избрания Председателя Думы и формирования Совета Думы полномочия переходят руководству палаты. Для участия в заседании после утверждения повестки необходима регистрация.':'Перед участием в заседании и голосовании необходимо зарегистрироваться в соответствующем органе после утверждения повестки.'}</p>
   <div className="civicRegistrationSelectors"><StyledSelect label="Орган" value={body} onChange={setBody} options={[...availableBodies.map(b=>({value:b.key,label:b.title})),...units.filter(u=>!allowedBodies||allowedBodies.includes('unit:'+u.id)).map(u=>({value:'unit:'+u.id,label:u.title}))]}/></div>
   <section className="civicMeetingDocuments" aria-label="Документы заседания" data-agenda-state={agendaReady?'approved':agendaDraft?'draft':'pending'}>
    <header><div><b>Повестка заседания</b><small>{agendaReady?'Утверждена · регистрация разрешена':agendaDraft?(gdStage12CanonicalAgenda?'Автоматически сформирована · требуется утверждение':'Проект в реестре · требуется утверждение'):verifiedRights&&!canAttend?'Повестка доступна уполномоченным участникам':'Повестка ещё не составлена'}</small></div><span>{agendaHasDocument?'В реестре НПА':'Не оформлена'}</span></header>
@@ -262,16 +267,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
    {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<div className="civicAgendaComposer"><small>{agendaTextLength<30?'Для сохранения укажите ещё '+(30-agendaTextLength)+' символов.':'Повестка готова к сохранению в реестре НПА.'}</small><button type="button" className={meetingCoordinator?'primary':'secondary'} disabled={busy||readOnly||agendaTextLength<30} onClick={()=>void saveMeetingDocument('agenda')}>{meetingCoordinator?'Сохранить и утвердить повестку':'Сохранить проект повестки в реестре НПА'}</button></div>}
    {canApproveAgenda&&!readOnly&&<button type="button" className="primary" disabled={busy||readOnly} onClick={()=>void approveMeeting('agenda')}>Утвердить подготовленный проект повестки</button>}
    {meetingCoordinator&&!readOnly&&!automatedSessionMinutes&&<div className="civicMeetingDelegate"><StyledSelect label="Поручить оформление повестки" value={delegateUser} onChange={setDelegateUser} options={[{value:'',label:'Без поручения'},...participants.map(p=>({value:p.user_id,label:p.full_name||'Участник'}))]}/><button type="button" disabled={busy} onClick={()=>void assignMeetingDelegate()}>Сохранить поручение</button></div>}
-   {registered.length>0&&<div className="civicMeetingMinutes">
-    <header><b>Протокол по итогам заседания</b><span>{meetingRecord?.minutes_approved_at?'Опубликован':automatedSessionMinutes?'После закрытия заседания':'Ожидает завершения'}</span></header>
-    <p className="civicMeetingHelp">Протокол составляется по сохранённой повестке, регистрации и голосованиям. Система удостоверяет документ от имени ГОС.ID без имитации личной подписи.</p>
-    {meetingRecord?.minutes_document_id&&onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(meetingRecord.minutes_document_id!)}>Открыть протокол в реестре НПА</button>}
-    {automatedSessionMinutes?<p className="civicMeetingHelp">После закрытия заседания документ автоматически появится в реестре НПА, загружать файл не требуется.</p>:
-     meetingCoordinator&&!meetingRecord?.minutes_approved_at&&!readOnly&&!meetingActionsLocked&&
-     <button type="button" className="primary" disabled={busy} onClick={()=>void publishMeetingMinutes()}>
-      {busy?'Оформление…':'Завершить заседание и опубликовать протокол'}
-     </button>}
-   </div>}
+
   </section>
   <div className="civicAttendance"><div><h3>{config?.title||unit?.title}</h3><p>{config?.basis||'Состав зарегистрированного в игре органа. Порог задаётся в голосовании.'}</p></div><div className="civicAttendanceNumbers"><span>Присутствует <b>{present} / {total}</b></span><span>Для кворума <b>{needed}</b></span><span>{present>=needed&&total>0?'Кворум есть':'Ожидаем участников'}</span></div><ul className="civicAttendees">{registered.map(r=>{const faction=body==='ksrf'?g.parties.find(p=>p.leader_user_id===r.user_id):null;const presence=gdPresence?.registered.find(x=>x.user_id===r.user_id);return <li key={r.user_id}>{body==='ksrf'?(faction?.name||'Участник КСРФ')+' · '+(g.names[r.user_id]||'Участник'):g.names[r.user_id]||'Участник'}<b>{body==='gd'?presence?(presence.present+' из '+presence.capacity+' депутатов'+(presence.declared==null?' · автоматически':'')):'Проверяем явку':body==='ksrf'?(faction?'1 голос фракции':'Без голоса фракции'):'1 голос'}</b></li>})}</ul>
   {body==='gd'?<div className="civicGdPresenceForm">
@@ -284,5 +280,18 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   {g.teacher&&unit?.unit_kind==='public_body'&&<button className="secondary" onClick={()=>{setEditing(unit.id);setNewTitle(unit.title);setSeats(String(unit.mandate_capacity||1));setUsers(assignments.filter(a=>a.unit_id===unit.id).map(a=>a.user_id));setHead(unit.head_user_id||'');document.getElementById('civic-body-editor')?.setAttribute('open','')}}>Изменить состав выбранного органа</button>}
   {g.teacher&&<details id="civic-body-editor" className="civicCustomBody"><summary>Добавить другой орган или комиссию</summary><div className="civicBodyEditor"><label>Название органа<input value={newTitle} onChange={e=>setNewTitle(e.target.value)}/></label><label>Установленный состав органа, мест<input type="number" aria-label="Установленный состав органа" min={1} max={10000} step={1} inputMode="numeric" value={seats} onChange={e=>setSeats(e.target.value)}/></label><p>Назначено {users.length} из {seats||0} мест. Свободные места учитываются в общем составе при расчёте кворума.</p><fieldset><legend>Назначенные участники · {users.length}</legend>{students.map(m=><label className="civicCheckbox" key={m.user_id}><input type="checkbox" checked={users.includes(m.user_id)} onChange={e=>{setUsers(old=>e.target.checked?[...old,m.user_id]:old.filter(id=>id!==m.user_id));if(head===m.user_id&&!e.target.checked)setHead('')}}/>{m.full_name}</label>)}</fieldset><StyledSelect label="Председатель" value={head} onChange={setHead} options={[{value:'',label:'Не назначен'},...students.filter(m=>users.includes(m.user_id)).map(m=>({value:m.user_id,label:m.full_name}))]}/><button type="button" className="primary" disabled={busy||readOnly||newTitle.trim().length<3||!Number.isInteger(Number(seats))||Number(seats)<Math.max(1,users.length)||Number(seats)>10000} onClick={()=>void createBody()}>{editing?'Сохранить состав':'Создать орган'}</button></div></details>}
   {notice&&<p role="status">{notice}</p>}
- </div></details>;
+ </div></details>
+ {minutesTarget&&createPortal(<>
+   {registered.length>0&&<div className="civicMeetingMinutes">
+    <header><b>Протокол по итогам заседания</b><span>{meetingRecord?.minutes_approved_at?'Опубликован':automatedSessionMinutes?'После закрытия заседания':'Ожидает завершения'}</span></header>
+    <p className="civicMeetingHelp">Протокол составляется по сохранённой повестке, регистрации и голосованиям. Система удостоверяет документ от имени ГОС.ID без имитации личной подписи.</p>
+    {meetingRecord?.minutes_document_id&&onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(meetingRecord.minutes_document_id!)}>Открыть протокол в реестре НПА</button>}
+    {automatedSessionMinutes?<p className="civicMeetingHelp">После закрытия заседания документ автоматически появится в реестре НПА, загружать файл не требуется.</p>:
+     meetingCoordinator&&!meetingRecord?.minutes_approved_at&&!readOnly&&!meetingActionsLocked&&
+     <button type="button" className="primary" disabled={busy} onClick={()=>void publishMeetingMinutes()}>
+      {busy?'Оформление…':'Завершить заседание и опубликовать протокол'}
+     </button>}
+   </div>}
+ </>,minutesTarget)}
+ </>;
 }

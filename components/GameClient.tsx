@@ -619,6 +619,11 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const dockShortLabels:Record<View,string>={dashboard:'Обзор',stages:'Этапы',actions:'Процесс',parties:'Партии',votes:'Голоса',documents:'НПА',grades:'Оценки',events:'События',budget:'Бюджет',teacher:'Пульт',profile:'Профиль'};
  const dockItems=[...mobilePrimary,...mobileSecondary.map(([k])=>k)].map(key=>({key,label:nav.find(([k])=>k===key)![1],shortLabel:dockShortLabels[key],icon:sectionBadge(key)>0?<span className="eventDockIcon">{navIcon(key)}<i className="eventDockBadge">{sectionBadge(key)}</i></span>:navIcon(key)}));
 
+ function openTeacherGameChooser(){
+  if(!teacher||previewMode)return;
+  window.location.assign(window.location.hostname.endsWith('.github.io')
+   ?'/gos-sim1/teacher/?choose=1':'/teacher?choose=1');
+ }
  function sidebarKeys(){return [...sidebarOrder,...nav.map(x=>x[0]).filter(x=>!sidebarOrder.includes(x))].filter(x=>nav.some(n=>n[0]===x))}
  function reorderSidebar(from:string,to:string){
   const order=sidebarKeys(),fromIndex=order.indexOf(from),toIndex=order.indexOf(to);
@@ -651,6 +656,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <div className="sidebarUser">
      <div className="simAvatar">{initials(shownMe.full_name)}</div>
      <div className="simUserText"><b>{shownMe.full_name}</b><span>{previewMode?'Просмотр · '+(shownMe.role_title||'Участник'):shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
+     {teacher&&!previewMode&&<button type="button" aria-label="Выбрать игру" title="Мои игры" className="sidebarIconButton" onClick={openTeacherGameChooser}><Landmark aria-hidden="true"/></button>}
      {previewMode?<button aria-label="Вернуться к преподавателю" className="sidebarIconButton" onClick={()=>setViewAs('')}><ChevronLeft/></button>:<button aria-label="Выйти" className="sidebarIconButton" onClick={logout}><LogOut/></button>}
     </div>
    </div>
@@ -696,7 +702,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      </div>}
     </div>}
 
-    <ChatToggleButton chatOpen={chatOpen} onToggle={toggleTourChat} unreadCount={g.chatUnreadCount} mentionCount={g.chatMentionCount}/>
+     <ChatToggleButton chatOpen={chatOpen} onToggle={toggleTourChat} unreadCount={g.chatUnreadCount} mentionCount={g.chatMentionCount}/>
    </header>
    </GameHeader>
 
@@ -732,7 +738,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
    <section ref={mobileDialogRef} tabIndex={-1} className="mobileMoreSheet" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
     <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><IconAction onClick={()=>setMobileMenuOpen(false)} label="Закрыть меню"/></header>
-    <div className="mobileAllGrid">{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} data-tour-view={k} onClick={()=>navigate(k,undefined,false,true)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" data-tour-view="chat" className={chatOpen?'active':''} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);toggleTourChat()}}><span className="mobileMenuChatIcon"><MessageCircle aria-hidden="true"/>{g.chatUnreadCount>0&&<i className={g.chatMentionCount>0?'hasMention':''}>{g.chatUnreadCount>99?'99+':g.chatUnreadCount}</i>}</span><span>Чат</span></button></div>
+    <div className="mobileAllGrid">{teacher&&!previewMode&&<button type="button" onClick={openTeacherGameChooser}><Landmark aria-hidden="true"/><span>Мои игры</span></button>}{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} data-tour-view={k} onClick={()=>navigate(k,undefined,false,true)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" data-tour-view="chat" className={chatOpen?'active':''} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);toggleTourChat()}}><span className="mobileMenuChatIcon"><MessageCircle aria-hidden="true"/>{g.chatUnreadCount>0&&<i className={g.chatMentionCount>0?'hasMention':''}>{g.chatUnreadCount>99?'99+':g.chatUnreadCount}</i>}</span><span>Чат</span></button></div>
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}

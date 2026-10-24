@@ -255,6 +255,24 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   if(!adoptedR)return;setBusy(true);const r=await supabase.rpc('set_regional_agreement_allocation',{p_rule_id:adoptedR.id,p_party_id:partyId,p_regions:Math.max(0,Number(regionDraft[partyId])||0)});
   if(r.error)setError(userError(r.error));else await load();setBusy(false);
  }
+ async function usePublishedAgreement(){
+  if(!teacher||!adoptedR||adoptedR.method!=='agreement'||adoptedR.status!=='adopted'
+    ||!latestRegionalSaved||latestRegionalSaved.method!=='agreement'||busy)return;
+  const publishedTotal=Object.values(latestRegionalSaved.result||{}).reduce((n,v)=>n+Number(v||0),0);
+  if(publishedTotal!==89){setError('Опубликованный расчёт содержит не 89 субъектов.');return;}
+  if(!window.confirm('Перенести опубликованный расчёт в проект договора? Итоговое распределение не будет утверждено до отдельного решения.'))return;
+  setBusy(true);
+  try{
+   const r=await supabase.rpc('prepare_regional_agreement_from_calculation',{
+    p_rule_id:adoptedR.id,p_calculation_id:latestRegionalSaved.id
+   });
+   if(r.error)throw r.error;
+   setRegionDraft(Object.fromEntries(parties.map(p=>[p.id,String(Number(latestRegionalSaved.result?.[p.id]||0))])));
+   await load();
+   setQueueNotice('Опубликованный расчёт перенесён в проект договора. Проверьте цифры и отдельно зафиксируйте решение.');
+  }catch(error){setError(userError(error))}
+  finally{setBusy(false)}
+ }
  async function executeR(){if(!adoptedR)return;setBusy(true);const r=await supabase.rpc('execute_regional_allocation',{p_rule_id:adoptedR.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  if(stageNo===2)return <section className="electoralLab">
@@ -314,6 +332,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   <div className="electoralRuleList">{activeR.length===0?<div className="emptyState">Предложений ещё нет.</div>:activeR.map(r=>{const v=voteStatus(r.vote_id);return <article key={r.id} className={r.status}><header><span>МЕТОД</span><b>{regionalLabel[r.method]}</b><em>{r.status==='allocated'?'Распределено':r.status==='adopted'?'Принято':r.status==='vote_open'?'На голосовании':r.status==='rejected'?'Отклонено':r.queued_at?'В очереди':'Проект'}</em></header>{r.rationale&&<p>{r.rationale}</p>}{r.rejection_reason&&<p className="electoralRejectionReason">{r.rejection_reason}</p>}<footer><span>{proposer(r.proposed_by)}</span>{v&&<span>{v.status==='open'?'Голосование открыто':v.result_label||'Закрыто'}</span>}{canPropose&&r.status==='draft'&&!r.queued_at&&!adoptedR&&<button disabled={busy} onClick={()=>void voteR(r.id)}>Вынести на голосование →</button>}</footer></article>})}</div>
 
   {latestRegionalSaved&&<section className="regionalPublishedResult">
+    <p className="regionalResultExplanation">{adoptedR?.status==='allocated'?'Справочный опубликованный расчёт. Решение уже зафиксировано в распределении ниже.':'Опубликованный расчёт преподавателя — это предложение распределения, а не утверждённый договор и не распределённые субъектам мандаты.'}</p>
    <div className="regionalPublishedHead"><div><small>ОПУБЛИКОВАННЫЙ РАСЧЁТ</small><h3>{regionalLabel[latestRegionalSaved.method]}</h3><p>Сохранён преподавателем · {new Date(latestRegionalSaved.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p></div><strong>89 субъектов</strong></div>
    <div className="regionalPublishedGrid">{parties.map(p=><div key={p.id}><span><i style={{background:p.color}}/><b>{p.name}</b></span><strong>{Number(latestRegionalSaved.result?.[p.id]||0)}</strong><small>субъектов</small></div>)}</div>
   </section>}
@@ -339,7 +358,13 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
    </div>
   </section>}
 
-  {adoptedR&&<section className="regionalAllocation"><div className="regionalAllocationHead"><div><small>РАСПРЕДЕЛЕНИЕ КОНТРОЛЯ</small><h3>{regionalLabel[adoptedR.method]}</h3></div><strong>{regionRows.reduce((a,x)=>a+Number(x.regions||0),0)} / 89</strong></div>
+  {adoptedR&&<section className="regionalAllocation"><div className="regionalAllocationHead"><div><small>{adoptedR.method==='agreement'&&adoptedR.status==='adopted'?'ПРОЕКТ ДОГОВОРНОГО РАСПРЕДЕЛЕНИЯ':'УТВЕРЖДЁННОЕ РАСПРЕДЕЛЕНИЕ КОНТРОЛЯ'}</small><h3>{regionalLabel[adoptedR.method]}</h3></div><strong>{regionRows.reduce((a,x)=>a+Number(x.regions||0),0)} / 89</strong></div>
+    {adoptedR.method==='agreement'&&adoptedR.status==='adopted'&&<p className="regionalResultExplanation">
+      Это проект договора, который утверждается отдельно от расчёта преподавателя. Пока не зафиксирован итог, число субъектов здесь может быть нулевым.
+    </p>}
+    {teacher&&adoptedR.method==='agreement'&&adoptedR.status==='adopted'&&latestRegionalSaved?.method==='agreement'&&totalAgreement===0&&<button type="button" className="secondary" disabled={busy} onClick={()=>void usePublishedAgreement()}>
+       Внести опубликованный расчёт в проект договора
+    </button>}
    {adoptedR.method==='proportional'&&<div className="regionalAmbiguity"><b>Неоднозначность авторских правил</b><p>В общем описании упомянут и бюджет партии, однако математический вес бюджета не задан; детальное описание определяет пропорцию по мандатам ГД. Поэтому автоматический расчёт использует только мандаты и не выдумывает коэффициент бюджета.</p></div>}
    <div className="regionalPartyRows">{parties.map(p=>{const row=regionRows.find(x=>x.party_id===p.id);return <div key={p.id}><i style={{background:p.color}}/><b>{p.name}</b><span>{p.mandates} мандатов ГД · бюджет {Number(p.budget||0).toLocaleString('ru-RU')}</span>{adoptedR.method==='agreement'&&adoptedR.status==='adopted'?(teacher||ledParty?.id===p.id?<input type="number" min="0" max="89" value={regionDraft[p.id]??String(row?.regions||0)} onChange={e=>setRegionDraft(v=>({...v,[p.id]:e.target.value}))}/>:<strong>{row?.regions||0}</strong>):<strong>{row?.regions??p.regions??0}</strong>}{adoptedR.method==='agreement'&&adoptedR.status==='adopted'&&(teacher||ledParty?.id===p.id)&&<button disabled={busy} onClick={()=>void setRegion(p.id)}>Записать</button>}</div>})}</div>
    {adoptedR.method==='agreement'&&adoptedR.status==='adopted'&&<div className={totalAgreement===89?'regionalTotal ok':'regionalTotal'}><span>Сумма договорённостей</span><b>{totalAgreement} / 89</b></div>}
