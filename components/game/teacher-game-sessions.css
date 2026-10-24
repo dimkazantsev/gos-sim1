@@ -32,12 +32,12 @@
 .gosTeacherSessions .teacherCodeRoleSections{display:grid;gap:12px;padding:16px;border:1px solid var(--gs-border,#dce5f2);border-radius:12px;background:var(--gs-surface-soft,#f6f8ff)}
 .gosTeacherSessions .teacherCodeRoleSections h4{font-size:15px;margin:0}
 .gosTeacherSessions .teacherCodeRoleSections>p{font-size:12px;color:var(--gs-muted,#5c718d);margin:0}
-.gosTeacherSessions .teacherCodeActiveRoles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.gosTeacherSessions .teacherCodeActiveRole{display:grid;gap:9px;align-content:start;min-width:0;padding:14px;border:1px solid var(--gs-border,#dce5f2);border-radius:12px;background:white}
+.gosTeacherSessions .teacherCodeActiveRoles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch}
+.gosTeacherSessions .teacherCodeActiveRole{display:grid;grid-template-rows:minmax(48px,auto) minmax(48px,auto) auto;gap:9px;align-content:start;min-width:0;padding:14px;border:1px solid var(--gs-border,#dce5f2);border-radius:12px;background:white}
 .gosTeacherSessions .teacherCodeActiveRole code{display:block;padding:10px;min-height:18px;border-radius:8px;border:1px solid var(--gs-border,#dce5f2);background:var(--gs-surface-soft,#f6f8ff);font-weight:800;overflow-wrap:anywhere;user-select:all}
-.gosTeacherSessions .teacherCodeActiveRole .teacherCodeActions{display:flex;flex-wrap:wrap;gap:8px}
-.gosTeacherSessions .teacherCodeActiveRole .teacherCodeActions button{flex:1;white-space:normal}
-@media(max-width:960px){.gosTeacherSessions .teacherCodeActiveRoles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.gosTeacherSessions .teacherCodeActiveRole .teacherCodeActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:0}
+.gosTeacherSessions .teacherCodeActiveRole .teacherCodeActions button{min-width:0;min-height:46px;padding:8px;white-space:normal;overflow-wrap:anywhere;line-height:1.35}
+
 @media(max-width:660px){
  .gosTeacherSessions .gosTeacherSessionRow{grid-template-columns:minmax(0,1fr);align-items:stretch}
  .gosTeacherSessions .gosTeacherAccessToggle{justify-self:stretch}
@@ -142,3 +142,27 @@
 .gosTeacherCreateFormActions{justify-content:space-between}
 .gosTeacherCreateCodeActions>button,.gosTeacherCreateFormActions>button{min-height:44px}
 @media(max-width:600px){.gosTeacherCreateFormActions>button{width:100%}}
+
+/* One owner-only source of game and role codes: no duplicate editor panel. */
+.teacherAccessCodes .teacherCodeRoleSections{display:grid;gap:12px;padding:16px;border:1px solid var(--gs-border,#dce5f2);border-radius:12px;background:var(--gs-surface-soft,#f6f8ff);min-width:0}
+.teacherAccessCodes .teacherCodeActiveRoles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;min-width:0}
+.teacherAccessCodes .teacherCodeActiveRole{display:grid;grid-template-rows:minmax(48px,auto) minmax(48px,auto) auto;align-content:start;gap:9px;min-width:0;padding:14px;border:1px solid var(--gs-border,#dce5f2);border-radius:12px;background:#fff}
+.teacherAccessCodes .teacherCodeActiveRole>b{display:flex;align-items:center;min-height:48px;line-height:1.4;overflow-wrap:anywhere}
+.teacherAccessCodes .teacherCodeActiveRole>code{display:block;box-sizing:border-box;min-width:0;min-height:48px;padding:11px;border:1px solid var(--gs-border,#dce5f2);border-radius:9px;background:var(--gs-surface-soft,#f6f8ff);font-weight:800;overflow-wrap:anywhere;user-select:all}
+.teacherAccessCodes .teacherCodeActiveRole>.teacherCodeActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0}
+.teacherAccessCodes .teacherCodeActiveRole>.teacherCodeActions>button{min-width:0;min-height:46px;padding:8px;line-height:1.35;white-space:normal;overflow-wrap:anywhere}
+.teacherAccessCodes .teacherCodeInlineEditor{display:grid;gap:9px;grid-column:1;min-width:0;padding-top:9px;border-top:1px solid var(--gs-border,#dce5f2)}
+.teacherAccessCodes .teacherCodeInlineEditor label,.teacherAccessCodes .teacherCodeAdditional label{display:grid;gap:7px;min-width:0;font-size:13px;font-weight:700}
+.teacherAccessCodes .teacherCodeInlineEditor input,.teacherAccessCodes .teacherCodeAdditional :is(input,select){box-sizing:border-box;width:100%;min-width:0;min-height:46px;padding:9px 11px;border:1px solid #cbd6e6;border-radius:9px;background:#fff;color:var(--gs-ink,#142d50)}
+.teacherAccessCodes .teacherCodeInlineEditor .teacherCodeActions,.teacherAccessCodes .teacherCodeAdditional .teacherCodeActions{display:flex;flex-wrap:wrap;gap:9px;margin:0}
+.teacherAccessCodes .teacherCodeInlineEditor .teacherCodeActions>button,.teacherAccessCodes .teacherCodeAdditional .teacherCodeActions>button{flex:1 1 145px;min-width:0;min-height:44px;line-height:1.35;white-space:normal}
+.teacherAccessCodes .teacherCodeAdditional{min-width:0;border-top:1px solid var(--gs-border,#dce5f2);padding-top:12px}
+.teacherAccessCodes .teacherCodeAdditional summary{width:fit-content;cursor:pointer;color:#173da3;font-weight:700;padding:7px 2px}
+.teacherAccessCodes .teacherCodeAdditionalFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:end;gap:12px;min-width:0;padding:12px 0 0}
+.teacherAccessCodes .teacherCodeAdditional .teacherAccessExplanation{align-self:center;margin:0;font-size:12px;line-height:1.5;color:var(--gs-muted,#5c718d)}
+.teacherAccessCodes .teacherCodeAdditional .teacherCodeActions{grid-column:1/-1}
+@media(max-width:760px){
+ .teacherAccessCodes .teacherCodeActiveRoles,.gosTeacherSessions .teacherCodeActiveRoles,.teacherAccessCodes .teacherCodeAdditionalFields{grid-template-columns:minmax(0,1fr)}
+ .teacherAccessCodes .teacherCodeRoleSections{padding:12px}
+ .teacherAccessCodes .teacherCodeActiveRole{padding:12px}
+}
