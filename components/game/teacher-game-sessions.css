@@ -180,3 +180,30 @@
 .teacherAccessCodes .teacherCodeRow .teacherCodeRowCopy{display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;box-sizing:border-box;width:44px;min-width:44px;min-height:44px;padding:0}
 .teacherAccessCodes .teacherCodeRow .teacherCodeRowCopy svg{flex-shrink:0}
 @container (max-width:650px){.teacherAccessCodes .teacherCodeRow .teacherCodeRowActions{justify-content:flex-start}}
+
+/* The archive/export/delete row is now the single management surface for a game. */
+.gosTeacherSessionUnit{min-width:0}
+.gosTeacherManagedGame{display:grid;gap:10px;min-width:0}
+.gosTeacherSessions .gosTeacherSessionRow{grid-template-columns:minmax(160px,1fr) auto;align-items:center}
+.gosTeacherSessions .gosTeacherSessionIdentity{display:grid;gap:4px;min-width:0}
+.gosTeacherSessions .gosTeacherSessionControls{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
+.gosTeacherSessions .gosTeacherSessionControls>button{flex:0 0 auto;min-height:44px;padding:9px 12px;white-space:nowrap;border-radius:10px}
+.gosTeacherSessions .gosTeacherSessionControls>.danger,.gosTeacherSessions .gosTeacherSessionDeleteActions>.danger{color:#b32f40;background:#fff4f5;border:1px solid #f4b8c1}
+.gosTeacherSessions .gosTeacherSessionControls>.gosTeacherOpenGame{order:2}
+.gosTeacherSessions .gosTeacherSessionDelete{margin:0;padding:16px;border:1px solid var(--gs-border,#dce5f2);border-radius:12px;background:#fff;min-width:0}
+.gosTeacherSessions .gosTeacherSessionDelete label{display:grid;gap:7px;min-width:0}
+.gosTeacherSessions .gosTeacherSessionDelete input[type="text"],.gosTeacherSessions .gosTeacherSessionDelete label>input:not([type]){width:100%;max-width:480px;min-height:44px;box-sizing:border-box}
+.gosTeacherSessions .gosTeacherSessionDelete .profileSessionConfirm{display:flex;align-items:center;gap:9px}
+.gosTeacherSessions .gosTeacherSessionDelete .profileSessionConfirm input{width:18px;height:18px;flex:0 0 auto}
+.gosTeacherSessions .gosTeacherSessionDeleteActions{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+.gosTeacherSessions .gosTeacherSessionDeleteActions>button{min-height:44px;padding:9px 14px;border-radius:9px}
+.gosTeacherSessions .gosTeacherManagedGame>.profileSessionNotice,.gosTeacherSessions .gosTeacherManagedGame>.profileSessionProgress{margin:0;padding:9px 12px;overflow-wrap:anywhere}
+@media(max-width:1080px){
+ .gosTeacherSessions .gosTeacherSessionRow{grid-template-columns:minmax(0,1fr)}
+ .gosTeacherSessions .gosTeacherSessionControls{justify-content:flex-start}
+}
+@media(max-width:600px){
+ .gosTeacherSessions .gosTeacherSessionControls>button{flex:1 1 135px;min-width:0;white-space:normal}
+ .gosTeacherSessions .gosTeacherSessionControls>.gosTeacherOpenGame{flex-basis:100%}
+ .gosTeacherSessions .gosTeacherSessionDeleteActions>button{flex:1 1 170px}
+}
