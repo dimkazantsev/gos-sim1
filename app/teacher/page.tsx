@@ -42,6 +42,19 @@ export default function TeacherPortal(){
    const payload=response.data as TeacherIndex|null;
    if(!payload||!Array.isArray(payload.games))throw Error('Сервер не вернул список игр.');
    setIndex(payload);
+   const saved=await supabase.from('teacher_profiles').select('full_name,bio,gender,avatar_path,signature_path')
+    .eq('user_id',auth.data.session.user.id).maybeSingle();
+   if(!saved.error&&saved.data){
+    const p=saved.data as TeacherProfile;setProfile(p);setName(p.full_name||'');setBio(p.bio||'');
+   }
+   if(!selecting&&payload.games.length){
+    let last='';try{last=window.localStorage.getItem(LAST_GAME_KEY)||''}catch{}
+    const game=payload.games.find(x=>x.id===last)||payload.games.find(x=>x.status!=='archived')||payload.games[0];
+    const access=await supabase.rpc('ensure_my_game_access',{p_game:game.id});
+    if(access.error)throw access.error;
+    rememberAndGo(game.id);
+    return;
+   }
   }catch(e){setError(userError(e)||'Не удалось открыть кабинет преподавателя.');setIndex(null)}
   finally{setLoading(false)}
  },[router,selecting]);
@@ -93,9 +106,9 @@ export default function TeacherPortal(){
      <h2>Мои игры</h2>
      <span>{index.games.length} {index.games.length===1?'игра':'игр'}</span>
     </div>
-    {!index.games.length&&<div className="teacherPortalEmpty"><BookOpenText size={34}/><h3>Игр пока нет</h3>
-     <p>Кабинет доступен независимо от запущенных сеансов. Создайте новую учебную игру, когда она понадобится.</p>
-     <Link href="/?teacher=create">Создать первую игру <ArrowRight size={17}/></Link>
+    {!index.games.length&&<div className="teacherPortalEmpty"><BookOpenText size={34}/><h3>Активных игр пока нет</h3>
+     <p>Личная учётная запись, профиль и структура всех этапов доступны без игрового сеанса.</p>
+     <Link href="/?teacher=create">Создать игру <ArrowRight size={17}/></Link>
     </div>}
     {!!index.games.length&&<div className="teacherPortalGames">
      {index.games.map(game=><article key={game.id} className="teacherPortalGame">
@@ -107,6 +120,19 @@ export default function TeacherPortal(){
       </button>
      </article>)}
     </div>}
+    {!index.games.length&&<section className="teacherPermanentStages" aria-label="Все этапы ГОС.ID">
+      <h2>Этапы ГОС.ID</h2>
+      <div className="teacherPermanentStageGrid">{Array.from({length:16},(_,i)=>i+1).map(no=><div key={no}>
+       <span>{String(no).padStart(2,'0')}</span><b>{STAGE_OPERATIONS[no].title}</b>
+      </div>)}</div>
+     </section>}
+    {profile&&<section className="teacherPermanentProfile" aria-label="Постоянный профиль преподавателя">
+     <h2>Постоянный профиль</h2>
+     <p>Профиль сохраняется независимо от игровых сеансов. Изменения ФИО и биографии доступны здесь даже без игры.</p>
+     <label>Фамилия, имя и отчество<input value={name} onChange={e=>setName(e.target.value)} maxLength={180}/></label>
+     <label>Биография<textarea value={bio} onChange={e=>setBio(e.target.value)} rows={3} maxLength={5000}/></label>
+     <button type="button" disabled={savingProfile||name.trim().length<4} onClick={()=>void savePermanentProfile()}>{savingProfile?'Сохранение…':'Сохранить профиль'}</button>
+    </section>}
    </>}
    {!loading&&!index&&<Link className="teacherPortalBack" href="/?teacher=1">Вернуться ко входу преподавателя</Link>}
   </div>
