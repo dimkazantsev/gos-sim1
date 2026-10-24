@@ -121,7 +121,7 @@
  color:var(--gs-muted,#5c718d);
  overflow-wrap:anywhere;
 }
-@media(max-width:760px){
+@media(max-width:960px){
  .gosTeacherSessions .gosTeacherCreateCodes{
   grid-template-columns:minmax(0,1fr);
  }
