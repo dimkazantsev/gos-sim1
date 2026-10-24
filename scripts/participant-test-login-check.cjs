@@ -22,7 +22,7 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
   async signInAnonymously(){calls.push('signInAnonymously');return{error:signupError}}
  },async rpc(name,args){
   calls.push('rpc:'+name);
-  assert.equal(name,'join_game_with_code');
+  assert.equal(name,'join_game_as_role');assert.equal(args.p_expected_kind,'student');
   assert.equal(args.p_game_code,'CODE');assert.equal(args.p_full_name,'Новый Участник Тестовый');
   return{data:'test-game-uuid',error:null};
  }};
@@ -39,7 +39,7 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
  };
  const module={exports:{}};
  vm.runInNewContext('(function(require,module,exports){'+source+'})',
-  {window:{location:{search:'',origin:'https://fixture.example'}},URLSearchParams,console,setTimeout})(imports,module,module.exports);
+  {window:{location:{search:'',origin:'https://fixture.example'},sessionStorage:{getItem:()=>null,setItem:()=>{}}},URLSearchParams,console,setTimeout})(imports,module,module.exports);
  function render(){cursor=0;tree=module.exports.default();return tree}
  function apply(predicate,value){const entry=nodes(tree,predicate)[0];assert(entry,'Input missing');
   entry.props.onChange({target:{value,checked:value}});render();}
@@ -48,26 +48,25 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
  apply(n=>n.type==='input'&&n.props.name==='gameCode','CODE');
  apply(n=>n.type==='input'&&n.props.id==='invite-code','STUDENT');
  apply(n=>n.type==='input'&&n.props.name==='group','Учебная группа');
- if(changeIdentity)apply(n=>n.type==='input'&&n.props.type==='checkbox',true);
+
  return{calls,async submit(){const form=nodes(tree,n=>n.type==='form')[0];await form.props.onSubmit({preventDefault(){}});render()},
   error(){const e=nodes(tree,n=>n.props?.role==='alert'||n.props?.className==='errorBox');return e.map(label).join(' ')}};
 }
 (async()=>{
  const teacher={user:{id:'account-teacher',is_anonymous:false}};
- const existing=harness(teacher,false);await existing.submit();
- assert(existing.error().includes('профиль преподавателя'),'Explain account collision');
- assert(!existing.calls.includes('signOut:local')&&!existing.calls.some(x=>x.startsWith('rpc:')),'No silent teacher role overwrite');
- const registeredParticipant=harness({user:{id:'regular-student',is_anonymous:false}},false,null,false);
- await registeredParticipant.submit();
- assert(registeredParticipant.calls.includes('rpc:join_game_with_code')&&!registeredParticipant.calls.includes('signOut:local'),
-  'Existing students can enter their own games with password identity intact');
- const switched=harness(teacher,true);await switched.submit();
- assert.deepEqual(switched.calls.filter(x=>x!=='getSession'),['signOut:local','signInAnonymously','rpc:join_game_with_code','navigate:/game/test-game-uuid']);
- const anonymous=harness({user:{id:'previous-test',is_anonymous:true}},true);await anonymous.submit();
- assert(anonymous.calls.includes('signOut:local')&&anonymous.calls.includes('signInAnonymously'),'New anonymous user needs a different auth uid');
+ const teacherSwitch=harness(teacher,false);await teacherSwitch.submit();
+ assert.deepEqual(teacherSwitch.calls.filter(x=>x!=='getSession'),
+   ['signOut:local','signInAnonymously','rpc:join_game_as_role','navigate:/game/test-game-uuid'],
+   'Entering participant mode automatically leaves the teacher identity');
+ const student=harness({user:{id:'student-confirmed',is_anonymous:false}},false,null,false);
+ await student.submit();
+ assert(student.calls.includes('rpc:join_game_as_role')&&!student.calls.includes('signOut:local'),
+   'A registered student can rejoin as student');
  const first=harness(null,false);await first.submit();
  assert(first.calls.includes('signInAnonymously')&&!first.calls.includes('signOut:local'));
- const denied=harness(teacher,true,{message:'Anonymous sign-ins are disabled'});
- await denied.submit();assert(!denied.calls.some(x=>x.startsWith('rpc:')),'Auth errors must not join a game');
- console.log('PASS student test identity: teacher protection, deliberate local switch, distinct anonymous user, first access and denied signup.');
+ const anonymous=harness({user:{id:'old-anonymous',is_anonymous:true,user_metadata:{full_name:'Предыдущее Имя'}}},false);
+ await anonymous.submit();assert(anonymous.calls.includes('signOut:local'),'Another FIO must create a fresh identity');
+ const blocked=harness(teacher,false,{message:'Anonymous sign-ins are disabled'});
+ await blocked.submit();assert(!blocked.calls.some(x=>x.startsWith('rpc:')),'Failed identity creation cannot enter a game');
+ console.log('PASS role entry: automatic teacher separation, correct student resume, new anonymous accounts and fail-closed auth');
 })().catch(e=>{console.error(e);process.exitCode=1});
