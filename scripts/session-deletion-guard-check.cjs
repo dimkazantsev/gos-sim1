@@ -45,3 +45,27 @@ assert(migration.includes("revoke all on function public.delete_game_permanently
 console.log('PASS safe CEC removal: permission, code, archive, media guards and child-first FK cleanup');
 
 console.log('PASS game-session deletion: scoped ZIP receipt, expiry, strict confirmation, UI explanation, owner and RPC protections');
+
+const permanent=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20261024223000_teacher_account_assets.sql'),'utf8');
+const saver=fs.readFileSync(path.join(__dirname,'../components/game/preserveTeacherAssets.ts'),'utf8');
+const gameHook=fs.readFileSync(path.join(__dirname,'../components/game/useRepublicGame.ts'),'utf8');
+const resolver=fs.readFileSync(path.join(__dirname,'../lib/resolveStoredAsset.ts'),'utf8');
+for(const guard of ['teacher_assets_owner_insert','teacher_assets_member_read','teacher_assets_owner_delete',
+ 'teacher_profile_sync_games','private.teacher_game_profile_persist','private.prevent_teacher_asset_loss']){
+ assert(permanent.includes(guard),'Account-scoped assets missing safeguard: '+guard);
+}
+assert(permanent.includes("JOIN storage.objects o ON o.bucket_id='game-assets'"),
+ 'Legacy deletion guard must check actual objects rather than stale paths');
+assert(permanent.includes("pg_trigger_depth()>1"),'Profile propagation must avoid recursive writes');
+assert(saver.includes("supabase.storage.from('teacher-assets').upload")&&saver.includes("supabase.from('teacher_profiles').update"),
+ 'Legacy assets must be copied before profile path is switched');
+assert(saver.includes('if(status===404)continue'),'Missing legacy files do not trigger permanent deletion failure');
+assert(resolver.includes("storedPath.startsWith(marker)")&&resolver.includes("bucket:'teacher-assets'"),
+ 'Account asset links use a private, game-independent bucket');
+assert(gameHook.includes("me.kind==='teacher'?'teacher-assets/'"),
+ 'Teacher avatar and signature uploads must be stored outside game paths');
+assert(ui.indexOf('preserveOwnTeacherAssets(s.id,me.user_id)')<ui.indexOf('await purgeGameAssets(s.id'),
+ 'Permanent teacher media must be migrated before cleanup');
+assert(!/delete\s+from\s+public\.teacher_profiles/i.test(permanent),
+ 'Game deletion must not erase the permanent teacher account');
+console.log('PASS permanent teacher asset storage: identity, access, profile sync and safe deletion order');
