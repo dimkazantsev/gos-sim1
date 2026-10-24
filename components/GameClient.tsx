@@ -35,6 +35,7 @@ import BudgetView from './game/BudgetView';
 import {useSectionUpdates} from './game/useSectionUpdates';
 import {notifySectionUpdates} from './game/useGameTableSync';
 import {supabase} from '@/lib/supabase';
+import {useRouter} from 'next/navigation';
 import MobileDock from './game/MobileDock';
 import GameHeader,{TeacherNavigationProvider} from './game/GameHeader';
 import {useSavedGameState,savedString} from './game/useSavedGameState';
@@ -193,6 +194,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
 }
 
 export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:string;initialMobileMenuOpen?:boolean}){
+ const router=useRouter();
  const g=useRepublicGame(gameId);
  const [screenHistory,setScreenHistory,navigationHydrated,navigationRestored]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
@@ -621,9 +623,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
  function openTeacherGameChooser(){
   if(!teacher||previewMode)return;
-  setSelectedProfileId('');
-  navigate('profile',undefined,false,true);
-  window.setTimeout(()=>document.getElementById('teacher-game-sessions')?.scrollIntoView({behavior:'smooth',block:'start'}),150);
+  router.push('/teacher');
  }
  function sidebarKeys(){return [...sidebarOrder,...nav.map(x=>x[0]).filter(x=>!sidebarOrder.includes(x))].filter(x=>nav.some(n=>n[0]===x))}
  function reorderSidebar(from:string,to:string){
@@ -657,7 +657,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <div className={'sidebarUser'+(teacher&&!previewMode?' sidebarUserTeacher':'')}>
      <div className="simAvatar">{initials(shownMe.full_name)}</div>
      <div className="simUserText"><b title={shownMe.full_name}>{shownMe.full_name}</b><span>{previewMode?'Просмотр · '+(shownMe.role_title||'Участник'):shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
-     {teacher&&!previewMode&&<button type="button" aria-label="Управление играми в профиле" title="Мои игры · Профиль" className="sidebarIconButton" onClick={openTeacherGameChooser}><Landmark aria-hidden="true"/></button>}
+     {teacher&&!previewMode&&<button type="button" aria-label="Открыть постоянную нулевую игру" title="Нулевая игра · Постоянный кабинет" className="sidebarIconButton" onClick={openTeacherGameChooser}><Landmark aria-hidden="true"/></button>}
      {previewMode?<button aria-label="Вернуться к преподавателю" className="sidebarIconButton" onClick={()=>setViewAs('')}><ChevronLeft/></button>:<button aria-label="Выйти" className="sidebarIconButton" onClick={logout}><LogOut/></button>}
     </div>
    </div>
