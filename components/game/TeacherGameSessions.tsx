@@ -39,7 +39,7 @@ export default function TeacherGameSessions({displayName='Преподавате
   try{
    const auth=await supabase.auth.getSession();
    if(!auth.data.session?.user)throw Error('Войдите в личную учётную запись.');
-   const r=await supabase.rpc('create_game_session',{
+   const r=await supabase.rpc('create_teacher_game_session',{
     p_title:title.trim(),p_game_code:code,p_teacher_code:teach,p_student_code:student,
     p_teacher_name:displayName.trim()||'Преподаватель'
    });
