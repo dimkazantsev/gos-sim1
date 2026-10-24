@@ -10,6 +10,18 @@ require.extensions['.css']=module=>{module.exports={}};
 // Static image imports use Next's asset shape; this preview has no bundler.
 for(const ext of ['.png','.jpg','.jpeg','.webp','.svg'])require.extensions[ext]=(module,file)=>{module.exports={src:require('node:url').pathToFileURL(file).href}};
 for(const ext of ['.ts','.tsx'])require.extensions[ext]=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,file);
+// Report offending import paths if a future offline render receives an object
+// where a JSX component was expected. This does not alter application JSX.
+const jsxRuntime=require('react/jsx-runtime');
+for(const key of ['jsx','jsxs']){
+ const original=jsxRuntime[key];
+ jsxRuntime[key]=function(type,...args){
+  if(type&&typeof type==='object'&&!type.$typeof){
+   console.error('INVALID JSX TYPE:',Object.keys(type),new Error().stack?.split('\n').slice(1,8).join('\n'));
+  }
+  return original(type,...args);
+ };
+}
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const h=React.createElement,noop=()=>{};
 const labels=['Учреждение политических партий','Архитектура выборов в Государственную Думу','Распределение субъектов Федерации','Парламентские выборы и руководство ГД','Режим Goust Voting','Выдвижение кандидатов в Президенты','Президентские выборы','Формирование Правительства','Комитеты и министерства','Государственные программы','Заседание Правительства','Законодательный процесс','Федеральный бюджет','Муниципальное управление','Кризисное управление','Итоговый разбор'];
