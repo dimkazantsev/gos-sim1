@@ -16,6 +16,7 @@ on:
       - 'components/game/TeacherGameSessions.tsx'
       - 'components/game/TeacherAccessCodes.tsx'
       - 'components/game/teacher-game-sessions.css'
+      - 'scripts/teacher-create-form-alignment-browser-check.cjs'
       - 'supabase/migrations/20261025113000_strict_roles_and_owner_codes.sql'
       - 'supabase/migrations/20261025114000_owner_only_code_management.sql'
       - 'supabase/migrations/20261025115000_protect_owner_name_and_teacher_profiles.sql'
@@ -45,6 +46,7 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm run typecheck
       - run: node scripts/permanent-teacher-flow-check.cjs
+      - run: node scripts/teacher-create-form-alignment-browser-check.cjs
       - run: node scripts/participant-test-login-check.cjs
       - run: node scripts/strict-role-and-owner-codes-check.cjs
       - run: node scripts/password-login-resilience-check.cjs
