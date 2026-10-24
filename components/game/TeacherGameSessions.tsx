@@ -89,10 +89,24 @@ export default function TeacherGameSessions({displayName='Преподавате
   {formOpen&&<form className="gosTeacherCreateForm" onSubmit={e=>void create(e)}>
    <h3>Новая игровая сессия</h3>
    <label>Название игры<input required maxLength={150} value={title} onChange={e=>setTitle(e.target.value)}/></label>
-   <label>Код игры<input required autoComplete="off" maxLength={32} value={gameCode} onChange={e=>setGameCode(e.target.value.toUpperCase())} placeholder="GOS-2026"/><button type="button" className="secondary" onClick={()=>setGameCode(generated('GOS'))}>Сгенерировать код игры</button></label>
+   <div className="gosTeacherCreateGameCode">
+    <label htmlFor="gos-teacher-game-code">Код игры</label>
+    <input id="gos-teacher-game-code" required autoComplete="off" maxLength={32} value={gameCode} onChange={e=>setGameCode(e.target.value.toUpperCase())} placeholder="GOS-2026"/>
+    <button type="button" className="secondary" onClick={()=>setGameCode(generated('GOS'))}>Сгенерировать код игры</button>
+   </div>
    <div className="gosTeacherCreateCodes">
-    <label>Приглашение дополнительного преподавателя<input type="text" required minLength={8} maxLength={80} autoComplete="off" value={teacherCode} onChange={e=>setTeacherCode(e.target.value)}/><button type="button" className="secondary" onClick={()=>setTeacherCode(generated('TCH'))}>Сгенерировать отдельно</button><small>Это не пароль владельца. Дополнительному преподавателю потребуется подтверждённая учётная запись.</small></label>
-    <label>Приглашение участника<input type="text" required minLength={8} maxLength={80} autoComplete="off" value={studentCode} onChange={e=>setStudentCode(e.target.value)}/><button type="button" className="secondary" onClick={()=>setStudentCode(generated('STD'))}>Сгенерировать отдельно</button></label>
+    <div className="gosTeacherCreateCodeField">
+     <label htmlFor="gos-teacher-invite-code">Приглашение дополнительного преподавателя</label>
+     <input id="gos-teacher-invite-code" type="text" required minLength={8} maxLength={80} autoComplete="off" value={teacherCode} onChange={e=>setTeacherCode(e.target.value)}/>
+     <button type="button" className="secondary" onClick={()=>setTeacherCode(generated('TCH'))}>Сгенерировать код</button>
+     <p className="gosTeacherCreateCodeHint">Это не пароль владельца. Дополнительному преподавателю потребуется подтверждённая учётная запись.</p>
+    </div>
+    <div className="gosTeacherCreateCodeField">
+     <label htmlFor="gos-student-invite-code">Приглашение участника</label>
+     <input id="gos-student-invite-code" type="text" required minLength={8} maxLength={80} autoComplete="off" value={studentCode} onChange={e=>setStudentCode(e.target.value)}/>
+     <button type="button" className="secondary" onClick={()=>setStudentCode(generated('STD'))}>Сгенерировать код</button>
+     <p className="gosTeacherCreateCodeHint">Предназначено только для участников игры и не даёт прав преподавателя.</p>
+    </div>
    </div>
    <button type="submit" className="primary" disabled={busy}>{busy?'Создание…':'Создать и открыть игру'}</button>
   </form>}
