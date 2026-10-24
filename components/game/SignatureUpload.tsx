@@ -4,13 +4,15 @@ import {useEffect,useRef,useState} from 'react';
 import {Check,ImageUp,Scissors,ShieldCheck} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 
-export default function SignatureUpload({g,onSaved}:{g:ReturnTypeRepublic;onSaved?:()=>void}){
+type AccountSignature={signatureUrl:string|null;saveSignature:(file:File)=>Promise<boolean>};
+export default function SignatureUpload({g,onSaved,account}:{g?:ReturnTypeRepublic;onSaved?:()=>void;account?:AccountSignature}){
  const input=useRef<HTMLInputElement>(null);
  const [file,setFile]=useState<File|null>(null);
  const [url,setUrl]=useState('');
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
- const mine=g.profiles.find(p=>p.user_id===g.me?.user_id);
+ const mine=g?.profiles.find(p=>p.user_id===g.me?.user_id);
+ const savedSignature=account?account.signatureUrl:mine?.signature_url;
  useEffect(()=>{if(!file){setUrl('');return}const current=URL.createObjectURL(file);setUrl(current);return()=>URL.revokeObjectURL(current)},[file]);
  async function crop(raw:File){
   if(raw.size>5*1024*1024){setNotice('Загрузите изображение размером до 5 МБ.');return}
@@ -51,7 +53,7 @@ export default function SignatureUpload({g,onSaved}:{g:ReturnTypeRepublic;onSave
  async function save(){
   if(!file||busy)return;
   setBusy(true);setNotice('');
-  const ok=await g.saveSignature(file);
+  const ok=account?await account.saveSignature(file):g?await g.saveSignature(file):false;
   setBusy(false);
   if(ok){setFile(null);onSaved?.();setNotice('Подпись сохранена. При подписании последующих НПА будет записан неизменяемый снимок изображения.')}
   else setNotice('Подпись не сохранена. Проверьте уведомление в игре.');
@@ -60,7 +62,7 @@ export default function SignatureUpload({g,onSaved}:{g:ReturnTypeRepublic;onSave
   <header><div><small>ДОКУМЕНТЫ И РЕЕСТР НПА</small><h2>Игровая подпись</h2></div><Scissors size={21} aria-hidden="true"/></header>
   <p>Расписывайтесь тёмной ручкой на чистом белом листе. Сделайте фото при ровном освещении либо загрузите PNG. Система удалит светлый фон, обрежет пустое поле и предложит проверить результат. Это визуальная подпись для учебной игры, а не юридически значимая электронная подпись.</p>
   <div className="profileSignaturePreview">
-   {url?<img src={url} alt="Подпись после автоматического удаления фона"/>:mine?.signature_url?<img src={mine.signature_url} alt="Сохранённая игровая подпись"/>:<span>Подпись ещё не загружена</span>}
+   {url?<img src={url} alt="Подпись после автоматического удаления фона"/>:savedSignature?<img src={savedSignature} alt="Сохранённая игровая подпись"/>:<span>Подпись ещё не загружена</span>}
   </div>
   <input type="file" accept="image/png,image/jpeg,image/webp" ref={input} hidden aria-label="Выбрать фото подписи"
    onChange={e=>{const chosen=e.target.files?.[0];if(chosen)void crop(chosen);e.target.value=''}}/>
