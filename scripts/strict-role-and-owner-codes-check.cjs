@@ -18,11 +18,11 @@ assert(m.includes("REVOKE ALL ON FUNCTION public.join_game_with_code"),'Legacy r
 assert(m.includes("REVOKE ALL ON FUNCTION public.resume_member_game"),'Old resume does not grant elevated role');
 assert(harden.includes("REVOKE ALL ON FUNCTION public.create_game_session"),'An anonymous account cannot create a fake teacher game');
 assert(names.includes("защищённой учётной записи")&&names.includes("u.is_anonymous"),'Owner name and teacher row protection');
-assert(sessions.includes('TeacherAccessCodes gameId={game.id}')&&sessions.includes('setCodesFor(String(r.data))'),'New codes accessible in owner profile immediately');
+assert(sessions.includes('TeacherAccessCodes gameId={game.id}')&&sessions.includes('game.is_owner&&')&&!sessions.includes('codesFor===game.id'),'Owner sees all invitation codes continuously without a collapsible gate');
 assert(sessions.includes("generated('STD')")&&sessions.includes("generated('TCH')")&&sessions.includes("generated('GOS')"),'Three distinct generator buttons');
 assert(!sessions.includes("openGame(String(r.data))"),'Creating a game stays in owner profile and displays codes');
-assert(access.includes("owner_rotate_invitation")&&access.includes('teacherCodeActiveRoles'),'Generated secrets remain visible and rotatable');
-assert(access.includes("p_kind:kind")&&access.includes("scope==='teacher'"),'Teacher invitation is separate from owner login');
+assert(access.includes("owner_rotate_invitation")&&access.includes('teacherRoleCodeCard')&&access.includes('entry?.code'),'Separate cards keep active codes visible and rotatable');
+assert(access.includes("p_kind:kind==='participant'?'student'")&&access.includes("kind==='teacher'")&&access.includes("kind==='guest'"),'Participant, extra teacher and guest invitation functions use distinct roles');
 assert(m.includes("vault.create_secret")&&m.includes("private.game_invitation_secrets"),'Initial secrets persist in Vault, not only in short-lived UI');
 assert(m.includes("private.is_game_code_owner")&&harden.includes("private.is_game_code_owner"),'Non-owner teachers cannot view or generate private codes');
 console.log('PASS strict game roles, owner-only persistent codes, safe fresh participant identity and no role-switch checkbox.');
