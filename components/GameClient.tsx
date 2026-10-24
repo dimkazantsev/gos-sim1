@@ -35,7 +35,6 @@ import BudgetView from './game/BudgetView';
 import {useSectionUpdates} from './game/useSectionUpdates';
 import {notifySectionUpdates} from './game/useGameTableSync';
 import {supabase} from '@/lib/supabase';
-import {useRouter} from 'next/navigation';
 import MobileDock from './game/MobileDock';
 import GameHeader,{TeacherNavigationProvider} from './game/GameHeader';
 import {useSavedGameState,savedString} from './game/useSavedGameState';
@@ -194,7 +193,6 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
 }
 
 export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:string;initialMobileMenuOpen?:boolean}){
- const router=useRouter();
  const g=useRepublicGame(gameId);
  const [screenHistory,setScreenHistory,navigationHydrated,navigationRestored]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
@@ -623,7 +621,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
 
  function openTeacherGameChooser(){
   if(!teacher||previewMode)return;
-  router.push('/teacher');
+  if(window.location.hostname.endsWith('.github.io'))window.location.assign('/gos-sim1/teacher/');
+  else window.location.assign('/teacher');
  }
  function sidebarKeys(){return [...sidebarOrder,...nav.map(x=>x[0]).filter(x=>!sidebarOrder.includes(x))].filter(x=>nav.some(n=>n[0]===x))}
  function reorderSidebar(from:string,to:string){
