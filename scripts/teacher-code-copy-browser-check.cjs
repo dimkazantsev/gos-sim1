@@ -46,14 +46,26 @@ async function main(){
    await page.evaluate(()=>window.__copyReject=true);await copies[0].click();await page.getByRole('alert').filter({hasText:'Не удалось скопировать'}).waitFor();
    await page.evaluate(()=>{window.__copyReject=false;Object.defineProperty(navigator,'clipboard',{configurable:true,value:undefined})});await bulk.click();assert(await page.locator('.gosTeacherSessionsError').isVisible());
    await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:window.__clipboard}));await bulk.focus();await page.keyboard.press('Enter');assert.equal(await last(),'Название игры: Республика теста\n\nКод игры: GOS-DEMO\n\nПриглашение участника: STD-DEMO-TEST');assert.equal(await page.locator('.gosTeacherSessionsError').count(),0);await inputs.nth(2).fill('TCH-PRIVATE-TEST');
-   const editors=page.locator('.teacherCodeEditor'),newGame=page.getByRole('button',{name:'Копировать новый код игры',exact:true}),newInvite=page.getByRole('button',{name:'Копировать новое приглашение',exact:true});
-   assert(await newGame.isDisabled());assert(await newInvite.isDisabled());
-   await editors.nth(0).getByRole('button',{name:'Сгенерировать',exact:true}).click();await newGame.click();assert.equal(await last(),await editors.nth(0).locator('input').inputValue());
-   await editors.nth(0).locator('input').fill(' gos-edited ');await newGame.click();assert.equal(await last(),'GOS-EDITED');
-   for(const [scope,prefix] of [['participant','STD-'],['group','GRP-'],['guest','GST-'],['teacher','TCH-']]){
-    await editors.nth(1).locator('select').selectOption(scope);await editors.nth(1).getByRole('button',{name:'Сгенерировать',exact:true}).click();await newInvite.click();assert((await last()).startsWith(prefix));assert.equal(await last(),await editors.nth(1).locator('input').last().inputValue());
+   const roleGroups=page.locator('.teacherCodeActiveRoles');assert.equal(await roleGroups.count(),2,'Exactly two owner code groups');
+   assert.equal(await page.locator('.teacherCodeGame').count(),1,'Game code appears only once');
+   assert.equal(await page.locator('.teacherCodeEditor,.teacherCodeGrid').count(),0,'No redundant lower editor');
+   if(width>760){
+    const rects=await roleGroups.first().locator('.teacherCodeActiveRole').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().toJSON()));
+    assert.equal(rects.length,2);assert(Math.abs(rects[0].width-rects[1].width)<3,'Owner cards occupy two balanced columns');
+    const second=await roleGroups.nth(1).locator('.teacherCodeActiveRole').evaluateAll(nodes=>nodes.map(n=>({code:n.querySelector('code').getBoundingClientRect().top,buttons:n.querySelector('.teacherCodeActions').getBoundingClientRect().top})));
+    assert(Math.abs(second[0].code-second[1].code)<3&&Math.abs(second[0].buttons-second[1].buttons)<3,'Teacher/guest fields are vertically aligned');
    }
-   await editors.nth(1).locator('input').last().fill('  edited-invite  ');await newInvite.click();assert.equal(await last(),'edited-invite');
+   const gameCard=page.locator('.teacherCodeGame');await gameCard.getByRole('button',{name:'Изменить код',exact:true}).click();
+   const extra=page.locator('.teacherCodeAdditional');await extra.locator('summary').click();
+   const editors=[gameCard.locator('.teacherCodeInlineEditor'),extra.locator('.teacherCodeAdditionalFields')];
+   const newGame=page.getByRole('button',{name:'Копировать новый код игры',exact:true}),newInvite=page.getByRole('button',{name:'Копировать новое приглашение',exact:true});
+   assert(await newGame.isDisabled());assert(await newInvite.isDisabled());
+   await editors[0].getByRole('button',{name:'Сгенерировать',exact:true}).click();await newGame.click();assert.equal(await last(),await editors[0].locator('input').inputValue());
+   await editors[0].locator('input').fill(' gos-edited ');await newGame.click();assert.equal(await last(),'GOS-EDITED');
+   for(const [scope,prefix] of [['participant','STD-'],['group','GRP-'],['guest','GST-'],['teacher','TCH-']]){
+    await editors[1].locator('select').selectOption(scope);await editors[1].getByRole('button',{name:'Сгенерировать',exact:true}).click();await newInvite.click();assert((await last()).startsWith(prefix));assert.equal(await last(),await editors[1].locator('input').last().inputValue());
+   }
+   await editors[1].locator('input').last().fill('  edited-invite  ');await newInvite.click();assert.equal(await last(),'edited-invite');
    assert.equal(requests.length,count,'Copying or generating must never submit, save, rotate or fetch codes');assert.deepEqual(errors,[]);
    const geometry=await form.evaluate(el=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth,footer:el.querySelector('.gosTeacherCreateFormActions').getBoundingClientRect().toJSON(),buttons:[...el.querySelectorAll('button')].map(b=>({name:b.textContent,...b.getBoundingClientRect().toJSON()}))}));
    assert(geometry.scroll<=width+1,'No horizontal overflow at '+width);assert(geometry.buttons.every(b=>b.height>=44),'Touch controls are at least 44px');
