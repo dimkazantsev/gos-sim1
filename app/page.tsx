@@ -44,6 +44,7 @@ export default function Home(){
  const [mode,setMode]=useState<'student'|'teacher'|'guest'>('student'),[createMode,setCreateMode]=useState(false);
  const [gameTitle,setGameTitle]=useState('Республика Политология'),[studentCode,setStudentCode]=useState(''),[fio,setFio]=useState(''),[group,setGroup]=useState(''),[gameCode,setGameCode]=useState(''),[invite,setInvite]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const [showCode,setShowCode]=useState(false);
+ const [newParticipantIdentity,setNewParticipantIdentity]=useState(false);
  const [personalLogin,setPersonalLogin]=useState(false);
  const [teacherLogin,setTeacherLogin]=useState(false);
  const [loginEmail,setLoginEmail]=useState(''),[loginPassword,setLoginPassword]=useState(''),[loginGameCode,setLoginGameCode]=useState(''),[recoverySent,setRecoverySent]=useState(false);
@@ -99,9 +100,23 @@ export default function Home(){
    if(code.length<2)throw new Error('Введите код игры.');
    if(access.length<(mode==='guest'?6:4))throw new Error(mode==='guest'?'Код гостя должен содержать минимум 6 символов.':'Код доступа должен содержать минимум 4 символа.');
    if(mode==='teacher'&&createMode){if(students.length<4)throw new Error('Код студентов должен содержать минимум 4 символа.');if(students===access)throw new Error('Коды преподавателя и студентов должны отличаться.')}
-   const session=(await supabase.auth.getSession()).data.session;
+   const auth=await supabase.auth.getSession();
+   if(auth.error)throw auth.error;
+   const session=auth.data.session;
    if(mode==='teacher'&&createMode&&(!session||session.user.is_anonymous)){setTeacherLogin(true);setPersonalLogin(true);setCreateMode(false);return}
-   if(!session){const a=await supabase.auth.signInAnonymously({options:{data:{full_name:name}}});if(a.error)throw a.error}
+   // Joining with different visible details never creates another account automatically.
+   // Protect the teacher's authenticated account from being silently reused or renamed.
+   if(mode!=='teacher'&&session&&!session.user.is_anonymous&&!newParticipantIdentity){
+    throw new Error('В браузере выполнен вход под личной учётной записью. Для теста другим участником включите «Новый участник» ниже. Данные прежней учётной записи сохранятся.');
+   }
+   if(mode!=='teacher'&&newParticipantIdentity&&session){
+    const signedOut=await supabase.auth.signOut({scope:'local'});
+    if(signedOut.error)throw signedOut.error;
+   }
+   if(!session||(mode!=='teacher'&&newParticipantIdentity)){
+    const a=await supabase.auth.signInAnonymously({options:{data:{full_name:name}}});
+    if(a.error)throw a.error;
+   }
    if(mode==='teacher'&&createMode){
     const r=await supabase.rpc('create_teacher_game_session',{p_title:gameTitle.trim(),p_game_code:code,p_teacher_code:access,p_student_code:students,p_teacher_name:name});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data+incomingSectionSuffix());
    }else{
@@ -201,6 +216,10 @@ export default function Home(){
       {mode==='teacher'&&createMode&&<label className="entryField">Название игры<input name="gameTitle" value={gameTitle} onChange={e=>setGameTitle(e.target.value)} required/></label>}
       <div className={'entryFieldRow '+(mode==='teacher'?'single':'')}><label className="entryField">Код игры<input name="gameCode" autoComplete="off" autoCapitalize="none" spellCheck={false} value={gameCode} onChange={e=>setGameCode(e.target.value)} placeholder="Например, 8.414" minLength={2} required/><small>Идентификатор конкретной игры, сообщённый преподавателем.</small></label>{mode==='student'&&<label className="entryField">Группа<input name="group" value={group} onChange={e=>setGroup(e.target.value)} placeholder="Для общего приглашения; при приглашении группы заполнять не нужно"/></label>}</div>
       <div className="entryField"><label htmlFor="invite-code">{mode==='teacher'?'Приглашение преподавателя':mode==='guest'?'Приглашение гостя':'Приглашение участника'}</label><span className="entrySecret"><input id="invite-code" name="inviteCode" autoComplete={createMode?'new-password':'current-password'} type={showCode?'text':'password'} minLength={mode==='guest'?6:4} value={invite} onChange={e=>setInvite(e.target.value)} required aria-describedby="code-hint"/><button type="button" onClick={()=>setShowCode(!showCode)} aria-label={showCode?'Скрыть код':'Показать код'} aria-pressed={showCode}>{showCode?<EyeOff/>:<Eye/>}</button></span><small id="code-hint">{mode==='teacher'?(createMode?'Придумайте код из 4 или более символов.':'Используйте код преподавателя, заданный при создании игры.'):mode==='guest'?'Предоставляет просмотр разрешённых разделов без участия в принятии решений.':mode==='student'?'Приглашение участника разрешает вход; приглашение группы автоматически привяжет группу.':'Отдельное приглашение, полученное от преподавателя.'}</small></div>
+      {mode!=='teacher'&&<label className="entryNewParticipant">
+       <input type="checkbox" checked={newParticipantIdentity} onChange={e=>setNewParticipantIdentity(e.target.checked)}/>
+       <span><strong>Новый участник — отдельный вход</strong><small>Для проверки игры под другим ФИО. Текущая авторизация в этом браузере сменится; профиль преподавателя, документы и подпись сохранятся.</small></span>
+      </label>}
       {mode==='teacher'&&createMode&&<div className="entryField"><label htmlFor="student-code">Начальное приглашение участников</label><input id="student-code" name="studentCode" type="password" autoComplete="new-password" minLength={4} value={studentCode} onChange={e=>setStudentCode(e.target.value)} required aria-describedby="student-code-hint"/><small id="student-code-hint">Не должен совпадать с кодом преподавателя.</small></div>}
       {error&&<div className="errorBox" role="alert">{error}</div>}
       <button className="primary entrySubmit" disabled={busy}>{busy?<><LoaderCircle className="spin" aria-hidden="true"/>Подключаемся…</>:<>{mode==='teacher'&&createMode?'Создать игру':'Войти в игру'}<ArrowRight aria-hidden="true"/></>}</button>
