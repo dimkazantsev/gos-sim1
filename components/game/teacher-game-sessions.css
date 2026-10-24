@@ -1,4 +1,4 @@
-.gosTeacherSessions{display:grid;gap:15px;min-width:0;margin:20px 0;padding:20px;border:1px solid var(--gs-border,#dce5f2);border-radius:16px;background:#fff;color:var(--gs-ink,#142d50)}
+.gosTeacherSessions{scroll-margin-top:110px;display:grid;gap:15px;min-width:0;margin:20px 0;padding:20px;border:1px solid var(--gs-border,#dce5f2);border-radius:16px;background:#fff;color:var(--gs-ink,#142d50)}
 .gosTeacherSessionsHeader{display:flex;align-items:start;justify-content:space-between;gap:16px}
 .gosTeacherSessionsHeader>div:first-child{min-width:0}.gosTeacherSessionsHeader small{color:var(--gs-muted,#5c718d);font-size:11px;font-weight:800;letter-spacing:.07em}
 .gosTeacherSessionsHeader h2{margin:4px 0 6px;font-size:19px;line-height:1.35}.gosTeacherSessionsHeader p{margin:0;color:var(--gs-muted,#5c718d);font-size:13px;line-height:1.5}
