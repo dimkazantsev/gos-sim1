@@ -15,6 +15,7 @@ const all=gameOfficeRoleList(groups);
 const ministries=groups.find(g=>g.label==='Пять министерств Правительства').roles;
 const committees=groups.find(g=>g.label==='Пять комитетов Государственной Думы').roles;
 assert.equal(ministries.filter(s=>s.startsWith('Министр ')).length,5,'Exactly five minister portfolios');
+assert.equal(ministries.filter(s=>s.startsWith('Заместитель министра')).length,5,'Five deputies, one per permitted portfolio');
 assert.equal(ministries.filter(s=>s.startsWith('Сотрудник — ')).length,5,'Five ministerial staffs');
 assert.equal(committees.filter(s=>s.startsWith('Председатель комитета')).length,5,'Exactly five Duma committee chairs');
 assert.equal(committees.filter(s=>s.startsWith('Член комитета')).length,5,'Five Duma committees');
