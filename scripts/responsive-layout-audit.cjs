@@ -87,7 +87,7 @@ function shortName(node){
      return {viewport,rootOverflow:html.scrollWidth-html.clientWidth,bodyOverflow:body.scrollWidth-html.clientWidth,limits,issues};
     });
     summary.push({screen:screen.id,label:screen.label,width,...report});
-    const mustShot=(width===390||width===768)&&examples.has(screen.id);
+    const mustShot=((width===390||width===768)&&examples.has(screen.id)) || (width===320&&['parties','metric-modal'].includes(screen.id));
     if(mustShot)await page.locator('#preview').screenshot({path:path.join(screenshots,screen.id+'-'+width+'.png')});
    }
   }
@@ -98,5 +98,6 @@ function shortName(node){
   console.log('RESPONSIVE-AUDIT '+JSON.stringify({screens:screens.length,widths,combinations:summary.length,problem_combinations:problemRows.length,problem_screens:byScreen.length}));
   for(const [,item] of byScreen.slice(0,45))console.log('RESPONSIVE-FINDING '+JSON.stringify(item));
   console.log('RESPONSIVE-REPORT '+output);
+  assert.equal(problemRows.length,0,'Measured responsive overlap/overflow remains: '+JSON.stringify(byScreen.map(([,x])=>({screen:x.screen,widths:x.widths,issues:x.issues.slice(0,3)}))));
  }finally{await page.close();await browser.close()}
 })().catch(e=>{console.error('RESPONSIVE-AUDIT-ERROR',e);process.exitCode=1});
