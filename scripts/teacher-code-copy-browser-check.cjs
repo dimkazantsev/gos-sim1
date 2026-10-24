@@ -22,8 +22,12 @@ async function main(){
     const u=new URL(r.request().url());requests.push(u.pathname);
     let data;
     if(u.pathname.endsWith('/list_my_teacher_games'))data={games:[{id:game,title:'Тестовая сохранённая игра',status:'preparing',created_at:'2026-10-25T00:00:00Z',is_owner:true}],is_admin:false};
-    else if(u.pathname.endsWith('/teacher_saved_invitation_list'))data=[];
-    else if(u.pathname==='/rest/v1/games')data={game_code:'GOS-SAVED-TEST'};
+    else if(u.pathname.endsWith('/teacher_saved_invitation_list'))data=[
+     {id:'participant-active',scope:'participant',group_name:null,active:true,created_at:'2026-10-25T00:00:00Z',code:'STD-SAVED-TEST'},
+     {id:'teacher-active',scope:'teacher',group_name:null,active:true,created_at:'2026-10-25T00:00:00Z',code:'TCH-DO-NOT-COPY'},
+     {id:'guest-active',scope:'guest',group_name:null,active:true,created_at:'2026-10-25T00:00:00Z',code:'GST-DO-NOT-COPY'}
+    ];
+    else if(u.pathname==='/rest/v1/games')data={game_code:'GOS-SAVED-TEST',title:'Тестовая сохранённая игра'};
     else throw Error('Unexpected request: '+u.pathname);
     await r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)});
    });
@@ -33,6 +37,14 @@ async function main(){
    const copies=['Копировать код игры','Копировать приглашение преподавателя','Копировать приглашение участника'].map(name=>form.getByRole('button',{name,exact:true}));
    for(const b of copies)assert(await b.isDisabled());assert(await bulk.isDisabled());
    const count=requests.length,last=()=>page.evaluate(()=>window.__copied.at(-1));
+   const savedBulk=page.getByRole('button',{name:'Копировать название игры, код и приглашение участника',exact:true});
+   assert(await savedBulk.isEnabled(),'Saved-game participant copy is available without opening the creation form');
+   await savedBulk.click();
+   assert.equal(await last(),'Название игры: Тестовая сохранённая игра\n\nКод игры: GOS-SAVED-TEST\n\nПриглашение участника: STD-SAVED-TEST','Saved-game copy contains exactly the current owner-visible participant access data');
+   assert(!(await last()).includes('TCH-')&&!(await last()).includes('GST-'),'Never copy teacher or guest access');
+   assert.equal(requests.length,count,'Bulk copy does not fetch or mutate anything');
+   await savedBulk.focus();await page.keyboard.press('Enter');
+   assert.equal(await last(),'Название игры: Тестовая сохранённая игра\n\nКод игры: GOS-SAVED-TEST\n\nПриглашение участника: STD-SAVED-TEST');
    const generators=[form.getByRole('button',{name:'Сгенерировать код игры',exact:true}),...await form.getByRole('button',{name:'Сгенерировать код',exact:true}).all()];
    assert.equal(generators.length,3);
    for(let i=0;i<3;i++){await generators[i].click();const value=await inputs.nth(i+1).inputValue();assert(value.startsWith(['GOS-','TCH-','STD-'][i]));await copies[i].click();assert.equal(await last(),value)}
