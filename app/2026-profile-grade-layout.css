@@ -665,3 +665,145 @@
  .gradeModalRefined .gradeExplanationNumber{flex-basis:28px;width:28px;height:28px}
  .gradeModalRefined .gradeExplanationExtras{padding:13px}
 }
+
+
+/* Grades on phones/tablets: keep score decisions reachable and every form inside the modal.
+   This block intentionally follows the approved ГОС.ID grade tokens and all legacy overrides. */
+.gradeModalBack:has(.gradeModalRefined){
+ box-sizing:border-box;overscroll-behavior:contain;
+}
+.gradeModal.gradeModalRefined{
+ box-sizing:border-box;min-width:0;overflow-x:hidden;overflow-y:auto;
+ max-height:min(94dvh,950px);overscroll-behavior-y:contain;
+ -webkit-overflow-scrolling:touch;
+}
+.gradeModal.gradeModalRefined .gradeModalHeading{
+ position:sticky;top:0;z-index:5;min-width:0;background:#fff;
+}
+.gradeModal.gradeModalRefined .gradeModalHeading>div{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+.gradeModal.gradeModalRefined .gradeModalHeading .gsIconAction{
+ flex:0 0 44px;width:44px;min-width:44px;height:44px;min-height:44px;
+ display:grid;place-items:center;padding:0;align-self:flex-start;
+}
+.gradeModal.gradeModalRefined .gradeApproval{
+ min-width:0;max-width:calc(100% - 40px);margin:14px 20px;padding:18px;
+ gap:14px;grid-template-columns:minmax(180px,.8fr) minmax(0,1.6fr);
+ border:1px solid #ceddf0;background:#f6f9fd;
+}
+.gradeModalRefined .gradeApproval>.styledSelect,
+.gradeModalRefined .gradeApproval>label{display:grid;align-content:start;gap:9px;min-width:0}
+.gradeModalRefined .gradeApproval .styledSelectLabel,
+.gradeModalRefined .gradeApproval>label{
+ color:#365578;font-size:14px;font-weight:750;line-height:1.45;
+}
+.gradeModalRefined .gradeApproval .styledSelectTrigger{
+ box-sizing:border-box;width:100%;min-width:0;min-height:48px;height:auto;
+ padding:10px 12px;white-space:normal;text-align:left;font-size:15px;line-height:1.4;
+}
+.gradeModalRefined .gradeApproval .styledSelectValue{
+ min-width:0;white-space:normal;overflow-wrap:anywhere;
+}
+.gradeModalRefined .gradeApproval textarea{
+ box-sizing:border-box;display:block;width:100%;max-width:100%;min-width:0;
+ min-height:120px;resize:vertical;padding:12px;border:1px solid #ccd9eb;
+ border-radius:10px;background:#fff;color:#243f62;
+ font-size:16px;line-height:1.55;overflow-wrap:anywhere;
+}
+.gradeModalRefined .gradeApproval>div:last-child{
+ display:flex;align-items:stretch;justify-content:flex-end;flex-wrap:wrap;
+ gap:10px;min-width:0;grid-column:1/-1;
+}
+.gradeModalRefined .gradeApproval>div:last-child>button{
+ box-sizing:border-box;flex:0 1 auto;min-height:46px;
+ padding:10px 14px;font-size:14px;line-height:1.4;
+ white-space:normal;overflow-wrap:anywhere;text-align:center;
+}
+.gradeModalRefined .gradeApproval :is(button,textarea):focus-visible,
+.gradeModalRefined .gradeModalHeading .gsIconAction:focus-visible{
+ outline:3px solid #386ce0;outline-offset:2px;
+}
+.gradesPage .gradesMatrixWrap,.gradesPage .gradesMatrix{min-width:0;max-width:100%}
+.gradesPage .gradesMatrix{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.gradesPage .gradesToolbar{min-width:0}
+.gradesPage .gradesToolbar>.styledSelect{min-width:0}
+.gradesPage .gradesToolbar .styledSelectTrigger{min-width:0;max-width:100%}
+
+@media(max-width:900px){
+ .gradeModalBack:has(.gradeModalRefined){padding:10px}
+ .gradeModal.gradeModalRefined{width:100%;max-width:100%;max-height:calc(100dvh - 20px)}
+ .gradeModal.gradeModalRefined .gradeApproval{
+  grid-template-columns:minmax(0,1fr);gap:12px;
+ }
+ .gradeModalRefined .gradeApproval>div:last-child{grid-column:1}
+ .gradeModalRefined .gradeApproval>div:last-child>button{flex:1 1 165px}
+ .gradesPage .gradesToolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .gradesPage .gradesToolbar>label:first-child{grid-column:1/-1}
+ .gradesPage .gradesToolbar>.styledSelect{width:100%;max-width:100%}
+ .gradesPage .gradesToolbar .gradesPending{grid-column:1/-1}
+}
+@media(max-width:600px){
+ .gradeModalBack:has(.gradeModalRefined){
+  inset:0;display:flex;align-items:stretch;justify-content:stretch;
+  padding:0;overflow:hidden;
+ }
+ .gradeModal.gradeModalRefined{
+  flex:1 1 auto;width:100%;min-width:0;max-width:none;
+  height:100dvh;max-height:100dvh;margin:0;
+  border:0;border-radius:0;
+  padding-bottom:env(safe-area-inset-bottom);
+ }
+ .gradeModal.gradeModalRefined .gradeModalHeading{
+  padding:12px 14px;gap:10px;align-items:flex-start;
+ }
+ .gradeModalRefined .gradeModalHeading h2{
+  font-size:clamp(18px,5.5vw,22px);overflow-wrap:anywhere;
+ }
+ .gradeModalRefined .gradeModalHeading p{font-size:13px}
+ .gradeModal.gradeModalRefined .gradeScoreHero,
+ .gradeModal.gradeModalRefined .blitzVsnScore,
+ .gradeModal.gradeModalRefined .gradeCriteria,
+ .gradeModal.gradeModalRefined .gradeRationale,
+ .gradeModal.gradeModalRefined .gradeTeacherNote,
+ .gradeModal.gradeModalRefined .gradeApproval,
+ .gradeModal.gradeModalRefined .gradeEvidence,
+ .gradeModal.gradeModalRefined .gradeRunHistory{
+  box-sizing:border-box;width:auto;max-width:calc(100% - 24px);
+  margin:12px 12px;
+ }
+ .gradeModal.gradeModalRefined .gradeApproval{padding:14px;gap:12px}
+ .gradeModalRefined .gradeApproval>div:last-child{display:grid;grid-template-columns:minmax(0,1fr);gap:9px}
+ .gradeModalRefined .gradeApproval>div:last-child>button{width:100%;min-width:0;min-height:48px}
+ .gradeModalRefined .gradeApproval .styledSelectTrigger{font-size:16px}
+ .gradeModal.gradeModalRefined .gradeRationale{padding:14px}
+ .gradeModalRefined .gradeExplanationCriterion{padding:12px}
+ .gradeModalRefined .gradeExplanationStatus{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+ .gradeModalRefined .gradeExplanationExtras{padding:12px}
+ .gradeModal.gradeModalRefined .gradeRunHistory>summary{
+  gap:10px;line-height:1.5;overflow-wrap:anywhere;min-height:48px;
+ }
+ .gradeModal.gradeModalRefined .gradeRunHistory article{
+  grid-template-columns:minmax(0,1fr);gap:7px;
+ }
+ .gradeModal.gradeModalRefined .gradeRunHistory :is(.gradeRunTrigger,.gradeRunCriteria){
+  min-width:0;max-width:100%;grid-column:1;
+ }
+ .gradeModal.gradeModalRefined .blitzVsnBreakdown{gap:8px}
+ .gradesPage .gradesHero{padding:18px 14px 18px 28px}
+ .gradesPage .gradesHero::before{left:12px;top:19px;bottom:19px}
+ .gradesPage .gradesToolbar{grid-template-columns:minmax(0,1fr)}
+ .gradesPage .gradesToolbar>label:first-child,
+ .gradesPage .gradesToolbar>.styledSelect,
+ .gradesPage .gradesToolbar .gradesPending{grid-column:1}
+ .gradesPage .gradesToolbar .gradesSortDir{grid-column:1}
+ .gradesPage .gradesToolbar :is(input[type="search"],.styledSelectTrigger){font-size:16px}
+ .gradesPage .gradesMatrixWrap{padding:10px}
+ .gradesDebriefRefined .gradesDebriefEditor textarea{font-size:16px}
+}
+@media(max-width:360px){
+ .gradeModal.gradeModalRefined .gradeScoreHero>strong{
+  flex:0 0 54px;width:54px;height:54px;font-size:27px;
+ }
+ .gradeModal.gradeModalRefined .blitzVsnBreakdown{grid-template-columns:minmax(0,1fr)}
+ .gradeModalRefined .gradeExplanationTop{gap:8px}
+ .gradeModalRefined .gradeExplanationName h4{font-size:13px}
+}
