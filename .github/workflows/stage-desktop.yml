@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'components/game/StagesView.tsx'
+      - 'components/ui/StageModuleHeader.module.css'
+      - 'scripts/stage-module-header-alignment-check.cjs'
       - 'components/game/TeacherView.tsx'
       - 'components/game/GameHeader.tsx'
       - 'components/game/TeacherStageManager.tsx'
@@ -79,6 +81,10 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - name: TypeScript
         run: npm run typecheck
+      - name: Stage summary KPI alignment on mobile, tablet and desktop
+        run: node scripts/stage-module-header-alignment-check.cjs
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - name: Build real component preview
         run: npm run design:preview
       - name: Stage 10 linked programme and award/browser regression
