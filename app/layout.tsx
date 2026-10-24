@@ -58,6 +58,7 @@ import './2026-bill-dossier-design.css';
 import './2026-stage12-synced-agenda.css';
 import './party-mobile-header-compact.css';
 import './teacher-agenda-composition.css';
+import './responsive-layout-repair.css';
 import type {Metadata} from 'next';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import '@fontsource-variable/manrope';
