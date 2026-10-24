@@ -66,7 +66,14 @@ for(const name of ['EventComic.tsx','ProfileAvatar.tsx','avatarCrop.ts','ComicSo
 }
 // Document extraction/import uses the same authorised API as the live app.
 for(const name of ['components/GameClient.tsx','components/PublicScreen.tsx'])transform(name,'href="/"','href='+JSON.stringify(base+'/'));
-transform('components/game/SessionManager.tsx',"window.location.assign('/')",'window.location.assign('+JSON.stringify(base+'/')+')');
+// The manager already handles GitHub Pages and its repository base path.
+// Keep supporting older manager versions without breaking new profile management.
+const managerSource=readFileSync(resolve(target,'components/game/SessionManager.tsx'),'utf8');
+if(managerSource.includes("window.location.assign('/')")){
+ transform('components/game/SessionManager.tsx',"window.location.assign('/')",'window.location.assign('+JSON.stringify(base+'/')+')');
+}else if(!managerSource.includes("window.location.hostname.endsWith('.github.io')")||!managerSource.includes(base+'/')){
+ throw Error('Static game manager must preserve GitHub Pages return navigation.');
+}
 // Both StaticLanding (derived from app/page.tsx) and ProfileSecurityPanel now
 // direct password recovery to the application server. Do not rewrite that
 // callback to the static GitHub Pages origin: it cannot serve dynamic recovery.
