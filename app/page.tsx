@@ -107,7 +107,12 @@ export default function Home(){
    // Joining with different visible details never creates another account automatically.
    // Protect the teacher's authenticated account from being silently reused or renamed.
    if(mode!=='teacher'&&session&&!session.user.is_anonymous&&!newParticipantIdentity){
-    throw new Error('В браузере выполнен вход под личной учётной записью. Для теста другим участником включите «Новый участник» ниже. Данные прежней учётной записи сохранятся.');
+    const teacherAccount=await supabase.from('teacher_profiles').select('user_id')
+     .eq('user_id',session.user.id).maybeSingle();
+    if(teacherAccount.error)throw teacherAccount.error;
+    if(teacherAccount.data){
+     throw new Error('В браузере открыт профиль преподавателя. Для теста другим участником включите «Новый участник» ниже. Данные преподавателя сохранятся.');
+    }
    }
    if(mode!=='teacher'&&newParticipantIdentity&&session){
     const signedOut=await supabase.auth.signOut({scope:'local'});
