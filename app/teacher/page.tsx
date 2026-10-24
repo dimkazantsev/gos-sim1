@@ -106,8 +106,33 @@ export default function TeacherPortal(){
  }
  async function logout(){await supabase.auth.signOut();router.replace('/?teacher=1')}
  function choose(id:Section){setSection(id);setStageNo(null);setMobileOpen(false)}
- if(loading)return <main className="connectionPage"><section className="connectionCard" role="status"><BrandIdentity tagline/><h1>Открываем ГОС.ID</h1><p>Загружаем постоянный профиль преподавателя.</p></section></main>;
- if(!authorized)return <main className="connectionPage"><section className="connectionCard" role="alert"><BrandIdentity tagline/><h1>Не удалось открыть профиль преподавателя</h1><p>{error||'Не удалось подтвердить доступ.'}</p><button type="button" className="primary" onClick={()=>void load()}>Повторить</button></section></main>;
+ if(loading||!authorized)return <div className="simShell teacherZeroShell teacherZeroLoadingShell" aria-busy={loading}>
+  <aside className="simSidebar">
+   <div className="sidebarBrand"><BrandIdentity tagline/></div>
+   <section className="sidebarStage teacherZeroStage">
+    <div className="sidebarStageNumber">00</div>
+    <div><small>ПОСТОЯННАЯ СРЕДА</small><b>Нулевая игра</b></div>
+    <span className="paused">Без сеанса</span>
+   </section>
+  </aside>
+  <div className="simWorkspace">
+   <header className="simTop">
+    <div className="mobileBrand"><BrandIdentity tagline/></div>
+    <div className="simTopCenter"><div className="topStageCopy"><small>ПОСТОЯННЫЙ КАБИНЕТ</small><strong>Мой профиль</strong></div></div>
+   </header>
+   <div className="simContentFlow"><main className="simMain" id="game-main">
+    <section className="profileHero teacherZeroLoadingHero" role={loading?'status':'alert'} aria-live="polite">
+     <div className="profilePhoto teacherZeroLoadingPhoto">{loading?<span className="spinner" aria-hidden="true"/>:<UserRound size={36} aria-hidden="true"/>}</div>
+     <div className="profileIntro">
+      <small>ЛИЧНЫЙ КАБИНЕТ</small>
+      <h1>{loading?'Открываем профиль преподавателя':'Не удалось открыть профиль преподавателя'}</h1>
+      <p>{loading?'Проверяем учётную запись и загружаем личные данные.':error||'Не удалось подтвердить доступ.'}</p>
+      {!loading&&<button type="button" className="primary" onClick={()=>void load()}>Повторить</button>}
+     </div>
+    </section>
+   </main></div>
+  </div>
+ </div>;
  const stages=Array.from({length:16},(_,i)=>({no:i+1,...STAGE_OPERATIONS[i+1]}));
  const label=SECTIONS.find(s=>s.id===section)?.label||'Мой профиль';
  return <div className="simShell teacherZeroShell">

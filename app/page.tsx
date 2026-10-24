@@ -63,22 +63,8 @@ export default function Home(){
  function saveSuccessfulGameCode(code:string){
   setSavedGameCodes(rememberGameCode(code));
  }
- // Resume an existing personal teacher session directly without an intermediate
- // code form. Invites, explicit new-game setup and shared links keep their routes.
- useEffect(()=>{
-  const qs=new URLSearchParams(window.location.search);
-  if(qs.has('game')||qs.get('teacher')==='create'||incomingSectionSuffix()||qs.has('invite'))return;
-  let live=true;
-  void (async()=>{
-   try{
-    const auth=await supabase.auth.getSession();if(!live||!auth.data.session?.user)return;
-    const p=await supabase.from('teacher_profiles').select('user_id')
-     .eq('user_id',auth.data.session.user.id).maybeSingle();
-    if(live&&!p.error&&p.data)router.replace('/teacher');
-   }catch{/* Public student entry remains available when profile lookup fails. */}
-  })();
-  return()=>{live=false};
- },[router]);
+ // The public entry always remains available, including for authenticated teachers.
+ // Only an explicit password sign-in or an in-game action opens /teacher.
  // Telegram links arrive at the public entry page. Reuse a session that
  // already exists IN THIS BROWSER; never put bearer tokens in Telegram URLs.
  useEffect(()=>{

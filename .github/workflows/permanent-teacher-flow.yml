@@ -13,6 +13,7 @@ on:
       - 'supabase/migrations/20261024234000_teacher_account_signature_onboarding.sql'
       - 'scripts/teacher-signature-onboarding-check.cjs'
       - 'scripts/permanent-teacher-flow-check.cjs'
+      - 'scripts/teacher-entry-navigation-check.cjs'
       - '.github/workflows/permanent-teacher-flow.yml'
   workflow_dispatch:
 permissions:
@@ -30,5 +31,6 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm run typecheck
       - run: node scripts/permanent-teacher-flow-check.cjs
+      - run: node scripts/teacher-entry-navigation-check.cjs
       - run: node scripts/teacher-signature-onboarding-check.cjs
       - run: node scripts/ksrf-proposal-queue-check.cjs
