@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
-import {ArrowUpRight,Compass,X} from 'lucide-react';
+import {ArrowDown,ArrowRight,ArrowUpRight,Compass,X} from 'lucide-react';
 import type {View} from './types';
 import styles from './GuidedTour.module.css';
 import {placeTourCard,type TourRect} from './tourPlacement';
@@ -84,6 +84,7 @@ export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:To
  },[onSkip]);
  if(typeof document==='undefined')return null;
  const w=viewport.width,h=viewport.height,p=9;
+ const mobile=w<=900;
  const spotlight=rect?{left:Math.max(0,rect.left-p),top:Math.max(0,rect.top-p),right:Math.min(w,rect.right+p),bottom:Math.min(h,rect.bottom+p)}:null;
  const placement=placeTourCard(rect,viewport,cardSize);
  const shownHeight=Math.min(cardSize.height,placement.maxHeight);
@@ -105,8 +106,13 @@ export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:To
    <div className={styles.progressLabel}>Шаг {index+1} из {total}</div>
    <div className={styles.progress}><span style={{width:`${(index+1)/total*100}%`}}/></div>
    <h2>{step.title}</h2><p>{step.body}</p>
-   <div className={styles.action}><ArrowUpRight size={18} aria-hidden="true"/><strong>{step.hint}</strong></div>
-   {!rect&&<button type="button" className={styles.fallback} onClick={()=>onFallback(step.target)}>Открыть указанный раздел</button>}
+   <div className={styles.action}>
+    {mobile?<ArrowDown size={20} aria-hidden="true"/>:<ArrowUpRight size={18} aria-hidden="true"/>}
+    <strong>{mobile?'Нажмите подсвеченную кнопку в нижнем меню: '+step.hint:step.hint}</strong>
+   </div>
+   {(mobile||!rect)&&<button type="button" className={styles.fallback} onClick={()=>onFallback(step.target)}>
+    <span>Перейти в раздел «{step.title}»</span><ArrowRight size={17} aria-hidden="true"/>
+   </button>}
    <button type="button" className={styles.skip} onClick={onSkip}>Пропустить экскурсию</button>
   </div>
  </div>,document.body);
