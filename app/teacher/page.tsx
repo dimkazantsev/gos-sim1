@@ -11,7 +11,7 @@ import './teacher-portal.css';
 
 type GameRow={id:string;title:string;status:string;created_at:string};
 type TeacherIndex={is_admin:boolean;games:GameRow[]};
-type TeacherProfile={full_name:string;bio:string|null;gender:string|null;avatar_path:string|null;signature_path:string|null};
+type TeacherProfile={full_name:string;bio:string|null;gender:string|null;avatar_path:string|null;signature_path:string|null;last_game_id?:string|null};
 const LAST_GAME_KEY='gos-id:teacher-last-game';
 export default function TeacherPortal(){
  const router=useRouter();
@@ -42,14 +42,14 @@ export default function TeacherPortal(){
    const payload=response.data as TeacherIndex|null;
    if(!payload||!Array.isArray(payload.games))throw Error('Сервер не вернул список игр.');
    setIndex(payload);
-   const saved=await supabase.from('teacher_profiles').select('full_name,bio,gender,avatar_path,signature_path')
+   const saved=await supabase.from('teacher_profiles').select('full_name,bio,gender,avatar_path,signature_path,last_game_id')
     .eq('user_id',auth.data.session.user.id).maybeSingle();
    if(!saved.error&&saved.data){
     const p=saved.data as TeacherProfile;setProfile(p);setName(p.full_name||'');setBio(p.bio||'');
    }
    if(!selecting&&payload.games.length){
     let last='';try{last=window.localStorage.getItem(LAST_GAME_KEY)||''}catch{}
-    const game=payload.games.find(x=>x.id===last)||payload.games.find(x=>x.status!=='archived')||payload.games[0];
+    const game=payload.games.find(x=>x.id===last)||payload.games.find(x=>x.id===saved.data?.last_game_id)||payload.games.find(x=>x.status!=='archived')||payload.games[0];
     const access=await supabase.rpc('ensure_my_game_access',{p_game:game.id});
     if(access.error)throw access.error;
     rememberAndGo(game.id);
@@ -67,8 +67,24 @@ export default function TeacherPortal(){
    // trust local UI state or the selected game ID as an access grant.
    const r=await supabase.rpc('ensure_my_game_access',{p_game:id});
    if(r.error)throw r.error;
+   const auth=await supabase.auth.getSession();
+   if(auth.data.session?.user){
+    const preference=await supabase.from('teacher_profiles').update({last_game_id:id})
+      .eq('user_id',auth.data.session.user.id);
+    if(preference.error)console.warn('Не удалось сохранить последнюю выбранную игру');
+   }
    rememberAndGo(id);
   }catch(e){setError(userError(e)||'Нет доступа к выбранной игре.');setOpening(null)}
+ }
+ async function archiveGame(id:string){
+  if(opening||!window.confirm('Архивировать игру? Все документы, этапы, оценки и результаты сохранятся, а действия участников будут остановлены.'))return;
+  setOpening(id);setError('');
+  try{
+   const result=await supabase.rpc('archive_my_teacher_game',{p_game:id});
+   if(result.error)throw result.error;
+   await refresh();
+  }catch(e){setError(userError(e)||'Не удалось архивировать игру.')}
+  finally{setOpening(null)}
  }
  async function savePermanentProfile(){
   if(!profile||savingProfile)return;setSavingProfile(true);setError('');
@@ -118,6 +134,7 @@ export default function TeacherPortal(){
       <button type="button" className="teacherPortalGameOpen" onClick={()=>void openGame(game.id)} disabled={!!opening}>
        {opening===game.id?'Открываем…':'Открыть игру'} <ArrowRight size={17}/>
       </button>
+      {game.status!=='archived'&&<button type="button" className="teacherPortalArchive" disabled={!!opening} onClick={()=>void archiveGame(game.id)}>Архивировать без удаления данных</button>}
      </article>)}
     </div>}
     {!index.games.length&&<section className="teacherPermanentStages" aria-label="Все этапы ГОС.ID">
