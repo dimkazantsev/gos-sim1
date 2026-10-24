@@ -4,14 +4,15 @@ import {useEffect,useRef,useState} from 'react';
 import {Landmark,ShieldCheck,Clock3} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import type {RoleGroup} from './gameOfficeCatalog';
 type Office={id:string;user_id:string;role_title:string;status:string;legal_basis:string;educational_exception:boolean;created_at:string};
-const ROLES=['Депутат Государственной Думы','Председатель Государственной Думы','Председатель комитета Государственной Думы','Сенатор Совета Федерации','Президент Российской Федерации','Председатель Правительства Российской Федерации','Министр финансов','Министр экономики','Министр здравоохранения','Министр образования','Министр науки','Министр культуры','Министр транспорта','Министр труда','Министр энергетики','Министр цифрового развития','Министр иностранных дел','Министр внутренних дел','Министр чрезвычайных ситуаций','Министр природных ресурсов','Председатель Банка России','Глава муниципального образования','Глава городской администрации','Редактор СМИ','Председатель Счётной палаты','Судья','Председатель избирательной комиссии'];
-export default function ProfileOffices({g,userId,readOnly=false}:{g:ReturnTypeRepublic;userId:string;readOnly?:boolean}){
+export default function ProfileOffices({g,userId,readOnly=false,roleGroups,catalogReady,catalogError}:{g:ReturnTypeRepublic;userId:string;readOnly?:boolean;roleGroups:RoleGroup[];catalogReady:boolean;catalogError:string}){
  const students=g.members.filter(m=>m.kind==='student');
  const initialTarget=students.some(m=>m.user_id===userId)?userId:g.teacher?students[0]?.user_id||'':userId;
- const [targetId,setTargetId]=useState(initialTarget),[offices,setOffices]=useState<Office[]>([]),[roleChoice,setRoleChoice]=useState(''),[customRole,setCustomRole]=useState(''),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
+ const [targetId,setTargetId]=useState(initialTarget),[offices,setOffices]=useState<Office[]>([]),[roleChoice,setRoleChoice]=useState(''),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
  const request=useRef(0);
- const role=(roleChoice==='__custom__'?customRole:roleChoice).trim();
+ const role=roleChoice.trim();
+ const roleAllowed=roleGroups.some(group=>group.roles.includes(role));
  const target=g.members.find(m=>m.user_id===targetId),active=offices.filter(o=>o.status==='active');
  const canInitiate=!readOnly&&(g.teacher||/президент|председатель.*правительств|глава/i.test(g.me?.role_title||''));
  async function load(){
@@ -22,15 +23,15 @@ export default function ProfileOffices({g,userId,readOnly=false}:{g:ReturnTypeRe
   if(r.error)setNotice(userError(r.error));else setOffices((r.data||[]) as Office[]);
  }
  useEffect(()=>{setTargetId(initialTarget);setNotice('')},[userId,g.teacher]);
- useEffect(()=>{setRoleChoice('');setCustomRole('')},[targetId]);
+ useEffect(()=>{setRoleChoice('')},[targetId,roleGroups]);
  useEffect(()=>{if(g.teacher&&!students.some(m=>m.user_id===targetId))setTargetId(students[0]?.user_id||'')},[g.members,targetId,g.teacher]);
  useEffect(()=>{setOffices([]);void load();return()=>{request.current++}},[g.game?.id,targetId,g.members]);
  async function appoint(){
-  if(readOnly||!g.game||busy||!target||target.kind!=='student'||role.length<2||offices.some(o=>o.role_title.toLocaleLowerCase('ru-RU')===role.toLocaleLowerCase('ru-RU')))return;
+  if(readOnly||!g.game||busy||!target||target.kind!=='student'||!catalogReady||!roleAllowed||offices.some(o=>o.role_title.toLocaleLowerCase('ru-RU')===role.toLocaleLowerCase('ru-RU')))return;
   setBusy(true);setNotice('');
   const r=await supabase.rpc('appoint_game_office',{p_game:g.game.id,p_user:targetId,p_role:role.trim(),p_basis:g.teacher?'Назначение должности в органе публичной власти':'Представление о назначении должностного лица',p_exception:g.teacher});
   setNotice(r.error?userError(r.error):g.teacher?'Должность назначена. Полномочия доступны автоматически.':'Представление направлено преподавателю.');
-  if(!r.error){setRoleChoice('');setCustomRole('');await Promise.all([load(),g.refresh()])}setBusy(false);
+  if(!r.error){setRoleChoice('');await Promise.all([load(),g.refresh()])}setBusy(false);
  }
  async function review(id:string,approve:boolean){
   if(readOnly||busy)return;setBusy(true);
@@ -48,18 +49,17 @@ export default function ProfileOffices({g,userId,readOnly=false}:{g:ReturnTypeRe
    {canInitiate&&<div className="officeAssignmentForm officeAssignmentFormRefined">
     <div className="officeAssignmentPicker">
      <label>Добавить должность
-      <select aria-label="Роль для назначения" value={roleChoice} onChange={e=>setRoleChoice(e.target.value)} disabled={busy}>
-       <option value="">Выберите должность из списка</option>
-       {ROLES.map(r=>{const assigned=offices.some(o=>o.role_title.toLocaleLowerCase('ru-RU')===r.toLocaleLowerCase('ru-RU'));return <option key={r} value={r} disabled={assigned}>{r}{assigned?' — уже назначена':''}</option>})}
-       <option value="__custom__">Другая должность…</option>
+      <select aria-label="Роль для назначения" value={roleChoice} onChange={e=>setRoleChoice(e.target.value)} disabled={busy||!catalogReady}>
+       <option value="">{catalogReady?'Выберите должность из списка':'Загружаем должности игры…'}</option>
+       {roleGroups.map(group=><optgroup key={group.label} label={group.label}>
+        {group.roles.map(r=>{const assigned=offices.some(o=>o.role_title.toLocaleLowerCase('ru-RU')===r.toLocaleLowerCase('ru-RU'));return <option key={r} value={r} disabled={assigned}>{r}{assigned?' — уже назначена':''}</option>})}
+       </optgroup>)}
       </select>
      </label>
-     {roleChoice==='__custom__'&&<label>Название должности
-      <input aria-label="Укажите должность" value={customRole} maxLength={180} onChange={e=>setCustomRole(e.target.value)} placeholder="Введите официальное наименование"/>
-     </label>}
     </div>
-    <button type="button" disabled={busy||role.length<2||offices.some(o=>o.role_title.toLocaleLowerCase('ru-RU')===role.toLocaleLowerCase('ru-RU'))} onClick={()=>void appoint()}>{busy?'Назначение…':g.teacher?'Назначить должность':'Предложить назначение'}</button>
-    <small>Назначения сохраняются независимо друг от друга. Доступ определяется полномочиями каждой должности.</small>
+    <button type="button" disabled={busy||!catalogReady||!roleAllowed||offices.some(o=>o.role_title.toLocaleLowerCase('ru-RU')===role.toLocaleLowerCase('ru-RU'))} onClick={()=>void appoint()}>{busy?'Назначение…':g.teacher?'Назначить должность':'Предложить назначение'}</button>
+    {catalogError&&<small role="alert">{catalogError}</small>}
+    <small>Перечень соответствует правилам ГОС.ID: пять министерств, пять комитетов и игровые органы. Должности сохраняются независимо друг от друга; полномочия проверяются сервером.</small>
    </div>}
   </>}
   {!g.teacher&&target?.kind==='teacher'&&<p>Преподаватель имеет полный административный доступ.</p>}
