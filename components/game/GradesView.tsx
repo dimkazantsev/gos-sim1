@@ -35,6 +35,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
  const [debriefRows,setDebriefRows]=useState<Debrief[]>([]);
  const [selected,setSelected]=useState<{userId:string;stageNo:number}|null>(null);
  const evidenceRequest=useRef(0);
+ const loadRequest=useRef(0);
  const [evidence,setEvidence]=useState<Evidence|null>(null);
  const [loadingEvidence,setLoadingEvidence]=useState(false);
  const [editScore,setEditScore]=useState<number|null>(null);
@@ -77,13 +78,15 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
 
 
  async function load(){
+  const request=++loadRequest.current;
   if(!game)return;
   if(teacher){
    const r=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).order('stage_no');
-   if(!r.error)setRows((r.data||[]) as Assessment[]);
+   if(!r.error&&request===loadRequest.current)setRows((r.data||[]) as Assessment[]);
   }else{
    // Everyone sees numerical scores; details belong only to the actual account owner.
    const publicResult=await supabase.rpc('get_public_stage_scores',{p_game_id:game.id});
+   if(request!==loadRequest.current)return;
    const safeRows:Assessment[]=((publicResult.data||[]) as Pick<Assessment,'user_id'|'stage_no'|'auto_score'|'final_score'|'status'>[])
     .map(a=>({...a,id:'public-'+a.user_id+'-'+a.stage_no,game_id:game.id,
       criterion_law:false,criterion_strategy:false,criterion_debrief:false,
@@ -91,6 +94,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
       teacher_note:null,finalized_at:null}));
    if(me&&authId===me.user_id){
     const own=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no');
+    if(request!==loadRequest.current)return;
     if(!own.error){
      const map=new Map(safeRows.map(a=>[a.user_id+':'+a.stage_no,a]));
      for(const a of (own.data||[]) as Assessment[])map.set(a.user_id+':'+a.stage_no,a);
@@ -98,8 +102,10 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
     }else setRows(safeRows);
    }else setRows(safeRows);
   }
+  if(request!==loadRequest.current)return;
   if(me?.kind==='student'&&authId===me.user_id){
    const d=await supabase.from('stage_debriefs').select('*').eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no');
+   if(request!==loadRequest.current)return;
    if(!d.error)setDebriefRows((d.data||[]) as Debrief[]);
   }
  }
@@ -112,7 +118,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
    .on('postgres_changes',{event:'*',schema:'public',table:'stage_debriefs',filter:'game_id=eq.'+game.id},()=>void load())
    .subscribe();
   return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ },[game?.id,authId,teacher,me?.user_id]);
 
  const currentStage=stages.find(s=>s.status==='open');
  const eligibleDebriefStages=stages.filter(s=>s.status==='open'||s.status==='completed');

@@ -212,7 +212,7 @@ export default function Home(){
     <div className="entryEyebrow"><span/>Учебная игра · ГМУ</div>
     <h1 id="entry-title">Государство<br/>начинается<br/><em>с вашего решения.</em></h1>
     <p className="entryLead">Создавайте партии. Принимайте законы. Договаривайтесь о будущем. Пройдите путь от первого политического союза до управления целой республикой.</p>
-    <div className="entryVisual"><CivicArtwork/><div className="entryVisualCaption"><span>РЕСПУБЛИКА ПОЛИТОЛОГИЯ</span><ArrowUpRight aria-hidden="true"/></div></div>
+    <div className="entryVisual"><CivicArtwork/><div className="entryVisualCaption"><span>{BRAND_NAME} // {BRAND_TAGLINE}</span><ArrowUpRight aria-hidden="true"/></div></div>
     <div className="entryFacts"><div><b>16</b><span>этапов игры</span></div><div><Landmark aria-hidden="true"/><span>Реальные институты.<br/>Учебные решения.</span></div><div><GraduationCap aria-hidden="true"/><span>Практика государственного<br/>и муниципального управления</span></div></div>
    </section>
    <section className="entryAccess" aria-labelledby="entry-heading">
