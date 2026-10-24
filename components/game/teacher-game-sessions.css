@@ -43,3 +43,97 @@
  .gosTeacherSessions .gosTeacherAccessToggle{justify-self:stretch}
  .gosTeacherSessions .teacherCodeActiveRoles{grid-template-columns:minmax(0,1fr)}
 }
+
+/* Create-game fields must not vertically distribute a <label>'s input,
+   action and hint according to the other column's longer contents.
+   Keep the existing ГОС.ID palette, borders, typography and controls. */
+.gosTeacherSessions .gosTeacherCreateGameCode{
+ display:grid;
+ grid-template-columns:minmax(0,1fr);
+ align-content:start;
+ justify-items:stretch;
+ gap:8px;
+ min-width:0;
+}
+.gosTeacherSessions .gosTeacherCreateCodes{
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ align-items:stretch;
+ gap:12px;
+}
+.gosTeacherSessions .gosTeacherCreateCodeField{
+ display:grid;
+ grid-template-columns:minmax(0,1fr);
+ grid-template-rows:auto 48px 44px minmax(0,auto);
+ align-content:start;
+ align-items:start;
+ gap:8px;
+ min-width:0;
+ padding:14px;
+ border:1px solid var(--gs-border,#dce5f2);
+ border-radius:12px;
+ background:#fff;
+}
+.gosTeacherSessions .gosTeacherCreateGameCode>label,
+.gosTeacherSessions .gosTeacherCreateCodeField>label{
+ display:block;
+ min-width:0;
+ margin:0;
+ font-size:13px;
+ font-weight:700;
+ line-height:1.4;
+ color:var(--gs-ink,#142d50);
+}
+.gosTeacherSessions .gosTeacherCreateGameCode>input,
+.gosTeacherSessions .gosTeacherCreateCodeField>input{
+ display:block;
+ box-sizing:border-box;
+ width:100%;
+ min-width:0;
+ height:48px;
+ min-height:48px;
+ margin:0;
+ align-self:start;
+}
+.gosTeacherSessions .gosTeacherCreateGameCode>button,
+.gosTeacherSessions .gosTeacherCreateCodeField>button{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ justify-self:start;
+ align-self:start;
+ box-sizing:border-box;
+ width:auto;
+ min-width:222px;
+ height:44px;
+ min-height:44px;
+ margin:0;
+ padding:9px 16px;
+ white-space:normal;
+ line-height:1.3;
+}
+.gosTeacherSessions .gosTeacherCreateCodeField>.gosTeacherCreateCodeHint{
+ align-self:start;
+ min-width:0;
+ margin:0;
+ font-size:12px;
+ font-weight:500;
+ line-height:1.5;
+ color:var(--gs-muted,#5c718d);
+ overflow-wrap:anywhere;
+}
+@media(max-width:760px){
+ .gosTeacherSessions .gosTeacherCreateCodes{
+  grid-template-columns:minmax(0,1fr);
+ }
+ .gosTeacherSessions .gosTeacherCreateCodeField{
+  padding:12px;
+ }
+}
+@media(max-width:420px){
+ .gosTeacherSessions .gosTeacherCreateGameCode>button,
+ .gosTeacherSessions .gosTeacherCreateCodeField>button{
+  justify-self:stretch;
+  width:100%;
+  min-width:0;
+ }
+}
