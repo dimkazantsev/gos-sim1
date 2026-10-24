@@ -68,4 +68,14 @@ assert(ui.indexOf('preserveOwnTeacherAssets(s.id,me.user_id)')<ui.indexOf('await
  'Permanent teacher media must be migrated before cleanup');
 assert(!/delete\s+from\s+public\.teacher_profiles/i.test(permanent),
  'Game deletion must not erase the permanent teacher account');
+const purgeGuard=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20261024224500_prevent_shared_teacher_asset_purge.sql'),'utf8');
+assert(purgeGuard.includes("JOIN storage.objects o ON o.bucket_id='game-assets'"),
+ 'All teachers shared with the game must be checked before file deletion');
+assert(purgeGuard.includes('g.owner_id<>(select auth.uid())')&&purgeGuard.includes("g.status<>'archived'"),
+ 'Private guard checks owner permissions and archive status');
+assert(ui.indexOf("supabase.rpc('assert_game_teacher_assets_safe_to_purge'")>
+       ui.indexOf('preserveOwnTeacherAssets(s.id,me.user_id)')&&
+       ui.indexOf("supabase.rpc('assert_game_teacher_assets_safe_to_purge'")<
+       ui.indexOf('await purgeGameAssets(s.id'),
+ 'Files of other teachers must be checked before purging any shared game media');
 console.log('PASS permanent teacher asset storage: identity, access, profile sync and safe deletion order');
