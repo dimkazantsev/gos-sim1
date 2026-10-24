@@ -2,11 +2,12 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const read=p=>fs.readFileSync(p,'utf8');
 const source=read('components/game/TeacherAccessCodes.tsx');
-const session=read('components/game/SessionManager.tsx');
+const session=read('components/game/TeacherGameSessions.tsx');
+const manager=read('components/game/SessionManager.tsx');
 const page=read('app/page.tsx');
 const sql=read('supabase/migrations/20261013234000_unified_guest_access_codes.sql');
-assert.ok(session.includes('<TeacherAccessCodes gameId={game.id}/>'));
-assert.ok(!session.includes('profileGuestInvites')&&!session.includes('guestCode,setGuestCode'),'No duplicate guest code editor');
+assert.ok(session.includes('<TeacherAccessCodes gameId={game.id}/>')&&session.includes('<SessionManager session={game}'),'Owner has exactly one invitation panel and one safe maintenance row');
+assert.ok(!session.includes('profileGuestInvites')&&!session.includes('guestCode,setGuestCode')&&manager.includes('delete_game_permanently'),'No duplicate guest code editor or unsafe delete replacement');
 for(const marker of ['participant','group','guest' ,'teacher_create_saved_invitation','teacher_saved_invitation_list',
  'teacher_revoke_access_code','teacher_delete_access_code','Сгенерировать','Создать приглашение','Копировать']){
  assert.ok(source.includes(marker),'Missing single-panel feature '+marker);
