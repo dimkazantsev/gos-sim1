@@ -1,21 +1,36 @@
 'use client';
-import {useCallback,useEffect,useState} from 'react';
+import {useCallback,useEffect,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
 import Link from 'next/link';
 import {ArrowRight,BookOpenText,LogOut,PlusCircle,RefreshCcw,ShieldCheck} from 'lucide-react';
 import {BRAND_NAME,BrandIdentity} from '@/components/ui/BrandIdentity';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
+import {STAGE_OPERATIONS} from '@/components/game/stageOperations';
 import './teacher-portal.css';
 
 type GameRow={id:string;title:string;status:string;created_at:string};
 type TeacherIndex={is_admin:boolean;games:GameRow[]};
+type TeacherProfile={full_name:string;bio:string|null;gender:string|null;avatar_path:string|null;signature_path:string|null};
+const LAST_GAME_KEY='gos-id:teacher-last-game';
 export default function TeacherPortal(){
  const router=useRouter();
  const [index,setIndex]=useState<TeacherIndex|null>(null);
  const [loading,setLoading]=useState(true);
  const [opening,setOpening]=useState<string|null>(null);
  const [error,setError]=useState('');
+ const [profile,setProfile]=useState<TeacherProfile|null>(null);
+ const [name,setName]=useState(''),[bio,setBio]=useState('');
+ const [savingProfile,setSavingProfile]=useState(false);
+ const navigating=useRef(false);
+ const selecting=typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('choose')==='1';
+ function rememberAndGo(id:string){
+  if(navigating.current)return;
+  navigating.current=true;
+  try{window.localStorage.setItem(LAST_GAME_KEY,id)}catch{}
+  if(window.location.hostname.endsWith('.github.io'))window.location.assign('/gos-sim1/?game='+encodeURIComponent(id));
+  else router.replace('/game/'+encodeURIComponent(id));
+ }
  const refresh=useCallback(async()=>{
   setLoading(true);setError('');
   try{
@@ -29,7 +44,7 @@ export default function TeacherPortal(){
    setIndex(payload);
   }catch(e){setError(userError(e)||'Не удалось открыть кабинет преподавателя.');setIndex(null)}
   finally{setLoading(false)}
- },[router]);
+ },[router,selecting]);
  useEffect(()=>{void refresh()},[refresh]);
  async function openGame(id:string){
   if(opening)return;
@@ -39,11 +54,18 @@ export default function TeacherPortal(){
    // trust local UI state or the selected game ID as an access grant.
    const r=await supabase.rpc('ensure_my_game_access',{p_game:id});
    if(r.error)throw r.error;
-   if(window.location.hostname.endsWith('.github.io')){
-    // Static GitHub Pages uses ?game=UUID instead of the Next.js dynamic route.
-    window.location.assign('/gos-sim1/?game='+encodeURIComponent(id));
-   }else router.push('/game/'+encodeURIComponent(id));
+   rememberAndGo(id);
   }catch(e){setError(userError(e)||'Нет доступа к выбранной игре.');setOpening(null)}
+ }
+ async function savePermanentProfile(){
+  if(!profile||savingProfile)return;setSavingProfile(true);setError('');
+  try{
+   const auth=await supabase.auth.getSession();if(!auth.data.session?.user)throw Error('Требуется вход');
+   const r=await supabase.from('teacher_profiles').update({full_name:name.trim(),bio:bio.trim()||null,updated_at:new Date().toISOString()})
+    .eq('user_id',auth.data.session.user.id).select('full_name,bio,gender,avatar_path,signature_path').single();
+   if(r.error)throw r.error;setProfile(r.data as TeacherProfile);
+  }catch(e){setError(userError(e)||'Не удалось сохранить профиль преподавателя.')}
+  finally{setSavingProfile(false)}
  }
  async function signOut(){
   setOpening('logout');
@@ -59,9 +81,9 @@ export default function TeacherPortal(){
   <div className="teacherPortalContent">
    <div className="teacherPortalEyebrow"><ShieldCheck size={16}/> ЛИЧНАЯ УЧЁТНАЯ ЗАПИСЬ</div>
    <h1>Кабинет преподавателя</h1>
-   <p className="teacherPortalIntro">Вход по личной почте и паролю. Коды игр и приглашения для доступа к кабинету не требуются.</p>
+   <p className="teacherPortalIntro">{!index?'Восстанавливаем личный профиль и последнюю игру.':index.games.length?'Выберите игру. При обычном входе последняя игра открывается сразу.':'Постоянный профиль доступен без созданных игр. Данные Вашей учётной записи сохраняются независимо от игровых сессий.'}</p>
    <div className="teacherPortalActions">
-    <button type="button" onClick={()=>void refresh()} disabled={loading||!!opening}><RefreshCcw size={17}/> Обновить список</button>
+    <button type="button" onClick={()=>void refresh()} disabled={loading||!!opening}><RefreshCcw size={17}/> Обновить</button>
     <Link className="teacherPortalPrimary" href="/?teacher=create"><PlusCircle size={18}/> Создать игру</Link>
    </div>
    {error&&<p className="teacherPortalError" role="alert">{error}</p>}
