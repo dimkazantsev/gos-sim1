@@ -18,7 +18,7 @@ function harness({responses=[ok],adoption=[{error:null}],rpc=[{data:'fixture-gam
   useEffect(){cursor++;},useMemo(fn){cursor++;return fn();}
  };
  const jsx=(type,props)=>({type,props:props||{}});
- const supabase={auth:{getSession(){throw Error('Explicit password login must not refresh the stored session');},async setSession(session){assert.equal(session.access_token,'fixture-access');return adoption[Math.min(calls.adopt++,adoption.length-1)];}},async rpc(name,args){assert.equal(name,'resume_member_game');assert.equal(args.p_game_code,'FIXTURE');return rpc[Math.min(calls.resume++,rpc.length-1)];}};
+ const supabase={auth:{getSession(){throw Error('Explicit password login must not refresh the stored session');},async setSession(session){assert.equal(session.access_token,'fixture-access');return adoption[Math.min(calls.adopt++,adoption.length-1)];}},async rpc(name,args){assert.equal(name,'resume_member_game_as_role');assert.equal(args.p_expected_kind,'student');assert.equal(args.p_game_code,'FIXTURE');return rpc[Math.min(calls.resume++,rpc.length-1)];}};
  const requireFor=name=>{
   if(name==='react')return react;
   if(name==='react/jsx-runtime')return{jsx,jsxs:jsx};

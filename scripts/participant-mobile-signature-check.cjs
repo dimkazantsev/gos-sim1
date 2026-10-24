@@ -23,6 +23,7 @@ assert(tour.includes('onClick={()=>onFallback(step.target)}'),'Mobile alternativ
 assert(css.includes('.fallback{display:flex'),'Mobile fallback must be a proper button');
 assert(dock.includes('.mobileDockIcon .eventDockBadge')&&dock.includes('top:0;right:-8px'),'Counters kept within clipped horizontal dock');
 assert(dock.includes('.mobileDockIcon{position:relative;transform:translateY(2px)}'),'Shared optical baseline');
-assert(home.includes("newParticipantIdentity&&session"),'Switch creates a separate anonymous identity');
+assert(home.includes("switchIdentity=!!check.data")&&!home.includes("newParticipantIdentity"),'Student/guest identity is isolated automatically without confusing checkbox');
+assert(home.includes("rpc('join_game_as_role'"),'Role must be enforced by new RPC');
 assert(migration.includes('gm.kind<>k')&&migration.includes('auth.uid()'),'RPC blocks cross-role changes');
 console.log('PASS: real-role signature guard, mobile tutorial action, counters and protected classroom identity switching.');
