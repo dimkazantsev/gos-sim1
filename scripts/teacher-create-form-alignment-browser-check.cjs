@@ -32,7 +32,7 @@ async function main(){
   for(const width of [1440,1024,820,768,600,390,320]){
    const page=await browser.newPage({viewport:{width,height:920},deviceScaleFactor:1,reducedMotion:'reduce'});
    await page.route('**/rest/v1/rpc/list_my_teacher_games',route=>route.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'{"is_admin":true,"games":[]}'}));
-   await page.goto(url,{waitUntil:'domcontentloaded'});
+   await page.goto(url,{waitUntil:'networkidle'});
    await page.getByRole('button',{name:'Создать игру',exact:true}).click();
    const form=page.locator('.gosTeacherCreateForm');
    const teacher=form.locator('.gosTeacherCreateCodeField').nth(0);
@@ -40,7 +40,7 @@ async function main(){
    const game=form.locator('.gosTeacherCreateGameCode');
    const box=async(el)=>el.evaluate(x=>{const r=x.getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,width:r.width,height:r.height,scroll:x.scrollWidth,client:x.clientWidth}});
    const inputs=[await box(teacher.locator('input')),await box(student.locator('input'))];
-   const buttons=[await box(teacher.locator('button')),await box(student.locator('button'))];
+   const buttons=[await box(teacher.getByRole('button',{name:'Сгенерировать код',exact:true})),await box(student.getByRole('button',{name:'Сгенерировать код',exact:true}))];
    const hints=[await box(teacher.locator('.gosTeacherCreateCodeHint')),await box(student.locator('.gosTeacherCreateCodeHint'))];
    const cards=[await box(teacher),await box(student)],panel=await box(form);
    assert(cards.every(x=>x.left>=panel.left-1&&x.right<=panel.right+1),'Cards escape form at '+width);

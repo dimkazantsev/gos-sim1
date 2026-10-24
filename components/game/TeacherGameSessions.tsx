@@ -1,6 +1,6 @@
 'use client';
 import {FormEvent,useCallback,useEffect,useState} from 'react';
-import {Archive,ArrowRight,Plus,RefreshCcw} from 'lucide-react';
+import {Archive,ArrowRight,Copy,Plus,RefreshCcw} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {rememberGameCode} from '@/lib/rememberedGameCodes';
 import {userError} from '@/lib/userError';
@@ -36,6 +36,10 @@ export default function TeacherGameSessions({displayName='Преподавате
   setIndex(value);onGamesChanged?.(value.games);
  },[onGamesChanged]);
  useEffect(()=>{void refresh()},[refresh]);
+ async function copy(value:string,all=false){
+  try{await navigator.clipboard.writeText(value);setError('');setNotice(all?'Название игры, код и приглашение участника скопированы.':'Код скопирован.');}
+  catch{setNotice('');setError('Не удалось скопировать. Выделите нужные значения в полях и скопируйте вручную.');}
+ }
  async function create(e:FormEvent){
   e.preventDefault();if(busy)return;
   const code=gameCode.trim().toUpperCase(),teach=teacherCode.trim(),student=studentCode.trim();
@@ -92,23 +96,26 @@ export default function TeacherGameSessions({displayName='Преподавате
    <div className="gosTeacherCreateGameCode">
     <label htmlFor="gos-teacher-game-code">Код игры</label>
     <input id="gos-teacher-game-code" required autoComplete="off" maxLength={32} value={gameCode} onChange={e=>setGameCode(e.target.value.toUpperCase())} placeholder="GOS-2026"/>
-    <button type="button" className="secondary" onClick={()=>setGameCode(generated('GOS'))}>Сгенерировать код игры</button>
+    <div className="gosTeacherCreateCodeActions"><button type="button" className="secondary" onClick={()=>setGameCode(generated('GOS'))}>Сгенерировать код игры</button><button type="button" className="secondary" aria-label="Копировать код игры" disabled={busy||!gameCode.trim()} onClick={()=>void copy(gameCode.trim().toUpperCase())}><Copy size={16} aria-hidden="true"/>Копировать</button></div>
    </div>
    <div className="gosTeacherCreateCodes">
     <div className="gosTeacherCreateCodeField">
      <label htmlFor="gos-teacher-invite-code">Приглашение дополнительного преподавателя</label>
      <input id="gos-teacher-invite-code" type="text" required minLength={8} maxLength={80} autoComplete="off" value={teacherCode} onChange={e=>setTeacherCode(e.target.value)}/>
-     <button type="button" className="secondary" onClick={()=>setTeacherCode(generated('TCH'))}>Сгенерировать код</button>
+     <div className="gosTeacherCreateCodeActions"><button type="button" className="secondary" onClick={()=>setTeacherCode(generated('TCH'))}>Сгенерировать код</button><button type="button" className="secondary" aria-label="Копировать приглашение преподавателя" disabled={busy||!teacherCode.trim()} onClick={()=>void copy(teacherCode.trim())}><Copy size={16} aria-hidden="true"/>Копировать</button></div>
      <p className="gosTeacherCreateCodeHint">Это не пароль владельца. Дополнительному преподавателю потребуется подтверждённая учётная запись.</p>
     </div>
     <div className="gosTeacherCreateCodeField">
      <label htmlFor="gos-student-invite-code">Приглашение участника</label>
      <input id="gos-student-invite-code" type="text" required minLength={8} maxLength={80} autoComplete="off" value={studentCode} onChange={e=>setStudentCode(e.target.value)}/>
-     <button type="button" className="secondary" onClick={()=>setStudentCode(generated('STD'))}>Сгенерировать код</button>
+     <div className="gosTeacherCreateCodeActions"><button type="button" className="secondary" onClick={()=>setStudentCode(generated('STD'))}>Сгенерировать код</button><button type="button" className="secondary" aria-label="Копировать приглашение участника" disabled={busy||!studentCode.trim()} onClick={()=>void copy(studentCode.trim())}><Copy size={16} aria-hidden="true"/>Копировать</button></div>
      <p className="gosTeacherCreateCodeHint">Предназначено только для участников игры и не даёт прав преподавателя.</p>
     </div>
    </div>
-   <button type="submit" className="primary" disabled={busy}>{busy?'Создание…':'Создать и открыть игру'}</button>
+   <div className="gosTeacherCreateFormActions">
+    <button type="submit" className="primary" disabled={busy}>{busy?'Создание…':'Создать и открыть игру'}</button>
+    <button type="button" className="secondary" disabled={busy||!title.trim()||!gameCode.trim()||!studentCode.trim()} onClick={()=>void copy('Название игры: '+title.trim()+'\n\nКод игры: '+gameCode.trim().toUpperCase()+'\n\nПриглашение участника: '+studentCode.trim(),true)}><Copy size={16} aria-hidden="true"/>Копировать все коды</button>
+   </div>
   </form>}
   {!index&&<p className="gosTeacherSessionsEmpty" role="status">Получаем список игр…</p>}
   {index&&index.games.length===0&&<p className="gosTeacherSessionsEmpty">Игровых сеансов пока нет. Создайте первую игру здесь — без повторной регистрации преподавателя.</p>}

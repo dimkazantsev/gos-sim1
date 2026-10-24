@@ -162,6 +162,7 @@ async function copy(value:string){
     </label>
     <div className="teacherCodeActions">
      <button type="button" disabled={busy} onClick={()=>setNewGameCode(generateCode('GOS'))}><RotateCw size={16}/> Сгенерировать</button>
+     <button type="button" disabled={busy||!newGameCode.trim()} aria-label="Копировать новый код игры" onClick={()=>void copy(newGameCode.trim().toUpperCase())}><Copy size={16} aria-hidden="true"/>Копировать</button>
      <button type="button" disabled={busy||!/^[A-Z0-9-]{4,32}$/.test(newGameCode)} onClick={()=>void saveGameCode()}>Сохранить</button>
     </div>
    </div>
@@ -184,6 +185,7 @@ async function copy(value:string){
     </label>
     <div className="teacherCodeActions">
      <button type="button" disabled={busy} onClick={()=>setNewInvite(generateCode(scope==='group'?'GRP':scope==='guest'?'GST':scope==='teacher'?'TCH':'STD'))}><RotateCw size={16}/> Сгенерировать</button>
+     <button type="button" disabled={busy||!newInvite.trim()} aria-label="Копировать новое приглашение" onClick={()=>void copy(newInvite.trim())}><Copy size={16} aria-hidden="true"/>Копировать</button>
      <button type="button" disabled={busy||newInvite.trim().length<(scope==='guest'?6:8)||scope==='group'&&!groupName.trim()} onClick={()=>void addCode()}>Создать приглашение</button>
     </div>
    </div>
