@@ -76,7 +76,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const primary=PRIMARY.map(k=>allowed.find(m=>m.metric_key===k)).filter(Boolean) as Metric[];
  const secondary=allowed.filter(m=>!PRIMARY.includes(m.metric_key));
  const visibleMetrics=[...primary,...secondary];
- const chosen=allowed.find(m=>m.id===selected&&(m.metric_key!=='budget'||g.budgetPulse));
+ const chosen=allowed.find(m=>m.id===selected);
  useEffect(()=>{
   if(!chosen||!plotRef.current)return;
   const node=plotRef.current;
@@ -95,7 +95,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const metricEvents=hist.filter(entry=>entry.source_type!=='baseline').length;
  const percentBound=(chosen?.min_value??0)===0&&(chosen?.max_value??100)===100;
  const formatDelta=(v:number)=>(v>0?'+':'')+new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(v);
- const comparisonOptions=visibleMetrics.filter(m=>m.id!==chosen?.id&&(m.metric_key!=='budget'||g.budgetPulse));
+ const comparisonOptions=visibleMetrics.filter(m=>m.id!==chosen?.id);
  const activeMetrics=chosen?[chosen,...comparisonOptions.filter(m=>compare.includes(m.id))]:[];
  const comparisonLimitReached=activeMetrics.length>=MAX_CHART_SERIES;
  const snapshotAt=useMemo(()=>Date.now(),[selected]);
@@ -123,14 +123,14 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
 
  function card(m:Metric){
   const d=delta(m);
-  const pending=m.metric_key==='budget'&&!g.budgetPulse;
+  const pending=m.metric_key==='budget'&&!Number.isFinite(Number(m.value));
   const rows=rowsFor(m.metric_key);
   const mini=rows.slice(-12).map(h=>Number(h.value));
   const last=rows.at(-1);
   const pct=m.max_value!=null&&m.min_value!=null?Math.max(0,Math.min(100,(Number(m.value)-Number(m.min_value))/Math.max(1,Number(m.max_value)-Number(m.min_value))*100)):null;
-  return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} data-budget-metric-value={m.metric_key==='budget'&&!pending?m.value:undefined} disabled={pending} onClick={()=>{setCompare([]);setBucket('changes');setFocusedPoint(null);setShowFullHistory(false);setSelected(m.id)}}>
+  return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} data-budget-metric-value={m.metric_key==='budget'&&!pending?m.value:undefined} onClick={()=>{setCompare([]);setBucket('changes');setFocusedPoint(null);setShowFullHistory(false);setSelected(m.id)}}>
    <span className="statePulseIcon" aria-hidden="true">{metricIcon(m.metric_key)}</span>
-   <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.metric_key==='budget'?'Доходы бюджета':m.label}</b><span>{pending?(g.budgetPulseError||'Получаем общий федеральный прогноз…'):last?.note||m.description||'Игровой показатель'}</span></div>
+   <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.metric_key==='budget'?'Доходы бюджета':m.label}</b><span>{pending?(g.budgetPulseError||'Нет сохранённого прогноза'):m.metric_key==='budget'&&!g.budgetPulse?'Последний сохранённый прогноз; актуализируется в разделе «Бюджет».':last?.note||m.description||'Игровой показатель'}</span></div>
    <div className="statePulseValue"><strong>{pending?'…':metricQuantity(Number(m.value),m.unit,m.metric_key)}</strong><em className={changeTone(m,d)}>{pending||d===0?'—':`${d>0?'▲ +':'▼ '}${m.metric_key==='budget'?metricQuantity(Math.abs(d),m.unit,m.metric_key):Math.abs(d).toFixed(Math.abs(d)%1?1:0)}`}</em></div>
    <div className="statePulseTrend">
     {mini.length>1&&<svg viewBox="0 0 120 32" aria-hidden="true"><path d={spark(mini,120,32)} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"/></svg>}
@@ -155,6 +155,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
      {chosen.metric_key==='budget'?<>
       <p>Доходы федерального бюджета — сумма рассчитанных доходных статей с учётом округления и утверждённых корректировок. Значение берётся из общего расчёта бюджета, а не из процента остальных показателей.</p>
       <p>Влияющие параметры бюджетной модели: экономическая активность, доверие граждан, ставка Банка России, инфляция, курс, цена нефти, налоговые ставки и изменения доходных статей. Черновые несохранённые действия в общий показатель не входят.</p>
+      {!g.budgetPulse&&<p>Показан последний сохранённый прогноз, даже когда раздел «Бюджет» не открыт. Новый расчёт производится при работе с бюджетом; это не текущие кассовые доходы.</p>}
       <small>Единица расчёта: млн ₽. Источник — общий бюджетный расчёт Supabase.</small>
      </>:<>
       <p>Текущее значение = предыдущее значение + сумма применённых игровых последствий. {percentBound?'Результат ограничивается диапазоном от 0 до 100%.':'Применяются минимальное и максимальное значения, установленные для этого показателя.'} Изменения начисляются в процентных пунктах, а не как процент от текущего значения.</p>
