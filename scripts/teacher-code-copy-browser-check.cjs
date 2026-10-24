@@ -63,9 +63,14 @@ async function main(){
    await editors[0].getByRole('button',{name:'Сгенерировать',exact:true}).click();await newGame.click();assert.equal(await last(),await editors[0].locator('input').inputValue());
    await editors[0].locator('input').fill(' gos-edited ');await newGame.click();assert.equal(await last(),'GOS-EDITED');
    for(const [scope,prefix] of [['participant','STD-'],['group','GRP-'],['guest','GST-'],['teacher','TCH-']]){
-    await editors[1].locator('select').selectOption(scope);await editors[1].getByRole('button',{name:'Сгенерировать',exact:true}).click();await newInvite.click();assert((await last()).startsWith(prefix));assert.equal(await last(),await editors[1].locator('input').last().inputValue());
+    await editors[1].locator('select').selectOption(scope);await editors[1].getByRole('button',{name:'Сгенерировать',exact:true}).click();await newInvite.click();assert((await last()).startsWith(prefix));assert.equal(await last(),await editors[1].getByRole('textbox',{name:'Код приглашения'}).inputValue());
+    const fields=editors[1].locator('.teacherCodeAdditionalField');
+    const controls=await fields.evaluateAll(nodes=>nodes.map(node=>({label:node.querySelector('label').getBoundingClientRect().top,field:node.querySelector('input,select').getBoundingClientRect().top,rect:node.getBoundingClientRect().toJSON()})));
+    if(width>760)assert(Math.abs(controls[0].label-controls[1].label)<2&&Math.abs(controls[0].field-controls[1].field)<2,'Select and invitation input must share label and field baselines at '+width);
+    else assert(controls[1].rect.top>controls[0].rect.bottom,'On narrow screens the fields stack cleanly at '+width);
+    const hint=await fields.first().locator('.teacherAccessExplanation').boundingBox();assert(hint&&hint.y>controls[0].field,'Hint stays beneath its select');
    }
-   await editors[1].locator('input').last().fill('  edited-invite  ');await newInvite.click();assert.equal(await last(),'edited-invite');
+   await editors[1].getByRole('textbox',{name:'Код приглашения'}).fill('  edited-invite  ');await newInvite.click();assert.equal(await last(),'edited-invite');
    assert.equal(requests.length,count,'Copying or generating must never submit, save, rotate or fetch codes');assert.deepEqual(errors,[]);
    const geometry=await form.evaluate(el=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth,footer:el.querySelector('.gosTeacherCreateFormActions').getBoundingClientRect().toJSON(),buttons:[...el.querySelectorAll('button')].map(b=>({name:b.textContent,...b.getBoundingClientRect().toJSON()}))}));
    assert(geometry.scroll<=width+1,'No horizontal overflow at '+width);assert(geometry.buttons.every(b=>b.height>=44),'Touch controls are at least 44px');

@@ -175,21 +175,25 @@ async function copy(value:string){
    <details className="teacherCodeAdditional">
     <summary>Создать дополнительное приглашение</summary>
     <div className="teacherCodeAdditionalFields">
-     <label>Кому предназначено
-      <select value={scope} onChange={e=>{setScope(e.target.value as Scope);setNewInvite('');setCreated('')}}>
-       <option value="participant">{labels.participant}</option>
-       <option value="group">{labels.group}</option>
-       <option value="guest">{labels.guest}</option>
-       <option value="teacher">{labels.teacher}</option>
-      </select>
-     </label>
-     <p className="teacherAccessExplanation">{hints[scope]} Дополнительное приглашение появится в реестре ниже и не заменит основной код в карточке.</p>
-     {scope==='group'&&<label>Название группы
-      <input autoComplete="off" maxLength={80} value={groupName} onChange={e=>setGroupName(e.target.value)} placeholder="Например, 8.414"/>
-     </label>}
-     <label>Код приглашения
-      <input autoComplete="off" value={newInvite} minLength={scope==='guest'?6:8} maxLength={80} onChange={e=>setNewInvite(e.target.value)} placeholder={scope==='guest'?'Не менее 6 символов':'Не менее 8 символов'}/>
-     </label>
+     <div className="teacherCodeAdditionalField">
+      <label>Кому предназначено
+       <select value={scope} onChange={e=>{setScope(e.target.value as Scope);setNewInvite('');setCreated('')}}>
+        <option value="participant">{labels.participant}</option>
+        <option value="group">{labels.group}</option>
+        <option value="guest">{labels.guest}</option>
+        <option value="teacher">{labels.teacher}</option>
+       </select>
+      </label>
+      <p className="teacherAccessExplanation">{hints[scope]} Дополнительное приглашение появится в реестре ниже и не заменит основной код в карточке.</p>
+     </div>
+     <div className="teacherCodeAdditionalField">
+      <label>Код приглашения
+       <input autoComplete="off" value={newInvite} minLength={scope==='guest'?6:8} maxLength={80} onChange={e=>setNewInvite(e.target.value)} placeholder={scope==='guest'?'Не менее 6 символов':'Не менее 8 символов'}/>
+      </label>
+      {scope==='group'&&<label>Название группы
+       <input autoComplete="off" maxLength={80} value={groupName} onChange={e=>setGroupName(e.target.value)} placeholder="Например, 8.414"/>
+      </label>}
+     </div>
      <div className="teacherCodeActions">
       <button type="button" disabled={busy} onClick={()=>setNewInvite(generateCode(scope==='group'?'GRP':scope==='guest'?'GST':scope==='teacher'?'TCH':'STD'))}><RotateCw size={16}/>Сгенерировать</button>
       <button type="button" disabled={busy||!newInvite.trim()} aria-label="Копировать новое приглашение" onClick={()=>void copy(newInvite.trim())}><Copy size={16}/>Копировать</button>
