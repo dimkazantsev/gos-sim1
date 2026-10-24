@@ -13,6 +13,13 @@ on:
       - 'supabase/migrations/20261024234000_teacher_account_signature_onboarding.sql'
       - 'scripts/teacher-signature-onboarding-check.cjs'
       - 'scripts/permanent-teacher-flow-check.cjs'
+      - 'components/game/TeacherGameSessions.tsx'
+      - 'components/game/TeacherAccessCodes.tsx'
+      - 'components/game/teacher-game-sessions.css'
+      - 'supabase/migrations/20261025113000_strict_roles_and_owner_codes.sql'
+      - 'supabase/migrations/20261025114000_owner_only_code_management.sql'
+      - 'supabase/migrations/20261025115000_protect_owner_name_and_teacher_profiles.sql'
+      - 'scripts/strict-role-and-owner-codes-check.cjs'
       - 'scripts/participant-test-login-check.cjs'
       - 'scripts/participant-mobile-signature-check.cjs'
       - 'components/game/GuidedTour.tsx'
@@ -39,6 +46,8 @@ jobs:
       - run: npm run typecheck
       - run: node scripts/permanent-teacher-flow-check.cjs
       - run: node scripts/participant-test-login-check.cjs
+      - run: node scripts/strict-role-and-owner-codes-check.cjs
+      - run: node scripts/password-login-resilience-check.cjs
       - run: node scripts/participant-mobile-signature-check.cjs
       - run: node scripts/teacher-entry-navigation-check.cjs
       - run: node scripts/teacher-signature-onboarding-check.cjs
