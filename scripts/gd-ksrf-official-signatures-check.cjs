@@ -82,7 +82,7 @@ const uuid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
  const paper=fs.readFileSync('components/game/DocumentPaper.tsx','utf8');
  const view=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
  const print=fs.readFileSync('components/game/officialDocumentPrint.ts','utf8');
- assert(paper.includes('formalSignatureList')&&paper.includes('Ожидает личной подписи'));
+ assert(paper.includes('formalSignatureList')&&paper.includes('Игровая подпись размещена автоматически')&&paper.includes('Изображение подписи не загружено'));
  assert(view.includes('sign_institution_document')&&view.includes('get_institution_document_signers'));
  assert(print.includes('.formalSignatureList'));
  console.log('PASS: GD absence and deputies 1/2; actual in-person participation; 3->2 KSRF signatures; 40 duplicate attempts rejected; print and UI controls.');
