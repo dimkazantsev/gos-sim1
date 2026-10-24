@@ -17,6 +17,7 @@ on:
       - 'scripts/participant-mobile-signature-check.cjs'
       - 'components/game/GuidedTour.tsx'
       - 'components/game/GuidedTour.module.css'
+      - 'scripts/guided-tour-dock-browser-check.cjs'
       - 'app/mobile-nav-polish.css'
       - 'app/entry-qr.css'
       - 'supabase/migrations/20261025002500_prevent_cross_role_rejoin.sql'
@@ -40,6 +41,7 @@ jobs:
       - run: node scripts/permanent-teacher-flow-check.cjs
       - run: node scripts/participant-test-login-check.cjs
       - run: node scripts/participant-mobile-signature-check.cjs
+      - run: node scripts/guided-tour-dock-browser-check.cjs
       - run: node scripts/teacher-entry-navigation-check.cjs
       - run: node scripts/teacher-signature-onboarding-check.cjs
       - run: node scripts/ksrf-proposal-queue-check.cjs
