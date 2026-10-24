@@ -35,3 +35,6 @@
 .teacherPermanentProfile input,.teacherPermanentProfile textarea{border:1px solid #bdcbed;border-radius:10px;min-width:0;width:100%;padding:10px 12px;color:#142b51;background:#fff}
 .teacherPermanentProfile button{background:#2353e5;color:#fff;border:0;border-radius:10px;padding:12px 18px;font-weight:800;justify-self:start}
 @media(max-width:520px){.teacherPermanentStages,.teacherPermanentProfile{padding:16px}.teacherPermanentStageGrid{grid-template-columns:1fr}}
+
+.teacherPortalArchive{margin-top:11px;border:1px solid #c8d5eb;background:#f6f8ff;border-radius:11px;padding:9px 12px;color:#3b5d90;font-size:12px;font-weight:750;cursor:pointer}
+.teacherPortalArchive:hover{border-color:#8aa5dc;background:#eaf0ff}
