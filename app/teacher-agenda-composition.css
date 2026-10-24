@@ -1,0 +1,75 @@
+/* Use the approved ГОС.ID tokens for agendas across institutions. */
+.civicRegistration .civicMeetingDocuments{
+ --meeting-border:var(--gs-border,#dce5f2);--meeting-ink:var(--gs-ink,#132c50);
+ --meeting-muted:var(--gs-muted,#526883);
+ border-radius:var(--gs-radius,14px);overflow:visible;gap:12px;
+ background:var(--gs-surface,#fff);scroll-margin-top:calc(var(--gs-top-h,72px) + 14px);
+}
+.civicRegistration .civicMeetingDocuments>header{
+ background:var(--gs-surface-soft,#f6f8ff);
+ border-radius:var(--gs-radius,14px) var(--gs-radius,14px) 0 0;
+ padding:15px 18px;min-height:70px;
+}
+.civicRegistration .civicMeetingDocuments>header b{font-size:16px;letter-spacing:normal;font-weight:800;line-height:1.45}
+.civicRegistration .civicMeetingDocuments>header small{font-size:12px;letter-spacing:0;font-weight:600}
+.civicRegistration .civicMeetingDocuments>header>span{
+ border-radius:9px;padding:7px 10px;font-size:11px;max-width:none;
+}
+.civicRegistration .civicMeetingDocuments>.civicMeetingHelp,
+.civicRegistration .civicMeetingDocuments>.civicMeetingError{
+ background:var(--gs-surface-soft,#f6f8ff);border-radius:10px;
+ font-size:12px;line-height:1.55;padding:10px 12px;margin:0 18px;
+}
+.civicRegistration .civicMeetingDocuments>label,
+.civicRegistration .civicMeetingDocuments>.civicAgendaComposer,
+.civicRegistration .civicMeetingDocuments>.civicMeetingDelegate{margin:0 18px}
+.civicRegistration .civicMeetingDocuments textarea{
+ min-height:116px;max-width:100%;box-sizing:border-box;
+ border-radius:10px;border-color:var(--gs-border,#dce5f2);
+ font-family:inherit;font-size:14px;line-height:1.6;
+}
+.civicRegistration .civicMeetingDocuments .civicAgendaEditBody textarea{min-height:110px}
+.civicRegistration .civicMeetingDocuments button{font-family:inherit;box-shadow:none}
+.civicRegistration .civicAgendaComposer,.civicRegistration .civicMeetingDelegate{
+ background:var(--gs-surface-soft,#f6f8ff);border-color:var(--gs-border,#dce5f2);
+ padding:12px;border-radius:11px;
+}
+.civicRegistration .civicAgendaSyncedPreview{scroll-margin-top:calc(var(--gs-top-h,72px) + 16px)}
+.civicRegistration .civicMeetingDocuments>button{margin:0 18px}
+.stageMeetingProcedureFlow{border-color:var(--gs-border,#dce5f2);background:var(--gs-surface,#fff);border-radius:var(--gs-radius,14px)}
+.stageMeetingProcedureFlow li{border-color:var(--gs-border,#dce5f2);background:var(--gs-surface-soft,#f6f8ff)}
+.stageMeetingProcedureNumber{color:var(--gs-accent,#2453e6)}
+/* Teacher identity stays on one row: avatar, full name and two aligned actions. */
+.simSidebar .sidebarUserTeacher{
+ display:grid;grid-template-columns:36px minmax(0,1fr) 32px 32px;gap:6px;
+ min-width:0;align-items:center;
+}
+.simSidebar .sidebarUserTeacher .simUserText{min-width:0}
+.simSidebar .sidebarUserTeacher .simUserText b{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ white-space:normal;overflow:hidden;text-overflow:ellipsis;
+ overflow-wrap:anywhere;font-size:12px;line-height:1.25;
+}
+.simSidebar .sidebarUserTeacher .simUserText span{font-size:11px;line-height:1.35;margin-top:3px}
+.simSidebar .sidebarUserTeacher .sidebarIconButton{
+ display:grid;place-items:center;width:32px;min-width:32px;height:38px;min-height:38px;padding:5px;
+ color:var(--gs-muted,#526883);border-radius:8px;
+}
+.simSidebar .sidebarUserTeacher .sidebarIconButton:hover{
+ background:var(--gs-surface-soft,#f6f8ff);color:var(--gs-accent,#2453e6);
+}
+.teacherArchiveDetails{margin-top:20px;border:1px solid var(--gs-border,#dce5f2);border-radius:13px;background:#fff;padding:12px 18px}
+.teacherArchiveDetails>summary{cursor:pointer;color:var(--gs-muted,#526883);font-weight:750;font-size:13px}
+.teacherArchiveDetails .profileSessionManager{margin-top:14px}
+.regionalPublishedActions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 16px 17px}
+.regionalPublishedActions>small{font-size:12px;line-height:1.5;color:var(--gs-muted,#526883)}
+@media(max-width:600px){
+ .civicRegistration .civicMeetingDocuments>header{padding:12px 14px;flex-wrap:wrap}
+ .civicRegistration .civicMeetingDocuments>.civicMeetingHelp,
+ .civicRegistration .civicMeetingDocuments>.civicMeetingError,
+ .civicRegistration .civicMeetingDocuments>label,
+ .civicRegistration .civicMeetingDocuments>.civicAgendaComposer,
+ .civicRegistration .civicMeetingDocuments>.civicMeetingDelegate{margin-left:14px;margin-right:14px}
+ .civicRegistration .civicMeetingDocuments>button{margin:0 14px}
+ .regionalPublishedActions>button{width:100%}
+}

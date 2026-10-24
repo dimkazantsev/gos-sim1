@@ -1,40 +1,44 @@
-.teacherPortal{min-height:100dvh;background:#f6f8ff;color:#0b234a;font-family:Manrope,Arial,sans-serif;padding:0 clamp(16px,4vw,54px) 70px}
-.teacherPortalHeader{width:min(1260px,100%);margin:auto;min-height:90px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #dfe6f4}
-.teacherPortalWordmark{text-decoration:none;color:inherit}.teacherPortalLogout,.teacherPortalActions>button{display:inline-flex;align-items:center;gap:9px;justify-content:center;min-height:44px;border:1px solid #d1ddf0;border-radius:12px;padding:8px 15px;background:#fff;color:#24569c;font-weight:750;cursor:pointer}
-.teacherPortalContent{width:min(1000px,100%);margin:clamp(36px,6vw,78px) auto}
-.teacherPortalEyebrow{color:#3866b1;font-size:12px;font-weight:850;letter-spacing:.11em;display:flex;align-items:center;gap:8px}
-.teacherPortal h1{font-size:clamp(32px,5vw,58px);line-height:1.13;letter-spacing:-.045em;margin:17px 0 16px}
-.teacherPortalIntro{color:#596c88;max-width:690px;font-size:clamp(15px,2vw,19px);line-height:1.65;margin:0 0 28px}
-.teacherPortalActions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:36px}
-.teacherPortalPrimary{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;border-radius:12px;padding:10px 17px;background:#2353e5;color:white!important;font-weight:800;text-decoration:none}
-.teacherPortalSectionHead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;gap:15px}
-.teacherPortalSectionHead h2{font-size:22px;font-weight:850;margin:0}.teacherPortalSectionHead span{color:#71809a;font-size:13px}
-.teacherPortalGames{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(265px,100%),1fr));gap:15px}
-.teacherPortalGame,.teacherPortalEmpty{background:#fff;border:1px solid #dce5f2;border-radius:20px;padding:24px;box-shadow:0 9px 25px #152d5710}
-.teacherPortalGameTop{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#697c95;font-size:12px}
-.teacherPortalGameStatus{border-radius:30px;background:#eaf1ff;color:#285abd;padding:6px 12px;font-weight:800}
-.teacherPortalGame h3{font-size:19px;line-height:1.4;overflow-wrap:anywhere;margin:20px 0 22px}
-.teacherPortalGameOpen{min-height:43px;display:inline-flex;align-items:center;justify-content:center;gap:10px;background:#2353e5;color:#fff;font-weight:850;border:0;border-radius:11px;padding:10px 15px;cursor:pointer}
-.teacherPortalEmpty{display:grid;justify-items:start;gap:8px;color:#60728c}
-.teacherPortalEmpty h3{font-size:22px;color:#10284e;margin:10px 0 0}
-.teacherPortalEmpty p{line-height:1.6;margin:0 0 12px;max-width:590px}
-.teacherPortalEmpty a{display:inline-flex;align-items:center;gap:8px;color:#2353e5;font-weight:850}
-.teacherPortalError{border:1px solid #eaa7ab;background:#fff3f3;border-radius:12px;padding:14px;color:#9e2634}
-.teacherPortalMessage{padding:20px;background:#fff;border-radius:15px;color:#677e99}
-.teacherPortalBack{font-weight:800;color:#2353e5}
-.teacherPortal button:disabled{opacity:.6;cursor:wait}
-@media(max-width:520px){.teacherPortalHeader{min-height:76px}.teacherPortalLogout{padding:8px 11px}.teacherPortalContent{margin:32px auto}.teacherPortalActions{display:grid;grid-template-columns:1fr}.teacherPortalActions>*{width:100%}}
-
-.teacherPermanentStages,.teacherPermanentProfile{margin-top:28px;padding:22px;background:#fff;border:1px solid #dce5f2;border-radius:18px}
-.teacherPermanentStages h2,.teacherPermanentProfile h2{font-size:19px;margin:0 0 16px;color:#10284e}
-.teacherPermanentStageGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:9px}
-.teacherPermanentStageGrid>div{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:#f6f8ff;font-size:13px}
-.teacherPermanentStageGrid>div span{color:#2555df;font-weight:850}
-.teacherPermanentProfile{display:grid;gap:12px}.teacherPermanentProfile p{color:#596c88;margin:0}
-.teacherPermanentProfile label{display:grid;gap:6px;font-size:14px;font-weight:700}
-.teacherPermanentProfile input,.teacherPermanentProfile textarea{border:1px solid #bdcbed;border-radius:10px;min-width:0;width:100%;padding:10px 12px;color:#142b51;background:#fff}
-.teacherPermanentProfile button{background:#2353e5;color:#fff;border:0;border-radius:10px;padding:12px 18px;font-weight:800;justify-self:start}
-@media(max-width:520px){.teacherPermanentStages,.teacherPermanentProfile{padding:16px}.teacherPermanentStageGrid{grid-template-columns:1fr}}
-
-.teacherPortalArchive{margin-top:11px;border:1px solid #c8d5eb;background:#f6f8ff;border-radius:11px;padding:9px 12px;color:#3b5d90;font-size:12px;font-weight:750;cursor:pointer}
-.teacherPortalArchive:hover{border-color:#8aa5dc;background:#eaf0ff}
+/* Empty teacher environment reuses the approved ГОС.ID palette and geometry. */
+.teacherEmptyShell{--empty-side:264px;min-height:100dvh;display:grid;grid-template-columns:var(--empty-side) minmax(0,1fr);background:var(--gs-bg,#f6f8ff);color:var(--gs-ink,#10284e);font-family:Manrope,Arial,sans-serif}
+.teacherEmptySidebar{position:sticky;top:0;height:100dvh;padding:24px 17px 18px;background:#fff;border-right:1px solid var(--gs-border,#dce5f2);display:flex;flex-direction:column;min-width:0}
+.teacherEmptySidebar .sidebarBrand{padding:0 5px 25px}
+.teacherEmptyScope{display:grid;gap:5px;border:1px solid var(--gs-border,#dce5f2);border-radius:12px;padding:15px;background:var(--gs-surface-soft,#f6f8ff);margin-bottom:18px}
+.teacherEmptyScope small{font-size:11px;letter-spacing:.07em;font-weight:850;color:var(--gs-muted,#657992)}
+.teacherEmptyScope b{font-size:14px}.teacherEmptyScope span{font-size:12px;color:var(--gs-muted,#657992)}
+.teacherEmptyNav{min-height:0;overflow:auto;flex:1;display:grid;align-content:start;gap:5px}
+.teacherEmptyNav button{display:flex;align-items:center;gap:11px;min-height:46px;width:100%;padding:11px 12px;font-size:13px;font-weight:700;color:var(--gs-muted,#657992);border:1px solid transparent;border-radius:10px;text-align:left;background:transparent;cursor:pointer}
+.teacherEmptyNav button:hover{background:var(--gs-surface-soft,#f6f8ff)}
+.teacherEmptyNav button.active{background:var(--gs-accent,#2453e6);color:#fff}
+.teacherEmptyNav button svg{flex-shrink:0}
+.teacherEmptyAccount{border-top:1px solid var(--gs-border,#dce5f2);padding-top:13px;display:grid;grid-template-columns:36px minmax(0,1fr) 32px 32px;align-items:center;gap:6px;min-width:0}
+.teacherEmptyAccount>div:nth-child(2){min-width:0;display:grid;gap:3px}
+.teacherEmptyAccount b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.teacherEmptyAccount small{font-size:11px;color:var(--gs-muted,#657992)}
+.teacherEmptyAccount button{width:32px;height:38px;border:0;border-radius:9px;display:grid;place-items:center;background:transparent;color:var(--gs-muted,#657992);cursor:pointer}
+.teacherEmptyAccount button:hover{background:var(--gs-surface-soft,#f6f8ff)}
+.teacherEmptyWorkspace{min-width:0}
+.teacherEmptyTop{position:sticky;top:0;z-index:10;height:74px;background:#fff;border-bottom:1px solid var(--gs-border,#dce5f2);display:flex;align-items:center;gap:16px;padding:0 clamp(18px,3vw,36px)}
+.teacherEmptyTopText{display:grid;gap:3px;min-width:0;margin-right:auto}.teacherEmptyTopText small{font-size:10px;letter-spacing:.07em;font-weight:850;color:var(--gs-muted,#657992)}.teacherEmptyTopText b{font-size:16px}
+.teacherEmptyState{display:inline-flex;align-items:center;gap:7px;color:#287454;background:#edf8f2;border:1px solid #cce5d7;border-radius:8px;padding:8px 11px;white-space:nowrap;font-size:12px;font-weight:750}
+.teacherEmptyMobileBrand,.teacherEmptyMobileMenu,.teacherEmptyMobileNavigation{display:none}
+.teacherEmptyMain{width:min(100%,1250px);margin:0 auto;min-width:0;padding:clamp(18px,3vw,36px)}
+.teacherEmptyIntro small{font-size:11px;letter-spacing:.08em;font-weight:850;color:var(--gs-accent,#2453e6)}
+.teacherEmptyIntro h1{font-size:clamp(25px,3vw,36px);margin:7px 0 10px;color:var(--gs-ink,#10284e);line-height:1.2}
+.teacherEmptyIntro p{margin:0 0 24px;font-size:14px;line-height:1.65;color:var(--gs-muted,#657992);max-width:76ch}
+.teacherEmptyStageGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:12px}
+.teacherEmptyStageGrid button{display:grid;align-content:start;gap:10px;min-height:127px;min-width:0;padding:18px;text-align:left;background:#fff;border:1px solid var(--gs-border,#dce5f2);border-radius:15px;cursor:pointer}
+.teacherEmptyStageGrid button:hover,.teacherEmptyStageGrid button.selected{border-color:var(--gs-accent,#2453e6);box-shadow:0 6px 16px #244d9820}
+.teacherEmptyStageGrid button span{font-size:17px;font-weight:850;color:var(--gs-accent,#2453e6)}.teacherEmptyStageGrid button b{font-size:14px;color:var(--gs-ink,#10284e);line-height:1.45}
+.teacherEmptyStageGrid button small{font-size:12px;line-height:1.5;color:var(--gs-muted,#657992)}
+.teacherEmptyProfileFields{display:grid;gap:14px;max-width:810px;margin:16px 0 24px;padding:22px;border:1px solid var(--gs-border,#dce5f2);background:white;border-radius:17px}
+.teacherEmptyProfileFields label{display:grid;gap:8px;min-width:0;color:var(--gs-ink,#10284e);font-size:13px;font-weight:750}
+.teacherEmptyProfileFields :is(input,textarea){box-sizing:border-box;min-width:0;width:100%;padding:12px 13px;color:var(--gs-ink,#10284e);background:white;border:1px solid #ccd8ee;border-radius:10px}
+.teacherEmptyProfileFields button{justify-self:start}
+.teacherEmptyError{border:1px solid #eeb4c1;background:#fff5f7;color:#a03451;padding:12px 15px;border-radius:11px;font-size:13px}
+.teacherEmptyOverviewActions{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 28px}
+.teacherEmptyOverviewActions button{display:flex;align-items:center;gap:9px;min-height:44px}
+.teacherEmptyQuickStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.teacherEmptyQuickStats article{display:grid;gap:6px;background:white;border:1px solid var(--gs-border,#dce5f2);border-radius:14px;padding:17px}
+.teacherEmptyQuickStats strong{font-size:26px;color:var(--gs-accent,#2453e6);font-variant-numeric:tabular-nums}.teacherEmptyQuickStats span{color:var(--gs-muted,#657992);font-size:12px}
+@media(max-width:960px){.teacherEmptyShell{grid-template-columns:minmax(0,1fr)}.teacherEmptySidebar{display:none}.teacherEmptyMobileBrand{display:block;margin-right:auto}.teacherEmptyTopText{display:none}.teacherEmptyMobileMenu{display:grid;place-items:center;order:1;width:43px;height:43px;border:1px solid var(--gs-border,#dce5f2);border-radius:10px;background:#fff}.teacherEmptyState{margin-left:auto}.teacherEmptyMobileNavigation{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:14px;border-bottom:1px solid var(--gs-border,#dce5f2);background:white}.teacherEmptyMobileNavigation button{display:flex;align-items:center;gap:8px;padding:11px;border:1px solid var(--gs-border,#dce5f2);border-radius:9px;background:var(--gs-surface-soft,#f6f8ff);font-size:12px;text-align:left}}
+@media(max-width:500px){.teacherEmptyTop{padding:0 12px;height:65px}.teacherEmptyState{font-size:0;padding:8px}.teacherEmptyState svg{width:19px;height:19px}.teacherEmptyQuickStats{grid-template-columns:repeat(2,minmax(0,1fr))}.teacherEmptyMain{padding:16px}.teacherEmptyMobileNavigation{grid-template-columns:1fr 1fr}.teacherEmptyMobileNavigation button{min-height:43px}}

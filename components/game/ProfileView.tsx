@@ -11,6 +11,7 @@ import ProfileSecurityPanel from './ProfileSecurityPanel';
 import RepublicComic from './RepublicComic';
 import {BlitzArchive} from './Blitz';
 import SessionManager from './SessionManager';
+import TeacherGameSessions from './TeacherGameSessions';
 import StyledSelect from '../ui/StyledSelect';
 import {cropPortrait,decodePortrait,preparePortraitDetector} from './avatarCrop';
 import ProfileAvatar from './ProfileAvatar';
@@ -251,7 +252,10 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
   </section>
   {own&&game&&<TelegramConnection gameId={game.id} teacher={teacher}/>}
   {own&&game&&<ProfileDocumentLinks gameId={game.id} userId={me.user_id}/>}
-  {own&&teacher&&<SessionManager g={g}/>}
+  {own&&teacher&&<>
+   <TeacherGameSessions displayName={me.full_name}/>
+   <details className="teacherArchiveDetails"><summary>Резервные копии и обслуживание архивов</summary><SessionManager g={g}/></details>
+  </>}
   {own&&game&&target.kind==='student'&&!previewAchievementsUserId&&<BlitzArchive gameId={game.id} userId={target.user_id} open={blitzOpen} onClose={()=>setBlitzOpen(false)}/>}
   <RepublicComic gameId={game?.id} initialView={comicView} teacherPreview={Boolean(own&&teacher)} open={comicOpen} onClose={()=>setComicOpen(false)}/>
  </div>;

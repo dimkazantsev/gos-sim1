@@ -1,0 +1,20 @@
+.gosTeacherSessions{display:grid;gap:15px;min-width:0;margin:20px 0;padding:20px;border:1px solid var(--gs-border,#dce5f2);border-radius:16px;background:#fff;color:var(--gs-ink,#142d50)}
+.gosTeacherSessionsHeader{display:flex;align-items:start;justify-content:space-between;gap:16px}
+.gosTeacherSessionsHeader>div:first-child{min-width:0}.gosTeacherSessionsHeader small{color:var(--gs-muted,#5c718d);font-size:11px;font-weight:800;letter-spacing:.07em}
+.gosTeacherSessionsHeader h2{margin:4px 0 6px;font-size:19px;line-height:1.35}.gosTeacherSessionsHeader p{margin:0;color:var(--gs-muted,#5c718d);font-size:13px;line-height:1.5}
+.gosTeacherSessionsActions,.gosTeacherSessionControls{display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+.gosTeacherSessions :is(button){display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px}
+.gosTeacherSessionsError,.gosTeacherSessionsNotice{margin:0;border-radius:10px;padding:10px 12px;font-size:13px}
+.gosTeacherSessionsError{background:#fff3f5;color:#9a2b48}.gosTeacherSessionsNotice{background:#edf8f2;color:#217255}
+.gosTeacherSessionsEmpty{margin:0;padding:16px;background:var(--gs-surface-soft,#f6f8ff);border-radius:12px;color:var(--gs-muted,#5c718d);font-size:13px}
+.gosTeacherSessionList{display:grid;gap:9px}
+.gosTeacherSessionRow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;padding:12px 14px;background:var(--gs-surface-soft,#f6f8ff);border:1px solid var(--gs-border,#dce5f2);border-radius:12px}
+.gosTeacherSessionRow>div:first-child{display:grid;gap:4px;min-width:0}
+.gosTeacherSessionRow b{font-size:14px;overflow-wrap:anywhere}.gosTeacherSessionRow span{font-size:12px;color:var(--gs-muted,#5c718d)}
+.gosTeacherCreateForm{display:grid;gap:12px;padding:16px;border:1px solid var(--gs-border,#dce5f2);background:var(--gs-surface-soft,#f6f8ff);border-radius:14px}
+.gosTeacherCreateForm h3{margin:0;color:var(--gs-ink,#142d50);font-size:16px}
+.gosTeacherCreateForm label{display:grid;gap:6px;min-width:0;font-size:13px;font-weight:700;color:var(--gs-ink,#142d50)}
+.gosTeacherCreateForm input{box-sizing:border-box;width:100%;min-width:0;min-height:43px;padding:10px 12px;border:1px solid var(--gs-border,#dce5f2);border-radius:10px;background:#fff;color:var(--gs-ink,#142d50)}
+.gosTeacherCreateCodes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.gosTeacherCreateForm>button{justify-self:start}
+@media(max-width:760px){.gosTeacherSessions{padding:15px}.gosTeacherSessionsHeader,.gosTeacherSessionRow{flex-direction:column;align-items:stretch}.gosTeacherSessionsActions>button,.gosTeacherSessionControls>button{flex:1}.gosTeacherCreateCodes{grid-template-columns:minmax(0,1fr)}}

@@ -45,7 +45,7 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  assert(ui.includes("get_my_institution_meeting_permissions"),'UI gets authoritative role from the new read-only RPC');
  assert(ui.includes("const meetingCoordinator=!!verifiedRights?.can_coordinate"),'No permission inference from role labels');
  assert(ui.includes('Проверяем ваши полномочия'),'Controls wait until roles are confirmed');
- assert(ui.includes('civicMeetingSteps')&&ui.includes('civicMeetingError'),'Meeting steps and action-local errors must be visible');
+ assert(ui.includes('civicMeetingDocuments')&&ui.includes('civicMeetingError'),'Meeting document controls and action-local errors must remain visible');
  assert(ui.includes('Открыть повестку в реестре НПА'),'Agenda link must be available after saving');
  assert(!ui.includes("const meetingCoordinator=!!g.teacher||"),'Do not reintroduce client-only privilege checks');
  assert(ui.includes('const canApproveAgenda=meetingCoordinator&&agendaDraft'), 'Approval unavailable without a prepared document');

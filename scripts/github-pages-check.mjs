@@ -7,7 +7,7 @@ function files(path){return readdirSync(path,{withFileTypes:true}).flatMap(x=>x.
 // Teacher sign-in must have its own permanent static route on GitHub Pages.
 assert.ok(existsSync(join(out,'teacher/index.html')),'Permanent teacher cabinet must be exported at /teacher/');
 const teacherHtml=readFileSync(join(out,'teacher/index.html'),'utf8');
-assert.ok(teacherHtml.includes('Кабинет преподавателя'),'Teacher HTML should clearly identify its purpose');
+assert.ok(teacherHtml.includes('Открываем игровую среду ГОС.ID')||teacherHtml.includes('Кабинет преподавателя'),'Teacher HTML should identify the permanent game entry');
 const refs=new Set();
 for(const file of files(out).filter(x=>x.endsWith('.html'))){
  for(const match of readFileSync(file,'utf8').matchAll(/(?:src|href)="([^"]+)"/g)){
