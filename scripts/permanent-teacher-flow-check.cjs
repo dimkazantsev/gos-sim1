@@ -17,7 +17,10 @@ assert(portal.includes('openGame(selected.id)')&&portal.includes('if(value.games
 assert(portal.includes('teacherEmptyShell')&&portal.includes('Все 16 этапов')&&portal.includes('STAGE_OPERATIONS'),'No-game teacher sees genuine empty game shell and stage navigation');
 assert(portal.includes('TeacherGameSessions')&&portal.includes('teacherEmptyProfileFields'),'No-game teacher keeps editable permanent profile and creation controls');
 assert(profile.includes('<TeacherGameSessions displayName={me.full_name}/>'),'Active teacher manages sessions in profile');
-assert(sessions.includes("rpc('create_game_session'")&&sessions.includes("rpc('ensure_my_game_access'"),'Create and open through existing authorized RPCs');
+assert(sessions.includes("rpc('create_teacher_game_session'")&&sessions.includes("rpc('ensure_my_game_access'"),'Verified teacher creates games through protected RPC');
+assert(!home.includes("rpc('create_game_session'")&&home.includes("rpc('create_teacher_game_session'")&&home.includes("if(requested==='create'){setTeacherLogin(true);setPersonalLogin(true)"),'Legacy create redirects to personal teacher sign-in');
+const creationGuard=read('supabase/migrations/20261024190000_guard_teacher_game_creation_rpc.sql');
+assert(creationGuard.includes('REVOKE ALL ON FUNCTION public.create_game_session')&&creationGuard.includes('GRANT EXECUTE ON FUNCTION public.create_teacher_game_session'),'Do not expose legacy unrestricted creation');
 assert(sessions.includes('archive_my_teacher_game'),'Archive games without deleting documents');
 assert(!agenda.includes('className="civicMeetingSteps"'),'Agenda does not repeat established five-step route');
 assert(home.includes("from('teacher_profiles')"),'Existing teacher session bypasses login form');
@@ -84,6 +87,12 @@ const query=async(db,sql,args=[]) =>(await db.query(sql,args)).rows;
   assert.equal(total,89);
   await assert.rejects(()=>query(db,'SELECT public.prepare_regional_agreement_from_calculation($1,$2)',[rule,calc]),/уже введены/i);
   assert.equal((await query(db,'SELECT status FROM public.regional_election_rules WHERE id=$1',[rule]))[0].status,'adopted');
+  // Privilege regression: legacy game creation is not a client RPC.
+  await db.exec("CREATE FUNCTION public.create_game_session(text,text,text,text,text) RETURNS uuid LANGUAGE sql AS $SELECT null::uuid$;");
+  await db.exec("CREATE FUNCTION public.create_teacher_game_session(text,text,text,text,text) RETURNS uuid LANGUAGE sql SECURITY DEFINER AS $SELECT public.create_game_session($1,$2,$3,$4,$5)$;");
+  await db.exec(creationGuard);
+  const direct=await query(db,"SELECT has_function_privilege('anon','public.create_game_session(text,text,text,text,text)','EXECUTE') anon, has_function_privilege('authenticated','public.create_game_session(text,text,text,text,text)','EXECUTE') authenticated, has_function_privilege('authenticated','public.create_teacher_game_session(text,text,text,text,text)','EXECUTE') teacher");
+  assert.deepEqual(direct[0],{anon:false,authenticated:false,teacher:true},'Only checked teacher wrapper is public API');
   console.log('PASS permanent teacher profile, archive, protected avatar, next-game restoration, 89 subject agreement and meeting guide');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
