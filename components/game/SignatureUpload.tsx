@@ -13,6 +13,8 @@ export default function SignatureUpload({g,onSaved,account}:{g?:ReturnTypeRepubl
  const [notice,setNotice]=useState('');
  const mine=g?.profiles.find(p=>p.user_id===g.me?.user_id);
  const savedSignature=account?account.signatureUrl:mine?.signature_url;
+ const [missingSaved,setMissingSaved]=useState(false);
+ useEffect(()=>setMissingSaved(false),[savedSignature]);
  useEffect(()=>{if(!file){setUrl('');return}const current=URL.createObjectURL(file);setUrl(current);return()=>URL.revokeObjectURL(current)},[file]);
  async function crop(raw:File){
   if(raw.size>5*1024*1024){setNotice('Загрузите изображение размером до 5 МБ.');return}
@@ -62,7 +64,7 @@ export default function SignatureUpload({g,onSaved,account}:{g?:ReturnTypeRepubl
   <header><div><small>ДОКУМЕНТЫ И РЕЕСТР НПА</small><h2>Игровая подпись</h2></div><Scissors size={21} aria-hidden="true"/></header>
   <p>Расписывайтесь тёмной ручкой на чистом белом листе. Сделайте фото при ровном освещении либо загрузите PNG. Система удалит светлый фон, обрежет пустое поле и предложит проверить результат. Это визуальная подпись для учебной игры, а не юридически значимая электронная подпись.</p>
   <div className="profileSignaturePreview">
-   {url?<img src={url} alt="Подпись после автоматического удаления фона"/>:savedSignature?<img src={savedSignature} alt="Сохранённая игровая подпись"/>:<span>Подпись ещё не загружена</span>}
+   {url?<img src={url} alt="Подпись после автоматического удаления фона"/>:savedSignature&&!missingSaved?<img src={savedSignature} onError={()=>setMissingSaved(true)} alt="Сохранённая игровая подпись"/>:<span>Подпись ещё не загружена</span>}
   </div>
   <input type="file" accept="image/png,image/jpeg,image/webp" ref={input} hidden aria-label="Выбрать фото подписи"
    onChange={e=>{const chosen=e.target.files?.[0];if(chosen)void crop(chosen);e.target.value=''}}/>
