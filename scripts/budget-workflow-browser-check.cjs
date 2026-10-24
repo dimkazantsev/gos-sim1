@@ -126,6 +126,22 @@ async function main(){
    }
 
    const nav=sim.getByRole('tablist',{name:'Разделы бюджетного расчёта'}),tabs=await nav.getByRole('tab').allTextContents();assert.deepEqual(tabs.map(s=>s.replace(/\s+/g,' ').trim().replace(/^\d+\s*/,'')),['Доходы','Регионы','Расходы','Баланс','Проект ФЗ']);
+    // Verify all five responsive tabs keep the viewer near the active steps.
+    await nav.scrollIntoViewIfNeeded();
+    await page.evaluate(()=>{
+     const steps=document.querySelector('[role="tablist"][aria-label="Разделы бюджетного расчёта"]');
+     if(steps)window.scrollBy(0,steps.getBoundingClientRect().top-240);
+    });
+    const beforeSteps=await page.evaluate(()=>window.scrollY);
+    assert(beforeSteps>100,'Budget steps must be tested below the header at '+width+'px');
+    for(const label of ['Регионы','Расходы','Баланс','Проект ФЗ','Доходы']){
+     const step=nav.getByRole('tab').filter({hasText:label});
+     await step.click();
+     await page.evaluate(()=>new Promise(requestAnimationFrame));
+     const afterStep=await page.evaluate(()=>window.scrollY);
+     assert(afterStep>Math.max(100,beforeSteps-45),'Budget step '+label+' reset the page position at '+width+'px: '+beforeSteps+' → '+afterStep);
+     assert.equal(await step.getAttribute('aria-selected'),'true');
+    }
    await openTab(page,'Доходы');await layout(page,'income '+width);await sim.screenshot({path:path.join(output,'income-'+width+'.png')});
    assert.equal(await sim.getByRole('table',{name:/Доходы/}).count(),1,'Revenue is a real table');assert.equal(await sim.locator('[data-budget-income-detail]').count(),12,'Each revenue article shows its own formula');
    assert.match(await sim.innerText(),/Ставка/);assert.match(await sim.innerText(),/База/);assert.match(await sim.innerText(),/Налог на прибыль/);assert.match(await sim.innerText(),/Утилизационный сбор/);
