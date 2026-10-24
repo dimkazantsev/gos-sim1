@@ -2,6 +2,7 @@
 import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {resolveStoredAsset} from '@/lib/resolveStoredAsset';
 import {createScopedSignedAssetCache} from './scopedSignedAssetCache';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {FormalDocument} from './types';
@@ -44,7 +45,8 @@ function readableBillIssue(issue:string){
 export default function DocumentsView({g,focusId,createTemplate,createStageNo,onOpenVotes,onSelectDocument,onOpenBudget,readOnly=false,initialDetailTab='text'}:{g:ReturnTypeRepublic;initialDetailTab?:'text'|'procedure';focusId?:string;createTemplate?:string;createStageNo?:number;onOpenVotes:(voteId?:string)=>void;onSelectDocument?:(id?:string)=>void;onOpenBudget?:()=>void;readOnly?:boolean}){
  const {formalDocuments,formalHistory,votes,members,me,teacher,currentStage,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,createVote}=g;
  const signedAsset=useMemo(()=>createScopedSignedAssetCache(async path=>{
-  const {data,error}=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
+  const location=resolveStoredAsset('game-assets',path);
+    const {data,error}=await supabase.storage.from(location.bucket).createSignedUrl(location.path,3600);
   return error?null:data?.signedUrl||null;
  }),[g.game?.id,me?.user_id]);
  const [mode,setMode]=useSavedGameState<'registry'|'create'>(g.game?.id,g.me?.user_id,'documents-mode','registry',savedChoice('registry','create')),[selectedId,setSelectedId]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-selected','',savedString),[query,setQuery]=useState(''),[filterSubject,setFilterSubject]=useState(''),[filterStatus,setFilterStatus]=useState(''),[sortOrder,setSortOrder]=useState('updated');
