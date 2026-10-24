@@ -623,6 +623,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(!teacher||previewMode)return;
   setSelectedProfileId('');
   navigate('profile',undefined,false,true);
+  window.setTimeout(()=>document.getElementById('teacher-game-sessions')?.scrollIntoView({behavior:'smooth',block:'start'}),150);
  }
  function sidebarKeys(){return [...sidebarOrder,...nav.map(x=>x[0]).filter(x=>!sidebarOrder.includes(x))].filter(x=>nav.some(n=>n[0]===x))}
  function reorderSidebar(from:string,to:string){
