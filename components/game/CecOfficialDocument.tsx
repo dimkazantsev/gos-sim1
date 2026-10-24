@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {resolveStoredAsset} from '@/lib/resolveStoredAsset';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
 import {institutionEmblem} from './institutionEmblems';
 import {cecOfficialResolution,type CecDecisionStatus} from './cecOfficialWording';
@@ -41,7 +42,8 @@ export default function CecOfficialDocument({
    }
    const path=kind==='decision'&&fixedPath?fixedPath:(currentPath||fixedPath||null);
    if(path){
-    const {data,error}=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
+    const location=resolveStoredAsset('game-assets',path);
+    const {data,error}=await supabase.storage.from(location.bucket).createSignedUrl(location.path,3600);
     if(alive&&!error&&data?.signedUrl)setSignedUrl(data.signedUrl);
    }
    if(alive)setLoadingSignature(false);
