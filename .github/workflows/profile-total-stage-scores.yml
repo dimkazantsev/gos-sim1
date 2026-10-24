@@ -3,12 +3,20 @@ on:
   pull_request:
     paths:
       - 'components/game/ProfileView.tsx'
+      - 'components/game/ProfileOffices.tsx'
+      - 'components/game/gameOfficeCatalog.ts'
+      - 'components/game/useGameOfficeCatalog.ts'
+      - 'scripts/game-office-catalog-check.cjs'
       - 'scripts/profile-total-stage-scores-check.cjs'
       - '.github/workflows/profile-total-stage-scores.yml'
   push:
     branches: [main]
     paths:
       - 'components/game/ProfileView.tsx'
+      - 'components/game/ProfileOffices.tsx'
+      - 'components/game/gameOfficeCatalog.ts'
+      - 'components/game/useGameOfficeCatalog.ts'
+      - 'scripts/game-office-catalog-check.cjs'
       - 'scripts/profile-total-stage-scores-check.cjs'
 jobs:
   verify:
@@ -25,6 +33,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/profile-total-stage-scores-check.cjs
+      - run: node scripts/game-office-catalog-check.cjs
       - run: node scripts/profile-grades-layout-check.cjs
       - run: node scripts/party-grades-stage-consistency-check.cjs
       - run: npm run typecheck
