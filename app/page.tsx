@@ -44,7 +44,6 @@ export default function Home(){
  const [mode,setMode]=useState<'student'|'teacher'|'guest'>('student'),[createMode,setCreateMode]=useState(false);
  const [gameTitle,setGameTitle]=useState('Республика Политология'),[studentCode,setStudentCode]=useState(''),[fio,setFio]=useState(''),[group,setGroup]=useState(''),[gameCode,setGameCode]=useState(''),[invite,setInvite]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const [showCode,setShowCode]=useState(false);
- const [newParticipantIdentity,setNewParticipantIdentity]=useState(false);
  const [personalLogin,setPersonalLogin]=useState(false);
  const [teacherLogin,setTeacherLogin]=useState(false);
  const [loginEmail,setLoginEmail]=useState(''),[loginPassword,setLoginPassword]=useState(''),[loginGameCode,setLoginGameCode]=useState(''),[recoverySent,setRecoverySent]=useState(false);
@@ -106,26 +105,32 @@ export default function Home(){
    if(mode==='teacher'&&createMode&&(!session||session.user.is_anonymous)){setTeacherLogin(true);setPersonalLogin(true);setCreateMode(false);return}
    // Joining with different visible details never creates another account automatically.
    // Protect the teacher's authenticated account from being silently reused or renamed.
-   if(mode!=='teacher'&&session&&!session.user.is_anonymous&&!newParticipantIdentity){
-    const teacherAccount=await supabase.from('teacher_profiles').select('user_id')
+   if(mode==='teacher'&&(!session||session.user.is_anonymous)){
+    throw new Error('Для входа преподавателя используйте подтверждённую почту и личный пароль. Приглашение дополнительного преподавателя не заменяет авторизацию.');
+   }
+   // A signed-in teacher cannot become a student/guest with the same auth.uid().
+   // Switching roles starts a separate anonymous session automatically; the
+   // original registered account and its assets remain unchanged on the server.
+   let switchIdentity=false;
+   if(mode!=='teacher'&&session){
+    const check=await supabase.from('teacher_profiles').select('user_id')
      .eq('user_id',session.user.id).maybeSingle();
-    if(teacherAccount.error)throw teacherAccount.error;
-    if(teacherAccount.data){
-     throw new Error('В браузере открыт профиль преподавателя. Для теста другим участником включите «Новый участник» ниже. Данные преподавателя сохранятся.');
-    }
+    if(check.error)throw check.error;
+    switchIdentity=!!check.data
+      ||!!session.user.is_anonymous&&session.user.user_metadata?.full_name!==name;
    }
-   if(mode!=='teacher'&&newParticipantIdentity&&session){
-    const signedOut=await supabase.auth.signOut({scope:'local'});
-    if(signedOut.error)throw signedOut.error;
+   if(switchIdentity){
+    const result=await supabase.auth.signOut({scope:'local'});
+    if(result.error)throw result.error;
    }
-   if(!session||(mode!=='teacher'&&newParticipantIdentity)){
+   if(!session||switchIdentity){
     const a=await supabase.auth.signInAnonymously({options:{data:{full_name:name}}});
     if(a.error)throw a.error;
    }
    if(mode==='teacher'&&createMode){
     const r=await supabase.rpc('create_teacher_game_session',{p_title:gameTitle.trim(),p_game_code:code,p_teacher_code:access,p_student_code:students,p_teacher_name:name});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data+incomingSectionSuffix());
    }else{
-    const r=await supabase.rpc('join_game_with_code',{p_game_code:code,p_invite_code:access,p_full_name:name,p_group_name:mode==='student'?group.trim():null});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data+incomingSectionSuffix());
+    const r=await supabase.rpc('join_game_as_role',{p_game_code:code,p_invite_code:access,p_full_name:name,p_group_name:mode==='student'?group.trim():null,p_expected_kind:mode==='guest'?'observer':mode});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data+incomingSectionSuffix());
    }
   }catch(e){setError(readableError(e))}finally{setBusy(false)}
  }
@@ -169,7 +174,7 @@ export default function Home(){
    // Resume is idempotent, unlike join_game_with_code which records an audit event.
    let resumedGameId='';
    for(let attempt=0;attempt<3;attempt++){
-    const r=await supabase.rpc('resume_member_game',{p_game_code:loginGameCode.trim()});
+    const r=await supabase.rpc('resume_member_game_as_role',{p_game_code:loginGameCode.trim(),p_expected_kind:mode==='guest'?'observer':'student'});
     if(!r.error){
      if(!r.data)throw new Error('Сервер не подтвердил участие в игре.');
      resumedGameId=String(r.data);break;
@@ -221,10 +226,6 @@ export default function Home(){
       {mode==='teacher'&&createMode&&<label className="entryField">Название игры<input name="gameTitle" value={gameTitle} onChange={e=>setGameTitle(e.target.value)} required/></label>}
       <div className={'entryFieldRow '+(mode==='teacher'?'single':'')}><label className="entryField">Код игры<input name="gameCode" autoComplete="off" autoCapitalize="none" spellCheck={false} value={gameCode} onChange={e=>setGameCode(e.target.value)} placeholder="Например, 8.414" minLength={2} required/><small>Идентификатор конкретной игры, сообщённый преподавателем.</small></label>{mode==='student'&&<label className="entryField">Группа<input name="group" value={group} onChange={e=>setGroup(e.target.value)} placeholder="Для общего приглашения; при приглашении группы заполнять не нужно"/></label>}</div>
       <div className="entryField"><label htmlFor="invite-code">{mode==='teacher'?'Приглашение преподавателя':mode==='guest'?'Приглашение гостя':'Приглашение участника'}</label><span className="entrySecret"><input id="invite-code" name="inviteCode" autoComplete={createMode?'new-password':'current-password'} type={showCode?'text':'password'} minLength={mode==='guest'?6:4} value={invite} onChange={e=>setInvite(e.target.value)} required aria-describedby="code-hint"/><button type="button" onClick={()=>setShowCode(!showCode)} aria-label={showCode?'Скрыть код':'Показать код'} aria-pressed={showCode}>{showCode?<EyeOff/>:<Eye/>}</button></span><small id="code-hint">{mode==='teacher'?(createMode?'Придумайте код из 4 или более символов.':'Используйте код преподавателя, заданный при создании игры.'):mode==='guest'?'Предоставляет просмотр разрешённых разделов без участия в принятии решений.':mode==='student'?'Приглашение участника разрешает вход; приглашение группы автоматически привяжет группу.':'Отдельное приглашение, полученное от преподавателя.'}</small></div>
-      {mode!=='teacher'&&<label className="entryNewParticipant">
-       <input type="checkbox" checked={newParticipantIdentity} onChange={e=>setNewParticipantIdentity(e.target.checked)}/>
-       <span><strong>Новый участник — отдельный вход</strong><small>Для проверки игры под другим ФИО. Текущая авторизация в этом браузере сменится; профиль преподавателя, документы и подпись сохранятся.</small></span>
-      </label>}
       {mode==='teacher'&&createMode&&<div className="entryField"><label htmlFor="student-code">Начальное приглашение участников</label><input id="student-code" name="studentCode" type="password" autoComplete="new-password" minLength={4} value={studentCode} onChange={e=>setStudentCode(e.target.value)} required aria-describedby="student-code-hint"/><small id="student-code-hint">Не должен совпадать с кодом преподавателя.</small></div>}
       {error&&<div className="errorBox" role="alert">{error}</div>}
       <button className="primary entrySubmit" disabled={busy}>{busy?<><LoaderCircle className="spin" aria-hidden="true"/>Подключаемся…</>:<>{mode==='teacher'&&createMode?'Создать игру':'Войти в игру'}<ArrowRight aria-hidden="true"/></>}</button>
