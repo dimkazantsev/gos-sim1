@@ -89,7 +89,7 @@ AS $function$
  SELECT auth.uid() IS NOT NULL
   AND NOT coalesce((auth.jwt()->>'is_anonymous')::boolean,true)
   AND EXISTS(SELECT 1 FROM public.games g WHERE g.id=p_game AND
-    (g.owner_id=auth.uid() OR private.is_platform_admin()));
+    g.owner_id=auth.uid());
 $function$;
 REVOKE ALL ON FUNCTION private.is_game_code_owner(uuid) FROM PUBLIC,anon,authenticated;
 
@@ -173,3 +173,36 @@ BEGIN
  WHERE i.game_id=p_game_id;
  RETURN result;
 END;$function$;
+
+-- Direct creation bypassed teacher authentication; the owner-only wrapper
+-- still calls this function with SECURITY DEFINER, preserving existing flow.
+REVOKE ALL ON FUNCTION public.create_game_session(text,text,text,text,text) FROM PUBLIC,anon,authenticated;
+
+-- Keep the existing teacher list, adding an explicit owner bit so invited
+-- teachers cannot see the personal owner's access-code inventory in the UI.
+CREATE OR REPLACE FUNCTION public.list_my_teacher_games()
+RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path TO ''
+AS $function$
+DECLARE v_user uuid := (select auth.uid());v_admin boolean;v_allowed boolean;v_games jsonb;
+BEGIN
+ IF v_user IS NULL OR coalesce((auth.jwt()->>'is_anonymous')::boolean,true)
+ THEN RAISE EXCEPTION 'Войдите с подтверждённой почтой и личным паролем';END IF;
+ v_admin:=private.is_platform_admin();
+ v_allowed:=v_admin
+  OR EXISTS(SELECT 1 FROM public.teacher_profiles t WHERE t.user_id=v_user)
+  OR EXISTS(SELECT 1 FROM public.games g WHERE g.owner_id=v_user)
+  OR EXISTS(SELECT 1 FROM public.game_members gm WHERE gm.user_id=v_user
+     AND gm.kind='teacher' AND gm.roster_archived_at IS NULL);
+ IF NOT v_allowed THEN RAISE EXCEPTION 'Доступ только преподавателю';END IF;
+ SELECT coalesce(jsonb_agg(jsonb_build_object(
+  'id',g.id,'title',g.title,'status',g.status,'created_at',g.created_at,
+  'is_owner',g.owner_id=v_user
+ ) ORDER BY g.created_at DESC,g.id DESC),'[]'::jsonb) INTO v_games
+ FROM public.games g WHERE v_admin OR g.owner_id=v_user OR EXISTS(
+  SELECT 1 FROM public.game_members gm WHERE gm.game_id=g.id
+   AND gm.user_id=v_user AND gm.kind='teacher' AND gm.roster_archived_at IS NULL);
+ RETURN jsonb_build_object('is_admin',v_admin,'games',v_games);
+END;$function$;
+
+-- Previously generated invitations use the existing owner-only management
+-- functions; a second teacher may join the game but cannot read its secrets.

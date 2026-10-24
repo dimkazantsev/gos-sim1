@@ -2,11 +2,12 @@
 import {FormEvent,useCallback,useEffect,useState} from 'react';
 import {Archive,ArrowRight,Plus,RefreshCcw} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {rememberGameCode} from '@/lib/rememberedGameCodes';
 import {userError} from '@/lib/userError';
 import './teacher-game-sessions.css';
 import TeacherAccessCodes from './TeacherAccessCodes';
 
-type Game={id:string;title:string;status:string;created_at:string};
+type Game={id:string;title:string;status:string;created_at:string;is_owner:boolean};
 type Index={games:Game[];is_admin:boolean};
 const LAST='gos-id:teacher-last-game';
 const CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -25,7 +26,6 @@ export default function TeacherGameSessions({displayName='Преподавате
  const [index,setIndex]=useState<Index|null>(null);
  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const [formOpen,setFormOpen]=useState(false);
- const [codesFor,setCodesFor]=useState('');
  const [title,setTitle]=useState('Новая республика');
  const [gameCode,setGameCode]=useState(''),[teacherCode,setTeacherCode]=useState(''),[studentCode,setStudentCode]=useState('');
  const refresh=useCallback(async()=>{
@@ -39,8 +39,8 @@ export default function TeacherGameSessions({displayName='Преподавате
  async function create(e:FormEvent){
   e.preventDefault();if(busy)return;
   const code=gameCode.trim().toUpperCase(),teach=teacherCode.trim(),student=studentCode.trim();
-  if(!title.trim()||code.length<4||teach.length<4||student.length<4||teach===student){
-   setError('Укажите название, код игры и два различных кода доступа длиной не менее 4 символов.');return;
+  if(!title.trim()||!/^[A-Z0-9-]{4,32}$/.test(code)||teach.length<8||student.length<8||teach===student){
+   setError('Укажите название, код игры и два различных приглашения длиной не менее 8 символов.');return;
   }
   setBusy(true);setError('');
   try{
@@ -51,7 +51,8 @@ export default function TeacherGameSessions({displayName='Преподавате
     p_teacher_name:displayName.trim()||'Преподаватель'
    });
    if(r.error)throw r.error;
-   setCodesFor(String(r.data));setFormOpen(false);
+   rememberGameCode(code);
+   setFormOpen(false);
    setGameCode('');setTeacherCode('');setStudentCode('');
    await refresh();setNotice('Игра создана. Все коды доступны ниже в любое время.');setBusy(false);
   }catch(e){setError(userError(e)||'Не удалось создать игру.');setBusy(false)}
@@ -88,25 +89,23 @@ export default function TeacherGameSessions({displayName='Преподавате
   {formOpen&&<form className="gosTeacherCreateForm" onSubmit={e=>void create(e)}>
    <h3>Новая игровая сессия</h3>
    <label>Название игры<input required maxLength={150} value={title} onChange={e=>setTitle(e.target.value)}/></label>
-   <label>Код игры<input required autoComplete="off" maxLength={30} value={gameCode} onChange={e=>setGameCode(e.target.value.toUpperCase())} placeholder="GOS-2026"/><button type="button" className="secondary" onClick={()=>setGameCode(generated('GOS'))}>Сгенерировать код игры</button></label>
+   <label>Код игры<input required autoComplete="off" maxLength={32} value={gameCode} onChange={e=>setGameCode(e.target.value.toUpperCase())} placeholder="GOS-2026"/><button type="button" className="secondary" onClick={()=>setGameCode(generated('GOS'))}>Сгенерировать код игры</button></label>
    <div className="gosTeacherCreateCodes">
-    <label>Приглашение дополнительного преподавателя<input type="text" required minLength={4} maxLength={80} autoComplete="off" value={teacherCode} onChange={e=>setTeacherCode(e.target.value)}/><button type="button" className="secondary" onClick={()=>setTeacherCode(generated('TCH'))}>Сгенерировать отдельно</button><small>Это не пароль владельца. Дополнительному преподавателю потребуется подтверждённая учётная запись.</small></label>
-    <label>Приглашение участника<input type="text" required minLength={4} maxLength={80} autoComplete="off" value={studentCode} onChange={e=>setStudentCode(e.target.value)}/><button type="button" className="secondary" onClick={()=>setStudentCode(generated('STD'))}>Сгенерировать отдельно</button></label>
+    <label>Приглашение дополнительного преподавателя<input type="text" required minLength={8} maxLength={80} autoComplete="off" value={teacherCode} onChange={e=>setTeacherCode(e.target.value)}/><button type="button" className="secondary" onClick={()=>setTeacherCode(generated('TCH'))}>Сгенерировать отдельно</button><small>Это не пароль владельца. Дополнительному преподавателю потребуется подтверждённая учётная запись.</small></label>
+    <label>Приглашение участника<input type="text" required minLength={8} maxLength={80} autoComplete="off" value={studentCode} onChange={e=>setStudentCode(e.target.value)}/><button type="button" className="secondary" onClick={()=>setStudentCode(generated('STD'))}>Сгенерировать отдельно</button></label>
    </div>
    <button type="submit" className="primary" disabled={busy}>{busy?'Создание…':'Создать и открыть игру'}</button>
   </form>}
   {!index&&<p className="gosTeacherSessionsEmpty" role="status">Получаем список игр…</p>}
   {index&&index.games.length===0&&<p className="gosTeacherSessionsEmpty">Игровых сеансов пока нет. Создайте первую игру здесь — без повторной регистрации преподавателя.</p>}
   {index&&index.games.length>0&&<div className="gosTeacherSessionList">
-   {index.games.map(game=><article key={game.id} className="gosTeacherSessionRow">
+   {index.games.map(game=><div key={game.id} className="gosTeacherSessionUnit"><article className="gosTeacherSessionRow">
     <div><b>{game.title}</b><span>{game.status==='archived'?'В архиве':game.status==='running'?'Идёт игра':'Подготовка'} · {new Date(game.created_at).toLocaleDateString('ru-RU')}</span></div>
     <div className="gosTeacherSessionControls">
      <button type="button" className="secondary" disabled={busy} onClick={()=>void enter(game.id)}>Открыть <ArrowRight size={16}/></button>
      {game.status!=='archived'&&<button type="button" className="secondary" disabled={busy} onClick={()=>void archive(game)}><Archive size={16}/>В архив</button>}
     </div>
-    <button type="button" className="secondary gosTeacherAccessToggle" aria-expanded={codesFor===game.id} onClick={()=>setCodesFor(v=>v===game.id?'':game.id)}>{codesFor===game.id?'Свернуть коды':'Все коды и приглашения'}</button>
-    {codesFor===game.id&&<TeacherAccessCodes gameId={game.id}/>}
-   </article>)}
+   </article>{game.is_owner&&<TeacherAccessCodes gameId={game.id}/>}</div>)}
   </div>}
  </section>;
 }
