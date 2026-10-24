@@ -120,13 +120,9 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
   }catch(e){setNotice('Не удалось удалить приглашение: '+((userError(e)||'Ошибка сервера')))}
   finally{setBusy(false)}
  }
- return <section className="teacherAccessCodes" aria-label="Коды доступа к игре">
-  <div className="teacherAccessHead"><KeyRound size={20} aria-hidden="true"/><div><h3>Доступ к игре</h3><p>Код игры и приглашения для участников, групп и гостей. Приглашение преподавателя также указано в списке и защищено от отключения. Личный пароль задаётся в профиле.</p></div></div>
-  <section className="teacherCodeRoleSections" aria-label="Сохранённые коды владельца">
-   <h4>Коды для подключения участников</h4>
-   <p>Код игры и приглашение участника — разные значения. Оба всегда доступны владельцу игры.</p>
-   <div className="teacherCodeActiveRoles">
-    {(['participant','teacher','guest'] as InventoryScope[]).map(kind=>{
+
+   function codeCard(kind:InventoryScope){
+
      const active=rows.find(x=>x.scope===kind&&x.active);
      return <article key={kind} className="teacherCodeActiveRole">
       <b>{inventoryLabels[kind]}</b>
@@ -136,7 +132,20 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
        <button type="button" disabled={busy} onClick={()=>void rotate(kind==='participant'?'student':kind==='guest'?'observer':'teacher')}><RotateCw size={16}/>{rotating===(kind==='participant'?'student':kind==='guest'?'observer':'teacher')?'Обновление…':active?'Обновить код':'Сгенерировать код'}</button>
       </div>
      </article>
-    })}
+   }
+ return <section className="teacherAccessCodes" aria-label="Коды доступа к игре">
+  <div className="teacherAccessHead"><KeyRound size={20} aria-hidden="true"/><div><h3>Доступ к игре</h3><p>Код игры и приглашения для участников, групп и гостей. Коды доступны только владельцу игры, их можно обновить отдельно. Личный пароль задаётся в профиле.</p></div></div>
+  <section className="teacherCodeRoleSections" aria-label="Сохранённые коды владельца">
+   <h4>Коды для подключения участников</h4>
+   <p>Код игры и приглашение участника — разные значения. Оба всегда доступны владельцу игры.</p>
+   <div className="teacherCodeActiveRoles">
+    {(['participant'] as InventoryScope[]).map(codeCard)}
+   </div>
+   <h4>Дополнительный преподаватель и гость</h4>
+   <p>Отдельные приглашения для других преподавателей и гостей. Они не дают доступа к учётной записи владельца.</p>
+   <div className="teacherCodeActiveRoles">
+    {(['teacher','guest'] as InventoryScope[]).map(codeCard)}
+
    </div>
    <p className="teacherCodeScopeInfo">Приглашение преподавателя предназначено только для дополнительного преподавателя, а не для входа владельца. Гость получает только доступ к разрешённому просмотру.</p>
   </section>
@@ -182,7 +191,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
   {created&&<div className="teacherCodeCreated" role="status"><ShieldCheck size={18}/><div><b>Сохраните: {labels[createdKind].toLowerCase()}</b> <code>{created}</code><p>Код сохранён для преподавателя.</p></div><button type="button" onClick={()=>void copy(created)}><Copy size={16}/> Копировать</button></div>}
   <div className="teacherCodeRows">
    <div className="teacherAccessListHead"><h4>Все приглашения ({rows.length})</h4><button type="button" disabled={busy} onClick={()=>void refresh().catch(e=>setNotice(String(e)))}><RotateCw size={15}/> Обновить</button></div>
-   {rows.length===0&&<p>Приглашений пока нет. Коды, созданные при запуске игры, также отображаются здесь без раскрытия секретного значения.</p>}
+   {rows.length===0&&<p>Приглашений пока нет. Создайте код участника, дополнительного преподавателя или гостя выше.</p>}
    {rows.map(row=><div key={row.id} className="teacherCodeRow">
     <div><b>{inventoryLabels[row.scope]}{row.scope==='group'&&row.group_name?': '+row.group_name:''}</b><small>{row.active?'Активно':'Отключено'} · {new Date(row.created_at).toLocaleDateString('ru-RU')} · Код защищён хешированием</small></div>
     {row.code?<span className="teacherInviteSecret"><code>{row.code}</code><button type="button" onClick={()=>void copy(row.code!)}><Copy size={15}/> Копировать</button></span>:<small>Старый код нельзя восстановить из хеша</small>}{row.active?<button type="button" disabled={busy} onClick={()=>void revoke(row)}>Отключить</button>:
