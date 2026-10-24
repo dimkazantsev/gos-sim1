@@ -174,3 +174,9 @@
 .teacherAccessCodes .teacherCodeParticipantCopy>button{display:inline-flex;align-items:center;justify-content:center;gap:9px;box-sizing:border-box;max-width:100%;min-height:44px;padding:10px 16px;border:1px solid #bacbea;border-radius:9px;background:#fff;color:#173da3;font-weight:700;line-height:1.4;text-align:center;white-space:normal;overflow-wrap:anywhere;cursor:pointer}
 .teacherAccessCodes .teacherCodeParticipantCopy>button:disabled{opacity:.5;cursor:not-allowed}
 @media(max-width:600px){.teacherAccessCodes .teacherCodeParticipantCopy>button{width:100%}}
+
+/* Owner invitation inventory: compact copy icon belongs to the revoke/delete action group. */
+.teacherAccessCodes .teacherCodeRow .teacherCodeRowActions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:nowrap;gap:8px;min-width:0}
+.teacherAccessCodes .teacherCodeRow .teacherCodeRowCopy{display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;box-sizing:border-box;width:44px;min-width:44px;min-height:44px;padding:0}
+.teacherAccessCodes .teacherCodeRow .teacherCodeRowCopy svg{flex-shrink:0}
+@container (max-width:650px){.teacherAccessCodes .teacherCodeRow .teacherCodeRowActions{justify-content:flex-start}}
