@@ -696,7 +696,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      </div>}
     </div>}
 
-    <ChatToggleButton chatOpen={chatOpen} onToggle={toggleTourChat} unreadCount={g.chatUnreadCount} mentionCount={g.chatMentionCount}/>
+    {teacher&&!previewMode&&<a className="gameShareScreen" href={typeof window!=='undefined'&&window.location.hostname.endsWith('.github.io')?'/gos-sim1/teacher/?choose=1':'/teacher?choose=1'} title="Выбрать игру или открыть постоянный кабинет">Мои игры</a>}
+     <ChatToggleButton chatOpen={chatOpen} onToggle={toggleTourChat} unreadCount={g.chatUnreadCount} mentionCount={g.chatMentionCount}/>
    </header>
    </GameHeader>
 
