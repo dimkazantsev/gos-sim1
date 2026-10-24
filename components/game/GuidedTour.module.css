@@ -35,3 +35,44 @@
  .fallback span{min-width:0;overflow-wrap:anywhere}
  .fallback svg{flex-shrink:0}
 }
+
+/* Explicit contrast contract for every walkthrough action. Global game button
+   states are not allowed to turn the primary step action white-on-white. */
+.card button.fallback,
+.card button.fallback:enabled,
+.card button.fallback:active,
+.card button.fallback:hover,
+.card button.fallback:focus-visible{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  width:100%;
+  min-height:48px;
+  margin-top:12px;
+  padding:11px 13px;
+  border:1px solid #2453e6!important;
+  border-radius:11px;
+  background:#2453e6!important;
+  background-image:none!important;
+  color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;
+  opacity:1!important;
+  filter:none!important;
+  box-shadow:0 5px 12px rgba(22,73,184,.17);
+  font-size:13px;
+  font-weight:800;
+  line-height:1.35;
+  text-align:left;
+  cursor:pointer;
+}
+.card button.fallback span,.card button.fallback svg{
+  color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;
+  opacity:1!important;
+}
+.card button.fallback:hover{background:#1744c6!important;border-color:#1744c6!important}
+.card button.fallback:focus-visible{outline:3px solid #86adff;outline-offset:2px}
+@media(max-width:600px){
+ .card button.fallback{min-height:48px;font-size:12px}
+}
