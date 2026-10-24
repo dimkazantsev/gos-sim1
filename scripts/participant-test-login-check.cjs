@@ -8,7 +8,7 @@ const nodes=(v,p)=>!v||typeof v!=='object'?[]:[
  ...(p(v)?[v]:[]),...[v.props?.children].flat(Infinity).flatMap(x=>nodes(x,p))
 ];
 const label=n=>!n||typeof n!=='object'?String(n||''):[n.props?.children].flat(Infinity).map(label).join('');
-function harness(initialSession,changeIdentity=false,signupError=null){
+function harness(initialSession,changeIdentity=false,signupError=null,teacherAccount=true){
  const values=[],calls=[];let cursor=0,tree;
  const jsx=(type,props)=>({type,props:props||{}});
  const react={
@@ -16,7 +16,7 @@ function harness(initialSession,changeIdentity=false,signupError=null){
    return [values[index].value,v=>values[index].value=typeof v==='function'?v(values[index].value):v];},
   useEffect(){cursor++;},useMemo(fn){cursor++;return fn()}
  };
- const api={auth:{
+ const api={from(table){assert.equal(table,'teacher_profiles');return{select:()=>({eq:()=>({maybeSingle:async()=>({data:teacherAccount?{user_id:initialSession?.user?.id}:null,error:null})})})}},auth:{
   async getSession(){calls.push('getSession');return{data:{session:initialSession},error:null}},
   async signOut({scope}){assert.equal(scope,'local');calls.push('signOut:local');return{error:null}},
   async signInAnonymously(){calls.push('signInAnonymously');return{error:signupError}}
@@ -55,8 +55,12 @@ function harness(initialSession,changeIdentity=false,signupError=null){
 (async()=>{
  const teacher={user:{id:'account-teacher',is_anonymous:false}};
  const existing=harness(teacher,false);await existing.submit();
- assert(existing.error().includes('личной учётной записью'),'Explain account collision');
+ assert(existing.error().includes('профиль преподавателя'),'Explain account collision');
  assert(!existing.calls.includes('signOut:local')&&!existing.calls.some(x=>x.startsWith('rpc:')),'No silent teacher role overwrite');
+ const registeredParticipant=harness({user:{id:'regular-student',is_anonymous:false}},false,null,false);
+ await registeredParticipant.submit();
+ assert(registeredParticipant.calls.includes('rpc:join_game_with_code')&&!registeredParticipant.calls.includes('signOut:local'),
+  'Existing students can enter their own games with password identity intact');
  const switched=harness(teacher,true);await switched.submit();
  assert.deepEqual(switched.calls.filter(x=>x!=='getSession'),['signOut:local','signInAnonymously','rpc:join_game_with_code','navigate:/game/test-game-uuid']);
  const anonymous=harness({user:{id:'previous-test',is_anonymous:true}},true);await anonymous.submit();
