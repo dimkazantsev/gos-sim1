@@ -226,8 +226,12 @@ async function copy(value:string){
    {rows.length===0&&<p>Приглашений пока нет. Создайте код участника, дополнительного преподавателя или гостя выше.</p>}
    {rows.map(row=><div key={row.id} className="teacherCodeRow">
     <div><b>{inventoryLabels[row.scope]}{row.scope==='group'&&row.group_name?': '+row.group_name:''}</b><small>{row.active?'Активно':'Отключено'} · {new Date(row.created_at).toLocaleDateString('ru-RU')} · Код защищён хешированием</small></div>
-    {row.code?<span className="teacherInviteSecret"><code>{row.code}</code><button type="button" onClick={()=>void copy(row.code!)}><Copy size={15}/> Копировать</button></span>:<small>Старый код нельзя восстановить из хеша</small>}{row.active?<button type="button" disabled={busy} onClick={()=>void revoke(row)}>Отключить</button>:
-     <button type="button" disabled={busy} onClick={()=>void remove(row)}><Trash2 size={15}/> Удалить</button>}
+    {row.code?<span className="teacherInviteSecret"><code>{row.code}</code></span>:<small>Старый код нельзя восстановить из хеша</small>}
+    <div className="teacherCodeRowActions">
+     {row.code&&<button type="button" className="teacherCodeRowCopy" disabled={busy} aria-label={'Копировать код: '+inventoryLabels[row.scope]} title="Копировать код приглашения" onClick={()=>void copy(row.code!)}><Copy size={18} aria-hidden="true"/></button>}
+     {row.active?<button type="button" disabled={busy} onClick={()=>void revoke(row)}>Отключить</button>:
+      <button type="button" disabled={busy} onClick={()=>void remove(row)}><Trash2 size={15}/> Удалить</button>}
+    </div>
    </div>)}
   </div>
   {notice&&<p className="teacherCodeNotice" role="status">{notice}</p>}
