@@ -166,6 +166,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
      {stage.stage_no===16&&<SystemDebriefLab g={g}/>}
     </div>
    </fieldset>
+   {bodies&&stage.stage_no!==12&&<div id={'stage-meeting-minutes-'+g.game?.id+'-'+stage.stage_no} className="stageMeetingFinalDocuments" aria-label="Итоговые документы заседания"/>}
    {!scoringClosed&&(stage.status==='open'||canRemediateCompleted)&&awaitingFinalDocuments.length>0&&<section className="stageFinalWorkPrompt" aria-live="polite">
       <div><FileText size={19} aria-hidden="true"/><span><b>Итоговые документы ещё не оформлены</b>
        <small>{stage.status==='completed'?'Осталось погасить задолженность по итоговым документам ('+awaitingFinalDocuments.length+'). После опубликования доступ и предварительный балл будут восстановлены.':'Осталось оформить обязательные документы ('+awaitingFinalDocuments.length+'). До этого этап завершить нельзя.'}</small></span></div>
