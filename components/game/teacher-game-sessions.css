@@ -168,3 +168,9 @@
  .teacherAccessCodes .teacherCodeRoleSections{padding:12px}
  .teacherAccessCodes .teacherCodeActiveRole{padding:12px}
 }
+
+/* The only bulk-copy action for saved games uses the current owner-visible participant invite. */
+.teacherAccessCodes .teacherCodeParticipantCopy{display:flex;justify-content:flex-end;min-width:0}
+.teacherAccessCodes .teacherCodeParticipantCopy>button{display:inline-flex;align-items:center;justify-content:center;gap:9px;box-sizing:border-box;max-width:100%;min-height:44px;padding:10px 16px;border:1px solid #bacbea;border-radius:9px;background:#fff;color:#173da3;font-weight:700;line-height:1.4;text-align:center;white-space:normal;overflow-wrap:anywhere;cursor:pointer}
+.teacherAccessCodes .teacherCodeParticipantCopy>button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:600px){.teacherAccessCodes .teacherCodeParticipantCopy>button{width:100%}}
