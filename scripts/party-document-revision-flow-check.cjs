@@ -8,6 +8,11 @@ const wanted=new Set(['signedAssetUrl','acceptPartyDocuments','loadPartyDocument
 const pieces=[];function visit(n){if(ts.isFunctionDeclaration(n)&&wanted.has(n.name?.text))pieces.push(n.getText(tree));ts.forEachChild(n,visit)}visit(tree);
 assert.equal(pieces.length,5);
 const code=ts.transpileModule(pieces.join('\n'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.None}}).outputText;
+const resolverModule={exports:{}};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/resolveStoredAsset.ts','utf8'),
+ {compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText,
+ {module:resolverModule,exports:resolverModule.exports});
+const {resolveStoredAsset}=resolverModule.exports;
 const tick=()=>new Promise(r=>setImmediate(r));
 function gate(){let resolve;return{promise:new Promise(r=>resolve=r),resolve}}
 async function prompt(p){let timer;try{return await Promise.race([p,new Promise((_,reject)=>timer=setTimeout(()=>reject(Error('Review metadata is blocked by Storage')),1500))])}finally{clearTimeout(timer)}}
@@ -15,7 +20,7 @@ async function actions(){
  const backend={docs:[{id:'v1',game_id:'game-a',party_id:'party-a',doc_kind:'program',title:'Программа',storage_path:'v1.pdf',version_no:1,status:'submitted',note:null}],writes:0,storageError:null};
  function client(teacher){
   let rows=[],version=0;const signing=gate(),errors=[],api={};
-  const env={api,console,Promise,Map,crypto:require('node:crypto').webcrypto,teacher,gameId:'game-a',game:{id:'game-a'},me:{user_id:teacher?'teacher':'owner'},parties:[{id:'party-a',game_id:'game-a'}],
+  const env={api,console,Promise,Map,resolveStoredAsset,crypto:require('node:crypto').webcrypto,teacher,gameId:'game-a',game:{id:'game-a'},me:{user_id:teacher?'teacher':'owner'},parties:[{id:'party-a',game_id:'game-a'}],
     assetSignatures:{current:new Map()},assetSignQueue:{current:{active:0,waiting:[]}},readEpoch:{current:0},alive:{current:true},
    setError:e=>errors.push(String(e)),setPartyDocuments:fn=>{rows=typeof fn==='function'?fn(rows):fn},
    readCurrent:t=>t.version===version,requireSuccessful:rs=>{const e=rs.find(r=>r.error)?.error;if(e)throw e},
