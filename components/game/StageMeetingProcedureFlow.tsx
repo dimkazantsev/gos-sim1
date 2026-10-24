@@ -1,6 +1,6 @@
 import type {Stage} from './types';
 import {STAGE_OPERATIONS} from './stageOperations';
-import './StageMeetingProcedureFlow.css';
+import './stage-meeting-procedure.css';
 
 // A shared presentation contract; voting, documents and permissions keep their
 // existing stage-specific server RPCs and approved legal procedures.
