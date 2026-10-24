@@ -32,6 +32,14 @@ async function main(){
     await r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)});
    });
    await page.goto(url,{waitUntil:'networkidle'});await page.getByText('GOS-SAVED-TEST',{exact:true}).waitFor();await page.addStyleTag({content:'nextjs-portal{display:none}'});
+   const maintenance=page.locator('.gosTeacherManagedGame');
+   assert.equal(await maintenance.count(),1,'Only one management row for the fixture game');
+   for(const action of ['JSON','HTML','ZIP · Локальная Игра','Удалить','Открыть'])assert.equal(await maintenance.getByRole('button',{name:action,exact:true}).count(),1,'Session action '+action+' appears in the saved game row');
+   assert.equal(await maintenance.getByRole('button',{name:'В архив',exact:true}).count(),0,'Remove stand-alone archive action');
+   assert.equal(await page.getByText('Резервные копии и обслуживание архивов').count(),0,'No duplicate archive maintenance section');
+   const actionRects=await maintenance.locator('.gosTeacherSessionControls button').evaluateAll(nodes=>nodes.map(el=>({text:el.textContent?.trim(),x:el.getBoundingClientRect().left,y:el.getBoundingClientRect().top,right:el.getBoundingClientRect().right,bottom:el.getBoundingClientRect().bottom})));
+   const openIndex=actionRects.findIndex(x=>x.text?.includes('Открыть'));assert(openIndex>0,'Open follows the export and deletion controls');
+   assert(actionRects.every(x=>x.right<=width+2&&x.x>=-2),'Every management action fits the '+width+'px viewport');
    await page.getByRole('button',{name:'Создать игру',exact:true}).click();
    const form=page.locator('.gosTeacherCreateForm'),inputs=form.locator('input'),bulk=form.getByRole('button',{name:'Копировать все коды',exact:true});
    const copies=['Копировать код игры','Копировать приглашение преподавателя','Копировать приглашение участника'].map(name=>form.getByRole('button',{name,exact:true}));
