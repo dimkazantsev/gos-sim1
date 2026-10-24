@@ -25,4 +25,12 @@ assert(client.includes("setupStatus.missing.length>0&&introSeen"),'No onboarding
 assert(profile.includes("own&&setupNotice&&<p className=\"profileSetupFeedback\""),'Show the reason immediately at the top of the profile');
 assert(profile.includes("onFinishSetup"),'Keep manual finalization as a fallback');
 assert(!client.includes("supabase.from('game_profiles').update("),'Do not forge a completion flag on the client');
+const sessions=fs.readFileSync('components/game/TeacherGameSessions.tsx','utf8');
+const sessionStyles=fs.readFileSync('components/game/teacher-game-sessions.css','utf8');
+assert(profile.includes("own&&teacher&&<button type=\"button\" onClick={()=>document.getElementById('teacher-game-sessions')?.scrollIntoView({behavior:'smooth',block:'start'})}"),'The teacher profile shortcut scrolls within the same screen');
+assert(!profile.includes("window.location.assign(window.location.hostname.endsWith('.github.io')?'/gos-sim1/teacher/':'/teacher')"),'The teacher profile shortcut must not open the separate portal');
+assert(sessions.includes('id="teacher-game-sessions"')&&profile.includes('<TeacherGameSessions displayName={me.full_name}/>'),'The scroll target is the existing games section in the same profile');
+assert(client.includes("document.getElementById('teacher-game-sessions')?.scrollIntoView"),'Sidebar and mobile games actions still navigate to the existing section');
+assert(sessionStyles.includes('scroll-margin-top:110px'),'The section heading must remain visible below sticky navigation');
+console.log('PASS teacher games shortcut: same profile, real target, sticky-header offset, no extra screen.');
 console.log('PASS profile navigation: six fields, race-free setup status, secure auto-finalization, remembered section, failure explanation.');

@@ -172,7 +172,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
     <div className="profileHeroControls">
      <button type="button" className="profileComicButton" aria-label="Вводный комикс" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Пролог</button>
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
-     {own&&teacher&&<button type="button" onClick={()=>window.location.assign(window.location.hostname.endsWith('.github.io')?'/gos-sim1/teacher/':'/teacher')}><Landmark size={17}/> Мои игры · Создать игру</button>}
+     {own&&teacher&&<button type="button" onClick={()=>document.getElementById('teacher-game-sessions')?.scrollIntoView({behavior:'smooth',block:'start'})}><Landmark size={17}/> Мои игры · Создать игру</button>}
      {own&&onStartTutorial&&<button type="button" onClick={onStartTutorial} title="Повторить интерактивное обучение навигации"><Compass size={17}/> Пройти обучение</button>}
      {own&&target.kind==='student'&&game&&<button type="button" onClick={()=>setBlitzOpen(true)} aria-haspopup="dialog" aria-label={'Блиц-вопросы'+(pendingBlitz?' — ответ не дан: '+pendingBlitz:'')}><BookOpenCheck size={17}/> Блиц-вопросы {pendingBlitz>0&&<span className="profileBlitzButtonBadge" aria-hidden="true">{pendingBlitz>99?'99+':pendingBlitz}</span>}</button>}
      {own&&target.kind!=='observer'&&<button type="button" onClick={()=>setTasksOpen(true)}><ListTodo size={17}/> Назначить задачу</button>}
