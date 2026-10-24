@@ -278,6 +278,28 @@ export function useRepublicGame(gameId:string){
    void Promise.resolve().then(()=>{scheduled=false;flush()});
   }
   const channel=supabase.channel('gos-id-live:'+gameId+':'+me.user_id);
+  // State pulse: reuse the existing game channel. One UPDATE notification
+  // replaces a 15-query core reload for all connected classroom clients.
+  // The source payload is still scoped by game_id and Realtime RLS.
+  // Postgres DELETE events are not RLS-filtered: subscribe only to INSERT
+  // and UPDATE, both of which enforce each game's existing SELECT policy.
+  for(const metricEvent of ['INSERT','UPDATE'] as const){
+   channel.on('postgres_changes',{event:metricEvent,schema:'public',table:'state_metrics',filter:'game_id=eq.'+gameId},payload=>{
+    const next=payload.new as unknown as Metric;
+    if(!next?.id||next.game_id!==gameId)return;
+    setMetrics(previous=>previous.some(item=>item.id===next.id)
+     ?previous.map(item=>item.id===next.id?next:item)
+     :[...previous,next]);
+   });
+  }
+  // A chart/history entry arrives on the same socket, with no follow-up
+  // PostgREST query. The 3000-row bound matches the initial history read.
+  channel.on('postgres_changes',{event:'INSERT',schema:'public',table:'state_metric_history',filter:'game_id=eq.'+gameId},payload=>{
+   const entry=payload.new as unknown as MetricHistory;
+   if(!entry?.id||entry.game_id!==gameId)return;
+   setMetricHistory(previous=>previous.some(item=>item.id===entry.id)?previous:
+    [...previous,entry].sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at)||a.id-b.id).slice(-3000));
+  });
   // Render the authorised INSERT payload immediately rather than waiting
   // for another PostgREST query. RLS still governs Realtime visibility.
   channel.on('postgres_changes',{event:'*',schema:'public',table:'chat_messages',filter:'game_id=eq.'+gameId},payload=>{

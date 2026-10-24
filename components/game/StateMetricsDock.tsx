@@ -1,12 +1,13 @@
 'use client';
-import {gameValueLabel} from '../../lib/gameLabels';
+import {gameValueLabel,impactConditionText} from '../../lib/gameLabels';
+import {supabase} from '@/lib/supabase';
 import {metricQuantity} from '@/lib/formatQuantity';
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {Activity,BadgeCheck,Globe2,Handshake,HeartHandshake,MessageSquare,Scale,ShieldCheck,TrendingUp,UsersRound,Wallet} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
-import type {Metric} from './types';
+import type {Metric,ImpactRule} from './types';
 import {drawMetricChart,METRIC_COLORS,pointsForMetric} from './metricChart';
 
 const PRIMARY=['public_trust','economy','budget','social_stability','lawfulness','international_standing'];
@@ -55,11 +56,27 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const plotRef=useRef<HTMLDivElement>(null);
  const [plotWidth,setPlotWidth]=useState(700);
  const [focusedPoint,setFocusedPoint]=useState<{id:string;at:number}|null>(null);
+ const [ruleRows,setRuleRows]=useState<ImpactRule[]|null>(null);
+ const [ruleError,setRuleError]=useState('');
+ // Load the live configured formula only when someone opens a metric.
+ // The dashboard itself makes no extra requests for a classroom of 40.
+ useEffect(()=>{
+  if(!selected||!game?.id){setRuleRows(null);setRuleError('');return}
+  let valid=true;setRuleRows(null);setRuleError('');
+  void (async()=>{
+   const r=await supabase.from('impact_rules').select('*')
+    .eq('game_id',game.id).order('priority').limit(60);
+   if(!valid)return;
+   if(r.error)setRuleError('Не удалось получить действующие правила расчёта.');
+   else setRuleRows((r.data||[]) as ImpactRule[]);
+  })();
+  return()=>{valid=false};
+ },[game?.id,!!selected]);
  const allowed=useMemo(()=>[...metrics].filter(m=>teacher||m.is_public).sort((a,b)=>a.sort_order-b.sort_order),[metrics,teacher]);
  const primary=PRIMARY.map(k=>allowed.find(m=>m.metric_key===k)).filter(Boolean) as Metric[];
  const secondary=allowed.filter(m=>!PRIMARY.includes(m.metric_key));
  const visibleMetrics=[...primary,...secondary];
- const chosen=allowed.find(m=>m.id===selected&&(m.metric_key!=='budget'||g.budgetPulse));
+ const chosen=allowed.find(m=>m.id===selected);
  useEffect(()=>{
   if(!chosen||!plotRef.current)return;
   const node=plotRef.current;
@@ -73,7 +90,12 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
 
  function rowsFor(metricKey:string){return metricHistory.filter(h=>h.metric_key===metricKey)}
  const hist=chosen?rowsFor(chosen.metric_key).sort((a,b)=>Date.parse(a.recorded_at)-Date.parse(b.recorded_at)):[];
- const comparisonOptions=visibleMetrics.filter(m=>m.id!==chosen?.id&&(m.metric_key!=='budget'||g.budgetPulse));
+ const affectsChosen=chosen&&ruleRows?ruleRows.filter(rule=>Number(rule.effects?.metrics?.[chosen.metric_key]||0)!==0):[];
+ const activeEffects=affectsChosen?affectsChosen.filter(rule=>rule.enabled&&rule.auto_apply):[];
+ const metricEvents=hist.filter(entry=>entry.source_type!=='baseline').length;
+ const percentBound=(chosen?.min_value??0)===0&&(chosen?.max_value??100)===100;
+ const formatDelta=(v:number)=>(v>0?'+':'')+new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(v);
+ const comparisonOptions=visibleMetrics.filter(m=>m.id!==chosen?.id);
  const activeMetrics=chosen?[chosen,...comparisonOptions.filter(m=>compare.includes(m.id))]:[];
  const comparisonLimitReached=activeMetrics.length>=MAX_CHART_SERIES;
  const snapshotAt=useMemo(()=>Date.now(),[selected]);
@@ -101,14 +123,14 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
 
  function card(m:Metric){
   const d=delta(m);
-  const pending=m.metric_key==='budget'&&!g.budgetPulse;
+  const pending=m.metric_key==='budget'&&!Number.isFinite(Number(m.value));
   const rows=rowsFor(m.metric_key);
   const mini=rows.slice(-12).map(h=>Number(h.value));
   const last=rows.at(-1);
   const pct=m.max_value!=null&&m.min_value!=null?Math.max(0,Math.min(100,(Number(m.value)-Number(m.min_value))/Math.max(1,Number(m.max_value)-Number(m.min_value))*100)):null;
-  return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} data-budget-metric-value={m.metric_key==='budget'&&!pending?m.value:undefined} disabled={pending} onClick={()=>{setCompare([]);setBucket('changes');setFocusedPoint(null);setShowFullHistory(false);setSelected(m.id)}}>
+  return <button key={m.id} className={'statePulseMetric '+m.group_key+' metric-'+m.metric_key} data-budget-metric-value={m.metric_key==='budget'&&!pending?m.value:undefined} onClick={()=>{setCompare([]);setBucket('changes');setFocusedPoint(null);setShowFullHistory(false);setSelected(m.id)}}>
    <span className="statePulseIcon" aria-hidden="true">{metricIcon(m.metric_key)}</span>
-   <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.metric_key==='budget'?'Доходы бюджета':m.label}</b><span>{pending?(g.budgetPulseError||'Получаем общий федеральный прогноз…'):last?.note||m.description||'Игровой показатель'}</span></div>
+   <div className="statePulseCopy"><small>{groupLabel(m.group_key)}</small><b>{m.metric_key==='budget'?'Доходы бюджета':m.label}</b><span>{pending?(g.budgetPulseError||'Нет сохранённого прогноза'):m.metric_key==='budget'&&!g.budgetPulse?'Последний сохранённый прогноз; актуализируется в разделе «Бюджет».':last?.note||m.description||'Игровой показатель'}</span></div>
    <div className="statePulseValue"><strong>{pending?'…':metricQuantity(Number(m.value),m.unit,m.metric_key)}</strong><em className={changeTone(m,d)}>{pending||d===0?'—':`${d>0?'▲ +':'▼ '}${m.metric_key==='budget'?metricQuantity(Math.abs(d),m.unit,m.metric_key):Math.abs(d).toFixed(Math.abs(d)%1?1:0)}`}</em></div>
    <div className="statePulseTrend">
     {mini.length>1&&<svg viewBox="0 0 120 32" aria-hidden="true"><path d={spark(mini,120,32)} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"/></svg>}
@@ -128,6 +150,25 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
     <div className="metricModalBody">
     <div className="metricHeroValue"><strong>{metricQuantity(Number(chosen.value),chosen.unit,chosen.metric_key)}</strong><span className={changeTone(chosen,delta(chosen))}>{delta(chosen)===0?'Без изменений':(delta(chosen)>0?'▲ +':'▼ ')+(chosen.metric_key==='budget'?metricQuantity(Math.abs(delta(chosen)),chosen.unit,'budget'):Math.abs(delta(chosen)).toFixed(1))+' с прошлого изменения'}</span></div>
     {hist.at(-1)&&<div className="metricLastCause"><small>ПОСЛЕДНЯЯ ПРИЧИНА</small><b>{hist.at(-1)?.note||hist.at(-1)?.source_type}</b><span>{new Date(hist.at(-1)!.recorded_at).toLocaleString('ru-RU')}</span></div>}
+    <section className="stateMetricFormula" aria-label="Расчёт и правила изменения показателя">
+     <h3>Как рассчитывается показатель</h3>
+     {chosen.metric_key==='budget'?<>
+      <p>Доходы федерального бюджета — сумма рассчитанных доходных статей с учётом округления и утверждённых корректировок. Значение берётся из общего расчёта бюджета, а не из процента остальных показателей.</p>
+      <p>Влияющие параметры бюджетной модели: экономическая активность, доверие граждан, ставка Банка России, инфляция, курс, цена нефти, налоговые ставки и изменения доходных статей. Черновые несохранённые действия в общий показатель не входят.</p>
+      {!g.budgetPulse&&<p>Показан последний сохранённый прогноз, даже когда раздел «Бюджет» не открыт. Новый расчёт производится при работе с бюджетом; это не текущие кассовые доходы.</p>}
+      <small>Единица расчёта: млн ₽. Источник — общий бюджетный расчёт ГОС.ID.</small>
+     </>:<>
+      <p>Каждое игровое событие изменяет предыдущее значение на установленное число процентных пунктов. {percentBound?'Результат ограничивается диапазоном от 0 до 100%.':'Применяются минимальное и максимальное значения, установленные для этого показателя.'} Изменения начисляются в процентных пунктах, а не как процент от текущего значения.</p>
+      <p>Записей об изменении после исходной точки: <strong>{metricEvents}</strong>. Каждое начисление и причина отображаются в журнале ниже.</p>
+      {ruleError?<p role="alert">{ruleError}</p>:ruleRows===null?<p>Загружаем утверждённые правила…</p>:activeEffects.length===0?
+       <p className="stateMetricFormulaNotice">Для этого индикатора сейчас не настроено активных автоматических начислений. Пока преподаватель не изменит значение или не утвердит соответствующее игровое последствие, показатель останется неизменным.</p>:
+       <div className="stateMetricFormulaRules"><b>Действующие автоматические начисления</b>
+        <ul>{activeEffects.map(rule=><li key={rule.id}><strong>{formatDelta(Number(rule.effects.metrics?.[chosen.metric_key]||0))} п. п.</strong> — {rule.label}{Object.keys(rule.conditions||{}).length>0?<small>{impactConditionText(rule.conditions)}</small>:null}</li>)}</ul>
+       </div>}
+      {affectsChosen&&affectsChosen.length>activeEffects.length&&<p className="stateMetricFormulaNotice">Другие правила для этого показателя сейчас отключены или требуют ручного применения.</p>}
+      <small>Используются настройки конкретной игры. Преподаватель может изменить последствия в разделе управления игровыми эффектами.</small>
+     </>}
+    </section>
     <div className="metricBucketTabs"><button className={bucket==='changes'?'active':''} aria-pressed={bucket==='changes'} onClick={()=>{setFocusedPoint(null);setBucket('changes')}}>Все изменения</button><button className={bucket==='day'?'active':''} aria-pressed={bucket==='day'} onClick={()=>{setFocusedPoint(null);setBucket('day')}}>По дням</button><button className={bucket==='week'?'active':''} aria-pressed={bucket==='week'} onClick={()=>{setFocusedPoint(null);setBucket('week')}}>По неделям</button></div>
     <section className="metricChart redesignedChart" aria-label="График динамики показателей">
      <div className="metricChartCaption"><b>{geometry.comparing?'Динамика показателей':'История показателя'}{axisUnit&&<small data-budget-chart-unit> · {axisUnit}</small>}</b><span>{bucket==='changes'?'По игровым событиям':bucket==='day'?'По дням':'По неделям'} · {activeMetrics.length} из {MAX_CHART_SERIES} линий</span></div>

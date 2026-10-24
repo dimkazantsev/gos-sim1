@@ -245,6 +245,10 @@ on:
       - 'app/topbar-controls-alignment.css'
       - 'app/tablet-topbar-layout.css'
       - 'scripts/tablet-topbar-layout-browser-check.cjs'
+      - 'scripts/state-pulse-contract-check.cjs'
+      - 'components/game/StateMetricsDock.tsx'
+      - 'app/impact-workbench.css'
+      - 'supabase/migrations/20261024193000_state_pulse_game_realtime.sql'
       - 'scripts/metric-modal-browser-check.cjs'
       - 'scripts/topbar-controls-height-check.cjs'
       - 'app/icon.svg'
@@ -457,6 +461,7 @@ jobs:
       - run: npm run design:dock
       - run: npm run design:mobile
       - run: npm run design:teacher
+      - run: node scripts/state-pulse-contract-check.cjs
       - run: npm run design:impact
       - uses: actions/upload-artifact@v4
         if: always()

@@ -124,3 +124,17 @@
 @media(max-width:550px){.impactWorkbench{border-radius:15px}.impactWorkbenchHeader{gap:16px;padding:18px 14px}.impactWorkbenchStats{gap:6px}.impactWorkbenchStats>span{padding:10px 8px;min-height:68px}.impactWorkbenchStats b{font-size:22px}.impactWorkbenchStats small{font-size:10px}.impactProcess{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:12px 10px}.impactProcess>span{display:grid;justify-items:center;gap:4px;padding:9px 3px;font-size:10px;text-align:center;line-height:1.2;white-space:normal}.impactProcess i{display:none}.impactProcess svg{height:18px;width:18px}.impactWorkbenchTabs{padding:10px 10px 0;gap:4px}.impactWorkbenchTabs button{flex:1;padding:9px 6px;gap:5px;font-size:11px;white-space:normal}.impactWorkbenchTabs svg{width:14px;height:14px}.impactTabContent{padding:15px 11px}.impactFilterChoices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:5px}.impactFilterChoices button{font-size:11px;min-width:0;padding:8px 3px}.impactRuleSummary{align-items:flex-start;padding:13px 12px 9px;gap:8px}.impactWorkbench .impactRuleTitleBlock h3{font-size:14px}.impactExpandButton{min-width:0;flex:0 0 auto;padding:9px 8px;gap:4px;font-size:11px}.impactExpandButton svg{width:13px;height:13px}.impactPreview{padding:0 12px 12px}.impactRuleEditor{padding:0 12px 13px}.impactRuleControls{grid-template-columns:minmax(0,1fr)}.impactToggle{padding:11px}.impactWorkbench .impactRuleEffects label{grid-template-columns:minmax(0,1fr) 110px;padding:8px;gap:6px}.impactEffectsHead{align-items:flex-start;flex-wrap:wrap}.impactEffectsHead>span{white-space:nowrap}.impactRuleFooter>div{width:100%;display:grid;grid-template-columns:1fr 1fr}.impactRuleFooter>div button{width:100%}.impactHistoryTop{grid-template-columns:29px minmax(0,1fr);gap:9px}.impactHistoryIcon{width:29px;height:29px}.impactHistoryStatus{grid-column:2;justify-self:start}.impactHistoryBottom{padding-left:0}.impactUndo{width:100%}}
 @media(max-width:350px){.impactWorkbench .impactRuleEffects label{grid-template-columns:minmax(0,1fr);gap:6px}.impactNumeric{max-width:100%}.impactRuleSummary{flex-wrap:wrap}.impactExpandButton{margin-left:auto}}
 @media(prefers-reduced-motion:reduce){.impactToggle input::before{transition:none}}
+
+/* Pulse formulas are part of the existing history modal, not a new dashboard panel. */
+.stateMetricFormula{margin:16px 0 18px;padding:16px 18px;border:1px solid #d9e3f2;border-radius:14px;background:#f8faff;color:#1b2a49}
+.stateMetricFormula h3{margin:0 0 10px;font-size:15px;font-weight:800;line-height:1.35}
+.stateMetricFormula p{margin:7px 0;font-size:13px;line-height:1.65;overflow-wrap:anywhere}
+.stateMetricFormula small{display:block;color:#5b7191;font-size:12px;line-height:1.5}
+.stateMetricFormula .stateMetricFormulaNotice{color:#536781}
+.stateMetricFormulaRules{margin:14px 0 10px}
+.stateMetricFormulaRules>b{font-size:13px}
+.stateMetricFormulaRules ul{margin:8px 0;padding-left:19px}
+.stateMetricFormulaRules li{font-size:13px;line-height:1.6;padding:3px 0;overflow-wrap:anywhere}
+.stateMetricFormulaRules li strong{font-variant-numeric:tabular-nums;white-space:nowrap}
+.stateMetricFormulaRules li small{padding-top:2px;white-space:pre-line}
+@media(max-width:520px){.stateMetricFormula{padding:12px 13px;margin:12px 0 15px}.stateMetricFormula h3{font-size:14px}}

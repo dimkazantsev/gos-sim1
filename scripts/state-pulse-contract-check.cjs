@@ -1,0 +1,32 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const read=path=>fs.readFileSync(path,'utf8');
+const game=read('components/game/useRepublicGame.ts');
+const dock=read('components/game/StateMetricsDock.tsx');
+const css=read('app/impact-workbench.css');
+const migration=read('supabase/migrations/20261024193000_state_pulse_game_realtime.sql');
+const source=read('supabase/migrations/024_seed_impact_engine_for_new_games.sql');
+const engine=read('supabase/migrations/021_automatic_impact_rule_engine.sql');
+assert.equal((game.match(/supabase\.channel\('gos-id-live:/g)||[]).length,1,'Use one authorised game socket for all clients');
+for(const table of ['state_metrics','state_metric_history']){
+ assert(game.includes("table:'"+table+"',filter:'game_id=eq.'+gameId"),'Filter realtime '+table+' by current game');
+ assert(migration.includes("tablename='"+table+"'")&&migration.includes('ADD TABLE public.'+table),'Publish both tables only once');
+}
+assert(game.includes('if(!next?.id||next.game_id!==gameId)return;'),'Ignore other games in metric payload');
+assert(game.includes("['INSERT','UPDATE'] as const")&&!game.includes("event:'*',schema:'public',table:'state_metrics'"),'Do not expose RLS-unfiltered DELETE events');
+assert(game.includes('if(!entry?.id||entry.game_id!==gameId)return;'),'Ignore other games in history payload');
+assert(game.includes('previous.some(item=>item.id===entry.id)'),'Deduplicate history deliveries');
+assert(game.includes('slice(-3000)'),'Cap browser history');
+assert(game.includes('setMetrics(previous=>'),'Update card immediately on new value, with no request');
+assert(!migration.includes('UPDATE public.state_metrics')&&!migration.includes('DELETE FROM'),'Do not rewrite scores or recorded history');
+assert(source.includes("'post_media'")&&source.includes("'vote_passed'")&&source.includes("'crisis_ultra'"),'Document only source-backed rules');
+assert(engine.includes('v_new:=v_old+delta')&&engine.includes('m.min_value')&&engine.includes('m.max_value'),'Current formula is bounded addition');
+assert(dock.includes('Расчёт и правила изменения показателя'),'Show formula when selected');
+assert(dock.includes(".from('impact_rules').select('*')")&&dock.includes(".eq('game_id',game.id).order('priority').limit(60)"),'Fetch only game-scoped approved coefficients on demand');
+assert(dock.includes('activeEffects.length===0'),'Explain when an indicator cannot change automatically');
+assert(dock.includes('Записей об изменении после исходной точки'),'Tell player whether any effects actually occurred');
+assert(dock.includes("const chosen=allowed.find(m=>m.id===selected);")&&dock.includes('Последний сохранённый прогноз; актуализируется'),'Do not hide saved budget on dashboard');
+assert(dock.includes('Сумма')||dock.includes('сумма рассчитанных доходных статей'),'Budget formula is not mistakenly read as a percent');
+assert(css.includes('.stateMetricFormula')&&css.includes('@media(max-width:520px)'),'Reuse branded responsive styles');
+console.log('PASS: state pulse realtime on one game channel, bounded history, source-based coefficients and zero-rule explanation');
