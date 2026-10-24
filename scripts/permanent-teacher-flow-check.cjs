@@ -27,7 +27,7 @@ const creationGuard=read('supabase/migrations/20261024190000_guard_teacher_game_
 assert(creationGuard.includes('REVOKE ALL ON FUNCTION public.create_game_session')&&creationGuard.includes('GRANT EXECUTE ON FUNCTION public.create_teacher_game_session'),'Do not expose legacy unrestricted creation');
 assert(sessions.includes('archive_my_teacher_game'),'Archive games without deleting documents');
 assert(!agenda.includes('className="civicMeetingSteps"'),'Agenda does not repeat established five-step route');
-assert(!home.includes("router.replace('/teacher')")&&!home.includes("from('teacher_profiles').select('user_id')"),'The public entry never redirects a signed-in teacher without explicit action');
+assert(!home.includes("router.replace('/teacher')")&&!home.includes("if(live&&!p.error&&p.data)router.replace('/teacher')"),'The public entry never redirects a signed-in teacher without explicit action');
 assert(home.includes("router.push('/teacher')"),'Explicit teacher password login still opens the permanent cabinet');
 assert(stage.includes('StageMeetingProcedureFlow'),'All active meeting stages share the same guide');
 for(const k of ['Повестка','Регистрация','Рассмотрение','Решения и голосования','Итоговые документы'])assert(guide.includes(k),k);

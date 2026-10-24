@@ -13,6 +13,13 @@ on:
       - 'supabase/migrations/20261024234000_teacher_account_signature_onboarding.sql'
       - 'scripts/teacher-signature-onboarding-check.cjs'
       - 'scripts/permanent-teacher-flow-check.cjs'
+      - 'scripts/participant-test-login-check.cjs'
+      - 'scripts/participant-mobile-signature-check.cjs'
+      - 'components/game/GuidedTour.tsx'
+      - 'components/game/GuidedTour.module.css'
+      - 'app/mobile-nav-polish.css'
+      - 'app/entry-qr.css'
+      - 'supabase/migrations/20261025002500_prevent_cross_role_rejoin.sql'
       - 'scripts/teacher-entry-navigation-check.cjs'
       - '.github/workflows/permanent-teacher-flow.yml'
   workflow_dispatch:
@@ -31,6 +38,8 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm run typecheck
       - run: node scripts/permanent-teacher-flow-check.cjs
+      - run: node scripts/participant-test-login-check.cjs
+      - run: node scripts/participant-mobile-signature-check.cjs
       - run: node scripts/teacher-entry-navigation-check.cjs
       - run: node scripts/teacher-signature-onboarding-check.cjs
       - run: node scripts/ksrf-proposal-queue-check.cjs

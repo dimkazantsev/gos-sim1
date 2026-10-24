@@ -1387,11 +1387,18 @@ export function useRepublicGame(gameId:string){
  }
 
  async function saveSignature(file:File){
-  if(!me||me.kind==='observer'||file.type!=='image/png'||file.size>2*1024*1024){setError('Загрузите PNG-подпись размером до 2 МБ.');return false}
+  if(!me||me.kind==='observer'){setError('Подпись может сохранить только участник, вошедший в собственную учётную запись.');return false}
+  if(file.type!=='image/png'||file.size===0||file.size>2*1024*1024){setError('Загрузите PNG-подпись размером до 2 МБ.');return false}
+  // Detect a stale teacher or other account session before attempting Storage
+  // writes. The actual permission remains enforced on the server by RLS.
+  const active=await supabase.auth.getSession();
+  if(active.error||active.data.session?.user.id!==me.user_id){
+   setError('Вы вошли под другой учётной записью. Откройте вход для участника и войдите под своим именем.');return false;
+  }
   const path=(me.kind==='teacher'?'teacher-assets/'+me.user_id:gameId+'/profiles/'+me.user_id)+'/signature-'+crypto.randomUUID()+'.png';
   const location=resolveStoredAsset('game-assets',path);
   const up=await supabase.storage.from(location.bucket).upload(location.path,file,{contentType:'image/png',upsert:false});
-  if(up.error){setError(up.error.message);return false}
+  if(up.error){setError(up.error.message+' Проверьте, что вход выполнен под своей учётной записью участника.');return false}
   const row=profiles.find(p=>p.user_id===me.user_id);
   const r=row?await supabase.from('game_profiles').update({signature_path:path,updated_at:new Date().toISOString()})
      .eq('game_id',gameId).eq('user_id',me.user_id).select('user_id,signature_path').single():
