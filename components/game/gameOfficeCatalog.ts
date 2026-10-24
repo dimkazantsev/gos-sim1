@@ -65,7 +65,7 @@ export function gameOfficeGroups(structure:GameGovernmentStructure|null=null,uni
   ]},
   {label:'Пять министерств Правительства',roles:[
    ...ministryTitles.map(ministerOffice),
-   ...ministryTitles.map(x=>ministerOffice(x).replace(/^Министр\b/u,'Заместитель министра')),
+   ...ministryTitles.map(x=>ministerOffice(x).replace(/^Министр(?=\s)/u,'Заместитель министра')),
    ...ministryTitles.map(x=>'Сотрудник — '+x)
   ]},
   {label:'Другие органы игровой процедуры',roles:[
