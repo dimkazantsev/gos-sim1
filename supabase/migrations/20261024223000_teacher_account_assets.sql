@@ -109,3 +109,24 @@ FROM public.teacher_profiles t,public.game_members gm
 WHERE gm.game_id=p.game_id AND gm.user_id=p.user_id
   AND gm.kind='teacher' AND t.user_id=p.user_id
   AND (p.avatar_path,p.signature_path) IS DISTINCT FROM (t.avatar_path,t.signature_path);
+
+-- A permanent teacher profile may exist before the first game. A nullable
+-- preferred gender must not violate game_profiles.gender NOT NULL.
+CREATE OR REPLACE FUNCTION private.teacher_member_persist()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,private,pg_temp AS $$
+DECLARE saved public.teacher_profiles%rowtype;
+BEGIN
+ IF NEW.kind<>'teacher' THEN RETURN NEW; END IF;
+ IF TG_OP='INSERT' THEN
+   INSERT INTO public.teacher_profiles(user_id,full_name,last_game_id)
+   VALUES(NEW.user_id,NEW.full_name,NEW.game_id) ON CONFLICT(user_id) DO NOTHING;
+   SELECT * INTO saved FROM public.teacher_profiles WHERE user_id=NEW.user_id;
+   INSERT INTO public.game_profiles(game_id,user_id,bio,gender,avatar_path,signature_path)
+   VALUES(NEW.game_id,NEW.user_id,saved.bio,COALESCE(saved.gender,'unspecified'),saved.avatar_path,saved.signature_path)
+   ON CONFLICT(game_id,user_id) DO NOTHING;
+ ELSIF NEW.full_name IS DISTINCT FROM OLD.full_name THEN
+   UPDATE public.teacher_profiles SET full_name=NEW.full_name,last_game_id=NEW.game_id,updated_at=now()
+   WHERE user_id=NEW.user_id;
+ END IF;
+ RETURN NEW;
+END $$;
