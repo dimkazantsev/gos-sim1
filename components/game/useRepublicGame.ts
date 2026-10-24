@@ -281,14 +281,17 @@ export function useRepublicGame(gameId:string){
   // State pulse: reuse the existing game channel. One UPDATE notification
   // replaces a 15-query core reload for all connected classroom clients.
   // The source payload is still scoped by game_id and Realtime RLS.
-  channel.on('postgres_changes',{event:'*',schema:'public',table:'state_metrics',filter:'game_id=eq.'+gameId},payload=>{
-   if(payload.eventType==='DELETE'){dirtyCore=true;schedule();return}
-   const next=payload.new as unknown as Metric;
-   if(!next?.id||next.game_id!==gameId)return;
-   setMetrics(previous=>previous.some(item=>item.id===next.id)
-    ?previous.map(item=>item.id===next.id?next:item)
-    :[...previous,next]);
-  });
+  // Postgres DELETE events are not RLS-filtered: subscribe only to INSERT
+  // and UPDATE, both of which enforce each game's existing SELECT policy.
+  for(const metricEvent of ['INSERT','UPDATE'] as const){
+   channel.on('postgres_changes',{event:metricEvent,schema:'public',table:'state_metrics',filter:'game_id=eq.'+gameId},payload=>{
+    const next=payload.new as unknown as Metric;
+    if(!next?.id||next.game_id!==gameId)return;
+    setMetrics(previous=>previous.some(item=>item.id===next.id)
+     ?previous.map(item=>item.id===next.id?next:item)
+     :[...previous,next]);
+   });
+  }
   // A chart/history entry arrives on the same socket, with no follow-up
   // PostgREST query. The 3000-row bound matches the initial history read.
   channel.on('postgres_changes',{event:'INSERT',schema:'public',table:'state_metric_history',filter:'game_id=eq.'+gameId},payload=>{
