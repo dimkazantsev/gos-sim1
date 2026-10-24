@@ -66,7 +66,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const [localRefresh,setLocalRefresh]=useState(0);
  const [vetoSfNote,setVetoSfNote]=useState('');
  const [billAmendmentGate,setBillAmendmentGate]=useState<BillAmendmentGate|null>(null);
- const [institutionSigners,setInstitutionSigners]=useState<{required:{user_id:string;office:string;signed:boolean}[];can_sign:boolean}|null>(null);
+ const [institutionSigners,setInstitutionSigners]=useState<{required:{user_id:string;office:string;signed:boolean;facsimile_url?:string|null}[];can_sign:boolean}|null>(null);
  const [documentSignatures,setDocumentSignatures]=useState<{id:string;signer_id:string;signed_at:string;history_id:number;url:string|null}[]>([]);
  const [supportDocuments,setSupportDocuments]=useState<SupportDocument[]>([]),[supportCategory,setSupportCategory]=useState('opinion'),[supportTitle,setSupportTitle]=useState(''),[supportNote,setSupportNote]=useState(''),[supportFile,setSupportFile]=useState<File|null>(null),[supportFormOpen,setSupportFormOpen]=useState(false);
 
@@ -142,13 +142,22 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   return()=>{active=false};
  },[selected?.id,selected?.updated_at,localRefresh]);
  useEffect(()=>{
-  if(!selected?.id||!['gd','ksrf'].includes(selected.subject_key)){setInstitutionSigners(null);return}
+  if(!selected?.id||!['gd','ksrf'].includes(selected.subject_key)&&!['meeting_agenda','minutes'].includes(selected.doc_type)){setInstitutionSigners(null);return}
   let alive=true;
-  void Promise.resolve(supabase.rpc('get_institution_document_signers',{p_document_id:selected.id}))
-   .then(({data,error})=>{if(alive)setInstitutionSigners(!error&&data&&Array.isArray(data.required)?data as {required:{user_id:string;office:string;signed:boolean}[];can_sign:boolean}:null)})
-   .catch(()=>{if(alive)setInstitutionSigners(null)});
+  void (async()=>{
+   try{
+    const {data,error}=await supabase.rpc('get_institution_document_signers',{p_document_id:selected.id});
+    if(error||!data||!Array.isArray(data.required)){if(alive)setInstitutionSigners(null);return}
+    const raw=data.required as {user_id:string;office:string;signed:boolean;facsimile_path?:string|null}[];
+    const required=await Promise.all(raw.map(async item=>({
+     user_id:item.user_id,office:item.office,signed:item.signed,
+     facsimile_url:item.facsimile_path?await signedAsset(item.facsimile_path):null
+    })));
+    if(alive)setInstitutionSigners({required,can_sign:!!data.can_sign});
+   }catch{if(alive)setInstitutionSigners(null)}
+  })();
   return()=>{alive=false};
- },[selected?.id,selected?.updated_at,localRefresh,formalHistory.length]);
+ },[selected?.id,selected?.updated_at,localRefresh,formalHistory.length,signedAsset]);
  const lastSigned=documentSignatures[0];
  const [committeeUnits,setCommitteeUnits]=useState<{unit_key:string;title:string;head_user_id:string|null}[]>([]);
  useEffect(()=>{if(!me||!g.game)return;let active=true;void supabase.from('institution_units').select('unit_key,title,head_user_id').eq('game_id',g.game.id).eq('unit_kind','committee').then(r=>{if(active&&!r.error)setCommitteeUnits((r.data||[]) as any)});return()=>{active=false}},[me?.user_id,g.game?.id]);
@@ -534,8 +543,8 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
      <section className="legalDocumentColumn" aria-label="Текст и материалы документа">
       <DocumentPaper document={selected} history={history} members={members} signature={editing?undefined:lastSigned} signatures={editing?[]:documentSignatures} requiredSigners={editing?[]:institutionSigners?.required||[]} footerSlot={<button type="button" className="secondary legalPrintButton" disabled={editing} title={editing?'Завершите редактирование перед печатью':undefined} onClick={()=>{if(!printOfficialDocument())g.setError('Не удалось открыть окно печати. Разрешите всплывающие окна для ГОС.ID.')}}><Printer size={17} aria-hidden="true"/> Печать</button>} titleSlot={editing?<input aria-label="Название редактируемого документа" className="formalEditTitle" value={editTitle} onChange={e=>setEditTitle(e.target.value)}/>:undefined}>{editing?<><label className="documentEditBodyLabel">Текст документа<textarea aria-label="Редактируемый текст документа" className="formalEditBody" value={editBody} onChange={e=>setEditBody(e.target.value)}/></label><label className="documentEditNote">Основание изменения<input value={editNote} onChange={e=>setEditNote(e.target.value)} maxLength={2000} placeholder="Например: Поправка к статье 2"/></label><div className="formalEditActions"><button className="primary" disabled={busy||editTitle.trim().length<3} onClick={saveEdit}>Сохранить текст</button><button className="secondary" disabled={busy} onClick={()=>setEditing(false)}>Отмена</button></div></>:<div className="formalPaperBody">{selected.body_text?<p>{selected.body_text}</p>:<p className="muted">Текст в системе не сохранён. Используйте прикреплённый оригинал.</p>}</div>}</DocumentPaper>
       {institutionSigners&&institutionSigners.required.length>0&&!editing&&<div className="formalInstitutionSigning" role="group" aria-label="Официальные подписи">
-       <b>Подписи документа: {institutionSigners.required.filter(s=>s.signed).length} из {institutionSigners.required.length}</b>
-       <span>{institutionSigners.required.every(s=>s.signed)?'Все уполномоченные лица подписали документ.':'Для оформления необходимо личное подтверждение каждого уполномоченного подписанта.'}</span>
+       <b>{['meeting_agenda','minutes'].includes(selected.doc_type)?'Подписи уполномоченных лиц':'Подписи документа'}: {institutionSigners.required.filter(s=>s.signed||s.facsimile_url).length} из {institutionSigners.required.length}</b>
+       <span>{['meeting_agenda','minutes'].includes(selected.doc_type)?'Игровые подписи размещаются автоматически. Это не личная электронная подпись.':institutionSigners.required.every(s=>s.signed)?'Все уполномоченные лица подписали документ.':'Для оформления необходимо личное подтверждение каждого уполномоченного подписанта.'}</span>
        {institutionSigners.can_sign&&!readOnly&&<button type="button" className="primary" disabled={busy} onClick={async()=>{
         setBusy(true);
         try{const {error}=await supabase.rpc('sign_institution_document',{p_document_id:selected.id});
