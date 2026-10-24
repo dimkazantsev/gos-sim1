@@ -58,7 +58,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
   }
   void load();return()=>{alive=false};
  },[gameId]);
- async function copy(value:string){
+async function copy(value:string){
   try{await navigator.clipboard.writeText(value);setNotice('Код скопирован. Передавайте его только адресатам.');}
   catch{setNotice('Копирование недоступно. Выделите код и скопируйте вручную.')}
  }
