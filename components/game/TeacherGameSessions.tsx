@@ -2,6 +2,7 @@
 import {FormEvent,useCallback,useEffect,useState} from 'react';
 import {Archive,ArrowRight,Plus,RefreshCcw} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {rememberGameCode} from '@/lib/rememberedGameCodes';
 import {userError} from '@/lib/userError';
 import './teacher-game-sessions.css';
 import TeacherAccessCodes from './TeacherAccessCodes';
@@ -50,6 +51,7 @@ export default function TeacherGameSessions({displayName='Преподавате
     p_teacher_name:displayName.trim()||'Преподаватель'
    });
    if(r.error)throw r.error;
+   rememberGameCode(code);
    setFormOpen(false);
    setGameCode('');setTeacherCode('');setStudentCode('');
    await refresh();setNotice('Игра создана. Все коды доступны ниже в любое время.');setBusy(false);
