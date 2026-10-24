@@ -53,7 +53,7 @@ export default function Home(){
  useEffect(()=>{
   const requested=new URLSearchParams(window.location.search).get('teacher');
   if(requested==='1'){setTeacherLogin(true);setPersonalLogin(true);setMode('teacher')}
-  if(requested==='create'){setTeacherLogin(false);setPersonalLogin(false);setMode('teacher');setCreateMode(true)}
+  if(requested==='create'){setTeacherLogin(true);setPersonalLogin(true);setMode('teacher');setCreateMode(false)}
  },[]);
  useEffect(()=>{
   const codes=readRememberedGameCodes();
@@ -114,9 +114,10 @@ export default function Home(){
    if(access.length<(mode==='guest'?6:4))throw new Error(mode==='guest'?'Код гостя должен содержать минимум 6 символов.':'Код доступа должен содержать минимум 4 символа.');
    if(mode==='teacher'&&createMode){if(students.length<4)throw new Error('Код студентов должен содержать минимум 4 символа.');if(students===access)throw new Error('Коды преподавателя и студентов должны отличаться.')}
    const session=(await supabase.auth.getSession()).data.session;
+   if(mode==='teacher'&&createMode&&(!session||session.user.is_anonymous)){setTeacherLogin(true);setPersonalLogin(true);setCreateMode(false);return}
    if(!session){const a=await supabase.auth.signInAnonymously({options:{data:{full_name:name}}});if(a.error)throw a.error}
    if(mode==='teacher'&&createMode){
-    const r=await supabase.rpc('create_game_session',{p_title:gameTitle.trim(),p_game_code:code,p_teacher_code:access,p_student_code:students,p_teacher_name:name});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data+incomingSectionSuffix());
+    const r=await supabase.rpc('create_teacher_game_session',{p_title:gameTitle.trim(),p_game_code:code,p_teacher_code:access,p_student_code:students,p_teacher_name:name});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data+incomingSectionSuffix());
    }else{
     const r=await supabase.rpc('join_game_with_code',{p_game_code:code,p_invite_code:access,p_full_name:name,p_group_name:mode==='student'?group.trim():null});if(r.error)throw r.error;saveSuccessfulGameCode(code);router.push('/game/'+r.data+incomingSectionSuffix());
    }
@@ -209,7 +210,7 @@ export default function Home(){
       <legend className="srOnly">Роль и данные для входа</legend>
       <div className="entryRoles" aria-label="Ваша роль"><button type="button" aria-pressed={mode==='student'} className={mode==='student'?'active':''} onClick={()=>{setMode('student');setCreateMode(false);setError('')}}><GraduationCap aria-hidden="true"/>Участник</button><button type="button" aria-pressed={mode==='teacher'} className={mode==='teacher'?'active':''} onClick={()=>{setMode('teacher');setError('')}}><Landmark aria-hidden="true"/>Преподаватель</button><button type="button" aria-pressed={mode==='guest'} className={mode==='guest'?'active':''} onClick={()=>{setMode('guest');setCreateMode(false);setError('')}}><Eye aria-hidden="true"/>Гость</button><button type="button" onClick={()=>{setTeacherLogin(mode==='teacher');setPersonalLogin(true);setError('')}}><LockKeyhole aria-hidden="true"/>Войти с личным паролем</button></div>
       {mode==='teacher'&&!createMode&&<button type="button" className="entryPersonalSwitch" onClick={()=>{setTeacherLogin(true);setPersonalLogin(true);setError('')}}><ShieldCheck size={17}/> Войти в кабинет преподавателя без кода игры</button>}
-      {mode==='teacher'&&<div className="entryMode"><button type="button" aria-pressed={!createMode} className={!createMode?'active':''} onClick={()=>{setCreateMode(false);setError('')}}>Войти в игру</button><button type="button" aria-pressed={createMode} className={createMode?'active':''} onClick={()=>{setCreateMode(true);setError('')}}>Создать игру</button></div>}
+      {mode==='teacher'&&<div className="entryMode"><button type="button" aria-pressed={!createMode} className={!createMode?'active':''} onClick={()=>{setCreateMode(false);setError('')}}>Войти в игру</button><button type="button" aria-pressed={createMode} className={createMode?'active':''} onClick={()=>{setTeacherLogin(true);setPersonalLogin(true);setCreateMode(false);setError('')}}>Создать игру в профиле</button></div>}
       <label className="entryField">Ваше ФИО<input name="fullName" autoComplete="name" value={fio} onChange={e=>setFio(e.target.value)} placeholder="Иванов Иван Иванович" minLength={2} required/></label>
       {mode==='teacher'&&createMode&&<label className="entryField">Название игры<input name="gameTitle" value={gameTitle} onChange={e=>setGameTitle(e.target.value)} required/></label>}
       <div className={'entryFieldRow '+(mode==='teacher'?'single':'')}><label className="entryField">Код игры<input name="gameCode" autoComplete="off" autoCapitalize="none" spellCheck={false} value={gameCode} onChange={e=>setGameCode(e.target.value)} placeholder="Например, 8.414" minLength={2} required/><small>Идентификатор конкретной игры, сообщённый преподавателем.</small></label>{mode==='student'&&<label className="entryField">Группа<input name="group" value={group} onChange={e=>setGroup(e.target.value)} placeholder="Для общего приглашения; при приглашении группы заполнять не нужно"/></label>}</div>
