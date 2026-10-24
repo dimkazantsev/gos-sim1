@@ -189,7 +189,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
    <StyledSelect label="Действовать в игре как" value={me.role_title||'Преподаватель'}
     disabled={!officeCatalog.ready}
     onChange={v=>{if(v==='Преподаватель'||officeRoleNames.includes(v))void g.updateMember(me.user_id,{role_title:v})}}
-    options={[...new Set(['Преподаватель',...officeRoleNames,me.role_title||''].filter(Boolean))].map(v=>({value:v,label:v}))}/>
+    options={[...new Set(['Преподаватель',...officeRoleNames])].map(v=>({value:v,label:v})).concat(me.role_title&&!officeRoleNames.includes(me.role_title)&&me.role_title!=='Преподаватель'?[{value:me.role_title,label:'Ранее назначенная должность: '+me.role_title,disabled:true}]:[])}/>
    {officeCatalog.error&&<p role="alert">{officeCatalog.error}</p>}
    <p className="profileHint">Доступные роли соответствуют пяти министерствам, пяти комитетам и другим должностям ГОС.ID. Принятое назначение в игровых процедурах сохраняется отдельно от выбора роли преподавателя.</p>
   </section>}
