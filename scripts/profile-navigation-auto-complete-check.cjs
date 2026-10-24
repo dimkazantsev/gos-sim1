@@ -29,7 +29,7 @@ const sessions=fs.readFileSync('components/game/TeacherGameSessions.tsx','utf8')
 const sessionStyles=fs.readFileSync('components/game/teacher-game-sessions.css','utf8');
 assert(profile.includes("own&&teacher&&<button type=\"button\" onClick={()=>document.getElementById('teacher-game-sessions')?.scrollIntoView({behavior:'smooth',block:'start'})}"),'The teacher profile shortcut scrolls within the same screen');
 assert(!profile.includes("window.location.assign(window.location.hostname.endsWith('.github.io')?'/gos-sim1/teacher/':'/teacher')"),'The teacher profile shortcut must not open the separate portal');
-assert(sessions.includes('id="teacher-game-sessions"')&&profile.includes('<TeacherGameSessions displayName={me.full_name}/>'),'The scroll target is the existing games section in the same profile');
+assert(sessions.includes('id="teacher-game-sessions"')&&profile.includes('<TeacherGameSessions displayName={me.full_name} currentGameId={game?.id}/>'),'The scroll target remains the same profile games section and passes the current game for safe deletion');
 assert(client.includes("function openTeacherGameChooser(){")&&client.includes("window.location.assign('/teacher')"),'Sidebar and mobile teacher action opens the permanent zero-game; the game profile retains its local session list');
 assert(sessionStyles.includes('scroll-margin-top:110px'),'The section heading must remain visible below sticky navigation');
 console.log('PASS teacher games shortcut: same profile, real target, sticky-header offset, no extra screen.');
