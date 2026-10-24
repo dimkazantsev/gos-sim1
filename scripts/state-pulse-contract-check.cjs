@@ -14,6 +14,7 @@ for(const table of ['state_metrics','state_metric_history']){
  assert(migration.includes("tablename='"+table+"'")&&migration.includes('ADD TABLE public.'+table),'Publish both tables only once');
 }
 assert(game.includes('if(!next?.id||next.game_id!==gameId)return;'),'Ignore other games in metric payload');
+assert(game.includes("['INSERT','UPDATE'] as const")&&!game.includes("event:'*',schema:'public',table:'state_metrics'"),'Do not expose RLS-unfiltered DELETE events');
 assert(game.includes('if(!entry?.id||entry.game_id!==gameId)return;'),'Ignore other games in history payload');
 assert(game.includes('previous.some(item=>item.id===entry.id)'),'Deduplicate history deliveries');
 assert(game.includes('slice(-3000)'),'Cap browser history');
