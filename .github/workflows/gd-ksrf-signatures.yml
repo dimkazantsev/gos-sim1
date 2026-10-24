@@ -4,6 +4,8 @@ on:
     paths:
       - 'supabase/migrations/20261018230000_gd_acting_chair_and_multi_institution_signatures.sql'
       - 'scripts/gd-ksrf-official-signatures-check.cjs'
+      - 'scripts/meeting-facsimiles-check.cjs'
+      - 'supabase/migrations/20261024182000_meeting_facsimile_auto_display.sql'
       - 'components/game/DocumentPaper.tsx'
       - 'components/game/DocumentsView.tsx'
       - 'components/game/officialDocumentPrint.ts'
@@ -14,6 +16,8 @@ on:
     paths:
       - 'supabase/migrations/20261018230000_gd_acting_chair_and_multi_institution_signatures.sql'
       - 'scripts/gd-ksrf-official-signatures-check.cjs'
+      - 'scripts/meeting-facsimiles-check.cjs'
+      - 'supabase/migrations/20261024182000_meeting_facsimile_auto_display.sql'
       - 'components/game/DocumentPaper.tsx'
       - 'components/game/DocumentsView.tsx'
       - 'components/game/officialDocumentPrint.ts'
@@ -30,4 +34,5 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: node scripts/gd-ksrf-official-signatures-check.cjs
+      - run: node scripts/meeting-facsimiles-check.cjs
       - run: npm run typecheck
