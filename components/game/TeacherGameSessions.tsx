@@ -1,11 +1,12 @@
 'use client';
 import {FormEvent,useCallback,useEffect,useState} from 'react';
-import {Archive,ArrowRight,Copy,Plus,RefreshCcw} from 'lucide-react';
+import {Copy,Plus,RefreshCcw} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {rememberGameCode} from '@/lib/rememberedGameCodes';
 import {userError} from '@/lib/userError';
 import './teacher-game-sessions.css';
 import TeacherAccessCodes from './TeacherAccessCodes';
+import SessionManager from './SessionManager';
 
 type Game={id:string;title:string;status:string;created_at:string;is_owner:boolean};
 type Index={games:Game[];is_admin:boolean};
@@ -20,12 +21,13 @@ function openGame(id:string){
  if(window.location.hostname.endsWith('.github.io'))window.location.assign('/gos-sim1/?game='+encodeURIComponent(id));
  else window.location.assign('/game/'+encodeURIComponent(id));
 }
-export default function TeacherGameSessions({displayName='Преподаватель',onGamesChanged}:{
- displayName?:string;onGamesChanged?:(games:Game[])=>void;
+export default function TeacherGameSessions({displayName='Преподаватель',onGamesChanged,currentGameId}:{
+ displayName?:string;onGamesChanged?:(games:Game[])=>void;currentGameId?:string;
 }){
  const [index,setIndex]=useState<Index|null>(null);
  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const [formOpen,setFormOpen]=useState(false);
+ const [maintenanceBusyGameId,setMaintenanceBusyGameId]=useState<string|null>(null);
  const [title,setTitle]=useState('Новая республика');
  const [gameCode,setGameCode]=useState(''),[teacherCode,setTeacherCode]=useState(''),[studentCode,setStudentCode]=useState('');
  const refresh=useCallback(async()=>{
@@ -69,17 +71,6 @@ export default function TeacherGameSessions({displayName='Преподавате
   if(auth.data.session?.user)await supabase.from('teacher_profiles').update({last_game_id:id}).eq('user_id',auth.data.session.user.id);
   openGame(id);
  }
- async function archive(g:Game){
-  if(busy||!window.confirm('Перенести «'+g.title+'» в архив? Оценки, протоколы, участники и документы останутся сохранены.'))return;
-  setBusy(true);setError('');setNotice('');
-  try{
-   const r=await supabase.rpc('archive_my_teacher_game',{p_game:g.id});
-   if(r.error)throw r.error;
-   setNotice('Игра перенесена в архив без удаления данных.');
-   await refresh();
-  }catch(e){setError(userError(e))}
-  finally{setBusy(false)}
- }
  return <section id="teacher-game-sessions" className="gosTeacherSessions surface" aria-label="Игры и учебные сеансы">
   <header className="gosTeacherSessionsHeader">
    <div><small>ЛИЧНЫЙ КАБИНЕТ</small><h2>Игры и учебные сеансы</h2><p>Игры создаются и переключаются здесь. Постоянный профиль преподавателя не удаляется вместе с ними.</p></div>
@@ -120,13 +111,10 @@ export default function TeacherGameSessions({displayName='Преподавате
   {!index&&<p className="gosTeacherSessionsEmpty" role="status">Получаем список игр…</p>}
   {index&&index.games.length===0&&<p className="gosTeacherSessionsEmpty">Игровых сеансов пока нет. Создайте первую игру здесь — без повторной регистрации преподавателя.</p>}
   {index&&index.games.length>0&&<div className="gosTeacherSessionList">
-   {index.games.map(game=><div key={game.id} className="gosTeacherSessionUnit"><article className="gosTeacherSessionRow">
-    <div><b>{game.title}</b><span>{game.status==='archived'?'В архиве':game.status==='running'?'Идёт игра':'Подготовка'} · {new Date(game.created_at).toLocaleDateString('ru-RU')}</span></div>
-    <div className="gosTeacherSessionControls">
-     <button type="button" className="secondary" disabled={busy} onClick={()=>void enter(game.id)}>Открыть <ArrowRight size={16}/></button>
-     {game.status!=='archived'&&<button type="button" className="secondary" disabled={busy} onClick={()=>void archive(game)}><Archive size={16}/>В архив</button>}
-    </div>
-   </article>{game.is_owner&&<TeacherAccessCodes gameId={game.id}/>}</div>)}
+   {index.games.map(game=><div key={game.id} className="gosTeacherSessionUnit">
+    <SessionManager session={game} isAdmin={index.is_admin} currentGameId={currentGameId} disabled={busy||Boolean(maintenanceBusyGameId&&maintenanceBusyGameId!==game.id)} onBusyChange={setMaintenanceBusyGameId} onOpen={()=>void enter(game.id)} onDeleted={refresh}/>
+    {game.is_owner&&<TeacherAccessCodes gameId={game.id}/>}
+   </div>)}
   </div>}
  </section>;
 }

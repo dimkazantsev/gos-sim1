@@ -4,7 +4,7 @@ const read=p=>fs.readFileSync(p,'utf8');
 const migration=read('supabase/migrations/20261013214500_teacher_access_codes_groups.sql');
 const actors=read('supabase/migrations/20261013215000_process_actors_instantiated_only.sql');
 const codes=read('components/game/TeacherAccessCodes.tsx');
-const sessions=read('components/game/SessionManager.tsx');
+const sessions=read('components/game/TeacherGameSessions.tsx');
 const home=read('app/page.tsx');
 const wall=read('components/game/PoliticalWallView.tsx');
 const webhook=read('app/api/telegram/webhook/route.ts');

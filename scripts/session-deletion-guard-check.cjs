@@ -19,10 +19,12 @@ for(const overrides of [{busy:true},{confirmed:false},{typed:'8.41'},{typed:'8.4
 }
 const ui=fs.readFileSync(path.join(__dirname,'../components/game/SessionManager.tsx'),'utf8');
 assert(ui.includes('window.sessionStorage.setItem(key,timestamp)')&&ui.includes('window.sessionStorage.getItem(receiptKey)'),'ZIP receipt survives refresh in one tab');
-assert(ui.includes("if(format==='zip'&&me)")&&ui.includes('saveGameBlob(blob,'),'Only full ZIP export creates deletion receipt');
-assert(ui.includes('disabled={!deleteAllowed}')&&ui.includes('if(!s||!teacher||!deleteAllowed)return'),'UI and handler share the same guard');
+assert(ui.includes("if(format==='zip')")&&ui.includes('saveGameBlob(blob,')&&ui.includes('setBackedUp(timestamp)'),'Only full ZIP export creates deletion receipt');
+assert(ui.includes('disabled={!deleteAllowed}')&&ui.includes('if(!deleteAllowed||!selected||!mayManage)return'),'UI and handler share the same guard');
 assert(ui.includes('Для разблокировки удаления')&&ui.includes('ZIP · Локальная Игра'),'User sees why deletion is disabled');
-assert(ui.includes("s.owner_id!==me?.user_id&&!admin")&&ui.includes("supabase.rpc('prepare_game_deletion'")&&ui.includes("supabase.rpc('delete_game_permanently'"),'Owner/admin checks and server deletion workflow remain intact');
+assert(ui.includes('readCode()')&&ui.includes("select('game_code,owner_id')")&&!ui.includes('useEffect('),'No automatic session maintenance fetch on page open');
+assert(ui.includes('currentGameId===session.id')&&ui.includes('onDeleted()'),'Deleting a displayed game navigates away; other deletions refresh the list');
+assert(ui.includes('result.data.owner_id!==id&&!isAdmin')&&ui.includes("supabase.rpc('prepare_game_deletion'")&&ui.includes("supabase.rpc('delete_game_permanently'"),'Owner/admin checks and server deletion workflow remain intact');
 const migration=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20261023165000_game_deletion_cec_dependencies.sql'),'utf8');
 for(const needle of ["select * into target from public.games where id=p_game for update","target.owner_id<>auth.uid()","upper(trim(p_code))<>target.game_code","target.status<>'archived'","storage.objects","remaining>0","delete from public.presidential_cec_court_referrals where game_id=p_game","delete from public.presidential_cec_complaints where game_id=p_game","delete from public.games where id=p_game"]){
  assert(migration.includes(needle),'Missing guarded game deletion clause: '+needle);
@@ -64,7 +66,7 @@ assert(resolver.includes("storedPath.startsWith(marker)")&&resolver.includes("bu
  'Account asset links use a private, game-independent bucket');
 assert(gameHook.includes("me.kind==='teacher'?'teacher-assets/'"),
  'Teacher avatar and signature uploads must be stored outside game paths');
-assert(ui.indexOf('preserveOwnTeacherAssets(s.id,me.user_id)')<ui.indexOf('await purgeGameAssets(s.id'),
+assert(ui.indexOf('preserveOwnTeacherAssets(session.id,id)')<ui.indexOf('await purgeGameAssets(session.id'),
  'Permanent teacher media must be migrated before cleanup');
 assert(!/delete\s+from\s+public\.teacher_profiles/i.test(permanent),
  'Game deletion must not erase the permanent teacher account');
@@ -74,8 +76,8 @@ assert(purgeGuard.includes("JOIN storage.objects o ON o.bucket_id='game-assets'"
 assert(purgeGuard.includes('g.owner_id<>(select auth.uid())')&&purgeGuard.includes("g.status<>'archived'"),
  'Private guard checks owner permissions and archive status');
 assert(ui.indexOf("supabase.rpc('assert_game_teacher_assets_safe_to_purge'")>
-       ui.indexOf('preserveOwnTeacherAssets(s.id,me.user_id)')&&
+       ui.indexOf('preserveOwnTeacherAssets(session.id,id)')&&
        ui.indexOf("supabase.rpc('assert_game_teacher_assets_safe_to_purge'")<
-       ui.indexOf('await purgeGameAssets(s.id'),
+       ui.indexOf('await purgeGameAssets(session.id'),
  'Files of other teachers must be checked before purging any shared game media');
 console.log('PASS permanent teacher asset storage: identity, access, profile sync and safe deletion order');
