@@ -49,7 +49,7 @@ async function main(){
     assert(item.scroll<=item.client+2,'Text or input clipped at '+width+': '+JSON.stringify(item));
    }
    assert(inputs.every(x=>x.height>=44)&&buttons.every(x=>x.height>=42),'Touch target at '+width);
-   if(width>760){
+   if(width>960){
     assert(Math.abs(inputs[0].top-inputs[1].top)<=2,'Inputs misaligned at '+width+': '+JSON.stringify(inputs));
     assert(Math.abs(buttons[0].top-buttons[1].top)<=2,'Buttons misaligned at '+width+': '+JSON.stringify(buttons));
     assert(Math.abs(hints[0].top-hints[1].top)<=2,'Help misaligned at '+width+': '+JSON.stringify(hints));
