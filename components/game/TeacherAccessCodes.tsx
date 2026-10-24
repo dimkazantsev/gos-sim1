@@ -37,6 +37,7 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
  const [rotating,setRotating]=useState('');
  const [rows,setRows]=useState<CodeRow[]>([]);
  const [busy,setBusy]=useState(false);
+ const [rotating,setRotating]=useState<InventoryScope|null>(null);
  const [notice,setNotice]=useState('');
  const refresh=useCallback(async()=>{
   const r=await supabase.rpc('teacher_saved_invitation_list',{p_game_id:gameId});
@@ -58,7 +59,20 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
   }
   void load();return()=>{alive=false};
  },[gameId]);
- async function copy(value:string){
+ async function rotateOwnerCode(kind:'participant'|'teacher'|'guest'){
+  if(busy)return;
+  const active=rows.find(r=>r.scope===kind&&r.active);
+  if(active&&!window.confirm('Обновить приглашение «'+inventoryLabels[kind]+'»? Старый код перестанет принимать новых пользователей. Существующие участники сохранят доступ.'))return;
+  setBusy(true);setRotating(kind);setNotice('');
+  try{
+   const r=await supabase.rpc('owner_rotate_invitation',{p_game_id:gameId,p_kind:kind==='participant'?'student':kind==='guest'?'observer':'teacher'});
+   if(r.error)throw r.error;
+   await refresh();
+   setNotice('Новый код '+inventoryLabels[kind].toLowerCase()+' сохранён в постоянном реестре.');
+  }catch(e){setNotice('Невозможно обновить код: '+userError(e))}
+  finally{setBusy(false);setRotating(null)}
+ }
+  async function copy(value:string){
   try{await navigator.clipboard.writeText(value);setNotice('Код скопирован. Передавайте его только адресатам.');}
   catch{setNotice('Копирование недоступно. Выделите код и скопируйте вручную.')}
  }
@@ -189,6 +203,24 @@ export default function TeacherAccessCodes({gameId}:{gameId:string}){
    </div>
   </div>
   {created&&<div className="teacherCodeCreated" role="status"><ShieldCheck size={18}/><div><b>Сохраните: {labels[createdKind].toLowerCase()}</b> <code>{created}</code><p>Код сохранён для преподавателя.</p></div><button type="button" onClick={()=>void copy(created)}><Copy size={16}/> Копировать</button></div>}
+  <div className="teacherCodeSeparated" aria-label="Постоянные коды по ролям">
+   {(['participant','teacher','guest'] as const).map(kind=>{
+    const entry=rows.find(row=>row.scope===kind&&row.active);
+    return <section key={kind} className="teacherRoleCodeCard">
+     <div className="teacherRoleCodeIntro"><small>{kind==='participant'?'УЧАСТНИКИ':kind==='teacher'?'ДОПОЛНИТЕЛЬНЫЙ ПРЕПОДАВАТЕЛЬ':'ГОСТИ'}</small>
+      <h4>{inventoryLabels[kind]}</h4>
+      <p>{kind==='participant'?'Используется только для вступления участника, не даёт полномочий преподавателя.':kind==='teacher'?'Приглашение другого преподавателя. Требуются его собственная подтверждённая почта и пароль. Ваш личный вход не меняется.':'Предоставляет гостевой просмотр без действий участника.'}</p>
+     </div>
+     <div className="teacherRoleCodeValue">
+      <code aria-label={inventoryLabels[kind]}>{entry?.code||'Не создан — сгенерируйте приглашение'}</code>
+      {entry?.code&&<button type="button" disabled={busy} onClick={()=>void copy(entry.code!)}><Copy size={15}/>Копировать</button>}
+     </div>
+     <button type="button" className="teacherRoleCodeRotate" disabled={busy} onClick={()=>void rotateOwnerCode(kind)}>
+      <RotateCw size={16}/>{rotating===kind?'Сохраняем…':entry?'Обновить код':'Сгенерировать код'}
+     </button>
+    </section>
+   })}
+  </div>
   <div className="teacherCodeRows">
    <div className="teacherAccessListHead"><h4>Все приглашения ({rows.length})</h4><button type="button" disabled={busy} onClick={()=>void refresh().catch(e=>setNotice(String(e)))}><RotateCw size={15}/> Обновить</button></div>
    {rows.length===0&&<p>Приглашений пока нет. Создайте код участника, дополнительного преподавателя или гостя выше.</p>}
