@@ -7,7 +7,8 @@ const styles=file('app/2026-profile-grade-layout.css');
 const layout=file('app/layout.tsx');
 
 assert(profile.includes('<select aria-label="Роль для назначения"'),'Teacher has an explicit, browser-native office dropdown');
-assert(profile.includes('<option value="__custom__">'),'Custom role is still available');
+assert(profile.includes('roleGroups.map(group=><optgroup'),'All authorised game offices appear in grouped native select');
+assert(!profile.includes('<option value="__custom__">'),'Unlisted offices cannot be invented through the dropdown');
 assert(profile.includes('disabled={assigned}'),'Already-assigned roles cannot be assigned twice from the picker');
 assert(!profile.includes('<datalist'),'Unreliable datalist no longer used for roles');
 assert(profile.includes("supabase.rpc('appoint_game_office'"),'Existing role RPC is still used');
