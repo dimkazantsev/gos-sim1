@@ -50,6 +50,7 @@ function clippedRect(el:HTMLElement):Rect|null{
 }
 export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:TourStep;index:number;total:number;onSkip:()=>void;onFallback:(target:TourTarget)=>void}){
  const [rect,setRect]=useState<Rect|null>(null);
+ const [dockTop,setDockTop]=useState<number|null>(null);
  const [viewport,setViewport]=useState(()=>({width:typeof window==='undefined'?1024:window.innerWidth,height:typeof window==='undefined'?768:window.innerHeight}));
  const cardRef=useRef<HTMLDivElement>(null);
  const [cardSize,setCardSize]=useState({width:400,height:240});
@@ -58,6 +59,12 @@ export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:To
   function update(){
    const el=targetElement(step.target);
    setRect(el?clippedRect(el):null);
+   // Keep the whole mobile dock swipeable while the tour spotlights one
+   // control. Cutting out only that button blocks gestures starting nearby.
+   const dock=window.matchMedia('(max-width:900px)').matches
+    ?document.querySelector<HTMLElement>('.mobileDock.mobileDockV2'):null;
+   const nextTop=dock?.getBoundingClientRect().top??null;
+   setDockTop(previous=>previous===nextTop?previous:nextTop);
    setViewport(previous=>previous.width===window.innerWidth&&previous.height===window.innerHeight?previous:{width:window.innerWidth,height:window.innerHeight});
   }
   const el=targetElement(step.target);
@@ -86,6 +93,7 @@ export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:To
  const w=viewport.width,h=viewport.height,p=9;
  const mobile=w<=900;
  const spotlight=rect?{left:Math.max(0,rect.left-p),top:Math.max(0,rect.top-p),right:Math.min(w,rect.right+p),bottom:Math.min(h,rect.bottom+p)}:null;
+ const interactionCutout=mobile&&dockTop!==null?{left:0,top:Math.max(0,dockTop-3),right:w,bottom:h}:spotlight;
  const placement=placeTourCard(rect,viewport,cardSize);
  const shownHeight=Math.min(cardSize.height,placement.maxHeight);
  const startX=placement.side==='right'?placement.left:placement.side==='left'?placement.left+placement.width:placement.left+placement.width/2;
@@ -93,11 +101,11 @@ export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:To
  const endX=rect?(placement.side==='right'?rect.right+5:placement.side==='left'?rect.left-5:rect.left+rect.width/2):startX;
  const endY=rect?(placement.side==='above'?rect.top-5:placement.side==='below'?rect.bottom+5:rect.top+rect.height/2):startY;
  return createPortal(<div className={styles.root} aria-label="Обучение навигации">
-  {spotlight?<div className={styles.shades} aria-hidden="true">
-   <div style={{left:0,top:0,width:w,height:spotlight.top}}/>
-   <div style={{left:0,top:spotlight.bottom,width:w,height:h-spotlight.bottom}}/>
-   <div style={{left:0,top:spotlight.top,width:spotlight.left,height:spotlight.bottom-spotlight.top}}/>
-   <div style={{left:spotlight.right,top:spotlight.top,width:w-spotlight.right,height:spotlight.bottom-spotlight.top}}/>
+  {interactionCutout?<div className={styles.shades} aria-hidden="true">
+   <div style={{left:0,top:0,width:w,height:interactionCutout.top}}/>
+   <div style={{left:0,top:interactionCutout.bottom,width:w,height:h-interactionCutout.bottom}}/>
+   <div style={{left:0,top:interactionCutout.top,width:interactionCutout.left,height:interactionCutout.bottom-interactionCutout.top}}/>
+   <div style={{left:interactionCutout.right,top:interactionCutout.top,width:w-interactionCutout.right,height:interactionCutout.bottom-interactionCutout.top}}/>
   </div>:<div className={styles.fullShade}/>}
   {spotlight&&<div className={styles.ring} aria-hidden="true" style={{left:spotlight.left,top:spotlight.top,width:spotlight.right-spotlight.left,height:spotlight.bottom-spotlight.top}}/>}
   {rect&&<svg className={styles.connector} aria-hidden="true" width={w} height={h} viewBox={`0 0 ${w} ${h}`}><defs><marker id="tour-arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1 1 L7 4.5 L1 8" fill="none" stroke="#82d5ff" strokeWidth="1.8" strokeLinecap="round"/></marker></defs><path d={`M ${startX} ${startY} Q ${(startX+endX)/2} ${(startY+endY)/2} ${endX} ${endY}`} fill="none" stroke="#82d5ff" strokeWidth="2" strokeLinecap="round" strokeDasharray="5 5" markerEnd="url(#tour-arrowhead)"/></svg>}
