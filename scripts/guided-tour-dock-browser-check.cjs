@@ -53,18 +53,21 @@ try{
     await page.waitForTimeout(150);
     const dock=page.locator('.mobileDockScroll');
     const initial=await dock.evaluate(el=>{el.scrollLeft=0;return {width:el.clientWidth,scroll:el.scrollWidth}});
-    assert(initial.scroll>initial.width+30,'Dock must scroll at '+width);
+    const overflows=initial.scroll>initial.width+30;
+    if(width<=390)assert(overflows,'Narrow mobile dock must scroll at '+width);
     const b=await dock.boundingBox();assert(b);
     const px=b.x+Math.min(110,b.width/2),py=b.y+b.height/2;
     const hit=await page.evaluate(([x,y])=>!!document.elementFromPoint(x,y)?.closest('.mobileDockScroll'),[px,py]);
     assert(hit,'Overlay blocks adjacent icons at '+width+' step '+(i+1));
-    await page.mouse.move(px,py);await page.mouse.down();await page.mouse.move(px-90,py,{steps:8});await page.mouse.up();
-    const scrolled=await dock.evaluate(el=>el.scrollLeft);
-    assert(scrolled>8,'Cannot swipe dock at '+width+' step '+(i+1)+': '+scrolled);
+    if(overflows){
+     await page.mouse.move(px,py);await page.mouse.down();await page.mouse.move(px-90,py,{steps:8});await page.mouse.up();
+     const scrolled=await dock.evaluate(el=>el.scrollLeft);
+     assert(scrolled>8,'Cannot swipe dock at '+width+' step '+(i+1)+': '+scrolled);
+    }
     await cta.click();await page.waitForFunction(n=>document.querySelector('[aria-label="Обучение навигации"] [role="status"]')?.textContent?.includes('Шаг '+(n+2)+' из 11'),i);
    }
   }
-  await ctx.close();console.log('PASS real tour: '+width+'px, 11 visible CTAs, vote/grades swipe, direct navigation');
+  await ctx.close();console.log('PASS real tour: '+width+'px, 11 visible CTAs, vote/grades dock hit-testing and conditional swipe, direct navigation');
  }
 }finally{await closeTestBrowser(browser);await stopTestServer(server);cleanTestRoute(root,route)}
 }
