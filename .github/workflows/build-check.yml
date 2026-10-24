@@ -440,6 +440,8 @@ jobs:
       - run: node scripts/fiscal-model-check.cjs
       - run: node scripts/event-card-browser-check.cjs
       - run: npm run design:preview
+      - name: Responsive all-screen geometry audit
+        run: node scripts/responsive-layout-audit.cjs
       - run: node scripts/styled-select-anchor-browser-check.cjs
       - run: node scripts/student-journal-layout-browser-check.cjs
       - run: node scripts/party-grades-layout-browser-check.cjs
@@ -467,7 +469,10 @@ jobs:
         if: always()
         with:
           name: metric-modal-responsive-screenshots
-          path: .design-review/screenshots/
+          path: |
+            .design-review/screenshots/
+            .design-review/responsive-audit.json
+            .design-review/responsive-shots/
           if-no-files-found: ignore
           retention-days: 7
       - run: npm run build
