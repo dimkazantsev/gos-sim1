@@ -51,6 +51,25 @@ const debriefMarkup=[
  '</section></main></body></html>'
 ].join('');
 
+// Synthetic teacher fixture: inspect CSS in Chromium without live student records.
+assert(component.indexOf('className="gradeApproval"')<component.indexOf('className="gradeRationale gradeRationaleExplained"'),'Teacher decision precedes long explanation');
+const teacherFixture=[
+ '<!doctype html><html lang="ru"><meta name="viewport" content="width=device-width,initial-scale=1"><style>',
+ '*{box-sizing:border-box}body{font:14px Arial,sans-serif;margin:0;background:#eef3fb}',
+ css,debriefCss,'</style><body>',
+ '<div class="gradeModalBack"><article class="gradeModal gradeModalRefined" role="dialog" aria-modal="true">',
+ '<header class="gradeModalHeading"><div><small>Этап 11 · Результат участника</small><h2>Тестов Тест Тестович</h2><p>Рассмотрение государственных программ и внесённых инициатив</p></div><button class="gsIconAction" aria-label="Закрыть оценку">×</button></header>',
+ '<div class="gradeScoreHero draft"><strong>2</strong><div><span class="gradeScoreCaption">Оценка за этап · из 3 баллов</span><b>Средний уровень</b><span>Автоматический черновик</span></div></div>',
+ '<div class="gradeCriteria"><span>Право и правила</span><span>Стратегия и интересы</span><span>Анализ этапа</span></div>',
+ '<section class="gradeApproval"><div class="styledSelect"><span class="styledSelectLabel">Итоговый балл</span><button class="styledSelectTrigger"><span class="styledSelectValue">2 · Средний уровень</span></button></div><label>Комментарий<textarea rows="3" placeholder="Почему вы подтверждаете или меняете автооценку"></textarea></label><div><button type="button">Пересчитать сейчас</button><button type="button" class="primary">Утвердить как итоговую</button></div></section>',
+ '<section class="gradeRationale gradeRationaleExplained"><header class="gradeRationaleHeading"><small>ПОЯСНЕНИЕ ОЦЕНКИ</small><h3>За что начисляются баллы</h3></header><div class="gradeExplanation"><article class="gradeExplanationCriterion"><h4>Законность решений и соблюдение процедур</h4><p>',
+ 'Оценка учитывает документы и решения. '.repeat(20),'</p></article></div></section>',
+ '<details class="gradeRunHistory" open><summary>История автоматических пересчётов <span>2</span></summary><div>',rows,'</div></details>',
+ '<section class="gradeEvidence"><h3>Доказательства</h3><div class="gradeEvidenceGroups"><details open><summary>Документы</summary><div><article><p>',
+ 'Описание игровых действий и обоснования. '.repeat(12),'</p></article></div></details></div></section>',
+ '</article></div></body></html>'
+].join('');
+
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
@@ -110,5 +129,36 @@ const debriefMarkup=[
    await page.close();
    console.log('PASS debrief form and AI/out-of-game guidance at '+width+'px');
   }
- }finally{await browser.close()}
+ 
+  for(const [width,height] of [[320,640],[360,740],[390,844],[600,740],[768,1024],[820,1180],[1024,768]]){
+   const page=await browser.newPage({viewport:{width,height},hasTouch:width<=820});
+   await page.setContent(teacherFixture);
+   const modal=page.locator('.gradeModalRefined'),note=modal.locator('.gradeApproval textarea');
+   const result=await page.evaluate(()=>{
+    const pick=s=>document.querySelector(s),rect=s=>pick(s).getBoundingClientRect(),d=pick('.gradeModalRefined');
+    const sections=['.gradeModalHeading','.gradeScoreHero','.gradeCriteria','.gradeApproval','.gradeRationale','.gradeRunHistory','.gradeEvidence','.styledSelectTrigger','.gradeApproval textarea'].map(selector=>{const r=rect(selector);return {selector,left:r.left,right:r.right,top:r.top,bottom:r.bottom}});
+    const buttons=[...document.querySelectorAll('.gradeApproval button')].map(n=>{const r=n.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height}});
+    const m=d.getBoundingClientRect();
+    return {pageScroll:document.documentElement.scrollWidth,modal:{left:m.left,right:m.right,height:m.height,scroll:d.scrollWidth,client:d.clientWidth},width:innerWidth,approval:rect('.gradeApproval').top,rationale:rect('.gradeRationale').top,sections,buttons};
+   });
+   assert(result.pageScroll<=width+2,'Global horizontal overflow '+width);
+   assert(result.modal.left>=-1&&result.modal.right<=width+2,'Dialog outside viewport '+width);
+   assert(result.modal.scroll<=result.modal.client+2,'Dialog horizontal clipping '+width);
+   assert(result.approval<result.rationale,'Teacher note must precede long rationale '+width);
+   for(const part of result.sections)assert(part.left>=result.modal.left-1&&part.right<=result.modal.right+2,'Section '+part.selector+' outside modal at '+width);
+   assert(result.buttons.every(b=>b.height>=44),'Touch buttons too small at '+width);
+   for(let i=0;i<result.buttons.length;i++)for(let j=i+1;j<result.buttons.length;j++){
+    const a=result.buttons[i],b=result.buttons[j];
+    assert(!(Math.min(a.right,b.right)-Math.max(a.left,b.left)>1&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1),'Overlapping actions at '+width);
+   }
+   await note.scrollIntoViewIfNeeded();await note.fill('Обоснование изменения оценки после анализа документов и участия в решениях');
+   assert((await note.inputValue()).startsWith('Обоснование'));
+   await modal.evaluate(el=>el.scrollTop=el.scrollHeight);
+   const close=await page.locator('.gradeModalHeading .gsIconAction').boundingBox(),box=await modal.boundingBox();
+   assert(close&&box&&close.y>=box.y-1&&close.y+close.height<=box.y+height+1,'Close action disappears on scroll '+width);
+   if(width<=600)assert(Math.abs(box.height-height)<=2,'Mobile modal is not full-height '+width);
+   await page.close();
+   console.log('PASS teacher grading '+width+'x'+height+': focus, scroll, touch, no overlap/overflow');
+  }
+}finally{await browser.close()}
 })().catch(err=>{console.error(err);process.exitCode=1});
