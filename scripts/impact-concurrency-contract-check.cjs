@@ -7,7 +7,7 @@ const file='supabase/migrations/20261025003300_lock_concurrent_impact_metric_upd
 const sql=fs.readFileSync(file,'utf8');
 const names=['private.apply_post_effects','private.apply_rule_effects','public.revert_impact_entry'];
 assert.equal((sql.match(/CREATE OR REPLACE FUNCTION /gi)||[]).length,3,'Exactly three targeted existing functions');
-assert.equal((sql.match(/\\$function\\$;/g)||[]).length,3,'Each CREATE OR REPLACE FUNCTION must terminate with a semicolon for Postgres migration');
+assert.equal((sql.match(/\$function\$;/g)||[]).length,3,'Each CREATE OR REPLACE FUNCTION must terminate with a semicolon for Postgres migration');
 assert(!/\b(drop|truncate|alter\s+table|delete\s+from\s+public\.games)\b/i.test(sql),'No destructive schema or game operation');
 for(const [i,name] of names.entries()){
  const start=sql.indexOf('CREATE OR REPLACE FUNCTION '+name+'(');
