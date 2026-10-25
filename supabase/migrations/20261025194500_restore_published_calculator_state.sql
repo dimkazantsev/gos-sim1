@@ -18,7 +18,7 @@ BEGIN
   FROM jsonb_each_text(v_calc.result);
   IF v_expected<>450 THEN RAISE EXCEPTION 'Опубликованный результат не равен 450 мандатам';END IF;
   UPDATE public.game_parties p
-  SET mandates=(v_calc.result->>p.id::text)::integer,updated_at=now()
+  SET mandates=(v_calc.result->>p.id::text)::integer
   WHERE p.game_id=v_calc.game_id AND
     p.mandates IS DISTINCT FROM (v_calc.result->>p.id::text)::integer;
   -- A party update already invokes the established seat-rebalance trigger.
