@@ -38,8 +38,8 @@ export default function PartyUnregisteredFiles({gameId,partyId,registered}:{game
   }catch(e){if(request===latestRequest.current)setError((userError(e)||'Не удалось прочитать хранилище файлов.'))}
   finally{if(request===latestRequest.current){setBusy(false);setLoaded(true)}}
  },[gameId,partyId,registeredPaths,signedAsset]);
- // Storage listing is expensive. Hidden party dossiers must not perform a list request.
- // Fetch only when the user opens this section; keep explicit refresh available.
+ // Запрос списка файлов затратен. Закрытое досье не должно обращаться к хранилищу.
+ // Загружаем данные только после раскрытия раздела; ручное обновление сохраняется.
  useEffect(()=>{if(!expanded)return;void refresh();return ()=>{latestRequest.current++}},[expanded,refresh]);
  return <details aria-label="Технические загрузки без регистрации" className="teacherPartySection" onToggle={event=>setExpanded(event.currentTarget.open)}>
   <summary>Технические загрузки без записи в реестре {loaded?'('+files.length+')':''}</summary>
