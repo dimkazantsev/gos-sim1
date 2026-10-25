@@ -20,7 +20,7 @@ for(const overrides of [{busy:true},{confirmed:false},{typed:'8.41'},{typed:'8.4
 const ui=fs.readFileSync(path.join(__dirname,'../components/game/SessionManager.tsx'),'utf8');
 assert(ui.includes('window.sessionStorage.setItem(key,timestamp)')&&ui.includes('window.sessionStorage.getItem(receiptKey)'),'ZIP receipt survives refresh in one tab');
 assert(ui.includes("if(format==='zip')")&&ui.includes('saveGameBlob(blob,')&&ui.includes('setBackedUp(timestamp)'),'Only full ZIP export creates deletion receipt');
-assert(ui.includes('disabled={!deleteAllowed}')&&ui.includes('if(!deleteAllowed||!selected||!mayManage)return'),'UI and handler share the same guard');
+assert(ui.includes('disabled={!deleteAllowed}')&&ui.includes('if(!deleteAllowed||!selected||!mayManage||operationRef.current)return'),'UI and handler share the same permission, ZIP and synchronous non-reentry guard');
 assert(ui.includes('Для разблокировки удаления')&&ui.includes('ZIP · Локальная Игра'),'User sees why deletion is disabled');
 assert(ui.includes('readCode()')&&ui.includes("select('game_code,owner_id')")&&!ui.includes('useEffect('),'No automatic session maintenance fetch on page open');
 assert(ui.includes('currentGameId===session.id')&&ui.includes('onDeleted()'),'Deleting a displayed game navigates away; other deletions refresh the list');
