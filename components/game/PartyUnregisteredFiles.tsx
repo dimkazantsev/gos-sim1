@@ -12,6 +12,7 @@ export default function PartyUnregisteredFiles({gameId,partyId,registered}:{game
  const [error,setError]=useState('');
  const [busy,setBusy]=useState(false);
  const [loaded,setLoaded]=useState(false);
+ const [expanded,setExpanded]=useState(false);
  const latestRequest=useRef(0);
  const signedAsset=useMemo(()=>createScopedSignedAssetCache(async path=>{
   const {data,error}=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
@@ -37,8 +38,10 @@ export default function PartyUnregisteredFiles({gameId,partyId,registered}:{game
   }catch(e){if(request===latestRequest.current)setError((userError(e)||'Не удалось прочитать хранилище файлов.'))}
   finally{if(request===latestRequest.current){setBusy(false);setLoaded(true)}}
  },[gameId,partyId,registeredPaths,signedAsset]);
- useEffect(()=>{void refresh();return ()=>{latestRequest.current++}},[refresh]);
- return <details aria-label="Технические загрузки без регистрации" className="teacherPartySection">
+ // Storage listing is expensive. Hidden party dossiers must not perform a list request.
+ // Fetch only when the user opens this section; keep explicit refresh available.
+ useEffect(()=>{if(!expanded)return;void refresh();return ()=>{latestRequest.current++}},[expanded,refresh]);
+ return <details aria-label="Технические загрузки без регистрации" className="teacherPartySection" onToggle={event=>setExpanded(event.currentTarget.open)}>
   <summary>Технические загрузки без записи в реестре {loaded?'('+files.length+')':''}</summary>
   <p className="teacherPartyMuted">Эти файлы сохранились в хранилище, но не были зарегистрированы как документы. Они не считаются поданными; виды и названия необходимо проверять отдельно. Оригиналы сохранены.</p>
   {!loaded&&<p className="teacherPartyMuted" role="status">Проверка файлов в хранилище…</p>}
