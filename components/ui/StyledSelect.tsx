@@ -62,6 +62,10 @@ export default function StyledSelect({label,value,options,onChange,disabled=fals
   }else if(e.key==='Enter'||e.key===' '){
    e.preventDefault();if(!open){show();return}
    const item=options[cursor];if(item&&!item.disabled){onChange(item.value);setOpen(false)}
+  }else if(e.key==='Tab'&&open){
+   // A portalled menu must not cover the next field after keyboard navigation.
+   // Keep Tab/Shift+Tab native so the parent dialog's focus trap still works.
+   setOpen(false);
   }else if(e.key==='Escape'&&open){e.preventDefault();setOpen(false)}
  }
  return <div ref={ref} className={'styledSelect '+(wide?'wide ':'')+className}>

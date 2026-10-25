@@ -42,6 +42,7 @@ on:
       - 'components/ui/StyledSelect.tsx'
       - 'components/ui/selectMenuPlacement.ts'
       - 'scripts/styled-select-anchor-browser-check.cjs'
+      - 'scripts/grade-dialog-keyboard-check.cjs'
       - 'components/game/DashboardView.tsx'
       - 'components/game/StageReadinessPanel.tsx'
       - 'components/game/ProfileView.tsx'
@@ -445,6 +446,7 @@ jobs:
       - name: Responsive all-screen geometry audit
         run: node scripts/responsive-layout-audit.cjs
       - run: node scripts/styled-select-anchor-browser-check.cjs
+      - run: node scripts/grade-dialog-keyboard-check.cjs
       - run: node scripts/student-journal-layout-browser-check.cjs
       - run: node scripts/party-grades-layout-browser-check.cjs
       - run: node scripts/party-logo-editor-check.cjs
