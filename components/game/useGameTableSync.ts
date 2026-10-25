@@ -77,7 +77,7 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
     if(hasPushCoverage&&gameRealtimeConnected(gameId)&&now-lastFallbackAt<180000)return;
     lastFallbackAt=now;
     schedule(0);
-  },60000+Math.floor(Math.random()*15000));
+  },30000+Math.floor(Math.random()*10000));
   window.addEventListener('focus',visible);window.addEventListener('online',online);
   const eventName=onlyTable?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT;
   window.addEventListener(eventName,local);document.addEventListener('visibilitychange',visible);
