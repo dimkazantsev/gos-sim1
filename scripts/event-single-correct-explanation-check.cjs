@@ -53,9 +53,28 @@ assert(!html.includes('Как следовало действовать')&&!html
 const hidden=markup({...props,correctIndex:null,showCorrectExplanation:false,revealResults:false});
 assert(!hidden.includes('Объяснение только правильного решения.')&&!hidden.includes('Проверенное правовое основание'),
  'Do not reveal correct answers or their explanation before the outcome');
+const linked=markup({...props,bestLegalBasis:'Федеральный закон № 323-ФЗ, статья 10. Источник: https://example.org/law'});
+assert(linked.includes('href="https://example.org/law"')&&linked.includes('rel="noopener noreferrer"'),'Legal references are clickable with safe external-link attributes');
+assert(!markup({...props,showCorrectExplanation:false,bestLegalBasis:'Федеральный закон № 323-ФЗ. https://example.org/law'}).includes('href="https://example.org/law"'),'Do not disclose the legal-source link before feedback is permitted');
 const educational=markup({...props,bestLegalBasis:'Авторская учебная модель: полномочия заданы досье.'});
 assert(!educational.includes('Авторская учебная модель')&&!educational.includes('Правовое основание:'),
  'Invented or educational descriptions must never be shown as legal citations');
+const qualified=markup({...props,bestLegalBasis:'Федеральный закон №68-ФЗ, статья 11: учебный пример не устанавливает универсальный порог эвакуации.'});
+assert(qualified.includes('Правовое основание:')&&qualified.includes('Федеральный закон №68-ФЗ'),'A genuine citation must survive a qualification about the educational example');
+assert(markup({...props,bestLegalBasis:'БК РФ, статья 38.'}).includes('Правовое основание:'),'Cyrillic code names must not depend on ASCII word boundaries');
+const editorialFile='supabase/migrations/20261025123000_distinct_event_editorial_catalog.sql';
+if(fs.existsSync(editorialFile)){
+ const cases=JSON.parse(fs.readFileSync(editorialFile,'utf8').split('$editorial$')[1]).map(p=>p.content);
+ assert.equal(cases.length,330);
+ for(const c of cases){
+  const correct=c.effect_plan.options.findIndex(o=>o.key===c.effect_plan.best_option_key),best=c.effect_plan.options[correct];
+  const shown=markup({...props,labels:c.decision_options,correctIndex:correct,bestDescription:best.description,bestLegalBasis:best.legal_basis});
+  assert(shown.includes('Правовое основание:'),c.case_key+' legal basis must remain visible after resolution');
+  assert(shown.includes('Открыть источник'),c.case_key+' legal source must be clickable');
+  const pending=markup({...props,labels:c.decision_options,correctIndex:null,revealResults:false,showCorrectExplanation:false,bestDescription:best.description,bestLegalBasis:best.legal_basis});
+  assert(!pending.includes('eventAnswerInlineFeedback')&&!pending.includes('Открыть источник'),c.case_key+' pending feedback must stay hidden');
+ }
+}
 const deduplicated=markup({...props,bestDescription:'Объяснение только правильного решения. Федеральный закон № 323-ФЗ, статья 10.'});
 assert.equal(deduplicated.match(/Федеральный закон № 323-ФЗ, статья 10\./g)?.length||0,1,
  'Repeated legal basis must not be printed twice');

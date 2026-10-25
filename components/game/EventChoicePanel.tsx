@@ -9,8 +9,12 @@ function publishedExplanation(value?:string){
   .replaceAll('Указанные в досье сведения и доступный ресурс позволяют выполнить ближайший этап без ожидания полного изменения программы.','').trim()||'';
 }
 function publishedLegalBasis(value?:string){
- if(!value||/учебн|вымышлен|авторская|игровой|модель/iu.test(value))return '';
- return /Конституци|Федеральн|\bФКЗ\b|\d+-ФЗ|\bКоАП\b|\b[БУГНТ]К\s*РФ\b|\bстать[яи]\b|Постановлени|Указ Президента/iu.test(value)?value.trim():'';
+ if(!value||/^\s*(?:учебн|вымышлен|авторск|игров|модель|правила\s+(?:деловой\s+)?игры)/iu.test(value))return '';
+ return /Конституци|Федеральн|ФКЗ|\d+-ФЗ|КоАП|Правила дорожного движения|ПДД|(?:^|[^\p{L}])(?:БК|ГК|ЖК|ЗК|ГрК|НК|ТК|ЛК|ВК|СК|УК|КАС|АПК|ГПК)\s*РФ|стать[яи]|Закон\s+РФ|Постановлени|Указ Президента/iu.test(value)?value.trim():'';
+}
+function LegalBasis({value}:{value:string}){
+ let source=0;
+ return <>{value.split(/(https?:\/\/[^\s]+)/u).map((part,i)=>/^https?:\/\//u.test(part)?<a key={i} href={part} target="_blank" rel="noopener noreferrer">Открыть источник {++source} ↗</a>:part)}</>;
 }
 export default function EventChoicePanel({labels,decisions,members,profiles,currentChoice,canAnswer,onAnswer,notice,revealResults=false,shuffleSeed='',showCorrectExplanation=false,correctIndex=null,bestDescription,bestLegalBasis}:{labels:string[];decisions:Decision[];members:Member[];profiles:GameProfile[];currentChoice?:string;canAnswer:boolean;onAnswer:(choice:string)=>void;notice?:string;revealResults?:boolean;shuffleSeed?:string;showCorrectExplanation?:boolean;correctIndex?:number|null;bestDescription?:string;bestLegalBasis?:string}){
  const cleanDescription=publishedExplanation(bestDescription),cleanBasis=publishedLegalBasis(bestLegalBasis);
@@ -30,7 +34,7 @@ export default function EventChoicePanel({labels,decisions,members,profiles,curr
     {revealResults&&<span className="eventAnswerProgress" aria-hidden="true"><i style={{width:percent+'%'}}/></span>}
     {revealResults&&<span className="eventAnswerPeople"><span className="eventAnswerAvatars">{voters.slice(0,8).map(d=>{const member=members.find(m=>m.user_id===d.actor_id),profile=profiles.find(p=>p.user_id===d.actor_id);return <span className="eventVoter" key={d.actor_id} title={member?.full_name||'Участник'}><ProfileAvatar src={profile?.avatar_url} name={member?.full_name||'Участник'} gender={profile?.gender}/></span>})}{voters.length>8&&<span className="eventVoterMore">+{voters.length-8}</span>}</span><span>Голосов: {voters.length}</span></span>}
    </button>
-   {showCorrectExplanation&&i===correctIndex&&(cleanDescription||cleanBasis)&&<div className="eventAnswerInlineFeedback" aria-label="Объяснение правильного варианта">{cleanDescription&&<p>{cleanDescription}</p>}{cleanBasis&&(!cleanDescription||!cleanDescription.includes(cleanBasis))&&<p className="eventLegalBasis"><b>Правовое основание:</b> {cleanBasis}</p>}</div>}
+   {showCorrectExplanation&&i===correctIndex&&(cleanDescription||cleanBasis)&&<div className="eventAnswerInlineFeedback" aria-label="Объяснение правильного варианта">{cleanDescription&&<p>{cleanDescription}</p>}{cleanBasis&&(!cleanDescription||!cleanDescription.includes(cleanBasis))&&<p className="eventLegalBasis"><b>Правовое основание:</b> <LegalBasis value={cleanBasis}/></p>}</div>}
   </div>;
  })}{notice&&<p className="eventAnswerNotice" role="status">{notice}</p>}</div>;
 }
