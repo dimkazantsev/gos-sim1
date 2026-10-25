@@ -56,7 +56,17 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher,chatOverview,setChatChannelPinned}=g;
  useEffect(()=>{setSelectedMessages([])},[channelId]);
  useEffect(()=>()=>{if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current)},[]);
-  useEffect(()=>{if(!g.game?.id)return;let live=true;void supabase.rpc('ensure_social_channels',{p_game_id:g.game.id}).then(r=>{if(live){if(r.error)g.setError(r.error.message);else void g.refresh()}});return()=>{live=false}},[g.game?.id]);
+  const socialChannelsReady=g.channels.some(c=>c.kind==='public'&&c.name==='Публичная политика')&&g.channels.some(c=>c.kind==='public'&&c.name==='Вне игры');
+ useEffect(()=>{
+  if(!g.game?.id||socialChannelsReady)return;
+  let live=true;
+  void supabase.rpc('ensure_social_channels',{p_game_id:g.game.id}).then(r=>{
+   if(!live)return;
+   if(r.error)g.setError(r.error.message);
+   else void g.refresh();
+  });
+  return()=>{live=false};
+ },[g.game?.id,socialChannelsReady]);
  const [sending,setSending]=useState(false);
  const [retentionClock,setRetentionClock]=useState(()=>Date.now());
  useEffect(()=>{const id=window.setInterval(()=>setRetentionClock(Date.now()),15000);return()=>window.clearInterval(id)},[]);

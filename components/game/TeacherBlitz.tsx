@@ -114,10 +114,15 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
    }
    if(live){setItems(results);setMatrixBusy(false)}
   }
-  const updated=(event:Event)=>{if((event as CustomEvent<{gameId:string}>).detail?.gameId===gameId)void load()};
+  let pending:ReturnType<typeof setTimeout>|undefined;
+  const updated=(event:Event)=>{
+   const detail=(event as CustomEvent<{gameId:string;table?:string}>).detail;
+   if(detail?.gameId!==gameId||(detail.table&&detail.table!=='blitz_assignments')||pending!==undefined)return;
+   pending=setTimeout(()=>{pending=undefined;if(live)void load()},1200);
+  };
   window.addEventListener(GAME_DATA_REFRESH_EVENT,updated);
   void load();
-  return ()=>{live=false;window.removeEventListener(GAME_DATA_REFRESH_EVENT,updated)};
+  return ()=>{live=false;clearTimeout(pending);window.removeEventListener(GAME_DATA_REFRESH_EVENT,updated)};
  },[gameId,opened.matrix,students.length]);
  const answerMap=useMemo(()=>new Map(items.map(x=>[x.question_id+':'+x.user_id,x])),[items]);
  const statsMap=useMemo(()=>new Map(stats.map(x=>[x.user_id,x])),[stats]);

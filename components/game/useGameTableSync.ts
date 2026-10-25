@@ -53,8 +53,18 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
    finally{running=false;if(queued&&!disposed){queued=false;schedule(250)}}
   }
   function schedule(delay=120){if(disposed||timer!==undefined)return;timer=setTimeout(()=>void flush(),delay)}
-  function visible(){if(document.visibilityState==='visible')schedule()}
-  function local(event:Event){const detail=(event as CustomEvent<{gameId:string;table?:string}>).detail;if(detail?.gameId===gameId&&(!onlyTable||detail.table===onlyTable))schedule()}
+  let lastVisibleRecoveryAt=0;
+  function visible(){
+   const now=Date.now();
+   if(document.visibilityState==='visible'&&now-lastVisibleRecoveryAt>20000){lastVisibleRecoveryAt=now;schedule()}
+  }
+  function local(event:Event){
+   const detail=(event as CustomEvent<{gameId:string;table?:string}>).detail;
+   if(detail?.gameId!==gameId)return;
+   if(onlyTable&&detail.table!==onlyTable)return;
+   if(!onlyTable&&detail.table&&_tables.length&&!_tables.includes(detail.table))return;
+   schedule();
+  }
   void flush();
   // Fall back without aligning all classroom tabs and stage widgets on the same tick.
   const poll=setInterval(()=>{
@@ -65,7 +75,7 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
     if(hasPushCoverage&&gameRealtimeConnected(gameId)&&now-lastFallbackAt<180000)return;
     lastFallbackAt=now;
     schedule(0);
-  },25000+Math.floor(Math.random()*10000));
+  },60000+Math.floor(Math.random()*15000));
   window.addEventListener('focus',visible);window.addEventListener('online',visible);
   const eventName=onlyTable?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT;
   window.addEventListener(eventName,local);document.addEventListener('visibilitychange',visible);

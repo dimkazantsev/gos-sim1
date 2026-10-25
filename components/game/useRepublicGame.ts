@@ -204,6 +204,7 @@ export function useRepublicGame(gameId:string){
   // Keep the first pending refresh: continuous Realtime events must not
   // indefinitely postpone it or refetch dozens of tables on every change.
   if(typeof document!=='undefined'&&document.visibilityState==='hidden')return;
+  if(Date.now()<backendRecoveryAfter.current)return;
   if(realtimeReloadTimer.current)return;
   const cooldown=Math.max(0,8000-(Date.now()-lastFullReloadAt.current));
   realtimeReloadTimer.current=setTimeout(()=>{realtimeReloadTimer.current=null;void flushRealtimeReload()},Math.max(delay,cooldown));
@@ -245,10 +246,11 @@ export function useRepublicGame(gameId:string){
     if(disposed||document.visibilityState==='hidden'||!authUser.current||!acceptedMember.current)return;
     // Focus + visibilitychange arrive together on some browsers. One recovery
     // suffices; explicit mutations and subscribed Realtime events bypass this guard.
-    const now=Date.now();if(now-lastRecoveryAt<1500)return;
+    const now=Date.now();if(now-lastRecoveryAt<30000)return;
     lastRecoveryAt=now;
-    void hydrateActiveView();notifyGameDataRefresh(gameId);
-    if(activeViewRef.current==='budget')void refreshBudgetPulse();
+    // Focus, online and visibility events arrive together. Stage widgets
+    // already own their focused reconciliation; do not broadcast a full refresh.
+    if(now-lastCoreSuccessAt.current>90000)scheduleRealtimeReload(0);
    };
   const visible=()=>{if(document.visibilityState==='visible')recover()};
   window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
@@ -260,14 +262,19 @@ export function useRepublicGame(gameId:string){
   let disposed=false,scheduled=false;
   let liveConnected=false,lastPollAt=0;
   let dirtyCore=false,dirtyPartyDocuments=false,dirtyChat=false,dirtyPins=false,dirtyOverview=false;
+  const dirtyTables=new Set<string>();
   let timer:ReturnType<typeof setTimeout>|undefined;
   function flush(){
    if(disposed||document.visibilityState==='hidden')return;
    const core=dirtyCore,partyDocs=dirtyPartyDocuments,chat=dirtyChat,pins=dirtyPins,overview=dirtyOverview;
+   const tables=[...dirtyTables];dirtyTables.clear();
    dirtyCore=false;dirtyPartyDocuments=false;dirtyChat=false;dirtyPins=false;dirtyOverview=false;
    // Read tickets in the loaders guard overlapping requests: never serialize
    // new events behind a stalled, older fetch.
-   if(core){void hydrateActiveView();notifyGameDataRefresh(gameId)}
+   if(core)scheduleRealtimeReload();
+   for(const table of tables)notifyGameDataRefresh(gameId,table);
+   // A post updates only the visible wall; it must not reload game identity.
+   if(tables.includes('political_posts')&&activeViewRef.current==='actions')void loadPoliticalWall();
    // A document version changes no core identity or party membership.
    if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments();
     if(partyDocs)notifySectionUpdates(gameId);
@@ -295,6 +302,7 @@ export function useRepublicGame(gameId:string){
     setMetrics(previous=>previous.some(item=>item.id===next.id)
      ?previous.map(item=>item.id===next.id?next:item)
      :[...previous,next]);
+    if(activeViewRef.current==='budget')notifyGameDataRefresh(gameId,'state_metrics');
    });
   }
   // A chart/history entry arrives on the same socket, with no follow-up
@@ -334,7 +342,9 @@ export function useRepublicGame(gameId:string){
   }
   for(const table of ['game_stages','game_parties','party_invitations','party_chair_ballots','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
-    dirtyCore=true;schedule();
+    dirtyTables.add(table);
+    if(['game_stages','game_parties','game_votes','formal_documents'].includes(table))dirtyCore=true;
+    schedule();
    });
   }
   channel.on('postgres_changes',{event:'*',schema:'public',table:'party_documents',filter:'game_id=eq.'+gameId},()=>{
@@ -346,7 +356,7 @@ export function useRepublicGame(gameId:string){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>notifyGameDataRefresh(gameId,table));
   }
   for(const table of ['duma_sessions','duma_agenda_items','institution_session_registrations','bill_amendments','bill_amendment_packs']){
-   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>notifyGameDataRefresh(gameId));
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>notifyGameDataRefresh(gameId,table));
   }
   liveRef.current=channel;
   setRealtimeState('connecting');

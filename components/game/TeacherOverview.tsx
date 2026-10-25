@@ -9,6 +9,7 @@ import {budgetDisplay} from './federalBudgetMath';
 import type {FiscalContext} from './fiscalMath';
 import type {ReturnTypeRepublic} from './viewTypes';
 import styles from './TeacherOverview.module.css';
+import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 
 type Snapshot={as_of:string;students:number;online:number;active_day:number;actions_day:number;stages_total:number;stages_completed:number;stages_overdue:number;documents_total:number;documents_draft:number;documents_published:number;documents_moving:number;votes_open:number;votes_closed:number;votes_failed_quorum:number;ballots_open:number;parties_total:number;parties_registered:number;parties_waiting:number;party_files:number;mandates:number;mandates_available:number;mandates_allocated:number;cases_active:number;case_invites_waiting:number;cases_resolved:number;posts_public:number;media_waiting:number;grades_final:number;grades_waiting:number;grade_average:number|null;changes_day:number};
 type Destination='documents'|'votes'|'budget'|'actions';
@@ -16,7 +17,8 @@ export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnType
  const gameId=g.game?.id;
  const [snapshot,setSnapshot]=useState<Snapshot|null>(null),[error,setError]=useState('');
  const [macro,setMacro]=useState<FiscalContext|null>(null);
- const request=useRef(0),alive=useRef(false),scope=useRef(gameId),snapshotScope=useRef('');scope.current=gameId;
+ const request=useRef(0),alive=useRef(false),scope=useRef(gameId),snapshotScope=useRef('');
+ const fiscalReadAt=useRef(0);scope.current=gameId;
  const refresh=useCallback(async()=>{
   if(!gameId||!g.teacher)return;
   const ticket=++request.current;
@@ -24,21 +26,32 @@ export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnType
    if(!alive.current||ticket!==request.current||scope.current!==gameId)return;
    if(r.error)throw r.error;if(!r.data?.as_of)throw new Error('Обзор управления не вернул данные.');
    snapshotScope.current=gameId;setSnapshot(r.data as Snapshot);setError('');
-   void supabase.rpc('get_fiscal_context',{p_game_id:gameId}).then(m=>{if(!m.error&&m.data?.policy&&alive.current&&scope.current===gameId)setMacro(m.data as FiscalContext);});
+   if(Date.now()-fiscalReadAt.current>120000){
+    fiscalReadAt.current=Date.now();
+    void supabase.rpc('get_fiscal_context',{p_game_id:gameId}).then(m=>{if(!m.error&&m.data?.policy&&alive.current&&scope.current===gameId)setMacro(m.data as FiscalContext);});
+   }
   }catch(e){if(alive.current&&ticket===request.current&&scope.current===gameId)setError(userError(e));}
  },[gameId,g.teacher]);
  useEffect(()=>{
+  if(!gameId||!g.teacher)return;
   alive.current=true;setSnapshot(null);setError('');void refresh();
-  const timer=setInterval(()=>{if(document.visibilityState==='visible')void refresh();},20000);
-  const resume=()=>{if(document.visibilityState==='visible')void refresh();};document.addEventListener('visibilitychange',resume);
-  let pending:ReturnType<typeof setTimeout>|undefined;const changed=()=>{clearTimeout(pending);pending=setTimeout(()=>void refresh(),350);};
-  let channel=supabase.channel('teacher-overview:'+gameId);
-  for(const table of ['game_members','game_presence','game_activity','game_stages','formal_documents','game_votes','game_parties','party_documents','party_member_mandates','event_assignments','event_case_outcomes','political_posts','media_news_proposals','stage_assessments','state_metric_history'])
-   channel=channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},changed);
-  // Ballots have no game_id; the server always aggregates only this game's votes.
-  channel=channel.on('postgres_changes',{event:'*',schema:'public',table:'game_ballots'},changed);channel.subscribe();
-  return()=>{alive.current=false;request.current++;clearInterval(timer);clearTimeout(pending);document.removeEventListener('visibilitychange',resume);void supabase.removeChannel(channel);};
- },[gameId,refresh]);
+  let lastAutomaticAt=Date.now(),pending:ReturnType<typeof setTimeout>|undefined;
+  const automatic=()=>{
+   if(document.visibilityState!=='visible'||Date.now()-lastAutomaticAt<12000)return;
+   lastAutomaticAt=Date.now();void refresh();
+  };
+  // Reuse the game shell's event stream rather than 16 extra Realtime subscriptions.
+  const tables=new Set(['game_stages','formal_documents','game_votes','game_parties','political_posts']);
+  const changed=(event:Event)=>{
+   const detail=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
+   if(detail?.gameId!==gameId||(detail.table&&!tables.has(detail.table))||pending!==undefined)return;
+   pending=setTimeout(()=>{pending=undefined;automatic()},1800);
+  };
+  const timer=setInterval(automatic,60000+Math.floor(Math.random()*15000));
+  document.addEventListener('visibilitychange',automatic);
+  window.addEventListener(GAME_DATA_REFRESH_EVENT,changed);
+  return()=>{alive.current=false;request.current++;clearInterval(timer);clearTimeout(pending);document.removeEventListener('visibilitychange',automatic);window.removeEventListener(GAME_DATA_REFRESH_EVENT,changed)};
+ },[gameId,refresh,g.teacher]);
  if(!g.teacher||!gameId)return null;
  const s=snapshotScope.current===gameId?snapshot:null,number=(n:number|undefined)=>n===undefined?'…':quantity(n,''),pulse=g.budgetPulse,c=pulse?.calculation;
  const waiting=(s?.parties_waiting??0)+(s?.media_waiting??0)+(s?.grades_waiting??0)+(s?.stages_overdue??0);
@@ -54,7 +67,7 @@ export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnType
   {key:'impact',title:'Состояние государства',Icon:Activity,value:s?.changes_day,unit:'изменений показателей за 24 часа',items:[['Просрочено открытых этапов',s?.stages_overdue]],action:()=>onWorkspace('impact'),button:'Открыть модель последствий'}
  ];
  return <section className={styles.overview} aria-label="Мониторинг текущей игры" data-teacher-overview={s?'ready':error?'error':'loading'}>
-  <div className={styles.freshness}><span>{s?'Обновлено '+new Date(s.as_of).toLocaleTimeString('ru-RU'):'Загрузка показателей текущей игры…'} · Обновление каждые 20 секунд</span><button type="button" className="secondary" aria-label="Обновить показатели обзора" onClick={()=>void refresh()}><RefreshCw size={18}/></button></div>
+  <div className={styles.freshness}><span>{s?'Обновлено '+new Date(s.as_of).toLocaleTimeString('ru-RU'):'Загрузка показателей текущей игры…'} · Автоматическое обновление не чаще раза в минуту</span><button type="button" className="secondary" aria-label="Обновить показатели обзора" onClick={()=>void refresh()}><RefreshCw size={18}/></button></div>
   {error&&<p className={styles.error} role="alert">{error}{s?' Показаны последние полученные данные.':''}</p>}
   <div className="teacherOverviewStats">
    <article><small>В ИГРЕ СЕЙЧАС</small><strong data-overview-kpi="online">{number(s?.online)}</strong><span>из {number(s?.students)} участников · активность за 90 секунд</span></article>
