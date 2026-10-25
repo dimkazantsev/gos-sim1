@@ -141,8 +141,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
    <StageMeetingProcedureFlow stage={stage} votesCount={votes.length} onOpenVotes={()=>onOpenVotes()} onOpenDocuments={()=>setTab('materials')}/>
    {scoringClosed&&<section className="stageFinalWorkPrompt" role="alert" aria-label="Оценочный срок завершён">
     <div><FileText size={19} aria-hidden="true"/><span><b>Оценочный срок завершён. Этап продлён автоматически</b><small>Новые баллы ВСН больше не начисляются. Оформите обязательные итоговые документы — это необходимо для завершения этапа. {awaitingFinalDocuments.length?'Осталось: '+awaitingFinalDocuments.length+'.':'Все итоговые документы подготовлены, проверьте оставшиеся процедуры.'}</small></span></div>
-    <button type="button" className="primary" onClick={()=>setTab('materials')}>Оформить документы <ChevronRight size={16}/></button>
-   </section>}
+   </section>
    {viewer&&<p className="stageOperationsNotice" role="status">{readOnly?'Просмотр участника. Изменение данных отключено.':g.me?.kind==='observer'?'Гостевой просмотр. Рабочие действия доступны назначенным участникам.':stageLocked?'Этап завершён или ещё не открыт. Изменение данных недоступно до решения преподавателя.':''}</p>}
    {bodies&&stage.stage_no!==12&&<div className="stageOperationsRegistration"><InstitutionRegistrationPanel g={g} readOnly={stage.stage_no===2||stage.stage_no===3?readOnly||g.me?.kind==='observer':viewer} stageNo={stage.stage_no} initialBody={bodies[0]} allowedBodies={bodies} onOpenDocument={onOpenDocument} onMeetingReadyChange={onMeetingReadyChange}/></div>}
    {ksrfSessionBlocked&&!viewer&&<p className="stageOperationsNotice" role="status">Действия КСРФ станут доступны после утверждения повестки и вашей регистрации на заседание. Сначала выполните эти действия в блоке выше.</p>}
@@ -167,12 +166,20 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
     </div>
    </fieldset>
    {bodies&&stage.stage_no!==12&&<div id={'stage-meeting-minutes-'+g.game?.id+'-'+stage.stage_no} className="stageMeetingFinalDocuments" aria-label="Итоговые документы заседания"/>}
-   {!scoringClosed&&(stage.status==='open'||canRemediateCompleted)&&awaitingFinalDocuments.length>0&&<section className="stageFinalWorkPrompt" aria-live="polite">
-      <div><FileText size={19} aria-hidden="true"/><span><b>Итоговые документы ещё не оформлены</b>
-       <small>{stage.status==='completed'?'Осталось погасить задолженность по итоговым документам ('+awaitingFinalDocuments.length+'). После опубликования доступ и предварительный балл будут восстановлены.':'Осталось оформить обязательные документы ('+awaitingFinalDocuments.length+'). До этого этап завершить нельзя.'}</small></span></div>
-      {(!viewer||canRemediateCompleted)&&actionableFinalDocuments.length>0&&<button type="button" className="primary"
-        onClick={()=>setTab('materials')}>Подготовить итоговые документы <ArrowLeft size={16} aria-hidden="true"/></button>}
-     </section>}
+   <section className="stageFinalWorkPrompt" aria-label={'Итоговые документы этапа '+stage.stage_no} aria-live="polite">
+    <div><FileText size={19} aria-hidden="true"/><span>
+     <b>{awaitingFinalDocuments.length>0?'Итоговые документы ещё не оформлены':'Итоговые документы этапа'}</b>
+     <small>{awaitingFinalDocuments.length>0
+      ?stage.status==='completed'
+       ?'Осталось погасить задолженность по итоговым документам ('+awaitingFinalDocuments.length+'). После опубликования доступ и предварительный балл будут восстановлены.'
+       :'Осталось оформить обязательные документы ('+awaitingFinalDocuments.length+'). До этого этап завершить нельзя.'
+      :'Откройте материалы этапа, чтобы проверить итоговые документы и при необходимости подготовить новые.'}</small>
+    </span></div>
+    <button type="button" className="primary" onClick={()=>setTab('materials')}>
+     {viewer&&!canRemediateCompleted?'Просмотреть итоговые документы':'Подготовить итоговые документы'}
+     <ChevronRight size={16} aria-hidden="true"/>
+    </button>
+   </section>
     <footer className="stageOperationsWorkFooter"><span><ClipboardCheck size={18}/>Проверка учитывает процедуры и опубликованные итоговые документы</span><button type="button" className="secondary" onClick={()=>setTab('check')}>Проверить завершение</button></footer>
   </section>
 
