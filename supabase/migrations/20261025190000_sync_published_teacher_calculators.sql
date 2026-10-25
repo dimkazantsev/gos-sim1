@@ -25,7 +25,7 @@ BEGIN
  -- Штатный триггер game_parties уже выполняет rebalance для каждой партии,
  -- с учётом индивидуальных мандатов, Goust Voting и санкций.
  UPDATE public.game_parties p
- SET mandates=(new.result->>p.id::text)::integer, updated_at=now()
+ SET mandates=(new.result->>p.id::text)::integer
  WHERE p.game_id=new.game_id
    AND p.mandates IS DISTINCT FROM (new.result->>p.id::text)::integer;
  RETURN new;
@@ -83,7 +83,7 @@ BEGIN
   PERFORM private.freeze_region_party_control(v_rule);
  END IF;
  UPDATE public.game_parties p
- SET regions=(new.result->>p.id::text)::integer,updated_at=now()
+ SET regions=(new.result->>p.id::text)::integer
  WHERE p.game_id=new.game_id
    AND p.regions IS DISTINCT FROM (new.result->>p.id::text)::integer;
  RETURN new;
@@ -123,7 +123,7 @@ BEGIN
    CONTINUE;
   END IF;
   UPDATE public.game_parties p
-  SET mandates=(rec.result->>p.id::text)::integer,updated_at=now()
+  SET mandates=(rec.result->>p.id::text)::integer
   WHERE p.game_id=rec.game_id
     AND p.mandates IS DISTINCT FROM (rec.result->>p.id::text)::integer;
  END LOOP;
