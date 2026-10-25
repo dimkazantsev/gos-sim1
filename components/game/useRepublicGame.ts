@@ -464,8 +464,11 @@ export function useRepublicGame(gameId:string){
    if(adoptUser(u.id)){ticket=startRead('all');if(show)setLoading(true)}
    let [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Открытие игровой сессии');
    if(!readCurrent(ticket,'all'))return;
-   if((g.error||m.error)&&![g.error,m.error].some(error=>['PGRST003','57014'].includes(String((error as {code?:string}|null)?.code||'')))){
-    await new Promise(resolve=>setTimeout(resolve,250));
+   if(g.error||m.error){
+    const poolBusy=[g.error,m.error].some(error=>['PGRST003','57014'].includes(String((error as {code?:string}|null)?.code||'')));
+    // Preserve one bootstrap recovery attempt, staggered to avoid synchronized retry storms.
+    const retryJitter=[...u.id].reduce((hash,char)=>hash+char.charCodeAt(0),0)%2000;
+    await new Promise(resolve=>setTimeout(resolve,poolBusy?5000+retryJitter:250));
     [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Повторное открытие игровой сессии');
     if(!readCurrent(ticket,'all'))return;
    }
