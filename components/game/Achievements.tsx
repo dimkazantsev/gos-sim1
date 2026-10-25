@@ -51,9 +51,10 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
    }
   }
   void load();
-  const timer=setInterval(()=>{if(document.visibilityState==='visible')void load()},45000+Math.floor(Math.random()*15000));
+  // Avoid repeated expensive achievement facts while the collection is collapsed.
+  const timer=setInterval(()=>{if(document.visibilityState==='visible'&&(!defaultCollapsed||expanded))void load()},300000+Math.floor(Math.random()*60000));
   return()=>{live=false;clearInterval(timer)};
- },[gameId,userId,previewOnly]);
+ },[gameId,userId,previewOnly,defaultCollapsed,expanded]);
 
  const visibleItems=previewOnly?publicAchievementPreview(items):items;
  const earned=visibleItems.filter(x=>x.earned_at);
@@ -119,40 +120,44 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
 
 export function AchievementCelebration({gameId,userId,enabled}:{gameId:string;userId?:string;enabled:boolean}){
  const [award,setAward]=useState<Achievement|null>(null);
- const [error,setError]=useState('');
  const active=useRef(false);
 
  useEffect(()=>{
-  active.current=false;setAward(null);setError('');
+  active.current=false;setAward(null);
   if(!enabled||!userId)return;
   let live=true;
   const running={current:false};
-  async function check(){
+  async function check(evaluate:boolean){
    if(!live||running.current||active.current||document.visibilityState==='hidden')return;
    running.current=true;
    try{
-    const a=await supabase.rpc('evaluate_game_achievements',{p_game_id:gameId});
-    if(!live)return;
-    if(a.error){setError(userError(a.error));return}
+    // A single facts evaluation touches many tables. Do not repeat it on every
+    // lightweight notification poll or for multiple hidden tabs.
+    if(evaluate){
+     const a=await supabase.rpc('evaluate_game_achievements',{p_game_id:gameId});
+     if(!live||a.error)return;
+    }
     const r=await supabase.rpc('claim_achievement_notification',{p_game_id:gameId});
     if(!live)return;
-    if(r.error){setError(userError(r.error));return}
-    if(r.data){active.current=true;setAward(r.data);setError('')}
-   }catch(e){if(live)setError(userError(e))}
+    if(r.error)return;
+    if(r.data){active.current=true;setAward(r.data)}
+   }catch{/* Rewards are optional: connection failures must not cover game controls. */}
    finally{running.current=false}
   }
   // Award evaluation is expensive for PostgreSQL: spread first checks after login
   // and preserve automatic delivery with a slower visible-tab recovery cadence.
-  const first=setTimeout(()=>void check(),3000+Math.floor(Math.random()*17000));
-  const timer=setInterval(()=>void check(),45000+Math.floor(Math.random()*15000));
-  return()=>{live=false;clearTimeout(first);clearInterval(timer)};
+  const firstClaim=setTimeout(()=>void check(false),3000+Math.floor(Math.random()*17000));
+  const firstEvaluation=setTimeout(()=>void check(true),60000+Math.floor(Math.random()*60000));
+  const claimTimer=setInterval(()=>void check(false),120000+Math.floor(Math.random()*30000));
+  const evaluationTimer=setInterval(()=>void check(true),540000+Math.floor(Math.random()*60000));
+  return()=>{live=false;clearTimeout(firstClaim);clearTimeout(firstEvaluation);clearInterval(claimTimer);clearInterval(evaluationTimer)};
  },[gameId,userId,enabled]);
 
  function close(){active.current=false;setAward(null)}
  useEffect(()=>{if(!award)return;const timer=setTimeout(close,7000);return()=>clearTimeout(timer)},[award?.id]);
 
  if(!enabled)return null;
- if(!award)return error?<p className="awardConnectionNotice" role="status">Награды: {error}</p>:null;
+ if(!award)return null;
 
  return <aside className="achievementBurst steamAchievementToast" role="status" aria-live="polite">
   <Medal id={award.id} title={award.title} earned/>
