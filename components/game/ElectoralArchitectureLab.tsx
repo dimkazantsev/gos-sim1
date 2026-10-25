@@ -4,7 +4,7 @@ import StyledSelect from '../ui/StyledSelect';
 import {useEffect,useRef,useState} from 'react';
 import {MessageCircle,Save} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
-import {useGameTableSync} from './useGameTableSync';
+import {useGameTableSync,notifyGameDataRefresh} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {allocateElectoralSeats as allocate,allocateRegionalSeats} from './electoralMath';
 
@@ -210,7 +210,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
    p_district_seats:districtPayload,
    p_result:resultPayload
   });
-  if(r.error)setError(userError(r.error));else await load();
+  if(r.error)setError(userError(r.error));else {notifyGameDataRefresh(activeGame.id,'game_parties');await load()}
   setBusy(false);
  }
  async function publishRegionalCalculatorResult(){
@@ -223,7 +223,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
     :{draw:'random'};
   const result=Object.fromEntries(regionalPreview.map(x=>[x.party.id,x.regions]));
   const r=await supabase.rpc('publish_regional_calculator_result',{p_game_id:activeGame.id,p_method:regionalCalculatorMethod,p_inputs:inputs,p_result:result});
-  if(r.error)setError(userError(r.error));else await load();
+  if(r.error)setError(userError(r.error));else {notifyGameDataRefresh(activeGame.id,'game_parties');await load()}
   setBusy(false);
  }
   async function proposeR(){
@@ -338,7 +338,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
     {calculatorSystem!=='proportional'&&<span>Округа <b>{districtTotal} / {districtPool}</b></span>}
     {calculatorSystem==='mixed'&&<span>Пропорционально <b>{proportionalPool}</b></span>}
     <span>Распределено <b>{calculatorAllocatedTotal} / 450</b></span>
-    <button type="button" className="primary electoralPublishCalc" disabled={busy||!calculatorReady} onClick={()=>void publishCalculatorResult()}><Save size={16} aria-hidden="true"/>Сохранить и открыть всем</button>
+    <button type="button" className="primary electoralPublishCalc" disabled={busy||!calculatorReady} onClick={()=>void publishCalculatorResult()}><Save size={16} aria-hidden="true"/>Утвердить и открыть всем</button>
    </div>
   </section>}
  </section>;
@@ -354,12 +354,8 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
 
   {latestRegionalSaved&&<section className="regionalPublishedResult">
     {adoptedR?.status==='allocated'&&<p className="regionalResultExplanation">Итоги распределения зафиксированы.</p>}
-   <div className="regionalPublishedHead"><div><small>ОПУБЛИКОВАННЫЙ РАСЧЁТ</small><h3>{regionalLabel[latestRegionalSaved.method]}</h3><p>Сохранён преподавателем · {new Date(latestRegionalSaved.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p></div><strong>89 субъектов</strong></div>
+   <div className="regionalPublishedHead"><div><small>УТВЕРЖДЁННЫЙ РЕЗУЛЬТАТ</small><h3>{regionalLabel[latestRegionalSaved.method]}</h3><p>Утверждён преподавателем · {new Date(latestRegionalSaved.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p></div><strong>89 субъектов</strong></div>
    <div className="regionalPublishedGrid">{parties.map(p=><div key={p.id}><span><i style={{background:p.color}}/><b>{p.name}</b></span><strong>{Number(latestRegionalSaved.result?.[p.id]||0)}</strong><small>субъектов</small></div>)}</div>
-   {teacher&&compactAgreement&&adoptedR?.status==='adopted'&&<div className="regionalPublishedActions">
-    <button type="button" className="primary" disabled={busy} onClick={()=>void finalizePublishedAgreement()}>{busy?'Сохранение…':'Зафиксировать итоговое распределение'}</button>
-    <small>Голосование и принятое правило КСРФ не изменяются.</small>
-   </div>}
   </section>}
 
   {teacher&&<section className="regionalCalculator">
@@ -379,11 +375,11 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
     {regionalCalculatorMethod==='proportional'&&<span>Мандаты ГД <b>{regionalMandateTotal}</b></span>}
     {regionalCalculatorMethod==='agreement'&&<span>По договору <b>{agreementRegionalTotal} / 89</b></span>}
     {regionalCalculatorMethod==='random'&&<span>Распределено <b>{regionalPreviewTotal} / 89</b></span>}
-    <button type="button" className="primary" disabled={busy||!regionalCalculatorReady} onClick={()=>void publishRegionalCalculatorResult()}><Save size={16} aria-hidden="true"/>Сохранить и открыть всем</button>
+    <button type="button" className="primary" disabled={busy||!regionalCalculatorReady} onClick={()=>void publishRegionalCalculatorResult()}><Save size={16} aria-hidden="true"/>Утвердить и открыть всем</button>
    </div>
   </section>}
 
-  {adoptedR&&!compactAgreement&&<section className="regionalAllocation"><div className="regionalAllocationHead"><div><small>{adoptedR.method==='agreement'&&adoptedR.status==='adopted'?'ПРОЕКТ ДОГОВОРНОГО РАСПРЕДЕЛЕНИЯ':'УТВЕРЖДЁННОЕ РАСПРЕДЕЛЕНИЕ КОНТРОЛЯ'}</small><h3>{regionalLabel[adoptedR.method]}</h3></div><strong>{regionRows.reduce((a,x)=>a+Number(x.regions||0),0)} / 89</strong></div>
+  {adoptedR&&!latestRegionalSaved&&<section className="regionalAllocation"><div className="regionalAllocationHead"><div><small>{adoptedR.method==='agreement'&&adoptedR.status==='adopted'?'ПРОЕКТ ДОГОВОРНОГО РАСПРЕДЕЛЕНИЯ':'УТВЕРЖДЁННОЕ РАСПРЕДЕЛЕНИЕ КОНТРОЛЯ'}</small><h3>{regionalLabel[adoptedR.method]}</h3></div><strong>{regionRows.reduce((a,x)=>a+Number(x.regions||0),0)} / 89</strong></div>
     {adoptedR.method==='agreement'&&adoptedR.status==='adopted'&&<p className="regionalResultExplanation">
       Это проект договора, который утверждается отдельно от расчёта преподавателя. Пока не зафиксирован итог, число субъектов здесь может быть нулевым.
     </p>}
