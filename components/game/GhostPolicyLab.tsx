@@ -43,10 +43,12 @@ export default function GhostPolicyLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onO
  const vote=(id:string|null)=>id?votes.find(v=>v.id===id):undefined;
 
  async function propose(){
+  if(busy||adopted)return;
   setBusy(true);const r=await supabase.rpc('propose_ghost_voting_policy',{p_game_id:activeGame.id,p_policy_mode:mode,p_rationale:rationale.trim()||null});
   if(r.error)setError(userError(r.error));else{setRationale('');await load()}setBusy(false);
  }
  async function openVote(id:string){
+  if(busy||adopted)return;
   setBusy(true);const r=await supabase.rpc('open_ghost_voting_policy_vote',{p_policy_id:id});
   if(r.error)setError(userError(r.error));else{await load();onOpenVotes()}setBusy(false);
  }
@@ -56,7 +58,7 @@ export default function GhostPolicyLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onO
 
   <div className="ghostCadenceNote"><b>Почему частота не автоматизирована жёстко</b><p>Фразы «через каждые 2 заседания» и «через одно заседание» допускают разные трактовки точки отсчёта. Поэтому система фиксирует выбранный режим и показывает авторскую формулировку дословно, а сам запуск конкретной жеребьёвки остаётся у преподавателя.</p></div>
 
-  {canPropose&&<section className="ghostPolicyProposal">
+  {canPropose&&!adopted&&<section className="ghostPolicyProposal">
    <div className="ghostPolicyProposalHead">
     <div><small>ПРОЕКТ ПОСТАНОВЛЕНИЯ</small><h3>Выберите режим Goust Voting</h3><p>Один вариант станет предметом рассмотрения Государственной Думы.</p></div>
    </div>
@@ -75,6 +77,6 @@ export default function GhostPolicyLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onO
    <footer className="ghostPolicyProposalFooter"><span>После внесения проект появится в списке ниже и сможет быть вынесен на голосование.</span><button className="primary" disabled={busy} onClick={()=>void propose()}>Внести проект постановления</button></footer>
   </section>}
 
-  <div className="ghostPolicyList">{visible.length===0?<div className="emptyState">Проектов постановления ещё нет.</div>:visible.map(p=>{const v=vote(p.vote_id);return <article key={p.id} className={p.status}><header><div><small>РЕЖИМ</small><b>{labels[p.policy_mode]}</b></div><em>{p.status==='adopted'?'Принят':p.status==='vote_open'?'Голосование':p.status==='rejected'?'Отклонён':'Проект'}</em></header><p>{cadence[p.policy_mode]}</p>{p.rationale&&<blockquote>{p.rationale}</blockquote>}<footer><span>{proposer(p.proposed_by)}</span>{v&&<span>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</span>}{(teacher||ledParty)&&p.status==='draft'&&<button disabled={busy} onClick={()=>void openVote(p.id)}>Вынести в зал ГД →</button>}</footer></article>})}</div>
+  <div className="ghostPolicyList">{visible.length===0?<div className="emptyState">Проектов постановления ещё нет.</div>:visible.map(p=>{const v=vote(p.vote_id);return <article key={p.id} className={p.status}><header><div><small>РЕЖИМ</small><b>{labels[p.policy_mode]}</b></div><em>{p.status==='adopted'?'Принят':p.status==='vote_open'?'Голосование':p.status==='rejected'?'Отклонён':'Проект'}</em></header><p>{cadence[p.policy_mode]}</p>{p.status==='rejected'&&adopted&&!p.vote_id&&<p className="ghostPolicyRejectedNote">Отклонено: по этому вопросу принято другое решение.</p>}{p.rationale&&<blockquote>{p.rationale}</blockquote>}<footer><span>{proposer(p.proposed_by)}</span>{v&&<span>{v.status==='open'?'голосование открыто':v.result_label||'закрыто'}</span>}{(teacher||ledParty)&&!adopted&&p.status==='draft'&&<button disabled={busy} onClick={()=>void openVote(p.id)}>Вынести в зал ГД →</button>}</footer></article>})}</div>
  </section>;
 }

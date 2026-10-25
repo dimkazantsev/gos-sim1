@@ -11,8 +11,8 @@ const STAGE_CONTENT:Record<number,string>={
  8:'Кандидатуры и состав Правительства',9:'Назначения министров',11:'Государственные программы',
  12:'Законопроекты и чтения',13:'Рассмотрение бюджета',14:'Муниципальные проекты'
 };
-export default function StageMeetingProcedureFlow({stage,votesCount=0,onOpenVotes,onOpenDocuments}:{
- stage:Stage;votesCount?:number;onOpenVotes:()=>void;onOpenDocuments:()=>void;
+export default function StageMeetingProcedureFlow({stage,votesCount=0,onOpenVotes}:{
+ stage:Stage;votesCount?:number;onOpenVotes:()=>void;
 }){
  if(!MEETING_STAGES.has(stage.stage_no))return null;
  const phases=[
@@ -31,7 +31,6 @@ export default function StageMeetingProcedureFlow({stage,votesCount=0,onOpenVote
    </li>)}</ol>
    <nav aria-label="Связанные реестры">
     <button type="button" onClick={onOpenVotes}>Все голосования этапа ({votesCount})</button>
-    <button type="button" onClick={onOpenDocuments}>Документы и протоколы</button>
    </nav>
   </section>;
 }

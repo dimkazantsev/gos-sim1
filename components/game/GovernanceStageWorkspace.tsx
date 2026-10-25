@@ -138,7 +138,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
 
   <section id={sectionId+'-work'} className="stageOperationsPane" hidden={tab!=='work'} aria-label="Рабочие процедуры">
    <div className="stageOperationsHandoff"><div><small>Основание</small><span>{operation.input}</span></div><ChevronRight size={18} aria-hidden="true"/><div><small>Результат этапа</small><span>{operation.output}</span></div></div>
-   <StageMeetingProcedureFlow stage={stage} votesCount={votes.length} onOpenVotes={()=>onOpenVotes()} onOpenDocuments={()=>setTab('materials')}/>
+   <StageMeetingProcedureFlow stage={stage} votesCount={votes.length} onOpenVotes={()=>onOpenVotes()}/>
    {scoringClosed&&<section className="stageFinalWorkPrompt" role="alert" aria-label="Оценочный срок завершён">
     <div><FileText size={19} aria-hidden="true"/><span><b>Оценочный срок завершён. Этап продлён автоматически</b><small>Новые баллы ВСН больше не начисляются. Оформите обязательные итоговые документы — это необходимо для завершения этапа. {awaitingFinalDocuments.length?'Осталось: '+awaitingFinalDocuments.length+'.':'Все итоговые документы подготовлены, проверьте оставшиеся процедуры.'}</small></span></div>
    </section>}
