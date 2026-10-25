@@ -177,7 +177,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
     </span></div>
     <button type="button" className="primary" onClick={()=>setTab('materials')}>
      {viewer&&!canRemediateCompleted?'Просмотреть итоговые документы':'Подготовить итоговые документы'}
-     <ChevronRight size={16} aria-hidden="true"/>
+     <ArrowLeft size={16} aria-hidden="true"/>
     </button>
    </section>
     <footer className="stageOperationsWorkFooter"><span><ClipboardCheck size={18}/>Проверка учитывает процедуры и опубликованные итоговые документы</span><button type="button" className="secondary" onClick={()=>setTab('check')}>Проверить завершение</button></footer>
