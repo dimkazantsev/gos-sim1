@@ -52,6 +52,8 @@ export function useRepublicGame(gameId:string){
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const lastTelegramDispatch=useRef(0);
  const lastCoreSuccessAt=useRef(0);
+ // Avoid amplifying PostgREST pool/statement timeouts with repeated 15-table reads.
+ const backendRecoveryAfter=useRef(0);
  const overviewRealtimeTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const lastRealtimeOverviewAt=useRef(0);
  function scheduleRealtimeChatOverview(){
@@ -221,6 +223,7 @@ export function useRepublicGame(gameId:string){
 
  useEffect(()=>{
   alive.current=true;
+  backendRecoveryAfter.current=0;
   clearGameData();setLoading(true);setRealtimeState('disconnected');
   let disposed=false,authReloadTimer:ReturnType<typeof setTimeout>|undefined,lastRecoveryAt=0;
   const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
@@ -365,6 +368,9 @@ export function useRepublicGame(gameId:string){
    // When disconnected, retain the existing prompt 30–40s recovery.
    const now=Date.now();
    if(liveConnected&&now-lastPollAt<180000)return;
+   // Preserve explicit actions and Realtime updates, but back off automatic
+   // full reloads while the server reports exhausted connections/timeouts.
+   if(!liveConnected&&now<backendRecoveryAfter.current)return;
    lastPollAt=now;
    dirtyCore=true;dirtyOverview=true;
    if(chatOpenRef.current){dirtyChat=true;dirtyPins=true}
@@ -458,7 +464,7 @@ export function useRepublicGame(gameId:string){
    if(adoptUser(u.id)){ticket=startRead('all');if(show)setLoading(true)}
    let [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Открытие игровой сессии');
    if(!readCurrent(ticket,'all'))return;
-   if(g.error||m.error){
+   if((g.error||m.error)&&![g.error,m.error].some(error=>['PGRST003','57014'].includes(String((error as {code?:string}|null)?.code||'')))){
     await new Promise(resolve=>setTimeout(resolve,250));
     [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Повторное открытие игровой сессии');
     if(!readCurrent(ticket,'all'))return;
@@ -500,6 +506,10 @@ export function useRepublicGame(gameId:string){
    limitedCoreRead(supabase.rpc('has_seen_my_intro'))
   ]);
   if(!readCurrent(ticket,'core'))return;
+  const coreResults=[g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro];
+  if(coreResults.some(result=>['PGRST003','57014'].includes(String((result.error as {code?:string}|null)?.code||'')))){
+   backendRecoveryAfter.current=Date.now()+90000;
+  }else if(coreResults.every(result=>!result.error))backendRecoveryAfter.current=0;
   if(g.error||m.error){
    const code=String((g.error as {code?:string}|null)?.code||(m.error as {code?:string}|null)?.code||'');
    if(code==='PGRST116'||code==='42501'){readEpoch.current++;clearGameData();setError('Нет доступа к игре');}
