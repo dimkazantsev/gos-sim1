@@ -47,7 +47,7 @@ begin
 
  update public.political_posts set effects_applied=true,updated_at=now() where id=p.id;
 end;
-$function$
+$function$;
 
 CREATE OR REPLACE FUNCTION private.apply_rule_effects(p_game uuid, p_rule impact_rules, p_source_type text, p_source_id text, p_actor uuid, p_context jsonb, p_note text)
  RETURNS boolean
@@ -112,7 +112,7 @@ begin
  values(p_game,p_rule.id,p_rule.rule_key,p_source_type,p_source_id,p_actor,v_actual_effects,coalesce(p_note,p_rule.label));
  return true;
 end;
-$function$
+$function$;
 
 CREATE OR REPLACE FUNCTION public.revert_impact_entry(p_ledger_id bigint)
  RETURNS void
@@ -151,4 +151,4 @@ begin
  end if;
  update public.impact_ledger set status='reverted',reverted_at=now() where id=l.id;
 end;
-$function$
+$function$;
