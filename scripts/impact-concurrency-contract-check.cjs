@@ -31,6 +31,16 @@ for(const [i,name] of names.entries()){
  }
  if(i===2)assert(body.includes("if l.status='reverted' then return"),'Revert operation remains idempotent');
 }
+// Follow-up privilege gate: the two private helpers are never exposed for
+// direct execution; postgres-owned SECURITY DEFINER callers remain intact.
+const aclFile='supabase/migrations/20261025064000_restrict_private_impact_effects_execute.sql';
+const aclSql=fs.readFileSync(aclFile,'utf8').replace(/^--[^\n]*$/gm,'');
+const aclStatements=aclSql.split(';').map(s=>s.trim()).filter(Boolean);
+assert.equal(aclStatements.length,2,'Only two narrowly scoped privilege statements');
+assert.match(aclStatements[0],/^REVOKE\s+EXECUTE\s+ON\s+FUNCTION\s+private\.apply_post_effects\s*\(uuid\s*,\s*uuid\)\s+FROM\s+PUBLIC\s*,\s*anon\s*,\s*authenticated$/i,'Protect private post effects');
+assert.match(aclStatements[1],/^REVOKE\s+EXECUTE\s+ON\s+FUNCTION\s+private\.apply_rule_effects\s*\(\s*uuid\s*,\s*public\.impact_rules\s*,\s*text\s*,\s*text\s*,\s*uuid\s*,\s*jsonb\s*,\s*text\s*\)\s+FROM\s+PUBLIC\s*,\s*anon\s*,\s*authenticated$/i,'Protect private rule effects');
+assert(!/\b(GRANT|ALTER|DROP|TRUNCATE|UPDATE|DELETE|CREATE)\b/i.test(aclSql),'Privilege migration cannot alter game data or schema objects');
+
 (async()=>{
  // Illustration only: each task corresponds to an independent action on the
  // SAME metric. Never mistake this for a real 40-client Supabase load test.
