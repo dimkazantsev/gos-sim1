@@ -6,7 +6,33 @@ import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import {publicAchievementPreview} from './achievementPreview';
 
-export type Achievement={id:string;title:string;description:string;hidden:boolean;earned_at:string|null;progress:number};
+export type Achievement={id:string;title:string;description:string;hidden:boolean;earned_at:string|null;progress:number;checked_at?:string|null};
+
+// The daily snapshot becomes available at 04:00 in Novosibirsk (21:00 UTC).
+export function achievementRefreshDay(now=Date.now()){
+ return new Date(now+3*60*60*1000).toISOString().slice(0,10);
+}
+
+export function watchAchievementMorningRefresh(refresh:()=>void){
+ let day=achievementRefreshDay(),timer:ReturnType<typeof setTimeout>,disposed=false;
+ function schedule(){
+  const next=Date.parse(achievementRefreshDay()+'T21:00:00Z');
+  timer=setTimeout(check,next-Date.now()+15000+Math.floor(Math.random()*45000));
+ }
+ function check(){
+  clearTimeout(timer);
+  if(disposed)return;
+  const current=achievementRefreshDay();
+  if(document.visibilityState==='visible'&&current!==day){day=current;refresh()}
+  schedule();
+ }
+ function visible(){
+  if(document.visibilityState!=='visible'||achievementRefreshDay()===day)return;
+  clearTimeout(timer);timer=setTimeout(check,15000+Math.floor(Math.random()*45000));
+ }
+ schedule();document.addEventListener('visibilitychange',visible);
+ return()=>{disposed=true;clearTimeout(timer);document.removeEventListener('visibilitychange',visible)};
+}
 
 function medalSrc(id:string){
  return (process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'')+'/medals/'+id+'.svg?v=20261003';
@@ -32,12 +58,19 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
  const [expanded,setExpanded]=useState(!defaultCollapsed);
  const contentId=useId();
  const [counts,setCounts]=useState({total:100,open:60,hidden:40});
+ const [loadedScope,setLoadedScope]=useState('');
+ const [checkedAt,setCheckedAt]=useState<string|null>(null);
+ const scope=gameId+':'+userId+':'+previewOnly;
 
  useEffect(()=>setFilter('earned'),[gameId,userId,previewOnly,showCatalog]);
  useEffect(()=>setExpanded(!defaultCollapsed),[gameId,userId,defaultCollapsed]);
  useEffect(()=>{
-  let live=true;
+  let live=true,running=false,viewerId:string|null|undefined;
+  setItems([]);setLoadedScope('');setCheckedAt(null);setError('');
   async function load(){
+   if(!live||running)return;
+   running=true;
+   try{
    const [r,c]=await Promise.all([
     supabase.rpc('get_game_achievements',{p_game_id:gameId,p_user_id:userId}),
     supabase.rpc('get_achievement_catalog_counts',{p_game_id:gameId})
@@ -46,17 +79,27 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
    if(r.error)setError(userError(r.error));
    else{
     setItems(previewOnly?publicAchievementPreview((r.data||[]) as Achievement[]):r.data||[]);
+    setLoadedScope(scope);setCheckedAt(r.data?.[0]?.checked_at||null);
     if(!c.error&&c.data)setCounts(c.data);
     setError('');
    }
+   }catch(e){if(live)setError(userError(e))}
+   finally{running=false}
   }
   void load();
-  // Avoid repeated expensive achievement facts while the collection is collapsed.
-  const timer=setInterval(()=>{if(document.visibilityState==='visible'&&(!defaultCollapsed||expanded))void load()},300000+Math.floor(Math.random()*60000));
-  return()=>{live=false;clearInterval(timer)};
- },[gameId,userId,previewOnly,defaultCollapsed,expanded]);
+  const stopMorning=watchAchievementMorningRefresh(()=>void load());
+  const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
+   const next=session?.user.id||null;
+   if(event==='SIGNED_OUT'||viewerId!==undefined&&next!==viewerId){
+    live=false;stopMorning();setItems([]);setLoadedScope('');setCheckedAt(null);setError('');
+   }
+   viewerId=next;
+  });
+  return()=>{live=false;stopMorning();subscription.unsubscribe()};
+ },[gameId,userId,previewOnly]);
 
- const visibleItems=previewOnly?publicAchievementPreview(items):items;
+ const scopedItems=loadedScope===scope?items:[];
+ const visibleItems=previewOnly?publicAchievementPreview(scopedItems):scopedItems;
  const earned=visibleItems.filter(x=>x.earned_at);
  const hiddenEarned=earned.filter(x=>x.hidden);
  const shown=filter==='earned'?earned:visibleItems.filter(x=>!x.hidden||!!x.earned_at);
@@ -68,7 +111,8 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
    <div className="awardShelfIntro">
     <small>ДОСТИЖЕНИЯ ГОС.ID</small>
     <h2><Trophy size={24}/> Награды</h2>
-    <p>Полученные достижения и доступные условия. Награды не изменяют ВСН.</p>
+    <p>Достижения обновляются ночью с 03:00 до 04:00 по Новосибирску. Результаты сегодняшней игры появятся здесь утром. Награды не изменяют ВСН.</p>
+    {!previewOnly&&loadedScope===scope&&<p>{checkedAt?'Последнее обновление: '+new Date(checkedAt).toLocaleString('ru-RU',{timeZone:'Asia/Novosibirsk',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+' (Новосибирск).':'Первое обновление достижений ещё не завершено.'}</p>}
     {defaultCollapsed&&<div className="awardShelfActions">
      <button type="button" className="awardShelfToggle" aria-expanded={expanded} aria-controls={contentId} onClick={()=>{if(!expanded)setFilter('earned');setExpanded(open=>!open)}}>{expanded?'Свернуть награды':'Показать награды'}<ChevronDown size={16} className={expanded?'is-expanded':''} aria-hidden="true"/></button>
      {showCatalog&&!expanded&&<button type="button" className="awardShelfCatalogButton" aria-expanded={expanded} aria-controls={contentId} onClick={()=>{setFilter('open');setExpanded(true)}}>Все награды <Award size={16} aria-hidden="true"/></button>}
@@ -87,7 +131,7 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
 
   {error&&<p className="awardError" role="alert">{error}</p>}
   <div id={contentId} hidden={!expanded}>
-  {!shown.length&&filter==='earned'&&<div className="awardEmpty"><Award size={28}/><div><b>Пока нет открытых достижений</b><span>Они появятся здесь после выполнения игровых условий.</span></div></div>}
+  {!shown.length&&filter==='earned'&&<div className="awardEmpty"><Award size={28}/><div><b>Пока нет открытых достижений</b><span>Достижения появятся после ночного обновления, когда выполнены игровые условия.</span></div></div>}
 
   <div className="awardGrid">
    {shown.map(a=>{
@@ -120,44 +164,53 @@ export function AwardShelf({gameId,userId,showCatalog=true,previewOnly=false,def
 
 export function AchievementCelebration({gameId,userId,enabled}:{gameId:string;userId?:string;enabled:boolean}){
  const [award,setAward]=useState<Achievement|null>(null);
+ const [awardScope,setAwardScope]=useState('');
  const active=useRef(false);
 
  useEffect(()=>{
   active.current=false;setAward(null);
   if(!enabled||!userId)return;
   let live=true;
+  const receiptKey='gos:achievement-notice:'+gameId+':'+userId;
+  let checkedDay='';
   const running={current:false};
-  async function check(evaluate:boolean){
+  async function check(){
    if(!live||running.current||active.current||document.visibilityState==='hidden')return;
+   const day=achievementRefreshDay();
+   if(checkedDay===day)return;
+   try{if(window.sessionStorage.getItem(receiptKey)===day)return}catch{}
+   checkedDay=day;
+   try{window.sessionStorage.setItem(receiptKey,day)}catch{/* One attempt per mounted session if storage is unavailable. */}
    running.current=true;
    try{
-    // A single facts evaluation touches many tables. Do not repeat it on every
-    // lightweight notification poll or for multiple hidden tabs.
-    if(evaluate){
-     const a=await supabase.rpc('evaluate_game_achievements',{p_game_id:gameId});
-     if(!live||a.error)return;
-    }
     const r=await supabase.rpc('claim_achievement_notification',{p_game_id:gameId});
     if(!live)return;
     if(r.error)return;
-    if(r.data){active.current=true;setAward(r.data)}
+    if(r.data){active.current=true;setAwardScope(gameId+':'+userId);setAward(r.data)}
    }catch{/* Rewards are optional: connection failures must not cover game controls. */}
    finally{running.current=false}
   }
-  // Award evaluation is expensive for PostgreSQL: spread first checks after login
-  // and preserve automatic delivery with a slower visible-tab recovery cadence.
-  const firstClaim=setTimeout(()=>void check(false),3000+Math.floor(Math.random()*17000));
-  const firstEvaluation=setTimeout(()=>void check(true),60000+Math.floor(Math.random()*60000));
-  const claimTimer=setInterval(()=>void check(false),120000+Math.floor(Math.random()*30000));
-  const evaluationTimer=setInterval(()=>void check(true),540000+Math.floor(Math.random()*60000));
-  return()=>{live=false;clearTimeout(firstClaim);clearTimeout(firstEvaluation);clearInterval(claimTimer);clearInterval(evaluationTimer)};
+  let firstClaim=setTimeout(()=>void check(),3000+Math.floor(Math.random()*17000));
+  const stopMorning=watchAchievementMorningRefresh(()=>void check());
+  const resume=()=>{
+   if(document.visibilityState!=='visible')return;
+   clearTimeout(firstClaim);firstClaim=setTimeout(()=>void check(),3000+Math.floor(Math.random()*17000));
+  };
+  document.addEventListener('visibilitychange',resume);
+  const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
+   if(event==='SIGNED_OUT'||session&&session.user.id!==userId){
+    live=false;clearTimeout(firstClaim);stopMorning();active.current=false;setAward(null);
+    try{window.sessionStorage.removeItem(receiptKey)}catch{}
+   }
+  });
+  return()=>{live=false;clearTimeout(firstClaim);stopMorning();document.removeEventListener('visibilitychange',resume);subscription.unsubscribe()};
  },[gameId,userId,enabled]);
 
  function close(){active.current=false;setAward(null)}
  useEffect(()=>{if(!award)return;const timer=setTimeout(close,7000);return()=>clearTimeout(timer)},[award?.id]);
 
  if(!enabled)return null;
- if(!award)return null;
+ if(!award||awardScope!==gameId+':'+userId)return null;
 
  return <aside className="achievementBurst steamAchievementToast" role="status" aria-live="polite">
   <Medal id={award.id} title={award.title} earned/>

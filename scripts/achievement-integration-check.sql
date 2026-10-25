@@ -1,6 +1,11 @@
--- Isolated classroom, authenticated RPC checks, complete rollback, no real IDs in source.
+-- Isolated database only: the private nightly worker selects from the whole roster.
+-- A teacher-owned 8.414 source fixture is required; no other students may exist.
+-- Never run this test against production. All synthetic changes are rolled back.
 begin;
 do $$declare g uuid:=gen_random_uuid();admin uuid;a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();begin
+ if exists(select 1 from public.game_members where kind='student') then
+  raise exception 'QA requires an isolated database without non-QA students; nightly worker is project-wide';
+ end if;
  select owner_id into admin from public.games where game_code='8.414';
  -- Two temporary identities avoid inheriting platform-admin rights. Both are
  -- rolled back; real users, logins and classroom roles are never changed.
@@ -14,16 +19,30 @@ do $$declare g uuid:=gen_random_uuid();admin uuid;a uuid:=gen_random_uuid();b uu
  perform set_config('qa.game',g::text,true);perform set_config('qa.teacher',admin::text,true);perform set_config('qa.a',a::text,true);perform set_config('qa.b',b::text,true);
 end$$;
 set local role authenticated;
-do $$declare g uuid:=current_setting('qa.game')::uuid;a uuid:=current_setting('qa.a')::uuid;admin uuid:=current_setting('qa.teacher')::uuid;b uuid:=current_setting('qa.b')::uuid;r jsonb;d uuid;o uuid;n integer;before_count integer;blocked boolean;seen text[]:='{}';next_notice jsonb;begin
+do $$declare g uuid:=current_setting('qa.game')::uuid;a uuid:=current_setting('qa.a')::uuid;admin uuid:=current_setting('qa.teacher')::uuid;r jsonb;d uuid;o uuid;blocked boolean;begin
  perform set_config('request.jwt.claim.sub',a::text,true);
  r:=public.get_game_achievements(g);if jsonb_array_length(r)<>60 or exists(select 1 from jsonb_array_elements(r) x where (x->>'hidden')::boolean) then raise exception 'FAIL hidden conditions exposed before earning';end if;
  blocked:=false;begin insert into game_achievements(game_id,user_id,achievement_id) values(g,a,'medal-099');exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL client forged achievement';end if;
  blocked:=false;begin perform private.achievement_facts(g,a);exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL client invoked protected facts';end if;
+ blocked:=false;begin perform private.run_nightly_achievements();exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL client invoked nightly worker';end if;
  d:=public.create_formal_document(g,1,'QA законопроект','fz_bill','gd_deputy','Депутат Государственной Думы','Статья 1. Учебный текст документа.',null,null,null,'bill','{}');
  perform set_config('request.jwt.claim.sub',admin::text,true);o:=public.appoint_game_office(g,a,'Глава муниципального образования','QA lawful document role',true);
  perform set_config('request.jwt.claim.sub',a::text,true);perform public.select_game_office(o);
  d:=public.create_formal_document(g,1,'QA муниципальный акт','municipal_act','municipality','Муниципальный орган','Решение по вопросу местного значения.',null,null,null,'municipal_act','{}');
- n:=public.evaluate_game_achievements(g);if n<3 then raise exception 'FAIL action evidence did not award medals: %',n;end if;
+ if public.evaluate_game_achievements(g)<>0 or exists(select 1 from game_achievements where game_id=g and user_id=a) then raise exception 'FAIL daytime compatibility call awarded medals';end if;
+ r:=public.get_game_achievements(g);if exists(select 1 from jsonb_array_elements(r) x where (x->>'progress')::numeric<>0 or x->>'checked_at' is not null) then raise exception 'FAIL progress fabricated before nightly calculation';end if;
+end$$;
+reset role;
+do $$declare g uuid:=current_setting('qa.game')::uuid;a uuid:=current_setting('qa.a')::uuid;night timestamptz:=(((clock_timestamp() at time zone 'UTC')::date+time '20:01') at time zone 'UTC');begin
+ if exists(select 1 from game_members where kind='student' and game_id<>g) then raise exception 'FAIL nightly test lost roster isolation';end if;
+ if private.run_nightly_achievements(night)<>1 or private.run_nightly_achievements(night+interval '1 minute')<>1 then raise exception 'FAIL two bounded nightly batches';end if;
+ if private.run_nightly_achievements(night+interval '2 minutes')<>0 then raise exception 'FAIL same-night duplicate evaluation';end if;
+ if (select count(*) from game_achievements where game_id=g and user_id=a)<3 then raise exception 'FAIL action evidence did not award medals at night';end if;
+ if not exists(select 1 from private.achievement_snapshots where game_id=g and user_id=a and checked_at in(night,night+interval '1 minute')) then raise exception 'FAIL nightly snapshot missing';end if;
+end$$;
+set local role authenticated;
+do $$declare g uuid:=current_setting('qa.game')::uuid;a uuid:=current_setting('qa.a')::uuid;admin uuid:=current_setting('qa.teacher')::uuid;b uuid:=current_setting('qa.b')::uuid;r jsonb;before_count integer;blocked boolean;seen text[]:='{}';next_notice jsonb;begin
+ perform set_config('request.jwt.claim.sub',a::text,true);
  select count(*) into before_count from game_achievements where game_id=g and user_id=a;
  if public.evaluate_game_achievements(g)<>0 or before_count<>(select count(*) from game_achievements where game_id=g and user_id=a) then raise exception 'FAIL repeated award';end if;
  r:=public.get_game_achievements(g);if not exists(select 1 from jsonb_array_elements(r) x where (x->>'hidden')::boolean and x->>'earned_at' is not null) then raise exception 'FAIL earned hidden medal stays invisible';end if;
@@ -47,5 +66,5 @@ end$$;
 set local role anon;
 do $$declare blocked boolean:=false;begin begin perform public.get_game_achievements(current_setting('qa.game')::uuid);exception when others then blocked:=true;end;if not blocked then raise exception 'FAIL anonymous medal access';end if;end$$;
 reset role;
-select jsonb_build_object('public_60_hidden_40','PASS','authoritative_conditions','PASS','earned_hidden_visible','PASS','client_forgery_denied','PASS','repeat_award_denied','PASS','notification_once','PASS','teacher_not_awarded','PASS','foreign_game_denied','PASS','server_presence_clock','PASS','idle_gap_excluded','PASS','anonymous_denied','PASS') checks;
+select jsonb_build_object('public_60_hidden_40','PASS','authoritative_conditions','PASS','daytime_evaluation_disabled','PASS','nightly_snapshot','PASS','client_worker_denied','PASS','earned_hidden_visible','PASS','client_forgery_denied','PASS','repeat_award_denied','PASS','notification_once','PASS','teacher_not_awarded','PASS','foreign_game_denied','PASS','server_presence_clock','PASS','idle_gap_excluded','PASS','anonymous_denied','PASS') checks;
 rollback;
