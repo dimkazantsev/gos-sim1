@@ -1,9 +1,10 @@
-name: ГОС.ID · Обучение: Контраст И Прокрутка
+name: 'ГОС.ID · Обучение: контраст и прокрутка'
 on:
   pull_request:
     paths:
       - 'components/game/GuidedTour.tsx'
       - 'components/game/GuidedTour.module.css'
+      - 'components/game/tourPlacement.ts'
       - 'scripts/guided-tour-dock-browser-check.cjs'
       - '.github/workflows/guided-tour-mobile-regression.yml'
   push:
@@ -11,6 +12,7 @@ on:
     paths:
       - 'components/game/GuidedTour.tsx'
       - 'components/game/GuidedTour.module.css'
+      - 'components/game/tourPlacement.ts'
       - 'scripts/guided-tour-dock-browser-check.cjs'
   workflow_dispatch:
 permissions:
