@@ -1,0 +1,47 @@
+name: A07 isolated PostgreSQL concurrency
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/impact-concurrency-postgres-check.cjs'
+      - 'supabase/migrations/20261025003300_lock_concurrent_impact_metric_updates.sql'
+      - '.github/workflows/a07-isolated-concurrency.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  forty-concurrent-actions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: a07_fixture
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d a07_fixture"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client if missing
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+      - name: Verify 40 isolated concurrent metric and party increments
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: ci-only-password
+          PGDATABASE: a07_fixture
+        run: node scripts/impact-concurrency-postgres-check.cjs
