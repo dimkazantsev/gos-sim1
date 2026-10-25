@@ -53,6 +53,8 @@ on:
       - 'components/game/sessionDeletionGuard.ts'
       - 'scripts/session-deletion-guard-check.cjs'
       - 'scripts/session-maintenance-reentry-check.cjs'
+      - 'scripts/impact-concurrency-contract-check.cjs'
+      - 'supabase/migrations/20261025003300_lock_concurrent_impact_metric_updates.sql'
       - 'components/game/RepublicComic.tsx'
       - 'components/game/RepublicComic.module.css'
       - 'components/game/stageComicModel.ts'
@@ -390,6 +392,7 @@ jobs:
       - run: node scripts/stage4-committees-layout-browser-check.cjs
       - run: node scripts/session-deletion-guard-check.cjs
       - run: node scripts/session-maintenance-reentry-check.cjs
+      - run: node scripts/impact-concurrency-contract-check.cjs
       - run: node --experimental-strip-types scripts/session-export-batches-check.mjs
       - run: node scripts/guided-tour-check.cjs
       - run: node scripts/document-input-check.cjs
