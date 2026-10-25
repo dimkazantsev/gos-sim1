@@ -28,24 +28,31 @@ assert(source.includes('},30000+pollJitter)'), 'Disconnected recovery remains on
 const focusStart=source.indexOf('  const recover=()=>{');
 const focusEnd=source.indexOf('  const visible=()=>{',focusStart);
 assert(focusStart>=0&&focusEnd>focusStart,'Focus recovery function is available');
-let focusClock=1_000_000,recoveryReads=0,widgetInvalidations=0;
+let focusClock=1_000_000,recoveryReads=0;
 const focusEnv={
  disposed:false,document:{visibilityState:'visible'},
  authUser:{current:'user-one'},acceptedMember:{current:{user_id:'user-one'}},
  Date:{now:()=>focusClock},lastRecoveryAt:0,
- hydrateActiveView(){recoveryReads++;return Promise.resolve()},
- notifyGameDataRefresh(){widgetInvalidations++},
- activeViewRef:{current:'stages'},refreshBudgetPulse(){},
- gameId:'game-one'
+ lastCoreSuccessAt:{current:0},
+ scheduleRealtimeReload(delay){assert.equal(delay,0);recoveryReads++}
 };
 vm.runInNewContext(source.slice(focusStart,focusEnd)+
  'recover();recover();document.visibilityState="hidden";recover();',focusEnv);
-assert.equal(recoveryReads,1,'Focus and visibility event burst causes one recovery');
-assert.equal(widgetInvalidations,1,'Only one stage invalidation per focus burst');
+assert.equal(recoveryReads,1,'Focus and visibility event burst schedules one core recovery');
 focusEnv.document.visibilityState='visible';
 focusClock+=1501;
 vm.runInNewContext('recover()',focusEnv);
-assert.equal(recoveryReads,2,'Recovery resumes after debounce interval');
+assert.equal(recoveryReads,1,'Recovery stays debounced within 30 seconds');
+focusClock+=30001;
+vm.runInNewContext('recover()',focusEnv);
+assert.equal(recoveryReads,2,'Recovery resumes after the 30-second debounce');
+focusEnv.lastCoreSuccessAt.current=focusClock;
+focusClock+=30001;
+vm.runInNewContext('recover()',focusEnv);
+assert.equal(recoveryReads,2,'Recently successful core reads suppress redundant recovery');
+focusClock+=90001;
+vm.runInNewContext('recover()',focusEnv);
+assert.equal(recoveryReads,3,'Stale core reads recover after the 90-second threshold');
 
 const cleanupSql=fs.readFileSync('supabase/migrations/20261021085946_chat_media_cleanup_skip_empty.sql','utf8');
 const operationalSql=fs.readFileSync('supabase/ops/chat_media_cleanup_schedule.sql','utf8');
