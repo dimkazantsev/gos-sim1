@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Vote} from './types';
 import StyledSelect from '../ui/StyledSelect';
@@ -44,9 +45,15 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    if(live&&!r.error){setCheckedIn(r.data||[]);setCheckinLoaded(true)}
   }
   void reload();
-  const channel=supabase.channel('vote-checkin:'+g.game.id)
-   .on('postgres_changes',{schema:'public',table:'institution_session_registrations',event:'*',filter:'game_id=eq.'+g.game.id},()=>void reload()).subscribe();
-  return()=>{live=false;void supabase.removeChannel(channel)};
+  // Registration changes arrive through the shared game socket.
+  let pending:ReturnType<typeof setTimeout>|undefined;
+  const changed=(event:Event)=>{
+   const detail=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
+   if(detail?.gameId!==g.game?.id||(detail.table&&detail.table!=='institution_session_registrations')||pending!==undefined)return;
+   pending=setTimeout(()=>{pending=undefined;if(live)void reload()},450);
+  };
+  window.addEventListener(GAME_DATA_REFRESH_EVENT,changed);
+  return()=>{live=false;clearTimeout(pending);window.removeEventListener(GAME_DATA_REFRESH_EVENT,changed)};
  },[g.game?.id]);
  function voteNeedsRegistration(v:Vote){
   return !!v.electorate_snapshot?.attendance_required||['registered_session','presidential_system','sf_resolution','government_nomination'].includes(v.procedure_key||'');

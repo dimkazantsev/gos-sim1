@@ -2,6 +2,7 @@
 import {scenarioUnit,scenarioMoney} from '@/lib/formatQuantity';
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
 import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
 
@@ -61,17 +62,9 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
   if(!a.error)setAllocations((a.data||[]) as ProgramAllocation[]);
   if(!p.error)setAdoptedPrograms((p.data||[]) as AdoptedProgram[]);
  }
- useEffect(()=>{void load()},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('budget-lab:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'budget_scenarios',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'budget_workstreams',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'budget_program_allocations',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'state_programs',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ // The shared game socket plus bounded visible-tab reconciliation replaces
+ // four per-panel Postgres Changes subscriptions. Local writes still call load().
+ useGameTableSync(game?.id,['budget_scenarios','budget_workstreams','budget_program_allocations','state_programs'],load,'budget-lab');
 
  const selected=scenarios.find(s=>s.id===selectedId);
  useEffect(()=>{

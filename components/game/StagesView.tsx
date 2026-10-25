@@ -57,9 +57,16 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
    setDocumentHolds(Array.isArray(result.data)?result.data:[]);
   };
   void refresh();
-  const onRefresh=()=>void refresh();
+  let pending:ReturnType<typeof setTimeout>|undefined;
+  const onRefresh=(event:Event)=>{
+   const detail=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
+   if(detail?.gameId!==gameId||
+      (detail.table&&!['game_stages','formal_documents','game_votes'].includes(detail.table))||
+      pending!==undefined)return;
+   pending=setTimeout(()=>{pending=undefined;if(live)void refresh()},900);
+  };
   window.addEventListener(GAME_DATA_REFRESH_EVENT,onRefresh);
-  return()=>{live=false;window.removeEventListener(GAME_DATA_REFRESH_EVENT,onRefresh)}
+  return()=>{live=false;clearTimeout(pending);window.removeEventListener(GAME_DATA_REFRESH_EVENT,onRefresh)}
  },[g.game?.id,g.me?.user_id,g.me?.kind,teacher,readOnly,stageStatuses,documentStates]);
  const selectedHold=selected&&!teacher?documentHolds.find(h=>h.blocked_stage<=selected.stage_no):null;
  const current=stages.find(s=>isStageWorkOpen(g.game,s))||stages.find(s=>s.status!=='completed')||stages.at(-1);
