@@ -131,7 +131,7 @@ const env={
  me:{user_id:'regression-student'},
  gameId:'simulation',
  schedule(){changed++},
- liveConnected:false,lastPollAt:0,disposed:false,dirtyCore:false,dirtyOverview:false,dirtyChat:false,dirtyPins:false,
+ liveConnected:false,lastPollAt:0,backendRecoveryAfter:{current:0},disposed:false,dirtyCore:false,dirtyOverview:false,dirtyChat:false,dirtyPins:false,
  console
 };
 const script=snippet.slice(0,snippet.indexOf('  // Realtime handles unread counters while chat is closed.'));
@@ -149,4 +149,9 @@ clock+=30000;tick();
 assert.equal(changed,1,'Not every 30 seconds while connected');
 callback('CLOSED');tick();
 assert.equal(changed,2,'Disconnected client recovers on next normal poll');
+env.backendRecoveryAfter.current=clock+120000;
+clock+=30000;tick();
+assert.equal(changed,2,'Server backoff suppresses disconnected recovery requests');
+clock+=120001;tick();
+assert.equal(changed,3,'Disconnected recovery resumes after server backoff');
 console.log('PASS: 402 visible to user, connected 3-minute fallback, disconnected 30-40s recovery, game realtime events retained, syntax.');
