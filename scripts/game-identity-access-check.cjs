@@ -128,6 +128,17 @@ async function main(){
   `);
   await db.exec(teacherDefinition);
   await db.exec(listDefinition);
+  const blockedPatch=read('20261025083500_blocked_teacher_authority.sql');
+  const blockedTeacherDef=blockedPatch.match(/CREATE OR REPLACE FUNCTION private\.is_game_teacher\([\s\S]*?\$function\$;/i)?.[0];
+  const blockedListDef=blockedPatch.match(/CREATE OR REPLACE FUNCTION public\.list_my_teacher_games\([\s\S]*?\$function\$;/i)?.[0];
+  const blockedCreateDef=blockedPatch.match(/CREATE OR REPLACE FUNCTION public\.create_teacher_game_session\([\s\S]*?\$function\$;/i)?.[0];
+  assert(blockedTeacherDef&&blockedListDef&&blockedCreateDef,'All three blocked-teacher definitions exist');
+  assert.equal((blockedPatch.match(/game_member_access_blocks b/g)||[]).length,5,'Every membership privilege gate checks access blocks');
+  assert(/ALTER POLICY teacher_profile_authorized_insert[\s\S]*game_member_access_blocks/i.test(blockedPatch),'Profile INSERT also checks access blocks');
+  await db.exec("insert into public.game_member_access_blocks(game_id,user_id) values ('"+uuid(100)+"','"+uuid(11)+"')");
+  await db.exec("insert into public.game_members(game_id,user_id,kind,roster_archived_at) values ('"+uuid(100)+"','"+uuid(13)+"','teacher',null)");
+  await db.exec(blockedTeacherDef);
+  await db.exec(blockedListDef);
   const roleCall=async(user,sql)=>{
    await db.query("select set_config('request.jwt.claim.sub',$1,false)",[user==null?'':uuid(user)]);
    await db.exec('set role authenticated');
@@ -138,7 +149,8 @@ async function main(){
    [2,true,'Active teacher'],
    [9,true,'Permanent admin remains teacher even with archived membership'],
    [10,false,'Archived teacher retains profile but not game permissions'],
-   [11,true,'Other active invited teacher'],
+   [11,false,'Blocked active teacher denied game powers'],
+   [13,true,'Unblocked active teacher keeps game powers'],
    [1,false,'Student remains student despite a synthetic stored teacher profile'],
    [7,false,'Unrelated account'],
    [8,true,'Permanent admin without game membership']
@@ -148,6 +160,16 @@ async function main(){
     assert.equal(got,expected);
    });
   }
+  await check('Blocked teacher cannot open permanent cabinet',async()=>{
+   await assert.rejects(roleCall(11,'select public.list_my_teacher_games() as value'),/Доступ только преподавателю/);
+  });
+  await check('Unblocked teacher retains its game list',async()=>{
+   const index=await roleCall(13,'select public.list_my_teacher_games() as value');
+   assert.equal(index.games.length,1);
+  });
+  await check('Blocked teacher cannot read game identity',async()=>{
+   assert.deepEqual(await call(11),{game:null,member:null});
+  });
   await check('Archived teacher cannot open permanent teacher cabinet',async()=>{
    await assert.rejects(roleCall(10,'select public.list_my_teacher_games() as value'),/Доступ только преподавателю/);
   });
