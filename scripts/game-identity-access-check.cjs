@@ -97,6 +97,71 @@ async function main(){
     assert.deepEqual(await call(6),{game:null,member:null});
    });
   }
+
+  // Real active-teacher SQL from this migration, exercised in isolated PGlite.
+  // Archived membership must not preserve privileged RPC access; a stored
+  // teacher profile is personal data, not proof of currently held powers.
+  const authPatch=read('20261025071500_enforce_active_teacher_authorization.sql');
+  const teacherDefinition=authPatch.match(/CREATE OR REPLACE FUNCTION private\.is_game_teacher\([\s\S]*?\$function\$;/i)?.[0];
+  const listDefinition=authPatch.match(/CREATE OR REPLACE FUNCTION public\.list_my_teacher_games\([\s\S]*?\$function\$;/i)?.[0];
+  const creatorDefinition=authPatch.match(/CREATE OR REPLACE FUNCTION public\.create_teacher_game_session\([\s\S]*?\$function\$;/i)?.[0];
+  assert(teacherDefinition&&listDefinition&&creatorDefinition,'All three targeted production functions must be present');
+  assert(!/teacher_profiles/i.test(listDefinition),'Teacher profile does not grant global teacher access');
+  assert(!/teacher_profiles/i.test(creatorDefinition),'Stored profile does not authorize creating games');
+  assert(/roster_archived_at IS NULL/i.test(creatorDefinition),'Game creation requires active teacher membership');
+  assert(/roster_archived_at IS NULL/i.test(teacherDefinition),'Game teacher authorization rejects archived membership');
+  assert(/ALTER POLICY teacher_profile_authorized_insert[\s\S]*roster_archived_at IS NULL/i.test(authPatch),'Profile insert respects active membership');
+  await db.exec(`
+   alter table public.games add column status text default 'lobby';
+   alter table public.games add column owner_id uuid;
+   alter table public.games add column created_at timestamptz default now();
+   create table public.teacher_profiles(user_id uuid primary key);
+   insert into public.teacher_profiles values ('${uuid(1)}'),('${uuid(10)}');
+   insert into public.game_members(game_id,user_id,kind,roster_archived_at)
+    values ('${uuid(100)}','${uuid(10)}','teacher',now()),
+           ('${uuid(100)}','${uuid(11)}','teacher',null);
+   update public.games set owner_id='${uuid(12)}' where id='${uuid(101)}';
+   create function auth.jwt() returns jsonb language sql stable as
+    'select jsonb_build_object(''is_anonymous'',false)';
+   grant usage on schema private to authenticated;
+   grant select on public.games,public.game_members,public.teacher_profiles,public.platform_admins to authenticated;
+  `);
+  await db.exec(teacherDefinition);
+  await db.exec(listDefinition);
+  const roleCall=async(user,sql)=>{
+   await db.query("select set_config('request.jwt.claim.sub',$1,false)",[user==null?'':uuid(user)]);
+   await db.exec('set role authenticated');
+   try{return (await db.query(sql)).rows[0].value;}
+   finally{await db.exec('reset role');}
+  };
+  for(const [id,expected,label] of [
+   [2,true,'Active teacher'],
+   [9,true,'Permanent admin remains teacher even with archived membership'],
+   [10,false,'Archived teacher retains profile but not game permissions'],
+   [11,true,'Other active invited teacher'],
+   [1,false,'Student remains student despite a synthetic stored teacher profile'],
+   [7,false,'Unrelated account'],
+   [8,true,'Permanent admin without game membership']
+  ]){
+   await check(label+' in live teacher guard',async()=>{
+    const got=await roleCall(id,`select private.is_game_teacher('${uuid(100)}'::uuid) as value`);
+    assert.equal(got,expected);
+   });
+  }
+  await check('Archived teacher cannot open permanent teacher cabinet',async()=>{
+   await assert.rejects(roleCall(10,'select public.list_my_teacher_games() as value'),/Доступ только преподавателю/);
+  });
+  await check('Student cannot open permanent teacher cabinet through an unrelated profile',async()=>{
+   await assert.rejects(roleCall(1,'select public.list_my_teacher_games() as value'),/Доступ только преподавателю/);
+  });
+  await check('Permanent platform admin may open cabinet without a game',async()=>{
+   const index=await roleCall(8,'select public.list_my_teacher_games() as value');
+   assert.equal(index.is_admin,true);
+  });
+  await check('Game owner may open cabinet even without an active game membership',async()=>{
+   const index=await roleCall(12,'select public.list_my_teacher_games() as value');
+   assert.equal(index.games.length,1);
+  });
  }finally{await db.close();}
  console.log(`${passed} passed, ${failed} failed; isolated PostgreSQL, no live sessions or production mutations.`);
  if(failed)process.exitCode=1;
