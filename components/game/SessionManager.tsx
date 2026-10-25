@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useRef,useState} from 'react';
 import {Archive,ArrowRight,Download,ShieldAlert,Trash2} from 'lucide-react';
 import {userError} from '@/lib/userError';
 import {supabase} from '@/lib/supabase';
@@ -27,6 +27,8 @@ export default function SessionManager({session,isAdmin,disabled,currentGameId,o
  const [userId,setUserId]=useState('');
  const [backedUp,setBackedUp]=useState('');
  const [busy,setBusy]=useState(false);
+ // React state commits asynchronously. Block a second click synchronously.
+ const operationRef=useRef(false);
  const [notice,setNotice]=useState('');
  const [progress,setProgress]=useState('');
  const mayManage=session.is_owner||isAdmin;
@@ -51,11 +53,16 @@ export default function SessionManager({session,isAdmin,disabled,currentGameId,o
   if(result.data.owner_id!==id&&!isAdmin)throw Error('Действие доступно только владельцу игры.');
   return {code:String(result.data.game_code),id};
  }
- function lock(){setBusy(true);onBusyChange(session.id)}
- function unlock(){setBusy(false);onBusyChange(null)}
+ function lock(){
+  if(operationRef.current)return false;
+  operationRef.current=true;
+  setBusy(true);onBusyChange(session.id);
+  return true;
+ }
+ function unlock(){operationRef.current=false;setBusy(false);onBusyChange(null)}
  async function exportOne(format:'json'|'zip'|'html'){
-  if(disabled||busy||!mayManage)return;
-  lock();setNotice('');setProgress('Подготавливаем архив…');
+  if(disabled||busy||!mayManage||!lock())return;
+  setNotice('');setProgress('Подготавливаем архив…');
   try{
    const {code,id}=await readCode();
    const suffix=code.replace(/[^a-zA-Zа-яА-Я0-9-]/g,'_');
@@ -77,9 +84,10 @@ export default function SessionManager({session,isAdmin,disabled,currentGameId,o
   finally{unlock();setProgress('')}
  }
  async function openDelete(){
-  if(disabled||busy||!mayManage)return;
+  if(disabled||busy||!mayManage||operationRef.current)return;
   if(selected){setSelected(false);setTyped('');setConfirmed(false);setNotice('');return}
-  lock();setNotice('');
+  if(!lock())return;
+  setNotice('');
   try{
    const {code,id}=await readCode();
    setUserId(id);setGameCode(code);setSelected(true);setTyped('');setConfirmed(false);
@@ -87,11 +95,12 @@ export default function SessionManager({session,isAdmin,disabled,currentGameId,o
   finally{unlock()}
  }
  async function deleteOne(){
-  if(!deleteAllowed||!selected||!mayManage)return;
+  if(!deleteAllowed||!selected||!mayManage||operationRef.current)return;
   if(!backupReady){setNotice('Сначала подготовьте свежую полную ZIP-копию этой игры.');return}
-  if(!window.confirm('Вы действительно хотите безвозвратно удалить игру «'+session.title+'»? Будут удалены участники, оценки, документы, события, сообщения и файлы игры. Личный профиль преподавателя, фотография и подпись сохраняются.'))return;
-  lock();setNotice('');
+  if(!lock())return;
   try{
+   if(!window.confirm('Вы действительно хотите безвозвратно удалить игру «'+session.title+'»? Будут удалены участники, оценки, документы, события, сообщения и файлы игры. Личный профиль преподавателя, фотография и подпись сохраняются.'))return;
+   setNotice('');
    const {code,id}=await readCode();
    if(code!==gameCode||typed!==code)throw Error('Код игры изменился. Повторите подтверждение удаления.');
    const first=await supabase.rpc('prepare_game_deletion',{p_game:session.id,p_code:code});
