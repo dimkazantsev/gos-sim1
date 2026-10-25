@@ -141,7 +141,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
    <StageMeetingProcedureFlow stage={stage} votesCount={votes.length} onOpenVotes={()=>onOpenVotes()} onOpenDocuments={()=>setTab('materials')}/>
    {scoringClosed&&<section className="stageFinalWorkPrompt" role="alert" aria-label="Оценочный срок завершён">
     <div><FileText size={19} aria-hidden="true"/><span><b>Оценочный срок завершён. Этап продлён автоматически</b><small>Новые баллы ВСН больше не начисляются. Оформите обязательные итоговые документы — это необходимо для завершения этапа. {awaitingFinalDocuments.length?'Осталось: '+awaitingFinalDocuments.length+'.':'Все итоговые документы подготовлены, проверьте оставшиеся процедуры.'}</small></span></div>
-   </section>
+   </section>}
    {viewer&&<p className="stageOperationsNotice" role="status">{readOnly?'Просмотр участника. Изменение данных отключено.':g.me?.kind==='observer'?'Гостевой просмотр. Рабочие действия доступны назначенным участникам.':stageLocked?'Этап завершён или ещё не открыт. Изменение данных недоступно до решения преподавателя.':''}</p>}
    {bodies&&stage.stage_no!==12&&<div className="stageOperationsRegistration"><InstitutionRegistrationPanel g={g} readOnly={stage.stage_no===2||stage.stage_no===3?readOnly||g.me?.kind==='observer':viewer} stageNo={stage.stage_no} initialBody={bodies[0]} allowedBodies={bodies} onOpenDocument={onOpenDocument} onMeetingReadyChange={onMeetingReadyChange}/></div>}
    {ksrfSessionBlocked&&!viewer&&<p className="stageOperationsNotice" role="status">Действия КСРФ станут доступны после утверждения повестки и вашей регистрации на заседание. Сначала выполните эти действия в блоке выше.</p>}
