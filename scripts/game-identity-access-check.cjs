@@ -102,15 +102,15 @@ async function main(){
   // Archived membership must not preserve privileged RPC access; a stored
   // teacher profile is personal data, not proof of currently held powers.
   const authPatch=read('20261025071500_enforce_active_teacher_authorization.sql');
-  const teacherDefinition=authPatch.match(/CREATE OR REPLACE FUNCTION private\\.is_game_teacher\\([\\s\\S]*?\\$function\\$;/i)?.[0];
-  const listDefinition=authPatch.match(/CREATE OR REPLACE FUNCTION public\\.list_my_teacher_games\\([\\s\\S]*?\\$function\\$;/i)?.[0];
-  const creatorDefinition=authPatch.match(/CREATE OR REPLACE FUNCTION public\\.create_teacher_game_session\\([\\s\\S]*?\\$function\\$;/i)?.[0];
+  const teacherDefinition=authPatch.match(/CREATE OR REPLACE FUNCTION private\.is_game_teacher\([\s\S]*?\$function\$;/i)?.[0];
+  const listDefinition=authPatch.match(/CREATE OR REPLACE FUNCTION public\.list_my_teacher_games\([\s\S]*?\$function\$;/i)?.[0];
+  const creatorDefinition=authPatch.match(/CREATE OR REPLACE FUNCTION public\.create_teacher_game_session\([\s\S]*?\$function\$;/i)?.[0];
   assert(teacherDefinition&&listDefinition&&creatorDefinition,'All three targeted production functions must be present');
   assert(!/teacher_profiles/i.test(listDefinition),'Teacher profile does not grant global teacher access');
   assert(!/teacher_profiles/i.test(creatorDefinition),'Stored profile does not authorize creating games');
   assert(/roster_archived_at IS NULL/i.test(creatorDefinition),'Game creation requires active teacher membership');
   assert(/roster_archived_at IS NULL/i.test(teacherDefinition),'Game teacher authorization rejects archived membership');
-  assert(/ALTER POLICY teacher_profile_authorized_insert[\\s\\S]*roster_archived_at IS NULL/i.test(authPatch),'Profile insert respects active membership');
+  assert(/ALTER POLICY teacher_profile_authorized_insert[\s\S]*roster_archived_at IS NULL/i.test(authPatch),'Profile insert respects active membership');
   await db.exec(`
    alter table public.games add column status text default 'lobby';
    alter table public.games add column owner_id uuid;
@@ -122,7 +122,7 @@ async function main(){
            ('${uuid(100)}','${uuid(11)}','teacher',null);
    update public.games set owner_id='${uuid(12)}' where id='${uuid(101)}';
    create function auth.jwt() returns jsonb language sql stable as
-    $ select '{"is_anonymous":false}'::jsonb $;
+    'select jsonb_build_object(''is_anonymous'',false)';
    grant usage on schema private to authenticated;
    grant select on public.games,public.game_members,public.teacher_profiles,public.platform_admins to authenticated;
   `);
