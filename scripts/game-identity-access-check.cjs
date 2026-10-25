@@ -184,6 +184,27 @@ async function main(){
    const index=await roleCall(12,'select public.list_my_teacher_games() as value');
    assert.equal(index.games.length,1);
   });
+
+  const normalizedNameSql=read('20261025090500_owner_name_whitespace_regex.sql');
+  const nameFilters=[...normalizedNameSql.matchAll(/regexp_replace\((?:btrim\(tp\.full_name\)|v_name),'([^']+)',' ','g'\)/g)];
+  assert.deepEqual(nameFilters.map(match=>match[1]),['[[:space:]]+','[[:space:]]+'],'Both sides must canonicalize all whitespace consistently');
+  assert(normalizedNameSql.includes('tp.user_id<>v_uid'),'Protect the existing owner-only exception');
+  assert(normalizedNameSql.includes('ic.kind=p_expected_kind'),'Keep invite-role matching on the server');
+  for(const [label,incoming,expected] of [
+   ['One extra space in protected FIO','Казанцев  Дмитрий Анатольевич',true],
+   ['Several spaces in protected FIO','Казанцев   Дмитрий  Анатольевич',true],
+   ['Tab between parts of protected FIO','Казанцев\tДмитрий Анатольевич',true],
+   ['Line break in protected FIO','Казанцев\nДмитрий Анатольевич',true],
+   ['Unrelated display name','Петров Пётр Петрович',false]
+  ]){
+   await check('Owner-name guard: '+label,async()=>{
+    const result=await db.query(
+     "select lower(regexp_replace(btrim($1),'[[:space:]]+',' ','g')) = lower(regexp_replace(btrim($2),'[[:space:]]+',' ','g')) as same",
+     ['Казанцев Дмитрий Анатольевич',incoming]
+    );
+    assert.equal(result.rows[0].same,expected);
+   });
+  }
  }finally{await db.close();}
  console.log(`${passed} passed, ${failed} failed; isolated PostgreSQL, no live sessions or production mutations.`);
  if(failed)process.exitCode=1;
