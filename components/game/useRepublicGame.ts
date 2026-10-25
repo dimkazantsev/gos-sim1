@@ -274,7 +274,11 @@ export function useRepublicGame(gameId:string){
    if(core)scheduleRealtimeReload();
    for(const table of tables)notifyGameDataRefresh(gameId,table);
    // A post updates only the visible wall; it must not reload game identity.
-   if(tables.includes('political_posts')&&activeViewRef.current==='actions')void loadPoliticalWall();
+   if(tables.includes('political_posts')&&['actions','dashboard'].includes(activeViewRef.current))void loadPoliticalWall();
+   // Only visible parties and registry screens fetch their dependent details.
+   if(tables.some(table=>['party_invitations','party_chair_ballots','game_parties'].includes(table))
+      &&['parties','teacher'].includes(activeViewRef.current))void loadPartyRepresentation(false);
+   if(tables.includes('formal_documents')&&activeViewRef.current==='documents')void loadFormalRegistry();
    // A document version changes no core identity or party membership.
    if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments();
     if(partyDocs)notifySectionUpdates(gameId);
@@ -289,6 +293,13 @@ export function useRepublicGame(gameId:string){
    // Collapse bursts in the same JS turn without delaying the first update.
    void Promise.resolve().then(()=>{scheduled=false;flush()});
   }
+  // Events received while hidden remain dirty and reconcile on return;
+  // clearing the flags while hidden would silently lose these updates.
+  const resumePending=()=>{
+   if(document.visibilityState==='visible'&&
+     (dirtyCore||dirtyTables.size>0||dirtyPartyDocuments||dirtyChat||dirtyPins||dirtyOverview))schedule();
+  };
+  document.addEventListener('visibilitychange',resumePending);
   const channel=supabase.channel('gos-id-live:'+gameId+':'+me.user_id);
   // State pulse: reuse the existing game channel. One UPDATE notification
   // replaces a 15-query core reload for all connected classroom clients.
@@ -402,6 +413,7 @@ export function useRepublicGame(gameId:string){
   },6000);
   return()=>{
    disposed=true;clearTimeout(timer);clearInterval(poll);clearInterval(chatRecovery);
+   document.removeEventListener('visibilitychange',resumePending);
    setGameRealtimeConnection(gameId,false);
    if(liveRef.current===channel)liveRef.current=null;
    void supabase.removeChannel(channel);
