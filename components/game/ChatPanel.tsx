@@ -69,7 +69,20 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  },[g.game?.id,socialChannelsReady]);
  const [sending,setSending]=useState(false);
  const [retentionClock,setRetentionClock]=useState(()=>Date.now());
- useEffect(()=>{const id=window.setInterval(()=>setRetentionClock(Date.now()),15000);return()=>window.clearInterval(id)},[]);
+ useEffect(()=>{
+  // Schedule only for the next expiring voice/video message; ordinary chat
+  // must not rerender every 15 seconds on every participant's device.
+  const expiryTimes=[...messages,...allPinnedMessages]
+   .filter(m=>m.channel_id===channelId&&(m.kind==='audio'||m.kind==='video'))
+   .map(m=>new Date(m.created_at).getTime()+60*60*1000)
+   .filter(expiry=>Number.isFinite(expiry)&&expiry>Date.now());
+  if(!expiryTimes.length)return;
+  const nextExpiry=Math.min(...expiryTimes);
+  const refresh=()=>setRetentionClock(Date.now());
+  // setTimeout is bounded by the browser's 32-bit timer limit.
+  const id=window.setTimeout(refresh,Math.min(2147483647,Math.max(1,nextExpiry-Date.now()+25)));
+  return()=>window.clearTimeout(id);
+ },[messages,allPinnedMessages,channelId,retentionClock]);
  const [uploading,setUploading]=useState(false);
  const [recordElapsed,setRecordElapsed]=useState(0);
  const [overlay,setOverlay]=useState(false);
