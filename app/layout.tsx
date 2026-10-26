@@ -54,6 +54,7 @@ import './meeting-agenda-canonical.css';
 import './stage6-election-workspace.css';
 import './stage6-cec-workspace-polish.css';
 import './vote-ballot-panel.css';
+import './mobile-layout-stability.css';
 import './2026-bill-dossier-design.css';
 import './2026-stage12-synced-agenda.css';
 import './party-mobile-header-compact.css';
