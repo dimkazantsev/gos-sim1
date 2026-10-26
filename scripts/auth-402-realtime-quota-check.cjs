@@ -33,7 +33,8 @@ const focusEnv={
  disposed:false,document:{visibilityState:'visible'},
  authUser:{current:'user-one'},acceptedMember:{current:{user_id:'user-one'}},
  Date:{now:()=>focusClock},lastRecoveryAt:0,
- hydrateActiveView(){recoveryReads++;return Promise.resolve()},
+ lastCoreSuccessAt:{current:0},realtimeDirtyTables:{current:new Set()},
+ scheduleRealtimeReload(){recoveryReads++},
  notifyGameDataRefresh(){widgetInvalidations++},
  activeViewRef:{current:'stages'},refreshBudgetPulse(){},
  gameId:'game-one'
@@ -41,9 +42,12 @@ const focusEnv={
 vm.runInNewContext(source.slice(focusStart,focusEnd)+
  'recover();recover();document.visibilityState="hidden";recover();',focusEnv);
 assert.equal(recoveryReads,1,'Focus and visibility event burst causes one recovery');
-assert.equal(widgetInvalidations,1,'Only one stage invalidation per focus burst');
+assert.equal(widgetInvalidations,0,'Focus recovery does not broadcast unrelated widget invalidations');
 focusEnv.document.visibilityState='visible';
 focusClock+=1501;
+vm.runInNewContext('recover()',focusEnv);
+assert.equal(recoveryReads,1,'Focus noise inside the upstream 30-second window does not reload');
+focusClock+=30000;
 vm.runInNewContext('recover()',focusEnv);
 assert.equal(recoveryReads,2,'Recovery resumes after debounce interval');
 
@@ -68,14 +72,14 @@ assert(gameTableSync.includes("export const SECTION_UPDATES_REFRESH_EVENT='gos-s
  'A separate section invalidation must not refetch unrelated stage widgets');
 assert(sectionSource.includes('window.addEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated)'),
  'Section count hook consumes the targeted event');
-assert(sectionSource.includes("document.visibilityState!=='visible'||(e as CustomEvent"),
+assert(sectionSource.includes("pending!==undefined||document.visibilityState!=='visible'"),
  'Hidden tabs cannot launch section counter RPCs on pushed events');
 assert(sectionSource.includes("document.addEventListener('visibilitychange',focused)"),
  'Resuming a hidden tab refreshes section counts without waiting for the 3-minute fallback');
 assert(sectionSource.includes('window.removeEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated)'),
  'Section count hook releases the event listener on unmount');
-assert(gameShell.includes('notifySectionUpdates(game!.id)'),
- 'Event assignment/invitation changes invalidate the section counter');
+assert(gameShell.includes("['event_assignments','event_collaboration_invites','event_decisions']"),
+ 'Event badges retain scoped reconciliation for assignments and invitations');
 assert(source.includes('if(partyDocs)notifySectionUpdates(gameId)'),
  'Party document changes invalidate teacher section counters');
 assert(sectionSource.includes('gameRealtimeConnected(gameId)'),
@@ -91,6 +95,7 @@ const sectionEnv={
  gameRealtimeConnected:()=>connected,gameId:'game-one',
  lastFallbackAt:pollClock,
  load:()=>{sectionReads++;return Promise.resolve()},
+ schedule:()=>{sectionReads++},
  setInterval:fn=>{sectionTick=fn;return 1},
  Math:Object.assign(Object.create(Math),{random:()=>0})
 };
@@ -125,6 +130,7 @@ const env={
  gameId:'simulation',
  schedule(){changed++},
  liveConnected:false,lastPollAt:0,disposed:false,dirtyCore:false,dirtyOverview:false,dirtyChat:false,dirtyPins:false,
+ backendRecoveryAfter:{current:0},
  console
 };
 const script=snippet.slice(0,snippet.indexOf('  // Realtime handles unread counters while chat is closed.'));

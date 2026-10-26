@@ -12,9 +12,12 @@ const code=ts.transpileModule(fs.readFileSync(path.join(root,'components/game/us
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 function deferred(){let resolve;const promise=new Promise(done=>resolve=done);return{promise,resolve};}
 
-function harness({effects=false}={}){
+function harness({effects=false,compiledCode=code}={}){
  const slots=[],pendingEffects=[],channels=[],timers=new Map(),listeners=new Map(),counts=new Map(),holds=new Map(),failures=new Set(),failureCodes=new Map();
  let cursor=0,dirty=false,revision=1,user='teacher-a',memberKind='teacher',gameId='game-a',authCallback,authError=null,clock=0,requests=0,disposed=false,recorders=0,stoppedTracks=0,withBallots=false,assetPaths=false,signed=0,activeSigns=0,peakSigns=0;
+ let virtualNow=Date.parse('2026-10-26T00:00:00Z'),responseBytes=0,aborted=0,ignoreAbort=false;
+ const started=new Map(),notices=[],docListeners=new Map(),fixtures=new Map(),queryLog=[];
+ class ClockDate extends Date{constructor(...args){super(...(args.length?args:[virtualNow]));}static now(){return virtualNow;}}
  const permission=deferred(),mediaSend=deferred();
  class Recorder{constructor(){recorders++;this.state='inactive';}static isTypeSupported(){return false;}start(){this.state='recording';}stop(){this.state='inactive';this.onstop?.();}}
  const redirects=[];
@@ -30,14 +33,18 @@ function harness({effects=false}={}){
    onAuthStateChange(callback){authCallback=callback;return{data:{subscription:{unsubscribe(){if(authCallback===callback)authCallback=undefined;}}}};},
    signOut:async()=>{user=null;authCallback?.('SIGNED_OUT',null);return{error:null};}
   },
-  channel(){const handlers=[];const channel={on(kind,filter,callback){handlers.push({filter,callback});return this;},subscribe(){return this;},handlers};channels.push(channel);return channel;},
+  channel(){const handlers=[];const channel={on(kind,filter,callback){handlers.push({filter,callback});return this;},subscribe(callback){callback?.('SUBSCRIBED');return this;},handlers};channels.push(channel);return channel;},
   removeChannel:async channel=>{const index=channels.indexOf(channel);if(index!==-1)channels.splice(index,1);},
   from(table){
    requests++;const number=(counts.get(table)||0)+1;counts.set(table,number);
-   const snapshot={revision,user,gameId,memberKind};
-   const query={singleRow:false,eqs:{},select(){return this;},order(){return this;},limit(){return this;},eq(key,value){this.eqs[key]=value;return this;},single(){this.singleRow=true;return this;},maybeSingle(){this.singleRow=true;return this;},in(){return this;},
+   const snapshot={revision,user,gameId,memberKind},fixtureSnapshot=fixtures.has(table)?JSON.parse(JSON.stringify(fixtures.get(table))):null;
+   const query={singleRow:false,eqs:{},ins:{},select(){return this;},order(){return this;},limit(){return this;},eq(key,value){this.eqs[key]=value;return this;},single(){this.singleRow=true;return this;},maybeSingle(){this.singleRow=true;return this;},in(key,values){this.ins[key]=values;return this;},abortSignal(signal){this.signal=signal;signal.addEventListener('abort',()=>{aborted++},{once:true});return this;},
     async then(resolve,reject){try{
-     await holds.get(table+':'+number)?.promise;
+     started.set(table,(started.get(table)||0)+1);
+     queryLog.push({table,eqs:{...this.eqs},ins:{...this.ins}});
+     const wait=holds.get(table+':'+number)?.promise;
+     if(wait&&this.signal&&!ignoreAbort)await Promise.race([wait,new Promise((_,fail)=>this.signal.addEventListener('abort',()=>fail(new Error('simulated abort')),{once:true}))]);
+     else await wait;
      const id=this.eqs.game_id||snapshot.gameId;
      let data=[];
      if(table==='games')data={id:this.eqs.id||snapshot.gameId,current_round:snapshot.revision,title:'revision-'+snapshot.revision};
@@ -54,12 +61,15 @@ function harness({effects=false}={}){
      if(table==='political_posts')data=[{id:'post-'+snapshot.revision,game_id:id,title:'post-'+snapshot.revision}];
      if(table==='chat_channels')data=[{id:'channel-a',game_id:id,name:'Общий чат',kind:'public'}];
      if(table==='chat_messages')data=[{id:'message-'+snapshot.revision,game_id:id,channel_id:this.eqs.channel_id||'channel-a',text:'message-'+snapshot.revision,created_at:'2026-10-08T10:00:00Z'}];
-     resolve(failures.has(table)?{data:null,error:{message:'simulated read outage '+table,code:failureCodes.get(table)}}:{data,error:null});
+     if(fixtureSnapshot){data=fixtureSnapshot.filter(row=>Object.entries(this.eqs).every(([key,value])=>row[key]===value)&&Object.entries(this.ins).every(([key,values])=>values.includes(row[key])));if(this.singleRow)data=data[0]||null;}
+     const result=failures.has(table)?{data:null,error:{message:'simulated read outage '+table,code:failureCodes.get(table)}}:{data,error:null};
+     responseBytes+=Buffer.byteLength(JSON.stringify(result));resolve(result);
     }catch(error){reject(error);}}
    };return query;
   },
   rpc:async(name,args)=>{
    requests++;
+   started.set('rpc:'+name,(started.get('rpc:'+name)||0)+1);
    if(name==='get_my_game_identity'){
     const snapshot={revision,user,gameId,memberKind};
     const gameNumber=(counts.get('games')||0)+1;counts.set('games',gameNumber);
@@ -78,7 +88,7 @@ function harness({effects=false}={}){
   storage:{from:()=>({createSignedUrl:async()=>{signed++;activeSigns++;peakSigns=Math.max(peakSigns,activeSigns);await tick();activeSigns--;return{data:{signedUrl:'https://example.invalid/media'},error:null}}})}
  };
  const win={addEventListener:(key,fn)=>listeners.set(key,fn),removeEventListener:(key,fn)=>{if(listeners.get(key)===fn)listeners.delete(key);},localStorage:{getItem:()=>null,setItem:()=>{}}};
- const doc={visibilityState:'visible',addEventListener:()=>{},removeEventListener:()=>{}};
+ const doc={visibilityState:'visible',addEventListener:(name,fn)=>{const values=docListeners.get(name)||new Set();values.add(fn);docListeners.set(name,values);},removeEventListener:(name,fn)=>docListeners.get(name)?.delete(fn)};
  const module={exports:{}};
  function requireFor(name){
   if(name==='react')return react;
@@ -92,7 +102,7 @@ function harness({effects=false}={}){
    vm.runInNewContext('(function(require,module,exports){'+compiled+'\n})')(requireFor,child,child.exports);
    return child.exports;
   }
-  if(name==='./useGameTableSync')return{notifyGameDataRefresh:()=>{},notifySectionUpdates:()=>{},setGameRealtimeConnection:()=>{}};
+  if(name==='./useGameTableSync')return{notifyGameDataRefresh:(gameId,table)=>notices.push({gameId,table}),notifySectionUpdates:()=>{},setGameRealtimeConnection:()=>{}};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
   if(name==='./chatChannelSelection'||name==='./chatRealtime'){
@@ -106,12 +116,12 @@ function harness({effects=false}={}){
   if(name==='./chatMediaTransport')return{sendChatMedia:async input=>{input.onPhase?.('uploading');await mediaSend.promise;input.onPhase?.('saving');return{ok:false,stage:'message',error:'old media save failure',pending:{messageId:'old-pending',path:'game-a/channel-a/teacher-a/old.webm'}};}};
   return{};
  }
- vm.runInNewContext('(function(require,module,exports){'+code+'\n})',{
-  console,window:win,document:doc,Date,Promise,Map,Set,WeakMap,Object,Blob,MediaRecorder:Recorder,
+ vm.runInNewContext('(function(require,module,exports){'+compiledCode+'\n})',{
+  console,window:win,document:doc,Date:ClockDate,Promise,Map,Set,WeakMap,Object,Blob,AbortController,MediaRecorder:Recorder,
   navigator:{mediaDevices:{getUserMedia:()=>permission.promise}},
   URL:{revokeObjectURL:()=>{}},
-  setTimeout:fn=>{const id=++clock;timers.set(id,fn);return id;},clearTimeout:id=>timers.delete(id),
-  setInterval:()=>++clock,clearInterval:()=>{}
+  setTimeout:(fn,delay=0)=>{const id=++clock;timers.set(id,{fn,at:virtualNow+delay});return id;},clearTimeout:id=>timers.delete(id),
+  setInterval:(fn,delay)=>{const id=++clock;timers.set(id,{fn,at:virtualNow+delay,interval:delay});return id;},clearInterval:id=>timers.delete(id)
  })(requireFor,module,module.exports);
  function render(id=gameId){cursor=0;dirty=false;gameId=id;const result=module.exports.useRepublicGame(id);while(pendingEffects.length)pendingEffects.shift()();return result;}
  async function settle(){for(let i=0;i<8;i++){render();await tick();if(!dirty)break;}return render();}
@@ -120,9 +130,13 @@ function harness({effects=false}={}){
   enableBallots(){withBallots=true;},readCount:table=>counts.get(table)||0,
   setRevision:value=>{revision=value;},setUser:value=>{user=value;},setMemberKind:value=>{memberKind=value;},setAssetPaths:value=>{assetPaths=value;},assetStats:()=>({signed,peakSigns}),failTable(table,code){failures.add(table);failureCodes.set(table,code);},setAuthError:value=>{authError=value;},
   hold(table,number=(counts.get(table)||0)+1){const pending=deferred();holds.set(table+':'+number,pending);return pending;},
-  emit(table){for(const channel of [...channels])for(const {filter,callback} of channel.handlers)if(filter.table===table&&filter.event!=='DELETE')callback({eventType:table==='chat_messages'?'UPDATE':'INSERT',new:{game_id:gameId}});},
+  emit(table,row,eventType){for(const channel of [...channels])for(const {filter,callback} of channel.handlers)if(filter.table===table&&filter.event!=='DELETE')callback({eventType:eventType||(table==='chat_messages'?'UPDATE':'INSERT'),new:{game_id:gameId,...row}});},
+  callbacks(table){return channels.flatMap(channel=>channel.handlers.filter(item=>item.filter.table===table).map(item=>item.callback))},
   auth(event,nextUser){user=nextUser;const before=requests;authCallback?.(event,nextUser?{user:{id:nextUser}}:null);assert.equal(requests,before,'Auth callback must schedule Supabase I/O outside its synchronous callback.');},
-  runTimers(){for(const [id,fn] of [...timers]){timers.delete(id);fn();}},
+  runTimers(){for(const [id,timer] of [...timers]){if(timer.interval)continue;timers.delete(id);timer.fn();}},
+  async advance(ms){await settle();const end=virtualNow+ms;let turns=0;while(true){const next=[...timers].filter(([,t])=>t.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!next)break;assert(++turns<10000,'Timers must remain bounded');virtualNow=next[1].at;if(next[1].interval)next[1].at+=next[1].interval;else timers.delete(next[0]);next[1].fn();await settle();}virtualNow=end;await settle();},
+  visible(state){doc.visibilityState=state;for(const fn of docListeners.get('visibilitychange')||[])fn();},
+  stats:()=>({requests,responseBytes,aborted,started:Object.fromEntries(started),notices:[...notices],queryLog:[...queryLog],timers:timers.size}),ignoreAbort(value){ignoreAbort=value;},fixture(table,rows){fixtures.set(table,rows)},
   resolveMedia(){permission.resolve({getTracks:()=>[{stop(){stoppedTracks++;}}]});},mediaState:()=>({recorders,stoppedTracks}),
   resolveMediaSend(){mediaSend.resolve();},
   dispose(){if(disposed)return;disposed=true;for(const slot of slots)slot?.cleanup?.();}
@@ -249,9 +263,11 @@ async function main(){
  await check('Rejected auth I/O leaves loading and reports a recoverable error',async()=>{
   const h=harness({effects:true});h.setAuthError(new Error('simulated auth network rejection'));await h.settle();assert.equal(h.render().loading,false);assert.match(h.render().error,/simulated auth network rejection/);h.dispose();
  });
- await check('Partial loader response order is guarded without canceling full core data',async()=>{
-  const h=harness({effects:true});await h.settle();const olderWall=h.hold('political_posts');h.setRevision(2);h.emit('political_posts');await tick();h.setRevision(3);h.emit('political_posts');await h.settle();assert.equal(h.render().politicalPosts[0].id,'post-3');olderWall.resolve();await h.settle();assert.equal(h.render().politicalPosts[0].id,'post-3');
-  const full=h.hold('games');h.setRevision(4);const refresh=h.render().refresh();await tick();h.setRevision(5);h.emit('political_posts');await h.settle();full.resolve();await refresh;assert.equal(h.render().game.current_round,5);assert.equal(h.render().metrics[0].value,5);h.dispose();
+ await check('Partial realtime reads coalesce behind one request and retain the trailing version',async()=>{
+  const h=harness({effects:true});await h.settle();const olderWall=h.hold('political_posts');h.setRevision(2);h.emit('political_posts');await h.advance(1000);
+  const before=h.readCount('political_posts');h.setRevision(3);h.emit('political_posts');await h.advance(1000);assert.equal(h.readCount('political_posts'),before,'An in-flight read is not duplicated');
+  olderWall.resolve();await h.settle();await h.advance(3000);assert.equal(h.render().politicalPosts[0].id,'post-3');
+  const full=h.hold('games');h.setRevision(4);const refresh=h.render().refresh();await tick();h.setRevision(5);h.emit('political_posts');await h.advance(1000);full.resolve();await refresh;assert.equal(h.render().game.current_round,5);assert.equal(h.render().metrics[0].value,5);h.dispose();
  });
  await check('Same-channel message refresh keeps the latest accepted history',async()=>{
   const h=harness({effects:true});await h.settle();h.render().setChatOpen(true);await h.settle();assert.equal(h.render().channelId,'channel-a');const old=h.hold('chat_messages');h.setRevision(2);h.emit('chat_messages');await tick();h.setRevision(3);h.emit('chat_messages');await h.settle();assert.equal(h.render().messages[0].id,'message-3');old.resolve();await h.settle();assert.equal(h.render().messages[0].id,'message-3');h.dispose();
@@ -287,5 +303,8 @@ async function main(){
 }
 // Fake timers inside the hook must not let Node exit successfully while the
 // last asynchronous test is still unresolved.
-const watchdog=setTimeout(()=>{console.error('FAIL Hook regression suite did not complete');process.exitCode=1;},15000);
-main().then(()=>clearTimeout(watchdog),error=>{clearTimeout(watchdog);console.error(error);process.exitCode=1;});
+module.exports={harness};
+if(require.main===module){
+ const watchdog=setTimeout(()=>{console.error('FAIL Hook regression suite did not complete');process.exitCode=1;},15000);
+ main().then(()=>clearTimeout(watchdog),error=>{clearTimeout(watchdog);console.error(error);process.exitCode=1;});
+}

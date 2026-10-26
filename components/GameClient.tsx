@@ -33,7 +33,7 @@ import {AchievementCelebration} from './game/Achievements';
 import {BlitzOverlay} from './game/Blitz';
 import BudgetView from './game/BudgetView';
 import {useSectionUpdates} from './game/useSectionUpdates';
-import {notifySectionUpdates} from './game/useGameTableSync';
+import {notifyGameDataRefresh,useGameTableSync} from './game/useGameTableSync';
 import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
 import GameHeader,{TeacherNavigationProvider} from './game/GameHeader';
@@ -252,6 +252,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
  const [pendingEvents,setPendingEvents]=useState(0);
  const [pendingBlitz,setPendingBlitz]=useState(0);
+ const counterScope=gameId+':'+g.me?.user_id+':'+g.me?.kind+':'+!!viewAs;
+ const counterScopeRef=useRef(counterScope);counterScopeRef.current=counterScope;
+ useEffect(()=>{setPendingEvents(0);setPendingBlitz(0)},[counterScope]);
  const sectionUpdates=useSectionUpdates(gameId,g.me?.user_id,view,!!viewAs);
  const sectionBadge=(key:string)=>Math.min(999,Math.max(sectionUpdates?.[key]||0,key==='events'?pendingEvents:key==='profile'?pendingBlitz:0));
  const [selectedProfileId,setSelectedProfileId]=useSavedGameState(gameId,g.me?.user_id,'profile-selected','',savedString);
@@ -508,57 +511,25 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   setSetupPromptBusy(false);
  }
 
- useEffect(()=>{
+ useGameTableSync(!previewMode&&me?game?.id:undefined,['event_assignments','event_collaboration_invites','event_decisions'],async()=>{
   if(!game||!me||previewMode)return;
-  let live=true;
-  async function count(){
-   const [r,i]=await Promise.all([supabase.from('event_assignments').select('case_id').eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending'),supabase.from('event_collaboration_invites').select('case_id').eq('game_id',game!.id).eq('recipient_id',me!.user_id).eq('status','pending')]);
-   if(live&&!r.error&&!i.error)setPendingEvents(new Set([...(r.data||[]).map(x=>x.case_id),...(i.data||[]).map(x=>x.case_id)]).size);
-  }
-  let connected=false,lastRecoveryAt=Date.now();
-  let pendingTimer:ReturnType<typeof setTimeout>|undefined;
-  function scheduleCount(){
-   if(pendingTimer!==undefined)return;
-   // One count refresh per event burst rather than one per incoming row.
-   pendingTimer=setTimeout(()=>{pendingTimer=undefined;if(live)void count()},450);
-    notifySectionUpdates(game!.id);
-  }
-  void count();
-  const poll=setInterval(()=>{
-   if(document.visibilityState!=='visible')return;
-   const now=Date.now();
-   if(connected&&now-lastRecoveryAt<180000)return;
-   lastRecoveryAt=now;void count();
-  },30000);
-  const channel=supabase.channel('event-count:'+game.id+':'+me.user_id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},scheduleCount)
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_collaboration_invites',filter:'game_id=eq.'+game.id},scheduleCount)
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_decisions',filter:'game_id=eq.'+game.id},scheduleCount)
-   .subscribe(status=>{connected=status==='SUBSCRIBED';if(connected)lastRecoveryAt=Date.now()});
-  return()=>{live=false;clearInterval(poll);clearTimeout(pendingTimer);void supabase.removeChannel(channel)};
- },[game?.id,me?.user_id,previewMode]);
+  const requestedScope=counterScope;
+  const [r,i]=await Promise.all([supabase.from('event_assignments').select('case_id').eq('game_id',game.id).eq('recipient_id',me.user_id).eq('status','pending'),supabase.from('event_collaboration_invites').select('case_id').eq('game_id',game.id).eq('recipient_id',me.user_id).eq('status','pending')]);
+  if(counterScopeRef.current===requestedScope&&!r.error&&!i.error)setPendingEvents(new Set([...(r.data||[]).map(x=>x.case_id),...(i.data||[]).map(x=>x.case_id)]).size);
+ },counterScope,undefined,750,30000);
 
 
+ useGameTableSync(!previewMode&&me?.kind==='student'?game?.id:undefined,['blitz_assignments'],async()=>{
+  if(!game||!me||previewMode||me.kind!=='student')return;
+  const requestedScope=counterScope;
+  const result=await supabase.rpc('blitz_inbox_counts',{p_game:game.id});
+  if(counterScopeRef.current===requestedScope&&!result.error)setPendingBlitz(Number(result.data?.pending||0));
+ },counterScope);
  useEffect(()=>{
-  if(!game||!me||previewMode||me.kind!=='student'){setPendingBlitz(0);return}
-  let live=true,connected=false,lastRecoveryAt=Date.now();
-  async function refresh(){
-   const result=await supabase.rpc('blitz_inbox_counts',{p_game:game!.id});
-   if(live&&!result.error)setPendingBlitz(Number(result.data?.pending||0));
-  }
-  void refresh();
-  const timer=setInterval(()=>{
-   if(document.visibilityState!=='visible')return;
-   const now=Date.now();
-   if(connected&&now-lastRecoveryAt<120000)return;
-   lastRecoveryAt=now;void refresh();
-  },25000);
-  const changed=()=>void refresh();
+  if(!game||!me||previewMode||me.kind!=='student')return;
+  const changed=()=>notifyGameDataRefresh(game.id,'blitz_assignments');
   window.addEventListener('blitz:updated',changed);
-  const channel=supabase.channel('blitz-count:'+game.id+':'+me.user_id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'blitz_assignments',filter:'user_id=eq.'+me.user_id},changed)
-   .subscribe(status=>{connected=status==='SUBSCRIBED';if(connected)lastRecoveryAt=Date.now()});
-  return()=>{live=false;clearInterval(timer);window.removeEventListener('blitz:updated',changed);void supabase.removeChannel(channel)};
+  return()=>window.removeEventListener('blitz:updated',changed);
  },[game?.id,me?.user_id,previewMode,me?.kind]);
 
  const backIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,-1,previewMode);
@@ -593,9 +564,11 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  useEffect(()=>{
   if(!me||previewMode||me.kind==='observer')return;
   const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политический процесс',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Ситуационные решения',budget:'Бюджет'};
-  void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
-  const id=setInterval(()=>void touchPresence(view),30000);
-  return()=>clearInterval(id);
+  const visible=()=>{if(document.visibilityState==='visible')void touchPresence(view)};
+  if(document.visibilityState==='visible')void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
+  const id=setInterval(visible,30000+Math.floor(Math.random()*10000));
+  document.addEventListener('visibilitychange',visible);
+  return()=>{clearInterval(id);document.removeEventListener('visibilitychange',visible)};
  },[view,me?.user_id,previewMode]);
 
  useEffect(()=>{
@@ -775,7 +748,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {(onboardingNotice||introSyncError)&&<p role="alert" className="profileSetupModalError">{onboardingNotice||introSyncError}</p>}
      <button type="button" className="primary profileSetupStart" disabled={setupPromptBusy} onClick={()=>void goToIncompleteProfile()}>{setupPromptBusy?'Открываем профиль…':'Перейти к заполнению'}</button>
     </section>
-   </div>} <BlitzOverlay gameId={gameId} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'&&!stageComicOpen}/>
+   </div>} <BlitzOverlay gameId={gameId} userId={me.user_id} stageKey={g.currentStage?g.currentStage.stage_no+':'+g.currentStage.status+':'+(g.currentStage.opened_at||''):''} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'&&!stageComicOpen}/>
   <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!stageComicOpen}/>
   <StageComics key={gameId+':'+me?.user_id} gameId={gameId} userId={me?.user_id||''} stages={g.stages} enabled={!g.loading&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'} onOpenChange={setStageComicOpen}/>
   <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>

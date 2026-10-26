@@ -1,22 +1,56 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {Check,Newspaper,X} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import DisclosureSummary from '../ui/DisclosureSummary';
 import RichPostText from './RichPostText';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {View} from './types';
 import {formalDocumentTitle} from './formalInstitutions';
 type Proposal={id:string;author_id:string;title:string;body:string;tags:string[];submitted_actor:string;status:'pending'|'approved'|'rejected';review_note:string|null;created_at:string;post_id:string|null;formal_ids:string[];external_url:string|null;internal_view:string|null;files:{storage_path:string;file_name:string;media_kind:string}[]};
 function ProposalFiles({files}:{files:Proposal['files']}){
  const [urls,setUrls]=useState<Record<string,string>>({});
- useEffect(()=>{let active=true;void Promise.all(files.map(async f=>{const r=await supabase.storage.from('game-assets').createSignedUrl(f.storage_path,3600);return [f.storage_path,r.data?.signedUrl||''] as const})).then(x=>{if(active)setUrls(Object.fromEntries(x))});return()=>{active=false}},[files]);
+ const signed=useRef<Record<string,{url:string;until:number}>>({});
+ useEffect(()=>{
+  let active=true,running=false,timer:ReturnType<typeof setTimeout>|undefined;
+  async function refresh(){
+   if(!active||running||document.visibilityState!=='visible')return;
+   running=true;
+   try{
+    const pairs=await Promise.all(files.map(async f=>{
+     const cached=signed.current[f.storage_path];
+     if(cached&&cached.until>Date.now())return [f.storage_path,cached.url] as const;
+     const r=await supabase.storage.from('game-assets').createSignedUrl(f.storage_path,3600),url=r.data?.signedUrl||'';
+     if(url&&active)signed.current[f.storage_path]={url,until:Date.now()+55*60000};
+     return [f.storage_path,url] as const;
+    }));
+    if(!active)return;
+    setUrls(Object.fromEntries(pairs));
+    const next=Math.min(...files.map(f=>signed.current[f.storage_path]?.until||Infinity).filter(until=>until>Date.now()));
+    if(Number.isFinite(next))timer=setTimeout(()=>void refresh(),Math.max(1000,next-Date.now()));
+   }catch(error){console.error('Proposal media refresh failed',error)}
+   finally{running=false}
+  }
+  const visible=()=>{clearTimeout(timer);if(document.visibilityState==='visible')void refresh()};
+  void refresh();document.addEventListener('visibilitychange',visible);
+  return()=>{active=false;clearTimeout(timer);document.removeEventListener('visibilitychange',visible)};
+ },[files]);
  return <div className="mediaProposalFiles">{files.map(f=>urls[f.storage_path]&&<div key={f.storage_path}>{f.media_kind==='image'?<img src={urls[f.storage_path]} alt={f.file_name}/>:f.media_kind==='video'?<video controls preload="metadata" src={urls[f.storage_path]}/>:f.media_kind==='audio'?<audio controls preload="metadata" src={urls[f.storage_path]}/>:null}<a href={urls[f.storage_path]} target="_blank" rel="noreferrer">{f.file_name}</a></div>)}</div>;
 }
 export default function NewsProposals({g,refreshKey,onOpenDocument,onNavigate,onPublished}:{g:ReturnTypeRepublic;refreshKey:number;onOpenDocument:(id:string)=>void;onNavigate:(v:View)=>void;onPublished:(title:string)=>void}){
  const [items,setItems]=useState<Proposal[]>([]),[error,setError]=useState(''),[openId,setOpenId]=useState(''),[note,setNote]=useState<Record<string,string>>({}),[busy,setBusy]=useState(''),[refresh,setRefresh]=useState(0);
- useEffect(()=>{if(!g.game?.id)return;let active=true;async function load(){let query=supabase.from('media_news_proposals').select('*').eq('game_id',g.game!.id).order('created_at',{ascending:false}).limit(50);if(g.teacher)query=query.eq('status','pending');const r=await query;if(active){if(r.error)setError(userError(r.error));else{setItems(r.data||[]);setError('')}}}void load();const interval=setInterval(()=>void load(),20000);return()=>{active=false;clearInterval(interval)}},[g.game?.id,g.teacher,refreshKey,refresh]);
+ const scope=(g.game?.id||'')+':'+(g.me?.user_id||'')+':'+g.teacher;
+ const activeScope=useRef(scope);activeScope.current=scope;
+ useEffect(()=>{setItems([]);setError('');setOpenId('')},[scope]);
+ useGameTableSync(g.game?.id,['media_news_proposals'],async()=>{
+  if(!g.game?.id)return;const requestedScope=scope;
+  let query=supabase.from('media_news_proposals').select('*').eq('game_id',g.game.id).order('created_at',{ascending:false}).limit(50);
+  if(g.teacher)query=query.eq('status','pending');const r=await query;
+  if(requestedScope!==activeScope.current)return;
+  if(r.error)setError(userError(r.error));else{setItems(r.data||[]);setError('')}
+ },scope+':'+refreshKey+':'+refresh,undefined,750,20000);
  async function review(p:Proposal,approve:boolean){setBusy(p.id);setError('');const r=await supabase.rpc('review_media_news',{p_proposal_id:p.id,p_approve:approve,p_note:note[p.id]||null});if(r.error)setError(userError(r.error));else{setRefresh(n=>n+1);await g.refresh();if(approve)onPublished(p.title)}setBusy('')}
  if(!items.length&&!error)return null;
  return <details className="projectDisclosure mediaProposalQueue"><DisclosureSummary icon={Newspaper} title={g.teacher?'Новости для согласования · '+items.length:'Мои предложения в СМИ · '+items.length} description={g.teacher?'Предложения студентов. Публикация появляется в ленте после одобрения.':'Статус рассмотрения и ответ преподавателя'}/><div className="civicDisclosureBody">

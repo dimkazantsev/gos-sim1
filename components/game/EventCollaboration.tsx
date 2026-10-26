@@ -1,7 +1,8 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 export type EventInvitation={id:string;case_id:string;recipient_id:string;inviter_id:string;status:string};
 type Entry={id:number;author_id:string;body:string;created_at:string};
@@ -27,8 +28,15 @@ export default function EventCollaboration({g,caseId,invitations,assignedIds,clo
   setRosterLoading(false);
  }
  useEffect(()=>{setRoster(null);setRecipient('');if(canInvite)void loadRoster();},[caseId,g.game?.id,canInvite]);
- async function load(){if(!assigned&&!g.teacher)return;const r=await supabase.from('event_discussion_messages').select('*').eq('case_id',caseId).order('created_at',{ascending:false}).limit(100);if(!r.error)setEntries(((r.data||[]) as Entry[]).reverse())}
- useEffect(()=>{if(!assigned&&!g.teacher)return;void load();const id=setInterval(()=>{if(document.visibilityState==='visible')void load()},30000);return()=>clearInterval(id)},[caseId,assigned,g.teacher]);
+ const discussionScope=(g.game?.id||'')+':'+caseId+':'+(g.me?.user_id||'')+':'+assigned+':'+g.teacher;
+ const activeDiscussionScope=useRef(discussionScope);activeDiscussionScope.current=discussionScope;
+ useEffect(()=>setEntries([]),[discussionScope]);
+ async function load(){
+  if(!assigned&&!g.teacher)return;const requestedScope=discussionScope;
+  const r=await supabase.from('event_discussion_messages').select('*').eq('case_id',caseId).order('created_at',{ascending:false}).limit(100);
+  if(requestedScope===activeDiscussionScope.current&&!r.error)setEntries(((r.data||[]) as Entry[]).reverse());
+ }
+ useGameTableSync(assigned||g.teacher?g.game?.id:undefined,['event_discussion_messages'],load,discussionScope,undefined,750,30000);
  async function act(name:string,params:Record<string,unknown>){if(busy)return;setBusy(true);const r=await supabase.rpc(name,params);setNotice(r.error?userError(r.error):'');if(!r.error){setText('');if(name==='invite_event_collaborator')setRecipient('');await Promise.all([onChanged(),load()])}setBusy(false)}
  return <section className="eventCollaboration">
  {assigned&&!closed&&!votingStarted&&<p className="eventInviteExplanation">Кнопка «Пригласить» позволяет привлечь участника с необходимыми полномочиями — например, руководителя профильного ведомства. Приглашённый должен принять приглашение; только после этого он участвует в совместном решении. Это особенно важно, если ваша должность не даёт права самостоятельно принять решение.</p>}

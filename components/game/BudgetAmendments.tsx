@@ -9,6 +9,7 @@ import type {FiscalContext,FiscalRate,FiscalRegion} from './fiscalMath';
 import {billions,calculateFederalBudget,type BudgetCalculation,type BudgetDraft,type BudgetTransfer,type SimulatorState} from './federalBudgetMath';
 import {amendmentSections,amendmentStatus,previewBudgetAmendment,type BudgetAmendment,type BudgetPlanSummary} from './budgetAmendmentMath';
 import styles from './BudgetAmendments.module.css';
+import {useGameTableSync} from './useGameTableSync';
 
 type Board={amendments:BudgetAmendment[];party_ids:string[];can_open:boolean;can_apply:boolean;can_submit_neutral:boolean};
 type Props={g:ReturnTypeRepublic;plans:BudgetPlanSummary[];selectedId:string;state:SimulatorState;context:FiscalContext|null;regions:FiscalRegion[];rates:FiscalRate[];requests:BudgetTransfer[];readOnly:boolean;onApplied:(result:{id:string;revision:number;draft:BudgetDraft})=>Promise<void>;onOpenVotes?:(id:string)=>void;onOpenDocument:(id:string)=>void;onOpenCalculator:()=>void};
@@ -30,7 +31,8 @@ export default function BudgetAmendments({g,plans,selectedId,state,context,regio
   try{const r=await supabase.rpc('get_budget_amendments',{p_game_id:g.game.id});if(requestedScope!==scope.current)return;if(r.error)setError(userError(r.error));else{setBoard(r.data as Board);setError('');}}
   catch(e){if(requestedScope===scope.current)setError(userError(e));}
  }
- useEffect(()=>{setBoard(null);setBusy(false);setNotice('');setPlanId('');setPartyId('');setReason('');void load();if(!g.game)return;const timer=setInterval(()=>void load(),15000);let pending:ReturnType<typeof setTimeout>;const update=()=>{clearTimeout(pending);pending=setTimeout(()=>void load(),200);};let channel=supabase.channel('budget-amendments:'+g.game.id);for(const table of ['budget_faction_amendments','budget_simulator_plans','game_votes','game_fiscal_policy','game_fiscal_regions','state_metrics','budget_simulator_state'])channel=channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+g.game.id},update);channel.subscribe();return()=>{clearInterval(timer);clearTimeout(pending);void supabase.removeChannel(channel);};},[g.game?.id,g.me?.user_id]);
+ useEffect(()=>{setBoard(null);setBusy(false);setNotice('');setPlanId('');setPartyId('');setReason('')},[g.game?.id,g.me?.user_id]);
+ useGameTableSync(g.game?.id,['budget_faction_amendments','budget_simulator_plans','game_votes','game_fiscal_policy','game_fiscal_regions','state_metrics','budget_simulator_state'],load,g.me?.user_id||'',undefined,750,15000);
  useEffect(()=>{if(!editable.some(p=>p.id===planId))setPlanId(editable.find(p=>p.id===selectedId)?.id||editable[0]?.id||'');},[plans,selectedId,planId]);
  useEffect(()=>{if(!board?.can_submit_neutral&&!partyIds.includes(partyId))setPartyId(partyIds[0]||'');},[board,partyId]);
  async function action(rpc:string,args:Record<string,unknown>,success:string){

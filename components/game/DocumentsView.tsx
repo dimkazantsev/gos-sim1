@@ -21,6 +21,7 @@ import CivicDiscussion from './CivicDiscussion';
 import CloudDocumentPicker from './CloudDocumentPicker';
 import BillAmendmentsPanel,{type BillAmendmentGate} from './BillAmendmentsPanel';
 import BudgetLawAmendmentsPanel from './BudgetLawAmendmentsPanel';
+import {useGameTableSync} from './useGameTableSync';
 
 function typeLabel(key:string){return formalDocumentTypeLabel(key)}
 function shortDate(v:string){return new Date(v).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'})}
@@ -57,7 +58,8 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const [templateKey,setTemplateKey]=useState('fz_bill'),[issuer,setIssuer]=useState(''),[place,setPlace]=useState('Москва'),[actingOfficeChoice,setActingOfficeChoice]=useState('');
  const [editing,setEditing]=useState(false),[editTitle,setEditTitle]=useState(''),[editBody,setEditBody]=useState('');
  const [documentAccess,setDocumentAccess]=useState<DocumentAccess|null>(null),[accessError,setAccessError]=useState(''),[editNote,setEditNote]=useState(''),[editRevision,setEditRevision]=useState(1);
- const [activeRoles,setActiveRoles]=useState<string[]>([]),[subjectPermissions,setSubjectPermissions]=useState<string[]|null>(null),[revisions,setRevisions]=useState<{id:string;revision:number;title:string;body_text:string|null;created_at:string}[]>([]);
+ const activeRoles=useMemo(()=>(g.officeAssignments||[]).filter(o=>o.user_id===me?.user_id&&o.status==='active').map(o=>o.role_title),[g.officeAssignments,me?.user_id]);
+ const [subjectPermissions,setSubjectPermissions]=useState<string[]|null>(null),[revisions,setRevisions]=useState<{id:string;revision:number;title:string;body_text:string|null;created_at:string}[]>([]);
  const [billProfile,setBillProfile]=useState<BillProfile|null>(null),[billFiles,setBillFiles]=useState<BillFile[]>([]),[billConclusion,setBillConclusion]=useState<BillConclusion|null>(null),[billReadiness,setBillReadiness]=useState<BillReadiness|null>(null);
  const [billFinancial,setBillFinancial]=useState(false),[billGovernmentOpinion,setBillGovernmentOpinion]=useState(false),[billCommittee,setBillCommittee]=useState(''),[billRepresentative,setBillRepresentative]=useState(''),[billNote,setBillNote]=useState('');
  const [billFileKind,setBillFileKind]=useState('explanatory_note'),[billFile,setBillFile]=useState<File|null>(null),[billReviewNote,setBillReviewNote]=useState<Record<string,string>>({}),[billDossierOpen,setBillDossierOpen]=useState(false);
@@ -80,7 +82,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  function changeTitle(value:string){draftVersions.current.title++;draftFields.current.title=value;setTitle(value)}
  function changeBody(value:string){draftVersions.current.body++;draftFields.current.body=value;setBody(value)}
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;extractionRequest.current++;extractionAbort.current?.abort()}},[]);
- useEffect(()=>{cancelExtraction();setBusy(false);setTitle('');setBody('');setFile(null);setRecognized('');setEditing(false);setEditTitle('');setEditBody('');setEditNote('');setIssuer('');setActingOfficeChoice('');setPlace('Москва');setSubjectKey('gd_deputy');setDocType('fz_bill');setDocumentAccess(null);setActiveRoles([]);setSubjectPermissions(null);setCommitteeUnits([]);resetPreparedBillPackage()},[editorScope]);
+ useEffect(()=>{cancelExtraction();setBusy(false);setTitle('');setBody('');setFile(null);setRecognized('');setEditing(false);setEditTitle('');setEditBody('');setEditNote('');setIssuer('');setActingOfficeChoice('');setPlace('Москва');setSubjectKey('gd_deputy');setDocType('fz_bill');setDocumentAccess(null);setSubjectPermissions(null);setCommitteeUnits([]);resetPreparedBillPackage()},[editorScope]);
 
  const role=[me?.role_title||'',...activeRoles].join(' ').toLowerCase();
  const availableSubjects=useMemo(()=>subjectPermissions?FORMAL_SUBJECTS.filter(s=>subjectPermissions.includes(s.key)):teacher?FORMAL_SUBJECTS:FORMAL_SUBJECTS.filter(s=>s.roleHints.some(h=>role.includes(h))),[teacher,role,subjectPermissions]);
@@ -94,8 +96,13 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const createDocumentReady=title.trim().length>=3&&(body.trim().length>=20||!!file);
  const createRequisitesReady=!!subjectKey&&!!docType&&issuer.trim().length>=2&&place.trim().length>=2;
  const createFinalReady=creatingBill?createBillReady:createDocumentReady&&createRequisitesReady;
- useEffect(()=>{if(!g.game?.id||readOnly)return;let active=true;async function load(){const r=await supabase.rpc('get_formal_subjects',{p_game_id:g.game!.id});if(active&&!r.error&&Array.isArray(r.data))setSubjectPermissions(r.data)}void load();const timer=setInterval(()=>{if(document.visibilityState==='visible')void load()},120000+Math.floor(Math.random()*20000));return()=>{active=false;clearInterval(timer)}},[g.game?.id,me?.user_id,me?.role_title,readOnly]);
- useEffect(()=>{if(!g.game?.id||!me?.user_id)return;let active=true;async function load(){const r=await supabase.from('game_office_assignments').select('role_title').eq('game_id',g.game!.id).eq('user_id',me!.user_id).eq('status','active');if(active&&!r.error)setActiveRoles((r.data||[]).map(x=>x.role_title))}void load();const timer=setInterval(()=>{if(document.visibilityState==='visible')void load()},120000+Math.floor(Math.random()*20000));return()=>{active=false;clearInterval(timer)}},[g.game?.id,me?.user_id]);
+ const subjectsRequest=useRef(0);
+ useGameTableSync(readOnly?undefined:g.game?.id,['game_office_assignments','game_members','institution_assignments','institution_units','game_stages'],async()=>{
+  if(!g.game?.id)return;
+  const ticket=++subjectsRequest.current,requestedScope=editorScope;
+  const r=await supabase.rpc('get_formal_subjects',{p_game_id:g.game.id});
+  if(alive.current&&ticket===subjectsRequest.current&&scope.current===requestedScope&&!r.error&&Array.isArray(r.data))setSubjectPermissions(r.data);
+ },editorScope+':'+(me?.role_title||'')+':'+activeRoles.join('|'),undefined,750,120000);
  const filtered=useMemo(()=>formalDocuments.filter(d=>{
   const q=query.trim().toLowerCase();
   const voting=votes.some(v=>v.formal_document_id===d.id&&v.status==='open');
@@ -551,11 +558,11 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
         setBusy(true);
         try{const {error}=await supabase.rpc('sign_institution_document',{p_document_id:selected.id});
          if(error)g.setError(userError(error));
-         else{await g.refresh();setLocalRefresh(n=>n+1);}
+         else{await g.refreshDocuments(selected.id);setLocalRefresh(n=>n+1);}
         }catch(error){g.setError(userError(error))}finally{setBusy(false)}
        }}>Подписать документ моей подписью</button>}
       </div>}
-      <DocumentTools document={selected} access={documentAccess} members={members} readOnly={readOnly||editing} onRefresh={async()=>{await g.refresh();setLocalRefresh(n=>n+1)}}/>
+      <DocumentTools document={selected} access={documentAccess} members={members} readOnly={readOnly||editing} onRefresh={async()=>{await g.refreshDocuments(selected.id);setLocalRefresh(n=>n+1)}}/>
      </section>
      <aside className="legalControlRail" aria-label="Управление документом">
       <article className="surface formalActions"><div className="surfaceHead"><div><small>Текущая стадия</small><h2>Что нужно сделать сейчас</h2></div></div>

@@ -4,11 +4,15 @@ import {useCallback,useEffect,useRef,useState} from 'react';
 import {Eye,MessageCircle,Send,ThumbsDown,ThumbsUp,Trash2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import ProfileAvatar from './ProfileAvatar';
+import {useGameTableSync} from './useGameTableSync';
 import {chatHandles} from './chatHandles';
 import type {ReturnTypeRepublic} from './viewTypes';
 type Discussion={likes:number;dislikes:number;mine:number;views:number;comment_count:number;comments:{id:string;author_id:string;full_name:string;body:string;created_at:string}[]};
 export default function CivicDiscussion({kind,targetId,g,readOnly=false}:{kind:'post'|'document';targetId:string;g:ReturnTypeRepublic;readOnly?:boolean}){
- const [data,setData]=useState<Discussion|null>(null),[open,setOpen]=useState(false),[limit,setLimit]=useState(30),[body,setBody]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[visible,setVisible]=useState(false);
+ const [rawData,setData]=useState<Discussion|null>(null),[open,setOpen]=useState(false),[limit,setLimit]=useState(30),[body,setBody]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[visible,setVisible]=useState(false);
+ const identity=kind+':'+targetId+':'+(g.me?.user_id||'');
+ const activeIdentity=useRef(identity),dataIdentity=useRef(''),mutating=useRef('');activeIdentity.current=identity;
+ const data=dataIdentity.current===identity?rawData:null;
  const mentionMatch=body.match(/(?:^|\\s)@([а-яёa-z0-9_-]*)$/i);
  const query=(mentionMatch?.[1]||'').toLocaleLowerCase('ru-RU');
  const addresses=chatHandles(g.members.filter(m=>m.game_id===g.game?.id&&m.user_id!==g.me?.user_id));
@@ -20,11 +24,15 @@ export default function CivicDiscussion({kind,targetId,g,readOnly=false}:{kind:'
   const label=ambiguous?surname+'_'+userId.replace(/-/g,'').slice(0,8):surname;
   setBody(body.slice(0,body.length-mentionMatch[0].length)+(mentionMatch[0].startsWith(' ')?' ':'')+'@'+label+' ');
  }
- const ref=useRef<HTMLDivElement>(null),seen=useRef(''),missingPost=useRef(false);
+ const ref=useRef<HTMLDivElement>(null),seen=useRef(''),recordingView=useRef(''),missingPost=useRef(false);
  const refreshGame=useRef(g.refresh);refreshGame.current=g.refresh;
+ const scope=identity+':'+open+':'+limit;
+ const activeScope=useRef(scope),request=useRef(0);activeScope.current=scope;
  const load=useCallback(async()=>{
-  if(missingPost.current)return;
-  const r=await supabase.rpc('get_civic_discussion',{p_kind:kind,p_target:targetId,p_limit:limit});
+  if(missingPost.current||scope!==activeScope.current)return;
+  const ticket=++request.current,requestedScope=scope;
+  const r=await supabase.rpc('get_civic_discussion',{p_kind:kind,p_target:targetId,p_limit:open?limit:1});
+  if(ticket!==request.current||requestedScope!==activeScope.current)return;
   if(r.error){
    // A post may have just been deleted while the discussion request was in flight.
    // Do not offer a meaningless retry for a permanently removed post.
@@ -34,15 +42,34 @@ export default function CivicDiscussion({kind,targetId,g,readOnly=false}:{kind:'
     return;
    }
    setError(userError(r.error));
-  }else{setData(r.data as Discussion);setError('')}
- },[kind,targetId,limit]);
- useEffect(()=>{setData(null);setOpen(false);setError('');setBody('');setLimit(30);seen.current='';missingPost.current=false;const element=ref.current?.closest('.wallPost,.formalDetail')||ref.current;if(!element)return;const observer=new IntersectionObserver(entries=>setVisible(entries.some(x=>x.isIntersecting)),{threshold:0.01});observer.observe(element);return()=>observer.disconnect()},[kind,targetId]);
- useEffect(()=>{if(!visible)return;let current=true;void(async()=>{if(!readOnly&&seen.current!==targetId){const r=await supabase.rpc('record_civic_view',{p_kind:kind,p_target:targetId});if(!r.error)seen.current=targetId}if(current)await load()})();const jitter=[...targetId+(g.me?.user_id||'')].reduce((hash,char)=>(Math.imul(hash,31)+char.charCodeAt(0))>>>0,0)%18000;
-  const interval=setInterval(()=>{if(document.visibilityState==='visible')void load()},(open?45000:150000)+jitter);
-  return()=>{current=false;clearInterval(interval)}},[visible,load,open,readOnly,targetId,kind]);
- async function react(value:number){if(busy||!data)return;setBusy(true);const r=await supabase.rpc('react_to_civic_content',{p_kind:kind,p_target:targetId,p_value:data.mine===value?0:value});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
- async function comment(){if(!body.trim()||busy)return;setBusy(true);const r=await supabase.rpc('comment_on_civic_content',{p_kind:kind,p_target:targetId,p_body:body});if(r.error)setError(userError(r.error));else{setBody('');await load()}setBusy(false)}
- async function remove(id:string){setBusy(true);const r=await supabase.rpc('delete_civic_comment',{p_comment_id:id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+  }else{dataIdentity.current=identity;setData(r.data as Discussion);setError('')}
+ },[kind,targetId,limit,open,scope,identity]);
+ const currentLoad=useRef(load);currentLoad.current=load;
+ useEffect(()=>{setData(null);setOpen(false);setError('');setBody('');setBusy(false);setLimit(30);dataIdentity.current='';seen.current='';missingPost.current=false;const element=ref.current?.closest('.wallPost,.formalDetail')||ref.current;if(!element)return;const observer=new IntersectionObserver(entries=>setVisible(entries.some(x=>x.isIntersecting)),{threshold:0.01});observer.observe(element);return()=>observer.disconnect()},[kind,targetId,identity]);
+ useEffect(()=>{
+  if(!visible||readOnly)return;
+  let live=true;
+  const record=async()=>{
+   if(document.visibilityState!=='visible'||seen.current===identity||recordingView.current===identity)return;
+   recordingView.current=identity;
+   try{const r=await supabase.rpc('record_civic_view',{p_kind:kind,p_target:targetId});if(live&&!r.error)seen.current=identity}
+   finally{if(recordingView.current===identity)recordingView.current=''}
+  };
+  void record();document.addEventListener('visibilitychange',record);
+  return()=>{live=false;document.removeEventListener('visibilitychange',record)};
+ },[visible,readOnly,targetId,kind,identity]);
+ useGameTableSync(visible?g.game?.id:undefined,['civic_comments','civic_reactions'],load,scope,undefined,750,open?45000:150000);
+ async function mutate(name:string,args:Record<string,unknown>,done?:()=>void){
+  if(busy||readOnly||mutating.current===identity)return;const startedIdentity=identity;mutating.current=identity;setBusy(true);
+  try{
+   const r=await supabase.rpc(name,args);if(startedIdentity!==activeIdentity.current)return;
+   if(r.error)setError(userError(r.error));else{done?.();await currentLoad.current()}
+  }catch(e){if(startedIdentity===activeIdentity.current)setError(userError(e))}
+  finally{if(mutating.current===startedIdentity)mutating.current='';if(startedIdentity===activeIdentity.current)setBusy(false)}
+ }
+ function react(value:number){if(data)return mutate('react_to_civic_content',{p_kind:kind,p_target:targetId,p_value:data.mine===value?0:value})}
+ function comment(){const submitted=body;if(submitted.trim())return mutate('comment_on_civic_content',{p_kind:kind,p_target:targetId,p_body:submitted},()=>setBody(current=>current===submitted?'':current))}
+ function remove(id:string){return mutate('delete_civic_comment',{p_comment_id:id})}
  return <div ref={ref} className="civicDiscussion">
   <div className="civicDiscussionStats"><button type="button" aria-label="Нравится" aria-pressed={data?.mine===1} disabled={readOnly||busy||!data} onClick={()=>void react(1)}><ThumbsUp size={18}/><span>{data?.likes??'—'}</span></button><button type="button" aria-label="Не нравится" aria-pressed={data?.mine===-1} disabled={readOnly||busy||!data} onClick={()=>void react(-1)}><ThumbsDown size={18}/><span>{data?.dislikes??'—'}</span></button><button type="button" aria-expanded={open} onClick={()=>setOpen(v=>!v)}><MessageCircle size={18}/>Комментарии <span>{data?.comment_count??'—'}</span></button><span className="civicViewCount" title="Уникальные просмотры участников"><Eye size={18}/>{data?.views??'—'}</span></div>
   {error&&<p className="error" role="alert">{error} <button type="button" onClick={()=>void load()}>Повторить</button></p>}

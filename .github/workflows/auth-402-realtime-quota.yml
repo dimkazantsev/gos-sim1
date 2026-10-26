@@ -3,6 +3,23 @@ on:
   pull_request:
     paths:
       - 'lib/userError.ts'
+      - 'lib/supabase.ts'
+      - 'scripts/backend-quota-stop-check.cjs'
+      - 'scripts/game-shell-load-check.cjs'
+      - 'scripts/performance-modules-check.cjs'
+      - 'scripts/realtime-targeted-load-check.cjs'
+      - 'scripts/event-workspace-load-check.cjs'
+      - 'scripts/republic-game-resilience-check.cjs'
+      - 'components/game/Blitz*.tsx'
+      - 'components/game/BudgetAmendments.tsx'
+      - 'components/game/CivicDiscussion.tsx'
+      - 'components/game/ClassroomJournal.tsx'
+      - 'components/game/DocumentTools.tsx'
+      - 'components/game/DocumentsView.tsx'
+      - 'components/game/EventCollaboration.tsx'
+      - 'components/game/EventWorkspace.tsx'
+      - 'components/game/NewsProposals.tsx'
+      - 'components/game/PoliticalWallView.tsx'
       - 'components/game/useRepublicGame.ts'
       - 'components/game/useGameTableSync.ts'
       - 'components/game/useSectionUpdates.ts'
@@ -17,6 +34,23 @@ on:
     branches: [main]
     paths:
       - 'lib/userError.ts'
+      - 'lib/supabase.ts'
+      - 'scripts/backend-quota-stop-check.cjs'
+      - 'scripts/game-shell-load-check.cjs'
+      - 'scripts/performance-modules-check.cjs'
+      - 'scripts/realtime-targeted-load-check.cjs'
+      - 'scripts/event-workspace-load-check.cjs'
+      - 'scripts/republic-game-resilience-check.cjs'
+      - 'components/game/Blitz*.tsx'
+      - 'components/game/BudgetAmendments.tsx'
+      - 'components/game/CivicDiscussion.tsx'
+      - 'components/game/ClassroomJournal.tsx'
+      - 'components/game/DocumentTools.tsx'
+      - 'components/game/DocumentsView.tsx'
+      - 'components/game/EventCollaboration.tsx'
+      - 'components/game/EventWorkspace.tsx'
+      - 'components/game/NewsProposals.tsx'
+      - 'components/game/PoliticalWallView.tsx'
       - 'components/game/useRepublicGame.ts'
       - 'components/game/useGameTableSync.ts'
       - 'components/game/useSectionUpdates.ts'
@@ -42,6 +76,12 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: node scripts/auth-402-realtime-quota-check.cjs
       - run: node scripts/forty-sessions-realtime-budget-check.cjs
+      - run: node scripts/backend-quota-stop-check.cjs
+      - run: node scripts/game-shell-load-check.cjs
+      - run: node scripts/performance-modules-check.cjs
+      - run: node scripts/realtime-targeted-load-check.cjs
+      - run: node scripts/republic-game-resilience-check.cjs
+      - run: node scripts/event-workspace-load-check.cjs
       - run: node scripts/password-login-resilience-check.cjs
       - run: node scripts/supabase-session-refresh-check.cjs
       - run: node scripts/chat-realtime-check.cjs

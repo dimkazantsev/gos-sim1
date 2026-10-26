@@ -1,10 +1,11 @@
 'use client';
 import {gameValueLabel,gameViewLabel} from '../../lib/gameLabels';
 import {userError} from '@/lib/userError';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {Activity,ArrowDownWideNarrow,Download,Search,Trash2,UsersRound} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 const VIEW_NAMES:Record<string,string>={
@@ -23,21 +24,16 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const [ownRows,setOwnRows]=useState<typeof activities>([]);
  const [ownBusy,setOwnBusy]=useState(false);
  const [ownError,setOwnError]=useState('');
- useEffect(()=>{
-  if(!game||!me?.user_id||teacher){setOwnRows([]);return}
-  let active=true;
-  async function loadMine(){
-   setOwnBusy(true);
-   const r=await supabase.from('game_activity').select('*').eq('game_id',game!.id)
-    .eq('actor_id',me!.user_id).order('created_at',{ascending:false}).limit(250);
-   if(!active)return;
-   if(r.error)setOwnError(userError(r.error));else{setOwnRows((r.data||[]) as typeof activities);setOwnError('')}
-   setOwnBusy(false);
-  }
-  void loadMine();
-  const timer=setInterval(()=>{if(document.visibilityState==='visible')void loadMine()},30000);
-  return()=>{active=false;clearInterval(timer)};
- },[game?.id,me?.user_id,teacher]);
+ const ownScope=(game?.id||'')+':'+(me?.user_id||'')+':'+teacher,activeOwnScope=useRef(ownScope);activeOwnScope.current=ownScope;
+ useEffect(()=>{setOwnRows([]);setOwnError('');setOwnBusy(false)},[ownScope]);
+ useGameTableSync(!teacher&&me?.user_id?game?.id:undefined,['game_activity'],async()=>{
+  if(!game||!me?.user_id||teacher)return;const requestedScope=ownScope;setOwnBusy(true);
+  const r=await supabase.from('game_activity').select('*').eq('game_id',game.id)
+   .eq('actor_id',me.user_id).order('created_at',{ascending:false}).limit(250);
+  if(requestedScope!==activeOwnScope.current)return;
+  if(r.error)setOwnError(userError(r.error));else{setOwnRows((r.data||[]) as typeof activities);setOwnError('')}
+  setOwnBusy(false);
+ },ownScope,undefined,750,30000);
  const [olderBusy,setOlderBusy]=useState(false);
  const [olderExhausted,setOlderExhausted]=useState(false);
  const [olderError,setOlderError]=useState('');

@@ -17,7 +17,7 @@ assert(blitz.includes("!r.answered_at")||blitz.includes('answered?<><p className
 assert(sql.includes('pg_advisory_xact_lock')&&sql.includes('a.answered_at is not null'),'Atomic selected open prevents second answers');
 assert(sql.includes("p_state='pending' and a.answered_at is null")&&sql.includes("p_state='answered' and a.answered_at is not null"),'Filtered views disjoint by answered_at');
 assert(sql.includes("gos_blitz_issue_offline_today"),'Assignments must persist while offline via pg_cron');
-assert(game.includes("key==='profile'?pendingBlitz")&&game.includes("table:'event_collaboration_invites'"),'Profile and event badges respond to updated assignments');
+assert(game.includes("key==='profile'?pendingBlitz")&&game.includes("['event_assignments','event_collaboration_invites','event_decisions']")&&game.includes("['blitz_assignments']"),'Profile and event badges respond through the shared assignment subscriptions');
 assert(css.includes('.blitzArchiveBackdrop')&&css.includes('.blitzInlineQuiz'),'Modal and inline layout styles exist');
 assert(game.includes('setPendingEvents(new Set(')&&events.includes('myPendingCases=new Set('),'Event notifications count unique cases, not duplicate invitations');
 console.log('PASS blitz inbox, atomic assignment, offline plan, profile and event badges');

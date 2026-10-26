@@ -1,9 +1,10 @@
 'use client';
 import {gameValueLabel} from '../../lib/gameLabels';
 import {userError} from '@/lib/userError';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {CalendarDays,CheckCircle2,RefreshCw,Send,UsersRound} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
 import DisclosureSummary from '../ui/DisclosureSummary';
@@ -52,8 +53,16 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const [saving,setSaving]=useState(false);
  const [notice,setNotice]=useState('');
  const [busyId,setBusyId]=useState<string|null>(null);
- async function reload(includeCount=false){
-  if(!game||!me)return;
+ const feedScope=JSON.stringify([game?.id,me?.user_id,me?.kind,me?.role_title,teacher,readOnly]);
+ const activeScope=useRef(feedScope),alive=useRef(true);activeScope.current=feedScope;
+ const reads=useRef({scope:feedScope,promise:null as Promise<void>|null,queued:false,count:false,explicit:false});
+ if(reads.current.scope!==feedScope)reads.current={scope:feedScope,promise:null,queued:false,count:false,explicit:false};
+ const scopeCurrent=()=>alive.current&&activeScope.current===feedScope;
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
+ useEffect(()=>{setCases([]);setAssignments([]);setDecisions([]);setOutcomes([]);setInvitations([]);setAuthority([]);setCaseRegions({});setReadyCaseCount(null);setExpanded('');setNotice('');setBusyId(null);setSaving(false)},[feedScope]);
+ async function readFeed(includeCount:boolean,background:boolean){
+  const current=()=>scopeCurrent()&&(!background||document.visibilityState==='visible');
+  if(!game||!me||!current())return;
   // Assigned cases belong to the active feed. The large unassigned bank
   // is intentionally fetched only by the bottom disclosure on demand.
   const [b,c,d,e,f]=await Promise.all([
@@ -63,6 +72,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    supabase.from('event_collaboration_invites').select('*').eq('game_id',game.id),
    supabase.from('event_authority_evidence').select('*').eq('game_id',game.id)
   ]);
+  if(!current())return;
   const error=[b,c,d,e,f].find(r=>r.error)?.error;
   if(error){setNotice(userError(error));return}
   const assignedRows=(b.data||[]) as Assignment[];
@@ -70,15 +80,18 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   const caseIds=[...new Set([...assignedRows.map(a=>a.case_id),...invitedRows.map(v=>v.case_id)])];
   if(caseIds.length){
    const result=await supabase.rpc('list_visible_event_cases',{p_game_id:game.id,p_case_ids:caseIds});
+   if(!current())return;
    if(result.error){setNotice(userError(result.error));return}
    setCases((result.data||[]) as CaseRow[]);
    const routing=await supabase.from('event_case_routing').select('case_id,region_code').eq('game_id',game.id).in('case_id',caseIds).not('region_code','is',null);
+   if(!current())return;
    if(!routing.error&&routing.data?.length){
     const regionCodes=[...new Set(routing.data.map(x=>x.region_code))];
     const [reference,control]=await Promise.all([
      supabase.from('fiscal_region_reference').select('code,name').in('code',regionCodes),
      supabase.from('game_region_party_control').select('region_code,party_id').eq('game_id',game.id).in('region_code',regionCodes)
     ]);
+    if(!current())return;
     if(!reference.error&&!control.error){
      const names=new Map((reference.data||[]).map(r=>[r.code,r.name]));
      const parties=new Map((g.parties||[]).map(p=>[p.id,p.name]));
@@ -93,31 +106,24 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   setAssignments(assignedRows);setDecisions((c.data||[]) as Decision[]);setOutcomes((d.data||[]) as Outcome[]);
   if(includeCount){
    const result=await supabase.from('event_cases').select('id',{head:true,count:'exact'}).eq('game_id',game.id).eq('status','ready');
+   if(!current())return;
    if(!result.error)setReadyCaseCount(result.count??0);
   }
  }
- useEffect(()=>{
-  if(!game?.id||!me?.user_id)return;
-  void reload(true);
-  // Poll assignment state only while visible; bank content stays lazy.
-  const poll=setInterval(()=>{if(document.visibilityState==='visible')void reload(false)},180000);
-  let pending:ReturnType<typeof setTimeout>|undefined,needsCatalog=false;
-  const changed=(catalog=false)=>{
-   needsCatalog=needsCatalog||catalog;
-   if(pending)clearTimeout(pending);
-   pending=setTimeout(()=>{
-    pending=undefined;
-    if(document.visibilityState==='visible'){void reload(needsCatalog);needsCatalog=false;}
-   },2500);
-  };
-  const channel=supabase.channel('event-workspace:'+game.id+':'+me.user_id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_cases',filter:'game_id=eq.'+game.id},()=>changed(true))
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_assignments',filter:'game_id=eq.'+game.id},()=>changed())
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_decisions',filter:'game_id=eq.'+game.id},()=>changed())
-   .on('postgres_changes',{event:'*',schema:'public',table:'event_case_outcomes',filter:'game_id=eq.'+game.id},()=>changed())
-   .subscribe();
-  return()=>{clearInterval(poll);if(pending)clearTimeout(pending);void supabase.removeChannel(channel)};
- },[game?.id,me?.user_id]);
+ async function reload(includeCount=false,background=false){
+  if(!scopeCurrent()||background&&document.visibilityState!=='visible')return;
+  const state=reads.current;
+  state.count=state.count||includeCount;state.explicit=state.explicit||!background;
+  if(state.promise){state.queued=true;return state.promise}
+  state.promise=(async()=>{
+   do{
+    state.queued=false;const count=state.count,passive=!state.explicit;state.count=false;state.explicit=false;
+    try{await readFeed(count,passive)}catch(error){if(scopeCurrent())setNotice(userError(error))}
+   }while(state.queued&&scopeCurrent());
+  })().finally(()=>{state.promise=null});
+  return state.promise;
+ }
+ useGameTableSync(me?.user_id?game?.id:undefined,['event_cases','event_assignments','event_decisions','event_case_outcomes','event_collaboration_invites','event_authority_evidence','event_case_routing'],()=>reload(readyCaseCount===null,true),feedScope,undefined,750,180000);
  const students=members.filter(m=>m.kind==='student');
  const roles=[...new Set(students.map(m=>m.role_title?.trim()).filter((r):r is string=>!!r))].sort((a,b)=>a.localeCompare(b,'ru'));
  const recipients=roleFilter&&audience!=='all'?students.filter(m=>m.role_title===roleFilter):students;
@@ -136,16 +142,18 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    p_game_id:game.id,p_title:title.trim(),p_situation:situation.trim(),p_category:category,
    p_seriousness:seriousness,p_audience:audience,p_options:options.map(o=>({label:o.label,trust:o.trust,description:o.description,authorized_roles:authorizedRoles(o.authorizedRoles),lawful:o.lawful,legal_basis:o.legalBasis.trim(),protects_role_interest:o.protectsRoleInterest})),p_recipients:eligible,p_roles:roleFilter?[roleFilter]:[]
   });
+  if(!scopeCurrent())return;
   if(r.error)setNotice(userError(r.error));
   else{setNotice('Событие направлено участникам: '+eligible.length);setTitle('');setSituation('');setSelected([]);setOptions(initialOptions());await reload()}
-  setSaving(false);
+  if(scopeCurrent())setSaving(false);
  }
  async function answer(assignment:Assignment,choice:string){
   if(busyId||readOnly||me?.kind!=='student')return;
   eventButtonSound();setBusyId(assignment.id);setNotice('');
   const r=await supabase.rpc('submit_event_decision',{p_assignment_id:assignment.id,p_choice:choice,p_rationale:null});
-  if(r.error)setNotice(userError(r.error));else await Promise.all([reload(false),g.refresh()]);
-  setBusyId(null);
+  if(!scopeCurrent())return;
+  if(r.error)setNotice(userError(r.error));else await Promise.all([reload(false),g.refreshEventEffects()]);
+  if(scopeCurrent())setBusyId(null);
  }
  const assignedCaseIds=new Set(assignments.map(a=>a.case_id));
  function resolvedValue(d:Decision,c:CaseRow){
@@ -182,8 +190,9 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  async function finalize(id:string){
   if(!teacher||busyId||!window.confirm('Подвести итог по текущим ответам и завершить голосование досрочно?'))return;
   setBusyId(id);const r=await supabase.rpc('finalize_event_case',{p_case_id:id});
+  if(!scopeCurrent())return;
   setNotice(r.error?userError(r.error):r.data?.reason==='no_answers'?'Пока нет голосов.':'Итог зафиксирован.');
-  if(!r.error)await Promise.all([reload(false),g.refresh()]);setBusyId(null);
+  if(!r.error)await Promise.all([reload(false),g.refreshEventEffects()]);if(scopeCurrent())setBusyId(null);
  }
  if(!game||!me)return null;
  return <section className="eventWorkspace" aria-label="События — ситуационные решения">

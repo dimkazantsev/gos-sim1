@@ -7,24 +7,29 @@ import {useDialog} from '../ui/useDialog';
 import {supabase} from '@/lib/supabase';
 type Row={id:string;question:string|null;topic:string;options:string[]|null;stage_no:number;available_at?:string;started_at?:string|null;deadline?:string;answered_at?:string|null;chosen_index?:number|null;correct_index?:number|null;is_correct?:boolean|null;explanation?:string|null;legal_act?:string|null;article?:string|null;source_url?:string|null};
 const legal=(r:Row)=>r.source_url&&/^https:\/\//.test(r.source_url)?<a href={r.source_url} target="_blank" rel="noopener noreferrer">{r.legal_act}, {r.article} ↗</a>:<span>{r.legal_act} {r.article}</span>;
-export function BlitzOverlay({gameId,enabled}:{gameId:string;enabled:boolean}){
+export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;userId?:string;stageKey?:string;enabled:boolean}){
  const refreshBusy=useRef(false),answerBusy=useRef(false),selectedQueued=useRef('');
- const since=useRef(new Date().toISOString());
+ const since=useRef(new Date().toISOString()),issuedDay=useRef('');
  const archiveShowing=useRef(false);
  useEffect(()=>{const opened=()=>{archiveShowing.current=true},closed=()=>{archiveShowing.current=false};window.addEventListener('blitz:archive-open',opened);window.addEventListener('blitz:archive-close',closed);return()=>{window.removeEventListener('blitz:archive-open',opened);window.removeEventListener('blitz:archive-close',closed)}},[]);
  const [card,setCard]=useState<Row|null>(null),[feedback,setFeedback]=useState<Row|null>(null),[time,setTime]=useState(20),[busy,setBusy]=useState(false),[error,setError]=useState('');
- useEffect(()=>{since.current=new Date().toISOString();setCard(null);setFeedback(null)},[gameId]);
+ useEffect(()=>{since.current=new Date().toISOString();issuedDay.current='';setCard(null);setFeedback(null)},[gameId,userId]);
  useEffect(()=>{
   if(!enabled||card||feedback)return;
   let stopped=false;
   async function refresh(selectedId=''){
-   if(archiveShowing.current&&!selectedId)return;
+   if(document.visibilityState!=='visible'||archiveShowing.current&&!selectedId)return;
    if(refreshBusy.current){if(selectedId)selectedQueued.current=selectedId;return}
    refreshBusy.current=true;
    try{
-    const issued=await supabase.rpc('blitz_issue_today',{p_game:gameId});
-    if(issued.error){if(selectedId&&!stopped)setError('Не удалось подготовить блиц-вопрос.');return}
-    if(issued.data>0)window.dispatchEvent(new Event('blitz:updated'));
+    // Assignment preparation is idempotent, but its backfill must not run on every delivery check.
+    const day=gameId+':'+(userId||'')+':'+stageKey+':'+new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Moscow'});
+    if(!selectedId&&issuedDay.current!==day){
+     issuedDay.current=day;
+     const issued=await supabase.rpc('blitz_issue_today',{p_game:gameId});
+     if(!stopped&&!issued.error&&issued.data>0)window.dispatchEvent(new Event('blitz:updated'));
+    }
+    if(stopped||document.visibilityState!=='visible')return;
     const result=selectedId
      ?await supabase.rpc('blitz_open_selected',{p_id:selectedId})
      :await supabase.rpc('blitz_open_recent',{p_game:gameId,p_not_before:since.current});
@@ -45,9 +50,10 @@ export function BlitzOverlay({gameId,enabled}:{gameId:string;enabled:boolean}){
   void refresh();
   const id=window.setInterval(()=>{if(document.visibilityState==='visible')void refresh()},45000);
   const request=(event:Event)=>void refresh((event as CustomEvent<{assignmentId?:string}>).detail?.assignmentId||'');
-  window.addEventListener('blitz:open',request);
-  return()=>{stopped=true;window.clearInterval(id);window.removeEventListener('blitz:open',request)}
- },[gameId,enabled,!!card,!!feedback]);
+  const resume=()=>{if(document.visibilityState==='visible')void refresh()};
+  window.addEventListener('blitz:open',request);document.addEventListener('visibilitychange',resume);
+  return()=>{stopped=true;window.clearInterval(id);window.removeEventListener('blitz:open',request);document.removeEventListener('visibilitychange',resume)}
+ },[gameId,userId,stageKey,enabled,!!card,!!feedback]);
  useEffect(()=>{if(!card?.deadline)return;const f=()=>setTime(Math.max(0,Math.ceil((Date.parse(card.deadline!)-Date.now())/1000)));f();const id=setInterval(f,250);return()=>clearInterval(id)},[card?.deadline]);
  async function answer(choice:number){if(!card||answerBusy.current||busy||feedback)return;answerBusy.current=true;setBusy(true);try{const r=await supabase.rpc('blitz_answer',{p_id:card.id,p_choice:choice});if(r.error)setError(userError(r.error));else{setError('');setFeedback({...card,...r.data});window.dispatchEvent(new Event('blitz:updated'))}}catch(e){setError((userError(e)||'Ответ не отправлен. Повторите попытку.'))}finally{answerBusy.current=false;setBusy(false)}}
  useEffect(()=>{if(card?.deadline&&time===0&&Date.now()>=Date.parse(card.deadline)&&!feedback&&!busy)void answer(-1)},[card?.id,card?.deadline,time,!!feedback,busy]);

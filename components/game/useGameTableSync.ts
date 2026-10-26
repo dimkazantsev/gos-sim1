@@ -10,13 +10,15 @@ export function setGameRealtimeConnection(gameId:string,connected:boolean){
  else connectedGames.delete(gameId);
 }
 export function gameRealtimeConnected(gameId:string){return connectedGames.has(gameId)}
-// Only these game tables trigger notifyGameDataRefresh() from the shared
-// game channel. Other stage data must keep its existing 25–35s poll until
-// it has an equivalent push invalidation, otherwise student updates lag.
-const pushedStageTables=new Set([
+// These tables have both a shared handler and server Realtime publication.
+// Other tables retain their fallback until equivalent push delivery exists.
+export const GAME_PUSH_TABLES:ReadonlySet<string>=new Set([
  'game_stages','game_parties','party_invitations','party_chair_ballots',
  'formal_documents','political_posts','game_votes','blitz_assignments',
- 'stage_deadline_rules','parliamentary_election_rules','regional_election_rules'
+ 'stage_deadline_rules','parliamentary_election_rules','regional_election_rules',
+ 'state_metrics','party_documents',
+ 'duma_sessions','duma_agenda_items',
+ 'institution_session_registrations','bill_amendments','bill_amendment_packs'
 ]);
 export const GAME_DATA_REFRESH_EVENT='gos-sims:refresh';
 export const KSRF_PROPOSAL_REFRESH_EVENT='gos-sims:ksrf-proposals';
@@ -35,28 +37,34 @@ export function notifyGameDataRefresh(gameId:string,table?:string){
 // subscription per widget multiplies catalog work in Realtime. Keep these
 // views eventually consistent through local invalidation, focus/online
 // recovery and a low-frequency visible-tab poll.
-export function useGameTableSync(gameId:string|undefined,_tables:readonly string[],load:()=>Promise<unknown>,scope='',onlyTable?:string){
+export function useGameTableSync(gameId:string|undefined,_tables:readonly string[],load:()=>Promise<unknown>,scope='',onlyTable?:string,minRefreshMs=750,fallbackMs=60000){
  const latest=useRef(load);latest.current=load;
+ const tableKey=_tables.join('|');
  useEffect(()=>{
   if(!gameId)return;
   let disposed=false,running=false,queued=false,timer:ReturnType<typeof setTimeout>|undefined;
   // Keep last fallback per mounted widget; direct mutations and Realtime
   // invalidation still refresh immediately through GAME_DATA_REFRESH_EVENT.
-  let lastFallbackAt=Date.now();
-  const hasPushCoverage=_tables.length>0&&_tables.every(table=>pushedStageTables.has(table));
+  let lastFallbackAt=Date.now(),lastStartedAt=0;
+  const hasPushCoverage=_tables.length>0&&_tables.every(table=>GAME_PUSH_TABLES.has(table));
   async function flush(){
-   if(disposed)return;
    timer=undefined;
+   if(disposed)return;
+   if(document.visibilityState!=='visible'){queued=true;return}
    if(running){queued=true;return}
-   running=true;
+   queued=false;running=true;lastStartedAt=Date.now();
    try{await latest.current()}catch(error){console.error('Stage refresh failed',error)}
    finally{running=false;if(queued&&!disposed){queued=false;schedule(250)}}
   }
-  function schedule(delay=120){if(disposed||timer!==undefined)return;timer=setTimeout(()=>void flush(),delay)}
+  function schedule(delay=120){
+   if(disposed||timer!==undefined)return;
+   if(document.visibilityState!=='visible'){queued=true;return}
+   timer=setTimeout(()=>void flush(),Math.max(delay,minRefreshMs-(Date.now()-lastStartedAt)));
+  }
   let lastVisibleRecoveryAt=0;
   function visible(){
    const now=Date.now();
-   if(document.visibilityState==='visible'&&now-lastVisibleRecoveryAt>20000){lastVisibleRecoveryAt=now;schedule()}
+   if(document.visibilityState==='visible'&&(queued||now-lastVisibleRecoveryAt>20000)){lastVisibleRecoveryAt=now;schedule()}
   }
   function local(event:Event){
    const detail=(event as CustomEvent<{gameId:string;table?:string}>).detail;
@@ -75,10 +83,10 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
     if(hasPushCoverage&&gameRealtimeConnected(gameId)&&now-lastFallbackAt<180000)return;
     lastFallbackAt=now;
     schedule(0);
-  },60000+Math.floor(Math.random()*15000));
+  },fallbackMs+Math.floor(Math.random()*Math.min(15000,fallbackMs/4)));
   window.addEventListener('focus',visible);window.addEventListener('online',visible);
   const eventName=onlyTable?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT;
   window.addEventListener(eventName,local);document.addEventListener('visibilitychange',visible);
   return()=>{disposed=true;clearTimeout(timer);clearInterval(poll);window.removeEventListener('focus',visible);window.removeEventListener('online',visible);window.removeEventListener(eventName,local);document.removeEventListener('visibilitychange',visible)};
- },[gameId,scope,onlyTable]);
+ },[gameId,scope,onlyTable,tableKey,minRefreshMs,fallbackMs]);
 }

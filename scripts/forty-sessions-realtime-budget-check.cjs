@@ -19,10 +19,10 @@ assert(game.includes('setGameRealtimeConnection(gameId,liveConnected)'));
 assert(game.includes('setGameRealtimeConnection(gameId,false)'));
 assert(game.includes('if(liveConnected&&now-lastChatRecoveryAt<60000)return'));
 assert(game.includes('},6000);'),'Disconnected chat recovery retained');
-assert(client.includes('if(connected&&now-lastRecoveryAt<180000)return'),'Event badge should not poll every 30 seconds when connected');
-assert(client.includes('if(connected&&now-lastRecoveryAt<120000)return'),'Blitz badge should not poll every 25 seconds when connected');
+assert(client.includes("useGameTableSync(!previewMode&&me?game?.id:undefined,['event_assignments'"),'Event badges use shared realtime and reconciliation');
+assert(client.includes("useGameTableSync(!previewMode&&me?.kind==='student'?game?.id:undefined,['blitz_assignments']"),'Blitz badges use the same bounded game scheduler');
 assert(!client.includes('},[game?.id,me?.user_id,previewMode,view]);'),'Section navigation must not resubscribe event badges');
-assert(client.includes('setTimeout(()=>{pendingTimer=undefined;if(live)void count()},450)'),'Burst of event rows merged');
+assert(!client.includes("supabase.channel('event-count:")&&!client.includes("supabase.channel('blitz-count:"),'No additional per-student badge subscriptions');
 
 const js=ts.transpileModule(sync,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 let now=1_000_000;
@@ -95,13 +95,13 @@ function browserSession(index,widgets=3,table='game_stages'){
  const afterEvent=sessions.reduce((sum,c)=>sum+c.counts.loads,0);
  assert.equal(afterEvent,reads240+120,'Direct game invalidation still refreshes all affected widgets');
  sessions.forEach(c=>c.connect(false));
- for(let i=0;i<8;i++){now+=5000;await Promise.all(sessions.map(c=>c.tick()))}
+ for(let i=0;i<15;i++){now+=5000;await Promise.all(sessions.map(c=>c.tick()))}
  const disconnected=sessions.reduce((sum,c)=>sum+c.counts.loads,0);
- assert(disconnected>=afterEvent+120,'Every disconnected client resumes its fallback within 40 seconds');
+ assert(disconnected>=afterEvent+120,'Every disconnected widget resumes the upstream 60–75-second fallback');
  // Extend the same 40 independent virtual browser sessions to 20 minutes.
  // No real users, credentials, network traffic or production writes are involved.
  sessions.forEach(c=>c.connect(true));
- for(let elapsed=0;elapsed<320_000;elapsed+=5_000){
+ for(let elapsed=0;elapsed<285_000;elapsed+=5_000){
   now+=5_000;await Promise.all(sessions.map(c=>c.tick()));
  }
  const hidden=sessions.slice(0,20);
@@ -129,10 +129,10 @@ function browserSession(index,widgets=3,table='game_stages'){
  const uncovered=browserSession(99,1,'unlisted_stage_table');
  await uncovered.settle();
  uncovered.connect(true);
- for(let elapsed=0;elapsed<40000;elapsed+=5000){now+=5000;await uncovered.tick()}
- assert(uncovered.counts.loads>=2,'Table without push invalidation retains normal 25–35s visible poll');
+ for(let elapsed=0;elapsed<75000;elapsed+=5000){now+=5000;await uncovered.tick()}
+ assert(uncovered.counts.loads>=2,'Table without push invalidation retains the upstream 60–75s visible poll');
  uncovered.dispose();
- console.log('PASS: 40 independent browser sessions, 3 widgets each; 120 initial reads, '+reads120+' at 2m, '+reads240+' at 4m, '+afterEvent+' after direct event, '+disconnected+' after 40s offline recovery');
+ console.log('PASS: 40 independent browser sessions, 3 widgets each; 120 initial reads, '+reads120+' at 2m, '+reads240+' at 4m, '+afterEvent+' after direct event, '+disconnected+' after 75s offline recovery');
  console.log('PASS: 20 virtual minutes, 40 sessions x 3 widgets, '+reads20m+' total widget loads; hidden-tab pause, reconnect and visibility recovery verified');
  console.log('NOTE: virtual-time simulation only; NOT a real 20-minute test with 40 independently authenticated users. No external requests or writes.');
 })().catch(e=>{console.error(e);process.exitCode=1});

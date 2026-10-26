@@ -19,7 +19,7 @@ import {mergeChatMessages} from './chatRealtime';
 import type {GameOfficeAssignment,ChatOverview} from './types';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
-type ReadScope='all'|'core'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
+type ReadScope='all'|'core'|'game'|'stages'|'votes'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
 const BOOTSTRAP_TIMEOUT_MS=12000;
 const SESSION_BOOTSTRAP_TIMEOUT_MS=16000;
@@ -41,6 +41,8 @@ export function useRepublicGame(gameId:string){
  const messageRowsRef=useRef<Message[]>([]),recentChatRecoveryRunning=useRef(false);
  useEffect(()=>{messageRowsRef.current=messages},[messages]);
  const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profileRows,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[partyInvitations,setPartyInvitations]=useState<PartyInvitation[]>([]),[partyMandates,setPartyMandateRows]=useState<PartyMandateAllocation[]>([]),[partyAgreements,setPartyAgreements]=useState<PartyAgreement[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]),[politicalPosts,setPoliticalPosts]=useState<PoliticalPost[]>([]),[politicalMedia,setPoliticalMedia]=useState<PoliticalPostMedia[]>([]),[postFormalLinks,setPostFormalLinks]=useState<PoliticalPostFormalLink[]>([]),[metricHistory,setMetricHistory]=useState<MetricHistory[]>([]),[partySupportHistory,setPartySupportHistory]=useState<PartySupportHistory[]>([]),[impactRules,setImpactRules]=useState<ImpactRule[]>([]),[impactLedger,setImpactLedger]=useState<ImpactLedger[]>([]);
+ const votesRef=useRef(votes);votesRef.current=votes;
+ const changedFormalIds=useRef(new Set<string>()),changedVoteIds=useRef(new Set<string>());
  const [loading,setLoading]=useState(true),[error,setErrorRaw]=useState(''),[chatOpen,setChatOpen]=useState(false),[secondsLeft,setSecondsLeft]=useState(0),[activeView,setActiveView]=useState<View>('dashboard');
  const [profileGameId,setProfileGameId]=useState('');
  const [introAccountSeen,setIntroAccountSeen]=useState(false);
@@ -49,12 +51,14 @@ export function useRepublicGame(gameId:string){
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),activeViewRef=useRef<View>('dashboard'),chatOpenRef=useRef(false);
  activeViewRef.current=activeView;chatOpenRef.current=chatOpen;
  const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
+ const realtimeDirtyTables=useRef(new Set<string>()),presenceInFlight=useRef('');
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const lastTelegramDispatch=useRef(0);
  const lastCoreSuccessAt=useRef(0);
  // Avoid amplifying PostgREST pool/statement timeouts with repeated 15-table reads.
  const backendRecoveryAfter=useRef(0);
  const overviewRealtimeTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const readReceipt=useRef({scope:'',timer:null as ReturnType<typeof setTimeout>|null,running:false,queued:false,lastAt:0});
  const lastRealtimeOverviewAt=useRef(0);
  function scheduleRealtimeChatOverview(){
   if(overviewRealtimeTimer.current!==null)return;
@@ -68,10 +72,25 @@ export function useRepublicGame(gameId:string){
  }
  const coreReadQueue=useRef({active:0,waiting:[] as Array<()=>void>});
  function limitedCoreRead<T>(query:PromiseLike<T>):Promise<T>{
+  const epoch=readEpoch.current,user=authUser.current,targetGame=gameId;
   return new Promise<T>((resolve,reject)=>{
    const run=()=>{
     coreReadQueue.current.active++;
-    void Promise.resolve(query).then(resolve,reject).finally(()=>{
+    const controller=new AbortController();
+    let timeout:ReturnType<typeof setTimeout>|undefined;
+    const request=async()=>{
+     if(!alive.current||epoch!==readEpoch.current||user!==authUser.current||targetGame!==activeGameRef.current)
+      throw new Error('Игровая сессия изменилась.');
+     const abortable=query as PromiseLike<T>&{abortSignal?:(signal:AbortSignal)=>PromiseLike<T>};
+     return Promise.race([
+      Promise.resolve(abortable.abortSignal?abortable.abortSignal(controller.signal):query),
+      new Promise<T>((_,fail)=>{timeout=setTimeout(()=>{
+       controller.abort();fail(new Error('Запрос игровых данных не завершился за 12 с. Повторите попытку.'));
+      },BOOTSTRAP_TIMEOUT_MS)})
+     ]);
+    };
+    void request().then(resolve,reject).finally(()=>{
+     clearTimeout(timeout);
      coreReadQueue.current.active--;
      coreReadQueue.current.waiting.shift()?.();
     });
@@ -163,6 +182,10 @@ export function useRepublicGame(gameId:string){
  }
  function clearGameData(){
   acceptedMember.current=null;
+  realtimeDirtyTables.current.clear();
+  changedFormalIds.current.clear();changedVoteIds.current.clear();
+  if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
+  readReceipt.current={scope:'',timer:null,running:false,queued:false,lastAt:0};
   assetSignatures.current.clear();lastCoreSuccessAt.current=0;
   if(overviewRealtimeTimer.current!==null){clearTimeout(overviewRealtimeTimer.current);overviewRealtimeTimer.current=null}
   lastRealtimeOverviewAt.current=0;
@@ -200,25 +223,31 @@ export function useRepublicGame(gameId:string){
  const sharedMetrics=useMemo(()=>withBudgetIncome(metrics,budgetPulse),[metrics,budgetPulse]);
  const sharedMetricHistory=useMemo(()=>budgetPulse?[...metricHistory.filter(h=>h.metric_key!=='budget'),...budgetPulse.history]:metricHistory,[metricHistory,budgetPulse]);
  async function syncBudget(){await refreshBudgetPulse();}
- function scheduleRealtimeReload(delay=1200){
+ function scheduleRealtimeReload(delay=1000,tables:readonly string[]=['*']){
+  for(const table of tables)realtimeDirtyTables.current.add(table);
   // Keep the first pending refresh: continuous Realtime events must not
   // indefinitely postpone it or refetch dozens of tables on every change.
   if(typeof document!=='undefined'&&document.visibilityState==='hidden')return;
   if(Date.now()<backendRecoveryAfter.current)return;
   if(realtimeReloadTimer.current)return;
-  const cooldown=Math.max(0,8000-(Date.now()-lastFullReloadAt.current));
+  const cooldown=Math.max(0,3000-(Date.now()-lastFullReloadAt.current));
   realtimeReloadTimer.current=setTimeout(()=>{realtimeReloadTimer.current=null;void flushRealtimeReload()},Math.max(delay,cooldown));
  }
  async function flushRealtimeReload(){
+  if(!alive.current||document.visibilityState==='hidden')return;
   if(realtimeReloadRunning.current){realtimeReloadQueued.current=true;return}
+  const tables=new Set(realtimeDirtyTables.current);realtimeDirtyTables.current.clear();
   const version=++realtimeReloadVersion.current;
   realtimeReloadRunning.current=true;
   lastFullReloadAt.current=Date.now();
-  try{await loadCoreSections()}
+  try{await within(loadRealtimeSections(tables),BOOTSTRAP_TIMEOUT_MS,'Обновление игровых данных')}
+  catch(error){
+   if(version===realtimeReloadVersion.current){backendRecoveryAfter.current=Date.now()+90000;setError(error)}
+  }
   finally{
    if(version!==realtimeReloadVersion.current)return;
    realtimeReloadRunning.current=false;
-   if(realtimeReloadQueued.current){realtimeReloadQueued.current=false;scheduleRealtimeReload()}
+   if(realtimeReloadQueued.current){realtimeReloadQueued.current=false;scheduleRealtimeReload(1000,[])}
   }
  }
 
@@ -250,7 +279,7 @@ export function useRepublicGame(gameId:string){
     lastRecoveryAt=now;
     // Focus, online and visibility events arrive together. Stage widgets
     // already own their focused reconciliation; do not broadcast a full refresh.
-    if(now-lastCoreSuccessAt.current>90000)scheduleRealtimeReload(0);
+    if(realtimeDirtyTables.current.size||now-lastCoreSuccessAt.current>90000)scheduleRealtimeReload(0);
    };
   const visible=()=>{if(document.visibilityState==='visible')recover()};
   window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
@@ -260,25 +289,23 @@ export function useRepublicGame(gameId:string){
  useEffect(()=>{
   if(!me?.user_id||me.game_id!==gameId)return;
   let disposed=false,scheduled=false;
+  const subscriptionEpoch=readEpoch.current;
+  const currentConnection=()=>!disposed&&subscriptionEpoch===readEpoch.current&&activeGameRef.current===gameId&&authUser.current===me.user_id;
   let liveConnected=false,lastPollAt=0;
   let dirtyCore=false,dirtyPartyDocuments=false,dirtyChat=false,dirtyPins=false,dirtyOverview=false;
   const dirtyTables=new Set<string>();
+  const reconcileTables=new Set<string>();
   let timer:ReturnType<typeof setTimeout>|undefined;
   function flush(){
-   if(disposed||document.visibilityState==='hidden')return;
+   if(!currentConnection()||document.visibilityState==='hidden')return;
    const core=dirtyCore,partyDocs=dirtyPartyDocuments,chat=dirtyChat,pins=dirtyPins,overview=dirtyOverview;
    const tables=[...dirtyTables];dirtyTables.clear();
+   const reconcile=[...reconcileTables];reconcileTables.clear();
    dirtyCore=false;dirtyPartyDocuments=false;dirtyChat=false;dirtyPins=false;dirtyOverview=false;
-   // Read tickets in the loaders guard overlapping requests: never serialize
-   // new events behind a stalled, older fetch.
-   if(core)scheduleRealtimeReload();
+   // Coalesce dependent reads; read tickets reject stale results after a delta.
+   if(core)scheduleRealtimeReload(1000,['*']);
+   else if(reconcile.length)scheduleRealtimeReload(1000,reconcile);
    for(const table of tables)notifyGameDataRefresh(gameId,table);
-   // A post updates only the visible wall; it must not reload game identity.
-   if(tables.includes('political_posts')&&['actions','dashboard'].includes(activeViewRef.current))void loadPoliticalWall();
-   // Only visible parties and registry screens fetch their dependent details.
-   if(tables.some(table=>['party_invitations','party_chair_ballots','game_parties'].includes(table))
-      &&['parties','teacher'].includes(activeViewRef.current))void loadPartyRepresentation(false);
-   if(tables.includes('formal_documents')&&activeViewRef.current==='documents')void loadFormalRegistry();
    // A document version changes no core identity or party membership.
    if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments();
     if(partyDocs)notifySectionUpdates(gameId);
@@ -296,6 +323,7 @@ export function useRepublicGame(gameId:string){
   // Events received while hidden remain dirty and reconcile on return;
   // clearing the flags while hidden would silently lose these updates.
   const resumePending=()=>{
+   if(document.visibilityState==='visible'&&chatOpenRef.current&&channelRef.current)void markChatRead(channelRef.current);
    if(document.visibilityState==='visible'&&
      (dirtyCore||dirtyTables.size>0||dirtyPartyDocuments||dirtyChat||dirtyPins||dirtyOverview))schedule();
   };
@@ -308,17 +336,19 @@ export function useRepublicGame(gameId:string){
   // and UPDATE, both of which enforce each game's existing SELECT policy.
   for(const metricEvent of ['INSERT','UPDATE'] as const){
    channel.on('postgres_changes',{event:metricEvent,schema:'public',table:'state_metrics',filter:'game_id=eq.'+gameId},payload=>{
+    if(!currentConnection())return;
     const next=payload.new as unknown as Metric;
     if(!next?.id||next.game_id!==gameId)return;
     setMetrics(previous=>previous.some(item=>item.id===next.id)
      ?previous.map(item=>item.id===next.id?next:item)
      :[...previous,next]);
-    if(activeViewRef.current==='budget')notifyGameDataRefresh(gameId,'state_metrics');
+    notifyGameDataRefresh(gameId,'state_metrics');
    });
   }
   // A chart/history entry arrives on the same socket, with no follow-up
   // PostgREST query. The 3000-row bound matches the initial history read.
   channel.on('postgres_changes',{event:'INSERT',schema:'public',table:'state_metric_history',filter:'game_id=eq.'+gameId},payload=>{
+   if(!currentConnection())return;
    const entry=payload.new as unknown as MetricHistory;
    if(!entry?.id||entry.game_id!==gameId)return;
    setMetricHistory(previous=>previous.some(item=>item.id===entry.id)?previous:
@@ -327,13 +357,14 @@ export function useRepublicGame(gameId:string){
   // Render the authorised INSERT payload immediately rather than waiting
   // for another PostgREST query. RLS still governs Realtime visibility.
   channel.on('postgres_changes',{event:'*',schema:'public',table:'chat_messages',filter:'game_id=eq.'+gameId},payload=>{
+   if(!currentConnection())return;
    if(payload.eventType==='INSERT'){
     const row=payload.new as unknown as Message;
     if(row?.id&&row.game_id===gameId&&row.channel_id===channelRef.current){
      setMessages(previous=>mergeChatMessages(previous,[row]));
      if(row.storage_path){
       void signedAssetUrl('game-media',row.storage_path).then(url=>{
-       if(!disposed&&channelRef.current===row.channel_id&&url)
+       if(currentConnection()&&channelRef.current===row.channel_id&&url)
         setMessages(previous=>mergeChatMessages(previous,[{...row,url}]));
       }).catch(()=>{/* A later media URL refresh can retry. */});
      }
@@ -351,10 +382,48 @@ export function useRepublicGame(gameId:string){
     schedule();
    });
   }
+  function acceptCoreDelta(table:string,payload:{eventType:string;new:Record<string,unknown>}){
+   if(!currentConnection()||!alive.current)return true;
+   if(payload.eventType!=='INSERT'&&payload.eventType!=='UPDATE')return false;
+   const row=payload.new;
+   if(row.game_id&&row.game_id!==gameId)return true;
+   if(row.game_id!==gameId||typeof row.id!=='string'||typeof row.title!=='string'||!Number.isInteger(row.stage_no))return false;
+   if(table==='game_stages'){
+    if(!['locked','open','completed'].includes(String(row.status)))return false;
+    const next=row as unknown as Stage;
+    startRead('stages');
+    setStages(previous=>[...previous.filter(old=>old.id!==next.id),next].sort((a,b)=>a.stage_no-b.stage_no));
+    reconcileTables.add('stage_game');
+    return true;
+   }
+   if(table==='game_votes'){
+    if(!['open','closed'].includes(String(row.status))||typeof row.opened_at!=='string')return false;
+    const next=row as unknown as Vote;
+    startRead('votes');
+    setVotes(previous=>[...previous.filter(old=>old.id!==next.id),next].sort((a,b)=>b.opened_at.localeCompare(a.opened_at)));
+    if(['votes','stages','teacher'].includes(activeViewRef.current)){changedVoteIds.current.add(next.id);reconcileTables.add('vote_ballots')}
+    return true;
+   }
+   if(table==='formal_documents'){
+    if(typeof row.updated_at!=='string'||typeof row.status_code!=='string')return false;
+    const next=row as unknown as FormalDocument;
+    startRead('formal');
+    setFormalDocuments(previous=>{
+     const old=previous.find(doc=>doc.id===next.id);
+     return [...previous.filter(doc=>doc.id!==next.id),{...next,file_url:old?.source_file_path===next.source_file_path?old?.file_url||null:null}]
+      .sort((a,b)=>b.updated_at.localeCompare(a.updated_at));
+    });
+    if(activeViewRef.current==='documents'){changedFormalIds.current.add(next.id);reconcileTables.add('formal_document_changes')}
+    return true;
+   }
+   return false;
+  }
   for(const table of ['game_stages','game_parties','party_invitations','party_chair_ballots','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
-   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},payload=>{
+    if(!currentConnection())return;
+    if('game_id' in payload.new&&payload.new.game_id!==gameId)return;
     dirtyTables.add(table);
-    if(['game_stages','game_parties','game_votes','formal_documents'].includes(table))dirtyCore=true;
+    if(!acceptCoreDelta(table,payload))reconcileTables.add(table);
     schedule();
    });
   }
@@ -401,7 +470,14 @@ export function useRepublicGame(gameId:string){
   // runs only for an actively open conversation.
   let lastChatRecoveryAt=Date.now();
   const chatRecovery=setInterval(()=>{
-   if(document.visibilityState!=='visible'||!chatOpenRef.current)return;
+   if(document.visibilityState!=='visible'||!currentConnection())return;
+   // Ordinary ballots are outside Realtime publication; reconcile only open
+   // procedures on their visible screens, using the existing six-second timer.
+   if(Date.now()>=backendRecoveryAfter.current&&['votes','stages','teacher'].includes(activeViewRef.current)){
+    const openVotes=votesRef.current.filter(vote=>vote.status==='open');
+    if(openVotes.length){for(const vote of openVotes)changedVoteIds.current.add(vote.id);scheduleRealtimeReload(0,['vote_ballots'])}
+   }
+   if(!chatOpenRef.current)return;
    const now=Date.now();
    // Incoming messages update from the existing authorised Realtime payload.
    // When that socket is healthy, a full chat recovery once per minute is
@@ -418,7 +494,7 @@ export function useRepublicGame(gameId:string){
    if(liveRef.current===channel)liveRef.current=null;
    void supabase.removeChannel(channel);
   };
- },[gameId,me?.user_id]);
+ },[gameId,me?.user_id,me?.kind,me?.role_title,me?.team,me?.group_name,me?.roster_archived_at]);
 
  useEffect(()=>()=>{
   const rec=recorder.current;
@@ -509,11 +585,74 @@ export function useRepublicGame(gameId:string){
   finally{if(readCurrent(ticket,'all'))setLoading(false)}
  }
 
+ async function loadRealtimeSections(tables:Set<string>){
+  if(tables.has('*')||tables.has('game_members')){await hydrateActiveView();return}
+  const jobs:Promise<unknown>[]=[];
+  const view=activeViewRef.current;
+  if(tables.has('game_stages'))jobs.push(readSafely(['game','stages'],async ticket=>{
+   const [g,st]=await Promise.all([
+    supabase.from('games').select('*').eq('id',gameId).maybeSingle(),
+    supabase.from('game_stages').select('*').eq('game_id',gameId).order('stage_no')
+   ]);
+   if(!readCurrent(ticket))return;
+   requireSuccessful([g,st]);
+   if(g.data)setGame(g.data as Game);
+   setStages((st.data||[]) as Stage[]);
+  }));
+  else if(tables.has('stage_game'))jobs.push(readSafely(['game'],async ticket=>{
+   const g=await supabase.from('games').select('*').eq('id',gameId).maybeSingle();
+   if(!readCurrent(ticket))return;
+   requireSuccessful([g]);if(g.data)setGame(g.data as Game);
+  }));
+  if(tables.has('game_votes')||tables.has('vote_ballots'))jobs.push(readSafely(['votes'],async ticket=>{
+   const retryStale=()=>{if(readActive(ticket))scheduleRealtimeReload(3000,[tables.has('game_votes')?'game_votes':'vote_ballots'])};
+   const vo=tables.has('game_votes')
+    ?await supabase.from('game_votes').select('*').eq('game_id',gameId).order('opened_at',{ascending:false})
+    :{data:votesRef.current,error:null};
+   if(!readCurrent(ticket)){retryStale();return}
+   requireSuccessful([vo]);
+   const rows=(vo.data||[]) as Vote[];setVotes(rows);
+   if(!rows.length){setBallots([]);return}
+   const ids=tables.has('game_votes')?rows.map(row=>row.id):[...changedVoteIds.current];
+   if(!ids.length)return;
+   const ba=await limitedCoreRead(supabase.from('game_ballots').select('*').in('vote_id',ids));
+   if(!readCurrent(ticket)){retryStale();return}
+   requireSuccessful([ba]);for(const id of ids)changedVoteIds.current.delete(id);
+   setBallots(previous=>[...previous.filter(row=>!ids.includes(row.vote_id)),...(ba.data||[]) as Ballot[]]);
+  }));
+  if(tables.has('game_parties'))jobs.push(readSafely(['parties'],async ticket=>{
+   const pa=await supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id');
+   if(!readCurrent(ticket))return;
+   requireSuccessful([pa]);acceptPartyRows((pa.data||[]) as Party[],ticket);
+  }));
+  if(tables.has('game_office_assignments'))jobs.push(loadRepublicOffices());
+  if(tables.has('formal_document_changes')){
+   const ids=[...changedFormalIds.current];
+   if(view==='documents'&&ids.length)jobs.push(loadFormalRegistry(ids));
+  }
+  if(tables.has('formal_documents')){
+   if(view==='documents')jobs.push(loadFormalRegistry());
+   else jobs.push(readSafely(['formal'],async ticket=>{
+    const fd=await supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false});
+    if(!readCurrent(ticket))return;
+    requireSuccessful([fd]);
+    setFormalDocuments(previous=>((fd.data||[]) as FormalDocument[]).map(row=>{
+     const old=previous.find(doc=>doc.id===row.id);
+     return {...row,file_url:old?.source_file_path===row.source_file_path?old.file_url||null:null};
+    }));
+   }));
+  }
+  if(tables.has('political_posts')&&(view==='actions'||view==='dashboard'))jobs.push(loadPoliticalWall());
+  if([...tables].some(table=>['party_invitations','party_chair_ballots','game_parties'].includes(table))
+    &&(view==='parties'||view==='teacher'))jobs.push(loadPartyRepresentation(false));
+  await Promise.allSettled(jobs);
+ }
+
  async function loadCoreSections(){
   const uid=authUser.current;
   if(!uid)return;
-  const ticket=startRead('core','members','metrics','profiles','parties','formal','channels');
-  const [g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro]=await Promise.all([
+  const ticket=startRead('core','game','stages','votes','members','metrics','profiles','parties','formal','channels');
+  const results=await Promise.all([
    limitedCoreRead(supabase.from('games').select('*').eq('id',gameId).maybeSingle()),
    limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle()),
    limitedCoreRead(supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label')),
@@ -529,7 +668,12 @@ export function useRepublicGame(gameId:string){
    limitedCoreRead(supabase.from('game_profiles').select('*').eq('game_id',gameId)),
    limitedCoreRead(supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false})),
    limitedCoreRead(supabase.rpc('has_seen_my_intro'))
-  ]);
+  ]).catch(error=>{
+   if(readCurrent(ticket,'core')){backendRecoveryAfter.current=Date.now()+90000;setError(error)}
+   return null;
+  });
+  if(!results)return;
+  const [g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro]=results;
   if(!readCurrent(ticket,'core'))return;
   const coreResults=[g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro];
   if(coreResults.some(result=>['PGRST003','57014'].includes(String((result.error as {code?:string}|null)?.code||'')))){
@@ -546,25 +690,25 @@ export function useRepublicGame(gameId:string){
   if(previousMember&&(['kind','role_title','team','group_name','roster_archived_at'] as const).some(key=>previousMember[key]!==member[key])){
    readEpoch.current++;clearGameData();authUser.current=uid;acceptedMember.current=member;setGame(g.data as Game);setMe(member);void hydrateActiveView();return;
   }
-  acceptedMember.current=member;lastCoreSuccessAt.current=Date.now();setGame(g.data as Game);setMe(member);
+  acceptedMember.current=member;lastCoreSuccessAt.current=Date.now();if(readCurrent(ticket,'game'))setGame(g.data as Game);setMe(member);
   if(!mt.error&&readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
   if(mt.error&&readCurrent(ticket,'metrics'))setError(mt.error);
   if(!ev.error)setEvents((ev.data||[]) as EventItem[]);
   if(!mb.error&&readCurrent(ticket,'members'))setMembers((mb.data||[]) as Member[]);
   if(!ch.error&&readCurrent(ticket,'channels'))setChannels((ch.data||[]) as Channel[]);
-  if(!st.error)setStages((st.data||[]) as Stage[]);
+  if(!st.error&&readCurrent(ticket,'stages'))setStages((st.data||[]) as Stage[]);
   if(!pa.error&&readCurrent(ticket,'parties'))setParties(previous=>((pa.data||[]) as Party[]).map(row=>{
     const old=previous.find(p=>p.id===row.id);
     return {...row,logo_url:old?.logo_path===row.logo_path?old?.logo_url||null:null};
    }));
-  if(!vo.error){
+  if(!vo.error&&readCurrent(ticket,'votes')){
    const voteRows=(vo.data||[]) as Vote[];setVotes(voteRows);
    const ids=voteRows.map(v=>v.id);
    if(ids.length){
     const ba=await supabase.from('game_ballots').select('*').in('vote_id',ids);
     // Session, game or a newer core refresh may have changed during this read.
     if(!readCurrent(ticket,'core'))return;
-    if(!ba.error)setBallots((ba.data||[]) as Ballot[]);
+    if(!ba.error&&readCurrent(ticket,'votes'))setBallots((ba.data||[]) as Ballot[]);
    }else setBallots([]);
   }
   if(!ge.error)setEvaluations((ge.data||[]) as Evaluation[]);
@@ -746,24 +890,34 @@ export function useRepublicGame(gameId:string){
   });
  }
 
- async function loadFormalRegistry(){
+ async function loadFormalRegistry(ids?:string[]){
   await readSafely(['formal'],async ticket=>{
+   const docs=supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false});
+   const history=supabase.from('formal_document_history').select('*').eq('game_id',gameId).order('created_at',{ascending:false});
    const [fd,fh]=await Promise.all([
-    supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}),
-    supabase.from('formal_document_history').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
+    limitedCoreRead(ids?docs.in('id',ids):docs),
+    limitedCoreRead(ids?history.in('document_id',ids):history)
    ]);
-   if(!readCurrent(ticket))return;
+   if(!readCurrent(ticket)){
+    if(readActive(ticket)){
+     if(ids)for(const id of ids)changedFormalIds.current.add(id);
+     scheduleRealtimeReload(3000,[ids?'formal_document_changes':'formal_documents']);
+    }
+    return;
+   }
    requireSuccessful([fd,fh]);
+   if(ids)for(const id of ids)changedFormalIds.current.delete(id);
    const rows=(fd.data||[]) as FormalDocument[];
    // Render the register independently from Storage availability.
    setFormalDocuments(previous=>{
     const cached=new Map(previous.map(row=>[row.id,row]));
-    return rows.map(row=>{
+    const accepted=rows.map(row=>{
      const old=cached.get(row.id);
      return {...row,file_url:old?.source_file_path===row.source_file_path?old.file_url||null:null};
     });
+    return (ids?[...previous.filter(row=>!ids.includes(row.id)),...accepted]:accepted).sort((a,b)=>b.updated_at.localeCompare(a.updated_at));
    });
-   setFormalHistory((fh.data||[]) as FormalHistory[]);
+   setFormalHistory(previous=>(ids?[...previous.filter(row=>!ids.includes(row.document_id)),...(fh.data||[]) as FormalHistory[]]:(fh.data||[]) as FormalHistory[]).sort((a,b)=>b.created_at.localeCompare(a.created_at)||b.id-a.id));
    void Promise.all(rows.filter(row=>row.source_file_path).map(async row=>({
     id:row.id,path:row.source_file_path,url:await signedAssetUrl('game-assets',row.source_file_path!)
    }))).then(links=>{
@@ -837,7 +991,7 @@ export function useRepublicGame(gameId:string){
 
  async function loadChatOverview(){
   const result=await readSafely(['overview'],async ticket=>{
-  const r=await supabase.rpc('get_my_chat_overview',{p_game_id:gameId});
+  const r=await limitedCoreRead(supabase.rpc('get_my_chat_overview',{p_game_id:gameId}));
   if(!readCurrent(ticket))return [] as ChatOverview[];
   requireSuccessful([r]);
   const rows=(r.data||[]) as ChatOverview[];
@@ -847,9 +1001,33 @@ export function useRepublicGame(gameId:string){
   return result||[];
  }
  async function markChatRead(cid:string){
-  if(!cid)return;
-  const r=await supabase.rpc('mark_chat_channel_read',{p_channel_id:cid});
-  if(!r.error)await loadChatOverview();
+  const uid=authUser.current;
+  if(!cid||!uid||!alive.current||!chatOpenRef.current||channelRef.current!==cid||document.visibilityState!=='visible')return;
+  const scope=gameId+':'+uid+':'+cid;
+  if(readReceipt.current.scope!==scope){
+   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
+   readReceipt.current={scope,timer:null,running:false,queued:false,lastAt:0};
+  }
+  const receipt=readReceipt.current;
+  receipt.queued=true;
+  if(receipt.running||receipt.timer!==null)return;
+  const flush=async()=>{
+   receipt.timer=null;
+   if(receipt!==readReceipt.current||!alive.current||activeGameRef.current!==gameId||authUser.current!==uid
+     ||!chatOpenRef.current||channelRef.current!==cid||document.visibilityState!=='visible')return;
+   receipt.queued=false;receipt.running=true;receipt.lastAt=Date.now();
+   try{
+    const r=await within(supabase.rpc('mark_chat_channel_read',{p_channel_id:cid}));
+    if(receipt===readReceipt.current&&!r.error)scheduleRealtimeChatOverview();
+   }catch{/* An optional read receipt must not interrupt message delivery. */}
+   finally{
+    receipt.running=false;
+    if(receipt===readReceipt.current&&receipt.queued)void markChatRead(cid);
+   }
+  };
+  const delay=Math.max(0,3000-(Date.now()-receipt.lastAt));
+  if(delay)receipt.timer=setTimeout(()=>void flush(),delay);
+  else void flush();
  }
  async function setChatChannelPinned(cid:string,pin:boolean){
   const r=await supabase.rpc('set_my_chat_channel_pin',{p_channel_id:cid,p_pin:pin});
@@ -957,6 +1135,8 @@ export function useRepublicGame(gameId:string){
   }catch(e){setChatPins(original);setError(e instanceof Error?e.message:'Не удалось изменить закрепление');return false}
  }
  async function refresh(){await loadAll(false);await Promise.all([hydrateActiveView(),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
+ async function refreshDocuments(id:string){await loadFormalRegistry([id]);notifyGameDataRefresh(gameId,'formal_documents')}
+ async function refreshEventEffects(){await Promise.all([loadPoliticalWall(),refreshBudgetPulse()]);notifyGameDataRefresh(gameId,'event_decisions')}
 
  async function logActivity(eventType:string,label:string,viewKey?:string,payload:Record<string,unknown>={}){
   const uid=me?.user_id;if(!uid||authUser.current!==uid)return;
@@ -965,7 +1145,12 @@ export function useRepublicGame(gameId:string){
  async function touchPresence(viewKey:string,label?:string){
   if(typeof document!=='undefined'&&document.visibilityState==='hidden')return;
   const uid=me?.user_id;if(!uid||authUser.current!==uid)return;
-  await supabase.from('game_presence').upsert({game_id:gameId,user_id:uid,current_view:viewKey,last_seen_at:new Date().toISOString()},{onConflict:'game_id,user_id'});
+  const scope=gameId+':'+uid;
+  if(presenceInFlight.current!==scope){
+   presenceInFlight.current=scope;
+   try{await supabase.from('game_presence').upsert({game_id:gameId,user_id:uid,current_view:viewKey,last_seen_at:new Date().toISOString()},{onConflict:'game_id,user_id'});}
+   finally{if(presenceInFlight.current===scope)presenceInFlight.current='';}
+  }
   if(label)await logActivity('navigation',label,viewKey);
  }
 
@@ -1350,7 +1535,23 @@ export function useRepublicGame(gameId:string){
  async function castVoteAllocation(v:Vote,yes:number,no:number,abstain:number){
   if(!me||!canVote(v))return false;
   const r=await supabase.rpc('cast_vote_allocation',{p_vote_id:v.id,p_yes:yes,p_no:no,p_abstain:abstain});
-  if(r.error){setError(r.error.message);return false}await refresh();return true;
+  if(r.error){setError(r.error.message);return false}
+  let closed=false;
+  await readSafely(['votes'],async ticket=>{
+   const [vo,ba]=await Promise.all([
+    limitedCoreRead(supabase.from('game_votes').select('*').eq('game_id',gameId).eq('id',v.id).maybeSingle()),
+    limitedCoreRead(supabase.from('game_ballots').select('*').eq('vote_id',v.id))
+   ]);
+   if(!readActive(ticket))return;
+   closed=vo.data?.status==='closed';
+   if(!readCurrent(ticket))return;
+   requireSuccessful([vo,ba]);
+   if(vo.data){const confirmed=vo.data as Vote;setVotes(previous=>[...previous.filter(row=>row.id!==v.id),confirmed].sort((a,b)=>b.opened_at.localeCompare(a.opened_at)))}
+   setBallots(previous=>[...previous.filter(row=>row.vote_id!==v.id),...(ba.data||[]) as Ballot[]]);
+  });
+  // The last registered ballot may close a procedure and change offices or documents.
+  if(closed)await refresh();else notifyGameDataRefresh(gameId,'game_votes');
+  return true;
  }
  async function castVote(v:Vote,choice:'yes'|'no'|'abstain',quantity?:number){const n=quantity??ballotWeight(v);return castVoteAllocation(v,choice==='yes'?n:0,choice==='no'?n:0,choice==='abstain'?n:0)}
  async function setStudentMandates(partyId:string,allocations:Record<string,number>|null){
@@ -1514,12 +1715,12 @@ export function useRepublicGame(gameId:string){
    p_metadata:data.metadata||{}
   });
   if(r.error){setError(r.error.message);return null}
-  await loadFormalRegistry();return r.data as string;
+  await loadFormalRegistry(typeof r.data==='string'?[r.data]:undefined);return r.data as string;
  }
  async function deleteFormalDocument(id:string){
   const r=await supabase.rpc('delete_formal_document',{p_document_id:id});
   if(r.error){setError(r.error.message);return false}
-  await loadFormalRegistry();return !!r.data?.deleted;
+  await loadFormalRegistry([id]);return !!r.data?.deleted;
  }
  async function advanceFormalDocument(id:string,action:'advance'|'return'|'reject'='advance',note?:string){
   const r=await supabase.rpc('advance_formal_document',{p_document_id:id,p_action:action,p_note:note||null});
@@ -1529,7 +1730,7 @@ export function useRepublicGame(gameId:string){
  async function updateFormalDraft(id:string,title:string,bodyText:string,metadata?:Record<string,unknown>){
   const r=await supabase.rpc('update_formal_draft',{p_document_id:id,p_title:title,p_body_text:bodyText,p_metadata:metadata||null});
   if(r.error){setError(r.error.message);return false}
-  await loadFormalRegistry();return true;
+  await loadFormalRegistry([id]);return true;
  }
  async function vetoFormalDocument(id:string,note?:string){
   const r=await supabase.rpc('veto_formal_document',{p_document_id:id,p_note:note||null});
@@ -1692,5 +1893,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {gdMandateCapacity,gdEffectivePresence,game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,secondsLeft,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  refresh,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
+  refresh,refreshDocuments,refreshEventEffects,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }
