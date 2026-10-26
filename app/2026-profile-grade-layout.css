@@ -697,7 +697,8 @@
    score selection, full-width comment, confirmation actions. */
 .gradeModal.gradeModalRefined .gradeApproval>.styledSelect{
  grid-column:1;width:100%;max-width:100%;min-width:0;
- justify-self:stretch;justify-content:start;justify-items:stretch;
+ grid-template-columns:minmax(0,1fr);
+ justify-self:stretch;justify-content:stretch;justify-items:stretch;
  margin:0;padding:0;align-self:start;
 }
 .gradeModal.gradeModalRefined .gradeApproval>label{

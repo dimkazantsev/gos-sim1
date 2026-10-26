@@ -156,7 +156,7 @@ const teacherFixture=[
    assert(Math.abs(scoreLabel.left-comment.left)<=2,'Score heading incorrectly shifted right at '+width+': '+JSON.stringify(result.form));
    assert(Math.abs(scoreTrigger.left-textarea.left)<=2,'Score field not aligned with comment at '+width+': '+JSON.stringify(result.form));
    assert(Math.abs(scoreTrigger.right-textarea.right)<=2,'Score field and comment must share the right edge at '+width);
-   assert(scoreAlignment==='start','The score selector must not use flex-end inherited from action row at '+width);
+   assert(scoreAlignment==='stretch','The score selector must stretch to the comment width at '+width);
    assert(selector.top>=panel.top-1&&selector.bottom<=comment.top+1,'Grade selection must precede comment at '+width);
    assert(comment.top>=selector.bottom-1&&comment.bottom<=actions.top+1,'Comment must precede buttons at '+width);
    assert(textarea.left>=panel.left-1&&textarea.right<=panel.right+1,'Textarea outside grade panel at '+width);
