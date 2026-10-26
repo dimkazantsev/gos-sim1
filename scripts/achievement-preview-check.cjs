@@ -20,7 +20,7 @@ assert(game.includes("const GENERIC_STUDENT='__generic_student_preview__'"),'Gen
 assert(game.includes('previewAchievementsUserId={teacher&&viewAs===GENERIC_STUDENT?me?.user_id:undefined}'),'Only generic teacher preview replaces sentinel with authenticated teacher UUID');
 assert(profile.includes('userId={previewAchievementsUserId||target.user_id}')&&profile.includes('previewOnly={!!previewAchievementsUserId}'),'Only generic preview uses proxy catalog, ordinary students use real user IDs');
 assert(profile.includes('!previewAchievementsUserId&&<BlitzArchive'),'Generic preview cannot send fake UUID to blitz RPC');
-assert(profile.includes('if(!game||!target||previewAchievementsUserId)return;'),'Generic preview cannot send fake UUID to public stats RPC');
+assert(profile.includes('if(!game||!target||previewAchievementsUserId||own)return;'),'Generic preview cannot send fake UUID to public stats RPC; own profile skips unused public stats');
 assert(shelf.includes("supabase.rpc('get_game_achievements'")&&shelf.includes('publicAchievementPreview((r.data||[]) as Achievement[])'),'Catalog fetched with existing authorized RPC and cleansed locally');
 assert(shelf.includes('Демонстрационный профиль:')&&shelf.includes("previewOnly?publicAchievementPreview"),'UI explains that progress is demonstration-only');
 assert(profile.includes('previewOnly={!!previewAchievementsUserId} defaultCollapsed/>'),'Every student profile starts with achievements collapsed, including generic preview');

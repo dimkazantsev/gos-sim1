@@ -19,7 +19,7 @@ assert(!profile.includes('avg.toFixed(2)'),'Remove stale average from profile su
 assert(grades.includes('const selected=rows.filter(a=>a.user_id===student.user_id),sum=selected.reduce((v,a)=>v+(shownScore(a)??0),0);'),'Stay consistent with journal sum');
 assert(grades.includes("a.status==='final'?(a.final_score??a.auto_score):a.auto_score"),'Journal has same approved-first policy');
 assert(profile.includes(".eq('user_id',userId)"),'Filter public RPC response to the selected participant');
-assert(profile.includes('useGameTableSync(scoresFromGrades?undefined:game?.id'),'Own student profile must reuse compact grades instead of fetching twice');
+assert(profile.includes('useGameTableSync(scoresFromGrades||!!previewAchievementsUserId?undefined:game?.id'),'Own student profile reuses compact grades; generic preview never sends its non-UUID sentinel to the public RPC');
 assert(profile.includes('compact onPublicScores={acceptPublicScores}'),'Profile header and compact journal share one public result');
 assert(!profile.includes("channel('profile-scores:"),'Profile must not open a subscription for unpublished assessments');
 assert(css.includes('.profilePage .profileIntro{flex:1 1 320px;min-width:0}'),'Header remains flexible');

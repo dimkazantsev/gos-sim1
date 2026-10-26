@@ -59,11 +59,11 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  const [comicView,setComicView]=useState<'intro'|'archive'>('intro');
  const [storedPublicScores,setPublicScores]=useState<PublicAssessment[]>([]);
  const [hasScores,setScoresLoaded]=useState(false);
- const scoreScope=[game?.id,target?.user_id,me?.user_id,teacher,readOnly].join(':');
+ const scoreScope=[game?.id,target?.user_id,me?.user_id,teacher,readOnly,previewAchievementsUserId].join(':');
  const activeScoreScope=useRef(scoreScope),acceptedScoreScope=useRef(''),scoreRequest=useRef(0);activeScoreScope.current=scoreScope;
  const publicScores=acceptedScoreScope.current===scoreScope?storedPublicScores:[];
  const scoresLoaded=acceptedScoreScope.current===scoreScope&&hasScores;
- const scoresFromGrades=own&&target?.kind==='student';
+ const scoresFromGrades=!previewAchievementsUserId&&own&&target?.kind==='student';
  const [publicStats,setPublicStats]=useState<PublicStats|null>(null);
  const photoInput=useRef<HTMLInputElement>(null);
  const initials=useMemo(()=>target?.full_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()||'Я',[target?.full_name]);
@@ -89,7 +89,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
   const userId=target?.user_id;
   acceptedScoreScope.current=scoreScope;setPublicScores(rows.filter(a=>a.user_id===userId));setScoresLoaded(true);
  }
- useGameTableSync(scoresFromGrades?undefined:game?.id,['stage_assessments'],async()=>{
+ useGameTableSync(scoresFromGrades||!!previewAchievementsUserId?undefined:game?.id,['stage_assessments'],async()=>{
   const gameId=game?.id,userId=target?.user_id,requestedScope=scoreScope,request=++scoreRequest.current;
   if(!gameId||!userId)return;
   const controller=new AbortController();let timeout:ReturnType<typeof setTimeout>|undefined;
@@ -225,7 +225,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
 
   
   {game&&target.kind==='student'&&<AwardShelf gameId={game.id} userId={previewAchievementsUserId||target.user_id} showCatalog={own||teacher||!!previewAchievementsUserId} previewOnly={!!previewAchievementsUserId} defaultCollapsed/>}
-  {own&&target.kind==='student'&&<GradesView g={g} compact onPublicScores={acceptPublicScores}/>}
+  {own&&target.kind==='student'&&!previewAchievementsUserId&&<GradesView g={g} compact onPublicScores={acceptPublicScores}/>}
   {own&&<section className="profileJournalAccess">
    <div><Activity size={19} aria-hidden="true"/><div><b>{teacher?'Мой журнал действий':'Личный журнал действий'}</b><span>История ваших действий и переходов по разделам игры.</span></div></div>
    <button type="button" aria-expanded={showMyJournal} onClick={()=>setShowMyJournal(!showMyJournal)}>{showMyJournal?'Скрыть журнал':'Открыть журнал'} <ChevronDown size={17} aria-hidden="true"/></button>
