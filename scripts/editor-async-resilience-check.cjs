@@ -18,6 +18,7 @@ function harness(component){
  const g={game:{id:'game-a'},me:{game_id:'game-a',user_id:'teacher-a',kind:'teacher',full_name:'Teacher A'},teacher:true,currentStage:{stage_no:7},formalDocuments:[],formalHistory:[],votes:[],members:[],parties:[],setError:error=>errors.push(String(error?.message||error))};
  for(const name of ['createFormalDocument','deleteFormalDocument','advanceFormalDocument','updateFormalDraft','vetoFormalDocument','resolveBudgetConciliation','startBudgetRejectionBranch','createVote'])g[name]=async()=>null;
  g.refresh=async()=>{};
+ g.refreshDocuments=async id=>{assert(g.formalDocuments.some(doc=>doc.id===id),'Document refresh must target an existing selected document');};
  props={g,onOpenVotes:()=>{}};
  const react={
   useState(initial){const i=cursor++;if(!slots[i])slots[i]={value:typeof initial==='function'?initial():initial};return[slots[i].value,next=>{const value=typeof next==='function'?next(slots[i].value):next;if(!Object.is(value,slots[i].value)){slots[i].value=value;dirty=true;}}];},

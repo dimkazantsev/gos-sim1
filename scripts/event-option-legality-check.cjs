@@ -11,6 +11,7 @@ function harness(){
  const g={game:{id:'fictional-game'},me:{user_id:'fictional-teacher',kind:'teacher'},teacher:true,members:[{user_id:'fictional-a',kind:'student',full_name:'Student A',role_title:'Министр финансов'},{user_id:'fictional-b',kind:'student',full_name:'Student B',role_title:'Председатель правительства'}],profiles:{},names:{},refresh:async()=>{}};
  const props={g,mode:'manage'};
  const react={
+  useRef(initial){const i=cursor++;return(slots[i]??={value:{current:initial}}).value;},
   useState(initial){const i=cursor++;if(!slots[i])slots[i]={value:typeof initial==='function'?initial():initial};return[slots[i].value,next=>{const value=typeof next==='function'?next(slots[i].value):next;if(!Object.is(value,slots[i].value)){slots[i].value=value;dirty=true;}}];},
   useEffect(effect,deps){const i=cursor++,old=slots[i];if(!old||deps.some((value,j)=>!Object.is(value,old.deps?.[j]))){slots[i]={deps,cleanup:old?.cleanup};effects.push(()=>{slots[i].cleanup?.();slots[i].cleanup=effect();});}}
  };
