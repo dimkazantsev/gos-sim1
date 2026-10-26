@@ -13,6 +13,8 @@ assert(form.includes('.abortSignal(abort.signal)')&&form.includes('18000'),'Boun
 assert(form.includes("saving.current")&&form.includes('finally{'),'Prevent duplicate submissions and always release button');
 assert(form.includes('onSaved(changed)')&&!form.includes('await onSaved()'),'Never block save confirmation on budget recalculation');
 assert(form.includes('Решение сохранено.')&&form.includes('role="status"'),'Show confirmed writes');
+assert(form.includes('Для сохранения необходимо указать основание решения')&&form.includes('disabled={busy}'), 'Explain required rationale rather than silently disabling the button');
+assert(!form.includes('disabled={busy||reason.trim().length<8}'),'Do not hide validation behind a disabled button');
 assert(form.includes('Результат сохранения неизвестен'),'Ambiguous server timeout must not be called failure');
 assert(!form.includes('retry('),'Do not re-submit non-idempotent RPC');
 assert(parent.includes("sequence.current++;")&&parent.includes('setContext(previous=>'),
