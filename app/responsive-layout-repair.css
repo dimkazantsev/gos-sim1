@@ -31,3 +31,37 @@
   white-space:normal;overflow-wrap:anywhere;
  }
 }
+
+/* Desktop sidebar counters: the legacy `.focusNav button i` rule fixes every
+   <i> to 22px, although this navigation uses <i> for multi-digit counts.
+   Reserve intrinsic badge width inside the item instead of letting digits
+   overflow their pill or overlap the route label. */
+@media(min-width:901px){
+ .simSidebar .focusNavInner>button{
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+ }
+ .simSidebar .focusNavInner>button>.sidebarRouteLabel{
+  min-width:0;
+  flex:1 1 auto;
+  overflow-wrap:anywhere;
+ }
+ .simSidebar .focusNavInner>button>.navBadge{
+  box-sizing:border-box;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  width:max-content;
+  min-width:26px;
+  max-width:none;
+  height:24px;
+  margin-left:auto;
+  padding:0 6px;
+  font-style:normal;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+  line-height:1;
+ }
+}
