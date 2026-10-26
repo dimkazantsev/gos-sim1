@@ -183,7 +183,29 @@ async function ready(){
    await queue.getByRole('button',{name:/Новость участника для согласования/}).click();
    await queue.getByLabel('Комментарий к решению',{exact:true}).fill('Согласовано для публикации.');
    await page.screenshot({path:path.join(screens,'process-live-news-review-'+width+'.png')});
-   await queue.getByRole('button',{name:'Опубликовать в СМИ',exact:true}).click();await page.locator('#process-published-media-ui-post').waitFor();
+   const mediaPublishButton=queue.getByRole('button',{name:'Опубликовать в СМИ',exact:true});
+   try{await mediaPublishButton.click()}
+   catch(error){
+    // Diagnostic only: preserve a real Playwright click and report why it cannot settle.
+    try{
+     const movement=await page.evaluate(async()=>{
+      const button=[...document.querySelectorAll('.mediaProposalQueue button')].find(el=>el.textContent?.includes('Опубликовать в СМИ'));
+      if(!button)return {reason:'button absent',viewport:innerWidth,scrollY};
+      const samples=[];
+      for(let index=0;index<10;index++){
+       const rect=button.getBoundingClientRect(),style=getComputedStyle(button);
+       samples.push({x:Math.round(rect.x*10)/10,y:Math.round(rect.y*10)/10,width:Math.round(rect.width*10)/10,height:Math.round(rect.height*10)/10,scrollY:Math.round(scrollY),transform:style.transform,animation:style.animationName,transition:style.transitionProperty,disabled:button.disabled,connected:button.isConnected});
+       await new Promise(resolve=>setTimeout(resolve,120));
+      }
+      const ancestors=[];for(let node=button.parentElement;node&&ancestors.length<8;node=node.parentElement){const style=getComputedStyle(node);ancestors.push({tag:node.tagName,className:String(node.className).slice(0,120),overflowY:style.overflowY,transform:style.transform,scrollTop:node.scrollTop,scrollHeight:node.scrollHeight,clientHeight:node.clientHeight})}
+      return {viewport:innerWidth,scrollY,visibility:document.visibilityState,samples,ancestors};
+     });
+     console.error('MEDIA_REVIEW_CLICK_DIAGNOSTICS '+JSON.stringify(movement));
+     await page.screenshot({path:path.join(screens,'media-review-click-failure-'+width+'.png'),fullPage:true});
+    }catch(diagnosticError){console.error('MEDIA_REVIEW_DIAGNOSTIC_FAILED',String(diagnosticError))}
+    throw error;
+   }
+   await page.locator('#process-published-media-ui-post').waitFor();
    assert.equal(toolCalls.filter(x=>x.rpc==='review_media_news').at(-1).p_approve,true);
    await page.getByRole('searchbox',{name:'Поиск публикаций',exact:true}).fill('');
    page.once('dialog',dialog=>dialog.accept());await page.locator('#process-justice-demo').getByRole('button',{name:'Удалить публикацию',exact:true}).click();
