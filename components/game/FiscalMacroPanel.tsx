@@ -16,7 +16,7 @@ export default function FiscalMacroPanel({g,context,readOnly,onSaved}:{g:ReturnT
  async function save(){
   if(!g.game||!context||saving.current)return;
   const changedFields=fields.filter(([key])=>
-   (g.teacher||key==='key_rate')&&draft[key]?.trim()!==''&&Number(draft[key])!==Number(context.policy[key]));
+   (g.teacher||key==='key_rate')&&draft[key]!==undefined&&(!draft[key]?.trim()||Number(draft[key])!==Number(context.policy[key])));
   if(!changedFields.length){setNotice('');setError('Измените хотя бы один параметр.');return}
   if(changedFields.some(([key])=>!draft[key]?.trim()||!Number.isFinite(Number(draft[key])))){
    setNotice('');setError('Заполните изменённые параметры числовыми значениями.');return;
