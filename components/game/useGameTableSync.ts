@@ -66,6 +66,8 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
    const now=Date.now();
    if(document.visibilityState==='visible'&&(queued||now-lastVisibleRecoveryAt>20000)){lastVisibleRecoveryAt=now;schedule()}
   }
+  // Restored connectivity must retry failed reads even after a recent focus event.
+  const online=()=>{queued=true;visible()};
   function local(event:Event){
    const detail=(event as CustomEvent<{gameId:string;table?:string}>).detail;
    if(detail?.gameId!==gameId)return;
@@ -84,9 +86,9 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
     lastFallbackAt=now;
     schedule(0);
   },fallbackMs+Math.floor(Math.random()*Math.min(15000,fallbackMs/4)));
-  window.addEventListener('focus',visible);window.addEventListener('online',visible);
+  window.addEventListener('focus',visible);window.addEventListener('online',online);
   const eventName=onlyTable?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT;
   window.addEventListener(eventName,local);document.addEventListener('visibilitychange',visible);
-  return()=>{disposed=true;clearTimeout(timer);clearInterval(poll);window.removeEventListener('focus',visible);window.removeEventListener('online',visible);window.removeEventListener(eventName,local);document.removeEventListener('visibilitychange',visible)};
+  return()=>{disposed=true;clearTimeout(timer);clearInterval(poll);window.removeEventListener('focus',visible);window.removeEventListener('online',online);window.removeEventListener(eventName,local);document.removeEventListener('visibilitychange',visible)};
  },[gameId,scope,onlyTable,tableKey,minRefreshMs,fallbackMs]);
 }
