@@ -14,7 +14,8 @@ function withBlitzClock(row:Row,sentAt:number):Row{
  const receivedAt=blitzClockNow();
  const serverAt=Date.parse(row.server_now||'');
  const deadline=Date.parse(row.deadline||'');
- const transit=Math.max(0,receivedAt-sentAt)/2;
+ // При долгой серверной обработке не вычитаем весь RTT из времени выбора.
+ const transit=Math.min(1000,Math.max(0,receivedAt-sentAt)/2);
  const estimatedNow=Number.isFinite(serverAt)?serverAt+transit:Date.now();
  const remaining=Number.isFinite(deadline)?Math.max(0,Math.min(BLITZ_CHOICE_WINDOW_MS,deadline-estimatedNow)):0;
  return {...row,remaining_at_receipt:remaining,receipt_monotonic:receivedAt};
