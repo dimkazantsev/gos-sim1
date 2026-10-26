@@ -35,7 +35,7 @@ const panel=fs.readFileSync('components/game/ChatPanel.tsx','utf8');
 assert.ok(dropdown.includes('const current=visibleChannels.find(c=>c.id===value);'),'header must not display an unselected fallback');
 assert.ok(!dropdown.includes('||orderedChannels[0]'),'header must not silently show a different chat');
 // Concurrent overview RPC reads must not cancel channel-list hydration on chat open.
-assert.ok(game.includes("startRead('core','members','metrics','profiles','parties','formal','channels')"),'channel fetch must have its own read ticket');
+assert.ok(/startRead\('core',[^\n]*'channels'\)/.test(game),'channel fetch must have its own read ticket alongside independently versioned core collections');
 assert.ok(game.includes("if(!ch.error&&readCurrent(ticket,'channels'))setChannels"),'channel state must use the channel ticket');
 assert.ok(game.includes("readSafely(['overview'],async ticket=>"),'overview RPC must use a separate ticket');
 assert.ok(!game.includes("readCurrent(ticket,'overview'))setChannels"),'overview RPC cannot invalidate loaded channels');
