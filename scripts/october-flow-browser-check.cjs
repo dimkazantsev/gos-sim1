@@ -178,6 +178,9 @@ async function ready(){
    assert((await queue.locator('.mediaProposalBy').textContent()).includes('Депутат Государственной Думы'),'Office author is retained in the proposal');
    assert.equal(toolCalls.filter(x=>x.rpc==='submit_media_news').at(-1).p_actor_key,'office');
    teacherMode=true;await page.getByRole('navigation',{name:'Проверяемый раздел'}).getByRole('button',{name:'Режим преподавателя',exact:true}).click();
+   await page.waitForFunction(()=>document.querySelector('.mediaProposalQueue .mediaProposalHeading')?.getAttribute('aria-expanded')==='false');
+   if(!await queue.evaluate(element=>element.open))await queue.locator('summary').click();
+   await queue.getByRole('button',{name:/Новость участника для согласования/}).click();
    await queue.getByLabel('Комментарий к решению',{exact:true}).fill('Согласовано для публикации.');
    await page.screenshot({path:path.join(screens,'process-live-news-review-'+width+'.png')});
    await queue.getByRole('button',{name:'Опубликовать в СМИ',exact:true}).click();await page.locator('#process-published-media-ui-post').waitFor();
