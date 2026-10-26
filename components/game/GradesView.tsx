@@ -10,6 +10,7 @@ import ScoreFormula from './ScoreFormula';
 import BlitzKnowledgeScore from './BlitzKnowledgeScore';
 import {ChevronDown} from 'lucide-react';
 import {assessmentRationaleParagraphs,assessmentRationaleSections,assessmentRationaleDetail,assessmentDisplaySentence,assessmentRunLabel} from './assessmentPresentation';
+import {useGameTableSync} from './useGameTableSync';
 
 type Assessment={
  id:string;game_id:string;stage_no:number;user_id:string;auto_score:number;final_score:number|null;
@@ -20,6 +21,7 @@ type Assessment={
 type Evidence=Record<string,unknown[]|unknown>;
 type Run={id:number;assessment_id:string;run_type:string;auto_score:number;criterion_law:boolean;criterion_strategy:boolean;criterion_debrief:boolean;created_at:string};
 type Debrief={id:string;game_id:string;stage_no:number;user_id:string;body:string;updated_at:string};
+export type PublicGradeScore=Pick<Assessment,'user_id'|'stage_no'|'auto_score'|'final_score'|'status'>;
 
 const STAGES=Array.from({length:16},(_,i)=>i+1);
 const shownScore=(a?:Assessment)=>a?(a.status==='final'?(a.final_score??a.auto_score):a.auto_score):null;
@@ -28,11 +30,11 @@ const isFinalScore=(n:number|null):n is number=>n!==null&&Number.isInteger(n)&&n
 const finalScoreChoice=(a?:Assessment)=>{const score=shownScore(a);return isFinalScore(score)?score:null;};
 const when=(v?:string|null)=>v?new Date(v).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
 
-export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnTypeRepublic;compact?:boolean;onOpenProfile?:(id:string)=>void}){
+export default function GradesView({g,compact=false,onOpenProfile,onPublicScores}:{g:ReturnTypeRepublic;compact?:boolean;onOpenProfile?:(id:string)=>void;onPublicScores?:(rows:PublicGradeScore[])=>void}){
  const {game,me,members,stages,teacher}=g;
- const [rows,setRows]=useState<Assessment[]>([]);
+ const [storedRows,setRows]=useState<Assessment[]>([]);
  const [runs,setRuns]=useState<Run[]>([]);
- const [debriefRows,setDebriefRows]=useState<Debrief[]>([]);
+ const [storedDebriefs,setDebriefRows]=useState<Debrief[]>([]);
  const [selected,setSelected]=useState<{userId:string;stageNo:number}|null>(null);
  const evidenceRequest=useRef(0);
  const loadRequest=useRef(0);
@@ -43,7 +45,17 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
  const [busy,setBusy]=useState(false);
  const [debrief,setDebrief]=useState('');
  const [debriefStage,setDebriefStage]=useState<number|null>(null);
- const [authId,setAuthId]=useState('');
+ const authScope=[game?.id,me?.user_id].join(':');
+ const [identity,setIdentity]=useState<{scope:string;id:string}|null>(null);
+ const authId=identity?.scope===authScope?identity.id:null;
+ const loadScope=[game?.id,me?.user_id,me?.kind,teacher,compact,authId].join(':');
+ const activeScope=useRef(loadScope),acceptedRowsScope=useRef(''),acceptedDebriefScope=useRef(''),selectedScope=useRef('');activeScope.current=loadScope;
+ const reads=useRef({scope:loadScope,promise:null as Promise<void>|null,queued:false,controller:null as AbortController|null});
+ if(reads.current.scope!==loadScope)reads.current={scope:loadScope,promise:null,queued:false,controller:null};
+ const readState=reads.current;
+ const publicScoresCallback=useRef(onPublicScores);publicScoresCallback.current=onPublicScores;
+ const rows=acceptedRowsScope.current===loadScope?storedRows:[];
+ const debriefRows=acceptedDebriefScope.current===loadScope?storedDebriefs:[];
  const [gradeSearch,setGradeSearch]=useState('');
  const [gradeTeam,setGradeTeam]=useState('');
  const [gradeSort,setGradeSort]=useState<'surname'|'name'|'sum'|'average'|'final'|'graded'>('surname');
@@ -78,47 +90,74 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
 
 
  async function load(){
-  const request=++loadRequest.current;
-  if(!game)return;
-  if(teacher){
-   const r=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).order('stage_no');
-   if(!r.error&&request===loadRequest.current)setRows((r.data||[]) as Assessment[]);
-  }else{
-   // Everyone sees numerical scores; details belong only to the actual account owner.
-   const publicResult=await supabase.rpc('get_public_stage_scores',{p_game_id:game.id});
-   if(request!==loadRequest.current)return;
-   const safeRows:Assessment[]=((publicResult.data||[]) as Pick<Assessment,'user_id'|'stage_no'|'auto_score'|'final_score'|'status'>[])
+  if(!game||authId===null||activeScope.current!==loadScope)return;
+  const state=reads.current;
+  if(state.promise){state.queued=true;return state.promise}
+  state.promise=Promise.resolve().then(async()=>{
+   do{state.queued=false;await loadPass()}while(state.queued&&activeScope.current===loadScope);
+  }).finally(()=>{state.promise=null});
+  return state.promise;
+ }
+ async function loadPass(){
+  if(!game||authId===null)return;
+  const request=++loadRequest.current,requestedScope=loadScope;
+  const controller=new AbortController();readState.controller=controller;
+  const signal=controller.signal,current=()=>request===loadRequest.current&&activeScope.current===requestedScope&&!signal.aborted;
+  let timeout:ReturnType<typeof setTimeout>|undefined;
+  try{
+   await Promise.race([(async()=>{
+   if(teacher){
+    const r=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).order('stage_no').abortSignal(signal);
+    if(!current())return;
+    if(r.error)g.setError(r.error.message);else{acceptedRowsScope.current=requestedScope;setRows((r.data||[]) as Assessment[])}
+   }else{
+    // A profile needs one participant; the full journal still shows every public score.
+    let query=supabase.rpc('get_public_stage_scores',{p_game_id:game.id});
+    if(compact&&me)query=query.eq('user_id',me.user_id);
+    const publicResult=await query.abortSignal(signal);
+    if(!current())return;
+    if(publicResult.error){g.setError(publicResult.error.message);return}
+    const publicRows:PublicGradeScore[]=((publicResult.data||[]) as PublicGradeScore[]).map(a=>({user_id:a.user_id,stage_no:a.stage_no,auto_score:a.auto_score,final_score:a.final_score,status:a.status}));
+    publicScoresCallback.current?.(publicRows);
+    const safeRows:Assessment[]=publicRows
     .map(a=>({...a,id:'public-'+a.user_id+'-'+a.stage_no,game_id:game.id,
       criterion_law:false,criterion_strategy:false,criterion_debrief:false,
       public_rationale:'',last_run_type:'',last_auto_at:null,revision_count:0,
       teacher_note:null,finalized_at:null}));
-   if(me&&authId===me.user_id){
-    const own=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no');
-    if(request!==loadRequest.current)return;
-    if(!own.error){
-     const map=new Map(safeRows.map(a=>[a.user_id+':'+a.stage_no,a]));
-     for(const a of (own.data||[]) as Assessment[])map.set(a.user_id+':'+a.stage_no,a);
-     setRows([...map.values()]);
-    }else setRows(safeRows);
-   }else setRows(safeRows);
-  }
-  if(request!==loadRequest.current)return;
-  if(me?.kind==='student'&&authId===me.user_id){
-   const d=await supabase.from('stage_debriefs').select('*').eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no');
-   if(request!==loadRequest.current)return;
-   if(!d.error)setDebriefRows((d.data||[]) as Debrief[]);
-  }
+    if(me?.kind==='student'&&authId===me.user_id){
+     const own=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no').abortSignal(signal);
+     if(!current())return;
+     if(!own.error){
+      const map=new Map(safeRows.map(a=>[a.user_id+':'+a.stage_no,a]));
+      for(const a of (own.data||[]) as Assessment[])map.set(a.user_id+':'+a.stage_no,a);
+      acceptedRowsScope.current=requestedScope;setRows([...map.values()]);
+     }else{g.setError(own.error.message);acceptedRowsScope.current=requestedScope;setRows(safeRows)}
+    }else{acceptedRowsScope.current=requestedScope;setRows(safeRows)}
+   }
+   if(!current())return;
+   if(me?.kind==='student'&&authId===me.user_id){
+    const d=await supabase.from('stage_debriefs').select('*').eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no').abortSignal(signal);
+    if(!current())return;
+    if(d.error)g.setError(d.error.message);else{acceptedDebriefScope.current=requestedScope;setDebriefRows((d.data||[]) as Debrief[])}
+   }
+   })(),new Promise<never>((_,reject)=>{timeout=setTimeout(()=>{controller.abort();reject(new Error('Не удалось обновить оценки: сервер не ответил вовремя.'))},12000)})]);
+  }catch(error){if(request===loadRequest.current&&activeScope.current===requestedScope)g.setError(error instanceof Error?error.message:String(error))}
+  finally{clearTimeout(timeout);if(readState.controller===controller)readState.controller=null}
  }
- useEffect(()=>{void supabase.auth.getUser().then(x=>setAuthId(x.data.user?.id||''))},[game?.id,me?.user_id]);
- useEffect(()=>{void load()},[game?.id,me?.user_id,authId,teacher]);
  useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('grades-view:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'stage_assessments',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'stage_debriefs',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id,authId,teacher,me?.user_id]);
+  let active=true,timeout:ReturnType<typeof setTimeout>|undefined;
+  void Promise.race([
+   supabase.auth.getUser(),
+   new Promise<never>((_,reject)=>{timeout=setTimeout(()=>reject(new Error('Не удалось подтвердить аккаунт вовремя. Показаны только публичные оценки.')),12000)})
+  ]).then(x=>{if(active)setIdentity({scope:authScope,id:x.data.user?.id||''})}).catch(error=>{if(active){setIdentity({scope:authScope,id:''});g.setError(error instanceof Error?error.message:String(error))}}).finally(()=>clearTimeout(timeout));
+  return()=>{active=false;clearTimeout(timeout)};
+ },[authScope]);
+ useEffect(()=>{
+  setSelected(null);setEvidence(null);setRuns([]);setLoadingEvidence(false);setDebrief('');
+  return()=>{loadRequest.current++;evidenceRequest.current++;readState.controller?.abort()};
+ },[loadScope]);
+ // Assessment tables are not in Realtime publication; retain visible reconciliation.
+ useGameTableSync(authId===null?undefined:game?.id,['stage_assessments','stage_debriefs'],load,loadScope,undefined,3000,180000);
 
  const currentStage=stages.find(s=>s.status==='open');
  const eligibleDebriefStages=stages.filter(s=>s.status==='open'||s.status==='completed');
@@ -135,7 +174,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
  },[myRows]);
 
  async function open(userId:string,stageNo:number){
-  const request=++evidenceRequest.current;
+  const request=++evidenceRequest.current,requestedScope=loadScope;selectedScope.current=loadScope;
   const a=rows.find(x=>x.user_id===userId&&x.stage_no===stageNo);
   setSelected({userId,stageNo});
   setEditScore(finalScoreChoice(a));
@@ -146,7 +185,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
   const requests:any[]=[supabase.rpc('get_stage_assessment_evidence',{p_game_id:game.id,p_user_id:userId,p_stage_no:stageNo})];
   if(a)requests.push(supabase.from('stage_assessment_runs').select('id,assessment_id,run_type,auto_score,criterion_law,criterion_strategy,criterion_debrief,created_at').eq('assessment_id',a.id).order('created_at',{ascending:false}).limit(50));
   const rr=await Promise.all(requests);
-  if(request!==evidenceRequest.current)return;
+  if(request!==evidenceRequest.current||activeScope.current!==requestedScope)return;
   if(!rr[0].error)setEvidence((rr[0].data||{}) as Evidence);
   if(rr[1]&&!rr[1].error)setRuns((rr[1].data||[]) as Run[]);
   setLoadingEvidence(false);
@@ -209,7 +248,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
    <div className="surfaceHead"><div><small>ЖУРНАЛ ВСН</small><h2>Динамика по 16 этапам</h2></div><strong>{myAverage!==null?myAverage.toFixed(2):'—'}</strong></div>
    <div className="vsnMiniTrend">{STAGES.map(n=>{const a=myRows.find(x=>x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(me.user_id,n)} aria-label={'Этап '+n+', оценка '+(v??'нет')}><small>{n}</small><b>{v??'—'}</b></button>})}</div>
    <p className="vsnCompactHint">Нажмите на этап, чтобы увидеть критерии и обоснование оценки.</p>
-   {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={false} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>{evidenceRequest.current++;setSelected(null)}} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
+   {selected&&selectedScope.current===loadScope&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={false} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>{evidenceRequest.current++;setSelected(null)}} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
   </section>;
  }
 
@@ -263,7 +302,7 @@ export default function GradesView({g,compact=false,onOpenProfile}:{g:ReturnType
     <footer className="gradesDebriefFooter"><div aria-live="polite"><strong>{targetAssessment?.status==='final'?'Оценка утверждена':debrief.trim().length+' знаков'}</strong><span>Минимум 40 знаков для отправки</span></div><button type="button" className="primary" disabled={!canWriteDebrief||busy||debrief.trim().length<40} onClick={()=>void submitDebrief()}>{busy?'Сохранение…':'Сдать / обновить разбор'}</button></footer>
    </section>}
 
-  {selected&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={teacher} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>{evidenceRequest.current++;setSelected(null)}} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
+  {selected&&selectedScope.current===loadScope&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={teacher} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>{evidenceRequest.current++;setSelected(null)}} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
  </div>;
 }
 

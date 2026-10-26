@@ -1,10 +1,11 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {useDialog} from '../ui/useDialog';
 import {AlertTriangle,CalendarClock,ChevronRight,Scale,ShieldAlert,UserRound,UsersRound,X} from 'lucide-react';
+import {notifyGameDataRefresh,useGameTableSync} from './useGameTableSync';
 
 type DeadlineIncident={
  id:string;game_id:string;stage_no:number;party_id:string|null;user_id:string|null;
@@ -29,7 +30,7 @@ const recommended=(stageNo:number):keyof typeof CONSEQUENCES=>
  stageNo<=2?'representation_loss':stageNo===3?'regional_seat_loss':stageNo===5?'ghost_risk':stageNo===6?'presidential_rating_loss':'other';
 
 export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageNo:number}){
- const {game,teacher,parties,members,stages,setError}=g;
+ const {game,me,teacher,parties,members,stages,setError}=g;
  const stage=stages.find(s=>s.stage_no===stageNo);
  const [rows,setRows]=useState<DeadlineIncident[]>([]);
  const [rule,setRule]=useState<DeadlineRule|null>(null);
@@ -42,35 +43,61 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  const [now,setNow]=useState(Date.now());
  const applyDialogRef=useDialog(applyOpen,()=>setApplyOpen(false));
 
- async function load(){
-  if(!game)return;
-  const [incidents,rules]=await Promise.all([
-   supabase.from('stage_deadline_incidents').select('*').eq('game_id',game.id).eq('stage_no',stageNo).order('created_at',{ascending:false}),
-   supabase.from('stage_deadline_rules').select('game_id,stage_no,deadline_at,inclusive,penalty_points,penalty_description,consequence_type,consequence_magnitude,updated_at').eq('game_id',game.id).eq('stage_no',stageNo).maybeSingle()
-  ]);
-  if(!incidents.error)setRows((incidents.data||[]) as DeadlineIncident[]);
-  if(!rules.error)setRule((rules.data||null) as DeadlineRule|null);
+ const scope=JSON.stringify([game?.id,stageNo,me?.user_id,me?.kind,me?.role_title,teacher]);
+ const activeScope=useRef(scope),alive=useRef(true),mutationScope=useRef<string|null>(null);activeScope.current=scope;
+ const [dataScope,setDataScope]=useState(scope);
+ const reads=useRef({scope,promise:null as Promise<void>|null,queued:false,explicit:false,cancel:null as (()=>void)|null});
+ if(reads.current.scope!==scope)reads.current={scope,promise:null,queued:false,explicit:false,cancel:null};
+ const readState=reads.current,scopeCurrent=()=>alive.current&&activeScope.current===scope;
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
+ useEffect(()=>{
+  setRows([]);setRule(null);setTargetType('party');setPartyId('');setUserId('');setNote('');setBusy(false);setApplyOpen(false);setDataScope(scope);
+  return()=>{readState.cancel?.()};
+ },[scope]);
+ async function load(background=false){
+  if(!game||!me||!scopeCurrent()||background&&document.visibilityState!=='visible')return;
+  const state=reads.current;state.explicit=state.explicit||!background;
+  if(state.promise){state.queued=true;return state.promise}
+  state.promise=(async()=>{
+   do{
+    state.queued=false;const passive=!state.explicit;state.explicit=false;
+    const controller=new AbortController();let timeout:ReturnType<typeof setTimeout>|undefined;
+    try{
+     const [incidents,rules]=await Promise.race([Promise.all([
+      supabase.from('stage_deadline_incidents').select('*').eq('game_id',game.id).eq('stage_no',stageNo).order('created_at',{ascending:false}).abortSignal(controller.signal),
+      supabase.from('stage_deadline_rules').select('game_id,stage_no,deadline_at,inclusive,penalty_points,penalty_description,consequence_type,consequence_magnitude,updated_at').eq('game_id',game.id).eq('stage_no',stageNo).abortSignal(controller.signal).maybeSingle()
+     ]),new Promise<never>((_,reject)=>{
+      state.cancel=()=>{clearTimeout(timeout);controller.abort();reject(new Error('Обновление последствий отменено.'))};
+      timeout=setTimeout(()=>{controller.abort();reject(new Error('Не удалось обновить последствия: сервер не ответил вовремя.'))},12000);
+     })]);
+     if(scopeCurrent()&&!controller.signal.aborted&&(!passive||document.visibilityState==='visible')){
+      if(!incidents.error)setRows((incidents.data||[]) as DeadlineIncident[]);
+      if(!rules.error)setRule((rules.data||null) as DeadlineRule|null);
+      if(incidents.error||rules.error)setError(userError(incidents.error||rules.error));
+     }
+    }catch(error){if(scopeCurrent()&&(!passive||document.visibilityState==='visible'))setError(userError(error))}
+    finally{clearTimeout(timeout);state.cancel=null}
+   }while(state.queued&&scopeCurrent());
+  })().finally(()=>{state.promise=null});
+  return state.promise;
  }
- useEffect(()=>{setTargetType('party');setPartyId('');setUserId('');setNote('');void load()},[game?.id,stageNo]);
+ useGameTableSync(me?.user_id?game?.id:undefined,['stage_deadline_incidents','stage_deadline_rules'],()=>load(true),scope,undefined,3000,180000);
  useEffect(()=>{
   if(!game)return;
   const gameId=game.id;
   const sync=(event:Event)=>{
    const detail=(event as CustomEvent<{gameId?:string;stageNo?:number}>).detail;
-   if(detail?.gameId===gameId&&detail?.stageNo===stageNo)void load();
+   if(scopeCurrent()&&detail?.gameId===gameId&&detail?.stageNo===stageNo)notifyGameDataRefresh(gameId,'stage_deadline_rules');
   };
   window.addEventListener('gos-stage-policy-updated',sync);
   return()=>window.removeEventListener('gos-stage-policy-updated',sync);
- },[game?.id,stageNo]);
+ },[scope]);
  useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('deadline-control:'+game.id+':'+stageNo)
-   .on('postgres_changes',{event:'*',schema:'public',table:'stage_deadline_incidents',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'stage_deadline_rules',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id,stageNo]);
- useEffect(()=>{const id=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(id)},[]);
+  let id:ReturnType<typeof setInterval>|undefined;
+  const sync=()=>{clearInterval(id);if(document.visibilityState==='visible'){setNow(Date.now());id=setInterval(()=>setNow(Date.now()),1000)}};
+  sync();document.addEventListener('visibilitychange',sync);
+  return()=>{clearInterval(id);document.removeEventListener('visibilitychange',sync)};
+ },[]);
 
  const effectiveDeadline=rule?.deadline_at??stage?.deadline??null;
  const deadline=effectiveDeadline?new Date(effectiveDeadline).getTime():null;
@@ -90,32 +117,34 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  const partyName=(id:string|null)=>parties.find(p=>p.id===id)?.name||'—';
  const userName=(id:string|null)=>members.find(m=>m.user_id===id)?.full_name||'—';
 
+ async function change(request:()=>PromiseLike<{error:unknown}>,after?:()=>void){
+  if(!game||!me||!scopeCurrent()||!teacher||mutationScope.current===scope)return;
+  mutationScope.current=scope;setBusy(true);
+  try{
+   const r=await request();if(!scopeCurrent())return;
+   if(r.error)setError(userError(r.error));else{notifyGameDataRefresh(game.id,'stage_deadline_incidents');await load();if(scopeCurrent())after?.()}
+  }catch(error){if(scopeCurrent())setError(userError(error))}
+  finally{if(mutationScope.current===scope)mutationScope.current=null;if(scopeCurrent())setBusy(false)}
+ }
  async function record(){
-  if(!game)return;
+  if(!game||!teacher||!scopeCurrent())return;
   const targetParty=targetType==='party'?partyId:'';
   const targetUser=targetType==='student'?userId:'';
   if(!targetParty&&!targetUser)return;
-  setBusy(true);
-  const r=await supabase.rpc('apply_stage_deadline_rule',{
+  const submittedNote=note;
+  await change(()=>supabase.rpc('apply_stage_deadline_rule',{
    p_game_id:game.id,
    p_stage_no:stageNo,
    p_party_id:targetParty||null,
    p_user_id:targetUser||null,
    p_note:note.trim()||null
-  });
-  if(r.error)setError(userError(r.error));
-  else{
-   setPartyId('');setUserId('');setNote('');
-   await load();setApplyOpen(false);
-  }
-  setBusy(false);
+  }),()=>{setPartyId(value=>value===targetParty?'':value);setUserId(value=>value===targetUser?'':value);setNote(value=>value===submittedNote?'':value);setApplyOpen(false)});
  }
  async function revert(id:string){
-  setBusy(true);const r=await supabase.rpc('revert_deadline_consequence',{p_incident_id:id});
-  if(r.error)setError(userError(r.error));else await load();setBusy(false);
+  await change(()=>supabase.rpc('revert_deadline_consequence',{p_incident_id:id}));
  }
 
- if(!game||!stage)return null;
+ if(!game||!stage||dataScope!==scope)return null;
  const configuredConsequence=rule?.consequence_type??'none';
  const configuredMagnitude=Number(rule?.consequence_magnitude??0);
  const guide=configuredConsequence==='none'?null:CONSEQUENCES[configuredConsequence];

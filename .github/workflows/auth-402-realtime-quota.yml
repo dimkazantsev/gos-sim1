@@ -9,6 +9,10 @@ on:
       - 'scripts/performance-modules-check.cjs'
       - 'scripts/realtime-targeted-load-check.cjs'
       - 'scripts/event-workspace-load-check.cjs'
+      - 'scripts/election-panels-load-check.cjs'
+      - 'scripts/presidential-panel-load-check.cjs'
+      - 'scripts/profile-results-load-check.cjs'
+      - 'scripts/teacher-readiness-load-check.cjs'
       - 'scripts/republic-game-resilience-check.cjs'
       - 'components/game/Blitz*.tsx'
       - 'components/game/BudgetAmendments.tsx'
@@ -18,6 +22,16 @@ on:
       - 'components/game/DocumentsView.tsx'
       - 'components/game/EventCollaboration.tsx'
       - 'components/game/EventWorkspace.tsx'
+      - 'components/game/DumaLeadershipElection.tsx'
+      - 'components/game/DeadlineControl.tsx'
+      - 'components/game/GhostPolicyLab.tsx'
+      - 'components/game/PartyChairElection.tsx'
+      - 'components/game/PresidentialElectionLab.tsx'
+      - 'components/game/GradesView.tsx'
+      - 'components/game/ProfileView.tsx'
+      - 'components/game/ParticipantsAnalytics.tsx'
+      - 'components/game/TeacherStageManager.tsx'
+      - 'components/game/GovernanceStageWorkspace.tsx'
       - 'components/game/NewsProposals.tsx'
       - 'components/game/PoliticalWallView.tsx'
       - 'components/game/useRepublicGame.ts'
@@ -40,6 +54,10 @@ on:
       - 'scripts/performance-modules-check.cjs'
       - 'scripts/realtime-targeted-load-check.cjs'
       - 'scripts/event-workspace-load-check.cjs'
+      - 'scripts/election-panels-load-check.cjs'
+      - 'scripts/presidential-panel-load-check.cjs'
+      - 'scripts/profile-results-load-check.cjs'
+      - 'scripts/teacher-readiness-load-check.cjs'
       - 'scripts/republic-game-resilience-check.cjs'
       - 'components/game/Blitz*.tsx'
       - 'components/game/BudgetAmendments.tsx'
@@ -49,6 +67,16 @@ on:
       - 'components/game/DocumentsView.tsx'
       - 'components/game/EventCollaboration.tsx'
       - 'components/game/EventWorkspace.tsx'
+      - 'components/game/DumaLeadershipElection.tsx'
+      - 'components/game/DeadlineControl.tsx'
+      - 'components/game/GhostPolicyLab.tsx'
+      - 'components/game/PartyChairElection.tsx'
+      - 'components/game/PresidentialElectionLab.tsx'
+      - 'components/game/GradesView.tsx'
+      - 'components/game/ProfileView.tsx'
+      - 'components/game/ParticipantsAnalytics.tsx'
+      - 'components/game/TeacherStageManager.tsx'
+      - 'components/game/GovernanceStageWorkspace.tsx'
       - 'components/game/NewsProposals.tsx'
       - 'components/game/PoliticalWallView.tsx'
       - 'components/game/useRepublicGame.ts'
@@ -82,6 +110,10 @@ jobs:
       - run: node scripts/realtime-targeted-load-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
       - run: node scripts/event-workspace-load-check.cjs
+      - run: node scripts/election-panels-load-check.cjs
+      - run: node scripts/presidential-panel-load-check.cjs
+      - run: node scripts/profile-results-load-check.cjs
+      - run: node scripts/teacher-readiness-load-check.cjs
       - run: node scripts/password-login-resilience-check.cjs
       - run: node scripts/supabase-session-refresh-check.cjs
       - run: node scripts/chat-realtime-check.cjs

@@ -18,8 +18,10 @@ assert(profile.includes("aria-label={'Сумма баллов: '+scoreTotalLabel
 assert(!profile.includes('avg.toFixed(2)'),'Remove stale average from profile summaries');
 assert(grades.includes('const selected=rows.filter(a=>a.user_id===student.user_id),sum=selected.reduce((v,a)=>v+(shownScore(a)??0),0);'),'Stay consistent with journal sum');
 assert(grades.includes("a.status==='final'?(a.final_score??a.auto_score):a.auto_score"),'Journal has same approved-first policy');
-assert(profile.includes("filter:'user_id=eq.'+userId"),'Target only relevant grade realtime updates');
-assert(profile.includes('supabase.removeChannel(channel)'),'Clean up subscription on profile/game changes');
+assert(profile.includes(".eq('user_id',userId)"),'Filter public RPC response to the selected participant');
+assert(profile.includes('useGameTableSync(scoresFromGrades?undefined:game?.id'),'Own student profile must reuse compact grades instead of fetching twice');
+assert(profile.includes('compact onPublicScores={acceptPublicScores}'),'Profile header and compact journal share one public result');
+assert(!profile.includes("channel('profile-scores:"),'Profile must not open a subscription for unpublished assessments');
 assert(css.includes('.profilePage .profileIntro{flex:1 1 320px;min-width:0}'),'Header remains flexible');
 assert(css.includes('.profilePage .profileHero{display:flex;align-items:center;gap:24px;flex-wrap:wrap'),'Header wraps for tablets');
 assert(css.includes('@media(max-width:700px)'),'Mobile profile layout preserved');
@@ -42,4 +44,4 @@ const all=Array.from({length:40},(_,i)=>({user_id:'s'+i,stage_no:1,status:'final
 assert.equal(total(all,'s7'),3);
 assert.equal(total(all,'s6'),2);
 assert.equal(new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(1.25),'1,25');
-console.log('PASS: public stages total, final-over-draft, 16 stages, 40 isolated accounts, realtime subscription, mobile layout contracts.');
+console.log('PASS: public stages total, final-over-draft, 16 stages, 40 isolated accounts, scoped shared refresh, mobile layout contracts.');

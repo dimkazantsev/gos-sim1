@@ -1,17 +1,22 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {Download,Search} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import StyledSelect from '../ui/StyledSelect';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {useGameTableSync} from './useGameTableSync';
 type Assessment={user_id:string;stage_no:number;auto_score:number;final_score:number|null;status:'draft'|'final'};
 type Sort='surname'|'name'|'score'|'average'|'approved'|'activity'|'posts'|'votes';
 const score=(a:Assessment)=>a.status==='final'?(a.final_score??a.auto_score):a.auto_score;
 export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
  const {game,members,activities,politicalPosts,formalDocuments,ballots,teacher}=g;
- const [assessments,setAssessments]=useState<Assessment[]>([]);
- const [activityTotals,setActivityTotals]=useState<Record<string,number>|null>(null);
+ const [storedAssessments,setAssessments]=useState<Assessment[]>([]);
+ const [storedActivityTotals,setActivityTotals]=useState<Record<string,number>|null>(null);
+ const scope=[game?.id,g.me?.user_id,teacher].join(':');
+ const activeScope=useRef(scope),assessmentScope=useRef(''),activityScope=useRef(''),loadRequest=useRef(0);activeScope.current=scope;
+ const assessments=assessmentScope.current===scope?storedAssessments:[];
+ const activityTotals=activityScope.current===scope?storedActivityTotals:null;
  const [sort,setSort]=useState<Sort>('score');
  const [asc,setAsc]=useState(false);
  const [search,setSearch]=useState('');
@@ -19,25 +24,24 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
  const [stage,setStage]=useState(0);
  const [onlyAssessed,setOnlyAssessed]=useState(false);
  const [error,setError]=useState('');
- useEffect(()=>{
+ useEffect(()=>()=>{loadRequest.current++},[scope]);
+ useGameTableSync(teacher?game?.id:undefined,['stage_assessments','game_activity'],async()=>{
   if(!game||!teacher)return;
-  let alive=true;
-  const load=async()=>{
-   const [r,t]=await Promise.all([
-    supabase.from('stage_assessments').select('user_id,stage_no,auto_score,final_score,status').eq('game_id',game.id),
-    supabase.rpc('teacher_game_activity_counts',{p_game_id:game.id})
-   ]);
-   if(!alive)return;
-   if(r.error)setError(userError(r.error));else setAssessments((r.data||[]) as Assessment[]);
-   if(t.error){setActivityTotals(null);setError(userError(t.error))}
-   else setActivityTotals(Object.fromEntries(((t.data||[]) as {user_id:string;activity_count:number|string}[]).map(item=>[item.user_id,Number(item.activity_count)])));
+  const requestedScope=scope,request=++loadRequest.current,controller=new AbortController(),signal=controller.signal;
+  let timeout:ReturnType<typeof setTimeout>|undefined;
+  try{
+   const [r,t]=await Promise.race([Promise.all([
+    supabase.from('stage_assessments').select('user_id,stage_no,auto_score,final_score,status').eq('game_id',game.id).abortSignal(signal),
+    supabase.rpc('teacher_game_activity_counts',{p_game_id:game.id}).abortSignal(signal)
+   ]),new Promise<never>((_,reject)=>{timeout=setTimeout(()=>{controller.abort();reject(new Error('Не удалось обновить аналитику: сервер не ответил вовремя.'))},12000)})]);
+   if(activeScope.current!==requestedScope||loadRequest.current!==request||signal.aborted)return;
+   if(r.error)setError(userError(r.error));else{assessmentScope.current=requestedScope;setAssessments((r.data||[]) as Assessment[])}
+   if(t.error){activityScope.current=requestedScope;setActivityTotals(null);setError(userError(t.error))}
+   else{activityScope.current=requestedScope;setActivityTotals(Object.fromEntries(((t.data||[]) as {user_id:string;activity_count:number|string}[]).map(item=>[item.user_id,Number(item.activity_count)])))}
    if(!r.error&&!t.error)setError('')
-  };
-  void load();
-  const channel=supabase.channel('analytics-assessments:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'stage_assessments',filter:'game_id=eq.'+game.id},()=>void load()).subscribe();
-  return()=>{alive=false;void supabase.removeChannel(channel)};
- },[game?.id,teacher]);
+  }catch(error){if(activeScope.current===requestedScope&&loadRequest.current===request)setError(userError(error))}
+  finally{clearTimeout(timeout)}
+ },scope,undefined,3000,180000);
  const students=members.filter(m=>m.kind==='student');
  const rows=useMemo(()=>students.map(m=>{
   const gradeRows=assessments.filter(a=>a.user_id===m.user_id&&(stage===0||a.stage_no===stage));

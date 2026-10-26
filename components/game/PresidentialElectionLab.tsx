@@ -1,7 +1,7 @@
 'use client';
 import {userError} from '@/lib/userError';
 import {IconAction} from '../ui/IconAction';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {createScopedSignedAssetCache} from './scopedSignedAssetCache';
 import {prepareCandidatePhoto} from './prepareCandidatePhoto';
 import {supabase} from '@/lib/supabase';
@@ -11,6 +11,7 @@ import {institutionEmblem} from './institutionEmblems';
 import CecOfficialDocument from './CecOfficialDocument';
 import {cecOfficialResolution} from './cecOfficialWording';
 import {extractCandidateDocumentText} from './candidateDocumentText';
+import {useGameTableSync} from './useGameTableSync';
 
 type Settings={game_id:string;system_type:'relative'|'absolute'|'qualified'|'preferential';threshold_pct:number;poll_enabled:boolean;status:'setup'|'round1'|'runoff'|'finished'|'manual_required';result:Record<string,any>};
 type Candidate={id:string;user_id:string|null;party_id:string|null;display_name:string;nomination_type:'party'|'self'|'fictional';registration_status:'submitted'|'registered'|'revision'|'rejected'|'withdrawn';program_summary:string|null;campaign_statement:string|null;registration_attempts:number;legal_error_count:number;rating_penalty:number;created_by:string;registration_number:string|null;registration_decision_no:string|null;registration_decision_at:string|null;registration_public_summary:string|null;cec_submitted_at:string|null;cec_submission_version:number;archived_at:string|null;photo_path:string|null};
@@ -21,7 +22,6 @@ type ProgramPoint={id:string;candidate_id:string;point_no:number;body:string};
 type CandidateDoc={id:string;candidate_id:string;doc_kind:string;title:string;storage_path:string;file_name:string;status:'submitted'|'accepted'|'revision';note:string|null;url?:string|null;extracted_text:string|null;extraction_status:'pending'|'extracted'|'no_text'|'unsupported'|'error';auto_check:{verdict?:'ok'|'issues'|'manual';summary?:string;issues?:string[];checks?:{label:string;ok:boolean}[];basis?:string};is_submitted:boolean;submitted_at:string|null;archived_at:string|null};
 type Supporter={id:string;candidate_id:string;supporter_user_id:string};
 type SignatureBatch={id:string;candidate_id:string;direction_label:string;signatures:number};
-type CandidateReadiness={ready:boolean;issues:string[];program_points:number;accepted_documents:number;required_documents:number;support_group:number;signatures:number;nomination_type:string};
 type AutoReviewItem={kind:string;title:string;state:string;verdict:'ok'|'issues'|'manual';summary?:string;issues?:string[];file_name?:string};
 type AutoReview={ready:boolean;recommended_status:'registered'|'revision';error_count:number;manual_count:number;issues:string[];items:AutoReviewItem[];program_points:number;support_group:number;signatures:number;legal_basis:string[]};
 
@@ -40,6 +40,9 @@ const docLabels:Record<string,string>={
 };
 const partyDocs=['party_decision','party_egrul','consent','passport','income','real_estate','expenses'];
 const selfDocs=['group_petition','signature_sheets','consent','passport','income','real_estate','expenses'];
+function preserveDrafts<T>(drafts:Record<string,T>,previous:Record<string,T>,next:Record<string,T>):Record<string,T>{
+ return {...next,...Object.fromEntries(Object.entries(drafts).filter(([id,value])=>JSON.stringify(value)!==JSON.stringify(previous[id])))};
+}
 
 export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,parties,currentStage,setError}=g;
@@ -56,13 +59,12 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const [signatureBatches,setSignatureBatches]=useState<SignatureBatch[]>([]);
  const [decisions,setDecisions]=useState<CecDecision[]>([]);
  const [privateNotes,setPrivateNotes]=useState<CecPrivateNote[]>([]);
- const [privateProfiles,setPrivateProfiles]=useState<Record<string,PrivateProfile>>({});
  const [privateDrafts,setPrivateDrafts]=useState<Record<string,PrivateProfile>>({});
- const [readiness,setReadiness]=useState<Record<string,CandidateReadiness>>({});
  const [autoReviews,setAutoReviews]=useState<Record<string,AutoReview>>({});
  const [docTextDraft,setDocTextDraft]=useState<Record<string,string>>({});
  const [docReviewNotes,setDocReviewNotes]=useState<Record<string,string>>({});
  const [photoUrls,setPhotoUrls]=useState<Record<string,string>>({});
+ const photoRequest=useRef(0);
  const [candidateUser,setCandidateUser]=useState('');
  const [candidateParty,setCandidateParty]=useState('');
  const [candidateName,setCandidateName]=useState('');
@@ -78,6 +80,22 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const [directionDraft,setDirectionDraft]=useState<Record<string,string>>({});
  const [signatureDraft,setSignatureDraft]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
+ const scope=JSON.stringify([game?.id,me?.user_id,me?.kind,me?.role_title,me?.team,me?.roster_archived_at,teacher]);
+ const activeScope=useRef(scope),alive=useRef(true);activeScope.current=scope;
+ const [dataScope,setDataScope]=useState(scope);
+ const reads=useRef({scope,promise:null as Promise<void>|null,queued:false,explicit:false,controller:null as AbortController|null});
+ if(reads.current.scope!==scope)reads.current={scope,promise:null,queued:false,explicit:false,controller:null};
+ const readState=reads.current;
+ const serverDrafts=useRef({review:{} as typeof review,private:{} as typeof privateDrafts,text:{} as typeof docTextDraft});
+ const scopeCurrent=()=>alive.current&&activeScope.current===scope;
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
+ useEffect(()=>{
+  setSettings(null);setSystemDecisionComplete(false);setCandidates([]);setPoints([]);setCandidateDocs([]);setSupporters([]);setSignatureBatches([]);setDecisions([]);setPrivateNotes([]);setAutoReviews({});setPhotoUrls({});
+  setPrivateDrafts({});setReview({});setDocTextDraft({});setDocReviewNotes({});setRefusalBasis({});setPointDraft({});setPointFeedback({});setSupporterDraft({});setDirectionDraft({});setSignatureDraft({});
+  setCandidateUser('');setCandidateParty('');setCandidateName('');setProgram('');setCampaign('');setDocumentPreview(null);setBusy(false);
+  serverDrafts.current={review:{},private:{},text:{}};setDataScope(scope);
+  return()=>{readState.controller?.abort()};
+ },[scope]);
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  // Party members may submit documents for their nominated candidate.
  // Management of private profiles, programmes and CEC decisions stays restricted.
@@ -87,63 +105,80 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const systemReady=!!settings&&systemDecisionComplete;
  const canNominate=!!me&&(teacher||currentStage?.stage_no===6);
 
- async function load(){
-  if(!game)return;
-  const [a,b,p,d,sg,sb,cd,cn,pp,sd]=await Promise.all([
-   supabase.from('presidential_election_settings').select('*').eq('game_id',game.id).maybeSingle(),
-   supabase.from('presidential_candidates').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at'),
-   supabase.from('presidential_candidate_program_points').select('*').eq('game_id',game.id).order('point_no'),
-   supabase.from('presidential_candidate_documents').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at'),
-   supabase.from('presidential_support_group').select('*').eq('game_id',game.id).order('created_at'),
-   supabase.from('presidential_signature_batches').select('*').eq('game_id',game.id).order('direction_label'),
-   supabase.from('presidential_cec_decisions').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
-   supabase.from('presidential_cec_private_notes').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
-   supabase.from('presidential_candidate_private_profiles').select('*').eq('game_id',game.id),
-   supabase.rpc('get_presidential_student_system_vote',{p_game_id:game.id})
+ async function load(background=false){
+  if(!game||!me||!scopeCurrent()||background&&document.visibilityState!=='visible')return;
+  const state=reads.current;state.explicit=state.explicit||!background;
+  if(state.promise){state.queued=true;return state.promise}
+  state.promise=(async()=>{
+   do{
+    state.queued=false;const passive=!state.explicit;state.explicit=false;
+    const controller=new AbortController();state.controller=controller;
+    const current=()=>scopeCurrent()&&!controller.signal.aborted&&(!passive||document.visibilityState==='visible');
+    let timeout:ReturnType<typeof setTimeout>|undefined;
+    try{await Promise.race([(async()=>{
+  const [a,b,p,d]=await Promise.all([
+   supabase.from('presidential_election_settings').select('*').eq('game_id',game.id).abortSignal(controller.signal).maybeSingle(),
+   supabase.from('presidential_candidates').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at').abortSignal(controller.signal),
+   supabase.from('presidential_candidate_program_points').select('*').eq('game_id',game.id).order('point_no').abortSignal(controller.signal),
+   supabase.from('presidential_candidate_documents').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at').abortSignal(controller.signal)
   ]);
+  if(!current())return;
+  const [sg,sb,cd,cn]=await Promise.all([
+   supabase.from('presidential_support_group').select('*').eq('game_id',game.id).order('created_at').abortSignal(controller.signal),
+   supabase.from('presidential_signature_batches').select('*').eq('game_id',game.id).order('direction_label').abortSignal(controller.signal),
+   supabase.from('presidential_cec_decisions').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal),
+   supabase.from('presidential_cec_private_notes').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal)
+  ]);
+  if(!current())return;
+  const [pp,sd]=await Promise.all([
+   supabase.from('presidential_candidate_private_profiles').select('*').eq('game_id',game.id).abortSignal(controller.signal),
+   supabase.rpc('get_presidential_student_system_vote',{p_game_id:game.id}).abortSignal(controller.signal)
+  ]);
+  if(!current())return;
+  const error=[a,b,p,d,sg,sb,cd,cn,pp,sd].find(x=>x.error)?.error;if(error)setError(userError(error));
   if(!a.error&&a.data)setSettings(a.data as Settings);
   if(!sd.error)setSystemDecisionComplete(Boolean(sd.data?.closed));
-  if(!b.error){const rows=(b.data||[]) as Candidate[];setCandidates(rows);setReview(Object.fromEntries(rows.map(x=>[x.id,{status:x.registration_status==='registered'?'registered':x.registration_status==='rejected'?'rejected':'revision',errors:String(x.legal_error_count),penalty:String(x.rating_penalty),publicSummary:x.registration_public_summary||'',privateSummary:''}])));const pairs=await Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,(await signedAsset(x.photo_path!))||''] as const));setPhotoUrls(Object.fromEntries(pairs.filter(x=>x[1])))}
+  if(!b.error){
+   const rows=(b.data||[]) as Candidate[];setCandidates(rows);const request=++photoRequest.current;
+   const next:typeof review=Object.fromEntries(rows.map(x=>[x.id,{status:x.registration_status==='registered'?'registered':x.registration_status==='rejected'?'rejected':'revision',errors:String(x.legal_error_count),penalty:String(x.rating_penalty),publicSummary:x.registration_public_summary||'',privateSummary:''}]));
+   const previous=serverDrafts.current.review;serverDrafts.current.review=next;setReview(v=>preserveDrafts(v,previous,next));
+   void Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,(await signedAsset(x.photo_path!))||''] as const)).then(pairs=>{if(current()&&request===photoRequest.current)setPhotoUrls(Object.fromEntries(pairs.filter(x=>x[1])))}).catch(error=>{if(current()&&request===photoRequest.current)setError(userError(error))});
+  }
   if(!p.error)setPoints((p.data||[]) as ProgramPoint[]);
   if(!d.error){
    const docs=(d.data||[]) as CandidateDoc[];
-   const withUrls=await Promise.all(docs.map(async x=>({...x,url:await signedAsset(x.storage_path)})));
-   setCandidateDocs(withUrls);setDocTextDraft(v=>({...v,...Object.fromEntries(withUrls.map(x=>[x.id,x.extracted_text||'']))}));
+   setCandidateDocs(v=>docs.map(x=>({...x,url:v.find(old=>old.id===x.id&&old.storage_path===x.storage_path)?.url})));
+   const next=Object.fromEntries(docs.map(x=>[x.id,x.extracted_text||'']));const previous=serverDrafts.current.text;serverDrafts.current.text=next;setDocTextDraft(v=>preserveDrafts(v,previous,next));
+   void Promise.all(docs.map(async x=>({...x,url:await signedAsset(x.storage_path)}))).then(rows=>{if(current())setCandidateDocs(v=>v.map(x=>({...x,url:rows.find(row=>row.id===x.id&&row.storage_path===x.storage_path)?.url||x.url})))}).catch(error=>{if(current())setError(userError(error))});
   }
   if(!sg.error)setSupporters((sg.data||[]) as Supporter[]);
   if(!sb.error)setSignatureBatches((sb.data||[]) as SignatureBatch[]);
   if(!cd.error)setDecisions((cd.data||[]) as CecDecision[]);
   if(!cn.error)setPrivateNotes((cn.data||[]) as CecPrivateNote[]);
-  if(!pp.error){const rows=(pp.data||[]) as PrivateProfile[];const map=Object.fromEntries(rows.map(x=>[x.candidate_id,x]));setPrivateProfiles(map);setPrivateDrafts(v=>({...v,...map}))}
+  if(!pp.error){const next=Object.fromEntries(((pp.data||[]) as PrivateProfile[]).map(x=>[x.candidate_id,x]));const previous=serverDrafts.current.private;serverDrafts.current.private=next;setPrivateDrafts(v=>preserveDrafts(v,previous,next))}
   if(!b.error){
-   const rr:Record<string,CandidateReadiness>={},ar:Record<string,AutoReview>={};
-   await Promise.all((teacher?((b.data||[]) as Candidate[]):[]).map(async x=>{
-    const [q,audit]=await Promise.all([
-     supabase.rpc('get_presidential_candidate_readiness',{p_candidate_id:x.id}),
-     supabase.rpc('get_presidential_cec_auto_review',{p_candidate_id:x.id})
-    ]);
-    if(!q.error&&q.data)rr[x.id]=q.data as CandidateReadiness;
-    if(!audit.error&&audit.data)ar[x.id]=audit.data as AutoReview;
-   }));
-   setReadiness(rr);setAutoReviews(ar);
+   const rows=teacher?((b.data||[]) as Candidate[]):[],ar:Record<string,AutoReview>={};
+   for(let offset=0;offset<rows.length;offset+=4){
+    if(!current())return;
+    await Promise.all(rows.slice(offset,offset+4).map(async x=>{
+     const audit=await supabase.rpc('get_presidential_cec_auto_review',{p_candidate_id:x.id}).abortSignal(controller.signal);
+     if(!current())return;
+     if(audit.error)setError(userError(audit.error));else if(audit.data)ar[x.id]=audit.data as AutoReview;
+    }));
+   }
+   if(current())setAutoReviews(v=>({...v,...ar}));
   }
+    })(),new Promise<never>((_,reject)=>{controller.signal.addEventListener('abort',()=>{clearTimeout(timeout);reject(new Error('Не удалось обновить досье: сервер не ответил вовремя.'))},{once:true});timeout=setTimeout(()=>controller.abort(),12000)})]);
+    }catch(error){if(scopeCurrent()&&(!passive||document.visibilityState==='visible'))setError(userError(error))}
+    finally{clearTimeout(timeout);if(state.controller===controller)state.controller=null}
+   }while(state.queued&&scopeCurrent());
+  })().finally(()=>{state.promise=null});
+  return state.promise;
  }
- useEffect(()=>{void load()},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('presidential-lab:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'presidential_election_settings',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'presidential_candidates',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'presidential_candidate_program_points',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'presidential_candidate_documents',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'presidential_support_group',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'presidential_signature_batches',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'presidential_cec_decisions',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ // Presidential tables are not published in Realtime; visible reconciliation remains bounded.
+ useGameTableSync(me?.user_id?game?.id:undefined,['presidential_election_settings','presidential_candidates','presidential_candidate_program_points','presidential_candidate_documents','presidential_support_group','presidential_signature_batches','presidential_cec_decisions'],()=>load(true),scope,undefined,3000,180000);
 
- if(!game||!me)return null;
+ if(!game||!me||dataScope!==scope)return null;
  const activeGame=game;
  const activeMe=me;
  const partyUsers=(partyId:string)=>{const p=parties.find(x=>x.id===partyId);return p?members.filter(m=>m.kind==='student'&&m.team===p.name):[]};
@@ -155,13 +190,15 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   const found=members.find(m=>m.user_id===userId);
   const name=(candidateName.trim()||found?.full_name||activeMe.full_name).trim();
   setBusy(true);const r=await supabase.rpc('save_presidential_candidate',{p_game_id:activeGame.id,p_candidate_id:null,p_user_id:userId,p_party_id:partyId,p_display_name:name,p_nomination_type:type,p_program_summary:program.trim()||null});
-  if(r.error)setError(userError(r.error));else{
+  if(!scopeCurrent())return;if(r.error)setError(userError(r.error));else{
    const candidateId=String(r.data||'');
    const programLines=program.split(/\n+/).map(x=>x.trim().replace(/^\d+[.)]\s*/,'' )).filter(Boolean).slice(0,50);
-   for(let i=0;i<programLines.length;i++)await supabase.rpc('save_presidential_program_point',{p_candidate_id:candidateId,p_point_no:i+1,p_body:programLines[i]});
+   for(let i=0;i<programLines.length;i++){if(!scopeCurrent())return;await supabase.rpc('save_presidential_program_point',{p_candidate_id:candidateId,p_point_no:i+1,p_body:programLines[i]});}
+   if(!scopeCurrent())return;
    if(candidateId)await supabase.rpc('save_presidential_public_profile',{p_candidate_id:candidateId,p_program_summary:program.trim()||null,p_campaign_statement:campaign.trim()||null});
+   if(!scopeCurrent())return;
    setCandidateName('');setCandidateUser('');setProgram('');setCampaign('');setPanelView('dossier');await load()
-  }setBusy(false)
+  }if(scopeCurrent())setBusy(false)
  }
  async function reviewCandidate(id:string){
   const x=review[id],candidate=candidates.find(c=>c.id===id);if(!x||!candidate||busy||!teacher)return;
@@ -179,9 +216,9 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   }
   setBusy(true);
   const r=await supabase.rpc('record_presidential_cec_decision',{p_candidate_id:id,p_status:x.status,p_legal_errors:Number(x.errors)||0,p_rating_penalty:Number(x.penalty)||0,p_public_summary:x.status==='rejected'?'Отказать в регистрации кандидата. Правовое основание: '+refusalBasis[id]+'.':x.publicSummary.trim()||null,p_private_summary:reason||null});
-  if(r.error)setError(userError(r.error));else{setPanelView('decisions');await load()}setBusy(false);
+  if(!scopeCurrent())return;if(r.error)setError(userError(r.error));else{setPanelView('decisions');await load()}if(scopeCurrent())setBusy(false);
  }
- async function savePrivateProfile(candidateId:string){const x=privateDrafts[candidateId]||{candidate_id:candidateId,birth_date:null,birth_place:null,contact_phone:null,contact_email:null,address_text:null,passport_note:null};setBusy(true);const r=await supabase.rpc('save_presidential_private_profile',{p_candidate_id:candidateId,p_birth_date:x.birth_date||null,p_birth_place:x.birth_place||null,p_contact_phone:x.contact_phone||null,p_contact_email:x.contact_email||null,p_address_text:x.address_text||null,p_passport_note:x.passport_note||null});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function savePrivateProfile(candidateId:string){const x=privateDrafts[candidateId]||{candidate_id:candidateId,birth_date:null,birth_place:null,contact_phone:null,contact_email:null,address_text:null,passport_note:null};setBusy(true);const r=await supabase.rpc('save_presidential_private_profile',{p_candidate_id:candidateId,p_birth_date:x.birth_date||null,p_birth_place:x.birth_place||null,p_contact_phone:x.contact_phone||null,p_contact_email:x.contact_email||null,p_address_text:x.address_text||null,p_passport_note:x.passport_note||null});if(!scopeCurrent())return;if(r.error)setError(userError(r.error));else await load();if(scopeCurrent())setBusy(false)}
  async function addProgramPoint(candidateId:string){
   if(busy)return;
   const body=(pointDraft[candidateId]||'').trim();
@@ -192,64 +229,64 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   }
   const next=Math.max(0,...points.filter(x=>x.candidate_id===candidateId).map(x=>x.point_no))+1;
   setBusy(true);const r=await supabase.rpc('save_presidential_program_point',{p_candidate_id:candidateId,p_point_no:next,p_body:body});
-  if(r.error){setError(userError(r.error));setPointFeedback(v=>({...v,[candidateId]:'Не удалось сохранить положение. Проверьте сообщение об ошибке и повторите попытку.'}));}
+  if(!scopeCurrent())return;if(r.error){setError(userError(r.error));setPointFeedback(v=>({...v,[candidateId]:'Не удалось сохранить положение. Проверьте сообщение об ошибке и повторите попытку.'}));}
   else{setPointDraft(v=>({...v,[candidateId]:''}));setPointFeedback(v=>({...v,[candidateId]:'Положение программы сохранено.'}));await load()}
-  setBusy(false);
+  if(scopeCurrent())setBusy(false);
  }
- async function deleteProgramPoint(id:string){setBusy(true);const r=await supabase.rpc('delete_presidential_program_point',{p_point_id:id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function deleteProgramPoint(id:string){setBusy(true);const r=await supabase.rpc('delete_presidential_program_point',{p_point_id:id});if(!scopeCurrent())return;if(r.error)setError(userError(r.error));else await load();if(scopeCurrent())setBusy(false)}
  async function uploadCandidateDoc(candidateId:string,kind:string,file:File){
   if(!file||!kind)return;
   const ext=(file.name.split('.').pop()||'bin').toLowerCase();
   const storagePath=activeGame.id+'/presidential/'+candidateId+'/docs/'+crypto.randomUUID()+'.'+ext;
   setBusy(true);
   const up=await supabase.storage.from('game-assets').upload(storagePath,file,{contentType:file.type||'application/octet-stream'});
-  if(up.error){setError(userError(up.error));setBusy(false);return}
+  if(!scopeCurrent())return;if(up.error){setError(userError(up.error));if(scopeCurrent())setBusy(false);return}
   const r=await supabase.rpc('add_presidential_candidate_document',{p_candidate_id:candidateId,p_doc_kind:kind,p_title:docLabels[kind]||file.name,p_storage_path:storagePath,p_file_name:file.name,p_mime_type:file.type||null,p_file_size:file.size});
-  if(r.error){setError(userError(r.error));setBusy(false);return}
+  if(!scopeCurrent())return;if(r.error){setError(userError(r.error));if(scopeCurrent())setBusy(false);return}
   const documentId=String(r.data||'');
-  const extracted=await extractCandidateDocumentText(file);
+  const extracted=await extractCandidateDocumentText(file);if(!scopeCurrent())return;
   if(documentId){
    const saved=await supabase.rpc('save_presidential_candidate_document_text',{p_document_id:documentId,p_text:extracted.text,p_extraction_status:extracted.status});
-   if(saved.error)setError(userError(saved.error));
+   if(!scopeCurrent())return;if(saved.error)setError(userError(saved.error));
   }
-  await load();setBusy(false);
+  await load();if(scopeCurrent())setBusy(false);
  }
  async function saveDocumentText(doc:CandidateDoc){
   setBusy(true);const text=(docTextDraft[doc.id]??doc.extracted_text??'').trim();
   const r=await supabase.rpc('save_presidential_candidate_document_text',{p_document_id:doc.id,p_text:text,p_extraction_status:text.length>=20?'extracted':'no_text'});
-  if(r.error)setError(userError(r.error));else await load();setBusy(false);
+  if(!scopeCurrent())return;if(r.error)setError(userError(r.error));else await load();if(scopeCurrent())setBusy(false);
  }
  async function archiveCandidateDocument(doc:CandidateDoc){
   if(!teacher||busy)return;
   if(typeof window!=='undefined'&&!window.confirm('Удалить документ «'+doc.file_name+'» из активного досье?'))return;
   setBusy(true);
   const r=await supabase.rpc('archive_presidential_candidate_document',{p_document_id:doc.id});
-  if(r.error)setError(userError(r.error));else await load();
-  setBusy(false);
+  if(!scopeCurrent())return;if(r.error)setError(userError(r.error));else await load();
+  if(scopeCurrent())setBusy(false);
  }
  async function archiveCandidateRecord(candidate:Candidate){
   if(!teacher||busy)return;
   if(typeof window!=='undefined'&&!window.confirm('Удалить кандидата «'+candidate.display_name+'» из активного реестра ЦИК и досье?'))return;
   setBusy(true);
   const r=await supabase.rpc('archive_presidential_candidate',{p_candidate_id:candidate.id});
-  if(r.error)setError(userError(r.error));else await load();
-  setBusy(false);
+  if(!scopeCurrent())return;if(r.error)setError(userError(r.error));else await load();
+  if(scopeCurrent())setBusy(false);
  }
  async function uploadCandidatePhoto(candidateId:string,file:File){
   if(!file.type.startsWith('image/')){setError('Нужно выбрать изображение кандидата.');return}
   setBusy(true);
-  const prepared=await prepareCandidatePhoto(file);
+  const prepared=await prepareCandidatePhoto(file);if(!scopeCurrent())return;
   const ext=(prepared.name.split('.').pop()||'jpg').toLowerCase();
   const storagePath=activeGame.id+'/presidential/'+candidateId+'/photo-'+crypto.randomUUID()+'.'+ext;
   const up=await supabase.storage.from('game-assets').upload(storagePath,prepared,{contentType:prepared.type||'image/jpeg',cacheControl:'3600'});
-  if(up.error){setError(userError(up.error));setBusy(false);return}
+  if(!scopeCurrent())return;if(up.error){setError(userError(up.error));if(scopeCurrent())setBusy(false);return}
   const r=await supabase.rpc('set_presidential_candidate_photo',{p_candidate_id:candidateId,p_storage_path:storagePath});
-  if(r.error){setError(userError(r.error));await supabase.storage.from('game-assets').remove([storagePath])}else await load();
-  setBusy(false);
+  if(!scopeCurrent())return;if(r.error){setError(userError(r.error));await supabase.storage.from('game-assets').remove([storagePath])}else await load();
+  if(scopeCurrent())setBusy(false);
  }
  async function submitToCec(candidateId:string){
   setBusy(true);const r=await supabase.rpc('submit_presidential_candidate_to_cec',{p_candidate_id:candidateId});
-  if(r.error)setError(userError(r.error));else{setPanelView('application');await load()}setBusy(false);
+  if(!scopeCurrent())return;if(r.error)setError(userError(r.error));else{setPanelView('application');await load()}if(scopeCurrent())setBusy(false);
  }
  function fillSuggestedDecision(id:string){
   const candidate=candidates.find(c=>c.id===id);if(!candidate)return;
@@ -273,33 +310,33 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   if(status==='revision'&&!note){setError('Укажите замечания к документу перед возвратом на доработку.');return}
   setBusy(true);
   const r=await supabase.rpc('review_presidential_candidate_document',{p_document_id:doc.id,p_status:status,p_note:status==='revision'?note:null});
-  if(r.error)setError(userError(r.error));
+  if(!scopeCurrent())return;if(r.error)setError(userError(r.error));
   else {setDocReviewNotes(v=>{const next={...v};delete next[doc.id];return next});await load()}
-  setBusy(false);
+  if(scopeCurrent())setBusy(false);
  }
  async function downloadCandidateDoc(doc:CandidateDoc){
   if(!teacher||!doc.is_submitted||busy)return;
   setBusy(true);
   try{
    const {data,error}=await supabase.storage.from('game-assets').download(doc.storage_path);
-   if(error||!data){setError(userError(error||new Error('Файл недоступен для скачивания.')));return}
+   if(!scopeCurrent())return;if(error||!data){setError(userError(error||new Error('Файл недоступен для скачивания.')));return}
    const url=URL.createObjectURL(data);
    const link=document.createElement('a');
    link.href=url;link.download=doc.file_name||'Документ кандидата';
    document.body.appendChild(link);link.click();link.remove();
    window.setTimeout(()=>URL.revokeObjectURL(url),2000);
-  }catch(err){setError(userError(err))}
-  finally{setBusy(false)}
+  }catch(err){if(scopeCurrent())setError(userError(err))}
+  finally{if(scopeCurrent())setBusy(false)}
  }
  async function addSupporter(candidateId:string){
   const uid=supporterDraft[candidateId];if(!uid)return;setBusy(true);const r=await supabase.rpc('add_presidential_supporter',{p_candidate_id:candidateId,p_supporter_user_id:uid});
-  if(r.error)setError(userError(r.error));else{setSupporterDraft(v=>({...v,[candidateId]:''}));await load()}setBusy(false);
+  if(!scopeCurrent())return;if(r.error)setError(userError(r.error));else{setSupporterDraft(v=>({...v,[candidateId]:''}));await load()}if(scopeCurrent())setBusy(false);
  }
- async function removeSupporter(id:string){setBusy(true);const r=await supabase.rpc('remove_presidential_supporter',{p_support_id:id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function removeSupporter(id:string){setBusy(true);const r=await supabase.rpc('remove_presidential_supporter',{p_support_id:id});if(!scopeCurrent())return;if(r.error)setError(userError(r.error));else await load();if(scopeCurrent())setBusy(false)}
  async function saveSignatureBatch(candidateId:string){
   const direction=(directionDraft[candidateId]||'').trim(),count=Math.max(0,Math.min(5,Number(signatureDraft[candidateId])||0));if(direction.length<2)return;
   setBusy(true);const r=await supabase.rpc('set_presidential_signature_batch',{p_candidate_id:candidateId,p_direction_label:direction,p_signatures:count});
-  if(r.error)setError(userError(r.error));else{setDirectionDraft(v=>({...v,[candidateId]:''}));setSignatureDraft(v=>({...v,[candidateId]:''}));await load()}setBusy(false);
+  if(!scopeCurrent())return;if(r.error)setError(userError(r.error));else{setDirectionDraft(v=>({...v,[candidateId]:''}));setSignatureDraft(v=>({...v,[candidateId]:''}));await load()}if(scopeCurrent())setBusy(false);
  }
 
  return <section id="stage6-cec" className="electionLab cecWorkspace">
@@ -333,7 +370,6 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    const docs=candidateDocs.filter(x=>x.candidate_id===c.id);
    const group=supporters.filter(x=>x.candidate_id===c.id);
    const sigs=signatureBatches.filter(x=>x.candidate_id===c.id);
-   const ready=readiness[c.id];
    const canManage=teacher||c.user_id===activeMe.user_id||c.created_by===activeMe.user_id||(!!ledParty&&c.party_id===ledParty.id);
    const canUploadDocuments=canManage||canUploadForCandidate(c);
    const requiredKinds=c.nomination_type==='party'?partyDocs:c.nomination_type==='self'?selfDocs:[];

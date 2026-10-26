@@ -48,6 +48,27 @@ async function ready(){
   await new Promise(r=>setTimeout(r,1000));
  }throw Error('Interface route did not become ready');
 }
+async function reviewLayoutDiagnostics(page,width,phase){
+ try{
+  // Capture bounded geometry evidence without changing click actionability or page styles.
+  const samples=await page.evaluate(async()=>{
+   const describe=element=>element?{tag:element.tagName,id:element.id,class:element.getAttribute('class')}:null;
+   const samples=[];
+   for(let frame=0;frame<12;frame++){
+    await new Promise(resolve=>requestAnimationFrame(resolve));
+    const button=document.querySelector('.mediaReviewForm button.primary'),ancestors=[];
+    for(let element=button;element&&ancestors.length<8;element=element.parentElement){
+     const style=getComputedStyle(element);
+     ancestors.push({...describe(element),rect:element.getBoundingClientRect().toJSON(),style:{display:style.display,position:style.position,transform:style.transform,translate:style.translate,scale:style.scale,animationName:style.animationName,animationDuration:style.animationDuration,transitionProperty:style.transitionProperty,transitionDuration:style.transitionDuration,overflow:style.overflow,contain:style.contain,contentVisibility:style.contentVisibility}});
+    }
+    const viewport=window.visualViewport;
+    samples.push({frame,time:performance.now(),scrollX:window.scrollX,scrollY:window.scrollY,visibility:document.visibilityState,activeElement:describe(document.activeElement),button:button?{connected:button.isConnected,disabled:button.disabled}:null,ancestors,visualViewport:viewport?{width:viewport.width,height:viewport.height,scale:viewport.scale,pageLeft:viewport.pageLeft,pageTop:viewport.pageTop,offsetLeft:viewport.offsetLeft,offsetTop:viewport.offsetTop}:null,activeAnimations:document.getAnimations().slice(0,12).map(animation=>({target:describe(animation.effect?.target),playState:animation.playState,currentTime:typeof animation.currentTime==='number'?animation.currentTime:String(animation.currentTime),playbackRate:animation.playbackRate,timing:animation.effect?.getComputedTiming()}))});
+   }
+   return samples;
+  });
+  fs.writeFileSync(path.join(screens,'media-review-layout-'+phase+'-'+width+'.json'),JSON.stringify({width,phase,samples},null,2));
+ }catch(error){console.error('Media review layout diagnostics failed:',error.message)}
+}
 (async()=>{
  fs.mkdirSync(route,{recursive:true});fs.writeFileSync(path.join(route,'page.tsx'),source);fs.mkdirSync(screens,{recursive:true});
  server=spawn(process.execPath,[require.resolve('next/dist/bin/next'),'dev','--hostname','127.0.0.1','--port','3995'],{cwd:root,env:{...process.env,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:'build-placeholder-key'},stdio:['ignore','pipe','pipe']});
@@ -183,7 +204,10 @@ async function ready(){
    await queue.getByRole('button',{name:/Новость участника для согласования/}).click();
    await queue.getByLabel('Комментарий к решению',{exact:true}).fill('Согласовано для публикации.');
    await page.screenshot({path:path.join(screens,'process-live-news-review-'+width+'.png')});
-   await queue.getByRole('button',{name:'Опубликовать в СМИ',exact:true}).click();await page.locator('#process-published-media-ui-post').waitFor();
+   await reviewLayoutDiagnostics(page,width,'before');
+   try{await queue.getByRole('button',{name:'Опубликовать в СМИ',exact:true}).click()}
+   catch(error){await reviewLayoutDiagnostics(page,width,'failed');throw error}
+   await page.locator('#process-published-media-ui-post').waitFor();
    assert.equal(toolCalls.filter(x=>x.rpc==='review_media_news').at(-1).p_approve,true);
    await page.getByRole('searchbox',{name:'Поиск публикаций',exact:true}).fill('');
    page.once('dialog',dialog=>dialog.accept());await page.locator('#process-justice-demo').getByRole('button',{name:'Удалить публикацию',exact:true}).click();

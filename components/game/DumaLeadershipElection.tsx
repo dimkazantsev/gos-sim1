@@ -1,10 +1,11 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {Landmark,ClipboardList,CheckCircle2,FileClock} from 'lucide-react';
 import {isStageWorkOpen} from './stageWorkStatus';
+import {notifyGameDataRefresh,useGameTableSync} from './useGameTableSync';
 
 type Election={id:string;game_id:string;office_key:'gd_chair'|'gd_deputy_1'|'gd_deputy_2';office_title:string;round_no:1|2;vote_mode:'open'|'secret';status:'nomination'|'open'|'closed'|'finished';ballot_mode?:'faction'|'personal';winner_candidate_id:string|null;parent_election_id:string|null;created_at:string};
 type OfficeCandidate={id:string;election_id:string;user_id:string;party_id:string;created_at:string};
@@ -32,45 +33,82 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
  const [voteDraft,setVoteDraft]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
-
- async function load(){
-  if(!game)return;
-  const [e,c,b,p,m,r,v,permissions]=await Promise.all([
-   supabase.from('office_elections').select('*').eq('game_id',game.id).eq('stage_no',4).in('office_key',['gd_chair','gd_deputy_1','gd_deputy_2']).order('created_at',{ascending:true}),
-   supabase.from('office_candidates').select('*').eq('game_id',game.id).order('created_at'),
-   supabase.from('office_ballots').select('*').eq('game_id',game.id),
-   supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id),
-   supabase.from('party_member_mandates').select('user_id,party_id,base_mandates,effective_mandates').eq('game_id',game.id),
-   supabase.from('institution_session_registrations').select('user_id,stage_no,institution_key,present_mandates').eq('game_id',game.id).eq('stage_no',4).eq('institution_key','gd'),
-   supabase.from('game_votes').select('id,status,result_code').eq('game_id',game.id).eq('stage_no',4).eq('procedure_key','gd_leadership_procedure'),
-   supabase.rpc('get_my_institution_meeting_permissions',{p_game_id:game.id,p_stage_no:4,p_institution:'gd'})
-  ]);
-  if(!e.error)setElections((e.data||[]) as Election[]);
-  if(!c.error)setCandidates((c.data||[]) as OfficeCandidate[]);
-  if(!b.error)setBallots((b.data||[]) as OfficeBallot[]);
-  if(!p.error)setPersonalBallots(p.data||[]);
-  if(!m.error)setPersonalMandates(m.data||[]);
-  if(!r.error)setRegistrations(r.data||[]);
-  if(!v.error)setProcedureVotes(v.data||[]);
-  if(!permissions.error)setCanCoordinate(!!permissions.data?.can_coordinate);
-  const failure=[e,c,b,p,m,r,v,permissions].find(x=>x.error);if(failure?.error)setError(userError(failure.error));
- }
- useEffect(()=>{void load()},[game?.id]);
+ const stageActive=isStageWorkOpen(game,g.stages.find(st=>st.stage_no===4));
+ const scope=JSON.stringify([game?.id,game?.status,stageActive,me?.user_id,me?.kind,me?.role_title,me?.team,me?.roster_archived_at,teacher]);
+ const activeScope=useRef(scope),alive=useRef(true),mutationScope=useRef<string|null>(null);activeScope.current=scope;
+ const [dataScope,setDataScope]=useState(scope);
+ const reads=useRef({scope,promise:null as Promise<void>|null,queued:false,explicit:false,cancel:null as (()=>void)|null});
+ if(reads.current.scope!==scope)reads.current={scope,promise:null,queued:false,explicit:false,cancel:null};
+ const readState=reads.current;
+ const scopeCurrent=()=>alive.current&&activeScope.current===scope;
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
  useEffect(()=>{
-  if(!game)return;
+  setElections([]);setCandidates([]);setBallots([]);setPersonalBallots([]);setPersonalMandates([]);setRegistrations([]);setProcedureVotes([]);setCanCoordinate(false);setNominee({});setVoteDraft({});setBusy(false);setDataScope(scope);
+  return()=>{readState.cancel?.()};
+ },[scope]);
+ async function load(background=false){
+  if(!game||!me||!scopeCurrent()||background&&document.visibilityState!=='visible')return;
+  const state=reads.current;state.explicit=state.explicit||!background;
+  if(state.promise){state.queued=true;return state.promise}
+  state.promise=(async()=>{
+   do{
+    state.queued=false;const passive=!state.explicit;state.explicit=false;
+    const controller=new AbortController();
+    const current=()=>scopeCurrent()&&!controller.signal.aborted&&(!passive||document.visibilityState==='visible');
+    let timeout:ReturnType<typeof setTimeout>|undefined;
+    try{
+     await Promise.race([(async()=>{
+      // Four reads at a time cap the initial classroom burst without changing ballot rules.
+      const [e,c,b,p]=await Promise.all([
+       supabase.from('office_elections').select('*').eq('game_id',game.id).eq('stage_no',4).in('office_key',['gd_chair','gd_deputy_1','gd_deputy_2']).order('created_at',{ascending:true}).abortSignal(controller.signal),
+       supabase.from('office_candidates').select('*').eq('game_id',game.id).order('created_at').abortSignal(controller.signal),
+       supabase.from('office_ballots').select('*').eq('game_id',game.id).abortSignal(controller.signal),
+       supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id).abortSignal(controller.signal)
+      ]);
+      if(!current())return;
+      if(!e.error)setElections((e.data||[]) as Election[]);
+      if(!c.error)setCandidates((c.data||[]) as OfficeCandidate[]);
+      if(!b.error)setBallots((b.data||[]) as OfficeBallot[]);
+      if(!p.error)setPersonalBallots(p.data||[]);
+      const firstError=[e,c,b,p].find(x=>x.error)?.error;if(firstError)setError(userError(firstError));
+      const [m,r,v,permissions]=await Promise.all([
+       supabase.from('party_member_mandates').select('user_id,party_id,base_mandates,effective_mandates').eq('game_id',game.id).abortSignal(controller.signal),
+       supabase.from('institution_session_registrations').select('user_id,stage_no,institution_key,present_mandates').eq('game_id',game.id).eq('stage_no',4).eq('institution_key','gd').abortSignal(controller.signal),
+       supabase.from('game_votes').select('id,status,result_code').eq('game_id',game.id).eq('stage_no',4).eq('procedure_key','gd_leadership_procedure').abortSignal(controller.signal),
+       supabase.rpc('get_my_institution_meeting_permissions',{p_game_id:game.id,p_stage_no:4,p_institution:'gd'}).abortSignal(controller.signal)
+      ]);
+      if(!current())return;
+      if(!m.error)setPersonalMandates(m.data||[]);
+      if(!r.error)setRegistrations(r.data||[]);
+      if(!v.error)setProcedureVotes(v.data||[]);
+      if(!permissions.error)setCanCoordinate(!!permissions.data?.can_coordinate);
+      const secondError=[m,r,v,permissions].find(x=>x.error)?.error;if(secondError)setError(userError(secondError));
+     })(),new Promise<never>((_,reject)=>{
+      state.cancel=()=>{clearTimeout(timeout);controller.abort();reject(new Error('Обновление выборов отменено.'))};
+      timeout=setTimeout(()=>{controller.abort();reject(new Error('Не удалось обновить выборы: сервер не ответил вовремя.'))},12000);
+     })]);
+    }catch(error){if(scopeCurrent()&&(!passive||document.visibilityState==='visible'))setError(userError(error))}
+    finally{clearTimeout(timeout);state.cancel=null}
+   }while(state.queued&&scopeCurrent());
+  })().finally(()=>{state.promise=null});
+  return state.promise;
+ }
+ useGameTableSync(me?.user_id?game?.id:undefined,['office_elections','office_candidates','office_ballots','office_personal_ballots','party_member_mandates','game_votes','institution_session_registrations'],()=>load(true),scope,undefined,3000,180000);
+ useEffect(()=>{
+  if(!game||!me)return;
+  // These five published tables are watched only while this election panel is mounted.
   const ch=supabase.channel('duma-leadership:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'office_elections',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'office_candidates',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'office_ballots',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'office_personal_ballots',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'party_member_mandates',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'game_votes',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'institution_session_registrations',filter:'game_id=eq.'+game.id},()=>void load())
+   .on('postgres_changes',{event:'*',schema:'public',table:'office_elections',filter:'game_id=eq.'+game.id},()=>{if(scopeCurrent())notifyGameDataRefresh(game.id,'office_elections')})
+   .on('postgres_changes',{event:'*',schema:'public',table:'office_candidates',filter:'game_id=eq.'+game.id},()=>{if(scopeCurrent())notifyGameDataRefresh(game.id,'office_candidates')})
+   .on('postgres_changes',{event:'*',schema:'public',table:'office_ballots',filter:'game_id=eq.'+game.id},()=>{if(scopeCurrent())notifyGameDataRefresh(game.id,'office_ballots')})
+   .on('postgres_changes',{event:'*',schema:'public',table:'office_personal_ballots',filter:'game_id=eq.'+game.id},()=>{if(scopeCurrent())notifyGameDataRefresh(game.id,'office_personal_ballots')})
+   .on('postgres_changes',{event:'*',schema:'public',table:'party_member_mandates',filter:'game_id=eq.'+game.id},()=>{if(scopeCurrent())notifyGameDataRefresh(game.id,'party_member_mandates')})
    .subscribe();
   return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+ },[scope]);
 
- if(!game||!me)return null;
+ const sorted=useMemo(()=>[...elections].sort((a,b)=>a.office_key.localeCompare(b.office_key)||a.round_no-b.round_no),[elections]);
+ if(!game||!me||dataScope!==scope)return null;
  const activeGame=game;
  const activeMe=me;
  const member=(id:string)=>members.find(m=>m.user_id===id);
@@ -80,7 +118,6 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
  const myAttendance=registrations.find(r=>r.user_id===activeMe.user_id)?.present_mandates;
  const myPresent=registrations.some(r=>r.user_id===activeMe.user_id)?gdEffectivePresence(activeMe.user_id,myAttendance):0;
  const myRegistered=registrations.some(r=>r.user_id===activeMe.user_id&&r.stage_no===4&&r.institution_key==='gd');
- const stageActive=isStageWorkOpen(activeGame,g.stages.find(st=>st.stage_no===4));
  const canPropose=stageActive&&activeMe.kind==='student'&&myRegistered&&myPresent>0;
  const canManage=stageActive&&(teacher||(canPropose&&canCoordinate));
  const myFaction=parties.find(p=>p.name===activeMe.team&&p.registration_status==='registered');
@@ -97,27 +134,32 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
  };
  const usedByParty=(eid:string,pid:string)=>electionBallots(eid).filter(b=>b.party_id===pid).reduce((a,b)=>a+Number(b.votes||0),0);
 
- async function openProcedureVote(){setBusy(true);const r=await supabase.rpc('open_duma_leadership_procedure_vote',{p_game_id:activeGame.id});if(r.error)setError(userError(r.error));else{await load();await g.refresh()}setBusy(false)}
+ async function change(request:()=>PromiseLike<{error:unknown}>,table:string,after?:()=>void|Promise<void>){
+  if(!scopeCurrent()||!stageActive||mutationScope.current===scope)return;
+  mutationScope.current=scope;setBusy(true);
+  try{
+   const r=await request();if(!scopeCurrent())return;
+   if(r.error)setError(userError(r.error));else{notifyGameDataRefresh(activeGame.id,table);await load();if(scopeCurrent())await after?.()}
+  }catch(error){if(scopeCurrent())setError(userError(error))}
+  finally{if(mutationScope.current===scope)mutationScope.current=null;if(scopeCurrent())setBusy(false)}
+ }
+ async function openProcedureVote(){await change(()=>supabase.rpc('open_duma_leadership_procedure_vote',{p_game_id:activeGame.id}),'game_votes',()=>g.refresh())}
  async function createElection(){
   if(!selectedOffice||electedKeys.has(selectedOffice)||activeKeys.has(selectedOffice))return;
-  setBusy(true);const r=await supabase.rpc('create_office_election',{p_game_id:activeGame.id,p_office_key:selectedOffice,p_vote_mode:mode});
-  if(r.error)setError(userError(r.error));else await load();setBusy(false);
+  await change(()=>supabase.rpc('create_office_election',{p_game_id:activeGame.id,p_office_key:selectedOffice,p_vote_mode:mode}),'office_elections');
  }
  async function nominate(electionId:string){
-  const userId=nominee[electionId];if(!userId)return;setBusy(true);
-  const r=await supabase.rpc('nominate_office_candidate',{p_election_id:electionId,p_user_id:userId});
-  if(r.error)setError(userError(r.error));else{setNominee(v=>({...v,[electionId]:''}));await load()}setBusy(false);
+  const userId=nominee[electionId];if(!userId)return;
+  await change(()=>supabase.rpc('nominate_office_candidate',{p_election_id:electionId,p_user_id:userId}),'office_candidates',()=>setNominee(v=>({...v,[electionId]:''})));
  }
- async function open(electionId:string){setBusy(true);const r=await supabase.rpc('open_office_election',{p_election_id:electionId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function open(electionId:string){await change(()=>supabase.rpc('open_office_election',{p_election_id:electionId}),'office_elections')}
  async function vote(electionId:string,candidateId:string){
-  const value=Math.max(0,Number(voteDraft[electionId+'-'+candidateId])||0);setBusy(true);
-  const r=await supabase.rpc('set_office_ballot',{p_election_id:electionId,p_candidate_id:candidateId,p_votes:value});
-  if(r.error)setError(userError(r.error));else await load();setBusy(false);
+  const value=Math.max(0,Number(voteDraft[electionId+'-'+candidateId])||0);
+  await change(()=>supabase.rpc('set_office_ballot',{p_election_id:electionId,p_candidate_id:candidateId,p_votes:value}),'office_ballots');
  }
- async function personalVote(electionId:string,candidateId:string){setBusy(true);const r=await supabase.rpc('cast_personal_office_ballot',{p_election_id:electionId,p_candidate_id:candidateId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
- async function close(electionId:string){setBusy(true);const r=await supabase.rpc('close_office_election',{p_election_id:electionId});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
+ async function personalVote(electionId:string,candidateId:string){await change(()=>supabase.rpc('cast_personal_office_ballot',{p_election_id:electionId,p_candidate_id:candidateId}),'office_personal_ballots')}
+ async function close(electionId:string){await change(()=>supabase.rpc('close_office_election',{p_election_id:electionId}),'office_elections')}
 
- const sorted=useMemo(()=>[...elections].sort((a,b)=>a.office_key.localeCompare(b.office_key)||a.round_no-b.round_no),[elections]);
  const electedKeys=new Set(elections.filter(e=>e.status==='finished'&&e.winner_candidate_id).map(e=>e.office_key));
  const activeKeys=new Set(elections.filter(e=>e.status==='nomination'||e.status==='open').map(e=>e.office_key));
  const availableOffices=offices.filter(([key])=>!electedKeys.has(key)&&!activeKeys.has(key));

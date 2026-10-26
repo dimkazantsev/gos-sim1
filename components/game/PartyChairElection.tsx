@@ -1,8 +1,9 @@
 'use client';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {CheckCircle2,Clock3,LockKeyhole,UsersRound,Vote} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
-import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
+import {useGameTableSync} from './useGameTableSync';
+import {userError} from '@/lib/userError';
 import {isStageWorkOpen} from './stageWorkStatus';
 import ProfileAvatar from './ProfileAvatar';
 import type {Party} from './types';
@@ -21,18 +22,45 @@ export default function PartyChairElection({g,party}:{g:ReturnTypeRepublic;party
  const votingOpen=isStageWorkOpen(g.game,stageOne);
  const ready=members.length>=1; // Votes may be cast before the quorum; election finalizes only with >=2 members and no pending invites.
  const canVote=!party.leader_user_id&&eligible&&votingOpen&&ready;
+ const scope=JSON.stringify([g.game?.id,party.game_id,party.id,party.name,votingOpen,me?.user_id,me?.kind,me?.role_title,me?.team,me?.roster_archived_at,g.teacher]);
+ const activeScope=useRef(scope),alive=useRef(true),mutationScope=useRef<string|null>(null);activeScope.current=scope;
+ const [dataScope,setDataScope]=useState(scope);
+ const reads=useRef({scope,promise:null as Promise<void>|null,queued:false,explicit:false,cancel:null as (()=>void)|null});
+ if(reads.current.scope!==scope)reads.current={scope,promise:null,queued:false,explicit:false,cancel:null};
+ const readState=reads.current;
+ const scopeCurrent=()=>alive.current&&activeScope.current===scope;
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
  useEffect(()=>{
-  let active=true;
-  async function load(){
-   const r=await supabase.from('party_chair_ballots').select('voter_id,candidate_id').eq('party_id',party.id).eq('game_id',party.game_id);
-   if(active&&!r.error)setVotes((r.data||[]) as Ballot[]);
-  }
-  const update=(e:Event)=>{if((e as CustomEvent<{gameId:string}>).detail?.gameId===party.game_id)void load()};
-  const channel=supabase.channel('chair-election:'+party.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'party_chair_ballots',filter:'party_id=eq.'+party.id},()=>void load()).subscribe();
-  void load();window.addEventListener(GAME_DATA_REFRESH_EVENT,update);
-  return()=>{active=false;window.removeEventListener(GAME_DATA_REFRESH_EVENT,update);void supabase.removeChannel(channel)};
- },[party.id,party.game_id]);
+  setVotes([]);setCandidate('');setBusy(false);setNotice('');setDataScope(scope);
+  return()=>{readState.cancel?.()};
+ },[scope]);
+ async function load(background=false){
+  if(!me||g.game?.id!==party.game_id||!scopeCurrent()||background&&document.visibilityState!=='visible')return;
+  const state=reads.current;state.explicit=state.explicit||!background;
+  if(state.promise){state.queued=true;return state.promise}
+  state.promise=(async()=>{
+   do{
+    state.queued=false;const passive=!state.explicit;state.explicit=false;
+    const controller=new AbortController();
+    let timeout:ReturnType<typeof setTimeout>|undefined;
+    try{
+     const r=await Promise.race([
+      supabase.from('party_chair_ballots').select('voter_id,candidate_id').eq('party_id',party.id).eq('game_id',party.game_id).abortSignal(controller.signal),
+      new Promise<never>((_,reject)=>{
+       state.cancel=()=>{clearTimeout(timeout);controller.abort();reject(new Error('Обновление голосов отменено.'))};
+       timeout=setTimeout(()=>{controller.abort();reject(new Error('Не удалось обновить голоса: сервер не ответил вовремя.'))},12000);
+      })
+     ]);
+     if(scopeCurrent()&&!controller.signal.aborted&&(!passive||document.visibilityState==='visible')){
+      if(!r.error)setVotes((r.data||[]) as Ballot[]);else setNotice(userError(r.error));
+     }
+    }catch(error){if(scopeCurrent()&&(!passive||document.visibilityState==='visible'))setNotice(userError(error))}
+    finally{clearTimeout(timeout);state.cancel=null}
+   }while(state.queued&&scopeCurrent());
+  })().finally(()=>{state.promise=null});
+  return state.promise;
+ }
+ useGameTableSync(me?.user_id&&g.game?.id===party.game_id?party.game_id:undefined,['party_chair_ballots'],()=>load(true),scope,undefined,3000,180000);
  const totals=new Map<string,number>();
  for(const vote of votes)if(members.some(m=>m.user_id===vote.voter_id)&&members.some(m=>m.user_id===vote.candidate_id))
   totals.set(vote.candidate_id,(totals.get(vote.candidate_id)||0)+1);
@@ -42,17 +70,17 @@ export default function PartyChairElection({g,party}:{g:ReturnTypeRepublic;party
  const votedWinner=!!party.leader_user_id&&votesCast===members.length&&leaderVotes>0&&[...totals.values()].filter(n=>n===leaderVotes).length===1&&[...totals.values()].every(n=>n<=leaderVotes);
  const status=party.leader_user_id?(votedWinner?'Председатель избран голосованием':'Председатель определён'):!votingOpen?'Этап не открыт':members.length<2?'Голосование · ожидается состав':pending.length?'Голосование · ожидаются приглашённые':'Идёт голосование';
  async function cast(choice=candidate){
-  if(!choice||busy||!canVote)return;
-  setBusy(true);setNotice('');
+  if(!scopeCurrent()||!choice||busy||mutationScope.current===scope||!canVote)return;
+  mutationScope.current=scope;setBusy(true);setNotice('');
   try{
    const success=await g.voteForPartyChair(party.id,choice);
+   if(!scopeCurrent())return;
    setNotice(success?members.length<2?'Ваш голос сохранён. Председатель будет определён после вступления второго участника и завершения выборов.':pending.length?'Голос сохранён. Итоги будут подведены после ответа всех приглашённых участников.':'Голос учтён. После голосования всех действующих членов определяется председатель.':'Голос не сохранён. Проверьте сообщение об ошибке.');
-   if(success){
-    const r=await supabase.from('party_chair_ballots').select('voter_id,candidate_id').eq('party_id',party.id);
-    if(!r.error)setVotes((r.data||[]) as Ballot[]);
-   }
-  }finally{setBusy(false)}
+   if(success)await load();
+  }catch(error){if(scopeCurrent())setNotice(userError(error))}
+  finally{if(mutationScope.current===scope)mutationScope.current=null;if(scopeCurrent())setBusy(false)}
  }
+ if(dataScope!==scope||g.game?.id!==party.game_id)return null;
  return <section className="gosPartyElection" aria-label={'Выборы председателя партии '+party.name}>
   <header className="gosPartyElectionHead">
    <span className="gosPartyElectionIcon" aria-hidden="true"><Vote size={22}/></span>

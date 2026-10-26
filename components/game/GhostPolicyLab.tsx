@@ -1,8 +1,9 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {notifyGameDataRefresh,useGameTableSync} from './useGameTableSync';
 
 type Policy={id:string;game_id:string;policy_mode:'prohibited'|'justified'|'allowed';rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'superseded';vote_id:string|null;proposed_by:string;adopted_at:string|null;created_at:string};
 const labels={prohibited:'Запрещено',justified:'Разрешено по уважительной причине',allowed:'Разрешено'} as const;
@@ -19,38 +20,68 @@ export default function GhostPolicyLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onO
  const [rationale,setRationale]=useState('');
  const [busy,setBusy]=useState(false);
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
- const canPropose=teacher||!!ledParty||(me?.role_title||'').toLowerCase().includes('депутат');
-
- async function load(){
-  if(!game)return;
-  const r=await supabase.from('ghost_voting_policies').select('*').eq('game_id',game.id).order('created_at',{ascending:false});
-  if(!r.error)setRows((r.data||[]) as Policy[]);
- }
- useEffect(()=>{void load()},[game?.id]);
+ const canPropose=teacher||me?.kind==='student'&&(!!ledParty||(me.role_title||'').toLowerCase().includes('депутат'));
+ const scope=JSON.stringify([game?.id,me?.user_id,me?.kind,me?.role_title,me?.team,teacher,ledParty?.id]);
+ const activeScope=useRef(scope),alive=useRef(true),mutationScope=useRef<string|null>(null);activeScope.current=scope;
+ const [dataScope,setDataScope]=useState(scope);
+ const reads=useRef({scope,promise:null as Promise<void>|null,queued:false,explicit:false,cancel:null as (()=>void)|null});
+ if(reads.current.scope!==scope)reads.current={scope,promise:null,queued:false,explicit:false,cancel:null};
+ const readState=reads.current,scopeCurrent=()=>alive.current&&activeScope.current===scope;
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
  useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('ghost-policy:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'ghost_voting_policies',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id]);
+  setRows([]);setMode('prohibited');setRationale('');setBusy(false);setDataScope(scope);
+  return()=>{readState.cancel?.()};
+ },[scope]);
+ async function load(background=false){
+  if(!game||!me||!scopeCurrent()||background&&document.visibilityState!=='visible')return;
+  const state=reads.current;state.explicit=state.explicit||!background;
+  if(state.promise){state.queued=true;return state.promise}
+  state.promise=(async()=>{
+   do{
+    state.queued=false;const passive=!state.explicit;state.explicit=false;
+    const controller=new AbortController();let timeout:ReturnType<typeof setTimeout>|undefined;
+    try{
+     const r=await Promise.race([
+      supabase.from('ghost_voting_policies').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal),
+      new Promise<never>((_,reject)=>{
+       state.cancel=()=>{clearTimeout(timeout);controller.abort();reject(new Error('Обновление постановлений отменено.'))};
+       timeout=setTimeout(()=>{controller.abort();reject(new Error('Не удалось обновить постановления: сервер не ответил вовремя.'))},12000);
+      })
+     ]);
+     if(scopeCurrent()&&!controller.signal.aborted&&(!passive||document.visibilityState==='visible')){
+      if(!r.error)setRows((r.data||[]) as Policy[]);else setError(userError(r.error));
+     }
+    }catch(error){if(scopeCurrent()&&(!passive||document.visibilityState==='visible'))setError(userError(error))}
+    finally{clearTimeout(timeout);state.cancel=null}
+   }while(state.queued&&scopeCurrent());
+  })().finally(()=>{state.promise=null});
+  return state.promise;
+ }
+ useGameTableSync(me?.user_id?game?.id:undefined,['ghost_voting_policies','game_votes'],()=>load(true),scope,undefined,3000,180000);
 
- if(!game||!me)return null;
+ if(!game||!me||dataScope!==scope)return null;
  const activeGame=game;
  const adopted=rows.find(x=>x.status==='adopted');
  const visible=rows.filter(x=>x.status!=='superseded');
  const proposer=(id:string)=>members.find(m=>m.user_id===id)?.full_name||'Участник';
  const vote=(id:string|null)=>id?votes.find(v=>v.id===id):undefined;
 
+ async function change(request:()=>PromiseLike<{error:unknown}>,after?:()=>void){
+  if(!scopeCurrent()||!canPropose||busy||adopted||mutationScope.current===scope)return;
+  mutationScope.current=scope;setBusy(true);
+  try{
+   const r=await request();if(!scopeCurrent())return;
+   if(r.error)setError(userError(r.error));else{notifyGameDataRefresh(activeGame.id,'ghost_voting_policies');await load();if(scopeCurrent())after?.()}
+  }catch(error){if(scopeCurrent())setError(userError(error))}
+  finally{if(mutationScope.current===scope)mutationScope.current=null;if(scopeCurrent())setBusy(false)}
+ }
  async function propose(){
-  if(busy||adopted)return;
-  setBusy(true);const r=await supabase.rpc('propose_ghost_voting_policy',{p_game_id:activeGame.id,p_policy_mode:mode,p_rationale:rationale.trim()||null});
-  if(r.error)setError(userError(r.error));else{setRationale('');await load()}setBusy(false);
+  const submittedRationale=rationale;
+  await change(()=>supabase.rpc('propose_ghost_voting_policy',{p_game_id:activeGame.id,p_policy_mode:mode,p_rationale:rationale.trim()||null}),()=>setRationale(value=>value===submittedRationale?'':value));
  }
  async function openVote(id:string){
-  if(busy||adopted)return;
-  setBusy(true);const r=await supabase.rpc('open_ghost_voting_policy_vote',{p_policy_id:id});
-  if(r.error)setError(userError(r.error));else{await load();onOpenVotes()}setBusy(false);
+  if(!teacher&&!ledParty)return;
+  await change(()=>supabase.rpc('open_ghost_voting_policy_vote',{p_policy_id:id}),()=>{notifyGameDataRefresh(activeGame.id,'game_votes');onOpenVotes()});
  }
 
  return <section className="ghostPolicyLab">

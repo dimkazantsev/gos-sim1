@@ -4,7 +4,8 @@ import {Activity,BookOpen,BookOpenCheck,Camera,ChevronDown,Compass,FileSignature
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {AwardShelf} from './Achievements';
-import GradesView from './GradesView';
+import GradesView,{type PublicGradeScore} from './GradesView';
+import {useGameTableSync} from './useGameTableSync';
 import ClassroomJournal from './ClassroomJournal';
 import SignatureUpload from './SignatureUpload';
 import ProfileSecurityPanel from './ProfileSecurityPanel';
@@ -56,8 +57,13 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  useEffect(()=>{if(previewRef.current)URL.revokeObjectURL(previewRef.current);previewRef.current='';setPhotoPreview('')},[target?.user_id]);
  const [saving,setSaving]=useState(false),[saved,setSaved]=useState(false),[showMyJournal,setShowMyJournal]=useState(false),[comicOpen,setComicOpen]=useState(false);
  const [comicView,setComicView]=useState<'intro'|'archive'>('intro');
- const [publicScores,setPublicScores]=useState<PublicAssessment[]>([]);
- const [scoresLoaded,setScoresLoaded]=useState(false);
+ const [storedPublicScores,setPublicScores]=useState<PublicAssessment[]>([]);
+ const [hasScores,setScoresLoaded]=useState(false);
+ const scoreScope=[game?.id,target?.user_id,me?.user_id,teacher,readOnly].join(':');
+ const activeScoreScope=useRef(scoreScope),acceptedScoreScope=useRef(''),scoreRequest=useRef(0);activeScoreScope.current=scoreScope;
+ const publicScores=acceptedScoreScope.current===scoreScope?storedPublicScores:[];
+ const scoresLoaded=acceptedScoreScope.current===scoreScope&&hasScores;
+ const scoresFromGrades=own&&target?.kind==='student';
  const [publicStats,setPublicStats]=useState<PublicStats|null>(null);
  const photoInput=useRef<HTMLInputElement>(null);
  const initials=useMemo(()=>target?.full_name.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()||'Я',[target?.full_name]);
@@ -77,33 +83,38 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  },[setupFocusVersion,own]);
 
 
+ useEffect(()=>{setPublicScores([]);setScoresLoaded(false);acceptedScoreScope.current='';return()=>{scoreRequest.current++}},[scoreScope]);
+ function acceptPublicScores(rows:PublicGradeScore[]){
+  if(activeScoreScope.current!==scoreScope)return;
+  const userId=target?.user_id;
+  acceptedScoreScope.current=scoreScope;setPublicScores(rows.filter(a=>a.user_id===userId));setScoresLoaded(true);
+ }
+ useGameTableSync(scoresFromGrades?undefined:game?.id,['stage_assessments'],async()=>{
+  const gameId=game?.id,userId=target?.user_id,requestedScope=scoreScope,request=++scoreRequest.current;
+  if(!gameId||!userId)return;
+  const controller=new AbortController();let timeout:ReturnType<typeof setTimeout>|undefined;
+  const current=()=>activeScoreScope.current===requestedScope&&scoreRequest.current===request;
+  try{
+   const r=await Promise.race([
+    supabase.rpc('get_public_stage_scores',{p_game_id:gameId}).eq('user_id',userId).abortSignal(controller.signal),
+    new Promise<never>((_,reject)=>{timeout=setTimeout(()=>{controller.abort();reject(new Error('Не удалось обновить баллы: сервер не ответил вовремя.'))},12000)})
+   ]);
+   if(!current()||controller.signal.aborted)return;
+   if(r.error)g.setError(r.error.message);else acceptPublicScores((r.data||[]) as PublicGradeScore[]);
+  }catch(error){if(current())g.setError(error instanceof Error?error.message:String(error))}
+  finally{clearTimeout(timeout)}
+ },scoreScope,undefined,3000,180000);
  useEffect(()=>{
-  const gameId=game?.id,userId=target?.user_id;
-  if(!gameId||!userId){setPublicScores([]);setScoresLoaded(false);return}
-  let active=true,request=0;
-  setPublicScores([]);setScoresLoaded(false);
-  async function updatePublicScores(){
-   const current=++request;
-   const r=await supabase.rpc('get_public_stage_scores',{p_game_id:gameId});
-   if(!active||current!==request)return;
-   if(!r.error){
-    setPublicScores(((r.data||[]) as (PublicAssessment & {user_id:string})[]).filter(a=>a.user_id===userId));
-    setScoresLoaded(true);
-   }
-  }
-  void updatePublicScores();
-  const channel=supabase.channel('profile-scores:'+gameId+':'+userId)
-   .on('postgres_changes',{event:'*',schema:'public',table:'stage_assessments',filter:'user_id=eq.'+userId},()=>void updatePublicScores())
-   .subscribe();
-  return()=>{active=false;void supabase.removeChannel(channel)};
- },[game?.id,target?.user_id]);
- useEffect(()=>{
-  if(!game||!target||previewAchievementsUserId)return;
-  let active=true;setPublicStats(null);
-  void supabase.rpc('get_member_public_stats',{p_game_id:game.id,p_user_id:target.user_id})
-   .then(r=>{if(active&&!r.error&&r.data?.[0])setPublicStats(r.data[0] as PublicStats)});
-  return()=>{active=false};
- },[game?.id,target?.user_id,previewAchievementsUserId]);
+  if(!game||!target||previewAchievementsUserId||own)return;
+  let active=true,started=false;setPublicStats(null);
+  const load=()=>{
+   if(started||document.visibilityState!=='visible')return;started=true;
+   void supabase.rpc('get_member_public_stats',{p_game_id:game.id,p_user_id:target.user_id}).abortSignal(AbortSignal.timeout(12000))
+    .then(r=>{if(active&&!r.error&&r.data?.[0])setPublicStats(r.data[0] as PublicStats)});
+  };
+  load();document.addEventListener('visibilitychange',load);
+  return()=>{active=false;document.removeEventListener('visibilitychange',load)};
+ },[game?.id,target?.user_id,previewAchievementsUserId,own]);
  if(!me||!target)return null;
  // Exactly the same stage scores used by the journal's Σ column:
  // one score per stage; the approved teacher score replaces its draft.
@@ -214,7 +225,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
 
   
   {game&&target.kind==='student'&&<AwardShelf gameId={game.id} userId={previewAchievementsUserId||target.user_id} showCatalog={own||teacher||!!previewAchievementsUserId} previewOnly={!!previewAchievementsUserId} defaultCollapsed/>}
-  {own&&target.kind==='student'&&<GradesView g={g} compact/>}
+  {own&&target.kind==='student'&&<GradesView g={g} compact onPublicScores={acceptPublicScores}/>}
   {own&&<section className="profileJournalAccess">
    <div><Activity size={19} aria-hidden="true"/><div><b>{teacher?'Мой журнал действий':'Личный журнал действий'}</b><span>История ваших действий и переходов по разделам игры.</span></div></div>
    <button type="button" aria-expanded={showMyJournal} onClick={()=>setShowMyJournal(!showMyJournal)}>{showMyJournal?'Скрыть журнал':'Открыть журнал'} <ChevronDown size={17} aria-hidden="true"/></button>

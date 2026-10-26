@@ -1312,7 +1312,7 @@ export function useRepublicGame(gameId:string){
   if(!me||me.kind!=='student'){setError('На выборах председателя голосуют участники партии.');return false}
   const r=await supabase.rpc('vote_for_party_chair',{p_party_id:partyId,p_candidate_id:candidateId});
   if(r.error){setError(r.error.message);return false}
-  await Promise.all([loadPartyRepresentation(),loadPartyAssets()]);notifyGameDataRefresh(gameId);return true;
+  await Promise.all([loadPartyRepresentation(),loadPartyAssets()]);notifyGameDataRefresh(gameId,'party_chair_ballots');return true;
  }
  async function updateParty(id:string,patch:Partial<Party>){const r=await supabase.from('game_parties').update(patch).eq('id',id);if(r.error)setError(r.error.message);else await refresh()}
  async function setPartyLeader(partyId:string,userId:string){

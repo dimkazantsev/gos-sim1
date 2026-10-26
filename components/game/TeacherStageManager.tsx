@@ -9,6 +9,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import StagePolicyEditor from './StagePolicyEditor';
 import DeadlineControl from './DeadlineControl';
 import StyledSelect from '../ui/StyledSelect';
+import {useGameTableSync} from './useGameTableSync';
 
 type StageFilter='all'|'open'|'completed'|'locked';
 type ResetTarget=number|'all'|null;
@@ -24,12 +25,17 @@ export default function TeacherStageManager({g,onOpenStage}:{
  g:ReturnTypeRepublic;onOpenStage:(stageNo:number)=>void
 }){
  const {stages,teacher,resetStageProgress,game}=g;
- const [readinessSnapshot,setReadinessSnapshot]=useState<{gameId:string;rows:StageReadiness[]}|null>(null);
- const [readinessFailure,setReadinessFailure]=useState<{gameId:string;message:string}|null>(null);
+ const [readinessSnapshot,setReadinessSnapshot]=useState<{scope:string;rows:StageReadiness[]}|null>(null);
+ const [readinessFailure,setReadinessFailure]=useState<{scope:string;message:string}|null>(null);
  const [readinessLoading,setReadinessLoading]=useState(false);
- const readinessRequest=useRef(0);
- const gameScope=useRef(game?.id);
- gameScope.current=game?.id;
+ const scope=JSON.stringify([game?.id,g.me?.user_id,g.me?.kind,teacher]);
+ const activeScope=useRef(scope),alive=useRef(true);activeScope.current=scope;
+ const reads=useRef({scope,promise:null as Promise<void>|null,queued:false,explicit:false,controller:null as AbortController|null});
+ if(reads.current.scope!==scope)reads.current={scope,promise:null,queued:false,explicit:false,controller:null};
+ const readState=reads.current;
+ const scopeCurrent=()=>alive.current&&activeScope.current===scope;
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
+ useEffect(()=>{setReadinessLoading(false);return()=>{readState.controller?.abort()}},[scope]);
  const [expanded,setExpanded]=useState<number|null>(null);
  const [stageSort,setStageSort]=useState<'number'|'reverse'|'status'>('number');
  const [filter,setFilter]=useState<StageFilter>('all');
@@ -51,43 +57,41 @@ export default function TeacherStageManager({g,onOpenStage}:{
    else setError('Не удалось изменить статус этапа. Проверьте сообщение системы.');
   }finally{setStageActionBusy(false)}
  }
- async function refreshReadiness(){
-  if(!game)return;
-  const gameId=game.id;
-  const request=++readinessRequest.current;
-  setReadinessLoading(true);
-  setReadinessFailure(null);
-  try{
-   const r=await supabase.rpc('get_game_readiness',{p_game_id:gameId});
-   if(request!==readinessRequest.current||gameScope.current!==gameId)return;
-   if(r.error)throw r.error;
-   if(!Array.isArray(r.data))throw new Error('Сервер не вернул результаты проверки этапов.');
-   setReadinessSnapshot({gameId,rows:r.data as StageReadiness[]});
-  }catch(err){
-   if(request===readinessRequest.current&&gameScope.current===gameId){
-    setReadinessSnapshot(null);
-    setReadinessFailure({gameId,message:(userError(err)||'Не удалось проверить готовность этапов.')});
-   }
-  }finally{
-   if(request===readinessRequest.current)setReadinessLoading(false);
-  }
+ async function refreshReadiness(background=false){
+  if(!game||!teacher||!scopeCurrent()||background&&document.visibilityState!=='visible')return;
+  const state=reads.current;state.explicit=state.explicit||!background;
+  if(state.promise){state.queued=true;return state.promise}
+  state.promise=(async()=>{
+   do{
+    state.queued=false;const passive=!state.explicit;state.explicit=false;
+    const controller=new AbortController();state.controller=controller;
+    const current=()=>scopeCurrent()&&!controller.signal.aborted&&(!passive||document.visibilityState==='visible');
+    let timeout:ReturnType<typeof setTimeout>|undefined;
+    setReadinessLoading(true);setReadinessFailure(null);
+    try{
+     const r=await Promise.race([
+      supabase.rpc('get_game_readiness',{p_game_id:game.id}).abortSignal(controller.signal),
+      new Promise<never>((_,reject)=>{controller.signal.addEventListener('abort',()=>{clearTimeout(timeout);reject(new Error('Сервер не ответил на проверку готовности вовремя.'))},{once:true});timeout=setTimeout(()=>controller.abort(),12000)})
+     ]);
+     if(!current())continue;
+     if(r.error)throw r.error;
+     if(!Array.isArray(r.data))throw new Error('Сервер не вернул результаты проверки этапов.');
+     setReadinessSnapshot({scope,rows:r.data as StageReadiness[]});
+    }catch(err){
+     if(scopeCurrent()&&(!passive||document.visibilityState==='visible')){
+      setReadinessSnapshot(null);setReadinessFailure({scope,message:(userError(err)||'Не удалось проверить готовность этапов.')});
+     }
+    }finally{clearTimeout(timeout);if(state.controller===controller)state.controller=null;if(scopeCurrent())setReadinessLoading(false)}
+   }while(state.queued&&scopeCurrent());
+  })().finally(()=>{state.promise=null});
+  return state.promise;
  }
- useEffect(()=>{void refreshReadiness();return()=>{readinessRequest.current++}},[game?.id]);
- useEffect(()=>{
-  if(!game)return;
-  let timer:ReturnType<typeof setTimeout>|undefined;
-  const update=()=>{if(timer)clearTimeout(timer);timer=setTimeout(()=>void refreshReadiness(),400)};
-  const c=supabase.channel('teacher-stage-readiness:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'stage_readiness_overrides',filter:'game_id=eq.'+game.id},update)
-   .on('postgres_changes',{event:'*',schema:'public',table:'formal_documents',filter:'game_id=eq.'+game.id},update)
-   .subscribe();
-  return()=>{if(timer)clearTimeout(timer);void supabase.removeChannel(c)};
- },[game?.id]);
+ useGameTableSync(teacher?game?.id:undefined,['stage_readiness_overrides','formal_documents','game_stages','game_votes'],()=>refreshReadiness(true),scope,undefined,5000,180000);
  const closeDialog=()=>{if(busy)return;setResetTarget(null);setConfirmation('');setError('')};
  const dialogRef=useDialog(resetTarget!==null,closeDialog);
- const readiness=readinessSnapshot&&readinessSnapshot.gameId===game?.id?readinessSnapshot.rows:[];
- const readinessChecked=Boolean(readinessSnapshot&&readinessSnapshot.gameId===game?.id);
- const readinessError=readinessFailure&&readinessFailure.gameId===game?.id?readinessFailure.message:'';
+ const readiness=readinessSnapshot&&readinessSnapshot.scope===scope?readinessSnapshot.rows:[];
+ const readinessChecked=Boolean(readinessSnapshot&&readinessSnapshot.scope===scope);
+ const readinessError=readinessFailure&&readinessFailure.scope===scope?readinessFailure.message:'';
  const completed=stages.filter(s=>s.status==='completed').length;
  const active=stages.filter(s=>s.status==='open').length;
  const searchTerm=search.trim().toLocaleLowerCase('ru-RU');

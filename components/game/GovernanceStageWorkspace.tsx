@@ -73,8 +73,8 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
    if(active&&!error)setLiveRule(data||null);
   }
   const update=(e:Event)=>{
-   const detail=(e as CustomEvent<{gameId?:string;stageNo?:number}>).detail;
-   if(detail?.gameId===gameId&&(detail.stageNo===undefined||detail.stageNo===stage.stage_no))void load();
+   const detail=(e as CustomEvent<{gameId?:string;stageNo?:number;table?:string}>).detail;
+   if(detail?.gameId===gameId&&(!detail.table||detail.table==='stage_deadline_rules')&&(detail.stageNo===undefined||detail.stageNo===stage.stage_no))void load();
   };
   void load();
   window.addEventListener(GAME_DATA_REFRESH_EVENT,update);
