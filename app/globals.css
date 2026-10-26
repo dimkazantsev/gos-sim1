@@ -50,9 +50,9 @@ button,a{-webkit-tap-highlight-color:transparent}
 .muted{color:var(--muted)}
 .primary,.secondary{min-height:var(--touch);padding:0 15px;border-radius:11px;font-size:13px;font-weight:800;line-height:1.15;transition:background .16s ease,border-color .16s ease,transform .16s ease,box-shadow .16s ease}
 .primary{border:1px solid var(--blue);background:var(--blue);color:#fff;box-shadow:0 7px 16px rgba(23,105,232,.16)}
-.primary:hover:not(:disabled){background:#0f5ed4;transform:translateY(-1px);box-shadow:0 10px 24px rgba(23,105,232,.18)}
+.primary:hover:not(:disabled){background:#0f5ed4;box-shadow:0 10px 24px rgba(23,105,232,.18)}
 .secondary{border:1px solid var(--line);background:#fff;color:var(--text)}
-.secondary:hover:not(:disabled){background:#f4f7fb;border-color:var(--line-strong);transform:translateY(-1px)}
+.secondary:hover:not(:disabled){background:#f4f7fb;border-color:var(--line-strong)}
 .errorBox{padding:12px 14px;border:1px solid #ecc8d1;background:var(--danger-soft);color:#8f2940;border-radius:13px;font-size:13px;box-shadow:0 5px 18px rgba(181,61,85,.07)}
 .closable{margin-bottom:14px;cursor:pointer}
 .loaderCard{display:flex;gap:12px;align-items:center;padding:20px 24px;border-radius:18px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}

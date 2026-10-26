@@ -67,6 +67,7 @@ async function reviewLayoutDiagnostics(page,width,phase){
    return samples;
   });
   fs.writeFileSync(path.join(screens,'media-review-layout-'+phase+'-'+width+'.json'),JSON.stringify({width,phase,samples},null,2));
+  return samples;
  }catch(error){console.error('Media review layout diagnostics failed:',error.message)}
 }
 (async()=>{
@@ -204,7 +205,9 @@ async function reviewLayoutDiagnostics(page,width,phase){
    await queue.getByRole('button',{name:/Новость участника для согласования/}).click();
    await queue.getByLabel('Комментарий к решению',{exact:true}).fill('Согласовано для публикации.');
    await page.screenshot({path:path.join(screens,'process-live-news-review-'+width+'.png')});
-   await reviewLayoutDiagnostics(page,width,'before');
+   const reviewLayout=await reviewLayoutDiagnostics(page,width,'before');
+   assert.equal(reviewLayout?.length,12,'Review action geometry was captured for twelve frames');
+   assert(reviewLayout.every(sample=>sample.ancestors[0]?.style.transform==='none'&&JSON.stringify(sample.ancestors[0].rect)===JSON.stringify(reviewLayout[0].ancestors[0].rect)),'Review action stays stationary before a normal click at '+width+'px');
    try{await queue.getByRole('button',{name:'Опубликовать в СМИ',exact:true}).click()}
    catch(error){await reviewLayoutDiagnostics(page,width,'failed');throw error}
    await page.locator('#process-published-media-ui-post').waitFor();
