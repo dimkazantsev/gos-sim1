@@ -58,7 +58,9 @@ function checkPlacement(viewport,target,expectedSide){
 }
 const box=(left,top,width,height)=>({left,top,right:left+width,bottom:top+height,width,height});
 checkPlacement({width:1440,height:900},box(20,200,270,46),'right');
-checkPlacement({width:671,height:645},box(15,475,310,46),'right');
+checkPlacement({width:671,height:645},box(15,475,310,46),'above');
+// Tablet-width layouts still use the mobile dock; the tour must not cover adjacent controls.
+checkPlacement({width:768,height:820},box(320,746,56,50),'above');
 for(const [width,height] of [[390,844],[430,932],[360,800]]){
  // A horizontally scrolled dock can expose targets at either edge.
  for(const left of [6,Math.round(width/2)-28,width-62])
