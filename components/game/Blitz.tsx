@@ -9,8 +9,9 @@ type Row={server_now?:string;remaining_at_receipt?:number;receipt_monotonic?:num
 // Серверные часы определяют оставшийся срок; время телефона не используется как доказательство.
 const BLITZ_RECEIVE_GRACE_MS=2000;
 const BLITZ_CHOICE_WINDOW_MS=20_000;
+const blitzClockNow=()=>typeof performance==='undefined'?Date.now():performance.now();
 function withBlitzClock(row:Row,sentAt:number):Row{
- const receivedAt=performance.now();
+ const receivedAt=blitzClockNow();
  const serverAt=Date.parse(row.server_now||'');
  const deadline=Date.parse(row.deadline||'');
  const transit=Math.max(0,receivedAt-sentAt)/2;
@@ -20,7 +21,7 @@ function withBlitzClock(row:Row,sentAt:number):Row{
 }
 function remainingBlitzMs(row:Row){
  if(row.remaining_at_receipt!==undefined&&row.receipt_monotonic!==undefined)
-  return Math.max(0,row.remaining_at_receipt-(performance.now()-row.receipt_monotonic));
+  return Math.max(0,row.remaining_at_receipt-(blitzClockNow()-row.receipt_monotonic));
  const remaining=Date.parse(row.deadline||'')-Date.now();
  return Number.isFinite(remaining)?Math.max(0,Math.min(BLITZ_CHOICE_WINDOW_MS,remaining)):0;
 }
@@ -50,7 +51,7 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
      if(!stopped&&!issued.error&&issued.data>0)window.dispatchEvent(new Event('blitz:updated'));
     }
     if(stopped||document.visibilityState!=='visible')return;
-    const requestedAt=performance.now();
+    const requestedAt=blitzClockNow();
     const result=selectedId
      ?await supabase.rpc('blitz_open_selected',{p_id:selectedId})
      :await supabase.rpc('blitz_open_recent',{p_game:gameId,p_not_before:since.current});
@@ -113,7 +114,7 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
   if(active||activeLock.current)return;
   activeLock.current=true;setActiveError('');
   try{
-   const requestedAt=performance.now();
+   const requestedAt=blitzClockNow();
    const result=await supabase.rpc('blitz_open_selected',{p_id:id});
    if(result.error){setActiveError(userError(result.error));void refresh();return;}
    if(!result.data){setActiveError('Вопрос уже закрыт или недоступен.');void refresh();return;}
