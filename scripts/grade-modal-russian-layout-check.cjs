@@ -40,6 +40,7 @@ assert(component.includes('Этот текст вы отправляете си�
 assert(component.includes('В чате «Вне игры»'), 'Explain the out-of-game discussion');
 assert(component.includes('Преподаватель может учесть содержательное обсуждение'), 'Keep teacher grading discretionary');
 const debriefCss=fs.readFileSync('app/2026-profile-grade-layout.css','utf8');
+assert(debriefCss.includes('@media (max-width:1366px)')&&debriefCss.includes('grid-auto-rows:min-content'),'Tablet assessment must stack its fields without stretching rows');
 const debriefMarkup=[
  '<!doctype html><html lang="ru"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{font:14px Arial,sans-serif;margin:0;background:#eef3fb}',css,debriefCss,'</style><body>',
  '<main class="gradesPage" style="width:100%;max-width:1350px;margin:auto;padding:12px"><section class="gradesDebrief gradesDebriefRefined"><header class="gradesDebriefHeading"><div><small>КРИТЕРИЙ 3 · ИТОГОВЫЙ РАЗБОР</small><h2>Анализ этапа</h2></div></header>',

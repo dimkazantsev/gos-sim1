@@ -110,9 +110,9 @@ export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:To
     {mobile?<ArrowDown size={20} aria-hidden="true"/>:<ArrowUpRight size={18} aria-hidden="true"/>}
     <strong>{mobile?'Нажмите подсвеченную кнопку в нижнем меню: '+step.hint:step.hint}</strong>
    </div>
-   {(mobile||!rect)&&<button type="button" className={styles.fallback} onClick={()=>onFallback(step.target)}>
+   <button type="button" className={styles.fallback} onClick={()=>onFallback(step.target)}>
     <span>Перейти в раздел «{step.title}»</span><ArrowRight size={17} aria-hidden="true"/>
-   </button>}
+   </button>
    <button type="button" className={styles.skip} onClick={onSkip}>Пропустить экскурсию</button>
   </div>
  </div>,document.body);
