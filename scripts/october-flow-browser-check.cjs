@@ -20,6 +20,7 @@ export default function FlowCheck(){
  const [data,setData]=useState<any>(initial),[view,setView]=useState('registry'),[output,setOutput]=useState('');
  useEffect(()=>{document.body.dataset.flowReady='yes'},[]);
  const g={...data,availableActors:()=>data.teacher?[{key:'teacher',label:'ГОС.ID · Нейтральная публикация'},{key:'participant',label:data.me.full_name},{key:'minjust',label:'Министерство юстиции Российской Федерации'},{key:'gd',label:'Государственная Дума'}]:[{key:'participant',label:data.me.full_name},{key:'office',label:data.me.role_title},{key:'gd',label:'Государственная Дума'}],
+  refreshDocuments:async(id:string)=>{if(!data.formalDocuments.some((doc:any)=>doc.id===id))throw Error('Unknown selected fixture document')},
   refresh:async()=>{setData((old:any)=>{const deleted=(window as any).__flowDeleted||[],approved=(window as any).__flowApproved||[];return {...old,politicalPosts:[...approved.filter((p:any)=>!old.politicalPosts.some((x:any)=>x.id===p.id)),...old.politicalPosts].filter((p:any)=>!deleted.includes(p.id))}})},setError:(message:string)=>setOutput(message),judgeAction:async()=>true,
   createPoliticalPost:async(p:any,files:File[])=>{
    setOutput(JSON.stringify({...p,files:files.map(f=>f.name)}));
