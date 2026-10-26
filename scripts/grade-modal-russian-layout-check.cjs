@@ -42,6 +42,9 @@ assert(component.includes('Преподаватель может учесть с
 const debriefCss=fs.readFileSync('app/2026-profile-grade-layout.css','utf8');
 assert(debriefCss.includes('grid-template-columns:minmax(0,1fr);grid-auto-rows:min-content'),'Teacher assessment must be single-column at ALL screen widths');
 assert(!debriefCss.includes('grid-template-columns:minmax(180px,.8fr) minmax(0,1.6fr)'),'Legacy desktop two-column form must be removed');
+const baseGradeCss=fs.readFileSync('app/sim-panels.css','utf8');
+assert(!baseGradeCss.includes('.gradeApproval>div{grid-column:1/-1;display:flex;justify-content:flex-end;gap:6px}'),'Selector wrapper must not inherit action-button right alignment');
+assert(baseGradeCss.includes('.gradeApproval>div:last-child:not(.styledSelect){'),'Action row must be the ONLY right-aligned direct div');
 const debriefMarkup=[
  '<!doctype html><html lang="ru"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{font:14px Arial,sans-serif;margin:0;background:#eef3fb}',css,debriefCss,'</style><body>',
  '<main class="gradesPage" style="width:100%;max-width:1350px;margin:auto;padding:12px"><section class="gradesDebrief gradesDebriefRefined"><header class="gradesDebriefHeading"><div><small>КРИТЕРИЙ 3 · ИТОГОВЫЙ РАЗБОР</small><h2>Анализ этапа</h2></div></header>',
@@ -143,13 +146,17 @@ const teacherFixture=[
     const m=d.getBoundingClientRect();
     const b=s=>{const r=rect(s);return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width}};
     return {pageScroll:document.documentElement.scrollWidth,modal:{left:m.left,right:m.right,height:m.height,scroll:d.scrollWidth,client:d.clientWidth},width:innerWidth,approval:rect('.gradeApproval').top,rationale:rect('.gradeRationale').top,sections,buttons,
-     form:{panel:b('.gradeApproval'),selector:b('.gradeApproval>.styledSelect'),comment:b('.gradeApproval>label'),textarea:b('.gradeApproval textarea'),actions:b('.gradeApproval>div:last-child') }};
+     form:{panel:b('.gradeApproval'),selector:b('.gradeApproval>.styledSelect'),scoreLabel:b('.gradeApproval .styledSelectLabel'),scoreTrigger:b('.gradeApproval .styledSelectTrigger'),comment:b('.gradeApproval>label'),textarea:b('.gradeApproval textarea'),actions:b('.gradeApproval>div:last-child'),scoreAlignment:getComputedStyle(pick('.gradeApproval>.styledSelect')).justifyContent }};
    });
    assert(result.pageScroll<=width+2,'Global horizontal overflow '+width);
    assert(result.modal.left>=-1&&result.modal.right<=width+2,'Dialog outside viewport '+width);
    assert(result.modal.scroll<=result.modal.client+2,'Dialog horizontal clipping '+width);
    assert(result.approval<result.rationale,'Teacher note must precede long rationale '+width);
-   const {panel,selector,comment,textarea,actions}=result.form;
+   const {panel,selector,scoreLabel,scoreTrigger,comment,textarea,actions,scoreAlignment}=result.form;
+   assert(Math.abs(scoreLabel.left-comment.left)<=2,'Score heading incorrectly shifted right at '+width+': '+JSON.stringify(result.form));
+   assert(Math.abs(scoreTrigger.left-textarea.left)<=2,'Score field not aligned with comment at '+width+': '+JSON.stringify(result.form));
+   assert(Math.abs(scoreTrigger.right-textarea.right)<=2,'Score field and comment must share the right edge at '+width);
+   assert(scoreAlignment==='start','The score selector must not use flex-end inherited from action row at '+width);
    assert(selector.top>=panel.top-1&&selector.bottom<=comment.top+1,'Grade selection must precede comment at '+width);
    assert(comment.top>=selector.bottom-1&&comment.bottom<=actions.top+1,'Comment must precede buttons at '+width);
    assert(textarea.left>=panel.left-1&&textarea.right<=panel.right+1,'Textarea outside grade panel at '+width);
