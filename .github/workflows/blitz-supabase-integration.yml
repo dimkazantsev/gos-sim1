@@ -29,6 +29,69 @@ jobs:
           mkdir -p /tmp/blitz-supabase
           cd /tmp/blitz-supabase
           supabase init
+          # GitHub runners may already have a service on the default 54322 port.
+          # Use a free local port only for the disposable test database.
+          python3 - <<'PY'
+          import pathlib,re,socket
+          cfg=pathlib.Path('/tmp/blitz-supabase/supabase/config.toml')
+          source=cfg.read_text()
+          with socket.socket() as sock:
+              sock.bind(('127.0.0.1',0))
+              free_port=sock.getsockname()[1]
+          source,count=re.subn(r'(?m)^port\s*=\s*54322\s*
+        run: |
+          set -euo pipefail
+          cd /tmp/blitz-supabase
+          supabase start -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Export local credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/blitz-supabase
+          while IFS='=' read -r key value; do
+            value="${value#\"}"
+            value="${value%\"}"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(
+            supabase status -o env \
+              --override-name api.url=SUPABASE_URL \
+              --override-name auth.anon_key=SUPABASE_ANON_KEY \
+              --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY
+          )
+      - name: Create disposable Blitz integration schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/blitz-supabase
+          DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\(.*\)"$/\1/p')"
+          test -n "$DB_URL"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_setup.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261012100100_blitz_attempt_lock_hardening.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
+          sleep 2
+      - name: Run 30 real local Supabase sessions
+        run: node supabase/tests/blitz_supabase_30_sessions.cjs
+      - name: Verify inbox migration on disposable Supabase
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/blitz-supabase
+          DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\(.*\)"$/\1/p')"
+          test -n "$DB_URL"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_inbox_setup.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261014170000_blitz_inbox_atomic_open.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_inbox_smoke.sql"
+      - name: Stop local Supabase
+        if: always()
+        run: |
+          cd /tmp/blitz-supabase || exit 0
+          supabase stop --no-backup
+,f'port = {free_port}',source)
+          if count!=1:
+              raise SystemExit('Supabase config DB port was not found')
+          cfg.write_text(source)
+          print('Local test DB mapped to dynamic port',free_port)
+          PY
       - name: Start minimal local Supabase stack
         run: |
           set -euo pipefail
