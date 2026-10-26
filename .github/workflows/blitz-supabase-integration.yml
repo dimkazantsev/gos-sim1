@@ -29,6 +29,20 @@ jobs:
           mkdir -p /tmp/blitz-supabase
           cd /tmp/blitz-supabase
           supabase init
+          # Use a free port for this disposable integration database.
+          python3 - <<'PY'
+          import pathlib,re,socket
+          cfg=pathlib.Path('/tmp/blitz-supabase/supabase/config.toml')
+          source=cfg.read_text()
+          with socket.socket() as sock:
+              sock.bind(('127.0.0.1',0))
+              free_port=sock.getsockname()[1]
+          source,count=re.subn(r'(?m)^port\s*=\s*54322\s*$',f'port = {free_port}',source)
+          if count!=1:
+              raise SystemExit('Expected local DB port 54322 in Supabase config')
+          cfg.write_text(source)
+          print('Disposable local DB port:',free_port)
+          PY
       - name: Start minimal local Supabase stack
         run: |
           set -euo pipefail
