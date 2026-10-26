@@ -686,9 +686,20 @@
  display:grid;place-items:center;padding:0;align-self:flex-start;
 }
 .gradeModal.gradeModalRefined .gradeApproval{
- min-width:0;max-width:calc(100% - 40px);margin:14px 20px;padding:18px;
- gap:14px;grid-template-columns:minmax(180px,.8fr) minmax(0,1.6fr);
+ box-sizing:border-box;display:grid;
+ width:calc(100% - 40px);min-width:0;max-width:calc(100% - 40px);
+ height:auto;min-height:0;margin:14px 20px;padding:18px;
+ grid-template-columns:minmax(0,1fr);grid-auto-rows:min-content;
+ align-items:start;align-content:start;gap:14px;
  border:1px solid #ceddf0;background:#f6f9fd;
+}
+/* One predictable reading order on desktop, tablets and phones:
+   score selection, full-width comment, confirmation actions. */
+.gradeModal.gradeModalRefined .gradeApproval>.styledSelect{
+ grid-column:1;width:100%;max-width:420px;min-width:0;justify-self:start;
+}
+.gradeModal.gradeModalRefined .gradeApproval>label{
+ grid-column:1;display:grid;min-width:0;width:100%;max-width:100%;
 }
 .gradeModalRefined .gradeApproval>.styledSelect,
 .gradeModalRefined .gradeApproval>label{display:grid;align-content:start;gap:9px;min-width:0}
@@ -808,40 +819,6 @@
  .gradeModalRefined .gradeExplanationName h4{font-size:13px}
 }
 
-/* Планшеты: окно оценки использует один последовательный столбец.
-   Не растягиваем строки на высоту содержимого соседней колонки. */
-@media (max-width:1366px){
- .gradeModal.gradeModalRefined .gradeApproval{
-  display:grid;
-  grid-template-columns:minmax(0,1fr);
-  grid-auto-rows:min-content;
-  align-items:start;
-  align-content:start;
-  justify-content:stretch;
-  height:auto;
-  min-height:0;
- }
- .gradeModal.gradeModalRefined .gradeApproval>.styledSelect{
-  grid-column:1;
-  width:100%;
-  max-width:460px;
-  align-self:start;
- }
- .gradeModal.gradeModalRefined .gradeApproval>label{
-  grid-column:1;
-  width:100%;
-  min-width:0;
-  align-self:start;
- }
- .gradeModal.gradeModalRefined .gradeApproval>div:last-child{
-  grid-column:1;
-  justify-content:flex-end;
- }
- .gradeModal.gradeModalRefined .gradeApproval textarea{
-  min-height:112px;
-  height:auto;
- }
-}
 @media (max-width:600px){
  .gradeModal.gradeModalRefined .gradeApproval>.styledSelect{max-width:100%}
  .gradeModal.gradeModalRefined .gradeApproval>div:last-child{

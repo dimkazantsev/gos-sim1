@@ -40,7 +40,8 @@ assert(component.includes('Этот текст вы отправляете си�
 assert(component.includes('В чате «Вне игры»'), 'Explain the out-of-game discussion');
 assert(component.includes('Преподаватель может учесть содержательное обсуждение'), 'Keep teacher grading discretionary');
 const debriefCss=fs.readFileSync('app/2026-profile-grade-layout.css','utf8');
-assert(debriefCss.includes('@media (max-width:1366px)')&&debriefCss.includes('grid-auto-rows:min-content'),'Tablet assessment must stack its fields without stretching rows');
+assert(debriefCss.includes('grid-template-columns:minmax(0,1fr);grid-auto-rows:min-content'),'Teacher assessment must be single-column at ALL screen widths');
+assert(!debriefCss.includes('grid-template-columns:minmax(180px,.8fr) minmax(0,1.6fr)'),'Legacy desktop two-column form must be removed');
 const debriefMarkup=[
  '<!doctype html><html lang="ru"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{font:14px Arial,sans-serif;margin:0;background:#eef3fb}',css,debriefCss,'</style><body>',
  '<main class="gradesPage" style="width:100%;max-width:1350px;margin:auto;padding:12px"><section class="gradesDebrief gradesDebriefRefined"><header class="gradesDebriefHeading"><div><small>КРИТЕРИЙ 3 · ИТОГОВЫЙ РАЗБОР</small><h2>Анализ этапа</h2></div></header>',
@@ -131,7 +132,7 @@ const teacherFixture=[
    console.log('PASS debrief form and AI/out-of-game guidance at '+width+'px');
   }
  
-  for(const [width,height] of [[320,640],[360,740],[390,844],[600,740],[768,1024],[820,1180],[1024,768]]){
+  for(const [width,height] of [[320,640],[360,740],[390,844],[600,740],[768,1024],[820,1180],[1024,768],[1440,900],[1680,1050]]){
    const page=await browser.newPage({viewport:{width,height},hasTouch:width<=820});
    await page.setContent(teacherFixture);
    const modal=page.locator('.gradeModalRefined'),note=modal.locator('.gradeApproval textarea');
@@ -140,12 +141,21 @@ const teacherFixture=[
     const sections=['.gradeModalHeading','.gradeScoreHero','.gradeCriteria','.gradeApproval','.gradeRationale','.gradeRunHistory','.gradeEvidence','.styledSelectTrigger','.gradeApproval textarea'].map(selector=>{const r=rect(selector);return {selector,left:r.left,right:r.right,top:r.top,bottom:r.bottom}});
     const buttons=[...document.querySelectorAll('.gradeApproval button')].map(n=>{const r=n.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height}});
     const m=d.getBoundingClientRect();
-    return {pageScroll:document.documentElement.scrollWidth,modal:{left:m.left,right:m.right,height:m.height,scroll:d.scrollWidth,client:d.clientWidth},width:innerWidth,approval:rect('.gradeApproval').top,rationale:rect('.gradeRationale').top,sections,buttons};
+    const b=s=>{const r=rect(s);return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width}};
+    return {pageScroll:document.documentElement.scrollWidth,modal:{left:m.left,right:m.right,height:m.height,scroll:d.scrollWidth,client:d.clientWidth},width:innerWidth,approval:rect('.gradeApproval').top,rationale:rect('.gradeRationale').top,sections,buttons,
+     form:{panel:b('.gradeApproval'),selector:b('.gradeApproval>.styledSelect'),comment:b('.gradeApproval>label'),textarea:b('.gradeApproval textarea'),actions:b('.gradeApproval>div:last-child') }};
    });
    assert(result.pageScroll<=width+2,'Global horizontal overflow '+width);
    assert(result.modal.left>=-1&&result.modal.right<=width+2,'Dialog outside viewport '+width);
    assert(result.modal.scroll<=result.modal.client+2,'Dialog horizontal clipping '+width);
    assert(result.approval<result.rationale,'Teacher note must precede long rationale '+width);
+   const {panel,selector,comment,textarea,actions}=result.form;
+   assert(selector.top>=panel.top-1&&selector.bottom<=comment.top+1,'Grade selection must precede comment at '+width);
+   assert(comment.top>=selector.bottom-1&&comment.bottom<=actions.top+1,'Comment must precede buttons at '+width);
+   assert(textarea.left>=panel.left-1&&textarea.right<=panel.right+1,'Textarea outside grade panel at '+width);
+   assert(textarea.width>=panel.width*.70,'Comment should fill grade panel, not a narrow desktop column at '+width);
+   assert(actions.top>=textarea.bottom-1,'Grade approval actions must sit after comment at '+width);
+   assert(selector.right<=panel.right+1&&actions.right<=panel.right+1,'Controls outside grade panel at '+width);
    for(const part of result.sections)assert(part.left>=result.modal.left-1&&part.right<=result.modal.right+2,'Section '+part.selector+' outside modal at '+width);
    assert(result.buttons.every(b=>b.height>=44),'Touch buttons too small at '+width);
    for(let i=0;i<result.buttons.length;i++)for(let j=i+1;j<result.buttons.length;j++){
