@@ -62,6 +62,11 @@ async function checks(){
  assert(v.readCount('games')>prior,'Auto-closing last ballot retains full procedure reconciliation even when its Realtime delta invalidates the ballot read');v.dispose();
  const role=harness({effects:true});await role.settle();const oldDelta=role.callbacks('formal_documents')[0];role.setMemberKind('observer');await role.render().refresh();await role.settle();
  oldDelta({eventType:'INSERT',new:doc('old-role')});assert(!role.render().formalDocuments.some(row=>row.id==='old-role'),'An earlier role-generation payload cannot repopulate cleared private state');role.dispose();
+ const pulse=harness({effects:true});await pulse.settle();pulse.render().setActiveView('parties');await pulse.settle();let noticeStart=pulse.stats().notices.length;
+ pulse.emit('state_metrics',{id:'metric',value:7},'UPDATE');assert.equal(pulse.render().metrics[0].value,7);
+ assert(!pulse.stats().notices.slice(noticeStart).some(row=>row.table==='state_metrics'),'Metric payloads must not invalidate unrelated party-election listeners');
+ pulse.render().setActiveView('budget');await pulse.settle();noticeStart=pulse.stats().notices.length;pulse.emit('state_metrics',{id:'metric',value:8},'UPDATE');
+ assert(pulse.stats().notices.slice(noticeStart).some(row=>row.table==='state_metrics'),'Visible budget widgets retain their targeted metric invalidation');pulse.dispose();
  console.log('PASS targeted document/history reads, preserved history, late document response, foreign-game rejection, hidden recovery, stalled queue abort/release, coalesced chat receipts, targeted ballot confirmation and auto-closure reconciliation');
  const model=await steady();assert(model.fullGameReads<=280,'Only periodic reconciliation may load game identity');assert(model.reads<20000,'Steady vote updates must not trigger a full game fanout');
  let beforeModel=null;

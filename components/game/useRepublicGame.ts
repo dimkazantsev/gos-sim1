@@ -342,7 +342,7 @@ export function useRepublicGame(gameId:string){
     setMetrics(previous=>previous.some(item=>item.id===next.id)
      ?previous.map(item=>item.id===next.id?next:item)
      :[...previous,next]);
-    notifyGameDataRefresh(gameId,'state_metrics');
+    if(activeViewRef.current==='budget')notifyGameDataRefresh(gameId,'state_metrics');
    });
   }
   // A chart/history entry arrives on the same socket, with no follow-up
