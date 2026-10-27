@@ -66,9 +66,10 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
    let reconciliationRetries=0;
    do{
     state.queued=false;const passive=!state.explicit;state.explicit=false;
-    const ballotOnly=passive&&!pending.full&&pending.tables.size>0&&[...pending.tables].every(table=>table==='office_ballots'||table==='office_personal_ballots');
+    const ballotOnly=passive&&!pending.full&&electionsRef.current.length>0&&pending.tables.size>0&&[...pending.tables].every(table=>table==='office_ballots'||table==='office_personal_ballots');
     if(passive&&!pending.full&&!pending.tables.size&&Date.now()-pending.lastFull<180000)continue;
     const ballotTables=new Set(pending.tables);pending.tables.clear();pending.full=false;
+    const currentElectionIds=electionsRef.current.map(row=>row.id);
     let succeeded=false,escalating=false;
     const controller=new AbortController();
     const current=()=>scopeCurrent()&&!controller.signal.aborted&&(!passive||document.visibilityState==='visible');
@@ -83,17 +84,18 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
       const [e,c,fastB,fastP]=await Promise.all([
        (ballotOnly?supabase.from('office_elections').select('id,status,vote_mode,ballot_mode,winner_candidate_id'):supabase.from('office_elections').select('*')).eq('game_id',game.id).eq('stage_no',4).in('office_key',['gd_chair','gd_deputy_1','gd_deputy_2']).order('created_at',{ascending:true}).abortSignal(controller.signal),
        ballotOnly?null:supabase.from('office_candidates').select('*').eq('game_id',game.id).order('created_at').abortSignal(controller.signal),
-       ballotOnly&&ballotTables.has('office_ballots')?supabase.from('office_ballots').select('*').eq('game_id',game.id).abortSignal(controller.signal):null,
-       ballotOnly&&ballotTables.has('office_personal_ballots')?supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id).abortSignal(controller.signal):null
+       ballotOnly&&ballotTables.has('office_ballots')?supabase.from('office_ballots').select('*').eq('game_id',game.id).in('election_id',currentElectionIds).abortSignal(controller.signal):null,
+       ballotOnly&&ballotTables.has('office_personal_ballots')?supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id).in('election_id',currentElectionIds).abortSignal(controller.signal):null
       ]);
       if(!current())return;
       if(e.error){setError(userError(e.error));return}
       const next=(e.data||[]) as ElectionState[];
+      const nextElectionIds=next.map(row=>row.id);
       // A transition may reveal all secret ballots, create a runoff or change meeting permissions.
       if(ballotOnly&&!sameElectionState(electionsRef.current,next)){reconcile();return}
       const [b,p,m,r]=await Promise.all([
-       ballotOnly?fastB:supabase.from('office_ballots').select('*').eq('game_id',game.id).abortSignal(controller.signal),
-       ballotOnly?fastP:supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id).abortSignal(controller.signal),
+       ballotOnly?fastB:nextElectionIds.length?supabase.from('office_ballots').select('*').eq('game_id',game.id).in('election_id',nextElectionIds).abortSignal(controller.signal):Promise.resolve({data:[] as OfficeBallot[],error:null}),
+       ballotOnly?fastP:nextElectionIds.length?supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id).in('election_id',nextElectionIds).abortSignal(controller.signal):Promise.resolve({data:[] as {election_id:string;voter_id:string;party_id:string;candidate_id:string}[],error:null}),
        ballotOnly?null:supabase.from('party_member_mandates').select('user_id,party_id,base_mandates,effective_mandates').eq('game_id',game.id).abortSignal(controller.signal),
        ballotOnly?null:supabase.from('institution_session_registrations').select('user_id,stage_no,institution_key,present_mandates').eq('game_id',game.id).eq('stage_no',4).eq('institution_key','gd').abortSignal(controller.signal)
       ]);
