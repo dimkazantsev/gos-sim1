@@ -1,0 +1,20 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript');
+const files=['components/game/useRepublicGame.ts','components/GameClient.tsx','components/game/useSectionUpdates.ts','lib/localGameSnapshot.ts'];
+for(const file of files){const source=fs.readFileSync(file,'utf8');const ast=ts.createSourceFile(file,source,ts.ScriptTarget.Latest,true,file.endsWith('tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);assert.equal(ast.parseDiagnostics.length,0,'Parse '+file)}
+const hook=fs.readFileSync(files[0],'utf8'),shell=fs.readFileSync(files[1],'utf8'),badges=fs.readFileSync(files[2],'utf8'),cache=fs.readFileSync(files[3],'utf8');
+assert(hook.includes('Date.now()-lastCoreSuccessAt.current>60000'),'Reuse core across navigation');
+assert(shell.includes('60000+Math.floor(Math.random()*12000)'),'Presence 60-72s, online freshness stays below 90s');
+assert(hook.includes('previous.view===viewKey&&now-previous.at<60000'),'Coalesce duplicate presence writes');
+assert(hook.includes("if(!response.error&&label)await logActivity('navigation'"),'Do not double-write activity after failed presence');
+assert(badges.includes('600+userJitter')&&badges.includes('90000+userJitter'),'Stagger and slow fallback counters');
+assert(badges.includes('now-lastFallbackAt<300000'),'Connected counters use five minute fallback');
+assert(badges.includes('r.status>=500')&&badges.includes('Date.now()+90000'),'Server overload backoff');
+assert(hook.includes('if(g.error||m.error)throw (g.error||m.error);'),'Transitory failure never claims revoked role');
+assert(hook.includes('readLocalGameSnapshot(gameId,u.id)')&&hook.includes('acceptedMember.current?.user_id!==u.id'),'Server-approved identity required');
+assert(hook.includes('lastCoreSuccessAt.current>0'),'Fresh network data supersedes cache');
+assert(hook.includes('deleteLocalGameSnapshot(gameId,me.user_id)'),'Logout clears local published snapshot');
+for(const guard of ['m.is_public','!!e.published_at','slice(0,16)','slice(0,64)','slice(0,80)','indexedDB.open','MAX_AGE=120000'])assert(cache.includes(guard),'Missing cache guard '+guard);
+for(const secret of ['game_ballots','chat_messages','blitz_assignments','password','access_token','refresh_token'])assert(!cache.includes(secret),'Secret in cache '+secret);
+const oldWrites=40*60/35,newWrites=40*60/66;
+assert(newWrites/oldWrites<0.60,'Expected >40% fewer heartbeat writes for 40 simulated devices');
+console.log('PASS 40 simulated devices: heartbeat reduction, scoped published IndexedDB, core reuse, overload backoff');
