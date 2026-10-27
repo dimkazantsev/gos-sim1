@@ -36,7 +36,9 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   }
   function schedule(){
    if(!live||blocked||initialPending||pending!==undefined||document.visibilityState!=='visible')return;
-   pending=setTimeout(()=>{pending=undefined;void load()},Math.max(250,15000-(Date.now()-lastStartedAt)));
+   // Cold invalidation: stagger simultaneous classroom broadcasts as well as
+   // the initial bootstrap. Inside the 15-second window, retain the cap.
+   pending=setTimeout(()=>{pending=undefined;void load()},Math.max(250+userJitter,15000-(Date.now()-lastStartedAt)));
   }
   const invalidated=(e:Event)=>{
    const detail=(e as CustomEvent<{gameId:string;table?:string}>).detail;
