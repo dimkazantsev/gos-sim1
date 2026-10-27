@@ -43,6 +43,8 @@ on:
       - 'components/GameClient.tsx'
       - 'scripts/forty-sessions-realtime-budget-check.cjs'
       - 'scripts/password-login-resilience-check.cjs'
+      - 'scripts/resume-member-actual-role-check.cjs'
+      - 'supabase/migrations/20261027102500_resume_existing_member_actual_role.sql'
       - 'scripts/auth-402-realtime-quota-check.cjs'
       - '.github/workflows/auth-402-realtime-quota.yml'
   push:
@@ -89,6 +91,8 @@ on:
       - 'components/GameClient.tsx'
       - 'scripts/forty-sessions-realtime-budget-check.cjs'
       - 'scripts/password-login-resilience-check.cjs'
+      - 'scripts/resume-member-actual-role-check.cjs'
+      - 'supabase/migrations/20261027102500_resume_existing_member_actual_role.sql'
       - 'scripts/auth-402-realtime-quota-check.cjs'
 jobs:
   check:
@@ -118,6 +122,7 @@ jobs:
       - run: node scripts/profile-results-load-check.cjs
       - run: node scripts/teacher-readiness-load-check.cjs
       - run: node scripts/password-login-resilience-check.cjs
+      - run: node scripts/resume-member-actual-role-check.cjs
       - run: node scripts/supabase-session-refresh-check.cjs
       - run: node scripts/chat-realtime-check.cjs
       - run: npm run typecheck
