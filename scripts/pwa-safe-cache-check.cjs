@@ -9,7 +9,7 @@ for(const [i,file] of files.entries()){
  assert.equal(png.readUInt32BE(20),size,file+' height');
 }
 const manifest=fs.readFileSync('app/manifest.ts','utf8');
-for(const frag of ["start_url:'/'","display:'standalone'","'/pwa/icon-192.png'","'/pwa/icon-512.png'","purpose:'any maskable'"])assert(manifest.includes(frag),frag);
+for(const frag of ["start_url:'/'","display:'standalone'","'/pwa/icon-192.png'","'/pwa/icon-512.png'","purpose:'maskable'"])assert(manifest.includes(frag),frag);
 const layout=fs.readFileSync('app/layout.tsx','utf8');
 assert(layout.includes("manifest:'/manifest.webmanifest'")&&layout.includes('<PwaRegistrar/>'));
 const sw=fs.readFileSync('public/sw.js','utf8');
@@ -27,6 +27,8 @@ const ask=(url,{mode='cors',method='GET',destination='',authorization=false,fail
  return {result,extras};
 };
 (async()=>{
+ const installing=[];listeners.install({waitUntil(p){installing.push(p)}});
+ await Promise.all(installing); // Real worker install precaches the generic offline shell.
  for(const url of ['https://bderfrcfuhnutuoyudje.supabase.co/auth/v1/token','https://gos-sim1.vercel.app/api/telegram/dispatch','https://gos-sim1.vercel.app/game/abc']){
   const ev=ask(url);assert.equal(ev.result,undefined,'Private/API not cached '+url);
  }
