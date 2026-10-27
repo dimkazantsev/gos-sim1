@@ -1,4 +1,6 @@
 import type {MetadataRoute} from 'next';
+// Required by the standalone GitHub Pages static export build.
+export const dynamic='force-static';
 export default function manifest():MetadataRoute.Manifest{
  return {
   id:'/',name:'ГОС.ID — Цифровая платформа России',short_name:'ГОС.ID',
