@@ -388,9 +388,13 @@ export function useRepublicGame(gameId:string){
    dirtyOverview=true;schedule();
   });
   for(const table of ['chat_mentions','chat_channel_state','chat_pins']){
-   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>{
-    if(table==='chat_pins')dirtyPins=true;
-    else dirtyOverview=true;
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},payload=>{
+    if(table==='chat_pins'){
+     const next=payload.new as Partial<ChatPin>|null,previous=payload.old as Partial<ChatPin>|null;
+     if(chatOpenRef.current&&channelRef.current&&
+       (next?.channel_id===channelRef.current||previous?.channel_id===channelRef.current||
+        (payload.eventType==='INSERT'?!next?.channel_id:!previous?.channel_id)))dirtyPins=true;
+    }else dirtyOverview=true;
     schedule();
    });
   }
@@ -533,7 +537,7 @@ export function useRepublicGame(gameId:string){
 
  useEffect(()=>{channelRef.current=channelId;messageRowsRef.current=[];setMessages([]);setChatPins([]);setPinnedMessages([]);if(channelId){void loadMessages(channelId,true);void loadChatPins(channelId);if(chatOpen)void markChatRead(channelId)}else setChatLoading(false)},[channelId]);
  // Reconcile changes missed while closed. Switching channels already loads history.
- useEffect(()=>{if(chatOpen&&channelRef.current)void loadMessages(channelRef.current)},[chatOpen]);
+ useEffect(()=>{if(chatOpen&&channelRef.current)void loadMessages(channelRef.current);if(chatOpen&&channelRef.current)void loadChatPins(channelRef.current)},[chatOpen]);
  useEffect(()=>{if(chatOpen&&channelId)void markChatRead(channelId)},[chatOpen,channelId,messages.length]);
  useEffect(()=>{
   // The chat header and composer must reflect exactly the same selected ID.

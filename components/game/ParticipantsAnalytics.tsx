@@ -43,17 +43,23 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
   finally{clearTimeout(timeout)}
  },scope,undefined,3000,180000);
  const students=members.filter(m=>m.kind==='student');
- const rows=useMemo(()=>students.map(m=>{
-  const gradeRows=assessments.filter(a=>a.user_id===m.user_id&&(stage===0||a.stage_no===stage));
-  const sum=gradeRows.reduce((total,a)=>total+score(a),0);
-  const approved=gradeRows.filter(a=>a.status==='final').length;
-  const posts=politicalPosts.filter(p=>p.author_id===m.user_id);
-  return {m,sum,average:gradeRows.length?sum/gradeRows.length:null,assessed:gradeRows.length,approved,
-   posts:posts.length,
-   documents:formalDocuments.filter(d=>d.author_id===m.user_id).length,
-   votes:ballots.filter(b=>b.voter_id===m.user_id).length,
-   activity:activityTotals===null?activities.filter(a=>a.actor_id===m.user_id).length:activityTotals[m.user_id]||0};
- }),[members,assessments,stage,politicalPosts,formalDocuments,ballots,activities,activityTotals]);
+ const rows=useMemo(()=>{
+  function counts<T>(items:T[],id:(item:T)=>string){const result=new Map<string,number>();for(const item of items){const key=id(item);result.set(key,(result.get(key)||0)+1)}return result}
+  const grades=new Map<string,{sum:number;assessed:number;approved:number}>();
+  for(const a of assessments){
+   if(stage!==0&&a.stage_no!==stage)continue;
+   const item=grades.get(a.user_id)||{sum:0,assessed:0,approved:0};
+   item.sum+=score(a);item.assessed++;if(a.status==='final')item.approved++;grades.set(a.user_id,item);
+  }
+  const posts=counts(politicalPosts,p=>p.author_id),documents=counts(formalDocuments,d=>d.author_id);
+  const votes=counts(ballots,b=>b.voter_id),activity=activityTotals===null?counts(activities,a=>a.actor_id):null;
+  return members.filter(m=>m.kind==='student').map(m=>{
+   const grade=grades.get(m.user_id)||{sum:0,assessed:0,approved:0};
+   return {m,...grade,average:grade.assessed?grade.sum/grade.assessed:null,
+    posts:posts.get(m.user_id)||0,documents:documents.get(m.user_id)||0,votes:votes.get(m.user_id)||0,
+    activity:activityTotals===null?activity?.get(m.user_id)||0:activityTotals[m.user_id]||0};
+  });
+ },[members,assessments,stage,politicalPosts,formalDocuments,ballots,activities,activityTotals]);
  const filtered=rows.filter(r=>(!team||(r.m.team||r.m.group_name||'')===team)&&(!onlyAssessed||r.assessed>0)&&
   (!search||[r.m.full_name,r.m.team||'',r.m.group_name||'',r.m.role_title||''].some(s=>s.toLocaleLowerCase('ru').includes(search.toLocaleLowerCase('ru'))))).sort((a,b)=>{
    const part=(n:string,index:number)=>n.trim().split(/\s+/)[index]||'';
