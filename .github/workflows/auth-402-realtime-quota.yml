@@ -16,6 +16,7 @@ on:
       - 'scripts/teacher-readiness-load-check.cjs'
       - 'scripts/republic-game-resilience-check.cjs'
       - 'scripts/local-traffic-snapshot-check.cjs'
+      - 'scripts/rest-overload-circuit-check.cjs'
       - 'lib/localGameSnapshot.ts'
       - 'components/game/Blitz*.tsx'
       - 'components/game/BudgetAmendments.tsx'
@@ -66,6 +67,7 @@ on:
       - 'scripts/teacher-readiness-load-check.cjs'
       - 'scripts/republic-game-resilience-check.cjs'
       - 'scripts/local-traffic-snapshot-check.cjs'
+      - 'scripts/rest-overload-circuit-check.cjs'
       - 'lib/localGameSnapshot.ts'
       - 'components/game/Blitz*.tsx'
       - 'components/game/BudgetAmendments.tsx'
@@ -120,6 +122,7 @@ jobs:
       - run: node scripts/realtime-targeted-load-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
       - run: node scripts/local-traffic-snapshot-check.cjs
+      - run: node scripts/rest-overload-circuit-check.cjs
       - run: node scripts/event-workspace-load-check.cjs
       - run: node scripts/election-panels-load-check.cjs
       - run: node scripts/duma-ballot-targeted-load-check.cjs
