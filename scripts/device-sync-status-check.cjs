@@ -10,7 +10,7 @@ for(const [name,data] of [['cache.ts',source],['component.tsx',component],['clie
  assert.equal(ast.parseDiagnostics.length,0,'TypeScript parse '+name);
 }
 assert(client.includes('<DeviceSyncStatus gameId={game.id} userId={me.user_id} realtimeState={g.realtimeState}/>'));
-assert(component.includes("detail.userId!==userId")&&component.includes("detail?.gameId!==gameId"),'Ignore other user's cached events');
+assert(component.includes("detail.userId!==userId")&&component.includes("detail?.gameId!==gameId"),'Ignore cached events from a different account');
 assert(component.includes("if(!live||wasUpdated)return"),'Old IndexedDB reads must never overwrite new state');
 assert(hook.includes('readEpoch.current')&&hook.includes('acceptedMember.current?.user_id!==uid'),'Reject old session during device save');
 assert(hook.includes('},1500)'), 'Reprioritize rapid pushed updates into one local write');
