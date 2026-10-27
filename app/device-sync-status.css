@@ -28,6 +28,10 @@
 .simWorkspace .simTop .deviceSyncDetails strong{display:block;font-size:14px;font-weight:800;margin-bottom:7px}
 .simWorkspace .simTop .deviceSyncDetails p{margin:0 0 9px;color:#506985}
 .simWorkspace .simTop .deviceSyncDetails small{color:#637997;font-size:11px;display:block}
+.simWorkspace .simTop .deviceSyncDetails .deviceDiagnosticsInfo{margin-top:12px;font-size:12px}
+.simWorkspace .simTop .deviceDiagnosticsActions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.simWorkspace .simTop .deviceDiagnosticsActions button{border:1px solid #cbdcf8;border-radius:8px;background:#eff6ff;color:#2453e6;padding:7px 10px;font:inherit;cursor:pointer}
+.simWorkspace .simTop .deviceDiagnosticsActions button:focus-visible{outline:2px solid #2453e6;outline-offset:2px}
 @media(max-width:1499px){
  .simWorkspace .simTop .deviceSyncStatus>summary{
   width:48px;min-width:48px;max-width:48px;padding:0;

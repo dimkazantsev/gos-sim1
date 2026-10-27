@@ -18,6 +18,7 @@ on:
       - 'scripts/republic-game-resilience-check.cjs'
       - 'scripts/local-traffic-snapshot-check.cjs'
       - 'scripts/rest-overload-circuit-check.cjs'
+      - 'scripts/request-diagnostics-check.cjs'
       - 'lib/localGameSnapshot.ts'
       - 'components/game/DeviceSyncStatus.tsx'
       - 'app/device-sync-status.css'
@@ -75,6 +76,7 @@ on:
       - 'scripts/republic-game-resilience-check.cjs'
       - 'scripts/local-traffic-snapshot-check.cjs'
       - 'scripts/rest-overload-circuit-check.cjs'
+      - 'scripts/request-diagnostics-check.cjs'
       - 'lib/localGameSnapshot.ts'
       - 'components/game/DeviceSyncStatus.tsx'
       - 'app/device-sync-status.css'
@@ -136,6 +138,7 @@ jobs:
       - run: node scripts/local-traffic-snapshot-check.cjs
       - run: node scripts/device-sync-status-check.cjs
       - run: node scripts/rest-overload-circuit-check.cjs
+      - run: node scripts/request-diagnostics-check.cjs
       - run: node scripts/event-workspace-load-check.cjs
       - run: node scripts/election-panels-load-check.cjs
       - run: node scripts/duma-ballot-targeted-load-check.cjs

@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {Check,CloudDownload,RefreshCw,WifiOff} from 'lucide-react';
+import {clearRequestDiagnostics,getRequestDiagnostics} from '@/lib/supabase';
 import {
  DEVICE_SNAPSHOT_EVENT,getLocalGameSnapshotInfo,
  type DeviceSnapshotEvent,type DeviceSnapshotInfo,type DeviceSnapshotStatus
@@ -13,6 +14,18 @@ export default function DeviceSyncStatus({gameId,userId,realtimeState}:{
  const [phase,setPhase]=useState<State>('checking');
  const [info,setInfo]=useState<DeviceSnapshotInfo|null>(null);
  const [online,setOnline]=useState(true);
+ const [diagnosticMessage,setDiagnosticMessage]=useState('');
+ function downloadDiagnostics(){
+  const entries=getRequestDiagnostics();
+  if(!entries.length){setDiagnosticMessage('Записей пока нет.');return}
+  try{
+   const blob=new Blob([JSON.stringify({generated_at:new Date().toISOString(),scope:'current_browser_tab',note:'status 0: сеть или отмена; local_limit: запрос остановлен браузером; duration_ms: время до ответа',entries},null,2)],{type:'application/json'});
+   const href=URL.createObjectURL(blob),link=document.createElement('a');
+   link.href=href;link.download='gos-id-diagnostics.json';document.body.appendChild(link);link.click();link.remove();
+   setTimeout(()=>URL.revokeObjectURL(href),1000);
+   setDiagnosticMessage('Файл диагностики подготовлен.');
+  }catch{setDiagnosticMessage('Не удалось подготовить файл диагностики.')}
+ }
  useEffect(()=>{
   let live=true,wasUpdated=false;
   setInfo(null);setPhase('checking');
@@ -31,7 +44,7 @@ export default function DeviceSyncStatus({gameId,userId,realtimeState}:{
   };
   window.addEventListener(DEVICE_SNAPSHOT_EVENT,updated);
   window.addEventListener('online',refresh);window.addEventListener('offline',refresh);
-  return()=>{live=false;window.removeEventListener(DEVICE_SNAPSHOT_EVENT,updated);
+  return()=>{live=false;clearRequestDiagnostics();window.removeEventListener(DEVICE_SNAPSHOT_EVENT,updated);
    window.removeEventListener('online',refresh);window.removeEventListener('offline',refresh)};
  },[gameId,userId]);
  const disconnected=!online;
@@ -54,6 +67,9 @@ export default function DeviceSyncStatus({gameId,userId,realtimeState}:{
     'Опубликованные сведения будут автоматически сохранены после загрузки из игры.'}</p>
    <p>{explanation}</p>
    <small>Голоса, оценки, права доступа и закрытые документы проверяются сервером. Локальная копия не заменяет синхронизацию.</small>
+   <p className="deviceDiagnosticsInfo">Диагностика хранит последние 500 запросов только этой вкладки до её закрытия или обновления: время до ответа, название операции и код ответа. Тексты, пароли и адреса запросов не сохраняются.</p>
+   <div className="deviceDiagnosticsActions"><button type="button" onClick={downloadDiagnostics}>Скачать диагностику</button><button type="button" onClick={()=>{clearRequestDiagnostics();setDiagnosticMessage('Журнал очищен.')}}>Очистить</button></div>
+   <small aria-live="polite">{diagnosticMessage}</small>
   </div>
  </details>
 }
