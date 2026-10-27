@@ -19,7 +19,7 @@ export default function DeviceSyncStatus({gameId,userId,realtimeState}:{
   const entries=getRequestDiagnostics();
   if(!entries.length){setDiagnosticMessage('Записей пока нет.');return}
   try{
-   const blob=new Blob([JSON.stringify({generated_at:new Date().toISOString(),scope:'current_browser_tab',note:'status 0: сеть или отмена; local_limit: запрос остановлен браузером; duration_ms: время до ответа',entries},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({generated_at:new Date().toISOString(),scope:'current_browser_tab',note:'Код 0 означает ошибку сети или отмену. Время до ответа указано в миллисекундах.',entries},null,2)],{type:'application/json'});
    const href=URL.createObjectURL(blob),link=document.createElement('a');
    link.href=href;link.download='gos-id-diagnostics.json';document.body.appendChild(link);link.click();link.remove();
    setTimeout(()=>URL.revokeObjectURL(href),1000);
