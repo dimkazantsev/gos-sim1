@@ -21,7 +21,7 @@ function meetingErrorMessage(message:string):string{
  if(/permission denied|недостаточно прав|42501|403/i.test(message))return 'Нет полномочий для этого действия. Повестку утверждает председатель или преподаватель; подготовку может выполнить назначенный участник.';
  return message.length<=250?message:'Не удалось выполнить действие. Обновите данные заседания и повторите попытку.';
 }
-export default function InstitutionRegistrationPanel({g,readOnly=false,freshAttendance=false,onUnitsChange,stageNo,initialBody,allowedBodies,defaultOpen=false,sessionId,onOpenDocument,onMeetingReadyChange}:{g:ReturnTypeRepublic;readOnly?:boolean;freshAttendance?:boolean;onUnitsChange?:(units:VotingUnit[])=>void;stageNo?:number;initialBody?:string;allowedBodies?:string[];defaultOpen?:boolean;sessionId?:string;onOpenDocument?:(id:string)=>void;onMeetingReadyChange?:(ready:boolean)=>void}){
+export default function InstitutionRegistrationPanel({g,readOnly=false,freshAttendance=false,onUnitsChange,stageNo,initialBody,allowedBodies,defaultOpen=false,sessionId,onOpenDocument,onMeetingReadyChange,onRegistrationChange}:{g:ReturnTypeRepublic;readOnly?:boolean;freshAttendance?:boolean;onUnitsChange?:(units:VotingUnit[])=>void;stageNo?:number;initialBody?:string;allowedBodies?:string[];defaultOpen?:boolean;sessionId?:string;onOpenDocument?:(id:string)=>void;onMeetingReadyChange?:(ready:boolean)=>void;onRegistrationChange?:()=>void}){
  const [rows,setRows]=useState<Entry[]>([]),[units,setUnits]=useState<VotingUnit[]>([]),[assignments,setAssignments]=useState<Assignment[]>([]),[offices,setOffices]=useState<Office[]>([]);
  const [body,setBody]=useState(initialBody||'gd'),[busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[newTitle,setNewTitle]=useState(''),[users,setUsers]=useState<string[]>([]),[head,setHead]=useState('');
  const [seats,setSeats]=useState('1'),[editing,setEditing]=useState<string|null>(null);
@@ -209,7 +209,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();setNotice('Ответственный исполнитель сохранён.')}
   setBusy(false);
  }
- async function register(){if(!g.game||!canAttend||!agendaReady||readOnly||meetingActionsLocked||busy)return;setMeetingError('');setNotice('');setBusy(true);const r=await supabase.rpc('register_institution_session_at_stage',{p_game_id:g.game.id,p_institution:body,p_stage_no:stage});if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();setNotice('Вы зарегистрированы на заседание.')}setBusy(false)}
+ async function register(){if(!g.game||!canAttend||!agendaReady||readOnly||meetingActionsLocked||busy)return;setMeetingError('');setNotice('');setBusy(true);const r=await supabase.rpc('register_institution_session_at_stage',{p_game_id:g.game.id,p_institution:body,p_stage_no:stage});if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{onRegistrationChange?.();await load();setNotice('Вы зарегистрированы на заседание.')}setBusy(false)}
  async function saveGdPresence(){
   if(!g.game||busy||readOnly||meetingActionsLocked||!agendaReady||!canAttend||!gdPresence)return;
   const number=Number(presenceDraft),capacity=Number(gdPresence.my_capacity||0);
@@ -221,7 +221,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
    p_game_id:g.game.id,p_stage_no:stage,p_present:number
   });
   if(error)setMeetingError(meetingErrorMessage(error.message));
-  else{await load();setNotice('Явка депутатов сохранена. Кворум пересчитан.')}
+  else{onRegistrationChange?.();await load();setNotice('Явка депутатов сохранена. Кворум пересчитан.')}
   setBusy(false);
  }
  async function createBody(){if(!g.game)return;setBusy(true);const r=await supabase.rpc('save_civic_voting_body',{p_game_id:g.game.id,p_title:newTitle.trim(),p_seats:Number(seats),p_users:users,p_head:head||null,p_unit:editing});if(r.error)g.setError(userError(r.error));else{await load();setBody('unit:'+r.data);setNewTitle('');setUsers([]);setHead('');setSeats('1');setEditing(null);setNotice('Состав органа сохранён. Его можно выбрать при открытии голосования.')}setBusy(false)}

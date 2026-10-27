@@ -11,6 +11,7 @@ on:
       - 'scripts/event-workspace-load-check.cjs'
       - 'scripts/election-panels-load-check.cjs'
       - 'scripts/duma-ballot-targeted-load-check.cjs'
+      - 'scripts/votes-registration-load-check.cjs'
       - 'scripts/presidential-panel-load-check.cjs'
       - 'scripts/profile-results-load-check.cjs'
       - 'scripts/teacher-readiness-load-check.cjs'
@@ -29,6 +30,8 @@ on:
       - 'components/game/DocumentsView.tsx'
       - 'components/game/EventCollaboration.tsx'
       - 'components/game/EventWorkspace.tsx'
+      - 'components/game/VotesView.tsx'
+      - 'components/game/InstitutionRegistrationPanel.tsx'
       - 'components/game/DumaLeadershipElection.tsx'
       - 'components/game/DeadlineControl.tsx'
       - 'components/game/GhostPolicyLab.tsx'
@@ -65,6 +68,7 @@ on:
       - 'scripts/event-workspace-load-check.cjs'
       - 'scripts/election-panels-load-check.cjs'
       - 'scripts/duma-ballot-targeted-load-check.cjs'
+      - 'scripts/votes-registration-load-check.cjs'
       - 'scripts/presidential-panel-load-check.cjs'
       - 'scripts/profile-results-load-check.cjs'
       - 'scripts/teacher-readiness-load-check.cjs'
@@ -83,6 +87,8 @@ on:
       - 'components/game/DocumentsView.tsx'
       - 'components/game/EventCollaboration.tsx'
       - 'components/game/EventWorkspace.tsx'
+      - 'components/game/VotesView.tsx'
+      - 'components/game/InstitutionRegistrationPanel.tsx'
       - 'components/game/DumaLeadershipElection.tsx'
       - 'components/game/DeadlineControl.tsx'
       - 'components/game/GhostPolicyLab.tsx'
@@ -133,6 +139,7 @@ jobs:
       - run: node scripts/event-workspace-load-check.cjs
       - run: node scripts/election-panels-load-check.cjs
       - run: node scripts/duma-ballot-targeted-load-check.cjs
+      - run: node scripts/votes-registration-load-check.cjs
       - run: node scripts/presidential-panel-load-check.cjs
       - run: node scripts/profile-results-load-check.cjs
       - run: node scripts/teacher-readiness-load-check.cjs

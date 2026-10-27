@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
-import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {Vote} from './types';
 import StyledSelect from '../ui/StyledSelect';
@@ -34,27 +34,38 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   &&!votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open'));
  const focused=useRef('');
  useEffect(()=>{if(focusId)setTab('all')},[focusId]);
- const [checkedIn,setCheckedIn]=useState<{user_id:string;institution_key:string;stage_no:number;present_mandates:number|null}[]>([]);
- const [checkinLoaded,setCheckinLoaded]=useState(false);
+ const registrationScope=JSON.stringify([g.game?.id,me?.user_id,me?.kind,me?.role_title,me?.roster_archived_at,teacher]);
+ const [checkins,setCheckins]=useState<{scope:string;rows:{user_id:string;institution_key:string;stage_no:number;present_mandates:number|null}[]}>({scope:'',rows:[]});
+ const checkedIn=checkins.scope===registrationScope?checkins.rows:[];
+ const checkinLoaded=checkins.scope===registrationScope;
+ const reads=useRef({scope:registrationScope,live:true,promise:null as Promise<void>|null,queued:false,cancel:null as (()=>void)|null});
+ if(reads.current.scope!==registrationScope)reads.current={scope:registrationScope,live:true,promise:null,queued:false,cancel:null};
+ const state=reads.current;
  useEffect(()=>{
-  if(!g.game)return;
-  let live=true;
-  async function reload(){
-   const game=g.game;if(!game)return;
-   const r=await supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates').eq('game_id',game.id);
-   if(live&&!r.error){setCheckedIn(r.data||[]);setCheckinLoaded(true)}
-  }
-  void reload();
-  // Registration changes arrive through the shared game socket.
-  let pending:ReturnType<typeof setTimeout>|undefined;
-  const changed=(event:Event)=>{
-   const detail=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
-   if(detail?.gameId!==g.game?.id||(detail.table&&detail.table!=='institution_session_registrations')||pending!==undefined)return;
-   pending=setTimeout(()=>{pending=undefined;if(live)void reload()},450);
-  };
-  window.addEventListener(GAME_DATA_REFRESH_EVENT,changed);
-  return()=>{live=false;clearTimeout(pending);window.removeEventListener(GAME_DATA_REFRESH_EVENT,changed)};
- },[g.game?.id]);
+  state.live=true;
+  return()=>{state.live=false;state.cancel?.()};
+ },[state]);
+ async function reloadRegistration(){
+  const gameId=g.game?.id;
+  if(!gameId||!me?.user_id||!state.live)return;
+  if(state.promise){state.queued=true;return state.promise}
+  state.promise=(async()=>{
+   do{
+    state.queued=false;
+    const controller=new AbortController();let timeout:ReturnType<typeof setTimeout>|undefined;
+    try{
+     const r=await Promise.race([
+      supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates').eq('game_id',gameId).abortSignal(controller.signal),
+      new Promise<never>((_,reject)=>{state.cancel=()=>{controller.abort();reject(new Error('Registration refresh cancelled'))};timeout=setTimeout(()=>{controller.abort();reject(new Error('Registration refresh timed out'))},12000)})
+     ]);
+     if(state.live&&reads.current===state&&!controller.signal.aborted&&!state.queued&&!r.error)setCheckins({scope:registrationScope,rows:r.data||[]});
+    }catch{/* Keep the last confirmed registration until the next refresh. */}
+    finally{clearTimeout(timeout);state.cancel=null}
+   }while(state.queued&&state.live&&reads.current===state);
+  })().finally(()=>{state.promise=null});
+  return state.promise;
+ }
+ useGameTableSync(g.game?.id,['institution_session_registrations'],reloadRegistration,registrationScope,undefined,3000,30000);
  function voteNeedsRegistration(v:Vote){
   return !!v.electorate_snapshot?.attendance_required||['registered_session','presidential_system','sf_resolution','government_nomination'].includes(v.procedure_key||'');
  }
@@ -133,6 +144,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   <div id="vote-registration" className={focusedNeedsRegistration?'voteRegistrationFocus isRequired':'voteRegistrationFocus'}>
    <InstitutionRegistrationPanel
     g={g}
+    onRegistrationChange={()=>void reloadRegistration()}
     onUnitsChange={setUnits}
     onOpenDocument={onOpenDocument}
     stageNo={focusedVote?.stage_no}
