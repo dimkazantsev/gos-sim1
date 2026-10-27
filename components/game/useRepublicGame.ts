@@ -15,6 +15,7 @@ import type {ChatMediaKind} from './recordingMedia';
 import {sendChatMedia} from './chatMediaTransport';
 import {analyseVoiceBlob} from './voiceWaveform';
 import {currentGameMembers,currentGameProfiles} from './gameRoster';
+import {coalesceInFlight} from './coalesceInFlight';
 import {resolveChatChannelId,visibleChatChannels} from './chatChannelSelection';
 import {mergeChatMessages} from './chatRealtime';
 import type {GameOfficeAssignment,ChatOverview} from './types';
@@ -77,6 +78,7 @@ export function useRepublicGame(gameId:string){
   },delay);
  }
  const coreReadQueue=useRef({active:0,waiting:[] as Array<()=>void>});
+ const rosterReads=useRef(new Map<string,Promise<{data:Member[]|null;error:{message:string;code?:string}|null}>>());
  function limitedCoreRead<T>(query:PromiseLike<T>):Promise<T>{
   const epoch=readEpoch.current,user=authUser.current,targetGame=gameId;
   return new Promise<T>((resolve,reject)=>{
@@ -103,6 +105,15 @@ export function useRepublicGame(gameId:string){
    };
    if(coreReadQueue.current.active<4)run();
    else coreReadQueue.current.waiting.push(run);
+  });
+ }
+ // Bootstrap and party/teacher panels may need the same roster concurrently.
+ // Share only the pending request; never reuse resolved role data.
+ function loadMemberRoster(){
+  const key=gameId+':'+(authUser.current||'')+':'+readEpoch.current;
+  return coalesceInFlight(rosterReads.current,key,async()=>{
+   const response=await limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name'));
+   return {data:(response.data||null) as Member[]|null,error:response.error};
   });
  }
  const lastPresenceWrite=useRef({scope:'',view:'',at:0});
@@ -189,6 +200,7 @@ export function useRepublicGame(gameId:string){
  }
  function clearGameData(){
   acceptedMember.current=null;
+  rosterReads.current.clear();
   realtimeDirtyTables.current.clear();
   changedFormalIds.current.clear();changedVoteIds.current.clear();
   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
@@ -716,7 +728,7 @@ export function useRepublicGame(gameId:string){
    limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle()),
    limitedCoreRead(supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label')),
    limitedCoreRead(supabase.from('game_events').select('*').eq('game_id',gameId).order('published_at',{ascending:false}).limit(100)),
-   limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name')),
+   loadMemberRoster(),
    limitedCoreRead(supabase.from('chat_channels').select('*').eq('game_id',gameId).order('name')),
    limitedCoreRead(supabase.from('game_stages').select('*').eq('game_id',gameId).order('stage_no')),
    limitedCoreRead(supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')),
@@ -940,7 +952,7 @@ export function useRepublicGame(gameId:string){
     supabase.from('party_invitations').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
     supabase.from('party_member_mandates').select('*').eq('game_id',gameId),
     refreshParties?supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'):Promise.resolve({data:null,error:null}),
-    supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name'),
+    loadMemberRoster(),
     supabase.from('party_agreements').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
    ]);
    if(!readActive(ticket))return;
