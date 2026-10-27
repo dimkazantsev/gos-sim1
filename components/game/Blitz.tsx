@@ -71,11 +71,16 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
    }
   }
   void refresh();
-  const id=window.setInterval(()=>{if(document.visibilityState==='visible')void refresh()},45000);
+  const jitter=userId?[...userId].reduce((hash,char)=>(Math.imul(hash^char.charCodeAt(0),16777619))>>>0,2166136261)%15000:0;
+  let id:number|undefined;
+  const first=window.setTimeout(()=>{
+   if(document.visibilityState==='visible')void refresh();
+   id=window.setInterval(()=>{if(document.visibilityState==='visible')void refresh()},45000);
+  },45000-jitter);
   const request=(event:Event)=>void refresh((event as CustomEvent<{assignmentId?:string}>).detail?.assignmentId||'');
   const resume=()=>{if(document.visibilityState==='visible')void refresh()};
   window.addEventListener('blitz:open',request);document.addEventListener('visibilitychange',resume);
-  return()=>{stopped=true;window.clearInterval(id);window.removeEventListener('blitz:open',request);document.removeEventListener('visibilitychange',resume)}
+  return()=>{stopped=true;window.clearTimeout(first);window.clearInterval(id);window.removeEventListener('blitz:open',request);document.removeEventListener('visibilitychange',resume)}
  },[gameId,userId,stageKey,enabled,!!card,!!feedback]);
  useEffect(()=>{if(!card?.deadline)return;const f=()=>setTime(remainingBlitzSeconds(card));f();const id=setInterval(f,250);return()=>clearInterval(id)},[card?.deadline]);
  async function answer(choice:number){if(!card||answerBusy.current||busy||feedback||(choice>=0&&time===0))return;answerBusy.current=true;setBusy(true);try{const r=await supabase.rpc('blitz_answer',{p_id:card.id,p_choice:choice});if(r.error)setError(userError(r.error));else{setError('');setFeedback({...card,...r.data});window.dispatchEvent(new Event('blitz:updated'))}}catch(e){setError((userError(e)||'Ответ не отправлен. Повторите попытку.'))}finally{answerBusy.current=false;setBusy(false)}}
