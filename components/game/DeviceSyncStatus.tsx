@@ -14,17 +14,18 @@ export default function DeviceSyncStatus({gameId,userId,realtimeState}:{
  const [info,setInfo]=useState<DeviceSnapshotInfo|null>(null);
  const [online,setOnline]=useState(true);
  useEffect(()=>{
-  let live=true;
+  let live=true,wasUpdated=false;
   setInfo(null);setPhase('checking');
   const refresh=()=>setOnline(navigator.onLine);
   refresh();
   void getLocalGameSnapshotInfo(gameId,userId).then(value=>{
-   if(!live)return;
+   if(!live||wasUpdated)return;
    setInfo(value);setPhase(value?'saved':'empty');
   });
   const updated=(event:Event)=>{
    const {detail}=event as CustomEvent<DeviceSnapshotEvent>;
    if(!live||detail?.gameId!==gameId||detail.userId!==userId)return;
+   wasUpdated=true;
    setPhase(detail.status);
    if(detail.status==='saved'&&detail.info)setInfo(detail.info);
   };
