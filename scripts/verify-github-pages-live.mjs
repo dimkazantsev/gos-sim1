@@ -35,7 +35,7 @@ function checkHead(html,source){
  for(const asset of ['favicon.ico?v=20261028-1','icon.svg?v=20261028-1']){
   assert.ok(head.includes('href="/gos-sim1/'+asset+'"'),source+' missing scoped browser icon '+asset);
  }
- assert.ok(!/<link\\b[^>]*rel="(?:shortcut )?icon"[^>]*href="\\/favicon\\.ico/.test(head),source+' has root-level favicon');
+ assert.ok(!/<link\b[^>]*rel="(?:shortcut )?icon"[^>]*href="\/favicon\\.ico/.test(head),source+' has root-level favicon');
 }
 async function check(){
  for(const item of endpoints){
