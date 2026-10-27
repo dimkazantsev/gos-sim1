@@ -13,7 +13,7 @@ replaceOnce("lastMutation='',clockUpdates=0,openedVotes=0;","lastMutation='',clo
 replaceOnce('failures=new Set(),counts=new Map(),starts=[];', 'failures=new Set(),counts=new Map(),failAt=new Map(),starts=[];');
 replaceOnce("return{data:failures.has(name)?null:rows[name]??null,error:failures.has(name)?{message:'synthetic read failure'}:null};", "const failed=failures.has(name)||failAt.get(name)===(counts.get(name)||0);return{data:failed?null:rows[name]??null,error:failed?{message:'synthetic read failure'}:null};");
 replaceOnce('const filters={},state={signal:null},builder=new Proxy','const filters={},state={signal:null,selection:null},builder=new Proxy');
-replaceOnce("if(key==='then')return object.then;if(key==='eq')", "if(key==='then')return object.then;if(key==='select')return value=>{state.selection=value;return builder};if(key==='eq')");
+replaceOnce("if(key==='then')return object.then;if(key==='eq')", "if(key==='then')return object.then;if(key==='select')return value=>{state.selection=value;return builder};if(key==='in')return(k,v)=>{filters[k]=v;return builder};if(key==='eq')");
 replaceOnce('const response=reply(name,filters,revision);','let response=reply(name,filters,revision);');
 replaceOnce('else await Promise.resolve();bytes+=Buffer.byteLength(JSON.stringify(response));','else await Promise.resolve();if((lateElection&&name===\'office_elections\')||(lateBallot&&(name===\'office_ballots\'||name===\'office_personal_ballots\')))response=reply(name,filters,revision);if(name===\'office_elections\'&&state.selection&&state.selection!==\'*\'&&Array.isArray(response.data))response={...response,data:response.data.map(row=>Object.fromEntries(state.selection.split(\',\').map(key=>[key,row[key]])))};bytes+=Buffer.byteLength(JSON.stringify(response));');
 replaceOnce('subscribe(){rawSubscriptions+=this.handlers.length;channels.add(this);return this}', "subscribe(callback){this.status=callback;rawSubscriptions+=this.handlers.length;channels.add(this);if(!deferSubscribe)callback?.('SUBSCRIBED');return this}");
@@ -38,7 +38,11 @@ async function main(){
  const before=baseline?{}:null,after={};for(const scenario of ['startup','idle','steady']){if(before)before[scenario]=await model(true,scenario);after[scenario]=await model(false,scenario)}
  assert(after.steady.reads<=50000,'The same-table 40-client model stays within its query budget');assert.equal(after.startup.reads,720);assert.equal(after.idle.reads,2880);
  if(before){assert(after.steady.reads<before.steady.reads/2);assert(after.steady.bytes<before.steady.bytes,'Synthetic bytes must decrease: '+JSON.stringify({before,after}))}
- const r=await ready();assert.equal(r.metrics().reads,18,'The first SUBSCRIBED reconciles the initial-read race');assert.deepEqual(r.state(3).map(x=>x.voter_id),['student-A'],'A synthetic secret vote initially exposes only the participant’s ballot');
+ const r=await ready();
+ const initialBallotQueries=r.starts.filter(item=>item.name==='office_ballots'||item.name==='office_personal_ballots');
+ assert(initialBallotQueries.length>=2,'Initial Duma snapshot includes both ballot tables');
+ assert(initialBallotQueries.every(item=>JSON.stringify(item.filters.election_id)==='["election-game-A"]'),'Duma ballot queries must exclude elections outside the three leadership offices');
+ assert.equal(r.metrics().reads,18,'The first SUBSCRIBED reconciles the initial-read race');assert.deepEqual(r.state(3).map(x=>x.voter_id),['student-A'],'A synthetic secret vote initially exposes only the participant’s ballot');
  let base=r.metrics().reads;r.emit('office_personal_ballots');await r.advance(3001);await r.settle();assert.equal(r.metrics().reads-base,3,'A secret personal ballot reads the round, the relevant ballots, and a final status check');assert.equal(r.count('get_my_institution_meeting_permissions'),2,'Ordinary ballots do not repeatedly reload permissions');
  base=r.metrics().reads;r.emit('office_ballots');await r.advance(3001);await r.settle();assert.equal(r.metrics().reads-base,3,'A faction ballot reads the round, relevant ballots, and a final status check');
  base=r.metrics().reads;r.emit('office_personal_ballots');r.emit('office_ballots');await r.advance(3001);await r.settle();assert.equal(r.metrics().reads-base,4,'Different ballot tables merge without dropping either update');
