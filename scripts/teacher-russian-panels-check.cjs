@@ -32,7 +32,7 @@ const pageMarkup='<!doctype html><html lang="ru"><meta name="viewport" content="
  '<div class="teacherRosterToolbar"><input aria-label="Поиск" placeholder="ФИО, должность, идентификатор"><select aria-label="Фильтр"><option>Текущий реестр</option></select><button class="secondary">Обновить</button></div>'+
  '<div class="teacherRosterList"><article class="teacherRosterEntry"><div class="teacherRosterIdentity"><b>Александра Михайловна Константинова</b><div><small>Председатель Государственной Думы Российской Федерации</small></div><small>Последняя активность: 14.10.2026, 16:00</small></div>'+
  '<div class="teacherRosterActions"><button>Исключить</button><button>Очистить профиль и доступ</button></div></article></div>'+
- '<div class="teacherRosterDialog"><h3>Подтверждение доступа</h3><p>Для продолжения введите полное имя участника.</p><label class="teacherRosterConfirm">Введите ФИО<input value=""></label><div class="teacherRosterDialogActions"><button>Подтвердить</button><button>Отмена</button></div></div></section>'+
+ '<dialog class="teacherRosterDialog"><h3>Подтверждение доступа</h3><p>Для продолжения введите полное имя участника.</p><label class="teacherRosterConfirm">Введите ФИО<input value=""></label><div class="teacherRosterDialogActions"><button>Подтвердить</button><button>Отмена</button></div></dialog></section>'+
  '<section class="teacherAccessCodes"><div class="teacherAccessHead"><svg width="20" height="20"></svg><div><h3>Доступ к игре</h3><p>Коды игры и приглашения</p></div></div>'+
  '<div class="teacherCodeGrid"><div class="teacherCodeEditor"><h4>Код игры</h4><label>Новый код<input></label><div class="teacherCodeActions"><button>Сгенерировать</button><button>Сохранить</button></div></div>'+
  '<div class="teacherCodeEditor"><h4>Приглашение</h4><label>Код<input></label><div class="teacherCodeActions"><button>Сгенерировать</button><button>Создать приглашение</button></div></div></div>'+
@@ -44,6 +44,8 @@ const pageMarkup='<!doctype html><html lang="ru"><meta name="viewport" content="
   for(const width of [390,768,1440]){
    const page=await browser.newPage({viewport:{width,height:900}});
    await page.setContent(pageMarkup);
+   await page.evaluate(()=>document.querySelector('dialog.teacherRosterDialog').showModal());
+   assert.equal(await page.locator('dialog.teacherRosterDialog').evaluate(el=>el.matches(':modal')),true,'Confirmation must be a real browser modal');
    const layout=await page.evaluate(()=>{
     const names=['.teacherParticipantRoster','.teacherRosterToolbar','.teacherRosterEntry','.teacherRosterDialog',
       '.teacherAccessCodes','.teacherCodeGrid','.teacherCodeRow'];
@@ -65,8 +67,10 @@ const pageMarkup='<!doctype html><html lang="ru"><meta name="viewport" content="
     assert(control.rect.left>=-1&&control.rect.right<=width+2,'Control leaves viewport at '+width+': '+control.text);
     assert(control.h>=43,'Control too short at '+width+': '+control.text);
    }
+   await page.keyboard.press('Escape');
+   assert.equal(await page.locator('dialog.teacherRosterDialog').evaluate(el=>el.open),false,'Escape must close native test modal');
    await page.close();
-   console.log('PASS: teacher roster and invitations without overlap at '+width+'px');
+   console.log('PASS: teacher roster, visible modal and invitations without overlap at '+width+'px');
   }
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
