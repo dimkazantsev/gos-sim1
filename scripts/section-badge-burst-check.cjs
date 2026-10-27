@@ -62,15 +62,15 @@ async function tick(clients,steps=1){for(let i=0;i<steps;i++){now+=1000;for(cons
  const one=session(77);await tick([one],12);
  const original=one.calls.length;one.event('gos-sims:refresh','chat_messages');await tick([one],3);
  assert.equal(one.calls.length,original,'Unrelated tables do not refresh unread section badges');
- await tick([one],25);one.event();await tick([one],1);
- assert.equal(one.calls.length,original+1,'First relevant notification after quiet period must refresh promptly');
+ await tick([one],25);one.event();await tick([one],11);
+ assert.equal(one.calls.length,original+1,'First relevant notification after quiet period must reconcile within 10 seconds');
  one.visible(false);const beforeHidden=one.calls.length;
  for(let i=0;i<90;i++){one.event();await tick([one],1)}
  assert.equal(one.calls.length,beforeHidden,'Hidden tab sends no badge RPC under events');
  one.visible(true);await tick([one],2);
  assert.equal(one.calls.length,beforeHidden+1,'A returning tab reconciles badges');
- await tick([one],25);one.event('gos-sims:section-updates');await tick([one],1);
- assert.equal(one.calls.length,beforeHidden+2,'Explicit section-read invalidation reconciles promptly when the throttle window has elapsed');
+ await tick([one],25);one.event('gos-sims:section-updates');await tick([one],11);
+ assert.equal(one.calls.length,beforeHidden+2,'Explicit section-read invalidation reconciles within the bounded stagger window');
  one.dispose();
  // A confirmed read removes the old badge locally. The server read should
  // not be duplicated while the staggered initial request is still pending.
