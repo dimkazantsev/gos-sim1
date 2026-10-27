@@ -34,6 +34,7 @@ on:
       - 'components/game/electoralMath.ts'
       - 'scripts/electoral-math-check.cjs'
       - 'app/editorial-news.css'
+      - 'app/2026-october-review.css'
       - 'app/party-governance-justice.css'
       - 'scripts/registry-browser-check.cjs'
       - 'supabase/migrations/*verified_editorial_automatic_news.sql'
