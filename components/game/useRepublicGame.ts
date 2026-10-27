@@ -812,7 +812,7 @@ export function useRepublicGame(gameId:string){
 
  async function loadRepublicOffices(){
   await readSafely(['offices'],async ticket=>{
-  const result=await supabase.from('game_office_assignments').select('*').eq('game_id',gameId).order('created_at');
+  const result=await supabase.from('game_office_assignments').select('id,game_id,user_id,role_title,status,created_at').eq('game_id',gameId).order('created_at');
   if(!readCurrent(ticket))return;
   requireSuccessful([result]);
   setOfficeRows((result.data||[]) as GameOfficeAssignment[]);

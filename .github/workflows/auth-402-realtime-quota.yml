@@ -17,6 +17,7 @@ on:
       - 'scripts/profile-results-load-check.cjs'
       - 'scripts/teacher-readiness-load-check.cjs'
       - 'scripts/republic-game-resilience-check.cjs'
+      - 'scripts/office-projection-check.cjs'
       - 'scripts/local-traffic-snapshot-check.cjs'
       - 'scripts/rest-overload-circuit-check.cjs'
       - 'scripts/request-diagnostics-check.cjs'
@@ -76,6 +77,7 @@ on:
       - 'scripts/profile-results-load-check.cjs'
       - 'scripts/teacher-readiness-load-check.cjs'
       - 'scripts/republic-game-resilience-check.cjs'
+      - 'scripts/office-projection-check.cjs'
       - 'scripts/local-traffic-snapshot-check.cjs'
       - 'scripts/rest-overload-circuit-check.cjs'
       - 'scripts/request-diagnostics-check.cjs'
@@ -138,6 +140,7 @@ jobs:
       - run: node scripts/realtime-targeted-load-check.cjs
       - run: node scripts/chat-overview-100-clients-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
+      - run: node scripts/office-projection-check.cjs
       - run: node scripts/local-traffic-snapshot-check.cjs
       - run: node scripts/device-sync-status-check.cjs
       - run: node scripts/rest-overload-circuit-check.cjs
