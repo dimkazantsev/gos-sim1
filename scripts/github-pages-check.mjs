@@ -17,12 +17,12 @@ assert.ok(favicon.length>500&&favicon.readUInt16LE(0)===0&&favicon.readUInt16LE(
  'Exported favicon must be a real multi-size ICO');
 for(const [name,document] of [['root',readFileSync(join(out,'index.html'),'utf8')],['teacher',teacherHtml]]){
  const head=document.slice(0,document.indexOf('</head>'));
- const iconTags=[...head.matchAll(/<link\\b[^>]*rel="(?:shortcut )?icon"[^>]*>/g)].map(match=>match[0]);
+ const iconTags=[...head.matchAll(/<link\b[^>]*rel="(?:shortcut )?icon"[^>]*>/g)].map(match=>match[0]);
  assert.ok(iconTags.some(tag=>tag.includes('href="'+base+'/favicon.ico?v=20261028-1"')),
   name+' must link to a versioned game-scoped browser icon');
  assert.ok(iconTags.some(tag=>tag.includes('href="'+base+'/icon.svg?v=20261028-1"')),
   name+' must link to a versioned game-scoped SVG icon');
- assert.ok(!iconTags.some(tag=>/href="\\/(?!gos-sim1\\/)/.test(tag)),
+ assert.ok(!iconTags.some(tag=>/href="\/(?!gos-sim1\/)/.test(tag)),
   name+' must not fetch a browser icon outside the GitHub Pages repository');
  assert.ok(head.includes('href="'+base+'/manifest.webmanifest"'),name+' PWA manifest must stay in the app scope');
 }
