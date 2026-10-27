@@ -63,7 +63,10 @@ export function useRepublicGame(gameId:string){
  const lastRealtimeOverviewAt=useRef(0);
  function scheduleRealtimeChatOverview(){
   if(overviewRealtimeTimer.current!==null)return;
-  const delay=Math.max(0,1500-(Date.now()-lastRealtimeOverviewAt.current));
+  // Message bodies arrive via the game Realtime socket; this RPC updates
+  // only the derived chat overview. Coalesce bursts from 100 clients without
+  // delaying delivery of messages or explicit read receipts.
+  const delay=Math.max(0,8000-(Date.now()-lastRealtimeOverviewAt.current));
   overviewRealtimeTimer.current=setTimeout(()=>{
    overviewRealtimeTimer.current=null;
    if(!alive.current||!authUser.current||document.visibilityState==='hidden')return;
