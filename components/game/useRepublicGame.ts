@@ -99,6 +99,7 @@ export function useRepublicGame(gameId:string){
    else coreReadQueue.current.waiting.push(run);
   });
  }
+ const lastPresenceWrite=useRef({scope:'',view:'',at:0});
  const assetSignatures=useRef(new Map<string,{expiresAt:number;promise:Promise<string|null>}>());
  const assetSignQueue=useRef({active:0,waiting:[] as Array<()=>void>});
  function signedAssetUrl(bucket:'game-assets'|'game-media',path:string,force=false):Promise<string|null>{
@@ -729,7 +730,7 @@ export function useRepublicGame(gameId:string){
   // Rapid view navigation can reuse recently updated common data.
   // Realtime, recovery and explicit refresh still force the core read.
   const jobs:Promise<unknown>[]=[loadRepublicOffices()];
-  if(!allowFreshCore||Date.now()-lastCoreSuccessAt.current>15000)jobs.unshift(loadCoreSections());
+  if(!allowFreshCore||Date.now()-lastCoreSuccessAt.current>60000)jobs.unshift(loadCoreSections());
   const view=activeViewRef.current;
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets());
   // Teacher dossiers must fetch document rows, not just party representation.
@@ -1145,13 +1146,19 @@ export function useRepublicGame(gameId:string){
  async function touchPresence(viewKey:string,label?:string){
   if(typeof document!=='undefined'&&document.visibilityState==='hidden')return;
   const uid=me?.user_id;if(!uid||authUser.current!==uid)return;
-  const scope=gameId+':'+uid;
-  if(presenceInFlight.current!==scope){
-   presenceInFlight.current=scope;
-   try{await supabase.from('game_presence').upsert({game_id:gameId,user_id:uid,current_view:viewKey,last_seen_at:new Date().toISOString()},{onConflict:'game_id,user_id'});}
-   finally{if(presenceInFlight.current===scope)presenceInFlight.current='';}
-  }
-  if(label)await logActivity('navigation',label,viewKey);
+  const scope=gameId+':'+uid,now=Date.now();
+  // Presence is a heartbeat. Duplicate focus/rerender events are not new actions.
+  const previous=lastPresenceWrite.current;
+  if(previous.scope===scope&&previous.view===viewKey&&now-previous.at<60000)return;
+  if(presenceInFlight.current===scope)return;
+  presenceInFlight.current=scope;
+  lastPresenceWrite.current={scope,view:viewKey,at:now};
+  try{
+   const response=await supabase.from('game_presence').upsert({
+    game_id:gameId,user_id:uid,current_view:viewKey,last_seen_at:new Date(now).toISOString()
+   },{onConflict:'game_id,user_id'});
+   if(!response.error&&label)await logActivity('navigation',label,viewKey);
+  }finally{if(presenceInFlight.current===scope)presenceInFlight.current=''}
  }
 
  async function logout(){await supabase.auth.signOut();router.replace('/')}

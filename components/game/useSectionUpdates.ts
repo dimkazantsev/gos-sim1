@@ -13,6 +13,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   if(!gameId||!userId||readOnly)return;
   let live=true,running=false,queued=false,blocked=false;
   let lastFallbackAt=Date.now(),lastFocusAt=0,lastStartedAt=0,recoveryAfter=0;
+  const userJitter=[...userId].reduce((n,c)=>(Math.imul(n,33)+c.charCodeAt(0))>>>0,0)%9000;
   let pending:ReturnType<typeof setTimeout>|undefined;
   async function load(){
    if(!live||blocked||document.visibilityState!=='visible'||Date.now()<recoveryAfter)return;
@@ -21,7 +22,8 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
    try{
     const r=await supabase.rpc('get_section_updates',{p_game_id:gameId});
     if(r.status===402)blocked=true;
-    if(r.error&&['PGRST003','57014'].includes(r.error.code))recoveryAfter=Date.now()+90000;
+    if(r.error&&['PGRST003','57014'].includes(r.error.code))recoveryAfter=Date.now()+120000;
+    else if(r.status>=500)recoveryAfter=Date.now()+90000;
     if(live&&!r.error&&r.data)setCounts(r.data as Record<string,number>);
    }catch{recoveryAfter=Date.now()+30000}
    finally{running=false;if(queued&&live){queued=false;schedule()}}
@@ -37,23 +39,24 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   };
   const focused=()=>{
    if(document.visibilityState!=='visible')return;
-   const now=Date.now();if(now-lastFocusAt<20000)return;
+   const now=Date.now();if(now-lastFocusAt<60000)return;
    lastFocusAt=now;schedule();
   };
-  void load();
+  // Spread initial counters across classroom clients.
+  const initial=setTimeout(()=>void load(),600+userJitter);
   const poll=setInterval(()=>{
    if(document.visibilityState!=='visible')return;
    const now=Date.now();
    // The shared game WebSocket delivers invalidation events immediately.
    // Poll rarely while subscribed, but retain 30-40s recovery offline.
-   if(gameRealtimeConnected(gameId)&&now-lastFallbackAt<180000)return;
+   if(gameRealtimeConnected(gameId)&&now-lastFallbackAt<300000)return;
    lastFallbackAt=now;schedule();
-  },30000+Math.floor(Math.random()*10000));
+  },90000+userJitter);
   window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidated);
   window.addEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated);
   window.addEventListener('focus',focused);
   document.addEventListener('visibilitychange',focused);
-  return()=>{live=false;clearTimeout(pending);clearInterval(poll);window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidated);window.removeEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated);window.removeEventListener('focus',focused);document.removeEventListener('visibilitychange',focused)};
+  return()=>{live=false;clearTimeout(initial);clearTimeout(pending);clearInterval(poll);window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidated);window.removeEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated);window.removeEventListener('focus',focused);document.removeEventListener('visibilitychange',focused)};
  },[gameId,userId,readOnly]);
  useEffect(()=>{
   if(!gameId||!userId||readOnly||!READABLE_SECTIONS.has(view))return;
