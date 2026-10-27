@@ -38,7 +38,7 @@ export default function DeviceSyncStatus({gameId,userId,realtimeState}:{
  const label=disconnected?'Нет сети':phase==='saving'?'Сохраняем':
   phase==='saved'?'На устройстве':phase==='failed'?'Не сохранено':phase==='checking'?'Проверяем':'Загружаем';
  const explanation=disconnected?'Соединение отсутствует. Новые игровые действия требуют подключения к серверу.':
-  realtimeState==='connected'?'Игровые обновления приходят через Realtime.':'Синхронизация с сервером восстанавливается.';
+  realtimeState==='connected'?'Игровые изменения передаются по защищённому соединению.':'Синхронизация с сервером восстанавливается.';
  const title=label+' · ГОС.ID';
  const count=info?info.stages+info.metrics+info.events:0;
  return <details className={'deviceSyncStatus state-'+(disconnected?'offline':phase)}>
