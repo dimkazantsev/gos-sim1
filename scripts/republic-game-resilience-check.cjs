@@ -94,6 +94,7 @@ function harness({effects=false,compiledCode=code}={}){
   if(name==='react')return react;
   if(name==='next/navigation')return{useRouter:()=>({replace:target=>redirects.push(target)})};
   if(name==='@/lib/supabase')return{supabase};
+  if(name==='@/lib/localGameSnapshot')return{readLocalGameSnapshot:async()=>null,writeLocalGameSnapshot:async()=>{},deleteLocalGameSnapshot:async()=>{}};
   if(name==='@/lib/userError')return{userError:error=>String(error?.message||error)};
   if(name==='@/lib/resolveStoredAsset'){
    const raw=fs.readFileSync(path.join(root,'lib/resolveStoredAsset.ts'),'utf8');
