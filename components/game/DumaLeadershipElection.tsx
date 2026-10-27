@@ -5,17 +5,25 @@ import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {Landmark,ClipboardList,CheckCircle2,FileClock} from 'lucide-react';
 import {isStageWorkOpen} from './stageWorkStatus';
-import {notifyGameDataRefresh,useGameTableSync} from './useGameTableSync';
+import {GAME_DATA_REFRESH_EVENT,notifyGameDataRefresh,useGameTableSync} from './useGameTableSync';
 
 type Election={id:string;game_id:string;office_key:'gd_chair'|'gd_deputy_1'|'gd_deputy_2';office_title:string;round_no:1|2;vote_mode:'open'|'secret';status:'nomination'|'open'|'closed'|'finished';ballot_mode?:'faction'|'personal';winner_candidate_id:string|null;parent_election_id:string|null;created_at:string};
 type OfficeCandidate={id:string;election_id:string;user_id:string;party_id:string;created_at:string};
 type OfficeBallot={id:string;election_id:string;party_id:string;candidate_id:string;votes:number;submitted_by:string;updated_at:string};
+type ElectionState=Pick<Election,'id'|'status'|'vote_mode'|'ballot_mode'|'winner_candidate_id'>;
 
 const offices=[
  ['gd_chair','Председатель ГД'],
  ['gd_deputy_1','Заместитель №1'],
  ['gd_deputy_2','Заместитель №2']
 ] as const;
+function sameElectionState(left:ElectionState[],right:ElectionState[]){
+ const previous=new Map(left.map(row=>[row.id,row]));
+ return previous.size===right.length&&right.every(row=>{
+  const old=previous.get(row.id);
+  return !!old&&old.status===row.status&&old.vote_mode===row.vote_mode&&old.ballot_mode===row.ballot_mode&&old.winner_candidate_id===row.winner_candidate_id;
+ });
+}
 
 export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepublic;onOpenVotes?:(id?:string)=>void}){
  const {game,me,teacher,members,parties,setError,gdMandateCapacity,gdEffectivePresence}=g;
@@ -32,6 +40,7 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
  const [nominee,setNominee]=useState<Record<string,string>>({});
  const [voteDraft,setVoteDraft]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
+ const electionsRef=useRef(elections);electionsRef.current=elections;
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  const stageActive=isStageWorkOpen(game,g.stages.find(st=>st.stage_no===4));
  const scope=JSON.stringify([game?.id,game?.status,stageActive,me?.user_id,me?.kind,me?.role_title,me?.team,me?.roster_archived_at,teacher]);
@@ -40,6 +49,9 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
  const reads=useRef({scope,promise:null as Promise<void>|null,queued:false,explicit:false,cancel:null as (()=>void)|null});
  if(reads.current.scope!==scope)reads.current={scope,promise:null,queued:false,explicit:false,cancel:null};
  const readState=reads.current;
+ const invalidations=useRef({scope,full:true,tables:new Set<string>(),lastFull:0});
+ if(invalidations.current.scope!==scope)invalidations.current={scope,full:true,tables:new Set<string>(),lastFull:0};
+ const pending=invalidations.current;
  const scopeCurrent=()=>alive.current&&activeScope.current===scope;
  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
  useEffect(()=>{
@@ -51,60 +63,120 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
   const state=reads.current;state.explicit=state.explicit||!background;
   if(state.promise){state.queued=true;return state.promise}
   state.promise=(async()=>{
+   let reconciliationRetries=0;
    do{
     state.queued=false;const passive=!state.explicit;state.explicit=false;
+    const ballotOnly=passive&&!pending.full&&pending.tables.size>0&&[...pending.tables].every(table=>table==='office_ballots'||table==='office_personal_ballots');
+    if(passive&&!pending.full&&!pending.tables.size&&Date.now()-pending.lastFull<180000)continue;
+    const ballotTables=new Set(pending.tables);pending.tables.clear();pending.full=false;
+    let succeeded=false,escalating=false;
     const controller=new AbortController();
     const current=()=>scopeCurrent()&&!controller.signal.aborted&&(!passive||document.visibilityState==='visible');
+    const reconcile=()=>{
+     if(reconciliationRetries>=2){pending.full=true;state.queued=false;state.explicit=false;setError('Результаты выборов продолжают меняться. Повторите обновление через несколько секунд.');return}
+     reconciliationRetries++;state.explicit=true;state.queued=true;escalating=true;
+    };
     let timeout:ReturnType<typeof setTimeout>|undefined;
     try{
      await Promise.race([(async()=>{
-      // Four reads at a time cap the initial classroom burst without changing ballot rules.
-      const [e,c,b,p]=await Promise.all([
-       supabase.from('office_elections').select('*').eq('game_id',game.id).eq('stage_no',4).in('office_key',['gd_chair','gd_deputy_1','gd_deputy_2']).order('created_at',{ascending:true}).abortSignal(controller.signal),
-       supabase.from('office_candidates').select('*').eq('game_id',game.id).order('created_at').abortSignal(controller.signal),
-       supabase.from('office_ballots').select('*').eq('game_id',game.id).abortSignal(controller.signal),
-       supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id).abortSignal(controller.signal)
+      // Read elections before full ballot snapshots so a closed secret vote is not paired with an older partial snapshot.
+      const [e,c,fastB,fastP]=await Promise.all([
+       (ballotOnly?supabase.from('office_elections').select('id,status,vote_mode,ballot_mode,winner_candidate_id'):supabase.from('office_elections').select('*')).eq('game_id',game.id).eq('stage_no',4).in('office_key',['gd_chair','gd_deputy_1','gd_deputy_2']).order('created_at',{ascending:true}).abortSignal(controller.signal),
+       ballotOnly?null:supabase.from('office_candidates').select('*').eq('game_id',game.id).order('created_at').abortSignal(controller.signal),
+       ballotOnly&&ballotTables.has('office_ballots')?supabase.from('office_ballots').select('*').eq('game_id',game.id).abortSignal(controller.signal):null,
+       ballotOnly&&ballotTables.has('office_personal_ballots')?supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id).abortSignal(controller.signal):null
       ]);
       if(!current())return;
-      if(!e.error)setElections((e.data||[]) as Election[]);
-      if(!c.error)setCandidates((c.data||[]) as OfficeCandidate[]);
-      if(!b.error)setBallots((b.data||[]) as OfficeBallot[]);
-      if(!p.error)setPersonalBallots(p.data||[]);
-      const firstError=[e,c,b,p].find(x=>x.error)?.error;if(firstError)setError(userError(firstError));
-      const [m,r,v,permissions]=await Promise.all([
-       supabase.from('party_member_mandates').select('user_id,party_id,base_mandates,effective_mandates').eq('game_id',game.id).abortSignal(controller.signal),
-       supabase.from('institution_session_registrations').select('user_id,stage_no,institution_key,present_mandates').eq('game_id',game.id).eq('stage_no',4).eq('institution_key','gd').abortSignal(controller.signal),
-       supabase.from('game_votes').select('id,status,result_code').eq('game_id',game.id).eq('stage_no',4).eq('procedure_key','gd_leadership_procedure').abortSignal(controller.signal),
-       supabase.rpc('get_my_institution_meeting_permissions',{p_game_id:game.id,p_stage_no:4,p_institution:'gd'}).abortSignal(controller.signal)
+      if(e.error){setError(userError(e.error));return}
+      const next=(e.data||[]) as ElectionState[];
+      // A transition may reveal all secret ballots, create a runoff or change meeting permissions.
+      if(ballotOnly&&!sameElectionState(electionsRef.current,next)){reconcile();return}
+      const [b,p,m,r]=await Promise.all([
+       ballotOnly?fastB:supabase.from('office_ballots').select('*').eq('game_id',game.id).abortSignal(controller.signal),
+       ballotOnly?fastP:supabase.from('office_personal_ballots').select('election_id,voter_id,party_id,candidate_id').eq('game_id',game.id).abortSignal(controller.signal),
+       ballotOnly?null:supabase.from('party_member_mandates').select('user_id,party_id,base_mandates,effective_mandates').eq('game_id',game.id).abortSignal(controller.signal),
+       ballotOnly?null:supabase.from('institution_session_registrations').select('user_id,stage_no,institution_key,present_mandates').eq('game_id',game.id).eq('stage_no',4).eq('institution_key','gd').abortSignal(controller.signal)
       ]);
       if(!current())return;
-      if(!m.error)setPersonalMandates(m.data||[]);
-      if(!r.error)setRegistrations(r.data||[]);
-      if(!v.error)setProcedureVotes(v.data||[]);
-      if(!permissions.error)setCanCoordinate(!!permissions.data?.can_coordinate);
-      const secondError=[m,r,v,permissions].find(x=>x.error)?.error;if(secondError)setError(userError(secondError));
+      const checkSecret=next.some(row=>row.vote_mode==='secret'&&row.status==='open');
+      const [v,permissions,confirmation]=await Promise.all([
+       ballotOnly?null:supabase.from('game_votes').select('id,status,result_code').eq('game_id',game.id).eq('stage_no',4).eq('procedure_key','gd_leadership_procedure').abortSignal(controller.signal),
+       ballotOnly?null:supabase.rpc('get_my_institution_meeting_permissions',{p_game_id:game.id,p_stage_no:4,p_institution:'gd'}).abortSignal(controller.signal),
+       checkSecret?supabase.from('office_elections').select('id,status,vote_mode,ballot_mode,winner_candidate_id').eq('game_id',game.id).eq('stage_no',4).in('office_key',['gd_chair','gd_deputy_1','gd_deputy_2']).order('created_at',{ascending:true}).abortSignal(controller.signal):null
+      ]);
+      if(!current())return;
+      if(confirmation?.error){setError(userError(confirmation.error));return}
+      if(confirmation&&!sameElectionState(next,(confirmation.data||[]) as ElectionState[])){reconcile();return}
+      const error=[c,b,p,m,r,v,permissions].find(x=>x?.error)?.error;
+      if(error)setError(userError(error));
+      const changed=!sameElectionState(electionsRef.current,next);
+      // Preserve the last coherent snapshot when either ballot read fails during a transition.
+      const coherent=!changed||!(b?.error||p?.error);
+      if(coherent){if(!ballotOnly){electionsRef.current=next as Election[];setElections(next as Election[])}if(b&&!b.error)setBallots((b.data||[]) as OfficeBallot[]);if(p&&!p.error)setPersonalBallots(p.data||[])}
+      if(c&&!c.error)setCandidates((c.data||[]) as OfficeCandidate[]);
+      if(m&&!m.error)setPersonalMandates(m.data||[]);
+      if(r&&!r.error)setRegistrations(r.data||[]);
+      if(v&&!v.error)setProcedureVotes(v.data||[]);
+      if(permissions&&!permissions.error)setCanCoordinate(!!permissions.data?.can_coordinate);
+      succeeded=!error;
      })(),new Promise<never>((_,reject)=>{
       state.cancel=()=>{clearTimeout(timeout);controller.abort();reject(new Error('Обновление выборов отменено.'))};
       timeout=setTimeout(()=>{controller.abort();reject(new Error('Не удалось обновить выборы: сервер не ответил вовремя.'))},12000);
      })]);
     }catch(error){if(scopeCurrent()&&(!passive||document.visibilityState==='visible'))setError(userError(error))}
-    finally{clearTimeout(timeout);state.cancel=null}
+    finally{
+     clearTimeout(timeout);state.cancel=null;
+     if(succeeded&&!ballotOnly)pending.lastFull=Date.now();
+     else if(!succeeded&&!escalating){if(ballotOnly)for(const table of ballotTables)pending.tables.add(table);else pending.full=true}
+    }
    }while(state.queued&&scopeCurrent());
   })().finally(()=>{state.promise=null});
   return state.promise;
  }
+ useEffect(()=>{
+  if(!game)return;
+  const tables=['office_elections','office_candidates','office_ballots','office_personal_ballots','party_member_mandates','game_votes','institution_session_registrations'];
+  const local=(event:Event)=>{
+   const detail=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
+   if(!scopeCurrent()||detail?.gameId!==game.id)return;
+   if(!detail.table)pending.full=true;
+   else if(tables.includes(detail.table)){
+    if(detail.table==='office_ballots'||detail.table==='office_personal_ballots')pending.tables.add(detail.table);
+    else pending.full=true;
+   }
+  };
+  const recover=()=>{pending.full=true};
+  window.addEventListener(GAME_DATA_REFRESH_EVENT,local);window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',recover);
+  return()=>{window.removeEventListener(GAME_DATA_REFRESH_EVENT,local);window.removeEventListener('focus',recover);window.removeEventListener('online',recover);document.removeEventListener('visibilitychange',recover)};
+ },[scope]);
  useGameTableSync(me?.user_id?game?.id:undefined,['office_elections','office_candidates','office_ballots','office_personal_ballots','party_member_mandates','game_votes','institution_session_registrations'],()=>load(true),scope,undefined,3000,180000);
  useEffect(()=>{
   if(!game||!me)return;
+  const refresh=(table:string,payload:{eventType?:string;new?:Record<string,unknown>}|undefined)=>{
+   if(!scopeCurrent())return;
+   if(payload?.new?.game_id&&payload.new.game_id!==game.id)return;
+   const row=payload?.new;
+   const fields=table==='office_elections'?['id','office_key','status']:table==='office_candidates'?['id','election_id','user_id']:table==='office_ballots'?['id','election_id','party_id','candidate_id']:table==='office_personal_ballots'?['election_id','voter_id','party_id','candidate_id']:['party_id','user_id'];
+   const complete=(payload?.eventType==='INSERT'||payload?.eventType==='UPDATE')&&row?.game_id===game.id&&fields.every(field=>typeof row[field]==='string');
+   if(!complete)pending.full=true;
+   notifyGameDataRefresh(game.id,table);
+  };
+  let recoveryTimer:ReturnType<typeof setTimeout>|undefined,lastRecovery=0;
+  const recoveryJitter=[...me.user_id].reduce((hash,char)=>(Math.imul(hash,31)+char.charCodeAt(0))>>>0,0)%1500;
   // These five published tables are watched only while this election panel is mounted.
   const ch=supabase.channel('duma-leadership:'+game.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'office_elections',filter:'game_id=eq.'+game.id},()=>{if(scopeCurrent())notifyGameDataRefresh(game.id,'office_elections')})
-   .on('postgres_changes',{event:'*',schema:'public',table:'office_candidates',filter:'game_id=eq.'+game.id},()=>{if(scopeCurrent())notifyGameDataRefresh(game.id,'office_candidates')})
-   .on('postgres_changes',{event:'*',schema:'public',table:'office_ballots',filter:'game_id=eq.'+game.id},()=>{if(scopeCurrent())notifyGameDataRefresh(game.id,'office_ballots')})
-   .on('postgres_changes',{event:'*',schema:'public',table:'office_personal_ballots',filter:'game_id=eq.'+game.id},()=>{if(scopeCurrent())notifyGameDataRefresh(game.id,'office_personal_ballots')})
-   .on('postgres_changes',{event:'*',schema:'public',table:'party_member_mandates',filter:'game_id=eq.'+game.id},()=>{if(scopeCurrent())notifyGameDataRefresh(game.id,'party_member_mandates')})
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
+   .on('postgres_changes',{event:'*',schema:'public',table:'office_elections',filter:'game_id=eq.'+game.id},payload=>refresh('office_elections',payload))
+   .on('postgres_changes',{event:'*',schema:'public',table:'office_candidates',filter:'game_id=eq.'+game.id},payload=>refresh('office_candidates',payload))
+   .on('postgres_changes',{event:'*',schema:'public',table:'office_ballots',filter:'game_id=eq.'+game.id},payload=>refresh('office_ballots',payload))
+   .on('postgres_changes',{event:'*',schema:'public',table:'office_personal_ballots',filter:'game_id=eq.'+game.id},payload=>refresh('office_personal_ballots',payload))
+   .on('postgres_changes',{event:'*',schema:'public',table:'party_member_mandates',filter:'game_id=eq.'+game.id},payload=>refresh('party_member_mandates',payload))
+   .subscribe(status=>{
+    if(status!=='SUBSCRIBED'||!scopeCurrent())return;
+    pending.full=true;
+    if(recoveryTimer!==undefined)return;
+    recoveryTimer=setTimeout(()=>{recoveryTimer=undefined;lastRecovery=Date.now();if(scopeCurrent())void load(true)},Math.max(recoveryJitter,lastRecovery+3000-Date.now()));
+   });
+  return()=>{clearTimeout(recoveryTimer);void supabase.removeChannel(ch)}
  },[scope]);
 
  const sorted=useMemo(()=>[...elections].sort((a,b)=>a.office_key.localeCompare(b.office_key)||a.round_no-b.round_no),[elections]);

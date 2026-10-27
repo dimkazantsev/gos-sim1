@@ -5,15 +5,29 @@ on:
     paths:
       - 'components/game/Achievements.tsx'
       - 'components/game/achievementPreview.ts'
+      - 'components/game/ProfileView.tsx'
+      - 'components/GameClient.tsx'
       - 'scripts/achievement-nightly-*.cjs'
       - 'scripts/achievement-preview-check.cjs'
       - 'supabase/migrations/*achievement_nightly_snapshots.sql'
+      - 'supabase/migrations/*achievement_nightly_evaluation_safeguard.sql'
+      - 'supabase/migrations/*throttle_expensive_achievement_scans.sql'
+      - 'supabase/changes/20261002_achievement_visibility.sql'
+      - 'supabase/changes/20261002_achievement_catalog.sql'
       - '.github/workflows/achievement-nightly.yml'
   pull_request:
     paths:
       - 'components/game/Achievements.tsx'
+      - 'components/game/achievementPreview.ts'
+      - 'components/game/ProfileView.tsx'
+      - 'components/GameClient.tsx'
       - 'scripts/achievement-nightly-*.cjs'
+      - 'scripts/achievement-preview-check.cjs'
       - 'supabase/migrations/*achievement_nightly_snapshots.sql'
+      - 'supabase/migrations/*achievement_nightly_evaluation_safeguard.sql'
+      - 'supabase/migrations/*throttle_expensive_achievement_scans.sql'
+      - 'supabase/changes/20261002_achievement_visibility.sql'
+      - 'supabase/changes/20261002_achievement_catalog.sql'
       - '.github/workflows/achievement-nightly.yml'
 permissions:
   contents: read

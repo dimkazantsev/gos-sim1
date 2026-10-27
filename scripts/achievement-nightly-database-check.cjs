@@ -5,6 +5,8 @@ const {PGlite}=require('@electric-sql/pglite');
 const previous=fs.readFileSync(path.join(work,'supabase/changes/20261002_achievement_visibility.sql'),'utf8');
 const originalRead=previous.slice(previous.indexOf('create or replace function public.get_game_achievements('),previous.indexOf('revoke all on function public.get_teacher_achievements'));
 const migration=path.join(work,'supabase/migrations/20261025124344_achievement_nightly_snapshots.sql');
+const oldGate=path.join(work,'supabase/migrations/20261025195500_throttle_expensive_achievement_scans.sql');
+const safeguard=path.join(work,'supabase/migrations/20261027010000_achievement_nightly_evaluation_safeguard.sql');
 const id=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
 const game=id(1000),foreignGame=id(1001),teacher=id(100),observer=id(101);
 async function main(){
@@ -53,6 +55,15 @@ async function main(){
    console.log('REPRODUCED: two ordinary achievement reads invoke expensive facts twice. No live calls.');return;
   }
   await db.exec(fs.readFileSync(migration,'utf8'));
+  // Reproduce the real migration order, then roll back its synthetic evaluation.
+  await db.exec('BEGIN');
+  await db.exec(fs.readFileSync(oldGate,'utf8'));
+  await db.query('SELECT public.evaluate_game_achievements($1)',[game]);
+  assert.equal((await db.query('SELECT count(*)::int n FROM private.fixture_calls')).rows[0].n,3,'The later old gate reintroduces a daytime facts scan');
+  await db.exec('ROLLBACK');
+  await db.exec(fs.readFileSync(oldGate,'utf8'));
+  await db.exec(fs.readFileSync(safeguard,'utf8'));
+  await db.query("INSERT INTO private.achievement_evaluation_gate VALUES($1,$2,now()-interval '9 minutes')",[game,id(1)]);
   const preEarned='medal-061';
   await db.query("INSERT INTO public.game_achievements VALUES($1,$2,$3,'2026-10-01T00:00:00Z','2026-10-02T00:00:00Z')",[game,id(1),preEarned]);
   async function read(user=id(1)){return(await db.query('SELECT public.get_game_achievements($1,$2) result',[game,user])).rows[0].result}
@@ -69,8 +80,14 @@ async function main(){
   await assert.rejects(db.query('SELECT private.run_nightly_achievements()'),/permission denied/);
   await assert.rejects(db.query('SELECT private.achievement_facts($1,$2)',[game,id(1)]),/permission denied/);
   await assert.rejects(db.query('SELECT public.get_game_achievements($1,$2)',[foreignGame,id(1)]),/Награды этого профиля недоступны/);
+  assert.equal((await db.query('SELECT public.evaluate_game_achievements($1) n',[foreignGame])).rows[0].n,0,'A student outside another game cannot trigger a calculation');
   await db.exec('RESET ROLE');
   assert.equal((await db.query('SELECT count(*)::int n FROM private.fixture_calls')).rows[0].n,2,'New daytime reads and compatibility calls never collect facts');
+  assert.equal((await db.query("SELECT has_function_privilege('anon','public.evaluate_game_achievements(uuid)','EXECUTE') allowed")).rows[0].allowed,false,'Anonymous callers cannot execute the compatibility RPC');
+  assert.equal((await db.query("SELECT has_function_privilege('authenticated','public.evaluate_game_achievements(uuid)','EXECUTE') allowed")).rows[0].allowed,true,'Authenticated clients retain compatibility');
+  await db.exec('SET ROLE anon');
+  await assert.rejects(db.query('SELECT public.evaluate_game_achievements($1)',[game]),/permission denied/);
+  await db.exec('RESET ROLE');
   for(const user of [teacher,observer]){
    await db.query("SELECT set_config('request.jwt.claim.sub',$1,false)",[user]);
    assert.equal((await db.query('SELECT public.evaluate_game_achievements($1) n',[game])).rows[0].n,0);
@@ -120,6 +137,8 @@ async function main(){
   assert.equal(job[0].schedule,'1-10,12-30,32-50,52-59 20 * * *');
   assert.match(job[0].command,/statement_timeout\s*=\s*'15s'/);
   await db.exec(fs.readFileSync(migration,'utf8'));
+  await db.exec(fs.readFileSync(safeguard,'utf8'));
+  await db.exec(fs.readFileSync(safeguard,'utf8'));
   assert.equal((await db.query('SELECT count(*)::int n FROM cron.job')).rows[0].n,1,'Applying the migration again keeps one named job');
   assert.equal((await db.query("SELECT has_table_privilege('authenticated','private.achievement_snapshots','SELECT') allowed")).rows[0].allowed,false);
   assert.equal((await db.query("SELECT has_function_privilege('authenticated','private.run_nightly_achievements(timestamptz)','EXECUTE') allowed")).rows[0].allowed,false);
