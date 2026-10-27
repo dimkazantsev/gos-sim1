@@ -18,6 +18,9 @@ on:
       - 'scripts/local-traffic-snapshot-check.cjs'
       - 'scripts/rest-overload-circuit-check.cjs'
       - 'lib/localGameSnapshot.ts'
+      - 'components/game/DeviceSyncStatus.tsx'
+      - 'app/device-sync-status.css'
+      - 'scripts/device-sync-status-check.cjs'
       - 'components/game/Blitz*.tsx'
       - 'components/game/BudgetAmendments.tsx'
       - 'components/game/CivicDiscussion.tsx'
@@ -69,6 +72,9 @@ on:
       - 'scripts/local-traffic-snapshot-check.cjs'
       - 'scripts/rest-overload-circuit-check.cjs'
       - 'lib/localGameSnapshot.ts'
+      - 'components/game/DeviceSyncStatus.tsx'
+      - 'app/device-sync-status.css'
+      - 'scripts/device-sync-status-check.cjs'
       - 'components/game/Blitz*.tsx'
       - 'components/game/BudgetAmendments.tsx'
       - 'components/game/CivicDiscussion.tsx'
@@ -122,6 +128,7 @@ jobs:
       - run: node scripts/realtime-targeted-load-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
       - run: node scripts/local-traffic-snapshot-check.cjs
+      - run: node scripts/device-sync-status-check.cjs
       - run: node scripts/rest-overload-circuit-check.cjs
       - run: node scripts/event-workspace-load-check.cjs
       - run: node scripts/election-panels-load-check.cjs
