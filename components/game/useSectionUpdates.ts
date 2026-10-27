@@ -34,11 +34,11 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
    }catch{recoveryAfter=Date.now()+30000}
    finally{running=false;if(queued&&live){queued=false;schedule()}}
   }
-  function schedule(){
+  function schedule(userInitiated=false){
    if(!live||blocked||initialPending||pending!==undefined||document.visibilityState!=='visible')return;
    // Cold invalidation: stagger simultaneous classroom broadcasts as well as
    // the initial bootstrap. Inside the 15-second window, retain the cap.
-   pending=setTimeout(()=>{pending=undefined;void load()},Math.max(250+userJitter,15000-(Date.now()-lastStartedAt)));
+   pending=setTimeout(()=>{pending=undefined;void load()},Math.max(userInitiated?250:250+userJitter,15000-(Date.now()-lastStartedAt)));
   }
   const invalidated=(e:Event)=>{
    const detail=(e as CustomEvent<{gameId:string;table?:string}>).detail;
@@ -50,7 +50,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   const focused=()=>{
    if(document.visibilityState!=='visible')return;
    const now=Date.now();if(now-lastFocusAt<60000)return;
-   lastFocusAt=now;schedule();
+   lastFocusAt=now;schedule(true);
   };
   // Spread initial counters across classroom clients.
   const initial=setTimeout(()=>{initialPending=false;void load()},600+userJitter);
