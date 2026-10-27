@@ -18,7 +18,8 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   if(!gameId||!userId||readOnly)return;
   let live=true,running=false,queued=false,blocked=false,initialPending=true;
   let lastFallbackAt=Date.now(),lastFocusAt=0,lastStartedAt=0,recoveryAfter=0;
-  const userJitter=[...userId].reduce((n,c)=>(Math.imul(n,33)+c.charCodeAt(0))>>>0,0)%9000;
+  // FNV-1a avoids grouping sequential participant IDs into the same second.
+  const userJitter=[...userId].reduce((hash,char)=>Math.imul(hash^char.charCodeAt(0),16777619)>>>0,2166136261)%9000;
   let pending:ReturnType<typeof setTimeout>|undefined;
   async function load(){
    if(!live||blocked||document.visibilityState!=='visible'||Date.now()<recoveryAfter)return;
