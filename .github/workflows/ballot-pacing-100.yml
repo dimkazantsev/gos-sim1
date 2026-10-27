@@ -1,0 +1,35 @@
+name: 100-client scoped ballot pacing
+on:
+  push:
+    branches: ['perf/ballot-poll-spread-100-20261028']
+    paths:
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/ballot-poll-spread-100-clients-check.cjs'
+      - 'scripts/forty-sessions-realtime-budget-check.cjs'
+      - '.github/workflows/ballot-pacing-100.yml'
+  pull_request:
+    paths:
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/ballot-poll-spread-100-clients-check.cjs'
+      - 'scripts/forty-sessions-realtime-budget-check.cjs'
+      - '.github/workflows/ballot-pacing-100.yml'
+permissions:
+  contents: read
+concurrency:
+  group: ballot-100-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  paced-ballots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/ballot-poll-spread-100-clients-check.cjs
+      - run: node scripts/forty-sessions-realtime-budget-check.cjs
+      - run: node scripts/realtime-targeted-load-check.cjs
+      - run: npm run typecheck

@@ -24,6 +24,8 @@ type ReadScope='all'|'core'|'game'|'stages'|'votes'|'members'|'metrics'|'telemet
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
 const BOOTSTRAP_TIMEOUT_MS=12000;
 const SESSION_BOOTSTRAP_TIMEOUT_MS=16000;
+// Explicit projection avoids transferring unused ballot timestamps to every classroom client.
+const GAME_BALLOT_COLUMNS='vote_id,voter_id,choice,weight,yes_weight,no_weight,abstain_weight';
 async function within<T>(promise:PromiseLike<T>,ms=BOOTSTRAP_TIMEOUT_MS,label='Запрос к серверу'):Promise<T>{
  let timer:ReturnType<typeof setTimeout>|undefined;
  try{return await Promise.race([Promise.resolve(promise),new Promise<T>((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+' не завершился за '+Math.round(ms/1000)+' с. '+(label==='Проверка сессии'?'Сервер авторизации отвечает слишком долго. Повторите вход.':'Сервер игровых данных не отвечает.'))),ms)})])}
@@ -479,7 +481,7 @@ export function useRepublicGame(gameId:string){
   // Realtime handles unread counters while chat is closed. Full chat recovery
   // runs only for an actively open conversation.
   let lastChatRecoveryAt=Date.now();
-  const chatRecovery=setInterval(()=>{
+  const recoverVisibleChatAndBallots=()=>{
    if(document.visibilityState!=='visible'||!currentConnection())return;
    // Ordinary ballots are outside Realtime publication; reconcile only open
    // procedures on their visible screens, using the existing six-second timer.
@@ -496,9 +498,22 @@ export function useRepublicGame(gameId:string){
    lastChatRecoveryAt=now;
    if(channelRef.current)void loadRecentChatMessages(channelRef.current);
    void loadChatOverview();
-  },6000);
+  };
+  // Spread identical six-second recovery work across the classroom, instead
+  // of making 100 devices hit PostgREST at the same wall-clock instant.
+  // Keep the interval itself at six seconds: no additional staleness window.
+  const recoveryHash=[...me.user_id].reduce((hash,char)=>
+   Math.imul(hash^char.charCodeAt(0),16777619)>>>0,2166136261);
+  const initialRecoveryDelay=500+recoveryHash%5500;
+  let chatRecovery:ReturnType<typeof setInterval>|null=null;
+  const startChatRecovery=setTimeout(()=>{
+   if(disposed)return;
+   recoverVisibleChatAndBallots();
+   chatRecovery=setInterval(recoverVisibleChatAndBallots,6000);
+  },initialRecoveryDelay);
   return()=>{
-   disposed=true;clearTimeout(timer);clearInterval(poll);clearInterval(chatRecovery);
+   disposed=true;clearTimeout(timer);clearInterval(poll);clearTimeout(startChatRecovery);
+   if(chatRecovery!==null)clearInterval(chatRecovery);
    document.removeEventListener('visibilitychange',resumePending);
    setGameRealtimeConnection(gameId,false);
    if(liveRef.current===channel)liveRef.current=null;
@@ -659,7 +674,7 @@ export function useRepublicGame(gameId:string){
    if(!rows.length){setBallots([]);return}
    const ids=tables.has('game_votes')?rows.map(row=>row.id):[...changedVoteIds.current];
    if(!ids.length)return;
-   const ba=await limitedCoreRead(supabase.from('game_ballots').select('*').in('vote_id',ids));
+   const ba=await limitedCoreRead(supabase.from('game_ballots').select(GAME_BALLOT_COLUMNS).in('vote_id',ids));
    if(!readCurrent(ticket)){retryStale();return}
    requireSuccessful([ba]);for(const id of ids)changedVoteIds.current.delete(id);
    setBallots(previous=>[...previous.filter(row=>!ids.includes(row.vote_id)),...(ba.data||[]) as Ballot[]]);
@@ -758,7 +773,7 @@ export function useRepublicGame(gameId:string){
    const voteRows=(vo.data||[]) as Vote[];setVotes(voteRows);
    const ids=voteRows.map(v=>v.id);
    if(ids.length){
-    const ba=await supabase.from('game_ballots').select('*').in('vote_id',ids);
+    const ba=await supabase.from('game_ballots').select(GAME_BALLOT_COLUMNS).in('vote_id',ids);
     // Session, game or a newer core refresh may have changed during this read.
     if(!readCurrent(ticket,'core'))return;
     if(!ba.error&&readCurrent(ticket,'votes'))setBallots((ba.data||[]) as Ballot[]);
@@ -1599,7 +1614,7 @@ export function useRepublicGame(gameId:string){
   await readSafely(['votes'],async ticket=>{
    const [vo,ba]=await Promise.all([
     limitedCoreRead(supabase.from('game_votes').select('*').eq('game_id',gameId).eq('id',v.id).maybeSingle()),
-    limitedCoreRead(supabase.from('game_ballots').select('*').eq('vote_id',v.id))
+    limitedCoreRead(supabase.from('game_ballots').select(GAME_BALLOT_COLUMNS).eq('vote_id',v.id))
    ]);
    if(!readActive(ticket))return;
    closed=vo.data?.status==='closed';
