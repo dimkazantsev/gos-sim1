@@ -19,6 +19,17 @@ assert.match(sql,/blitz_assignments_current_member/,'Own-row blitz read must be 
 assert.match(sql,/blitz_daily_plans_current_member/,'Blitz plan read must be gated');
 assert.match(ui,/teacher_participant_roster/);
 assert.match(ui,/teacher_manage_participant/);
+assert.match(ui,/<dialog ref=\{dialogRef\}/,'Confirmation must use a native modal dialog');
+assert.match(ui,/dialog\.showModal\(\)/,'Click must bring confirmation into the browser top layer');
+assert.match(ui,/dialog\.close\(\)/,'Modal closes without remaining in the top layer');
+assert.match(ui,/onCancel=\{event=>\{event\.preventDefault\(\);closeDialog\(\)\}\}/,'Escape must close safely');
+assert.match(ui,/Идентификатор выбранной записи:/,'Duplicate names must be distinguishable');
+assert.match(ui,/setDialogError\('Операция не выполнена:/,'RPC rejection must be visible in the modal');
+const style=fs.readFileSync('app/teacher-ui-polish.css','utf8');
+assert.match(style,/teacherRosterDialog::backdrop/,'Modal must have a visible backdrop');
+assert.match(style,/max-height:calc\(100dvh - 32px\)/,'Modal must fit small viewports');
+assert.match(style,/teacherRosterDialog:not\(\[open\]\)\{display:none\}/,'Dialog should never flash at list bottom');
+
 assert.match(ui,/'exclude'\|'erase_profile'/);
 assert.match(ui,/confirmation!==selected\.entry\.full_name/);
 assert.match(ui,/protectedUser=e\.kind==='teacher'/);

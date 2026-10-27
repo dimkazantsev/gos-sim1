@@ -178,7 +178,18 @@
 .teacherParticipantRoster .teacherRosterIdentity{min-width:0;overflow-wrap:anywhere;line-height:1.55}
 .teacherParticipantRoster .teacherRosterIdentity small{display:inline-block;max-width:100%}
 .teacherParticipantRoster .teacherRosterActions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;min-width:0}
-.teacherParticipantRoster .teacherRosterDialog{display:grid;gap:12px;margin-top:4px;padding:16px;border:2px solid #c97070;border-radius:12px;min-width:0}
+.teacherParticipantRoster .teacherRosterDialog{
+  box-sizing:border-box;position:fixed;inset:0;margin:auto;display:grid;gap:14px;
+  width:min(560px,calc(100vw - 32px));max-width:calc(100vw - 32px);
+  max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;
+  padding:clamp(16px,3vw,24px);border:1px solid #cbd6e6;border-radius:16px;
+  background:#fff;color:#16345f;box-shadow:0 24px 70px rgba(12,31,65,.28)
+}
+.teacherParticipantRoster .teacherRosterDialog:not([open]){display:none}
+.teacherParticipantRoster .teacherRosterDialog::backdrop{background:rgba(12,31,65,.58)}
+.teacherParticipantRoster .teacherRosterTargetId{font-size:12px;color:#5e718d}
+.teacherParticipantRoster .teacherRosterTargetId code{overflow-wrap:anywhere;white-space:normal}
+.teacherParticipantRoster .teacherRosterDialogError{color:#922c2c;font-weight:650}
 .teacherParticipantRoster .teacherRosterDialog h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0}
 .teacherParticipantRoster .teacherRosterDialog h3 svg{flex-shrink:0}
 .teacherParticipantRoster .teacherRosterDialog p{margin:0;overflow-wrap:anywhere}
