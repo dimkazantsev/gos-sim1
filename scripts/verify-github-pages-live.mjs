@@ -32,6 +32,10 @@ function checkHead(html,source){
  for(const pattern of patterns)assert.ok(head.includes(pattern),source+': missing '+pattern);
  assert.ok(head.indexOf('property="og:image"')<3500,source+' image metadata not at head start');
  assert.ok(!head.includes('GOS//SIMS'),source+' has legacy branding');
+ for(const asset of ['favicon.ico?v=20261028-1','icon.svg?v=20261028-1']){
+  assert.ok(head.includes('href="/gos-sim1/'+asset+'"'),source+' missing scoped browser icon '+asset);
+ }
+ assert.ok(!/<link\b[^>]*rel="(?:shortcut )?icon"[^>]*href="\/favicon\\.ico/.test(head),source+' has root-level favicon');
 }
 async function check(){
  for(const item of endpoints){
@@ -43,11 +47,17 @@ async function check(){
  const routeHtml=await route.text();
  assert.ok(routeHtml.includes('property="og:title" content="'+title+'"'),'Shared visit page must show the current title');
  assert.ok(routeHtml.includes('property="og:image"'),'Shared visit page must advertise the image');
+ const favicon=await get(canonical+'favicon.ico?v=20261028-1');
+ assert.ok((favicon.headers.get('content-type')||'').includes('image/x-icon')||(favicon.headers.get('content-type')||'').includes('image/vnd.microsoft.icon')||(favicon.headers.get('content-type')||'').includes('application/octet-stream'),'Expected ICO response');
+ const ico=new DataView(await favicon.arrayBuffer());
+ assert.ok(ico.byteLength>500&&ico.getUint16(0,true)===0&&ico.getUint16(2,true)===1&&ico.getUint16(4,true)>=3,'Invalid live ICO header');
+ const svg=await get(canonical+'icon.svg?v=20261028-1');
+ assert.ok((await svg.text()).includes('<svg'),'Live SVG icon unavailable');
  const jpg=await get(image);
  assert.ok((jpg.headers.get('content-type')||'').includes('image/jpeg'),'Image must be served as JPEG');
  const data=new Uint8Array(await jpg.arrayBuffer());
  assert.ok(data.length>20000&&data[0]===0xff&&data[1]===0xd8,'Image bytes must be a real JPEG');
- console.log('PASS live GitHub Pages: canonical/no-slash/dashboard metadata, visit page, public JPEG.');
+ console.log('PASS live GitHub Pages: HTML browser icons, scoped ICO and SVG, canonical preview and JPEG.');
 }
 let last;
 for(let n=1;n<=12;n++){

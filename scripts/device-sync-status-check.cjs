@@ -18,7 +18,7 @@ assert(!controls.includes('<DeviceSyncStatus'),'Header must not contain device s
 assert(profile.indexOf('profileDeviceTools')>profile.indexOf('<TeacherGameSessions'),'Device status must follow the teacher sessions section');
 assert(profile.indexOf('profileDeviceTools')>profile.indexOf('<BlitzArchive'),'Device status must follow student archive');
 assert(!component.includes('clearRequestDiagnostics();window.removeEventListener'),'Leaving profile must preserve local diagnostic history');
-assert(layout.includes("shortcut:'/favicon.ico'"),'Explicit browser favicon required');
+assert(layout.includes("shortcut:'/favicon.ico?v=20261028-1'"),'Versioned browser favicon required');
 assert(component.includes("detail.userId!==userId")&&component.includes("detail?.gameId!==gameId"),'Ignore cached events from a different account');
 assert(component.includes("if(!live||wasUpdated)return"),'Old IndexedDB reads must never overwrite new state');
 assert(hook.includes('readEpoch.current')&&hook.includes('acceptedMember.current?.user_id!==uid'),'Reject old session during device save');
