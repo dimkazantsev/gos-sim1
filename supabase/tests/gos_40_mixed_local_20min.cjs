@@ -3,8 +3,16 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {createClient}=require('@supabase/supabase-js');
-const modules=['chat','documents','votes','budget','events','blitz','stages'];
-const allowed=new Set(['send_chat_text','create_formal_document','update_formal_draft','cast_vote_allocation','submit_budget_amendment','submit_event_decision','blitz_open_selected','blitz_answer','submit_stage_debrief','manage_game_stage']);
+const allowed={
+ chat:new Set(['send_chat_text']),
+ documents:new Set(['create_formal_document','update_formal_draft']),
+ votes:new Set(['cast_vote_allocation']),
+ budget:new Set(['submit_budget_amendment']),
+ events:new Set(['submit_event_decision']),
+ blitz:new Set(['blitz_open_selected','blitz_answer']),
+ stages:new Set(['submit_stage_debrief','manage_game_stage'])
+};
+const modules=Object.keys(allowed);
 const transport={fetch:(input,init)=>fetch(input,{...init,signal:AbortSignal.any([...(init?.signal?[init.signal]:[]),AbortSignal.timeout(15000)])})};
 function localOrigin(value){
  const parsed=new URL(value);
@@ -23,6 +31,39 @@ function latencySummary(samples){
  const labels=[...new Set(samples.map(s=>s.label))];
  return Object.fromEntries(labels.map(label=>{const values=samples.filter(s=>s.label===label).map(s=>s.ms).sort((a,b)=>a-b);return[label,{n:values.length,p95_ms:values[Math.ceil(values.length*.95)-1],p99_ms:values[Math.ceil(values.length*.99)-1]}]}));
 }
+function verifyContract(op,fixture){
+ const {args,verify}=op,actor=op.actor==='teacher'?fixture.teacher:fixture.students[op.actor];
+ function field(object,key,value){
+  assert(value!==undefined&&value!==null&&value!=='','Missing value for verification: '+key);
+  assert.deepEqual(object[key],value,'Verification must match the action: '+key);
+ }
+ function table(name){assert.equal(verify.table,name,'Verification must inspect the action table')}
+ function text(value){assert(typeof value==='string'&&value.trim(),'Action text required for verification');return value.trim()}
+ switch(op.rpc){
+  case 'send_chat_text':table('chat_messages');field(verify.match,'id','$result');field(verify.expect,'text',text(args.p_text));break;
+  case 'create_formal_document':table('formal_documents');field(verify.match,'id','$result');field(verify.expect,'title',text(args.p_title));break;
+  case 'update_formal_draft':table('formal_documents');field(verify.match,'id',args.p_document_id);field(verify.expect,'body_text',args.p_body_text);break;
+  case 'cast_vote_allocation':
+   table('game_ballots');field(verify.match,'vote_id',args.p_vote_id);field(verify.match,'voter_id',actor.userId);
+   for(const [column,arg] of [['yes_weight','p_yes'],['no_weight','p_no'],['abstain_weight','p_abstain']])field(verify.expect,column,args[arg]);break;
+  case 'submit_budget_amendment':
+   table('budget_faction_amendments');field(verify.match,'id','$result');field(verify.expect,'from_section',args.p_from);field(verify.expect,'to_section',args.p_to);break;
+  case 'submit_event_decision':{
+   table('event_decisions');field(verify.match,'assignment_id',args.p_assignment_id);field(verify.match,'actor_id',actor.userId);
+   const choice=args.p_choice==='accept'?'option_1':args.p_choice==='reject'?'option_2':args.p_choice;
+   assert(typeof choice==='string'&&/^option_[1-6]$/.test(choice),'Valid event choice required');field(verify.expect,'choice',choice);break;
+  }
+  case 'blitz_open_selected':case 'blitz_answer':
+   table('blitz_assignments');field(verify.match,'id',args.p_id);field(verify.match,'user_id',actor.userId);
+   field(verify.expect,op.rpc==='blitz_answer'?'answered_at':'started_at','$nonNull');break;
+  case 'submit_stage_debrief':table('stage_debriefs');field(verify.match,'id','$result');field(verify.expect,'body',text(args.p_body));break;
+  case 'manage_game_stage':
+   table('game_stages');field(args,'p_game_id',fixture.gameId);field(verify.match,'game_id',fixture.gameId);field(verify.match,'stage_no',args.p_stage_no);
+   assert(['open','close','extend'].includes(args.p_action),'Valid stage action required');
+   if(args.p_action==='extend')field(verify.expect,'deadline','$nonNull');
+   else field(verify.expect,'status',args.p_action==='open'?'open':'completed');break;
+ }
+}
 function validate(f,studentCount=40){
  assert(f.version===1&&/^LOCAL QA ·/.test(f.title),'Fixture must explicitly name a disposable LOCAL QA game');
  assert(/^[a-f\d-]{36}$/i.test(f.gameId));
@@ -34,10 +75,11 @@ function validate(f,studentCount=40){
   const operations=f.operations?.[name];assert(operations?.length,'Missing actual write scenario: '+name);
   for(const op of operations){
    assert(op.actor==='teacher'||Number.isInteger(op.actor)&&op.actor>=0&&op.actor<studentCount,'Invalid actor');
-   assert(allowed.has(op.rpc),'Unsupported or destructive operation: '+op.rpc);
+   assert(allowed[name].has(op.rpc),'Unsupported operation for '+name+': '+op.rpc);
    assert(op.args&&op.verify?.table&&Object.keys(op.verify?.match||{}).length&&Object.keys(op.verify?.expect||{}).length,'Every confirmed operation needs a nonempty persisted-result verification');
    assert(!op.verify.columns?.includes('*'),'Read only the verified fields');
    assert(Number.isInteger(op.minute)&&op.minute>=0&&op.minute<20,'A write must be scheduled inside the twenty-minute run');
+   verifyContract(op,f);
   }
  }
  assert.equal(new Set(f.operations.chat.map(op=>op.actor)).size,studentCount,'Each participant must have a real chat action');
