@@ -1,0 +1,27 @@
+name: Duma ballot scoped load
+on:
+  pull_request:
+    paths:
+      - 'components/game/DumaLeadershipElection.tsx'
+      - 'components/game/useGameTableSync.ts'
+      - 'scripts/duma-ballot-targeted-load-check.cjs'
+      - 'scripts/election-panels-load-check.cjs'
+      - '.github/workflows/duma-ballot-scoped-load.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: duma-ballot-scoped-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/duma-ballot-targeted-load-check.cjs
