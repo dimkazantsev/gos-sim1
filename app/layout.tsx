@@ -62,6 +62,7 @@ import './teacher-agenda-composition.css';
 import './responsive-layout-repair.css';
 import type {Metadata} from 'next';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
+import PwaRegistrar from '@/components/PwaRegistrar';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
 
@@ -74,6 +75,9 @@ export const metadata:Metadata={
  title:socialTitle,
  description:socialDescription,
  applicationName:BRAND_NAME,
+ manifest:'/manifest.webmanifest',
+ appleWebApp:{capable:true,title:BRAND_NAME,statusBarStyle:'default'},
+ icons:{icon:[{url:'/icon.svg',type:'image/svg+xml'},{url:'/pwa/icon-192.png',sizes:'192x192',type:'image/png'}],apple:[{url:'/pwa/apple-touch-icon.png',sizes:'180x180',type:'image/png'}]},
  openGraph:{
   type:'website',locale:'ru_RU',url:'/',siteName:BRAND_NAME,
   title:socialTitle,description:socialDescription,
@@ -84,5 +88,5 @@ export const metadata:Metadata={
 };
 
 export default function RootLayout({children}:{children:React.ReactNode}){
- return <html lang="ru" className={GeistMono.variable}><body>{children}</body></html>;
+ return <html lang="ru" className={GeistMono.variable}><body>{children}<PwaRegistrar/></body></html>;
 }

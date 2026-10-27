@@ -9,7 +9,9 @@ const nextConfig: NextConfig = {
     '/api/import-cloud-document': ['./lib/server/document-parser.worker.cjs', './node_modules/mammoth/**/*', './node_modules/unpdf/**/*', './node_modules/underscore/underscore-umd.js']
   },
   async headers() {
-    return [{ source: '/:path*', headers: [
+    return [
+     {source:'/sw.js',headers:[{key:'Cache-Control',value:'no-store, no-cache, must-revalidate'}]},
+     { source: '/:path*', headers: [
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
