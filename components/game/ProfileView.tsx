@@ -181,8 +181,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
      {allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}
     </div>
     <div className="profileHeroControls">
-     {own&&game&&<DeviceSyncStatus gameId={game.id} userId={me.user_id} realtimeState={g.realtimeState}/>}
-     <button type="button" className="profileComicButton" aria-label="Вводный комикс" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Пролог</button>
+          <button type="button" className="profileComicButton" aria-label="Вводный комикс" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Пролог</button>
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
      {own&&teacher&&<button type="button" onClick={()=>document.getElementById('teacher-game-sessions')?.scrollIntoView({behavior:'smooth',block:'start'})}><Landmark size={17}/> Мои игры · Создать игру</button>}
      {own&&onStartTutorial&&<button type="button" onClick={onStartTutorial} title="Повторить интерактивное обучение навигации"><Compass size={17}/> Пройти обучение</button>}
@@ -265,6 +264,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
    <TeacherGameSessions displayName={me.full_name} currentGameId={game?.id}/>
   </>}
   {own&&game&&target.kind==='student'&&!previewAchievementsUserId&&<BlitzArchive gameId={game.id} userId={target.user_id} open={blitzOpen} onClose={()=>setBlitzOpen(false)}/>}
+  {own&&game&&<section className="surface profileDeviceTools" aria-label="Данные на устройстве"><DeviceSyncStatus gameId={game.id} userId={me.user_id} realtimeState={g.realtimeState}/></section>}
   <RepublicComic gameId={game?.id} initialView={comicView} teacherPreview={Boolean(own&&teacher)} open={comicOpen} onClose={()=>setComicOpen(false)}/>
  </div>;
 }
