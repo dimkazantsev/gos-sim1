@@ -12,16 +12,20 @@ for(const [name,data] of [['cache.ts',source],['component.tsx',component],['clie
  assert.equal(ast.parseDiagnostics.length,0,'TypeScript parse '+name);
 }
 assert(!client.includes('DeviceSyncStatus'),'Sync button must be absent from the game header');
-assert(profile.includes('{own&&game&&<DeviceSyncStatus gameId={game.id} userId={me.user_id} realtimeState={g.realtimeState}/>}'),'Sync button only appears in owner profile');
+assert(profile.includes('{own&&game&&<section className="surface profileDeviceTools" aria-label="Данные на устройстве"><DeviceSyncStatus gameId={game.id} userId={me.user_id} realtimeState={g.realtimeState}/></section>}'),'Sync button only appears in the final section of the owner profile');
+const controls=profile.slice(profile.indexOf('<div className="profileHeroControls">'),profile.indexOf('</div>',profile.indexOf('<div className="profileHeroControls">')));
+assert(!controls.includes('<DeviceSyncStatus'),'Header must not contain device status');
+assert(profile.indexOf('profileDeviceTools')>profile.indexOf('<TeacherGameSessions'),'Device status must follow the teacher sessions section');
+assert(profile.indexOf('profileDeviceTools')>profile.indexOf('<BlitzArchive'),'Device status must follow student archive');
 assert(!component.includes('clearRequestDiagnostics();window.removeEventListener'),'Leaving profile must preserve local diagnostic history');
 assert(layout.includes("shortcut:'/favicon.ico'"),'Explicit browser favicon required');
 assert(component.includes("detail.userId!==userId")&&component.includes("detail?.gameId!==gameId"),'Ignore cached events from a different account');
 assert(component.includes("if(!live||wasUpdated)return"),'Old IndexedDB reads must never overwrite new state');
 assert(hook.includes('readEpoch.current')&&hook.includes('acceptedMember.current?.user_id!==uid'),'Reject old session during device save');
 assert(hook.includes('},1500)'), 'Reprioritize rapid pushed updates into one local write');
-assert(css.includes('@media(max-width:760px)')&&css.includes('.profilePage .profileHeroControls>.deviceSyncStatus'),'Button must stay inside mobile profile');
+assert(css.includes('@media(max-width:760px)')&&css.includes('.profilePage .profileDeviceTools>.deviceSyncStatus'),'Button must stay inside mobile profile footer');
 assert(!css.includes('.simTop'),'No toolbar placement CSS must remain');
-assert(css.includes('width:min(320px,calc(100vw - 72px))'),'Popover fits 320px viewport');
+assert(css.includes('width:min(100%,560px);max-width:100%')&&css.includes('position:static')&&!css.includes('position:absolute'),'Details expand inline and fit narrow screens');
 const favicon=fs.readFileSync('app/favicon.ico');
 assert.equal(favicon.readUInt16LE(0),0,'ICO header reserved');
 assert.equal(favicon.readUInt16LE(2),1,'ICO format');
