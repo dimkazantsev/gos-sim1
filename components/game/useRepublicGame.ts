@@ -6,6 +6,7 @@ import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
+import {readLocalGameSnapshot,writeLocalGameSnapshot,deleteLocalGameSnapshot} from '@/lib/localGameSnapshot';
 import {resolveStoredAsset} from '@/lib/resolveStoredAsset';
 import type {Activity,Ballot,Channel,ChatPin,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,ImpactLedger,ImpactRule,Member,Message,Metric,MetricHistory,Party,PartyAgreement,PartyDocument,PartyInvitation,PartyMandateAllocation,PartySupportHistory,PoliticalPost,PoliticalPostFormalLink,PoliticalPostMedia,Presence,Stage,Vote,View} from './types';
 import {CRISES} from './constants';
@@ -581,6 +582,17 @@ export function useRepublicGame(gameId:string){
    if(!await acceptIdentity(g,m,u.id)){
     readEpoch.current++;clearGameData();setError('Нет доступа к игре');setLoading(false);return;
    }
+   // Restore public display-only data after authoritative role verification.
+   // A completed network refresh always has precedence over the local copy.
+   const identityEpoch=readEpoch.current;
+   void readLocalGameSnapshot(gameId,u.id).then(snapshot=>{
+    if(!snapshot||!alive.current||authUser.current!==u.id||
+      acceptedMember.current?.user_id!==u.id||readEpoch.current!==identityEpoch||
+      lastCoreSuccessAt.current>0)return;
+    setStages(previous=>previous.length?previous:snapshot.stages);
+    setMetrics(previous=>previous.length?previous:snapshot.metrics);
+    setEvents(previous=>previous.length?previous:snapshot.events);
+   });
    setLoading(false);
   }catch(error){if(readCurrent(ticket,'all'))setError(error)}
   finally{if(readCurrent(ticket,'all'))setLoading(false)}
@@ -675,6 +687,15 @@ export function useRepublicGame(gameId:string){
   });
   if(!results)return;
   const [g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro]=results;
+  // Store only published presentation data. Roles, answers, votes and private
+  // metrics are never persisted on the student's device.
+  if(!st.error&&!mt.error&&!ev.error&&authUser.current===uid){
+   void writeLocalGameSnapshot(gameId,uid,{
+    stages:(st.data||[]) as Stage[],
+    metrics:((mt.data||[]) as Metric[]).filter(value=>value.is_public),
+    events:(ev.data||[]) as EventItem[]
+   });
+  }
   if(!readCurrent(ticket,'core'))return;
   const coreResults=[g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro];
   if(coreResults.some(result=>['PGRST003','57014'].includes(String((result.error as {code?:string}|null)?.code||'')))){
@@ -1161,7 +1182,7 @@ export function useRepublicGame(gameId:string){
   }finally{if(presenceInFlight.current===scope)presenceInFlight.current=''}
  }
 
- async function logout(){await supabase.auth.signOut();router.replace('/')}
+ async function logout(){await supabase.auth.signOut();if(me?.user_id)void deleteLocalGameSnapshot(gameId,me.user_id);router.replace('/')}
  async function setTurn(open:boolean){const r=await supabase.from('games').update({turn_open:open,status:open?'running':'paused',turn_ends_at:open?new Date(Date.now()+12*60*1000).toISOString():null}).eq('id',gameId);if(r.error)setError(r.error.message);else await refresh()}
  async function setTurnMinutes(minutes:number){if(!game)return;const r=await supabase.from('games').update({turn_open:true,status:'running',turn_ends_at:new Date(Date.now()+minutes*60*1000).toISOString()}).eq('id',gameId);if(r.error)setError(r.error.message);else await refresh()}
 
