@@ -15,6 +15,9 @@ const css=[
  'app/2026-stage-party-grades-repair.css',
  'app/2026-profile-grade-layout.css'
 ].map(p=>fs.readFileSync(p,'utf8')).join('\n');
+assert(journal.includes('className="journalParticipantFilter"'),'Participant selector needs its own compact class');
+const compactCss=fs.readFileSync('app/journal-mobile-isolated.css','utf8');
+assert(compactCss.includes('max-width:238px')&&compactCss.includes('text-overflow:ellipsis'),'Long names must truncate without resizing selector');
 const escaped=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const rows=Array.from({length:50},(_,i)=>{
  const fullName=i%3===0?'Тестов Тест Тестович':'Петрова Александра Александровна';

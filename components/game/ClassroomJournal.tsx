@@ -110,7 +110,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   </header>
   <div className="journalToolbar">
    <label className="journalSearch"><Search size={17} aria-hidden="true"/><input type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Поиск по журналу" aria-label="Поиск по журналу"/></label>
-   {teacher&&<StyledSelect label="Участник" value={memberFilter} onChange={setMemberFilter}
+   {teacher&&<StyledSelect className="journalParticipantFilter" label="Участник" value={memberFilter} onChange={setMemberFilter}
     options={[{value:'',label:'Все участники'},...studentMembers.map(m=>({value:m.user_id,label:m.full_name}))]}/>}
    <StyledSelect label="Раздел" value={viewFilter} onChange={setViewFilter}
     options={[{value:'',label:'Все разделы'},...uniqueViews.map(v=>({value:v,label:gameViewLabel(v)}))]}/>

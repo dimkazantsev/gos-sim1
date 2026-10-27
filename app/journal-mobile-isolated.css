@@ -59,3 +59,21 @@
  .classroomJournal .gosJournalRecordAuthor{font-size:13px}
  .classroomJournal .gosJournalRecordAction{font-size:12px}
 }
+
+/* Journal participant picker: long names must never expand the filter row. */
+.classroomJournal .journalToolbar > .styledSelect.journalParticipantFilter{
+ box-sizing:border-box;flex:0 1 238px;width:238px;max-width:238px;min-width:0;
+}
+.classroomJournal .journalToolbar > .journalParticipantFilter .styledSelectTrigger{
+ box-sizing:border-box;width:100%;max-width:100%;min-width:0;overflow:hidden;
+}
+.classroomJournal .journalToolbar > .journalParticipantFilter .styledSelectValue{
+ display:block;flex:1 1 auto;min-width:0;max-width:100%;
+ overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+.classroomJournal .journalToolbar > .journalParticipantFilter .styledSelectTrigger > svg{flex:0 0 auto}
+@media(max-width:650px){
+ .classroomJournal .journalToolbar > .styledSelect.journalParticipantFilter{
+  flex:1 1 auto;width:100%;max-width:100%;
+ }
+}
