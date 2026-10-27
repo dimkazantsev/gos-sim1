@@ -1,0 +1,31 @@
+name: Section unread 100-client pacing
+on:
+  push:
+    branches: ['perf/section-read-burst-100-20261028']
+    paths:
+      - 'components/game/useSectionUpdates.ts'
+      - 'scripts/section-badge-burst-check.cjs'
+      - '.github/workflows/section-unread-100.yml'
+  pull_request:
+    paths:
+      - 'components/game/useSectionUpdates.ts'
+      - 'scripts/section-badge-burst-check.cjs'
+      - '.github/workflows/section-unread-100.yml'
+permissions:
+  contents: read
+concurrency:
+  group: unread-100-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  unread-burst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/section-badge-burst-check.cjs
+      - run: npm run typecheck
