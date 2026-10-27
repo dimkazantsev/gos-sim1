@@ -1,0 +1,38 @@
+name: ГОС.ID · PWA безопасность и установка
+on:
+  pull_request:
+    paths:
+      - 'app/manifest.ts'
+      - 'app/layout.tsx'
+      - 'components/PwaRegistrar.tsx'
+      - 'public/sw.js'
+      - 'public/offline.html'
+      - 'public/pwa/**'
+      - 'next.config.ts'
+      - 'scripts/pwa-safe-cache-check.cjs'
+      - '.github/workflows/pwa-safety.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'app/manifest.ts'
+      - 'app/layout.tsx'
+      - 'components/PwaRegistrar.tsx'
+      - 'public/sw.js'
+      - 'public/offline.html'
+      - 'public/pwa/**'
+      - 'next.config.ts'
+      - 'scripts/pwa-safe-cache-check.cjs'
+      - '.github/workflows/pwa-safety.yml'
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/pwa-safe-cache-check.cjs
+      - run: npm run typecheck
