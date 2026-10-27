@@ -38,7 +38,7 @@ export const supabase = createClient(url, publishableKey, {
   global:{fetch:async(input,init)=>{
    const href=typeof input==='string'?input:input instanceof URL?input.href:input.url;
    const rest=href.startsWith(restPrefix);
-   const method=(init?.method||(typeof input==='object'&&'method' in input?input.method:'GET')||'GET').toUpperCase();
+   const method=String(init?.method||(typeof input==='object'&&'method' in input?input.method:'GET')||'GET').toUpperCase();
    const safeRead=rest&&safeRestRead(href,method);
    // A blocked project must not receive another request from every background timer.
    // Reloading the page after the owner restores the service starts a fresh check.
