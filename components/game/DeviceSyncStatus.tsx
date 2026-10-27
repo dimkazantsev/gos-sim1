@@ -44,7 +44,7 @@ export default function DeviceSyncStatus({gameId,userId,realtimeState}:{
   };
   window.addEventListener(DEVICE_SNAPSHOT_EVENT,updated);
   window.addEventListener('online',refresh);window.addEventListener('offline',refresh);
-  return()=>{live=false;clearRequestDiagnostics();window.removeEventListener(DEVICE_SNAPSHOT_EVENT,updated);
+  return()=>{live=false;window.removeEventListener(DEVICE_SNAPSHOT_EVENT,updated);
    window.removeEventListener('online',refresh);window.removeEventListener('offline',refresh)};
  },[gameId,userId]);
  const disconnected=!online;

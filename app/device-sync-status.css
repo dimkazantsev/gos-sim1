@@ -1,61 +1,68 @@
-/* Compact, truthful device-copy status in the approved ГОС.ID toolbar. */
-.simWorkspace .simTop .deviceSyncStatus{
- position:relative;box-sizing:border-box;flex:0 0 auto;min-width:0;
- color:#315a93;font-size:12px;line-height:1.25;
+/* ГОС.ID · Device sync button belongs in the owner's profile controls. */
+.profilePage .profileHeroControls>.deviceSyncStatus{
+ position:relative;box-sizing:border-box;min-width:0;flex:0 0 auto;
+ color:#315a93;font-size:12px;line-height:1.3;
 }
-.simWorkspace .simTop .deviceSyncStatus>summary{
- box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:6px;
- height:48px;min-height:48px;max-height:48px;
- padding:0 10px;cursor:pointer;list-style:none;border:1px solid #d0dbe9;border-radius:10px;
- color:#315a93;background:#fff;font-family:inherit;font-size:12px;font-weight:750;line-height:1.2;
- white-space:nowrap;box-shadow:none;
+.profilePage .profileHeroControls>.deviceSyncStatus>summary{
+ box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+ gap:8px;min-height:42px;padding:10px 14px;
+ border:1px solid #cbdcf9;border-radius:10px;
+ background:#f3f7ff;color:#3159aa;font-family:inherit;font-size:12px;font-weight:790;line-height:1.3;
+ list-style:none;cursor:pointer;white-space:nowrap;
 }
-.simWorkspace .simTop .deviceSyncStatus>summary::-webkit-details-marker{display:none}
-.simWorkspace .simTop .deviceSyncStatus>summary:focus-visible{outline:2px solid #2453e6;outline-offset:2px}
-.simWorkspace .simTop .deviceSyncStatus>summary svg{width:17px;height:17px;flex:0 0 17px;stroke-width:2}
-.simWorkspace .simTop .deviceSyncStatus.state-saved>summary{background:#eff6ff;border-color:#cbdcf8;color:#2453e6}
-.simWorkspace .simTop .deviceSyncStatus.state-offline>summary,
-.simWorkspace .simTop .deviceSyncStatus.state-failed>summary{color:#97512f;background:#fff8ed;border-color:#ead8bf}
-.simWorkspace .simTop .deviceSyncStatus.state-saving>summary svg{animation:gsSyncSpin 1.6s linear infinite}
+.profilePage .profileHeroControls>.deviceSyncStatus>summary::-webkit-details-marker{display:none}
+.profilePage .profileHeroControls>.deviceSyncStatus>summary:focus-visible{
+ outline:2px solid #2453e6;outline-offset:2px;
+}
+.profilePage .profileHeroControls>.deviceSyncStatus>summary svg{
+ display:block;width:17px;height:17px;flex:0 0 17px;stroke-width:2;
+}
+.profilePage .deviceSyncStatus.state-saved>summary{
+ background:#eff6ff;border-color:#cbdcf8;color:#2453e6;
+}
+.profilePage .deviceSyncStatus.state-offline>summary,
+.profilePage .deviceSyncStatus.state-failed>summary{
+ background:#fff8ed;border-color:#ead8bf;color:#97512f;
+}
+.profilePage .deviceSyncStatus.state-saving>summary svg{
+ animation:gsSyncSpin 1.6s linear infinite;
+}
 @keyframes gsSyncSpin{to{transform:rotate(360deg)}}
-.simWorkspace .simTop .deviceSyncStatus .deviceSyncDetails{
- box-sizing:border-box;position:absolute;right:0;top:calc(100% + 9px);z-index:500;
- width:310px;max-width:calc(100vw - 24px);padding:16px;
- border:1px solid #d0dbe9;border-radius:14px;
+.profilePage .deviceSyncStatus .deviceSyncDetails{
+ box-sizing:border-box;position:absolute;left:0;top:calc(100% + 8px);
+ z-index:200;width:320px;max-width:min(320px,calc(100vw - 72px));
+ padding:16px;border:1px solid #d0dbe9;border-radius:14px;
  background:#fff;color:#16345f;box-shadow:0 14px 38px rgba(18,39,86,.14);
- white-space:normal;font-family:inherit;font-size:13px;font-weight:500;line-height:1.5;
+ white-space:normal;font-size:13px;font-weight:500;line-height:1.5;
+ overflow-wrap:anywhere;
 }
-.simWorkspace .simTop .deviceSyncDetails strong{display:block;font-size:14px;font-weight:800;margin-bottom:7px}
-.simWorkspace .simTop .deviceSyncDetails p{margin:0 0 9px;color:#506985}
-.simWorkspace .simTop .deviceSyncDetails small{color:#637997;font-size:11px;display:block}
-.simWorkspace .simTop .deviceSyncDetails .deviceDiagnosticsInfo{margin-top:12px;font-size:12px}
-.simWorkspace .simTop .deviceDiagnosticsActions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
-.simWorkspace .simTop .deviceDiagnosticsActions button{border:1px solid #cbdcf8;border-radius:8px;background:#eff6ff;color:#2453e6;padding:7px 10px;font:inherit;cursor:pointer}
-.simWorkspace .simTop .deviceDiagnosticsActions button:focus-visible{outline:2px solid #2453e6;outline-offset:2px}
-@media(max-width:1499px){
- .simWorkspace .simTop .deviceSyncStatus>summary{
-  width:48px;min-width:48px;max-width:48px;padding:0;
- }
- .simWorkspace .simTop .deviceSyncStatus .deviceSyncLabel{display:none}
+.profilePage .deviceSyncDetails strong{
+ display:block;font-size:14px;font-weight:800;margin-bottom:7px;
 }
-@media(max-width:900px){
- .simWorkspace .simTop .deviceSyncStatus>summary{
-  width:36px;min-width:36px;max-width:36px;height:36px;min-height:36px;max-height:36px;
- }
+.profilePage .deviceSyncDetails p{margin:0 0 9px;color:#506985}
+.profilePage .deviceSyncDetails small{
+ display:block;color:#637997;font-size:11px;
+}
+.profilePage .deviceSyncDetails .deviceDiagnosticsInfo{margin-top:12px;font-size:12px}
+.profilePage .deviceSyncDetails .deviceDiagnosticsActions{
+ display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;
+}
+.profilePage .deviceSyncDetails .deviceDiagnosticsActions button{
+ min-height:36px;border:1px solid #cbdcf8;border-radius:8px;
+ background:#eff6ff;color:#2453e6;padding:7px 10px;
+ font:inherit;cursor:pointer;
+}
+.profilePage .deviceSyncDetails .deviceDiagnosticsActions button:focus-visible{
+ outline:2px solid #2453e6;outline-offset:2px;
 }
 @media(max-width:760px){
- .simWorkspace .simTop .deviceSyncStatus{
-  position:absolute;left:32px;top:3px;z-index:12;flex:none;
+ .profilePage .profileHeroControls>.deviceSyncStatus{
+  max-width:100%;flex:0 1 auto;
  }
- .simWorkspace .simTop .deviceSyncStatus>summary{
-  width:23px;min-width:23px;max-width:23px;height:23px;min-height:23px;max-height:23px;
-  border-radius:50%;border-width:1px;background:#fff;
- }
- .simWorkspace .simTop .deviceSyncStatus>summary svg{width:12px;height:12px;flex-basis:12px}
- .simWorkspace .simTop .deviceSyncStatus .deviceSyncDetails{
-  position:fixed;left:12px;right:auto;top:62px;width:min(310px,calc(100vw - 24px));z-index:999;
+ .profilePage .deviceSyncStatus .deviceSyncDetails{
+  width:min(320px,calc(100vw - 72px));
  }
 }
 @media(prefers-reduced-motion:reduce){
- .simWorkspace .simTop .deviceSyncStatus.state-saving>summary svg{animation:none}
+ .profilePage .deviceSyncStatus.state-saving>summary svg{animation:none}
 }
