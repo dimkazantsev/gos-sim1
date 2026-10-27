@@ -1,0 +1,31 @@
+name: Section badges 40 clients
+on:
+  pull_request:
+    paths:
+      - components/game/useSectionUpdates.ts
+      - scripts/section-badge-burst-check.cjs
+      - .github/workflows/section-badge-burst.yml
+  push:
+    branches:
+      - perf/section-badge-coalescing-20261028
+    paths:
+      - components/game/useSectionUpdates.ts
+      - scripts/section-badge-burst-check.cjs
+      - .github/workflows/section-badge-burst.yml
+permissions:
+  contents: read
+concurrency:
+  group: badge-burst-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  burst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/section-badge-burst-check.cjs
