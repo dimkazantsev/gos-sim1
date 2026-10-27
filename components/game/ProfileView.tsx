@@ -9,6 +9,7 @@ import {useGameTableSync} from './useGameTableSync';
 import ClassroomJournal from './ClassroomJournal';
 import SignatureUpload from './SignatureUpload';
 import ProfileSecurityPanel from './ProfileSecurityPanel';
+import DeviceSyncStatus from './DeviceSyncStatus';
 import RepublicComic from './RepublicComic';
 import {BlitzArchive} from './Blitz';
 import TeacherGameSessions from './TeacherGameSessions';
@@ -180,6 +181,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
      {allocation&&<span>{allocation.effective_mandates} голосов в ГД</span>}
     </div>
     <div className="profileHeroControls">
+     {own&&game&&<DeviceSyncStatus gameId={game.id} userId={me.user_id} realtimeState={g.realtimeState}/>}
      <button type="button" className="profileComicButton" aria-label="Вводный комикс" onClick={()=>{setComicView('intro');setComicOpen(true)}}><BookOpen size={17}/> Пролог</button>
      <button type="button" onClick={()=>{setComicView('archive');setComicOpen(true)}}><Library size={17}/> Архив комиксов</button>
      {own&&teacher&&<button type="button" onClick={()=>document.getElementById('teacher-game-sessions')?.scrollIntoView({behavior:'smooth',block:'start'})}><Landmark size={17}/> Мои игры · Создать игру</button>}

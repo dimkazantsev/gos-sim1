@@ -3,7 +3,6 @@ import {userError} from '@/lib/userError';
 import {IconAction} from './ui/IconAction';
 import {BrandIdentity,BrandName} from './ui/BrandIdentity';
 import ChatToggleButton from './game/ChatToggleButton';
-import DeviceSyncStatus from './game/DeviceSyncStatus';
 import {useEffect,useRef,useState} from 'react';
 import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
@@ -647,7 +646,6 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <div className="simTopCenter">
      <div className="topStageCopy"><small>ЭТАП {String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</small><strong>{nav.find(([key])=>key===view)?.[1]||game.title}</strong></div>
      <div className="topIndicators">
-      <DeviceSyncStatus gameId={game.id} userId={me.user_id} realtimeState={g.realtimeState}/>
       <span className={`livePill ${game.turn_open?'on':'off'}`} aria-label={game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'} title={game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'}><Radio aria-hidden="true"/><span className="livePillText">{game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'}</span></span>
       <button type="button" className="gameShareScreen" onClick={()=>void shareCurrentScreen()} title="Поделиться текущим разделом или документом" aria-label="Поделиться текущим разделом"><Share2 size={17} aria-hidden="true"/><span>Поделиться</span></button>
       {game.turn_open&&game.turn_ends_at&&(()=>{

@@ -78,7 +78,7 @@ export const metadata:Metadata={
  applicationName:BRAND_NAME,
  manifest:'/manifest.webmanifest',
  appleWebApp:{capable:true,title:BRAND_NAME,statusBarStyle:'default'},
- icons:{icon:[{url:'/icon.svg',type:'image/svg+xml'},{url:'/pwa/icon-192.png',sizes:'192x192',type:'image/png'}],apple:[{url:'/pwa/apple-touch-icon.png',sizes:'180x180',type:'image/png'}]},
+ icons:{icon:[{url:'/favicon.ico',type:'image/x-icon',sizes:'any'},{url:'/icon.svg',type:'image/svg+xml'},{url:'/pwa/icon-192.png',sizes:'192x192',type:'image/png'}],shortcut:'/favicon.ico',apple:[{url:'/pwa/apple-touch-icon.png',sizes:'180x180',type:'image/png'}]},
  openGraph:{
   type:'website',locale:'ru_RU',url:'/',siteName:BRAND_NAME,
   title:socialTitle,description:socialDescription,
