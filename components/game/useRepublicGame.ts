@@ -565,12 +565,19 @@ export function useRepublicGame(gameId:string){
    let [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Открытие игровой сессии');
    if(!readCurrent(ticket,'all'))return;
    if(g.error||m.error){
-    const poolBusy=[g.error,m.error].some(error=>['PGRST003','57014'].includes(String((error as {code?:string}|null)?.code||'')));
-    // Preserve one bootstrap recovery attempt, staggered to avoid synchronized retry storms.
-    const retryJitter=[...u.id].reduce((hash,char)=>hash+char.charCodeAt(0),0)%2000;
-    await new Promise(resolve=>setTimeout(resolve,poolBusy?5000+retryJitter:250));
+    const transient=[g.error,m.error].some(error=>{
+     const code=String((error as {code?:string}|null)?.code||'');
+     const message=String((error as {message?:string}|null)?.message||'');
+     return ['PGRST003','PGRST000','PGRST001','57014'].includes(code)||
+      /timeout|timed out|connection|gateway|unavailable|fetch failed|too many/i.test(message);
+    });
+    if(!transient)throw (g.error||m.error);
+    // One staggered recovery; do not retry 40 students in sync.
+    const retryJitter=[...u.id].reduce((hash,char)=>hash+char.charCodeAt(0),0)%2500;
+    await new Promise(resolve=>setTimeout(resolve,4000+retryJitter));
     [g,m]=await within(readIdentity(u.id),BOOTSTRAP_TIMEOUT_MS,'Повторное открытие игровой сессии');
     if(!readCurrent(ticket,'all'))return;
+    if(g.error||m.error)throw (g.error||m.error);
    }
    if(!g.error&&!m.error&&(!g.data||!m.data)){
     const access=await within(supabase.rpc('ensure_my_game_access',{p_game:gameId}),BOOTSTRAP_TIMEOUT_MS,'Проверка доступа к игре');
