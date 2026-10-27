@@ -315,7 +315,7 @@ export function useRepublicGame(gameId:string){
    if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments();
     if(partyDocs)notifySectionUpdates(gameId);
    if(overview||chat)scheduleRealtimeChatOverview();
-   if(chat&&channelRef.current)void loadMessages(channelRef.current);
+   if(chat&&chatOpenRef.current&&channelRef.current)void loadMessages(channelRef.current);
    if(pins&&channelRef.current)void loadChatPins(channelRef.current);
    
   }
@@ -377,7 +377,12 @@ export function useRepublicGame(gameId:string){
    }else if(payload.eventType==='DELETE'){
     const id=(payload.old as {id?:string}|null)?.id;
     if(id)setMessages(previous=>previous.filter(m=>m.id!==id));
-   }else dirtyChat=true;
+   }else if(payload.eventType==='UPDATE'){
+    // An edit in another channel must not reload the visible channel.
+    // Still reconcile a moved row that was previously visible here.
+    const next=payload.new as Partial<Message>;
+    if(!next.channel_id||next.channel_id===channelRef.current||messageRowsRef.current.some(row=>row.id===next.id))dirtyChat=true;
+   }
    dirtyOverview=true;schedule();
   });
   for(const table of ['chat_mentions','chat_channel_state','chat_pins']){
@@ -512,6 +517,8 @@ export function useRepublicGame(gameId:string){
  },[]);
 
  useEffect(()=>{channelRef.current=channelId;messageRowsRef.current=[];setMessages([]);setChatPins([]);setPinnedMessages([]);if(channelId){void loadMessages(channelId,true);void loadChatPins(channelId);if(chatOpen)void markChatRead(channelId)}else setChatLoading(false)},[channelId]);
+ // Reconcile changes missed while closed. Switching channels already loads history.
+ useEffect(()=>{if(chatOpen&&channelRef.current)void loadMessages(channelRef.current)},[chatOpen]);
  useEffect(()=>{if(chatOpen&&channelId)void markChatRead(channelId)},[chatOpen,channelId,messages.length]);
  useEffect(()=>{
   // The chat header and composer must reflect exactly the same selected ID.

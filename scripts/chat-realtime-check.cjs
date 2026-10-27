@@ -32,7 +32,9 @@ assert(source.includes("table:'chat_messages'")&&source.includes("payload.eventT
 assert(source.includes('setMessages(previous=>mergeChatMessages(previous,[row]))'),'Render incoming chat messages immediately');
 assert(source.includes('void loadRecentChatMessages(channelRef.current)'),'Recover only current channel');
 assert(source.includes('},6000);'),'Recovery should not wait for 30s periodic snapshot');
-assert(source.includes("else dirtyChat=true"),'Handle updated message rows');
+assert(source.includes("else if(payload.eventType==='UPDATE')")&&source.includes('next.channel_id===channelRef.current'),'Handle UPDATE only for the selected channel or previously visible moved messages');
+assert(source.includes('if(chat&&chatOpenRef.current&&channelRef.current)void loadMessages(channelRef.current)'),'Do not load hidden chat history on every edit');
+assert(source.includes('if(chatOpen&&channelRef.current)void loadMessages(channelRef.current)'), 'Opening chat must recover edits that arrived while closed');
 assert(source.includes('messageRowsRef.current.some(old=>old.id===m.id)'),'Avoid duplicate media signing');
 assert(source.includes('void Promise.allSettled([loadMessages(targetChannel),loadChatOverview()])'),'Text sends must not wait for history readback');
 console.log('PASS 30 chat clients, ordered deduplicated messages, signed media, realtime INSERT and six-second incremental recovery');
