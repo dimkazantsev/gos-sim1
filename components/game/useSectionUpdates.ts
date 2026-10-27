@@ -16,7 +16,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   optimisticVersion.current+=1;
   lastRelevantMutationAt.current=0;
   if(!gameId||!userId||readOnly)return;
-  let live=true,running=false,queued=false,blocked=false;
+  let live=true,running=false,queued=false,blocked=false,initialPending=true;
   let lastFallbackAt=Date.now(),lastFocusAt=0,lastStartedAt=0,recoveryAfter=0;
   const userJitter=[...userId].reduce((n,c)=>(Math.imul(n,33)+c.charCodeAt(0))>>>0,0)%9000;
   let pending:ReturnType<typeof setTimeout>|undefined;
@@ -35,7 +35,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
    finally{running=false;if(queued&&live){queued=false;schedule()}}
   }
   function schedule(){
-   if(!live||blocked||pending!==undefined||document.visibilityState!=='visible')return;
+   if(!live||blocked||initialPending||pending!==undefined||document.visibilityState!=='visible')return;
    pending=setTimeout(()=>{pending=undefined;void load()},Math.max(250,15000-(Date.now()-lastStartedAt)));
   }
   const invalidated=(e:Event)=>{
@@ -51,7 +51,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
    lastFocusAt=now;schedule();
   };
   // Spread initial counters across classroom clients.
-  const initial=setTimeout(()=>void load(),600+userJitter);
+  const initial=setTimeout(()=>{initialPending=false;void load()},600+userJitter);
   const poll=setInterval(()=>{
    if(document.visibilityState!=='visible')return;
    const now=Date.now();
