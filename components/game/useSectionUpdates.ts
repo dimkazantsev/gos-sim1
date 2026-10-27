@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {GAME_DATA_REFRESH_EVENT,SECTION_UPDATES_REFRESH_EVENT,gameRealtimeConnected,notifySectionUpdates} from './useGameTableSync';
 import type {View} from './types';
@@ -8,8 +8,13 @@ const READABLE_SECTIONS=new Set<View>(['dashboard','stages','parties','votes','d
 const UPDATE_TABLES=new Set(['formal_documents','game_votes','event_assignments','event_collaboration_invites','event_decisions','political_posts','game_parties','party_invitations','game_stages','party_documents','game_members']);
 export function useSectionUpdates(gameId:string|undefined,userId:string|undefined,view:View,readOnly:boolean){
  const [counts,setCounts]=useState<Record<string,number>>({});
+ // Ignore snapshots that started before a confirmed local read acknowledgement.
+ const optimisticVersion=useRef(0);
+ const lastRelevantMutationAt=useRef(0);
  useEffect(()=>{
   setCounts({});
+  optimisticVersion.current+=1;
+  lastRelevantMutationAt.current=0;
   if(!gameId||!userId||readOnly)return;
   let live=true,running=false,queued=false,blocked=false;
   let lastFallbackAt=Date.now(),lastFocusAt=0,lastStartedAt=0,recoveryAfter=0;
@@ -19,23 +24,26 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
    if(!live||blocked||document.visibilityState!=='visible'||Date.now()<recoveryAfter)return;
    if(running){queued=true;return}
    running=true;lastStartedAt=Date.now();
+   const startedVersion=optimisticVersion.current;
    try{
     const r=await supabase.rpc('get_section_updates',{p_game_id:gameId});
     if(r.status===402)blocked=true;
     if(r.error&&['PGRST003','57014'].includes(r.error.code))recoveryAfter=Date.now()+120000;
     else if(r.status>=500)recoveryAfter=Date.now()+90000;
-    if(live&&!r.error&&r.data)setCounts(r.data as Record<string,number>);
+    if(live&&!r.error&&r.data&&startedVersion===optimisticVersion.current)setCounts(r.data as Record<string,number>);
    }catch{recoveryAfter=Date.now()+30000}
    finally{running=false;if(queued&&live){queued=false;schedule()}}
   }
-  function schedule(immediate=false){
+  function schedule(){
    if(!live||blocked||pending!==undefined||document.visibilityState!=='visible')return;
-   pending=setTimeout(()=>{pending=undefined;void load()},immediate?0:Math.max(250,15000-(Date.now()-lastStartedAt)));
+   pending=setTimeout(()=>{pending=undefined;void load()},Math.max(250,15000-(Date.now()-lastStartedAt)));
   }
   const invalidated=(e:Event)=>{
    const detail=(e as CustomEvent<{gameId:string;table?:string}>).detail;
    if(detail?.gameId!==gameId||detail.table&&!UPDATE_TABLES.has(detail.table))return;
-   schedule(e.type===SECTION_UPDATES_REFRESH_EVENT);
+   if(e.type===GAME_DATA_REFRESH_EVENT)lastRelevantMutationAt.current=Date.now();
+   // A local read already updates its own badge; no second unbounded RPC.
+   schedule();
   };
   const focused=()=>{
    if(document.visibilityState!=='visible')return;
@@ -61,12 +69,23 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
  useEffect(()=>{
   if(!gameId||!userId||readOnly||!READABLE_SECTIONS.has(view))return;
   // New items arriving after entry remain unread.
-  const enteredAt=new Date().toISOString();
+  const enteredAtMs=Date.now();
+  const enteredAt=new Date(enteredAtMs).toISOString();
+  let active=true;
   const id=setTimeout(()=>{
    void supabase.rpc('mark_section_read',{p_game_id:gameId,p_section:view,p_seen_at:enteredAt})
-    .then(r=>{if(!r.error)notifySectionUpdates(gameId)});
+    .then(r=>{
+     if(!active||r.error)return;
+     // The server marks only items that existed when the section was entered.
+     // Never optimistically hide notifications arriving after that moment.
+     if(lastRelevantMutationAt.current<=enteredAtMs){
+      optimisticVersion.current+=1;
+      setCounts(previous=>({...previous,[view]:0}));
+     }
+     notifySectionUpdates(gameId);
+    });
   },1500);
-  return()=>clearTimeout(id);
+  return()=>{active=false;clearTimeout(id)};
  },[gameId,userId,view,readOnly]);
  return counts;
 }
