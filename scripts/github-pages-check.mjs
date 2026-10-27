@@ -8,6 +8,24 @@ function files(path){return readdirSync(path,{withFileTypes:true}).flatMap(x=>x.
 assert.ok(existsSync(join(out,'teacher/index.html')),'Permanent teacher cabinet must be exported at /teacher/');
 const teacherHtml=readFileSync(join(out,'teacher/index.html'),'utf8');
 assert.ok(teacherHtml.includes('Открываем ГОС.ID')||teacherHtml.includes('Постоянная среда')||teacherHtml.includes('ПОСТОЯННЫЙ КАБИНЕТ'),'Teacher HTML must serve the same permanent zero-game entry');
+// The static host serves the game from /gos-sim1/, not the github.io root.
+// Verify the exact link references and real multi-resolution browser icon.
+const faviconPath=join(out,'favicon.ico');
+assert.ok(existsSync(faviconPath),'The browser favicon must exist in GitHub Pages output');
+const favicon=readFileSync(faviconPath);
+assert.ok(favicon.length>500&&favicon.readUInt16LE(0)===0&&favicon.readUInt16LE(2)===1&&favicon.readUInt16LE(4)>=3,
+ 'Exported favicon must be a real multi-size ICO');
+for(const [name,document] of [['root',readFileSync(join(out,'index.html'),'utf8')],['teacher',teacherHtml]]){
+ const head=document.slice(0,document.indexOf('</head>'));
+ const iconTags=[...head.matchAll(/<link\\b[^>]*rel="(?:shortcut )?icon"[^>]*>/g)].map(match=>match[0]);
+ assert.ok(iconTags.some(tag=>tag.includes('href="'+base+'/favicon.ico?v=20261028-1"')),
+  name+' must link to a versioned game-scoped browser icon');
+ assert.ok(iconTags.some(tag=>tag.includes('href="'+base+'/icon.svg?v=20261028-1"')),
+  name+' must link to a versioned game-scoped SVG icon');
+ assert.ok(!iconTags.some(tag=>/href="\\/(?!gos-sim1\\/)/.test(tag)),
+  name+' must not fetch a browser icon outside the GitHub Pages repository');
+ assert.ok(head.includes('href="'+base+'/manifest.webmanifest"'),name+' PWA manifest must stay in the app scope');
+}
 const refs=new Set();
 for(const file of files(out).filter(x=>x.endsWith('.html'))){
  for(const match of readFileSync(file,'utf8').matchAll(/(?:src|href)="([^"]+)"/g)){

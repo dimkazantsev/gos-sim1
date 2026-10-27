@@ -33,6 +33,12 @@ transform('app/layout.tsx',
 transform('app/layout.tsx',
  "const socialPreview='/share/gos-id-preview.jpg';",
  'const socialPreview='+JSON.stringify(pagesImage)+';');
+// Every browser-facing URL in the static export must live below the repository path.
+// Root-relative icon metadata points at github.io/favicon.ico (outside this app).
+for(const asset of ['/favicon.ico?v=20261028-1','/icon.svg?v=20261028-1','/pwa/icon-192.png','/pwa/apple-touch-icon.png']){
+ transform('app/layout.tsx',"'"+asset+"'",JSON.stringify(base+asset));
+}
+transform('app/layout.tsx',"manifest:'/manifest.webmanifest'","manifest:"+JSON.stringify(base+'/manifest.webmanifest'));
 transform('app/layout.tsx',
  "type:'website',locale:'ru_RU',url:'/',siteName:BRAND_NAME,",
  "type:'website',locale:'ru_RU',url:"+JSON.stringify(pagesUrl)+",siteName:BRAND_NAME,");
