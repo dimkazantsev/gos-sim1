@@ -54,7 +54,7 @@ async function main(){
   let tick,delay,cleared=false;const calls=[],listeners=new Map();
   const document={visibilityState:'visible',addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:name=>listeners.delete(name)};
   const {fn}=compile(presence.arguments[0],{me:{kind:'student'},previewMode:false,view:'documents',document,Math,touchPresence:(...args)=>{calls.push(args);return Promise.resolve()},setInterval:(fn,ms)=>{tick=fn;delay=ms;return 1},clearInterval:()=>{cleared=true}});
-  const cleanup=fn();assert.equal(calls.length,1);assert(delay>=30000&&delay<40000);
+  const cleanup=fn();assert.equal(calls.length,1);assert(delay>=60000&&delay<72000);
   tick();assert.equal(calls.length,2);document.visibilityState='hidden';
   for(let minute=0;minute<20;minute++)tick();assert.equal(calls.length,2,'Hidden sessions send zero twenty-minute presence writes');
   document.visibilityState='visible';listeners.get('visibilitychange')();assert.equal(calls.length,3,'Returning starts a new presence interval');

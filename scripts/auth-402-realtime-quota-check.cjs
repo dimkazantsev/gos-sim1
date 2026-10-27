@@ -97,15 +97,16 @@ const sectionEnv={
  load:()=>{sectionReads++;return Promise.resolve()},
  schedule:()=>{sectionReads++},
  setInterval:fn=>{sectionTick=fn;return 1},
+ userJitter:0,
  Math:Object.assign(Object.create(Math),{random:()=>0})
 };
 vm.runInNewContext(sectionSource.slice(sectionPollStart,sectionPollEnd),sectionEnv);
 pollClock+=120_000;sectionTick();
 assert.equal(sectionReads,0,'Connected badges must not poll within 2 minutes');
-pollClock+=60_000;sectionTick();
-assert.equal(sectionReads,1,'Connected badges reconcile once after 3 minutes');
+pollClock+=180_000;sectionTick();
+assert.equal(sectionReads,1,'Connected badges reconcile once after 5 minutes');
 pollClock+=30_000;sectionTick();
-assert.equal(sectionReads,1,'No 30-second polling on a healthy WebSocket');
+assert.equal(sectionReads,1,'No frequent polling on a healthy WebSocket');
 connected=false;pollClock+=30_000;sectionTick();
 assert.equal(sectionReads,2,'Disconnected badges recover on the regular timer');
 sectionEnv.document.visibilityState='hidden';pollClock+=60_000;sectionTick();
@@ -148,4 +149,4 @@ clock+=30000;tick();
 assert.equal(changed,1,'Not every 30 seconds while connected');
 callback('CLOSED');tick();
 assert.equal(changed,2,'Disconnected client recovers on next normal poll');
-console.log('PASS: 402 visible to user, connected 3-minute fallback, disconnected 30-40s recovery, game realtime events retained, syntax.');
+console.log('PASS: 402 visible, connected 5-minute badge fallback, game realtime 3-minute fallback, syntax.');

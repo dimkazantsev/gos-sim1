@@ -566,7 +566,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политический процесс',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Ситуационные решения',budget:'Бюджет'};
   const visible=()=>{if(document.visibilityState==='visible')void touchPresence(view)};
   if(document.visibilityState==='visible')void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
-  const id=setInterval(visible,30000+Math.floor(Math.random()*10000));
+  const id=setInterval(visible,60000+Math.floor(Math.random()*12000));
   document.addEventListener('visibilitychange',visible);
   return()=>{clearInterval(id);document.removeEventListener('visibilitychange',visible)};
  },[view,me?.user_id,previewMode]);

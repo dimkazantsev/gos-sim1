@@ -15,7 +15,7 @@ assert(screen.includes("setPRules(previous=>previous.some(item=>item.id===row.id
 assert(screen.includes("void loadProposalRules();"),'Refresh in the background without delaying acknowledgement');
 assert(screen.includes(".limit(100)"),'Bound per-client proposal queries');
 assert(screen.includes("stageNo===2?'parliamentary_election_rules':'regional_election_rules'"),'Read only the current stage proposals');
-assert(hook.includes("(!onlyTable||detail.table===onlyTable)"),'Ignore unrelated game changes');
+assert(hook.includes("if(onlyTable&&detail.table!==onlyTable)return;"),'Ignore unrelated game changes');
 assert(hook.includes('KSRF_PROPOSAL_REFRESH_EVENT'),'Send proposal invalidations on a distinct event');
 assert(hook.includes('const eventName=onlyTable?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT'),'Do not wake unrelated stage panels');
 assert(hook.includes('window.addEventListener(eventName,local)'),'Subscribe to scoped event only');
