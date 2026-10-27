@@ -14,7 +14,9 @@ function harness(component){
  const result=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX},reportDiagnostics:true,fileName:relative});
  assert.equal((result.diagnostics||[]).filter(d=>d.category===ts.DiagnosticCategory.Error).length,0,'Component must parse');
  const slots=[],effects=[],calls=[],counts=new Map(),holds=new Map(),tables=new Map(),failures=new Set();
- let cursor=0,dirty=false,tree,latestLoad,rpcError=null,revision=1;
+ let cursor=0,dirty=false,tree,latestLoad,rpcError=null,revision=1,now=Date.now(),activeSigns=0,peakSigns=0;
+ const intervals=new Map();let timerId=0;
+ class ClockDate extends Date{constructor(...args){super(...(args.length?args:[now]))}static now(){return now}}
  const g={game:{id:'game-a'},me:{game_id:'game-a',user_id:'teacher-a',kind:'teacher',role_title:'Преподаватель',roster_archived_at:null},teacher:true,members:[{user_id:'student-a',kind:'student',full_name:'Student A'},{user_id:'student-b',kind:'student',full_name:'Student B'},{user_id:'student-archived',kind:'student',full_name:'Archived Student',roster_archived_at:'2026-10-08'}],votes:[],setError:error=>errors.push(String(error?.message||error))},errors=[];
  function rows(table,value,game='game-a'){tables.set(game+':'+table,clone(value));}
  rows('municipal_projects',[project('a'),project('b')]);rows('municipal_project_members',[{project_id:'a',user_id:'student-a'}]);
@@ -23,6 +25,7 @@ function harness(component){
  const react={
   useState(initial){const i=cursor++;if(!slots[i])slots[i]={value:typeof initial==='function'?initial():initial};return[slots[i].value,next=>{const value=typeof next==='function'?next(slots[i].value):next;if(!Object.is(value,slots[i].value)){slots[i].value=value;dirty=true;}}];},
   useRef(initial){const i=cursor++;return(slots[i]??={value:{current:initial}}).value;},
+  useMemo(fn,deps){const i=cursor++,old=slots[i];if(!old||deps.some((v,j)=>!Object.is(v,old.deps[j])))slots[i]={deps,value:fn()};return slots[i].value;},
   useEffect(effect,deps){const i=cursor++,old=slots[i];if(!old||!deps||deps.some((value,j)=>!Object.is(value,old.deps?.[j]))){slots[i]={deps,cleanup:old?.cleanup};effects.push(()=>{slots[i].cleanup?.();slots[i].cleanup=effect();});}}
  };
  const supabase={
@@ -35,12 +38,12 @@ function harness(component){
    }
    return{data:null,error:null};
   },
-  storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/evidence'},error:null}),upload:async()=>({data:{},error:null})})}
+  storage:{from:()=>({createSignedUrl:async path=>{const number=(counts.get('storage')||0)+1;counts.set('storage',number);activeSigns++;peakSigns=Math.max(peakSigns,activeSigns);try{await holds.get('storage:'+number)?.promise;return failures.has('storage')?{data:null,error:{message:'Storage unavailable'}}:{data:{signedUrl:'https://example.invalid/'+path+'?signature='+number},error:null}}finally{activeSigns--}},upload:async()=>({data:{},error:null})})}
  };
  const jsx=(type,props)=>({type,props:props||{}}),tag=name=>Object.assign(()=>{},{displayName:name});
- function requireFor(name){if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};if(name==='@/lib/supabase')return{supabase};if(name==='@/lib/userError')return{userError:error=>String(error?.message||error)};if(name==='../../lib/gameLabels')return{gameValueLabel:value=>String(value||'Не указано')};if(name==='./useGameTableSync')return{useGameTableSync(id,tables,load,scope){const latest=react.useRef(load);latest.current=load;latestLoad=()=>latest.current();react.useEffect(()=>{if(id)void latest.current();},[id,scope,tables.join('|')]);}};if(name.endsWith('.module.css'))return{__esModule:true,default:new Proxy({},{get:(_,key)=>String(key)})};return new Proxy({__esModule:true,default:tag(path.basename(name))},{get:(object,key)=>key in object?object[key]:tag(String(key))});}
+ function requireFor(name){if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};if(name==='@/lib/supabase')return{supabase};if(name==='@/lib/userError')return{userError:error=>String(error?.message||error)};if(name==='../../lib/gameLabels')return{gameValueLabel:value=>String(value||'Не указано')};if(name==='./scopedSignedAssetCache'){const source=fs.readFileSync(path.join(root,'components/game/scopedSignedAssetCache.ts'),'utf8'),code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,child={exports:{}};vm.runInNewContext('(function(module,exports){'+code+'\n})',{Date:ClockDate,Map,Promise})(child,child.exports);return child.exports;}if(name==='./useGameTableSync')return{useGameTableSync(id,tables,load,scope){const latest=react.useRef(load);latest.current=load;latestLoad=()=>latest.current();react.useEffect(()=>{if(id)void latest.current();},[id,scope,tables.join('|')]);}};if(name.endsWith('.module.css'))return{__esModule:true,default:new Proxy({},{get:(_,key)=>String(key)})};return new Proxy({__esModule:true,default:tag(path.basename(name))},{get:(object,key)=>key in object?object[key]:tag(String(key))});}
  const module={exports:{}};
- vm.runInNewContext('(function(require,module,exports){'+result.outputText+'\n})',{console,Date,Promise,Map,Set,Object,Array,String,Number,Math,Error,URL,crypto:{randomUUID:()=> 'fictional-upload-id'},fetch:()=>{throw new Error('Unexpected external URL fetch');}})(requireFor,module,module.exports);
+ vm.runInNewContext('(function(require,module,exports){'+result.outputText+'\n})',{console,Date:ClockDate,Promise,Map,Set,Object,Array,String,Number,Math,Error,URL,document:{visibilityState:'visible',addEventListener(){},removeEventListener(){}},setInterval:fn=>{const id=++timerId;intervals.set(id,fn);return id},clearInterval:id=>intervals.delete(id),crypto:{randomUUID:()=> 'fictional-upload-id'},fetch:()=>{throw new Error('Unexpected external URL fetch');}})(requireFor,module,module.exports);
  function render(){cursor=0;dirty=false;tree=module.exports.default({g});while(effects.length)effects.shift()();return tree;}
  async function settle(){for(let i=0;i<10;i++){render();await tick();if(!dirty)break;}return render();}
  const all=(type,from=tree)=>nodes(from,node=>node.type===type);
@@ -53,11 +56,60 @@ function harness(component){
  function addLink(name,url){button('Добавить презентацию').props.onClick();render();const index=all('input').filter(node=>node.props.type==='url').length;change('Название презентации '+index,name);change('Ссылка на презентацию '+index,url);}
  function patchProject(id,patch,game='game-a'){const key=game+':municipal_projects';tables.set(key,(tables.get(key)||[]).map(row=>row.id===id?{...row,...patch,updated_at:'revision-'+(++revision)}:row));}
  return{g,calls,errors,render,settle,all,byClass,field,button,select,change,base,addLink,rows,patchProject,text:()=>text(tree),validUrl:module.exports.validGooglePresentationUrl,refresh:()=>latestLoad(),
-  hold(name){const hold=deferred();holds.set(name+':'+((counts.get(name)||0)+1),hold);return hold;},fail:table=>failures.add(table),setRpcError:error=>{rpcError=error;},dispose(){for(const slot of slots)slot?.cleanup?.();}};
+  hold(name){const hold=deferred();holds.set(name+':'+((counts.get(name)||0)+1),hold);return hold;},signStats:()=>({calls:counts.get('storage')||0,peak:peakSigns}),advance(ms){now+=ms;for(const fn of intervals.values())fn()},fail:table=>failures.add(table),recover:table=>failures.delete(table),setRpcError:error=>{rpcError=error;},dispose(){for(const slot of slots)slot?.cleanup?.();}};
 }
 async function main(){
  const failed=[];
  async function check(name,fn){try{await fn();console.log('PASS '+name);}catch(error){failed.push(name);console.error('FAIL '+name+': '+error.stack);}}
+ await check('Evidence metadata renders before bounded signing, reuses URLs and renews them',async()=>{
+  const h=harness('MunicipalProjectLab'),held=h.hold('storage');
+  const rows=Array.from({length:20},(_,i)=>({id:'ev-'+i,game_id:'game-a',project_id:i<10?'a':'b',uploaded_by:'teacher-a',media_kind:'image',storage_path:'game-a/evidence-'+i,file_name:'evidence-'+i+'.jpg',created_at:'2026-10-08T00:00:00Z'}));
+  try{
+   h.rows('municipal_project_evidence',rows);await h.settle();
+   assert.ok(h.text().includes('Problem a'),'Project metadata must render before slow signing finishes');
+   assert.ok(h.signStats().peak<=4,'At most four signatures in flight');
+   held.resolve();await h.settle();for(let i=0;i<10;i++)await tick();await h.settle();
+   assert.equal(h.signStats().calls,10,'Only selected project is signed');
+   await h.refresh();await h.settle();assert.equal(h.signStats().calls,10,'Reload reuses unexpired signed URLs');
+   h.button('Problem bLocation bПроектируется').props.onClick();await h.settle();for(let i=0;i<10;i++)await tick();await h.settle();assert.equal(h.signStats().calls,20,'Only newly selected project is signed');
+   h.advance(46*60*1000);await h.settle();for(let i=0;i<10;i++)await tick();await h.settle();assert.equal(h.signStats().calls,30,'Visible signed URLs refresh before their one-hour expiry');
+  }finally{held.resolve();h.dispose()}
+ });
+ await check('A late signed link cannot appear after an identity or role change',async()=>{
+  const h=harness('MunicipalProjectLab'),held=h.hold('storage');
+  h.rows('municipal_project_evidence',[{id:'private',game_id:'game-a',project_id:'a',uploaded_by:'teacher-a',media_kind:'image',storage_path:'game-a/private',file_name:'private.jpg',created_at:'2026-10-08T00:00:00Z'}]);
+  try{
+   await h.settle();assert.equal(h.signStats().calls,1);
+   h.rows('municipal_project_evidence',[]);h.g.teacher=false;h.g.me.user_id='student-b';h.g.me.kind='student';h.g.me.role_title='Служащий';
+   await h.settle();held.resolve();await h.settle();
+   assert.equal(h.all('img').length,0,'The previous identity must not restore private evidence');
+   assert.doesNotMatch(h.text(),/private\.jpg/);
+  }finally{held.resolve();h.dispose()}
+ });
+ await check('A slow file signature does not delay the other files on the page',async()=>{
+  const h=harness('MunicipalProjectLab'),held=h.hold('storage');
+  h.rows('municipal_project_evidence',Array.from({length:3},(_,i)=>({id:'ev-'+i,game_id:'game-a',project_id:'a',uploaded_by:'teacher-a',media_kind:'image',storage_path:'game-a/evidence-'+i,file_name:'evidence-'+i+'.jpg',created_at:'2026-10-08T00:00:00Z'})));
+  try{
+   await h.settle();for(let i=0;i<10;i++)await tick();await h.settle();
+   assert.equal(h.all('img').length,2,'Ready images must not wait for the held signature');
+   held.resolve();await h.settle();assert.equal(h.all('img').length,3);
+  }finally{held.resolve();h.dispose()}
+ });
+ await check('A large evidence archive signs only the current page and can be browsed completely',async()=>{
+  const h=harness('MunicipalProjectLab');
+  h.rows('municipal_project_evidence',Array.from({length:45},(_,i)=>({id:'ev-'+i,game_id:'game-a',project_id:'a',uploaded_by:'teacher-a',media_kind:'image',storage_path:'game-a/evidence-'+i,file_name:'evidence-'+i+'.jpg',created_at:'2026-10-08T00:00:00Z'})));
+  try{
+   await h.settle();for(let i=0;i<20;i++)await tick();await h.settle();assert.equal(h.signStats().calls,20,'The first page signs only 20 files');
+   h.button('Следующие материалы').props.onClick();await h.settle();for(let i=0;i<20;i++)await tick();await h.settle();assert.equal(h.signStats().calls,40);
+   h.button('Следующие материалы').props.onClick();await h.settle();for(let i=0;i<20;i++)await tick();await h.settle();assert.equal(h.signStats().calls,45);assert.match(h.text(),/evidence-44\.jpg/);
+   h.button('Предыдущие материалы').props.onClick();await h.settle();assert.equal(h.signStats().calls,45,'Returning to a page reuses cached signatures');
+  }finally{h.dispose()}
+ });
+ await check('A failed file signature can be retried without losing the project',async()=>{
+  const h=harness('MunicipalProjectLab');h.fail('storage');
+  h.rows('municipal_project_evidence',[{id:'ev',game_id:'game-a',project_id:'a',uploaded_by:'teacher-a',media_kind:'image',storage_path:'game-a/evidence',file_name:'evidence.jpg',created_at:'2026-10-08T00:00:00Z'}]);
+  try{await h.settle();assert.match(h.text(),/Problem a/);assert.ok(h.button('Не удалось открыть. Повторить'));h.recover('storage');h.button('Не удалось открыть. Повторить').props.onClick();await h.settle();assert.equal(h.all('img').length,1);}finally{h.dispose()}
+ });
  await check('Governance uses Russian status labels, wrapped accessible selects, and an active roster',async()=>{
   const h=harness('MunicipalGovernancePanel');await h.settle();assert.match(h.text(),/Выдвижение кандидатов/);assert.equal(h.all('select').length,0);assert.ok(nodes(h.render(),node=>node.type?.displayName==='StageModuleHeader').length);assert.doesNotMatch(h.text(),/команд|nomination/iu);assert.equal(h.select('Кандидат в главы города').props.wrap,true);assert.ok(!h.select('Кандидат в главы города').props.options.some(o=>o.value==='student-archived'));
   for(const [status,label] of [['open','Тайное голосование'],['finished','Выборы завершены'],['tie','Повторное голосование']]){h.rows('municipal_mayor_elections',[{id:'election-a',status,winner_user_id:'student-a'}]);await h.refresh();await h.settle();assert.match(h.text(),new RegExp(label));assert.equal(h.all('select').length,0);for(const select of nodes(h.render(),node=>node.type?.displayName==='StyledSelect'))assert.equal(select.props.wrap,true);}h.dispose();

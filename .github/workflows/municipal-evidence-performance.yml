@@ -1,0 +1,29 @@
+name: Municipal evidence performance
+on:
+  pull_request:
+    paths:
+      - 'components/game/MunicipalProjectLab.tsx'
+      - 'components/game/scopedSignedAssetCache.ts'
+      - 'scripts/municipal-workflow-check.cjs'
+      - '.github/workflows/municipal-evidence-performance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'components/game/MunicipalProjectLab.tsx'
+      - 'components/game/scopedSignedAssetCache.ts'
+      - 'scripts/municipal-workflow-check.cjs'
+      - '.github/workflows/municipal-evidence-performance.yml'
+permissions:
+  contents: read
+jobs:
+  municipal-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/municipal-workflow-check.cjs

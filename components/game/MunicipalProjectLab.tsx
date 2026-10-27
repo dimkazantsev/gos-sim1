@@ -1,11 +1,12 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import StageModuleHeader from '../ui/StageModuleHeader';
 import StyledSelect from '../ui/StyledSelect';
 import {IconAction} from '../ui/IconAction';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
+import {createScopedSignedAssetCache} from './scopedSignedAssetCache';
 import type {ReturnTypeRepublic} from './viewTypes';
 import styles from './MunicipalStages.module.css';
 
@@ -36,6 +37,8 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
  const [districts,setDistricts]=useState<District[]>([]);
  const [urls,setUrls]=useState<Record<string,string>>({});
  const [selectedId,setSelectedId]=useState('');
+ const [evidencePage,setEvidencePage]=useState(0);
+ const [retryEvidence,setRetryEvidence]=useState(0);
  const [drafts,setDrafts]=useState<Record<string,ProjectDraft>>({new:emptyDraft()});
  const [memberToAdd,setMemberToAdd]=useState('');
  const [files,setFiles]=useState<File[]>([]);
@@ -43,6 +46,14 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
  const [busy,setBusy]=useState(false);
  const scopeKey=[game?.id,me?.user_id,me?.kind,me?.role_title,me?.roster_archived_at,teacher].join('|');
  const scope=useRef(scopeKey),generation=useRef(0),request=useRef(0),busyRef=useRef(false);
+ const signer=useMemo(()=>{
+  const identity={epoch:-1};
+  return {identity,sign:createScopedSignedAssetCache(async path=>{
+   if(scope.current!==scopeKey||generation.current!==identity.epoch)return null;
+   const result=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
+   return result.error?null:result.data?.signedUrl||null;
+  })};
+ },[scopeKey]);
  const selectedRef=useRef(''),selectionTouched=useRef(false),dirtyDrafts=useRef(new Set<string>()),versions=useRef<Record<string,number>>({}),fileVersion=useRef(0);
  const [stateScope,setStateScope]=useState(scopeKey);
  scope.current=scopeKey;
@@ -50,11 +61,11 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
  useEffect(()=>{
   generation.current++;request.current++;busyRef.current=false;selectedRef.current='';selectionTouched.current=false;
   dirtyDrafts.current.clear();versions.current={};fileVersion.current++;
-  setStateScope(scopeKey);setProjects([]);setProjectMembers([]);setEvidence([]);setDistricts([]);setUrls({});setSelectedId('');setDrafts({new:emptyDraft()});
+  setStateScope(scopeKey);setProjects([]);setProjectMembers([]);setEvidence([]);setDistricts([]);setUrls({});setSelectedId('');setEvidencePage(0);setDrafts({new:emptyDraft()});
   setMemberToAdd('');setFiles([]);setEvidenceNote('');setBusy(false);
   return()=>{generation.current++;request.current++;};
  },[scopeKey]);
- function pickProject(id:string){selectedRef.current=id;selectionTouched.current=true;setSelectedId(id);setMemberToAdd('');setFiles([]);setEvidenceNote('');fileVersion.current++;}
+ function pickProject(id:string){selectedRef.current=id;selectionTouched.current=true;setSelectedId(id);setEvidencePage(0);setMemberToAdd('');setFiles([]);setEvidenceNote('');fileVersion.current++;}
  function edit(patch:Partial<ProjectDraft>){
   const key=selectedRef.current||'new';dirtyDrafts.current.add(key);versions.current[key]=(versions.current[key]||0)+1;
   setDrafts(old=>({...old,[key]:{...(old[key]||emptyDraft()),...patch}}));
@@ -74,16 +85,34 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
   if(!current())return;
   const failure=[p,m,e,d].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
    const rows=(e.data||[]) as Evidence[];
-   const next:Record<string,string>={};
-   await Promise.all(rows.map(async x=>{const s=await supabase.storage.from('game-assets').createSignedUrl(x.storage_path,3600);if(!s.error&&s.data?.signedUrl)next[x.id]=s.data.signedUrl}));
-   if(!current())return;
    const projectRows=(p.data||[]) as Project[];
-   setProjects(projectRows);setProjectMembers((m.data||[]) as ProjectMember[]);setDistricts((d.data||[]) as District[]);setEvidence(rows);setUrls(next);
+   setProjects(projectRows);setProjectMembers((m.data||[]) as ProjectMember[]);setDistricts((d.data||[]) as District[]);setEvidence(rows);
    setDrafts(old=>{const next={...old};for(const project of projectRows)if(!dirtyDrafts.current.has(project.id))next[project.id]=projectDraft(project);return next;});
    if(selectedRef.current&&!projectRows.some(project=>project.id===selectedRef.current))pickProject('');
    else if(!selectedRef.current&&!selectionTouched.current&&projectRows[0]){selectedRef.current=projectRows[0].id;setSelectedId(projectRows[0].id);}
   }catch(error){if(current())setError(userError(error)||'Не удалось выполнить действие.');}
  }
+ useEffect(()=>{
+  if(!selectedId||stateScope!==scopeKey||me?.roster_archived_at)return;
+  let active=true;const epoch=generation.current;signer.identity.epoch=epoch;
+  const refresh=()=>{
+   if(document.visibilityState!=='visible')return;
+   const all=evidence.filter(row=>row.project_id===selectedId),page=Math.min(evidencePage,Math.max(0,Math.ceil(all.length/20)-1));
+   const selected=all.slice(page*20,page*20+20);
+   const paths=new Set(selected.map(row=>row.storage_path));
+   setUrls(previous=>Object.keys(previous).some(path=>!paths.has(path))
+    ?Object.fromEntries(Object.entries(previous).filter(([path])=>paths.has(path))):previous);
+   for(const row of selected)void signer.sign(row.storage_path).then(url=>{
+    if(!active||scope.current!==scopeKey||generation.current!==epoch)return;
+    const value=url||'';
+    setUrls(previous=>previous[row.storage_path]===value?previous:{...previous,[row.storage_path]:value});
+   });
+  };
+  refresh();
+  const timer=setInterval(refresh,5*60*1000);
+  document.addEventListener('visibilitychange',refresh);
+  return()=>{active=false;clearInterval(timer);document.removeEventListener('visibilitychange',refresh)};
+ },[selectedId,evidence,evidencePage,stateScope,scopeKey,signer,retryEvidence,me?.roster_archived_at]);
  useGameTableSync(game?.id,['municipal_projects','municipal_project_members','municipal_project_evidence','municipal_districts','game_votes'],load,scopeKey);
 
  const selected=projects.find(p=>p.id===selectedId);
@@ -97,6 +126,7 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
  const activeMe=me;
  const selectedMembers=selected?projectMembers.filter(x=>x.project_id===selected.id):[];
  const selectedEvidence=selected?evidence.filter(x=>x.project_id===selected.id):[];
+ const pageCount=Math.ceil(selectedEvidence.length/20),page=Math.min(evidencePage,Math.max(0,pageCount-1));
  const imageCount=selectedEvidence.filter(x=>x.media_kind==='image').length;
  const videoCount=selectedEvidence.filter(x=>x.media_kind==='video').length;
  const fieldEvidenceReady=imageCount>=10&&videoCount>=5;
@@ -199,7 +229,8 @@ export default function MunicipalProjectLab({g}:{g:ReturnTypeRepublic}){
    <div className="municipalTeam"><div><small>СОСТАВ МУНИЦИПАЛЬНОЙ АДМИНИСТРАЦИИ</small><div>{selectedMembers.map(x=><span key={x.user_id}>{memberName(x.user_id)}</span>)}</div></div>{canManageMembers&&['fieldwork','draft'].includes(selected.status)&&<div><StyledSelect wrap label="Муниципальный служащий" value={memberToAdd} onChange={setMemberToAdd} disabled={busy} options={[{value:'',label:'Добавить в состав администрации…'},...members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&!selectedMembers.some(x=>x.user_id===m.user_id)).map(m=>({value:m.user_id,label:m.full_name}))]}/><button disabled={busy||!memberToAdd} onClick={()=>void addMember()}>Добавить</button></div>}</div>
 
    <div className="municipalEvidence"><div className="municipalSectionTitle"><div><small>ПОЛЕВЫЕ ДОКАЗАТЕЛЬСТВА</small><h3>Не менее 10 фото и 5 видео</h3></div><span>{imageCount}/10 фото · {videoCount}/5 видео</span></div>
-    <div className="municipalEvidenceGrid">{selectedEvidence.length===0?<div className="emptyState">Без доказательств проект нельзя отправить на рассмотрение.</div>:selectedEvidence.map(x=><article key={x.id}>{x.media_kind==='image'&&urls[x.id]?<img src={urls[x.id]} alt={x.note||x.file_name}/>:x.media_kind==='video'&&urls[x.id]?<video src={urls[x.id]} controls preload="metadata"/>:<div className="evidenceFile"><b>{x.media_kind==='audio'?'АУДИО':'ФАЙЛ'}</b><a href={urls[x.id]||'#'} target="_blank" rel="noopener noreferrer">{x.file_name}</a></div>}<footer><b>{x.file_name}</b>{x.note&&<p>{x.note}</p>}<span>{memberName(x.uploaded_by)} · {new Date(x.created_at).toLocaleString('ru-RU')}</span></footer></article>)}</div>
+    <div className="municipalEvidenceGrid">{selectedEvidence.length===0?<div className="emptyState">Без доказательств проект нельзя отправить на рассмотрение.</div>:selectedEvidence.slice(page*20,page*20+20).map(x=><article key={x.id}>{x.media_kind==='image'&&urls[x.storage_path]?<img src={urls[x.storage_path]} alt={x.note||x.file_name}/>:x.media_kind==='video'&&urls[x.storage_path]?<video src={urls[x.storage_path]} controls preload="metadata"/>:<div className="evidenceFile"><b>{x.media_kind==='audio'?'АУДИО':x.media_kind==='image'?'ИЗОБРАЖЕНИЕ':x.media_kind==='video'?'ВИДЕО':'ФАЙЛ'}</b>{urls[x.storage_path]?<a href={urls[x.storage_path]} target="_blank" rel="noopener noreferrer">{x.file_name}</a>:urls[x.storage_path]===''?<button type="button" onClick={()=>setRetryEvidence(n=>n+1)}>Не удалось открыть. Повторить</button>:<span>Подготавливаем файл…</span>}</div>}<footer><b>{x.file_name}</b>{x.note&&<p>{x.note}</p>}<span>{memberName(x.uploaded_by)} · {new Date(x.created_at).toLocaleString('ru-RU')}</span></footer></article>)}</div>
+    {pageCount>1&&<nav aria-label="Страницы полевых материалов"><button type="button" disabled={page===0} onClick={()=>setEvidencePage(page-1)}>Предыдущие материалы</button><span> Страница {page+1} из {pageCount} </span><button type="button" disabled={page+1>=pageCount} onClick={()=>setEvidencePage(page+1)}>Следующие материалы</button></nav>}
     {canEdit&&['fieldwork','draft'].includes(selected.status)&&<div className="municipalUpload"><input type="file" aria-label="Полевые материалы проекта" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx" onChange={e=>{fileVersion.current++;setFiles(Array.from(e.target.files||[]));}}/><input aria-label="Описание полевых материалов" value={evidenceNote} onChange={e=>{fileVersion.current++;setEvidenceNote(e.target.value);}} placeholder="Что подтверждает этот материал?"/><button disabled={busy||files.length===0} onClick={()=>void upload()}>Загрузить {files.length?'('+files.length+')':''}</button></div>}
    </div>
 
