@@ -30,7 +30,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   }
   function schedule(immediate=false){
    if(!live||blocked||pending!==undefined||document.visibilityState!=='visible')return;
-   pending=setTimeout(()=>{pending=undefined;void load()},immediate?0:Math.max(250,8000-(Date.now()-lastStartedAt)));
+   pending=setTimeout(()=>{pending=undefined;void load()},immediate?0:Math.max(250,15000-(Date.now()-lastStartedAt)));
   }
   const invalidated=(e:Event)=>{
    const detail=(e as CustomEvent<{gameId:string;table?:string}>).detail;
