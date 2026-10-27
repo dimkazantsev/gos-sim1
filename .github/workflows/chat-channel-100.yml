@@ -1,0 +1,31 @@
+name: Chat channel 100-client scoped refresh
+on:
+  pull_request:
+    paths:
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/chat-visibility-100-clients-check.cjs'
+      - '.github/workflows/chat-channel-100.yml'
+  push:
+    branches:
+      - 'perf/chat-visible-channel-100-20261028'
+    paths:
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/chat-visibility-100-clients-check.cjs'
+      - '.github/workflows/chat-channel-100.yml'
+permissions:
+  contents: read
+concurrency:
+  group: chat-channel-100-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  scoped-refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/chat-visibility-100-clients-check.cjs
