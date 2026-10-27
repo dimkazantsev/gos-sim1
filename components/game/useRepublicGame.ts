@@ -522,6 +522,20 @@ export function useRepublicGame(gameId:string){
   if(next)rememberChatChannel(next,visibleMe.user_id);
  },[chatOpen,channels,chatOverview,channelId,visibleMe?.user_id,gameId]);
 
+ // Persist authorised presentation deltas from Realtime without fetching
+ // anything extra. Debounce successive changes to avoid storage-write bursts.
+ useEffect(()=>{
+  const uid=me?.user_id;
+  if(!uid||me?.game_id!==gameId||authUser.current!==uid||
+     acceptedMember.current?.user_id!==uid||lastCoreSuccessAt.current===0)return;
+  const epoch=readEpoch.current;
+  const timer=setTimeout(()=>{
+   if(!alive.current||authUser.current!==uid||epoch!==readEpoch.current||
+      acceptedMember.current?.user_id!==uid)return;
+   void writeLocalGameSnapshot(gameId,uid,{stages,metrics,events});
+  },1500);
+  return()=>clearTimeout(timer);
+ },[gameId,me?.user_id,stages,metrics,events]);
  useEffect(()=>{if(me?.user_id)void hydrateActiveView(true);},[activeView,me?.user_id,gameId]);
  useEffect(()=>{if(chatOpen&&me?.user_id)void loadChatOverview();},[chatOpen,me?.user_id,gameId]);
 

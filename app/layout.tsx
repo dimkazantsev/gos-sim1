@@ -60,6 +60,7 @@ import './2026-stage12-synced-agenda.css';
 import './party-mobile-header-compact.css';
 import './teacher-agenda-composition.css';
 import './responsive-layout-repair.css';
+import './device-sync-status.css';
 import type {Metadata} from 'next';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import PwaRegistrar from '@/components/PwaRegistrar';
