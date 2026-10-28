@@ -16,7 +16,7 @@ function harness({effects=false,compiledCode=code}={}){
  const slots=[],pendingEffects=[],channels=[],timers=new Map(),listeners=new Map(),counts=new Map(),holds=new Map(),failures=new Set(),failureCodes=new Map();
  let cursor=0,dirty=false,revision=1,user='teacher-a',memberKind='teacher',gameId='game-a',authCallback,authError=null,clock=0,requests=0,disposed=false,recorders=0,stoppedTracks=0,withBallots=false,assetPaths=false,signed=0,activeSigns=0,peakSigns=0;
  let virtualNow=Date.parse('2026-10-26T00:00:00Z'),responseBytes=0,aborted=0,ignoreAbort=false;
- const started=new Map(),notices=[],docListeners=new Map(),fixtures=new Map(),queryLog=[];
+ const started=new Map(),notices=[],docListeners=new Map(),fixtures=new Map(),queryLog=[],rpcFailures=new Map();
  class ClockDate extends Date{constructor(...args){super(...(args.length?args:[virtualNow]));}static now(){return virtualNow;}}
  const permission=deferred(),mediaSend=deferred();
  class Recorder{constructor(){recorders++;this.state='inactive';}static isTypeSupported(){return false;}start(){this.state='recording';}stop(){this.state='inactive';this.onstop?.();}}
@@ -38,7 +38,7 @@ function harness({effects=false,compiledCode=code}={}){
   from(table){
    requests++;const number=(counts.get(table)||0)+1;counts.set(table,number);
    const snapshot={revision,user,gameId,memberKind},fixtureSnapshot=fixtures.has(table)?JSON.parse(JSON.stringify(fixtures.get(table))):null;
-   const query={singleRow:false,eqs:{},ins:{},select(){return this;},order(){return this;},limit(){return this;},eq(key,value){this.eqs[key]=value;return this;},single(){this.singleRow=true;return this;},maybeSingle(){this.singleRow=true;return this;},in(key,values){this.ins[key]=values;return this;},abortSignal(signal){this.signal=signal;signal.addEventListener('abort',()=>{aborted++},{once:true});return this;},
+   const query={singleRow:false,eqs:{},ins:{},upsert(){started.set('write:'+table,(started.get('write:'+table)||0)+1);return Promise.resolve({data:null,error:null});},insert(){started.set('write:'+table,(started.get('write:'+table)||0)+1);return Promise.resolve({data:null,error:null});},select(){return this;},order(){return this;},limit(){return this;},eq(key,value){this.eqs[key]=value;return this;},single(){this.singleRow=true;return this;},maybeSingle(){this.singleRow=true;return this;},in(key,values){this.ins[key]=values;return this;},abortSignal(signal){this.signal=signal;signal.addEventListener('abort',()=>{aborted++},{once:true});return this;},
     async then(resolve,reject){try{
      started.set(table,(started.get(table)||0)+1);
      queryLog.push({table,eqs:{...this.eqs},ins:{...this.ins}});
@@ -70,6 +70,7 @@ function harness({effects=false,compiledCode=code}={}){
   rpc:async(name,args)=>{
    requests++;
    started.set('rpc:'+name,(started.get('rpc:'+name)||0)+1);
+   if(rpcFailures.has(name))return{data:null,error:{code:rpcFailures.get(name),message:'simulated RPC failure '+name}};
    if(name==='get_my_game_identity'){
     const snapshot={revision,user,gameId,memberKind};
     const gameNumber=(counts.get('games')||0)+1;counts.set('games',gameNumber);
@@ -128,6 +129,7 @@ function harness({effects=false,compiledCode=code}={}){
  async function settle(){for(let i=0;i<8;i++){render();await tick();if(!dirty)break;}return render();}
  return{
   render,settle,redirects,
+  rpcCount:name=>started.get('rpc:'+name)||0,writeCount:table=>started.get('write:'+table)||0,failRpc:(name,code)=>rpcFailures.set(name,code),
   enableBallots(){withBallots=true;},readCount:table=>counts.get(table)||0,
   setRevision:value=>{revision=value;},setUser:value=>{user=value;},setMemberKind:value=>{memberKind=value;},setAssetPaths:value=>{assetPaths=value;},assetStats:()=>({signed,peakSigns}),failTable(table,code){failures.add(table);failureCodes.set(table,code);},setAuthError:value=>{authError=value;},
   hold(table,number=(counts.get(table)||0)+1){const pending=deferred();holds.set(table+':'+number,pending);return pending;},
@@ -179,6 +181,41 @@ async function main(){
   assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,14);
   assert(source.slice(start,end).includes('loadMemberRoster()'),'The fifteenth core request uses the shared, concurrency-limited roster reader');
   assert(source.includes('coreReadQueue.current.active<4'));
+ });
+ await check('100 simulated players submit one presence plus one navigation event in one network call',async()=>{
+  const clients=Array.from({length:100},()=>harness());
+  try{
+   await Promise.all(clients.map(async h=>{
+    await h.render().refresh();
+    assert(h.render().me,'Client must have accepted server identity');
+    const before=h.rpcCount('record_my_game_presence');
+    await h.render().touchPresence('stages','Открыл раздел «Этапы»');
+    assert.equal(h.rpcCount('record_my_game_presence'),before+1);
+    assert.equal(h.writeCount('game_presence'),0,'The RPC does not need a separate client presence upsert');
+    assert.equal(h.writeCount('game_activity'),0,'The RPC writes the journal within the same server transaction');
+    await h.render().touchPresence('stages','Открыл раздел «Этапы»');
+    assert.equal(h.rpcCount('record_my_game_presence'),before+1,'Duplicate same-view heartbeats remain throttled');
+   }));
+  }finally{clients.forEach(h=>h.dispose());}
+ });
+ await check('Presence RPC schema fallback and permission failure preserve original RLS path',async()=>{
+  const h=harness();
+  try{
+   await h.render().refresh();
+   h.failRpc('record_my_game_presence','PGRST202');
+   await h.render().touchPresence('parties','Открыл раздел «Партия»');
+   assert.equal(h.rpcCount('record_my_game_presence'),1);
+   assert.equal(h.writeCount('game_presence'),1);
+   assert.equal(h.writeCount('game_activity'),1,'Legacy fallback preserves the navigation journal');
+  }finally{h.dispose();}
+  const denied=harness();
+  try{
+   await denied.render().refresh();
+   denied.failRpc('record_my_game_presence','42501');
+   await denied.render().touchPresence('parties','Открыл раздел «Партия»');
+   assert.equal(denied.writeCount('game_presence'),0,'RLS denial must never retry through another write path');
+   assert.equal(denied.writeCount('game_activity'),0);
+  }finally{denied.dispose();}
  });
  await check('40 simulated simultaneous party panels survive the same document update',async()=>{
   const clients=Array.from({length:40},()=>harness({effects:true}));
