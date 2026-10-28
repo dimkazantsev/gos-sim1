@@ -12,27 +12,34 @@ import styles from './BudgetAmendments.module.css';
 import {useGameTableSync} from './useGameTableSync';
 
 type Board={amendments:BudgetAmendment[];party_ids:string[];can_open:boolean;can_apply:boolean;can_submit_neutral:boolean};
-type Props={g:ReturnTypeRepublic;plans:BudgetPlanSummary[];selectedId:string;state:SimulatorState;context:FiscalContext|null;regions:FiscalRegion[];rates:FiscalRate[];requests:BudgetTransfer[];readOnly:boolean;onApplied:(result:{id:string;revision:number;draft:BudgetDraft})=>Promise<void>;onOpenVotes?:(id:string)=>void;onOpenDocument:(id:string)=>void;onOpenCalculator:()=>void};
+type Props={g:ReturnTypeRepublic;plans:BudgetPlanSummary[];selectedId:string;state:SimulatorState;context:FiscalContext|null;regions:FiscalRegion[];rates:FiscalRate[];requests:BudgetTransfer[];readOnly:boolean;active:boolean;onApplied:(result:{id:string;revision:number;draft:BudgetDraft})=>Promise<void>;onOpenVotes?:(id:string)=>void;onOpenDocument:(id:string)=>void;onOpenCalculator:()=>void};
 const sectionName=(key:string)=>amendmentSections.find(l=>l.key===key)?.label||'Раздел расходов';
 function Comparison({base,next,sections}:{base:BudgetCalculation;next:BudgetCalculation;sections:string[]}){
  const lines=[...sections.map(key=>({key,label:sectionName(key),before:base.expense_lines.find(l=>l.key===key)?.amount??0,after:next.expense_lines.find(l=>l.key===key)?.amount??0})),{key:'total',label:'Всего расходов',before:base.expenditure,after:next.expenditure},{key:'income',label:'Доходы',before:base.revenue,after:next.revenue},{key:'deficit',label:'Дефицит',before:base.deficit,after:next.deficit},{key:'funding',label:'Источники финансирования',before:base.financing,after:next.financing}];
  return <div className={styles.comparison} role="table" aria-label="Сравнение бюджетной поправки"><div className={styles.columns} role="row"><span role="columnheader">Показатель</span><span role="columnheader">До поправки</span><span role="columnheader">После поправки</span><span role="columnheader">Изменение</span></div>{lines.map(l=>{const delta=l.after-l.before;return <div className={styles.row} role="row" key={l.key} data-amendment-row={l.key}><b role="rowheader">{l.label}</b><span role="cell"><small>До поправки</small>{billions(l.before)}</span><span role="cell"><small>После поправки</small>{billions(l.after)}</span><strong role="cell" data-delta={delta}><small>Изменение</small>{delta===0?'Без изменения':(delta>0?'+':'')+billions(delta)}</strong></div>;})}</div>;
 }
-export default function BudgetAmendments({g,plans,selectedId,state,context,regions,rates,requests,readOnly,onApplied,onOpenVotes,onOpenDocument,onOpenCalculator}:Props){
- const [board,setBoard]=useState<Board|null>(null),[planId,setPlanId]=useState(''),[partyId,setPartyId]=useState(''),[from,setFrom]=useState('04'),[to,setTo]=useState('09'),[amount,setAmount]=useState('10'),[title,setTitle]=useState('Поправка к расходам федерального бюджета'),[reason,setReason]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
- const scope=useRef('');scope.current=(g.game?.id||'')+':'+(g.me?.user_id||'');
+export default function BudgetAmendments({g,plans,selectedId,state,context,regions,rates,requests,readOnly,active,onApplied,onOpenVotes,onOpenDocument,onOpenCalculator}:Props){
+ const [snapshot,setSnapshot]=useState<{scope:string;cycle:number;board:Board}|null>(null),[planId,setPlanId]=useState(''),[partyId,setPartyId]=useState(''),[from,setFrom]=useState('04'),[to,setTo]=useState('09'),[amount,setAmount]=useState('10'),[title,setTitle]=useState('Поправка к расходам федерального бюджета'),[reason,setReason]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
+ const scope=useRef('');scope.current=JSON.stringify([g.game?.id,g.me?.user_id,g.me?.kind,g.me?.role_title,g.me?.team,g.me?.roster_archived_at,g.teacher,readOnly]);
+ const currentReason=useRef(reason);currentReason.current=reason;
+ const activeRef=useRef(active),readVersion=useRef(0),activeCycle=useRef(0);
+ if(activeRef.current!==active){activeRef.current=active;readVersion.current++;activeCycle.current++}
+ const board=snapshot?.scope===scope.current&&snapshot.cycle===activeCycle.current?snapshot.board:null;
+ useEffect(()=>()=>{readVersion.current++},[]);
  const editable=plans.filter(p=>p.status==='draft'),basePlan=editable.find(p=>p.id===planId),partyIds=board?.party_ids||[];
  const maySubmit=!readOnly&&!!board&&(board.can_submit_neutral||partyIds.length>0);
  const base=useMemo(()=>basePlan?calculateFederalBudget(basePlan.draft,state,context,regions,rates,requests):null,[basePlan,state,context,regions,rates,requests]);
  const value=amount.trim()?Number(amount)*1000:NaN;
  const preview=useMemo(()=>basePlan&&base?previewBudgetAmendment(basePlan.draft,base,requests,from,to,value):null,[basePlan,base,requests,from,to,value]);
  async function load(){
-  if(!g.game)return;const requestedScope=scope.current;
-  try{const r=await supabase.rpc('get_budget_amendments',{p_game_id:g.game.id});if(requestedScope!==scope.current)return;if(r.error)setError(userError(r.error));else{setBoard(r.data as Board);setError('');}}
-  catch(e){if(requestedScope===scope.current)setError(userError(e));}
+  if(!g.game||!activeRef.current)return;const requestedScope=scope.current,cycle=activeCycle.current,version=++readVersion.current;
+  const current=()=>requestedScope===scope.current&&activeRef.current&&readVersion.current===version;
+  try{const r=await supabase.rpc('get_budget_amendments',{p_game_id:g.game.id});if(!current())return;if(r.error)setError(userError(r.error));else{setSnapshot({scope:requestedScope,cycle,board:r.data as Board});setError('');}}
+  catch(e){if(current())setError(userError(e));}
  }
- useEffect(()=>{setBoard(null);setBusy(false);setNotice('');setPlanId('');setPartyId('');setReason('')},[g.game?.id,g.me?.user_id]);
- useGameTableSync(g.game?.id,['budget_faction_amendments','budget_simulator_plans','game_votes','game_fiscal_policy','game_fiscal_regions','state_metrics','budget_simulator_state'],load,g.me?.user_id||'',undefined,750,15000);
+ useEffect(()=>{setSnapshot(null);setBusy(false);setNotice('')},[scope.current]);
+ useEffect(()=>{setPlanId('');setPartyId('');setReason('')},[g.game?.id,g.me?.user_id]);
+ useGameTableSync(active?g.game?.id:undefined,['budget_faction_amendments','budget_simulator_plans','game_votes','game_fiscal_policy','game_fiscal_regions','state_metrics','budget_simulator_state'],load,scope.current,undefined,750,15000);
  useEffect(()=>{if(!editable.some(p=>p.id===planId))setPlanId(editable.find(p=>p.id===selectedId)?.id||editable[0]?.id||'');},[plans,selectedId,planId]);
  useEffect(()=>{if(!board?.can_submit_neutral&&!partyIds.includes(partyId))setPartyId(partyIds[0]||'');},[board,partyId]);
  async function action(rpc:string,args:Record<string,unknown>,success:string){
@@ -43,8 +50,9 @@ export default function BudgetAmendments({g,plans,selectedId,state,context,regio
  }
  async function submit(){
   if(!maySubmit||!basePlan||!preview||preview.error||reason.trim().length<30||title.trim().length<3)return;
+  const submittedReason=reason;
   const r=await action('submit_budget_amendment',{p_plan_id:basePlan.id,p_revision:basePlan.revision,p_party_id:partyId||null,p_title:title.trim(),p_reason:reason.trim(),p_from:from,p_to:to,p_amount:Math.round(value*100)/100},'Поправка направлена. Расчет группы и действующий бюджет пока сохраняют прежние значения.');
-  if(r)setReason('');
+  if(r&&currentReason.current===submittedReason)setReason('');
  }
  async function open(a:BudgetAmendment){const r=await action('open_budget_amendment_vote',{p_amendment_id:a.id},'Предварительное голосование открыто в разделе «Голосования».');if(r){await g.refresh();onOpenVotes?.(String(r.data));}}
  async function apply(a:BudgetAmendment){const r=await action('apply_budget_amendment',{p_amendment_id:a.id},'Одобренная поправка включена в общий черновик. Теперь из него можно подготовить проект НПА.');if(r)await onApplied(r.data);}

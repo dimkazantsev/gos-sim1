@@ -204,6 +204,15 @@ async function main(){
    assert(Number(await sim.locator('[data-budget-funding-gap]').getAttribute('data-budget-funding-gap'))>0,'Additional obligations must be financed');
    await sim.locator('[data-financing-source="ofz_fixed"]').getByRole('button',{name:'Покрыть остаток',exact:true}).click();assert.equal(Number(await sim.locator('[data-budget-funding-gap]').getAttribute('data-budget-funding-gap')),0,'Gap closure also finances the new coupon cost with no residual kopeck');
    await openTab(page,'Проект ФЗ');await layout(page,'law '+width);await sim.screenshot({path:path.join(output,'law-'+width+'.png')});
+   if(width===320){
+    assert.equal(f.calls.filter(c=>c.rpc==='get_budget_amendments').length,0,'A collapsed amendment section does not fetch');
+    const summary=sim.getByText('Предложения фракций к распределению расходов',{exact:true}),reason=sim.getByLabel('Обоснование поправки');
+    await summary.click();await reason.waitFor();assert.equal(f.calls.filter(c=>c.rpc==='get_budget_amendments').length,1,'Opening loads amendments');
+    await reason.fill('Черновик сохраняется при закрытии раздела');await summary.click();await summary.click();await reason.waitFor();
+    assert.equal(await reason.inputValue(),'Черновик сохраняется при закрытии раздела','Closing preserves the amendment draft');
+    assert.equal(f.calls.filter(c=>c.rpc==='get_budget_amendments').length,2,'Reopening refreshes amendments');
+    await summary.click();
+   }
    assert.match(await sim.innerText(),/Первое чтение ГД/);assert.match(await sim.innerText(),/Второе чтение ГД/);assert.match(await sim.innerText(),/Третье чтение ГД/);assert.match(await sim.innerText(),/Совет Федерации, Президент и опубликование/);
    await sim.getByLabel('Обоснование и приоритеты').fill('Увеличиваем доступность медицинской помощи, сохраняем точные годовые ассигнования программы и смету региональной поликлиники. Дополнительные расходы и проценты покрываем размещением ОФЗ.');
    f.failSave=true;await sim.getByRole('button',{name:'Сохранить расчёт',exact:true}).click();await sim.getByRole('alert').waitFor();assert.equal(await sim.getByLabel('Название расчета').inputValue(),'Учебный бюджет: проверка полной процедуры','An unsuccessful save preserves the local draft');assert.equal(f.plans.length,1);assert.equal(f.plans[0].revision,1,'Failed save cannot overwrite the shared revision');f.failSave=false;
