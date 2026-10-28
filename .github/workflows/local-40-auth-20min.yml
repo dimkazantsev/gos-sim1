@@ -80,3 +80,5 @@ jobs:
           cd /tmp/gos-id-40-load || exit 0
           supabase stop --no-backup
 
+
+# Dedicated one-time isolated load-test branch.

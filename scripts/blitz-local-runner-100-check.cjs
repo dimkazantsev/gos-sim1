@@ -62,8 +62,9 @@ async function run(clients,scenario='healthy'){
 }
 (async()=>{
  const workflow=fs.readFileSync(path.join(__dirname,'../.github/workflows/local-40-auth-20min.yml'),'utf8');
- assert.match(workflow,/\bon:\s*\r?\n  workflow_dispatch:/,'The sustained job must be manual only');
- assert.doesNotMatch(workflow,/^  (?:push|pull_request|schedule):/m,'No automatic 20-minute load');
+ assert.match(workflow,/^  push:\r?\n    branches: \['perf\/isolated-blitz-100-20261028'\]\r?\n    paths: \['\.github\/workflows\/local-40-auth-20min\.yml'\]/m,'Only the isolated test branch and workflow path can trigger this run');
+ assert.match(workflow,/^  workflow_dispatch:/m,'Manual dispatch remains available');
+ assert.doesNotMatch(workflow,/^  (?:pull_request|schedule):/m,'No other automatic 20-minute load');
  assert.match(workflow,/blitz_disposable_guard\.sql/,'The manual job must install the disposable marker');
  const invalid={require:name=>name==='@supabase/supabase-js'?{createClient(){throw Error('No connection should be created for invalid input')}}:require(name),process:{env:{SUPABASE_URL:'http://localhost:54321',SUPABASE_ANON_KEY:'anon',SUPABASE_SERVICE_ROLE_KEY:'service',QA_DURATION_SECONDS:'invalid'}},URL};
  assert.throws(()=>vm.runInNewContext(source,{...invalid}),/20 real minutes/,'Invalid duration must fail before creating a client');
@@ -76,3 +77,4 @@ async function run(clients,scenario='healthy'){
  await verifyGuardSql();for(const scenario of ['missingGuard','existingUser','existingGame'])await run(40,scenario);
  const out=[];for(const n of [40,100])out.push(await run(n));console.log(JSON.stringify({status:'PASS',checks:out,environment:'synthetic Auth/Realtime/REST, virtual clock, no server load'}))
 })().catch(e=>{console.error(e);process.exitCode=1});
+
