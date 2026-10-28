@@ -31,6 +31,35 @@ function latencySummary(samples){
  const labels=[...new Set(samples.map(s=>s.label))];
  return Object.fromEntries(labels.map(label=>{const values=samples.filter(s=>s.label===label).map(s=>s.ms).sort((a,b)=>a-b);return[label,{n:values.length,p95_ms:values[Math.ceil(values.length*.95)-1],p99_ms:values[Math.ceil(values.length*.99)-1]}]}));
 }
+function createMeasurements(now=()=>performance.now()){
+ const samples=[];let attempted=0,completed=0,responseBytes=0;
+ async function measure(label,work){
+  attempted++;const started=now();
+  try{
+   const value=await work();
+   if(value.error)throw new Error(label+': '+value.error.message);
+   responseBytes+=Buffer.byteLength(JSON.stringify(value.data));
+   samples.push({label,ms:now()-started,failed:false});return value.data;
+  }catch(error){samples.push({label,ms:now()-started,failed:true});throw error}
+  finally{completed++}
+ }
+ function snapshot(){
+  const successful=samples.filter(s=>!s.failed),failed=samples.filter(s=>s.failed);
+  return {attempted,completed,failed:failed.length,inflight:attempted-completed,response_json_bytes:responseBytes,
+   latency_success:latencySummary(successful),latency_failure:latencySummary(failed)};
+ }
+ return {measure,snapshot};
+}
+function reportMeasurements(stats){
+ return {measured_calls:stats.completed,measured_success_data_json_bytes:stats.response_json_bytes,
+  measurement_scope:'Explicitly measured client calls only; a client call can involve multiple HTTP requests. Excludes observer denial, cross-user read, Realtime connection, subscriptions and messages, and sign-out. Durations are client-call durations; response bytes are serialized successful data, not wire bytes.'};
+}
+async function reconnectSessions(sessions,measure,subscribe,password){
+ await Promise.all(sessions.map(async session=>{
+  const auth=await measure('reauth',()=>session.client.auth.signInWithPassword({email:session.person.email,password}));
+  await session.client.realtime.setAuth(auth.session.access_token);await subscribe(session);
+ }));
+}
 function verifyContract(op,fixture){
  const {args,verify}=op,actor=op.actor==='teacher'?fixture.teacher:fixture.students[op.actor];
  function field(object,key,value){
@@ -88,35 +117,34 @@ function validate(f,studentCount=40){
  assert(f.negativeObserver?.rpc==='manage_game_stage'&&f.negativeObserver.args?.p_game_id===f.gameId,'Observer denial must address this game through the real teacher-only stage operation');
  return f;
 }
+let currentMeasurements;
 if(require.main===module&&process.argv.includes('--self-test')){
  assert.equal(localOrigin('http://127.0.0.1:54321'),'http://127.0.0.1:54321');
  for(const url of ['https://example.supabase.co','https://localhost.example.com','http://user:pass@localhost:54321','http://localhost:54321/path'])assert.throws(()=>localOrigin(url));
  assert.throws(()=>validate({version:1,title:'LOCAL QA · test',gameId:'00000000-0000-4000-8000-000000000001',students:[]}));
  console.log('PASS: runner refuses remote/credential-bearing origins and incomplete fixtures. No server/Auth/load run.');
-}else if(require.main===module)main().catch(error=>{console.error(error.message);process.exitCode=1});
-module.exports={localOrigin,validate,parseStudentCount,latencySummary};
+}else if(require.main===module)main().catch(error=>{
+ console.error(error.message);
+ if(currentMeasurements){const stats=currentMeasurements.snapshot(),{response_json_bytes,...details}=stats;console.error(JSON.stringify({status:'FAIL',partial:true,...details,...reportMeasurements(stats)}))}
+ process.exitCode=1;
+});
+module.exports={localOrigin,validate,parseStudentCount,latencySummary,createMeasurements,reconnectSessions,reportMeasurements};
 async function main(){
  const studentCount=parseStudentCount(process.argv.slice(2));
  const url=localOrigin(process.env.SUPABASE_URL||'');
  const anon=process.env.SUPABASE_ANON_KEY,service=process.env.SUPABASE_SERVICE_ROLE_KEY,password=process.env.QA_LOCAL_PASSWORD;
  assert(anon&&service&&password&&process.env.QA_MIXED_FIXTURE,'Local keys, synthetic password and prepared fixture are required');
  const fixture=validate(JSON.parse(fs.readFileSync(process.env.QA_MIXED_FIXTURE,'utf8')),studentCount);
+ const confirmed=[],measurements=createMeasurements();currentMeasurements=measurements;
+ const {measure}=measurements;
  const admin=createClient(url,service,{global:transport,auth:{persistSession:false,autoRefreshToken:false}});
  // A local address alone is insufficient: refuse copied production data.
- const games=await admin.from('games').select('id,title').limit(101);
- if(games.error)throw games.error;
- assert(games.data.length<101&&games.data.every(g=>/^LOCAL QA ·/.test(g.title)),'Database contains games not explicitly disposable');
- assert(games.data.some(g=>g.id===fixture.gameId&&g.title===fixture.title),'Prepared test game is missing');
- const roster=await admin.from('game_members').select('user_id,kind').eq('game_id',fixture.gameId);
- if(roster.error)throw roster.error;
+ const games=await measure('preflight:games',()=>admin.from('games').select('id,title').limit(101));
+ assert(games.length<101&&games.every(g=>/^LOCAL QA ·/.test(g.title)),'Database contains games not explicitly disposable');
+ assert(games.some(g=>g.id===fixture.gameId&&g.title===fixture.title),'Prepared test game is missing');
+ const roster=await measure('preflight:roster',()=>admin.from('game_members').select('user_id,kind').eq('game_id',fixture.gameId));
  for(const [kind,persons] of [['student',fixture.students],['teacher',[fixture.teacher]],['observer',[fixture.observer]]])
-  for(const person of persons)assert(roster.data.some(m=>m.user_id===person.userId&&m.kind===kind),'Fixture role mismatch');
- const samples=[],confirmed=[];let responseBytes=0,requests=0;
- async function measure(label,work){
-  const start=performance.now();const value=await work();samples.push({label,ms:performance.now()-start});requests++;
-  if(value.error)throw new Error(label+': '+value.error.message);
-  responseBytes+=Buffer.byteLength(JSON.stringify(value.data));return value.data;
- }
+  for(const person of persons)assert(roster.some(m=>m.user_id===person.userId&&m.kind===kind),'Fixture role mismatch');
  async function login(person){
   const client=createClient(url,anon,{global:transport,auth:{persistSession:false,autoRefreshToken:false}});
   const auth=await measure('auth',()=>client.auth.signInWithPassword({email:person.email,password}));
@@ -149,10 +177,7 @@ async function main(){
   for(let minute=0;minute<20;minute++){
    await sleep(Math.max(0,began+minute*60000-performance.now()));
    if(minute===8)await Promise.all(sessions.slice(studentCount/2).map(s=>s.client.removeChannel(s.channel)));
-   if(minute===10)for(const session of sessions.slice(studentCount/2)){
-    const auth=await measure('reauth',()=>session.client.auth.signInWithPassword({email:session.person.email,password}));
-    await session.client.realtime.setAuth(auth.session.access_token);await subscribe(session);
-   }
+   if(minute===10)await reconnectSessions(sessions.slice(studentCount/2),measure,subscribe,password);
    const active=minute>=8&&minute<10?sessions.slice(0,studentCount/2):sessions;
    await Promise.all(active.map((s,i)=>{
     const name=readRPC[(minute+i)%readRPC.length];const args=name==='blitz_inbox_counts'?{p_game:fixture.gameId}:{p_game_id:fixture.gameId};
@@ -177,8 +202,8 @@ async function main(){
   const cross=await sessions[0].client.from('blitz_assignments').select('id').eq('game_id',fixture.gameId).eq('user_id',sessions[1].person.userId).limit(1);
   if(cross.error)throw cross.error;assert.equal(cross.data.length,0,'Another student Blitz assignment leaked');
   assert(performance.now()-began>=1200000,'A real twenty-minute run is required');
-  const latency=latencySummary(samples);
-  console.log(JSON.stringify({status:'PASS',environment:'prepared disposable local Supabase with real HTTP/Auth',students:studentCount,teacher:1,observer:1,wall_clock_ms:performance.now()-began,requests,response_json_bytes:responseBytes,confirmed_writes:confirmed.length,modules:modules.map(module=>({module,writes:confirmed.filter(i=>i.op.module===module).length})),latency,limits:'No browser rendering or external-provider capacity claim; no agreed latency acceptance threshold.'},null,2));
+  const stats=measurements.snapshot();
+  console.log(JSON.stringify({status:'PASS',environment:'prepared disposable local Supabase with real HTTP/Auth',students:studentCount,teacher:1,observer:1,wall_clock_ms:performance.now()-began,...reportMeasurements(stats),confirmed_writes:confirmed.length,modules:modules.map(module=>({module,writes:confirmed.filter(i=>i.op.module===module).length})),latency:stats.latency_success,limits:'One scheduled read per active student per minute, plus fixture writes and verification; no browser rendering or external-provider capacity claim; no agreed latency acceptance threshold.'},null,2));
  }finally{
   await Promise.all([...sessions,teacher,observer].map(async s=>{if(s.channel)await s.client.removeChannel(s.channel);await s.client.auth.signOut({scope:'local'})}));
  }

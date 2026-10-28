@@ -5,7 +5,13 @@ const url=process.env.SUPABASE_URL;
 const anon=process.env.SUPABASE_ANON_KEY;
 const service=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!url||!anon||!service)throw new Error('Local Supabase environment is incomplete');
-if(!['localhost','127.0.0.1'].includes(new URL(url).hostname))throw new Error('Refusing to run against a non-local project');
+const origin=new URL(url);
+if(!['localhost','127.0.0.1'].includes(origin.hostname))throw new Error('Refusing to run against a non-local project');
+if(!['http:','https:'].includes(origin.protocol)||origin.username||origin.password||origin.search||origin.hash||origin.pathname!=='/')throw new Error('Use a bare local Supabase origin');
+const clientCount=Number(process.env.QA_CLIENTS||40);
+if(![40,100].includes(clientCount))throw new Error('QA_CLIENTS must be 40 or 100');
+const duration=Number(process.env.QA_DURATION_SECONDS||1200);
+if(!Number.isFinite(duration)||duration<1200)throw new Error('Acceptance run must last at least 20 real minutes');
 
 const admin=createClient(url,service,{auth:{persistSession:false,autoRefreshToken:false}});
 const password='Blitz-QA-2026!strong';
@@ -27,8 +33,14 @@ async function login(u){
  return {...u,client};
 }
 async function main(){
+ const marker=await admin.from('qa_blitz_disposable_guard').select('marker').eq('marker','gos-id-disposable-blitz-v1').maybeSingle();
+ if(marker.error||!marker.data)throw new Error('Disposable local test marker is missing');
+ const existingUsers=await admin.auth.admin.listUsers({page:1,perPage:1});
+ if(existingUsers.error||!Array.isArray(existingUsers.data?.users)||existingUsers.data.users.length)throw new Error('Disposable Auth must be empty before the test');
+ const existingGames=await admin.from('games').select('id').limit(1);
+ if(existingGames.error||!Array.isArray(existingGames.data)||existingGames.data.length)throw new Error('Disposable game database must be empty before the test');
  const teacher=await createUser(0);
- const students=await Promise.all(Array.from({length:40},(_,k)=>createUser(k+1)));
+ const students=await Promise.all(Array.from({length:clientCount},(_,k)=>createUser(k+1)));
  let r=await admin.from('games').insert({id:gameId,title:'Blitz local QA',game_code:'BLITZQA',owner_id:teacher.id});
  if(r.error)throw r.error;
  r=await admin.from('game_members').insert([
@@ -36,7 +48,7 @@ async function main(){
   ...students.map(u=>({game_id:gameId,user_id:u.id,full_name:`QA Student ${u.i}`,kind:'student'}))
  ]);
  if(r.error)throw r.error;
- const questions=Array.from({length:42},(_,k)=>({id:k+1,topic:'QA',question:`Question ${k+1}`,options:['Correct','Wrong'],correct_index:0,legal_act:'QA act',article:'art. 1',source_url:'https://example.invalid/qa',explanation:'Synthetic local integration question only.',verified:true}));
+ const questions=Array.from({length:clientCount+2},(_,k)=>({id:k+1,topic:'QA',question:`Question ${k+1}`,options:['Correct','Wrong'],correct_index:0,legal_act:'QA act',article:'art. 1',source_url:'https://example.invalid/qa',explanation:'Synthetic local integration question only.',verified:true}));
  r=await admin.from('blitz_questions').insert(questions);if(r.error)throw r.error;
  r=await admin.from('blitz_assignments').insert(students.map((u,k)=>({id:`20000000-0000-4000-8000-${String(k+1).padStart(12,'0')}`,game_id:gameId,user_id:u.id,question_id:k+1,stage_no:1,available_at:new Date(Date.now()-60000).toISOString()})));if(r.error)throw r.error;
 
@@ -56,8 +68,8 @@ async function main(){
 
  const first=sessions[0];
  r=await admin.from('blitz_assignments').insert([
-  {id:'30000000-0000-4000-8000-000000000001',game_id:gameId,user_id:first.id,question_id:41,stage_no:2,available_at:new Date(Date.now()-60000).toISOString()},
-  {id:'30000000-0000-4000-8000-000000000002',game_id:gameId,user_id:first.id,question_id:42,stage_no:2,available_at:new Date(Date.now()-30000).toISOString()}
+  {id:'30000000-0000-4000-8000-000000000001',game_id:gameId,user_id:first.id,question_id:clientCount+1,stage_no:2,available_at:new Date(Date.now()-60000).toISOString()},
+  {id:'30000000-0000-4000-8000-000000000002',game_id:gameId,user_id:first.id,question_id:clientCount+2,stage_no:2,available_at:new Date(Date.now()-30000).toISOString()}
  ]);if(r.error)throw r.error;
  const same=await Promise.all(Array.from({length:5},()=>first.client.rpc('blitz_open',{p_game:gameId})));
  same.forEach(x=>{if(x.error)throw x.error});
@@ -70,15 +82,10 @@ async function main(){
 
  // Sustained, wall-clock 20-minute authenticated run against disposable local Supabase.
  // One bounded request per visible session each minute. No production URL is allowed.
- const duration=Number(process.env.QA_DURATION_SECONDS||1200);
- if(duration<1200)throw new Error('Acceptance run must last at least 20 real minutes');
- const hostname=new URL(url).hostname;
- if(!['localhost','127.0.0.1'].includes(hostname))throw new Error('Only local Supabase is permitted');
  const latency=[],audit={reads:0,bytes:0,reconnects:0,failures:0,skipped:0};
- const since=performance.now();
  const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
- const sessionsWithConnection=await Promise.all(sessions.map(async s=>{
-  const channel=s.client.channel('gos-qa-40-rooms',{config:{broadcast:{self:true}}});
+ async function subscribe(s){
+  const channel=s.client.channel('gos-qa-load-rooms',{config:{broadcast:{self:true}}});
   await new Promise((resolve,reject)=>{
    const timer=setTimeout(()=>reject(new Error('Realtime subscription timeout for session '+s.i)),20000);
    channel.subscribe(status=>{
@@ -86,19 +93,25 @@ async function main(){
     if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){clearTimeout(timer);reject(new Error('Realtime '+status+' for session '+s.i))}
    });
   });
-  return {...s,channel};
- }));
+  s.channel=channel;
+ }
+ const sessionsWithConnection=sessions;
+ await Promise.all(sessionsWithConnection.map(subscribe));
+ const since=performance.now();
  // Every authenticated client has a genuine WebSocket subscription.
- console.log('PASS: 40 real local authenticated Realtime subscriptions established');
+ console.log('PASS: '+clientCount+' real local authenticated Realtime subscriptions established');
  for(let minute=0;minute<20;minute++){
   const desired=since+minute*60000;
   await sleep(Math.max(0,desired-performance.now()));
   const disconnectedWindow=minute>=8&&minute<10;
-  const active=disconnectedWindow?sessionsWithConnection.slice(0,20):sessionsWithConnection;
+  const active=disconnectedWindow?sessionsWithConnection.slice(0,clientCount/2):sessionsWithConnection;
   audit.skipped+=sessionsWithConnection.length-active.length;
+  if(minute===8){
+   const removed=await Promise.all(sessionsWithConnection.slice(clientCount/2).map(s=>s.client.removeChannel(s.channel)));
+   if(removed.some(status=>status!=='ok'))throw new Error('Realtime disconnect failed');
+  }
   if(minute===12){
-   // Second round of actual concurrent writes without modifying the original
-   // 40 completed answers. The first participant already has a test assignment.
+   // Second round leaves the original completed answers intact.
    const second=students.slice(1).map(u=>({
     id:'40000000-0000-4000-8000-'+String(u.i).padStart(12,'0'),
     game_id:gameId,user_id:u.id,question_id:u.i,stage_no:2,
@@ -112,14 +125,15 @@ async function main(){
    submittedAgain.forEach((x,i)=>{if(x.error||x.data?.is_correct!==true)throw new Error('Round 2 lost confirmed action: '+i)});
    const retry=await Promise.all(Array.from({length:4},()=>sessionsWithConnection[0].client.rpc('blitz_answer',{p_id:openedAgain[0].data.id,p_choice:0})));
    retry.forEach(x=>{if(x.error||x.data?.is_correct!==true)throw new Error('Idempotent answer retry failed')});
-   audit.gameplayWrites=40;
+   audit.gameplayWrites=clientCount;
   }
   if(minute===10){
-   // Restore real auth sessions after simulated outage of the other 20 clients.
-   const resumed=await Promise.all(sessionsWithConnection.slice(20).map(async s=>{
+   // Restore authentication and Realtime for the disconnected half.
+   const resumed=await Promise.all(sessionsWithConnection.slice(clientCount/2).map(async s=>{
     const response=await s.client.auth.signInWithPassword({email:s.email,password});
     if(response.error||!response.data.session)throw new Error('Auth reconnection failed');
     await s.client.realtime.setAuth(response.data.session.access_token);
+    await subscribe(s);
     return true;
    }));
    audit.reconnects+=resumed.length;
@@ -138,16 +152,17 @@ async function main(){
    return true;
   }));
   assert.equal(responses.length,active.length);
-  if((minute+1)%5===0)console.log('Local 40-session check: '+(minute+1)+'/20 minutes; validated reads '+audit.reads);
+  if((minute+1)%5===0)console.log('Local '+clientCount+'-session check: '+(minute+1)+'/20 minutes; validated reads '+audit.reads);
  }
  await sleep(Math.max(0,since+duration*1000-performance.now()));
  const elapsedMs=performance.now()-since;
  assert(elapsedMs>=1200000,'Sustained test must run at least 20 real minutes');
  assert.equal(audit.failures,0,'No failed or lost authenticated reads allowed');
- assert.equal(audit.reconnects,20,'All temporarily offline users must reauthenticate');
- assert.equal(audit.gameplayWrites,40,'Second concurrent Blitz round completed');
- assert(audit.reads<=800,'Request budget: no more than 800 sustained REST reads');
+ assert.equal(audit.reconnects,clientCount/2,'All temporarily offline users must reauthenticate');
+ assert.equal(audit.gameplayWrites,clientCount,'Second concurrent Blitz round completed');
+ assert(audit.reads<=clientCount*20,'Request budget: no more than one sustained REST read per session per minute');
  const p95=latency.sort((a,b)=>a-b)[Math.max(0,Math.ceil(latency.length*.95)-1)];
+ const p99=latency[Math.max(0,Math.ceil(latency.length*.99)-1)];
  // Verify confirmed answer was not altered by repeated queries or reconnections.
  const verified=await Promise.all(sessionsWithConnection.map(s=>s.client.from('blitz_assignments').select('id,chosen_index,is_correct').eq('user_id',s.id).eq('stage_no',1)));
  for(const result of verified){
@@ -157,9 +172,9 @@ async function main(){
   assert.equal(result.data[0].is_correct,true);
  }
  await Promise.all(sessionsWithConnection.map(s=>s.client.removeChannel(s.channel)));
- console.log('PASS: 20 REAL minutes, 40 distinct authenticated local clients; 40 Realtime subscriptions, 20 auth reconnections, '+audit.reads+' bounded REST reads; zero lost results');
- console.log(JSON.stringify({environment:'isolated local Supabase',duration_seconds:Math.round(elapsedMs/1000),clients:40,subscriptions:40,reconnects:audit.reconnects,reads:audit.reads,second_round_writes:audit.gameplayWrites,skipped_inactive_reads:audit.skipped,response_bytes:audit.bytes,p95_ms:Math.round(p95),failures:audit.failures}));
+ console.log('PASS: 20 REAL minutes, '+clientCount+' distinct authenticated local clients; '+clientCount+' Realtime subscriptions, '+audit.reconnects+' auth renewals and channel resubscriptions, '+audit.reads+' bounded REST reads; zero lost results');
+ console.log(JSON.stringify({environment:'isolated local Supabase',scope:'Blitz-only',latency_scope:'Blitz assignment REST reads',latency_samples:latency.length,realtime_scope:'Channel subscription status only; no event delivery or underlying socket closure measured',duration_seconds:Math.round(elapsedMs/1000),clients:clientCount,subscriptions:clientCount,reconnects:audit.reconnects,reads:audit.reads,second_round_writes:audit.gameplayWrites,skipped_inactive_reads:audit.skipped,response_bytes:audit.bytes,p95_ms:Math.round(p95),p99_ms:Math.round(p99),failures:audit.failures}));
 
- console.log('PASS: 40 independent local Supabase Auth sessions, persisted Blitz answers, RLS isolation and serialized repeated opens');
+ console.log('PASS: '+clientCount+' independent local Supabase Auth sessions, persisted Blitz answers, RLS isolation and serialized repeated opens');
 }
 main().catch(e=>{console.error(e);process.exit(1)});

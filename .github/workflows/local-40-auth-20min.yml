@@ -1,11 +1,13 @@
-name: ГОС.ID · 40 независимых Auth-сессий (локальный Supabase, 20 минут)
+name: ГОС.ID · Blitz на 40–100 Auth-сессиях (локальный Supabase, 20 минут)
 on:
-  push:
-    branches: [chore/sync-event-privacy-migration-version-20261021]
-    paths:
-      - 'supabase/tests/gos_40_authenticated_20min.cjs'
-      - '.github/workflows/local-40-auth-20min.yml'
   workflow_dispatch:
+    inputs:
+      clients:
+        description: 'Число участников для изолированного Blitz-теста'
+        required: true
+        type: choice
+        options: ['40', '100']
+        default: '40'
 jobs:
   isolated-40-auth:
     runs-on: ubuntu-latest
@@ -14,6 +16,7 @@ jobs:
       contents: read
     env:
       QA_DURATION_SECONDS: '1200'
+      QA_CLIENTS: ${{ inputs.clients || '40' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,6 +28,7 @@ jobs:
           node --check supabase/tests/gos_40_authenticated_20min.cjs
           node -e "const fs=require('fs');const s=fs.readFileSync('supabase/tests/gos_40_authenticated_20min.cjs','utf8'); if(!s.includes('Refusing to run against a non-local project')||!s.includes('duration<1200'))process.exit(1)"
       - run: npm ci --no-audit --no-fund
+      - run: node scripts/blitz-local-runner-100-check.cjs
       - uses: supabase/setup-cli@v3
         with:
           version: latest
@@ -63,9 +67,10 @@ jobs:
           test -n "$DB_URL"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_setup.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261012100100_blitz_attempt_lock_hardening.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_disposable_guard.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
           sleep 2
-      - name: Run 40 real local Auth sessions and Realtime for 20 minutes
+      - name: Run real local Auth sessions and Realtime for 20 minutes
         run: node supabase/tests/gos_40_authenticated_20min.cjs
       - name: Stop isolated Supabase without backups
         if: always()

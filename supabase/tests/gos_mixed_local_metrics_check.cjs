@@ -1,8 +1,8 @@
 const assert=require('node:assert/strict');
-const {spawnSync}=require('node:child_process');
-const path=require('node:path');
+const {spawn,spawnSync}=require('node:child_process');
+const path=require('node:path'),fs=require('node:fs'),os=require('node:os'),http=require('node:http');
 const runner=path.join(__dirname,'gos_40_mixed_local_20min.cjs');
-const {localOrigin,validate,parseStudentCount,latencySummary}=require(runner);
+const {localOrigin,validate,parseStudentCount,latencySummary,createMeasurements,reconnectSessions,reportMeasurements}=require(runner);
 assert.equal(parseStudentCount([]),40);
 assert.equal(parseStudentCount(['--students=100']),100);
 for(const value of ['0','41','101','100.5','NaN'])assert.throws(()=>parseStudentCount(['--students='+value]));
@@ -50,4 +50,41 @@ for(const count of [40,100]){
 }
 const blocked=spawnSync(process.execPath,[runner,'--students=100'],{encoding:'utf8',env:{...process.env,SUPABASE_URL:'https://example.supabase.co',SUPABASE_ANON_KEY:'x',SUPABASE_SERVICE_ROLE_KEY:'x',QA_LOCAL_PASSWORD:'x',QA_MIXED_FIXTURE:'x'}});
 assert.notEqual(blocked.status,0);assert.match(blocked.stderr,/Only an isolated local Supabase is permitted/);
-console.log('PASS: local-only 40/100 fixtures and p95/p99 nearest-rank; no network load.');
+async function measurementChecks(){
+ let now=0;const tracker=createMeasurements(()=>now);
+ assert.deepEqual(await tracker.measure('read',async()=>{now+=10;return {data:{ok:true},error:null}}),{ok:true});
+ await assert.rejects(tracker.measure('read',async()=>{now+=20;return {data:null,error:{message:'failure'}}}),/failure/);
+ await assert.rejects(tracker.measure('write',async()=>{now+=30;throw Error('network')}),/network/);
+ let resolve;const pending=tracker.measure('write',()=>new Promise(done=>{resolve=done}));
+ let snapshot=tracker.snapshot();assert.equal(snapshot.attempted,4);assert.equal(snapshot.completed,3);assert.equal(snapshot.failed,2);assert.equal(snapshot.inflight,1);
+ assert.equal(snapshot.latency_success.read.p95_ms,10);assert.equal(snapshot.latency_failure.read.p99_ms,20);assert.equal(snapshot.latency_failure.write.p99_ms,30);
+ now+=40;resolve({data:{ok:true},error:null});await pending;snapshot=tracker.snapshot();assert.equal(snapshot.inflight,0);assert.equal(snapshot.completed,4);
+ assert.equal(snapshot.response_json_bytes,Buffer.byteLength(JSON.stringify({ok:true}))*2);
+ const summary=reportMeasurements(snapshot);
+ assert.equal(summary.measured_calls,4);assert.equal(summary.measured_success_data_json_bytes,snapshot.response_json_bytes);
+ assert(!('requests' in summary),'The measured calls must not be presented as all requests');
+ assert.match(summary.measurement_scope,/Realtime/);assert.match(summary.measurement_scope,/observer denial/);assert.match(summary.measurement_scope,/cross-user/);assert.match(summary.measurement_scope,/wire bytes/);
+ let releaseReconnect;const gate=new Promise(resolve=>{releaseReconnect=resolve});const started=[],subscribed=[];
+ const sessions=['one','two'].map(name=>({person:{email:name},client:{auth:{signInWithPassword:async()=>{started.push(name);await gate;return{data:{session:{access_token:name}},error:null}}},realtime:{setAuth:async token=>assert.equal(token,name)}}}));
+ const reconnect=reconnectSessions(sessions,tracker.measure,async session=>{subscribed.push(session.person.email)},'synthetic');
+ await Promise.resolve();assert.deepEqual(started,['one','two'],'Reconnect starts independent sessions concurrently');
+ releaseReconnect();await reconnect;assert.deepEqual(subscribed.sort(),['one','two']);
+ const server=http.createServer((req,res)=>{res.writeHead(503,{'Content-Type':'application/json'});res.end(JSON.stringify({message:'synthetic preflight failure'}))});
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const fixtureFile=path.join(os.tmpdir(),'gos-load-fixture-'+process.pid+'.json');
+ try{
+  fs.writeFileSync(fixtureFile,JSON.stringify(fixture(100)),{flag:'wx'});
+  const child=spawn(process.execPath,[runner,'--students=100'],{env:{...process.env,SUPABASE_URL:'http://127.0.0.1:'+server.address().port,SUPABASE_ANON_KEY:'x',SUPABASE_SERVICE_ROLE_KEY:'x',QA_LOCAL_PASSWORD:'x',QA_MIXED_FIXTURE:fixtureFile}});
+  let stderr='';child.stderr.on('data',chunk=>stderr+=chunk);
+  const code=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',resolve)});
+  assert.notEqual(code,0,'Preflight failure cannot pass');
+  const report=stderr.split(/\r?\n/).filter(line=>line.startsWith('{')).map(line=>JSON.parse(line)).find(line=>line.status==='FAIL');
+  assert(report?.partial,'Preflight failure emits an explicitly partial report');
+  assert.equal(report.attempted,1);assert.equal(report.completed,1);assert.equal(report.failed,1);assert.equal(report.inflight,0);
+  assert.equal(report.latency_failure['preflight:games'].n,1,'Failed request latency is retained');
+  assert.equal(report.measured_calls,1);assert(!('requests' in report));assert(!('response_json_bytes' in report));
+  assert.match(report.measurement_scope,/Realtime/);assert.match(report.measurement_scope,/wire bytes/);
+ }finally{server.close();if(fs.existsSync(fixtureFile))fs.unlinkSync(fixtureFile)}
+ console.log('PASS: local-only fixtures, p95/p99 and completed/failed/inflight measurements; local synthetic HTTP only.');
+}
+measurementChecks().catch(error=>{console.error(error);process.exitCode=1});
