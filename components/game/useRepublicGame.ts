@@ -1229,10 +1229,20 @@ export function useRepublicGame(gameId:string){
   presenceInFlight.current=scope;
   lastPresenceWrite.current={scope,view:viewKey,at:now};
   try{
-   const response=await supabase.from('game_presence').upsert({
-    game_id:gameId,user_id:uid,current_view:viewKey,last_seen_at:new Date(now).toISOString()
-   },{onConflict:'game_id,user_id'});
-   if(!response.error&&label)await logActivity('navigation',label,viewKey);
+   // A single SECURITY INVOKER RPC preserves presence and the navigation
+   // journal under their original RLS checks and database triggers.
+   const response=await supabase.rpc('record_my_game_presence',{
+    p_game_id:gameId,p_view:viewKey,p_label:label||null
+   });
+   if(response.error?.code==='PGRST202'){
+    // Rolling deployments: an older DB schema still accepts the existing
+    // two-request path. Never retry a permission/timeout/unknown RPC error,
+    // as its transaction may already have committed.
+    const legacy=await supabase.from('game_presence').upsert({
+     game_id:gameId,user_id:uid,current_view:viewKey,last_seen_at:new Date(now).toISOString()
+    },{onConflict:'game_id,user_id'});
+    if(!legacy.error&&label)await logActivity('navigation',label,viewKey);
+   }
   }finally{if(presenceInFlight.current===scope)presenceInFlight.current=''}
  }
 
