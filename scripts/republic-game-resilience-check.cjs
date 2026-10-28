@@ -106,7 +106,7 @@ function harness({effects=false,compiledCode=code}={}){
   if(name==='./useGameTableSync')return{notifyGameDataRefresh:(gameId,table)=>notices.push({gameId,table}),notifySectionUpdates:()=>{},setGameRealtimeConnection:()=>{}};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
-  if(name==='./chatChannelSelection'||name==='./chatRealtime'){
+  if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./coalesceInFlight'){
    const source=fs.readFileSync(path.join(root,'components/game',name.slice(2)+'.ts'),'utf8');
    const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
    const child={exports:{}};
@@ -176,7 +176,8 @@ async function main(){
   const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
   const start=source.indexOf('async function loadCoreSections()'),end=source.indexOf('async function hydrateActiveView(',start);
   assert(start>=0&&end>start);
-  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,15);
+  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,14);
+  assert(source.slice(start,end).includes('loadMemberRoster()'),'The fifteenth core request uses the shared, concurrency-limited roster reader');
   assert(source.includes('coreReadQueue.current.active<4'));
  });
  await check('40 simulated simultaneous party panels survive the same document update',async()=>{

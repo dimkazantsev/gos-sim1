@@ -1,0 +1,33 @@
+name: Roster 100-client single-flight
+on:
+  push:
+    branches: ['perf/coalesce-member-roster-100-20261028']
+    paths:
+      - 'components/game/coalesceInFlight.ts'
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/member-roster-single-flight-check.cjs'
+      - '.github/workflows/roster-single-flight-100.yml'
+  pull_request:
+    paths:
+      - 'components/game/coalesceInFlight.ts'
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/member-roster-single-flight-check.cjs'
+      - '.github/workflows/roster-single-flight-100.yml'
+permissions:
+  contents: read
+concurrency:
+  group: roster-100-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  roster:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/member-roster-single-flight-check.cjs
+      - run: npm run typecheck
