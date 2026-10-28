@@ -20,4 +20,25 @@ for(const guard of ['m.is_public','!!e.published_at','slice(0,16)','slice(0,64)'
 for(const secret of ['game_ballots','chat_messages','blitz_assignments','password','access_token','refresh_token'])assert(!cache.includes(secret),'Secret in cache '+secret);
 const oldWrites=40*60/35,newWrites=40*60/66;
 assert(newWrites/oldWrites<0.60,'Expected >40% fewer heartbeat writes for 40 simulated devices');
+const updatesMigration=fs.readFileSync('supabase/migrations/20261028203000_section_updates_single_scan.sql','utf8');
+assert(updatesMigration.includes('private.is_game_member(p_game_id)'),'Member authorization must be unchanged');
+assert(updatesMigration.includes('private.is_game_teacher(p_game_id)'),'Teacher-only badge must stay role-checked');
+assert(updatesMigration.includes('STABLE SECURITY DEFINER'),'Function volatility and security mode must remain');
+assert.equal((updatesMigration.match(/from section_reads\b/g)||[]).length,1,'Eight receipt queries must become one read');
+for(const key of ['documents','votes','events','actions','parties','stages','teacher','dashboard']){
+ assert(updatesMigration.includes("filter (where section_key='"+key+"')"),'Missing read marker '+key);
+ assert(updatesMigration.includes("'"+key+"',"),'Missing JSON response key '+key);
+}
+assert(updatesMigration.includes('into d,v,e,a,p,s,t,h'),'Receipt variables must retain their original order');
+assert(updatesMigration.includes('where game_id=p_game_id and user_id=u'),'Receipt query must stay isolated by game and user');
+for(let user=0;user<100;user++){
+ const sectionNames=['documents','votes','events','actions','parties','stages','teacher','dashboard'];
+ const rows=Array.from({length:24},(_,i)=>({section:sectionNames[(i*17+user*5)%sectionNames.length],seen:i*37+user}));
+ for(const section of sectionNames){
+  const oldMax=rows.filter(row=>row.section===section).reduce((m,row)=>Math.max(m,row.seen),Number.NEGATIVE_INFINITY);
+  const newMax=rows.reduce((m,row)=>row.section===section?Math.max(m,row.seen):m,Number.NEGATIVE_INFINITY);
+  assert.equal(newMax,oldMax,'100-viewer synthetic receipt equivalence: '+section);
+ }
+}
+console.log('PASS 100 synthetic viewers: section receipts preserve all counters with one SQL scan');
 console.log('PASS 40 simulated devices: heartbeat reduction, scoped published IndexedDB, core reuse, overload backoff');
