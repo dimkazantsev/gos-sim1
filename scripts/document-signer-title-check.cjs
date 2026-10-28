@@ -21,14 +21,14 @@ assert.equal(role('president_decree','president','Преподаватель'),'
 assert.equal(role('sf_resolution','sf','Руководитель симуляции'),'Председатель Совета Федерации');
 assert.equal(role('government_resolution','government','Преподаватель'),'Председатель Правительства Российской Федерации');
 assert.equal(role('other','other','Преподаватель',{issuer_name:'Счётная палата Российской Федерации'}),'Уполномоченное лицо — Счётная палата Российской Федерации');
-assert.equal(role('justice_response','minjust','Министр юстиции Российской Федерации'),'Министр юстиции Российской Федерации');
-assert.equal(role('justice_response','minjust','Преподаватель',{signatory_title:'Начальник Управления Минюста'}),'Начальник Управления Минюста');
+assert.equal(role('justice_response','minjust','Министр юстиции Российской Федерации'),minjust);
+assert.equal(role('justice_response','minjust','Преподаватель',{signatory_title:'Начальник Управления Минюста'}),minjust);
 assert.equal(role('government_resolution','government','Преподаватель',{acting_office_title:'Заместитель Председателя Правительства Российской Федерации'}),'Заместитель Председателя Правительства Российской Федерации');
 assert.equal(role('sf_resolution','sf','Преподаватель-администратор',{acting_office_title:'Администратор игры'}),'Председатель Совета Федерации');
-assert.equal(role('justice_response','minjust','Преподаватель',{signatory_title:'Заместитель министра юстиции',acting_office_title:'Сотрудник Минюста'}),'Заместитель министра юстиции');
+assert.equal(role('justice_response','minjust','Преподаватель',{signatory_title:'Заместитель министра юстиции',acting_office_title:'Сотрудник Минюста'}),minjust);
 
 assert.equal(role('sf_resolution','sf','Председатель Совета Федерации'),'Председатель Совета Федерации');
 const paper=fs.readFileSync('components/game/DocumentPaper.tsx','utf8');
 assert(paper.includes('role=documentSignerTitle(d,metadataSigned?m.signed_role:null)'),'Signed paper must resolve a contextual game office');
 assert(paper.includes('<b>{name}</b>')&&paper.includes("role||'Уполномоченное лицо'"),'Existing signer name/date display is preserved');
-console.log('PASS: signer office follows signed authority, existing office snapshot prevails, technical access role never appears');
+console.log('PASS: approved Minjust institutional signer overrides unrelated roles, other offices use signed authority');
