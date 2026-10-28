@@ -174,6 +174,22 @@ async function main(){
   assert.equal(h.assetStats().signed,first.signed,'Unchanged Storage paths must reuse session-scoped signed URLs');
   h.dispose();
  });
+ await check('Rapid navigation shares an in-flight automatic core snapshot without cross-user caching',async()=>{
+  const h=harness({effects:true});
+  try{
+   await h.settle();
+   await h.advance(61000);
+   const before=h.readCount('games');
+   const slow=h.hold('games');
+   h.render().setActiveView('parties');h.render();await tick();
+   assert.equal(h.readCount('games'),before+1,'The first navigation starts one core snapshot');
+   h.render().setActiveView('votes');h.render();await tick();
+   assert.equal(h.readCount('games'),before+1,'Another section must share the pending game snapshot');
+   slow.resolve();await h.settle();
+   h.render().setActiveView('documents');h.render();await tick();
+   assert.equal(h.readCount('games'),before+1,'A completed snapshot is fresh for the next section');
+  }finally{h.dispose()}
+ });
  await check('Initial game hydration caps its fifteen core requests at four parallel requests per client',async()=>{
   const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
   const start=source.indexOf('async function loadCoreSections()'),end=source.indexOf('async function hydrateActiveView(',start);
