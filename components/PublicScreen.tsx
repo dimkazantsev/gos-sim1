@@ -1,14 +1,11 @@
 'use client';
 import {gameValueLabel} from '../lib/gameLabels';
 import {useRepublicGame} from './game/useRepublicGame';
+import {PublicTurnCountdown} from './game/TurnClock';
 
-function fmt(seconds:number){
- const m=Math.floor(seconds/60),s=seconds%60;
- return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-}
 export default function PublicScreen({gameId}:{gameId:string}){
  const g=useRepublicGame(gameId);
- const {game,me,currentStage,metrics,events,votes,parties,crises,secondsLeft,loading,error,tally,quorum}=g;
+ const {game,me,currentStage,metrics,events,votes,parties,crises,loading,error,tally,quorum}=g;
  if(loading||!game||!me)return <main className="publicLoading">{!error&&<div className="spinner"/>}<b>{error||'Подключение общего экрана…'}</b>{error&&<a className="secondary" href="/">Вернуться ко входу</a>}</main>;
  const vote=votes.find(v=>v.status==='open');
  const score=vote?tally(vote):null;
@@ -19,7 +16,7 @@ export default function PublicScreen({gameId}:{gameId:string}){
   <header className="publicTop">
    <div className="publicBrand"><span>ГОС//ID</span><div><b>ГОС.ID</b><small>ОБЩИЙ ЭКРАН АУДИТОРИИ</small></div></div>
    <div className="publicGame"><b>{game.title}</b><span>Этап {currentStage?.stage_no||game.current_round} из 16</span></div>
-   <div className="publicClock"><span className={game.turn_open?'publicLive on':'publicLive'}>● {game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span><b>{game.turn_open&&game.turn_ends_at?fmt(secondsLeft):'—'}</b><button onClick={async()=>{try{await document.documentElement.requestFullscreen?.()}catch{g.setError('Полноэкранный режим недоступен в этом браузере.')}}}>На весь экран</button></div>
+   <div className="publicClock"><span className={game.turn_open?'publicLive on':'publicLive'}>● {game.turn_open?'ХОД ОТКРЫТ':'ПАУЗА'}</span><b>{game.turn_open&&game.turn_ends_at?<PublicTurnCountdown endAt={game.turn_ends_at}/>: '—'}</b><button onClick={async()=>{try{await document.documentElement.requestFullscreen?.()}catch{g.setError('Полноэкранный режим недоступен в этом браузере.')}}}>На весь экран</button></div>
   </header>
 
   {error&&<div className="errorBox" role="alert">{error}</div>}

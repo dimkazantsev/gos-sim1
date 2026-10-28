@@ -12,7 +12,8 @@ const client=fs.readFileSync(path.join(root,'components/GameClient.tsx'),'utf8')
 assert(layout.indexOf("import './topbar-controls-alignment.css'")>layout.indexOf("import './brand-identity.css'"),'Alignment styles must be loaded after existing responsive styles');
 const pause=client.indexOf('className={`livePill ');
 const share=client.indexOf('className="gameShareScreen"');
-const timer=client.indexOf('className="timerPill timerPillDuration"');
+const timer=client.indexOf('<TurnCountdownPill ');
+assert(fs.readFileSync(path.join(root,'components/game/TurnClock.tsx'),'utf8').includes('className="timerPill timerPillDuration"'),'Countdown must keep the existing timer style');
 assert(pause>0&&share>pause&&timer>share,'Pause, Share, timer must retain their original header order');
 const browserPath=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser','/opt/google/chrome/chrome'].find(p=>p&&fs.existsSync(p));
 if(!browserPath)throw Error('Chromium required for top-bar geometry check');

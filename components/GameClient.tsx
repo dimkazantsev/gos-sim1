@@ -7,7 +7,7 @@ import {useEffect,useRef,useState} from 'react';
 import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import {useActionErrorPlacement} from './game/useActionErrorPlacement';
-import {turnCountdown} from './game/turnCountdown';
+import {TurnCountdownPill} from './game/TurnClock';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
 import {initials} from './game/constants';
@@ -363,7 +363,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  function clearVoteFocus(){
   setScreenHistory(previous=>({entries:previous.entries.map((screen,index)=>index===previous.index&&screen.view==='votes'?{...screen,voteId:''}:screen),index:previous.index}));
  }
- const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,secondsLeft,logout,touchPresence,logActivity}=g;
+ const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,logout,touchPresence,logActivity}=g;
  const actionError=useActionErrorPlacement(error,view,()=>setError(''));
 
  const genericStudent:Member|undefined=teacher&&game?{
@@ -648,14 +648,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      <div className="topIndicators">
       <span className={`livePill ${game.turn_open?'on':'off'}`} aria-label={game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'} title={game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'}><Radio aria-hidden="true"/><span className="livePillText">{game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'}</span></span>
       <button type="button" className="gameShareScreen" onClick={()=>void shareCurrentScreen()} title="Поделиться текущим разделом или документом" aria-label="Поделиться текущим разделом"><Share2 size={17} aria-hidden="true"/><span>Поделиться</span></button>
-      {game.turn_open&&game.turn_ends_at&&(()=>{
-        const remaining=turnCountdown(secondsLeft);
-        return <span className="timerPill timerPillDuration" aria-label={remaining.ariaLabel} title={remaining.ariaLabel}>
-         <span className="timerPillUnit" aria-hidden="true"><strong>{remaining.days}</strong><span className="timerPillUnitFull">ДНИ</span><span className="timerPillUnitCompact">д</span></span>
-         <span className="timerPillUnit" aria-hidden="true"><strong>{remaining.hours}</strong><span className="timerPillUnitFull">ЧАСЫ</span><span className="timerPillUnitCompact">ч</span></span>
-         <span className="timerPillUnit" aria-hidden="true"><strong>{remaining.minutes}</strong><span className="timerPillUnitFull">МИНУТЫ</span><span className="timerPillUnitCompact">м</span></span>
-        </span>;
-       })()}
+      {game.turn_open&&game.turn_ends_at&&<TurnCountdownPill endAt={game.turn_ends_at}/>}
      </div>
     </div>
 
