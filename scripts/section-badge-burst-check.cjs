@@ -5,9 +5,9 @@ const parsed=ts.createSourceFile(name,source,ts.ScriptTarget.Latest,true,ts.Scri
 assert.equal(parsed.parseDiagnostics.length,0,'Hook source must parse');
 const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 let now=1_000_000;
-function session(n,view='chat'){
+function session(n,view='chat',realtimeConnected=true){
  const timers=[],events=new Map(),docs=new Map(),calls=[],cleanups=[];
- let state={},marked=false,lateVote=false;
+ let state={},marked=false,lateVote=false,readNotices=0;
  const registered=(map,key,fn)=>{const list=map.get(key)||[];list.push(fn);map.set(key,list)};
  const removed=(map,key,fn)=>map.set(key,(map.get(key)||[]).filter(x=>x!==fn));
  const window={addEventListener:(k,f)=>registered(events,k,f),removeEventListener:(k,f)=>removed(events,k,f)};
@@ -29,12 +29,12 @@ function session(n,view='chat'){
   setInterval:(f,ms)=>schedule(f,ms,ms),clearInterval:t=>{if(t)t.cancelled=true}};
  const requireMock=p=>p==='react'?react:p==='@/lib/supabase'?{supabase}:p==='./useGameTableSync'?{
   GAME_DATA_REFRESH_EVENT:'gos-sims:refresh',SECTION_UPDATES_REFRESH_EVENT:'gos-sims:section-updates',
-  gameRealtimeConnected:()=>true,notifySectionUpdates:(gameId)=>{for(const f of events.get('gos-sims:section-updates')||[])f({type:'gos-sims:section-updates',detail:{gameId}})}
+  gameRealtimeConnected:()=>realtimeConnected,notifySectionUpdates:(gameId)=>{readNotices++;for(const f of events.get('gos-sims:section-updates')||[])f({type:'gos-sims:section-updates',detail:{gameId}})}
  }:null;
  vm.runInNewContext('(function(require,module,exports){'+js+'})',env)(requireMock,mod,mod.exports);
  mod.exports.useSectionUpdates('game-a','student-'+n,view,false);
  return {calls,document,
-  getCounts(){return state},setLateVote(){lateVote=true},
+  getCounts(){return state},getReadNotices(){return readNotices},setLateVote(){lateVote=true},
   event(type='gos-sims:refresh',table='game_votes'){if(type==='gos-sims:refresh')lateVote=true;for(const f of events.get(type)||[])f({type,detail:{gameId:'game-a',table}})},
   visible(next){document.visibilityState=next?'visible':'hidden';for(const f of docs.get('visibilitychange')||[])f()},
   tick(){for(const t of timers){if(t.cancelled||t.due>now)continue;
@@ -88,6 +88,21 @@ async function tick(clients,steps=1){for(let i=0;i<steps;i++){now+=1000;for(cons
  await tick([concurrent],11);
  assert.equal(concurrent.getCounts().votes,4,'Newly arrived notifications remain unread after marking an earlier timestamp');
  concurrent.dispose();
+ // In a connected class, a successful read clears only its own local badge;
+ // the next Realtime event and periodic fallback are already responsible for
+ // reconciliation, so 100 page entries must not schedule 100 redundant reads.
+ const connectedReaders=Array.from({length:100},(_,i)=>session(3000+i,'votes',true));
+ await tick(connectedReaders,32);
+ assert(connectedReaders.every(c=>c.calls.filter(x=>x.method==='mark_section_read').length===1),'Every connected student must acknowledge a visited section');
+ assert(connectedReaders.every(c=>c.calls.filter(x=>x.method==='get_section_updates').length===1),'Successful local reads cannot cause a second badge RPC while Realtime is healthy');
+ assert(connectedReaders.every(c=>c.getReadNotices()===0),'A confirmed connected read needs no extra invalidation');
+ connectedReaders.forEach(c=>c.dispose());
+ // When disconnected, preserve the existing recovery request after the
+ // server write. When a new event races a read, reconciliation is still sent.
+ const offline=session(5555,'votes',false);await tick([offline],3);
+ assert.equal(offline.getReadNotices(),1,'Disconnected tabs still invalidate the badge after read acknowledgement');offline.dispose();
+ const raced=session(5666,'votes',true);await tick([raced],1);raced.event();await tick([raced],3);
+ assert.equal(raced.getReadNotices(),1,'A Realtime update after entering a section cannot be silently discarded');raced.dispose();
  // 100 clients receive 60 explicit read invalidations each. These previously
  // bypassed the ordinary 15-second budget, causing a synchronized RPC flood.
  const hundred=Array.from({length:100},(_,i)=>session(1000+i));
