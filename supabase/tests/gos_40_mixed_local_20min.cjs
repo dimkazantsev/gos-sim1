@@ -100,6 +100,8 @@ function validate(f,studentCount=40){
  assert.equal(new Set(f.students.map(s=>s.userId)).size,studentCount);
  assert.equal(new Set(f.students.map(s=>s.email)).size,studentCount);
  for(const person of [...f.students,f.teacher,f.observer])assert(person?.userId&&/@example\.invalid$/.test(person.email),'Only named synthetic identities are allowed');
+ assert.equal(new Set([...f.students,f.teacher,f.observer].map(s=>s.userId)).size,studentCount+2,'Fixture identities must be distinct');
+ assert.equal(new Set([...f.students,f.teacher,f.observer].map(s=>s.email)).size,studentCount+2,'Fixture emails must be distinct');
  for(const name of modules){
   const operations=f.operations?.[name];assert(operations?.length,'Missing actual write scenario: '+name);
   for(const op of operations){
@@ -137,12 +139,18 @@ async function main(){
  const fixture=validate(JSON.parse(fs.readFileSync(process.env.QA_MIXED_FIXTURE,'utf8')),studentCount);
  const confirmed=[],measurements=createMeasurements();currentMeasurements=measurements;
  const {measure}=measurements;
+ console.error('Use a physically separate disposable Supabase instance, not a forwarded or shared database. The marker and fixture checks do not inspect every table or prove physical isolation.');
  const admin=createClient(url,service,{global:transport,auth:{persistSession:false,autoRefreshToken:false}});
- // A local address alone is insufficient: refuse copied production data.
+ // Install this marker only on an empty disposable stack before provisioning the fixture.
+ const guard=await measure('preflight:guard',()=>admin.from('qa_mixed_disposable_guard').select('marker').eq('marker','gos-id-disposable-mixed-v1').limit(1));
+ assert(guard.length===1&&guard[0].marker==='gos-id-disposable-mixed-v1','Disposable test marker is missing');
  const games=await measure('preflight:games',()=>admin.from('games').select('id,title').limit(101));
- assert(games.length<101&&games.every(g=>/^LOCAL QA ·/.test(g.title)),'Database contains games not explicitly disposable');
- assert(games.some(g=>g.id===fixture.gameId&&g.title===fixture.title),'Prepared test game is missing');
+ assert(games.length===1&&games[0].id===fixture.gameId&&games[0].title===fixture.title,'Database must contain only the prepared disposable fixture game');
+ const expected=[...fixture.students,fixture.teacher,fixture.observer];
+ const auth=await measure('preflight:users',()=>admin.auth.admin.listUsers({page:1,perPage:expected.length+1}));
+ assert(auth.users?.length===expected.length&&expected.every(person=>auth.users.some(user=>user.id===person.userId&&user.email===person.email)),'Auth users must exactly match the disposable fixture');
  const roster=await measure('preflight:roster',()=>admin.from('game_members').select('user_id,kind').eq('game_id',fixture.gameId));
+ assert.equal(roster.length,expected.length,'The disposable fixture roster must have no extra members');
  for(const [kind,persons] of [['student',fixture.students],['teacher',[fixture.teacher]],['observer',[fixture.observer]]])
   for(const person of persons)assert(roster.some(m=>m.user_id===person.userId&&m.kind===kind),'Fixture role mismatch');
  async function login(person){
@@ -203,7 +211,7 @@ async function main(){
   if(cross.error)throw cross.error;assert.equal(cross.data.length,0,'Another student Blitz assignment leaked');
   assert(performance.now()-began>=1200000,'A real twenty-minute run is required');
   const stats=measurements.snapshot();
-  console.log(JSON.stringify({status:'PASS',environment:'prepared disposable local Supabase with real HTTP/Auth',students:studentCount,teacher:1,observer:1,wall_clock_ms:performance.now()-began,...reportMeasurements(stats),confirmed_writes:confirmed.length,modules:modules.map(module=>({module,writes:confirmed.filter(i=>i.op.module===module).length})),latency:stats.latency_success,limits:'One scheduled read per active student per minute, plus fixture writes and verification; no browser rendering or external-provider capacity claim; no agreed latency acceptance threshold.'},null,2));
+  console.log(JSON.stringify({status:'PASS',environment:'prepared disposable local Supabase with real HTTP/Auth',students:studentCount,teacher:1,observer:1,wall_clock_ms:performance.now()-began,...reportMeasurements(stats),confirmed_writes:confirmed.length,modules:modules.map(module=>({module,writes:confirmed.filter(i=>i.op.module===module).length})),latency:stats.latency_success,limits:'One scheduled read per active student per minute, plus fixture writes and verification; no browser rendering or external-provider capacity claim; no agreed latency acceptance threshold. Isolation must be independently verified; preflight does not inspect all tables.'},null,2));
  }finally{
   await Promise.all([...sessions,teacher,observer].map(async s=>{if(s.channel)await s.client.removeChannel(s.channel);await s.client.auth.signOut({scope:'local'})}));
  }

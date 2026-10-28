@@ -32,6 +32,8 @@ for(const count of [40,100]){
  assert.throws(()=>validate(fixture(count),count===40?100:40));
  const invalid=fixture(count);invalid.operations.chat[0].actor=count;
  assert.throws(()=>validate(invalid,count));
+ const duplicate=fixture(count);duplicate.observer.userId=duplicate.students[0].userId;assert.throws(()=>validate(duplicate,count));
+ const duplicateEmail=fixture(count);duplicateEmail.teacher.email=duplicateEmail.students[0].email;assert.throws(()=>validate(duplicateEmail,count));
  for(const module of ['chat','documents','votes','budget','events','blitz','stages']){
   const wrong=fixture(count);wrong.operations[module][0].rpc=module==='stages'?'send_chat_text':'manage_game_stage';
   assert.throws(()=>validate(wrong,count),'Reject unrelated RPC in '+module);
@@ -50,7 +52,51 @@ for(const count of [40,100]){
 }
 const blocked=spawnSync(process.execPath,[runner,'--students=100'],{encoding:'utf8',env:{...process.env,SUPABASE_URL:'https://example.supabase.co',SUPABASE_ANON_KEY:'x',SUPABASE_SERVICE_ROLE_KEY:'x',QA_LOCAL_PASSWORD:'x',QA_MIXED_FIXTURE:'x'}});
 assert.notEqual(blocked.status,0);assert.match(blocked.stderr,/Only an isolated local Supabase is permitted/);
+async function disposableChecks(){
+ const {PGlite}=require('@electric-sql/pglite'),sql=fs.readFileSync(path.join(__dirname,'mixed_disposable_guard.sql'),'utf8');
+ for(const scenario of ['empty','existing-user','existing-game']){
+  const db=new PGlite();try{
+   await db.exec('create role anon; create role authenticated; create role service_role; create schema auth; create table auth.users(id integer); create table public.games(id integer);');
+   if(scenario==='existing-user')await db.exec('insert into auth.users values (1)');
+   if(scenario==='existing-game')await db.exec('insert into public.games values (1)');
+   if(scenario==='empty'){
+    await db.exec(sql);await db.exec('set role authenticated');await assert.rejects(db.query('select * from public.qa_mixed_disposable_guard'));
+    await db.exec('reset role; set role service_role');const result=await db.query('select marker from public.qa_mixed_disposable_guard');assert.equal(result.rows[0].marker,'gos-id-disposable-mixed-v1');
+   }else{
+    await assert.rejects(db.exec(sql),/must be empty/);const result=await db.query("select to_regclass('public.qa_mixed_disposable_guard') as name");assert.equal(result.rows[0].name,null);
+   }
+  }finally{await db.close()}
+ }
+ const input=fixture(40),people=[...input.students,input.teacher,input.observer],roles=[...input.students.map(person=>({user_id:person.userId,kind:'student'})),{user_id:input.teacher.userId,kind:'teacher'},{user_id:input.observer.userId,kind:'observer'}];
+ let scenario='',requests=[];
+ const server=http.createServer((req,res)=>{
+  requests.push({method:req.method,path:req.url.split('?')[0]});
+  const route=req.url.split('?')[0];let body;
+  if(route==='/rest/v1/qa_mixed_disposable_guard')body=scenario==='marker-missing'?[]:[{marker:'gos-id-disposable-mixed-v1'}];
+  else if(route==='/rest/v1/games')body=[{id:input.gameId,title:input.title},...(scenario==='extra-game'?[{id:'other',title:'LOCAL QA · other'}]:[])];
+  else if(route==='/rest/v1/game_members')body=[...roles,...(scenario==='extra-member'?[{user_id:'foreign',kind:'student'}]:[])];
+  else if(route==='/auth/v1/admin/users')body={users:[...people.map(person=>({id:person.userId,email:person.email})),...(scenario==='extra-user'?[{id:'foreign',email:'foreign@example.invalid'}]:[])]};
+  else if(route==='/auth/v1/token'){res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({message:'intentional stop after preflight'}));return}
+  else{res.writeHead(404,{'Content-Type':'application/json'});res.end('{}');return}
+  res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify(body));
+ });
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const fixtureFile=path.join(os.tmpdir(),'gos-mixed-guard-'+process.pid+'.json');
+ try{
+  fs.writeFileSync(fixtureFile,JSON.stringify(input),{flag:'wx'});
+  for(scenario of ['marker-missing','extra-user','extra-game','extra-member','valid']){
+   requests=[];const child=spawn(process.execPath,[runner],{env:{...process.env,SUPABASE_URL:'http://127.0.0.1:'+server.address().port,SUPABASE_ANON_KEY:'x',SUPABASE_SERVICE_ROLE_KEY:'x',QA_LOCAL_PASSWORD:'x',QA_MIXED_FIXTURE:fixtureFile}});
+   let stderr='';child.stderr.on('data',chunk=>stderr+=chunk);
+   const code=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',resolve)});assert.notEqual(code,0);
+   assert.match(stderr,/physically separate disposable Supabase/);assert.match(stderr,/do not inspect every table/);
+   assert.equal(requests[0]?.path,'/rest/v1/qa_mixed_disposable_guard','Guard checked before any game access');
+   if(scenario==='valid')assert(requests.some(r=>r.path==='/auth/v1/token'),'An exact fixture can proceed to login');
+   else{assert(!requests.some(r=>r.method!=='GET'),'Foreign or unmarked data cannot reach authentication or writes');assert.match(stderr,/disposable|fixture|Database/i)}
+  }
+ }finally{server.close();if(fs.existsSync(fixtureFile))fs.unlinkSync(fixtureFile)}
+}
 async function measurementChecks(){
+ await disposableChecks();
  let now=0;const tracker=createMeasurements(()=>now);
  assert.deepEqual(await tracker.measure('read',async()=>{now+=10;return {data:{ok:true},error:null}}),{ok:true});
  await assert.rejects(tracker.measure('read',async()=>{now+=20;return {data:null,error:{message:'failure'}}}),/failure/);
@@ -81,7 +127,7 @@ async function measurementChecks(){
   const report=stderr.split(/\r?\n/).filter(line=>line.startsWith('{')).map(line=>JSON.parse(line)).find(line=>line.status==='FAIL');
   assert(report?.partial,'Preflight failure emits an explicitly partial report');
   assert.equal(report.attempted,1);assert.equal(report.completed,1);assert.equal(report.failed,1);assert.equal(report.inflight,0);
-  assert.equal(report.latency_failure['preflight:games'].n,1,'Failed request latency is retained');
+  assert.equal(report.latency_failure['preflight:guard'].n,1,'Failed request latency is retained');
   assert.equal(report.measured_calls,1);assert(!('requests' in report));assert(!('response_json_bytes' in report));
   assert.match(report.measurement_scope,/Realtime/);assert.match(report.measurement_scope,/wire bytes/);
  }finally{server.close();if(fs.existsSync(fixtureFile))fs.unlinkSync(fixtureFile)}
