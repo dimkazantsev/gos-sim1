@@ -17,6 +17,21 @@ type CrisisIntensity=keyof typeof INTENSITY_LABEL;
 type CrisisChoice={type:string;intensity:CrisisIntensity};
 const intensityKeys=['low','medium','high','ultra'] as const;
 
+function CrisisCountdown({deadline}:{deadline:number|null}){
+ const [now,setNow]=useState(Date.now());
+ useEffect(()=>{
+  if(deadline===null||!Number.isFinite(deadline))return;
+  let timer:ReturnType<typeof setInterval>|undefined;
+  const tick=()=>{const current=Date.now();setNow(current);if(deadline-current<1000)clearInterval(timer)};
+  tick();if(deadline-Date.now()>=1000)timer=setInterval(tick,1000);
+  return()=>clearInterval(timer);
+ },[deadline]);
+ const left=deadline===null||!Number.isFinite(deadline)?null:Math.max(0,Math.floor((deadline-now)/1000));
+ const late=left===0;
+ const label=left===null?'—':String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');
+ return <span className={late?styles.expired:undefined}>{late?'Срок истёк':label}</span>;
+}
+
 function CrisisCatalog({busy,active,onLaunch}:{busy:boolean;active:boolean;onLaunch:(choice?:CrisisChoice)=>Promise<void>}){
  const [selectedId,setSelectedId]=useState<string>(CRISES[0].id);
  const [intensity,setIntensity]=useState<CrisisIntensity>('low');
@@ -88,7 +103,19 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
  }
 
  useGameTableSync(game?.id,['game_crises','crisis_information_requests','crisis_responses','game_role_consequences'],load,active?.id||'');
- useEffect(()=>{const id=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(id)},[]);
+ useEffect(()=>{
+  if(!teacher||!active)return;
+  let timer:ReturnType<typeof setTimeout>|undefined;
+  const sync=()=>{
+   clearTimeout(timer);
+   const current=Date.now();setNow(current);
+   const next=Math.min(...consequences.filter(x=>x.status!=='active'&&x.until_at).map(x=>Date.parse(x.until_at!)).filter(time=>time>current));
+   if(Number.isFinite(next))timer=setTimeout(sync,Math.min(next-current,2147483647));
+  };
+  const visible=()=>{if(document.visibilityState==='visible')sync()};
+  sync();document.addEventListener('visibilitychange',visible);
+  return()=>{clearTimeout(timer);document.removeEventListener('visibilitychange',visible)};
+ },[teacher,active?.id,consequences]);
 
  async function launch(choice?:CrisisChoice){
   if(busy||active)return;
@@ -106,9 +133,6 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
   </section>;
  }
  const deadline=active.response_deadline?new Date(active.response_deadline).getTime():null;
- const left=deadline?Math.max(0,Math.floor((deadline-now)/1000)):null;
- const late=deadline!==null&&left===0;
- const mm=left===null?'—':String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');
  const myResponse=responses.find(x=>x.user_id===me.user_id);
 
  async function ask(){
@@ -145,7 +169,7 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
  }
 
  return <section className={'crisisCommand '+styles.room}>
-  <StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · АКТИВНЫЙ КРИЗИС`} title={active.crisis_type} description={active.description} stats={[{label:'Окно первичной реакции',value:<span className={late?styles.expired:undefined}>{late?'Срок истёк':mm}</span>,detail:`Запущен на этапе ${active.stage_no}`},{label:'Интенсивность',value:INTENSITY_LABEL[active.intensity]}]}/>
+  <StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · АКТИВНЫЙ КРИЗИС`} title={active.crisis_type} description={active.description} stats={[{label:'Окно первичной реакции',value:<CrisisCountdown deadline={deadline}/>,detail:`Запущен на этапе ${active.stage_no}`},{label:'Интенсивность',value:INTENSITY_LABEL[active.intensity]}]}/>
 
   <div className="crisisCommandGrid">
    <article className="crisisIntel">
@@ -162,9 +186,9 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
   </div>
 
   {teacher&&<section className="crisisRoleConsequences">
-   <div className="crisisSectionHead"><div><small>ИНСТИТУЦИОНАЛЬНЫЕ ПОСЛЕДСТВИЯ</small><h3>Статус государственных ролей</h3></div><span>{consequences.filter(x=>x.status!=='active'&&(!x.until_at||new Date(x.until_at)>new Date())).length} ограничено</span></div>
+   <div className="crisisSectionHead"><div><small>ИНСТИТУЦИОНАЛЬНЫЕ ПОСЛЕДСТВИЯ</small><h3>Статус государственных ролей</h3></div><span>{consequences.filter(x=>x.status!=='active'&&(!x.until_at||new Date(x.until_at).getTime()>now)).length} ограничено</span></div>
    <p className="crisisRoleIntro">Последствие не стирает должность из профиля. Оно временно или постоянно отключает полномочия роли для институциональных действий и голосований; преподаватель может восстановить полномочия.</p>
-   <div className="crisisRoleGrid">{members.filter(m=>m.kind==='student'&&m.role_title).map(m=>{const x=consequences.find(c=>c.user_id===m.user_id);const effective=x&&x.status!=='active'&&(!x.until_at||new Date(x.until_at)>new Date());return <article key={m.user_id} className={effective?x.status:'active'}><div><b>{m.full_name}</b><small>{m.role_title}</small>{x?.reason&&effective&&<p>{x.reason}</p>}</div><span>{!effective?'Полномочия активны':x.status==='suspended'?'Отстранён(а)':x.status==='arrested'?'Арестован(а)':x.status==='detained'?'Заключён(а)':x.status==='deceased'?'Роль погибла':'Недееспособен(на)'}</span>{x?.until_at&&effective&&<time>до {new Date(x.until_at).toLocaleString('ru-RU')}</time>}</article>})}</div>
+   <div className="crisisRoleGrid">{members.filter(m=>m.kind==='student'&&m.role_title).map(m=>{const x=consequences.find(c=>c.user_id===m.user_id);const effective=x&&x.status!=='active'&&(!x.until_at||new Date(x.until_at).getTime()>now);return <article key={m.user_id} className={effective?x.status:'active'}><div><b>{m.full_name}</b><small>{m.role_title}</small>{x?.reason&&effective&&<p>{x.reason}</p>}</div><span>{!effective?'Полномочия активны':x.status==='suspended'?'Отстранён(а)':x.status==='arrested'?'Арестован(а)':x.status==='detained'?'Заключён(а)':x.status==='deceased'?'Роль погибла':'Недееспособен(на)'}</span>{x?.until_at&&effective&&<time>до {new Date(x.until_at).toLocaleString('ru-RU')}</time>}</article>})}</div>
    <div className="crisisRoleComposer"><select value={consequenceUser} onChange={e=>setConsequenceUser(e.target.value)}><option value="">Участник с государственной ролью…</option>{members.filter(m=>m.kind==='student'&&m.role_title).map(m=><option key={m.user_id} value={m.user_id}>{m.full_name} · {m.role_title}</option>)}</select><select value={consequenceStatus} onChange={e=>setConsequenceStatus(e.target.value as RoleConsequence['status'])}><option value="suspended">Временно отстранить</option><option value="arrested">Арестовать роль</option><option value="detained">Заключить / задержать</option><option value="incapacitated">Временно недееспособна</option><option value="deceased">Роль погибла</option><option value="active">Восстановить полномочия</option></select><input value={consequenceReason} onChange={e=>setConsequenceReason(e.target.value)} placeholder="Основание / последствие кризиса"/><label>До<input type="datetime-local" disabled={consequenceStatus==='deceased'||consequenceStatus==='active'} value={consequenceUntil} onChange={e=>setConsequenceUntil(e.target.value)}/></label><button className="primary" disabled={busy||!consequenceUser} onClick={()=>void applyRoleConsequence()}>Зафиксировать статус</button></div>
   </section>}
 

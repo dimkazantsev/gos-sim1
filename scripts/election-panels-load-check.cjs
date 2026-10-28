@@ -13,7 +13,7 @@ function componentCode(kind,old){
  return compiled.get(key);
 }
 const syncCode=transpile(source('components/game/useGameTableSync.ts'));
-function realm(kind,old=false,{hidden=false}={}){
+function realm(kind,old=false,{hidden=false,subscription='immediate',secretTransition=false}={}){
  let now=Date.parse('2026-10-26T12:00:00Z'),cursor=0,nextId=0,revision=0,holdReads=false,holdMutation=false,mutationError=null,currentProps,lastMutation='',clockUpdates=0,openedVotes=0;
  let reads=0,mutations=0,inflight=0,maxInflight=0,bytes=0,rawSubscriptions=0,tree;
  const hooks=[],effects=[],timers=new Map(),channels=new Set(),held=[],heldMutations=[],errors=[],failures=new Set(),counts=new Map(),starts=[];
@@ -31,7 +31,7 @@ function realm(kind,old=false,{hidden=false}={}){
  function reply(name,filters,rev){
   const game=filters.game_id||'game-A',party=filters.party_id||'party-A';
   const rows={
-   office_elections:[{id:'election-'+game,game_id:game,office_key:'gd_chair',office_title:'Председатель ГД',round_no:1,vote_mode:'open',status:'open',ballot_mode:'personal',winner_candidate_id:null,created_at:'2026-10-26'}],
+   office_elections:[{id:'election-'+game,game_id:game,office_key:'gd_chair',office_title:'Председатель ГД',round_no:1,vote_mode:secretTransition?'secret':'open',status:secretTransition&&rev?'closed':'open',ballot_mode:'personal',winner_candidate_id:null,created_at:'2026-10-26'}],
    office_candidates:[{id:'candidate-'+game,election_id:'election-'+game,user_id:'student-A',party_id:'party-A'}],
    office_ballots:[],office_personal_ballots:rev?[{election_id:'election-'+game,voter_id:'student-A',party_id:'party-A',candidate_id:'candidate-'+game}]:[],
    party_member_mandates:[{user_id:'student-A',party_id:'party-A',base_mandates:15,effective_mandates:15}],
@@ -60,7 +60,7 @@ function realm(kind,old=false,{hidden=false}={}){
  }
  const supabase={
   from:name=>query(name),rpc:(name,args)=>query(name,args,name!=='get_my_institution_meeting_permissions'),
-  channel(name){const ch={name,handlers:[],on(_event,filter,fn){this.handlers.push({filter,fn});return this},subscribe(){rawSubscriptions+=this.handlers.length;channels.add(this);return this}};return ch},
+  channel(name){const ch={name,handlers:[],on(_event,filter,fn){this.handlers.push({filter,fn});return this},subscribe(callback){rawSubscriptions+=this.handlers.length;channels.add(this);this.status=callback;if(subscription==='immediate')callback?.('SUBSCRIBED');return this}};return ch},
   removeChannel(ch){channels.delete(ch);return Promise.resolve()}
  };
  const jsx=(type,props)=>({type,props}),math=Object.create(Math);math.random=()=>0.5;
@@ -87,6 +87,7 @@ function realm(kind,old=false,{hidden=false}={}){
    if(['game_votes','institution_session_registrations','party_chair_ballots','stage_deadline_rules'].includes(table))sync.notifyGameDataRefresh(gameId,table);
   },
   local:(table,gameId='game-A')=>sync.notifyGameDataRefresh(gameId,table),
+  status:value=>{for(const ch of channels)ch.status?.(value)},revision:()=>revision++,
   visible(value){document.visibilityState=value?'visible':'hidden';document.dispatchEvent({type:'visibilitychange'})},
   event:type=>window.dispatchEvent({type}),hold(value=true){holdReads=value},holdWrite(value=true){holdMutation=value},errorWrite(value){mutationError=value},
   policy:(stageNo=4,gameId='game-A')=>window.dispatchEvent({type:'gos-stage-policy-updated',detail:{gameId,stageNo}}),
@@ -124,6 +125,14 @@ async function regressions(kind){
  const unmounted=realm(kind);await unmounted.settle();unmounted.hold();unmounted.local(tables[kind][0]);await unmounted.advance(3001);unmounted.close();await tick();unmounted.release();await tick();
  const failed=realm(kind);await failed.settle();failed.errorWrite(new Error('synthetic write failure'));voteButton(failed,kind).props.onClick();await failed.settle();assert.equal(failed.state(kind==='duma'?12:2),false,'Rejected mutation releases busy state');assert(failed.errors.length||failed.state(3),'Rejected mutation is visible');failed.close();
  if(kind==='duma'){
+  const fallback=realm(kind,false,{subscription:'manual'});await fallback.advance(1600);await fallback.settle();assert.equal(fallback.metrics().reads,8,'An unavailable channel still loads the initial snapshot');fallback.status('SUBSCRIBED');await fallback.advance(4000);assert.equal(fallback.metrics().reads,16,'A late connection reconciles a snapshot started before subscription');fallback.status('SUBSCRIBED');await fallback.advance(4000);assert.equal(fallback.metrics().reads,24,'A reconnected channel reconciles again');fallback.close();
+  const failedChannel=realm(kind,false,{subscription:'manual'});failedChannel.status('CHANNEL_ERROR');await failedChannel.settle();assert.equal(failedChannel.metrics().reads,8,'A reported connection error starts the initial snapshot immediately');failedChannel.status('SUBSCRIBED');await failedChannel.advance(4000);assert.equal(failedChannel.metrics().reads,16,'Recovery after a failed subscription reconciles the snapshot');failedChannel.close();
+  const beforeConnect=realm(kind,false,{subscription:'manual'});beforeConnect.revision();beforeConnect.status('SUBSCRIBED');await beforeConnect.settle();await beforeConnect.advance(4000);assert.equal(beforeConnect.metrics().reads,8,'An update before subscribing is included in the first snapshot');assert.equal(beforeConnect.state(3).length,1);beforeConnect.close();
+  const duringSnapshot=realm(kind,false,{subscription:'manual'});duringSnapshot.hold();duringSnapshot.status('SUBSCRIBED');await tick();duringSnapshot.revision();duringSnapshot.emit('office_personal_ballots');await duringSnapshot.advance(3001);duringSnapshot.release();await duringSnapshot.settle();await duringSnapshot.advance(3001);assert.equal(duringSnapshot.state(3).length,1,'An event during the first snapshot is reconciled');assert.equal(duringSnapshot.metrics().reads,16,'An in-flight event requires only one trailing snapshot');duringSnapshot.close();
+  const secret=realm(kind,false,{subscription:'manual',secretTransition:true});secret.hold();secret.status('SUBSCRIBED');await tick();secret.revision();secret.release();await secret.settle();assert.equal(secret.state(0)[0].status,'closed','A vote closed during the initial read receives a coherent retry');assert.equal(secret.state(3).length,1,'The confirmed closed election is paired with the matching ballots');secret.close();
+  const waitingHidden=realm(kind,false,{subscription:'manual'});waitingHidden.visible(false);waitingHidden.status('SUBSCRIBED');await waitingHidden.advance(4000);assert.equal(waitingHidden.metrics().reads,0,'A pending startup does not query after the tab is hidden');waitingHidden.visible(true);await waitingHidden.advance(4000);assert.equal(waitingHidden.metrics().reads,8,'A visible tab resumes its initial snapshot');waitingHidden.close();
+  const switching=realm(kind,false,{subscription:'manual'});switching.render(switching.props('game-B','new-student'));switching.status('SUBSCRIBED');await switching.settle();await switching.advance(4000);assert.equal(switching.metrics().reads,8,'A pending startup does not query the previous game after a scope switch');assert.equal(switching.state(0)[0].game_id,'game-B');switching.close();
+  const cancelled=realm(kind,false,{subscription:'manual'});cancelled.close();await tick();assert.equal(cancelled.metrics().reads,0,'Unmount cancels a pending initial snapshot');
   const partial=realm(kind);await partial.settle();const accepted=JSON.stringify(partial.state(1));partial.failures.add('office_candidates');partial.local('office_candidates');await partial.advance(3001);assert.equal(JSON.stringify(partial.state(1)),accepted,'Partial read failure preserves accepted candidates');assert(partial.errors.length,'Read errors are visible');assert(partial.count('get_my_institution_meeting_permissions')>=2,'Permission RPC is preserved in the second batch');partial.close();
  }
 }
@@ -159,6 +168,8 @@ async function policyRegressions(kind){
  }
 }
 async function main(){
+ const startup=Array.from({length:100},()=>realm('duma'));await tick();for(const client of startup){await client.settle();await client.advance(4000)}
+ const startup100Reads=startup.reduce((total,client)=>total+client.metrics().reads,0);assert.equal(startup100Reads,800,'A successful first subscription and initial snapshot do not duplicate reads');for(const client of startup)client.close();
  const before=compareRef?{}:null,after={};
  for(const kind of ['duma','party']){
   if(before){before[kind]={};for(const mode of ['burst','steady','idle'])before[kind][mode]=await model(kind,true,mode)}
@@ -175,6 +186,6 @@ async function main(){
   await policyRegressions(kind);assert.equal(after[kind].steady.rawHandlers,0,'Policy panels do not add dead/duplicate subscriptions');assert.equal(after[kind].steady.maxInflightPerClient,kind==='deadline'?2:1);
   if(before){assert(after[kind].idle.reads>before[kind].idle.reads,'Unpublished tables need a previously absent fallback');if(kind==='deadline')assert(after[kind].steady.reads<before[kind].steady.reads/10);else assert(after[kind].steady.reads>before[kind].steady.reads,'Ghost baseline was stale: retain its newly working vote invalidation and fallback')}
  }
- console.log(JSON.stringify({environment:'Actual component effects; 40 isolated clients per panel; 20 virtual minutes; eight invalidation events/s, not vote RPCs; synthetic replies, no network or Auth. Idle reconciliation adds reads to the previous no-fallback panels. Ghost baseline cannot receive its unpublished table: added reads restore freshness after vote changes and at 180–195s reconciliation.',baseline:compareRef||null,before,after,checks:['table/game/stage filtering','hidden suspension and visible recovery','hidden deadline clock paused','online recovery after focus','4+4 Duma concurrency','scope abort and late-read exclusion','double-submit suppression','own mutation trailing read','12s deadline recovery even if transport ignores abort','observer and closed-stage stale handlers blocked','partial error preserves accepted data','newer draft preserved during save','ghost vote opens once','unmount cancels in-flight deadline']},null,2));
+ console.log(JSON.stringify({environment:'Actual component effects; 40 isolated clients per panel; 20 virtual minutes; eight invalidation events/s, not vote RPCs; synthetic replies, no network or Auth. Idle reconciliation adds reads to the previous no-fallback panels. Ghost baseline cannot receive its unpublished table: added reads restore freshness after vote changes and at 180–195s reconciliation.',baseline:compareRef||null,startup100Reads,before,after,checks:['table/game/stage filtering','hidden suspension and visible recovery','hidden deadline clock paused','online recovery after focus','subscription-first snapshot without duplicate initial reads','offline startup fallback and reconnect recovery','pre-subscription and in-flight changes','secret vote closes during initial snapshot','hidden and unmounted pending startup','4+4 Duma concurrency','scope abort and late-read exclusion','double-submit suppression','own mutation trailing read','12s deadline recovery even if transport ignores abort','observer and closed-stage stale handlers blocked','partial error preserves accepted data','newer draft preserved during save','ghost vote opens once','unmount cancels in-flight deadline']},null,2));
 }
 main().catch(error=>{console.error(error);process.exitCode=1});

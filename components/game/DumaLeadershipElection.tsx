@@ -49,6 +49,9 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
  const reads=useRef({scope,promise:null as Promise<void>|null,queued:false,explicit:false,cancel:null as (()=>void)|null});
  if(reads.current.scope!==scope)reads.current={scope,promise:null,queued:false,explicit:false,cancel:null};
  const readState=reads.current;
+ const startup=useRef({scope,started:false,subscribed:false,promise:null as Promise<void>|null,resolve:null as (()=>void)|null,timer:undefined as ReturnType<typeof setTimeout>|undefined});
+ if(startup.current.scope!==scope)startup.current={scope,started:false,subscribed:false,promise:null,resolve:null,timer:undefined};
+ const initial=startup.current;
  const invalidations=useRef({scope,full:true,tables:new Set<string>(),lastFull:0});
  if(invalidations.current.scope!==scope)invalidations.current={scope,full:true,tables:new Set<string>(),lastFull:0};
  const pending=invalidations.current;
@@ -56,10 +59,16 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
  useEffect(()=>{
   setElections([]);setCandidates([]);setBallots([]);setPersonalBallots([]);setPersonalMandates([]);setRegistrations([]);setProcedureVotes([]);setCanCoordinate(false);setNominee({});setVoteDraft({});setBusy(false);setDataScope(scope);
-  return()=>{readState.cancel?.()};
+  return()=>{readState.cancel?.();clearTimeout(initial.timer);initial.resolve?.()};
  },[scope]);
  async function load(background=false){
   if(!game||!me||!scopeCurrent()||background&&document.visibilityState!=='visible')return;
+  if(!initial.started&&!initial.subscribed){
+   if(!initial.promise)initial.promise=new Promise<void>(resolve=>{initial.resolve=resolve;initial.timer=setTimeout(resolve,1500)});
+   await initial.promise;
+   if(!scopeCurrent()||background&&document.visibilityState!=='visible')return;
+  }
+  initial.started=true;clearTimeout(initial.timer);initial.resolve=null;
   const state=reads.current;state.explicit=state.explicit||!background;
   if(state.promise){state.queued=true;return state.promise}
   state.promise=(async()=>{
@@ -173,7 +182,10 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
    .on('postgres_changes',{event:'*',schema:'public',table:'office_personal_ballots',filter:'game_id=eq.'+game.id},payload=>refresh('office_personal_ballots',payload))
    .on('postgres_changes',{event:'*',schema:'public',table:'party_member_mandates',filter:'game_id=eq.'+game.id},payload=>refresh('party_member_mandates',payload))
    .subscribe(status=>{
-    if(status!=='SUBSCRIBED'||!scopeCurrent())return;
+    if(!scopeCurrent())return;
+    if(status!=='SUBSCRIBED'){initial.subscribed=false;initial.resolve?.();return}
+    initial.subscribed=true;initial.resolve?.();
+    if(!initial.started)return;
     pending.full=true;
     if(recoveryTimer!==undefined)return;
     recoveryTimer=setTimeout(()=>{recoveryTimer=undefined;lastRecovery=Date.now();if(scopeCurrent())void load(true)},Math.max(recoveryJitter,lastRecovery+3000-Date.now()));

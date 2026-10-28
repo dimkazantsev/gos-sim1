@@ -24,6 +24,8 @@ on:
       - 'scripts/teacher-readiness-load-check.cjs'
       - 'scripts/republic-game-resilience-check.cjs'
       - 'scripts/turn-clock-isolation-check.cjs'
+      - 'scripts/crisis-clock-isolation-check.cjs'
+      - 'components/game/CrisisRoom.tsx'
       - 'scripts/turn-countdown-check.cjs'
       - 'components/game/TurnClock.tsx'
       - 'components/game/turnCountdown.ts'
@@ -95,6 +97,8 @@ on:
       - 'scripts/teacher-readiness-load-check.cjs'
       - 'scripts/republic-game-resilience-check.cjs'
       - 'scripts/turn-clock-isolation-check.cjs'
+      - 'scripts/crisis-clock-isolation-check.cjs'
+      - 'components/game/CrisisRoom.tsx'
       - 'scripts/turn-countdown-check.cjs'
       - 'components/game/TurnClock.tsx'
       - 'components/game/turnCountdown.ts'
@@ -163,6 +167,7 @@ jobs:
       - run: node scripts/chat-overview-100-clients-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
       - run: node scripts/turn-clock-isolation-check.cjs
+      - run: node scripts/crisis-clock-isolation-check.cjs
       - run: node scripts/turn-countdown-check.cjs
       - run: node scripts/office-projection-check.cjs
       - run: node scripts/local-traffic-snapshot-check.cjs
