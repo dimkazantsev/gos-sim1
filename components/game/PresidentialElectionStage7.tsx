@@ -58,6 +58,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const [ceremonyFeedback,setCeremonyFeedback]=useState('');
  const [photoUrls,setPhotoUrls]=useState<Record<string,string>>({});
  const [audioUrls,setAudioUrls]=useState<Record<string,string>>({});
+ const mediaPaths=useRef<{photos:Record<string,string>;hymn:string;music:string}>({photos:{},hymn:'',music:''});
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
  const [candidateId,setCandidateId]=useState('');
@@ -83,16 +84,18 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const [hymnLink,setHymnLink]=useState('');
  const [musicLink,setMusicLink]=useState('');
 
- const viewScope=JSON.stringify([gameId,me?.user_id,me?.kind,teacher]);
+ const viewScope=JSON.stringify([gameId,me?.user_id,me?.kind,me?.role_title,me?.roster_archived_at,teacher]);
  const scope=useRef(viewScope),request=useRef(0),alive=useRef(true),ceremonyDirty=useRef(false);
+ const [stateScope,setStateScope]=useState(viewScope);
  scope.current=viewScope;
  const signedAsset=useMemo(()=>createScopedSignedAssetCache(async path=>{
+  if(!alive.current||scope.current!==viewScope)return null;
   const {data,error}=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
   return error?null:data?.signedUrl||null;
- }),[gameId,me?.user_id]);
+ }),[viewScope]);
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{
-  request.current++;ceremonyDirty.current=false;
+  request.current++;ceremonyDirty.current=false;mediaPaths.current={photos:{},hymn:'',music:''};setStateScope(viewScope);
   setCandidates([]);setMaterials([]);setDecision(null);setPublicPolls([]);setSettings(null);setStage6Ready(false);setScores([]);setInauguration(null);setInaugurationConfirmed(false);setPhotoUrls({});setAudioUrls({});
   setCandidateId('');setCeremonyAt('');setVenue('');setCeremonyNotes('');setHymnLink('');setMusicLink('');setCeremonyFeedback('');setBusy(false);setNotice('');
   setTitle('');setBody('');setPrintRun('');setPublisher('');setProductionDate('');setImprint('');setExternalUrl('');setFiles([]);
@@ -150,24 +153,30 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   const failure=[cr,mr,dr,pr,sr,sc,ir,stageDecision,ceremonyPost].find(result=>result.error);if(failure?.error)throw failure.error;
   setStage6Ready(Boolean(stageDecision.data?.closed));setInaugurationConfirmed(Boolean(ceremonyPost.data?.id));
   const rows=(cr.data||[]) as Candidate[],scoreRows=(sc.data||[]) as Score[],ceremony=ir.data as Inauguration|null;
-  const [pairs,hymn,music]=await Promise.all([
-   Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,await signed(x.photo_path)] as const)),
-   signed(ceremony?.hymn_path||null),signed(ceremony?.ceremonial_music_path||null)
-  ]);
-  if(!current())return;
-  setCandidates(rows);setPhotoUrls(Object.fromEntries(pairs.filter(x=>x[1])));
+  const previousPaths=mediaPaths.current;
+  const paths={photos:Object.fromEntries(rows.filter(x=>x.photo_path).map(x=>[x.id,x.photo_path!])),hymn:ceremony?.hymn_path||'',music:ceremony?.ceremonial_music_path||''};
+  mediaPaths.current=paths;
+  setPhotoUrls(previous=>Object.fromEntries(Object.entries(previous).filter(([id])=>paths.photos[id]&&paths.photos[id]===previousPaths.photos[id])));
+  setAudioUrls(previous=>Object.fromEntries(Object.entries(previous).filter(([key])=>paths[key as 'hymn'|'music']&&paths[key as 'hymn'|'music']===previousPaths[key as 'hymn'|'music'])));
+  setCandidates(rows);
   const preferred=rows.find(x=>x.registration_status==='registered'&&canManage(x));
   setCandidateId(previous=>rows.some(x=>x.id===previous&&x.registration_status==='registered'&&canManage(x))?previous:preferred?.id||'');
   setMaterials((mr.data||[]) as Material[]);setDecision(dr.data as PollDecision|null);setPublicPolls((pr.data||[]) as PublicPoll[]);setSettings(sr.data as Settings|null);
   setScores(scoreRows);
 
-  setInauguration(ceremony);setAudioUrls({hymn,music});
+  setInauguration(ceremony);
   if(!ceremonyDirty.current){setCeremonyAt(inaugurationDateInput(ceremony?.scheduled_at));setVenue(ceremony?.venue||'');setCeremonyNotes(ceremony?.notes||'');setHymnLink(isExternalAudioLink(ceremony?.hymn_path)?ceremony!.hymn_path!:'');setMusicLink(isExternalAudioLink(ceremony?.ceremonial_music_path)?ceremony!.ceremonial_music_path!:'')}
+  for(const row of rows)if(row.photo_path)void signed(row.photo_path).then(url=>{
+   if(current())setPhotoUrls(previous=>{const next={...previous};if(url)next[row.id]=url;else delete next[row.id];return next});
+  }).catch(error=>{if(current())setError(error)});
+  for(const key of ['hymn','music'] as const)if(paths[key])void signed(paths[key]).then(url=>{
+   if(current())setAudioUrls(previous=>({...previous,[key]:url}));
+  }).catch(error=>{if(current())setError(error)});
   }catch(error){if(current())setError(error)}
  }
  useGameTableSync(gameId,['presidential_candidates','presidential_campaign_materials','presidential_poll_decision','presidential_public_polls','presidential_scorecards','presidential_election_settings','presidential_inauguration','game_parties','political_posts'],load,viewScope);
 
- if(!game||!me)return null;
+ if(!game||!me||stateScope!==viewScope)return null;
  const baseUrl=typeof window!=='undefined'?window.location.origin:'';
  const assetBase=(process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'').replace(/\/$/,'');
  const pollUrl=publicPoll?baseUrl+assetBase+'/poll?slug='+encodeURIComponent(publicPoll.slug):'';

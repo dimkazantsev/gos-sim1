@@ -14,7 +14,7 @@ function harness(component){
  const file=path.join(root,'components/game',component+'.tsx');
  const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const slots=[],pendingEffects=[],channels=[],counts=new Map(),holds=new Map(),errors=[],fetches=[],failures=new Set(),profileNotes=new Map(),committeeLegal=new Map(),budgetConclusions=new Map();
- let cursor=0,dirty=false,tree,latestTableLoad,revision=1,serverVenue='Saved venue',serverPollApproved=false,serverHymn=null,serverMusic=null,serverCeremonyAt='2026-10-08T12:00:00Z',serverSettingsStatus='round1',ceremonySaveCount=0,ceremonyConfirmCount=0,clock=0,sessionUser='teacher-a',props;
+ let cursor=0,dirty=false,tree,latestTableLoad,revision=1,serverVenue='Saved venue',serverPollApproved=false,serverHymn=null,serverMusic=null,serverPhoto=null,serverPhotos=null,serverCeremonyAt='2026-10-08T12:00:00Z',serverSettingsStatus='round1',ceremonySaveCount=0,ceremonyConfirmCount=0,clock=0,sessionUser='teacher-a',props;
  const g={game:{id:'game-a'},me:{game_id:'game-a',user_id:'teacher-a',kind:'teacher',full_name:'Teacher A'},teacher:true,currentStage:{stage_no:7},formalDocuments:[],formalHistory:[],votes:[],members:[],parties:[],setError:error=>errors.push(String(error?.message||error))};
  for(const name of ['createFormalDocument','deleteFormalDocument','advanceFormalDocument','updateFormalDraft','vetoFormalDocument','resolveBudgetConciliation','startBudgetRejectionBranch','createVote'])g[name]=async()=>null;
  g.refresh=async()=>{};
@@ -23,7 +23,7 @@ function harness(component){
  const react={
   useState(initial){const i=cursor++;if(!slots[i])slots[i]={value:typeof initial==='function'?initial():initial};return[slots[i].value,next=>{const value=typeof next==='function'?next(slots[i].value):next;if(!Object.is(value,slots[i].value)){slots[i].value=value;dirty=true;}}];},
   useRef(initial){const i=cursor++;return(slots[i]??={value:{current:initial}}).value;},
-  useMemo(fn){cursor++;return fn();},
+  useMemo(fn,deps){const i=cursor++,old=slots[i];if(!old||!deps||deps.some((value,j)=>!Object.is(value,old.deps?.[j])))slots[i]={deps,value:fn()};return slots[i].value;},
   useEffect(effect,deps){const i=cursor++,old=slots[i];if(!old||!deps||deps.some((value,j)=>!Object.is(value,old.deps?.[j]))){slots[i]={deps,cleanup:old?.cleanup};pendingEffects.push(()=>{slots[i].cleanup?.();slots[i].cleanup=effect();});}}
  };
  const supabase={
@@ -31,7 +31,7 @@ function harness(component){
   from(table){const number=(counts.get(table)||0)+1;counts.set(table,number);const snapshot={revision,serverVenue,user:g.me.user_id,game:g.game.id},filters={};const query={select(){return this;},eq(key,value){filters[key]=value;return this;},is(){return this;},order(){return this;},maybeSingle(){return this;},async then(resolve,reject){try{
    await holds.get(table+':'+number)?.promise;
    let data=[];
-   if(table==='presidential_candidates')data=['a','b'].map(letter=>({id:'candidate-'+letter,user_id:snapshot.user,created_by:snapshot.user,registration_status:'registered',display_name:'Candidate '+letter+' revision '+snapshot.revision,photo_path:null,party_id:null,rating_penalty:0}));
+   if(table==='presidential_candidates')data=(serverPhotos||['a','b']).map((letter,index)=>({id:'candidate-'+letter,user_id:snapshot.user,created_by:snapshot.user,registration_status:'registered',display_name:'Candidate '+letter+' revision '+snapshot.revision,photo_path:serverPhotos?'game-a/photo-'+index:letter==='a'?serverPhoto:null,party_id:null,rating_penalty:0}));
    if(table==='presidential_election_settings')data={game_id:snapshot.game,system_type:'relative',status:serverSettingsStatus,poll_enabled:true,result:{}};
    if(table==='presidential_scorecards')data=['a','b'].map(letter=>({candidate_id:'candidate-'+letter,round_no:1,poll_pct:20,computed_pct:snapshot.revision}));
    if(table==='presidential_poll_decision')data={game_id:snapshot.game,status:'closed',result:serverPollApproved};
@@ -49,7 +49,7 @@ function harness(component){
    if(name==='save_budget_preliminary_review')budgetConclusions.set(args.p_document_id,args.p_committee_conclusion);
    return{data:name==='get_presidential_student_system_vote'?{closed:true,result:{system_type:'relative',votes_total:40}}:name==='get_formal_subjects'?['gd_deputy']:name==='get_bill_dossier_readiness'?{issues:[],review_issues:[],required_files:[],submission_ready:false,committee_ready:false}:null,error:null};
   },
-  storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:'https://example.invalid/media'},error:null})})},
+  storage:{from:()=>({createSignedUrl:async path=>{const number=(counts.get('storage')||0)+1;counts.set('storage',number);await holds.get('storage:'+number)?.promise;return{data:{signedUrl:'https://example.invalid/media/'+encodeURIComponent(path)},error:null}}})},
   channel(){const handlers=[];const channel={on(kind,filter,callback){handlers.push({filter,callback});return this;},subscribe(){return this;},handlers};channels.push(channel);return channel;},removeChannel:async()=>{}
  };
  const jsx=(type,props)=>({type,props:props||{}}),tag=name=>Object.assign(()=>{},{displayName:name});
@@ -58,7 +58,7 @@ function harness(component){
  function requireFor(name){
   if(name==='react')return react;
   if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};
-  if(name==='./scopedSignedAssetCache')return{createScopedSignedAssetCache:sign=>sign};
+  if(name==='./scopedSignedAssetCache'){const source=fs.readFileSync(path.join(root,'components/game/scopedSignedAssetCache.ts'),'utf8'),compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,child={exports:{}};vm.runInNewContext('(function(module,exports){'+compiled+'\n})',{Date,Map,Promise})(child,child.exports);return child.exports;}
   if(name==='./prepareCandidatePhoto')return{prepareCandidatePhoto:async file=>file};
   if(name==='@/lib/supabase')return{supabase};
   if(name==='@/lib/userError')return{userError:error=>String(error?.message||error)};
@@ -92,9 +92,10 @@ function harness(component){
   refreshDocument(){return nodes(tree,node=>node.type?.displayName==='DocumentTools')[0].props.onRefresh();},
   remoteProfile(value,id='doc-a'){profileNotes.set(id,value);},remoteLegal(value,id='doc-a'){committeeLegal.set(id,value);},remoteBudget(value,id='doc-a'){budgetConclusions.set(id,value);},
   resolveFetch(index,data,ok=true){fetches[index].response.resolve({ok,json:async()=>data});},
-  setRevision:value=>{revision=value;},setVenue:value=>{serverVenue=value;},setSessionUser:value=>{sessionUser=value;},setPollApproved:value=>{serverPollApproved=value;},setAudioPaths:(hymn,music)=>{serverHymn=hymn;serverMusic=music;},setCeremonyDate:value=>{serverCeremonyAt=value;},setElectionStatus:value=>{serverSettingsStatus=value;},ceremonyConfirmedCalls:()=>ceremonyConfirmCount,savedAudio:()=>({hymn:serverHymn,music:serverMusic,date:serverCeremonyAt,count:ceremonySaveCount}),
+  setRevision:value=>{revision=value;},setVenue:value=>{serverVenue=value;},setSessionUser:value=>{sessionUser=value;},setPollApproved:value=>{serverPollApproved=value;},setPhotoPath:value=>{serverPhoto=value;},setPhotoCandidates:value=>{serverPhotos=value;},signCount:()=>counts.get('storage')||0,setAudioPaths:(hymn,music)=>{serverHymn=hymn;serverMusic=music;},setCeremonyDate:value=>{serverCeremonyAt=value;},setElectionStatus:value=>{serverSettingsStatus=value;},ceremonyConfirmedCalls:()=>ceremonyConfirmCount,savedAudio:()=>({hymn:serverHymn,music:serverMusic,date:serverCeremonyAt,count:ceremonySaveCount}),
   fail:table=>failures.add(table),
   hold(table){const pending=deferred();holds.set(table+':'+((counts.get(table)||0)+1),pending);return pending;},
+  holdMany(table,n){return Array.from({length:n},(_,i)=>{const pending=deferred();holds.set(table+':'+((counts.get(table)||0)+i+1),pending);return pending})},
   refresh(){if(latestTableLoad)return latestTableLoad();for(const channel of channels)for(const {filter,callback} of channel.handlers)if(filter.table==='presidential_scorecards')callback();},
   dispose(){for(const slot of slots)slot?.cleanup?.();}
  };
@@ -103,6 +104,38 @@ function harness(component){
 async function main(){
  const failures=[];
  async function check(name,fn){try{await fn();console.log('PASS '+name);}catch(error){failures.push(name);console.error('FAIL '+name+': '+error.message);}}
+ await check('Stage7 standings are usable while candidate photos are delayed',async()=>{
+  const h=harness('PresidentialElectionStage7'),slow=h.hold('storage');h.setPhotoPath('game-a/photo');h.setAudioPaths('game-a/hymn',null);
+  try{await h.settle();h.clickResults();h.render();assert.match(text(h.byClass('resultBars')),/Candidate a revision 1/,'Election results must not wait for a media URL');assert.equal(h.all('audio',h.byClass('ceremonyAudio')).length,1,'Ready audio must not wait for a delayed photo');}
+  finally{slow.resolve();h.dispose()}
+ });
+ await check('Stage7 ignores stale signed photos after a newer image or identity',async()=>{
+  const h=harness('PresidentialElectionStage7'),slow=h.hold('storage');h.setPhotoPath('game-a/old');h.setElectionStatus('finished');
+  try{
+   await h.settle();h.clickResults();h.render();h.setPhotoPath('game-a/new');h.setRevision(2);await h.refresh();await h.settle();
+   assert.match(h.all('img',h.byClass('winnerPhoto'))[0].props.src,/game-a%2Fnew/);
+   slow.resolve();await h.settle();assert.match(h.all('img',h.byClass('winnerPhoto'))[0].props.src,/game-a%2Fnew/,'Old URL cannot overwrite the latest photo');
+   const stale=h.hold('storage');h.setPhotoPath('game-a/private');await h.refresh();await h.settle();
+   h.setPhotoPath(null);h.g.teacher=false;h.g.me.kind='student';h.g.me.user_id='student-b';await h.settle();stale.resolve();await h.settle();
+   assert.equal(h.all('img',h.byClass('winnerPhoto')).length,0,'Previous identity cannot restore a signed image');
+  }finally{slow.resolve();h.dispose()}
+ });
+ await check('Stage7 reauthorizes media after the same user changes role',async()=>{
+  const h=harness('PresidentialElectionStage7');h.setPhotoPath('game-a/photo');h.setElectionStatus('finished');
+  try{await h.settle();h.clickResults();h.render();assert.equal(h.signCount(),1);
+   h.g.teacher=false;h.g.me.kind='student';const transition=h.render();assert.equal(nodes(transition,node=>node.type==='img').length,0,'Old authorized image must be hidden during scope transition');
+   await h.settle();assert.equal(h.signCount(),2,'A role change must not reuse an earlier authorized URL');
+   h.g.me.role_title='Новая должность';await h.settle();assert.equal(h.signCount(),3,'A changed office must also isolate the signed URL cache');
+  }finally{h.dispose()}
+ });
+ await check('Stage7 never starts queued signatures after a role change',async()=>{
+  const h=harness('PresidentialElectionStage7'),pending=h.holdMany('storage',4);h.setPhotoCandidates(['a','b','c','d','e','f']);
+  try{
+   await h.settle();assert.equal(h.signCount(),4,'Storage signatures are bounded at four');
+   h.setPhotoCandidates(null);h.g.teacher=false;h.g.me.kind='student';await h.settle();
+   pending.forEach(item=>item.resolve());await h.settle();await tick();assert.equal(h.signCount(),4,'Old queued requests must not start after demotion');
+  }finally{pending.forEach(item=>item.resolve());h.dispose()}
+ });
  await check('Stage7 inauguration confirmation explains a future date without appointing the President',async()=>{
   const h=harness('PresidentialElectionStage7');
   h.setElectionStatus('finished');h.setCeremonyDate('2030-10-23T14:50:00Z');
