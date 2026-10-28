@@ -7,7 +7,7 @@ assert(shell.includes('60000+Math.floor(Math.random()*12000)'),'Presence 60-72s,
 assert(hook.includes('previous.view===viewKey&&now-previous.at<60000'),'Coalesce duplicate presence writes');
 assert(hook.includes("p_label:label||null")&&hook.includes("response.error?.code==='PGRST202'"),'One authenticated RPC for navigation; fallback only for unavailable migration');
 assert(hook.includes("if(!legacy.error&&label)await logActivity('navigation'"),'Legacy path must not write activity after failed presence');
-const presenceMigration=fs.readFileSync('supabase/migrations/20261028200000_game_presence_one_roundtrip.sql','utf8');
+const presenceMigration=fs.readFileSync('supabase/migrations/20261028091547_game_presence_one_roundtrip_20261028.sql','utf8');
 for(const guard of ['SECURITY INVOKER','auth.uid()','REVOKE ALL','GRANT EXECUTE','public.game_presence','public.game_activity'])assert(presenceMigration.includes(guard),'Presence migration must preserve auth, RLS and both writes: '+guard);
 assert(badges.includes('600+userJitter')&&badges.includes('90000+userJitter'),'Stagger and slow fallback counters');
 assert(badges.includes('now-lastFallbackAt<300000'),'Connected counters use five minute fallback');
