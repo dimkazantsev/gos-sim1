@@ -84,8 +84,15 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
      if(lastRelevantMutationAt.current<=enteredAtMs){
       optimisticVersion.current+=1;
       setCounts(previous=>({...previous,[view]:0}));
+      // The confirmed read is already reflected locally. A healthy shared
+      // Realtime channel will invalidate badges on subsequent game changes;
+      // avoid one redundant RPC after every navigation by connected players.
+      if(!gameRealtimeConnected(gameId))notifySectionUpdates(gameId);
+     }else{
+      // An event arrived after entering the screen: do not clear it, and
+      // preserve the existing server reconciliation even while connected.
+      notifySectionUpdates(gameId);
      }
-     notifySectionUpdates(gameId);
     });
   },1500);
   return()=>{active=false;clearTimeout(id)};
