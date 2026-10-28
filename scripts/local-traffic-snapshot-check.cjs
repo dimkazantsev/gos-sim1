@@ -5,7 +5,10 @@ const hook=fs.readFileSync(files[0],'utf8'),shell=fs.readFileSync(files[1],'utf8
 assert(hook.includes('Date.now()-lastCoreSuccessAt.current>60000'),'Reuse core across navigation');
 assert(shell.includes('60000+Math.floor(Math.random()*12000)'),'Presence 60-72s, online freshness stays below 90s');
 assert(hook.includes('previous.view===viewKey&&now-previous.at<60000'),'Coalesce duplicate presence writes');
-assert(hook.includes("if(!response.error&&label)await logActivity('navigation'"),'Do not double-write activity after failed presence');
+assert(hook.includes("p_label:label||null")&&hook.includes("response.error?.code==='PGRST202'"),'One authenticated RPC for navigation; fallback only for unavailable migration');
+assert(hook.includes("if(!legacy.error&&label)await logActivity('navigation'"),'Legacy path must not write activity after failed presence');
+const presenceMigration=fs.readFileSync('supabase/migrations/20261028091547_game_presence_one_roundtrip_20261028.sql','utf8');
+for(const guard of ['SECURITY INVOKER','auth.uid()','REVOKE ALL','GRANT EXECUTE','public.game_presence','public.game_activity'])assert(presenceMigration.includes(guard),'Presence migration must preserve auth, RLS and both writes: '+guard);
 assert(badges.includes('600+userJitter')&&badges.includes('90000+userJitter'),'Stagger and slow fallback counters');
 assert(badges.includes('now-lastFallbackAt<300000'),'Connected counters use five minute fallback');
 assert(badges.includes('r.status>=500')&&badges.includes('Date.now()+90000'),'Server overload backoff');
