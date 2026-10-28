@@ -11,6 +11,9 @@ export function documentSignerTitle(
  document:Pick<FormalDocument,'metadata'|'subject_key'|'subject_label'|'doc_type'>,
  capturedRole:unknown
 ):string{
+ // Institutional answers always use the issuing office, not another game office of the teacher.
+ if(document.subject_key==='minjust'&&['justice_response','party_certificate'].includes(document.doc_type))
+  return MINJUST_REGISTRATION_SIGNER_TITLE;
  const role=typeof capturedRole==='string'?capturedRole.trim():'';
  if(role&&!TECHNICAL_ROLES.test(role))return role;
  const explicit=[document.metadata?.signatory_title,document.metadata?.acting_office_title].find(value=>
