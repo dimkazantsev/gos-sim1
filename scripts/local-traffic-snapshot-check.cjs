@@ -24,7 +24,7 @@ const updatesMigration=fs.readFileSync('supabase/migrations/20261028203000_secti
 assert(updatesMigration.includes('private.is_game_member(p_game_id)'),'Member authorization must be unchanged');
 assert(updatesMigration.includes('private.is_game_teacher(p_game_id)'),'Teacher-only badge must stay role-checked');
 assert(updatesMigration.includes('STABLE SECURITY DEFINER'),'Function volatility and security mode must remain');
-assert.equal((updatesMigration.match(/from section_reads\\b/g)||[]).length,1,'Eight receipt queries must become one read');
+assert.equal((updatesMigration.match(/from section_reads\b/g)||[]).length,1,'Eight receipt queries must become one read');
 for(const key of ['documents','votes','events','actions','parties','stages','teacher','dashboard']){
  assert(updatesMigration.includes("filter (where section_key='"+key+"')"),'Missing read marker '+key);
  assert(updatesMigration.includes("'"+key+"',"),'Missing JSON response key '+key);
