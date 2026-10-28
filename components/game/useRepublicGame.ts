@@ -79,6 +79,8 @@ export function useRepublicGame(gameId:string){
  }
  const coreReadQueue=useRef({active:0,waiting:[] as Array<()=>void>});
  const rosterReads=useRef(new Map<string,Promise<{data:Member[]|null;error:{message:string;code?:string}|null}>>());
+ // Reuse only in-flight automatic core snapshots, scoped to an authenticated game epoch.
+ const automaticCoreReads=useRef(new Map<string,Promise<void>>());
  function limitedCoreRead<T>(query:PromiseLike<T>):Promise<T>{
   const epoch=readEpoch.current,user=authUser.current,targetGame=gameId;
   return new Promise<T>((resolve,reject)=>{
@@ -200,7 +202,7 @@ export function useRepublicGame(gameId:string){
  }
  function clearGameData(){
   acceptedMember.current=null;
-  rosterReads.current.clear();
+  rosterReads.current.clear();automaticCoreReads.current.clear();
   realtimeDirtyTables.current.clear();
   changedFormalIds.current.clear();changedVoteIds.current.clear();
   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
@@ -801,11 +803,17 @@ export function useRepublicGame(gameId:string){
   if(!intro.error)setIntroAccountSeen(!!intro.data);
  }
 
- async function hydrateActiveView(allowFreshCore=false){
+ function loadAutomaticCoreSections(){
+  const key=gameId+':'+(authUser.current||'')+':'+readEpoch.current;
+  return coalesceInFlight(automaticCoreReads.current,key,loadCoreSections);
+ }
+
+ async function hydrateActiveView(allowFreshCore=false,forceCore=false){
   // Rapid view navigation can reuse recently updated common data.
   // Realtime, recovery and explicit refresh still force the core read.
   const jobs:Promise<unknown>[]=[loadRepublicOffices()];
-  if(!allowFreshCore||Date.now()-lastCoreSuccessAt.current>60000)jobs.unshift(loadCoreSections());
+  if(!allowFreshCore||Date.now()-lastCoreSuccessAt.current>60000)
+   jobs.unshift(forceCore?loadCoreSections():loadAutomaticCoreSections());
   const view=activeViewRef.current;
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets());
   // Teacher dossiers must fetch document rows, not just party representation.
@@ -1210,7 +1218,7 @@ export function useRepublicGame(gameId:string){
    return true;
   }catch(e){setChatPins(original);setError(e instanceof Error?e.message:'Не удалось изменить закрепление');return false}
  }
- async function refresh(){await loadAll(false);await Promise.all([hydrateActiveView(),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
+ async function refresh(){await loadAll(false);await Promise.all([hydrateActiveView(false,true),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
  async function refreshDocuments(id:string){await loadFormalRegistry([id]);notifyGameDataRefresh(gameId,'formal_documents')}
  async function refreshEventEffects(){await Promise.all([loadPoliticalWall(),refreshBudgetPulse()]);notifyGameDataRefresh(gameId,'event_decisions')}
 
