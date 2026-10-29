@@ -1,0 +1,27 @@
+name: 'ГОС.ID · 100 клиентов: восстановление состояния после устаревшего ответа'
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/republic-stage-recovery-100.yml'
+      - 'scripts/republic-stage-recovery-100-check.cjs'
+      - 'scripts/republic-game-resilience-check.cjs'
+permissions:
+  contents: read
+concurrency:
+  group: gos-stage-recovery-100-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Validate script syntax
+        run: node --check scripts/republic-stage-recovery-100-check.cjs
+      - name: Verify 100 game clients ignore stale bootstrap replies
+        run: node scripts/republic-stage-recovery-100-check.cjs
