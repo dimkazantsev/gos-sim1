@@ -1,0 +1,33 @@
+name: Document revision lazy loading regression
+on:
+  pull_request:
+    paths:
+      - 'components/game/DocumentsView.tsx'
+      - 'scripts/document-revision-lazy-check.cjs'
+      - '.github/workflows/document-revisions-lazy.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: document-lazy-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  revision-lazy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Verify scoped on-demand revision reads and restore behavior
+        run: node scripts/document-revision-lazy-check.cjs
+      - name: Verify document fields and signatures
+        run: |
+          node scripts/document-input-check.cjs
+          node scripts/document-signer-title-check.cjs
+          node scripts/official-document-paper-check.cjs
