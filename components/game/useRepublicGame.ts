@@ -934,7 +934,7 @@ export function useRepublicGame(gameId:string){
   const jobs:Promise<unknown>[]=[loadRepublicOffices(forceOffices)];
   if(!allowFreshCore||Date.now()-lastCoreSuccessAt.current>60000)jobs.unshift(loadCoreSections());
   const view=activeViewRef.current;
-  if(view==='parties'||view==='profile')jobs.push(loadPartyAssets());
+  if(view==='parties'||view==='profile')jobs.push(loadPartyAssets(view==='parties'));
   // Teacher dossiers must fetch document rows, not just party representation.
   if(view==='teacher')jobs.push(loadPartyDocuments());
   if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation(false));
@@ -1047,8 +1047,11 @@ export function useRepublicGame(gameId:string){
   }).catch(()=>{});
  }
 
- async function loadPartyAssets(){
-  await readSafely(['parties','profiles','partyDocuments'],async ticket=>{
+ async function loadPartyAssets(includeDocuments=true){
+  // Profile needs party identity and personal images, not party document rows
+  // or their Storage signatures. Party/teacher dossiers retain full reads.
+  const scopes:ReadScope[]=includeDocuments?['parties','profiles','partyDocuments']:['parties','profiles'];
+  await readSafely(scopes,async ticket=>{
    // Render each table as soon as its own query completes.
    // An overloaded document service must not make parties disappear.
    const partyRead=loadCachedParties().then(({data,error})=>{
@@ -1056,11 +1059,13 @@ export function useRepublicGame(gameId:string){
     if(error)setError(error);
     else acceptPartyRows((data||[]) as Party[],ticket);
    });
-   const documentRead=Promise.resolve(supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})).then(({data,error})=>{
-    if(!readCurrent(ticket,'partyDocuments'))return;
-    if(error)setError(error);
-    else acceptPartyDocuments((data||[]) as PartyDocument[],ticket);
-   });
+   const documentRead=includeDocuments
+    ?Promise.resolve(supabase.from('party_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})).then(({data,error})=>{
+      if(!readCurrent(ticket,'partyDocuments'))return;
+      if(error)setError(error);
+      else acceptPartyDocuments((data||[]) as PartyDocument[],ticket);
+     })
+    :Promise.resolve();
    const profileRead=Promise.resolve(supabase.from('game_profiles').select('*').eq('game_id',gameId)).then(({data,error})=>{
     if(!readCurrent(ticket,'profiles'))return;
     if(error){setError(error);return}
