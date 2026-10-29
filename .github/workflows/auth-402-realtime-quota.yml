@@ -12,6 +12,8 @@ on:
       - 'scripts/classroom-100-read-budget-check.cjs'
       - 'scripts/party-ten-minute-cache-check.cjs'
       - 'scripts/party-representation-projection-rls-check.cjs'
+      - 'scripts/impact-engine-projection-rls-check.cjs'
+      - 'supabase/migrations/20261029144000_impact_engine_projection_invoker.sql'
       - 'scripts/political-wall-projection-rls-check.cjs'
       - 'supabase/migrations/20261029150000_political_wall_projection_invoker.sql'
       - 'supabase/migrations/20261029141000_party_representation_projection_invoker.sql'
@@ -105,6 +107,8 @@ on:
       - 'scripts/classroom-100-read-budget-check.cjs'
       - 'scripts/party-ten-minute-cache-check.cjs'
       - 'scripts/party-representation-projection-rls-check.cjs'
+      - 'scripts/impact-engine-projection-rls-check.cjs'
+      - 'supabase/migrations/20261029144000_impact_engine_projection_invoker.sql'
       - 'scripts/political-wall-projection-rls-check.cjs'
       - 'supabase/migrations/20261029150000_political_wall_projection_invoker.sql'
       - 'supabase/migrations/20261029141000_party_representation_projection_invoker.sql'
@@ -208,6 +212,7 @@ jobs:
       - run: node scripts/classroom-100-read-budget-check.cjs
       - run: node scripts/party-ten-minute-cache-check.cjs
       - run: node scripts/party-representation-projection-rls-check.cjs
+      - run: node scripts/impact-engine-projection-rls-check.cjs
       - run: node scripts/political-wall-projection-rls-check.cjs
       - run: node scripts/section-updates-post-count-check.cjs
       - run: node scripts/party-rename-process-actor-check.cjs
