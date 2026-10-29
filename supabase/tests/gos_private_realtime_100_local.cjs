@@ -168,7 +168,7 @@ async function runSustainedPrivate(students,authorised){
  assert.equal(stats.broadcasts,10,'Only 10 bounded writes on disposable local document fixture');
  assert.equal(stats.reconnections,50);
  assert.equal(stats.readErrors,0);
- assert.equal(stats.receipts,920,'Expected 8 × 102 + 2 × 52 private receipts');
+ assert.equal(stats.receipts,970,'Expected 9 × 102 + 1 × 52 private receipts');
  console.log(JSON.stringify({status:'PASS',environment:'disposable local Supabase',
   scenario:'20-minute 100-user private Realtime + RLS reads + offline recovery',
   ...stats,read_latency:percentiles(latencies),
