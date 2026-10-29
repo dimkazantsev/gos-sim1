@@ -8,6 +8,7 @@ import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
 import {readLocalGameSnapshot,writeLocalGameSnapshot,deleteLocalGameSnapshot} from '@/lib/localGameSnapshot';
 import {resolveStoredAsset} from '@/lib/resolveStoredAsset';
+import {signDocumentAssetBatch} from './signDocumentAssetBatch';
 import type {Activity,Ballot,Channel,ChatPin,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,ImpactLedger,ImpactRule,Member,Message,Metric,MetricHistory,Party,PartyAgreement,PartyDocument,PartyInvitation,PartyMandateAllocation,PartySupportHistory,PoliticalPost,PoliticalPostFormalLink,PoliticalPostMedia,Presence,Stage,Vote,View} from './types';
 import {CRISES} from './constants';
 import {CHAT_MAX_FILE_BYTES,preferredRecordingMime,recordingFileName,uploadedChatKind,inferChatMime} from './recordingMedia';
@@ -175,6 +176,27 @@ export function useRepublicGame(gameId:string){
   });
   assetSignatures.current.set(key,{expiresAt:now+45*60*1000,promise});
   return promise;
+ }
+ function signedDocumentLinks(rows:readonly {id:string;path:string}[]){
+  const epoch=readEpoch.current,uid=authUser.current;
+  const valid=()=>alive.current&&readEpoch.current===epoch&&authUser.current===uid&&activeGameRef.current===gameId;
+  return signDocumentAssetBatch(rows,{
+   isCurrent:valid,
+   cached:key=>{
+    const value=assetSignatures.current.get(key);
+    return value&&value.expiresAt>Date.now()?value.promise:undefined;
+   },
+   store:(key,url)=>{
+    if(valid())assetSignatures.current.set(key,{expiresAt:Date.now()+45*60*1000,promise:Promise.resolve(url)});
+   },
+   signOne:path=>signedAssetUrl('game-assets',path),
+   signMany:async(bucket,paths)=>{
+    const client=supabase.storage.from(bucket);
+    // Retain legacy single signing for test transports without this API.
+    if(typeof client.createSignedUrls!=='function')return {data:null,error:new Error('Batch signing unavailable')};
+    return client.createSignedUrls(paths,3600);
+   }
+  });
  }
  async function kickTelegramDispatch(){
   if(typeof window==='undefined'||!me?.user_id||Date.now()-lastTelegramDispatch.current<12000)return;
@@ -1002,10 +1024,7 @@ export function useRepublicGame(gameId:string){
     return {...row,url,url_loading:!url};
    });
   });
-  void Promise.all(rows.map(async row=>{
-   try{return {id:row.id,path:row.storage_path,url:await signedAssetUrl('game-assets',row.storage_path)}}
-   catch{return {id:row.id,path:row.storage_path,url:null}}
-  })).then(links=>{
+  void signedDocumentLinks(rows.map(row=>({id:row.id,path:row.storage_path}))).then(links=>{
    if(!readCurrent(ticket,'partyDocuments'))return;
    const byId=new Map(links.map(link=>[link.id,link]));
    setPartyDocuments(previous=>previous.map(row=>{
@@ -1194,8 +1213,8 @@ export function useRepublicGame(gameId:string){
     return (ids?[...previous.filter(row=>!ids.includes(row.id)),...accepted]:accepted).sort((a,b)=>b.updated_at.localeCompare(a.updated_at));
    });
    setFormalHistory(previous=>(ids?[...previous.filter(row=>!ids.includes(row.document_id)),...(fh.data||[]) as FormalHistory[]]:(fh.data||[]) as FormalHistory[]).sort((a,b)=>b.created_at.localeCompare(a.created_at)||b.id-a.id));
-   void Promise.all(rows.filter(row=>row.source_file_path).map(async row=>({
-    id:row.id,path:row.source_file_path,url:await signedAssetUrl('game-assets',row.source_file_path!)
+   void signedDocumentLinks(rows.filter(row=>row.source_file_path).map(row=>({
+    id:row.id,path:row.source_file_path!
    }))).then(links=>{
     if(!readCurrent(ticket))return;
     const byId=new Map(links.map(link=>[link.id,link]));
