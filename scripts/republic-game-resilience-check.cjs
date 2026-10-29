@@ -71,6 +71,18 @@ function harness({effects=false,compiledCode=code}={}){
    requests++;
    started.set('rpc:'+name,(started.get('rpc:'+name)||0)+1);
    if(rpcFailures.has(name))return{data:null,error:{code:rpcFailures.get(name),message:'simulated RPC failure '+name}};
+   if(name==='get_chat_pins_projection'){
+    // Model a bounded, joined RPC response so the 100-client test observes
+    // exactly the transport used by the actual hook, not a legacy table read.
+    const rows=fixtures.has('chat_pins')?JSON.parse(JSON.stringify(fixtures.get('chat_pins'))):[];
+    const pins=rows.filter(row=>row.channel_id===args.p_channel_id)
+     .sort((a,b)=>String(b.pinned_at).localeCompare(String(a.pinned_at))).slice(0,12);
+    const ids=new Set(pins.map(row=>row.message_id));
+    const allMessages=fixtures.has('chat_messages')?JSON.parse(JSON.stringify(fixtures.get('chat_messages')))
+     :[{id:'message-'+revision,game_id:gameId,channel_id:args.p_channel_id,text:'message-'+revision,created_at:'2026-10-08T10:00:00Z'}];
+    const messages=allMessages.filter(row=>row.channel_id===args.p_channel_id&&ids.has(row.id));
+    return{data:{pins,messages},error:null,status:200};
+   }
    if(name==='get_impact_engine_projection'){
     const id=args.p_game_id;
     const read=(table,defaultRows)=>fixtures.has(table)
