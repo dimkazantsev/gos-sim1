@@ -178,7 +178,9 @@ async function main(){
   const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
   const start=source.indexOf('async function loadCoreSections()'),end=source.indexOf('async function hydrateActiveView(',start);
   assert(start>=0&&end>start);
-  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,14);
+  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,13);
+  assert(source.slice(start,end).includes('loadCachedParties()'),'One core table uses a shared cache, with its query still queue-limited');
+  assert(source.includes("const request=limitedCoreRead(supabase.from('game_parties')"),'Party reads preserve four-slot limiter');
   assert(source.slice(start,end).includes('loadMemberRoster()'),'The fifteenth core request uses the shared, concurrency-limited roster reader');
   assert(source.includes('coreReadQueue.current.active<4'));
  });
