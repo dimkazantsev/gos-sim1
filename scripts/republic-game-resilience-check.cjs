@@ -34,7 +34,7 @@ function harness({effects=false,compiledCode=code}={}){
    signOut:async()=>{user=null;authCallback?.('SIGNED_OUT',null);return{error:null};}
   },
   realtime:{setAuth:async()=>{}},
-  channel(topic,options){const handlers=[],presence={tracks:0,untracks:0,payloads:[],result:failFuturePresenceTrack?'error':'ok'};const channel={topic,options,presence,on(kind,filter,callback){handlers.push({kind,filter,callback});return this;},subscribe(callback){this.statusCallback=callback;callback?.('SUBSCRIBED');return this;},track:async payload=>{presence.tracks++;presence.payloads.push(payload);return presence.result;},untrack:async()=>{presence.untracks++;return 'ok';},handlers};channels.push(channel);return channel;},
+  channel(topic,options){const handlers=[],presence={tracks:0,untracks:0,payloads:[],result:failFuturePresenceTrack?'error':'ok',nextHold:null,heldTrack:null};const channel={topic,options,presence,on(kind,filter,callback){handlers.push({kind,filter,callback});return this;},subscribe(callback){this.statusCallback=callback;callback?.('SUBSCRIBED');return this;},track:async payload=>{presence.tracks++;presence.payloads.push(payload);if(presence.nextHold){const hold=presence.nextHold;presence.nextHold=null;presence.heldTrack=hold;await hold.promise;presence.heldTrack=null;}return presence.result;},untrack:async()=>{presence.untracks++;return 'ok';},handlers};channels.push(channel);return channel;},
   removeChannel:async channel=>{const index=channels.indexOf(channel);if(index!==-1)channels.splice(index,1);},
   from(table){
    requests++;const number=(counts.get(table)||0)+1;counts.set(table,number);
@@ -240,6 +240,8 @@ function harness({effects=false,compiledCode=code}={}){
   broadcast(topic,event,payload){for(const channel of [...channels])if(channel.topic===topic)for(const handler of channel.handlers)if(handler.kind==='broadcast'&&handler.filter.event===event)handler.callback({event,payload});},
   channelsInfo(){return channels.map(channel=>({topic:channel.topic,private:channel.options?.config?.private===true,tracked:channel.presence.tracks,untracked:channel.presence.untracks,presencePayloads:channel.presence.payloads,handlers:channel.handlers.map(item=>({kind:item.kind,event:item.filter.event,table:item.filter.table}))}))},
   channelStatus(status){for(const channel of channels)channel.statusCallback?.(status)},
+  holdNextPresenceTrack(){for(const channel of channels)channel.presence.nextHold=deferred()},
+  releasePresenceTrack(){for(const channel of channels)channel.presence.heldTrack?.resolve()},
   failPresenceTrack(){failFuturePresenceTrack=true;for(const channel of channels)channel.presence.result='error'},
   auth(event,nextUser){user=nextUser;const before=requests;authCallback?.(event,nextUser?{user:{id:nextUser}}:null);assert.equal(requests,before,'Auth callback must schedule Supabase I/O outside its synchronous callback.');},
   runTimers(){for(const [id,timer] of [...timers]){if(timer.interval)continue;timers.delete(id);timer.fn();}},
