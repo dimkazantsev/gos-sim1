@@ -83,6 +83,21 @@ async function verifyClients(){
   await Promise.all(tabs.map(h=>h.settle()));
   assert(tabs.every(h=>h.channelsInfo()[0].tracked===3),'Reconnect retries once, without extra channel');
   assert(tabs.every(h=>h.channelsInfo().length===1));
+  // When a previous socket's track acknowledgement arrives only after a
+  // subsequent reconnect, it cannot suppress tracking on the new socket.
+  tabs.forEach(h=>h.holdNextPresenceTrack());
+  tabs.forEach(h=>h.channelStatus('CHANNEL_ERROR'));
+  tabs.forEach(h=>h.channelStatus('SUBSCRIBED'));
+  await Promise.all(tabs.map(h=>h.settle()));
+  assert(tabs.every(h=>h.channelsInfo()[0].tracked===4),'One delayed track per tab');
+  tabs.forEach(h=>h.channelStatus('CHANNEL_ERROR'));
+  tabs.forEach(h=>h.channelStatus('SUBSCRIBED'));
+  await Promise.all(tabs.map(h=>h.settle()));
+  assert(tabs.every(h=>h.channelsInfo()[0].tracked===4),'Do not overlap track calls during reconnect');
+  tabs.forEach(h=>h.releasePresenceTrack());
+  await Promise.all(tabs.map(h=>h.settle()));
+  assert(tabs.every(h=>h.channelsInfo()[0].tracked===5),'A stale ACK cannot mark the new socket as tracked');
+  assert(tabs.every(h=>h.channelsInfo().length===1),'No duplicate connection when recovering from a stale ACK');
   for(const h of tabs){
    assert.equal(h.rpcCount('record_my_game_presence'),0,'Network presence does not generate SQL heartbeat');
   }
