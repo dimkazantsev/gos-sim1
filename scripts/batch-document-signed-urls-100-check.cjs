@@ -9,7 +9,7 @@ const root=path.resolve(__dirname,'..');
 const helper=fs.readFileSync(path.join(root,'components/game/signDocumentAssetBatch.ts'),'utf8');
 const core=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
 assert(core.includes("import {signDocumentAssetBatch} from './signDocumentAssetBatch'"));
-assert.equal((core.match(/signedDocumentLinks\(rows/g)||[]).length,2,'Only party and formal registry use the batch helper');
+assert.equal((core.match(/void signedDocumentLinks\(rows/g)||[]).length,2,'Only party and formal registry use the batch helper');
 assert(core.includes("signOne:path=>signedAssetUrl('game-assets',path)"),'Single-file RLS fallback remains in production');
 const js=ts.transpileModule(helper,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 const module={exports:{}};
