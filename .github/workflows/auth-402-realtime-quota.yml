@@ -11,6 +11,8 @@ on:
       - 'scripts/chat-overview-100-clients-check.cjs'
       - 'scripts/classroom-100-read-budget-check.cjs'
       - 'scripts/party-ten-minute-cache-check.cjs'
+      - 'scripts/section-updates-post-count-check.cjs'
+      - 'supabase/migrations/20261029114500_section_updates_one_post_scan.sql'
       - 'scripts/party-rename-process-actor-check.cjs'
       - 'components/game/PartiesView.tsx'
       - 'supabase/migrations/20261029100000_party_rename_process_actor_catalog.sql'
@@ -94,6 +96,8 @@ on:
       - 'scripts/chat-overview-100-clients-check.cjs'
       - 'scripts/classroom-100-read-budget-check.cjs'
       - 'scripts/party-ten-minute-cache-check.cjs'
+      - 'scripts/section-updates-post-count-check.cjs'
+      - 'supabase/migrations/20261029114500_section_updates_one_post_scan.sql'
       - 'scripts/party-rename-process-actor-check.cjs'
       - 'components/game/PartiesView.tsx'
       - 'supabase/migrations/20261029100000_party_rename_process_actor_catalog.sql'
@@ -187,6 +191,7 @@ jobs:
       - run: node scripts/chat-overview-100-clients-check.cjs
       - run: node scripts/classroom-100-read-budget-check.cjs
       - run: node scripts/party-ten-minute-cache-check.cjs
+      - run: node scripts/section-updates-post-count-check.cjs
       - run: node scripts/party-rename-process-actor-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
       - run: node scripts/turn-clock-isolation-check.cjs
