@@ -55,10 +55,15 @@ function reportMeasurements(stats){
   measurement_scope:'Explicitly measured client calls only; a client call can involve multiple HTTP requests. Excludes observer denial, cross-user read, Realtime connection, subscriptions and messages, and sign-out. Durations are client-call durations; response bytes are serialized successful data, not wire bytes.'};
 }
 async function reconnectSessions(sessions,measure,subscribe,password){
- await Promise.all(sessions.map(async session=>{
+ await settleAll(sessions.map(async session=>{
   const auth=await measure('reauth',()=>session.client.auth.signInWithPassword({email:session.person.email,password}));
   await session.client.realtime.setAuth(auth.session.access_token);await subscribe(session);
  }));
+}
+async function settleAll(promises){
+ const results=await Promise.allSettled(promises),failure=results.find(result=>result.status==='rejected');
+ if(failure)throw failure.reason;
+ return results.map(result=>result.value);
 }
 function verifyContract(op,fixture){
  const {args,verify}=op,actor=op.actor==='teacher'?fixture.teacher:fixture.students[op.actor];
@@ -119,7 +124,7 @@ function validate(f,studentCount=40){
  assert(f.negativeObserver?.rpc==='manage_game_stage'&&f.negativeObserver.args?.p_game_id===f.gameId,'Observer denial must address this game through the real teacher-only stage operation');
  return f;
 }
-let currentMeasurements;
+let currentMeasurements,currentConfirmed,currentCleanupFailures=0;
 if(require.main===module&&process.argv.includes('--self-test')){
  assert.equal(localOrigin('http://127.0.0.1:54321'),'http://127.0.0.1:54321');
  for(const url of ['https://example.supabase.co','https://localhost.example.com','http://user:pass@localhost:54321','http://localhost:54321/path'])assert.throws(()=>localOrigin(url));
@@ -127,7 +132,7 @@ if(require.main===module&&process.argv.includes('--self-test')){
  console.log('PASS: runner refuses remote/credential-bearing origins and incomplete fixtures. No server/Auth/load run.');
 }else if(require.main===module)main().catch(error=>{
  console.error(error.message);
- if(currentMeasurements){const stats=currentMeasurements.snapshot(),{response_json_bytes,...details}=stats;console.error(JSON.stringify({status:'FAIL',partial:true,...details,...reportMeasurements(stats)}))}
+ if(currentMeasurements){const stats=currentMeasurements.snapshot(),{response_json_bytes,...details}=stats;console.error(JSON.stringify({status:'FAIL',partial:true,...details,writes_returned_success:currentConfirmed?.length||0,cleanup_failures:currentCleanupFailures,...reportMeasurements(stats)}))}
  process.exitCode=1;
 });
 module.exports={localOrigin,validate,parseStudentCount,latencySummary,createMeasurements,reconnectSessions,reportMeasurements};
@@ -137,7 +142,7 @@ async function main(){
  const anon=process.env.SUPABASE_ANON_KEY,service=process.env.SUPABASE_SERVICE_ROLE_KEY,password=process.env.QA_LOCAL_PASSWORD;
  assert(anon&&service&&password&&process.env.QA_MIXED_FIXTURE,'Local keys, synthetic password and prepared fixture are required');
  const fixture=validate(JSON.parse(fs.readFileSync(process.env.QA_MIXED_FIXTURE,'utf8')),studentCount);
- const confirmed=[],measurements=createMeasurements();currentMeasurements=measurements;
+ const confirmed=[],measurements=createMeasurements(),clients=[];currentMeasurements=measurements;currentConfirmed=confirmed;
  const {measure}=measurements;
  console.error('Use a physically separate disposable Supabase instance, not a forwarded or shared database. The marker and fixture checks do not inspect every table or prove physical isolation.');
  const admin=createClient(url,service,{global:transport,auth:{persistSession:false,autoRefreshToken:false}});
@@ -155,11 +160,14 @@ async function main(){
   for(const person of persons)assert(roster.some(m=>m.user_id===person.userId&&m.kind===kind),'Fixture role mismatch');
  async function login(person){
   const client=createClient(url,anon,{global:transport,auth:{persistSession:false,autoRefreshToken:false}});
+  const session={person,client,channel:null};clients.push(session);
   const auth=await measure('auth',()=>client.auth.signInWithPassword({email:person.email,password}));
   assert.equal(auth.user.id,person.userId);await client.realtime.setAuth(auth.session.access_token);
-  return {person,client,channel:null};
+  return session;
  }
- const sessions=await Promise.all(fixture.students.map(login)),teacher=await login(fixture.teacher),observer=await login(fixture.observer);
+ let failed=false,successReport;
+ try{
+ const sessions=await settleAll(fixture.students.map(login)),teacher=await login(fixture.teacher),observer=await login(fixture.observer);
  async function subscribe(session){
   session.channel=session.client.channel('local-mixed-'+session.person.userId).on('postgres_changes',{event:'*',schema:'public',table:'game_votes',filter:'game_id=eq.'+fixture.gameId},()=>{});
   await new Promise((resolve,reject)=>{
@@ -167,7 +175,7 @@ async function main(){
    session.channel.subscribe(status=>{if(status==='SUBSCRIBED'){clearTimeout(timer);resolve()}else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){clearTimeout(timer);reject(Error('Local Realtime '+status))}});
   });
  }
- try{await Promise.all(sessions.map(subscribe))}catch(error){await Promise.all(sessions.map(s=>s.client.removeAllChannels()));throw error}
+ await settleAll(sessions.map(subscribe));
  const readRPC=['get_section_updates','get_my_chat_overview','get_game_achievements','blitz_inbox_counts'];
  const allOps=modules.flatMap(module=>fixture.operations[module].map(op=>({...op,module})));
  const began=performance.now(),sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -181,20 +189,19 @@ async function main(){
    else assert.deepEqual(rows[0][key],value,'Persisted field differs: '+key);
   }
  }
- try{
   for(let minute=0;minute<20;minute++){
    await sleep(Math.max(0,began+minute*60000-performance.now()));
-   if(minute===8)await Promise.all(sessions.slice(studentCount/2).map(s=>s.client.removeChannel(s.channel)));
+   if(minute===8)await settleAll(sessions.slice(studentCount/2).map(async s=>{if(await s.client.removeChannel(s.channel)!=='ok')throw Error('Realtime channel disconnect failed')}));
    if(minute===10)await reconnectSessions(sessions.slice(studentCount/2),measure,subscribe,password);
    const active=minute>=8&&minute<10?sessions.slice(0,studentCount/2):sessions;
-   await Promise.all(active.map((s,i)=>{
+   await settleAll(active.map((s,i)=>{
     const name=readRPC[(minute+i)%readRPC.length];const args=name==='blitz_inbox_counts'?{p_game:fixture.gameId}:{p_game_id:fixture.gameId};
     return measure('read:'+name,()=>s.client.rpc(name,args));
    }));
-   await Promise.all([teacher,observer].map(s=>measure('role-observation',()=>s.client.rpc('get_section_updates',{p_game_id:fixture.gameId}))));
+   await settleAll([teacher,observer].map(s=>measure('role-observation',()=>s.client.rpc('get_section_updates',{p_game_id:fixture.gameId}))));
    const waves=new Map();
    for(const op of allOps.filter(op=>op.minute===minute)){const chain=waves.get(op.actor)||[];chain.push(op);waves.set(op.actor,chain)}
-   await Promise.all([...waves.values()].map(async chain=>{
+   await settleAll([...waves.values()].map(async chain=>{
     for(const op of chain){
      const session=op.actor==='teacher'?teacher:sessions[op.actor];
      assert(active.includes(session)||session===teacher,'Do not schedule writes for a deliberately offline client');
@@ -211,8 +218,18 @@ async function main(){
   if(cross.error)throw cross.error;assert.equal(cross.data.length,0,'Another student Blitz assignment leaked');
   assert(performance.now()-began>=1200000,'A real twenty-minute run is required');
   const stats=measurements.snapshot();
-  console.log(JSON.stringify({status:'PASS',environment:'prepared disposable local Supabase with real HTTP/Auth',students:studentCount,teacher:1,observer:1,wall_clock_ms:performance.now()-began,...reportMeasurements(stats),confirmed_writes:confirmed.length,modules:modules.map(module=>({module,writes:confirmed.filter(i=>i.op.module===module).length})),latency:stats.latency_success,limits:'One scheduled read per active student per minute, plus fixture writes and verification; no browser rendering or external-provider capacity claim; no agreed latency acceptance threshold. Isolation must be independently verified; preflight does not inspect all tables.'},null,2));
- }finally{
-  await Promise.all([...sessions,teacher,observer].map(async s=>{if(s.channel)await s.client.removeChannel(s.channel);await s.client.auth.signOut({scope:'local'})}));
+  successReport={status:'PASS',environment:'prepared disposable local Supabase with real HTTP/Auth',students:studentCount,teacher:1,observer:1,wall_clock_ms:performance.now()-began,...reportMeasurements(stats),confirmed_writes:confirmed.length,modules:modules.map(module=>({module,writes:confirmed.filter(i=>i.op.module===module).length})),latency:stats.latency_success,limits:'One scheduled read per active student per minute, plus fixture writes and verification; no browser rendering or external-provider capacity claim; no agreed latency acceptance threshold. Isolation must be independently verified; preflight does not inspect all tables.'};
+ }catch(error){failed=true;throw error}finally{
+  const cleanup=await Promise.allSettled(clients.map(async s=>{
+   let failure;
+   let removed=false;
+   try{if(s.channel){const statuses=await s.client.removeAllChannels();removed=true;if(statuses.some(status=>status!=='ok'))throw Error('Realtime channel cleanup failed')}}catch(error){failure=error;if(!removed){try{s.channel?.teardown()}catch{}try{await s.client.realtime.disconnect()}catch{}}}
+   try{const result=await s.client.auth.signOut({scope:'local'});if(result.error)throw result.error}catch(error){failure??=error}
+   if(failure)throw failure;
+  }));
+  currentCleanupFailures=cleanup.filter(result=>result.status==='rejected').length;
+  const error=cleanup.find(result=>result.status==='rejected');
+  if(error&&!failed)throw error.reason;
  }
+ console.log(JSON.stringify(successReport,null,2));
 }

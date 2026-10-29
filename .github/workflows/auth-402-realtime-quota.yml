@@ -34,6 +34,7 @@ on:
       - 'scripts/participants-analytics-performance-check.cjs'
       - 'supabase/tests/gos_40_mixed_local_20min.cjs'
       - 'supabase/tests/gos_mixed_local_metrics_check.cjs'
+      - 'supabase/tests/gos_mixed_failure_check.cjs'
       - 'supabase/tests/mixed_disposable_guard.sql'
       - 'supabase/tests/gos_40_authenticated_20min.cjs'
       - 'supabase/tests/blitz_disposable_guard.sql'
@@ -129,6 +130,7 @@ on:
       - 'scripts/participants-analytics-performance-check.cjs'
       - 'supabase/tests/gos_40_mixed_local_20min.cjs'
       - 'supabase/tests/gos_mixed_local_metrics_check.cjs'
+      - 'supabase/tests/gos_mixed_failure_check.cjs'
       - 'supabase/tests/mixed_disposable_guard.sql'
       - 'supabase/tests/gos_40_authenticated_20min.cjs'
       - 'supabase/tests/blitz_disposable_guard.sql'
@@ -237,6 +239,7 @@ jobs:
       - run: node scripts/profile-results-load-check.cjs
       - run: node scripts/participants-analytics-performance-check.cjs
       - run: node supabase/tests/gos_mixed_local_metrics_check.cjs
+      - run: node supabase/tests/gos_mixed_failure_check.cjs
       - run: node scripts/blitz-local-runner-100-check.cjs
       - run: node scripts/teacher-readiness-load-check.cjs
       - run: node scripts/password-login-resilience-check.cjs
