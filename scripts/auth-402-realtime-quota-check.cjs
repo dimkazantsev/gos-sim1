@@ -132,6 +132,9 @@ const env={
  schedule(){changed++},
  liveConnected:false,lastPollAt:0,disposed:false,dirtyCore:false,dirtyOverview:false,dirtyChat:false,dirtyPins:false,
  backendRecoveryAfter:{current:0},
+ officeReadState:{current:{lastSuccessAt:0,lastAttemptAt:0,inflight:null}},
+ loadRepublicOffices:()=>Promise.resolve(),
+ PRESENTATION_CACHE_TTL_MS:600000,
  console
 };
 const script=snippet.slice(0,snippet.indexOf('  // Realtime handles unread counters while chat is closed.'));
