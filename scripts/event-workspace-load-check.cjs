@@ -3,6 +3,21 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const root=path.resolve(__dirname,'..');
 const compile=file=>ts.transpileModule(fs.readFileSync(path.join(root,file),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const component=compile('components/game/EventWorkspace.tsx'),shared=compile('components/game/useGameTableSync.ts');
+const feedSource=fs.readFileSync(path.join(root,'components/game/EventWorkspace.tsx'),'utf8');
+const projections={
+ event_assignments:'id,case_id,game_id,recipient_id,status,created_at',
+ event_decisions:'id,case_id,actor_id,choice,role_snapshot',
+ event_case_outcomes:'case_id,winner,trust_delta,votes_count,assignments_count,media_post_id,requested_trust_delta,resolution_kind',
+ event_collaboration_invites:'id,case_id,inviter_id,recipient_id,status',
+ event_authority_evidence:'decision_id,case_id,actor_id,authority_ok,lawful,strategy_point,role_snapshot,legal_basis'
+};
+for(const [table,columns] of Object.entries(projections)){
+ assert(feedSource.includes("supabase.from('"+table+"').select('"+columns+"').eq('game_id',game.id)"),
+  'Feed must select only consumed columns of '+table);
+ assert(!feedSource.includes("supabase.from('"+table+"').select('*')"),
+  'No wildcard fields in hot event feed '+table);
+}
+
 const tick=async()=>{for(let i=0;i<100;i++)await Promise.resolve()};
 function realm({hidden=false,hold='',teacher=false,answered=false}={}){
  let now=1000000,cursor=0,nextId=0,held=false,release,props;
