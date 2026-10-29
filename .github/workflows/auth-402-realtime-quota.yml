@@ -76,6 +76,8 @@ on:
       - 'components/GameClient.tsx'
       - 'scripts/forty-sessions-realtime-budget-check.cjs'
       - 'scripts/password-login-resilience-check.cjs'
+      - 'scripts/participant-test-login-check.cjs'
+      - 'app/page.tsx'
       - 'scripts/resume-member-actual-role-check.cjs'
       - 'supabase/migrations/20261027102500_resume_existing_member_actual_role.sql'
       - 'scripts/auth-402-realtime-quota-check.cjs'
@@ -157,6 +159,8 @@ on:
       - 'components/GameClient.tsx'
       - 'scripts/forty-sessions-realtime-budget-check.cjs'
       - 'scripts/password-login-resilience-check.cjs'
+      - 'scripts/participant-test-login-check.cjs'
+      - 'app/page.tsx'
       - 'scripts/resume-member-actual-role-check.cjs'
       - 'supabase/migrations/20261027102500_resume_existing_member_actual_role.sql'
       - 'scripts/auth-402-realtime-quota-check.cjs'
@@ -206,6 +210,7 @@ jobs:
       - run: node scripts/blitz-local-runner-100-check.cjs
       - run: node scripts/teacher-readiness-load-check.cjs
       - run: node scripts/password-login-resilience-check.cjs
+      - run: node scripts/participant-test-login-check.cjs
       - run: node scripts/resume-member-actual-role-check.cjs
       - run: node scripts/supabase-session-refresh-check.cjs
       - run: node scripts/chat-realtime-check.cjs

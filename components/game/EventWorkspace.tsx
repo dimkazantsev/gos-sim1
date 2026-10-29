@@ -65,12 +65,14 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   if(!game||!me||!current())return;
   // Assigned cases belong to the active feed. The large unassigned bank
   // is intentionally fetched only by the bottom disclosure on demand.
+  // Project only the fields consumed by this feed. RLS still determines
+  // which game rows are visible; no read cache is shared across identities.
   const [b,c,d,e,f]=await Promise.all([
-   supabase.from('event_assignments').select('*').eq('game_id',game.id),
-   supabase.from('event_decisions').select('*').eq('game_id',game.id),
-   supabase.from('event_case_outcomes').select('*').eq('game_id',game.id),
-   supabase.from('event_collaboration_invites').select('*').eq('game_id',game.id),
-   supabase.from('event_authority_evidence').select('*').eq('game_id',game.id)
+   supabase.from('event_assignments').select('id,case_id,game_id,recipient_id,status,created_at').eq('game_id',game.id),
+   supabase.from('event_decisions').select('id,case_id,actor_id,choice,role_snapshot').eq('game_id',game.id),
+   supabase.from('event_case_outcomes').select('case_id,winner,trust_delta,votes_count,assignments_count,media_post_id,requested_trust_delta,resolution_kind').eq('game_id',game.id),
+   supabase.from('event_collaboration_invites').select('id,case_id,inviter_id,recipient_id,status').eq('game_id',game.id),
+   supabase.from('event_authority_evidence').select('decision_id,case_id,actor_id,authority_ok,lawful,strategy_point,role_snapshot,legal_basis').eq('game_id',game.id)
   ]);
   if(!current())return;
   const error=[b,c,d,e,f].find(r=>r.error)?.error;
