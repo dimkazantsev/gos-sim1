@@ -154,7 +154,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
      {DOCS.map(kind=>{
       const current=latestPartyDocument(docs,kind.kind);
       const history=docs.filter(d=>d.doc_kind===kind.kind).sort((a,b)=>(b.version_no??1)-(a.version_no??1)||b.created_at.localeCompare(a.created_at));
-      const canUpload=teacher||(partyFormationOpen&&selected.registration_status!=='registered'&&me?.kind==='student'&&!me.roster_archived_at&&me.team===selected.name);
+      const canUpload=teacher||(selected.registration_status!=='registered'&&me?.kind==='student'&&!me.roster_archived_at&&me.team===selected.name);
       const nextVersion=(current?.version_no??0)+1;
       return <article className={"partyRegistrationDoc"+(current?.status==="revision"?" isRevision":"")} key={kind.kind}>
        <div className="partyRegistrationDocTop">
