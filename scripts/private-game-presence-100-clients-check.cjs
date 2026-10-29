@@ -46,7 +46,9 @@ async function verifyRls(){
    await send(1,topic,'presence');
   }catch(error){
    const details=await db.query('select current_user, auth.uid() as current_uid, realtime.topic() as current_topic, private.is_game_member($1::uuid) as is_member',[game]);
-   console.error('Synthetic RLS diagnostics',details.rows);
+   const predicate=await db.query("select (substring(realtime.topic() from 13)::uuid=$1::uuid) as same_game, private.is_game_member(substring(realtime.topic() from 13)::uuid) as room_member, (auth.uid() is not null) as jwt_ok",[game]);
+   const policies=await db.query("select policyname,cmd,qual,with_check from pg_policies where schemaname='realtime' and tablename='messages' order by policyname");
+   console.error('Synthetic RLS diagnostics',details.rows,predicate.rows,policies.rows);
    throw error;
   }
   for(let n=2;n<=102;n++)await send(n,topic,'presence');
