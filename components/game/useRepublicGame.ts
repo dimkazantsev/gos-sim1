@@ -24,6 +24,7 @@ export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:strin
 type ReadScope='all'|'core'|'game'|'stages'|'votes'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
 const BOOTSTRAP_TIMEOUT_MS=12000;
+const PRESENTATION_CACHE_TTL_MS=600000;
 const SESSION_BOOTSTRAP_TIMEOUT_MS=16000;
 // Explicit projection avoids transferring unused ballot timestamps to every classroom client.
 const GAME_BALLOT_COLUMNS='vote_id,voter_id,choice,weight,yes_weight,no_weight,abstain_weight';
@@ -117,7 +118,26 @@ export function useRepublicGame(gameId:string){
   });
  }
  const lastPresenceWrite=useRef({scope:'',view:'',at:0});
- const officeReadState=useRef({scope:'',lastSuccessAt:0,inflight:null as Promise<void>|null});
+ const officeReadState=useRef({scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null as Promise<void>|null});
+ type PartyRead={data:Party[]|null;error:{message:string;code?:string}|null};
+ const partyReadState=useRef({scope:'',lastSuccessAt:0,rows:null as Party[]|null,inflight:null as Promise<PartyRead>|null});
+ function invalidatePartyRows(){partyReadState.current={scope:'',lastSuccessAt:0,rows:null,inflight:null}}
+ function loadCachedParties(force=false):Promise<PartyRead>{
+  const scope=gameId+':'+(authUser.current||'')+':'+readEpoch.current;
+  if(partyReadState.current.scope!==scope){invalidatePartyRows();partyReadState.current.scope=scope}
+  const cache=partyReadState.current;
+  if(cache.inflight)return cache.inflight;
+  if(!force&&cache.rows!==null&&Date.now()-cache.lastSuccessAt<PRESENTATION_CACHE_TTL_MS)
+   return Promise.resolve({data:cache.rows,error:null});
+  const request=limitedCoreRead(supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'))
+   .then(result=>{
+    const response:PartyRead={data:(result.data??null) as Party[]|null,error:result.error};
+    if(!response.error&&partyReadState.current===cache){cache.rows=response.data??[];cache.lastSuccessAt=Date.now()}
+    return response;
+   }).finally(()=>{if(cache.inflight===request)cache.inflight=null});
+  cache.inflight=request;
+  return request;
+ }
  const assetSignatures=useRef(new Map<string,{expiresAt:number;promise:Promise<string|null>}>());
  const assetSignQueue=useRef({active:0,waiting:[] as Array<()=>void>});
  function signedAssetUrl(bucket:'game-assets'|'game-media',path:string,force=false):Promise<string|null>{
@@ -207,7 +227,8 @@ export function useRepublicGame(gameId:string){
   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
   readReceipt.current={scope:'',timer:null,running:false,queued:false,lastAt:0};
   assetSignatures.current.clear();lastCoreSuccessAt.current=0;
-  officeReadState.current={scope:'',lastSuccessAt:0,inflight:null};
+  officeReadState.current={scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null};
+  invalidatePartyRows();
   if(overviewRealtimeTimer.current!==null){clearTimeout(overviewRealtimeTimer.current);overviewRealtimeTimer.current=null}
   lastRealtimeOverviewAt.current=0;
   setGame(null);setMe(null);setMetrics([]);setEvents([]);setMembers([]);setOfficeRows([]);
@@ -453,6 +474,7 @@ export function useRepublicGame(gameId:string){
     if(!currentConnection())return;
     if('game_id' in payload.new&&payload.new.game_id!==gameId)return;
     dirtyTables.add(table);
+    if(table==='game_parties')invalidatePartyRows();
     if(!acceptCoreDelta(table,payload))reconcileTables.add(table);
     schedule();
    });
@@ -487,6 +509,10 @@ export function useRepublicGame(gameId:string){
    // on healthy subscriptions multiplied database requests and egress.
    // When disconnected, retain the existing prompt 30–40s recovery.
    const now=Date.now();
+   const officeCache=officeReadState.current;
+   if(officeCache.lastSuccessAt&&now-officeCache.lastSuccessAt>=PRESENTATION_CACHE_TTL_MS&&
+      !officeCache.inflight&&now-officeCache.lastAttemptAt>=60000&&now>=backendRecoveryAfter.current)
+    void loadRepublicOffices();
    if(liveConnected&&now-lastPollAt<180000)return;
    // Preserve explicit actions and Realtime updates, but back off automatic
    // full reloads while the server reports exhausted connections/timeouts.
@@ -690,7 +716,7 @@ export function useRepublicGame(gameId:string){
    setBallots(previous=>[...previous.filter(row=>!ids.includes(row.vote_id)),...(ba.data||[]) as Ballot[]]);
   }));
   if(tables.has('game_parties'))jobs.push(readSafely(['parties'],async ticket=>{
-   const pa=await supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id');
+   const pa=await loadCachedParties(true);
    if(!readCurrent(ticket))return;
    requireSuccessful([pa]);acceptPartyRows((pa.data||[]) as Party[],ticket);
   }));
@@ -729,7 +755,7 @@ export function useRepublicGame(gameId:string){
    loadMemberRoster(),
    limitedCoreRead(supabase.from('chat_channels').select('*').eq('game_id',gameId).order('name')),
    limitedCoreRead(supabase.from('game_stages').select('*').eq('game_id',gameId).order('stage_no')),
-   limitedCoreRead(supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')),
+   loadCachedParties(),
    limitedCoreRead(supabase.from('game_votes').select('*').eq('game_id',gameId).order('opened_at',{ascending:false})),
    limitedCoreRead(supabase.from('game_evaluations').select('*').eq('game_id',gameId).order('stage_no')),
    limitedCoreRead(supabase.from('game_crises').select('*').eq('game_id',gameId).order('created_at',{ascending:false})),
@@ -825,9 +851,10 @@ export function useRepublicGame(gameId:string){
   // role decisions continue through the authoritative game identity RPC.
   const scope=gameId+':'+(authUser.current||'')+':'+readEpoch.current;
   const cache=officeReadState.current;
-  if(cache.scope!==scope){cache.scope=scope;cache.lastSuccessAt=0;cache.inflight=null}
+  if(cache.scope!==scope){cache.scope=scope;cache.lastSuccessAt=0;cache.lastAttemptAt=0;cache.inflight=null}
   if(cache.inflight){await cache.inflight;return}
-  if(!force&&cache.lastSuccessAt&&Date.now()-cache.lastSuccessAt<30000)return;
+  if(!force&&cache.lastSuccessAt&&Date.now()-cache.lastSuccessAt<PRESENTATION_CACHE_TTL_MS)return;
+  cache.lastAttemptAt=Date.now();
   const request=readSafely(['offices'],async ticket=>{
    const result=await supabase.from('game_office_assignments').select('id,game_id,user_id,role_title,status,created_at').eq('game_id',gameId).order('created_at');
    if(!readCurrent(ticket))return;
@@ -912,7 +939,7 @@ export function useRepublicGame(gameId:string){
   await readSafely(['parties','profiles','partyDocuments'],async ticket=>{
    // Render each table as soon as its own query completes.
    // An overloaded document service must not make parties disappear.
-   const partyRead=Promise.resolve(supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')).then(({data,error})=>{
+   const partyRead=loadCachedParties().then(({data,error})=>{
     if(!readCurrent(ticket,'parties'))return;
     if(error)setError(error);
     else acceptPartyRows((data||[]) as Party[],ticket);
@@ -960,7 +987,7 @@ export function useRepublicGame(gameId:string){
    const [pi,pm,pa,mb,ag]=await Promise.all([
     supabase.from('party_invitations').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
     supabase.from('party_member_mandates').select('*').eq('game_id',gameId),
-    refreshParties?supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'):Promise.resolve({data:null,error:null}),
+    refreshParties?loadCachedParties(true):Promise.resolve({data:null,error:null}),
     loadMemberRoster(),
     supabase.from('party_agreements').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
    ]);
@@ -1029,7 +1056,7 @@ export function useRepublicGame(gameId:string){
     supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
     supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
     supabase.from('state_metrics').select('*').eq('game_id',gameId).order('sort_order'),
-    supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')
+    loadCachedParties()
    ]);
    if(!readActive(ticket))return;
    requireSuccessful([pp,px,pl,mh,psh,mt,pa]);
@@ -1223,7 +1250,7 @@ export function useRepublicGame(gameId:string){
    return true;
   }catch(e){setChatPins(original);setError(e instanceof Error?e.message:'Не удалось изменить закрепление');return false}
  }
- async function refresh(){await loadAll(false);await Promise.all([hydrateActiveView(false,true),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
+ async function refresh(){invalidatePartyRows();await loadAll(false);await Promise.all([hydrateActiveView(false,true),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
  async function refreshDocuments(id:string){await loadFormalRegistry([id]);notifyGameDataRefresh(gameId,'formal_documents')}
  async function refreshEventEffects(){await Promise.all([loadPoliticalWall(),refreshBudgetPulse()]);notifyGameDataRefresh(gameId,'event_decisions')}
 
