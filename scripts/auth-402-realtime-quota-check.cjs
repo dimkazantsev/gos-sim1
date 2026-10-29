@@ -113,43 +113,40 @@ sectionEnv.document.visibilityState='hidden';pollClock+=60_000;sectionTick();
 assert.equal(sectionReads,2,'Hidden tabs do not poll');
 
 
-const from=source.indexOf('  channel.subscribe(status=>{');
-const to=source.indexOf('  return()=>{',from);
-assert(from>=0&&to>from,'Live subscribe and fallback polling located');
+assert(source.includes('void supabase.realtime.setAuth().then(()=>{'),'Private Broadcast must authenticate before subscribing');
+assert(source.includes('channel.subscribe(status=>{'),'Existing single channel still carries health status');
+assert(source.includes('setGameRealtimeConnection(gameId,liveConnected)'),'Room connection health remains shared');
+const from=source.indexOf('  const pollJitter=');
+const to=source.indexOf('  // Realtime handles unread counters while chat is closed.',from);
+assert(from>=0&&to>from,'Live fallback polling section found');
 const snippet=source.slice(from,to);
-assert(snippet.includes('const poll=setInterval'), 'Expected polling callback');
-let clock=1000000,callback=null,tick=null,changed=0;
+assert(snippet.includes('const poll=setInterval'),'Expected 30–40s polling callback');
+let clock=1_000_000,tick=null,changed=0;
 const env={
  Date:{now:()=>clock},
- channel:{subscribe(fn){callback=fn;return this}},
- setGameRealtimeConnection(_gameId,_connected){},
- document:{visibilityState:'visible'},
- setRealtimeState(){},
  setInterval(fn){tick=fn;return 1},
+ document:{visibilityState:'visible'},
  chatOpenRef:{current:false},
  me:{user_id:'regression-student'},
  gameId:'simulation',
  schedule(){changed++},
- liveConnected:false,lastPollAt:0,disposed:false,dirtyCore:false,dirtyOverview:false,dirtyChat:false,dirtyPins:false,
+ liveConnected:true,lastPollAt:clock,disposed:false,dirtyCore:false,dirtyOverview:false,dirtyChat:false,dirtyPins:false,
  backendRecoveryAfter:{current:0},
  officeReadState:{current:{lastSuccessAt:0,lastAttemptAt:0,inflight:null}},
  loadRepublicOffices:()=>Promise.resolve(),
  PRESENTATION_CACHE_TTL_MS:600000,
  console
 };
-const script=snippet.slice(0,snippet.indexOf('  // Realtime handles unread counters while chat is closed.'));
-vm.runInNewContext(script,env);
-assert.equal(typeof callback,'function');
-assert.equal(typeof tick,'function');
-callback('SUBSCRIBED');
+vm.runInNewContext(snippet,env);
+assert.equal(typeof tick,'function','Existing fallback timer remains registered');
 tick();
-assert.equal(changed,0,'No immediate full refresh on healthy socket');
+assert.equal(changed,0,'No immediate refresh on healthy socket');
 clock+=179999;tick();
 assert.equal(changed,0,'Connected refresh skipped until 3-minute fallback threshold');
 clock+=1;tick();
 assert.equal(changed,1,'Once per 3 minutes when connected');
 clock+=30000;tick();
 assert.equal(changed,1,'Not every 30 seconds while connected');
-callback('CLOSED');tick();
+env.liveConnected=false;tick();
 assert.equal(changed,2,'Disconnected client recovers on next normal poll');
 console.log('PASS: 402 visible, connected 5-minute badge fallback, game realtime 3-minute fallback, syntax.');
