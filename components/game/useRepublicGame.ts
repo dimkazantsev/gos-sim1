@@ -1350,21 +1350,39 @@ export function useRepublicGame(gameId:string){
  async function loadChatPins(cid:string){
   if(channelRef.current!==cid)return;
   await readSafely(['pins'],async ticket=>{
-  const r=await supabase.from('chat_pins').select('id,game_id,channel_id,message_id,pinned_by,pinned_at').eq('channel_id',cid).order('pinned_at',{ascending:false}).limit(12);
-  if(!readCurrent(ticket)||channelRef.current!==cid)return;
-  requireSuccessful([r]);
-  const pins=(r.data||[]) as ChatPin[];
-  const ids=pins.map(p=>p.message_id);
-  if(!ids.length){if(channelRef.current===cid){setChatPins([]);setPinnedMessages([])}return}
-  const linked=await supabase.from('chat_messages').select('*').in('id',ids).eq('channel_id',cid);
-  if(!readCurrent(ticket)||channelRef.current!==cid)return;
-  requireSuccessful([linked]);
-  const media=await Promise.all(((linked.data||[]) as Message[]).map(async m=>{
-   if(!m.storage_path)return m;
-   const url=await signedAssetUrl('game-media',m.storage_path);
-   return {...m,url};
-  }));
-  if(readCurrent(ticket)&&channelRef.current===cid){setChatPins(pins);setPinnedMessages(media)}
+   // Channel RLS and message RLS both apply inside one SECURITY INVOKER call.
+   const projection=await limitedCoreRead(supabase.rpc('get_chat_pins_projection',{p_channel_id:cid}));
+   if(!readCurrent(ticket)||channelRef.current!==cid)return;
+   let pins:ChatPin[];
+   let messages:Message[];
+   if(projection.error&&['PGRST202','42883'].includes(String(projection.error.code||''))){
+    // Transitional schema fallback only. Never double-read on 402, 429 or 5xx.
+    const r=await supabase.from('chat_pins').select('id,game_id,channel_id,message_id,pinned_by,pinned_at')
+     .eq('channel_id',cid).order('pinned_at',{ascending:false}).limit(12);
+    if(!readCurrent(ticket)||channelRef.current!==cid)return;
+    requireSuccessful([r]);
+    pins=(r.data||[]) as ChatPin[];
+    const ids=pins.map(p=>p.message_id);
+    if(!ids.length){setChatPins([]);setPinnedMessages([]);return}
+    const linked=await supabase.from('chat_messages').select('*').in('id',ids).eq('channel_id',cid);
+    if(!readCurrent(ticket)||channelRef.current!==cid)return;
+    requireSuccessful([linked]);
+    messages=(linked.data||[]) as Message[];
+   }else{
+    requireSuccessful([projection]);
+    const snapshot=projection.data as {pins?:ChatPin[];messages?:Message[]}|null;
+    if(!snapshot||!Array.isArray(snapshot.pins)||!Array.isArray(snapshot.messages)){
+     setError('Не удалось загрузить закреплённые сообщения.');return;
+    }
+    pins=snapshot.pins;messages=snapshot.messages;
+   }
+   if(!pins.length){setChatPins([]);setPinnedMessages([]);return}
+   const media=await Promise.all(messages.map(async m=>{
+    if(!m.storage_path)return m;
+    const url=await signedAssetUrl('game-media',m.storage_path);
+    return {...m,url};
+   }));
+   if(readCurrent(ticket)&&channelRef.current===cid){setChatPins(pins);setPinnedMessages(media)}
   });
  }
  async function setChatPin(messageId:string,pin:boolean){
