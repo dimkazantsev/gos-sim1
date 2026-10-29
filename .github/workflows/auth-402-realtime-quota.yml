@@ -32,6 +32,8 @@ on:
       - 'scripts/blitz-local-runner-100-check.cjs'
       - 'scripts/teacher-readiness-load-check.cjs'
       - 'scripts/republic-game-resilience-check.cjs'
+      - 'scripts/game-bootstrap-v2-check.cjs'
+      - 'supabase/migrations/20261029130000_game_bootstrap_v2_invoker.sql'
       - 'scripts/turn-clock-isolation-check.cjs'
       - 'scripts/crisis-clock-isolation-check.cjs'
       - 'components/game/CrisisRoom.tsx'
@@ -117,6 +119,8 @@ on:
       - 'scripts/blitz-local-runner-100-check.cjs'
       - 'scripts/teacher-readiness-load-check.cjs'
       - 'scripts/republic-game-resilience-check.cjs'
+      - 'scripts/game-bootstrap-v2-check.cjs'
+      - 'supabase/migrations/20261029130000_game_bootstrap_v2_invoker.sql'
       - 'scripts/turn-clock-isolation-check.cjs'
       - 'scripts/crisis-clock-isolation-check.cjs'
       - 'components/game/CrisisRoom.tsx'
@@ -194,6 +198,7 @@ jobs:
       - run: node scripts/section-updates-post-count-check.cjs
       - run: node scripts/party-rename-process-actor-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
+      - run: node scripts/game-bootstrap-v2-check.cjs
       - run: node scripts/turn-clock-isolation-check.cjs
       - run: node scripts/crisis-clock-isolation-check.cjs
       - run: node scripts/turn-countdown-check.cjs

@@ -5,6 +5,8 @@ let source=fs.readFileSync(file,'utf8');
 function replace(before,after){assert(source.includes(before),'Expected game harness found');source=source.replace(before,after)}
 replace("let virtualNow=Date.parse('2026-10-26T00:00:00Z')","let perSecondUpdates=0,currentInterval=0;let virtualNow=Date.parse('2026-10-26T00:00:00Z')");
 replace('slots[i].value=value;dirty=true;','slots[i].value=value;dirty=true;if(currentInterval===1000)perSecondUpdates++;');
+replace("const game={id,current_round:snapshot.revision,title:'revision-'+snapshot.revision};",
+ "const game={id,current_round:snapshot.revision,title:'revision-'+snapshot.revision,turn_open:true,turn_ends_at:'2026-10-26T01:00:00.000Z'};");
 replace("game:{id:snapshot.gameId,current_round:snapshot.revision,title:'revision-'+snapshot.revision},","game:{id:snapshot.gameId,current_round:snapshot.revision,title:'revision-'+snapshot.revision,turn_open:true,turn_ends_at:'2026-10-26T01:00:00.000Z'},");
 replace("if(table==='games')data={id:this.eqs.id||snapshot.gameId,current_round:snapshot.revision,title:'revision-'+snapshot.revision};","if(table==='games')data={id:this.eqs.id||snapshot.gameId,current_round:snapshot.revision,title:'revision-'+snapshot.revision,turn_open:true,turn_ends_at:'2026-10-26T01:00:00.000Z'};");
 replace('next[1].fn();await settle();','currentInterval=next[1].interval||0;next[1].fn();currentInterval=0;await settle();');

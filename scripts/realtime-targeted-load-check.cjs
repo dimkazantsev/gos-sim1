@@ -39,9 +39,16 @@ async function checks(){
  h.emit('formal_documents',{...doc('foreign'),game_id:'game-b'},'UPDATE');assert(!h.render().formalDocuments.some(d=>d.id==='foreign'));
  h.visible('hidden');const hidden=h.stats().responseBytes;h.emit('formal_documents',doc('new','Скрытое обновление'),'UPDATE');await h.advance(5000);assert.equal(h.stats().responseBytes,hidden,'Hidden tab starts no reconciliation');h.visible('visible');await h.advance(3100);h.dispose();
  const q=harness({effects:true});await q.settle();q.ignoreAbort(true);
- for(const table of ['games','game_members','state_metrics','game_events'])q.hold(table,q.readCount(table)+(['games','game_members'].includes(table)?2:1));
- const refresh=q.render().refresh();await tick();await q.advance(12001);await refresh;
- assert(q.stats().aborted>=4,'Stalled GETs receive an abort signal');assert(q.stats().started.game_profiles>=1,'An uncooperative request cannot permanently occupy a queue slot');q.dispose();
+ // Eleven core tables are now bundled: hold only the independent member GET.
+ const heldMember=q.hold('game_members',q.readCount('game_members')+2);
+ const beforeBootstrap=q.rpcCount('get_game_bootstrap_v2');
+ const refresh=q.render().refresh();for(let n=0;n<4;n++)await tick();
+ q.runTimers();await refresh;
+ assert(q.stats().aborted>=1,'Stalled personal member read must abort');
+ heldMember.resolve();
+ await q.render().refresh();
+ assert(q.rpcCount('get_game_bootstrap_v2')>beforeBootstrap,'Next bootstrap must not remain blocked');
+ q.dispose();
  const c=harness({effects:true});await c.settle();c.render().setChatOpen(true);await c.settle();const initial=c.stats().started['rpc:mark_chat_channel_read']||0;
  for(let i=0;i<80;i++){c.emit('chat_messages',{id:'m'+i,channel_id:'channel-a',text:'Сообщение',created_at:new Date().toISOString()},'INSERT');await c.settle();await c.advance(125)}
  await c.advance(3100);const receipts=(c.stats().started['rpc:mark_chat_channel_read']||0)-initial;
