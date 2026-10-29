@@ -10,7 +10,7 @@ assert(source.includes("if(openVotes.length){for(const vote of openVotes)changed
  'Six-second recovery for every voter must remain intact');
 assert(source.includes("chatRecovery=setInterval(recoverVisibleChatAndBallots,6000)"),
  'Keep existing six-second ballot cadence');
-assert(source.includes("officeReadState.current={scope:'',lastSuccessAt:0,inflight:null};"),
+assert(source.includes("officeReadState.current={scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null};"),
  'Game/user resets must clear the office cache');
 const start=source.indexOf(' async function loadRepublicOffices(');
 const end=source.indexOf(' async function loadClassroomTelemetry(',start);
@@ -21,7 +21,8 @@ async function simulateBrowser(index){
  let clock=1000000,requests=0;
  const ctx={
   gameId:'game-1',authUser:{current:'student-'+index},readEpoch:{current:3},
-  officeReadState:{current:{scope:'',lastSuccessAt:0,inflight:null}},
+  officeReadState:{current:{scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null}},
+  PRESENTATION_CACHE_TTL_MS:600000,
   Date:{now:()=>clock},readSafely:async (_scopes,fn)=>fn({}),
   readCurrent:()=>true,requireSuccessful:([r])=>{if(r.error)throw r.error;},
   setOfficeRows:()=>{},
@@ -33,7 +34,9 @@ async function simulateBrowser(index){
  for(let i=0;i<10;i++)await ctx.loadOffices();
  assert.equal(requests,1,'Ten sequential view changes must reuse a fresh read');
  clock+=30001;await ctx.loadOffices();
- assert.equal(requests,2,'30-second stale office data must revalidate');
+ assert.equal(requests,1,'Office metadata is fresh for ten minutes');
+ clock+=570000;await ctx.loadOffices();
+ assert.equal(requests,2,'Cache expires after ten minutes and refreshes once');
  await ctx.loadOffices(true);
  assert.equal(requests,3,'Manual refresh must bypass cache');
  ctx.authUser.current='another-user-'+index;await ctx.loadOffices();
@@ -43,5 +46,5 @@ async function simulateBrowser(index){
 (async()=>{
  const results=await Promise.all(Array.from({length:100},(_,i)=>simulateBrowser(i)));
  assert.equal(results.reduce((sum,n)=>sum+n,0),400);
- console.log('PASS: 100 simulated independent browsers, 2,000 rapid view loads => 100 office queries, unchanged six-second ballot recovery');
+ console.log('PASS: 100 synthetic clients, 10-minute office TTL, concurrent and cross-user isolation, six-second voting unchanged');
 })().catch(error=>{console.error(error);process.exitCode=1});
