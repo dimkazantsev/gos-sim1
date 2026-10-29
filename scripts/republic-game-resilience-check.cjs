@@ -71,6 +71,18 @@ function harness({effects=false,compiledCode=code}={}){
    requests++;
    started.set('rpc:'+name,(started.get('rpc:'+name)||0)+1);
    if(rpcFailures.has(name))return{data:null,error:{code:rpcFailures.get(name),message:'simulated RPC failure '+name}};
+   if(name==='get_impact_engine_projection'){
+    const id=args.p_game_id;
+    const read=(table,defaultRows)=>fixtures.has(table)
+     ?JSON.parse(JSON.stringify(fixtures.get(table))).filter(row=>row.game_id===id)
+     :defaultRows;
+    const broken=['impact_rules','impact_ledger'].find(table=>failures.has(table));
+    if(broken)return{data:null,error:{message:'simulated read outage '+broken,code:failureCodes.get(broken)||'PGRST123'},status:400};
+    return{data:{
+     rules:read('impact_rules',[{id:'impact-rule',game_id:id,priority:1,enabled:true}]).sort((a,b)=>a.priority-b.priority),
+     ledger:read('impact_ledger',[]).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))).slice(0,500)
+    },error:null,status:200};
+   }
    if(name==='get_political_wall_projection'){
     const snapshot={revision,user,gameId},id=args.p_game_id;
     const n=(counts.get('political_wall')||0)+1;counts.set('political_wall',n);
@@ -260,6 +272,35 @@ async function main(){
   assert(h.readCount('state_metrics')>0,'Older backend uses the existing RLS table read');
   assert.equal(h.render().teacher,true);
   h.dispose();
+ });
+ await check('40 synthetic teacher panels read one impact projection and preserve results',async()=>{
+  const clients=Array.from({length:40},()=>harness({effects:true}));
+  try{
+   for(const h of clients){
+    h.fixture('impact_rules',[{id:'rule-a',game_id:'game-a',rule_key:'education',priority:1,enabled:true}]);
+    h.fixture('impact_ledger',[{id:1,game_id:'game-a',rule_key:'education',created_at:'2026-10-29T10:00:00Z',effects:{score:2}}]);
+   }
+   await Promise.all(clients.map(async h=>{await h.settle();h.render().setActiveView('teacher');await h.settle()}));
+   for(const h of clients){
+    assert(h.rpcCount('get_impact_engine_projection')>=1,'Teacher panel has one impact RPC');
+    assert.equal(h.readCount('impact_rules'),0,'No separate rule HTTP request');
+    assert.equal(h.readCount('impact_ledger'),0,'No separate ledger HTTP request');
+    assert.equal(h.render().impactRules.length,1,'Rule state unchanged');
+    assert.equal(h.render().impactLedger[0].effects.score,2,'Ledger effects unchanged');
+   }
+  }finally{clients.forEach(h=>h.dispose());}
+ });
+ await check('Missing impact RPC uses original RLS reads, overload does not fan out',async()=>{
+  const legacy=harness({effects:true});legacy.failRpc('get_impact_engine_projection','PGRST202');
+  await legacy.settle();legacy.render().setActiveView('teacher');await legacy.settle();
+  assert(legacy.readCount('impact_rules')>=1);
+  assert(legacy.readCount('impact_ledger')>=1);
+  legacy.dispose();
+  const failed=harness({effects:true});failed.failRpc('get_impact_engine_projection','PGRST003');
+  await failed.settle();failed.render().setActiveView('teacher');await failed.settle();
+  assert.equal(failed.readCount('impact_rules'),0);
+  assert.equal(failed.readCount('impact_ledger'),0);
+  failed.dispose();
  });
  await check('40 simulated party screens share a single grouped read instead of three independent reads',async()=>{
   const clients=Array.from({length:40},()=>harness({effects:true}));
