@@ -1097,15 +1097,47 @@ export function useRepublicGame(gameId:string){
  }
  async function loadPoliticalWall(){
   await readSafely(['political','metrics','parties'],async ticket=>{
-   const [pp,px,pl,mh,psh,mt,pa]=await Promise.all([
-    supabase.from('political_posts').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
-    supabase.from('political_post_media').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-    supabase.from('political_post_formal_links').select('*').eq('game_id',gameId),
-    supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
-    supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
-    supabase.from('state_metrics').select('*').eq('game_id',gameId).order('sort_order'),
+   // Six RLS-checked feeds share one consistent PostgreSQL statement;
+   // party identity stays in its independent session-scoped cache.
+   const [projection,pa]=await Promise.all([
+    limitedCoreRead(supabase.rpc('get_political_wall_projection',{p_game_id:gameId})),
     loadCachedParties()
    ]);
+   if(!readActive(ticket))return;
+   let pp:{data:PoliticalPost[]|null;error:unknown};
+   let px:{data:PoliticalPostMedia[]|null;error:unknown};
+   let pl:{data:PoliticalPostFormalLink[]|null;error:unknown};
+   let mh:{data:MetricHistory[]|null;error:unknown};
+   let psh:{data:PartySupportHistory[]|null;error:unknown};
+   let mt:{data:Metric[]|null;error:unknown};
+   if(projection.error&&['PGRST202','42883'].includes(String(projection.error.code||''))){
+    // Compatible only with an absent RPC; no extra requests on overload.
+    const [oldPosts,oldMedia,oldLinks,oldMetrics,oldSupport,oldState]=await Promise.all([
+     supabase.from('political_posts').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
+     supabase.from('political_post_media').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+     supabase.from('political_post_formal_links').select('*').eq('game_id',gameId),
+     supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
+     supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
+     supabase.from('state_metrics').select('*').eq('game_id',gameId).order('sort_order')
+    ]);
+    pp={data:oldPosts.data,error:oldPosts.error};px={data:oldMedia.data,error:oldMedia.error};
+    pl={data:oldLinks.data,error:oldLinks.error};mh={data:oldMetrics.data,error:oldMetrics.error};
+    psh={data:oldSupport.data,error:oldSupport.error};mt={data:oldState.data,error:oldState.error};
+   }else if(projection.error){
+    pp={data:null,error:projection.error};px={data:null,error:projection.error};
+    pl={data:null,error:projection.error};mh={data:null,error:projection.error};
+    psh={data:null,error:projection.error};mt={data:null,error:projection.error};
+   }else{
+    const data=projection.data as {posts?:PoliticalPost[];media?:PoliticalPostMedia[];formal_links?:PoliticalPostFormalLink[];metric_history?:MetricHistory[];support_history?:PartySupportHistory[];metrics?:Metric[]}|null;
+    if(!data||!Array.isArray(data.posts)||!Array.isArray(data.media)||
+       !Array.isArray(data.formal_links)||!Array.isArray(data.metric_history)||
+       !Array.isArray(data.support_history)||!Array.isArray(data.metrics)){
+     setError('Не удалось получить политическую ленту.');return;
+    }
+    pp={data:data.posts,error:null};px={data:data.media,error:null};
+    pl={data:data.formal_links,error:null};mh={data:data.metric_history,error:null};
+    psh={data:data.support_history,error:null};mt={data:data.metrics,error:null};
+   }
    if(!readActive(ticket))return;
    requireSuccessful([pp,px,pl,mh,psh,mt,pa]);
    if(readCurrent(ticket,'political')){
