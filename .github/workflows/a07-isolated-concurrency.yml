@@ -1,4 +1,4 @@
-name: A07 isolated PostgreSQL concurrency
+name: A07 isolated PostgreSQL concurrency (40 and 100)
 
 on:
   pull_request:
@@ -11,24 +11,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: a07-100-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  forty-concurrent-actions:
-    runs-on: ubuntu-latest
-    timeout-minutes: 8
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ci-only-password
-          POSTGRES_DB: a07_fixture
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d a07_fixture"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 12
+  atomic-impact-100:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Install PostgreSQL client if missing
@@ -37,7 +27,17 @@ jobs:
             sudo apt-get update -qq
             sudo apt-get install -y -qq postgresql-client
           fi
-      - name: Verify 40 isolated concurrent metric and party increments
+      - name: Start disposable PostgreSQL with room for 100 client sessions
+        run: |
+          docker run --rm -d --name gos-a07-disposable -p 127.0.0.1:5432:5432 \
+            -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=ci-only-password \
+            -e POSTGRES_DB=a07_fixture postgres:17 -c max_connections=160
+          for attempt in $(seq 1 60); do
+            if docker exec gos-a07-disposable pg_isready -U postgres -d a07_fixture; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: 'Verify atomic effects: 40 and 100 independent actions; 100 same-source retries'
         env:
           PGHOST: 127.0.0.1
           PGPORT: '5432'
@@ -45,3 +45,6 @@ jobs:
           PGPASSWORD: ci-only-password
           PGDATABASE: a07_fixture
         run: node scripts/impact-concurrency-postgres-check.cjs
+      - name: Remove disposable PostgreSQL
+        if: always()
+        run: docker rm -f gos-a07-disposable || true

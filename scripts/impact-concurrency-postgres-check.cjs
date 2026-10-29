@@ -1,5 +1,5 @@
 /* A07: Test the actual deployed apply_post_effects source against an EPHEMERAL
- * PostgreSQL service with 40 independent client connections.
+ * PostgreSQL service with 40 and 100 independent client connections.
  * Never use a real Supabase URL; this script intentionally permits localhost only.
  */
 'use strict';
@@ -15,7 +15,7 @@ const game='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const party='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
 const actor='cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 const postId=n=>'00000000-0000-4000-8000-'+n.toString(16).padStart(12,'0');
-const plan=JSON.stringify({metrics:{beta:1,alpha:1},party_support:{[party]:1}});
+const plan=JSON.stringify({metrics:{beta:1,alpha:1},party_support:{[party]:0.1}});
 const migration=fs.readFileSync('supabase/migrations/20261025003300_lock_concurrent_impact_metric_updates.sql','utf8');
 const a=migration.indexOf('CREATE OR REPLACE FUNCTION private.apply_post_effects(');
 const b=migration.indexOf('CREATE OR REPLACE FUNCTION private.apply_rule_effects(',a+1);
@@ -48,7 +48,7 @@ const setup=[
  functionSql,
  "INSERT INTO public.state_metrics(game_id,metric_key,value) VALUES ('"+game+"','alpha',10),('"+game+"','beta',50);",
  "INSERT INTO public.game_parties(id,game_id,support) VALUES ('"+party+"','"+game+"',10);",
- "INSERT INTO public.political_posts(id,game_id,effects_applied,title,impact_plan) VALUES "+Array.from({length:40},(_,i)=>row(postId(i+1))).join(',')+';'
+ "INSERT INTO public.political_posts(id,game_id,effects_applied,title,impact_plan) VALUES "+Array.from({length:140},(_,i)=>row(postId(i+1))).join(',')+';'
 ].join('\n');
 
 async function snapshot(){
@@ -64,14 +64,19 @@ async function parallel(ids){
  await sql(setup);
  const ms40=await parallel(Array.from({length:40},(_,i)=>postId(i+1)));
  let observed=await snapshot();
- assert.deepEqual(observed,{alpha:50,beta:90,support:50,history:40,applied:40},
+ assert.deepEqual(observed,{alpha:50,beta:90,support:14,history:40,applied:40},
  '40 distinct concurrent confirmed effects must all count exactly once');
- const repeatId=postId(41);
- await sql("INSERT INTO public.political_posts(id,game_id,effects_applied,title,impact_plan) VALUES "+row(repeatId)+";");
- const msRetry=await parallel(Array.from({length:40},()=>repeatId));
+ // Keep support below its production 0–100 clamp, so lost increments remain observable.
+ const ms100=await parallel(Array.from({length:100},(_,i)=>postId(i+41)));
  observed=await snapshot();
- assert.deepEqual(observed,{alpha:51,beta:91,support:51,history:41,applied:41},
- '40 parallel retries of ONE decision must change state exactly once');
- console.log('PASS isolated PostgreSQL: 40 distinct sessions: '+ms40+'ms; 40 same-source retries: '+msRetry+'ms; 0 lost/duplicate increments');
- console.log('Note: Test uses actual apply_post_effects PL/pgSQL and simplified data/history fixtures; it is NOT 40 authenticated users on live Supabase');
+ assert.deepEqual(observed,{alpha:150,beta:190,support:24,history:140,applied:140},
+ '100 distinct concurrent confirmed effects must preserve every increment and history row');
+ const repeatId=postId(141);
+ await sql("INSERT INTO public.political_posts(id,game_id,effects_applied,title,impact_plan) VALUES "+row(repeatId)+";");
+ const msRetry=await parallel(Array.from({length:100},()=>repeatId));
+ observed=await snapshot();
+ assert.deepEqual(observed,{alpha:151,beta:191,support:24.1,history:141,applied:141},
+ '100 parallel retries of ONE decision must change metrics and support exactly once');
+ console.log('PASS isolated PostgreSQL: 40 distinct sessions: '+ms40+'ms; 100 distinct sessions: '+ms100+'ms; 100 same-source retries: '+msRetry+'ms; 0 lost/duplicate increments');
+ console.log('Note: Actual apply_post_effects PL/pgSQL with simplified data/history fixtures; NOT 100 independent JWT, Supabase HTTP, Realtime, or live users.');
 })().catch(e=>{console.error(e);process.exitCode=1});
