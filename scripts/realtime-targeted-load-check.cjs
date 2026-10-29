@@ -27,7 +27,7 @@ async function checks(){
  assert.equal(after.started.games,before.started.games,'A valid document delta cannot reload game identity');
  const registry=after.queryLog.slice(before.queryLog.length).filter(q=>q.table==='rpc:get_formal_registry_projection');
  assert.equal(registry.length,1,'One scoped RPC replaces two direct document/history reads');
- assert.deepEqual(registry[0].ins.document_ids,['new'],'Fetch only changed document/history rows');
+ assert.equal(JSON.stringify(registry[0].ins.document_ids),JSON.stringify(['new']),'Fetch only changed document/history rows');
  assert.equal(after.started['rpc:get_formal_registry_projection']-before.started['rpc:get_formal_registry_projection'],1,'Exactly one registry request');
  assert.equal(h.render().formalDocuments.length,2);assert.equal(h.render().formalHistory.length,2,'Unchanged history is retained');
  const old=h.hold('formal_registry');const earlier=h.render().refreshDocuments('new');await tick();
