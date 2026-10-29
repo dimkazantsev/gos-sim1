@@ -63,22 +63,47 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  async function readFeed(includeCount:boolean,background:boolean){
   const current=()=>scopeCurrent()&&(!background||document.visibilityState==='visible');
   if(!game||!me||!current())return;
-  // Assigned cases belong to the active feed. The large unassigned bank
-  // is intentionally fetched only by the bottom disclosure on demand.
-  // Project only the fields consumed by this feed. RLS still determines
-  // which game rows are visible; no read cache is shared across identities.
-  const [b,c,d,e,f]=await Promise.all([
-   supabase.from('event_assignments').select('id,case_id,game_id,recipient_id,status,created_at').eq('game_id',game.id),
-   supabase.from('event_decisions').select('id,case_id,actor_id,choice,role_snapshot').eq('game_id',game.id),
-   supabase.from('event_case_outcomes').select('case_id,winner,trust_delta,votes_count,assignments_count,media_post_id,requested_trust_delta,resolution_kind').eq('game_id',game.id),
-   supabase.from('event_collaboration_invites').select('id,case_id,inviter_id,recipient_id,status').eq('game_id',game.id),
-   supabase.from('event_authority_evidence').select('decision_id,case_id,actor_id,authority_ok,lawful,strategy_point,role_snapshot,legal_basis').eq('game_id',game.id)
-  ]);
+  // One SQL-statement read projection, under the RLS of every table.
+  // The unassigned case bank is intentionally not included.
+  const projection=await supabase.rpc('get_event_workspace_projection',{
+   p_game_id:game.id,p_include_ready_count:includeCount
+  });
   if(!current())return;
-  const error=[b,c,d,e,f].find(r=>r.error)?.error;
-  if(error){setNotice(userError(error));return}
-  const assignedRows=(b.data||[]) as Assignment[];
-  const invitedRows=(e.data||[]) as EventInvitation[];
+  let snapshot:{
+   assignments:Assignment[];decisions:Decision[];outcomes:Outcome[];
+   invitations:EventInvitation[];authority:Authority[];ready_case_count:number|null;
+  };
+  if(projection.error){
+   // Rolling schema deployment compatibility only. Never amplify overload.
+   if(!['PGRST202','42883'].includes(String(projection.error.code||''))){
+    setNotice(userError(projection.error));return;
+   }
+   const [b,c,d,e,f]=await Promise.all([
+    supabase.from('event_assignments').select('id,case_id,game_id,recipient_id,status,created_at').eq('game_id',game.id),
+    supabase.from('event_decisions').select('id,case_id,actor_id,choice,role_snapshot').eq('game_id',game.id),
+    supabase.from('event_case_outcomes').select('case_id,winner,trust_delta,votes_count,assignments_count,media_post_id,requested_trust_delta,resolution_kind').eq('game_id',game.id),
+    supabase.from('event_collaboration_invites').select('id,case_id,inviter_id,recipient_id,status').eq('game_id',game.id),
+    supabase.from('event_authority_evidence').select('decision_id,case_id,actor_id,authority_ok,lawful,strategy_point,role_snapshot,legal_basis').eq('game_id',game.id)
+   ]);
+   if(!current())return;
+   const error=[b,c,d,e,f].find(r=>r.error)?.error;
+   if(error){setNotice(userError(error));return}
+   snapshot={
+    assignments:(b.data||[]) as Assignment[],decisions:(c.data||[]) as Decision[],
+    outcomes:(d.data||[]) as Outcome[],invitations:(e.data||[]) as EventInvitation[],
+    authority:(f.data||[]) as Authority[],ready_case_count:null
+   };
+  }else{
+   const data=projection.data as typeof snapshot|null;
+   if(!data||!Array.isArray(data.assignments)||!Array.isArray(data.decisions)||
+      !Array.isArray(data.outcomes)||!Array.isArray(data.invitations)||
+      !Array.isArray(data.authority)){
+    setNotice('Не удалось получить состояние событий.');return;
+   }
+   snapshot=data;
+  }
+  const assignedRows=snapshot.assignments;
+  const invitedRows=snapshot.invitations;
   const caseIds=[...new Set([...assignedRows.map(a=>a.case_id),...invitedRows.map(v=>v.case_id)])];
   if(caseIds.length){
    const result=await supabase.rpc('list_visible_event_cases',{p_game_id:game.id,p_case_ids:caseIds});
@@ -104,12 +129,17 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     }
    }else setCaseRegions({});
   }else {setCases([]);setCaseRegions({})}
-  setInvitations(invitedRows);setAuthority((f.data||[]) as Authority[]);
-  setAssignments(assignedRows);setDecisions((c.data||[]) as Decision[]);setOutcomes((d.data||[]) as Outcome[]);
+  setInvitations(invitedRows);setAuthority(snapshot.authority);
+  setAssignments(assignedRows);setDecisions(snapshot.decisions);setOutcomes(snapshot.outcomes);
   if(includeCount){
-   const result=await supabase.from('event_cases').select('id',{head:true,count:'exact'}).eq('game_id',game.id).eq('status','ready');
-   if(!current())return;
-   if(!result.error)setReadyCaseCount(result.count??0);
+   if(snapshot.ready_case_count!==null&&Number.isFinite(snapshot.ready_case_count)){
+    setReadyCaseCount(snapshot.ready_case_count);
+   }else if(projection.error){
+    // The older schema has no server-projected count.
+    const result=await supabase.from('event_cases').select('id',{head:true,count:'exact'}).eq('game_id',game.id).eq('status','ready');
+    if(!current())return;
+    if(!result.error)setReadyCaseCount(result.count??0);
+   }
   }
  }
  async function reload(includeCount=false,background=false){
