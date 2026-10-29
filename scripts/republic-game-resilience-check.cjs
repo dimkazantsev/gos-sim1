@@ -174,15 +174,30 @@ async function main(){
   assert.equal(h.assetStats().signed,first.signed,'Unchanged Storage paths must reuse session-scoped signed URLs');
   h.dispose();
  });
- await check('Initial game hydration caps its fifteen core requests at four parallel requests per client',async()=>{
+ await check('Initial game hydration reuses the authorised roster across fourteen core reads',async()=>{
   const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
   const start=source.indexOf('async function loadCoreSections()'),end=source.indexOf('async function hydrateActiveView(',start);
   assert(start>=0&&end>start);
-  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,13);
+  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,12);
+  assert(!source.slice(start,end).includes(".eq('user_id',uid).maybeSingle()"),'Core must not duplicate the member roster REST read');
+  assert(source.slice(start,end).includes('row.user_id===uid&&row.game_id===gameId'),'Member must still be selected within the authenticated game');
   assert(source.slice(start,end).includes('loadCachedParties()'),'One core table uses a shared cache, with its query still queue-limited');
   assert(source.includes("const request=limitedCoreRead(supabase.from('game_parties')"),'Party reads preserve four-slot limiter');
-  assert(source.slice(start,end).includes('loadMemberRoster()'),'The fifteenth core request uses the shared, concurrency-limited roster reader');
+  assert(source.slice(start,end).includes('loadMemberRoster()'),'The roster remains shared, concurrency-limited and RLS-authorised');
   assert(source.includes('coreReadQueue.current.active<4'));
+ });
+ await check('40 simultaneous fresh clients avoid 40 duplicate member reads without mixing identities',async()=>{
+  const clients=Array.from({length:40},()=>harness({effects:true}));
+  try{
+   await Promise.all(clients.map(h=>h.settle()));
+   for(const [index,h] of clients.entries()){
+    assert.equal(h.readCount('game_members'),2,'Client '+index+' needs one identity RPC and only one roster read');
+    assert.equal(h.render().me.user_id,'teacher-a');
+    assert.equal(h.render().members.length,1);
+   }
+   assert.equal(clients.reduce((sum,h)=>sum+h.readCount('game_members'),0),80,
+    'Forty clients save forty redundant PostgREST reads per initial hydration');
+  }finally{clients.forEach(h=>h.dispose());}
  });
  await check('100 simulated players submit one presence plus one navigation event in one network call',async()=>{
   const clients=Array.from({length:100},()=>harness());
