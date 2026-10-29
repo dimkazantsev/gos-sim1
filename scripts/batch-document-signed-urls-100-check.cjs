@@ -77,7 +77,7 @@ function fixture(opts={}){
  const group=await sign(mixed,second.options);
  assert.deepEqual(second.requests.map(q=>q.bucket),['teacher-assets']);
  assert.equal(second.singles.length,1,'Single ordinary game-assets path retains existing per-file request');
- assert.deepEqual(group.map(r=>r.url),[
+ assert.deepEqual(Array.from(group,r=>r.url),[
   'batch:teacher-assets/game-1/confidential/one.pdf',
   'single:game-1/public/two.pdf',
   'batch:teacher-assets/game-1/confidential/three.pdf'
