@@ -126,6 +126,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
     <div className="teacherResetDialogTop"><span className="teacherResetWarningIcon"><ShieldAlert size={24} aria-hidden="true"/></span><button type="button" className="teacherResetClose" aria-label="Закрыть" onClick={()=>setDeleteDocumentId(null)} disabled={deletingDocument}><X size={18}/></button></div>
     <h2 id="party-document-delete-title">Удалить документ?</h2>
     <p id="party-document-delete-desc">{docLabels[documentToDelete.doc_kind]||'Дополнительный документ'} · {partyDocumentVersionLabel(documentToDelete)}. Документ исчезнет из досье и списка участников. Решения и сведения об удалении сохранятся в служебном журнале. Для повторной подачи потребуется загрузить новую версию.</p>
+    {documentDeleteNotice&&!documentDeleteNotice.success&&<p className="teacherResetError" role="alert">{g.error||documentDeleteNotice.message}</p>}
     <div className="teacherResetDialogActions"><button type="button" className="teacherResetCancel" disabled={deletingDocument} onClick={()=>setDeleteDocumentId(null)}>Отмена</button><button type="button" className="teacherResetConfirm" disabled={deletingDocument} onClick={()=>void removeDocument()}><Trash2 size={16} aria-hidden="true"/>{deletingDocument?'Удаление…':'Удалить документ'}</button></div>
    </section>
   </div>}
