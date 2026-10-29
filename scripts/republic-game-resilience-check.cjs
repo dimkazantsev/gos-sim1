@@ -79,15 +79,19 @@ function harness({effects=false,compiledCode=code}={}){
     const broken=bundled.find(table=>failures.has(table));
     if(broken)return{data:null,error:{message:'simulated read outage '+broken,code:failureCodes.get(broken)||'PGRST123'},status:400};
     const game={id,current_round:snapshot.revision,title:'revision-'+snapshot.revision};
+    const fixtureRows=(table,defaults)=>{
+     if(!fixtures.has(table))return defaults;
+     return JSON.parse(JSON.stringify(fixtures.get(table))).filter(row=>row.game_id===id);
+    };
     return{data:{
-     game,metrics:[{id:'metric',game_id:id,value:snapshot.revision}],events:[],
-     channels:[{id:'channel-a',game_id:id,name:'Общий чат',kind:'public'}],
-     stages:[],votes:withBallots?[{id:'vote',game_id:id}]:[],
-     evaluations:withBallots?[{id:'evaluation-'+snapshot.revision,user_id:snapshot.user}]:[],
-     crises:withBallots?[{id:'crisis-'+snapshot.revision,game_id:id}]:[],
-     documents:withBallots?[{id:'document-'+snapshot.revision,game_id:id,created_by:snapshot.user}]:[],
-     profiles:assetPaths?[{game_id:id,user_id:snapshot.user,avatar_path:'teacher-assets/'+snapshot.user+'/avatar-fixture.webp',signature_path:'teacher-assets/'+snapshot.user+'/signature-fixture.png'}]:[],
-     formal_documents:[]
+     game,metrics:fixtureRows('state_metrics',[{id:'metric',game_id:id,value:snapshot.revision}]),events:fixtureRows('game_events',[]),
+     channels:fixtureRows('chat_channels',[{id:'channel-a',game_id:id,name:'Общий чат',kind:'public'}]),
+     stages:fixtureRows('game_stages',[]),votes:fixtureRows('game_votes',withBallots?[{id:'vote',game_id:id}]:[]),
+     evaluations:fixtureRows('game_evaluations',withBallots?[{id:'evaluation-'+snapshot.revision,user_id:snapshot.user}]:[]),
+     crises:fixtureRows('game_crises',withBallots?[{id:'crisis-'+snapshot.revision,game_id:id}]:[]),
+     documents:fixtureRows('game_documents',withBallots?[{id:'document-'+snapshot.revision,game_id:id,created_by:snapshot.user}]:[]),
+     profiles:fixtureRows('game_profiles',assetPaths?[{game_id:id,user_id:snapshot.user,avatar_path:'teacher-assets/'+snapshot.user+'/avatar-fixture.webp',signature_path:'teacher-assets/'+snapshot.user+'/signature-fixture.png'}]:[]),
+     formal_documents:fixtureRows('formal_documents',[])
     },error:null,status:200};
    }
    if(name==='get_my_game_identity'){
@@ -212,7 +216,7 @@ async function main(){
    await Promise.all(clients.map(h=>h.settle()));
    for(const h of clients){
     assert.equal(h.rpcCount('get_game_bootstrap_v2'),1,'One grouped read per client');
-    assert.equal(h.readCount('state_metrics'),0,'Legacy metrics read is skipped');
+    assert.equal(h.readCount('state_metrics'),1,'Dashboard still independently loads metric history; core no longer adds a second direct read');
     assert.equal(h.readCount('formal_documents'),0,'Legacy document feed read is skipped');
     assert.equal(h.render().teacher,true);
     assert.equal(h.render().game.id,'game-a');
