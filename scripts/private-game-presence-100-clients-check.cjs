@@ -42,7 +42,72 @@ async function verifyRls(){
    await db.exec('set role authenticated');
    return db.query('insert into realtime.messages(topic,event,payload,extension,private) values($1,$2,$3,$4,true)',[room,'presence',JSON.stringify({connected:true}),extension]);
   }
-  for(let n=1;n<=102;n++)await send(n,topic,'presence');
+  try{await send(1,topic,'presence')}
+  catch(error){
+   const details=await db.query("select current_user, auth.uid() as current_uid, realtime.topic() as current_topic, private.is_game_member($1::uuid) as member, (realtime.topic() ~ '^gos-id-live:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
+  await assert.rejects(send(1,topic,'broadcast'),error=>error.code==='42501','Broadcast must remain denied');
+  await assert.rejects(send(1,'gos-id-live:'+other,'presence'),error=>error.code==='42501','Other game denied');
+  await assert.rejects(send(103,topic,'presence'),error=>error.code==='42501','Foreign member denied');
+  await assert.rejects(send(null,topic,'presence'),error=>error.code==='42501','No JWT denied');
+  await assert.rejects(send(1,'gos-id-live:not-a-uuid','presence'),error=>error.code==='42501','Malformed topic denied');
+  await db.exec('reset role');
+  const messages=(await db.query('select topic,extension,payload,private from realtime.messages')).rows;
+  assert.equal(messages.length,102);
+  assert(messages.every(row=>row.topic===topic&&row.extension==='presence'&&row.private));
+  assert(messages.every(row=>JSON.stringify(row.payload)==='{"connected":true}'),'Never leak user data in presence');
+  console.log('PASS: server RLS for 100 players, teacher and observer; foreign game, anon and client Broadcast denied');
+ }finally{await db.close()}
+}
+async function verifyClients(){
+ const N=100,tabs=Array.from({length:N},(_,i)=>{const h=harness({effects:true});h.setUser('student-'+i);return h});
+ try{
+  await Promise.all(tabs.map(h=>h.settle()));
+  for(const h of tabs){
+   const c=h.channelsInfo();assert.equal(c.length,1,'Only existing private channel, no second WebSocket');
+   assert.equal(c[0].private,true);
+   assert.equal(c[0].tracked,1,'One track after authenticated subscription');
+   assert.equal(c[0].untracked,0);
+   assert.deepEqual(c[0].presencePayloads,[{connected:true}],'No identity, view or private content');
+  }
+  const before=tabs.map(h=>h.stats().requests);
+  await Promise.all(tabs.map(h=>h.advance(60000)));
+  assert(tabs.every((h,i)=>h.stats().requests>=before[i]),'Existing background work remains intact');
+  assert(tabs.every(h=>h.channelsInfo()[0].tracked===1),'No repeated track on stage updates or heartbeat timers');
+  tabs.forEach(h=>h.visible('hidden'));
+  await Promise.all(tabs.map(h=>h.settle()));
+  assert(tabs.every(h=>h.channelsInfo()[0].untracked===1),'Hidden tabs untrack');
+  tabs.forEach(h=>h.visible('visible'));
+  await Promise.all(tabs.map(h=>h.settle()));
+  assert(tabs.every(h=>h.channelsInfo()[0].tracked===2),'Returning tabs track exactly once');
+  tabs.forEach(h=>h.channelStatus('CHANNEL_ERROR'));
+  await Promise.all(tabs.map(h=>h.settle()));
+  tabs.forEach(h=>h.channelStatus('SUBSCRIBED'));
+  await Promise.all(tabs.map(h=>h.settle()));
+  assert(tabs.every(h=>h.channelsInfo()[0].tracked===3),'Reconnect retries once, without extra channel');
+  assert(tabs.every(h=>h.channelsInfo().length===1));
+  for(const h of tabs){
+   assert.equal(h.rpcCount('record_my_game_presence'),0,'Network presence does not generate SQL heartbeat');
+  }
+  console.log('PASS: 100 synthetic tabs; 1 private channel; track once, hidden untrack, restored reconnect; no extra RPC');
+ }finally{tabs.forEach(h=>h.dispose())}
+ const failed=harness({effects:true});
+ try{
+  failed.failPresenceTrack();
+  await failed.settle();
+  assert.equal(failed.channelsInfo()[0].tracked,1);
+  await failed.advance(30000);
+  assert.equal(failed.channelsInfo()[0].tracked,1,'Rejected track cannot cause a retry storm');
+  failed.visible('hidden');await failed.settle();
+  failed.visible('visible');await failed.settle();
+  assert.equal(failed.channelsInfo()[0].tracked,2,'Explicit focus can retry after failure');
+ }finally{failed.dispose()}
+}
+(async()=>{await verifyRls();await verifyClients()})().catch(error=>{console.error(error);process.exitCode=1});
+) as valid_topic",[game]);
+   console.error('Synthetic SQL policy diagnostics:',details.rows);
+   throw error;
+  }
+  for(let n=2;n<=102;n++)await send(n,topic,'presence');
   await assert.rejects(send(1,topic,'broadcast'),error=>error.code==='42501','Broadcast must remain denied');
   await assert.rejects(send(1,'gos-id-live:'+other,'presence'),error=>error.code==='42501','Other game denied');
   await assert.rejects(send(103,topic,'presence'),error=>error.code==='42501','Foreign member denied');
