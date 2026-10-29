@@ -43,6 +43,38 @@ function readableBillIssue(issue:string){
   .replace('Профильный комитет не завершил мотивированное заключение','Профильный комитет ещё не зафиксировал итоговое заключение');
 }
 
+type HistoricalRevisionHeader={id:string;revision:number;title:string;created_at:string};
+function HistoricalRevisionItem({revision,documentId,canRestore,onRestore}:{revision:HistoricalRevisionHeader;documentId:string;canRestore:boolean;onRestore:(title:string,body:string,revision:number)=>void}){
+ const [opened,setOpened]=useState(false),[body,setBody]=useState<string|null>(null),[loading,setLoading]=useState(false),[error,setError]=useState('');
+ const cached=useRef<string|null>(null),pending=useRef<Promise<string|null>|null>(null),active=useRef(true);
+ useEffect(()=>{active.current=true;return()=>{active.current=false}},[]);
+ function fetchRevisionText():Promise<string|null>{
+  if(cached.current!==null)return Promise.resolve(cached.current);
+  if(pending.current)return pending.current;
+  setLoading(true);setError('');
+  const request=Promise.resolve(supabase.from('formal_document_revisions').select('body_text').eq('document_id',documentId).eq('id',revision.id).maybeSingle())
+   .then(({data,error:readError})=>{
+    if(readError)throw readError;
+    if(!data)throw new Error('Редакция недоступна.');
+    const value=data.body_text||'';
+    cached.current=value;
+    if(active.current)setBody(value);
+    return value;
+   })
+   .catch(readError=>{if(active.current)setError(userError(readError));return null})
+   .finally(()=>{pending.current=null;if(active.current)setLoading(false)});
+  pending.current=request;
+  return request;
+ }
+ return <article><div><b>Редакция {revision.revision}</b><time>{fmtDateTime(revision.created_at)}</time></div><h3>{revision.title}</h3>
+  <details onToggle={e=>{setOpened(e.currentTarget.open);if(e.currentTarget.open)void fetchRevisionText()}}>
+   <summary>Показать текст редакции</summary>
+   {opened&&<p>{loading?'Загрузка текста редакции…':error||body||'Текст отсутствует'}</p>}
+  </details>
+  {canRestore&&<button type="button" className="secondary" disabled={loading} onClick={()=>void fetchRevisionText().then(value=>{if(value!==null&&active.current)onRestore(revision.title,value,revision.revision)})}>Использовать текст в новой редакции</button>}
+ </article>;
+}
+
 export default function DocumentsView({g,focusId,createTemplate,createStageNo,onOpenVotes,onSelectDocument,onOpenBudget,readOnly=false,initialDetailTab='text'}:{g:ReturnTypeRepublic;initialDetailTab?:'text'|'procedure';focusId?:string;createTemplate?:string;createStageNo?:number;onOpenVotes:(voteId?:string)=>void;onSelectDocument?:(id?:string)=>void;onOpenBudget?:()=>void;readOnly?:boolean}){
  const {formalDocuments,formalHistory,votes,members,me,teacher,currentStage,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,createVote}=g;
  const signedAsset=useMemo(()=>createScopedSignedAssetCache(async path=>{
@@ -59,7 +91,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const [editing,setEditing]=useState(false),[editTitle,setEditTitle]=useState(''),[editBody,setEditBody]=useState('');
  const [documentAccess,setDocumentAccess]=useState<DocumentAccess|null>(null),[accessError,setAccessError]=useState(''),[editNote,setEditNote]=useState(''),[editRevision,setEditRevision]=useState(1);
  const activeRoles=useMemo(()=>(g.officeAssignments||[]).filter(o=>o.user_id===me?.user_id&&o.status==='active').map(o=>o.role_title),[g.officeAssignments,me?.user_id]);
- const [subjectPermissions,setSubjectPermissions]=useState<string[]|null>(null),[revisions,setRevisions]=useState<{id:string;revision:number;title:string;body_text:string|null;created_at:string}[]>([]);
+ const [subjectPermissions,setSubjectPermissions]=useState<string[]|null>(null),[revisions,setRevisions]=useState<HistoricalRevisionHeader[]>([]);
  const [billProfile,setBillProfile]=useState<BillProfile|null>(null),[billFiles,setBillFiles]=useState<BillFile[]>([]),[billConclusion,setBillConclusion]=useState<BillConclusion|null>(null),[billReadiness,setBillReadiness]=useState<BillReadiness|null>(null);
  const [billFinancial,setBillFinancial]=useState(false),[billGovernmentOpinion,setBillGovernmentOpinion]=useState(false),[billCommittee,setBillCommittee]=useState(''),[billRepresentative,setBillRepresentative]=useState(''),[billNote,setBillNote]=useState('');
  const [billFileKind,setBillFileKind]=useState('explanatory_note'),[billFile,setBillFile]=useState<File|null>(null),[billReviewNote,setBillReviewNote]=useState<Record<string,string>>({}),[billDossierOpen,setBillDossierOpen]=useState(false);
@@ -124,7 +156,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   setCommitteeRapporteur('');setCommitteeLegal('');setCommitteeLogic('');setCommitteeActs('');setCommitteeRecommendation('draft');
   setBudgetReview(null);setBudgetDocsOk(false);setBudgetDistributed(false);setBudgetAccounts(false);setBudgetConclusion('');setBudgetDecision('draft');setBudgetReviewNote('');
  },[selected?.id,editorScope]);
- useEffect(()=>{setDocumentAccess(null);setAccessError('');if(!selected?.id)return;let active=true;void Promise.all([supabase.rpc('get_formal_document_tools',{p_document_id:selected.id}),supabase.from('formal_document_revisions').select('id,revision,title,body_text,created_at').eq('document_id',selected.id).order('revision',{ascending:false})]).then(([a,r])=>{if(!active)return;if(a.error)setAccessError(userError(a.error));else setDocumentAccess(a.data as DocumentAccess);if(!r.error)setRevisions(r.data||[])});return()=>{active=false}},[selected?.id,selected?.updated_at,localRefresh,editorScope]);
+ useEffect(()=>{setDocumentAccess(null);setAccessError('');setRevisions([]);if(!selected?.id)return;let active=true;void Promise.all([supabase.rpc('get_formal_document_tools',{p_document_id:selected.id}),supabase.from('formal_document_revisions').select('id,revision,title,created_at').eq('document_id',selected.id).order('revision',{ascending:false})]).then(([a,r])=>{if(!active)return;if(a.error)setAccessError(userError(a.error));else setDocumentAccess(a.data as DocumentAccess);if(!r.error)setRevisions(r.data||[])});return()=>{active=false}},[selected?.id,selected?.updated_at,localRefresh,editorScope]);
  useEffect(()=>{
   if(!selected?.id){setDocumentSignatures([]);return}
   let current=true;
@@ -719,7 +751,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
      </section>}
     <details className="surface formalHistoryDisclosure"><summary className="formalHistorySummary"><div className="formalHistorySummaryMain"><div><small>Журнал действий</small><h2>История изменений</h2></div><span className="formalHistoryCount">{history.length} записей</span></div><span className="formalHistoryChevron" aria-hidden="true"><ChevronDown size={18}/></span></summary><div className="formalHistoryBody"><div className="formalLinkedVotes">{votes.filter(v=>v.formal_document_id===selected.id).map(v=><button type="button" key={v.id} onClick={()=>onOpenVotes(v.id)}><b>{v.title}</b><span>{v.status==='open'?'Голосование открыто':v.result_label||'Голосование завершено'}</span></button>)}</div><div>{history.length?history.map(h=><div className="formalHistoryRow" key={h.id}><span/><div><time>{fmtDateTime(h.created_at)}</time><b>{h.action}</b><small>{h.actor_id?members.find(m=>m.user_id===h.actor_id)?.full_name||'Участник':'Система'}{h.note?' · '+h.note:''}</small></div></div>):<div className="emptyState">История пока пуста.</div>}</div></div></details>
     <CivicDiscussion key={selected.id} kind="document" targetId={selected.id} g={g} readOnly={readOnly}/>
-    {revisions.length>0&&<details className="documentRevisionList"><summary>Предыдущие редакции · {revisions.length}</summary>{revisions.map(r=><article key={r.id}><div><b>Редакция {r.revision}</b><time>{fmtDateTime(r.created_at)}</time></div><h3>{r.title}</h3><details><summary>Показать текст редакции</summary><p>{r.body_text||'Текст отсутствует'}</p></details>{canEditSelected&&!editing&&<button type="button" className="secondary" onClick={()=>{setEditTitle(r.title);setEditBody(r.body_text||'');setEditNote('Восстановлен текст редакции '+r.revision);setEditRevision(Number(selected.metadata?.revision||1));setEditing(true)}}>Использовать текст в новой редакции</button>}</article>)}</details>}
+    {revisions.length>0&&<details className="documentRevisionList"><summary>Предыдущие редакции · {revisions.length}</summary>{revisions.map(r=><HistoricalRevisionItem key={r.id} revision={r} documentId={selected.id} canRestore={canEditSelected&&!editing} onRestore={(title,body,revision)=>{if(selectedDocument.current!==selected.id)return;setEditTitle(title);setEditBody(body);setEditNote('Восстановлен текст редакции '+revision);setEditRevision(Number(selected.metadata?.revision||1));setEditing(true)}}/>)}</details>}
    </>}</article>
   </section>}
 
