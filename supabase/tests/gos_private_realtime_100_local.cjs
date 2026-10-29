@@ -16,6 +16,8 @@ function localOnly(value){
 const url=localOnly(api);
 const anon=process.env.SUPABASE_ANON_KEY,service=process.env.SUPABASE_SERVICE_ROLE_KEY;
 assert(anon&&service&&process.env.GOS_PRIVATE_QA==='LOCAL-100','Local ephemeral credentials and explicit QA guard required');
+const qaDuration=Number(process.env.GOS_PRIVATE_SUSTAIN_SECONDS||0);
+assert(qaDuration===0||qaDuration===1200,'Sustained private QA must be disabled or exactly 20 minutes');
 const password='Gos-Private-QA-only-2026!';
 const gameId='a7b00000-0000-4000-8000-000000000100';
 const otherGameId='a7b00000-0000-4000-8000-000000000200';
@@ -85,6 +87,94 @@ async function waitForAll(items,count){
  const missing=items.filter(c=>c.received<count).length;
  throw Error('Production party-documents Broadcast missing on '+missing+'/'+items.length+' authorised private channels');
 }
+// Stage 9 is an isolated sustained private channel trial, not a full-game benchmark.
+// Exactly 100 separate student JWTs, with 102 permitted private WS connections.
+async function runSustainedPrivate(students,authorised){
+ const studentItems=studentClients;
+ const sleepUntil=async desired=>await sleep(Math.max(0,desired-Date.now()));
+ const registeredQuestion={id:991001,topic:'Local QA',question:'Presence read probe',
+  options:['Yes','No'],correct_index:0,legal_act:'QA only',article:'QA',
+  source_url:'https://example.invalid/qa',explanation:'Local synthetic probe only',verified:true};
+ let response=await admin.from('blitz_questions').insert(registeredQuestion);
+ if(response.error)throw Error('QA question fixture: '+response.error.message);
+ response=await admin.from('blitz_assignments').insert(students.map(person=>({
+  game_id:gameId,user_id:person.id,question_id:991001,stage_no:1,
+  available_at:new Date().toISOString()
+ })));
+ if(response.error)throw Error('QA assignment fixture: '+response.error.message);
+ const latencies=[],stats={reads:0,bytes:0,broadcasts:0,receipts:0,reconnections:0,readErrors:0,presenceTracks:0};
+ const start=Date.now();
+ let detached=[];
+ const connected=()=>studentItems.filter(item=>!!item.channel);
+ async function verifyRoundBroadcast(expected){
+  const baseline=new Map(expected.map(item=>[item,item.received]));
+  const result=await admin.from('party_documents').insert({game_id:gameId,status:'submitted'});
+  if(result.error)throw Error('Local private Broadcast producer: '+result.error.message);
+  const deadline=Date.now()+12000;
+  while(Date.now()<deadline){
+   if(expected.every(item=>item.received>baseline.get(item)))break;
+   await sleep(100);
+  }
+  const missing=expected.filter(item=>item.received<=baseline.get(item)).length;
+  assert.equal(missing,0,'Private Broadcast missed '+missing+'/'+expected.length+' active JWT channels');
+  stats.broadcasts++;
+  stats.receipts+=expected.length;
+ }
+ for(let minute=0;minute<20;minute++){
+  await sleepUntil(start+minute*60000);
+  if(minute===8){
+   detached=studentItems.slice(50);
+   await Promise.all(detached.map(async item=>{
+    assert(item.channel,'Expected active channel before planned outage');
+    await item.client.removeChannel(item.channel);
+    item.channel=null;
+   }));
+   assert.equal(connected().length,50,'Half of student channels intentionally disconnected');
+  }
+  if(minute===10){
+   const joins=await batch(detached,10,item=>subscribe(item));
+   assert(joins.every(x=>x.status==='SUBSCRIBED'),'All 50 clients must reconnect');
+   const tracked=await batch(detached,10,item=>item.channel.track({connected:true}));
+   assert(tracked.every(status=>status==='ok'),'Presence recovery after reconnect failed');
+   stats.reconnections=detached.length;stats.presenceTracks+=tracked.length;
+   detached=[];
+  }
+  const active=connected();
+  assert.equal(active.length,minute===8||minute===9?50:100);
+  // At most one authenticated REST read per connected student per minute.
+  // Each RLS-scoped request must return precisely that student's own row.
+  const reads=await Promise.all(active.map(async item=>{
+   const t=performance.now();
+   const value=await item.client.from('blitz_assignments').select('id,user_id').eq('user_id',item.person.id);
+   const elapsed=performance.now()-t;
+   return {item,value,elapsed};
+  }));
+  for(const {item,value,elapsed} of reads){
+   if(value.error||value.data?.length!==1||value.data[0]?.user_id!==item.person.id){
+    stats.readErrors++;
+    throw Error('Local authenticated RLS read failed during minute '+minute);
+   }
+   stats.reads++;latencies.push(elapsed);
+   stats.bytes+=Buffer.byteLength(JSON.stringify(value.data),'utf8');
+  }
+  if(minute%2===0)await verifyRoundBroadcast([...active, ...authorised.slice(100)]);
+  console.log('LOCAL_PRIVATE_MINUTE '+JSON.stringify({
+   minute:minute+1,studentReadCount:stats.reads,connectedStudents:active.length,
+   completedBroadcasts:stats.broadcasts,receipts:stats.receipts,errors:stats.readErrors
+  }));
+ }
+ await sleepUntil(start+1200*1000);
+ assert.equal(stats.reads,1900,'100 JWTs × 20 minutes minus 50 × 2-minute outage');
+ assert.equal(stats.broadcasts,10,'Only 10 bounded writes on disposable local document fixture');
+ assert.equal(stats.reconnections,50);
+ assert.equal(stats.readErrors,0);
+ assert.equal(stats.receipts,920,'Expected 8 × 102 + 2 × 52 private receipts');
+ console.log(JSON.stringify({status:'PASS',environment:'disposable local Supabase',
+  scenario:'20-minute 100-user private Realtime + RLS reads + offline recovery',
+  ...stats,read_latency:percentiles(latencies),
+  scope:'Actual local JWT, RLS and WS, not production, 16-stage actions or 100 human players'}));
+}
+
 async function main(){
  await preflight();
  const students=await batch(Array.from({length:100},(_,i)=>i+1),10,i=>createPerson(i,'student'));
@@ -125,6 +215,7 @@ async function main(){
   type:'broadcast',event:'qa_client_not_authorised',payload:{table:'none'}
  });
  assert.notEqual(deniedBroadcast,'ok','A student must not gain server-only Broadcast publishing rights');
+ if(qaDuration)await runSustainedPrivate(students,authorised);
  console.log(JSON.stringify({
   status:'PASS',environment:'disposable local Supabase with real Auth and Realtime',
   students:100,teacher:1,guest:1,foreign_denied:rejected.status,
