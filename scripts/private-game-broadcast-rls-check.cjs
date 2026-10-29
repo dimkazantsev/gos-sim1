@@ -61,7 +61,7 @@ async function sqlTest(){
   assert.equal(await role(43,'gos-id-live:'+another),1,'Foreign game teacher sees only own topic');
   assert.equal(await role(null),0,'Unsigned client blocked');
   assert.equal(await role(1,'gos-id-live:not-a-uuid'),0,'Malformed topic denied without cast error');
-  assert.equal(await role(1,topic,'anon'),0,'Anonymous Postgres role blocked');
+  await assert.rejects(role(1,topic,'anon'),e=>e.code==='42501','Anonymous Postgres role lacks SELECT');
   console.log('PASS: SQL: 40 students, teacher, guest, other game, anon, malformed topic; 4 private metadata-only triggers');
  }finally{await db.close()}
 }
