@@ -178,6 +178,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   saveProfile:blocked as typeof g.saveProfile,
   saveSignature:blocked as typeof g.saveSignature,
   savePartyIdentity:blocked as typeof g.savePartyIdentity,
+  renameParty:blocked as typeof g.renameParty,
   uploadPartyDocument:blocked as typeof g.uploadPartyDocument,
   reviewPartyDocument:blocked as typeof g.reviewPartyDocument,
   createFormalDocument:blockedNull as typeof g.createFormalDocument,
