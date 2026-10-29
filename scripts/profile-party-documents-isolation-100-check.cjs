@@ -49,6 +49,9 @@ function client(){
   readSafely:async(scopes,reader)=>{scopeCalls.push(scopes);await reader({})},
   readCurrent:()=>true,requireSuccessful:()=>{},
   signedAssetUrl:async(bucket,objectPath)=>{signs.push({bucket,objectPath});return 'signed://'+objectPath},
+  // This route-isolation fixture models signing results; the separate batch test
+  // exercises the actual grouped Storage API and URL/path matching.
+  signedDocumentLinks:async rows=>rows.map(row=>{signs.push({bucket:'game-assets',objectPath:row.path});return {...row,url:'signed://'+row.path}}),
   setError:error=>errors.push(error),
   setPartyDocuments:fn=>{documents=fn(documents)},
   setProfiles:fn=>{profiles=fn(profiles)},
