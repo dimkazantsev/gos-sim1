@@ -193,11 +193,11 @@ async function main(){
   assert.equal(h.assetStats().signed,first.signed,'Unchanged Storage paths must reuse session-scoped signed URLs');
   h.dispose();
  });
- await check('Initial game hydration makes five direct reads plus one bundled RPC under four-slot limit',async()=>{
+ await check('Initial game hydration makes five core reads including one bundled RPC under four-slot limit',async()=>{
   const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
   const start=source.indexOf('async function loadCoreSections()'),end=source.indexOf('async function hydrateActiveView(',start);
   assert(start>=0&&end>start);
-  assert.equal((source.slice(start,end).match(/limitedCoreRead\\(/g)||[]).length,3);
+  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,3);
   assert(source.includes("supabase.rpc('get_game_bootstrap_v2'"),'Server-side RLS bundle replaces eleven HTTP requests');
   assert(source.includes("function readLegacyBootstrap()"),'Absent-schema fallback remains available');
   assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Personal membership stays independent of full roster');
