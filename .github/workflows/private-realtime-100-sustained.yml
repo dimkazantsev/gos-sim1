@@ -1,0 +1,75 @@
+name: ГОС.ID · Шаг 9: 100 приватных Auth/Realtime-сессий 20 минут
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/private-realtime-100-sustained.yml'
+      - 'supabase/tests/gos_private_realtime_100_local.cjs'
+permissions:
+  contents: read
+concurrency:
+  group: gos-private-sustained-100-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  private-100-sustained:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GOS_PRIVATE_QA: LOCAL-100
+      GOS_PRIVATE_SUSTAIN_SECONDS: '1200'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Check local-only runner syntax
+        run: node --check supabase/tests/gos_private_realtime_100_local.cjs
+      - name: Verify production private Presence policy in isolated PGlite
+        run: node scripts/private-game-presence-100-clients-check.cjs
+      - uses: supabase/setup-cli@v3
+        with:
+          version: latest
+      - name: Create fresh disposable local Supabase
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gos-private-100-ci
+          cd /tmp/gos-private-100-ci
+          supabase init
+          supabase start -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Use local-only Supabase credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-private-100-ci
+          while IFS='=' read -r key value; do
+            value="${value#\"}"
+            value="${value%\"}"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(
+            supabase status -o env \
+              --override-name api.url=SUPABASE_URL \
+              --override-name auth.anon_key=SUPABASE_ANON_KEY \
+              --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY
+          )
+      - name: Install actual game Realtime policies and trigger only in local stack
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-private-100-ci
+          DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\(.*\)"$/\1/p')"
+          test -n "$DB_URL"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_setup.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_disposable_guard.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/private_realtime_100_local_setup.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261029180000_private_game_broadcast_documents.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261029200000_private_room_presence_track.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
+          sleep 2
+      - name: Verify 100 real private JWTs for 20 minutes, 10 Broadcast rounds and reconnect
+        run: node supabase/tests/gos_private_realtime_100_local.cjs
+      - name: Destroy disposable local instance
+        if: always()
+        run: |
+          cd /tmp/gos-private-100-ci || exit 0
+          supabase stop --no-backup
