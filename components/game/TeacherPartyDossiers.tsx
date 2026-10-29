@@ -30,6 +30,23 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
   }
   finally{setReviewingId('')}
  }
+ const [deleteDocumentId,setDeleteDocumentId]=useState<string|null>(null);
+ const [deletingDocument,setDeletingDocument]=useState(false);
+ const [documentDeleteNotice,setDocumentDeleteNotice]=useState<{success:boolean;message:string}|null>(null);
+ const documentToDelete=partyDocuments.find(d=>d.id===deleteDocumentId);
+ const deleteDocumentDialogRef=useDialog(!!documentToDelete,()=>{if(!deletingDocument)setDeleteDocumentId(null)});
+ async function removeDocument(){
+  if(!documentToDelete||deletingDocument)return;
+  setDeletingDocument(true);
+  const result=await g.deletePartyDocument(documentToDelete.id);
+  setDeletingDocument(false);
+  if(result.deleted){
+   setDocumentDeleteNotice({success:!result.storageWarning,message:result.storageWarning||'Документ удалён из регистрационного досье.'});
+   setDeleteDocumentId(null);
+  }else{
+   setDocumentDeleteNotice({success:false,message:'Документ не удалён. Проверьте сообщение об ошибке.'});
+  }
+ }
  const [notice,setNotice]=useState('');
  const [error,setError]=useState('');
  const target=parties.find(p=>p.id===selected);
@@ -46,6 +63,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
  if(!teacher)return null;
  return <section className="teacherPartyDossiers" aria-label="Расширенные партийные досье">
   <header className="teacherPartyDossierHead"><div><small>ПОЛНОЕ ДОСЬЕ</small><h2>Партии, руководство и регистрация</h2><p>Председателя избирают члены партии. Преподавателю доступно резервное переназначение и рассмотрение регистрационных документов.</p></div><span>{parties.length} партий</span></header>
+  {documentDeleteNotice&&<p className={'civicPartyInviteFeedback '+(documentDeleteNotice.success?'isSuccess':'isError')} role={documentDeleteNotice.success?'status':'alert'}>{documentDeleteNotice.message}</p>}
   <div className="teacherPartyDossierGrid">{parties.length===0?<div className="journalEmpty">Партии пока не созданы.</div>:parties.map(p=>{
    const staff=members.filter(m=>m.kind==='student'&&m.team===p.name);
    const leader=members.find(m=>m.user_id===p.leader_user_id);
@@ -78,6 +96,10 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
          <button type="button" className="primary" disabled={!!reviewingId} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Проверка…':'Принять'}</button>
          <button type="button" className="secondary" disabled={!!reviewingId} aria-expanded={revisionFor===d.id} onClick={()=>{setRevisionFor(previous=>previous===d.id?null:d.id);setReviewNotice(null)}}>На доработку</button>
         </div>:<span className={'partyDossierDocState'+(d.status==='revision'?' isRevision':'')}>{partyDocumentVerdict(d)}</span>}
+        <button type="button" className="partyDossierDocDelete" title={p.registration_status==='registered'?'Документы зарегистрированной партии защищены от удаления':'Удалить документ'}
+         aria-label={'Удалить '+(docLabels[d.doc_kind]||'документ')+' '+partyDocumentVersionLabel(d)}
+         disabled={!!reviewingId||deletingDocument||p.registration_status==='registered'}
+         onClick={()=>{setDeleteDocumentId(d.id);setDocumentDeleteNotice(null)}}><Trash2 size={16} aria-hidden="true"/></button>
         {d.url?<a className="partyDossierDocOpen" href={d.url} target="_blank" rel="noreferrer" title={'Открыть '+(docLabels[d.doc_kind]||'Дополнительный документ')} aria-label={'Открыть '+(docLabels[d.doc_kind]||'Дополнительный документ')+' '+partyDocumentVersionLabel(d)}><ExternalLink size={16}/></a>:null}
        </div>
        {revisionFor===d.id&&canReview&&<div className="partyDossierRevisionEditor">
@@ -99,6 +121,15 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
    </article>;
   })}</div>
   {notice&&<p className="teacherPartyNotice" role="status">{notice}</p>}
+  {documentToDelete&&<div className="teacherResetBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!deletingDocument)setDeleteDocumentId(null)}}>
+   <section ref={deleteDocumentDialogRef} tabIndex={-1} role="alertdialog" aria-modal="true" aria-labelledby="party-document-delete-title" aria-describedby="party-document-delete-desc" className="teacherResetDialog">
+    <div className="teacherResetDialogTop"><span className="teacherResetWarningIcon"><ShieldAlert size={24} aria-hidden="true"/></span><button type="button" className="teacherResetClose" aria-label="Закрыть" onClick={()=>setDeleteDocumentId(null)} disabled={deletingDocument}><X size={18}/></button></div>
+    <h2 id="party-document-delete-title">Удалить документ?</h2>
+    <p id="party-document-delete-desc">{docLabels[documentToDelete.doc_kind]||'Дополнительный документ'} · {partyDocumentVersionLabel(documentToDelete)}. Документ исчезнет из досье и списка участников. Решения и сведения об удалении сохранятся в служебном журнале. Для повторной подачи потребуется загрузить новую версию.</p>
+    {documentDeleteNotice&&!documentDeleteNotice.success&&<p className="teacherResetError" role="alert">{g.error||documentDeleteNotice.message}</p>}
+    <div className="teacherResetDialogActions"><button type="button" className="teacherResetCancel" disabled={deletingDocument} onClick={()=>setDeleteDocumentId(null)}>Отмена</button><button type="button" className="teacherResetConfirm" disabled={deletingDocument} onClick={()=>void removeDocument()}><Trash2 size={16} aria-hidden="true"/>{deletingDocument?'Удаление…':'Удалить документ'}</button></div>
+   </section>
+  </div>}
   {target&&<div className="teacherResetBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)close()}}>
    <section ref={dialogRef} tabIndex={-1} role="alertdialog" aria-modal="true" aria-labelledby="party-delete-title" aria-describedby="party-delete-desc" className="teacherResetDialog">
     <div className="teacherResetDialogTop"><span className="teacherResetWarningIcon"><ShieldAlert size={24} aria-hidden="true"/></span><button type="button" className="teacherResetClose" aria-label="Закрыть" onClick={close} disabled={busy}><X size={18}/></button></div>
