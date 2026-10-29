@@ -79,7 +79,7 @@ async function main(){
   assert.equal((await get(publicChat)).pins.length,12,'Observer can read public pins');
   await assert.rejects(get(privateChat),e=>e.code==='42501','Observer cannot read private channel');
   await as(43);
-  await assert.rejects(get(publicChat),e=>e.code==='42501','Foreign game's teacher cannot read room');
+  await assert.rejects(get(publicChat),e=>e.code==='42501','Teacher from another game cannot read room');
   await as(null);
   await assert.rejects(get(publicChat),e=>e.code==='42501','No authenticated user');
   await as(null,'anon');
