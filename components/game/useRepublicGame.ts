@@ -743,27 +743,52 @@ export function useRepublicGame(gameId:string){
   await Promise.allSettled(jobs);
  }
 
- async function loadCoreSections(){
-  const uid=authUser.current;
-  if(!uid)return;
-  const ticket=startRead('core','game','stages','votes','members','metrics','profiles','parties','formal','channels');
-  const results=await Promise.all([
+ function readLegacyBootstrap(){
+  // Retained for schema-cache rollout only; never retry on 402, 429 or 5xx.
+  return Promise.all([
    limitedCoreRead(supabase.from('games').select('*').eq('id',gameId).maybeSingle()),
-   limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle()),
    limitedCoreRead(supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label')),
    limitedCoreRead(supabase.from('game_events').select('*').eq('game_id',gameId).order('published_at',{ascending:false}).limit(100)),
-   loadMemberRoster(),
    limitedCoreRead(supabase.from('chat_channels').select('*').eq('game_id',gameId).order('name')),
    limitedCoreRead(supabase.from('game_stages').select('*').eq('game_id',gameId).order('stage_no')),
-   loadCachedParties(),
    limitedCoreRead(supabase.from('game_votes').select('*').eq('game_id',gameId).order('opened_at',{ascending:false})),
    limitedCoreRead(supabase.from('game_evaluations').select('*').eq('game_id',gameId).order('stage_no')),
    limitedCoreRead(supabase.from('game_crises').select('*').eq('game_id',gameId).order('created_at',{ascending:false})),
    limitedCoreRead(supabase.from('game_documents').select('*').eq('game_id',gameId).order('created_at',{ascending:false})),
    limitedCoreRead(supabase.from('game_profiles').select('*').eq('game_id',gameId)),
-   limitedCoreRead(supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false})),
-   limitedCoreRead(supabase.rpc('has_seen_my_intro'))
-  ]).catch(error=>{
+   limitedCoreRead(supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}))
+  ]);
+ }
+ async function loadCoreSections(){
+  const uid=authUser.current;
+  if(!uid)return;
+  const ticket=startRead('core','game','stages','votes','members','metrics','profiles','parties','formal','channels');
+  const results=await (async()=>{
+   // Personal authoritative RLS read is independent of the roster and bundle.
+   const [bundle,m,mb,pa,intro]=await Promise.all([
+    limitedCoreRead(supabase.rpc('get_game_bootstrap_v2',{p_game_id:gameId})),
+    limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle()),
+    loadMemberRoster(),
+    loadCachedParties(),
+    limitedCoreRead(supabase.rpc('has_seen_my_intro'))
+   ]);
+   const fields=['game','metrics','events','channels','stages','votes','evaluations','crises','documents','profiles','formal_documents'] as const;
+   const payload=bundle.data as Record<string,unknown>|null;
+   if(bundle.error||!payload||!fields.every(key=>Object.prototype.hasOwnProperty.call(payload,key))){
+    const status=bundle.status,code=String(bundle.error?.code||'');
+    if([402,429,502,503,504].includes(status)||['PGRST003','57014','42501'].includes(code)){
+     throw bundle.error||new Error('Данные игровой комнаты временно недоступны.');
+    }
+    // Rolling deployment compatibility: do not multiply requests on overload.
+    const legacy=await readLegacyBootstrap();
+    return [legacy[0],m,legacy[1],legacy[2],mb,legacy[3],legacy[4],pa,
+     legacy[5],legacy[6],legacy[7],legacy[8],legacy[9],legacy[10],intro];
+   }
+   const row=(key:typeof fields[number])=>({data:payload[key],error:null});
+   return [row('game'),m,row('metrics'),row('events'),mb,row('channels'),
+    row('stages'),pa,row('votes'),row('evaluations'),row('crises'),
+    row('documents'),row('profiles'),row('formal_documents'),intro];
+  })()catch(error=>{
    if(readCurrent(ticket,'core')){backendRecoveryAfter.current=Date.now()+90000;setError(error)}
    return null;
   });
