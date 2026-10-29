@@ -37,7 +37,7 @@ jobs:
             sleep 1
           done
           exit 1
-      - name: Verify atomic effects: 40 and 100 independent actions; 100 same-source retries
+      - name: 'Verify atomic effects: 40 and 100 independent actions; 100 same-source retries'
         env:
           PGHOST: 127.0.0.1
           PGPORT: '5432'
