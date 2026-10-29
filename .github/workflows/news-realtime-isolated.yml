@@ -1,0 +1,56 @@
+name: News Realtime isolated RLS contract (synthetic)
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/news-realtime-isolated.yml'
+      - 'supabase/tests/news_realtime_fixture.sql'
+      - 'supabase/tests/news_realtime_fixture_check.cjs'
+      - 'supabase/tests/news_realtime_disposable.cjs'
+permissions:
+  contents: read
+jobs:
+  news-realtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node supabase/tests/news_realtime_fixture_check.cjs
+      - uses: supabase/setup-cli@v3
+        with:
+          version: latest
+      - name: Start a physically separate temporary Supabase
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gos-news-realtime-qa
+          cd /tmp/gos-news-realtime-qa
+          supabase init
+          supabase start -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Configure only the disposable fixture
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-news-realtime-qa
+          while IFS='=' read -r key value; do
+            value="${value#\"}"
+            value="${value%\"}"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(supabase status -o env --override-name api.url=SUPABASE_URL --override-name auth.anon_key=SUPABASE_ANON_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY)
+          DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\(.*\)"$/\1/p')"
+          test -n "$DB_URL"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/news_realtime_fixture.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
+          sleep 2
+      - name: Check actual local Auth, RLS and WebSocket delivery
+        env:
+          GOS_NEWS_DISPOSABLE: 'YES'
+        run: node supabase/tests/news_realtime_disposable.cjs
+      - name: Stop disposable Supabase without backups
+        if: always()
+        run: |
+          cd /tmp/gos-news-realtime-qa || exit 0
+          supabase stop --no-backup
