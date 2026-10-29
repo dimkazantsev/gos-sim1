@@ -224,6 +224,8 @@ on:
       - 'supabase/migrations/*fix_vote_office_execute_for_authenticated.sql'
       - 'scripts/party-document-visibility-check.cjs'
       - 'scripts/party-registration-versions-check.cjs'
+      - 'scripts/registered-party-document-admin-check.cjs'
+      - 'supabase/migrations/20261029194000_registered_party_teacher_document_maintenance.sql'
       - 'scripts/party-document-revision-flow-check.cjs'
       - 'scripts/party-document-stage-trigger-check.cjs'
       - 'supabase/migrations/*_party_document_stage_trigger_composite_scope.sql'
@@ -407,6 +409,7 @@ jobs:
       - run: node scripts/party-grades-stage-consistency-check.cjs
       - run: node scripts/party-document-visibility-check.cjs
       - run: node scripts/party-registration-versions-check.cjs
+      - run: node scripts/registered-party-document-admin-check.cjs
       - name: Teacher party rating and support write regression
         run: node scripts/teacher-party-statistics-write-check.cjs
       - name: Student and teacher document revision contract
