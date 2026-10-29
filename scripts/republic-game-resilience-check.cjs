@@ -71,6 +71,17 @@ function harness({effects=false,compiledCode=code}={}){
    requests++;
    started.set('rpc:'+name,(started.get('rpc:'+name)||0)+1);
    if(rpcFailures.has(name))return{data:null,error:{code:rpcFailures.get(name),message:'simulated RPC failure '+name}};
+   if(name==='get_party_representation_projection'){
+    const id=args.p_game_id;
+    const rows=table=>fixtures.has(table)
+     ?JSON.parse(JSON.stringify(fixtures.get(table))).filter(item=>item.game_id===id)
+     :[];
+    return {data:{
+     invitations:rows('party_invitations').sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))),
+     mandates:rows('party_member_mandates'),
+     agreements:rows('party_agreements').sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))
+    },error:null,status:200};
+   }
    if(name==='get_game_bootstrap_v2'){
     const snapshot={revision,user,gameId,memberKind},id=args.p_game_id;
     const num=(counts.get('games')||0)+1;counts.set('games',num);
@@ -230,6 +241,28 @@ async function main(){
   assert(h.readCount('state_metrics')>0,'Older backend uses the existing RLS table read');
   assert.equal(h.render().teacher,true);
   h.dispose();
+ });
+ await check('40 simulated party screens share a single grouped read instead of three independent reads',async()=>{
+  const clients=Array.from({length:40},()=>harness({effects:true}));
+  try{
+   for(const h of clients)h.fixture('party_invitations',[{id:'invite-1',game_id:'game-a',party_id:'party-1',invited_user_id:'teacher-a',status:'pending',created_at:'2026-10-27T00:00:00Z'}]);
+   await Promise.all(clients.map(async h=>{await h.settle();h.render().setActiveView('parties');await h.settle()}));
+   for(const h of clients){
+    assert(h.rpcCount('get_party_representation_projection')>=1,'Party screen fetches one grouped RLS projection');
+    assert.equal(h.readCount('party_invitations'),0);
+    assert.equal(h.readCount('party_member_mandates'),0);
+    assert.equal(h.readCount('party_agreements'),0);
+    assert.equal(h.render().partyInvitations?.length,1,'Existing invitations reach the screen');
+   }
+  }finally{clients.forEach(h=>h.dispose());}
+ });
+ await check('Missing projection allows backwards-compatible reads but overloaded RPC never fans out',async()=>{
+  const old=harness();old.failRpc('get_party_representation_projection','PGRST202');
+  await old.render().refresh();old.render().setActiveView('parties');await old.settle();
+  assert(old.readCount('party_invitations')>=1,'Old schema retains per-table RLS');old.dispose();
+  const down=harness();down.failRpc('get_party_representation_projection','PGRST003');
+  await down.render().refresh();down.render().setActiveView('parties');await down.settle();
+  assert.equal(down.readCount('party_invitations'),0,'No fallbacks on overload');down.dispose();
  });
   await check('100 simulated players submit one presence plus one navigation event in one network call',async()=>{
   const clients=Array.from({length:100},()=>harness());
