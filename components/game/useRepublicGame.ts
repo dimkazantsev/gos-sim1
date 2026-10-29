@@ -1009,13 +1009,36 @@ export function useRepublicGame(gameId:string){
  async function loadPartyRepresentation(refreshParties=true){
   const scopes:ReadScope[]=refreshParties?['partyRepresentation','members','parties']:['partyRepresentation','members'];
   await readSafely(scopes,async ticket=>{
-   const [pi,pm,pa,mb,ag]=await Promise.all([
-    supabase.from('party_invitations').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
-    supabase.from('party_member_mandates').select('*').eq('game_id',gameId),
+   // A single read-only RPC projects the three RLS-scoped collections.
+   // Personal role checks and the existing party/roster cache stay separate.
+   const [projection,pa,mb]=await Promise.all([
+    limitedCoreRead(supabase.rpc('get_party_representation_projection',{p_game_id:gameId})),
     refreshParties?loadCachedParties(true):Promise.resolve({data:null,error:null}),
-    loadMemberRoster(),
-    supabase.from('party_agreements').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
+    loadMemberRoster()
    ]);
+   if(!readActive(ticket))return;
+   let pi:{data:PartyInvitation[]|null;error:unknown};
+   let pm:{data:PartyMandateAllocation[]|null;error:unknown};
+   let ag:{data:PartyAgreement[]|null;error:unknown};
+   if(projection.error&&['PGRST202','42883'].includes(String(projection.error.code||''))){
+    // Only a missing RPC can use the legacy per-table RLS read.
+    const [oldInvites,oldMandates,oldAgreements]=await Promise.all([
+     supabase.from('party_invitations').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
+     supabase.from('party_member_mandates').select('*').eq('game_id',gameId),
+     supabase.from('party_agreements').select('*').eq('game_id',gameId).order('created_at',{ascending:false})
+    ]);
+    pi={data:oldInvites.data,error:oldInvites.error};
+    pm={data:oldMandates.data,error:oldMandates.error};
+    ag={data:oldAgreements.data,error:oldAgreements.error};
+   }else if(projection.error){
+    pi={data:null,error:projection.error};pm={data:null,error:projection.error};ag={data:null,error:projection.error};
+   }else{
+    const payload=projection.data as {invitations?:PartyInvitation[];mandates?:PartyMandateAllocation[];agreements?:PartyAgreement[]}|null;
+    if(!payload||!Array.isArray(payload.invitations)||!Array.isArray(payload.mandates)||!Array.isArray(payload.agreements)){
+     setError('Не удалось получить представительство партий.');return;
+    }
+    pi={data:payload.invitations,error:null};pm={data:payload.mandates,error:null};ag={data:payload.agreements,error:null};
+   }
    if(!readActive(ticket))return;
    if(readCurrent(ticket,'partyRepresentation')){
     if(!pi.error)setPartyInvitations((pi.data||[]) as PartyInvitation[]);else setError(pi.error);

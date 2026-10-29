@@ -101,7 +101,7 @@ function safeRestRead(href:string,method:string){
  // INSERT/UPDATE state (get_budget_pulse, get_fiscal_context,
  // blitz_inbox_counts) and must never be queued or suppressed.
  // Writes, votes, and login identity are never blocked by an overload circuit.
- return /^rpc\/(?:get_event_workspace_projection|get_game_bootstrap_v2|get_section_updates|get_teacher_overview|get_signed_state_program_budget|telegram_status|get_process_actors|get_game_achievements|get_achievement_catalog_counts)$/.test(path);
+ return /^rpc\/(?:get_party_representation_projection|get_event_workspace_projection|get_game_bootstrap_v2|get_section_updates|get_teacher_overview|get_signed_state_program_budget|telegram_status|get_process_actors|get_game_achievements|get_achievement_catalog_counts)$/.test(path);
 }
 function pausedRestResponse(status:402|429){
  const headers:Record<string,string>={'content-type':'application/json','x-gos-local-limit':'1'};
