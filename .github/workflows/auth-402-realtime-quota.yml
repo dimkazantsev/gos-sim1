@@ -40,6 +40,7 @@ on:
       - 'scripts/office-projection-check.cjs'
       - 'scripts/local-traffic-snapshot-check.cjs'
       - 'scripts/rest-overload-circuit-check.cjs'
+      - 'scripts/rest-read-concurrency-100-check.cjs'
       - 'scripts/request-diagnostics-check.cjs'
       - 'lib/localGameSnapshot.ts'
       - 'components/game/DeviceSyncStatus.tsx'
@@ -120,6 +121,7 @@ on:
       - 'scripts/office-projection-check.cjs'
       - 'scripts/local-traffic-snapshot-check.cjs'
       - 'scripts/rest-overload-circuit-check.cjs'
+      - 'scripts/rest-read-concurrency-100-check.cjs'
       - 'scripts/request-diagnostics-check.cjs'
       - 'lib/localGameSnapshot.ts'
       - 'components/game/DeviceSyncStatus.tsx'
@@ -190,6 +192,7 @@ jobs:
       - run: node scripts/local-traffic-snapshot-check.cjs
       - run: node scripts/device-sync-status-check.cjs
       - run: node scripts/rest-overload-circuit-check.cjs
+      - run: node scripts/rest-read-concurrency-100-check.cjs
       - run: node scripts/request-diagnostics-check.cjs
       - run: node scripts/event-workspace-load-check.cjs
       - run: node scripts/election-panels-load-check.cjs
