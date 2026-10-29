@@ -58,7 +58,7 @@ async function login(person){
 }
 async function subscribe(item,target=topic,shouldAllow=true){
  const start=performance.now();
- const channel=item.client.channel(target,{config:{private:true,presence:{key:item.person.id}}});
+ const channel=item.client.channel(target,{config:{private:true,presence:{key:item.person.id},broadcast:{ack:true}}});
  const expected=target===topic;
  channel.on('broadcast',{event:'party_documents_changed'},msg=>{
   if(expected&&msg?.payload?.table==='party_documents')item.received++;
@@ -114,15 +114,17 @@ async function main(){
  const anonDenied=await subscribe(unauth,topic,false);
  const tracks=await batch(authorised,10,item=>item.channel.track({connected:true}));
  assert(tracks.every(status=>status==='ok'),'All 100 players, teacher and guest must track private Presence');
- const deniedBroadcast=await studentClients[0].channel.send({
-  type:'broadcast',event:'qa_client_not_authorised',payload:{table:'none'}
- });
- assert.notEqual(deniedBroadcast,'ok','A student must not gain server-only Broadcast publishing rights');
  // Original production trigger emits only a minimal, table-scoped payload.
  r=await admin.from('party_documents').insert({game_id:gameId,status:'submitted'});
  if(r.error)throw Error('Authorised local document notification failed: '+r.error.message);
  await waitForAll(authorised,1);
  assert.equal(foreign.received,0);
+ // Request an explicit server ACK; otherwise the client may optimistically
+ // report "ok" without checking the INSERT policy.
+ const deniedBroadcast=await studentClients[0].channel.send({
+  type:'broadcast',event:'qa_client_not_authorised',payload:{table:'none'}
+ });
+ assert.notEqual(deniedBroadcast,'ok','A student must not gain server-only Broadcast publishing rights');
  console.log(JSON.stringify({
   status:'PASS',environment:'disposable local Supabase with real Auth and Realtime',
   students:100,teacher:1,guest:1,foreign_denied:rejected.status,
