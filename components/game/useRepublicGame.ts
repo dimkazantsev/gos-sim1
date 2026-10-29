@@ -1069,12 +1069,32 @@ export function useRepublicGame(gameId:string){
 
  async function loadFormalRegistry(ids?:string[]){
   await readSafely(['formal'],async ticket=>{
-   const docs=supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false});
-   const history=supabase.from('formal_document_history').select('*').eq('game_id',gameId).order('created_at',{ascending:false});
-   const [fd,fh]=await Promise.all([
-    limitedCoreRead(ids?docs.in('id',ids):docs),
-    limitedCoreRead(ids?history.in('document_id',ids):history)
-   ]);
+   // One consistent RLS-scoped snapshot, also supporting narrow ID refresh.
+   // Only a missing RPC may use the old two reads during schema rollout.
+   const projection=await limitedCoreRead(supabase.rpc('get_formal_registry_projection',{
+    p_game_id:gameId,p_document_ids:ids??null
+   }));
+   let fd:{data:FormalDocument[]|null;error:unknown};
+   let fh:{data:FormalHistory[]|null;error:unknown};
+   if(projection.error&&['PGRST202','42883'].includes(String(projection.error.code||''))){
+    const docs=supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false});
+    const history=supabase.from('formal_document_history').select('*').eq('game_id',gameId).order('created_at',{ascending:false});
+    const [previousDocuments,previousHistory]=await Promise.all([
+     limitedCoreRead(ids?docs.in('id',ids):docs),
+     limitedCoreRead(ids?history.in('document_id',ids):history)
+    ]);
+    fd={data:(previousDocuments.data||null) as FormalDocument[]|null,error:previousDocuments.error};
+    fh={data:(previousHistory.data||null) as FormalHistory[]|null,error:previousHistory.error};
+   }else if(projection.error){
+    fd={data:null,error:projection.error};fh={data:null,error:projection.error};
+   }else{
+    const payload=projection.data as {documents?:FormalDocument[];history?:FormalHistory[]}|null;
+    if(!payload||!Array.isArray(payload.documents)||!Array.isArray(payload.history)){
+     setError('Не удалось загрузить реестр документов.');return;
+    }
+    fd={data:payload.documents,error:null};
+    fh={data:payload.history,error:null};
+   }
    if(!readCurrent(ticket)){
     if(readActive(ticket)){
      if(ids)for(const id of ids)changedFormalIds.current.add(id);
