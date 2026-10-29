@@ -525,26 +525,30 @@ export function useRepublicGame(gameId:string){
   // The already-private game channel also carries low-frequency Presence.
   // Supabase assigns an ephemeral presence key. Never publish user IDs, roles,
   // names, current pages or other personally identifying game data.
-  let networkPresenceTracked=false,networkPresencePending=false;
+  let networkPresenceTracked=false,networkPresencePending=false,networkPresenceEpoch=0;
   function syncNetworkPresence(){
    if(!currentConnection()||!liveConnected||networkPresencePending)return;
    const shouldTrack=document.visibilityState==='visible';
    if(shouldTrack===networkPresenceTracked)return;
+   const requestEpoch=networkPresenceEpoch;
    networkPresencePending=true;
    let succeeded=false;
    void (shouldTrack?channel.track({connected:true}):channel.untrack())
     .then(result=>{
-     if(!currentConnection()||!liveConnected)return;
+     // An old socket's ACK cannot mark Presence as tracked on a new socket.
+     if(!currentConnection()||!liveConnected||requestEpoch!==networkPresenceEpoch)return;
      if(result!=='ok')return; // Failed joins must not trigger retry loops.
      networkPresenceTracked=shouldTrack;succeeded=true;
     })
     .catch(()=>{/* Offline/browser limitations keep the SQL recovery path. */})
     .finally(()=>{
      networkPresencePending=false;
-     // A tab may have hidden or resurfaced while the request was in flight.
-     // Reconcile once only after a successful request, never spin on failure.
-     if(succeeded&&currentConnection()&&liveConnected&&
-        (document.visibilityState==='visible')!==networkPresenceTracked)syncNetworkPresence();
+     if(!currentConnection()||!liveConnected)return;
+     // Only a changed connection epoch authorises one new attempt after a
+     // stale ACK. An ordinary error must never create a retry storm.
+     if(requestEpoch!==networkPresenceEpoch){syncNetworkPresence();return}
+     if(succeeded&&(document.visibilityState==='visible')!==networkPresenceTracked)
+      syncNetworkPresence();
     });
   }
   setRealtimeState('connecting');
@@ -554,8 +558,12 @@ export function useRepublicGame(gameId:string){
    if(!currentConnection())return;
    channel.subscribe(status=>{
     if(disposed)return;
+    const wasConnected=liveConnected;
     liveConnected=status==='SUBSCRIBED';
-    if(!liveConnected)networkPresenceTracked=false;
+    if(wasConnected&&!liveConnected){
+     networkPresenceEpoch++;
+     networkPresenceTracked=false;
+    }
     setGameRealtimeConnection(gameId,liveConnected);
     if(liveConnected){lastPollAt=Date.now();syncNetworkPresence()}
     setRealtimeState(liveConnected?'connected':'disconnected');
