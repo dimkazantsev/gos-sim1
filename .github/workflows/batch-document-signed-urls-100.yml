@@ -1,0 +1,32 @@
+name: ГОС.ID · Пакетная подпись документов (100 файлов)
+on:
+  pull_request:
+    paths:
+      - 'components/game/signDocumentAssetBatch.ts'
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/batch-document-signed-urls-100-check.cjs'
+      - '.github/workflows/batch-document-signed-urls-100.yml'
+permissions:
+  contents: read
+concurrency:
+  group: gos-storage-sign-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  signed-documents:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Verify 100 documents, RLS fallback and session scope
+        run: node scripts/batch-document-signed-urls-100-check.cjs
+      - name: Verify TypeScript and document regression
+        run: |
+          npm run typecheck
+          node scripts/party-document-visibility-check.cjs
+          node scripts/formal-document-terminal-route-check.cjs
+          node scripts/profile-party-documents-isolation-100-check.cjs
