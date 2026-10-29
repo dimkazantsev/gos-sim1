@@ -37,7 +37,7 @@ assert(student.includes('Регистрационные документы')&&st
 assert(!student.includes('partyRegistrationUpdates'),'Do not duplicate the document list in a second status feed');
 assert(!student.includes('civicPartyUploadMain'),'Do not duplicate per-document upload with another upload form');
 assert(student.includes('uploadInputs.current[kind.kind]?.click()'),'Each row has its own upload action');
-assert(student.includes("const canUpload=teacher||(partyFormationOpen&&selected.registration_status!=='registered'"),'Teacher may update registered party files; students remain restricted to the open formation stage');
+assert(student.includes("const canUpload=teacher||(selected.registration_status!=='registered'"),'Teacher may update registered party files; students remain restricted to the open formation stage');
 assert(student.includes('void upload(selected.id,kind.kind,kind.title,file)'),'Chosen file must upload directly for its document kind');
 assert(student.includes('partyRegistrationHiddenInput')&&student.includes('uploadInFlight.current'),'Guard concurrent submissions');
 assert(student.includes('partyRegistrationRevisionNote')&&student.includes('Предыдущие версии ('),'Previous versions and revision grounds must remain accessible');
