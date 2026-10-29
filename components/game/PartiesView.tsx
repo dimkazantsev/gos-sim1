@@ -33,9 +33,9 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const partyStagePaused=stageOne?.status==='open'&&!partyFormationOpen&&g.game?.status!=='lobby';
  const partyStageBadge=partyStageCompleted?'Этап 01 завершён':partyFormationOpen?'Этап 01 открыт':partyStagePaused?'Этап 01 приостановлен':'Этап 01 ещё не открыт';
  const partyStageNotice=partyStageCompleted
-  ?'Первый этап завершён. Формирование партий и работа с регистрационными документами в рамках этого этапа завершены. Сведения о партиях и результаты доступны для просмотра.'
+  ?(teacher?'Первый этап завершён. Преподаватель может исправлять регистрационные документы независимо от этапа.':'Первый этап завершён. Формирование партий и работа с регистрационными документами в рамках этого этапа завершены. Сведения о партиях и результаты доступны для просмотра.')
   :partyStagePaused
-   ?'Первый этап приостановлен. Изменения временно недоступны. Сведения о партиях и результаты можно просматривать.'
+   ?(teacher?'Первый этап приостановлен. Преподаватель может продолжать актуализацию документов зарегистрированных партий.':'Первый этап приостановлен. Изменения временно недоступны. Сведения о партиях и результаты можно просматривать.')
    :'Первый этап ещё не открыт. Работа с партиями начнётся после его открытия преподавателем. Пока доступны сведения о партиях и результатах.';
  const canCreate=partyFormationOpen&&(!!teacher||(me?.kind==='student'&&!me.team&&!me.roster_archived_at));
  const ranked=useMemo(()=>[...parties].filter(p=>!query.trim()||[p.name,p.ideology,p.description].join(' ').toLowerCase().includes(query.toLowerCase())).sort((a,b)=>b.support-a.support),[parties,query]);
