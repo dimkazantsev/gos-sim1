@@ -1175,13 +1175,28 @@ export function useRepublicGame(gameId:string){
 
  async function loadImpactEngine(){
   await readSafely(['impact'],async ticket=>{
-  const [ir,il]=await Promise.all([
-   supabase.from('impact_rules').select('*').eq('game_id',gameId).order('priority'),
-   supabase.from('impact_ledger').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(500)
-  ]);
-  if(!readCurrent(ticket))return;
-  requireSuccessful([ir,il]);
-  setImpactRules((ir.data||[]) as ImpactRule[]);setImpactLedger((il.data||[]) as ImpactLedger[]);
+   // Read-only projection: one consistent snapshot under each table's original RLS.
+   // All scoring, manual corrections, and mutations remain unchanged.
+   const response=await limitedCoreRead(supabase.rpc('get_impact_engine_projection',{p_game_id:gameId}));
+   if(!readCurrent(ticket))return;
+   if(response.error&&['PGRST202','42883'].includes(String(response.error.code||''))){
+    // Only older schemas may fall back. Never amplify 402/429/5xx.
+    const [ir,il]=await Promise.all([
+     supabase.from('impact_rules').select('*').eq('game_id',gameId).order('priority'),
+     supabase.from('impact_ledger').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(500)
+    ]);
+    if(!readCurrent(ticket))return;
+    requireSuccessful([ir,il]);
+    setImpactRules((ir.data||[]) as ImpactRule[]);setImpactLedger((il.data||[]) as ImpactLedger[]);
+    return;
+   }
+   requireSuccessful([response]);
+   const snapshot=response.data as {rules?:ImpactRule[];ledger?:ImpactLedger[]}|null;
+   if(!snapshot||!Array.isArray(snapshot.rules)||!Array.isArray(snapshot.ledger)){
+    setError('Не удалось получить состояние последствий.');return;
+   }
+   setImpactRules(snapshot.rules);
+   setImpactLedger(snapshot.ledger);
   });
  }
 
