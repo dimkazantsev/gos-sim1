@@ -21,6 +21,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const {parties,members,profiles,partyDocuments,partyInvitations,partyMandates,me,teacher}=g;
  const [selectedId,setSelectedId]=useState(''),[query,setQuery]=useState(''),[description,setDescription]=useState(''),[busy,setBusy]=useState(false),[inviteUser,setInviteUser]=useState(''),[name,setName]=useState(''),[ideology,setIdeology]=useState('');
  const [deletingPartyId,setDeletingPartyId]=useState('');
+ const [renameName,setRenameName]=useState(''),[renameNotice,setRenameNotice]=useState('');
  const uploadInputs=useRef<Partial<Record<PartyDocument['doc_kind'],HTMLInputElement|null>>>({});
  const uploadInFlight=useRef(false);
  const registrationPackageRef=useRef<HTMLDetailsElement>(null);
@@ -48,6 +49,8 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const canInvite=partyFormationOpen&&!!selected&&!!me&&!me.roster_archived_at&&(teacher||me.kind==='student'&&me.team===selected.name);
  const inviteClosed=!!selected?.leader_user_id;
  const workflowCount=partyInvitations.filter(i=>i.game_id===g.game?.id&&i.status==='pending'&&i.invited_user_id===me?.user_id).length;
+ const canRename=!!selected&&!!me&&(teacher||selected.leader_user_id===me.user_id);
+ useEffect(()=>{setRenameName(selected?.name||'');setRenameNotice('')},[selected?.id,selected?.name]);
  useEffect(()=>{if(revisionVersions&&registrationPackageRef.current)registrationPackageRef.current.open=true;},[revisionVersions,selected?.id]);
   // Preparing draft documents is allowed while the party elects its chair.
   // Open once when selecting that party; manual collapse remains possible.
@@ -55,6 +58,14 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
    if(partyFormationOpen&&selected&&!selected.leader_user_id&&selected.registration_status!=='registered'&&registrationPackageRef.current)
     registrationPackageRef.current.open=true;
   },[partyFormationOpen,selected?.id,selected?.leader_user_id,selected?.registration_status]);
+ async function savePartyName(){
+  if(!canRename||!selected||busy||renameName.trim()===selected.name)return;
+  setBusy(true);setRenameNotice('');
+  try{
+   const ok=await g.renameParty(selected.id,renameName);
+   setRenameNotice(ok?'Название партии обновлено. Участники сохранили членство.':'Не удалось изменить название. Проверьте сообщение об ошибке.');
+  }finally{setBusy(false)}
+ }
  async function saveDescription(){if(!selected)return;setBusy(true);try{await g.savePartyIdentity(selected.id,description||selected.description||'')}finally{setBusy(false)}}
  async function saveLogo(file:File):Promise<boolean>{if(!selected)return false;setBusy(true);try{return await g.savePartyIdentity(selected.id,undefined,file)}finally{setBusy(false)}}
  async function upload(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File){
@@ -106,6 +117,14 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
   {selected&&<section className="civicPartyPublic"><header><span className="civicPartyLogo" style={{background:selected.color}}>{selected.logo_url?<img src={selected.logo_url} alt={'Эмблема: '+selected.name}/>:selected.name.slice(0,1)}</span><div><h2>{selected.name}</h2><p>{selected.ideology||'Идеология не указана'}</p></div><span>{statusLabel[selected.registration_status]}</span></header><p className="civicPartyDescription">{selected.description||'Публичное описание пока не опубликовано.'}</p><div className="civicPartyFacts"><span><b>{selected.support}%</b> поддержка</span><span><b>{selected.mandates}</b> мандатов</span><span><b>{staff.length}</b> участников</span></div>
    <div className="civicPartyLeader"><span className="eventVoter"><ProfileAvatar name={leader?.full_name||'Не назначен'} src={profiles.find(p=>p.user_id===leader?.user_id)?.avatar_url}/></span><div><small>Председатель партии</small><b>{leader?.full_name||'Не назначен'}</b></div></div>
    <PartyChairElection g={g} party={selected}/>
+   {canRename&&<details className="civicPartyEditor" data-party-rename>
+    <PartyDisclosureSummary icon={PencilLine} title="Изменить название партии" meta="Доступно председателю партии и преподавателю"/>
+    <label>Название партии
+     <input type="text" value={renameName} maxLength={100} minLength={3} onChange={e=>{setRenameName(e.target.value);setRenameNotice('')}} aria-label="Новое название партии"/>
+    </label>
+    <button className="secondary" type="button" disabled={busy||renameName.trim().length<3||renameName.trim()===selected.name} onClick={()=>void savePartyName()}>{busy?'Сохранение…':'Сохранить название'}</button>
+    {renameNotice&&<p role="status" className="civicPartyInviteFeedback">{renameNotice}</p>}
+   </details>}
    <section className="civicPublicDocs" aria-label="Публичные документы партии"><h3>Публичные документы</h3>
     {publicDocs.length?[...publicDocs].sort((a,b)=>Number(b.doc_kind==='program')-Number(a.doc_kind==='program')).map(d=>{
      const program=d.doc_kind==='program';
