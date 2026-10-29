@@ -17,6 +17,8 @@ on:
       - 'components/game/PartiesView.tsx'
       - 'supabase/migrations/20261029100000_party_rename_process_actor_catalog.sql'
       - 'scripts/event-workspace-load-check.cjs'
+      - 'scripts/event-workspace-projection-rls-check.cjs'
+      - 'supabase/migrations/20261029133000_event_workspace_projection_invoker.sql'
       - 'scripts/election-panels-load-check.cjs'
       - 'scripts/duma-ballot-targeted-load-check.cjs'
       - 'scripts/votes-registration-load-check.cjs'
@@ -104,6 +106,8 @@ on:
       - 'components/game/PartiesView.tsx'
       - 'supabase/migrations/20261029100000_party_rename_process_actor_catalog.sql'
       - 'scripts/event-workspace-load-check.cjs'
+      - 'scripts/event-workspace-projection-rls-check.cjs'
+      - 'supabase/migrations/20261029133000_event_workspace_projection_invoker.sql'
       - 'scripts/election-panels-load-check.cjs'
       - 'scripts/duma-ballot-targeted-load-check.cjs'
       - 'scripts/votes-registration-load-check.cjs'
@@ -209,6 +213,7 @@ jobs:
       - run: node scripts/rest-read-concurrency-100-check.cjs
       - run: node scripts/request-diagnostics-check.cjs
       - run: node scripts/event-workspace-load-check.cjs
+      - run: node scripts/event-workspace-projection-rls-check.cjs
       - run: node scripts/election-panels-load-check.cjs
       - run: node scripts/duma-ballot-targeted-load-check.cjs
       - run: node scripts/votes-registration-load-check.cjs
