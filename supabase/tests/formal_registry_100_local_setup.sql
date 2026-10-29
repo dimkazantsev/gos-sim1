@@ -65,6 +65,10 @@ create policy qa_formal_history_read on public.formal_document_history for selec
   using(private.is_game_member(game_id));
 revoke all on public.formal_documents,public.formal_document_history from public,anon,authenticated;
 grant select on public.formal_documents,public.formal_document_history to authenticated;
+-- The QA private membership helper owns the membership check; direct clients
+-- must not read the unscoped disposable membership table.
+alter table public.game_members enable row level security;
+revoke all on public.game_members from public,anon,authenticated;
 create table public.qa_formal_registry_guard(marker text primary key);
 insert into public.qa_formal_registry_guard values('gos-id-disposable-formal-registry-100-v1');
 revoke all on public.qa_formal_registry_guard from public,anon,authenticated;
