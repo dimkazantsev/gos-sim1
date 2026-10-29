@@ -749,7 +749,6 @@ export function useRepublicGame(gameId:string){
   const ticket=startRead('core','game','stages','votes','members','metrics','profiles','parties','formal','channels');
   const results=await Promise.all([
    limitedCoreRead(supabase.from('games').select('*').eq('id',gameId).maybeSingle()),
-   limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle()),
    limitedCoreRead(supabase.from('state_metrics').select('*').eq('game_id',gameId).order('label')),
    limitedCoreRead(supabase.from('game_events').select('*').eq('game_id',gameId).order('published_at',{ascending:false}).limit(100)),
    loadMemberRoster(),
@@ -768,7 +767,13 @@ export function useRepublicGame(gameId:string){
    return null;
   });
   if(!results)return;
-  const [g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro]=results;
+  const [g,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro]=results;
+  // The roster is already fetched for the game shell. Reuse that exact
+  // authorised response for the current player instead of a second
+  // simultaneous game_members request on every classroom bootstrap.
+  // A missing/denied player still follows the original fail-closed path.
+  const m={data:mb.error?null:((mb.data||[]) as Member[]).find(row=>
+   row.user_id===uid&&row.game_id===gameId)??null,error:mb.error};
   // Store only published presentation data. Roles, answers, votes and private
   // metrics are never persisted on the student's device.
   if(!st.error&&!mt.error&&!ev.error&&authUser.current===uid){
