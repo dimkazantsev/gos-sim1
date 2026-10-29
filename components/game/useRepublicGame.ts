@@ -371,6 +371,9 @@ export function useRepublicGame(gameId:string){
   // Events received while hidden remain dirty and reconcile on return;
   // clearing the flags while hidden would silently lose these updates.
   const resumePending=()=>{
+   // Visibility only changes ephemeral Realtime Presence; the existing
+   // authoritative SQL presence and navigation journal are unchanged.
+   syncNetworkPresence();
    if(document.visibilityState==='visible'&&chatOpenRef.current&&channelRef.current)void markChatRead(channelRef.current);
    if(document.visibilityState==='visible'&&
      (dirtyCore||dirtyTables.size>0||dirtyPartyDocuments||dirtyChat||dirtyPins||dirtyOverview))schedule();
@@ -519,6 +522,31 @@ export function useRepublicGame(gameId:string){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>notifyGameDataRefresh(gameId,table));
   }
   liveRef.current=channel;
+  // The already-private game channel also carries low-frequency Presence.
+  // Supabase assigns an ephemeral presence key. Never publish user IDs, roles,
+  // names, current pages or other personally identifying game data.
+  let networkPresenceTracked=false,networkPresencePending=false;
+  function syncNetworkPresence(){
+   if(!currentConnection()||!liveConnected||networkPresencePending)return;
+   const shouldTrack=document.visibilityState==='visible';
+   if(shouldTrack===networkPresenceTracked)return;
+   networkPresencePending=true;
+   let succeeded=false;
+   void (shouldTrack?channel.track({connected:true}):channel.untrack())
+    .then(result=>{
+     if(!currentConnection()||!liveConnected)return;
+     if(result!=='ok')return; // Failed joins must not trigger retry loops.
+     networkPresenceTracked=shouldTrack;succeeded=true;
+    })
+    .catch(()=>{/* Offline/browser limitations keep the SQL recovery path. */})
+    .finally(()=>{
+     networkPresencePending=false;
+     // A tab may have hidden or resurfaced while the request was in flight.
+     // Reconcile once only after a successful request, never spin on failure.
+     if(succeeded&&currentConnection()&&liveConnected&&
+        (document.visibilityState==='visible')!==networkPresenceTracked)syncNetworkPresence();
+    });
+  }
   setRealtimeState('connecting');
   // A private Realtime topic needs the user's current JWT before joining.
   // Keep the original single game channel and its offline/visible-tab recovery.
@@ -527,8 +555,9 @@ export function useRepublicGame(gameId:string){
    channel.subscribe(status=>{
     if(disposed)return;
     liveConnected=status==='SUBSCRIBED';
+    if(!liveConnected)networkPresenceTracked=false;
     setGameRealtimeConnection(gameId,liveConnected);
-    if(liveConnected)lastPollAt=Date.now();
+    if(liveConnected){lastPollAt=Date.now();syncNetworkPresence()}
     setRealtimeState(liveConnected?'connected':'disconnected');
    });
   }).catch(()=>{
