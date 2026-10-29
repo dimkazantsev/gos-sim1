@@ -10,7 +10,7 @@ assert(source.includes("if(openVotes.length){for(const vote of openVotes)changed
  'Six-second recovery for every voter must remain intact');
 assert(source.includes("chatRecovery=setInterval(recoverVisibleChatAndBallots,6000)"),
  'Keep existing six-second ballot cadence');
-assert(source.includes("officeReadState.current={scope:'',lastSuccessAt:0,inflight:null};"),
+assert(source.includes("officeReadState.current={scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null};"),
  'Game/user resets must clear the office cache');
 const start=source.indexOf(' async function loadRepublicOffices(');
 const end=source.indexOf(' async function loadClassroomTelemetry(',start);
@@ -21,7 +21,8 @@ async function simulateBrowser(index){
  let clock=1000000,requests=0;
  const ctx={
   gameId:'game-1',authUser:{current:'student-'+index},readEpoch:{current:3},
-  officeReadState:{current:{scope:'',lastSuccessAt:0,inflight:null}},
+  officeReadState:{current:{scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null}},
+  PRESENTATION_CACHE_TTL_MS:600000,
   Date:{now:()=>clock},readSafely:async (_scopes,fn)=>fn({}),
   readCurrent:()=>true,requireSuccessful:([r])=>{if(r.error)throw r.error;},
   setOfficeRows:()=>{},
