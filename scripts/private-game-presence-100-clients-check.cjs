@@ -13,7 +13,7 @@ const game=uid(900),other=uid(901),topic='gos-id-live:'+game;
 assert(sql.includes("extension = 'presence'"),'Only Presence extension must be writable');
 assert(!sql.includes("extension in ('presence','broadcast')"),'Cannot grant client Broadcast write');
 assert(sql.includes('private.is_game_member'),'Room membership must remain server-side');
-assert(sql.includes('when realtime.topic() ~'),'Reject malformed room before cast');
+assert(sql.includes('private.is_game_member(substring(realtime.topic() from')&&sql.includes('gos-id-live:([0-9a-f]{8}'),'Regex extraction must reject malformed rooms without throwing');
 assert(hook.includes('channel.track({connected:true})'),'Track minimal anonymous state');
 assert(hook.includes('channel.untrack()'),'Hidden client must cease presence');
 assert(!hook.includes('channel.track({user_id:')&&!hook.includes('channel.track({full_name:'),'Never expose names or identifiers');
@@ -42,28 +42,7 @@ async function verifyRls(){
    await db.exec('set role authenticated');
    return db.query('insert into realtime.messages(topic,event,payload,extension,private) values($1,$2,$3,$4,true)',[room,'presence',JSON.stringify({connected:true}),extension]);
   }
-  try{await send(1,topic,'presence')}
-  catch(error){
-   const cases=[
-    ['extension', "extension = 'presence'"],
-    ['uid', 'auth.uid() is not null'],
-    ['topic', "realtime.topic() like 'gos-id-live:%'"],
-    ['member', 'private.is_game_member(substring(realtime.topic() from 13)::uuid)'],
-    ['extension_member', "extension = 'presence' and private.is_game_member(substring(realtime.topic() from 13)::uuid)"],
-    ['allow_test_only', 'true']
-   ];
-   for(const [name,condition] of cases){
-    await db.exec('reset role');
-    await db.exec('alter policy gos_game_presence_track on realtime.messages with check ('+condition+')');
-    await db.exec('set role authenticated');
-    try{
-     await db.query('insert into realtime.messages(topic,event,payload,extension,private) values($1,$2,$3,$4,true)',[topic,'presence',JSON.stringify({connected:true}),'presence']);
-     console.error('RLS probe '+name+': allowed');
-    }catch(subError){console.error('RLS probe '+name+': '+subError.code)}
-   }
-   throw error;
-  }
-  for(let n=2;n<=102;n++)await send(n,topic,'presence');
+  for(let n=1;n<=102;n++)await send(n,topic,'presence');
   await assert.rejects(send(1,topic,'broadcast'),error=>error.code==='42501','Broadcast must remain denied');
   await assert.rejects(send(1,'gos-id-live:'+other,'presence'),error=>error.code==='42501','Other game denied');
   await assert.rejects(send(103,topic,'presence'),error=>error.code==='42501','Foreign member denied');
