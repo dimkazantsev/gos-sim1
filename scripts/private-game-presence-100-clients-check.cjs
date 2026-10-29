@@ -65,7 +65,7 @@ async function verifyClients(){
    assert.equal(c[0].private,true);
    assert.equal(c[0].tracked,1,'One track after authenticated subscription');
    assert.equal(c[0].untracked,0);
-   assert.deepEqual(c[0].presencePayloads,[{connected:true}],'No identity, view or private content');
+   assert.equal(JSON.stringify(c[0].presencePayloads),'[{"connected":true}]','No identity, view or private content');
   }
   const before=tabs.map(h=>h.stats().requests);
   await Promise.all(tabs.map(h=>h.advance(60000)));
