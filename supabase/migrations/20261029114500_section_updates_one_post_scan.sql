@@ -56,5 +56,4 @@ begin
     +(select count(*) from party_documents where game_id=p_game_id and created_at>t and status <> 'accepted')
    else 0 end
  );
-end $function$
-
+end $function$;
