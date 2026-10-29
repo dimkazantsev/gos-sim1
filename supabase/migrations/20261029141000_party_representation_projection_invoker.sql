@@ -3,12 +3,16 @@
 -- No tables, triggers, materialized stale role data or additional write traffic.
 create or replace function public.get_party_representation_projection(p_game_id uuid)
 returns jsonb
-language sql
+language plpgsql
 stable
 security invoker
 set search_path = ''
 as $function$
- select jsonb_build_object(
+begin
+ if auth.uid() is null or not private.is_game_member(p_game_id) then
+  raise exception 'Нет доступа к игре.' using errcode='42501';
+ end if;
+ return jsonb_build_object(
   'invitations',coalesce((
     select jsonb_agg(to_jsonb(i) order by i.created_at desc)
     from public.party_invitations i where i.game_id=p_game_id
@@ -21,8 +25,8 @@ as $function$
     select jsonb_agg(to_jsonb(a) order by a.created_at desc)
     from public.party_agreements a where a.game_id=p_game_id
   ),'[]'::jsonb)
- )
- where (select auth.uid()) is not null and private.is_game_member(p_game_id)
+ );
+end;
 $function$;
 
 revoke all on function public.get_party_representation_projection(uuid) from public, anon;
