@@ -33,10 +33,6 @@ async function within<T>(promise:PromiseLike<T>,ms=BOOTSTRAP_TIMEOUT_MS,label='Ð
  finally{if(timer)clearTimeout(timer)}
 }
 
-export function shouldReconcileOpenBallots(now:number,lastReadAt:number,memberKind:string|undefined,openVoteCount:number):boolean{
- return openVoteCount>0&&now-lastReadAt>=(memberKind==='teacher'?6000:30000);
-}
-
 export function useRepublicGame(gameId:string){
  const router=useRouter();
  const setError=(value:unknown)=>setErrorRaw(userError(value));
@@ -502,21 +498,17 @@ export function useRepublicGame(gameId:string){
   },30000+pollJitter);
   // Realtime handles unread counters while chat is closed. Full chat recovery
   // runs only for an actively open conversation.
-  let lastChatRecoveryAt=Date.now(),lastBallotRecoveryAt=Date.now();
+  let lastChatRecoveryAt=Date.now();
   const recoverVisibleChatAndBallots=()=>{
    if(document.visibilityState!=='visible'||!currentConnection())return;
    // Ordinary ballots are outside Realtime publication; reconcile only open
    // procedures on their visible screens, using the existing six-second timer.
-   const now=Date.now();
-   if(now>=backendRecoveryAfter.current&&['votes','stages','teacher'].includes(activeViewRef.current)){
+   if(Date.now()>=backendRecoveryAfter.current&&['votes','stages','teacher'].includes(activeViewRef.current)){
     const openVotes=votesRef.current.filter(vote=>vote.status==='open');
-    if(shouldReconcileOpenBallots(now,lastBallotRecoveryAt,me.kind,openVotes.length)){
-     lastBallotRecoveryAt=now;
-     for(const vote of openVotes)changedVoteIds.current.add(vote.id);
-     scheduleRealtimeReload(0,['vote_ballots']);
-    }
+    if(openVotes.length){for(const vote of openVotes)changedVoteIds.current.add(vote.id);scheduleRealtimeReload(0,['vote_ballots'])}
    }
    if(!chatOpenRef.current)return;
+   const now=Date.now();
    // Incoming messages update from the existing authorised Realtime payload.
    // When that socket is healthy, a full chat recovery once per minute is
    // sufficient; when disconnected, preserve the 6s recovery cadence.
