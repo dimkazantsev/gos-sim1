@@ -19,7 +19,7 @@ assert(migration.includes("gm.kind='student'")&&migration.includes("gm.roster_ar
 assert(migration.includes("gm.team=gp.name")&&migration.includes("gp.registration_status<>'registered'"), 'Storage policy must not admit post-registration student uploads');
 assert(olderPolicy.includes('create policy party_documents_delete on public.party_documents for delete to authenticated using(false)'), 'Client DELETE stays blocked');
 assert(!migration.includes('drop policy if exists party_documents_delete'), 'Never expose direct DELETE');
-assert(parties.includes("const canUpload=teacher||(partyFormationOpen&&selected.registration_status!=='registered'"), 'Teacher upload button must bypass deadline');
+assert(parties.includes("const canUpload=teacher||(selected.registration_status!=='registered'"), 'Teacher upload button must bypass deadline');
 assert(parties.includes('disabled={busy||(!teacher&&!partyFormationOpen)}'), 'Student upload button retains stage restriction');
 assert(dossier.includes('disabled={!!reviewingId||deletingDocument}'), 'Teacher delete button must work after registration');
 assert(dossier.includes("const canReview=latest?.id===d.id&&['submitted','draft'].includes(d.status)"), 'Replacement versions still require teacher review');
