@@ -13,6 +13,9 @@ as $member$
     );
 $member$;
 revoke all on function private.is_game_member(uuid) from public,anon,authenticated;
+-- The permission checks evaluate this function as an authenticated client.
+grant usage on schema private to authenticated;
+grant execute on function private.is_game_member(uuid) to authenticated;
 
 create table public.party_documents(
   id uuid primary key default gen_random_uuid(),
