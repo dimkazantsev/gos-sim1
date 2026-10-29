@@ -17,7 +17,15 @@ function harness(){
  };
  const supabase={
   from(){return{select(){return this;},eq(){return this;},order(){return this;},limit(){return this;},then(resolve){return Promise.resolve({data:[],error:null}).then(resolve);}};},
-  rpc:async(name,args)=>{calls.push({name,args});return{data:'fictional-event',error:rpcError};},
+  rpc:async(name,args)=>{
+   // Read projection is not a teacher mutation. The established tests assert
+   // the number/payload of create calls, not unrelated background reads.
+   if(name==='get_event_workspace_projection')return{data:{
+    assignments:[],decisions:[],outcomes:[],invitations:[],authority:[],
+    ready_case_count:args.p_include_ready_count?0:null
+   },error:null};
+   calls.push({name,args});return{data:'fictional-event',error:rpcError};
+  },
   channel(){return{on(){return this;},subscribe(){return this;}};},removeChannel:async()=>{}
  };
  const jsx=(type,props)=>({type,props:props||{}}),tag=name=>Object.assign(()=>{},{displayName:name});
