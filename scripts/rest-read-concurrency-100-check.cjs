@@ -51,20 +51,19 @@ async function exercise(index){
  assert.equal(tabs.reduce((sum,c)=>sum+c.writes,0),100);
  const c=tab(101),url=origin+'/rest/v1/political_posts';
  const abort=new AbortController();
- const jobs=Array.from({length:53},(_,i)=>c.fetch(url+'?i='+i));
+ const jobs=Array.from({length:51},(_,i)=>c.fetch(url+'?i='+i));
  const canceled=c.fetch(url+'?aborted=yes',{signal:abort.signal});
  await settle();
- abort.abort();await settle();
- const reject=await canceled;assert.equal(reject.status,503,'Queued, aborted read must not start');
  const denied=await c.fetch(url+'?overflow=yes');
  assert.equal(denied.status,503,'Bounded waiting queue rejects excess work locally');
  assert.equal(denied.headers.get('x-gos-local-limit'),'1');
  assert.equal(c.count.readStarted,4,'Overload must not cause extra network traffic');
+ abort.abort();await settle();
+ assert.equal((await canceled).status,503,'Queued, aborted read must not start');
  c.unhold();
  while(c.pending.length){c.pending.splice(0).forEach(f=>f());await settle()}
  const result=await Promise.all(jobs);
- assert.equal(result.filter(r=>r.status===200).length,52);
- assert.equal(result.filter(r=>r.status===503).length,1);
- assert.equal(c.count.readStarted,52);
+ assert.equal(result.filter(r=>r.status===200).length,51);
+ assert.equal(c.count.readStarted,51);
  console.log('PASS 100 synthetic clients: <=4 GET/readonly RPC per tab, 1800 responses; Auth/votes bypass; abort and backlog protection; no live load.');
 })().catch(error=>{console.error(error);process.exitCode=1});
