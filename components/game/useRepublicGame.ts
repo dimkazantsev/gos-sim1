@@ -894,13 +894,26 @@ export function useRepublicGame(gameId:string){
 
  async function loadClassroomTelemetry(){
   await readSafely(['telemetry'],async ticket=>{
-  const [al,pr]=await Promise.all([
-   supabase.from('game_activity').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
-   supabase.from('game_presence').select('*').eq('game_id',gameId).order('last_seen_at',{ascending:false})
-  ]);
-  if(!readCurrent(ticket))return;
-  requireSuccessful([al,pr]);
-  setActivities((al.data||[]) as Activity[]);setPresence((pr.data||[]) as Presence[]);
+   // One teacher-only RLS snapshot; no change to presence writes or journal.
+   const projection=await limitedCoreRead(supabase.rpc('get_classroom_telemetry_projection',{p_game_id:gameId}));
+   if(!readCurrent(ticket))return;
+   if(projection.error&&['PGRST202','42883'].includes(String(projection.error.code||''))){
+    // Rolling schema rollout only: do not retry denied or overloaded RPCs.
+    const [al,pr]=await Promise.all([
+     supabase.from('game_activity').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
+     supabase.from('game_presence').select('*').eq('game_id',gameId).order('last_seen_at',{ascending:false})
+    ]);
+    if(!readCurrent(ticket))return;
+    requireSuccessful([al,pr]);
+    setActivities((al.data||[]) as Activity[]);setPresence((pr.data||[]) as Presence[]);
+    return;
+   }
+   requireSuccessful([projection]);
+   const data=projection.data as {activity?:Activity[];presence?:Presence[]}|null;
+   if(!data||!Array.isArray(data.activity)||!Array.isArray(data.presence)){
+    setError('Не удалось получить журнал аудитории.');return;
+   }
+   setActivities(data.activity);setPresence(data.presence);
   });
  }
 
