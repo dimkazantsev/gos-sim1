@@ -12,16 +12,16 @@ assert(core.includes("import {signDocumentAssetBatch} from './signDocumentAssetB
 assert.equal((core.match(/void signedDocumentLinks\(rows/g)||[]).length,2,'Only party and formal registry use the batch helper');
 assert(core.includes("signOne:path=>signedAssetUrl('game-assets',path)"),'Single-file RLS fallback remains in production');
 const js=ts.transpileModule(helper,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-const module={exports:{}};
+const vmModule={exports:{}};
 vm.runInNewContext(js,{
- module,exports:module.exports,Map,Set,Promise,Error,
+ module:vmModule,exports:vmModule.exports,Map,Set,Promise,Error,
  require:moduleName=>{
   assert.equal(moduleName,'@/lib/resolveStoredAsset');
   return{resolveStoredAsset:(bucket,p)=>bucket==='game-assets'&&p.startsWith('teacher-assets/')
    ?{bucket:'teacher-assets',path:p.slice('teacher-assets/'.length)}:{bucket,path:p}};
  }
 },{filename:'signDocumentAssetBatch.js'});
-const sign=module.exports.signDocumentAssetBatch;
+const sign=vmModule.exports.signDocumentAssetBatch;
 const batchSize=20;
 const docs=Array.from({length:100},(_,i)=>({id:'doc-'+i,path:'game-1/parties/p/docs/file-'+i+'.pdf'}));
 const key=(b,p)=>b+':'+p;
