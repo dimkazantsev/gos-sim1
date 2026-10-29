@@ -92,7 +92,8 @@ async function ready(){for(let n=0;n<60;n++){if(server.exitCode!==null)throw Err
    assert.equal(await student.locator('.civicPublicDocument').count(),4);
    const publicProgram=student.locator('.civicPublicDocument').first();
    assert((await publicProgram.getAttribute('class')).includes('civicPartyProgram'));assert((await publicProgram.textContent()).includes('В2'));
-   assert.equal(await student.locator('.partyRegistrationDocActions button').count(),0,'Registered package is locked');
+   assert.equal(await student.locator('.partyRegistrationDocActions button').count(),0,'Registered party remains locked to students');
+    assert(await teacher.locator('.partyDossierDocDelete').first().isEnabled(),'Teacher may remove outdated documents after registration');
    const geometry=await student.evaluate(el=>({viewport:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,cards:[...el.querySelectorAll('.civicPublicDocument')].map(c=>{const r=c.getBoundingClientRect(),style=getComputedStyle(c);return {left:r.left,right:r.right,display:style.display,decoration:style.textDecorationLine,border:style.borderTopWidth}})}));
    assert(geometry.scroll<=geometry.viewport+2,'Student cabinet overflows at '+width+': '+JSON.stringify(geometry));
    for(const c of geometry.cards){assert(c.left>=0&&c.right<=width+1);assert.equal(c.display,'grid');assert.equal(c.decoration,'none');assert.equal(c.border,'1px')}

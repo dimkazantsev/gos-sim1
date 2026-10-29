@@ -35,6 +35,8 @@ async function main(){
   if(!process.argv.includes('--before')){
    const migration=fs.readdirSync('supabase/migrations').find(p=>p.endsWith('_party_asset_upload_path_scope.sql'));
    if(migration)await db.exec(read('supabase/migrations/'+migration));
+   await db.exec('drop policy if exists game_assets_party_insert on storage.objects');
+   await db.exec(policy(read('supabase/migrations/20261029194000_registered_party_teacher_document_maintenance.sql'),'create','game_assets_party_insert'));
   }
   async function asUser(uid,query,args=[],role='authenticated'){
    await db.exec('begin');try{await db.query("select set_config('request.jwt.claim.sub',$1,true)",[uid||'']);await db.exec('set local role '+role);const r=await db.query(query,args);await db.exec('commit');return r}catch(e){await db.exec('rollback');throw e}
@@ -53,9 +55,15 @@ async function main(){
   assert.equal((await asUser(owner,"update storage.objects set metadata='{\"version\":2}' where name=$1 returning name",[logo])).rows.length,1,'Logo upsert checks the actual Storage path');
   await assert.rejects(asUser(owner,'update storage.objects set name=$1 where name=$2',[game+'/parties/'+otherParty+'/logo.png',logo]),/row-level security/);
   await db.query("update game_parties set registration_status='registered' where id=$1",[party]);
-  for(const uid of [owner,teacher])await assert.rejects(insert(uid,doc(party,'after-registration-'+uid+'.pdf')),/row-level security/);
-  assert.equal((await db.query('select count(*)::int as n from storage.objects')).rows[0].n,4,'Rejected uploads leave no metadata');
-  console.log('PASS actual Storage INSERT/UPDATE RLS: own-party JPG/PDF/DOCX, next version, teacher, logo upsert; other party/game, archived, observer, anonymous and registered-party uploads denied.');
+  await assert.rejects(insert(owner,doc(party,'after-registration-student.pdf')),/row-level security/);
+  if(process.argv.includes('--before')){
+   await assert.rejects(insert(teacher,doc(party,'after-registration-teacher.pdf')),/row-level security/);
+   assert.equal((await db.query('select count(*)::int as n from storage.objects')).rows[0].n,4);
+  }else{
+   assert.equal((await insert(teacher,doc(party,'after-registration-teacher.pdf'))).rows.length,1,'Teacher may upload a registered-party replacement');
+   assert.equal((await db.query('select count(*)::int as n from storage.objects')).rows[0].n,5);
+  }
+  console.log('PASS actual Storage INSERT/UPDATE RLS: own-party JPG/PDF/DOCX, authorised teacher post-registration replacement, student/foreign party, archived, observer and anonymous restrictions.');
  }finally{await db.close()}
 }
 main().catch(e=>{console.error(e.message);process.exitCode=1});

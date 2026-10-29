@@ -1986,11 +1986,11 @@ export function useRepublicGame(gameId:string){
   return !!r.data;
  }
 
- async function deletePartyDocument(id:string):Promise<{deleted:boolean;storageWarning?:string}>{
+ async function deletePartyDocument(id:string):Promise<{deleted:boolean;storageWarning?:string;historyRetained?:boolean}>{
   if(!teacher){setError('Удаление документов доступно только преподавателю.');return {deleted:false}}
   const r=await supabase.rpc('teacher_delete_party_document',{p_document_id:id});
   if(r.error){setError(r.error.message);return {deleted:false}}
-  const result=r.data as {deleted?:boolean;storage_path?:string}|null;
+  const result=r.data as {deleted?:boolean;storage_path?:string;historical_file_retained?:boolean}|null;
   if(!result?.deleted){setError('Документ уже удалён или недоступен.');await loadPartyDocuments();return {deleted:false}}
   setPartyDocuments(previous=>previous.filter(doc=>doc.id!==id));
   // DB record and its audit trail are committed before Storage cleanup.
@@ -2001,7 +2001,7 @@ export function useRepublicGame(gameId:string){
   }
   await loadPartyDocuments();
   notifyGameDataRefresh(gameId);
-  return {deleted:true,storageWarning};
+  return {deleted:true,storageWarning,historyRetained:!!result.historical_file_retained};
  }
 
  async function createFormalDocument(data:{stageNo:number;title:string;docType:string;subjectKey:string;subjectLabel:string;bodyText:string;workflowKey:string;metadata?:Record<string,unknown>},file?:File){

@@ -41,7 +41,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
   const result=await g.deletePartyDocument(documentToDelete.id);
   setDeletingDocument(false);
   if(result.deleted){
-   setDocumentDeleteNotice({success:!result.storageWarning,message:result.storageWarning||'Документ удалён из регистрационного досье.'});
+   setDocumentDeleteNotice({success:!result.storageWarning,message:result.storageWarning||(result.historyRetained?'Документ исключён из актуального досье. Историческая копия и запись в журнале сохранены.':'Документ удалён из регистрационного досье.')});
    setDeleteDocumentId(null);
   }else{
    setDocumentDeleteNotice({success:false,message:'Документ не удалён. Проверьте сообщение об ошибке.'});
@@ -85,7 +85,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
     <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы ({docs.length})</h4><p className="partyDossierDocHint">Принимайте документы по одному. При возврате укажите замечания; официальный ответ по регистрационному пакету оформляется ниже.</p>
      {docs.length?<ul>{[...docs].sort((a,b)=>a.doc_kind.localeCompare(b.doc_kind)||(b.version_no??1)-(a.version_no??1)).map(d=>{
       const latest=latestPartyDocument(docs,d.doc_kind);
-      const canReview=latest?.id===d.id&&['submitted','draft'].includes(d.status)&&p.registration_status!=='registered';
+      const canReview=latest?.id===d.id&&['submitted','draft'].includes(d.status);
       return <li key={d.id} className={'partyDossierDocRow'+(d.status==='revision'?' isRevision':'')}>
        <div className="partyDossierDocMain">
         <b>{docLabels[d.doc_kind]||'Дополнительный документ'}</b>
@@ -96,9 +96,9 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
          <button type="button" className="primary" disabled={!!reviewingId} onClick={()=>void review(d.id,'accepted')}>{reviewingId===d.id?'Проверка…':'Принять'}</button>
          <button type="button" className="secondary" disabled={!!reviewingId} aria-expanded={revisionFor===d.id} onClick={()=>{setRevisionFor(previous=>previous===d.id?null:d.id);setReviewNotice(null)}}>На доработку</button>
         </div>:<span className={'partyDossierDocState'+(d.status==='revision'?' isRevision':'')}>{partyDocumentVerdict(d)}</span>}
-        <button type="button" className="partyDossierDocDelete" title={p.registration_status==='registered'?'Документы зарегистрированной партии защищены от удаления':'Удалить документ'}
+        <button type="button" className="partyDossierDocDelete" title="Удалить документ из актуального досье"
          aria-label={'Удалить '+(docLabels[d.doc_kind]||'документ')+' '+partyDocumentVersionLabel(d)}
-         disabled={!!reviewingId||deletingDocument||p.registration_status==='registered'}
+         disabled={!!reviewingId||deletingDocument}
          onClick={()=>{setDeleteDocumentId(d.id);setDocumentDeleteNotice(null)}}><Trash2 size={16} aria-hidden="true"/></button>
         {d.url?<a className="partyDossierDocOpen" href={d.url} target="_blank" rel="noreferrer" title={'Открыть '+(docLabels[d.doc_kind]||'Дополнительный документ')} aria-label={'Открыть '+(docLabels[d.doc_kind]||'Дополнительный документ')+' '+partyDocumentVersionLabel(d)}><ExternalLink size={16}/></a>:null}
        </div>
@@ -125,7 +125,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
    <section ref={deleteDocumentDialogRef} tabIndex={-1} role="alertdialog" aria-modal="true" aria-labelledby="party-document-delete-title" aria-describedby="party-document-delete-desc" className="teacherResetDialog">
     <div className="teacherResetDialogTop"><span className="teacherResetWarningIcon"><ShieldAlert size={24} aria-hidden="true"/></span><button type="button" className="teacherResetClose" aria-label="Закрыть" onClick={()=>setDeleteDocumentId(null)} disabled={deletingDocument}><X size={18}/></button></div>
     <h2 id="party-document-delete-title">Удалить документ?</h2>
-    <p id="party-document-delete-desc">{docLabels[documentToDelete.doc_kind]||'Дополнительный документ'} · {partyDocumentVersionLabel(documentToDelete)}. Документ исчезнет из досье и списка участников. Решения и сведения об удалении сохранятся в служебном журнале. Для повторной подачи потребуется загрузить новую версию.</p>
+    <p id="party-document-delete-desc">{docLabels[documentToDelete.doc_kind]||'Дополнительный документ'} · {partyDocumentVersionLabel(documentToDelete)}. Документ исчезнет из досье и списка участников. Решения и сведения об удалении сохранятся в служебном журнале. Для повторной подачи потребуется загрузить новую версию.{parties.find(p=>p.id===documentToDelete.party_id)?.registration_status==='registered'&&' Исторический файл останется в защищённом архиве, а выданное свидетельство о регистрации сохранится.'}</p>
     {documentDeleteNotice&&!documentDeleteNotice.success&&<p className="teacherResetError" role="alert">{g.error||documentDeleteNotice.message}</p>}
     <div className="teacherResetDialogActions"><button type="button" className="teacherResetCancel" disabled={deletingDocument} onClick={()=>setDeleteDocumentId(null)}>Отмена</button><button type="button" className="teacherResetConfirm" disabled={deletingDocument} onClick={()=>void removeDocument()}><Trash2 size={16} aria-hidden="true"/>{deletingDocument?'Удаление…':'Удалить документ'}</button></div>
    </section>

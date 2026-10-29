@@ -33,9 +33,9 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const partyStagePaused=stageOne?.status==='open'&&!partyFormationOpen&&g.game?.status!=='lobby';
  const partyStageBadge=partyStageCompleted?'Этап 01 завершён':partyFormationOpen?'Этап 01 открыт':partyStagePaused?'Этап 01 приостановлен':'Этап 01 ещё не открыт';
  const partyStageNotice=partyStageCompleted
-  ?'Первый этап завершён. Формирование партий и работа с регистрационными документами в рамках этого этапа завершены. Сведения о партиях и результаты доступны для просмотра.'
+  ?(teacher?'Первый этап завершён. Преподаватель может исправлять регистрационные документы независимо от этапа.':'Первый этап завершён. Формирование партий и работа с регистрационными документами в рамках этого этапа завершены. Сведения о партиях и результаты доступны для просмотра.')
   :partyStagePaused
-   ?'Первый этап приостановлен. Изменения временно недоступны. Сведения о партиях и результаты можно просматривать.'
+   ?(teacher?'Первый этап приостановлен. Преподаватель может продолжать актуализацию документов зарегистрированных партий.':'Первый этап приостановлен. Изменения временно недоступны. Сведения о партиях и результаты можно просматривать.')
    :'Первый этап ещё не открыт. Работа с партиями начнётся после его открытия преподавателем. Пока доступны сведения о партиях и результатах.';
  const canCreate=partyFormationOpen&&(!!teacher||(me?.kind==='student'&&!me.team&&!me.roster_archived_at));
  const ranked=useMemo(()=>[...parties].filter(p=>!query.trim()||[p.name,p.ideology,p.description].join(' ').toLowerCase().includes(query.toLowerCase())).sort((a,b)=>b.support-a.support),[parties,query]);
@@ -69,7 +69,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  async function saveDescription(){if(!selected)return;setBusy(true);try{await g.savePartyIdentity(selected.id,description||selected.description||'')}finally{setBusy(false)}}
  async function saveLogo(file:File):Promise<boolean>{if(!selected)return false;setBusy(true);try{return await g.savePartyIdentity(selected.id,undefined,file)}finally{setBusy(false)}}
  async function upload(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File){
-  if(!partyFormationOpen||!selected||selected.id!==partyId||busy||uploadInFlight.current||selected.registration_status==='registered'||!(teacher||me?.kind==='student'&&!me.roster_archived_at&&me.team===selected.name))return;
+  if(!selected||selected.id!==partyId||busy||uploadInFlight.current||(!teacher&&(!partyFormationOpen||selected.registration_status==='registered'||!(me?.kind==='student'&&!me.roster_archived_at&&me.team===selected.name))))return;
   uploadInFlight.current=true;
   setBusy(true);setDocumentNotice(null);
   try{
@@ -154,7 +154,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
      {DOCS.map(kind=>{
       const current=latestPartyDocument(docs,kind.kind);
       const history=docs.filter(d=>d.doc_kind===kind.kind).sort((a,b)=>(b.version_no??1)-(a.version_no??1)||b.created_at.localeCompare(a.created_at));
-      const canUpload=selected.registration_status!=='registered'&&(teacher||me?.kind==='student'&&!me.roster_archived_at&&me.team===selected.name);
+      const canUpload=teacher||(selected.registration_status!=='registered'&&me?.kind==='student'&&!me.roster_archived_at&&me.team===selected.name);
       const nextVersion=(current?.version_no??0)+1;
       return <article className={"partyRegistrationDoc"+(current?.status==="revision"?" isRevision":"")} key={kind.kind}>
        <div className="partyRegistrationDocTop">
@@ -169,7 +169,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
            accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp"
            ref={node=>{uploadInputs.current[kind.kind]=node}}
            onChange={event=>{const file=event.currentTarget.files?.[0];event.currentTarget.value='';if(file)void upload(selected.id,kind.kind,kind.title,file)}}/>
-          <button type="button" className="secondary" disabled={busy||!partyFormationOpen} aria-label={"Загрузить "+kind.title+" · версия В"+nextVersion} onClick={()=>uploadInputs.current[kind.kind]?.click()}>
+          <button type="button" className="secondary" disabled={busy||(!teacher&&!partyFormationOpen)} aria-label={"Загрузить "+kind.title+" · версия В"+nextVersion} onClick={()=>uploadInputs.current[kind.kind]?.click()}>
            <Upload size={16} aria-hidden="true"/>{busy?"Загрузка…":"Загрузить В"+nextVersion}
           </button>
          </>}

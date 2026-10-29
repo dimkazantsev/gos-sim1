@@ -36,9 +36,9 @@ assert.ok(student.includes('<div className="gosPartyStageFieldset"><JusticeDocum
  'Minjust documents remain clickable for party members after Stage 1 closes');
 assert.ok(!student.includes('<fieldset className="gosPartyStageFieldset" disabled={!partyFormationOpen}>'),
  'A disabled ancestor must not prevent opening previously issued documents');
-assert.ok(student.includes('if(!partyFormationOpen||!selected||selected.id!==partyId'),
- 'Uploading still requires the active party formation stage');
-assert.ok(student.includes('disabled={busy||!partyFormationOpen}'),
- 'Upload buttons remain disabled outside the stage work window');
+assert.ok(student.includes('if(!selected||selected.id!==partyId||busy||uploadInFlight.current||(!teacher&&(!partyFormationOpen'),
+ 'Students remain gated by the active party formation stage, whereas teachers can correct the dossier later');
+assert.ok(student.includes('disabled={busy||(!teacher&&!partyFormationOpen)}'),
+ 'Student upload buttons remain disabled outside the stage work window');
 
 console.log('PASS party documents: teacher hydration, party isolation, student revision notes, orphan separation.');
