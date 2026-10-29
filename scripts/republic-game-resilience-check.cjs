@@ -75,6 +75,9 @@ function harness({effects=false,compiledCode=code}={}){
     const snapshot={revision,user,gameId},id=args.p_game_id;
     const n=(counts.get('political_wall')||0)+1;counts.set('political_wall',n);
     await holds.get('political_wall:'+n)?.promise;
+    // An entire PostgreSQL projection fails if one of its SELECTs fails.
+    const broken=['political_posts','political_post_media','political_post_formal_links','state_metric_history','party_support_history','state_metrics'].find(table=>failures.has(table));
+    if(broken)return{data:null,error:{message:'simulated read outage '+broken,code:failureCodes.get(broken)||'PGRST123'},status:400};
     const fixtureRows=(table,defaults)=>fixtures.has(table)
      ?JSON.parse(JSON.stringify(fixtures.get(table))).filter(row=>row.game_id===id)
      :defaults;
@@ -243,7 +246,7 @@ async function main(){
    await Promise.all(clients.map(h=>h.settle()));
    for(const h of clients){
     assert.equal(h.rpcCount('get_game_bootstrap_v2'),1,'One grouped read per client');
-    assert.equal(h.readCount('state_metrics'),1,'Dashboard still independently loads metric history; core no longer adds a second direct read');
+    assert.equal(h.readCount('state_metrics'),0,'Political wall projection now includes metrics without an extra table read');
     assert.equal(h.readCount('formal_documents'),0,'Legacy document feed read is skipped');
     assert.equal(h.render().teacher,true);
     assert.equal(h.render().game.id,'game-a');
